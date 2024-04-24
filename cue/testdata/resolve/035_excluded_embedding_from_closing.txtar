@@ -75,6 +75,124 @@ Retain: 0
 Unifications: 21
 Conjuncts:    29
 Disjuncts:    21
+-- out/evalalpha --
+Errors:
+V.c.e: field not allowed:
+    ./in.cue:10:5
+V.b.extra: field not allowed:
+    ./in.cue:7:5
+    ./in.cue:11:5
+
+Result:
+(_|_){
+  // [eval]
+  #S: (#struct){
+    a: (#struct){
+      c: (int){ int }
+    }
+    c: (#struct){
+      d: (int){ int }
+    }
+    let B#1 = (#struct){
+      open: (int){ int }
+    }
+    b: (#struct){
+      open: (int){ int }
+    }
+  }
+  V: (_|_){
+    // [eval]
+    c: (_|_){
+      // [eval]
+      e: (_|_){
+        // [eval] V.c.e: field not allowed:
+        //     ./in.cue:10:5
+      }
+      d: (int){ int }
+    }
+    b: (_|_){
+      // [eval]
+      extra: (_|_){
+        // [eval] V.b.extra: field not allowed:
+        //     ./in.cue:7:5
+        //     ./in.cue:11:5
+      }
+      open: (int){ int }
+    }
+    a: (#struct){
+      c: (int){ int }
+    }
+    let B#1 = (#struct){
+      open: (int){ int }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,14 +1,9 @@
+ Errors:
++V.c.e: field not allowed:
++    ./in.cue:10:5
+ V.b.extra: field not allowed:
+-    ./in.cue:6:10
+     ./in.cue:7:5
+-    ./in.cue:9:4
+     ./in.cue:11:5
+-V.c.e: field not allowed:
+-    ./in.cue:3:2
+-    ./in.cue:4:6
+-    ./in.cue:9:4
+-    ./in.cue:10:5
+ 
+ Result:
+ (_|_){
+@@ -29,33 +24,28 @@
+   }
+   V: (_|_){
+     // [eval]
+-    a: (#struct){
+-      c: (int){ int }
+-    }
+     c: (_|_){
+       // [eval]
+-      d: (int){ int }
+       e: (_|_){
+         // [eval] V.c.e: field not allowed:
+-        //     ./in.cue:3:2
+-        //     ./in.cue:4:6
+-        //     ./in.cue:9:4
+         //     ./in.cue:10:5
+       }
+-    }
+-    let B#1 = (#struct){
+-      open: (int){ int }
++      d: (int){ int }
+     }
+     b: (_|_){
+       // [eval]
+-      open: (int){ int }
+       extra: (_|_){
+         // [eval] V.b.extra: field not allowed:
+-        //     ./in.cue:6:10
+         //     ./in.cue:7:5
+-        //     ./in.cue:9:4
+         //     ./in.cue:11:5
+       }
++      open: (int){ int }
++    }
++    a: (#struct){
++      c: (int){ int }
++    }
++    let B#1 = (#struct){
++      open: (int){ int }
+     }
+   }
+ }
+-- diff/todo/p2 --
+Positions.
+Reordering.
 -- out/eval --
 Errors:
 V.b.extra: field not allowed:

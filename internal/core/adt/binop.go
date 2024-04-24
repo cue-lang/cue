@@ -208,6 +208,13 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 			n := c.newInlineVertex(nil, nil, MakeConjunct(c.Env(0), list, c.ci))
 			n.CompleteArcs(c)
 
+			// NOTE: if we set isData to true, whoever processes the result will
+			// avoid having to process the expressions again. This improves
+			// performance. It also change the a potential cycle error message
+			// to a more concrete messages as if this result was unified as is.
+			// TODO: uncomment this and see if we like the result.
+			// n.isData = true
+
 			return n
 		}
 

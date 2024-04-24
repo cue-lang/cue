@@ -20,78 +20,45 @@ import "cuelang.org/go/cue/token"
 // use to evaluate a value.
 type Op int
 
-func (o Op) String() string {
-	return opToString[o]
-}
+//go:generate go run golang.org/x/tools/cmd/stringer -type=Op -linecomment
 
 // Values of Op.
 const (
 	NoOp Op = iota
 
-	AndOp
-	OrOp
+	AndOp // &
+	OrOp  // |
 
-	SelectorOp
-	IndexOp
-	SliceOp
-	CallOp
+	SelectorOp // .
+	IndexOp    // []
+	SliceOp    // [:]
+	CallOp     // ()
 
-	BoolAndOp
-	BoolOrOp
+	BoolAndOp // &&
+	BoolOrOp  // ||
 
-	EqualOp
-	NotOp
-	NotEqualOp
-	LessThanOp
-	LessEqualOp
-	GreaterThanOp
-	GreaterEqualOp
+	EqualOp        // ==
+	NotOp          // !
+	NotEqualOp     // !=
+	LessThanOp     // <
+	LessEqualOp    // <=
+	GreaterThanOp  // >
+	GreaterEqualOp // >=
 
-	MatchOp
-	NotMatchOp
+	MatchOp    // =~
+	NotMatchOp // !~
 
-	AddOp
-	SubtractOp
-	MultiplyOp
-	FloatQuotientOp
-	IntQuotientOp
-	IntRemainderOp
-	IntDivideOp
-	IntModuloOp
+	AddOp           // +
+	SubtractOp      // -
+	MultiplyOp      // *
+	FloatQuotientOp // /
+	IntQuotientOp   // quo
+	IntRemainderOp  // rem
+	IntDivideOp     // div
+	IntModuloOp     // mod
 
-	InterpolationOp
+	InterpolationOp // \()
 )
-
-var opToString = map[Op]string{
-	AndOp:           "&",
-	OrOp:            "|",
-	BoolAndOp:       "&&",
-	BoolOrOp:        "||",
-	EqualOp:         "==",
-	NotOp:           "!",
-	NotEqualOp:      "!=",
-	LessThanOp:      "<",
-	LessEqualOp:     "<=",
-	GreaterThanOp:   ">",
-	GreaterEqualOp:  ">=",
-	MatchOp:         "=~",
-	NotMatchOp:      "!~",
-	AddOp:           "+",
-	SubtractOp:      "-",
-	MultiplyOp:      "*",
-	FloatQuotientOp: "/",
-	IntQuotientOp:   "quo",
-	IntRemainderOp:  "rem",
-	IntDivideOp:     "div",
-	IntModuloOp:     "mod",
-
-	SelectorOp: ".",
-	IndexOp:    "[]",
-	SliceOp:    "[:]",
-	CallOp:     "()",
-
-	InterpolationOp: `\()`,
-}
 
 // OpFromToken converts a token.Token to an Op.
 func OpFromToken(t token.Token) Op {

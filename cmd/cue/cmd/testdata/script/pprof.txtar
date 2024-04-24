@@ -1,0 +1,20 @@
+# Grab a CPU profile and check that it's valid.
+exec cue eval --cpuprofile cpu.out x.cue
+go tool pprof -top cpu.out
+stdout 'Type: cpu'
+
+# Grab an allocation profile and check that it's valid.
+exec cue eval --memprofile mem.out x.cue
+go tool pprof -top mem.out
+stdout 'Type: inuse_space'
+
+# Both flags can be used at the same time.
+rm cpu.out mem.out
+exec cue eval --cpuprofile=cpu.out --memprofile=mem.out x.cue
+exists cpu.out
+exists mem.out
+
+-- x.cue --
+a: 1
+b: 2
+c: a | b

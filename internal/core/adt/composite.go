@@ -102,9 +102,9 @@ type cacheKey struct {
 }
 
 func (e *Environment) up(ctx *OpContext, count int32) *Environment {
-	for ; count > 0; count-- {
+	for i := int32(0); i < count; i++ {
 		e = e.Up
-		ctx.Assertf(ctx.Pos(), e.Vertex != nil, "Environment.up encountered a nil vertex")
+		ctx.Assertf(ctx.Pos(), e.Vertex != nil, "Environment.up encountered a nil vertex at step %d out of %d", i+1, count)
 	}
 	return e
 }
@@ -237,6 +237,10 @@ type Vertex struct {
 	//
 	// This value may be nil, in which case the Arcs are considered to define
 	// the final value of this Vertex.
+	//
+	// TODO: all access to Conjuncts should go through functions like
+	// VisitLeafConjuncts and VisitAllConjuncts. We should probably make this
+	// an unexported field.
 	Conjuncts []Conjunct
 
 	// Structs is a slice of struct literals that contributed to this value.
@@ -244,17 +248,33 @@ type Vertex struct {
 	Structs []*StructInfo
 }
 
+func deref(v *Vertex) *Vertex {
+	v = v.Indirect()
+	n := v.state
+	if n != nil {
+		v = n.underlying
+	}
+	if v == nil {
+		panic("unexpected nil underlying with non-nil state")
+	}
+	return v
+}
+
+func equalDeref(a, b *Vertex) bool {
+	return deref(a) == deref(b)
+}
+
 // rootCloseContext creates a closeContext for this Vertex or returns the
 // existing one.
-func (v *Vertex) rootCloseContext() *closeContext {
+func (v *Vertex) rootCloseContext(ctx *OpContext) *closeContext {
 	if v.cc == nil {
 		v.cc = &closeContext{
-			group:           &ConjunctGroup{},
+			group:           (*ConjunctGroup)(&v.Conjuncts),
 			parent:          nil,
 			src:             v,
 			parentConjuncts: v,
 		}
-		v.cc.incDependent(ROOT, nil) // matched in REF(decrement:nodeDone)
+		v.cc.incDependent(ctx, ROOT, nil) // matched in REF(decrement:nodeDone)
 	}
 	return v.cc
 }
@@ -275,6 +295,22 @@ func (ctx *OpContext) newInlineVertex(parent *Vertex, v BaseValue, a ...Conjunct
 func (v *Vertex) updateArcType(t ArcType) {
 	if t >= v.ArcType {
 		return
+	}
+	if v.ArcType == ArcNotPresent {
+		return
+	}
+	s := v.state
+	if (s != nil || v.isFinal()) && s.ctx.isDevVersion() {
+		c := s.ctx
+		if s.scheduler.frozen.meets(arcTypeKnown) {
+			parent := v.Parent
+			parent.reportFieldCycleError(c, c.Source().Pos(), v.Label)
+			return
+		}
+	}
+	if v.Parent != nil && v.Parent.ArcType == ArcPending && v.Parent.state != nil && v.Parent.state.ctx.isDevVersion() {
+		// TODO: check that state is always non-nil.
+		v.Parent.state.unshare()
 	}
 	v.ArcType = t
 }
@@ -502,7 +538,11 @@ func (v *Vertex) IsUnprocessed() bool {
 }
 
 func (v *Vertex) updateStatus(s vertexStatus) {
-	Assertf(v.status <= s+1, "attempt to regress status from %d to %d", v.Status(), s)
+	if !isCyclePlaceholder(v.BaseValue) {
+		if _, ok := v.BaseValue.(*Bottom); !ok && v.state != nil {
+			Assertf(v.state.ctx, v.status <= s+1, "attempt to regress status from %d to %d", v.Status(), s)
+		}
+	}
 
 	if s == finalized && v.BaseValue == nil {
 		// TODO: for debugging.
@@ -532,6 +572,65 @@ func (v *Vertex) setParentDone() {
 	}
 }
 
+// VisitLeafConjuncts visits all conjuncts that are leafs of the ConjunctGroup tree.
+func (v *Vertex) VisitLeafConjuncts(f func(Conjunct) bool) {
+	visitConjuncts(v.Conjuncts, f)
+}
+
+func visitConjuncts(a []Conjunct, f func(Conjunct) bool) bool {
+	for _, c := range a {
+		switch x := c.x.(type) {
+		case *ConjunctGroup:
+			if !visitConjuncts(*x, f) {
+				return false
+			}
+		default:
+			if !f(c) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+// VisitAllConjuncts visits all conjuncts of v, including ConjunctGroups.
+// Note that ConjunctGroups do not have an Environment associated with them.
+func (v *Vertex) VisitAllConjuncts(f func(c Conjunct, isLeaf bool)) {
+	visitAllConjuncts(v.Conjuncts, f)
+}
+
+func visitAllConjuncts(a []Conjunct, f func(c Conjunct, isLeaf bool)) {
+	for _, c := range a {
+		switch x := c.x.(type) {
+		case *ConjunctGroup:
+			f(c, false)
+			visitAllConjuncts(*x, f)
+		default:
+			f(c, true)
+		}
+	}
+}
+
+// SingleConjunct reports whether there is a single leaf conjunct and returns 1
+// if so. It will return 0 if there are no conjuncts or 2 if there are more than
+// 1.
+//
+// This is an often-used operation.
+func (v *Vertex) SingleConjunct() (c Conjunct, count int) {
+	if v == nil {
+		return c, 0
+	}
+	v.VisitLeafConjuncts(func(x Conjunct) bool {
+		c = x
+		if count++; count > 1 {
+			return false
+		}
+		return true
+	})
+
+	return c, count
+}
+
 // Value returns the Value of v without definitions if it is a scalar
 // or itself otherwise.
 func (v *Vertex) Value() Value {
@@ -558,6 +657,12 @@ func (v *Vertex) isUndefined() bool {
 		return true
 	}
 	return false
+}
+
+// isFinal reports whether this node may no longer be modified.
+func (v *Vertex) isFinal() bool {
+	v = v.Indirect()
+	return v.status == finalized
 }
 
 func (x *Vertex) IsConcrete() bool {
@@ -687,6 +792,10 @@ func (v *Vertex) CompleteArcs(c *OpContext) {
 	c.unify(v, final(conjuncts, allKnown))
 }
 
+func (v *Vertex) CompleteArcsOnly(c *OpContext) {
+	c.unify(v, final(conjuncts, fieldSetKnown))
+}
+
 func (v *Vertex) AddErr(ctx *OpContext, b *Bottom) {
 	v.SetValue(ctx, CombineErrors(nil, v.Value(), b))
 }
@@ -698,6 +807,7 @@ func (v *Vertex) SetValue(ctx *OpContext, value BaseValue) *Bottom {
 
 func (v *Vertex) setValue(ctx *OpContext, state vertexStatus, value BaseValue) *Bottom {
 	v.BaseValue = value
+	// TODO: should not set status here for new evaluator.
 	v.updateStatus(state)
 	return nil
 }
@@ -766,14 +876,14 @@ func (v *Vertex) Kind() Kind {
 	// This is possible when evaluating comprehensions. It is potentially
 	// not known at this time what the type is.
 	switch {
-	// TODO: using this line would be more stable.
-	// case v.status != finalized && v.state != nil:
+	case v.state != nil && v.state.kind == BottomKind:
+		return BottomKind
+	case v.BaseValue != nil && !isCyclePlaceholder(v.BaseValue):
+		return v.BaseValue.Kind()
 	case v.state != nil:
 		return v.state.kind
-	case v.BaseValue == nil:
-		return TopKind
 	default:
-		return v.BaseValue.Kind()
+		return TopKind
 	}
 }
 
@@ -885,6 +995,18 @@ func (v *Vertex) MatchAndInsert(ctx *OpContext, arc *Vertex) {
 		}
 		s.MatchAndInsert(ctx, arc)
 	}
+
+	// This is the equivalent for the new implementation.
+	if pcs := v.PatternConstraints; pcs != nil {
+		for _, pc := range pcs.Pairs {
+			if matchPattern(ctx, pc.Pattern, arc.Label) {
+				for _, c := range pc.Constraint.Conjuncts {
+					root := arc.rootCloseContext(ctx)
+					root.insertConjunct(ctx, root, c, c.CloseInfo, ArcMember, true, false)
+				}
+			}
+		}
+	}
 }
 
 func (v *Vertex) IsList() bool {
@@ -896,7 +1018,28 @@ func (v *Vertex) IsList() bool {
 func (v *Vertex) Lookup(f Feature) *Vertex {
 	for _, a := range v.Arcs {
 		if a.Label == f {
+			// TODO(share): this indirection should ultimately be eliminated:
+			// the original node may have useful information (like original
+			// conjuncts) that are eliminated after indirection.
+			// We should leave it up to the user of Lookup at what point an
+			// indirection is necessary.
 			a = a.Indirect()
+			return a
+		}
+	}
+	return nil
+}
+
+// LookupRaw returns the Arc with label f if it exists or nil otherwise.
+//
+// TODO: with the introduction of structure sharing, it is not always correct
+// to indirect the arc. At the very least, this discards potential useful
+// information. We introduce LookupRaw to avoid having to delete the
+// information. Ultimately, this should become Lookup, or better, we should
+// have a higher-level API for accessing values.
+func (v *Vertex) LookupRaw(f Feature) *Vertex {
+	for _, a := range v.Arcs {
+		if a.Label == f {
 			return a
 		}
 	}
@@ -915,6 +1058,10 @@ func (v *Vertex) Elems() []*Vertex {
 	return a
 }
 
+func (v *Vertex) Init(c *OpContext) {
+	v.getState(c)
+}
+
 // GetArc returns a Vertex for the outgoing arc with label f. It creates and
 // ads one if it doesn't yet exist.
 func (v *Vertex) GetArc(c *OpContext, f Feature, t ArcType) (arc *Vertex, isNew bool) {
@@ -922,6 +1069,10 @@ func (v *Vertex) GetArc(c *OpContext, f Feature, t ArcType) (arc *Vertex, isNew 
 	if arc != nil {
 		arc.updateArcType(t)
 		return arc, false
+	}
+
+	if c.isDevVersion() {
+		return nil, false
 	}
 
 	if v.LockArcs {
@@ -998,6 +1149,8 @@ func hasConjunct(cs []Conjunct, c Conjunct) bool {
 }
 
 func (n *nodeContext) addConjunction(c Conjunct, index int) {
+	unreachableForDev(n.ctx)
+
 	// NOTE: This does not split binary expressions for comprehensions.
 	// TODO: split for comprehensions and rewrap?
 	if x, ok := c.Elem().(*BinaryExpr); ok && x.Op == AndOp {
@@ -1013,7 +1166,11 @@ func (n *nodeContext) addConjunction(c Conjunct, index int) {
 func (v *Vertex) addConjunctUnchecked(c Conjunct) {
 	index := len(v.Conjuncts)
 	v.Conjuncts = append(v.Conjuncts, c)
-	if n := v.state; n != nil {
+	if n := v.state; n != nil && !n.ctx.isDevVersion() {
+		// TODO(notify): consider this as a central place to send out
+		// notifications. At the moment this is not necessary, but it may
+		// be if we move the notification mechanism outside of the path of
+		// running tasks.
 		n.addConjunction(c, index)
 
 		// TODO: can we remove notifyConjunct here? This method is only
@@ -1027,6 +1184,8 @@ func (v *Vertex) addConjunctUnchecked(c Conjunct) {
 // addConjunctDynamic adds a conjunct to a vertex and immediately evaluates
 // it, whilst doing the same for any vertices on the notify list, recursively.
 func (n *nodeContext) addConjunctDynamic(c Conjunct) {
+	unreachableForDev(n.ctx)
+
 	n.node.Conjuncts = append(n.node.Conjuncts, c)
 	n.addExprConjunct(c, partial)
 	n.notifyConjunct(c)
@@ -1034,6 +1193,8 @@ func (n *nodeContext) addConjunctDynamic(c Conjunct) {
 }
 
 func (n *nodeContext) notifyConjunct(c Conjunct) {
+	unreachableForDev(n.ctx)
+
 	for _, rec := range n.notify {
 		arc := rec.v
 		if !arc.hasConjunct(c) {
@@ -1041,7 +1202,7 @@ func (n *nodeContext) notifyConjunct(c Conjunct) {
 				// TODO: continuing here is likely to result in a faulty
 				// (incomplete) configuration. But this may be okay. The
 				// CUE_DEBUG=0 flag disables this assertion.
-				n.ctx.Assertf(n.ctx.pos(), Debug, "unexpected nil state")
+				n.ctx.Assertf(n.ctx.pos(), !n.ctx.Strict, "unexpected nil state")
 				n.ctx.addErrf(0, n.ctx.pos(), "cannot add to field %v", arc.Label)
 				continue
 			}
@@ -1144,10 +1305,37 @@ func (c *Conjunct) Elem() Elem {
 	}
 }
 
-// Expr retrieves the expression form of the contained conjunct.
-// If it is a field or comprehension, it will return its associated value.
+// Expr retrieves the expression form of the contained conjunct. If it is a
+// field or comprehension, it will return its associated value. This is only to
+// be used for syntactic operations where evaluation of the expression is not
+// required. To get an expression paired with the correct environment, use
+// EnvExpr.
+//
+// TODO: rename to RawExpr.
 func (c *Conjunct) Expr() Expr {
 	return ToExpr(c.x)
+}
+
+// EnvExpr returns the expression form of the contained conjunct alongside an
+// Environment in which this expression should be evaluated.
+func (c Conjunct) EnvExpr() (*Environment, Expr) {
+	return EnvExpr(c.Env, c.Elem())
+}
+
+// EnvExpr returns the expression represented by Elem alongside an Environment
+// with the necessary adjustments in which the resulting expression can be
+// evaluated.
+func EnvExpr(env *Environment, elem Elem) (*Environment, Expr) {
+	for {
+		if c, ok := elem.(*Comprehension); ok {
+			env = linkChildren(env, c)
+			c := MakeConjunct(env, c.Value, CloseInfo{})
+			elem = c.Elem()
+			continue
+		}
+		break
+	}
+	return env, ToExpr(elem)
 }
 
 // ToExpr extracts the underlying expression for a Node. If something is already

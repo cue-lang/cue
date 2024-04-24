@@ -18,11 +18,12 @@ import (
 	"io"
 	"math/big"
 
+	"github.com/cockroachdb/apd/v3"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/value"
-	"github.com/cockroachdb/apd/v3"
 )
 
 // CallCtxt is passed to builtin implementations that need to use a cue.Value. This is an internal type. Its interface may change.
@@ -129,11 +130,12 @@ func (c *CallCtxt) uintValue(i, bits int, typ string) uint64 {
 
 func (c *CallCtxt) Decimal(i int) *apd.Decimal {
 	x := value.Make(c.ctx, c.args[i])
-	if _, err := x.MantExp(nil); err != nil {
+	res, err := x.Decimal()
+	if err != nil {
 		c.invalidArgType(c.args[i], i, "Decimal", err)
 		return nil
 	}
-	return &c.args[i].(*adt.Num).X
+	return res
 }
 
 func (c *CallCtxt) Float64(i int) float64 {

@@ -1,0 +1,9 @@
+# Test that `cue login` succeeds with the device flow
+# when the device login is authorized after the first polling request.
+
+env CUE_CONFIG_DIR=$WORK/cueconfig
+oauthregistry pending-success
+
+exec cue login
+stdout 'open:.*user_code=user-code'
+grep 'secret-access-token' cueconfig/logins.json

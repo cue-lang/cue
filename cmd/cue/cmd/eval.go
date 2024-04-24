@@ -107,7 +107,7 @@ func runEval(cmd *Command, args []string) error {
 	}
 	b.encConfig.Format = opts
 
-	e, err := encoding.NewEncoder(b.outFile, b.encConfig)
+	e, err := encoding.NewEncoder(cmd.ctx, b.outFile, b.encConfig)
 	exitOnErr(cmd, err, true)
 
 	iter := b.instances()

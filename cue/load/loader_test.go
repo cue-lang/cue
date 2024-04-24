@@ -24,12 +24,32 @@ import (
 	"text/template"
 	"unicode"
 
+	"github.com/go-quicktest/qt"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
-	"cuelang.org/go/internal/str"
+	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/tdtest"
 )
+
+func init() {
+	// Ignore the value of CUE_EXPERIMENT for the purposes
+	// of these tests, which we want to test both with the experiment
+	// enabled and disabled.
+	os.Setenv("CUE_EXPERIMENT", "")
+
+	// Once we've called cueexperiment.Init, cueexperiment.Vars
+	// will not be touched again, so we can set fields in it for the tests.
+	cueexperiment.Init()
+
+	// The user running `go test` might have a broken environment,
+	// such as an invalid $CUE_REGISTRY like the one below,
+	// or a broken $DOCKER_CONFIG/config.json due to syntax errors.
+	// Go tests should be hermetic by explicitly setting load.Config.Env;
+	// catch any that do not by leaving a broken $CUE_REGISTRY in os.Environ.
+	os.Setenv("CUE_REGISTRY", "inline:{")
+}
 
 // TestLoad is an end-to-end test.
 func TestLoad(t *testing.T) {
@@ -51,10 +71,9 @@ func TestLoad(t *testing.T) {
 		want string
 	}
 
-	args := str.StringList
 	testCases := []loadTest{{
 		cfg:  badModCfg,
-		args: args("."),
+		args: []string{"."},
 		want: `err:    module: cannot use value 123 (type int) as string:
     $CWD/testdata/badmod/cue.mod/module.cue:2:9
 path:   ""
@@ -81,7 +100,7 @@ imports:
 		// the module is test. So "package test" is correctly the default
 		// package of this directory.
 		cfg:  dirCfg,
-		args: args("."),
+		args: []string{"."},
 		want: `path:   mod.test/test
 module: mod.test/test
 root:   $CWD/testdata/testmod
@@ -94,7 +113,7 @@ imports:
 		// TODO:
 		// - path incorrect, should be mod.test/test/other:main.
 		cfg:  dirCfg,
-		args: args("./other/..."),
+		args: []string{"./other/..."},
 		want: `err:    import failed: relative import paths not allowed ("./file"):
     $CWD/testdata/testmod/other/main.cue:6:2
 path:   ""
@@ -103,7 +122,7 @@ root:   $CWD/testdata/testmod
 dir:    ""
 display:""`}, {
 		cfg:  dirCfg,
-		args: args("./anon"),
+		args: []string{"./anon"},
 		want: `err:    build constraints exclude all CUE files in ./anon:
     anon/anon.cue: no package name
 path:   mod.test/test/anon
@@ -114,7 +133,7 @@ display:./anon`}, {
 		// TODO:
 		// - paths are incorrect, should be mod.test/test/other:main.
 		cfg:  dirCfg,
-		args: args("./other"),
+		args: []string{"./other"},
 		want: `err:    import failed: relative import paths not allowed ("./file"):
     $CWD/testdata/testmod/other/main.cue:6:2
 path:   mod.test/test/other:main
@@ -127,7 +146,7 @@ files:
 		// TODO:
 		// - incorrect path, should be mod.test/test/hello:test
 		cfg:  dirCfg,
-		args: args("./hello"),
+		args: []string{"./hello"},
 		want: `path:   mod.test/test/hello:test
 module: mod.test/test
 root:   $CWD/testdata/testmod
@@ -141,7 +160,7 @@ imports:
 		// TODO:
 		// - incorrect path, should be mod.test/test/hello:test
 		cfg:  dirCfg,
-		args: args("mod.test/test/hello:test"),
+		args: []string{"mod.test/test/hello:test"},
 		want: `path:   mod.test/test/hello:test
 module: mod.test/test
 root:   $CWD/testdata/testmod
@@ -155,7 +174,7 @@ imports:
 		// TODO:
 		// - incorrect path, should be mod.test/test/hello:test
 		cfg:  dirCfg,
-		args: args("mod.test/test/hello:nonexist"),
+		args: []string{"mod.test/test/hello:nonexist"},
 		want: `err:    build constraints exclude all CUE files in mod.test/test/hello:nonexist:
     anon.cue: no package name
     test.cue: package is test, want nonexist
@@ -166,7 +185,7 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/hello
 display:mod.test/test/hello:nonexist`}, {
 		cfg:  dirCfg,
-		args: args("./anon.cue", "./other/anon.cue"),
+		args: []string{"./anon.cue", "./other/anon.cue"},
 		want: `path:   ""
 module: ""
 root:   $CWD/testdata/testmod
@@ -177,7 +196,7 @@ files:
     $CWD/testdata/testmod/other/anon.cue`}, {
 		cfg: dirCfg,
 		// Absolute file is normalized.
-		args: args(filepath.Join(cwd, testdata("testmod", "anon.cue"))),
+		args: []string{filepath.Join(cwd, testdata("testmod", "anon.cue"))},
 		want: `path:   ""
 module: ""
 root:   $CWD/testdata/testmod
@@ -186,7 +205,7 @@ display:command-line-arguments
 files:
     $CWD/testdata/testmod/anon.cue`}, {
 		cfg:  dirCfg,
-		args: args("-"),
+		args: []string{"-"},
 		want: `path:   ""
 module: ""
 root:   $CWD/testdata/testmod
@@ -194,18 +213,35 @@ dir:    $CWD/testdata/testmod
 display:command-line-arguments
 files:
     -`}, {
-		// NOTE: dir should probably be set to $CWD/testdata, but either way.
 		cfg:  dirCfg,
-		args: args("non-existing"),
-		want: `err:    implied package identifier "non-existing" from import path "non-existing" is not valid
-path:   non-existing
+		args: []string{"foo.com/bad-identifier"},
+		want: `err:    implied package identifier "bad-identifier" from import path "foo.com/bad-identifier" is not valid
+path:   foo.com/bad-identifier
 module: mod.test/test
 root:   $CWD/testdata/testmod
-dir:    $CWD/testdata/testmod/cue.mod/gen/non-existing
-display:non-existing`,
+dir:    $CWD/testdata/testmod/cue.mod/gen/foo.com/bad-identifier
+display:foo.com/bad-identifier`,
 	}, {
 		cfg:  dirCfg,
-		args: args("./empty"),
+		args: []string{"nonexisting"},
+		want: `err:    standard library import path "nonexisting" cannot be imported as a CUE package
+path:   nonexisting
+module: mod.test/test
+root:   $CWD/testdata/testmod
+dir:    ""
+display:nonexisting`,
+	}, {
+		cfg:  dirCfg,
+		args: []string{"strconv"},
+		want: `err:    standard library import path "strconv" cannot be imported as a CUE package
+path:   strconv
+module: mod.test/test
+root:   $CWD/testdata/testmod
+dir:    ""
+display:strconv`,
+	}, {
+		cfg:  dirCfg,
+		args: []string{"./empty"},
 		want: `err:    no CUE files in ./empty
 path:   mod.test/test/empty
 module: mod.test/test
@@ -214,7 +250,7 @@ dir:    $CWD/testdata/testmod/empty
 display:./empty`,
 	}, {
 		cfg:  dirCfg,
-		args: args("./imports"),
+		args: []string{"./imports"},
 		want: `path:   mod.test/test/imports
 module: mod.test/test
 root:   $CWD/testdata/testmod
@@ -226,7 +262,7 @@ imports:
     mod.test/catch: $CWD/testdata/testmod/cue.mod/pkg/mod.test/catch/catch.cue
     mod.test/helper:helper1: $CWD/testdata/testmod/cue.mod/pkg/mod.test/helper/helper1.cue`}, {
 		cfg:  dirCfg,
-		args: args("./toolonly"),
+		args: []string{"./toolonly"},
 		want: `path:   mod.test/test/toolonly:foo
 module: mod.test/test
 root:   $CWD/testdata/testmod
@@ -237,7 +273,7 @@ files:
 		cfg: &Config{
 			Dir: testdataDir,
 		},
-		args: args("./toolonly"),
+		args: []string{"./toolonly"},
 		want: `err:    build constraints exclude all CUE files in ./toolonly:
     anon.cue: no package name
     test.cue: package is test, want foo
@@ -251,7 +287,7 @@ display:./toolonly`}, {
 			Dir:  testdataDir,
 			Tags: []string{"prod"},
 		},
-		args: args("./tags"),
+		args: []string{"./tags"},
 		want: `path:   mod.test/test/tags
 module: mod.test/test
 root:   $CWD/testdata/testmod
@@ -263,7 +299,7 @@ files:
 			Dir:  testdataDir,
 			Tags: []string{"prod", "foo=bar"},
 		},
-		args: args("./tags"),
+		args: []string{"./tags"},
 		want: `path:   mod.test/test/tags
 module: mod.test/test
 root:   $CWD/testdata/testmod
@@ -275,7 +311,7 @@ files:
 			Dir:  testdataDir,
 			Tags: []string{"prod"},
 		},
-		args: args("./tagsbad"),
+		args: []string{"./tagsbad"},
 		want: `err:    tag "prod" not used in any file
 previous declaration here:
     $CWD/testdata/testmod/tagsbad/prod.cue:1:1
@@ -289,7 +325,7 @@ display:./tagsbad`}, {
 		cfg: &Config{
 			Dir: testdataDir,
 		},
-		args: args("./cycle"),
+		args: []string{"./cycle"},
 		want: `err:    import failed: import failed: import failed: package import cycle not allowed:
     $CWD/testdata/testmod/cycle/cycle.cue:3:8
     $CWD/testdata/testmod/cue.mod/pkg/mod.test/cycle/bar/bar.cue:3:8
@@ -360,7 +396,7 @@ func TestOverlays(t *testing.T) {
 	c := &Config{
 		Overlay: map[string]Source{
 			// Not necessary, but nice to add.
-			abs("cue.mod"): FromString(`module: "mod.test"`),
+			abs("cue.mod/module.cue"): FromString(`module: "mod.test"`),
 
 			abs("dir/top.cue"): FromBytes([]byte(`
 			   package top
@@ -404,10 +440,32 @@ func TestOverlays(t *testing.T) {
 	}
 }
 
+func TestLoadOrder(t *testing.T) {
+	testDataDir := testdata("testsort")
+	insts := Instances([]string{"."}, &Config{
+		Package: "*",
+		Dir:     testDataDir,
+	})
+
+	var actualFiles = []string{}
+	for _, inst := range insts {
+		for _, f := range inst.BuildFiles {
+			if strings.Contains(f.Filename, testDataDir) {
+				actualFiles = append(actualFiles, filepath.Base(f.Filename))
+			}
+		}
+	}
+	var expectedFiles []string
+	for _, c := range "abcdefghij" {
+		expectedFiles = append(expectedFiles, string(c)+".cue")
+	}
+	qt.Assert(t, qt.DeepEquals(actualFiles, expectedFiles))
+}
+
 func TestLoadInstancesConcurrent(t *testing.T) {
 	// This test is designed to fail when run with the race detector
 	// if there's an underlying race condition.
-	// See https:/cuelang.org/issue/1746
+	// See https://cuelang.org/issue/1746
 	race(func() {
 		Instances([]string{"."}, nil)
 	})
@@ -422,4 +480,5 @@ func race(f func()) {
 			wg.Done()
 		}()
 	}
+	wg.Wait()
 }

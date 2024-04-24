@@ -46,6 +46,7 @@ import (
 
 -- cue.mod/module.cue --
 module: "test.org"
+language: version: "v0.8.0"
 deps: "example.com/e": v: "v0.0.1"
 
 -- cue.mod/pkg/example.com/e/local_pkg/x.cue --
@@ -70,6 +71,7 @@ a: gen: true
 
 -- _registry/example.com_e_v0.0.1/cue.mod/module.cue --
 module: "example.com/e@v0"
+language: version: "v0.8.0"
 
 -- _registry/example.com_e_v0.0.1/main.cue --
 package e

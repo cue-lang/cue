@@ -53,6 +53,90 @@ Retain: 1
 Unifications: 19
 Conjuncts:    40
 Disjuncts:    29
+-- out/evalalpha --
+Errors:
+conflictRangingOverSelf.x.age: conflicting values int and "age" (mismatched types int and string):
+    ./in.cue:36:9
+    ./in.cue:40:3
+circularFor.#list: cannot range over tail != null (found bool, want list or struct):
+    ./in.cue:12:12
+intField: integer fields not supported:
+    ./in.cue:27:4
+
+Result:
+(_|_){
+  // [eval]
+  circularIf: (struct){
+    #list: (#struct){
+      tail: ((null|struct)){ |(*(null){ null }, (#struct){
+          tail: (null){ null }
+        }) }
+    }
+  }
+  circularFor: (_|_){
+    // [eval]
+    #list: (_|_){
+      // [eval] circularFor.#list: cannot range over tail != null (found bool, want list or struct):
+      //     ./in.cue:12:12
+      tail: (null){ null }
+    }
+  }
+  userError: (_|_){
+    // [incomplete] userError: non-concrete value string in operand to !=:
+    //     ./in.cue:21:5
+    //     ./in.cue:20:5
+    a: (string){ string }
+  }
+  intField: (_|_){
+    // [eval] intField: integer fields not supported:
+    //     ./in.cue:27:4
+  }
+  conflictRangingOverSelf: (_|_){
+    // [eval]
+    x: (_|_){
+      // [eval]
+      name: (string){ "name" }
+      age: (_|_){
+        // [eval] conflictRangingOverSelf.x.age: conflicting values int and "age" (mismatched types int and string):
+        //     ./in.cue:36:9
+        //     ./in.cue:40:3
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -2,7 +2,6 @@
+ conflictRangingOverSelf.x.age: conflicting values int and "age" (mismatched types int and string):
+     ./in.cue:36:9
+     ./in.cue:40:3
+-    ./in.cue:41:9
+ circularFor.#list: cannot range over tail != null (found bool, want list or struct):
+     ./in.cue:12:12
+ intField: integer fields not supported:
+@@ -35,10 +34,6 @@
+   intField: (_|_){
+     // [eval] intField: integer fields not supported:
+     //     ./in.cue:27:4
+-    0: (struct){
+-    }
+-    1: (struct){
+-    }
+   }
+   conflictRangingOverSelf: (_|_){
+     // [eval]
+@@ -49,7 +44,6 @@
+         // [eval] conflictRangingOverSelf.x.age: conflicting values int and "age" (mismatched types int and string):
+         //     ./in.cue:36:9
+         //     ./in.cue:40:3
+-        //     ./in.cue:41:9
+       }
+     }
+   }
+-- diff/todo/p2 --
+Missing error message.
 -- out/eval --
 Errors:
 conflictRangingOverSelf.x.age: conflicting values int and "age" (mismatched types int and string):

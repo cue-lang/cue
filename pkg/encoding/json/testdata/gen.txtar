@@ -42,6 +42,10 @@ unmarshal: [string]: X={
 	#result: json.Unmarshal(X)
 }
 unmarshal: t1: "1"
+unmarshal: {
+	trailingValid:   #"{"a": 1}{"b": 2}"#
+	trailingInvalid: #"{"a": 1}}invalid json"#
+}
 
 marshalStream: [string]: X={
 	[...] // input
@@ -88,6 +92,10 @@ validate.t2.result: error in call to encoding/json.Validate: invalid value 10 (o
     ./in.cue:6:10
     ./in.cue:9:27
     json.Validate:1:6
+unmarshal.trailingInvalid.#result: error in call to encoding/json.Unmarshal: json: invalid JSON:
+    ./in.cue:39:11
+unmarshal.trailingValid.#result: error in call to encoding/json.Unmarshal: json: invalid JSON:
+    ./in.cue:39:11
 
 Result:
 import "encoding/json"
@@ -146,6 +154,12 @@ unmarshal: {
 	t1: {
 		"1"
 		#result: 1
+	}
+	trailingValid: {
+		#result: _|_ // unmarshal.trailingValid.#result: error in call to encoding/json.Unmarshal: json: invalid JSON
+	}
+	trailingInvalid: {
+		#result: _|_ // unmarshal.trailingInvalid.#result: error in call to encoding/json.Unmarshal: json: invalid JSON
 	}
 }
 marshalStream: {

@@ -86,4 +86,4 @@ command: noreads: {
 		cmd: ["echo", "not reading any stdin"]
 	}
 }
--- cue.mod --
+-- cue.mod/module.cue --

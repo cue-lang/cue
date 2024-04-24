@@ -74,9 +74,10 @@ func (r *Runtime) injectImplementations(b *build.Instance, v *adt.Vertex) (errs 
 		d.errs = errors.Append(d.errs, d.addFile(f))
 	}
 
-	for _, c := range v.Conjuncts {
+	v.VisitLeafConjuncts(func(c adt.Conjunct) bool {
 		d.decorateConjunct(c.Elem(), v)
-	}
+		return true
+	})
 
 	return d.errs
 }

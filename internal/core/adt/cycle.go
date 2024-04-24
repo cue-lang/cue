@@ -280,6 +280,8 @@ type cyclicConjunct struct {
 // the conjunct seems to be fully cyclic so far or if there is a valid reference
 // cycle.
 func (n *nodeContext) markCycle(arc *Vertex, env *Environment, x Resolver, ci CloseInfo) (_ CloseInfo, skip bool) {
+	n.assertInitialized()
+
 	// TODO(perf): this optimization can work if we also check for any
 	// references pointing to arc within arc. This can be done with compiler
 	// support. With this optimization, almost all references could avoid cycle
@@ -294,7 +296,16 @@ func (n *nodeContext) markCycle(arc *Vertex, env *Environment, x Resolver, ci Cl
 	depth := int32(0)
 	for r := ci.Refs; r != nil; r = r.Next {
 		if r.Ref != x {
-			continue
+			// TODO(share): this is a bit of a hack. We really should implement
+			// (*Vertex).cyclicReferences for the new evaluator. However,
+			// implementing cyclicReferences is somewhat tricky, as it requires
+			// referenced nodes to be evaluated, which is a guarantee we may not
+			// want to give. Moreover, it seems we can find a simpler solution
+			// based on structure sharing. So punt on this solution for now.
+			if r.Arc != arc || !n.ctx.isDevVersion() {
+				continue
+			}
+			found = true
 		}
 
 		// A reference that is within a graph that is being evaluated
@@ -303,13 +314,13 @@ func (n *nodeContext) markCycle(arc *Vertex, env *Environment, x Resolver, ci Cl
 		// graph will always be the same address. Hence, if this is a
 		// finalized arc with a different address, it resembles a reference that
 		// is included through a different path and is not a cycle.
-		if r.Arc != arc && arc.status == finalized {
+		if !equalDeref(r.Arc, arc) && arc.status == finalized {
 			continue
 		}
 
 		// For dynamically created structs we mark this as an error. Otherwise
 		// there is only an error if we have visited the arc before.
-		if ci.Inline && (arc.IsDynamic || r.Arc == arc) {
+		if ci.Inline && (arc.IsDynamic || equalDeref(r.Arc, arc)) {
 			n.reportCycleError()
 			return ci, true
 		}
@@ -317,7 +328,14 @@ func (n *nodeContext) markCycle(arc *Vertex, env *Environment, x Resolver, ci Cl
 		// We have a reference cycle, as distinguished from a structural
 		// cycle. Reference cycles represent equality, and thus are equal
 		// to top. We can stop processing here.
-		if r.Node == n.node {
+		// var nn1, nn2 *Vertex
+		// if u := r.Node.state.underlay; u != nil {
+		// 	nn1 = u.node
+		// }
+		// if u := n.node.state.underlay; u != nil {
+		// 	nn2 = u.node
+		// }
+		if equalDeref(r.Node, n.node) {
 			return ci, true
 		}
 
@@ -341,7 +359,7 @@ func (n *nodeContext) markCycle(arc *Vertex, env *Environment, x Resolver, ci Cl
 				// "parent" conjuncts? This mechanism seems not entirely
 				// accurate. Maybe a pointer up to find the root and then
 				// "spread" downwards?
-				if r.Ref == x && r.Arc == rr.Arc {
+				if r.Ref == x && equalDeref(r.Arc, rr.Arc) {
 					n.node.Conjuncts[i].CloseInfo.IsCyclic = true
 					break
 				}
@@ -368,7 +386,7 @@ outer:
 		}
 
 		arc.cyclicReferences = &RefNode{
-			Arc:  arc,
+			Arc:  deref(arc),
 			Ref:  x,
 			Next: arc.cyclicReferences,
 		}
@@ -385,8 +403,8 @@ outer:
 				}
 			}
 			ci.Refs = &RefNode{
-				Arc:  r.Arc,
-				Node: n.node,
+				Arc:  deref(r.Arc),
+				Node: deref(n.node),
 
 				Ref:   x,
 				Next:  ci.Refs,
@@ -402,6 +420,43 @@ outer:
 	//      y: [string]: b: y
 	//      x: y
 	//      x: c: x
+	//
+	// ->
+	//          - in conjuncts
+	//             - out conjuncts: these count for cycle detection.
+	//      x: {
+	//          [string]: <1: y> b: y
+	//          c: x
+	//      }
+	//      x.c: {
+	//          <1: y> b: y
+	//          <2: x> y
+	//             [string]: <3: x, y> b: y
+	//          <2: x> c: x
+	//      }
+	//      x.c.b: {
+	//          <1: y> y
+	//             [string]: <4: y; Cyclic> b: y
+	//          <3: x, y> b: y
+	//      }
+	//      x.c.b.b: {
+	//          <3: x, y> y
+	//               [string]: <5: x, y, Cyclic> b: y
+	//          <4: y, Cyclic> y
+	//               [string]: <5: x, y, Cyclic> b: y
+	//      }
+	//      x.c.c: { // structural cycle
+	//          <3: x, y> b: y
+	//          <2: x> x
+	//               <6: x, Cyclic>: y
+	//                    [string]: <8: x, y; Cyclic> b: y
+	//               <7: x, Cyclic>: c: x
+	//      }
+	//      x.c.c.b: { // structural cycle
+	//          <3: x, y> y
+	//               [string]: <3: x, y; Cyclic> b: y
+	//          <8: x, y; Cyclic> y
+	//      }
 	// ->
 	//      x: [string]: b: y
 	//      x: c: b: y
@@ -420,10 +475,14 @@ outer:
 		// gives somewhat better error messages.
 		// We also need to add the reference again if the depth differs, as
 		// the depth is used for tracking "new structure".
+		// var nn *Vertex
+		// if u := n.node.state.underlay; u != nil {
+		// 	nn = u.node
+		// }
 		ci.Refs = &RefNode{
-			Arc:   arc,
+			Arc:   deref(arc),
 			Ref:   x,
-			Node:  n.node,
+			Node:  deref(n.node),
 			Next:  ci.Refs,
 			Depth: n.depth,
 		}
@@ -468,7 +527,12 @@ outer:
 
 	n.hasCycle = true
 	if !n.hasNonCycle && env != nil {
+		// TODO: investigate if we can get rid of cyclicConjuncts in the new
+		// evaluator.
 		v := Conjunct{env, x, ci}
+		if n.ctx.isDevVersion() {
+			n.node.cc.incDependent(n.ctx, DEFER, nil)
+		}
 		n.cyclicConjuncts = append(n.cyclicConjuncts, cyclicConjunct{v, arc})
 		return ci, true
 	}
@@ -499,13 +563,28 @@ func (n *nodeContext) updateCyclicStatus(c CloseInfo) {
 	if !c.IsCyclic {
 		n.hasNonCycle = true
 		for _, c := range n.cyclicConjuncts {
-			n.addVertexConjuncts(c.c, c.arc, false)
+			if n.ctx.isDevVersion() {
+				ci := c.c.CloseInfo
+				ci.cc = n.node.rootCloseContext(n.ctx)
+				n.scheduleVertexConjuncts(c.c, c.arc, ci)
+				n.node.cc.decDependent(n.ctx, DEFER, nil)
+			} else {
+				n.addVertexConjuncts(c.c, c.arc, false)
+			}
 		}
 		n.cyclicConjuncts = n.cyclicConjuncts[:0]
 	}
 }
 
 func assertStructuralCycle(n *nodeContext) bool {
+	// TODO: is this the right place to put it?
+	if n.ctx.isDevVersion() {
+		for range n.cyclicConjuncts {
+			n.node.cc.decDependent(n.ctx, DEFER, nil)
+		}
+		n.cyclicConjuncts = n.cyclicConjuncts[:0]
+	}
+
 	if n.hasCycle && !n.hasNonCycle {
 		n.reportCycleError()
 		return true

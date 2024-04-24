@@ -157,12 +157,28 @@ type closeContext struct {
 	// Used to recursively insert Vertices.
 	parent *closeContext
 
+	// overlay is used to temporarily link a closeContext to its "overlay" copy,
+	// as it is used in a corresponding disjunction.
+	overlay *closeContext
+	// generation is used to track the current generation of the closeContext
+	// in disjunction overlays. This is mostly for debugging.
+	generation int
+
 	dependencies []*ccDep // For testing only. See debug.go
+
+	// externalDeps lists the closeContexts associated with a root node for
+	// which there are outstanding decrements (can only be NOTIFY or ARC). This
+	// is used to break counter cycles, if necessary.
+	//
+	// This is only used for root closedContext and only for debugging.
+	// TODO: move to nodeContext.
+	externalDeps []ccArcRef
 
 	// child links to a sequence which additional patterns need to be verified
 	// against (&&). If there are more than one, these additional nodes are
 	// linked with next. Only closed nodes with patterns are added. Arc sets are
 	// already merged during processing.
+	// A child is always done. This means it cannot be modified.
 	child *closeContext
 
 	// next holds a linked list of nodes to process.
@@ -174,11 +190,32 @@ type closeContext struct {
 	// be an additional increment at the start before any processing is done.
 	conjunctCount int
 
+	// disjunctCount counts the number of disjunctions that contribute to
+	// conjunctCount. When a node is unfinished, for instance due to an error,
+	// we allow disjunctions to not be decremented. This count is then used
+	// to suppress errors about missing decrements.
+	disjunctCount int
+
 	src *Vertex
+
+	arcType ArcType
 
 	// isDef indicates whether the closeContext is created as part of a
 	// definition.
 	isDef bool
+
+	// hasEllipsis indicates whether the node contains an ellipsis.
+	hasEllipsis bool
+
+	// hasTop indicates a node has at least one top conjunct.
+	hasTop bool
+
+	// hasNonTop indicates a node has at least one conjunct that is not top.
+	hasNonTop bool
+
+	// isClosedOnce is true if this closeContext is the result of calling the
+	// close builtin.
+	isClosedOnce bool
 
 	// isEmbed indicates whether the closeContext is created as part of an
 	// embedding.
@@ -194,6 +231,13 @@ type closeContext struct {
 	// isTotal is true if a node contains an ellipsis and is defined for all
 	// values.
 	isTotal bool
+
+	// done is true if all dependencies have been decremented.
+	done bool
+
+	// isDecremented is used to keep track of whether the evaluator decremented
+	// a closedContext for the ROOT depKind.
+	isDecremented bool
 
 	// needsCloseInSchedule is non-nil if a closeContext that was created
 	// as an arc still needs to be decremented. It points to the creating arc
@@ -235,17 +279,40 @@ func (c *closeContext) Label() Feature {
 	return c.src.Label
 }
 
+// See also Vertex.updateArcType in composite.go.
+func (c *closeContext) updateArcType(t ArcType) {
+	if t >= c.arcType {
+		return
+	}
+	if c.arcType == ArcNotPresent {
+		return
+	}
+	c.arcType = t
+}
+
 type ccArc struct {
-	kind depKind
-	key  *closeContext
-	cc   *closeContext
+	kind        depKind
+	decremented bool
+	key         *closeContext
+	cc          *closeContext
+}
+
+// A ccArcRef x refers to the x.src.arcs[x.index].
+// We use this instead of pointers, because the address may change when
+// growing a slice. We use this instead mechanism instead of a pointers so
+// that we do not need to maintain separate free buffers once we use pools of
+// closeContext.
+type ccArcRef struct {
+	src   *closeContext
+	index int
 }
 
 type conjunctGrouper interface {
-	assignConjunct(root *closeContext, c Conjunct, check, checkClosed bool) (arc *closeContext, pos int, added bool)
+	assignConjunct(ctx *OpContext, root *closeContext, c Conjunct, mode ArcType, check, checkClosed bool) (arc *closeContext, pos int, added bool)
 }
 
 func (n *nodeContext) getArc(f Feature, mode ArcType) (arc *Vertex, isNew bool) {
+	// TODO(disjunct,perf): CopyOnRead
 	v := n.node
 	for _, a := range v.Arcs {
 		if a.Label == f {
@@ -258,9 +325,14 @@ func (n *nodeContext) getArc(f Feature, mode ArcType) (arc *Vertex, isNew bool) 
 		}
 	}
 
-	arc = &Vertex{Parent: v, Label: f, ArcType: mode}
+	arc = &Vertex{
+		Parent:    v,
+		Label:     f,
+		ArcType:   mode,
+		nonRooted: v.IsDynamic || v.Label.IsLet() || v.nonRooted,
+	}
 	if n.scheduler.frozen&fieldSetKnown != 0 {
-		b := n.ctx.NewErrf("field %v not allowed by earlier comprehension or reference cycle", f)
+		b := n.ctx.NewErrf("adding field %v not allowed as field set was already referenced", f)
 		n.ctx.AddBottom(b)
 		// This may panic for list arithmetic. Safer to leave out for now.
 		arc.ArcType = ArcNotPresent
@@ -269,13 +341,14 @@ func (n *nodeContext) getArc(f Feature, mode ArcType) (arc *Vertex, isNew bool) 
 	return arc, true
 }
 
-func (v *Vertex) assignConjunct(root *closeContext, c Conjunct, check, checkClosed bool) (a *closeContext, pos int, added bool) {
+func (v *Vertex) assignConjunct(ctx *OpContext, root *closeContext, c Conjunct, mode ArcType, check, checkClosed bool) (a *closeContext, pos int, added bool) {
 	// TODO: consider clearing CloseInfo.cc.
 	// c.CloseInfo.cc = nil
 
 	arc := root.src
+	arc.updateArcType(mode) // TODO: probably not necessary: consider removing.
 
-	pos = len(arc.Conjuncts) - 1
+	pos = len(arc.Conjuncts)
 
 	added = !check || !arc.hasConjunct(c)
 	if added {
@@ -286,9 +359,10 @@ func (v *Vertex) assignConjunct(root *closeContext, c Conjunct, check, checkClos
 	return root, pos, added
 }
 
-func (cc *closeContext) getKeyedCC(key *closeContext, c CycleInfo, checkClosed bool) *closeContext {
+func (cc *closeContext) getKeyedCC(ctx *OpContext, key *closeContext, c CycleInfo, mode ArcType, checkClosed bool) *closeContext {
 	for _, a := range cc.arcs {
 		if a.key == key {
+			a.cc.updateArcType(mode)
 			return a.cc
 		}
 	}
@@ -299,37 +373,42 @@ func (cc *closeContext) getKeyedCC(key *closeContext, c CycleInfo, checkClosed b
 		panic("parent is self")
 	}
 
-	parent, pos, _ := cc.parentConjuncts.assignConjunct(key, Conjunct{
+	parent, pos, _ := cc.parentConjuncts.assignConjunct(ctx, key, Conjunct{
 		CloseInfo: CloseInfo{
 			FromDef:   cc.isDef,
 			FromEmbed: cc.isEmbed,
 			CycleInfo: c,
 		},
 		x: group,
-	}, false, checkClosed)
+	}, mode, false, checkClosed)
 
 	arc := &closeContext{
+		generation:      cc.generation,
 		parent:          parent,
 		parentConjuncts: parent,
 		parentIndex:     pos,
 
-		src:   key.src,
-		group: group,
+		src:     key.src,
+		arcType: mode,
+		group:   group,
 
 		isDef:                cc.isDef,
 		isEmbed:              cc.isEmbed,
 		needsCloseInSchedule: cc,
 	}
 
-	arc.parent.incDependent(PARENT, arc)
+	arc.parent.incDependent(ctx, PARENT, arc)
 
 	// If the parent, w.r.t. the subfield relation was already processed,
 	// there is no need to register the notification.
-	arc.incDependent(EVAL, cc) // matched in REF(decrement:nodeDone)
+	arc.incDependent(ctx, EVAL, cc) // matched in REF(decrement:nodeDone)
 
 	// A let field never depends on its parent. So it is okay to filter here.
 	if !arc.Label().IsLet() {
-		cc.addDependency(ARC, key, arc)
+		// prevent a dependency on self.
+		if key.src != cc.src {
+			cc.addDependency(ctx, ARC, key, arc, key)
+		}
 	}
 
 	v := key.src
@@ -340,20 +419,21 @@ func (cc *closeContext) getKeyedCC(key *closeContext, c CycleInfo, checkClosed b
 	return arc
 }
 
-func (cc *closeContext) linkNotify(key *closeContext, c CycleInfo) {
+func (cc *closeContext) linkNotify(ctx *OpContext, dst *Vertex, key *closeContext, c CycleInfo) bool {
 	for _, a := range cc.arcs {
 		if a.key == key {
-			return
+			return false
 		}
 	}
 
-	cc.addDependency(NOTIFY, key, key)
+	cc.addDependency(ctx, NOTIFY, key, key, dst.cc)
+	return true
 }
 
-func (cc *closeContext) assignConjunct(root *closeContext, c Conjunct, check, checkClosed bool) (arc *closeContext, pos int, added bool) {
-	arc = cc.getKeyedCC(root, c.CloseInfo.CycleInfo, checkClosed)
+func (cc *closeContext) assignConjunct(ctx *OpContext, root *closeContext, c Conjunct, mode ArcType, check, checkClosed bool) (arc *closeContext, pos int, added bool) {
+	arc = cc.getKeyedCC(ctx, root, c.CloseInfo.CycleInfo, mode, checkClosed)
 
-	pos = len(*arc.group) - 1
+	pos = len(*arc.group)
 
 	c.CloseInfo.cc = nil
 	added = !check || !hasConjunct(*arc.group, c)
@@ -375,19 +455,20 @@ func (cc *closeContext) assignConjunct(root *closeContext, c Conjunct, check, ch
 // an embedding or a definition.
 //
 // This call is used when preparing ADT values for evaluation.
-func (c CloseInfo) spawnCloseContext(t closeNodeType) (CloseInfo, *closeContext) {
+func (c CloseInfo) spawnCloseContext(ctx *OpContext, t closeNodeType) (CloseInfo, *closeContext) {
 	cc := c.cc
 	if cc == nil {
 		panic("nil closeContext")
 	}
 
 	c.cc = &closeContext{
+		generation:      cc.generation,
 		parent:          cc,
 		src:             cc.src,
 		parentConjuncts: cc,
 	}
 
-	cc.incDependent(PARENT, c.cc) // REF(decrement: spawn)
+	cc.incDependent(ctx, PARENT, c.cc) // REF(decrement: spawn)
 
 	switch t {
 	case closeDef:
@@ -400,30 +481,57 @@ func (c CloseInfo) spawnCloseContext(t closeNodeType) (CloseInfo, *closeContext)
 }
 
 // addDependency adds a dependent arc to c. If child is an arc, child.src == key
-func (c *closeContext) addDependency(kind depKind, key, child *closeContext) {
+func (c *closeContext) addDependency(ctx *OpContext, kind depKind, key, child, root *closeContext) {
 	// NOTE: do not increment
 	// - either root closeContext or otherwise resulting from sub closeContext
 	//   all conjuncts will be added now, notified, or scheduled as task.
 
-	child.incDependent(kind, c) // matched in decDependent REF(arcs)
+	child.incDependent(ctx, kind, c) // matched in decDependent REF(arcs)
 
 	for _, a := range c.arcs {
 		if a.key == key {
 			panic("addArc: Label already exists")
 		}
 	}
-	c.arcs = append(c.arcs, ccArc{kind: kind, key: key, cc: child})
+
+	// TODO: this tests seems sensible, but panics. Investigate what could
+	// trigger this.
+	// if child.src.Parent != c.src {
+	// 	panic("addArc: inconsistent parent")
+	// }
+	if child.src.cc != root.src.cc {
+		panic("addArc: inconsistent root")
+	}
+	c.arcs = append(c.arcs, ccArc{
+		kind: kind,
+		key:  key,
+		cc:   child,
+	})
+	root.externalDeps = append(root.externalDeps, ccArcRef{
+		src:   c,
+		index: len(c.arcs) - 1,
+	})
 }
 
 // incDependent needs to be called for any conjunct or child closeContext
 // scheduled for c that is queued for later processing and not scheduled
 // immediately.
-func (c *closeContext) incDependent(kind depKind, dependant *closeContext) (debug *ccDep) {
+func (c *closeContext) incDependent(ctx *OpContext, kind depKind, dependant *closeContext) (debug *ccDep) {
 	if c.src == nil {
-		panic("incDependent: unexpected nil state")
+		panic("incDependent: unexpected nil src")
 	}
+	if dependant != nil && c.generation != dependant.generation {
+		// TODO: enable this check.
 
-	debug = c.addDependent(kind, dependant)
+		// panic(fmt.Sprintf("incDependent: inconsistent generation: %d %d", c.generation, dependant.generation))
+	}
+	debug = c.addDependent(ctx, kind, dependant)
+
+	if c.done {
+		openDebugGraph(ctx, c.src, "incDependent: already checked")
+
+		panic(fmt.Sprintf("incDependent: already closed: %p", c))
+	}
 
 	c.conjunctCount++
 	return debug
@@ -435,7 +543,7 @@ func (c *closeContext) incDependent(kind depKind, dependant *closeContext) (debu
 func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *closeContext) {
 	v := c.src
 
-	c.matchDecrement(v, kind, dependant)
+	c.matchDecrement(ctx, v, kind, dependant)
 
 	if c.conjunctCount == 0 {
 		panic(fmt.Sprintf("negative reference counter %d %p", c.conjunctCount, c))
@@ -446,24 +554,42 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 		return
 	}
 
+	c.done = true
+
 	p := c.parent
 
-	for _, a := range c.arcs {
+	if c.isDef && !c.hasEllipsis && (!c.hasTop || c.hasNonTop) {
+		c.isClosed = true
+		if p != nil {
+			p.isDef = true
+		}
+	}
+
+	if c.isClosedOnce {
+		c.isClosed = true
+		if p != nil {
+			p.isClosedOnce = true
+		}
+	}
+
+	for i, a := range c.arcs {
 		cc := a.cc
+		if a.decremented {
+			continue
+		}
+		c.arcs[i].decremented = true
 		cc.decDependent(ctx, a.kind, c) // REF(arcs)
 	}
 
 	c.finalizePattern()
 
-	if c.isDef {
-		c.isClosed = true
-	}
-
 	if p == nil {
 		// Root pattern, set allowed patterns.
 		if pcs := v.PatternConstraints; pcs != nil {
 			if pcs.Allowed != nil {
-				panic("unexpected allowed set")
+				// This can happen for lists.
+				// TODO: unify the values.
+				// panic("unexpected allowed set")
 			}
 			pcs.Allowed = c.Expr
 			return
@@ -471,12 +597,27 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 		return
 	}
 
-	if !c.isEmbed && c.isClosed {
+	if c.hasEllipsis {
+		p.hasEllipsis = true
+	}
+	if c.hasTop {
+		p.hasTop = true
+	}
+	if c.hasNonTop {
+		p.hasNonTop = true
+	}
+
+	switch {
+	case c.isTotal:
+		if !p.isClosed {
+			p.isTotal = true
+		}
+	case !c.isEmbed && c.isClosed:
 		// Merge the two closeContexts and ensure that the patterns and fields
 		// are mutually compatible according to the closedness rules.
 		injectClosed(ctx, c, p)
 		p.Expr = mergeConjunctions(p.Expr, c.Expr)
-	} else {
+	default:
 		// Do not check closedness of fields for embeddings.
 		// The pattern constraints of the embedding still need to be added
 		// to the current context.
@@ -496,6 +637,38 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 	}
 }
 
+// incDisjunct increases disjunction-related counters. We require kind to be
+// passed explicitly so that we can easily find the points where certain kinds
+// are used.
+func (c *closeContext) incDisjunct(ctx *OpContext, kind depKind) {
+	if kind != DISJUNCT {
+		panic("unexpected kind")
+	}
+	c.incDependent(ctx, DISJUNCT, nil)
+
+	// TODO: the counters are only used in debug mode and we could skip this
+	// if debug is disabled.
+	for ; c != nil; c = c.parent {
+		c.disjunctCount++
+	}
+}
+
+// decDisjunct decreases disjunction-related counters. We require kind to be
+// passed explicitly so that we can easily find the points where certain kinds
+// are used.
+func (c *closeContext) decDisjunct(ctx *OpContext, kind depKind) {
+	if kind != DISJUNCT {
+		panic("unexpected kind")
+	}
+	c.decDependent(ctx, DISJUNCT, nil)
+
+	// TODO: the counters are only used in debug mode and we could skip this
+	// if debug is disabled.
+	for ; c != nil; c = c.parent {
+		c.disjunctCount++
+	}
+}
+
 // linkPatterns merges the patterns of child into c, if needed.
 func (c *closeContext) linkPatterns(child *closeContext) {
 	if len(child.Patterns) > 0 {
@@ -507,6 +680,8 @@ func (c *closeContext) linkPatterns(child *closeContext) {
 // checkArc validates that the node corresponding to cc allows a field with
 // label v.Label.
 func (n *nodeContext) checkArc(cc *closeContext, v *Vertex) *Vertex {
+	n.assertInitialized()
+
 	f := v.Label
 	ctx := n.ctx
 
@@ -539,19 +714,52 @@ func (n *nodeContext) checkArc(cc *closeContext, v *Vertex) *Vertex {
 }
 
 // insertConjunct inserts conjunct c into cc.
-func (cc *closeContext) insertConjunct(key *closeContext, c Conjunct, id CloseInfo, check, checkClosed bool) bool {
-	arc, _, added := cc.assignConjunct(key, c, check, checkClosed)
+func (cc *closeContext) insertConjunct(ctx *OpContext, key *closeContext, c Conjunct, id CloseInfo, mode ArcType, check, checkClosed bool) (arc *closeContext, added bool) {
+	arc, _, added = cc.assignConjunct(ctx, key, c, mode, check, checkClosed)
 	if key.src != arc.src {
 		panic("inconsistent src")
 	}
 
-	return added
+	if !added {
+		return
+	}
+
+	n := key.src.getBareState(ctx)
+	if n == nil {
+		// already done
+		return
+	}
+
+	if key.src.isInProgress() {
+		c.CloseInfo.cc = nil
+		id.cc = arc
+		n.scheduleConjunct(c, id)
+	}
+
+	for _, rec := range n.notify {
+		if mode == ArcPending {
+			panic("unexpected pending arc")
+		}
+		// TODO: we should probably only notify a conjunct once the root of the
+		// conjunct group is completed. This will make it easier to "stitch" the
+		// conjunct trees together, as its correctness will be guaranteed.
+		cc.insertConjunct(ctx, rec.cc, c, id, mode, check, checkClosed)
+	}
+
+	return
+}
+
+func (n *nodeContext) insertArc(f Feature, mode ArcType, c Conjunct, id CloseInfo, check bool) *Vertex {
+	v, _ := n.insertArcCC(f, mode, c, id, check)
+	return v
 }
 
 // insertArc inserts conjunct c into n. If check is true it will not add c if it
 // was already added.
 // Returns the arc of n.node with label f.
-func (n *nodeContext) insertArc(f Feature, mode ArcType, c Conjunct, id CloseInfo, check bool) *Vertex {
+func (n *nodeContext) insertArcCC(f Feature, mode ArcType, c Conjunct, id CloseInfo, check bool) (*Vertex, *closeContext) {
+	n.assertInitialized()
+
 	if n == nil {
 		panic("nil nodeContext")
 	}
@@ -565,17 +773,30 @@ func (n *nodeContext) insertArc(f Feature, mode ArcType, c Conjunct, id CloseInf
 
 	v, insertedArc := n.getArc(f, mode)
 
+	defer n.ctx.PopArc(n.ctx.PushArc(v))
+
+	// TODO: this block is not strictly needed. Removing it slightly changes the
+	// paths at which errors are reported, arguably, but not clearly, for the
+	// better. Investigate this once the new evaluator is done.
 	if v.ArcType == ArcNotPresent {
-		n.node.reportFieldCycleError(n.ctx, c.Source().Pos(), f)
-		return v
+		// It was already determined before that this arc may not be present.
+		// This case can only manifest itself if we have a cycle.
+		n.node.reportFieldCycleError(n.ctx, pos(c.x), f)
+		return v, nil
 	}
 
-	if !cc.insertConjunct(v.rootCloseContext(), c, id, check, true) {
-		return v
+	if v.cc == nil {
+		v.cc = v.rootCloseContext(n.ctx)
+		v.cc.generation = n.node.cc.generation
+	}
+
+	arc, added := cc.insertConjunct(n.ctx, v.cc, c, id, mode, check, true)
+	if !added {
+		return v, arc
 	}
 
 	if !insertedArc {
-		return v
+		return v, arc
 	}
 
 	// Match and insert patterns.
@@ -583,13 +804,18 @@ func (n *nodeContext) insertArc(f Feature, mode ArcType, c Conjunct, id CloseInf
 		for _, pc := range pcs.Pairs {
 			if matchPattern(n.ctx, pc.Pattern, f) {
 				for _, c := range pc.Constraint.Conjuncts {
+					// TODO: consider using the root cc, but probably does not
+					// matter.
+					// This is necessary if we defunct tasks, but otherwise not.
+					// It breaks the CloseContext tests, though.
+					// c.CloseInfo.cc = id.cc
 					n.addConstraint(v, mode, c, check)
 				}
 			}
 		}
 	}
 
-	return v
+	return v, arc
 }
 
 // addConstraint adds a constraint to arc of n.
@@ -604,6 +830,8 @@ func (n *nodeContext) insertArc(f Feature, mode ArcType, c Conjunct, id CloseInf
 //
 // The arc must be the node arc to which the conjunct is added.
 func (n *nodeContext) addConstraint(arc *Vertex, mode ArcType, c Conjunct, check bool) {
+	n.assertInitialized()
+
 	// TODO(perf): avoid cloning the Environment, if:
 	// - the pattern constraint has no LabelReference
 	//   (require compile-time support)
@@ -629,11 +857,13 @@ func (n *nodeContext) addConstraint(arc *Vertex, mode ArcType, c Conjunct, check
 
 	arc, _ = n.getArc(f, mode)
 
-	root := arc.rootCloseContext()
-	cc.insertConjunct(root, c, c.CloseInfo, check, false)
+	root := arc.rootCloseContext(n.ctx)
+	cc.insertConjunct(n.ctx, root, c, c.CloseInfo, mode, check, false)
 }
 
 func (n *nodeContext) insertPattern(pattern Value, c Conjunct) {
+	n.assertInitialized()
+
 	ctx := n.ctx
 	cc := c.CloseInfo.cc
 
@@ -699,13 +929,34 @@ func injectClosed(ctx *OpContext, closed, dst *closeContext) {
 	// TODO: check that fields are not void arcs.
 outer:
 	for _, a := range dst.arcs {
+		if a.kind != ARC {
+			continue
+		}
 		ca := a.cc
 		f := ca.Label()
-		if f.IsHidden() || f.IsLet() {
+		switch ca.src.ArcType {
+		case ArcMember, ArcRequired:
+		case ArcOptional, ArcNotPresent:
+			// Without this continue, an evaluation error may be propagated to
+			// parent nodes that are otherwise allowed.
+			continue
+		case ArcPending:
+			// TODO: Need to evaluate?
+		default:
+			panic("unreachable")
+		}
+		// TODO: disallow new definitions in closed structs.
+		if f.IsHidden() || f.IsLet() || f.IsDef() {
 			continue
 		}
 		for _, b := range closed.arcs {
 			cb := b.cc
+			// TODO: we could potentially remove the check  for ArcPending if we
+			// explicitly set the arcType to ArcNonPresent when a comprehension
+			// yields no results.
+			if cb.arcType == ArcNotPresent || cb.arcType == ArcPending {
+				continue
+			}
 			if f == cb.Label() {
 				continue outer
 			}
@@ -750,19 +1001,26 @@ func (ctx *OpContext) notAllowedError(v, arc *Vertex) {
 	for _, c := range arc.Conjuncts {
 		ctx.addPositions(c)
 	}
-	// XXX(0.7): Find another way to get this provenance information. Not
+	// TODO(0.7): Find another way to get this provenance information. Not
 	// currently stored in new evaluator.
 	// for _, s := range x.Structs {
 	//  s.AddPositions(ctx)
 	// }
 
+	// TODO: use the arcType from the closeContext.
 	if arc.ArcType == ArcPending {
-		arc.ArcType = ArcNotPresent
+		// arc.ArcType = ArcNotPresent
+		// We do not know yet whether the arc will be present or not. Checking
+		// this will be deferred until this is known, after the comprehension
+		// has been evaluated.
 		return
 	}
 	// TODO: setting arc instead of n.node eliminates subfields. This may be
 	// desirable or not, but it differs, at least from <=v0.6 behavior.
 	arc.SetValue(ctx, ctx.NewErrf("field not allowed"))
+	if arc.state != nil {
+		arc.state.kind = 0
+	}
 
 	// TODO: remove? We are now setting it on both fields, which seems to be
 	// necessary for now. But we should remove this as it often results in

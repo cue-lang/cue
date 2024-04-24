@@ -83,8 +83,16 @@ import (
 //     - So only need to check exact labels for vertices.
 
 type envDisjunct struct {
-	env         *Environment
-	cloneID     CloseInfo
+	env     *Environment
+	cloneID CloseInfo
+
+	// fields for new evaluator
+
+	src       Node
+	disjuncts []disjunct
+
+	// fields for old evaluator
+
 	expr        *DisjunctionExpr
 	value       *Disjunction
 	hasDefaults bool
@@ -108,13 +116,21 @@ func (n *nodeContext) addDisjunction(env *Environment, x *DisjunctionExpr, clone
 		}
 	}
 
-	n.disjunctions = append(n.disjunctions,
-		envDisjunct{env, cloneID, x, nil, numDefaults > 0, false, false})
+	n.disjunctions = append(n.disjunctions, envDisjunct{
+		env:         env,
+		cloneID:     cloneID,
+		expr:        x,
+		hasDefaults: numDefaults > 0,
+	})
 }
 
 func (n *nodeContext) addDisjunctionValue(env *Environment, x *Disjunction, cloneID CloseInfo) {
-	n.disjunctions = append(n.disjunctions,
-		envDisjunct{env, cloneID, nil, x, x.HasDefaults, false, false})
+	n.disjunctions = append(n.disjunctions, envDisjunct{
+		env:         env,
+		cloneID:     cloneID,
+		value:       x,
+		hasDefaults: x.HasDefaults,
+	})
 
 }
 
@@ -123,6 +139,8 @@ func (n *nodeContext) expandDisjuncts(
 	parent *nodeContext,
 	parentMode defaultMode, // default mode of this disjunct
 	recursive, last bool) {
+
+	unreachableForDev(n.ctx)
 
 	n.ctx.stats.Disjuncts++
 
@@ -342,7 +360,7 @@ func (n *nodeContext) expandDisjuncts(
 					m = combineDefault(m, info.nestedMode)
 
 				case hasDefaults && !used:
-					Assertf(parent == notDefault, "unexpected default mode")
+					Assertf(n.ctx, parent == notDefault, "unexpected default mode")
 				}
 			}
 			d.defaultMode = m

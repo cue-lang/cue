@@ -7,11 +7,11 @@ import (
 	"runtime"
 	"sync"
 
-	"cuelang.org/go/internal/mod/internal/par"
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modrequirements"
-	"cuelang.org/go/internal/mod/module"
 	"cuelang.org/go/internal/mod/semver"
+	"cuelang.org/go/internal/par"
+	"cuelang.org/go/mod/module"
 )
 
 // queryImport attempts to locate a module that can be added to the

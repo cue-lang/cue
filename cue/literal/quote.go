@@ -65,6 +65,7 @@ func tabs(n int) string {
 // WithOptionalIndent is like WithTabIndent, but only returns a multiline
 // strings if it doesn't contain any newline characters.
 func (f Form) WithOptionalTabIndent(tabs int) Form {
+	// TODO(mvdan): remove this optimization once Go 1.23 lands with https://go.dev/cl/536615
 	if tabs < len(tabIndent) {
 		f.indent = tabIndent[:tabs]
 	} else {

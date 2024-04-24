@@ -51,6 +51,7 @@ import "example.com/blah:otherpkg"
 
 -- _registry/example.com_v0.0.1/cue.mod/module.cue --
 module: "example.com@v0"
+language: version: "v0.8.0"
 deps: {
 	"foo.com/bar/hello@v0": v: "v0.2.3"
 	"bar.com@v0": v: "v0.5.0"
@@ -64,6 +65,7 @@ import _ "foo.com/bar/hello/more@v0"
 
 -- _registry/foo.com_bar_v0.0.1/cue.mod/module.cue --
 module: "foo.com/bar@v0"
+language: version: "v0.8.0"
 -- _registry/foo.com_bar_v0.0.1/hello/goodbye/hello.cue --
 package goodbye
 -- _registry/foo.com_bar_v0.0.1/hello/more

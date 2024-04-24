@@ -6,55 +6,27 @@ import (
 	"github.com/go-quicktest/qt"
 )
 
-var tests = []struct {
-	testName      string
-	cueExperiment string
-	flagVal       *bool
-	want          bool
-	wantError     string
-}{{
-	testName:      "Empty",
-	cueExperiment: "",
-	flagVal:       &Flags.Modules,
-	want:          false,
-}, {
-	testName:      "Unknown",
-	cueExperiment: "foo",
-	flagVal:       &Flags.Modules,
-	wantError:     "unknown CUE_EXPERIMENT foo",
-}, {
-	testName:      "Set",
-	cueExperiment: "modules",
-	flagVal:       &Flags.Modules,
-	want:          true,
-}, {
-	testName:      "SetTwice",
-	cueExperiment: "modules,modules",
-	flagVal:       &Flags.Modules,
-	want:          true,
-}, {
-	testName:      "SetWithUnknown",
-	cueExperiment: "modules,other",
-	flagVal:       &Flags.Modules,
-	wantError:     "unknown CUE_EXPERIMENT other",
-}}
-
 func TestInit(t *testing.T) {
-	for _, test := range tests {
-		t.Run(test.testName, func(t *testing.T) {
-			setZero(&Flags)
-			t.Setenv("CUE_EXPERIMENT", test.cueExperiment)
-			err := Init()
-			if test.wantError != "" {
-				qt.Assert(t, qt.ErrorMatches(err, test.wantError))
-				return
-			}
-			qt.Assert(t, qt.IsNil(err))
-			qt.Assert(t, qt.Equals(*test.flagVal, test.want))
-		})
-	}
-}
+	// This is just a smoke test to make sure it's all wired up OK.
 
-func setZero[T any](x *T) {
-	*x = *new(T)
+	// Check the default values.
+	t.Setenv("CUE_EXPERIMENT", "")
+	err := initAlways()
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.IsFalse(Flags.Modules))
+	qt.Assert(t, qt.IsTrue(Flags.YAMLV3Decoder))
+
+	// Check that we can enable all experiments.
+	t.Setenv("CUE_EXPERIMENT", "modules,yamlv3decoder")
+	err = initAlways()
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.IsTrue(Flags.Modules))
+	qt.Assert(t, qt.IsTrue(Flags.YAMLV3Decoder))
+
+	// Check that we can disable all experiments.
+	t.Setenv("CUE_EXPERIMENT", "modules=0,yamlv3decoder=0")
+	err = initAlways()
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.IsFalse(Flags.Modules))
+	qt.Assert(t, qt.IsFalse(Flags.YAMLV3Decoder))
 }

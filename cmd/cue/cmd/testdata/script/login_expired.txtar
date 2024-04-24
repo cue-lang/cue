@@ -1,0 +1,10 @@
+# Test that `cue login` fails when given an error
+# such as a device_code being expired.
+
+env CUE_CONFIG_DIR=$WORK/cueconfig
+oauthregistry device-code-expired
+
+! exec cue login
+stdout 'open:.*user_code=user-code'
+stderr 'cannot obtain the OAuth2 token.*expired_token'
+! exists cueconfig/logins.json

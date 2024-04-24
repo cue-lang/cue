@@ -47,7 +47,7 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 		s.fileCache[filename] = result{p, err}
 	}()
 
-	b, err := source.Read(filename, src)
+	b, err := source.ReadAll(filename, src)
 	if err != nil {
 		return nil, err
 	}

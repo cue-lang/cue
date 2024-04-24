@@ -16,7 +16,6 @@ package cmd
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -51,6 +50,7 @@ for this command to work.
 		RunE: mkRunE(c, runModTidy),
 		Args: cobra.ExactArgs(0),
 	}
+	cmd.Flags().Bool(string(flagCheck), false, "check for tidiness only; do not update module.cue file")
 
 	return cmd
 }
@@ -63,16 +63,18 @@ func runModTidy(cmd *Command, args []string) error {
 	if reg == nil {
 		return fmt.Errorf("modules experiment not enabled (enable with CUE_EXPERIMENT=modules)")
 	}
-	ctx := context.Background()
+	ctx := backgroundContext()
 	modRoot, err := findModuleRoot()
 	if err != nil {
 		return err
+	}
+	if flagCheck.Bool(cmd) {
+		return modload.CheckTidy(ctx, os.DirFS(modRoot), ".", reg)
 	}
 	mf, err := modload.Tidy(ctx, os.DirFS(modRoot), ".", reg, versionForModFile())
 	if err != nil {
 		return err
 	}
-	// TODO check whether it's changed or not.
 	data, err := mf.Format()
 	if err != nil {
 		return fmt.Errorf("internal error: invalid module.cue file generated: %v", err)
@@ -91,33 +93,4 @@ func runModTidy(cmd *Command, args []string) error {
 		return err
 	}
 	return nil
-}
-
-func findModuleRoot() (string, error) {
-	// TODO this logic is duplicated in multiple places. We should
-	// consider deduplicating it.
-	dir, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
-	for {
-		if _, err := os.Stat(filepath.Join(dir, "cue.mod")); err == nil {
-			return dir, nil
-		} else if !os.IsNotExist(err) {
-			return "", err
-		}
-		dir1 := filepath.Dir(dir)
-		if dir1 == dir {
-			return "", fmt.Errorf("module root not found")
-		}
-		dir = dir1
-	}
-}
-
-func modCacheDir() (string, error) {
-	cacheDir, err := cueCacheDir()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(cacheDir, "mod"), nil
 }

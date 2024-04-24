@@ -6,8 +6,24 @@ import (
 	"strings"
 	"testing"
 
+	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 	"github.com/go-quicktest/qt"
 )
+
+func TestRegistryConfigSchema(t *testing.T) {
+	schema := RegistryConfigSchema()
+	// Sanity check that it parses OK as CUE and can
+	// validate a legitimate schema.
+	ctx := cuecontext.New()
+	v := ctx.CompileString(schema)
+	fileSchema := v.LookupPath(cue.MakePath(cue.Def("#file")))
+	qt.Assert(t, qt.IsNil(fileSchema.Err()))
+	cfgVal := ctx.CompileString(`defaultRegistry: registry: "something.example"`)
+	qt.Assert(t, qt.IsNil(cfgVal.Err()))
+	cfgVal = cfgVal.Unify(fileSchema)
+	qt.Assert(t, qt.IsNil(cfgVal.Err()))
+}
 
 func TestParseCUERegistry(t *testing.T) {
 	testCases := []struct {
@@ -146,6 +162,30 @@ func TestParseCUERegistry(t *testing.T) {
 				Host:       "registry.example.com",
 				Repository: "offset/example.com/blah",
 			},
+		},
+	}, {
+		testName:        "PrefixWithCatchAllDefaultAndExplicitNoneFallback",
+		in:              "example.com=registry.example.com/offset,none",
+		catchAllDefault: "registry.somewhere",
+		wantAllHosts:    []Host{{"registry.example.com", false}},
+		lookups: map[string]*Location{
+			"fruit.com/apple": nil,
+			"example.com/blah": {
+				Host:       "registry.example.com",
+				Repository: "offset/example.com/blah",
+			},
+		},
+	}, {
+		testName:        "PrefixWithExplicitNone",
+		in:              "example.com=none",
+		catchAllDefault: "registry.somewhere",
+		wantAllHosts:    []Host{{"registry.somewhere", false}},
+		lookups: map[string]*Location{
+			"fruit.com/apple": {
+				Host:       "registry.somewhere",
+				Repository: "fruit.com/apple",
+			},
+			"example.com/blah": nil,
 		},
 	}, {
 		testName:     "LocalhostIsInsecure",
@@ -314,6 +354,9 @@ moduleRegistries: {
 		registry: "r3.example/repo"
 		stripPrefix: true
 	}
+	"badmodules.org": {
+		registry: "none"
+	}
 }
 `,
 		wantAllHosts: []Host{{
@@ -365,6 +408,13 @@ moduleRegistries: {
 				Repository: "repo/one/two/three",
 				Tag:        "v0.0.1",
 			},
+			"stripped.org/bar v0.0.1": {
+				Host:       "r3.example",
+				Repository: "repo",
+				Tag:        "v0.0.1",
+			},
+			"badmodules.org/something v1.2.3": nil,
+			"badmodules.org v1.2.3":           nil,
 		},
 	}, {
 		testName: "InvalidModulePath",
@@ -412,6 +462,18 @@ moduleRegistries: {
 }
 `,
 		err: `registry host "ok.com" is specified both as secure and insecure`,
+	}, {
+		testName:        "StripPrefixWithNoRepo",
+		catchAllDefault: "c.example",
+		in: `
+moduleRegistries: {
+	"a.example/foo": {
+		registry: "foo.example"
+		stripPrefix: true
+	}
+}
+`,
+		err: `invalid registry configuration in "a.example/foo": use of stripPrefix requires a non-empty repository within the registry`,
 	}}
 
 	for _, tc := range testCases {
@@ -428,11 +490,11 @@ moduleRegistries: {
 	}
 }
 
-func testLookups(t *testing.T, r HostResolver, lookups map[string]*Location) {
+func testLookups(t *testing.T, r LocationResolver, lookups map[string]*Location) {
 	for key, want := range lookups {
 		t.Run(key, func(t *testing.T) {
 			m, v, _ := strings.Cut(key, " ")
-			got, ok := r.Resolve(m, v)
+			got, ok := r.ResolveToLocation(m, v)
 			if want == nil {
 				qt.Assert(t, qt.IsFalse(ok))
 			} else {

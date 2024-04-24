@@ -60,6 +60,105 @@ Retain: 0
 Unifications: 9
 Conjuncts:    29
 Disjuncts:    9
+-- out/evalalpha --
+Errors:
+c.aaa: field not allowed:
+    ./in.cue:5:18
+    ./in.cue:2:2
+    ./in.cue:9:11
+d.aaa: field not allowed:
+    ./in.cue:5:18
+    ./in.cue:2:2
+    ./in.cue:12:10
+
+Result:
+(_|_){
+  // [eval]
+  #A: (#struct){
+  }
+  #B: (#struct){
+  }
+  #C: (#struct){
+  }
+  c: (_|_){
+    // [eval]
+    aaa: (_|_){
+      // [eval] c.aaa: field not allowed:
+      //     ./in.cue:5:18
+      //     ./in.cue:2:2
+      //     ./in.cue:9:11
+    }
+  }
+  #D: (#struct){
+  }
+  d: (_|_){
+    // [eval]
+    aaa: (_|_){
+      // [eval] d.aaa: field not allowed:
+      //     ./in.cue:5:18
+      //     ./in.cue:2:2
+      //     ./in.cue:12:10
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,18 +1,11 @@
+ Errors:
+ c.aaa: field not allowed:
+-    ./in.cue:2:2
+-    ./in.cue:4:5
+-    ./in.cue:8:5
+-    ./in.cue:8:10
+-    ./in.cue:9:5
++    ./in.cue:5:18
++    ./in.cue:2:2
+     ./in.cue:9:11
+ d.aaa: field not allowed:
+-    ./in.cue:2:2
+-    ./in.cue:4:5
+-    ./in.cue:11:5
+-    ./in.cue:11:6
+-    ./in.cue:11:11
+-    ./in.cue:12:4
++    ./in.cue:5:18
++    ./in.cue:2:2
+     ./in.cue:12:10
+ 
+ Result:
+@@ -28,11 +21,8 @@
+     // [eval]
+     aaa: (_|_){
+       // [eval] c.aaa: field not allowed:
+-      //     ./in.cue:2:2
+-      //     ./in.cue:4:5
+-      //     ./in.cue:8:5
+-      //     ./in.cue:8:10
+-      //     ./in.cue:9:5
++      //     ./in.cue:5:18
++      //     ./in.cue:2:2
+       //     ./in.cue:9:11
+     }
+   }
+@@ -42,12 +32,8 @@
+     // [eval]
+     aaa: (_|_){
+       // [eval] d.aaa: field not allowed:
+-      //     ./in.cue:2:2
+-      //     ./in.cue:4:5
+-      //     ./in.cue:11:5
+-      //     ./in.cue:11:6
+-      //     ./in.cue:11:11
+-      //     ./in.cue:12:4
++      //     ./in.cue:5:18
++      //     ./in.cue:2:2
+       //     ./in.cue:12:10
+     }
+   }
+-- diff/todo/p2 --
+Missing positions.
 -- out/eval --
 Errors:
 c.aaa: field not allowed:

@@ -126,7 +126,7 @@ func (e *MultiplePackageError) InputPositions() []token.Pos { return nil }
 func (e *MultiplePackageError) Path() []string              { return nil }
 
 func (e *MultiplePackageError) Msg() (string, []interface{}) {
-	return "found packages %q (%s) and %s (%s) in %q", []interface{}{
+	return "found packages %q (%s) and %q (%s) in %q", []interface{}{
 		e.Packages[0],
 		e.Files[0],
 		e.Packages[1],

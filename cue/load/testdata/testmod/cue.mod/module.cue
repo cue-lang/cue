@@ -13,3 +13,4 @@
 // limitations under the License.
 
 module: "mod.test/test"
+language: version: "v0.8.0"

@@ -71,10 +71,10 @@ func extractDocs(v *adt.Vertex, a []adt.Conjunct) (docs []*ast.CommentGroup) {
 
 		newFields := []*ast.Field{}
 
-		for _, x := range p.Conjuncts {
+		p.VisitLeafConjuncts(func(x adt.Conjunct) bool {
 			f, ok := x.Source().(*ast.Field)
 			if !ok || !hasShorthandValue(f) {
-				continue
+				return true
 			}
 
 			nested := nestedField(f)
@@ -88,7 +88,8 @@ func extractDocs(v *adt.Vertex, a []adt.Conjunct) (docs []*ast.CommentGroup) {
 					}
 				}
 			}
-		}
+			return true
+		})
 
 		fields = newFields
 	}
@@ -144,9 +145,10 @@ func containsDoc(a []*ast.CommentGroup, cg *ast.CommentGroup) bool {
 }
 
 func ExtractFieldAttrs(v *adt.Vertex) (attrs []*ast.Attribute) {
-	for _, x := range v.Conjuncts {
+	v.VisitLeafConjuncts(func(x adt.Conjunct) bool {
 		attrs = extractFieldAttrs(attrs, x.Field())
-	}
+		return true
+	})
 	return attrs
 }
 

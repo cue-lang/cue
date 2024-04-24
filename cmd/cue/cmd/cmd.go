@@ -139,7 +139,6 @@ Run "cue help commands" for more details on tasks and commands.
 			// depending on whether we ran via `cue cmd` or the `cue` shortcut.
 			isRootCmd := cmd.Command == cmd.root
 
-			// TODO(mvdan): test running `cue` and `cue cmd` via testscript as well
 			if len(args) == 0 {
 				// `cue` should print the top-level help like `cue -h`,
 				// but `cue cmd` should explain that a custom command is required.
@@ -175,6 +174,10 @@ Run "cue help commands" for more details on tasks and commands.
 			}
 			// Presumably the *cobra.Command argument should be cmd.Command,
 			// as that is the one which will have the right settings applied.
+			if isRootCmd {
+				cmd.PrintErrf("The short-form 'cue %[1]s' is deprecated; use 'cue cmd %[1]s'.\n", args[0])
+				cmd.PrintErrf("See: https://cuelang.org/issue/2519\n")
+			}
 			return sub.RunE(cmd.Command, args[1:])
 		}),
 	}

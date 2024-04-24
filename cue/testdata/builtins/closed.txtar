@@ -51,6 +51,272 @@ Retain: 40
 Unifications: 185
 Conjuncts:    365
 Disjuncts:    190
+-- out/evalalpha --
+Errors:
+b.x: field not allowed:
+    ./in.cue:1:4
+    ./in.cue:5:9
+
+Result:
+(_|_){
+  // [eval]
+  a: (#struct){
+    a: (struct){
+      b: (int){ int }
+    }
+  }
+  b: (_|_){
+    // [eval]
+    x: (_|_){
+      // [eval] b.x: field not allowed:
+      //     ./in.cue:1:4
+      //     ./in.cue:5:9
+    }
+    a: (struct){
+      b: (int){ int }
+    }
+  }
+  c: (#struct){
+    a: (struct){
+      c: (int){ int }
+      b: (int){ int }
+    }
+  }
+  inDisjunctions: (struct){
+    x: (struct){
+      socket: (#struct){
+        string: (#struct){ |((#struct){
+            a: (#struct){
+              b: (bool){ true }
+            }
+            let X#1 = (#struct){
+              b: (bool){ true }
+            }
+            uint: (#struct){
+              a: (#struct){
+                b: (bool){ true }
+              }
+            }
+          }, (#struct){
+            a: (#struct){
+              b: (bool){ true }
+            }
+            let X#1 = (#struct){
+              b: (bool){ true }
+            }
+            string: (#struct){
+              a: (#struct){
+                b: (bool){ true }
+              }
+            }
+          }) }
+      }
+      syslog: (#struct){
+        xxx: (#struct){ |((#struct){
+            a: (#struct){
+              b: (bool){ true }
+            }
+            let X#1 = (#struct){
+              b: (bool){ true }
+            }
+            uint: (#struct){
+              a: (#struct){
+                b: (bool){ true }
+              }
+            }
+          }, (#struct){
+            a: (#struct){
+              b: (bool){ true }
+            }
+            let X#1 = (#struct){
+              b: (bool){ true }
+            }
+            string: (#struct){
+              a: (#struct){
+                b: (bool){ true }
+              }
+            }
+          }) }
+        string: (#struct){ |((#struct){
+            a: (#struct){
+              b: (bool){ true }
+            }
+            let X#1 = (#struct){
+              b: (bool){ true }
+            }
+            uint: (#struct){
+              a: (#struct){
+                b: (bool){ true }
+              }
+            }
+          }, (#struct){
+            a: (#struct){
+              b: (bool){ true }
+            }
+            let X#1 = (#struct){
+              b: (bool){ true }
+            }
+            string: (#struct){
+              a: (#struct){
+                b: (bool){ true }
+              }
+            }
+          }) }
+      }
+    }
+    #Def: (#struct){
+    }
+  }
+  issue642: (struct){
+    test: (#struct){
+      a: (struct){
+        x: (_){ _ }
+        y: (_){ _ }
+      }
+      b: (struct){
+        x: (_){ _ }
+        y: (_){ _ }
+      }
+    }
+  }
+  withSubfields: (struct){
+    test: (#struct){
+      a: (struct){
+        x: (_){ _ }
+        y: (_){ _ }
+      }
+      b: (struct){
+        x: (_){ _ }
+        y: (_){ _ }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,7 +1,6 @@
+ Errors:
+ b.x: field not allowed:
+-    ./in.cue:1:10
+-    ./in.cue:5:4
++    ./in.cue:1:4
+     ./in.cue:5:9
+ 
+ Result:
+@@ -14,20 +13,19 @@
+   }
+   b: (_|_){
+     // [eval]
+-    a: (struct){
+-      b: (int){ int }
+-    }
+     x: (_|_){
+       // [eval] b.x: field not allowed:
+-      //     ./in.cue:1:10
+-      //     ./in.cue:5:4
++      //     ./in.cue:1:4
+       //     ./in.cue:5:9
+     }
++    a: (struct){
++      b: (int){ int }
++    }
+   }
+   c: (#struct){
+     a: (struct){
+-      b: (int){ int }
+       c: (int){ int }
++      b: (int){ int }
+     }
+   }
+   inDisjunctions: (struct){
+@@ -60,42 +58,50 @@
+           }) }
+       }
+       syslog: (#struct){
+-        string: (#struct){ |((#struct){
+-            a: (#struct){
+-              b: (bool){ true }
+-            }
+-            let X#1multi = 〈0;a〉
+-            uint: (#struct){
+-              a: (#struct){
+-                b: (bool){ true }
+-              }
+-            }
+-          }, (#struct){
+-            a: (#struct){
+-              b: (bool){ true }
+-            }
+-            let X#1multi = 〈0;a〉
+-            string: (#struct){
+-              a: (#struct){
+-                b: (bool){ true }
+-              }
+-            }
+-          }) }
+         xxx: (#struct){ |((#struct){
+             a: (#struct){
+               b: (bool){ true }
+             }
+-            let X#1multi = 〈0;a〉
+-            uint: (#struct){
+-              a: (#struct){
+-                b: (bool){ true }
+-              }
+-            }
+-          }, (#struct){
+-            a: (#struct){
+-              b: (bool){ true }
+-            }
+-            let X#1multi = 〈0;a〉
++            let X#1 = (#struct){
++              b: (bool){ true }
++            }
++            uint: (#struct){
++              a: (#struct){
++                b: (bool){ true }
++              }
++            }
++          }, (#struct){
++            a: (#struct){
++              b: (bool){ true }
++            }
++            let X#1 = (#struct){
++              b: (bool){ true }
++            }
++            string: (#struct){
++              a: (#struct){
++                b: (bool){ true }
++              }
++            }
++          }) }
++        string: (#struct){ |((#struct){
++            a: (#struct){
++              b: (bool){ true }
++            }
++            let X#1 = (#struct){
++              b: (bool){ true }
++            }
++            uint: (#struct){
++              a: (#struct){
++                b: (bool){ true }
++              }
++            }
++          }, (#struct){
++            a: (#struct){
++              b: (bool){ true }
++            }
++            let X#1 = (#struct){
++              b: (bool){ true }
++            }
+             string: (#struct){
+               a: (#struct){
+                 b: (bool){ true }
+-- diff/todo/p3 --
+Reordering
+Let differs.
 -- out/eval --
 Errors:
 b.x: field not allowed:

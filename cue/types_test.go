@@ -658,8 +658,14 @@ func TestNull(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
-			err := getInstance(t, tc.value).Lookup("v").Null()
+			v := getInstance(t, tc.value).Lookup("v")
+			err := v.Null()
 			checkErr(t, err, tc.err, "init")
+			wantBool := err == nil
+			gotBool := v.IsNull()
+			if wantBool != gotBool {
+				t.Fatalf("IsNull reported %v, but Null reported: %v", gotBool, err)
+			}
 		})
 	}
 }
@@ -3045,27 +3051,6 @@ func TestWalk(t *testing.T) {
 	}
 }
 
-func TestTrimZeros(t *testing.T) {
-	testCases := []struct {
-		in  string
-		out string
-	}{
-		{"", ""},
-		{"2", "2"},
-		{"2.0", "2.0"},
-		{"2.000000000000", "2.0"},
-		{"2000000000000", "2e+12"},
-		{"2000000", "2e+6"},
-	}
-	for _, tc := range testCases {
-		t.Run(tc.in, func(t *testing.T) {
-			if got := trimZeros(tc.in); got != tc.out {
-				t.Errorf("got %q; want %q", got, tc.out)
-			}
-		})
-	}
-}
-
 func TestReferencePath(t *testing.T) {
 	testCases := []struct {
 		input          string
@@ -3084,6 +3069,9 @@ func TestReferencePath(t *testing.T) {
 	}, {
 		input: "v: w: x: a.b.c, a: b: c: 1",
 		want:  "a.b.c",
+	}, {
+		input: "if true { v: w: x: a, a: 1 }",
+		want:  "a",
 	}, {
 		input: "v: w: x: w.a.b.c, v: w: a: b: c: 1",
 		want:  "v.w.a.b.c",
@@ -3447,6 +3435,38 @@ func TestPathCorrection(t *testing.T) {
 			v = v.Lookup("t")
 			return v
 		},
+	}, {
+		input: `
+		x: { if true { v: a } }
+		a: b
+		b: 2
+		`,
+		want: "b",
+		lookup: func(inst *Instance) Value {
+			v := inst.Value().LookupPath(ParsePath("x.v"))
+			v = Dereference(v)
+			return v
+		},
+	}, {
+		input: `
+		package foo
+
+		#A:{ if true { #B: #T } }
+
+		#T: {
+			a: #S.#U
+			#S: #U: {}
+		}
+		`,
+		want: "#T.#S.#U",
+		lookup: func(inst *Instance) Value {
+			f, _ := inst.Value().LookupField("#A")
+			f, _ = f.Value.LookupField("#B")
+			v := f.Value
+			v = Dereference(v)
+			v = v.Lookup("a")
+			return v
+		},
 	}}
 	for _, tc := range testCases {
 		if tc.skip {
@@ -3723,6 +3743,9 @@ func TestExpr(t *testing.T) {
 	}, {
 		input: `v: {>30, <40}`,
 		want:  `&(>(30) <(40))`,
+	}, {
+		input: `a: string, if true { v: a }`,
+		want:  `.(〈〉 "a")`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {

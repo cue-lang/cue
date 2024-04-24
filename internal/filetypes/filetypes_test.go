@@ -43,7 +43,7 @@ func TestFromFile(t *testing.T) {
 	}{{
 		name: "must specify encoding",
 		in:   build.File{},
-		out:  `#FileInfo.encoding: non-concrete value string`,
+		out:  `modes.input.FileInfo: field not found: encoding`,
 	}, {
 		// Default without any
 		name: "cue",
@@ -71,13 +71,32 @@ func TestFromFile(t *testing.T) {
 			Attributes:   true,
 		},
 	}, {
+		// CUE encoding in data form.
+		name: "data: cue",
+		in: build.File{
+			Filename: "",
+			Form:     build.Data,
+			Encoding: build.CUE,
+		},
+		mode: Input,
+		out: &FileInfo{
+			File: &build.File{
+				Filename: "",
+				Encoding: "cue",
+				Form:     "data",
+			},
+			Data:       true,
+			Docs:       true,
+			Attributes: true,
+		},
+	}, {
 		// Filename starting with a . but no other extension.
 		name: "filename-with-dot",
 		in: build.File{
 			Filename: ".json",
 		},
 		mode: Def,
-		out:  "#FileInfo.encoding: non-concrete value string",
+		out:  `modes.def.FileInfo: field not found: encoding`,
 	}, {
 		name: "yaml",
 		mode: Def,
@@ -333,6 +352,20 @@ func TestParseFile(t *testing.T) {
 	}, {
 		in:  "file.bar",
 		out: `unknown file extension .bar`,
+	}, {
+		in:   "-",
+		mode: Input,
+		out: &build.File{
+			Filename: "-",
+			Encoding: "cue",
+		},
+	}, {
+		in:   "-",
+		mode: Export,
+		out: &build.File{
+			Filename: "-",
+			Encoding: "json",
+		},
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.in, func(t *testing.T) {

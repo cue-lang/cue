@@ -4,11 +4,11 @@ exec cue export
 cmp stdout expect/concrete.json
 
 # Using the explicitly written command works OK.
-exec cue hello1
+exec cue cmd hello1
 stdout 'hello, world'
 
 # Using the command that's defined externally fails.
-exec cue hello
+exec cue cmd hello
 stdout 'hello, world'
 
 

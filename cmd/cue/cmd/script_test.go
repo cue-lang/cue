@@ -18,23 +18,29 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"io/fs"
+	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
+	"cuelabs.dev/go/oci/ociregistry/ociclient"
 	"cuelabs.dev/go/oci/ociregistry/ocimem"
-	"cuelabs.dev/go/oci/ociregistry/ociserver"
+	"cuelabs.dev/go/oci/ociregistry/ociref"
 	"github.com/google/shlex"
 	"github.com/rogpeppe/go-internal/goproxytest"
 	"github.com/rogpeppe/go-internal/gotooltest"
 	"github.com/rogpeppe/go-internal/testscript"
+	"golang.org/x/oauth2"
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue/errors"
@@ -109,6 +115,36 @@ func TestScript(t *testing.T) {
 					ts.Check(os.WriteFile(path, []byte(data), 0o666))
 				}
 			},
+			// get-manifest writes the manifest for a given reference within an OCI
+			// registry to a file in JSON format.
+			"get-manifest": func(ts *testscript.TestScript, neg bool, args []string) {
+				usage := func() {
+					ts.Fatalf("usage: get-metadata OCI-ref@tag dest-file")
+				}
+				if neg {
+					usage()
+				}
+				if len(args) != 2 {
+					usage()
+				}
+				ref, err := ociref.Parse(args[0])
+				if err != nil {
+					ts.Fatalf("invalid OCI reference %q: %v", args[0], err)
+				}
+				if ref.Tag == "" {
+					ts.Fatalf("no tag in OCI reference %q", args[0])
+				}
+				client, err := ociclient.New(ref.Host, &ociclient.Options{
+					Insecure: true,
+				})
+				ts.Check(err)
+				r, err := client.GetTag(context.Background(), ref.Repository, ref.Tag)
+				ts.Check(err)
+				data, err := io.ReadAll(r)
+				ts.Check(err)
+				err = os.WriteFile(ts.MkAbs(args[1]), data, 0o666)
+				ts.Check(err)
+			},
 			// memregistry starts an in-memory OCI server and sets the argument
 			// environment variable name to its hostname.
 			"memregistry": func(ts *testscript.TestScript, neg bool, args []string) {
@@ -138,9 +174,29 @@ func TestScript(t *testing.T) {
 					usage()
 				}
 
-				srv := httptest.NewServer(registrytest.AuthHandler(ociserver.New(ocimem.New(), nil), auth))
+				srv, err := registrytest.NewServer(ocimem.New(), auth)
+				if err != nil {
+					ts.Fatalf("cannot start registrytest server: %v", err)
+				}
+				ts.Setenv(args[0], srv.Host())
+				ts.Defer(srv.Close)
+			},
+			// memregistry starts an HTTP server with enough endpoints to test `cue login`.
+			// It takes a single argument to describe the oauth server's behavior:
+			//
+			// * device-code-expired: polling for a token with device_code
+			//   always responds with [tokenErrorCodeExpired]
+			// * pending-success: polling for a token with device_code
+			//   responds with [tokenErrorCodePending] once, and then succeeds
+			// * immediate-success: polling for a token with device_code succeeds right away
+			"oauthregistry": func(ts *testscript.TestScript, neg bool, args []string) {
+				if len(args) != 1 {
+					ts.Fatalf("usage: oauthregistry <mode>")
+				}
+				ts.Setenv("CUE_EXPERIMENT", "modules")
+				srv := newMockRegistryOauth(args[0])
 				u, _ := url.Parse(srv.URL)
-				ts.Setenv(args[0], u.Host)
+				ts.Setenv("CUE_REGISTRY", u.Host+"+insecure")
 				ts.Defer(srv.Close)
 			},
 		},
@@ -275,21 +331,21 @@ func TestX(t *testing.T) {
 
 func TestMain(m *testing.M) {
 	os.Exit(testscript.RunMain(m, map[string]func() int{
-		"cue": MainTest,
+		"cue": Main,
 		// Until https://github.com/rogpeppe/go-internal/issues/93 is fixed,
 		// or we have some other way to use "exec" without caring about success,
 		// this is an easy way for us to mimic `? exec cue`.
 		"cue_exitzero": func() int {
-			MainTest()
+			Main()
 			return 0
 		},
 		"cue_stdinpipe": func() int {
 			cwd, _ := os.Getwd()
-			if err := mainTestStdinPipe(); err != nil {
+			if err := mainStdinPipe(); err != nil {
 				if err != ErrPrintedError { // print errors like Main
 					errors.Print(os.Stderr, err, &errors.Config{
 						Cwd:     cwd,
-						ToSlash: inTest,
+						ToSlash: testing.Testing(),
 					})
 				}
 				return 1
@@ -312,10 +368,9 @@ func tsExpand(ts *testscript.TestScript, s string) string {
 	})
 }
 
-func mainTestStdinPipe() error {
-	// Like MainTest, but sets stdin to a pipe,
+func mainStdinPipe() error {
+	// Like Main, but sets stdin to a pipe,
 	// to emulate stdin reads like a terminal.
-	inTest = true
 	cmd, _ := New(os.Args[1:])
 	pr, pw, err := os.Pipe()
 	if err != nil {
@@ -354,4 +409,89 @@ func testCmd() error {
 	default:
 		return fmt.Errorf("unknown command: %q\n", cmd)
 	}
+}
+
+// newMockRegistryOauth starts a test HTTP server with the OAuth2 device flow endpoints
+// used by `cue login` to obtain an access token.
+// Note that this HTTP server isn't an OCI registry yet, as that isn't needed for now.
+//
+// TODO: once we support refresh tokens, add those endpoints and test them too.
+func newMockRegistryOauth(mode string) *httptest.Server {
+	mux := http.NewServeMux()
+	ts := httptest.NewServer(mux)
+	const (
+		staticUserCode    = "user-code"
+		staticDeviceCode  = "device-code-longer-string"
+		staticAccessToken = "secret-access-token"
+		intervalSecs      = 1 // 1s to keep the tests fast
+	)
+	// OAuth2 Device Authorization Request endpoint: https://datatracker.ietf.org/doc/html/rfc8628#section-3.1
+	mux.HandleFunc("/login/device/code", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, http.StatusOK, oauth2.DeviceAuthResponse{
+			DeviceCode: staticDeviceCode,
+			UserCode:   staticUserCode,
+
+			VerificationURI:         ts.URL + "/login/device",
+			VerificationURIComplete: ts.URL + "/login/device?user_code=" + url.QueryEscape(staticUserCode),
+
+			Expiry:   time.Now().Add(time.Minute),
+			Interval: intervalSecs,
+		})
+	})
+	// OAuth2 Token endpoint: https://datatracker.ietf.org/doc/html/rfc6749#section-3.2
+	var tokenRequestCounter atomic.Int64
+	mux.HandleFunc("/login/oauth/token", func(w http.ResponseWriter, r *http.Request) {
+		deviceCode := r.FormValue("device_code")
+		if deviceCode != staticDeviceCode {
+			writeJSON(w, http.StatusBadRequest, tokenError{ErrorCode: tokenErrorCodeDenied})
+			return
+		}
+		switch mode {
+		case "device-code-expired":
+			writeJSON(w, http.StatusBadRequest, tokenError{ErrorCode: tokenErrorCodeExpired})
+		case "pending-success":
+			count := tokenRequestCounter.Add(1)
+			if count == 1 {
+				writeJSON(w, http.StatusBadRequest, tokenError{ErrorCode: tokenErrorCodePending})
+				break
+			}
+			fallthrough
+		case "immediate-success":
+			writeJSON(w, http.StatusOK, oauth2.Token{
+				AccessToken: staticAccessToken,
+				TokenType:   "Bearer",
+				Expiry:      time.Now().Add(time.Hour),
+			})
+		default:
+			panic(fmt.Sprintf("unknown mode: %q", mode))
+		}
+	})
+	return ts
+}
+
+func writeJSON(w http.ResponseWriter, statusCode int, v any) {
+	b, err := json.Marshal(v)
+	if err != nil { // should never happen
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	w.Write(b)
+}
+
+const (
+	// Device flow token error code strings from https://datatracker.ietf.org/doc/html/rfc8628#section-3.5
+	tokenErrorCodePending  = "authorization_pending" // waiting for user
+	tokenErrorCodeSlowDown = "slow_down"             // increase polling interval
+	tokenErrorCodeDenied   = "access_denied"         // the user denied the request
+	tokenErrorCodeExpired  = "expired_token"         // the device_code expired
+)
+
+// tokenError implements the error response structure defined by
+// https://datatracker.ietf.org/doc/html/rfc6749#section-5.2
+type tokenError struct {
+	ErrorCode        string `json:"error"` // one of the constants above
+	ErrorDescription string `json:"error_description,omitempty"`
+	ErrorURI         string `json:"error_uri,omitempty"`
 }

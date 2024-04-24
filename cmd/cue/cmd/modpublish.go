@@ -15,17 +15,19 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
+	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
 
-	"cuelang.org/go/internal/mod/modfile"
-	"cuelang.org/go/internal/mod/modregistry"
-	"cuelang.org/go/internal/mod/module"
-	"cuelang.org/go/internal/mod/modzip"
+	"cuelang.org/go/internal/vcs"
+	"cuelang.org/go/mod/modfile"
+	"cuelang.org/go/mod/modregistry"
+	"cuelang.org/go/mod/module"
+	"cuelang.org/go/mod/modzip"
 )
 
 func newModUploadCmd(c *Command) *cobra.Command {
@@ -51,6 +53,7 @@ for this command to work.
 }
 
 func runModUpload(cmd *Command, args []string) error {
+	ctx := cmd.Context()
 	resolver, err := getRegistryResolver()
 	if err != nil {
 		return err
@@ -76,6 +79,10 @@ func runModUpload(cmd *Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("cannot form module version: %v", err)
 	}
+	if mf.Source == nil {
+		// TODO print filename relative to current directory
+		return fmt.Errorf("no source field found in cue.mod/module.cue")
+	}
 	zf, err := os.CreateTemp("", "cue-publish-")
 	if err != nil {
 		return err
@@ -84,8 +91,41 @@ func runModUpload(cmd *Command, args []string) error {
 	defer zf.Close()
 
 	// TODO verify that all dependencies exist in the registry.
-	if err := modzip.CreateFromDir(zf, mv, modRoot); err != nil {
-		return err
+
+	var meta *modregistry.Metadata
+
+	switch mf.Source.Kind {
+	case "self":
+		if err := modzip.CreateFromDir(zf, mv, modRoot); err != nil {
+			return err
+		}
+	default:
+		vcsImpl, err := vcs.New(mf.Source.Kind, modRoot)
+		if err != nil {
+			return err
+		}
+		status, err := vcsImpl.Status(ctx)
+		if err != nil {
+			return err
+		}
+		if status.Uncommitted {
+			// TODO implement --force to bypass this check
+			return fmt.Errorf("VCS state is not clean")
+		}
+		files, err := vcsImpl.ListFiles(ctx, modRoot)
+		if err != nil {
+			return err
+		}
+		if err := modzip.Create[string](zf, mv, files, osFileIO{
+			modRoot: modRoot,
+		}); err != nil {
+			return err
+		}
+		meta = &modregistry.Metadata{
+			VCSType:       mf.Source.Kind,
+			VCSCommit:     status.Revision,
+			VCSCommitTime: status.CommitTime,
+		}
 	}
 	info, err := zf.Stat()
 	if err != nil {
@@ -93,9 +133,31 @@ func runModUpload(cmd *Command, args []string) error {
 	}
 
 	rclient := modregistry.NewClientWithResolver(resolver)
-	if err := rclient.PutModule(context.Background(), mv, zf, info.Size()); err != nil {
+	if err := rclient.PutModuleWithMetadata(backgroundContext(), mv, zf, info.Size(), meta); err != nil {
 		return fmt.Errorf("cannot put module: %v", err)
 	}
 	fmt.Printf("published %s\n", mv)
 	return nil
+}
+
+// osFileIO implements [modzip.FileIO] for filepath paths relative to
+// the module root directory, as returned by [vcs.VCS.ListFiles].
+type osFileIO struct {
+	modRoot string
+}
+
+func (osFileIO) Path(f string) string {
+	return filepath.ToSlash(f)
+}
+
+func (fio osFileIO) Lstat(f string) (fs.FileInfo, error) {
+	return os.Lstat(fio.absPath(f))
+}
+
+func (fio osFileIO) Open(f string) (io.ReadCloser, error) {
+	return os.Open(fio.absPath(f))
+}
+
+func (fio osFileIO) absPath(f string) string {
+	return filepath.Join(fio.modRoot, f)
 }

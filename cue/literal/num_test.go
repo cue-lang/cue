@@ -60,6 +60,7 @@ func TestNumbers(t *testing.T) {
 	}{
 		{"0", "0", mkInt(0)},
 		{"1", "1", mkInt(1)},
+		{"+1", "1", mkInt(1)},
 		{"-1", "-1", mkInt(-1)},
 		{"100_000", "100000", NumInfo{UseSep: true, base: 10, buf: []byte("100000")}},
 		{"1.", "1.", mkFloat("1.")},

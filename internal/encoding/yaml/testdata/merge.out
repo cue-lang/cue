@@ -1,0 +1,71 @@
+// From http://yaml.org/type/merge.html
+// Test
+anchors: {
+	list: [{
+		x: 1, y: 2
+	}, {
+		x: 0, y: 2
+	}, {
+		r: 10
+	}, {
+		r: 1
+	}]
+}
+
+// All the following maps are equal:
+plain: {
+	// Explicit keys
+	x:     1
+	y:     2
+	r:     10
+	label: "center/big"
+}
+mergeOne: {
+	// Merge one map
+	x:     1
+	y:     2
+	r:     10
+	label: "center/big"
+}
+mergeMultiple: {
+	// Merge multiple maps
+	r:     10
+	x:     1
+	y:     2
+	label: "center/big"
+}
+override: {
+	// Override
+	r:     10
+	x:     1
+	y:     2
+	label: "center/big"
+}
+shortTag: {
+	// Explicit short merge tag
+	r:     10
+	x:     1
+	y:     2
+	label: "center/big"
+}
+longTag: {
+	// Explicit merge long tag
+	r:     10
+	x:     1
+	y:     2
+	label: "center/big"
+}
+inlineMap: {
+	// Inlined map
+	x:     1
+	y:     2
+	r:     10
+	label: "center/big"
+}
+inlineSequenceMap: {
+	// Inlined map in sequence
+	r:     10
+	x:     1
+	y:     2
+	label: "center/big"
+}

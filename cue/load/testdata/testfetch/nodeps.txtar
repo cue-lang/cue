@@ -4,6 +4,7 @@
 }
 -- cue.mod/module.cue --
 module: "main.org"
+language: version: "v0.8.0"
 
 -- main.cue --
 package main

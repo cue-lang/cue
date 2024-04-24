@@ -25,4 +25,4 @@ command: ls: {
 	}
 }
 
--- cue.mod --
+-- cue.mod/module.cue --

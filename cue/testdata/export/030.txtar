@@ -63,6 +63,38 @@ Retain: 1
 Unifications: 28
 Conjuncts:    131
 Disjuncts:    71
+-- out/evalalpha --
+(struct){
+  #Foo: (#struct){
+    sgl: (string){ string }
+    ref: (null){ null }
+    ext: ((null|string)){ |((string){ string }, (null){ null }) }
+    ref2: ((null|string)){ |((null){ null }, (string){ string }) }
+    "#Foo": (int){ 2 }
+  }
+  #Bar: (string){ string }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,13 +1,7 @@
+ (struct){
+   #Foo: (#struct){
+     sgl: (string){ string }
+-    ref: ((null|struct)){ |((null){ null }, (#struct){
+-        sgl: (string){ string }
+-        ref: (null){ null }
+-        ext: ((null|string)){ |((string){ string }, (null){ null }) }
+-        ref2: ((null|string)){ |((null){ null }, (string){ string }) }
+-        "#Foo": (int){ 2 }
+-      }) }
++    ref: (null){ null }
+     ext: ((null|string)){ |((string){ string }, (null){ null }) }
+     ref2: ((null|string)){ |((null){ null }, (string){ string }) }
+     "#Foo": (int){ 2 }
+-- diff/todo/p2 --
+Structural cycle eliminated too soon?
 -- out/eval --
 (struct){
   #Foo: (#struct){

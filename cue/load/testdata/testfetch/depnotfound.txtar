@@ -3,6 +3,7 @@ import failed: cannot find package "example.com": cannot fetch example.com@v0.0.
     ./main.cue:2:8
 -- cue.mod/module.cue --
 module: "main.org@v0"
+language: version: "v0.8.0"
 
 deps: "example.com@v0": v: "v0.0.1"
 

@@ -83,6 +83,70 @@ Retain: 0
 Unifications: 15
 Conjuncts:    32
 Disjuncts:    15
+-- out/evalalpha --
+Errors:
+e: conflicting values 1 and {a:3} (mismatched types int and struct):
+    ./in.cue:7:5
+    ./in.cue:8:4
+e: cannot combine regular field "a" with 1:
+    ./in.cue:8:8
+    ./in.cue:7:5
+
+Result:
+(_|_){
+  // [eval]
+  o1: (struct){
+    a: (int){ 1 }
+    b: (int){ 2 }
+  }
+  o2: (struct){
+    a: (int){ 1 }
+    b: (int){ 2 }
+  }
+  o3: (struct){
+    a: (int){ 1 }
+    b: (int){ 2 }
+  }
+  o4: (struct){
+    a: (int){ 1 }
+    b: (int){ 2 }
+  }
+  e: (_|_){
+    // [eval] e: conflicting values 1 and {a:3} (mismatched types int and struct):
+    //     ./in.cue:7:5
+    //     ./in.cue:8:4
+    // e: cannot combine regular field "a" with 1:
+    //     ./in.cue:8:8
+    //     ./in.cue:7:5
+    a: (int){ 3 }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -2,6 +2,9 @@
+ e: conflicting values 1 and {a:3} (mismatched types int and struct):
+     ./in.cue:7:5
+     ./in.cue:8:4
++e: cannot combine regular field "a" with 1:
++    ./in.cue:8:8
++    ./in.cue:7:5
+ 
+ Result:
+ (_|_){
+@@ -26,6 +29,9 @@
+     // [eval] e: conflicting values 1 and {a:3} (mismatched types int and struct):
+     //     ./in.cue:7:5
+     //     ./in.cue:8:4
++    // e: cannot combine regular field "a" with 1:
++    //     ./in.cue:8:8
++    //     ./in.cue:7:5
+     a: (int){ 3 }
+   }
+ }
+-- diff/explanation --
+An extra error messages that is correct, but not required.
 -- out/eval --
 Errors:
 e: conflicting values 1 and {a:3} (mismatched types int and struct):

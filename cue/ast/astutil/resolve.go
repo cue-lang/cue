@@ -308,10 +308,7 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 				// illegal name clashes, and it allows giving better error
 				// messages. This puts the burden on clients of this library
 				// to detect illegal usage, though.
-				name, err := ast.ParseIdent(a.Ident)
-				if err == nil {
-					s.insert(name, a.Expr, a)
-				}
+				s.insert(a.Ident.Name, a.Expr, a)
 			}
 
 			ast.Walk(expr, nil, func(n ast.Node) {
@@ -420,23 +417,14 @@ func scopeClauses(s *scope, clauses []ast.Clause) *scope {
 			walk(s, x.Source)
 			s = newScope(s.file, s, x, nil)
 			if x.Key != nil {
-				name, err := ast.ParseIdent(x.Key)
-				if err == nil {
-					s.insert(name, x.Key, x)
-				}
+				s.insert(x.Key.Name, x.Key, x)
 			}
-			name, err := ast.ParseIdent(x.Value)
-			if err == nil {
-				s.insert(name, x.Value, x)
-			}
+			s.insert(x.Value.Name, x.Value, x)
 
 		case *ast.LetClause:
 			walk(s, x.Expr)
 			s = newScope(s.file, s, x, nil)
-			name, err := ast.ParseIdent(x.Ident)
-			if err == nil {
-				s.insert(name, x.Ident, x)
-			}
+			s.insert(x.Ident.Name, x.Ident, x)
 
 		default:
 			walk(s, c)

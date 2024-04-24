@@ -21,34 +21,39 @@ import (
 // Common flags
 const (
 	flagAll           flagName = "all"
-	flagDryrun        flagName = "dryrun"
-	flagVerbose       flagName = "verbose"
 	flagAllErrors     flagName = "all-errors"
-	flagTrace         flagName = "trace"
+	flagCheck         flagName = "check"
+	flagDryrun        flagName = "dryrun"
+	flagEscape        flagName = "escape"
+	flagExpression    flagName = "expression"
+	flagExt           flagName = "ext"
+	flagFiles         flagName = "files"
 	flagForce         flagName = "force"
+	flagGlob          flagName = "name"
 	flagIgnore        flagName = "ignore"
-	flagStrict        flagName = "strict"
-	flagSimplify      flagName = "simplify"
-	flagInlineImports flagName = "inline-imports"
-	flagPackage       flagName = "package"
 	flagInject        flagName = "inject"
 	flagInjectVars    flagName = "inject-vars"
+	flagInlineImports flagName = "inline-imports"
+	flagList          flagName = "list"
+	flagMerge         flagName = "merge"
+	flagOut           flagName = "out"
+	flagOutFile       flagName = "outfile"
+	flagPackage       flagName = "package"
+	flagPath          flagName = "path"
+	flagProtoEnum     flagName = "proto_enum"
+	flagProtoPath     flagName = "proto_path"
+	flagRecursive     flagName = "recursive"
+	flagSchema        flagName = "schema"
+	flagSimplify      flagName = "simplify"
+	flagSource        flagName = "source"
+	flagStrict        flagName = "strict"
+	flagTrace         flagName = "trace"
+	flagVerbose       flagName = "verbose"
+	flagWithContext   flagName = "with-context"
 
-	flagExpression  flagName = "expression"
-	flagSchema      flagName = "schema"
-	flagEscape      flagName = "escape"
-	flagGlob        flagName = "name"
-	flagRecursive   flagName = "recursive"
-	flagMerge       flagName = "merge"
-	flagList        flagName = "list"
-	flagPath        flagName = "path"
-	flagFiles       flagName = "files"
-	flagProtoPath   flagName = "proto_path"
-	flagProtoEnum   flagName = "proto_enum"
-	flagExt         flagName = "ext"
-	flagWithContext flagName = "with-context"
-	flagOut         flagName = "out"
-	flagOutFile     flagName = "outfile"
+	// Hidden flags.
+	flagCpuProfile flagName = "cpuprofile"
+	flagMemProfile flagName = "memprofile"
 )
 
 func addOutFlags(f *pflag.FlagSet, allowNonCUE bool) {
@@ -73,6 +78,11 @@ func addGlobalFlags(f *pflag.FlagSet) {
 	f.BoolP(string(flagVerbose), "v", false,
 		"print information about progress")
 	f.BoolP(string(flagAllErrors), "E", false, "print all available errors")
+
+	f.String(string(flagCpuProfile), "", "write a CPU profile to the specified file before exiting")
+	f.MarkHidden(string(flagCpuProfile))
+	f.String(string(flagMemProfile), "", "write an allocation profile to the specified file before exiting")
+	f.MarkHidden(string(flagMemProfile))
 }
 
 func addOrphanFlags(f *pflag.FlagSet) {

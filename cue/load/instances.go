@@ -25,10 +25,12 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/mod/modimports"
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modrequirements"
+	"cuelang.org/go/mod/module"
 
 	// Trigger the unconditional loading of all core builtin packages if load
 	// is used. This was deemed the simplest way to avoid having to import
@@ -47,13 +49,32 @@ func Instances(args []string, c *Config) []*build.Instance {
 	if c == nil {
 		c = &Config{}
 	}
+	// We want to consult the CUE_EXPERIMENT flag to see whether
+	// consult external registries by default.
+	if err := cueexperiment.Init(); err != nil {
+		return []*build.Instance{c.newErrInstance(err)}
+	}
 	newC, err := c.complete()
 	if err != nil {
 		return []*build.Instance{c.newErrInstance(err)}
 	}
 	c = newC
 
-	pkgs, err := loadPackages(ctx, c)
+	// TODO: This requires packages to be placed before files. At some point this
+	// could be relaxed.
+	i := 0
+	for ; i < len(args) && filetypes.IsPackage(args[i]); i++ {
+	}
+	pkgArgs := args[:i]
+	otherArgs := args[i:]
+
+	// Pass all arguments that look like packages to loadPackages
+	// so that they'll be available when looking up the packages
+	// that are specified on the command line.
+	// Relative import paths create a package with an associated
+	// error but it turns out that's actually OK because the cue/load
+	// logic resolves such paths without consulting pkgs.
+	pkgs, err := loadPackages(ctx, c, pkgArgs)
 	if err != nil {
 		return []*build.Instance{c.newErrInstance(err)}
 	}
@@ -67,16 +88,9 @@ func Instances(args []string, c *Config) []*build.Instance {
 		)
 	}
 
-	// TODO: require packages to be placed before files. At some point this
-	// could be relaxed.
-	i := 0
-	for ; i < len(args) && filetypes.IsPackage(args[i]); i++ {
-	}
-
 	a := []*build.Instance{}
-
 	if len(args) == 0 || i > 0 {
-		for _, m := range l.importPaths(args[:i]) {
+		for _, m := range l.importPaths(pkgArgs) {
 			if m.Err != nil {
 				inst := c.newErrInstance(m.Err)
 				a = append(a, inst)
@@ -86,8 +100,8 @@ func Instances(args []string, c *Config) []*build.Instance {
 		}
 	}
 
-	if args = args[i:]; len(args) > 0 {
-		files, err := filetypes.ParseArgs(args)
+	if len(otherArgs) > 0 {
+		files, err := filetypes.ParseArgs(otherArgs)
 		if err != nil {
 			return []*build.Instance{c.newErrInstance(err)}
 		}
@@ -130,7 +144,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 	return a
 }
 
-func loadPackages(ctx context.Context, cfg *Config) (*modpkgload.Packages, error) {
+func loadPackages(ctx context.Context, cfg *Config, extraPkgs []string) (*modpkgload.Packages, error) {
 	if cfg.Registry == nil || cfg.modFile == nil || cfg.modFile.Module == "" {
 		return nil, nil
 	}
@@ -140,7 +154,7 @@ func loadPackages(ctx context.Context, cfg *Config) (*modpkgload.Packages, error
 		cfg.modFile.DepVersions(),
 		cfg.modFile.DefaultMajorVersions(),
 	)
-	mainModLoc := modpkgload.SourceLoc{
+	mainModLoc := module.SourceLoc{
 		FS:  cfg.fileSystem.ioFS(cfg.ModuleRoot),
 		Dir: ".",
 	}
@@ -148,6 +162,9 @@ func loadPackages(ctx context.Context, cfg *Config) (*modpkgload.Packages, error
 	if err != nil {
 		return nil, fmt.Errorf("cannot enumerate all module imports: %v", err)
 	}
+	// Add any packages specified on the command line so they're always
+	// available.
+	allImports = append(allImports, extraPkgs...)
 	return modpkgload.LoadPackages(
 		ctx,
 		cfg.Module,

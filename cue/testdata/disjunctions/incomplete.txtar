@@ -59,6 +59,113 @@ Retain: 0
 Unifications: 40
 Conjuncts:    99
 Disjuncts:    70
+-- out/evalalpha --
+(struct){
+  issue700: (struct){
+    a: (struct){
+      y: (string){ "y" }
+    }
+    test1: (int){ 1 }
+    test2: ((int|string)){ |(*(string){ "y" }, (int){ 1 }) }
+  }
+  lookup: (struct){
+    x: (struct){
+      name: (string){ "Hello" }
+    }
+    y: (_|_){
+      // [incomplete] lookup.y: undefined field: a:
+      //     ./in.cue:13:14
+    }
+    ok1: (struct){
+      name: (string){ "Hello" }
+    }
+    ok2: (struct){
+      name: (string){ "Hello" }
+    }
+    ok3: (struct){
+      name: (string){ "Hello" }
+    }
+    ok4: (struct){
+      name: (string){ "Hello" }
+    }
+    ok5: (struct){
+      name: (string){ "Hello" }
+    }
+    allFail1: (_|_){
+      // [incomplete] lookup.allFail1: undefined field: a:
+      //     ./in.cue:20:14
+      // lookup.allFail1: undefined field: b:
+      //     ./in.cue:20:20
+    }
+    allFail2: (_|_){
+      // [incomplete] lookup.allFail2: undefined field: a:
+      //     ./in.cue:21:14
+      // lookup.allFail2: undefined field: b:
+      //     ./in.cue:21:20
+    }
+  }
+  func: (struct){
+    s: (string){ string }
+    ok1: (_|_){
+      // [incomplete] func.ok1: non-concrete argument 0:
+      //     ./in.cue:26:7
+      // func.ok1: non-concrete argument 0:
+      //     ./in.cue:26:31
+    }
+  }
+  issue782: (struct){
+    a: (struct){
+      inner: (string){ string }
+      interpolation: (string){ "override" }
+    }
+    b: (struct){
+      inner: (string){ string }
+      interpolation: (string){ "override" }
+    }
+    c: (struct){
+      inner: (string){ string }
+      interpolation: (string){ "override" }
+    }
+    d: (struct){
+      inner: (string){ string }
+      interpolation: (string){ "override" }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -30,15 +30,13 @@
+       name: (string){ "Hello" }
+     }
+     allFail1: (_|_){
+-      // [incomplete] lookup.allFail1: 2 errors in empty disjunction:
+-      // lookup.allFail1: undefined field: a:
++      // [incomplete] lookup.allFail1: undefined field: a:
+       //     ./in.cue:20:14
+       // lookup.allFail1: undefined field: b:
+       //     ./in.cue:20:20
+     }
+     allFail2: (_|_){
+-      // [incomplete] lookup.allFail2: 2 errors in empty disjunction:
+-      // lookup.allFail2: undefined field: a:
++      // [incomplete] lookup.allFail2: undefined field: a:
+       //     ./in.cue:21:14
+       // lookup.allFail2: undefined field: b:
+       //     ./in.cue:21:20
+@@ -47,8 +45,7 @@
+   func: (struct){
+     s: (string){ string }
+     ok1: (_|_){
+-      // [incomplete] func.ok1: 2 errors in empty disjunction:
+-      // func.ok1: non-concrete argument 0:
++      // [incomplete] func.ok1: non-concrete argument 0:
+       //     ./in.cue:26:7
+       // func.ok1: non-concrete argument 0:
+       //     ./in.cue:26:31
+-- diff/todo/p2 --
+Missing "X errors in empty disjunction"
 -- out/eval --
 (struct){
   issue700: (struct){

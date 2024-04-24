@@ -15,7 +15,10 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
+	"bytes"
+	"fmt"
+	"os"
+	"path/filepath"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -24,7 +27,10 @@ import (
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/encoding"
+	"cuelang.org/go/internal/source"
 	"cuelang.org/go/tools/fix"
+
+	"github.com/spf13/cobra"
 )
 
 func newFmtCmd(c *Command) *cobra.Command {
@@ -56,19 +62,41 @@ func newFmtCmd(c *Command) *cobra.Command {
 			cfg.Format = opts
 			cfg.Force = true
 
+			check := flagCheck.Bool(cmd)
+			var badlyFormattedFiles []string
+
 			for _, inst := range builds {
 				if inst.Err != nil {
-					var p *load.PackageError
 					switch {
-					case errors.As(inst.Err, &p):
+					case errors.As(inst.Err, new(*load.PackageError)):
+					case errors.As(inst.Err, new(*load.NoFilesError)):
 					default:
 						exitOnErr(cmd, inst.Err, false)
 						continue
 					}
 				}
 				for _, file := range inst.BuildFiles {
-					files := []*ast.File{}
-					d := encoding.NewDecoder(file, &cfg)
+					shouldFormat := inst.User || file.Filename == "-" || filepath.Dir(file.Filename) == inst.Dir
+					if !shouldFormat {
+						continue
+					}
+
+					// When using --check, we need to buffer the input and output bytes to compare them.
+					var original []byte
+					var formatted bytes.Buffer
+					if check {
+						if bs, ok := file.Source.([]byte); ok {
+							original = bs
+						} else {
+							original, err = source.ReadAll(file.Filename, file.Source)
+							exitOnErr(cmd, err, true)
+							file.Source = original
+						}
+						cfg.Out = &formatted
+					}
+
+					var files []*ast.File
+					d := encoding.NewDecoder(cmd.ctx, file, &cfg)
 					for ; !d.Done(); d.Next() {
 						f := d.File()
 
@@ -86,20 +114,46 @@ func newFmtCmd(c *Command) *cobra.Command {
 						exitOnErr(cmd, err, true)
 					}
 
-					e, err := encoding.NewEncoder(file, &cfg)
+					e, err := encoding.NewEncoder(cmd.ctx, file, &cfg)
 					exitOnErr(cmd, err, true)
 
 					for _, f := range files {
 						err := e.EncodeFile(f)
 						exitOnErr(cmd, err, false)
 					}
+
 					if err := e.Close(); err != nil {
 						exitOnErr(cmd, err, true)
 					}
+
+					if check && !bytes.Equal(formatted.Bytes(), original) {
+						badlyFormattedFiles = append(badlyFormattedFiles, file.Filename)
+					}
 				}
 			}
+
+			if check && len(badlyFormattedFiles) > 0 {
+				cwd, _ := os.Getwd()
+				stdout := cmd.OutOrStdout()
+				for _, f := range badlyFormattedFiles {
+					if f == "-" {
+						continue
+					}
+
+					relPath, err := filepath.Rel(cwd, f)
+					if err != nil {
+						relPath = f
+					}
+					fmt.Fprintln(stdout, relPath)
+				}
+				return ErrPrintedError
+			}
+
 			return nil
 		}),
 	}
+
+	cmd.Flags().Bool(string(flagCheck), false, "exits with non-zero status if any files are not formatted")
+
 	return cmd
 }

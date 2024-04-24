@@ -23,6 +23,49 @@ Retain: 0
 Unifications: 2
 Conjuncts:    5
 Disjuncts:    4
+-- out/evalalpha --
+Errors:
+a: conflicting values 8000.9 and 7080 (mismatched types float and int):
+    ./in.cue:1:4
+    ./in.cue:2:4
+a: conflicting values 8000.9 and int (mismatched types float and int):
+    ./in.cue:1:4
+    ./in.cue:2:11
+
+Result:
+(_|_){
+  // [eval]
+  a: (_|_){
+    // [eval] a: conflicting values 8000.9 and 7080 (mismatched types float and int):
+    //     ./in.cue:1:4
+    //     ./in.cue:2:4
+    // a: conflicting values 8000.9 and int (mismatched types float and int):
+    //     ./in.cue:1:4
+    //     ./in.cue:2:11
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,5 +1,4 @@
+ Errors:
+-a: 2 errors in empty disjunction:
+ a: conflicting values 8000.9 and 7080 (mismatched types float and int):
+     ./in.cue:1:4
+     ./in.cue:2:4
+@@ -11,8 +10,7 @@
+ (_|_){
+   // [eval]
+   a: (_|_){
+-    // [eval] a: 2 errors in empty disjunction:
+-    // a: conflicting values 8000.9 and 7080 (mismatched types float and int):
++    // [eval] a: conflicting values 8000.9 and 7080 (mismatched types float and int):
+     //     ./in.cue:1:4
+     //     ./in.cue:2:4
+     // a: conflicting values 8000.9 and int (mismatched types float and int):
+-- diff/todo/p2 --
+Missing "X errors in empty disjunctions" message.
 -- out/eval --
 Errors:
 a: 2 errors in empty disjunction:

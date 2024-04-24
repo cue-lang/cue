@@ -31,7 +31,7 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/mod/module"
+	"cuelang.org/go/mod/module"
 )
 
 // pathEncoding represents one of the possible types of
@@ -48,13 +48,15 @@ const (
 	encHashAsTag  pathEncoding = "hashAsTag"
 )
 
-// HostResolver resolves module paths to their location in a registry.
+// LocationResolver resolves module paths to a location
+// consisting of a host name of a registry and where
+// in that registry the module is to be found.
 //
 // Note: The implementation in this package operates entirely lexically,
 // which is why [Location] contains only a host name and not an actual
 // [ociregistry.Interface] implementation.
-type HostResolver interface {
-	// Resolve resolves a base module path (without a version
+type LocationResolver interface {
+	// ResolveToLocation resolves a base module path (without a version
 	// suffix, a.k.a. OCI repository name) and optional version to
 	// the location for that path. It reports whether it can find
 	// appropriate location for the module.
@@ -63,10 +65,10 @@ type HostResolver interface {
 	// will hold the prefix that all versions of the module in its
 	// repository have. That prefix will be followed by the version
 	// itself.
-	Resolve(path string, vers string) (Location, bool)
+	ResolveToLocation(path string, vers string) (Location, bool)
 
 	// AllHosts returns all the registry hosts that the resolver
-	// might resolve to, ordered lexically.
+	// might resolve to, ordered lexically by hostname.
 	AllHosts() []Host
 }
 
@@ -132,6 +134,7 @@ type registryConfig struct {
 	StripPrefix   bool         `json:"stripPrefix,omitempty"`
 
 	// The following fields are filled in from Registry after parsing.
+	none       bool
 	host       string
 	repository string
 	insecure   bool
@@ -142,7 +145,7 @@ func (r *registryConfig) init() error {
 	if err != nil {
 		return err
 	}
-	r.host, r.repository, r.insecure = r1.host, r1.repository, r1.insecure
+	r.none, r.host, r.repository, r.insecure = r1.none, r1.host, r1.repository, r1.insecure
 
 	if r.PrefixForTags != "" {
 		if !ociref.IsValidTag(r.PrefixForTags) {
@@ -153,8 +156,16 @@ func (r *registryConfig) init() error {
 		// Shouldn't happen because default should apply.
 		return fmt.Errorf("empty pathEncoding")
 	}
-	if r.StripPrefix && r.PathEncoding != encPath {
-		return fmt.Errorf("cannot strip prefix unless using path encoding")
+	if r.StripPrefix {
+		if r.PathEncoding != encPath {
+			// TODO we could relax this to allow storing of naked tags
+			// when the module path matches exactly and hash tags
+			// otherwise.
+			return fmt.Errorf("cannot strip prefix unless using path encoding")
+		}
+		if r.repository == "" {
+			return fmt.Errorf("use of stripPrefix requires a non-empty repository within the registry")
+		}
 	}
 	return nil
 }
@@ -169,10 +180,24 @@ var (
 //go:embed schema.cue
 var configSchemaData []byte
 
+// RegistryConfigSchema returns the CUE schema
+// for the configuration parsed by [ParseConfig].
+func RegistryConfigSchema() string {
+	// Cut out the copyright header and the header that's
+	// not pure schema.
+	schema := string(configSchemaData)
+	i := strings.Index(schema, "\n// #file ")
+	if i == -1 {
+		panic("no file definition found in schema")
+	}
+	i++
+	return schema[i:]
+}
+
 // ParseConfig parses the registry configuration with the given contents and file name.
 // If there is no default registry, then the single registry specified in catchAllDefault
 // will be used as a default.
-func ParseConfig(configFile []byte, filename string, catchAllDefault string) (HostResolver, error) {
+func ParseConfig(configFile []byte, filename string, catchAllDefault string) (LocationResolver, error) {
 	configSchemaOnce.Do(func() {
 		ctx := cuecontext.New()
 		schemav := ctx.CompileBytes(configSchemaData, cue.Filename("cuelang.org/go/internal/mod/modresolve/schema.cue"))
@@ -252,7 +277,7 @@ func ParseConfig(configFile []byte, filename string, catchAllDefault string) (Ho
 // and no catchAllDefault is provided.
 //
 // [docker reference]: https://pkg.go.dev/github.com/distribution/reference
-func ParseCUERegistry(s string, catchAllDefault string) (HostResolver, error) {
+func ParseCUERegistry(s string, catchAllDefault string) (LocationResolver, error) {
 	if s == "" && catchAllDefault == "" {
 		return nil, fmt.Errorf("no catch-all registry or default")
 	}
@@ -324,6 +349,9 @@ type resolver struct {
 func (r *resolver) initHosts() error {
 	hosts := make(map[string]bool)
 	addHost := func(reg *registryConfig) error {
+		if reg.none {
+			return nil
+		}
 		if insecure, ok := hosts[reg.host]; ok {
 			if insecure != reg.insecure {
 				return fmt.Errorf("registry host %q is specified both as secure and insecure", reg.host)
@@ -363,7 +391,7 @@ func (r *resolver) AllHosts() []Host {
 	return r.allHosts
 }
 
-func (r *resolver) Resolve(mpath, vers string) (Location, bool) {
+func (r *resolver) ResolveToLocation(mpath, vers string) (Location, bool) {
 	if mpath == "" {
 		return Location{}, false
 	}
@@ -372,6 +400,7 @@ func (r *resolver) Resolve(mpath, vers string) (Location, bool) {
 	bestMatchReg := r.cfg.DefaultRegistry
 	for pat, reg := range r.cfg.ModuleRegistries {
 		if pat == mpath {
+			bestMatch = pat
 			bestMatchReg = reg
 			break
 		}
@@ -391,10 +420,10 @@ func (r *resolver) Resolve(mpath, vers string) (Location, bool) {
 		// It's a possible match but not necessarily the longest one.
 		bestMatch, bestMatchReg = pat, reg
 	}
-	if bestMatchReg == nil {
+	reg := bestMatchReg
+	if reg == nil || reg.none {
 		return Location{}, false
 	}
-	reg := bestMatchReg
 	loc := Location{
 		Host:     reg.host,
 		Insecure: reg.insecure,
@@ -423,6 +452,12 @@ func (r *resolver) Resolve(mpath, vers string) (Location, bool) {
 }
 
 func parseRegistry(env0 string) (*registryConfig, error) {
+	if env0 == "none" {
+		return &registryConfig{
+			Registry: env0,
+			none:     true,
+		}, nil
+	}
 	env := env0
 	var suffix string
 	if i := strings.LastIndex(env, "+"); i > 0 {

@@ -64,10 +64,6 @@ workflows: trybot: _repo.bashWorkflow & {
 					// so we only need to run them on one of the matrix jobs.
 					if: _isLatestLinux
 				},
-				json.#step & {
-					if:  "\(_repo.isProtectedBranch) || \(_isLatestLinux)"
-					run: "echo CUE_LONG=true >> $GITHUB_ENV"
-				},
 				_goGenerate,
 				_goTest & {
 					if: "\(_repo.isProtectedBranch) || !\(_isLatestLinux)"
@@ -75,6 +71,7 @@ workflows: trybot: _repo.bashWorkflow & {
 				_goTestRace & {
 					if: _isLatestLinux
 				},
+				_goTestWasm,
 				for v in _e2eTestSteps {v},
 				_goCheck,
 				_repo.checkGitClean,
@@ -119,7 +116,7 @@ workflows: trybot: _repo.bashWorkflow & {
 		// The end-to-end tests require a github token secret and are a bit slow,
 		// so we only run them on pushes to protected branches and on one
 		// environment in the source repo.
-		if: "github.repository == '\(_repo.githubRepositoryPath)' && \(_repo.isProtectedBranch) && \(_isLatestLinux)"
+		if: "github.repository == '\(_repo.githubRepositoryPath)' && (\(_repo.isProtectedBranch) || \(_repo.isTestDefaultBranch)) && \(_isLatestLinux)"
 	}] & [
 		// Two setup steps per the upstream docs:
 		// https://github.com/google-github-actions/setup-gcloud#service-account-key-json
@@ -142,15 +139,14 @@ workflows: trybot: _repo.bashWorkflow & {
 			// on the entire cue-labs-modules-testing org. Note that porcuepine is also an org admin,
 			// since otherwise the repo admin access to create and delete repos does not work.
 			env: {
-				GITHUB_TOKEN: "${{ secrets.E2E_GITHUB_TOKEN }}"
-				CUE_LOGINS:   "${{ secrets.E2E_CUE_LOGINS }}"
+				CUE_TEST_LOGINS: "${{ secrets.E2E_CUE_LOGINS }}"
 			}
 			// Our regular tests run with both `go test ./...` and `go test -race ./...`.
 			// The end-to-end tests should only be run once, given the slowness and API rate limits.
 			// We want to catch any data races they spot as soon as possible, and they aren't CPU-bound,
 			// so running them only with -race seems reasonable.
 			run: """
-				cd internal/e2e
+				cd internal/_e2e
 				go test -race
 				"""
 		},
@@ -162,19 +158,12 @@ workflows: trybot: _repo.bashWorkflow & {
 		// However, CUE does not have any such build tags yet, and we don't use
 		// dependencies that vary wildly between platforms.
 		// For now, to save CI resources, just run the checks on one matrix job.
-		// We loop over all Go modules and use a subshell to run the commands in each directory;
-		// note that this still makes the script stop at the first command failure.
 		// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
 		if:   "\(_isLatestLinux)"
 		name: "Check"
 		run: """
-			for module in . internal/e2e; do
-				(
-					cd $module
-					go vet ./...
-					go mod tidy
-				)
-			done
+			go vet ./...
+			go mod tidy
 			"""
 	}
 
@@ -182,5 +171,12 @@ workflows: trybot: _repo.bashWorkflow & {
 		name: "Test with -race"
 		env: GORACE: "atexit_sleep_ms=10" // Otherwise every Go package being tested sleeps for 1s; see https://go.dev/issues/20364.
 		run: "go test -race ./..."
+	}
+
+	_goTestWasm: json.#step & {
+		name: "Test with -tags=cuewasm"
+		// The wasm interpreter is only bundled into cmd/cue with the cuewasm build tag.
+		// Test the related packages with the build tag enabled as well.
+		run: "go test -tags cuewasm ./cmd/cue/cmd ./cue/interpreter/wasm"
 	}
 }

@@ -124,6 +124,146 @@ Retain: 0
 Unifications: 50
 Conjuncts:    91
 Disjuncts:    52
+-- out/evalalpha --
+Errors:
+callOfCallToValidator.e: cannot call previously called validator b:
+    ./in.cue:94:5
+
+Result:
+(_|_){
+  // [eval]
+  incompleteError1: (struct){
+    MyType: (struct){
+      kv: (struct){ struct.MinFields(1) }
+    }
+    foo: (struct){
+      kv: (struct){
+        joel: (string){ "testing" }
+      }
+    }
+  }
+  incompleteError2: (struct){
+    MyType: (struct){
+      kv: (_|_){
+        // [incomplete] incompleteError2.MyType.kv: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
+        //     ./in.cue:22:7
+        //     ./in.cue:22:24
+      }
+    }
+    foo: (struct){
+      kv: (struct){
+        joel: (string){ "testing" }
+      }
+    }
+  }
+  incompleteError3: (struct){
+    t: (string){ &("encoding/json".Validate(string), string) }
+  }
+  uniqueConstrains1: (struct){
+    t: (string){ &("encoding/json".Validate(string), string) }
+  }
+  uniqueConstrains2: (struct){
+    t: (struct){ struct.MaxFields(1) }
+  }
+  violation: (struct){
+    #MyType: (#struct){
+      kv: (_|_){
+        // [incomplete] violation.#MyType.kv: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
+        //     ./in.cue:49:7
+        //     ./in.cue:49:24
+      }
+    }
+    foo: (#struct){
+      kv: (#struct){
+        joel: (string){ "testing" }
+        tony: (string){ "testing" }
+      }
+    }
+  }
+  conjuncts: (struct){
+    kv: (struct){ &(struct.MinFields(1), struct.MaxFields(3)) }
+  }
+  bareBuiltin: (struct){
+    a: ((string|bytes)){ "encoding/json".Valid() }
+  }
+  bareBuiltinCheck: (struct){
+    a: (string){ "3" }
+  }
+  builtinValidator: (struct){
+    a: ((string|bytes)){ "encoding/json".Valid() }
+  }
+  builtinValidatorCheck: (struct){
+    a: (string){ "3" }
+  }
+  callOfCallToValidator: (_|_){
+    // [eval]
+    a: ((string|bytes)){ "encoding/json".Valid() }
+    b: ((string|bytes)){ "encoding/json".Valid() }
+    e: (_|_){
+      // [eval] callOfCallToValidator.e: cannot call previously called validator b:
+      //     ./in.cue:94:5
+    }
+  }
+  validatorAsFunction: (struct){
+    a: ((string|bytes)){ "encoding/json".Valid() }
+    b: (bool){ true }
+    c: (bool){ true }
+  }
+  issue2098: (struct){
+    ok1: (int){
+      1
+      _a: (list){
+        0: (int){ 1 }
+      }
+    }
+    incomplete1: (struct){
+      _a: (_|_){
+        // [incomplete] issue2098.incomplete1._a: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1):
+        //     ./in.cue:112:6
+        //     ./in.cue:112:20
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -20,7 +20,6 @@
+       kv: (_|_){
+         // [incomplete] incompleteError2.MyType.kv: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
+         //     ./in.cue:22:7
+-        //     ./in.cue:21:7
+         //     ./in.cue:22:24
+       }
+     }
+@@ -44,7 +43,6 @@
+       kv: (_|_){
+         // [incomplete] violation.#MyType.kv: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
+         //     ./in.cue:49:7
+-        //     ./in.cue:48:7
+         //     ./in.cue:49:24
+       }
+     }
+@@ -91,15 +89,10 @@
+         0: (int){ 1 }
+       }
+     }
+-    incomplete1: (_|_){
+-      // [incomplete] issue2098.incomplete1._a: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1):
+-      //     ./in.cue:112:6
+-      //     ./in.cue:111:6
+-      //     ./in.cue:112:20
++    incomplete1: (struct){
+       _a: (_|_){
+         // [incomplete] issue2098.incomplete1._a: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1):
+         //     ./in.cue:112:6
+-        //     ./in.cue:111:6
+         //     ./in.cue:112:20
+       }
+     }
+-- diff/todo/p2 --
+Missing error at incomplete1: index 0 is erased.
 -- out/eval --
 Errors:
 callOfCallToValidator.e: cannot call previously called validator b:

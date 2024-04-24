@@ -281,7 +281,8 @@ func (t *Test) RawInstances(args ...string) []*build.Instance {
 // files in the root directory. Relative files in the archive are given an
 // absolute location by prefixing it with dir.
 func Load(a *txtar.Archive, dir string, args ...string) []*build.Instance {
-	return loadWithConfig(a, dir, load.Config{}, args...)
+	// Don't let Env be nil, as the tests shouldn't depend on os.Environ.
+	return loadWithConfig(a, dir, load.Config{Env: []string{}}, args...)
 }
 
 func loadWithConfig(a *txtar.Archive, dir string, cfg load.Config, args ...string) []*build.Instance {
@@ -338,6 +339,10 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 
 				prefix:     path.Join("out", x.Name),
 				LoadConfig: x.LoadConfig,
+			}
+			// Don't let Env be nil, as the tests shouldn't depend on os.Environ.
+			if tc.LoadConfig.Env == nil {
+				tc.LoadConfig.Env = []string{}
 			}
 			if x.Fallback != "" {
 				tc.fallback = path.Join("out", x.Fallback)
@@ -402,16 +407,42 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 						continue
 					}
 
-					diff := diff.Diff("old", fallback, "new", result)
-					if len(diff) == 0 {
-						continue
-					}
+					diffName := "diff/-" + sub.name + "<==>+" + sub.fallback
+					switch diff := diff.Diff("old", fallback, "new", result); {
+					case len(diff) > 0:
+						tc.outFiles = append(tc.outFiles, file{
+							name: diffName,
+							buf:  bytes.NewBuffer(diff),
+							diff: true,
+						})
 
-					tc.outFiles = append(tc.outFiles, file{
-						name: "diff/-" + sub.name + "<==>+" + sub.fallback,
-						buf:  bytes.NewBuffer(diff),
-						diff: true,
-					})
+					default:
+						// Only update file if anything changes.
+						if _, ok := index[sub.name]; ok {
+							delete(index, sub.name)
+							if !cuetest.UpdateGoldenFiles {
+								t.Errorf("file %q exists but is equal to fallback", sub.name)
+							}
+							update = cuetest.UpdateGoldenFiles
+						}
+						if _, ok := index[diffName]; ok {
+							delete(index, diffName)
+							if !cuetest.UpdateGoldenFiles {
+								t.Errorf("file %q exists but is empty", diffName)
+							}
+							update = cuetest.UpdateGoldenFiles
+						}
+						// Remove all diff-related todo files.
+						for n := range index {
+							if strings.HasPrefix(n, "diff/todo/") {
+								delete(index, n)
+								if !cuetest.UpdateGoldenFiles {
+									t.Errorf("todo file %q exists without changes", n)
+								}
+								update = cuetest.UpdateGoldenFiles
+							}
+						}
+					}
 				}
 			}
 
@@ -429,7 +460,13 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 				}
 			}
 
-			files := a.Files[:k:k]
+			// Filter files up to k from the original list.
+			files := make([]txtar.File, 0, len(a.Files))
+			for _, f := range a.Files[:k] {
+				if _, ok := index[f.Name]; ok {
+					files = append(files, f)
+				}
+			}
 
 			for _, sub := range tc.outFiles {
 				result := sub.buf.Bytes()

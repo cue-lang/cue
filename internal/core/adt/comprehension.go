@@ -151,13 +151,16 @@ func (n *nodeContext) insertComprehension(
 	}
 
 	if ec.done && len(ec.envs) == 0 {
+		n.decComprehension(c)
 		return
 	}
 
 	x := c.Value
 
-	ci = ci.SpawnEmbed(c)
-	ci.closeInfo.span |= ComprehensionSpan
+	if !n.ctx.isDevVersion() {
+		ci = ci.SpawnEmbed(c)
+		ci.closeInfo.span |= ComprehensionSpan
+	}
 
 	var decls []Decl
 	switch v := ToExpr(x).(type) {
@@ -174,7 +177,8 @@ func (n *nodeContext) insertComprehension(
 					Syntax:  c.Syntax,
 					Clauses: c.Clauses,
 					Value:   f,
-					arcType: f.ArcType,
+					arcType: f.ArcType, // TODO: can be derived, remove this field.
+					cc:      ci.cc,
 
 					comp:   ec,
 					parent: c,
@@ -182,9 +186,16 @@ func (n *nodeContext) insertComprehension(
 				}
 
 				conjunct := MakeConjunct(env, c, ci)
-				n.node.state.insertFieldUnchecked(f.Label, ArcPending, conjunct)
+				if n.ctx.isDevVersion() {
+					n.assertInitialized()
+					_, c.arcCC = n.insertArcCC(f.Label, ArcPending, conjunct, conjunct.CloseInfo, false)
+					c.cc = ci.cc
+					ci.cc.incDependent(n.ctx, COMP, c.arcCC)
+				} else {
+					n.insertFieldUnchecked(f.Label, ArcPending, conjunct)
+				}
+
 				fields = append(fields, f)
-				// TODO: adjust ci to embed?
 
 			case *LetField:
 				// TODO: consider merging this case with the LetField case.
@@ -203,7 +214,8 @@ func (n *nodeContext) insertComprehension(
 				}
 
 				conjunct := MakeConjunct(env, c, ci)
-				arc := n.node.state.insertFieldUnchecked(f.Label, ArcMember, conjunct)
+				n.assertInitialized()
+				arc := n.insertFieldUnchecked(f.Label, ArcMember, conjunct)
 				arc.MultiLet = f.IsMulti
 
 				fields = append(fields, f)
@@ -251,13 +263,19 @@ func (n *nodeContext) insertComprehension(
 		}
 	}
 
-	n.comprehensions = append(n.comprehensions, envYield{
-		envComprehension: ec,
-		leaf:             c,
-		env:              env,
-		id:               ci,
-		expr:             x,
-	})
+	if n.ctx.isDevVersion() {
+		t := n.scheduleTask(handleComprehension, env, x, ci)
+		t.comp = ec
+		t.leaf = c
+	} else {
+		n.comprehensions = append(n.comprehensions, envYield{
+			envComprehension: ec,
+			leaf:             c,
+			env:              env,
+			id:               ci,
+			expr:             x,
+		})
+	}
 }
 
 type compState struct {
@@ -321,6 +339,8 @@ func (s *compState) yield(env *Environment) (ok bool) {
 // embeddings before inserting the results to ensure that the order of
 // evaluation does not matter.
 func (n *nodeContext) injectComprehensions(state vertexStatus) (progress bool) {
+	unreachableForDev(n.ctx)
+
 	workRemaining := false
 
 	// We use variables, instead of range, as the list may grow dynamically.
@@ -371,6 +391,8 @@ func (n *nodeContext) injectComprehensions(state vertexStatus) (progress bool) {
 // as iterating over the node in which they are defined. Such comprehensions
 // are legal as long as they do not modify the arc set of the node.
 func (n *nodeContext) injectSelfComprehensions(state vertexStatus) {
+	unreachableForDev(n.ctx)
+
 	// We use variables, instead of range, as the list may grow dynamically.
 	for i := 0; i < len(n.selfComprehensions); i++ {
 		n.processComprehension(&n.selfComprehensions[i], state)
@@ -382,6 +404,27 @@ func (n *nodeContext) injectSelfComprehensions(state vertexStatus) {
 // It returns an incomplete error if there was one. Fatal errors are
 // processed as a "successfully" completed computation.
 func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bottom {
+	err := n.processComprehensionInner(d, state)
+
+	// NOTE: we cannot move this to defer in processComprehensionInner, as we
+	// use panics to implement "yielding" (and possibly coroutines in the
+	// future).
+	n.decComprehension(d.leaf)
+
+	return err
+}
+
+func (n *nodeContext) decComprehension(p *Comprehension) {
+	for ; p != nil; p = p.parent {
+		cc := p.cc
+		if cc != nil {
+			cc.decDependent(n.ctx, COMP, p.arcCC)
+		}
+		p.cc = nil
+	}
+}
+
+func (n *nodeContext) processComprehensionInner(d *envYield, state vertexStatus) *Bottom {
 	ctx := n.ctx
 
 	// Compute environments, if needed.
@@ -420,11 +463,30 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 	d.inserted = true
 
 	if len(d.envs) == 0 {
+		c := d.leaf
+		for p := c.arcCC; p != nil; p = p.parent {
+			// because the parent referrer will reach a zero count before this
+			// node will reach a zero count, we need to propagate the arcType.
+			p.updateArcType(ArcNotPresent)
+		}
 		return nil
 	}
 
 	v := n.node
+	f := v.Label
 	for c := d.leaf; c.parent != nil; c = c.parent {
+		// because the parent referrer will reach a zero count before this
+		// node will reach a zero count, we need to propagate the arcType.
+		for arc, p := c.arcCC, c.cc; p != nil; arc, p = arc.parent, p.parent {
+			// TODO: remove this line once we use the arcType of the
+			// closeContext in notAllowedError.
+			arc.src.updateArcType(c.arcType)
+			t := arc.arcType
+			arc.updateArcType(c.arcType)
+			if p.isClosed && t >= ArcPending && !matchPattern(ctx, p.Expr, f) {
+				ctx.notAllowedError(p.src, arc.src)
+			}
+		}
 		v.updateArcType(c.arcType)
 		if v.ArcType == ArcNotPresent {
 			parent := v.Parent
@@ -448,7 +510,12 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 		}
 
 		env = linkChildren(env, d.leaf)
-		n.addExprConjunct(Conjunct{env, d.expr, id}, state)
+
+		if ctx.isDevVersion() {
+			n.scheduleConjunct(Conjunct{env, d.expr, id}, id)
+		} else {
+			n.addExprConjunct(Conjunct{env, d.expr, id}, state)
+		}
 	}
 
 	return nil

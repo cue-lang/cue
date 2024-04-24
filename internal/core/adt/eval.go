@@ -99,6 +99,8 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state combinedFlags) Value {
 	}
 
 	if n := v.state; n != nil {
+		n.assertInitialized()
+
 		if n.errs != nil && !n.errs.IsIncomplete() {
 			return n.errs
 		}
@@ -131,7 +133,7 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state combinedFlags) Value {
 		return nil
 	}
 
-	if v.status < finalized && v.state != nil {
+	if v.status < finalized && v.state != nil && !c.isDevVersion() {
 		// TODO: errors are slightly better if we always add addNotify, but
 		// in this case it is less likely to cause a performance penalty.
 		// See https://cuelang.org/issue/661. It may be possible to
@@ -151,8 +153,14 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state combinedFlags) Value {
 // state == finalized means it is evaluated to completion. See vertexStatus
 // for more details.
 func (c *OpContext) unify(v *Vertex, flags combinedFlags) {
+	if c.isDevVersion() {
+		requires, mode := flags.conditions(), flags.runMode()
+		v.unify(c, requires, mode)
+		return
+	}
+
 	// defer c.PopVertex(c.PushVertex(v))
-	if Debug {
+	if c.LogEval > 0 {
 		c.nest++
 		c.Logf(v, "Unify")
 		defer func() {
@@ -186,7 +194,7 @@ func (c *OpContext) unify(v *Vertex, flags combinedFlags) {
 		return
 
 	case evaluatingArcs:
-		Assertf(v.status > 0, "unexpected status %d", v.status)
+		Assertf(c, v.status > 0, "unexpected status %d", v.status)
 		return
 
 	case 0:
@@ -372,6 +380,8 @@ func (c *OpContext) unify(v *Vertex, flags combinedFlags) {
 
 // insertConjuncts inserts conjuncts previously not inserted.
 func (n *nodeContext) insertConjuncts(state vertexStatus) bool {
+	unreachableForDev(n.ctx)
+
 	// Exit early if we have a concrete value and only need partial results.
 	if state == partial {
 		for n.conjunctsPartialPos < len(n.conjuncts) {
@@ -463,6 +473,7 @@ func (n *nodeContext) doNotify() {
 
 func (n *nodeContext) postDisjunct(state vertexStatus) {
 	ctx := n.ctx
+	unreachableForDev(ctx)
 
 	for {
 		// Use maybeSetCache for cycle breaking
@@ -603,7 +614,7 @@ func (n *nodeContext) validateValue(state vertexStatus) {
 	} else if len(n.node.Structs) > 0 {
 		markStruct = n.kind&StructKind != 0 && !n.hasTop
 	}
-	v := n.node.Value()
+	v := n.node.Indirect().Value()
 	if n.node.BaseValue == nil && markStruct {
 		n.node.BaseValue = &StructMarker{}
 		v = n.node
@@ -673,6 +684,7 @@ func (n *nodeContext) incompleteErrors(final bool) *Bottom {
 		// n := d.node.getNodeContext(ctx)
 		// n.addBottom(err)
 		if final && c.vertex != nil && c.vertex.status != finalized {
+			c.vertex.state.assertInitialized()
 			c.vertex.state.addBottom(err)
 			c.vertex = nil
 		}
@@ -737,6 +749,8 @@ func (n *nodeContext) incompleteErrors(final bool) *Bottom {
 // though, that any potential performance issues are eliminated for
 // Protobuf-like oneOf fields.
 func (n *nodeContext) checkClosed(state vertexStatus) bool {
+	unreachableForDev(n.ctx)
+
 	ignore := state != finalized || n.skipNonMonotonicChecks()
 
 	v := n.node
@@ -756,6 +770,8 @@ func (n *nodeContext) checkClosed(state vertexStatus) bool {
 }
 
 func (n *nodeContext) completeArcs(state vertexStatus) {
+	unreachableForDev(n.ctx)
+
 	if DebugSort > 0 {
 		DebugSortArcs(n.ctx, n.node)
 	}
@@ -958,6 +974,14 @@ type nodeContext struct {
 	// for source-level debuggers.
 	node *Vertex
 
+	// underlying is the original Vertex that this node overlays. It should be
+	// set for all Vertex values that were cloned.
+	underlying *Vertex
+
+	// overlays is set if this node is the root of a disjunct created in
+	// doDisjunct. It points to the direct parent nodeContext.
+	overlays *nodeContext
+
 	nodeContextState
 
 	scheduler
@@ -993,15 +1017,28 @@ type nodeContext struct {
 	// Disjunction handling
 	disjunctions []envDisjunct
 
+	// disjunctCCs holds the close context that represent "holes" in which
+	// pending disjuncts are to be inserted for the clone represented by this
+	// nodeContext. Holes that are not yet filled will always need to be cloned
+	// when a disjunction branches in doDisjunct.
+	//
+	// Holes may accumulate as nested disjunctions get added and filled holes
+	// may be removed. So the list of disjunctCCs may differ from the number
+	// of disjunctions.
+	disjunctCCs []disjunctHole
+
 	// usedDefault indicates the for each of possibly multiple parent
 	// disjunctions whether it is unified with a default disjunct or not.
 	// This is then later used to determine whether a disjunction should
 	// be treated as a marked disjunction.
 	usedDefault []defaultInfo
 
+	// disjuncts holds disjuncts that evaluated to a non-bottom value.
+	// TODO: come up with a better name.
 	disjuncts    []*nodeContext
 	buffer       []*nodeContext
 	disjunctErrs []*Bottom
+	disjunct     Conjunct
 
 	// snapshot holds the last value of the vertex before calling postDisjunct.
 	snapshot Vertex
@@ -1022,11 +1059,28 @@ type conjunct struct {
 }
 
 type nodeContextState struct {
+	// isInitialized indicates whether conjuncts have been inserted in the node.
+	isInitialized bool
+
+	// toComplete marks whether completeNodeTasks needs to be called on this
+	// node after a corresponding task has been completed.
+	toComplete bool
+
+	// isCompleting > 0 indicates whether a call to completeNodeTasks is in
+	// progress.
+	isCompleting int
+
 	// State info
 
 	hasTop      bool
 	hasCycle    bool // has conjunct with structural cycle
 	hasNonCycle bool // has conjunct without structural cycle
+
+	isShared      bool      // set if we are currently structure sharing.
+	noSharing     bool      // set if structure sharing is not allowed
+	shared        Conjunct  // the original conjunct that led to sharing
+	sharedID      CloseInfo // the original CloseInfo that led to sharing
+	origBaseValue BaseValue // the BaseValue that structure sharing replaces.
 
 	depth       int32
 	defaultMode defaultMode
@@ -1044,6 +1098,11 @@ type nodeContextState struct {
 	aStruct   Expr
 	aStructID CloseInfo
 
+	// List fields
+	listIsClosed bool
+	maxListLen   int
+	maxNode      Expr
+
 	lowerBound *BoundValue // > or >=
 	upperBound *BoundValue // < or <=
 	errs       *Bottom
@@ -1057,6 +1116,8 @@ type nodeContextState struct {
 	// conjunctsPartialPos is like conjunctsPos, but for the 'partial' phase
 	// of processing where conjuncts are only processed as concrete scalars.
 	conjunctsPartialPos int
+
+	arcPos int
 }
 
 // A receiver receives notifications.
@@ -1084,6 +1145,8 @@ type defaultInfo struct {
 }
 
 func (n *nodeContext) addNotify(v *Vertex, cc *closeContext) {
+	unreachableForDev(n.ctx)
+
 	if v != nil && !n.node.hasAllConjuncts {
 		n.notify = append(n.notify, receiver{v, cc})
 	}
@@ -1147,6 +1210,7 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			vLists:             n.vLists[:0],
 			exprs:              n.exprs[:0],
 			disjunctions:       n.disjunctions[:0],
+			disjunctCCs:        n.disjunctCCs[:0],
 			usedDefault:        n.usedDefault[:0],
 			disjunctErrs:       n.disjunctErrs[:0],
 			disjuncts:          n.disjuncts[:0],
@@ -1154,6 +1218,7 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 		}
 		n.scheduler.clear()
 		n.scheduler.node = n
+		n.underlying = node
 
 		return n
 	}
@@ -1168,10 +1233,13 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 		nodeContextState: nodeContextState{kind: TopKind},
 	}
 	n.scheduler.node = n
+	n.underlying = node
 	return n
 }
 
 func (v *Vertex) getNodeContext(c *OpContext, ref int) *nodeContext {
+	unreachableForDev(c)
+
 	if v.state == nil {
 		if v.status == finalized {
 			return nil
@@ -1352,6 +1420,8 @@ func (n *nodeContext) finalDone() bool {
 // hasErr is used to determine if an evaluation path, for instance a single
 // path after expanding all disjunctions, has an error.
 func (n *nodeContext) hasErr() bool {
+	n.assertInitialized()
+
 	if n.node.ChildErrors != nil {
 		return true
 	}
@@ -1362,12 +1432,16 @@ func (n *nodeContext) hasErr() bool {
 }
 
 func (n *nodeContext) getErr() *Bottom {
+	n.assertInitialized()
+
 	n.errs = CombineErrors(nil, n.errs, n.ctx.Err())
 	return n.errs
 }
 
 // getValidators sets the vertex' Value in case there was no concrete value.
 func (n *nodeContext) getValidators(state vertexStatus) BaseValue {
+	n.assertInitialized()
+
 	ctx := n.ctx
 
 	a := []Value{}
@@ -1468,6 +1542,8 @@ type envCheck struct {
 }
 
 func (n *nodeContext) addBottom(b *Bottom) {
+	n.assertInitialized()
+
 	n.errs = CombineErrors(nil, n.errs, b)
 	// TODO(errors): consider doing this
 	// n.kindExpr = n.errs
@@ -1475,6 +1551,8 @@ func (n *nodeContext) addBottom(b *Bottom) {
 }
 
 func (n *nodeContext) addErr(err errors.Error) {
+	n.assertInitialized()
+
 	if err != nil {
 		n.addBottom(&Bottom{Err: err})
 	}
@@ -1484,6 +1562,8 @@ func (n *nodeContext) addErr(err errors.Error) {
 // into the nodeContext if successful or queue it for later evaluation if it is
 // incomplete or is not value.
 func (n *nodeContext) addExprConjunct(v Conjunct, state vertexStatus) {
+	unreachableForDev(n.ctx)
+
 	env := v.Env
 	id := v.CloseInfo
 
@@ -1535,6 +1615,8 @@ func (n *nodeContext) addExprConjunct(v Conjunct, state vertexStatus) {
 // evalExpr is only called by addExprConjunct. If an error occurs, it records
 // the error in n and returns nil.
 func (n *nodeContext) evalExpr(v Conjunct, state vertexStatus) {
+	unreachableForDev(n.ctx)
+
 	// Require an Environment.
 	ctx := n.ctx
 
@@ -1626,6 +1708,8 @@ func (n *nodeContext) evalExpr(v Conjunct, state vertexStatus) {
 }
 
 func (n *nodeContext) addVertexConjuncts(c Conjunct, arc *Vertex, inline bool) {
+	unreachableForDev(n.ctx)
+
 	closeInfo := c.CloseInfo
 
 	// We need to ensure that each arc is only unified once (or at least) a
@@ -2031,6 +2115,10 @@ func (n *nodeContext) addStruct(
 // disjunctions.
 func (n *nodeContext) insertField(f Feature, mode ArcType, x Conjunct) *Vertex {
 	ctx := n.ctx
+	if ctx.isDevVersion() {
+		return n.insertArc(f, mode, x, x.CloseInfo, true)
+	}
+
 	arc, isNew := n.node.GetArc(ctx, f, mode)
 	if f.IsLet() && !isNew {
 		arc.MultiLet = true
@@ -2060,6 +2148,10 @@ func (n *nodeContext) insertField(f Feature, mode ArcType, x Conjunct) *Vertex {
 
 func (n *nodeContext) insertFieldUnchecked(f Feature, mode ArcType, x Conjunct) *Vertex {
 	ctx := n.ctx
+	if ctx.isDevVersion() {
+		return n.insertArc(f, mode, x, x.CloseInfo, false)
+	}
+
 	arc, isNew := n.node.GetArc(ctx, f, mode)
 	if f.IsLet() && !isNew {
 		arc.MultiLet = true
@@ -2083,6 +2175,8 @@ func (n *nodeContext) insertFieldUnchecked(f Feature, mode ArcType, x Conjunct) 
 // TODO(errors): detect when a field is added to a struct that is already used
 // in a for clause.
 func (n *nodeContext) expandOne(state vertexStatus) (done bool) {
+	unreachableForDev(n.ctx)
+
 	// Don't expand incomplete expressions if we detected a cycle.
 	if n.done() || (n.hasCycle && !n.hasNonCycle) {
 		return false
@@ -2120,6 +2214,8 @@ func (n *nodeContext) expandOne(state vertexStatus) (done bool) {
 
 // injectDynamic evaluates and inserts dynamic declarations.
 func (n *nodeContext) injectDynamic() (progress bool) {
+	unreachableForDev(n.ctx)
+
 	ctx := n.ctx
 	k := 0
 

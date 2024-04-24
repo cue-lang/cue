@@ -153,17 +153,17 @@ package descriptor
 		// 0 is reserved for errors.
 		// Order is weird for historical reasons.
 		"TYPE_DOUBLE"
-					#enumValue: 1
+		#enumValue: 1
 	} | {"TYPE_FLOAT", #enumValue: 2} | {
 		// Not ZigZag encoded.  Negative numbers take 10 bytes.  Use TYPE_SINT64 if
 		// negative values are likely.
 		"TYPE_INT64"
-					#enumValue: 3
+		#enumValue: 3
 	} | {"TYPE_UINT64", #enumValue: 4} | {
 		// Not ZigZag encoded.  Negative numbers take 10 bytes.  Use TYPE_SINT32 if
 		// negative values are likely.
 		"TYPE_INT32"
-						#enumValue: 5
+		#enumValue: 5
 	} | {"TYPE_FIXED64", #enumValue: 6} |
 		{"TYPE_FIXED32", #enumValue: 7} |
 		{"TYPE_BOOL", #enumValue: 8} |
@@ -180,7 +180,7 @@ package descriptor
 		} | {
 			// New in version 2.
 			"TYPE_BYTES"
-						#enumValue: 12
+			#enumValue: 12
 		} | {"TYPE_UINT32", #enumValue: 13} |
 		{"TYPE_ENUM", #enumValue: 14} |
 		{"TYPE_SFIXED32", #enumValue: 15} |
@@ -216,7 +216,7 @@ package descriptor
 	#Label: {
 		// 0 is reserved for errors
 		"LABEL_OPTIONAL"
-						#enumValue: 1
+		#enumValue: 1
 	} | {"LABEL_REQUIRED", #enumValue: 2} |
 		{"LABEL_REPEATED", #enumValue: 3}
 
@@ -518,7 +518,7 @@ package descriptor
 	#CType: {
 		// Default mode.
 		"STRING"
-					#enumValue: 0
+		#enumValue: 0
 	} | {"CORD", #enumValue: 1} |
 		{"STRING_PIECE", #enumValue: 2}
 

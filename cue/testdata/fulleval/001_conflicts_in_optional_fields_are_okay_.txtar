@@ -44,6 +44,40 @@ Retain: 0
 Unifications: 10
 Conjuncts:    17
 Disjuncts:    14
+-- out/evalalpha --
+(struct){
+  d: (struct){ |((struct){
+      a: (int){ 1 }
+      b?: (int){ 3 }
+    }, (struct){
+      a: (int){ 2 }
+    }) }
+  c: (struct){ |((struct){
+      b?: (_|_){
+        // [eval] c.b: conflicting values 3 and 4:
+        //     ./in.cue:1:15
+        //     ./in.cue:4:13
+      }
+      a: (int){ 1 }
+    }, (struct){
+      b?: (int){ 4 }
+      a: (int){ 2 }
+    }) }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -9,7 +9,6 @@
+       b?: (_|_){
+         // [eval] c.b: conflicting values 3 and 4:
+         //     ./in.cue:1:15
+-        //     ./in.cue:4:4
+         //     ./in.cue:4:13
+       }
+       a: (int){ 1 }
+-- diff/todo/p3 --
+Missing error position.
 -- out/eval --
 (struct){
   d: (struct){ |((struct){

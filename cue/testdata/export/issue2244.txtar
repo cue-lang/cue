@@ -41,6 +41,9 @@ Retain: 30
 Unifications: 24
 Conjuncts:    58
 Disjuncts:    40
+-- diff/explanation --
+New evaluator should ultimately disallow new definitions in closed structs
+and not allow #pattern in #step
 -- out/eval --
 (struct){
   _#matchPattern(:x): (_|_){

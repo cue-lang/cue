@@ -9,18 +9,19 @@ import (
 	"github.com/go-quicktest/qt"
 	"golang.org/x/tools/txtar"
 
-	"cuelang.org/go/internal/mod/modfile"
-	"cuelang.org/go/internal/mod/modregistry"
-	"cuelang.org/go/internal/mod/module"
 	"cuelang.org/go/internal/mod/mvs"
 	"cuelang.org/go/internal/registrytest"
 	"cuelang.org/go/internal/txtarfs"
+	"cuelang.org/go/mod/modfile"
+	"cuelang.org/go/mod/modregistry"
+	"cuelang.org/go/mod/module"
 )
 
 func TestRequirements(t *testing.T) {
 	const registryContents = `
 -- example.com_v0.0.1/cue.mod/module.cue --
 module: "example.com@v0"
+language: version: "v0.8.0"
 deps: {
 	"foo.com/bar/hello@v0": v: "v0.2.3"
 	"bar.com@v0": v: "v0.5.0"
@@ -28,6 +29,7 @@ deps: {
 
 -- foo.com_bar_hello_v0.2.3/cue.mod/module.cue --
 module: "foo.com/bar/hello@v0"
+language: version: "v0.8.0"
 deps: {
 	"bar.com@v0": v: "v0.0.2"
 	"baz.org@v0": v: "v0.10.1"
@@ -35,23 +37,29 @@ deps: {
 
 -- bar.com_v0.0.2/cue.mod/module.cue --
 module: "bar.com@v0"
+language: version: "v0.8.0"
 deps: "baz.org@v0": v: "v0.0.2"
 
 -- bar.com_v0.5.0/cue.mod/module.cue --
 module: "bar.com@v0"
+language: version: "v0.8.0"
 deps: "baz.org@v0": v: "v0.5.0"
 
 -- baz.org_v0.0.2/cue.mod/module.cue --
 module: "baz.org@v0"
+language: version: "v0.8.0"
 
 -- baz.org_v0.1.2/cue.mod/module.cue --
 module: "baz.org@v0"
+language: version: "v0.8.0"
 
 -- baz.org_v0.5.0/cue.mod/module.cue --
 module: "baz.org@v0"
+language: version: "v0.8.0"
 
 -- baz.org_v0.10.1/cue.mod/module.cue --
 module: "baz.org@v0"
+language: version: "v0.8.0"
 `
 
 	ctx := context.Background()
@@ -98,10 +106,12 @@ func TestRequirementsErrorFromMissingModule(t *testing.T) {
 	const registryContents = `
 -- example.com_v0.0.1/cue.mod/module.cue --
 module: "example.com@v0"
+language: version: "v0.8.0"
 deps: "foo.com/bar/hello@v0": v: "v0.2.3"
 
 -- foo.com_bar_hello_v0.2.3/cue.mod/module.cue --
 module: "foo.com/bar/hello@v0"
+language: version: "v0.8.0"
 deps: "bar.com@v0": v: "v0.0.2"	// doesn't exist
 `
 	ctx := context.Background()
@@ -167,7 +177,7 @@ type registryImpl struct {
 
 var _ Registry = (*registryImpl)(nil)
 
-func (r *registryImpl) CUEModSummary(ctx context.Context, mv module.Version) (*ModFileSummary, error) {
+func (r *registryImpl) Requirements(ctx context.Context, mv module.Version) ([]module.Version, error) {
 	m, err := r.reg.GetModule(ctx, mv)
 	if err != nil {
 		return nil, err
@@ -180,10 +190,7 @@ func (r *registryImpl) CUEModSummary(ctx context.Context, mv module.Version) (*M
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse module file from %v: %v", m, err)
 	}
-	return &ModFileSummary{
-		Require: mf.DepVersions(),
-		Module:  mv,
-	}, nil
+	return mf.DepVersions(), nil
 }
 
 func versions(vs ...string) []module.Version {

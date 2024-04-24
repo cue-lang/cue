@@ -188,6 +188,26 @@ func (f *formatter) walkListElems(list []ast.Expr) {
 	f.before(nil)
 	for _, x := range list {
 		f.before(x)
+
+		// This is a hack to ensure that comments are printed correctly in lists.
+		// A comment must be printed after each element in a list, but we can't
+		// print a comma at the end of a comment because it will be considered
+		// part of the comment and ignored.
+		// To fix this we collect all comments that appear after the element,
+		// and only handle them after it's formatted.
+		var commentsAfter []*ast.CommentGroup
+		splitComments := x.Pos().IsValid()
+		if splitComments {
+			for _, cg := range ast.Comments(x) {
+				if x.Pos().Before(cg.Pos()) {
+					commentsAfter = append(commentsAfter, cg)
+				}
+			}
+		}
+
+		if splitComments {
+			f.current.cg = nil
+		}
 		switch n := x.(type) {
 		case *ast.Comprehension:
 			f.walkClauseList(n.Clauses, blank)
@@ -208,6 +228,10 @@ func (f *formatter) walkListElems(list []ast.Expr) {
 			f.exprRaw(n, token.LowestPrec, 1)
 		}
 		f.print(comma, blank)
+
+		if splitComments {
+			f.current.cg = commentsAfter
+		}
 		f.after(x)
 	}
 	f.after(nil)
@@ -235,7 +259,7 @@ func (f *formatter) inlineField(n *ast.Field) *ast.Field {
 	regular := internal.IsRegularField(n)
 	// shortcut single-element structs.
 	// If the label has a valid position, we assume that an unspecified
-	// Lbrace signals the intend to collapse fields.
+	// Lbrace signals the intent to collapse fields.
 	if !n.Label.Pos().IsValid() && !(f.printer.cfg.simplify && regular) {
 		return nil
 	}
@@ -304,7 +328,7 @@ func (f *formatter) decl(decl ast.Decl) {
 
 		nextFF := f.nextNeedsFormfeed(n.Value)
 		tab := vtab
-		if nextFF {
+		if nextFF || f.prevLbraceOnLine {
 			tab = blank
 		}
 
@@ -645,6 +669,7 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 			ws |= newline | nooverride
 		}
 		f.print(x.Lbrace, token.LBRACE, &l, ws, ff, indent)
+		f.prevLbraceOnLine = l == f.lineout
 
 		f.walkDeclList(x.Elts)
 		f.matchUnindent()
@@ -849,7 +874,7 @@ func (f *formatter) binaryExpr(x *ast.BinaryExpr, prec1, cutoff, depth int) {
 	prec := x.Op.Precedence()
 	if prec < prec1 {
 		// parenthesis needed
-		// Note: The parser inserts an syntax.ParenExpr node; thus this case
+		// Note: The parser inserts a syntax.ParenExpr node; thus this case
 		//       can only occur if the AST is created in a different way.
 		// defer p.pushComment(nil).pop()
 		f.print(token.LPAREN, nooverride)

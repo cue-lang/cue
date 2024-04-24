@@ -102,9 +102,12 @@ func ParseNum(s string, n *NumInfo) error {
 	if !n.next() {
 		return n.errorf("invalid number %q", s)
 	}
-	if n.ch == '-' {
+	switch n.ch {
+	case '-':
 		n.neg = true
 		n.buf = append(n.buf, '-')
+		n.next()
+	case '+':
 		n.next()
 	}
 	seenDecimalPoint := false

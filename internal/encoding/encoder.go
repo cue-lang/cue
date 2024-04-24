@@ -40,6 +40,7 @@ import (
 // An Encoder converts CUE to various file formats, including CUE itself.
 // An Encoder allows
 type Encoder struct {
+	ctx          *cue.Context
 	cfg          *Config
 	close        func() error
 	interpret    func(cue.Value) (*ast.File, error)
@@ -47,7 +48,6 @@ type Encoder struct {
 	encValue     func(cue.Value) error
 	autoSimplify bool
 	concrete     bool
-	instance     *cue.Instance
 }
 
 // IsConcrete reports whether the output is required to be concrete.
@@ -67,12 +67,13 @@ func (e Encoder) Close() error {
 }
 
 // NewEncoder writes content to the file with the given specification.
-func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
+func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) {
 	w, close, err := writer(f, cfg)
 	if err != nil {
 		return nil, err
 	}
 	e := &Encoder{
+		ctx:   ctx,
 		cfg:   cfg,
 		close: close,
 	}
@@ -83,15 +84,11 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 		// TODO: get encoding options
 		cfg := &openapi.Config{}
 		e.interpret = func(v cue.Value) (*ast.File, error) {
-			i := e.instance
-			if i == nil {
-				i = internal.MakeInstance(v).(*cue.Instance)
-			}
-			return openapi.Generate(i, cfg)
+			return openapi.Generate(v, cfg)
 		}
 	case build.ProtobufJSON:
 		e.interpret = func(v cue.Value) (*ast.File, error) {
-			f := valueToFile(v)
+			f := internal.ToFile(v.Syntax())
 			return f, jsonpb.NewEncoder(v).RewriteFile(f)
 		}
 
@@ -124,7 +121,6 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 			cue.Optional(fi.Optional),
 			cue.Concrete(!fi.Incomplete),
 			cue.Definitions(fi.Definitions),
-			cue.ResolveReferences(!fi.References),
 			cue.DisallowCycles(!fi.Cycles),
 			cue.InlineImports(cfg.InlineImports),
 		)
@@ -149,7 +145,15 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 
 			// Casting an ast.Expr to an ast.File ensures that it always ends
 			// with a newline.
-			b, err := format.Node(internal.ToFile(n), opts...)
+			f := internal.ToFile(n)
+			if e.cfg.PkgName != "" && f.PackageName() == "" {
+				f.Decls = append([]ast.Decl{
+					&ast.Package{
+						Name: ast.NewIdent(e.cfg.PkgName),
+					},
+				}, f.Decls...)
+			}
+			b, err := format.Node(f, opts...)
 			if err != nil {
 				return err
 			}
@@ -243,15 +247,6 @@ func (e *Encoder) EncodeFile(f *ast.File) error {
 	return e.encodeFile(f, e.interpret)
 }
 
-// EncodeInstance is as Encode, but stores instance information. This should
-// all be retrievable from the value itself.
-func (e *Encoder) EncodeInstance(v *cue.Instance) error {
-	e.instance = v
-	err := e.Encode(v.Value())
-	e.instance = nil
-	return err
-}
-
 func (e *Encoder) Encode(v cue.Value) error {
 	e.autoSimplify = true
 	if err := v.Validate(cue.Concrete(e.concrete)); err != nil {
@@ -267,7 +262,7 @@ func (e *Encoder) Encode(v cue.Value) error {
 	if e.encValue != nil {
 		return e.encValue(v)
 	}
-	return e.encFile(valueToFile(v))
+	return e.encFile(internal.ToFile(v.Syntax()))
 }
 
 func (e *Encoder) encodeFile(f *ast.File, interpret func(cue.Value) (*ast.File, error)) error {
@@ -275,15 +270,13 @@ func (e *Encoder) encodeFile(f *ast.File, interpret func(cue.Value) (*ast.File, 
 		return e.encFile(f)
 	}
 	e.autoSimplify = true
-	var r cue.Runtime
-	inst, err := r.CompileFile(f)
-	if err != nil {
+	v := e.ctx.BuildFile(f)
+	if err := v.Err(); err != nil {
 		return err
 	}
 	if interpret != nil {
-		return e.Encode(inst.Value())
+		return e.Encode(v)
 	}
-	v := inst.Value()
 	if err := v.Validate(cue.Concrete(e.concrete)); err != nil {
 		return err
 	}

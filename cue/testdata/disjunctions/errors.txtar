@@ -41,6 +41,142 @@ Retain: 0
 Unifications: 28
 Conjuncts:    56
 Disjuncts:    40
+-- out/evalalpha --
+Errors:
+issue516.x.match: field not allowed:
+    ./in.cue:23:5
+issue516.x.match.metrics.foo: field not allowed:
+    ./in.cue:23:21
+issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
+    ./in.cue:3:19
+    ./in.cue:12:12
+
+Result:
+(_|_){
+  // [eval]
+  issue570: (_|_){
+    // [eval]
+    results: (_|_){
+      // [eval] issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
+      //     ./in.cue:3:19
+      //     ./in.cue:12:12
+      result: (string){ "hello" }
+    }
+    #Output: (#struct){ |((#struct){
+        result: (_){ _ }
+      }, (#struct){
+        error: (string){ string }
+      }) }
+    #DecodeOutput: (#struct){ |((#struct){
+        result: (list){
+        }
+      }, (#struct){
+        result?: (list){
+        }
+        error: (string){ string }
+      }) }
+  }
+  issue516: (_|_){
+    // [eval]
+    #Def: (#struct){ |((#struct){
+        match: (#struct){
+          metrics: (#struct){
+            string: (#struct){
+            }
+          }
+        }
+      }, (#struct){
+      }) }
+    x: (_|_){
+      // [eval] issue516.x.match: field not allowed:
+      //     ./in.cue:23:5
+      // issue516.x.match.metrics.foo: field not allowed:
+      //     ./in.cue:23:21
+      match: (struct){
+        metrics: (struct){
+          foo: (struct){
+          }
+        }
+      }
+    }
+  }
+  explicitDefaultError: (_|_){
+    // [incomplete] explicitDefaultError: non-concrete value string in operand to !=:
+    //     ./in.cue:30:5
+    //     ./in.cue:28:5
+    a: (string){ string }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,15 +1,9 @@
+ Errors:
+-issue516.x: 2 errors in empty disjunction:
+ issue516.x.match: field not allowed:
+-    ./in.cue:20:6
+-    ./in.cue:22:5
+     ./in.cue:23:5
+ issue516.x.match.metrics.foo: field not allowed:
+-    ./in.cue:19:19
+-    ./in.cue:22:5
+     ./in.cue:23:21
+ issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
+-    ./in.cue:2:11
+     ./in.cue:3:19
+     ./in.cue:12:12
+ 
+@@ -20,16 +14,9 @@
+     // [eval]
+     results: (_|_){
+       // [eval] issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
+-      //     ./in.cue:2:11
+       //     ./in.cue:3:19
+       //     ./in.cue:12:12
+-      result: (_|_){
+-        // [eval] issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
+-        //     ./in.cue:2:11
+-        //     ./in.cue:3:19
+-        //     ./in.cue:12:12
+-      }
+-      error: (string){ string }
++      result: (string){ "hello" }
+     }
+     #Output: (#struct){ |((#struct){
+         result: (_){ _ }
+@@ -57,20 +44,11 @@
+       }, (#struct){
+       }) }
+     x: (_|_){
+-      // [eval] issue516.x: 2 errors in empty disjunction:
+-      // issue516.x.match: field not allowed:
+-      //     ./in.cue:20:6
+-      //     ./in.cue:22:5
++      // [eval] issue516.x.match: field not allowed:
+       //     ./in.cue:23:5
+       // issue516.x.match.metrics.foo: field not allowed:
+-      //     ./in.cue:19:19
+-      //     ./in.cue:22:5
+       //     ./in.cue:23:21
+-      match: (_|_){
+-        // [eval] issue516.x.match: field not allowed:
+-        //     ./in.cue:20:6
+-        //     ./in.cue:22:5
+-        //     ./in.cue:23:5
++      match: (struct){
+         metrics: (struct){
+           foo: (struct){
+           }
+-- diff/todo/p1 --
+issue570.results.result: Spurious error: field not allowed
+-- diff/todo/p3 --
+Missing empty disjunction message.
+Missing error positions.
+-- diff/explanation --
+The additional "field not allowed" error is correct and a message corresponding
+to one of the conjuncts failing.
+issue516.x.match: changes are okay and arguably better.
 -- out/eval --
 Errors:
 issue516.x: 2 errors in empty disjunction:

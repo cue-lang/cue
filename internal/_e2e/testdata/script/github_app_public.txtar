@@ -1,0 +1,59 @@
+# Publish a CUE module under a public GitHub repository namespace
+# where the $CUE_TEST_LOGINS tokens have full read-write access.
+# Publish a version for this new repository with `cue mod publish`,
+# and then fetch the module as a dependency via cmd/cue.
+
+github-repo-module public
+env VERSION=v0.0.1
+env MODVER=${MODULE}@v0
+
+cd publish
+
+exec cue mod init --source self ${MODVER}
+exec cue mod publish ${VERSION}
+
+cd ../depend
+
+env-fill out_foo.cue
+exec cue mod init --source self depend.localhost
+exec cue mod tidy
+exec cue export
+cmp stdout export.golden
+
+# TODO(mvdan): Use another registry token without access to this private repo
+# and check that they can list and fetch, but not publish, any versions.
+
+# Trying to publish the same version again with the same contents should succeed.
+cd ../publish
+exec cue mod publish ${VERSION}
+
+# Trying to publish the same version again with different contents should fail.
+# TODO: Note that the error does say the repository has enabled tag immutability,
+# but that error message comes from Google Cloud, not from our registry service,
+# so it's not a stable string. We should give the user a short and stable error,
+# and test for it here with a regular expression.
+cd ../publish-different
+exec cue mod init --source self ${MODVER}
+! exec cue mod publish ${VERSION}
+stderr 'cannot tag.*400 Bad Request'
+
+-- publish/foo.cue --
+package publish
+
+foo: "foo value"
+
+-- publish-different/foo.cue --
+package publish
+
+foo: "different foo value"
+
+-- depend/out_foo.cue --
+package depend
+
+import mt "${MODVER}:publish"
+
+out: mt.foo
+-- depend/export.golden --
+{
+    "out": "foo value"
+}

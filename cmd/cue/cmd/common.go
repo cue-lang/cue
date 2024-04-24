@@ -16,14 +16,13 @@ package cmd
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
-	"sync"
+	"testing"
 
 	"github.com/spf13/pflag"
 	"golang.org/x/text/language"
@@ -75,8 +74,6 @@ func defaultConfig() (*config, error) {
 	}, nil
 }
 
-var inTest = false
-
 func getLang() language.Tag {
 	loc := os.Getenv("LC_ALL")
 	if loc == "" {
@@ -86,6 +83,12 @@ func getLang() language.Tag {
 	return language.Make(loc)
 }
 
+// exitOnErr uses cue/errors to print any error to stderr,
+// and if fatal is true, it causes the command's exit code to be 1.
+// Note that os.Exit is not called, as that would prevent defers from running.
+//
+// TODO(mvdan): can we avoid the panicError and recover shenanigans?
+// They work, but they make the code flow somewhat confusing to follow.
 func exitOnErr(cmd *Command, err error, fatal bool) {
 	if err == nil {
 		return
@@ -103,13 +106,13 @@ func exitOnErr(cmd *Command, err error, fatal bool) {
 	errors.Print(w, err, &errors.Config{
 		Format:  format,
 		Cwd:     cwd,
-		ToSlash: inTest,
+		ToSlash: testing.Testing(),
 	})
 
 	b := w.Bytes()
 	_, _ = cmd.Stderr().Write(b)
 	if fatal {
-		exit()
+		panicExit()
 	}
 }
 
@@ -442,7 +445,7 @@ type decoderInfo struct {
 
 func (d *decoderInfo) dec(b *buildPlan) *encoding.Decoder {
 	if d.d == nil {
-		d.d = encoding.NewDecoder(d.file, b.encConfig)
+		d.d = encoding.NewDecoder(b.cmd.ctx, d.file, b.encConfig)
 	}
 	return d.d
 }
@@ -490,7 +493,7 @@ func (p *buildPlan) getDecoders(b *build.Instance) (schemas, values []*decoderIn
 		if b.Module != "" {
 			c.ProtoPath = append(c.ProtoPath, b.Root)
 		}
-		d := encoding.NewDecoder(f, &c)
+		d := encoding.NewDecoder(p.cmd.ctx, f, &c)
 
 		fi, err := filetypes.FromFile(f, p.cfg.outMode)
 		if err != nil {
@@ -848,25 +851,3 @@ func shortFile(root string, f *build.File) string {
 	}
 	return dir
 }
-
-var cueConfigDir = sync.OnceValues(func() (string, error) {
-	if dir := os.Getenv("CUE_CONFIG_DIR"); dir != "" {
-		return dir, nil
-	}
-	dir, err := os.UserConfigDir()
-	if err != nil {
-		return "", fmt.Errorf("cannot determine system config directory: %v", err)
-	}
-	return filepath.Join(dir, "cue"), nil
-})
-
-var cueCacheDir = sync.OnceValues(func() (string, error) {
-	if dir := os.Getenv("CUE_CACHE_DIR"); dir != "" {
-		return dir, nil
-	}
-	dir, err := os.UserCacheDir()
-	if err != nil {
-		return "", fmt.Errorf("cannot determine system cache directory: %v", err)
-	}
-	return filepath.Join(dir, "cue"), nil
-})

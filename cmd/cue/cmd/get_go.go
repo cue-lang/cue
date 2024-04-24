@@ -246,9 +246,10 @@ func (e *extractor) filter(name string) bool {
 type extractor struct {
 	cmd *Command
 
-	stderr io.Writer
-	pkgs   []*packages.Package
-	done   map[string]bool
+	stderr  io.Writer
+	pkgs    []*packages.Package
+	allPkgs map[string]*packages.Package
+	done    map[string]bool
 
 	// per package
 	orig     map[types.Type]*ast.StructType
@@ -280,19 +281,21 @@ func (e *extractor) usedPkg(pkg string) {
 }
 
 var (
-	typeAny   = types.NewInterfaceType(nil, nil).Complete() // interface{}
-	typeBytes = types.NewSlice(types.Typ[types.Byte])       // []byte
-	typeError = types.Universe.Lookup("error").Type()       // error
+	typeAny    = types.Universe.Lookup("any").Type()    // any or interface{}
+	typeByte   = types.Universe.Lookup("byte").Type()   // byte
+	typeBytes  = types.NewSlice(typeByte)               // []byte
+	typeString = types.Universe.Lookup("string").Type() // string
+	typeError  = types.Universe.Lookup("error").Type()  // error
 )
 
 // Note that we can leave positions, packages, and parameter/result names empty.
 // They are not used by go/types.Implements.
 
 func typeMethod(name string, params, results []types.Type) *types.Func {
-	return types.NewFunc(token.NoPos, nil, name, typeSignature(name, params, results))
+	return types.NewFunc(token.NoPos, nil, name, typeSignature(params, results))
 }
 
-func typeSignature(name string, params, results []types.Type) *types.Signature {
+func typeSignature(params, results []types.Type) *types.Signature {
 	paramVars := make([]*types.Var, len(params))
 	for i, param := range params {
 		paramVars[i] = types.NewParam(token.NoPos, nil, "", param)
@@ -332,7 +335,7 @@ var toTop = []*types.Interface{
 	// yaml.Unmarshaler: interface { UnmarshalYAML(func(interface{}) error) error }
 	types.NewInterfaceType([]*types.Func{
 		typeMethod("UnmarshalYAML", []types.Type{
-			typeSignature("", []types.Type{typeAny}, []types.Type{typeError}),
+			typeSignature([]types.Type{typeAny}, []types.Type{typeError}),
 		}, []types.Type{typeError}),
 	}, nil).Complete(),
 }
@@ -395,10 +398,11 @@ func extract(cmd *Command, args []string) error {
 	}
 
 	e := extractor{
-		cmd:    cmd,
-		stderr: cmd.Stderr(),
-		pkgs:   pkgs,
-		orig:   map[types.Type]*ast.StructType{},
+		cmd:     cmd,
+		stderr:  cmd.Stderr(),
+		pkgs:    pkgs,
+		allPkgs: map[string]*packages.Package{},
+		orig:    map[types.Type]*ast.StructType{},
 	}
 
 	e.initExclusions(flagExclude.String(cmd))
@@ -407,6 +411,7 @@ func extract(cmd *Command, args []string) error {
 
 	for _, p := range pkgs {
 		e.done[p.PkgPath] = true
+		e.addPackage(p)
 	}
 
 	for _, p := range pkgs {
@@ -415,6 +420,19 @@ func extract(cmd *Command, args []string) error {
 		}
 	}
 	return nil
+}
+
+func (e *extractor) addPackage(p *packages.Package) {
+	if pkg, ok := e.allPkgs[p.PkgPath]; ok {
+		if p != pkg {
+			panic(fmt.Sprintf("duplicate package %s", p.PkgPath))
+		}
+		return
+	}
+	e.allPkgs[p.PkgPath] = p
+	for _, pkg := range p.Imports {
+		e.addPackage(pkg)
+	}
 }
 
 func (e *extractor) recordTypeInfo(p *packages.Package) {
@@ -546,8 +564,7 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 	for path := range e.usedPkgs {
 		if !e.done[path] {
 			e.done[path] = true
-			p := p.Imports[path]
-			if err := e.extractPkg(root, p); err != nil {
+			if err := e.extractPkg(root, e.allPkgs[path]); err != nil {
 				return err
 			}
 		}
@@ -771,6 +788,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 					}
 				}
 
+				typ := e.pkg.TypesInfo.TypeOf(name)
 				c := e.pkg.TypesInfo.Defs[v.Names[i]].(*types.Const)
 				sv := c.Val().ExactString()
 				cv, err := parser.ParseExpr("", sv)
@@ -788,13 +806,13 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 					}
 				}
 
-				typ := e.pkg.TypesInfo.TypeOf(name)
-				if s := typ.String(); !strings.Contains(s, "untyped") {
-					switch s {
-					case "byte", "string", "error":
-					default:
-						cv = cueast.NewBinExpr(cuetoken.AND, e.makeType(typ), cv)
+				switch typ {
+				case typeByte, typeString, typeError:
+				default:
+					if basic, ok := typ.(*types.Basic); ok && basic.Info()&types.IsUntyped != 0 {
+						break // untyped basic types do not make valid identifiers
 					}
+					cv = cueast.NewBinExpr(cuetoken.AND, e.makeType(typ), cv)
 				}
 
 				f.Value = cv
@@ -948,7 +966,7 @@ func supportedType(stack []types.Type, t types.Type) (ok bool) {
 	t = t.Underlying()
 	switch x := t.(type) {
 	case *types.Basic:
-		return x.String() != "invalid type"
+		return x.Kind() != types.Invalid
 	case *types.Named:
 		return true
 	case *types.Pointer:
@@ -1027,9 +1045,8 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 			return e.ident("_", false)
 		}
 		// Check for builtin packages.
-		// TODO: replace these literal types with a reference to the fixed
-		switch obj.Type().String() {
-		case "time.Time":
+		switch {
+		case obj.Pkg().Path() == "time" && obj.Name() == "Time":
 			ref := e.ident(e.pkgNames[obj.Pkg().Path()].name, false)
 			var name *cueast.Ident
 			if ref.Name != "time" {
@@ -1038,7 +1055,25 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 			ref.Node = cueast.NewImport(name, "time")
 			return cueast.NewSel(ref, obj.Name())
 
-		case "math/big.Int":
+		case obj.Pkg().Path() == "time" && obj.Name() == "Duration":
+			// Go's time.Duration is an int64 to represent nanoseconds,
+			// and even though most Go users would find the string representation
+			// like "3s" or "40m" most reasonable and readable for constant values,
+			// encoding/json is bound via Go's compatibility promise to encoding as integers.
+			//
+			// Since compatibility with JSON encoding and decoding in Go
+			// is more important than readability, we use integers as well here.
+			// Note that this means we aren't compatible with CUE's own time.Duration,
+			// which is rather unfortunate, but we have to choose one or the other.
+			//
+			// TODO(mvdan): reconsider once 'cue get go' is more configurable,
+			// and especially once encoding/json/v2 becomes a reality,
+			// as it does encode time.Duration via strings rather than integers.
+			// For example, could we generate types like 'int | *time.Duration'
+			// and constants like '300 | *"300ns"' to support both at the same time?
+			return e.ident("int", false)
+
+		case obj.Pkg().Path() == "math/big" && obj.Name() == "Int":
 			return e.ident("int", false)
 
 		default:
@@ -1136,16 +1171,18 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 		return st
 
 	case *types.Slice:
-		// TODO: should this be x.Elem().Underlying().String()? One could
-		// argue either way.
-		if x.Elem().String() == "byte" {
+		// Note that []byte is treated different from []uint8,
+		// even though byte is an alias for the basic type uint8.
+		// TODO: reconsider this; both encoding/json and the future v2
+		// encode []uint8, or anything assignable to []byte, as bytes.
+		if x.Elem() == typeByte {
 			return e.ident("bytes", false)
 		}
 		return cueast.NewList(&cueast.Ellipsis{Type: e.makeType(x.Elem())})
 
 	case *types.Array:
-		if x.Elem().String() == "byte" {
-			// TODO: no way to constraint lengths of bytes for now, as regexps
+		if x.Elem() == typeByte {
+			// TODO: no way to constrain lengths of bytes for now, as regexps
 			// operate on Unicode, not bytes. So we need
 			//     fmt.Fprint(e.w, fmt.Sprintf("=~ '^\C{%d}$'", x.Len())),
 			// but regexp does not support that.
@@ -1187,7 +1224,7 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 		case types.Complex64, types.Complex128:
 			return e.ident("_", false)
 		}
-		return e.ident(x.String(), false)
+		return e.ident(x.Name(), false)
 
 	case *types.Union:
 		var exprs []cueast.Expr
@@ -1312,12 +1349,12 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 		typeName := f.Type().String()
 		// simplify type names:
 		for path, info := range e.pkgNames {
-			typeName = strings.Replace(typeName, path+".", info.name+".", -1)
+			typeName = strings.ReplaceAll(typeName, path+".", info.name+".")
 		}
-		typeName = strings.Replace(typeName, e.pkg.Types.Path()+".", "", -1)
+		typeName = strings.ReplaceAll(typeName, e.pkg.Types.Path()+".", "")
 
-		cueStr := strings.Replace(cueType, "_#", "", -1)
-		cueStr = strings.Replace(cueStr, "#", "", -1)
+		cueStr := strings.ReplaceAll(cueType, "_#", "")
+		cueStr = strings.ReplaceAll(cueStr, "#", "")
 
 		// TODO: remove fields in @go attr that are the same as printed?
 		if name != f.Name() || typeName != cueStr {
@@ -1362,8 +1399,8 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 				tk := tags.Get("protobuf_key")
 				tv := tags.Get("protobuf_val")
 				if tk != "" && tv != "" {
-					tk = strings.SplitN(tk, ",", 2)[0]
-					tv = strings.SplitN(tv, ",", 2)[0]
+					tk, _, _ = strings.Cut(tk, ",")
+					tv, _, _ = strings.Cut(tv, ",")
 					split[1] = fmt.Sprintf("map[%s]%s", tk, tv)
 				}
 			}

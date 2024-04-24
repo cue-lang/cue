@@ -11,6 +11,9 @@ mul3: math.MultipleOf(100, 1.00001)
 mul4: math.MultipleOf(1, 1)
 mul5: math.MultipleOf(5, 2.5)
 mul6: math.MultipleOf(100e100, 10)
+mul7: 10
+mul7: math.MultipleOf(2)
+mul8: 9 & math.MultipleOf(3)
 
 r0: math.Round(2.5)
 r1: math.Round(-2.5)
@@ -36,9 +39,9 @@ Errors:
 mul2: error in call to math.MultipleOf: division by zero:
     ./in.cue:6:7
 floorE1: too many arguments in call to math.Floor (have 2, want 1):
-    ./in.cue:17:10
+    ./in.cue:20:10
 floorE2: cannot use "foo" (type string) as number in argument 1 to math.Floor:
-    ./in.cue:18:21
+    ./in.cue:21:21
 
 Result:
 mul0: true
@@ -49,6 +52,8 @@ mul3:    false
 mul4:    true
 mul5:    true
 mul6:    true
+mul7:    10
+mul8:    9
 r0:      3
 r1:      -3
 r2:      2

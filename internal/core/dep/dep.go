@@ -232,9 +232,10 @@ func (v *visitor) visit(n *adt.Vertex, top bool) (err error) {
 		}
 	}()
 
-	for _, x := range n.Conjuncts {
+	n.VisitLeafConjuncts(func(x adt.Conjunct) bool {
 		v.markExpr(x.Env, x.Elem())
-	}
+		return true
+	})
 
 	return nil
 }
@@ -485,11 +486,12 @@ func hasLetParent(v *adt.Vertex) bool {
 
 // markConjuncts transitively marks all reference of the current node.
 func (c *visitor) markConjuncts(v *adt.Vertex) {
-	for _, x := range v.Conjuncts {
+	v.VisitLeafConjuncts(func(x adt.Conjunct) bool {
 		// Use Elem instead of Expr to preserve the Comprehension to, in turn,
 		// ensure an Environment is inserted for the Value clause.
 		c.markExpr(x.Env, x.Elem())
-	}
+		return true
+	})
 }
 
 // markInternalResolvers marks dependencies for rootless nodes. As these
@@ -506,9 +508,10 @@ func (c *visitor) markInternalResolvers(env *adt.Environment, r adt.Resolver, v 
 	// As lets have no path and we otherwise will not process them, we set
 	// processing all to true.
 	if c.marked != nil && hasLetParent(v) {
-		for _, x := range v.Conjuncts {
+		v.VisitLeafConjuncts(func(x adt.Conjunct) bool {
 			c.marked.markExpr(x.Expr())
-		}
+			return true
+		})
 	}
 
 	c.markConjuncts(v)
@@ -621,6 +624,7 @@ func (c *visitor) markComprehension(env *adt.Environment, y *adt.Comprehension) 
 	for i := y.Nest(); i > 0; i-- {
 		env = &adt.Environment{Up: env, Vertex: empty}
 	}
+	// TODO: consider using adt.EnvExpr and remove the above loop.
 	c.markExpr(env, adt.ToExpr(y.Value))
 }
 

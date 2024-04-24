@@ -21,7 +21,7 @@ jobs:
           - 1.22.x
         runner:
           - ubuntu-22.04
-          - macos-11
+          - macos-14
           - windows-2022
     runs-on: ${{ matrix.runner }}
     defaults:
@@ -149,10 +149,6 @@ jobs:
           	echo "${commit_signers}"
           	exit 1
           fi
-      - if: |-
-          ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
-          Dispatch-Trailer: {"type":"')))) || (matrix.go-version == '1.22.x' && matrix.runner == 'ubuntu-22.04')
-        run: echo CUE_LONG=true >> $GITHUB_ENV
       - if: (matrix.go-version == '1.22.x' && matrix.runner == 'ubuntu-22.04')
         name: Generate
         run: go generate ./...
@@ -166,38 +162,34 @@ jobs:
         run: go test -race ./...
         env:
           GORACE: atexit_sleep_ms=10
+      - name: Test with -tags=cuewasm
+        run: go test -tags cuewasm ./cmd/cue/cmd ./cue/interpreter/wasm
       - name: gcloud auth for end-to-end tests
         id: auth
         if: |-
-          github.repository == 'cue-lang/cue' && ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
-          Dispatch-Trailer: {"type":"')))) && (matrix.go-version == '1.22.x' && matrix.runner == 'ubuntu-22.04')
+          github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
+          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.22.x' && matrix.runner == 'ubuntu-22.04')
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.E2E_GCLOUD_KEY }}
       - if: |-
-          github.repository == 'cue-lang/cue' && ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
-          Dispatch-Trailer: {"type":"')))) && (matrix.go-version == '1.22.x' && matrix.runner == 'ubuntu-22.04')
+          github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
+          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.22.x' && matrix.runner == 'ubuntu-22.04')
         name: gcloud setup for end-to-end tests
         uses: google-github-actions/setup-gcloud@v2
       - if: |-
-          github.repository == 'cue-lang/cue' && ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
-          Dispatch-Trailer: {"type":"')))) && (matrix.go-version == '1.22.x' && matrix.runner == 'ubuntu-22.04')
+          github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
+          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.22.x' && matrix.runner == 'ubuntu-22.04')
         name: End-to-end test
         env:
-          GITHUB_TOKEN: ${{ secrets.E2E_GITHUB_TOKEN }}
-          CUE_LOGINS: ${{ secrets.E2E_CUE_LOGINS }}
+          CUE_TEST_LOGINS: ${{ secrets.E2E_CUE_LOGINS }}
         run: |-
-          cd internal/e2e
+          cd internal/_e2e
           go test -race
       - if: (matrix.go-version == '1.22.x' && matrix.runner == 'ubuntu-22.04')
         name: Check
         run: |-
-          for module in . internal/e2e; do
-          	(
-          		cd $module
-          		go vet ./...
-          		go mod tidy
-          	)
-          done
+          go vet ./...
+          go mod tidy
       - name: Check that git is clean at the end of the job
         run: test -z "$(git status --porcelain)" || (git status; git diff; false)

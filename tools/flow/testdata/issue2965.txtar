@@ -1,0 +1,83 @@
+#IgnoreConcrete: true
+#InferTasks: true
+-- in.cue --
+package x
+
+root: {
+	prepare: {
+		$id: "prepare"
+		stdout: string
+	}
+	env2: {
+		// Note: the string interpolation here is the only difference
+		// from issue2517.txtar. It makes the value incomplete
+		// rather than just non-concrete.
+		input: "\(prepare.stdout)"
+	}
+	run: {
+		$id: "run"
+		env: env2
+	}
+}
+-- out/run/errors --
+-- out/run/t0 --
+graph TD
+  t0("root.prepare [Ready]")
+  t1("root.run [Waiting]")
+  t1-->t0
+
+-- out/run/t1 --
+graph TD
+  t0("root.prepare [Terminated]")
+  t1("root.run [Ready]")
+  t1-->t0
+
+-- out/run/t1/value --
+{
+	$id:    "prepare"
+	stdout: "foo"
+}
+-- out/run/t1/stats --
+Leaks:  0
+Freed:  11
+Reused: 6
+Allocs: 5
+Retain: 0
+
+Unifications: 11
+Conjuncts:    16
+Disjuncts:    11
+-- out/run/t2 --
+graph TD
+  t0("root.prepare [Terminated]")
+  t1("root.run [Terminated]")
+  t1-->t0
+
+-- out/run/t2/value --
+{
+	$id:    "run"
+	stdout: "foo"
+	env: {
+		input: "foo"
+	}
+}
+-- out/run/t2/stats --
+Leaks:  0
+Freed:  12
+Reused: 12
+Allocs: 0
+Retain: 0
+
+Unifications: 12
+Conjuncts:    20
+Disjuncts:    12
+-- out/run/stats/totals --
+Leaks:  0
+Freed:  23
+Reused: 18
+Allocs: 5
+Retain: 0
+
+Unifications: 23
+Conjuncts:    36
+Disjuncts:    23

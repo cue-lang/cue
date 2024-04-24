@@ -37,7 +37,7 @@ func main() {
 	}
 
 	for _, d := range dirs {
-		if !d.IsDir() {
+		if !d.IsDir() || d.Name() == "cue.mod" {
 			continue
 		}
 		dir := filepath.Join(cwd, "testdata")

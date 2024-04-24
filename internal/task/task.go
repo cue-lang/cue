@@ -23,6 +23,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/value"
 )
 
@@ -113,11 +114,12 @@ func (t *taskError) Position() token.Pos {
 func (t *taskError) InputPositions() (a []token.Pos) {
 	_, nx := value.ToInternal(t.v)
 
-	for _, x := range nx.Conjuncts {
+	nx.VisitLeafConjuncts(func(x adt.Conjunct) bool {
 		if src := x.Source(); src != nil {
 			a = append(a, src.Pos())
 		}
-	}
+		return true
+	})
 	return a
 }
 

@@ -38,7 +38,7 @@ config: {
 	}]
 
 	builds: [
-		{main: "./cmd/cue", binary:    "cue"},
+		{main: "./cmd/cue", binary: "cue"},
 		{main: "./cmd/cuepls", binary: "cuepls"},
 	]
 
@@ -70,7 +70,7 @@ config: {
 	checksum: name_template: "checksums.txt"
 	snapshot: name_template: "{{ .Tag }}-next"
 	// As explained above, we write our own release notes.
-	changelog: skip: true
+	changelog: disable: true
 
 	brews: [{
 		if !#latest {

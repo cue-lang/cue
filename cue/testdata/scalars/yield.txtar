@@ -30,6 +30,51 @@ Retain: 3
 Unifications: 7
 Conjuncts:    13
 Disjuncts:    7
+-- out/evalalpha --
+Errors:
+ifScalarConflict: conflicting values "soo" and 5 (mismatched types string and int):
+    ./in.cue:10:13
+    ./in.cue:12:2
+
+Result:
+(_|_){
+  // [eval]
+  ifScalar: (int){
+    5
+    _#cond: (bool){ true }
+  }
+  ifScalarConflict: (_|_){
+    // [eval] ifScalarConflict: conflicting values "soo" and 5 (mismatched types string and int):
+    //     ./in.cue:10:13
+    //     ./in.cue:12:2
+    _#cond: (bool){ true }
+  }
+  ifScalarNested: (int){
+    5
+    _#cond: (bool){ true }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,6 +1,5 @@
+ Errors:
+ ifScalarConflict: conflicting values "soo" and 5 (mismatched types string and int):
+-    ./in.cue:10:2
+     ./in.cue:10:13
+     ./in.cue:12:2
+ 
+@@ -13,7 +12,6 @@
+   }
+   ifScalarConflict: (_|_){
+     // [eval] ifScalarConflict: conflicting values "soo" and 5 (mismatched types string and int):
+-    //     ./in.cue:10:2
+     //     ./in.cue:10:13
+     //     ./in.cue:12:2
+     _#cond: (bool){ true }
+-- diff/todo/p2 --
+Missing error positions
 -- out/eval --
 Errors:
 ifScalarConflict: conflicting values "soo" and 5 (mismatched types string and int):

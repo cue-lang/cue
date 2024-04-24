@@ -18,7 +18,7 @@ command: print: {
 }
 -- cue.mod/module.cue --
 module: "main.example"
-
+language: version: "v0.8.0"
 deps: "foo.example/text@v0": {
 	default: true
 	v: "v0.0.1"
@@ -27,6 +27,7 @@ deps: "foo.example/text@v0": {
 package home
 -- _registry/foo.example_text_v0.0.1/cue.mod/module.cue --
 module: "foo.example/text@v0"
+language: version: "v0.8.0"
 -- _registry/foo.example_text_v0.0.1/text.cue --
 package text
 value: "world"

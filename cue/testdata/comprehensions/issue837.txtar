@@ -63,16 +63,456 @@
 }
 
 #ServiceManifest: #Manifest & {ref: kind: "service"}
+-- out/evalalpha/stats --
+Leaks:  123
+Freed:  10
+Reused: 9
+Allocs: 124
+Retain: 0
+
+Unifications: 95
+Conjuncts:    563
+Disjuncts:    30
+-- out/evalalpha --
+Errors:
+_params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
+    ./in.cue:55:12
+    ./in.cue:56:22
+_params.hsize.$_instances: conflicting values >=0 and {$_instances:(>=0|*1)} (mismatched types number and struct):
+    ./in.cue:55:12
+    ./in.cue:56:15
+_params.hsize.$_instances.$_instances: field not allowed:
+    ./in.cue:33:20
+    ./in.cue:56:2
+#RelabelService.out.labstr: undefined field: label:
+    ./in.cue:51:14
+_params.hsize.$_instances: invalid operands {$_instances:_|_(_params.hsize.$_instances.$_instances: field not allowed)} and 0 to '>=' (type _|_ and int):
+    ./in.cue:56:15
+    ./in.cue:56:17
+_params.hsize.$_instances.$_instances: field not allowed:
+    ./in.cue:56:15
+    ./in.cue:56:2
+
+Result:
+(_|_){
+  // [eval]
+  #DeploymentManifest: (#struct){
+    ref: (#struct){
+      kind: (string){ "deployment" }
+    }
+    description: (#struct){
+      service: (#struct){
+        ref: (#struct){
+          kind: (string){ "service" }
+        }
+        description: (_|_){
+          // [incomplete] #ServiceManifest.description: undefined field: service:
+          //     ./in.cue:5:28
+        }
+      }
+      hsize: (_|_){
+        // [incomplete] #ServiceManifest.description: undefined field: service:
+        //     ./in.cue:5:28
+      }
+    }
+  }
+  #Manifest: (#struct){
+    ref: (#struct){
+      kind: (string){ |((string){ "service" }, (string){ "deployment" }) }
+    }
+    description: (_|_){
+      // [incomplete] #Manifest.description: unresolved disjunction "service" | "deployment" (type string):
+      //     ./in.cue:5:15
+    }
+  }
+  #ManifestRef: (#struct){
+    kind: (string){ |((string){ "service" }, (string){ "deployment" }) }
+  }
+  #KindsNames: (string){ |((string){ "service" }, (string){ "deployment" }) }
+  #KumoriKinds: (#struct){
+    deployment: (#struct){
+      service: (#struct){
+        ref: (#struct){
+          kind: (string){ "service" }
+        }
+        description: (_|_){
+          // [incomplete] #ServiceManifest.description: undefined field: service:
+          //     ./in.cue:5:28
+        }
+      }
+      hsize: (_|_){
+        // [incomplete] #ServiceManifest.description: undefined field: service:
+        //     ./in.cue:5:28
+      }
+    }
+  }
+  #DoDeploy: (_|_){
+    // [eval]
+    _params: (#struct){
+      manifest: (#struct){
+        ref: (#struct){
+          kind: (string){ "deployment" }
+        }
+        description: (#struct){
+          service: (#struct){
+            ref: (#struct){
+              kind: (string){ "service" }
+            }
+            description: (_|_){
+              // [incomplete] #ServiceManifest.description: undefined field: service:
+              //     ./in.cue:5:28
+            }
+          }
+          hsize: (_|_){
+            // [incomplete] #ServiceManifest.description: undefined field: service:
+            //     ./in.cue:5:28
+          }
+        }
+      }
+    }
+    deployment: (_|_){
+      // [eval]
+      description: (_|_){
+        // [eval]
+        let dep#1 = (#struct){
+          service: (#struct){
+            ref: (#struct){
+              kind: (string){ "service" }
+            }
+            description: (_|_){
+              // [incomplete] #ServiceManifest.description: undefined field: service:
+              //     ./in.cue:5:28
+            }
+          }
+          hsize: (_|_){
+            // [incomplete] #ServiceManifest.description: undefined field: service:
+            //     ./in.cue:5:28
+          }
+        }
+        service: (_|_){
+          // [eval] _params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
+          //     ./in.cue:55:12
+          //     ./in.cue:56:22
+          // _params.hsize.$_instances: conflicting values >=0 and {$_instances:(>=0|*1)} (mismatched types number and struct):
+          //     ./in.cue:55:12
+          //     ./in.cue:56:15
+          // _params.hsize.$_instances.$_instances: field not allowed:
+          //     ./in.cue:33:20
+          //     ./in.cue:56:2
+          // _params.hsize.$_instances: invalid operands {$_instances:_|_(_params.hsize.$_instances.$_instances: field not allowed)} and 0 to '>=' (type _|_ and int):
+          //     ./in.cue:56:15
+          //     ./in.cue:56:17
+          // _params.hsize.$_instances.$_instances: field not allowed:
+          //     ./in.cue:56:15
+          //     ./in.cue:56:2
+        }
+      }
+    }
+  }
+  #Configure: (_|_){
+    // [eval]
+    _params: (#struct){
+      hsize: (#struct){
+      }
+    }
+    service: (_|_){
+      // [eval]
+      description: (_|_){
+        // [eval]
+        let configed#2 = (_|_){
+          // [eval] _params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
+          //     ./in.cue:55:12
+          //     ./in.cue:56:22
+          // _params.hsize.$_instances: conflicting values >=0 and {$_instances:(>=0|*1)} (mismatched types number and struct):
+          //     ./in.cue:55:12
+          //     ./in.cue:56:15
+          // _params.hsize.$_instances.$_instances: field not allowed:
+          //     ./in.cue:33:20
+          //     ./in.cue:56:2
+          // _params.hsize.$_instances: invalid operands {$_instances:_|_(_params.hsize.$_instances.$_instances: field not allowed)} and 0 to '>=' (type _|_ and int):
+          //     ./in.cue:56:15
+          //     ./in.cue:56:17
+          // _params.hsize.$_instances.$_instances: field not allowed:
+          //     ./in.cue:56:15
+          //     ./in.cue:56:2
+        }
+        role: (_|_){
+          // [eval] _params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
+          //     ./in.cue:55:12
+          //     ./in.cue:56:22
+          // _params.hsize.$_instances: conflicting values >=0 and {$_instances:(>=0|*1)} (mismatched types number and struct):
+          //     ./in.cue:55:12
+          //     ./in.cue:56:15
+          // _params.hsize.$_instances.$_instances: field not allowed:
+          //     ./in.cue:33:20
+          //     ./in.cue:56:2
+          // _params.hsize.$_instances: invalid operands {$_instances:_|_(_params.hsize.$_instances.$_instances: field not allowed)} and 0 to '>=' (type _|_ and int):
+          //     ./in.cue:56:15
+          //     ./in.cue:56:17
+          // _params.hsize.$_instances.$_instances: field not allowed:
+          //     ./in.cue:56:15
+          //     ./in.cue:56:2
+        }
+      }
+    }
+  }
+  #RelabelService: (_|_){
+    // [eval]
+    _params: (#struct){
+      hsize: (#struct){
+        $_instances: (number){ |(*(int){ 1 }, (number){ >=0 }) }
+      }
+    }
+    out: (_|_){
+      // [eval]
+      labstr: (_|_){
+        // [eval] #RelabelService.out.labstr: undefined field: label:
+        //     ./in.cue:51:14
+      }
+    }
+  }
+  #RoleSize: (#struct){
+    $_instances: (number){ |(*(int){ 1 }, (number){ >=0 }) }
+  }
+  #Deployment: (#struct){
+    service: (#struct){
+      ref: (#struct){
+        kind: (string){ "service" }
+      }
+      description: (_|_){
+        // [incomplete] #ServiceManifest.description: undefined field: service:
+        //     ./in.cue:5:28
+      }
+    }
+    hsize: (_|_){
+      // [incomplete] #ServiceManifest.description: undefined field: service:
+      //     ./in.cue:5:28
+    }
+  }
+  #ServiceManifest: (#struct){
+    ref: (#struct){
+      kind: (string){ "service" }
+    }
+    description: (_|_){
+      // [incomplete] #ServiceManifest.description: undefined field: service:
+      //     ./in.cue:5:28
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,10 +1,21 @@
+ Errors:
+-#Configure.service.description.role: undefined field: role:
+-    ./in.cue:40:19
+-#DoDeploy.deployment.description.service.description.role: undefined field: role:
+-    ./in.cue:40:19
++_params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
++    ./in.cue:55:12
++    ./in.cue:56:22
++_params.hsize.$_instances: conflicting values >=0 and {$_instances:(>=0|*1)} (mismatched types number and struct):
++    ./in.cue:55:12
++    ./in.cue:56:15
++_params.hsize.$_instances.$_instances: field not allowed:
++    ./in.cue:33:20
++    ./in.cue:56:2
+ #RelabelService.out.labstr: undefined field: label:
+     ./in.cue:51:14
++_params.hsize.$_instances: invalid operands {$_instances:_|_(_params.hsize.$_instances.$_instances: field not allowed)} and 0 to '>=' (type _|_ and int):
++    ./in.cue:56:15
++    ./in.cue:56:17
++_params.hsize.$_instances.$_instances: field not allowed:
++    ./in.cue:56:15
++    ./in.cue:56:2
+ 
+ Result:
+ (_|_){
+@@ -19,11 +30,13 @@
+           kind: (string){ "service" }
+         }
+         description: (_|_){
+-          // [incomplete] #DeploymentManifest.description.service.description: undefined field: service:
+-          //     ./in.cue:5:28
+-        }
+-      }
+-      hsize: (#struct){
++          // [incomplete] #ServiceManifest.description: undefined field: service:
++          //     ./in.cue:5:28
++        }
++      }
++      hsize: (_|_){
++        // [incomplete] #ServiceManifest.description: undefined field: service:
++        //     ./in.cue:5:28
+       }
+     }
+   }
+@@ -47,11 +60,13 @@
+           kind: (string){ "service" }
+         }
+         description: (_|_){
+-          // [incomplete] #KumoriKinds.deployment.service.description: undefined field: service:
+-          //     ./in.cue:5:28
+-        }
+-      }
+-      hsize: (#struct){
++          // [incomplete] #ServiceManifest.description: undefined field: service:
++          //     ./in.cue:5:28
++        }
++      }
++      hsize: (_|_){
++        // [incomplete] #ServiceManifest.description: undefined field: service:
++        //     ./in.cue:5:28
+       }
+     }
+   }
+@@ -68,11 +83,13 @@
+               kind: (string){ "service" }
+             }
+             description: (_|_){
+-              // [incomplete] #DoDeploy._params.manifest.description.service.description: undefined field: service:
+-              //     ./in.cue:5:28
+-            }
+-          }
+-          hsize: (#struct){
++              // [incomplete] #ServiceManifest.description: undefined field: service:
++              //     ./in.cue:5:28
++            }
++          }
++          hsize: (_|_){
++            // [incomplete] #ServiceManifest.description: undefined field: service:
++            //     ./in.cue:5:28
+           }
+         }
+       }
+@@ -87,29 +104,31 @@
+               kind: (string){ "service" }
+             }
+             description: (_|_){
+-              // [incomplete] #DoDeploy.deployment.description.dep.service.description: undefined field: service:
+-              //     ./in.cue:5:28
+-            }
+-          }
+-          hsize: (#struct){
++              // [incomplete] #ServiceManifest.description: undefined field: service:
++              //     ./in.cue:5:28
++            }
++          }
++          hsize: (_|_){
++            // [incomplete] #ServiceManifest.description: undefined field: service:
++            //     ./in.cue:5:28
+           }
+         }
+         service: (_|_){
+-          // [eval]
+-          description: (_|_){
+-            // [eval]
+-            let configed#2 = (_|_){
+-              // [eval]
+-              labstr: (_|_){
+-                // [eval] #DoDeploy.deployment.description.service.description.configed.labstr: undefined field: label:
+-                //     ./in.cue:51:14
+-              }
+-            }
+-            role: (_|_){
+-              // [eval] #DoDeploy.deployment.description.service.description.role: undefined field: role:
+-              //     ./in.cue:40:19
+-            }
+-          }
++          // [eval] _params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
++          //     ./in.cue:55:12
++          //     ./in.cue:56:22
++          // _params.hsize.$_instances: conflicting values >=0 and {$_instances:(>=0|*1)} (mismatched types number and struct):
++          //     ./in.cue:55:12
++          //     ./in.cue:56:15
++          // _params.hsize.$_instances.$_instances: field not allowed:
++          //     ./in.cue:33:20
++          //     ./in.cue:56:2
++          // _params.hsize.$_instances: invalid operands {$_instances:_|_(_params.hsize.$_instances.$_instances: field not allowed)} and 0 to '>=' (type _|_ and int):
++          //     ./in.cue:56:15
++          //     ./in.cue:56:17
++          // _params.hsize.$_instances.$_instances: field not allowed:
++          //     ./in.cue:56:15
++          //     ./in.cue:56:2
+         }
+       }
+     }
+@@ -125,15 +144,38 @@
+       description: (_|_){
+         // [eval]
+         let configed#2 = (_|_){
+-          // [eval]
+-          labstr: (_|_){
+-            // [eval] #Configure.service.description.configed.labstr: undefined field: label:
+-            //     ./in.cue:51:14
+-          }
++          // [eval] _params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
++          //     ./in.cue:55:12
++          //     ./in.cue:56:22
++          // _params.hsize.$_instances: conflicting values >=0 and {$_instances:(>=0|*1)} (mismatched types number and struct):
++          //     ./in.cue:55:12
++          //     ./in.cue:56:15
++          // _params.hsize.$_instances.$_instances: field not allowed:
++          //     ./in.cue:33:20
++          //     ./in.cue:56:2
++          // _params.hsize.$_instances: invalid operands {$_instances:_|_(_params.hsize.$_instances.$_instances: field not allowed)} and 0 to '>=' (type _|_ and int):
++          //     ./in.cue:56:15
++          //     ./in.cue:56:17
++          // _params.hsize.$_instances.$_instances: field not allowed:
++          //     ./in.cue:56:15
++          //     ./in.cue:56:2
+         }
+         role: (_|_){
+-          // [eval] #Configure.service.description.role: undefined field: role:
+-          //     ./in.cue:40:19
++          // [eval] _params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
++          //     ./in.cue:55:12
++          //     ./in.cue:56:22
++          // _params.hsize.$_instances: conflicting values >=0 and {$_instances:(>=0|*1)} (mismatched types number and struct):
++          //     ./in.cue:55:12
++          //     ./in.cue:56:15
++          // _params.hsize.$_instances.$_instances: field not allowed:
++          //     ./in.cue:33:20
++          //     ./in.cue:56:2
++          // _params.hsize.$_instances: invalid operands {$_instances:_|_(_params.hsize.$_instances.$_instances: field not allowed)} and 0 to '>=' (type _|_ and int):
++          //     ./in.cue:56:15
++          //     ./in.cue:56:17
++          // _params.hsize.$_instances.$_instances: field not allowed:
++          //     ./in.cue:56:15
++          //     ./in.cue:56:2
+         }
+       }
+     }
+@@ -162,11 +204,13 @@
+         kind: (string){ "service" }
+       }
+       description: (_|_){
+-        // [incomplete] #Deployment.service.description: undefined field: service:
+-        //     ./in.cue:5:28
+-      }
+-    }
+-    hsize: (#struct){
++        // [incomplete] #ServiceManifest.description: undefined field: service:
++        //     ./in.cue:5:28
++      }
++    }
++    hsize: (_|_){
++      // [incomplete] #ServiceManifest.description: undefined field: service:
++      //     ./in.cue:5:28
+     }
+   }
+   #ServiceManifest: (#struct){
 -- out/eval/stats --
 Leaks:  16
 Freed:  117
 Reused: 108
 Allocs: 25
-Retain: 123
+Retain: 53
 
 Unifications: 107
-Conjuncts:    295
-Disjuncts:    240
+Conjuncts:    243
+Disjuncts:    170
 -- out/eval --
 Errors:
 #Configure.service.description.role: undefined field: role:
@@ -255,6 +695,10 @@ Result:
     }
   }
 }
+-- diff/todo/p2 --
+Some incorrect error messages. The newly introduced error messages for hsize
+seem to be correct, though.
+Error paths seem wrong as a result of structure sharing.
 -- out/compile --
 --- in.cue
 {

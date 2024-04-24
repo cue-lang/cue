@@ -66,58 +66,6 @@ func TestErrorList_Reset(t *testing.T) {
 	}
 }
 
-func TestErrorList_Len(t *testing.T) {
-	tests := []struct {
-		name string
-		p    list
-		want int
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		if got := tt.p.Len(); got != tt.want {
-			t.Errorf("%q. list.Len() = %v, want %v", tt.name, got, tt.want)
-		}
-	}
-}
-
-func TestErrorList_Swap(t *testing.T) {
-	type args struct {
-		i int
-		j int
-	}
-	tests := []struct {
-		name string
-		p    list
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		tt.p.Swap(tt.args.i, tt.args.j)
-	}
-}
-
-func TestErrorList_Less(t *testing.T) {
-	type args struct {
-		i int
-		j int
-	}
-	tests := []struct {
-		name string
-		p    list
-		args args
-		want bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		if got := tt.p.Less(tt.args.i, tt.args.j); got != tt.want {
-			t.Errorf("%q. list.Less() = %v, want %v", tt.name, got, tt.want)
-		}
-	}
-}
-
 func TestErrorList_Sort(t *testing.T) {
 	tests := []struct {
 		name string

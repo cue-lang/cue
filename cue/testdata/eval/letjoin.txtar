@@ -16,7 +16,7 @@ t1: {
 
 	x1: x
 	x1: a: 1
-	
+
 	x2: x
 	x2: a: 2
 
@@ -53,6 +53,141 @@ Retain: 8
 Unifications: 73
 Conjuncts:    123
 Disjuncts:    69
+-- out/evalalpha --
+(struct){
+  t1: (struct){
+    x: (struct){
+      a: (int){ int }
+      y: (struct){
+        let X#1 = (struct){
+          b: (int){ int }
+          c: (int){ 1 }
+        }
+        v: (int){ 1 }
+      }
+    }
+    x1: (struct){
+      a: (int){ 1 }
+      y: (struct){
+        let X#1 = (struct){
+          b: (int){ 1 }
+          c: (int){ 1 }
+        }
+        v: (int){ 1 }
+      }
+    }
+    x2: (struct){
+      a: (int){ 2 }
+      y: (struct){
+        let X#1 = (struct){
+          b: (int){ 2 }
+          c: (int){ 1 }
+        }
+        v: (int){ 1 }
+      }
+    }
+    xy: (struct){
+      let X#1multi = &[&[&[{
+        b: 〈2;a〉
+        c: 1
+      }]]]
+      v: (int){ 1 }
+    }
+  }
+  t2: (struct){
+    x: (struct){
+      a: (struct){
+      }
+      y: (struct){
+        let X#2 = (struct){
+          b: (struct){
+          }
+          c: (int){ 1 }
+        }
+        v: (int){ 1 }
+      }
+    }
+    x1: (struct){
+      a: (struct){
+        q: (int){ 1 }
+      }
+      y: (struct){
+        let X#2 = (struct){
+          b: (struct){
+            q: (int){ 1 }
+          }
+          c: (int){ 1 }
+        }
+        v: (int){ 1 }
+      }
+    }
+    x2: (struct){
+      a: (struct){
+        r: (int){ 2 }
+      }
+      y: (struct){
+        let X#2 = (struct){
+          b: (struct){
+            r: (int){ 2 }
+          }
+          c: (int){ 1 }
+        }
+        v: (int){ 1 }
+      }
+    }
+    xy: (struct){
+      a: (struct){
+        q: (int){ 1 }
+        r: (int){ 2 }
+      }
+      y: (struct){
+        let X#2 = (struct){
+          b: (struct){
+            q: (int){ 1 }
+            r: (int){ 2 }
+          }
+          c: (int){ 1 }
+        }
+        v: (int){ 1 }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -31,10 +31,10 @@
+       }
+     }
+     xy: (struct){
+-      let X#1multi = {
++      let X#1multi = &[&[&[{
+         b: 〈2;a〉
+         c: 1
+-      }
++      }]]]
+       v: (int){ 1 }
+     }
+   }
+@@ -85,9 +85,12 @@
+         r: (int){ 2 }
+       }
+       y: (struct){
+-        let X#2multi = {
+-          b: 〈2;a〉
+-          c: 1
++        let X#2 = (struct){
++          b: (struct){
++            q: (int){ 1 }
++            r: (int){ 2 }
++          }
++          c: (int){ 1 }
+         }
+         v: (int){ 1 }
+       }
+-- diff/todo/p4 --
+Reduce conjunct group size. Semantically correct, though.
 -- out/eval --
 (struct){
   t1: (struct){

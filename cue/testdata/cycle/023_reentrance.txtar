@@ -62,6 +62,145 @@ fib12: (fib & {n: 12}).out // Error
     n: 12
   }).out
 }
+-- out/evalalpha/stats --
+Leaks:  70
+Freed:  0
+Reused: 0
+Allocs: 70
+Retain: 0
+
+Unifications: 62
+Conjuncts:    212
+Disjuncts:    0
+-- out/evalalpha --
+Errors:
+structural cycle:
+    ./in.cue:3:25
+
+Result:
+(_|_){
+  // [structural cycle]
+  fibRec: (struct){
+    nn: (int){ int }
+    out: (_|_){
+      // [incomplete] non-concrete value int in operand to >=:
+      //     ./in.cue:7:5
+      //     ./in.cue:3:35
+      //     ./in.cue:5:5
+    }
+  }
+  fib: (_|_){
+    // [incomplete] fib: non-concrete value int in operand to >=:
+    //     ./in.cue:7:5
+    //     ./in.cue:5:5
+    n: (int){ int }
+  }
+  fib1: (int){ 1 }
+  fib2: (_|_){
+    // [structural cycle] structural cycle:
+    //     ./in.cue:3:25
+  }
+  fib3: (_|_){
+    // [structural cycle] structural cycle:
+    //     ./in.cue:3:25
+  }
+  fib7: (_|_){
+    // [structural cycle] structural cycle:
+    //     ./in.cue:3:25
+  }
+  fib12: (_|_){
+    // [structural cycle] structural cycle:
+    //     ./in.cue:3:25
+  }
+}
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  16
+-Freed:  180
+-Reused: 170
+-Allocs: 26
+-Retain: 148
++Leaks:  70
++Freed:  0
++Reused: 0
++Allocs: 70
++Retain: 0
+ 
+-Unifications: 196
+-Conjuncts:    464
+-Disjuncts:    268
++Unifications: 62
++Conjuncts:    212
++Disjuncts:    0
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,10 +1,6 @@
+ Errors:
+ structural cycle:
+     ./in.cue:3:25
+-structural cycle:
+-    ./in.cue:8:9
+-structural cycle:
+-    ./in.cue:8:38
+ 
+ Result:
+ (_|_){
+@@ -16,10 +12,6 @@
+       //     ./in.cue:7:5
+       //     ./in.cue:3:35
+       //     ./in.cue:5:5
+-      // non-concrete value int in operand to <:
+-      //     ./in.cue:10:5
+-      //     ./in.cue:3:35
+-      //     ./in.cue:5:5
+     }
+   }
+   fib: (_|_){
+@@ -26,33 +18,23 @@
+     // [incomplete] fib: non-concrete value int in operand to >=:
+     //     ./in.cue:7:5
+     //     ./in.cue:5:5
+-    // fib: non-concrete value int in operand to <:
+-    //     ./in.cue:10:5
+-    //     ./in.cue:5:5
+     n: (int){ int }
+   }
+   fib1: (int){ 1 }
+-  fib2: (int){ 1 }
++  fib2: (_|_){
++    // [structural cycle] structural cycle:
++    //     ./in.cue:3:25
++  }
+   fib3: (_|_){
+     // [structural cycle] structural cycle:
+     //     ./in.cue:3:25
+-    // structural cycle:
+-    //     ./in.cue:8:38
+   }
+   fib7: (_|_){
+     // [structural cycle] structural cycle:
+     //     ./in.cue:3:25
+-    // structural cycle:
+-    //     ./in.cue:8:9
+-    // structural cycle:
+-    //     ./in.cue:8:38
+   }
+   fib12: (_|_){
+     // [structural cycle] structural cycle:
+     //     ./in.cue:3:25
+-    // structural cycle:
+-    //     ./in.cue:8:9
+-    // structural cycle:
+-    //     ./in.cue:8:38
+   }
+ }
+-- diff/todo/p3 --
+Note that it is okay for fib2 to fail.
 -- out/eval/stats --
 Leaks:  16
 Freed:  180
@@ -131,3 +270,5 @@ Result:
     //     ./in.cue:8:38
   }
 }
+-- diff/todo/p2 --
+Elimination of unnecessary, but potentially useful, errors.

@@ -21,10 +21,11 @@ import (
 	"os"
 	"runtime"
 	"runtime/debug"
-	"time"
+	"testing"
 
 	"github.com/spf13/cobra"
-	"golang.org/x/mod/module"
+
+	"cuelang.org/go/internal/cueversion"
 )
 
 func newVersionCmd(c *Command) *cobra.Command {
@@ -36,8 +37,6 @@ func newVersionCmd(c *Command) *cobra.Command {
 	}
 	return cmd
 }
-
-const defaultVersion = "(devel)"
 
 // version can be set by a builder using
 // -ldflags='-X cuelang.org/go/cmd/cue/cmd.version=<version>'.
@@ -57,11 +56,7 @@ func runVersion(cmd *Command, args []string) error {
 		// shouldn't happen
 		return errors.New("unknown error reading build-info")
 	}
-	version := cueVersion(bi)
-	if version == "" {
-		version = defaultVersion
-	}
-	fmt.Fprintf(w, "cue version %s\n\n", version)
+	fmt.Fprintf(w, "cue version %s\n\n", cueVersion())
 	fmt.Fprintf(w, "go version %s\n", runtime.Version())
 	for _, s := range bi.Settings {
 		if s.Value == "" {
@@ -82,52 +77,22 @@ func runVersion(cmd *Command, args []string) error {
 // cueVersion returns the version of the CUE module as much
 // as can reasonably be determined. If no version can be
 // determined, it returns the empty string.
-func cueVersion(bi *debug.BuildInfo) string {
-	if v := os.Getenv("CUE_VERSION_OVERRIDE"); v != "" && inTest {
-		return v
-	}
-	v := version
-	if v != "" {
-		// The global version variable has been
-		// configured via ldflags.
-		return v
-	}
-	if bi == nil {
-		return ""
-	}
-	if bi.Main.Version != "" && bi.Main.Version != defaultVersion {
-		v = bi.Main.Version
-	}
-	if v != "" {
-		return v
-	}
-	// a specific version was not provided by ldflags or buildInfo
-	// attempt to make our own
-	var vcsTime time.Time
-	var vcsRevision string
-	for _, s := range bi.Settings {
-		switch s.Key {
-		case "vcs.time":
-			// If the format is invalid, we'll print a zero timestamp.
-			vcsTime, _ = time.Parse(time.RFC3339Nano, s.Value)
-		case "vcs.revision":
-			vcsRevision = s.Value
-			// module.PseudoVersion recommends the revision to be a 12-byte
-			// commit hash prefix, which is what cmd/go uses as well.
-			if len(vcsRevision) > 12 {
-				vcsRevision = vcsRevision[:12]
-			}
+func cueVersion() string {
+	if testing.Testing() {
+		if v := os.Getenv("CUE_VERSION_OVERRIDE"); v != "" {
+			return v
 		}
 	}
-	if vcsRevision != "" {
-		return module.PseudoVersion("", "", vcsTime, vcsRevision)
+	if v := version; v != "" {
+		// The global version variable has been configured via ldflags.
+		return v
 	}
-	return ""
+	return cueversion.Version()
 }
 
 func readBuildInfo() (*debug.BuildInfo, bool) {
 	bi, ok := debug.ReadBuildInfo()
-	if !ok || !inTest {
+	if !ok || !testing.Testing() {
 		return bi, ok
 	}
 	// test-based overrides

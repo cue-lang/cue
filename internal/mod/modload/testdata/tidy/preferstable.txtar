@@ -1,0 +1,39 @@
+# This test checks that stable releases are preferred over
+# pre-releases.
+
+-- tidy-check-error --
+module is not tidy: cannot find module providing package example.com.*
+-- want --
+module: "main.org@v0"
+language: {
+	version: "v0.8.100"
+}
+deps: {
+	"example.com@v0": {
+		v: "v0.0.1"
+	}
+}
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: {
+	version: "v0.8.100"
+}
+
+-- main.cue --
+package main
+
+import "example.com@v0"
+
+-- _registry/example.com_v0.0.1/cue.mod/module.cue --
+module: "example.com@v0"
+language: version: "v0.8.0"
+
+-- _registry/example.com_v0.0.1/top.cue --
+package main
+
+-- _registry/example.com_v0.0.3-alpha/cue.mod/module.cue --
+module: "example.com@v0"
+language: version: "v0.8.0"
+
+-- _registry/example.com_v0.0.3-alpha/top.cue --
+package main

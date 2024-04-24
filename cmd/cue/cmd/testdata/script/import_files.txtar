@@ -27,4 +27,4 @@ json: "[1, 2]"
     "name": "supplement\nfoo",
     "json": "[1, 2]"
 }
--- cue.mod --
+-- cue.mod/module.cue --

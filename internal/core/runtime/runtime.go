@@ -17,6 +17,7 @@ package runtime
 import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/cuedebug"
 )
 
 // A Runtime maintains data structures for indexing and reuse for evaluation.
@@ -30,10 +31,12 @@ type Runtime struct {
 	interpreters map[string]Interpreter
 
 	version internal.EvaluatorVersion
+
+	flags cuedebug.Config
 }
 
-func (r *Runtime) EvaluatorVersion() internal.EvaluatorVersion {
-	return r.version
+func (r *Runtime) Settings() (internal.EvaluatorVersion, cuedebug.Config) {
+	return r.version, r.flags
 }
 
 func (r *Runtime) SetBuildData(b *build.Instance, x interface{}) {
@@ -52,12 +55,20 @@ func New() *Runtime {
 	return r
 }
 
-// NewVersioned creates a new Runtime using the given runtime version.
-// The builtins registered with RegisterBuiltin are available for evaluation.
-func NewVersioned(v internal.EvaluatorVersion) *Runtime {
-	r := &Runtime{version: v}
+// NewWithSettings creates a new Runtime using the given runtime version and
+// debug flags. The builtins registered with RegisterBuiltin are available for
+// evaluation.
+func NewWithSettings(v internal.EvaluatorVersion, flags cuedebug.Config) *Runtime {
+	r := &Runtime{version: v, flags: flags}
 	r.Init()
 	return r
+}
+
+// SetSettings sets the version to use for the Runtime. This should only be set
+// before first use.
+func (r *Runtime) SetSettings(v internal.EvaluatorVersion, flags cuedebug.Config) {
+	r.version = v
+	r.flags = flags
 }
 
 // IsInitialized reports whether the runtime has been initialized.

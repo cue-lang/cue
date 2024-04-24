@@ -3,13 +3,13 @@ module cuelang.org/go
 go 1.21
 
 require (
-	cuelabs.dev/go/oci/ociregistry v0.0.0-20240222174315-5a9bab78b48a
+	cuelabs.dev/go/oci/ociregistry v0.0.0-20240404174027-a39bec0462d2
 	github.com/cockroachdb/apd/v3 v3.2.1
 	github.com/emicklei/proto v1.10.0
 	github.com/go-quicktest/qt v1.101.0
 	github.com/google/go-cmp v0.6.0
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
-	github.com/google/uuid v1.2.0
+	github.com/google/uuid v1.6.0
 	github.com/kr/pretty v0.3.1
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0
@@ -18,13 +18,13 @@ require (
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/pflag v1.0.5
 	github.com/tetratelabs/wazero v1.6.0
-	golang.org/x/mod v0.15.0
-	golang.org/x/net v0.21.0
-	golang.org/x/oauth2 v0.17.0
+	golang.org/x/mod v0.16.0
+	golang.org/x/net v0.22.0
+	golang.org/x/oauth2 v0.18.0
 	golang.org/x/sync v0.6.0
-	golang.org/x/sys v0.17.0
+	golang.org/x/sys v0.18.0
 	golang.org/x/text v0.14.0
-	golang.org/x/tools v0.18.0
+	golang.org/x/tools v0.19.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 

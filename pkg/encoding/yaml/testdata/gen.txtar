@@ -27,6 +27,11 @@ unmarshalStream: {
 	null2: yaml.UnmarshalStream('1\n---\n---\n2')
 	null2: yaml.UnmarshalStream("1\n---\n---\n2")
 }
+
+unmarshalTrailingInput: {
+	valid:   yaml.Unmarshal("1\n---\n2")
+	invalid: yaml.Unmarshal("1\n---\n}invalid yaml")
+}
 -- out/yaml --
 Errors:
 t1: error in call to encoding/yaml.Validate: invalid value 4 (out of bound <3):
@@ -40,6 +45,10 @@ t4: error in call to encoding/yaml.ValidatePartial: invalid value 4 (out of boun
     ./in.cue:6:5
     ./in.cue:6:49
     yaml.ValidatePartial:3:4
+unmarshalTrailingInput.valid: error in call to encoding/yaml.Unmarshal: 3:1: expected a single YAML document:
+    ./in.cue:27:11
+unmarshalTrailingInput.invalid: error in call to encoding/yaml.Unmarshal: expected a single YAML document: :2: did not find expected node content:
+    ./in.cue:28:11
 
 Result:
 t1: _|_ // t1: error in call to encoding/yaml.Validate: a: invalid value 4 (out of bound <3)
@@ -74,4 +83,8 @@ unmarshalStream: {
 	nums: [1, 2]
 	null1: [1, null, 2]
 	null2: [1, null, 2]
+}
+unmarshalTrailingInput: {
+	valid:   _|_ // unmarshalTrailingInput.valid: error in call to encoding/yaml.Unmarshal: 3:1: expected a single YAML document
+	invalid: _|_ // unmarshalTrailingInput.invalid: error in call to encoding/yaml.Unmarshal: expected a single YAML document: :2: did not find expected node content
 }

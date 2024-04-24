@@ -70,61 +70,6 @@ func IsValidIdent(ident string) bool {
 	return true
 }
 
-// ParseIdent unquotes a possibly quoted identifier and validates
-// if the result is valid.
-//
-// Deprecated: quoted identifiers are deprecated. Use aliases.
-func ParseIdent(n *Ident) (string, error) {
-	return parseIdent(n.NamePos, n.Name)
-}
-
-func parseIdent(pos token.Pos, ident string) (string, error) {
-	if ident == "" {
-		return "", errors.Newf(pos, "empty identifier")
-	}
-	quoted := false
-	if ident[0] == '`' {
-		u, err := strconv.Unquote(ident)
-		if err != nil {
-			return "", errors.Newf(pos, "invalid quoted identifier")
-		}
-		ident = u
-		quoted = true
-	}
-
-	p := 0
-	if strings.HasPrefix(ident, "_") {
-		p++
-		if len(ident) == 1 {
-			return ident, nil
-		}
-	}
-	if strings.HasPrefix(ident[p:], "#") {
-		p++
-		// if len(ident) == p {
-		// 	return "", errors.Newf(pos, "invalid identifier '_#'")
-		// }
-	}
-
-	if p == 0 || ident[p-1] == '#' {
-		if r, _ := utf8.DecodeRuneInString(ident[p:]); isDigit(r) {
-			return "", errors.Newf(pos, "invalid character '%s' in identifier", string(r))
-		}
-	}
-
-	for _, r := range ident[p:] {
-		if isLetter(r) || isDigit(r) || r == '_' || r == '$' {
-			continue
-		}
-		if r == '-' && quoted {
-			continue
-		}
-		return "", errors.Newf(pos, "invalid character '%s' in identifier", string(r))
-	}
-
-	return ident, nil
-}
-
 // LabelName reports the name of a label, whether it is an identifier
 // (it binds a value to a scope), and whether it is valid.
 // Keywords that are allowed in label positions are interpreted accordingly.
@@ -150,14 +95,11 @@ func LabelName(l Label) (name string, isIdent bool, err error) {
 			"cannot reference fields with square brackets labels outside the field value")
 
 	case *Ident:
-		// TODO(legacy): use name = n.Name
-		name, err = ParseIdent(n)
-		if err != nil {
-			return "", false, err
+		name = n.Name
+		if !IsValidIdent(name) {
+			return "", false, errors.Newf(l.Pos(), "invalid identifier")
 		}
-		isIdent = true
-		// TODO(legacy): remove this return once quoted identifiers are removed.
-		return name, isIdent, err
+		return name, true, err
 
 	case *BasicLit:
 		switch n.Kind {
@@ -178,17 +120,13 @@ func LabelName(l Label) (name string, isIdent bool, err error) {
 			return "", false, errors.Wrapf(ErrIsExpression, l.Pos(),
 				"cannot use numbers as fields")
 		}
+		return name, isIdent, err
 
 	default:
 		// This includes interpolation and template labels.
 		return "", false, errors.Wrapf(ErrIsExpression, l.Pos(),
 			"label is an expression")
 	}
-	if !IsValidIdent(name) {
-		isIdent = false
-	}
-	return name, isIdent, err
-
 }
 
 // ErrIsExpression reports whether a label is an expression.

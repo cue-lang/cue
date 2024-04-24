@@ -17,7 +17,6 @@ package adt
 import (
 	"fmt"
 	"log"
-	"os"
 	"reflect"
 	"regexp"
 	"sort"
@@ -31,18 +30,8 @@ import (
 	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/cuedebug"
 )
-
-// Debug sets whether extra aggressive checking should be done.
-// This should typically default to true for pre-releases and default to
-// false otherwise.
-var Debug bool = os.Getenv("CUE_DEBUG") != "0"
-
-// Verbosity sets the log level. There are currently only two levels:
-//
-//	0: no logging
-//	1: logging
-var Verbosity int
 
 // DebugSort specifies that arcs be sorted consistently between implementations.
 //
@@ -50,6 +39,8 @@ var Verbosity int
 //	1: sort by Feature: this should be consistent between implementations where
 //		   there is no change in the compiler and indexing code.
 //	2: alphabetical
+//
+// TODO: move to DebugFlags
 var DebugSort int
 
 func DebugSortArcs(c *OpContext, n *Vertex) {
@@ -92,8 +83,8 @@ func DebugSortFields(c *OpContext, a []Feature) {
 //
 // It is advisable for each use of Assert to document how the error is expected
 // to be handled down the line.
-func Assertf(b bool, format string, args ...interface{}) {
-	if Debug && !b {
+func Assertf(c *OpContext, b bool, format string, args ...interface{}) {
+	if c.Strict && !b {
 		panic(fmt.Sprintf("assertion failed: "+format, args...))
 	}
 }
@@ -101,7 +92,7 @@ func Assertf(b bool, format string, args ...interface{}) {
 // Assertf either panics or reports an error to c if the condition is not met.
 func (c *OpContext) Assertf(pos token.Pos, b bool, format string, args ...interface{}) {
 	if !b {
-		if Debug {
+		if c.Strict {
 			panic(fmt.Sprintf("assertion failed: "+format, args...))
 		}
 		c.addErrf(0, pos, format, args...)
@@ -115,7 +106,7 @@ func init() {
 var pMap = map[*Vertex]int{}
 
 func (c *OpContext) Logf(v *Vertex, format string, args ...interface{}) {
-	if Verbosity == 0 {
+	if c.LogEval == 0 {
 		return
 	}
 	if v == nil {
@@ -176,7 +167,7 @@ type Runtime interface {
 	// type if available.
 	LoadType(t reflect.Type) (src ast.Expr, expr Expr, ok bool)
 
-	EvaluatorVersion() internal.EvaluatorVersion
+	Settings() (internal.EvaluatorVersion, cuedebug.Config)
 }
 
 type Config struct {
@@ -189,11 +180,14 @@ func New(v *Vertex, cfg *Config) *OpContext {
 	if cfg.Runtime == nil {
 		panic("nil Runtime")
 	}
+	version, flags := cfg.Runtime.Settings()
 	ctx := &OpContext{
-		Runtime: cfg.Runtime,
-		Format:  cfg.Format,
-		vertex:  v,
-		Version: cfg.Runtime.EvaluatorVersion(),
+		Runtime:     cfg.Runtime,
+		Format:      cfg.Format,
+		vertex:      v,
+		Version:     version,
+		Config:      flags,
+		taskContext: schedConfig,
 	}
 	if v != nil {
 		ctx.e = &Environment{Up: nil, Vertex: v}
@@ -213,6 +207,7 @@ type OpContext struct {
 	Runtime
 	Format func(Node) string
 
+	cuedebug.Config
 	Version internal.EvaluatorVersion // Copied from Runtime
 
 	taskContext
@@ -268,6 +263,10 @@ type OpContext struct {
 	// as an error if this is true.
 	// TODO: strictly separate validators and functions.
 	IsValidator bool
+
+	// ErrorGraphs contains an analysis, represented as a Mermaid graph, for
+	// each node that has an error.
+	ErrorGraphs map[string]string
 }
 
 func (c *OpContext) CloseInfo() CloseInfo { return c.ci }
@@ -623,7 +622,7 @@ func (c *OpContext) evaluateRec(v Conjunct, state combinedFlags) Value {
 	val := c.evalState(x, state)
 	if val == nil {
 		// Be defensive: this never happens, but just in case.
-		Assertf(false, "nil return value: unspecified error")
+		Assertf(c, false, "nil return value: unspecified error")
 		val = &Bottom{
 			Code: IncompleteError,
 			Err:  c.Newf("UNANTICIPATED ERROR"),
@@ -659,7 +658,7 @@ func (c *OpContext) evalState(v Expr, state combinedFlags) (result Value) {
 				switch b.Code {
 				case IncompleteError:
 				case CycleError:
-					if state.vertexStatus() == partial {
+					if state.vertexStatus() == partial || c.isDevVersion() {
 						break
 					}
 					fallthrough
@@ -698,14 +697,58 @@ func (c *OpContext) evalState(v Expr, state combinedFlags) (result Value) {
 		if arc == nil {
 			return nil
 		}
+		// TODO: consider moving this after markCycle, depending on how we
+		// implement markCycle.
+		arc = arc.Indirect()
 
 		// Save the old CloseInfo and restore after evaluate to avoid detecting
 		// spurious cycles.
 		saved := c.ci
-		if n := arc.state; n != nil {
+		n := arc.state
+		if c.isDevVersion() {
+			n = arc.getState(c)
+		}
+		if n != nil {
 			c.ci, _ = n.markCycle(arc, nil, x, c.ci)
 		}
 		c.ci.Inline = true
+
+		if c.isDevVersion() {
+			if s := arc.getState(c); s != nil {
+				needs := state.conditions()
+				runMode := state.runMode()
+
+				arc.unify(c, needs|arcTypeKnown, attemptOnly) // to set scalar
+
+				if runMode == finalize {
+					// arc.unify(c, needs, attemptOnly) // to set scalar
+					// Freeze node.
+					arc.state.freeze(needs)
+				} else {
+					arc.unify(c, needs, runMode)
+				}
+
+				v := arc
+				if v.ArcType == ArcPending {
+					if v.status == evaluating {
+						for ; v.Parent != nil && v.ArcType == ArcPending; v = v.Parent {
+						}
+						err := c.Newf("cycle with field %v", x)
+						b := &Bottom{Code: CycleError, Err: err}
+						v.setValue(c, v.status, b)
+						return b
+						// TODO: use this instead, as is usual for incomplete errors,
+						// and also move this block one scope up to also apply to
+						// defined arcs. In both cases, though, doing so results in
+						// some errors to be misclassified as evaluation error.
+						// c.AddBottom(b)
+						// return nil
+					}
+					c.undefinedFieldError(v, IncompleteError)
+					return nil
+				}
+			}
+		}
 		v := c.evaluate(arc, x, state)
 		c.ci = saved
 		return v
@@ -781,9 +824,19 @@ func (c *OpContext) unifyNode(v Expr, state combinedFlags) (result Value) {
 		if v == nil {
 			return nil
 		}
+		// TODO: consider moving this after markCycle, depending on how we
+		// implement markCycle.
+		v = v.Indirect()
 
-		if v.isUndefined() || state.vertexStatus() > v.status {
-			c.unify(v, state)
+		if c.isDevVersion() {
+			if n := v.getState(c); n != nil {
+				// Always yield to not get spurious errors.
+				n.process(arcTypeKnown, yield)
+			}
+		} else {
+			if v.isUndefined() || state.vertexStatus() > v.status {
+				c.unify(v, state)
+			}
 		}
 
 		return v
@@ -795,6 +848,9 @@ func (c *OpContext) unifyNode(v Expr, state combinedFlags) (result Value) {
 }
 
 func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, flags combinedFlags) *Vertex {
+	if c.isDevVersion() {
+		return x.lookup(c, pos, l, flags)
+	}
 
 	state := flags.vertexStatus()
 
@@ -886,6 +942,8 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, flags combinedFl
 		}
 	} else {
 		if x.state != nil {
+			x.state.assertInitialized()
+
 			for _, e := range x.state.exprs {
 				if isCyclePlaceholder(e.err) {
 					hasCycle = true
@@ -896,7 +954,7 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, flags combinedFl
 		// As long as we have incomplete information, we cannot mark the
 		// inability to look up a field as "final", as it may resolve down the
 		// line.
-		permanent := x.status > conjuncts
+		permanent := x.status >= conjuncts
 		if m, _ := x.BaseValue.(*ListMarker); m != nil && !m.IsOpen {
 			permanent = true
 		}

@@ -11,7 +11,7 @@ env CUE_CACHE_DIR=$WORK/.tmp/different-cache
 env-fill cueconfig/badtoken.json
 cp cueconfig/badtoken.json cueconfig/logins.json
 ! exec cue export .
-stderr 'import failed: cannot find package .* 401 Unauthorized; body: "invalid credentials'
+stderr 'import failed: cannot find package .* 401 Unauthorized: unauthorized: authentication required: invalid bearer credentials'
 
 # An invalid logins.json should result in an immediate error.
 env CUE_CONFIG_DIR=$WORK/badconfig
@@ -65,6 +65,7 @@ import "example.com/e3"
 
 -- cue.mod/module.cue --
 module: "test.org"
+language: version: "v0.8.0"
 deps: "example.com/e1": v: "v0.0.1"
 deps: "example.com/e2": v: "v0.0.1"
 deps: "example.com/e3": v: "v0.0.1"
@@ -74,6 +75,7 @@ deps: "example.com/e3": v: "v0.0.1"
 somewhere/other
 -- _registry/example.com_e1_v0.0.1/cue.mod/module.cue --
 module: "example.com/e1@v0"
+language: version: "v0.8.0"
 
 -- _registry/example.com_e1_v0.0.1/main.cue --
 package e1
@@ -81,6 +83,7 @@ package e1
 foo: "ok1"
 -- _registry/example.com_e2_v0.0.1/cue.mod/module.cue --
 module: "example.com/e2@v0"
+language: version: "v0.8.0"
 
 -- _registry/example.com_e2_v0.0.1/main.cue --
 package e2
@@ -88,6 +91,7 @@ package e2
 foo: "ok2"
 -- _registry/example.com_e3_v0.0.1/cue.mod/module.cue --
 module: "example.com/e3@v0"
+language: version: "v0.8.0"
 
 -- _registry/example.com_e3_v0.0.1/main.cue --
 package e3

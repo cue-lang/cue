@@ -63,14 +63,10 @@ func runFixAll(cmd *Command, args []string) error {
 		args = []string{"./..."}
 
 		for {
-			if fi, err := os.Stat(filepath.Join(dir, "cue.mod")); err == nil {
-				if fi.IsDir() {
-					args = appendDirs(args, filepath.Join(dir, "cue.mod", "gen"))
-					args = appendDirs(args, filepath.Join(dir, "cue.mod", "pkg"))
-					args = appendDirs(args, filepath.Join(dir, "cue.mod", "usr"))
-				} else {
-					args = appendDirs(args, filepath.Join(dir, "pkg"))
-				}
+			if _, err := os.Stat(filepath.Join(dir, "cue.mod")); err == nil {
+				args = appendDirs(args, filepath.Join(dir, "cue.mod", "gen"))
+				args = appendDirs(args, filepath.Join(dir, "cue.mod", "pkg"))
+				args = appendDirs(args, filepath.Join(dir, "cue.mod", "usr"))
 				break
 			}
 

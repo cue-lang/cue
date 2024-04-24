@@ -36,6 +36,56 @@ Retain: 2
 Unifications: 7
 Conjuncts:    10
 Disjuncts:    8
+-- out/evalalpha --
+Errors:
+c2: conflicting values 1 and {bar:1} (mismatched types int and struct):
+    ./in.cue:2:5
+    ./in.cue:2:16
+c2: cannot combine regular field "bar" with 1:
+    ./in.cue:2:16
+
+Result:
+(_|_){
+  // [eval]
+  c1: (struct){
+    bar: (struct){
+      baz: (int){ 2 }
+    }
+    baz: (int){ 2 }
+  }
+  c2: (_|_){
+    // [eval] c2: conflicting values 1 and {bar:1} (mismatched types int and struct):
+    //     ./in.cue:2:5
+    //     ./in.cue:2:16
+    // c2: cannot combine regular field "bar" with 1:
+    //     ./in.cue:2:16
+    bar: (int){ 1 }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -2,6 +2,8 @@
+ c2: conflicting values 1 and {bar:1} (mismatched types int and struct):
+     ./in.cue:2:5
+     ./in.cue:2:16
++c2: cannot combine regular field "bar" with 1:
++    ./in.cue:2:16
+ 
+ Result:
+ (_|_){
+@@ -16,6 +18,8 @@
+     // [eval] c2: conflicting values 1 and {bar:1} (mismatched types int and struct):
+     //     ./in.cue:2:5
+     //     ./in.cue:2:16
++    // c2: cannot combine regular field "bar" with 1:
++    //     ./in.cue:2:16
+     bar: (int){ 1 }
+   }
+ }
+-- diff/todo/p3 --
+Additional error message. Seems okay.
 -- out/eval --
 Errors:
 c2: conflicting values 1 and {bar:1} (mismatched types int and struct):

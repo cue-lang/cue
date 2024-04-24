@@ -16,8 +16,10 @@ package load
 
 import (
 	"bytes"
+	"cmp"
 	pathpkg "path"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -58,16 +60,16 @@ func rewriteFiles(p *build.Instance, root string, isLocal bool) {
 // normalizeFiles sorts the files so that files contained by a parent directory
 // always come before files contained in sub-directories, and that filenames in
 // the same directory are sorted lexically byte-wise, like Go's `<` operator.
-func normalizeFiles(a []*build.File) {
-	sort.Slice(a, func(i, j int) bool {
-		fi := a[i].Filename
-		fj := a[j].Filename
-		ci := strings.Count(fi, string(filepath.Separator))
-		cj := strings.Count(fj, string(filepath.Separator))
-		if ci != cj {
-			return ci < cj
+func normalizeFiles(files []*build.File) {
+	slices.SortFunc(files, func(a, b *build.File) int {
+		fa := a.Filename
+		fb := b.Filename
+		ca := strings.Count(fa, string(filepath.Separator))
+		cb := strings.Count(fb, string(filepath.Separator))
+		if c := cmp.Compare(ca, cb); c != 0 {
+			return c
 		}
-		return fi < fj
+		return cmp.Compare(fa, fb)
 	})
 }
 
@@ -102,7 +104,6 @@ type fileProcessor struct {
 	firstCommentFile string
 	imported         map[string][]token.Pos
 	allTags          map[string]bool
-	allFiles         bool
 	ignoreOther      bool // ignore files from other packages
 	allPackages      bool
 
@@ -183,7 +184,7 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 		return true
 	}
 
-	match, data, err := matchFile(fp.c, file, true, fp.allFiles, fp.allTags)
+	match, data, err := matchFile(fp.c, file, true, fp.allTags)
 	switch {
 	case match:
 
@@ -264,11 +265,13 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 				p.IgnoredFiles = append(p.IgnoredFiles, file)
 				return false
 			}
-			return badFile(&MultiplePackageError{
-				Dir:      p.Dir,
-				Packages: []string{p.PkgName, pkg},
-				Files:    []string{fp.firstFile, base},
-			})
+			if !fp.allPackages {
+				return badFile(&MultiplePackageError{
+					Dir:      p.Dir,
+					Packages: []string{p.PkgName, pkg},
+					Files:    []string{fp.firstFile, base},
+				})
+			}
 		}
 	}
 
@@ -276,7 +279,7 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 	isTool := strings.HasSuffix(base, "_tool"+cueSuffix)
 
 	if mode&importComment != 0 {
-		qcom, line := findimportComment(data)
+		qcom, line := findImportComment(data)
 		if line != 0 {
 			com, err := strconv.Unquote(qcom)
 			if err != nil {
@@ -332,7 +335,7 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 	return true
 }
 
-func findimportComment(data []byte) (s string, line int) {
+func findImportComment(data []byte) (s string, line int) {
 	// expect keyword package
 	word, data := parseWord(data)
 	if string(word) != "package" {
@@ -480,22 +483,6 @@ func cleanPatterns(patterns []string) []string {
 // isMetaPackage checks if name is a reserved package name that expands to multiple packages.
 func isMetaPackage(name string) bool {
 	return name == "std" || name == "cmd" || name == "all"
-}
-
-// hasPathPrefix reports whether the path s begins with the
-// elements in prefix.
-func hasPathPrefix(s, prefix string) bool {
-	switch {
-	default:
-		return false
-	case len(s) == len(prefix):
-		return s == prefix
-	case len(s) > len(prefix):
-		if prefix != "" && prefix[len(prefix)-1] == '/' {
-			return strings.HasPrefix(s, prefix)
-		}
-		return s[len(prefix)] == '/' && s[:len(prefix)] == prefix
-	}
 }
 
 // hasFilepathPrefix reports whether the path s begins with the

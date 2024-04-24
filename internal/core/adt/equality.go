@@ -67,6 +67,9 @@ func equalVertex(ctx *OpContext, x *Vertex, v Value, flags Flag) bool {
 		if x.IsClosedStruct() != y.IsClosedStruct() {
 			return false
 		}
+		if x.IsClosedList() != y.IsClosedList() {
+			return false
+		}
 		if !equalClosed(ctx, x, y, flags) {
 			return false
 		}

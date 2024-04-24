@@ -17,18 +17,23 @@ package cmd
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"runtime"
+	"runtime/pprof"
+	"testing"
 
 	"github.com/spf13/cobra"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/interpreter/wasm"
 	"cuelang.org/go/cue/stats"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
+	cueruntime "cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
@@ -57,7 +62,7 @@ func statsEncoder(cmd *Command) *encoding.Encoder {
 	stats, err := filetypes.ParseFile(file, filetypes.Export)
 	exitOnErr(cmd, err, true)
 
-	statsEnc, err := encoding.NewEncoder(stats, &encoding.Config{
+	statsEnc, err := encoding.NewEncoder(cmd.ctx, stats, &encoding.Config{
 		Stdout: cmd.OutOrStderr(),
 		Force:  true,
 	})
@@ -88,8 +93,46 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		if err := cueexperiment.Init(); err != nil {
 			return err
 		}
+		if err := cuedebug.Init(); err != nil {
+			return err
+		}
+		// Some init work, such as in internal/filetypes, evaluates CUE by design.
+		// We don't want that work to count towards $CUE_STATS.
+		adt.ResetStats()
+
+		if cpuprofile := flagCpuProfile.String(c); cpuprofile != "" {
+			f, err := os.Create(cpuprofile)
+			if err != nil {
+				return fmt.Errorf("could not create CPU profile: %v", err)
+			}
+			defer f.Close()
+			if err := pprof.StartCPUProfile(f); err != nil {
+				return fmt.Errorf("could not start CPU profile: %v", err)
+			}
+			defer pprof.StopCPUProfile()
+		}
+
+		// TODO: do not rely on a global variable here, as this API is also used
+		// in a non-tooling context.
+		if cueexperiment.Flags.EvalV3 {
+			const dev = internal.DevVersion
+			(*cueruntime.Runtime)(c.ctx).SetSettings(internal.EvaluatorVersion(dev), cuedebug.Flags)
+		}
 
 		err := f(c, args)
+
+		// TODO(mvdan): support -memprofilerate like `go help testflag`.
+		if memprofile := flagMemProfile.String(c); memprofile != "" {
+			f, err := os.Create(memprofile)
+			if err != nil {
+				return fmt.Errorf("could not create memory profile: %v", err)
+			}
+			defer f.Close()
+			runtime.GC() // get up-to-date statistics
+			if err := pprof.WriteHeapProfile(f); err != nil {
+				return fmt.Errorf("could not write memory profile: %v", err)
+			}
+		}
 
 		if statsEnc != nil {
 			var stats Stats
@@ -100,7 +143,7 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 			// due to the inherent behavior of memory pools like sync.Pool,
 			// we support supplying MemStats as a JSON file in the tests.
 			var m runtime.MemStats
-			if name := os.Getenv("CUE_TEST_MEMSTATS"); name != "" && inTest {
+			if name := os.Getenv("CUE_TEST_MEMSTATS"); name != "" && testing.Testing() {
 				bs, err := os.ReadFile(name)
 				if err != nil {
 					return err
@@ -169,7 +212,7 @@ For more information on writing CUE configuration files see cuelang.org.`,
 	c := &Command{
 		Command: cmd,
 		root:    cmd,
-		ctx:     cuecontext.New(cuecontext.Interpreter(wasm.New())),
+		ctx:     cuecontext.New(rootContextOptions...),
 	}
 
 	cmdCmd := newCmdCmd(c)
@@ -194,7 +237,7 @@ For more information on writing CUE configuration files see cuelang.org.`,
 		newAddCmd(c),
 		newLoginCmd(c),
 	}
-	subCommands = append(subCommands, newHelpTopics(c)...)
+	subCommands = append(subCommands, helpTopics...)
 
 	addGlobalFlags(cmd.PersistentFlags())
 	// We add the injection flags to the root command for the sake of the short form "cue -t foo=bar mycmd".
@@ -219,26 +262,17 @@ For more information on writing CUE configuration files see cuelang.org.`,
 	return c, nil
 }
 
-// MainTest is like Main, runs the cue tool and returns the code for passing to os.Exit.
-func MainTest() int {
-	// Setting inTest causes filenames printed in error messages
-	// to be normalized so the output looks the same on Unix
-	// as Windows.
-	// TODO: replace with testing.Testing once we can require Go 1.21 or later,
-	// per the accepted proposal at https://go.dev/issue/52600.
-	inTest = true
-	return Main()
-}
+var rootContextOptions []cuecontext.Option
 
 // Main runs the cue tool and returns the code for passing to os.Exit.
 func Main() int {
 	cwd, _ := os.Getwd()
 	cmd, _ := New(os.Args[1:])
-	if err := cmd.Run(context.Background()); err != nil {
+	if err := cmd.Run(backgroundContext()); err != nil {
 		if err != ErrPrintedError {
 			errors.Print(os.Stderr, err, &errors.Config{
 				Cwd:     cwd,
-				ToSlash: inTest,
+				ToSlash: testing.Testing(),
 			})
 		}
 		return 1
@@ -330,6 +364,6 @@ type panicError struct {
 	Err error
 }
 
-func exit() {
+func panicExit() {
 	panic(panicError{ErrPrintedError})
 }

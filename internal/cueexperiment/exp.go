@@ -1,40 +1,36 @@
 package cueexperiment
 
 import (
-	"fmt"
-	"os"
-	"reflect"
-	"strings"
+	"sync"
+
+	"cuelang.org/go/internal/envflag"
 )
 
 // Flags holds the set of CUE_EXPERIMENT flags. It is initialized
 // by Init.
 var Flags struct {
 	Modules bool
+
+	// YAMLV3Decoder swaps the old internal/third_party/yaml decoder with the new
+	// decoder implemented in internal/encoding/yaml on top of yaml.v3.
+	YAMLV3Decoder bool `envflag:"default:true"`
+
+	// EvalV3 enables the new evaluator. The new evaluator addresses various
+	// performance concerns.
+	EvalV3 bool
 }
 
 // Init initializes Flags. Note: this isn't named "init" because we
 // don't always want it to be called (for example we don't want it to be
 // called when running "cue help"), and also because we want the failure
 // mode to be one of error not panic, which would be the only option if
-// it was a top level init function
+// it was a top level init function.
 func Init() error {
-	exp := os.Getenv("CUE_EXPERIMENT")
-	if exp == "" {
-		return nil
-	}
-	names := make(map[string]int)
-	fv := reflect.ValueOf(&Flags).Elem()
-	ft := fv.Type()
-	for i := 0; i < ft.NumField(); i++ {
-		names[strings.ToLower(ft.Field(i).Name)] = i
-	}
-	for _, uexp := range strings.Split(exp, ",") {
-		index, ok := names[uexp]
-		if !ok {
-			return fmt.Errorf("unknown CUE_EXPERIMENT %s", uexp)
-		}
-		fv.Field(index).SetBool(true)
-	}
-	return nil
+	return initOnce()
+}
+
+var initOnce = sync.OnceValue(initAlways)
+
+func initAlways() error {
+	return envflag.Init(&Flags, "CUE_EXPERIMENT")
 }

@@ -15,6 +15,8 @@
 package load
 
 import (
+	"context"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -25,8 +27,10 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
-	"cuelang.org/go/internal/mod/modfile"
-	"cuelang.org/go/internal/mod/modload"
+	"cuelang.org/go/internal/cueexperiment"
+	"cuelang.org/go/mod/modconfig"
+	"cuelang.org/go/mod/modfile"
+	"cuelang.org/go/mod/module"
 )
 
 const (
@@ -249,7 +253,7 @@ type Config struct {
 	DataFiles bool
 
 	// StdRoot specifies an alternative directory for standard libraries.
-	// This is mostly used for bootstrapping.
+	// Deprecated: this has no effect.
 	StdRoot string
 
 	// ParseFile is called to read and parse each file when preparing a
@@ -276,11 +280,20 @@ type Config struct {
 
 	// Registry is used to fetch CUE module dependencies.
 	//
-	// When nil, dependencies will be resolved in legacy mode:
-	// reading from cue.mod/pkg, cue.mod/usr, and cue.mod/gen.
+	// When nil, if the modules experiment is enabled
+	// (CUE_EXPERIMENT=modules), [modconfig.NewRegistry]
+	// will be used to create a registry instance using the
+	// usual cmd/cue conventions for environment variables
+	// (but see the Env field below).
 	//
-	// THIS IS EXPERIMENTAL FOR NOW. DO NOT USE.
-	Registry modload.Registry
+	// THIS IS EXPERIMENTAL. API MIGHT CHANGE.
+	Registry modconfig.Registry
+
+	// Env provides environment variables for use in the configuration.
+	// Currently this is only used in the construction of the Registry
+	// value (see above). If this is nil, the current process's environment
+	// will be used.
+	Env []string
 
 	fileSystem fileSystem
 }
@@ -298,6 +311,7 @@ type fsPath string
 
 func addImportQualifier(pkg importPath, name string) (importPath, errors.Error) {
 	if name != "" {
+		// TODO use module.ParseImportPath
 		s := string(pkg)
 		if i := strings.LastIndexByte(s, '/'); i >= 0 {
 			s = s[i+1:]
@@ -363,10 +377,69 @@ func (c Config) complete() (cfg *Config, err error) {
 	} else if !filepath.IsAbs(c.ModuleRoot) {
 		c.ModuleRoot = filepath.Join(c.Dir, c.ModuleRoot)
 	}
+	// Note: if cueexperiment.Flags.Modules _isn't_ set but c.Registry
+	// is, we consider that a good enough hint that modules support
+	// should be enabled and hence don't return an error in that case.
+	if cueexperiment.Flags.Modules && c.Registry == nil {
+		registry, err := modconfig.NewRegistry(&modconfig.Config{
+			Env: c.Env,
+		})
+		if err != nil {
+			// If there's an error in the registry configuration,
+			// don't error immediately, but only when we actually
+			// need to resolve modules.
+			registry = errorRegistry{err}
+		}
+		c.Registry = registry
+	}
 	if err := c.loadModule(); err != nil {
 		return nil, err
 	}
 	return &c, nil
+}
+
+// loadModule loads the module file, resolves and downloads module
+// dependencies. It sets c.Module if it's empty or checks it for
+// consistency with the module file otherwise.
+func (c *Config) loadModule() error {
+	// TODO: also make this work if run from outside the module?
+	mod := filepath.Join(c.ModuleRoot, modDir)
+	info, cerr := c.fileSystem.stat(mod)
+	if cerr != nil {
+		return nil
+	}
+	if !info.IsDir() {
+		return fmt.Errorf("cue.mod files are no longer supported; use cue.mod/module.cue")
+	}
+	mod = filepath.Join(mod, moduleFile)
+	f, cerr := c.fileSystem.openFile(mod)
+	if cerr != nil {
+		return nil
+	}
+	defer f.Close()
+	data, err := io.ReadAll(f)
+	if err != nil {
+		return err
+	}
+	parseModFile := modfile.ParseNonStrict
+	if c.Registry == nil {
+		parseModFile = modfile.ParseLegacy
+	}
+	mf, err := parseModFile(data, mod)
+	if err != nil {
+		return err
+	}
+	c.modFile = mf
+	if mf.Module == "" {
+		// Backward compatibility: allow empty module.cue file.
+		// TODO maybe check that the rest of the fields are empty too?
+		return nil
+	}
+	if c.Module != "" && c.Module != mf.Module {
+		return errors.Newf(token.NoPos, "inconsistent modules: got %q, want %q", mf.Module, c.Module)
+	}
+	c.Module = mf.Module
+	return nil
 }
 
 func (c Config) isRoot(dir string) bool {
@@ -403,4 +476,21 @@ func (c *Config) newErrInstance(err error) *build.Instance {
 	i.Module = c.Module
 	i.Err = errors.Promote(err, "instance")
 	return i
+}
+
+// errorRegistry implements [modconfig.Registry] by returning err from all methods.
+type errorRegistry struct {
+	err error
+}
+
+func (r errorRegistry) Requirements(ctx context.Context, m module.Version) ([]module.Version, error) {
+	return nil, r.err
+}
+
+func (r errorRegistry) Fetch(ctx context.Context, m module.Version) (module.SourceLoc, error) {
+	return module.SourceLoc{}, r.err
+}
+
+func (r errorRegistry) ModuleVersions(ctx context.Context, mpath string) ([]string, error) {
+	return nil, r.err
 }

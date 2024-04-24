@@ -1,0 +1,52 @@
+# Verify that cue fmt does not format files in ancestor
+# directories that are part of a cue instance.
+
+! exec cue fmt --check a/b/c/p_c.cue
+cmpenv stdout single-file.golden
+
+! exec cue fmt --check a/b/c/p_c.cue a/p_a.cue
+cmpenv stdout multi-file.golden
+
+! exec cue fmt --check ./a/...
+cmpenv stdout all-under-a.golden
+
+! exec cue fmt --check ./a/b/c/p_c.cue ./x/p_x.cue
+cmpenv stdout multiple-instances.golden
+
+-- single-file.golden --
+a${/}b${/}c${/}p_c.cue
+-- multi-file.golden --
+a${/}p_a.cue
+a${/}b${/}c${/}p_c.cue
+-- all-under-a.golden --
+a${/}p_a.cue
+a${/}b${/}p_b.cue
+a${/}b${/}c${/}p_c.cue
+-- multiple-instances.golden --
+x${/}p_x.cue
+a${/}b${/}c${/}p_c.cue
+-- cue.mod/module.cue --
+module: "mod.example"
+language: {
+        version: "v0.9.0-alpha.1"
+}
+-- p_root.cue --
+package p
+
+x:   5
+-- a/p_a.cue --
+package p
+
+x:   5
+-- a/b/p_b.cue --
+package p
+
+x:   5
+-- a/b/c/p_c.cue --
+package p
+
+x:   5
+-- x/p_x.cue --
+package p
+
+x:   5

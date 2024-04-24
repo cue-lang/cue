@@ -17,20 +17,26 @@ package adt_test
 import (
 	"flag"
 	"fmt"
+	"path/filepath"
+	"sort"
 	"strings"
 	"testing"
 
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/stats"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/core/validate"
+	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cuetxtar"
 	_ "cuelang.org/go/pkg"
 )
@@ -53,7 +59,7 @@ func TestEval(t *testing.T) {
 	}
 
 	test.Run(t, func(tc *cuetxtar.Test) {
-		runEvalTest(tc, internal.DefaultVersion)
+		runEvalTest(tc, internal.DefaultVersion, cuedebug.Config{})
 	})
 }
 
@@ -65,12 +71,28 @@ var needFix = map[string]string{
 	"DIR/NAME": "reason",
 }
 
-var todoAlpha = map[string]string{
-	"DIR/NAME": "reason",
-}
-
 func TestEvalAlpha(t *testing.T) {
-	adt.DebugDeps = true // check unmatched dependencies.
+	// TODO: remove use of externalDeps for processing. Currently, enabling
+	// this would fix some issues, but also introduce some closedness bugs.
+	// As a first step, we should ensure that the temporary hack of using
+	// externalDeps to agitate pending dependencies is replaced with a
+	// dedicated mechanism.
+	//
+	// adt.DebugDeps = true // check unmatched dependencies.
+
+	flags := cuedebug.Config{
+		Sharing: true,
+	}
+
+	var todoAlpha = map[string]string{
+		// Crashes and hangs
+		"cycle/evaluate": "hang",
+		"cycle/chain":    "hang",
+
+		"cycle/structural": "hang",
+
+		"benchmarks/issue2176": "too many errors",
+	}
 
 	test := cuetxtar.TxTarTest{
 		Root:     "../../../cue/testdata",
@@ -84,15 +106,47 @@ func TestEvalAlpha(t *testing.T) {
 		test.ToDo = nil
 	}
 
+	var ran, skipped, errorCount int
+
 	test.Run(t, func(t *cuetxtar.Test) {
-		runEvalTest(t, internal.DevVersion)
+		if reason := skipFiles(t.Instance().Files...); reason != "" {
+			skipped++
+			t.Skip(reason)
+		}
+		ran++
+
+		errorCount += runEvalTest(t, internal.DevVersion, flags)
 	})
+
+	t.Logf("todo: %d, ran: %d, skipped: %d, nodeErrors: %d",
+		len(todoAlpha), ran, skipped, errorCount)
 }
 
-func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion) {
+// skipFiles returns true if the given files contain CUE that is not yet handled
+// by the development version of the evaluator.
+func skipFiles(a ...*ast.File) (reason string) {
+	// Skip disjunctions.
+	fn := func(n ast.Node) bool {
+		switch x := n.(type) {
+		case *ast.BinaryExpr:
+			if x.Op == token.OR {
+				// Uncomment to disable disjunction testing.
+				// NOTE: keep around until implementation of disjunctions
+				// is complete.
+				// reason = "disjunctions"
+			}
+		}
+		return true
+	}
+	for _, f := range a {
+		ast.Walk(f, fn, nil)
+	}
+	return reason
+}
+
+func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, flags cuedebug.Config) (errorCount int) {
 	a := t.Instance()
-	// TODO: use version once we implement disjunctions.
-	r := runtime.NewVersioned(internal.DefaultVersion)
+	r := runtime.NewWithSettings(version, flags)
 
 	v, err := r.Build(nil, a)
 	if err != nil {
@@ -103,13 +157,56 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion) {
 	e := eval.New(r)
 	ctx := e.NewContext(v)
 	ctx.Version = version
+	ctx.Config = flags
 	v.Finalize(ctx)
 
-	if version != internal.DevVersion {
-		stats := ctx.Stats()
-		w := t.Writer("stats")
-		fmt.Fprintln(w, stats)
+	// Print discrepancies in dependencies.
+	if m := ctx.ErrorGraphs; len(m) > 0 {
+		errorCount += 1 // Could use len(m), but this seems more useful.
+		i := 0
+		keys := make([]string, len(m))
+		for k := range m {
+			keys[i] = k
+			i++
+		}
+		t.Errorf("unexpected node errors: %d", len(ctx.ErrorGraphs))
+		sort.Strings(keys)
+		for _, s := range keys {
+			t.Errorf("  -- path: %s", s)
+		}
 	}
+
+	switch counts := ctx.Stats(); {
+	case version == internal.DevVersion:
+		for _, f := range t.Archive.Files {
+			if f.Name != "out/eval/stats" {
+				continue
+			}
+			c := cuecontext.New()
+			v := c.CompileBytes(f.Data)
+			var orig stats.Counts
+			v.Decode(&orig)
+
+			// TODO: do something more principled.
+			switch {
+			case orig.Disjuncts < counts.Disjuncts,
+				orig.Disjuncts > counts.Disjuncts*5 &&
+					counts.Disjuncts > 20,
+				orig.Conjuncts > counts.Conjuncts*2:
+				// For now, we only care about disjuncts.
+				// TODO: add triggers once the disjunction issues have bene
+				// solved.
+				w := t.Writer("stats")
+				fmt.Fprintln(w, counts)
+			}
+			break
+		}
+
+	default:
+		w := t.Writer("stats")
+		fmt.Fprintln(w, counts)
+	}
+
 	// if n := stats.Leaks(); n > 0 {
 	// 	t.Skipf("%d leaks reported", n)
 	// }
@@ -129,14 +226,19 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion) {
 
 	debug.WriteNode(t, r, v, &debug.Config{Cwd: t.Dir})
 	fmt.Fprintln(t)
+
+	return
 }
 
 // TestX is for debugging. Do not delete.
 func TestX(t *testing.T) {
-	var verbosity int
-	verbosity = 1 // comment to turn logging off.
-
 	adt.DebugDeps = true
+	// adt.OpenGraphs = true
+
+	flags := cuedebug.Config{
+		Sharing: true, // Uncomment to turn sharing off.
+		LogEval: 1,    // Uncomment to turn logging off
+	}
 
 	var version internal.EvaluatorVersion
 	version = internal.DevVersion // comment to use default implementation.
@@ -158,22 +260,25 @@ module: "mod.test"
 		t.Fatal(instance.Err)
 	}
 
-	r := runtime.NewVersioned(version)
+	r := runtime.NewWithSettings(version, flags)
 
 	v, err := r.Build(nil, instance)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// t.Error(debug.NodeString(r, v, nil))
-	// eval.Debug = true
-	adt.Verbosity = verbosity
-	t.Cleanup(func() { adt.Verbosity = 0 })
-
 	e := eval.New(r)
 	ctx := e.NewContext(v)
+	ctx.Config = flags
 	v.Finalize(ctx)
-	adt.Verbosity = 0
+
+	out := debug.NodeString(r, v, nil)
+	if adt.OpenGraphs {
+		for p, g := range ctx.ErrorGraphs {
+			path := filepath.Join(".debug/TestX", p)
+			adt.OpenNodeGraph("TestX", path, in, out, g)
+		}
+	}
 
 	if b := validate.Validate(ctx, v, &validate.Config{
 		AllErrors: true,
@@ -181,7 +286,7 @@ module: "mod.test"
 		t.Log(errors.Details(b.Err, nil))
 	}
 
-	t.Error(debug.NodeString(r, v, nil))
+	t.Error(out)
 
 	t.Log(ctx.Stats())
 }

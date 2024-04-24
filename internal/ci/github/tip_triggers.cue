@@ -24,15 +24,6 @@ workflows: tip_triggers: _repo.bashWorkflow & {
 		"runs-on": _repo.linuxMachine
 		if:        "${{github.repository == '\(_repo.githubRepositoryPath)'}}"
 		steps: [
-			_repo.workflowDispatch & {
-				name:                  "Trigger tip.cuelang.org deploy"
-				#githubRepositoryPath: _repo.cuelangRepositoryPath
-
-				// #workflowID corresponds to the filename of the update_tip
-				// workflow in the cue-lang/cuelang.org repo. If we could constrain
-				// this across repos we would.
-				#workflowID: "update_tip.yml"
-			},
 			_repo.repositoryDispatch & {
 				name:                          "Trigger unity build"
 				#githubRepositoryPath:         _repo.unityRepositoryPath

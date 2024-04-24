@@ -32,6 +32,8 @@ func isComplexStruct(ctx *OpContext, v *Vertex) bool {
 // TODO: cleanup code and error messages. Reduce duplication in some related
 // code.
 func verifyArc2(ctx *OpContext, f Feature, v *Vertex, isClosed bool) (found bool, err *Bottom) {
+	unreachableForDev(ctx)
+
 	// Don't check computed, temporary vertices.
 	if v.Label == InvalidLabel {
 		return true, nil

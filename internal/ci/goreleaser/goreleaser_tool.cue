@@ -44,7 +44,7 @@ command: release: {
 
 	let latestCUEVersion = strings.TrimSpace(latestCUE.stdout)
 
-	tidyUp: os.RemoveAll & {
+	tidyUp: file.RemoveAll & {
 		$after: latestCUE
 		path:   tempDir.path
 	}

@@ -80,6 +80,76 @@ Retain: 58
 Unifications: 26
 Conjuncts:    50
 Disjuncts:    56
+-- out/evalalpha --
+Errors:
+out: cannot combine regular field "val" with "b":
+    ./in.cue:33:2
+
+Result:
+(_|_){
+  // [eval]
+  out: (_|_){
+    // [eval] out: cannot combine regular field "val" with "b":
+    //     ./in.cue:33:2
+    val: (string){ "b" }
+  }
+  multiLets: (string){
+    "b"
+    let val#1multi = &[&[&[&[&[&[〈2;k〉]]]]]]
+  }
+  keys: (#list){
+    0: (string){ "a" }
+    1: (string){ "b" }
+  }
+  values: (struct){
+    b: (string){ "member" }
+    c: (string){ "foo" }
+  }
+  full: (struct){
+    out: (_|_){
+      // [incomplete] full.out: non-concrete value _ in operand to !=:
+      //     ./in.cue:54:8
+      let val#2multi = &[&[&[&[&[&[&[〈4;values〉[〈2;k〉]]]]]]]]
+    }
+    #github_team_membership: (#struct){
+      team_id: (string){ string }
+      role: (string){ string }
+    }
+    values: (struct){
+      role: (string){ "member" }
+      username: (string){ "foo" }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -12,7 +12,7 @@
+   }
+   multiLets: (string){
+     "b"
+-    let val#1multi = 〈2;k〉
++    let val#1multi = &[&[&[&[&[&[〈2;k〉]]]]]]
+   }
+   keys: (#list){
+     0: (string){ "a" }
+@@ -23,9 +23,10 @@
+     c: (string){ "foo" }
+   }
+   full: (struct){
+-    out: (struct){
+-      let val#2multi = 〈4;values〉[〈2;k〉]
+-      role: (string){ "member" }
++    out: (_|_){
++      // [incomplete] full.out: non-concrete value _ in operand to !=:
++      //     ./in.cue:54:8
++      let val#2multi = &[&[&[&[&[&[&[〈4;values〉[〈2;k〉]]]]]]]]
+     }
+     #github_team_membership: (#struct){
+       team_id: (string){ string }
+-- diff/explanation --
+Conjunct groups in let output.
 -- out/eval --
 Errors:
 out: cannot combine regular field "val" with "b":

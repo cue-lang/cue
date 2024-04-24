@@ -23,7 +23,6 @@ import (
 	"strings"
 	"testing"
 
-	"cuelang.org/go/cmd/cue/cmd"
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
@@ -35,38 +34,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
-
-	"github.com/rogpeppe/go-internal/gotooltest"
-	"github.com/rogpeppe/go-internal/testscript"
 )
-
-// We are using TestMain because we want to ensure Wasm is enabled and
-// works as expected with the command-line tool.
-func TestMain(m *testing.M) {
-	os.Exit(testscript.RunMain(m, map[string]func() int{
-		"cue": cmd.MainTest,
-	}))
-}
-
-// TestExe tests Wasm using the command-line tool.
-func TestExe(t *testing.T) {
-	root := must(filepath.Abs("testdata"))(t)
-	wasmFiles := filepath.Join(root, "cue")
-	p := testscript.Params{
-		Dir:                 "testdata/cue",
-		UpdateScripts:       cuetest.UpdateGoldenFiles,
-		RequireExplicitExec: true,
-		Setup: func(e *testscript.Env) error {
-			copyWasmFiles(t, e.WorkDir, wasmFiles)
-			return nil
-		},
-		Condition: cuetest.Condition,
-	}
-	if err := gotooltest.Setup(&p); err != nil {
-		t.Fatal(err)
-	}
-	testscript.Run(t, p)
-}
 
 // TestWasm tests Wasm using the API.
 func TestWasm(t *testing.T) {

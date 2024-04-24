@@ -23,7 +23,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	cueyaml "cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/pkg"
-	"cuelang.org/go/internal/third_party/yaml"
 )
 
 // Marshal returns the YAML encoding of v.
@@ -64,16 +63,12 @@ func MarshalStream(v cue.Value) (string, error) {
 
 // Unmarshal parses the YAML to a CUE expression.
 func Unmarshal(data []byte) (ast.Expr, error) {
-	return yaml.Unmarshal("", data)
+	return cueyaml.Unmarshal("", data)
 }
 
 // UnmarshalStream parses the YAML to a CUE list expression on success.
 func UnmarshalStream(data []byte) (ast.Expr, error) {
-	d, err := yaml.NewDecoder("", data)
-	if err != nil {
-		return nil, err
-	}
-
+	d := cueyaml.NewDecoder("", data)
 	a := []ast.Expr{}
 	for {
 		x, err := d.Decode()
@@ -92,10 +87,7 @@ func UnmarshalStream(data []byte) (ast.Expr, error) {
 // Validate validates YAML and confirms it is an instance of the schema
 // specified by v. If the YAML source is a stream, every object must match v.
 func Validate(b []byte, v cue.Value) (bool, error) {
-	d, err := yaml.NewDecoder("yaml.Validate", b)
-	if err != nil {
-		return false, err
-	}
+	d := cueyaml.NewDecoder("yaml.Validate", b)
 	r := v.Context()
 	for {
 		expr, err := d.Decode()
@@ -141,10 +133,7 @@ func Validate(b []byte, v cue.Value) (bool, error) {
 // but does not have to be an instance of v. If the YAML source is a stream,
 // every object must match v.
 func ValidatePartial(b []byte, v cue.Value) (bool, error) {
-	d, err := yaml.NewDecoder("yaml.ValidatePartial", b)
-	if err != nil {
-		return false, err
-	}
+	d := cueyaml.NewDecoder("yaml.ValidatePartial", b)
 	r := v.Context()
 	for {
 		expr, err := d.Decode()

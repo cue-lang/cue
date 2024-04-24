@@ -36,6 +36,80 @@ Retain: 0
 Unifications: 7
 Conjuncts:    15
 Disjuncts:    11
+-- out/evalalpha --
+Errors:
+y.a: conflicting values 1 and 3:
+    ./in.cue:1:12
+    ./in.cue:2:12
+y.a: conflicting values 2 and 3:
+    ./in.cue:1:21
+    ./in.cue:2:12
+
+Result:
+(_|_){
+  // [eval]
+  x: (struct){ |((struct){
+      a: (int){ 1 }
+    }, (struct){
+      a: (int){ 2 }
+    }) }
+  y: (_|_){
+    // [eval] y.a: conflicting values 1 and 3:
+    //     ./in.cue:1:12
+    //     ./in.cue:2:12
+    // y.a: conflicting values 2 and 3:
+    //     ./in.cue:1:21
+    //     ./in.cue:2:12
+    a: (int){ 3 }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,12 +1,9 @@
+ Errors:
+-y: 2 errors in empty disjunction:
+ y.a: conflicting values 1 and 3:
+     ./in.cue:1:12
+-    ./in.cue:2:4
+     ./in.cue:2:12
+ y.a: conflicting values 2 and 3:
+     ./in.cue:1:21
+-    ./in.cue:2:4
+     ./in.cue:2:12
+ 
+ Result:
+@@ -18,20 +15,12 @@
+       a: (int){ 2 }
+     }) }
+   y: (_|_){
+-    // [eval] y: 2 errors in empty disjunction:
+-    // y.a: conflicting values 1 and 3:
++    // [eval] y.a: conflicting values 1 and 3:
+     //     ./in.cue:1:12
+-    //     ./in.cue:2:4
+     //     ./in.cue:2:12
+     // y.a: conflicting values 2 and 3:
+     //     ./in.cue:1:21
+-    //     ./in.cue:2:4
+-    //     ./in.cue:2:12
+-    a: (_|_){
+-      // [eval] y.a: conflicting values 2 and 3:
+-      //     ./in.cue:1:21
+-      //     ./in.cue:2:4
+-      //     ./in.cue:2:12
+-    }
++    //     ./in.cue:2:12
++    a: (int){ 3 }
+   }
+ }
+-- diff/todo/p3 --
+Missing "empty disjunction" error message.
+Missing error positions.
+-- diff/explanation --
+It is okay to show field a as long as the error is clear and points to the
+violating disjunction.
 -- out/eval --
 Errors:
 y: 2 errors in empty disjunction:

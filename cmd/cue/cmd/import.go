@@ -36,7 +36,7 @@ import (
 	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/protobuf"
 	"cuelang.org/go/internal"
-	"cuelang.org/go/internal/third_party/yaml"
+	pkgyaml "cuelang.org/go/pkg/encoding/yaml"
 )
 
 func newImportCmd(c *Command) *cobra.Command {
@@ -590,7 +590,7 @@ func tryParse(str string) (s ast.Expr, pkg string) {
 		return nil, ""
 	}
 
-	if expr, err := yaml.Unmarshal("", b); err == nil {
+	if expr, err := pkgyaml.Unmarshal(b); err == nil {
 		switch expr.(type) {
 		case *ast.StructLit, *ast.ListLit:
 		default:

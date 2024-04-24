@@ -48,4 +48,4 @@ command: after: {
 -- task.cue --
 package home
 
--- cue.mod --
+-- cue.mod/module.cue --

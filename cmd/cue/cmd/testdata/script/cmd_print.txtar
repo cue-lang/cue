@@ -34,4 +34,4 @@ command: print: {
 }
 -- task.cue --
 package home
--- cue.mod --
+-- cue.mod/module.cue --

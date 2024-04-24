@@ -22,6 +22,36 @@ Retain: 0
 Unifications: 10
 Conjuncts:    22
 Disjuncts:    16
+-- out/evalalpha --
+(struct){
+  range1: (struct){
+    min: (int){ |(*(int){ 1 }, (int){ int }) }
+    range: (int){ 8 }
+  }
+  range2: (struct){
+    min: (int){ |(*(int){ 1 }, (int){ int }) }
+    max: (int){ &(>1, int) }
+  }
+  rg: (struct){
+    max: (int){ 8 }
+    min: (int){ |(*(int){ 1 }, (int){ int }) }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -8,7 +8,7 @@
+     max: (int){ &(>1, int) }
+   }
+   rg: (struct){
+-    min: (int){ |(*(int){ 1 }, (int){ int }) }
+     max: (int){ 8 }
++    min: (int){ |(*(int){ 1 }, (int){ int }) }
+   }
+ }
+-- diff/todo/p3 --
+Reordering.
 -- out/eval --
 (struct){
   range1: (struct){

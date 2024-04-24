@@ -54,16 +54,16 @@ v: #T
   #X: 〈0;v〉
   #X: 〈0;#T〉
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  447
-Reused: 439
-Allocs: 8
+-- out/evalalpha/stats --
+Leaks:  16
+Freed:  3
+Reused: 3
+Allocs: 16
 Retain: 0
 
-Unifications: 287
-Conjuncts:    894
-Disjuncts:    447
+Unifications: 15
+Conjuncts:    43
+Disjuncts:    4
 -- out/eval --
 (struct){
   #T: (list){
@@ -85,3 +85,34 @@ Disjuncts:    447
     0: (string){ "d" }
   }
 }
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  0
+-Freed:  447
+-Reused: 439
+-Allocs: 8
++Leaks:  16
++Freed:  3
++Reused: 3
++Allocs: 16
+ Retain: 0
+ 
+-Unifications: 287
+-Conjuncts:    894
+-Disjuncts:    447
++Unifications: 15
++Conjuncts:    43
++Disjuncts:    4
+-- out/eval/stats --
+Leaks:  0
+Freed:  447
+Reused: 439
+Allocs: 8
+Retain: 0
+
+Unifications: 287
+Conjuncts:    894
+Disjuncts:    447

@@ -112,6 +112,122 @@ Retain: 0
 Unifications: 21
 Conjuncts:    34
 Disjuncts:    23
+-- out/evalalpha --
+Errors:
+a.v.b: field not allowed:
+    ./in.cue:5:6
+b.w.c: field not allowed:
+    ./in.cue:11:6
+c.w.0.d: field not allowed:
+    ./in.cue:17:7
+
+Result:
+(_|_){
+  // [eval]
+  #S: (#struct){
+  }
+  a: (_|_){
+    // [eval]
+    v: (_|_){
+      // [eval]
+      b: (_|_){
+        // [eval] a.v.b: field not allowed:
+        //     ./in.cue:5:6
+      }
+      a: (int){ int }
+    }
+  }
+  #Q: (#struct){
+  }
+  b: (_|_){
+    // [eval]
+    w: (_|_){
+      // [eval] b.w.c: field not allowed:
+      //     ./in.cue:11:6
+      c: (int){ int }
+    }
+  }
+  #R: (#struct){
+  }
+  c: (_|_){
+    // [eval]
+    w: (_|_){
+      // [eval]
+      0: (_|_){
+        // [eval]
+        d: (_|_){
+          // [eval] c.w.0.d: field not allowed:
+          //     ./in.cue:17:7
+        }
+        a: (int){ int }
+      }
+      1: (#struct){
+        b: (int){ int }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,16 +1,9 @@
+ Errors:
+ a.v.b: field not allowed:
+-    ./in.cue:2:12
+-    ./in.cue:4:4
+     ./in.cue:5:6
+ b.w.c: field not allowed:
+-    ./in.cue:8:12
+-    ./in.cue:10:4
+     ./in.cue:11:6
+ c.w.0.d: field not allowed:
+-    ./in.cue:14:12
+-    ./in.cue:14:13
+-    ./in.cue:16:4
+     ./in.cue:17:7
+ 
+ Result:
+@@ -24,8 +17,6 @@
+       // [eval]
+       b: (_|_){
+         // [eval] a.v.b: field not allowed:
+-        //     ./in.cue:2:12
+-        //     ./in.cue:4:4
+         //     ./in.cue:5:6
+       }
+       a: (int){ int }
+@@ -37,17 +28,8 @@
+     // [eval]
+     w: (_|_){
+       // [eval] b.w.c: field not allowed:
+-      //     ./in.cue:8:12
+-      //     ./in.cue:10:4
+       //     ./in.cue:11:6
+-      c: (_|_){
+-        // [eval] b.w.c: field not allowed:
+-        //     ./in.cue:8:12
+-        //     ./in.cue:8:23
+-        //     ./in.cue:10:4
+-        //     ./in.cue:11:6
+-      }
+-      b: (int){ int }
++      c: (int){ int }
+     }
+   }
+   #R: (#struct){
+@@ -60,9 +42,6 @@
+         // [eval]
+         d: (_|_){
+           // [eval] c.w.0.d: field not allowed:
+-          //     ./in.cue:14:12
+-          //     ./in.cue:14:13
+-          //     ./in.cue:16:4
+           //     ./in.cue:17:7
+         }
+         a: (int){ int }
+-- diff/todo/p3 --
+Missing error positions.
 -- out/eval --
 Errors:
 a.v.b: field not allowed:

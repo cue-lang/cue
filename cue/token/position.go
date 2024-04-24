@@ -149,7 +149,7 @@ func (p RelPos) Pos() Pos {
 	return Pos{nil, int(p)}
 }
 
-// HasRelPos repors whether p has a relative position.
+// HasRelPos reports whether p has a relative position.
 func (p Pos) HasRelPos() bool {
 	return p.offset&relMask != 0
 
@@ -287,6 +287,19 @@ func (f *File) MergeLine(line int) {
 	// are 0-based and line numbers are 1-based.
 	copy(f.lines[line:], f.lines[line+1:])
 	f.lines = f.lines[:len(f.lines)-1]
+}
+
+// Lines returns the effective line offset table of the form described by [File.SetLines].
+// Callers must not mutate the result.
+func (f *File) Lines() []int {
+	var lines []int
+	f.mutex.Lock()
+	// Unfortunate that we have to loop, but we use our own type.
+	for _, line := range f.lines {
+		lines = append(lines, int(line))
+	}
+	f.mutex.Unlock()
+	return lines
 }
 
 // SetLines sets the line offsets for a file and reports whether it succeeded.

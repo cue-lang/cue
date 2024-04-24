@@ -84,6 +84,98 @@ Retain: 4
 Unifications: 27
 Conjuncts:    46
 Disjuncts:    26
+-- out/evalalpha --
+Errors:
+e: conflicting values 4 and [] (mismatched types int and list):
+    ./in.cue:4:8
+    ./in.cue:4:13
+e2: undefined field: d:
+    ./in.cue:5:12
+e3: invalid index -1 (index must be non-negative):
+    ./in.cue:6:8
+    ./in.cue:6:12
+e4.3: invalid value 8 (out of bound <=5):
+    ./in.cue:7:24
+    ./in.cue:7:41
+e5.3: invalid value 8 (out of bound <=5):
+    ./in.cue:8:39
+    ./in.cue:8:18
+
+Result:
+(_|_){
+  // [eval]
+  list: (#list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+    2: (int){ 3 }
+  }
+  index: (int){ 2 }
+  unify: (#list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+    2: (int){ 3 }
+  }
+  e: (_|_){
+    // [eval] e: conflicting values 4 and [] (mismatched types int and list):
+    //     ./in.cue:4:8
+    //     ./in.cue:4:13
+  }
+  e2: (_|_){
+    // [eval] e2: undefined field: d:
+    //     ./in.cue:5:12
+  }
+  e3: (_|_){
+    // [eval] e3: invalid index -1 (index must be non-negative):
+    //     ./in.cue:6:8
+    //     ./in.cue:6:12
+  }
+  e4: (_|_){
+    // [eval]
+    0: (int){ 1 }
+    1: (int){ 2 }
+    2: (int){ 4 }
+    3: (_|_){
+      // [eval] e4.3: invalid value 8 (out of bound <=5):
+      //     ./in.cue:7:24
+      //     ./in.cue:7:41
+    }
+  }
+  e5: (_|_){
+    // [eval]
+    0: (int){ 1 }
+    1: (int){ 2 }
+    2: (int){ 4 }
+    3: (_|_){
+      // [eval] e5.3: invalid value 8 (out of bound <=5):
+      //     ./in.cue:8:39
+      //     ./in.cue:8:18
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -2,7 +2,7 @@
+ e: conflicting values 4 and [] (mismatched types int and list):
+     ./in.cue:4:8
+     ./in.cue:4:13
+-e2: invalid list index d (type string):
++e2: undefined field: d:
+     ./in.cue:5:12
+ e3: invalid index -1 (index must be non-negative):
+     ./in.cue:6:8
+@@ -34,7 +34,7 @@
+     //     ./in.cue:4:13
+   }
+   e2: (_|_){
+-    // [eval] e2: invalid list index d (type string):
++    // [eval] e2: undefined field: d:
+     //     ./in.cue:5:12
+   }
+   e3: (_|_){
+-- diff/todo/p2 --
+error: more precise message
 -- out/eval --
 Errors:
 e: conflicting values 4 and [] (mismatched types int and list):

@@ -15,4 +15,4 @@ command: pkg: {
 	}
 }
 
--- cue.mod --
+-- cue.mod/module.cue --

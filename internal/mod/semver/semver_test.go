@@ -6,7 +6,7 @@ package semver
 
 import (
 	"math/rand"
-	"sort"
+	"slices"
 	"strings"
 	"testing"
 )
@@ -16,12 +16,12 @@ var tests = []struct {
 	out string
 }{
 	{"bad", ""},
+	{"v1+meta", ""},
 	{"v1-alpha.beta.gamma", ""},
 	{"v1-pre", ""},
-	{"v1+meta", ""},
 	{"v1-pre+meta", ""},
-	{"v1.2-pre", ""},
 	{"v1.2+meta", ""},
+	{"v1.2-pre", ""},
 	{"v1.2-pre+meta", ""},
 	{"v1.0.0-alpha", "v1.0.0-alpha"},
 	{"v1.0.0-alpha.1", "v1.0.0-alpha.1"},
@@ -161,9 +161,10 @@ func TestSort(t *testing.T) {
 	for i, test := range tests {
 		versions[i] = test.in
 	}
+	sortedVersions := slices.Clone(versions)
 	rand.Shuffle(len(versions), func(i, j int) { versions[i], versions[j] = versions[j], versions[i] })
 	Sort(versions)
-	if !sort.IsSorted(ByVersion(versions)) {
+	if !slices.Equal(versions, sortedVersions) {
 		t.Errorf("list is not sorted:\n%s", strings.Join(versions, "\n"))
 	}
 }

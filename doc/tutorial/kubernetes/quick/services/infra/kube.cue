@@ -1,3 +1,0 @@
-package kube
-
-#Component: "infra"

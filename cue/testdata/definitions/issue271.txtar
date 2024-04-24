@@ -16,6 +16,57 @@ Retain: 2
 Unifications: 8
 Conjuncts:    18
 Disjuncts:    8
+-- out/evalalpha --
+Errors:
+x.b: field not allowed:
+    ./in.cue:2:5
+    ./in.cue:1:5
+    ./in.cue:6:2
+
+Result:
+(_|_){
+  // [eval]
+  #T: (#struct){
+    a: (string){ string }
+  }
+  x: (_|_){
+    // [eval]
+    a: (string){ "hello" }
+    b: (_|_){
+      // [eval] x.b: field not allowed:
+      //     ./in.cue:2:5
+      //     ./in.cue:1:5
+      //     ./in.cue:6:2
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,8 +1,7 @@
+ Errors:
+ x.b: field not allowed:
++    ./in.cue:2:5
+     ./in.cue:1:5
+-    ./in.cue:2:11
+-    ./in.cue:3:5
+     ./in.cue:6:2
+ 
+ Result:
+@@ -16,9 +15,8 @@
+     a: (string){ "hello" }
+     b: (_|_){
+       // [eval] x.b: field not allowed:
++      //     ./in.cue:2:5
+       //     ./in.cue:1:5
+-      //     ./in.cue:2:11
+-      //     ./in.cue:3:5
+       //     ./in.cue:6:2
+     }
+   }
+-- diff/todo/p2 --
+Positions.
 -- out/eval --
 Errors:
 x.b: field not allowed:

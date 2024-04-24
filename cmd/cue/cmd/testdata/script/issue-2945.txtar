@@ -1,0 +1,37 @@
+# Root package cannot work
+! exec cue export mod.example
+stderr 'unknown file extension \.example'
+
+# Explicitly select root package to resolve ambiguity
+exec cue export mod.example:x
+cmp stdout root.golden
+
+# p implicitly selected
+exec cue export mod.example/p
+cmp stdout p.golden
+
+# p explicitly selected
+exec cue export mod.example/p:p
+cmp stdout p.golden
+
+exec cue export ./p
+cmp stdout p.golden
+
+-- cue.mod/module.cue --
+module: "mod.example"
+-- x.cue --
+package x
+
+x: 5
+-- p/p.cue --
+package p
+
+p: 4
+-- root.golden --
+{
+    "x": 5
+}
+-- p.golden --
+{
+    "p": 4
+}

@@ -55,7 +55,7 @@ func newCompletionCmd(c *Command) *cobra.Command {
 		Long:      ``,
 		Example:   completionExample,
 		ValidArgs: validCompletionArgs,
-		Args:      cobra.ExactValidArgs(1),
+		Args:      cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
 		RunE:      mkRunE(c, runCompletion),
 	}
 	return cmd

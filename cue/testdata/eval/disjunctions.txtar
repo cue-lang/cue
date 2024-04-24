@@ -142,6 +142,224 @@ Retain: 0
 Unifications: 147
 Conjuncts:    564
 Disjuncts:    304
+-- out/evalalpha --
+Errors:
+f.name: conflicting values "int" and "str":
+    ./in.cue:5:8
+    ./in.cue:15:15
+f.val: conflicting values 3 and string (mismatched types int and string):
+    ./in.cue:9:8
+    ./in.cue:15:27
+
+Result:
+(_|_){
+  // [eval]
+  a: (int){ |(*(int){ 1 }, (int){ int }) }
+  aa: (int){ |(*(int){ 1 }, *(int){ 2 }, (int){ int }) }
+  b: (struct){ |((struct){
+      name: (string){ "int" }
+      val: (int){ int }
+    }, (struct){
+      name: (string){ "str" }
+      val: (string){ string }
+    }) }
+  d: (struct){
+    val: (int){ 3 }
+    name: (string){ "int" }
+  }
+  c: (struct){
+    name: (string){ "int" }
+    val: (int){ 3 }
+  }
+  e: (struct){
+    val: (string){ "foo" }
+    name: (string){ "str" }
+  }
+  f: (_|_){
+    // [eval] f.name: conflicting values "int" and "str":
+    //     ./in.cue:5:8
+    //     ./in.cue:15:15
+    // f.val: conflicting values 3 and string (mismatched types int and string):
+    //     ./in.cue:9:8
+    //     ./in.cue:15:27
+    name: (string){ "str" }
+    val: (int){ 3 }
+  }
+  e1: (struct){
+    a: ((null|struct)){ |((null){ null }, (struct){
+        bar: (int){ 2 }
+      }) }
+    b: (int){ 2 }
+  }
+  d1: (struct){
+    a: (struct){
+      c: (int){ 1 }
+    }
+    b: (struct){
+      c: (int){ 1 }
+    }
+  }
+  d2: (struct){
+    a: (struct){
+      c: (int){ 1 }
+    }
+    b: (struct){
+      c: (int){ 1 }
+    }
+  }
+  d3: (struct){
+    a: (struct){
+      c: (int){ 1 }
+    }
+    b: (struct){
+      c: (int){ 1 }
+    }
+  }
+  d4: (struct){
+    a: (struct){
+      c: (int){ 1 }
+    }
+    b: (struct){
+      c: (int){ 1 }
+    }
+  }
+  d5: (struct){
+    a: (struct){
+      c: (int){ 1 }
+    }
+    b: (struct){
+      c: (int){ 1 }
+    }
+  }
+  d6: (struct){
+    a: (struct){
+      c: (int){ 1 }
+    }
+    b: (struct){
+      c: (int){ 1 }
+    }
+  }
+  t10: (struct){
+    schema: (#struct){
+      name: (string){ "Test" }
+    }
+    #A: ((string|struct)){ |((string){ string }, (#struct){
+        name: (string){ string }
+      }) }
+    test: (#struct){
+      name: (string){ "Test" }
+    }
+  }
+  t11: (struct){
+    a: (#list){
+      0: (string){ "b" }
+    }
+    b: (#list){
+      0: (string){ "b" }
+    }
+    #A: ((list|struct)){ |((#list){
+        0: (string){ |((string){ "a" }, (string){ "b" }) }
+      }, (#struct){
+      }) }
+  }
+  cross: (struct){
+    a: (string){ |(*(string){ "word" }, (string){ string }) }
+  }
+  d100: (struct){
+    i: ((null|struct)){ |((null){ null }, (struct){
+        bar: (int){ 2 }
+      }) }
+    j: (_|_){
+      // [incomplete] d100.j: unresolved disjunction null | {bar:2} (type (null|struct)):
+      //     ./in.cue:106:5
+    }
+  }
+  issue641: (struct){
+    #A: (#struct){
+      type: (string){ "a" }
+      x: (string){ "" }
+    }
+    #B: (#struct){
+      type: (string){ "b" }
+      x: (string){ string }
+    }
+    #C: (#struct){
+      b: (#struct){ |((#struct){
+          type: (string){ "a" }
+          x: (string){ "" }
+        }, (#struct){
+          type: (string){ "b" }
+          x: (string){ string }
+        }) }
+    }
+    e: (struct){
+      foobar: (#struct){
+        b: (#struct){
+          x: (string){ "foobar" }
+          type: (string){ "b" }
+        }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,12 +1,9 @@
+ Errors:
+-f: 2 errors in empty disjunction:
+ f.name: conflicting values "int" and "str":
+     ./in.cue:5:8
+-    ./in.cue:15:4
+     ./in.cue:15:15
+ f.val: conflicting values 3 and string (mismatched types int and string):
+     ./in.cue:9:8
+-    ./in.cue:15:4
+     ./in.cue:15:27
+ 
+ Result:
+@@ -34,22 +31,14 @@
+     name: (string){ "str" }
+   }
+   f: (_|_){
+-    // [eval] f: 2 errors in empty disjunction:
+-    // f.name: conflicting values "int" and "str":
++    // [eval] f.name: conflicting values "int" and "str":
+     //     ./in.cue:5:8
+-    //     ./in.cue:15:4
+     //     ./in.cue:15:15
+     // f.val: conflicting values 3 and string (mismatched types int and string):
+     //     ./in.cue:9:8
+-    //     ./in.cue:15:4
+     //     ./in.cue:15:27
+     name: (string){ "str" }
+-    val: (_|_){
+-      // [eval] f.val: conflicting values 3 and string (mismatched types int and string):
+-      //     ./in.cue:9:8
+-      //     ./in.cue:15:4
+-      //     ./in.cue:15:27
+-    }
++    val: (int){ 3 }
+   }
+   e1: (struct){
+     a: ((null|struct)){ |((null){ null }, (struct){
+@@ -161,8 +150,8 @@
+     e: (struct){
+       foobar: (#struct){
+         b: (#struct){
+-          type: (string){ "b" }
+           x: (string){ "foobar" }
++          type: (string){ "b" }
+         }
+       }
+     }
+-- diff/todo/p3 --
+f: Missing "errors in empty disjunction:"
+Missing error positions.
+  It is probably okay to show name and val fields with original values, as long
+  as it is made clear that f does not unify with disjunctions and positions are
+  conveyed properly.
 -- out/eval --
 Errors:
 f: 2 errors in empty disjunction:

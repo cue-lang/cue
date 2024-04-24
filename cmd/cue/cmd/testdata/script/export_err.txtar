@@ -45,4 +45,4 @@ a: b: [0, 1, {c: int}, 3]
 // Issue #553
 b: c: "hello"
 out: "d is \(b.d)"
--- exporterr/cue.mod --
+-- exporterr/cue.mod/module.cue --

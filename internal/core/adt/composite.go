@@ -206,6 +206,10 @@ type Vertex struct {
 	// hasPendingArc is set if this Vertex has a void arc (e.g. for comprehensions)
 	hasPendingArc bool
 
+	// IsDisjunct indicates this Vertex is a disjunct resulting from a
+	// disjunction evaluation.
+	IsDisjunct bool
+
 	// ArcType indicates the level of optionality of this arc.
 	ArcType ArcType
 

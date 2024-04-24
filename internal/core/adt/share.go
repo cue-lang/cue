@@ -104,10 +104,32 @@ func (n *nodeContext) shareIfPossible(c Conjunct, arc *Vertex, id CloseInfo) boo
 	return true
 }
 
-// IndirectNonShared finds the indirection of an arc that is not the result of
+// DerefDisjunct indirects a node that points to a disjunction.
+func (v *Vertex) DerefDisjunct() *Vertex {
+	for {
+		arc, ok := v.BaseValue.(*Vertex)
+		if !ok || !arc.IsDisjunct {
+			return v
+		}
+		v = arc
+	}
+}
+
+// DerefNonDisjunct indirects a node that points to a disjunction.
+func (v *Vertex) DerefNonDisjunct() *Vertex {
+	for {
+		arc, ok := v.BaseValue.(*Vertex)
+		if !ok || arc.IsDisjunct {
+			return v
+		}
+		v = arc
+	}
+}
+
+// DerefNonShared finds the indirection of an arc that is not the result of
 // structure sharing. This is especially relevant when indirecting disjunction
 // values.
-func (v *Vertex) IndirectNonShared() *Vertex {
+func (v *Vertex) DerefNonShared() *Vertex {
 	if v.state != nil && v.state.isShared {
 		return v
 	}

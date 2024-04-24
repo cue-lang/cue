@@ -1,6 +1,126 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "8df8ad18_cba253f3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-24T08:47:12Z",
+      "side": 1,
+      "message": "how about a slightly higher level title, like:\n\n\u003e cue/load: avoid repeatedly loading parent directories by caching",
+      "revId": "eafb598e79f17098c2d59e22a9fa86b7965d3a09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f260c963_f3c5b3e7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-24T08:47:12Z",
+      "side": 1,
+      "message": "nit: say \"is\" or \"are\"",
+      "range": {
+        "startLine": 13,
+        "startChar": 21,
+        "endLine": 13,
+        "endChar": 25
+      },
+      "revId": "eafb598e79f17098c2d59e22a9fa86b7965d3a09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "109f3632_5c0ccf6b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-24T08:47:12Z",
+      "side": 1,
+      "message": "loaded as well",
+      "range": {
+        "startLine": 13,
+        "startChar": 29,
+        "endLine": 13,
+        "endChar": 36
+      },
+      "revId": "eafb598e79f17098c2d59e22a9fa86b7965d3a09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1efea901_faef6293",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-24T08:47:12Z",
+      "side": 1,
+      "message": "\u003e ... as we descend into subdirectories.",
+      "range": {
+        "startLine": 15,
+        "startChar": 2,
+        "endLine": 15,
+        "endChar": 43
+      },
+      "revId": "eafb598e79f17098c2d59e22a9fa86b7965d3a09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "173e4100_de0c0663",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-24T08:47:12Z",
+      "side": 1,
+      "message": "to be a bit more precise:\n\n\u003e each file is loaded as a `*build.File` and its source parsed as an `*ast.File`",
+      "revId": "eafb598e79f17098c2d59e22a9fa86b7965d3a09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7837cccf_702055d6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-24T08:47:12Z",
+      "side": 1,
+      "message": "can you clarify that what we cache is the build.File and ast.File, since those are what need to get returned as part of the cue/load API?",
+      "revId": "eafb598e79f17098c2d59e22a9fa86b7965d3a09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "69950d32_7860741b",
@@ -32,6 +152,40 @@
       "side": 1,
       "message": "\u003e I played around with this, and I\u0027m pretty sure that we\u0027ll need two separate caches:\n\u003e  - one for abs file path -\u003e ast files\n\u003e  - one for abs dir -\u003e build files\n\u003e \n\u003e Since in l.addFiles we\u0027re looping over a []*build.File, a cache keyed by dir would become awkward and inefficient. Intuitively I thought that the syntax could be added right after a *build.File is added to the package, but that breaks everything - it looks like (at least atm) the syntax adding must happen at the end of the *build.Instance loading phase.\n\u003e \n\u003e Please let me know if I\u0027m missing something basic\n\nhmm still learning about the gerrit markdown syntax - fixed here:\n\nI played around with this, and I\u0027m pretty sure that we\u0027ll need two separate caches:\n  - one for abs file path -\u003e ast files\n  - one for abs dir -\u003e build files\n\nSince in l.addFiles we\u0027re looping over a `[]*build.File`, a cache keyed by dir would become awkward and inefficient. Intuitively I thought that the syntax could be added right after a `*build.File` is added to the package, but that breaks everything - it looks like (at least atm) the syntax adding must happen at the end of the `*build.Instance` loading phase.\n\nPlease let me know if I\u0027m missing something basic",
       "parentUuid": "69950d32_7860741b",
+      "revId": "eafb598e79f17098c2d59e22a9fa86b7965d3a09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f4a3392_1b04ecee",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-24T08:47:12Z",
+      "side": 1,
+      "message": "Thanks!",
+      "revId": "eafb598e79f17098c2d59e22a9fa86b7965d3a09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fd3c060_c1fa0f9e",
+        "filename": "cue/load/loader.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-24T08:47:12Z",
+      "side": 1,
+      "message": "I would make these field and type names more explicit, for instance:\n\n```\ndirCachedBuildFiles map[string]cachedBuildFiles\ndirCachedSyntaxFiles map[string]cachedSyntaxFiles\n```\n\nThe types are small as well, so there\u0027s really no point in using pointers. Not using pointers will mean you have to rewrite the code slightly to only insert into the map once each cached value is finished, but that\u0027s fine.\n\nPlease also add a brief comment above the two fields, like:\n\n\u003e // When we descend into subdirectories to load patterns such as ./...\n\u003e // we often end up loading parent directories many times over; cache that work by directory.",
       "revId": "eafb598e79f17098c2d59e22a9fa86b7965d3a09",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

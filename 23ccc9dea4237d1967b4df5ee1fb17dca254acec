@@ -1,0 +1,130 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf864c6e_f1413dd6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T17:47:50Z",
+      "side": 1,
+      "message": "accessing?",
+      "range": {
+        "startLine": 16,
+        "startChar": 5,
+        "endLine": 16,
+        "endChar": 11
+      },
+      "revId": "23ccc9dea4237d1967b4df5ee1fb17dca254acec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6554287e_22d348d2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T17:47:50Z",
+      "side": 1,
+      "message": "nit: \"information along the path that one may want to access\", i.e. the pointer/reference path",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 39
+      },
+      "revId": "23ccc9dea4237d1967b4df5ee1fb17dca254acec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4e383c5_81556b93",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T17:47:50Z",
+      "side": 1,
+      "message": "change",
+      "range": {
+        "startLine": 27,
+        "startChar": 23,
+        "endLine": 27,
+        "endChar": 30
+      },
+      "revId": "23ccc9dea4237d1967b4df5ee1fb17dca254acec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "882f124b_58646b1b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T17:47:50Z",
+      "side": 1,
+      "message": "dereference?\n\nI struggle to parse your prose sometimes, these are my best guesses as to how to fix it up, but say if I got it wrong.",
+      "range": {
+        "startLine": 28,
+        "startChar": 23,
+        "endLine": 28,
+        "endChar": 35
+      },
+      "revId": "23ccc9dea4237d1967b4df5ee1fb17dca254acec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "678a8d8c_c3aec70f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T17:47:50Z",
+      "side": 1,
+      "message": "big thumbs up to this strategy!",
+      "revId": "23ccc9dea4237d1967b4df5ee1fb17dca254acec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3042022c_ddebd16c",
+        "filename": "cue/types.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T17:47:50Z",
+      "side": 1,
+      "message": "To give another reason why this TODO is a good idea: Max Gaß was asking on Slack how he can show all the positions for expressions that contributed towards a particular CUE value, e.g. as comments attached to each field in a `cue export`. I assume this would help towards that.",
+      "revId": "23ccc9dea4237d1967b4df5ee1fb17dca254acec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

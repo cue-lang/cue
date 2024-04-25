@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c10123e5_a7de84aa",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_time.txtar",
+        "patchSetId": 7
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-04-25T20:24:31Z",
+      "side": 1,
+      "message": "Would using `exec stat ...` possibly avoid needing to introduce a new testscript verb? I\u0027ve no idea how *desirable* that might be, but the thought occurred... :-)",
+      "revId": "e0d8c4d30c10e0dbe07196445733852f391d955e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

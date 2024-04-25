@@ -240,7 +240,7 @@ func TestDecode(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
-			err := getInstance(t, tc.value).Value().Decode(tc.dst)
+			err := getValue(t, tc.value).Decode(tc.dst)
 			checkFatal(t, err, tc.err, "init")
 
 			got := reflect.ValueOf(tc.dst).Elem().Interface()
@@ -260,13 +260,13 @@ func TestDecodeIntoCUEValue(t *testing.T) {
 	var st struct {
 		X Value `json:"x"`
 	}
-	err := getInstance(t, `x: string`).Value().Decode(&st)
+	err := getValue(t, `x: string`).Decode(&st)
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.Equals(fmt.Sprint(st.X), "string"))
 
 	// Check we can decode into a top level value.
 	var v Value
-	err = getInstance(t, `int`).Value().Decode(&v)
+	err = getValue(t, `int`).Decode(&v)
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.Equals(fmt.Sprint(v), "int"))
 }

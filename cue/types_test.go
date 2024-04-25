@@ -36,7 +36,7 @@ import (
 	"cuelang.org/go/internal/tdtest"
 )
 
-func getInstance(t *testing.T, body string) *Instance {
+func getValue(t *testing.T, body string) Value {
 	t.Helper()
 
 	var r Runtime // TODO: use Context and return Value
@@ -45,7 +45,7 @@ func getInstance(t *testing.T, body string) *Instance {
 	if err != nil {
 		t.Fatalf("unexpected parse error: %v", err)
 	}
-	return inst
+	return inst.Value()
 }
 
 func TestAPI(t *testing.T) {
@@ -340,7 +340,7 @@ func TestValueType(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
-			inst := getInstance(t, tc.value)
+			inst := getValue(t, tc.value)
 			v := inst.Lookup("v")
 			if got := v.Kind(); got != tc.kind {
 				t.Errorf("Kind: got %x; want %x", int(got), int(tc.kind))
@@ -407,7 +407,7 @@ func TestInt(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
-			n := getInstance(t, tc.value).Value()
+			n := getValue(t, tc.value)
 			base := 10
 			if tc.base > 0 {
 				base = tc.base
@@ -546,7 +546,7 @@ func TestFloat(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
-			n := getInstance(t, tc.value).Value()
+			n := getValue(t, tc.value)
 			if n.Kind() != tc.kind {
 				t.Fatal("Not a number")
 			}
@@ -597,19 +597,19 @@ func TestString(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
-			str, err := getInstance(t, tc.value).Value().String()
+			str, err := getValue(t, tc.value).String()
 			checkFatal(t, err, tc.err, "init")
 			if str != tc.str {
 				t.Errorf("String: got %q; want %q", str, tc.str)
 			}
 
-			b, err := getInstance(t, tc.value).Value().Bytes()
+			b, err := getValue(t, tc.value).Bytes()
 			checkFatal(t, err, tc.err, "init")
 			if got := string(b); got != tc.str {
 				t.Errorf("Bytes: got %q; want %q", got, tc.str)
 			}
 
-			r, err := getInstance(t, tc.value).Value().Reader()
+			r, err := getValue(t, tc.value).Reader()
 			checkFatal(t, err, tc.err, "init")
 			b, _ = io.ReadAll(r)
 			if got := string(b); got != tc.str {
@@ -634,7 +634,7 @@ func TestError(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
-			err := getInstance(t, tc.value).Value().Err()
+			err := getValue(t, tc.value).Err()
 			checkErr(t, err, tc.err, "init")
 		})
 	}
@@ -658,7 +658,7 @@ func TestNull(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
-			v := getInstance(t, tc.value).Lookup("v")
+			v := getValue(t, tc.value).Lookup("v")
 			err := v.Null()
 			checkErr(t, err, tc.err, "init")
 			wantBool := err == nil
@@ -692,7 +692,7 @@ func TestBool(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
-			got, err := getInstance(t, tc.value).Value().Bool()
+			got, err := getValue(t, tc.value).Bool()
 			if checkErr(t, err, tc.err, "init") {
 				if got != tc.bool {
 					t.Errorf("got %v; want %v", got, tc.bool)
@@ -729,7 +729,7 @@ func TestList(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
-			l, err := getInstance(t, tc.value).Value().List()
+			l, err := getValue(t, tc.value).List()
 			checkFatal(t, err, tc.err, "init")
 
 			buf := []byte{'['}
@@ -829,7 +829,7 @@ func TestFields(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
-			obj := getInstance(t, tc.value).Value()
+			obj := getValue(t, tc.value)
 
 			iter, err := obj.Fields(tc.opts...)
 			checkFatal(t, err, tc.err, "init")
@@ -890,7 +890,7 @@ func TestAllFields(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
-			obj := getInstance(t, tc.value).Value()
+			obj := getValue(t, tc.value)
 
 			var iter *Iterator // Verify that the returned iterator is a pointer.
 			iter, err := obj.Fields(All())
@@ -934,7 +934,7 @@ func TestFieldType(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
-			obj := getInstance(t, tc.value).Value()
+			obj := getValue(t, tc.value)
 
 			iter, err := obj.Fields(All())
 			if err != nil {
@@ -1768,7 +1768,7 @@ func TestDefaults(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
-			v := getInstance(t, "a: "+tc.value).Lookup("a")
+			v := getValue(t, "a: "+tc.value).Lookup("a")
 
 			v = v.Eval()
 			d, ok := v.Default()
@@ -1821,7 +1821,7 @@ func TestLen(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {
-			v := getInstance(t, "a: "+tc.input).Lookup("a")
+			v := getValue(t, "a: "+tc.input).Lookup("a")
 
 			length := v.Len()
 			if got := fmt.Sprint(length); got != tc.length {
@@ -1870,7 +1870,7 @@ func TestTemplate(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
-			v := getInstance(t, tc.value).Value()
+			v := getValue(t, tc.value)
 			for _, p := range tc.path {
 				if p == "" {
 					v = v.Template()("label")
@@ -1928,7 +1928,7 @@ func TestElem(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
-			v := getInstance(t, tc.value).Value()
+			v := getValue(t, tc.value)
 			v.v.Finalize(v.ctx()) // TODO: do in instance.
 			for _, p := range tc.path {
 				if p == "" {
@@ -2057,7 +2057,7 @@ func TestSubsume(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
-			v := getInstance(t, tc.value)
+			v := getValue(t, tc.value)
 			a := v.Value().LookupPath(tc.pathA)
 			b := v.Value().LookupPath(tc.pathB)
 			got := a.Subsume(b, tc.options...) == nil
@@ -2120,7 +2120,7 @@ func TestSubsumes(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
-			v := getInstance(t, tc.value)
+			v := getValue(t, tc.value)
 			a := v.Lookup(tc.pathA...)
 			b := v.Lookup(tc.pathB...)
 			got := a.Subsumes(b)
@@ -2191,7 +2191,7 @@ func TestUnify(t *testing.T) {
 	}}
 	// TODO(tdtest): use cuetest.Run when supported.
 	tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
-		v := getInstance(t.T, tc.value).Value()
+		v := getValue(t.T, tc.value)
 		x := v.LookupPath(ParsePath(tc.pathA))
 		y := v.LookupPath(ParsePath(tc.pathB))
 		b, err := x.Unify(y).MarshalJSON()
@@ -2243,7 +2243,7 @@ func TestUnifyAccept(t *testing.T) {
 	}}
 	// TODO(tdtest): use cuetest.Run when supported.
 	tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
-		v := getInstance(t.T, tc.value).Value()
+		v := getValue(t.T, tc.value)
 		x := v.LookupPath(ParsePath("#v"))
 		y := v.LookupPath(ParsePath("#w"))
 		a := v.LookupPath(ParsePath("#accept"))
@@ -2584,7 +2584,7 @@ func TestValueLookup(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.str, func(t *testing.T) {
-			v := getInstance(t, tc.config).Value().Lookup(tc.path...)
+			v := getValue(t, tc.config).Lookup(tc.path...)
 			if got := !v.Exists(); got != tc.notExists {
 				t.Errorf("exists: got %v; want %v", got, tc.notExists)
 			}
@@ -2929,7 +2929,7 @@ func TestMarshalJSON(t *testing.T) {
 	}}
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("%d/%v", i, tc.value), func(t *testing.T) {
-			inst := getInstance(t, tc.value)
+			inst := getValue(t, tc.value)
 			b, err := inst.Value().MarshalJSON()
 			checkFatal(t, err, tc.err, "init")
 
@@ -3005,7 +3005,7 @@ func TestWalk(t *testing.T) {
 	}}
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("%d/%v", i, tc.value), func(t *testing.T) {
-			inst := getInstance(t, tc.value)
+			inst := getValue(t, tc.value)
 			buf := []byte{}
 			stripComma := func() {
 				if n := len(buf) - 1; buf[n] == ',' {
@@ -3749,7 +3749,7 @@ func TestExpr(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {
-			v := getInstance(t, tc.input).Lookup("v")
+			v := getValue(t, tc.input).Lookup("v")
 			got := exprStr(v)
 			if got != tc.want {
 				t.Errorf("\n got %v;\nwant %v", got, tc.want)

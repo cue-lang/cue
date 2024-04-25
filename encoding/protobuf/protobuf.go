@@ -64,6 +64,8 @@
 //	Timestamp      time.Time        See struct.proto.
 //	Duration       time.Duration    See struct.proto.
 //
+// # Annotations
+//
 // Protobuf definitions can be annotated with CUE constraints that are included
 // in the generated CUE:
 //

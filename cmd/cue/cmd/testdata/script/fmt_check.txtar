@@ -45,9 +45,9 @@ x:   1
 not_formatted.cue
 another${/}not_formatted.cue
 -- standalone/stdin-expected-output --
-<standard input>
+-
 -- standalone/stdin-mixed-expected-output --
-<standard input>
+-
 another${/}not_formatted.cue
 -- module/cue.mod/module.cue --
 module: "example.com"

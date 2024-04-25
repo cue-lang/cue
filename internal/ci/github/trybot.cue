@@ -73,7 +73,7 @@ workflows: trybot: _repo.bashWorkflow & {
 				},
 				_goTestWasm,
 				for v in _e2eTestSteps {v},
-				_goCheck,
+				for v in _checks {v},
 				_repo.checkGitClean,
 			]
 		}
@@ -152,20 +152,29 @@ workflows: trybot: _repo.bashWorkflow & {
 		},
 	]
 
-	_goCheck: json.#step & {
+	// TODO: consider adding more checks following https://go.dev/issue/42119.
+	_checks: [... json.#step & {
 		// These checks can vary between platforms, as different code can be built
 		// based on GOOS and GOARCH build tags.
 		// However, CUE does not have any such build tags yet, and we don't use
 		// dependencies that vary wildly between platforms.
 		// For now, to save CI resources, just run the checks on one matrix job.
-		// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
 		if:   "\(_isLatestLinux)"
-		name: "Check"
-		run: """
-			go vet ./...
-			go mod tidy
-			"""
-	}
+		run!: string
+		name: string | *"Check: \(run)"
+	}] & [
+		{run: "go vet ./..."},
+		// TODO(mvdan): use -check once we can rely on https://go.dev/issue/27005,
+		// rather than relying on the last "check git is clean" step.
+		{run: "go mod tidy"},
+		// TODO(mvdan): use -check once we can rely on https://go.dev/issue/46289,
+		// rather than relying on the last "check git is clean" step.
+		{
+			name: "gofmt -l ."
+			run:  #"test -z "$(gofmt -l .)" || (gofmt -l . && false)"#
+		},
+		{run: "cue fmt --check ./..."},
+	]
 
 	_goTestRace: json.#step & {
 		name: "Test with -race"

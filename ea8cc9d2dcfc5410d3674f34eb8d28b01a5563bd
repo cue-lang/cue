@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9047a5b_94f6d15e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T15:15:41Z",
+      "side": 1,
+      "message": "typo: \"this\"",
+      "range": {
+        "startLine": 10,
+        "startChar": 34,
+        "endLine": 10,
+        "endChar": 39
+      },
+      "revId": "ea8cc9d2dcfc5410d3674f34eb8d28b01a5563bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b829d6b_4efc6f66",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T15:15:41Z",
+      "side": 1,
+      "message": "addressable is a concept in Go already, can we use a different one, or perhaps explain what you mean in a sentence or two? From reading the rest of the patch, this means \"rooted\", i.e. \"there is a path from the root of the tree\". How about \"reachable from the root\"?",
+      "range": {
+        "startLine": 10,
+        "startChar": 44,
+        "endLine": 10,
+        "endChar": 55
+      },
+      "revId": "ea8cc9d2dcfc5410d3674f34eb8d28b01a5563bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

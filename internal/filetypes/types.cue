@@ -60,10 +60,10 @@ package build
 // from those that are mentioned in modes,
 // allowing us to quickly discard files with unknown extensions.
 knownExtensions: {
-    for mode in modes
-    for ext, _ in mode.extensions {
-        (ext): true
-    }
+	for mode in modes
+	for ext, _ in mode.extensions {
+		(ext): true
+	}
 }
 
 // modes sets defaults for different operational modes.

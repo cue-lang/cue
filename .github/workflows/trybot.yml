@@ -187,9 +187,16 @@ jobs:
           cd internal/_e2e
           go test -race
       - if: (matrix.go-version == '1.22.x' && matrix.runner == 'ubuntu-22.04')
-        name: Check
-        run: |-
-          go vet ./...
-          go mod tidy
+        run: go vet ./...
+        name: 'Check: go vet ./...'
+      - if: (matrix.go-version == '1.22.x' && matrix.runner == 'ubuntu-22.04')
+        run: go mod tidy
+        name: 'Check: go mod tidy'
+      - if: (matrix.go-version == '1.22.x' && matrix.runner == 'ubuntu-22.04')
+        name: gofmt -l .
+        run: test -z "$(gofmt -l .)" || (gofmt -l . && false)
+      - if: (matrix.go-version == '1.22.x' && matrix.runner == 'ubuntu-22.04')
+        run: cue fmt --check ./...
+        name: 'Check: cue fmt --check ./...'
       - name: Check that git is clean at the end of the job
         run: test -z "$(git status --porcelain)" || (git status; git diff; false)

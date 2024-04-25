@@ -32,9 +32,9 @@ diff not-formatted.cue.orig not-formatted.cue
 +foo: "bar"
 
 -- not-formatted-stdin.golden --
-diff <standard input>.orig <standard input>
---- <standard input>.orig
-+++ <standard input>
+diff -.orig -
+--- -.orig
++++ -
 @@ -1,1 +1,1 @@
 -foo:   "bar"
 +foo: "bar"

@@ -1,0 +1,204 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6bc8d65_9d7f1f31",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T15:44:29Z",
+      "side": 1,
+      "message": "remove this word? or is another word perhaps missing?",
+      "range": {
+        "startLine": 14,
+        "startChar": 12,
+        "endLine": 14,
+        "endChar": 16
+      },
+      "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1b292c0_0f6c18b3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T15:44:29Z",
+      "side": 1,
+      "message": "\u003e The state was\n\n?",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 7
+      },
+      "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6aca52e7_2d0707dc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T15:44:29Z",
+      "side": 1,
+      "message": "nit: \"replace the\"",
+      "range": {
+        "startLine": 23,
+        "startChar": 13,
+        "endLine": 23,
+        "endChar": 20
+      },
+      "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "981b53d6_f46e95a8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T15:44:29Z",
+      "side": 1,
+      "message": "surely you mean \"replace the old mechanism\" here? I assume \"it\" means \"the new mechanism\", i.e. the subject of the whole paragraph, but I\u0027m actually not 100% sure. I would honestly replace \"it\" with either \"the new mechanism\" or \"the old mechanism\" in the entire paragraph for clarity.",
+      "range": {
+        "startLine": 29,
+        "startChar": 31,
+        "endLine": 29,
+        "endChar": 41
+      },
+      "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb9f6464_fcb9820a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T15:44:29Z",
+      "side": 1,
+      "message": "presumably only once the old evaluator is removed, if we want to play it safe?",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 10
+      },
+      "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fcb128d1_fe62f8d3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T15:44:29Z",
+      "side": 1,
+      "message": "I don\u0027t see any diff/todo improvements; should there be any, given that the new mechanism is higher fidelity? If not, I would perhaps mention why in the commit message.",
+      "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2a905f4_8e6fd688",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 643,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T15:44:29Z",
+      "side": 1,
+      "message": "given that these are only called once, should they be inlined?",
+      "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc59cbb1_217b3a60",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 660,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T15:44:29Z",
+      "side": 1,
+      "message": "Big fan of including examples as part of the godoc, this makes it incredibly clear. Would be a fan of doing this sort of thing in more godocs.",
+      "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "20fe067d_5517106a",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T15:44:29Z",
+      "side": 1,
+      "message": "a thought: if you make these funcs do the increment and return a func that does the matching decrement, then the calls could be like `defer markOptional()()`. I bring this up only to avoid potential but easy to miss human errors like `defer unmarkOptional(markDepth())`, where the first and second func names are actually mismatched, and it happens to compile OK since their signatures are identical.\n\nif your worry is this line allocating due to the closure/func, I would say we should worry about it only when profiles show that it\u0027s a problem. By that point, if it ever comes to it, I am willing to bet that we can make the compiler do the right thing, as upstream is currently making big improvements to the inliner.",
+      "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94504aa6_84adfa2b",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 608,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T15:44:29Z",
+      "side": 1,
+      "message": "these assignments seem to do nothing?",
+      "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

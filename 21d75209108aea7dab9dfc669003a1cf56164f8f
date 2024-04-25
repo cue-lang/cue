@@ -1,0 +1,124 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca5b7d47_5209365f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T17:52:52Z",
+      "side": 1,
+      "message": "Neat, this also makes the debug printer useful in seeing whether structure sharing is kicking in or not. At the very least this will help with upcoming improvements to use structure sharing in more scenarios.",
+      "revId": "21d75209108aea7dab9dfc669003a1cf56164f8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08c97106_c6b6bcd6",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T17:52:52Z",
+      "side": 1,
+      "message": "typo: if",
+      "range": {
+        "startLine": 213,
+        "startChar": 21,
+        "endLine": 213,
+        "endChar": 23
+      },
+      "revId": "21d75209108aea7dab9dfc669003a1cf56164f8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a4ddb98_55bd9f14",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T17:52:52Z",
+      "side": 1,
+      "message": "typo: its",
+      "range": {
+        "startLine": 218,
+        "startChar": 58,
+        "endLine": 218,
+        "endChar": 62
+      },
+      "revId": "21d75209108aea7dab9dfc669003a1cf56164f8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "150e376d_d689bba2",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T17:52:52Z",
+      "side": 1,
+      "message": "Starting to wonder if all of these boolean fields should eventually be condensed into a bitset.",
+      "revId": "21d75209108aea7dab9dfc669003a1cf56164f8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc8cbf9f_a3934a57",
+        "filename": "internal/core/debug/debug.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T17:52:52Z",
+      "side": 1,
+      "message": "document `x`?",
+      "range": {
+        "startLine": 109,
+        "startChar": 33,
+        "endLine": 109,
+        "endChar": 73
+      },
+      "revId": "21d75209108aea7dab9dfc669003a1cf56164f8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c76bb4b_38c27747",
+        "filename": "internal/core/debug/debug.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T17:52:52Z",
+      "side": 1,
+      "message": "unrelated and unnecessary change?",
+      "revId": "21d75209108aea7dab9dfc669003a1cf56164f8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

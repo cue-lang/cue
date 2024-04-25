@@ -51,6 +51,24 @@
       "parentUuid": "522ecb58_23815e31",
       "revId": "201e75d64e90577c0eff5b1ce0288407a2af758b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe8d9437_e3aca2bf",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-25T13:21:03Z",
+      "side": 1,
+      "message": "\u003e I think we make it use the very same version\n\nJust to make sure I understand, you mean do `go run ./cmd/cue fmt ./...`?\n\nIf so, I don\u0027t think that will work. The LSP will not necessarily (unless explicitly triggered or taught to) be compiled against the \"current\" fmt code. Nor would `cue` that is installed on my machine, again unless explicitly re-installed.\n\nIt would also lead to awkward conflicts in the rare occasion that two CLs make `fmt`-related changes. \n\nInstead I would suggest pinning to a released version of CUE that developers in this repo should use. It keeps it specific.",
+      "parentUuid": "e029dee4_750e9a94",
+      "revId": "201e75d64e90577c0eff5b1ce0288407a2af758b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

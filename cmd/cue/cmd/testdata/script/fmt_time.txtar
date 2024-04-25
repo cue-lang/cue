@@ -1,0 +1,10 @@
+# Verify that cue fmt does not write to files
+# if they are already formatted
+mod-time formatted.cue
+cp stdout mod-time.txt
+exec cue fmt formatted.cue
+mod-time formatted.cue
+cmp stdout mod-time.txt
+
+-- formatted.cue --
+a: 1

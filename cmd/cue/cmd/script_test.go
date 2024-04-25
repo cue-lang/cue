@@ -28,6 +28,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -115,6 +116,18 @@ func TestScript(t *testing.T) {
 					data = tsExpand(ts, data)
 					ts.Check(os.WriteFile(path, []byte(data), 0o666))
 				}
+			},
+			// mod-time writes the modification time of a file to stdout.
+			// The format time in nanoseconds since the Unix epoch.
+			"mod-time": func(ts *testscript.TestScript, neg bool, args []string) {
+				if neg || len(args) != 1 {
+					ts.Fatalf("usage: mod-time PATH")
+				}
+				path := ts.MkAbs(args[0])
+				fi, err := os.Stat(path)
+				ts.Check(err)
+				_, err = io.WriteString(ts.Stdout(), strconv.FormatInt(fi.ModTime().UnixNano(), 10))
+				ts.Check(err)
 			},
 			// get-manifest writes the manifest for a given reference within an OCI
 			// registry to a file in JSON format.

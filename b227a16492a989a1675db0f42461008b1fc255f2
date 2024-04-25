@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "815dc708_ab2ea4b3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-25T13:13:53Z",
+      "side": 1,
+      "message": "Ah and as I suspect, the trybots made the same point as me :)",
+      "revId": "b227a16492a989a1675db0f42461008b1fc255f2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

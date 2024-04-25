@@ -69,6 +69,24 @@
       "parentUuid": "e029dee4_750e9a94",
       "revId": "201e75d64e90577c0eff5b1ce0288407a2af758b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "712e18b5_e61bfe11",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-25T13:30:23Z",
+      "side": 1,
+      "message": "Hmm. I think there are pros and cons both ways.\n\nPros of following a pinned version:\n* Less chance of conflicts due to the diff noise of any formatting changes (though they should be rare)\n* Easier for anyone not re-running `go install ./cmd/cue` on master continuously\n\nPros of following master always:\n* Any formatting changes are \"dogfooded\" immediately, although we could do this by bumping the pinned version with alphas\n* No need to remember what version we are currently pinning, although we could solve this with e.g. `cue cmd check` or `cue cmd format` at the top level, to be used by both humans and CI\n\nI think I lean towards a pinned version now, like you say. As long as we bump the pinned version with alphas and provide a `cue cmd` so we all format the same way easily. I will take another stab at this CL.",
+      "parentUuid": "fe8d9437_e3aca2bf",
+      "revId": "201e75d64e90577c0eff5b1ce0288407a2af758b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

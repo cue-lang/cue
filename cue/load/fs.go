@@ -134,10 +134,6 @@ func (fs *fileSystem) init(cwd string, overlay map[string]Source) error {
 	return nil
 }
 
-func (fs *fileSystem) joinPath(elem ...string) string {
-	return filepath.Join(elem...)
-}
-
 func (fs *fileSystem) makeAbs(path string) string {
 	if filepath.IsAbs(path) {
 		return path
@@ -270,7 +266,7 @@ func (fs *fileSystem) walkRec(path string, entry iofs.DirEntry, f walkFunc) erro
 	}
 
 	for _, entry := range dir {
-		filename := fs.joinPath(path, entry.Name())
+		filename := filepath.Join(path, entry.Name())
 		err = fs.walkRec(filename, entry, f)
 		if err != nil {
 			if !entry.IsDir() || err != skipDir {
@@ -335,7 +331,7 @@ func (fs *ioFS) ReadDir(name string) ([]iofs.DirEntry, error) {
 	return fs.fs.readDir(fpath)
 }
 
-// ReadDir implements [io/fs.ReadFileFS].
+// ReadFile implements [io/fs.ReadFileFS].
 func (fs *ioFS) ReadFile(name string) ([]byte, error) {
 	fpath, err := fs.absPathFromFSPath(name)
 	if err != nil {

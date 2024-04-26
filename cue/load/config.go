@@ -371,7 +371,7 @@ func (c Config) complete() (cfg *Config, err error) {
 	if c.ModuleRoot == "" {
 		// Only consider the current directory by default
 		c.ModuleRoot = c.Dir
-		if root := c.findRoot(c.Dir); root != "" {
+		if root := c.findModRoot(c.Dir); root != "" {
 			c.ModuleRoot = root
 		}
 	} else if !filepath.IsAbs(c.ModuleRoot) {
@@ -442,19 +442,18 @@ func (c *Config) loadModule() error {
 	return nil
 }
 
-func (c Config) isRoot(dir string) bool {
-	fs := &c.fileSystem
+func (c Config) isModRoot(dir string) bool {
 	// Note: cue.mod used to be a file. We still allow both to match.
-	_, err := fs.stat(filepath.Join(dir, modDir))
+	_, err := c.fileSystem.stat(filepath.Join(dir, modDir))
 	return err == nil
 }
 
-// findRoot returns the module root that's ancestor
+// findModRoot returns the module root that's ancestor
 // of the given absolute directory path, or "" if none was found.
-func (c Config) findRoot(absDir string) string {
+func (c Config) findModRoot(absDir string) string {
 	abs := absDir
 	for {
-		if c.isRoot(abs) {
+		if c.isModRoot(abs) {
 			return abs
 		}
 		d := filepath.Dir(abs)

@@ -131,7 +131,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	// have the same module scope and that there are no invalid modules.
 	inModule := false // if pkg == "_"
 	for _, d := range dirs {
-		if l.cfg.findRoot(d[1]) != "" {
+		if l.cfg.findModRoot(d[1]) != "" {
 			inModule = true
 			break
 		}
@@ -156,7 +156,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 				fp.add(dir, &bf, importComment)
 			}
 
-			if p.PkgName == "" || !inModule || l.cfg.isRoot(dir) || dir == d[0] {
+			if p.PkgName == "" || !inModule || l.cfg.isModRoot(dir) || dir == d[0] {
 				break
 			}
 
@@ -259,9 +259,6 @@ func (l *loader) newRelInstance(pos token.Pos, path, pkgName string) *build.Inst
 		panic(fmt.Errorf("non-relative import path %q passed to newRelInstance", path))
 	}
 
-	var err errors.Error
-	dir := path
-
 	p := l.cfg.Context.NewInstance(path, l.loadFunc)
 	p.PkgName = pkgName
 	p.DisplayPath = filepath.ToSlash(path)
@@ -269,13 +266,13 @@ func (l *loader) newRelInstance(pos token.Pos, path, pkgName string) *build.Inst
 	p.Root = l.cfg.ModuleRoot
 	p.Module = l.cfg.Module
 
-	dir = filepath.Join(l.cfg.Dir, filepath.FromSlash(path))
-
+	var err errors.Error
 	if path != cleanImport(path) {
 		err = errors.Append(err, l.errPkgf(nil,
 			"non-canonical import path: %q should be %q", path, pathpkg.Clean(path)))
 	}
 
+	dir := filepath.Join(l.cfg.Dir, filepath.FromSlash(path))
 	if importPath, e := l.importPathFromAbsDir(fsPath(dir), path); e != nil {
 		// Detect later to keep error messages consistent.
 	} else {

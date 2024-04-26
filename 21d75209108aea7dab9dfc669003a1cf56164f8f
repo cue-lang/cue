@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "be2ae3e9_e981e57d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-26T12:27:00Z",
+      "side": 1,
+      "message": "Not that it doesn\u0027t always show structure sharing quite yet. Right now, I originally did, but it caused too many tests to change. This is the goal eventually, though. It already was useful to see why errors are sometimes not propagated up, which is an issue with a few of the outstanding TODOs.",
+      "parentUuid": "ca5b7d47_5209365f",
+      "revId": "21d75209108aea7dab9dfc669003a1cf56164f8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "08c97106_c6b6bcd6",
@@ -41,6 +59,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f9e43dd_3c5ea4f1",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-26T12:27:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "08c97106_c6b6bcd6",
+      "range": {
+        "startLine": 213,
+        "startChar": 21,
+        "endLine": 213,
+        "endChar": 23
+      },
+      "revId": "21d75209108aea7dab9dfc669003a1cf56164f8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2a4ddb98_55bd9f14",
@@ -54,6 +96,30 @@
       "writtenOn": "2024-04-25T17:52:52Z",
       "side": 1,
       "message": "typo: its",
+      "range": {
+        "startLine": 218,
+        "startChar": 58,
+        "endLine": 218,
+        "endChar": 62
+      },
+      "revId": "21d75209108aea7dab9dfc669003a1cf56164f8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "97127ccf_965216ea",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-26T12:27:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2a4ddb98_55bd9f14",
       "range": {
         "startLine": 218,
         "startChar": 58,
@@ -104,6 +170,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "884c34d0_85d63805",
+        "filename": "internal/core/debug/debug.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-26T12:27:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc8cbf9f_a3934a57",
+      "range": {
+        "startLine": 109,
+        "startChar": 33,
+        "endLine": 109,
+        "endChar": 73
+      },
+      "revId": "21d75209108aea7dab9dfc669003a1cf56164f8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8c76bb4b_38c27747",
@@ -117,6 +207,24 @@
       "writtenOn": "2024-04-25T17:52:52Z",
       "side": 1,
       "message": "unrelated and unnecessary change?",
+      "revId": "21d75209108aea7dab9dfc669003a1cf56164f8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0a717c2_1a809d83",
+        "filename": "internal/core/debug/debug.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-26T12:27:00Z",
+      "side": 1,
+      "message": "Ah, a gofmt artifact.",
+      "parentUuid": "8c76bb4b_38c27747",
       "revId": "21d75209108aea7dab9dfc669003a1cf56164f8f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

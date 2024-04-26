@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2ea6a67_cf4933da",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-26T17:51:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d6bc8d65_9d7f1f31",
+      "range": {
+        "startLine": 14,
+        "startChar": 12,
+        "endLine": 14,
+        "endChar": 16
+      },
+      "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f1b292c0_0f6c18b3",
@@ -47,6 +71,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d107b086_9297b4f8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-26T17:51:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f1b292c0_0f6c18b3",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 7
+      },
+      "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6aca52e7_2d0707dc",
@@ -60,6 +108,30 @@
       "writtenOn": "2024-04-25T15:44:29Z",
       "side": 1,
       "message": "nit: \"replace the\"",
+      "range": {
+        "startLine": 23,
+        "startChar": 13,
+        "endLine": 23,
+        "endChar": 20
+      },
+      "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09c1d9cc_bd37e06b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-26T17:51:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6aca52e7_2d0707dc",
       "range": {
         "startLine": 23,
         "startChar": 13,
@@ -140,6 +212,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0db621aa_18950c5b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-26T17:51:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cb9f6464_fcb9820a",
+      "range": {
+        "startLine": 29,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 10
+      },
+      "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fcb128d1_fe62f8d3",
@@ -159,6 +255,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "798b6ce7_6669d71c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-26T17:51:56Z",
+      "side": 1,
+      "message": "The change in structural.txtar is a bug fix. I\u0027ve added it to diff/explanation. The bug was not noted before. It is a relatively minor change.\n\nThe bug fix in issue990 fixes a todo. I do not think this issue was fixed by this CL, though, and this bug keeps coming back. So I\u0027ll leave the todo in for now as the changes that this flips back is high, while I will otherwise soon find the todo and remove it if it stay this way.",
+      "parentUuid": "fcb128d1_fe62f8d3",
+      "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a2a905f4_8e6fd688",
         "filename": "internal/core/adt/cycle.go",
         "patchSetId": 2
@@ -170,6 +284,24 @@
       "writtenOn": "2024-04-25T15:44:29Z",
       "side": 1,
       "message": "given that these are only called once, should they be inlined?",
+      "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bfe00fe4_72810649",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 643,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-26T17:51:56Z",
+      "side": 1,
+      "message": "I prefer not to. There will probably other places where this will be called, and also the logic may change. It also serves a documentation purpose to keep this all in one location. For instance, it makes it easy to go over these functions and find all relevant locations to this algorithm (one does not also have to visit related fields).",
+      "parentUuid": "a2a905f4_8e6fd688",
       "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -210,6 +342,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f8543ac9_59bb8688",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-26T17:51:56Z",
+      "side": 1,
+      "message": "It is not a public AP and I am not too worried about incorrect usage. Incorrect usage would be quickly exposed.\n\nI agree premature optimization is dangerous, but one can also go too far. In my experience, near-zero cost changes that avoid allocations are worth while. It is still introducing technical debt that will cost time down the line, even if small.",
+      "parentUuid": "20fe067d_5517106a",
+      "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "94504aa6_84adfa2b",
         "filename": "internal/core/adt/disjunct2.go",
         "patchSetId": 2
@@ -221,6 +371,24 @@
       "writtenOn": "2024-04-25T15:44:29Z",
       "side": 1,
       "message": "these assignments seem to do nothing?",
+      "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5106df60_f52443e9",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 608,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-26T17:51:56Z",
+      "side": 1,
+      "message": "ah, it is a left over from a different algorithm. Good catch. Done.",
+      "parentUuid": "94504aa6_84adfa2b",
       "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

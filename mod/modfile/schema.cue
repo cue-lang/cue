@@ -18,11 +18,6 @@
 // used instead, which will be rewritten to the canonical form by the cue command tooling.
 // To check against that form,
 
-// Note: we're using 1&2 rather than _|_ because
-// use of _|_ causes the source location of the errors
-// to be lost. See https://github.com/cue-lang/cue/issues/2319.
-let unimplemented = 1 & 2
-
 // versions holds an element for each supported version
 // of the schema. The version key specifies that
 // the schema covers all versions from then until the
@@ -51,8 +46,8 @@ versions: "v0.8.0": {
 	versions["v0.9.0-alpha.0"]
 
 	// The source field was added in v0.9.0, so "remove"
-	// it here by marking it as unimplemented.
-	#File: source?: unimplemented
+	// it here by marking it as an error when used.
+	#File: source?: _errorSourceFieldRequiredVersion
 }
 
 versions: "v0.9.0-alpha.0": {
@@ -131,3 +126,14 @@ versions: "v0.9.0-alpha.0": {
 		// kind!: "self" | "git" | "bzr" | "hg" | "svn"
 	}
 }
+
+// The //error comments are specially recognized by the parsing
+// code so we can avoid opaque conflict errors.
+// TODO use error function when that's available.
+//
+// Note: we're using 1&2 rather than _|_ because
+// use of _|_ causes the source location of the errors
+// to be lost. See https://github.com/cue-lang/cue/issues/2319.
+
+//error: source field is not allowed at this language version; need at least v0.9.0-alpha.0
+let _errorSourceFieldRequiredVersion = 1&2

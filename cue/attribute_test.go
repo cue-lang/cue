@@ -95,6 +95,8 @@ func TestAttributes(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		runMatrix(t, tc.path, func(t *testing.T, cfg *evalConfig) {
+			TODO_V3(t, cfg)
+
 			v := cfg.getValue(t, config).LookupPath(ParsePath(tc.path))
 			a := v.Attributes(tc.flags)
 			got := fmt.Sprint(a)

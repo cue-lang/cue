@@ -16,6 +16,29 @@
       "message": "I hope I got everything fixed up... lots of internal errors from gerrit",
       "revId": "7dd8f5e2e64f75d6b9a792b6f24c09851545c434",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a71a6e9_653b2087",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-26T13:02:02Z",
+      "side": 1,
+      "message": "you can remove this as duplicate now?",
+      "range": {
+        "startLine": 138,
+        "startChar": 26,
+        "endLine": 138,
+        "endChar": 71
+      },
+      "revId": "7dd8f5e2e64f75d6b9a792b6f24c09851545c434",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

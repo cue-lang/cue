@@ -34,6 +34,24 @@
       "parentUuid": "9773ab78_3931b962",
       "revId": "33050e22e12b87a8161ac79aa659d72be172cd3b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3769449_1a0d219f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-26T11:51:15Z",
+      "side": 1,
+      "message": "ah those are good points, I don\u0027t have the \"holistic\" view of the cue cli yet, but I agree with your points.\nReverted to only add a shorthand for diff.",
+      "parentUuid": "afb00afe_33f9455b",
+      "revId": "33050e22e12b87a8161ac79aa659d72be172cd3b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

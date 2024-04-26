@@ -759,6 +759,8 @@ func TestFields(t *testing.T) {
 		res   string
 		err   string
 		opts  []Option
+
+		todoV3 bool
 	}{{
 		value: `{ #def: 1, _hidden: 2, opt?: 3, reg: 4 }`,
 		res:   "{reg:4,}",
@@ -806,6 +808,8 @@ func TestFields(t *testing.T) {
 		if step1.value > 100 {
 		}`,
 		err: "undefined field: value",
+
+		todoV3: true,
 	}, {
 		opts: []Option{Concrete(true)},
 		value: `
@@ -813,6 +817,8 @@ func TestFields(t *testing.T) {
 		if step1.value > 100 {
 		}`,
 		err: "undefined field: value",
+
+		todoV3: true,
 	}, {
 		value: `{a!: 1, b?: 2, c: 3}`,
 		err:   "a: field is required but not present",
@@ -831,7 +837,9 @@ func TestFields(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		runMatrix(t, tc.value, func(t *testing.T, cfg *evalConfig) {
-			TODO_V3(t, cfg)
+			if tc.todoV3 {
+				TODO_V3(t, cfg)
+			}
 
 			obj := cfg.getValue(t, tc.value)
 

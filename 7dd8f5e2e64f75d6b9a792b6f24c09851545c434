@@ -39,6 +39,30 @@
       },
       "revId": "7dd8f5e2e64f75d6b9a792b6f24c09851545c434",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f28d719e_afe1ddee",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-26T13:05:32Z",
+      "side": 1,
+      "message": "it\u0027s a leftover from my conflicts... I removed the above check, it\u0027s supposed to be in the next commit",
+      "parentUuid": "6a71a6e9_653b2087",
+      "range": {
+        "startLine": 138,
+        "startChar": 26,
+        "endLine": 138,
+        "endChar": 71
+      },
+      "revId": "7dd8f5e2e64f75d6b9a792b6f24c09851545c434",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

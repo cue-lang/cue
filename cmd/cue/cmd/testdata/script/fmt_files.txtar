@@ -1,0 +1,49 @@
+# succeeds when all files are well formatted
+exec cue fmt --files --check standalone/a/
+
+# prints files that are not well formatted, recursively
+! exec cue fmt --files --check standalone/b
+cmp stdout standalone/b/stdout-golden
+
+# regular files can be passed as an argument
+! exec cue fmt --files --check standalone/b/c/not-formatted.cue standalone/b/not-formatted.cue
+cmp stdout standalone/b/stdout-golden
+
+# files under cue.mod are ignored
+exec cue fmt --files --check mod
+! stdout .
+
+# files under cue.mod files are processed when passed explicitly
+! exec cue fmt --files --check mod/cue.mod/
+cmp stdout mod/stdout-golden
+
+# exit early if user attempts to use import paths
+! exec cue fmt --files --check standalone/a/...
+stderr 'cannot use "..." in --files mode'
+! stdout "standalone"
+
+-- standalone/a/formatted.cue --
+foo: "bar"
+-- standalone/b/not-formatted.cue --
+x:    1
+-- standalone/b/c/not-formatted.cue --
+foo:    "bar"
+-- standalone/b/stdout-golden --
+standalone/b/c/not-formatted.cue
+standalone/b/not-formatted.cue
+-- mod/cue.mod/gen/not-formatted.cue --
+foo:    "bar"
+-- mod/cue.mod/usr/not-formatted.cue --
+foo:    "bar"
+-- mod/cue.mod/pkg/not-formatted.cue --
+foo:    "bar"
+-- mod/cue.mod/module.cue --
+module: "example.com"
+language: {
+	version:        "v0.9.3"
+}
+-- mod/stdout-golden --
+mod/cue.mod/gen/not-formatted.cue
+mod/cue.mod/module.cue
+mod/cue.mod/pkg/not-formatted.cue
+mod/cue.mod/usr/not-formatted.cue

@@ -313,14 +313,12 @@ func (w *compactPrinter) node(n adt.Node) {
 		}
 
 	case *adt.ConjunctGroup:
-		w.string("&[")
 		for i, c := range *x {
 			if i > 0 {
 				w.string(" & ")
 			}
 			w.node(c.Expr())
 		}
-		w.string("]")
 
 	case *adt.Disjunction:
 		for i, c := range x.Values {

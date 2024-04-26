@@ -3792,7 +3792,7 @@ func TestExpr(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		runMatrix(t, tc.input, func(t *testing.T, cfg *evalConfig) {
-			TODO_V3(t, cfg)
+			TODO_Sharing(t, cfg)
 
 			v := getValue(t, cfg, tc.input).Lookup("v")
 			got := exprStr(v)

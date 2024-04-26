@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "669c9003_9871409a",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-26T13:03:20Z",
+      "side": 1,
+      "message": "\u003e is already well formatted.",
+      "range": {
+        "startLine": 89,
+        "startChar": 51,
+        "endLine": 90,
+        "endChar": 46
+      },
+      "revId": "f0ce4894dafcbf0ea7d1a00084ef0ffb3fc599da",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

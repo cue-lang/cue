@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d63c00a5_a3e00bd1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-26T09:50:47Z",
+      "side": 1,
+      "message": "perhaps just say \"succeed\" or \"exit with status code 0\".",
+      "range": {
+        "startLine": 17,
+        "startChar": 19,
+        "endLine": 17,
+        "endChar": 36
+      },
+      "revId": "f5e93a6a47cd48b5a1b1119b8956fca241d6f107",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f673465_fdd06010",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-26T09:50:47Z",
+      "side": 1,
+      "message": "nit: \"exit with status code\" to avoid repetition",
+      "range": {
+        "startLine": 20,
+        "startChar": 27,
+        "endLine": 20,
+        "endChar": 46
+      },
+      "revId": "f5e93a6a47cd48b5a1b1119b8956fca241d6f107",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

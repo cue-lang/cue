@@ -139,7 +139,7 @@ module: "foo.com/bar@v0"
 language: version: "v0.8.6"
 source: kind: "git"
 `,
-	wantError: `source: conflicting values 1 and (.|\n)+`,
+	wantError: `invalid module.cue file: source field is not allowed at this language version; need at least v0.9.0-alpha.0`,
 }, {
 	testName: "AmbiguousDefaults",
 	parse:    Parse,

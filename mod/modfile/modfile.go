@@ -40,7 +40,9 @@ import (
 )
 
 //go:embed schema.cue
-var moduleSchemaData []byte
+var moduleSchemaData string
+
+const schemaFile = "cuelang.org/go/mod/modfile/schema.cue"
 
 // File represents the contents of a cue.mod/module.cue file.
 type File struct {
@@ -152,10 +154,14 @@ type schemaInfo struct {
 	EarliestClosedSchemaVersion string               `json:"earliestClosedSchemaVersion"`
 }
 
+// moduleSchemaDo runs f with information about all the schema versions
+// present in schema.cue. It does this within a mutex because it is
+// not currently allowed to use cue.Value concurrently.
+// TODO remove the mutex when https://cuelang.org/issue/2733 is fixed.
 func moduleSchemaDo[T any](f func(*cue.Context, *schemaInfo) (T, error)) (T, error) {
 	moduleSchemaOnce.Do(func() {
 		_cueContext = cuecontext.New()
-		schemav := _cueContext.CompileBytes(moduleSchemaData, cue.Filename("cuelang.org/go/mod/modfile/schema.cue"))
+		schemav := _cueContext.CompileString(moduleSchemaData, cue.Filename(schemaFile))
 		if err := schemav.Decode(&_schemas); err != nil {
 			panic(fmt.Errorf("internal error: invalid CUE module.cue schema: %v", errors.Details(err, nil)))
 		}
@@ -372,8 +378,53 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 }
 
 func newCUEError(err error, filename string) error {
-	// TODO we have some potential to improve error messages here.
+	ps := errors.Positions(err)
+	for _, p := range ps {
+		if errStr := findErrorComment(p); errStr != "" {
+			return fmt.Errorf("invalid module.cue file: %s", errStr)
+		}
+	}
+	// TODO we have more potential to improve error messages here.
 	return err
+}
+
+// findErrorComment finds an error comment in the form
+//
+//	//error: ...
+//
+// before the given position.
+// This works as a kind of poor-man's error primitive
+// so we can customize the error strings when verification
+// fails.
+func findErrorComment(p token.Pos) string {
+	if p.Filename() != schemaFile {
+		return ""
+	}
+	off := p.Offset()
+	source := moduleSchemaData
+	if off > len(source) {
+		return ""
+	}
+	source, _, ok := cutLast(source[:off], "\n")
+	if !ok {
+		return ""
+	}
+	_, errorLine, ok := cutLast(source, "\n")
+	if !ok {
+		return ""
+	}
+	errStr, ok := strings.CutPrefix(errorLine, "//error: ")
+	if !ok {
+		return ""
+	}
+	return errStr
+}
+
+func cutLast(s, sep string) (before, after string, found bool) {
+	if i := strings.LastIndex(s, sep); i >= 0 {
+		return s[:i], s[i+len(sep):], true
+	}
+	return "", s, false
 }
 
 // DepVersions returns the versions of all the modules depended on by the

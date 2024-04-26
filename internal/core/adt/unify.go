@@ -287,9 +287,10 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 			// Should resolve with dereference.
 			v.Closed = true
 		}
-		v.status = w.status
 
-		return w.unify(c, needs, mode)
+		result := w.unify(c, needs, mode)
+		v.status = w.status
+		return result
 	}
 
 	// validationCompleted

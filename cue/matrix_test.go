@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuedebug"
 )
 
@@ -25,6 +26,16 @@ type evalConfig struct {
 	name    string
 	version internal.EvaluatorVersion
 	flags   cuedebug.Config
+}
+
+func (c *evalConfig) runtime() *Runtime {
+	var r Runtime
+	c.updateRuntime(r.runtime())
+	return &r
+}
+
+func (c *evalConfig) updateRuntime(r *runtime.Runtime) {
+	r.SetSettings(c.version, c.flags)
 }
 
 func runMatrix(t *testing.T, name string, f func(t *testing.T, c *evalConfig)) {
@@ -36,14 +47,25 @@ func runMatrix(t *testing.T, name string, f func(t *testing.T, c *evalConfig)) {
 func doMatrix(t *testing.T, f func(t *testing.T, c *evalConfig)) {
 	matrix := []*evalConfig{
 		{"v2", internal.DefaultVersion, cuedebug.Config{}},
-		// TODO: enable this in next CL.
-		// {"v3", internal.DevVersion, cuedebug.Config{Sharing: true}},
-		// {"v3-noshare", internal.DevVersion, cuedebug.Config{}},
+		{"v3", internal.DevVersion, cuedebug.Config{Sharing: true}},
+		{"v3-noshare", internal.DevVersion, cuedebug.Config{}},
 	}
 
 	for _, c := range matrix {
 		t.Run(c.name, func(t *testing.T) {
 			f(t, c)
 		})
+	}
+}
+
+func TODO_V3(t *testing.T, c *evalConfig) {
+	if c.version == internal.DevVersion {
+		t.Skip("Skipping v3")
+	}
+}
+
+func TODO_Sharing(t *testing.T, c *evalConfig) {
+	if c.flags.Sharing {
+		t.Skip("Skipping v3 with sharing")
 	}
 }

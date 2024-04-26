@@ -39,7 +39,7 @@ import (
 func (c *evalConfig) getValue(t *testing.T, body string) Value {
 	t.Helper()
 
-	var r Runtime // TODO: use Context and return Value
+	r := c.runtime()
 
 	inst, err := r.Compile("foo", body)
 	if err != nil {
@@ -340,6 +340,8 @@ func TestValueType(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		runMatrix(t, tc.value, func(t *testing.T, cfg *evalConfig) {
+			TODO_V3(t, cfg)
+
 			inst := cfg.getValue(t, tc.value)
 			v := inst.Lookup("v")
 			if got := v.Kind(); got != tc.kind {
@@ -829,6 +831,8 @@ func TestFields(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		runMatrix(t, tc.value, func(t *testing.T, cfg *evalConfig) {
+			TODO_V3(t, cfg)
+
 			obj := cfg.getValue(t, tc.value)
 
 			iter, err := obj.Fields(tc.opts...)
@@ -1067,6 +1071,8 @@ func goValue(v Value) interface{} {
 
 // TODO: Exporting of Vertex as Conjunct
 func TestFill(t *testing.T) {
+	// TODO: run with matrix.
+
 	r := &Runtime{}
 
 	inst, err := r.CompileExpr(ast.NewStruct("bar", ast.NewString("baz")))
@@ -1129,6 +1135,8 @@ func TestFill(t *testing.T) {
 }
 
 func TestFill2(t *testing.T) {
+	// TODO: run with matrix.
+
 	r := &Runtime{}
 
 	root, err := r.Compile("test", `
@@ -1768,6 +1776,8 @@ func TestDefaults(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		runMatrix(t, tc.value, func(t *testing.T, cfg *evalConfig) {
+			TODO_V3(t, cfg)
+
 			v := cfg.getValue(t, "a: "+tc.value).Lookup("a")
 
 			v = v.Eval()
@@ -1870,6 +1880,8 @@ func TestTemplate(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
+			TODO_V3(t, cfg)
+
 			v := cfg.getValue(t, tc.value)
 			for _, p := range tc.path {
 				if p == "" {
@@ -1928,6 +1940,8 @@ func TestElem(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
+			TODO_V3(t, cfg)
+
 			v := cfg.getValue(t, tc.value)
 			v.v.Finalize(v.ctx()) // TODO: do in instance.
 			for _, p := range tc.path {
@@ -2191,6 +2205,8 @@ func TestUnify(t *testing.T) {
 	}}
 	// TODO(tdtest): use cuetest.Run when supported.
 	doMatrix(t, func(t *testing.T, cfg *evalConfig) {
+		TODO_V3(t, cfg)
+
 		tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
 			v := cfg.getValue(t.T, tc.value)
 			x := v.LookupPath(ParsePath(tc.pathA))
@@ -2245,6 +2261,8 @@ func TestUnifyAccept(t *testing.T) {
 	}}
 	// TODO(tdtest): use cuetest.Run when supported.
 	doMatrix(t, func(t *testing.T, cfg *evalConfig) {
+		TODO_V3(t, cfg)
+
 		tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
 			v := cfg.getValue(t.T, tc.value)
 			x := v.LookupPath(ParsePath("#v"))
@@ -2311,8 +2329,11 @@ func TestEquals(t *testing.T) {
 		true,
 	}}
 	for _, tc := range testCases {
-		t.Run("", func(t *testing.T) {
-			var r Runtime
+		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
+			TODO_Sharing(t, cfg)
+
+			r := cfg.runtime()
+
 			a, err := r.Compile("a", tc.a)
 			if err != nil {
 				t.Fatal(err)
@@ -2460,8 +2481,11 @@ func TestValidate(t *testing.T) {
 		`,
 	}}
 	for _, tc := range testCases {
-		t.Run(tc.desc, func(t *testing.T) {
-			r := Runtime{}
+		runMatrix(t, tc.desc, func(t *testing.T, cfg *evalConfig) {
+			TODO_V3(t, cfg)
+
+			r := cfg.runtime()
+
 			inst, err := r.Parse("validate", tc.in)
 			if err == nil {
 				err = inst.Value().Validate(tc.opts...)
@@ -2495,12 +2519,13 @@ func TestPath(t *testing.T) {
 		mkpath("b", `"4b"`),
 	}
 	for _, tc := range testCases {
-		r := Runtime{}
-		inst, err := r.Parse("config", config)
-		if err != nil {
-			t.Fatal(err)
-		}
-		t.Run(strings.Join(tc, "."), func(t *testing.T) {
+		runMatrix(t, strings.Join(tc, "."), func(t *testing.T, cfg *evalConfig) {
+			r := cfg.runtime()
+			inst, err := r.Parse("config", config)
+			if err != nil {
+				t.Fatal(err)
+			}
+
 			v := inst.Lookup(tc[0])
 			for _, e := range tc[1:] {
 				if '0' <= e[0] && e[0] <= '9' {
@@ -2933,6 +2958,8 @@ func TestMarshalJSON(t *testing.T) {
 	}}
 	for i, tc := range testCases {
 		runMatrix(t, fmt.Sprintf("%d/%v", i, tc.value), func(t *testing.T, cfg *evalConfig) {
+			TODO_V3(t, cfg)
+
 			inst := cfg.getValue(t, tc.value)
 			b, err := inst.Value().MarshalJSON()
 			checkFatal(t, err, tc.err, "init")
@@ -3009,6 +3036,8 @@ func TestWalk(t *testing.T) {
 	}}
 	for i, tc := range testCases {
 		runMatrix(t, fmt.Sprintf("%d/%v", i, tc.value), func(t *testing.T, cfg *evalConfig) {
+			TODO_V3(t, cfg)
+
 			inst := cfg.getValue(t, tc.value)
 			buf := []byte{}
 			stripComma := func() {
@@ -3134,8 +3163,11 @@ func TestReferencePath(t *testing.T) {
 		alt:            "3.14159265358979323846264338327950288419716939937510582097494459",
 	}}
 	for _, tc := range testCases {
-		t.Run("", func(t *testing.T) {
-			var r Runtime
+		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
+			TODO_Sharing(t, cfg)
+
+			r := cfg.runtime()
+
 			inst, _ := r.Compile("in", tc.input) // getInstance(t, tc.input)
 			v := inst.Lookup("v", "w", "x")
 
@@ -3219,9 +3251,13 @@ a: x: y: z: "x"`,
 		pos: "3:4",
 	}}
 	for _, tc := range testCases {
-		t.Run("", func(t *testing.T) {
+		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
+			TODO_V3(t, cfg)
+
 			var c Context
 			(*runtime.Runtime)(&c).Init()
+			cfg.updateRuntime(c.runtime())
+
 			v := c.CompileString(tc.value)
 			v = v.LookupPath(ParsePath("a"))
 			pos := v.Pos().String()
@@ -3476,8 +3512,11 @@ func TestPathCorrection(t *testing.T) {
 		if tc.skip {
 			continue
 		}
-		t.Run("", func(t *testing.T) {
-			var r Runtime
+		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
+			TODO_Sharing(t, cfg)
+
+			r := cfg.runtime()
+
 			inst, err := r.Compile("in", tc.input)
 			if err != nil {
 				t.Fatal(err)
@@ -3753,6 +3792,8 @@ func TestExpr(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		runMatrix(t, tc.input, func(t *testing.T, cfg *evalConfig) {
+			TODO_V3(t, cfg)
+
 			v := cfg.getValue(t, tc.input).Lookup("v")
 			got := exprStr(v)
 			if got != tc.want {

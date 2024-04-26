@@ -1,5 +1,13 @@
 ! exec cue fmt ./fmt
 cmp stderr expect-stderr
+
+# Issue 1744: if we encounter an error while formatting,
+# don't overwrite the input file with zero bytes.
+cp issue1744/invalid.cue issue1744/invalid.cue.orig
+! exec cue fmt issue1744/invalid.cue
+cmp stderr issue1744/stderr-golden
+cmp issue1744/invalid.cue issue1744/invalid.cue.orig
+
 -- expect-stderr --
 expected 'STRING', found '.':
     ./fmt/error.cue:1:9
@@ -9,3 +17,8 @@ import a.b "foo"
 a: 2
 bb: 3
 -- fmt/cue.mod/module.cue --
+-- issue1744/invalid.cue --
+~
+-- issue1744/stderr-golden --
+illegal character U+007E '~':
+    ./issue1744/invalid.cue:1:1

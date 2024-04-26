@@ -85,19 +85,19 @@ func newFmtCmd(c *Command) *cobra.Command {
 						continue
 					}
 
-					// When using --check and --diff, we need to buffer the input and output bytes to compare them.
+					// We buffer the input and output bytes to compare them.
+					// This allows us to determine whether a file needs to be
+					// formatted, without modifying the file.
 					var original []byte
 					var formatted bytes.Buffer
-					if doDiff || check {
-						if bs, ok := file.Source.([]byte); ok {
-							original = bs
-						} else {
-							original, err = source.ReadAll(file.Filename, file.Source)
-							exitOnErr(cmd, err, true)
-							file.Source = original
-						}
-						cfg.Out = &formatted
+					if bs, ok := file.Source.([]byte); ok {
+						original = bs
+					} else {
+						original, err = source.ReadAll(file.Filename, file.Source)
+						exitOnErr(cmd, err, true)
+						file.Source = original
 					}
+					cfg.Out = &formatted
 
 					var files []*ast.File
 					d := encoding.NewDecoder(cmd.ctx, file, &cfg)
@@ -135,20 +135,27 @@ func newFmtCmd(c *Command) *cobra.Command {
 						continue
 					}
 
-					if (doDiff || check) && !bytes.Equal(formatted.Bytes(), original) {
-						foundBadlyFormatted = true
-						var path string
-						f := file.Filename
-						path, err = filepath.Rel(cwd, f)
-						if err != nil {
-							path = f
-						}
+					foundBadlyFormatted = true
+					var path string
+					f := file.Filename
+					path, err = filepath.Rel(cwd, f)
+					if err != nil {
+						path = f
+					}
 
-						if doDiff {
-							d := diff.Diff(path+".orig", original, path, formatted.Bytes())
-							fmt.Fprintln(stdout, string(d))
-						} else {
-							fmt.Fprintln(stdout, path)
+					switch {
+					case doDiff:
+						d := diff.Diff(path+".orig", original, path, formatted.Bytes())
+						fmt.Fprintln(stdout, string(d))
+					case check:
+						fmt.Fprintln(stdout, path)
+					case file.Filename == "-":
+						if _, err := fmt.Fprint(stdout, formatted.String()); err != nil {
+							exitOnErr(cmd, err, false)
+						}
+					default:
+						if err := os.WriteFile(file.Filename, formatted.Bytes(), 0644); err != nil {
+							exitOnErr(cmd, err, false)
 						}
 					}
 				}

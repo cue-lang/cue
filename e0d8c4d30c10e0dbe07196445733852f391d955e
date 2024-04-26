@@ -16,6 +16,24 @@
       "message": "Would using `exec stat ...` possibly avoid needing to introduce a new testscript verb? I\u0027ve no idea how *desirable* that might be, but the thought occurred... :-)",
       "revId": "e0d8c4d30c10e0dbe07196445733852f391d955e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da218394_8ad37603",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_time.txtar",
+        "patchSetId": 7
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-26T06:24:39Z",
+      "side": 1,
+      "message": "I tried that once, and then @mvdan@mvdan.cc mentioned that this is not a cross platform solution - so it would break on windows.\n\nI could use a testscript build constraint to run a different commant depending on the OS:\n\n```\n[unix] exec stat ...\n[!unix] dir /T:w ...\n```\n\nbut I\u0027m not sure if that\u0027s a cleaner solution or not - also the `[!unix]` doesn\u0027t seem logically correct to me, since it doesn\u0027t necessarily imply that we\u0027re on windows.",
+      "parentUuid": "c10123e5_a7de84aa",
+      "revId": "e0d8c4d30c10e0dbe07196445733852f391d955e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

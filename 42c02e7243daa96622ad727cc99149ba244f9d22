@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "48199bdc_00cb61c7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-26T12:18:09Z",
+      "side": 1,
+      "message": "This was a bug in cue/load and fixed in https://review.gerrithub.io/c/cue-lang/cue/+/1193030. Pretty much just an oversight.",
+      "parentUuid": "af835480_fb10c0b1",
+      "revId": "42c02e7243daa96622ad727cc99149ba244f9d22",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4e646cb8_15902f8a",
@@ -49,6 +67,24 @@
       "writtenOn": "2024-04-04T15:19:59Z",
       "side": 1,
       "message": "from my p.o.v. I think it\u0027s probably fine to print them in lexical order for consistency, particularly as the arguments can mix regular files and packages. I agree about printing them relative to the current directory though, or (perhaps better) printing them exactly as they were specified on the command line.",
+      "revId": "42c02e7243daa96622ad727cc99149ba244f9d22",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "07047f20_912c5273",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_check.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-26T12:18:09Z",
+      "side": 1,
+      "message": "Agreed. The relative filenames were done in https://review.gerrithub.io/c/cue-lang/cue/+/1191475, and now the files are printed in deterministic order as returned by cue/load, which is lexical sorting.",
+      "parentUuid": "4e646cb8_15902f8a",
       "revId": "42c02e7243daa96622ad727cc99149ba244f9d22",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

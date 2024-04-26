@@ -271,6 +271,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe8e8590_19e76250",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-26T20:06:32Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "798b6ce7_6669d71c",
+      "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a2a905f4_8e6fd688",
@@ -302,6 +320,24 @@
       "side": 1,
       "message": "I prefer not to. There will probably other places where this will be called, and also the logic may change. It also serves a documentation purpose to keep this all in one location. For instance, it makes it easy to go over these functions and find all relevant locations to this algorithm (one does not also have to visit related fields).",
       "parentUuid": "a2a905f4_8e6fd688",
+      "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2026aa7e_4a5d2b02",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 643,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-26T20:06:32Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "bfe00fe4_72810649",
       "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -354,6 +390,24 @@
       "side": 1,
       "message": "It is not a public AP and I am not too worried about incorrect usage. Incorrect usage would be quickly exposed.\n\nI agree premature optimization is dangerous, but one can also go too far. In my experience, near-zero cost changes that avoid allocations are worth while. It is still introducing technical debt that will cost time down the line, even if small.",
       "parentUuid": "20fe067d_5517106a",
+      "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "87fdd4fc_bde06f65",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-26T20:06:32Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f8543ac9_59bb8688",
       "revId": "41712818f11ec87716e7c1b791fefa15068c8a7f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

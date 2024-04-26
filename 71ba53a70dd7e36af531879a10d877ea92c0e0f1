@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04270f5e_e747d564",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-26T11:52:47Z",
+      "side": 1,
+      "message": "rewrite into a sentence? no longer need a bullet point list for a single element",
+      "revId": "71ba53a70dd7e36af531879a10d877ea92c0e0f1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

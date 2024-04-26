@@ -646,13 +646,13 @@ d3.config.0: structural cycle:
     ./in.cue:315:13
 d3.x.0: structural cycle:
     ./in.cue:315:13
-e4.a.0.0: cannot combine regular field "c" with [1,&[&[&[&[&[{c:1} & (a|{}) & [{c:1}]]]]]]]:
+e4.a.0.0: cannot combine regular field "c" with [1,{c:1} & (a|{}) & [{c:1}]]:
     ./in.cue:399:11
-e4.a.0.0.0: cannot combine regular field "c" with [1,&[&[&[&[&[&[{c:1}]]]]]]]:
+e4.a.0.0.0: cannot combine regular field "c" with [1,{c:1}]:
     ./in.cue:399:11
-e4.b.0.0: cannot combine regular field "c" with [1,&[&[&[&[&[{c:1} & [{c:1}] & (b|{})]]]]]]:
+e4.b.0.0: cannot combine regular field "c" with [1,{c:1} & [{c:1}] & (b|{})]:
     ./in.cue:401:11
-e4.b.0.0.0: cannot combine regular field "c" with [1,&[&[&[&[&[&[{c:1}]]]]]]]:
+e4.b.0.0.0: cannot combine regular field "c" with [1,{c:1}]:
     ./in.cue:401:11
 nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
     ./in.cue:416:6
@@ -1422,9 +1422,9 @@ Result:
         //     ./in.cue:398:10
         //     ./in.cue:399:6
         // e4.a.0.0.0: structural cycle
-        // e4.a.0.0: cannot combine regular field "c" with [1,&[&[&[&[&[{c:1} & (a|{}) & [{c:1}]]]]]]]:
+        // e4.a.0.0: cannot combine regular field "c" with [1,{c:1} & (a|{}) & [{c:1}]]:
         //     ./in.cue:399:11
-        // e4.a.0.0.0: cannot combine regular field "c" with [1,&[&[&[&[&[&[{c:1}]]]]]]]:
+        // e4.a.0.0.0: cannot combine regular field "c" with [1,{c:1}]:
         //     ./in.cue:399:11
       }
     }
@@ -1447,9 +1447,9 @@ Result:
         //     ./in.cue:401:6
         //     ./in.cue:402:10
         // e4.b.0.0.0: structural cycle
-        // e4.b.0.0: cannot combine regular field "c" with [1,&[&[&[&[&[{c:1} & [{c:1}] & (b|{})]]]]]]:
+        // e4.b.0.0: cannot combine regular field "c" with [1,{c:1} & [{c:1}] & (b|{})]:
         //     ./in.cue:401:11
-        // e4.b.0.0.0: cannot combine regular field "c" with [1,&[&[&[&[&[&[{c:1}]]]]]]]:
+        // e4.b.0.0.0: cannot combine regular field "c" with [1,{c:1}]:
         //     ./in.cue:401:11
       }
     }
@@ -1895,13 +1895,13 @@ diff old new
 +    ./in.cue:315:13
 +d3.x.0: structural cycle:
 +    ./in.cue:315:13
-+e4.a.0.0: cannot combine regular field "c" with [1,&[&[&[&[&[{c:1} & (a|{}) & [{c:1}]]]]]]]:
++e4.a.0.0: cannot combine regular field "c" with [1,{c:1} & (a|{}) & [{c:1}]]:
 +    ./in.cue:399:11
-+e4.a.0.0.0: cannot combine regular field "c" with [1,&[&[&[&[&[&[{c:1}]]]]]]]:
++e4.a.0.0.0: cannot combine regular field "c" with [1,{c:1}]:
 +    ./in.cue:399:11
-+e4.b.0.0: cannot combine regular field "c" with [1,&[&[&[&[&[{c:1} & [{c:1}] & (b|{})]]]]]]:
++e4.b.0.0: cannot combine regular field "c" with [1,{c:1} & [{c:1}] & (b|{})]:
 +    ./in.cue:401:11
-+e4.b.0.0.0: cannot combine regular field "c" with [1,&[&[&[&[&[&[{c:1}]]]]]]]:
++e4.b.0.0.0: cannot combine regular field "c" with [1,{c:1}]:
 +    ./in.cue:401:11
 +nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
 +    ./in.cue:416:6
@@ -2396,9 +2396,9 @@ diff old new
 +        //     ./in.cue:398:10
 +        //     ./in.cue:399:6
 +        // e4.a.0.0.0: structural cycle
-+        // e4.a.0.0: cannot combine regular field "c" with [1,&[&[&[&[&[{c:1} & (a|{}) & [{c:1}]]]]]]]:
++        // e4.a.0.0: cannot combine regular field "c" with [1,{c:1} & (a|{}) & [{c:1}]]:
 +        //     ./in.cue:399:11
-+        // e4.a.0.0.0: cannot combine regular field "c" with [1,&[&[&[&[&[&[{c:1}]]]]]]]:
++        // e4.a.0.0.0: cannot combine regular field "c" with [1,{c:1}]:
 +        //     ./in.cue:399:11
 +      }
 +    }
@@ -2426,9 +2426,9 @@ diff old new
 +        //     ./in.cue:401:6
 +        //     ./in.cue:402:10
 +        // e4.b.0.0.0: structural cycle
-+        // e4.b.0.0: cannot combine regular field "c" with [1,&[&[&[&[&[{c:1} & [{c:1}] & (b|{})]]]]]]:
++        // e4.b.0.0: cannot combine regular field "c" with [1,{c:1} & [{c:1}] & (b|{})]:
 +        //     ./in.cue:401:11
-+        // e4.b.0.0.0: cannot combine regular field "c" with [1,&[&[&[&[&[&[{c:1}]]]]]]]:
++        // e4.b.0.0.0: cannot combine regular field "c" with [1,{c:1}]:
 +        //     ./in.cue:401:11
        }
      }

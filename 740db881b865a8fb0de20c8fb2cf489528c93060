@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f45bf081_719a5eff",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-26T09:46:18Z",
+      "side": 1,
+      "message": "nit: for consistency, CUE uses `-` to refer to stdin:\n\n```\n$ echo \u0027}\u0027 | cue export -\nexpected \u0027EOF\u0027, found \u0027}\u0027:\n    -:1:1\n```\n\nperhaps not as evident, but I\u0027d rather be consistent. in other words, it should always be file.Filename as a relative path.",
+      "revId": "740db881b865a8fb0de20c8fb2cf489528c93060",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

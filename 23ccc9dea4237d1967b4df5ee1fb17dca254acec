@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "31c6004d_a41c3da0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-26T12:20:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cf864c6e_f1413dd6",
+      "range": {
+        "startLine": 16,
+        "startChar": 5,
+        "endLine": 16,
+        "endChar": 11
+      },
+      "revId": "23ccc9dea4237d1967b4df5ee1fb17dca254acec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6554287e_22d348d2",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-04-25T17:47:50Z",
       "side": 1,
       "message": "nit: \"information along the path that one may want to access\", i.e. the pointer/reference path",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 39
+      },
+      "revId": "23ccc9dea4237d1967b4df5ee1fb17dca254acec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc17f908_5d5b065f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-26T12:20:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6554287e_22d348d2",
       "range": {
         "startLine": 18,
         "startChar": 0,
@@ -70,6 +118,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3af3a8a_375462e1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-26T12:20:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e4e383c5_81556b93",
+      "range": {
+        "startLine": 27,
+        "startChar": 23,
+        "endLine": 27,
+        "endChar": 30
+      },
+      "revId": "23ccc9dea4237d1967b4df5ee1fb17dca254acec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "882f124b_58646b1b",
@@ -83,6 +155,30 @@
       "writtenOn": "2024-04-25T17:47:50Z",
       "side": 1,
       "message": "dereference?\n\nI struggle to parse your prose sometimes, these are my best guesses as to how to fix it up, but say if I got it wrong.",
+      "range": {
+        "startLine": 28,
+        "startChar": 23,
+        "endLine": 28,
+        "endChar": 35
+      },
+      "revId": "23ccc9dea4237d1967b4df5ee1fb17dca254acec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "67b0e8cd_22659a9f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-26T12:20:46Z",
+      "side": 1,
+      "message": "Done. Would be nice if my IDE had a grammar checker. 😊",
+      "parentUuid": "882f124b_58646b1b",
       "range": {
         "startLine": 28,
         "startChar": 23,
@@ -123,6 +219,24 @@
       "writtenOn": "2024-04-25T17:47:50Z",
       "side": 1,
       "message": "To give another reason why this TODO is a good idea: Max Gaß was asking on Slack how he can show all the positions for expressions that contributed towards a particular CUE value, e.g. as comments attached to each field in a `cue export`. I assume this would help towards that.",
+      "revId": "23ccc9dea4237d1967b4df5ee1fb17dca254acec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d491151_2cfdefa2",
+        "filename": "cue/types.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-26T12:20:46Z",
+      "side": 1,
+      "message": "Yes.",
+      "parentUuid": "3042022c_ddebd16c",
       "revId": "23ccc9dea4237d1967b4df5ee1fb17dca254acec",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

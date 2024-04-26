@@ -16,6 +16,24 @@
       "message": "can you briefly document in the commit message that you are adding the -d shortcut for symmetry with `gofmt -d`?",
       "revId": "63c095bdbd757b3788ae1bf3c64b4530a2970ce8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbf6fbcd_76186b96",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-26T12:14:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "852f6928_3986008d",
+      "revId": "63c095bdbd757b3788ae1bf3c64b4530a2970ce8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

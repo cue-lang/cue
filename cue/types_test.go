@@ -3172,8 +3172,6 @@ func TestReferencePath(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
-			TODO_Sharing(t, cfg)
-
 			r := cfg.runtime()
 
 			inst, _ := r.Compile("in", tc.input) // getInstance(t, tc.input)

@@ -623,7 +623,6 @@ func newValueRoot(idx *runtime.Runtime, ctx *adt.OpContext, x adt.Expr) Value {
 func newChildValue(o *structValue, i int) Value {
 	arc := o.at(i)
 	// TODO: fix linkage to parent.
-	arc = arc.Indirect()
 	return makeValue(o.v.idx, arc, linkParent(o.v.parent_, o.v.v, arc))
 }
 

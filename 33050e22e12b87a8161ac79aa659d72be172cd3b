@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9773ab78_3931b962",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-26T09:54:39Z",
+      "side": 1,
+      "message": "For --diff I agree, particularly to mirror Go\u0027s `gofmt -d`.\n\nFor --check I\u0027m less sure. It\u0027s a flag that will be generally useful in other cases as well, for example we already have `cue mod tidy --check`. And upstream Go is also adding `go mod tidy -check` and `gofmt -check` with all likelihood (single dashes as they don\u0027t use GNU flags, but still the same flag name).\n\nAnd, because it\u0027s a flag that we will use in many places, I\u0027m nervous about taking over -c as a short flag. It\u0027s already taken elsewhere, for example `cue vet` and `cue eval` have `-c` as short for `--concrete`. We might not think that those commands will need a `--check` flag today, but who knows - and having the same short flag mean different stuff in different commands is something I\u0027d like to avoid if possible.\n\nAll in all I _think_ --check will mainly be used in CI and scripts, so I think it\u0027s OK to not have a short-hand.",
+      "revId": "33050e22e12b87a8161ac79aa659d72be172cd3b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

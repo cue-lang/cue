@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "95e547e1_59c11cbc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-26T12:16:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "75bc4b08_2cddb51f",
+      "range": {
+        "startLine": 9,
+        "startChar": 31,
+        "endLine": 9,
+        "endChar": 40
+      },
+      "revId": "20eedba79374608c741962ef61c858d4fd9fc0d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9eef5584_8cc06e23",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-04-25T15:47:42Z",
       "side": 1,
       "message": "unfinished sentence?",
+      "range": {
+        "startLine": 11,
+        "startChar": 42,
+        "endLine": 11,
+        "endChar": 58
+      },
+      "revId": "20eedba79374608c741962ef61c858d4fd9fc0d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "763174b7_7a67e2ae",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-26T12:16:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9eef5584_8cc06e23",
       "range": {
         "startLine": 11,
         "startChar": 42,
@@ -77,6 +125,30 @@
       "writtenOn": "2024-04-25T15:47:42Z",
       "side": 1,
       "message": "nit: \"this can happen\"? otherwise it first seemed like an incomplete sentence.",
+      "range": {
+        "startLine": 946,
+        "startChar": 49,
+        "endLine": 946,
+        "endChar": 60
+      },
+      "revId": "20eedba79374608c741962ef61c858d4fd9fc0d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01d03ce5_1aa1310c",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 946,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-26T12:16:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7888f52b_525e2c71",
       "range": {
         "startLine": 946,
         "startChar": 49,

@@ -26,6 +26,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "73740e81_1db444a1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-26T12:17:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d5453ee9_546010d3",
+      "range": {
+        "startLine": 18,
+        "startChar": 14,
+        "endLine": 18,
+        "endChar": 17
+      },
+      "revId": "e0d8c4d30c10e0dbe07196445733852f391d955e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "2ea317aa_6ee96989",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 7
@@ -71,6 +95,30 @@
       "writtenOn": "2024-04-26T10:03:48Z",
       "side": 1,
       "message": "nit: well formatted",
+      "range": {
+        "startLine": 2,
+        "startChar": 22,
+        "endLine": 2,
+        "endChar": 31
+      },
+      "revId": "e0d8c4d30c10e0dbe07196445733852f391d955e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d142e31_208f9f4e",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_time.txtar",
+        "patchSetId": 7
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-26T12:17:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b3a673f4_cf7cd367",
       "range": {
         "startLine": 2,
         "startChar": 22,

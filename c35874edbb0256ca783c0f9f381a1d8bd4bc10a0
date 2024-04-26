@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5b20075_284961a9",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 423,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-26T20:04:36Z",
+      "side": 1,
+      "message": "it still baffles me they did not accept strings.CutLast",
+      "revId": "c35874edbb0256ca783c0f9f381a1d8bd4bc10a0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

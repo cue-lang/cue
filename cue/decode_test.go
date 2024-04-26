@@ -239,8 +239,8 @@ func TestDecode(t *testing.T) {
 		want:  []interface{}{},
 	}}
 	for _, tc := range testCases {
-		t.Run(tc.value, func(t *testing.T) {
-			err := getValue(t, tc.value).Decode(tc.dst)
+		runMatrix(t, tc.value, func(t *testing.T, cfg *evalConfig) {
+			err := cfg.getValue(t, tc.value).Decode(tc.dst)
 			checkFatal(t, err, tc.err, "init")
 
 			got := reflect.ValueOf(tc.dst).Elem().Interface()
@@ -253,22 +253,24 @@ func TestDecode(t *testing.T) {
 }
 
 func TestDecodeIntoCUEValue(t *testing.T) {
-	// We should be able to decode into a CUE value so we can
-	// decode partially incomplete values into Go.
-	// This test doesn't fit within the table used by TestDecode
-	// because cue values aren't easily comparable with cmp.Diff.
-	var st struct {
-		X Value `json:"x"`
-	}
-	err := getValue(t, `x: string`).Decode(&st)
-	qt.Assert(t, qt.IsNil(err))
-	qt.Assert(t, qt.Equals(fmt.Sprint(st.X), "string"))
+	doMatrix(t, func(t *testing.T, cfg *evalConfig) {
+		// We should be able to decode into a CUE value so we can
+		// decode partially incomplete values into Go.
+		// This test doesn't fit within the table used by TestDecode
+		// because cue values aren't easily comparable with cmp.Diff.
+		var st struct {
+			X Value `json:"x"`
+		}
+		err := cfg.getValue(t, `x: string`).Decode(&st)
+		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.Equals(fmt.Sprint(st.X), "string"))
 
-	// Check we can decode into a top level value.
-	var v Value
-	err = getValue(t, `int`).Decode(&v)
-	qt.Assert(t, qt.IsNil(err))
-	qt.Assert(t, qt.Equals(fmt.Sprint(v), "int"))
+		// Check we can decode into a top level value.
+		var v Value
+		err = cfg.getValue(t, `int`).Decode(&v)
+		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.Equals(fmt.Sprint(v), "int"))
+	})
 }
 
 type Duration struct {

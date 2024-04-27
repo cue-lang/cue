@@ -122,13 +122,9 @@ func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope
 			label := x.Label
 
 			if a, ok := x.Label.(*ast.Alias); ok {
-				// TODO(legacy): use name := a.Ident.Name once quoted
-				// identifiers are no longer supported.
-				label, _ = a.Expr.(ast.Label)
-				if name, _, _ := ast.LabelName(a.Ident); name != "" {
-					if _, ok := label.(*ast.ListLit); !ok {
-						s.insert(name, x, a)
-					}
+				name := a.Ident.Name
+				if _, ok := a.Expr.(*ast.ListLit); !ok {
+					s.insert(name, x, a)
 				}
 			}
 

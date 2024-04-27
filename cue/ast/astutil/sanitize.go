@@ -50,11 +50,11 @@ func Sanitize(f *ast.File) error {
 	}
 
 	// Gather all names.
-	walk(&scope{
+	ast.WalkVisitor(f, &scope{
 		errFn:   z.errf,
 		nameFn:  z.addName,
 		identFn: z.markUsed,
-	}, f)
+	})
 	if z.errs != nil {
 		return z.errs
 	}
@@ -67,7 +67,7 @@ func Sanitize(f *ast.File) error {
 		index:   make(map[string]entry),
 	}
 	z.fileScope = s
-	walk(s, f)
+	ast.WalkVisitor(f, s)
 	if z.errs != nil {
 		return z.errs
 	}

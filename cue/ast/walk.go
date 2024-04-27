@@ -28,23 +28,28 @@ func Walk(node Node, before func(Node) bool, after func(Node)) {
 	walk(&inspector{before: before, after: after}, node)
 }
 
-// A visitor's before method is invoked for each node encountered by Walk.
-// If the result visitor w is true, Walk visits each of the children
-// of node with the visitor w, followed by a call of w.After.
-type visitor interface {
-	Before(node Node) (w visitor)
+// WalkVisitor traverses an AST in depth-first order with a [Visitor].
+func WalkVisitor(node Node, visitor Visitor) {
+	walk(visitor, node)
+}
+
+// A Visitor's before method is invoked for each node encountered by Walk.
+// If the result Visitor w is true, Walk visits each of the children
+// of node with the Visitor w, followed by a call of w.After.
+type Visitor interface {
+	Before(node Node) (w Visitor)
 	After(node Node)
 }
 
 // Helper functions for common node lists. They may be empty.
 
-func walkExprList(v visitor, list []Expr) {
+func walkExprList(v Visitor, list []Expr) {
 	for _, x := range list {
 		walk(v, x)
 	}
 }
 
-func walkDeclList(v visitor, list []Decl) {
+func walkDeclList(v Visitor, list []Decl) {
 	for _, x := range list {
 		walk(v, x)
 	}
@@ -55,7 +60,7 @@ func walkDeclList(v visitor, list []Decl) {
 // v.Visit(node) is not nil, walk is invoked recursively with visitor
 // w for each of the non-nil children of node, followed by a call of
 // w.Visit(nil).
-func walk(v visitor, node Node) {
+func walk(v Visitor, node Node) {
 	if v = v.Before(node); v == nil {
 		return
 	}
@@ -215,7 +220,7 @@ type commentFrame struct {
 	pos int8
 }
 
-func (f *inspector) Before(node Node) visitor {
+func (f *inspector) Before(node Node) Visitor {
 	if f.before == nil || f.before(node) {
 		f.commentStack = append(f.commentStack, f.current)
 		f.current = commentFrame{cg: Comments(node)}

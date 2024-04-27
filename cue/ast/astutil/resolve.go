@@ -75,14 +75,14 @@ type ErrFunc func(pos token.Pos, msg string, args ...interface{})
 // Resolve resolves all identifiers in a file. Unresolved identifiers are
 // recorded in Unresolved. It will not overwrite already resolved values.
 func Resolve(f *ast.File, errFn ErrFunc) {
-	walk(&scope{errFn: errFn, identFn: resolveIdent}, f)
+	ast.WalkVisitor(f, &scope{errFn: errFn, identFn: resolveIdent})
 }
 
 // Resolve resolves all identifiers in an expression.
 // It will not overwrite already resolved values.
 func ResolveExpr(e ast.Expr, errFn ErrFunc) {
 	f := &ast.File{}
-	walk(&scope{file: f, errFn: errFn, identFn: resolveIdent}, e)
+	ast.WalkVisitor(e, &scope{file: f, errFn: errFn, identFn: resolveIdent})
 }
 
 // A Scope maintains the set of named language entities declared
@@ -250,13 +250,13 @@ func (s *scope) lookup(name string) (p *scope, obj ast.Node, node entry) {
 }
 
 func (s *scope) After(n ast.Node) {}
-func (s *scope) Before(n ast.Node) (w visitor) {
+func (s *scope) Before(n ast.Node) (w ast.Visitor) {
 	switch x := n.(type) {
 	case *ast.File:
 		s := newScope(x, s, x, x.Decls)
 		// Support imports.
 		for _, d := range x.Decls {
-			walk(s, d)
+			ast.WalkVisitor(d, s)
 		}
 		return nil
 
@@ -265,7 +265,7 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 
 	case *ast.Comprehension:
 		s = scopeClauses(s, x.Clauses)
-		walk(s, x.Value)
+		ast.WalkVisitor(x.Value, s)
 		return nil
 
 	case *ast.Field:
@@ -277,10 +277,10 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 
 		switch label := n.(type) {
 		case *ast.ParenExpr:
-			walk(s, label)
+			ast.WalkVisitor(label, s)
 
 		case *ast.Interpolation:
-			walk(s, label)
+			ast.WalkVisitor(label, s)
 
 		case *ast.ListLit:
 			if len(label.Elts) != 1 {
@@ -317,7 +317,7 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 					}
 				}
 			})
-			walk(s, expr)
+			ast.WalkVisitor(expr, s)
 		}
 
 		if n := x.Value; n != nil {
@@ -329,7 +329,7 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 				n = alias.Expr
 			}
 			s.inField = true
-			walk(s, n)
+			ast.WalkVisitor(n, s)
 			s.inField = false
 		}
 
@@ -342,7 +342,7 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 		delete(s.index, name) // The same name may still appear in another scope
 
 		if x.Expr != nil {
-			walk(s, x.Expr)
+			ast.WalkVisitor(x.Expr, s)
 		}
 		s.index[name] = saved
 		return nil
@@ -354,7 +354,7 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 		delete(s.index, name) // The same name may still appear in another scope
 
 		if x.Expr != nil {
-			walk(s, x.Expr)
+			ast.WalkVisitor(x.Expr, s)
 		}
 		s.index[name] = saved
 		return nil
@@ -367,7 +367,7 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 		// that resolve in a list.
 
 	case *ast.SelectorExpr:
-		walk(s, x.X)
+		ast.WalkVisitor(x.X, s)
 		return nil
 
 	case *ast.Ident:
@@ -410,7 +410,7 @@ func scopeClauses(s *scope, clauses []ast.Clause) *scope {
 	for _, c := range clauses {
 		switch x := c.(type) {
 		case *ast.ForClause:
-			walk(s, x.Source)
+			ast.WalkVisitor(x.Source, s)
 			s = newScope(s.file, s, x, nil)
 			if x.Key != nil {
 				s.insert(x.Key.Name, x.Key, x)
@@ -418,12 +418,12 @@ func scopeClauses(s *scope, clauses []ast.Clause) *scope {
 			s.insert(x.Value.Name, x.Value, x)
 
 		case *ast.LetClause:
-			walk(s, x.Expr)
+			ast.WalkVisitor(x.Expr, s)
 			s = newScope(s.file, s, x, nil)
 			s.insert(x.Ident.Name, x.Ident, x)
 
 		default:
-			walk(s, c)
+			ast.WalkVisitor(c, s)
 		}
 	}
 	return s

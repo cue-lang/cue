@@ -41,17 +41,9 @@ type Visitor interface {
 	After(node Node)
 }
 
-// Helper functions for common node lists. They may be empty.
-
-func walkExprList(v Visitor, list []Expr) {
-	for _, x := range list {
-		walk(v, x)
-	}
-}
-
-func walkDeclList(v Visitor, list []Decl) {
-	for _, x := range list {
-		walk(v, x)
+func walkList[N Node](v Visitor, list []N) {
+	for _, node := range list {
+		walk(v, node)
 	}
 }
 
@@ -67,9 +59,7 @@ func walk(v Visitor, node Node) {
 
 	// TODO: record the comment groups and interleave with the values like for
 	// parsing and printing?
-	for _, c := range Comments(node) {
-		walk(v, c)
-	}
+	walkList(v, Comments(node))
 
 	// walk children
 	// (the order of the cases matches the order
@@ -80,9 +70,7 @@ func walk(v Visitor, node Node) {
 		// nothing to do
 
 	case *CommentGroup:
-		for _, c := range n.List {
-			walk(v, c)
-		}
+		walkList(v, n.List)
 
 	case *Attribute:
 		// nothing to do
@@ -92,28 +80,24 @@ func walk(v Visitor, node Node) {
 		if n.Value != nil {
 			walk(v, n.Value)
 		}
-		for _, a := range n.Attrs {
-			walk(v, a)
-		}
+		walkList(v, n.Attrs)
 
 	case *Func:
-		walkExprList(v, n.Args)
+		walkList(v, n.Args)
 		walk(v, n.Ret)
 
 	case *StructLit:
-		walkDeclList(v, n.Elts)
+		walkList(v, n.Elts)
 
 	// Expressions
 	case *BottomLit, *BadExpr, *Ident, *BasicLit:
 		// nothing to do
 
 	case *Interpolation:
-		for _, e := range n.Elts {
-			walk(v, e)
-		}
+		walkList(v, n.Elts)
 
 	case *ListLit:
-		walkExprList(v, n.Elts)
+		walkList(v, n.Elts)
 
 	case *Ellipsis:
 		if n.Type != nil {
@@ -142,7 +126,7 @@ func walk(v Visitor, node Node) {
 
 	case *CallExpr:
 		walk(v, n.Fun)
-		walkExprList(v, n.Args)
+		walkList(v, n.Args)
 
 	case *UnaryExpr:
 		walk(v, n.X)
@@ -162,9 +146,7 @@ func walk(v Visitor, node Node) {
 		// nothing to do
 
 	case *ImportDecl:
-		for _, s := range n.Specs {
-			walk(v, s)
-		}
+		walkList(v, n.Specs)
 
 	case *EmbedDecl:
 		walk(v, n.Expr)
@@ -178,14 +160,12 @@ func walk(v Visitor, node Node) {
 		walk(v, n.Expr)
 
 	case *Comprehension:
-		for _, c := range n.Clauses {
-			walk(v, c)
-		}
+		walkList(v, n.Clauses)
 		walk(v, n.Value)
 
 	// Files and packages
 	case *File:
-		walkDeclList(v, n.Decls)
+		walkList(v, n.Decls)
 
 	case *Package:
 		walk(v, n.Name)

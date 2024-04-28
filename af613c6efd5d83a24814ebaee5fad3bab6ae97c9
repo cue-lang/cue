@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97d6173e_92c6e6e3",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_stdin.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-28T07:46:15Z",
+      "side": 1,
+      "message": "I would strengthen this test by also asserting the output on stderr.",
+      "revId": "af613c6efd5d83a24814ebaee5fad3bab6ae97c9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

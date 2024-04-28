@@ -17,6 +17,7 @@ package cmd
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -98,6 +99,10 @@ func newFmtCmd(c *Command) *cobra.Command {
 						file.Source = original
 					}
 					cfg.Out = &formatted
+					if file.Filename == "-" && !doDiff && !check {
+						// Always write to stdout if the file is read from stdin.
+						cfg.Out = io.MultiWriter(cfg.Out, stdout)
+					}
 
 					var files []*ast.File
 					d := encoding.NewDecoder(cmd.ctx, file, &cfg)
@@ -150,9 +155,7 @@ func newFmtCmd(c *Command) *cobra.Command {
 					case check:
 						fmt.Fprintln(stdout, path)
 					case file.Filename == "-":
-						if _, err := fmt.Fprint(stdout, formatted.String()); err != nil {
-							exitOnErr(cmd, err, false)
-						}
+						// already written to stdout during encoding
 					default:
 						if err := os.WriteFile(file.Filename, formatted.Bytes(), 0644); err != nil {
 							exitOnErr(cmd, err, false)

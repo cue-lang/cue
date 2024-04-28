@@ -1,11 +1,29 @@
-stdin feed
-exec cue fmt -
-cmp stdout expect-stdout
+# Verify that `cue fmt -` always writes valid CUE provided
+# in stdin to stdout, even if it is well formatted.
 
--- feed --
+stdin not-formatted
+exec cue fmt -
+cmp stdout formatted
+
+stdin formatted
+exec cue fmt -
+cmp stdout formatted
+
+# Verify that `cue fmt -` does not write invalid CUE to stdout.
+stdin syntax-error
+! exec cue fmt -
+! stdout .
+cmp stderr syntax-error.stderr-golden
+
+-- syntax-error --
+a: {
+-- syntax-error.stderr-golden --
+expected '}', found 'EOF':
+    -:1:6
+-- not-formatted --
 foo : 2
 a: {b: 3} // a comment
--- expect-stdout --
+-- formatted --
 foo: 2
 a: {b: 3} // a comment
 -- fmt/cue.mod/module.cue --

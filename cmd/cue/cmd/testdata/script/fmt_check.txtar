@@ -5,6 +5,7 @@ exec cue fmt --check formatted.cue
 
 stdin formatted.cue
 exec cue fmt --check -
+! stdout .
 
 # fails and displays non formatted files
 ! exec cue fmt --check not_formatted.cue another/not_formatted.cue

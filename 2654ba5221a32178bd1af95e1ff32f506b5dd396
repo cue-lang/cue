@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8df3467d_ab2750b6",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-28T07:49:03Z",
+      "side": 1,
+      "message": "should we always rely on `newBuildPlan`, even in files mode?",
+      "range": {
+        "startLine": 63,
+        "startChar": 3,
+        "endLine": 71,
+        "endChar": 24
+      },
+      "revId": "2654ba5221a32178bd1af95e1ff32f506b5dd396",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95fd1966_77ca0729",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-28T07:49:03Z",
+      "side": 1,
+      "message": "should we disallow \"-\" in files mode? technically we don\u0027t *have* to exclude it, but I wonder which one is more intuitive",
+      "range": {
+        "startLine": 119,
+        "startChar": 5,
+        "endLine": 121,
+        "endChar": 13
+      },
+      "revId": "2654ba5221a32178bd1af95e1ff32f506b5dd396",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

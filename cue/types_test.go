@@ -1910,6 +1910,7 @@ func TestElem(t *testing.T) {
 		value string
 		path  []string
 		want  string
+		skip  bool
 	}{{
 		value: `
 		a: [...int]
@@ -1941,10 +1942,13 @@ func TestElem(t *testing.T) {
 		`,
 		path: []string{"a", "foo", "b", ""},
 		want: "{\n\tc: \"foo\" + string\n\td: string\n}",
+		skip: true, // TODO(p3): Skip because this is just a reordering.
 	}}
 	for _, tc := range testCases {
 		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
-			TODO_V3(t, cfg)
+			if tc.skip {
+				TODO_V3(t, cfg)
+			}
 
 			v := cfg.getValue(t, tc.value)
 			v.v.Finalize(v.ctx()) // TODO: do in instance.

@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "559064ed_b8b7dc29",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-29T15:23:52Z",
+      "side": 1,
+      "message": "I think @mvdan@mvdan.cc is also going to follow up with some further comments",
+      "revId": "e26fca153c7807b085e54365fe7068316ca5b98c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5b99fdac_2c0a44d0",
@@ -37,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c5cf041a_0fa74cce",
+        "filename": "cmd/cue/cmd/version.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-29T15:23:52Z",
+      "side": 1,
+      "message": "I\u0027d tend to agree.",
+      "parentUuid": "5b99fdac_2c0a44d0",
+      "revId": "e26fca153c7807b085e54365fe7068316ca5b98c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3a84b186_7b3f4390",
         "filename": "internal/cueversion/version.go",
         "patchSetId": 2
@@ -48,6 +83,24 @@
       "writtenOn": "2024-04-29T15:12:18Z",
       "side": 1,
       "message": "Just like in the other comment, I\u0027m honestly not fond of \"build version\" and would prefer to just keep \"version\" here.\n\n(also note you forgot about the first godoc word)",
+      "revId": "e26fca153c7807b085e54365fe7068316ca5b98c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94e7fc46_9d197dd6",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-29T15:23:52Z",
+      "side": 1,
+      "message": "Having seen this code in review form, I\u0027d tend to agree.",
+      "parentUuid": "3a84b186_7b3f4390",
       "revId": "e26fca153c7807b085e54365fe7068316ca5b98c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

@@ -1,0 +1,28 @@
+# Check that we can use the cue mod publish command to create an
+# OCI image.
+
+env CUE_EXPERIMENT=modules
+env CUE_CACHE_DIR=$WORK/.tmp/cache
+
+exec cue mod publish --out $WORK/image v0.0.1
+stdout '^wrote image for example.com@v0.0.1 to .*/image$'
+
+cmp $WORK/image/oci-layout $WORK/want-oci-layout
+exists $WORK/image/index.json
+exists $WORK/image/blobs
+
+-- want-oci-layout --
+{
+    "imageLayoutVersion": "1.0.0"
+}
+-- cue.mod/module.cue --
+module: "example.com@v0"
+language: version: "v0.9.0-alpha.0"
+
+source: kind: "self"
+
+-- foo.cue --
+package foo
+
+"example.com/foo@v0": "v0.0.1"
+

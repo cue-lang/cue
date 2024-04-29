@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f60e7aca_aa3c42cd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-29T15:34:10Z",
+      "side": 1,
+      "message": "I think it\u0027s useful particularly if someone is running a custom build on top of a commit we don\u0027t have access to. It says _something_ about the version of CUE even in the absence of meaningful build info.",
+      "parentUuid": "b39179ea_821553e7",
+      "revId": "e26fca153c7807b085e54365fe7068316ca5b98c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5b99fdac_2c0a44d0",
         "filename": "cmd/cue/cmd/version.go",
         "patchSetId": 2
@@ -124,6 +142,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6b089d94_54046340",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-29T15:34:10Z",
+      "side": 1,
+      "message": "The reason I went with \"BuildVersion\" is to distinguish it from the other kind of version also provided by this cueversion package and because that\u0027s the way I\u0027ve been describing it elsewhere. I do think it\u0027s worth making the distinction clear, otherwise why would anyone know what the difference was between cueversion.LanguageVersion and cueversion.Version.\n\nHow about \"ModuleVersion\"?\n\nOr even `cueversion.Language` and `cueversion.Module` I guess?",
+      "parentUuid": "3a84b186_7b3f4390",
+      "revId": "e26fca153c7807b085e54365fe7068316ca5b98c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a2362cdb_c323266a",
         "filename": "internal/cueversion/version.go",
         "patchSetId": 2
@@ -152,6 +188,24 @@
       "writtenOn": "2024-04-29T15:12:18Z",
       "side": 1,
       "message": "Just like `cue version`, I\u0027m not sure I agree with showing the language version first. The main point of the user agent string is literally to tell the server what version the client software is running, to e.g. work around old client bugs or to know when the client is new enough to handle new kinds of responses.\n\nMoreover, the user-agent syntax is like \"\u003cproduct\u003e / \u003cproduct-version\u003e\". The latest pre-release we have right now has a \"product version\" of v0.9.0-alpha.3, not v0.9.0. If anything, the language version is the extra string that should go later as a comment.",
+      "revId": "e26fca153c7807b085e54365fe7068316ca5b98c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59336bc2_e9e12f8b",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-29T15:34:10Z",
+      "side": 1,
+      "message": "The reason I went with it this way round is because the version as reported by the build info is somewhat less structured (for example it can contain parentheses). My reasoning was also that the language version in telling the server what protocol the client is using - it\u0027s always going to be present, unlike the build version.\n\nThat said, I don\u0027t feel strongly. I\u0027ll change it as you suggest.",
+      "parentUuid": "8bb1ea2f_010f1616",
       "revId": "e26fca153c7807b085e54365fe7068316ca5b98c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

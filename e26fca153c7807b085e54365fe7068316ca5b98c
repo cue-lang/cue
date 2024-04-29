@@ -90,6 +90,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d4c4bde3_cbb48166",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-29T16:17:04Z",
+      "side": 1,
+      "message": "\u003e all bets are off\n\nIt at least gives _some_ clue, I think. As in \"forked at least after this version\" information. Given that we\u0027re also including lots of random not-usually-relevant information about the Go build, I\u0027d be inclined to keep it in.\n\nOne possibility might be to include it as one of the attribute-value pairs along with `vcs.revision` etc. Say `cue.language.version`. WDYT?",
+      "parentUuid": "72869748_60fdcc95",
+      "revId": "e26fca153c7807b085e54365fe7068316ca5b98c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5b99fdac_2c0a44d0",
         "filename": "cmd/cue/cmd/version.go",
         "patchSetId": 2

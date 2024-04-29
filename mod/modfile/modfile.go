@@ -262,8 +262,8 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 		if !semver.IsValid(base.Language.Version) {
 			return nil, fmt.Errorf("language version %q in module.cue is not valid semantic version", base.Language.Version)
 		}
-		if semver.Compare(base.Language.Version, cueversion.Version()) > 0 {
-			return nil, fmt.Errorf("language version %q declared in module.cue is too new for current version %q", base.Language.Version, cueversion.Version())
+		if mv, lv := base.Language.Version, cueversion.LanguageVersion(); semver.Compare(mv, lv) > 0 {
+			return nil, fmt.Errorf("language version %q declared in module.cue is too new for current language version %q", mv, lv)
 		}
 		// Now that we're happy we're within bounds, find the latest
 		// schema that applies to the declared version.

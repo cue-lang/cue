@@ -162,10 +162,8 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 
 	w := v.DerefDisjunct()
 	if w != v {
-		if w.Closed {
-			// Should resolve with dereference.
-			v.Closed = true
-		}
+		// Should resolve with dereference.
+		v.Closed = w.Closed
 		v.status = w.status
 		v.ChildErrors = CombineErrors(nil, v.ChildErrors, w.ChildErrors)
 		v.Arcs = nil
@@ -282,19 +280,37 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		v.ChildErrors = nil
 		v.Arcs = nil
 
+		result := w.unify(c, needs, mode)
+
 		// Set control fields that are referenced without dereferencing.
 		if w.Closed {
-			// Should resolve with dereference.
 			v.Closed = true
 		}
-
-		result := w.unify(c, needs, mode)
+		if w.HasEllipsis {
+			v.HasEllipsis = true
+		}
 		v.status = w.status
+
 		return result
 	}
 
+	// TODO: adding this is wrong, but it should not cause the snippet below
+	// to hang. Investigate.
+	// v.Closed = v.cc.isClosed
+	//
+	// This hangs:
+	// issue1940: {
+	// 	#T: ["a", #T] | ["c", #T] | ["d", [...#T]]
+	// 	#A: t: #T
+	// 	#B: x: #A
+	// 	#C: #B
+	// 	#C: x: #A
+	// }
+
 	// validationCompleted
 	if n.completed&(subFieldsProcessed) != 0 {
+		n.node.HasEllipsis = n.node.cc.hasEllipsis
+
 		n.node.updateStatus(finalized)
 
 		defer n.unmarkOptional(n.markOptional())

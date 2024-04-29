@@ -1159,6 +1159,8 @@ func (v hiddenValue) IsClosed() bool {
 	case ListKind:
 		return v.v.IsClosedList()
 	case StructKind:
+		// TODO: remove this more expensive computation once the old evaluator
+		// is removed.
 		return !v.Allows(AnyString)
 	}
 	return false
@@ -1169,6 +1171,9 @@ func (v hiddenValue) IsClosed() bool {
 // Allows does not take into account validators like list.MaxItems(4). This may
 // change in the future.
 func (v Value) Allows(sel Selector) bool {
+	if v.v.HasEllipsis {
+		return true
+	}
 	c := v.ctx()
 	f := sel.sel.feature(c)
 	return v.v.Accept(c, f)

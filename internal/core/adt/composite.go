@@ -186,6 +186,10 @@ type Vertex struct {
 	// conjuncts, or ancestor conjuncts, is a definition.
 	Closed bool
 
+	// HasEllipsis indicates that this Vertex is open by means of an ellipsis.
+	// TODO: combine this field with Closed once we removed the old evaluator.
+	HasEllipsis bool
+
 	// MultiLet indicates whether multiple let fields were added from
 	// different sources. If true, a LetReference must be resolved using
 	// the per-Environment value cache.
@@ -925,9 +929,21 @@ func (v *Vertex) accepts(ok, required bool) bool {
 }
 
 func (v *Vertex) IsClosedStruct() bool {
+	// TODO: uncomment this. This fixes a bunch of closedness bugs
+	// in the old and new evaluator. For compability sake, though, we
+	// keep it as is for now.
+	// if v.Closed {
+	// 	return true
+	// }
+	// if v.HasEllipsis {
+	// 	return false
+	// }
 	switch x := v.BaseValue.(type) {
 	default:
 		return false
+
+	case *Vertex:
+		return v.Closed && !v.HasEllipsis
 
 	case *StructMarker:
 		if x.NeedClose {

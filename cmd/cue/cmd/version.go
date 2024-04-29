@@ -56,8 +56,12 @@ func runVersion(cmd *Command, args []string) error {
 		// shouldn't happen
 		return errors.New("unknown error reading build-info")
 	}
-	fmt.Fprintf(w, "cue version %s\n\n", cueVersion())
+	fmt.Fprintf(w, "cue version %s\n\n", moduleVersion())
 	fmt.Fprintf(w, "go version %s\n", runtime.Version())
+	bi.Settings = append(bi.Settings, debug.BuildSetting{
+		Key:   "cue.lang.version",
+		Value: cueversion.LanguageVersion(),
+	})
 	for _, s := range bi.Settings {
 		if s.Value == "" {
 			// skip empty build settings
@@ -68,16 +72,17 @@ func runVersion(cmd *Command, args []string) error {
 		//   veryverylong.key value
 		//          short.key some-other-value
 		//
-		// Empirically, 16 is enough; the longest key seen is "vcs.revision".
+		// Empirically, 16 is enough; the longest key seen outside our own "cue.lang.version"
+		// is "vcs.revision".
 		fmt.Fprintf(w, "%16s %s\n", s.Key, s.Value)
 	}
 	return nil
 }
 
-// cueVersion returns the version of the CUE module as much
+// moduleVersion returns the version of the main module as much
 // as can reasonably be determined. If no version can be
 // determined, it returns the empty string.
-func cueVersion() string {
+func moduleVersion() string {
 	if testing.Testing() {
 		if v := os.Getenv("CUE_VERSION_OVERRIDE"); v != "" {
 			return v
@@ -87,7 +92,7 @@ func cueVersion() string {
 		// The global version variable has been configured via ldflags.
 		return v
 	}
-	return cueversion.Version()
+	return cueversion.ModuleVersion()
 }
 
 func readBuildInfo() (*debug.BuildInfo, bool) {

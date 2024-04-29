@@ -1,6 +1,7 @@
 # Test that we can use the --source flag to cue mod init.
 
-env CUE_VERSION_OVERRIDE=v0.9.0-alpha.2
+env-fill $WORK/want-module.cue-0
+env-fill $WORK/want-module.cue-1
 
 mkdir $WORK/test0
 cd $WORK/test0
@@ -20,7 +21,7 @@ cmp stderr $WORK/want-stderr
 -- want-module.cue-0 --
 module: "test.example"
 language: {
-	version: "v0.9.0-alpha.2"
+	version: "$CUE_LANGUAGE_VERSION"
 }
 source: {
 	kind: "self"
@@ -28,7 +29,7 @@ source: {
 -- want-module.cue-1 --
 module: "test.example"
 language: {
-	version: "v0.9.0-alpha.2"
+	version: "$CUE_LANGUAGE_VERSION"
 }
 source: {
 	kind: "git"

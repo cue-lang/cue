@@ -10,34 +10,53 @@ import (
 	"sync"
 )
 
-// fallbackVersion is used when there isn't a recorded main module version,
-// for example when building via `go install ./cmd/cue`.
-// It should reflect the last release in the current branch.
-//
-// TODO: remove once Go stamps local builds with a main module version
-// derived from the local VCS information per https://go.dev/issue/50603.
-const fallbackVersion = "v0.9.0-alpha.3"
-
-// Version returns the version of the cuelang.org/go module as best as can
-// reasonably be determined. The result is always a valid Go semver version.
-func Version() string {
-	return versionOnce()
+// LanguageVersion returns the CUE language version.
+// This determines the latest version of CUE that
+// is accepted by the module.
+func LanguageVersion() string {
+	return "v0.9.0"
 }
 
-var versionOnce = sync.OnceValue(func() string {
+// ModuleVersion returns the version of the cuelang.org/go module as best as can
+// reasonably be determined. This is provided for informational
+// and debugging purposes and should not be used to predicate
+// version-specific behavior.
+func ModuleVersion() string {
+	return moduleVersionOnce()
+}
+
+const cueModule = "cuelang.org/go"
+
+var moduleVersionOnce = sync.OnceValue(func() string {
 	bi, ok := debug.ReadBuildInfo()
 	if !ok {
-		return fallbackVersion
+		// This might happen if the binary was not built with module support
+		// or with an alternative toolchain.
+		return "(no-build-info)"
 	}
-	switch bi.Main.Version {
-	case "": // missing version
-	case "(devel)": // local build
-	case "v0.0.0-00010101000000-000000000000": // build via a directory replace directive
-	default:
-		return bi.Main.Version
+	cueMod := findCUEModule(bi)
+	if cueMod == nil {
+		// Could happen if someone has forked CUE under a different
+		// module name; it also happens when running the cue tests.
+		return "(no-cue-module)"
 	}
-	return fallbackVersion
+	return cueMod.Version
 })
+
+func findCUEModule(bi *debug.BuildInfo) *debug.Module {
+	if bi.Main.Path == cueModule {
+		return &bi.Main
+	}
+	for _, m := range bi.Deps {
+		if m.Replace != nil && m.Replace.Path == cueModule {
+			return m.Replace
+		}
+		if m.Path == cueModule {
+			return m
+		}
+	}
+	return nil
+}
 
 // UserAgent returns a string suitable for adding as the User-Agent
 // header in an HTTP agent. The clientType argument specifies
@@ -45,7 +64,7 @@ var versionOnce = sync.OnceValue(func() string {
 //
 // Example:
 //
-//	Cue/v0.8.0 (cuelang.org/go) Go/go1.22.0 (linux/amd64)
+//	Cue/v0.8.0 (cuelang.org/go; vxXXX) Go/go1.22.0 (linux/amd64)
 func UserAgent(clientType string) string {
 	if clientType == "" {
 		clientType = "cuelang.org/go"
@@ -55,5 +74,6 @@ func UserAgent(clientType string) string {
 	// As the runtime version won't contain underscores itself, this
 	// is reversible.
 	goVersion := strings.ReplaceAll(runtime.Version(), " ", "_")
-	return fmt.Sprintf("Cue/%s (%s) Go/%s (%s/%s)", Version(), clientType, goVersion, runtime.GOOS, runtime.GOARCH)
+
+	return fmt.Sprintf("Cue/%s (%s; lang %s) Go/%s (%s/%s)", ModuleVersion(), clientType, LanguageVersion(), goVersion, runtime.GOOS, runtime.GOARCH)
 }

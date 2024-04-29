@@ -46,6 +46,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/cuetest"
+	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/registrytest"
 )
 
@@ -232,6 +233,7 @@ func TestScript(t *testing.T) {
 			e.Vars = append(e.Vars,
 				"GOPROXY="+srv.URL,
 				"GONOSUMDB=*", // GOPROXY is a private proxy
+				"CUE_LANGUAGE_VERSION="+cueversion.LanguageVersion(),
 			)
 			entries, err := os.ReadDir(e.WorkDir)
 			if err != nil {

@@ -56,7 +56,8 @@ func runVersion(cmd *Command, args []string) error {
 		// shouldn't happen
 		return errors.New("unknown error reading build-info")
 	}
-	fmt.Fprintf(w, "cue version %s\n\n", cueVersion())
+	fmt.Fprintf(w, "language version %s\n", cueversion.LanguageVersion())
+	fmt.Fprintf(w, "build version %s\n\n", buildVersion())
 	fmt.Fprintf(w, "go version %s\n", runtime.Version())
 	for _, s := range bi.Settings {
 		if s.Value == "" {
@@ -74,10 +75,10 @@ func runVersion(cmd *Command, args []string) error {
 	return nil
 }
 
-// cueVersion returns the version of the CUE module as much
+// buildVersion returns the build version of the main module as much
 // as can reasonably be determined. If no version can be
 // determined, it returns the empty string.
-func cueVersion() string {
+func buildVersion() string {
 	if testing.Testing() {
 		if v := os.Getenv("CUE_VERSION_OVERRIDE"); v != "" {
 			return v
@@ -87,7 +88,7 @@ func cueVersion() string {
 		// The global version variable has been configured via ldflags.
 		return v
 	}
-	return cueversion.Version()
+	return cueversion.BuildVersion()
 }
 
 func readBuildInfo() (*debug.BuildInfo, bool) {

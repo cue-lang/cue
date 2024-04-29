@@ -35,6 +35,7 @@ const (
 	flagInject        flagName = "inject"
 	flagInjectVars    flagName = "inject-vars"
 	flagInlineImports flagName = "inline-imports"
+	flagJSON          flagName = "json"
 	flagList          flagName = "list"
 	flagMerge         flagName = "merge"
 	flagOut           flagName = "out"

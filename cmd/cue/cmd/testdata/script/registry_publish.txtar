@@ -4,7 +4,7 @@ env ORIG_CUE_REGISTRY=$CUE_REGISTRY
 env CUE_REGISTRY=example.com=$MEMREGISTRY+insecure,$CUE_REGISTRY
 cd example
 exec cue mod publish v0.0.1
-cmp stdout ../expect-publish-stdout
+stdout '^published example.com@v0.0.1 to [^ ]+/example.com:v0.0.1@sha256:[0-9a-f]+$'
 cd ../main
 exec cue eval .
 cmp stdout ../expect-eval-stdout
@@ -15,8 +15,6 @@ env CUE_CACHE_DIR=$WORK/.tmp/different-cache
 ! exec cue eval
 stderr 'repository name not known to registry'
 
--- expect-publish-stdout --
-published example.com@v0.0.1
 -- expect-eval-stdout --
 main:                   "main"
 "foo.com/bar/hello@v0": "v0.2.3"

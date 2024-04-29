@@ -1,0 +1,37 @@
+# Check that we can use the cue mod publish command to
+# print information about the module to be published in JSON
+# format
+
+env CUE_EXPERIMENT=modules
+env CUE_CACHE_DIR=$WORK/.tmp/cache
+
+cd example
+exec cue mod publish --json v0.0.1
+cp stdout $WORK/got.json
+
+# Note: use a CUE schema here because we don't
+# to hard-code the exact result.
+cd $WORK
+exec cue vet got.json want.cue
+
+-- want.cue --
+#schema: {
+	version!: "example.com@v0.0.1"
+	ref!: =~ "^registry.cue.works/example.com:v0.0.1@sha256:[a-f0-9]+$"
+	files!: [
+		"cue.mod/module.cue",
+		"foo.cue",
+	]
+}
+#schema
+-- example/cue.mod/module.cue --
+module: "example.com@v0"
+language: version: "v0.9.0-alpha.0"
+
+source: kind: "self"
+
+-- example/foo.cue --
+package foo
+
+"example.com/foo@v0": "v0.0.1"
+

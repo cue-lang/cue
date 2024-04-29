@@ -340,8 +340,6 @@ func TestValueType(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		runMatrix(t, tc.value, func(t *testing.T, cfg *evalConfig) {
-			TODO_V3(t, cfg)
-
 			inst := cfg.getValue(t, tc.value)
 			v := inst.Lookup("v")
 			if got := v.Kind(); got != tc.kind {

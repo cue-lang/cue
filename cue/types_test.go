@@ -3229,6 +3229,7 @@ func TestPos(t *testing.T) {
 	testCases := []struct {
 		value string
 		pos   string
+		skip  bool
 	}{{
 		value: `
 a: string
@@ -3239,6 +3240,10 @@ a: "foo"`,
 a: x: string
 a: x: "x"`,
 		pos: "2:4",
+
+		// the position is of the new evaluator is also correct, and actually
+		// better.
+		skip: true,
 	}, {
 		// Prefer struct conjuncts with actual fields.
 		value: `
@@ -3258,7 +3263,9 @@ a: x: y: z: "x"`,
 	}}
 	for _, tc := range testCases {
 		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
-			TODO_V3(t, cfg)
+			if tc.skip {
+				TODO_V3(t, cfg)
+			}
 
 			var c Context
 			(*runtime.Runtime)(&c).Init()

@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/go-quicktest/qt"
-	"golang.org/x/mod/semver"
 )
 
 func TestVersion(t *testing.T) {
@@ -17,14 +16,14 @@ func TestVersion(t *testing.T) {
 	// enough that that would amount to creating invariants
 	// that just match the code, not providing any more
 	// assurance of correctness.
-	vers := Version()
-	qt.Assert(t, qt.Satisfies(vers, semver.IsValid))
+	vers := ModuleVersion()
+	qt.Assert(t, qt.Not(qt.Equals(vers, "")))
 }
 
 func TestUserAgent(t *testing.T) {
 	agent := UserAgent("custom")
 	qt.Assert(t, qt.Matches(agent,
-		`Cue/v[^ ]+ \(custom\) Go/[^ ]+ \([^/]+/[^/]+\)`,
+		`Cue/[^ ]+ \(custom; v[^)]+\) Go/[^ ]+ \([^/]+/[^/]+\)`,
 	))
 }
 
@@ -41,5 +40,5 @@ func TestTransport(t *testing.T) {
 	defer resp.Body.Close()
 	data, err := io.ReadAll(resp.Body)
 	qt.Assert(t, qt.IsNil(err))
-	qt.Assert(t, qt.Matches(string(data), `Cue/v[^ ]+ \(foo\) Go/[^ ]+ \([^/]+/[^/]+\)`))
+	qt.Assert(t, qt.Matches(string(data), `Cue/[^ ]+ \(foo; v[^)]+\) Go/[^ ]+ \([^/]+/[^/]+\)`))
 }

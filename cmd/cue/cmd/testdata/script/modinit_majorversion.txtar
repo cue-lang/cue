@@ -1,4 +1,5 @@
-env CUE_VERSION_OVERRIDE=v0.8.100
+env-fill want-module.cue
+env-fill want-module-experiment.cue
 
 # Without the experiment, the major version is allowed,
 # even though it's not particularly useful.
@@ -19,10 +20,10 @@ exists cue.mod/pkg
 -- want-module.cue --
 module: "foo.com/bar@v1"
 language: {
-	version: "v0.8.100"
+	version: "$CUE_LANGUAGE_VERSION"
 }
 -- want-module-experiment.cue --
 module: "foo.com/bar@v1"
 language: {
-	version: "v0.8.100"
+	version: "$CUE_LANGUAGE_VERSION"
 }

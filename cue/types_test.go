@@ -1850,6 +1850,8 @@ func TestTemplate(t *testing.T) {
 		value string
 		path  []string
 		want  string
+
+		skip bool
 	}{{
 		value: `
 		a: [Name=string]: Name
@@ -1881,10 +1883,14 @@ func TestTemplate(t *testing.T) {
 		`,
 		path: []string{"a", "foo", "b", ""},
 		want: `{"c":"foolabel","d":"label"}`,
+
+		skip: true, // TODO: reordering
 	}}
 	for _, tc := range testCases {
 		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
-			TODO_V3(t, cfg)
+			if tc.skip {
+				TODO_V3(t, cfg)
+			}
 
 			v := cfg.getValue(t, tc.value)
 			for _, p := range tc.path {

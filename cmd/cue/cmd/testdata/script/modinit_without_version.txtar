@@ -1,8 +1,7 @@
-# Check that cue mod init uses the latest schema
-# version when it lacks any version information at all.
-# A zero pseudo-version is one such case, as there are no semver numbers.
+# Check that cue mod init is independent of the build version.
 env CUE_EXPERIMENT=modules
 env CUE_VERSION_OVERRIDE=v0.0.0-00010101000000-000000000000
+env-fill want-module
 exec cue mod init foo.example
 cmp cue.mod/module.cue want-module
 
@@ -15,5 +14,5 @@ cmp cue.mod/module.cue want-module
 -- want-module --
 module: "foo.example@v0"
 language: {
-	version: "v0.9.0-alpha.0"
+	version: "$CUE_LANGUAGE_VERSION"
 }

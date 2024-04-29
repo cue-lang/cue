@@ -127,6 +127,22 @@ func stripNonDefaults(elem Elem) (r Elem, stripped bool) {
 		}
 		return x, false
 
+	case *ConjunctGroup:
+		// NOTE: this code requires allocations unconditional. This should be
+		// mitigated once we optimize conjunct groupings.
+		isNew := false
+		var a ConjunctGroup = make([]Conjunct, len(*x))
+		for i, c := range *x {
+			a[i].x, ok = stripNonDefaults(c.Expr())
+			if ok {
+				isNew = true
+			}
+		}
+		if isNew {
+			return &a, true
+		}
+		return x, false
+
 	default:
 		return x, false
 	}

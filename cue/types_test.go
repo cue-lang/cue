@@ -1784,8 +1784,6 @@ func TestDefaults(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		runMatrix(t, tc.value, func(t *testing.T, cfg *evalConfig) {
-			TODO_V3(t, cfg)
-
 			v := cfg.getValue(t, "a: "+tc.value).Lookup("a")
 
 			v = v.Eval()

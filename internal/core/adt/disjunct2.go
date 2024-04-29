@@ -453,6 +453,14 @@ func (n *nodeContext) finalizeDisjunctions() {
 		return
 	}
 
+	// TODO: we clear the Conjuncts to be compatible with the old evaluator.
+	// This is especially relevant for the API. Ideally, though, we should
+	// update Conjuncts to reflect the actual conjunct that went into the
+	// disjuncts.
+	for _, x := range n.disjuncts {
+		x.node.Conjuncts = nil
+	}
+
 	a := make([]Value, len(n.disjuncts))
 	p := 0
 	hasDefaults := false

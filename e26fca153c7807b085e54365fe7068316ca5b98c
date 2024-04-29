@@ -106,6 +106,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ab1bf19_c9c5e75d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-29T16:42:51Z",
+      "side": 1,
+      "message": "I\u0027ve gone with that as a straw man for now, as I think it\u0027s worth it and it\u0027s trivial to do. We can always remove it later if we want.",
+      "parentUuid": "d4c4bde3_cbb48166",
+      "revId": "e26fca153c7807b085e54365fe7068316ca5b98c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5b99fdac_2c0a44d0",
@@ -137,6 +155,24 @@
       "side": 1,
       "message": "I\u0027d tend to agree.",
       "parentUuid": "5b99fdac_2c0a44d0",
+      "revId": "e26fca153c7807b085e54365fe7068316ca5b98c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "59b33ef2_d56c5d1d",
+        "filename": "cmd/cue/cmd/version.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-29T16:42:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c5cf041a_0fa74cce",
       "revId": "e26fca153c7807b085e54365fe7068316ca5b98c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -212,6 +248,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "84a9c183_8f53bf4f",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-29T16:42:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d4d0b13e_999d544a",
+      "revId": "e26fca153c7807b085e54365fe7068316ca5b98c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a2362cdb_c323266a",
@@ -225,6 +279,24 @@
       "writtenOn": "2024-04-29T15:12:18Z",
       "side": 1,
       "message": "I don\u0027t think this is quite right; you should make sure to check `Module.Replace`. I don\u0027t think we need to go as far as writing a test, but at least we should write reasonably sound logic.",
+      "revId": "e26fca153c7807b085e54365fe7068316ca5b98c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b511748_4128dc0d",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-29T16:42:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a2362cdb_c323266a",
       "revId": "e26fca153c7807b085e54365fe7068316ca5b98c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -278,6 +350,24 @@
       "side": 1,
       "message": "The language version is not about the \"protocol\" or the feature/bug set of the client though. If we start work on v0.10 tomorrow, we will bump its language version to v0.10.0, but all features relating to modules will not have landed yet. The registry _must_ use the module version to tell if a client is running a version new enough - for example, v0.10.0-alpha.2 - that supports a new feature.",
       "parentUuid": "59336bc2_e9e12f8b",
+      "revId": "e26fca153c7807b085e54365fe7068316ca5b98c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6560e4a7_37c499c1",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-29T16:42:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "afa8cec9_c159d443",
       "revId": "e26fca153c7807b085e54365fe7068316ca5b98c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

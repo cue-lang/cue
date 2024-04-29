@@ -13,7 +13,7 @@ exec git add .
 exec git -c user.name=noone -c user.email=noone@example.com commit -m 'initial commit'
 cd cuemodule
 exec cue mod publish v0.0.1
-cmp stdout $WORK/expect-publish-stdout
+stdout '^published x.example/e@v0.0.1 to [^ ]+/x.example/e:v0.0.1@sha256:[0-9a-f]+$'
 cd $WORK/main
 exec cue eval .
 cmp stdout ../expect-eval-stdout

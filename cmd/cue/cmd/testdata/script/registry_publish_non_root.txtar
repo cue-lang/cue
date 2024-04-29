@@ -1,17 +1,15 @@
 # Check that we can use the cue mod publish command to publish to a registry
-# that's protected by authorization.
+# with a repository prefix.
 
 memregistry MEMREGISTRY
 env CUE_EXPERIMENT=modules
 env CUE_CACHE_DIR=$WORK/.tmp/cache
-env CUE_REGISTRY=$MEMREGISTRY+insecure
+env CUE_REGISTRY=$MEMREGISTRY/some/repo+insecure
 
 cd example/foo
 exec cue mod publish v0.0.1
-cmp stdout ../../expect-publish-stdout
+stdout '^published example.com@v0.0.1 to [^ ]+/some/repo/example.com:v0.0.1@sha256:[0-9a-f]+$'
 
--- expect-publish-stdout --
-published example.com@v0.0.1
 -- example/cue.mod/module.cue --
 module: "example.com@v0"
 language: version: "v0.9.0-alpha.0"

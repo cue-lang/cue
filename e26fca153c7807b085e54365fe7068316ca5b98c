@@ -72,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "72869748_60fdcc95",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-29T15:45:06Z",
+      "side": 1,
+      "message": "Personally I\u0027d worry about the most common case - and that is people running official cmd/cue binaries. In such cases, I think it\u0027s rather confusing to tell the user about two versions, when in fact only one version - the module version - truly matters to them. Even to us when we receive bug reports, the `cue language` version does not add any useful info either.\n\nIf someone forks the binary and we don\u0027t know the commit that the embedded build version reports (or the info is missing altogether), then all bets are off. I don\u0027t think knowing the language version helps much. I\u0027d also only worry about such cases if/when they actually pop up.",
+      "parentUuid": "f60e7aca_aa3c42cd",
+      "revId": "e26fca153c7807b085e54365fe7068316ca5b98c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5b99fdac_2c0a44d0",
         "filename": "cmd/cue/cmd/version.go",
         "patchSetId": 2
@@ -160,6 +178,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d4d0b13e_999d544a",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-29T15:45:06Z",
+      "side": 1,
+      "message": "internally, \"module version\" is fine. externally, e.g. in `cue version`, I\u0027d avoid words like \"build\" or \"module\" as they will mean little to someone that e.g. just installs the cue binary via a package manager.",
+      "parentUuid": "6b089d94_54046340",
+      "revId": "e26fca153c7807b085e54365fe7068316ca5b98c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a2362cdb_c323266a",
         "filename": "internal/cueversion/version.go",
         "patchSetId": 2
@@ -206,6 +242,24 @@
       "side": 1,
       "message": "The reason I went with it this way round is because the version as reported by the build info is somewhat less structured (for example it can contain parentheses). My reasoning was also that the language version in telling the server what protocol the client is using - it\u0027s always going to be present, unlike the build version.\n\nThat said, I don\u0027t feel strongly. I\u0027ll change it as you suggest.",
       "parentUuid": "8bb1ea2f_010f1616",
+      "revId": "e26fca153c7807b085e54365fe7068316ca5b98c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "afa8cec9_c159d443",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-29T15:45:06Z",
+      "side": 1,
+      "message": "The language version is not about the \"protocol\" or the feature/bug set of the client though. If we start work on v0.10 tomorrow, we will bump its language version to v0.10.0, but all features relating to modules will not have landed yet. The registry _must_ use the module version to tell if a client is running a version new enough - for example, v0.10.0-alpha.2 - that supports a new feature.",
+      "parentUuid": "59336bc2_e9e12f8b",
       "revId": "e26fca153c7807b085e54365fe7068316ca5b98c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

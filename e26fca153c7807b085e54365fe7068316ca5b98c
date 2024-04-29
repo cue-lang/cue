@@ -37,6 +37,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b39179ea_821553e7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-29T15:25:26Z",
+      "side": 1,
+      "message": "Do we even need to show the language version in `cue version`, or even in the user agent string? Aside from our debugging, I struggle to imagine when a user might ever need to look at the hard-coded language version string. If they know that they are running e.g. v0.10.1 or v0.10.0-alpha.3, how is it helpful to know that the language version is v0.10.0, which is fairly obvious as long as we document the policy?\n\nThe only scenario where including the language version seems necessary is if someone forks the software and follows our language version but uses a different versioning scheme for their software. But honestly that is for them to deal with. For us and cmd/cue, the two versions follow the same path in unison.",
+      "revId": "e26fca153c7807b085e54365fe7068316ca5b98c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5b99fdac_2c0a44d0",
         "filename": "cmd/cue/cmd/version.go",
         "patchSetId": 2

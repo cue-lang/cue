@@ -25,6 +25,7 @@ import (
 	"golang.org/x/mod/semver"
 
 	"cuelang.org/go/internal/cueexperiment"
+	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
 )
@@ -95,14 +96,8 @@ func runModInit(cmd *Command, args []string) (err error) {
 			return err
 		}
 	}
-	vers := versionForModFile()
-	if vers == "" {
-		// Shouldn't happen because we should use the
-		// fallback version if we can't the version otherwise.
-		return fmt.Errorf("cannot determine language version for module")
-	}
 	mf.Language = &modfile.Language{
-		Version: vers,
+		Version: cueversion.LanguageVersion(),
 	}
 
 	err = os.Mkdir(mod, 0755)
@@ -129,7 +124,7 @@ func runModInit(cmd *Command, args []string) (err error) {
 }
 
 func versionForModFile() string {
-	version := cueVersion()
+	version := cueversion.LanguageVersion()
 	earliestPossibleVersion := modfile.EarliestClosedSchemaVersion()
 	if semver.Compare(version, earliestPossibleVersion) < 0 {
 		// The reported version is earlier than it should be,

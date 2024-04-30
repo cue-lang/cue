@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f093e02_1f563cbf",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 970,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T15:37:40Z",
+      "side": 1,
+      "message": "holds",
+      "range": {
+        "startLine": 970,
+        "startChar": 48,
+        "endLine": 970,
+        "endChar": 52
+      },
+      "revId": "e7da411a1e74cda5d38f01289c892e8b96a7aec1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8475410a_0b8f76d2",
+        "filename": "internal/core/adt/share.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T15:37:40Z",
+      "side": 1,
+      "message": "is this \"Use\" out of place, or did you mean to say \"Use DerefValue to:\"? I\u0027d also make it consistent with DerefDisjunct above",
+      "range": {
+        "startLine": 117,
+        "startChar": 3,
+        "endLine": 117,
+        "endChar": 6
+      },
+      "revId": "e7da411a1e74cda5d38f01289c892e8b96a7aec1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

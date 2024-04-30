@@ -310,15 +310,15 @@ issue2367: {
 }
 
 -- out/evalalpha/stats --
-Leaks:  451
+Leaks:  431
 Freed:  12
 Reused: 12
-Allocs: 451
+Allocs: 431
 Retain: 0
 
-Unifications: 375
-Conjuncts:    2094
-Disjuncts:    58
+Unifications: 397
+Conjuncts:    2202
+Disjuncts:    36
 -- out/evalalpha --
 Errors:
 issue1881.p1.o.retry: field not allowed:
@@ -1482,18 +1482,18 @@ diff old new
 -Reused: 1260
 -Allocs: 60
 -Retain: 145
-+Leaks:  451
++Leaks:  431
 +Freed:  12
 +Reused: 12
-+Allocs: 451
++Allocs: 431
 +Retain: 0
  
 -Unifications: 832
 -Conjuncts:    2525
 -Disjuncts:    1404
-+Unifications: 375
-+Conjuncts:    2094
-+Disjuncts:    58
++Unifications: 397
++Conjuncts:    2202
++Disjuncts:    36
 -- out/eval/stats --
 Leaks:  50
 Freed:  1270

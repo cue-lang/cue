@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e1dc5a8e_14d1e0a9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-30T10:19:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5bec15d2_a1ad4e64",
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "40cc755e_1b981d7f",
@@ -31,6 +49,30 @@
       "writtenOn": "2024-04-30T08:32:38Z",
       "side": 1,
       "message": "surely you mean `cue fmt --files -`?",
+      "range": {
+        "startLine": 31,
+        "startChar": 22,
+        "endLine": 31,
+        "endChar": 31
+      },
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d80f68a7_3bcfd8d8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-30T10:19:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "40cc755e_1b981d7f",
       "range": {
         "startLine": 31,
         "startChar": 22,
@@ -72,6 +114,24 @@
       "side": 1,
       "message": "\u003e ... as they only make sense as import paths",
       "parentUuid": "385a03f1_d1881f24",
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ae14dde_f37f54b5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-30T10:19:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "11ef63b7_0549d672",
       "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -134,6 +194,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "16bd1fd3_39f7ad46",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-30T10:19:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7b8ea226_e53355fa",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 12
+      },
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c0f9264f_f4dc7bbe",
@@ -147,6 +231,24 @@
       "writtenOn": "2024-04-30T08:32:38Z",
       "side": 1,
       "message": "nit: `isDot` for consistency",
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8727633_31586d9e",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-30T10:19:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c0f9264f_f4dc7bbe",
       "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -174,6 +276,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2cc481ac_3908d61e",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-30T10:19:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "76c81f54_fb2a1359",
+      "range": {
+        "startLine": 153,
+        "startChar": 10,
+        "endLine": 153,
+        "endChar": 20
+      },
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a26ece55_ac1e4b14",
@@ -187,6 +313,24 @@
       "writtenOn": "2024-04-30T08:32:38Z",
       "side": 1,
       "message": "we should mention the word \"descend\" here as a reminder that we do walk directories. how about:\n\n\u003e \"treat arguments as file paths to descend into rather than import paths\"",
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4ba521b_2027a064",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-30T10:19:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a26ece55_ac1e4b14",
       "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -208,6 +352,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ef1f946_864218a7",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-30T10:19:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ae6ae370_c3c20638",
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c7126486_c2d73658",
@@ -221,6 +383,24 @@
       "writtenOn": "2024-04-30T08:32:38Z",
       "side": 1,
       "message": "this is a result, not an input parameter - move to the end as a separate section of fields?",
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa55abdb_7d442713",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-30T10:19:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c7126486_c2d73658",
       "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -242,6 +422,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "de909088_e0c276d0",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-30T10:19:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff2aa134_f3b3d72b",
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9d2713a4_bd294c27",
@@ -255,6 +453,24 @@
       "writtenOn": "2024-04-30T08:32:38Z",
       "side": 1,
       "message": "the `err !\u003d nil` is unnecessary, as exitOnErr already does nothing on a nil error",
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "959cd530_a38a3926",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-30T10:19:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9d2713a4_bd294c27",
       "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -276,6 +492,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "01816713_6003f5bd",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_files.txtar",
+        "patchSetId": 11
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-30T10:19:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a7af1a5c_96d9045d",
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "383b93c1_13a0eaa4",
@@ -293,6 +527,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "785a641a_40792051",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_files.txtar",
+        "patchSetId": 11
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-30T10:19:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "383b93c1_13a0eaa4",
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f95e8d69_f49a8f53",
@@ -306,6 +558,30 @@
       "writtenOn": "2024-04-30T08:32:38Z",
       "side": 1,
       "message": "nit: `... patterns`, because an import path like `cue fmt --files ./standalone/a` will often still work, as it\u0027s still a valid directory path",
+      "range": {
+        "startLine": 23,
+        "startChar": 37,
+        "endLine": 23,
+        "endChar": 49
+      },
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c342705f_b7bf9cf9",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_files.txtar",
+        "patchSetId": 11
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-30T10:19:44Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f95e8d69_f49a8f53",
       "range": {
         "startLine": 23,
         "startChar": 37,

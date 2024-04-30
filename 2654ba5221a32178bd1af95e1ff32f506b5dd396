@@ -48,6 +48,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9967272b_707eac58",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-30T10:19:44Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "1cb4a42f_8fe1816a",
+      "range": {
+        "startLine": 63,
+        "startChar": 3,
+        "endLine": 71,
+        "endChar": 24
+      },
+      "revId": "2654ba5221a32178bd1af95e1ff32f506b5dd396",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "95fd1966_77ca0729",
@@ -85,6 +109,30 @@
       "side": 1,
       "message": "Not sure. I lean towards allowing it; some people like myself might choose to use `cue fmt --files` as a shell alias, and having the alias fail on stdin feels unnecessary.",
       "parentUuid": "95fd1966_77ca0729",
+      "range": {
+        "startLine": 119,
+        "startChar": 5,
+        "endLine": 121,
+        "endChar": 13
+      },
+      "revId": "2654ba5221a32178bd1af95e1ff32f506b5dd396",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09901c55_f8e9de67",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-30T10:19:44Z",
+      "side": 1,
+      "message": "Agreed. Since `load.Instances` is the code that reads from stdin, I needed to add explicit handling for the stdin in the --files case - let me know if it\u0027s too ugly...",
+      "parentUuid": "ec69a1d9_9d3a464f",
       "range": {
         "startLine": 119,
         "startChar": 5,

@@ -57,6 +57,24 @@
       "parentUuid": "27a06698_fca03a7f",
       "revId": "db5100b437b3f90d5966fef66def9601e9c3db7d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9cc8d9f_fbdc48e4",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1036,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T08:54:13Z",
+      "side": 1,
+      "message": "ack. I didn\u0027t mean remove the conditional FWIW, I only meant the copying.",
+      "parentUuid": "110f64f0_b5c7fa0f",
+      "revId": "db5100b437b3f90d5966fef66def9601e9c3db7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

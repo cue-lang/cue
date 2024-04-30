@@ -208,21 +208,21 @@ issue2052: full: {
 	d: #Depth & {#in: tree}
 }
 -- out/evalalpha/stats --
-Leaks:  22127
-Freed:  1994
-Reused: 1993
-Allocs: 22128
+Leaks:  19985
+Freed:  1462
+Reused: 1461
+Allocs: 19986
 Retain: 0
 
-Unifications: 8358
-Conjuncts:    121910
-Disjuncts:    15463
+Unifications: 7496
+Conjuncts:    107561
+Disjuncts:    13651
 -- out/evalalpha --
 Errors:
 issue2052.t1.#Depth: adding field #basic not allowed as field set was already referenced:
     ./issue2052.cue:8:20
 issue2052.t2.#Depth: adding field #basic not allowed as field set was already referenced:
-    ./issue2052.cue:46:14
+    ./issue2052.cue:41:20
 
 Result:
 (_|_){
@@ -350,7 +350,7 @@ Result:
       // [eval]
       #Depth: (_|_){
         // [eval] issue2052.t2.#Depth: adding field #basic not allowed as field set was already referenced:
-        //     ./issue2052.cue:46:14
+        //     ./issue2052.cue:41:20
         #maxiter: (int){ 4 }
         #funcs: (#struct){
           "4": (null){ null }
@@ -725,18 +725,18 @@ diff old new
 -Reused: 1801
 -Allocs: 84
 -Retain: 185
-+Leaks:  22127
-+Freed:  1994
-+Reused: 1993
-+Allocs: 22128
++Leaks:  19985
++Freed:  1462
++Reused: 1461
++Allocs: 19986
 +Retain: 0
  
 -Unifications: 800
 -Conjuncts:    3175
 -Disjuncts:    1974
-+Unifications: 8358
-+Conjuncts:    121910
-+Disjuncts:    15463
++Unifications: 7496
++Conjuncts:    107561
++Disjuncts:    13651
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
@@ -747,7 +747,7 @@ diff old new
 +issue2052.t1.#Depth: adding field #basic not allowed as field set was already referenced:
 +    ./issue2052.cue:8:20
 +issue2052.t2.#Depth: adding field #basic not allowed as field set was already referenced:
-+    ./issue2052.cue:46:14
++    ./issue2052.cue:41:20
 +
 +Result:
 +(_|_){
@@ -969,7 +969,7 @@ diff old new
 +      // [eval]
 +      #Depth: (_|_){
 +        // [eval] issue2052.t2.#Depth: adding field #basic not allowed as field set was already referenced:
-+        //     ./issue2052.cue:46:14
++        //     ./issue2052.cue:41:20
 +        #maxiter: (int){ 4 }
 +        #funcs: (#struct){
 +          "4": (null){ null }

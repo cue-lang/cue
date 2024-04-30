@@ -964,10 +964,16 @@ func (v *Vertex) IsClosedList() bool {
 
 // TODO: return error instead of boolean? (or at least have version that does.)
 func (v *Vertex) Accept(ctx *OpContext, f Feature) bool {
+	// TODO(#543): remove this check.
+	if f.IsDef() {
+		return true
+	}
+
 	if f.IsHidden() || f.IsLet() {
 		return true
 	}
 
+	v = v.Indirect()
 	if x, ok := v.BaseValue.(*Disjunction); ok {
 		for _, v := range x.Values {
 			if x, ok := v.(*Vertex); ok && x.Accept(ctx, f) {
@@ -997,6 +1003,14 @@ func (v *Vertex) Accept(ctx *OpContext, f Feature) bool {
 		if k != BottomKind || len(v.Structs) == 0 {
 			return false
 		}
+	}
+
+	// TODO: move this check to IsClosedStruct. Right now this causes too many
+	// changes in the debug output, and it also appears to be not entirely
+	// correct.
+	if v.HasEllipsis {
+		return true
+
 	}
 
 	if !v.IsClosedStruct() || v.Lookup(f) != nil {

@@ -25,12 +25,33 @@ import (
 // each of the non-nil children of node, followed by a call of after. Both
 // functions may be nil. If before is nil, it is assumed to always return true.
 func Walk(node Node, before func(Node) bool, after func(Node)) {
-	walk(&inspector{before: before, after: after}, node)
+	v := &inspector{before: before, after: after}
+	walk(node, v.Before, v.After)
 }
 
 // WalkVisitor traverses an AST in depth-first order with a [Visitor].
 func WalkVisitor(node Node, visitor Visitor) {
-	walk(visitor, node)
+	v := &stackVisitor{stack: []Visitor{visitor}}
+	walk(node, v.Before, v.After)
+}
+
+// stackVisitor helps implement Visitor support on top of Walk.
+type stackVisitor struct {
+	stack []Visitor
+}
+
+func (v *stackVisitor) Before(node Node) bool {
+	current := v.stack[len(v.stack)-1]
+	next := current.Before(node)
+	if next == nil {
+		return false
+	}
+	v.stack = append(v.stack, next)
+	return true
+}
+
+func (v *stackVisitor) After(node Node) {
+	v.stack = v.stack[:len(v.stack)-1]
 }
 
 // A Visitor's before method is invoked for each node encountered by Walk.
@@ -41,25 +62,20 @@ type Visitor interface {
 	After(node Node)
 }
 
-func walkList[N Node](v Visitor, list []N) {
+func walkList[N Node](list []N, before func(Node) bool, after func(Node)) {
 	for _, node := range list {
-		walk(v, node)
+		walk(node, before, after)
 	}
 }
 
-// walk traverses an AST in depth-first order: It starts by calling
-// v.Visit(node); node must not be nil. If the visitor w returned by
-// v.Visit(node) is not nil, walk is invoked recursively with visitor
-// w for each of the non-nil children of node, followed by a call of
-// w.Visit(nil).
-func walk(v Visitor, node Node) {
-	if v = v.Before(node); v == nil {
+func walk(node Node, before func(Node) bool, after func(Node)) {
+	if !before(node) {
 		return
 	}
 
 	// TODO: record the comment groups and interleave with the values like for
 	// parsing and printing?
-	walkList(v, Comments(node))
+	walkList(Comments(node), before, after)
 
 	// walk children
 	// (the order of the cases matches the order
@@ -70,121 +86,121 @@ func walk(v Visitor, node Node) {
 		// nothing to do
 
 	case *CommentGroup:
-		walkList(v, n.List)
+		walkList(n.List, before, after)
 
 	case *Attribute:
 		// nothing to do
 
 	case *Field:
-		walk(v, n.Label)
+		walk(n.Label, before, after)
 		if n.Value != nil {
-			walk(v, n.Value)
+			walk(n.Value, before, after)
 		}
-		walkList(v, n.Attrs)
+		walkList(n.Attrs, before, after)
 
 	case *Func:
-		walkList(v, n.Args)
-		walk(v, n.Ret)
+		walkList(n.Args, before, after)
+		walk(n.Ret, before, after)
 
 	case *StructLit:
-		walkList(v, n.Elts)
+		walkList(n.Elts, before, after)
 
 	// Expressions
 	case *BottomLit, *BadExpr, *Ident, *BasicLit:
 		// nothing to do
 
 	case *Interpolation:
-		walkList(v, n.Elts)
+		walkList(n.Elts, before, after)
 
 	case *ListLit:
-		walkList(v, n.Elts)
+		walkList(n.Elts, before, after)
 
 	case *Ellipsis:
 		if n.Type != nil {
-			walk(v, n.Type)
+			walk(n.Type, before, after)
 		}
 
 	case *ParenExpr:
-		walk(v, n.X)
+		walk(n.X, before, after)
 
 	case *SelectorExpr:
-		walk(v, n.X)
-		walk(v, n.Sel)
+		walk(n.X, before, after)
+		walk(n.Sel, before, after)
 
 	case *IndexExpr:
-		walk(v, n.X)
-		walk(v, n.Index)
+		walk(n.X, before, after)
+		walk(n.Index, before, after)
 
 	case *SliceExpr:
-		walk(v, n.X)
+		walk(n.X, before, after)
 		if n.Low != nil {
-			walk(v, n.Low)
+			walk(n.Low, before, after)
 		}
 		if n.High != nil {
-			walk(v, n.High)
+			walk(n.High, before, after)
 		}
 
 	case *CallExpr:
-		walk(v, n.Fun)
-		walkList(v, n.Args)
+		walk(n.Fun, before, after)
+		walkList(n.Args, before, after)
 
 	case *UnaryExpr:
-		walk(v, n.X)
+		walk(n.X, before, after)
 
 	case *BinaryExpr:
-		walk(v, n.X)
-		walk(v, n.Y)
+		walk(n.X, before, after)
+		walk(n.Y, before, after)
 
 	// Declarations
 	case *ImportSpec:
 		if n.Name != nil {
-			walk(v, n.Name)
+			walk(n.Name, before, after)
 		}
-		walk(v, n.Path)
+		walk(n.Path, before, after)
 
 	case *BadDecl:
 		// nothing to do
 
 	case *ImportDecl:
-		walkList(v, n.Specs)
+		walkList(n.Specs, before, after)
 
 	case *EmbedDecl:
-		walk(v, n.Expr)
+		walk(n.Expr, before, after)
 
 	case *LetClause:
-		walk(v, n.Ident)
-		walk(v, n.Expr)
+		walk(n.Ident, before, after)
+		walk(n.Expr, before, after)
 
 	case *Alias:
-		walk(v, n.Ident)
-		walk(v, n.Expr)
+		walk(n.Ident, before, after)
+		walk(n.Expr, before, after)
 
 	case *Comprehension:
-		walkList(v, n.Clauses)
-		walk(v, n.Value)
+		walkList(n.Clauses, before, after)
+		walk(n.Value, before, after)
 
 	// Files and packages
 	case *File:
-		walkList(v, n.Decls)
+		walkList(n.Decls, before, after)
 
 	case *Package:
-		walk(v, n.Name)
+		walk(n.Name, before, after)
 
 	case *ForClause:
 		if n.Key != nil {
-			walk(v, n.Key)
+			walk(n.Key, before, after)
 		}
-		walk(v, n.Value)
-		walk(v, n.Source)
+		walk(n.Value, before, after)
+		walk(n.Source, before, after)
 
 	case *IfClause:
-		walk(v, n.Condition)
+		walk(n.Condition, before, after)
 
 	default:
 		panic(fmt.Sprintf("Walk: unexpected node type %T", n))
 	}
 
-	v.After(node)
+	after(node)
 }
 
 type inspector struct {
@@ -200,14 +216,14 @@ type commentFrame struct {
 	pos int8
 }
 
-func (f *inspector) Before(node Node) Visitor {
+func (f *inspector) Before(node Node) bool {
 	if f.before == nil || f.before(node) {
 		f.commentStack = append(f.commentStack, f.current)
 		f.current = commentFrame{cg: Comments(node)}
 		f.visitComments(f.current.pos)
-		return f
+		return true
 	}
-	return nil
+	return false
 }
 
 func (f *inspector) After(node Node) {

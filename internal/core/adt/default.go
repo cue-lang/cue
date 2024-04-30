@@ -45,7 +45,7 @@ func (d *Disjunction) Default() Value {
 //
 // It also closes a list, representing its default value.
 func (v *Vertex) Default() *Vertex {
-	v = v.Indirect()
+	v = v.DerefValue()
 	switch d := v.BaseValue.(type) {
 	default:
 		return v

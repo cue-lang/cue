@@ -614,7 +614,7 @@ func (n *nodeContext) validateValue(state vertexStatus) {
 	} else if len(n.node.Structs) > 0 {
 		markStruct = n.kind&StructKind != 0 && !n.hasTop
 	}
-	v := n.node.Indirect().Value()
+	v := n.node.DerefValue().Value()
 	if n.node.BaseValue == nil && markStruct {
 		n.node.BaseValue = &StructMarker{}
 		v = n.node

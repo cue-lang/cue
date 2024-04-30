@@ -48,6 +48,7 @@ See also:
 	cmd.AddCommand(newModGetCmd(c))
 	cmd.AddCommand(newModInitCmd(c))
 	cmd.AddCommand(newModRegistryCmd(c))
+	cmd.AddCommand(newModResolveCmd(c))
 	cmd.AddCommand(newModTidyCmd(c))
 	cmd.AddCommand(newModUploadCmd(c))
 	return cmd

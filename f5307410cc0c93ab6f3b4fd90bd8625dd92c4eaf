@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0bdb1605_93697008",
+        "filename": "cue/testdata/cycle/disjunction.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-30T15:29:36Z",
+      "side": 1,
+      "message": "I would start this in a new file (like -- issue3042 --). This allows us to add smaller tests here, without disrupting the line numbers.\n\nAlternatively, you could add this in a separate file. But here seems fine.",
+      "revId": "f5307410cc0c93ab6f3b4fd90bd8625dd92c4eaf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cde412de_a58f10b4",
+        "filename": "cue/testdata/cycle/disjunction.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-30T15:29:36Z",
+      "side": 1,
+      "message": "Indentation.",
+      "revId": "f5307410cc0c93ab6f3b4fd90bd8625dd92c4eaf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

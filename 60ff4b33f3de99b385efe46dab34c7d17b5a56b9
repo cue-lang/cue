@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36a7bbb2_e50b4e68",
+        "filename": "cue/ast/walk.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-30T12:23:06Z",
+      "side": 1,
+      "message": "Maybe zero out the final element in the stack to let the GC at it?",
+      "revId": "60ff4b33f3de99b385efe46dab34c7d17b5a56b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

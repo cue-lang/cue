@@ -29,24 +29,24 @@ import (
 //	// comment
 //	foo: bar: 2
 func ExtractDoc(v *adt.Vertex) (docs []*ast.CommentGroup) {
-	return extractDocs(v, v.Conjuncts)
+	return extractDocs(v)
 }
 
-func extractDocs(v *adt.Vertex, a []adt.Conjunct) (docs []*ast.CommentGroup) {
+func extractDocs(v *adt.Vertex) (docs []*ast.CommentGroup) {
 	fields := []*ast.Field{}
 
 	// Collect docs directly related to this Vertex.
-	for _, x := range a {
+	v.VisitLeafConjuncts(func(x adt.Conjunct) bool {
 		// TODO: Is this still being used?
 		if v, ok := x.Elem().(*adt.Vertex); ok {
-			docs = append(docs, extractDocs(v, v.Conjuncts)...)
-			continue
+			docs = append(docs, extractDocs(v)...)
+			return true
 		}
 
 		switch f := x.Field().Source().(type) {
 		case *ast.Field:
 			if hasShorthandValue(f) {
-				continue
+				return true
 			}
 			fields = append(fields, f)
 			for _, cg := range f.Comments() {
@@ -60,11 +60,9 @@ func extractDocs(v *adt.Vertex, a []adt.Conjunct) (docs []*ast.CommentGroup) {
 				docs = append(docs, c)
 			}
 		}
-	}
 
-	if v == nil {
-		return docs
-	}
+		return true
+	})
 
 	// Collect docs from parent scopes in collapsed fields.
 	for p := v.Parent; p != nil; p = p.Parent {

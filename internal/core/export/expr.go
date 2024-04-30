@@ -268,7 +268,8 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 
 		internal.SetConstraint(d, field.arcType.Token())
 		if x.cfg.ShowDocs {
-			docs := extractDocs(src, a)
+			v := &adt.Vertex{Conjuncts: a}
+			docs := extractDocs(v)
 			ast.SetComments(d, docs)
 		}
 		if x.cfg.ShowAttributes {

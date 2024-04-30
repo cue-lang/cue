@@ -18,40 +18,6 @@ import (
 	"fmt"
 )
 
-// WalkVisitor traverses an AST in depth-first order with a [Visitor].
-func WalkVisitor(node Node, visitor Visitor) {
-	v := &stackVisitor{stack: []Visitor{visitor}}
-	Walk(node, v.Before, v.After)
-}
-
-// stackVisitor helps implement Visitor support on top of Walk.
-type stackVisitor struct {
-	stack []Visitor
-}
-
-func (v *stackVisitor) Before(node Node) bool {
-	current := v.stack[len(v.stack)-1]
-	next := current.Before(node)
-	if next == nil {
-		return false
-	}
-	v.stack = append(v.stack, next)
-	return true
-}
-
-func (v *stackVisitor) After(node Node) {
-	v.stack[len(v.stack)-1] = nil // set visitor to nil so it can be garbage collected
-	v.stack = v.stack[:len(v.stack)-1]
-}
-
-// A Visitor's before method is invoked for each node encountered by Walk.
-// If the result Visitor w is true, Walk visits each of the children
-// of node with the Visitor w, followed by a call of w.After.
-type Visitor interface {
-	Before(node Node) (w Visitor)
-	After(node Node)
-}
-
 func walkList[N Node](list []N, before func(Node) bool, after func(Node)) {
 	for _, node := range list {
 		Walk(node, before, after)

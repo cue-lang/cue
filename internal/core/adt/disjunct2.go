@@ -517,7 +517,7 @@ func appendDisjunct(ctx *OpContext, a []*nodeContext, x *nodeContext) []*nodeCon
 		return a
 	}
 
-	nv := x.node.Indirect()
+	nv := x.node.DerefValue()
 	nx := nv.BaseValue
 	if nx == nil || isCyclePlaceholder(nx) {
 		nx = x.getValidators(finalized)
@@ -528,7 +528,7 @@ func appendDisjunct(ctx *OpContext, a []*nodeContext, x *nodeContext) []*nodeCon
 	// (overlayed) closeContexts are identical.
 outer:
 	for _, xn := range a {
-		xv := xn.node.Indirect()
+		xv := xn.node.DerefValue()
 		if xv.status != finalized || nv.status != finalized {
 			// Partial node
 
@@ -564,7 +564,7 @@ outer:
 			}
 		} else {
 			// Complete nodes.
-			if !Equal(ctx, xn.node.Indirect(), x.node.Indirect(), CheckStructural) {
+			if !Equal(ctx, xn.node.DerefValue(), x.node.DerefValue(), CheckStructural) {
 				continue outer
 			}
 		}

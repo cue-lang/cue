@@ -273,7 +273,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 
 	n.finalizeDisjunctions()
 
-	w = v.Indirect() // Dereference anything, including shared nodes.
+	w = v.DerefValue() // Dereference anything, including shared nodes.
 	if w != v {
 		// Clear value fields that are now referred to in the dereferenced
 		// value (w).
@@ -595,7 +595,7 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 	needs := flags.conditions()
 	runMode := flags.runMode()
 
-	v = v.Indirect()
+	v = v.DerefValue()
 
 	c.Logf(c.vertex, "LOOKUP %v", f)
 
@@ -731,7 +731,7 @@ func (v *Vertex) accept(ctx *OpContext, f Feature) bool {
 	// 	return true, true
 	// }
 
-	v = v.Indirect()
+	v = v.DerefValue()
 
 	pc := v.PatternConstraints
 	if pc == nil {

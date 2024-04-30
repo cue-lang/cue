@@ -267,7 +267,7 @@ type Vertex struct {
 }
 
 func deref(v *Vertex) *Vertex {
-	v = v.Indirect()
+	v = v.DerefValue()
 	n := v.state
 	if n != nil {
 		v = n.underlying
@@ -679,7 +679,10 @@ func (v *Vertex) isUndefined() bool {
 
 // isFinal reports whether this node may no longer be modified.
 func (v *Vertex) isFinal() bool {
-	v = v.Indirect()
+	// TODO(deref): the accounting of what is final should be recorded
+	// in the original node. Remove this dereference once the old
+	// evaluator has been removed.
+	v = v.DerefValue()
 	return v.status == finalized
 }
 
@@ -852,7 +855,11 @@ func Unwrap(v Value) Value {
 	if !ok {
 		return v
 	}
-	x = x.Indirect()
+	// TODO(deref): BaseValue is currently overloaded to track cycles as well
+	// as the actual or dereferenced value. Once the old evaluator can be
+	// removed, we should use the new cycle tracking mechanism for cycle
+	// detection and keep BaseValue clean.
+	x = x.DerefValue()
 	if n := x.state; n != nil && isCyclePlaceholder(x.BaseValue) {
 		if n.errs != nil && !n.errs.IsIncomplete() {
 			return n.errs
@@ -862,19 +869,6 @@ func Unwrap(v Value) Value {
 		}
 	}
 	return x.Value()
-}
-
-// Indirect unrolls indirections of Vertex values. These may be introduced,
-// for instance, by temporary bindings such as comprehension values.
-// It returns v itself if v does not point to another Vertex.
-func (v *Vertex) Indirect() *Vertex {
-	for {
-		arc, ok := v.BaseValue.(*Vertex)
-		if !ok {
-			return v
-		}
-		v = arc
-	}
 }
 
 // OptionalType is a bit field of the type of optional constraints in use by an
@@ -973,7 +967,14 @@ func (v *Vertex) Accept(ctx *OpContext, f Feature) bool {
 		return true
 	}
 
-	v = v.Indirect()
+	// TODO(deref): right now a dereferenced value hold all the necessary
+	// closedness information. In the future we may want to allow sharing nodes
+	// with different closedness information. In that case, we should reconsider
+	// the use of this dereference. Consider, for instance:
+	//
+	//     #a: b     // this node is currently not shared, but could be.
+	//     b: {c: 1}
+	v = v.DerefValue()
 	if x, ok := v.BaseValue.(*Disjunction); ok {
 		for _, v := range x.Values {
 			if x, ok := v.(*Vertex); ok && x.Accept(ctx, f) {
@@ -1068,12 +1069,12 @@ func (v *Vertex) IsList() bool {
 func (v *Vertex) Lookup(f Feature) *Vertex {
 	for _, a := range v.Arcs {
 		if a.Label == f {
-			// TODO(share): this indirection should ultimately be eliminated:
-			// the original node may have useful information (like original
-			// conjuncts) that are eliminated after indirection.
-			// We should leave it up to the user of Lookup at what point an
+			// TODO(P1)/TODO(deref): this indirection should ultimately be
+			// eliminated: the original node may have useful information (like
+			// original conjuncts) that are eliminated after indirection. We
+			// should leave it up to the user of Lookup at what point an
 			// indirection is necessary.
-			a = a.Indirect()
+			a = a.DerefValue()
 			return a
 		}
 	}

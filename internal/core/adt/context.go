@@ -497,7 +497,7 @@ func (c *OpContext) resolveState(x Conjunct, r Resolver, state combinedFlags) (*
 	}
 
 	if !c.isDevVersion() {
-		arc = arc.Indirect()
+		arc = arc.DerefValue()
 	}
 
 	return arc, err
@@ -512,7 +512,9 @@ func (c *OpContext) Lookup(env *Environment, r Resolver) (*Vertex, *Bottom) {
 	err := c.PopState(s)
 
 	if arc != nil {
-		arc = arc.Indirect()
+		// TODO(P1)/TODO(deref): lookup should probably not use DerefValue, but
+		// rather only dereference disjunctions.
+		arc = arc.DerefValue()
 	}
 
 	return arc, err

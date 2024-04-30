@@ -71,6 +71,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9041e829_fb5b3809",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T15:50:06Z",
+      "side": 1,
+      "message": "I think --out with no shortcut is fine.",
+      "parentUuid": "ec2df943_7f43aad5",
+      "revId": "4bcab035a7922a72579973ef245778aab3341398",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a703e11f_e78121ee",

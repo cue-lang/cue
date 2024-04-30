@@ -710,6 +710,10 @@ func (c *OpContext) evalState(v Expr, state combinedFlags) (result Value) {
 		if arc == nil {
 			return nil
 		}
+		// TODO(deref): what is the right level of dereferencing here?
+		// DerefValue seems to work too.
+		arc = arc.DerefNonShared()
+
 		// TODO: consider moving this after markCycle, depending on how we
 		// implement markCycle, or whether we need it at all.
 		// TODO: is this indirect necessary?
@@ -838,6 +842,8 @@ func (c *OpContext) unifyNode(v Expr, state combinedFlags) (result Value) {
 		if v == nil {
 			return nil
 		}
+		v = v.DerefValue()
+
 		// TODO: consider moving this after markCycle, depending on how we
 		// implement markCycle, or whether we need it at all.
 		// TODO: is this indirect necessary?

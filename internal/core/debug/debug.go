@@ -118,7 +118,7 @@ func (w *printer) printShared(v *adt.Vertex) (x *adt.Vertex, ok bool) {
 	useReference := v.IsShared
 	isCyclic := v.IsCyclic
 	s, ok := v.BaseValue.(*adt.Vertex)
-	v = v.Indirect()
+	v = v.DerefValue()
 	isCyclic = isCyclic || v.IsCyclic
 	if useReference && isCyclic && ok && len(v.Arcs) > 0 {
 		w.shared(s)

@@ -53,8 +53,8 @@ func equalVertex(ctx *OpContext, x *Vertex, v Value, flags Flag) bool {
 		return false
 	}
 
-	x = x.Indirect()
-	y = y.Indirect()
+	x = x.DerefValue()
+	y = y.DerefValue()
 
 	if x == y {
 		return true

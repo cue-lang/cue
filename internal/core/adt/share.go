@@ -106,6 +106,31 @@ func (n *nodeContext) shareIfPossible(c Conjunct, arc *Vertex, id CloseInfo) boo
 	return true
 }
 
+// Vertex values that are held in BaseValue will be wrapped in the following
+// order:
+//
+//    disjuncts -> (shared | computed | data)
+//
+// DerefDisjunct
+//   - get the current value under computation
+//
+// DerefValue
+//   - get the value the node ultimately represents.
+//
+
+// DerefValue unrolls indirections of Vertex values. These may be introduced,
+// for instance, by temporary bindings such as comprehension values.
+// It returns v itself if v does not point to another Vertex.
+func (v *Vertex) DerefValue() *Vertex {
+	for {
+		arc, ok := v.BaseValue.(*Vertex)
+		if !ok {
+			return v
+		}
+		v = arc
+	}
+}
+
 // DerefDisjunct indirects a node that points to a disjunction.
 func (v *Vertex) DerefDisjunct() *Vertex {
 	for {

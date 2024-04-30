@@ -1431,7 +1431,7 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flag
 }
 
 func isFinalError(n *Vertex) bool {
-	n = n.Indirect()
+	n = n.DerefValue()
 	if b, ok := Unwrap(n).(*Bottom); ok && b.Code < IncompleteError {
 		return true
 	}

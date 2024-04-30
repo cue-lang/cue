@@ -1430,13 +1430,13 @@ func TestFillPathError(t *testing.T) {
 }
 
 func TestAllows(t *testing.T) {
-	r := &Runtime{}
-
 	testCases := []struct {
 		desc  string
 		in    string
 		sel   Selector
 		allow bool
+
+		todo_nosharing bool
 	}{{
 		desc: "allow new field in open struct",
 		in: `
@@ -1463,6 +1463,14 @@ func TestAllows(t *testing.T) {
 		})
 		`,
 		sel: Str("b"),
+	}, {
+		desc: "allow field in pattern",
+		in: `
+				x: #X
+				#X: [>"a"]: 1
+				`,
+		sel:   Str("b"),
+		allow: true,
 	}, {
 		desc: "allow index in open list",
 		in: `
@@ -1615,6 +1623,8 @@ func TestAllows(t *testing.T) {
 		`,
 		sel:   AnyString,
 		allow: true,
+
+		todo_nosharing: true,
 	}, {
 		desc: "disallow label in disjunction",
 		in: `
@@ -1657,7 +1667,10 @@ func TestAllows(t *testing.T) {
 
 	for _, tc := range testCases {
 		runMatrix(t, tc.desc, func(t *testing.T, cfg *evalConfig) {
-			v := compileT(t, r, tc.in).Value()
+			if tc.todo_nosharing {
+				TODO_NoSharing(t, cfg)
+			}
+			v := compileT(t, cfg.runtime(), tc.in).Value()
 			v = v.LookupPath(path)
 
 			got := v.Allows(tc.sel)
@@ -2211,8 +2224,6 @@ func TestUnify(t *testing.T) {
 	}}
 	// TODO(tdtest): use cuetest.Run when supported.
 	doMatrix(t, func(t *testing.T, cfg *evalConfig) {
-		TODO_V3(t, cfg)
-
 		tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
 			v := cfg.getValue(t.T, tc.value)
 			x := v.LookupPath(ParsePath(tc.pathA))
@@ -2267,8 +2278,6 @@ func TestUnifyAccept(t *testing.T) {
 	}}
 	// TODO(tdtest): use cuetest.Run when supported.
 	doMatrix(t, func(t *testing.T, cfg *evalConfig) {
-		TODO_V3(t, cfg)
-
 		tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
 			v := cfg.getValue(t.T, tc.value)
 			x := v.LookupPath(ParsePath("#v"))

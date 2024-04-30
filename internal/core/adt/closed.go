@@ -344,6 +344,9 @@ func isClosed(v *Vertex) bool {
 // Accept determines whether f is allowed in n. It uses the OpContext for
 // caching administrative fields.
 func Accept(ctx *OpContext, n *Vertex, f Feature) (found, required bool) {
+	if ctx.isDevVersion() {
+		return n.accept(ctx, f), true
+	}
 	ctx.generation++
 	ctx.todo = nil
 

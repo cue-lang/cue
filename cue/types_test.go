@@ -2374,6 +2374,8 @@ func TestValidate(t *testing.T) {
 		in   string
 		err  bool
 		opts []Option
+
+		skip bool
 	}{{
 		desc: "issue #51",
 		in: `
@@ -2452,6 +2454,15 @@ func TestValidate(t *testing.T) {
 			`,
 		opts: []Option{DisallowCycles(true)},
 		err:  true,
+
+		// TODO: in the new evaluator these are not considered to be cycles
+		// but rather incomplete errors. This is actually the correct behavior
+		// and the old evaluator treats errors like this by default.
+		// The option tested in this test was added for backwards compatibility
+		// when the old evaluator was made to treat these kinds of errors
+		// equally. With the new evaluator we can no longer distinguish these
+		// errors. For now, at least. Consider what to do with this option.
+		skip: true,
 	}, {
 		desc: "builtins are okay",
 		in: `
@@ -2499,7 +2510,9 @@ func TestValidate(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		runMatrix(t, tc.desc, func(t *testing.T, cfg *evalConfig) {
-			TODO_V3(t, cfg)
+			if tc.skip {
+				TODO_V3(t, cfg)
+			}
 
 			r := cfg.runtime()
 

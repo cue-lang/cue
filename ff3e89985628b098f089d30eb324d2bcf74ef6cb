@@ -431,6 +431,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "422260e4_abcaf3de",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-30T10:22:51Z",
+      "side": 1,
+      "message": "Ah, sorry, I see what you mean now. I thought you were referring to the second if statement on its own and that\u0027s what I tested 😊",
+      "parentUuid": "d67a01ed_1e4e6687",
+      "revId": "ff3e89985628b098f089d30eb324d2bcf74ef6cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ad74d9b4_a7ae9c3f",
         "filename": "internal/cueversion/version.go",
         "patchSetId": 3

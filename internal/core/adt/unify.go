@@ -721,3 +721,22 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 	v.reportFieldIndexError(c, pos, f)
 	return nil
 }
+
+// accept reports whether the given feature is allowed by the pattern
+// constraints.
+func (v *Vertex) accept(ctx *OpContext, f Feature) bool {
+	// TODO: this is already handled by callers at the moment, but it may be
+	// better design to move this here.
+	// if v.LookupRaw(f) != nil {
+	// 	return true, true
+	// }
+
+	v = v.Indirect()
+
+	pc := v.PatternConstraints
+	if pc == nil {
+		return false
+	}
+
+	return matchPattern(ctx, pc.Allowed, f)
+}

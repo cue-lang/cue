@@ -69,3 +69,9 @@ func TODO_Sharing(t *testing.T, c *evalConfig) {
 		t.Skip("Skipping v3 with sharing")
 	}
 }
+
+func TODO_NoSharing(t *testing.T, c *evalConfig) {
+	if c.version == internal.DevVersion && !c.flags.Sharing {
+		t.Skip("Skipping v3 without sharing")
+	}
+}

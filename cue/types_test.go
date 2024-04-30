@@ -68,6 +68,8 @@ func TestAPI(t *testing.T) {
 			return res
 		},
 		want: "_|_ // #runSpec.ction: field not allowed",
+
+		skip: true,
 	}, {
 		// Issue #567
 		input: `
@@ -2741,6 +2743,7 @@ func TestValueDoc(t *testing.T) {
 			val  Value
 			path string
 			doc  string
+			skip bool
 		}{{
 			val:  v1,
 			path: "foos",
@@ -2776,6 +2779,8 @@ field1 is an int.
 
 comment from baz on field 1
 `,
+			// New evaluaotor orders the comments differently (arguably better).
+			skip: true,
 		}, {
 			val:  v1,
 			path: "baz field2",
@@ -2795,8 +2800,9 @@ Another Foo.
 		}}
 		for _, tc := range testCases {
 			t.Run("field:"+tc.path, func(t *testing.T) {
-				TODO_V3(t, cfg)
-
+				if tc.skip {
+					TODO_V3(t, cfg)
+				}
 				v := tc.val.Lookup(strings.Split(tc.path, " ")...)
 				doc := docStr(v.Doc())
 				if doc != tc.doc {

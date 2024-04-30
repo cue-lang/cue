@@ -666,12 +666,12 @@ Result:
       }
     }
     fail: (_|_){
-      // [incomplete] selfReferential.fail.b: cyclic reference to field x:
+      // [incomplete] selfReferential.fail.b: undefined field: x:
       //     ./in.cue:300:7
       a: (struct){
       }
       b: (_|_){
-        // [incomplete] selfReferential.fail.b: cyclic reference to field x:
+        // [incomplete] selfReferential.fail.b: undefined field: x:
         //     ./in.cue:300:7
       }
     }
@@ -952,7 +952,7 @@ diff old new
          }
        }
      }
-@@ -127,208 +181,269 @@
+@@ -127,116 +181,165 @@
      insertionError: (_|_){
        // [eval]
        A: (_|_){
@@ -1227,16 +1227,7 @@ diff old new
          }
        }
      }
-     fail: (_|_){
--      // [incomplete] selfReferential.fail.b: undefined field: x:
-+      // [incomplete] selfReferential.fail.b: cyclic reference to field x:
-       //     ./in.cue:300:7
-       a: (struct){
-       }
-       b: (_|_){
--        // [incomplete] selfReferential.fail.b: undefined field: x:
-+        // [incomplete] selfReferential.fail.b: cyclic reference to field x:
-         //     ./in.cue:300:7
+@@ -251,84 +354,96 @@
        }
      }
    }

@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "36b780b3_e275ac21",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-30T08:44:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aa9023c1_ef906983",
+      "range": {
+        "startLine": 7,
+        "startChar": 40,
+        "endLine": 7,
+        "endChar": 45
+      },
+      "revId": "ff3e89985628b098f089d30eb324d2bcf74ef6cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "36d7f720_6be3c06a",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-04-30T07:39:55Z",
       "side": 1,
       "message": "perhaps mention that writing a local regression test for this is hard, as dependency modules only have versions as provided by a proxy, and deps replaced by a directory don\u0027t have module versions.\n\nalso \"module version\" rather than \"build version\".",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 49
+      },
+      "revId": "ff3e89985628b098f089d30eb324d2bcf74ef6cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3d867b5_417f37f0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-30T08:44:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "36d7f720_6be3c06a",
       "range": {
         "startLine": 17,
         "startChar": 0,
@@ -87,6 +135,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c1ccc34_f87f212f",
+        "filename": "cmd/cue/cmd/testdata/script/modinit_without_version.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-30T08:44:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "02eb818d_9f032d77",
+      "range": {
+        "startLine": 1,
+        "startChar": 48,
+        "endLine": 1,
+        "endChar": 53
+      },
+      "revId": "ff3e89985628b098f089d30eb324d2bcf74ef6cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6508c4d6_1e0ca9e7",
@@ -100,6 +172,24 @@
       "writtenOn": "2024-04-30T07:39:55Z",
       "side": 1,
       "message": "you say 20 above but left 16 here? did you check that the output still looks OK?",
+      "revId": "ff3e89985628b098f089d30eb324d2bcf74ef6cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a2d88f5_6135e7f5",
+        "filename": "cmd/cue/cmd/version.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-30T08:44:34Z",
+      "side": 1,
+      "message": "Yeah, 20 is a holdover from when I had \"cue.language.version\" which seemed a bit too long.",
+      "parentUuid": "6508c4d6_1e0ca9e7",
       "revId": "ff3e89985628b098f089d30eb324d2bcf74ef6cb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -127,6 +217,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "817dcde8_81eb6947",
+        "filename": "cmd/cue/cmd/version.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-30T08:44:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a4756e7_35ce3cf8",
+      "range": {
+        "startLine": 85,
+        "startChar": 5,
+        "endLine": 85,
+        "endChar": 17
+      },
+      "revId": "ff3e89985628b098f089d30eb324d2bcf74ef6cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "636e4ec2_608cf9a1",
@@ -140,6 +254,24 @@
       "writtenOn": "2024-04-30T07:39:55Z",
       "side": 1,
       "message": "this should be v0.9.0 as discussed; we agreed it would only follow major versions and not alphas or any other pre-releases.",
+      "revId": "ff3e89985628b098f089d30eb324d2bcf74ef6cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b46ed2d6_d6138645",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-30T08:44:34Z",
+      "side": 1,
+      "message": "I had been thinking that it was still worth tracking (some) prerelease versions here, specifically the ones that add new features, because otherwise we can be in a situation where a binary can reject data created by another binary that\u0027s ostensibly using the same language version.\n\nThat said, given that this is all prerelease and hence inherently unstable, it\u0027s probably fine, so done.",
+      "parentUuid": "636e4ec2_608cf9a1",
       "revId": "ff3e89985628b098f089d30eb324d2bcf74ef6cb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -167,6 +299,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb171381_39d15701",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-30T08:44:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3b816078_538826c4",
+      "range": {
+        "startLine": 30,
+        "startChar": 4,
+        "endLine": 30,
+        "endChar": 15
+      },
+      "revId": "ff3e89985628b098f089d30eb324d2bcf74ef6cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "94ca00f7_6537560b",
@@ -184,6 +340,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9277a958_487dcdda",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-30T08:44:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "94ca00f7_6537560b",
+      "revId": "ff3e89985628b098f089d30eb324d2bcf74ef6cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9e1a1f20_24586159",
@@ -197,6 +371,24 @@
       "writtenOn": "2024-04-30T07:39:55Z",
       "side": 1,
       "message": "as far as I can tell this is backwards; if M1 is replaced by M2, we need to return M2, not M1.",
+      "revId": "ff3e89985628b098f089d30eb324d2bcf74ef6cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c6358a7_d53c4441",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-30T08:44:34Z",
+      "side": 1,
+      "message": "Isn\u0027t that what this does? The doc comment in Module says:\n```\nReplace *Module // replaced by this module\n```\nwhich indicates to me that M1 is m here and M2 is m.Replace.\n\nI\u0027ll experiment to be sure.\n\nEdit: after experimentation, it does seem that this is doing the right thing.",
+      "parentUuid": "9e1a1f20_24586159",
       "revId": "ff3e89985628b098f089d30eb324d2bcf74ef6cb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -224,6 +416,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7379b5c1_4706bf86",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-30T08:44:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ad74d9b4_a7ae9c3f",
+      "range": {
+        "startLine": 76,
+        "startChar": 33,
+        "endLine": 76,
+        "endChar": 35
+      },
+      "revId": "ff3e89985628b098f089d30eb324d2bcf74ef6cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9e9cc0f1_8e4c3aed",
@@ -237,6 +453,30 @@
       "writtenOn": "2024-04-30T07:39:55Z",
       "side": 1,
       "message": "TestModuleVersion",
+      "range": {
+        "startLine": 12,
+        "startChar": 5,
+        "endLine": 12,
+        "endChar": 16
+      },
+      "revId": "ff3e89985628b098f089d30eb324d2bcf74ef6cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1e98654_01e07f10",
+        "filename": "internal/cueversion/version_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-30T08:44:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9e9cc0f1_8e4c3aed",
       "range": {
         "startLine": 12,
         "startChar": 5,

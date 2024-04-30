@@ -16,6 +16,24 @@
       "message": "Perhaps document that the functions will never be invoked directly on comment nodes?",
       "revId": "98e459abfafe5b09d515134b7e56b8106e325653",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "622a5fa5_a2398b0d",
+        "filename": "cue/ast/walk.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T12:37:41Z",
+      "side": 1,
+      "message": "They literally are, though. See `walkList(Comments(node), before, after)` below. This CL is about not walking them twice.",
+      "parentUuid": "9281efe8_dd421141",
+      "revId": "98e459abfafe5b09d515134b7e56b8106e325653",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

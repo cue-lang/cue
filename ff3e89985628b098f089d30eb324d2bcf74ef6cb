@@ -276,6 +276,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "21c5417b_13ac4d4e",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T09:01:29Z",
+      "side": 1,
+      "message": "Just wanted to be on the same page in terms of what the language version should be and when we should bump it. We\u0027d discussed following the Go model of bumping to a new major version when feature development begins on master, so I\u0027d stick with that unless we discuss otherwise together with Paul and Marcel.",
+      "parentUuid": "b46ed2d6_d6138645",
+      "revId": "ff3e89985628b098f089d30eb324d2bcf74ef6cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3b816078_538826c4",
@@ -389,6 +407,24 @@
       "side": 1,
       "message": "Isn\u0027t that what this does? The doc comment in Module says:\n```\nReplace *Module // replaced by this module\n```\nwhich indicates to me that M1 is m here and M2 is m.Replace.\n\nI\u0027ll experiment to be sure.\n\nEdit: after experimentation, it does seem that this is doing the right thing.",
       "parentUuid": "9e1a1f20_24586159",
+      "revId": "ff3e89985628b098f089d30eb324d2bcf74ef6cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d67a01ed_1e4e6687",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T09:01:29Z",
+      "side": 1,
+      "message": "Yes, when we are M1 and we are being replaced by M2, M1 should be m and M2 should be m.Replace. So we should return M2, not M1, because M1\u0027s version is not being used at all.\n\nSo with the logic below:\n\n```\nif m.Path \u003d\u003d cueModule {\n\treturn m\n}\nif m.Replace !\u003d nil \u0026\u0026 m.Replace.Path \u003d\u003d cueModule {\n\treturn m.Replace\n}\n```\n\nthis still seems backwards to me. `m.Path \u003d\u003d cueModule` will likely be true for M1, so we will return M1, not returning M2 in the scenario above.\n\nyou said you experimented with this and your code was working well, can you give some details? I\u0027m not sure you can easily test this properly until we push the code to master and resolve module versions via proxy.golang.org.\n\nI don\u0027t want to block the CL on this comment because the situation should be rare, but I reckon the logic isn\u0027t correct, so we might need to revisit it later.",
+      "parentUuid": "2c6358a7_d53c4441",
       "revId": "ff3e89985628b098f089d30eb324d2bcf74ef6cb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

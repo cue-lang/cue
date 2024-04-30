@@ -135,7 +135,9 @@ func TestAPI(t *testing.T) {
 			continue
 		}
 		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
-			var r Runtime
+			TODO_V3(t, cfg)
+
+			r := cfg.runtime()
 			inst, err := r.Compile("in", tc.input)
 			if err != nil {
 				t.Fatal(err)
@@ -955,8 +957,9 @@ func TestFieldType(t *testing.T) {
 }
 
 func TestLookup(t *testing.T) {
-	var runtime = new(Runtime)
-	inst, err := runtime.Compile("x.cue", `
+	doMatrix(t, func(t *testing.T, cfg *evalConfig) {
+		runtime := cfg.runtime()
+		inst, err := runtime.Compile("x.cue", `
 #V: {
 	x: int
 }
@@ -970,83 +973,84 @@ a: {
 	c: 2
 }
 `)
-	if err != nil {
-		t.Fatalf("compile: %v", err)
-	}
-	// expr, err := parser.ParseExpr("lookup.cue", `v`, parser.DeclarationErrors, parser.AllErrors)
-	// if err != nil {
-	// 	log.Fatalf("parseExpr: %v", err)
-	// }
-	// v := inst.Eval(expr)
+		if err != nil {
+			t.Fatalf("compile: %v", err)
+		}
+		// expr, err := parser.ParseExpr("lookup.cue", `v`, parser.DeclarationErrors, parser.AllErrors)
+		// if err != nil {
+		// 	log.Fatalf("parseExpr: %v", err)
+		// }
+		// v := inst.Eval(expr)
 
-	type testCase struct {
-		ref    []string
-		result string
-		syntax string
-	}
-	testCases := []testCase{{
-		ref: []string{"a"},
-		result: `{
+		type testCase struct {
+			ref    []string
+			result string
+			syntax string
+		}
+		testCases := []testCase{{
+			ref: []string{"a"},
+			result: `{
 	b!: 1
 	c:  2
 }`,
-		syntax: "{b!: 1, c: 2}",
-	}, {
-		// Allow descending into structs even if it has a required field error.
-		ref:    []string{"a", "c"},
-		result: "2",
-		syntax: "2",
-	}, {
-		ref:    []string{"a", "b"},
-		result: "_|_ // a.b: field is required but not present",
-		syntax: "1",
-	}, {
-		ref:    []string{"v", "x"},
-		result: "int64",
-		syntax: "int64",
-	}}
-	for _, tc := range testCases {
-		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
-			v := inst.Lookup(tc.ref...)
+			syntax: "{b!: 1, c: 2}",
+		}, {
+			// Allow descending into structs even if it has a required field error.
+			ref:    []string{"a", "c"},
+			result: "2",
+			syntax: "2",
+		}, {
+			ref:    []string{"a", "b"},
+			result: "_|_ // a.b: field is required but not present",
+			syntax: "1",
+		}, {
+			ref:    []string{"v", "x"},
+			result: "int64",
+			syntax: "int64",
+		}}
+		for _, tc := range testCases {
+			t.Run("", func(t *testing.T) {
+				v := inst.Lookup(tc.ref...)
 
-			if got := fmt.Sprintf("%+v", v); got != tc.result {
-				t.Errorf("got %v; want %v", got, tc.result)
-			}
-
-			got := fmt.Sprint(astinternal.DebugStr(v.Eval().Syntax()))
-			if got != tc.syntax {
-				t.Errorf("got %v; want %v", got, tc.syntax)
-			}
-
-			v = inst.Lookup()
-			for _, ref := range tc.ref {
-				s, err := v.Struct()
-				if err != nil {
-					t.Fatal(err)
+				if got := fmt.Sprintf("%+v", v); got != tc.result {
+					t.Errorf("got %v; want %v", got, tc.result)
 				}
-				fi, err := s.FieldByName(ref, false)
-				if err != nil {
-					t.Fatal(err)
+
+				got := fmt.Sprint(astinternal.DebugStr(v.Eval().Syntax()))
+				if got != tc.syntax {
+					t.Errorf("got %v; want %v", got, tc.syntax)
 				}
-				v = fi.Value
 
-				// Struct gets all fields. Skip tests with optional fields,
-				// as the result will differ.
-				if v.v.ArcType != adt.ArcMember {
-					return
+				v = inst.Lookup()
+				for _, ref := range tc.ref {
+					s, err := v.Struct()
+					if err != nil {
+						t.Fatal(err)
+					}
+					fi, err := s.FieldByName(ref, false)
+					if err != nil {
+						t.Fatal(err)
+					}
+					v = fi.Value
+
+					// Struct gets all fields. Skip tests with optional fields,
+					// as the result will differ.
+					if v.v.ArcType != adt.ArcMember {
+						return
+					}
 				}
-			}
 
-			if got := fmt.Sprintf("%+v", v); got != tc.result {
-				t.Errorf("got %v; want %v", got, tc.result)
-			}
+				if got := fmt.Sprintf("%+v", v); got != tc.result {
+					t.Errorf("got %v; want %v", got, tc.result)
+				}
 
-			got = fmt.Sprint(astinternal.DebugStr(v.Eval().Syntax()))
-			if got != tc.syntax {
-				t.Errorf("got %v; want %v", got, tc.syntax)
-			}
-		})
-	}
+				got = fmt.Sprint(astinternal.DebugStr(v.Eval().Syntax()))
+				if got != tc.syntax {
+					t.Errorf("got %v; want %v", got, tc.syntax)
+				}
+			})
+		}
+	})
 }
 
 func compileT(t *testing.T, r *Runtime, s string) *Instance {
@@ -1178,179 +1182,180 @@ providers: {
 }
 
 func TestFillPath(t *testing.T) {
-	r := &Runtime{}
+	doMatrix(t, func(t *testing.T, cfg *evalConfig) {
+		r := cfg.runtime()
 
-	inst, err := r.CompileExpr(ast.NewStruct("bar", ast.NewString("baz")))
-	if err != nil {
-		t.Fatal(err)
-	}
+		inst, err := r.CompileExpr(ast.NewStruct("bar", ast.NewString("baz")))
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	testCases := []struct {
-		in   string
-		x    interface{}
-		path Path
-		out  string
-	}{{
-		in: `
+		testCases := []struct {
+			in   string
+			x    interface{}
+			path Path
+			out  string
+		}{{
+			in: `
 		foo: int
 		bar: foo
 		`,
-		x:    3,
-		path: ParsePath("foo"),
-		out: `
+			x:    3,
+			path: ParsePath("foo"),
+			out: `
 		foo: 3
 		bar: 3
 		`,
-	}, {
-		in: `
+		}, {
+			in: `
 		X="#foo": int
 		bar: X
 		`,
-		x:    3,
-		path: ParsePath(`"#foo"`),
-		out: `
+			x:    3,
+			path: ParsePath(`"#foo"`),
+			out: `
 		"#foo": 3
 		bar: 3
 		`,
-	}, {
-		in: `
+		}, {
+			in: `
 		X="#foo": foo: int
 		bar: X.foo
 		`,
-		x:    3,
-		path: ParsePath(`"#foo".foo`),
-		out: `
+			x:    3,
+			path: ParsePath(`"#foo".foo`),
+			out: `
 		"#foo": foo: 3
 		bar: 3
 		`,
-	}, {
-		in: `
+		}, {
+			in: `
 		foo: #foo: int
 		bar: foo.#foo
 		`,
-		x:    3,
-		path: ParsePath("foo.#foo"),
-		out: `
+			x:    3,
+			path: ParsePath("foo.#foo"),
+			out: `
 		foo: {
 			#foo: 3
 		}
 		bar: 3
 		`,
-	}, {
-		in: `
+		}, {
+			in: `
 		foo: _foo: int
 		bar: foo._foo
 		`,
-		x:    3,
-		path: MakePath(Str("foo"), Hid("_foo", "_")),
-		out: `
+			x:    3,
+			path: MakePath(Str("foo"), Hid("_foo", "_")),
+			out: `
 		foo: {
 			_foo: 3
 		}
 		bar: 3
 		`,
-	}, {
-		in: `
+		}, {
+			in: `
 		string
 		`,
-		x:    "foo",
-		path: ParsePath(""),
-		out: `
+			x:    "foo",
+			path: ParsePath(""),
+			out: `
 		"foo"
 		`,
-	}, {
-		in: `
+		}, {
+			in: `
 		foo: _
 		`,
-		x:    inst.Value(),
-		path: ParsePath("foo"),
-		out: `
+			x:    inst.Value(),
+			path: ParsePath("foo"),
+			out: `
 		{foo: {bar: "baz"}}
 		`,
-	}, {
-		// Resolve to enclosing
-		in: `
+		}, {
+			// Resolve to enclosing
+			in: `
 		foo: _
 		x: 1
 		`,
-		x:    ast.NewIdent("x"),
-		path: ParsePath("foo"),
-		out: `
+			x:    ast.NewIdent("x"),
+			path: ParsePath("foo"),
+			out: `
 		{foo: 1, x: 1}
 		`,
-	}, {
-		in: `
+		}, {
+			in: `
 		foo: {
 			bar: _
 			x: 1
 		}
 		`,
-		x:    ast.NewIdent("x"),
-		path: ParsePath("foo.bar"),
-		out: `
+			x:    ast.NewIdent("x"),
+			path: ParsePath("foo.bar"),
+			out: `
 		{foo: {bar: 1, x: 1}}
 		`,
-	}, {
-		// Resolve one scope up
-		in: `
+		}, {
+			// Resolve one scope up
+			in: `
 		x: 1
 		foo: {
 			bar: _
 		}
 		`,
-		x:    ast.NewIdent("x"),
-		path: ParsePath("foo.bar"),
-		out: `
+			x:    ast.NewIdent("x"),
+			path: ParsePath("foo.bar"),
+			out: `
 		{foo: {bar: 1}, x: 1}
 		`,
-	}, {
-		// Resolve within ast expression
-		in: `
+		}, {
+			// Resolve within ast expression
+			in: `
 		foo: {
 			bar: _
 		}
 		`,
-		x: ast.NewStruct(
-			ast.NewIdent("x"), ast.NewString("1"),
-			ast.NewIdent("y"), ast.NewIdent("x"),
-		),
-		path: ParsePath("foo.bar"),
-		out: `
+			x: ast.NewStruct(
+				ast.NewIdent("x"), ast.NewString("1"),
+				ast.NewIdent("y"), ast.NewIdent("x"),
+			),
+			path: ParsePath("foo.bar"),
+			out: `
 			{foo: {bar: {x: "1", y: "1"}}}
 			`,
-	}, {
-		// Resolve in non-existing
-		in: `
+		}, {
+			// Resolve in non-existing
+			in: `
 		foo: x: 1
 		`,
-		x:    ast.NewIdent("x"),
-		path: ParsePath("foo.bar.baz"),
-		out: `
+			x:    ast.NewIdent("x"),
+			path: ParsePath("foo.bar.baz"),
+			out: `
 		{foo: {x: 1, bar: baz: 1}}
 		`,
-	}, {
-		// empty path
-		in: `
+		}, {
+			// empty path
+			in: `
 		_
 		#foo: 1
 		`,
-		x:   ast.NewIdent("#foo"),
-		out: `{1, #foo: 1}`,
-	}, {
-		in:   `[...int]`,
-		x:    1,
-		path: ParsePath("0"),
-		out:  `[1]`,
-	}, {
-		in:   `[1, ...int]`,
-		x:    1,
-		path: ParsePath("1"),
-		out:  `[1, 1]`,
-	}, {
-		in:   `a: {b: v: int, c: v: int}`,
-		x:    1,
-		path: MakePath(Str("a"), AnyString, Str("v")),
-		out: `{
+			x:   ast.NewIdent("#foo"),
+			out: `{1, #foo: 1}`,
+		}, {
+			in:   `[...int]`,
+			x:    1,
+			path: ParsePath("0"),
+			out:  `[1]`,
+		}, {
+			in:   `[1, ...int]`,
+			x:    1,
+			path: ParsePath("1"),
+			out:  `[1, 1]`,
+		}, {
+			in:   `a: {b: v: int, c: v: int}`,
+			x:    1,
+			path: MakePath(Str("a"), AnyString, Str("v")),
+			out: `{
 	a: {
 		b: {
 			v: 1
@@ -1360,46 +1365,45 @@ func TestFillPath(t *testing.T) {
 		}
 	}
 }`,
-	}, {
-		in:   `a: [_]`,
-		x:    1,
-		path: MakePath(Str("a"), AnyIndex, Str("b")),
-		out: `{
+		}, {
+			in:   `a: [_]`,
+			x:    1,
+			path: MakePath(Str("a"), AnyIndex, Str("b")),
+			out: `{
 	a: [{
 		b: 1
 	}]
 }`,
-	}, {
-		in:   `a: 1`,
-		x:    1,
-		path: MakePath(Str("b").Optional()),
-		out:  `{a: 1}`,
-	}, {
-		in:   `b: int`,
-		x:    1,
-		path: MakePath(Str("b").Optional()),
-		out:  `{b: 1}`,
-	}}
+		}, {
+			in:   `a: 1`,
+			x:    1,
+			path: MakePath(Str("b").Optional()),
+			out:  `{a: 1}`,
+		}, {
+			in:   `b: int`,
+			x:    1,
+			path: MakePath(Str("b").Optional()),
+			out:  `{b: 1}`,
+		}}
 
-	for _, tc := range testCases {
-		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
-			v := compileT(t, r, tc.in).Value()
-			v = v.FillPath(tc.path, tc.x)
+		for _, tc := range testCases {
+			t.Run("", func(t *testing.T) {
+				v := compileT(t, r, tc.in).Value()
+				v = v.FillPath(tc.path, tc.x)
 
-			w := compileT(t, r, tc.out).Value()
+				w := compileT(t, r, tc.out).Value()
 
-			if diff := cmp.Diff(goValue(v), goValue(w)); diff != "" {
-				t.Error(diff)
-				t.Error(cmp.Diff(goValue(v), goValue(w)))
-				t.Errorf("\ngot:  %s\nwant: %s", v, w)
-			}
-		})
-	}
+				if diff := cmp.Diff(goValue(v), goValue(w)); diff != "" {
+					t.Error(diff)
+					t.Error(cmp.Diff(goValue(v), goValue(w)))
+					t.Errorf("\ngot:  %s\nwant: %s", v, w)
+				}
+			})
+		}
+	})
 }
 
 func TestFillPathError(t *testing.T) {
-	r := &Runtime{}
-
 	testCases := []struct {
 		in   string
 		x    interface{}
@@ -1414,6 +1418,7 @@ func TestFillPathError(t *testing.T) {
 
 	for _, tc := range testCases {
 		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
+			r := cfg.runtime()
 			v := compileT(t, r, tc.in).Value()
 			v = v.FillPath(tc.path, tc.x)
 
@@ -1714,8 +1719,6 @@ func TestFillFloat(t *testing.T) {
 }
 
 func TestValue_LookupDef(t *testing.T) {
-	r := &Runtime{}
-
 	testCases := []struct {
 		in     string
 		def    string // comma-separated path
@@ -1741,6 +1744,7 @@ func TestValue_LookupDef(t *testing.T) {
 
 	for _, tc := range testCases {
 		runMatrix(t, tc.def, func(t *testing.T, cfg *evalConfig) {
+			r := cfg.runtime()
 			v := compileT(t, r, tc.in).Value()
 			v = v.LookupDef(tc.def)
 			got := fmt.Sprint(v)
@@ -2703,90 +2707,95 @@ func TestValueDoc(t *testing.T) {
 	// Another Foo.
 	Foo: {}
 	`
-	var r Runtime
-	getInst := func(name, body string) *Instance {
-		inst, err := r.Compile("dir/file1.cue", body)
-		if err != nil {
-			t.Fatal(err)
+
+	doMatrix(t, func(t *testing.T, cfg *evalConfig) {
+		r := cfg.runtime()
+		getInst := func(name, body string) *Instance {
+			inst, err := r.Compile("dir/file1.cue", body)
+			if err != nil {
+				t.Fatal(err)
+			}
+			return inst
 		}
-		return inst
-	}
 
-	inst := getInst("config", config)
+		inst := getInst("config", config)
 
-	v1 := inst.Value()
-	v2 := getInst("config2", config2).Value()
-	both := v1.Unify(v2)
+		v1 := inst.Value()
+		v2 := getInst("config2", config2).Value()
+		both := v1.Unify(v2)
 
-	testCases := []struct {
-		val  Value
-		path string
-		doc  string
-	}{{
-		val:  v1,
-		path: "foos",
-		doc:  "foos are instances of Foo.\n",
-	}, {
-		val:  v1,
-		path: "foos MyFoo",
-		doc:  "My first little foo.\n",
-	}, {
-		val:  v1,
-		path: "foos MyFoo field1",
-		doc: `local field comment.
+		testCases := []struct {
+			val  Value
+			path string
+			doc  string
+		}{{
+			val:  v1,
+			path: "foos",
+			doc:  "foos are instances of Foo.\n",
+		}, {
+			val:  v1,
+			path: "foos MyFoo",
+			doc:  "My first little foo.\n",
+		}, {
+			val:  v1,
+			path: "foos MyFoo field1",
+			doc: `local field comment.
 
 field1 is an int.
 `,
-	}, {
-		val:  v1,
-		path: "foos MyFoo field2",
-		doc:  "other field comment.\n",
-	}, {
-		// Duplicates are now removed.
-		val:  v1,
-		path: "foos MyFoo dup3",
-		doc:  "duplicate field comment\n",
-	}, {
-		val:  v1,
-		path: "bar field1",
-		doc:  "comment from bar on field 1\n",
-	}, {
-		val:  v1,
-		path: "baz field1",
-		doc: `comment from bar on field 1
+		}, {
+			val:  v1,
+			path: "foos MyFoo field2",
+			doc:  "other field comment.\n",
+		}, {
+			// Duplicates are now removed.
+			val:  v1,
+			path: "foos MyFoo dup3",
+			doc:  "duplicate field comment\n",
+		}, {
+			val:  v1,
+			path: "bar field1",
+			doc:  "comment from bar on field 1\n",
+		}, {
+			val:  v1,
+			path: "baz field1",
+			doc: `comment from bar on field 1
 
 comment from baz on field 1
 `,
-	}, {
-		val:  v1,
-		path: "baz field2",
-		doc:  "comment from bar on field 2\n",
-	}, {
-		val:  v2,
-		path: "Foo",
-		doc: `Another Foo.
+		}, {
+			val:  v1,
+			path: "baz field2",
+			doc:  "comment from bar on field 2\n",
+		}, {
+			val:  v2,
+			path: "Foo",
+			doc: `Another Foo.
 `,
-	}, {
-		val:  both,
-		path: "Foo",
-		doc: `A Foo fooses stuff.
+		}, {
+			val:  both,
+			path: "Foo",
+			doc: `A Foo fooses stuff.
 
 Another Foo.
 `,
-	}}
-	for _, tc := range testCases {
-		runMatrix(t, "field:"+tc.path, func(t *testing.T, cfg *evalConfig) {
-			v := tc.val.Lookup(strings.Split(tc.path, " ")...)
-			doc := docStr(v.Doc())
-			if doc != tc.doc {
-				t.Errorf("doc: got:\n%vwant:\n%v", doc, tc.doc)
-			}
-		})
-	}
-	want := "foobar defines at least foo.\n"
-	if got := docStr(inst.Value().Doc()); got != want {
-		t.Errorf("pkg: got:\n%vwant:\n%v", got, want)
-	}
+		}}
+		for _, tc := range testCases {
+			t.Run("field:"+tc.path, func(t *testing.T) {
+				TODO_V3(t, cfg)
+
+				v := tc.val.Lookup(strings.Split(tc.path, " ")...)
+				doc := docStr(v.Doc())
+				if doc != tc.doc {
+					t.Errorf("doc: got:\n%vwant:\n%v", doc, tc.doc)
+				}
+			})
+		}
+		want := "foobar defines at least foo.\n"
+		if got := docStr(inst.Value().Doc()); got != want {
+			t.Errorf("pkg: got:\n%vwant:\n%v", got, want)
+		}
+	})
 }
 
 func docStr(docs []*ast.CommentGroup) string {

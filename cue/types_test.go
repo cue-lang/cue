@@ -2345,8 +2345,6 @@ func TestEquals(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
-			TODO_Sharing(t, cfg)
-
 			r := cfg.runtime()
 
 			a, err := r.Compile("a", tc.a)

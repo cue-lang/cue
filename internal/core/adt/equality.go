@@ -42,12 +42,24 @@ func equalVertex(ctx *OpContext, x *Vertex, v Value, flags Flag) bool {
 	if !ok {
 		return false
 	}
-	if x == y {
-		return true
-	}
+
+	// Note that the arc type of an originating node may be different than
+	// the one we are sharing. So do this check before dereferencing.
+	// For instance:
+	//
+	//    a?: #B  // ArcOptional
+	//    #B: {}  // ArcMember
 	if x.ArcType != y.ArcType {
 		return false
 	}
+
+	x = x.Indirect()
+	y = y.Indirect()
+
+	if x == y {
+		return true
+	}
+
 	xk := x.Kind()
 	yk := y.Kind()
 

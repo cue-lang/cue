@@ -153,6 +153,17 @@ func (v *Vertex) DerefNonDisjunct() *Vertex {
 	}
 }
 
+// DerefNonRooted indirects a node that points to a value that is not rooted.
+func (v *Vertex) DerefNonRooted() *Vertex {
+	for {
+		arc, ok := v.BaseValue.(*Vertex)
+		if !ok || arc.IsDisjunct || v.IsShared {
+			return v
+		}
+		v = arc
+	}
+}
+
 // DerefNonShared finds the indirection of an arc that is not the result of
 // structure sharing. This is especially relevant when indirecting disjunction
 // values.

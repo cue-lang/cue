@@ -710,7 +710,7 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 		return nil
 
 	case ArcNotPresent:
-		v.reportFieldCycleError(c, pos, f)
+		v.reportFieldIndexError(c, pos, f)
 		return nil
 
 	case ArcPending:

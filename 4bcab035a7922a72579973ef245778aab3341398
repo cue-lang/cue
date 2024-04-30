@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31a59a24_bce40a63",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T15:19:10Z",
+      "side": 1,
+      "message": "did you forget to mention the \"output path\" flag?",
+      "revId": "4bcab035a7922a72579973ef245778aab3341398",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e456de4_868e1daf",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T15:19:10Z",
+      "side": 1,
+      "message": "Not sure if you are trying to be consistent with other commands or not, but in addOutFlags, `-o` is short for `--outfile`, not `--out`. given how `--json` has no short form, I think not having a short form for `--out` is fine as well. alternatively, stick with `--outfile` and `-o`?\n\nnot a huge deal, but I might prefer to be consistent where possible.",
+      "revId": "4bcab035a7922a72579973ef245778aab3341398",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a703e11f_e78121ee",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T15:19:10Z",
+      "side": 1,
+      "message": "are you mising log.Printf here with fmt.Printf below on purpose? it seems odd",
+      "revId": "4bcab035a7922a72579973ef245778aab3341398",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "39ae1709_efe99185",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T15:19:10Z",
+      "side": 1,
+      "message": "what line lengths are you wrapping with? line 243 is only 66 characters, so \"registry\" fits perfectly fine, and it reads odd that just one word is split up. commit messages are 76, but for code, I think anything around 80 to 100 is perfectly reasonable - we often have code lines beyond 80 anyway.",
+      "revId": "4bcab035a7922a72579973ef245778aab3341398",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d41c38dd_932ea561",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T15:19:10Z",
+      "side": 1,
+      "message": "perhaps be explicit, as others might not be aware of our convention:\n\n\u003e mu protects all fields below.",
+      "revId": "4bcab035a7922a72579973ef245778aab3341398",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da2e3c4c_64d6a72c",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T15:19:10Z",
+      "side": 1,
+      "message": "odd that the library doesn\u0027t expose this in any way.\n\nalso, nit: can we put `{` at the start of a line too, for readability? perhaps with your `[1:]` trick.",
+      "revId": "4bcab035a7922a72579973ef245778aab3341398",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0baa2a8f_326b637c",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T15:19:10Z",
+      "side": 1,
+      "message": "can you expand this TODO slightly? e.g. I imagine we could have this func type assert to io.ReaderAt, and then make the PushBlob caller provide content that\u0027s both Reader and ReaderAt (which caller implementation is that, though?).",
+      "revId": "4bcab035a7922a72579973ef245778aab3341398",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3f808cb_06a91aab",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T15:19:10Z",
+      "side": 1,
+      "message": "nit: reuse the same reader, seeking it back to the start?",
+      "revId": "4bcab035a7922a72579973ef245778aab3341398",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "513e1414_f72e82f5",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 443,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T15:19:10Z",
+      "side": 1,
+      "message": "nit: check this error",
+      "revId": "4bcab035a7922a72579973ef245778aab3341398",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

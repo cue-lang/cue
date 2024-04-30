@@ -1,0 +1,61 @@
+env CUE_EXPERIMENT=modules
+env CUE_REGISTRY=foo.com/bar=myregistry.example/foo,other.org=none
+
+exec cue mod resolve somethingelse.bar.com/abc@v1.2.3
+cmp stdout want-resolve0
+
+exec cue mod resolve somethingelse.bar.com/abc
+cmp stdout want-resolve1
+
+exec cue mod resolve foo.com/bar/baz@v0.1.2
+cmp stdout want-resolve2
+
+! exec cue mod resolve other.org/a/b
+cmp stderr want-resolve3
+
+env CUE_REGISTRY=file:registry-config.cue
+
+exec cue mod resolve a.com/b
+cmp stdout want-resolve4
+
+exec cue mod resolve a.com/foo/bar/baz@v1.2.3
+cmp stdout want-resolve5
+
+exec cue mod resolve a.com/foo/bar/baz@v1.2.3
+cmp stdout want-resolve5
+
+exec cue mod resolve stripped.org/bar/baz/p@v0.1.2
+cmp stdout want-resolve6
+
+-- registry-config.cue --
+moduleRegistries: {
+	"a.com": {
+		registry: "r1.example/a/b+insecure"
+	}
+	"a.com/foo/bar": {
+		registry: "r2.example/xxx"
+		pathEncoding: "hashAsRepo"
+		prefixForTags: "cue-"
+	}
+	"stripped.org/bar": {
+		registry: "r3.example/repo"
+		stripPrefix: true
+	}
+	"badmodules.org": {
+		registry: "none"
+	}
+}
+-- want-resolve0 --
+registry.cue.works/somethingelse.bar.com/abc:v1.2.3
+-- want-resolve1 --
+registry.cue.works/somethingelse.bar.com/abc
+-- want-resolve2 --
+myregistry.example/foo/foo.com/bar/baz:v0.1.2
+-- want-resolve3 --
+no registry found for module "other.org/a/b"
+-- want-resolve4 --
+r1.example/a/b/a.com/b
+-- want-resolve5 --
+r2.example/xxx/0764601cd4e1d9d84efc2f4ddc23191e599fa9826f46b16b84269b6fe3679184:cue-v1.2.3
+-- want-resolve6 --
+r3.example/repo/baz/p:v0.1.2

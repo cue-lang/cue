@@ -1,6 +1,63 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "5bec15d2_a1ad4e64",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T08:32:38Z",
+      "side": 1,
+      "message": "perhaps mention why, e.g. the pkg and gen directories underneath aren\u0027t maintained by humans, so shouldn\u0027t need formatting",
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40cc755e_1b981d7f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T08:32:38Z",
+      "side": 1,
+      "message": "surely you mean `cue fmt --files -`?",
+      "range": {
+        "startLine": 31,
+        "startChar": 22,
+        "endLine": 31,
+        "endChar": 31
+      },
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "385a03f1_d1881f24",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T08:32:38Z",
+      "side": 1,
+      "message": "\u003e ... as they only",
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "8bf17a79_7cdaabad",
@@ -14,6 +71,229 @@
       "writtenOn": "2024-04-29T08:25:15Z",
       "side": 1,
       "message": "please let me know if this should be split into separate commits",
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d83bc72_e57fbc21",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T08:32:38Z",
+      "side": 1,
+      "message": "I don\u0027t think you can, I don\u0027t really see anything that can be neatly split up.",
+      "parentUuid": "8bf17a79_7cdaabad",
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b8ea226_e53355fa",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T08:32:38Z",
+      "side": 1,
+      "message": "this is all related, so I would rewrite into a single paragraph, and also mention the ignoring of directories:\n\n\u003e Arguments are interpreted as import paths (see \u0027cue help inputs\u0027) unless --flags is set,\n\u003e in which case the arguments are file paths to descend into and format all CUE files.\n\u003e Directories named \"cue.mod\" and those beginning with \".\" and \"_\" are skipped unless\n\u003e given as explicit arguments.",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 53,
+        "endChar": 12
+      },
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0f9264f_f4dc7bbe",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T08:32:38Z",
+      "side": 1,
+      "message": "nit: `isDot` for consistency",
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76c81f54_fb2a1359",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T08:32:38Z",
+      "side": 1,
+      "message": "move this to the top of the walk func, e.g. `if err !\u003d nil { return err }`",
+      "range": {
+        "startLine": 153,
+        "startChar": 10,
+        "endLine": 153,
+        "endChar": 20
+      },
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a26ece55_ac1e4b14",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T08:32:38Z",
+      "side": 1,
+      "message": "we should mention the word \"descend\" here as a reminder that we do walk directories. how about:\n\n\u003e \"treat arguments as file paths to descend into rather than import paths\"",
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae6ae370_c3c20638",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T08:32:38Z",
+      "side": 1,
+      "message": "how about onError? these are not really warnings, as we do fail if any are printed out.",
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7126486_c2d73658",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T08:32:38Z",
+      "side": 1,
+      "message": "this is a result, not an input parameter - move to the end as a separate section of fields?",
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff2aa134_f3b3d72b",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T08:32:38Z",
+      "side": 1,
+      "message": "move this line inside the \"else\" block",
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d2713a4_bd294c27",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T08:32:38Z",
+      "side": 1,
+      "message": "the `err !\u003d nil` is unnecessary, as exitOnErr already does nothing on a nil error",
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7af1a5c_96d9045d",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_files.txtar",
+        "patchSetId": 11
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T08:32:38Z",
+      "side": 1,
+      "message": "\u003e ... with or without --files",
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "383b93c1_13a0eaa4",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_files.txtar",
+        "patchSetId": 11
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T08:32:38Z",
+      "side": 1,
+      "message": "check the same for dirs starting with `_` or `.`?",
+      "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f95e8d69_f49a8f53",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_files.txtar",
+        "patchSetId": 11
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T08:32:38Z",
+      "side": 1,
+      "message": "nit: `... patterns`, because an import path like `cue fmt --files ./standalone/a` will often still work, as it\u0027s still a valid directory path",
+      "range": {
+        "startLine": 23,
+        "startChar": 37,
+        "endLine": 23,
+        "endChar": 49
+      },
       "revId": "be546b8cc4506e53df0b9d3bb0720f514f435290",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

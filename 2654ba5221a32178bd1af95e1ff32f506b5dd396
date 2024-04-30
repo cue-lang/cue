@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1cb4a42f_8fe1816a",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T08:32:38Z",
+      "side": 1,
+      "message": "in files mode we shouldn\u0027t use cue/load, so I think newBuildPlan shouldn\u0027t be necessary then",
+      "parentUuid": "8df3467d_ab2750b6",
+      "range": {
+        "startLine": 63,
+        "startChar": 3,
+        "endLine": 71,
+        "endChar": 24
+      },
+      "revId": "2654ba5221a32178bd1af95e1ff32f506b5dd396",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "95fd1966_77ca0729",
         "filename": "cmd/cue/cmd/fmt.go",
         "patchSetId": 7
@@ -37,6 +61,30 @@
       "writtenOn": "2024-04-28T07:49:03Z",
       "side": 1,
       "message": "should we disallow \"-\" in files mode? technically we don\u0027t *have* to exclude it, but I wonder which one is more intuitive",
+      "range": {
+        "startLine": 119,
+        "startChar": 5,
+        "endLine": 121,
+        "endChar": 13
+      },
+      "revId": "2654ba5221a32178bd1af95e1ff32f506b5dd396",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec69a1d9_9d3a464f",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T08:32:38Z",
+      "side": 1,
+      "message": "Not sure. I lean towards allowing it; some people like myself might choose to use `cue fmt --files` as a shell alias, and having the alias fail on stdin feels unnecessary.",
+      "parentUuid": "95fd1966_77ca0729",
       "range": {
         "startLine": 119,
         "startChar": 5,

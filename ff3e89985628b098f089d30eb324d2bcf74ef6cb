@@ -447,6 +447,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f538185f_5eea3b61",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-30T10:23:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "422260e4_abcaf3de",
+      "revId": "ff3e89985628b098f089d30eb324d2bcf74ef6cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ad74d9b4_a7ae9c3f",

@@ -16,23 +16,12 @@ package ast
 
 import (
 	"fmt"
-
-	"cuelang.org/go/cue/token"
 )
-
-// Walk traverses an AST in depth-first order: It starts by calling f(node);
-// node must not be nil. If before returns true, Walk invokes f recursively for
-// each of the non-nil children of node, followed by a call of after. Both
-// functions may be nil. If before is nil, it is assumed to always return true.
-func Walk(node Node, before func(Node) bool, after func(Node)) {
-	v := &inspector{before: before, after: after}
-	walk(node, v.Before, v.After)
-}
 
 // WalkVisitor traverses an AST in depth-first order with a [Visitor].
 func WalkVisitor(node Node, visitor Visitor) {
 	v := &stackVisitor{stack: []Visitor{visitor}}
-	walk(node, v.Before, v.After)
+	Walk(node, v.Before, v.After)
 }
 
 // stackVisitor helps implement Visitor support on top of Walk.
@@ -64,12 +53,16 @@ type Visitor interface {
 
 func walkList[N Node](list []N, before func(Node) bool, after func(Node)) {
 	for _, node := range list {
-		walk(node, before, after)
+		Walk(node, before, after)
 	}
 }
 
-func walk(node Node, before func(Node) bool, after func(Node)) {
-	if !before(node) {
+// Walk traverses an AST in depth-first order: It starts by calling f(node);
+// node must not be nil. If before returns true, Walk invokes f recursively for
+// each of the non-nil children of node, followed by a call of after. Both
+// functions may be nil. If before is nil, it is assumed to always return true.
+func Walk(node Node, before func(Node) bool, after func(Node)) {
+	if before != nil && !before(node) {
 		return
 	}
 
@@ -92,15 +85,15 @@ func walk(node Node, before func(Node) bool, after func(Node)) {
 		// nothing to do
 
 	case *Field:
-		walk(n.Label, before, after)
+		Walk(n.Label, before, after)
 		if n.Value != nil {
-			walk(n.Value, before, after)
+			Walk(n.Value, before, after)
 		}
 		walkList(n.Attrs, before, after)
 
 	case *Func:
 		walkList(n.Args, before, after)
-		walk(n.Ret, before, after)
+		Walk(n.Ret, before, after)
 
 	case *StructLit:
 		walkList(n.Elts, before, after)
@@ -117,46 +110,46 @@ func walk(node Node, before func(Node) bool, after func(Node)) {
 
 	case *Ellipsis:
 		if n.Type != nil {
-			walk(n.Type, before, after)
+			Walk(n.Type, before, after)
 		}
 
 	case *ParenExpr:
-		walk(n.X, before, after)
+		Walk(n.X, before, after)
 
 	case *SelectorExpr:
-		walk(n.X, before, after)
-		walk(n.Sel, before, after)
+		Walk(n.X, before, after)
+		Walk(n.Sel, before, after)
 
 	case *IndexExpr:
-		walk(n.X, before, after)
-		walk(n.Index, before, after)
+		Walk(n.X, before, after)
+		Walk(n.Index, before, after)
 
 	case *SliceExpr:
-		walk(n.X, before, after)
+		Walk(n.X, before, after)
 		if n.Low != nil {
-			walk(n.Low, before, after)
+			Walk(n.Low, before, after)
 		}
 		if n.High != nil {
-			walk(n.High, before, after)
+			Walk(n.High, before, after)
 		}
 
 	case *CallExpr:
-		walk(n.Fun, before, after)
+		Walk(n.Fun, before, after)
 		walkList(n.Args, before, after)
 
 	case *UnaryExpr:
-		walk(n.X, before, after)
+		Walk(n.X, before, after)
 
 	case *BinaryExpr:
-		walk(n.X, before, after)
-		walk(n.Y, before, after)
+		Walk(n.X, before, after)
+		Walk(n.Y, before, after)
 
 	// Declarations
 	case *ImportSpec:
 		if n.Name != nil {
-			walk(n.Name, before, after)
+			Walk(n.Name, before, after)
 		}
-		walk(n.Path, before, after)
+		Walk(n.Path, before, after)
 
 	case *BadDecl:
 		// nothing to do
@@ -165,100 +158,42 @@ func walk(node Node, before func(Node) bool, after func(Node)) {
 		walkList(n.Specs, before, after)
 
 	case *EmbedDecl:
-		walk(n.Expr, before, after)
+		Walk(n.Expr, before, after)
 
 	case *LetClause:
-		walk(n.Ident, before, after)
-		walk(n.Expr, before, after)
+		Walk(n.Ident, before, after)
+		Walk(n.Expr, before, after)
 
 	case *Alias:
-		walk(n.Ident, before, after)
-		walk(n.Expr, before, after)
+		Walk(n.Ident, before, after)
+		Walk(n.Expr, before, after)
 
 	case *Comprehension:
 		walkList(n.Clauses, before, after)
-		walk(n.Value, before, after)
+		Walk(n.Value, before, after)
 
 	// Files and packages
 	case *File:
 		walkList(n.Decls, before, after)
 
 	case *Package:
-		walk(n.Name, before, after)
+		Walk(n.Name, before, after)
 
 	case *ForClause:
 		if n.Key != nil {
-			walk(n.Key, before, after)
+			Walk(n.Key, before, after)
 		}
-		walk(n.Value, before, after)
-		walk(n.Source, before, after)
+		Walk(n.Value, before, after)
+		Walk(n.Source, before, after)
 
 	case *IfClause:
-		walk(n.Condition, before, after)
+		Walk(n.Condition, before, after)
 
 	default:
 		panic(fmt.Sprintf("Walk: unexpected node type %T", n))
 	}
 
-	after(node)
-}
-
-type inspector struct {
-	before func(Node) bool
-	after  func(Node)
-
-	commentStack []commentFrame
-	current      commentFrame
-}
-
-type commentFrame struct {
-	cg  []*CommentGroup
-	pos int8
-}
-
-func (f *inspector) Before(node Node) bool {
-	if f.before == nil || f.before(node) {
-		f.commentStack = append(f.commentStack, f.current)
-		f.current = commentFrame{cg: Comments(node)}
-		f.visitComments(f.current.pos)
-		return true
-	}
-	return false
-}
-
-func (f *inspector) After(node Node) {
-	f.visitComments(127)
-	p := len(f.commentStack) - 1
-	f.current = f.commentStack[p]
-	f.commentStack = f.commentStack[:p]
-	f.current.pos++
-	if f.after != nil {
-		f.after(node)
-	}
-}
-
-func (f *inspector) Token(t token.Token) {
-	f.current.pos++
-}
-
-func (f *inspector) visitComments(pos int8) {
-	c := &f.current
-	for ; len(c.cg) > 0; c.cg = c.cg[1:] {
-		cg := c.cg[0]
-		if cg.Position == pos {
-			continue
-		}
-		if f.before == nil || f.before(cg) {
-			for _, c := range cg.List {
-				if f.before == nil || f.before(c) {
-					if f.after != nil {
-						f.after(c)
-					}
-				}
-			}
-			if f.after != nil {
-				f.after(cg)
-			}
-		}
+	if after != nil {
+		after(node)
 	}
 }

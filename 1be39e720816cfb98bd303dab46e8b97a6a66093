@@ -16,6 +16,24 @@
       "message": "I will run this new API by Marcel sometime this week, but a review still appreciated.",
       "revId": "1be39e720816cfb98bd303dab46e8b97a6a66093",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8302a3a_cd3357a2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-30T09:47:43Z",
+      "side": 1,
+      "message": "We agreed on a call that exposing this API is OK. Roger mentioned it should be possible to write the sanitize/apply logic on top of before and after funcs; I\u0027m not actually sure I see it in my head but I will give it a go, sending a follow-up CL to remove WalkVisitor again if I succeed.",
+      "parentUuid": "2c2c721b_83504b84",
+      "revId": "1be39e720816cfb98bd303dab46e8b97a6a66093",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

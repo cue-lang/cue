@@ -39,6 +39,24 @@
       "message": "can this not just be `c.Env.DynamicLabel \u003d arc.Label`? or is there a reason that we are replacing c.Env with a modified copy rather than modifying in-place? if so I\u0027d perhaps briefly document that",
       "revId": "db5100b437b3f90d5966fef66def9601e9c3db7d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "110f64f0_b5c7fa0f",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1036,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-30T08:53:32Z",
+      "side": 1,
+      "message": "The conditional assignment is necessary, because it should only be assigned if the value is not AnyString, AnyIndex, or any other potential label type in the future.\nTests will fail if this exception is left out.\n\nWe have to copy the Environment, because the same conjuncts can be copied to many different arcs, where in each case the label will be different.",
+      "parentUuid": "27a06698_fca03a7f",
+      "revId": "db5100b437b3f90d5966fef66def9601e9c3db7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -3836,8 +3836,6 @@ func TestExpr(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		runMatrix(t, tc.input, func(t *testing.T, cfg *evalConfig) {
-			TODO_Sharing(t, cfg)
-
 			v := cfg.getValue(t, tc.input).Lookup("v")
 			got := exprStr(v)
 			if got != tc.want {

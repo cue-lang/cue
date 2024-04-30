@@ -3559,8 +3559,6 @@ func TestPathCorrection(t *testing.T) {
 			continue
 		}
 		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
-			TODO_Sharing(t, cfg)
-
 			r := cfg.runtime()
 
 			inst, err := r.Compile("in", tc.input)

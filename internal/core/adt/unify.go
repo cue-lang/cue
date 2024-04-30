@@ -624,9 +624,13 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 	// TODO: verify lookup types.
 
 	arc := v.LookupRaw(f)
+	// We leave further dereferencing to the caller, but we do dereference for
+	// the remainder of this function to be able to check the status.
+	arcReturn := arc
 	if arc != nil {
-		// TODO: ideally we should leave the dereferencing up to the caller.
-		arc = arc.DerefNonDisjunct()
+		arc = arc.DerefNonRooted()
+		// TODO(perf): NonRooted is the minimum, but consider doing more.
+		// arc = arc.DerefValue()
 	}
 
 	// TODO: clean up this logic:
@@ -638,7 +642,7 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 	switch {
 	case arc != nil:
 		if arc.ArcType == ArcMember {
-			return arc
+			return arcReturn
 		}
 		arcState = arc.getState(c)
 
@@ -681,7 +685,7 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 			if task != nil {
 				arcState.addNotify2(task.node.node, task.id)
 			}
-			return arc
+			return arcReturn
 
 		case yield:
 			arcState.process(needs, yield)
@@ -696,7 +700,7 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 
 	switch arc.ArcType {
 	case ArcMember:
-		return arc
+		return arcReturn
 
 	case ArcOptional, ArcRequired:
 		label := f.SelectorString(c.Runtime)

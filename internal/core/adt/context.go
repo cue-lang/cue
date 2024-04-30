@@ -511,8 +511,8 @@ func (c *OpContext) Lookup(env *Environment, r Resolver) (*Vertex, *Bottom) {
 
 	err := c.PopState(s)
 
-	if arc != nil {
-		// TODO(P1)/TODO(deref): lookup should probably not use DerefValue, but
+	if arc != nil && !c.isDevVersion() {
+		// TODO(deref): lookup should probably not use DerefValue, but
 		// rather only dereference disjunctions.
 		arc = arc.DerefValue()
 	}

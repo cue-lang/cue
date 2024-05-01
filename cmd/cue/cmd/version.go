@@ -38,13 +38,9 @@ func newVersionCmd(c *Command) *cobra.Command {
 	return cmd
 }
 
-// version can be set by a builder using
-// -ldflags='-X cuelang.org/go/cmd/cue/cmd.version=<version>'.
-// However, people should prefer building via a mechanism which
-// resolves cuelang.org/go as a dependency (and not the main
-// module), in which case the version information is determined
-// from the *debug.BuildInfo (see below). So this mechanism is
-// considered legacy.
+// version can be set at build time to inject cmd/cue's version string,
+// particularly necessary when building a release locally.
+// See the top-level README.md for more details.
 var version string
 
 func runVersion(cmd *Command, args []string) error {

@@ -24,9 +24,7 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/eval"
-	"cuelang.org/go/internal/core/runtime"
-	"cuelang.org/go/internal/cuetest"
-	"cuelang.org/go/internal/tdtest"
+	"cuelang.org/go/internal/cuetdtest"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -37,6 +35,8 @@ func TestValidate(t *testing.T) {
 		out    string
 		lookup string
 		cfg    *Config
+
+		todo_v3 bool
 	}
 	testCases := []testCase{{
 		name: "no error, but not concrete, even with definition label",
@@ -118,6 +118,9 @@ y: conflicting values 4 and 2:
 		x: y
 		`,
 	}, {
+		// TODO: discarded cycle error
+		todo_v3: true,
+
 		name: "disallow cycle",
 		cfg:  &Config{DisallowCycles: true},
 		in: `
@@ -126,6 +129,9 @@ y: conflicting values 4 and 2:
 		`,
 		out: "cycle\ncycle error:\n    test:2:6",
 	}, {
+		// TODO: discarded cycle error
+		todo_v3: true,
+
 		name: "disallow cycle",
 		cfg:  &Config{DisallowCycles: true},
 		in: `
@@ -185,6 +191,9 @@ y: conflicting values 4 and 2:
 			`,
 		out: "incomplete\nx.a: incomplete value 1 | 2",
 	}, {
+		// TODO: missing error position
+		todo_v3: true,
+
 		name: "required field not present",
 		cfg:  &Config{Final: true},
 		in: `
@@ -216,10 +225,13 @@ y: conflicting values 4 and 2:
 		out: "",
 	}}
 
-	r := runtime.New()
-	ctx := eval.NewContext(r, nil)
+	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {
+		if tc.todo_v3 {
+			t.M.TODO_V3()
+		}
+		r := t.M.Runtime()
+		ctx := eval.NewContext(r, nil)
 
-	tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
 		f, err := parser.ParseFile("test", tc.in)
 		if err != nil {
 			t.Fatal(err)

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "91e9539b_c9548f83",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-01T08:36:28Z",
+      "side": 1,
+      "message": "Thanks! No comments, really. Merging on my own so we can ship in alpha.4.",
+      "revId": "ac5f285576b6e0c48f5db5bea68601c971cc39e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -36,6 +36,33 @@
 	#def: 3
 	#bar: int
 }
+-- out/doc-v3 --
+[]
+[#A]
+[#A #a]
+[#E]
+[#F]
+[#G]
+[#B]
+[#B #def]
+[#B #f]
+[#B #bar]
+[#B #a]
+-- diff/-out/doc-v3<==>+out/doc --
+diff old new
+--- old
++++ new
+@@ -5,7 +5,7 @@
+ [#F]
+ [#G]
+ [#B]
+-[#B #a]
+ [#B #def]
+ [#B #f]
+ [#B #bar]
++[#B #a]
+-- diff/doc/explanation --
+Reordering.
 -- out/doc --
 []
 [#A]

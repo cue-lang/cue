@@ -2,7 +2,7 @@
 -- in.cue --
 t: {name: string}
 output: [...t]
--- out/default --
+-- out/self/default --
 
 [...{
 	name: string

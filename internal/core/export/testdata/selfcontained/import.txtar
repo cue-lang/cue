@@ -48,7 +48,7 @@ w: {
 	}
 }
 
--- out/default --
+-- out/self/default --
 import (
 	"mod.test/a/pkg"
 	"tool/exec"
@@ -74,7 +74,7 @@ wa: pkg.w.a
 // Never expand builtin packages.
 run:     exec.Run
 _hidden: int
--- out/expand_imports --
+-- out/self/expand_imports --
 import "tool/exec"
 
 // Can be inlined.

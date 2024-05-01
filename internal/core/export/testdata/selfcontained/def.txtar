@@ -5,7 +5,7 @@
 }
 
 a: b: c: #def
--- out/default --
+-- out/self/default --
 c: DEF.#x
 
 //cue:path: #def

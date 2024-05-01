@@ -24,7 +24,7 @@ a: b: {
 
 	ref6: y.z.map[incomplete2] // inline the single-use map.
 }
--- out/default --
+-- out/self/default --
 ref1: MAP
 ref2: MAP.foo
 ref3: MAP[INCOMPLETE1]

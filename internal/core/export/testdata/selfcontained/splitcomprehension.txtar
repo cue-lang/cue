@@ -20,7 +20,7 @@ a: {
 	}
 	b: {}
 }
--- out/default --
+-- out/self/default --
 
 {
 	k2: "test"

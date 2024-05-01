@@ -472,6 +472,850 @@ Missing lines.
 [Y]
 [y]
 [Y]
+-- out/value-v3 --
+== Simplified
+{
+	comprehension: {
+		for cfg in [{
+			a: "one"
+		}] {
+			let filepath = "kind-\(cfg.name)"
+			"\(filepath)": {
+				patches: cfg
+			}
+		}
+	}
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
+		}
+	}
+	cfgs: [{
+		metadata: {
+			name: "one"
+		}
+	}, {
+		metadata: {
+			name: "two"
+		}
+	}]
+	files: {
+		"\("kind-\(cfg.name)")": {
+			patches: cfg
+		}
+	}
+	scoped: {
+		direct: {
+			a: 1
+		}
+		embed1: {
+			a: 1
+		}
+		embed2: {
+			a: 1
+		}
+		list: {
+			a: [1]
+		}
+		listStruct: {
+			a: [{
+				a: 1
+			}]
+		}
+		listEmbed: {
+			a: [1]
+		}
+	}
+	x: "foo"
+	incomplete: {
+		a: {
+			x: "a \(run.a) z"
+			run: {
+				a: string
+			}
+		}
+		b: {
+			x: "a \(run.a) z"
+			run: {
+				a: string
+			}
+		}
+		c: {
+			x:  "a \(run.a) z"
+			x2: "a \(run2.a) z"
+			run: {
+				a: string
+			}
+			run2: {
+				a: string
+			}
+		}
+		d: {
+			x:  "a \(run.a) z"
+			x2: "a \(run2.a) z"
+			run: {
+				a: string
+			}
+			run2: {
+				a: string
+			}
+		}
+	}
+	unresolvedDisjunction: {}
+	y: "foo"
+}
+== Raw
+{
+	comprehension: {
+		for cfg in [{
+			a: "one"
+		}] {
+			let filepath = "kind-\(cfg.name)"
+			"\(filepath)": {
+				patches: cfg
+			}
+		}
+	}
+	#Foo: 2
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
+		}
+	}
+	cfgs: [{
+		metadata: {
+			name: "one"
+		}
+	}, {
+		metadata: {
+			name: "two"
+		}
+	}]
+	files: {
+		"\("kind-\(cfg.name)")": {
+			patches: cfg
+		}
+	}
+	scoped: {
+		_args: {
+			required: 1
+		}
+		direct: {
+			a: 1
+		}
+		embed1: {
+			a: 1
+		}
+		embed2: {
+			a: 1
+		}
+		list: {
+			a: [1]
+		}
+		listStruct: {
+			a: [{
+				a: 1
+			}]
+		}
+		listEmbed: {
+			a: [1]
+		}
+	}
+	x: "foo"
+	incomplete: {
+		a: {
+			x: "a \(run.a) z"
+			run: {
+				a: string
+			}
+		}
+		b: {
+			x: "a \(run.a) z"
+			run: {
+				a: string
+			}
+		}
+		c: {
+			x:  "a \(run.a) z"
+			x2: "a \(run2.a) z"
+			run: {
+				a: string
+			}
+			run2: {
+				a: string
+			}
+		}
+		d: {
+			x:  "a \(run.a) z"
+			x2: "a \(run2.a) z"
+			run: {
+				a: string
+			}
+			run2: {
+				a: string
+			}
+		}
+	}
+	unresolvedDisjunction: {
+		#TypePrimitive: {
+			_args: {
+				required: bool
+			}
+			"*": {}
+		}
+		#TypeBool: {
+			let Args = _args
+			_args: {
+				required: bool
+			}
+
+			if !Args.required {
+				// `default` sets the default value.
+				default: bool | null
+			}
+		}
+	}
+	y: "foo"
+}
+== Final
+{
+	comprehension: _|_ // comprehension: key value of dynamic field must be concrete, found _|_(invalid interpolation: invalid interpolation: comprehension.filepath: undefined field: name (and 1 more errors)) (and 2 more errors)
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
+		}
+	}
+	cfgs: [{
+		metadata: {
+			name: "one"
+		}
+	}, {
+		metadata: {
+			name: "two"
+		}
+	}]
+	files: _|_ // files: key value of dynamic field must be concrete, found _|_(invalid interpolation: invalid interpolation: filepath: undefined field: name (and 3 more errors)) (and 9 more errors)
+	scoped: {
+		direct: {
+			a: 1
+		}
+		embed1: {
+			a: 1
+		}
+		embed2: {
+			a: 1
+		}
+		list: {
+			a: [1]
+		}
+		listStruct: {
+			a: [{
+				a: 1
+			}]
+		}
+		listEmbed: {
+			a: [1]
+		}
+	}
+	x: "foo"
+	incomplete: {
+		a: {
+			x: _|_ // invalid interpolation: incomplete.a.x: non-concrete value string (type string) (and 1 more errors)
+			run: {
+				a: string
+			}
+		}
+		b: {
+			x: _|_ // invalid interpolation: incomplete.b.x: non-concrete value string (type string) (and 1 more errors)
+			run: {
+				a: string
+			}
+		}
+		c: {
+			x:  _|_ // invalid interpolation: incomplete.c.x: non-concrete value string (type string) (and 1 more errors)
+			x2: _|_ // invalid interpolation: incomplete.c.x2: non-concrete value string (type string) (and 1 more errors)
+			run: {
+				a: string
+			}
+			run2: {
+				a: string
+			}
+		}
+		d: {
+			x:  _|_ // invalid interpolation: incomplete.d.x: non-concrete value string (type string) (and 1 more errors)
+			x2: _|_ // invalid interpolation: incomplete.d.x2: non-concrete value string (type string) (and 1 more errors)
+			run: {
+				a: string
+			}
+			run2: {
+				a: string
+			}
+		}
+	}
+	unresolvedDisjunction: {}
+	y: "foo"
+}
+== All
+{
+	comprehension: {
+		for cfg in [{
+			a: "one"
+		}] {
+			let filepath = "kind-\(cfg.name)"
+			"\(filepath)": {
+				patches: cfg
+			}
+		}
+	}
+	#Foo: 2
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
+		}
+	}
+	cfgs: [{
+		metadata: {
+			name: "one"
+		}
+	}, {
+		metadata: {
+			name: "two"
+		}
+	}]
+	files: {
+		"\("kind-\(cfg.name)")": {
+			patches: cfg
+		}
+	}
+	scoped: {
+		_args: {
+			required: 1
+		}
+		direct: {
+			a: 1
+		}
+		embed1: {
+			a: 1
+		}
+		embed2: {
+			a: 1
+		}
+		list: {
+			a: [1]
+		}
+		listStruct: {
+			a: [{
+				a: 1
+			}]
+		}
+		listEmbed: {
+			a: [1]
+		}
+	}
+	x: "foo"
+	incomplete: {
+		a: {
+			x: "a \(run.a) z"
+			run: {
+				a: string
+			}
+		}
+		b: {
+			x: "a \(run.a) z"
+			run: {
+				a: string
+			}
+		}
+		c: {
+			x:  "a \(run.a) z"
+			x2: "a \(run2.a) z"
+			run: {
+				a: string
+			}
+			run2: {
+				a: string
+			}
+		}
+		d: {
+			x:  "a \(run.a) z"
+			x2: "a \(run2.a) z"
+			run: {
+				a: string
+			}
+			run2: {
+				a: string
+			}
+		}
+	}
+	unresolvedDisjunction: {
+		#TypePrimitive: {
+			_args: {
+				required: bool
+			}
+			"*": {}
+		}
+		#TypeBool: {
+			let Args = _args
+			_args: {
+				required: bool
+			}
+
+			if !Args.required {
+				// `default` sets the default value.
+				default: bool | null
+			}
+		}
+	}
+	y: "foo"
+}
+== Eval
+{
+	comprehension: {
+		for cfg in [{
+			a: "one"
+		}] {
+			let filepath = "kind-\(cfg.name)"
+			"\(filepath)": {
+				patches: cfg
+			}
+		}
+	}
+	#Foo: 2
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
+		}
+	}
+	cfgs: [{
+		metadata: {
+			name: "one"
+		}
+	}, {
+		metadata: {
+			name: "two"
+		}
+	}]
+	files: {
+		"\("kind-\(cfg.name)")": {
+			patches: cfg
+		}
+	}
+	scoped: {
+		direct: {
+			a: 1
+		}
+		embed1: {
+			a: 1
+		}
+		embed2: {
+			a: 1
+		}
+		list: {
+			a: [1]
+		}
+		listStruct: {
+			a: [{
+				a: 1
+			}]
+		}
+		listEmbed: {
+			a: [1]
+		}
+	}
+	x: "foo"
+	incomplete: {
+		a: {
+			x: "a \(run.a) z"
+			run: {
+				a: string
+			}
+		}
+		b: {
+			x: "a \(run.a) z"
+			run: {
+				a: string
+			}
+		}
+		c: {
+			x:  "a \(run.a) z"
+			x2: "a \(run2.a) z"
+			run: {
+				a: string
+			}
+			run2: {
+				a: string
+			}
+		}
+		d: {
+			x:  "a \(run.a) z"
+			x2: "a \(run2.a) z"
+			run: {
+				a: string
+			}
+			run2: {
+				a: string
+			}
+		}
+	}
+	unresolvedDisjunction: {
+		#TypePrimitive: {
+			"*": {}
+		}
+		#TypeBool: {
+			let Args = _args
+			_args: {
+				required: bool
+			}
+
+			if !Args.required {
+				default: bool | null
+			}
+		}
+	}
+	y: "foo"
+}
+-- diff/-out/value-v3<==>+out/value --
+diff old new
+--- old
++++ new
+@@ -61,29 +61,24 @@
+ 			}
+ 		}
+ 		b: {
+-			let A = run.a
+-			x: "a \(A) z"
+-			run: {
+-				a: string
+-			}
+-		}
+-		c: {
+-			let A_1 = run.a
+-			let A_2 = run2.a
+-			x:  "a \(A_1) z"
+-			x2: "a \(A_2) z"
+-			run: {
+-				a: string
+-			}
+-			run2: {
+-				a: string
+-			}
+-		}
+-		d: {
+-			let A_3 = run.a
+-			let A_4 = run2.a
+-			x:  "a \(A_3) z"
+-			x2: "a \(A_4) z"
++			x: "a \(run.a) z"
++			run: {
++				a: string
++			}
++		}
++		c: {
++			x:  "a \(run.a) z"
++			x2: "a \(run2.a) z"
++			run: {
++				a: string
++			}
++			run2: {
++				a: string
++			}
++		}
++		d: {
++			x:  "a \(run.a) z"
++			x2: "a \(run2.a) z"
+ 			run: {
+ 				a: string
+ 			}
+@@ -162,29 +157,24 @@
+ 			}
+ 		}
+ 		b: {
+-			let A = run.a
+-			x: "a \(A) z"
+-			run: {
+-				a: string
+-			}
+-		}
+-		c: {
+-			let A_1 = run.a
+-			let A_2 = run2.a
+-			x:  "a \(A_1) z"
+-			x2: "a \(A_2) z"
+-			run: {
+-				a: string
+-			}
+-			run2: {
+-				a: string
+-			}
+-		}
+-		d: {
+-			let A_3 = run.a
+-			let A_4 = run2.a
+-			x:  "a \(A_3) z"
+-			x2: "a \(A_4) z"
++			x: "a \(run.a) z"
++			run: {
++				a: string
++			}
++		}
++		c: {
++			x:  "a \(run.a) z"
++			x2: "a \(run2.a) z"
++			run: {
++				a: string
++			}
++			run2: {
++				a: string
++			}
++		}
++		d: {
++			x:  "a \(run.a) z"
++			x2: "a \(run2.a) z"
+ 			run: {
+ 				a: string
+ 			}
+@@ -216,72 +206,72 @@
+ }
+ == Final
+ {
+-	comprehension: _|_ // invalid interpolation: cycle error
+-	complete: {
+-		x: "a foo z"
+-		run: {
+-			a: "foo"
+-		}
+-	}
+-	cfgs: [{
+-		metadata: {
+-			name: "one"
+-		}
+-	}, {
+-		metadata: {
+-			name: "two"
+-		}
+-	}]
+-	files: _|_ // invalid interpolation: cycle error (and 3 more errors)
+-	scoped: {
+-		direct: {
+-			a: 1
+-		}
+-		embed1: {
+-			a: 1
+-		}
+-		embed2: {
+-			a: 1
+-		}
+-		list: {
+-			a: [1]
+-		}
+-		listStruct: {
+-			a: [{
+-				a: 1
+-			}]
+-		}
+-		listEmbed: {
+-			a: [1]
+-		}
+-	}
+-	x: "foo"
+-	incomplete: {
+-		a: {
+-			x: _|_ // invalid interpolation: incomplete.a.x: non-concrete value string (type string)
+-			run: {
+-				a: string
+-			}
+-		}
+-		b: {
+-			x: _|_ // invalid interpolation: incomplete.b.x: non-concrete value string (type string)
+-			run: {
+-				a: string
+-			}
+-		}
+-		c: {
+-			x:  _|_ // invalid interpolation: incomplete.c.x: non-concrete value string (type string)
+-			x2: _|_ // invalid interpolation: incomplete.c.x2: non-concrete value string (type string)
+-			run: {
+-				a: string
+-			}
+-			run2: {
+-				a: string
+-			}
+-		}
+-		d: {
+-			x:  _|_ // invalid interpolation: incomplete.d.x: non-concrete value string (type string)
+-			x2: _|_ // invalid interpolation: incomplete.d.x2: non-concrete value string (type string)
++	comprehension: _|_ // comprehension: key value of dynamic field must be concrete, found _|_(invalid interpolation: invalid interpolation: comprehension.filepath: undefined field: name (and 1 more errors)) (and 2 more errors)
++	complete: {
++		x: "a foo z"
++		run: {
++			a: "foo"
++		}
++	}
++	cfgs: [{
++		metadata: {
++			name: "one"
++		}
++	}, {
++		metadata: {
++			name: "two"
++		}
++	}]
++	files: _|_ // files: key value of dynamic field must be concrete, found _|_(invalid interpolation: invalid interpolation: filepath: undefined field: name (and 3 more errors)) (and 9 more errors)
++	scoped: {
++		direct: {
++			a: 1
++		}
++		embed1: {
++			a: 1
++		}
++		embed2: {
++			a: 1
++		}
++		list: {
++			a: [1]
++		}
++		listStruct: {
++			a: [{
++				a: 1
++			}]
++		}
++		listEmbed: {
++			a: [1]
++		}
++	}
++	x: "foo"
++	incomplete: {
++		a: {
++			x: _|_ // invalid interpolation: incomplete.a.x: non-concrete value string (type string) (and 1 more errors)
++			run: {
++				a: string
++			}
++		}
++		b: {
++			x: _|_ // invalid interpolation: incomplete.b.x: non-concrete value string (type string) (and 1 more errors)
++			run: {
++				a: string
++			}
++		}
++		c: {
++			x:  _|_ // invalid interpolation: incomplete.c.x: non-concrete value string (type string) (and 1 more errors)
++			x2: _|_ // invalid interpolation: incomplete.c.x2: non-concrete value string (type string) (and 1 more errors)
++			run: {
++				a: string
++			}
++			run2: {
++				a: string
++			}
++		}
++		d: {
++			x:  _|_ // invalid interpolation: incomplete.d.x: non-concrete value string (type string) (and 1 more errors)
++			x2: _|_ // invalid interpolation: incomplete.d.x2: non-concrete value string (type string) (and 1 more errors)
+ 			run: {
+ 				a: string
+ 			}
+@@ -360,29 +350,24 @@
+ 			}
+ 		}
+ 		b: {
+-			let A = run.a
+-			x: "a \(A) z"
+-			run: {
+-				a: string
+-			}
+-		}
+-		c: {
+-			let A_1 = run.a
+-			let A_2 = run2.a
+-			x:  "a \(A_1) z"
+-			x2: "a \(A_2) z"
+-			run: {
+-				a: string
+-			}
+-			run2: {
+-				a: string
+-			}
+-		}
+-		d: {
+-			let A_3 = run.a
+-			let A_4 = run2.a
+-			x:  "a \(A_3) z"
+-			x2: "a \(A_4) z"
++			x: "a \(run.a) z"
++			run: {
++				a: string
++			}
++		}
++		c: {
++			x:  "a \(run.a) z"
++			x2: "a \(run2.a) z"
++			run: {
++				a: string
++			}
++			run2: {
++				a: string
++			}
++		}
++		d: {
++			x:  "a \(run.a) z"
++			x2: "a \(run2.a) z"
+ 			run: {
+ 				a: string
+ 			}
+@@ -476,29 +461,24 @@
+ 			}
+ 		}
+ 		b: {
+-			let A = run.a
+-			x: "a \(A) z"
+-			run: {
+-				a: string
+-			}
+-		}
+-		c: {
+-			let A_1 = run.a
+-			let A_2 = run2.a
+-			x:  "a \(A_1) z"
+-			x2: "a \(A_2) z"
+-			run: {
+-				a: string
+-			}
+-			run2: {
+-				a: string
+-			}
+-		}
+-		d: {
+-			let A_3 = run.a
+-			let A_4 = run2.a
+-			x:  "a \(A_3) z"
+-			x2: "a \(A_4) z"
++			x: "a \(run.a) z"
++			run: {
++				a: string
++			}
++		}
++		c: {
++			x:  "a \(run.a) z"
++			x2: "a \(run2.a) z"
++			run: {
++				a: string
++			}
++			run2: {
++				a: string
++			}
++		}
++		d: {
++			x:  "a \(run.a) z"
++			x2: "a \(run2.a) z"
+ 			run: {
+ 				a: string
+ 			}
+-- diff/value/todo/p0 --
+Large change, investigate.
 -- out/value --
 == Simplified
 {

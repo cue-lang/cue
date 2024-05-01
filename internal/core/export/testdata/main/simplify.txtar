@@ -39,6 +39,85 @@ additional: {
 [additional]
 [additional env]
 [additional confs]
+-- out/value-v3 --
+== Simplified
+{
+	x: {
+		y: int64
+	}
+	s: strings.MinRunes(4) & strings.MaxRunes(7)
+	additional: {
+		env: _
+		confs: {
+			if env {}
+		}
+	}
+}
+== Raw
+{
+	x: {
+		y: >=-9223372036854775808 & <=9223372036854775807 & int
+	}
+	s: strings.MinRunes(4) & strings.MaxRunes(7)
+	additional: {
+		env: _
+		confs: {
+			if env {}
+		}
+	}
+}
+== Final
+{
+	x: {
+		y: int64
+	}
+	s: strings.MinRunes(4) & strings.MaxRunes(7)
+	additional: {
+		env:   _
+		confs: _|_ // additional.confs: incomplete bool: _ (and 1 more errors)
+	}
+}
+== All
+{
+	x: {
+		y: int64
+	}
+	s: strings.MinRunes(4) & strings.MaxRunes(7)
+	additional: {
+		env: _
+		confs: {
+			if env {}
+		}
+	}
+}
+== Eval
+{
+	x: {
+		y: >=-9223372036854775808 & <=9223372036854775807 & int
+	}
+	s: strings.MinRunes(4) & strings.MaxRunes(7)
+	additional: {
+		env: _
+		confs: {
+			if env {}
+		}
+	}
+}
+-- diff/-out/value-v3<==>+out/value --
+diff old new
+--- old
++++ new
+@@ -32,7 +32,7 @@
+ 	s: strings.MinRunes(4) & strings.MaxRunes(7)
+ 	additional: {
+ 		env:   _
+-		confs: _|_ // additional.confs: incomplete bool: _ (and 2 more errors)
++		confs: _|_ // additional.confs: incomplete bool: _ (and 1 more errors)
+ 	}
+ }
+ == All
+-- diff/value/explanation --
+Benign change in error message.
 -- out/value --
 == Simplified
 {

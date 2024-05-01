@@ -87,6 +87,215 @@ Missing lines.
 ["s-r"]
 ["s-q1"]
 ["s-q1" r1]
+-- out/value-v3 --
+== Simplified
+{
+	x:     string
+	X=(x): 4
+	Y=(x): 6
+	Z="y": int
+	a: {
+		labelX: X
+		labelY: Y
+		labelZ: Z
+	}
+	E=["cue"]: {
+		name: E | null
+	}
+	q:           "q"
+	q1:          "q1"
+	r:           "r"
+	r1:          "r1"
+	("s-" + q)?: 1
+	("s-" + r)!: 2
+	("s-" + q1)?: {
+		(r1)!: 3
+	}
+}
+== Raw
+{
+	x:     string
+	X=(x): 4
+	Y=(x): 6
+	Z="y": int
+	a: {
+		labelX: X
+		labelY: Y
+		labelZ: Z
+	}
+	E=["cue"]: {
+		name: E | null
+	}
+	q:           "q"
+	q1:          "q1"
+	r:           "r"
+	r1:          "r1"
+	("s-" + q)?: 1
+	("s-" + r)!: 2
+	("s-" + q1)?: {
+		(r1)!: 3
+	}
+}
+== Final
+_|_ // key value of dynamic field must be concrete, found string (and 2 more errors)
+== All
+{
+	x:     string
+	X=(x): 4
+	Y=(x): 6
+	Z="y": int
+	a: {
+		labelX: X
+		labelY: Y
+		labelZ: Z
+	}
+	E=["cue"]: {
+		name: E | null
+	}
+	q:           "q"
+	q1:          "q1"
+	r:           "r"
+	r1:          "r1"
+	("s-" + q)?: 1
+	("s-" + r)!: 2
+	("s-" + q1)?: {
+		(r1)!: 3
+	}
+}
+== Eval
+{
+	x:     string
+	X=(x): 4
+	Y=(x): 6
+	Z="y": int
+	a: {
+		labelX: X
+		labelY: Y
+		labelZ: Z
+	}
+	E=["cue"]: {
+		name: E | null
+	}
+	q:           "q"
+	q1:          "q1"
+	r:           "r"
+	r1:          "r1"
+	("s-" + q)?: 1
+	("s-" + r)!: 2
+	("s-" + q1)?: {
+		(r1)!: 3
+	}
+}
+-- diff/-out/value-v3<==>+out/value --
+diff old new
+--- old
++++ new
+@@ -1,10 +1,98 @@
+ == Simplified
+-_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
++{
++	x:     string
++	X=(x): 4
++	Y=(x): 6
++	Z="y": int
++	a: {
++		labelX: X
++		labelY: Y
++		labelZ: Z
++	}
++	E=["cue"]: {
++		name: E | null
++	}
++	q:           "q"
++	q1:          "q1"
++	r:           "r"
++	r1:          "r1"
++	("s-" + q)?: 1
++	("s-" + r)!: 2
++	("s-" + q1)?: {
++		(r1)!: 3
++	}
++}
+ == Raw
+-_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
++{
++	x:     string
++	X=(x): 4
++	Y=(x): 6
++	Z="y": int
++	a: {
++		labelX: X
++		labelY: Y
++		labelZ: Z
++	}
++	E=["cue"]: {
++		name: E | null
++	}
++	q:           "q"
++	q1:          "q1"
++	r:           "r"
++	r1:          "r1"
++	("s-" + q)?: 1
++	("s-" + r)!: 2
++	("s-" + q1)?: {
++		(r1)!: 3
++	}
++}
+ == Final
+-_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
++_|_ // key value of dynamic field must be concrete, found string (and 2 more errors)
+ == All
+-_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
++{
++	x:     string
++	X=(x): 4
++	Y=(x): 6
++	Z="y": int
++	a: {
++		labelX: X
++		labelY: Y
++		labelZ: Z
++	}
++	E=["cue"]: {
++		name: E | null
++	}
++	q:           "q"
++	q1:          "q1"
++	r:           "r"
++	r1:          "r1"
++	("s-" + q)?: 1
++	("s-" + r)!: 2
++	("s-" + q1)?: {
++		(r1)!: 3
++	}
++}
+ == Eval
+-_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
++{
++	x:     string
++	X=(x): 4
++	Y=(x): 6
++	Z="y": int
++	a: {
++		labelX: X
++		labelY: Y
++		labelZ: Z
++	}
++	E=["cue"]: {
++		name: E | null
++	}
++	q:           "q"
++	q1:          "q1"
++	r:           "r"
++	r1:          "r1"
++	("s-" + q)?: 1
++	("s-" + r)!: 2
++	("s-" + q1)?: {
++		(r1)!: 3
++	}
++}
+-- diff/value/todo/p0 --
+Ignored errors?
 -- out/value --
 == Simplified
 _|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)

@@ -24,7 +24,7 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/eval"
-	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/cuetdtest"
 )
 
 const (
@@ -43,6 +43,8 @@ func TestValues(t *testing.T) {
 		subsumes bool
 		in       string
 		mode     int
+
+		todo_v3 bool
 	}
 	testCases := []subsumeTest{
 		// Top subsumes everything
@@ -293,9 +295,9 @@ func TestValues(t *testing.T) {
 		// defining one at all.
 		420: {subsumes: true, in: `a: {foo?: _}, b: {}`},
 
-		430: {subsumes: false, in: `a: {[_]: 4}, b: {[_]: int}`},
+		430: {subsumes: false, in: `a: {[_]: 4}, b: {[_]: int}`, todo_v3: true},
 		// TODO: handle optionals.
-		431: {subsumes: false, in: `a: {[_]: int}, b: {[_]: 2}`},
+		431: {subsumes: false, in: `a: {[_]: int}, b: {[_]: 2}`, todo_v3: true},
 
 		// TODO: the subNoOptional mode used to be used by the equality check.
 		// Now this has its own implementation it is no longer necessary. Keep
@@ -425,9 +427,11 @@ func TestValues(t *testing.T) {
 		const cutset = "\n ,"
 		key := strings.Trim(m[1], cutset) + " ⊑ " + strings.Trim(m[2], cutset)
 
-		r := runtime.New()
-
-		t.Run(strconv.Itoa(i)+"/"+key, func(t *testing.T) {
+		cuetdtest.RunMatrix(t, strconv.Itoa(i)+"/"+key, func(t *cuetdtest.M) {
+			if tc.todo_v3 {
+				t.TODO_V3()
+			}
+			r := t.Runtime()
 
 			file, err := parser.ParseFile("subsume", tc.in)
 			if err != nil {

@@ -51,6 +51,24 @@
       "parentUuid": "5b72975c_212546a7",
       "revId": "b66f8e0c5cb3541a45fc02e2bf3056d0d72852fc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d77fc8a_b558146e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-01T11:00:31Z",
+      "side": 1,
+      "message": "It wasn\u0027t really a P1 bug. I should have used XXX here. I didn\u0027t want to make semantic changes in the previous commit, but rather have this isolated in a separate commit, so that the change becomes bisectable.\n\nWith all the other changes about dereferencing, this now can be removed without breaking tests. There is no need for additional tests.",
+      "parentUuid": "c4ef050e_c8d35cac",
+      "revId": "b66f8e0c5cb3541a45fc02e2bf3056d0d72852fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

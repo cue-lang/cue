@@ -39,6 +39,37 @@ r1:     "r1"
 "s-q1"?: {
 	(r1)!: 3
 }
+-- out/doc-v3 --
+[]
+[x]
+[a]
+[a labelX]
+[a labelY]
+[a labelZ]
+[q]
+[q1]
+[r]
+[r1]
+[y]
+["s-q"]
+["s-r"]
+["s-q1"]
+-- diff/-out/doc-v3<==>+out/doc --
+diff old new
+--- old
++++ new
+@@ -8,9 +8,7 @@
+ [q1]
+ [r]
+ [r1]
+-[_]
+ [y]
+ ["s-q"]
+ ["s-r"]
+ ["s-q1"]
+-["s-q1" r1]
+-- diff/out/todo/p1 --
+Missing lines.
 -- out/doc --
 []
 [x]

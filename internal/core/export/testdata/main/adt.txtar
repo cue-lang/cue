@@ -251,6 +251,8 @@ errorListDef: {
 	errorList
 	#Def: 1
 }
+-- diff/doc/explanation --
+Reordering.
 -- out/doc --
 []
 [p1]

@@ -22,7 +22,7 @@ import (
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/export"
-	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
 )
 
@@ -30,11 +30,13 @@ func TestExtract(t *testing.T) {
 	test := cuetxtar.TxTarTest{
 		Root: "./testdata/main",
 		Name: "doc",
+
+		// TODO: use FullMatrix when enough tests pass.
+		Matrix: cuetdtest.SmallMatrix,
 	}
 
-	r := runtime.New()
-
 	test.Run(t, func(t *cuetxtar.Test) {
+		r := t.Runtime()
 		a := t.Instance()
 
 		v, err := compile.Files(nil, r, "", a.Files...)

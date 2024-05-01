@@ -14,6 +14,26 @@
 #GraphFieldConfig: #LineConfig & {
 	drawStyle?: int
 }
+-- out/doc-v3 --
+[]
+[#LineConfig]
+[#LineConfig lineColor]
+[#GraphFieldConfig]
+[#GraphFieldConfig drawStyle]
+[#GraphFieldConfig lineColor]
+-- diff/-out/doc-v3<==>+out/doc --
+diff old new
+--- old
++++ new
+@@ -2,5 +2,5 @@
+ [#LineConfig]
+ [#LineConfig lineColor]
+ [#GraphFieldConfig]
+-[#GraphFieldConfig lineColor]
+ [#GraphFieldConfig drawStyle]
++[#GraphFieldConfig lineColor]
+-- diff/doc/explanation --
+reordering
 -- out/doc --
 []
 [#LineConfig]

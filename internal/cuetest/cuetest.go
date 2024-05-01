@@ -92,6 +92,9 @@ func init() {
 }
 
 // Run creates a new table-driven test using the CUE testing defaults.
+//
+// TODO: move this wrapper out to cuetdtest. Users should either use the full
+// version of tdtest directly, or use the cuetdtest wrapper.
 func Run[TC any](t *testing.T, table []TC, fn func(t *T, tc *TC)) {
 	tdtest.Run(t, table, fn)
 }

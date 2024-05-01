@@ -22,12 +22,12 @@ import (
 	"text/tabwriter"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/dep"
 	"cuelang.org/go/internal/core/eval"
+	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/value"
 )
@@ -36,12 +36,17 @@ type visitFunc func(*adt.OpContext, *adt.ImportReference, *adt.Vertex, dep.Visit
 
 func TestVisit(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root: "./testdata",
-		Name: "dependencies",
+		Root:   "./testdata",
+		Name:   "dependencies",
+		Matrix: cuetdtest.SmallMatrix,
+
+		ToDo: map[string]string{
+			"dependencies-v3/inline": "error",
+		},
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		val := cuecontext.New().BuildInstance(t.Instance())
+		val := t.Context().BuildInstance(t.Instance())
 		if val.Err() != nil {
 			t.Fatal(val.Err())
 		}

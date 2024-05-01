@@ -31,6 +31,7 @@ import (
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/export"
 	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/value"
 	"golang.org/x/tools/txtar"
@@ -38,13 +39,13 @@ import (
 
 func TestDefinition(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root: "./testdata/main",
-		Name: "definition",
+		Root:   "./testdata/main",
+		Name:   "definition",
+		Matrix: cuetdtest.FullMatrix,
 	}
 
-	r := runtime.New()
-
 	test.Run(t, func(t *cuetxtar.Test) {
+		r := t.Runtime()
 		a := t.Instance()
 
 		v, errs := compile.Files(nil, r, "", a.Files...)
@@ -345,8 +346,9 @@ func TestFromAPI(t *testing.T) {
 	}}
 	// Issue #1204
 	for _, tc := range testCases {
-		t.Run("", func(t *testing.T) {
+		cuetdtest.RunMatrix(t, "", func(t *cuetdtest.M) {
 			ctx := cuecontext.New()
+			t.UpdateRuntime((*runtime.Runtime)(ctx))
 
 			v := ctx.BuildExpr(tc.expr)
 

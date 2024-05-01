@@ -26,11 +26,15 @@ import (
 	"strings"
 	"testing"
 
+	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
+	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetest"
 	"github.com/google/go-cmp/cmp"
 	"github.com/rogpeppe/go-internal/diff"
@@ -66,6 +70,10 @@ type TxTarTest struct {
 	// LoadConfig is passed to load.Instances when loading instances.
 	// It's copied before doing that and the Dir and Overlay fields are overwritten.
 	LoadConfig load.Config
+
+	// If Matrix is non-nil, the tests are run for each configuration in the
+	// matrix.
+	Matrix cuetdtest.Matrix
 }
 
 // A Test represents a single test based on a .txtar file.
@@ -97,6 +105,7 @@ type TxTarTest struct {
 type Test struct {
 	// Allow Test to be used as a T.
 	*testing.T
+	*cuetdtest.M
 
 	prefix   string
 	fallback string
@@ -306,6 +315,47 @@ func loadWithConfig(a *txtar.Archive, dir string, cfg load.Config, args ...strin
 // The function f is called for each such txtar file. See the [Test] documentation
 // for more details.
 func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
+	if x.Matrix == nil {
+		x.run(t, f)
+		return
+	}
+	x.Matrix.Do(t, func(m *cuetdtest.M) {
+		test := *x
+		if s := m.Fallback(); s != "" {
+			test.Fallback = test.Name
+			if s != cuetdtest.DefaultVersion {
+				test.Fallback += "-" + s
+			}
+		}
+		if s := m.Name(); s != cuetdtest.DefaultVersion {
+			test.Name += "-" + s
+		}
+		test.run(t, func(tc *Test) {
+			tc.M = m
+			f(tc)
+		})
+	})
+}
+
+// Runtime returns a new runtime based on the configuration of the test.
+func (t *Test) Runtime() *runtime.Runtime {
+	r := runtime.New()
+	if t.M != nil {
+		t.M.UpdateRuntime(r)
+	}
+	return r
+}
+
+// Context returns a new cue.Context based on the configuration of the test.
+func (t *Test) Context() *cue.Context {
+	ctx := cuecontext.New()
+	if t.M != nil {
+		t.M.UpdateRuntime((*runtime.Runtime)(ctx))
+	}
+	return ctx
+}
+
+func (x *TxTarTest) run(t *testing.T, f func(tc *Test)) {
 	t.Helper()
 
 	dir, err := os.Getwd()
@@ -325,7 +375,13 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 
 		str := filepath.ToSlash(fullpath)
 		p := strings.Index(str, "/testdata/")
-		testName := str[p+len("/testdata/") : len(str)-len(".txtar")]
+		var testName string
+		// Do not include the name of the test if the Matrix feature is not used
+		// to ensure that the todo lists of existing tests do not break.
+		if x.Matrix != nil && x.Name != "" {
+			testName = x.Name + "/"
+		}
+		testName += str[p+len("/testdata/") : len(str)-len(".txtar")]
 
 		t.Run(testName, func(t *testing.T) {
 			a, err := txtar.ParseFile(fullpath)

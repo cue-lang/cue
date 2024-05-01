@@ -24,7 +24,7 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/eval"
-	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/cuetdtest"
 )
 
 func TestStructural(t *testing.T) {
@@ -456,9 +456,8 @@ func TestStructural(t *testing.T) {
 		const cutset = "\n ,"
 		key := strings.Trim(m[1], cutset) + " ⊑ " + strings.Trim(m[2], cutset)
 
-		r := runtime.New()
-
-		t.Run(strconv.Itoa(i)+"/"+key, func(t *testing.T) {
+		cuetdtest.FullMatrix.Run(t, strconv.Itoa(i)+"/"+key, func(t *cuetdtest.M) {
+			r := t.Runtime()
 
 			file, err := parser.ParseFile("subsume", tc.in)
 			if err != nil {

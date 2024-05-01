@@ -73,7 +73,8 @@ func newFmtCmd(c *Command) *cobra.Command {
 			for _, inst := range builds {
 				if inst.Err != nil {
 					switch {
-					case errors.As(inst.Err, new(*load.PackageError)):
+					case errors.As(inst.Err, new(*load.PackageError)) && len(inst.BuildFiles) != 0:
+						// Ignore package errors if there are files to format.
 					case errors.As(inst.Err, new(*load.NoFilesError)):
 					default:
 						exitOnErr(cmd, inst.Err, false)

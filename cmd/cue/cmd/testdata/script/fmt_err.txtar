@@ -1,3 +1,7 @@
+# error when provided package not found
+! exec cue fmt ./non-existing-file
+cmp stderr non-existing-file.golden
+
 # Ignore certain package loading errors in cue fmt.
 cd issue644
 exec cue fmt x.cue
@@ -17,6 +21,8 @@ cmp x.cue out/x_cue
 cmp y.cue out/y_cue
 cd ..
 
+-- non-existing-file.golden --
+cannot find package "./non-existing-file"
 -- cue.mod/module.cue --
 module: "mod.test/x"
 -- emptypkg/.empty --

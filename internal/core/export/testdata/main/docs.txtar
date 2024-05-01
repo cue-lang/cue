@@ -65,6 +65,77 @@ sub: {
 
 }
 -- out.txt --
+-- out/doc-v3 --
+[]
+- foobar defines at least foo.
+
+[Foo]
+- A Foo fooses stuff.
+
+[Foo field1]
+- field1 is an int.
+
+[Foo field2]
+[Foo dup3]
+- duplicate field comment
+
+[foos]
+- foos are instances of Foo.
+
+[foos MyFoo]
+- My first little foo.
+
+[foos MyFoo field1]
+- local field comment.
+
+- field1 is an int.
+
+[foos MyFoo field2]
+- other field comment.
+
+[foos MyFoo dup3]
+- duplicate field comment
+
+[bar]
+[bar field1]
+- comment from bar on field 1
+
+[bar field2]
+- comment from bar on field 2
+
+[baz]
+[baz field1]
+- comment from baz on field 1
+
+- comment from bar on field 1
+
+[baz field2]
+- comment from bar on field 2
+
+[sub]
+[sub field1]
+- comment inside of if comprehension
+
+[sub innerField]
+-- diff/-out/doc-v3<==>+out/doc --
+diff old new
+--- old
++++ new
+@@ -37,10 +37,10 @@
+ 
+ [baz]
+ [baz field1]
+-- comment from bar on field 1
+-
+ - comment from baz on field 1
+ 
++- comment from bar on field 1
++
+ [baz field2]
+ - comment from bar on field 2
+ 
+-- diff/out/explanation --
+Reordering.
 -- out/doc --
 []
 - foobar defines at least foo.

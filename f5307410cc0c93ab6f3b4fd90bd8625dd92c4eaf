@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7fcac5d_958a65d6",
+        "filename": "cue/testdata/cycle/disjunction.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-01T13:40:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0bdb1605_93697008",
+      "revId": "f5307410cc0c93ab6f3b4fd90bd8625dd92c4eaf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cde412de_a58f10b4",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-04-30T15:29:36Z",
       "side": 1,
       "message": "Indentation.",
+      "revId": "f5307410cc0c93ab6f3b4fd90bd8625dd92c4eaf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "86a0de63_a1c42f79",
+        "filename": "cue/testdata/cycle/disjunction.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-01T13:40:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cde412de_a58f10b4",
       "revId": "f5307410cc0c93ab6f3b4fd90bd8625dd92c4eaf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

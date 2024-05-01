@@ -16,6 +16,24 @@
       "message": "nit: missing period",
       "revId": "aa21c06c19886b0791283ad1f4d1ac4b76b39202",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e2c049a_40ad1521",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-01T11:04:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8d273b89_7195b85b",
+      "revId": "aa21c06c19886b0791283ad1f4d1ac4b76b39202",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

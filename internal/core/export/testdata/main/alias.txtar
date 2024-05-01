@@ -199,6 +199,422 @@ was known to compile and is known to be correct.
 [issue2374 a r]
 [issue2374 a z]
 [issue2374 a b]
+-- out/value-v3 --
+== Simplified
+{
+	fieldAlias: {
+		simple: {
+			"a-b": 4
+			foo:   4
+			bar:   5
+			"a-c": 5
+		}
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
+	}
+	valueAlias: {
+		merge: {
+			// Merge fields, rename alias to avoid conflict.
+			// TODO: merged values can still be simplified.
+			value: {
+				b: 2
+				v: {
+					X: 3
+				}
+			}
+		}
+		selfRef: {
+			struct: {
+				a: {
+					b: {
+						b: 2
+					}
+				}
+			}
+		}
+		selfRefValue: {
+			struct: {
+				// Note: this resolves to a cycle error, which is considered
+				// to be equal to "incomplete". As a result, in case of
+				// non-final evaluation, reference will remain. This is not
+				// an issue exclusive to value aliases, and falls within the
+				// range of what is acceptable for now.
+				// TODO: solve this issue.
+				a: or(X)
+			}
+			pattern: {
+				// this triggers the verbatim "adt" path. Note that there
+				// is no need to rename the variable here as the expression
+				// was known to compile and is known to be correct.
+				a: {}
+			}
+		}
+	}
+	issue1308: {
+		sub: [{}]
+	}
+
+	// TODO: these could be merged into a single struct.
+	issue2374: {
+		a: {
+			r: 0
+			z: 1
+			b: null
+		}
+	}
+}
+== Raw
+{
+	fieldAlias: {
+		simple: {
+			"a-b": 4
+			foo:   4
+			bar:   5
+			"a-c": 5
+		}
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
+	}
+	valueAlias: {
+		merge: {
+			// Merge fields, rename alias to avoid conflict.
+			// TODO: merged values can still be simplified.
+			value: {
+				#value: 2
+				b:      2
+				v: {
+					X: 3
+				}
+			}
+		}
+		selfRef: {
+			struct: {
+				a: {
+					b: {
+						#foo: 2
+						b:    2
+					}
+				}
+			}
+		}
+		selfRefValue: {
+			struct: {
+				// Note: this resolves to a cycle error, which is considered
+				// to be equal to "incomplete". As a result, in case of
+				// non-final evaluation, reference will remain. This is not
+				// an issue exclusive to value aliases, and falls within the
+				// range of what is acceptable for now.
+				// TODO: solve this issue.
+				a: or(X)
+			}
+			pattern: {
+				// this triggers the verbatim "adt" path. Note that there
+				// is no need to rename the variable here as the expression
+				// was known to compile and is known to be correct.
+				a: {}
+			}
+		}
+	}
+	issue1308: {
+		sub: [{
+			_A: 1
+		}]
+	}
+
+	// TODO: these could be merged into a single struct.
+	issue2374: {
+		a: {
+			r: 0
+			z: 1
+			b: null
+		}
+	}
+}
+== Final
+{
+	fieldAlias: {
+		simple: {
+			"a-b": 4
+			foo:   4
+			bar:   5
+			"a-c": 5
+		}
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
+	}
+	valueAlias: {
+		merge: {
+			value: {
+				b: 2
+				v: {
+					X: 3
+				}
+			}
+		}
+		selfRef: {
+			struct: {
+				a: {
+					b: {
+						b: 2
+					}
+				}
+			}
+		}
+		selfRefValue: {
+			struct: {
+				a: _|_ // valueAlias.selfRefValue.struct.a: incomplete list: _ (and 3 more errors)
+			}
+			pattern: {
+				a: {}
+			}
+		}
+	}
+	issue1308: {
+		sub: [{}]
+	}
+	issue2374: {
+		a: {
+			r: 0
+			z: 1
+			b: null
+		}
+	}
+}
+== All
+{
+	fieldAlias: {
+		simple: {
+			"a-b": 4
+			foo:   4
+			bar:   5
+			"a-c": 5
+		}
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
+	}
+	valueAlias: {
+		merge: {
+			// Merge fields, rename alias to avoid conflict.
+			// TODO: merged values can still be simplified.
+			value: {
+				#value: 2
+				b:      2
+				v: {
+					X: 3
+				}
+			}
+		}
+		selfRef: {
+			struct: {
+				a: {
+					b: {
+						#foo: 2
+						b:    2
+					}
+				}
+			}
+		}
+		selfRefValue: {
+			struct: {
+				// Note: this resolves to a cycle error, which is considered
+				// to be equal to "incomplete". As a result, in case of
+				// non-final evaluation, reference will remain. This is not
+				// an issue exclusive to value aliases, and falls within the
+				// range of what is acceptable for now.
+				// TODO: solve this issue.
+				a: or(X)
+			}
+			pattern: {
+				// this triggers the verbatim "adt" path. Note that there
+				// is no need to rename the variable here as the expression
+				// was known to compile and is known to be correct.
+				a: {}
+			}
+		}
+	}
+	issue1308: {
+		sub: [{
+			_A: 1
+		}]
+	}
+
+	// TODO: these could be merged into a single struct.
+	issue2374: {
+		a: {
+			r: 0
+			z: 1
+			b: null
+		}
+	}
+}
+== Eval
+{
+	fieldAlias: {
+		simple: {
+			"a-b": 4
+			foo:   4
+			bar:   5
+			"a-c": 5
+		}
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
+	}
+	valueAlias: {
+		merge: {
+			value: {
+				#value: 2
+				b:      2
+				v: {
+					X: 3
+				}
+			}
+		}
+		selfRef: {
+			struct: {
+				a: {
+					b: {
+						#foo: 2
+						b:    2
+					}
+				}
+			}
+		}
+		selfRefValue: {
+			struct: {
+				a: or(X)
+			}
+			pattern: {
+				a: {}
+			}
+		}
+	}
+	issue1308: {
+		sub: [{}]
+	}
+	issue2374: {
+		a: {
+			r: 0
+			z: 1
+			b: null
+		}
+	}
+}
+-- diff/-out/value-v3<==>+out/value --
+diff old new
+--- old
++++ new
+@@ -4,6 +4,7 @@
+ 		simple: {
+ 			"a-b": 4
+ 			foo:   4
++			bar:   5
+ 			"a-c": 5
+ 		}
+ 		cross: {
+@@ -68,7 +69,7 @@
+ 		simple: {
+ 			"a-b": 4
+ 			foo:   4
+-			bar?:  5
++			bar:   5
+ 			"a-c": 5
+ 		}
+ 		cross: {
+@@ -137,34 +138,35 @@
+ 		simple: {
+ 			"a-b": 4
+ 			foo:   4
+-			"a-c": 5
+-		}
+-		cross: {
+-			baz: 3
+-			"d-2": {}
+-		}
+-	}
+-	valueAlias: {
+-		merge: {
+-			value: {
+-				b: 2
+-				v: {
+-					X: 3
+-				}
+-			}
+-		}
+-		selfRef: {
+-			struct: {
+-				a: {
+-					b: {
+-						b: 2
+-					}
+-				}
+-			}
+-		}
+-		selfRefValue: {
+-			struct: {
+-				a: _|_ // cycle error
++			bar:   5
++			"a-c": 5
++		}
++		cross: {
++			baz: 3
++			"d-2": {}
++		}
++	}
++	valueAlias: {
++		merge: {
++			value: {
++				b: 2
++				v: {
++					X: 3
++				}
++			}
++		}
++		selfRef: {
++			struct: {
++				a: {
++					b: {
++						b: 2
++					}
++				}
++			}
++		}
++		selfRefValue: {
++			struct: {
++				a: _|_ // valueAlias.selfRefValue.struct.a: incomplete list: _ (and 3 more errors)
+ 			}
+ 			pattern: {
+ 				a: {}
+@@ -188,7 +190,7 @@
+ 		simple: {
+ 			"a-b": 4
+ 			foo:   4
+-			bar?:  5
++			bar:   5
+ 			"a-c": 5
+ 		}
+ 		cross: {
+@@ -257,7 +259,7 @@
+ 		simple: {
+ 			"a-b": 4
+ 			foo:   4
+-			bar?:  5
++			bar:   5
+ 			"a-c": 5
+ 		}
+ 		cross: {
+-- diff/value/todo/p0 --
+Dropped optional field marker.
+Reorderings?
 -- out/value --
 == Simplified
 {

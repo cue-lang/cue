@@ -52,6 +52,88 @@ Missing line item.
 [F2 _]
 [D]
 [L]
+-- out/value-v3 --
+== Simplified
+{
+	let L = D
+	F1: {
+		sub1: {
+			sub2: {}
+		}
+	}
+	F2: {
+		(string): _
+		L
+	}
+	D: {}
+}
+== Raw
+{
+	let L = D
+	F1: {
+		sub1: {
+			sub2: {}
+		}
+	}
+	F2: {
+		(string): _
+		L
+	}
+	D: {}
+}
+== Final
+{
+	F1: {
+		sub1: {
+			sub2: {}
+		}
+	}
+	F2: _|_ // F2: key value of dynamic field must be concrete, found string
+	D: {}
+}
+== All
+{
+	let L = D
+	F1: {
+		sub1: {
+			sub2: {}
+		}
+	}
+	F2: {
+		(string): _
+		L
+	}
+	D: {}
+}
+== Eval
+{
+	let L = D
+	F1: {
+		sub1: {
+			sub2: {}
+		}
+	}
+	F2: {
+		(string): _
+		L
+	}
+	D: {}
+}
+-- diff/-out/value-v3<==>+out/value --
+diff old new
+--- old
++++ new
+@@ -33,7 +33,7 @@
+ 			sub2: {}
+ 		}
+ 	}
+-	F2: _|_ // F2: invalid non-ground value string (must be concrete string)
++	F2: _|_ // F2: key value of dynamic field must be concrete, found string
+ 	D: {}
+ }
+ == All
+-- diff/value/todo/p2 --
+Seemingly benign change in error message.
 -- out/value --
 == Simplified
 {

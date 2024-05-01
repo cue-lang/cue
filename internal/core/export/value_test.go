@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/export"
 	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
 	"golang.org/x/tools/txtar"
 )
@@ -35,14 +36,14 @@ var exclude = map[string]string{
 
 func TestValue(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root: "./testdata/main",
-		Name: "value",
-		Skip: exclude,
+		Root:   "./testdata/main",
+		Name:   "value",
+		Skip:   exclude,
+		Matrix: cuetdtest.SmallMatrix,
 	}
 
-	r := runtime.New()
-
 	test.Run(t, func(t *cuetxtar.Test) {
+		r := t.Runtime()
 		a := t.Instance()
 
 		pkgID := a.ID()

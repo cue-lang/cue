@@ -11,7 +11,7 @@ root: {
 a: [{
 	s: t: string
 }]
--- out/default --
+-- out/self/default --
 b:      Index0_1
 c:      Index0_1
 Index0: int

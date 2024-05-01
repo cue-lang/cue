@@ -10,7 +10,7 @@ a: b: {
 	d: {}
 }
 
--- out/default --
+-- out/self/default --
 import "struct"
 
 c: struct.MaxFields(S, 3)

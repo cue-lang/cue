@@ -9,7 +9,7 @@ is already a definition.
 }
 
 #a: b: c: #def
--- out/default --
+-- out/self/default --
 
 _#def
 _#def: {

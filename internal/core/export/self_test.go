@@ -34,6 +34,7 @@ import (
 
 func TestSelfContained(t *testing.T) {
 	test := cuetxtar.TxTarTest{
+		Name: "self",
 		Root: "./testdata/selfcontained",
 	}
 

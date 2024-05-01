@@ -30,11 +30,11 @@ q: {
 
 r: {out: k: l: string}.out
 
--- out/default --
+-- out/self/default --
 import "example.com/t"
 
 f: t.p
--- out/expand_imports --
+-- out/self/expand_imports --
 f: {
 	c: [int]
 	d: [c][0]

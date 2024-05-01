@@ -21,8 +21,6 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	gomodule "golang.org/x/mod/module"
-	"golang.org/x/mod/semver"
 
 	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/cueversion"
@@ -121,31 +119,4 @@ func runModInit(cmd *Command, args []string) (err error) {
 	}
 
 	return err
-}
-
-func versionForModFile() string {
-	version := cueversion.LanguageVersion()
-	earliestPossibleVersion := modfile.EarliestClosedSchemaVersion()
-	if semver.Compare(version, earliestPossibleVersion) < 0 {
-		// The reported version is earlier than it should be,
-		// which can occur for some pseudo versions, or
-		// potentially the cue command has been forked and
-		// published under an independent version numbering.
-		//
-		// In this case, we use the latest known schema version
-		// as the best guess as to a version that actually
-		// reflects the capabilities of the module file.
-		version = modfile.LatestKnownSchemaVersion()
-	}
-	if gomodule.IsPseudoVersion(version) {
-		// If we have a version like v0.7.1-0.20240130142347-7855e15cb701
-		// we want it to turn into the base version (v0.7.0 in that example).
-		// Subject the resulting base version to the same sanity check
-		// as above.
-		pv, _ := gomodule.PseudoVersionBase(version)
-		if pv != "" && semver.Compare(pv, earliestPossibleVersion) >= 0 {
-			version = pv
-		}
-	}
-	return version
 }

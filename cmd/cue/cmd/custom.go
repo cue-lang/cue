@@ -281,7 +281,7 @@ var testServerOnce = sync.OnceValue(func() string {
 	s := httptest.NewServer(http.HandlerFunc(
 		func(w http.ResponseWriter, req *http.Request) {
 			data, _ := io.ReadAll(req.Body)
-			d := map[string]interface{}{
+			d := map[string]string{
 				"data": string(data),
 				"when": "now",
 			}

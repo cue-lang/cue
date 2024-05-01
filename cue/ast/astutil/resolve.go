@@ -385,12 +385,12 @@ func resolveIdent(s *scope, x *ast.Ident) bool {
 		return false
 	}
 	if _, obj, node := s.lookup(name); node.node != nil {
-		switch {
-		case x.Node == nil:
+		switch x.Node {
+		case nil:
 			x.Node = node.node
 			x.Scope = obj
 
-		case x.Node == node.node:
+		case node.node:
 			x.Scope = obj
 
 		default: // x.Node != node

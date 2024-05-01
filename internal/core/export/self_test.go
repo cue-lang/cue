@@ -26,6 +26,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/core/export"
+	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/diff"
 	"cuelang.org/go/internal/types"
@@ -36,11 +37,20 @@ func TestSelfContained(t *testing.T) {
 	test := cuetxtar.TxTarTest{
 		Name: "self",
 		Root: "./testdata/selfcontained",
+
+		Matrix: cuetdtest.FullMatrix,
+
+		ToDo: map[string]string{
+			"self-v3/selfcontained/errors":                     "reordering",
+			"self-v3/selfcontained/import":                     `wa: reference "_hidden_567475F3" not found:`,
+			"self-v3/selfcontained/splitcomprehension":         "reference not found",
+			"self-v3-noshare/selfcontained/splitcomprehension": "reference not found",
+		},
 	}
 
-	r := cuecontext.New()
-
 	test.Run(t, func(t *cuetxtar.Test) {
+		r := t.Context()
+
 		a := t.Instances()
 
 		v := buildFile(t.T, r, a[0])

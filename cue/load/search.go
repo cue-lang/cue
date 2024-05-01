@@ -15,8 +15,6 @@
 package load
 
 import (
-	// TODO: remove this usage
-
 	"io/fs"
 	"path"
 	"path/filepath"

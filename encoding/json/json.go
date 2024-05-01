@@ -28,7 +28,6 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/value"
 )
 
 // Valid reports whether data is a valid JSON encoding.
@@ -42,15 +41,14 @@ func Validate(b []byte, v cue.Value) error {
 	if !json.Valid(b) {
 		return fmt.Errorf("json: invalid JSON")
 	}
-	r := value.ConvertToRuntime(v.Context())
-	inst, err := r.Compile("json.Validate", b)
-	if err != nil {
+	v2 := v.Context().CompileBytes(b, cue.Filename("json.Validate"))
+	if err := v2.Err(); err != nil {
 		return err
 	}
 
-	v = v.Unify(inst.Value())
-	if v.Err() != nil {
-		return v.Err()
+	v = v.Unify(v2)
+	if err := v.Err(); err != nil {
+		return err
 	}
 	return v.Validate(cue.Final())
 }

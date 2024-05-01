@@ -202,7 +202,7 @@ func newFormatter(p *printer) *formatter {
 type whiteSpace int
 
 const (
-	ignore whiteSpace = 0
+	_ whiteSpace = 0
 
 	// write a space, or disallow it
 	blank whiteSpace = 1 << iota

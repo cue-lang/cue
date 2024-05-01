@@ -2,6 +2,6 @@
 -- x.cue --
 a: _
 b: [a][0]
--- out/default --
+-- out/self/default --
 a: _
 b: [a][0]

@@ -38,7 +38,7 @@ a: b: {
 	s: string
 	t: b.s
 }
--- out/default --
+-- out/self/default --
 c: "out"
 // TODO: should most likely resolve to "out", not c, because b points to
 // outside the exported value

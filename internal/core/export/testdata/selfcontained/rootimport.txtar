@@ -20,14 +20,14 @@ v: {
 	b: a
 }
 
--- out/default --
+-- out/self/default --
 import "mod.test/a/pkg"
 
 a: pkg
 
 // Force no inline.
 b: pkg.v.a
--- out/expand_imports --
+-- out/self/expand_imports --
 a: PKG
 
 // Force no inline.

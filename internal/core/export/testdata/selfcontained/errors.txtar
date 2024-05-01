@@ -24,7 +24,7 @@ y: "b"
 z: string
 m: {}
 n: {foo: {baz: int}}
--- out/default --
+-- out/self/default --
 // comprehensions
 t1: {
 	for p in B let x = C if D {}

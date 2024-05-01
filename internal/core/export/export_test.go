@@ -76,70 +76,72 @@ func formatNode(t *testing.T, n ast.Node) []byte {
 // TestGenerated tests conversions of generated Go structs, which may be
 // different from parsed or evaluated CUE, such as having Vertex values.
 func TestGenerated(t *testing.T) {
-	ctx := cuecontext.New()
+	cuetdtest.FullMatrix.Do(t, func(t *cuetdtest.M) {
+		ctx := cuecontext.New()
+		t.UpdateRuntime((*runtime.Runtime)(ctx))
 
-	testCases := []struct {
-		in  func(ctx *adt.OpContext) (adt.Expr, error)
-		out string
-		p   *export.Profile
-	}{{
-		in: func(ctx *adt.OpContext) (adt.Expr, error) {
-			in := &C{
-				Terminals: []*A{{Name: "Name", Description: "Desc"}},
-			}
-			return convert.GoValueToValue(ctx, in, false), nil
-		},
-		out: `Terminals: [{Name: "Name", Description: "Desc"}]`,
-	}, {
-		in: func(ctx *adt.OpContext) (adt.Expr, error) {
-			in := &C{
-				Terminals: []*A{{Name: "Name", Description: "Desc"}},
-			}
-			return convert.GoTypeToExpr(ctx, in)
-		},
-		out: `*null|{Terminals?: *null|[...*null|{Name: string, Description: string}]}`,
-	}, {
-		in: func(ctx *adt.OpContext) (adt.Expr, error) {
-			in := []*A{{Name: "Name", Description: "Desc"}}
-			return convert.GoValueToValue(ctx, in, false), nil
-		},
-		out: `[{Name: "Name", Description: "Desc"}]`,
-	}, {
-		in: func(ctx *adt.OpContext) (adt.Expr, error) {
-			in := []*A{{Name: "Name", Description: "Desc"}}
-			return convert.GoTypeToExpr(ctx, in)
-		},
-		out: `*null|[...*null|{Name: string, Description: string}]`,
-	}, {
-		in: func(ctx *adt.OpContext) (adt.Expr, error) {
-			expr, err := parser.ParseExpr("test", `{
+		testCases := []struct {
+			in  func(ctx *adt.OpContext) (adt.Expr, error)
+			out string
+			p   *export.Profile
+		}{{
+			in: func(ctx *adt.OpContext) (adt.Expr, error) {
+				in := &C{
+					Terminals: []*A{{Name: "Name", Description: "Desc"}},
+				}
+				return convert.GoValueToValue(ctx, in, false), nil
+			},
+			out: `Terminals: [{Name: "Name", Description: "Desc"}]`,
+		}, {
+			in: func(ctx *adt.OpContext) (adt.Expr, error) {
+				in := &C{
+					Terminals: []*A{{Name: "Name", Description: "Desc"}},
+				}
+				return convert.GoTypeToExpr(ctx, in)
+			},
+			out: `*null|{Terminals?: *null|[...*null|{Name: string, Description: string}]}`,
+		}, {
+			in: func(ctx *adt.OpContext) (adt.Expr, error) {
+				in := []*A{{Name: "Name", Description: "Desc"}}
+				return convert.GoValueToValue(ctx, in, false), nil
+			},
+			out: `[{Name: "Name", Description: "Desc"}]`,
+		}, {
+			in: func(ctx *adt.OpContext) (adt.Expr, error) {
+				in := []*A{{Name: "Name", Description: "Desc"}}
+				return convert.GoTypeToExpr(ctx, in)
+			},
+			out: `*null|[...*null|{Name: string, Description: string}]`,
+		}, {
+			in: func(ctx *adt.OpContext) (adt.Expr, error) {
+				expr, err := parser.ParseExpr("test", `{
 				x: Guide.#Terminal
 				Guide: {}
 			}`)
-			if err != nil {
-				return nil, err
-			}
-			c, err := compile.Expr(nil, ctx, "_", expr)
-			if err != nil {
-				return nil, err
-			}
-			root := &adt.Vertex{}
-			root.AddConjunct(c)
-			root.Finalize(ctx)
+				if err != nil {
+					return nil, err
+				}
+				c, err := compile.Expr(nil, ctx, "_", expr)
+				if err != nil {
+					return nil, err
+				}
+				root := &adt.Vertex{}
+				root.AddConjunct(c)
+				root.Finalize(ctx)
 
-			// Simulate Value.Unify of Lookup("x") and Lookup("Guide").
-			n := &adt.Vertex{}
-			n.AddConjunct(adt.MakeRootConjunct(nil, root.Arcs[0]))
-			n.AddConjunct(adt.MakeRootConjunct(nil, root.Arcs[1]))
-			n.Finalize(ctx)
+				// Simulate Value.Unify of Lookup("x") and Lookup("Guide").
+				n := &adt.Vertex{}
+				n.AddConjunct(adt.MakeRootConjunct(nil, root.Arcs[0]))
+				n.AddConjunct(adt.MakeRootConjunct(nil, root.Arcs[1]))
+				n.Finalize(ctx)
 
-			return n, nil
-		},
-		out: `<[l2// x: undefined field: #Terminal] _|_>`,
-		p:   export.Final,
-	}, {
-		in: func(r *adt.OpContext) (adt.Expr, error) {
-			v := ctx.CompileString(`
+				return n, nil
+			},
+			out: `<[l2// x: undefined field: #Terminal] _|_>`,
+			p:   export.Final,
+		}, {
+			in: func(r *adt.OpContext) (adt.Expr, error) {
+				v := ctx.CompileString(`
 				#Provider: {
 					ID: string
 					notConcrete: bool
@@ -147,108 +149,108 @@ func TestGenerated(t *testing.T) {
 					b: a + 1
 				}`)
 
-			spec := v.LookupPath(cue.ParsePath("#Provider"))
-			spec2 := spec.FillPath(cue.ParsePath("ID"), "12345")
-			root := v.FillPath(cue.ParsePath("providers.foo"), spec2)
-			_, n := value.ToInternal(root)
+				spec := v.LookupPath(cue.ParsePath("#Provider"))
+				spec2 := spec.FillPath(cue.ParsePath("ID"), "12345")
+				root := v.FillPath(cue.ParsePath("providers.foo"), spec2)
+				_, n := value.ToInternal(root)
 
-			return n, nil
-		},
-		out: `#Provider: {ID: string, notConcrete: bool, a: int, b: a+1}, providers: {foo: {ID: "12345", notConcrete: bool, a: int, b: a+1}}`,
-		p:   export.All,
-	}, {
-		// Issue #882
-		in: func(r *adt.OpContext) (adt.Expr, error) {
-			valA := ctx.CompileString(`
+				return n, nil
+			},
+			out: `#Provider: {ID: string, notConcrete: bool, a: int, b: a+1}, providers: {foo: {ID: "12345", notConcrete: bool, a: int, b: a+1}}`,
+			p:   export.All,
+		}, {
+			// Issue #882
+			in: func(r *adt.OpContext) (adt.Expr, error) {
+				valA := ctx.CompileString(`
 				#One: { version: string }
 			`)
 
-			valB := ctx.CompileString(`
+				valB := ctx.CompileString(`
 				#One: _
 				ones: {[string]: #One}
 			`)
-			v := valB.Unify(valA)
-			_, n := value.ToInternal(v)
-			return n, nil
-		},
-		out: `#One: {version: string}, ones: {[string]: #One}`,
-		p:   export.All,
-	}, {
-		// Indicate closedness in an element that is closed and misses parent
-		// context.
-		// Issue #882
-		in: func(r *adt.OpContext) (adt.Expr, error) {
-			v := ctx.CompileString(`
+				v := valB.Unify(valA)
+				_, n := value.ToInternal(v)
+				return n, nil
+			},
+			out: `#One: {version: string}, ones: {[string]: #One}`,
+			p:   export.All,
+		}, {
+			// Indicate closedness in an element that is closed and misses parent
+			// context.
+			// Issue #882
+			in: func(r *adt.OpContext) (adt.Expr, error) {
+				v := ctx.CompileString(`
 					#A: b: c: string
 				`)
-			v = v.LookupPath(cue.ParsePath("#A.b"))
+				v = v.LookupPath(cue.ParsePath("#A.b"))
 
-			_, n := value.ToInternal(v)
-			return n, nil
-		},
-		out: `_#def, _#def: {c: string}`,
-		p:   export.All,
-	}, {
-		// Don't wrap in def if the if the value is an embedded scalar.
-		// Issue #977
-		in: func(r *adt.OpContext) (adt.Expr, error) {
-			v := ctx.CompileString(`
+				_, n := value.ToInternal(v)
+				return n, nil
+			},
+			out: `_#def, _#def: {c: string}`,
+			p:   export.All,
+		}, {
+			// Don't wrap in def if the if the value is an embedded scalar.
+			// Issue #977
+			in: func(r *adt.OpContext) (adt.Expr, error) {
+				v := ctx.CompileString(`
 					#A: { "foo", #enum: 2 }
 				`)
-			v = v.LookupPath(cue.ParsePath("#A"))
+				v = v.LookupPath(cue.ParsePath("#A"))
 
-			_, n := value.ToInternal(v)
-			return n, nil
-		},
-		out: `"foo", #enum: 2`,
-		p:   export.All,
-	}, {
-		// Issue #1131
-		in: func(r *adt.OpContext) (adt.Expr, error) {
-			m := make(map[string]interface{})
-			v := ctx.Encode(m)
-			_, x := value.ToInternal(v)
-			return x, nil
-		},
-		out: ``, // empty file
-	}, {
-		in: func(r *adt.OpContext) (adt.Expr, error) {
-			v := &adt.Vertex{}
-			v.SetValue(r, &adt.StructMarker{})
-			return v, nil
-		},
-		out: ``, // empty file
-	}}
-	for _, tc := range testCases {
-		t.Run("", func(t *testing.T) {
-			ctx := adt.NewContext((*runtime.Runtime)(ctx), &adt.Vertex{})
+				_, n := value.ToInternal(v)
+				return n, nil
+			},
+			out: `"foo", #enum: 2`,
+			p:   export.All,
+		}, {
+			// Issue #1131
+			in: func(r *adt.OpContext) (adt.Expr, error) {
+				m := make(map[string]interface{})
+				v := ctx.Encode(m)
+				_, x := value.ToInternal(v)
+				return x, nil
+			},
+			out: ``, // empty file
+		}, {
+			in: func(r *adt.OpContext) (adt.Expr, error) {
+				v := &adt.Vertex{}
+				v.SetValue(r, &adt.StructMarker{})
+				return v, nil
+			},
+			out: ``, // empty file
+		}}
+		for _, tc := range testCases {
+			t.Run("", func(t *testing.T) {
+				ctx := adt.NewContext((*runtime.Runtime)(ctx), &adt.Vertex{})
+				v, err := tc.in(ctx)
+				if err != nil {
+					t.Fatal("failed test case: ", err)
+				}
 
-			v, err := tc.in(ctx)
-			if err != nil {
-				t.Fatal("failed test case: ", err)
-			}
+				p := tc.p
+				if p == nil {
+					p = export.Simplified
+				}
 
-			p := tc.p
-			if p == nil {
-				p = export.Simplified
-			}
-
-			var n ast.Node
-			switch x := v.(type) {
-			case *adt.Vertex:
-				n, err = p.Def(ctx, "", x)
-			default:
-				n, err = p.Expr(ctx, "", v)
-			}
-			if err != nil {
-				t.Fatal("failed export: ", err)
-			}
-			got := astinternal.DebugStr(n)
-			if got != tc.out {
-				t.Errorf("got:  %s\nwant: %s", got, tc.out)
-			}
-		})
-	}
+				var n ast.Node
+				switch x := v.(type) {
+				case *adt.Vertex:
+					n, err = p.Def(ctx, "", x)
+				default:
+					n, err = p.Expr(ctx, "", v)
+				}
+				if err != nil {
+					t.Fatal("failed export: ", err)
+				}
+				got := astinternal.DebugStr(n)
+				if got != tc.out {
+					t.Errorf("got:  %s\nwant: %s", got, tc.out)
+				}
+			})
+		}
+	})
 }
 
 type A struct {

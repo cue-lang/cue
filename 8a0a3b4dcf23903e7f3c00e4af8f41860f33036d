@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f36a4597_63b323de",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-02T09:35:47Z",
+      "side": 1,
+      "message": "Thanks! SGTM, will just run this past Marcel later to confirm there aren\u0027t any issues.",
+      "revId": "8a0a3b4dcf23903e7f3c00e4af8f41860f33036d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

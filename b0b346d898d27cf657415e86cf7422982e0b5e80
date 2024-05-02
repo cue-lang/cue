@@ -98,6 +98,24 @@
       "parentUuid": "d41d32c0_789eb209",
       "revId": "b0b346d898d27cf657415e86cf7422982e0b5e80",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0da03f08_ff57ae2b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-02T09:35:47Z",
+      "side": 1,
+      "message": "OK, makes sense. Can you please add a summary of this in the commit message? i.e. nil used to be returned for \"success\" in validator builtins, as well as when a builtin were incorrectly called, and the latter was wrong and is being changed.",
+      "parentUuid": "5932738b_6f39d86f",
+      "revId": "b0b346d898d27cf657415e86cf7422982e0b5e80",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -29,6 +29,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/stats"
+	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/tools/flow"
 )
@@ -37,12 +38,13 @@ import (
 // their dependencies.
 func TestFlow(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root: "./testdata",
-		Name: "run",
+		Root:   "./testdata",
+		Name:   "run",
+		Matrix: cuetdtest.SmallMatrix,
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		v := cuecontext.New().BuildInstance(t.Instance())
+		v := t.Context().BuildInstance(t.Instance())
 		if err := v.Err(); err != nil {
 			t.Fatal(errors.Details(err, nil))
 		}
@@ -64,9 +66,11 @@ func TestFlow(t *testing.T) {
 				}
 				fmt.Fprintln(t.Writer(path.Join(step, "value")), string(b))
 
-				stats := task.Stats()
-				tasksTotal.Add(stats)
-				fmt.Fprintln(t.Writer(path.Join(step, "stats")), &stats)
+				if t.M.IsDefault() {
+					stats := task.Stats()
+					tasksTotal.Add(stats)
+					fmt.Fprintln(t.Writer(path.Join(step, "stats")), &stats)
+				}
 			}
 
 			incSeqNum()
@@ -92,6 +96,10 @@ func TestFlow(t *testing.T) {
 				Cwd:     cwd,
 				ToSlash: true,
 			})
+		}
+
+		if !t.M.IsDefault() {
+			return
 		}
 
 		totals := c.Stats()

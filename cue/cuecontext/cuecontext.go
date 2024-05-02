@@ -16,7 +16,10 @@ package cuecontext
 
 import (
 	"cuelang.org/go/cue"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/cuedebug"
+	"cuelang.org/go/internal/envflag"
 
 	_ "cuelang.org/go/pkg"
 )
@@ -44,5 +47,40 @@ type ExternInterpreter = runtime.Interpreter
 func Interpreter(i ExternInterpreter) Option {
 	return Option{func(r *runtime.Runtime) {
 		r.SetInterpreter(i)
+	}}
+}
+
+type EvaluatorVersion = internal.EvaluatorVersion
+
+const (
+	// Latest is the latest stable version of the evaluator.
+	Latest EvaluatorVersion = V2
+
+	// Experimental refers to the latest unstable version of the evaluator.
+	// Note that this version may change without notice.
+	Experimental EvaluatorVersion = V3
+
+	// V2 is the currently latest stable version of the evaluator.
+	V2 EvaluatorVersion = internal.DefaultVersion
+
+	// V3 is the currently experimental version of the evaluator.
+	V3 EvaluatorVersion = internal.DevVersion
+)
+
+// Version indicates which version of the evaluator to use. Currently only
+// experimental versions can be selected as an alternative.
+func Version(v EvaluatorVersion) Option {
+	return Option{func(r *runtime.Runtime) {
+		r.SetVersion(v)
+	}}
+}
+
+// CUE_DEBUG takes a string with the same contents as CUE_DEBUG and configures
+// the context with the relevant debug options.
+func CUE_DEBUG(s string) Option {
+	return Option{func(r *runtime.Runtime) {
+		var c cuedebug.Config
+		envflag.Parse(&c, "CUE_DEBUG", s)
+		r.SetDebugOptions(&c)
 	}}
 }

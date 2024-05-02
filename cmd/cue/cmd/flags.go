@@ -44,6 +44,7 @@ const (
 	flagPath          flagName = "path"
 	flagProtoEnum     flagName = "proto_enum"
 	flagProtoPath     flagName = "proto_path"
+	flagRecurse       flagName = "recurse"
 	flagRecursive     flagName = "recursive"
 	flagSchema        flagName = "schema"
 	flagSimplify      flagName = "simplify"

@@ -26,6 +26,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "5c9272fd_612efcc6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-02T09:26:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "356dc455_60be2dfe",
+      "range": {
+        "startLine": 11,
+        "startChar": 10,
+        "endLine": 11,
+        "endChar": 14
+      },
+      "revId": "b0b346d898d27cf657415e86cf7422982e0b5e80",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "41eae52e_97f0a9c0",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 4
@@ -54,6 +78,24 @@
       "writtenOn": "2024-05-02T08:51:29Z",
       "side": 1,
       "message": "The only two \"call\" method callers explicitly checked if the result was `nil`; what should happen to that? Presumably that never happens now, so I wonder if we should remove those nil checks/cases, or replace them with Bottom somehow. Perhaps see if you can remove them first.",
+      "revId": "b0b346d898d27cf657415e86cf7422982e0b5e80",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5932738b_6f39d86f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-02T09:26:35Z",
+      "side": 1,
+      "message": "I tried removing them, and it turns out that validators can return `nil` in case the validator is valid - os for example the result of `uuid.Valid` is `nil` on a valid uuid. So a nil result of `call` signified both a correct and invalid result.\n\nTo remove these nil checks, we would need to enforce that all validators have a non-nil return type in all cases, but I\u0027m pretty sure that\u0027s a lot of work, and not sure it\u0027s correct",
+      "parentUuid": "d41d32c0_789eb209",
       "revId": "b0b346d898d27cf657415e86cf7422982e0b5e80",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

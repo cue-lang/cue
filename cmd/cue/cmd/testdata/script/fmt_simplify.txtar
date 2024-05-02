@@ -1,0 +1,14 @@
+# simplify works in package mode
+exec cue fmt --simplify ./pkg/...
+cmp pkg/file.cue file.golden
+
+# simplify works in --files mode
+exec cue fmt --simplify --files ./files/
+cmp files/file.cue file.golden
+
+-- files/file.cue --
+"quoted": b
+-- pkg/file.cue --
+"quoted": b
+-- file.golden --
+quoted: b

@@ -136,4 +136,4 @@ versions: "v0.9.0-alpha.0": {
 // to be lost. See https://github.com/cue-lang/cue/issues/2319.
 
 //error: source field is not allowed at this language version; need at least v0.9.0-alpha.0
-let _errorSourceFieldRequiredVersion = 1&2
+let _errorSourceFieldRequiredVersion = 1 & 2

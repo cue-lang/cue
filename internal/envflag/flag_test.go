@@ -23,11 +23,21 @@ func success[T comparable](want T) func(t *testing.T) {
 	}
 }
 
-func failure[T comparable](wantError string) func(t *testing.T) {
+func failure[T comparable](want T, wantError string) func(t *testing.T) {
 	return func(t *testing.T) {
 		var x T
 		err := Init(&x, "TEST_VAR")
 		qt.Assert(t, qt.ErrorMatches(err, wantError))
+		qt.Assert(t, qt.Equals(x, want))
+	}
+}
+
+func invalid[T comparable](want T) func(t *testing.T) {
+	return func(t *testing.T) {
+		var x T
+		err := Init(&x, "TEST_VAR")
+		qt.Assert(t, qt.ErrorIs(err, InvalidError))
+		qt.Assert(t, qt.Equals(x, want))
 	}
 }
 
@@ -44,7 +54,8 @@ var tests = []struct {
 }, {
 	testName: "Unknown",
 	envVal:   "ratchet",
-	test:     failure[testFlags]("unknown TEST_VAR ratchet"),
+	test: failure[testFlags](testFlags{DefaultTrue: true},
+		"cannot parse TEST_VAR: unknown ratchet"),
 }, {
 	testName: "Set",
 	envVal:   "foo",
@@ -62,7 +73,10 @@ var tests = []struct {
 }, {
 	testName: "SetWithUnknown",
 	envVal:   "foo,other",
-	test:     failure[testFlags]("unknown TEST_VAR other"),
+	test: failure[testFlags](testFlags{
+		Foo:         true,
+		DefaultTrue: true,
+	}, "cannot parse TEST_VAR: unknown other"),
 }, {
 	testName: "TwoFlags",
 	envVal:   "barbaz,foo",
@@ -83,6 +97,17 @@ var tests = []struct {
 	test: success(testFlags{
 		DefaultFalse: true,
 	}),
+}, {
+	testName: "MultipleUnknown",
+	envVal:   "other1,other2,foo",
+	test: failure(testFlags{
+		Foo:         true,
+		DefaultTrue: true,
+	}, "cannot parse TEST_VAR: unknown other1\nunknown other2"),
+}, {
+	testName: "Invalid",
+	envVal:   "foo=2,BarBaz=true",
+	test:     invalid(testFlags{DefaultTrue: true}),
 }}
 
 func TestInit(t *testing.T) {

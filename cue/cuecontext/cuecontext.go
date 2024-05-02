@@ -15,8 +15,14 @@
 package cuecontext
 
 import (
+	"errors"
+	"fmt"
+
 	"cuelang.org/go/cue"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/cuedebug"
+	"cuelang.org/go/internal/envflag"
 
 	_ "cuelang.org/go/pkg"
 )
@@ -26,9 +32,20 @@ type Option struct {
 	apply func(r *runtime.Runtime)
 }
 
+// defaultFlags defines the debug flags that are set by default.
+var defaultFlags cuedebug.Config
+
+func init() {
+	if err := envflag.Parse(&defaultFlags, ""); err != nil {
+		panic(err)
+	}
+}
+
 // New creates a new Context.
 func New(options ...Option) *cue.Context {
 	r := runtime.New()
+	// Ensure default behavior if the flags are not set explicitly.
+	r.SetDebugOptions(&defaultFlags)
 	for _, o := range options {
 		o.apply(r)
 	}
@@ -44,5 +61,50 @@ type ExternInterpreter = runtime.Interpreter
 func Interpreter(i ExternInterpreter) Option {
 	return Option{func(r *runtime.Runtime) {
 		r.SetInterpreter(i)
+	}}
+}
+
+type EvalVersion = internal.EvaluatorVersion
+
+const (
+	// EvalDefault is the latest stable version of the evaluator.
+	EvalDefault EvalVersion = EvalV2
+
+	// EvalExperimental refers to the latest unstable version of the evaluator.
+	// Note that this version may change without notice.
+	EvalExperimental EvalVersion = EvalV3
+
+	// EvalV2 is the currently latest stable version of the evaluator.
+	// It was introduced in CUE version 0.3 and is being maintained until 2024.
+	EvalV2 EvalVersion = internal.DefaultVersion
+
+	// EvalV3 is the currently experimental version of the evaluator.
+	// It was introduced in 2024 and brought a new disjunction algorithm,
+	// a new closedness algorithm, a new core scheduler, and adds performance
+	// enhancements like structure sharing.
+	EvalV3 EvalVersion = internal.DevVersion
+)
+
+// EvaluatorVersion indicates which version of the evaluator to use. Currently
+// only experimental versions can be selected as an alternative.
+func EvaluatorVersion(v EvalVersion) Option {
+	return Option{func(r *runtime.Runtime) {
+		r.SetVersion(v)
+	}}
+}
+
+// CUE_DEBUG takes a string with the same contents as CUE_DEBUG and configures
+// the context with the relevant debug options. It panics for unknown or
+// malformed options.
+func CUE_DEBUG(s string) Option {
+	var c cuedebug.Config
+	// Ignore errors if it pertains to unknown fields. Note that cuecontext
+	// already panics in init() for any other errors.
+	if err := envflag.Parse(&c, s); errors.Is(err, envflag.InvalidError) {
+		panic(fmt.Errorf("cuecontext.CUE_DEBUG: %v", err))
+	}
+
+	return Option{func(r *runtime.Runtime) {
+		r.SetDebugOptions(&c)
 	}}
 }

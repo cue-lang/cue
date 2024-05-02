@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "422cd430_aa3f2081",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-02T08:47:05Z",
+      "side": 1,
+      "message": "Paul yesterday brought up something about YAML and CUE interoperability in import/export, and I realised that we use internal/encoding for CUE files even in cases where we don\u0027t need to deal with other encodings... like fmt. Unsurprisingly, the added layer adds overhead and code complexity.",
+      "revId": "66da85ac997c02a68cb0b750f171010da5f8850e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

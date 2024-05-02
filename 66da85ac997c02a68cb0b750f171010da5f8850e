@@ -16,6 +16,23 @@
       "message": "Paul yesterday brought up something about YAML and CUE interoperability in import/export, and I realised that we use internal/encoding for CUE files even in cases where we don\u0027t need to deal with other encodings... like fmt. Unsurprisingly, the added layer adds overhead and code complexity.",
       "revId": "66da85ac997c02a68cb0b750f171010da5f8850e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e7708cb_69d90a25",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-02T08:52:07Z",
+      "side": 1,
+      "message": "awesome, I always wondered in which cases multiple files would be formatted from a single cue file 😊",
+      "revId": "66da85ac997c02a68cb0b750f171010da5f8850e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

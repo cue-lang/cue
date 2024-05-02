@@ -1,0 +1,63 @@
+# Verify how fmt behaves with different encodings.
+
+exec cue fmt --diff input.cue
+cmp stdout input.cue.diff
+
+# Unknown file extensions fail on their own
+! exec cue fmt --diff input.cue-unknown
+stderr 'unknown file extension'
+
+# Unknown file extensions work if we specify them as CUE.
+cp input.cue input.cue-unknown
+exec cue fmt --diff cue: input.cue-unknown
+cmp stdout input.cue-unknown.diff
+
+# TODO(mvdan): we should probably fail rather than doing nothing.
+exec cue fmt --diff input.json
+! stdout .
+! stderr .
+
+# JSON is valid CUE syntax, so it can be formatted as CUE, if one wants to.
+exec cue fmt --diff cue: input.json
+cmp stdout input.json.diff
+
+# TODO(mvdan): we should probably fail rather than doing nothing.
+exec cue fmt --diff input.yaml
+! stdout .
+! stderr .
+
+# YAML in this case is not valid CUE.
+! exec cue fmt --diff cue: input.yaml
+stderr 'in struct literal'
+
+-- input.cue --
+foo:     "bar"
+-- input.cue.diff --
+diff input.cue.orig input.cue
+--- input.cue.orig
++++ input.cue
+@@ -1,1 +1,1 @@
+-foo:     "bar"
++foo: "bar"
+
+-- input.cue-unknown.diff --
+diff input.cue-unknown.orig input.cue-unknown
+--- input.cue-unknown.orig
++++ input.cue-unknown
+@@ -1,1 +1,1 @@
+-foo:     "bar"
++foo: "bar"
+
+-- input.json --
+{"foo":     "bar"}
+-- input.json.diff --
+diff input.json.orig input.json
+--- input.json.orig
++++ input.json
+@@ -1,1 +1,1 @@
+-{"foo":     "bar"}
++{"foo": "bar"}
+
+-- input.yaml --
+foo:
+- unquoted bar

@@ -376,13 +376,15 @@ func (c *OpContext) Err() *Bottom {
 	return b
 }
 
-func (c *OpContext) addErrf(code ErrorCode, pos token.Pos, msg string, args ...interface{}) {
+func (c *OpContext) addErrf(code ErrorCode, pos token.Pos, msg string, args ...interface{}) *Bottom {
 	err := c.NewPosf(pos, msg, args...)
-	c.addErr(code, err)
+	return c.addErr(code, err)
 }
 
-func (c *OpContext) addErr(code ErrorCode, err errors.Error) {
-	c.AddBottom(&Bottom{Code: code, Err: err})
+func (c *OpContext) addErr(code ErrorCode, err errors.Error) *Bottom {
+	b := &Bottom{Code: code, Err: err}
+	c.AddBottom(b)
+	return b
 }
 
 // AddBottom records an error in OpContext.

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d805d22_ea10f214",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 21
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-02T13:38:20Z",
+      "side": 1,
+      "message": "I added a test case for `fmt_simplify.txtar` as I noticed I missed it in my --recurse impl, and the normal cue fmt --simplify wasn\u0027t tested either",
+      "revId": "889db26ce744b28d2d544678825493b24ff9b6fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

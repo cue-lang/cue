@@ -52,6 +52,24 @@
       "parentUuid": "b3040d86_5e08ad01",
       "revId": "1c4f071d9ba929ba74e2e927fad771fa8bb67285",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5158e9f3_3173f341",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-02T13:38:20Z",
+      "side": 1,
+      "message": "got it. Changed to --recurse",
+      "parentUuid": "36a4f2f6_22acfbca",
+      "revId": "1c4f071d9ba929ba74e2e927fad771fa8bb67285",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

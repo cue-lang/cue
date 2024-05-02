@@ -16,6 +16,24 @@
       "message": "Marcel is fine with adding this mode, he\u0027s just not a fan of calling the flag --files as we already have `cue import --files` as a flag, so this is a small overlap that could confuse users, given that the two flags do different things.\n\nHe\u0027s fine with `--recurse`. We talked about other flags like `--file-mode` but couldn\u0027t think of one we liked. He also suggested `cue fmt all` or `cue fmt files`, but `all` would likely collide with us supporting something like `go list all` in the future, and `files` could easily be a standard library package in the future.\n\nLet me know if you can think of a better name; if not, I think `--recurse` is fine. It\u0027s less obvious about the fact that we swap \"package mode\" for \"file mode\", but it\u0027s also much more obvious about the fact that we recurse directory trees.",
       "revId": "1c4f071d9ba929ba74e2e927fad771fa8bb67285",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3040d86_5e08ad01",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-02T12:51:52Z",
+      "side": 1,
+      "message": "makes sense.\n\nI thought about `cue fmt -- [FILE...]` I think it\u0027s standard for tools to treat everything that appears after -- as files, so it might make sense\n\nbut if that seems to weird, I think --recurse is good",
+      "parentUuid": "715958b7_3e35b371",
+      "revId": "1c4f071d9ba929ba74e2e927fad771fa8bb67285",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

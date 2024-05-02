@@ -720,19 +720,23 @@ func (b *buildPlan) parseFlags() (err error) {
 		// Set a default file filter to only include json and yaml files
 		b.cfg.fileFilter = s
 	}
-	b.encConfig = &encoding.Config{
-		Force:         flagForce.Bool(b.cmd),
-		Mode:          b.cfg.outMode,
-		Stdin:         b.cmd.InOrStdin(),
-		Stdout:        b.cmd.OutOrStdout(),
-		ProtoPath:     flagProtoPath.StringArray(b.cmd),
-		AllErrors:     flagAllErrors.Bool(b.cmd),
-		PkgName:       flagPackage.String(b.cmd),
-		Strict:        flagStrict.Bool(b.cmd),
-		InlineImports: flagInlineImports.Bool(b.cmd),
-		EscapeHTML:    flagEscape.Bool(b.cmd),
-	}
+	b.encConfig = encConfig(b.cmd)
+	b.encConfig.Mode = b.cfg.outMode
 	return nil
+}
+
+func encConfig(cmd *Command) *encoding.Config {
+	return &encoding.Config{
+		Force:         flagForce.Bool(cmd),
+		Stdin:         cmd.InOrStdin(),
+		Stdout:        cmd.OutOrStdout(),
+		ProtoPath:     flagProtoPath.StringArray(cmd),
+		AllErrors:     flagAllErrors.Bool(cmd),
+		PkgName:       flagPackage.String(cmd),
+		Strict:        flagStrict.Bool(cmd),
+		InlineImports: flagInlineImports.Bool(cmd),
+		EscapeHTML:    flagEscape.Bool(cmd),
+	}
 }
 
 func buildInstances(cmd *Command, binst []*build.Instance, ignoreErrors bool) []*instance {

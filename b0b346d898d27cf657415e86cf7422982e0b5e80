@@ -1,6 +1,29 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "356dc455_60be2dfe",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-02T08:51:29Z",
+      "side": 1,
+      "message": "nit: its",
+      "range": {
+        "startLine": 11,
+        "startChar": 10,
+        "endLine": 11,
+        "endChar": 14
+      },
+      "revId": "b0b346d898d27cf657415e86cf7422982e0b5e80",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "41eae52e_97f0a9c0",
@@ -14,6 +37,23 @@
       "writtenOn": "2024-05-02T08:37:43Z",
       "side": 1,
       "message": "there\u0027s a lot of info/assumptions to process in the codebase, so this could be way off the mark.",
+      "revId": "b0b346d898d27cf657415e86cf7422982e0b5e80",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d41d32c0_789eb209",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-02T08:51:29Z",
+      "side": 1,
+      "message": "The only two \"call\" method callers explicitly checked if the result was `nil`; what should happen to that? Presumably that never happens now, so I wonder if we should remove those nil checks/cases, or replace them with Bottom somehow. Perhaps see if you can remove them first.",
       "revId": "b0b346d898d27cf657415e86cf7422982e0b5e80",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

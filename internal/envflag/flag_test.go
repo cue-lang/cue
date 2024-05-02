@@ -44,7 +44,7 @@ var tests = []struct {
 }, {
 	testName: "Unknown",
 	envVal:   "ratchet",
-	test:     failure[testFlags]("unknown TEST_VAR ratchet"),
+	test:     failure[testFlags]("cannot parse TEST_VAR: unknown ratchet"),
 }, {
 	testName: "Set",
 	envVal:   "foo",
@@ -62,7 +62,7 @@ var tests = []struct {
 }, {
 	testName: "SetWithUnknown",
 	envVal:   "foo,other",
-	test:     failure[testFlags]("unknown TEST_VAR other"),
+	test:     failure[testFlags]("cannot parse TEST_VAR: unknown other"),
 }, {
 	testName: "TwoFlags",
 	envVal:   "barbaz,foo",

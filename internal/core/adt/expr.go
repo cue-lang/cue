@@ -1606,18 +1606,16 @@ func bottom(v Value) *Bottom {
 func (x *Builtin) call(c *OpContext, p token.Pos, validate bool, args []Value) Expr {
 	fun := x // right now always x.
 	if len(args) > len(x.Params) {
-		c.addErrf(0, p,
+		return c.addErrf(0, p,
 			"too many arguments in call to %v (have %d, want %d)",
 			fun, len(args), len(x.Params))
-		return nil
 	}
 	for i := len(args); i < len(x.Params); i++ {
 		v := x.Params[i].Default()
 		if v == nil {
-			c.addErrf(0, p,
+			return c.addErrf(0, p,
 				"not enough arguments in call to %v (have %d, want %d)",
 				fun, len(args), len(x.Params))
-			return nil
 		}
 		args = append(args, v)
 	}
@@ -1634,10 +1632,9 @@ func (x *Builtin) call(c *OpContext, p token.Pos, validate bool, args []Value) E
 			if b != nil {
 				code = b.Code
 			}
-			c.addErrf(code, pos(a),
+			return c.addErrf(code, pos(a),
 				"cannot use %s (type %s) as %s in argument %d to %v",
 				a, k, x.Params[i].Kind(), i+1, fun)
-			return nil
 		}
 		v := x.Params[i].Value
 		if _, ok := v.(*BasicType); !ok {
@@ -1646,10 +1643,9 @@ func (x *Builtin) call(c *OpContext, p token.Pos, validate bool, args []Value) E
 			n := c.newInlineVertex(nil, nil, Conjunct{env, x, c.ci})
 			n.Finalize(c)
 			if _, ok := n.BaseValue.(*Bottom); ok {
-				c.addErrf(0, pos(a),
+				return c.addErrf(0, pos(a),
 					"cannot use %s as %s in argument %d to %v",
 					a, v, i+1, fun)
-				return nil
 			}
 			args[i] = n
 		}

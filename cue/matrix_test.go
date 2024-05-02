@@ -35,7 +35,8 @@ func (c *evalConfig) runtime() *Runtime {
 }
 
 func (c *evalConfig) updateRuntime(r *runtime.Runtime) {
-	r.SetSettings(c.version, c.flags)
+	r.SetVersion(c.version)
+	r.SetDebugOptions(&c.flags)
 }
 
 func runMatrix(t *testing.T, name string, f func(t *testing.T, c *evalConfig)) {

@@ -35,6 +35,42 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e639a025_5276b141",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 740,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-02T12:15:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d1543fbc_4c65bed3",
+      "revId": "112a15d0762271a92657c25f8d30bfa4bb666da8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a8f67ae_32e9255a",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 740,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-02T12:15:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d1543fbc_4c65bed3",
+      "revId": "112a15d0762271a92657c25f8d30bfa4bb666da8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "92987325_5a94c160",
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b745f98_f17f31c4",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-02T12:15:39Z",
+      "side": 1,
+      "message": "wow, I had no idea! good to know",
+      "parentUuid": "92987325_5a94c160",
+      "revId": "112a15d0762271a92657c25f8d30bfa4bb666da8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1ec63994_ec158315",
@@ -65,6 +119,24 @@
       "writtenOn": "2024-05-02T11:29:50Z",
       "side": 1,
       "message": "can you try refactoring this so you always call WalkDir on each argument? because:\n\n* right now you stat first and then call walkdir later, which is arguably one unneeded syscall\n* it\u0027s more code; the WalkDir recursion already knows how to handle errors and regular files, and you also need more indentation\n* you can still handle cases like \"ignore cue.mod unless given explicitly\" by comparing path to arg:\n\n\u003e The path argument contains the argument to WalkDir as a prefix. That is, if WalkDir is called with root argument \"dir\" and finds a file named \"a\" in that directory, the walk function will be called with argument \"dir/a\".",
+      "revId": "112a15d0762271a92657c25f8d30bfa4bb666da8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b4f35e2_d55ca732",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-02T12:15:39Z",
+      "side": 1,
+      "message": "that\u0027s much simpler, done",
+      "parentUuid": "1ec63994_ec158315",
       "revId": "112a15d0762271a92657c25f8d30bfa4bb666da8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

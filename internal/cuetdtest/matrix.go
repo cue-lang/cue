@@ -43,7 +43,8 @@ func (t *M) Runtime() *runtime.Runtime {
 }
 
 func (t *M) UpdateRuntime(r *runtime.Runtime) {
-	r.SetSettings(t.version, t.flags)
+	r.SetVersion(t.version)
+	r.SetDebugOptions(&t.flags)
 }
 
 const DefaultVersion = "v2"

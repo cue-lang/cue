@@ -66,6 +66,8 @@ var FullMatrix Matrix = []M{{
 
 var SmallMatrix Matrix = FullMatrix[:2]
 
+var DefaultOnlyMatrix Matrix = FullMatrix[:1]
+
 // Run runs a test with the given name f for each configuration in the matrix.
 func (m Matrix) Run(t *testing.T, name string, f func(t *M)) {
 	t.Run(name, func(t *testing.T) {

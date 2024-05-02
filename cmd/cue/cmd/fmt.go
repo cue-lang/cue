@@ -17,19 +17,15 @@ package cmd
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 
-	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/source"
-	"cuelang.org/go/tools/fix"
 
 	"github.com/rogpeppe/go-internal/diff"
 	"github.com/spf13/cobra"
@@ -42,15 +38,12 @@ func newFmtCmd(c *Command) *cobra.Command {
 		Long: `Fmt formats the given files or the files for the given packages in place
 `,
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {
-			plan, err := newBuildPlan(cmd, &config{loadCfg: &load.Config{
+			builds := loadFromArgs(args, &load.Config{
 				Tests:       true,
 				Tools:       true,
 				AllCUEFiles: true,
 				Package:     "*",
-			}})
-			exitOnErr(cmd, err, true)
-
-			builds := loadFromArgs(args, plan.cfg.loadCfg)
+			})
 			if builds == nil {
 				exitOnErr(cmd, errors.Newf(token.NoPos, "invalid args"), true)
 			}
@@ -59,10 +52,6 @@ func newFmtCmd(c *Command) *cobra.Command {
 			if flagSimplify.Bool(cmd) {
 				opts = append(opts, format.Simplify())
 			}
-
-			cfg := *plan.encConfig
-			cfg.Format = opts
-			cfg.Force = true
 
 			var foundBadlyFormatted bool
 			check := flagCheck.Bool(cmd)
@@ -90,75 +79,45 @@ func newFmtCmd(c *Command) *cobra.Command {
 					// We buffer the input and output bytes to compare them.
 					// This allows us to determine whether a file is already
 					// formatted, without modifying the file.
-					var original []byte
-					var formatted bytes.Buffer
-					if bs, ok := file.Source.([]byte); ok {
-						original = bs
-					} else {
-						original, err = source.ReadAll(file.Filename, file.Source)
-						exitOnErr(cmd, err, true)
-						file.Source = original
-					}
-					cfg.Out = &formatted
-					if file.Filename == "-" && !doDiff && !check {
-						// Always write to stdout if the file is read from stdin.
-						cfg.Out = io.MultiWriter(cfg.Out, stdout)
-					}
-
-					var files []*ast.File
-					d := encoding.NewDecoder(cmd.ctx, file, &cfg)
-					for ; !d.Done(); d.Next() {
-						f := d.File()
-
-						if file.Encoding == build.CUE {
-							f = fix.File(f)
-						}
-
-						files = append(files, f)
-					}
-					// Do not defer this Close call, as we are looping over builds,
-					// and otherwise we would hold all of their files open at once.
-					// Note that we always call Close after NewDecoder as well.
-					d.Close()
-					if err := d.Err(); err != nil {
+					src, ok := file.Source.([]byte)
+					if !ok {
+						var err error
+						src, err = source.ReadAll(file.Filename, file.Source)
 						exitOnErr(cmd, err, true)
 					}
 
-					e, err := encoding.NewEncoder(cmd.ctx, file, &cfg)
+					file, err := parser.ParseFile(file.Filename, src, parser.ParseComments)
 					exitOnErr(cmd, err, true)
 
-					for _, f := range files {
-						err := e.EncodeFile(f)
-						exitOnErr(cmd, err, false)
-					}
+					formatted, err := format.Node(file, opts...)
+					exitOnErr(cmd, err, true)
 
-					if err := e.Close(); err != nil {
-						exitOnErr(cmd, err, true)
+					// Always write to stdout if the file is read from stdin.
+					if file.Filename == "-" && !doDiff && !check {
+						stdout.Write(formatted)
 					}
 
 					// File is already well formatted; we can stop here.
-					if bytes.Equal(formatted.Bytes(), original) {
+					if bytes.Equal(formatted, src) {
 						continue
 					}
 
 					foundBadlyFormatted = true
-					var path string
-					f := file.Filename
-					path, err = filepath.Rel(cwd, f)
+					path, err := filepath.Rel(cwd, file.Filename)
 					if err != nil {
-						path = f
+						path = file.Filename
 					}
 
 					switch {
 					case doDiff:
-						d := diff.Diff(path+".orig", original, path, formatted.Bytes())
+						d := diff.Diff(path+".orig", src, path, formatted)
 						fmt.Fprintln(stdout, string(d))
 					case check:
 						fmt.Fprintln(stdout, path)
 					case file.Filename == "-":
-						// already written to stdout during encoding
+						// already wrote the formatted source to stdout above
 					default:
-						if err := os.WriteFile(file.Filename, formatted.Bytes(), 0644); err != nil {
+						if err := os.WriteFile(file.Filename, formatted, 0644); err != nil {
 							exitOnErr(cmd, err, false)
 						}
 					}

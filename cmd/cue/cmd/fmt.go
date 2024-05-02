@@ -17,18 +17,24 @@ package cmd
 import (
 	"bytes"
 	"fmt"
+	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
+	"slices"
+	"strings"
 
+	"github.com/rogpeppe/go-internal/diff"
+	"github.com/spf13/cobra"
+
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/source"
-
-	"github.com/rogpeppe/go-internal/diff"
-	"github.com/spf13/cobra"
 )
 
 func newFmtCmd(c *Command) *cobra.Command {
@@ -36,96 +42,121 @@ func newFmtCmd(c *Command) *cobra.Command {
 		Use:   "fmt [-s] [inputs]",
 		Short: "formats CUE configuration files",
 		Long: `Fmt formats the given files or the files for the given packages in place
+
+Arguments are interpreted as import paths (see 'cue help inputs') unless --files is set,
+in which case the arguments are file paths to descend into and format all CUE files.
+Directories named "cue.mod" and those beginning with "." and "_" are skipped unless
+given as explicit arguments.
 `,
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {
-			builds := loadFromArgs(args, &load.Config{
-				Tests:       true,
-				Tools:       true,
-				AllCUEFiles: true,
-				Package:     "*",
-			})
-			if builds == nil {
-				return errors.Newf(token.NoPos, "invalid args")
-			}
+			cwd, _ := os.Getwd()
+			check := flagCheck.Bool(cmd)
+			doDiff := flagDiff.Bool(cmd)
 
-			opts := []format.Option{}
+			formatOpts := []format.Option{}
 			if flagSimplify.Bool(cmd) {
-				opts = append(opts, format.Simplify())
+				formatOpts = append(formatOpts, format.Simplify())
 			}
 
 			var foundBadlyFormatted bool
-			check := flagCheck.Bool(cmd)
-			doDiff := flagDiff.Bool(cmd)
-			cwd, _ := os.Getwd()
-			stdout := cmd.OutOrStdout()
-
-			for _, inst := range builds {
-				if err := inst.Err; err != nil {
-					switch {
-					case errors.As(err, new(*load.PackageError)) && len(inst.BuildFiles) != 0:
-						// Ignore package errors if there are files to format.
-					case errors.As(err, new(*load.NoFilesError)):
-					default:
-						return err
-					}
+			if !flagFiles.Bool(cmd) { // format packages
+				builds := loadFromArgs(args, &load.Config{
+					Tests:       true,
+					Tools:       true,
+					AllCUEFiles: true,
+					Package:     "*",
+				})
+				if len(builds) == 0 {
+					return errors.Newf(token.NoPos, "invalid args")
 				}
-				for _, file := range inst.BuildFiles {
-					shouldFormat := inst.User || file.Filename == "-" || filepath.Dir(file.Filename) == inst.Dir
-					if !shouldFormat {
-						continue
-					}
 
-					// We buffer the input and output bytes to compare them.
-					// This allows us to determine whether a file is already
-					// formatted, without modifying the file.
-					src, ok := file.Source.([]byte)
-					if !ok {
-						var err error
-						src, err = source.ReadAll(file.Filename, file.Source)
+				for _, inst := range builds {
+					if inst.Err != nil {
+						switch {
+						case errors.As(inst.Err, new(*load.PackageError)) && len(inst.BuildFiles) != 0:
+							// Ignore package errors if there are files to format.
+						case errors.As(inst.Err, new(*load.NoFilesError)):
+						default:
+							exitOnErr(cmd, inst.Err, false)
+							continue
+						}
+					}
+					for _, file := range inst.BuildFiles {
+						shouldFormat := inst.User || file.Filename == "-" || filepath.Dir(file.Filename) == inst.Dir
+						if !shouldFormat {
+							continue
+						}
+
+						wasModified, err := formatFile(file, formatOpts, cwd, doDiff, check, cmd)
 						if err != nil {
 							return err
 						}
+						if wasModified {
+							foundBadlyFormatted = true
+						}
 					}
+				}
+			} else { // format individual files
+				hasDots := slices.ContainsFunc(args, func(arg string) bool {
+					return strings.Contains(arg, "...")
+				})
+				if hasDots {
+					return errors.New(`cannot use "..." in --files mode`)
+				}
 
-					file, err := parser.ParseFile(file.Filename, src, parser.ParseComments)
+				if len(args) == 0 {
+					args = []string{"."}
+				}
+
+				processFile := func(path string) error {
+					file, err := filetypes.ParseFile(path, filetypes.Input)
 					if err != nil {
 						return err
 					}
 
-					formatted, err := format.Node(file, opts...)
+					if path == "-" {
+						contents, err := io.ReadAll(cmd.InOrStdin())
+						exitOnErr(cmd, err, false)
+						file.Source = contents
+					}
+
+					wasModified, err := formatFile(file, formatOpts, cwd, doDiff, check, cmd)
 					if err != nil {
 						return err
 					}
-
-					// Always write to stdout if the file is read from stdin.
-					if file.Filename == "-" && !doDiff && !check {
-						stdout.Write(formatted)
+					if wasModified {
+						foundBadlyFormatted = true
 					}
-
-					// File is already well formatted; we can stop here.
-					if bytes.Equal(formatted, src) {
+					return nil
+				}
+				for _, arg := range args {
+					if arg == "-" {
+						err := processFile(arg)
+						exitOnErr(cmd, err, false)
 						continue
 					}
 
-					foundBadlyFormatted = true
-					path, err := filepath.Rel(cwd, file.Filename)
-					if err != nil {
-						path = file.Filename
-					}
-
-					switch {
-					case doDiff:
-						d := diff.Diff(path+".orig", src, path, formatted)
-						fmt.Fprintln(stdout, string(d))
-					case check:
-						fmt.Fprintln(stdout, path)
-					case file.Filename == "-":
-						// already wrote the formatted source to stdout above
-					default:
-						if err := os.WriteFile(file.Filename, formatted, 0644); err != nil {
+					err := filepath.WalkDir(arg, func(path string, d fs.DirEntry, err error) error {
+						if err != nil {
 							return err
 						}
-					}
+
+						if d.IsDir() {
+							name := d.Name()
+							isMod := name == "cue.mod"
+							isDot := strings.HasPrefix(name, ".") && name != "." && name != ".."
+							if path != arg && (isMod || isDot || strings.HasPrefix(name, "_")) {
+								return filepath.SkipDir
+							}
+						}
+
+						if !strings.HasSuffix(path, ".cue") {
+							return nil
+						}
+
+						return processFile(path)
+					})
+					exitOnErr(cmd, err, false)
 				}
 			}
 
@@ -139,6 +170,63 @@ func newFmtCmd(c *Command) *cobra.Command {
 
 	cmd.Flags().Bool(string(flagCheck), false, "exits with non-zero status if any files are not formatted")
 	cmd.Flags().BoolP(string(flagDiff), "d", false, "display diffs instead of rewriting files")
+	cmd.Flags().Bool(string(flagFiles), false, "treat arguments as file paths to descend into rather than import paths")
 
 	return cmd
+}
+
+// formatFile formats a single file.
+// It returns true if the file was not well formatted.
+func formatFile(file *build.File, opts []format.Option, cwd string, doDiff, check bool, cmd *Command) (bool, error) {
+	// We buffer the input and output bytes to compare them.
+	// This allows us to determine whether a file is already
+	// formatted, without modifying the file.
+	src, ok := file.Source.([]byte)
+	if !ok {
+		var err error
+		src, err = source.ReadAll(file.Filename, file.Source)
+		if err != nil {
+			return false, err
+		}
+	}
+
+	syntax, err := parser.ParseFile(file.Filename, src, parser.ParseComments)
+	if err != nil {
+		return false, err
+	}
+
+	formatted, err := format.Node(syntax, opts...)
+	if err != nil {
+		return false, err
+	}
+
+	stdout := cmd.OutOrStdout()
+	// Always write to stdout if the file is read from stdin.
+	if file.Filename == "-" && !doDiff && !check {
+		stdout.Write(formatted)
+	}
+
+	// File is already well formatted; we can stop here.
+	if bytes.Equal(formatted, src) {
+		return false, nil
+	}
+
+	path, err := filepath.Rel(cwd, file.Filename)
+	if err != nil {
+		path = file.Filename
+	}
+
+	switch {
+	case doDiff:
+		d := diff.Diff(path+".orig", src, path, formatted)
+		fmt.Fprintln(stdout, string(d))
+	case check:
+		fmt.Fprintln(stdout, path)
+	case file.Filename == "-":
+		// already wrote the formatted source to stdout above
+	default:
+		err := os.WriteFile(file.Filename, formatted, 0644)
+		exitOnErr(cmd, err, false)
+	}
+	return true, nil
 }

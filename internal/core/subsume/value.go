@@ -102,8 +102,14 @@ func (s *subsumer) values(a, b adt.Value) (result bool) {
 		return x == b
 
 	case *adt.BuiltinValidator:
-		if y := s.ctx.Validate(x, b); y != nil {
+		hadError := s.ctx.HasErr()
+		y := s.ctx.Validate(x, b)
+		switch {
+		case y != nil:
 			s.errs = errors.Append(s.errs, y.Err)
+			return false
+		case !hadError && s.ctx.HasErr():
+			s.errs = errors.Append(s.errs, s.ctx.Err().Err)
 			return false
 		}
 		return true

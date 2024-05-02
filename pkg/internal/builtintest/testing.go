@@ -16,25 +16,30 @@ package builtintest
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/export"
-	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/core/validate"
+	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
 )
 
 func Run(name string, t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root: "./testdata",
-		Name: name,
+		Root:   "./testdata",
+		Name:   name,
+		Matrix: cuetdtest.SmallMatrix,
 	}
 
-	r := runtime.New()
+	// Find common patterns that we want to ignore for testing purposes.
+	// TODO(evalv3): remove once new implementation is stable.
+	re := regexp.MustCompile(` \(and \d* more errors\)`)
 
 	test.Run(t, func(t *cuetxtar.Test) {
+		r := t.Runtime()
 		a := t.Instance()
 
 		v, errs := r.Build(nil, a)
@@ -68,6 +73,8 @@ func Run(name string, t *testing.T) {
 			t.Fatal(err)
 		}
 
-		fmt.Fprint(t, string(b))
+		s := re.ReplaceAllString(string(b), "")
+
+		fmt.Fprint(t, s)
 	})
 }

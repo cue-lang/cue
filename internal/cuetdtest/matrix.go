@@ -48,8 +48,12 @@ func (t *M) UpdateRuntime(r *runtime.Runtime) {
 
 // RunMatrix runs f for each configuration in the matrix.
 func RunMatrix(t *testing.T, name string, f func(t *M)) {
+	FullMatrix.Run(t, name, f)
+}
+
+func (m Matrix) Run(t *testing.T, name string, f func(t *M)) {
 	t.Run(name, func(t *testing.T) {
-		do(t, FullMatrix, f)
+		do(t, m, f)
 	})
 }
 
@@ -72,6 +76,8 @@ var FullMatrix Matrix = []M{{
 }}
 
 var SmallMatrix Matrix = FullMatrix[:2]
+
+var DefaultOnlyMatrix Matrix = FullMatrix[:1]
 
 func (m Matrix) Do(t *testing.T, f func(t *M)) {
 	do(t, m, f)

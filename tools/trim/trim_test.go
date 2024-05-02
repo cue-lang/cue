@@ -25,7 +25,16 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
+)
+
+var (
+	// TODO(evalv3): many broken tests in new evaluator, use FullMatrix to
+	// expose. This is probably due to the changed underlying representation.
+	// matrix = cuetdtest.FullMatrix
+	matrix = cuetdtest.DefaultOnlyMatrix
 )
 
 func TestFiles(t *testing.T) {
@@ -250,12 +259,13 @@ foo: entry: {
 `,
 	}}
 	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+		matrix.Run(t, tc.name, func(t *cuetdtest.M) {
 			f, err := parser.ParseFile("test", tc.in)
 			if err != nil {
 				t.Fatal(err)
 			}
 			r := cuecontext.New()
+			t.UpdateRuntime((*runtime.Runtime)(r))
 			v := r.BuildFile(f)
 			if err := v.Err(); err != nil {
 				t.Fatal(err)
@@ -265,7 +275,7 @@ foo: entry: {
 				t.Fatal(err)
 			}
 
-			out := formatNode(t, f)
+			out := formatNode(t.T, f)
 			if got := string(out); got != tc.out {
 				t.Errorf("\ngot:\n%s\nwant:\n%s", got, tc.out)
 			}
@@ -277,14 +287,17 @@ const trace = false
 
 func TestData(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root: "./testdata",
-		Name: "trim",
+		Root:   "./testdata",
+		Name:   "trim",
+		Matrix: matrix,
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
 
 		a := t.Instance()
-		val := cuecontext.New().BuildInstance(a)
+		ctx := cuecontext.New()
+		t.UpdateRuntime((*runtime.Runtime)(ctx))
+		val := ctx.BuildInstance(a)
 		// Note: don't check val.Err because there are deliberate
 		// errors in some tests.
 

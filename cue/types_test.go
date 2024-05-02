@@ -2100,6 +2100,15 @@ func TestSubsume(t *testing.T) {
 		pathB:   ParsePath("#B"),
 		options: []Option{},
 		want:    true,
+	}, {
+		value: `
+			import "time"
+			a: time.Format(time.ANSIC)
+			b: 1
+			`,
+		pathA: a,
+		pathB: b,
+		want:  false,
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {

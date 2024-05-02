@@ -141,6 +141,30 @@
       },
       "revId": "2654ba5221a32178bd1af95e1ff32f506b5dd396",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c1a5fdb_19193033",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-02T10:30:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09901c55_f8e9de67",
+      "range": {
+        "startLine": 119,
+        "startChar": 5,
+        "endLine": 121,
+        "endChar": 13
+      },
+      "revId": "2654ba5221a32178bd1af95e1ff32f506b5dd396",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

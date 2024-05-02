@@ -19,6 +19,8 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/cuetdtest"
 )
 
 func TestDiff(t *testing.T) {
@@ -402,8 +404,9 @@ a: x: "hello"
 		y:    `1 & 4`,
 	}}
 	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+		cuetdtest.FullMatrix.Run(t, tc.name, func(t *cuetdtest.M) {
 			var r cue.Runtime
+			t.UpdateRuntime((*runtime.Runtime)(&r))
 			x, err := r.Compile("x", tc.x)
 			if err != nil {
 				t.Fatal(err)

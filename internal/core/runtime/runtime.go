@@ -64,11 +64,16 @@ func NewWithSettings(v internal.EvaluatorVersion, flags cuedebug.Config) *Runtim
 	return r
 }
 
-// SetSettings sets the version to use for the Runtime. This should only be set
+// SetVersion sets the version to use for the Runtime. This should only be set
 // before first use.
-func (r *Runtime) SetSettings(v internal.EvaluatorVersion, flags cuedebug.Config) {
+func (r *Runtime) SetVersion(v internal.EvaluatorVersion) {
 	r.version = v
-	r.flags = flags
+}
+
+// SetDebugOptions sets the debug flags to use for the Runtime. This should only
+// be set before first use.
+func (r *Runtime) SetDebugOptions(flags *cuedebug.Config) {
+	r.flags = *flags
 }
 
 // IsInitialized reports whether the runtime has been initialized.

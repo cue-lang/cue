@@ -22,6 +22,11 @@ import (
 // Value strings are parsed as Go booleans via [strconv.ParseBool],
 // meaning that they accept "true" and "false" but also the shorter "1" and "0".
 func Init[T any](flags *T, envVar string) error {
+	return Parse(flags, envVar, os.Getenv(envVar))
+}
+
+// Parse the env value to set the fields.
+func Parse[T any](flags *T, envVar, env string) error {
 	// Collect the field indices and set the default values.
 	indexByName := make(map[string]int)
 	fv := reflect.ValueOf(flags).Elem()
@@ -44,8 +49,6 @@ func Init[T any](flags *T, envVar string) error {
 		indexByName[strings.ToLower(field.Name)] = i
 	}
 
-	// Parse the env value to set the fields.
-	env := os.Getenv(envVar)
 	if env == "" {
 		return nil
 	}

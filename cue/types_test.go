@@ -32,14 +32,21 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/tdtest"
 )
 
-func (c *evalConfig) getValue(t *testing.T, body string) Value {
+func newRuntime(t *cuetdtest.M) *Runtime {
+	r := &Runtime{}
+	t.UpdateRuntime(r.runtime())
+	return r
+}
+
+func getValue(t *cuetdtest.M, body string) Value {
 	t.Helper()
 
-	r := c.runtime()
+	r := newRuntime(t)
 
 	inst, err := r.Compile("foo", body)
 	if err != nil {
@@ -136,10 +143,11 @@ func TestAPI(t *testing.T) {
 		if tc.skip {
 			continue
 		}
-		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
-			TODO_V3(t, cfg)
+		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
+			t.TODO_V3() // todox
 
-			r := cfg.runtime()
+			r := newRuntime(t)
+
 			inst, err := r.Compile("in", tc.input)
 			if err != nil {
 				t.Fatal(err)
@@ -343,8 +351,8 @@ func TestValueType(t *testing.T) {
 		closed: false,
 	}}
 	for _, tc := range testCases {
-		runMatrix(t, tc.value, func(t *testing.T, cfg *evalConfig) {
-			inst := cfg.getValue(t, tc.value)
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
+			inst := getValue(t, tc.value)
 			v := inst.Lookup("v")
 			if got := v.Kind(); got != tc.kind {
 				t.Errorf("Kind: got %x; want %x", int(got), int(tc.kind))
@@ -410,14 +418,14 @@ func TestInt(t *testing.T) {
 		notInt: true,
 	}}
 	for _, tc := range testCases {
-		runMatrix(t, tc.value, func(t *testing.T, cfg *evalConfig) {
-			n := cfg.getValue(t, tc.value)
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
+			n := getValue(t, tc.value)
 			base := 10
 			if tc.base > 0 {
 				base = tc.base
 			}
 			b, err := n.AppendInt(nil, base)
-			if checkFailed(t, err, tc.err, "append") {
+			if checkFailed(t.T, err, tc.err, "append") {
 				want := tc.value
 				if got := string(b); got != want {
 					t.Errorf("append: got %v; want %v", got, want)
@@ -425,13 +433,13 @@ func TestInt(t *testing.T) {
 			}
 
 			vi, err := n.Int64()
-			checkErr(t, err, tc.err, "Int64")
+			checkErr(t.T, err, tc.err, "Int64")
 			if vi != tc.int {
 				t.Errorf("Int64: got %v; want %v", vi, tc.int)
 			}
 
 			vu, err := n.Uint64()
-			checkErr(t, err, tc.errU, "Uint64")
+			checkErr(t.T, err, tc.errU, "Uint64")
 			if vu != uint64(tc.uint) {
 				t.Errorf("Uint64: got %v; want %v", vu, tc.uint)
 			}
@@ -549,8 +557,8 @@ func TestFloat(t *testing.T) {
 		err:     ErrAbove.Error(),
 	}}
 	for _, tc := range testCases {
-		runMatrix(t, tc.value, func(t *testing.T, cfg *evalConfig) {
-			n := cfg.getValue(t, tc.value)
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
+			n := getValue(t, tc.value)
 			if n.Kind() != tc.kind {
 				t.Fatal("Not a number")
 			}
@@ -572,7 +580,7 @@ func TestFloat(t *testing.T) {
 			}
 
 			f, err := n.Float64()
-			checkErr(t, err, tc.err, "Float64")
+			checkErr(t.T, err, tc.err, "Float64")
 			if f != tc.float64 {
 				t.Errorf("Float64: got %v; want %v", f, tc.float64)
 			}
@@ -600,21 +608,21 @@ func TestString(t *testing.T) {
 		err:   "non-concrete value string",
 	}}
 	for _, tc := range testCases {
-		runMatrix(t, tc.value, func(t *testing.T, cfg *evalConfig) {
-			str, err := cfg.getValue(t, tc.value).String()
-			checkFatal(t, err, tc.err, "init")
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
+			str, err := getValue(t, tc.value).String()
+			checkFatal(t.T, err, tc.err, "init")
 			if str != tc.str {
 				t.Errorf("String: got %q; want %q", str, tc.str)
 			}
 
-			b, err := cfg.getValue(t, tc.value).Bytes()
-			checkFatal(t, err, tc.err, "init")
+			b, err := getValue(t, tc.value).Bytes()
+			checkFatal(t.T, err, tc.err, "init")
 			if got := string(b); got != tc.str {
 				t.Errorf("Bytes: got %q; want %q", got, tc.str)
 			}
 
-			r, err := cfg.getValue(t, tc.value).Reader()
-			checkFatal(t, err, tc.err, "init")
+			r, err := getValue(t, tc.value).Reader()
+			checkFatal(t.T, err, tc.err, "init")
 			b, _ = io.ReadAll(r)
 			if got := string(b); got != tc.str {
 				t.Errorf("Reader: got %q; want %q", got, tc.str)
@@ -637,9 +645,9 @@ func TestError(t *testing.T) {
 		err:   "",
 	}}
 	for _, tc := range testCases {
-		runMatrix(t, tc.value, func(t *testing.T, cfg *evalConfig) {
-			err := cfg.getValue(t, tc.value).Err()
-			checkErr(t, err, tc.err, "init")
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
+			err := getValue(t, tc.value).Err()
+			checkErr(t.T, err, tc.err, "init")
 		})
 	}
 }
@@ -661,10 +669,10 @@ func TestNull(t *testing.T) {
 		err:   "non-concrete value _",
 	}}
 	for _, tc := range testCases {
-		runMatrix(t, tc.value, func(t *testing.T, cfg *evalConfig) {
-			v := cfg.getValue(t, tc.value).Lookup("v")
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
+			v := getValue(t, tc.value).Lookup("v")
 			err := v.Null()
-			checkErr(t, err, tc.err, "init")
+			checkErr(t.T, err, tc.err, "init")
 			wantBool := err == nil
 			gotBool := v.IsNull()
 			if wantBool != gotBool {
@@ -695,9 +703,9 @@ func TestBool(t *testing.T) {
 		err:   "non-concrete value bool",
 	}}
 	for _, tc := range testCases {
-		runMatrix(t, tc.value, func(t *testing.T, cfg *evalConfig) {
-			got, err := cfg.getValue(t, tc.value).Bool()
-			if checkErr(t, err, tc.err, "init") {
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
+			got, err := getValue(t, tc.value).Bool()
+			if checkErr(t.T, err, tc.err, "init") {
 				if got != tc.bool {
 					t.Errorf("got %v; want %v", got, tc.bool)
 				}
@@ -732,9 +740,9 @@ func TestList(t *testing.T) {
 		err:   "cannot convert incomplete value",
 	}}
 	for _, tc := range testCases {
-		runMatrix(t, tc.value, func(t *testing.T, cfg *evalConfig) {
-			l, err := cfg.getValue(t, tc.value).List()
-			checkFatal(t, err, tc.err, "init")
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
+			l, err := getValue(t, tc.value).List()
+			checkFatal(t.T, err, tc.err, "init")
 
 			buf := []byte{'['}
 			for wantIdx := 0; l.Next(); wantIdx++ {
@@ -743,7 +751,7 @@ func TestList(t *testing.T) {
 					t.Errorf("Index got %v; want %v", got, wantIdx)
 				}
 				b, err := l.Value().MarshalJSON()
-				checkFatal(t, err, tc.err, "list.Value")
+				checkFatal(t.T, err, tc.err, "list.Value")
 				buf = append(buf, b...)
 				buf = append(buf, ',')
 			}
@@ -834,18 +842,18 @@ func TestFields(t *testing.T) {
 		err:   "cannot use value 1 (type int) as struct",
 	}}
 	for _, tc := range testCases {
-		runMatrix(t, tc.value, func(t *testing.T, cfg *evalConfig) {
-			obj := cfg.getValue(t, tc.value)
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
+			obj := getValue(t, tc.value)
 
 			iter, err := obj.Fields(tc.opts...)
-			checkFatal(t, err, tc.err, "init")
+			checkFatal(t.T, err, tc.err, "init")
 
 			buf := []byte{'{'}
 			for iter.Next() {
 				buf = append(buf, iter.Selector().String()...)
 				buf = append(buf, ':')
 				b, err := iter.Value().MarshalJSON()
-				checkFatal(t, err, tc.err, "Obj.At")
+				checkFatal(t.T, err, tc.err, "Obj.At")
 				buf = append(buf, b...)
 				buf = append(buf, ',')
 			}
@@ -857,17 +865,17 @@ func TestFields(t *testing.T) {
 			iter, _ = obj.Fields(tc.opts...)
 			for iter.Next() {
 				want, err := iter.Value().MarshalJSON()
-				checkFatal(t, err, tc.err, "Obj.At2")
+				checkFatal(t.T, err, tc.err, "Obj.At2")
 
 				got, err := obj.LookupPath(MakePath(iter.Selector())).MarshalJSON()
-				checkFatal(t, err, tc.err, "Obj.At2")
+				checkFatal(t.T, err, tc.err, "Obj.At2")
 
 				if !bytes.Equal(got, want) {
 					t.Errorf("Lookup: got %q; want %q", got, want)
 				}
 			}
 			v := obj.LookupPath(MakePath(Str("non-existing")))
-			checkErr(t, v.Err(), "not found", "non-existing")
+			checkErr(t.T, v.Err(), "not found", "non-existing")
 		})
 	}
 }
@@ -895,19 +903,19 @@ func TestAllFields(t *testing.T) {
 		res:   `{a!:1,b?:2,c:3,}`,
 	}}
 	for _, tc := range testCases {
-		runMatrix(t, tc.value, func(t *testing.T, cfg *evalConfig) {
-			obj := cfg.getValue(t, tc.value)
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
+			obj := getValue(t, tc.value)
 
 			var iter *Iterator // Verify that the returned iterator is a pointer.
 			iter, err := obj.Fields(All())
-			checkFatal(t, err, tc.err, "init")
+			checkFatal(t.T, err, tc.err, "init")
 
 			buf := []byte{'{'}
 			for iter.Next() {
 				buf = append(buf, iter.Selector().String()...)
 				buf = append(buf, ':')
 				b, err := iter.Value().MarshalJSON()
-				checkFatal(t, err, tc.err, "Obj.At")
+				checkFatal(t.T, err, tc.err, "Obj.At")
 				buf = append(buf, b...)
 				buf = append(buf, ',')
 			}
@@ -939,8 +947,8 @@ func TestFieldType(t *testing.T) {
 		StringLabel`,
 	}}
 	for _, tc := range testCases {
-		runMatrix(t, tc.value, func(t *testing.T, cfg *evalConfig) {
-			obj := cfg.getValue(t, tc.value)
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
+			obj := getValue(t, tc.value)
 
 			iter, err := obj.Fields(All())
 			if err != nil {
@@ -959,8 +967,8 @@ func TestFieldType(t *testing.T) {
 }
 
 func TestLookup(t *testing.T) {
-	doMatrix(t, func(t *testing.T, cfg *evalConfig) {
-		runtime := cfg.runtime()
+	cuetdtest.FullMatrix.Do(t, func(t *cuetdtest.M) {
+		runtime := newRuntime(t)
 		inst, err := runtime.Compile("x.cue", `
 #V: {
 	x: int
@@ -1184,8 +1192,8 @@ providers: {
 }
 
 func TestFillPath(t *testing.T) {
-	doMatrix(t, func(t *testing.T, cfg *evalConfig) {
-		r := cfg.runtime()
+	cuetdtest.FullMatrix.Do(t, func(t *cuetdtest.M) {
+		r := newRuntime(t)
 
 		inst, err := r.CompileExpr(ast.NewStruct("bar", ast.NewString("baz")))
 		if err != nil {
@@ -1419,9 +1427,8 @@ func TestFillPathError(t *testing.T) {
 	}}
 
 	for _, tc := range testCases {
-		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
-			r := cfg.runtime()
-			v := compileT(t, r, tc.in).Value()
+		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
+			v := compileT(t.T, newRuntime(t), tc.in).Value()
 			v = v.FillPath(tc.path, tc.x)
 
 			err := v.Err()
@@ -1673,11 +1680,11 @@ func TestAllows(t *testing.T) {
 	path := ParsePath("x")
 
 	for _, tc := range testCases {
-		runMatrix(t, tc.desc, func(t *testing.T, cfg *evalConfig) {
+		cuetdtest.FullMatrix.Run(t, tc.desc, func(t *cuetdtest.M) {
 			if tc.todo_nosharing {
-				TODO_NoSharing(t, cfg)
+				t.TODO_NoSharing()
 			}
-			v := compileT(t, cfg.runtime(), tc.in).Value()
+			v := compileT(t.T, newRuntime(t), tc.in).Value()
 			v = v.LookupPath(path)
 
 			got := v.Allows(tc.sel)
@@ -1745,9 +1752,9 @@ func TestValue_LookupDef(t *testing.T) {
 	}}
 
 	for _, tc := range testCases {
-		runMatrix(t, tc.def, func(t *testing.T, cfg *evalConfig) {
-			r := cfg.runtime()
-			v := compileT(t, r, tc.in).Value()
+		cuetdtest.FullMatrix.Run(t, tc.def, func(t *cuetdtest.M) {
+			r := newRuntime(t)
+			v := compileT(t.T, r, tc.in).Value()
 			v = v.LookupDef(tc.def)
 			got := fmt.Sprint(v)
 
@@ -1792,8 +1799,8 @@ func TestDefaults(t *testing.T) {
 		ok:    false,
 	}}
 	for _, tc := range testCases {
-		runMatrix(t, tc.value, func(t *testing.T, cfg *evalConfig) {
-			v := cfg.getValue(t, "a: "+tc.value).Lookup("a")
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
+			v := getValue(t, "a: "+tc.value).Lookup("a")
 
 			v = v.Eval()
 			d, ok := v.Default()
@@ -1845,8 +1852,8 @@ func TestLen(t *testing.T) {
 		length: "_|_ // len not supported for type int",
 	}}
 	for _, tc := range testCases {
-		runMatrix(t, tc.input, func(t *testing.T, cfg *evalConfig) {
-			v := cfg.getValue(t, "a: "+tc.input).Lookup("a")
+		cuetdtest.FullMatrix.Run(t, tc.input, func(t *cuetdtest.M) {
+			v := getValue(t, "a: "+tc.input).Lookup("a")
 
 			length := v.Len()
 			if got := fmt.Sprint(length); got != tc.length {
@@ -1898,12 +1905,12 @@ func TestTemplate(t *testing.T) {
 		skip: true, // TODO: reordering
 	}}
 	for _, tc := range testCases {
-		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
+		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
 			if tc.skip {
-				TODO_V3(t, cfg)
+				t.TODO_V3()
 			}
 
-			v := cfg.getValue(t, tc.value)
+			v := getValue(t, tc.value)
 			for _, p := range tc.path {
 				if p == "" {
 					v = v.Template()("label")
@@ -1962,12 +1969,12 @@ func TestElem(t *testing.T) {
 		skip: true, // TODO(p3): Skip because this is just a reordering.
 	}}
 	for _, tc := range testCases {
-		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
+		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
 			if tc.skip {
-				TODO_V3(t, cfg)
+				t.TODO_V3()
 			}
 
-			v := cfg.getValue(t, tc.value)
+			v := getValue(t, tc.value)
 			v.v.Finalize(v.ctx()) // TODO: do in instance.
 			for _, p := range tc.path {
 				if p == "" {
@@ -2095,8 +2102,8 @@ func TestSubsume(t *testing.T) {
 		want:    true,
 	}}
 	for _, tc := range testCases {
-		runMatrix(t, tc.value, func(t *testing.T, cfg *evalConfig) {
-			v := cfg.getValue(t, tc.value)
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
+			v := getValue(t, tc.value)
 			a := v.Value().LookupPath(tc.pathA)
 			b := v.Value().LookupPath(tc.pathB)
 			got := a.Subsume(b, tc.options...) == nil
@@ -2158,8 +2165,8 @@ func TestSubsumes(t *testing.T) {
 		want:  true,
 	}}
 	for _, tc := range testCases {
-		runMatrix(t, tc.value, func(t *testing.T, cfg *evalConfig) {
-			v := cfg.getValue(t, tc.value)
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
+			v := getValue(t, tc.value)
 			a := v.Lookup(tc.pathA...)
 			b := v.Lookup(tc.pathB...)
 			got := a.Subsumes(b)
@@ -2229,9 +2236,9 @@ func TestUnify(t *testing.T) {
 		want:  `{}`,
 	}}
 	// TODO(tdtest): use cuetest.Run when supported.
-	doMatrix(t, func(t *testing.T, cfg *evalConfig) {
+	cuetdtest.FullMatrix.Do(t, func(m *cuetdtest.M) {
 		tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
-			v := cfg.getValue(t.T, tc.value)
+			v := getValue(m, tc.value)
 			x := v.LookupPath(ParsePath(tc.pathA))
 			y := v.LookupPath(ParsePath(tc.pathB))
 			b, err := x.Unify(y).MarshalJSON()
@@ -2283,9 +2290,9 @@ func TestUnifyAccept(t *testing.T) {
 		want: `{"b":1}`,
 	}}
 	// TODO(tdtest): use cuetest.Run when supported.
-	doMatrix(t, func(t *testing.T, cfg *evalConfig) {
+	cuetdtest.FullMatrix.Do(t, func(m *cuetdtest.M) {
 		tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
-			v := cfg.getValue(t.T, tc.value)
+			v := getValue(m, tc.value)
 			x := v.LookupPath(ParsePath("#v"))
 			y := v.LookupPath(ParsePath("#w"))
 			a := v.LookupPath(ParsePath("#accept"))
@@ -2350,8 +2357,8 @@ func TestEquals(t *testing.T) {
 		true,
 	}}
 	for _, tc := range testCases {
-		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
-			r := cfg.runtime()
+		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
+			r := newRuntime(t)
 
 			a, err := r.Compile("a", tc.a)
 			if err != nil {
@@ -2511,12 +2518,12 @@ func TestValidate(t *testing.T) {
 		`,
 	}}
 	for _, tc := range testCases {
-		runMatrix(t, tc.desc, func(t *testing.T, cfg *evalConfig) {
+		cuetdtest.FullMatrix.Run(t, tc.desc, func(t *cuetdtest.M) {
 			if tc.skip {
-				TODO_V3(t, cfg)
+				t.TODO_V3()
 			}
 
-			r := cfg.runtime()
+			r := newRuntime(t)
 
 			inst, err := r.Parse("validate", tc.in)
 			if err == nil {
@@ -2551,8 +2558,8 @@ func TestPath(t *testing.T) {
 		mkpath("b", `"4b"`),
 	}
 	for _, tc := range testCases {
-		runMatrix(t, strings.Join(tc, "."), func(t *testing.T, cfg *evalConfig) {
-			r := cfg.runtime()
+		cuetdtest.FullMatrix.Run(t, strings.Join(tc, "."), func(t *cuetdtest.M) {
+			r := newRuntime(t)
 			inst, err := r.Parse("config", config)
 			if err != nil {
 				t.Fatal(err)
@@ -2644,8 +2651,8 @@ func TestValueLookup(t *testing.T) {
 		str:    "cannot use value 0 (type int) as struct",
 	}}
 	for _, tc := range testCases {
-		runMatrix(t, tc.str, func(t *testing.T, cfg *evalConfig) {
-			v := cfg.getValue(t, tc.config).Lookup(tc.path...)
+		cuetdtest.FullMatrix.Run(t, tc.str, func(t *cuetdtest.M) {
+			v := getValue(t, tc.config).Lookup(tc.path...)
 			if got := !v.Exists(); got != tc.notExists {
 				t.Errorf("exists: got %v; want %v", got, tc.notExists)
 			}
@@ -2723,8 +2730,8 @@ func TestValueDoc(t *testing.T) {
 	Foo: {}
 	`
 
-	doMatrix(t, func(t *testing.T, cfg *evalConfig) {
-		r := cfg.runtime()
+	cuetdtest.FullMatrix.Do(t, func(t *cuetdtest.M) {
+		r := newRuntime(t)
 		getInst := func(name, body string) *Instance {
 			inst, err := r.Compile("dir/file1.cue", body)
 			if err != nil {
@@ -2799,10 +2806,10 @@ Another Foo.
 `,
 		}}
 		for _, tc := range testCases {
+			if tc.skip {
+				t.TODO_V3()
+			}
 			t.Run("field:"+tc.path, func(t *testing.T) {
-				if tc.skip {
-					TODO_V3(t, cfg)
-				}
 				v := tc.val.Lookup(strings.Split(tc.path, " ")...)
 				doc := docStr(v.Doc())
 				if doc != tc.doc {
@@ -2998,12 +3005,12 @@ func TestMarshalJSON(t *testing.T) {
 		err: "cue: marshal error: V2: cannot convert incomplete value \"|((string){ \\\"x\\\" }, (string){ \\\"y\\\" })\" to JSON",
 	}}
 	for i, tc := range testCases {
-		runMatrix(t, fmt.Sprintf("%d/%v", i, tc.value), func(t *testing.T, cfg *evalConfig) {
-			TODO_V3(t, cfg)
+		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%d/%v", i, tc.value), func(t *cuetdtest.M) {
+			t.TODO_V3() // todox
 
-			inst := cfg.getValue(t, tc.value)
+			inst := getValue(t, tc.value)
 			b, err := inst.Value().MarshalJSON()
-			checkFatal(t, err, tc.err, "init")
+			checkFatal(t.T, err, tc.err, "init")
 
 			if got := string(b); got != tc.json {
 				t.Errorf("\n got %v;\nwant %v", got, tc.json)
@@ -3076,10 +3083,10 @@ func TestWalk(t *testing.T) {
 		out:   `{a:2,b:3,c:["A","B"]}`,
 	}}
 	for i, tc := range testCases {
-		runMatrix(t, fmt.Sprintf("%d/%v", i, tc.value), func(t *testing.T, cfg *evalConfig) {
-			TODO_V3(t, cfg)
+		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%d/%v", i, tc.value), func(t *cuetdtest.M) {
+			t.TODO_V3() // todox
 
-			inst := cfg.getValue(t, tc.value)
+			inst := getValue(t, tc.value)
 			buf := []byte{}
 			stripComma := func() {
 				if n := len(buf) - 1; buf[n] == ',' {
@@ -3204,8 +3211,8 @@ func TestReferencePath(t *testing.T) {
 		alt:            "3.14159265358979323846264338327950288419716939937510582097494459",
 	}}
 	for _, tc := range testCases {
-		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
-			r := cfg.runtime()
+		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
+			r := newRuntime(t)
 
 			inst, _ := r.Compile("in", tc.input) // getInstance(t, tc.input)
 			v := inst.Lookup("v", "w", "x")
@@ -3295,14 +3302,14 @@ a: x: y: z: "x"`,
 		pos: "3:4",
 	}}
 	for _, tc := range testCases {
-		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
+		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
 			if tc.skip {
-				TODO_V3(t, cfg)
+				t.TODO_V3()
 			}
 
 			var c Context
 			(*runtime.Runtime)(&c).Init()
-			cfg.updateRuntime(c.runtime())
+			t.UpdateRuntime(c.runtime())
 
 			v := c.CompileString(tc.value)
 			v = v.LookupPath(ParsePath("a"))
@@ -3558,8 +3565,8 @@ func TestPathCorrection(t *testing.T) {
 		if tc.skip {
 			continue
 		}
-		runMatrix(t, "", func(t *testing.T, cfg *evalConfig) {
-			r := cfg.runtime()
+		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
+			r := newRuntime(t)
 
 			inst, err := r.Compile("in", tc.input)
 			if err != nil {
@@ -3835,8 +3842,8 @@ func TestExpr(t *testing.T) {
 		want:  `.(〈〉 "a")`,
 	}}
 	for _, tc := range testCases {
-		runMatrix(t, tc.input, func(t *testing.T, cfg *evalConfig) {
-			v := cfg.getValue(t, tc.input).Lookup("v")
+		cuetdtest.FullMatrix.Run(t, tc.input, func(t *cuetdtest.M) {
+			v := getValue(t, tc.input).Lookup("v")
 			got := exprStr(v)
 			if got != tc.want {
 				t.Errorf("\n got %v;\nwant %v", got, tc.want)

@@ -18,10 +18,12 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/cuedebug"
 )
 
 // For debugging purposes, do not remove.
@@ -29,6 +31,9 @@ func TestX(t *testing.T) {
 	t.Skip()
 
 	r := runtime.New()
+	// Uncomment to use default evaluator.
+	r.SetVersion(internal.DevVersion)
+	r.SetDebugOptions(&cuedebug.Config{Sharing: true})
 	ctx := eval.NewContext(r, nil)
 
 	const gt = `a: *1 | int`

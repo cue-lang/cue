@@ -16,6 +16,24 @@
       "message": "Spoke to Marcel briefly about this patch: we agree there is a bug and that the fix is in the right area. As a fix it\u0027s fine - there is no issue in merging it, particularly if it fixes this case and doesn\u0027t break any other tests.\n\nHis only suggestion is that Builtin.Call giving back the bottom error as both OpContext.errs and as a return value is not ideal in terms of code consistency going forward - he did OpContext.errs on purpose so that a lot of the code in these packages can do a sequence of operations without tons of `err !\u003d nil` checks, and at the end simply check the `errs` list.\n\nHe suspects that somewhere along the call stack to Builtin.call, we are missing a check on OpContext.errs. For example, multiple other bits of this package use PopState to check whether errs contains a bottom error, so perhaps we\u0027re missing a PushState+PopState pair of calls for builtin calls.\n\nI share this to see if you\u0027re interested in digging a bit, and going that route, which would save us having to modify how functions like addErr work. If you don\u0027t find how to hold this alternative method right, or don\u0027t find the time, no problem - we can merge this patch as is with a TODO for Marcel to come back later and refactor the bottom error handling a bit.",
       "revId": "70119b944f7c868478e1251a0d8641b1464a97f1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a1f509f_6421f151",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-03T16:45:12Z",
+      "side": 1,
+      "message": "I tried to pull the error handling logic higher. I\u0027m not 100% sure about this solution because it causes a sort of \"implicitness\" to the `Validate` API - the caller needs to know to handle the error stack, and check if any were added during the Validate call.\n\nOn the other hand, it looks like it\u0027s problematic to move this error handling further down, because there\u0027s a [todo](https://github.com/cue-lang/cue/blob/af36efd160f7b0cf15a7724330165a01b3232738/internal/core/adt/context.go#L525) to make Validate only return a boolean:\n\n```go\n// Validate calls validates value for the given validator.\n//\n// TODO(errors): return boolean instead: only the caller has enough information\n// to generate a proper error message.\nfunc (c *OpContext) Validate(check Validator, value Value) *Bottom {\n\t// TODO: use a position stack to push both values.\n\tsaved :\u003d c.src\n\tc.src \u003d check.Source()\n\n\terr :\u003d check.validate(c, value)\n\n\tc.src \u003d saved\n\n\treturn err\n}\n```\n\nso it looks like this is the \"lowest\" level in which the error handling can be added.",
+      "parentUuid": "955d6064_f75e26f5",
+      "revId": "70119b944f7c868478e1251a0d8641b1464a97f1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

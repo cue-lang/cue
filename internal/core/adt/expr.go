@@ -1478,7 +1478,7 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 		b = f
 
 	case *BuiltinValidator:
-		// We allow a validator that takes no arguments accept the validated
+		// We allow a validator that takes no arguments except the validated
 		// value to be called with zero arguments.
 		switch {
 		case f.Src != nil:

@@ -31,7 +31,7 @@ import (
 //
 // Keeping track of which fields are allowed means keeping provenance data on
 // whether certain conjuncts originate from embeddings or definitions, as well
-// as how they group together with other conjuncts. These data structure should
+// as how they group together with other conjuncts. These data structures should
 // allow for a "mark and unwind" approach to allow for backtracking when
 // computing disjunctions.
 //
@@ -56,7 +56,7 @@ import (
 // Conjuncts
 //
 // To keep track of conjunct provenance, each conjunct has a few flags that
-// indicates whether it orignates from
+// indicates whether it originates from
 //   - an embedding
 //   - a definition
 //   - a reference (optional and unimplemented)

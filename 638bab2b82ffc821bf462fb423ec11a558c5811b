@@ -1,0 +1,129 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "007c4c2c_0ce4c69c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-03T10:40:24Z",
+      "side": 1,
+      "message": "SGTM, just some thoughts about the names and API.",
+      "revId": "638bab2b82ffc821bf462fb423ec11a558c5811b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0853e45_f225a03a",
+        "filename": "cue/cuecontext/cuecontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-03T10:40:24Z",
+      "side": 1,
+      "message": "perhaps document that this is the default. Or perhaps even rename it Default?",
+      "revId": "638bab2b82ffc821bf462fb423ec11a558c5811b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d1d89cd_676e788c",
+        "filename": "cue/cuecontext/cuecontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-03T10:40:24Z",
+      "side": 1,
+      "message": "how about briefly summarizing these versions in terms of time and features? over time we will forget what V2 meant, so having some frame of reference will help.\n\nfor example, making up some of the details as I don\u0027t know them by heart:\n\n\u003e V2 is the latest stable version of the evaluator.\n\u003e It was introduced in 2022(?) and is being maintained until 2024.\n\u003e\n\u003e V3 is the current experimental version of the evaluator.\n\u003e It was introduced in 2024 and brought a new disjunction algorithm\n\u003e as well as many performance improvements like structure sharing.",
+      "revId": "638bab2b82ffc821bf462fb423ec11a558c5811b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d99eda40_21f85d86",
+        "filename": "cue/cuecontext/cuecontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-03T10:40:24Z",
+      "side": 1,
+      "message": "did you consider prefixing these with Evaluator, e.g. EvaluatorV2, EvaluatorV3? This would be more consistent with e.g. CUE_EXPERIMENT\u003devalv3, and `cuecontext.EvaluatorV3` is more explicit and intuitive than `cuecontext.V3`.\n\nor if you prefer shorter prefixes, just Eval, like EvalV3.",
+      "revId": "638bab2b82ffc821bf462fb423ec11a558c5811b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0054ba13_9bc14409",
+        "filename": "cue/cuecontext/cuecontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-03T10:40:24Z",
+      "side": 1,
+      "message": "thinking about naming for a second - I like that CUE_DEBUG is called exactly like the env var, but `cuecontext.CUE_DEBUG` is an odd name. it repeats \"cue\", and PASCAL_CASE in Go APIs is extremely rare.\n\nhow about `cuecontext.DebugFlags`, and leave the mention of CUE_DEBUG as part of the godoc?\n\nI use the name \"flags\" above rather than \"options\" on purpose - the way CUE_DEBUG is parsed is very close to how Go flags work, and we call the strings \"debug flags\" elsewhere too, e.g. the package envflag.",
+      "revId": "638bab2b82ffc821bf462fb423ec11a558c5811b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "836ed91c_9b4e8400",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-03T10:40:24Z",
+      "side": 1,
+      "message": "I think the godoc from Init should be moved to Parse, replacing \"environment variable\" with \"string\", and then Init can just be:\n\n\u003e Init uses Parse with the contents of the given environment variable as input.",
+      "revId": "638bab2b82ffc821bf462fb423ec11a558c5811b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a15764e4_6a4a4eef",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-03T10:40:24Z",
+      "side": 1,
+      "message": "it doesn\u0027t make sense for Parse to take envVar anymore; it\u0027s still used in an error message, but you could instead have Init wrap the error with envVar, like:\n\n    cannot parse CUE_DEBUG: unknown flag foobar\n\nrather than the current\n\n    unknown CUE_DEBUG foobar\n    \nthe cuecontext API can then also add its own wrapping, like:\n\n    cuecontext.DebugFlags: unknown flag foobar",
+      "range": {
+        "startLine": 29,
+        "startChar": 28,
+        "endLine": 29,
+        "endChar": 34
+      },
+      "revId": "638bab2b82ffc821bf462fb423ec11a558c5811b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

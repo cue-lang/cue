@@ -44,7 +44,7 @@ func TestValues(t *testing.T) {
 		in       string
 		mode     int
 
-		todo_v3 bool
+		skip_v2 bool // Bug only exists in v2. Won't fix.
 	}
 	testCases := []subsumeTest{
 		// Top subsumes everything
@@ -295,9 +295,41 @@ func TestValues(t *testing.T) {
 		// defining one at all.
 		420: {subsumes: true, in: `a: {foo?: _}, b: {}`},
 
-		430: {subsumes: false, in: `a: {[_]: 4}, b: {[_]: int}`, todo_v3: true},
-		// TODO: handle optionals.
-		431: {subsumes: false, in: `a: {[_]: int}, b: {[_]: 2}`, todo_v3: true},
+		430: {subsumes: false, in: `a: {[_]: 4}, b: {[_]: int}`},
+		431: {subsumes: true, in: `a: {[_]: int}, b: {[_]: 2}`, skip_v2: true},
+		432: {
+			subsumes: true,
+			in:       `a: {[string]: int, [<"m"]: 3}, b: {[string]: 2, [<"m"]: 3}`,
+			skip_v2:  true,
+		},
+		433: {
+			subsumes: true,
+			in:       `a: {[<"m"]: 3, [string]: int}, b: {[string]: 2, [<"m"]: 3}`,
+			skip_v2:  true,
+		},
+		434: {
+			subsumes: false,
+			in:       `a: {[<"n"]: 3, [string]: int}, b: {[string]: 2, [<"m"]: 3}`,
+		},
+		435: {
+			subsumes: true,
+			// both sides unify to a single string pattern.
+			in:      `a: {[string]: <5, [string]: int}, b: {[string]: <=3, [string]: 3}`,
+			skip_v2: true,
+		},
+		436: {
+			subsumes: true,
+			// matches because bottom is subsumed by >5
+			in:      `a: {[string]: >5}, b: {[string]: 1, [string]: 2}`,
+			skip_v2: true,
+		},
+		437: {
+			subsumes: false,
+			// subsumption gives up if a has more pattern constraints than b.
+			// TODO: support this?
+			in: `a: {[_]: >5, [>"b"]: int}, b: {[_]: 6}`,
+		},
+		438: {subsumes: true, in: `a: {}, b: {[_]: 6}`},
 
 		// TODO: the subNoOptional mode used to be used by the equality check.
 		// Now this has its own implementation it is no longer necessary. Keep
@@ -428,8 +460,8 @@ func TestValues(t *testing.T) {
 		key := strings.Trim(m[1], cutset) + " ⊑ " + strings.Trim(m[2], cutset)
 
 		cuetdtest.FullMatrix.Run(t, strconv.Itoa(i)+"/"+key, func(t *cuetdtest.M) {
-			if tc.todo_v3 {
-				t.TODO_V3()
+			if tc.skip_v2 && t.IsDefault() {
+				t.Skipf("skipping v2 test")
 			}
 			r := t.Runtime()
 

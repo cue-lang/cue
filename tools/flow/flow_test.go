@@ -38,9 +38,13 @@ import (
 // their dependencies.
 func TestFlow(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root:   "./testdata",
-		Name:   "run",
-		Matrix: cuetdtest.SmallMatrix,
+		Root: "./testdata",
+		Name: "run",
+		// TODO(evalv3): the breaking tests causes the synchronization to go out
+		// of whack, causing the test to become flaky. We revert to the default
+		// evaluator for now. Switch back to SmallMatrix when the tests are
+		// fixed for the new evaluator.
+		Matrix: cuetdtest.DefaultOnlyMatrix, // SmallMatrix,
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {

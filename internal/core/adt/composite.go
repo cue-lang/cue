@@ -1298,7 +1298,7 @@ func appendPath(a []Feature, v *Vertex) []Feature {
 	return a
 }
 
-// An Conjunct is an Environment-Expr pair. The Environment is the starting
+// A Conjunct is an Environment-Expr pair. The Environment is the starting
 // point for reference lookup for any reference contained in X.
 type Conjunct struct {
 	Env *Environment

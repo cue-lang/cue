@@ -52,17 +52,17 @@
 //	  e: f
 //	}
 //	f: 4
-//	g: a.b { // d.c points to inside the referred value, e.f, not.
+//	g: a.b { // d.c points to inside the referred value; e.f, not.
 //	  c: 3
 //	}
 //
 // The implementation doesn't actually copy referred values, but rather resolves
 // references with the aid of an Environment. During compile time, each
-// references is associated with the label and a number indicating in which
+// reference is associated with the label and a number indicating in which
 // parent scope (offset from the current) this label needs to be looked up. An
 // Environment keeps track of the point at which a value was referenced,
 // providing enough information to look up the labeled value. This Environment
-// is the identical for all references within a fields conjunct. Often, an
+// is identical for all references within a fields conjunct. Often, an
 // Environment can even be shared among conjuncts.
 //
 // # Values

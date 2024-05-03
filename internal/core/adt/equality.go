@@ -176,6 +176,10 @@ func equalTerminal(ctx *OpContext, v, w Value, flags Flag) bool {
 		_, ok := w.(*Bottom)
 		return ok
 
+	case *Top:
+		_, ok := w.(*Top)
+		return ok
+
 	case *Num, *String, *Bool, *Bytes, *Null:
 		if b, ok := BinOp(ctx, EqualOp, v, w).(*Bool); ok {
 			return b.B

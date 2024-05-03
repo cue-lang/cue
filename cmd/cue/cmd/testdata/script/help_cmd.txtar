@@ -5,6 +5,14 @@ cmp stderr cue-cmd.stderr
 exec cue help cmd
 cmp stdout cue-help-cmd.stdout
 
+exec cue help cmd hello
+cmp stdout cue-help-cmd-hello.stdout
+
+! exec cue help cmd missing
+stderr -count=1 'Unknown cmd command: missing'
+stderr -count=1 '^Available Commands:$'
+stderr -count=1 'hello *say hello to someone'
+
 -- cue.mod/module.cue --
 -- task_tool.cue --
 package home
@@ -12,6 +20,10 @@ package home
 import "tool/cli"
 
 // say hello to someone
+//
+//   Usage: hello
+//
+// Hello can be used to say hello to the world.
 command: hello: {
     task: say: {
         cli.Print
@@ -157,3 +169,16 @@ Global Flags:
   -v, --verbose      print information about progress
 
 Use "cue cmd [command] --help" for more information about a command.
+-- cue-help-cmd-hello.stdout --
+Hello can be used to say hello to the world.
+
+Usage:
+  cue cmd hello [flags]
+
+Global Flags:
+  -E, --all-errors   print all available errors
+  -i, --ignore       proceed in the presence of errors
+  -s, --simplify     simplify output
+      --strict       report errors for lossy mappings
+      --trace        trace computation
+  -v, --verbose      print information about progress

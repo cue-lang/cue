@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"bufio"
+	"fmt"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -40,8 +41,14 @@ func newHelpCmd(c *Command) *cobra.Command {
 		Long: `Help provides help for any command in the application.
 Simply type ` + c.Name() + ` help [path to command] for full details.`,
 		Run: func(_ *cobra.Command, args []string) {
-			cmd, _, e := c.Root().Find(args)
-			if len(args) > 0 && args[0] == "cmd" {
+			findCmd := func() (*cobra.Command, bool) {
+				cmd, rest, err := c.Root().Find(args)
+				found := cmd != nil && err == nil && len(rest) == 0
+				return cmd, found
+			}
+			cmd, found := findCmd()
+			isCmd := len(args) > 0 && args[0] == "cmd"
+			if isCmd {
 				// args is one of:
 				//
 				//	["cmd"]
@@ -58,12 +65,21 @@ Simply type ` + c.Name() + ` help [path to command] for full details.`,
 				if err == nil {
 					addCustomCommands(c, cmd, commandSection, tools)
 					// For the sake of `cue help cmd mycmd`, find the command again.
-					cmd, _, e = c.Root().Find(args)
+					cmd, found = findCmd()
 				}
 			}
-			if cmd == nil || e != nil {
-				c.Printf("Unknown help topic %#q\n", args)
-				cobra.CheckErr(c.Root().Usage())
+			if !found {
+				if isCmd {
+					// Note that for args ["cmd", "mycmd", "./mypkg"] we only want "mycmd".
+					fmt.Fprintf(c.Stderr(), "Unknown cmd command: %s\n", args[1])
+				} else {
+					fmt.Fprintf(c.Stderr(), "Unknown help topic: %s\n", strings.Join(args, " "))
+				}
+				if cmd == nil {
+					cobra.CheckErr(c.Root().Usage())
+				} else {
+					cobra.CheckErr(cmd.Usage())
+				}
 			} else {
 				cobra.CheckErr(cmd.Help())
 			}

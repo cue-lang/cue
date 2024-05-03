@@ -1,4 +1,4 @@
-# Verify that the various forms of requesting help work
+# Verify that the various forms of requesting the top-level help.
 
 exec cue
 cmp stdout stdout.golden
@@ -11,6 +11,42 @@ cmp stdout stdout.golden
 
 exec cue -h
 cmp stdout stdout.golden
+
+# Requesting help for commands and sub-commands.
+
+exec cue help mod
+stdout -count=1 'groups commands which operate on CUE modules'
+stdout -count=1 'publish *publish the current module to a registry$'
+
+exec cue mod --help
+stdout -count=1 'groups commands which operate on CUE modules'
+stdout -count=1 'publish *publish the current module to a registry$'
+
+exec cue help mod publish
+stdout -count=1 '^Publish the current module to an OCI registry\.'
+
+exec cue mod publish --help
+stdout -count=1 '^Publish the current module to an OCI registry\.'
+
+# Requesting additional help topics, with or without "help" in between.
+
+exec cue help filetypes
+stdout -count=1 '^The cue tools supports the following file types:$'
+
+exec cue filetypes
+stdout -count=1 '^The cue tools supports the following file types:$'
+
+# Requesting help for missing commands and sub-commands fails and prints the help text.
+
+! exec cue help missing
+! stdout .
+stderr -count=1 'Unknown help topic: missing'
+stderr -count=1 '^Available Commands:$'
+
+! exec cue help mod missing
+! stdout .
+stderr -count=1 'Unknown help topic: mod missing'
+stderr -count=1 '^Available Commands:$'
 
 -- stdout.golden --
 cue evaluates CUE files, an extension of JSON, and sends them

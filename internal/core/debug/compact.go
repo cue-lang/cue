@@ -163,10 +163,10 @@ func (w *compactPrinter) node(n adt.Node) {
 		w.string("null")
 
 	case *adt.Bool:
-		fmt.Fprint(w, x.B)
+		fmt.Fprint(w.w, x.B)
 
 	case *adt.Num:
-		fmt.Fprint(w, &x.X)
+		fmt.Fprint(w.w, &x.X)
 
 	case *adt.String:
 		w.string(literal.String.Quote(x.Str))
@@ -178,14 +178,14 @@ func (w *compactPrinter) node(n adt.Node) {
 		w.string("_")
 
 	case *adt.BasicType:
-		fmt.Fprint(w, x.K)
+		fmt.Fprint(w.w, x.K)
 
 	case *adt.BoundExpr:
-		fmt.Fprint(w, x.Op)
+		fmt.Fprint(w.w, x.Op)
 		w.node(x.Expr)
 
 	case *adt.BoundValue:
-		fmt.Fprint(w, x.Op)
+		fmt.Fprint(w.w, x.Op)
 		w.node(x.Value)
 
 	case *adt.NodeLink:
@@ -251,13 +251,13 @@ func (w *compactPrinter) node(n adt.Node) {
 		w.interpolation(x)
 
 	case *adt.UnaryExpr:
-		fmt.Fprint(w, x.Op)
+		fmt.Fprint(w.w, x.Op)
 		w.node(x.X)
 
 	case *adt.BinaryExpr:
 		w.string("(")
 		w.node(x.X)
-		fmt.Fprint(w, " ", x.Op, " ")
+		fmt.Fprint(w.w, " ", x.Op, " ")
 		w.node(x.Y)
 		w.string(")")
 

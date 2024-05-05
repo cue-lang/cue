@@ -46,7 +46,7 @@ func WriteNode(w io.Writer, i adt.StringIndexer, n adt.Node, config *Config) {
 	if config == nil {
 		config = &Config{}
 	}
-	p := printer{Writer: w, index: i, cfg: config}
+	p := printer{w: w, index: i, cfg: config}
 	if config.Compact {
 		p := compactPrinter{p}
 		p.node(n)
@@ -66,7 +66,7 @@ func NodeString(i adt.StringIndexer, n adt.Node, config *Config) string {
 }
 
 type printer struct {
-	io.Writer
+	w      io.Writer
 	index  adt.StringIndexer
 	indent string
 	cfg    *Config
@@ -79,8 +79,10 @@ type printer struct {
 }
 
 func (w *printer) string(s string) {
-	s = strings.Replace(s, "\n", "\n"+w.indent, -1)
-	_, _ = io.WriteString(w, s)
+	if len(w.indent) > 0 {
+		s = strings.Replace(s, "\n", "\n"+w.indent, -1)
+	}
+	_, _ = io.WriteString(w.w, s)
 }
 
 func (w *printer) label(f adt.Feature) {
@@ -150,7 +152,7 @@ func (w *printer) labelString(f adt.Feature) string {
 func (w *printer) shortError(errs errors.Error) {
 	for {
 		msg, args := errs.Msg()
-		fmt.Fprintf(w, msg, args...)
+		fmt.Fprintf(w.w, msg, args...)
 
 		err := errors.Unwrap(errs)
 		if err == nil {
@@ -180,7 +182,7 @@ func (w *printer) interpolation(x *adt.Interpolation) {
 			}
 		case adt.BytesKind:
 			if s, ok := x.Parts[i].(*adt.Bytes); ok {
-				_, _ = w.Write(s.B)
+				_, _ = w.w.Write(s.B)
 			} else {
 				w.string("<bad bytes>")
 			}
@@ -216,7 +218,7 @@ func (w *printer) node(n adt.Node) {
 			}
 		}
 
-		fmt.Fprintf(w, "(%s){", kindStr)
+		fmt.Fprintf(w.w, "(%s){", kindStr)
 
 		saved := w.indent
 		w.indent += "  "
@@ -229,7 +231,7 @@ func (w *printer) node(n adt.Node) {
 			saved := w.indent
 			w.indent += "// "
 			w.string("\n")
-			fmt.Fprintf(w, "[%v]", v.Code)
+			fmt.Fprintf(w.w, "[%v]", v.Code)
 			if !v.ChildError {
 				msg := errors.Details(v.Err, &errors.Config{
 					Cwd:     w.cfg.Cwd,
@@ -405,10 +407,10 @@ func (w *printer) node(n adt.Node) {
 		w.string("null")
 
 	case *adt.Bool:
-		fmt.Fprint(w, x.B)
+		fmt.Fprint(w.w, x.B)
 
 	case *adt.Num:
-		fmt.Fprint(w, &x.X)
+		fmt.Fprint(w.w, &x.X)
 
 	case *adt.String:
 		w.string(literal.String.Quote(x.Str))
@@ -420,14 +422,14 @@ func (w *printer) node(n adt.Node) {
 		w.string("_")
 
 	case *adt.BasicType:
-		fmt.Fprint(w, x.K)
+		fmt.Fprint(w.w, x.K)
 
 	case *adt.BoundExpr:
-		fmt.Fprint(w, x.Op)
+		fmt.Fprint(w.w, x.Op)
 		w.node(x.Expr)
 
 	case *adt.BoundValue:
-		fmt.Fprint(w, x.Op)
+		fmt.Fprint(w.w, x.Op)
 		w.node(x.Value)
 
 	case *adt.NodeLink:
@@ -509,13 +511,13 @@ func (w *printer) node(n adt.Node) {
 		w.interpolation(x)
 
 	case *adt.UnaryExpr:
-		fmt.Fprint(w, x.Op)
+		fmt.Fprint(w.w, x.Op)
 		w.node(x.X)
 
 	case *adt.BinaryExpr:
 		w.string("(")
 		w.node(x.X)
-		fmt.Fprint(w, " ", x.Op, " ")
+		fmt.Fprint(w.w, " ", x.Op, " ")
 		w.node(x.Y)
 		w.string(")")
 

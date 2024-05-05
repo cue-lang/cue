@@ -117,16 +117,14 @@ func (w *compactPrinter) node(n adt.Node) {
 		w.string("]")
 
 	case *adt.Field:
-		s := w.labelString(x.Label)
-		w.string(s)
+		w.label(x.Label)
 		w.string(x.ArcType.Suffix())
 		w.string(":")
 		w.node(x.Value)
 
 	case *adt.LetField:
 		w.string("let ")
-		s := w.labelString(x.Label)
-		w.string(s)
+		w.label(x.Label)
 		if x.IsMulti {
 			w.string("m")
 		}

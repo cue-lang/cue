@@ -86,7 +86,22 @@ func (w *printer) string(s string) {
 }
 
 func (w *printer) label(f adt.Feature) {
-	w.string(w.labelString(f))
+	switch {
+	case f.IsHidden():
+		ident := f.IdentString(w.index)
+		if pkgName := f.PkgID(w.index); pkgName != "_" {
+			ident = fmt.Sprintf("%s(%s)", ident, pkgName)
+		}
+		w.string(ident)
+
+	case f.IsLet():
+		ident := f.RawString(w.index)
+		ident = strings.Replace(ident, "\x00", "#", 1)
+		w.string(ident)
+
+	default:
+		w.string(f.SelectorString(w.index))
+	}
 }
 
 func (w *printer) ident(f adt.Feature) {
@@ -127,26 +142,6 @@ func (w *printer) printShared(v *adt.Vertex) (x *adt.Vertex, ok bool) {
 		return v, true
 	}
 	return v, false
-}
-
-// TODO: fold into label once :: is no longer supported.
-func (w *printer) labelString(f adt.Feature) string {
-	switch {
-	case f.IsHidden():
-		ident := f.IdentString(w.index)
-		if pkgName := f.PkgID(w.index); pkgName != "_" {
-			ident = fmt.Sprintf("%s(%s)", ident, pkgName)
-		}
-		return ident
-
-	case f.IsLet():
-		ident := f.RawString(w.index)
-		ident = strings.Replace(ident, "\x00", "#", 1)
-		return ident
-
-	default:
-		return f.SelectorString(w.index)
-	}
 }
 
 func (w *printer) shortError(errs errors.Error) {
@@ -360,8 +355,7 @@ func (w *printer) node(n adt.Node) {
 		w.string("\n]")
 
 	case *adt.Field:
-		s := w.labelString(x.Label)
-		w.string(s)
+		w.label(x.Label)
 		w.string(x.ArcType.Suffix())
 		w.string(":")
 		w.string(" ")
@@ -369,8 +363,7 @@ func (w *printer) node(n adt.Node) {
 
 	case *adt.LetField:
 		w.string("let ")
-		s := w.labelString(x.Label)
-		w.string(s)
+		w.label(x.Label)
 		if x.IsMulti {
 			w.string("multi")
 		}

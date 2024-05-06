@@ -1,7 +1,6 @@
 # An empty argument is not a valid package pattern nor filename.
-# TODO(mvdan): an empty string is not a standard library path
 ! exec cue export ''
-stderr 'standard library import path "" cannot be imported as a CUE package'
+stderr 'empty package name in import path ""'
 
 # Unknown filetype prefix.
 ! exec cue export cue+date: somefile.cue
@@ -29,12 +28,11 @@ cmp stdout export.golden
 exec cue export ./somepkg/
 cmp stdout export.golden
 # TODO(mvdan): we should support loading packages from absolute directories.
-# TODO(mvdan): extension-less forward-slash absolute paths should not be mistaken for standard library paths.
 ! exec cue export ${WORK}${/}somepkg
-[!windows] stderr 'standard library import path ".*somepkg" cannot be imported as a CUE package'
+[!windows] stderr 'cannot find package ".*somepkg"'
 [windows] stderr 'no encoding specified for file ".*somepkg.*"'
 ! exec cue export ${WORK}${/}somepkg${/}
-[!windows] stderr 'standard library import path ".*somepkg" cannot be imported as a CUE package'
+[!windows] stderr 'cannot find package ".*somepkg"'
 [windows] stderr 'no encoding specified for file ".*somepkg.*"'
 
 # Now do some of the same filename tests, but for a file without any extension.
@@ -57,10 +55,9 @@ stderr 'standard library import path "somefile" cannot be imported as a CUE pack
 # TODO(mvdan): "cannot find package" is perhaps confusing to the user given that the file exists.
 ! exec cue export ./somefile
 stderr 'cannot find package "\./somefile"'
-# TODO(mvdan): extension-less forward-slash absolute paths should not be mistaken for standard library paths.
 # TODO(mvdan): we probably should not behave differently on Windows.
 ! exec cue export ${WORK}${/}somefile
-[!windows] stderr 'standard library import path ".*somefile" cannot be imported as a CUE package'
+[!windows] stderr 'cannot find package ".*somefile"'
 [windows] stderr 'no encoding specified for file ".*somefile"'
 
 -- cue.mod/module.cue --

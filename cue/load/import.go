@@ -436,5 +436,9 @@ func absPathForSourceLoc(loc module.SourceLoc) (string, error) {
 // an import from the standard library.
 func isStdlibPackage(pkgPath string) bool {
 	firstElem, _, _ := strings.Cut(pkgPath, "/")
+	if firstElem == "" {
+		return false // absolute paths like "/foo/bar"
+	}
+	// Paths like ".foo/bar", "./foo/bar", or "foo.com/bar" are not standard library import paths.
 	return strings.IndexByte(firstElem, '.') == -1
 }

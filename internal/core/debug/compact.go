@@ -21,6 +21,7 @@ package debug
 
 import (
 	"fmt"
+	"strconv"
 
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/internal/core/adt"
@@ -28,6 +29,10 @@ import (
 
 type compactPrinter struct {
 	printer
+}
+
+func (w *compactPrinter) string(s string) {
+	w.dst = append(w.dst, s...)
 }
 
 func (w *compactPrinter) node(n adt.Node) {
@@ -161,29 +166,29 @@ func (w *compactPrinter) node(n adt.Node) {
 		w.string("null")
 
 	case *adt.Bool:
-		fmt.Fprint(w.w, x.B)
+		w.dst = strconv.AppendBool(w.dst, x.B)
 
 	case *adt.Num:
-		fmt.Fprint(w.w, &x.X)
+		w.string(x.X.String())
 
 	case *adt.String:
-		w.string(literal.String.Quote(x.Str))
+		w.dst = literal.String.Append(w.dst, x.Str)
 
 	case *adt.Bytes:
-		w.string(literal.Bytes.Quote(string(x.B)))
+		w.dst = literal.Bytes.Append(w.dst, string(x.B))
 
 	case *adt.Top:
 		w.string("_")
 
 	case *adt.BasicType:
-		fmt.Fprint(w.w, x.K)
+		w.string(x.K.String())
 
 	case *adt.BoundExpr:
-		fmt.Fprint(w.w, x.Op)
+		w.string(x.Op.String())
 		w.node(x.Expr)
 
 	case *adt.BoundValue:
-		fmt.Fprint(w.w, x.Op)
+		w.string(x.Op.String())
 		w.node(x.Value)
 
 	case *adt.NodeLink:
@@ -249,13 +254,15 @@ func (w *compactPrinter) node(n adt.Node) {
 		w.interpolation(x)
 
 	case *adt.UnaryExpr:
-		fmt.Fprint(w.w, x.Op)
+		w.string(x.Op.String())
 		w.node(x.X)
 
 	case *adt.BinaryExpr:
 		w.string("(")
 		w.node(x.X)
-		fmt.Fprint(w.w, " ", x.Op, " ")
+		w.string(" ")
+		w.string(x.Op.String())
+		w.string(" ")
 		w.node(x.Y)
 		w.string(")")
 

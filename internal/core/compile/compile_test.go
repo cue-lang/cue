@@ -64,9 +64,9 @@ func TestCompile(t *testing.T) {
 				fmt.Fprintln(t)
 			}
 			fmt.Fprintln(t, "---", t.Rel(f.Filename))
-			debug.WriteNode(t, r, v.Conjuncts[i].Elem(), &debug.Config{
+			t.Write(debug.AppendNode(nil, r, v.Conjuncts[i].Elem(), &debug.Config{
 				Cwd: t.Dir,
-			})
+			}))
 		}
 		fmt.Fprintln(t)
 	})

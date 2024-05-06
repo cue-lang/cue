@@ -21,7 +21,6 @@ package debug
 
 import (
 	"fmt"
-	"io"
 	"strconv"
 	"strings"
 
@@ -41,18 +40,19 @@ type Config struct {
 	Raw     bool
 }
 
-// WriteNode writes a string representation of the node to w.
-func WriteNode(w io.Writer, i adt.StringIndexer, n adt.Node, config *Config) {
+// AppendNode writes a string representation of the node to w.
+func AppendNode(dst []byte, i adt.StringIndexer, n adt.Node, config *Config) []byte {
 	if config == nil {
 		config = &Config{}
 	}
-	p := printer{w: w, index: i, cfg: config}
+	p := printer{dst: dst, index: i, cfg: config}
 	if config.Compact {
 		p := compactPrinter{p}
 		p.node(n)
-	} else {
-		p.node(n)
+		return p.dst
 	}
+	p.node(n)
+	return p.dst
 }
 
 // NodeString returns a string representation of the given node.
@@ -60,13 +60,12 @@ func WriteNode(w io.Writer, i adt.StringIndexer, n adt.Node, config *Config) {
 // Commonly available implementations of StringIndexer include *adt.OpContext
 // and *runtime.Runtime.
 func NodeString(i adt.StringIndexer, n adt.Node, config *Config) string {
-	b := &strings.Builder{}
-	WriteNode(b, i, n, config)
-	return b.String()
+	var buf [128]byte
+	return string(AppendNode(buf[:0], i, n, config))
 }
 
 type printer struct {
-	w      io.Writer
+	dst    []byte
 	index  adt.StringIndexer
 	indent string
 	cfg    *Config
@@ -82,7 +81,11 @@ func (w *printer) string(s string) {
 	if len(w.indent) > 0 {
 		s = strings.Replace(s, "\n", "\n"+w.indent, -1)
 	}
-	_, _ = io.WriteString(w.w, s)
+	w.dst = append(w.dst, s...)
+}
+
+func (w *printer) int(i int64) {
+	w.dst = strconv.AppendInt(w.dst, i, 10)
 }
 
 func (w *printer) label(f adt.Feature) {
@@ -147,7 +150,7 @@ func (w *printer) printShared(v *adt.Vertex) (x *adt.Vertex, ok bool) {
 func (w *printer) shortError(errs errors.Error) {
 	for {
 		msg, args := errs.Msg()
-		fmt.Fprintf(w.w, msg, args...)
+		w.dst = fmt.Appendf(w.dst, msg, args...)
 
 		err := errors.Unwrap(errs)
 		if err == nil {
@@ -177,7 +180,7 @@ func (w *printer) interpolation(x *adt.Interpolation) {
 			}
 		case adt.BytesKind:
 			if s, ok := x.Parts[i].(*adt.Bytes); ok {
-				_, _ = w.w.Write(s.B)
+				w.dst = append(w.dst, s.B...)
 			} else {
 				w.string("<bad bytes>")
 			}
@@ -213,7 +216,7 @@ func (w *printer) node(n adt.Node) {
 			}
 		}
 
-		fmt.Fprintf(w.w, "(%s){", kindStr)
+		w.dst = fmt.Appendf(w.dst, "(%s){", kindStr)
 
 		saved := w.indent
 		w.indent += "  "
@@ -226,7 +229,7 @@ func (w *printer) node(n adt.Node) {
 			saved := w.indent
 			w.indent += "// "
 			w.string("\n")
-			fmt.Fprintf(w.w, "[%v]", v.Code)
+			w.dst = fmt.Appendf(w.dst, "[%v]", v.Code)
 			if !v.ChildError {
 				msg := errors.Details(v.Err, &errors.Config{
 					Cwd:     w.cfg.Cwd,
@@ -400,29 +403,29 @@ func (w *printer) node(n adt.Node) {
 		w.string("null")
 
 	case *adt.Bool:
-		fmt.Fprint(w.w, x.B)
+		w.dst = strconv.AppendBool(w.dst, x.B)
 
 	case *adt.Num:
-		fmt.Fprint(w.w, &x.X)
+		w.string(x.X.String())
 
 	case *adt.String:
-		w.string(literal.String.Quote(x.Str))
+		w.dst = literal.String.Append(w.dst, x.Str)
 
 	case *adt.Bytes:
-		w.string(literal.Bytes.Quote(string(x.B)))
+		w.dst = literal.Bytes.Append(w.dst, string(x.B))
 
 	case *adt.Top:
 		w.string("_")
 
 	case *adt.BasicType:
-		fmt.Fprint(w.w, x.K)
+		w.string(x.K.String())
 
 	case *adt.BoundExpr:
-		fmt.Fprint(w.w, x.Op)
+		w.string(x.Op.String())
 		w.node(x.Expr)
 
 	case *adt.BoundValue:
-		fmt.Fprint(w.w, x.Op)
+		w.string(x.Op.String())
 		w.node(x.Value)
 
 	case *adt.NodeLink:
@@ -437,25 +440,25 @@ func (w *printer) node(n adt.Node) {
 
 	case *adt.FieldReference:
 		w.string(openTuple)
-		w.string(strconv.Itoa(int(x.UpCount)))
+		w.int(int64(x.UpCount))
 		w.string(";")
 		w.label(x.Label)
 		w.string(closeTuple)
 
 	case *adt.ValueReference:
 		w.string(openTuple)
-		w.string(strconv.Itoa(int(x.UpCount)))
+		w.int(int64(x.UpCount))
 		w.string(closeTuple)
 
 	case *adt.LabelReference:
 		w.string(openTuple)
-		w.string(strconv.Itoa(int(x.UpCount)))
+		w.int(int64(x.UpCount))
 		w.string(";-")
 		w.string(closeTuple)
 
 	case *adt.DynamicReference:
 		w.string(openTuple)
-		w.string(strconv.Itoa(int(x.UpCount)))
+		w.int(int64(x.UpCount))
 		w.string(";(")
 		w.node(x.Label)
 		w.string(")")
@@ -468,7 +471,7 @@ func (w *printer) node(n adt.Node) {
 
 	case *adt.LetReference:
 		w.string(openTuple)
-		w.string(strconv.Itoa(int(x.UpCount)))
+		w.int(int64(x.UpCount))
 		w.string(";let ")
 		w.label(x.Label)
 		w.string(closeTuple)
@@ -504,13 +507,15 @@ func (w *printer) node(n adt.Node) {
 		w.interpolation(x)
 
 	case *adt.UnaryExpr:
-		fmt.Fprint(w.w, x.Op)
+		w.string(x.Op.String())
 		w.node(x.X)
 
 	case *adt.BinaryExpr:
 		w.string("(")
 		w.node(x.X)
-		fmt.Fprint(w.w, " ", x.Op, " ")
+		w.string(" ")
+		w.string(x.Op.String())
+		w.string(" ")
 		w.node(x.Y)
 		w.string(")")
 

@@ -432,7 +432,7 @@ func (e *exporter) structComposite(v *adt.Vertex, attrs []*ast.Attribute) ast.Ex
 			e.inDefinition++
 		}
 
-		arc := v.Lookup(label)
+		arc := v.LookupRaw(label)
 		if arc == nil {
 			continue
 		}
@@ -446,6 +446,7 @@ func (e *exporter) structComposite(v *adt.Vertex, attrs []*ast.Attribute) ast.Ex
 
 		internal.SetConstraint(f, arc.ArcType.Token())
 
+		arc = arc.DerefValue()
 		f.Value = e.vertex(arc)
 
 		if label.IsDef() {

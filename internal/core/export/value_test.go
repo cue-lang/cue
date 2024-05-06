@@ -20,11 +20,13 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/export"
 	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
 	"golang.org/x/tools/txtar"
@@ -96,6 +98,9 @@ func TestValueX(t *testing.T) {
 	a := cuetxtar.Load(archive, t.TempDir())
 
 	r := runtime.New()
+	(*runtime.Runtime)(r).SetVersion(internal.DevVersion)
+	(*runtime.Runtime)(r).SetDebugOptions(&cuedebug.Config{Sharing: true})
+
 	v, errs := compile.Files(nil, r, "", a[0].Files...)
 	if errs != nil {
 		t.Fatal(errs)

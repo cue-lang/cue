@@ -1,4 +1,77 @@
-! exec cue eval cue+date: x.cue
+# An empty argument is not a valid package pattern nor filename.
+# TODO(mvdan): an empty string is not a standard library path
+! exec cue export ''
+stderr 'standard library import path "" cannot be imported as a CUE package'
+
+# Unknown filetype prefix.
+! exec cue export cue+date: somefile.cue
 stderr 'unknown filetype date'
--- x.cue --
+
+# Trying to parse as the wrong filetype.
+! exec cue export json: somefile.cue
+stderr 'invalid JSON for file'
+
+# Trying to parse as the explicitly right filetype.
+exec cue export cue: somefile.cue
+cmp stdout export.golden
+
+# Filetype detection works with absolute or relative paths, including dot prefixes.
+exec cue export somefile.cue
+cmp stdout export.golden
+exec cue export ./somefile.cue
+cmp stdout export.golden
+exec cue export ${WORK}${/}somefile.cue
+cmp stdout export.golden
+
+# A package can be loaded as a pattern or as a directory, with or without trailing slashes.
+exec cue export ./somepkg
+cmp stdout export.golden
+exec cue export ./somepkg/
+cmp stdout export.golden
+# TODO(mvdan): we should support loading packages from absolute directories.
+# TODO(mvdan): extension-less forward-slash absolute paths should not be mistaken for standard library paths.
+! exec cue export ${WORK}${/}somepkg
+[!windows] stderr 'standard library import path ".*somepkg" cannot be imported as a CUE package'
+[windows] stderr 'no encoding specified for file ".*somepkg.*"'
+! exec cue export ${WORK}${/}somepkg${/}
+[!windows] stderr 'standard library import path ".*somepkg" cannot be imported as a CUE package'
+[windows] stderr 'no encoding specified for file ".*somepkg.*"'
+
+# Now do some of the same filename tests, but for a file without any extension.
+cp somefile.cue somefile
+
+! exec cue export json: somefile
+stderr 'invalid JSON for file'
+
+exec cue export cue: somefile
+cmp stdout export.golden
+exec cue export cue: ./somefile
+cmp stdout export.golden
+exec cue export cue: ${WORK}${/}somefile
+cmp stdout export.golden
+
+# Without an extension nor a filetype, "somefile" on its own looks like a std package.
+! exec cue export somefile
+stderr 'standard library import path "somefile" cannot be imported as a CUE package'
+
+# TODO(mvdan): "cannot find package" is perhaps confusing to the user given that the file exists.
+! exec cue export ./somefile
+stderr 'cannot find package "\./somefile"'
+# TODO(mvdan): extension-less forward-slash absolute paths should not be mistaken for standard library paths.
+# TODO(mvdan): we probably should not behave differently on Windows.
+! exec cue export ${WORK}${/}somefile
+[!windows] stderr 'standard library import path ".*somefile" cannot be imported as a CUE package'
+[windows] stderr 'no encoding specified for file ".*somefile"'
+
+-- cue.mod/module.cue --
+module: "mod.test/test"
+-- somefile.cue --
 a: 5
+-- somepkg/somefile.cue --
+package somepkg
+
+a: 5
+-- export.golden --
+{
+    "a": 5
+}

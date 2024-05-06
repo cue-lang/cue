@@ -242,6 +242,44 @@ func TestX(t *testing.T) {
 module: "mod.test"
 
 -- in.cue --
+import (
+	"strings"
+	"net"
+)
+
+
+// Already closed.
+// let svc = O.S
+// X: svc
+// O: S: a: 1
+// for v in O
+// for w in v { O: "\("S")": {} }
+
+// a.b
+// a: {}
+
+// #T: ["a", #T] | ["d", ...#T]
+// x: #T
+
+// A: a: B
+// B: or([for x in A { b: x }])
+
+// list: [2, 3]
+// b: [ 3, for x in list if x > 2 {x}]
+
+
+// x: {
+// 	b: {
+// 		if c.g != _|_ {}
+// 	}
+// 	c: {
+// 		if false {g: _}
+// 	}
+// }
+
+
+// a: string
+// if true { v: a }
 	`
 
 	if strings.HasSuffix(strings.TrimSpace(in), ".cue --") {

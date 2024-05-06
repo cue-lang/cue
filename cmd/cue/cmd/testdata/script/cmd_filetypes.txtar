@@ -38,9 +38,8 @@ stderr 'standard library import path "somefile" cannot be imported as a CUE pack
 # TODO(mvdan): "cannot find package" is perhaps confusing to the user given that the file exists.
 ! exec cue export ./somefile
 stderr 'cannot find package "\./somefile"'
-# TODO(mvdan): extension-less absolute paths should not be mistaken for standard library paths
 ! exec cue export ${WORK}/somefile
-stderr 'standard library import path ".*/somefile" cannot be imported as a CUE package'
+stderr 'cannot find package ".*/somefile"'
 
 -- somefile.cue --
 a: 5

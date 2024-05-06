@@ -1,4 +1,50 @@
-! exec cue eval cue+date: x.cue
+# Unknown filetype string.
+! exec cue export cue+date: somefile.cue
 stderr 'unknown filetype date'
--- x.cue --
+
+# Trying to parse as the wrong filetype.
+! exec cue export json: somefile.cue
+stderr 'invalid JSON for file'
+
+# Trying to parse as the explicitly right filetype.
+exec cue export cue: somefile.cue
+cmp stdout export.golden
+
+# Filetype detection works with absolute or relative paths, including dot prefixes.
+exec cue export somefile.cue
+cmp stdout export.golden
+exec cue export ./somefile.cue
+cmp stdout export.golden
+exec cue export ${WORK}/somefile.cue
+cmp stdout export.golden
+
+# Now do some of the same tests, but for a file without any extension.
+cp somefile.cue somefile
+
+! exec cue export json: somefile
+stderr 'invalid JSON for file'
+
+exec cue export cue: somefile
+cmp stdout export.golden
+exec cue export cue: ./somefile
+cmp stdout export.golden
+exec cue export cue: ${WORK}/somefile
+cmp stdout export.golden
+
+# Without an extension nor a filetype, "somefile" on its own looks like a std package.
+! exec cue export somefile
+stderr 'standard library import path "somefile" cannot be imported as a CUE package'
+
+# TODO(mvdan): "cannot find package" is perhaps confusing to the user given that the file exists.
+! exec cue export ./somefile
+stderr 'cannot find package "\./somefile"'
+# TODO(mvdan): extension-less absolute paths should not be mistaken for standard library paths
+! exec cue export ${WORK}/somefile
+stderr 'standard library import path ".*/somefile" cannot be imported as a CUE package'
+
+-- somefile.cue --
 a: 5
+-- export.golden --
+{
+    "a": 5
+}

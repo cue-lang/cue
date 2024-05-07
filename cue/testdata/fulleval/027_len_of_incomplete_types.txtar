@@ -52,16 +52,16 @@ Disjuncts:    93
   v3: (int){ 0 }
   v4: (int){ 1 }
   v5: (_|_){
-    // [incomplete] v5: unresolved disjunction {a:3} | {a:4} (type struct):
+    // [incomplete] v5: incomplete argument {a:3} | {a:4} (type struct):
     //     ./in.cue:6:7
   }
   v6: (_|_){
-    // [incomplete] v6: unresolved disjunction 'sf' | 'dd' (type bytes):
+    // [incomplete] v6: incomplete argument 'sf' | 'dd' (type bytes):
     //     ./in.cue:7:7
   }
   v7: (int){ 2 }
   v8: (_|_){
-    // [incomplete] v8: unresolved disjunction [2] | [1,2] (type list):
+    // [incomplete] v8: incomplete argument [2] | [1,2] (type list):
     //     ./in.cue:9:7
   }
   v9: (int){ 4 }

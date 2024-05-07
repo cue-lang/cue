@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e785ff00_1f8669cc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-07T09:03:27Z",
+      "side": 1,
+      "message": "Nice catch!",
+      "revId": "e2bf7c81946e6b0ca3ed796aa1be1d6afc249e35",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e14a8c9_e471bf98",
+        "filename": "internal/core/subsume/value.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-07T09:03:27Z",
+      "side": 1,
+      "message": "Wouldn\u0027t this potentially duplicate errors in s.errs?\n\nPerhaps you could write:\n\t\tif y :\u003d s.ctx.Validate(x, b); y !\u003d nil {\n\t\t\ts.errs \u003d errors.Append(s.errs, y.Err)\n\t\t}\n\t\tif b :\u003d s.ctx.PopState(state); b !\u003d nil {\n\t\t\ts.errs \u003d errors.Append(s.errs, b.Err)\n\t\t}",
+      "revId": "e2bf7c81946e6b0ca3ed796aa1be1d6afc249e35",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -549,19 +549,14 @@ func writeErr(w io.Writer, err Error) {
 	for {
 		u := errors.Unwrap(err)
 
-		printed := false
 		msg, args := err.Msg()
-		s := fmt.Sprintf(msg, args...)
-		if s != "" || u == nil { // print at least something
-			_, _ = io.WriteString(w, s)
-			printed = true
-		}
+		n, _ := fmt.Fprintf(w, msg, args...)
 
 		if u == nil {
 			break
 		}
 
-		if printed {
+		if n > 0 {
 			_, _ = io.WriteString(w, ": ")
 		}
 		err, _ = u.(Error)

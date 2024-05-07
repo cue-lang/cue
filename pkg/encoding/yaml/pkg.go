@@ -70,7 +70,7 @@ var p = &pkg.Package{
 		},
 		Result: adt.BoolKind,
 		Func: func(c *pkg.CallCtxt) {
-			b, v := c.Bytes(0), c.Value(1)
+			b, v := c.Bytes(0), c.Top(1)
 			if c.Do() {
 				c.Ret, c.Err = Validate(b, v)
 			}

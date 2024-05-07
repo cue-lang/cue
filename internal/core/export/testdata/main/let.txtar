@@ -697,7 +697,7 @@ Missing lines.
 			name: "two"
 		}
 	}]
-	files: _|_ // files: key value of dynamic field must be concrete, found _|_(invalid interpolation: invalid interpolation: filepath: undefined field: name (and 3 more errors)) (and 9 more errors)
+	files: _|_ // files: key value of dynamic field must be concrete, found _|_(invalid interpolation: invalid interpolation: filepath: undefined field: name (and 1 more errors)) (and 5 more errors)
 	scoped: {
 		direct: {
 			a: 1
@@ -1165,7 +1165,7 @@ diff old new
 +			name: "two"
 +		}
 +	}]
-+	files: _|_ // files: key value of dynamic field must be concrete, found _|_(invalid interpolation: invalid interpolation: filepath: undefined field: name (and 3 more errors)) (and 9 more errors)
++	files: _|_ // files: key value of dynamic field must be concrete, found _|_(invalid interpolation: invalid interpolation: filepath: undefined field: name (and 1 more errors)) (and 5 more errors)
 +	scoped: {
 +		direct: {
 +			a: 1

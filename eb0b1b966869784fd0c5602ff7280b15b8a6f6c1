@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "205088d6_0c8b0d1c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-07T17:56:52Z",
+      "side": 1,
+      "message": "I\u0027m fine with that. An alternative might be just \"workflow\".",
+      "revId": "eb0b1b966869784fd0c5602ff7280b15b8a6f6c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

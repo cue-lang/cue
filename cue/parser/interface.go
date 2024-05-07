@@ -174,9 +174,8 @@ func ParseFile(filename string, src interface{}, mode ...Option) (f *ast.File, e
 
 		// set result values
 		if f == nil {
-			// source is not a valid Go source file - satisfy
-			// ParseFile API and return a valid (but) empty
-			// *File
+			// source is not a valid CUE source file - satisfy
+			// ParseFile API and return a valid (but) empty *File
 			f = &ast.File{
 				// Scope: NewScope(nil),
 			}

@@ -65,7 +65,7 @@ func (p *PackageError) Error() string {
 type NoFilesError struct {
 	Package *build.Instance
 
-	ignored bool // whether any Go files were ignored due to build tags
+	ignored bool // whether any CUE files were ignored due to build tags
 }
 
 func (e *NoFilesError) Position() token.Pos         { return token.NoPos }

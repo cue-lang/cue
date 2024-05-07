@@ -72,7 +72,7 @@ type DowngradeReqs[V comparable] interface {
 
 // BuildList returns the build list for the target module.
 //
-// target is the root vertex of a module requirement graph. For cmd/go, this is
+// target is the root vertex of a module requirement graph. For cmd/cue, this is
 // typically the main module, but note that this algorithm is not intended to
 // be Go-specific: module paths and versions are treated as opaque values.
 //

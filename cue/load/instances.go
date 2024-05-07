@@ -14,11 +14,6 @@
 
 package load
 
-// Files in package are to a large extent based on Go files from the following
-// Go packages:
-//    - cmd/go/internal/load
-//    - go/build
-
 import (
 	"context"
 	"fmt"

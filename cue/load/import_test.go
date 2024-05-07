@@ -16,7 +16,6 @@ package load
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -81,12 +80,7 @@ func TestMultiplePackageImport(t *testing.T) {
 }
 
 func TestLocalDirectory(t *testing.T) {
-	cwd, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	p, err := getInst(".", cwd)
+	p, err := getInst(".", testdata("testmod", "hello"))
 	if err != nil {
 		t.Fatal(err)
 	}

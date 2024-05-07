@@ -466,17 +466,20 @@ func TestLoadInstancesConcurrent(t *testing.T) {
 	// This test is designed to fail when run with the race detector
 	// if there's an underlying race condition.
 	// See https://cuelang.org/issue/1746
-	race(func() {
-		Instances([]string{"."}, nil)
+	race(t, func() error {
+		_, err := getInst(".", testdata("testmod", "hello"))
+		return err
 	})
 }
 
-func race(f func()) {
+func race(t *testing.T, f func() error) {
 	var wg sync.WaitGroup
 	for i := 0; i < 2; i++ {
 		wg.Add(1)
 		go func() {
-			f()
+			if err := f(); err != nil {
+				t.Error(err)
+			}
 			wg.Done()
 		}()
 	}

@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb862da4_64ce8c8f",
+        "filename": "cue/cuecontext/cuecontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-07T09:22:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f0853e45_f225a03a",
+      "revId": "638bab2b82ffc821bf462fb423ec11a558c5811b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9d1d89cd_676e788c",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-05-03T10:40:24Z",
       "side": 1,
       "message": "how about briefly summarizing these versions in terms of time and features? over time we will forget what V2 meant, so having some frame of reference will help.\n\nfor example, making up some of the details as I don\u0027t know them by heart:\n\n\u003e V2 is the latest stable version of the evaluator.\n\u003e It was introduced in 2022(?) and is being maintained until 2024.\n\u003e\n\u003e V3 is the current experimental version of the evaluator.\n\u003e It was introduced in 2024 and brought a new disjunction algorithm\n\u003e as well as many performance improvements like structure sharing.",
+      "revId": "638bab2b82ffc821bf462fb423ec11a558c5811b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02598b92_11eedcab",
+        "filename": "cue/cuecontext/cuecontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-07T09:22:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9d1d89cd_676e788c",
       "revId": "638bab2b82ffc821bf462fb423ec11a558c5811b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "acfaab20_31b0fec4",
+        "filename": "cue/cuecontext/cuecontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-07T09:22:45Z",
+      "side": 1,
+      "message": "Done as discussed.",
+      "parentUuid": "d99eda40_21f85d86",
+      "revId": "638bab2b82ffc821bf462fb423ec11a558c5811b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0054ba13_9bc14409",
@@ -82,6 +136,24 @@
       "writtenOn": "2024-05-03T10:40:24Z",
       "side": 1,
       "message": "thinking about naming for a second - I like that CUE_DEBUG is called exactly like the env var, but `cuecontext.CUE_DEBUG` is an odd name. it repeats \"cue\", and PASCAL_CASE in Go APIs is extremely rare.\n\nhow about `cuecontext.DebugFlags`, and leave the mention of CUE_DEBUG as part of the godoc?\n\nI use the name \"flags\" above rather than \"options\" on purpose - the way CUE_DEBUG is parsed is very close to how Go flags work, and we call the strings \"debug flags\" elsewhere too, e.g. the package envflag.",
+      "revId": "638bab2b82ffc821bf462fb423ec11a558c5811b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df7c46f8_bed3b10a",
+        "filename": "cue/cuecontext/cuecontext.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-07T09:22:45Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "0054ba13_9bc14409",
       "revId": "638bab2b82ffc821bf462fb423ec11a558c5811b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

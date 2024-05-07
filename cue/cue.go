@@ -15,7 +15,7 @@
 // Package cue is the main API for CUE evaluation.
 //
 // [Value] is the main type that represents CUE evaluations.
-// Values are created with a [cuecontext.Context].
+// Values are created with a [cuelang.org/go/cue/cuecontext.Context].
 // Only values created from the same Context can be involved in the same operation.
 // Values created from the same Context are not safe for concurrent use,
 // which we intend to change in the future.
@@ -32,10 +32,10 @@
 // Note that the following types are DEPRECATED and their usage should be
 // avoided if possible:
 //
-//	[FieldInfo]
-//	[Instance]
-//	[Runtime]
-//	[Struct]
+//   - [FieldInfo]
+//   - [Instance]
+//   - [Runtime]
+//   - [Struct]
 //
 // Many types also have deprecated methods. Code that already uses deprecated
 // methods can keep using them for at least some time. We aim to provide a

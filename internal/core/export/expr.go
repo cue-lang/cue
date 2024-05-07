@@ -418,7 +418,7 @@ func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Elem, i
 			e.addValueConjunct(src, env, x)
 
 		case *adt.Vertex:
-			if b, ok := v.BaseValue.(*adt.Bottom); ok {
+			if b := v.Bottom(); b != nil {
 				if !b.IsIncomplete() || e.cfg.Final {
 					e.addExpr(env, v, b, false)
 					return

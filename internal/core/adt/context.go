@@ -667,7 +667,7 @@ func (c *OpContext) evalState(v Expr, state combinedFlags) (result Value) {
 		c.errs = CombineErrors(c.src, c.errs, err)
 
 		if v, ok := result.(*Vertex); ok {
-			if b, _ := v.BaseValue.(*Bottom); b != nil {
+			if b := v.Bottom(); b != nil {
 				switch b.Code {
 				case IncompleteError:
 				case CycleError:
@@ -803,7 +803,7 @@ func (c *OpContext) unifyNode(v Expr, state combinedFlags) (result Value) {
 		c.errs = CombineErrors(c.src, c.errs, err)
 
 		if v, ok := result.(*Vertex); ok {
-			if b, _ := v.BaseValue.(*Bottom); b != nil && !b.IsIncomplete() {
+			if b := v.Bottom(); b != nil && !b.IsIncomplete() {
 				result = b
 			}
 		}

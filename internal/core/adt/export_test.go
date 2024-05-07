@@ -48,12 +48,12 @@ func NewFieldTester(r Runtime) *FieldTester {
 }
 
 func (x *FieldTester) Error() string {
-	if b, ok := x.n.node.BaseValue.(*Bottom); ok && b.Err != nil {
+	if b := x.n.node.Bottom(); b != nil && b.Err != nil {
 		return b.Err.Error()
 	}
 	var errs []string
 	for _, a := range x.n.node.Arcs {
-		if b, ok := a.BaseValue.(*Bottom); ok && b.Err != nil {
+		if b := a.Bottom(); b != nil && b.Err != nil {
 			errs = append(errs, b.Err.Error())
 		}
 	}

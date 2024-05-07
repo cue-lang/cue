@@ -256,7 +256,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 
 	if err := n.getErr(); err != nil {
 		n.errs = nil
-		if b, _ := n.node.BaseValue.(*Bottom); b != nil {
+		if b := n.node.Bottom(); b != nil {
 			err = CombineErrors(nil, b, err)
 		}
 		n.node.BaseValue = err
@@ -432,8 +432,7 @@ func (n *nodeContext) completeNodeTasks(mode runMode) {
 func (n *nodeContext) updateScalar() {
 	// Set BaseValue to scalar, but only if it was not set before. Most notably,
 	// errors should not be discarded.
-	_, isErr := n.node.BaseValue.(*Bottom)
-	if n.scalar != nil && (!isErr || isCyclePlaceholder(n.node.BaseValue)) {
+	if n.scalar != nil && (!n.node.IsErr() || isCyclePlaceholder(n.node.BaseValue)) {
 		n.node.BaseValue = n.scalar
 		n.signal(scalarKnown)
 	}
@@ -520,7 +519,7 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 		// complete accordingly.
 		if !a.Label.IsLet() && a.ArcType <= ArcRequired {
 			a := a.DerefValue()
-			if err, _ := a.BaseValue.(*Bottom); err != nil {
+			if err := a.Bottom(); err != nil {
 				n.node.AddChildError(err)
 			}
 			success = true // other arcs are irrelevant

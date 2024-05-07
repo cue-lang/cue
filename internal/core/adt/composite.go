@@ -557,7 +557,7 @@ func (v *Vertex) IsUnprocessed() bool {
 
 func (v *Vertex) updateStatus(s vertexStatus) {
 	if !isCyclePlaceholder(v.BaseValue) {
-		if _, ok := v.BaseValue.(*Bottom); !ok && v.state != nil {
+		if !v.IsErr() && v.state != nil {
 			Assertf(v.state.ctx, v.status <= s+1, "attempt to regress status from %d to %d", v.Status(), s)
 		}
 	}
@@ -782,15 +782,18 @@ func toDataAll(ctx *OpContext, v BaseValue) BaseValue {
 
 func (v *Vertex) IsErr() bool {
 	// if v.Status() > Evaluating {
-	if _, ok := v.BaseValue.(*Bottom); ok {
-		return true
-	}
-	// }
-	return false
+	return v.Bottom() != nil
 }
 
 func (v *Vertex) Err(c *OpContext) *Bottom {
 	v.Finalize(c)
+	return v.Bottom()
+}
+
+// Bottom returns a Bottom value if v represents an error or nil otherwise.
+func (v *Vertex) Bottom() *Bottom {
+	// TODO: should we consider errors recorded in the state?
+	v = v.DerefValue()
 	if b, ok := v.BaseValue.(*Bottom); ok {
 		return b
 	}

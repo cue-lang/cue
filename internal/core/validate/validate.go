@@ -74,7 +74,7 @@ func (v *validator) validate(x *adt.Vertex) {
 	// values. This prevents us from processing structure-shared nodes more than
 	// once and prevents potential cycles.
 	x = x.DerefNonRooted()
-	if b, _ := x.BaseValue.(*adt.Bottom); b != nil {
+	if b := x.Bottom(); b != nil {
 		switch b.Code {
 		case adt.CycleError:
 			if v.checkConcrete() || v.DisallowCycles {

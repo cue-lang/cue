@@ -133,7 +133,7 @@ func isIncomplete(v *Vertex) bool {
 	if v == nil {
 		return true
 	}
-	if b, ok := v.BaseValue.(*Bottom); ok {
+	if b := v.Bottom(); b != nil {
 		return b.IsIncomplete()
 	}
 	return false

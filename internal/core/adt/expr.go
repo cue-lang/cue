@@ -909,8 +909,8 @@ func (x *LetReference) resolve(ctx *OpContext, state combinedFlags) *Vertex {
 	// We can reevaluate this once we have redone some of the planned order of
 	// evaluation work.
 	arc.Finalize(ctx)
-	b, ok := arc.BaseValue.(*Bottom)
-	if !arc.MultiLet && !ok {
+	b := arc.Bottom()
+	if !arc.MultiLet && b == nil {
 		return arc
 	}
 

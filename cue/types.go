@@ -1182,7 +1182,7 @@ func (v Value) IsConcrete() bool {
 	if v.v == nil {
 		return false // any is neither concrete, not a list or struct.
 	}
-	if b, ok := v.v.BaseValue.(*adt.Bottom); ok {
+	if b := v.v.Bottom(); b != nil {
 		return !b.IsIncomplete()
 	}
 	if !adt.IsConcrete(v.v) {
@@ -1207,7 +1207,7 @@ func (v Value) Exists() bool {
 	if v.v == nil {
 		return false
 	}
-	if err, ok := v.v.BaseValue.(*adt.Bottom); ok {
+	if err := v.v.Bottom(); err != nil {
 		return !err.NotExists
 	}
 	return true
@@ -1412,8 +1412,8 @@ func (v Value) structValOpts(ctx *adt.OpContext, o options) (s structValue, err 
 
 	obj := v.v
 
-	switch b, ok := v.v.BaseValue.(*adt.Bottom); {
-	case ok && b.IsIncomplete() && !o.concrete && !o.final:
+	switch b := v.v.Bottom(); {
+	case b != nil && b.IsIncomplete() && !o.concrete && !o.final:
 
 	// Allow scalar values if hidden or definition fields are requested.
 	case !o.omitHidden, !o.omitDefinitions:

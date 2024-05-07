@@ -378,6 +378,8 @@ func (g *generator) goKind(typ types.Type) string {
 		return "cueList"
 	case "cuelang.org/go/internal/pkg.Struct":
 		return "struct"
+	case "cuelang.org/go/internal/pkg.Schema":
+		return "schema"
 	case "[]*github.com/cockroachdb/apd/v3.Decimal":
 		return "decimalList"
 	case "cuelang.org/go/cue.Value":

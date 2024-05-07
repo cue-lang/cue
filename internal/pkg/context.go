@@ -49,10 +49,13 @@ func (c *CallCtxt) Do() bool {
 	return c.Err == nil
 }
 
+func (c *CallCtxt) Schema(i int) cue.Value {
+	return value.Make(c.ctx, c.args[i])
+}
+
 func (c *CallCtxt) Value(i int) cue.Value {
 	v := value.Make(c.ctx, c.args[i])
-	// TODO: remove default
-	// v, _ = v.Default()
+	v, _ = v.Default()
 	if !v.IsConcrete() {
 		c.errcf(adt.IncompleteError, "non-concrete argument %d", i)
 	}

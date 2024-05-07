@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c398c159_d74997d3",
+        "filename": "cue/testdata/comprehensions/issue2481.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-07T16:03:01Z",
+      "side": 1,
+      "message": "Yep. The representation of lets is still different.",
+      "parentUuid": "0cafd61b_92741a65",
+      "revId": "62193cf369865e1a87605186565af30b04948ce9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cdd1a477_3bcd6452",
         "filename": "internal/core/adt/expr.go",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2024-05-07T15:12:51Z",
       "side": 1,
       "message": "do we want to assert this?",
+      "revId": "62193cf369865e1a87605186565af30b04948ce9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "994f8368_94a689cf",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 930,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-07T16:03:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cdd1a477_3bcd6452",
       "revId": "62193cf369865e1a87605186565af30b04948ce9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0cafd61b_92741a65",
+        "filename": "cue/testdata/comprehensions/issue2481.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-07T15:12:51Z",
+      "side": 1,
+      "message": "is this diff explanation still up to date?",
+      "revId": "62193cf369865e1a87605186565af30b04948ce9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdd1a477_3bcd6452",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 930,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-07T15:12:51Z",
+      "side": 1,
+      "message": "do we want to assert this?",
+      "revId": "62193cf369865e1a87605186565af30b04948ce9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10f3dfec_fecf0566",
+        "filename": "cue/cuecontext/cuecontext.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-07T10:35:42Z",
+      "side": 1,
+      "message": "nit: perhaps EvalExperiment reads better than EvalExperimental.",
+      "revId": "6e31772a2eaa1bad2e7fd31e9ffdbf5ad341005e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd1815f0_a3e894e3",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-07T10:35:42Z",
+      "side": 1,
+      "message": "nit: panicking",
+      "range": {
+        "startLine": 44,
+        "startChar": 21,
+        "endLine": 44,
+        "endChar": 29
+      },
+      "revId": "6e31772a2eaa1bad2e7fd31e9ffdbf5ad341005e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

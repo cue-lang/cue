@@ -238,6 +238,30 @@
       },
       "revId": "638bab2b82ffc821bf462fb423ec11a558c5811b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d92f0143_ed619c0a",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-07T10:35:42Z",
+      "side": 1,
+      "message": "Personally I would lean towards panicking on any error, to be safe. Few users should be setting CUE_DEBUG flags as part of the Go API, and those who do are likely to use static ones. It would be better to fail loudly when there\u0027s any mistake rather than silently continue.\n\n\u003e For now, I\u0027ve changed the code to ignore missing features for now.\n\nNot sure if you realise, but I think you did the opposite - you panic _only_ on missing feature errors, but ignore any other errors.\n\nbut in any case, I\u0027d personally panic on any error, and then there\u0027s no need for any new error API either.",
+      "parentUuid": "5e1bda80_509b86a1",
+      "range": {
+        "startLine": 29,
+        "startChar": 28,
+        "endLine": 29,
+        "endChar": 34
+      },
+      "revId": "638bab2b82ffc821bf462fb423ec11a558c5811b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

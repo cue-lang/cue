@@ -2,11 +2,83 @@
 import "encoding/yaml"
 
 t1: yaml.Validate("a: 2", {a!: int} | {b!: int})
--- out/yaml --
-import "encoding/yaml"
+t2: yaml.Validate("a: 2", close({a: int}) | close({b: int}))
 
-t1: yaml.Validate("a: 2", {
-	a!: int
-} | {
-	b!: int
-})
+#A: {a: int}
+#B: {b: int}
+t3: yaml.Validate("a: 2", #A | #B)
+
+t4: yaml.Validate("'foo'", *int | string)
+t5: yaml.Validate("'foo'", string)
+-- diff/todo --
+{t2,t3}: fix these tests. They resolves to true in the old evaluator,
+but incorrectly error in the new evaluator.
+-- out/yaml-v3 --
+Errors:
+t2: error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b:int}:
+    ./in.cue:4:5
+t3: error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b:int}:
+    ./in.cue:8:5
+
+Result:
+t1: true
+t2: _|_ // t2: error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b:int}
+#A: {
+	a: int
+}
+#B: {
+	b: int
+}
+t3: _|_ // t3: error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b:int}
+t4: true
+t5: true
+-- diff/-out/yaml-v3<==>+out/yaml --
+diff old new
+--- old
++++ new
+@@ -1,10 +1,12 @@
+ Errors:
+-t1: error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b:int}:
+-    ./in.cue:3:5
++t2: error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b:int}:
++    ./in.cue:4:5
++t3: error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b:int}:
++    ./in.cue:8:5
+ 
+ Result:
+-t1: _|_ // t1: error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b:int}
+-t2: true
++t1: true
++t2: _|_ // t2: error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b:int}
+ #A: {
+ 	a: int
+ }
+@@ -11,6 +13,6 @@
+ #B: {
+ 	b: int
+ }
+-t3: true
++t3: _|_ // t3: error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b:int}
+ t4: true
+ t5: true
+-- diff/explanation --
+t1: The incomplete value error in the old evaluator was incorrect - the presence of
+required fields in each disjunct provides enough information to resolve the disjunction,
+and the new evaluator correctly identifies this.
+-- out/yaml --
+Errors:
+t1: error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b:int}:
+    ./in.cue:3:5
+
+Result:
+t1: _|_ // t1: error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b:int}
+t2: true
+#A: {
+	a: int
+}
+#B: {
+	b: int
+}
+t3: true
+t4: true
+t5: true

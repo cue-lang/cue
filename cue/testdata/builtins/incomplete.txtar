@@ -181,12 +181,12 @@ Result:
   }
   value1: (struct){
     a: (_|_){
-      // [incomplete] value1.a: unresolved disjunction 'sf' | 'dd' (type bytes):
+      // [incomplete] value1.a: incomplete argument 'sf' | 'dd' (type bytes):
       //     ./in.cue:39:5
     }
   }
   value2: (_|_){
-    // [incomplete] value2: unresolved disjunction 'sf' | 'dd' (type bytes):
+    // [incomplete] value2: incomplete argument 'sf' | 'dd' (type bytes):
     //     ./in.cue:43:2
   }
   incompleteArgDecimalList: (struct){

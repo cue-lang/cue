@@ -49,6 +49,10 @@ func (c *CallCtxt) Do() bool {
 	return c.Err == nil
 }
 
+func (c *CallCtxt) Top(i int) cue.Value {
+	return value.Make(c.ctx, c.args[i])
+}
+
 func (c *CallCtxt) Value(i int) cue.Value {
 	v := value.Make(c.ctx, c.args[i])
 	// TODO: remove default

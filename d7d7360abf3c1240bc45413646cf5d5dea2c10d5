@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5d7070b_7bd2bd63",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-07T07:47:48Z",
+      "side": 1,
+      "message": "nit: these",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 4
+      },
+      "revId": "d7d7360abf3c1240bc45413646cf5d5dea2c10d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67c6ad7d_b97f159c",
+        "filename": "internal/core/subsume/vertex.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-07T07:47:48Z",
+      "side": 1,
+      "message": "intuitively this seems backwards - a required field is definitely not optional. if the value/logic is right, perhaps rename aOpt to something more intuitive?",
+      "revId": "d7d7360abf3c1240bc45413646cf5d5dea2c10d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80f970aa_19c83f60",
+        "filename": "internal/core/subsume/vertex.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-07T07:47:48Z",
+      "side": 1,
+      "message": "surely you mean \"required field is missing\"?",
+      "revId": "d7d7360abf3c1240bc45413646cf5d5dea2c10d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ce7fdf2_332fe99f",
+        "filename": "internal/core/subsume/vertex.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-07T07:47:48Z",
+      "side": 1,
+      "message": "does this deserve a comment like the other inexact result?",
+      "revId": "d7d7360abf3c1240bc45413646cf5d5dea2c10d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

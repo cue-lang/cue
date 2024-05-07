@@ -146,7 +146,6 @@ var (
 	// TODO remove this mutex when https://cuelang.org/issue/2733 is fixed.
 	moduleSchemaMutex sync.Mutex // guards any use of _moduleSchema
 	_schemas          schemaInfo
-	_cueContext       *cue.Context
 )
 
 type schemaInfo struct {
@@ -158,17 +157,29 @@ type schemaInfo struct {
 // present in schema.cue. It does this within a mutex because it is
 // not currently allowed to use cue.Value concurrently.
 // TODO remove the mutex when https://cuelang.org/issue/2733 is fixed.
-func moduleSchemaDo[T any](f func(*cue.Context, *schemaInfo) (T, error)) (T, error) {
+func moduleSchemaDo[T any](f func(*schemaInfo) (T, error)) (T, error) {
 	moduleSchemaOnce.Do(func() {
-		_cueContext = cuecontext.New()
-		schemav := _cueContext.CompileString(moduleSchemaData, cue.Filename(schemaFile))
+		// It is important that this cue.Context not be used for anything else,
+		// such as calls to [Parse] or [ParseLegacy].
+		// A value holds memory as long as the context it was built with is kept alive for,
+		// and this context is alive forever via the _schemas global.
+		//
+		// TODO(mvdan): this violates the documented API rules in the cue package:
+		//
+		//    Only values created from the same Context can be involved in the same operation.
+		//
+		// However, this appears to work in practice, and all alternatives right now would be
+		// either too costly or awkward. We want to lift that API restriction, and this works OK,
+		// so leave it as-is for the time being.
+		ctx := cuecontext.New()
+		schemav := ctx.CompileString(moduleSchemaData, cue.Filename(schemaFile))
 		if err := schemav.Decode(&_schemas); err != nil {
 			panic(fmt.Errorf("internal error: invalid CUE module.cue schema: %v", errors.Details(err, nil)))
 		}
 	})
 	moduleSchemaMutex.Lock()
 	defer moduleSchemaMutex.Unlock()
-	return f(_cueContext, &_schemas)
+	return f(&_schemas)
 }
 
 func lookup(v cue.Value, sels ...cue.Selector) cue.Value {
@@ -190,7 +201,7 @@ func LatestKnownSchemaVersion() string {
 }
 
 var schemaVersionLimits = sync.OnceValue(func() [2]string {
-	limits, _ := moduleSchemaDo(func(_ *cue.Context, info *schemaInfo) ([2]string, error) {
+	limits, _ := moduleSchemaDo(func(info *schemaInfo) ([2]string, error) {
 		earliest := ""
 		latest := ""
 		for v := range info.Versions {
@@ -219,20 +230,19 @@ func Parse(modfile []byte, filename string) (*File, error) {
 // that only supports the single field "module" and ignores all other
 // fields.
 func ParseLegacy(modfile []byte, filename string) (*File, error) {
-	return moduleSchemaDo(func(ctx *cue.Context, _ *schemaInfo) (*File, error) {
-		v := ctx.CompileBytes(modfile, cue.Filename(filename))
-		if err := v.Err(); err != nil {
-			return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file")
-		}
-		var f noDepsFile
-		if err := v.Decode(&f); err != nil {
-			return nil, newCUEError(err, filename)
-		}
-		return &File{
-			Module:              f.Module,
-			actualSchemaVersion: "v0.0.0",
-		}, nil
-	})
+	// Unfortunate to need a new context, but see the note inside [moduleSchemaDo].
+	v := cuecontext.New().CompileBytes(modfile, cue.Filename(filename))
+	if err := v.Err(); err != nil {
+		return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file")
+	}
+	var f noDepsFile
+	if err := v.Decode(&f); err != nil {
+		return nil, newCUEError(err, filename)
+	}
+	return &File{
+		Module:              f.Module,
+		actualSchemaVersion: "v0.0.0",
+	}, nil
 }
 
 // ParseNonStrict is like Parse but allows some laxity in the parsing:
@@ -251,26 +261,28 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 	}
 	// TODO disallow non-data-mode CUE.
 
-	mf, err := moduleSchemaDo(func(ctx *cue.Context, schemas *schemaInfo) (*File, error) {
-		v := ctx.BuildFile(file)
-		if err := v.Validate(cue.Concrete(true)); err != nil {
-			return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file value")
-		}
-		// First determine the declared version of the module file.
-		var base baseFileVersion
-		if err := v.Decode(&base); err != nil {
-			return nil, errors.Wrapf(err, token.NoPos, "cannot determine language version")
-		}
-		if base.Language.Version == "" {
-			// TODO is something different we could do here?
-			return nil, fmt.Errorf("no language version declared in module.cue")
-		}
-		if !semver.IsValid(base.Language.Version) {
-			return nil, fmt.Errorf("language version %q in module.cue is not valid semantic version", base.Language.Version)
-		}
-		if mv, lv := base.Language.Version, cueversion.LanguageVersion(); semver.Compare(mv, lv) > 0 {
-			return nil, fmt.Errorf("language version %q declared in module.cue is too new for current language version %q", mv, lv)
-		}
+	// Unfortunate to need a new context, but see the note inside [moduleSchemaDo].
+	v := cuecontext.New().BuildFile(file)
+	if err := v.Validate(cue.Concrete(true)); err != nil {
+		return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file value")
+	}
+	// First determine the declared version of the module file.
+	var base baseFileVersion
+	if err := v.Decode(&base); err != nil {
+		return nil, errors.Wrapf(err, token.NoPos, "cannot determine language version")
+	}
+	if base.Language.Version == "" {
+		// TODO is something different we could do here?
+		return nil, fmt.Errorf("no language version declared in module.cue")
+	}
+	if !semver.IsValid(base.Language.Version) {
+		return nil, fmt.Errorf("language version %q in module.cue is not valid semantic version", base.Language.Version)
+	}
+	if mv, lv := base.Language.Version, cueversion.LanguageVersion(); semver.Compare(mv, lv) > 0 {
+		return nil, fmt.Errorf("language version %q declared in module.cue is too new for current language version %q", mv, lv)
+	}
+
+	mf, err := moduleSchemaDo(func(schemas *schemaInfo) (*File, error) {
 		// Now that we're happy we're within bounds, find the latest
 		// schema that applies to the declared version.
 		latest := ""

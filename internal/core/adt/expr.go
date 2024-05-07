@@ -1507,7 +1507,17 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 		cond := state.conditions() | allAncestorsProcessed | concreteKnown
 		state = combineMode(cond, runMode).withVertexStatus(state.vertexStatus())
 
-		expr := c.value(a, state)
+		// we can't use c.value here, as it attempts to retrieve the default values.
+		// if the argument is a disjunction, this would cause an incomplete error,
+		// despite the fact that it should be valid to call a function with an unresolved
+		// disjunction.
+		expr := c.evalState(a, state)
+		s := c.PushState(c.Env(0), a.Source())
+		if y, ok := c.getDefault(expr); ok {
+			expr = y
+		}
+		c.PopState(s)
+		expr = Unwrap(expr)
 
 		switch v := expr.(type) {
 		case nil:

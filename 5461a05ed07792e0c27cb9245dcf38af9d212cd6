@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "507d5f3e_49aa13dd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-07T10:20:04Z",
+      "side": 1,
+      "message": "PTAL\n\nremoved use of stderr \"str\" as it does not support CUE_UPDATE.",
+      "revId": "5461a05ed07792e0c27cb9245dcf38af9d212cd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

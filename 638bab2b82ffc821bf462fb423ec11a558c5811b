@@ -175,6 +175,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5975467c_e9e29314",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-07T10:20:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "836ed91c_9b4e8400",
+      "revId": "638bab2b82ffc821bf462fb423ec11a558c5811b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a15764e4_6a4a4eef",
@@ -188,6 +206,30 @@
       "writtenOn": "2024-05-03T10:40:24Z",
       "side": 1,
       "message": "it doesn\u0027t make sense for Parse to take envVar anymore; it\u0027s still used in an error message, but you could instead have Init wrap the error with envVar, like:\n\n    cannot parse CUE_DEBUG: unknown flag foobar\n\nrather than the current\n\n    unknown CUE_DEBUG foobar\n    \nthe cuecontext API can then also add its own wrapping, like:\n\n    cuecontext.DebugFlags: unknown flag foobar",
+      "range": {
+        "startLine": 29,
+        "startChar": 28,
+        "endLine": 29,
+        "endChar": 34
+      },
+      "revId": "638bab2b82ffc821bf462fb423ec11a558c5811b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e1bda80_509b86a1",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-07T10:20:04Z",
+      "side": 1,
+      "message": "Note that cuecontext.New() does not create an error. Right now the error is ignored. We could choose to either panic or ignore the errors.\n\nFor now, I\u0027ve changed the code to ignore missing features for now. Some alternatives:\n- make it panic unconditionally\n- add an argument to indicate whether to be strict or not\n- in the future add another option with a struct that has this failure behavior: this has the additional benefit that errors will be caught at compile time, not runtime.",
+      "parentUuid": "a15764e4_6a4a4eef",
       "range": {
         "startLine": 29,
         "startChar": 28,

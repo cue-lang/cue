@@ -43,7 +43,7 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 		y = y.Default()
 	}
 
-	if b, _ := y.BaseValue.(*adt.Bottom); b != nil {
+	if b := y.Bottom(); b != nil {
 		// If the value is incomplete, the error is not final. So either check
 		// structural equivalence or return an error.
 		return !b.IsIncomplete()
@@ -250,7 +250,7 @@ func (s *subsumer) verticesDev(x, y *adt.Vertex) bool {
 		y = y.Default()
 	}
 
-	if b, _ := y.BaseValue.(*adt.Bottom); b != nil {
+	if b := y.Bottom(); b != nil {
 		// If the value is incomplete, the error is not final. So either check
 		// structural equivalence or return an error.
 		return !b.IsIncomplete()

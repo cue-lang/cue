@@ -353,7 +353,7 @@ func (c *OpContext) unify(v *Vertex, flags combinedFlags) {
 		// completing all disjunctions.
 		if !n.done() {
 			if err := n.incompleteErrors(true); err != nil {
-				b, _ := n.node.BaseValue.(*Bottom)
+				b := n.node.Bottom()
 				if b != err {
 					err = CombineErrors(n.ctx.src, b, err)
 				}
@@ -459,7 +459,7 @@ func (n *nodeContext) doNotify() {
 	for _, rec := range n.notify {
 		v := rec.v
 		if v.state == nil {
-			if b, ok := v.BaseValue.(*Bottom); ok {
+			if b := v.Bottom(); b != nil {
 				v.BaseValue = CombineErrors(nil, b, n.errs)
 			} else {
 				v.BaseValue = n.errs
@@ -822,7 +822,7 @@ func (n *nodeContext) completeArcs(state vertexStatus) {
 					state = conjuncts
 				}
 
-				if err, _ := a.BaseValue.(*Bottom); err != nil {
+				if err := a.Bottom(); err != nil {
 					n.node.AddChildError(err)
 				}
 			}
@@ -848,7 +848,7 @@ func (n *nodeContext) completeArcs(state vertexStatus) {
 				// faulty CUE using this mechanism, though. At most error
 				// messages are a bit unintuitive. This may change once we have
 				// functionality to reflect on types.
-				if _, ok := n.node.BaseValue.(*Bottom); !ok {
+				if !n.node.IsErr() {
 					n.node.BaseValue = &StructMarker{}
 					n.kind = StructKind
 				}
@@ -920,6 +920,10 @@ var cycle = &Bottom{
 }
 
 func isCyclePlaceholder(v BaseValue) bool {
+	// TODO: do not mark cycle in BaseValue.
+	if a, _ := v.(*Vertex); a != nil {
+		v = a.DerefValue().BaseValue
+	}
 	return v == cycle
 }
 

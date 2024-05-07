@@ -3115,7 +3115,7 @@ func TestWalk(t *testing.T) {
 				case ListKind:
 					buf = append(buf, '[')
 				default:
-					if b, _ := v.v.BaseValue.(*adt.Bottom); b != nil {
+					if b := v.v.Bottom(); b != nil {
 						s := debugStr(v.ctx(), b)
 						buf = append(buf, fmt.Sprint(s, ",")...)
 						return true

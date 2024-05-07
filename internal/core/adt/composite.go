@@ -557,7 +557,7 @@ func (v *Vertex) IsUnprocessed() bool {
 
 func (v *Vertex) updateStatus(s vertexStatus) {
 	if !isCyclePlaceholder(v.BaseValue) {
-		if _, ok := v.BaseValue.(*Bottom); !ok && v.state != nil {
+		if !v.IsErr() && v.state != nil {
 			Assertf(v.state.ctx, v.status <= s+1, "attempt to regress status from %d to %d", v.Status(), s)
 		}
 	}
@@ -780,17 +780,26 @@ func toDataAll(ctx *OpContext, v BaseValue) BaseValue {
 // 	return v.Value == cycle
 // }
 
+// IsErr is a convenience function to check whether a Vertex represents an
+// error currently. It does not finalize the value, so it is possible that
+// v may become erroneous after this call.
 func (v *Vertex) IsErr() bool {
 	// if v.Status() > Evaluating {
-	if _, ok := v.BaseValue.(*Bottom); ok {
-		return true
-	}
-	// }
-	return false
+	return v.Bottom() != nil
 }
 
+// Err finalizes v, if it isn't yet, and returns an error if v evaluates to an
+// error or nil otherwise.
 func (v *Vertex) Err(c *OpContext) *Bottom {
 	v.Finalize(c)
+	return v.Bottom()
+}
+
+// Bottom reports whether v is currently erroneous It does not finalize the
+// value, so it is possible that v may become erroneous after this call.
+func (v *Vertex) Bottom() *Bottom {
+	// TODO: should we consider errors recorded in the state?
+	v = v.DerefValue()
 	if b, ok := v.BaseValue.(*Bottom); ok {
 		return b
 	}

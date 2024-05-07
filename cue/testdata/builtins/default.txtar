@@ -1,0 +1,91 @@
+-- in.cue --
+import (
+	"list"
+	"strings"
+	"text/template"
+)
+
+_B: *string | int
+
+Len: len(*[1, 2, 3] | 0)
+Close: close(*{} | 0)
+And: and([_B, _B])
+Or: or([_B, _B])
+Div: div(*5 | string, 2)
+Mod: mod(*5 | string, 2)
+Quo: quo(*5 | string, 2)
+Rem: rem(*5 | string, 2)
+-- out/compile --
+--- in.cue
+{
+  _B: (*string|int)
+  Len: len((*[
+    1,
+    2,
+    3,
+  ]|0))
+  Close: close((*{}|0))
+  And: and([
+    〈1;_B〉,
+    〈1;_B〉,
+  ])
+  Or: or([
+    〈1;_B〉,
+    〈1;_B〉,
+  ])
+  Div: div((*5|string), 2)
+  Mod: mod((*5|string), 2)
+  Quo: quo((*5|string), 2)
+  Rem: rem((*5|string), 2)
+}
+-- out/eval/stats --
+Leaks:  2
+Freed:  48
+Reused: 40
+Allocs: 10
+Retain: 2
+
+Unifications: 22
+Conjuncts:    62
+Disjuncts:    50
+-- out/eval --
+(struct){
+  _B: ((int|string)){ |(*(string){ string }, (int){ int }) }
+  Len: (int){ 3 }
+  Close: (struct){
+  }
+  And: ((int|string)){ |(*(string){ string }, (int){ int }) }
+  Or: ((int|string)){ |(*(string){ string }, (int){ int }) }
+  Div: (int){ 2 }
+  Mod: (int){ 1 }
+  Quo: (int){ 2 }
+  Rem: (int){ 1 }
+}
+-- out/evalalpha --
+(struct){
+  _B: ((int|string)){ |(*(string){ string }, (int){ int }) }
+  Len: (int){ 3 }
+  Close: (struct){
+  }
+  And: (string){ string }
+  Or: (string){ string }
+  Div: (int){ 2 }
+  Mod: (int){ 1 }
+  Quo: (int){ 2 }
+  Rem: (int){ 1 }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -3,8 +3,8 @@
+   Len: (int){ 3 }
+   Close: (struct){
+   }
+-  And: ((int|string)){ |(*(string){ string }, (int){ int }) }
+-  Or: ((int|string)){ |(*(string){ string }, (int){ int }) }
++  And: (string){ string }
++  Or: (string){ string }
+   Div: (int){ 2 }
+   Mod: (int){ 1 }
+   Quo: (int){ 2 }

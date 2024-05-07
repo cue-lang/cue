@@ -35,7 +35,7 @@ var lenBuiltin = &adt.Builtin{
 	Params: []adt.Param{{Value: &adt.BasicType{K: supportedByLen}}},
 	Result: adt.IntKind,
 	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
-		v := args[0]
+		v := c.Default(args[0])
 		if x, ok := v.(*adt.Vertex); ok {
 			x.LockArcs = true
 			switch x.BaseValue.(type) {
@@ -82,7 +82,8 @@ var closeBuiltin = &adt.Builtin{
 	Params: []adt.Param{structParam},
 	Result: adt.StructKind,
 	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
-		s, ok := args[0].(*adt.Vertex)
+		arg := c.Default(args[0])
+		s, ok := arg.(*adt.Vertex)
 		if !ok {
 			return c.NewErrf("struct argument must be concrete")
 		}
@@ -107,8 +108,8 @@ var andBuiltin = &adt.Builtin{
 			return &adt.Top{}
 		}
 		a := []adt.Value{}
-		for _, c := range list {
-			a = append(a, c)
+		for _, v := range list {
+			a = append(a, c.Default(v))
 		}
 		return &adt.Conjunction{Values: a}
 	},
@@ -120,8 +121,8 @@ var orBuiltin = &adt.Builtin{
 	Result: adt.IntKind,
 	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
 		d := []adt.Disjunct{}
-		for _, c := range c.RawElems(args[0]) {
-			d = append(d, adt.Disjunct{Val: c, Default: false})
+		for _, v := range c.RawElems(args[0]) {
+			d = append(d, adt.Disjunct{Val: c.Default(v), Default: false})
 		}
 		if len(d) == 0 {
 			// TODO(manifest): This should not be unconditionally incomplete,
@@ -195,8 +196,8 @@ var remBuiltin = &adt.Builtin{
 type intFunc func(c *adt.OpContext, x, y *adt.Num) adt.Value
 
 func intDivOp(c *adt.OpContext, fn intFunc, name string, args []adt.Value) adt.Value {
-	a := c.Num(args[0], name)
-	b := c.Num(args[1], name)
+	a := c.Num(c.Default(args[0]), name)
+	b := c.Num(c.Default(args[1]), name)
 
 	if c.HasErr() {
 		return nil

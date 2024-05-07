@@ -1,0 +1,16 @@
+# Check that default values are resolved correctly.
+
+exec cue eval -E --out cue
+cmp stdout out/wasm
+
+-- a.cue --
+@extern("wasm")
+package p
+
+add: _ @extern("basic.wasm", abi=c, sig="func(int64, int64): int64")
+
+x0: add(*1 | string, *2 | string)
+-- basic.wasm --
+-- out/wasm --
+add: add
+x0:  3

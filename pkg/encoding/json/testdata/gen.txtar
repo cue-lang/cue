@@ -11,6 +11,9 @@ validate: [string]: {
 validate: t1: schema: {b: string}
 validate: t2: schema: {a: <3}
 
+validate: disjunctionRequired: schema: {a!: int} | {b!: int}
+validate: disjunctionClosed: schema: close({a: int}) | close({b: int})
+
 // Issue #2395
 validate: enforceRequired: {
 	str: "{}"
@@ -93,9 +96,9 @@ validate.t2.result: error in call to encoding/json.Validate: invalid value 10 (o
     ./in.cue:9:27
     json.Validate:1:6
 unmarshal.trailingInvalid.#result: error in call to encoding/json.Unmarshal: json: invalid JSON:
-    ./in.cue:39:11
+    ./in.cue:42:11
 unmarshal.trailingValid.#result: error in call to encoding/json.Unmarshal: json: invalid JSON:
-    ./in.cue:39:11
+    ./in.cue:42:11
 
 Result:
 import "encoding/json"
@@ -114,6 +117,24 @@ validate: {
 			a: <3
 		}
 		result: _|_ // validate.t2.result: error in call to encoding/json.Validate: validate.t2.schema.a: invalid value 10 (out of bound <3)
+	}
+	disjunctionRequired: {
+		str: *"{\"a\":10}" | string
+		schema: {
+			a!: int
+		} | {
+			b!: int
+		}
+		result: json.Validate(str, schema)
+	}
+	disjunctionClosed: {
+		str: *"{\"a\":10}" | string
+		schema: {
+			a: int
+		} | {
+			b: int
+		}
+		result: json.Validate(str, schema)
 	}
 
 	// Issue #2395
@@ -251,7 +272,7 @@ unmarshalStream: {
 diff old new
 --- old
 +++ new
-@@ -75,23 +75,15 @@
+@@ -93,23 +93,15 @@
  }
  marshalStream: {
  	t1: {
@@ -284,7 +305,7 @@ diff old new
  		[{
  			a: 1
  		}, {
-@@ -99,11 +91,7 @@
+@@ -117,11 +109,7 @@
  		}]
  	}
  	t3: {
@@ -297,7 +318,7 @@ diff old new
  		[{
  			a: "\\ \" & < >"
  		}, {
-@@ -113,31 +101,27 @@
+@@ -131,31 +119,27 @@
  }
  marshal: {
  	t1: {
@@ -356,9 +377,9 @@ validate.t2.result: error in call to encoding/json.Validate: invalid value 10 (o
     ./in.cue:9:27
     json.Validate:1:6
 unmarshal.trailingInvalid.#result: error in call to encoding/json.Unmarshal: json: invalid JSON:
-    ./in.cue:39:11
+    ./in.cue:42:11
 unmarshal.trailingValid.#result: error in call to encoding/json.Unmarshal: json: invalid JSON:
-    ./in.cue:39:11
+    ./in.cue:42:11
 
 Result:
 import "encoding/json"
@@ -377,6 +398,24 @@ validate: {
 			a: <3
 		}
 		result: _|_ // validate.t2.result: error in call to encoding/json.Validate: validate.t2.schema.a: invalid value 10 (out of bound <3)
+	}
+	disjunctionRequired: {
+		str: *"{\"a\":10}" | string
+		schema: {
+			a!: int
+		} | {
+			b!: int
+		}
+		result: json.Validate(str, schema)
+	}
+	disjunctionClosed: {
+		str: *"{\"a\":10}" | string
+		schema: {
+			a: int
+		} | {
+			b: int
+		}
+		result: json.Validate(str, schema)
 	}
 
 	// Issue #2395

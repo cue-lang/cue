@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a013c88_1ab1aa7d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-07T13:53:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d5d7070b_7bd2bd63",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 4
+      },
+      "revId": "d7d7360abf3c1240bc45413646cf5d5dea2c10d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "67c6ad7d_b97f159c",
@@ -37,6 +61,24 @@
       "writtenOn": "2024-05-07T07:47:48Z",
       "side": 1,
       "message": "intuitively this seems backwards - a required field is definitely not optional. if the value/logic is right, perhaps rename aOpt to something more intuitive?",
+      "revId": "d7d7360abf3c1240bc45413646cf5d5dea2c10d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4f1736b_6147383a",
+        "filename": "internal/core/subsume/vertex.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-07T13:53:00Z",
+      "side": 1,
+      "message": "This evolved in the original code from when there wasn\u0027t required. They are both constraints. I\u0027ll change the name.",
+      "parentUuid": "67c6ad7d_b97f159c",
       "revId": "d7d7360abf3c1240bc45413646cf5d5dea2c10d5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -58,6 +100,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "14aac39e_48fd6a74",
+        "filename": "internal/core/subsume/vertex.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-07T13:53:00Z",
+      "side": 1,
+      "message": "Same here. Changed it to \"regular field is a constraint in subsumed value\"",
+      "parentUuid": "80f970aa_19c83f60",
+      "revId": "d7d7360abf3c1240bc45413646cf5d5dea2c10d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9ce7fdf2_332fe99f",
@@ -71,6 +131,24 @@
       "writtenOn": "2024-05-07T07:47:48Z",
       "side": 1,
       "message": "does this deserve a comment like the other inexact result?",
+      "revId": "d7d7360abf3c1240bc45413646cf5d5dea2c10d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "49fe0423_e393c5ed",
+        "filename": "internal/core/subsume/vertex.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-07T13:53:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ce7fdf2_332fe99f",
       "revId": "d7d7360abf3c1240bc45413646cf5d5dea2c10d5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -496,7 +496,7 @@ func (n *nodeContext) finalizeDisjunctions() {
 }
 
 func (n *nodeContext) getError() *Bottom {
-	if b, ok := n.node.BaseValue.(*Bottom); ok && !isCyclePlaceholder(b) {
+	if b := n.node.Bottom(); b != nil && !isCyclePlaceholder(b) {
 		return b
 	}
 	if n.node.ChildErrors != nil {

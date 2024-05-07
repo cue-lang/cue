@@ -49,10 +49,13 @@ func (c *CallCtxt) Do() bool {
 	return c.Err == nil
 }
 
+func (c *CallCtxt) Schema(i int) Schema {
+	return Schema(value.Make(c.ctx, c.args[i]))
+}
+
 func (c *CallCtxt) Value(i int) cue.Value {
 	v := value.Make(c.ctx, c.args[i])
-	// TODO: remove default
-	// v, _ = v.Default()
+	v, _ = v.Default()
 	if !v.IsConcrete() {
 		c.errcf(adt.IncompleteError, "non-concrete argument %d", i)
 	}
@@ -253,7 +256,7 @@ func (c *CallCtxt) Iter(i int) (a cue.Iterator) {
 }
 
 func (c *CallCtxt) getList(i int) *adt.Vertex {
-	x := c.args[i]
+	x := c.ctx.Default(c.args[i])
 	switch v, ok := x.(*adt.Vertex); {
 	case ok && v.IsList():
 		v.Finalize(c.ctx)
@@ -262,6 +265,7 @@ func (c *CallCtxt) getList(i int) *adt.Vertex {
 	case v != nil:
 		x = v.Value()
 	}
+
 	if x.Kind()&adt.ListKind == 0 {
 		var err error
 		if b, ok := x.(*adt.Bottom); ok {

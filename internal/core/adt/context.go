@@ -1403,3 +1403,14 @@ func (c *OpContext) NewList(values ...Value) *Vertex {
 	v.Finalize(c)
 	return v
 }
+
+// Default is used to get the default value of v.
+// It is used to process an argument for builtins.
+// To ensure that a Vertex has Conjuncts that are representative of
+// the chosen default, use the function adt.Default instead.
+func (c *OpContext) Default(v Value) Value {
+	if a, ok := c.getDefault(v); ok && v != nil {
+		v = a
+	}
+	return v
+}

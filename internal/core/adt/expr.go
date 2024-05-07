@@ -1519,8 +1519,7 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 		runMode := state.runMode()
 		cond := state.conditions() | allAncestorsProcessed | concreteKnown
 		state = combineMode(cond, runMode).withVertexStatus(state.vertexStatus())
-
-		expr := c.value(a, state)
+		expr := Unwrap(c.evalState(a, state))
 
 		switch v := expr.(type) {
 		case nil:

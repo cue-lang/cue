@@ -286,6 +286,30 @@
       },
       "revId": "638bab2b82ffc821bf462fb423ec11a558c5811b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8353c6d_b0506c13",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-07T11:09:00Z",
+      "side": 1,
+      "message": "\u003e Not sure if you realise, but I think you did the opposite - you panic only on missing feature errors, but ignore any other errors.\n\nI verified it in a test, this does what I intended: panic on invalid, but pass for unknown.\n\nEither way, I\u0027ve changed it to always panic.",
+      "parentUuid": "2ffeab1a_f19e9202",
+      "range": {
+        "startLine": 29,
+        "startChar": 28,
+        "endLine": 29,
+        "endChar": 34
+      },
+      "revId": "638bab2b82ffc821bf462fb423ec11a558c5811b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

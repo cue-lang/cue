@@ -1670,7 +1670,7 @@ func (p *parser) parseFile() *ast.File {
 	c := p.comments
 
 	// Don't bother parsing the rest if we had errors scanning the first
-	// Likely not a Go source file at all.
+	// Likely not a CUE source file at all.
 	if p.errors != nil {
 		return nil
 	}

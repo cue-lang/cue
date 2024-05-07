@@ -58,7 +58,7 @@ import (
 
 const (
 	// MaxZipFile is the maximum size in bytes of a module zip file. The
-	// go command will report an error if either the zip file or its extracted
+	// cue command will report an error if either the zip file or its extracted
 	// content is larger than this.
 	MaxZipFile = 500 << 20
 

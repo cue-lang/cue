@@ -84,9 +84,7 @@ func TestEvalAlpha(t *testing.T) {
 		Sharing: true,
 	}
 
-	var todoAlpha = map[string]string{
-		"benchmarks/issue2176": "too many errors",
-	}
+	var todoAlpha = map[string]string{}
 
 	test := cuetxtar.TxTarTest{
 		Root:     "../../../cue/testdata",

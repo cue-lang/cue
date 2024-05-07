@@ -919,6 +919,19 @@ func (x *LetReference) resolve(ctx *OpContext, state combinedFlags) *Vertex {
 	// any other context.
 	c := arc.Conjuncts[0]
 	expr := c.Expr()
+
+	// Unwrap the ConjunctGroup
+	if ctx.isDevVersion() {
+		for {
+			g, ok := expr.(*ConjunctGroup)
+			if !ok {
+				break
+			}
+			// A let field always has a single expression.
+			expr = (*g)[0].Expr()
+		}
+	}
+
 	key := cacheKey{expr, arc}
 	v, ok := e.cache[key]
 	if !ok {

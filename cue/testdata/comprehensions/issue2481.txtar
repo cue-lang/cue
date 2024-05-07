@@ -106,10 +106,9 @@ Result:
     c: (string){ "foo" }
   }
   full: (struct){
-    out: (_|_){
-      // [incomplete] full.out: non-concrete value _ in operand to !=:
-      //     ./in.cue:54:8
+    out: (struct){
       let val#2multi = &[&[&[&[&[&[&[〈4;values〉[〈2;k〉]]]]]]]]
+      role: (string){ "member" }
     }
     #github_team_membership: (#struct){
       team_id: (string){ string }
@@ -134,20 +133,15 @@ diff old new
    }
    keys: (#list){
      0: (string){ "a" }
-@@ -23,9 +23,10 @@
-     c: (string){ "foo" }
+@@ -24,7 +24,7 @@
    }
    full: (struct){
--    out: (struct){
+     out: (struct){
 -      let val#2multi = 〈4;values〉[〈2;k〉]
--      role: (string){ "member" }
-+    out: (_|_){
-+      // [incomplete] full.out: non-concrete value _ in operand to !=:
-+      //     ./in.cue:54:8
 +      let val#2multi = &[&[&[&[&[&[&[〈4;values〉[〈2;k〉]]]]]]]]
+       role: (string){ "member" }
      }
      #github_team_membership: (#struct){
-       team_id: (string){ string }
 -- diff/explanation --
 Conjunct groups in let output.
 -- out/eval --

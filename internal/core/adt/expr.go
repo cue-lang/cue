@@ -919,6 +919,20 @@ func (x *LetReference) resolve(ctx *OpContext, state combinedFlags) *Vertex {
 	// any other context.
 	c := arc.Conjuncts[0]
 	expr := c.Expr()
+
+	// Unwrap the ConjunctGroup
+	if ctx.isDevVersion() {
+		for {
+			g, ok := expr.(*ConjunctGroup)
+			if !ok {
+				break
+			}
+			// A let field always has a single expression.
+			ctx.Assertf(pos(expr), len(*g) == 1, "unexpected number of expressions")
+			expr = (*g)[0].Expr()
+		}
+	}
+
 	key := cacheKey{expr, arc}
 	v, ok := e.cache[key]
 	if !ok {
@@ -991,6 +1005,10 @@ func (x *SelectorExpr) resolve(c *OpContext, state combinedFlags) *Vertex {
 	// This may especially result in incorrect results when using embedded
 	// scalars.
 	// In the new evaluator, evaluation of the node is done in lookup.
+	// TODO:
+	// - attempt: if we ensure that errors are propagated in pending arcs.
+	// - require: if we want to ensure that all arcs
+	//  are known now.
 	n := c.node(x, x.X, x.Sel.IsRegular(), attempt(partial, needFieldSetKnown))
 	if n == emptyNode {
 		return n
@@ -1645,7 +1663,7 @@ func (x *Builtin) call(c *OpContext, p token.Pos, validate bool, args []Value) E
 			x := &BinaryExpr{Op: AndOp, X: v, Y: a}
 			n := c.newInlineVertex(nil, nil, Conjunct{env, x, c.ci})
 			n.Finalize(c)
-			if _, ok := n.BaseValue.(*Bottom); ok {
+			if n.IsErr() {
 				c.addErrf(0, pos(a),
 					"cannot use %s as %s in argument %d to %v",
 					a, v, i+1, fun)

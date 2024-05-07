@@ -38,11 +38,10 @@ import (
 )
 
 type loader struct {
-	cfg      *Config
-	tagger   *tagger
-	stk      importStack
-	loadFunc build.LoadFunc
-	pkgs     *modpkgload.Packages
+	cfg    *Config
+	tagger *tagger
+	stk    importStack
+	pkgs   *modpkgload.Packages
 
 	// When we descend into subdirectories to load patterns such as ./...
 	// we often end up loading parent directories many times over; cache that work by directory.
@@ -67,19 +66,13 @@ type (
 )
 
 func newLoader(c *Config, tg *tagger, pkgs *modpkgload.Packages) *loader {
-	l := &loader{
+	return &loader{
 		cfg:                   c,
 		tagger:                tg,
 		pkgs:                  pkgs,
 		dirCachedBuildFiles:   map[string]cachedFileFiles{},
 		fileCachedSyntaxFiles: map[string]cachedSyntaxFiles{},
 	}
-	l.loadFunc = l._loadFunc
-	return l
-}
-
-func (l *loader) buildLoadFunc() build.LoadFunc {
-	return l.loadFunc
 }
 
 func (l *loader) abs(filename string) string {

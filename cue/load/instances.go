@@ -83,7 +83,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 
 	if c.Context == nil {
 		c.Context = build.NewContext(
-			build.Loader(l.buildLoadFunc()),
+			build.Loader(l.loadFunc),
 			build.ParseFile(c.ParseFile),
 		)
 	}

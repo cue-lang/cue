@@ -235,8 +235,7 @@ func (l *loader) scanDir(dir string) cachedFileFiles {
 	return sd
 }
 
-// _loadFunc is the method used for the value of l.loadFunc.
-func (l *loader) _loadFunc(pos token.Pos, path string) *build.Instance {
+func (l *loader) loadFunc(pos token.Pos, path string) *build.Instance {
 	impPath := importPath(path)
 	if isLocalImport(path) {
 		return l.cfg.newErrInstance(errors.Newf(pos, "relative import paths not allowed (%q)", path))

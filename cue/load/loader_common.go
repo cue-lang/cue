@@ -466,13 +466,13 @@ func cleanPatterns(patterns []string) []string {
 			a = strings.Replace(a, `\`, `/`, -1)
 		}
 
-		// Put argument in canonical form, but preserve leading ./.
+		// Put argument in canonical form, but preserve leading "./".
 		if strings.HasPrefix(a, "./") {
 			a = "./" + pathpkg.Clean(a)
 			if a == "./." {
 				a = "."
 			}
-		} else {
+		} else if a != "" {
 			a = pathpkg.Clean(a)
 		}
 		out = append(out, a)

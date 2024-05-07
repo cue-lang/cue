@@ -84,10 +84,11 @@ func UnmarshalStream(data []byte) (ast.Expr, error) {
 	return ast.NewList(a...), nil
 }
 
-// Validate validates YAML and confirms it is an instance of the schema
-// specified by v. If the YAML source is a stream, every object must match v.
-func Validate(b []byte, v cue.Value) (bool, error) {
+// Validate validates YAML and confirms it is an instance of schema.
+// If the YAML source is a stream, every object must match v.
+func Validate(b []byte, schema pkg.Schema) (bool, error) {
 	d := cueyaml.NewDecoder("yaml.Validate", b)
+	v := schema.Value()
 	r := v.Context()
 	for {
 		expr, err := d.Decode()
@@ -132,8 +133,9 @@ func Validate(b []byte, v cue.Value) (bool, error) {
 // specified by v using unification. This means that b must be consistent with,
 // but does not have to be an instance of v. If the YAML source is a stream,
 // every object must match v.
-func ValidatePartial(b []byte, v cue.Value) (bool, error) {
+func ValidatePartial(b []byte, schema pkg.Schema) (bool, error) {
 	d := cueyaml.NewDecoder("yaml.ValidatePartial", b)
+	v := schema.Value()
 	r := v.Context()
 	for {
 		expr, err := d.Decode()

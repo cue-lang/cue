@@ -21,6 +21,8 @@ import (
 
 // A Schema represents an arbitrary cue.Value that can hold non-concrete values.
 // By default function arguments are checked to be concrete.
+//
+// TODO(mvdan,mpvl): consider using type Schema = cue.Value.
 type Schema cue.Value
 
 func (s Schema) Value() cue.Value {

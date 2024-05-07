@@ -81,7 +81,7 @@ var closeBuiltin = &adt.Builtin{
 	Name:   "close",
 	Params: []adt.Param{structParam},
 	Result: adt.StructKind,
-	// Noncrete: true, // TODO: should probably be noncrete
+	// NonConcrete: true, // TODO: should probably be noncrete
 	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
 		s, ok := args[0].(*adt.Vertex)
 		if !ok {

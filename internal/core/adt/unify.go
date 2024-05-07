@@ -519,6 +519,7 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 		// Errors are allowed in let fields. Handle errors and failure to
 		// complete accordingly.
 		if !a.Label.IsLet() && a.ArcType <= ArcRequired {
+			a := a.DerefValue()
 			if err, _ := a.BaseValue.(*Bottom); err != nil {
 				n.node.AddChildError(err)
 			}

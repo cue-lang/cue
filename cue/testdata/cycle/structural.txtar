@@ -646,6 +646,8 @@ d3.config.0: structural cycle:
     ./in.cue:315:13
 d3.x.0: structural cycle:
     ./in.cue:315:13
+withLetFail._schema_1: structural cycle:
+    ./in.cue:360:17
 e4.a.0.0: cannot combine regular field "c" with [1,{c:1} & (a|{}) & [{c:1}]]:
     ./in.cue:399:11
 e4.a.0.0.0: cannot combine regular field "c" with [1,{c:1}]:
@@ -1040,21 +1042,29 @@ Result:
         }
       }
     }
-    a: (#struct){
-      a: (#struct){
-        one: (#struct){
-          link: (#struct){
-            a: (#struct){
-              two: (#struct){
+    a: (_|_){
+      // [structural cycle]
+      a: (_|_){
+        // [structural cycle]
+        one: (_|_){
+          // [structural cycle]
+          link: (_|_){
+            // [structural cycle]
+            a: (_|_){
+              // [structural cycle]
+              two: (_|_){
+                // [structural cycle]
                 link: ~(p2.#T)
               }
-              b: (#struct){
+              b: (_|_){
+                // [structural cycle]
                 link: ~(p2.#T)
               }
             }
           }
         }
-        b: (#struct){
+        b: (_|_){
+          // [structural cycle]
           link: ~(p2.#T)
         }
       }
@@ -1131,12 +1141,18 @@ Result:
         }
       }
     }
-    a: (#struct){
-      a: (#list){
-        0: (#struct){
-          link: (#struct){
-            a: (#list){
-              0: (#struct){
+    a: (_|_){
+      // [structural cycle]
+      a: (_|_){
+        // [structural cycle]
+        0: (_|_){
+          // [structural cycle]
+          link: (_|_){
+            // [structural cycle]
+            a: (_|_){
+              // [structural cycle]
+              0: (_|_){
+                // [structural cycle]
                 link: ~(p5.#T)
               }
             }
@@ -1193,10 +1209,14 @@ Result:
   }
   d1: (_|_){
     // [structural cycle]
-    a: (struct){
-      b: (struct){
-        c: (struct){
-          d: (struct){
+    a: (_|_){
+      // [structural cycle]
+      b: (_|_){
+        // [structural cycle]
+        c: (_|_){
+          // [structural cycle]
+          d: (_|_){
+            // [structural cycle]
             h: (int){ int }
             t: (_|_){
               // [structural cycle] d1.r: structural cycle
@@ -1208,13 +1228,8 @@ Result:
     r: (_|_){
       // [structural cycle] d1.r: structural cycle
     }
-    x: (struct){
-      d: (struct){
-        h: (int){ int }
-        t: (_|_){
-          // [structural cycle] d1.r: structural cycle
-        }
-      }
+    x: (_|_){
+      // [structural cycle] d1.r: structural cycle
     }
   }
   d2: (struct){
@@ -1236,8 +1251,10 @@ Result:
     // [structural cycle]
     config: (_|_){
       // [structural cycle]
-      a: (struct){
-        b: (struct){
+      a: (_|_){
+        // [structural cycle]
+        b: (_|_){
+          // [structural cycle]
           c: (_|_){
             // [structural cycle] d3.config.0: structural cycle:
             //     ./in.cue:315:13
@@ -1253,8 +1270,10 @@ Result:
     x: (_|_){
       // [structural cycle]
       i: (int){ 0 }
-      a: (struct){
-        b: (struct){
+      a: (_|_){
+        // [structural cycle]
+        b: (_|_){
+          // [structural cycle]
           c: (_|_){
             // [structural cycle] d3.x.0: structural cycle:
             //     ./in.cue:315:13
@@ -1315,8 +1334,10 @@ Result:
       }
     }
   }
-  withLetFail: (struct){
-    schema: (struct){
+  withLetFail: (_|_){
+    // [structural cycle]
+    schema: (_|_){
+      // [structural cycle]
       next: (_|_){
         // [structural cycle] withLetFail._schema_1: structural cycle:
         //     ./in.cue:360:17
@@ -1599,7 +1620,8 @@ Result:
     }
     z: (_|_){
       // [structural cycle]
-      f: (struct){
+      f: (_|_){
+        // [structural cycle]
         h: ~(z1.z.g)
       }
       g: (_|_){
@@ -1803,7 +1825,7 @@ diff old new
  e1.a.c: structural cycle
  e1.b.c: structural cycle
  e2.a.c: structural cycle
-@@ -32,61 +36,79 @@
+@@ -32,61 +36,81 @@
      ./in.cue:393:5
      ./in.cue:394:5
  e3.b.c: structural cycle
@@ -1895,6 +1917,8 @@ diff old new
 +    ./in.cue:315:13
 +d3.x.0: structural cycle:
 +    ./in.cue:315:13
++withLetFail._schema_1: structural cycle:
++    ./in.cue:360:17
 +e4.a.0.0: cannot combine regular field "c" with [1,{c:1} & (a|{}) & [{c:1}]]:
 +    ./in.cue:399:11
 +e4.a.0.0.0: cannot combine regular field "c" with [1,{c:1}]:
@@ -1910,7 +1934,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -168,11 +190,17 @@
+@@ -168,11 +192,17 @@
      }
    }
    b4: (_|_){
@@ -1933,7 +1957,7 @@ diff old new
        }
      }
      x: (_|_){
-@@ -240,10 +268,9 @@
+@@ -240,10 +270,9 @@
          // [eval]
          0: (_|_){
            // [eval] b6.b.a.0: conflicting values 1 and [1] (mismatched types int and list):
@@ -1945,7 +1969,7 @@ diff old new
            0: (_|_){
              // [structural cycle] b6.b.a.0.0: structural cycle
            }
-@@ -261,11 +288,20 @@
+@@ -261,11 +290,20 @@
      }
    }
    b7: (_|_){
@@ -1971,7 +1995,7 @@ diff old new
        }
      }
      a: (_|_){
-@@ -304,7 +340,7 @@
+@@ -304,7 +342,7 @@
      #ref: (#struct){
        ref: (string){ string }
      }
@@ -1980,7 +2004,7 @@ diff old new
          c: (#list){
            0: ((string|struct)){ |((string){ string }, (#struct){
                ref: (string){ string }
-@@ -327,7 +363,9 @@
+@@ -327,7 +365,9 @@
          }) }
      }
      c: (#struct){
@@ -1991,7 +2015,7 @@ diff old new
      }
      d: (struct){
        d: (struct){
-@@ -372,7 +410,7 @@
+@@ -372,7 +412,7 @@
        // [structural cycle] b12b.#list.tail: structural cycle
      }
      list1: (_|_){
@@ -2000,12 +2024,10 @@ diff old new
      }
    }
    b13: (_|_){
-@@ -453,22 +491,28 @@
-         }
-       }
+@@ -455,20 +495,34 @@
      }
--    a: (_|_){
--      // [structural cycle]
+     a: (_|_){
+       // [structural cycle]
 -      a: (struct){
 -        one: (struct){
 -          link: (struct){
@@ -2014,21 +2036,27 @@ diff old new
 -              }
 -            }
 -          }
-+    a: (#struct){
-+      a: (#struct){
-+        one: (#struct){
-+          link: (#struct){
-+            a: (#struct){
-+              two: (#struct){
++      a: (_|_){
++        // [structural cycle]
++        one: (_|_){
++          // [structural cycle]
++          link: (_|_){
++            // [structural cycle]
++            a: (_|_){
++              // [structural cycle]
++              two: (_|_){
++                // [structural cycle]
 +                link: ~(p2.#T)
 +              }
-+              b: (#struct){
++              b: (_|_){
++                // [structural cycle]
 +                link: ~(p2.#T)
 +              }
 +            }
 +          }
 +        }
-+        b: (#struct){
++        b: (_|_){
++          // [structural cycle]
 +          link: ~(p2.#T)
          }
        }
@@ -2040,7 +2068,7 @@ diff old new
      #S: (#struct){
        #T: (#struct){
          a: (#struct){
-@@ -491,7 +535,15 @@
+@@ -491,7 +545,15 @@
        }
      }
      a: (_|_){
@@ -2057,28 +2085,30 @@ diff old new
      }
    }
    p4: (struct){
-@@ -530,13 +582,13 @@
-         }
-       }
+@@ -532,11 +594,17 @@
      }
--    a: (_|_){
--      // [structural cycle]
+     a: (_|_){
+       // [structural cycle]
 -      a: (#list){
 -        0: (struct){
 -          link: (struct){
 -            a: (#list){
 -              0: (struct){
-+    a: (#struct){
-+      a: (#list){
-+        0: (#struct){
-+          link: (#struct){
-+            a: (#list){
-+              0: (#struct){
++      a: (_|_){
++        // [structural cycle]
++        0: (_|_){
++          // [structural cycle]
++          link: (_|_){
++            // [structural cycle]
++            a: (_|_){
++              // [structural cycle]
++              0: (_|_){
++                // [structural cycle]
 +                link: ~(p5.#T)
                }
              }
            }
-@@ -545,7 +597,7 @@
+@@ -545,7 +613,7 @@
      }
    }
    p6: (_|_){
@@ -2087,7 +2117,7 @@ diff old new
      #S: (#struct){
        #T: (#struct){
          a: (list){
-@@ -568,7 +620,15 @@
+@@ -568,7 +636,15 @@
        }
      }
      a: (_|_){
@@ -2104,7 +2134,7 @@ diff old new
      }
    }
    c1: (_|_){
-@@ -578,77 +638,47 @@
+@@ -578,12 +654,7 @@
        b: (struct){
        }
        c: (_|_){
@@ -2118,18 +2148,10 @@ diff old new
        }
      }
    }
-   d1: (_|_){
-     // [structural cycle]
--    a: (_|_){
--      // [structural cycle]
--      b: (_|_){
--        // [structural cycle]
--        c: (_|_){
--          // [structural cycle]
--          d: (_|_){
--            // [structural cycle]
--            h: (int){ int }
--            t: (_|_){
+@@ -599,56 +670,30 @@
+             // [structural cycle]
+             h: (int){ int }
+             t: (_|_){
 -              // [structural cycle] d1.a.b.c.d.t: structural cycle
 -            }
 -          }
@@ -2150,25 +2172,8 @@ diff old new
 -      // [structural cycle]
 -      d: (_|_){
 -        // [structural cycle]
-+    a: (struct){
-+      b: (struct){
-+        c: (struct){
-+          d: (struct){
-+            h: (int){ int }
-+            t: (_|_){
-+              // [structural cycle] d1.r: structural cycle
-+            }
-+          }
-+        }
-+      }
-+    }
-+    r: (_|_){
-+      // [structural cycle] d1.r: structural cycle
-+    }
-+    x: (struct){
-+      d: (struct){
-         h: (int){ int }
-         t: (_|_){
+-        h: (int){ int }
+-        t: (_|_){
 -          // [structural cycle]
 -        }
 -      }
@@ -2197,9 +2202,17 @@ diff old new
 -              // [structural cycle] d2.a.b.c.d.t: structural cycle
 -            }
 -          }
-+          // [structural cycle] d1.r: structural cycle
++              // [structural cycle] d1.r: structural cycle
++            }
++          }
 +        }
 +      }
++    }
++    r: (_|_){
++      // [structural cycle] d1.r: structural cycle
++    }
++    x: (_|_){
++      // [structural cycle] d1.r: structural cycle
 +    }
 +  }
 +  d2: (struct){
@@ -2216,7 +2229,7 @@ diff old new
          }
        }
      }
-@@ -655,31 +685,37 @@
+@@ -655,31 +700,41 @@
    }
    d3: (_|_){
      // [structural cycle]
@@ -2229,8 +2242,10 @@ diff old new
 -      indirect: (null){ null }
 +    config: (_|_){
 +      // [structural cycle]
-+      a: (struct){
-+        b: (struct){
++      a: (_|_){
++        // [structural cycle]
++        b: (_|_){
++          // [structural cycle]
 +          c: (_|_){
 +            // [structural cycle] d3.config.0: structural cycle:
 +            //     ./in.cue:315:13
@@ -2259,8 +2274,10 @@ diff old new
 -        //     ./in.cue:314:12
 -      }
        i: (int){ 0 }
-+      a: (struct){
-+        b: (struct){
++      a: (_|_){
++        // [structural cycle]
++        b: (_|_){
++          // [structural cycle]
 +          c: (_|_){
 +            // [structural cycle] d3.x.0: structural cycle:
 +            //     ./in.cue:315:13
@@ -2274,7 +2291,7 @@ diff old new
      }
    }
    shortPathFail: (_|_){
-@@ -696,9 +732,7 @@
+@@ -696,9 +751,7 @@
        // [structural cycle]
        t1: (struct){
          #Foo: (#struct){
@@ -2285,7 +2302,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -706,10 +740,7 @@
+@@ -706,10 +759,7 @@
          Foo: (_|_){
            // [structural cycle]
            ref: (_|_){
@@ -2297,16 +2314,9 @@ diff old new
            }
          }
        }
-@@ -735,12 +766,11 @@
-       }
-     }
-   }
--  withLetFail: (_|_){
--    // [structural cycle]
--    schema: (_|_){
--      // [structural cycle]
-+  withLetFail: (struct){
-+    schema: (struct){
+@@ -740,7 +790,8 @@
+     schema: (_|_){
+       // [structural cycle]
        next: (_|_){
 -        // [structural cycle] withLetFail.schema.next: structural cycle
 +        // [structural cycle] withLetFail._schema_1: structural cycle:
@@ -2314,7 +2324,7 @@ diff old new
        }
      }
      let _schema_1#1 = (_|_){
-@@ -801,11 +831,12 @@
+@@ -801,11 +852,12 @@
        // [eval] e3.a: conflicting values [a] and {c:a} (mismatched types list and struct):
        //     ./in.cue:390:5
        //     ./in.cue:391:5
@@ -2332,7 +2342,7 @@ diff old new
        }
      }
      b: (_|_){
-@@ -812,11 +843,12 @@
+@@ -812,11 +864,12 @@
        // [eval] e3.b: conflicting values [b] and {c:b} (mismatched types list and struct):
        //     ./in.cue:393:5
        //     ./in.cue:394:5
@@ -2350,7 +2360,7 @@ diff old new
        }
      }
    }
-@@ -825,41 +857,51 @@
+@@ -825,41 +878,51 @@
      a: (_|_){
        // [eval]
        0: (_|_){
@@ -2433,7 +2443,7 @@ diff old new
        }
      }
    }
-@@ -882,19 +924,14 @@
+@@ -882,19 +945,14 @@
        y: (_|_){
          // [eval]
          0: (_|_){
@@ -2456,7 +2466,7 @@ diff old new
          }
          1: (int){ 1 }
        }
-@@ -904,19 +941,14 @@
+@@ -904,19 +962,14 @@
        y: (_|_){
          // [eval]
          0: (_|_){
@@ -2479,21 +2489,18 @@ diff old new
          }
          1: (int){ 1 }
        }
-@@ -1018,11 +1050,8 @@
-     }
-     z: (_|_){
+@@ -1020,9 +1073,7 @@
        // [structural cycle]
--      f: (_|_){
--        // [structural cycle]
+       f: (_|_){
+         // [structural cycle]
 -        h: (_|_){
 -          // [structural cycle] z1.z.f.h: structural cycle
 -        }
-+      f: (struct){
 +        h: ~(z1.z.g)
        }
        g: (_|_){
          // [structural cycle]
-@@ -1169,19 +1198,19 @@
+@@ -1169,19 +1220,19 @@
      }
    }
    n4: (struct){
@@ -2533,9 +2540,6 @@ Reducer:
 TODO(share): fix the following bug once we have structure sharing.
 d3.config: should structural cycle be reported?
 p3.a.a: field not allowed incorrect?
-p2.a.a.one.link.a.two.link: error not propagated up. Could be a structure
-   sharing artifact, though, in which case it is probably okay.
-withLetFail: structural cycle is not propagated up.
 -- diff/todo/p3 --
 n4: Reordering.
 b12b: reported at correct level, but investigate if it is not processing

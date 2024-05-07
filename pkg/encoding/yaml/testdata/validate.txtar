@@ -1,0 +1,12 @@
+-- in.cue --
+import "encoding/yaml"
+
+t1: yaml.Validate("a: 2", {a!: int} | {b!: int})
+-- out/yaml --
+import "encoding/yaml"
+
+t1: yaml.Validate("a: 2", {
+	a!: int
+} | {
+	b!: int
+})

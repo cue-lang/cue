@@ -2,11 +2,28 @@
 import "encoding/yaml"
 
 t1: yaml.Validate("a: 2", {a!: int} | {b!: int})
+-- out/yaml-v3 --
+t1: true
+-- diff/-out/yaml-v3<==>+out/yaml --
+diff old new
+--- old
++++ new
+@@ -1,6 +1,1 @@
+-Errors:
+-t1: error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b:int}:
+-    ./in.cue:3:5
+-
+-Result:
+-t1: _|_ // t1: error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b:int}
++t1: true
+-- diff/explanation --
+t1: The incomplete value error in the old evaluator was incorrect - the presence of
+required fields in each disjunct provides enough information to resolve the disjunction,
+and the new evaluator correctly identifies this.
 -- out/yaml --
-import "encoding/yaml"
+Errors:
+t1: error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b:int}:
+    ./in.cue:3:5
 
-t1: yaml.Validate("a: 2", {
-	a!: int
-} | {
-	b!: int
-})
+Result:
+t1: _|_ // t1: error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b:int}

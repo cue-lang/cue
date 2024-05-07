@@ -15,6 +15,7 @@
 package pkg
 
 import (
+	"cuelang.org/go/cue"
 	"cuelang.org/go/internal/core/adt"
 )
 
@@ -82,3 +83,11 @@ type ValidationError struct {
 }
 
 func (v ValidationError) Error() string { return v.B.Err.Error() }
+
+// A Schema represents a cue.Value that is not necessarily concrete.
+// If it's a disjunction, its default values may be unresolved.
+type Schema cue.Value
+
+func (s Schema) Value() cue.Value {
+	return cue.Value(s)
+}

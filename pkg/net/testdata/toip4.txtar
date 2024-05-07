@@ -1,0 +1,22 @@
+-- in.cue --
+import "net"
+
+fail: {
+    [string]: net.ToIP4
+    t1: net.ToIP4(1 | 2)
+    t2: net.ToIP4(string)
+}
+
+ok: {
+    t1: net.ToIP4(*"4.4.4.4" | "8.8.8.8")
+}
+-- out/net --
+import "net"
+
+fail: {
+	t1: net.ToIP4(1 | 2) & net.ToIP4
+	t2: net.ToIP4(string) & net.ToIP4
+}
+ok: {
+	t1: [4, 4, 4, 4]
+}

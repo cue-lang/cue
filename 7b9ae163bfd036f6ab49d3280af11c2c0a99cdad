@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58d39d77_1066ab4c",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 785,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-07T16:07:54Z",
+      "side": 1,
+      "message": "should this not be `v.Err() !\u003d nil`? now that you\u0027re adding Bottom as a method, which seems extremely similar to Err but not identical, at the very least we want to document how they are different and perhaps why they both need to exist.",
+      "revId": "7b9ae163bfd036f6ab49d3280af11c2c0a99cdad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

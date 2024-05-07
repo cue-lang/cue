@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8644d70_5c6d8883",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-07T12:08:12Z",
+      "side": 1,
+      "message": "note to self: test `cue export \"\"`, i.e. a single empty argument, which should fail.",
+      "revId": "c24ef70b0942199834066f8a87fa5108d029bc72",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

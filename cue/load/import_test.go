@@ -22,7 +22,6 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue/build"
-	"cuelang.org/go/cue/token"
 )
 
 func testdata(elems ...string) string {
@@ -34,27 +33,18 @@ func getInst(pkg, cwd string) (*build.Instance, error) {
 	// all the way to the root of the git repository, causing Go's test caching
 	// to never kick in, as the .git directory almost always changes.
 	// Moreover, it's extra work that isn't useful to the tests.
-	c, err := (&Config{ModuleRoot: ".", Dir: cwd}).complete()
-	if err != nil {
-		return nil, fmt.Errorf("unexpected error on Config.complete: %v", err)
+	insts := Instances([]string{pkg}, &Config{ModuleRoot: ".", Dir: cwd})
+	if len(insts) != 1 {
+		return nil, fmt.Errorf("expected one instance, got %d", len(insts))
 	}
-	l := newLoader(c, nil, nil)
-	inst := l.newRelInstance(token.NoPos, pkg, c.Package)
-	p := l.importPkg(token.NoPos, inst)[0]
-	return p, p.Err
+	inst := insts[0]
+	return inst, inst.Err
 }
 
 func TestEmptyImport(t *testing.T) {
-	c, err := (&Config{
-		ModuleRoot: ".",
-	}).complete()
-	if err != nil {
-		t.Fatal(err)
-	}
-	l := newLoader(c, nil, nil)
-	inst := l.newInstance(token.NoPos, "")
-	p := l.importPkg(token.NoPos, inst)[0]
-	if p.Err == nil {
+	path := testdata("testmod", "hello")
+	p, err := getInst("", path)
+	if err == nil {
 		t.Fatal(`Import("") returned nil error.`)
 	}
 	if p == nil {

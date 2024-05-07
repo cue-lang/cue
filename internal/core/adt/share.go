@@ -154,10 +154,12 @@ func (v *Vertex) DerefNonDisjunct() *Vertex {
 }
 
 // DerefNonRooted indirects a node that points to a value that is not rooted.
+// This includes structure-shared nodes that point to a let field: let fields
+// may or may not be part of a struct, and thus should be treated as non-rooted.
 func (v *Vertex) DerefNonRooted() *Vertex {
 	for {
 		arc, ok := v.BaseValue.(*Vertex)
-		if !ok || arc.IsDisjunct || v.IsShared {
+		if !ok || arc.IsDisjunct || (v.IsShared && !arc.Label.IsLet()) {
 			return v
 		}
 		v = arc

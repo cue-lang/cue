@@ -721,21 +721,29 @@ Result:
     }
     issue1503: (_|_){
       // [structural cycle]
-      a: (#struct){
-        a: (#struct){
-          one: (#struct){
-            link: (#struct){
-              a: (#struct){
-                two: (#struct){
+      a: (_|_){
+        // [structural cycle]
+        a: (_|_){
+          // [structural cycle]
+          one: (_|_){
+            // [structural cycle]
+            link: (_|_){
+              // [structural cycle]
+              a: (_|_){
+                // [structural cycle]
+                two: (_|_){
+                  // [structural cycle]
                   link: ~(selfTriggerCycle.issue1503.#T)
                 }
-                b: (#struct){
+                b: (_|_){
+                  // [structural cycle]
                   link: ~(selfTriggerCycle.issue1503.#T)
                 }
               }
             }
           }
-          b: (#struct){
+          b: (_|_){
+            // [structural cycle]
             link: ~(selfTriggerCycle.issue1503.#T)
           }
         }
@@ -827,44 +835,40 @@ diff old new
        #T: (_|_){
          // [structural cycle]
          b: (_|_){
-@@ -280,25 +275,22 @@
-     }
-     issue1503: (_|_){
-       // [structural cycle]
--      a: (_|_){
--        // [structural cycle]
--        a: (_|_){
--          // [structural cycle]
+@@ -284,21 +279,26 @@
+         // [structural cycle]
+         a: (_|_){
+           // [structural cycle]
 -          b: (_|_){
 -            // [structural cycle]
 -            link: (_|_){
 -              // [structural cycle]
 -            }
 -          }
--          one: (_|_){
--            // [structural cycle]
--            link: (_|_){
--              // [structural cycle]
+           one: (_|_){
+             // [structural cycle]
+             link: (_|_){
+               // [structural cycle]
 -              a: (struct){
 -                two: (struct){
 -                }
 -              }
 -            }
-+      a: (#struct){
-+        a: (#struct){
-+          one: (#struct){
-+            link: (#struct){
-+              a: (#struct){
-+                two: (#struct){
++              a: (_|_){
++                // [structural cycle]
++                two: (_|_){
++                  // [structural cycle]
 +                  link: ~(selfTriggerCycle.issue1503.#T)
 +                }
-+                b: (#struct){
++                b: (_|_){
++                  // [structural cycle]
 +                  link: ~(selfTriggerCycle.issue1503.#T)
 +                }
 +              }
 +            }
 +          }
-+          b: (#struct){
++          b: (_|_){
++            // [structural cycle]
 +            link: ~(selfTriggerCycle.issue1503.#T)
            }
          }

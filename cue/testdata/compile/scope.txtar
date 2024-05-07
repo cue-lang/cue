@@ -88,7 +88,13 @@ Unifications: 50
 Conjuncts:    102
 Disjuncts:    54
 -- out/evalalpha --
-(struct){
+Errors:
+_schema_1: structural cycle:
+    ./in.cue:32:8
+
+Result:
+(_|_){
+  // [structural cycle]
   a: (struct){
     d: (struct){
     }
@@ -111,7 +117,8 @@ Disjuncts:    54
   f: (struct){
     open: (int){ int }
   }
-  schema: (struct){
+  schema: (_|_){
+    // [structural cycle]
     next: (_|_){
       // [structural cycle] _schema_1: structural cycle:
       //     ./in.cue:32:8
@@ -126,24 +133,17 @@ Disjuncts:    54
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,4 @@
--Errors:
+@@ -1,5 +1,6 @@
+ Errors:
 -schema.next: structural cycle
--
--Result:
--(_|_){
--  // [structural cycle]
-+(struct){
-   a: (struct){
-     d: (struct){
-     }
-@@ -26,10 +21,10 @@
-   f: (struct){
-     open: (int){ int }
-   }
--  schema: (_|_){
--    // [structural cycle]
-+  schema: (struct){
++_schema_1: structural cycle:
++    ./in.cue:32:8
+ 
+ Result:
+ (_|_){
+@@ -29,7 +30,8 @@
+   schema: (_|_){
+     // [structural cycle]
      next: (_|_){
 -      // [structural cycle] schema.next: structural cycle
 +      // [structural cycle] _schema_1: structural cycle:
@@ -151,8 +151,10 @@ diff old new
      }
    }
    let _schema_1#2 = (_|_){
--- diff/todo/p1 --
-schema: structural cycle not propagated up. This causes the error to be missed.
+-- diff/todo/p3 --
+Structural cycle reported in different location. Seems fine, as
+ultimately we need to print the paths of the cycle anyway.
+Now also reports a position.
 -- out/eval --
 Errors:
 schema.next: structural cycle

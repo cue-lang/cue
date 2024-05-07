@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4bc9f1f_a3e8a3f7",
+        "filename": "cue/testdata/builtins/incomplete.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-07T18:18:23Z",
+      "side": 1,
+      "message": "should I work to preserve the original error messages? That might be tricky",
+      "range": {
+        "startLine": 184,
+        "startChar": 32,
+        "endLine": 184,
+        "endChar": 51
+      },
+      "revId": "1e6a77951304a97ba0a67edf7605c7a99f93f92d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4d54dd9_860fc488",
+        "filename": "internal/pkg/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-07T18:18:23Z",
+      "side": 1,
+      "message": "I\u0027m not a fan of this name, but Value was already taken - is NonConcreteValue too long?",
+      "range": {
+        "startLine": 52,
+        "startChar": 19,
+        "endLine": 52,
+        "endChar": 22
+      },
+      "revId": "1e6a77951304a97ba0a67edf7605c7a99f93f92d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

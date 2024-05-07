@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e2eccb3_77ffd5d5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-07T18:18:23Z",
+      "side": 1,
+      "message": "It\u0027s quite possible this changes semantics of the evaluator that I do not yet fully understand, so I\u0027m very open to rewriting this completely if necessary.",
+      "revId": "da2046cd40e1e3265c9f50be02662b8347726d8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -262,6 +262,30 @@
       },
       "revId": "638bab2b82ffc821bf462fb423ec11a558c5811b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ffeab1a_f19e9202",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-07T10:37:00Z",
+      "side": 1,
+      "message": "To be clear, I\u0027m fine with leaving TODOs to do something better in the future, e.g. have cuecontext.New return an error, or have it remember its error so that the first error-returning call like Context.BuildExpr would simply return that constructor error as bottom.",
+      "parentUuid": "d92f0143_ed619c0a",
+      "range": {
+        "startLine": 29,
+        "startChar": 28,
+        "endLine": 29,
+        "endChar": 34
+      },
+      "revId": "638bab2b82ffc821bf462fb423ec11a558c5811b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -249,7 +249,7 @@ Result:
       1: (int){ 2 }
       2: (int){ 3 }
     }
-    let Y#1Amulti = &[&[&[&[(〈1;v〉 * 4)]]]]
+    let Y#1Amulti = (〈1;v〉 * 4)
     "0": (int){ 4 }
     "1": (int){ 8 }
     "2": (int){ 12 }
@@ -260,7 +260,7 @@ Result:
       1: (int){ 2 }
       2: (int){ 3 }
     }
-    let Y#1Bmulti = &[&[&[&[〈1;X〉]]]]
+    let Y#1Bmulti = 〈1;X〉
     "0": (int){ 4 }
     "1": (int){ 8 }
     "2": (int){ 12 }
@@ -326,7 +326,7 @@ Result:
     }
   }
   nestedFor: (struct){
-    let X#1Emulti = &[&[&[&[{
+    let X#1Emulti = {
       for _, x in [
         1,
         2,
@@ -334,14 +334,14 @@ Result:
         let X#1Fmulti = 〈1;x〉
         "\(〈0;let X#1F〉)": 〈0;let X#1F〉
       }
-    }]]]]
+    }
     "0": (struct){
-      let X#1Fmulti = &[&[&[〈1;x〉]]]
+      let X#1Fmulti = 〈1;x〉
       "2": (int){ 2 }
       "1": (int){ 1 }
     }
     "1": (struct){
-      let X#1Fmulti = &[&[&[〈1;x〉]]]
+      let X#1Fmulti = 〈1;x〉
       "2": (int){ 2 }
       "1": (int){ 1 }
     }
@@ -380,7 +380,7 @@ Result:
       a: (string){ "d" }
       b: (string){ "e" }
     }
-    let T#23multi = &[&[&[&[〈1;v〉]]]]
+    let T#23multi = 〈1;v〉
     e: (string){ "1" }
     d: (string){ "1" }
   }
@@ -397,7 +397,7 @@ Result:
     }
   }
   disabled_parent_test: (struct){
-    let parent_config#24multi = &[&[&[&[(*〈3;_parent_configs〉[〈1;v〉.parent]|false)]]]]
+    let parent_config#24multi = (*〈3;_parent_configs〉[〈1;v〉.parent]|false)
     CHILD1: (struct){
       parent_config: (bool){ false }
     }
@@ -424,25 +424,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -82,7 +78,7 @@
-       1: (int){ 2 }
-       2: (int){ 3 }
-     }
--    let Y#1Amulti = (〈1;v〉 * 4)
-+    let Y#1Amulti = &[&[&[&[(〈1;v〉 * 4)]]]]
-     "0": (int){ 4 }
-     "1": (int){ 8 }
-     "2": (int){ 12 }
-@@ -93,7 +89,7 @@
-       1: (int){ 2 }
-       2: (int){ 3 }
-     }
--    let Y#1Bmulti = 〈1;X〉
-+    let Y#1Bmulti = &[&[&[&[〈1;X〉]]]]
-     "0": (int){ 4 }
-     "1": (int){ 8 }
-     "2": (int){ 12 }
-@@ -121,65 +117,45 @@
+@@ -121,61 +117,41 @@
        // [eval] indirectReference.y: conflicting values 2 and 1:
        //     ./incomprehension.cue:42:7
        //     ./incomprehension.cue:42:10
@@ -519,56 +501,34 @@ diff old new
      }
    }
    nestedFor: (struct){
--    let X#1Emulti = {
-+    let X#1Emulti = &[&[&[&[{
-       for _, x in [
-         1,
-         2,
-@@ -187,16 +163,16 @@
-         let X#1Fmulti = 〈1;x〉
-         "\(〈0;let X#1F〉)": 〈0;let X#1F〉
-       }
--    }
-+    }]]]]
+@@ -190,13 +166,13 @@
+     }
      "0": (struct){
--      let X#1Fmulti = 〈1;x〉
+       let X#1Fmulti = 〈1;x〉
 -      "1": (int){ 1 }
 -      "2": (int){ 2 }
-+      let X#1Fmulti = &[&[&[〈1;x〉]]]
 +      "2": (int){ 2 }
 +      "1": (int){ 1 }
      }
      "1": (struct){
--      let X#1Fmulti = 〈1;x〉
+       let X#1Fmulti = 〈1;x〉
 -      "1": (int){ 1 }
 -      "2": (int){ 2 }
-+      let X#1Fmulti = &[&[&[〈1;x〉]]]
 +      "2": (int){ 2 }
 +      "1": (int){ 1 }
      }
    }
    keepDescending: (struct){
-@@ -233,9 +209,9 @@
-       a: (string){ "d" }
+@@ -234,8 +210,8 @@
        b: (string){ "e" }
      }
--    let T#23multi = 〈1;v〉
+     let T#23multi = 〈1;v〉
 -    d: (string){ "1" }
-+    let T#23multi = &[&[&[&[〈1;v〉]]]]
      e: (string){ "1" }
 +    d: (string){ "1" }
    }
    _parent_configs: (struct){
      PARENT: (bool){ true }
-@@ -250,7 +226,7 @@
-     }
-   }
-   disabled_parent_test: (struct){
--    let parent_config#24multi = (*〈3;_parent_configs〉[〈1;v〉.parent]|false)
-+    let parent_config#24multi = &[&[&[&[(*〈3;_parent_configs〉[〈1;v〉.parent]|false)]]]]
-     CHILD1: (struct){
-       parent_config: (bool){ false }
-     }
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old

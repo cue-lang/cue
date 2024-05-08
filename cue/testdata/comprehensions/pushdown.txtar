@@ -1350,7 +1350,7 @@ Result:
       y: (int){ 1 }
     }
     a: (struct){
-      let x#1multi = &[&[&[&[&[〈1;v〉]]]]]
+      let x#1multi = 〈1;v〉
     }
   }
   nestedWithEmbeddingOK: (struct){
@@ -1667,15 +1667,6 @@ diff old new
          }
        }
      }
-@@ -611,7 +577,7 @@
-       y: (int){ 1 }
-     }
-     a: (struct){
--      let x#1multi = 〈1;v〉
-+      let x#1multi = &[&[&[&[&[〈1;v〉]]]]]
-     }
-   }
-   nestedWithEmbeddingOK: (struct){
 @@ -626,9 +592,8 @@
      _c: (struct){
        y: (int){ 1 }

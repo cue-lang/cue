@@ -243,8 +243,10 @@ func (n *nodeContext) scheduleStruct(env *Environment,
 	hasEmbed := false
 	hasEllipsis := false
 
+	// TODO: do we still need this?
 	// shouldClose := ci.cc.isDef || ci.cc.isClosedOnce
-	// s.Init()
+
+	s.Init(n.ctx)
 
 	// TODO: do we still need to AddStruct and do we still need to Disable?
 	parent := n.node.AddStruct(s, childEnv, ci)

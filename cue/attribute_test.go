@@ -96,8 +96,6 @@ func TestAttributes(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.path, func(t *cuetdtest.M) {
-			t.TODO_V3()
-
 			v := getValue(t, config).LookupPath(ParsePath(tc.path))
 			a := v.Attributes(tc.flags)
 			got := fmt.Sprint(a)

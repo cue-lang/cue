@@ -97,11 +97,16 @@ func (o *StructLit) MarkField(f Feature) {
 	o.Fields = append(o.Fields, FieldInfo{Label: f})
 }
 
-func (o *StructLit) Init() {
+func (o *StructLit) Init(ctx *OpContext) {
 	if o.initialized {
 		return
 	}
 	o.initialized = true
+
+	if ctx.isDevVersion() {
+		return
+	}
+
 	for _, d := range o.Decls {
 		switch x := d.(type) {
 		case *Field:

@@ -39,9 +39,10 @@ var exclude = map[string]string{
 func TestValue(t *testing.T) {
 	const debugValue = `
 -- in.cue --
-// Issue #2305
-g: #d
-#d: 1
+if false {
+	c4: { @step(4a) } @step(4b)
+	@step(4c)
+}
 `
 
 	test := cuetxtar.TxTarTest{

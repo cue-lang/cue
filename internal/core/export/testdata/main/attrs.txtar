@@ -369,7 +369,6 @@ dynamicSimple: {
 	comprehensions: {
 		@step(0)
 		@step(2c)
-		@step(4c)
 		c1: {} @step(1)
 		c2: {
 			@step(2a)
@@ -435,7 +434,6 @@ dynamicSimple: {
 	comprehensions: {
 		@step(0)
 		@step(2c)
-		@step(4c)
 		c1: {} @step(1)
 		c2: {
 			@step(2a)
@@ -456,7 +454,7 @@ dynamicSimple: {
 diff old new
 --- old
 +++ new
-@@ -150,19 +150,20 @@
+@@ -150,11 +150,11 @@
  			@decl1()
  		}
  		b: {
@@ -465,32 +463,15 @@ diff old new
 -		}
 -		c: {
 -			@decl1(), @decl2()
--		}
--		d: {
--			@decl2(), @decl1()
--		}
--	}
--	comprehensions: {
--		@step(0)
--		@step(2c)
 +			@decl2(), @decl1()
 +			x: 1
 +		}
 +		c: {
 +			@decl2(), @decl1()
-+		}
-+		d: {
-+			@decl2(), @decl1()
-+		}
-+	}
-+	comprehensions: {
-+		@step(0)
-+		@step(2c)
-+		@step(4c)
- 		c1: {} @step(1)
- 		c2: {
- 			@step(2a)
-@@ -215,19 +216,20 @@
+ 		}
+ 		d: {
+ 			@decl2(), @decl1()
+@@ -215,11 +215,11 @@
  			@decl1()
  		}
  		b: {
@@ -499,33 +480,14 @@ diff old new
 -		}
 -		c: {
 -			@decl1(), @decl2()
--		}
--		d: {
--			@decl2(), @decl1()
--		}
--	}
--	comprehensions: {
--		@step(0)
--		@step(2c)
 +			@decl2(), @decl1()
 +			x: 1
 +		}
 +		c: {
 +			@decl2(), @decl1()
-+		}
-+		d: {
-+			@decl2(), @decl1()
-+		}
-+	}
-+	comprehensions: {
-+		@step(0)
-+		@step(2c)
-+		@step(4c)
- 		c1: {} @step(1)
- 		c2: {
- 			@step(2a)
--- diff/value/todo/p1 --
-comprehension: @step(4c) added in comprehensions
+ 		}
+ 		d: {
+ 			@decl2(), @decl1()
 -- diff/value/todo/p3 --
 Reordering of attributes.
 -- out/value --

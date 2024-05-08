@@ -34,6 +34,24 @@
       "parentUuid": "205088d6_0c8b0d1c",
       "revId": "eb0b1b966869784fd0c5602ff7280b15b8a6f6c1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ee5b661_e398fdd2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-08T13:42:21Z",
+      "side": 1,
+      "message": "\u003e The CLI is cue cmd, and the CUE declares a command struct, so I think we\u0027re stuck with \"command\" for now. Maybe we can revisit with cue run.\n\nJust \"workflow\" is, I agree, not good because it conflicts with the requirement to declare something under a `command` field. However, I\u0027m not clear that \"command\" is better because it leaves open the conflict with the existing use of \"command\" when it comes to referring to \"export\", \"eval\" and friends. That is a source of ambiguity you sought to remove by dropping support for `cue banana` in favour of the more explicit `cue cmd banana`. \n\nSo the proposal here is to make the reference to such `banana` commands more precise as \"workflow commands\". \n\n@mvdan@mvdan.cc - was your +2 in favour of the change as it stands? Because the wording of your response \"I think we\u0027re stuck with \u0027command\u0027 for now\" seems to suggest you don\u0027t agree with the change as it stands?",
+      "parentUuid": "2ef4b66c_11a44fb3",
+      "revId": "eb0b1b966869784fd0c5602ff7280b15b8a6f6c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

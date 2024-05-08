@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d6ebd587_53325ecf",
+        "filename": "cue/testdata/builtins/incomplete.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-08T21:03:53Z",
+      "side": 1,
+      "message": "personally I think the new error message is fine; unresolved disjunctions are not a problem per se with some builtins.",
+      "parentUuid": "d4bc9f1f_a3e8a3f7",
+      "range": {
+        "startLine": 184,
+        "startChar": 32,
+        "endLine": 184,
+        "endChar": 51
+      },
+      "revId": "1e6a77951304a97ba0a67edf7605c7a99f93f92d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d4d54dd9_860fc488",
         "filename": "internal/pkg/context.go",
         "patchSetId": 1
@@ -37,6 +61,30 @@
       "writtenOn": "2024-05-07T18:18:23Z",
       "side": 1,
       "message": "I\u0027m not a fan of this name, but Value was already taken - is NonConcreteValue too long?",
+      "range": {
+        "startLine": 52,
+        "startChar": 19,
+        "endLine": 52,
+        "endChar": 22
+      },
+      "revId": "1e6a77951304a97ba0a67edf7605c7a99f93f92d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ab6a83e_bbe5912d",
+        "filename": "internal/pkg/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-08T21:03:53Z",
+      "side": 1,
+      "message": "or rename Value to ConcreteValue, and make this the new Value. these are internal APIs, so we can do that. perhaps as a second CL though, for the sake of making it very clear what are the minimum changes necessary in this fix; so for this CL I might use a temporary name like NonConcreteValue.",
+      "parentUuid": "d4d54dd9_860fc488",
       "range": {
         "startLine": 52,
         "startChar": 19,

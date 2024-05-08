@@ -1,6 +1,74 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "06008331_ad61a00c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-08T21:03:53Z",
+      "side": 1,
+      "message": "when you indent, no need to use backticks at the same time",
+      "revId": "da2046cd40e1e3265c9f50be02662b8347726d8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f4ffb83_6c94f1bb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-08T21:03:53Z",
+      "side": 1,
+      "message": "perhaps clarify \"incorrectly returned\" and why - that in CUE, unifying `\"a\"` with `\"a\" | \"b\"` should result in `\"a\"` and not an error.",
+      "revId": "da2046cd40e1e3265c9f50be02662b8347726d8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0e9f0a5_73360d1e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-08T21:03:53Z",
+      "side": 1,
+      "message": "can we summarize why this is the case?",
+      "revId": "da2046cd40e1e3265c9f50be02662b8347726d8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd76bbaa_e11ce05b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-08T21:03:53Z",
+      "side": 1,
+      "message": "ditto about the backticks.",
+      "revId": "da2046cd40e1e3265c9f50be02662b8347726d8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "0e2eccb3_77ffd5d5",
@@ -14,6 +82,74 @@
       "writtenOn": "2024-05-07T18:18:23Z",
       "side": 1,
       "message": "It\u0027s quite possible this changes semantics of the evaluator that I do not yet fully understand, so I\u0027m very open to rewriting this completely if necessary.",
+      "revId": "da2046cd40e1e3265c9f50be02662b8347726d8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "05b71212_8f25d17a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-08T21:03:53Z",
+      "side": 1,
+      "message": "I can ping Marcel for a review tomorrow once you\u0027ve sent a second patchset :) Thanks for the fix!",
+      "revId": "da2046cd40e1e3265c9f50be02662b8347726d8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cad4260e_7b5a80ca",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 1513,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-08T21:03:53Z",
+      "side": 1,
+      "message": "nit: capitalize the start of each sentence",
+      "revId": "da2046cd40e1e3265c9f50be02662b8347726d8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50e43f36_21c14c3a",
+        "filename": "pkg/encoding/json/testdata/gen.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 418,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-08T21:03:53Z",
+      "side": 1,
+      "message": "can you mention in the commit message whether you think these changes in existing tests are expected?",
+      "revId": "da2046cd40e1e3265c9f50be02662b8347726d8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd6118d7_4ab612a5",
+        "filename": "pkg/encoding/yaml/testdata/validate.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-08T21:03:53Z",
+      "side": 1,
+      "message": "FYI we have been using `-- diff/explanation --` txtar entries to explain why a difference in the new evaluator output is good - in this case, better behavior. look at other files with similar file entries.",
       "revId": "da2046cd40e1e3265c9f50be02662b8347726d8f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

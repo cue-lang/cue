@@ -44,7 +44,7 @@ func TestFlow(t *testing.T) {
 		// of whack, causing the test to become flaky. We revert to the default
 		// evaluator for now. Switch back to SmallMatrix when the tests are
 		// fixed for the new evaluator.
-		Matrix: cuetdtest.DefaultOnlyMatrix, // SmallMatrix,
+		Matrix: cuetdtest.SmallMatrix,
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {

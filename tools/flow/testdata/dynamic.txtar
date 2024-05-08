@@ -35,24 +35,28 @@ graph TD
   t1("root.b [Waiting]")
   t1-->t0
 
--- out/run-v3/t1 --
+-- out/run/t1 --
 graph TD
   t0("root.a [Terminated]")
-  t1("root.b [Ready]")
+  t1("root.b [Waiting]")
   t1-->t0
+  t1-->t2
   t2("root.middle.la2 [Ready]")
+  t2-->t0
 
 -- out/run/t1/value --
 {
 	$id: "list"
 	out: [1, 2]
 }
--- out/run-v3/t2 --
+-- out/run/t2 --
 graph TD
   t0("root.a [Terminated]")
-  t1("root.b [Running]")
+  t1("root.b [Ready]")
   t1-->t0
+  t1-->t2
   t2("root.middle.la2 [Terminated]")
+  t2-->t0
 
 -- out/run/t2/value --
 {
@@ -61,13 +65,16 @@ graph TD
 	out: "foo2"
 	val: "foo2"
 }
--- out/run-v3/t3 --
+-- out/run/t3 --
 graph TD
   t0("root.a [Terminated]")
   t1("root.b [Terminated]")
   t1-->t0
+  t1-->t2
   t2("root.middle.la2 [Terminated]")
+  t2-->t0
   t3("root.after.lb2 [Ready]")
+  t3-->t1
 
 -- out/run/t3/value --
 {
@@ -80,100 +87,6 @@ graph TD
 	}]
 	out: [1, 2]
 }
--- out/run-v3/t4 --
-graph TD
-  t0("root.a [Terminated]")
-  t1("root.b [Terminated]")
-  t1-->t0
-  t2("root.middle.la2 [Terminated]")
-  t3("root.after.lb2 [Terminated]")
-
--- diff/-out/run-v3/t1<==>+out/run/t1 --
-diff old new
---- old
-+++ new
-@@ -1,8 +1,6 @@
- graph TD
-   t0("root.a [Terminated]")
--  t1("root.b [Waiting]")
-+  t1("root.b [Ready]")
-   t1-->t0
--  t1-->t2
-   t2("root.middle.la2 [Ready]")
--  t2-->t0
- 
--- diff/-out/run-v3/t2<==>+out/run/t2 --
-diff old new
---- old
-+++ new
-@@ -1,8 +1,6 @@
- graph TD
-   t0("root.a [Terminated]")
--  t1("root.b [Ready]")
-+  t1("root.b [Running]")
-   t1-->t0
--  t1-->t2
-   t2("root.middle.la2 [Terminated]")
--  t2-->t0
- 
--- diff/-out/run-v3/t3<==>+out/run/t3 --
-diff old new
---- old
-+++ new
-@@ -2,9 +2,6 @@
-   t0("root.a [Terminated]")
-   t1("root.b [Terminated]")
-   t1-->t0
--  t1-->t2
-   t2("root.middle.la2 [Terminated]")
--  t2-->t0
-   t3("root.after.lb2 [Ready]")
--  t3-->t1
- 
--- diff/-out/run-v3/t4<==>+out/run/t4 --
-diff old new
---- old
-+++ new
-@@ -2,9 +2,6 @@
-   t0("root.a [Terminated]")
-   t1("root.b [Terminated]")
-   t1-->t0
--  t1-->t2
-   t2("root.middle.la2 [Terminated]")
--  t2-->t0
-   t3("root.after.lb2 [Terminated]")
--  t3-->t1
--- diff/out/todo/p1 --
-Investigate changes.
--- out/run/t1 --
-graph TD
-  t0("root.a [Terminated]")
-  t1("root.b [Waiting]")
-  t1-->t0
-  t1-->t2
-  t2("root.middle.la2 [Ready]")
-  t2-->t0
-
--- out/run/t2 --
-graph TD
-  t0("root.a [Terminated]")
-  t1("root.b [Ready]")
-  t1-->t0
-  t1-->t2
-  t2("root.middle.la2 [Terminated]")
-  t2-->t0
-
--- out/run/t3 --
-graph TD
-  t0("root.a [Terminated]")
-  t1("root.b [Terminated]")
-  t1-->t0
-  t1-->t2
-  t2("root.middle.la2 [Terminated]")
-  t2-->t0
-  t3("root.after.lb2 [Ready]")
-  t3-->t1
-
 -- out/run/t4 --
 graph TD
   t0("root.a [Terminated]")

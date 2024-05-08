@@ -46,6 +46,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path"
 	"path/filepath"
@@ -599,13 +600,13 @@ func CreateFromDir(w io.Writer, m module.Version, dir string) (err error) {
 
 type dirFile struct {
 	filePath, slashPath string
-	info                os.FileInfo
+	entry               fs.DirEntry
 }
 
 type dirFileIO struct{}
 
 func (dirFileIO) Path(f dirFile) string                 { return f.slashPath }
-func (dirFileIO) Lstat(f dirFile) (os.FileInfo, error)  { return f.info, nil }
+func (dirFileIO) Lstat(f dirFile) (os.FileInfo, error)  { return f.entry.Info() }
 func (dirFileIO) Open(f dirFile) (io.ReadCloser, error) { return os.Open(f.filePath) }
 
 // isVendoredPackage reports whether the given filename is inside
@@ -737,7 +738,7 @@ func (cc collisionChecker) check(p string, isDir bool) error {
 // files, as well as a list of directories and files that were skipped (for
 // example, nested modules and symbolic links).
 func listFilesInDir(dir string) (files []dirFile, omitted []FileError, err error) {
-	err = filepath.Walk(dir, func(filePath string, info os.FileInfo, err error) error {
+	err = filepath.WalkDir(dir, func(filePath string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -754,7 +755,7 @@ func listFilesInDir(dir string) (files []dirFile, omitted []FileError, err error
 			return nil
 		}
 
-		if info.IsDir() {
+		if entry.IsDir() {
 			if filePath == dir {
 				// Don't skip the top-level directory.
 				return nil
@@ -779,7 +780,7 @@ func listFilesInDir(dir string) (files []dirFile, omitted []FileError, err error
 
 		// Skip irregular files and files in vendor directories.
 		// Irregular files are ignored. They're typically symbolic links.
-		if !info.Mode().IsRegular() {
+		if !entry.Type().IsRegular() {
 			omitted = append(omitted, FileError{Path: slashPath, Err: errNotRegular})
 			return nil
 		}
@@ -787,7 +788,7 @@ func listFilesInDir(dir string) (files []dirFile, omitted []FileError, err error
 		files = append(files, dirFile{
 			filePath:  filePath,
 			slashPath: slashPath,
-			info:      info,
+			entry:     entry,
 		})
 		return nil
 	})

@@ -16,6 +16,23 @@
       "message": "Will leave this to Rog",
       "revId": "710aaeaf7cea0bc8d7030701a9ed03283179e07a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c90a532_adbe68d6",
+        "filename": "cue/load/import.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-08T15:04:41Z",
+      "side": 1,
+      "message": "or non-stdlib-looking paths like \".something/else\" ?",
+      "revId": "710aaeaf7cea0bc8d7030701a9ed03283179e07a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

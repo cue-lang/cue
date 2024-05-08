@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c50660b9_fed32195",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-08T14:01:46Z",
+      "side": 1,
+      "message": "nit: reflow the paragraph so that we don\u0027t go over 76 columns",
+      "revId": "39043550ad70e4d94f8217a464a4cc584a45c56c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60b2d9c5_8e3da1a0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-08T14:01:46Z",
+      "side": 1,
+      "message": "should this include a new test or any test changes?",
+      "revId": "39043550ad70e4d94f8217a464a4cc584a45c56c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

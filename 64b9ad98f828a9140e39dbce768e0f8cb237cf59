@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0df4cf2a_404bdc7c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-08T15:55:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "961c2af6_6593754a",
+      "revId": "64b9ad98f828a9140e39dbce768e0f8cb237cf59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6f235006_869a266e",
@@ -86,6 +104,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "48396301_84aa1037",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-08T15:55:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8826f1c6_338fd433",
+      "revId": "64b9ad98f828a9140e39dbce768e0f8cb237cf59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4bc77691_9c700d78",
@@ -99,6 +135,24 @@
       "writtenOn": "2024-05-08T14:59:51Z",
       "side": 1,
       "message": "```suggestion\n\t// Unfortunately we need a new context. See the note inside [moduleSchemaDo].\n```",
+      "revId": "64b9ad98f828a9140e39dbce768e0f8cb237cf59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "074ed9a8_fc5c68dd",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-08T15:55:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4bc77691_9c700d78",
       "revId": "64b9ad98f828a9140e39dbce768e0f8cb237cf59",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

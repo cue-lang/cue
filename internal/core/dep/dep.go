@@ -461,7 +461,7 @@ func (c *visitor) reportDependency(env *adt.Environment, ref adt.Resolver, v *ad
 	c.numRefs++
 
 	d := Dependency{
-		Node:      v.DerefNonRooted(),
+		Node:      v,
 		Reference: altRef,
 		pkg:       c.pkg,
 		top:       c.top,

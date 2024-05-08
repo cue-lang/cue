@@ -2050,7 +2050,7 @@ func (n *nodeContext) addStruct(
 		Vertex: n.node,
 	}
 
-	s.Init()
+	s.Init(n.ctx)
 
 	if s.HasEmbed && !s.IsFile() {
 		closeInfo = closeInfo.SpawnGroup(nil)
@@ -2441,7 +2441,7 @@ outer:
 		s := l.list.info
 		if s == nil {
 			s = &StructLit{Decls: []Decl{l.elipsis}}
-			s.Init()
+			s.Init(n.ctx)
 			l.list.info = s
 		}
 		info := n.node.AddStruct(s, l.env, l.id)

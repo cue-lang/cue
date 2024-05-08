@@ -562,6 +562,20 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 	}
 	n.node.Arcs = n.node.Arcs[:k]
 
+	// Strip struct literals that were not initialized and are not part
+	// of the output.
+	//
+	// TODO(perf): we could keep track if any such structs exist and only
+	// do this removal if there is a change of shrinking the list.
+	k = 0
+	for _, s := range n.node.Structs {
+		if s.initialized {
+			n.node.Structs[k] = s
+			k++
+		}
+	}
+	n.node.Structs = n.node.Structs[:k]
+
 	// TODO: This seems to be necessary, but enables structural cycles.
 	// Evaluator whether we still need this.
 	//

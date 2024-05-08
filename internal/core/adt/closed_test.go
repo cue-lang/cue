@@ -41,7 +41,7 @@ func TestClosedness(t *testing.T) {
 			t.Fatal(err)
 		}
 		st := expr.Elem().(*adt.StructLit)
-		st.Init()
+		st.Init(ctx)
 
 		return &adt.StructInfo{
 			StructLit: st,

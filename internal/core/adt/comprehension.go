@@ -244,7 +244,7 @@ func (n *nodeContext) insertComprehension(
 			case !ec.done:
 				ec.structs = append(ec.structs, st)
 			case len(ec.envs) > 0:
-				st.Init()
+				st.Init(n.ctx)
 			}
 		}
 
@@ -453,7 +453,7 @@ func (n *nodeContext) processComprehensionInner(d *envYield, state vertexStatus)
 
 		if len(d.envs) > 0 {
 			for _, s := range d.structs {
-				s.Init()
+				s.Init(n.ctx)
 			}
 		}
 		d.structs = nil

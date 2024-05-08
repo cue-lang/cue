@@ -496,9 +496,9 @@ func (c *OpContext) resolveState(x Conjunct, r Resolver, state combinedFlags) (*
 		return nil, arc.ChildErrors
 	}
 
-	if !c.isDevVersion() {
-		arc = arc.DerefValue()
-	}
+	// Dereference any vertices that do not contribute to more knownledge about
+	// the node.
+	arc = arc.DerefNonRooted()
 
 	return arc, err
 }

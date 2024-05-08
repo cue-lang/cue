@@ -52,6 +52,24 @@
       "parentUuid": "2ef4b66c_11a44fb3",
       "revId": "eb0b1b966869784fd0c5602ff7280b15b8a6f6c1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c86bd686_ff997564",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-08T13:44:33Z",
+      "side": 1,
+      "message": "Sorry, I should have been clear. I meant to say I agree with \"workflow command\" instead of just \"workflow\", because we cannot drop the word \"command\" entirely - it is already present in `cue cmd` and the top level field `command:`. I realise now that my wording was ambiguous. Yes, my +2 is in favor of your change as-is.",
+      "parentUuid": "4ee5b661_e398fdd2",
+      "revId": "eb0b1b966869784fd0c5602ff7280b15b8a6f6c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -16,6 +16,24 @@
       "message": "perhaps expand the commit message with a bit of context?",
       "revId": "a3b1f35a7316aa751d7b4cff7c2b93760ceb047f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2bc08151_e126d2e1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-08T14:08:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5af0ceb5_0ee6cf5b",
+      "revId": "a3b1f35a7316aa751d7b4cff7c2b93760ceb047f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -33,6 +33,24 @@
       "message": "or non-stdlib-looking paths like \".something/else\" ?",
       "revId": "710aaeaf7cea0bc8d7030701a9ed03283179e07a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d264cb0e_cc12aef5",
+        "filename": "cue/load/import.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-08T16:54:57Z",
+      "side": 1,
+      "message": "Done; in fact the switch is not needed at all.",
+      "parentUuid": "1c90a532_adbe68d6",
+      "revId": "710aaeaf7cea0bc8d7030701a9ed03283179e07a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

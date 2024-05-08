@@ -1387,9 +1387,17 @@ func (c Conjunct) EnvExpr() (*Environment, Expr) {
 // evaluated.
 func EnvExpr(env *Environment, elem Elem) (*Environment, Expr) {
 	for {
-		if c, ok := elem.(*Comprehension); ok {
-			env = linkChildren(env, c)
-			c := MakeConjunct(env, c.Value, CloseInfo{})
+		switch x := elem.(type) {
+		case *ConjunctGroup:
+			if len(*x) == 1 {
+				c := (*x)[0]
+				env = c.Env
+				elem = c.Elem()
+				continue
+			}
+		case *Comprehension:
+			env = linkChildren(env, x)
+			c := MakeConjunct(env, x.Value, CloseInfo{})
 			elem = c.Elem()
 			continue
 		}

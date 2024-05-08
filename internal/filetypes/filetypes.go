@@ -199,6 +199,9 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 					return nil, err
 				}
 			}
+			if s == "" {
+				return nil, errors.Newf(token.NoPos, "empty file name")
+			}
 			f, err := toFile(modeVal, fileVal, s)
 			if err != nil {
 				return nil, err
@@ -252,7 +255,10 @@ func ParseFile(s string, mode Mode) (*build.File, error) {
 	}
 
 	if file == "" {
-		return nil, errors.Newf(token.NoPos, "empty file name in %q", s)
+		if s != "" {
+			return nil, errors.Newf(token.NoPos, "empty file name in %q", s)
+		}
+		return nil, errors.Newf(token.NoPos, "empty file name")
 	}
 	// Quickly discard files which we aren't interested in.
 	// These cases are very common when loading `./...` in a large repository.

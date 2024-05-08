@@ -23,14 +23,14 @@ import (
 // IsPackage reports whether a command-line argument is a package based on its
 // lexical representation alone.
 func IsPackage(s string) bool {
-	if s == "." || s == ".." {
+	switch s {
+	case ".", "..":
 		return true
-	}
-	if s == "-" {
+	case "", "-":
 		return false
 	}
 
-	// This goes of the assumption that file names may not have a `:` in their
+	// This goes off the assumption that file names may not have a `:` in their
 	// name in cue.
 	// A filename must have an extension or be preceded by a qualifier argument.
 	// So strings of the form foo/bar:baz, where bar is a valid identifier and

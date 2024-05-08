@@ -16,6 +16,24 @@
       "message": "I\u0027m fine with that. An alternative might be just \"workflow\".",
       "revId": "eb0b1b966869784fd0c5602ff7280b15b8a6f6c1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ef4b66c_11a44fb3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-08T07:32:51Z",
+      "side": 1,
+      "message": "The CLI is `cue cmd`, and the CUE declares a `command` struct, so I think we\u0027re stuck with \"command\" for now. Maybe we can revisit with `cue run`.",
+      "parentUuid": "205088d6_0c8b0d1c",
+      "revId": "eb0b1b966869784fd0c5602ff7280b15b8a6f6c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

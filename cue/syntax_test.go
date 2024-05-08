@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
 )
@@ -215,6 +216,19 @@ if true {
 	}
 }
 	`,
+	}, {
+		name: "fragments",
+		in: `
+		// #person is a real person
+		#person: {
+			children: [...#person]
+			name: =~"^[A-Za-z0-9]+$"
+			address: string
+		}
+		`,
+		path:    "#person.children",
+		options: o(cue.Schema(), cue.Raw()),
+		out:     `[...#person]`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -235,4 +249,49 @@ if true {
 			}
 		})
 	}
+}
+
+func TestFragment(t *testing.T) {
+	in := `
+	#person: {
+		children: [...#person]
+	}`
+
+	ctx := cuecontext.New()
+
+	v := ctx.CompileString(in)
+	v = v.LookupPath(cue.ParsePath("#person.children"))
+
+	syntax := v.Syntax(cue.Schema(), cue.Raw()).(ast.Expr)
+
+	// Compile the fragment from within the scope it was derived.
+	v = ctx.BuildExpr(syntax, cue.Scope(v))
+
+	// Generate the syntax, this time as self-contained.
+	syntax = v.Syntax(cue.Schema()).(ast.Expr)
+	b, err := format.Node(syntax)
+	if err != nil {
+		t.Fatal(err)
+	}
+	out := `{
+	[...PERSON.#x]
+
+	//cue:path: #person
+	let PERSON = {
+		#x: {
+			children: [...#person]
+		}
+	}
+}`
+	got := strings.TrimSpace(string(b))
+	want := strings.TrimSpace(out)
+	if got != want {
+		t.Errorf("got: %v; want %v", got, want)
+	}
+	// got := strings.TrimSpace(string(b))
+	// want := strings.TrimSpace(tc.out)
+	// if got != want {
+	// 	t.Errorf("got: %v; want %v", got, want)
+	// }
+
 }

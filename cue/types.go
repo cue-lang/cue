@@ -975,6 +975,7 @@ func (v Value) Syntax(opts ...Option) ast.Node {
 		ShowDocs:        o.docs,
 		ShowErrors:      o.showErrors,
 		InlineImports:   o.inlineImports,
+		Fragment:        o.raw,
 	}
 
 	pkgID := v.instance().ID()
@@ -2190,7 +2191,13 @@ func ErrorsAsValues(show bool) Option {
 	return func(p *options) { p.showErrors = show }
 }
 
-// Raw tells Syntax to generate the value as is without any simplifications.
+// Raw tells Syntax to generate the value as is without any simplifications and
+// without ensuring a value is self contained. Any references are left dangling.
+// The generated syntax tree can be compiled by passing the Value from which it
+// was generated to scope.
+//
+// The option InlineImports overrides this option with respect to ensuring the
+// output is self contained.
 func Raw() Option {
 	return func(p *options) { p.raw = true }
 }

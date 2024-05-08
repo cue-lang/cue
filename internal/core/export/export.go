@@ -60,6 +60,11 @@ type Profile struct {
 	// SelfContained exports a schema such that it does not rely on any imports.
 	SelfContained bool
 
+	// Fragment disables printing a value as self contained. To successfully
+	// parse a fragment, the compiler needs to be given a scope with the value
+	// from which the fragment was extracted.
+	Fragment bool
+
 	// AddPackage causes a package clause to be added.
 	AddPackage bool
 
@@ -135,7 +140,7 @@ func (p *Profile) Def(r adt.Runtime, pkgID string, v *adt.Vertex) (f *ast.File, 
 
 		// TODO: embed an empty definition instead once we verify that this
 		// preserves semantics.
-		if v.Kind() == adt.StructKind {
+		if v.Kind() == adt.StructKind && !p.Fragment {
 			expr = ast.NewStruct(
 				ast.Embed(ast.NewIdent("_#def")),
 				ast.NewIdent("_#def"), expr,
@@ -358,12 +363,12 @@ func newExporter(p *Profile, r adt.Runtime, pkgID string, v adt.Value) *exporter
 // initPivot initializes the pivotter to allow aligning a configuration around
 // a new root, if needed.
 func (e *exporter) initPivot(n *adt.Vertex) {
-	if !e.cfg.InlineImports &&
-		!e.cfg.SelfContained &&
-		n.Parent == nil {
+	switch {
+	case e.cfg.SelfContained, e.cfg.InlineImports:
+		// Explicitly enabled.
+	case n.Parent == nil, e.cfg.Fragment:
 		return
 	}
-
 	e.initPivotter(n)
 }
 

@@ -1402,14 +1402,22 @@ func EnvExpr(env *Environment, elem Elem) (*Environment, Expr) {
 // an Expr, it will return it as is, if it is a field, it will return its value,
 // and for comprehensions it returns the yielded struct.
 func ToExpr(n Node) Expr {
-	switch x := n.(type) {
-	case Expr:
-		return x
-	case interface{ expr() Expr }:
-		return x.expr()
-	case *Comprehension:
-		return ToExpr(x.Value)
-	default:
-		panic("unreachable")
+	for {
+		switch x := n.(type) {
+		case *ConjunctGroup:
+			if len(*x) != 1 {
+				return x
+			}
+			n = (*x)[0].x
+		case Expr:
+			return x
+		case interface{ expr() Expr }:
+			n = x.expr()
+		case *Comprehension:
+			n = x.Value
+			continue
+		default:
+			panic("unreachable")
+		}
 	}
 }

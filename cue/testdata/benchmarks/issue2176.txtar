@@ -87,7 +87,7 @@ Disjuncts:    4804
           // [incomplete] #Datastream.marker.position.characters: error in call to strings.Split: non-concrete value string:
           //     ./in.cue:14:21
           //     ./in.cue:9:11
-          let combination#3multi = &[&[&[&[&[&[&[&[〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))]]]]]]]]
+          let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
         }
       }
     }
@@ -139,7 +139,7 @@ Disjuncts:    4804
           // [incomplete] datastream.marker.position.unique_combinations: non-concrete value int in operand to -:
           //     ./in.cue:17:36
           //     ./in.cue:12:11
-          let combination#3multi = &[&[&[&[&[&[&[&[&[〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))]]]]]]]]]
+          let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
         }
       }
     }
@@ -180,7 +180,7 @@ Disjuncts:    4804
         29: (string){ "b" }
       }
       let unique_combinations#2 = (#struct){
-        let combination#3multi = &[&[&[&[&[&[&[&[〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))]]]]]]]]
+        let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
         "7": (#list){
           0: (string){ "j" }
           1: (string){ "p" }
@@ -362,7 +362,7 @@ Disjuncts:    4804
         29: (string){ "b" }
       }
       let unique_combinations#2 = (#struct){
-        let combination#3multi = &[&[&[&[&[&[&[&[〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))]]]]]]]]
+        let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
         "19": (#list){
           0: (string){ "q" }
           1: (string){ "m" }
@@ -498,7 +498,7 @@ diff old new
 +          // [incomplete] #Datastream.marker.position.characters: error in call to strings.Split: non-concrete value string:
 +          //     ./in.cue:14:21
 +          //     ./in.cue:9:11
-+          let combination#3multi = &[&[&[&[&[&[&[&[〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))]]]]]]]]
++          let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
          }
        }
      }
@@ -517,7 +517,7 @@ diff old new
 +          // [incomplete] datastream.marker.position.unique_combinations: non-concrete value int in operand to -:
 +          //     ./in.cue:17:36
 +          //     ./in.cue:12:11
-+          let combination#3multi = &[&[&[&[&[&[&[&[&[〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))]]]]]]]]]
++          let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
          }
        }
      }
@@ -532,7 +532,7 @@ diff old new
 -            "\((〈2;i〉 + 1))": 〈1;let combination#3〉
 -          }
 +      let unique_combinations#2 = (#struct){
-+        let combination#3multi = &[&[&[&[&[&[&[&[〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))]]]]]]]]
++        let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
 +        "7": (#list){
 +          0: (string){ "j" }
 +          1: (string){ "p" }
@@ -690,7 +690,7 @@ diff old new
 -            "\((〈2;i〉 + 1))": 〈1;let combination#3〉
 -          }
 +      let unique_combinations#2 = (#struct){
-+        let combination#3multi = &[&[&[&[&[&[&[&[〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))]]]]]]]]
++        let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
 +        "19": (#list){
 +          0: (string){ "q" }
 +          1: (string){ "m" }

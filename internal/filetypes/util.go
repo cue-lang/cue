@@ -23,10 +23,10 @@ import (
 // IsPackage reports whether a command-line argument is a package based on its
 // lexical representation alone.
 func IsPackage(s string) bool {
-	if s == "." || s == ".." {
+	switch s {
+	case ".", "..":
 		return true
-	}
-	if s == "-" {
+	case "", "-":
 		return false
 	}
 

@@ -1,6 +1,6 @@
 # An empty argument is not a valid package pattern nor filename.
 ! exec cue export ''
-stderr 'empty package name in import path ""'
+stderr 'empty file name in ""'
 
 # Unknown filetype prefix.
 ! exec cue export cue+date: somefile.cue

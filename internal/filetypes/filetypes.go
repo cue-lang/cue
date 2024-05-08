@@ -199,6 +199,9 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 					return nil, err
 				}
 			}
+			if s == "" {
+				return nil, errors.Newf(token.NoPos, "empty file name in %q", s)
+			}
 			f, err := toFile(modeVal, fileVal, s)
 			if err != nil {
 				return nil, err

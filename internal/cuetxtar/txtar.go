@@ -74,6 +74,10 @@ type TxTarTest struct {
 	// If Matrix is non-nil, the tests are run for each configuration in the
 	// matrix.
 	Matrix cuetdtest.Matrix
+
+	// DebugArchive, if set, is loaded instead of the on-disk archive. This allows
+	// a test to be used for debugging.
+	DebugArchive string
 }
 
 // A Test represents a single test based on a .txtar file.
@@ -357,6 +361,31 @@ func (t *Test) Context() *cue.Context {
 
 func (x *TxTarTest) run(t *testing.T, f func(tc *Test)) {
 	t.Helper()
+
+	if x.DebugArchive != "" {
+		archive := txtar.Parse([]byte(x.DebugArchive))
+
+		t.Run("", func(t *testing.T) {
+			tc := &Test{
+				T:       t,
+				Archive: archive,
+				Dir:     "/tmp",
+
+				prefix:     path.Join("out", x.Name),
+				LoadConfig: x.LoadConfig,
+			}
+			// Don't let Env be nil, as the tests shouldn't depend on os.Environ.
+			if tc.LoadConfig.Env == nil {
+				tc.LoadConfig.Env = []string{}
+			}
+
+			f(tc)
+
+			// Unconditionally output as an error.
+			t.Error(tc.buf.String())
+		})
+		return
+	}
 
 	dir, err := os.Getwd()
 	if err != nil {

@@ -25,29 +25,6 @@ c: {
 
 // Issue #2305
 g: #d
--- out/doc-v3 --
-[]
-[a]
-[b]
-[c]
-[#d]
-[#d e]
-[#d f]
-[g]
-- Issue #2305
-
--- diff/-out/doc-v3<==>+out/doc --
-diff old new
---- old
-+++ new
-@@ -8,5 +8,3 @@
- [g]
- - Issue #2305
- 
--[g e]
--[g f]
--- diff/doc/todo/p1 --
-Two missing entries.
 -- out/doc --
 []
 [a]

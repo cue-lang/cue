@@ -68,8 +68,12 @@ diff old new
  ["s-r"]
  ["s-q1"]
 -["s-q1" r1]
--- diff/out/todo/p1 --
-Missing lines.
+-- diff/out/todo/p3 --
+One missing entry is the result of the new evaluator not generating a
+bogus field for a failed dynamic field.
+The second one results from the fact that the new evaluator does not
+resolve `r1`, but rather propagates the error of the top-level node.
+This is probably okay.
 -- out/doc --
 []
 [x]

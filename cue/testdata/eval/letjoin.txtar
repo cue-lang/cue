@@ -87,10 +87,10 @@ Disjuncts:    69
       }
     }
     xy: (struct){
-      let X#1multi = &[&[&[{
+      let X#1multi = {
         b: 〈2;a〉
         c: 1
-      }]]]
+      }
       v: (int){ 1 }
     }
   }
@@ -157,19 +157,6 @@ Disjuncts:    69
 diff old new
 --- old
 +++ new
-@@ -31,10 +31,10 @@
-       }
-     }
-     xy: (struct){
--      let X#1multi = {
-+      let X#1multi = &[&[&[{
-         b: 〈2;a〉
-         c: 1
--      }
-+      }]]]
-       v: (int){ 1 }
-     }
-   }
 @@ -85,9 +85,12 @@
          r: (int){ 2 }
        }

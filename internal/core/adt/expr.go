@@ -920,18 +920,12 @@ func (x *LetReference) resolve(ctx *OpContext, state combinedFlags) *Vertex {
 	c := arc.Conjuncts[0]
 	expr := c.Expr()
 
-	// Unwrap the ConjunctGroup
-	if ctx.isDevVersion() {
-		for {
-			g, ok := expr.(*ConjunctGroup)
-			if !ok {
-				break
-			}
-			// A let field always has a single expression.
-			ctx.Assertf(pos(expr), len(*g) == 1, "unexpected number of expressions")
-			expr = (*g)[0].Expr()
-		}
-	}
+	// A let field always has a single expression and thus ConjunctGroups
+	// should always have been eliminated. This is critical, as we must
+	// ensure that Comprehensions, which may be wrapped in ConjunctGroups,
+	// are eliminated.
+	_, isGroup := expr.(*ConjunctGroup)
+	ctx.Assertf(pos(expr), !isGroup, "unexpected number of expressions")
 
 	key := cacheKey{expr, arc}
 	v, ok := e.cache[key]

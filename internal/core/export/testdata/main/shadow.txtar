@@ -520,7 +520,7 @@ _|_ // shadowRef.e1.x.x: structural cycle
 				b: 0
 				d: {
 					b: 1
-					c: b & a.z
+					c: A & a.z
 				}
 			}
 		}
@@ -554,23 +554,12 @@ diff old new
  			}
  		}
  	}
-@@ -132,7 +132,7 @@
- 				b: 0
- 				d: {
- 					b: 1
--					c: A & a.z
-+					c: b & a.z
- 				}
- 			}
- 		}
 @@ -139,4 +139,4 @@
  	}
  }
  == Eval
 -_|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)
 +_|_ // shadowRef.e1.x.x: structural cycle
--- diff/value/todo/p1 --
-Changes may be related to sharing. Investigate.
 -- out/value --
 == Simplified
 _|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)

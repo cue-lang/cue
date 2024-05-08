@@ -536,14 +536,17 @@ Missing lines.
 			}
 		}
 		b: {
-			x: "a \(run.a) z"
+			let A = run.a
+			x: "a \(A) z"
 			run: {
 				a: string
 			}
 		}
 		c: {
-			x:  "a \(run.a) z"
-			x2: "a \(run2.a) z"
+			let A_1 = run.a
+			let A_2 = run2.a
+			x:  "a \(A_1) z"
+			x2: "a \(A_2) z"
 			run: {
 				a: string
 			}
@@ -552,8 +555,10 @@ Missing lines.
 			}
 		}
 		d: {
-			x:  "a \(run.a) z"
-			x2: "a \(run2.a) z"
+			let A_3 = run.a
+			let A_4 = run2.a
+			x:  "a \(A_3) z"
+			x2: "a \(A_4) z"
 			run: {
 				a: string
 			}
@@ -632,14 +637,17 @@ Missing lines.
 			}
 		}
 		b: {
-			x: "a \(run.a) z"
+			let A = run.a
+			x: "a \(A) z"
 			run: {
 				a: string
 			}
 		}
 		c: {
-			x:  "a \(run.a) z"
-			x2: "a \(run2.a) z"
+			let A_1 = run.a
+			let A_2 = run2.a
+			x:  "a \(A_1) z"
+			x2: "a \(A_2) z"
 			run: {
 				a: string
 			}
@@ -648,8 +656,10 @@ Missing lines.
 			}
 		}
 		d: {
-			x:  "a \(run.a) z"
-			x2: "a \(run2.a) z"
+			let A_3 = run.a
+			let A_4 = run2.a
+			x:  "a \(A_3) z"
+			x2: "a \(A_4) z"
 			run: {
 				a: string
 			}
@@ -825,14 +835,17 @@ Missing lines.
 			}
 		}
 		b: {
-			x: "a \(run.a) z"
+			let A = run.a
+			x: "a \(A) z"
 			run: {
 				a: string
 			}
 		}
 		c: {
-			x:  "a \(run.a) z"
-			x2: "a \(run2.a) z"
+			let A_1 = run.a
+			let A_2 = run2.a
+			x:  "a \(A_1) z"
+			x2: "a \(A_2) z"
 			run: {
 				a: string
 			}
@@ -841,8 +854,10 @@ Missing lines.
 			}
 		}
 		d: {
-			x:  "a \(run.a) z"
-			x2: "a \(run2.a) z"
+			let A_3 = run.a
+			let A_4 = run2.a
+			x:  "a \(A_3) z"
+			x2: "a \(A_4) z"
 			run: {
 				a: string
 			}
@@ -936,14 +951,17 @@ Missing lines.
 			}
 		}
 		b: {
-			x: "a \(run.a) z"
+			let A = run.a
+			x: "a \(A) z"
 			run: {
 				a: string
 			}
 		}
 		c: {
-			x:  "a \(run.a) z"
-			x2: "a \(run2.a) z"
+			let A_1 = run.a
+			let A_2 = run2.a
+			x:  "a \(A_1) z"
+			x2: "a \(A_2) z"
 			run: {
 				a: string
 			}
@@ -952,8 +970,10 @@ Missing lines.
 			}
 		}
 		d: {
-			x:  "a \(run.a) z"
-			x2: "a \(run2.a) z"
+			let A_3 = run.a
+			let A_4 = run2.a
+			x:  "a \(A_3) z"
+			x2: "a \(A_4) z"
 			run: {
 				a: string
 			}
@@ -983,103 +1003,7 @@ Missing lines.
 diff old new
 --- old
 +++ new
-@@ -61,29 +61,24 @@
- 			}
- 		}
- 		b: {
--			let A = run.a
--			x: "a \(A) z"
--			run: {
--				a: string
--			}
--		}
--		c: {
--			let A_1 = run.a
--			let A_2 = run2.a
--			x:  "a \(A_1) z"
--			x2: "a \(A_2) z"
--			run: {
--				a: string
--			}
--			run2: {
--				a: string
--			}
--		}
--		d: {
--			let A_3 = run.a
--			let A_4 = run2.a
--			x:  "a \(A_3) z"
--			x2: "a \(A_4) z"
-+			x: "a \(run.a) z"
-+			run: {
-+				a: string
-+			}
-+		}
-+		c: {
-+			x:  "a \(run.a) z"
-+			x2: "a \(run2.a) z"
-+			run: {
-+				a: string
-+			}
-+			run2: {
-+				a: string
-+			}
-+		}
-+		d: {
-+			x:  "a \(run.a) z"
-+			x2: "a \(run2.a) z"
- 			run: {
- 				a: string
- 			}
-@@ -162,29 +157,24 @@
- 			}
- 		}
- 		b: {
--			let A = run.a
--			x: "a \(A) z"
--			run: {
--				a: string
--			}
--		}
--		c: {
--			let A_1 = run.a
--			let A_2 = run2.a
--			x:  "a \(A_1) z"
--			x2: "a \(A_2) z"
--			run: {
--				a: string
--			}
--			run2: {
--				a: string
--			}
--		}
--		d: {
--			let A_3 = run.a
--			let A_4 = run2.a
--			x:  "a \(A_3) z"
--			x2: "a \(A_4) z"
-+			x: "a \(run.a) z"
-+			run: {
-+				a: string
-+			}
-+		}
-+		c: {
-+			x:  "a \(run.a) z"
-+			x2: "a \(run2.a) z"
-+			run: {
-+				a: string
-+			}
-+			run2: {
-+				a: string
-+			}
-+		}
-+		d: {
-+			x:  "a \(run.a) z"
-+			x2: "a \(run2.a) z"
- 			run: {
- 				a: string
- 			}
-@@ -216,72 +206,72 @@
+@@ -216,72 +216,72 @@
  }
  == Final
  {
@@ -1218,104 +1142,8 @@ diff old new
  			run: {
  				a: string
  			}
-@@ -360,29 +350,24 @@
- 			}
- 		}
- 		b: {
--			let A = run.a
--			x: "a \(A) z"
--			run: {
--				a: string
--			}
--		}
--		c: {
--			let A_1 = run.a
--			let A_2 = run2.a
--			x:  "a \(A_1) z"
--			x2: "a \(A_2) z"
--			run: {
--				a: string
--			}
--			run2: {
--				a: string
--			}
--		}
--		d: {
--			let A_3 = run.a
--			let A_4 = run2.a
--			x:  "a \(A_3) z"
--			x2: "a \(A_4) z"
-+			x: "a \(run.a) z"
-+			run: {
-+				a: string
-+			}
-+		}
-+		c: {
-+			x:  "a \(run.a) z"
-+			x2: "a \(run2.a) z"
-+			run: {
-+				a: string
-+			}
-+			run2: {
-+				a: string
-+			}
-+		}
-+		d: {
-+			x:  "a \(run.a) z"
-+			x2: "a \(run2.a) z"
- 			run: {
- 				a: string
- 			}
-@@ -476,29 +461,24 @@
- 			}
- 		}
- 		b: {
--			let A = run.a
--			x: "a \(A) z"
--			run: {
--				a: string
--			}
--		}
--		c: {
--			let A_1 = run.a
--			let A_2 = run2.a
--			x:  "a \(A_1) z"
--			x2: "a \(A_2) z"
--			run: {
--				a: string
--			}
--			run2: {
--				a: string
--			}
--		}
--		d: {
--			let A_3 = run.a
--			let A_4 = run2.a
--			x:  "a \(A_3) z"
--			x2: "a \(A_4) z"
-+			x: "a \(run.a) z"
-+			run: {
-+				a: string
-+			}
-+		}
-+		c: {
-+			x:  "a \(run.a) z"
-+			x2: "a \(run2.a) z"
-+			run: {
-+				a: string
-+			}
-+			run2: {
-+				a: string
-+			}
-+		}
-+		d: {
-+			x:  "a \(run.a) z"
-+			x2: "a \(run2.a) z"
- 			run: {
- 				a: string
- 			}
--- diff/value/todo/p0 --
-Large change, investigate.
+-- diff/value/explanation --
+Improved error messages.
 -- out/value --
 == Simplified
 {

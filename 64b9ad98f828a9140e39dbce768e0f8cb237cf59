@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "961c2af6_6593754a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-08T14:59:51Z",
+      "side": 1,
+      "message": "I think this is a little misleading. This CL doesn\u0027t stop the context from being kept alive for a long time. Indeed we\u0027re continuing to use it in order to validate each module.cue file that comes in, even if we\u0027re not actually using it to parse that file initially.",
+      "revId": "64b9ad98f828a9140e39dbce768e0f8cb237cf59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6f235006_869a266e",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -31,6 +48,57 @@
       "writtenOn": "2024-05-08T13:36:50Z",
       "side": 1,
       "message": "Per our chat earlier, happy to defer to Marcel here. But +1 on the detail I understand 😊",
+      "revId": "64b9ad98f828a9140e39dbce768e0f8cb237cf59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "35732c47_f4ae1881",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-08T14:59:51Z",
+      "side": 1,
+      "message": "LGTM modulo some comment and commit message suggestions.",
+      "revId": "64b9ad98f828a9140e39dbce768e0f8cb237cf59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8826f1c6_338fd433",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-08T14:59:51Z",
+      "side": 1,
+      "message": "This comment is misleading IMHO. We are still using this context as part of Parse and ParseLegacy (because it\u0027s part of the values inside the cue.Value values inside _schemas, so we can\u0027t avoid doing that). What\u0027s important is that we don\u0027t invoke CompileBytes or CompileString for each module file on this schema, because that is what causes the memory leak.",
+      "revId": "64b9ad98f828a9140e39dbce768e0f8cb237cf59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4bc77691_9c700d78",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-08T14:59:51Z",
+      "side": 1,
+      "message": "```suggestion\n\t// Unfortunately we need a new context. See the note inside [moduleSchemaDo].\n```",
       "revId": "64b9ad98f828a9140e39dbce768e0f8cb237cf59",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

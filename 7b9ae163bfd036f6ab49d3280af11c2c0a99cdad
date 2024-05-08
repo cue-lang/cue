@@ -34,6 +34,24 @@
       "parentUuid": "58d39d77_1066ab4c",
       "revId": "7b9ae163bfd036f6ab49d3280af11c2c0a99cdad",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bcf01da_a6c62f98",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 785,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-08T09:58:44Z",
+      "side": 1,
+      "message": "v.Err() has different semantics.\n\nAdded doc comments.",
+      "parentUuid": "c9bb3350_4a465b9b",
+      "revId": "7b9ae163bfd036f6ab49d3280af11c2c0a99cdad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

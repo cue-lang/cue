@@ -41,8 +41,9 @@ diff old new
 -[F2 _]
  [D]
  [L]
--- diff/out/todo/p1 --
-Missing line item.
+-- diff/doc/explanation --
+An incomplete dynamic field does not manifest itself as an invalid field
+in the new evaluator. This is probably for the better.
 -- out/doc --
 []
 [F1]

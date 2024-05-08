@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3469fef7_20e5e159",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-08T14:11:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c50660b9_fed32195",
+      "revId": "39043550ad70e4d94f8217a464a4cc584a45c56c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "60b2d9c5_8e3da1a0",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-05-08T14:01:46Z",
       "side": 1,
       "message": "should this include a new test or any test changes?",
+      "revId": "39043550ad70e4d94f8217a464a4cc584a45c56c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c94d4d6_d26a15a4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-08T14:11:27Z",
+      "side": 1,
+      "message": "The way it was is not necessarily wrong and I can\u0027t think of a scenario where it would be. It is just a bit of defensive programming, where it may cause issues (analogous to ToExpr) and it may be faster.\n\nBut as I can\u0027t think of a scenario where this is bad, I can\u0027t really come up with a test for it.",
+      "parentUuid": "60b2d9c5_8e3da1a0",
       "revId": "39043550ad70e4d94f8217a464a4cc584a45c56c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

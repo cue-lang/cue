@@ -331,7 +331,7 @@ dynamicSimple: {
 	} @field(2) @field(1) @field(4) @field(3) @field(5)
 	doNotPropagate: {
 		#A: {} @attr1()
-		a: {} @attr1()
+		a: {}
 
 		// Do not accumulated field attributes in embedding.
 		#B: {} @attr1()
@@ -399,7 +399,7 @@ dynamicSimple: {
 	} @field(2) @field(1) @field(4) @field(3) @field(5)
 	doNotPropagate: {
 		#A: {} @attr1()
-		a: {} @attr1()
+		a: {}
 		#B: {} @attr1()
 		b: {}
 	}
@@ -456,35 +456,10 @@ dynamicSimple: {
 diff old new
 --- old
 +++ new
-@@ -125,44 +125,45 @@
- 	} @field(2) @field(1) @field(4) @field(3) @field(5)
- 	doNotPropagate: {
- 		#A: {} @attr1()
--		a: {}
--
--		// Do not accumulated field attributes in embedding.
--		#B: {} @attr1()
--		b: {}
--	}
--	embedScalarField: {
--		a: 2 @attr1() @attr2()
--	}
--	embedScalarDecl: {
--		b0: {
--			2, @attr1()
--		}
--		b1: {
--			2, @attr1()
--		}
--		b2: {
--			2, @attr2(), @attr1()
--		}
--	}
--	dontMergeForDef: {
--		a: {
--			@decl1()
--		}
--		b: {
+@@ -150,19 +150,20 @@
+ 			@decl1()
+ 		}
+ 		b: {
 -			@decl1(), @decl2()
 -			x: 1
 -		}
@@ -498,31 +473,6 @@ diff old new
 -	comprehensions: {
 -		@step(0)
 -		@step(2c)
-+		a: {} @attr1()
-+
-+		// Do not accumulated field attributes in embedding.
-+		#B: {} @attr1()
-+		b: {}
-+	}
-+	embedScalarField: {
-+		a: 2 @attr1() @attr2()
-+	}
-+	embedScalarDecl: {
-+		b0: {
-+			2, @attr1()
-+		}
-+		b1: {
-+			2, @attr1()
-+		}
-+		b2: {
-+			2, @attr2(), @attr1()
-+		}
-+	}
-+	dontMergeForDef: {
-+		a: {
-+			@decl1()
-+		}
-+		b: {
 +			@decl2(), @decl1()
 +			x: 1
 +		}
@@ -540,33 +490,10 @@ diff old new
  		c1: {} @step(1)
  		c2: {
  			@step(2a)
-@@ -192,42 +193,43 @@
- 	} @field(2) @field(1) @field(4) @field(3) @field(5)
- 	doNotPropagate: {
- 		#A: {} @attr1()
--		a: {}
--		#B: {} @attr1()
--		b: {}
--	}
--	embedScalarField: {
--		a: 2 @attr1() @attr2()
--	}
--	embedScalarDecl: {
--		b0: {
--			2, @attr1()
--		}
--		b1: {
--			2, @attr1()
--		}
--		b2: {
--			2, @attr2(), @attr1()
--		}
--	}
--	dontMergeForDef: {
--		a: {
--			@decl1()
--		}
--		b: {
+@@ -215,19 +216,20 @@
+ 			@decl1()
+ 		}
+ 		b: {
 -			@decl1(), @decl2()
 -			x: 1
 -		}
@@ -580,29 +507,6 @@ diff old new
 -	comprehensions: {
 -		@step(0)
 -		@step(2c)
-+		a: {} @attr1()
-+		#B: {} @attr1()
-+		b: {}
-+	}
-+	embedScalarField: {
-+		a: 2 @attr1() @attr2()
-+	}
-+	embedScalarDecl: {
-+		b0: {
-+			2, @attr1()
-+		}
-+		b1: {
-+			2, @attr1()
-+		}
-+		b2: {
-+			2, @attr2(), @attr1()
-+		}
-+	}
-+	dontMergeForDef: {
-+		a: {
-+			@decl1()
-+		}
-+		b: {
 +			@decl2(), @decl1()
 +			x: 1
 +		}
@@ -621,9 +525,9 @@ diff old new
  		c2: {
  			@step(2a)
 -- diff/value/todo/p1 --
-== Eval.doNotPropagate
-.a: missing attribute.
-#B: missing comment
+comprehension: @step(4c) added in comprehensions
+-- diff/value/todo/p3 --
+Reordering of attributes.
 -- out/value --
 == Simplified
 {

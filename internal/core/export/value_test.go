@@ -37,11 +37,21 @@ var exclude = map[string]string{
 }
 
 func TestValue(t *testing.T) {
+	const debugValue = `
+-- in.cue --
+// Issue #2305
+g: #d
+#d: 1
+`
+
 	test := cuetxtar.TxTarTest{
 		Root:   "./testdata/main",
 		Name:   "value",
 		Skip:   exclude,
 		Matrix: cuetdtest.SmallMatrix,
+
+		// Uncomment to debug an isolated test case.
+		// DebugArchive: debugValue,
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {

@@ -11,6 +11,12 @@ cd $WORK/example
 exec git init .
 exec git add .
 exec git -c user.name=noone -c user.email=noone@example.com commit -m 'initial commit'
+
+# Remove an file that's outside the module directory, which
+# makes the git repository unclean but the module subdirectory
+# remains clean.
+rm $WORK/example/otherfile
+
 cd cuemodule
 exec cue mod publish v0.0.1
 stdout '^published x.example/e@v0.0.1 to [^ ]+/x.example/e:v0.0.1@sha256:[0-9a-f]+$'
@@ -90,3 +96,6 @@ e: true
 package e
 
 sensitive: true
+-- example/otherfile --
+this will be removed but is outside the module so
+that shouldn't stop the publish working.

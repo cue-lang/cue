@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d9a5d84_25f543dc",
+        "filename": "internal/vcs/git.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-09T12:16:50Z",
+      "side": 1,
+      "message": "nit: nested modules, for clarity against git submodules",
+      "range": {
+        "startLine": 73,
+        "startChar": 27,
+        "endLine": 73,
+        "endChar": 37
+      },
+      "revId": "aaadea64998d035cf195535cfb840072c831a3b2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

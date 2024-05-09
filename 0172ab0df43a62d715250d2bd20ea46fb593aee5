@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "58c706df_a57e8dfd",
+        "filename": "internal/filetypes/filetypes.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-09T21:21:50Z",
+      "side": 1,
+      "message": "done; note I had only done this for parity with ParseFile, so I\u0027ve adapted it too.",
+      "parentUuid": "3a840661_c7475034",
+      "revId": "0172ab0df43a62d715250d2bd20ea46fb593aee5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2a7eaff4_c138a177",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-05-09T17:07:50Z",
       "side": 1,
       "message": "In passing:\n\n```suggestion\n\t// This goes off the assumption that file names may not have a `:` in their\n```",
+      "revId": "0172ab0df43a62d715250d2bd20ea46fb593aee5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "da93616c_9d143874",
+        "filename": "internal/filetypes/util.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-09T21:21:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2a7eaff4_c138a177",
       "revId": "0172ab0df43a62d715250d2bd20ea46fb593aee5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

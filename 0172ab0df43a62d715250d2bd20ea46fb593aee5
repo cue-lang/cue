@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "87e000f3_ba4f9ad8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-09T17:07:50Z",
+      "side": 1,
+      "message": "LGTM with a couple trivial suggestions.",
+      "revId": "0172ab0df43a62d715250d2bd20ea46fb593aee5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a840661_c7475034",
+        "filename": "internal/filetypes/filetypes.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-09T17:07:50Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t\t\treturn nil, errors.Newf(token.NoPos, \"empty file name\")\n```\n\nThe ` in \"\"` suffix doesn\u0027t really seem to add any useful information to my mind.",
+      "revId": "0172ab0df43a62d715250d2bd20ea46fb593aee5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a7eaff4_c138a177",
+        "filename": "internal/filetypes/util.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-09T17:07:50Z",
+      "side": 1,
+      "message": "In passing:\n\n```suggestion\n\t// This goes off the assumption that file names may not have a `:` in their\n```",
+      "revId": "0172ab0df43a62d715250d2bd20ea46fb593aee5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

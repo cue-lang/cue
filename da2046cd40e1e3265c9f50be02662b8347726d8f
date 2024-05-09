@@ -245,6 +245,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e0aa2d8_52f32b17",
+        "filename": "pkg/encoding/json/testdata/gen.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 418,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-09T22:03:12Z",
+      "side": 1,
+      "message": "d\u0027oh, LGTM.",
+      "parentUuid": "25617f50_1593550c",
+      "revId": "da2046cd40e1e3265c9f50be02662b8347726d8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cd6118d7_4ab612a5",

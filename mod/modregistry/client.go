@@ -450,8 +450,13 @@ func isNotExist(err error) bool {
 	// without explicitly including a "denied" error code.
 	// We treat this as a "not found" error because there's
 	// nothing the user can do about it.
+	//
+	// Also, some registries return an invalid error code with a 404
+	// response (see https://cuelang.org/issue/2982), so it
+	// seems reasonable to treat that as a non-found error too.
 	if herr := ociregistry.HTTPError(nil); errors.As(err, &herr) {
-		return herr.StatusCode() == http.StatusForbidden
+		return herr.StatusCode() == http.StatusForbidden ||
+			herr.StatusCode() == http.StatusNotFound
 	}
 	return false
 }

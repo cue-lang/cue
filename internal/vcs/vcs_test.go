@@ -51,6 +51,10 @@ func TestGit(t *testing.T) {
 	mustRunCmd(t, dir, "git", "init")
 	v, err := New("git", filepath.Join(dir, "subdir"))
 	qt.Assert(t, qt.IsNil(err))
+
+	// The status shows that we have uncommitted files
+	// because we haven't yet added the files after doing
+	// git init.
 	status, err := v.Status(ctx)
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.IsTrue(status.Uncommitted))
@@ -83,6 +87,13 @@ func TestGit(t *testing.T) {
 		"subdir/bar/baz",
 		"subdir/foo",
 	}))
+
+	// Change a file that's not in subdir. The status should remain the same.
+	err = os.WriteFile(filepath.Join(dir, "bar.txt"), []byte("something else"), 0o666)
+	qt.Assert(t, qt.IsNil(err))
+	status1, err := v.Status(ctx)
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(status1, status))
 }
 
 // initTestEnv sets up the environment so that

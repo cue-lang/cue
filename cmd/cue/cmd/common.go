@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"bytes"
 	"io"
 	"os"
 	"path/filepath"
@@ -101,16 +100,11 @@ func exitOnErr(cmd *Command, err error, fatal bool) {
 	}
 
 	cwd, _ := os.Getwd()
-
-	w := &bytes.Buffer{}
-	errors.Print(w, err, &errors.Config{
+	errors.Print(cmd.Stderr(), err, &errors.Config{
 		Format:  format,
 		Cwd:     cwd,
 		ToSlash: testing.Testing(),
 	})
-
-	b := w.Bytes()
-	_, _ = cmd.Stderr().Write(b)
 	if fatal {
 		panicExit()
 	}

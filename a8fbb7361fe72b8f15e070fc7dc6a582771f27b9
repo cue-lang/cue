@@ -35,6 +35,42 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1166dca2_a6b6ff44",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-09T21:40:43Z",
+      "side": 1,
+      "message": "indeed, there\u0027s no other library that exposes a parser or tokenizer that I could find. this one is unstable and uses unsafe, both of which are very unfortunate, but at least it sort of works today. I\u0027ve raised an issue upstream about unsafe, and I hope they stabilize the API soon-ish.",
+      "parentUuid": "80cc8e21_d64587c7",
+      "revId": "a8fbb7361fe72b8f15e070fc7dc6a582771f27b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a4b2d1b_fc526228",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-09T21:40:43Z",
+      "side": 1,
+      "message": "I thought about it for the sake of CUE_UPDATE; will take a look in a future CL.",
+      "parentUuid": "14fa24a4_80fb805b",
+      "revId": "a8fbb7361fe72b8f15e070fc7dc6a582771f27b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "162889a7_448c5f80",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-05-09T16:22:10Z",
       "side": 1,
       "message": "Why not just name this \"toml\" ? The \"unstable\" part doesn\u0027t seem that interesting when we\u0027re already importing it.",
+      "revId": "a8fbb7361fe72b8f15e070fc7dc6a582771f27b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bad23962_77f4c13b",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-09T21:40:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "162889a7_448c5f80",
       "revId": "a8fbb7361fe72b8f15e070fc7dc6a582771f27b9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +123,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "572a7210_4b0bc412",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-09T21:40:43Z",
+      "side": 1,
+      "message": "I deliberately avoided this because I\u0027m pretty sure I will have to redesign this once I start supporting tables. I plan to document it when I\u0027m done with those.",
+      "parentUuid": "aba4a22b_eec20a60",
+      "revId": "a8fbb7361fe72b8f15e070fc7dc6a582771f27b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "30258be6_7cfef47a",
@@ -82,6 +154,24 @@
       "writtenOn": "2024-05-09T16:22:10Z",
       "side": 1,
       "message": "```suggestion\n// subsequent calls to this method will return [io.EOF].\n```",
+      "revId": "a8fbb7361fe72b8f15e070fc7dc6a582771f27b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f9dc18b7_9515fd32",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-09T21:40:43Z",
+      "side": 1,
+      "message": "I was deliberate here. I want to reserve the right to return other errors, e.g. if the first Decode call fails, keep returning that same error, much like io.Closer errors tend to be sticky. I don\u0027t think I need to make any promises in terms of specific behavior.",
+      "parentUuid": "30258be6_7cfef47a",
       "revId": "a8fbb7361fe72b8f15e070fc7dc6a582771f27b9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +193,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f2246b2_25f613a9",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-09T21:40:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2ef31077_fcfc704e",
+      "revId": "a8fbb7361fe72b8f15e070fc7dc6a582771f27b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f7ae6001_82befdbb",
@@ -116,6 +224,24 @@
       "writtenOn": "2024-05-09T16:22:10Z",
       "side": 1,
       "message": "Could we add a check that the decoded result is somehow data-equivalent to the result of the TOML itself when decoded? That is, have we actually preserved the data that we\u0027re converting to CUE?",
+      "revId": "a8fbb7361fe72b8f15e070fc7dc6a582771f27b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "22429e00_8dad81b7",
+        "filename": "encoding/toml/decode_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-09T21:40:43Z",
+      "side": 1,
+      "message": "I had a similar thought earlier in the evening, e.g. doing an equality check over JSON or `map[string]any` from both TOML directly and CUE. I\u0027ll add a TODO, because I\u0027d rather keep the commits small if possible.",
+      "parentUuid": "f7ae6001_82befdbb",
       "revId": "a8fbb7361fe72b8f15e070fc7dc6a582771f27b9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -33,6 +33,24 @@
       "message": "Technically there is an advantage to the previous approach: when there are many errors (as there may well be) the previous approach would use a single write call rather than many write calls, and that overhead can really mount up.\n\nbufio.Writer is there for to mitigate exactly that issue: perhaps use that here?",
       "revId": "08147c68a17a9e2b7fa116c6ded7f0bc8f234c95",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85b01ed2_59e4c283",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-09T12:24:02Z",
+      "side": 1,
+      "message": "I don\u0027t know, we already print errors straight to stderr elsewhere like in root.go. If this were a problem in practice we would likely be using bufio.Writers for stdout and stderr everywhere. I\u0027ve personally not seen buffering on top of stdout/stderr, and it seems like mild premature optimization.\n\nas another example, `cue export` writes to `os.Stdout` directly without any buffering. if we did indeed want to buffer stdout and stderr, I would do that wholesale via cmd\u0027s stdout and stderr methods rather than having to remember to insert buffering everywhere separately.",
+      "parentUuid": "2b88b79c_c07fdf71",
+      "revId": "08147c68a17a9e2b7fa116c6ded7f0bc8f234c95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

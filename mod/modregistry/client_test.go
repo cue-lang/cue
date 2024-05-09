@@ -19,6 +19,9 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"os"
 	"path"
 	"testing"
@@ -28,6 +31,7 @@ import (
 
 	"golang.org/x/tools/txtar"
 
+	"cuelabs.dev/go/oci/ociregistry/ociclient"
 	"cuelabs.dev/go/oci/ociregistry/ocimem"
 
 	"cuelang.org/go/internal/mod/semver"
@@ -125,6 +129,43 @@ x: a.foo + something.bar
 	tags, err := c.ModuleVersions(ctx, mv.Path())
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.DeepEquals(tags, []string{"v0.5.100"}))
+}
+
+func TestNotFound(t *testing.T) {
+	// Check that we get appropriate not-found behavior when the
+	// HTTP response isn't entirely according to spec.
+	// See https://cuelang.org/issue/2982 for an example.
+	var writeResponse func(w http.ResponseWriter)
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		writeResponse(w)
+	}))
+	defer srv.Close()
+	u, _ := url.Parse(srv.URL)
+	reg, err := ociclient.New(u.Host, &ociclient.Options{
+		Insecure: true,
+	})
+	qt.Assert(t, qt.IsNil(err))
+	client := NewClient(reg)
+	checkNotFound := func(writeResp func(w http.ResponseWriter)) {
+		ctx := context.Background()
+		writeResponse = writeResp
+		mv := module.MustNewVersion("foo.com/bar@v1", "v1.2.3")
+		_, err := client.GetModule(ctx, mv)
+		qt.Assert(t, qt.ErrorIs(err, ErrNotFound))
+		versions, err := client.ModuleVersions(ctx, "foo/bar")
+		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.HasLen(versions, 0))
+	}
+
+	checkNotFound(func(w http.ResponseWriter) {
+		// issue 2982
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte(`{"errors":[{"code":"NOT_FOUND","message":"repository playground/cue/github.com not found"}]}`))
+	})
+	checkNotFound(func(w http.ResponseWriter) {
+		w.WriteHeader(http.StatusForbidden)
+		w.Write([]byte(`some other message`))
+	})
 }
 
 func TestPutWithMetadata(t *testing.T) {

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db5ead54_8dd57882",
+        "filename": "pkg/struct/testdata/struct.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-09T21:59:16Z",
+      "side": 1,
+      "message": "so in this case the old evaluator is still buggy? should we call this out in the commit message?",
+      "revId": "42a32ce38dc34b57457a2d119059bb99524c4273",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

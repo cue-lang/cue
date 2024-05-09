@@ -50,7 +50,7 @@ func (s *Struct) Arcs() []*adt.Vertex {
 func (s *Struct) Len() int {
 	count := 0
 	for _, a := range s.Arcs() {
-		if a.Label.IsString() {
+		if a.Label.IsString() && !s.node.IsOptional(a.Label) {
 			count++
 		}
 	}

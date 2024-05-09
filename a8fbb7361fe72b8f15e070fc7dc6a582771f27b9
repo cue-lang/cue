@@ -16,6 +16,108 @@
       "message": "the tests could benefit from the use of tdtest or cuetdtest. just an idea.",
       "revId": "a8fbb7361fe72b8f15e070fc7dc6a582771f27b9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "80cc8e21_d64587c7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-09T16:22:10Z",
+      "side": 1,
+      "message": "LGTM, nice stuff. I have some reservations about importing a package that\u0027s explicitly marked as \"unstable\" and that uses unsafe a little more freely than I\u0027d like, but I\u0027m guessing there\u0027s no decent alternative.",
+      "revId": "a8fbb7361fe72b8f15e070fc7dc6a582771f27b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "162889a7_448c5f80",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-09T16:22:10Z",
+      "side": 1,
+      "message": "Why not just name this \"toml\" ? The \"unstable\" part doesn\u0027t seem that interesting when we\u0027re already importing it.",
+      "revId": "a8fbb7361fe72b8f15e070fc7dc6a582771f27b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aba4a22b_eec20a60",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-09T16:22:10Z",
+      "side": 1,
+      "message": "a doc comment on this would be useful.",
+      "revId": "a8fbb7361fe72b8f15e070fc7dc6a582771f27b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30258be6_7cfef47a",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-09T16:22:10Z",
+      "side": 1,
+      "message": "```suggestion\n// subsequent calls to this method will return [io.EOF].\n```",
+      "revId": "a8fbb7361fe72b8f15e070fc7dc6a582771f27b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ef31077_fcfc704e",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-09T16:22:10Z",
+      "side": 1,
+      "message": "```suggestion\n// because some kinds of top-level expressions like comments and table headers\n```",
+      "revId": "a8fbb7361fe72b8f15e070fc7dc6a582771f27b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7ae6001_82befdbb",
+        "filename": "encoding/toml/decode_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-09T16:22:10Z",
+      "side": 1,
+      "message": "Could we add a check that the decoded result is somehow data-equivalent to the result of the TOML itself when decoded? That is, have we actually preserved the data that we\u0027re converting to CUE?",
+      "revId": "a8fbb7361fe72b8f15e070fc7dc6a582771f27b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

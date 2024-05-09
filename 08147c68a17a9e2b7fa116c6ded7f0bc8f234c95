@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c09ea6f0_092fbe2b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-09T12:19:17Z",
+      "side": 1,
+      "message": "I like the idea but we can have large numbers of error messages and the overhead of many writes could be significant, so maybe better to have at least some buffering?",
+      "revId": "08147c68a17a9e2b7fa116c6ded7f0bc8f234c95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b88b79c_c07fdf71",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-09T12:19:17Z",
+      "side": 1,
+      "message": "Technically there is an advantage to the previous approach: when there are many errors (as there may well be) the previous approach would use a single write call rather than many write calls, and that overhead can really mount up.\n\nbufio.Writer is there for to mitigate exactly that issue: perhaps use that here?",
+      "revId": "08147c68a17a9e2b7fa116c6ded7f0bc8f234c95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

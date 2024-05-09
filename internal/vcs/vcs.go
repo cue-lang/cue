@@ -59,6 +59,9 @@ var vcsTypes = map[string]func(dir string) (VCS, error){
 // version control system of the given type that
 // controls the given directory.
 //
+// Status checks apply only to the given directory; other
+// directories controlled by the VCS will not be considered.
+//
 // It returns an error if a VCS of the specified type
 // cannot be found.
 func New(vcsType string, dir string) (VCS, error) {

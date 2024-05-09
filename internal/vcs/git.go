@@ -25,7 +25,8 @@ import (
 )
 
 type gitVCS struct {
-	root string
+	root   string
+	subDir string
 }
 
 func newGitVCS(dir string) (VCS, error) {
@@ -37,7 +38,8 @@ func newGitVCS(dir string) (VCS, error) {
 		}
 	}
 	return gitVCS{
-		root: root,
+		root:   root,
+		subDir: dir,
 	}, nil
 }
 
@@ -64,7 +66,13 @@ func (v gitVCS) ListFiles(ctx context.Context, dir string) ([]string, error) {
 
 // Status implements [VCS.Status].
 func (v gitVCS) Status(ctx context.Context) (Status, error) {
-	out, err := runCmd(ctx, v.root, "git", "status", "--porcelain")
+	// We only care about the module's subdirectory status - if anything
+	// else is dirty, it won't go into the module so we don't care.
+	// TODO this will change if/when we include license files
+	// from outside the module directory. It also over-reports dirtiness
+	// because there might be submodules that aren't included, but
+	// are nonetheless included in the status check.
+	out, err := runCmd(ctx, v.root, "git", "status", "--porcelain", v.subDir)
 	if err != nil {
 		return Status{}, err
 	}

@@ -51,6 +51,24 @@
       "parentUuid": "2b88b79c_c07fdf71",
       "revId": "08147c68a17a9e2b7fa116c6ded7f0bc8f234c95",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75005cd6_56550a82",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-09T13:09:36Z",
+      "side": 1,
+      "message": "OK, fair enough. We could probably do that.",
+      "parentUuid": "85b01ed2_59e4c283",
+      "revId": "08147c68a17a9e2b7fa116c6ded7f0bc8f234c95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

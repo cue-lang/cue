@@ -13,7 +13,7 @@ cmp stdout ../expect-eval-stdout
 env CUE_REGISTRY=$ORIG_CUE_REGISTRY
 env CUE_CACHE_DIR=$WORK/.tmp/different-cache
 ! exec cue eval
-stderr 'repository name not known to registry'
+stderr 'cannot fetch example.com@v0.0.1: module example.com@v0.0.1: module not found'
 
 -- expect-eval-stdout --
 main:                   "main"

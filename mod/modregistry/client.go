@@ -118,8 +118,7 @@ func (c *Client) GetModule(ctx context.Context, m module.Version) (*Module, erro
 	}
 	rd, err := loc.Registry.GetTag(ctx, loc.Repository, loc.Tag)
 	if err != nil {
-		// TODO should we use isNotExist here too?
-		if errors.Is(err, ociregistry.ErrManifestUnknown) {
+		if isNotExist(err) {
 			return nil, fmt.Errorf("module %v: %w", m, ErrNotFound)
 		}
 		return nil, fmt.Errorf("module %v: %w", m, err)
@@ -450,8 +449,14 @@ func isNotExist(err error) bool {
 	// without explicitly including a "denied" error code.
 	// We treat this as a "not found" error because there's
 	// nothing the user can do about it.
+	//
+	// Also, some registries return an invalid error code with a 404
+	// response (see https://cuelang.org/issue/2982), so it
+	// seems reasonable to treat that as a non-found error too.
 	if herr := ociregistry.HTTPError(nil); errors.As(err, &herr) {
-		return herr.StatusCode() == http.StatusForbidden
+		statusCode := herr.StatusCode()
+		return statusCode == http.StatusForbidden ||
+			statusCode == http.StatusNotFound
 	}
 	return false
 }

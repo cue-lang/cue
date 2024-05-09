@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a90819e2_d0c706fa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-09T17:16:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "06008331_ad61a00c",
+      "revId": "da2046cd40e1e3265c9f50be02662b8347726d8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4f4ffb83_6c94f1bb",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-05-08T21:03:53Z",
       "side": 1,
       "message": "perhaps clarify \"incorrectly returned\" and why - that in CUE, unifying `\"a\"` with `\"a\" | \"b\"` should result in `\"a\"` and not an error.",
+      "revId": "da2046cd40e1e3265c9f50be02662b8347726d8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2640e171_d7a6b97b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-09T17:16:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4f4ffb83_6c94f1bb",
       "revId": "da2046cd40e1e3265c9f50be02662b8347726d8f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b18d6360_aa7bc3b5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-09T17:16:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a0e9f0a5_73360d1e",
+      "revId": "da2046cd40e1e3265c9f50be02662b8347726d8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dd76bbaa_e11ce05b",
@@ -65,6 +119,24 @@
       "writtenOn": "2024-05-08T21:03:53Z",
       "side": 1,
       "message": "ditto about the backticks.",
+      "revId": "da2046cd40e1e3265c9f50be02662b8347726d8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d265987_41c6b732",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-09T17:16:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd76bbaa_e11ce05b",
       "revId": "da2046cd40e1e3265c9f50be02662b8347726d8f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +192,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e554c83_91d70e7f",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 1513,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-09T17:16:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cad4260e_7b5a80ca",
+      "revId": "da2046cd40e1e3265c9f50be02662b8347726d8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "50e43f36_21c14c3a",
@@ -139,6 +229,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "25617f50_1593550c",
+        "filename": "pkg/encoding/json/testdata/gen.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 418,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-09T17:16:50Z",
+      "side": 1,
+      "message": "I added them in the previous CL to show to fix - should I still mention them?",
+      "parentUuid": "50e43f36_21c14c3a",
+      "revId": "da2046cd40e1e3265c9f50be02662b8347726d8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cd6118d7_4ab612a5",
         "filename": "pkg/encoding/yaml/testdata/validate.txtar",
         "patchSetId": 4
@@ -150,6 +258,24 @@
       "writtenOn": "2024-05-08T21:03:53Z",
       "side": 1,
       "message": "FYI we have been using `-- diff/explanation --` txtar entries to explain why a difference in the new evaluator output is good - in this case, better behavior. look at other files with similar file entries.",
+      "revId": "da2046cd40e1e3265c9f50be02662b8347726d8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7981b51e_179f66a4",
+        "filename": "pkg/encoding/yaml/testdata/validate.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-09T17:16:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cd6118d7_4ab612a5",
       "revId": "da2046cd40e1e3265c9f50be02662b8347726d8f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -41,13 +41,10 @@ minFields.fail1: invalid value {} (does not satisfy struct.MinFields(1)): len(fi
 minFields.failHidden1: invalid value {_a:1} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
     ./in.cue:4:12
     ./in.cue:4:29
+minFields.failOptional1: invalid value {a?:1} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
+    ./in.cue:4:12
+    ./in.cue:4:29
 maxFields.fail1: invalid value {a:1,b:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
-    ./in.cue:18:12
-    ./in.cue:18:29
-maxFields.ok4: invalid value {a?:1,b?:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
-    ./in.cue:18:12
-    ./in.cue:18:29
-maxFields.ok5: invalid value {a:1,b?:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
     ./in.cue:18:12
     ./in.cue:18:29
 
@@ -56,11 +53,9 @@ import "struct"
 
 minFields: {
 	incomplete1: {} & struct.MinFields(1)
-	fail1: _|_ // minFields.fail1: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
-	failOptional1: {
-		a?: 1
-	}
-	failHidden1: _|_ // minFields.failHidden1: invalid value {_a:1} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
+	fail1:         _|_ // minFields.fail1: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
+	failOptional1: _|_ // minFields.failOptional1: invalid value {a?:1} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
+	failHidden1:   _|_ // minFields.failHidden1: invalid value {_a:1} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
 	ok4: {
 		a: 1
 	}
@@ -86,8 +81,14 @@ maxFields: {
 	ok3: {
 		a: 1
 	}
-	ok4: _|_ // maxFields.ok4: invalid value {a?:1,b?:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1)
-	ok5: _|_ // maxFields.ok5: invalid value {a:1,b?:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1)
+	ok4: {
+		a?: 1
+		b?: 2
+	}
+	ok5: {
+		a:  1
+		b?: 2
+	}
 	ok6: {
 		a: 1
 	}
@@ -101,7 +102,7 @@ maxFields: {
 diff old new
 --- old
 +++ new
-@@ -2,23 +2,18 @@
+@@ -2,15 +2,15 @@
  minFields.fail1: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
      ./in.cue:4:12
      ./in.cue:4:29
@@ -110,31 +111,29 @@ diff old new
      ./in.cue:4:12
      ./in.cue:4:29
 -    ./in.cue:9:15
++minFields.failOptional1: invalid value {a?:1} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
++    ./in.cue:4:12
++    ./in.cue:4:29
  maxFields.fail1: invalid value {a:1,b:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
      ./in.cue:18:12
      ./in.cue:18:29
 -    ./in.cue:32:9
- maxFields.ok4: invalid value {a?:1,b?:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
-     ./in.cue:18:12
-     ./in.cue:18:29
--    ./in.cue:23:7
--maxFields.ok5: invalid value {a:1 & 1,b?:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
--    ./in.cue:18:12
--    ./in.cue:18:29
--    ./in.cue:24:7
-+maxFields.ok5: invalid value {a:1,b?:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
-+    ./in.cue:18:12
-+    ./in.cue:18:29
  
  Result:
  import "struct"
-@@ -56,7 +51,7 @@
- 		a: 1
- 	}
- 	ok4: _|_ // maxFields.ok4: invalid value {a?:1,b?:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1)
--	ok5: _|_ // maxFields.ok5: invalid value {a:1 & 1,b?:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1)
-+	ok5: _|_ // maxFields.ok5: invalid value {a:1,b?:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1)
- 	ok6: {
+@@ -17,11 +17,9 @@
+ 
+ minFields: {
+ 	incomplete1: {} & struct.MinFields(1)
+-	fail1: _|_ // minFields.fail1: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
+-	failOptional1: close({
+-		a?: 1
+-	}) & struct.MinFields(1)
+-	failHidden1: _|_ // minFields.failHidden1: invalid value {_a:1} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
++	fail1:         _|_ // minFields.fail1: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
++	failOptional1: _|_ // minFields.failOptional1: invalid value {a?:1} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
++	failHidden1:   _|_ // minFields.failHidden1: invalid value {_a:1} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
+ 	ok4: {
  		a: 1
  	}
 -- diff/todo/p2 --
@@ -153,14 +152,6 @@ maxFields.fail1: invalid value {a:1,b:2} (does not satisfy struct.MaxFields(1)):
     ./in.cue:18:12
     ./in.cue:18:29
     ./in.cue:32:9
-maxFields.ok4: invalid value {a?:1,b?:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
-    ./in.cue:18:12
-    ./in.cue:18:29
-    ./in.cue:23:7
-maxFields.ok5: invalid value {a:1 & 1,b?:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
-    ./in.cue:18:12
-    ./in.cue:18:29
-    ./in.cue:24:7
 
 Result:
 import "struct"
@@ -168,9 +159,9 @@ import "struct"
 minFields: {
 	incomplete1: {} & struct.MinFields(1)
 	fail1: _|_ // minFields.fail1: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
-	failOptional1: {
+	failOptional1: close({
 		a?: 1
-	}
+	}) & struct.MinFields(1)
 	failHidden1: _|_ // minFields.failHidden1: invalid value {_a:1} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
 	ok4: {
 		a: 1
@@ -197,8 +188,14 @@ maxFields: {
 	ok3: {
 		a: 1
 	}
-	ok4: _|_ // maxFields.ok4: invalid value {a?:1,b?:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1)
-	ok5: _|_ // maxFields.ok5: invalid value {a:1 & 1,b?:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1)
+	ok4: {
+		a?: 1
+		b?: 2
+	}
+	ok5: {
+		a:  1
+		b?: 2
+	}
 	ok6: {
 		a: 1
 	}

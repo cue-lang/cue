@@ -15,8 +15,9 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
-	"golang.org/x/text/message"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
@@ -129,8 +130,7 @@ func doVet(cmd *Command, args []string) error {
 			err = v.Validate(append(opt, cue.Concrete(false))...)
 			if !shown && err == nil {
 				shown = true
-				p := message.NewPrinter(getLang())
-				_, _ = p.Fprintln(w,
+				_, _ = fmt.Fprintln(w,
 					"some instances are incomplete; use the -c flag to show errors or suppress this message")
 			}
 		}

@@ -22,7 +22,6 @@ import (
 	"strings"
 
 	"github.com/spf13/pflag"
-	"golang.org/x/text/language"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
@@ -68,15 +67,6 @@ func defaultConfig() (*config, error) {
 			Registry: reg,
 		},
 	}, nil
-}
-
-func getLang() language.Tag {
-	loc := os.Getenv("LC_ALL")
-	if loc == "" {
-		loc = os.Getenv("LANG")
-	}
-	loc, _, _ = strings.Cut(loc, ".")
-	return language.Make(loc)
 }
 
 func loadFromArgs(args []string, cfg *load.Config) []*build.Instance {

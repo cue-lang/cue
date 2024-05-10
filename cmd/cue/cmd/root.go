@@ -25,7 +25,6 @@ import (
 	"testing"
 
 	"github.com/spf13/cobra"
-	"golang.org/x/text/message"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
@@ -346,15 +345,8 @@ func printError(cmd *Command, err error) {
 		return
 	}
 
-	// Link x/text as our localizer.
-	p := message.NewPrinter(getLang())
-	format := func(w io.Writer, format string, args ...interface{}) {
-		p.Fprintf(w, format, args...)
-	}
-
 	cwd, _ := os.Getwd()
 	errors.Print(cmd.Stderr(), err, &errors.Config{
-		Format:  format,
 		Cwd:     cwd,
 		ToSlash: testing.Testing(),
 	})

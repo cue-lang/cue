@@ -25,7 +25,7 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
-// See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#data-types
+// See https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.0.md#data-types
 var cueToOpenAPI = map[string]string{
 	"int32": "int32",
 	"int64": "int64",

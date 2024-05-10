@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36f80da7_ea15a109",
+        "filename": "internal/ci/github/workflows.cue",
+        "patchSetId": 3
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-10T15:26:38Z",
+      "side": 1,
+      "message": "Document in the commit message what has changed here and why.",
+      "revId": "f063d9fdef5721286650e654ea505778901d1374",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

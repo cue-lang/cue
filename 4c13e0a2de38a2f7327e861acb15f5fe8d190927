@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7341c7c2_670639ad",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-10T08:27:53Z",
+      "side": 1,
+      "message": "I believe the commit message is also missing a \"fixes\" or at least an \"updates\" line for the issue number.",
+      "revId": "4c13e0a2de38a2f7327e861acb15f5fe8d190927",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f57195c1_1fad6f21",
+        "filename": "pkg/encoding/yaml/testdata/validate.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-10T08:27:53Z",
+      "side": 1,
+      "message": "can you clarify what you mean by \"works\"? e.g.:\n\n\u003e It succeeds with the old evaluator but incorrectly errors with the new one.",
+      "range": {
+        "startLine": 6,
+        "startChar": 24,
+        "endLine": 6,
+        "endChar": 77
+      },
+      "revId": "4c13e0a2de38a2f7327e861acb15f5fe8d190927",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

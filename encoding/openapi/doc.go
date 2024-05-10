@@ -17,5 +17,5 @@
 //
 // It currently handles OpenAPI Schema components only.
 //
-// See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#schemaObject.
+// See https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.0.md#schema-object
 package openapi

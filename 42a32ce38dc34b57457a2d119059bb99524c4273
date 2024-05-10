@@ -34,6 +34,24 @@
       "parentUuid": "db5ead54_8dd57882",
       "revId": "42a32ce38dc34b57457a2d119059bb99524c4273",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "677a94b2_f1932a45",
+        "filename": "pkg/struct/testdata/struct.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-10T08:32:04Z",
+      "side": 1,
+      "message": "differences in positions are a known quirk that will be ironed out. what concerns me is how the outputs and diff between them in the test show that only the new evaluator fails as expected. maybe Marcel can give some ideas as to why this might be happening.\n\nyou could try rebasing on master to see if that helps.",
+      "parentUuid": "41eb42e3_8983bf63",
+      "revId": "42a32ce38dc34b57457a2d119059bb99524c4273",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

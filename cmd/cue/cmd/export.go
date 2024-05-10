@@ -111,22 +111,29 @@ The following formats are recognized:
 
 func runExport(cmd *Command, args []string) error {
 	b, err := parseArgs(cmd, args, &config{outMode: filetypes.Export})
-	exitOnErr(cmd, err, true)
+	if err != nil {
+		return err
+	}
 
 	enc, err := encoding.NewEncoder(cmd.ctx, b.outFile, b.encConfig)
-	exitOnErr(cmd, err, true)
+	if err != nil {
+		return err
+	}
 
 	iter := b.instances()
 	defer iter.close()
 	for iter.scan() {
 		v := iter.value()
-		err = enc.Encode(v)
-		exitOnErr(cmd, err, true)
+		err := enc.Encode(v)
+		if err != nil {
+			return err
+		}
 	}
-	exitOnErr(cmd, iter.err(), true)
-
-	err = enc.Close()
-	exitOnErr(cmd, err, true)
-
+	if err := iter.err(); err != nil {
+		return err
+	}
+	if err := enc.Close(); err != nil {
+		return err
+	}
 	return nil
 }

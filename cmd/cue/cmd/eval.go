@@ -86,7 +86,9 @@ const (
 
 func runEval(cmd *Command, args []string) error {
 	b, err := parseArgs(cmd, args, &config{outMode: filetypes.Eval})
-	exitOnErr(cmd, err, true)
+	if err != nil {
+		return err
+	}
 
 	syn := []cue.Option{
 		cue.Final(), // for backwards compatibility
@@ -108,7 +110,9 @@ func runEval(cmd *Command, args []string) error {
 	b.encConfig.Format = opts
 
 	e, err := encoding.NewEncoder(cmd.ctx, b.outFile, b.encConfig)
-	exitOnErr(cmd, err, true)
+	if err != nil {
+		return err
+	}
 
 	iter := b.instances()
 	defer iter.close()
@@ -170,10 +174,11 @@ func runEval(cmd *Command, args []string) error {
 			exitOnErr(cmd, err, false)
 		}
 	}
-	exitOnErr(cmd, iter.err(), true)
-
-	err = e.Close()
-	exitOnErr(cmd, err, true)
-
+	if err := iter.err(); err != nil {
+		return err
+	}
+	if err := e.Close(); err != nil {
+		return err
+	}
 	return nil
 }

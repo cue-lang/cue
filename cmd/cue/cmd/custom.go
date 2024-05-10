@@ -158,10 +158,7 @@ func doTasks(cmd *Command, typ, command string, root *cue.Instance) error {
 
 	c := flow.New(cfg, root, newTaskFunc(cmd))
 
-	err := c.Run(backgroundContext())
-	exitOnErr(cmd, err, true)
-
-	return err
+	return c.Run(backgroundContext())
 }
 
 // func (r *customRunner) tagReference(t *task, ref cue.Value) error {

@@ -91,14 +91,15 @@ func doVet(cmd *Command, args []string) error {
 	b, err := parseArgs(cmd, args, &config{
 		noMerge: true,
 	})
-	exitOnErr(cmd, err, true)
+	if err != nil {
+		return err
+	}
 
 	// Go into a special vet mode if the user explicitly specified non-cue
 	// files on the command line.
 	// TODO: unify these two modes.
 	if len(b.orphaned) > 0 {
-		vetFiles(cmd, b)
-		return nil
+		return vetFiles(cmd, b)
 	}
 
 	shown := false
@@ -135,15 +136,17 @@ func doVet(cmd *Command, args []string) error {
 		}
 		exitOnErr(cmd, err, false)
 	}
-	exitOnErr(cmd, iter.err(), true)
+	if err := iter.err(); err != nil {
+		return err
+	}
 	return nil
 }
 
-func vetFiles(cmd *Command, b *buildPlan) {
+func vetFiles(cmd *Command, b *buildPlan) error {
 	// Use -r type root, instead of -e
 
 	if !b.encConfig.Schema.Exists() {
-		exitOnErr(cmd, errors.New("data files specified without a schema"), true)
+		return errors.New("data files specified without a schema")
 	}
 
 	iter := b.instances()
@@ -155,5 +158,8 @@ func vetFiles(cmd *Command, b *buildPlan) {
 		err := v.Validate(cue.Concrete(true))
 		exitOnErr(cmd, err, false)
 	}
-	exitOnErr(cmd, iter.err(), false)
+	if err := iter.err(); err != nil {
+		return err
+	}
+	return nil
 }

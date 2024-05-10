@@ -312,7 +312,9 @@ func runImport(cmd *Command, args []string) (err error) {
 	}
 
 	b, err := parseArgs(cmd, args, c)
-	exitOnErr(cmd, err, true)
+	if err != nil {
+		return err
+	}
 
 	switch mode {
 	default:
@@ -320,9 +322,7 @@ func runImport(cmd *Command, args []string) (err error) {
 	case "proto":
 		err = protoMode(b)
 	}
-
-	exitOnErr(cmd, err, true)
-	return nil
+	return err
 }
 
 func protoMode(b *buildPlan) error {
@@ -418,8 +418,7 @@ func genericMode(cmd *Command, b *buildPlan) error {
 		}
 		// TODO: allow if there is a unique package name.
 		if pkgName == "" && len(b.insts) > 1 {
-			err := fmt.Errorf("must specify package name with the -p flag")
-			exitOnErr(cmd, err, true)
+			return fmt.Errorf("must specify package name with the -p flag")
 		}
 	}
 

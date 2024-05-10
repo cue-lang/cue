@@ -45,7 +45,7 @@ func newFmtCmd(c *Command) *cobra.Command {
 				Package:     "*",
 			})
 			if builds == nil {
-				exitOnErr(cmd, errors.Newf(token.NoPos, "invalid args"), true)
+				return errors.Newf(token.NoPos, "invalid args")
 			}
 
 			opts := []format.Option{}
@@ -60,14 +60,13 @@ func newFmtCmd(c *Command) *cobra.Command {
 			stdout := cmd.OutOrStdout()
 
 			for _, inst := range builds {
-				if inst.Err != nil {
+				if err := inst.Err; err != nil {
 					switch {
-					case errors.As(inst.Err, new(*load.PackageError)) && len(inst.BuildFiles) != 0:
+					case errors.As(err, new(*load.PackageError)) && len(inst.BuildFiles) != 0:
 						// Ignore package errors if there are files to format.
-					case errors.As(inst.Err, new(*load.NoFilesError)):
+					case errors.As(err, new(*load.NoFilesError)):
 					default:
-						exitOnErr(cmd, inst.Err, false)
-						continue
+						return err
 					}
 				}
 				for _, file := range inst.BuildFiles {
@@ -83,14 +82,20 @@ func newFmtCmd(c *Command) *cobra.Command {
 					if !ok {
 						var err error
 						src, err = source.ReadAll(file.Filename, file.Source)
-						exitOnErr(cmd, err, true)
+						if err != nil {
+							return err
+						}
 					}
 
 					file, err := parser.ParseFile(file.Filename, src, parser.ParseComments)
-					exitOnErr(cmd, err, true)
+					if err != nil {
+						return err
+					}
 
 					formatted, err := format.Node(file, opts...)
-					exitOnErr(cmd, err, true)
+					if err != nil {
+						return err
+					}
 
 					// Always write to stdout if the file is read from stdin.
 					if file.Filename == "-" && !doDiff && !check {
@@ -118,7 +123,7 @@ func newFmtCmd(c *Command) *cobra.Command {
 						// already wrote the formatted source to stdout above
 					default:
 						if err := os.WriteFile(file.Filename, formatted, 0644); err != nil {
-							exitOnErr(cmd, err, false)
+							return err
 						}
 					}
 				}

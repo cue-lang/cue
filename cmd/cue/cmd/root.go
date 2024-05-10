@@ -53,22 +53,21 @@ import (
 
 type runFunction func(cmd *Command, args []string) error
 
-func statsEncoder(cmd *Command) *encoding.Encoder {
+func statsEncoder(cmd *Command) (*encoding.Encoder, error) {
 	file := os.Getenv("CUE_STATS_FILE")
 	if file == "" {
-		return nil
+		return nil, nil
 	}
 
 	stats, err := filetypes.ParseFile(file, filetypes.Export)
-	exitOnErr(cmd, err, true)
+	if err != nil {
+		return nil, err
+	}
 
-	statsEnc, err := encoding.NewEncoder(cmd.ctx, stats, &encoding.Config{
+	return encoding.NewEncoder(cmd.ctx, stats, &encoding.Config{
 		Stdout: cmd.OutOrStderr(),
 		Force:  true,
 	})
-	exitOnErr(cmd, err, true)
-
-	return statsEnc
 }
 
 // Stats expands [stats.Counts] with counters obtained from other sources,
@@ -88,8 +87,10 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		c.Command = cmd
 
-		statsEnc := statsEncoder(c)
-
+		statsEnc, err := statsEncoder(c)
+		if err != nil {
+			return err
+		}
 		if err := cueexperiment.Init(); err != nil {
 			return err
 		}
@@ -120,7 +121,7 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 			(*cueruntime.Runtime)(c.ctx).SetDebugOptions(&cuedebug.Flags)
 		}
 
-		err := f(c, args)
+		err = f(c, args)
 
 		// TODO(mvdan): support -memprofilerate like `go help testflag`.
 		if memprofile := flagMemProfile.String(c); memprofile != "" {
@@ -267,10 +268,10 @@ var rootContextOptions []cuecontext.Option
 
 // Main runs the cue tool and returns the code for passing to os.Exit.
 func Main() int {
-	cwd, _ := os.Getwd()
 	cmd, _ := New(os.Args[1:])
 	if err := cmd.Run(backgroundContext()); err != nil {
 		if err != ErrPrintedError {
+			cwd, _ := os.Getwd()
 			errors.Print(os.Stderr, err, &errors.Config{
 				Cwd:     cwd,
 				ToSlash: testing.Testing(),

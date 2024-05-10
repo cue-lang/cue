@@ -2,6 +2,7 @@ exec cue cmd -t greeting=hello prefix
 
 -- cue.mod/module.cue --
 module: "mod.test"
+language: version: "v0.9.0"
 -- my.cue --
 package tools
 

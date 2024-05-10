@@ -317,7 +317,10 @@ func (l *loader) importPathFromAbsDir(absDir fsPath, key string) (importPath, er
 		return "", errors.Newf(token.NoPos,
 			"cannot determine import path for %q (no module)", key)
 	default:
-		pkg = l.cfg.Module + pkg
+		impPath := module.ParseImportPath(l.cfg.Module)
+		impPath.Path += pkg
+		impPath.Qualifier = ""
+		pkg = impPath.String()
 	}
 
 	name := l.cfg.Package
@@ -348,6 +351,9 @@ func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
 //
 // The returned directory may not exist.
 func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name string, err errors.Error) {
+	if p == "" {
+		return "", "", errors.Newf(pos, "empty package name in import path %q", p)
+	}
 	if l.cfg.ModuleRoot == "" {
 		return "", "", errors.Newf(pos, "cannot import %q (root undefined)", p)
 	}
@@ -379,10 +385,10 @@ func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 		// and hence it's available by that name via Pkg.
 		pkg := l.pkgs.Pkg(string(origp))
 		if pkg == nil {
-			return "", name, errors.Newf(pos, "no dependency found for package %q", p)
+			return "", name, l.errPkgf([]token.Pos{pos}, "no dependency found for package %q", p)
 		}
 		if err := pkg.Error(); err != nil {
-			return "", name, errors.Newf(pos, "cannot find package %q: %v", p, err)
+			return "", name, l.errPkgf([]token.Pos{pos}, "cannot find package %q: %v", p, err)
 		}
 		if mv := pkg.Mod(); mv.IsLocal() {
 			// It's a local package that's present inside one or both of the gen, usr or pkg
@@ -393,12 +399,15 @@ func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 		} else {
 			locs := pkg.Locations()
 			if len(locs) > 1 {
-				return "", "", errors.Newf(pos, "package %q unexpectedly found in multiple locations", p)
+				return "", "", l.errPkgf([]token.Pos{pos}, "package %q unexpectedly found in multiple locations", p)
+			}
+			if len(locs) == 0 {
+				return "", "", l.errPkgf([]token.Pos{pos}, "no location found for package %q", p)
 			}
 			var err error
 			absDir, err = absPathForSourceLoc(locs[0])
 			if err != nil {
-				return "", name, errors.Newf(pos, "cannot determine source directory for package %q: %v", p, err)
+				return "", name, l.errPkgf([]token.Pos{pos}, "cannot determine source directory for package %q: %v", p, err)
 			}
 		}
 		return absDir, name, nil

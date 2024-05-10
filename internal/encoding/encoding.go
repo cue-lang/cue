@@ -375,6 +375,9 @@ func (v *validator) validate(n ast.Node) bool {
 	ok := true
 	check := func(n ast.Node, option bool, s string, cond bool) {
 		if !option && cond {
+			if v.fileinfo.Form == "graph" {
+				panic("xxxx")
+			}
 			v.errs = errors.Append(v.errs, errors.Newf(n.Pos(),
 				"%s not allowed in %s mode", s, v.fileinfo.Form))
 			v.count++

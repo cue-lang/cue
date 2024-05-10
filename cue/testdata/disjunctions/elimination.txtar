@@ -486,6 +486,10 @@ issue2263: full: {
 		value: number
 	}
 }
+-- issue1417.cue --
+#ID: !~"^a" | =~"^ab$" | =~"^aB$"
+#ID: =~"^a" | !~"[A-Z]"
+ids: [...#ID] & ["xyz", "ab", "aB"]
 -- out/evalalpha --
 (struct){
   disambiguateClosed: (struct){
@@ -1395,13 +1399,20 @@ issue2263: full: {
       }
     }
   }
+  #ID: (string){ |((string){ &(!~"^a", =~"^a") }, (string){ &(!~"^a", !~"[A-Z]") }, (string){ &(=~"^ab$", =~"^a") }, (string){ &(=~"^ab$", !~"[A-Z]") }, (string){ &(=~"^aB$", =~"^a") }, (string){ &(=~"^aB$", !~"[A-Z]") }) }
+  ids: (#list){
+    0: (string){ "xyz" }
+    1: (string){ "ab" }
+    2: (string){ "aB" }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,36 +1,4 @@
+@@ -1,49 +1,4 @@
 -Errors:
+-ids.2: 2 errors in empty disjunction:
 -issue2209.full.Bar.resource.spec: 6 errors in empty disjunction:
 -issue2209.full.Bar.resource.spec.minBar: 2 errors in empty disjunction:
 -issue2209.full.Bar.resource.spec.minBar: conflicting values null and int (mismatched types null and int):
@@ -1430,6 +1441,18 @@ diff old new
 -    ./issue2209full.cue:35:9
 -issue2209.full.Bar.resource.spec.minBar: undefined field: min:
 -    ./issue2209full.cue:77:25
+-ids.1: invalid value "ab" (out of bound !~"^a"):
+-    ./issue1417.cue:1:6
+-    ./issue1417.cue:3:10
+-    ./issue1417.cue:3:25
+-ids.2: invalid value "aB" (out of bound !~"^a"):
+-    ./issue1417.cue:1:6
+-    ./issue1417.cue:3:10
+-    ./issue1417.cue:3:31
+-ids.2: invalid value "aB" (out of bound !~"[A-Z]"):
+-    ./issue1417.cue:2:15
+-    ./issue1417.cue:3:10
+-    ./issue1417.cue:3:31
 -
 -Result:
 -(_|_){
@@ -1438,7 +1461,7 @@ diff old new
    disambiguateClosed: (struct){
      b: (#struct){ |((#struct){
          x: (bool){ true }
-@@ -121,7 +89,6 @@
+@@ -134,7 +89,6 @@
                      // [incomplete] nestedNonMonotonic.incomplete.a.n2.p1.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
                      //     ./in.cue:96:15
                      //     ./in.cue:96:32
@@ -1446,7 +1469,7 @@ diff old new
                      c: (int){ 1 }
                    }
                  }
-@@ -133,7 +100,6 @@
+@@ -146,7 +100,6 @@
                    b: (_|_){
                      // [incomplete] nestedNonMonotonic.incomplete.a.n2.p2.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
                      //     ./in.cue:102:15
@@ -1454,7 +1477,7 @@ diff old new
                      //     ./in.cue:102:32
                      c: (int){ 1 }
                    }
-@@ -159,16 +125,8 @@
+@@ -172,16 +125,8 @@
              x: ((null|struct)){ |((struct){
                  a: (struct){
                    b: (_|_){
@@ -1472,7 +1495,7 @@ diff old new
                      //     ./in.cue:138:32
                      c: (int){ 1 }
                      d: (int){ 1 }
-@@ -227,38 +185,60 @@
+@@ -240,38 +185,60 @@
            }, (#struct){
              a: (string){ string }
              d: (string){ string }
@@ -1565,7 +1588,7 @@ diff old new
              d: (string){ string }
            }) }
          #B: (#struct){ |(*(#struct){
-@@ -293,6 +273,17 @@
+@@ -306,6 +273,17 @@
            }, (#struct){
              a: (string){ string }
              d: (string){ string }
@@ -1583,7 +1606,7 @@ diff old new
            }) }
          #B: (#struct){ |(*(#struct){
            }, (#struct){
-@@ -327,10 +318,6 @@
+@@ -340,10 +318,6 @@
        #type: (#struct){
          fieldName: ((string|struct)){ |((string){ string }, (#struct){
              foo: (string){ string }
@@ -1594,7 +1617,7 @@ diff old new
            }) }
        }
        #subtype: ((string|struct)){ |((string){ string }, (#struct){
-@@ -364,9 +351,12 @@
+@@ -377,9 +351,12 @@
        }
      }
      t4: (struct){
@@ -1610,7 +1633,7 @@ diff old new
        #D: (#struct){ |((#struct){
            a: (null){ null }
          }, (#struct){
-@@ -410,12 +400,8 @@
+@@ -423,12 +400,8 @@
      #T: (list){
        0: (string){ "d" }
      }
@@ -1625,7 +1648,7 @@ diff old new
    }
    issue1940: (struct){
      #T: (#list){
-@@ -424,28 +410,18 @@
+@@ -437,28 +410,18 @@
        }
      }
      #A: (#struct){
@@ -1661,7 +1684,7 @@ diff old new
        t1: (struct){
          #SpecFoo: (#struct){
            foo: (#struct){
-@@ -508,185 +484,118 @@
+@@ -521,185 +484,118 @@
              x: (int){ 1 }
            }
          }
@@ -1958,7 +1981,7 @@ diff old new
          }
        }
        #Abstract: (#struct){
-@@ -702,34 +611,34 @@
+@@ -715,34 +611,34 @@
              }
            }) }
          resource: (#struct){
@@ -2021,7 +2044,7 @@ diff old new
          }
        }
        _#Spec: (#struct){ |(*(#struct){
-@@ -756,36 +665,36 @@
+@@ -769,36 +665,36 @@
          }
        }
        _Thing: (#struct){
@@ -2087,7 +2110,7 @@ diff old new
        }
        #Constrained: (#struct){
          spec: (#struct){ |(*(#struct){
-@@ -869,19 +778,19 @@
+@@ -882,19 +778,19 @@
            common: (int){ 3 }
          }
          #FormFoo: (#struct){
@@ -2114,7 +2137,7 @@ diff old new
            }) }
        }
        #Input: (#struct){
-@@ -930,10 +839,23 @@
+@@ -943,10 +839,23 @@
      }
      full: (struct){
        metrics: (#list){
@@ -2142,29 +2165,48 @@ diff old new
          1: (#struct){
            id: (string){ "bar" }
            value: (int){ 80 }
+@@ -998,25 +907,9 @@
+     }
+   }
+   #ID: (string){ |((string){ &(!~"^a", =~"^a") }, (string){ &(!~"^a", !~"[A-Z]") }, (string){ &(=~"^ab$", =~"^a") }, (string){ &(=~"^ab$", !~"[A-Z]") }, (string){ &(=~"^aB$", =~"^a") }, (string){ &(=~"^aB$", !~"[A-Z]") }) }
+-  ids: (_|_){
+-    // [eval]
++  ids: (#list){
+     0: (string){ "xyz" }
+-    1: (_|_){
+-      // [eval] ids.1: invalid value "ab" (out of bound !~"^a"):
+-      //     ./issue1417.cue:1:6
+-      //     ./issue1417.cue:3:10
+-      //     ./issue1417.cue:3:25
+-    }
+-    2: (_|_){
+-      // [eval] ids.2: 2 errors in empty disjunction:
+-      // ids.2: invalid value "aB" (out of bound !~"^a"):
+-      //     ./issue1417.cue:1:6
+-      //     ./issue1417.cue:3:10
+-      //     ./issue1417.cue:3:31
+-      // ids.2: invalid value "aB" (out of bound !~"[A-Z]"):
+-      //     ./issue1417.cue:2:15
+-      //     ./issue1417.cue:3:10
+-      //     ./issue1417.cue:3:31
+-    }
++    1: (string){ "ab" }
++    2: (string){ "aB" }
+   }
+ }
 -- out/eval/stats --
 Leaks:  4
-Freed:  2339
-Reused: 2323
+Freed:  2368
+Reused: 2352
 Allocs: 20
 Retain: 115
 
-Unifications: 1260
-Conjuncts:    3417
-Disjuncts:    2454
--- diff/todo/p1 --
-issue2263.full: missing elimination, may be lack of closeContext
--- diff/todo/p2 --
-noChildError.issue1808.#type: one disjunction options eliminated due to earlier detected structural cycle. May be okay, but investigate.
-issue2209.simplified.full._X: ditto
-preserveClosedness.medium.p*: missing elimination of disjuncts / needs default elimination.
--- diff/todo/p3 --
-issue2209.simplified.t2.BAZ: error reported in wrong location.
--- diff/explanation --
-issue2209.simplified.t3: new evaluator fixes known bug.
-preserveClosedness.medium.p*: discarding of default is correct.
+Unifications: 1265
+Conjuncts:    3458
+Disjuncts:    2483
 -- out/eval --
 Errors:
+ids.2: 2 errors in empty disjunction:
 issue2209.full.Bar.resource.spec: 6 errors in empty disjunction:
 issue2209.full.Bar.resource.spec.minBar: 2 errors in empty disjunction:
 issue2209.full.Bar.resource.spec.minBar: conflicting values null and int (mismatched types null and int):
@@ -2193,6 +2235,18 @@ issue2209.simplified.t3.BAZ: undefined field: y:
     ./issue2209full.cue:35:9
 issue2209.full.Bar.resource.spec.minBar: undefined field: min:
     ./issue2209full.cue:77:25
+ids.1: invalid value "ab" (out of bound !~"^a"):
+    ./issue1417.cue:1:6
+    ./issue1417.cue:3:10
+    ./issue1417.cue:3:25
+ids.2: invalid value "aB" (out of bound !~"^a"):
+    ./issue1417.cue:1:6
+    ./issue1417.cue:3:10
+    ./issue1417.cue:3:31
+ids.2: invalid value "aB" (out of bound !~"[A-Z]"):
+    ./issue1417.cue:2:15
+    ./issue1417.cue:3:10
+    ./issue1417.cue:3:31
 
 Result:
 (_|_){
@@ -3150,7 +3204,41 @@ Result:
       }
     }
   }
+  #ID: (string){ |((string){ &(!~"^a", =~"^a") }, (string){ &(!~"^a", !~"[A-Z]") }, (string){ &(=~"^ab$", =~"^a") }, (string){ &(=~"^ab$", !~"[A-Z]") }, (string){ &(=~"^aB$", =~"^a") }, (string){ &(=~"^aB$", !~"[A-Z]") }) }
+  ids: (_|_){
+    // [eval]
+    0: (string){ "xyz" }
+    1: (_|_){
+      // [eval] ids.1: invalid value "ab" (out of bound !~"^a"):
+      //     ./issue1417.cue:1:6
+      //     ./issue1417.cue:3:10
+      //     ./issue1417.cue:3:25
+    }
+    2: (_|_){
+      // [eval] ids.2: 2 errors in empty disjunction:
+      // ids.2: invalid value "aB" (out of bound !~"^a"):
+      //     ./issue1417.cue:1:6
+      //     ./issue1417.cue:3:10
+      //     ./issue1417.cue:3:31
+      // ids.2: invalid value "aB" (out of bound !~"[A-Z]"):
+      //     ./issue1417.cue:2:15
+      //     ./issue1417.cue:3:10
+      //     ./issue1417.cue:3:31
+    }
+  }
 }
+-- diff/todo/p1 --
+issue2263.full: missing elimination, may be lack of closeContext
+-- diff/todo/p2 --
+noChildError.issue1808.#type: one disjunction options eliminated due to earlier detected structural cycle. May be okay, but investigate.
+issue2209.simplified.full._X: ditto
+preserveClosedness.medium.p*: missing elimination of disjuncts / needs default elimination.
+-- diff/todo/p3 --
+issue2209.simplified.t2.BAZ: error reported in wrong location.
+-- diff/explanation --
+issue2209.simplified.t3: new evaluator fixes known bug.
+preserveClosedness.medium.p*: discarding of default is correct.
+issue1417: new evaluator fixes known bug
 -- out/compile --
 --- in.cue
 {
@@ -4174,4 +4262,16 @@ Result:
       }
     }
   }
+}
+--- issue1417.cue
+{
+  #ID: (!~"^a"|=~"^ab$"|=~"^aB$")
+  #ID: (=~"^a"|!~"[A-Z]")
+  ids: ([
+    ...〈1;#ID〉,
+  ] & [
+    "xyz",
+    "ab",
+    "aB",
+  ])
 }

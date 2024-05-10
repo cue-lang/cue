@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "04b0df39_737c2846",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-10T09:50:24Z",
+      "side": 1,
+      "message": "FYI Paul - does this translation/language stuff ring any bells?\n\nThe point of this stack is to continue chipping away at the cmd/cue complexity. I don\u0027t intend to finish it all today, but every now and then I spend another thirty minutes making the code a little bit saner.",
+      "revId": "414b4f7d505e6e43ab3b86df6a3b0191d85dea3c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

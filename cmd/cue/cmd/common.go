@@ -15,17 +15,14 @@
 package cmd
 
 import (
-	"io"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
-	"testing"
 
 	"github.com/spf13/pflag"
 	"golang.org/x/text/language"
-	"golang.org/x/text/message"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
@@ -80,34 +77,6 @@ func getLang() language.Tag {
 	}
 	loc, _, _ = strings.Cut(loc, ".")
 	return language.Make(loc)
-}
-
-// exitOnErr uses cue/errors to print any error to stderr,
-// and if fatal is true, it causes the command's exit code to be 1.
-// Note that os.Exit is not called, as that would prevent defers from running.
-//
-// TODO(mvdan): can we avoid the panicError and recover shenanigans?
-// They work, but they make the code flow somewhat confusing to follow.
-func exitOnErr(cmd *Command, err error, fatal bool) {
-	if err == nil {
-		return
-	}
-
-	// Link x/text as our localizer.
-	p := message.NewPrinter(getLang())
-	format := func(w io.Writer, format string, args ...interface{}) {
-		p.Fprintf(w, format, args...)
-	}
-
-	cwd, _ := os.Getwd()
-	errors.Print(cmd.Stderr(), err, &errors.Config{
-		Format:  format,
-		Cwd:     cwd,
-		ToSlash: testing.Testing(),
-	})
-	if fatal {
-		panicExit()
-	}
 }
 
 func loadFromArgs(args []string, cfg *load.Config) []*build.Instance {
@@ -168,9 +137,11 @@ func (b *buildPlan) instances() iterator {
 	case len(b.orphaned) > 0:
 		i = newStreamingIterator(b)
 	case len(b.insts) > 0:
+		insts, err := buildInstances(b.cmd, b.insts, false)
 		i = &instanceIterator{
 			inst: b.instance,
-			a:    buildInstances(b.cmd, b.insts, false),
+			a:    insts,
+			e:    err,
 			i:    -1,
 		}
 	default:
@@ -625,11 +596,14 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 			// TODO: ignore errors here for now until reporting of concreteness
 			// of errors is correct.
 			// See https://github.com/cue-lang/cue/issues/1483.
-			inst := buildInstances(
+			insts, err := buildInstances(
 				p.cmd,
 				[]*build.Instance{schema},
-				true)[0]
-
+				true)
+			if err != nil {
+				return nil, err
+			}
+			inst := insts[0]
 			if err := inst.err; err != nil {
 				return nil, err
 			}
@@ -729,12 +703,14 @@ func (b *buildPlan) parseFlags() (err error) {
 	return nil
 }
 
-func buildInstances(cmd *Command, binst []*build.Instance, ignoreErrors bool) []*instance {
+func buildInstances(cmd *Command, binst []*build.Instance, ignoreErrors bool) ([]*instance, error) {
 	// TODO:
 	// If there are no files and User is true, then use those?
 	// Always use all files in user mode?
 	instances, err := cmd.ctx.BuildInstances(binst)
-	exitOnErr(cmd, err, true)
+	if err != nil {
+		return nil, err
+	}
 
 	insts := make([]*instance, len(instances))
 	for i, v := range instances {
@@ -748,15 +724,22 @@ func buildInstances(cmd *Command, binst []*build.Instance, ignoreErrors bool) []
 	// TODO: remove ignoreErrors flag and always return here, leaving it up to
 	// clients to check for errors down the road.
 	if ignoreErrors || flagIgnore.Bool(cmd) {
-		return insts
+		return insts, nil
 	}
 
 	for _, inst := range instances {
 		// TODO: consider merging errors of multiple files, but ensure
 		// duplicates are removed.
-		exitOnErr(cmd, inst.Validate(), !flagIgnore.Bool(cmd))
+		err := inst.Validate()
+		if err != nil {
+			if flagIgnore.Bool(cmd) {
+				printError(cmd, err)
+			} else {
+				return nil, err
+			}
+		}
 	}
-	return insts
+	return insts, nil
 }
 
 func buildToolInstances(binst []*build.Instance) ([]*cue.Instance, error) {

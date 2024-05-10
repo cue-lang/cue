@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a46e2e5_41d74828",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-10T08:38:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7341c7c2_670639ad",
+      "revId": "4c13e0a2de38a2f7327e861acb15f5fe8d190927",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f57195c1_1fad6f21",
@@ -31,6 +49,30 @@
       "writtenOn": "2024-05-10T08:27:53Z",
       "side": 1,
       "message": "can you clarify what you mean by \"works\"? e.g.:\n\n\u003e It succeeds with the old evaluator but incorrectly errors with the new one.",
+      "range": {
+        "startLine": 6,
+        "startChar": 24,
+        "endLine": 6,
+        "endChar": 77
+      },
+      "revId": "4c13e0a2de38a2f7327e861acb15f5fe8d190927",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "47c04ee1_da2f200b",
+        "filename": "pkg/encoding/yaml/testdata/validate.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-10T08:38:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f57195c1_1fad6f21",
       "range": {
         "startLine": 6,
         "startChar": 24,

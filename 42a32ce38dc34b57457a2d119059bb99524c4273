@@ -16,6 +16,24 @@
       "message": "so in this case the old evaluator is still buggy? should we call this out in the commit message?",
       "revId": "42a32ce38dc34b57457a2d119059bb99524c4273",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41eb42e3_8983bf63",
+        "filename": "pkg/struct/testdata/struct.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-10T06:47:57Z",
+      "side": 1,
+      "message": "It actually looks OK, I\u0027m not sure why the output is different in the two cases:\n\n```\n╰─❯ go run ./cmd/cue export test.cue                                                                                                                                                       ─╯\nminFields.failOptional1: invalid value {a?:1} (does not satisfy struct.MinFields(1)): len(fields) \u003c MinFields(1) (0 \u003c 1):\n    ./test.cue:4:12\n    ./test.cue:4:29\n    ./test.cue:6:17\nexit status 1\n╭─ ~/src/cue-lang/cue change-1194425:master ⇡2 *5 ?1 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 09:45:51 ─╮\n╰─❯ CUE_EXPERIMENT\u003devalv3 go run ./cmd/cue export test.cue                                                                                                                                 ─╯\nminFields.failOptional1: invalid value {a?:1} (does not satisfy struct.MinFields(1)): len(fields) \u003c MinFields(1) (0 \u003c 1):\n    ./test.cue:4:12\n    ./test.cue:4:29\nexit status 1\n```",
+      "parentUuid": "db5ead54_8dd57882",
+      "revId": "42a32ce38dc34b57457a2d119059bb99524c4273",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

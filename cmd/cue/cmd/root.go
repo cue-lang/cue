@@ -25,6 +25,7 @@ import (
 	"testing"
 
 	"github.com/spf13/cobra"
+	"golang.org/x/text/message"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
@@ -300,7 +301,7 @@ type errWriter Command
 
 func (w *errWriter) Write(b []byte) (int, error) {
 	c := (*Command)(w)
-	c.hasErr = true
+	c.hasErr = len(b) > 0
 	return c.Command.OutOrStderr().Write(b)
 }
 
@@ -309,6 +310,9 @@ func (w *errWriter) Write(b []byte) (int, error) {
 // be used directly.
 
 // Stderr returns a writer that should be used for error messages.
+// Writing to it will result in the command's exit code being 1.
+//
+// TODO(mvdan): provide an alternative to write to stderr without setting the exit code to 1.
 func (c *Command) Stderr() io.Writer {
 	return (*errWriter)(c)
 }
@@ -331,8 +335,30 @@ func (c *Command) SetInput(r io.Reader) {
 	c.root.SetIn(r)
 }
 
-// ErrPrintedError indicates error messages have been printed to stderr.
+// ErrPrintedError indicates error messages have been printed directly to stderr,
+// and can be used so that the returned error itself isn't printed as well.
 var ErrPrintedError = errors.New("terminating because of errors")
+
+// printError uses cue/errors to print an error to stderr when non-nil.
+func printError(cmd *Command, err error) {
+	if err == nil {
+		return
+	}
+
+	// Link x/text as our localizer.
+	p := message.NewPrinter(getLang())
+	format := func(w io.Writer, format string, args ...interface{}) {
+		p.Fprintf(w, format, args...)
+	}
+
+	// TODO(mvdan): call os.Getwd only once at the start of the process.
+	cwd, _ := os.Getwd()
+	errors.Print(cmd.Stderr(), err, &errors.Config{
+		Format:  format,
+		Cwd:     cwd,
+		ToSlash: testing.Testing(),
+	})
+}
 
 func (c *Command) Run(ctx context.Context) (err error) {
 	// Three categories of commands:
@@ -340,8 +366,6 @@ func (c *Command) Run(ctx context.Context) (err error) {
 	// - user defined
 	// - help
 	// For the latter two, we need to use the default loading.
-	defer recoverError(&err)
-
 	if err := c.root.Execute(); err != nil {
 		return err
 	}
@@ -349,23 +373,4 @@ func (c *Command) Run(ctx context.Context) (err error) {
 		return ErrPrintedError
 	}
 	return nil
-}
-
-func recoverError(err *error) {
-	switch e := recover().(type) {
-	case nil:
-	case panicError:
-		*err = e.Err
-	default:
-		panic(e)
-	}
-	// We use panic to escape, instead of os.Exit
-}
-
-type panicError struct {
-	Err error
-}
-
-func panicExit() {
-	panic(panicError{ErrPrintedError})
 }

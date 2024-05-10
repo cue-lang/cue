@@ -100,7 +100,10 @@ func runTrim(cmd *Command, args []string) error {
 	if binst == nil {
 		return nil
 	}
-	instances := buildInstances(cmd, binst, false)
+	instances, err := buildInstances(cmd, binst, false)
+	if err != nil {
+		return err
+	}
 
 	dst := flagOutFile.String(cmd)
 	if dst != "" && dst != "-" && !flagForce.Bool(cmd) {
@@ -130,7 +133,10 @@ func runTrim(cmd *Command, args []string) error {
 
 	cfg := *defCfg.loadCfg
 	cfg.Overlay = overlay
-	tinsts := buildInstances(cmd, load.Instances(args, &cfg), false)
+	tinsts, err := buildInstances(cmd, load.Instances(args, &cfg), false)
+	if err != nil {
+		return err
+	}
 	if len(tinsts) != len(binst) {
 		return errors.New("unexpected number of new instances")
 	}

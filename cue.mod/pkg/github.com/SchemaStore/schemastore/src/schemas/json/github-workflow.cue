@@ -3,7 +3,8 @@ package json
 import "strings"
 
 #Workflow: {
-	@jsonschema(schema="http://json-schema.org/draft-07/schema")
+	@jsonschema(schema="http://json-schema.org/draft-07/schema#")
+	@jsonschema(id="https://json.schemastore.org/github-workflow.json")
 
 	// The name of your workflow. GitHub displays the names of your
 	// workflows on your repository's actions page. If you omit this
@@ -123,15 +124,6 @@ import "strings"
 			...
 		}
 
-		// Runs your workflow anytime the member event occurs. More than
-		// one activity type triggers this event. For information about
-		// the REST API, see
-		// https://developer.github.com/v3/repos/collaborators/.
-		member?: #eventObject & {
-			types?: #types & [..."added" | "edited" | "deleted"] | *["added", "edited", "deleted"]
-			...
-		}
-
 		// Runs your workflow when a pull request is added to a merge
 		// queue, which adds the pull request to a merge group. For
 		// information about the merge queue, see
@@ -204,7 +196,7 @@ import "strings"
 		// read-only. For more information about the GITHUB_TOKEN, see
 		// https://help.github.com/en/articles/virtual-environments-for-github-actions.
 		pull_request?: #ref & {
-			types?: #types & [..."assigned" | "unassigned" | "labeled" | "unlabeled" | "opened" | "edited" | "closed" | "reopened" | "synchronize" | "converted_to_draft" | "ready_for_review" | "locked" | "unlocked" | "review_requested" | "review_request_removed" | "auto_merge_enabled" | "auto_merge_disabled"] | *["opened", "synchronize", "reopened"]
+			types?: #types & [..."assigned" | "unassigned" | "labeled" | "unlabeled" | "opened" | "edited" | "closed" | "reopened" | "synchronize" | "converted_to_draft" | "ready_for_review" | "locked" | "unlocked" | "milestoned" | "demilestoned" | "review_requested" | "review_request_removed" | "auto_merge_enabled" | "auto_merge_disabled"] | *["opened", "synchronize", "reopened"]
 
 			{[=~"^(branche|tag|path)s(-ignore)?$" & !~"^(types)$"]: [...]}
 		}
@@ -344,7 +336,7 @@ import "strings"
 										description?: string
 
 					// A boolean specifying whether the secret must be supplied.
-					required: _
+					required: bool
 				}}
 			}
 			...
@@ -378,7 +370,7 @@ import "strings"
 					default?: _
 
 					// A string representing the type of the input.
-					type?: "string" | "choice" | "boolean" | "environment"
+					type?: "string" | "choice" | "boolean" | "number" | "environment"
 
 					// The options of the dropdown list, if the type is a choice.
 					options?: [...string] & [_, ...]
@@ -394,7 +386,7 @@ import "strings"
 		// create a new workflow that uses workflow_run to analyze the
 		// results and add a comment to the original pull request.
 		workflow_run?: #eventObject & {
-			types?:     #types & [..."requested" | "completed"] | *["requested", "completed"]
+			types?:     #types & [..."requested" | "completed" | "in_progress"] | *["requested", "completed"]
 			workflows?: [...string] & [_, ...]
 
 			{[=~"^branches(-ignore)?$" & !~"^(types|workflows)$"]: _}
@@ -426,7 +418,7 @@ import "strings"
 		// To help you get started, there is also a list of crontab guru
 		// examples (https://crontab.guru/examples.html).
 		schedule?: [...null | bool | number | string | [...] | {
-			cron?: =~"^(((\\d+,)+\\d+|((\\d+|\\*)/\\d+|((JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)(-(JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC))?))|(\\d+-\\d+)|\\d+|\\*|((MON|TUE|WED|THU|FRI|SAT|SUN)(-(MON|TUE|WED|THU|FRI|SAT|SUN))?)) ?){5}$"
+			cron?: string
 		}] & [_, ...]
 	}
 
@@ -539,6 +531,7 @@ import "strings"
 
 	#: "permissions-event": {
 		actions?:               #["permissions-level"]
+		attestations?:          #["permissions-level"]
 		checks?:                #["permissions-level"]
 		contents?:              #["permissions-level"]
 		deployments?:           #["permissions-level"]
@@ -567,7 +560,7 @@ import "strings"
 		url?: string
 	}
 
-	#event: "branch_protection_rule" | "check_run" | "check_suite" | "create" | "delete" | "deployment" | "deployment_status" | "discussion" | "discussion_comment" | "fork" | "gollum" | "issue_comment" | "issues" | "label" | "member" | "milestone" | "page_build" | "project" | "project_card" | "project_column" | "public" | "pull_request" | "pull_request_review" | "pull_request_review_comment" | "pull_request_target" | "push" | "registry_package" | "release" | "status" | "watch" | "workflow_call" | "workflow_dispatch" | "workflow_run" | "repository_dispatch"
+	#event: "branch_protection_rule" | "check_run" | "check_suite" | "create" | "delete" | "deployment" | "deployment_status" | "discussion" | "discussion_comment" | "fork" | "gollum" | "issue_comment" | "issues" | "label" | "merge_group" | "milestone" | "page_build" | "project" | "project_card" | "project_column" | "public" | "pull_request" | "pull_request_review" | "pull_request_review_comment" | "pull_request_target" | "push" | "registry_package" | "release" | "status" | "watch" | "workflow_call" | "workflow_dispatch" | "workflow_run" | "repository_dispatch"
 
 	#eventObject: null | {
 			...
@@ -609,11 +602,20 @@ import "strings"
 
 	#jobNeeds: [...#name] & [_, ...] | #name
 
+	#matrix: ({
+		...
+	} | #expressionSyntax) & {
+		{[=~"^(in|ex)clude$" & !~"^()$"]: #expressionSyntax | [...{
+							[string]: #configuration
+		}] & [_, ...]}
+		{[!~"^(in|ex)clude$" & !~"^()$"]: [...#configuration] & [_, ...] | #expressionSyntax}
+	}
+
 	#reusableWorkflowCallJob: {
 		// The name of the job displayed on GitHub.
 		name?:        string
 		needs?:       #jobNeeds
-		permissions?: #["permissions-event"]
+		permissions?: #permissions
 
 		// You can use the if conditional to prevent a job from running
 		// unless a condition is met. You can use any supported context
@@ -648,40 +650,17 @@ import "strings"
 		// A strategy creates a build matrix for your jobs. You can define
 		// different variations of an environment to run each job in.
 		strategy?: {
-			// A build matrix is a set of different configurations of the
-			// virtual environment. For example you might run a job against
-			// more than one supported version of a language, operating
-			// system, or tool. Each configuration is a copy of the job that
-			// runs and reports a status.
-			// You can specify a matrix by supplying an array for the
-			// configuration options. For example, if the GitHub virtual
-			// environment supports Node.js versions 6, 8, and 10 you could
-			// specify an array of those versions in the matrix.
-			// When you define a matrix of operating systems, you must set the
-			// required runs-on keyword to the operating system of the
-			// current job, rather than hard-coding the operating system
-			// name. To access the operating system name, you can use the
-			// matrix.os context parameter to set runs-on. For more
-			// information, see
-			// https://help.github.com/en/articles/contexts-and-expression-syntax-for-github-actions.
-			matrix: ({
-				...
-			} | #expressionSyntax) & {
-				{[=~"^(in|ex)clude$" & !~"^()$"]: [...{
-									[string]: #configuration
-				}] & [_, ...]}
-				{[!~"^(in|ex)clude$" & !~"^()$"]: [...#configuration] & [_, ...] | #expressionSyntax}
-			}
+			matrix: #matrix
 
 			// When set to true, GitHub cancels all in-progress jobs if any
 			// matrix job fails. Default: true
-			"fail-fast"?: bool | *true
+			"fail-fast"?: bool | string | *true
 
 			// The maximum number of jobs that can run simultaneously when
 			// using a matrix job strategy. By default, GitHub will maximize
 			// the number of jobs run in parallel depending on the available
 			// runners on GitHub-hosted virtual machines.
-			"max-parallel"?: number
+			"max-parallel"?: number | string
 		}
 
 		// Concurrency ensures that only a single job or workflow using
@@ -707,7 +686,11 @@ import "strings"
 
 		// The type of machine to run the job on. The machine can be
 		// either a GitHub-hosted runner, or a self-hosted runner.
-		"runs-on": "macos-10.15" | "macos-11" | "macos-12" | "macos-latest" | "self-hosted" | "ubuntu-18.04" | "ubuntu-20.04" | "ubuntu-22.04" | "ubuntu-latest" | "windows-2019" | "windows-2022" | "windows-latest" | (["self-hosted", ...string] & [_, ...] | ["self-hosted", #machine, ...string] & [_, _, ...] | ["self-hosted", #architecture, ...string] & [_, _, ...] | ["self-hosted", #machine, #architecture, ...string] & [_, _, _, ...] | ["self-hosted", #architecture, #machine, ...string] & [_, _, _, ...]) & [...] | #stringContainingExpressionSyntax
+		"runs-on": (string | [string] & [_, ...] & [...] | {
+			group?:  string
+			labels?: string | [...string]
+			...
+		} | #stringContainingExpressionSyntax | #expressionSyntax) & _
 
 		// The environment that the job references.
 		environment?: string | #environment
@@ -743,7 +726,14 @@ import "strings"
 		// filesystem. Because steps run in their own process, changes to
 		// environment variables are not preserved between steps. GitHub
 		// provides built-in steps to set up and complete a job.
-		steps?: [...{
+		// Must contain either `uses` or `run`
+		steps?: [...({
+			uses: string
+			...
+		} | {
+			run: string
+			...
+		}) & {
 			// A unique identifier for the step. You can use the id to
 			// reference the step in contexts. For more information, see
 			// https://help.github.com/en/articles/contexts-and-expression-syntax-for-github-actions.
@@ -823,50 +813,27 @@ import "strings"
 
 			// The maximum number of minutes to run the step before killing
 			// the process.
-			"timeout-minutes"?: number
+			"timeout-minutes"?: number | #expressionSyntax
 		}] & [_, ...]
 
 		// The maximum number of minutes to let a workflow run before
 		// GitHub automatically cancels it. Default: 360
-		"timeout-minutes"?: number | *360
+		"timeout-minutes"?: number | #expressionSyntax | *360
 
 		// A strategy creates a build matrix for your jobs. You can define
 		// different variations of an environment to run each job in.
 		strategy?: {
-			// A build matrix is a set of different configurations of the
-			// virtual environment. For example you might run a job against
-			// more than one supported version of a language, operating
-			// system, or tool. Each configuration is a copy of the job that
-			// runs and reports a status.
-			// You can specify a matrix by supplying an array for the
-			// configuration options. For example, if the GitHub virtual
-			// environment supports Node.js versions 6, 8, and 10 you could
-			// specify an array of those versions in the matrix.
-			// When you define a matrix of operating systems, you must set the
-			// required runs-on keyword to the operating system of the
-			// current job, rather than hard-coding the operating system
-			// name. To access the operating system name, you can use the
-			// matrix.os context parameter to set runs-on. For more
-			// information, see
-			// https://help.github.com/en/articles/contexts-and-expression-syntax-for-github-actions.
-			matrix: ({
-				...
-			} | #expressionSyntax) & {
-				{[=~"^(in|ex)clude$" & !~"^()$"]: [...{
-									[string]: #configuration
-				}] & [_, ...]}
-				{[!~"^(in|ex)clude$" & !~"^()$"]: [...#configuration] & [_, ...] | #expressionSyntax}
-			}
+			matrix: #matrix
 
 			// When set to true, GitHub cancels all in-progress jobs if any
 			// matrix job fails. Default: true
-			"fail-fast"?: bool | *true
+			"fail-fast"?: bool | string | *true
 
 			// The maximum number of jobs that can run simultaneously when
 			// using a matrix job strategy. By default, GitHub will maximize
 			// the number of jobs run in parallel depending on the available
 			// runners on GitHub-hosted virtual machines.
-			"max-parallel"?: number
+			"max-parallel"?: number | string
 		}
 
 		// Prevents a workflow run from failing when a job fails. Set to

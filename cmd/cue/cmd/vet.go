@@ -134,7 +134,7 @@ func doVet(cmd *Command, args []string) error {
 					"some instances are incomplete; use the -c flag to show errors or suppress this message")
 			}
 		}
-		exitOnErr(cmd, err, false)
+		printError(cmd, err)
 	}
 	if err := iter.err(); err != nil {
 		return err
@@ -156,7 +156,7 @@ func vetFiles(cmd *Command, b *buildPlan) error {
 
 		// Always concrete when checking against concrete files.
 		err := v.Validate(cue.Concrete(true))
-		exitOnErr(cmd, err, false)
+		printError(cmd, err)
 	}
 	if err := iter.err(); err != nil {
 		return err

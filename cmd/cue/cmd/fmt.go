@@ -71,14 +71,13 @@ given as explicit arguments.
 				}
 
 				for _, inst := range builds {
-					if inst.Err != nil {
+					if err := inst.Err; err != nil {
 						switch {
-						case errors.As(inst.Err, new(*load.PackageError)) && len(inst.BuildFiles) != 0:
+						case errors.As(err, new(*load.PackageError)) && len(inst.BuildFiles) != 0:
 							// Ignore package errors if there are files to format.
-						case errors.As(inst.Err, new(*load.NoFilesError)):
+						case errors.As(err, new(*load.NoFilesError)):
 						default:
-							exitOnErr(cmd, inst.Err, false)
-							continue
+							return err
 						}
 					}
 					for _, file := range inst.BuildFiles {
@@ -116,7 +115,9 @@ given as explicit arguments.
 
 					if path == "-" {
 						contents, err := io.ReadAll(cmd.InOrStdin())
-						exitOnErr(cmd, err, false)
+						if err != nil {
+							return err
+						}
 						file.Source = contents
 					}
 
@@ -131,13 +132,14 @@ given as explicit arguments.
 				}
 				for _, arg := range args {
 					if arg == "-" {
-						err := processFile(arg)
-						exitOnErr(cmd, err, false)
+						if err := processFile(arg); err != nil {
+							return err
+						}
 						continue
 					}
 
 					arg = filepath.Clean(arg)
-					err := filepath.WalkDir(arg, func(path string, d fs.DirEntry, err error) error {
+					if err := filepath.WalkDir(arg, func(path string, d fs.DirEntry, err error) error {
 						if err != nil {
 							return err
 						}
@@ -157,8 +159,9 @@ given as explicit arguments.
 						}
 
 						return processFile(path)
-					})
-					exitOnErr(cmd, err, false)
+					}); err != nil {
+						return err
+					}
 				}
 			}
 
@@ -227,8 +230,9 @@ func formatFile(file *build.File, opts []format.Option, cwd string, doDiff, chec
 	case file.Filename == "-":
 		// already wrote the formatted source to stdout above
 	default:
-		err := os.WriteFile(file.Filename, formatted, 0644)
-		exitOnErr(cmd, err, false)
+		if err := os.WriteFile(file.Filename, formatted, 0644); err != nil {
+			return false, err
+		}
 	}
 	return true, nil
 }

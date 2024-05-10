@@ -132,7 +132,7 @@ func runEval(cmd *Command, args []string) error {
 			err := e.Encode(v)
 			if err != nil {
 				errHeader()
-				exitOnErr(cmd, err, false)
+				printError(cmd, err)
 			}
 			continue
 		}
@@ -160,7 +160,7 @@ func runEval(cmd *Command, args []string) error {
 			if e.IsConcrete() || flagConcrete.Bool(cmd) {
 				if err := v.Validate(cue.Concrete(true)); err != nil {
 					errHeader()
-					exitOnErr(cmd, err, false)
+					printError(cmd, err)
 					continue
 				}
 			}
@@ -171,7 +171,7 @@ func runEval(cmd *Command, args []string) error {
 		err := e.EncodeFile(f)
 		if err != nil {
 			errHeader()
-			exitOnErr(cmd, err, false)
+			printError(cmd, err)
 		}
 	}
 	if err := iter.err(); err != nil {

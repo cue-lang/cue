@@ -18,10 +18,11 @@ import (
 	"strings"
 	"testing"
 
-	"cuelang.org/go/cue/build"
-	"cuelang.org/go/cue/errors"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+
+	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/errors"
 )
 
 func check(t *testing.T, want, x interface{}, err error) {

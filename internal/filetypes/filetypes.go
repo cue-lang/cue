@@ -101,7 +101,7 @@ func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
 	typesInit()
 	modeVal := typesValue.LookupPath(cue.MakePath(cue.Str("modes"), cue.Str(mode.String())))
 	fileVal := modeVal.LookupPath(cue.MakePath(cue.Str("FileInfo")))
-	fileVal = fileVal.Fill(b)
+	fileVal = fileVal.FillPath(cue.Path{}, b)
 
 	if b.Encoding == "" {
 		ext := modeVal.LookupPath(cue.MakePath(cue.Str("extensions"), cue.Str(fileExt(b.Filename))))
@@ -319,7 +319,7 @@ func parseType(scope string, mode Mode) (modeVal, fileVal cue.Value, _ error) {
 		for _, tag := range strings.Split(scope, "+") {
 			tagName, tagVal, ok := strings.Cut(tag, "=")
 			if ok {
-				fileVal = fileVal.Fill(tagVal, "tags", tagName)
+				fileVal = fileVal.FillPath(cue.MakePath(cue.Str("tags"), cue.Str(tagName)), tagVal)
 			} else {
 				info := typesValue.LookupPath(cue.MakePath(cue.Str("tags"), cue.Str(tag)))
 				if !info.Exists() {

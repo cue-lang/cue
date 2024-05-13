@@ -18,8 +18,9 @@ import (
 	"path"
 	"testing"
 
-	"cuelang.org/go/cue/ast"
 	"github.com/google/go-cmp/cmp"
+
+	"cuelang.org/go/cue/ast"
 )
 
 func TestImportInfo(t *testing.T) {

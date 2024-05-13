@@ -23,6 +23,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
 	_ "cuelang.org/go/pkg"
@@ -80,14 +81,12 @@ func TestToFile(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			var r cue.Runtime
-
-			inst, err := r.CompileFile(f)
-			if err != nil {
+			v := cuecontext.New().BuildFile(f)
+			if err := v.Err(); err != nil {
 				t.Fatal(err)
 			}
 
-			b, err := format.Node(inst.Value().Syntax(cue.Concrete(true)))
+			b, err := format.Node(v.Syntax(cue.Concrete(true)))
 			if err != nil {
 				t.Fatal(err)
 			}

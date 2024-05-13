@@ -31,7 +31,7 @@ import (
 // - change a predeclared identifier reference to use the __ident form,
 //   instead of introducing an alias.
 
-// Sanitize rewrites File f in place to be well formed after automated
+// Sanitize rewrites File f in place to be well-formed after automated
 // construction of an AST.
 //
 // Rewrites:

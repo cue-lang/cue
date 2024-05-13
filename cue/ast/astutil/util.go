@@ -78,7 +78,7 @@ func CopyComments(to, from ast.Node) {
 	if from == nil {
 		return
 	}
-	ast.SetComments(to, from.Comments())
+	ast.SetComments(to, ast.Comments(from))
 }
 
 // CopyPosition sets the position of one node to another.
@@ -95,7 +95,7 @@ func CopyMeta(to, from ast.Node) ast.Node {
 	if from == nil {
 		return to
 	}
-	ast.SetComments(to, from.Comments())
+	ast.SetComments(to, ast.Comments(from))
 	ast.SetPos(to, from.Pos())
 	return to
 }

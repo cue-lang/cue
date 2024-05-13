@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7254a1e8_68889c69",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 732,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-13T11:43:56Z",
+      "side": 1,
+      "message": "literally the next CL does this :) and I mention it in the commit message that I do it separately as it\u0027s more tricky.",
+      "parentUuid": "14d8fefd_af5adc63",
+      "revId": "efbfc4e9bc696538252b3a6ead01f365ea877768",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "79919bf9_13ce073a",
@@ -48,6 +66,30 @@
       "writtenOn": "2024-05-13T11:25:05Z",
       "side": 1,
       "message": "I\u0027m wondering the reasoning behind not doing a `return iter.err()` here?",
+      "range": {
+        "startLine": 139,
+        "startChar": 0,
+        "endLine": 142,
+        "endChar": 11
+      },
+      "revId": "efbfc4e9bc696538252b3a6ead01f365ea877768",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a116b2f_bf7e298a",
+        "filename": "cmd/cue/cmd/vet.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-13T11:43:56Z",
+      "side": 1,
+      "message": "just consistency. if we wanted to add any code after the `iter.err()` call, with this code we can do it directly and the diff will be small. with `return iter.err()`, we would have to first refactor the code to use a conditional, meaning more churn and a larger diff.\n\nit\u0027s a very minor point of course. either way the compiled code should be the same.",
+      "parentUuid": "79919bf9_13ce073a",
       "range": {
         "startLine": 139,
         "startChar": 0,

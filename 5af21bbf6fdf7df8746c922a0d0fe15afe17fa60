@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "84abacc4_8ac41d0f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-13T13:47:12Z",
+      "side": 1,
+      "message": "I tried to be more accurate + simplify the commit message, please let me know if there\u0027s still something important I\u0027m missing",
+      "parentUuid": "d33f61a6_053f1e6b",
+      "revId": "5af21bbf6fdf7df8746c922a0d0fe15afe17fa60",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c19687df_274cc7e9",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1706404e_263cb4c5",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 1529,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-13T13:47:12Z",
+      "side": 1,
+      "message": "That\u0027s a great point, I didn\u0027t think of that. I removed the default resolution and default value logic to `CallCtx.Value`.\n\nI\u0027ll just point out that there was a TODO there saying not to do this, I\u0027m not sure why:\n```\n\t// TODO: remove default\n\t// v, _ \u003d v.Default()\n```",
+      "parentUuid": "c19687df_274cc7e9",
+      "revId": "5af21bbf6fdf7df8746c922a0d0fe15afe17fa60",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cf1e2ddc_3ddae126",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-05-13T12:34:48Z",
       "side": 1,
       "message": "It would be good to see if `net.ToIP4(1 | 2)` holds up to this approach. Maybe add a test in that directory. I think it will.",
+      "revId": "5af21bbf6fdf7df8746c922a0d0fe15afe17fa60",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf16b657_4fb9cc6d",
+        "filename": "internal/pkg/context.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-13T13:47:12Z",
+      "side": 1,
+      "message": "I\u0027m not 100% sure I follow, can you please elaborate? (since `CallCtxt.Schema` is only in use in `encoding/yaml` and `encoding/json`)",
+      "parentUuid": "cf1e2ddc_3ddae126",
       "revId": "5af21bbf6fdf7df8746c922a0d0fe15afe17fa60",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

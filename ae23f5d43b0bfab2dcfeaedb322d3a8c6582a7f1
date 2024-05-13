@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a26dc8c_c9fe9229",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-13T11:59:31Z",
+      "side": 1,
+      "message": "To be clear, I ran this past Marcel in a call earlier today, and he agreed it\u0027s just a typo/mistake in the spec. I just didn\u0027t want to write that in the commit message.",
+      "revId": "ae23f5d43b0bfab2dcfeaedb322d3a8c6582a7f1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

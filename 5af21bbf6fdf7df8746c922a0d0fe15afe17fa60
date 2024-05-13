@@ -126,6 +126,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8aeb2ec4_2d057b61",
+        "filename": "internal/pkg/context.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-13T16:00:19Z",
+      "side": 1,
+      "message": "Your intuition was quite right, it turns out that I pretty much broke all pre-declared builtins (I wasn\u0027t aware that they\u0027re not declared in `/pkg`, although this makes sense).\n\nThe tricky part is that they currently rely on arg validation/resolution to occur before they\u0027re called, like the other builtins did - but they don\u0027t have the CallCtxt mechanism.\n\nI can do something like this:\n```\n\tFunc: func(c *adt.OpContext, args []adt.Value) adt.Expr {\n\t\tsaved :\u003d c.PushState(c.Env(0), args[0].Source())\n\t\tv :\u003d args[0]\n\t\tif a, ok :\u003d c.GetDefault(v); ok \u0026\u0026 v !\u003d nil {\n\t\t\tv \u003d a\n\t\t}\n\t\tc.PopState(saved)\n```\n\nbut this would require the `OpContext.getDefault` method to be made public, and I\u0027m not sure that\u0027s desired.\n\nThe other option would be to do something similar to what the `/pkg` builtins do (`value.Make`, and perhaps share this logic across all builtins), but I\u0027m assuming that wasn\u0027t done because it\u0027s less efficient? Or would that be OK?",
+      "parentUuid": "12de63da_1f971929",
+      "revId": "5af21bbf6fdf7df8746c922a0d0fe15afe17fa60",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bd7e389b_19d22aea",
         "filename": "pkg/encoding/yaml/testdata/validate.txtar",
         "patchSetId": 11
@@ -137,6 +155,24 @@
       "writtenOn": "2024-05-13T14:03:47Z",
       "side": 1,
       "message": "Marcel suggested something earlier on a call - there are two ways to close a value, the `close` builtin and definitions getting automatically closed when referenced. The two methods work fairly differently internally, so we should have test cases for both, to check that they both eventually work the same for builtin calls.",
+      "revId": "5af21bbf6fdf7df8746c922a0d0fe15afe17fa60",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "073dbc28_540684bc",
+        "filename": "pkg/encoding/yaml/testdata/validate.txtar",
+        "patchSetId": 11
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-13T16:00:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bd7e389b_19d22aea",
       "revId": "5af21bbf6fdf7df8746c922a0d0fe15afe17fa60",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

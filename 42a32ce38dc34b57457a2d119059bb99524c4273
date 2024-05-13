@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4fc29f3a_d942865e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-13T11:46:10Z",
+      "side": 1,
+      "message": "Good catch.\n\nThis issue must have been introduced when we moved when we included optional fields in the Arcs list. Originally they were maintained elsewhere, but for various reasons we needed to include them in Arcs.\n\nA question remains whether we should count required fields. With this change they are _not_ counted. (The IsOptional method is inappropriately named, a remnant from when we did not have required fields.) Technically, required fields are not fields. So that means this change is correct. On the other hand, if we have, say, a MaxFields of 1, and we have two required fields, we know there is no completed configuration that can ever satisfy this constraint.\n\nI\u0027m inclined to say that we _should_ count required fields for both MinFields and MaxFields, but this can be left for another CL.",
+      "revId": "42a32ce38dc34b57457a2d119059bb99524c4273",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "db5ead54_8dd57882",

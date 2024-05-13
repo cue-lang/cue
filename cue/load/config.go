@@ -20,7 +20,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -310,25 +309,15 @@ type importPath string
 type fsPath string
 
 func addImportQualifier(pkg importPath, name string) (importPath, errors.Error) {
-	if name != "" {
-		// TODO use module.ParseImportPath
-		s := string(pkg)
-		if i := strings.LastIndexByte(s, '/'); i >= 0 {
-			s = s[i+1:]
-		}
-		if i := strings.LastIndexByte(s, ':'); i >= 0 {
-			// should never happen, but just in case.
-			s = s[i+1:]
-			if s != name {
-				return "", errors.Newf(token.NoPos,
-					"non-matching package names (%s != %s)", s, name)
-			}
-		} else if s != name {
-			pkg += importPath(":" + name)
-		}
+	if name == "" {
+		return pkg, nil
 	}
-
-	return pkg, nil
+	ip := module.ParseImportPath(string(pkg))
+	if ip.ExplicitQualifier && ip.Qualifier != name {
+		return "", errors.Newf(token.NoPos, "non-matching package names (%s != %s)", ip.Qualifier, name)
+	}
+	ip.Qualifier = name
+	return importPath(ip.String()), nil
 }
 
 // Complete updates the configuration information. After calling complete,

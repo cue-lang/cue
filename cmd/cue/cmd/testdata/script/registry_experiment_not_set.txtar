@@ -1,7 +1,7 @@
-# When CUE_EXPERIMENT is empty, the CUE_REGISTRY
+# When CUE_EXPERIMENT is disabled, the CUE_REGISTRY
 # variable is ignored, as are the new fields in module.cue
 
-env CUE_EXPERIMENT=
+env CUE_EXPERIMENT=modules=false
 exec cue export .
 cmp stdout expect-stdout
 
@@ -15,6 +15,7 @@ e.foo
 
 -- cue.mod/module.cue --
 module: "test.org"
+language: version: "v0.9.0"
 // This should be ignored.
 deps: "example.com/e": v: "v0.0.1"
 -- cue.mod/pkg/example.com/e/cue.mod/module.cue --

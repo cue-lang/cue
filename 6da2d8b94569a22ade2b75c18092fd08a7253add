@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0777dde4_247ccc54",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 29
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-13T14:39:38Z",
+      "side": 1,
+      "message": "fixed by calling `filepath.Clean` on each arg\n\nalso added a missing `return nil` in case we\u0027re in a dir, I suppose that should add a slight perf improvement",
+      "revId": "6da2d8b94569a22ade2b75c18092fd08a7253add",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

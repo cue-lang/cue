@@ -87,6 +87,24 @@
       "parentUuid": "41eb42e3_8983bf63",
       "revId": "42a32ce38dc34b57457a2d119059bb99524c4273",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62fb8fc3_709f9c67",
+        "filename": "pkg/struct/testdata/struct.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-13T14:16:18Z",
+      "side": 1,
+      "message": "So to recap, `cue export` fails as expected with both the old and new evaluator, but in the test, the old evaluator succeeds unexpectedly. Perhaps the code being run is different. @mpvl@gmail.com any ideas?",
+      "parentUuid": "677a94b2_f1932a45",
+      "revId": "42a32ce38dc34b57457a2d119059bb99524c4273",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

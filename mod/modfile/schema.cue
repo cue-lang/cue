@@ -73,6 +73,13 @@ versions: "v0.9.0-alpha.0": {
 		// deps holds dependency information for modules, keyed by module path.
 		deps?: [#Module]: #Dep
 
+		// custom holds arbitrary data intended for use by
+		// third-party tools. Each field at the top level
+		// represents a tooling namespace, conventionally allied
+		// to a module or domain name. Data migrated from legacy
+		// module.cue files is placed in the "legacy" namespace.
+		custom?: [#Module | "legacy"]: [_]: _
+
 		#Dep: {
 			// v indicates the minimum required version of the module.
 			// This can be null if the version is unknown and the module

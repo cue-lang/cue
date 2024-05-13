@@ -48,10 +48,11 @@ const schemaFile = "cuelang.org/go/mod/modfile/schema.cue"
 
 // File represents the contents of a cue.mod/module.cue file.
 type File struct {
-	Module   string          `json:"module"`
-	Language *Language       `json:"language,omitempty"`
-	Source   *Source         `json:"source,omitempty"`
-	Deps     map[string]*Dep `json:"deps,omitempty"`
+	Module   string                    `json:"module"`
+	Language *Language                 `json:"language,omitempty"`
+	Source   *Source                   `json:"source,omitempty"`
+	Deps     map[string]*Dep           `json:"deps,omitempty"`
+	Custom   map[string]map[string]any `json:"custom,omitempty"`
 	versions []module.Version
 	// defaultMajorVersions maps from module base path to the
 	// major version default for that path.
@@ -245,6 +246,27 @@ func ParseLegacy(modfile []byte, filename string) (*File, error) {
 		Module:              f.Module,
 		actualSchemaVersion: "v0.0.0",
 	}, nil
+}
+
+// FixLegacy converts a legacy module.cue file as parsed by [ParseLegacy]
+// into a format suitable for parsing with [Parse]. It adds a language.version
+// field and moves all unrecognized fields into custom.legacy.
+func FixLegacy(modfile []byte, filename string) (*File, error) {
+	f, err := ParseNonStrict(modfile, filename)
+	if err == nil {
+		// It parses OK then it doesn't need fixing.
+		return f, nil
+	}
+	ctx := cuecontext.New()
+	file, err := parseDataOnlyCUE(ctx, modfile, filename)
+	if err != nil {
+		return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file syntax")
+	}
+	v := ctx.BuildFile(file)
+	if err := v.Validate(cue.Concrete(true)); err != nil {
+		return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file value")
+	}
+	return nil, nil
 }
 
 // ParseNonStrict is like Parse but allows some laxity in the parsing:

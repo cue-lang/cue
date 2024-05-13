@@ -276,7 +276,7 @@ deps: "example.com": v: "v1.2.3"
 	data: `
 module: "foo.com/bar"
 something: 4
-cue: lang: "xxx"
+language: version: "xxx"
 `,
 	want: &File{
 		Module: "foo.com/bar",
@@ -287,32 +287,52 @@ cue: lang: "xxx"
 	data: `
 module: "foo.com/bar"
 _foo: "v0.9.0"
-cue: lang: _foo
+language: version: _foo
 `,
 	wantError: `invalid module.cue file syntax: references not allowed in data mode:
-    module.cue:4:12`,
+    module.cue:4:20`,
 }, {
 	testName: "ReferencesNotAllowed#2",
 	parse:    Parse,
 	data: `
 module: "foo.com/bar"
 let foo = "v0.9.0"
-cue: lang: foo
+language: version: foo
 `,
 	wantError: `invalid module.cue file syntax: references not allowed in data mode:
     module.cue:3:1
 invalid module.cue file syntax: references not allowed in data mode:
-    module.cue:4:12`,
+    module.cue:4:20`,
 }, {
 	testName: "DefinitionsNotAllowed",
 	parse:    Parse,
 	data: `
 module: "foo.com/bar"
 #x: "v0.9.0"
-cue: lang: "v0.9.0"
+language: version: "v0.9.0"
 `,
 	wantError: `invalid module.cue file syntax: definitions not allowed in data mode:
     module.cue:3:1`,
+}, {
+	testName: "CustomData",
+	parse:    Parse,
+	data: `
+module: "foo.com/bar@v0"
+language: version: "v0.9.0"
+custom: "somewhere.com": foo: true
+`,
+	want: &File{
+		Module:   "foo.com/bar@v0",
+		Language: &Language{Version: "v0.9.0"},
+		Custom: map[string]map[string]any{
+			"somewhere.com": {
+				"foo": true,
+			},
+		},
+	},
+	wantDefaults: map[string]string{
+		"foo.com/bar": "v0",
+	},
 }}
 
 func TestParse(t *testing.T) {
@@ -325,7 +345,7 @@ func TestParse(t *testing.T) {
 				return
 			}
 			qt.Assert(t, qt.IsNil(err), qt.Commentf("details: %v", strings.TrimSuffix(errors.Details(err, nil), "\n")))
-			qt.Assert(t, qt.CmpEquals(f, test.want, cmpopts.IgnoreUnexported(File{})))
+			qt.Assert(t, fileEquals(f, test.want))
 			qt.Assert(t, qt.DeepEquals(f.DepVersions(), test.wantVersions))
 			qt.Assert(t, qt.DeepEquals(f.DefaultMajorVersions(), test.wantDefaults))
 		})
@@ -424,7 +444,7 @@ language: {
 		// Check that it round-trips.
 		f, err := Parse(data, "")
 		qt.Assert(t, qt.IsNil(err))
-		qt.Assert(t, qt.CmpEquals(f, test.file, cmpopts.IgnoreUnexported(File{}), cmpopts.EquateEmpty()))
+		qt.Assert(t, fileEquals(f, test.file))
 	})
 }
 
@@ -442,4 +462,13 @@ func parseVersions(vs ...string) []module.Version {
 		vvs = append(vvs, module.MustParseVersion(v))
 	}
 	return vvs
+}
+
+// fileEquals returns a checker that checks whether two File instances
+// are equal.
+func fileEquals(got, want *File) qt.Checker {
+	return qt.CmpEquals(got, want,
+		cmpopts.IgnoreUnexported(File{}),
+		cmpopts.EquateEmpty(),
+	)
 }

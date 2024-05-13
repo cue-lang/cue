@@ -2,6 +2,7 @@ env-fill want-module.cue
 env-fill want-module-experiment.cue
 
 # Without the experiment, we use the module path as-is.
+env CUE_EXPERIMENT=modules=false
 exec cue mod init foo.com/bar
 cmp cue.mod/module.cue want-module.cue
 exists cue.mod/usr

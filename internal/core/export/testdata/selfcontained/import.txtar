@@ -2,6 +2,7 @@
 
 -- cue.mod/module.cue --
 module: "mod.test/a"
+language: version: "v0.9.0"
 
 -- in.cue --
 import "mod.test/a/pkg"
@@ -136,20 +137,20 @@ diff old new
 +++ new
 @@ -1,10 +1,7 @@
  import "tool/exec"
- 
+
  // Can be inlined.
 -v: {
 -	x: 3
 -	y: x
 -}
 +v: V
- 
+
  // Do not simplify because of multiple usages of enclosing struct.
  x: B.c
 @@ -24,6 +21,12 @@
  run:     exec.Run
  _hidden: int
- 
+
 +//cue:path: "mod.test/a/pkg".v.v
 +let V = {
 +	x: 3

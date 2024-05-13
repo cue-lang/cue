@@ -1,4 +1,5 @@
-! exec cue mod tidy
-cmp stderr want-stderr
--- want-stderr --
-modules experiment not enabled (enable with CUE_EXPERIMENT=modules)
+# Check that modules are enabled by default.
+exec cue mod tidy
+-- cue.mod/module.cue --
+module: "test.example"
+language: version: "v0.9.0"

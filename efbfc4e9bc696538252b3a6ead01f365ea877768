@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "14d8fefd_af5adc63",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 732,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-13T11:25:34Z",
+      "side": 1,
+      "message": "Maybe add a TODO here to remove calls to exitOnErr ?",
+      "revId": "efbfc4e9bc696538252b3a6ead01f365ea877768",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "79919bf9_13ce073a",
         "filename": "cmd/cue/cmd/vet.go",
         "patchSetId": 1

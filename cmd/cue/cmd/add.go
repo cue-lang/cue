@@ -252,7 +252,7 @@ func initFile(cmd *Command, file string, getBuild func(path string) *build.Insta
 		if err != nil {
 			return nil, err
 		}
-		if _, pkgName, _ := internal.PackageInfo(f); pkgName != "" {
+		if pkgName := internal.GetPackageInfo(f).Name; pkgName != "" {
 			if pkg := flagPackage.String(cmd); pkg != "" && pkgName != pkg {
 				return nil, fmt.Errorf("package mismatch (%s vs %s) for file %s", pkgName, pkg, file)
 			}

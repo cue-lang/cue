@@ -166,7 +166,6 @@ func placeOrphans(b *buildPlan, d *encoding.Decoder, pkg string, objs ...*ast.Fi
 			astutil.CopyMeta(f, file)
 		}
 		expr := internal.ToExpr(file)
-		p, _, _ := internal.PackageInfo(file)
 
 		var path cue.Path
 		var labels []ast.Label
@@ -272,7 +271,7 @@ func placeOrphans(b *buildPlan, d *encoding.Decoder, pkg string, objs ...*ast.Fi
 		} else {
 			field := &ast.Field{Label: labels[0]}
 			f.Decls = append(f.Decls, field)
-			if p != nil {
+			if p := internal.GetPackageInfo(file).Package; p != nil {
 				astutil.CopyComments(field, p)
 			}
 			for _, e := range labels[1:] {

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b394f619_d13d4178",
+        "filename": "cmd/cue/cmd/flags.go",
+        "patchSetId": 25
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-13T13:01:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b13117df_69bb8a00",
+      "revId": "0af73d732471e53a1367fea3f09cce1c32369460",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aad85683_f019a434",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-05-13T12:42:11Z",
       "side": 1,
       "message": "I would honestly just call `exitOnError` here, there\u0027s no need to make this a struct field func.\n\nyou can then make cmd the first field of the struct - and then, unsurprisingly, the ctx and stdout fields become unnecessary as well :) perhaps even to the point where you can use regular parameters rather than a struct?",
+      "revId": "0af73d732471e53a1367fea3f09cce1c32369460",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "19d8fdf9_e24263d2",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 25
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-13T13:01:46Z",
+      "side": 1,
+      "message": "good points. I removed the struct - replaced the method with a function, and extracted the badlyFormattedResults field to a var in the fmt func.",
+      "parentUuid": "aad85683_f019a434",
       "revId": "0af73d732471e53a1367fea3f09cce1c32369460",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

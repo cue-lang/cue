@@ -1096,7 +1096,7 @@ as long as it is not unified with a defined field.
 
 The subsumption relation for fields with the various markers is defined as
 ```
-{a?: x} ⊑ {a!: x} ⊑ {a: x}
+{a: x} ⊑ {a!: x} ⊑ {a?: x}
 ```
 for any given `x`.
 

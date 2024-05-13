@@ -16,6 +16,23 @@
       "message": "thanks for the review, very good points :)",
       "revId": "83f45244f618bafe4c5d48991db245cffdbb709e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a52b9e9_86ec0510",
+        "filename": "internal/pkg/context.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-13T14:52:31Z",
+      "side": 1,
+      "message": "As we no longer do so in expo.go, it should now be done in Value.\n\nFor instance, \n\n```\nimport \"net\"\n\na: *\"4.4.4.4\" | \"8.8.8.8\"\nb: net.ToIP4(a)\n```\n\nI think this won\u0027t work without taking the default in value now.",
+      "revId": "83f45244f618bafe4c5d48991db245cffdbb709e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

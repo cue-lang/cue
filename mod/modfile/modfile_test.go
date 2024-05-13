@@ -281,6 +281,47 @@ cue: lang: "xxx"
 	want: &File{
 		Module: "foo.com/bar",
 	},
+}, {
+	testName: "LegacyReferencesNotAllowed",
+	parse:    ParseLegacy,
+	data: `
+module: _foo
+_foo: "blah.example"
+`,
+	wantError: `invalid module.cue file syntax: references not allowed in data mode:
+    module.cue:2:9`,
+}, {
+	testName: "ReferencesNotAllowed#1",
+	parse:    Parse,
+	data: `
+module: "foo.com/bar"
+_foo: "v0.9.0"
+cue: lang: _foo
+`,
+	wantError: `invalid module.cue file syntax: references not allowed in data mode:
+    module.cue:4:12`,
+}, {
+	testName: "ReferencesNotAllowed#2",
+	parse:    Parse,
+	data: `
+module: "foo.com/bar"
+let foo = "v0.9.0"
+cue: lang: foo
+`,
+	wantError: `invalid module.cue file syntax: references not allowed in data mode:
+    module.cue:3:1
+invalid module.cue file syntax: references not allowed in data mode:
+    module.cue:4:12`,
+}, {
+	testName: "DefinitionsNotAllowed",
+	parse:    Parse,
+	data: `
+module: "foo.com/bar"
+#x: "v0.9.0"
+cue: lang: "v0.9.0"
+`,
+	wantError: `invalid module.cue file syntax: definitions not allowed in data mode:
+    module.cue:3:1`,
 }}
 
 func TestParse(t *testing.T) {

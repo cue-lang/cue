@@ -108,6 +108,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "12de63da_1f971929",
+        "filename": "internal/pkg/context.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-13T14:45:56Z",
+      "side": 1,
+      "message": "Even though the code of many builtins has not changed, the code path leading up to their call has. Some of them rely on the caller to already have checked that the value is concrete. Value should now catch that, but it is not entirely clear in all cases that the error messages are still okay. Some of the builtins in the net package are a good candidate of that.\n\nI think all is fine, but some of these are poorly tested for error messages, so just to make sure.",
+      "parentUuid": "cf16b657_4fb9cc6d",
+      "revId": "5af21bbf6fdf7df8746c922a0d0fe15afe17fa60",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bd7e389b_19d22aea",
         "filename": "pkg/encoding/yaml/testdata/validate.txtar",
         "patchSetId": 11

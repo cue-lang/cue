@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "00b22d28_271e31e4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-13T13:24:46Z",
+      "side": 1,
+      "message": "For clarity, removing this deprecated API is fine as it is internal.",
+      "revId": "4f081cb071c3ee45b66a46531a839358d4797972",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

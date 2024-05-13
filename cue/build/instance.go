@@ -239,11 +239,11 @@ func (inst *Instance) AddSyntax(file *ast.File) errors.Error {
 	astutil.Resolve(file, func(pos token.Pos, msg string, args ...interface{}) {
 		inst.Err = errors.Append(inst.Err, errors.Newf(pos, msg, args...))
 	})
-	_, pkg, pos := internal.PackageInfo(file)
-	if pkg != "" && pkg != "_" && !inst.User && !inst.setPkg(pkg) && pkg != inst.PkgName {
-		err := errors.Newf(pos,
+	pkgName := internal.GetPackageInfo(file).Name
+	if pkgName != "" && pkgName != "_" && !inst.User && !inst.setPkg(pkgName) && pkgName != inst.PkgName {
+		err := errors.Newf(file.Pos(),
 			"package name %q conflicts with previous package name %q",
-			pkg, inst.PkgName)
+			pkgName, inst.PkgName)
 		inst.ReportError(err)
 		return err
 	}

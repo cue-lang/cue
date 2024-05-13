@@ -119,7 +119,7 @@ func (r *Runtime) CompileFile(cfg *Config, file *ast.File) (*adt.Vertex, *build.
 	if err != nil {
 		return nil, p
 	}
-	_, p.PkgName, _ = internal.PackageInfo(file)
+	p.PkgName = internal.GetPackageInfo(file).Name
 	v, _ := r.Build(cfg, p)
 	return v, p
 }

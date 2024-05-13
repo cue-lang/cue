@@ -158,23 +158,13 @@ func GetPackageInfo(f *ast.File) PkgInfo {
 	return PkgInfo{}
 }
 
-// Deprecated: use GetPackageInfo
-func PackageInfo(f *ast.File) (p *ast.Package, name string, tok token.Pos) {
-	x := GetPackageInfo(f)
-	if p := x.Package; p != nil {
-		return p, x.Name, p.Name.Pos()
-	}
-	return nil, "", f.Pos()
-}
-
 func SetPackage(f *ast.File, name string, overwrite bool) {
-	p, str, _ := PackageInfo(f)
-	if p != nil {
-		if !overwrite || str == name {
+	if pi := GetPackageInfo(f); pi.Package != nil {
+		if !overwrite || pi.Name == name {
 			return
 		}
 		ident := ast.NewIdent(name)
-		astutil.CopyMeta(ident, p.Name)
+		astutil.CopyMeta(ident, pi.Package.Name)
 		return
 	}
 
@@ -235,9 +225,8 @@ func NewComment(isDoc bool, s string) *ast.CommentGroup {
 }
 
 func FileComment(f *ast.File) *ast.CommentGroup {
-	pkg, _, _ := PackageInfo(f)
 	var cgs []*ast.CommentGroup
-	if pkg != nil {
+	if pkg := GetPackageInfo(f).Package; pkg != nil {
 		cgs = pkg.Comments()
 	} else if cgs = f.Comments(); len(cgs) > 0 {
 		// Use file comment.

@@ -104,6 +104,23 @@
       "parentUuid": "cf1e2ddc_3ddae126",
       "revId": "5af21bbf6fdf7df8746c922a0d0fe15afe17fa60",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd7e389b_19d22aea",
+        "filename": "pkg/encoding/yaml/testdata/validate.txtar",
+        "patchSetId": 11
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-13T14:03:47Z",
+      "side": 1,
+      "message": "Marcel suggested something earlier on a call - there are two ways to close a value, the `close` builtin and definitions getting automatically closed when referenced. The two methods work fairly differently internally, so we should have test cases for both, to check that they both eventually work the same for builtin calls.",
+      "revId": "5af21bbf6fdf7df8746c922a0d0fe15afe17fa60",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

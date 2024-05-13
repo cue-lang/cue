@@ -19,6 +19,7 @@ cmp stdout p.golden
 
 -- cue.mod/module.cue --
 module: "mod.example"
+language: version: "v0.9.0"
 -- x.cue --
 package x
 

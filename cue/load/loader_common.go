@@ -212,10 +212,11 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 		return true
 	}
 
-	_, pkg, pos := internal.PackageInfo(pf)
+	pkg := internal.GetPackageInfo(pf).Name
 	if pkg == "" {
 		pkg = "_"
 	}
+	pos := pf.Pos()
 
 	switch {
 	case pkg == p.PkgName, mode&allowAnonymous != 0:

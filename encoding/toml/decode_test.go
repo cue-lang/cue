@@ -15,13 +15,18 @@
 package toml_test
 
 import (
+	"encoding/json"
 	"io"
 	"strings"
 	"testing"
 
+	"github.com/go-quicktest/qt"
+	gotoml "github.com/pelletier/go-toml/v2"
+
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/encoding/toml"
-	"github.com/go-quicktest/qt"
 )
 
 func TestDecoder(t *testing.T) {
@@ -36,13 +41,13 @@ func TestDecoder(t *testing.T) {
 	}{{
 		name:  "Empty",
 		input: "",
-		want:  "null",
+		want:  "",
 	}, {
 		name: "LoneComment",
 		input: `
 			# Just a comment
 		`,
-		want: "null",
+		want: "",
 	}, {
 		name: "RootKeysOne",
 		input: `
@@ -288,10 +293,35 @@ line two.\
 			qt.Assert(t, qt.IsNil(err))
 			qt.Assert(t, qt.Equals(string(formatted), string(wantFormatted)))
 
-			// TODO(mvdan): validate that the decoded CUE values are equivalent
-			// to the Go values that a direct TOML unmarshal would produce.
-			// For example, compare JSON equality between the CUE encoded as JSON
-			// and the TOML decoded into `any` and encoded as JSON.
+			// Ensure that the CUE node can be compiled into a cue.Value and validated.
+			ctx := cuecontext.New()
+			// TODO(mvdan): cue.Context can only build ast.Expr or ast.File, not ast.Node;
+			// it's then likely not the right choice for the interface to return ast.Node.
+			val := ctx.BuildFile(node.(*ast.File))
+			qt.Assert(t, qt.IsNil(val.Err()))
+			qt.Assert(t, qt.IsNil(val.Validate()))
+
+			// See the TODO above; go-toml rejects duplicate keys per the spec,
+			// but our decoder does not yet.
+			if test.name == "RootKeysDuplicate" {
+				return
+			}
+
+			// Validate that the decoded CUE value is equivalent
+			// to the Go value that a direct TOML unmarshal produces.
+			// We use JSON equality as some details such as which integer types are used
+			// are not actually relevant to an "equal data" check.
+			var unmarshalTOML any
+			err = gotoml.Unmarshal([]byte(test.input), &unmarshalTOML)
+			qt.Assert(t, qt.IsNil(err))
+			jsonTOML, err := json.Marshal(unmarshalTOML)
+			qt.Assert(t, qt.IsNil(err))
+			t.Logf("json.Marshal via go-toml:\t%s\n", jsonTOML)
+
+			jsonCUE, err := json.Marshal(val)
+			qt.Assert(t, qt.IsNil(err))
+			t.Logf("json.Marshal via CUE:\t%s\n", jsonCUE)
+			qt.Assert(t, qt.JSONEquals(jsonCUE, unmarshalTOML))
 		})
 	}
 }

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab48a3ed_a3f65c93",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-13T15:46:09Z",
+      "side": 1,
+      "message": "This is still messy; writing directly to os.Stderr is technically not allowed, as it breaks Marcel\u0027s in-process debugging test Testx. I\u0027ve added a TODO to redo this a bit later, and perhaps ask him if he truly still needs TestX.",
+      "parentUuid": "9ccce28c_0cc1d8bb",
+      "revId": "351bd6d1cc70854d076c5e34f4f7a81efc075e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d1a6f866_6dafea10",
@@ -41,6 +59,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5fb1eec7_000d1d59",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-13T15:46:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d1a6f866_6dafea10",
+      "range": {
+        "startLine": 342,
+        "startChar": 0,
+        "endLine": 344,
+        "endChar": 0
+      },
+      "revId": "351bd6d1cc70854d076c5e34f4f7a81efc075e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ab6ea900_2a7ec71a",
@@ -54,6 +96,24 @@
       "writtenOn": "2024-05-13T11:52:14Z",
       "side": 1,
       "message": "Calling os.Getwd every time an error is printed seems a little heavyweight, but maybe it\u0027s OK. It would kinda be nicer to call it only once though. Maybe add a TODO?",
+      "revId": "351bd6d1cc70854d076c5e34f4f7a81efc075e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ebc97ef_acc5970f",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-13T15:46:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ab6ea900_2a7ec71a",
       "revId": "351bd6d1cc70854d076c5e34f4f7a81efc075e09",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

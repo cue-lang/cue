@@ -304,3 +304,12 @@ func TestParseImportPath(t *testing.T) {
 		})
 	}
 }
+
+func TestImportPathStringAddsQualifier(t *testing.T) {
+	ip := ImportPath{
+		Path:      "foo.com/bar",
+		Version:   "v0",
+		Qualifier: "baz",
+	}
+	qt.Assert(t, qt.Equals(ip.String(), "foo.com/bar@v0:baz"))
+}

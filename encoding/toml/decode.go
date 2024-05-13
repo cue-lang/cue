@@ -68,6 +68,9 @@ func (d *Decoder) Decode() (ast.Node, error) {
 		return nil, err
 	}
 	d.parser.Reset(data)
+	// Note that if the input is empty the result will be the same
+	// as for an empty table: an empty struct.
+	// The TOML spec and other decoders also work this way.
 	file := &ast.File{}
 	for d.parser.NextExpression() {
 		if err := d.nextRootNode(d.parser.Expression()); err != nil {
@@ -78,10 +81,6 @@ func (d *Decoder) Decode() (ast.Node, error) {
 		file.Decls = append(file.Decls, field)
 	}
 	d.currentFields = d.currentFields[:0]
-	if len(file.Decls) == 0 {
-		// Empty inputs are decoded as null, much like JSON or YAML.
-		file.Decls = append(file.Decls, ast.NewNull())
-	}
 	return file, nil
 }
 
@@ -147,6 +146,8 @@ func (d *Decoder) nextRootNode(tnode *toml.Node) error {
 
 // nextRootNode is called for every top-level expression from the TOML parser.
 func (d *Decoder) decodeExpr(tnode *toml.Node) (ast.Expr, error) {
+	// TODO(mvdan): we currently assume that TOML basic literals (string, int, float)
+	// are also valid CUE literals; we should double check this, perhaps via fuzzing.
 	data := string(tnode.Data)
 	switch tnode.Kind {
 	case toml.String:

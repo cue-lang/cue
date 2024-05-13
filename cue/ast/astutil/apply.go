@@ -450,7 +450,7 @@ func (f *applier) Before(c Cursor) applyVisitor {
 	node := c.Node()
 	if f.before == nil || (f.before(c) && node == c.Node()) {
 		f.commentStack = append(f.commentStack, f.current)
-		f.current = commentFrame{cg: node.Comments()}
+		f.current = commentFrame{cg: ast.Comments(node)}
 		f.visitComments(c, f.current.pos)
 		return f
 	}

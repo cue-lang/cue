@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ccce28c_0cc1d8bb",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-13T11:52:14Z",
+      "side": 1,
+      "message": "As an aside, this behaviour is sometimes problematic; for example, any command with a verbose mode that prints to standard error causes a non-zero exit code.\n\nPerhaps add a comment saying \"Use [os.Stderr] directly to print informational\nmessages such as when running in a verbose mode\".\n\n?",
+      "revId": "351bd6d1cc70854d076c5e34f4f7a81efc075e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1a6f866_6dafea10",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-13T11:52:14Z",
+      "side": 1,
+      "message": "This looks like a holdover from before.",
+      "range": {
+        "startLine": 342,
+        "startChar": 0,
+        "endLine": 344,
+        "endChar": 0
+      },
+      "revId": "351bd6d1cc70854d076c5e34f4f7a81efc075e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab6ea900_2a7ec71a",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-13T11:52:14Z",
+      "side": 1,
+      "message": "Calling os.Getwd every time an error is printed seems a little heavyweight, but maybe it\u0027s OK. It would kinda be nicer to call it only once though. Maybe add a TODO?",
+      "revId": "351bd6d1cc70854d076c5e34f4f7a81efc075e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

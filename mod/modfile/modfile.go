@@ -48,10 +48,11 @@ const schemaFile = "cuelang.org/go/mod/modfile/schema.cue"
 
 // File represents the contents of a cue.mod/module.cue file.
 type File struct {
-	Module   string          `json:"module"`
-	Language *Language       `json:"language,omitempty"`
-	Source   *Source         `json:"source,omitempty"`
-	Deps     map[string]*Dep `json:"deps,omitempty"`
+	Module   string                    `json:"module"`
+	Language *Language                 `json:"language,omitempty"`
+	Source   *Source                   `json:"source,omitempty"`
+	Deps     map[string]*Dep           `json:"deps,omitempty"`
+	Custom   map[string]map[string]any `json:"custom,omitempty"`
 	versions []module.Version
 	// defaultMajorVersions maps from module base path to the
 	// major version default for that path.

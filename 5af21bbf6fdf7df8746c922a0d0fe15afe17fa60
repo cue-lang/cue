@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d33f61a6_053f1e6b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-13T12:34:48Z",
+      "side": 1,
+      "message": "Note that we can make a distinction between concrete, \"final\" (fully evaluated, with no references remaining), self sufficient (no references outside a node), and defaults resolved.",
+      "revId": "5af21bbf6fdf7df8746c922a0d0fe15afe17fa60",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c19687df_274cc7e9",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 1529,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-13T12:34:48Z",
+      "side": 1,
+      "message": "So if I am getting this right,the point here is to take the default value if it exists, and otherwise leave the disjunction as is.\n\nThis means we would not want to support:\n```\na: *int | string\nyaml.Validate(\"\u0027foo\u0027\", a)\n```\nThis seems somewhat unexpected. Especially so because any nested default values will _not_ be picked by this approach.\n\nIs there any reason why the default is not handled in the `CallCtx.Value` method?",
+      "revId": "5af21bbf6fdf7df8746c922a0d0fe15afe17fa60",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf1e2ddc_3ddae126",
+        "filename": "internal/pkg/context.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-13T12:34:48Z",
+      "side": 1,
+      "message": "It would be good to see if `net.ToIP4(1 | 2)` holds up to this approach. Maybe add a test in that directory. I think it will.",
+      "revId": "5af21bbf6fdf7df8746c922a0d0fe15afe17fa60",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

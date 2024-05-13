@@ -72,6 +72,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b5ca3e9_0c662d61",
+        "filename": "cue/testdata/builtins/incomplete.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-13T12:34:48Z",
+      "side": 1,
+      "message": "I think the new error message is fine.",
+      "parentUuid": "1f4a8bd2_2c4822ee",
+      "range": {
+        "startLine": 184,
+        "startChar": 32,
+        "endLine": 184,
+        "endChar": 51
+      },
+      "revId": "1e6a77951304a97ba0a67edf7605c7a99f93f92d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d4d54dd9_860fc488",
@@ -157,6 +181,30 @@
       "side": 1,
       "message": "changed to NonConcreteValue in the meantime",
       "parentUuid": "a46afd4d_75412cf3",
+      "range": {
+        "startLine": 52,
+        "startChar": 19,
+        "endLine": 52,
+        "endChar": 22
+      },
+      "revId": "1e6a77951304a97ba0a67edf7605c7a99f93f92d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6284ab4e_b177cdb1",
+        "filename": "internal/pkg/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-13T12:34:48Z",
+      "side": 1,
+      "message": "Maybe use `Schema` instead of `NonConreteValue`? Maybe not entirely accurate, but we use that terminology at other points.",
+      "parentUuid": "c5ca3579_46d4f088",
       "range": {
         "startLine": 52,
         "startChar": 19,

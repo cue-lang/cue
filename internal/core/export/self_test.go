@@ -152,7 +152,7 @@ func TestSC(t *testing.T) {
 	in := `
 -- cue.mod/module.cue --
 module: "mod.test/a"
-
+language: version: "v0.9.0"
 -- in.cue --
 	`
 	if strings.HasSuffix(strings.TrimSpace(in), ".cue --") {

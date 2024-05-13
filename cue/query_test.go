@@ -147,7 +147,7 @@ func TestHidden(t *testing.T) {
 	in := `
 -- cue.mod/module.cue --
 module: "mod.test"
-
+language: version: "v0.9.0"
 -- in.cue --
 import "mod.test/foo"
 

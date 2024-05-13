@@ -30,12 +30,14 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
-	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/cueversion"
+	"cuelang.org/go/internal/encoding"
+	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/mod/module"
 )
 
@@ -230,8 +232,13 @@ func Parse(modfile []byte, filename string) (*File, error) {
 // that only supports the single field "module" and ignores all other
 // fields.
 func ParseLegacy(modfile []byte, filename string) (*File, error) {
+	ctx := cuecontext.New()
+	file, err := parseDataOnlyCUE(ctx, modfile, filename)
+	if err != nil {
+		return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file syntax")
+	}
 	// Unfortunately we need a new context. See the note inside [moduleSchemaDo].
-	v := cuecontext.New().CompileBytes(modfile, cue.Filename(filename))
+	v := ctx.BuildFile(file)
 	if err := v.Err(); err != nil {
 		return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file")
 	}
@@ -255,14 +262,14 @@ func ParseNonStrict(modfile []byte, filename string) (*File, error) {
 }
 
 func parse(modfile []byte, filename string, strict bool) (*File, error) {
-	file, err := parser.ParseFile(filename, modfile)
+	// Unfortunately we need a new context. See the note inside [moduleSchemaDo].
+	ctx := cuecontext.New()
+	file, err := parseDataOnlyCUE(ctx, modfile, filename)
 	if err != nil {
 		return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file syntax")
 	}
-	// TODO disallow non-data-mode CUE.
 
-	// Unfortunate to need a new context, but see the note inside [moduleSchemaDo].
-	v := cuecontext.New().BuildFile(file)
+	v := ctx.BuildFile(file)
 	if err := v.Validate(cue.Concrete(true)); err != nil {
 		return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file value")
 	}
@@ -387,6 +394,23 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 	mf.versions = versions[:len(versions):len(versions)]
 	module.Sort(mf.versions)
 	return mf, nil
+}
+
+func parseDataOnlyCUE(ctx *cue.Context, cueData []byte, filename string) (*ast.File, error) {
+	dec := encoding.NewDecoder(ctx, &build.File{
+		Filename:       filename,
+		Encoding:       build.CUE,
+		Interpretation: build.Auto,
+		Form:           build.Data,
+		Source:         cueData,
+	}, &encoding.Config{
+		Mode:      filetypes.Export,
+		AllErrors: true,
+	})
+	if err := dec.Err(); err != nil {
+		return nil, err
+	}
+	return dec.File(), nil
 }
 
 func newCUEError(err error, filename string) error {

@@ -94,10 +94,9 @@ func (l *loader) errPkgf(importPos []token.Pos, format string, args ...interface
 // cueFilesPackage creates a package for building a collection of CUE files
 // (typically named on the command line).
 func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
-	cfg := l.cfg
-	cfg.filesMode = true
+
 	// ModInit() // TODO: support modules
-	pkg := l.cfg.Context.NewInstance(cfg.Dir, l.loadFunc)
+	pkg := l.cfg.Context.NewInstance(l.cfg.Dir, l.loadFunc)
 
 	for _, bf := range files {
 		f := bf.Filename
@@ -105,28 +104,28 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 			continue
 		}
 		if !filepath.IsAbs(f) {
-			f = filepath.Join(cfg.Dir, f)
+			f = filepath.Join(l.cfg.Dir, f)
 		}
-		fi, err := cfg.fileSystem.stat(f)
+		fi, err := l.cfg.fileSystem.stat(f)
 		if err != nil {
-			return cfg.newErrInstance(errors.Wrapf(err, token.NoPos, "could not find file %v", f))
+			return l.cfg.newErrInstance(errors.Wrapf(err, token.NoPos, "could not find file %v", f))
 		}
 		if fi.IsDir() {
-			return cfg.newErrInstance(errors.Newf(token.NoPos, "file is a directory %v", f))
+			return l.cfg.newErrInstance(errors.Newf(token.NoPos, "file is a directory %v", f))
 		}
 	}
 
-	fp := newFileProcessor(cfg, pkg, l.tagger)
+	fp := newFileProcessor(l.cfg, pkg, l.tagger)
 	if l.cfg.Package == "*" {
 		fp.allPackages = true
 		pkg.PkgName = "_"
 	}
 	for _, file := range files {
-		fp.add(cfg.Dir, file, allowAnonymous)
+		fp.add(l.cfg.Dir, file, allowAnonymous|allowExcludedFiles)
 	}
 
 	// TODO: ModImportFromFiles(files)
-	pkg.Dir = cfg.Dir
+	pkg.Dir = l.cfg.Dir
 	rewriteFiles(pkg, pkg.Dir, true)
 	for _, err := range errors.Errors(fp.finalize(pkg)) { // ImportDir(&ctxt, dir, 0)
 		var x *NoFilesError
@@ -142,7 +141,7 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 	// }
 
 	pkg.User = true
-	l.addFiles(cfg.Dir, pkg)
+	l.addFiles(l.cfg.Dir, pkg)
 
 	l.stk.Push("user")
 	_ = pkg.Complete()

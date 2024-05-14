@@ -62,6 +62,10 @@ func Instances(args []string, c *Config) []*build.Instance {
 	}
 	pkgArgs := args[:i]
 	otherArgs := args[i:]
+	otherFiles, err := filetypes.ParseArgs(otherArgs)
+	if err != nil {
+		return []*build.Instance{c.newErrInstance(err)}
+	}
 
 	// Pass all arguments that look like packages to loadPackages
 	// so that they'll be available when looking up the packages
@@ -95,12 +99,8 @@ func Instances(args []string, c *Config) []*build.Instance {
 		}
 	}
 
-	if len(otherArgs) > 0 {
-		files, err := filetypes.ParseArgs(otherArgs)
-		if err != nil {
-			return []*build.Instance{c.newErrInstance(err)}
-		}
-		a = append(a, l.cueFilesPackage(files))
+	if len(otherFiles) > 0 {
+		a = append(a, l.cueFilesPackage(otherFiles))
 	}
 
 	for _, p := range a {

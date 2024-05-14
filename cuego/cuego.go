@@ -140,7 +140,7 @@ func (c *Context) Constrain(x interface{}, constraints string) error {
 		return err
 	}
 
-	v := instance.Eval(expr)
+	v := runtime.BuildExpr(expr)
 	if v.Err() != nil {
 		return err
 	}
@@ -158,18 +158,9 @@ func (c *Context) Constrain(x interface{}, constraints string) error {
 }
 
 var (
-	mutex    sync.Mutex
-	instance *cue.Instance
-	runtime  = cuecontext.New()
+	mutex   sync.Mutex
+	runtime = cuecontext.New()
 )
-
-func init() {
-	var err error
-	instance, err = value.ConvertToRuntime(runtime).Compile("<cuego>", "{}")
-	if err != nil {
-		panic(err)
-	}
-}
 
 // fromGoValue converts a Go value to CUE
 func fromGoValue(x interface{}, nilIsNull bool) (v cue.Value, err error) {

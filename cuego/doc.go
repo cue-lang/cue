@@ -54,7 +54,7 @@
 // A Complete will implicitly validate a struct.
 package cuego // import "cuelang.org/go/cuego"
 
-// The first goal of this packages is to get the semantics right. After that,
+// The first goal of this package is to get the semantics right. After that,
 // there are a lot of performance gains to be made:
 // - cache the type info extracted during value (as opposed to type) conversion
 // - remove the usage of mutex for value conversions

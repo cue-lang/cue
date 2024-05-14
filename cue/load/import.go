@@ -190,7 +190,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 			return all
 		}
 
-		l.addFiles(cfg.ModuleRoot, p)
+		l.addFiles(p)
 		_ = p.Complete()
 	}
 	slices.SortFunc(all, func(a, b *build.Instance) int {

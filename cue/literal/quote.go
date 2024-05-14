@@ -96,7 +96,7 @@ var (
 	// TODO: ExactString: quotes to bytes type if the string cannot be
 	// represented without loss of accuracy.
 
-	// Label is like Text, but optimized for labels.
+	// Label is like String, but optimized for labels.
 	Label Form = stringForm
 
 	// Bytes defines the format of bytes literal.

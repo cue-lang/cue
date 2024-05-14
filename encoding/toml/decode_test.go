@@ -35,25 +35,32 @@ func TestDecoder(t *testing.T) {
 	// The whitespace doesn't affect the input TOML, and we cue/format on the "want" CUE source,
 	// so the added newlines and tabs don't change the test behavior.
 	tests := []struct {
-		name  string
-		input string
-		want  string
+		name    string
+		input   string
+		wantCUE string
+		wantErr string
 	}{{
-		name:  "Empty",
-		input: "",
-		want:  "",
+		name:    "Empty",
+		input:   "",
+		wantCUE: "",
 	}, {
 		name: "LoneComment",
 		input: `
 			# Just a comment
 		`,
-		want: "",
+		wantCUE: "",
+	}, {
+		name: "RootKeyMissing",
+		input: `
+			= "no key name"
+		`,
+		wantErr: "invalid character at start of key: =",
 	}, {
 		name: "RootKeysOne",
 		input: `
 			key = "value"
 		`,
-		want: `
+		wantCUE: `
 			key: "value"
 		`,
 	}, {
@@ -63,7 +70,7 @@ func TestDecoder(t *testing.T) {
 			key2 = "value2"
 			key3 = "value3"
 		`,
-		want: `
+		wantCUE: `
 			key1: "value1"
 			key2: "value2"
 			key3: "value3"
@@ -75,7 +82,7 @@ func TestDecoder(t *testing.T) {
 			b1.b2    = "B"
 			c1.c2.c3 = "C"
 		`,
-		want: `
+		wantCUE: `
 			a1: "A"
 			b1: b2: "B"
 			c1: c2: c3: "C"
@@ -87,7 +94,7 @@ func TestDecoder(t *testing.T) {
 			a_b = "underscores"
 			123 = "numbers"
 		`,
-		want: `
+		wantCUE: `
 			"a-b": "dashes"
 			a_b:   "underscores"
 			"123": "numbers"
@@ -99,7 +106,7 @@ func TestDecoder(t *testing.T) {
 			"foo bar" = "quoted space"
 			'foo "bar"' = "nested quotes"
 		`,
-		want: `
+		wantCUE: `
 			"1.2.3":       "quoted dots"
 			"foo bar":     "quoted space"
 			"foo \"bar\"": "nested quotes"
@@ -109,28 +116,23 @@ func TestDecoder(t *testing.T) {
 		input: `
 			site."foo.com".title = "foo bar"
 		`,
-		want: `
+		wantCUE: `
 			site: "foo.com": title: "foo bar"
 		`,
 	}, {
-		// TODO(mvdan): the TOML spec says that defining a key multiple times is invalid,
-		// we should error even though this can be OK in CUE as long as the values unify.
 		name: "RootKeysDuplicate",
 		input: `
 			foo = "same value"
 			foo = "same value"
 		`,
-		want: `
-			foo: "same value"
-			foo: "same value"
-		`,
+		wantErr: `duplicate key: foo`,
 	}, {
 		name: "BasicStrings",
 		input: `
 			escapes = "foo \"bar\" \n\t\\ baz"
 			unicode = "foo \u00E9"
 		`,
-		want: `
+		wantCUE: `
 			escapes: "foo \"bar\" \n\t\\ baz"
 			unicode: "foo é"
 		`,
@@ -153,7 +155,7 @@ line one \
 line two.\
 """
 		`,
-		want: `
+		wantCUE: `
 			nested:           " can contain \"\" quotes "
 			four:             "\"four\""
 			double:           "line one\nline two"
@@ -169,7 +171,7 @@ line two.\
 			quoted   = 'Tom "Dubs" Preston-Werner'
 			regex    = '<\i\c*\s*>'
 		`,
-		want: `
+		wantCUE: `
 			winpath:  "C:\\Users\\nodejs\\templates"
 			winpath2: "\\\\ServerX\\admin$\\system32\\"
 			quoted:   "Tom \"Dubs\" Preston-Werner"
@@ -194,7 +196,7 @@ line one \
 line two.\
 '''
 		`,
-		want: `
+		wantCUE: `
 			nested:           " can contain '' quotes "
 			four:             "'four'"
 			double:           "line one\nline two"
@@ -213,7 +215,7 @@ line two.\
 			octal       = 0o755
 			binary      = 0b11010110
 		`,
-		want: `
+		wantCUE: `
 			zero:        0
 			positive:    123
 			plus:        +40
@@ -234,7 +236,7 @@ line two.\
 			exponent_minus = -2E-4
 			exponent_dot   = 6.789e-30
 		`,
-		want: `
+		wantCUE: `
 			pi:             3.1415
 			plus:           +1.23
 			minus:          -4.56
@@ -249,7 +251,7 @@ line two.\
 			positive = true
 			negative = false
 		`,
-		want: `
+		wantCUE: `
 			positive: true
 			negative: false
 		`,
@@ -263,7 +265,7 @@ line two.\
 			strings       = [ "all", 'strings', """are the same""", '''type''' ]
 			mixed_numbers = [ 0.1, 0.2, 0.5, 1, 2, 5 ]
 		`,
-		want: `
+		wantCUE: `
 			integers:      [1, 2, 3]
 			colors:        ["red", "yellow", "green"]
 			nested_ints:   [[1, 2], [3, 4, 5]]
@@ -280,13 +282,20 @@ line two.\
 			dec := toml.NewDecoder(strings.NewReader(test.input))
 
 			node, err := dec.Decode()
+			if test.wantErr != "" {
+				qt.Assert(t, qt.ErrorMatches(err, test.wantErr))
+				qt.Assert(t, qt.IsNil(node))
+				// We don't continue, so we can't expect any decoded CUE.
+				qt.Assert(t, qt.Equals(test.wantCUE, ""))
+				return
+			}
 			qt.Assert(t, qt.IsNil(err))
 
 			node2, err := dec.Decode()
 			qt.Assert(t, qt.IsNil(node2))
 			qt.Assert(t, qt.Equals(err, io.EOF))
 
-			wantFormatted, err := format.Source([]byte(test.want))
+			wantFormatted, err := format.Source([]byte(test.wantCUE))
 			qt.Assert(t, qt.IsNil(err))
 
 			formatted, err := format.Node(node)
@@ -300,12 +309,6 @@ line two.\
 			val := ctx.BuildFile(node.(*ast.File))
 			qt.Assert(t, qt.IsNil(val.Err()))
 			qt.Assert(t, qt.IsNil(val.Validate()))
-
-			// See the TODO above; go-toml rejects duplicate keys per the spec,
-			// but our decoder does not yet.
-			if test.name == "RootKeysDuplicate" {
-				return
-			}
 
 			// Validate that the decoded CUE value is equivalent
 			// to the Go value that a direct TOML unmarshal produces.

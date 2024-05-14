@@ -39,7 +39,7 @@ versions: [string]: {
 	#Strict!: _
 }
 
-versions: "v0.8.0": {
+versions: "v0.8.0-alpha.0": {
 	// Define this version in terms of the later versions
 	// rather than the other way around, so that
 	// the latest version is clearest.

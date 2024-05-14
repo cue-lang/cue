@@ -143,10 +143,7 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 	pkg.User = true
 	l.addFiles(l.cfg.Dir, pkg)
 
-	l.stk.Push("user")
 	_ = pkg.Complete()
-	l.stk.Pop()
-	//pkg.LocalPrefix = dirToImportPath(dir)
 	pkg.DisplayPath = "command-line-arguments"
 
 	return pkg

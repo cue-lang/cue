@@ -26,3 +26,5 @@ command: ref: {
 -- task.cue --
 package home
 -- cue.mod/module.cue --
+module: "test.example"
+language: version: "v0.9.0"

@@ -28,3 +28,5 @@ json: "[1, 2]"
     "json": "[1, 2]"
 }
 -- cue.mod/module.cue --
+module: "test.example"
+language: version: "v0.9.0"

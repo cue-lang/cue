@@ -25,6 +25,7 @@ import (
 	toml "github.com/pelletier/go-toml/v2/unstable"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 )
 
@@ -34,7 +35,7 @@ import (
 func NewDecoder(r io.Reader) *Decoder {
 	// Note that we don't consume the reader here,
 	// as there's no need, and we can't return an error either.
-	return &Decoder{r: r}
+	return &Decoder{r: r, seenKeys: make(map[string]bool)}
 }
 
 // Decoder implements the decoding state.
@@ -46,6 +47,11 @@ type Decoder struct {
 
 	decoded bool // whether [Decoder.Decoded] has been called already
 	parser  toml.Parser
+
+	// seenKeys tracks which dot-separated rooted keys we have already decoded,
+	// as duplicate keys in TOML are not allowed.
+	// The string elements in between the dots may be quoted to avoid ambiguity.
+	seenKeys map[string]bool
 
 	currentFields []*ast.Field
 }
@@ -76,6 +82,9 @@ func (d *Decoder) Decode() (ast.Node, error) {
 		if err := d.nextRootNode(d.parser.Expression()); err != nil {
 			return nil, err
 		}
+	}
+	if err := d.parser.Error(); err != nil {
+		return nil, err
 	}
 	for _, field := range d.currentFields {
 		file.Decls = append(file.Decls, field)
@@ -110,26 +119,31 @@ func (d *Decoder) nextRootNode(tnode *toml.Node) error {
 	//   }
 	case toml.KeyValue:
 		keys := tnode.Key()
-		topField := &ast.Field{
-			Label: &ast.Ident{
-				NamePos: token.NoPos.WithRel(token.Newline),
-				Name:    string(keys.Node().Data),
-			},
-		}
-		ast.SetRelPos(topField.Label, token.Newline)
+		curName := string(keys.Node().Data)
+		curField := &ast.Field{Label: &ast.Ident{
+			NamePos: token.NoPos.WithRel(token.Newline),
+			Name:    curName,
+		}}
+
+		topField := curField
+		rootKey := quoteLabelIfNeeded(curName)
+
 		keys.Next() // TODO(mvdan): for some reason the first Next call doesn't count?
-		curField := topField
 		for keys.Next() {
-			nextField := &ast.Field{
-				Label: &ast.Ident{
-					NamePos: token.NoPos.WithRel(token.Blank),
-					Name:    string(keys.Node().Data),
-				},
-			}
-			ast.SetRelPos(nextField.Label, token.Blank)
+			nextName := string(keys.Node().Data)
+			nextField := &ast.Field{Label: &ast.Ident{
+				NamePos: token.NoPos.WithRel(token.Blank),
+				Name:    nextName,
+			}}
+
 			curField.Value = &ast.StructLit{Elts: []ast.Decl{nextField}}
 			curField = nextField
+			rootKey += "." + quoteLabelIfNeeded(nextName)
 		}
+		if d.seenKeys[rootKey] {
+			return fmt.Errorf("duplicate key: %s", rootKey)
+		}
+		d.seenKeys[rootKey] = true
 		value, err := d.decodeExpr(tnode.Value())
 		if err != nil {
 			return err
@@ -142,6 +156,13 @@ func (d *Decoder) nextRootNode(tnode *toml.Node) error {
 		return fmt.Errorf("encoding/toml.Decoder.nextRootNode: unknown %s %#v\n", tnode.Kind, tnode)
 	}
 	return nil
+}
+
+func quoteLabelIfNeeded(name string) string {
+	if ast.IsValidIdent(name) {
+		return name
+	}
+	return literal.Label.Quote(name)
 }
 
 // nextRootNode is called for every top-level expression from the TOML parser.

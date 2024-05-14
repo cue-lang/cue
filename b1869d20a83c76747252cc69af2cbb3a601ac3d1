@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22bf70bf_1df15f7a",
+        "filename": "cue/load/loader.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-14T10:32:18Z",
+      "side": 0,
+      "message": "This change doesn\u0027t feel like it belongs in a default flip CL?",
+      "revId": "b1869d20a83c76747252cc69af2cbb3a601ac3d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

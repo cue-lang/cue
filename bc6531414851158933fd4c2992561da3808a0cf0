@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f80437c_d5e36810",
+        "filename": "cmd/cue/cmd/testdata/script/issue174.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-14T10:32:18Z",
+      "side": 1,
+      "message": "What does this `instance:` prefix mean? It says nothing to me in terms of context.",
+      "revId": "bc6531414851158933fd4c2992561da3808a0cf0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b784a68_659f5308",
+        "filename": "cue/load/config.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-14T10:32:18Z",
+      "side": 1,
+      "message": "Does this change below in this default flip CL?",
+      "revId": "bc6531414851158933fd4c2992561da3808a0cf0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a9a53ba_f24c0104",
+        "filename": "cue/load/import.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-14T10:32:18Z",
+      "side": 1,
+      "message": "Do these changes belong in this default flip CL?\n\nDitto below.",
+      "revId": "bc6531414851158933fd4c2992561da3808a0cf0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4582dd8e_d5e4af9a",
+        "filename": "cue/load/testdata/testmod/cue.mod/module.cue",
+        "patchSetId": 8
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-14T10:32:18Z",
+      "side": 1,
+      "message": "These sorts of changes don\u0027t feel like they belong in this default flip CL.",
+      "revId": "bc6531414851158933fd4c2992561da3808a0cf0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "945fd6bb_14694693",
+        "filename": "encoding/protobuf/protobuf.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-14T10:32:18Z",
+      "side": 1,
+      "message": "This doesn\u0027t feel like it belongs in this default flip CL",
+      "revId": "bc6531414851158933fd4c2992561da3808a0cf0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

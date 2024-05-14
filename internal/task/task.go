@@ -39,7 +39,7 @@ type Context struct {
 }
 
 func (c *Context) Lookup(field string) cue.Value {
-	f := c.Obj.Lookup(field)
+	f := c.Obj.LookupPath(cue.MakePath(cue.Str(field)))
 	if !f.Exists() {
 		c.addErr(f, nil, "could not find field %q", field)
 		return cue.Value{}
@@ -51,7 +51,7 @@ func (c *Context) Lookup(field string) cue.Value {
 }
 
 func (c *Context) Int64(field string) int64 {
-	f := c.Obj.Lookup(field)
+	f := c.Obj.LookupPath(cue.MakePath(cue.Str(field)))
 	value, err := f.Int64()
 	if err != nil {
 		c.addErr(f, err, "invalid integer argument")
@@ -61,7 +61,7 @@ func (c *Context) Int64(field string) int64 {
 }
 
 func (c *Context) String(field string) string {
-	f := c.Obj.Lookup(field)
+	f := c.Obj.LookupPath(cue.MakePath(cue.Str(field)))
 	value, err := f.String()
 	if err != nil {
 		c.addErr(f, err, "invalid string argument")
@@ -71,7 +71,7 @@ func (c *Context) String(field string) string {
 }
 
 func (c *Context) Bytes(field string) []byte {
-	f := c.Obj.Lookup(field)
+	f := c.Obj.LookupPath(cue.MakePath(cue.Str(field)))
 	value, err := f.Bytes()
 	if err != nil {
 		c.addErr(f, err, "invalid bytes argument")

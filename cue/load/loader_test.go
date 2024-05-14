@@ -27,6 +27,7 @@ import (
 	"github.com/go-quicktest/qt"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/cueexperiment"
@@ -424,9 +425,14 @@ func TestOverlays(t *testing.T) {
 		}
 		return r
 	}
-	for i, inst := range cue.Build(Instances([]string{"./dir/..."}, c)) {
-		if inst.Err != nil {
-			t.Error(inst.Err)
+	ctx := cuecontext.New()
+	insts, err := ctx.BuildInstances(Instances([]string{"./dir/..."}, c))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i, inst := range insts {
+		if err := inst.Err(); err != nil {
+			t.Error(err)
 			continue
 		}
 		b, err := format.Node(inst.Value().Syntax(cue.Final()))
@@ -435,7 +441,7 @@ func TestOverlays(t *testing.T) {
 			continue
 		}
 		if got := string(bytes.Map(rmSpace, b)); got != want[i] {
-			t.Errorf("%s: got %s; want %s", inst.Dir, got, want[i])
+			t.Errorf("%s: got %s; want %s", inst.BuildInstance().Dir, got, want[i])
 		}
 	}
 }

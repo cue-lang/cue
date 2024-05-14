@@ -39,12 +39,12 @@ var parseTests = []struct {
 	parse:    Parse,
 	data: `
 module: "foo.com/bar@v0"
-language: version: "v0.8.0"
+language: version: "v0.8.0-alpha.0"
 `,
 	want: &File{
 		Module: "foo.com/bar@v0",
 		Language: &Language{
-			Version: "v0.8.0",
+			Version: "v0.8.0-alpha.0",
 		},
 	},
 	wantDefaults: map[string]string{
@@ -458,7 +458,7 @@ language: {
 }
 
 func TestEarliestClosedSchemaVersion(t *testing.T) {
-	qt.Assert(t, qt.Equals(EarliestClosedSchemaVersion(), "v0.8.0"))
+	qt.Assert(t, qt.Equals(EarliestClosedSchemaVersion(), "v0.8.0-alpha.0"))
 }
 
 func TestLatestKnownSchemaVersion(t *testing.T) {

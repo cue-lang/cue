@@ -83,7 +83,7 @@ func (f Feature) SelectorString(index StringIndexer) string {
 		if f == AnyString {
 			return "_"
 		}
-		return literal.String.Quote(s)
+		return literal.Label.Quote(s)
 	default:
 		return f.IdentString(index)
 	}

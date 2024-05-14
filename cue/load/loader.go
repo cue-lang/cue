@@ -141,7 +141,7 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 	// }
 
 	pkg.User = true
-	l.addFiles(l.cfg.Dir, pkg)
+	l.addFiles(pkg)
 
 	_ = pkg.Complete()
 	pkg.DisplayPath = "command-line-arguments"
@@ -149,7 +149,7 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 	return pkg
 }
 
-func (l *loader) addFiles(dir string, p *build.Instance) {
+func (l *loader) addFiles(p *build.Instance) {
 	for _, bf := range p.BuildFiles {
 		syntax, ok := l.fileCachedSyntaxFiles[bf.Filename]
 		if !ok {

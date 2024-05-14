@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8098234_95ef3e3e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-14T15:30:41Z",
+      "side": 1,
+      "message": "FYI Noam, since Marcel is travelling for a week starting tomorrow, and we are doing v0.9.0-rc.1 next week, we think we should delay this relatively risky change until we have done the final release for v0.9.0 and begin work for v0.10 - probably in 2-3 weeks.\n\nRisky changes like these need a few weeks of alpha testing to make sure we\u0027re not introducing a big regression, so it\u0027s best to play it safe. Hopefully that makes sense!",
+      "revId": "5d0e2cdf1f9f2a26948cbaf833a8b5d2f0fb334d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

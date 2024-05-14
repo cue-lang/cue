@@ -37,9 +37,9 @@ latestStableGo: "1.22.x"
 // Use a specific latest version for release builds.
 // Note that we don't want ".x" for the sake of reproducibility,
 // so we instead pin a specific Go release.
-pinnedReleaseGo: "1.22.2"
+pinnedReleaseGo: "1.22.3"
 
-goreleaserVersion: "v1.24.0"
+goreleaserVersion: "v1.26.0"
 
 // zeroReleaseTagSuffix is the suffix used to identify all "zero" releases.
 // When we create a release branch for v0.$X.0, it's likely that commits on the

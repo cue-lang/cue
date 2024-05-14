@@ -299,7 +299,7 @@ func (d *decoder) attachDocComments(m yaml_mark_t, pos int8, expr ast.Node) {
 		line = c.mark.line
 	}
 	if len(comments) > 0 {
-		expr.AddComment(&ast.CommentGroup{
+		ast.AddComment(expr, &ast.CommentGroup{
 			Doc:      pos == 0 && line+1 == m.line,
 			Position: pos,
 			List:     comments,
@@ -317,7 +317,7 @@ func (d *decoder) attachLineComment(m yaml_mark_t, pos int8, expr ast.Node) {
 			Slash: d.pos(c.mark),
 			Text:  "//" + c.text[1:],
 		}
-		expr.AddComment(&ast.CommentGroup{
+		ast.AddComment(expr, &ast.CommentGroup{
 			Line:     true,
 			Position: pos,
 			List:     []*ast.Comment{comment},

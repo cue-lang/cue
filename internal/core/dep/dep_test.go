@@ -22,6 +22,7 @@ import (
 	"text/tabwriter"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
@@ -130,15 +131,14 @@ func TestX(t *testing.T) {
 		t.Skip()
 	}
 
-	rt := cue.Runtime{}
-	inst, err := rt.Compile("", in)
-	if err != nil {
+	v := cuecontext.New().CompileString(in)
+	if err := v.Err(); err != nil {
 		t.Fatal(err)
 	}
 
-	v := inst.Lookup("a")
+	aVal := v.LookupPath(cue.MakePath(cue.Str("a")))
 
-	r, n := value.ToInternal(v)
+	r, n := value.ToInternal(aVal)
 
 	ctxt := eval.NewContext(r, n)
 

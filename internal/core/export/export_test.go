@@ -17,6 +17,8 @@ package export_test
 import (
 	"testing"
 
+	"golang.org/x/tools/txtar"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
@@ -34,7 +36,6 @@ import (
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/value"
-	"golang.org/x/tools/txtar"
 )
 
 func TestDefinition(t *testing.T) {
@@ -310,8 +311,8 @@ func TestFromGo(t *testing.T) {
 		A: "a",
 		B: "b",
 	}
-	var r cue.Runtime
-	codec := gocodec.New(&r, nil)
+	ctx := cuecontext.New()
+	codec := gocodec.New(ctx, nil)
 	v, err := codec.Decode(m)
 	if err != nil {
 		panic(err)

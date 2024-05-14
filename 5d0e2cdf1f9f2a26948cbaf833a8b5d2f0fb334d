@@ -16,6 +16,24 @@
       "message": "FYI Noam, since Marcel is travelling for a week starting tomorrow, and we are doing v0.9.0-rc.1 next week, we think we should delay this relatively risky change until we have done the final release for v0.9.0 and begin work for v0.10 - probably in 2-3 weeks.\n\nRisky changes like these need a few weeks of alpha testing to make sure we\u0027re not introducing a big regression, so it\u0027s best to play it safe. Hopefully that makes sense!",
       "revId": "5d0e2cdf1f9f2a26948cbaf833a8b5d2f0fb334d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0146716_8b5ed80f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-14T16:39:09Z",
+      "side": 1,
+      "message": "makes a lot of sense, understood. \n\nDo you think it would be safe to try finishing this change based on @mpvl@gmail.com\u0027s comment, or should I wait for v0.9.0 to be released to avoid the risk of conflicts?",
+      "parentUuid": "e8098234_95ef3e3e",
+      "revId": "5d0e2cdf1f9f2a26948cbaf833a8b5d2f0fb334d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

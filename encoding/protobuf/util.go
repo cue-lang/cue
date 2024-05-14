@@ -49,8 +49,8 @@ func addComments(f ast.Node, i int, doc, inline *proto.Comment) bool {
 	if cg != nil && len(cg.List) > 0 && i > 0 {
 		cg.List[0].Slash = newSection
 	}
-	f.AddComment(cg)
-	f.AddComment(comment(inline, false))
+	ast.AddComment(f, cg)
+	ast.AddComment(f, comment(inline, false))
 	return doc != nil
 }
 

@@ -45,6 +45,7 @@ const (
 	importComment importMode = 1 << iota
 
 	allowAnonymous
+	allowExcludedFiles
 )
 
 func rewriteFiles(p *build.Instance, root string, isLocal bool) {
@@ -184,7 +185,7 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 		return true
 	}
 
-	match, data, err := matchFile(fp.c, file, true, fp.allTags)
+	match, data, err := matchFile(fp.c, file, true, fp.allTags, mode)
 	switch {
 	case match:
 

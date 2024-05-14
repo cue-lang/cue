@@ -96,7 +96,7 @@ config: {
 		image_templates: [
 			"docker.io/cuelang/cue:{{ .Version }}-amd64",
 		]
-		dockerfile: "Dockerfile"
+		dockerfile: "cmd/cue/Dockerfile"
 		use:        "buildx"
 		build_flag_templates: [
 			"--platform=linux/amd64",
@@ -114,7 +114,7 @@ config: {
 			"docker.io/cuelang/cue:{{ .Version }}-arm64",
 		]
 		goarch:     "arm64"
-		dockerfile: "Dockerfile"
+		dockerfile: "cmd/cue/Dockerfile"
 		use:        "buildx"
 		build_flag_templates: [
 			"--platform=linux/arm64",

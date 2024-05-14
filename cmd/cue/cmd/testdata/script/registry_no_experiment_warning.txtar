@@ -1,4 +1,4 @@
-env CUE_EXPERIMENT=
+env CUE_EXPERIMENT=modules=false
 env CUE_REGISTRY=ignored.example.com
 exec cue export .
 cmp stdout expect-stdout

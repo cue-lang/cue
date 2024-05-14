@@ -239,7 +239,8 @@ func TestScript(t *testing.T) {
 			if err != nil {
 				return fmt.Errorf("cannot read workdir: %v", err)
 			}
-			hasRegistry := false
+			// As modules are enabled by default, we always want a cache directory.
+			e.Vars = append(e.Vars, "CUE_CACHE_DIR="+filepath.Join(e.WorkDir, ".tmp/cache"))
 			for _, entry := range entries {
 				if !entry.IsDir() {
 					continue
@@ -250,7 +251,6 @@ func TestScript(t *testing.T) {
 				}
 				// There's a _registry directory. Start a fake registry server to serve
 				// the modules in it.
-				hasRegistry = true
 				registryDir := filepath.Join(e.WorkDir, entry.Name())
 				prefix := ""
 				if data, err := os.ReadFile(filepath.Join(e.WorkDir, "_registry"+regID+"_prefix")); err == nil {
@@ -271,14 +271,8 @@ func TestScript(t *testing.T) {
 					// Some tests execute cue commands that need to write cache files.
 					// Since os.UserCacheDir relies on OS-specific env vars that we don't set,
 					// explicitly set up the cache directory somewhere predictable.
-					"CUE_CACHE_DIR="+filepath.Join(e.WorkDir, ".tmp/cache"),
 				)
 				e.Defer(reg.Close)
-			}
-			if hasRegistry {
-				e.Vars = append(e.Vars,
-					"CUE_EXPERIMENT=modules",
-				)
 			}
 			return nil
 		},

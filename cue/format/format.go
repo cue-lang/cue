@@ -282,7 +282,7 @@ func (f *formatter) before(node ast.Node) bool {
 		if ok && len(s.Elts) <= 1 && f.current.nodeSep != blank && f.onOneLine(node) {
 			f.current.nodeSep = blank
 		}
-		f.current.cg = node.Comments()
+		f.current.cg = ast.Comments(node)
 		f.visitComments(f.current.pos)
 		return true
 	}

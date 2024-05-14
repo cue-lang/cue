@@ -87,16 +87,16 @@ func nestDepth(f *ast.Field) int {
 
 // TODO: be more accurate and move to astutil
 func hasDocComments(d ast.Decl) bool {
-	if len(d.Comments()) > 0 {
+	if len(ast.Comments(d)) > 0 {
 		return true
 	}
 	switch x := d.(type) {
 	case *ast.Field:
-		return len(x.Label.Comments()) > 0
+		return len(ast.Comments(x.Label)) > 0
 	case *ast.Alias:
-		return len(x.Ident.Comments()) > 0
+		return len(ast.Comments(x.Ident)) > 0
 	case *ast.LetClause:
-		return len(x.Ident.Comments()) > 0
+		return len(ast.Comments(x.Ident)) > 0
 	}
 	return false
 }

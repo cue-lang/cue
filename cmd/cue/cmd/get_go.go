@@ -802,7 +802,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 						b.Value = val
 					}
 					if b.Value != val {
-						cv.AddComment(internal.NewComment(false, val))
+						cueast.AddComment(cv, internal.NewComment(false, val))
 					}
 				}
 
@@ -859,7 +859,7 @@ func (e *extractor) altType(typ types.Type) cueast.Expr {
 func addDoc(g *ast.CommentGroup, x cueast.Node) bool {
 	doc := makeDoc(g, true)
 	if doc != nil {
-		x.AddComment(doc)
+		cueast.AddComment(x, doc)
 		return true
 	}
 	return false

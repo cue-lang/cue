@@ -1,6 +1,7 @@
 #inlineImports: true
 -- cue.mod/module.cue --
 module: "example.com"
+language: version: "v0.9.0"
 -- x.cue --
 import "example.com/t"
 

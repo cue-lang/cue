@@ -14,6 +14,8 @@ stderr -count=1 '^Available Commands:$'
 stderr -count=1 'hello *say hello to someone'
 
 -- cue.mod/module.cue --
+module: "test.example"
+language: version: "v0.9.0"
 -- task_tool.cue --
 package home
 

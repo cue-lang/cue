@@ -19,7 +19,7 @@ cd $WORK/test2
 cmp stderr $WORK/want-stderr
 
 -- want-module.cue-0 --
-module: "test.example"
+module: "test.example@v0"
 language: {
 	version: "$CUE_LANGUAGE_VERSION"
 }
@@ -27,7 +27,7 @@ source: {
 	kind: "self"
 }
 -- want-module.cue-1 --
-module: "test.example"
+module: "test.example@v0"
 language: {
 	version: "$CUE_LANGUAGE_VERSION"
 }

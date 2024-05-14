@@ -50,6 +50,7 @@ func TestExe(t *testing.T) {
 		RequireUniqueNames:  true,
 		Setup: func(e *testscript.Env) error {
 			copyWasmFiles(t, e.WorkDir, wasmFiles)
+			e.Vars = append(e.Vars, "CUE_CACHE_DIR="+filepath.Join(e.WorkDir, ".tmp/cache"))
 			return nil
 		},
 		Condition: cuetest.Condition,

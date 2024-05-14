@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5cd0926a_82db43f3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-14T07:34:51Z",
+      "side": 1,
+      "message": "Can you please add all the language.version lines in a separate commit first? Much like Unity, I would expect that to not break anything at all, and it would make the diffs for the actual flip over and any bugfixes much easier to review.",
+      "revId": "f6965c200b8d70b5bca6182c95173a075c318597",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -144,6 +144,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e6997fc5_90b0410e",
+        "filename": "internal/pkg/context.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-05-14T15:59:15Z",
+      "side": 1,
+      "message": "There is also adt.Default(v adt.Value). This does more than should be necessary, though.\n\nI don\u0027t think is possible to use CallCtx in compile, though, as it will result in an import cycle. We should probably have your own call context.\n\nThe easiest thing to do, indeed, is to just evaluate the default value for all the builtins. I would probably do something like:\n\n```\nFunc: func(c *adt.OpContext, args []adt.Value) adt.Expr {\n     s, ok :\u003d c.Default(args[0]).(*adt.Vertex)\n     \n```\nwhere\n```\n// context.go\n\n// Default is used to get the default value v.\n// It is used to process an argument for builtins. To ensure that\n// a Vertex has Conjuncts that are representative of the chosen\n// default, use the function adt.Default instead.\nfunc (c *OpContext) Default(v Value) Value {\n    if a, ok :\u003d c.getDefault(v); ok \u0026\u0026 v !\u003d nil {\n        v \u003d a\n    }\n    return v\n}\n\n```\n\nNote that you probably should not use PushState, as, in these cases, you want any error to be collected and propagated up. This is sometimes desirable, but not usually.\n\nAlso note that OpContext.Num does not take a default of a value. We could change that, but let\u0027s not make the change too large. So best is to take the default value in compile.go wherever it is needed.\n\nNote that we also have builtin implementations for WASM. These might also have to be adjusted. There is only one Builtin entry for that. The safest there would be to just preprocess the arguments there unconditionally. This is in cue/interpreter/wasm/builtin.go.",
+      "parentUuid": "8aeb2ec4_2d057b61",
+      "revId": "5af21bbf6fdf7df8746c922a0d0fe15afe17fa60",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bd7e389b_19d22aea",
         "filename": "pkg/encoding/yaml/testdata/validate.txtar",
         "patchSetId": 11

@@ -23,6 +23,7 @@ exec cue eval uses_imports_root.cue
 
 -- cue.mod/module.cue --
 module: "mod.test/local"
+language: version: "v0.9.0"
 -- uses_imports_root.cue --
 package p
 

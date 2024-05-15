@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9d02168_4c7e5c41",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-15T09:48:41Z",
+      "side": 0,
+      "message": "Cool, I thought about calling this out initially - nil didn\u0027t seem quite right.",
+      "revId": "98432a6f2189acbe0453d6ae83ece347837a17d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

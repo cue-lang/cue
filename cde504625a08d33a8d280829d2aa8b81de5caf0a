@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08acd92f_cfc83ce3",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-15T09:48:41Z",
+      "side": 1,
+      "message": "I\u0027m not sure what \"key-values\" means here. Does it mean\nthat both the key and the value are zero, or that the value\nfor a given key is zero?\n\nAh, on reflection I _think_ you mean that if the input is empty, we\u0027ll get\nan empty struct or map.\n\nAssuming that, then perhaps this might be clearer?\n\n```\n// Note that if the input is empty the result\n// will be the same as for an empty table: an empty\n// map or struct.\n```",
+      "revId": "cde504625a08d33a8d280829d2aa8b81de5caf0a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

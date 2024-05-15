@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c64c5759_923ad983",
+        "filename": "mod/modfile/modfile_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-15T13:34:36Z",
+      "side": 1,
+      "message": "This test was originally intended to make sure that an invalid language.version field did not cause ParseLegacy to fail, but it was not changed when we changed the spelling of `cue.lang` to `language.version`, so this is a drive-by fix that does that.",
+      "parentUuid": "fb107ed4_70b84380",
+      "revId": "9fd1bc535f6c004884a2d23e06317bf1a02d0f47",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3dfd2eda_01b526da",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "09075a51_31a7f9d3",
+        "filename": "mod/modfile/modfile_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-15T13:34:36Z",
+      "side": 1,
+      "message": "Similar to above: I\u0027d intended to use `language.version` but did not. The test failed before it got to the `language.version` checking piece, but the intention was to have a file that _would_ be valid if not for the reference, and this change makes that so.",
+      "parentUuid": "3dfd2eda_01b526da",
+      "revId": "9fd1bc535f6c004884a2d23e06317bf1a02d0f47",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f518c93d_ae30863f",
@@ -48,6 +84,30 @@
       "writtenOn": "2024-05-15T08:12:59Z",
       "side": 1,
       "message": "I\u0027ve never seen \"allied\" used in this way, is that a common thing? how about just:\n\n\u003e conventionally a module or domain name.",
+      "range": {
+        "startLine": 78,
+        "startChar": 52,
+        "endLine": 78,
+        "endChar": 58
+      },
+      "revId": "9fd1bc535f6c004884a2d23e06317bf1a02d0f47",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae70b33d_110ee744",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 3
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-15T13:34:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f518c93d_ae30863f",
       "range": {
         "startLine": 78,
         "startChar": 52,

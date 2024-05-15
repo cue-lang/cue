@@ -1,0 +1,23 @@
+# This test checks that the legacy module.cue fixing code
+# is wired up correctly. More comprehensive tests for
+# this functionality are inside the modfile package.
+
+exec cue mod fix
+cmp cue.mod/module.cue want-module
+
+exec cue mod fix
+cmp cue.mod/module.cue want-module
+
+-- cue.mod/module.cue --
+module: "foo.com"
+foo: "bar"
+-- want-module --
+module: "foo.com@v0"
+language: {
+	version: "v0.9.0"
+}
+custom: {
+	legacy: {
+		foo: "bar"
+	}
+}

@@ -9,7 +9,7 @@ import (
 // Flags holds the set of CUE_EXPERIMENT flags. It is initialized
 // by Init.
 var Flags struct {
-	Modules bool
+	Modules bool `envflag:"default:true"`
 
 	// YAMLV3Decoder swaps the old internal/third_party/yaml decoder with the new
 	// decoder implemented in internal/encoding/yaml on top of yaml.v3.

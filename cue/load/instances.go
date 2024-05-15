@@ -82,7 +82,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 	// logic resolves such paths without consulting pkgs.
 	pkgs, err := loadPackages(ctx, c, synCache, pkgArgs, otherFiles)
 	if err != nil {
-		return []*build.Instance{c.newErrInstance(fmt.Errorf("xxx: %v", err))}
+		return []*build.Instance{c.newErrInstance(err)}
 	}
 	tg := newTagger(c)
 	l := newLoader(c, tg, synCache, pkgs)

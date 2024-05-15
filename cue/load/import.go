@@ -257,6 +257,12 @@ func setFileSource(cfg *Config, f *build.File) error {
 		} else {
 			f.Source = fi.contents
 		}
+	} else {
+		b, err := os.ReadFile(fullPath)
+		if err != nil {
+			return err
+		}
+		f.Source = b
 	}
 	return nil
 }

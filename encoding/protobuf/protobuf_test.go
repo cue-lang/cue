@@ -78,7 +78,7 @@ func TestBuild(t *testing.T) {
 	root := filepath.Join(cwd, "testdata/istio.io/api")
 	c := &Config{
 		Root:   root,
-		Module: "istio.io/api",
+		Module: "istio.io/api@v0",
 		Paths: []string{
 			root,
 			filepath.Join(cwd, "testdata"),

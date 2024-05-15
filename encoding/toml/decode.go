@@ -21,6 +21,7 @@ package toml
 import (
 	"fmt"
 	"io"
+	"strconv"
 
 	toml "github.com/pelletier/go-toml/v2/unstable"
 
@@ -118,43 +119,11 @@ func (d *Decoder) nextRootNode(tnode *toml.Node) error {
 	//       bar: baz: "value"
 	//   }
 	case toml.KeyValue:
-		keys := tnode.Key()
-		curName := string(keys.Node().Data)
-		curField := &ast.Field{
-			Label: &ast.Ident{
-				NamePos: token.NoPos.WithRel(token.Newline),
-				Name:    curName,
-			},
-		}
-
-		topField := curField
-		rootKey := quoteLabelIfNeeded(curName)
-
-		keys.Next() // TODO(mvdan): for some reason the first Next call doesn't count?
-		for keys.Next() {
-			nextName := string(keys.Node().Data)
-			nextField := &ast.Field{
-				Label: &ast.Ident{
-					NamePos: token.NoPos.WithRel(token.Blank),
-					Name:    nextName,
-				},
-			}
-
-			curField.Value = &ast.StructLit{Elts: []ast.Decl{nextField}}
-			curField = nextField
-			// TODO(mvdan): use an append-like API once we have benchmarks
-			rootKey += "." + quoteLabelIfNeeded(nextName)
-		}
-		if d.seenKeys[rootKey] {
-			return fmt.Errorf("duplicate key: %s", rootKey)
-		}
-		d.seenKeys[rootKey] = true
-		value, err := d.decodeExpr(tnode.Value())
+		field, err := d.decodeField("", tnode)
 		if err != nil {
 			return err
 		}
-		curField.Value = value
-		d.currentFields = append(d.currentFields, topField)
+		d.currentFields = append(d.currentFields, field)
 	// TODO(mvdan): tables
 	// TODO(mvdan): array tables
 	default:
@@ -171,7 +140,7 @@ func quoteLabelIfNeeded(name string) string {
 }
 
 // nextRootNode is called for every top-level expression from the TOML parser.
-func (d *Decoder) decodeExpr(tnode *toml.Node) (ast.Expr, error) {
+func (d *Decoder) decodeExpr(rootKey string, tnode *toml.Node) (ast.Expr, error) {
 	// TODO(mvdan): we currently assume that TOML basic literals (string, int, float)
 	// are also valid CUE literals; we should double check this, perhaps via fuzzing.
 	data := string(tnode.Data)
@@ -188,16 +157,80 @@ func (d *Decoder) decodeExpr(tnode *toml.Node) (ast.Expr, error) {
 		list := &ast.ListLit{}
 		elems := tnode.Children()
 		for elems.Next() {
-			elem, err := d.decodeExpr(elems.Node())
+			// A path into an array element is like "arr.3",
+			// which looks very similar to a table's "tbl.key",
+			// particularly since a table key can be any string.
+			// However, we just need these keys to detect duplicates,
+			// and a path cannot be both an array and table, so it's OK.
+			rootKey := rootKey + "." + strconv.Itoa(len(list.Elts))
+			elem, err := d.decodeExpr(rootKey, elems.Node())
 			if err != nil {
 				return nil, err
 			}
 			list.Elts = append(list.Elts, elem)
 		}
 		return list, nil
+	case toml.InlineTable:
+		strct := &ast.StructLit{
+			// We want a single-line struct, just like TOML's inline tables are on a single line.
+			Lbrace: token.NoPos.WithRel(token.Blank),
+			Rbrace: token.NoPos.WithRel(token.Blank),
+		}
+		elems := tnode.Children()
+		for elems.Next() {
+			field, err := d.decodeField(rootKey, elems.Node())
+			if err != nil {
+				return nil, err
+			}
+			strct.Elts = append(strct.Elts, field)
+		}
+		return strct, nil
 	// TODO(mvdan): dates and times
-	// TODO(mvdan): inline tables
 	default:
 		return nil, fmt.Errorf("encoding/toml.Decoder.decodeExpr: unknown %s %#v\n", tnode.Kind, tnode)
 	}
+}
+
+func (d *Decoder) decodeField(rootKey string, tnode *toml.Node) (*ast.Field, error) {
+	keys := tnode.Key()
+	curName := string(keys.Node().Data)
+
+	relPos := token.Newline
+	if rootKey != "" {
+		rootKey += "."
+		relPos = token.Blank
+	}
+	rootKey += quoteLabelIfNeeded(curName)
+	curField := &ast.Field{
+		Label: &ast.Ident{
+			NamePos: token.NoPos.WithRel(relPos),
+			Name:    curName,
+		},
+	}
+
+	topField := curField
+	keys.Next() // TODO(mvdan): for some reason the first Next call doesn't count?
+	for keys.Next() {
+		nextName := string(keys.Node().Data)
+		nextField := &ast.Field{
+			Label: &ast.Ident{
+				NamePos: token.NoPos.WithRel(token.Blank),
+				Name:    nextName,
+			},
+		}
+		curField.Value = &ast.StructLit{Elts: []ast.Decl{nextField}}
+		curField = nextField
+		// TODO(mvdan): use an append-like API once we have benchmarks
+		rootKey += "." + quoteLabelIfNeeded(nextName)
+	}
+	if d.seenKeys[rootKey] {
+		return nil, fmt.Errorf("duplicate key: %s", rootKey)
+	}
+	d.seenKeys[rootKey] = true
+	value, err := d.decodeExpr(rootKey, tnode.Value())
+	if err != nil {
+		return nil, err
+	}
+	curField.Value = value
+	return topField, nil
 }

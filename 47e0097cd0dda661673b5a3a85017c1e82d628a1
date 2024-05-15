@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6be53a33_415d8753",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-15T15:45:41Z",
+      "side": 1,
+      "message": "I would avoid \"it sets it\" as it is rather ambiguous and confusing. how about \"it is set\"?",
+      "range": {
+        "startLine": 269,
+        "startChar": 47,
+        "endLine": 269,
+        "endChar": 57
+      },
+      "revId": "47e0097cd0dda661673b5a3a85017c1e82d628a1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae84f944_4711c756",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-15T15:45:41Z",
+      "side": 1,
+      "message": "should this be a TODO?",
+      "revId": "47e0097cd0dda661673b5a3a85017c1e82d628a1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

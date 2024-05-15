@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d78f8938_b3ac4291",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-15T16:24:29Z",
+      "side": 1,
+      "message": "I only +1 now because this appears to rely on the new version of the evaluator eliminating disjuncts that subsume another. I vaguely remember @mpvl@gmail.com mentioning we might do this. So will leave the final review to him.",
+      "revId": "04bb7b95ca5c577de0c7aeb2ea3601ffc11889e8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

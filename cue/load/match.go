@@ -15,7 +15,6 @@
 package load
 
 import (
-	"io"
 	"path/filepath"
 	"strings"
 
@@ -50,26 +49,13 @@ func (e excludeError) Is(err error) bool { return err == errExclude }
 // If allTags is non-nil, matchFile records any encountered build tag
 // by setting allTags[tag] = true.
 func matchFile(cfg *Config, file *build.File, returnImports bool, allTags map[string]bool, mode importMode) (match bool, data []byte, err errors.Error) {
-	if fi := cfg.fileSystem.getOverlay(file.Filename); fi != nil {
-		if fi.file != nil {
-			file.Source = fi.file
-		} else {
-			file.Source = fi.contents
-		}
-	}
-
+	// Note: file.Source should already have been set by setFileSource just
+	// after the build.File value was created.
 	if file.Encoding != build.CUE {
 		return false, nil, nil // not a CUE file, don't record.
 	}
-
 	if file.Filename == "-" {
-		b, err2 := io.ReadAll(cfg.stdin())
-		if err2 != nil {
-			err = errors.Newf(token.NoPos, "read stdin: %v", err)
-			return
-		}
-		file.Source = b
-		return true, b, nil // don't check shouldBuild for stdin
+		return true, file.Source.([]byte), nil // don't check shouldBuild for stdin
 	}
 
 	name := filepath.Base(file.Filename)

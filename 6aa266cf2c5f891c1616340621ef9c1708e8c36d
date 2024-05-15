@@ -16,6 +16,24 @@
       "message": "I would add more context to the commit message, like:\n\n\u003e Note that we never supported non-data CUE in cue.mod/module.cue;\n\u003e commands like `cue mod tidy` and `cue mod get` assumed plain CUE data\n\u003e so that they could modify some fields and write the file back to disk.",
       "revId": "6aa266cf2c5f891c1616340621ef9c1708e8c36d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2e79740_19ac541a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-15T13:34:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b54dabaf_00868a32",
+      "revId": "6aa266cf2c5f891c1616340621ef9c1708e8c36d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d8d288d_aa87bef7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-15T14:43:01Z",
+      "side": 1,
+      "message": "yay, less code :)",
+      "parentUuid": "d4d85826_f2d66864",
+      "revId": "fa4f598fd1e4e1a2b5231a6ee8621411093b50a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4855a23c_fc1cd153",

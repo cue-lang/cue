@@ -342,6 +342,65 @@ custom: "somewhere.com": foo: true
 	wantDefaults: map[string]string{
 		"foo.com/bar": "v0",
 	},
+}, {
+	testName: "FixLegacyWithModulePath",
+	parse:    FixLegacy,
+	data: `
+module: "foo.com/bar"
+`,
+	want: &File{
+		Module:   "foo.com/bar@v0",
+		Language: &Language{Version: "v0.9.0"},
+	},
+	wantDefaults: map[string]string{
+		"foo.com/bar": "v0",
+	},
+}, {
+	testName: "FixLegacyWithoutModulePath",
+	parse:    FixLegacy,
+	data: `
+`,
+	want: &File{
+		Module:   "test.example@v0",
+		Language: &Language{Version: "v0.9.0"},
+	},
+	wantDefaults: map[string]string{
+		"test.example": "v0",
+	},
+}, {
+	testName: "FixLegacyWithEmptyModulePath",
+	parse:    FixLegacy,
+	data: `
+module: ""
+`,
+	want: &File{
+		Module:   "test.example@v0",
+		Language: &Language{Version: "v0.9.0"},
+	},
+	wantDefaults: map[string]string{
+		"test.example": "v0",
+	},
+}, {
+	testName: "FixLegacyWithCustomFields",
+	parse:    FixLegacy,
+	data: `
+module: "foo.com"
+some: true
+other: field: 123
+`,
+	want: &File{
+		Module:   "foo.com@v0",
+		Language: &Language{Version: "v0.9.0"},
+		Custom: map[string]map[string]any{
+			"legacy": {
+				"some":  true,
+				"other": map[string]any{"field": 123},
+			},
+		},
+	},
+	wantDefaults: map[string]string{
+		"foo.com": "v0",
+	},
 }}
 
 func TestParse(t *testing.T) {

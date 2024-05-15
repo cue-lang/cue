@@ -17,6 +17,8 @@ package load
 import (
 	"context"
 	"fmt"
+	"sort"
+	"strconv"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -66,17 +68,21 @@ func Instances(args []string, c *Config) []*build.Instance {
 	if err != nil {
 		return []*build.Instance{c.newErrInstance(err)}
 	}
+	for _, f := range otherFiles {
+		if err := setFileSource(c, f); err != nil {
+			return []*build.Instance{c.newErrInstance(err)}
+		}
+	}
 	synCache := newSyntaxCache(c)
-
 	// Pass all arguments that look like packages to loadPackages
 	// so that they'll be available when looking up the packages
 	// that are specified on the command line.
 	// Relative import paths create a package with an associated
 	// error but it turns out that's actually OK because the cue/load
 	// logic resolves such paths without consulting pkgs.
-	pkgs, err := loadPackages(ctx, c, pkgArgs)
+	pkgs, err := loadPackages(ctx, c, synCache, pkgArgs, otherFiles)
 	if err != nil {
-		return []*build.Instance{c.newErrInstance(err)}
+		return []*build.Instance{c.newErrInstance(fmt.Errorf("xxx: %v", err))}
 	}
 	tg := newTagger(c)
 	l := newLoader(c, tg, synCache, pkgs)
@@ -140,7 +146,9 @@ func Instances(args []string, c *Config) []*build.Instance {
 	return a
 }
 
-func loadPackages(ctx context.Context, cfg *Config, extraPkgs []string) (*modpkgload.Packages, error) {
+// loadPackages returns packages loaded from the given package list and also
+// including imports from the given build files.
+func loadPackages(ctx context.Context, cfg *Config, synCache *syntaxCache, extraPkgs []string, otherFiles []*build.File) (*modpkgload.Packages, error) {
 	if cfg.Registry == nil || cfg.modFile == nil || cfg.modFile.Module == "" {
 		return nil, nil
 	}
@@ -154,19 +162,61 @@ func loadPackages(ctx context.Context, cfg *Config, extraPkgs []string) (*modpkg
 		FS:  cfg.fileSystem.ioFS(cfg.ModuleRoot),
 		Dir: ".",
 	}
-	allImports, err := modimports.AllImports(modimports.AllModuleFiles(mainModLoc.FS, mainModLoc.Dir))
-	if err != nil {
-		return nil, fmt.Errorf("cannot enumerate all module imports: %v", err)
+	pkgPaths := make(map[string]bool)
+	// Add any packages specified directly on the command line.
+	for _, pkg := range extraPkgs {
+		pkgPaths[pkg] = true
 	}
-	// Add any packages specified on the command line so they're always
-	// available.
-	allImports = append(allImports, extraPkgs...)
+	if len(otherFiles) == 0 || len(extraPkgs) > 0 {
+		// Resolve all the imports in the current module. We specifically
+		// avoid doing this when files are specified on the command line
+		// but no packages because we don't want to fail because of
+		// invalid files in the module when we're just evaluating files.
+		// TODO this means that if files _and_ packages are specified,
+		// we can still error when there are problems with packages that
+		// aren't used by anything explicitly specified on the command line;
+		// a proper solution would involve pushing the pattern evaluation
+		// down into the module loading code, but that implies a significant
+		// refactoring of the modules code, so this will do for now.
+		modImports, err := modimports.AllImports(modimports.AllModuleFiles(mainModLoc.FS, mainModLoc.Dir))
+		if err != nil {
+			return nil, fmt.Errorf("cannot enumerate all module imports: %v", err)
+		}
+		for _, pkg := range modImports {
+			pkgPaths[pkg] = true
+		}
+	}
+	// Add any imports found in other files.
+	for _, f := range otherFiles {
+		syntaxes, err := synCache.getSyntax(f)
+		if err != nil {
+			return nil, fmt.Errorf("cannot get syntax for %q: %v", f.Filename, err)
+		}
+		for _, syntax := range syntaxes {
+			for _, imp := range syntax.Imports {
+				pkgPath, err := strconv.Unquote(imp.Path.Value)
+				if err != nil {
+					// Should never happen.
+					return nil, fmt.Errorf("invalid import path %q in %s", imp.Path.Value, f.Filename)
+				}
+				// Canonicalize the path.
+				pkgPath = module.ParseImportPath(pkgPath).Canonical().String()
+				pkgPaths[pkgPath] = true
+			}
+		}
+	}
+	// TODO use maps.Keys when we can.
+	pkgPathSlice := make([]string, 0, len(pkgPaths))
+	for p := range pkgPaths {
+		pkgPathSlice = append(pkgPathSlice, p)
+	}
+	sort.Strings(pkgPathSlice)
 	return modpkgload.LoadPackages(
 		ctx,
 		cfg.Module,
 		mainModLoc,
 		reqs,
 		cfg.Registry,
-		allImports,
+		pkgPathSlice,
 	), nil
 }

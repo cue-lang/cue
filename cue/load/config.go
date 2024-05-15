@@ -15,12 +15,14 @@
 package load
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -274,6 +276,10 @@ type Config struct {
 	// the corresponding build.File will be associated with the full buffer.
 	Stdin io.Reader
 
+	// stdinReader returns a reader that reads from Stdin (or os.Stdin if
+	// Stdin is nil), but only ever reads the input once.
+	stdinReader func() io.Reader
+
 	// Registry is used to fetch CUE module dependencies.
 	//
 	// When nil, if the modules experiment is enabled
@@ -295,10 +301,7 @@ type Config struct {
 }
 
 func (c *Config) stdin() io.Reader {
-	if c.Stdin == nil {
-		return os.Stdin
-	}
-	return c.Stdin
+	return c.stdinReader()
 }
 
 type importPath string
@@ -360,6 +363,7 @@ func (c Config) complete() (cfg *Config, err error) {
 	if err := c.fileSystem.init(c.Dir, c.Overlay); err != nil {
 		return nil, err
 	}
+	c.stdinReader = newOnceReader(c.Stdin)
 
 	// TODO: determine root on a package basis. Maybe we even need a
 	// pkgname.cue.mod
@@ -488,4 +492,59 @@ func (r errorRegistry) Fetch(ctx context.Context, m module.Version) (module.Sour
 
 func (r errorRegistry) ModuleVersions(ctx context.Context, mpath string) ([]string, error) {
 	return nil, r.err
+}
+
+// newOnceReader returns a function that returns the same
+// bytes read from r, but only ever reads them once.
+//
+// It only reads the data when a Read method is actually invoked.
+func newOnceReader(r io.Reader) func() io.Reader {
+	if r == nil {
+		r = os.Stdin
+	}
+	rb := &onceReaderBytes{
+		r: r,
+	}
+	return func() io.Reader {
+		return &onceReader{
+			data: rb,
+		}
+	}
+}
+
+type onceReader struct {
+	data *onceReaderBytes
+	r    io.Reader
+}
+
+func (r *onceReader) Read(buf []byte) (int, error) {
+	if r.r == nil {
+		r.r = r.data.newReader()
+	}
+	return r.r.Read(buf)
+}
+
+type onceReaderBytes struct {
+	r    io.Reader
+	once sync.Once
+	data []byte
+	err  error
+}
+
+func (b *onceReaderBytes) newReader() io.Reader {
+	b.once.Do(func() {
+		b.data, b.err = io.ReadAll(b.r)
+	})
+	if b.err != nil {
+		return errorReader{b.err}
+	}
+	return bytes.NewReader(b.data)
+}
+
+type errorReader struct {
+	err error
+}
+
+func (r errorReader) Read([]byte) (int, error) {
+	return 0, r.err
 }

@@ -17,6 +17,7 @@ package load
 import (
 	"cmp"
 	"fmt"
+	"io"
 	"os"
 	pathpkg "path"
 	"path/filepath"
@@ -229,10 +230,32 @@ func (l *loader) scanDir(dir string) cachedFileFiles {
 			})
 			continue // skip unrecognized file types
 		}
-
 		sd.buildFiles = append(sd.buildFiles, file)
 	}
 	return sd
+}
+
+func setFileSource(cfg *Config, f *build.File) error {
+	fullPath := f.Filename
+	if fullPath == "-" {
+		b, err := io.ReadAll(cfg.stdin())
+		if err != nil {
+			return errors.Newf(token.NoPos, "read stdin: %v", err)
+		}
+		f.Source = b
+		return nil
+	}
+	if !filepath.IsAbs(fullPath) {
+		fullPath = filepath.Join(cfg.Dir, fullPath)
+	}
+	if fi := cfg.fileSystem.getOverlay(fullPath); fi != nil {
+		if fi.file != nil {
+			f.Source = fi.file
+		} else {
+			f.Source = fi.contents
+		}
+	}
+	return nil
 }
 
 func (l *loader) loadFunc(pos token.Pos, path string) *build.Instance {

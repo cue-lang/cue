@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b73ab5b6_e6d719cf",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-15T10:53:35Z",
+      "side": 1,
+      "message": "nit: I\u0027m not convinced that putting the field name on the same line is worth it. More readable on its own line IMHO, which should make the diff clearer too.\n```suggestion\n\t\tcurField :\u003d \u0026ast.Field{\n\t\t    Label: \u0026ast.Ident{\n```",
+      "revId": "a7728de5dd20a994f1f510496d9cfe4d82ae04df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5593f6c_f44a5abe",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-15T10:53:35Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "a7728de5dd20a994f1f510496d9cfe4d82ae04df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5880f9b_9d932c8d",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-15T10:53:35Z",
+      "side": 1,
+      "message": "Could use strings.Builder to amortize the cost of this, I suppose.",
+      "revId": "a7728de5dd20a994f1f510496d9cfe4d82ae04df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7756a183_73efcb39",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-15T10:53:35Z",
+      "side": 1,
+      "message": "I guess an alternative to this might be to use the same label-interning logic used by the rest of CUE, meaning we could use cheaper logic for the de-duping., but then we\u0027d need to use some internal of the API, which is probably a deal-breaker",
+      "revId": "a7728de5dd20a994f1f510496d9cfe4d82ae04df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

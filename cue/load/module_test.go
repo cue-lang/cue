@@ -31,7 +31,7 @@ func TestModuleLoadWithInvalidRegistryConfig(t *testing.T) {
 	t.Setenv("CUE_CACHE_DIR", cacheDir)
 
 	insts := load.Instances([]string{"./imports"}, &load.Config{
-		Dir: filepath.Join("testdata", "testmod"),
+		Dir: filepath.Join("testdata/testmod"),
 	})
 	qt.Assert(t, qt.IsNil(insts[0].Err))
 

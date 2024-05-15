@@ -91,37 +91,37 @@ display:""`,
 		// package of this directory.
 		cfg:  dirCfg,
 		args: nil,
-		want: `path:   mod.test/test
-module: mod.test/test
+		want: `err:    import failed: cannot find package "mod.test/test/sub":
+    $CWD/testdata/testmod/test.cue:3:8
+path:   mod.test/test@v0
+module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod
 display:.
 files:
-    $CWD/testdata/testmod/test.cue
-imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
+    $CWD/testdata/testmod/test.cue`}, {
 		name: "DefaultPackageWithExplicitDotArgument",
 		// Even though the directory is called testdata, the last path in
 		// the module is test. So "package test" is correctly the default
 		// package of this directory.
 		cfg:  dirCfg,
 		args: []string{"."},
-		want: `path:   mod.test/test
-module: mod.test/test
+		want: `err:    import failed: cannot find package "mod.test/test/sub":
+    $CWD/testdata/testmod/test.cue:3:8
+path:   mod.test/test@v0
+module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod
 display:.
 files:
-    $CWD/testdata/testmod/test.cue
-imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
+    $CWD/testdata/testmod/test.cue`}, {
 		name: "RelativeImportPathWildcard",
 		cfg:  dirCfg,
 		args: []string{"./other/..."},
 		want: `err:    import failed: relative import paths not allowed ("./file"):
     $CWD/testdata/testmod/other/main.cue:6:2
 path:   ""
-module: mod.test/test
+module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    ""
 display:""`}, {
@@ -130,8 +130,8 @@ display:""`}, {
 		args: []string{"./anon"},
 		want: `err:    build constraints exclude all CUE files in ./anon:
     anon/anon.cue: no package name
-path:   mod.test/test/anon
-module: mod.test/test
+path:   mod.test/test/anon@v0
+module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/anon
 display:./anon`}, {
@@ -140,8 +140,8 @@ display:./anon`}, {
 		args: []string{"./other"},
 		want: `err:    import failed: relative import paths not allowed ("./file"):
     $CWD/testdata/testmod/other/main.cue:6:2
-path:   mod.test/test/other
-module: mod.test/test
+path:   mod.test/test/other@v0:main
+module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/other
 display:./other
@@ -150,41 +150,36 @@ files:
 		name: "RelativePathSuccess",
 		cfg:  dirCfg,
 		args: []string{"./hello"},
-		want: `path:   mod.test/test/hello
-module: mod.test/test
+		want: `err:    import failed: cannot find package "mod.test/test/sub":
+    $CWD/testdata/testmod/test.cue:3:8
+path:   mod.test/test/hello@v0:test
+module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/hello
 display:./hello
 files:
     $CWD/testdata/testmod/test.cue
-    $CWD/testdata/testmod/hello/test.cue
-imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
+    $CWD/testdata/testmod/hello/test.cue`}, {
 		name: "ExplicitPackageIdentifier",
 		cfg:  dirCfg,
 		args: []string{"mod.test/test/hello:test"},
-		want: `path:   mod.test/test/hello:test
-module: mod.test/test
+		want: `err:    cannot find package "mod.test/test/hello:test"
+path:   mod.test/test/hello:test
+module: mod.test/test@v0
 root:   $CWD/testdata/testmod
-dir:    $CWD/testdata/testmod/hello
-display:mod.test/test/hello:test
-files:
-    $CWD/testdata/testmod/test.cue
-    $CWD/testdata/testmod/hello/test.cue
-imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
+dir:    $CWD/testdata/testmod/cue.mod/gen/mod.test/test/hello
+display:mod.test/test/hello:test`,
+	}, {
 		name: "NoPackageName",
 		cfg:  dirCfg,
 		args: []string{"mod.test/test/hello:nonexist"},
-		want: `err:    build constraints exclude all CUE files in mod.test/test/hello:nonexist:
-    anon.cue: no package name
-    test.cue: package is test, want nonexist
-    hello/test.cue: package is test, want nonexist
+		want: `err:    cannot find package "mod.test/test/hello:nonexist"
 path:   mod.test/test/hello:nonexist
-module: mod.test/test
+module: mod.test/test@v0
 root:   $CWD/testdata/testmod
-dir:    $CWD/testdata/testmod/hello
-display:mod.test/test/hello:nonexist`}, {
+dir:    $CWD/testdata/testmod/cue.mod/gen/mod.test/test/hello
+display:mod.test/test/hello:nonexist`,
+	}, {
 		name: "ExplicitNonPackageFiles",
 		cfg:  dirCfg,
 		args: []string{"./anon.cue", "./other/anon.cue"},
@@ -222,7 +217,7 @@ files:
 		args: []string{"foo.com/bad-identifier"},
 		want: `err:    implied package identifier "bad-identifier" from import path "foo.com/bad-identifier" is not valid
 path:   foo.com/bad-identifier
-module: mod.test/test
+module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/cue.mod/gen/foo.com/bad-identifier
 display:foo.com/bad-identifier`,
@@ -232,7 +227,7 @@ display:foo.com/bad-identifier`,
 		args: []string{"nonexisting"},
 		want: `err:    standard library import path "nonexisting" cannot be imported as a CUE package
 path:   nonexisting
-module: mod.test/test
+module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    ""
 display:nonexisting`,
@@ -242,7 +237,7 @@ display:nonexisting`,
 		args: []string{"strconv"},
 		want: `err:    standard library import path "strconv" cannot be imported as a CUE package
 path:   strconv
-module: mod.test/test
+module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    ""
 display:strconv`,
@@ -251,8 +246,8 @@ display:strconv`,
 		cfg:  dirCfg,
 		args: []string{"./empty"},
 		want: `err:    no CUE files in ./empty
-path:   mod.test/test/empty
-module: mod.test/test
+path:   mod.test/test/empty@v0
+module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/empty
 display:./empty`,
@@ -260,8 +255,8 @@ display:./empty`,
 		name: "PackageWithImports",
 		cfg:  dirCfg,
 		args: []string{"./imports"},
-		want: `path:   mod.test/test/imports
-module: mod.test/test
+		want: `path:   mod.test/test/imports@v0
+module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/imports
 display:./imports
@@ -273,8 +268,8 @@ imports:
 		name: "OnlyToolFiles",
 		cfg:  dirCfg,
 		args: []string{"./toolonly"},
-		want: `path:   mod.test/test/toolonly
-module: mod.test/test
+		want: `path:   mod.test/test/toolonly@v0:foo
+module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/toolonly
 display:./toolonly
@@ -289,8 +284,8 @@ files:
     anon.cue: no package name
     test.cue: package is test, want foo
     toolonly/foo_tool.cue: _tool.cue files excluded in non-cmd mode
-path:   mod.test/test/toolonly
-module: mod.test/test
+path:   mod.test/test/toolonly@v0:foo
+module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/toolonly
 display:./toolonly`}, {
@@ -300,8 +295,8 @@ display:./toolonly`}, {
 			Tags: []string{"prod"},
 		},
 		args: []string{"./tags"},
-		want: `path:   mod.test/test/tags
-module: mod.test/test
+		want: `path:   mod.test/test/tags@v0
+module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/tags
 display:./tags
@@ -313,8 +308,8 @@ files:
 			Tags: []string{"prod", "foo=bar"},
 		},
 		args: []string{"./tags"},
-		want: `path:   mod.test/test/tags
-module: mod.test/test
+		want: `path:   mod.test/test/tags@v0
+module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/tags
 display:./tags
@@ -331,8 +326,8 @@ previous declaration here:
     $CWD/testdata/testmod/tagsbad/prod.cue:1:1
 multiple @if attributes:
     $CWD/testdata/testmod/tagsbad/prod.cue:2:1
-path:   mod.test/test/tagsbad
-module: mod.test/test
+path:   mod.test/test/tagsbad@v0
+module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/tagsbad
 display:./tagsbad`}, {
@@ -345,8 +340,8 @@ display:./tagsbad`}, {
     $CWD/testdata/testmod/cycle/cycle.cue:3:8
     $CWD/testdata/testmod/cue.mod/pkg/mod.test/cycle/bar/bar.cue:3:8
     $CWD/testdata/testmod/cue.mod/pkg/mod.test/cycle/foo/foo.cue:3:8
-path:   mod.test/test/cycle
-module: mod.test/test
+path:   mod.test/test/cycle@v0
+module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/cycle
 display:./cycle

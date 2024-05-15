@@ -12,5 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module: "mod.test/test"
+module: "mod.test/test@v0"
 language: version: "v0.8.0"

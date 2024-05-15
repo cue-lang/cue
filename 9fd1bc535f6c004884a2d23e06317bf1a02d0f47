@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb107ed4_70b84380",
+        "filename": "mod/modfile/modfile_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-15T08:12:59Z",
+      "side": 1,
+      "message": "I would fully expect ParseLegacy to not care about extra data fields, because before the strict schema, we didn\u0027t care about those, so I\u0027m confused by this change.",
+      "revId": "9fd1bc535f6c004884a2d23e06317bf1a02d0f47",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3dfd2eda_01b526da",
+        "filename": "mod/modfile/modfile_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-15T08:12:59Z",
+      "side": 1,
+      "message": "perhaps mention in the commit message why this change with the Parse testdata is also happening. I assume it comes from TestParse now being stricter in how it uses go-cmp?",
+      "revId": "9fd1bc535f6c004884a2d23e06317bf1a02d0f47",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f518c93d_ae30863f",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 3
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-15T08:12:59Z",
+      "side": 1,
+      "message": "I\u0027ve never seen \"allied\" used in this way, is that a common thing? how about just:\n\n\u003e conventionally a module or domain name.",
+      "range": {
+        "startLine": 78,
+        "startChar": 52,
+        "endLine": 78,
+        "endChar": 58
+      },
+      "revId": "9fd1bc535f6c004884a2d23e06317bf1a02d0f47",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

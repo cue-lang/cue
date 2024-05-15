@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "80277b1e_f419cf79",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-15T16:19:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6be53a33_415d8753",
+      "range": {
+        "startLine": 269,
+        "startChar": 47,
+        "endLine": 269,
+        "endChar": 57
+      },
+      "revId": "47e0097cd0dda661673b5a3a85017c1e82d628a1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ae84f944_4711c756",
@@ -37,6 +61,24 @@
       "writtenOn": "2024-05-15T15:45:41Z",
       "side": 1,
       "message": "should this be a TODO?",
+      "revId": "47e0097cd0dda661673b5a3a85017c1e82d628a1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b80e10c6_eca97955",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-15T16:19:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ae84f944_4711c756",
       "revId": "47e0097cd0dda661673b5a3a85017c1e82d628a1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -13,7 +13,7 @@ func TestInit(t *testing.T) {
 	t.Setenv("CUE_EXPERIMENT", "")
 	err := initAlways()
 	qt.Assert(t, qt.IsNil(err))
-	qt.Assert(t, qt.IsFalse(Flags.Modules))
+	qt.Assert(t, qt.IsTrue(Flags.Modules))
 	qt.Assert(t, qt.IsTrue(Flags.YAMLV3Decoder))
 
 	// Check that we can enable all experiments.

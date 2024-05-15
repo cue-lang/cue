@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b352c5ac_a38fe010",
+        "filename": "cmd/cue/cmd/modfix.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-15T15:50:41Z",
+      "side": 1,
+      "message": "how about \"fix a legacy cue.mod/module.cue file\", to be a bit more like plain english?",
+      "revId": "298aee09ee35d50b1c58b7cfd8ff4c1d14556a9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c13e783_ded5eda0",
+        "filename": "cmd/cue/cmd/modfix.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-15T15:50:41Z",
+      "side": 1,
+      "message": "... if missing? what do we do if it already existed before?",
+      "revId": "298aee09ee35d50b1c58b7cfd8ff4c1d14556a9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c2269ce_ed70c4b5",
+        "filename": "cmd/cue/cmd/modfix.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-15T15:50:41Z",
+      "side": 1,
+      "message": "like before, \"it just formats it\" reads weird to me",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 18
+      },
+      "revId": "298aee09ee35d50b1c58b7cfd8ff4c1d14556a9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

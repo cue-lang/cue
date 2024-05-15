@@ -73,7 +73,7 @@ func TestLatest(t *testing.T) {
 
 		for _, f := range a.Files {
 			t.Run(path.Join(fullpath, f.Name), func(t *testing.T) {
-				if !strings.HasSuffix(f.Name, ".cue") {
+				if !strings.HasSuffix(f.Name, ".cue") || path.Base(f.Name) == "invalid.cue" {
 					return
 				}
 				v := parser.FromVersion(parser.Latest)

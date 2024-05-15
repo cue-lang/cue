@@ -66,6 +66,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 	if err != nil {
 		return []*build.Instance{c.newErrInstance(err)}
 	}
+	synCache := newSyntaxCache(c)
 
 	// Pass all arguments that look like packages to loadPackages
 	// so that they'll be available when looking up the packages
@@ -78,7 +79,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 		return []*build.Instance{c.newErrInstance(err)}
 	}
 	tg := newTagger(c)
-	l := newLoader(c, tg, pkgs)
+	l := newLoader(c, tg, synCache, pkgs)
 
 	if c.Context == nil {
 		c.Context = build.NewContext(

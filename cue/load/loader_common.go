@@ -163,6 +163,7 @@ func (fp *fileProcessor) finalize(p *build.Instance) errors.Error {
 	return nil
 }
 
+// add adds the given file to the appropriate package in fp.
 func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (added bool) {
 	fullPath := file.Filename
 	if fullPath != "-" {

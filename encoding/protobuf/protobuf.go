@@ -22,14 +22,14 @@
 // # Package Paths
 //
 // If a .proto file contains a go_package directive, it will be used as the
-// destination package fo the generated .cue files. A common use case is to
+// destination package for the generated .cue files. A common use case is to
 // generate the CUE in the same directory as the .proto definition. If a
 // destination package is not within the current CUE module, it will be written
 // relative to the pkg directory.
 //
 // If a .proto file does not specify go_package, it will convert a proto package
 // "google.parent.sub" to the import path "googleapis.com/google/parent/sub".
-// It is safe to mix package with and without a go_package within the same
+// It is safe to mix packages with and without a go_package within the same
 // project.
 //
 // # Type Mappings
@@ -99,6 +99,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/mod/module"
 
 	// Generated protobuf CUE may use builtins. Ensure that these can always be
 	// found, even if the user does not use cue/load or another package that
@@ -181,13 +182,25 @@ type result struct {
 // it will be observable by the Err method fo the Extractor. It is safe,
 // however, to only check errors after building the output.
 func NewExtractor(c *Config) *Extractor {
+	var modulePath string
+	// We don't want to consider the module's major version as
+	// part of the path when checking to see a protobuf package
+	// declares itself as part of that module.
+	if c.Module != "" {
+		var ok bool
+		modulePath, _, ok = module.SplitPathVersion(c.Module)
+		if !ok {
+			modulePath = c.Module
+
+		}
+	}
 	cwd, _ := os.Getwd()
 	b := &Extractor{
 		root:      c.Root,
 		cwd:       cwd,
 		paths:     c.Paths,
 		pkgName:   c.PkgName,
-		module:    c.Module,
+		module:    modulePath,
 		enumMode:  c.EnumMode,
 		fileCache: map[string]result{},
 		imports:   map[string]*build.Instance{},

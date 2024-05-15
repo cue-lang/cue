@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4d85826_f2d66864",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-15T14:41:07Z",
+      "side": 1,
+      "message": "Ha, I thought there was some deeper reason why it was happening, but actually you\u0027re absolutely right, we can do that. Done.",
+      "parentUuid": "e605d322_c65f0c4f",
+      "revId": "fa4f598fd1e4e1a2b5231a6ee8621411093b50a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4855a23c_fc1cd153",
@@ -41,6 +59,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a14b4420_bd974a64",
+        "filename": "cmd/cue/cmd/testdata/script/issue3144.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-15T14:41:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4855a23c_fc1cd153",
+      "range": {
+        "startLine": 1,
+        "startChar": 64,
+        "endLine": 1,
+        "endChar": 76
+      },
+      "revId": "fa4f598fd1e4e1a2b5231a6ee8621411093b50a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4d6ee616_6cd5de00",
@@ -54,6 +96,24 @@
       "writtenOn": "2024-05-15T14:13:17Z",
       "side": 1,
       "message": "what\u0027s the point of this change? if you mean to say \"the slashes don\u0027t matter\", then why keep using filepath.Join at all? I\u0027m inclined to say this change is unnecessary",
+      "revId": "fa4f598fd1e4e1a2b5231a6ee8621411093b50a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db9e7d76_9d1c29f2",
+        "filename": "cue/load/module_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-15T14:41:07Z",
+      "side": 1,
+      "message": "It\u0027s a drive-by: I was continually a little annoyed by the fact that I couldn\u0027t just click on the \"testdata/testmod\" path to open that directory. I could change it to `filepath.FromSlash` but you\u0027re probably right that it\u0027s not worth it, and it\u0027s certainly unrelated to this stack.",
+      "parentUuid": "4d6ee616_6cd5de00",
       "revId": "fa4f598fd1e4e1a2b5231a6ee8621411093b50a7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

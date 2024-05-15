@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0e04977_3eac6af0",
+        "filename": "cmd/cue/cmd/modfix.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-15T16:19:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b352c5ac_a38fe010",
+      "revId": "298aee09ee35d50b1c58b7cfd8ff4c1d14556a9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7c13e783_ded5eda0",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "137ca943_cf7c4bd1",
+        "filename": "cmd/cue/cmd/modfix.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-15T16:19:15Z",
+      "side": 1,
+      "message": "It\u0027s moved into the custom field, as there\u0027s no guarantee that it was intended to mean the same thing before as it does now.",
+      "parentUuid": "7c13e783_ded5eda0",
+      "revId": "298aee09ee35d50b1c58b7cfd8ff4c1d14556a9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4c2269ce_ed70c4b5",
@@ -48,6 +84,30 @@
       "writtenOn": "2024-05-15T15:50:41Z",
       "side": 1,
       "message": "like before, \"it just formats it\" reads weird to me",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 18
+      },
+      "revId": "298aee09ee35d50b1c58b7cfd8ff4c1d14556a9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d006941_e2abab29",
+        "filename": "cmd/cue/cmd/modfix.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-15T16:19:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4c2269ce_ed70c4b5",
       "range": {
         "startLine": 43,
         "startChar": 0,

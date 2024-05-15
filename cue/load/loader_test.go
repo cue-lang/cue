@@ -77,8 +77,14 @@ func TestLoad(t *testing.T) {
 		name: "BadModuleFile",
 		cfg:  badModCfg,
 		args: []string{"."},
-		want: `err:    module: cannot use value 123 (type int) as string:
+		want: `err:    module: 2 errors in empty disjunction:
+module: conflicting values 123 and "" (mismatched types int and string):
     $CWD/testdata/badmod/cue.mod/module.cue:2:9
+    cuelang.org/go/mod/modfile/schema.cue:56:22
+module: conflicting values 123 and string (mismatched types int and string):
+    $CWD/testdata/badmod/cue.mod/module.cue:2:9
+    cuelang.org/go/mod/modfile/schema.cue:56:12
+    cuelang.org/go/mod/modfile/schema.cue:101:12
 path:   ""
 module: ""
 root:   ""
@@ -91,30 +97,30 @@ display:""`,
 		// package of this directory.
 		cfg:  dirCfg,
 		args: nil,
-		want: `err:    import failed: cannot find package "mod.test/test/sub":
-    $CWD/testdata/testmod/test.cue:3:8
-path:   mod.test/test@v0
+		want: `path:   mod.test/test@v0
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod
 display:.
 files:
-    $CWD/testdata/testmod/test.cue`}, {
+    $CWD/testdata/testmod/test.cue
+imports:
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
 		name: "DefaultPackageWithExplicitDotArgument",
 		// Even though the directory is called testdata, the last path in
 		// the module is test. So "package test" is correctly the default
 		// package of this directory.
 		cfg:  dirCfg,
 		args: []string{"."},
-		want: `err:    import failed: cannot find package "mod.test/test/sub":
-    $CWD/testdata/testmod/test.cue:3:8
-path:   mod.test/test@v0
+		want: `path:   mod.test/test@v0
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod
 display:.
 files:
-    $CWD/testdata/testmod/test.cue`}, {
+    $CWD/testdata/testmod/test.cue
+imports:
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
 		name: "RelativeImportPathWildcard",
 		cfg:  dirCfg,
 		args: []string{"./other/..."},
@@ -150,36 +156,41 @@ files:
 		name: "RelativePathSuccess",
 		cfg:  dirCfg,
 		args: []string{"./hello"},
-		want: `err:    import failed: cannot find package "mod.test/test/sub":
-    $CWD/testdata/testmod/test.cue:3:8
-path:   mod.test/test/hello@v0:test
+		want: `path:   mod.test/test/hello@v0:test
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/hello
 display:./hello
 files:
     $CWD/testdata/testmod/test.cue
-    $CWD/testdata/testmod/hello/test.cue`}, {
+    $CWD/testdata/testmod/hello/test.cue
+imports:
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
 		name: "ExplicitPackageIdentifier",
 		cfg:  dirCfg,
 		args: []string{"mod.test/test/hello:test"},
-		want: `err:    cannot find package "mod.test/test/hello:test"
-path:   mod.test/test/hello:test
+		want: `path:   mod.test/test/hello:test
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
-dir:    $CWD/testdata/testmod/cue.mod/gen/mod.test/test/hello
-display:mod.test/test/hello:test`,
-	}, {
+dir:    $CWD/testdata/testmod/hello
+display:mod.test/test/hello:test
+files:
+    $CWD/testdata/testmod/test.cue
+    $CWD/testdata/testmod/hello/test.cue
+imports:
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
 		name: "NoPackageName",
 		cfg:  dirCfg,
 		args: []string{"mod.test/test/hello:nonexist"},
-		want: `err:    cannot find package "mod.test/test/hello:nonexist"
+		want: `err:    build constraints exclude all CUE files in mod.test/test/hello:nonexist:
+    anon.cue: no package name
+    test.cue: package is test, want nonexist
+    hello/test.cue: package is test, want nonexist
 path:   mod.test/test/hello:nonexist
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
-dir:    $CWD/testdata/testmod/cue.mod/gen/mod.test/test/hello
-display:mod.test/test/hello:nonexist`,
-	}, {
+dir:    $CWD/testdata/testmod/hello
+display:mod.test/test/hello:nonexist`}, {
 		name: "ExplicitNonPackageFiles",
 		cfg:  dirCfg,
 		args: []string{"./anon.cue", "./other/anon.cue"},
@@ -190,7 +201,8 @@ dir:    $CWD/testdata/testmod
 display:command-line-arguments
 files:
     $CWD/testdata/testmod/anon.cue
-    $CWD/testdata/testmod/other/anon.cue`}, {
+    $CWD/testdata/testmod/other/anon.cue`,
+	}, {
 		name: "AbsoluteFileIsNormalized", // TODO(rogpeppe) what is this actually testing?
 		cfg:  dirCfg,
 		// Absolute file is normalized.
@@ -215,11 +227,11 @@ files:
 		name: "BadIdentifier",
 		cfg:  dirCfg,
 		args: []string{"foo.com/bad-identifier"},
-		want: `err:    implied package identifier "bad-identifier" from import path "foo.com/bad-identifier" is not valid
+		want: `err:    cannot find package "foo.com/bad-identifier": cannot find module providing package foo.com/bad-identifier
 path:   foo.com/bad-identifier
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
-dir:    $CWD/testdata/testmod/cue.mod/gen/foo.com/bad-identifier
+dir:    ""
 display:foo.com/bad-identifier`,
 	}, {
 		name: "NonexistentStdlibImport",

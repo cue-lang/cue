@@ -262,6 +262,75 @@ func ParseNonStrict(modfile []byte, filename string) (*File, error) {
 	return parse(modfile, filename, false)
 }
 
+// FixLegacy converts a legacy module.cue file as parsed by [ParseLegacy]
+// into a format suitable for parsing with [Parse]. It adds a language.version
+// field and moves all unrecognized fields into custom.legacy.
+//
+// If there is no module field or it is empty, it sets it to "test.example@v0".
+//
+// If the file already parses OK with [ParseNonStrict], it returns the
+// result of that.
+func FixLegacy(modfile []byte, filename string) (*File, error) {
+	f, err := ParseNonStrict(modfile, filename)
+	if err == nil {
+		// It parses OK so it doesn't need fixing.
+		return f, nil
+	}
+	ctx := cuecontext.New()
+	file, err := parseDataOnlyCUE(ctx, modfile, filename)
+	if err != nil {
+		return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file syntax")
+	}
+	v := ctx.BuildFile(file)
+	if err := v.Validate(cue.Concrete(true)); err != nil {
+		return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file value")
+	}
+	var allFields map[string]any
+	if err := v.Decode(&allFields); err != nil {
+		return nil, err
+	}
+	mpath := "test.example@v0"
+	if m, ok := allFields["module"]; ok {
+		if mpath1, ok := m.(string); ok && mpath1 != "" {
+			mpath = mpath1
+		} else if !ok {
+			return nil, fmt.Errorf("module field has unexpected type %T", m)
+		}
+		// What to do if the module path isn't OK according to the new rules?
+	}
+	customLegacy := make(map[string]any)
+	for k, v := range allFields {
+		if k != "module" {
+			customLegacy[k] = v
+		}
+	}
+	var custom map[string]map[string]any
+	if len(customLegacy) > 0 {
+		custom = map[string]map[string]any{
+			"legacy": customLegacy,
+		}
+	}
+	f = &File{
+		Module: mpath,
+		Language: &Language{
+			Version: LatestKnownSchemaVersion(),
+		},
+		Custom: custom,
+	}
+	// Round-trip through [Parse] so that we get exactly the same
+	// result as a later parse of the same data will. This also
+	// adds a major version to the module path if needed.
+	data, err := f.Format()
+	if err != nil {
+		return nil, fmt.Errorf("cannot format fixed file: %v", err)
+	}
+	f, err = ParseNonStrict(data, "fixed-"+filename)
+	if err != nil {
+		return nil, fmt.Errorf("cannot round-trip fixed module file %q: %v", data, err)
+	}
+	return f, nil
+}
+
 func parse(modfile []byte, filename string, strict bool) (*File, error) {
 	// Unfortunately we need a new context. See the note inside [moduleSchemaDo].
 	ctx := cuecontext.New()

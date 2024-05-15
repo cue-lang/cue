@@ -170,8 +170,8 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 		if !filepath.IsAbs(fullPath) {
 			fullPath = filepath.Join(root, fullPath)
 		}
+		file.Filename = fullPath
 	}
-	file.Filename = fullPath
 
 	base := filepath.Base(fullPath)
 
@@ -184,6 +184,9 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 		file.ExcludeReason = fp.err
 		p.InvalidFiles = append(p.InvalidFiles, file)
 		return true
+	}
+	if err := setFileSource(fp.c, file); err != nil {
+		return badFile(errors.Promote(err, ""))
 	}
 
 	match, data, err := matchFile(fp.c, file, true, fp.allTags, mode)

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1254eb2a_45ecbc10",
+        "filename": "cmd/cue/cmd/testdata/script/issue174.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-15T16:25:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7f80437c_d5e36810",
+      "revId": "bc6531414851158933fd4c2992561da3808a0cf0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6b784a68_659f5308",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-05-14T10:32:18Z",
       "side": 1,
       "message": "Does this change below in this default flip CL?",
+      "revId": "bc6531414851158933fd4c2992561da3808a0cf0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21b262a3_191bcad7",
+        "filename": "cue/load/config.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-15T16:25:25Z",
+      "side": 1,
+      "message": "Moved into another CL.",
+      "parentUuid": "6b784a68_659f5308",
       "revId": "bc6531414851158933fd4c2992561da3808a0cf0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "819e4010_5a5c0b5a",
+        "filename": "cue/load/testdata/testmod/cue.mod/module.cue",
+        "patchSetId": 8
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-15T16:25:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4582dd8e_d5e4af9a",
+      "revId": "bc6531414851158933fd4c2992561da3808a0cf0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "945fd6bb_14694693",
@@ -82,6 +136,24 @@
       "writtenOn": "2024-05-14T10:32:18Z",
       "side": 1,
       "message": "This doesn\u0027t feel like it belongs in this default flip CL",
+      "revId": "bc6531414851158933fd4c2992561da3808a0cf0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8920ad63_c4f2fc99",
+        "filename": "encoding/protobuf/protobuf.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-15T16:25:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "945fd6bb_14694693",
       "revId": "bc6531414851158933fd4c2992561da3808a0cf0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

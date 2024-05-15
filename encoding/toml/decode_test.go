@@ -120,12 +120,43 @@ func TestDecoder(t *testing.T) {
 			site: "foo.com": title: "foo bar"
 		`,
 	}, {
-		name: "RootKeysDuplicate",
+		name: "KeysDuplicateSimple",
 		input: `
-			foo = "same value"
-			foo = "same value"
+			foo = "same key"
+			foo = "same key"
 		`,
 		wantErr: `duplicate key: foo`,
+	}, {
+		name: "KeysDuplicateQuoted",
+		input: `
+			"foo" = "same key"
+			foo = "same key"
+		`,
+		wantErr: `duplicate key: foo`,
+	}, {
+		name: "KeysDuplicateWhitespace",
+		input: `
+			foo . bar = "same key"
+			foo.bar = "same key"
+		`,
+		wantErr: `duplicate key: foo\.bar`,
+	}, {
+		name: "KeysDuplicateDots",
+		input: `
+			foo."bar.baz".zzz = "same key"
+			foo."bar.baz".zzz = "same key"
+		`,
+		wantErr: `duplicate key: foo\."bar\.baz"\.zzz`,
+	}, {
+		name: "KeysNotDuplicateDots",
+		input: `
+			foo."bar.baz" = "different key"
+			"foo.bar".baz = "different key"
+		`,
+		wantCUE: `
+			foo: "bar.baz": "different key"
+			"foo.bar": baz: "different key"
+		`,
 	}, {
 		name: "BasicStrings",
 		input: `
@@ -258,20 +289,58 @@ line two.\
 	}, {
 		name: "Arrays",
 		input: `
-			integers      = [ 1, 2, 3 ]
-			colors        = [ "red", "yellow", "green" ]
-			nested_ints   = [ [ 1, 2 ], [3, 4, 5] ]
-			nested_mixed  = [ [ 1, 2 ], ["a", "b", "c"] ]
-			strings       = [ "all", 'strings', """are the same""", '''type''' ]
-			mixed_numbers = [ 0.1, 0.2, 0.5, 1, 2, 5 ]
+			integers      = [1, 2, 3]
+			colors        = ["red", "yellow", "green"]
+			nested_ints   = [[1, 2], [3, 4, 5]]
+			nested_mixed  = [[1, 2], ["a", "b", "c"], {extra = "keys"}]
+			strings       = ["all", 'strings', """are the same""", '''type''']
+			mixed_numbers = [0.1, 0.2, 0.5, 1, 2, 5]
 		`,
 		wantCUE: `
 			integers:      [1, 2, 3]
 			colors:        ["red", "yellow", "green"]
 			nested_ints:   [[1, 2], [3, 4, 5]]
-			nested_mixed:  [[1, 2], ["a", "b", "c"]]
+			nested_mixed:  [[1, 2], ["a", "b", "c"], {extra: "keys"}]
 			strings:       ["all", "strings", "are the same", "type"]
 			mixed_numbers: [0.1, 0.2, 0.5, 1, 2, 5]
+		`,
+	}, {
+		name: "InlineTables",
+		input: `
+			point  = {x = 1, y = 2}
+			animal = {type.name = "pug"}
+			deep   = {l1 = {l2 = {l3 = "leaf"}}}
+		`,
+		wantCUE: `
+			point:  {x: 1, y: 2}
+			animal: {type: name: "pug"}
+			deep:   {l1: {l2: {l3: "leaf"}}}
+		`,
+	}, {
+		name: "InlineTablesDuplicate",
+		input: `
+			point = {x = "same key", x = "same key"}
+		`,
+		wantErr: `duplicate key: point\.x`,
+	}, {
+		name: "ArrayInlineTablesDuplicate",
+		input: `
+			point = [{}, {}, {x = "same key", x = "same key"}]
+		`,
+		wantErr: `duplicate key: point\.2\.x`,
+	}, {
+		name: "InlineTablesNotDuplicateScoping",
+		input: `
+			repeat = {repeat = {repeat = "leaf"}}
+			struct1 = {sibling = "leaf"}
+			struct2 = {sibling = "leaf"}
+			arrays = [{sibling = "leaf"}, {sibling = "leaf"}]
+		`,
+		wantCUE: `
+			repeat: {repeat: {repeat: "leaf"}}
+			struct1: {sibling: "leaf"}
+			struct2: {sibling: "leaf"}
+			arrays: [{sibling: "leaf"}, {sibling: "leaf"}]
 		`,
 	}}
 	for _, test := range tests {
@@ -287,6 +356,10 @@ line two.\
 				qt.Assert(t, qt.IsNil(node))
 				// We don't continue, so we can't expect any decoded CUE.
 				qt.Assert(t, qt.Equals(test.wantCUE, ""))
+
+				// Validate that go-toml's Unmarshal also rejects this input.
+				err = gotoml.Unmarshal([]byte(test.input), new(any))
+				qt.Assert(t, qt.IsNotNil(err))
 				return
 			}
 			qt.Assert(t, qt.IsNil(err))
@@ -311,7 +384,7 @@ line two.\
 			qt.Assert(t, qt.IsNil(val.Validate()))
 
 			// Validate that the decoded CUE value is equivalent
-			// to the Go value that a direct TOML unmarshal produces.
+			// to the Go value that go-toml's Unmarshal produces.
 			// We use JSON equality as some details such as which integer types are used
 			// are not actually relevant to an "equal data" check.
 			var unmarshalTOML any

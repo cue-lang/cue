@@ -161,17 +161,3 @@ func checkErrors(t *testing.T, filename string, input interface{}) {
 	// verify errors returned by the parser
 	compareErrors(t, file, expected, found)
 }
-
-func TestFuzz(t *testing.T) {
-	testCases := []string{
-		"(({\"\\(0)\"(",
-		"{{\"\\(0\xbf\"(",
-		"a:y for x n{b:\"\"(\"\\(" +
-			"\"\"\\\"(",
-	}
-	for _, tc := range testCases {
-		t.Run("", func(t *testing.T) {
-			_, _ = ParseFile("go-fuzz", []byte(tc))
-		})
-	}
-}

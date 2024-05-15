@@ -34,6 +34,24 @@
       "parentUuid": "e8098234_95ef3e3e",
       "revId": "5d0e2cdf1f9f2a26948cbaf833a8b5d2f0fb334d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "93c93340_4849e339",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-15T12:37:14Z",
+      "side": 1,
+      "message": "Up to you - my impression is that conflicts between this CL and Marcel\u0027s work in the next 2-3 weeks until the release are rather slim, so I think it would be fine for you to continue now. But it\u0027s of course also fine if you want to delay until the release happens, there\u0027s no rush.",
+      "parentUuid": "e0146716_8b5ed80f",
+      "revId": "5d0e2cdf1f9f2a26948cbaf833a8b5d2f0fb334d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

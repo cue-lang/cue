@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e605d322_c65f0c4f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-15T14:13:17Z",
+      "side": 1,
+      "message": "naively, I would assume that you can just read the build.File source once, and shove the []byte in the Source field - ensuring the original io.Reader isn\u0027t read again. Why is that not enough?",
+      "revId": "fa4f598fd1e4e1a2b5231a6ee8621411093b50a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4855a23c_fc1cd153",
+        "filename": "cmd/cue/cmd/testdata/script/issue3144.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-15T14:13:17Z",
+      "side": 1,
+      "message": "only files?",
+      "range": {
+        "startLine": 1,
+        "startChar": 64,
+        "endLine": 1,
+        "endChar": 76
+      },
+      "revId": "fa4f598fd1e4e1a2b5231a6ee8621411093b50a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d6ee616_6cd5de00",
+        "filename": "cue/load/module_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-15T14:13:17Z",
+      "side": 1,
+      "message": "what\u0027s the point of this change? if you mean to say \"the slashes don\u0027t matter\", then why keep using filepath.Join at all? I\u0027m inclined to say this change is unnecessary",
+      "revId": "fa4f598fd1e4e1a2b5231a6ee8621411093b50a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

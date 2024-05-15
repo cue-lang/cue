@@ -80,8 +80,8 @@ func Example() {
 
 	// Output:
 	// Number of instances: 1
-	// Instance module: mod.test/test
-	// Instance import path: mod.test/test/example
+	// Instance module: mod.test/test@v0
+	// Instance import path: mod.test/test/example@v0
 	//
 	// Source files:
 	// example.cue with 3 declarations

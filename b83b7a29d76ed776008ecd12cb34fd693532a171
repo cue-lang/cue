@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b879db71_0ee0ac1b",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_registry_not_enabled.txtar",
+        "patchSetId": 19
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-16T11:44:54Z",
+      "side": 1,
+      "message": "unlike modpublish_registry_not_enabled, this test now runs with the modules mode _enabled_, not _disabled_. given the test name modtidy_registry_not_enabled.txtar, I think you sholud probably keep it as it was, but with `env CUE_EXPERIMENT\u003dmodules\u003d0`.\n\nwhile here, I would replace `registry_not_enabled` with `modules_disabled` for consistency with other test names.",
+      "revId": "b83b7a29d76ed776008ecd12cb34fd693532a171",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61e0272e_e839e6e3",
+        "filename": "cmd/cue/cmd/testdata/script/registry_experiment_not_set.txtar",
+        "patchSetId": 19
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-16T11:44:54Z",
+      "side": 1,
+      "message": "like before, this test name still says `experiment_not_set`, so now the title and contents are a mismatch.\n\nI think in this case you want to retitle the file to say `modules_disabled`.",
+      "revId": "b83b7a29d76ed776008ecd12cb34fd693532a171",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1dbc8cc2_4de11903",
+        "filename": "cmd/cue/cmd/testdata/script/registry_no_experiment_warning.txtar",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-16T11:44:54Z",
+      "side": 1,
+      "message": "nit: this test name should now swap `no_experiment` for `modules_disabled`.",
+      "revId": "b83b7a29d76ed776008ecd12cb34fd693532a171",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4b4ca3c_4633ffb6",
+        "filename": "encoding/gocode/testdata/cue.mod/module.cue",
+        "patchSetId": 19
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-16T11:44:54Z",
+      "side": 1,
+      "message": "split this into a separate CL, like you did with cue/load/testdata?",
+      "revId": "b83b7a29d76ed776008ecd12cb34fd693532a171",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b1ca0d2_c4f4574a",
+        "filename": "encoding/gocode/testdata/gen.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-16T11:44:54Z",
+      "side": 1,
+      "message": "ditto the split",
+      "revId": "b83b7a29d76ed776008ecd12cb34fd693532a171",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

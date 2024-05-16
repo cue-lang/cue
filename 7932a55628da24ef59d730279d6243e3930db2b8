@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ac56c62_2aae20eb",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-16T13:16:59Z",
+      "side": 1,
+      "message": "woh, that was an interesting one",
+      "range": {
+        "startLine": 322,
+        "startChar": 1,
+        "endLine": 322,
+        "endChar": 89
+      },
+      "revId": "7932a55628da24ef59d730279d6243e3930db2b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

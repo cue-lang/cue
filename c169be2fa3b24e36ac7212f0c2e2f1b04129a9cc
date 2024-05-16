@@ -16,6 +16,24 @@
       "message": "nit: over 76 columns",
       "revId": "c169be2fa3b24e36ac7212f0c2e2f1b04129a9cc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e19eef37_7f7cc235",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-16T11:36:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c8db4bcb_5c5bdbab",
+      "revId": "c169be2fa3b24e36ac7212f0c2e2f1b04129a9cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

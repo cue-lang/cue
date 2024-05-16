@@ -16,6 +16,24 @@
       "message": "it still baffles me they did not accept strings.CutLast",
       "revId": "c35874edbb0256ca783c0f9f381a1d8bd4bc10a0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2a7235a_9ed5bb30",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 423,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-16T16:50:13Z",
+      "side": 1,
+      "message": "FWIW I don\u0027t _think_ it\u0027s been explicitly not accepted.\nIn https://github.com/golang/go/issues/46336 Russ said:\n\n\u003e I considered including LastCut in this proposal, but it seemed easier to limit it to the single function Cut.\n\u003e\n\u003e It may be worth adding LastCut as well.\n\nI\u0027m sure you know better than I, but I don\u0027t think I\u0027ve seen any subsequent proposal for its addition.",
+      "parentUuid": "f5b20075_284961a9",
+      "revId": "c35874edbb0256ca783c0f9f381a1d8bd4bc10a0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

@@ -143,6 +143,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "64569011_0386acee",
+        "filename": "encoding/gocode/testdata/cue.mod/module.cue",
+        "patchSetId": 19
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-16T12:03:20Z",
+      "side": 1,
+      "message": "Ah, fair enough. Can you please call it out in the commit message? It\u0027s a pretty important detail to record, if e.g. we need to revert the default change due to breakage, we\u0027ll need to revert this test change too.",
+      "parentUuid": "f30fee69_e8d4ca79",
+      "revId": "b83b7a29d76ed776008ecd12cb34fd693532a171",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2b1ca0d2_c4f4574a",
         "filename": "encoding/gocode/testdata/gen.go",
         "patchSetId": 19

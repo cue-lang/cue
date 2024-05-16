@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc850bab_228a4cb9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 20
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-16T12:03:20Z",
+      "side": 1,
+      "message": "as far as I can tell, all of this (cue fmt, user, protobuf, cue/load) happened in previous CLs now, so it shouldn\u0027t be mentioned.",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 49
+      },
+      "revId": "baa362510428503fcb57a49f1c60e5c11504657c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

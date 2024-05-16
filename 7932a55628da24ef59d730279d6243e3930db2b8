@@ -22,6 +22,23 @@
       },
       "revId": "7932a55628da24ef59d730279d6243e3930db2b8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2aefc622_11cff225",
+        "filename": "mod/modzip/zip.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-16T16:54:45Z",
+      "side": 1,
+      "message": "Thanks for making these changes. It\u0027s great to have better type inference for cases like this!",
+      "revId": "7932a55628da24ef59d730279d6243e3930db2b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "560a1257_6947bf8c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-16T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c040eda3_274b62fd",
+      "range": {
+        "startLine": 7,
+        "startChar": 10,
+        "endLine": 7,
+        "endChar": 22
+      },
+      "revId": "e1db80b1248b1c5a4c9589dd4e6a8f84ae3476b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cadda0f4_10d8a193",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-05-16T09:59:08Z",
       "side": 1,
       "message": "nit: assign the TODOs to yourself, e.g. TODO(rog) or TODO(rogpeppe) because otherwise it\u0027s not terribly clear who was once asking this question or who should review the patch that eventually figures out this TODO.",
+      "range": {
+        "startLine": 199,
+        "startChar": 39,
+        "endLine": 199,
+        "endChar": 43
+      },
+      "revId": "e1db80b1248b1c5a4c9589dd4e6a8f84ae3476b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "98ecd640_85e96f68",
+        "filename": "cue/load/loader_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-16T10:34:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cadda0f4_10d8a193",
       "range": {
         "startLine": 199,
         "startChar": 39,

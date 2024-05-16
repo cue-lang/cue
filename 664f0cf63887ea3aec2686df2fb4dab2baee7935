@@ -16,6 +16,24 @@
       "message": "I would tweak the title, and add more context:\n\n```\ncue/load: add major version suffix to module path in testdata\n\nWe are about to enable the modules experiment by default,\nand its new module.cue schema requires a major version suffix in module paths.\n```",
       "revId": "664f0cf63887ea3aec2686df2fb4dab2baee7935",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd8c02c6_4630da65",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-16T11:29:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "812c6970_9d501508",
+      "revId": "664f0cf63887ea3aec2686df2fb4dab2baee7935",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

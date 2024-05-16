@@ -20,8 +20,6 @@ import (
 	"cuelabs.dev/go/oci/ociregistry/ociserver"
 	"golang.org/x/tools/txtar"
 
-	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/modregistry"
 	"cuelang.org/go/mod/module"
@@ -330,44 +328,6 @@ func tokenHandler(*AuthConfig) http.Handler {
 	})
 }
 
-// authnHandler wraps the given handler with logic that checks
-// that the incoming requests fulfil the authenticiation requirements defined
-// in cfg. If cfg is nil or there are no auth requirements, it returns handler
-// unchanged.
-func authnHandler(cfg *AuthConfig, handler http.Handler) http.Handler {
-	if cfg == nil || (*cfg == AuthConfig{}) {
-		return handler
-	}
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		auth := req.Header.Get("Authorization")
-		if auth == "" {
-			if cfg.BearerToken != "" {
-				// Note that this lacks information like the realm,
-				// but we don't need it for our test cases yet.
-				w.Header().Set("Www-Authenticate", "Bearer service=registry")
-			} else {
-				w.Header().Set("Www-Authenticate", "Basic service=registry")
-			}
-			writeError(w, fmt.Errorf("%w: no credentials", ociregistry.ErrUnauthorized))
-			return
-		}
-		if cfg.BearerToken != "" {
-			token, ok := strings.CutPrefix(auth, "Bearer ")
-			if !ok || token != cfg.BearerToken {
-				writeError(w, fmt.Errorf("%w: invalid bearer credentials", ociregistry.ErrUnauthorized))
-				return
-			}
-		} else {
-			username, password, ok := req.BasicAuth()
-			if !ok || username != cfg.Username || password != cfg.Password {
-				writeError(w, fmt.Errorf("%w: invalid user-password credentials", ociregistry.ErrUnauthorized))
-				return
-			}
-		}
-		handler.ServeHTTP(w, req)
-	})
-}
-
 func writeError(w http.ResponseWriter, err error) {
 	data, httpStatus := ociregistry.MarshalError(err)
 	w.Header().Set("Content-Type", "application/json")
@@ -452,13 +412,8 @@ func (r *Registry) Host() string {
 	return r.host
 }
 
-type handler struct {
-	modules []*moduleContent
-}
-
 func getModules(fsys fs.FS) (map[module.Version]*moduleContent, []byte, error) {
 	var authConfig []byte
-	ctx := cuecontext.New()
 	modules := make(map[string]*moduleContent)
 	if err := fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -501,7 +456,7 @@ func getModules(fsys fs.FS) (map[module.Version]*moduleContent, []byte, error) {
 		return nil, nil, err
 	}
 	for modver, content := range modules {
-		if err := content.init(ctx, modver); err != nil {
+		if err := content.init(modver); err != nil {
 			return nil, nil, fmt.Errorf("cannot initialize module %q: %v", modver, err)
 		}
 	}
@@ -519,10 +474,10 @@ type moduleContent struct {
 }
 
 func (c *moduleContent) writeZip(w io.Writer) error {
-	return modzip.Create[txtar.File](w, c.version, c.files, txtarFileIO{})
+	return modzip.Create(w, c.version, c.files, txtarFileIO{})
 }
 
-func (c *moduleContent) init(ctx *cue.Context, versDir string) error {
+func (c *moduleContent) init(versDir string) error {
 	found := false
 	for _, f := range c.files {
 		if f.Name != "cue.mod/module.cue" {

@@ -44,6 +44,9 @@ func TestRegistry(t *testing.T) {
 			client, err := ociclient.New(r.Host(), &ociclient.Options{
 				Insecure: true,
 			})
+			if err != nil {
+				t.Fatal(err)
+			}
 			runTest(t, ocifilter.Sub(client, "someprefix/other"), string(ar.Comment), ar)
 		})
 	}

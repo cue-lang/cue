@@ -22,6 +22,23 @@
       },
       "revId": "baa362510428503fcb57a49f1c60e5c11504657c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f33bfaf0_1e55e1fb",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 20
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-16T12:04:04Z",
+      "side": 1,
+      "message": "this comment should be moved or deleted now, I think.",
+      "revId": "baa362510428503fcb57a49f1c60e5c11504657c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

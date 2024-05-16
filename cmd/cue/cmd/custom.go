@@ -141,7 +141,7 @@ func customCommand(c *Command, typ, name string, tools *cue.Instance) (*cobra.Co
 			// - parse flags and env vars
 			// - constrain current config with config section
 
-			return doTasks(cmd, typ, name, tools)
+			return doTasks(cmd, name, tools)
 		}),
 	}
 
@@ -149,7 +149,7 @@ func customCommand(c *Command, typ, name string, tools *cue.Instance) (*cobra.Co
 	return sub, nil
 }
 
-func doTasks(cmd *Command, typ, command string, root *cue.Instance) error {
+func doTasks(cmd *Command, command string, root *cue.Instance) error {
 	cfg := &flow.Config{
 		Root:           cue.MakePath(cue.Str(commandSection), cue.Str(command)),
 		InferTasks:     true,

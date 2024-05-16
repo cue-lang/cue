@@ -162,7 +162,7 @@ func runModUpload(cmd *Command, args []string) error {
 		if err != nil {
 			return err
 		}
-		if err := modzip.Create[string](zf, mv, files, osFileIO{
+		if err := modzip.Create(zf, mv, files, osFileIO{
 			modRoot: modRoot,
 		}); err != nil {
 			return err
@@ -253,7 +253,6 @@ func (fio osFileIO) absPath(f string) string {
 // module's zip file.
 type publishRegistryResolverShim struct {
 	resolver    *modconfig.Resolver
-	registry    ociregistry.Interface
 	dryRun      bool
 	recordFiles bool
 	outDir      string
@@ -320,7 +319,7 @@ func (r *publishRegistryResolverShim) writeIndex() error {
 		return err
 	}
 	data = append(data, '\n')
-	if os.WriteFile(filepath.Join(r.outDir, "index.json"), data, 0o666); err != nil {
+	if err := os.WriteFile(filepath.Join(r.outDir, "index.json"), data, 0o666); err != nil {
 		return err
 	}
 	return nil

@@ -374,7 +374,7 @@ func CheckDir(dir string) (CheckedFiles, error) {
 	if err != nil {
 		return CheckedFiles{}, err
 	}
-	cf, cfErr := CheckFiles[dirFile](files, dirFileIO{})
+	cf, cfErr := CheckFiles(files, dirFileIO{})
 	_ = cfErr // ignore this error; we'll generate our own after rewriting paths.
 
 	// Replace all paths with file system paths.
@@ -595,7 +595,7 @@ func CreateFromDir(w io.Writer, m module.Version, dir string) (err error) {
 		return err
 	}
 
-	return Create[dirFile](w, m, files, dirFileIO{})
+	return Create(w, m, files, dirFileIO{})
 }
 
 type dirFile struct {

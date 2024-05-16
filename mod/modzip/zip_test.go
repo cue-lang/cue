@@ -179,9 +179,7 @@ func (fi fakeFileInfo) Sys() interface{}   { return nil }
 type zeroReader struct{}
 
 func (r zeroReader) Read(b []byte) (int, error) {
-	for i := range b {
-		b[i] = 0
-	}
+	clear(b)
 	return len(b), nil
 }
 

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "48acf0cb_4dd8bd99",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_registry_not_enabled.txtar",
+        "patchSetId": 19
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-16T11:54:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b879db71_0ee0ac1b",
+      "revId": "b83b7a29d76ed776008ecd12cb34fd693532a171",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "61e0272e_e839e6e3",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-05-16T11:44:54Z",
       "side": 1,
       "message": "like before, this test name still says `experiment_not_set`, so now the title and contents are a mismatch.\n\nI think in this case you want to retitle the file to say `modules_disabled`.",
+      "revId": "b83b7a29d76ed776008ecd12cb34fd693532a171",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a47576a1_8b74d97b",
+        "filename": "cmd/cue/cmd/testdata/script/registry_experiment_not_set.txtar",
+        "patchSetId": 19
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-16T11:54:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "61e0272e_e839e6e3",
       "revId": "b83b7a29d76ed776008ecd12cb34fd693532a171",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3bebb7e9_bdecb495",
+        "filename": "cmd/cue/cmd/testdata/script/registry_no_experiment_warning.txtar",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-16T11:54:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1dbc8cc2_4de11903",
+      "revId": "b83b7a29d76ed776008ecd12cb34fd693532a171",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b4b4ca3c_4633ffb6",
@@ -69,6 +123,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f30fee69_e8d4ca79",
+        "filename": "encoding/gocode/testdata/cue.mod/module.cue",
+        "patchSetId": 19
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-16T11:54:37Z",
+      "side": 1,
+      "message": "I tried to make a comment on this (patchset 15), anticipating your feedback here, but it disappeared from view.\nI\u0027ll say it again:\n\nNote: this change cannot be made before this CL because this module path does not function correctly when modules are not enabled.",
+      "parentUuid": "b4b4ca3c_4633ffb6",
+      "revId": "b83b7a29d76ed776008ecd12cb34fd693532a171",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2b1ca0d2_c4f4574a",
@@ -82,6 +154,24 @@
       "writtenOn": "2024-05-16T11:44:54Z",
       "side": 1,
       "message": "ditto the split",
+      "revId": "b83b7a29d76ed776008ecd12cb34fd693532a171",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce3e60d9_f1fe7b74",
+        "filename": "encoding/gocode/testdata/gen.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-16T11:54:37Z",
+      "side": 1,
+      "message": "ditto the comment (the two go hand-in-hand)",
+      "parentUuid": "2b1ca0d2_c4f4574a",
       "revId": "b83b7a29d76ed776008ecd12cb34fd693532a171",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

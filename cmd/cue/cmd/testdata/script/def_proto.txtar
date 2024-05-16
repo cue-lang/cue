@@ -1,3 +1,9 @@
+env CUE_EXPERIMENT=modules=0
+exec cue def policy.proto -p api -I include
+cmp stdout expect-stdout
+
+env CUE_EXPERIMENT=modules
+env CUE_CACHE_DIR=$WORK/tmp/cache
 exec cue def policy.proto -p api -I include
 cmp stdout expect-stdout
 

@@ -1,9 +1,12 @@
 # This tests that when there's an import and no current module,
-# fmt will still work.
+# fmt will still work with both stdin and files.
 
 stdin a/x.cue
 exec cue fmt -
 cmp stdout a.cue-want
+
+exec cue fmt a/x.cue
+cmp a/x.cue a.cue-want
 
 -- a/x.cue --
 package x

@@ -188,6 +188,10 @@ func loadPackages(ctx context.Context, cfg *Config, synCache *syntaxCache, extra
 	}
 	// Add any imports found in other files.
 	for _, f := range otherFiles {
+		if f.Encoding != build.CUE {
+			// not a CUE file; assume it has no imports for now.
+			continue
+		}
 		syntaxes, err := synCache.getSyntax(f)
 		if err != nil {
 			return nil, fmt.Errorf("cannot get syntax for %q: %v", f.Filename, err)

@@ -250,6 +250,8 @@ func setFileSource(cfg *Config, f *build.File) error {
 	}
 	if !filepath.IsAbs(fullPath) {
 		fullPath = filepath.Join(cfg.Dir, fullPath)
+		// Ensure that encoding.NewDecoder will work correctly.
+		f.Filename = fullPath
 	}
 	if fi := cfg.fileSystem.getOverlay(fullPath); fi != nil {
 		if fi.file != nil {

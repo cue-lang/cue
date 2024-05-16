@@ -52,9 +52,10 @@ func VertexFeatures(c *adt.OpContext, v *adt.Vertex) []adt.Feature {
 }
 
 func extractFeatures(in []*adt.StructInfo) (a [][]adt.Feature) {
+	a = make([][]adt.Feature, 0, len(in))
 	for _, s := range in {
-		sorted := []adt.Feature{}
-		for _, e := range s.StructLit.Decls {
+		sorted := make([]adt.Feature, 0, len(s.Decls))
+		for _, e := range s.Decls {
 			switch x := e.(type) {
 			case *adt.Field:
 				sorted = append(sorted, x.Label)

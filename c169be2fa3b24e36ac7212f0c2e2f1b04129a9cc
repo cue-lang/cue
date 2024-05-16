@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8db4bcb_5c5bdbab",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-16T11:25:42Z",
+      "side": 1,
+      "message": "nit: over 76 columns",
+      "revId": "c169be2fa3b24e36ac7212f0c2e2f1b04129a9cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

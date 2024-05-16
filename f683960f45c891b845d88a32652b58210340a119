@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40c4cb96_ec5a7cbf",
+        "filename": "encoding/gocode/testdata/cue.mod/module.cue",
+        "patchSetId": 15
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-16T11:06:48Z",
+      "side": 1,
+      "message": "Note: this change cannot be made before this CL because this module path does not function correctly when modules are not enabled.",
+      "revId": "f683960f45c891b845d88a32652b58210340a119",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

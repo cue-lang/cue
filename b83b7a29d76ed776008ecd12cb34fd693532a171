@@ -159,6 +159,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "107d8473_6b84fd80",
+        "filename": "encoding/gocode/testdata/cue.mod/module.cue",
+        "patchSetId": 19
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-16T12:09:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "64569011_0386acee",
+      "revId": "b83b7a29d76ed776008ecd12cb34fd693532a171",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2b1ca0d2_c4f4574a",

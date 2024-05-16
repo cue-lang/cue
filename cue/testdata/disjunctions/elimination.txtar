@@ -487,9 +487,24 @@ issue2263: full: {
 	}
 }
 -- issue1417.cue --
-#ID: !~"^a" | =~"^ab$" | =~"^aB$"
-#ID: =~"^a" | !~"[A-Z]"
-ids: [...#ID] & ["xyz", "ab", "aB"]
+issue1417: {
+	#ID: !~"^a" | =~"^ab$" | =~"^aB$"
+	#ID: =~"^a" | !~"[A-Z]"
+	ids: [...#ID] & ["xyz", "ab", "aB"]
+}
+-- issue3149.cue --
+issue3149: {
+	#valid: {
+		name!: ( (=~"^Foo") | "an exception") & ( (=~"Foo$") | "an exception")
+	}
+	list: [...#valid]
+	list: [
+		{name: "FooBarFoo"},
+		{name: "FooBazFoo"},
+		{name: "FooQuuxFoo"},
+		{name: "an exception"},
+	]
+}
 -- out/evalalpha --
 (struct){
   disambiguateClosed: (struct){
@@ -913,11 +928,13 @@ ids: [...#ID] & ["xyz", "ab", "aB"]
       }
     }
   }
-  #ID: (string){ |((string){ &(!~"^a", =~"^a") }, (string){ &(!~"^a", !~"[A-Z]") }, (string){ &(=~"^ab$", =~"^a") }, (string){ &(=~"^ab$", !~"[A-Z]") }, (string){ &(=~"^aB$", =~"^a") }, (string){ &(=~"^aB$", !~"[A-Z]") }) }
-  ids: (#list){
-    0: (string){ "xyz" }
-    1: (string){ "ab" }
-    2: (string){ "aB" }
+  issue1417: (struct){
+    #ID: (string){ |((string){ &(!~"^a", =~"^a") }, (string){ &(!~"^a", !~"[A-Z]") }, (string){ &(=~"^ab$", =~"^a") }, (string){ &(=~"^ab$", !~"[A-Z]") }, (string){ &(=~"^aB$", =~"^a") }, (string){ &(=~"^aB$", !~"[A-Z]") }) }
+    ids: (#list){
+      0: (string){ "xyz" }
+      1: (string){ "ab" }
+      2: (string){ "aB" }
+    }
   }
   issue2209: (struct){
     simplified: (struct){
@@ -1405,14 +1422,33 @@ ids: [...#ID] & ["xyz", "ab", "aB"]
       }
     }
   }
+  issue3149: (struct){
+    #valid: (#struct){
+      name!: (string){ |((string){ &(=~"^Foo", =~"Foo$") }, (string){ "an exception" }) }
+    }
+    list: (#list){
+      0: (#struct){
+        name: (string){ "FooBarFoo" }
+      }
+      1: (#struct){
+        name: (string){ "FooBazFoo" }
+      }
+      2: (#struct){
+        name: (string){ "FooQuuxFoo" }
+      }
+      3: (#struct){
+        name: (string){ "an exception" }
+      }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,49 +1,4 @@
+@@ -1,58 +1,4 @@
 -Errors:
--ids.2: 2 errors in empty disjunction:
+-issue1417.ids.2: 2 errors in empty disjunction:
 -issue2209.full.Bar.resource.spec: 6 errors in empty disjunction:
 -issue2209.full.Bar.resource.spec.minBar: 2 errors in empty disjunction:
 -issue2209.full.Bar.resource.spec.minBar: conflicting values null and int (mismatched types null and int):
@@ -1437,22 +1473,31 @@ diff old new
 -    ./issue2209full.cue:83:16
 -    ./issue2209full.cue:92:13
 -    ./issue2209full.cue:105:20
--ids.1: invalid value "ab" (out of bound !~"^a"):
--    ./issue1417.cue:1:6
--    ./issue1417.cue:3:10
--    ./issue1417.cue:3:25
--ids.2: invalid value "aB" (out of bound !~"^a"):
--    ./issue1417.cue:1:6
--    ./issue1417.cue:3:10
--    ./issue1417.cue:3:31
--ids.2: invalid value "aB" (out of bound !~"[A-Z]"):
--    ./issue1417.cue:2:15
--    ./issue1417.cue:3:10
--    ./issue1417.cue:3:31
+-issue3149.list.3.name: 2 errors in empty disjunction:
+-issue1417.ids.1: invalid value "ab" (out of bound !~"^a"):
+-    ./issue1417.cue:2:7
+-    ./issue1417.cue:4:11
+-    ./issue1417.cue:4:26
+-issue1417.ids.2: invalid value "aB" (out of bound !~"^a"):
+-    ./issue1417.cue:2:7
+-    ./issue1417.cue:4:11
+-    ./issue1417.cue:4:32
+-issue1417.ids.2: invalid value "aB" (out of bound !~"[A-Z]"):
+-    ./issue1417.cue:3:16
+-    ./issue1417.cue:4:11
+-    ./issue1417.cue:4:32
 -issue2209.simplified.t3.BAZ: undefined field: y:
 -    ./issue2209full.cue:35:9
 -issue2209.full.Bar.resource.spec.minBar: undefined field: min:
 -    ./issue2209full.cue:77:25
+-issue3149.list.3.name: invalid value "an exception" (out of bound =~"^Foo"):
+-    ./issue3149.cue:3:13
+-    ./issue3149.cue:3:10
+-    ./issue3149.cue:10:10
+-issue3149.list.3.name: invalid value "an exception" (out of bound =~"Foo$"):
+-    ./issue3149.cue:3:46
+-    ./issue3149.cue:3:10
+-    ./issue3149.cue:10:10
 -
 -Result:
 -(_|_){
@@ -1461,7 +1506,7 @@ diff old new
    disambiguateClosed: (struct){
      b: (#struct){ |((#struct){
          x: (bool){ true }
-@@ -134,7 +89,6 @@
+@@ -143,7 +89,6 @@
                      // [incomplete] nestedNonMonotonic.incomplete.a.n2.p1.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
                      //     ./in.cue:96:15
                      //     ./in.cue:96:32
@@ -1469,7 +1514,7 @@ diff old new
                      c: (int){ 1 }
                    }
                  }
-@@ -146,7 +100,6 @@
+@@ -155,7 +100,6 @@
                    b: (_|_){
                      // [incomplete] nestedNonMonotonic.incomplete.a.n2.p2.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
                      //     ./in.cue:102:15
@@ -1477,7 +1522,7 @@ diff old new
                      //     ./in.cue:102:32
                      c: (int){ 1 }
                    }
-@@ -172,16 +125,8 @@
+@@ -181,16 +125,8 @@
              x: ((null|struct)){ |((struct){
                  a: (struct){
                    b: (_|_){
@@ -1495,7 +1540,7 @@ diff old new
                      //     ./in.cue:138:32
                      c: (int){ 1 }
                      d: (int){ 1 }
-@@ -240,38 +185,60 @@
+@@ -249,38 +185,60 @@
            }, (#struct){
              a: (string){ string }
              d: (string){ string }
@@ -1588,7 +1633,7 @@ diff old new
              d: (string){ string }
            }) }
          #B: (#struct){ |(*(#struct){
-@@ -306,6 +273,17 @@
+@@ -315,6 +273,17 @@
            }, (#struct){
              a: (string){ string }
              d: (string){ string }
@@ -1606,7 +1651,7 @@ diff old new
            }) }
          #B: (#struct){ |(*(#struct){
            }, (#struct){
-@@ -340,10 +318,6 @@
+@@ -349,10 +318,6 @@
        #type: (#struct){
          fieldName: ((string|struct)){ |((string){ string }, (#struct){
              foo: (string){ string }
@@ -1617,7 +1662,7 @@ diff old new
            }) }
        }
        #subtype: ((string|struct)){ |((string){ string }, (#struct){
-@@ -377,9 +351,12 @@
+@@ -386,9 +351,12 @@
        }
      }
      t4: (struct){
@@ -1633,7 +1678,7 @@ diff old new
        #D: (#struct){ |((#struct){
            a: (null){ null }
          }, (#struct){
-@@ -423,12 +400,8 @@
+@@ -432,12 +400,8 @@
      #T: (list){
        0: (string){ "d" }
      }
@@ -1648,7 +1693,7 @@ diff old new
    }
    issue1940: (struct){
      #T: (#list){
-@@ -437,50 +410,24 @@
+@@ -446,53 +410,26 @@
        }
      }
      #A: (#struct){
@@ -1668,46 +1713,54 @@ diff old new
 -          1: (list){
 -          }
 -        }
-+        type: ~(issue1940.#T)
-       }
-     }
-   }
-   #ID: (string){ |((string){ &(!~"^a", =~"^a") }, (string){ &(!~"^a", !~"[A-Z]") }, (string){ &(=~"^ab$", =~"^a") }, (string){ &(=~"^ab$", !~"[A-Z]") }, (string){ &(=~"^aB$", =~"^a") }, (string){ &(=~"^aB$", !~"[A-Z]") }) }
--  ids: (_|_){
--    // [eval]
-+  ids: (#list){
-     0: (string){ "xyz" }
--    1: (_|_){
--      // [eval] ids.1: invalid value "ab" (out of bound !~"^a"):
--      //     ./issue1417.cue:1:6
--      //     ./issue1417.cue:3:10
--      //     ./issue1417.cue:3:25
+-      }
 -    }
--    2: (_|_){
--      // [eval] ids.2: 2 errors in empty disjunction:
--      // ids.2: invalid value "aB" (out of bound !~"^a"):
--      //     ./issue1417.cue:1:6
--      //     ./issue1417.cue:3:10
--      //     ./issue1417.cue:3:31
--      // ids.2: invalid value "aB" (out of bound !~"[A-Z]"):
--      //     ./issue1417.cue:2:15
--      //     ./issue1417.cue:3:10
--      //     ./issue1417.cue:3:31
+-  }
+-  issue1417: (_|_){
+-    // [eval]
++        type: ~(issue1940.#T)
++      }
++    }
++  }
++  issue1417: (struct){
+     #ID: (string){ |((string){ &(!~"^a", =~"^a") }, (string){ &(!~"^a", !~"[A-Z]") }, (string){ &(=~"^ab$", =~"^a") }, (string){ &(=~"^ab$", !~"[A-Z]") }, (string){ &(=~"^aB$", =~"^a") }, (string){ &(=~"^aB$", !~"[A-Z]") }) }
+-    ids: (_|_){
+-      // [eval]
++    ids: (#list){
+       0: (string){ "xyz" }
+-      1: (_|_){
+-        // [eval] issue1417.ids.1: invalid value "ab" (out of bound !~"^a"):
+-        //     ./issue1417.cue:2:7
+-        //     ./issue1417.cue:4:11
+-        //     ./issue1417.cue:4:26
+-      }
+-      2: (_|_){
+-        // [eval] issue1417.ids.2: 2 errors in empty disjunction:
+-        // issue1417.ids.2: invalid value "aB" (out of bound !~"^a"):
+-        //     ./issue1417.cue:2:7
+-        //     ./issue1417.cue:4:11
+-        //     ./issue1417.cue:4:32
+-        // issue1417.ids.2: invalid value "aB" (out of bound !~"[A-Z]"):
+-        //     ./issue1417.cue:3:16
+-        //     ./issue1417.cue:4:11
+-        //     ./issue1417.cue:4:32
+-      }
 -    }
 -  }
 -  issue2209: (_|_){
 -    // [eval]
 -    simplified: (_|_){
 -      // [eval]
-+    1: (string){ "ab" }
-+    2: (string){ "aB" }
++      1: (string){ "ab" }
++      2: (string){ "aB" }
++    }
 +  }
 +  issue2209: (struct){
 +    simplified: (struct){
        t1: (struct){
          #SpecFoo: (#struct){
            foo: (#struct){
-@@ -543,185 +490,118 @@
+@@ -555,185 +492,118 @@
              x: (int){ 1 }
            }
          }
@@ -2004,7 +2057,7 @@ diff old new
          }
        }
        #Abstract: (#struct){
-@@ -737,34 +617,34 @@
+@@ -749,34 +619,34 @@
              }
            }) }
          resource: (#struct){
@@ -2067,7 +2120,7 @@ diff old new
          }
        }
        _#Spec: (#struct){ |(*(#struct){
-@@ -791,36 +671,36 @@
+@@ -803,36 +673,36 @@
          }
        }
        _Thing: (#struct){
@@ -2133,7 +2186,7 @@ diff old new
        }
        #Constrained: (#struct){
          spec: (#struct){ |(*(#struct){
-@@ -904,19 +784,19 @@
+@@ -916,19 +786,19 @@
            common: (int){ 3 }
          }
          #FormFoo: (#struct){
@@ -2160,7 +2213,7 @@ diff old new
            }) }
        }
        #Input: (#struct){
-@@ -965,10 +845,23 @@
+@@ -977,10 +847,23 @@
      }
      full: (struct){
        metrics: (#list){
@@ -2188,16 +2241,54 @@ diff old new
          1: (#struct){
            id: (string){ "bar" }
            value: (int){ 80 }
+@@ -1031,13 +914,11 @@
+       }
+     }
+   }
+-  issue3149: (_|_){
+-    // [eval]
++  issue3149: (struct){
+     #valid: (#struct){
+       name!: (string){ |((string){ &(=~"^Foo", =~"Foo$") }, (string){ "an exception" }) }
+     }
+-    list: (_|_){
+-      // [eval]
++    list: (#list){
+       0: (#struct){
+         name: (string){ "FooBarFoo" }
+       }
+@@ -1047,19 +928,8 @@
+       2: (#struct){
+         name: (string){ "FooQuuxFoo" }
+       }
+-      3: (_|_){
+-        // [eval]
+-        name: (_|_){
+-          // [eval] issue3149.list.3.name: 2 errors in empty disjunction:
+-          // issue3149.list.3.name: invalid value "an exception" (out of bound =~"^Foo"):
+-          //     ./issue3149.cue:3:13
+-          //     ./issue3149.cue:3:10
+-          //     ./issue3149.cue:10:10
+-          // issue3149.list.3.name: invalid value "an exception" (out of bound =~"Foo$"):
+-          //     ./issue3149.cue:3:46
+-          //     ./issue3149.cue:3:10
+-          //     ./issue3149.cue:10:10
+-        }
++      3: (#struct){
++        name: (string){ "an exception" }
+       }
+     }
+   }
 -- out/eval/stats --
 Leaks:  4
-Freed:  2368
-Reused: 2352
+Freed:  2403
+Reused: 2387
 Allocs: 20
 Retain: 115
 
-Unifications: 1265
-Conjuncts:    3458
-Disjuncts:    2483
+Unifications: 1278
+Conjuncts:    3512
+Disjuncts:    2518
 -- diff/todo/p1 --
 issue2263.full: missing elimination, may be lack of closeContext
 -- diff/todo/p2 --
@@ -2210,9 +2301,10 @@ issue2209.simplified.t2.BAZ: error reported in wrong location.
 issue2209.simplified.t3: new evaluator fixes known bug.
 preserveClosedness.medium.p*: discarding of default is correct.
 issue1417: new evaluator fixes known bug
+issue3149: new evaluator fixes known bug
 -- out/eval --
 Errors:
-ids.2: 2 errors in empty disjunction:
+issue1417.ids.2: 2 errors in empty disjunction:
 issue2209.full.Bar.resource.spec: 6 errors in empty disjunction:
 issue2209.full.Bar.resource.spec.minBar: 2 errors in empty disjunction:
 issue2209.full.Bar.resource.spec.minBar: conflicting values null and int (mismatched types null and int):
@@ -2237,22 +2329,31 @@ issue2209.full.Bar.resource.spec.minFoo: conflicting values null and int (mismat
     ./issue2209full.cue:83:16
     ./issue2209full.cue:92:13
     ./issue2209full.cue:105:20
-ids.1: invalid value "ab" (out of bound !~"^a"):
-    ./issue1417.cue:1:6
-    ./issue1417.cue:3:10
-    ./issue1417.cue:3:25
-ids.2: invalid value "aB" (out of bound !~"^a"):
-    ./issue1417.cue:1:6
-    ./issue1417.cue:3:10
-    ./issue1417.cue:3:31
-ids.2: invalid value "aB" (out of bound !~"[A-Z]"):
-    ./issue1417.cue:2:15
-    ./issue1417.cue:3:10
-    ./issue1417.cue:3:31
+issue3149.list.3.name: 2 errors in empty disjunction:
+issue1417.ids.1: invalid value "ab" (out of bound !~"^a"):
+    ./issue1417.cue:2:7
+    ./issue1417.cue:4:11
+    ./issue1417.cue:4:26
+issue1417.ids.2: invalid value "aB" (out of bound !~"^a"):
+    ./issue1417.cue:2:7
+    ./issue1417.cue:4:11
+    ./issue1417.cue:4:32
+issue1417.ids.2: invalid value "aB" (out of bound !~"[A-Z]"):
+    ./issue1417.cue:3:16
+    ./issue1417.cue:4:11
+    ./issue1417.cue:4:32
 issue2209.simplified.t3.BAZ: undefined field: y:
     ./issue2209full.cue:35:9
 issue2209.full.Bar.resource.spec.minBar: undefined field: min:
     ./issue2209full.cue:77:25
+issue3149.list.3.name: invalid value "an exception" (out of bound =~"^Foo"):
+    ./issue3149.cue:3:13
+    ./issue3149.cue:3:10
+    ./issue3149.cue:10:10
+issue3149.list.3.name: invalid value "an exception" (out of bound =~"Foo$"):
+    ./issue3149.cue:3:46
+    ./issue3149.cue:3:10
+    ./issue3149.cue:10:10
 
 Result:
 (_|_){
@@ -2668,26 +2769,29 @@ Result:
       }
     }
   }
-  #ID: (string){ |((string){ &(!~"^a", =~"^a") }, (string){ &(!~"^a", !~"[A-Z]") }, (string){ &(=~"^ab$", =~"^a") }, (string){ &(=~"^ab$", !~"[A-Z]") }, (string){ &(=~"^aB$", =~"^a") }, (string){ &(=~"^aB$", !~"[A-Z]") }) }
-  ids: (_|_){
+  issue1417: (_|_){
     // [eval]
-    0: (string){ "xyz" }
-    1: (_|_){
-      // [eval] ids.1: invalid value "ab" (out of bound !~"^a"):
-      //     ./issue1417.cue:1:6
-      //     ./issue1417.cue:3:10
-      //     ./issue1417.cue:3:25
-    }
-    2: (_|_){
-      // [eval] ids.2: 2 errors in empty disjunction:
-      // ids.2: invalid value "aB" (out of bound !~"^a"):
-      //     ./issue1417.cue:1:6
-      //     ./issue1417.cue:3:10
-      //     ./issue1417.cue:3:31
-      // ids.2: invalid value "aB" (out of bound !~"[A-Z]"):
-      //     ./issue1417.cue:2:15
-      //     ./issue1417.cue:3:10
-      //     ./issue1417.cue:3:31
+    #ID: (string){ |((string){ &(!~"^a", =~"^a") }, (string){ &(!~"^a", !~"[A-Z]") }, (string){ &(=~"^ab$", =~"^a") }, (string){ &(=~"^ab$", !~"[A-Z]") }, (string){ &(=~"^aB$", =~"^a") }, (string){ &(=~"^aB$", !~"[A-Z]") }) }
+    ids: (_|_){
+      // [eval]
+      0: (string){ "xyz" }
+      1: (_|_){
+        // [eval] issue1417.ids.1: invalid value "ab" (out of bound !~"^a"):
+        //     ./issue1417.cue:2:7
+        //     ./issue1417.cue:4:11
+        //     ./issue1417.cue:4:26
+      }
+      2: (_|_){
+        // [eval] issue1417.ids.2: 2 errors in empty disjunction:
+        // issue1417.ids.2: invalid value "aB" (out of bound !~"^a"):
+        //     ./issue1417.cue:2:7
+        //     ./issue1417.cue:4:11
+        //     ./issue1417.cue:4:32
+        // issue1417.ids.2: invalid value "aB" (out of bound !~"[A-Z]"):
+        //     ./issue1417.cue:3:16
+        //     ./issue1417.cue:4:11
+        //     ./issue1417.cue:4:32
+      }
     }
   }
   issue2209: (_|_){
@@ -3229,6 +3333,38 @@ Result:
       }
       #TargetValue: (#struct){
         value: (number){ number }
+      }
+    }
+  }
+  issue3149: (_|_){
+    // [eval]
+    #valid: (#struct){
+      name!: (string){ |((string){ &(=~"^Foo", =~"Foo$") }, (string){ "an exception" }) }
+    }
+    list: (_|_){
+      // [eval]
+      0: (#struct){
+        name: (string){ "FooBarFoo" }
+      }
+      1: (#struct){
+        name: (string){ "FooBazFoo" }
+      }
+      2: (#struct){
+        name: (string){ "FooQuuxFoo" }
+      }
+      3: (_|_){
+        // [eval]
+        name: (_|_){
+          // [eval] issue3149.list.3.name: 2 errors in empty disjunction:
+          // issue3149.list.3.name: invalid value "an exception" (out of bound =~"^Foo"):
+          //     ./issue3149.cue:3:13
+          //     ./issue3149.cue:3:10
+          //     ./issue3149.cue:10:10
+          // issue3149.list.3.name: invalid value "an exception" (out of bound =~"Foo$"):
+          //     ./issue3149.cue:3:46
+          //     ./issue3149.cue:3:10
+          //     ./issue3149.cue:10:10
+        }
       }
     }
   }
@@ -3950,15 +4086,17 @@ Result:
 }
 --- issue1417.cue
 {
-  #ID: (!~"^a"|=~"^ab$"|=~"^aB$")
-  #ID: (=~"^a"|!~"[A-Z]")
-  ids: ([
-    ...〈1;#ID〉,
-  ] & [
-    "xyz",
-    "ab",
-    "aB",
-  ])
+  issue1417: {
+    #ID: (!~"^a"|=~"^ab$"|=~"^aB$")
+    #ID: (=~"^a"|!~"[A-Z]")
+    ids: ([
+      ...〈1;#ID〉,
+    ] & [
+      "xyz",
+      "ab",
+      "aB",
+    ])
+  }
 }
 --- issue2209full.cue
 {
@@ -4267,5 +4405,30 @@ Result:
         value: number
       }
     }
+  }
+}
+--- issue3149.cue
+{
+  issue3149: {
+    #valid: {
+      name!: ((=~"^Foo"|"an exception") & (=~"Foo$"|"an exception"))
+    }
+    list: [
+      ...〈1;#valid〉,
+    ]
+    list: [
+      {
+        name: "FooBarFoo"
+      },
+      {
+        name: "FooBazFoo"
+      },
+      {
+        name: "FooQuuxFoo"
+      },
+      {
+        name: "an exception"
+      },
+    ]
   }
 }

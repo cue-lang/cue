@@ -1,0 +1,13 @@
+# This tests that when there's an import and no current module,
+# fmt will still work.
+
+stdin a/x.cue
+exec cue fmt -
+
+-- a/x.cue --
+package x
+
+import "mod.com/p"
+
+x:    p.p
+-- a.cue-want --

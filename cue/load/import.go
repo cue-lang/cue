@@ -379,14 +379,24 @@ func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
 //
 // The returned directory may not exist.
 func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name string, err errors.Error) {
+	dir, name, err0 := l.absDirFromImportPath1(pos, p)
+	if err0 != nil {
+		// Any error trying to determine the package location
+		// is a PackageError.
+		err = l.errPkgf([]token.Pos{pos}, "%s", err0.Error())
+	}
+	return dir, name, err
+}
+
+func (l *loader) absDirFromImportPath1(pos token.Pos, p importPath) (absDir, name string, err error) {
 	if p == "" {
-		return "", "", errors.Newf(pos, "empty package name in import path %q", p)
+		return "", "", fmt.Errorf("empty package name in import path %q", p)
 	}
 	if l.cfg.ModuleRoot == "" {
-		return "", "", errors.Newf(pos, "cannot import %q (root undefined)", p)
+		return "", "", fmt.Errorf("cannot import %q (root undefined)", p)
 	}
 	if isStdlibPackage(string(p)) {
-		return "", "", errors.Newf(pos, "standard library import path %q cannot be imported as a CUE package", p)
+		return "", "", fmt.Errorf("standard library import path %q cannot be imported as a CUE package", p)
 	}
 	origp := p
 	// Extract the package name.
@@ -394,17 +404,15 @@ func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 	name = parts.Qualifier
 	p = importPath(parts.Unqualified().String())
 	if name == "" {
-		err = errors.Newf(pos, "empty package name in import path %q", p)
+		err = fmt.Errorf("empty package name in import path %q", p)
 	} else if strings.IndexByte(name, '.') >= 0 {
-		err = errors.Newf(pos,
-			"cannot determine package name for %q (set explicitly with ':')", p)
+		err = fmt.Errorf("cannot determine package name for %q (set explicitly with ':')", p)
 	} else if !ast.IsValidIdent(name) {
-		err = errors.Newf(pos,
-			"implied package identifier %q from import path %q is not valid", name, p)
+		err = fmt.Errorf("implied package identifier %q from import path %q is not valid", name, p)
 	}
 	if l.cfg.Registry != nil {
 		if l.pkgs == nil {
-			return "", name, errors.Newf(pos, "imports are unavailable because there is no cue.mod/module.cue file")
+			return "", name, fmt.Errorf("imports are unavailable because there is no cue.mod/module.cue file")
 		}
 		// TODO predicate registry-aware lookup on module.cue-declared CUE version?
 
@@ -413,10 +421,10 @@ func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 		// and hence it's available by that name via Pkg.
 		pkg := l.pkgs.Pkg(string(origp))
 		if pkg == nil {
-			return "", name, l.errPkgf([]token.Pos{pos}, "no dependency found for package %q", p)
+			return "", name, fmt.Errorf("no dependency found for package %q", p)
 		}
 		if err := pkg.Error(); err != nil {
-			return "", name, l.errPkgf([]token.Pos{pos}, "cannot find package %q: %v", p, err)
+			return "", name, fmt.Errorf("cannot find package %q: %v", p, err)
 		}
 		if mv := pkg.Mod(); mv.IsLocal() {
 			// It's a local package that's present inside one or both of the gen, usr or pkg
@@ -427,15 +435,15 @@ func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 		} else {
 			locs := pkg.Locations()
 			if len(locs) > 1 {
-				return "", "", l.errPkgf([]token.Pos{pos}, "package %q unexpectedly found in multiple locations", p)
+				return "", "", fmt.Errorf("package %q unexpectedly found in multiple locations", p)
 			}
 			if len(locs) == 0 {
-				return "", "", l.errPkgf([]token.Pos{pos}, "no location found for package %q", p)
+				return "", "", fmt.Errorf("no location found for package %q", p)
 			}
 			var err error
 			absDir, err = absPathForSourceLoc(locs[0])
 			if err != nil {
-				return "", name, l.errPkgf([]token.Pos{pos}, "cannot determine source directory for package %q: %v", p, err)
+				return "", name, fmt.Errorf("cannot determine source directory for package %q: %v", p, err)
 			}
 		}
 		return absDir, name, nil

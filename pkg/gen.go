@@ -48,7 +48,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	cueformat "cuelang.org/go/cue/format"
 	"cuelang.org/go/internal"
-	"cuelang.org/go/internal/core/runtime"
+	pkginternal "cuelang.org/go/pkg/internal"
 )
 
 const genFile = "pkg.go"
@@ -209,7 +209,7 @@ func (g *generator) processCUE() error {
 	// Note: we avoid using the cue/load and the cuecontext packages
 	// because they depend on the standard library which is what this
 	// command is generating - cyclic dependencies are undesirable in general.
-	ctx := newContext()
+	ctx := pkginternal.NewContext()
 	val, err := loadCUEPackage(ctx, g.dir, g.cuePkgPath)
 	if err != nil {
 		if errors.Is(err, errNoCUEFiles) {
@@ -230,7 +230,7 @@ func (g *generator) processCUE() error {
 	b = bytes.ReplaceAll(b, []byte("\n\n"), []byte("\n"))
 	// Try to use a Go string with backquotes, for readability.
 	// If not possible due to cueSrc itself having backquotes,
-	// use a single-line double quoted string, removing tabs for brevity.
+	// use a single-line double-quoted string, removing tabs for brevity.
 	// We don't use strconv.CanBackquote as it is for quoting as a single line.
 	if cueSrc := string(b); !strings.Contains(cueSrc, "`") {
 		fmt.Fprintf(g.w, "CUE: `%s`,\n", cueSrc)
@@ -243,7 +243,7 @@ func (g *generator) processCUE() error {
 
 func (g *generator) processGo(pkg *packages.Package) error {
 	// We sort the objects by their original source code position.
-	// Otherwise go/types defaults to sorting by name strings.
+	// Otherwise, go/types defaults to sorting by name strings.
 	// We could remove this code if we were fine with sorting by name.
 	scope := pkg.Types.Scope()
 	type objWithPos struct {
@@ -472,11 +472,4 @@ func loadCUEPackage(ctx *cue.Context, dir string, pkgPath string) (cue.Value, er
 		return cue.Value{}, err
 	}
 	return vals[0], nil
-}
-
-// Avoid using cuecontext.New because that package imports
-// the entire stdlib which we are generating.
-func newContext() *cue.Context {
-	r := runtime.New()
-	return (*cue.Context)(r)
 }

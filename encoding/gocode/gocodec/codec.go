@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package codec converts Go to and from CUE and validates Go values based on
+// Package gocodec converts Go to and from CUE and validates Go values based on
 // CUE constraints.
 //
 // CUE constraints can be used to validate Go types as well as fill out

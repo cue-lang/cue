@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e79746a_a1c343b3",
+        "filename": "cue/testdata/builtins/default.txtar",
+        "patchSetId": 15
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-17T13:01:36Z",
+      "side": 1,
+      "message": "this is worrying - I\u0027m not yet sure why the old evaluator does not resolve these disjunctions",
+      "range": {
+        "startLine": 85,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 25
+      },
+      "revId": "6489b44dcdcb8003614f98ed3ab7f57b03e8500d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

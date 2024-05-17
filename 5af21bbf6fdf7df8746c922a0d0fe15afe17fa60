@@ -160,6 +160,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f75e6473_52d2808d",
+        "filename": "internal/pkg/context.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-17T13:01:36Z",
+      "side": 1,
+      "message": "I added the functions and adjusted the compile builtins accordingly.\n\nThe WASM builtin implementation uses the pkg.CallCtxt to resolve values, so there was no need to modify it - although I added some tests to be sure.",
+      "parentUuid": "e6997fc5_90b0410e",
+      "revId": "5af21bbf6fdf7df8746c922a0d0fe15afe17fa60",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bd7e389b_19d22aea",

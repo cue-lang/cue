@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55bab27b_8d5e61d3",
+        "filename": "pkg/gen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-17T09:49:25Z",
+      "side": 1,
+      "message": "perhaps briefly mention in the commit message that you fix a few typos as well.",
+      "revId": "fea933ead671695c1ecdcd56e0f2faf798e379fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69d69462_e8e0974a",
+        "filename": "pkg/internal/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-17T09:49:25Z",
+      "side": 1,
+      "message": "personally I\u0027d add this to pkg/internal/internal.go, no need for a new file",
+      "revId": "fea933ead671695c1ecdcd56e0f2faf798e379fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f09d22f3_058921d8",
+        "filename": "pkg/internal/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-17T09:49:25Z",
+      "side": 1,
+      "message": "\"we are generating\" now makes less sense given that you\u0027re inside pkg/internal; how about:\n\n\u003e Some packages like pkg/... cannot use cuecontext.New due to import cycles.",
+      "revId": "fea933ead671695c1ecdcd56e0f2faf798e379fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -16,6 +16,24 @@
       "message": "Suspect you need to regen here, but trybots will confirm. So LGTM on green trybots",
       "revId": "5281b9d50085f0e34b10bc5e9339ba83288ad93c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cff2cb92_6f7010a3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-17T09:38:06Z",
+      "side": 1,
+      "message": "I keep forgetting. My mind already lives in a happy place where github and goreleaser consume the CUE directly.",
+      "parentUuid": "0ed522f9_4fb32510",
+      "revId": "5281b9d50085f0e34b10bc5e9339ba83288ad93c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

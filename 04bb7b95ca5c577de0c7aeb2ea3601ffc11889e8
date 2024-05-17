@@ -34,6 +34,24 @@
       "parentUuid": "d78f8938_b3ac4291",
       "revId": "04bb7b95ca5c577de0c7aeb2ea3601ffc11889e8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f9acf2b4_555178c9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-17T09:03:19Z",
+      "side": 1,
+      "message": "Let\u0027s got with this for now because there _must_ be an \"evaluator\" test case lower down that covers this.",
+      "parentUuid": "1db23f48_d0b51f6e",
+      "revId": "04bb7b95ca5c577de0c7aeb2ea3601ffc11889e8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

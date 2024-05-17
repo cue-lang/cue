@@ -22,6 +22,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/internal/task"
+	"cuelang.org/go/pkg/internal"
 )
 
 func TestEnv(t *testing.T) {
@@ -72,15 +73,15 @@ func TestEnv(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			var r cue.Runtime
-			inst, err := r.Compile(tc.desc, tc.val)
-			if err != nil {
+			ctx := internal.NewContext()
+			v := ctx.CompileString(tc.val, cue.Filename(tc.desc))
+			if err := v.Err(); err != nil {
 				t.Fatal(err)
 			}
 
 			cmd, _, err := mkCommand(&task.Context{
 				Context: context.Background(),
-				Obj:     inst.Value(),
+				Obj:     v,
 			})
 			if err != nil {
 				t.Fatalf("mkCommand error = %v", err)

@@ -26,6 +26,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/task"
 	"cuelang.org/go/internal/value"
+	"cuelang.org/go/pkg/internal"
 )
 
 func newTLSServer() *httptest.Server {
@@ -43,12 +44,11 @@ func parse(t *testing.T, kind, expr string) cue.Value {
 	if err != nil {
 		t.Fatal(err)
 	}
-	var r cue.Runtime
-	i, err := r.CompileExpr(x)
-	if err != nil {
+	v := internal.NewContext().BuildExpr(x)
+	if err := v.Err(); err != nil {
 		t.Fatal(err)
 	}
-	return value.UnifyBuiltin(i.Value(), kind)
+	return value.UnifyBuiltin(v, kind)
 }
 
 func TestTLS(t *testing.T) {
@@ -133,13 +133,13 @@ func TestParseHeaders(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
-			r := cue.Runtime{}
-			inst, err := r.Compile("http headers", tc.req)
-			if err != nil {
+			ctx := internal.NewContext()
+			v := ctx.CompileString(tc.req, cue.Filename("http headers"))
+			if err := v.Err(); err != nil {
 				t.Fatal(err)
 			}
 
-			h, err := parseHeaders(inst.Value(), tc.field)
+			h, err := parseHeaders(v, tc.field)
 
 			b := &strings.Builder{}
 			switch {

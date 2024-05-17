@@ -46,6 +46,30 @@
       },
       "revId": "6489b44dcdcb8003614f98ed3ab7f57b03e8500d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b003226_8ebcdfa4",
+        "filename": "cue/testdata/builtins/default.txtar",
+        "patchSetId": 15
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-17T13:13:39Z",
+      "side": 1,
+      "message": "my bad, my tests were wrong (instead of passing in a disjunction to and/or, I passed in a list of disjunctions) - my brain must have been fried from this CL",
+      "parentUuid": "e566a835_3b14bd34",
+      "range": {
+        "startLine": 85,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 25
+      },
+      "revId": "6489b44dcdcb8003614f98ed3ab7f57b03e8500d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

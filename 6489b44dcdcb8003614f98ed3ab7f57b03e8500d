@@ -22,6 +22,30 @@
       },
       "revId": "6489b44dcdcb8003614f98ed3ab7f57b03e8500d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e566a835_3b14bd34",
+        "filename": "cue/testdata/builtins/default.txtar",
+        "patchSetId": 15
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-17T13:04:47Z",
+      "side": 1,
+      "message": "nevermind, they do evaluate correctly - it\u0027s just an incorrect output, possible to do with the test framework?\n\n```\n╰─❯ CUE_EXPERIMENT\u003devalv3 go run ./cmd/cue eval test.cue                                               ─╯\nLen: 3\nClose: {}\nAnd: string\nOr:  string\nDiv: 2\nMod: 1\nQuo: 2\nRem: 1\n╭─ ~/src/cue-lang/cue change-1194425:master ⇣53⇡1 *5 ?1 ───────────────────────────────────── 16:03:28 ─╮\n╰─❯ cat test.cue                                                                                       ─╯\n_B: *string | int\n\nLen: len(*[1, 2, 3] | 0)\nClose: close(*{} | 0)\nAnd: and([_B, _B])\nOr: or([_B, _B])\nDiv: div(*5 | string, 2)\nMod: mod(*5 | string, 2)\nQuo: quo(*5 | string, 2)\nRem: rem(*5 | string, 2)\n```",
+      "parentUuid": "5e79746a_a1c343b3",
+      "range": {
+        "startLine": 85,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 25
+      },
+      "revId": "6489b44dcdcb8003614f98ed3ab7f57b03e8500d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

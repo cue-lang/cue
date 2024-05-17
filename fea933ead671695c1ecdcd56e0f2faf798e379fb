@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd0dc071_9e44cb35",
+        "filename": "pkg/gen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-17T11:29:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "55bab27b_8d5e61d3",
+      "revId": "fea933ead671695c1ecdcd56e0f2faf798e379fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "69d69462_e8e0974a",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "babd153d_68b7727c",
+        "filename": "pkg/internal/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-17T11:29:18Z",
+      "side": 1,
+      "message": "there wasn\u0027t an pkg/internal/internal.go file yet - so I renamed `context.go` -\u003e `internal.go`.",
+      "parentUuid": "69d69462_e8e0974a",
+      "revId": "fea933ead671695c1ecdcd56e0f2faf798e379fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f09d22f3_058921d8",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-05-17T09:49:25Z",
       "side": 1,
       "message": "\"we are generating\" now makes less sense given that you\u0027re inside pkg/internal; how about:\n\n\u003e Some packages like pkg/... cannot use cuecontext.New due to import cycles.",
+      "revId": "fea933ead671695c1ecdcd56e0f2faf798e379fb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc92974f_023dc984",
+        "filename": "pkg/internal/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-17T11:29:18Z",
+      "side": 1,
+      "message": "I slightly altered this suggestion so the func doc would start with NewContext",
+      "parentUuid": "f09d22f3_058921d8",
       "revId": "fea933ead671695c1ecdcd56e0f2faf798e379fb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -208,8 +208,8 @@ func TestComplete(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			r := &cue.Runtime{}
-			codec := New(r, nil)
+			ctx := cuecontext.New()
+			codec := New(ctx, nil)
 
 			v, err := codec.ExtractType(tc.value)
 			if err != nil {
@@ -217,11 +217,11 @@ func TestComplete(t *testing.T) {
 			}
 
 			if tc.constraints != "" {
-				inst, err := r.Compile(tc.name, tc.constraints)
-				if err != nil {
+				c := ctx.CompileString(tc.constraints, cue.Filename(tc.name))
+				if err := c.Err(); err != nil {
 					t.Fatal(err)
 				}
-				v = v.Unify(inst.Value())
+				v = v.Unify(c)
 			}
 
 			err = codec.Complete(v, tc.value)
@@ -243,17 +243,17 @@ func TestEncode(t *testing.T) {
 		dst:  new(int),
 		want: 4,
 	}}
-	r := &cue.Runtime{}
-	c := New(r, nil)
+	ctx := cuecontext.New()
+	c := New(ctx, nil)
 
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
-			inst, err := r.Compile("test", tc.in)
-			if err != nil {
+			in := ctx.CompileString(tc.in, cue.Filename("test"))
+			if err := in.Err(); err != nil {
 				t.Fatal(err)
 			}
 
-			err = c.Encode(inst.Value(), tc.dst)
+			err := c.Encode(in, tc.dst)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -306,7 +306,7 @@ func TestDecode(t *testing.T) {
 	}
 }`,
 	}}
-	c := New(&cue.Runtime{}, nil)
+	c := New(cuecontext.New(), nil)
 
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
@@ -336,8 +336,8 @@ func TestX(t *testing.T) {
 		wantErr     = fail
 	)
 
-	r := &cue.Runtime{}
-	codec := New(r, nil)
+	ctx := cuecontext.New()
+	codec := New(ctx, nil)
 
 	v, err := codec.ExtractType(value)
 	if err != nil {
@@ -345,12 +345,11 @@ func TestX(t *testing.T) {
 	}
 
 	if constraints != "" {
-		inst, err := r.Compile(name, constraints)
-		if err != nil {
+		c := ctx.CompileString(constraints, cue.Filename(name))
+		if err := c.Err(); err != nil {
 			t.Fatal(err)
 		}
-		w := inst.Value()
-		v = v.Unify(w)
+		v = v.Unify(c)
 	}
 
 	err = codec.Validate(v, value)

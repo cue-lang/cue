@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/task"
 	"cuelang.org/go/internal/value"
+	"cuelang.org/go/pkg/internal"
 )
 
 func parse(t *testing.T, kind, expr string) cue.Value {
@@ -34,12 +35,11 @@ func parse(t *testing.T, kind, expr string) cue.Value {
 	if err != nil {
 		t.Fatal(err)
 	}
-	var r cue.Runtime
-	i, err := r.CompileExpr(x)
-	if err != nil {
+	v := internal.NewContext().BuildExpr(x)
+	if err := v.Err(); err != nil {
 		t.Fatal(err)
 	}
-	return value.UnifyBuiltin(i.Value(), kind)
+	return value.UnifyBuiltin(v, kind)
 }
 
 func TestRead(t *testing.T) {

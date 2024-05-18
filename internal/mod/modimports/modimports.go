@@ -1,7 +1,6 @@
 package modimports
 
 import (
-	"errors"
 	"fmt"
 	"io/fs"
 	"path"
@@ -88,47 +87,49 @@ func PackageFiles(fsys fs.FS, dir string, pkgQualifier string) func(func(ModuleF
 // module at the given root.
 func AllModuleFiles(fsys fs.FS, root string) func(func(ModuleFile, error) bool) {
 	return func(yield func(ModuleFile, error) bool) {
-		fs.WalkDir(fsys, root, func(fpath string, d fs.DirEntry, err error) (_err error) {
-			if err != nil {
-				if !yield(ModuleFile{
-					FilePath: fpath,
-				}, err) {
-					return fs.SkipAll
-				}
-				return nil
-			}
-			if path.Base(fpath) == "cue.mod" {
-				return fs.SkipDir
-			}
-			if d.IsDir() {
-				if fpath == root {
-					return nil
-				}
-				base := path.Base(fpath)
-				if strings.HasPrefix(base, ".") || strings.HasPrefix(base, "_") {
-					return fs.SkipDir
-				}
-				_, err := fs.Stat(fsys, path.Join(fpath, "cue.mod"))
-				if err == nil {
-					// TODO is it enough to have a cue.mod directory
-					// or should we look for cue.mod/module.cue too?
-					return fs.SkipDir
-				}
-				if !errors.Is(err, fs.ErrNotExist) {
-					// We haven't got a package file to produce with the
-					// error here. Should we just ignore the error or produce
-					// a ModuleFile with an empty path?
-					yield(ModuleFile{}, err)
-					return fs.SkipAll
-				}
-				return nil
-			}
-			if !yieldPackageFile(fsys, fpath, "*", yield) {
-				return fs.SkipAll
-			}
-			return nil
-		})
+		yieldAllModFiles(fsys, root, true, yield)
 	}
+}
+
+// yieldAllModFiles implements AllModuleFiles by recursing into directories.
+//
+// Note that we avoid [fs.WalkDir]; it yields directory entries in lexical order,
+// so we would walk `foo/bar.cue` before walking `foo/cue.mod/` and realizing
+// that `foo/` is a nested module that we should be ignoring entirely.
+// That could be avoided via extra `fs.Stat` calls, but those would
+// Using [fs.ReadDir] directly avoids this issue, as we can loop twice.
+func yieldAllModFiles(fsys fs.FS, fpath string, topDir bool, yield func(ModuleFile, error) bool) bool {
+	entries, err := fs.ReadDir(fsys, fpath)
+	if err != nil {
+		if !yield(ModuleFile{
+			FilePath: fpath,
+		}, err) {
+			return false
+		}
+	}
+	// Skip nested submodules entirely.
+	if !topDir {
+		for _, entry := range entries {
+			if entry.Name() == "cue.mod" {
+				return true
+			}
+		}
+	}
+	for _, entry := range entries {
+		name := entry.Name()
+		fpath := path.Join(fpath, name)
+		if entry.IsDir() {
+			if name == "cue.mod" || strings.HasPrefix(name, ".") || strings.HasPrefix(name, "_") {
+				continue
+			}
+			if !yieldAllModFiles(fsys, fpath, false, yield) {
+				return false
+			}
+		} else if !yieldPackageFile(fsys, fpath, "*", yield) {
+			return false
+		}
+	}
+	return true
 }
 
 func yieldPackageFile(fsys fs.FS, fpath, pkgQualifier string, yield func(ModuleFile, error) bool) bool {

@@ -144,6 +144,12 @@ func yieldPackageFile(fsys fs.FS, fpath, pkgQualifier string, yield func(ModuleF
 		return yield(pf, err)
 	}
 	defer f.Close()
+
+	// Note that we use cueimports.Read before parser.ParseFile as cue/parser
+	// will always consume the whole input reader, which is often wasteful.
+	//
+	// TODO(mvdan): the need for cueimports.Read can go once cue/parser can work
+	// on a reader in a streaming manner.
 	data, err := cueimports.Read(f)
 	if err != nil {
 		return yield(pf, err)
@@ -152,6 +158,7 @@ func yieldPackageFile(fsys fs.FS, fpath, pkgQualifier string, yield func(ModuleF
 	if err != nil {
 		return yield(pf, err)
 	}
+
 	if pkgQualifier != "*" && syntax.PackageName() != pkgQualifier {
 		return true
 	}

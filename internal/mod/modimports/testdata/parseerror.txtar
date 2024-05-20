@@ -1,6 +1,27 @@
 -- want --
-x.cue: error: expected label or ':', found 'IDENT' contents
+badsyntax_after_package.cue
+badsyntax_imports.cue: error: string literal not terminated
+badsyntax_lone.cue
+imports_no_package.cue "dep1"
+no_package.cue
 -- want-imports --
-error: cannot read "x.cue": expected label or ':', found 'IDENT' contents
--- x.cue --
-bogus contents
+error: cannot read "badsyntax_imports.cue": string literal not terminated
+-- no_package.cue --
+// Note that a CUE file does not need a package clause.
+
+foo: "bar"
+-- imports_no_package.cue --
+// Note that a CUE file can use imports without a package clause.
+
+import "dep1"
+-- badsyntax_imports.cue --
+import "dep2
+-- badsyntax_lone.cue --
+// Note that some forms of invalid syntax are OK with parser.ImportsOnly
+// as it can stop as soon as it knows there are no more imports.
+
+(unterminated
+-- badsyntax_after_package.cue --
+package p
+
+(unterminated

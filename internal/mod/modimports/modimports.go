@@ -10,7 +10,6 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/internal/cueimports"
 	"cuelang.org/go/mod/module"
 )
 
@@ -144,11 +143,7 @@ func yieldPackageFile(fsys fs.FS, fpath, pkgQualifier string, yield func(ModuleF
 		return yield(pf, err)
 	}
 	defer f.Close()
-	data, err := cueimports.Read(f)
-	if err != nil {
-		return yield(pf, err)
-	}
-	syntax, err := parser.ParseFile(fpath, data, parser.ParseComments)
+	syntax, err := parser.ParseFile(fpath, f, parser.ImportsOnly)
 	if err != nil {
 		return yield(pf, err)
 	}

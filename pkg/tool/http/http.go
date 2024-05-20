@@ -47,8 +47,8 @@ func (c *httpCmd) Run(ctx *task.Context) (res interface{}, err error) {
 		u      = ctx.String("url")
 	)
 	var r io.Reader
-	if obj := ctx.Obj.Lookup("request"); obj.Exists() {
-		if v := obj.Lookup("body"); v.Exists() {
+	if obj := ctx.Obj.LookupPath(cue.MakePath(cue.Str("request"))); obj.Exists() {
+		if v := obj.LookupPath(cue.MakePath(cue.Str("body"))); v.Exists() {
 			r, err = v.Reader()
 			if err != nil {
 				return nil, err
@@ -143,7 +143,7 @@ func (c *httpCmd) Run(ctx *task.Context) (res interface{}, err error) {
 }
 
 func parseHeaders(obj cue.Value, label string) (http.Header, error) {
-	m := obj.Lookup(label)
+	m := obj.LookupPath(cue.MakePath(cue.Str(label)))
 	if !m.Exists() {
 		return nil, nil
 	}

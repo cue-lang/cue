@@ -170,20 +170,23 @@ func TestFlowValuePanic(t *testing.T) {
 }
 
 func taskFunc(v cue.Value) (flow.Runner, error) {
-	switch name, err := v.Lookup("$id").String(); name {
+	idPath := cue.MakePath(cue.Str("$id"))
+	valPath := cue.MakePath(cue.Str("val"))
+
+	switch name, err := v.LookupPath(idPath).String(); name {
 	default:
 		if err == nil {
 			return flow.RunnerFunc(func(t *flow.Task) error {
 				t.Fill(map[string]string{"stdout": "foo"})
 				return nil
 			}), nil
-		} else if v.LookupPath(cue.MakePath(cue.Str("$id"))).Exists() {
+		} else if v.LookupPath(idPath).Exists() {
 			return nil, err
 		}
 
 	case "valToOut":
 		return flow.RunnerFunc(func(t *flow.Task) error {
-			if str, err := t.Value().Lookup("val").String(); err == nil {
+			if str, err := t.Value().LookupPath(valPath).String(); err == nil {
 				t.Fill(map[string]string{"out": str})
 			}
 			return nil
@@ -216,14 +219,14 @@ func taskFunc(v cue.Value) (flow.Runner, error) {
 		// This task is used to serialize different runners in case
 		// non-deterministic scheduling is possible.
 		return flow.RunnerFunc(func(t *flow.Task) error {
-			seq, err := t.Value().Lookup("seq").Int64()
+			seq, err := t.Value().LookupPath(cue.MakePath(cue.Str("seq"))).Int64()
 			if err != nil {
 				return err
 			}
 
 			waitSeqNum(seq)
 
-			if str, err := t.Value().Lookup("val").String(); err == nil {
+			if str, err := t.Value().LookupPath(valPath).String(); err == nil {
 				t.Fill(map[string]string{"out": str})
 			}
 

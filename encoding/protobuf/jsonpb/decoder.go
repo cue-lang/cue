@@ -18,6 +18,8 @@ import (
 	"encoding/base64"
 	"strings"
 
+	"github.com/cockroachdb/apd/v3"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
@@ -25,7 +27,6 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/protobuf/pbinternal"
-	"github.com/cockroachdb/apd/v3"
 )
 
 // Option is an option.
@@ -77,7 +78,7 @@ func NewDecoder(schema cue.Value, options ...Option) *Decoder {
 // according to the protocol buffer to JSON mapping defined in the protocol
 // buffer spec.
 //
-// RewriteFile is idempotent, calling it multiples times on an expression gives
+// RewriteFile is idempotent, calling it multiple times on an expression gives
 // the same result.
 func (d *Decoder) RewriteFile(file *ast.File) error {
 	var r rewriter

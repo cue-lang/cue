@@ -99,7 +99,7 @@ func (c *environCmd) Run(ctx *task.Context) (res interface{}, err error) {
 
 	for _, kv := range os.Environ() {
 		name, str, _ := strings.Cut(kv, "=")
-		if v := ctx.Obj.Lookup(name); v.Exists() {
+		if v := ctx.Obj.LookupPath(cue.MakePath(cue.Str(name))); v.Exists() {
 			update[name], err = fromString(name, str, v)
 			if err != nil {
 				return nil, err

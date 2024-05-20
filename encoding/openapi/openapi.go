@@ -165,8 +165,8 @@ func (c *Config) compose(inst cue.InstanceOrValue, schemas *ast.StructLit) (x *a
 				errs = errors.Append(errs, errors.Newf(i.Value().Pos(),
 					"info must be a struct"))
 			}
-			title, _ = i.Value().Lookup("title").String()
-			version, _ = i.Value().Lookup("version").String()
+			title, _ = i.Value().LookupPath(cue.MakePath(cue.Str("title"))).String()
+			version, _ = i.Value().LookupPath(cue.MakePath(cue.Str("version"))).String()
 
 		default:
 			errs = errors.Append(errs, errors.Newf(i.Value().Pos(),
@@ -186,7 +186,7 @@ func (c *Config) compose(inst cue.InstanceOrValue, schemas *ast.StructLit) (x *a
 		}
 
 		if version == "" {
-			version, _ = val.Lookup("$version").String()
+			version, _ = val.LookupPath(cue.MakePath(cue.Str("$version"))).String()
 			if version == "" {
 				version = "no version"
 			}

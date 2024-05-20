@@ -51,8 +51,8 @@ func Extract(data cue.InstanceOrValue, c *Config) (*ast.File, error) {
 
 	v := data.Value()
 
-	doc, _ := v.Lookup("info", "title").String() // Required
-	if s, _ := v.Lookup("info", "description").String(); s != "" {
+	doc, _ := v.LookupPath(cue.MakePath(cue.Str("info"), cue.Str("title"))).String() // Required
+	if s, _ := v.LookupPath(cue.MakePath(cue.Str("info"), cue.Str("description"))).String(); s != "" {
 		doc += "\n\n" + s
 	}
 	cg := internal.NewComment(true, doc)
@@ -84,7 +84,7 @@ func Extract(data cue.InstanceOrValue, c *Config) (*ast.File, error) {
 	// 	add(internal.NewAttr("openapi", "version="+ version))
 	// }
 
-	if info := v.Lookup("info"); info.Exists() {
+	if info := v.LookupPath(cue.MakePath(cue.Str("info"))); info.Exists() {
 		decls := []interface{}{}
 		if st, ok := info.Syntax().(*ast.StructLit); ok {
 			// Remove title.

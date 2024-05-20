@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc5d9b2d_3a11beb4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-20T07:45:32Z",
+      "side": 1,
+      "message": "Got it, I wasn\u0027t sure which function is considered more idiomatic - MakePath definitely makes more sense to me.",
+      "parentUuid": "51f2823e_dbea1387",
+      "revId": "cd6fa8161fe7acf66e0705d79d116c33b977756e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cda88729_5cfccc00",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "94a276a4_d1930c39",
+        "filename": "encoding/openapi/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-20T07:45:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cda88729_5cfccc00",
+      "revId": "cd6fa8161fe7acf66e0705d79d116c33b977756e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9287ad65_edd018e3",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-05-20T07:37:26Z",
       "side": 1,
       "message": "nit: MakePath",
+      "revId": "cd6fa8161fe7acf66e0705d79d116c33b977756e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "27d6a640_2603c9a5",
+        "filename": "encoding/openapi/openapi.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-05-20T07:45:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9287ad65_edd018e3",
       "revId": "cd6fa8161fe7acf66e0705d79d116c33b977756e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,0 +1,20 @@
+-- want --
+imports_no_package.cue "dep1"
+no_package.cue
+-- want-imports --
+dep1
+-- no_package.cue --
+// Valid syntax without a package clause.
+
+foo: "bar"
+-- imports_no_package.cue --
+// Valid syntax with an import but without a package clause.
+//
+// TODO(mvdan): should we collect imports from files without a package clause?
+// On one hand cue/load with Config.Package "*" loads files without package as the package "_",
+// but on the other, Go skips over `//go:build ignore` files in e.g. `go mod tidy`,
+// and perhaps we consider no-package files to be a de facto "ignored from any package".
+
+import "dep1"
+
+foo: "bar"

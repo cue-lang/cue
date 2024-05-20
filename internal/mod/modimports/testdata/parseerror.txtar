@@ -1,6 +1,50 @@
 -- want --
-x.cue: error: expected label or ':', found 'IDENT' contents
+bad_after_import.cue: error: expected ')', found newline
+bad_after_package.cue
+bad_after_package_import.cue "dep4"
+bad_imports.cue: error: string literal not terminated
+bad_lone.cue: error: expected ')', found newline
+bad_package_imports.cue: error: string literal not terminated
 -- want-imports --
-error: cannot read "x.cue": expected label or ':', found 'IDENT' contents
--- x.cue --
-bogus contents
+error: cannot read "bad_after_import.cue": expected ')', found newline
+-- bad_imports.cue --
+// Invalid import syntax without a package clause.
+
+import "dep1
+
+-- bad_package_imports.cue --
+// Invalid import syntax with a package clause; should fail.
+
+package p
+
+import "dep2
+
+-- bad_lone.cue --
+// Invalid syntax without a package clause, assumed to be after imports.
+// TODO(mvdan): just like bad_after_package.cue, this shouldn't fail.
+
+(unterminated
+
+-- bad_after_package.cue --
+// Invalid syntax with a package clause, assumed to be after imports.
+
+package p
+
+(unterminated
+
+-- bad_after_import.cue --
+// Invalid syntax after some imports without a package clause.
+// TODO(mvdan): just like bad_after_package_import.cue, this shouldn't fail.
+
+import "dep3"
+
+(unterminated
+
+-- bad_after_package_import.cue --
+// Invalid syntax after some imports with a package clause.
+
+package p
+
+import "dep4"
+
+(unterminated

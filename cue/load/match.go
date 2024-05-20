@@ -21,6 +21,7 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/cueimports"
 )
 
 // A match represents the result of matching a single package pattern.
@@ -74,7 +75,7 @@ func matchFile(cfg *Config, file *build.File, returnImports bool, allTags map[st
 		return false, nil, err
 	}
 
-	data, err = readImports(f, false, nil)
+	data, err = cueimports.Read(f)
 	f.Close()
 	if err != nil {
 		return false, nil,

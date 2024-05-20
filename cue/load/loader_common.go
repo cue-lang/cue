@@ -211,7 +211,7 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 		return false
 	}
 
-	pf, perr := parser.ParseFile(fullPath, data, parser.ImportsOnly, parser.ParseComments)
+	pf, perr := parser.ParseFile(fullPath, data, parser.ImportsOnly)
 	if perr != nil {
 		badFile(errors.Promote(perr, "add failed"))
 		return true

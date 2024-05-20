@@ -154,7 +154,7 @@ func yieldPackageFile(fsys fs.FS, fpath, pkgQualifier string, yield func(ModuleF
 	if err != nil {
 		return yield(pf, err)
 	}
-	syntax, err := parser.ParseFile(fpath, data, parser.ParseComments)
+	syntax, err := parser.ParseFile(fpath, data, parser.ImportsOnly)
 	if err != nil {
 		return yield(pf, err)
 	}

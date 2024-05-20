@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "51f2823e_dbea1387",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-20T07:37:26Z",
+      "side": 1,
+      "message": "SGTM but please use MakePath consistently - I know it\u0027s more verbose but that\u0027s a UX problem we need to fix, using ParsePath everywhere in the code isn\u0027t the solution IMHO",
+      "revId": "cd6fa8161fe7acf66e0705d79d116c33b977756e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cda88729_5cfccc00",
+        "filename": "encoding/openapi/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-20T07:37:26Z",
+      "side": 1,
+      "message": "nit: use MakePath for consistency, even though I know it\u0027s more verbose",
+      "revId": "cd6fa8161fe7acf66e0705d79d116c33b977756e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9287ad65_edd018e3",
+        "filename": "encoding/openapi/openapi.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-20T07:37:26Z",
+      "side": 1,
+      "message": "nit: MakePath",
+      "revId": "cd6fa8161fe7acf66e0705d79d116c33b977756e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

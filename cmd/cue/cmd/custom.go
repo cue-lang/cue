@@ -43,7 +43,7 @@ import (
 const commandSection = "command"
 
 func lookupString(obj cue.Value, key, def string) string {
-	str, err := obj.Lookup(key).String()
+	str, err := obj.LookupPath(cue.MakePath(cue.Str(key))).String()
 	if err == nil {
 		def = str
 	}

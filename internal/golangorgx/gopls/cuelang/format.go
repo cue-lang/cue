@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package golang defines the LSP features for navigation, analysis,
-// and refactoring of Go source code.
 package cuelang
 
 import (

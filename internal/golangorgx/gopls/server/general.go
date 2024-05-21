@@ -107,6 +107,7 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 
 	return &protocol.InitializeResult{
 		Capabilities: protocol.ServerCapabilities{
+			DefinitionProvider:         &protocol.Or_ServerCapabilities_definitionProvider{Value: true},
 			DocumentFormattingProvider: &protocol.Or_ServerCapabilities_documentFormattingProvider{Value: true},
 			TextDocumentSync: &protocol.TextDocumentSyncOptions{
 				Change:    protocol.Incremental,

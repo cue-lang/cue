@@ -713,7 +713,7 @@ func (s *Session) DidModifyFiles(ctx context.Context, modifications []file.Modif
 	// This is done while holding viewMu because the set of open files affects
 	// the set of views, and to prevent views from seeing updated file content
 	// before they have processed invalidations.
-	replaced, err := s.updateOverlays(ctx, modifications)
+	_, err := s.updateOverlays(ctx, modifications)
 	if err != nil {
 		return nil, err
 	}
@@ -733,42 +733,18 @@ func (s *Session) DidModifyFiles(ctx context.Context, modifications []file.Modif
 			checkViews = true
 		}
 
-		// Any on-disk change to a go.work or go.mod file causes recomputing views.
-		//
-		// TODO(rfindley): go.work files need not be named "go.work" -- we need to
-		// check each view's source to handle the case of an explicit GOWORK value.
-		// Write a test that fails, and fix this.
-		if (isGoWork(c.URI) || isGoMod(c.URI)) && (c.Action == file.Save || c.OnDisk) {
-			checkViews = true
-		}
+		// TODO: add logic here which triggers checking the view in case a
+		// cue.mod/module.cue file changes (in any way).
 
-		// Any change to the set of supported ports in a file may affect view
-		// selection. This is perhaps more subtle than it first seems: since the
-		// algorithm for selecting views considers open files in a deterministic
-		// order, a change in supported ports may cause a different port to be
-		// chosen, even if all open files still match an existing View!
-		//
-		// We endeavor to avoid that sort of path dependence, so must re-run the
-		// view selection algorithm whenever any input changes.
-		//
-		// However, extracting the build comment is nontrivial, so we don't want to
-		// pay this cost when e.g. processing a bunch of on-disk changes due to a
-		// branch change. Be careful to only do this if both files are open Go
-		// files.
-		if old, ok := replaced[c.URI]; ok && !checkViews && fileKind(fh) == file.Go {
-			if new, ok := fh.(*overlay); ok {
-				if buildComment(old.content) != buildComment(new.content) {
-					checkViews = true
-				}
-			}
-		}
+		// TODO: add logic around the change of build constraints (@if
+		// directives).
 	}
 
 	if checkViews {
-		// Hack: collect folders from existing views.
-		// TODO(golang/go#57979): we really should track folders independent of
-		// Views, but since we always have a default View for each folder, this
-		// works for now.
+		// TODO: there was a comment here relating to maintaing folders independent of
+		// Views. Revisit that when we come to refine the logic for maintaining
+		// WorkspaceFolders vs Views.
+
 		var folders []*Folder // preserve folder order
 		seen := make(map[*Folder]unit)
 		for _, v := range s.views {

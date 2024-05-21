@@ -54,10 +54,8 @@ type set[TC any] struct {
 	t *testing.T
 
 	table []TC
-	toRun []int
 
 	updateEnabled bool
-	file          string
 	info          *info
 }
 

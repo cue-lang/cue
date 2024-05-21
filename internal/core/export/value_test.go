@@ -44,6 +44,7 @@ if false {
 	@step(4c)
 }
 `
+	var _ = debugValue // avoid "unused const" warnings
 
 	test := cuetxtar.TxTarTest{
 		Root:   "./testdata/main",

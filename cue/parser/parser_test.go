@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/internal/astinternal"
 )
 
 func TestParse(t *testing.T) {
@@ -685,7 +686,7 @@ bar: 2
 				mode = append(mode, ParseFuncs)
 			}
 			f, err := ParseFile("input", tc.in, mode...)
-			got := debugStr(f)
+			got := astinternal.DebugStr(f)
 			if err != nil {
 				got += "\n" + err.Error()
 			}
@@ -858,7 +859,7 @@ func TestIncompleteSelection(t *testing.T) {
 				return true
 			}, nil)
 			if sel == nil {
-				t.Fatalf("found no *SelectorExpr: %#v %s", f.Decls[0], debugStr(f))
+				t.Fatalf("found no *SelectorExpr: %#v %s", f.Decls[0], astinternal.DebugStr(f))
 			}
 			const wantSel = "&{fmt _ {<nil>} {{}}}"
 			if fmt.Sprint(sel) != wantSel {
@@ -877,5 +878,5 @@ func TestX(t *testing.T) {
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
-	t.Error(debugStr(f))
+	t.Error(astinternal.DebugStr(f))
 }

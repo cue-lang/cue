@@ -505,6 +505,26 @@ issue3149: {
 		{name: "an exception"},
 	]
 }
+-- issue770.cue --
+issue770: {
+	#A: {
+		v: "a" | "b" | "c"
+	}
+	h: [string]: #A
+	h: a: {
+		v: *"a" | string
+	}
+	h: [=~"^b"]: {
+		v: *h.a.v | string
+	}
+	h: [=~"^c"]: {
+		v: *h.b.v | string
+	}
+	h: b:   _
+	h: boo: _
+	h: c:   _
+	h: coo: _
+}
 -- out/evalalpha --
 (struct){
   disambiguateClosed: (struct){
@@ -1441,6 +1461,28 @@ issue3149: {
       }
     }
   }
+  issue770: (struct){
+    #A: (#struct){
+      v: (string){ |((string){ "a" }, (string){ "b" }, (string){ "c" }) }
+    }
+    h: (struct){
+      a: (#struct){
+        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+      }
+      b: (#struct){
+        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+      }
+      boo: (#struct){
+        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+      }
+      c: (#struct){
+        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+      }
+      coo: (#struct){
+        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+      }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -2279,16 +2321,29 @@ diff old new
        }
      }
    }
+@@ -1078,10 +948,10 @@
+         v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+       }
+       c: (#struct){
+-        v: (string){ |(*(string){ "a" }, *(string){ "b" }, *(string){ "c" }) }
++        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+       }
+       coo: (#struct){
+-        v: (string){ |(*(string){ "a" }, *(string){ "b" }, *(string){ "c" }) }
++        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+       }
+     }
+   }
 -- out/eval/stats --
 Leaks:  4
-Freed:  2403
-Reused: 2387
+Freed:  2554
+Reused: 2538
 Allocs: 20
 Retain: 115
 
-Unifications: 1278
-Conjuncts:    3512
-Disjuncts:    2518
+Unifications: 1292
+Conjuncts:    3726
+Disjuncts:    2669
 -- diff/todo/p1 --
 issue2263.full: missing elimination, may be lack of closeContext
 -- diff/todo/p2 --
@@ -2302,6 +2357,7 @@ issue2209.simplified.t3: new evaluator fixes known bug.
 preserveClosedness.medium.p*: discarding of default is correct.
 issue1417: new evaluator fixes known bug
 issue3149: new evaluator fixes known bug
+issue770: new evaluator fixes a bug in "c" and "coo" where defaults did not apply correctly.
 -- out/eval --
 Errors:
 issue1417.ids.2: 2 errors in empty disjunction:
@@ -3368,6 +3424,28 @@ Result:
       }
     }
   }
+  issue770: (struct){
+    #A: (#struct){
+      v: (string){ |((string){ "a" }, (string){ "b" }, (string){ "c" }) }
+    }
+    h: (struct){
+      a: (#struct){
+        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+      }
+      b: (#struct){
+        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+      }
+      boo: (#struct){
+        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+      }
+      c: (#struct){
+        v: (string){ |(*(string){ "a" }, *(string){ "b" }, *(string){ "c" }) }
+      }
+      coo: (#struct){
+        v: (string){ |(*(string){ "a" }, *(string){ "b" }, *(string){ "c" }) }
+      }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -4430,5 +4508,43 @@ Result:
         name: "an exception"
       },
     ]
+  }
+}
+--- issue770.cue
+{
+  issue770: {
+    #A: {
+      v: ("a"|"b"|"c")
+    }
+    h: {
+      [string]: 〈1;#A〉
+    }
+    h: {
+      a: {
+        v: (*"a"|string)
+      }
+    }
+    h: {
+      [=~"^b"]: {
+        v: (*〈2;h〉.a.v|string)
+      }
+    }
+    h: {
+      [=~"^c"]: {
+        v: (*〈2;h〉.b.v|string)
+      }
+    }
+    h: {
+      b: _
+    }
+    h: {
+      boo: _
+    }
+    h: {
+      c: _
+    }
+    h: {
+      coo: _
+    }
   }
 }

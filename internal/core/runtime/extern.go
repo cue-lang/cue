@@ -100,7 +100,6 @@ type externDecorator struct {
 }
 
 type fieldInfo struct {
-	file     *ast.File
 	extern   string
 	funcName string
 	attrBody string

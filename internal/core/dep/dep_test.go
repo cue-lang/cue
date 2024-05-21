@@ -33,8 +33,6 @@ import (
 	"cuelang.org/go/internal/value"
 )
 
-type visitFunc func(*adt.OpContext, *adt.ImportReference, *adt.Vertex, dep.VisitFunc) error
-
 func TestVisit(t *testing.T) {
 	test := cuetxtar.TxTarTest{
 		Root:   "./testdata",

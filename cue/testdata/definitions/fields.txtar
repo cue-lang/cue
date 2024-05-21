@@ -187,16 +187,37 @@ err: t8: {
 	V: #S
 	V: { c: e:  1 } // Should fail
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  194
-Reused: 184
-Allocs: 10
-Retain: 14
+-- issue1830.cue --
+issue1830: {
+	#x: {
+		y: {
+			z?: {
+				name: string
+			}
+		}
+	}
 
-Unifications: 194
-Conjuncts:    353
-Disjuncts:    208
+	egs: {
+		x1: (#x & {y: z: _}).y.z & {
+			name: "blah"
+			age1: 5
+		}
+		x2: (#x.y & {z: _}).z & {
+			name: "blah"
+			age2: 5
+		}
+	}
+}
+-- out/eval/stats --
+Leaks:  3
+Freed:  210
+Reused: 203
+Allocs: 10
+Retain: 19
+
+Unifications: 213
+Conjuncts:    388
+Disjuncts:    229
 -- out/evalalpha --
 Errors:
 err.t2.V.c.e: field not allowed:
@@ -226,6 +247,12 @@ err.t3.p1.a.c: field not allowed:
 err.t7.a.b: field not allowed:
     ./in.cue:177:5
     ./in.cue:178:5
+issue1830.egs.x1.age1: field not allowed:
+    ./issue1830.cue:11:7
+    ./issue1830.cue:13:4
+issue1830.egs.x2.age2: field not allowed:
+    ./issue1830.cue:15:7
+    ./issue1830.cue:17:4
 
 Result:
 (_|_){
@@ -631,12 +658,43 @@ Result:
       }
     }
   }
+  issue1830: (_|_){
+    // [eval]
+    #x: (#struct){
+      y: (#struct){
+        z?: (#struct){
+          name: (string){ string }
+        }
+      }
+    }
+    egs: (_|_){
+      // [eval]
+      x1: (_|_){
+        // [eval]
+        name: (string){ "blah" }
+        age1: (_|_){
+          // [eval] issue1830.egs.x1.age1: field not allowed:
+          //     ./issue1830.cue:11:7
+          //     ./issue1830.cue:13:4
+        }
+      }
+      x2: (_|_){
+        // [eval]
+        name: (string){ "blah" }
+        age2: (_|_){
+          // [eval] issue1830.egs.x2.age2: field not allowed:
+          //     ./issue1830.cue:15:7
+          //     ./issue1830.cue:17:4
+        }
+      }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,60 +1,31 @@
+@@ -1,60 +1,37 @@
  Errors:
 -err.t1.a.disallowed: field not allowed:
 -    ./in.cue:128:10
@@ -706,10 +764,16 @@ diff old new
 +err.t7.a.b: field not allowed:
 +    ./in.cue:177:5
 +    ./in.cue:178:5
++issue1830.egs.x1.age1: field not allowed:
++    ./issue1830.cue:11:7
++    ./issue1830.cue:13:4
++issue1830.egs.x2.age2: field not allowed:
++    ./issue1830.cue:15:7
++    ./issue1830.cue:17:4
  
  Result:
  (_|_){
-@@ -63,7 +34,7 @@
+@@ -63,7 +40,7 @@
      // [eval]
      t1: (struct){
        c: (#list){
@@ -718,7 +782,7 @@ diff old new
            b: (int){ int }
          }
        }
-@@ -72,7 +43,7 @@
+@@ -72,7 +49,7 @@
      }
      t2: (struct){
        #A: (_){ _ }
@@ -727,7 +791,7 @@ diff old new
          f: (string){ "hi" }
        }
      }
-@@ -102,11 +73,11 @@
+@@ -102,11 +79,11 @@
          }
        }
        W: (#struct){
@@ -744,7 +808,7 @@ diff old new
          }
        }
      }
-@@ -120,10 +91,7 @@
+@@ -120,10 +97,7 @@
          // [eval]
          c: (_|_){
            // [eval] ok.t5.x.c: field not allowed:
@@ -755,7 +819,7 @@ diff old new
            //     ./in.cue:41:5
          }
        }
-@@ -179,7 +147,7 @@
+@@ -179,7 +153,7 @@
      }
      t9: (struct){
        c: (#list){
@@ -764,7 +828,7 @@ diff old new
            b: (int){ int }
          }
        }
-@@ -188,7 +156,7 @@
+@@ -188,7 +162,7 @@
      }
      t10: (struct){
        #A: (_){ _ }
@@ -773,7 +837,7 @@ diff old new
          f: (string){ "hi" }
        }
      }
-@@ -218,11 +186,11 @@
+@@ -218,11 +192,11 @@
          }
        }
        W: (#struct){
@@ -790,7 +854,7 @@ diff old new
          }
        }
      }
-@@ -236,10 +204,7 @@
+@@ -236,10 +210,7 @@
          // [eval]
          c: (_|_){
            // [eval] ok.t13.x.c: field not allowed:
@@ -801,7 +865,7 @@ diff old new
            //     ./in.cue:112:5
          }
        }
-@@ -263,13 +228,12 @@
+@@ -263,13 +234,12 @@
        }
        a: (_|_){
          // [eval]
@@ -816,7 +880,7 @@ diff old new
        }
      }
      t2: (_|_){
-@@ -283,14 +247,11 @@
+@@ -283,14 +253,11 @@
          // [eval]
          c: (_|_){
            // [eval]
@@ -832,7 +896,7 @@ diff old new
          }
        }
      }
-@@ -304,7 +265,6 @@
+@@ -304,7 +271,6 @@
            // [eval]
            c: (_|_){
              // [eval] err.t3.p1.a.c: field not allowed:
@@ -840,7 +904,7 @@ diff old new
              //     ./in.cue:141:5
              //     ./in.cue:142:5
            }
-@@ -322,8 +282,6 @@
+@@ -322,8 +288,6 @@
              // [eval]
              c: (_|_){
                // [eval] err.t3.p2.a.b.c: field not allowed:
@@ -849,7 +913,7 @@ diff old new
                //     ./in.cue:148:8
              }
            }
-@@ -336,54 +294,47 @@
+@@ -336,54 +300,47 @@
          // [eval]
          b: (_|_){
            // [eval]
@@ -937,7 +1001,7 @@ diff old new
          }
        }
      }
-@@ -433,17 +384,12 @@
+@@ -433,17 +390,12 @@
                // [eval]
                e: (_|_){
                  // [eval]
@@ -957,7 +1021,7 @@ diff old new
                }
              }
            }
-@@ -457,13 +403,12 @@
+@@ -457,13 +409,12 @@
        }
        a: (_|_){
          // [eval]
@@ -972,7 +1036,7 @@ diff old new
        }
      }
      t8: (_|_){
-@@ -477,14 +422,11 @@
+@@ -477,19 +428,17 @@
          // [eval]
          c: (_|_){
            // [eval]
@@ -984,10 +1048,55 @@ diff old new
 -            //     ./in.cue:184:5
              //     ./in.cue:185:10
            }
+-        }
+-      }
+-    }
+-  }
+-  issue1830: (struct){
 +          d: (int){ 1 }
++        }
++      }
++    }
++  }
++  issue1830: (_|_){
++    // [eval]
+     #x: (#struct){
+       y: (#struct){
+         z?: (#struct){
+@@ -497,14 +446,25 @@
          }
        }
      }
+-    egs: (struct){
+-      x1: (struct){
+-        name: (string){ "blah" }
+-        age1: (int){ 5 }
+-      }
+-      x2: (struct){
+-        name: (string){ "blah" }
+-        age2: (int){ 5 }
++    egs: (_|_){
++      // [eval]
++      x1: (_|_){
++        // [eval]
++        name: (string){ "blah" }
++        age1: (_|_){
++          // [eval] issue1830.egs.x1.age1: field not allowed:
++          //     ./issue1830.cue:11:7
++          //     ./issue1830.cue:13:4
++        }
++      }
++      x2: (_|_){
++        // [eval]
++        name: (string){ "blah" }
++        age2: (_|_){
++          // [eval] issue1830.egs.x2.age2: field not allowed:
++          //     ./issue1830.cue:15:7
++          //     ./issue1830.cue:17:4
++        }
+       }
+     }
+   }
 -- diff/todo/p2 --
 ok.t1.c.0: closedness probably incorrect: #R defines elements as type "top",
 which are not closed by definition. Probably does not matter for evaluation,
@@ -999,6 +1108,7 @@ evaluation semantics.
 all: error positions and reordering.
 -- diff/explanation --
 ok.t5 and ok.t13 retain semantics of v0.6 for now.
+issue1830: the new evaluator correctly rejects inserting new fields in a closed struct
 -- out/eval --
 Errors:
 err.t1.a.disallowed: field not allowed:
@@ -1491,6 +1601,25 @@ Result:
       }
     }
   }
+  issue1830: (struct){
+    #x: (#struct){
+      y: (#struct){
+        z?: (#struct){
+          name: (string){ string }
+        }
+      }
+    }
+    egs: (struct){
+      x1: (struct){
+        name: (string){ "blah" }
+        age1: (int){ 5 }
+      }
+      x2: (struct){
+        name: (string){ "blah" }
+        age2: (int){ 5 }
+      }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -1875,6 +2004,34 @@ Result:
           e: 1
         }
       }
+    }
+  }
+}
+--- issue1830.cue
+{
+  issue1830: {
+    #x: {
+      y: {
+        z?: {
+          name: string
+        }
+      }
+    }
+    egs: {
+      x1: ((〈1;#x〉 & {
+        y: {
+          z: _
+        }
+      }).y.z & {
+        name: "blah"
+        age1: 5
+      })
+      x2: ((〈1;#x〉.y & {
+        z: _
+      }).z & {
+        name: "blah"
+        age2: 5
+      })
     }
   }
 }

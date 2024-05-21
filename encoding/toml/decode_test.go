@@ -64,7 +64,7 @@ func TestDecoder(t *testing.T) {
 			key: "value"
 		`,
 	}, {
-		name: "RootKeysMany",
+		name: "RootMultiple",
 		input: `
 			key1 = "value1"
 			key2 = "value2"
@@ -307,11 +307,13 @@ line two.\
 	}, {
 		name: "InlineTables",
 		input: `
+			empty  = {}
 			point  = {x = 1, y = 2}
 			animal = {type.name = "pug"}
 			deep   = {l1 = {l2 = {l3 = "leaf"}}}
 		`,
 		wantCUE: `
+			empty:  {}
 			point:  {x: 1, y: 2}
 			animal: {type: name: "pug"}
 			deep:   {l1: {l2: {l3: "leaf"}}}
@@ -342,6 +344,370 @@ line two.\
 			struct2: {sibling: "leaf"}
 			arrays: [{sibling: "leaf"}, {sibling: "leaf"}]
 		`,
+	}, {
+		name: "TablesEmpty",
+		input: `
+			[foo]
+			[bar]
+		`,
+		wantCUE: `
+			foo: {}
+			bar: {}
+		`,
+	}, {
+		name: "TablesOne",
+		input: `
+			[foo]
+			single = "single"
+		`,
+		wantCUE: `
+			foo: {
+				single: "single"
+			}
+		`,
+	}, {
+		name: "TablesMultiple",
+		input: `
+			root1 = "root1 value"
+			root2 = "root2 value"
+			[foo]
+			foo1 = "foo1 value"
+			foo2 = "foo2 value"
+			[bar]
+			bar1 = "bar1 value"
+			bar2 = "bar2 value"
+		`,
+		wantCUE: `
+			root1: "root1 value"
+			root2: "root2 value"
+			foo: {
+				foo1: "foo1 value"
+				foo2: "foo2 value"
+			}
+			bar: {
+				bar1: "bar1 value"
+				bar2: "bar2 value"
+			}
+		`,
+	}, {
+		// A lot of these edge cases are covered by RootKeys tests already.
+		name: "TablesKeysComplex",
+		input: `
+			[foo.bar . "baz.zzz zzz"]
+			one = "1"
+			[123-456]
+			two = "2"
+		`,
+		wantCUE: `
+			foo: bar: "baz.zzz zzz": {
+				one: "1"
+			}
+			"123-456": {
+				two: "2"
+			}
+		`,
+	}, {
+		name: "TableKeysDuplicateSimple",
+		input: `
+			[foo]
+			[foo]
+		`,
+		wantErr: `duplicate key: foo`,
+	}, {
+		name: "TableKeysDuplicateOverlap",
+		input: `
+			[foo]
+			bar = "leaf"
+			[foo.bar]
+			baz = "second leaf"
+		`,
+		wantErr: `duplicate key: foo.bar`,
+	}, {
+		name: "TableInnerKeysDuplicateSimple",
+		input: `
+			[foo]
+			bar = "same key"
+			bar = "same key"
+		`,
+		wantErr: `duplicate key: foo\.bar`,
+	}, {
+		name: "TablesNotDuplicateScoping",
+		input: `
+			[repeat]
+			repeat.repeat = "leaf"
+			[struct1]
+			sibling = "leaf"
+			[struct2]
+			sibling = "leaf"
+		`,
+		wantCUE: `
+			repeat: {
+				repeat: repeat: "leaf"
+			}
+			struct1: {
+				sibling: "leaf"
+			}
+			struct2: {
+				sibling: "leaf"
+			}
+		`,
+	}, {
+		name: "ArrayTablesEmpty",
+		input: `
+			[[foo]]
+		`,
+		wantCUE: `
+			foo: [
+				{},
+			]
+		`,
+	}, {
+		name: "ArrayTablesOne",
+		input: `
+			[[foo]]
+			single = "single"
+		`,
+		wantCUE: `
+			foo: [
+				{
+					single: "single"
+				},
+			]
+		`,
+	}, {
+		name: "ArrayTablesMultiple",
+		input: `
+			root = "root value"
+			[[foo]]
+			foo1 = "foo1 value"
+			foo2 = "foo2 value"
+			[[foo]]
+			foo3 = "foo3 value"
+			foo4 = "foo4 value"
+			[[foo]]
+			[[foo]]
+			single = "single"
+		`,
+		wantCUE: `
+			root: "root value"
+			foo: [
+				{
+					foo1: "foo1 value"
+					foo2: "foo2 value"
+				},
+				{
+					foo3: "foo3 value"
+					foo4: "foo4 value"
+				},
+				{},
+				{
+					single: "single"
+				},
+			]
+		`,
+	}, {
+		name: "ArrayTablesSeparate",
+		input: `
+			root = "root value"
+			[[foo]]
+			foo1 = "foo1 value"
+			[[bar]]
+			bar1 = "bar1 value"
+			[[baz]]
+		`,
+		wantCUE: `
+			root: "root value"
+			foo: [
+				{
+					foo1: "foo1 value"
+				},
+			]
+			bar: [
+				{
+					bar1: "bar1 value"
+				},
+			]
+			baz: [
+				{},
+			]
+		`,
+	}, {
+		name: "ArrayTablesSubtable",
+		input: `
+			[[foo]]
+			foo1 = "foo1 value"
+			[foo.subtable1]
+			sub1 = "sub1 value"
+			[foo.subtable2]
+			sub2 = "sub2 value"
+			[foo.subtable2.deeper]
+			sub2d = "sub2d value"
+			[[foo]]
+			foo2 = "foo2 value"
+		`,
+		wantCUE: `
+			foo: [
+				{
+					foo1: "foo1 value"
+					subtable1: {
+						sub1: "sub1 value"
+					}
+					subtable2: {
+						sub2: "sub2 value"
+					}
+					subtable2: deeper: {
+						sub2d: "sub2d value"
+					}
+				},
+				{
+					foo2: "foo2 value"
+				},
+			]
+		`,
+	}, {
+		name: "ArrayTablesNested",
+		input: `
+			[[foo]]
+			foo1 = "foo1 value"
+			[[foo.nested1]]
+			nest1a = "nest1a value"
+			[[foo.nested1]]
+			nest1b = "nest1b value"
+			[[foo.nested2]]
+			nest2 = "nest2 value"
+			[[foo.nested2.deeper]]
+			nest2d = "nest2d value"
+			[[foo.nested3.directly.deeper]]
+			nest3d = "nest3d value"
+			[[foo]]
+			foo2 = "foo2 value"
+		`,
+		wantCUE: `
+			foo: [
+				{
+					foo1: "foo1 value"
+					nested1: [
+						{
+							nest1a: "nest1a value"
+						},
+						{
+							nest1b: "nest1b value"
+						},
+					]
+					nested2: [
+						{
+							nest2: "nest2 value"
+							deeper: [
+								{
+									nest2d: "nest2d value"
+								}
+							]
+						},
+					]
+					nested3: directly: deeper: [
+						{
+							nest3d: "nest3d value"
+						},
+					]
+				},
+				{
+					foo2: "foo2 value"
+				},
+			]
+		`,
+	}, {
+		name: "RedeclareKeyAsTableArray",
+		input: `
+			foo = "foo value"
+			[middle]
+			middle = "to ensure we don't rely on the last key"
+			[[foo]]
+			baz = "baz value"
+		`,
+		wantErr: `cannot redeclare key "foo" as a table array`,
+	}, {
+		name: "RedeclareTableAsTableArray",
+		input: `
+			[foo]
+			bar = "bar value"
+			[middle]
+			middle = "to ensure we don't rely on the last key"
+			[[foo]]
+			baz = "baz value"
+		`,
+		wantErr: `cannot redeclare key "foo" as a table array`,
+	}, {
+		name: "RedeclareArrayAsTableArray",
+		input: `
+			foo = ["inline array"]
+			[middle]
+			middle = "to ensure we don't rely on the last key"
+			[[foo]]
+			baz = "baz value"
+		`,
+		wantErr: `cannot redeclare key "foo" as a table array`,
+	}, {
+		name: "RedeclareTableArrayAsKey",
+		input: `
+			[[foo.foo2]]
+			bar = "bar value"
+			[middle]
+			middle = "to ensure we don't rely on the last key"
+			[foo]
+			foo2 = "redeclaring"
+		`,
+		wantErr: `cannot redeclare table array "foo.foo2" as a table`,
+	}, {
+		name: "RedeclareTableArrayAsTable",
+		input: `
+			[[foo]]
+			bar = "bar value"
+			[middle]
+			middle = "to ensure we don't rely on the last key"
+			[foo]
+			baz = "baz value"
+		`,
+		wantErr: `cannot redeclare table array "foo" as a table`,
+	}, {
+		name: "KeysNotDuplicateTableArrays",
+		input: `
+			[[foo]]
+			bar = "foo.0.bar"
+			[[foo]]
+			bar = "foo.1.bar"
+			[[foo]]
+			bar = "foo.2.bar"
+			[[foo.nested]]
+			bar = "foo.2.nested.0.bar"
+			[[foo.nested]]
+			bar = "foo.2.nested.1.bar"
+			[[foo.nested]]
+			bar = "foo.2.nested.2.bar"
+		`,
+		wantCUE: `
+			foo: [
+				{
+					bar: "foo.0.bar"
+				},
+				{
+					bar: "foo.1.bar"
+				},
+				{
+					bar: "foo.2.bar"
+					nested: [
+						{
+							bar: "foo.2.nested.0.bar"
+						},
+						{
+							bar: "foo.2.nested.1.bar"
+						},
+						{
+							bar: "foo.2.nested.2.bar"
+						},
+					]
+				},
+			]
+		`,
 	}}
 	for _, test := range tests {
 		test := test
@@ -369,10 +735,11 @@ line two.\
 			qt.Assert(t, qt.Equals(err, io.EOF))
 
 			wantFormatted, err := format.Source([]byte(test.wantCUE))
-			qt.Assert(t, qt.IsNil(err))
+			qt.Assert(t, qt.IsNil(err), qt.Commentf("wantCUE:\n%s", test.wantCUE))
 
 			formatted, err := format.Node(node)
 			qt.Assert(t, qt.IsNil(err))
+			t.Logf("CUE:\n%s", formatted)
 			qt.Assert(t, qt.Equals(string(formatted), string(wantFormatted)))
 
 			// Ensure that the CUE node can be compiled into a cue.Value and validated.

@@ -84,7 +84,8 @@ func NewMessagef(format string, args ...interface{}) Message {
 }
 
 // NewMessage creates an error message for human consumption.
-// Deprecated: Use NewMessagef instead.
+//
+// Deprecated: Use [NewMessagef] instead.
 func NewMessage(format string, args []interface{}) Message {
 	return NewMessagef(format, args...)
 }

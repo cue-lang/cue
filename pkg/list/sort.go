@@ -211,7 +211,7 @@ func getArc(ctx *adt.OpContext, v *adt.Vertex, s string) *adt.Vertex {
 	return arc
 }
 
-// Deprecated: use Sort, which is always stable
+// Deprecated: use [Sort], which is always stable
 func SortStable(list []cue.Value, cmp cue.Value) (sorted []cue.Value, err error) {
 	s := makeValueSorter(list, cmp)
 	sort.Stable(&s)

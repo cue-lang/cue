@@ -31,7 +31,7 @@ import (
 // The zero value of Runtime works for legacy reasons, but
 // should not be used. It may panic at some point.
 //
-// Deprecated: use Context.
+// Deprecated: use [Context].
 type Runtime runtime.Runtime
 
 func (r *Runtime) runtime() *runtime.Runtime {
@@ -57,7 +57,8 @@ func (r *Runtime) complete(p *build.Instance, v *adt.Vertex) (*Instance, error) 
 // name in position information. The source may import builtin packages. Use
 // Build to allow importing non-builtin packages.
 //
-// Deprecated: use Parse or ParseBytes. The use of Instance is being phased out.
+// Deprecated: use [Context] with methods like [Context.CompileString] or [Context.CompileBytes].
+// The use of [Instance] is being phased out.
 func (r *hiddenRuntime) Compile(filename string, source interface{}) (*Instance, error) {
 	cfg := &runtime.Config{Filename: filename}
 	v, p := r.runtime().Compile(cfg, source)
@@ -67,7 +68,7 @@ func (r *hiddenRuntime) Compile(filename string, source interface{}) (*Instance,
 // CompileFile compiles the given source file into an Instance. The source may
 // import builtin packages. Use Build to allow importing non-builtin packages.
 //
-// Deprecated: use BuildFile. The use of Instance is being phased out.
+// Deprecated: use [Context.BuildFile]. The use of [Instance] is being phased out.
 func (r *hiddenRuntime) CompileFile(file *ast.File) (*Instance, error) {
 	v, p := r.runtime().CompileFile(nil, file)
 	return r.complete(p, v)
@@ -77,7 +78,7 @@ func (r *hiddenRuntime) CompileFile(file *ast.File) (*Instance, error) {
 // may import builtin packages. Use Build to allow importing non-builtin
 // packages.
 //
-// Deprecated: use BuildExpr. The use of Instance is being phased out.
+// Deprecated: use [Context.BuildExpr]. The use of [Instance] is being phased out.
 func (r *hiddenRuntime) CompileExpr(expr ast.Expr) (*Instance, error) {
 	f, err := astutil.ToFile(expr)
 	if err != nil {
@@ -148,7 +149,7 @@ func (r *hiddenRuntime) build(instances []*build.Instance) ([]*Instance, error) 
 // FromExpr creates an instance from an expression.
 // Any references must be resolved beforehand.
 //
-// Deprecated: use CompileExpr
+// Deprecated: use [Context.BuildExpr]. The use of [Instance] is being phased out.
 func (r *hiddenRuntime) FromExpr(expr ast.Expr) (*Instance, error) {
 	return r.CompileFile(&ast.File{
 		Decls: []ast.Decl{&ast.EmbedDecl{Expr: expr}},

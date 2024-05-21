@@ -1304,7 +1304,7 @@ func (v Value) Len() Value {
 
 // Elem returns the value of undefined element types of lists and structs.
 //
-// Deprecated: use LookupPath in combination with "AnyString" or "AnyIndex".
+// Deprecated: use [Value.LookupPath] in combination with "AnyString" or "AnyIndex".
 func (v hiddenValue) Elem() (Value, bool) {
 	sel := AnyString
 	if v.v.IsList() {
@@ -1472,7 +1472,7 @@ func (v Value) structValOpts(ctx *adt.OpContext, o options) (s structValue, err 
 // Struct returns the underlying struct of a value or an error if the value
 // is not a struct.
 //
-// Deprecated: use Fields.
+// Deprecated: use [Value.Fields].
 func (v hiddenValue) Struct() (*Struct, error) {
 	ctx := v.ctx()
 	obj, err := v.structValOpts(ctx, options{})
@@ -1641,7 +1641,7 @@ func appendPath(a []Selector, v Value) []Selector {
 
 // LookupDef is equal to LookupPath(MakePath(Def(name))).
 //
-// Deprecated: use LookupPath.
+// Deprecated: use [Value.LookupPath].
 func (v hiddenValue) LookupDef(name string) Value {
 	return v.LookupPath(MakePath(Def(name)))
 }
@@ -1652,7 +1652,7 @@ var errNotFound = errors.Newf(token.NoPos, "field not found")
 // look up a definition or hidden field (starting with `_` or `_#`). Otherwise
 // it interprets name as an arbitrary string for a regular field.
 //
-// Deprecated: use LookupPath.
+// Deprecated: use [Value.LookupPath].
 func (v hiddenValue) FieldByName(name string, isIdent bool) (f FieldInfo, err error) {
 	s, err := v.Struct()
 	if err != nil {
@@ -1663,7 +1663,7 @@ func (v hiddenValue) FieldByName(name string, isIdent bool) (f FieldInfo, err er
 
 // LookupField reports information about a field of v.
 //
-// Deprecated: use LookupPath
+// Deprecated: use [Value.LookupPath].
 func (v hiddenValue) LookupField(name string) (FieldInfo, error) {
 	s, err := v.Struct()
 	if err != nil {
@@ -1701,7 +1701,7 @@ func (v hiddenValue) LookupField(name string) (FieldInfo, error) {
 // Any reference in v referring to the value at the given path will resolve
 // to x in the newly created value. The resulting value is not validated.
 //
-// Deprecated: use FillPath.
+// Deprecated: use [Value.FillPath].
 func (v hiddenValue) Fill(x interface{}, path ...string) Value {
 	if v.v == nil {
 		return v
@@ -1807,7 +1807,7 @@ func (v Value) FillPath(p Path, x interface{}) Value {
 // The returned function returns the value that would be unified with field
 // given its name.
 //
-// Deprecated: use LookupPath in combination with using optional selectors.
+// Deprecated: use [Value.LookupPath] in combination with using optional selectors.
 func (v hiddenValue) Template() func(label string) Value {
 	if v.v == nil {
 		return nil
@@ -2162,7 +2162,7 @@ func DisallowCycles(disallow bool) Option {
 
 // ResolveReferences forces the evaluation of references when outputting.
 //
-// Deprecated: Syntax will now always attempt to resolve dangling references and
+// Deprecated: [Value.Syntax] will now always attempt to resolve dangling references and
 // make the output self-contained. When [Final] or [Concrete] are used,
 // it will already attempt to resolve all references.
 // See also [InlineImports].

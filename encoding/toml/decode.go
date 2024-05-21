@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"strings"
 
 	toml "github.com/pelletier/go-toml/v2/unstable"
 
@@ -54,7 +55,34 @@ type Decoder struct {
 	// The string elements in between the dots may be quoted to avoid ambiguity.
 	seenKeys map[string]bool
 
-	currentFields []*ast.Field
+	// topFile is the top-level CUE file we are decoding into.
+	topFile *ast.File
+
+	// openTableArrays keeps track of all the declared table arrays so that
+	// later headers can append a new table array element, or add a field
+	// to the last element in a table array.
+	//
+	// TODO(mvdan): an unsorted slice means we do two linear searches per header key.
+	// For N distinct `[[keys]]`, this means a decoding runtime of O(2*N*N).
+	// Consider either sorting this array so we can do a binary search for O(N*log2(N)),
+	// or perhaps a tree, although for a nesting level D, that could cause O(N*D),
+	// and a tree would use more slices and so more allocations.
+	openTableArrays []openTableArray
+
+	// currentTableKey is the rooted key for the current table where the following
+	// TOML `key = value` lines will be inserted.
+	currentTableKey string
+
+	// currentTable is the CUE struct literal for currentTableKey.
+	// It is nil before the first [header] or [[header]],
+	// in which case any key-values are inserted in topFile.
+	currentTable *ast.StructLit
+}
+
+type openTableArray struct {
+	key   string
+	level int // the level of nesting, e.g. 2 for key="foo.bar"
+	list  *ast.ListLit
 }
 
 // TODO(mvdan): support decoding comments
@@ -78,7 +106,7 @@ func (d *Decoder) Decode() (ast.Node, error) {
 	// Note that if the input is empty the result will be the same
 	// as for an empty table: an empty struct.
 	// The TOML spec and other decoders also work this way.
-	file := &ast.File{}
+	d.topFile = &ast.File{}
 	for d.parser.NextExpression() {
 		if err := d.nextRootNode(d.parser.Expression()); err != nil {
 			return nil, err
@@ -87,11 +115,7 @@ func (d *Decoder) Decode() (ast.Node, error) {
 	if err := d.parser.Error(); err != nil {
 		return nil, err
 	}
-	for _, field := range d.currentFields {
-		file.Decls = append(file.Decls, field)
-	}
-	d.currentFields = d.currentFields[:0]
-	return file, nil
+	return d.topFile, nil
 }
 
 // nextRootNode is called for every top-level expression from the TOML parser.
@@ -119,17 +143,211 @@ func (d *Decoder) nextRootNode(tnode *toml.Node) error {
 	//       bar: baz: "value"
 	//   }
 	case toml.KeyValue:
-		field, err := d.decodeField("", tnode)
+		// Top-level fields begin a new line.
+		field, err := d.decodeField(d.currentTableKey, tnode, token.Newline)
 		if err != nil {
 			return err
 		}
-		d.currentFields = append(d.currentFields, field)
-	// TODO(mvdan): tables
-	// TODO(mvdan): array tables
+		if d.currentTable != nil {
+			d.currentTable.Elts = append(d.currentTable.Elts, field)
+		} else {
+			d.topFile.Decls = append(d.topFile.Decls, field)
+		}
+	case toml.Table:
+		// Tables always begin a new line.
+		key, keyElems := decodeKey("", tnode.Key())
+		// Table keys must be unique.
+		if d.seenKeys[key] {
+			return fmt.Errorf("duplicate key: %s", key)
+		}
+		d.seenKeys[key] = true
+
+		// We want a multi-line struct with curly braces,
+		// just like TOML's tables are on multiple lines.
+		d.currentTable = &ast.StructLit{
+			Lbrace: token.NoPos.WithRel(token.Blank),
+			Rbrace: token.NoPos.WithRel(token.Newline),
+		}
+		array, ok := d.arrayReference(key)
+		if ok { // [last_array.new_table]
+			subKeyElems := keyElems[array.level:]
+			if len(subKeyElems) == 0 {
+				// XXX: error; redeclaring [[last_array]] as [last_array]
+			}
+			topField, leafField := inlineFields(subKeyElems, token.Newline)
+			// XXX: remove the need for type casts
+			lastArrayElem := array.list.Elts[len(array.list.Elts)-1].(*ast.StructLit)
+			lastArrayElem.Elts = append(lastArrayElem.Elts, topField)
+			d.currentTableKey = key
+			leafField.Value = d.currentTable
+		} else { // [new_table]
+			topField, leafField := inlineFields(keyElems, token.Newline)
+			d.topFile.Decls = append(d.topFile.Decls, topField)
+			d.currentTableKey = key
+			leafField.Value = d.currentTable
+		}
+
+	case toml.ArrayTable:
+		// Table array elements always begin a new line.
+		key, keyElems := decodeKey("", tnode.Key())
+		// XXX: error if redeclaring [key] as [[key]]
+
+		// Table array keys do not need to be unique; when they repeat the current key,
+		// they append to an existing array.
+		switch array, ok := d.arrayReference(key); {
+		case !ok: // [[new_array]]
+			// We want a multi-line list with square braces,
+			// since TOML's table arrays are on multiple lines.
+			list := &ast.ListLit{
+				Lbrack: token.NoPos.WithRel(token.Blank),
+				Rbrack: token.NoPos.WithRel(token.Newline),
+			}
+			d.openTableArrays = append(d.openTableArrays, openTableArray{
+				key:   key,
+				level: len(keyElems),
+				list:  list,
+			})
+
+			topField, leafField := inlineFields(keyElems, token.Newline)
+			d.topFile.Decls = append(d.topFile.Decls, topField)
+			leafField.Value = list
+
+			// Each struct inside a table array sits on separate lines.
+			d.currentTable = &ast.StructLit{
+				Lbrace: token.NoPos.WithRel(token.Newline),
+				Rbrace: token.NoPos.WithRel(token.Newline),
+			}
+			d.currentTableKey = key // XXX: missing index?
+			list.Elts = append(list.Elts, d.currentTable)
+
+		case len(keyElems) > array.level: // [[last_array.new_array]]
+			// We want a multi-line list with square braces,
+			// since TOML's table arrays are on multiple lines.
+			list := &ast.ListLit{
+				Lbrack: token.NoPos.WithRel(token.Blank),
+				Rbrack: token.NoPos.WithRel(token.Newline),
+			}
+			d.openTableArrays = append(d.openTableArrays, openTableArray{
+				key:   key,
+				level: len(keyElems),
+				list:  list,
+			})
+
+			subKeyElems := keyElems[array.level:]
+			topField, leafField := inlineFields(subKeyElems, token.Newline)
+			// XXX: remove the need for type casts
+			lastArrayElem := array.list.Elts[len(array.list.Elts)-1].(*ast.StructLit)
+			lastArrayElem.Elts = append(lastArrayElem.Elts, topField)
+			leafField.Value = list
+
+			// Each struct inside a table array sits on separate lines.
+			d.currentTable = &ast.StructLit{
+				Lbrace: token.NoPos.WithRel(token.Newline),
+				Rbrace: token.NoPos.WithRel(token.Newline),
+			}
+			d.currentTableKey = key // XXX: missing index?
+			list.Elts = append(list.Elts, d.currentTable)
+		default: // [[last_array]]
+			// Each struct inside a table array sits on separate lines.
+			d.currentTable = &ast.StructLit{
+				Lbrace: token.NoPos.WithRel(token.Newline),
+				Rbrace: token.NoPos.WithRel(token.Newline),
+			}
+			d.currentTableKey = key // XXX: missing index?
+			array.list.Elts = append(array.list.Elts, d.currentTable)
+		}
+
 	default:
-		return fmt.Errorf("encoding/toml.Decoder.nextRootNode: unknown %s %#v\n", tnode.Kind, tnode)
+		return fmt.Errorf("encoding/toml.Decoder.nextRootNode: unknown %s %#v", tnode.Kind, tnode)
 	}
 	return nil
+}
+
+func (d *Decoder) decodeField(key string, tnode *toml.Node, relPos token.RelPos) (*ast.Field, error) {
+	key, keyElems := decodeKey(key, tnode.Key())
+	topField, leafField := inlineFields(keyElems, relPos)
+	// Table inner keys must be unique.
+	if d.seenKeys[key] {
+		return nil, fmt.Errorf("duplicate key: %s", key)
+	}
+	d.seenKeys[key] = true
+	value, err := d.decodeExpr(key, tnode.Value())
+	if err != nil {
+		return nil, err
+	}
+	leafField.Value = value
+	return topField, nil
+}
+
+func (d *Decoder) arrayReference(key string) (openTableArray, bool) {
+	// TODO(mvdan): see the performance TODO on [Decoder.openTableArrays].
+
+	// Prefer an exact match over a relative prefix match.
+	for _, arr := range d.openTableArrays {
+		if arr.key == key {
+			return arr, true
+		}
+	}
+	// The longest relative key match wins.
+	maxLevel := 0
+	maxLevelArr := openTableArray{}
+	for _, arr := range d.openTableArrays {
+		if relativeKey(arr.key, key) != "" && arr.level > maxLevel {
+			maxLevel = arr.level
+			maxLevelArr = arr
+		}
+	}
+	if maxLevel > 0 {
+		return maxLevelArr, true
+	}
+	return openTableArray{}, false
+}
+
+func relativeKey(baseKey, targetKey string) string {
+	if baseKey == "" {
+		return ""
+	}
+	relKey, ok := strings.CutPrefix(targetKey, baseKey+".")
+	if !ok {
+		return ""
+	}
+	return relKey
+}
+
+func decodeKey(key string, iter toml.Iterator) (string, []string) {
+	var elems []string
+	for i := 0; iter.Next(); i++ {
+		name := string(iter.Node().Data)
+		// TODO(mvdan): use an append-like API once we have benchmarks
+		if len(key) > 0 {
+			key += "."
+		}
+		key += quoteLabelIfNeeded(name)
+		elems = append(elems, name)
+	}
+	return key, elems
+}
+
+func inlineFields(names []string, relPos token.RelPos) (top, leaf *ast.Field) {
+	curField := &ast.Field{
+		Label: &ast.Ident{
+			NamePos: token.NoPos.WithRel(relPos),
+			Name:    names[0],
+		},
+	}
+
+	topField := curField
+	for _, elem := range names[1:] {
+		nextField := &ast.Field{
+			Label: &ast.Ident{
+				NamePos: token.NoPos.WithRel(token.Blank),
+				Name:    elem,
+			},
+		}
+		curField.Value = &ast.StructLit{Elts: []ast.Decl{nextField}}
+		curField = nextField
+	}
+	return topField, curField
 }
 
 func quoteLabelIfNeeded(name string) string {
@@ -139,8 +357,7 @@ func quoteLabelIfNeeded(name string) string {
 	return literal.Label.Quote(name)
 }
 
-// nextRootNode is called for every top-level expression from the TOML parser.
-func (d *Decoder) decodeExpr(rootKey string, tnode *toml.Node) (ast.Expr, error) {
+func (d *Decoder) decodeExpr(key string, tnode *toml.Node) (ast.Expr, error) {
 	// TODO(mvdan): we currently assume that TOML basic literals (string, int, float)
 	// are also valid CUE literals; we should double check this, perhaps via fuzzing.
 	data := string(tnode.Data)
@@ -162,8 +379,8 @@ func (d *Decoder) decodeExpr(rootKey string, tnode *toml.Node) (ast.Expr, error)
 			// particularly since a table key can be any string.
 			// However, we just need these keys to detect duplicates,
 			// and a path cannot be both an array and table, so it's OK.
-			rootKey := rootKey + "." + strconv.Itoa(len(list.Elts))
-			elem, err := d.decodeExpr(rootKey, elems.Node())
+			key := key + "." + strconv.Itoa(len(list.Elts))
+			elem, err := d.decodeExpr(key, elems.Node())
 			if err != nil {
 				return nil, err
 			}
@@ -178,7 +395,8 @@ func (d *Decoder) decodeExpr(rootKey string, tnode *toml.Node) (ast.Expr, error)
 		}
 		elems := tnode.Children()
 		for elems.Next() {
-			field, err := d.decodeField(rootKey, elems.Node())
+			// Inline table fields are on the same line.
+			field, err := d.decodeField(key, elems.Node(), token.Blank)
 			if err != nil {
 				return nil, err
 			}
@@ -187,52 +405,6 @@ func (d *Decoder) decodeExpr(rootKey string, tnode *toml.Node) (ast.Expr, error)
 		return strct, nil
 	// TODO(mvdan): dates and times
 	default:
-		return nil, fmt.Errorf("encoding/toml.Decoder.decodeExpr: unknown %s %#v\n", tnode.Kind, tnode)
+		return nil, fmt.Errorf("encoding/toml.Decoder.decodeExpr: unknown %s %#v", tnode.Kind, tnode)
 	}
-}
-
-func (d *Decoder) decodeField(rootKey string, tnode *toml.Node) (*ast.Field, error) {
-	keys := tnode.Key()
-	curName := string(keys.Node().Data)
-
-	// If we are decoding a top-level field, it follows a newline.
-	// Otherwise, we are in an inline table, and it goes on the same line.
-	relPos := token.Newline
-	if rootKey != "" {
-		rootKey += "."
-		relPos = token.Blank
-	}
-	rootKey += quoteLabelIfNeeded(curName)
-	curField := &ast.Field{
-		Label: &ast.Ident{
-			NamePos: token.NoPos.WithRel(relPos),
-			Name:    curName,
-		},
-	}
-
-	topField := curField
-	keys.Next() // TODO(mvdan): for some reason the first Next call doesn't count?
-	for keys.Next() {
-		nextName := string(keys.Node().Data)
-		nextField := &ast.Field{
-			Label: &ast.Ident{
-				NamePos: token.NoPos.WithRel(token.Blank),
-				Name:    nextName,
-			},
-		}
-		curField.Value = &ast.StructLit{Elts: []ast.Decl{nextField}}
-		curField = nextField
-		// TODO(mvdan): use an append-like API once we have benchmarks
-		rootKey += "." + quoteLabelIfNeeded(nextName)
-	}
-	if d.seenKeys[rootKey] {
-		return nil, fmt.Errorf("duplicate key: %s", rootKey)
-	}
-	d.seenKeys[rootKey] = true
-	value, err := d.decodeExpr(rootKey, tnode.Value())
-	if err != nil {
-		return nil, err
-	}
-	curField.Value = value
-	return topField, nil
 }

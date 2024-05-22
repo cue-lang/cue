@@ -460,9 +460,6 @@ func warnUnmatched(matches []*match) {
 // command line. It canonicalizes the patterns but does not
 // evaluate any matches.
 func cleanPatterns(patterns []string) []string {
-	if len(patterns) == 0 {
-		return []string{"."}
-	}
 	var out []string
 	for _, a := range patterns {
 		// Arguments are supposed to be import paths, but

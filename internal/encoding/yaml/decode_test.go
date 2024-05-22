@@ -902,9 +902,9 @@ func TestUnmarshalNaN(t *testing.T) {
 var unmarshalErrorTests = []struct {
 	data, error string
 }{
-	{"\nv: !!float 'error'", `test.yaml:2: cannot decode "error" as !!float`},
-	{"\nv: !!int 'error'", `test.yaml:2: cannot decode "error" as !!int`},
-	{"\nv: !!int 123.456", `test.yaml:2: cannot decode "123.456" as !!int`},
+	{"\nv: !!float 'error'", `test.yaml:2: cannot decode "error" as !!float: illegal number start "error"`},
+	{"\nv: !!int 'error'", `test.yaml:2: cannot decode "error" as !!int: illegal number start "error"`},
+	{"\nv: !!int 123.456", `test.yaml:2: cannot decode "123.456" as !!int: not a literal number`},
 	{"v: [A,", "test.yaml:1: did not find expected node content"},
 	{"v:\n- [A,", "test.yaml:2: did not find expected node content"},
 	{"a:\n- b: *,", "test.yaml:2: did not find expected alphabetic or numeric character"},

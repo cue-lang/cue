@@ -542,8 +542,10 @@ func (d *decoder) scalar(yn *yaml.Node) (ast.Expr, error) {
 		// We make the assumption that any valid YAML integer literal will be a valid
 		// CUE integer literal as well, with the only exception of octal numbers above.
 		// Note that `!!int 123.456` is not allowed.
-		if err := literal.ParseNum(value, &info); err != nil || !info.IsInt() {
-			return nil, d.posErrorf(yn, "cannot decode %q as %s", value, yn.ShortTag())
+		if err := literal.ParseNum(value, &info); err != nil {
+			return nil, d.posErrorf(yn, "cannot decode %q as %s: %v", value, tag, err)
+		} else if !info.IsInt() {
+			return nil, d.posErrorf(yn, "cannot decode %q as %s: not a literal number", value, tag)
 		}
 		return d.makeNum(yn, value, token.INT), nil
 
@@ -563,7 +565,7 @@ func (d *decoder) scalar(yn *yaml.Node) (ast.Expr, error) {
 			// CUE float literal as well, with the only exception of Inf/NaN above.
 			// Note that `!!float 123` is allowed.
 			if err := literal.ParseNum(value, &info); err != nil {
-				return nil, d.posErrorf(yn, "cannot decode %q as %s", value, yn.ShortTag())
+				return nil, d.posErrorf(yn, "cannot decode %q as %s: %v", value, tag, err)
 			}
 			// If the decoded YAML scalar was explicitly or implicitly a float,
 			// and the scalar literal looks like an integer,

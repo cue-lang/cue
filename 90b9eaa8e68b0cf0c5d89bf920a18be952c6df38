@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8bb9cb7_02274581",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-22T15:19:02Z",
+      "side": 1,
+      "message": "Nice. Thanks for going to the effort of fixing the links.",
+      "revId": "90b9eaa8e68b0cf0c5d89bf920a18be952c6df38",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

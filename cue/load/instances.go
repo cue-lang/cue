@@ -56,6 +56,9 @@ func Instances(args []string, c *Config) []*build.Instance {
 		return []*build.Instance{c.newErrInstance(err)}
 	}
 	c = newC
+	if len(args) == 0 {
+		args = []string{"."}
+	}
 
 	// TODO: This requires packages to be placed before files. At some point this
 	// could be relaxed.
@@ -95,7 +98,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 	}
 
 	a := []*build.Instance{}
-	if len(args) == 0 || i > 0 {
+	if len(pkgArgs) > 0 {
 		for _, m := range l.importPaths(pkgArgs) {
 			if m.Err != nil {
 				inst := c.newErrInstance(m.Err)

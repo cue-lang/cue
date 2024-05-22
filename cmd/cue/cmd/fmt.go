@@ -49,7 +49,6 @@ Directories named "cue.mod" and those beginning with "." and "_" are skipped unl
 given as explicit arguments.
 `,
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {
-			cwd, _ := os.Getwd()
 			check := flagCheck.Bool(cmd)
 			doDiff := flagDiff.Bool(cmd)
 
@@ -86,7 +85,7 @@ given as explicit arguments.
 							continue
 						}
 
-						wasModified, err := formatFile(file, formatOpts, cwd, doDiff, check, cmd)
+						wasModified, err := formatFile(file, formatOpts, doDiff, check, cmd)
 						if err != nil {
 							return err
 						}
@@ -121,7 +120,7 @@ given as explicit arguments.
 						file.Source = contents
 					}
 
-					wasModified, err := formatFile(file, formatOpts, cwd, doDiff, check, cmd)
+					wasModified, err := formatFile(file, formatOpts, doDiff, check, cmd)
 					if err != nil {
 						return err
 					}
@@ -182,7 +181,7 @@ given as explicit arguments.
 
 // formatFile formats a single file.
 // It returns true if the file was not well formatted.
-func formatFile(file *build.File, opts []format.Option, cwd string, doDiff, check bool, cmd *Command) (bool, error) {
+func formatFile(file *build.File, opts []format.Option, doDiff, check bool, cmd *Command) (bool, error) {
 	// We buffer the input and output bytes to compare them.
 	// This allows us to determine whether a file is already
 	// formatted, without modifying the file.
@@ -216,7 +215,7 @@ func formatFile(file *build.File, opts []format.Option, cwd string, doDiff, chec
 		return false, nil
 	}
 
-	path, err := filepath.Rel(cwd, file.Filename)
+	path, err := filepath.Rel(rootWorkingDir, file.Filename)
 	if err != nil {
 		path = file.Filename
 	}

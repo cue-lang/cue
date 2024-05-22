@@ -267,14 +267,21 @@ For more information on writing CUE configuration files see cuelang.org.`,
 
 var rootContextOptions []cuecontext.Option
 
+var rootWorkingDir = func() string {
+	wd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	return wd
+}()
+
 // Main runs the cue tool and returns the code for passing to os.Exit.
 func Main() int {
 	cmd, _ := New(os.Args[1:])
 	if err := cmd.Run(backgroundContext()); err != nil {
 		if err != ErrPrintedError {
-			cwd, _ := os.Getwd()
 			errors.Print(os.Stderr, err, &errors.Config{
-				Cwd:     cwd,
+				Cwd:     rootWorkingDir,
 				ToSlash: testing.Testing(),
 			})
 		}
@@ -350,12 +357,9 @@ func printError(cmd *Command, err error) {
 	format := func(w io.Writer, format string, args ...interface{}) {
 		p.Fprintf(w, format, args...)
 	}
-
-	// TODO(mvdan): call os.Getwd only once at the start of the process.
-	cwd, _ := os.Getwd()
 	errors.Print(cmd.Stderr(), err, &errors.Config{
 		Format:  format,
-		Cwd:     cwd,
+		Cwd:     rootWorkingDir,
 		ToSlash: testing.Testing(),
 	})
 }

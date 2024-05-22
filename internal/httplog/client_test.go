@@ -32,6 +32,7 @@ func TestTransportWithSlog(t *testing.T) {
 	resp, err := client.Get(srv.URL + "/foo/bar?foo=bar")
 	qt.Assert(t, qt.IsNil(err))
 	data, err := io.ReadAll(resp.Body)
+	qt.Assert(t, qt.IsNil(err))
 	resp.Body.Close()
 	qt.Assert(t, qt.Equals(string(data), "hello"))
 

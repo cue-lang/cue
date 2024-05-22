@@ -2368,7 +2368,6 @@ func (v Value) Expr() (Op, []Value) {
 
 	case 1:
 		// the default case, processed below.
-		env = c.Env
 		env, expr = c.EnvExpr()
 		if w, ok := expr.(*adt.Vertex); ok {
 			return Value{v.idx, w, v.parent_}.Expr()

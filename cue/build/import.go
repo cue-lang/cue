@@ -89,10 +89,10 @@ func (inst *Instance) complete() errors.Error {
 
 	if inst.loadFunc != nil {
 		for i, path := range paths {
-			isLocal := IsLocalImport(path)
-			if isLocal {
-				// path = dirToImportPath(filepath.Join(dir, path))
-			}
+			// isLocal := IsLocalImport(path)
+			// if isLocal {
+			// 	path = dirToImportPath(filepath.Join(dir, path))
+			// }
 
 			imp := c.imports[path]
 			if imp == nil {

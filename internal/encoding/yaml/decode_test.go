@@ -150,8 +150,21 @@ var unmarshalTests = []struct {
 		"decimal: +685_230",
 		"decimal: +685_230",
 	}, {
-		"octal: 02472256",
-		"octal: 0o2472256",
+		"octal_yaml11: 02472256",
+		"octal_yaml11: 0o2472256",
+	}, {
+		"octal_yaml12: 0o2472256",
+		"octal_yaml12: 0o2472256",
+	}, {
+		"not_octal_yaml12: 0o123456789",
+		`not_octal_yaml12: "0o123456789"`,
+	}, {
+		// TODO(mvdan): 01234 is not a valid numeric literal in CUE.
+		"float_octal_yaml11: !!float 01234",
+		"float_octal_yaml11: number & 01234",
+	}, {
+		"float_octal_yaml12: !!float 0o1234",
+		"float_octal_yaml12: number & 0o1234",
 	}, {
 		"hexa: 0x_0A_74_AE",
 		"hexa: 0x_0A_74_AE",
@@ -916,6 +929,11 @@ var unmarshalErrorTests = []struct {
 	{"{{.}}", `test.yaml:1: invalid map key: !!map`},
 	{"b: *a\na: &a {c: 1}", `test.yaml: unknown anchor 'a' referenced`},
 	{"%TAG !%79! tag:yaml.org,2002:\n---\nv: !%79!int '1'", "test.yaml: did not find expected whitespace"},
+	// TODO(mvdan): just like not_octal_yaml12, we should interpret the value as a string.
+	{
+		"not_octal_yaml11: 0123456789",
+		`test.yaml:1: cannot decode "0123456789" as !!float: illegal integer number "0123456789"`,
+	},
 }
 
 func TestUnmarshalErrors(t *testing.T) {

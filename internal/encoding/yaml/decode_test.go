@@ -156,6 +156,9 @@ var unmarshalTests = []struct {
 		"octal_yaml12: 0o2472256",
 		"octal_yaml12: 0o2472256",
 	}, {
+		"not_octal_yaml11: 0123456789",
+		`not_octal_yaml11: "0123456789"`,
+	}, {
 		"not_octal_yaml12: 0o123456789",
 		`not_octal_yaml12: "0o123456789"`,
 	}, {
@@ -929,11 +932,6 @@ var unmarshalErrorTests = []struct {
 	{"{{.}}", `test.yaml:1: invalid map key: !!map`},
 	{"b: *a\na: &a {c: 1}", `test.yaml: unknown anchor 'a' referenced`},
 	{"%TAG !%79! tag:yaml.org,2002:\n---\nv: !%79!int '1'", "test.yaml: did not find expected whitespace"},
-	// TODO(mvdan): just like not_octal_yaml12, we should interpret the value as a string.
-	{
-		"not_octal_yaml11: 0123456789",
-		`test.yaml:1: cannot decode "0123456789" as !!float: illegal integer number "0123456789"`,
-	},
 }
 
 func TestUnmarshalErrors(t *testing.T) {

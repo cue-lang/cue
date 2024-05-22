@@ -71,12 +71,7 @@ func runModInit(cmd *Command, args []string) (err error) {
 		}
 	}
 
-	cwd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
-	mod := filepath.Join(cwd, "cue.mod")
+	mod := filepath.Join(rootWorkingDir, "cue.mod")
 	if info, err := os.Stat(mod); err == nil {
 		if !info.IsDir() {
 			return fmt.Errorf("cue.mod files are no longer supported; use cue.mod/module.cue")

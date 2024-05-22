@@ -49,11 +49,6 @@ Without any packages, fix applies to all files within a module.
 }
 
 func runFixAll(cmd *Command, args []string) error {
-	dir, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
 	var opts []fix.Option
 	if flagSimplify.Bool(cmd) {
 		opts = append(opts, fix.Simplify())
@@ -62,6 +57,7 @@ func runFixAll(cmd *Command, args []string) error {
 	if len(args) == 0 {
 		args = []string{"./..."}
 
+		dir := rootWorkingDir
 		for {
 			if _, err := os.Stat(filepath.Join(dir, "cue.mod")); err == nil {
 				args = appendDirs(args, filepath.Join(dir, "cue.mod", "gen"))

@@ -8,6 +8,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/mod/semver"
 )
 
@@ -443,7 +444,7 @@ func (parts ImportPath) String() string {
 			needQualifier = true
 		}
 	}
-	if parts.Version == "" && !parts.ExplicitQualifier {
+	if parts.Version == "" && !needQualifier {
 		// Fast path.
 		return parts.Path
 	}
@@ -461,6 +462,7 @@ func (parts ImportPath) String() string {
 }
 
 // ParseImportPath returns the various components of an import path.
+// It does not check the result for validity.
 func ParseImportPath(p string) ImportPath {
 	var parts ImportPath
 	pathWithoutQualifier := p
@@ -479,6 +481,9 @@ func ParseImportPath(p string) ImportPath {
 			parts.Qualifier = parts.Path[i+1:]
 		} else {
 			parts.Qualifier = parts.Path
+		}
+		if !ast.IsValidIdent(parts.Qualifier) || strings.HasPrefix(parts.Qualifier, "#") {
+			parts.Qualifier = ""
 		}
 	}
 	return parts

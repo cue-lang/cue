@@ -52,7 +52,7 @@ func (s *labelSimplifier) processDecls(decls []ast.Decl) {
 	for _, d := range decls {
 		switch x := d.(type) {
 		case *ast.Field:
-			x = astutil.Apply(x, sc.replace, nil).(*ast.Field)
+			astutil.Apply(x, sc.replace, nil)
 		}
 	}
 }

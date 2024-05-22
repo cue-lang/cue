@@ -76,11 +76,13 @@ func TestGit(t *testing.T) {
 	qt.Assert(t, qt.IsTrue(!status.CommitTime.Before(commitTime)))
 	qt.Assert(t, qt.Matches(status.Revision, `[0-9a-f]+`))
 	files, err := v.ListFiles(ctx, filepath.Join(dir, "subdir"))
+	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.DeepEquals(files, []string{
 		"bar/baz",
 		"foo",
 	}))
 	files, err = v.ListFiles(ctx, dir)
+	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.DeepEquals(files, []string{
 		"bar.txt",
 		"baz/something",

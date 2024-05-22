@@ -16,7 +16,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"cuelang.org/go/cue/errors"
 	"github.com/spf13/cobra"
@@ -164,8 +163,7 @@ Run "cue help commands" for more details on tasks and workflow commands.
 				if !isRootCmd {
 					cmdline += " cmd"
 				}
-				cwd, _ := os.Getwd()
-				fmt.Fprint(w, errors.Details(err, &errors.Config{Cwd: cwd}))
+				fmt.Fprint(w, errors.Details(err, &errors.Config{Cwd: rootWorkingDir}))
 				fmt.Fprintln(w, `Ensure custom commands are defined in a "_tool.cue" file.`)
 				fmt.Fprintln(w, "Run 'cue help cmd' to list available custom commands.")
 				if isRootCmd {

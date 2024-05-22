@@ -227,7 +227,8 @@ files:
 		name: "BadIdentifier",
 		cfg:  dirCfg,
 		args: []string{"foo.com/bad-identifier"},
-		want: `err:    cannot find package "foo.com/bad-identifier": cannot find module providing package foo.com/bad-identifier
+		want: `err:    cannot determine package name for "foo.com/bad-identifier" (set explicitly with ':')
+cannot find package "foo.com/bad-identifier": cannot find module providing package foo.com/bad-identifier
 path:   foo.com/bad-identifier
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod

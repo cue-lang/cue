@@ -260,7 +260,7 @@ var parseImportPathTests = []struct {
 	want: ImportPath{
 		Path:      "main.test",
 		Version:   "v0",
-		Qualifier: "main.test",
+		Qualifier: "",
 	},
 }, {
 	testName: "WithMajorVersionAndExplicitQualifier",
@@ -289,6 +289,46 @@ var parseImportPathTests = []struct {
 		Qualifier:         "bar",
 	},
 	wantCanonical: "foo.com/bar@v0",
+}, {
+	testName: "WithPattern",
+	path:     "foo.com/bar/.../blah",
+	want: ImportPath{
+		Path:              "foo.com/bar/.../blah",
+		Version:           "",
+		ExplicitQualifier: false,
+		Qualifier:         "blah",
+	},
+	wantCanonical: "foo.com/bar/.../blah",
+}, {
+	testName: "WithPatternAtEnd",
+	path:     "foo.com/bar/...",
+	want: ImportPath{
+		Path:              "foo.com/bar/...",
+		Version:           "",
+		ExplicitQualifier: false,
+		Qualifier:         "",
+	},
+	wantCanonical: "foo.com/bar/...",
+}, {
+	testName: "WithUnderscoreLastElement",
+	path:     "foo.com/bar/_foo",
+	want: ImportPath{
+		Path:              "foo.com/bar/_foo",
+		Version:           "",
+		ExplicitQualifier: false,
+		Qualifier:         "_foo",
+	},
+	wantCanonical: "foo.com/bar/_foo",
+}, {
+	testName: "WithHashLastElement",
+	path:     "foo.com/bar/#foo",
+	want: ImportPath{
+		Path:              "foo.com/bar/#foo",
+		Version:           "",
+		ExplicitQualifier: false,
+		Qualifier:         "",
+	},
+	wantCanonical: "foo.com/bar/#foo",
 }}
 
 func TestParseImportPath(t *testing.T) {
@@ -312,4 +352,12 @@ func TestImportPathStringAddsQualifier(t *testing.T) {
 		Qualifier: "baz",
 	}
 	qt.Assert(t, qt.Equals(ip.String(), "foo.com/bar@v0:baz"))
+}
+
+func TestImportPathStringAddsQualifierWhenNoVersion(t *testing.T) {
+	ip := ImportPath{
+		Path:      "foo.com/bar",
+		Qualifier: "baz",
+	}
+	qt.Assert(t, qt.Equals(ip.String(), "foo.com/bar:baz"))
 }

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -493,8 +494,19 @@ const (
 	mergeTag     = "!!merge"
 )
 
+// rxAnyOctalYaml11 uses the implicit tag resolution regular expression for base-8 integers
+// from YAML's 1.1 spec, but including the 8 and 9 digits which aren't valid for octal integers.
+var rxAnyOctalYaml11 = regexp.MustCompile(`^[-+]?0[0-9_]+$`)
+
 func (d *decoder) scalar(yn *yaml.Node) (ast.Expr, error) {
-	switch tag := yn.ShortTag(); tag {
+	tag := yn.ShortTag()
+	// If YAML thinks the value is a float, and the value looks like a YAML 1.1 octal,
+	// that means the input value was like `01289` and not a valid octal integer.
+	// The safest thing to do, and what most YAML decoders do, is to interpret as a string.
+	if tag == floatTag && rxAnyOctalYaml11.MatchString(yn.Value) {
+		tag = strTag
+	}
+	switch tag {
 	// TODO: use parse literal or parse expression instead.
 	case timestampTag:
 		return &ast.BasicLit{

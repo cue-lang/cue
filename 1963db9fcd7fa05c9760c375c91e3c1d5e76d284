@@ -34,6 +34,24 @@
       "parentUuid": "94f374d7_6261bcc2",
       "revId": "1963db9fcd7fa05c9760c375c91e3c1d5e76d284",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f63aee1_470caee2",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-23T08:50:44Z",
+      "side": 1,
+      "message": "Maybe just printing the error and calling os.Exit(1) might be better than a panic then?",
+      "parentUuid": "711d1dec_66f05e3c",
+      "revId": "1963db9fcd7fa05c9760c375c91e3c1d5e76d284",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

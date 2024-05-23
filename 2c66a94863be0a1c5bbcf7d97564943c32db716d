@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7250b56_f030276a",
+        "filename": "cue/build/import.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-23T07:26:08Z",
+      "side": 1,
+      "message": "Or just remove.",
+      "revId": "2c66a94863be0a1c5bbcf7d97564943c32db716d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

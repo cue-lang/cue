@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // Package format implements standard formatting of CUE configurations.
-package format // import "cuelang.org/go/cue/format"
+package format
 
 // TODO: this package is in need of a rewrite. When doing so, the API should
 // allow for reformatting an AST, without actually writing bytes.

@@ -14,7 +14,7 @@
 
 // Package token defines constants representing the lexical tokens of the Go
 // programming language and basic operations on tokens (printing, predicates).
-package token // import "cuelang.org/go/cue/token"
+package token
 
 // Token is the set of lexical tokens of the CUE configuration language.
 type Token int

@@ -52,7 +52,7 @@
 // is considered undefined if it is a nil pointer type or if it is a zero
 // value and there is a JSON field tag with the omitempty flag.
 // A Complete will implicitly validate a struct.
-package cuego // import "cuelang.org/go/cuego"
+package cuego
 
 // The first goal of this package is to get the semantics right. After that,
 // there are a lot of performance gains to be made:

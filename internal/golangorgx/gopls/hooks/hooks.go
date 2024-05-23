@@ -5,7 +5,7 @@
 // Package hooks adds all the standard gopls implementations.
 // This can be used in tests without needing to use the gopls main, and is
 // also the place to edit for custom builds of gopls.
-package hooks // import "cuelang.org/go/internal/golangorgx/gopls/hooks"
+package hooks
 
 import (
 	"cuelang.org/go/internal/golangorgx/gopls/settings"

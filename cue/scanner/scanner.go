@@ -15,7 +15,7 @@
 // Package scanner implements a scanner for CUE source text. It takes a []byte
 // as source which can then be tokenized through repeated calls to the Scan
 // method.
-package scanner // import "cuelang.org/go/cue/scanner"
+package scanner
 
 import (
 	"bytes"

@@ -16,6 +16,24 @@
       "message": "Perhaps add this test too? `x: !!float 0123` \n\nIn that case we definitely don\u0027t want to treat it as a string (it should be an error), but from my cursory reading of the logic I\u0027m not sure it will.",
       "revId": "b1b3febf91e86aa3f9d04ccb302bc7081906834e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6d1c80e_0626cb19",
+        "filename": "internal/encoding/yaml/decode_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-23T12:21:17Z",
+      "side": 1,
+      "message": "Nice thought. I added a test case to the previous CL; the existing behavior is `number \u0026 0123`, which is broken, as `0123` is not a valid CUE integer literal.\n\nThe new behavior as of PS1 is indeed stringifying as `\"0123\"`, and I agree it\u0027s not great, but at least it\u0027s not invalid CUE, so it\u0027s not strictly any worse.\n\nThat said, I have tweaked the octal logic to not kick in when there is an explicit tag, because I didn\u0027t mean to change this other broken edge case. We can deal with this edge case of yours separately, via the TODO reminder I\u0027ve added for myself.",
+      "parentUuid": "42211cc8_7792e955",
+      "revId": "b1b3febf91e86aa3f9d04ccb302bc7081906834e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

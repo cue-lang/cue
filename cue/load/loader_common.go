@@ -26,7 +26,6 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
@@ -299,23 +298,17 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 		}
 	}
 
-	for _, decl := range pf.Decls {
-		d, ok := decl.(*ast.ImportDecl)
-		if !ok {
-			continue
+	for _, spec := range pf.Imports {
+		quoted := spec.Path.Value
+		path, err := strconv.Unquote(quoted)
+		if err != nil {
+			badFile(errors.Newf(
+				spec.Path.Pos(),
+				"%s: parser returned invalid quoted string: <%s>", fullPath, quoted,
+			))
 		}
-		for _, spec := range d.Specs {
-			quoted := spec.Path.Value
-			path, err := strconv.Unquote(quoted)
-			if err != nil {
-				badFile(errors.Newf(
-					spec.Path.Pos(),
-					"%s: parser returned invalid quoted string: <%s>", fullPath, quoted,
-				))
-			}
-			if !isTest || fp.c.Tests {
-				fp.imported[path] = append(fp.imported[path], spec.Pos())
-			}
+		if !isTest || fp.c.Tests {
+			fp.imported[path] = append(fp.imported[path], spec.Pos())
 		}
 	}
 	switch {

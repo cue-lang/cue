@@ -150,9 +150,11 @@ func GetPackageInfo(f *ast.File) PkgInfo {
 		case *ast.Attribute:
 		case *ast.Package:
 			if x.Name == nil {
-				break
+				return PkgInfo{}
 			}
 			return PkgInfo{x, i, x.Name.Name}
+		default:
+			return PkgInfo{}
 		}
 	}
 	return PkgInfo{}

@@ -26,7 +26,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
 )
 
 // An Instance describes the collection of files, and its imports, necessary
@@ -239,7 +238,7 @@ func (inst *Instance) AddSyntax(file *ast.File) errors.Error {
 	astutil.Resolve(file, func(pos token.Pos, msg string, args ...interface{}) {
 		inst.Err = errors.Append(inst.Err, errors.Newf(pos, msg, args...))
 	})
-	pkg := internal.GetPackageInfo(file).Name
+	pkg := file.PackageName()
 	if pkg != "" && pkg != "_" && !inst.User && !inst.setPkg(pkg) && pkg != inst.PkgName {
 		err := errors.Newf(file.Pos(),
 			"package name %q conflicts with previous package name %q",

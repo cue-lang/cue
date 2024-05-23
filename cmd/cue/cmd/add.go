@@ -31,7 +31,6 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/internal"
 )
 
 func newAddCmd(c *Command) *cobra.Command {
@@ -252,7 +251,7 @@ func initFile(cmd *Command, file string, getBuild func(path string) *build.Insta
 		if err != nil {
 			return nil, err
 		}
-		if pkgName := internal.GetPackageInfo(f).Name; pkgName != "" {
+		if pkgName := f.PackageName(); pkgName != "" {
 			if pkg := flagPackage.String(cmd); pkg != "" && pkgName != pkg {
 				return nil, fmt.Errorf("package mismatch (%s vs %s) for file %s", pkgName, pkg, file)
 			}

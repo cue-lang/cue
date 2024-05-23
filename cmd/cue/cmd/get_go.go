@@ -591,7 +591,7 @@ func (e *extractor) importCUEFiles(p *packages.Package, dir, args string) error 
 				return err
 			}
 
-			if pkg := internal.GetPackageInfo(f).Name; pkg != "" && pkg == p.Name {
+			if pkg := f.PackageName(); pkg != "" && pkg == p.Name {
 				file := filepath.Base(path)
 				file = file[:len(file)-len(".cue")]
 				file += "_gen.cue"

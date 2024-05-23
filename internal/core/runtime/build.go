@@ -23,7 +23,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
 )
@@ -119,7 +118,7 @@ func (r *Runtime) CompileFile(cfg *Config, file *ast.File) (*adt.Vertex, *build.
 	if err != nil {
 		return nil, p
 	}
-	p.PkgName = internal.GetPackageInfo(file).Name
+	p.PkgName = file.PackageName()
 	v, _ := r.Build(cfg, p)
 	return v, p
 }

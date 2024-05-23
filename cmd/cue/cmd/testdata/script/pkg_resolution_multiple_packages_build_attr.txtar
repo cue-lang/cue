@@ -1,0 +1,33 @@
+# Test that a wildcard pattern respects build attributes when determining
+# what packages it resolves to.
+
+exec cue eval ./...
+cmp stdout stdout.golden
+
+! exec cue eval -t something ./...
+stderr '^found packages "x" \(x.cue\) and "y" \(y.cue\) in ".*x"$'
+
+-- stdout.golden --
+x: 5
+// ---
+x: 5
+-- cue.mod/module.cue --
+module: "mod.com"
+language: version: "v0.9.0"
+-- root.cue --
+package root
+
+import "mod.com/x"
+
+x
+-- x/x.cue --
+package x
+
+x: 5
+-- x/y.cue --
+
+@if(something)
+
+package y
+
+y: 5

@@ -16,6 +16,24 @@
       "message": "Previously we didn\u0027t panic, just used an empty directory. Given that the syscall can legitimately fail, might it not be best just to go with the original behaviour?",
       "revId": "1963db9fcd7fa05c9760c375c91e3c1d5e76d284",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "711d1dec_66f05e3c",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-23T08:47:41Z",
+      "side": 1,
+      "message": "before we used a mix of ignoring the error (which could lead to weird behavior) and failing on an error. I think it\u0027s best to consistently fail on an error, with the assumption that it should be exceptionally rare.\n\nI can\u0027t even imagine a case where this would fail and continuing to run cmd/cue would be a good idea. If the current directory is somehow gone or entirely broken, finding the current CUE module or any current/relative CUE packages will fail entirely.\n\nnote that the working directory is used for more than just printing errors.",
+      "parentUuid": "94f374d7_6261bcc2",
+      "revId": "1963db9fcd7fa05c9760c375c91e3c1d5e76d284",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

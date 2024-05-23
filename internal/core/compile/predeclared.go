@@ -40,6 +40,8 @@ func predeclared(n *ast.Ident) adt.Expr {
 	case "number", "__number":
 		return &adt.BasicType{Src: n, K: adt.NumKind}
 
+	case "exists", "__exists":
+		return existsBuiltin
 	case "len", "__len":
 		return lenBuiltin
 	case "close", "__close":

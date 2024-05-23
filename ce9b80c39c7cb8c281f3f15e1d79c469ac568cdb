@@ -39,6 +39,52 @@
       "message": "+1 because I cannot +2 in this repo.",
       "revId": "ce9b80c39c7cb8c281f3f15e1d79c469ac568cdb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6df8a53f_c55178a4",
+        "filename": "cue.mod/usr/github.com/SchemaStore/schemastore/src/schemas/json/workflow.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-23T21:57:52Z",
+      "side": 1,
+      "message": "I assume this should be deleted now, or rather joined with the new comment? i.e. we should simply say somehting like:\n\n\u003e CUE does not properly encode a JSON Schema oneOf; see https://cuelang.org/issue/943.\n\u003e For now, apply a temporary workaround which forces either option to bottom.",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 66
+      },
+      "revId": "ce9b80c39c7cb8c281f3f15e1d79c469ac568cdb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80ec6dc8_713186af",
+        "filename": "cue.mod/usr/github.com/SchemaStore/schemastore/src/schemas/json/workflow.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-23T21:57:52Z",
+      "side": 1,
+      "message": "personally I would make this note in 3165 itself, and not here.",
+      "range": {
+        "startLine": 10,
+        "startChar": 35,
+        "endLine": 12,
+        "endChar": 13
+      },
+      "revId": "ce9b80c39c7cb8c281f3f15e1d79c469ac568cdb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

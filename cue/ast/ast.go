@@ -14,7 +14,7 @@
 
 // Package ast declares the types used to represent syntax trees for CUE
 // packages.
-package ast // import "cuelang.org/go/cue/ast"
+package ast
 
 import (
 	"fmt"

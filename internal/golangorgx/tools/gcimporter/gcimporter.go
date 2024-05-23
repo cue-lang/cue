@@ -19,7 +19,7 @@
 // the details of its internal representation. Because of these
 // differences, re-encoding the imported package may yield a
 // different, but equally valid, encoding of the package.
-package gcimporter // import "cuelang.org/go/internal/golangorgx/tools/gcimporter"
+package gcimporter
 
 import (
 	"bufio"

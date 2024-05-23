@@ -13,4 +13,4 @@
 // limitations under the License.
 
 // Package build defines collections of CUE files to build an instance.
-package build // import "cuelang.org/go/cue/build"
+package build

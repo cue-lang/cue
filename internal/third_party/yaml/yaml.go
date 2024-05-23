@@ -3,7 +3,7 @@
 // Source code and other details for the project are available at GitHub:
 //
 //	https://github.com/go-yaml/yaml
-package yaml // import "cuelang.org/go/internal/third_party/yaml"
+package yaml
 
 import (
 	"fmt"

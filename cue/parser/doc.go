@@ -20,4 +20,4 @@
 // The parser accepts a larger language than is syntactically permitted by the
 // CUE spec, for simplicity, and for improved robustness in the presence of
 // syntax errors.
-package parser // import "cuelang.org/go/cue/parser"
+package parser

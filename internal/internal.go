@@ -15,7 +15,7 @@
 // Package internal exposes some cue internals to other packages.
 //
 // A better name for this package would be technicaldebt.
-package internal // import "cuelang.org/go/internal"
+package internal
 
 // TODO: refactor packages as to make this package unnecessary.
 

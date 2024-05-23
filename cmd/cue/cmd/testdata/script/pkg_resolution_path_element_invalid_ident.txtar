@@ -1,0 +1,55 @@
+# Test that a package qualifier is always required to import
+# a package where the final element of the import path
+# is not a valid CUE identifier.
+
+# When there's a qualifier, the import is OK.
+exec cue eval ./test1/root.cue
+cmp stdout stdout.golden
+exec cue eval mod.com/1x:x
+cmp stdout stdout.golden
+exec cue eval ./1x:x
+cmp stdout stdout.golden
+
+# Without a qualifier, it's an error because the chosen package is
+# ambiguous (the package clause in CUE has to declare a valid CUE
+# identifier).
+! exec cue eval ./test2/root.cue
+# Note: the errors here could use improvement. Specifically it says:
+#	package is x, want 1x:
+# but it's not possible for a package to be 1x because it's not
+# a valid CUE identifier.
+cmp stderr test2-import-stderr.golden
+! exec cue eval mod.com/1x
+cmp stderr test2-abs-stderr.golden
+
+# TODO the following succeeds inappropriately
+exec cue eval ./1x
+
+-- cue.mod/module.cue --
+module: "mod.com"
+language: version: "v0.9.0"
+-- test1/root.cue --
+package test1
+
+import "mod.com/1x:x"
+
+x
+-- test2/root.cue --
+package test1
+
+import "mod.com/1x"
+
+x
+-- 1x/x.cue --
+package x
+
+x: 5
+-- stdout.golden --
+x: 5
+-- test2-import-stderr.golden --
+import failed: build constraints exclude all CUE files in mod.com/1x:
+    1x/x.cue: package is x, want 1x:
+    ./test2/root.cue:3:8
+-- test2-abs-stderr.golden --
+build constraints exclude all CUE files in mod.com/1x:
+    1x/x.cue: package is x, want 1x

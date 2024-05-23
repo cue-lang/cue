@@ -52,6 +52,24 @@
       "parentUuid": "711d1dec_66f05e3c",
       "revId": "1963db9fcd7fa05c9760c375c91e3c1d5e76d284",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77f4b02f_66cec460",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-23T08:56:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f63aee1_470caee2",
+      "revId": "1963db9fcd7fa05c9760c375c91e3c1d5e76d284",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

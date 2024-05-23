@@ -194,7 +194,7 @@ func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) *ast.File {
 				return true
 			}
 
-			if name := internal.GetPackageInfo(f).Name; name != "" {
+			if name := f.PackageName(); name != "" {
 				pkgName = name
 			}
 

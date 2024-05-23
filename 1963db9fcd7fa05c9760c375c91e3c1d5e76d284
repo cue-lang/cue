@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94f374d7_6261bcc2",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-23T07:24:33Z",
+      "side": 1,
+      "message": "Previously we didn\u0027t panic, just used an empty directory. Given that the syscall can legitimately fail, might it not be best just to go with the original behaviour?",
+      "revId": "1963db9fcd7fa05c9760c375c91e3c1d5e76d284",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

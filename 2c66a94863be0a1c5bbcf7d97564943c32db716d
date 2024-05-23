@@ -16,6 +16,24 @@
       "message": "Or just remove.",
       "revId": "2c66a94863be0a1c5bbcf7d97564943c32db716d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f3656ee_3da2ff09",
+        "filename": "cue/build/import.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-23T08:49:19Z",
+      "side": 1,
+      "message": "this would imply removing a bunch of other code as well, and isn\u0027t related to the \"unused value\" warning, so I\u0027d rather leave it to a separate commit. I\u0027m trying to appease staticcheck step by step :)",
+      "parentUuid": "e7250b56_f030276a",
+      "revId": "2c66a94863be0a1c5bbcf7d97564943c32db716d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

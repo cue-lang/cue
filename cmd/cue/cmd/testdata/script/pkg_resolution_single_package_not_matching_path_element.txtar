@@ -1,0 +1,41 @@
+# Test that a relative package path functions the same as an
+# absolute package path when there is a single package
+# in the directory with a name that does not match the final
+# element of the import path.
+
+! exec cue eval root.cue
+# TODO the error for this isn't quite right: it
+# says:
+#	root.cue: package is root, want x
+# but the evaluation should not care about the
+# package in the root directory because we are
+# not trying to evaluate that package.
+cmp stderr import_stderr.golden
+! exec cue eval mod.com/x
+cmp stderr absolute_stderr.golden
+# TODO the following command succeeds unexpectedly,
+# although it should be consistent with the above.
+exec cue eval ./x
+
+-- cue.mod/module.cue --
+module: "mod.com"
+language: version: "v0.9.0"
+-- root.cue --
+package root
+
+import "mod.com/x"
+
+x
+-- x/y.cue --
+package y
+
+y: 5
+-- import_stderr.golden --
+import failed: build constraints exclude all CUE files in mod.com/x:
+    root.cue: package is root, want x
+    x/y.cue: package is y, want x:
+    ./root.cue:3:8
+-- absolute_stderr.golden --
+build constraints exclude all CUE files in mod.com/x:
+    root.cue: package is root, want x
+    x/y.cue: package is y, want x

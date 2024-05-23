@@ -1,0 +1,33 @@
+# Test that a relative package path functions the same as an
+# absolute package path when there is are multiple packages
+# in the directory where one has a name that does matches the final
+# element of the import path.
+
+exec cue eval root.cue
+cmp stdout stdout.golden
+exec cue eval mod.com/x
+cmp stdout stdout.golden
+# TODO the following command fails unexpectedly
+# although it should be consistent with the above.
+! exec cue eval ./x
+stderr 'found packages "x" \(x.cue\) and "y" \(y.cue\) in ".*script-pkg_resolution_multiple_packages_one_matching_path_element.x"'
+
+-- stdout.golden --
+x: 5
+-- cue.mod/module.cue --
+module: "mod.com"
+language: version: "v0.9.0"
+-- root.cue --
+package root
+
+import "mod.com/x"
+
+x
+-- x/x.cue --
+package x
+
+x: 5
+-- x/y.cue --
+package y
+
+y: 5

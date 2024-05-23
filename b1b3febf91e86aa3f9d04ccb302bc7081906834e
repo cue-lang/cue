@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42211cc8_7792e955",
+        "filename": "internal/encoding/yaml/decode_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-23T07:33:19Z",
+      "side": 1,
+      "message": "Perhaps add this test too? `x: !!float 0123` \n\nIn that case we definitely don\u0027t want to treat it as a string (it should be an error), but from my cursory reading of the logic I\u0027m not sure it will.",
+      "revId": "b1b3febf91e86aa3f9d04ccb302bc7081906834e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

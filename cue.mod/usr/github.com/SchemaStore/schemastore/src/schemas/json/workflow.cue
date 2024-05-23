@@ -5,7 +5,12 @@ package json
 
 // CUE does not properly encode a JSON Schema oneOf. This will be fixed in
 // https://cuelang.org/issue/943, but for now we apply this patch.
-#Workflow: jobs: [string]: steps: [...(
+//
+// See also the discussion in https://cuelang.org/issue/3165 on how oneofs
+// could/should be encoded in CUE. https://cuelang.org/issue/943 suggests one
+// approach, https://cuelang.org/issue/3165 is a more general exploration of
+// the space.
+#Workflow: jobs?: [string]: steps?: [...(
 	{
 		uses?: _|_
 	} | {

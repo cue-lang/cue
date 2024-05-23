@@ -85,7 +85,10 @@ func DefaultTagVars() map[string]TagVar {
 		"username": {
 			Func: func() (ast.Expr, error) {
 				u, err := user.Current()
-				return varToString(u.Username, err)
+				if err != nil {
+					return nil, err
+				}
+				return ast.NewString(u.Username), nil
 			},
 		},
 		"hostname": {

@@ -1,6 +1,6 @@
 // Test data - not compiled.
 
-package main
+package other
 
 import (
 	"./file"

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99123516_545b6530",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-24T17:16:06Z",
+      "side": 1,
+      "message": "thanks for the note, I thought I was seeing double with the diff at first :)",
+      "revId": "de5bf84ee03bf43412b905219b7502177385273b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

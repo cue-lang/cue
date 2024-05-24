@@ -29,11 +29,9 @@ exec cue export ./somepkg/
 cmp stdout export.golden
 # TODO(mvdan): we should support loading packages from absolute directories.
 ! exec cue export ${WORK}${/}somepkg
-[!windows] stderr 'no location found for package ".*somepkg"'
-[windows] stderr 'no encoding specified for file ".*somepkg.*"'
+stderr 'cannot use absolute directory ".*somepkg" as package path'
 ! exec cue export ${WORK}${/}somepkg${/}
-[!windows] stderr 'no dependency found for package ".*somepkg"'
-[windows] stderr 'no encoding specified for file ".*somepkg.*"'
+stderr 'cannot use absolute directory ".*somepkg." as package path'
 
 # Now do some of the same filename tests, but for a file without any extension.
 cp somefile.cue somefile
@@ -54,11 +52,10 @@ stderr 'standard library import path "somefile" cannot be imported as a CUE pack
 
 # TODO(mvdan): "cannot find package" is perhaps confusing to the user given that the file exists.
 ! exec cue export ./somefile
-stderr 'cannot find package "\./somefile"'
+stderr '\./somefile refers to a file not a package directory'
 # TODO(mvdan): we probably should not behave differently on Windows.
 ! exec cue export ${WORK}${/}somefile
-[!windows] stderr 'no location found for package ".*somefile"'
-[windows] stderr 'no encoding specified for file ".*somefile"'
+stderr 'cannot use absolute directory ".*somefile" as package path'
 
 -- cue.mod/module.cue --
 module: "mod.test/test"

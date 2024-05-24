@@ -40,7 +40,7 @@ command: importjsonschema: {
 
 		// Tip link for humans:
 		// https://github.com/SchemaStore/schemastore/blob/master/src/schemas/json/github-workflow.json
-		url: "https://raw.githubusercontent.com/SchemaStore/schemastore/debca867d3174cc6c58f0ff40939c8a42300ea85/src/schemas/json/github-workflow.json"
+		url: "https://raw.githubusercontent.com/SchemaStore/schemastore/88d26ad0d451cbd5ebc70218062850aa905bdf18/src/schemas/json/github-workflow.json"
 	}
 	import: exec.Run & {
 		_outpath: path.FromSlash("../../cue.mod/pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue", "unix")

@@ -602,14 +602,12 @@ import "strings"
 
 	#jobNeeds: [...#name] & [_, ...] | #name
 
-	#matrix: ({
-		...
-	} | #expressionSyntax) & {
+	#matrix: {
 		{[=~"^(in|ex)clude$" & !~"^()$"]: #expressionSyntax | [...{
 							[string]: #configuration
 		}] & [_, ...]}
 		{[!~"^(in|ex)clude$" & !~"^()$"]: [...#configuration] & [_, ...] | #expressionSyntax}
-	}
+	} | #expressionSyntax
 
 	#reusableWorkflowCallJob: {
 		// The name of the job displayed on GitHub.

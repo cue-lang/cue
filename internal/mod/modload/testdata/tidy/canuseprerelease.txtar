@@ -2,7 +2,7 @@
 # no stable releases available.
 
 -- tidy-check-error --
-module is not tidy: cannot find module providing package example.com@v0
+module is not tidy: cannot find module providing package example.com@v0:main
 -- want --
 module: "main.org@v0"
 language: {
@@ -20,7 +20,7 @@ language: version: "v0.8.0"
 -- main.cue --
 package main
 
-import "example.com@v0"
+import "example.com@v0:main"
 
 -- _registry/example.com_v0.0.1-foo/cue.mod/module.cue --
 module: "example.com@v0"

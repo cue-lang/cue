@@ -38,6 +38,8 @@ const (
 	moduleFile = "module.cue"
 )
 
+type importPath string
+
 // FromArgsUsage is a partial usage message that applications calling
 // FromArgs may wish to include in their -help output.
 //
@@ -131,6 +133,7 @@ type Config struct {
 	// A Module is a collection of packages and instances that are within the
 	// directory hierarchy rooted at the module root. The module root can be
 	// marked with a cue.mod file.
+	// If this is a relative path, it will be interpreted relative to [Config.Dir].
 	ModuleRoot string
 
 	// Module specifies the module prefix. If not empty, this value must match
@@ -300,17 +303,13 @@ func (c *Config) stdin() io.Reader {
 	return c.Stdin
 }
 
-type importPath string
-
-type fsPath string
-
-func addImportQualifier(pkg importPath, name string) (importPath, errors.Error) {
+func addImportQualifier(pkg importPath, name string) (importPath, error) {
 	if name == "" {
 		return pkg, nil
 	}
 	ip := module.ParseImportPath(string(pkg))
 	if ip.ExplicitQualifier && ip.Qualifier != name {
-		return "", errors.Newf(token.NoPos, "non-matching package names (%s != %s)", ip.Qualifier, name)
+		return "", fmt.Errorf("non-matching package names (%s != %s)", ip.Qualifier, name)
 	}
 	ip.Qualifier = name
 	return importPath(ip.String()), nil
@@ -349,7 +348,7 @@ func (c Config) complete() (cfg *Config, err error) {
 	if err := c.fileSystem.init(c.Dir, c.Overlay); err != nil {
 		return nil, err
 	}
-
+	//	log.Printf("complete with module root %q", c.ModuleRoot)
 	// TODO: determine root on a package basis. Maybe we even need a
 	// pkgname.cue.mod
 	// Look to see if there is a cue.mod.
@@ -389,6 +388,7 @@ func (c Config) complete() (cfg *Config, err error) {
 func (c *Config) loadModule() error {
 	// TODO: also make this work if run from outside the module?
 	mod := filepath.Join(c.ModuleRoot, modDir)
+	//	log.Printf("loading module from %q", mod)
 	info, cerr := c.fileSystem.stat(mod)
 	if cerr != nil {
 		return nil

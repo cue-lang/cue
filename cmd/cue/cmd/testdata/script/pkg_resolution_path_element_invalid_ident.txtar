@@ -47,9 +47,7 @@ x: 5
 -- stdout.golden --
 x: 5
 -- test2-import-stderr.golden --
-import failed: build constraints exclude all CUE files in mod.com/1x:
-    1x/x.cue: package is x, want 1x:
+import failed: cannot find package "mod.com/1x": cannot determine package name from import path "mod.com/1x":
     ./test2/root.cue:3:8
 -- test2-abs-stderr.golden --
-build constraints exclude all CUE files in mod.com/1x:
-    1x/x.cue: package is x, want 1x
+cannot find package "mod.com/1x": cannot determine package name from import path "mod.com/1x"

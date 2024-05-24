@@ -450,8 +450,7 @@ func isLocalImport(path string) bool {
 func warnUnmatched(matches []*match) {
 	for _, m := range matches {
 		if len(m.Pkgs) == 0 {
-			m.Err =
-				errors.Newf(token.NoPos, "cue: %q matched no packages\n", m.Pattern)
+			m.Err = errors.Newf(token.NoPos, "cue: %q matched no packages", m.Pattern)
 		}
 	}
 }
@@ -460,6 +459,9 @@ func warnUnmatched(matches []*match) {
 // command line. It canonicalizes the patterns but does not
 // evaluate any matches.
 func cleanPatterns(patterns []string) []string {
+	if len(patterns) == 0 {
+		return []string{"."}
+	}
 	var out []string
 	for _, a := range patterns {
 		// Arguments are supposed to be import paths, but
@@ -484,6 +486,8 @@ func cleanPatterns(patterns []string) []string {
 }
 
 // isMetaPackage checks if name is a reserved package name that expands to multiple packages.
+// TODO none of these package names are actually recognized anywhere else
+// and at least one (cmd) doesn't seem like it belongs in the CUE world.
 func isMetaPackage(name string) bool {
 	return name == "std" || name == "cmd" || name == "all"
 }

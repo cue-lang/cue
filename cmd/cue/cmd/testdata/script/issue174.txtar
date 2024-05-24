@@ -1,7 +1,8 @@
 ! exec cue export ./issue174
 cmp stderr expect-stderr
 -- expect-stderr --
-cannot enumerate all module imports: invalid import path "'foo'" in issue174/issue174.cue
+build constraints exclude all CUE files in ./issue174:
+    issue174/issue174.cue: no package name
 -- cue.mod/module.cue --
 module: "mod.test"
 language: version: "v0.9.0"

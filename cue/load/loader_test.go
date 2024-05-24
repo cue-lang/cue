@@ -146,7 +146,7 @@ display:./anon`}, {
 		args: []string{"./other"},
 		want: `err:    import failed: relative import paths not allowed ("./file"):
     $CWD/testdata/testmod/other/main.cue:6:2
-path:   mod.test/test/other@v0:main
+path:   mod.test/test/other@v0
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/other
@@ -182,15 +182,13 @@ imports:
 		name: "NoPackageName",
 		cfg:  dirCfg,
 		args: []string{"mod.test/test/hello:nonexist"},
-		want: `err:    build constraints exclude all CUE files in mod.test/test/hello:nonexist:
-    anon.cue: no package name
-    test.cue: package is test, want nonexist
-    hello/test.cue: package is test, want nonexist
+		want: `err:    cannot find package "mod.test/test/hello": no files in package directory with package name "nonexist"
 path:   mod.test/test/hello:nonexist
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
-dir:    $CWD/testdata/testmod/hello
-display:mod.test/test/hello:nonexist`}, {
+dir:    ""
+display:mod.test/test/hello:nonexist`,
+	}, {
 		name: "ExplicitNonPackageFiles",
 		cfg:  dirCfg,
 		args: []string{"./anon.cue", "./other/anon.cue"},
@@ -280,7 +278,7 @@ imports:
 		name: "OnlyToolFiles",
 		cfg:  dirCfg,
 		args: []string{"./toolonly"},
-		want: `path:   mod.test/test/toolonly@v0:foo
+		want: `path:   mod.test/test/toolonly@v0
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/toolonly
@@ -294,9 +292,9 @@ files:
 		args: []string{"./toolonly"},
 		want: `err:    build constraints exclude all CUE files in ./toolonly:
     anon.cue: no package name
-    test.cue: package is test, want foo
+    test.cue: package is test, want toolonly
     toolonly/foo_tool.cue: _tool.cue files excluded in non-cmd mode
-path:   mod.test/test/toolonly@v0:foo
+path:   mod.test/test/toolonly@v0
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/toolonly
@@ -447,7 +445,15 @@ func TestOverlays(t *testing.T) {
 		return r
 	}
 	ctx := cuecontext.New()
-	insts, err := ctx.BuildInstances(Instances([]string{"./dir/..."}, c))
+	buildInsts := Instances([]string{"./dir/..."}, c)
+	for i, inst := range buildInsts {
+		if inst.Err != nil {
+			t.Logf("got instance %d: %q: error %v", i, inst.ImportPath, inst.Err)
+		} else {
+			t.Logf("got instance %d: %q", i, inst.ImportPath)
+		}
+	}
+	insts, err := ctx.BuildInstances(buildInsts)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -461,6 +467,9 @@ func TestOverlays(t *testing.T) {
 			t.Error(err)
 			continue
 		}
+		if i >= len(want) {
+			t.Fatalf("more instances returned from BuildInstances than expected (%d/%d); extras %q", len(insts), len(want), b)
+		}
 		if got := string(bytes.Map(rmSpace, b)); got != want[i] {
 			t.Errorf("%s: got %s; want %s", inst.BuildInstance().Dir, got, want[i])
 		}
@@ -473,6 +482,7 @@ func TestLoadOrder(t *testing.T) {
 		Package: "*",
 		Dir:     testDataDir,
 	})
+	t.Logf("got %d instances; error %v", len(insts), insts[0].Err)
 
 	var actualFiles = []string{}
 	for _, inst := range insts {
@@ -494,7 +504,7 @@ func TestLoadInstancesConcurrent(t *testing.T) {
 	// if there's an underlying race condition.
 	// See https://cuelang.org/issue/1746
 	race(t, func() error {
-		_, err := getInst(".", testdata("testmod", "hello"))
+		_, err := getInst(".:test", testdata("testmod", "hello"))
 		return err
 	})
 }

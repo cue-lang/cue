@@ -24,7 +24,6 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/filetypes"
-	"cuelang.org/go/internal/mod/modimports"
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modrequirements"
 	"cuelang.org/go/mod/module"
@@ -46,6 +45,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 	if c == nil {
 		c = &Config{}
 	}
+	//	log.Printf("Instances with module root %q", c.ModuleRoot)
 	// We want to consult the CUE_EXPERIMENT flag to see whether
 	// consult external registries by default.
 	if err := cueexperiment.Init(); err != nil {
@@ -80,13 +80,22 @@ func Instances(args []string, c *Config) []*build.Instance {
 	// Pass all arguments that look like packages to loadPackages
 	// so that they'll be available when looking up the packages
 	// that are specified on the command line.
-	// Relative import paths create a package with an associated
-	// error but it turns out that's actually OK because the cue/load
-	// logic resolves such paths without consulting pkgs.
-	pkgs, err := loadPackages(ctx, c, synCache, pkgArgs, otherFiles)
+	expandedPaths, err := expandPackageArgs(c, pkgArgs, c.Package)
 	if err != nil {
 		return []*build.Instance{c.newErrInstance(err)}
 	}
+	pkgs, err := loadPackages(ctx, c, synCache, expandedPaths, otherFiles)
+	if err != nil {
+		return []*build.Instance{c.newErrInstance(err)}
+	}
+	//	if pkgs != nil {
+	//		log.Printf("got modpkgload.Packages")
+	//		for _, p := range pkgs.All() {
+	//			log.Printf("loaded pkg %v: %v", p.ImportPath(), p.Error())
+	//		}
+	//	} else {
+	//		log.Printf("no modpkgload.Packages")
+	//	}
 	tg := newTagger(c)
 	l := newLoader(c, tg, synCache, pkgs)
 
@@ -98,15 +107,9 @@ func Instances(args []string, c *Config) []*build.Instance {
 	}
 
 	a := []*build.Instance{}
-	if len(pkgArgs) > 0 {
-		for _, m := range l.importPaths(pkgArgs) {
-			if m.Err != nil {
-				inst := c.newErrInstance(m.Err)
-				a = append(a, inst)
-				continue
-			}
-			a = append(a, m.Pkgs...)
-		}
+	if len(expandedPaths) > 0 {
+		//		log.Printf("making instances from expanded paths %v", expandedPaths)
+		a = l.instancesFromResolvedPackages(expandedPaths)
 	}
 
 	if len(otherFiles) > 0 {
@@ -151,8 +154,9 @@ func Instances(args []string, c *Config) []*build.Instance {
 
 // loadPackages returns packages loaded from the given package list and also
 // including imports from the given build files.
-func loadPackages(ctx context.Context, cfg *Config, synCache *syntaxCache, extraPkgs []string, otherFiles []*build.File) (*modpkgload.Packages, error) {
+func loadPackages(ctx context.Context, cfg *Config, synCache *syntaxCache, pkgs []resolvedPackageArg, otherFiles []*build.File) (*modpkgload.Packages, error) {
 	if cfg.Registry == nil || cfg.modFile == nil || cfg.modFile.Module == "" {
+		//		log.Printf("no packages (registry %v; modFile %#v)", cfg.Registry != nil, cfg.modFile)
 		return nil, nil
 	}
 	reqs := modrequirements.NewRequirements(
@@ -167,27 +171,8 @@ func loadPackages(ctx context.Context, cfg *Config, synCache *syntaxCache, extra
 	}
 	pkgPaths := make(map[string]bool)
 	// Add any packages specified directly on the command line.
-	for _, pkg := range extraPkgs {
-		pkgPaths[pkg] = true
-	}
-	if len(otherFiles) == 0 || len(extraPkgs) > 0 {
-		// Resolve all the imports in the current module. We specifically
-		// avoid doing this when files are specified on the command line
-		// but no packages because we don't want to fail because of
-		// invalid files in the module when we're just evaluating files.
-		// TODO this means that if files _and_ packages are specified,
-		// we can still error when there are problems with packages that
-		// aren't used by anything explicitly specified on the command line;
-		// a proper solution would involve pushing the pattern evaluation
-		// down into the module loading code, but that implies a significant
-		// refactoring of the modules code, so this will do for now.
-		modImports, err := modimports.AllImports(modimports.AllModuleFiles(mainModLoc.FS, mainModLoc.Dir))
-		if err != nil {
-			return nil, fmt.Errorf("cannot enumerate all module imports: %v", err)
-		}
-		for _, pkg := range modImports {
-			pkgPaths[pkg] = true
-		}
+	for _, pkg := range pkgs {
+		pkgPaths[pkg.resolved] = true
 	}
 	// Add any imports found in other files.
 	for _, f := range otherFiles {

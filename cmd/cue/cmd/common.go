@@ -510,7 +510,7 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 
 	builds := loadFromArgs(args, cfg.loadCfg)
 	if builds == nil {
-		return nil, errors.Newf(token.NoPos, "invalid args")
+		return nil, errors.Newf(token.NoPos, "invalid args2")
 	}
 
 	if err := p.parsePlacementFlags(); err != nil {

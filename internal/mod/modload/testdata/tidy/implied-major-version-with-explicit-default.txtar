@@ -26,7 +26,7 @@ deps: {
 -- main.cue --
 package main
 
-import "example.com"
+import "example.com:main"
 
 -- _registry/example.com_v0.0.1/cue.mod/module.cue --
 module: "example.com@v0"

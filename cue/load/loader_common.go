@@ -32,6 +32,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/golangorgx/gopls/util/maps"
 )
 
 // An importMode controls the behavior of the Import method.
@@ -158,7 +159,8 @@ func (fp *fileProcessor) finalize(p *build.Instance) errors.Error {
 	}
 	sort.Strings(p.AllTags)
 
-	p.ImportPaths, _ = cleanImports(fp.imported)
+	p.ImportPaths = maps.Keys(fp.imported)
+	sort.Strings(p.ImportPaths)
 
 	return nil
 }
@@ -430,15 +432,6 @@ func parseWord(data []byte) (word, rest []byte) {
 	return word, rest
 }
 
-func cleanImports(m map[string][]token.Pos) ([]string, map[string][]token.Pos) {
-	all := make([]string, 0, len(m))
-	for path := range m {
-		all = append(all, path)
-	}
-	sort.Strings(all)
-	return all, m
-}
-
 // isLocalImport reports whether the import path is
 // a local import path, like ".", "..", "./foo", or "../foo".
 func isLocalImport(path string) bool {
@@ -450,8 +443,7 @@ func isLocalImport(path string) bool {
 func warnUnmatched(matches []*match) {
 	for _, m := range matches {
 		if len(m.Pkgs) == 0 {
-			m.Err =
-				errors.Newf(token.NoPos, "cue: %q matched no packages\n", m.Pattern)
+			m.Err = errors.Newf(token.NoPos, "cue: %q matched no packages", m.Pattern)
 		}
 	}
 }
@@ -465,27 +457,18 @@ func cleanPatterns(patterns []string) []string {
 		// Arguments are supposed to be import paths, but
 		// as a courtesy to Windows developers, rewrite \ to /
 		// in command-line arguments. Handles .\... and so on.
-		if filepath.Separator == '\\' {
-			a = strings.Replace(a, `\`, `/`, -1)
-		}
+		a = filepath.ToSlash(a)
 
-		// Put argument in canonical form, but preserve leading "./".
-		if strings.HasPrefix(a, "./") {
-			a = "./" + pathpkg.Clean(a)
-			if a == "./." {
-				a = "."
-			}
-		} else if a != "" {
-			a = pathpkg.Clean(a)
+		isRel := strings.HasPrefix(a, "./")
+		// Put argument in canonical form.
+		a = pathpkg.Clean(a)
+		if isRel && a != "." {
+			// Preserve leading "./".
+			a = "./" + a
 		}
 		out = append(out, a)
 	}
 	return out
-}
-
-// isMetaPackage checks if name is a reserved package name that expands to multiple packages.
-func isMetaPackage(name string) bool {
-	return name == "std" || name == "cmd" || name == "all"
 }
 
 // hasFilepathPrefix reports whether the path s begins with the

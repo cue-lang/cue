@@ -55,6 +55,7 @@ import (
 //	_       anonymous files (which may be marked with _)
 //	*       all packages
 func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
+	//	log.Printf("importPkg %q", p.ImportPath)
 	retErr := func(errs errors.Error) []*build.Instance {
 		// XXX: move this loop to ReportError
 		for _, err := range errors.Errors(errs) {
@@ -181,7 +182,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 		impPath, err := addImportQualifier(importPath(p.ImportPath), p.PkgName)
 		p.ImportPath = string(impPath)
 		if err != nil {
-			p.ReportError(err)
+			p.ReportError(errors.Promote(err, ""))
 		}
 
 		all = append(all, p)
@@ -264,7 +265,6 @@ func setFileSource(cfg *Config, f *build.File) error {
 }
 
 func (l *loader) loadFunc(pos token.Pos, path string) *build.Instance {
-	impPath := importPath(path)
 	if isLocalImport(path) {
 		return l.cfg.newErrInstance(errors.Newf(pos, "relative import paths not allowed (%q)", path))
 	}
@@ -273,8 +273,10 @@ func (l *loader) loadFunc(pos token.Pos, path string) *build.Instance {
 		// It looks like a builtin.
 		return nil
 	}
-
-	p := l.newInstance(pos, impPath)
+	p := l.newInstance(pos, resolvedPackageArg{
+		resolved: path,
+		original: path,
+	})
 	_ = l.importPkg(pos, p)
 	return p
 }
@@ -300,10 +302,21 @@ func (l *loader) newRelInstance(pos token.Pos, path, pkgName string) *build.Inst
 	}
 
 	dir := filepath.Join(l.cfg.Dir, filepath.FromSlash(path))
-	if importPath, e := l.importPathFromAbsDir(fsPath(dir), path); e != nil {
+	if pkgPath, e := importPathFromAbsDir(l.cfg, dir, path); e != nil {
 		// Detect later to keep error messages consistent.
 	} else {
-		p.ImportPath = string(importPath)
+		// Add package qualifier if the configuration requires it.
+		name := l.cfg.Package
+		switch name {
+		case "_", "*":
+			name = ""
+		}
+		pkgPath, e := addImportQualifier(pkgPath, name)
+		if e != nil {
+			// Detect later to keep error messages consistent.
+		} else {
+			p.ImportPath = string(pkgPath)
+		}
 	}
 
 	p.Dir = dir
@@ -320,53 +333,43 @@ func (l *loader) newRelInstance(pos token.Pos, path, pkgName string) *build.Inst
 	return p
 }
 
-func (l *loader) importPathFromAbsDir(absDir fsPath, key string) (importPath, errors.Error) {
-	if l.cfg.ModuleRoot == "" {
-		return "", errors.Newf(token.NoPos,
-			"cannot determine import path for %q (root undefined)", key)
+func importPathFromAbsDir(c *Config, absDir string, origPath string) (importPath, error) {
+	if c.ModuleRoot == "" {
+		return "", fmt.Errorf("cannot determine import path for %q (root undefined)", origPath)
 	}
 
-	dir := filepath.Clean(string(absDir))
-	if !strings.HasPrefix(dir, l.cfg.ModuleRoot) {
-		return "", errors.Newf(token.NoPos,
-			"cannot determine import path for %q (dir outside of root)", key)
+	dir := filepath.Clean(absDir)
+	if !strings.HasPrefix(dir, c.ModuleRoot) {
+		return "", fmt.Errorf("cannot determine import path for %q (dir outside of root)", origPath)
 	}
 
-	pkg := filepath.ToSlash(dir[len(l.cfg.ModuleRoot):])
+	pkg := filepath.ToSlash(dir[len(c.ModuleRoot):])
 	switch {
 	case strings.HasPrefix(pkg, "/cue.mod/"):
 		pkg = pkg[len("/cue.mod/"):]
 		if pkg == "" {
-			return "", errors.Newf(token.NoPos,
-				"invalid package %q (root of %s)", key, modDir)
+			return "", fmt.Errorf("invalid package %q (root of %s)", origPath, modDir)
 		}
 
-	case l.cfg.Module == "":
-		return "", errors.Newf(token.NoPos,
-			"cannot determine import path for %q (no module)", key)
+	case c.Module == "":
+		return "", fmt.Errorf("cannot determine import path for %q (no module)", origPath)
 	default:
-		impPath := module.ParseImportPath(l.cfg.Module)
+		impPath := module.ParseImportPath(c.Module)
 		impPath.Path += pkg
 		impPath.Qualifier = ""
 		pkg = impPath.String()
 	}
-
-	name := l.cfg.Package
-	switch name {
-	case "_", "*":
-		name = ""
-	}
-
-	return addImportQualifier(importPath(pkg), name)
+	return importPath(pkg), nil
 }
 
-func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
-	dir, name, err := l.absDirFromImportPath(pos, p)
+func (l *loader) newInstance(pos token.Pos, p resolvedPackageArg) *build.Instance {
+	//	log.Printf("newInstance %#v", p)
+	dir, name, err := l.absDirFromImportPath(pos, importPath(p.resolved))
 	i := l.cfg.Context.NewInstance(dir, l.loadFunc)
 	i.Dir = dir
 	i.PkgName = name
-	i.DisplayPath = string(p)
-	i.ImportPath = string(p)
+	i.DisplayPath = p.original
+	i.ImportPath = p.resolved
 	i.Root = l.cfg.ModuleRoot
 	i.Module = l.cfg.Module
 	i.Err = errors.Append(i.Err, err)
@@ -379,7 +382,7 @@ func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
 //
 // The returned directory may not exist.
 func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name string, err errors.Error) {
-	dir, name, err0 := l.absDirFromImportPath1(pos, p)
+	dir, name, err0 := l.absDirFromImportPath1(p)
 	if err0 != nil {
 		// Any error trying to determine the package location
 		// is a PackageError.
@@ -388,7 +391,7 @@ func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 	return dir, name, err
 }
 
-func (l *loader) absDirFromImportPath1(pos token.Pos, p importPath) (absDir, name string, err error) {
+func (l *loader) absDirFromImportPath1(p importPath) (absDir, name string, err error) {
 	if p == "" {
 		return "", "", fmt.Errorf("empty package name in import path %q", p)
 	}
@@ -401,6 +404,16 @@ func (l *loader) absDirFromImportPath1(pos token.Pos, p importPath) (absDir, nam
 	origp := p
 	// Extract the package name.
 	parts := module.ParseImportPath(string(p))
+	if isLocalImport(parts.Path) {
+		// This can happen when there is no module.
+		// If there is a module, this should never happen because
+		// expandPackageArgs should have been used to
+		// turn all relative paths into absolute unambiguous paths.
+		if l.cfg.Module != "" {
+			panic(fmt.Errorf("absDirFromImportPath unexpectedly called with relative path %q", p))
+		}
+		return filepath.Join(l.cfg.Dir, parts.Path), parts.Qualifier, nil
+	}
 	name = parts.Qualifier
 	p = importPath(parts.Unqualified().String())
 	if name == "" {

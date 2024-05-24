@@ -30,6 +30,8 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 // TODO:
@@ -133,7 +135,8 @@ func (t *T) Equal(actual, field any, msgAndArgs ...any) {
 		t.updateField(info, ci, actual)
 	case len(msgAndArgs) == 0:
 		_, ci := t.getCallInfo()
-		t.Errorf("unexpected value for field %s:\ngot:  %v;\nwant: %v", ci.fieldName, actual, field)
+		//t.Errorf("unexpected value for field %s:\nGOT:\n%v\nWANT:\n%v", ci.fieldName, actual, field)
+		t.Errorf("unexpected value for field %s:\ndiff (-want, +got):\n%s", ci.fieldName, cmp.Diff(field, actual))
 	default:
 		format := msgAndArgs[0].(string) + ":\ngot:  %v;\nwant: %v"
 		args := append(msgAndArgs[1:], actual, field)

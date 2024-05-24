@@ -67,7 +67,7 @@ given as explicit arguments.
 					Package:     "*",
 				})
 				if len(builds) == 0 {
-					return errors.Newf(token.NoPos, "invalid args")
+					return errors.Newf(token.NoPos, "invalid args1")
 				}
 
 				for _, inst := range builds {

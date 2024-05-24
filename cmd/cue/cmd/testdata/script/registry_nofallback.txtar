@@ -4,7 +4,7 @@ env CUE_REGISTRY=foo.com=$CUE_REGISTRY1,none
 cmp stderr expect-stderr
 
 -- expect-stderr --
-main.org@v0: import failed: cannot find package "example.com@v0": cannot fetch example.com@v0.0.1: module not found:
+main.org@v0:main: import failed: cannot find package "example.com@v0": cannot fetch example.com@v0.0.1: module not found:
     ./main.cue:2:8
 -- cue.mod/module.cue --
 module: "main.org@v0"

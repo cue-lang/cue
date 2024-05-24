@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c24c27c_a4c24b5a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-05-24T10:55:43Z",
+      "side": 1,
+      "message": "Did a first pass, looks pretty good, I hope my comments don\u0027t turn out too naïve!",
+      "revId": "a834f5d932f18e4b15b791d9e2a8ea73a36fdd7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22f5eacd_12c04982",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-05-24T10:55:43Z",
+      "side": 1,
+      "message": "Why not just a map?",
+      "revId": "a834f5d932f18e4b15b791d9e2a8ea73a36fdd7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "004e0cd9_dce23fea",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-05-24T10:55:43Z",
+      "side": 1,
+      "message": "So `level\u003d0` is invalid?",
+      "revId": "a834f5d932f18e4b15b791d9e2a8ea73a36fdd7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09265dec_32566b27",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-05-24T10:55:43Z",
+      "side": 1,
+      "message": "Is this associated with positional information, or is it just a naked error?",
+      "revId": "a834f5d932f18e4b15b791d9e2a8ea73a36fdd7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9e0365e_67ad845d",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-05-24T10:55:43Z",
+      "side": 1,
+      "message": "So if we\u0027re only looking for `key`, why can\u0027t we use a map?",
+      "revId": "a834f5d932f18e4b15b791d9e2a8ea73a36fdd7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7790ae2e_0cc14cbb",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-05-24T10:55:43Z",
+      "side": 1,
+      "message": "Creating this string in a loop is somewhat unfortunate, but the alternative seems ugly.",
+      "revId": "a834f5d932f18e4b15b791d9e2a8ea73a36fdd7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "017d9d18_8a89efb6",
+        "filename": "encoding/toml/decode_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 402,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-05-24T10:55:43Z",
+      "side": 1,
+      "message": "How come we use the shorthand CUE syntax `a: b: c` here but on line 365 we don\u0027t? Is this a property of how `encoding/toml` works (in which case, why does it work like that?), or is it a property of `cue/format`?",
+      "revId": "a834f5d932f18e4b15b791d9e2a8ea73a36fdd7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "747f532e_9eb018ef",
+        "filename": "encoding/toml/decode_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 461,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-05-24T10:55:43Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be `_` instead of `{}`?",
+      "revId": "a834f5d932f18e4b15b791d9e2a8ea73a36fdd7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b29da64_f19fff37",
+        "filename": "encoding/toml/decode_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 679,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-05-24T10:55:43Z",
+      "side": 1,
+      "message": "So a numeric \"selector\" (for the lack of a better word) in TOML always implies array?",
+      "revId": "a834f5d932f18e4b15b791d9e2a8ea73a36fdd7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

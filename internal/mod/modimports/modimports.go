@@ -68,23 +68,78 @@ func AllImports(modFilesIter func(func(ModuleFile, error) bool)) (_ []string, re
 // If pkgQualifier is "*", files from all packages in the directory will be produced.
 func PackageFiles(fsys fs.FS, dir string, pkgQualifier string) func(func(ModuleFile, error) bool) {
 	return func(yield func(ModuleFile, error) bool) {
-		entries, err := fs.ReadDir(fsys, dir)
-		if err != nil {
-			yield(ModuleFile{
-				FilePath: dir,
-			}, err)
-			return
+		// Start at the target directory, but also include package files
+		// from packages with the same name(s) in parent directories.
+		// Stop the iteration when we find a cue.mod entry, signifying
+		// the module root. If the location is inside a `cue.mod` directory
+		// already, do not look at parent directories - this mimics historic
+		// behavior.
+		selectPackage := func(pkg string) bool {
+			if pkgQualifier == "*" {
+				return true
+			}
+			return pkg == pkgQualifier
 		}
-		for _, e := range entries {
-			if !yieldPackageFile(fsys, path.Join(dir, e.Name()), pkgQualifier, yield) {
+		inCUEMod := false
+		if before, after, ok := strings.Cut(dir, "cue.mod"); ok {
+			// We're underneath a cue.mod directory if some parent
+			// element is cue.mod.
+			inCUEMod =
+				(before == "" || strings.HasSuffix(before, "/")) &&
+					(after == "" || strings.HasPrefix(after, "/"))
+		}
+		var matchedPackages map[string]bool
+		for {
+			entries, err := fs.ReadDir(fsys, dir)
+			if err != nil {
+				yield(ModuleFile{
+					FilePath: dir,
+				}, err)
 				return
 			}
+			inModRoot := false
+			for _, e := range entries {
+				if e.Name() == "cue.mod" {
+					inModRoot = true
+				}
+				pkgName, cont := yieldPackageFile(fsys, path.Join(dir, e.Name()), selectPackage, yield)
+				if !cont {
+					return
+				}
+				if pkgName != "" {
+					if matchedPackages == nil {
+						matchedPackages = make(map[string]bool)
+					}
+					matchedPackages[pkgName] = true
+				}
+			}
+			if inModRoot || inCUEMod {
+				// We're at the module root or we're inside the cue.mod
+				// directory. Don't go any further up the hierarchy.
+				return
+			}
+			if matchedPackages == nil {
+				// No packages possible in parent directories if there are
+				// no matching package files in the package directory itself.
+				return
+			}
+			selectPackage = func(pkgName string) bool {
+				return matchedPackages[pkgName]
+			}
+			parent := path.Dir(dir)
+			if len(parent) >= len(dir) {
+				// No more parent directories.
+				return
+			}
+			dir = parent
 		}
 	}
 }
 
 // AllModuleFiles returns an iterator that produces all the CUE files inside the
 // module at the given root.
+//
+// The caller may assume that files from the same package are always adjacent.
 func AllModuleFiles(fsys fs.FS, root string) func(func(ModuleFile, error) bool) {
 	return func(yield func(ModuleFile, error) bool) {
 		yieldAllModFiles(fsys, root, true, yield)
@@ -115,33 +170,50 @@ func yieldAllModFiles(fsys fs.FS, fpath string, topDir bool, yield func(ModuleFi
 			}
 		}
 	}
+	// Generate all entries for the package before moving onto packages
+	// in subdirectories.
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+		fpath := path.Join(fpath, entry.Name())
+		if _, ok := yieldPackageFile(fsys, fpath, func(string) bool { return true }, yield); !ok {
+			return false
+		}
+	}
+
 	for _, entry := range entries {
 		name := entry.Name()
+		if !entry.IsDir() {
+			continue
+		}
+		if name == "cue.mod" || strings.HasPrefix(name, ".") || strings.HasPrefix(name, "_") {
+			continue
+		}
 		fpath := path.Join(fpath, name)
-		if entry.IsDir() {
-			if name == "cue.mod" || strings.HasPrefix(name, ".") || strings.HasPrefix(name, "_") {
-				continue
-			}
-			if !yieldAllModFiles(fsys, fpath, false, yield) {
-				return false
-			}
-		} else if !yieldPackageFile(fsys, fpath, "*", yield) {
+		if !yieldAllModFiles(fsys, fpath, false, yield) {
 			return false
 		}
 	}
 	return true
 }
 
-func yieldPackageFile(fsys fs.FS, fpath, pkgQualifier string, yield func(ModuleFile, error) bool) bool {
+// yieldPackageFile invokes yield with the contents of the package file
+// at the given path if selectPackage returns true for the file's
+// package name.
+//
+// It returns the yielded package name (if any) and reports whether
+// the iteration should continue.
+func yieldPackageFile(fsys fs.FS, fpath string, selectPackage func(pkgName string) bool, yield func(ModuleFile, error) bool) (pkgName string, cont bool) {
 	if !strings.HasSuffix(fpath, ".cue") {
-		return true
+		return "", true
 	}
 	pf := ModuleFile{
 		FilePath: fpath,
 	}
 	f, err := fsys.Open(fpath)
 	if err != nil {
-		return yield(pf, err)
+		return "", yield(pf, err)
 	}
 	defer f.Close()
 
@@ -152,16 +224,16 @@ func yieldPackageFile(fsys fs.FS, fpath, pkgQualifier string, yield func(ModuleF
 	// on a reader in a streaming manner.
 	data, err := cueimports.Read(f)
 	if err != nil {
-		return yield(pf, err)
+		return "", yield(pf, err)
 	}
 	syntax, err := parser.ParseFile(fpath, data, parser.ImportsOnly)
 	if err != nil {
-		return yield(pf, err)
+		return "", yield(pf, err)
 	}
 
-	if pkgQualifier != "*" && syntax.PackageName() != pkgQualifier {
-		return true
+	if !selectPackage(syntax.PackageName()) {
+		return "", true
 	}
 	pf.Syntax = syntax
-	return yield(pf, nil)
+	return syntax.PackageName(), yield(pf, nil)
 }

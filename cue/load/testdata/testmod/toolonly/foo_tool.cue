@@ -1,4 +1,4 @@
-package foo
+package toolonly
 
 import "tool/cli"
 

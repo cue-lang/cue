@@ -4,6 +4,7 @@ y/y1.cue "dep3" "dep4"
 y/y2.cue
 y/z1.cue
 y/z2.cue
+z.cue
 -- want-imports --
 dep1
 dep2:a
@@ -39,6 +40,9 @@ package z
 
 -- y/z2.cue --
 package z
+
+-- z.cue --
+package example
 
 -- _omitted1/foo.cue --
 not even looked at

@@ -22,7 +22,7 @@ language: {
 -- main.cue --
 package main
 
-import "example.com@v0"
+import "example.com@v0:main"
 
 -- _registry/example.com_v0.0.1/cue.mod/module.cue --
 module: "example.com@v0"

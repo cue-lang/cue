@@ -1,0 +1,45 @@
+# Test that only packages explicitly implied from command line
+# arguments and their dependencies are scanned.
+# See https://cuelang.org/issue/3155 for context.
+
+# TODO this should not fail.
+! exec cue eval ./a
+
+cmp stderr stderr.golden
+-- stderr.golden --
+cannot enumerate all module imports: cannot read "c/c.cue": expected 'STRING', found 'INT' 435
+-- cue.mod/module.cue --
+module: "mod.com"
+language: version: "v0.9.0"
+deps: "example.com/foo": v: "v0.0.1"
+-- root.cue --
+package root
+
+import "mod.com/x"
+
+x
+-- a/a.cue --
+package a
+
+import "mod.com/b"
+
+b
+-- b/b.cue --
+package b
+import "example.com/foo"
+b: 5
+foo
+-- c/c.cue --
+// This file should be ignored because it's not part of the dependencies
+// mentioned on the command line.
+package c
+import 435
+
+-- _registry/example.com_foo_v0.0.1/cue.mod/module.cue --
+module: "example.com/foo@v0"
+language: version: "v0.8.0"
+
+-- _registry/example.com_foo_v0.0.1/foo.cue --
+package foo
+foo: true
+

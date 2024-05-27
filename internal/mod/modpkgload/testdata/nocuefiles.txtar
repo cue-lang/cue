@@ -12,9 +12,9 @@ main.test@v0:main
 	imports:
 		example.com/blah@v0
 example.com/blah@v0
-	flags: inAll,isRoot,fromRoot,importsLoaded
-	mod: example.com@v0.0.1
-	location: _registry/example.com_v0.0.1/blah
+	flags: inAll,isRoot,fromRoot
+	error: no files in package directory with package name "blah"
+	missing: false
 -- main.cue --
 package main
 import "example.com/blah@v0"

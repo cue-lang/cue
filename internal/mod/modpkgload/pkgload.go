@@ -245,9 +245,19 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 		pkgs.applyPkgFlags(ctx, pkg, PkgInAll)
 	}
 	pkgQual := module.ParseImportPath(pkg.path).Qualifier
+	if pkgQual == "" {
+		pkg.err = fmt.Errorf("cannot determine package name from import path %q", pkg.path)
+		return
+	}
 	importsMap := make(map[string]bool)
+	foundPackageFile := false
 	for _, loc := range pkg.locs {
-		imports, err := modimports.AllImports(modimports.PackageFiles(loc.FS, loc.Dir, pkgQual))
+		pkgFileIter := modimports.PackageFiles(loc.FS, loc.Dir, pkgQual)
+		pkgFileIter(func(_ modimports.ModuleFile, err error) bool {
+			foundPackageFile = err == nil
+			return false
+		})
+		imports, err := modimports.AllImports(pkgFileIter)
 		if err != nil {
 			pkg.err = fmt.Errorf("cannot get imports: %v", err)
 			return
@@ -255,6 +265,10 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 		for _, imp := range imports {
 			importsMap[imp] = true
 		}
+	}
+	if !foundPackageFile {
+		pkg.err = fmt.Errorf("no files in package directory with package name %q", pkgQual)
+		return
 	}
 	imports := make([]string, 0, len(importsMap))
 	for imp := range importsMap {

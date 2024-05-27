@@ -118,5 +118,5 @@ import (
 	qt.Assert(t, qt.DeepEquals(imps, []string{"other"}))
 	imps, err = AllImports(PackageFiles(tfs, "sub", "x"))
 	qt.Assert(t, qt.IsNil(err))
-	qt.Assert(t, qt.DeepEquals(imps, []string{"imported-from-sub.com/foo"}))
+	qt.Assert(t, qt.DeepEquals(imps, []string{"bar.com/baz", "foo", "imported-from-sub.com/foo", "something.else:other"}))
 }

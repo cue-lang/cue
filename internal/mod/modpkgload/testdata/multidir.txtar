@@ -15,6 +15,12 @@ example.com/blah@v0
 	flags: inAll,isRoot,fromRoot,importsLoaded
 	mod: example.com@v0.0.1
 	location: _registry/example.com_v0.0.1/blah
+	imports:
+		foo.com/bar/hello/goodbye@v0
+foo.com/bar/hello/goodbye@v0
+	flags: inAll,isRoot,fromRoot
+	error: cannot find module providing package foo.com/bar/hello/goodbye@v0
+	missing: true
 -- main.cue --
 package main
 import "example.com/blah@v0"

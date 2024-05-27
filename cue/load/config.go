@@ -131,6 +131,7 @@ type Config struct {
 	// A Module is a collection of packages and instances that are within the
 	// directory hierarchy rooted at the module root. The module root can be
 	// marked with a cue.mod file.
+	// If this is a relative path, it will be interpreted relative to [Config.Dir].
 	ModuleRoot string
 
 	// Module specifies the module prefix. If not empty, this value must match
@@ -304,13 +305,13 @@ type importPath string
 
 type fsPath string
 
-func addImportQualifier(pkg importPath, name string) (importPath, errors.Error) {
+func addImportQualifier(pkg importPath, name string) (importPath, error) {
 	if name == "" {
 		return pkg, nil
 	}
 	ip := module.ParseImportPath(string(pkg))
 	if ip.ExplicitQualifier && ip.Qualifier != name {
-		return "", errors.Newf(token.NoPos, "non-matching package names (%s != %s)", ip.Qualifier, name)
+		return "", fmt.Errorf("non-matching package names (%s != %s)", ip.Qualifier, name)
 	}
 	ip.Qualifier = name
 	return importPath(ip.String()), nil
@@ -353,6 +354,10 @@ func (c Config) complete() (cfg *Config, err error) {
 	// TODO: determine root on a package basis. Maybe we even need a
 	// pkgname.cue.mod
 	// Look to see if there is a cue.mod.
+	//
+	// TODO(mvdan): note that setting Config.ModuleRoot to a directory
+	// without a cue.mod file does not result in any error, which is confusing
+	// or can lead to not using the right CUE module silently.
 	if c.ModuleRoot == "" {
 		// Only consider the current directory by default
 		c.ModuleRoot = c.Dir

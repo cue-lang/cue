@@ -226,7 +226,9 @@ func yieldPackageFile(fsys fs.FS, fpath string, selectPackage func(pkgName strin
 	if err != nil {
 		return "", yield(pf, err)
 	}
-	syntax, err := parser.ParseFile(fpath, data, parser.ImportsOnly)
+	// Add a leading "./" so that a parse error filename is consistent
+	// with the other error filenames created elsewhere in the codebase.
+	syntax, err := parser.ParseFile("./"+fpath, data, parser.ImportsOnly)
 	if err != nil {
 		return "", yield(pf, err)
 	}

@@ -12,9 +12,6 @@ cmp stdout stdout.golden
 # Without a qualifier, it's an error because the chosen package is ambiguous
 # (the package clause in CUE has to declare a valid CUE identifier).
 ! exec cue eval ./test2/root.cue
-# Note: the errors here could use improvement. Specifically it says:
-#	package is x, want 1x:
-# but it's not possible for a package to be 1x because it's not a valid CUE identifier.
 cmp stderr test2-import-stderr.golden
 ! exec cue eval mod.com/1x
 cmp stderr test2-abs-stderr.golden
@@ -44,9 +41,7 @@ x: 5
 -- stdout.golden --
 x: 5
 -- test2-import-stderr.golden --
-import failed: build constraints exclude all CUE files in mod.com/1x:
-    1x/x.cue: package is x, want 1x:
+import failed: cannot determine package name for "mod.com/1x"; set it explicitly with ':':
     ./test2/root.cue:3:8
 -- test2-abs-stderr.golden --
-build constraints exclude all CUE files in mod.com/1x:
-    1x/x.cue: package is x, want 1x
+cannot determine package name for "mod.com/1x"; set it explicitly with ':'

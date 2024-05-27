@@ -260,7 +260,7 @@ var parseImportPathTests = []struct {
 	want: ImportPath{
 		Path:      "main.test",
 		Version:   "v0",
-		Qualifier: "main.test",
+		Qualifier: "",
 	},
 }, {
 	testName: "WithMajorVersionAndExplicitQualifier",
@@ -306,7 +306,7 @@ var parseImportPathTests = []struct {
 		Path:              "foo.com/bar/...",
 		Version:           "",
 		ExplicitQualifier: false,
-		Qualifier:         "...",
+		Qualifier:         "",
 	},
 	wantCanonical: "foo.com/bar/...",
 }, {
@@ -326,7 +326,7 @@ var parseImportPathTests = []struct {
 		Path:              "foo.com/bar/#foo",
 		Version:           "",
 		ExplicitQualifier: false,
-		Qualifier:         "#foo",
+		Qualifier:         "",
 	},
 	wantCanonical: "foo.com/bar/#foo",
 }}
@@ -359,5 +359,5 @@ func TestImportPathStringAddsQualifierWhenNoVersion(t *testing.T) {
 		Path:      "foo.com/bar",
 		Qualifier: "baz",
 	}
-	qt.Assert(t, qt.Equals(ip.String(), "foo.com/bar"))
+	qt.Assert(t, qt.Equals(ip.String(), "foo.com/bar:baz"))
 }

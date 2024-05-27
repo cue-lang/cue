@@ -2,12 +2,11 @@
 # arguments and their dependencies are scanned.
 # See https://cuelang.org/issue/3155 for context.
 
-# TODO: this should not fail.
-! exec cue eval ./a
-
-cmp stderr stderr.golden
--- stderr.golden --
-cannot enumerate all module imports: cannot read "c/invalid.cue": expected 'STRING', found 'INT' 435
+exec cue eval ./a
+cmp stdout stdout.golden
+-- stdout.golden --
+b:   5
+foo: true
 -- cue.mod/module.cue --
 module: "mod.com"
 language: version: "v0.9.0"

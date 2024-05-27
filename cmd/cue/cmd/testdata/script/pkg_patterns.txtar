@@ -35,6 +35,7 @@ stdout -count=1 '^self: "mod.com/alpha1/leaf"$'
 # TODO: Why does this succeed? What does the output mean? This seems broken.
 exec cue eval ./.../leaf
 cmp stderr dot-dots-middle.stderr
+# TODO: Unlike other cases, this still returns a "matched no packages" error.
 ! exec cue eval mod.com/.../leaf
 cmp stderr current-dots-middle.stderr
 
@@ -47,34 +48,25 @@ cmp stderr external-dots-middle.stderr
 cmp stderr external-dots-multimod.stderr
 
 -- external.stderr --
-cue: "example.com/foo/..." matched no packages
-
+pattern not allowed in external package path "example.com/foo/..."
 -- all.stderr --
 cue: "all" matched no packages
-
 -- cmd.stderr --
 cue: "cmd" matched no packages
-
 -- std.stderr --
 cue: "std" matched no packages
-
 -- dots.stderr --
-cue: "..." matched no packages
-
+pattern not allowed in external package path "..."
 -- dots-prefix.stderr --
-cue: ".../leaf" matched no packages
-
+pattern not allowed in external package path ".../leaf"
 -- dot-dots-middle.stderr --
 // mod.com@v0:root
 -- current-dots-middle.stderr --
 cue: "mod.com/.../leaf" matched no packages
-
 -- external-dots-middle.stderr --
-cue: "example.com/foo/.../bar" matched no packages
-
+pattern not allowed in external package path "example.com/foo/.../bar"
 -- external-dots-multimod.stderr --
-cue: "example.com/..." matched no packages
-
+pattern not allowed in external package path "example.com/..."
 -- cue.mod/module.cue --
 module: "mod.com"
 

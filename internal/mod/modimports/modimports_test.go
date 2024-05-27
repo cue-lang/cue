@@ -90,6 +90,11 @@ import "other"
 -- omitted --
 -- y.cue --
 package y
+-- sub/x.cue --
+package x
+import (
+	"imported-from-sub.com/foo"
+)
 `))
 	tfs := txtarfs.FS(dirContents)
 	imps, err := AllImports(PackageFiles(tfs, ".", "*"))
@@ -111,4 +116,7 @@ package y
 	imps, err = AllImports(PackageFiles(tfs, "foo", "*"))
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.DeepEquals(imps, []string{"other"}))
+	imps, err = AllImports(PackageFiles(tfs, "sub", "x"))
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(imps, []string{"imported-from-sub.com/foo"}))
 }

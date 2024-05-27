@@ -182,15 +182,13 @@ imports:
 		name: "NoPackageName",
 		cfg:  dirCfg,
 		args: []string{"mod.test/test/hello:nonexist"},
-		want: `err:    build constraints exclude all CUE files in mod.test/test/hello:nonexist:
-    anon.cue: no package name
-    test.cue: package is test, want nonexist
-    hello/test.cue: package is test, want nonexist
+		want: `err:    cannot find package "mod.test/test/hello": no files in package directory with package name "nonexist"
 path:   mod.test/test/hello:nonexist
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
-dir:    $CWD/testdata/testmod/hello
-display:mod.test/test/hello:nonexist`}, {
+dir:    ""
+display:mod.test/test/hello:nonexist`,
+	}, {
 		name: "ExplicitNonPackageFiles",
 		cfg:  dirCfg,
 		args: []string{"./anon.cue", "./other/anon.cue"},

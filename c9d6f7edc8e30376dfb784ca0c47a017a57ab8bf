@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9259b265_2857b6af",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1020333
+      },
+      "writtenOn": "2024-05-28T19:09:42Z",
+      "side": 1,
+      "message": "Err, I wrote these comments under the wrong account :)",
+      "revId": "c9d6f7edc8e30376dfb784ca0c47a017a57ab8bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "035fed5f_01dab55d",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_filetypes.txtar",
+        "patchSetId": 18
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1020333
+      },
+      "writtenOn": "2024-05-28T19:09:42Z",
+      "side": 1,
+      "message": "this TODO is now out of date. will update.",
+      "revId": "c9d6f7edc8e30376dfb784ca0c47a017a57ab8bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ecd3f40_b67c27fb",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_filetypes.txtar",
+        "patchSetId": 18
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1020333
+      },
+      "writtenOn": "2024-05-28T19:09:42Z",
+      "side": 1,
+      "message": "FYI, reworded this error a bit to be clearer.",
+      "revId": "c9d6f7edc8e30376dfb784ca0c47a017a57ab8bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d243cd5_fa22cd4e",
+        "filename": "cue/load/config.go",
+        "patchSetId": 18
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1020333
+      },
+      "writtenOn": "2024-05-28T19:09:42Z",
+      "side": 1,
+      "message": "moving this appears unnecessary, and the old location is closer to its first use and the other type fsPath, so I\u0027ll undo this change.",
+      "revId": "c9d6f7edc8e30376dfb784ca0c47a017a57ab8bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd6c2076_7d38d22a",
+        "filename": "cue/load/import_test.go",
+        "patchSetId": 18
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1020333
+      },
+      "writtenOn": "2024-05-28T19:09:42Z",
+      "side": 1,
+      "message": "Interesting that `ModuleRoot: \".\"` never really did what I (we?) expected. I\u0027ve added a TODO to perhaps make cue/load fail if Config.ModuleRoot points to a directory which is not a module root.",
+      "revId": "c9d6f7edc8e30376dfb784ca0c47a017a57ab8bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

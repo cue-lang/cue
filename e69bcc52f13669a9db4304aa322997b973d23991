@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f91e1f96_816d021d",
+        "filename": "cmd/cue/cmd/testdata/script/pkg_resolution_multiple_packages_no_matching_path_element.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-28T12:54:06Z",
+      "side": 1,
+      "message": "removing this TODO as it now appears obsoleted by this fix.",
+      "revId": "e69bcc52f13669a9db4304aa322997b973d23991",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "be50008a_e81f9244",
+        "filename": "cmd/cue/cmd/testdata/script/pkg_resolution_single_package_not_matching_path_element.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-28T12:54:06Z",
+      "side": 1,
+      "message": "removing this TODO as it now appears obsoleted by this fix.",
+      "revId": "e69bcc52f13669a9db4304aa322997b973d23991",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e57d41c_0efb1da0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-28T09:43:22Z",
+      "side": 1,
+      "message": "SGTM - I tweaked the commit message and testscripts slightly for formatting.",
+      "revId": "ff01afc52c861298944e3932160bd21daaf0c73c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

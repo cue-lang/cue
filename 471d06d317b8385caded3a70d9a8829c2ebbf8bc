@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3679258f_5cfdbca1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1020333
+      },
+      "writtenOn": "2024-05-28T11:38:14Z",
+      "side": 1,
+      "message": "Approving again to unblock my own merge with changes.",
+      "revId": "471d06d317b8385caded3a70d9a8829c2ebbf8bc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

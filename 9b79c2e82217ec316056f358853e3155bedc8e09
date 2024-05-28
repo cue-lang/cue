@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f894d55_ec1f4743",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 19
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-28T20:02:47Z",
+      "side": 1,
+      "message": "This makes it sound like you\u0027re just moving code, but you\u0027re adding 350 lines without deleting a similar amount, and as far as I can tell, they\u0027ve been mostly written from scratch or rewritten to the point where this is not really moving code anymore.",
+      "range": {
+        "startLine": 11,
+        "startChar": 14,
+        "endLine": 11,
+        "endChar": 48
+      },
+      "revId": "9b79c2e82217ec316056f358853e3155bedc8e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6cc76061_10047106",
+        "filename": "cue/load/search.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-28T20:02:47Z",
+      "side": 1,
+      "message": "as far as I can see, there\u0027s no need to add a second path import under a different name, so I\u0027m cleaning this up.",
+      "revId": "9b79c2e82217ec316056f358853e3155bedc8e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a41e69c_9dfe1ffa",
+        "filename": "cue/load/search.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-28T20:02:47Z",
+      "side": 1,
+      "message": "there are exactly zero references to this \"original\" string field; why not use []string rather than []resolvedPackageArg?",
+      "revId": "9b79c2e82217ec316056f358853e3155bedc8e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

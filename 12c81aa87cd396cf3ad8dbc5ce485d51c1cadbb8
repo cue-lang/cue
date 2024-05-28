@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a1dd5e2_d8f7a20f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1020333
+      },
+      "writtenOn": "2024-05-28T12:54:55Z",
+      "side": 1,
+      "message": "Unblocking myself.",
+      "revId": "12c81aa87cd396cf3ad8dbc5ce485d51c1cadbb8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

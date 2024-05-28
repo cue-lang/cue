@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab9126fd_5e79a1cd",
+        "filename": "cmd/cue/cmd/testdata/script/pkg_resolution_path_element_invalid_ident.txtar",
+        "patchSetId": 10
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-28T09:50:40Z",
+      "side": 1,
+      "message": "I assume this is out of date now. Fixing up.",
+      "revId": "9941e76512d72c7c83f6a679260845211372f8c3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ca44db4_91f2e11b",
+        "filename": "cue/load/import.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 371,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-28T09:50:40Z",
+      "side": 1,
+      "message": "this confused me greatly, as I read the parentheses as \"it was set explicitly with a colon\", when you in fact mean \"you should set it explicitly with a colon\". I will rewrite.",
+      "revId": "9941e76512d72c7c83f6a679260845211372f8c3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

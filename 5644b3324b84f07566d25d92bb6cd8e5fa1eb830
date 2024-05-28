@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "011cfc9c_e10ce616",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1020333
+      },
+      "writtenOn": "2024-05-28T09:53:01Z",
+      "side": 1,
+      "message": "Unblocking myself from submitting, as the uploader can\u0027t self-approve.",
+      "revId": "5644b3324b84f07566d25d92bb6cd8e5fa1eb830",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

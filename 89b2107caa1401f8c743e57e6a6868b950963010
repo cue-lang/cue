@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d39a64fb_a1e9f6a7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-29T11:02:00Z",
+      "side": 1,
+      "message": "The one thing missing at this point in the stack (I think) is a test that verifies that we do not support `...` expansion for non-main module packages.",
+      "revId": "89b2107caa1401f8c743e57e6a6868b950963010",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8c62add6_999b4f73",
         "filename": "cmd/cue/cmd/testdata/script/fmt.txtar",
         "patchSetId": 20

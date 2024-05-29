@@ -66,6 +66,9 @@ func AllImports(modFilesIter func(func(ModuleFile, error) bool)) (_ []string, re
 // PackageFiles returns an iterator that produces all the CUE files
 // inside the package with the given name at the given location.
 // If pkgQualifier is "*", files from all packages in the directory will be produced.
+//
+// TODO(mvdan): this should now be called InstanceFiles, to follow the naming from
+// https://cuelang.org/docs/concept/modules-packages-instances/#instances.
 func PackageFiles(fsys fs.FS, dir string, pkgQualifier string) func(func(ModuleFile, error) bool) {
 	return func(yield func(ModuleFile, error) bool) {
 		// Start at the target directory, but also include package files

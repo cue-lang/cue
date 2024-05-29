@@ -50,6 +50,24 @@
       "message": "Ah, found the code now. This path needs a test. And I also think \"external package path\" is not something that is well defined? Is it too much of a mouthful to say \"non-main module package path\"?",
       "revId": "89b2107caa1401f8c743e57e6a6868b950963010",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69b2143f_364ecc69",
+        "filename": "cue/load/search.go",
+        "patchSetId": 20
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-29T11:05:27Z",
+      "side": 1,
+      "message": "FYI Go is moving away from the term \"main module\", as it is confusing with \"main package\", and I agree with that. we could use \"current module\", but \"non-current module package path\" is significantly more verbose than \"external package path\", so I would leave as is.",
+      "parentUuid": "83b0b05b_f94ab511",
+      "revId": "89b2107caa1401f8c743e57e6a6868b950963010",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

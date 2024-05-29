@@ -1,0 +1,108 @@
+# Test the various kinds of wildcard patterns that we do not support.
+
+# Patterns on modules other than the current module are not supported,
+# even though one valid package could be matched.
+! exec cue eval example.com/foo/...
+cmp stderr external.stderr
+exec cue eval example.com/foo
+stdout -count=1 '^self: "example.com/foo"$'
+
+# The "all", "cmd", and "std" patterns were inherited from Go,
+# but they do nothing useful right now.
+# TODO: decide whether to support or reject these.
+! exec cue eval all
+cmp stderr all.stderr
+! exec cue eval cmd
+cmp stderr cmd.stderr
+! exec cue eval std
+cmp stderr std.stderr
+
+# A lone wildcard, perhaps equivalent to "all", is not supported for now.
+# TODO: much like "all", decide whether to support or reject this.
+! exec cue eval ...
+cmp stderr dots.stderr
+
+# Patterns with a leading wildcard are not supported either,
+# as they could match any module ever published,
+# even though one valid package could be matched.
+! exec cue eval .../leaf
+cmp stderr dots-prefix.stderr
+exec cue eval ./alpha1/leaf
+stdout -count=1 '^self: "mod.com/alpha1/leaf"$'
+
+# A wildcard in the middle of a pattern, with the current module as a prefix
+# either as "dot" or as the full path.
+# TODO: Why does this succeed? What does the output mean? This seems broken.
+exec cue eval ./.../leaf
+cmp stderr dot-dots-middle.stderr
+! exec cue eval mod.com/.../leaf
+cmp stderr current-dots-middle.stderr
+
+# A wildcard in the middle of a pattern, with a dependency module as a prefix.
+! exec cue eval example.com/foo/.../bar
+cmp stderr external-dots-middle.stderr
+
+# Matching many external modules, which could mean registry requests.
+! exec cue eval example.com/...
+cmp stderr external-dots-multimod.stderr
+
+-- external.stderr --
+cue: "example.com/foo/..." matched no packages
+
+-- all.stderr --
+cue: "all" matched no packages
+
+-- cmd.stderr --
+cue: "cmd" matched no packages
+
+-- std.stderr --
+cue: "std" matched no packages
+
+-- dots.stderr --
+cue: "..." matched no packages
+
+-- dots-prefix.stderr --
+cue: ".../leaf" matched no packages
+
+-- dot-dots-middle.stderr --
+// mod.com@v0:root
+-- current-dots-middle.stderr --
+cue: "mod.com/.../leaf" matched no packages
+
+-- external-dots-middle.stderr --
+cue: "example.com/foo/.../bar" matched no packages
+
+-- external-dots-multimod.stderr --
+cue: "example.com/..." matched no packages
+
+-- cue.mod/module.cue --
+module: "mod.com"
+
+language: version: "v0.9.0"
+
+deps: "example.com/foo": v: "v0.0.1"
+-- root.cue --
+package root
+
+import "example.com/foo"
+
+foo.bar
+-- alpha1/leaf/leaf.cue --
+package leaf
+self: "mod.com/alpha1/leaf"
+-- beta1/leaf/leaf.cue --
+package leaf
+self: "mod.com/beta1/leaf"
+-- beta1/beta2/leaf/leaf.cue --
+package leaf
+self: "mod.com/beta1/beta2/leaf"
+-- _registry/example.com_foo_v0.0.1/cue.mod/module.cue --
+module: "example.com/foo@v0"
+language: version: "v0.8.0"
+
+-- _registry/example.com_foo_v0.0.1/foo.cue --
+package foo
+self: "example.com/foo"
+-- _registry/example.com_foo_v0.0.1/bar/bar.cue --
+package bar
+self: "example.com/foo/bar"

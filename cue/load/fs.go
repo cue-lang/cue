@@ -141,15 +141,6 @@ func (fs *fileSystem) makeAbs(path string) string {
 	return filepath.Join(fs.cwd, path)
 }
 
-func (fs *fileSystem) isDir(path string) bool {
-	path = fs.makeAbs(path)
-	if fs.getDir(path, false) != nil {
-		return true
-	}
-	fi, err := os.Stat(path)
-	return err == nil && fi.IsDir()
-}
-
 func (fs *fileSystem) readDir(path string) ([]iofs.DirEntry, errors.Error) {
 	path = fs.makeAbs(path)
 	m := fs.getDir(path, false)

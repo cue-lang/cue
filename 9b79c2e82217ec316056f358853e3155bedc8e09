@@ -50,6 +50,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "1fac4317_b52498e2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 19
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-29T22:17:58Z",
+      "side": 1,
+      "message": "Thanks, rewording slightly.",
+      "parentUuid": "3598c22e_75c8b0db",
+      "range": {
+        "startLine": 11,
+        "startChar": 14,
+        "endLine": 11,
+        "endChar": 48
+      },
+      "revId": "9b79c2e82217ec316056f358853e3155bedc8e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "6cc76061_10047106",
         "filename": "cue/load/search.go",
         "patchSetId": 19
@@ -96,6 +120,24 @@
       "side": 1,
       "message": "resolvedPackageArg is a holdover from when I was trying to get the wildcard expansion to work as a full replacement for the original expansion code - the original field was used to populate the Instance.DisplayPath field. It could be removed now - I left it in because I was running out of time, it seems benign, and I still have hopes of deduplicating the expansion code, so it might yet be useful. Feel free to rip it out if you like.",
       "parentUuid": "4a41e69c_9dfe1ffa",
+      "revId": "9b79c2e82217ec316056f358853e3155bedc8e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9527dc1_7b5950e7",
+        "filename": "cue/load/search.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-29T22:17:58Z",
+      "side": 1,
+      "message": "Ack, adding a doc summarizing this.",
+      "parentUuid": "0c676da7_167eecba",
       "revId": "9b79c2e82217ec316056f358853e3155bedc8e09",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

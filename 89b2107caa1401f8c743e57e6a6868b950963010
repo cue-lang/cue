@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6d68015_56022d08",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 20
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-29T22:17:58Z",
+      "side": 1,
+      "message": "https://github.com/cue-lang/cue/issues/3183",
+      "parentUuid": "ec55b169_73fe4f41",
+      "range": {
+        "startLine": 21,
+        "startChar": 29,
+        "endLine": 21,
+        "endChar": 57
+      },
+      "revId": "89b2107caa1401f8c743e57e6a6868b950963010",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d39a64fb_a1e9f6a7",
@@ -37,6 +61,24 @@
       "writtenOn": "2024-05-29T11:02:00Z",
       "side": 1,
       "message": "The one thing missing at this point in the stack (I think) is a test that verifies that we do not support `...` expansion for non-main module packages.",
+      "revId": "89b2107caa1401f8c743e57e6a6868b950963010",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c3545b0_ac921939",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-29T22:17:58Z",
+      "side": 1,
+      "message": "Done in a new parent CL.",
+      "parentUuid": "d39a64fb_a1e9f6a7",
       "revId": "89b2107caa1401f8c743e57e6a6868b950963010",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -71,6 +113,24 @@
       "writtenOn": "2024-05-29T11:16:12Z",
       "side": 1,
       "message": "I don\u0027t understand this. Adding a comment to come back to it.",
+      "revId": "89b2107caa1401f8c743e57e6a6868b950963010",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e476256b_89791771",
+        "filename": "cue/load/loader_test.go",
+        "patchSetId": 20
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-29T22:17:58Z",
+      "side": 1,
+      "message": "These test changes appear to be unnecessary for this CL to pass CI, they seem unrelated, and they aren\u0027t documented in the commit message. I\u0027m reverting them.\n\nSeparately, this particular test case appears broken, and it seems like it has been broken for some time. I will add a TODO as part of another CL.",
+      "parentUuid": "1339a1c8_a90fad8c",
       "revId": "89b2107caa1401f8c743e57e6a6868b950963010",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -124,6 +184,24 @@
       "side": 1,
       "message": "raised https://github.com/cue-lang/cue/issues/3181 to track this on our end.",
       "parentUuid": "69b2143f_364ecc69",
+      "revId": "89b2107caa1401f8c743e57e6a6868b950963010",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc5748c9_3b145a6f",
+        "filename": "cue/load/search.go",
+        "patchSetId": 20
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-29T22:17:58Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "3a0a3365_01f9ec7c",
       "revId": "89b2107caa1401f8c743e57e6a6868b950963010",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -252,13 +252,16 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 	importsMap := make(map[string]bool)
 	foundPackageFile := false
 	for _, loc := range pkg.locs {
-		// TODO(mvdan): using the PackageFiles iterator twice below
-		// causes twice as many io/fs operations on loc.FS.
-		pkgFileIter := modimports.PackageFiles(loc.FS, loc.Dir, pkgQual)
-		pkgFileIter(func(_ modimports.ModuleFile, err error) bool {
-			foundPackageFile = err == nil
-			return false
-		})
+		// Layer an iterator whose yield function keeps track of whether we have seen
+		// a single valid CUE file in the package directory.
+		// Otherwise we would have to iterate twice, causing twice as many io/fs operations.
+		pkgFileIter := func(yield func(modimports.ModuleFile, error) bool) {
+			yield2 := func(mf modimports.ModuleFile, err error) bool {
+				foundPackageFile = err == nil
+				return yield(mf, err)
+			}
+			modimports.PackageFiles(loc.FS, loc.Dir, pkgQual)(yield2)
+		}
 		imports, err := modimports.AllImports(pkgFileIter)
 		if err != nil {
 			pkg.err = fmt.Errorf("cannot get imports: %v", err)

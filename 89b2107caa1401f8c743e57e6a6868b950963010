@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c62add6_999b4f73",
+        "filename": "cmd/cue/cmd/testdata/script/fmt.txtar",
+        "patchSetId": 20
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-29T10:59:22Z",
+      "side": 1,
+      "message": "TODO: investigate why this is happening",
+      "revId": "89b2107caa1401f8c743e57e6a6868b950963010",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -18,6 +18,7 @@ import (
 	"cmp"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	pathpkg "path"
 	"path/filepath"
@@ -141,13 +142,17 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	// since a package foo/bar/baz inherits from parent packages foo/bar and foo.
 	// See https://cuelang.org/docs/concept/modules-packages-instances/#instances.
 	for _, d := range dirs {
-		for dir := filepath.Clean(d[1]); ctxt.isDir(dir); {
+		dir := filepath.Clean(d[1])
+		for {
 			sd, ok := l.dirCachedBuildFiles[dir]
 			if !ok {
 				sd = l.scanDir(dir)
 				l.dirCachedBuildFiles[dir] = sd
 			}
 			if err := sd.err; err != nil {
+				if errors.Is(err, fs.ErrNotExist) {
+					break
+				}
 				return retErr(errors.Wrapf(err, token.NoPos, "import failed reading dir %v", dir))
 			}
 			p.UnknownFiles = append(p.UnknownFiles, sd.unknownFiles...)
@@ -208,7 +213,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 func (l *loader) scanDir(dir string) cachedFileFiles {
 	sd := cachedFileFiles{}
 	files, err := l.cfg.fileSystem.readDir(dir)
-	if err != nil && !os.IsNotExist(err) {
+	if err != nil {
 		sd.err = err
 		return sd
 	}

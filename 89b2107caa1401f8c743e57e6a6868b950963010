@@ -100,6 +100,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3acffd1_28820dc3",
+        "filename": "cmd/cue/cmd/testdata/script/fmt.txtar",
+        "patchSetId": 20
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-29T22:30:23Z",
+      "side": 1,
+      "message": "Fixed; `yieldPackageFile` needed to add a `./` prefix to filenames when parsing files, for consistency with other cue/load error cases and the previous logic.",
+      "parentUuid": "8c62add6_999b4f73",
+      "revId": "89b2107caa1401f8c743e57e6a6868b950963010",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1339a1c8_a90fad8c",

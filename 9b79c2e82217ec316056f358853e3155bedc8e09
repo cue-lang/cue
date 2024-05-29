@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "3598c22e_75c8b0db",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 19
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-29T08:25:03Z",
+      "side": 1,
+      "message": "Yes, I didn\u0027t actually want to imply that the code itself was moved, just that the functionality is now in a different place. Probably worth rephrasing this message.\n\nI rewrote the code because the original seemed closely bound to the loader and Instance-creating code and we don\u0027t have that at this stage. This CL did start by removing the old code too, but as mentioned in the last paragraph here, it ended up not doing so. My efforts to make it work as a full replacement have made made it somewhat more complex than it started out, and maybe more complex than it needs to be, but my hope is that in time it is independent enough of the cue/load code that it can be substantially used as the basis for matching code inside internal/mod/modload etc to enable package patterns to work for non-local modules too.",
+      "parentUuid": "6f894d55_ec1f4743",
+      "range": {
+        "startLine": 11,
+        "startChar": 14,
+        "endLine": 11,
+        "endChar": 48
+      },
+      "revId": "9b79c2e82217ec316056f358853e3155bedc8e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "6cc76061_10047106",
@@ -54,6 +78,24 @@
       "writtenOn": "2024-05-28T20:02:47Z",
       "side": 1,
       "message": "there are exactly zero references to this \"original\" string field; why not use []string rather than []resolvedPackageArg?",
+      "revId": "9b79c2e82217ec316056f358853e3155bedc8e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c676da7_167eecba",
+        "filename": "cue/load/search.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-05-29T08:25:03Z",
+      "side": 1,
+      "message": "resolvedPackageArg is a holdover from when I was trying to get the wildcard expansion to work as a full replacement for the original expansion code - the original field was used to populate the Instance.DisplayPath field. It could be removed now - I left it in because I was running out of time, it seems benign, and I still have hopes of deduplicating the expansion code, so it might yet be useful. Feel free to rip it out if you like.",
+      "parentUuid": "4a41e69c_9dfe1ffa",
       "revId": "9b79c2e82217ec316056f358853e3155bedc8e09",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

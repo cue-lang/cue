@@ -204,7 +204,7 @@ func TestScript(t *testing.T) {
 			//   responds with [tokenErrorCodePending] once, and then succeeds
 			// * immediate-success: polling for a token with device_code succeeds right away
 			"oauthregistry": func(ts *testscript.TestScript, neg bool, args []string) {
-				if len(args) != 1 {
+				if neg || len(args) != 1 {
 					ts.Fatalf("usage: oauthregistry <mode>")
 				}
 				ts.Setenv("CUE_EXPERIMENT", "modules")
@@ -212,6 +212,30 @@ func TestScript(t *testing.T) {
 				u, _ := url.Parse(srv.URL)
 				ts.Setenv("CUE_REGISTRY", u.Host+"+insecure")
 				ts.Defer(srv.Close)
+			},
+			// find-files recursively lists files under a directory, like `find -type f` on Linux.
+			// It prints the paths relative to the root working directory of the testscript run,
+			// for the sake of avoiding verbose and non-deterministic absolute paths.
+			"find-files": func(ts *testscript.TestScript, neg bool, args []string) {
+				if neg || len(args) == 0 {
+					ts.Fatalf("usage: find-files args...")
+				}
+				out := ts.Stdout()
+				workdir := ts.Getenv("WORK")
+				for _, arg := range args {
+					err := filepath.WalkDir(arg, func(path string, d fs.DirEntry, err error) error {
+						if err != nil {
+							return err
+						}
+						if d.Type().IsRegular() {
+							rel, err := filepath.Rel(workdir, path)
+							ts.Check(err)
+							fmt.Fprintln(out, rel)
+						}
+						return nil
+					})
+					ts.Check(err)
+				}
 			},
 		},
 		Setup: func(e *testscript.Env) error {

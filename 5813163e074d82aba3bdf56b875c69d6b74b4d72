@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9de18833_14b4dae6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-30T14:41:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "19762d32_5632b794",
+      "range": {
+        "startLine": 14,
+        "startChar": 11,
+        "endLine": 14,
+        "endChar": 24
+      },
+      "revId": "5813163e074d82aba3bdf56b875c69d6b74b4d72",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a98dfca4_120f09c7",
@@ -41,6 +65,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8c54e49_16c8851b",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-30T14:41:02Z",
+      "side": 1,
+      "message": "Nice. Done.",
+      "parentUuid": "a98dfca4_120f09c7",
+      "revId": "5813163e074d82aba3bdf56b875c69d6b74b4d72",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1fd1daf7_47c0c1e8",
@@ -54,6 +96,30 @@
       "writtenOn": "2024-05-30T14:34:11Z",
       "side": 1,
       "message": "```suggestion\n// [ociref.Reference.String] minus the trailing digest. The code implementation\n```",
+      "range": {
+        "startLine": 236,
+        "startChar": 3,
+        "endLine": 236,
+        "endChar": 28
+      },
+      "revId": "5813163e074d82aba3bdf56b875c69d6b74b4d72",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "82de91f7_5db09044",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-30T14:41:02Z",
+      "side": 1,
+      "message": "I keep forgetting we have that capability now with go docs. Thanks, done.",
+      "parentUuid": "1fd1daf7_47c0c1e8",
       "range": {
         "startLine": 236,
         "startChar": 3,

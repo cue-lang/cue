@@ -34,6 +34,7 @@ import (
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/spf13/cobra"
 
+	"cuelang.org/go/internal/mod/semver"
 	"cuelang.org/go/internal/vcs"
 	"cuelang.org/go/mod/modconfig"
 	"cuelang.org/go/mod/modfile"
@@ -123,8 +124,16 @@ func runModUpload(cmd *Command, args []string) error {
 		return fmt.Errorf("cannot form module version: %v", err)
 	}
 	if mf.Source == nil {
-		// TODO print filename relative to current directory
-		return fmt.Errorf("no source field found in cue.mod/module.cue")
+		// The source field started being a requirement to publish modules in v0.9.0-alpha.2.
+		// For backwards compatibility with existing modules which were already being published,
+		// we assume that any earlier version means "self", mimicking the old behavior.
+		// TODO: perhaps some of this logic, or at least the alpha.2 version, should be in modfile.
+		if semver.Compare(mf.Language.Version, "v0.9.0-alpha.2") < 0 {
+			mf.Source = &modfile.Source{Kind: "self"}
+		} else {
+			// TODO print filename relative to current directory
+			return fmt.Errorf("no source field found in cue.mod/module.cue")
+		}
 	}
 	zf, err := os.CreateTemp("", "cue-publish-")
 	if err != nil {

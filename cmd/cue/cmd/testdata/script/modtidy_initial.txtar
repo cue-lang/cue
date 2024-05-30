@@ -61,28 +61,28 @@ import "example.com@v0:main"
 main
 
 -- cue-cache-dir.files --
-.tmp/cache/bar.com@v0.5.0/bar/x.cue
-.tmp/cache/bar.com@v0.5.0/cue.mod/module.cue
-.tmp/cache/baz.org@v0.10.1/baz.cue
-.tmp/cache/baz.org@v0.10.1/cue.mod/module.cue
-.tmp/cache/cache/download/bar.com/@v/v0.5.0.lock
-.tmp/cache/cache/download/bar.com/@v/v0.5.0.mod
-.tmp/cache/cache/download/bar.com/@v/v0.5.0.zip
-.tmp/cache/cache/download/baz.org/@v/v0.10.1.lock
-.tmp/cache/cache/download/baz.org/@v/v0.10.1.mod
-.tmp/cache/cache/download/baz.org/@v/v0.10.1.zip
-.tmp/cache/cache/download/example.com/@v/v0.0.1.lock
-.tmp/cache/cache/download/example.com/@v/v0.0.1.mod
-.tmp/cache/cache/download/example.com/@v/v0.0.1.zip
-.tmp/cache/cache/download/foo.com/bar/hello/@v/v0.2.3.lock
-.tmp/cache/cache/download/foo.com/bar/hello/@v/v0.2.3.mod
-.tmp/cache/cache/download/foo.com/bar/hello/@v/v0.2.3.zip
-.tmp/cache/cache/download/unused.com/@v/v0.2.4.lock
-.tmp/cache/cache/download/unused.com/@v/v0.2.4.mod
-.tmp/cache/example.com@v0.0.1/cue.mod/module.cue
-.tmp/cache/example.com@v0.0.1/top.cue
-.tmp/cache/foo.com/bar/hello@v0.2.3/cue.mod/module.cue
-.tmp/cache/foo.com/bar/hello@v0.2.3/x.cue
+.tmp/cache/mod/download/bar.com/@v/v0.5.0.lock
+.tmp/cache/mod/download/bar.com/@v/v0.5.0.mod
+.tmp/cache/mod/download/bar.com/@v/v0.5.0.zip
+.tmp/cache/mod/download/baz.org/@v/v0.10.1.lock
+.tmp/cache/mod/download/baz.org/@v/v0.10.1.mod
+.tmp/cache/mod/download/baz.org/@v/v0.10.1.zip
+.tmp/cache/mod/download/example.com/@v/v0.0.1.lock
+.tmp/cache/mod/download/example.com/@v/v0.0.1.mod
+.tmp/cache/mod/download/example.com/@v/v0.0.1.zip
+.tmp/cache/mod/download/foo.com/bar/hello/@v/v0.2.3.lock
+.tmp/cache/mod/download/foo.com/bar/hello/@v/v0.2.3.mod
+.tmp/cache/mod/download/foo.com/bar/hello/@v/v0.2.3.zip
+.tmp/cache/mod/download/unused.com/@v/v0.2.4.lock
+.tmp/cache/mod/download/unused.com/@v/v0.2.4.mod
+.tmp/cache/mod/extract/bar.com@v0.5.0/bar/x.cue
+.tmp/cache/mod/extract/bar.com@v0.5.0/cue.mod/module.cue
+.tmp/cache/mod/extract/baz.org@v0.10.1/baz.cue
+.tmp/cache/mod/extract/baz.org@v0.10.1/cue.mod/module.cue
+.tmp/cache/mod/extract/example.com@v0.0.1/cue.mod/module.cue
+.tmp/cache/mod/extract/example.com@v0.0.1/top.cue
+.tmp/cache/mod/extract/foo.com/bar/hello@v0.2.3/cue.mod/module.cue
+.tmp/cache/mod/extract/foo.com/bar/hello@v0.2.3/x.cue
 -- _registry/example.com_v0.0.1/cue.mod/module.cue --
 module: "example.com@v0"
 language: version: "v0.8.0"

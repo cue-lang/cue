@@ -24,6 +24,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"sync"
 
@@ -169,8 +170,45 @@ func runModUpload(cmd *Command, args []string) error {
 			return err
 		}
 
+		underlying := make(map[string]string)
+		for _, f := range files {
+			underlying[f] = filepath.Join(modRoot, f)
+		}
+
+		// Do we have a LICENSE at the root of the module? If not try to grab one
+		// from the root of the VCS repo, first ensuring that git is clean with
+		// respect to that file too.
+		haveLICENSE := slices.Contains(files, "LICENSE")
+		if !haveLICENSE && modRoot != vcsImpl.Root() {
+			// Do we have a LICENSE file at the root?
+			licenseFile := filepath.Join(vcsImpl.Root(), "LICENSE")
+			licenseFilePaths, err := vcsImpl.ListFiles(ctx, vcsImpl.Root(), licenseFile)
+			if err != nil {
+				// TODO: we might need to "ignore" this error and make it
+				// best-efforts. git at least does not error in case you attempt
+				// to ls-file a file that is not controlled by VCS.
+				return err
+			}
+			if len(licenseFilePaths) == 1 {
+				// Verify that the LICENSE file is "clean" with respect to the commit
+				status, err := vcsImpl.Status(ctx, licenseFile)
+				if err != nil {
+					// TODO: again we might need to "ignore" this error and make it
+					// best-efforts.
+					return err
+				}
+				if status.Uncommitted {
+					// TODO: output relative path
+					return fmt.Errorf("VCS state is not clean for %s", licenseFile)
+				}
+
+				files = append(files, "LICENSE")
+				underlying["LICENSE"] = licenseFile
+			}
+		}
+
 		if err := modzip.Create(zf, mv, files, osFileIO{
-			modRoot: modRoot,
+			underlying: underlying,
 		}); err != nil {
 			return err
 		}
@@ -255,7 +293,9 @@ func shortString(ref ociref.Reference) string {
 // osFileIO implements [modzip.FileIO] for filepath paths relative to
 // the module root directory, as returned by [vcs.VCS.ListFiles].
 type osFileIO struct {
-	modRoot string
+	// underlying is a map from the relative path of a file in the
+	// zip archive to its absolute location on disk
+	underlying map[string]string
 }
 
 func (osFileIO) Path(f string) string {
@@ -263,15 +303,11 @@ func (osFileIO) Path(f string) string {
 }
 
 func (fio osFileIO) Lstat(f string) (fs.FileInfo, error) {
-	return os.Lstat(fio.absPath(f))
+	return os.Lstat(fio.underlying[f])
 }
 
 func (fio osFileIO) Open(f string) (io.ReadCloser, error) {
-	return os.Open(fio.absPath(f))
-}
-
-func (fio osFileIO) absPath(f string) string {
-	return filepath.Join(fio.modRoot, f)
+	return os.Open(fio.underlying[f])
 }
 
 // publishRegistryResolverShim implements a wrapper around

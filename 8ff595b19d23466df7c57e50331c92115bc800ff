@@ -41,6 +41,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c89d9fa_e563f965",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-30T21:16:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dc5da49b_366f7cec",
+      "range": {
+        "startLine": 180,
+        "startChar": 4,
+        "endLine": 180,
+        "endChar": 13
+      },
+      "revId": "8ff595b19d23466df7c57e50331c92115bc800ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "da4ed695_29c1dc6e",
@@ -54,6 +78,24 @@
       "writtenOn": "2024-05-30T20:16:36Z",
       "side": 1,
       "message": "Perhaps:\n\n```\n- mod/download for module archives fetched from registries\n- mod/extract for extracted module archives\n```\n\nThe \"from registries\" bit is a bit repetitive, and needlessly so.",
+      "revId": "8ff595b19d23466df7c57e50331c92115bc800ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3429a50e_495af755",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-30T21:16:32Z",
+      "side": 1,
+      "message": "done, minus your suggestion to add \"archives\" to the first point - we fetch .mod files and not just .zip archives.",
+      "parentUuid": "da4ed695_29c1dc6e",
       "revId": "8ff595b19d23466df7c57e50331c92115bc800ff",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -75,6 +117,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "61faa47f_84c9516f",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-30T21:16:32Z",
+      "side": 1,
+      "message": "I struggled with this a bit, because I agree that examples and being more precise is good, but I didn\u0027t want to make this help doc even longer or to add too much verbosity. I opted for adding a section at the very end with a short example, which works for both env vars. PTAL",
+      "parentUuid": "e7375386_a4190065",
+      "revId": "8ff595b19d23466df7c57e50331c92115bc800ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eaec7305_84840e14",
@@ -92,6 +152,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "376362a5_cf03e838",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-30T21:16:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eaec7305_84840e14",
+      "revId": "8ff595b19d23466df7c57e50331c92115bc800ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6cefc9a4_a4bcc0b2",
@@ -105,6 +183,24 @@
       "writtenOn": "2024-05-30T20:16:36Z",
       "side": 1,
       "message": "I\u0027m not entirely clear that \"The registries\" is accurate because this env var can be a file path. How about something like:\n\n```\nThis variable specifies the configuration for downloading and publishing modules. See \"cue help registryconfig\" for details.\n```",
+      "revId": "8ff595b19d23466df7c57e50331c92115bc800ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "751518d5_beb5d4fc",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-30T21:16:32Z",
+      "side": 1,
+      "message": "Ah, you\u0027re right. Done with a very minor wording tweak, mainly to remove the redundant \"this variable specifies\".",
+      "parentUuid": "6cefc9a4_a4bcc0b2",
       "revId": "8ff595b19d23466df7c57e50331c92115bc800ff",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

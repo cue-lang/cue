@@ -223,8 +223,8 @@ type Iterator struct {
 
 type hiddenIterator = Iterator
 
-// Next advances the iterator to the next value and reports whether there was
-// any. It must be called before the first call to Value or Key.
+// Next advances the iterator to the next value and reports whether there was any.
+// It must be called before the first call to [Iterator.Value] or [Iterator.Selector].
 func (i *Iterator) Next() bool {
 	if i.p >= len(i.arcs) {
 		i.cur = Value{}
@@ -240,8 +240,8 @@ func (i *Iterator) Next() bool {
 	return true
 }
 
-// Value returns the current value in the list. It will panic if Next advanced
-// past the last entry.
+// Value returns the current value in the list.
+// It will panic if [Iterator.Next] advanced past the last entry.
 func (i *Iterator) Value() Value {
 	return i.cur
 }
@@ -259,8 +259,8 @@ func (i *Iterator) Selector() Selector {
 // Label reports the label of the value if i iterates over struct fields and ""
 // otherwise.
 //
-// Slated to be deprecated: use i.Selector().String(). Note that this will give
-// more accurate string representations.
+// Slated to be deprecated: use [Iterator.Selector] and [Selector.String].
+// Note that this will give more accurate string representations.
 func (i *hiddenIterator) Label() string {
 	if i.f == 0 {
 		return ""

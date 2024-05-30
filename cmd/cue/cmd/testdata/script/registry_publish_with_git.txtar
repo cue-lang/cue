@@ -19,7 +19,7 @@ rm $WORK/example/otherfile
 
 cd cuemodule
 exec cue mod publish v0.0.1
-stdout '^published x.example/e@v0.0.1 to [^ ]+/x.example/e:v0.0.1@sha256:[0-9a-f]+$'
+stdout '^published x.example/e@v0.0.1 to [^ ]+/x.example/e:v0.0.1$'
 cd $WORK/main
 exec cue eval .
 cmp stdout ../expect-eval-stdout

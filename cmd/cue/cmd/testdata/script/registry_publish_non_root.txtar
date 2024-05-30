@@ -8,7 +8,7 @@ env CUE_REGISTRY=$MEMREGISTRY/some/repo+insecure
 
 cd example/foo
 exec cue mod publish v0.0.1
-stdout '^published example.com@v0.0.1 to [^ ]+/some/repo/example.com:v0.0.1@sha256:[0-9a-f]+$'
+stdout '^published example.com@v0.0.1 to [^ ]+/some/repo/example.com:v0.0.1$'
 
 -- example/cue.mod/module.cue --
 module: "example.com@v0"

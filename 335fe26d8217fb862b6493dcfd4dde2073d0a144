@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b6717e4_6a7a71f0",
+        "filename": "cmd/cue/cmd/testdata/script/issue174.txtar",
+        "patchSetId": 22
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-30T09:47:36Z",
+      "side": 1,
+      "message": "added a TODO, as this is not a regression in this CL.",
+      "parentUuid": "f517414b_34c2f614",
+      "revId": "335fe26d8217fb862b6493dcfd4dde2073d0a144",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "297cd181_a7634c8f",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d391ab01_0cdd984a",
+        "filename": "cue/load/testdata/testfetch/simple.txtar",
+        "patchSetId": 22
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-30T09:47:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "297cd181_a7634c8f",
+      "revId": "335fe26d8217fb862b6493dcfd4dde2073d0a144",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fd26b1ea_5f021da9",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-05-30T04:38:03Z",
       "side": 1,
       "message": "This also proves to be an unnecessary change.",
+      "revId": "335fe26d8217fb862b6493dcfd4dde2073d0a144",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd06e670_4a94cf70",
+        "filename": "cue/load/testdata/testmod-external/cue.mod/module.cue",
+        "patchSetId": 22
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-30T09:47:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fd26b1ea_5f021da9",
       "revId": "335fe26d8217fb862b6493dcfd4dde2073d0a144",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

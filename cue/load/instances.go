@@ -168,7 +168,7 @@ func loadPackages(ctx context.Context, cfg *Config, synCache *syntaxCache, pkgs 
 	pkgPaths := make(map[string]bool)
 	// Add any packages specified directly on the command line.
 	for _, pkg := range pkgs {
-		pkgPaths[pkg.resolved] = true
+		pkgPaths[pkg.resolvedCanonical] = true
 	}
 	// Add any imports found in other files.
 	for _, f := range otherFiles {

@@ -146,6 +146,8 @@ func (pkg *Package) Mod() module.Version {
 // packages they import, recursively, using modules from the given
 // requirements to determine which modules they might be obtained from,
 // and reg to download module contents.
+//
+// rootPkgPaths should only contain canonical import paths.
 func LoadPackages(
 	ctx context.Context,
 	mainModulePath string,
@@ -210,8 +212,9 @@ func (pkgs *Packages) All() []*Package {
 	return slices.Clip(pkgs.pkgs)
 }
 
-func (pkgs *Packages) Pkg(pkgPath string) *Package {
-	pkg, _ := pkgs.pkgCache.Get(pkgPath)
+// Pkg obtains a given package given its canonical import path.
+func (pkgs *Packages) Pkg(canonicalPkgPath string) *Package {
+	pkg, _ := pkgs.pkgCache.Get(canonicalPkgPath)
 	return pkg
 }
 

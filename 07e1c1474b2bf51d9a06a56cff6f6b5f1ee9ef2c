@@ -16,6 +16,24 @@
       "message": "As a minor suggestion, it might also be good to include the permissions of the file (although that would work somewhat against the naming of `find-files`)",
       "revId": "07e1c1474b2bf51d9a06a56cff6f6b5f1ee9ef2c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b85ed92_600f01d8",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_initial.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-30T14:27:52Z",
+      "side": 1,
+      "message": "Good point, I\u0027ll do that as part of the read-only issue if that\u0027s OK, as it\u0027s not really needed here.",
+      "parentUuid": "9a9faa9d_415c5368",
+      "revId": "07e1c1474b2bf51d9a06a56cff6f6b5f1ee9ef2c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

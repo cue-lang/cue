@@ -88,6 +88,11 @@ import (
 	"cuelang.org/go/internal/mod/semver"
 )
 
+const (
+	// LICENSE defines the name of a license file in a module
+	LICENSE = "LICENSE"
+)
+
 // A Version (for clients, a module.Version) is defined by a module path and version pair.
 // These are stored in their plain (unescaped) form.
 // This type is comparable.

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e7a5af5_10485eba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-30T20:20:14Z",
+      "side": 1,
+      "message": "Thanks - makes it very clear what works/doesn\u0027t work (and why)",
+      "revId": "6964003c902a137a0727d0d0d181aae7ea9436e0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48b8e52c_55130d63",
+        "filename": "cmd/cue/cmd/testdata/script/modpublish_no_source.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-30T20:20:14Z",
+      "side": 1,
+      "message": "FWIW I prefer `cd $WORK/v0.9` to keep things clean and avoid a `cd ..`. But that\u0027s a mild preference at best.",
+      "revId": "6964003c902a137a0727d0d0d181aae7ea9436e0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

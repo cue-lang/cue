@@ -27,7 +27,7 @@ const logging = false // TODO hook this up to CUE_DEBUG
 
 // New returns r wrapped inside a caching layer that
 // stores persistent cached content inside the given
-// OS directory.
+// OS directory, typically ${CUE_CACHE_DIR}.
 //
 // The `module.SourceLoc.FS` fields in the locations
 // returned by the registry implement the `OSRootFS` interface,
@@ -39,13 +39,13 @@ func New(registry *modregistry.Client, dir string) (modload.Registry, error) {
 		return nil, fmt.Errorf("%q is not a directory", dir)
 	}
 	return &cache{
-		dir: dir,
+		dir: filepath.Join(dir, "mod"),
 		reg: registry,
 	}, nil
 }
 
 type cache struct {
-	dir              string
+	dir              string // typically ${CUE_CACHE_DIR}/mod
 	reg              *modregistry.Client
 	downloadZipCache par.ErrCache[module.Version, string]
 	modFileCache     par.ErrCache[string, []byte]

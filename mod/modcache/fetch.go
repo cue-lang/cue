@@ -66,7 +66,7 @@ func (c *cache) Requirements(ctx context.Context, mv module.Version) ([]module.V
 // Fetch returns the location of the contents for the given module
 // version, downloading it if necessary.
 func (c *cache) Fetch(ctx context.Context, mv module.Version) (module.SourceLoc, error) {
-	dir, err := c.downloadDir(ctx, mv)
+	dir, err := c.downloadDir(mv)
 	if err == nil {
 		// The directory has already been completely extracted (no .partial file exists).
 		return c.dirToLocation(dir), nil
@@ -83,14 +83,14 @@ func (c *cache) Fetch(ctx context.Context, mv module.Version) (module.SourceLoc,
 		return module.SourceLoc{}, err
 	}
 
-	unlock, err := c.lockVersion(ctx, mv)
+	unlock, err := c.lockVersion(mv)
 	if err != nil {
 		return module.SourceLoc{}, err
 	}
 	defer unlock()
 
 	// Check whether the directory was populated while we were waiting on the lock.
-	_, dirErr := c.downloadDir(ctx, mv)
+	_, dirErr := c.downloadDir(mv)
 	if dirErr == nil {
 		return c.dirToLocation(dir), nil
 	}
@@ -115,7 +115,8 @@ func (c *cache) Fetch(ctx context.Context, mv module.Version) (module.SourceLoc,
 		}
 	}
 
-	partialPath, err := c.cachePath(ctx, mv, "partial")
+	var partialPath string
+	partialPath, err = c.cachePath(mv, "partial")
 	if err != nil {
 		return module.SourceLoc{}, err
 	}
@@ -157,7 +158,7 @@ func (c *cache) ModuleVersions(ctx context.Context, mpath string) ([]string, err
 
 func (c *cache) downloadZip(ctx context.Context, mv module.Version) (zipfile string, err error) {
 	return c.downloadZipCache.Do(mv, func() (string, error) {
-		zipfile, err := c.cachePath(ctx, mv, "zip")
+		zipfile, err := c.cachePath(mv, "zip")
 		if err != nil {
 			return "", err
 		}
@@ -167,7 +168,7 @@ func (c *cache) downloadZip(ctx context.Context, mv module.Version) (zipfile str
 			return zipfile, nil
 		}
 		logf("cue: downloading %s", mv)
-		unlock, err := c.lockVersion(ctx, mv)
+		unlock, err := c.lockVersion(mv)
 		if err != nil {
 			return "", err
 		}
@@ -244,19 +245,19 @@ func (c *cache) downloadZip1(ctx context.Context, mod module.Version, zipfile st
 
 func (c *cache) downloadModFile(ctx context.Context, mod module.Version) ([]byte, error) {
 	return c.modFileCache.Do(mod.String(), func() ([]byte, error) {
-		modfile, data, err := c.readDiskModFile(ctx, mod)
+		modfile, data, err := c.readDiskModFile(mod)
 		if err == nil {
 			return data, nil
 		}
 		logf("cue: downloading %s", mod)
-		unlock, err := c.lockVersion(ctx, mod)
+		unlock, err := c.lockVersion(mod)
 		if err != nil {
 			return nil, err
 		}
 		defer unlock()
 		// Double-check that the file hasn't been created while we were
 		// acquiring the lock.
-		_, data, err = c.readDiskModFile(ctx, mod)
+		_, data, err = c.readDiskModFile(mod)
 		if err == nil {
 			return data, nil
 		}

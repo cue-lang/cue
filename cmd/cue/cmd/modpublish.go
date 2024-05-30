@@ -24,6 +24,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"cuelabs.dev/go/oci/ociregistry"
@@ -189,6 +190,14 @@ func runModUpload(cmd *Command, args []string) error {
 			return err
 		}
 	}
+
+	// Do not output full OCI references by default without --json, as sources
+	// like git may cause non-deterministic digests due to commit hashes
+	// including timestamps. Most users shouldn't care about full digests in
+	// most cases, and any non-determinism causes issues for reproducible guides
+	// such as those under cuelang.org.
+	//
+	// TODO: implement -v or similar to include the full ociref.Reference form.
 	switch {
 	case useJSON:
 		info := publishInfo{
@@ -206,11 +215,31 @@ func runModUpload(cmd *Command, args []string) error {
 	case outDir != "":
 		fmt.Printf("wrote image for %s to %s\n", mv, outDir)
 	case dryRun:
-		fmt.Printf("dry-run published %s to %v\n", mv, ref)
+		// See comment above about short vs regular OCI reference output.
+		fmt.Printf("dry-run published %s to %v\n", mv, shortString(ref))
 	default:
-		fmt.Printf("published %s to %v\n", mv, ref)
+		// See comment above about short vs regular OCI reference output.
+		fmt.Printf("published %s to %v\n", mv, shortString(ref))
 	}
 	return nil
+}
+
+// shortString returns a shortened form of an OCI reference, basically
+// [ociref.Reference.String] minus the trailing digest. The code implementation
+// is a copy-paste with exactly that adaptation.
+func shortString(ref ociref.Reference) string {
+	var buf strings.Builder
+	buf.Grow(len(ref.Host) + 1 + len(ref.Repository) + 1 + len(ref.Tag))
+	if ref.Host != "" {
+		buf.WriteString(ref.Host)
+		buf.WriteByte('/')
+	}
+	buf.WriteString(ref.Repository)
+	if len(ref.Tag) > 0 {
+		buf.WriteByte(':')
+		buf.WriteString(ref.Tag)
+	}
+	return buf.String()
 }
 
 // osFileIO implements [modzip.FileIO] for filepath paths relative to

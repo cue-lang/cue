@@ -31,9 +31,7 @@ func newModGetCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get",
 		Short: "add and upgrade module dependencies",
-		Long: `WARNING: THIS COMMAND IS EXPERIMENTAL.
-
-Get updates module dependencies, fetching new dependencies if
+		Long: `Get updates module dependencies, fetching new dependencies if
 needed and changing versions to specified versions. It can downgrade
 a version only when a higher version is not required by other
 dependencies.
@@ -55,9 +53,7 @@ this command will fail.
 See "cue help environment" for details on how $CUE_REGISTRY is used to
 determine the modules registry.
 
-Note: you must enable the modules experiment with:
-	export CUE_EXPERIMENT=modules
-for this command to work.
+Note that this command is not yet stable and may be changed.
 `,
 		RunE: mkRunE(c, runModGet),
 		Args: cobra.MinimumNArgs(1),

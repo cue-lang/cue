@@ -38,10 +38,7 @@ cmp stdout ../expect-eval-stdout
 # Verify that we have a LICENSE files for all modules
 cmp $WORK/.cache/mod/extract/x.example/root@v0.0.1/LICENSE $WORK/example/LICENSE
 cmp $WORK/.cache/mod/extract/x.example/root/a@v0.0.1/LICENSE $WORK/example/a/LICENSE
-
-# TODO: support grabbing the LICENSE file from the VCS root if one is not
-# contained in the module
-# cmp $WORK/.cache/mod/extract/x.example/root/b@v0.0.1/LICENSE $WORK/example/LICENSE
+cmp $WORK/.cache/mod/extract/x.example/root/b@v0.0.1/LICENSE $WORK/example/LICENSE
 
 # Check that the manifest contains the expected git metadata
 # Note: we use cue vet rather than cmp because the

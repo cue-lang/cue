@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c091b269_2322aa95",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-30T14:28:53Z",
+      "side": 1,
+      "message": "Worth updating the docs for `CUE_CACHE_DIR` to say what the structure is?\n\nhttps://cuelang.org/docs/reference/cli/cue-environment/",
+      "revId": "adf9cb2c593506adc70417a6d6aa85009ea818b2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

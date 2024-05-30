@@ -50,6 +50,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7e0db5be_bd41cd00",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 20
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-30T04:38:03Z",
+      "side": 1,
+      "message": "Small nit, we might as well mention the issue in the commit message. Thanks for creating the issue BTW.",
+      "parentUuid": "b6d68015_56022d08",
+      "range": {
+        "startLine": 21,
+        "startChar": 29,
+        "endLine": 21,
+        "endChar": 57
+      },
+      "revId": "89b2107caa1401f8c743e57e6a6868b950963010",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d39a64fb_a1e9f6a7",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 20
@@ -114,6 +138,24 @@
       "side": 1,
       "message": "Fixed; `yieldPackageFile` needed to add a `./` prefix to filenames when parsing files, for consistency with other cue/load error cases and the previous logic.",
       "parentUuid": "8c62add6_999b4f73",
+      "revId": "89b2107caa1401f8c743e57e6a6868b950963010",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0abd977c_ef1623b3",
+        "filename": "cmd/cue/cmd/testdata/script/fmt.txtar",
+        "patchSetId": 20
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-30T04:38:03Z",
+      "side": 1,
+      "message": "Great fix, thank you.",
+      "parentUuid": "a3acffd1_28820dc3",
       "revId": "89b2107caa1401f8c743e57e6a6868b950963010",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

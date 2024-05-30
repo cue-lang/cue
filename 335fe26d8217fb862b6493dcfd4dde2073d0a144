@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f517414b_34c2f614",
+        "filename": "cmd/cue/cmd/testdata/script/issue174.txtar",
+        "patchSetId": 22
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-30T04:38:03Z",
+      "side": 1,
+      "message": "Minor nit but we appear to be missing a leading `./` here too?",
+      "revId": "335fe26d8217fb862b6493dcfd4dde2073d0a144",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "297cd181_a7634c8f",
+        "filename": "cue/load/testdata/testfetch/simple.txtar",
+        "patchSetId": 22
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-30T04:38:03Z",
+      "side": 1,
+      "message": "I downloaded patchset 22 and \"reverted\" this change and the tests pass. So I put this also into the camp of let\u0027s undo the change and work out (later) why we thought it necessary, add tests etc.",
+      "revId": "335fe26d8217fb862b6493dcfd4dde2073d0a144",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd26b1ea_5f021da9",
+        "filename": "cue/load/testdata/testmod-external/cue.mod/module.cue",
+        "patchSetId": 22
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-30T04:38:03Z",
+      "side": 1,
+      "message": "This also proves to be an unnecessary change.",
+      "revId": "335fe26d8217fb862b6493dcfd4dde2073d0a144",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

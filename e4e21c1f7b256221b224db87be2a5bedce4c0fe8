@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "388e280c_f35b9d5c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-30T13:50:36Z",
+      "side": 1,
+      "message": "So we\u0027re OK with stabilizing all the modules CLI, including subcommands and flags and their behavior?\n\nI think it\u0027s fine, as nothing sticks out in terms of being a bad design, but I thought we would remove the mentions of CUE_EXPERIMENT\u003dmodules and slowly remove the \"EXPERIMENTAL\" note on the CLI design over the coming weeks as we gain confidence that it works well for users - particularly after v0.9 once they get decently broad use.",
+      "revId": "e4e21c1f7b256221b224db87be2a5bedce4c0fe8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

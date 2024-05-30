@@ -34,6 +34,24 @@
       "parentUuid": "9a9faa9d_415c5368",
       "revId": "07e1c1474b2bf51d9a06a56cff6f6b5f1ee9ef2c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba4fd380_901c8163",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_initial.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-30T14:29:35Z",
+      "side": 1,
+      "message": "Totally - I +2-ed the CL intentionally.",
+      "parentUuid": "7b85ed92_600f01d8",
+      "revId": "07e1c1474b2bf51d9a06a56cff6f6b5f1ee9ef2c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

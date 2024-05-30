@@ -22,6 +22,30 @@
       },
       "revId": "6fb565b35880aa2c6930657df650e96a27fc65cf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "89739bec_1f568ebb",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-30T21:16:32Z",
+      "side": 1,
+      "message": "yup, done. we have a test case with such a missing version now as well. I wrote this being defensive, but I wasn\u0027t thinking that the non-legacy module.cue parsing as used by `mod publish` does require a language version.",
+      "parentUuid": "4e92cfd2_a286442a",
+      "range": {
+        "startLine": 131,
+        "startChar": 5,
+        "endLine": 131,
+        "endChar": 23
+      },
+      "revId": "6fb565b35880aa2c6930657df650e96a27fc65cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -28,9 +28,7 @@ func newModResolveCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "resolve <modulepath>[@<version>] ...",
 		Short: "Show how a module path resolves to a registry",
-		Long: `WARNING: THIS COMMAND IS EXPERIMENTAL.
-
-This command prints information about how a given
+		Long: `This command prints information about how a given
 module path will resolve to an actual registry in the
 form of an OCI reference.
 
@@ -42,9 +40,7 @@ with respect to the registry configuration (see "cue help registryconfig")
 and does not make any network calls to check whether
 the module exists.
 
-Note: you must enable the modules experiment with:
-	export CUE_EXPERIMENT=modules
-for this command to work.
+Note that this command is not yet stable and may be changed.
 `,
 		RunE: mkRunE(c, runModResolve),
 	}

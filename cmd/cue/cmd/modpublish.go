@@ -19,11 +19,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"sync"
 
@@ -168,9 +170,47 @@ func runModUpload(cmd *Command, args []string) error {
 		if err != nil {
 			return err
 		}
-		if err := modzip.Create(zf, mv, files, osFileIO{
-			modRoot: modRoot,
-		}); err != nil {
+
+		archive := make([]pathAbsPair, len(files))
+		for i, f := range files {
+			archive[i] = pathAbsPair{
+				path: f,
+				abs:  filepath.Join(modRoot, f),
+			}
+		}
+
+		// Do we have a LICENSE at the root of the module? If not try to grab one
+		// from the root of the VCS repo, first ensuring that git is clean with
+		// respect to that file too.
+		//
+		// TODO: work out whether we can/should consider alternative spellings of
+		// "LICENSE" here. For example with .txt extensions. For context
+		// https://go.dev/ref/mod#vcs-license says:
+		//
+		// This special case allows the same LICENSE file to apply to all modules
+		// within a repository. This only applies to files named LICENSE
+		// specifically, without extensions like .txt. Unfortunately, this cannot
+		// be extended without breaking cryptographic sums of existing modules;
+		// see Authenticating modules. Other tools and websites like pkg.go.dev
+		// may recognize files with other names.
+		//
+		// https://pkg.go.dev/golang.org/x/pkgsite/internal/licenses#pkg-variables
+		// has a much longer list of files.
+		haveLICENSE := slices.Contains(files, module.LICENSE)
+		if !haveLICENSE && modRoot != vcsImpl.Root() {
+			licenseFile, err := rootLICENSEFile(ctx, vcsImpl)
+			if err != nil {
+				return err
+			}
+			if licenseFile != "" {
+				archive = append(archive, pathAbsPair{
+					path: module.LICENSE,
+					abs:  licenseFile,
+				})
+			}
+		}
+
+		if err := modzip.Create(zf, mv, archive, pathAbsPairIO{}); err != nil {
 			return err
 		}
 		meta = &modregistry.Metadata{
@@ -233,6 +273,47 @@ func runModUpload(cmd *Command, args []string) error {
 	return nil
 }
 
+// rootLICENSEFile returns the absolute path of a LICENSE file if one
+// exists under the control of vcsImpl, and that file is "clean" with
+// respect to the current commit. If no LICENSE file exists, then an
+// empty string is returned.
+func rootLICENSEFile(ctx context.Context, vcsImpl vcs.VCS) (string, error) {
+	licenseFile := filepath.Join(vcsImpl.Root(), module.LICENSE)
+
+	// relLicenseFile is used in a couple of error situations below
+	relLicenseFile := func() string {
+		rel, err := filepath.Rel(rootWorkingDir, licenseFile)
+		if err == nil {
+			return rel
+		}
+		return licenseFile
+	}
+
+	licenseFileInfo, err := os.Lstat(licenseFile)
+	if err != nil {
+		// If the LICENSE file does not exist, this is not an error. We just
+		// have nothing to include.
+		if errors.Is(err, os.ErrNotExist) {
+			return "", nil
+		}
+		return "", err
+	}
+	if !licenseFileInfo.Mode().IsRegular() {
+		return "", fmt.Errorf("%s is not a regular file", relLicenseFile())
+	}
+
+	// Verify that the LICENSE file is "clean" with respect to the commit
+	status, err := vcsImpl.Status(ctx, licenseFile)
+	if err != nil {
+		return "", err
+	}
+	if status.Uncommitted {
+		return "", fmt.Errorf("VCS state is not clean for %s", relLicenseFile())
+	}
+
+	return licenseFile, nil
+}
+
 // shortString returns a shortened form of an OCI reference, basically
 // [ociref.Reference.String] minus the trailing digest. The code implementation
 // is a copy-paste with exactly that adaptation.
@@ -251,26 +332,26 @@ func shortString(ref ociref.Reference) string {
 	return buf.String()
 }
 
-// osFileIO implements [modzip.FileIO] for filepath paths relative to
-// the module root directory, as returned by [vcs.VCS.ListFiles].
-type osFileIO struct {
-	modRoot string
+// pathAbsPair is the pair of a path (in a zip archive) and the absolute
+// filepath on disk of the file that will be placed at that path.
+type pathAbsPair struct {
+	path string
+	abs  string
 }
 
-func (osFileIO) Path(f string) string {
-	return filepath.ToSlash(f)
+// pathAbsPairIO implements [modzip.FileIO] for [pathAbsPair] paths.
+type pathAbsPairIO struct{}
+
+func (pathAbsPairIO) Path(p pathAbsPair) string {
+	return filepath.ToSlash(p.path)
 }
 
-func (fio osFileIO) Lstat(f string) (fs.FileInfo, error) {
-	return os.Lstat(fio.absPath(f))
+func (pathAbsPairIO) Lstat(p pathAbsPair) (fs.FileInfo, error) {
+	return os.Lstat(p.abs)
 }
 
-func (fio osFileIO) Open(f string) (io.ReadCloser, error) {
-	return os.Open(fio.absPath(f))
-}
-
-func (fio osFileIO) absPath(f string) string {
-	return filepath.Join(fio.modRoot, f)
+func (pathAbsPairIO) Open(p pathAbsPair) (io.ReadCloser, error) {
+	return os.Open(p.abs)
 }
 
 // publishRegistryResolverShim implements a wrapper around

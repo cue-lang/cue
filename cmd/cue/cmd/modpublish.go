@@ -24,6 +24,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"cuelabs.dev/go/oci/ociregistry"
@@ -187,6 +188,22 @@ func runModUpload(cmd *Command, args []string) error {
 			return err
 		}
 	}
+
+	// For --dryrun and the default case below, we choose not to output the full
+	// OCI reference including the digest, opting instead for every except the
+	// digest. The reason for this is that docs (of the sort on cuelang.org) are
+	// made somewhat less clear by output that is unstable between runs. When
+	// using source: "git", the git commit sha forms part of the module
+	// metadata. That metadata is an input to the resulting digest. Hence a user
+	// trying to repeat locally what they see on the cuelang.org site will get
+	// different output because their commit sha will (almost certainly) be
+	// different to that in the docs. This difference needs to be explained,
+	// even though the vast majority of end users will not care about the digest
+	// at all. As such, the output of the full OCI reference should be reserved
+	// for a verbose (-v) version of cue mod publish.
+	//
+	// TODO: implement -v or similar to include the full ociref.Reference
+	// form.
 	switch {
 	case useJSON:
 		info := publishInfo{
@@ -204,11 +221,31 @@ func runModUpload(cmd *Command, args []string) error {
 	case outDir != "":
 		fmt.Printf("wrote image for %s to %s\n", mv, outDir)
 	case dryRun:
-		fmt.Printf("dry-run published %s to %v\n", mv, ref)
+		// See comment above about short vs regular OCI reference output.
+		fmt.Printf("dry-run published %s to %v\n", mv, shortString(ref))
 	default:
-		fmt.Printf("published %s to %v\n", mv, ref)
+		// See comment above about short vs regular OCI reference output.
+		fmt.Printf("published %s to %v\n", mv, shortString(ref))
 	}
 	return nil
+}
+
+// shortString returns a shortened form of an OCI reference, basically
+// ociref.Reference.String() minus the trailing digest. The code implementation
+// is a copy-paste with exactly that adaptation.
+func shortString(ref ociref.Reference) string {
+	var buf strings.Builder
+	buf.Grow(len(ref.Host) + 1 + len(ref.Repository) + 1 + len(ref.Tag))
+	if ref.Host != "" {
+		buf.WriteString(ref.Host)
+		buf.WriteByte('/')
+	}
+	buf.WriteString(ref.Repository)
+	if len(ref.Tag) > 0 {
+		buf.WriteByte(':')
+		buf.WriteString(ref.Tag)
+	}
+	return buf.String()
 }
 
 // osFileIO implements [modzip.FileIO] for filepath paths relative to

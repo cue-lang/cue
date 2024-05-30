@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e92cfd2_a286442a",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-30T20:25:31Z",
+      "side": 1,
+      "message": "This use of `mf.Language \u003d\u003d nil` doesn\u0027t feel right. It should be an invariant at this point in the code that we have a language version, no?",
+      "range": {
+        "startLine": 131,
+        "startChar": 5,
+        "endLine": 131,
+        "endChar": 23
+      },
+      "revId": "6fb565b35880aa2c6930657df650e96a27fc65cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

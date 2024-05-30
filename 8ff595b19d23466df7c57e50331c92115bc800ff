@@ -1,0 +1,112 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6a8492b_d914e219",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-30T20:16:36Z",
+      "side": 1,
+      "message": "LGTM with some suggestions on wording.",
+      "revId": "8ff595b19d23466df7c57e50331c92115bc800ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc5da49b_366f7cec",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-30T20:16:36Z",
+      "side": 1,
+      "message": "\"directory\" (singular) sounds like everything gets stuffed in this single directory. \"A directory structure to hold files that are reused between operations\"?",
+      "range": {
+        "startLine": 180,
+        "startChar": 4,
+        "endLine": 180,
+        "endChar": 13
+      },
+      "revId": "8ff595b19d23466df7c57e50331c92115bc800ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da4ed695_29c1dc6e",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-30T20:16:36Z",
+      "side": 1,
+      "message": "Perhaps:\n\n```\n- mod/download for module archives fetched from registries\n- mod/extract for extracted module archives\n```\n\nThe \"from registries\" bit is a bit repetitive, and needlessly so.",
+      "revId": "8ff595b19d23466df7c57e50331c92115bc800ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7375386_a4190065",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-30T20:16:36Z",
+      "side": 1,
+      "message": "Perhaps a comment on how to enable/disable them? Otherwise, where would the user look to answer that question?",
+      "revId": "8ff595b19d23466df7c57e50331c92115bc800ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eaec7305_84840e14",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-30T20:16:36Z",
+      "side": 1,
+      "message": "Ditto re how to enable/disable. An example might make it easier.",
+      "revId": "8ff595b19d23466df7c57e50331c92115bc800ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6cefc9a4_a4bcc0b2",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-30T20:16:36Z",
+      "side": 1,
+      "message": "I\u0027m not entirely clear that \"The registries\" is accurate because this env var can be a file path. How about something like:\n\n```\nThis variable specifies the configuration for downloading and publishing modules. See \"cue help registryconfig\" for details.\n```",
+      "revId": "8ff595b19d23466df7c57e50331c92115bc800ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

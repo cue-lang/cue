@@ -1,9 +1,6 @@
 # Check that we can use the cue mod publish command to create an
 # OCI image.
 
-env CUE_EXPERIMENT=modules
-env CUE_CACHE_DIR=$WORK/.tmp/cache
-
 exec cue mod publish --out $WORK/image v0.0.1
 stdout '^wrote image for example.com@v0.0.1 to .*/image$'
 

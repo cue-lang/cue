@@ -2,9 +2,6 @@
 # print information about the module to be published in JSON
 # format
 
-env CUE_EXPERIMENT=modules
-env CUE_CACHE_DIR=$WORK/.tmp/cache
-
 cd example
 exec cue mod publish --json v0.0.1
 cp stdout $WORK/got.json

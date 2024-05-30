@@ -1,8 +1,6 @@
 # Check that imports from files specified on the command line
 # are still considered even when they are not part of the main module.
 
-env CUE_EXPERIMENT=modules
-env CUE_CACHE_DIR=$WORK/tmp/cache
 exec cue export _foo/x.cue
 cmp stdout stdout.golden
 

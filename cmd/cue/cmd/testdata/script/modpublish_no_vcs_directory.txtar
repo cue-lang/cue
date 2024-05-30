@@ -2,7 +2,6 @@
 # a VCS source specified but no VCS directory
 # can be found.
 
-env CUE_EXPERIMENT=modules
 ! exec cue mod publish v1.0.0
 stderr 'git VCS not found in any parent of ".+"'
 -- cue.mod/module.cue --

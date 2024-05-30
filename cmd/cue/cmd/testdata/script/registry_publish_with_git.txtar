@@ -3,9 +3,7 @@
 
 [!exec:git] skip 'no git command found'
 memregistry MEMREGISTRY
-env CUE_EXPERIMENT=modules
 env CUE_REGISTRY=$MEMREGISTRY
-env CUE_CACHE_DIR=$WORK/.tmp/cache
 
 cd $WORK/example
 exec git init .

@@ -2,8 +2,6 @@
 # with a repository prefix.
 
 memregistry MEMREGISTRY
-env CUE_EXPERIMENT=modules
-env CUE_CACHE_DIR=$WORK/.tmp/cache
 env CUE_REGISTRY=$MEMREGISTRY/some/repo+insecure
 
 cd example/foo

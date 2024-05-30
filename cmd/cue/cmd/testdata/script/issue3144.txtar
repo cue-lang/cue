@@ -1,9 +1,6 @@
 # Check that unrelated invalid files do not cause an error when only files
 # are specified on the command line.
 
-env CUE_EXPERIMENT=modules
-env CUE_CACHE_DIR=$WORK/tmp/cache
-
 exec cue export valid.cue
 cmp stdout stdout.golden
 

@@ -1,13 +1,10 @@
 # Check that cue mod init is independent of the module version.
-env CUE_EXPERIMENT=modules
 env CUE_VERSION_OVERRIDE=v0.0.0-00010101000000-000000000000
 env-fill want-module
 exec cue mod init foo.example
 cmp cue.mod/module.cue want-module
 
-
 # cue mod tidy should be a no-op after cue mod init
-env CUE_CACHE_DIR=$WORK/.tmp/cache
 exec cue mod tidy
 cmp cue.mod/module.cue want-module
 

@@ -22,7 +22,21 @@ rm $WORK/example/otherfile
 cd $WORK/example/a
 exec cue mod publish v0.0.1
 stdout '^published x.example/root/a@v0.0.1 to [^ ]+/x.example/root/a:v0.0.1$'
+
 cd $WORK/example/b
+
+# Modify the root LICENSE and verify that we cannot publish root/b in this
+# state (root/b does not have a LICENSE and so we should expect it to find the
+# root LICENSE, but fail because it's unclean).
+cp $WORK/example/LICENSE $WORK/example/LICENSE.golden
+mv $WORK/example/LICENSE.modified $WORK/example/LICENSE
+
+! exec cue mod publish v0.0.1
+env
+stderr 'VCS state is not clean for \.\.'${/}'LICENSE'
+
+# Restore the root LICENSE file and actually publish
+cp $WORK/example/LICENSE.golden $WORK/example/LICENSE
 exec cue mod publish v0.0.1
 stdout '^published x.example/root/b@v0.0.1 to [^ ]+/x.example/root/b:v0.0.1$'
 
@@ -34,10 +48,7 @@ cmp stdout ../expect-eval-stdout
 # Verify that we have a LICENSE files for all modules
 cmp ${CUE_CACHE_DIR}/mod/extract/x.example/root@v0.0.1/LICENSE $WORK/example/LICENSE
 cmp ${CUE_CACHE_DIR}/mod/extract/x.example/root/a@v0.0.1/LICENSE $WORK/example/a/LICENSE
-
-# TODO: support grabbing the LICENSE file from the VCS root if one is not
-# contained in the module
-# cmp ${CUE_CACHE_DIR}/mod/extract/x.example/root/b@v0.0.1/LICENSE $WORK/example/LICENSE
+cmp ${CUE_CACHE_DIR}/mod/extract/x.example/root/b@v0.0.1/LICENSE $WORK/example/LICENSE
 
 # Check that the manifest contains the expected git metadata
 # Note: we use cue vet rather than cmp because the
@@ -115,6 +126,8 @@ language: version: "v0.9.0-alpha.0"
 source: kind: "git"
 -- example/LICENSE --
 root LICENSE
+-- example/LICENSE.modified --
+modified root LICENSE
 -- example/root.cue --
 package root
 root: true

@@ -24,6 +24,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"sync"
 
@@ -168,9 +169,34 @@ func runModUpload(cmd *Command, args []string) error {
 		if err != nil {
 			return err
 		}
-		if err := modzip.Create(zf, mv, files, osFileIO{
-			modRoot: modRoot,
-		}); err != nil {
+
+		archive := make([]pathAbsPair, len(files))
+		for i, f := range files {
+			archive[i] = pathAbsPair{
+				path: f,
+				abs:  filepath.Join(modRoot, f),
+			}
+		}
+
+		// Do we have a LICENSE at the root of the module? If not try to grab one
+		// from the root of the VCS repo, first ensuring that git is clean with
+		// respect to that file too.
+		haveLICENSE := slices.Contains(files, module.LICENSE)
+		if !haveLICENSE && modRoot != vcsImpl.Root() {
+			// Do we have a LICENSE file at the root?
+			licenseFile, err := rootLICENSEFile(ctx, vcsImpl)
+			if err != nil {
+				return err
+			}
+			if licenseFile != "" {
+				archive = append(archive, pathAbsPair{
+					path: module.LICENSE,
+					abs:  licenseFile,
+				})
+			}
+		}
+
+		if err := modzip.Create(zf, mv, archive, pathAbsPairIO{}); err != nil {
 			return err
 		}
 		meta = &modregistry.Metadata{
@@ -233,6 +259,52 @@ func runModUpload(cmd *Command, args []string) error {
 	return nil
 }
 
+// rootLICENSEFile returns the absolute path of a LICENSE file if one
+// exists under the control of vcsImpl, and that file is "clean" with
+// respect to the current commit. If no LICENSE file exists, then an
+// empty string is returned.
+func rootLICENSEFile(ctx context.Context, vcsImpl vcs.VCS) (string, error) {
+	// Do we have a LICENSE file at the root?
+	licenseFile := filepath.Join(vcsImpl.Root(), module.LICENSE)
+
+	// relLicenseFile is used in a couple of error situations below
+	relLicenseFile := func() string {
+		rel, err := filepath.Rel(rootWorkingDir, licenseFile)
+		if err == nil {
+			return rel
+		}
+		return licenseFile
+	}
+
+	// We use [VCS.ListFiles] here because [VCS.Status] does not (at least for
+	// git) report an error in case an argument (a filepath in this case) does
+	// not exist.
+	licenseFilePaths, err := vcsImpl.ListFiles(ctx, vcsImpl.Root(), licenseFile)
+	if err != nil {
+		// TODO: we might need to "ignore" this error and make it
+		// best-efforts. git at least does not error in case you attempt
+		// to ls-file a file that is not controlled by VCS.
+		return "", err
+	}
+	if len(licenseFilePaths) == 0 {
+		// We don't require a LICENSE file
+		return "", nil
+	}
+
+	// Verify that the LICENSE file is "clean" with respect to the commit
+	status, err := vcsImpl.Status(ctx, licenseFile)
+	if err != nil {
+		// TODO: again we might need to "ignore" this error and make it
+		// best-efforts.
+		return "", err
+	}
+	if status.Uncommitted {
+		return "", fmt.Errorf("VCS state is not clean for %s", relLicenseFile())
+	}
+
+	return licenseFile, nil
+}
+
 // shortString returns a shortened form of an OCI reference, basically
 // [ociref.Reference.String] minus the trailing digest. The code implementation
 // is a copy-paste with exactly that adaptation.
@@ -251,26 +323,25 @@ func shortString(ref ociref.Reference) string {
 	return buf.String()
 }
 
+type pathAbsPair struct {
+	path string
+	abs  string
+}
+
 // osFileIO implements [modzip.FileIO] for filepath paths relative to
 // the module root directory, as returned by [vcs.VCS.ListFiles].
-type osFileIO struct {
-	modRoot string
+type pathAbsPairIO struct{}
+
+func (pathAbsPairIO) Path(p pathAbsPair) string {
+	return filepath.ToSlash(p.path)
 }
 
-func (osFileIO) Path(f string) string {
-	return filepath.ToSlash(f)
+func (pathAbsPairIO) Lstat(p pathAbsPair) (fs.FileInfo, error) {
+	return os.Lstat(p.abs)
 }
 
-func (fio osFileIO) Lstat(f string) (fs.FileInfo, error) {
-	return os.Lstat(fio.absPath(f))
-}
-
-func (fio osFileIO) Open(f string) (io.ReadCloser, error) {
-	return os.Open(fio.absPath(f))
-}
-
-func (fio osFileIO) absPath(f string) string {
-	return filepath.Join(fio.modRoot, f)
+func (pathAbsPairIO) Open(p pathAbsPair) (io.ReadCloser, error) {
+	return os.Open(p.abs)
 }
 
 // publishRegistryResolverShim implements a wrapper around

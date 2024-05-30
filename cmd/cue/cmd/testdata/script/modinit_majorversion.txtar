@@ -4,6 +4,7 @@ env-fill want-module-experiment.cue
 # Without the experiment, the major version is allowed,
 # even though it's not particularly useful.
 # It feels unnecessary to ask the user to re-run with the experiment.
+env CUE_EXPERIMENT=modules=0
 exec cue mod init foo.com/bar@v1
 cmp cue.mod/module.cue want-module.cue
 exists cue.mod/usr

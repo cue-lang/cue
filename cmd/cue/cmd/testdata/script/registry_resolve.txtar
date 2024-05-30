@@ -1,4 +1,3 @@
-env CUE_EXPERIMENT=modules
 env CUE_REGISTRY=foo.com/bar=myregistry.example/foo,other.org=none
 
 exec cue mod resolve somethingelse.bar.com/abc@v1.2.3

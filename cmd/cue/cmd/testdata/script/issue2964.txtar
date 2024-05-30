@@ -1,5 +1,3 @@
-env CUE_EXPERIMENT=modules
-env CUE_CACHE_DIR=$WORK/.tmp/cache
 exec cue mod init test.example
 ! exec cue export anypath
 cmp stderr want-stderr

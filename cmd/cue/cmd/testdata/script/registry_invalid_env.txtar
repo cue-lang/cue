@@ -1,4 +1,3 @@
-env CUE_EXPERIMENT=modules
 env CUE_REGISTRY=malformed!registry@url
 ! exec cue eval .
 cmp stderr expect-stderr

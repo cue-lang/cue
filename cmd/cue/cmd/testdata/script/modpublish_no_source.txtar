@@ -1,11 +1,59 @@
 # Test that cue mod publish fails when there is no
 # explicit source field in module.cue.
+# Also ensure that "tidy -check" does not complain if "publish" doesn't either.
 
+memregistry MEMREGISTRY
+env CUE_REGISTRY=$MEMREGISTRY+insecure
+
+# Starting with language.version=v0.9.0-alpha.2, we require source.kind to be set.
+cd ${WORK}/v0.9
+exec cue mod tidy --check
 ! exec cue mod publish v1.0.0
-env-fill want-stderr
-cmp stderr want-stderr
--- want-stderr --
+cmp stderr publish.stderr
+
+# v0.8 language.version values can publish just like on CUE's v0.8.0 release.
+cd ${WORK}/v0.8
+exec cue mod tidy --check
+# TODO: don't reference a source field which cannot be set in this language.version.
+# Moreover, this is a regression for existing users of v0.8.0 who were already publishing modules.
+! exec cue mod publish v1.0.0
+cmp stderr publish.stderr
+
+# Publishing with an ancient language.version, before we had a schema, fails.
+cd ${WORK}/v0.5
+! exec cue mod tidy --check
+cmp stderr both.stderr
+! exec cue mod publish v1.0.0
+cmp stderr both.stderr
+
+# Trying to publish without a language.version value is an error;
+# since CUE_EXPERIMENT=modules shipped in v0.8.0-alpha.1 we have inserted a version.
+# Moreover, the language version is a crucial bit of info for the registry.
+cd ${WORK}/none
+! exec cue mod tidy --check
+cmp stderr both.stderr
+! exec cue mod publish v1.0.0
+cmp stderr both.stderr
+
+-- v0.9/publish.stderr --
 no source field found in cue.mod/module.cue
--- cue.mod/module.cue --
-module: "x.example@v1"
-language: version: "v0.9.0-alpha.0"
+-- v0.9/cue.mod/module.cue --
+module: "test.example/09@v1"
+language: version: "v0.9.0-alpha.2"
+
+-- v0.8/publish.stderr --
+no source field found in cue.mod/module.cue
+-- v0.8/cue.mod/module.cue --
+module: "test.example/08@v1"
+language: version: "v0.8.0-alpha.1"
+
+-- v0.5/both.stderr --
+cannot find schema suitable for reading module file with language version "v0.5.0"
+-- v0.5/cue.mod/module.cue --
+module: "test.example/05@v1"
+language: version: "v0.5.0"
+
+-- none/both.stderr --
+no language version declared in module.cue
+-- none/cue.mod/module.cue --
+module: "test.example/none@v1"

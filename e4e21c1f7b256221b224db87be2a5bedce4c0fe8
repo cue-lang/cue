@@ -16,6 +16,24 @@
       "message": "So we\u0027re OK with stabilizing all the modules CLI, including subcommands and flags and their behavior?\n\nI think it\u0027s fine, as nothing sticks out in terms of being a bad design, but I thought we would remove the mentions of CUE_EXPERIMENT\u003dmodules and slowly remove the \"EXPERIMENTAL\" note on the CLI design over the coming weeks as we gain confidence that it works well for users - particularly after v0.9 once they get decently broad use.",
       "revId": "e4e21c1f7b256221b224db87be2a5bedce4c0fe8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be9612e4_c8b560d9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-30T14:14:00Z",
+      "side": 1,
+      "message": "That\u0027s a fair point. How about this as a middle ground: move the warning to the bottom of each command, to slightly de-emphasise it, and changing the wording to something like \"warning: CLI is not yet stable\"?\n\nThe main concern I had looking at the docs is that it still appeared like modules was experimental: all the key commands had big warnings at the top of them.",
+      "parentUuid": "388e280c_f35b9d5c",
+      "revId": "e4e21c1f7b256221b224db87be2a5bedce4c0fe8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

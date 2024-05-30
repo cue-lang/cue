@@ -172,52 +172,59 @@ $ cue export data.json schema: schema.json
 var environmentHelp = &cobra.Command{
 	Use:   "environment",
 	Short: "environment variables",
-	Long: `The cue command consults environment variables for configuration.
-If an environment variable is unset or empty, it uses a sensible default
-setting.
+	Long: `
+The cue command consults environment variables for configuration.
+If an environment variable is unset or empty, sensible default setting is used.
 
 	CUE_CACHE_DIR
-		The directory where the cue command keeps a cache of files to be
-		reused. This defaults to a directory for user-specific temporary
-		cache data, such as:
+		A directory structure to hold files which are reused between operations.
+		It defaults to a directory for user-specific temporary data, such as:
 
-			"$XDG_CACHE_HOME/cue" or "$HOME/.cache/cue" on Linux
-			"$HOME/Library/Caches/cue" on MacOS
-			"%LocalAppData%/cue" on Windows
+		- "$XDG_CACHE_HOME/cue" or "$HOME/.cache/cue" on Linux
+		- "$HOME/Library/Caches/cue" on MacOS
+		- "%LocalAppData%/cue" on Windows
+
+		Its contents are generally read-only and include:
+
+		- mod/download for modules fetched from registries
+		- mod/extract for extracted module archives
 
 	CUE_CONFIG_DIR
-		The directory where the cue command keeps configuration and
-		state files. This defaults to a directory for user-specific
-		configuration data, such as:
+		A directory to hold configuration and long-lived state files.
+		It defaults to a directory for user-specific persistent data, such as:
 
-			"$XDG_CONFIG_HOME/cue" or "$HOME/.config/cue" on Linux
-			"$HOME/Library/Application Support/cue" on MacOS
-			"%AppData%/cue" on Windows
-
-	CUE_DEBUG
-		Comma-separated list of debug flags to enable or disable.
-		Current possible values are:
-			http
-				Print log messages in JSON format, one per line showing
-				HTTP requests and responses made when interacting with
-				module registries.
-
-	CUE_EXPERIMENT
-		Comma-separated list of experiments to enable or disable.
-		The list of available experiments may change arbitrarily over time.
-		See exp.go in package cuelang.org/go/internal/cueexperiment for
-		currently valid values.
-
-		Warning: This variable is provided for the development and
-		testing of the cue commands itself. Use beyond that purpose is
-		unsupported.
+		- "$XDG_CONFIG_HOME/cue" or "$HOME/.config/cue" on Linux
+		- "$HOME/Library/Application Support/cue" on MacOS
+		- "%AppData%/cue" on Windows
 
 	CUE_REGISTRY
+		The configuration to use when downloading and publishing modules.
+		See "cue help registryconfig" for details.
 
-		This variable specifies which registry or registries to use for
-		downloading and publishing modules. See "cue help registryconfig"
-		for details.
-`,
+	CUE_EXPERIMENT
+		Comma-separated list of experiment flags to enable or disable:
+
+		modules (default true)
+			Enable support for the Modules and package management proposal
+			as described in https://cuelang.org/discussion/2939.
+		yamlv3decoder (default true)
+			Enable the new YAML decoder based on yaml.v3.
+		evalv3
+			Enable the new CUE evaluator, addressing performance issues
+			and bringing a better disjunction algorithm.
+
+	CUE_DEBUG
+		Comma-separated list of debug flags to enable or disable, such as:
+
+		http
+			Log a JSON message per HTTP request and response made
+			when interacting with module registries.
+
+CUE_EXPERIMENT and CUE_DEBUG are comma-separated lists of key-value strings,
+where the value is a boolean "true" or "1" if omitted. For example:
+
+	CUE_EXPERIMENT=toenable,todisable=0
+`[1:],
 }
 
 var modulesHelp = &cobra.Command{

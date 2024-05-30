@@ -6,8 +6,10 @@ import (
 	"cuelang.org/go/internal/envflag"
 )
 
-// Flags holds the set of CUE_EXPERIMENT flags. It is initialized
-// by Init.
+// Flags holds the set of CUE_EXPERIMENT flags. It is initialized by Init.
+//
+// When adding, deleting, or modifying entries below,
+// update cmd/cue/cmd/help.go as well for `cue help environment`.
 var Flags struct {
 	Modules bool `envflag:"default:true"`
 

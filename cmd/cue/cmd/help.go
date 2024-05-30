@@ -225,12 +225,6 @@ var modulesHelp = &cobra.Command{
 	Short: "module support",
 	Long: `Modules are how CUE publishes packages and manages dependencies.
 
-NOTE: modules support is current experimental. To enable the
-experiment, you must enable the modules experiment by exporting this
-environment variable:
-
-	CUE_EXPERIMENT=modules
-
 A module is a collection of packages that are released, versioned, and
 distributed together. Modules are downloaded from OCI-compliant
 artifact registries.

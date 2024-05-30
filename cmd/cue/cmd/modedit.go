@@ -32,9 +32,7 @@ func newModEditCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "edit",
 		Short: "edit cue.mod/module.cue",
-		Long: `WARNING: THIS COMMAND IS EXPERIMENTAL.
-
-Edit provides a command-line interface for editing cue.mod/module.cue.
+		Long: `Edit provides a command-line interface for editing cue.mod/module.cue.
 It reads only that file; it does not look up information about the modules
 involved.
 
@@ -50,10 +48,6 @@ to satisfy constraints imposed by other modules.
 The --module flag changes the module's path (the module.cue file's module field).
 The --source flag changes the module's declared source.
 The --drop-source flag removes the source field.
-
-Note: you must enable the modules experiment with:
-	export CUE_EXPERIMENT=modules
-for this command to work.
 `,
 		RunE: mkRunE(c, editCmd.run),
 		Args: cobra.ExactArgs(0),

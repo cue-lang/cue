@@ -45,16 +45,10 @@ func newModUploadCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "publish <version>",
 		Short: "publish the current module to a registry",
-		Long: `WARNING: THIS COMMAND IS EXPERIMENTAL.
-
-Publish the current module to an OCI registry. It consults
+		Long: `Publish the current module to an OCI registry. It consults
 $CUE_REGISTRY to determine where the module should be published (see
 "cue help environment" for details). Also note that this command does
 no dependency or other checks at the moment.
-
-Note: you must enable the modules experiment with:
-	export CUE_EXPERIMENT=modules
-for this command to work.
 
 When the --dryrun flag is specified, nothing will actually be written
 to a registry, but all other checks will take place.

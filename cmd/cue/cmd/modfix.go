@@ -28,9 +28,7 @@ func newModFixCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "fix",
 		Short: "fix a legacy cue.mod/module.cue file",
-		Long: `WARNING: THIS COMMAND IS EXPERIMENTAL.
-
-Fix provides a way to migrate from a legacy module.cue file
+		Long: `Fix provides a way to migrate from a legacy module.cue file
 to the new standard syntax. It
 
 - adds a language.version field
@@ -41,10 +39,6 @@ If there is no module path, it chooses an arbitrary path (test.example@v0).
 
 If the module.cue file is already compatible with the new syntax,
 it is just formatted without making any other changes.
-
-Note: you must enable the modules experiment with:
-	export CUE_EXPERIMENT=modules
-for this command to work.
 `,
 		RunE: mkRunE(c, runModFix),
 		Args: cobra.ExactArgs(0),

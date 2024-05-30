@@ -78,8 +78,8 @@ func TestGit(t *testing.T) {
 	files, err := v.ListFiles(ctx, filepath.Join(dir, "subdir"))
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.DeepEquals(files, []string{
-		"bar/baz",
-		"foo",
+		"subdir/bar/baz",
+		"subdir/foo",
 	}))
 	files, err = v.ListFiles(ctx, dir)
 	qt.Assert(t, qt.IsNil(err))

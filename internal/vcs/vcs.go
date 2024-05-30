@@ -31,17 +31,24 @@ type VCS interface {
 	// the VCS (e.g. the directory containing .git).
 	Root() string
 
-	// ListFiles returns a list of all the files tracked by the VCS
-	// under the given directory, relative to that directory, as
-	// filepaths, in lexical order. It does not include directory
-	// names.
+	// ListFiles returns a list of files tracked by VCS. The optional args
+	// determine what should be listed. If no args are provided, then all of the
+	// files under VCS control are returned. It us up to the caller to ensure
+	// that args are contained by the VCS root (some VCS implementations might
+	// return an error if an arg is provided that is outside the VCS root).
+	// Filepaths are relative to the VCS root and returned in lexical order.
+	// They do not include directory names.
 	//
-	// The directory should be within the VCS root.
-	ListFiles(ctx context.Context, dir string) ([]string, error)
+	// Note that ListFiles is generally silent in the case an arg is provided
+	// that does correspond to a VCS-controlled file. For example, calling
+	// with an arg of "BANANA" where no such file is controlled by VCS will
+	// result in no filepaths being returned.
+	//
+	ListFiles(ctx context.Context, args ...string) ([]string, error)
 
 	// Status returns the current state of the repository holding
-	// the given directory.
-	Status(ctx context.Context) (Status, error)
+	// the given args (files or directories). If args is not provided
+	Status(ctx context.Context, args ...string) (Status, error)
 }
 
 // Status is the current state of a local repository.

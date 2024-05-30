@@ -30,9 +30,7 @@ func newModTidyCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "tidy",
 		Short: "download and tidy module dependencies",
-		Long: `WARNING: THIS COMMAND IS EXPERIMENTAL.
-
-Tidy resolves all module dependencies in the current module and updates
+		Long: `Tidy resolves all module dependencies in the current module and updates
 the cue.mod/module.cue file to reflect them.
 
 It also removes dependencies that are not needed.
@@ -44,9 +42,7 @@ a registry.
 See "cue help environment" for details on how $CUE_REGISTRY is used to
 determine the modules registry.
 
-Note: you must enable the modules experiment with:
-	export CUE_EXPERIMENT=modules
-for this command to work.
+Note that this command is not yet stable and may be changed.
 `,
 		RunE: mkRunE(c, runModTidy),
 		Args: cobra.ExactArgs(0),

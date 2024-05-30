@@ -9,6 +9,15 @@ cmp stdout output.golden
 exec cue eval ./x
 cmp stdout output.golden
 
+# Also test that the above all works when using an explicit qualifier.
+
+exec cue eval root_qualifier.cue
+cmp stdout output.golden
+exec cue eval mod.com/x:x
+cmp stdout output.golden
+exec cue eval ./x:x
+cmp stdout output.golden
+
 -- output.golden --
 x: 5
 -- cue.mod/module.cue --
@@ -18,6 +27,12 @@ language: version: "v0.9.0"
 package root
 
 import "mod.com/x"
+
+x
+-- root_qualifier.cue --
+package root
+
+import "mod.com/x:x"
 
 x
 -- x/y.cue --

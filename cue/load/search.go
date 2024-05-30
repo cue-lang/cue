@@ -272,8 +272,8 @@ func (l *loader) importPathsQuiet(patterns []string) []*match {
 type resolvedPackageArg struct {
 	// The original field may be needed once we want to replace the original
 	// package pattern matching code, as it is necessary to populate Instance.DisplayPath.
-	original string
-	resolved string
+	original          string
+	resolvedCanonical string
 }
 
 func expandPackageArgs(c *Config, pkgArgs []string, pkgQual string, tg *tagger) ([]resolvedPackageArg, error) {
@@ -350,7 +350,7 @@ func appendExpandedPackageArg(c *Config, pkgPaths []resolvedPackageArg, p string
 				Dir: ".",
 			}, c.Module, tg)
 		}
-		return append(pkgPaths, resolvedPackageArg{origp, ip.String()}), nil
+		return append(pkgPaths, resolvedPackageArg{origp, ip.Canonical().String()}), nil
 	}
 	// Strip the module prefix, leaving only the directory relative
 	// to the module root.

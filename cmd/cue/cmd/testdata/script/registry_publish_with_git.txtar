@@ -1,6 +1,9 @@
 # Check that we can use the cue mod publish command to publish to a registry
 # using the git VCS, and that it doesn't publish files that are git-ignored.
 
+# Set a specific CUE_CACHE_DIR for later inspection of extracted module contents
+env CUE_CACHE_DIR=$WORK/.cache
+
 [!exec:git] skip 'no git command found'
 memregistry MEMREGISTRY
 env CUE_REGISTRY=$MEMREGISTRY
@@ -10,30 +13,48 @@ exec git init .
 exec git add .
 exec git -c user.name=noone -c user.email=noone@example.com commit -m 'initial commit'
 
-# Remove an file that's outside the module directory, which
-# makes the git repository unclean but the module subdirectory
-# remains clean.
+
+# Publish the root module
+cd $WORK/example
+exec cue mod publish v0.0.1
+stdout '^published x.example/root@v0.0.1 to [^ ]+/x.example/root:v0.0.1$'
+
+# Now remove a file that's outside the root/a or root/b directory, which makes
+# the git repository unclean but the module subdirectories remain clean.
 rm $WORK/example/otherfile
 
-cd cuemodule
+cd $WORK/example/a
 exec cue mod publish v0.0.1
-stdout '^published x.example/e@v0.0.1 to [^ ]+/x.example/e:v0.0.1$'
+stdout '^published x.example/root/a@v0.0.1 to [^ ]+/x.example/root/a:v0.0.1$'
+cd $WORK/example/b
+exec cue mod publish v0.0.1
+stdout '^published x.example/root/b@v0.0.1 to [^ ]+/x.example/root/b:v0.0.1$'
+
+# Verify that we can evaluate based on those dependencies
 cd $WORK/main
 exec cue eval .
 cmp stdout ../expect-eval-stdout
+
+# Verify that we have a LICENSE files for all modules
+cmp $WORK/.cache/mod/extract/x.example/root@v0.0.1/LICENSE $WORK/example/LICENSE
+cmp $WORK/.cache/mod/extract/x.example/root/a@v0.0.1/LICENSE $WORK/example/a/LICENSE
+
+# TODO: support grabbing the LICENSE file from the VCS root if one is not
+# contained in the module
+# cmp $WORK/.cache/mod/extract/x.example/root/b@v0.0.1/LICENSE $WORK/example/LICENSE
 
 # Check that the manifest contains the expected git metadata
 # Note: we use cue vet rather than cmp because the
 # manifest contains information that's tricky to control/predict
 # in a test, such as git commit times and commit hashes.
-get-manifest $MEMREGISTRY/x.example/e:v0.0.1 $WORK/manifest0.json
+get-manifest $MEMREGISTRY/x.example/root:v0.0.1 $WORK/manifest0.json
 exec cue vet $WORK/manifest-schema.cue $WORK/manifest0.json
 
 # If the git directory is not clean, the publish should fail. We can
 # conveniently combine that check with the .gitignore removal.
 cd $WORK/example
 rm .gitignore
-cd cuemodule
+cd $WORK/example/a
 ! exec cue mod publish v0.0.2
 cmp stderr $WORK/expect-unclean-stderr
 
@@ -42,10 +63,10 @@ cmp stderr $WORK/expect-unclean-stderr
 cd $WORK/example
 exec git add .
 exec git -c user.name=noone -c user.email=noone@example.com commit -m 'commit with no .gitignore'
-cd cuemodule
+cd $WORK/example/a
 exec cue mod publish v0.0.2
 cd $WORK/main
-exec cue mod get x.example/e@v0.0.2
+exec cue mod get x.example/root/a@v0.0.2
 exec cue eval .
 cmp stdout $WORK/expect-eval-stdout2
 
@@ -60,40 +81,66 @@ annotations!: {
 -- expect-publish-stdout --
 published x.example/e@v0.0.1
 -- expect-eval-stdout --
-e: true
+root: true
+a:    true
+b:    true
 -- expect-unclean-stderr --
 VCS state is not clean
 -- expect-eval-stdout2 --
-e:         true
-sensitive: true
+root:        true
+a:           true
+sensitive_a: true
+b:           true
 -- main/cue.mod/module.cue --
 module: "main.org@v0"
 language: version: "v0.9.0-alpha.0"
 source: kind: "self"
 
-deps: "x.example/e@v0": v: "v0.0.1"
-
+deps: "x.example/root@v0": v: "v0.0.1"
+deps: "x.example/root/a@v0": v: "v0.0.1"
+deps: "x.example/root/b@v0": v: "v0.0.1"
 -- main/main.cue --
 package main
-import "x.example/e@v0"
 
-e
+import (
+	"x.example/root@v0"
+	"x.example/root/a@v0"
+	"x.example/root/b@v0"
+)
 
--- example/cuemodule/cue.mod/module.cue --
-module: "x.example/e@v0"
+root
+a
+b
+-- example/.gitignore --
+/a/ignored.cue
+-- example/cue.mod/module.cue --
+module: "x.example/root@v0"
 language: version: "v0.9.0-alpha.0"
 source: kind: "git"
--- example/.gitignore --
-/cuemodule/ignored.cue
--- example/cuemodule/e.cue --
-package e
-
-e: true
-
--- example/cuemodule/ignored.cue --
-package e
-
-sensitive: true
+-- example/LICENSE --
+root LICENSE
+-- example/root.cue --
+package root
+root: true
+-- example/a/cue.mod/module.cue --
+module: "x.example/root/a@v0"
+language: version: "v0.9.0-alpha.0"
+source: kind: "git"
+-- example/a/LICENSE --
+a LICENSE
+-- example/a/a.cue --
+package a
+a: true
+-- example/a/ignored.cue --
+package a
+sensitive_a: true
+-- example/b/cue.mod/module.cue --
+module: "x.example/root/b@v0"
+language: version: "v0.9.0-alpha.0"
+source: kind: "git"
+-- example/b/b.cue --
+package b
+b: true
 -- example/otherfile --
 this will be removed but is outside the module so
 that shouldn't stop the publish working.

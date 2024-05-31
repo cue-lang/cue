@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4684834_5c884f33",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-31T19:00:23Z",
+      "side": 1,
+      "message": "\"even though no such file has ever existed\"",
+      "revId": "92624991eea78e5893f7f37ae0114f95e801b22c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a363c606_b8563f49",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-31T19:00:23Z",
+      "side": 1,
+      "message": "Which file? Perhaps be explicit just to be clear.",
+      "range": {
+        "startLine": 12,
+        "startChar": 26,
+        "endLine": 12,
+        "endChar": 30
+      },
+      "revId": "92624991eea78e5893f7f37ae0114f95e801b22c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4c5f2b5_26f50332",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-31T19:00:23Z",
+      "side": 1,
+      "message": "Thanks for doing this.",
+      "revId": "92624991eea78e5893f7f37ae0114f95e801b22c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb77400f_86188e04",
+        "filename": "CONTRIBUTING.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 762,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-31T19:00:23Z",
+      "side": 1,
+      "message": "\"a GitHub account\" just to be explicit and clear.",
+      "range": {
+        "startLine": 762,
+        "startChar": 36,
+        "endLine": 762,
+        "endChar": 38
+      },
+      "revId": "92624991eea78e5893f7f37ae0114f95e801b22c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

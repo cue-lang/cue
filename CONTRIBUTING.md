@@ -757,14 +757,13 @@ issue/edit/code review/submit process itself.
 
 Files in the CUE repository don't list author names, both to avoid clutter and
 to avoid having to keep the lists up to date.  Instead, your name will appear in
-the [change log](https://review.gerrithub.io/plugins/gitiles/cue-lang/cue/+log)
-and in the [`CONTRIBUTORS`](../CONTRIBUTORS) file and perhaps the
-[`AUTHORS`](../AUTHORS) file.  These files are automatically generated from the
-commit logs periodically.  The [`AUTHORS`](../AUTHORS) file defines who
-&ldquo;The CUE Authors&rdquo;&mdash;the copyright holders&mdash;are.
+the [git change log](https://review.gerrithub.io/plugins/gitiles/cue-lang/cue/+log)
+and in [GitHub's contributor stats](https://github.com/cue-lang/cue/graphs/contributors)
+if using an email address linked to an account.
 
-
-New files that you contribute should use the standard copyright header:
+New files that you contribute should use the standard copyright header
+with the current year reflecting when they were added.
+Do not update the copyright year for existing files that you change.
 
 
 ```
@@ -782,10 +781,6 @@ New files that you contribute should use the standard copyright header:
 // See the License for the specific language governing permissions and
 // limitations under the License.
 ```
-
-(Use the current year if you're reading this in 2019 or beyond.)
-Files in the repository are copyrighted the year they are added.
-Do not update the copyright year on files that you change.
 
 ### Troubleshooting GerritHub mail errors
 

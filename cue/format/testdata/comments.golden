@@ -105,6 +105,10 @@ list4: [
 	// selector
 ]
 
+list5: [
+	if true {}, // a comment
+]
+
 funcArg1: foo(
 		// Comment1
 

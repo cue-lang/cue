@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "30b7a7c7_d64f6d97",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-31T09:57:31Z",
+      "side": 1,
+      "message": "typo; fixing",
+      "range": {
+        "startLine": 10,
+        "startChar": 36,
+        "endLine": 10,
+        "endChar": 39
+      },
+      "revId": "d72acbb73cbdba93a164eed2b8183427b357bf07",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dfb30f70_3ee80fb7",
+        "filename": "cmd/cue/cmd/testdata/script/registry_publish_with_git.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-05-31T09:57:31Z",
+      "side": 1,
+      "message": "no need for this as TestScript set a CUE_CACHE_DIR which you can use directly; simplifying the test.",
+      "revId": "d72acbb73cbdba93a164eed2b8183427b357bf07",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

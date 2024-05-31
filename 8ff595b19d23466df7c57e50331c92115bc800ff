@@ -65,6 +65,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "84f03e7b_7c8652fe",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-31T06:59:43Z",
+      "side": 1,
+      "message": "I definitely defer to others if there is better wording here, but thanks for making the change.",
+      "parentUuid": "6c89d9fa_e563f965",
+      "range": {
+        "startLine": 180,
+        "startChar": 4,
+        "endLine": 180,
+        "endChar": 13
+      },
+      "revId": "8ff595b19d23466df7c57e50331c92115bc800ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "da4ed695_29c1dc6e",
@@ -100,6 +124,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "181ca259_211db44f",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-31T06:59:43Z",
+      "side": 1,
+      "message": "Good point.",
+      "parentUuid": "3429a50e_495af755",
+      "revId": "8ff595b19d23466df7c57e50331c92115bc800ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e7375386_a4190065",
@@ -131,6 +173,24 @@
       "side": 1,
       "message": "I struggled with this a bit, because I agree that examples and being more precise is good, but I didn\u0027t want to make this help doc even longer or to add too much verbosity. I opted for adding a section at the very end with a short example, which works for both env vars. PTAL",
       "parentUuid": "e7375386_a4190065",
+      "revId": "8ff595b19d23466df7c57e50331c92115bc800ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e0ac636_c747d6a6",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-31T06:59:43Z",
+      "side": 1,
+      "message": "LGTM.",
+      "parentUuid": "61faa47f_84c9516f",
       "revId": "8ff595b19d23466df7c57e50331c92115bc800ff",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

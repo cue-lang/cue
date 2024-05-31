@@ -701,6 +701,10 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 		f.print(trailcomma, noblank)
 		f.visitComments(f.current.pos)
 		f.matchUnindent()
+
+		if f.lastTok == token.COMMENT {
+			f.print(newline, nooverride)
+		}
 		f.print(noblank, x.Rbrack, token.RBRACK)
 
 	case *ast.Ellipsis:

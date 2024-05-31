@@ -17,7 +17,6 @@ package vcs
 import (
 	"context"
 	"fmt"
-	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -49,30 +48,28 @@ func (v gitVCS) Root() string {
 }
 
 // ListFiles implements [VCS.ListFiles].
-func (v gitVCS) ListFiles(ctx context.Context, dir string) ([]string, error) {
-	rel, err := filepath.Rel(v.root, dir)
-	if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
-		return nil, fmt.Errorf("cannot list files from %q, outside VCS root %q", dir, v.root)
-	}
+func (v gitVCS) ListFiles(ctx context.Context, dir string, args ...string) ([]string, error) {
 	// TODO should we use --recurse-submodules?
-	out, err := runCmd(ctx, dir, "git", "ls-files", "-z")
+	gitargs := append([]string{"ls-files", "-z"}, args...)
+	out, err := runCmd(ctx, dir, "git", gitargs...)
 	if err != nil {
 		return nil, err
 	}
-	files := strings.Split(strings.TrimSuffix(out, "\x00"), "\x00")
+	out = strings.TrimSuffix(out, "\x00")
+	if out == "" {
+		return nil, nil
+	}
+	files := strings.Split(out, "\x00")
 	sort.Strings(files)
 	return files, nil
 }
 
 // Status implements [VCS.Status].
-func (v gitVCS) Status(ctx context.Context) (Status, error) {
+func (v gitVCS) Status(ctx context.Context, args ...string) (Status, error) {
 	// We only care about the module's subdirectory status - if anything
 	// else is dirty, it won't go into the module so we don't care.
-	// TODO this will change if/when we include license files
-	// from outside the module directory. It also over-reports dirtiness
-	// because there might be nested modules that aren't included, but
-	// are nonetheless included in the status check.
-	out, err := runCmd(ctx, v.root, "git", "status", "--porcelain", v.subDir)
+	gitargs := append([]string{"status", "--porcelain"}, args...)
+	out, err := runCmd(ctx, v.root, "git", gitargs...)
 	if err != nil {
 		return Status{}, err
 	}

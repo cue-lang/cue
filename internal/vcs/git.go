@@ -25,8 +25,7 @@ import (
 )
 
 type gitVCS struct {
-	root   string
-	subDir string
+	root string
 }
 
 func newGitVCS(dir string) (VCS, error) {
@@ -38,8 +37,7 @@ func newGitVCS(dir string) (VCS, error) {
 		}
 	}
 	return gitVCS{
-		root:   root,
-		subDir: dir,
+		root: root,
 	}, nil
 }
 
@@ -48,31 +46,40 @@ func (v gitVCS) Root() string {
 	return v.root
 }
 
-// ListFiles implements [VCS.ListFiles].
-func (v gitVCS) ListFiles(ctx context.Context, dir string) ([]string, error) {
-	rel, err := filepath.Rel(v.root, dir)
-	if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
-		return nil, fmt.Errorf("cannot list files from %q, outside VCS root %q", dir, v.root)
+// fixDir adjusts dir according to the semantics described in [VCS.ListFiles].
+func fixDir(v VCS, dir string) string {
+	if dir == "" {
+		return v.Root()
 	}
+	if !filepath.IsAbs(dir) {
+		return filepath.Join(v.Root(), dir)
+	}
+	return dir
+}
+
+// ListFiles implements [VCS.ListFiles].
+func (v gitVCS) ListFiles(ctx context.Context, dir string, paths ...string) ([]string, error) {
+	dir = fixDir(v, dir)
+
 	// TODO should we use --recurse-submodules?
-	out, err := runCmd(ctx, dir, "git", "ls-files", "-z")
+	gitargs := append([]string{"ls-files", "-z", "--"}, paths...)
+	out, err := runCmd(ctx, dir, "git", gitargs...)
 	if err != nil {
 		return nil, err
 	}
-	files := strings.Split(strings.TrimSuffix(out, "\x00"), "\x00")
+	out = strings.TrimSuffix(out, "\x00")
+	if out == "" {
+		return nil, nil
+	}
+	files := strings.Split(out, "\x00")
 	sort.Strings(files)
 	return files, nil
 }
 
 // Status implements [VCS.Status].
-func (v gitVCS) Status(ctx context.Context) (Status, error) {
-	// We only care about the module's subdirectory status - if anything
-	// else is dirty, it won't go into the module so we don't care.
-	// TODO this will change if/when we include license files
-	// from outside the module directory. It also over-reports dirtiness
-	// because there might be nested modules that aren't included, but
-	// are nonetheless included in the status check.
-	out, err := runCmd(ctx, v.root, "git", "status", "--porcelain", v.subDir)
+func (v gitVCS) Status(ctx context.Context, paths ...string) (Status, error) {
+	gitargs := append([]string{"status", "--porcelain", "--"}, paths...)
+	out, err := runCmd(ctx, v.root, "git", gitargs...)
 	if err != nil {
 		return Status{}, err
 	}

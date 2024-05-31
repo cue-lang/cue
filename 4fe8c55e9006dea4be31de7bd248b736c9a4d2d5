@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c1c62c4_807dca76",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-05-31T08:49:46Z",
+      "side": 1,
+      "message": "Relative to the working dir of the command.",
+      "revId": "4fe8c55e9006dea4be31de7bd248b736c9a4d2d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

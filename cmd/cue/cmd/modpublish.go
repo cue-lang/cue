@@ -147,7 +147,7 @@ func runModUpload(cmd *Command, args []string) error {
 		if err != nil {
 			return err
 		}
-		status, err := vcsImpl.Status(ctx)
+		status, err := vcsImpl.Status(ctx, modRoot)
 		if err != nil {
 			return err
 		}
@@ -159,6 +159,17 @@ func runModUpload(cmd *Command, args []string) error {
 		if err != nil {
 			return err
 		}
+
+		// It is an invariant at this point that modRoot is contained
+		// by the VCS root.
+		modRootRel, _ := filepath.Rel(vcsImpl.Root(), modRoot)
+		// All files are relative to the VCS root. Change them to be relative to
+		// the modRoot.
+		for i, f := range files {
+			f = strings.TrimPrefix(f, modRootRel+string(os.PathSeparator))
+			files[i] = f
+		}
+
 		if err := modzip.Create(zf, mv, files, osFileIO{
 			modRoot: modRoot,
 		}); err != nil {

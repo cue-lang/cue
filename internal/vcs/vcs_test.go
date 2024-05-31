@@ -55,12 +55,12 @@ func TestGit(t *testing.T) {
 	// The status shows that we have uncommitted files
 	// because we haven't yet added the files after doing
 	// git init.
-	status, err := v.Status(ctx)
+	status, err := v.Status(ctx, "subdir")
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.IsTrue(status.Uncommitted))
 
 	mustRunCmd(t, dir, "git", "add", ".")
-	status, err = v.Status(ctx)
+	status, err = v.Status(ctx, "subdir")
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.IsTrue(status.Uncommitted))
 
@@ -70,7 +70,7 @@ func TestGit(t *testing.T) {
 		"-c", "user.name=cueckoo",
 		"commit", "-m", "something",
 	)
-	status, err = v.Status(ctx)
+	status, err = v.Status(ctx, "subdir")
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.IsFalse(status.Uncommitted))
 	qt.Assert(t, qt.IsTrue(!status.CommitTime.Before(commitTime)))
@@ -93,7 +93,7 @@ func TestGit(t *testing.T) {
 	// Change a file that's not in subdir. The status should remain the same.
 	err = os.WriteFile(filepath.Join(dir, "bar.txt"), []byte("something else"), 0o666)
 	qt.Assert(t, qt.IsNil(err))
-	status1, err := v.Status(ctx)
+	status1, err := v.Status(ctx, "subdir")
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.DeepEquals(status1, status))
 }

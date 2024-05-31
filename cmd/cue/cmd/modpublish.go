@@ -156,7 +156,7 @@ func runModUpload(cmd *Command, args []string) error {
 		if err != nil {
 			return err
 		}
-		status, err := vcsImpl.Status(ctx)
+		status, err := vcsImpl.Status(ctx, modRoot)
 		if err != nil {
 			return err
 		}

@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "84e9cb60_9dae67e3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-01T21:49:01Z",
+      "side": 1,
+      "message": "FWIW my attempt at this a few months back was https://review.gerrithub.io/c/cue-lang/cue/+/1173870, which I never merged as it broke other test cases, from what I recall. I think it would be a more general fix for all comments to be followed by a newline, but I don\u0027t oppose a specific fix if that is easier to merge without regressions.",
+      "revId": "a8534a864bcc13a9dd8e5147ebc2d31f6acc3723",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "06248e64_30da295f",

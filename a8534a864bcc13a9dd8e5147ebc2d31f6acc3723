@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06248e64_30da295f",
+        "filename": "cue/format/node.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 705,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-01T21:46:36Z",
+      "side": 1,
+      "message": "can you very briefly document this? e.g. I would expect something like:\n\n\u003e If we just printed a comment, a newline must follow it.",
+      "revId": "a8534a864bcc13a9dd8e5147ebc2d31f6acc3723",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

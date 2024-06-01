@@ -1,0 +1,158 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5996970_2643c014",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-01T12:41:40Z",
+      "side": 1,
+      "message": "SGTM; making the VCS \"forget\" the subdirectory or module root is the best approach I think, because the VCS dir may be entirely different, and in cases like LICENSE, we must be able to look at the whole VCS dir.\n\nMy only last concern is that we don\u0027t say much about what \"args\" are - in git these may be patterns, which could be useful to us (such as `v.Status(ctx, \"*.cue\")` to check if all CUE files in the repo are clean), but they would likely not be portable to other VCSes.\n\nSo I would defensively state in the VCS interface godoc that any arguments may only be paths to files or directories, which is all we need for now anyway. You could also make this clearer by calling them `paths ...string`.",
+      "revId": "d7e6ebbe9b01ea625a7d0dbc6500a5098260343b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "991a65f0_27753d3f",
+        "filename": "internal/vcs/git.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-01T12:41:40Z",
+      "side": 1,
+      "message": "like in Status, this would likely benefit from `--`.",
+      "revId": "d7e6ebbe9b01ea625a7d0dbc6500a5098260343b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a3bbaa2_22cb94cd",
+        "filename": "internal/vcs/git.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-01T12:41:40Z",
+      "side": 1,
+      "message": "you are using `dir` as-is here. I think you need to protect against:\n\n* an empty string; I think this could just default to the repo root for ease of use\n\n* a relative path; assuming os/exec semantics, it would then be relative to $PWD rather than the repo root, so I assume you should join it with the repo root, much like the previous case",
+      "range": {
+        "startLine": 52,
+        "startChar": 25,
+        "endLine": 52,
+        "endChar": 28
+      },
+      "revId": "d7e6ebbe9b01ea625a7d0dbc6500a5098260343b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2652894_49b98ead",
+        "filename": "internal/vcs/git.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-01T12:41:40Z",
+      "side": 1,
+      "message": "this comment is out of date now that you no longer hard-code subDir.",
+      "revId": "d7e6ebbe9b01ea625a7d0dbc6500a5098260343b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ee3c297_08da2a5d",
+        "filename": "internal/vcs/git.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-01T12:41:40Z",
+      "side": 1,
+      "message": "careful: if I give you `\"-foo\", \"bar\"` as args, then you would interpret the first as a git flag. You probably want to add `--` to always treat args as non-flags.",
+      "revId": "d7e6ebbe9b01ea625a7d0dbc6500a5098260343b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71c08824_4097ea3b",
+        "filename": "internal/vcs/vcs.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-01T12:41:40Z",
+      "side": 1,
+      "message": "personally I\u0027d omit this detail; we don\u0027t have to give a reason why it\u0027s unsupported.",
+      "range": {
+        "startLine": 38,
+        "startChar": 1,
+        "endLine": 39,
+        "endChar": 33
+      },
+      "revId": "d7e6ebbe9b01ea625a7d0dbc6500a5098260343b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9ab2be5_fdd16622",
+        "filename": "internal/vcs/vcs.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-01T12:41:40Z",
+      "side": 1,
+      "message": "On my first read I thought this was related to the paths being relative to `dir`, but now I realise you mean that directory files are not returned. How about tweaking the first sentence instead:\n\n\u003e ListFiles returns a list of non-directory files tracked by VCS relative to dir in lexical order.\n\n(and this way you can also omit the \"relative to\" sentence\")",
+      "range": {
+        "startLine": 40,
+        "startChar": 22,
+        "endLine": 41,
+        "endChar": 3
+      },
+      "revId": "d7e6ebbe9b01ea625a7d0dbc6500a5098260343b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd198363_39ed52fb",
+        "filename": "internal/vcs/vcs.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-01T12:41:40Z",
+      "side": 1,
+      "message": "why add \"dir\" to ListFiles but not Status? is it purely so that ListFiles will return paths relative to dir, whereas this is not a problem for Status?\n\nat least Status should clarify that it\u0027s always relative to the repo root.",
+      "revId": "d7e6ebbe9b01ea625a7d0dbc6500a5098260343b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

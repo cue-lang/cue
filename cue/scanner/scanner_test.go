@@ -846,7 +846,7 @@ func TestNoLiteralComments(t *testing.T) {
 			A: 1 // foo
 		}
 
-		b :: {
+		#b: {
 			B: 2
 			// foo
 		}

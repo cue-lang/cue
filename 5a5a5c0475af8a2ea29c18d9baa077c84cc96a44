@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b88eaac5_0e89a00e",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-01T12:50:17Z",
+      "side": 1,
+      "message": "my intuition is that you should use `os.Lstat` here rather than `ListFiles` - you just want to check if the file exists on disk, and then call VCS\u0027s Status method to check that the file is tracked and committed. if there\u0027s a very good reason to use ListFiles, perhaps document it, as it\u0027s not obvious to me at least.\n\nor, even more than that, I would imagine that calling just Status would be enough. the only bit of info that Status doesn\u0027t say is whether LICENSE is a regular file, because if it\u0027s a directory with many files, we supposedly want to ignore it. So perhaps for that reason `os.Lstat` is still necessary.",
+      "revId": "5a5a5c0475af8a2ea29c18d9baa077c84cc96a44",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5a630a6_71e0f674",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-01T12:50:17Z",
+      "side": 1,
+      "message": "this doc is out of date now.\n\nIt\u0027s a bit unfortunate to have one map entry per file - in the vast majority of cases, i.e. all except a parent LICENSE file, the old absPath logic was fine. perhaps the map can just be used as an \"absPathOverlay\" with either 0 or 1 entries in practice? and you can document it\u0027s needed for files being published from outside modRoot.",
+      "revId": "5a5a5c0475af8a2ea29c18d9baa077c84cc96a44",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

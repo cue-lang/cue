@@ -187,10 +187,6 @@ func (o *StructLit) OptionalTypes() OptionalType {
 //	foo: bar
 //	#foo: bar
 //	_foo: bar
-//
-// Legacy:
-//
-//	Foo :: bar
 type Field struct {
 	Src *ast.Field
 

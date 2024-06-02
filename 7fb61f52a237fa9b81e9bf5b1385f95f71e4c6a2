@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "32067744_b24e9693",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-02T08:50:45Z",
+      "side": 1,
+      "message": "I\u0027ve had another go at refactoring this to be cleaner. Let me know what you think.",
+      "revId": "7fb61f52a237fa9b81e9bf5b1385f95f71e4c6a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -16,6 +16,7 @@ package load
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -467,22 +468,34 @@ func TestOverlays(t *testing.T) {
 }
 
 func TestLoadOrder(t *testing.T) {
-	testDataDir := testdata("testsort")
+	testDir := t.TempDir()
+	letters := "abcdefghij"
+
+	for _, c := range letters {
+		contents := fmt.Sprintf(`
+package %s
+
+x: 1
+`, string(c))
+		err := os.WriteFile(filepath.Join(testDir, string(c)+".cue"), []byte(contents), 0o644)
+		qt.Assert(t, qt.IsNil(err))
+	}
+
 	insts := Instances([]string{"."}, &Config{
 		Package: "*",
-		Dir:     testDataDir,
+		Dir:     testDir,
 	})
 
 	var actualFiles = []string{}
 	for _, inst := range insts {
 		for _, f := range inst.BuildFiles {
-			if strings.Contains(f.Filename, testDataDir) {
+			if strings.Contains(f.Filename, testDir) {
 				actualFiles = append(actualFiles, filepath.Base(f.Filename))
 			}
 		}
 	}
 	var expectedFiles []string
-	for _, c := range "abcdefghij" {
+	for _, c := range letters {
 		expectedFiles = append(expectedFiles, string(c)+".cue")
 	}
 	qt.Assert(t, qt.DeepEquals(actualFiles, expectedFiles))

@@ -16,6 +16,24 @@
       "message": "FYI - there is a bug in `testscript` that is causing the test failure. Investigating.",
       "revId": "217cc8379820576af2cf62d5c00e88f69064b00e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9950c4d4_1929e98e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-02T13:51:51Z",
+      "side": 1,
+      "message": "Raised as https://github.com/rogpeppe/go-internal/issues/255 and worked around for now.",
+      "parentUuid": "8ffc86b4_50e2551a",
+      "revId": "217cc8379820576af2cf62d5c00e88f69064b00e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "82874f61_4469ca0b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-02T08:37:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d5996970_2643c014",
+      "revId": "d7e6ebbe9b01ea625a7d0dbc6500a5098260343b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "991a65f0_27753d3f",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-06-01T12:41:40Z",
       "side": 1,
       "message": "like in Status, this would likely benefit from `--`.",
+      "revId": "d7e6ebbe9b01ea625a7d0dbc6500a5098260343b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "466bf9ac_02648ca6",
+        "filename": "internal/vcs/git.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-02T08:37:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "991a65f0_27753d3f",
       "revId": "d7e6ebbe9b01ea625a7d0dbc6500a5098260343b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -58,6 +94,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c202788f_3b002482",
+        "filename": "internal/vcs/git.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-02T08:37:33Z",
+      "side": 1,
+      "message": "Done, and updated the doc comment on the interface to match.",
+      "parentUuid": "6a3bbaa2_22cb94cd",
+      "range": {
+        "startLine": 52,
+        "startChar": 25,
+        "endLine": 52,
+        "endChar": 28
+      },
+      "revId": "d7e6ebbe9b01ea625a7d0dbc6500a5098260343b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d2652894_49b98ead",
@@ -71,6 +131,24 @@
       "writtenOn": "2024-06-01T12:41:40Z",
       "side": 1,
       "message": "this comment is out of date now that you no longer hard-code subDir.",
+      "revId": "d7e6ebbe9b01ea625a7d0dbc6500a5098260343b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99fdbd63_61c0ccef",
+        "filename": "internal/vcs/git.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-02T08:37:33Z",
+      "side": 1,
+      "message": "Good spot, thank you.",
+      "parentUuid": "d2652894_49b98ead",
       "revId": "d7e6ebbe9b01ea625a7d0dbc6500a5098260343b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -92,6 +170,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c65ef1e_88390ad5",
+        "filename": "internal/vcs/git.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-02T08:37:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2ee3c297_08da2a5d",
+      "revId": "d7e6ebbe9b01ea625a7d0dbc6500a5098260343b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "71c08824_4097ea3b",
@@ -105,6 +201,30 @@
       "writtenOn": "2024-06-01T12:41:40Z",
       "side": 1,
       "message": "personally I\u0027d omit this detail; we don\u0027t have to give a reason why it\u0027s unsupported.",
+      "range": {
+        "startLine": 38,
+        "startChar": 1,
+        "endLine": 39,
+        "endChar": 33
+      },
+      "revId": "d7e6ebbe9b01ea625a7d0dbc6500a5098260343b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "935d4958_c34b67ba",
+        "filename": "internal/vcs/vcs.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-02T08:37:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "71c08824_4097ea3b",
       "range": {
         "startLine": 38,
         "startChar": 1,
@@ -138,6 +258,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9ddc7e7_9d8b64d7",
+        "filename": "internal/vcs/vcs.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-02T08:37:33Z",
+      "side": 1,
+      "message": "I\u0027m not sure this is strictly necessary, because VCS\u0027s that I\u0027m aware of only track directories by virtue of the files contained within them. That is, directories by themselves are never tracked. Or put another way, we\u0027re not doing anything special in the Go code that surrounds the use of `git` to only return directory names. I think this sentence is only a confirmation of this point, and as such I think it\u0027s superfluous and (arguably) misleading given your comments. I\u0027ve removed it.",
+      "parentUuid": "f9ab2be5_fdd16622",
+      "range": {
+        "startLine": 40,
+        "startChar": 22,
+        "endLine": 41,
+        "endChar": 3
+      },
+      "revId": "d7e6ebbe9b01ea625a7d0dbc6500a5098260343b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fd198363_39ed52fb",
@@ -151,6 +295,24 @@
       "writtenOn": "2024-06-01T12:41:40Z",
       "side": 1,
       "message": "why add \"dir\" to ListFiles but not Status? is it purely so that ListFiles will return paths relative to dir, whereas this is not a problem for Status?\n\nat least Status should clarify that it\u0027s always relative to the repo root.",
+      "revId": "d7e6ebbe9b01ea625a7d0dbc6500a5098260343b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c3461b7_53870e6f",
+        "filename": "internal/vcs/vcs.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-02T08:37:33Z",
+      "side": 1,
+      "message": "\u003e why add \"dir\" to ListFiles but not Status? is it purely so that ListFiles will return paths relative to dir, whereas this is not a problem for Status?\n\nCorrect. I found myself somewhat torn here (although I\u0027ll note that this is a bit of an odd dilemma because there are \"bigger\" API issues I would address before this one). `Status` and `ListFiles` arguably _both_ want to optionally take a directory, and optionally args. But for `Status` we currently only use the version that is relative to the repo root, so I would be passing `\"\"`. It therefore felt premature to be trying to tweak this API any further, especially given that it\u0027s internal. \n\n\u003e at least Status should clarify that it\u0027s always relative to the repo root.\n\nDone.",
+      "parentUuid": "fd198363_39ed52fb",
       "revId": "d7e6ebbe9b01ea625a7d0dbc6500a5098260343b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "99ff479b_416ddb48",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-02T08:49:33Z",
+      "side": 1,
+      "message": "We need `ListFiles` here, at least for `git`. I\u0027ve added comment to that effect. Let me know if that explanation is clear enough.",
+      "parentUuid": "b88eaac5_0e89a00e",
+      "revId": "5a5a5c0475af8a2ea29c18d9baa077c84cc96a44",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d5a630a6_71e0f674",
         "filename": "cmd/cue/cmd/modpublish.go",
         "patchSetId": 5
@@ -31,6 +49,24 @@
       "writtenOn": "2024-06-01T12:50:17Z",
       "side": 1,
       "message": "this doc is out of date now.\n\nIt\u0027s a bit unfortunate to have one map entry per file - in the vast majority of cases, i.e. all except a parent LICENSE file, the old absPath logic was fine. perhaps the map can just be used as an \"absPathOverlay\" with either 0 or 1 entries in practice? and you can document it\u0027s needed for files being published from outside modRoot.",
+      "revId": "5a5a5c0475af8a2ea29c18d9baa077c84cc96a44",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0175f9a_2b5504ce",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-02T08:49:33Z",
+      "side": 1,
+      "message": "Now that I\u0027ve had more than 5 mins to look at this code properly without rushing between things, I think a simpler thing is to work on a set of pairs. Let me know what you think about the refactor which I think is much clearer.",
+      "parentUuid": "d5a630a6_71e0f674",
       "revId": "5a5a5c0475af8a2ea29c18d9baa077c84cc96a44",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

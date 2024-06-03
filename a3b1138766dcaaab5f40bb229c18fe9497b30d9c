@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ed5d594_e973d0e9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-03T13:36:31Z",
+      "side": 1,
+      "message": "SGTM, meant to +2 again, but submitting also works!",
+      "revId": "a3b1138766dcaaab5f40bb229c18fe9497b30d9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

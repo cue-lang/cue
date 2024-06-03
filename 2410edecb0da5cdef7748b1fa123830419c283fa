@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe603cc6_cc1be9b3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-03T12:40:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "058eb719_97f9ffdb",
+      "revId": "2410edecb0da5cdef7748b1fa123830419c283fa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ef2983cd_886a7ee6",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-06-03T08:36:37Z",
       "side": 1,
       "message": "is this comment duplicated now?",
+      "revId": "2410edecb0da5cdef7748b1fa123830419c283fa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5be93a8f_c2aadd54",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-03T12:40:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef2983cd_886a7ee6",
       "revId": "2410edecb0da5cdef7748b1fa123830419c283fa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b285c4d_136c402c",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-03T12:40:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a2c7db87_b111c70d",
+      "revId": "2410edecb0da5cdef7748b1fa123830419c283fa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6573bd36_6f632a4c",
@@ -65,6 +119,24 @@
       "writtenOn": "2024-06-03T08:36:37Z",
       "side": 1,
       "message": "it\u0027s only used in one place now though, so I\u0027d inline.",
+      "revId": "2410edecb0da5cdef7748b1fa123830419c283fa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f35f4977_612af07a",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-03T12:40:06Z",
+      "side": 1,
+      "message": "There are now two places with the `Lstat` change so I\u0027ve left it in.",
+      "parentUuid": "6573bd36_6f632a4c",
       "revId": "2410edecb0da5cdef7748b1fa123830419c283fa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

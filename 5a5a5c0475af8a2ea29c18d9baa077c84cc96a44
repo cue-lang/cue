@@ -54,6 +54,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3817b272_b462ea3d",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-03T12:40:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b096472b_1bb27ea9",
+      "revId": "5a5a5c0475af8a2ea29c18d9baa077c84cc96a44",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d5a630a6_71e0f674",

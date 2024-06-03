@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c80d590b_200c8f30",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-03T21:04:16Z",
+      "side": 1,
+      "message": "https://go.dev/ref/mod#vcs-license says:\n\n\u003e This special case allows the same LICENSE file to apply to all modules within a repository. This only applies to files named LICENSE specifically, without extensions like .txt. Unfortunately, this cannot be extended without breaking cryptographic sums of existing modules; see Authenticating modules. Other tools and websites like pkg.go.dev may recognize files with other names.\n\nand indeed pkg.go.dev does detect many many more files:\n\nhttps://pkg.go.dev/golang.org/x/pkgsite/internal/licenses#pkg-variables\n\nI think we should leave a TODO, or possibly even a tracking issue, for detecting and keeping either some or all of the license files that pkgsite does. not a blocker but still important to be aware of.",
+      "revId": "86076b6c7888e139705c37514c3c70b610ad95a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "52fbedc6_42f0ba4b",
         "filename": "cmd/cue/cmd/testdata/script/registry_publish_with_git.txtar",
         "patchSetId": 14

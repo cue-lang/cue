@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8183546_b85c3cb6",
+        "filename": "cue/scanner/scanner_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 849,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-03T12:48:20Z",
+      "side": 1,
+      "message": "Why is this test not failing out of interest?",
+      "revId": "529f441e38d323a5529b56a4b87231df54a6b9c7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

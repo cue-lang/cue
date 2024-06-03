@@ -108,7 +108,13 @@ func tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, cueVers
 }
 
 func equalRequirements(rs0, rs1 *modrequirements.Requirements) bool {
-	return slices.Equal(rs0.RootModules(), rs1.RootModules()) &&
+	// Note that rs1.RootModules may include the unversioned local module
+	// if the current module imports any packages under cue.mod/*/.
+	// In such a case we want to skip over the local module when comparing,
+	// just like modfileFromRequirements does when filling [modfile.File.Deps].
+	// Note that we clone the slice to not modify rs1's internal slice in-place.
+	rs1RootMods := slices.DeleteFunc(slices.Clone(rs1.RootModules()), module.Version.IsLocal)
+	return slices.Equal(rs0.RootModules(), rs1RootMods) &&
 		maps.Equal(rs0.DefaultMajorVersions(), rs1.DefaultMajorVersions())
 }
 

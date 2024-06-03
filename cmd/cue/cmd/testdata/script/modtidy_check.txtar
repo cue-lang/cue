@@ -2,9 +2,7 @@
 # is formatted differently e.g. language.version in a single line,
 # or when there are dependencies to local modules inside cue.mod/*/.
 
-# TODO(mvdan): fix this bug in the commit immediately after.
-! exec cue mod tidy --check
-stderr 'module is not tidy'
+exec cue mod tidy --check
 
 # Sanity check what the tidy form of module.cue looks like.
 exec cue mod tidy

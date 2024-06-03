@@ -51,6 +51,24 @@
       "parentUuid": "52fbedc6_42f0ba4b",
       "revId": "86076b6c7888e139705c37514c3c70b610ad95a5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08e2d8b7_38643657",
+        "filename": "cmd/cue/cmd/testdata/script/registry_publish_with_git.txtar",
+        "patchSetId": 14
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-03T14:51:45Z",
+      "side": 1,
+      "message": "sorting SGTM, althoguh I\u0027m a bit nervous about the particular order we choose. when source is \"self\", we take the order from filepath.WalkDir, which is likely different from slices.Sort on a string slice. Ideally we would use the same sorting for all module zips, no matter how they were created.\n\nso it seems to me like we already don\u0027t have stable sorting. maybe that\u0027s OK for now, but at the very least we need a TODO to revisit this, as it makes me nervous we already have 2 (and with this patchset, 3) different ways to order files in a module zip.",
+      "parentUuid": "7eb6f048_fcef0ca7",
+      "revId": "86076b6c7888e139705c37514c3c70b610ad95a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

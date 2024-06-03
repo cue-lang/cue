@@ -49,7 +49,7 @@ func newAddCmd(c *Command) *cobra.Command {
 	f := cmd.Flags()
 	f.Bool(string(flagList), false,
 		"text executed as Go template with instance info")
-	f.BoolP(string(flagDryrun), "n", false,
+	f.BoolP(string(flagDryRun), "n", false,
 		"only run simulation")
 	f.StringP(string(flagPackage), "p", "", "package to append to")
 
@@ -147,7 +147,7 @@ func doAdd(cmd *Command, args []string) (err error) {
 		}
 	}
 
-	if flagDryrun.Bool(cmd) {
+	if flagDryRun.Bool(cmd) {
 		stdout := cmd.OutOrStdout()
 		for _, fi := range todo {
 			fmt.Fprintln(stdout, "---", fi.filename)

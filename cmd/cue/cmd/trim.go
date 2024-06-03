@@ -152,7 +152,7 @@ func runTrim(cmd *Command, args []string) error {
 		}
 	}
 
-	if flagDryrun.Bool(cmd) {
+	if flagDryRun.Bool(cmd) {
 		return nil
 	}
 

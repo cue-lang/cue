@@ -24,7 +24,7 @@ const (
 	flagAllErrors     flagName = "all-errors"
 	flagCheck         flagName = "check"
 	flagDiff          flagName = "diff"
-	flagDryrun        flagName = "dryrun"
+	flagDryRun        flagName = "dry-run"
 	flagEscape        flagName = "escape"
 	flagExpression    flagName = "expression"
 	flagExt           flagName = "ext"

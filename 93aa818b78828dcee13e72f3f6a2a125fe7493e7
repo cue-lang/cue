@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "1fb0c6ca_78a4f374",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-03T08:29:13Z",
+      "side": 1,
+      "message": "For #3130.",
+      "revId": "93aa818b78828dcee13e72f3f6a2a125fe7493e7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "3da96506_d03c7a54",
@@ -14,6 +31,40 @@
       "writtenOn": "2024-06-02T08:50:53Z",
       "side": 1,
       "message": "PTAL.",
+      "revId": "93aa818b78828dcee13e72f3f6a2a125fe7493e7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08d221a5_eda96b3f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-03T08:29:13Z",
+      "side": 1,
+      "message": "SGTM although I just realised you should cover the new API edge cases in TestGit, for example:\n\n* ListFiles with an empty dir argument\n* ListFiles with paths pointing to tracked files and dirs\n* ListFiles with paths pointing to missing and present-but-untracked files (and probably for Status too)\n* Status with zero paths\n\nI don\u0027t mean to require perfection but given we had a slight misunderstanding on these semantics in the next CL, I\u0027d really want to lock in the behavior via a test.",
+      "revId": "93aa818b78828dcee13e72f3f6a2a125fe7493e7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a04fcd4e_f2f65890",
+        "filename": "internal/vcs/vcs_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-03T08:29:13Z",
+      "side": 1,
+      "message": "It\u0027s perhaps a bit odd that this test now hard-codes the location of the module directory relative to the repo root, as that would not be a known detail in a real scenario. I think in a real scenario one would have to either feed the entirety of `filepath.Join(dir, \"subdir\")` to Status, or obtain it as a relative path from `v.Root` via `filepath.Rel`.\n\npersonally I might do the former here, with something like `mdir :\u003d filepath.Join(dir, \"subdir\")`, documenting that that\u0027s where the module lives.",
       "revId": "93aa818b78828dcee13e72f3f6a2a125fe7493e7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,8 +1,14 @@
-# Check that cue mod tidy --check succeeds OK
-# even when the module file is formatted differently
-# e.g. language.version in a single line.
+# Check that cue mod tidy --check succeeds OK even when the module file
+# is formatted differently e.g. language.version in a single line,
+# or when there are dependencies to local modules inside cue.mod/*/.
 
-exec cue mod tidy --check
+# TODO(mvdan): fix this bug in the commit immediately after.
+! exec cue mod tidy --check
+stderr 'module is not tidy'
+
+# Sanity check what the tidy form of module.cue looks like.
+exec cue mod tidy
+cmp cue.mod/module.cue cue.mod/module.cue.tidy
 
 -- cue.mod/module.cue --
 module: "main.org@v0"
@@ -11,11 +17,51 @@ language: version: "v0.8.100"
 // A comment.
 deps: "example.com@v0": v: "v0.0.1"
 
+-- cue.mod/module.cue.tidy --
+module: "main.org@v0"
+language: {
+	version: "v0.8.100"
+}
+deps: {
+	"example.com@v0": {
+		v: "v0.0.1"
+	}
+}
+-- cue.mod/pkg/cuemodpkg.test/top.cue --
+package cuemodpkg
+
+"cuemodpkg.test": "local"
+
+-- cue.mod/gen/cuemodgen.test/top.cue --
+package cuemodgen
+
+"cuemodgen.test": "local"
+
+-- cue.mod/usr/cuemodusr.test/top.cue --
+package cuemodusr
+
+"cuemodusr.test": "local"
+
 -- main.cue --
 package main
-import "example.com@v0:main"
+import (
+	"example.com@v0:main"
+	"main.org/subpkg@v0"
+	"cuemodpkg.test:cuemodpkg"
+	"cuemodgen.test:cuemodgen"
+	"cuemodusr.test:cuemodusr"
+)
 
 main
+subpkg
+cuemodpkg
+cuemodgen
+cuemodusr
+
+-- subpkg/top.cue --
+package subpkg
+
+"main.org@v0/sub": "current"
 
 -- _registry/example.com_v0.0.1/cue.mod/module.cue --
 module: "example.com@v0"

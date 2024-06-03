@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "b9e47cde_4a1b555f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-03T12:32:49Z",
+      "side": 1,
+      "message": "Done. I\u0027ve also filled out the issue.",
+      "parentUuid": "1fb0c6ca_78a4f374",
+      "revId": "93aa818b78828dcee13e72f3f6a2a125fe7493e7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "3da96506_d03c7a54",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 5
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0cd67bc7_6477e672",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-03T12:32:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "08d221a5_eda96b3f",
+      "revId": "93aa818b78828dcee13e72f3f6a2a125fe7493e7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a04fcd4e_f2f65890",
@@ -65,6 +101,24 @@
       "writtenOn": "2024-06-03T08:29:13Z",
       "side": 1,
       "message": "It\u0027s perhaps a bit odd that this test now hard-codes the location of the module directory relative to the repo root, as that would not be a known detail in a real scenario. I think in a real scenario one would have to either feed the entirety of `filepath.Join(dir, \"subdir\")` to Status, or obtain it as a relative path from `v.Root` via `filepath.Rel`.\n\npersonally I might do the former here, with something like `mdir :\u003d filepath.Join(dir, \"subdir\")`, documenting that that\u0027s where the module lives.",
+      "revId": "93aa818b78828dcee13e72f3f6a2a125fe7493e7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ab818d7_b032e7d9",
+        "filename": "internal/vcs/vcs_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-03T12:32:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a04fcd4e_f2f65890",
       "revId": "93aa818b78828dcee13e72f3f6a2a125fe7493e7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

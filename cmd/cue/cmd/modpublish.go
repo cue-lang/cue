@@ -52,7 +52,7 @@ $CUE_REGISTRY to determine where the module should be published (see
 "cue help environment" for details). Also note that this command does
 no dependency or other checks at the moment.
 
-When the --dryrun flag is specified, nothing will actually be written
+When the --dry-run flag is specified, nothing will actually be written
 to a registry, but all other checks will take place.
 
 The --json flag can be used to find out more information about the upload.
@@ -66,9 +66,9 @@ Note that this command is not yet stable and may be changed.
 		RunE: mkRunE(c, runModUpload),
 		Args: cobra.ExactArgs(1),
 	}
-	cmd.Flags().BoolP(string(flagDryrun), "n", false, "only run simulation")
-	cmd.Flags().Bool(string(flagJSON), false, "print verbose information in JSON format (implies --dryrun)")
-	cmd.Flags().String(string(flagOut), "", "write module contents to specified directory in OCI Image Layout format (implies --dryrun)")
+	cmd.Flags().BoolP(string(flagDryRun), "n", false, "only run simulation")
+	cmd.Flags().Bool(string(flagJSON), false, "print verbose information in JSON format (implies --dry-run)")
+	cmd.Flags().String(string(flagOut), "", "write module contents to specified directory in OCI Image Layout format (implies --dry-run)")
 
 	return cmd
 }
@@ -91,7 +91,7 @@ func runModUpload(cmd *Command, args []string) error {
 	if resolver0 == nil {
 		return fmt.Errorf("modules experiment not enabled (enable with CUE_EXPERIMENT=modules)")
 	}
-	dryRun := flagDryrun.Bool(cmd)
+	dryRun := flagDryRun.Bool(cmd)
 	outDir := flagOut.String(cmd)
 	useJSON := flagJSON.Bool(cmd)
 	if outDir != "" || useJSON {

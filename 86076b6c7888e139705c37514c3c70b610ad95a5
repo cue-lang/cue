@@ -33,6 +33,24 @@
       "message": "The only open question I have left (and would appreciate your thoughts @mvdan@mvdan.cc) is whether it\u0027s a problem that we don\u0027t have \"order\" when we augment a module with the VCS license file.",
       "revId": "86076b6c7888e139705c37514c3c70b610ad95a5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7eb6f048_fcef0ca7",
+        "filename": "cmd/cue/cmd/testdata/script/registry_publish_with_git.txtar",
+        "patchSetId": 14
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-03T14:41:53Z",
+      "side": 1,
+      "message": "My only hesitation here is that it\u0027s undocumented how `git ls-files` sorts files, and I would be willing to place some money on the fact that it\u0027s a function of the system language setting. Which perhaps points to use wanting to stabilise this order by explicitly doing a `sort.Strings` on the result from `ListFiles`.",
+      "parentUuid": "52fbedc6_42f0ba4b",
+      "revId": "86076b6c7888e139705c37514c3c70b610ad95a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

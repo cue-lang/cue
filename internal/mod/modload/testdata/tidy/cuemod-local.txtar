@@ -1,0 +1,64 @@
+# This test checks that a mix of dependencies from a registry,
+# local modules from cue.mod/*/, and imports from the current module
+# all works and passes the tidy check.
+
+-- tidy-check-error --
+module is not tidy: cannot find module providing package example.com@v0:main
+-- want --
+module: "main.org@v0"
+language: {
+	version: "v0.8.0"
+}
+deps: {
+	"example.com@v0": {
+		v: "v0.0.1"
+	}
+}
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.8.0"
+
+-- cue.mod/pkg/cuemodpkg.test/top.cue --
+package cuemodpkg
+
+"cuemodpkg.test": "local"
+
+-- cue.mod/gen/cuemodgen.test/top.cue --
+package cuemodgen
+
+"cuemodgen.test": "local"
+
+-- cue.mod/usr/cuemodusr.test/top.cue --
+package cuemodusr
+
+"cuemodusr.test": "local"
+
+-- main.cue --
+package main
+import (
+	"example.com@v0:main"
+	"main.org/subpkg@v0"
+	"cuemodpkg.test:cuemodpkg"
+	"cuemodgen.test:cuemodgen"
+	"cuemodusr.test:cuemodusr"
+)
+
+main
+subpkg
+cuemodpkg
+cuemodgen
+cuemodusr
+
+-- subpkg/top.cue --
+package subpkg
+
+"main.org@v0/sub": "current"
+
+-- _registry/example.com_v0.0.1/cue.mod/module.cue --
+module: "example.com@v0"
+language: version: "v0.8.0"
+
+-- _registry/example.com_v0.0.1/top.cue --
+package main
+
+"example.com@v0": "v0.0.1"

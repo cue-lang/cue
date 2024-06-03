@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b096472b_1bb27ea9",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-03T08:36:37Z",
+      "side": 1,
+      "message": "but that\u0027s why I suggest you can use `os.Lstat`, no? I think doing a tiny and very simple file operation is much simpler to understand (and faster) than using `git ls-files` on top of `git status`. Lstat can trivially answer \"the file exists on disk and is a regular file\".\n\nif the issue is the file existing but not being tracked, then the comment should be tweaked, and I\u0027d feel even more strongly about the previous CL needing tests for these edge cases, as I have no clue how ListFiles and Status would behave for untracked but present files :)",
+      "parentUuid": "99ff479b_416ddb48",
+      "revId": "5a5a5c0475af8a2ea29c18d9baa077c84cc96a44",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d5a630a6_71e0f674",
         "filename": "cmd/cue/cmd/modpublish.go",
         "patchSetId": 5
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "Now that I\u0027ve had more than 5 mins to look at this code properly without rushing between things, I think a simpler thing is to work on a set of pairs. Let me know what you think about the refactor which I think is much clearer.",
       "parentUuid": "d5a630a6_71e0f674",
+      "revId": "5a5a5c0475af8a2ea29c18d9baa077c84cc96a44",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "071a03ba_f936e203",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-03T08:36:37Z",
+      "side": 1,
+      "message": "Nice, I do like this. The list of entries also mimics very closely how an archive works.",
+      "parentUuid": "a0175f9a_2b5504ce",
       "revId": "5a5a5c0475af8a2ea29c18d9baa077c84cc96a44",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

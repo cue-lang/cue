@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "058eb719_97f9ffdb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-03T08:36:37Z",
+      "side": 1,
+      "message": "Fixes #3130.",
+      "revId": "2410edecb0da5cdef7748b1fa123830419c283fa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef2983cd_886a7ee6",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-03T08:36:37Z",
+      "side": 1,
+      "message": "is this comment duplicated now?",
+      "revId": "2410edecb0da5cdef7748b1fa123830419c283fa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2c7db87_b111c70d",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-03T08:36:37Z",
+      "side": 1,
+      "message": "I think this comment is redundant now, perhaps copied over.",
+      "revId": "2410edecb0da5cdef7748b1fa123830419c283fa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6573bd36_6f632a4c",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-03T08:36:37Z",
+      "side": 1,
+      "message": "it\u0027s only used in one place now though, so I\u0027d inline.",
+      "revId": "2410edecb0da5cdef7748b1fa123830419c283fa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

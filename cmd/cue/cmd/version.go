@@ -52,7 +52,7 @@ func runVersion(cmd *Command, args []string) error {
 		// shouldn't happen
 		return errors.New("unknown error reading build-info")
 	}
-	fmt.Fprintf(w, "cue version %s\n\n", moduleVersion())
+	fmt.Fprintf(w, "cue version %s\n\n", cueModuleVersion())
 	fmt.Fprintf(w, "go version %s\n", runtime.Version())
 	bi.Settings = append(bi.Settings, debug.BuildSetting{
 		Key:   "cue.lang.version",
@@ -75,15 +75,10 @@ func runVersion(cmd *Command, args []string) error {
 	return nil
 }
 
-// moduleVersion returns the version of the main module as much
-// as can reasonably be determined. If no version can be
-// determined, it returns the empty string.
-func moduleVersion() string {
-	if testing.Testing() {
-		if v := os.Getenv("CUE_VERSION_OVERRIDE"); v != "" {
-			return v
-		}
-	}
+// cueModuleVersion returns the version of the cuelang.org/go module as much
+// as can reasonably be determined. If no version can be determined,
+// it returns the empty string.
+func cueModuleVersion() string {
 	if v := version; v != "" {
 		// The global version variable has been configured via ldflags.
 		return v

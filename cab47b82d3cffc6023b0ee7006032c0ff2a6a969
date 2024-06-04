@@ -39,6 +39,48 @@
       "message": "This feels like an \"odd\" couple of tests to bundle together, but I hold that point lightly.",
       "revId": "cab47b82d3cffc6023b0ee7006032c0ff2a6a969",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "61123e85_d15ebec4",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_check.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-04T10:32:38Z",
+      "side": 1,
+      "message": "good point, split up.",
+      "parentUuid": "3da823af_5eae48ec",
+      "revId": "cab47b82d3cffc6023b0ee7006032c0ff2a6a969",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ceca07b_c7d2bac0",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_check.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-04T10:32:38Z",
+      "side": 1,
+      "message": "reworded with the test changes.",
+      "parentUuid": "ea4ff0a6_e765bad3",
+      "range": {
+        "startLine": 3,
+        "startChar": 33,
+        "endLine": 3,
+        "endChar": 35
+      },
+      "revId": "cab47b82d3cffc6023b0ee7006032c0ff2a6a969",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

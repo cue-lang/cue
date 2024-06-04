@@ -52,7 +52,7 @@ func (s *labelSimplifier) processDecls(decls []ast.Decl) {
 	for _, d := range decls {
 		switch x := d.(type) {
 		case *ast.Field:
-			astutil.Apply(x, sc.replace, nil)
+			x.Label = astutil.Apply(x.Label, nil, sc.replace).(ast.Label)
 		}
 	}
 }
@@ -108,11 +108,10 @@ func (s *labelSimplifier) replace(c astutil.Cursor) bool {
 		// only those that are labels.
 		// Here we only replace x if it is a field label,
 		// for example {"foo": 1} as opposed to [!="foo"].
-		if c.Parent() == nil {
-			return false
-		}
-		if f, ok := c.Parent().Node().(*ast.Field); !ok || f.Label != x {
-			return false
+		if c.Parent() != nil {
+			if f, ok := c.Parent().Node().(*ast.Field); !ok || f.Label != x {
+				return true
+			}
 		}
 
 		str, err := strconv.Unquote(x.Value)

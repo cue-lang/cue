@@ -43,6 +43,7 @@ package modzip
 import (
 	"archive/zip"
 	"bytes"
+	"cmp"
 	"errors"
 	"fmt"
 	"io"
@@ -50,6 +51,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"slices"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -508,7 +510,8 @@ func CheckZip(m module.Version, r io.ReaderAt, zipSize int64) (*zip.Reader, *zip
 }
 
 // Create builds a zip archive for module m from an abstract list of files
-// and writes it to w.
+// and writes it to w, after first sorting the slice of files in a path-aware
+// lexical fashion (files first, then directories, both sorted lexically).
 //
 // Note that m.Version is checked for validity but only the major version
 // is used for checking correctness of the cue.mod/module.cue file.
@@ -528,6 +531,18 @@ func Create[F any](w io.Writer, m module.Version, files []F, fio FileIO[F]) (err
 			err = &zipError{verb: "create zip", err: err}
 		}
 	}()
+
+	files = slices.Clone(files)
+	slices.SortFunc(files, func(a, b F) int {
+		ap := fio.Path(a)
+		bp := fio.Path(b)
+		ca := strings.Count(ap, string(filepath.Separator))
+		cb := strings.Count(ap, string(filepath.Separator))
+		if c := cmp.Compare(ca, cb); c != 0 {
+			return c
+		}
+		return cmp.Compare(ap, bp)
+	})
 
 	// Check whether files are valid, not valid, or should be omitted.
 	// Also check that the valid files don't exceed the maximum size.

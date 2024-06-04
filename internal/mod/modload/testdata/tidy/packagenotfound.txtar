@@ -1,7 +1,7 @@
 # Test what happens when we try to import a package that does not exist.
 
 -- tidy-check-error --
-module is not tidy: cannot find module providing package example.com/nonexistent@v0
+module is not tidy: missing dependency providing package example.com/nonexistent@v0
 -- want --
 error: failed to resolve "example.com/nonexistent@v0": cannot find module providing package example.com/nonexistent@v0
 -- cue.mod/module.cue --

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57a405f5_2f24c3dc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-04T13:20:50Z",
+      "side": 1,
+      "message": "\"behavior\"\n\n(if we insist on the US spelling that is 😊)",
+      "range": {
+        "startLine": 22,
+        "startChar": 10,
+        "endLine": 22,
+        "endChar": 18
+      },
+      "revId": "bd8a9b7a54cf9b28c70c928b1f545ba8f3a10ca5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -188,7 +188,7 @@ func TestScript(t *testing.T) {
 					usage()
 				}
 
-				srv, err := registrytest.NewServer(ocimem.New(), auth)
+				srv, err := registrytest.NewServer(ocimem.NewWithConfig(&ocimem.Config{ImmutableTags: true}), auth)
 				if err != nil {
 					ts.Fatalf("cannot start registrytest server: %v", err)
 				}

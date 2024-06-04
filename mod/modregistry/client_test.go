@@ -40,7 +40,7 @@ import (
 )
 
 func newTestClient(t *testing.T) *Client {
-	return NewClient(ocimem.New())
+	return NewClient(ocimem.NewWithConfig(&ocimem.Config{ImmutableTags: true}))
 }
 
 func TestPutGetModule(t *testing.T) {
@@ -238,7 +238,8 @@ x: a.foo + something.bar
 `
 	ctx := context.Background()
 	mv := module.MustParseVersion("foo.com/bar@v0.5.100")
-	reg := ocimem.New()
+	// Note that we delete a tag below, so we want a mutable registry.
+	reg := ocimem.NewWithConfig(&ocimem.Config{ImmutableTags: false})
 
 	c := NewClient(reg)
 	zipData := putModule(t, c, mv, testMod)

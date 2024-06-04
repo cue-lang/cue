@@ -144,7 +144,7 @@ language: version: "v0.8.0"
 package x
 `))
 	ctx := context.Background()
-	rmem := ocimem.New()
+	rmem := ocimem.NewWithConfig(&ocimem.Config{ImmutableTags: true})
 	err := registrytest.Upload(ctx, rmem, txtarfs.FS(modules))
 	qt.Assert(t, qt.IsNil(err))
 	rh := ociserver.New(rmem, nil)

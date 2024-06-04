@@ -67,15 +67,7 @@ func runModTidy(cmd *Command, args []string) error {
 	}
 	if flagCheck.Bool(cmd) {
 		err := modload.CheckTidy(ctx, os.DirFS(modRoot), ".", reg)
-		notTidyErr := new(modload.ErrModuleNotTidy)
-		if errors.As(err, &notTidyErr) {
-			if notTidyErr.Reason == "" {
-				err = fmt.Errorf("module is not tidy, use 'cue mod tidy'")
-			} else {
-				err = fmt.Errorf("module is not tidy, use 'cue mod tidy': %v", notTidyErr.Reason)
-			}
-		}
-		return err
+		return suggestModTidy(err)
 	}
 	mf, err := modload.Tidy(ctx, os.DirFS(modRoot), ".", reg)
 	if err != nil {
@@ -99,4 +91,18 @@ func runModTidy(cmd *Command, args []string) error {
 		return err
 	}
 	return nil
+}
+
+// suggestModTidy rewrites [modload.ErrModuleNotTidy] errors
+// so that they suggest running `cue mod tidy` to the user.
+func suggestModTidy(err error) error {
+	notTidyErr := new(modload.ErrModuleNotTidy)
+	if errors.As(err, &notTidyErr) {
+		if notTidyErr.Reason == "" {
+			err = fmt.Errorf("module is not tidy, use 'cue mod tidy'")
+		} else {
+			err = fmt.Errorf("module is not tidy, use 'cue mod tidy': %v", notTidyErr.Reason)
+		}
+	}
+	return err
 }

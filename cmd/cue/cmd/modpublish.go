@@ -36,6 +36,7 @@ import (
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/spf13/cobra"
 
+	"cuelang.org/go/internal/mod/modload"
 	"cuelang.org/go/internal/mod/semver"
 	"cuelang.org/go/internal/vcs"
 	"cuelang.org/go/mod/modconfig"
@@ -111,7 +112,19 @@ func runModUpload(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	// TODO ensure module tidiness.
+
+	// Ensure that the module is tidy before publishing it.
+	// TODO: can we use modload.CheckTidy on the already-parsed modfile.File below?
+	// TODO: we might want to provide a "force" flag to skip this check,
+	// particularly for cases where one has private deps or pushes to a custom registry.
+	reg, err := getCachedRegistry()
+	if err != nil {
+		return err
+	}
+	if err := modload.CheckTidy(ctx, os.DirFS(modRoot), ".", reg); err != nil {
+		return suggestModTidy(err)
+	}
+
 	modPath := filepath.Join(modRoot, "cue.mod/module.cue")
 	modfileData, err := os.ReadFile(modPath)
 	if err != nil {

@@ -5,8 +5,8 @@ env OLD_CUE_REGISTRY=${CUE_REGISTRY}
 memregistry MEMREGISTRY
 env CUE_REGISTRY=$MEMREGISTRY+insecure
 
-# TODO(mvdan): mod publish does not check tidiness right now.
-exec cue mod publish v1.0.0
+! exec cue mod publish v1.0.0
+cmp stderr publish.stderr
 
 # Sanity check that we can tidy the module and then publish again.
 # Note that the dependency is in the original registry populated from _registry/.
@@ -18,6 +18,8 @@ cmp cue.mod/module.cue cue.mod/module.cue.tidy
 
 exec cue mod publish v1.0.1
 
+-- publish.stderr --
+module is not tidy, use 'cue mod tidy': missing dependency providing package example.com@v0:main
 -- cue.mod/module.cue --
 module: "main.org@v1"
 language: version: "v0.9.0"

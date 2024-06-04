@@ -81,3 +81,8 @@ y: {
         }
     }
 }
+
+{
+    foo: {}
+    bar: "foo": foo // removing the quotes would cause a cyclic reference
+}

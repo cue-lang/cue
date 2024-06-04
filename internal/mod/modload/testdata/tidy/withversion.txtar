@@ -1,6 +1,4 @@
 # Test that a version is not added or changed if present
--- cue-version --
-v1.2.3
 -- want --
 module: "main.org@v0"
 language: {

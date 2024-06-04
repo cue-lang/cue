@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "01c2522b_c77a4b05",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-04T10:34:53Z",
+      "side": 1,
+      "message": "Ended up joining this CL with the old test CL at https://review.gerrithub.io/c/cue-lang/cue/+/1195659.",
+      "revId": "b9bec9595957944178f1cec77126217461635b8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8c4f3933_e5751dad",
         "filename": "cmd/cue/cmd/testdata/script/modtidy_check.txtar",
         "patchSetId": 1
@@ -14,6 +31,24 @@
       "writtenOn": "2024-06-04T08:59:24Z",
       "side": 1,
       "message": "Do we have a test somewhere the covers the hybrid situation? i.e. a mix of \"local\" module dependencies (inside `cue.mod/{pkg,gen,usr}`) and non-local?",
+      "revId": "b9bec9595957944178f1cec77126217461635b8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df5de4fe_bef02990",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_check.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-04T10:34:53Z",
+      "side": 1,
+      "message": "the previously added test case already covered a mix; made that clearer with the split of test cases.",
+      "parentUuid": "8c4f3933_e5751dad",
       "revId": "b9bec9595957944178f1cec77126217461635b8f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

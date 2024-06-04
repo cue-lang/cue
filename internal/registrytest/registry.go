@@ -108,7 +108,7 @@ func upload(ctx context.Context, r ociregistry.Interface, fsys fs.FS) (authConfi
 //
 // The Registry should be closed after use.
 func New(fsys fs.FS, prefix string) (*Registry, error) {
-	r := ocimem.New()
+	r := ocimem.NewWithConfig(&ocimem.Config{ImmutableTags: true})
 
 	authConfigData, err := upload(context.Background(), ocifilter.Sub(r, prefix), fsys)
 	if err != nil {

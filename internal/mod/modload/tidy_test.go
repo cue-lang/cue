@@ -45,17 +45,31 @@ func TestTidy(t *testing.T) {
 			}
 
 			var out strings.Builder
+			var tidyFile []byte
 			mf, err := Tidy(context.Background(), tfs, ".", reg, stringFromFile(tfs, "cue-version"))
 			if err != nil {
 				fmt.Fprintf(&out, "error: %v\n", err)
 			} else {
-				data, err := mf.Format()
+				tidyFile, err = mf.Format()
 				qt.Assert(t, qt.IsNil(err))
-				out.Write(data)
+				out.Write(tidyFile)
 			}
 			if diff := cmp.Diff(string(want), out.String()); diff != "" {
 				t.Log("actual result:\n", out.String())
 				t.Fatalf("unexpected results (-want +got):\n%s", diff)
+			}
+
+			// Ensure that CheckTidy does not error after a successful Tidy.
+			// We make a new txtar FS given that an FS is read-only.
+			if len(tidyFile) > 0 {
+				for i := range ar.Files {
+					file := &ar.Files[i]
+					if file.Name == "cue.mod/module.cue" {
+						file.Data = []byte(out.String())
+					}
+				}
+				err = CheckTidy(context.Background(), txtarfs.FS(ar), ".", reg)
+				qt.Check(t, qt.IsNil(err), qt.Commentf("CheckTidy after a successful Tidy should not fail"))
 			}
 		})
 	}

@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d883bc6_1241824c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-04T19:28:36Z",
+      "side": 1,
+      "message": "\"label nodes\"?",
+      "range": {
+        "startLine": 14,
+        "startChar": 56,
+        "endLine": 14,
+        "endChar": 70
+      },
+      "revId": "13d996733b14b25d96a5744af196f3db2ab5cc36",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2390e9bb_a110cbdd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-04T19:28:36Z",
+      "side": 1,
+      "message": "do we want to leave a TODO for that, or are we OK with the current state of things?",
+      "revId": "13d996733b14b25d96a5744af196f3db2ab5cc36",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2824e30_6089bddd",
+        "filename": "cue/format/testdata/simplify.golden",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-04T19:28:36Z",
+      "side": 1,
+      "message": "I am slightly confused fro mreading the commit message and the fix; is `\"foo\"` here not also a field label?",
+      "range": {
+        "startLine": 83,
+        "startChar": 6,
+        "endLine": 83,
+        "endChar": 11
+      },
+      "revId": "13d996733b14b25d96a5744af196f3db2ab5cc36",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

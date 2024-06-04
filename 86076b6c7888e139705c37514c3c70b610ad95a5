@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ef58398e_5c6afbc7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-04T08:06:59Z",
+      "side": 1,
+      "message": "What\u0027s tricky is coming up with a set of rules here. I\u0027ll add a TODO.\n\nI also wonder whether there is a lesson lurking in here. The addition of an \"extra\" `LICENSE` fiel i",
+      "parentUuid": "c80d590b_200c8f30",
+      "revId": "86076b6c7888e139705c37514c3c70b610ad95a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "52fbedc6_42f0ba4b",
         "filename": "cmd/cue/cmd/testdata/script/registry_publish_with_git.txtar",
         "patchSetId": 14
@@ -84,6 +102,24 @@
       "side": 1,
       "message": "sorting SGTM, althoguh I\u0027m a bit nervous about the particular order we choose. when source is \"self\", we take the order from filepath.WalkDir, which is likely different from slices.Sort on a string slice. Ideally we would use the same sorting for all module zips, no matter how they were created.\n\nso it seems to me like we already don\u0027t have stable sorting. maybe that\u0027s OK for now, but at the very least we need a TODO to revisit this, as it makes me nervous we already have 2 (and with this patchset, 3) different ways to order files in a module zip.",
       "parentUuid": "7eb6f048_fcef0ca7",
+      "revId": "86076b6c7888e139705c37514c3c70b610ad95a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83241a02_c7eb5ce4",
+        "filename": "cmd/cue/cmd/testdata/script/registry_publish_with_git.txtar",
+        "patchSetId": 14
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-04T08:06:59Z",
+      "side": 1,
+      "message": "I\u0027ve now \"fixed\" this in an earlier CL which applies the path-aware sort in `modzip.Create`. Yes that\u0027s non-internal API, but it\u0027s entirely experimental and all of our code uses a function that is marked as deprecated. So my argument is that that change is not making things worse. I\u0027m also unclear that we have the right separation in API terms in that package; creating a zip file conflates checking files sizes, removing sub modules etc... which feels wrong. Look forward to rounding this out in person :)",
+      "parentUuid": "08e2d8b7_38643657",
       "revId": "86076b6c7888e139705c37514c3c70b610ad95a5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

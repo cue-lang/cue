@@ -33,6 +33,24 @@
       "message": "didn\u0027t you mean to unexport this constant? FWIW I think just using the string locally directly is fine.",
       "revId": "70798ceb9ee9b76775d2bf13d3572af701f7951e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40eb9b47_f5d08fdf",
+        "filename": "mod/module/module.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-04T08:55:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b068a6cb_e45d3a22",
+      "revId": "70798ceb9ee9b76775d2bf13d3572af701f7951e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

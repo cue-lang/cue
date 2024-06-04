@@ -66,14 +66,19 @@ y: {
 			bar: "bar"
 			baz: "baz"
 			[!={
-				a: "baz"
+				"a": "baz"
 			}.a & !="bar"]: {}
 		}
 		y: {
 			bar: "a-value"
 			({
-				a: "bar"
+				"a": "bar"
 			}.a): {}
 		}
 	}
+}
+
+{
+	foo: {}
+	bar: "foo": foo // removing the quotes would cause a cyclic reference
 }

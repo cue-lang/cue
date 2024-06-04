@@ -52,7 +52,9 @@ func (s *labelSimplifier) processDecls(decls []ast.Decl) {
 	for _, d := range decls {
 		switch x := d.(type) {
 		case *ast.Field:
-			astutil.Apply(x, sc.replace, nil)
+			if _, ok := x.Label.(*ast.BasicLit); ok {
+				x.Label = astutil.Apply(x.Label, nil, sc.replace).(ast.Label)
+			}
 		}
 	}
 }
@@ -104,21 +106,10 @@ func (s *labelSimplifier) markStrings(n ast.Node) bool {
 func (s *labelSimplifier) replace(c astutil.Cursor) bool {
 	switch x := c.Node().(type) {
 	case *ast.BasicLit:
-		// We do not want to replace all nodes of type *ast.BasicList,
-		// only those that are labels.
-		// Here we only replace x if it is a field label,
-		// for example {"foo": 1} as opposed to [!="foo"].
-		if c.Parent() == nil {
-			return false
-		}
-		if f, ok := c.Parent().Node().(*ast.Field); !ok || f.Label != x {
-			return false
-		}
-
 		str, err := strconv.Unquote(x.Value)
 		if err == nil && s.scope[str] && !internal.IsDefOrHidden(str) {
 			c.Replace(ast.NewIdent(str))
 		}
 	}
-	return true
+	return false
 }

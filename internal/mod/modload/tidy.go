@@ -62,12 +62,6 @@ func tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, checkTi
 	if err != nil {
 		return nil, err
 	}
-	if checkTidy {
-		// This is the cheapest check, so do it first.
-		if mf.Language == nil || mf.Language.Version == "" {
-			return nil, fmt.Errorf("no language version found in cue.mod/module.cue")
-		}
-	}
 	// TODO check that module path is well formed etc
 	origRs := modrequirements.NewRequirements(mf.Module, reg, mf.DepVersions(), mf.DefaultMajorVersions())
 	rootPkgPaths, err := modimports.AllImports(modimports.AllModuleFiles(fsys, modRoot))

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d34b9dd4_5fd148dc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-04T08:11:05Z",
+      "side": 1,
+      "message": "Not the cleanest fix due to the cloning, but like you say, this API is deprecated so we can rethink as part of stabilizing.",
+      "revId": "a69e8f7585dfbcf06035274b372535bd0448a941",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+# Test that cue mod publish fails when the module is not tidy
+# because one of the required dependencies is missing from module.cue.
+
+env OLD_CUE_REGISTRY=${CUE_REGISTRY}
+memregistry MEMREGISTRY
+env CUE_REGISTRY=$MEMREGISTRY+insecure
+
+# TODO(mvdan): mod publish does not check tidiness right now.
+exec cue mod publish v1.0.0
+
+# Sanity check that we can tidy the module and then publish again.
+# Note that the dependency is in the original registry populated from _registry/.
+
+env CUE_REGISTRY=${OLD_CUE_REGISTRY}
+exec cue mod tidy
+env CUE_REGISTRY=$MEMREGISTRY+insecure
+cmp cue.mod/module.cue cue.mod/module.cue.tidy
+
+exec cue mod publish v1.0.1
+
+-- cue.mod/module.cue --
+module: "main.org@v1"
+language: version: "v0.9.0"
+source: kind: "self"
+-- cue.mod/module.cue.tidy --
+module: "main.org@v1"
+language: {
+	version: "v0.9.0"
+}
+source: {
+	kind: "self"
+}
+deps: {
+	"example.com@v0": {
+		v: "v0.0.1"
+	}
+}
+-- main.cue --
+package main
+import "example.com@v0:main"
+
+main
+
+-- _registry/example.com_v0.0.1/cue.mod/module.cue --
+module: "example.com@v0"
+language: version: "v0.8.0"
+
+-- _registry/example.com_v0.0.1/top.cue --
+package main
+
+"example.com@v0": "v0.0.1"

@@ -53,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d2e8baa_d228901c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-04T08:13:37Z",
+      "side": 1,
+      "message": "I agree it\u0027s a bit of a sticky situation, but at least being aware of it with a TODO is good.",
+      "parentUuid": "ef58398e_5c6afbc7",
+      "revId": "86076b6c7888e139705c37514c3c70b610ad95a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "52fbedc6_42f0ba4b",
@@ -120,6 +138,24 @@
       "side": 1,
       "message": "I\u0027ve now \"fixed\" this in an earlier CL which applies the path-aware sort in `modzip.Create`. Yes that\u0027s non-internal API, but it\u0027s entirely experimental and all of our code uses a function that is marked as deprecated. So my argument is that that change is not making things worse. I\u0027m also unclear that we have the right separation in API terms in that package; creating a zip file conflates checking files sizes, removing sub modules etc... which feels wrong. Look forward to rounding this out in person :)",
       "parentUuid": "08e2d8b7_38643657",
+      "revId": "86076b6c7888e139705c37514c3c70b610ad95a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0f3f613_54f77b60",
+        "filename": "cmd/cue/cmd/testdata/script/registry_publish_with_git.txtar",
+        "patchSetId": 14
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-04T08:13:37Z",
+      "side": 1,
+      "message": "Ack. Marking as done; I think this should be follow-up work done by Roger, as it does not block the release nor is it urgent.",
+      "parentUuid": "83241a02_c7eb5ce4",
       "revId": "86076b6c7888e139705c37514c3c70b610ad95a5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

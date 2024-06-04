@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46f026f2_9703fa6d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-04T08:13:37Z",
+      "side": 1,
+      "message": "SGTM modulo the constant export",
+      "revId": "70798ceb9ee9b76775d2bf13d3572af701f7951e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b068a6cb_e45d3a22",
+        "filename": "mod/module/module.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-04T08:13:37Z",
+      "side": 1,
+      "message": "didn\u0027t you mean to unexport this constant? FWIW I think just using the string locally directly is fine.",
+      "revId": "70798ceb9ee9b76775d2bf13d3572af701f7951e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

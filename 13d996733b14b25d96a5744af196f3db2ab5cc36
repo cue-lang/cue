@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "75c5025b_abf8adc5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-06-04T20:32:34Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "4d883bc6_1241824c",
+      "range": {
+        "startLine": 14,
+        "startChar": 56,
+        "endLine": 14,
+        "endChar": 70
+      },
+      "revId": "13d996733b14b25d96a5744af196f3db2ab5cc36",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2390e9bb_a110cbdd",
@@ -41,6 +65,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "58152e45_3f8905cb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-06-04T20:32:34Z",
+      "side": 1,
+      "message": "I believe this is OK, as explained in the updated commit message",
+      "parentUuid": "2390e9bb_a110cbdd",
+      "revId": "13d996733b14b25d96a5744af196f3db2ab5cc36",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a2824e30_6089bddd",
@@ -54,6 +96,30 @@
       "writtenOn": "2024-06-04T19:28:36Z",
       "side": 1,
       "message": "I am slightly confused fro mreading the commit message and the fix; is `\"foo\"` here not also a field label?",
+      "range": {
+        "startLine": 83,
+        "startChar": 6,
+        "endLine": 83,
+        "endChar": 11
+      },
+      "revId": "13d996733b14b25d96a5744af196f3db2ab5cc36",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0234ff86_374154e4",
+        "filename": "cue/format/testdata/simplify.golden",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-06-04T20:32:34Z",
+      "side": 1,
+      "message": "that\u0027s a good point, I thought about it further and attempted to make this clearer in the commit message.",
+      "parentUuid": "a2824e30_6089bddd",
       "range": {
         "startLine": 83,
         "startChar": 6,

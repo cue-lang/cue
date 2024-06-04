@@ -3,7 +3,7 @@
 # all works and passes the tidy check.
 
 -- tidy-check-error --
-module is not tidy: cannot find module providing package example.com@v0:main
+module is not tidy: missing dependency providing package example.com@v0:main
 -- want --
 module: "main.org@v0"
 language: {

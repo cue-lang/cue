@@ -2,7 +2,7 @@
 # pre-releases.
 
 -- tidy-check-error --
-module is not tidy: cannot find module providing package example.com.*
+module is not tidy: missing dependency providing package example.com.*
 -- want --
 module: "main.org@v0"
 language: {

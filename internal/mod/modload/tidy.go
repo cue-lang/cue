@@ -184,11 +184,20 @@ func (ld *loader) resolveDependencies(ctx context.Context, rootPkgPaths []string
 		pkgs := modpkgload.LoadPackages(ctx, ld.mainModule.Path(), ld.mainModuleLoc, rs, ld.registry, rootPkgPaths)
 		if ld.checkTidy {
 			for _, pkg := range pkgs.All() {
-				if err := pkg.Error(); err != nil {
-					// TODO: transform "cannot find module" error as it may be confusing
-					// when the module does exist in the registry.
-					return nil, nil, &ErrModuleNotTidy{Reason: err.Error()}
+				err := pkg.Error()
+				if err == nil {
+					continue
 				}
+				missingErr := new(modpkgload.ImportMissingError)
+				// "cannot find module providing package P" is confusing here,
+				// as checkTidy simply points out missing dependencies without fetching them.
+				if errors.As(err, &missingErr) {
+					err = &ErrModuleNotTidy{Reason: fmt.Sprintf(
+						"missing dependency providing package %s", missingErr.Path)}
+				} else {
+					panic(fmt.Sprintf("%#v\n", err) + ": " + err.Error())
+				}
+				return nil, nil, err
 			}
 			// All packages could be loaded OK so there are no new
 			// dependencies to be resolved and nothing to do.

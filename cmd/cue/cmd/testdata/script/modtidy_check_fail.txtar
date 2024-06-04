@@ -4,7 +4,7 @@
 cmp stderr want-stderr
 
 -- want-stderr --
-module is not tidy, use 'cue mod tidy': cannot find module providing package example.com@v0:main
+module is not tidy, use 'cue mod tidy': missing dependency providing package example.com@v0:main
 -- cue.mod/module.cue --
 module: "main.org@v0"
 language: version: "v0.8.0"

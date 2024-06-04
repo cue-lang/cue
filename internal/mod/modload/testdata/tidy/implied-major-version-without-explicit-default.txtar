@@ -1,7 +1,7 @@
-# This test checks we can have have an import with an implied major version
+# This test checks we can have an import with an implied major version
 # when there's no explicit default in the module file.
 -- tidy-check-error --
-module is not tidy: cannot find module providing package .*
+module is not tidy: missing dependency providing package .*
 -- want --
 module: "main.org@v0"
 language: {

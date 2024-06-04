@@ -7,7 +7,7 @@
 -- want --
 error: failed to resolve "example.com/foo": cannot find module providing package example.com/foo
 -- tidy-check-error --
-module is not tidy: cannot find module providing package example.com/bar@v1
+module is not tidy: missing dependency providing package example.com/bar@v1
 -- cue.mod/module.cue --
 module: "main.org@v0"
 language: version: "v0.8.0"

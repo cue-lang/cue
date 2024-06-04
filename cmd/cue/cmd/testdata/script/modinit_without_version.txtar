@@ -1,5 +1,6 @@
-# Check that cue mod init is independent of the module version.
-env CUE_VERSION_OVERRIDE=v0.0.0-00010101000000-000000000000
+# Check that cue mod init is independent of the module version;
+# even though CUE's current module version will often be a v0 pseudo-version
+# or a pre-release, we will always use the current language version in init.
 env-fill want-module
 exec cue mod init foo.example
 cmp cue.mod/module.cue want-module

@@ -46,7 +46,7 @@ func TestTidy(t *testing.T) {
 
 			var out strings.Builder
 			var tidyFile []byte
-			mf, err := Tidy(context.Background(), tfs, ".", reg, stringFromFile(tfs, "cue-version"))
+			mf, err := Tidy(context.Background(), tfs, ".", reg)
 			if err != nil {
 				fmt.Fprintf(&out, "error: %v\n", err)
 			} else {

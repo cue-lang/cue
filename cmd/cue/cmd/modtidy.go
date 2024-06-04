@@ -23,7 +23,6 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/mod/modload"
 )
 
@@ -78,7 +77,7 @@ func runModTidy(cmd *Command, args []string) error {
 		}
 		return err
 	}
-	mf, err := modload.Tidy(ctx, os.DirFS(modRoot), ".", reg, cueversion.LanguageVersion())
+	mf, err := modload.Tidy(ctx, os.DirFS(modRoot), ".", reg)
 	if err != nil {
 		return err
 	}

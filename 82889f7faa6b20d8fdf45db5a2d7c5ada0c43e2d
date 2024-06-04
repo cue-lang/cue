@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3251b5c_e9960e72",
+        "filename": "cmd/cue/cmd/testdata/script/modpublish_non_tidy.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-04T14:07:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "55d2bc9e_583042d6",
+      "revId": "82889f7faa6b20d8fdf45db5a2d7c5ada0c43e2d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "72b78385_4bd1a732",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-06-04T13:48:25Z",
       "side": 1,
       "message": "This should fail. You\u0027re publishing to the same tag but with different module contents.",
+      "revId": "82889f7faa6b20d8fdf45db5a2d7c5ada0c43e2d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c9059d7_0a2ba838",
+        "filename": "cmd/cue/cmd/testdata/script/modpublish_non_tidy.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-04T14:07:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "72b78385_4bd1a732",
       "revId": "82889f7faa6b20d8fdf45db5a2d7c5ada0c43e2d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

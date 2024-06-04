@@ -101,10 +101,24 @@ func tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, cueVers
 		return nil, fmt.Errorf("cannot tidy requirements: %v", err)
 	}
 	if ld.checkTidy && !equalRequirements(origRs, rs) {
-		// TODO be more specific in this error?
-		return nil, fmt.Errorf("module is not tidy")
+		// TODO: provide a reason, perhaps in structured form rather than a string
+		return nil, &ErrModuleNotTidy{}
 	}
 	return modfileFromRequirements(mf, rs, cueVers), nil
+}
+
+// ErrModuleNotTidy is returned by CheckTidy when a module is not tidy,
+// such as when there are missing or unnecessary dependencies listed.
+type ErrModuleNotTidy struct {
+	// Reason summarizes why the module is not tidy.
+	Reason string
+}
+
+func (e ErrModuleNotTidy) Error() string {
+	if e.Reason == "" {
+		return "module is not tidy"
+	}
+	return "module is not tidy: " + e.Reason
 }
 
 func equalRequirements(rs0, rs1 *modrequirements.Requirements) bool {
@@ -171,7 +185,9 @@ func (ld *loader) resolveDependencies(ctx context.Context, rootPkgPaths []string
 		if ld.checkTidy {
 			for _, pkg := range pkgs.All() {
 				if err := pkg.Error(); err != nil {
-					return nil, nil, fmt.Errorf("module is not tidy: %v", err)
+					// TODO: transform "cannot find module" error as it may be confusing
+					// when the module does exist in the registry.
+					return nil, nil, &ErrModuleNotTidy{Reason: err.Error()}
 				}
 			}
 			// All packages could be loaded OK so there are no new

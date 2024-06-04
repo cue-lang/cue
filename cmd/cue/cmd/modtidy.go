@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -66,7 +67,20 @@ func runModTidy(cmd *Command, args []string) error {
 		return err
 	}
 	if flagCheck.Bool(cmd) {
-		return modload.CheckTidy(ctx, os.DirFS(modRoot), ".", reg)
+		// TODO: Once CheckTidy returns a structured error with the reason why a module isn't tidy,
+		// we can make better errors like:
+		//
+		//    tidy the module via 'cue mod tidy': no recorded dependency provides package ...
+		err := modload.CheckTidy(ctx, os.DirFS(modRoot), ".", reg)
+		notTidyErr := new(modload.ErrModuleNotTidy)
+		if errors.As(err, &notTidyErr) {
+			if notTidyErr.Reason == "" {
+				err = fmt.Errorf("module is not tidy, use 'cue mod tidy'")
+			} else {
+				err = fmt.Errorf("module is not tidy, use 'cue mod tidy': %v", notTidyErr.Reason)
+			}
+		}
+		return err
 	}
 	mf, err := modload.Tidy(ctx, os.DirFS(modRoot), ".", reg, cueversion.LanguageVersion())
 	if err != nil {

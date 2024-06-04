@@ -223,14 +223,14 @@ func (pkgs *Packages) addPkg(ctx context.Context, pkgPath string, flags Flags) *
 		pkg := &Package{
 			path: pkgPath,
 		}
-		pkgs.applyPkgFlags(ctx, pkg, flags)
+		pkgs.applyPkgFlags(pkg, flags)
 
 		pkgs.work.Add(func() { pkgs.load(ctx, pkg) })
 		return pkg
 	})
 
 	// Ensure the flags apply even if the package already existed.
-	pkgs.applyPkgFlags(ctx, pkg, flags)
+	pkgs.applyPkgFlags(pkg, flags)
 	return pkg
 }
 
@@ -245,7 +245,7 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 		return
 	}
 	if pkgs.mainModuleVersion.Path() == pkg.mod.Path() {
-		pkgs.applyPkgFlags(ctx, pkg, PkgInAll)
+		pkgs.applyPkgFlags(pkg, PkgInAll)
 	}
 	pkgQual := module.ParseImportPath(pkg.path).Qualifier
 	if pkgQual == "" {
@@ -292,13 +292,13 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 	for _, path := range imports {
 		pkg.imports = append(pkg.imports, pkgs.addPkg(ctx, path, importFlags))
 	}
-	pkgs.applyPkgFlags(ctx, pkg, PkgImportsLoaded)
+	pkgs.applyPkgFlags(pkg, PkgImportsLoaded)
 }
 
 // applyPkgFlags updates pkg.flags to set the given flags and propagate the
 // (transitive) effects of those flags, possibly loading or enqueueing further
 // packages as a result.
-func (pkgs *Packages) applyPkgFlags(ctx context.Context, pkg *Package, flags Flags) {
+func (pkgs *Packages) applyPkgFlags(pkg *Package, flags Flags) {
 	if flags == 0 {
 		return
 	}
@@ -324,13 +324,13 @@ func (pkgs *Packages) applyPkgFlags(ctx context.Context, pkg *Package, flags Fla
 		// We have just marked pkg with pkgInAll, or we have just loaded its
 		// imports, or both. Now is the time to propagate pkgInAll to the imports.
 		for _, dep := range pkg.imports {
-			pkgs.applyPkgFlags(ctx, dep, PkgInAll)
+			pkgs.applyPkgFlags(dep, PkgInAll)
 		}
 	}
 
 	if new.has(PkgFromRoot) && !old.has(PkgFromRoot|PkgImportsLoaded) {
 		for _, dep := range pkg.imports {
-			pkgs.applyPkgFlags(ctx, dep, PkgFromRoot)
+			pkgs.applyPkgFlags(dep, PkgFromRoot)
 		}
 	}
 }

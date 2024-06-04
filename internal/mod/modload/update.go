@@ -29,7 +29,7 @@ import (
 //     version or $module@$majorVersion if it does, where $majorVersion is the
 //     default major version for $module.
 func UpdateVersions(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, versions []string) (*modfile.File, error) {
-	mainModuleVersion, mf, err := readModuleFile(ctx, fsys, modRoot)
+	mainModuleVersion, mf, err := readModuleFile(fsys, modRoot)
 	if err != nil {
 		return nil, err
 	}

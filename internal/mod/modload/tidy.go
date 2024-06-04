@@ -58,7 +58,7 @@ func Tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry) (*modfi
 }
 
 func tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, checkTidy bool) (*modfile.File, error) {
-	mainModuleVersion, mf, err := readModuleFile(ctx, fsys, modRoot)
+	mainModuleVersion, mf, err := readModuleFile(fsys, modRoot)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func equalRequirements(rs0, rs1 *modrequirements.Requirements) bool {
 		maps.Equal(rs0.DefaultMajorVersions(), rs1.DefaultMajorVersions())
 }
 
-func readModuleFile(ctx context.Context, fsys fs.FS, modRoot string) (module.Version, *modfile.File, error) {
+func readModuleFile(fsys fs.FS, modRoot string) (module.Version, *modfile.File, error) {
 	modFilePath := path.Join(modRoot, "cue.mod/module.cue")
 	data, err := fs.ReadFile(fsys, modFilePath)
 	if err != nil {

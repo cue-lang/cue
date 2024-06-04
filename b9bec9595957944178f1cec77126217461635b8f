@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c4f3933_e5751dad",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_check.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-04T08:59:24Z",
+      "side": 1,
+      "message": "Do we have a test somewhere the covers the hybrid situation? i.e. a mix of \"local\" module dependencies (inside `cue.mod/{pkg,gen,usr}`) and non-local?",
+      "revId": "b9bec9595957944178f1cec77126217461635b8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

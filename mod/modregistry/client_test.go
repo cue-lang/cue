@@ -254,7 +254,7 @@ x: a.foo + something.bar
 	err = reg.DeleteTag(ctx, "foo.com/bar", "v0.5.100")
 	qt.Assert(t, qt.IsNil(err))
 
-	m, err := c.GetModuleWithManifest(ctx, mv, mdata, "application/json")
+	m, err := c.GetModuleWithManifest(mv, mdata, "application/json")
 	qt.Assert(t, qt.IsNil(err))
 
 	r, err := m.GetZip(ctx)
@@ -364,7 +364,7 @@ func putModule(t *testing.T, c *Client, mv module.Version, txtarData string) []b
 func createZip(t *testing.T, mv module.Version, txtarData string) []byte {
 	ar := txtar.Parse([]byte(txtarData))
 	var zipContent bytes.Buffer
-	err := modzip.Create[txtar.File](&zipContent, mv, ar.Files, txtarFileIO{})
+	err := modzip.Create(&zipContent, mv, ar.Files, txtarFileIO{})
 	qt.Assert(t, qt.IsNil(err))
 	return zipContent.Bytes()
 }

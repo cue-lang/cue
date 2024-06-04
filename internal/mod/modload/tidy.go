@@ -47,19 +47,17 @@ type loader struct {
 // - it includes valid modules for all of its dependencies
 // - it does not include any unnecessary dependencies.
 func CheckTidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry) error {
-	_, err := tidy(ctx, fsys, modRoot, reg, "", true)
+	_, err := tidy(ctx, fsys, modRoot, reg, true)
 	return err
 }
 
 // Tidy evaluates all the requirements of the given main module, using the given
 // registry to download requirements and returns a resolved and tidied module file.
-// If there's no language version in the module file and cueVers is non-empty
-// it will be used to populate the language version field.
-func Tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, cueVers string) (*modfile.File, error) {
-	return tidy(ctx, fsys, modRoot, reg, cueVers, false)
+func Tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry) (*modfile.File, error) {
+	return tidy(ctx, fsys, modRoot, reg, false)
 }
 
-func tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, cueVers string, checkTidy bool) (*modfile.File, error) {
+func tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, checkTidy bool) (*modfile.File, error) {
 	mainModuleVersion, mf, err := readModuleFile(ctx, fsys, modRoot)
 	if err != nil {
 		return nil, err
@@ -104,7 +102,7 @@ func tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, cueVers
 		// TODO: provide a reason, perhaps in structured form rather than a string
 		return nil, &ErrModuleNotTidy{}
 	}
-	return modfileFromRequirements(mf, rs, cueVers), nil
+	return modfileFromRequirements(mf, rs), nil
 }
 
 // ErrModuleNotTidy is returned by CheckTidy when a module is not tidy,
@@ -149,7 +147,7 @@ func readModuleFile(ctx context.Context, fsys fs.FS, modRoot string) (module.Ver
 	return mainModuleVersion, mf, nil
 }
 
-func modfileFromRequirements(old *modfile.File, rs *modrequirements.Requirements, cueVers string) *modfile.File {
+func modfileFromRequirements(old *modfile.File, rs *modrequirements.Requirements) *modfile.File {
 	// TODO it would be nice to have some way of automatically including new
 	// fields by default when they're added to modfile.File, but we don't
 	// want to just copy the entirety of old because that includes
@@ -159,11 +157,6 @@ func modfileFromRequirements(old *modfile.File, rs *modrequirements.Requirements
 		Language: old.Language,
 		Deps:     make(map[string]*modfile.Dep),
 		Source:   old.Source,
-	}
-	if cueVers != "" && (mf.Language == nil || mf.Language.Version == "") {
-		mf.Language = &modfile.Language{
-			Version: cueVers,
-		}
 	}
 	defaults := rs.DefaultMajorVersions()
 	for _, v := range rs.RootModules() {

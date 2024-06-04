@@ -1,6 +1,4 @@
 # Test that it fails if a version isn't already present.
--- cue-version --
-v1.2.3
 -- want --
 error: no language version declared in module.cue
 -- tidy-check-error --

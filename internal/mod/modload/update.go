@@ -93,7 +93,7 @@ func UpdateVersions(ctx context.Context, fsys fs.FS, modRoot string, reg Registr
 		}
 	}
 	rs = modrequirements.NewRequirements(mf.Module, reg, finalVersions, mf.DefaultMajorVersions())
-	return modfileFromRequirements(mf, rs, ""), nil
+	return modfileFromRequirements(mf, rs), nil
 }
 
 // resolveUpdateVersions resolves a set of version strings as accepted by [UpdateVersions]

@@ -31,7 +31,7 @@ func TestTidy(t *testing.T) {
 			ar, err := txtar.ParseFile(f)
 			qt.Assert(t, qt.IsNil(err))
 			tfs := txtarfs.FS(ar)
-			reg := newRegistry(t, tfs, "_registry")
+			reg := newRegistry(t, tfs)
 
 			want, err := fs.ReadFile(tfs, "want")
 			qt.Assert(t, qt.IsNil(err))
@@ -80,7 +80,7 @@ func stringFromFile(fsys fs.FS, file string) string {
 	return strings.TrimSpace(string(data))
 }
 
-func newRegistry(t *testing.T, fsys fs.FS, root string) Registry {
+func newRegistry(t *testing.T, fsys fs.FS) Registry {
 	fsys, err := fs.Sub(fsys, "_registry")
 	qt.Assert(t, qt.IsNil(err))
 	regSrv, err := registrytest.New(fsys, "")

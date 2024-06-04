@@ -23,7 +23,7 @@ func TestUpdateVersions(t *testing.T) {
 			ar, err := txtar.ParseFile(f)
 			qt.Assert(t, qt.IsNil(err))
 			tfs := txtarfs.FS(ar)
-			reg := newRegistry(t, tfs, "_registry")
+			reg := newRegistry(t, tfs)
 
 			want, err := fs.ReadFile(tfs, "want")
 			qt.Assert(t, qt.IsNil(err))

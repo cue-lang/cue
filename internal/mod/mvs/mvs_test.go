@@ -505,7 +505,7 @@ func Test(t *testing.T) {
 				t.Fatalf("build takes one argument: %q", line)
 			}
 			fns = append(fns, func(t *testing.T) {
-				list, err := BuildList[version]([]version{m(kf[1])}, reqs)
+				list, err := BuildList([]version{m(kf[1])}, reqs)
 				checkList(t, key, list, err, val)
 			})
 			continue
@@ -514,7 +514,7 @@ func Test(t *testing.T) {
 				t.Fatalf("upgrade* takes one argument: %q", line)
 			}
 			fns = append(fns, func(t *testing.T) {
-				list, err := UpgradeAll[version](m(kf[1]), reqs)
+				list, err := UpgradeAll(m(kf[1]), reqs)
 				checkList(t, key, list, err, val)
 			})
 			continue
@@ -523,7 +523,7 @@ func Test(t *testing.T) {
 				t.Fatalf("upgrade takes at least one argument: %q", line)
 			}
 			fns = append(fns, func(t *testing.T) {
-				list, err := Upgrade[version](m(kf[1]), reqs, ms(kf[2:])...)
+				list, err := Upgrade(m(kf[1]), reqs, ms(kf[2:])...)
 				if err == nil {
 					// Copy the reqs map, but substitute the upgraded requirements in
 					// place of the target's original requirements.
@@ -533,7 +533,7 @@ func Test(t *testing.T) {
 					}
 					upReqs[m(kf[1])] = list
 
-					list, err = Req[version](m(kf[1]), nil, upReqs)
+					list, err = Req(m(kf[1]), nil, upReqs)
 				}
 				checkList(t, key, list, err, val)
 			})
@@ -543,7 +543,7 @@ func Test(t *testing.T) {
 				t.Fatalf("upgrade takes at least one argument: %q", line)
 			}
 			fns = append(fns, func(t *testing.T) {
-				list, err := Upgrade[version](m(kf[1]), reqs, ms(kf[2:])...)
+				list, err := Upgrade(m(kf[1]), reqs, ms(kf[2:])...)
 				checkList(t, key, list, err, val)
 			})
 			continue
@@ -552,7 +552,7 @@ func Test(t *testing.T) {
 				t.Fatalf("downgrade takes at least one argument: %q", line)
 			}
 			fns = append(fns, func(t *testing.T) {
-				list, err := Downgrade[version](m(kf[1]), reqs, ms(kf[1:])...)
+				list, err := Downgrade(m(kf[1]), reqs, ms(kf[1:])...)
 				checkList(t, key, list, err, val)
 			})
 			continue
@@ -561,7 +561,7 @@ func Test(t *testing.T) {
 				t.Fatalf("req takes at least one argument: %q", line)
 			}
 			fns = append(fns, func(t *testing.T) {
-				list, err := Req[version](m(kf[1]), kf[2:], reqs)
+				list, err := Req(m(kf[1]), kf[2:], reqs)
 				checkList(t, key, list, err, val)
 			})
 			continue

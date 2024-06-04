@@ -129,14 +129,13 @@ func (c *Client) GetModule(ctx context.Context, m module.Version) (*Module, erro
 		return nil, err
 	}
 
-	return c.GetModuleWithManifest(ctx, m, data, rd.Descriptor().MediaType)
+	return c.GetModuleWithManifest(m, data, rd.Descriptor().MediaType)
 }
 
 // GetModuleWithManifest returns a module instance given
 // the top level manifest contents, without querying its tag.
-// It assumes that the module will be tagged with the given
-// version.
-func (c *Client) GetModuleWithManifest(ctx context.Context, m module.Version, contents []byte, mediaType string) (*Module, error) {
+// It assumes that the module will be tagged with the given version.
+func (c *Client) GetModuleWithManifest(m module.Version, contents []byte, mediaType string) (*Module, error) {
 	loc, err := c.resolve(m)
 	if err != nil {
 		// Note: don't return [ErrNotFound] here because if we've got the
@@ -146,7 +145,7 @@ func (c *Client) GetModuleWithManifest(ctx context.Context, m module.Version, co
 		return nil, err
 	}
 
-	manifest, err := unmarshalManifest(ctx, contents, mediaType)
+	manifest, err := unmarshalManifest(contents, mediaType)
 	if err != nil {
 		return nil, fmt.Errorf("module %v: %v", m, err)
 	}
@@ -429,7 +428,7 @@ func (c *Client) resolve(m module.Version) (RegistryLocation, error) {
 	return loc, nil
 }
 
-func unmarshalManifest(ctx context.Context, data []byte, mediaType string) (*ociregistry.Manifest, error) {
+func unmarshalManifest(data []byte, mediaType string) (*ociregistry.Manifest, error) {
 	if !isJSON(mediaType) {
 		return nil, fmt.Errorf("expected JSON media type but %q does not look like JSON", mediaType)
 	}

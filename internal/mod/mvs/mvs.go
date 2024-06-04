@@ -317,7 +317,7 @@ func Upgrade[V comparable](target V, reqs UpgradeReqs[V], upgrade ...V) ([]V, er
 		}
 	}
 
-	return buildList[V]([]V{target}, &override[V]{target, list, reqs}, func(m V) (V, error) {
+	return buildList([]V{target}, &override[V]{target, list, reqs}, func(m V) (V, error) {
 		if v, ok := upgradeTo[reqs.Path(m)]; ok {
 			return reqs.New(reqs.Path(m), v)
 		}
@@ -340,7 +340,7 @@ func Downgrade[V comparable](target V, reqs DowngradeReqs[V], downgrade ...V) ([
 	//
 	// In order to generate those new requirements, we need to identify versions
 	// for every module in the build list — not just reqs.Required(target).
-	list, err := BuildList[V]([]V{target}, reqs)
+	list, err := BuildList([]V{target}, reqs)
 	if err != nil {
 		return nil, err
 	}
@@ -460,7 +460,7 @@ List:
 	// list with the actual versions of the downgraded modules as selected by MVS,
 	// instead of our initial downgrades.
 	// (See the downhiddenartifact and downhiddencross test cases).
-	actual, err := BuildList[V]([]V{target}, &override[V]{
+	actual, err := BuildList([]V{target}, &override[V]{
 		target: target,
 		list:   downgraded,
 		Reqs:   reqs,
@@ -485,7 +485,7 @@ List:
 		}
 	}
 
-	return BuildList[V]([]V{target}, &override[V]{
+	return BuildList([]V{target}, &override[V]{
 		target: target,
 		list:   downgraded,
 		Reqs:   reqs,

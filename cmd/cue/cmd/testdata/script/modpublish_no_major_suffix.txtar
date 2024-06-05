@@ -1,0 +1,64 @@
+# Test that cue mod publish fails when the module path lacks a major version suffix.
+# The module path can be fixed up with `cue mod fix` and then published successfully.
+
+memregistry MEMREGISTRY
+env CUE_REGISTRY=$MEMREGISTRY+insecure
+
+exec cue export
+cmp stdout export.stdout
+exec cue mod tidy --check
+
+cp cue.mod/module.cue cue.mod/module.cue.original
+
+! exec cue mod publish v0.0.1
+# TODO(mvdan): this error message should not use an absolute path.
+# TODO(mvdan): we should suggest what command to run to the user based on the version to publish.
+stderr 'module path "main.example" in '${WORK@R}\${/}cue.mod\${/}'module.cue does not contain major version'
+
+# TODO(mvdan): if a module's path lacks a major version suffix, to the point that
+# it cannot be published and `cue mod fix` fixes it, we should not consider it tidy.
+exec cue mod tidy --check
+
+# `cue mod fix` adds a major version suffix "v0" when missing.
+# The user can use `cue mod edit --module` if they want a different major version.
+exec cue mod fix
+exec cat cue.mod/module.cue
+cmp cue.mod/module.cue cue.mod/module.cue.fixed
+
+# TODO(mvdan): we cannot edit the module to add a missing major version suffix, which seems like a bug.
+cp cue.mod/module.cue.original cue.mod/module.cue
+! exec cue mod edit --module main.example@v0
+stderr 'module.cue does not contain major version'
+
+# Continue the test with the fixed v0 form.
+cp cue.mod/module.cue.fixed cue.mod/module.cue
+
+# Trying to publish with the wrong major version will fail.
+! exec cue mod publish v1.0.0
+stderr 'mismatched major version suffix'
+! exec cue mod publish v2.0.0
+stderr 'mismatched major version suffix'
+
+# Publishing with the right major version works.
+exec cue mod publish v0.0.1
+
+-- export.stdout --
+{
+    "out": "hello world"
+}
+-- cue.mod/module.cue --
+module: "main.example"
+language: version: "v0.9.0"
+source: kind: "self"
+-- cue.mod/module.cue.fixed --
+module: "main.example@v0"
+language: {
+	version: "v0.9.0"
+}
+source: {
+	kind: "self"
+}
+-- main.cue --
+package main
+
+out: "hello world"

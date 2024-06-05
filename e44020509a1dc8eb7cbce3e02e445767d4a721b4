@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "84b6e533_ba641a1e",
+        "filename": "cmd/cue/cmd/testdata/script/registry_publish_idempotent.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-05T21:14:38Z",
+      "side": 1,
+      "message": "I felt like it needed to be included for completeness. It\u0027s not strictly necessary I agree, but I\u0027ll leave it for now.",
+      "parentUuid": "0689fdab_ba9ef7bf",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 22
+      },
+      "revId": "e44020509a1dc8eb7cbce3e02e445767d4a721b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "71f1aafd_fd161534",
@@ -37,6 +61,24 @@
       "writtenOn": "2024-06-05T21:09:25Z",
       "side": 1,
       "message": "nit: I think you can move this down until the point you actually use source.kind\u003dgit",
+      "revId": "e44020509a1dc8eb7cbce3e02e445767d4a721b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2defe61e_1bfc0837",
+        "filename": "cmd/cue/cmd/testdata/script/registry_publish_idempotent.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-05T21:14:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "71f1aafd_fd161534",
       "revId": "e44020509a1dc8eb7cbce3e02e445767d4a721b4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -58,6 +100,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfcc99c1_91b46b32",
+        "filename": "cmd/cue/cmd/testdata/script/registry_publish_idempotent.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-05T21:14:38Z",
+      "side": 1,
+      "message": "I really don\u0027t have a preference, other than it being visually obvious. I went with this here to make it easier to my eye. But I\u0027ve switched to two lines for consistency with what you have been doing.",
+      "parentUuid": "ddb602d8_a757c793",
+      "revId": "e44020509a1dc8eb7cbce3e02e445767d4a721b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e17a8e68_5fafe8c4",
@@ -71,6 +131,30 @@
       "writtenOn": "2024-06-05T21:09:25Z",
       "side": 1,
       "message": "surely you mean v0.0.1 here?",
+      "range": {
+        "startLine": 50,
+        "startChar": 29,
+        "endLine": 50,
+        "endChar": 35
+      },
+      "revId": "e44020509a1dc8eb7cbce3e02e445767d4a721b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a091a3b1_7f1121f2",
+        "filename": "cmd/cue/cmd/testdata/script/registry_publish_idempotent.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-05T21:14:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e17a8e68_5fafe8c4",
       "range": {
         "startLine": 50,
         "startChar": 29,

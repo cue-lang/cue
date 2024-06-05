@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a1385f6_ea56543c",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-05T04:29:10Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "bb386eea_d7600a9d",
+      "range": {
+        "startLine": 82,
+        "startChar": 61,
+        "endLine": 82,
+        "endChar": 63
+      },
+      "revId": "fa69aeb1c9739229104f37a165973e0156328fcd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "db01c0f8_eef48bd8",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-06-04T19:31:20Z",
       "side": 1,
       "message": "isn\u0027t this backwards? the module root is the directory _containing the cue.mod directory_, not _contained by the cue.mod directory_.",
+      "range": {
+        "startLine": 125,
+        "startChar": 5,
+        "endLine": 125,
+        "endChar": 49
+      },
+      "revId": "fa69aeb1c9739229104f37a165973e0156328fcd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e759e75d_34238315",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-05T04:29:10Z",
+      "side": 1,
+      "message": "You\u0027re absolutely right. What happened here is that I meant to copy and paste wording from the cuelang.org page back to the comments (because I was working on the wording for both values in the page)... but then forgot to copy it back.",
+      "parentUuid": "db01c0f8_eef48bd8",
       "range": {
         "startLine": 125,
         "startChar": 5,

@@ -122,7 +122,7 @@ func runModUpload(cmd *Command, args []string) error {
 		return err
 	}
 	if err := modload.CheckTidy(ctx, os.DirFS(modRoot), ".", reg); err != nil {
-		return suggestModTidy(err)
+		return suggestModCommand(err)
 	}
 
 	modPath := filepath.Join(modRoot, "cue.mod/module.cue")

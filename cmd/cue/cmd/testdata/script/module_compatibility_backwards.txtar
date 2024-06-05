@@ -1,0 +1,139 @@
+# This test checks for backwards compatibility with modules developed
+# using older versions of CUE. It checks that:
+#
+# 1) Downstream consumption does work, where one only needs to load CUE packages.
+#    `cue export`, loading as a dependency via `cue/load`, etc.
+# 2) Upstream development does work, where one may need to modify cue.mod/module.cue
+#    or publish the module to a registry. `cue mod tidy`, `cue mod publish`, etc.
+#
+# TODO(mvdan): once we split up language.version from the schema version,
+# cover scenarios where just one of them is older.
+
+# This test uses an in-memory registry for `cue mod publish` to be able to succeed,
+# but some tests will also need ORIG_CUE_REGISTRY to fetch modules from _registry/ below.
+memregistry MEMREGISTRY
+env ORIG_CUE_REGISTRY=${CUE_REGISTRY}
+env CUE_REGISTRY=$MEMREGISTRY+insecure
+
+# A module that was created before the modules experiment,
+# without a major version suffix nor a language version.
+
+# Downstream consumption via cue.mod/*/ works.
+# Downstream consumption via a registry is not possible as its module path lacks a major version suffix.
+cd ${WORK}/premodules
+exec cue export
+stdout '"downstream": "hello from premodules.example"'
+
+# Continue inside the module's own directory as if we had cloned it directly.
+cd ${WORK}
+mv premodules/cue.mod/pkg/premodules.example premodules-downstream-direct
+cd premodules-downstream-direct
+
+# Downstream consumption via `cue export` fails; when the current module lacks
+# a language.version field, we always nudge the user or developer to add one.
+! exec cue export
+stderr '^no language version declared in module.cue$'
+
+# Upstream development works once `cue mod fix` adds a language.version field.
+# TODO(mvdan): we don't have anything like `cue mod edit -langversion` if the user wants an older version.
+! exec cue mod tidy --check
+stderr '^no language version declared in module.cue$'
+! exec cue mod get some.dependency
+stderr '^no language version declared in module.cue$'
+! exec cue mod publish v0.0.2
+stderr '^no language version declared in module.cue$'
+exec cue mod fix
+cmp cue.mod/module.cue ${WORK}/premodules-module.cue.fixed
+exec cue export
+stdout '"hello from premodules.example"'
+exec cue mod tidy --check
+
+# Upstream publishing then works once a source.kind is chosen by the user.
+! exec cue mod publish v0.0.2
+stderr '^no source field found in cue.mod/module.cue$'
+exec cue mod edit --source self
+exec cue mod publish v0.0.2
+
+
+# A module that was created with a language.version of v0.8.0.
+
+# Downstream consumption via a registry works.
+# Note that we need to point CUE_REGISTRY back to the contents inside _registry/ below.
+env CUE_REGISTRY=${ORIG_CUE_REGISTRY}
+cd ${WORK}/v0.8.0-downstream-deps
+exec cue export
+stdout '"downstream": "hello from v0.8.0.example"'
+env CUE_REGISTRY=$MEMREGISTRY+insecure
+
+# Downstream consumption via cue.mod/*/ works.
+cd ${WORK}/v0.8.0-downstream-cuemod
+mv ${WORK}/_registry/v0.8.0.example_v0.0.1 cue.mod/pkg/v0.8.0.example
+exec cue export
+stdout '"downstream": "hello from v0.8.0.example"'
+
+# Continue inside the module's own directory as if we had cloned it directly.
+cd ${WORK}
+mv v0.8.0-downstream-cuemod/cue.mod/pkg/v0.8.0.example v0.8.0-downstream-direct
+cd v0.8.0-downstream-direct
+
+# Downstream consumption via `cue export` works.
+exec cue export
+stdout '"hello from v0.8.0.example"'
+
+# Upstream development via `cue mod tidy` works.
+exec cue mod tidy --check
+
+# Upstream publishing works directly, as v0.8.0 has no source.kind.
+exec cue mod publish v0.0.2
+
+
+-- premodules/cue.mod/module.cue --
+module: "downstream.example"
+language: version: "v0.9.0"
+-- premodules/downstream.cue --
+package downstream
+import "premodules.example:root"
+downstream: root
+-- premodules/cue.mod/pkg/premodules.example/cue.mod/module.cue --
+module: "premodules.example"
+-- premodules-module.cue.fixed --
+module: "premodules.example@v0"
+language: {
+	version: "v0.9.0"
+}
+-- premodules/cue.mod/pkg/premodules.example/root.cue --
+package root
+import "premodules.example/subpkg"
+subpkg
+-- premodules/cue.mod/pkg/premodules.example/subpkg/subpkg.cue --
+package subpkg
+"hello from premodules.example"
+
+-- v0.8.0-downstream-deps/cue.mod/module.cue --
+module: "downstream.example"
+language: version: "v0.9.0"
+deps: "v0.8.0.example": v: "v0.0.1"
+-- v0.8.0-downstream-deps/downstream.cue --
+package downstream
+import "v0.8.0.example:root"
+downstream: root
+
+-- v0.8.0-downstream-cuemod/cue.mod/module.cue --
+module: "downstream.example"
+language: version: "v0.9.0"
+-- v0.8.0-downstream-cuemod/cue.mod/pkg/.mkdir --
+-- v0.8.0-downstream-cuemod/downstream.cue --
+package downstream
+import "v0.8.0.example:root"
+downstream: root
+
+-- _registry/v0.8.0.example_v0.0.1/cue.mod/module.cue --
+module: "v0.8.0.example@v0"
+language: version: "v0.8.0"
+-- _registry/v0.8.0.example_v0.0.1/root.cue --
+package root
+import "v0.8.0.example/subpkg"
+subpkg
+-- _registry/v0.8.0.example_v0.0.1/subpkg/subpkg.cue --
+package subpkg
+"hello from v0.8.0.example"

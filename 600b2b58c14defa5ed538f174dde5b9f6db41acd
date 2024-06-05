@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d876346e_a6a50e6c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-05T15:46:08Z",
+      "side": 1,
+      "message": "Very nice; thank you for going to the effort of laying this ground work.",
+      "revId": "600b2b58c14defa5ed538f174dde5b9f6db41acd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c036427f_2fe6b76b",
+        "filename": "cmd/cue/cmd/testdata/script/module_compatibility_backwards.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-05T15:46:08Z",
+      "side": 1,
+      "message": "Maybe just motivate why we need this setup? It took me a couple of mins to work it out.",
+      "revId": "600b2b58c14defa5ed538f174dde5b9f6db41acd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03faba33_852f1b81",
+        "filename": "cmd/cue/cmd/testdata/script/module_compatibility_backwards.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-05T15:46:08Z",
+      "side": 1,
+      "message": "I\u0027m not clear on this one. Because that would effectively imply that we have to permit no language version in the current module. And we don\u0027t want to do that?\n\nSo I think this is an unfortunate \"wart\" - that we \"allow\" an old-style modules dependency to not declare a `language.version` when consumed via `cue.mod/{pkg,gen,usr}`, but require it everywhere else.",
+      "revId": "600b2b58c14defa5ed538f174dde5b9f6db41acd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

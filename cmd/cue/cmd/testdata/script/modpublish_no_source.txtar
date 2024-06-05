@@ -49,6 +49,6 @@ module: "test.example/05@v1"
 language: version: "v0.5.0"
 
 -- none/both.stderr --
-no language version declared in module.cue
+no language version declared in module.cue; run 'cue mod fix'
 -- none/cue.mod/module.cue --
 module: "test.example/none@v1"

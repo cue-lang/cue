@@ -5,7 +5,7 @@
 cmp stderr want-stderr
 
 -- want-stderr --
-no language version declared in module.cue
+no language version declared in module.cue; run 'cue mod fix'
 -- cue.mod/module.cue --
 module: "main.org@v0"
 

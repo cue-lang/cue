@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd02a8db_538dcfa1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-05T08:12:00Z",
+      "side": 1,
+      "message": "its",
+      "range": {
+        "startLine": 15,
+        "startChar": 57,
+        "endLine": 15,
+        "endChar": 61
+      },
+      "revId": "35d33cf3039ac118d3c1f29dc93b566684cfdd56",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf50da89_b15cef18",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-05T08:12:00Z",
+      "side": 1,
+      "message": "The new commit message makes more sense, thanks!\n\nIt\u0027s likely we can refactor the code a bit to be more intuitive, but as long as it works and fixes the regression in the upcoming release, I don\u0027t have a problem with it.",
+      "revId": "35d33cf3039ac118d3c1f29dc93b566684cfdd56",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

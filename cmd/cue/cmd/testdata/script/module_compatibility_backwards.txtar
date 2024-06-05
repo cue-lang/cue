@@ -34,11 +34,11 @@ stderr '^no language version declared in module.cue$'
 # Upstream development works once `cue mod fix` adds a language.version field.
 # TODO(mvdan): we don't have anything like `cue mod edit -langversion` if the user wants an older version.
 ! exec cue mod tidy --check
-stderr '^no language version declared in module.cue$'
+stderr '^no language version declared in module.cue; run ''cue mod fix''$'
 ! exec cue mod get some.dependency
-stderr '^no language version declared in module.cue$'
+stderr '^no language version declared in module.cue; run ''cue mod fix''$'
 ! exec cue mod publish v0.0.2
-stderr '^no language version declared in module.cue$'
+stderr '^no language version declared in module.cue; run ''cue mod fix''$'
 exec cue mod fix
 cmp cue.mod/module.cue ${WORK}/premodules-module.cue.fixed
 exec cue export

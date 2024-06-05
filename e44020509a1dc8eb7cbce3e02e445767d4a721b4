@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0689fdab_ba9ef7bf",
+        "filename": "cmd/cue/cmd/testdata/script/registry_publish_idempotent.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-05T21:09:25Z",
+      "side": 1,
+      "message": "I\u0027m not sure if this last part of the comment is necessary; we control ocimem, and we made the choice to allow publishing with the same digest in immutable mode, so I don\u0027t think that is an unknown or something that may change.",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 22
+      },
+      "revId": "e44020509a1dc8eb7cbce3e02e445767d4a721b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71f1aafd_fd161534",
+        "filename": "cmd/cue/cmd/testdata/script/registry_publish_idempotent.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-05T21:09:25Z",
+      "side": 1,
+      "message": "nit: I think you can move this down until the point you actually use source.kind\u003dgit",
+      "revId": "e44020509a1dc8eb7cbce3e02e445767d4a721b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ddb602d8_a757c793",
+        "filename": "cmd/cue/cmd/testdata/script/registry_publish_idempotent.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-05T21:09:25Z",
+      "side": 1,
+      "message": "FYI I have been using two empty lines as \"section separators\", I\u0027m not sure what works best in general but we might want to try being a bit consistent amongst ourselves. I don\u0027t have a strong opinion so I\u0027m happy to go with whatever you or Rog prefer.",
+      "revId": "e44020509a1dc8eb7cbce3e02e445767d4a721b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e17a8e68_5fafe8c4",
+        "filename": "cmd/cue/cmd/testdata/script/registry_publish_idempotent.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-05T21:09:25Z",
+      "side": 1,
+      "message": "surely you mean v0.0.1 here?",
+      "range": {
+        "startLine": 50,
+        "startChar": 29,
+        "endLine": 50,
+        "endChar": 35
+      },
+      "revId": "e44020509a1dc8eb7cbce3e02e445767d4a721b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

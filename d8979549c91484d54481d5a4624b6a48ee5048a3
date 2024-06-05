@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "557b45c4_1f503c58",
+        "filename": "cmd/cue/cmd/testdata/script/modpublish_no_major_suffix.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-05T15:10:00Z",
+      "side": 1,
+      "message": "I don\u0027t follow this line of reasoning. Adding a major version suffix to a module you never publish is harmless, indeed. But it\u0027s only required if you publish a module. If you don\u0027t it\u0027s not necessary. So it\u0027s very much the case that a module without a major version suffix can be tidy.",
+      "revId": "d8979549c91484d54481d5a4624b6a48ee5048a3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45f9e86f_7c1074d4",
+        "filename": "cmd/cue/cmd/testdata/script/modpublish_no_major_suffix.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-05T15:10:00Z",
+      "side": 1,
+      "message": "Nit: debugging line.",
+      "revId": "d8979549c91484d54481d5a4624b6a48ee5048a3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

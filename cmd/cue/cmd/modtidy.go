@@ -24,6 +24,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"cuelang.org/go/internal/mod/modload"
+	"cuelang.org/go/mod/modfile"
 )
 
 func newModTidyCmd(c *Command) *cobra.Command {
@@ -67,11 +68,11 @@ func runModTidy(cmd *Command, args []string) error {
 	}
 	if flagCheck.Bool(cmd) {
 		err := modload.CheckTidy(ctx, os.DirFS(modRoot), ".", reg)
-		return suggestModTidy(err)
+		return suggestModCommand(err)
 	}
 	mf, err := modload.Tidy(ctx, os.DirFS(modRoot), ".", reg)
 	if err != nil {
-		return err
+		return suggestModCommand(err)
 	}
 	data, err := mf.Format()
 	if err != nil {
@@ -93,11 +94,16 @@ func runModTidy(cmd *Command, args []string) error {
 	return nil
 }
 
-// suggestModTidy rewrites [modload.ErrModuleNotTidy] errors
-// so that they suggest running `cue mod tidy` to the user.
-func suggestModTidy(err error) error {
+// suggestModCommand rewrites a non-nil error to suggest to the user
+// what command they could use to fix a problem.
+// [modload.ErrModuleNotTidy] suggests running `cue mod tidy`,
+// and [modfile.ErrNoLanguageVersion] suggests running `cue mod fix`.
+func suggestModCommand(err error) error {
 	notTidyErr := new(modload.ErrModuleNotTidy)
-	if errors.As(err, &notTidyErr) {
+	switch {
+	case errors.Is(err, modfile.ErrNoLanguageVersion):
+		err = fmt.Errorf("%w; run 'cue mod fix'", err)
+	case errors.As(err, &notTidyErr):
 		if notTidyErr.Reason == "" {
 			err = fmt.Errorf("module is not tidy, use 'cue mod tidy'")
 		} else {

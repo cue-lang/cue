@@ -220,11 +220,11 @@ var schemaVersionLimits = sync.OnceValue(func() [2]string {
 	return limits
 })
 
-// Parse verifies that the module file has correct syntax.
+// Parse verifies that the module file has correct syntax
+// and follows the schema following the required language.version field.
 // The file name is used for error messages.
 // All dependencies must be specified correctly: with major
-// versions in the module paths and canonical dependency
-// versions.
+// versions in the module paths and canonical dependency versions.
 func Parse(modfile []byte, filename string) (*File, error) {
 	return parse(modfile, filename, true)
 }
@@ -349,8 +349,7 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 		return nil, errors.Wrapf(err, token.NoPos, "cannot determine language version")
 	}
 	if base.Language.Version == "" {
-		// TODO is something different we could do here?
-		return nil, fmt.Errorf("no language version declared in module.cue")
+		return nil, ErrNoLanguageVersion
 	}
 	if !semver.IsValid(base.Language.Version) {
 		return nil, fmt.Errorf("language version %q in module.cue is not valid semantic version", base.Language.Version)
@@ -465,6 +464,10 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 	module.Sort(mf.versions)
 	return mf, nil
 }
+
+// ErrNoLanguageVersion is returned by [Parse] and [ParseNonStrict]
+// when a cue.mod/module.cue file lacks the `language.version` field.
+var ErrNoLanguageVersion = fmt.Errorf("no language version declared in module.cue")
 
 func parseDataOnlyCUE(ctx *cue.Context, cueData []byte, filename string) (*ast.File, error) {
 	dec := encoding.NewDecoder(ctx, &build.File{

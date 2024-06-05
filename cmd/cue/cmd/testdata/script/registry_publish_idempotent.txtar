@@ -1,0 +1,75 @@
+# Check that cue mod publish is idempotent for all sources.
+#
+# We first perform the check on a 'source: kind: "self"' module, before reusing
+# that same module but with 'source: kind: "git"' for later versions.
+#
+# These checks rely on two critical properties of the in-memory OCI server:
+#
+#   1. the in-memory OCI server is run in immutable mode
+#   2. the in-memory OCI server accepts an attempt to publish a module under an
+#      existing tag, but only in the case that the modules digest is identical.
+#
+# If point 1 were not true, then we would get a false positive from this check,
+# i.e. we would fail to detect that 'cue mod publish' is not idempotent.  If,
+# separately, point 2 were not true, then we would get a failure as a result of
+# the follow 'republish' attempt, even if the published module digest were
+# identicial.
+#
+# We ensure point 1 is the case by asserting that we get an error when we
+# attempt to republish to an existing version of a module when we know the
+# contents to be different.
+#
+# If we fall foul of the failure as a result of point 2 not being true, this
+# series of tests will fail. We will then be forced to move this test to a
+# different place, which is perhaps where it belongs given the length of this
+# explanatory comment.
+
+[!exec:git] skip 'no git command found'
+memregistry MEMREGISTRY
+env CUE_REGISTRY=$MEMREGISTRY
+
+################################
+# v0.0.1 - source.kind == "self"
+cd $WORK/example
+cp $WORK/v0.0.1 $WORK/example/root.cue
+exec cue mod publish --json v0.0.1
+stdin stdout
+exec cue export -e files json: -
+cmp stdout $WORK/filelist.golden
+exec cue mod publish v0.0.1
+exec cue mod publish v0.0.1 # idempotent check
+
+################################
+# v0.0.2 - source.kind == "git"
+exec cue mod edit --source git
+cp $WORK/v0.0.2 $WORK/example/root.cue
+exec git init .
+exec git add .
+exec git -c user.name=noone -c user.email=noone@example.com commit -m 'initial commit'
+
+# Verify we cannot overwrite v0.0.2 with what we know is different module contents.
+# This ensures the in-memory OCI server is run in immutable mode.
+! exec cue mod publish v0.0.1
+stderr 'cannot overwrite tag'
+
+exec cue mod publish --json v0.0.2
+stdin stdout
+exec cue export -e files json: -
+cmp stdout $WORK/filelist.golden
+exec cue mod publish v0.0.2
+exec cue mod publish v0.0.2 # idempotent check
+
+-- filelist.golden --
+[
+    "cue.mod/module.cue",
+    "root.cue"
+]
+-- v0.0.1 --
+package root
+v: "v0.0.1"
+-- v0.0.2 --
+package root
+v: "v0.0.2"
+-- example/cue.mod/module.cue --
+module: "x.example/root@v0"
+language: version: "v0.9.0-alpha.0"

@@ -77,7 +77,7 @@ func runModGet(cmd *Command, args []string) error {
 	}
 	mf, err := modload.UpdateVersions(ctx, os.DirFS(modRoot), ".", reg, args)
 	if err != nil {
-		return err
+		return suggestModCommand(err)
 	}
 	// TODO check whether it's changed or not.
 	data, err := mf.Format()

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "40c50abe_ddaab1ae",
+        "filename": "cmd/cue/cmd/testdata/script/modpublish_no_major_suffix.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-05T21:54:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "557b45c4_1f503c58",
+      "revId": "d8979549c91484d54481d5a4624b6a48ee5048a3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "45f9e86f_7c1074d4",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-06-05T15:10:00Z",
       "side": 1,
       "message": "Nit: debugging line.",
+      "revId": "d8979549c91484d54481d5a4624b6a48ee5048a3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec62e3f5_3d437539",
+        "filename": "cmd/cue/cmd/testdata/script/modpublish_no_major_suffix.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-05T21:54:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "45f9e86f_7c1074d4",
       "revId": "d8979549c91484d54481d5a4624b6a48ee5048a3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

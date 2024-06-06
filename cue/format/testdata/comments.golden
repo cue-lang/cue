@@ -135,3 +135,10 @@ funcArg3: foo(
 	)
 
 //	comment including		some tabs
+
+{
+	// comments
+	... // surrounding
+
+	// an ellipsis
+}

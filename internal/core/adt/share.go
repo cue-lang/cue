@@ -46,6 +46,18 @@ func (n *nodeContext) unshare() {
 	n.node.BaseValue = n.origBaseValue
 
 	n.scheduleVertexConjuncts(n.shared, v, n.sharedID)
+
+	n.sharedID.cc.decDependent(n.ctx, SHARED, n.node.cc)
+	n.sharedID.cc = nil
+}
+
+// finalizeSharing should be called when it is known for sure a node can be
+// shared.
+func (n *nodeContext) finalizeSharing() {
+	if n.sharedID.cc != nil {
+		n.sharedID.cc.decDependent(n.ctx, SHARED, n.node.cc)
+		n.sharedID.cc = nil
+	}
 }
 
 func (n *nodeContext) share(c Conjunct, arc *Vertex, id CloseInfo) {
@@ -58,6 +70,13 @@ func (n *nodeContext) share(c Conjunct, arc *Vertex, id CloseInfo) {
 	n.isShared = true
 	n.shared = c
 	n.sharedID = id
+
+	// At this point, the node may still be unshared at a later point. For this
+	// purpose we need to keep the retain count above zero until all conjuncts
+	// have been processed and it is clear that sharing is possible. Delaying
+	// such a count should not hurt performance, as a shared node is completed
+	// anyway.
+	id.cc.incDependent(n.ctx, SHARED, n.node.cc)
 }
 
 func (n *nodeContext) shareIfPossible(c Conjunct, arc *Vertex, id CloseInfo) bool {

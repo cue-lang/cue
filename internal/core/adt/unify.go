@@ -562,6 +562,11 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 	}
 	n.node.Arcs = n.node.Arcs[:k]
 
+	// This should be called after all arcs have been processed, because
+	// whether sharing is possible or not may depend on how arcs with type
+	// ArcPending will resolve.
+	n.finalizeSharing()
+
 	// Strip struct literals that were not initialized and are not part
 	// of the output.
 	//

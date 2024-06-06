@@ -181,8 +181,6 @@ func (ld *loader) resolveDependencies(ctx context.Context, rootPkgPaths []string
 				if errors.As(err, &missingErr) {
 					err = &ErrModuleNotTidy{Reason: fmt.Sprintf(
 						"missing dependency providing package %s", missingErr.Path)}
-				} else {
-					panic(fmt.Sprintf("%#v\n", err) + ": " + err.Error())
 				}
 				return nil, nil, err
 			}

@@ -123,6 +123,7 @@ var p = &pkg.Package{
 		Name: "Match",
 		Params: []pkg.Param{
 			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
 			{Kind: adt.StringKind, Value: unixDefault},
 		},
 		Result: adt.BoolKind,

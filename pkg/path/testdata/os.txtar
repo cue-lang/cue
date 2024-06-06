@@ -56,6 +56,13 @@ Clean: [_]: {
     #"c:\abc\def\..\.."#: _
 }
 
+Match: [OS=#AnyOS]: [Pattern=string]: [Name=string]: path.Match(Pattern, Name, OS)
+Match: [_]: {
+    "*c":    "abc":               _
+    "*.txt": "a/b.txt":           _
+    "*.zip": #"c:\a\b\file.zip"#: _
+}
+
 Slash: [OS=string]: [ARG=string]: {
     to:   path.ToSlash(ARG, OS)
     from: path.FromSlash(ARG, OS)
@@ -212,6 +219,41 @@ Clean: {
 	windows: {
 		"abc//def//ghi":        "abc\\def\\ghi"
 		"c:\\abc\\def\\..\\..": "c:\\"
+	}
+}
+Match: {
+	unix: {
+		"*c": {
+			abc: true
+		}
+		"*.txt": {
+			"a/b.txt": false
+		}
+		"*.zip": {
+			"c:\\a\\b\\file.zip": true
+		}
+	}
+	plan9: {
+		"*c": {
+			abc: true
+		}
+		"*.txt": {
+			"a/b.txt": false
+		}
+		"*.zip": {
+			"c:\\a\\b\\file.zip": true
+		}
+	}
+	windows: {
+		"*c": {
+			abc: true
+		}
+		"*.txt": {
+			"a/b.txt": true
+		}
+		"*.zip": {
+			"c:\\a\\b\\file.zip": false
+		}
 	}
 }
 Slash: {

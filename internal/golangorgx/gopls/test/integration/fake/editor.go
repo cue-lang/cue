@@ -1678,3 +1678,11 @@ func (e *Editor) interpretTokens(x []uint32, contents string) []SemanticToken {
 	}
 	return ans
 }
+
+var (
+	addressRegexp = regexp.MustCompile(`:\d+:\d$`)
+)
+
+func (e *Editor) ParseAddress(addr string) (protocol.Location, error) {
+
+}

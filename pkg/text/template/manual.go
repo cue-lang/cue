@@ -41,7 +41,9 @@ func AddFuncMap(funcMap FuncMap) {
 
 // Execute executes a Go-style template.
 func Execute(templ string, data cue.Value) (string, error) {
+	muFM.Lock()
 	t, err := template.New("").Funcs(fm).Parse(templ)
+	muFM.Unlock()
 	if err != nil {
 		return "", err
 	}

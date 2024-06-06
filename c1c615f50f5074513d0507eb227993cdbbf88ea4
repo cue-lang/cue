@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9df52708_a64291b0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-06T21:17:38Z",
+      "side": 1,
+      "message": "When",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 3
+      },
+      "revId": "c1c615f50f5074513d0507eb227993cdbbf88ea4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "24829b84_94840eaf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-06T21:17:38Z",
+      "side": 1,
+      "message": "Could you add the test before this CL, so we can very clearly show the improvement in behavior?",
+      "revId": "c1c615f50f5074513d0507eb227993cdbbf88ea4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7e33476_e634c5fd",
+        "filename": "cue/format/node.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-06T21:17:38Z",
+      "side": 1,
+      "message": "nit: with the",
+      "range": {
+        "startLine": 160,
+        "startChar": 37,
+        "endLine": 160,
+        "endChar": 41
+      },
+      "revId": "c1c615f50f5074513d0507eb227993cdbbf88ea4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

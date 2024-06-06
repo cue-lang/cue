@@ -1,0 +1,57 @@
+
+
+-- in.cue --
+issue3062: ok1: {
+	#S: "a"
+	#o: x: #S
+	o: #o
+	o: X
+	X: x: A
+	A: "a"
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  11
+Reused: 4
+Allocs: 7
+Retain: 3
+
+Unifications: 11
+Conjuncts:    18
+Disjuncts:    12
+-- out/eval --
+(struct){
+  issue3062: (struct){
+    ok1: (struct){
+      #S: (string){ "a" }
+      #o: (#struct){
+        x: (string){ "a" }
+      }
+      o: (#struct){
+        x: (string){ "a" }
+      }
+      X: (struct){
+        x: (string){ "a" }
+      }
+      A: (string){ "a" }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  issue3062: {
+    ok1: {
+      #S: "a"
+      #o: {
+        x: 〈1;#S〉
+      }
+      o: 〈0;#o〉
+      o: 〈0;X〉
+      X: {
+        x: 〈1;A〉
+      }
+      A: "a"
+    }
+  }
+}

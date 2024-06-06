@@ -192,6 +192,10 @@ const (
 	// DEFER is used to track recursive processing of a node.
 	DEFER // Always refers to self.
 
+	// SHARED is used to track shared nodes. The processing of shared nodes may
+	// change until all other conjuncts have been processed.
+	SHARED
+
 	// TEST is used for testing notifications.
 	TEST // Always refers to self.
 )
@@ -219,6 +223,8 @@ func (k depKind) String() string {
 		return "INIT"
 	case DEFER:
 		return "DEFER"
+	case SHARED:
+		return "SHARED"
 	case TEST:
 		return "TEST"
 	}
@@ -565,7 +571,7 @@ func (m *mermaidContext) cc(cc *closeContext) {
 				taskID = m.task(d)
 			}
 			name = fmt.Sprintf("%s((%d))", taskID, d.taskID)
-		case ROOT, INIT:
+		case ROOT, INIT, SHARED:
 			w = node
 			src := cc.src
 			if v.f != src.Label {

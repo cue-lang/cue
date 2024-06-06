@@ -16,6 +16,24 @@
       "message": "should we test Match\u0027s default unix behavior just like we do with other APIs?",
       "revId": "2c23f53f9889d146a44994f31ae6c0d6655fa7e6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c99ba30_5ea220bd",
+        "filename": "pkg/path/testdata/os.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-06-06T14:39:29Z",
+      "side": 1,
+      "message": "for sure, I missed that that was an option",
+      "parentUuid": "f4a774ba_a1f2f1f0",
+      "revId": "2c23f53f9889d146a44994f31ae6c0d6655fa7e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

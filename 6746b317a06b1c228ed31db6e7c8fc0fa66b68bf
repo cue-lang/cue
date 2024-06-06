@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8c97ec8_3ce04993",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-06T14:30:35Z",
+      "side": 1,
+      "message": "for the sake of being safe, please add my Signed-off-by line as well.",
+      "revId": "6746b317a06b1c228ed31db6e7c8fc0fa66b68bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ec681f3_d62f36cd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-06T14:30:35Z",
+      "side": 1,
+      "message": "Feels odd to approve my own patch, but I guess you also agree it\u0027s an OK change to make for now :)",
+      "revId": "6746b317a06b1c228ed31db6e7c8fc0fa66b68bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9c51b75_7ea52a27",
+        "filename": "cue/testdata/definitions/hidden.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-06T14:30:35Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "6746b317a06b1c228ed31db6e7c8fc0fa66b68bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c759767_835d0d00",
+        "filename": "internal/core/export/testdata/selfcontained/import.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-06T14:30:35Z",
+      "side": 1,
+      "message": "these changes seem unrelated, and even a bit worse, in how they add trailing whitespace. I\u0027d just undo them for now.",
+      "revId": "6746b317a06b1c228ed31db6e7c8fc0fa66b68bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

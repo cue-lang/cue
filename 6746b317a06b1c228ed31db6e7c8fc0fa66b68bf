@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "005a73e1_5fba53ff",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-06-06T14:37:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c8c97ec8_3ce04993",
+      "revId": "6746b317a06b1c228ed31db6e7c8fc0fa66b68bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "1ec681f3_d62f36cd",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 3
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e25eca9d_4d18d7b9",
+        "filename": "cue/testdata/definitions/hidden.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-06-06T14:37:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e9c51b75_7ea52a27",
+      "revId": "6746b317a06b1c228ed31db6e7c8fc0fa66b68bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6c759767_835d0d00",
@@ -65,6 +101,24 @@
       "writtenOn": "2024-06-06T14:30:35Z",
       "side": 1,
       "message": "these changes seem unrelated, and even a bit worse, in how they add trailing whitespace. I\u0027d just undo them for now.",
+      "revId": "6746b317a06b1c228ed31db6e7c8fc0fa66b68bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c6b968c_9d4af286",
+        "filename": "internal/core/export/testdata/selfcontained/import.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-06-06T14:37:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6c759767_835d0d00",
       "revId": "6746b317a06b1c228ed31db6e7c8fc0fa66b68bf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

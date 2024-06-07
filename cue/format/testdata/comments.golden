@@ -144,3 +144,11 @@ foo: [
 [
 	if true {}, // inline comment
 ]
+
+{
+
+	foo: {
+		...
+	}
+	...
+}

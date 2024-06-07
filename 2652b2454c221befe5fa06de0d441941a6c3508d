@@ -69,6 +69,24 @@
       "parentUuid": "b0f49305_e658994b",
       "revId": "2652b2454c221befe5fa06de0d441941a6c3508d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7aacc673_74dfb1e9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-07T13:52:51Z",
+      "side": 1,
+      "message": "As discussed on Discord, this is on purpose - the other bits of cleanup are left for later as they would require more invasive changes. I\u0027ve added TODOs with all three remaining rough edges I\u0027m aware of.",
+      "parentUuid": "01bcd2ba_14f1833a",
+      "revId": "2652b2454c221befe5fa06de0d441941a6c3508d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

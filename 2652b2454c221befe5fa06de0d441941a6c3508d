@@ -51,6 +51,24 @@
       "parentUuid": "5132ae9c_85680745",
       "revId": "2652b2454c221befe5fa06de0d441941a6c3508d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01bcd2ba_14f1833a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-06-07T11:13:25Z",
+      "side": 1,
+      "message": "If we do decide to make this change, I think that the final line of `cue help` should be updated from\n\n```\nUse \"cue [command] --help\" for more information about a command.\n```\n\nto \n\n```\nUse \"cue help [command]\" for more information about any command.\n```",
+      "parentUuid": "b0f49305_e658994b",
+      "revId": "2652b2454c221befe5fa06de0d441941a6c3508d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

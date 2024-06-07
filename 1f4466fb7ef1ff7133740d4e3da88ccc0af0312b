@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "be3908db_9db375c3",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-06-07T14:04:27Z",
+      "side": 1,
+      "message": "nit: typo",
+      "range": {
+        "startLine": 268,
+        "startChar": 40,
+        "endLine": 268,
+        "endChar": 47
+      },
+      "revId": "1f4466fb7ef1ff7133740d4e3da88ccc0af0312b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

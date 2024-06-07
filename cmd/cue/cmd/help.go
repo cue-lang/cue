@@ -37,9 +37,7 @@ import (
 func newHelpCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "help [command]",
-		Short: "Help about any command",
-		Long: `Help provides help for any command in the application.
-Simply type ` + c.Name() + ` help [path to command] for full details.`,
+		Short: "show help text for a command or topic",
 		Run: func(_ *cobra.Command, args []string) {
 			findCmd := func() (*cobra.Command, bool) {
 				cmd, rest, err := c.Root().Find(args)
@@ -47,6 +45,10 @@ Simply type ` + c.Name() + ` help [path to command] for full details.`,
 				return cmd, found
 			}
 			cmd, found := findCmd()
+			// Treat `cue help help` as an unknown help topic; just use `cue help`.
+			if found && cmd.Name() == "help" {
+				cmd, found = nil, false
+			}
 			isCmd := len(args) > 0 && args[0] == "cmd"
 			if isCmd {
 				// args is one of:

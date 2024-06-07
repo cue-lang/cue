@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed58b36c_502d8171",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-06-07T10:32:22Z",
+      "side": 1,
+      "message": "LGTM. I\u0027ll make sure cuelang.org\u0027s help text generation is compatible with this.",
+      "revId": "2652b2454c221befe5fa06de0d441941a6c3508d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

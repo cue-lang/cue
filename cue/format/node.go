@@ -104,7 +104,7 @@ func hasDocComments(d ast.Decl) bool {
 func (f *formatter) walkDeclList(list []ast.Decl) {
 	f.before(nil)
 	d := 0
-	hasEllipsis := false
+	var ellipsis ast.Decl
 	for i, x := range list {
 		if i > 0 {
 			f.print(declcomma)
@@ -128,7 +128,7 @@ func (f *formatter) walkDeclList(list []ast.Decl) {
 			}
 		}
 		if f.printer.cfg.simplify && internal.IsEllipsis(x) {
-			hasEllipsis = true
+			ellipsis = x
 			continue
 		}
 		f.decl(x)
@@ -156,8 +156,11 @@ func (f *formatter) walkDeclList(list []ast.Decl) {
 		}
 		f.print(f.current.parentSep)
 	}
-	if hasEllipsis {
-		f.decl(&ast.Ellipsis{})
+	if ellipsis != nil {
+		// ensure that comments associated with the original ellipsis are preserved
+		n := &ast.Ellipsis{}
+		ast.SetComments(n, ast.Comments(ellipsis))
+		f.decl(n)
 		f.print(f.current.parentSep)
 	}
 	f.after(nil)

@@ -148,7 +148,11 @@ foo: [
 {
 
 	foo: {
-		...
+		// some
+		... // comment
 	}
-	...
+	// comments
+	... // surrounding
+
+	// an ellipsis
 }

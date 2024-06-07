@@ -33,6 +33,24 @@
       "message": "Apologies - I missed this in my earlier review, and it only came up as I was updating cuelang.org\u0027s help text generation to be compatible:\n\nRight now, `cue help help` shows help text about *using* the `cue help` command. Sure, it\u0027s not complicated, but the output includes:\n\n```\nUsage:\n  cue help [command] [flags]\n```\n\n... which is instructional information not directly included anywhere else, as far as I can see.\n\nIf `cue help help` goes away, we won\u0027t have a CLI-related page on cuelang.org that includes this info. Unless we hard code the exception of `cue help --help`, which will still be available (but pretty hidden), I guess?",
       "revId": "2652b2454c221befe5fa06de0d441941a6c3508d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0f49305_e658994b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-06-07T11:11:09Z",
+      "side": 1,
+      "message": "\u003cunresolving\u003e",
+      "parentUuid": "5132ae9c_85680745",
+      "revId": "2652b2454c221befe5fa06de0d441941a6c3508d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

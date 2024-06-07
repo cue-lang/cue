@@ -22,6 +22,30 @@
       },
       "revId": "1f4466fb7ef1ff7133740d4e3da88ccc0af0312b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d61e40b_ed95e78e",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-07T14:59:41Z",
+      "side": 1,
+      "message": "Oops, fixed.",
+      "parentUuid": "be3908db_9db375c3",
+      "range": {
+        "startLine": 268,
+        "startChar": 40,
+        "endLine": 268,
+        "endChar": 47
+      },
+      "revId": "1f4466fb7ef1ff7133740d4e3da88ccc0af0312b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

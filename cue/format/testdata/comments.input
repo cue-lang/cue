@@ -155,3 +155,15 @@ foo: [
 [
 	if true // inline comment
 	{}]
+
+{
+    // comments
+    ... // surrounding
+
+    // an ellipsis
+
+    foo: {
+        // some
+        [string]: _ // comment
+    }
+}

@@ -177,6 +177,14 @@ func New(args []string) (*Command, error) {
 	cmd := &cobra.Command{
 		Use:   "cue",
 		Short: "cue emits configuration files to user-defined commands.",
+		// TODO(mvdan): the text below should not jump straight into `cue cmd`,
+		// and instead give a high level overview of CUE and its commands.
+		// TODO(mvdan): cobra's help text template ends with
+		//     Use "cue [command] --help" for more information about a command.
+		// which isn't great; use our own template to say
+		//     Use "cue help [command]" for more information about a command.
+		// TODO(mvdan): cobra's help text template suggests help topics
+		// such as `cue inputs`; swap with `cue help inputs`.
 		Long: `cue evaluates CUE files, an extension of JSON, and sends them
 to user-defined commands for processing.
 
@@ -256,6 +264,8 @@ For more information on writing CUE configuration files see cuelang.org.`,
 	cmd.Flag("help").Hidden = true
 
 	// "help" is treated as a special command by cobra.
+	// TODO(mvdan): hide this command; `cue help` showing itself in the list of commands
+	// is not particularly helpful, and we alreayd mention it as the way to get help.
 	cmd.SetHelpCommand(newHelpCmd(c))
 
 	// For `cue mycmd` to be a shortcut for `cue cmd mycmd`.

@@ -48,6 +48,12 @@ stderr -count=1 '^Available Commands:$'
 stderr -count=1 'Unknown help topic: mod missing'
 stderr -count=1 '^Available Commands:$'
 
+# Requesting the help text for the help command itself is a bit silly.
+# `cue help` already describes how to query help for commands or topics.
+# Fail even though technically "help" is a valid command, just a special one.
+! exec cue help help
+stderr -count=1 'Unknown help topic: help'
+
 -- stdout.golden --
 cue evaluates CUE files, an extension of JSON, and sends them
 to user-defined commands for processing.
@@ -81,7 +87,7 @@ Available Commands:
   fix            rewrite packages to latest standards
   fmt            formats CUE configuration files
   get            add dependencies to the current module
-  help           Help about any command
+  help           show help text for a command or topic
   import         convert other formats to CUE files
   login          log into a CUE registry
   mod            module maintenance

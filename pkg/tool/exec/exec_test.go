@@ -93,3 +93,40 @@ func TestEnv(t *testing.T) {
 		})
 	}
 }
+
+func TestArgs(t *testing.T) {
+	testCases := []struct {
+		desc string
+		val  string
+		args []string
+	}{
+		{
+			desc: "string cmd parses args correctly",
+			val: `
+			cmd: "bash -c 'echo hello world'"
+			`,
+			args: []string{"bash", "-c", "echo hello world"},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			ctx := internal.NewContext()
+			v := ctx.CompileString(tc.val, cue.Filename(tc.desc))
+			if err := v.Err(); err != nil {
+				t.Fatal(err)
+			}
+
+			cmd, _, err := mkCommand(&task.Context{
+				Context: context.Background(),
+				Obj:     v,
+			})
+			if err != nil {
+				t.Fatalf("mkCommand error = %v", err)
+			}
+
+			if diff := cmp.Diff(cmd.Args, tc.args); diff != "" {
+				t.Error(diff)
+			}
+		})
+	}
+}

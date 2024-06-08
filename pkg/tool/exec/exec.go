@@ -17,11 +17,11 @@ package exec
 import (
 	"fmt"
 	"os/exec"
-	"strings"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/task"
+	"github.com/kballard/go-shellquote"
 )
 
 func init() {
@@ -114,7 +114,10 @@ func mkCommand(ctx *task.Context) (c *exec.Cmd, doc string, err error) {
 	case cue.StringKind:
 		str := ctx.String("cmd")
 		doc = str
-		list := strings.Fields(str)
+		list, err := shellquote.Split(str)
+		if err != nil {
+			return nil, "", fmt.Errorf("failed to split cmd args: %w", err)
+		}
 		bin = list[0]
 		args = append(args, list[1:]...)
 

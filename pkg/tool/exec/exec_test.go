@@ -99,13 +99,53 @@ func TestArgs(t *testing.T) {
 		desc string
 		val  string
 		args []string
+		doc  string
+		err  string
 	}{
 		{
 			desc: "string cmd parses args correctly",
 			val: `
-			cmd: "bash -c 'echo hello world'"
+			cmd: "bash -c \"echo hello world\""
 			`,
+			doc:  `bash -c 'echo hello world'`,
 			args: []string{"bash", "-c", "echo hello world"},
+		},
+		{
+			desc: "list cmd doc is joined correctly",
+			val: `
+			cmd: ["bash", "-c", "echo hello world"]
+			`,
+			doc:  `bash -c 'echo hello world'`,
+			args: []string{"bash", "-c", "echo hello world"},
+		},
+		{
+			desc: "empty cmd string errors correctly",
+			val: `
+			cmd: ""
+			`,
+			err: "empty command",
+		},
+		{
+			desc: "empty cmd list errors correctly",
+			val: `
+			cmd: []
+			`,
+			err: "empty command",
+		},
+		{
+			desc: "cmd string with starting space",
+			val: `
+			cmd: " abc"
+			`,
+			doc:  "abc",
+			args: []string{"abc"},
+		},
+		{
+			desc: "cmd list with empty bin",
+			val: `
+			cmd: [""]
+			`,
+			err: "empty command",
 		},
 	}
 	for _, tc := range testCases {
@@ -116,14 +156,20 @@ func TestArgs(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			cmd, _, err := mkCommand(&task.Context{
+			cmd, doc, err := mkCommand(&task.Context{
 				Context: context.Background(),
 				Obj:     v,
 			})
 			if err != nil {
-				t.Fatalf("mkCommand error = %v", err)
+				if diff := cmp.Diff(err.Error(), tc.err); diff != "" {
+					t.Error(diff)
+				}
+				return
 			}
 
+			if diff := cmp.Diff(doc, tc.doc); diff != "" {
+				t.Error(diff)
+			}
 			if diff := cmp.Diff(cmd.Args, tc.args); diff != "" {
 				t.Error(diff)
 			}

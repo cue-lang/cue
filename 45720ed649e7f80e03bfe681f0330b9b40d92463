@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40f0a5bc_a3ef50a7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-10T15:11:52Z",
+      "side": 1,
+      "message": "Note that I also switched us to quicktest as part of this change, hence the big reduction in lines of code in format_test.go.",
+      "revId": "45720ed649e7f80e03bfe681f0330b9b40d92463",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

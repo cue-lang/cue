@@ -17,19 +17,22 @@ package format
 // TODO: port more of the tests of go/printer
 
 import (
-	"bytes"
-	"fmt"
+	"io/fs"
 	"os"
+	"path"
 	"path/filepath"
+	"strings"
 	"testing"
-	"time"
+
+	"github.com/go-quicktest/qt"
+	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cuetest"
+	"cuelang.org/go/internal/txtarfs"
 )
 
 var (
@@ -37,181 +40,72 @@ var (
 	Fprint        = defaultConfig.fprint
 )
 
-const (
-	dataDir = "testdata"
-)
-
-type checkMode uint
-
-const (
-	_ checkMode = 1 << iota
-	idempotent
-	simplify
-	sortImps
-)
-
-// format parses src, prints the corresponding AST, verifies the resulting
-// src is syntactically correct, and returns the resulting src or an error
-// if any.
-func format(src []byte, mode checkMode) ([]byte, error) {
-	// parse src
-	opts := []Option{TabIndent(true)}
-	if mode&simplify != 0 {
-		opts = append(opts, Simplify())
-	}
-	if mode&sortImps != 0 {
-		opts = append(opts, sortImportsOption())
-	}
-
-	res, err := Source(src, opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	// make sure formatted output is syntactically correct
-	if _, err := parser.ParseFile("", res, parser.AllErrors); err != nil {
-		return nil, errors.Append(err.(errors.Error),
-			errors.Newf(token.NoPos, "re-parse failed: %s", res))
-	}
-
-	return res, nil
-}
-
-// lineAt returns the line in text starting at offset offs.
-func lineAt(text []byte, offs int) []byte {
-	i := offs
-	for i < len(text) && text[i] != '\n' {
-		i++
-	}
-	return text[offs:i]
-}
-
-// diff compares a and b.
-func diff(aname, bname string, a, b []byte) error {
-	var buf bytes.Buffer // holding long error message
-
-	// compare lengths
-	if len(a) != len(b) {
-		fmt.Fprintf(&buf, "\nlength changed: len(%s) = %d, len(%s) = %d", aname, len(a), bname, len(b))
-	}
-
-	// compare contents
-	line := 1
-	offs := 1
-	for i := 0; i < len(a) && i < len(b); i++ {
-		ch := a[i]
-		if ch != b[i] {
-			fmt.Fprintf(&buf, "\n%s:%d:%d: %s", aname, line, i-offs+1, lineAt(a, offs))
-			fmt.Fprintf(&buf, "\n%s:%d:%d: %s", bname, line, i-offs+1, lineAt(b, offs))
-			fmt.Fprintf(&buf, "\n\n")
-			break
-		}
-		if ch == '\n' {
-			line++
-			offs = i + 1
-		}
-	}
-
-	if buf.Len() > 0 {
-		return errors.New(buf.String())
-	}
-	return nil
-}
-
-func runcheck(t *testing.T, source, golden string, mode checkMode) {
-	src, err := os.ReadFile(source)
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	res, err := format(src, mode)
-	if err != nil {
-		b := &bytes.Buffer{}
-		errors.Print(b, err, nil)
-		t.Error(b.String())
-		return
-	}
-
-	// update golden files if necessary
-	if cuetest.UpdateGoldenFiles {
-		if err := os.WriteFile(golden, res, 0644); err != nil {
-			t.Error(err)
-		}
-		return
-	}
-
-	// get golden
-	gld, err := os.ReadFile(golden)
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	// formatted source and golden must be the same
-	if err := diff(source, golden, res, gld); err != nil {
-		t.Error(err)
-		return
-	}
-
-	if mode&idempotent != 0 {
-		// formatting golden must be idempotent
-		// (This is very difficult to achieve in general and for now
-		// it is only checked for files explicitly marked as such.)
-		res, err = format(gld, mode)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if err := diff(golden, fmt.Sprintf("format(%s)", golden), gld, res); err != nil {
-			t.Errorf("golden is not idempotent: %s", err)
-		}
-	}
-}
-
-func check(t *testing.T, source, golden string, mode checkMode) {
-	// run the test
-	cc := make(chan int)
-	go func() {
-		runcheck(t, source, golden, mode)
-		cc <- 0
-	}()
-
-	// wait with timeout
-	select {
-	case <-time.After(100000 * time.Second): // plenty of a safety margin, even for very slow machines
-		// test running past time out
-		t.Errorf("%s: running too slowly", source)
-	case <-cc:
-		// test finished within allotted time margin
-	}
-}
-
-type entry struct {
-	source, golden string
-	mode           checkMode
-}
-
-// Set CUE_UPDATE=1 to create/update the respective golden files.
-var data = []entry{
-	{"comments.input", "comments.golden", simplify},
-	{"simplify.input", "simplify.golden", simplify},
-	{"expressions.input", "expressions.golden", 0},
-	{"values.input", "values.golden", 0},
-	{"imports.input", "imports.golden", sortImps},
-}
-
 func TestFiles(t *testing.T) {
-	t.Parallel()
-	for _, e := range data {
-		source := filepath.Join(dataDir, e.source)
-		golden := filepath.Join(dataDir, e.golden)
-		mode := e.mode
-		t.Run(e.source, func(t *testing.T) {
-			t.Parallel()
-			check(t, source, golden, mode)
-			// TODO(gri) check that golden is idempotent
-			//check(t, golden, golden, e.mode)
-		})
+	txtarFiles, err := filepath.Glob("testdata/*.txtar")
+	qt.Assert(t, qt.IsNil(err))
+	for _, txtarFile := range txtarFiles {
+		ar, err := txtar.ParseFile(txtarFile)
+		qt.Assert(t, qt.IsNil(err))
+
+		opts := []Option{TabIndent(true)}
+		for _, word := range strings.Fields(string(ar.Comment)) {
+			switch word {
+			case "simplify":
+				opts = append(opts, Simplify())
+			case "sort-imports":
+				opts = append(opts, sortImportsOption())
+			}
+		}
+
+		tfs := txtarfs.FS(ar)
+		inputFiles, err := fs.Glob(tfs, "*.input")
+		qt.Assert(t, qt.IsNil(err))
+
+		for _, inputFile := range inputFiles {
+			goldenFile := strings.TrimSuffix(inputFile, ".input") + ".golden"
+			t.Run(path.Join(txtarFile, inputFile), func(t *testing.T) {
+				src, err := fs.ReadFile(tfs, inputFile)
+				qt.Assert(t, qt.IsNil(err))
+
+				res, err := Source(src, opts...)
+				qt.Assert(t, qt.IsNil(err))
+
+				// make sure formatted output is syntactically correct
+				_, err = parser.ParseFile("", res, parser.AllErrors)
+				qt.Assert(t, qt.IsNil(err))
+
+				// update golden files if necessary
+				// TODO(mvdan): deduplicate this code with UpdateGoldenFiles on txtar files?
+				if cuetest.UpdateGoldenFiles {
+					for i := range ar.Files {
+						file := &ar.Files[i]
+						if file.Name == goldenFile {
+							file.Data = res
+							return
+						}
+					}
+					ar.Files = append(ar.Files, txtar.File{
+						Name: goldenFile,
+						Data: res,
+					})
+					return
+				}
+
+				// get golden
+				gld, err := fs.ReadFile(tfs, goldenFile)
+				qt.Assert(t, qt.IsNil(err))
+
+				// formatted source and golden must be the same
+				qt.Assert(t, qt.Equals(string(res), string(gld)))
+
+				// TODO(mvdan): check that all files format in an idempotent way,
+				// i.e. that formatting a golden file results in no changes.
+			})
+		}
+		if cuetest.UpdateGoldenFiles {
+			err = os.WriteFile(txtarFile, txtar.Format(ar), 0o666)
+			qt.Assert(t, qt.IsNil(err))
+		}
 	}
 }
 
@@ -476,7 +370,7 @@ func TestX(t *testing.T) {
 	const src = `
 
 `
-	b, err := format([]byte(src), simplify)
+	b, err := Source([]byte(src), Simplify())
 	if err != nil {
 		t.Error(err)
 	}

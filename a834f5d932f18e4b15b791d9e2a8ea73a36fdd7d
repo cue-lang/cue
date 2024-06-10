@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "76004a68_d3ced4cd",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-10T14:01:49Z",
+      "side": 1,
+      "message": "did you mean to post this comment elsewhere? assuming you meant it for openTableArrays, note that we need to do a prefix search in some cases, which a map doesn\u0027t lend itself well to.\n\nI\u0027ve left a TODO about doing something relatively optimal for both use cases, such as a sorted slice, but I\u0027m not worrying about this for now given that we don\u0027t have any benchmarks yet. I\u0027m only focusing on the (reasonably) quickest path to a working encoding for now.",
+      "parentUuid": "22f5eacd_12c04982",
+      "revId": "a834f5d932f18e4b15b791d9e2a8ea73a36fdd7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "004e0cd9_dce23fea",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-05-24T10:55:43Z",
       "side": 1,
       "message": "So `level\u003d0` is invalid?",
+      "revId": "a834f5d932f18e4b15b791d9e2a8ea73a36fdd7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb8d541a_26f9238a",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-10T14:01:49Z",
+      "side": 1,
+      "message": "correct; made that clearer.",
+      "parentUuid": "004e0cd9_dce23fea",
       "revId": "a834f5d932f18e4b15b791d9e2a8ea73a36fdd7d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +122,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "827756f9_2ae08afa",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-10T14:01:49Z",
+      "side": 1,
+      "message": "see my other comment; not all lookups are exact, e.g. findArrayPrefix. a prefix lookup on a sorted slice would likely be better than on a map, given that we can do a binary search based on prefixes. I\u0027ve added to the TODO on the field name.",
+      "parentUuid": "a9e0365e_67ad845d",
+      "revId": "a834f5d932f18e4b15b791d9e2a8ea73a36fdd7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7790ae2e_0cc14cbb",
@@ -99,6 +153,24 @@
       "writtenOn": "2024-05-24T10:55:43Z",
       "side": 1,
       "message": "Creating this string in a loop is somewhat unfortunate, but the alternative seems ugly.",
+      "revId": "a834f5d932f18e4b15b791d9e2a8ea73a36fdd7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6e4d24b_94c3eb0e",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-10T14:01:49Z",
+      "side": 1,
+      "message": "indeed. I\u0027m leaving all of this stuff for future optimizations based on benchmarks, where added code/ugliness needs to show proof that it actually helps.",
+      "parentUuid": "7790ae2e_0cc14cbb",
       "revId": "a834f5d932f18e4b15b791d9e2a8ea73a36fdd7d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +192,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ea39c36_7a261cec",
+        "filename": "encoding/toml/decode_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 402,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-10T14:01:49Z",
+      "side": 1,
+      "message": "I\u0027m basically trying to mimic one line of TOML to one line of CUE. If TOML has `[foo]` followed by a key in a separate line, then I want two lines in CUE. If TOML has `[foo.bar.baz]` in a single line, then I want one line in CUE.\n\nThis is not a precise science, but it\u0027s basically about trying to keep the visual structure of the TOML in CUE. You can think of it as - TOML headers will also appear on their own lines in CUE.",
+      "parentUuid": "017d9d18_8a89efb6",
+      "revId": "a834f5d932f18e4b15b791d9e2a8ea73a36fdd7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "747f532e_9eb018ef",
@@ -137,6 +227,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cdfac294_115c26be",
+        "filename": "encoding/toml/decode_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 461,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-10T14:01:49Z",
+      "side": 1,
+      "message": "I don\u0027t think so; TOML calls these \"empty tables\", and a table is a map/struct. It would be imprecise to make it seem like a TOML table could be, for example, a CUE float or list.\n\nSimilarly, other TOML decoders decode empty tables as empty maps or structs.",
+      "parentUuid": "747f532e_9eb018ef",
+      "revId": "a834f5d932f18e4b15b791d9e2a8ea73a36fdd7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4b29da64_f19fff37",
@@ -150,6 +258,24 @@
       "writtenOn": "2024-05-24T10:55:43Z",
       "side": 1,
       "message": "So a numeric \"selector\" (for the lack of a better word) in TOML always implies array?",
+      "revId": "a834f5d932f18e4b15b791d9e2a8ea73a36fdd7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "83537896_382faa46",
+        "filename": "encoding/toml/decode_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 679,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-10T14:01:49Z",
+      "side": 1,
+      "message": "these \"selectors\" are just mine, entirely for the sake of reminding myself what is the structure of the test. They are just TOML strings :)",
+      "parentUuid": "4b29da64_f19fff37",
       "revId": "a834f5d932f18e4b15b791d9e2a8ea73a36fdd7d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

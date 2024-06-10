@@ -84,6 +84,23 @@
       "message": "Interesting that `ModuleRoot: \".\"` never really did what I (we?) expected. I\u0027ve added a TODO to perhaps make cue/load fail if Config.ModuleRoot points to a directory which is not a module root.",
       "revId": "c9d6f7edc8e30376dfb784ca0c47a017a57ab8bf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15af6c8e_1e0fd7da",
+        "filename": "cue/load/loader_test.go",
+        "patchSetId": 18
+      },
+      "lineNbr": 471,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-10T10:22:04Z",
+      "side": 1,
+      "message": "FWIW I think this change should have been kept - it prevents a panic when there are more instances returned than expected.",
+      "revId": "c9d6f7edc8e30376dfb784ca0c47a017a57ab8bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

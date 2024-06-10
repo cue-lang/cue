@@ -706,7 +706,7 @@ func isEqualNodeValue(x, y *nodeContext) bool {
 	if x.hasTop != y.hasTop {
 		return false
 	}
-	if !isEqualBaseValue(x.ctx, x.scalar, y.scalar) {
+	if !isEqualValue(x.ctx, x.scalar, y.scalar) {
 		return false
 	}
 
@@ -718,10 +718,10 @@ func isEqualNodeValue(x, y *nodeContext) bool {
 		return false
 	}
 
-	if !isEqualBaseValue(x.ctx, x.lowerBound, y.lowerBound) {
+	if !isEqualValue(x.ctx, x.lowerBound, y.lowerBound) {
 		return false
 	}
-	if !isEqualBaseValue(x.ctx, x.upperBound, y.upperBound) {
+	if !isEqualValue(x.ctx, x.upperBound, y.upperBound) {
 		return false
 	}
 
@@ -749,15 +749,20 @@ func isEqualNodeValue(x, y *nodeContext) bool {
 	return true
 }
 
-func isEqualBaseValue(ctx *OpContext, x, y BaseValue) bool {
+type ComparableValue interface {
+	comparable
+	Value
+}
+
+func isEqualValue[P ComparableValue](ctx *OpContext, x, y P) bool {
+	var zero P
+
 	if x == y {
 		return true
 	}
-	xv, _ := x.(Value)
-	yv, _ := y.(Value)
-	if xv == nil || yv == nil {
+	if x == zero || y == zero {
 		return false
 	}
 
-	return Equal(ctx, xv, yv, CheckStructural)
+	return Equal(ctx, x, y, CheckStructural)
 }

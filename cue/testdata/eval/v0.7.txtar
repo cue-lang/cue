@@ -204,16 +204,26 @@ mutual: t4: ok: {
 	check: p1 & p2 & p3 & p4 & p5
 }
 
--- out/eval/stats --
-Leaks:  0
-Freed:  261
-Reused: 249
-Allocs: 12
-Retain: 166
+-- equality.cue --
+issue3194: reduced: {
+	A: *0 | >10
+	A: *0 | >10
+	{
+		out: close({ b: A })
+		out: b: A
+	}.out
+}
 
-Unifications: 261
-Conjuncts:    1578
-Disjuncts:    408
+-- out/eval/stats --
+Leaks:  4
+Freed:  285
+Reused: 273
+Allocs: 16
+Retain: 170
+
+Unifications: 269
+Conjuncts:    1619
+Disjuncts:    436
 -- out/eval --
 Errors:
 definition.t0.err.d1.env.c: field not allowed:
@@ -375,6 +385,12 @@ Result:
           }
         }
       }
+    }
+  }
+  issue3194: (struct){
+    reduced: (#struct){
+      A: (number){ |(*(int){ 0 }, (number){ >10 }) }
+      b: (number){ |(*(int){ 0 }, (number){ >10 }) }
     }
   }
   expr: (struct){
@@ -666,6 +682,16 @@ Result:
     }
   }
 }
+-- out/evalalpha/stats --
+Leaks:  288
+Freed:  16
+Reused: 16
+Allocs: 288
+Retain: 0
+
+Unifications: 258
+Conjuncts:    2303
+Disjuncts:    44
 -- out/evalalpha --
 Errors:
 definition.t0.err.d1.env.c: field not allowed:
@@ -810,6 +836,12 @@ Result:
           }
         }
       }
+    }
+  }
+  issue3194: (struct){
+    reduced: (#struct){
+      A: (number){ |(*(int){ 0 }, (number){ >10 }) }
+      b: (number){ |(*(int){ 0 }, (number){ >10 }) }
     }
   }
   expr: (struct){
@@ -1096,6 +1128,28 @@ Result:
     }
   }
 }
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  4
+-Freed:  285
+-Reused: 273
+-Allocs: 16
+-Retain: 170
++Leaks:  288
++Freed:  16
++Reused: 16
++Allocs: 288
++Retain: 0
+ 
+-Unifications: 269
+-Conjuncts:    1619
+-Disjuncts:    436
++Unifications: 258
++Conjuncts:    2303
++Disjuncts:    44
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
@@ -1210,7 +1264,7 @@ diff old new
            }
            #A: (#struct){
              a: (int){ int }
-@@ -196,8 +179,7 @@
+@@ -202,8 +185,7 @@
        }
      }
    }
@@ -1220,7 +1274,7 @@ diff old new
      t0: (struct){
        ok: (struct){
          c: (struct){
-@@ -264,134 +246,130 @@
+@@ -270,134 +252,130 @@
          }
        }
      }
@@ -1479,7 +1533,7 @@ diff old new
              }
            }
          }
-@@ -401,23 +379,23 @@
+@@ -407,23 +385,23 @@
                d: (struct){
                  b: (int){ 2 }
                }
@@ -1692,6 +1746,23 @@ Reordering / positions.
           }
         }
       }
+    }
+  }
+}
+--- equality.cue
+{
+  issue3194: {
+    reduced: {
+      A: (*0|>10)
+      A: (*0|>10)
+      {
+        out: close({
+          b: 〈2;A〉
+        })
+        out: {
+          b: 〈2;A〉
+        }
+      }.out
     }
   }
 }

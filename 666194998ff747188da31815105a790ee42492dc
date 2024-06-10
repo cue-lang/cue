@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d023aaf7_08b5b224",
+        "filename": "internal/mod/modpkgload/pkgload.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-10T09:23:45Z",
+      "side": 1,
+      "message": "FWIW it shouldn\u0027t double the number of io/fs operations because we cause the first iteration to terminate immediately an entry is found. So the number of io/fs operations should only increase marginally, assuming the iterator is implemented in a reasonable fashion.",
+      "revId": "666194998ff747188da31815105a790ee42492dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

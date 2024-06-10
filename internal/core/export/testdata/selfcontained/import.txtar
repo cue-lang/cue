@@ -144,13 +144,13 @@ diff old new
 -	y: x
 -}
 +v: V
-
+ 
  // Do not simplify because of multiple usages of enclosing struct.
  x: B.c
 @@ -24,6 +21,12 @@
  run:     exec.Run
  _hidden: int
-
+ 
 +//cue:path: "mod.test/a/pkg".v.v
 +let V = {
 +	x: 3

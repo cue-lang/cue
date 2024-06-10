@@ -34,6 +34,24 @@
       "parentUuid": "93d43643_2d20c796",
       "revId": "f8ce56364b1f1bd1ef6a15fd9537f6d5ed647bbc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3a8e767_7a8cffcb",
+        "filename": "internal/mod/modimports/modimports.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-10T09:21:46Z",
+      "side": 1,
+      "message": "Except that it\u0027s not just a cue/load term; see https://cuelang.org/docs/concept/modules-packages-instances/#instances\n\nI agree that the distinction between package and instance is blurry, but at least we should aim to not make it even blurrier.",
+      "parentUuid": "7edaf1e2_664dede8",
+      "revId": "f8ce56364b1f1bd1ef6a15fd9537f6d5ed647bbc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

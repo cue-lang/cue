@@ -228,6 +228,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dcf68239_6cc265f2",
+        "filename": "cue/format/node.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 705,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-10T15:10:01Z",
+      "side": 1,
+      "message": "ack; updated the comment",
+      "parentUuid": "2ebfd3c6_0d545676",
+      "range": {
+        "startLine": 705,
+        "startChar": 0,
+        "endLine": 705,
+        "endChar": 1
+      },
+      "revId": "2b7d5be55e8a4516ff1eaac730bb35d7ded3b19e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5e8fe369_f46b1a01",
@@ -259,6 +283,24 @@
       "side": 1,
       "message": "It\u0027s a legacy artifact of the original name of the function: https://github.com/golang/go/blob/5fcd1badf724db853784243b29711df209976873/src/cmd/compile/internal/syntax/printer.go#L236",
       "parentUuid": "5e8fe369_f46b1a01",
+      "revId": "2b7d5be55e8a4516ff1eaac730bb35d7ded3b19e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f79c308_ef928b45",
+        "filename": "cue/format/printer.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-10T15:10:01Z",
+      "side": 1,
+      "message": "ack; updated as a TODO with context.",
+      "parentUuid": "26ae7f56_5efeb440",
       "revId": "2b7d5be55e8a4516ff1eaac730bb35d7ded3b19e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fcf35c5_566811e1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-10T14:13:20Z",
+      "side": 1,
+      "message": "this CL still shows in my dashboard as \"pending comments\". posting a reply in hopes it gets gerrithub to stop being silly.",
+      "revId": "d3c72bf637bd802606d23fc614bbba0499972567",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -16,6 +16,24 @@
       "message": "I reckon this API should now be called InstanceFiles to be clearer; I\u0027ve added a TODO to minimize churn and conflicts.",
       "revId": "f8ce56364b1f1bd1ef6a15fd9537f6d5ed647bbc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7edaf1e2_664dede8",
+        "filename": "internal/mod/modimports/modimports.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-10T09:20:28Z",
+      "side": 1,
+      "message": "FWIW I\u0027m not convinced about that naming. \"Instance\" is a term used in cue/load but it doesn\u0027t really correspond well to CUE language concepts AFAICS. \"Package\" does seem like the most applicable term here AFAICS. In CUE, a package really does include files from its parent directories.",
+      "parentUuid": "93d43643_2d20c796",
+      "revId": "f8ce56364b1f1bd1ef6a15fd9537f6d5ed647bbc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

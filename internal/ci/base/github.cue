@@ -280,6 +280,7 @@ isReleaseTag: {
 
 checkGitClean: json.#step & {
 	name: "Check that git is clean at the end of the job"
+	if:   "always()"
 	run:  "test -z \"$(git status --porcelain)\" || (git status; git diff; false)"
 }
 

@@ -69,6 +69,24 @@
       "parentUuid": "42227b16_289e2db8",
       "revId": "a94f9661e544ac12bef9e9062c02a5db3a2071b3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6f205b0_652b0174",
+        "filename": "cue/load/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 423,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-11T19:53:43Z",
+      "side": 1,
+      "message": "tbh I don\u0027t really understand why the Module field is present at all, and I suspect that no-one uses it in practice, but that is a valid point (and probably is an issue for the current modules code too). I\u0027ll change that check to allow a missing major version.",
+      "parentUuid": "6d341d5c_c298158c",
+      "revId": "a94f9661e544ac12bef9e9062c02a5db3a2071b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

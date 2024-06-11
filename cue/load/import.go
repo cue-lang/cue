@@ -424,7 +424,7 @@ func (l *loader) absDirFromImportPath1(pos token.Pos, p importPath) (absDir stri
 		// should we not be using either the original path or the canonical path?
 		// The unqualified import path should only be used for filepath.FromSlash further below.
 		if pkg == nil {
-			return "", fmt.Errorf("no dependency found for package %q", unqualified)
+			return "", fmt.Errorf("no dependency found for package %q (original %q)", unqualified, p)
 		}
 		if err := pkg.Error(); err != nil {
 			return "", fmt.Errorf("cannot find package %q: %v", unqualified, err)

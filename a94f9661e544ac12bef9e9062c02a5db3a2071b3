@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "44a59bc4_4421deba",
+        "filename": "cue/load/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-11T20:39:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "261684ed_e269d478",
+      "revId": "a94f9661e544ac12bef9e9062c02a5db3a2071b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "11ef5500_fb7eb8ad",
@@ -103,6 +121,24 @@
       "side": 1,
       "message": "Interestingly there is not one single test case that covers Config.Module or anywhere in the cue source code that uses it outside the cue/load package.",
       "parentUuid": "c6f205b0_652b0174",
+      "revId": "a94f9661e544ac12bef9e9062c02a5db3a2071b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0dad2d85_9edafe4b",
+        "filename": "cue/load/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 423,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-11T20:39:58Z",
+      "side": 1,
+      "message": "Done that now.",
+      "parentUuid": "e89fefef_6b7f14d0",
       "revId": "a94f9661e544ac12bef9e9062c02a5db3a2071b3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

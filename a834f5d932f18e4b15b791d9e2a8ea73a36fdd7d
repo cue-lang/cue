@@ -105,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3c915d1_26a5f6ec",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-11T07:52:08Z",
+      "side": 1,
+      "message": "I had written a reply here, not sure where it went. All errors for now lack positions, there\u0027s a TODO at the top of the file.",
+      "parentUuid": "09265dec_32566b27",
+      "revId": "a834f5d932f18e4b15b791d9e2a8ea73a36fdd7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a9e0365e_67ad845d",

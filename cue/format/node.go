@@ -462,10 +462,16 @@ func (f *formatter) nextNeedsFormfeed(n ast.Expr) bool {
 		return strings.IndexByte(x.Value, '\n') >= 0
 	case *ast.ListLit:
 		return true
+	case *ast.ParenExpr:
+		return f.nextNeedsFormfeed(x.X)
 	case *ast.UnaryExpr:
 		return f.nextNeedsFormfeed(x.X)
 	case *ast.BinaryExpr:
 		return f.nextNeedsFormfeed(x.X) || f.nextNeedsFormfeed(x.Y)
+	case *ast.IndexExpr:
+		return f.nextNeedsFormfeed(x.X)
+	case *ast.SelectorExpr:
+		return f.nextNeedsFormfeed(x.X)
 	case *ast.CallExpr:
 		for _, arg := range x.Args {
 			if f.nextNeedsFormfeed(arg) {

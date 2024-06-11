@@ -87,6 +87,24 @@
       "parentUuid": "6d341d5c_c298158c",
       "revId": "a94f9661e544ac12bef9e9062c02a5db3a2071b3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e89fefef_6b7f14d0",
+        "filename": "cue/load/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 423,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-11T20:07:54Z",
+      "side": 1,
+      "message": "Interestingly there is not one single test case that covers Config.Module or anywhere in the cue source code that uses it outside the cue/load package.",
+      "parentUuid": "c6f205b0_652b0174",
+      "revId": "a94f9661e544ac12bef9e9062c02a5db3a2071b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

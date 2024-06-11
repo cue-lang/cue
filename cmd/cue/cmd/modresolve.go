@@ -21,12 +21,13 @@ import (
 	"cuelabs.dev/go/oci/ociregistry/ociref"
 	"github.com/spf13/cobra"
 
+	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
 )
 
 func newModResolveCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "resolve <modulepath>[@<version>] ...",
+		Use:   "resolve [<modulepath>[@<version>] ...]",
 		Short: "Show how a module path resolves to a registry",
 		Long: `This command prints information about how a given
 module path will resolve to an actual registry in the
@@ -39,6 +40,10 @@ It only consults local information - it works lexically
 with respect to the registry configuration (see "cue help registryconfig")
 and does not make any network calls to check whether
 the module exists.
+
+If no arguments are provided, the current module path is used.
+This is equivalent to specifying "." as an argument, which
+also refers to the current module.
 
 Note that this command is not yet stable and may be changed.
 `,
@@ -55,15 +60,31 @@ func runModResolve(cmd *Command, args []string) error {
 	if resolver == nil {
 		return fmt.Errorf("modules experiment not enabled (enable with CUE_EXPERIMENT=modules)")
 	}
+	var mf *modfile.File
+	if len(args) == 0 {
+		// Use the current module if no arguments are provided.
+		args = []string{"."}
+	}
 
 	for _, arg := range args {
+		if arg == "." {
+			if mf == nil {
+				var err error
+				_, mf, _, err = readModuleFile()
+				if err != nil {
+					return err
+				}
+			}
+			arg = mf.Module
+		}
+
 		mpath, vers, ok := strings.Cut(arg, "@")
 		if ok {
 			if _, err := module.ParseVersion(arg); err != nil {
 				return fmt.Errorf("invalid module path: %v", err)
 			}
 		} else {
-			mpath = args[0]
+			mpath = arg
 			if err := module.CheckPathWithoutVersion(arg); err != nil {
 				return fmt.Errorf("invalid module path: %v", err)
 			}

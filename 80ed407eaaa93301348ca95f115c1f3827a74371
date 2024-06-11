@@ -16,6 +16,23 @@
       "message": "PTAL, should no longer need a hold.",
       "revId": "80ed407eaaa93301348ca95f115c1f3827a74371",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b24d454b_9cb90f33",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-11T08:45:42Z",
+      "side": 1,
+      "message": "Friendly ping, Marcel, I think you forgot to remove the hold vote. I can\u0027t submit.",
+      "revId": "80ed407eaaa93301348ca95f115c1f3827a74371",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

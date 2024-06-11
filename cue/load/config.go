@@ -20,6 +20,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -135,8 +136,15 @@ type Config struct {
 	ModuleRoot string
 
 	// Module specifies the module prefix. If not empty, this value must match
-	// the module field of an existing cue.mod file.
+	// the module field of an existing cue.mod file, with the exception
+	// that if it does not contain a major version suffix, it must match the
+	// path part of the module field.
 	Module string
+
+	// AcceptLegacyModuleFiles causes the module resolution code
+	// to accept module files that lack a language.version field.
+	// When there is such a module file,
+	AcceptLegacyModuleFiles bool
 
 	// modFile holds the contents of the module file, or nil
 	// if no module file was present. If non-nil, then
@@ -414,6 +422,8 @@ func (c *Config) loadModule() error {
 	parseModFile := modfile.ParseNonStrict
 	if c.Registry == nil {
 		parseModFile = modfile.ParseLegacy
+	} else if c.AcceptLegacyModuleFiles {
+		parseModFile = modfile.FixLegacy
 	}
 	mf, err := parseModFile(data, mod)
 	if err != nil {
@@ -426,7 +436,23 @@ func (c *Config) loadModule() error {
 		return nil
 	}
 	if c.Module != "" && c.Module != mf.Module {
-		return errors.Newf(token.NoPos, "inconsistent modules: got %q, want %q", mf.Module, c.Module)
+		if !strings.Contains(c.Module, "@") {
+			// There is no major version suffix in the Config.Module field.
+			// Infer it from the major version suffix in the module file.
+			// This covers the specific situation where a caller
+			// is using AcceptLegacyModuleFiles and also setting the Module
+			// field to match the non-major-version-suffix-containing
+			// module path in the module.cue file.
+			modPath := mf.Module
+			if p, _, ok := module.SplitPathVersion(mf.Module); ok {
+				modPath = p
+			}
+			if modPath != c.Module {
+				return errors.Newf(token.NoPos, "inconsistent module path: got %q, want %q", modPath, c.Module)
+			}
+		} else {
+			return errors.Newf(token.NoPos, "inconsistent modules: got %q, want %q", mf.Module, c.Module)
+		}
 	}
 	c.Module = mf.Module
 	return nil

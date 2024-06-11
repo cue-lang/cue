@@ -16,6 +16,24 @@
       "message": "I was bitten by this issue just this morning, writing examples for cuelang.org. If this change fixes https://github.com/cue-lang/cue/issues/722 that\u0027ll be fantastic!",
       "revId": "788d7d659dd31a2330e1906ab4005fdbd462b861",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "88a46c6e_a9a9cb14",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-11T19:53:22Z",
+      "side": 1,
+      "message": "Good point, this is indeed 722 :) will add a \"fixes\".",
+      "parentUuid": "923eb3fb_904f0c15",
+      "revId": "788d7d659dd31a2330e1906ab4005fdbd462b861",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

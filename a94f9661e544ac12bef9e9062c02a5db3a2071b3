@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "261684ed_e269d478",
+        "filename": "cue/load/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-11T19:43:35Z",
+      "side": 1,
+      "message": "incomplete?",
+      "revId": "a94f9661e544ac12bef9e9062c02a5db3a2071b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "11ef5500_fb7eb8ad",
         "filename": "cue/load/config.go",
         "patchSetId": 1

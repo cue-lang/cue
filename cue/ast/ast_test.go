@@ -41,19 +41,7 @@ func TestCommentText(t *testing.T) {
 		{[]string{"// foo  bar  "}, "foo  bar\n"},
 		{[]string{"// foo", "// bar"}, "foo\nbar\n"},
 		{[]string{"// foo", "//", "//", "//", "// bar"}, "foo\n\nbar\n"},
-		{[]string{"// foo", "/* bar */"}, "foo\n bar\n"},
 		{[]string{"//", "//", "//", "// foo", "//", "//", "//"}, "foo\n"},
-
-		{[]string{"/**/"}, ""},
-		{[]string{"/*   */"}, ""},
-		{[]string{"/**/", "/**/", "/*   */"}, ""},
-		{[]string{"/* Foo   */"}, " Foo\n"},
-		{[]string{"/* Foo  Bar  */"}, " Foo  Bar\n"},
-		{[]string{"/* Foo*/", "/* Bar*/"}, " Foo\n Bar\n"},
-		{[]string{"/* Foo*/", "/**/", "/**/", "/**/", "// Bar"}, " Foo\n\nBar\n"},
-		{[]string{"/* Foo*/", "/*\n*/", "//", "/*\n*/", "// Bar"}, " Foo\n\nBar\n"},
-		{[]string{"/* Foo*/", "// Bar"}, " Foo\nBar\n"},
-		{[]string{"/* Foo\n Bar*/"}, " Foo\n Bar\n"},
 	}
 
 	for i, c := range testCases {

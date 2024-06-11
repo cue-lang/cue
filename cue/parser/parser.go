@@ -274,19 +274,7 @@ func (p *parser) next0() {
 
 // Consume a comment and return it and the line on which it ends.
 func (p *parser) consumeComment() (comment *ast.Comment, endline int) {
-	// /*-style comments may end on a different line than where they start.
-	// Scan the comment for '\n' chars and adjust endline accordingly.
 	endline = p.file.Line(p.pos)
-	if p.lit[1] == '*' {
-		p.assertV0(p.pos, 0, 10, "block quotes")
-
-		// don't use range here - no need to decode Unicode code points
-		for i := 0; i < len(p.lit); i++ {
-			if p.lit[i] == '\n' {
-				endline++
-			}
-		}
-	}
 
 	comment = &ast.Comment{Slash: p.pos, Text: p.lit}
 	p.next0()

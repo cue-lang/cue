@@ -20,8 +20,6 @@
 package fix
 
 import (
-	"strings"
-
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/token"
@@ -63,39 +61,6 @@ func File(f *ast.File, o ...Option) *ast.File {
 		}
 		return true
 	}, nil).(*ast.File)
-
-	// Rewrite block comments to regular comments.
-	ast.Walk(f, func(n ast.Node) bool {
-		switch x := n.(type) {
-		case *ast.CommentGroup:
-			comments := []*ast.Comment{}
-			for _, c := range x.List {
-				s := c.Text
-				if !strings.HasPrefix(s, "/*") || !strings.HasSuffix(s, "*/") {
-					comments = append(comments, c)
-					continue
-				}
-				if x.Position > 0 {
-					// Moving to the end doesn't work, as it still
-					// may inject at a false line break position.
-					x.Position = 0
-					x.Doc = true
-				}
-				s = strings.TrimSpace(s[2 : len(s)-2])
-				for _, s := range strings.Split(s, "\n") {
-					for i := 0; i < 3; i++ {
-						if strings.HasPrefix(s, " ") || strings.HasPrefix(s, "*") {
-							s = s[1:]
-						}
-					}
-					comments = append(comments, &ast.Comment{Text: "// " + s})
-				}
-			}
-			x.List = comments
-			return false
-		}
-		return true
-	}, nil)
 
 	// TODO: we are probably reintroducing slices. Disable for now.
 	//

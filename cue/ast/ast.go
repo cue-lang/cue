@@ -176,10 +176,10 @@ func (c *comments) SetComments(cgs []*CommentGroup) {
 	*c.groups = cgs
 }
 
-// A Comment node represents a single //-style or /*-style comment.
+// A Comment node represents a single //-style comment.
 type Comment struct {
 	Slash token.Pos // position of "/" starting the comment
-	Text  string    // comment text (excluding '\n' for //-style comments)
+	Text  string    // comment text excluding '\n'
 }
 
 func (c *Comment) Comments() []*CommentGroup { return nil }
@@ -226,7 +226,7 @@ func stripTrailingWhitespace(s string) string {
 }
 
 // Text returns the text of the comment.
-// Comment markers (//, /*, and */), the first space of a line comment, and
+// Comment markers ("//"), the first space of a line comment, and
 // leading and trailing empty lines are removed. Multiple empty lines are
 // reduced to one, and trailing space on lines is trimmed. Unless the result
 // is empty, it is newline-terminated.
@@ -243,17 +243,10 @@ func (g *CommentGroup) Text() string {
 	for _, c := range comments {
 		// Remove comment markers.
 		// The parser has given us exactly the comment text.
-		switch c[1] {
-		case '/':
-			//-style comment (no newline at the end)
-			c = c[2:]
-			// strip first space - required for Example tests
-			if len(c) > 0 && c[0] == ' ' {
-				c = c[1:]
-			}
-		case '*':
-			/*-style comment */
-			c = c[2 : len(c)-2]
+		c = c[2:]
+		// strip first space - required for Example tests
+		if len(c) > 0 && c[0] == ' ' {
+			c = c[1:]
 		}
 
 		// Split on newlines.

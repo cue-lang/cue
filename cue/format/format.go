@@ -25,7 +25,6 @@ package format
 import (
 	"bytes"
 	"fmt"
-	"strings"
 	"text/tabwriter"
 
 	"cuelang.org/go/cue/ast"
@@ -320,22 +319,15 @@ func (f *formatter) printComment(cg *ast.CommentGroup) {
 		printBlank = true
 	}
 	for _, c := range cg.List {
-		isEnd := strings.HasPrefix(c.Text, "//")
 		if !printBlank {
-			if isEnd {
-				f.Print(vtab)
-			} else {
-				f.Print(blank)
-			}
+			f.Print(vtab)
 		}
 		f.Print(c.Slash)
 		f.Print(c)
-		if isEnd {
-			f.printingComment = true
-			f.Print(newline)
-			if cg.Doc {
-				f.Print(nooverride)
-			}
+		f.printingComment = true
+		f.Print(newline)
+		if cg.Doc {
+			f.Print(nooverride)
 		}
 	}
 }

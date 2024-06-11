@@ -58,7 +58,6 @@ func Instances(args []string, c *Config) []*build.Instance {
 	if len(args) == 0 {
 		args = []string{"."}
 	}
-
 	// TODO: This requires packages to be placed before files. At some point this
 	// could be relaxed.
 	i := 0
@@ -75,6 +74,25 @@ func Instances(args []string, c *Config) []*build.Instance {
 			return []*build.Instance{c.newErrInstance(err)}
 		}
 	}
+	if c.Package != "" && c.Package != "_" && c.Package != "*" {
+		// The caller has specified an explicit package to load.
+		// This is essentially the same as passing an explicit package
+		// qualifier to all package arguments that don't already have
+		// one. We add that qualifier here so that there's a distinction
+		// between package paths specified as arguments, which
+		// have the qualifier added, and package paths that are dependencies
+		// of those, which don't.
+		pkgArgs1 := make([]string, 0, len(pkgArgs))
+		for _, p := range pkgArgs {
+			if ip := module.ParseImportPath(p); !ip.ExplicitQualifier {
+				ip.Qualifier = c.Package
+				p = ip.String()
+			}
+			pkgArgs1 = append(pkgArgs1, p)
+		}
+		pkgArgs = pkgArgs1
+	}
+
 	synCache := newSyntaxCache(c)
 	tg := newTagger(c)
 	// Pass all arguments that look like packages to loadPackages

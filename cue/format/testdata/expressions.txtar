@@ -566,7 +566,6 @@ import "list"
 	s: [string]: {s: string}
 }
 -- issue2496.input --
-// TODO(mvdan): we indent the list elements too much.
 machine_type: [
 	if arch == "amd" {"n2-standard-2"},
 	if arch == "arm" {"t2a-standard-2"},
@@ -589,19 +588,18 @@ _foo: {
 	// skip_create_image: true
 }
 -- issue2496.golden --
-// TODO(mvdan): we indent the list elements too much.
 machine_type: [
-		if arch == "amd" {"n2-standard-2"},
-		if arch == "arm" {"t2a-standard-2"},
-		"unknown arch",
+	if arch == "amd" {"n2-standard-2"},
+	if arch == "arm" {"t2a-standard-2"},
+	"unknown arch",
 ][0]
 
 long_field_name: ([
-			"foo",
+	"foo",
 ])
 
 long_field_name: [
-			"foo",
+	"foo",
 ].bar
 
 // TODO(mvdan): we insert an empty line between the definitions.

@@ -358,7 +358,75 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/cycle
 display:./cycle
 files:
-    $CWD/testdata/testmod/cycle/cycle.cue`}}
+    $CWD/testdata/testmod/cycle/cycle.cue`}, {
+		name: "AcceptLegacyModuleWithLegacyModule",
+		cfg: &Config{
+			Dir:                     testdata("testmod_legacy"),
+			AcceptLegacyModuleFiles: true,
+		},
+		want: `path:   test.example/foo@v0
+module: test.example/foo@v0
+root:   $CWD/testdata/testmod_legacy
+dir:    $CWD/testdata/testmod_legacy
+display:.
+files:
+    $CWD/testdata/testmod_legacy/foo.cue`}, {
+		name: "AcceptLegacyModuleWithNonLegacyModule",
+		cfg: &Config{
+			Dir:                     testdataDir,
+			Tools:                   true,
+			AcceptLegacyModuleFiles: true,
+		},
+		args: []string{"./imports"},
+		want: `path:   mod.test/test/imports@v0
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/imports
+display:./imports
+files:
+    $CWD/testdata/testmod/imports/imports.cue
+imports:
+    mod.test/catch: $CWD/testdata/testmod/cue.mod/pkg/mod.test/catch/catch.cue
+    mod.test/helper:helper1: $CWD/testdata/testmod/cue.mod/pkg/mod.test/helper/helper1.cue`}, {
+		name: "MismatchedModulePathInConfig",
+		cfg: &Config{
+			Dir:    testdataDir,
+			Tools:  true,
+			Module: "wrong.test@v0",
+		},
+		args: []string{"./imports"},
+		want: `err:    inconsistent modules: got "mod.test/test@v0", want "wrong.test@v0"
+path:   ""
+module: wrong.test@v0
+root:   ""
+dir:    ""
+display:""`}, {
+		name: "ModulePathInConfigWithoutMajorVersion",
+		cfg: &Config{
+			Dir:    testdataDir,
+			Tools:  true,
+			Module: "mod.test/test",
+		},
+		args: []string{"./imports"},
+		want: `err:    inconsistent modules: got "mod.test/test@v0", want "mod.test/test"
+path:   ""
+module: mod.test/test
+root:   ""
+dir:    ""
+display:""`}, {
+		name: "ModulePathInConfigWithoutMajorVersionAndMismatchedPath",
+		cfg: &Config{
+			Dir:    testdataDir,
+			Tools:  true,
+			Module: "mod.test/wrong",
+		},
+		args: []string{"./imports"},
+		want: `err:    inconsistent modules: got "mod.test/test@v0", want "mod.test/wrong"
+path:   ""
+module: mod.test/wrong
+root:   ""
+dir:    ""
+display:""`}}
 	tdtest.Run(t, testCases, func(t *tdtest.T, tc *loadTest) {
 		pkgs := Instances(tc.args, tc.cfg)
 

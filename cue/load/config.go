@@ -138,6 +138,10 @@ type Config struct {
 	// the module field of an existing cue.mod file.
 	Module string
 
+	// AcceptLegacyModules causes the module resolution code
+	// to accept module files that lack a language.version field.
+	AcceptLegacyModules bool
+
 	// modFile holds the contents of the module file, or nil
 	// if no module file was present. If non-nil, then
 	// after calling Config.complete, modFile.Module will be
@@ -414,6 +418,13 @@ func (c *Config) loadModule() error {
 	parseModFile := modfile.ParseNonStrict
 	if c.Registry == nil {
 		parseModFile = modfile.ParseLegacy
+	} else if c.AcceptLegacyModules {
+		// Note: technically this does not support all legacy module
+		// files because some old module files might contain non-concrete
+		// data, but that seems like an OK restriction for now at least,
+		// given that no actual instances of non-concrete data in
+		// module files have been discovered in the wild.
+		parseModFile = modfile.FixLegacy
 	}
 	mf, err := parseModFile(data, mod)
 	if err != nil {

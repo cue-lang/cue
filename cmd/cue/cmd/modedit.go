@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"fmt"
 	"os"
-	"path/filepath"
 	"strconv"
 
 	"cuelang.org/go/internal/cueversion"
@@ -71,16 +70,7 @@ type modEditCmd struct {
 }
 
 func (c *modEditCmd) run(cmd *Command, args []string) error {
-	modRoot, err := findModuleRoot()
-	if err != nil {
-		return err
-	}
-	modPath := filepath.Join(modRoot, "cue.mod", "module.cue")
-	data, err := os.ReadFile(modPath)
-	if err != nil {
-		return err
-	}
-	mf, err := modfile.ParseNonStrict(data, modPath)
+	modPath, mf, data, err := readModuleFile()
 	if err != nil {
 		return err
 	}

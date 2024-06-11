@@ -137,7 +137,7 @@ diff old new
 +++ new
 @@ -1,10 +1,7 @@
  import "tool/exec"
-
+ 
  // Can be inlined.
 -v: {
 -	x: 3

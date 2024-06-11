@@ -589,7 +589,7 @@ _foo: {
 	// skip_create_image: true
 }
 -- issue2496.golden --
-		// TODO(mvdan): we indent the list elements too much.
+// TODO(mvdan): we indent the list elements too much.
 machine_type: [
 		if arch == "amd" {"n2-standard-2"},
 		if arch == "arm" {"t2a-standard-2"},

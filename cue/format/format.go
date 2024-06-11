@@ -313,13 +313,12 @@ func (f *formatter) visitComments(until int8) {
 func (f *formatter) printComment(cg *ast.CommentGroup) {
 	f.Print(cg)
 
-	printBlank := false
 	if cg.Doc && len(f.output) > 0 {
 		f.Print(newline)
-		printBlank = true
 	}
 	for _, c := range cg.List {
-		if !printBlank {
+		if f.pos.Column > 1 {
+			// Vertically align inline comments.
 			f.Print(vtab)
 		}
 		f.Print(c.Slash)

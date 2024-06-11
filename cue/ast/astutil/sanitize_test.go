@@ -101,7 +101,7 @@ a: bar.Min()
 			spec2 := ast.NewImport(nil, "foo/bar")
 			spec3 := ast.NewImport(ast.NewIdent("bar"), "foo")
 			return &ast.File{Decls: []ast.Decl{
-				internal.NewComment(false, "File comment"),
+				&ast.CommentGroup{List: []*ast.Comment{{Text: "// File comment"}}},
 				&ast.Package{Name: ast.NewIdent("pkg")},
 				&ast.Field{
 					Label: ast.NewIdent("a"),

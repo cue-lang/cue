@@ -12,7 +12,7 @@ f1: math.MultipleOf(5555555, 2)
 f2: math.MultipleOf(100.01, 4)
 
 -- out/math --
-	// should be true
+// should be true
 t1: true
 t2: true
 t3: true

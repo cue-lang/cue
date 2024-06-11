@@ -25,6 +25,7 @@ import (
 
 	"cuelang.org/go/internal/httplog"
 	"cuelang.org/go/internal/mod/modload"
+	"cuelang.org/go/mod/modfile"
 )
 
 func newModGetCmd(c *Command) *cobra.Command {
@@ -98,6 +99,23 @@ func runModGet(cmd *Command, args []string) error {
 		return err
 	}
 	return nil
+}
+
+func readModuleFile() (string, *modfile.File, []byte, error) {
+	modRoot, err := findModuleRoot()
+	if err != nil {
+		return "", nil, nil, err
+	}
+	modPath := filepath.Join(modRoot, "cue.mod", "module.cue")
+	data, err := os.ReadFile(modPath)
+	if err != nil {
+		return "", nil, nil, err
+	}
+	mf, err := modfile.ParseNonStrict(data, modPath)
+	if err != nil {
+		return "", nil, nil, err
+	}
+	return modPath, mf, data, nil
 }
 
 func findModuleRoot() (string, error) {

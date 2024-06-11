@@ -358,7 +358,36 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/cycle
 display:./cycle
 files:
-    $CWD/testdata/testmod/cycle/cycle.cue`}}
+    $CWD/testdata/testmod/cycle/cycle.cue`}, {
+		name: "AcceptLegacyModuleWithLegacyModule",
+		cfg: &Config{
+			Dir:                     testdata("testmod_legacy"),
+			AcceptLegacyModuleFiles: true,
+		},
+		want: `path:   test.example/foo@v0
+module: test.example/foo@v0
+root:   $CWD/testdata/testmod_legacy
+dir:    $CWD/testdata/testmod_legacy
+display:.
+files:
+    $CWD/testdata/testmod_legacy/foo.cue`}, {
+		name: "AcceptLegacyModuleWithNonLegacyModule",
+		cfg: &Config{
+			Dir:                     testdataDir,
+			Tools:                   true,
+			AcceptLegacyModuleFiles: true,
+		},
+		args: []string{"./imports"},
+		want: `path:   mod.test/test/imports@v0
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/imports
+display:./imports
+files:
+    $CWD/testdata/testmod/imports/imports.cue
+imports:
+    mod.test/catch: $CWD/testdata/testmod/cue.mod/pkg/mod.test/catch/catch.cue
+    mod.test/helper:helper1: $CWD/testdata/testmod/cue.mod/pkg/mod.test/helper/helper1.cue`}}
 	tdtest.Run(t, testCases, func(t *tdtest.T, tc *loadTest) {
 		pkgs := Instances(tc.args, tc.cfg)
 

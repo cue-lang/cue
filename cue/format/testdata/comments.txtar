@@ -329,3 +329,27 @@ foo: [
 
 	// an ellipsis
 }
+-- comment_alone.input --
+// Just one comment on its own.
+-- comment_alone.golden --
+// Just one comment on its own.
+-- comment_field.input --
+// Just one comment on a field. TODO(mvdan): do not indent.
+foo: string
+-- comment_field.golden --
+	// Just one comment on a field. TODO(mvdan): do not indent.
+foo: string
+-- comments_alone.input --
+// Just a few comments
+// on their own.
+-- comments_alone.golden --
+// Just a few comments
+// on their own.
+-- comments_field.input --
+// Just a few comments
+// on a field.
+foo: string
+-- comments_field.golden --
+// Just a few comments
+// on a field.
+foo: string

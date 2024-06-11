@@ -155,7 +155,7 @@ graph TD
 
 -- out/run/t3/value --
 {
-	x:   [0, 1][INDEX]
+	x: [0, 1][INDEX]
 	$id: "valToOut"
 
 	//cue:path: root.concreteValueInGeneratedSubfield.index
@@ -184,7 +184,7 @@ graph TD
 -- out/run/t4/value --
 {
 	$after: {
-		x:   [0, 1][INDEX]
+		x: [0, 1][INDEX]
 		$id: "valToOut"
 	}
 	$id: "valToOut"

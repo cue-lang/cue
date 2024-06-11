@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11ef5500_fb7eb8ad",
+        "filename": "cue/load/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 423,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-11T17:43:26Z",
+      "side": 1,
+      "message": "I\u0027m not sure what `FixLegacy` does exactly, but I\u0027m assume it will add the major version suffix to a module path? If so, we don\u0027t want that, correct? Because otherwise error messages etc will refer to a concept alien to the user?",
+      "revId": "a94f9661e544ac12bef9e9062c02a5db3a2071b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

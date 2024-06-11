@@ -34,6 +34,24 @@
       "parentUuid": "11ef5500_fb7eb8ad",
       "revId": "a94f9661e544ac12bef9e9062c02a5db3a2071b3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d341d5c_c298158c",
+        "filename": "cue/load/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 423,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-11T18:39:52Z",
+      "side": 1,
+      "message": "```\ngo mod tidy\ngo run .\ncmp stdout stdout.golden\n\n-- cue.mod/module.cue --\nmodule: \"example.com/blah\"\n-- go.mod --\nmodule mod.example\n\ngo 1.22.3\n\nrequire cuelang.org/go v0.9.0\n\nreplace cuelang.org/go \u003d\u003e /home/myitcv/dev/cuelang/cue\n-- main.go --\npackage main\n\nimport (\n\t\"fmt\"\n\n\t\"cuelang.org/go/cue/cuecontext\"\n\t\"cuelang.org/go/cue/load\"\n)\n\nfunc main() {\n\tctx :\u003d cuecontext.New()\n\tbis :\u003d load.Instances([]string{\"example.com/blah\"}, \u0026load.Config{\n\t\tModule:                  \"example.com/blah\",\n\t\tAcceptLegacyModuleFiles: true,\n\t})\n\tv :\u003d ctx.BuildInstance(bis[0])\n\tfmt.Println(v)\n}\n-- rubbish/rubbish.cue --\npackage rubbish\n\nsomething: 5\n-- x.cue --\npackage blah\n\nimport \"example.com/blah/rubbish\"\n\nrubbish\nx: 5\n-- stdout.golden --\n{\n\tx:         5\n\tsomething: 5\n}\n```\n\nShould pass but:\n\n```\n\u003e go mod tidy\n\u003e go run .\n[stderr]\nmain.go:19: inconsistent modules: got \"example.com/blah@v0\", want \"example.com/blah\"\nexit status 1\n\n[exit status 1]\nFAIL: /tmp/testscript1582439590/repro.txtar/script.txtar:2: unexpected go command failure\n```",
+      "parentUuid": "42227b16_289e2db8",
+      "revId": "a94f9661e544ac12bef9e9062c02a5db3a2071b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

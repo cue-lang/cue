@@ -52,6 +52,24 @@
       "parentUuid": "d74830e7_a361cdd6",
       "revId": "d817d8261310e90131bfd6b5210180c1a327d701",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5cb19ed3_a22c7dc9",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_initial.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-12T14:29:44Z",
+      "side": 1,
+      "message": "Ah, I see. I wanted to test that the",
+      "parentUuid": "220af904_42cb43be",
+      "revId": "d817d8261310e90131bfd6b5210180c1a327d701",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

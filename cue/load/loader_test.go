@@ -426,6 +426,46 @@ path:   ""
 module: mod.test/wrong
 root:   ""
 dir:    ""
+display:""`}, {
+		name: "ExplicitPackageWithUnqualifiedImportPath#1",
+		cfg: &Config{
+			Dir:     filepath.Join(testdataDir, "multi"),
+			Package: "main",
+		},
+		args: []string{"."},
+		want: `err:    found packages "main" (file.cue) and "test_package" (file_appengine.cue) in "multi"
+path:   ""
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    ""
+display:""`}, {
+		name: "ExplicitPackageWithUnqualifiedImportPath#2",
+		// This test replicates the failure reported in https://cuelang.org/issue/3213
+		cfg: &Config{
+			Dir:     filepath.Join(testdataDir, "multi2"),
+			Package: "other",
+		},
+		args: []string{"."},
+		want: `err:    mod.test/test/multi2@v0:other: import failed: no dependency found for package "mod.test/test/sub":
+    $CWD/testdata/testmod/multi2/other.cue:3:8
+path:   mod.test/test/multi2@v0:other
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/multi2
+display:.
+files:
+    $CWD/testdata/testmod/multi2/other.cue`}, {
+		name: "ExplicitPackageWithUnqualifiedImportPath#3",
+		cfg: &Config{
+			Dir:     filepath.Join(testdataDir, "multi3"),
+			Package: "other",
+		},
+		args: []string{"."},
+		want: `err:    found packages "multi3" (multi3.cue) and "other" (other.cue) in "multi3"
+path:   ""
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    ""
 display:""`}}
 	tdtest.Run(t, testCases, func(t *tdtest.T, tc *loadTest) {
 		pkgs := Instances(tc.args, tc.cfg)

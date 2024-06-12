@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14085a93_db0106b4",
+        "filename": "cue/load/config.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 441,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-12T04:32:14Z",
+      "side": 1,
+      "message": "Why is it specific to this situation? Doesn\u0027t it apply regardless of whether `AcceptLegacyModuleFiles` is being used?\n\nOn a related not, it feels like the other change we discussed yesterday (inferring of `v0`) is sufficiently related/important for this change. To the extent that it (the other change) could come before in the stack? Not least because it (the other change) is directly related to this bit of code.",
+      "revId": "dd692113723a341fedba4d6e55f4b13f248ada90",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

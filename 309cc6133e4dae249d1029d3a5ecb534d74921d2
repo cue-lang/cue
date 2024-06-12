@@ -16,6 +16,24 @@
       "message": "I have added a new `pkg.Schema` type so that the pkg.go files won\u0027t be overriden - I missed the fact that they were auto-generated.",
       "revId": "309cc6133e4dae249d1029d3a5ecb534d74921d2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "262040a8_9067c619",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-12T08:41:46Z",
+      "side": 1,
+      "message": "Can you summarize in the commit message why we need to change the signatures of funcs like `pkg/encoding/yaml.Validate`? I admit I don\u0027t follow the reason - a Schema seems to embed a Value anyway, so they should be interchangeable.\n\nMy only guess is that a func parameter being Schema rather than Value signals \"this value may be incomplete\". But I\u0027m only guessing, since you don\u0027t explain it :)\n\nChanging the signatures of pkg/... Go APIs should be OK I think - not ideal, but they are meant for consumption from CUE, not Go. I would vote for hiding them in internal to be honest; I\u0027ll mention it to the others.",
+      "parentUuid": "bf68552f_f21e5d43",
+      "revId": "309cc6133e4dae249d1029d3a5ecb534d74921d2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

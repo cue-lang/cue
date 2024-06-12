@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5663513d_cb7cdf4d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-12T13:08:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ae6a689d_4ffed917",
+      "revId": "e8a885d0c4fd7c5589588b1c0682d972d9f98a1b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "362f06c9_11740ead",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "09f8c812_774033f5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-12T13:08:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "362f06c9_11740ead",
+      "revId": "e8a885d0c4fd7c5589588b1c0682d972d9f98a1b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ead2c770_345e4383",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-06-12T12:12:56Z",
       "side": 1,
       "message": "track this via a small issue, e.g. for the v0.10 release project?",
+      "revId": "e8a885d0c4fd7c5589588b1c0682d972d9f98a1b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5672c18_0a866c0f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-12T13:08:24Z",
+      "side": 1,
+      "message": "Done (https://github.com/cue-lang/cue/issues/3220).",
+      "parentUuid": "ead2c770_345e4383",
       "revId": "e8a885d0c4fd7c5589588b1c0682d972d9f98a1b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +140,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6691ef8c_c920b374",
+        "filename": "cmd/cue/cmd/testdata/script/modpublish_no_major_suffix.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-12T13:08:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "43662680_98378dee",
+      "revId": "e8a885d0c4fd7c5589588b1c0682d972d9f98a1b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5ec9a14c_940aa60d",
@@ -99,6 +171,24 @@
       "writtenOn": "2024-06-12T12:12:56Z",
       "side": 1,
       "message": "what about trying to publish v1.0.0 or v2.0.0 here? would it also work, or fail?",
+      "revId": "e8a885d0c4fd7c5589588b1c0682d972d9f98a1b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ff9206f_4bf11095",
+        "filename": "cmd/cue/cmd/testdata/script/modpublish_no_major_suffix.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-12T13:08:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ec9a14c_940aa60d",
       "revId": "e8a885d0c4fd7c5589588b1c0682d972d9f98a1b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +210,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "20eecbf0_625b7bf9",
+        "filename": "cmd/cue/cmd/testdata/script/modpublish_no_major_suffix.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-12T13:08:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "17192459_e36fbb26",
+      "revId": "e8a885d0c4fd7c5589588b1c0682d972d9f98a1b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f8679011_d35cd88f",
@@ -137,6 +245,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e66e388d_b7f4613e",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-12T13:08:24Z",
+      "side": 1,
+      "message": "Renaming back to `Module`, as discussed online.",
+      "parentUuid": "f8679011_d35cd88f",
+      "revId": "e8a885d0c4fd7c5589588b1c0682d972d9f98a1b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fb6e1341_d5495872",
@@ -150,6 +276,24 @@
       "writtenOn": "2024-06-12T12:12:56Z",
       "side": 1,
       "message": "clarify whether this includes `@` or not?",
+      "revId": "e8a885d0c4fd7c5589588b1c0682d972d9f98a1b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c51586c_dc414354",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-12T13:08:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fb6e1341_d5495872",
       "revId": "e8a885d0c4fd7c5589588b1c0682d972d9f98a1b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

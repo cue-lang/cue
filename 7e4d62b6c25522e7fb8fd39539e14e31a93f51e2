@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51835313_f9e776a0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-12T14:59:41Z",
+      "side": 1,
+      "message": "perhaps mention that it mirrors Go\u0027s slices.Reverse.",
+      "revId": "7e4d62b6c25522e7fb8fd39539e14e31a93f51e2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2113b43e_0bb07886",
+        "filename": "pkg/list/list.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-12T14:59:41Z",
+      "side": 1,
+      "message": "use a tab for consistency?",
+      "revId": "7e4d62b6c25522e7fb8fd39539e14e31a93f51e2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94ba6e16_fa41932c",
+        "filename": "pkg/list/list.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-12T14:59:41Z",
+      "side": 1,
+      "message": "use slices.Reverse? we already require Go 1.21 or later. the only quirk is whether to modify in-place; I\u0027m not sure if making a copy of the slice is strictly necessary. if the builtin call code already creates a new slice to make the call, maybe we don\u0027t need to.",
+      "revId": "7e4d62b6c25522e7fb8fd39539e14e31a93f51e2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

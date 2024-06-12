@@ -16,6 +16,23 @@
       "message": "PTAL; would like to merge this so I can continue with other work like the TODOs.",
       "revId": "9f4e1af1168185482c9fb4a5b1f6a06dd68cb23d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4762a882_4780157e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-06-12T09:15:08Z",
+      "side": 1,
+      "message": "LGTM, thanks!",
+      "revId": "9f4e1af1168185482c9fb4a5b1f6a06dd68cb23d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

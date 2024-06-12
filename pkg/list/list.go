@@ -215,6 +215,23 @@ func Slice(x []cue.Value, i, j int) ([]cue.Value, error) {
 	return x[i:j], nil
 }
 
+// Reverse reverses a list.
+//
+// For instance:
+//
+//	Reverse([1, 2, 3, 4])
+//
+// results in
+//
+// [4, 3, 2, 1]
+func Reverse(x []cue.Value) []cue.Value {
+	var res []cue.Value
+	for i := len(x) - 1; i >= 0; i-- {
+		res = append(res, x[i])
+	}
+	return res
+}
+
 // MinItems reports whether a has at least n items.
 func MinItems(list pkg.List, n int) (bool, error) {
 	count := len(list.Elems())

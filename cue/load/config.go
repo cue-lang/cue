@@ -420,7 +420,7 @@ func (c *Config) loadModule() error {
 		return err
 	}
 	c.modFile = mf
-	if mf.Module == "" {
+	if mf.QualifiedModule() == "" {
 		// Backward compatibility: allow empty module.cue file.
 		// TODO maybe check that the rest of the fields are empty too?
 		return nil
@@ -428,7 +428,7 @@ func (c *Config) loadModule() error {
 	if c.Module != "" && c.Module != mf.Module {
 		return errors.Newf(token.NoPos, "inconsistent modules: got %q, want %q", mf.Module, c.Module)
 	}
-	c.Module = mf.Module
+	c.Module = mf.QualifiedModule()
 	return nil
 }
 

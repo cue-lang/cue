@@ -48,6 +48,11 @@ const schemaFile = "cuelang.org/go/mod/modfile/schema.cue"
 
 // File represents the contents of a cue.mod/module.cue file.
 type File struct {
+	// Module holds the module path, which may
+	// not contain a major version suffix.
+	// Use the [File.QualifiedModule] method to obtain a module
+	// path that's always qualified. See also the
+	// [File.ModulePath] and [File.MajorVersion] methods.
 	Module   string                    `json:"module"`
 	Language *Language                 `json:"language,omitempty"`
 	Source   *Source                   `json:"source,omitempty"`
@@ -62,6 +67,39 @@ type File struct {
 	// entries in the versions field in schema.cue and
 	// is set by the Parse functions.
 	actualSchemaVersion string
+}
+
+// Module returns the fully qualified module path
+// if is one. It returns the empty string when [ParseLegacy]
+// is used and the module field is empty.
+//
+// Note that when the module field does not contain a major
+// version suffix, "@v0" is assumed.
+func (f *File) QualifiedModule() string {
+	if strings.Contains(f.Module, "@") {
+		return f.Module
+	}
+	if f.Module == "" {
+		return ""
+	}
+	return f.Module + "@v0"
+}
+
+// ModulePath returns the path part of the module without
+// its major version suffix.
+func (f *File) ModulePath() string {
+	path, _, _ := module.SplitPathVersion(f.QualifiedModule())
+	return path
+}
+
+// MajorVersion returns the major version of the module,
+// not including the "@".
+// If there is no module (which can happen when [ParseLegacy]
+// is used or if Module is explicitly set to an empty string),
+// it returns the empty string.
+func (f *File) MajorVersion() string {
+	_, vers, _ := module.SplitPathVersion(f.QualifiedModule())
+	return vers
 }
 
 // baseFileVersion is used to decode the language version
@@ -266,7 +304,7 @@ func ParseNonStrict(modfile []byte, filename string) (*File, error) {
 // into a format suitable for parsing with [Parse]. It adds a language.version
 // field and moves all unrecognized fields into custom.legacy.
 //
-// If there is no module field or it is empty, it is set to "test.example@v0".
+// If there is no module field or it is empty, it is set to "test.example".
 //
 // If the file already parses OK with [ParseNonStrict], it returns the
 // result of that.
@@ -289,7 +327,7 @@ func FixLegacy(modfile []byte, filename string) (*File, error) {
 	if err := v.Decode(&allFields); err != nil {
 		return nil, err
 	}
-	mpath := "test.example@v0"
+	mpath := "test.example"
 	if m, ok := allFields["module"]; ok {
 		if mpath1, ok := m.(string); ok && mpath1 != "" {
 			mpath = mpath1
@@ -408,9 +446,6 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 		return nil, err
 	}
 	mainPath, mainMajor, ok := module.SplitPathVersion(mf.Module)
-	if strict && !ok {
-		return nil, fmt.Errorf("module path %q in %s does not contain major version", mf.Module, filename)
-	}
 	if ok {
 		if semver.Major(mainMajor) != mainMajor {
 			return nil, fmt.Errorf("module path %s in %q should contain the major version only", mf.Module, filename)
@@ -421,8 +456,6 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 		}
 		// There's no main module major version: default to v0.
 		mainMajor = "v0"
-		// TODO perhaps we'd be better preserving the original?
-		mf.Module += "@v0"
 	}
 	if mf.Language != nil {
 		vers := mf.Language.Version

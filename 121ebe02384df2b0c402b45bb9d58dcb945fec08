@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a871119f_444e1600",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-12T12:15:02Z",
+      "side": 1,
+      "message": "SGTM but I agree with Paul\u0027s last comment; \"fix\" semantics aren\u0027t right here in the long term.",
+      "revId": "121ebe02384df2b0c402b45bb9d58dcb945fec08",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

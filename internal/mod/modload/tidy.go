@@ -63,7 +63,7 @@ func tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, checkTi
 		return nil, err
 	}
 	// TODO check that module path is well formed etc
-	origRs := modrequirements.NewRequirements(mf.Module, reg, mf.DepVersions(), mf.DefaultMajorVersions())
+	origRs := modrequirements.NewRequirements(mf.QualifiedModule(), reg, mf.DepVersions(), mf.DefaultMajorVersions())
 	rootPkgPaths, err := modimports.AllImports(modimports.AllModuleFiles(fsys, modRoot))
 	if err != nil {
 		return nil, err
@@ -134,9 +134,9 @@ func readModuleFile(fsys fs.FS, modRoot string) (module.Version, *modfile.File, 
 	if err != nil {
 		return module.Version{}, nil, err
 	}
-	mainModuleVersion, err := module.NewVersion(mf.Module, "")
+	mainModuleVersion, err := module.NewVersion(mf.QualifiedModule(), "")
 	if err != nil {
-		return module.Version{}, nil, fmt.Errorf("invalid module path %q: %v", mf.Module, err)
+		return module.Version{}, nil, fmt.Errorf("invalid module path %q: %v", mf.QualifiedModule(), err)
 	}
 	return mainModuleVersion, mf, nil
 }

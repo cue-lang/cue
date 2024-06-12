@@ -17,6 +17,7 @@ package list
 
 import (
 	"fmt"
+	"slices"
 	"sort"
 
 	"cuelang.org/go/cue"
@@ -213,6 +214,20 @@ func Slice(x []cue.Value, i, j int) ([]cue.Value, error) {
 	}
 
 	return x[i:j], nil
+}
+
+// Reverse reverses a list.
+//
+// For instance:
+//
+//	Reverse([1, 2, 3, 4])
+//
+// results in
+//
+//	[4, 3, 2, 1]
+func Reverse(x []cue.Value) []cue.Value {
+	slices.Reverse(x)
+	return x
 }
 
 // MinItems reports whether a has at least n items.

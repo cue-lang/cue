@@ -420,15 +420,15 @@ func (c *Config) loadModule() error {
 		return err
 	}
 	c.modFile = mf
-	if mf.Module == "" {
+	if mf.Module() == "" {
 		// Backward compatibility: allow empty module.cue file.
 		// TODO maybe check that the rest of the fields are empty too?
 		return nil
 	}
-	if c.Module != "" && c.Module != mf.Module {
-		return errors.Newf(token.NoPos, "inconsistent modules: got %q, want %q", mf.Module, c.Module)
+	if c.Module != "" && c.Module != mf.ModuleField {
+		return errors.Newf(token.NoPos, "inconsistent modules: got %q, want %q", mf.ModuleField, c.Module)
 	}
-	c.Module = mf.Module
+	c.Module = mf.Module()
 	return nil
 }
 

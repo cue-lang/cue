@@ -343,17 +343,11 @@ func checkModFile(m module.Version, f *zip.File) ([]byte, *modfile.File, error) 
 	if err != nil {
 		return nil, nil, err
 	}
-	if mf.Module != m.Path() {
-		return nil, nil, fmt.Errorf("module path %q found in %s does not match module path being published %q", mf.Module, f.Name, m.Path())
-	}
-	_, major, ok := module.SplitPathVersion(mf.Module)
-	if !ok {
-		// Note: can't happen because we already know that mf.Module is the same
-		// as m.Path which is a valid module path.
-		return nil, nil, fmt.Errorf("invalid module path %q", mf.Module)
+	if mf.Module() != m.Path() {
+		return nil, nil, fmt.Errorf("module path %q found in %s does not match module path being published %q", mf.Module(), f.Name, m.Path())
 	}
 	wantMajor := semver.Major(m.Version())
-	if major != wantMajor {
+	if major := mf.MajorVersion(); major != wantMajor {
 		// This can't actually happen because the zip checker checks the major version
 		// that's being published to, so the above path check also implicitly checks that.
 		return nil, nil, fmt.Errorf("major version %q found in %s does not match version being published %q", major, f.Name, m.Version())

@@ -63,7 +63,7 @@ func tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, checkTi
 		return nil, err
 	}
 	// TODO check that module path is well formed etc
-	origRs := modrequirements.NewRequirements(mf.Module, reg, mf.DepVersions(), mf.DefaultMajorVersions())
+	origRs := modrequirements.NewRequirements(mf.Module(), reg, mf.DepVersions(), mf.DefaultMajorVersions())
 	rootPkgPaths, err := modimports.AllImports(modimports.AllModuleFiles(fsys, modRoot))
 	if err != nil {
 		return nil, err
@@ -134,9 +134,9 @@ func readModuleFile(fsys fs.FS, modRoot string) (module.Version, *modfile.File, 
 	if err != nil {
 		return module.Version{}, nil, err
 	}
-	mainModuleVersion, err := module.NewVersion(mf.Module, "")
+	mainModuleVersion, err := module.NewVersion(mf.Module(), "")
 	if err != nil {
-		return module.Version{}, nil, fmt.Errorf("invalid module path %q: %v", mf.Module, err)
+		return module.Version{}, nil, fmt.Errorf("invalid module path %q: %v", mf.Module(), err)
 	}
 	return mainModuleVersion, mf, nil
 }
@@ -147,10 +147,10 @@ func modfileFromRequirements(old *modfile.File, rs *modrequirements.Requirements
 	// want to just copy the entirety of old because that includes
 	// private fields too.
 	mf := &modfile.File{
-		Module:   old.Module,
-		Language: old.Language,
-		Deps:     make(map[string]*modfile.Dep),
-		Source:   old.Source,
+		ModuleField: old.ModuleField,
+		Language:    old.Language,
+		Deps:        make(map[string]*modfile.Dep),
+		Source:      old.Source,
 	}
 	defaults := rs.DefaultMajorVersions()
 	for _, v := range rs.RootModules() {

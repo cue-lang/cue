@@ -34,6 +34,24 @@
       "parentUuid": "bf68552f_f21e5d43",
       "revId": "309cc6133e4dae249d1029d3a5ecb534d74921d2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "659e4496_d4f1b523",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 19
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-06-12T14:08:07Z",
+      "side": 1,
+      "message": "sorry about that, I forgot to mention it in the commit message - I added an explanation. Essentially I didn\u0027t notice that `pkg.go` is auto-generated, so as best as I could tell, the only way to \"force\" the function arguments to be resolved via `c.Schema` is by using a dedicated type so that gen.go would be able to differentiate between \"schemas\" and \"values\". If there\u0027s a better way to do this, I\u0027d be happy to hear - maybe I missed something",
+      "parentUuid": "262040a8_9067c619",
+      "revId": "309cc6133e4dae249d1029d3a5ecb534d74921d2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

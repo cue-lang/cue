@@ -34,6 +34,24 @@
       "parentUuid": "49b60495_e794d7da",
       "revId": "d817d8261310e90131bfd6b5210180c1a327d701",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "220af904_42cb43be",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_initial.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-12T13:39:06Z",
+      "side": 1,
+      "message": "The commit message says:\n\n\u003e It also changes the `cue mod tidy` check to ensure that it adds major versions to dependency modules when they are not present.\n\nSo in this tidy test, you remove the major version from the dependency (example.com), which agrees with the commit message, but also from `main.org`, the main module, which seems entirely unrelated. hence my confusion.\n\nnot saying the change is wrong, but it seems unrelated and unexplained.",
+      "parentUuid": "d74830e7_a361cdd6",
+      "revId": "d817d8261310e90131bfd6b5210180c1a327d701",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

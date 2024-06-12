@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49b60495_e794d7da",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_initial.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-12T12:24:52Z",
+      "side": 1,
+      "message": "the dependency here is `example.com` though, not `main.org`; is this change necessary?",
+      "revId": "d817d8261310e90131bfd6b5210180c1a327d701",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

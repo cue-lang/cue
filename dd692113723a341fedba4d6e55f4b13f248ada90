@@ -34,6 +34,24 @@
       "parentUuid": "14085a93_db0106b4",
       "revId": "dd692113723a341fedba4d6e55f4b13f248ada90",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30556507_b0c6c235",
+        "filename": "cue/load/config.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 441,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-12T08:37:22Z",
+      "side": 1,
+      "message": "\u003e It could do, but I don\u0027t think there\u0027s any necessity for it to do so. That said, maybe that other change might make this one easier, so I\u0027ll give that a go.\n\nMy reason for asking is that this change still uses `modfile.FixLegacy`. Which implies (to my perhaps naive reading) that you will be \"fixing\" a module path like `mod.com/example` to be `mod.com/example@v0` during the load, but not writing that change back to disk. The latter is not what the user knows, hence any logic that pivots around that will be wrong, as will any error messages (from the user\u0027s perspective). Making the change to address https://cuelang.org/issue/3217 ahead of this change seems to sidestep that problem by making a missing major version well defined.",
+      "parentUuid": "7a60c8db_ed030ff2",
+      "revId": "dd692113723a341fedba4d6e55f4b13f248ada90",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

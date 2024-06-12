@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cdec6205_645dc9a9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-12T09:08:19Z",
+      "side": 1,
+      "message": "The Unity breakage is okay; just a tiny improvement in formatting that causes diffs.",
+      "revId": "4ade850ba5d7f4e764c776647df46f1939aa4ff9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

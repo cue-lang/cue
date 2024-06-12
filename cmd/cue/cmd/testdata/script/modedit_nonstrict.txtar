@@ -1,0 +1,12 @@
+# This test checks that cue mod edit works OK even when the
+# module file doesn't conform to the strict parsing.
+# TODO fix this to pass.
+! exec cue mod edit --source self
+cmpenv stderr want-stderr
+
+-- cue.mod/module.cue --
+module: "main.org"
+deps: "foo.com": v: "v1.2.3"
+language: version: "v0.9.0-alpha.0"
+-- want-stderr --
+invalid module.cue file $WORK${/}cue.mod${/}module.cue: no major version in "foo.com"

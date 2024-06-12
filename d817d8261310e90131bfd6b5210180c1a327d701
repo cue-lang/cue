@@ -16,6 +16,24 @@
       "message": "the dependency here is `example.com` though, not `main.org`; is this change necessary?",
       "revId": "d817d8261310e90131bfd6b5210180c1a327d701",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d74830e7_a361cdd6",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_initial.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-12T13:33:04Z",
+      "side": 1,
+      "message": "I\u0027m not sure I entirely understand your comment.\n\nThis is deliberate, as mentioned in the commit message. I think it\u0027s worth doing, as it\u0027s a feature of `cue mod tidy` that didn\u0027t seem to have an end-to-end test until now.",
+      "parentUuid": "49b60495_e794d7da",
+      "revId": "d817d8261310e90131bfd6b5210180c1a327d701",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

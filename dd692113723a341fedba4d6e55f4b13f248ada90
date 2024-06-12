@@ -16,6 +16,24 @@
       "message": "Why is it specific to this situation? Doesn\u0027t it apply regardless of whether `AcceptLegacyModuleFiles` is being used?\n\nOn a related not, it feels like the other change we discussed yesterday (inferring of `v0`) is sufficiently related/important for this change. To the extent that it (the other change) could come before in the stack? Not least because it (the other change) is directly related to this bit of code.",
       "revId": "dd692113723a341fedba4d6e55f4b13f248ada90",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a60c8db_ed030ff2",
+        "filename": "cue/load/config.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 441,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-12T06:50:15Z",
+      "side": 1,
+      "message": "\u003e Doesn\u0027t it apply regardless of whether AcceptLegacyModuleFiles is being used?\n\nIt technically applies yes, but I can\u0027t see that it\u0027s very useful in other situations, although it\u0027s hard to tell because the purpose of the Config.Module field is unclear to me. In general Config.Module is redundant when there\u0027s a module file, so AFAICS setting it is only asking for trouble because the only thing that setting it can do is produce an error if there\u0027s a mismatch - something that could easily be done by just checking the Instance.Module value after loading.\n\nOn reflection, I think a better semantic for `Config.Module` would have been to use as a default module path when there is none available. That can happen when there\u0027s no module file or one with an empty module field, as is allowed for legacy module files. That would make it more useful.\n\nI\u0027m wondering if it might actually be OK to change it. Then this check could just be removed.\n\n\u003e To the extent that it (the other change) could come before in the stack?\n\nIt could do, but I don\u0027t think there\u0027s any necessity for it to do so. That said, maybe that other change might make this one easier, so I\u0027ll give that a go.",
+      "parentUuid": "14085a93_db0106b4",
+      "revId": "dd692113723a341fedba4d6e55f4b13f248ada90",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

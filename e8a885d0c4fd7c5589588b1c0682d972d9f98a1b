@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae6a689d_4ffed917",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-12T12:12:56Z",
+      "side": 1,
+      "message": "This commit message should explain how this affects `cue mod publish`; do we allow publishing without a major version suffix? If so, what major version is assumed, if any? this is related to my testscript comment below.",
+      "revId": "e8a885d0c4fd7c5589588b1c0682d972d9f98a1b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "362f06c9_11740ead",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-12T12:12:56Z",
+      "side": 1,
+      "message": "please remember to stick to 76 columns. two paragraphs below also go over unnecessarily.",
+      "revId": "e8a885d0c4fd7c5589588b1c0682d972d9f98a1b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ead2c770_345e4383",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-12T12:12:56Z",
+      "side": 1,
+      "message": "track this via a small issue, e.g. for the v0.10 release project?",
+      "revId": "e8a885d0c4fd7c5589588b1c0682d972d9f98a1b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d6cf4c7_260ebe7c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-12T12:12:56Z",
+      "side": 1,
+      "message": "SGTM but we should be clearer about the change in behavior to `cue mod publish` in the commit message. I am also pushing back gently against renaming `Module` to `ModulePath`; happy to discuss this outside of Gerrit if that would be easier or faster.",
+      "revId": "e8a885d0c4fd7c5589588b1c0682d972d9f98a1b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43662680_98378dee",
+        "filename": "cmd/cue/cmd/testdata/script/modpublish_no_major_suffix.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-12T12:12:56Z",
+      "side": 1,
+      "message": "This seems out of date now.",
+      "revId": "e8a885d0c4fd7c5589588b1c0682d972d9f98a1b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ec9a14c_940aa60d",
+        "filename": "cmd/cue/cmd/testdata/script/modpublish_no_major_suffix.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-12T12:12:56Z",
+      "side": 1,
+      "message": "what about trying to publish v1.0.0 or v2.0.0 here? would it also work, or fail?",
+      "revId": "e8a885d0c4fd7c5589588b1c0682d972d9f98a1b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "17192459_e36fbb26",
+        "filename": "cmd/cue/cmd/testdata/script/modpublish_no_major_suffix.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-12T12:12:56Z",
+      "side": 1,
+      "message": "nit: this filename should be `edited-with-v0` to make it clear it wasn\u0027t from `cue mod fix`",
+      "revId": "e8a885d0c4fd7c5589588b1c0682d972d9f98a1b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8679011_d35cd88f",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-12T12:12:56Z",
+      "side": 1,
+      "message": "Did you consider naming this `QualifiedModule` or somesuch? Because now the field is inconsistent with the json/CUE name, which is unfortunate:\n\n    ModuleField string  `json:\"module\"`\n\nAt least I would have leaned for this option myself - there\u0027s nothing wrong with either of them taking the `Module` name per se, either could be the correct choice depending on what the Go API user wants.\n\nI might even argue that leaving `Module` to the original form on disk is correct, e.g. for error messages. We should only infer a major version suffix where necessary.\n\nRe-reading your commit message, I think swapping the field and method names should still allow you to roundtrip and keep all the desired behavior.",
+      "revId": "e8a885d0c4fd7c5589588b1c0682d972d9f98a1b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb6e1341_d5495872",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-12T12:12:56Z",
+      "side": 1,
+      "message": "clarify whether this includes `@` or not?",
+      "revId": "e8a885d0c4fd7c5589588b1c0682d972d9f98a1b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

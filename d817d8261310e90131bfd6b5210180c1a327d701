@@ -70,6 +70,24 @@
       "parentUuid": "220af904_42cb43be",
       "revId": "d817d8261310e90131bfd6b5210180c1a327d701",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13cb021a_56c61ce1",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_initial.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-12T14:31:09Z",
+      "side": 1,
+      "message": "Gerrit glitch! I meant to say:\n\nAh, I see. I\u0027ve amended the commit message accordingly.",
+      "parentUuid": "5cb19ed3_a22c7dc9",
+      "revId": "d817d8261310e90131bfd6b5210180c1a327d701",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

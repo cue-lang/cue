@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dde363cc_649176d3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-06-12T15:06:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "51835313_f9e776a0",
+      "revId": "7e4d62b6c25522e7fb8fd39539e14e31a93f51e2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2113b43e_0bb07886",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "33d5bcf2_94982b1e",
+        "filename": "pkg/list/list.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-06-12T15:06:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2113b43e_0bb07886",
+      "revId": "7e4d62b6c25522e7fb8fd39539e14e31a93f51e2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "94ba6e16_fa41932c",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-06-12T14:59:41Z",
       "side": 1,
       "message": "use slices.Reverse? we already require Go 1.21 or later. the only quirk is whether to modify in-place; I\u0027m not sure if making a copy of the slice is strictly necessary. if the builtin call code already creates a new slice to make the call, maybe we don\u0027t need to.",
+      "revId": "7e4d62b6c25522e7fb8fd39539e14e31a93f51e2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a64744a7_98f7b618",
+        "filename": "pkg/list/list.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-06-12T15:06:40Z",
+      "side": 1,
+      "message": "Ah I didn\u0027t notice that the list is created before the builtin in called.\n\nIn general I like to avoid functions that modify data in-place, they scare me - but it seems fine here",
+      "parentUuid": "94ba6e16_fa41932c",
       "revId": "7e4d62b6c25522e7fb8fd39539e14e31a93f51e2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -77,7 +77,7 @@ func (c *modEditCmd) run(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	mf, err := modfile.Parse(data, modPath)
+	mf, err := modfile.ParseNonStrict(data, modPath)
 	if err != nil {
 		return err
 	}

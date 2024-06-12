@@ -133,7 +133,7 @@ func (c *modEditCmd) flagModule(arg string) error {
 		return err
 	}
 	c.addEdit(func(f *modfile.File) error {
-		f.Module = arg
+		f.ModuleField = arg
 		return nil
 	})
 	return nil

@@ -152,11 +152,11 @@ func Instances(args []string, c *Config) []*build.Instance {
 // loadPackages returns packages loaded from the given package list and also
 // including imports from the given build files.
 func loadPackages(ctx context.Context, cfg *Config, synCache *syntaxCache, pkgs []resolvedPackageArg, otherFiles []*build.File) (*modpkgload.Packages, error) {
-	if cfg.Registry == nil || cfg.modFile == nil || cfg.modFile.Module == "" {
+	if cfg.Registry == nil || cfg.modFile == nil || cfg.modFile.Module() == "" {
 		return nil, nil
 	}
 	reqs := modrequirements.NewRequirements(
-		cfg.modFile.Module,
+		cfg.modFile.Module(),
 		cfg.Registry,
 		cfg.modFile.DepVersions(),
 		cfg.modFile.DefaultMajorVersions(),

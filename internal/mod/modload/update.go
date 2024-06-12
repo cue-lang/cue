@@ -33,7 +33,7 @@ func UpdateVersions(ctx context.Context, fsys fs.FS, modRoot string, reg Registr
 	if err != nil {
 		return nil, err
 	}
-	rs := modrequirements.NewRequirements(mf.Module, reg, mf.DepVersions(), mf.DefaultMajorVersions())
+	rs := modrequirements.NewRequirements(mf.Module(), reg, mf.DepVersions(), mf.DefaultMajorVersions())
 	mversions, err := resolveUpdateVersions(ctx, reg, rs, mainModuleVersion, versions)
 	if err != nil {
 		return nil, err
@@ -73,7 +73,7 @@ func UpdateVersions(ctx context.Context, fsys fs.FS, modRoot string, reg Registr
 	for _, v := range mversionsMap {
 		newVersions = append(newVersions, v)
 	}
-	rs = modrequirements.NewRequirements(mf.Module, reg, newVersions, mf.DefaultMajorVersions())
+	rs = modrequirements.NewRequirements(mf.Module(), reg, newVersions, mf.DefaultMajorVersions())
 	g, err = rs.Graph(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("cannot determine new module graph: %v", err)
@@ -92,7 +92,7 @@ func UpdateVersions(ctx context.Context, fsys fs.FS, modRoot string, reg Registr
 			finalVersions = append(finalVersions, v)
 		}
 	}
-	rs = modrequirements.NewRequirements(mf.Module, reg, finalVersions, mf.DefaultMajorVersions())
+	rs = modrequirements.NewRequirements(mf.Module(), reg, finalVersions, mf.DefaultMajorVersions())
 	return modfileFromRequirements(mf, rs), nil
 }
 

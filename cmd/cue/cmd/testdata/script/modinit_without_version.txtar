@@ -10,7 +10,7 @@ exec cue mod tidy
 cmp cue.mod/module.cue want-module
 
 -- want-module --
-module: "foo.example@v0"
+module: "foo.example"
 language: {
 	version: "$CUE_LANGUAGE_VERSION"
 }

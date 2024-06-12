@@ -490,16 +490,12 @@ func (c *moduleContent) init(versDir string) error {
 		if found {
 			return fmt.Errorf("multiple module.cue files")
 		}
-		modp, _, ok := module.SplitPathVersion(modf.Module)
-		if !ok {
-			return fmt.Errorf("module %q does not contain major version", modf.Module)
-		}
-		mod := strings.ReplaceAll(modp, "/", "_") + "_"
+		mod := strings.ReplaceAll(modf.ModulePath(), "/", "_") + "_"
 		vers := strings.TrimPrefix(versDir, mod)
 		if len(vers) == len(versDir) {
-			return fmt.Errorf("module path %q in module.cue does not match directory %q", modf.Module, versDir)
+			return fmt.Errorf("module path %q in module.cue does not match directory %q", modf.Module(), versDir)
 		}
-		v, err := module.NewVersion(modf.Module, vers)
+		v, err := module.NewVersion(modf.Module(), vers)
 		if err != nil {
 			return fmt.Errorf("cannot make module version: %v", err)
 		}

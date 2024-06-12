@@ -42,7 +42,7 @@ module: "foo.com/bar@v0"
 language: version: "v0.8.0-alpha.0"
 `,
 	want: &File{
-		Module: "foo.com/bar@v0",
+		ModuleField: "foo.com/bar@v0",
 		Language: &Language{
 			Version: "v0.8.0-alpha.0",
 		},
@@ -66,7 +66,7 @@ deps: "other.com/something@v0": v: "v0.2.3"
 		Language: &Language{
 			Version: "v0.8.1",
 		},
-		Module: "foo.com/bar@v0",
+		ModuleField: "foo.com/bar@v0",
 		Deps: map[string]*Dep{
 			"example.com@v1": {
 				Default: true,
@@ -94,7 +94,7 @@ source: kind: "git"
 		Language: &Language{
 			Version: "v0.9.0-alpha.0",
 		},
-		Module: "foo.com/bar@v0",
+		ModuleField: "foo.com/bar@v0",
 		Source: &Source{
 			Kind: "git",
 		},
@@ -114,7 +114,7 @@ source: kind: "self"
 		Language: &Language{
 			Version: "v0.9.0-alpha.0",
 		},
-		Module: "foo.com/bar@v0",
+		ModuleField: "foo.com/bar@v0",
 		Source: &Source{
 			Kind: "self",
 		},
@@ -227,10 +227,10 @@ deps: "example.com@v1": v: "v1.2"
 	testName: "NonCanonicalModule",
 	parse:    Parse,
 	data: `
-module: "foo.com/bar"
+module: "foo.com/bar@v0.1.2"
 language: version: "v0.8.0"
 `,
-	wantError: `module path "foo.com/bar" in module.cue does not contain major version`,
+	wantError: `module path foo.com/bar@v0.1.2 in "module.cue" should contain the major version only`,
 }, {
 	testName: "NonCanonicalDep",
 	parse:    Parse,
@@ -258,8 +258,8 @@ language: version: "v0.8.0"
 deps: "example.com": v: "v1.2.3"
 `,
 	want: &File{
-		Module:   "foo.com/bar@v0",
-		Language: &Language{Version: "v0.8.0"},
+		ModuleField: "foo.com/bar",
+		Language:    &Language{Version: "v0.8.0"},
 		Deps: map[string]*Dep{
 			"example.com": {
 				Version: "v1.2.3",
@@ -279,7 +279,7 @@ something: 4
 language: version: "xxx"
 `,
 	want: &File{
-		Module: "foo.com/bar",
+		ModuleField: "foo.com/bar",
 	},
 }, {
 	testName: "LegacyReferencesNotAllowed",
@@ -290,6 +290,16 @@ _foo: "blah.example"
 `,
 	wantError: `invalid module.cue file syntax: references not allowed in data mode:
     module.cue:2:9`,
+}, {
+	testName: "LegacyNoModule",
+	parse:    ParseLegacy,
+	data:     "",
+	want:     &File{},
+}, {
+	testName: "LegacyEmptyModule",
+	parse:    ParseLegacy,
+	data:     `module: ""`,
+	want:     &File{},
 }, {
 	testName: "ReferencesNotAllowed#1",
 	parse:    Parse,
@@ -331,8 +341,8 @@ language: version: "v0.9.0"
 custom: "somewhere.com": foo: true
 `,
 	want: &File{
-		Module:   "foo.com/bar@v0",
-		Language: &Language{Version: "v0.9.0"},
+		ModuleField: "foo.com/bar@v0",
+		Language:    &Language{Version: "v0.9.0"},
 		Custom: map[string]map[string]any{
 			"somewhere.com": {
 				"foo": true,
@@ -349,8 +359,8 @@ custom: "somewhere.com": foo: true
 module: "foo.com/bar"
 `,
 	want: &File{
-		Module:   "foo.com/bar@v0",
-		Language: &Language{Version: "v0.9.0"},
+		ModuleField: "foo.com/bar",
+		Language:    &Language{Version: "v0.9.0"},
 	},
 	wantDefaults: map[string]string{
 		"foo.com/bar": "v0",
@@ -361,8 +371,8 @@ module: "foo.com/bar"
 	data: `
 `,
 	want: &File{
-		Module:   "test.example@v0",
-		Language: &Language{Version: "v0.9.0"},
+		ModuleField: "test.example",
+		Language:    &Language{Version: "v0.9.0"},
 	},
 	wantDefaults: map[string]string{
 		"test.example": "v0",
@@ -374,8 +384,8 @@ module: "foo.com/bar"
 module: ""
 `,
 	want: &File{
-		Module:   "test.example@v0",
-		Language: &Language{Version: "v0.9.0"},
+		ModuleField: "test.example",
+		Language:    &Language{Version: "v0.9.0"},
 	},
 	wantDefaults: map[string]string{
 		"test.example": "v0",
@@ -389,8 +399,8 @@ some: true
 other: field: 123
 `,
 	want: &File{
-		Module:   "foo.com@v0",
-		Language: &Language{Version: "v0.9.0"},
+		ModuleField: "foo.com",
+		Language:    &Language{Version: "v0.9.0"},
 		Custom: map[string]map[string]any{
 			"legacy": {
 				"some":  true,
@@ -416,6 +426,20 @@ func TestParse(t *testing.T) {
 			qt.Assert(t, fileEquals(f, test.want))
 			qt.Assert(t, qt.DeepEquals(f.DepVersions(), test.wantVersions))
 			qt.Assert(t, qt.DeepEquals(f.DefaultMajorVersions(), test.wantDefaults))
+			path, vers, ok := strings.Cut(f.ModuleField, "@")
+			if ok {
+				qt.Assert(t, qt.Equals(f.Module(), f.ModuleField))
+				qt.Assert(t, qt.Equals(f.ModulePath(), path))
+				qt.Assert(t, qt.Equals(f.MajorVersion(), vers))
+			} else if f.ModuleField == "" {
+				qt.Assert(t, qt.Equals(f.Module(), ""))
+				qt.Assert(t, qt.Equals(f.ModulePath(), ""))
+				qt.Assert(t, qt.Equals(f.MajorVersion(), ""))
+			} else {
+				qt.Assert(t, qt.Equals(f.Module(), f.ModuleField+"@v0"))
+				qt.Assert(t, qt.Equals(f.ModulePath(), f.ModuleField))
+				qt.Assert(t, qt.Equals(f.MajorVersion(), "v0"))
+			}
 		})
 	}
 }
@@ -433,7 +457,7 @@ func TestFormat(t *testing.T) {
 			Language: &Language{
 				Version: "v0.8.0",
 			},
-			Module: "foo.com/bar@v0",
+			ModuleField: "foo.com/bar@v0",
 			Deps: map[string]*Dep{
 				"example.com@v1": {
 					Version: "v1.2.3",
@@ -458,7 +482,7 @@ deps: {
 `}, {
 		name: "WithoutLanguage",
 		file: &File{
-			Module: "foo.com/bar@v0",
+			ModuleField: "foo.com/bar@v0",
 			Language: &Language{
 				Version: "v0.8.0",
 			},
@@ -470,7 +494,7 @@ language: {
 `}, {
 		name: "WithVersionTooEarly",
 		file: &File{
-			Module: "foo.com/bar@v0",
+			ModuleField: "foo.com/bar@v0",
 			Language: &Language{
 				Version: "v0.4.3",
 			},
@@ -479,7 +503,7 @@ language: {
 	}, {
 		name: "WithInvalidModuleVersion",
 		file: &File{
-			Module: "foo.com/bar@v0",
+			ModuleField: "foo.com/bar@v0",
 			Language: &Language{
 				Version: "badversion--",
 			},
@@ -488,7 +512,7 @@ language: {
 	}, {
 		name: "WithNonNilEmptyDeps",
 		file: &File{
-			Module: "foo.com/bar@v0",
+			ModuleField: "foo.com/bar@v0",
 			Language: &Language{
 				Version: "v0.8.0",
 			},

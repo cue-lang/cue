@@ -7,7 +7,7 @@ exec cue export .
 cmp stdout want-stdout
 
 -- want-module --
-module: "main.example@v0"
+module: "main.example"
 language: {
 	version: "v0.8.0"
 }

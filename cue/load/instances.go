@@ -156,7 +156,7 @@ func loadPackages(ctx context.Context, cfg *Config, synCache *syntaxCache, pkgs 
 		return nil, nil
 	}
 	reqs := modrequirements.NewRequirements(
-		cfg.modFile.Module,
+		cfg.modFile.QualifiedModule(),
 		cfg.Registry,
 		cfg.modFile.DepVersions(),
 		cfg.modFile.DefaultMajorVersions(),

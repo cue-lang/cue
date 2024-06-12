@@ -1,5 +1,4 @@
-# Test that cue mod publish fails when the module path lacks a major version suffix.
-# The module path can be fixed up with `cue mod fix` and then published successfully.
+# Test that cue mod publish succeeds when the module path lacks a major version suffix.
 # Using or developing the module locally works otherwise, even `cue mod tidy`.
 
 memregistry MEMREGISTRY
@@ -11,27 +10,21 @@ exec cue mod tidy --check
 
 cp cue.mod/module.cue cue.mod/module.cue.original
 
-! exec cue mod publish v0.0.1
-# TODO(mvdan): this error message should not use an absolute path.
-# TODO(mvdan): we should suggest what command to run to the user based on the version to publish.
-stderr 'module path "main.example" in '${WORK@R}\${/}cue.mod\${/}'module.cue does not contain major version'
+exec cue mod publish v0.0.1
 
-# Note that module commands like `cue mod tidy` work even without a major version suffix
-# as one is not required to fully use the current module locally, even with dependencies.
-exec cue mod tidy --check
+# The inferred version is v0. Using any other major version will fail.
+! exec cue mod publish v1.0.0
+stderr 'mismatched major version suffix'
+! exec cue mod publish v2.0.0
+stderr 'mismatched major version suffix'
 
-# `cue mod fix` adds a major version suffix "v0" when missing.
-# The user can use `cue mod edit --module` if they want a different major version.
+# `cue mod fix` will not add add a major version suffix when missing.
 exec cue mod fix
 cmp cue.mod/module.cue cue.mod/module.cue.fixed
 
-# TODO(mvdan): we cannot edit the module to add a missing major version suffix, which seems like a bug.
 cp cue.mod/module.cue.original cue.mod/module.cue
-! exec cue mod edit --module main.example@v0
-stderr 'module.cue does not contain major version'
-
-# Continue the test with the fixed v0 form.
-cp cue.mod/module.cue.fixed cue.mod/module.cue
+exec cue mod edit --module main.example@v0
+cmp cue.mod/module.cue cue.mod/module.cue.edited-with-v0
 
 # Trying to publish with the wrong major version will fail.
 ! exec cue mod publish v1.0.0
@@ -40,7 +33,7 @@ stderr 'mismatched major version suffix'
 stderr 'mismatched major version suffix'
 
 # Publishing with the right major version works.
-exec cue mod publish v0.0.1
+exec cue mod publish v0.0.2
 
 -- export.stdout --
 {
@@ -51,6 +44,14 @@ module: "main.example"
 language: version: "v0.9.0"
 source: kind: "self"
 -- cue.mod/module.cue.fixed --
+module: "main.example"
+language: {
+	version: "v0.9.0"
+}
+source: {
+	kind: "self"
+}
+-- cue.mod/module.cue.edited-with-v0 --
 module: "main.example@v0"
 language: {
 	version: "v0.9.0"

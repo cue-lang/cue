@@ -134,7 +134,7 @@ func runModUpload(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	mv, err := module.NewVersion(mf.Module, args[0])
+	mv, err := module.NewVersion(mf.QualifiedModule(), args[0])
 	if err != nil {
 		return fmt.Errorf("cannot form module version: %v", err)
 	}

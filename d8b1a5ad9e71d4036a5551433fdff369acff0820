@@ -16,6 +16,24 @@
       "message": "please summarize the fix in the commit message, e.g. as a brief version of the comment you already wrote below.",
       "revId": "d8b1a5ad9e71d4036a5551433fdff369acff0820",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01f42958_d176e8c7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-12T13:33:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e780fd91_8e84f1e7",
+      "revId": "d8b1a5ad9e71d4036a5551433fdff369acff0820",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

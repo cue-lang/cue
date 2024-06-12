@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a482ad6b_b6b1c8bf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-12T10:26:20Z",
+      "side": 1,
+      "message": "typo? (see other comment for naming thoughts)",
+      "revId": "0ed1b31ef4a7d1ec1d3ff11cd9b8d2c300f12fae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0e5343e_d921356f",
+        "filename": "cue/load/config.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-12T10:26:20Z",
+      "side": 1,
+      "message": "Naming thought: `AcceptLegacayModules`\n\n\"module files\" seems ambiguous to me because it\u0027s not defined anywhere. Could be the files in a module, or `cue.mod/module.cue`.",
+      "revId": "0ed1b31ef4a7d1ec1d3ff11cd9b8d2c300f12fae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6333c6c8_47e7b822",
+        "filename": "cue/load/config.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-12T10:26:20Z",
+      "side": 1,
+      "message": "Noting here that this is stricter than `v0.7.0` because we now enforce data-only. But I think we have to consider that a bug fix. Perhaps add a comment to that effect?",
+      "revId": "0ed1b31ef4a7d1ec1d3ff11cd9b8d2c300f12fae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0232aaf_355958ff",
+        "filename": "cue/load/config.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-12T10:26:20Z",
+      "side": 1,
+      "message": "Also I\u0027m not clear that we end up with the right `language.version` in this case. Didn\u0027t we agree we would \"pin\" to `v0.7.0`? Using the current CUE version is wrong to my mind because any later language change that we do make contingent on the `language.version` will automatically be enabled when loading legacy modules. That can\u0027t be right?",
+      "revId": "0ed1b31ef4a7d1ec1d3ff11cd9b8d2c300f12fae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -139,6 +139,24 @@
       "parentUuid": "6333c6c8_47e7b822",
       "revId": "0ed1b31ef4a7d1ec1d3ff11cd9b8d2c300f12fae",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81da6992_e47802e8",
+        "filename": "cue/load/config.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-06-12T11:52:30Z",
+      "side": 1,
+      "message": "Please can you therefore add a TODO with a link to an issue (after creating one) that captures this? We can indeed punt on it for now... but there is also no harm in making that change ~soon to get it out of the way.",
+      "parentUuid": "d11386e7_a4b9af12",
+      "revId": "0ed1b31ef4a7d1ec1d3ff11cd9b8d2c300f12fae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

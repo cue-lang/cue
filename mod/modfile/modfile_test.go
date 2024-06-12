@@ -227,10 +227,10 @@ deps: "example.com@v1": v: "v1.2"
 	testName: "NonCanonicalModule",
 	parse:    Parse,
 	data: `
-module: "foo.com/bar"
+module: "foo.com/bar@v0.1.2"
 language: version: "v0.8.0"
 `,
-	wantError: `module path "foo.com/bar" in module.cue does not contain major version`,
+	wantError: `module path foo.com/bar@v0.1.2 in "module.cue" should contain the major version only`,
 }, {
 	testName: "NonCanonicalDep",
 	parse:    Parse,
@@ -258,7 +258,7 @@ language: version: "v0.8.0"
 deps: "example.com": v: "v1.2.3"
 `,
 	want: &File{
-		Module:   "foo.com/bar@v0",
+		Module:   "foo.com/bar",
 		Language: &Language{Version: "v0.8.0"},
 		Deps: map[string]*Dep{
 			"example.com": {
@@ -290,6 +290,16 @@ _foo: "blah.example"
 `,
 	wantError: `invalid module.cue file syntax: references not allowed in data mode:
     module.cue:2:9`,
+}, {
+	testName: "LegacyNoModule",
+	parse:    ParseLegacy,
+	data:     "",
+	want:     &File{},
+}, {
+	testName: "LegacyEmptyModule",
+	parse:    ParseLegacy,
+	data:     `module: ""`,
+	want:     &File{},
 }, {
 	testName: "ReferencesNotAllowed#1",
 	parse:    Parse,
@@ -349,7 +359,7 @@ custom: "somewhere.com": foo: true
 module: "foo.com/bar"
 `,
 	want: &File{
-		Module:   "foo.com/bar@v0",
+		Module:   "foo.com/bar",
 		Language: &Language{Version: "v0.9.0"},
 	},
 	wantDefaults: map[string]string{
@@ -361,7 +371,7 @@ module: "foo.com/bar"
 	data: `
 `,
 	want: &File{
-		Module:   "test.example@v0",
+		Module:   "test.example",
 		Language: &Language{Version: "v0.9.0"},
 	},
 	wantDefaults: map[string]string{
@@ -374,7 +384,7 @@ module: "foo.com/bar"
 module: ""
 `,
 	want: &File{
-		Module:   "test.example@v0",
+		Module:   "test.example",
 		Language: &Language{Version: "v0.9.0"},
 	},
 	wantDefaults: map[string]string{
@@ -389,7 +399,7 @@ some: true
 other: field: 123
 `,
 	want: &File{
-		Module:   "foo.com@v0",
+		Module:   "foo.com",
 		Language: &Language{Version: "v0.9.0"},
 		Custom: map[string]map[string]any{
 			"legacy": {
@@ -416,6 +426,20 @@ func TestParse(t *testing.T) {
 			qt.Assert(t, fileEquals(f, test.want))
 			qt.Assert(t, qt.DeepEquals(f.DepVersions(), test.wantVersions))
 			qt.Assert(t, qt.DeepEquals(f.DefaultMajorVersions(), test.wantDefaults))
+			path, vers, ok := strings.Cut(f.Module, "@")
+			if ok {
+				qt.Assert(t, qt.Equals(f.QualifiedModule(), f.Module))
+				qt.Assert(t, qt.Equals(f.ModulePath(), path))
+				qt.Assert(t, qt.Equals(f.MajorVersion(), vers))
+			} else if f.Module == "" {
+				qt.Assert(t, qt.Equals(f.QualifiedModule(), ""))
+				qt.Assert(t, qt.Equals(f.ModulePath(), ""))
+				qt.Assert(t, qt.Equals(f.MajorVersion(), ""))
+			} else {
+				qt.Assert(t, qt.Equals(f.QualifiedModule(), f.Module+"@v0"))
+				qt.Assert(t, qt.Equals(f.ModulePath(), f.Module))
+				qt.Assert(t, qt.Equals(f.MajorVersion(), "v0"))
+			}
 		})
 	}
 }

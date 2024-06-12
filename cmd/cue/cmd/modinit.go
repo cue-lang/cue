@@ -22,7 +22,6 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
@@ -63,10 +62,6 @@ func runModInit(cmd *Command, args []string) (err error) {
 					err1 = err
 				}
 				return fmt.Errorf("invalid module name %q: %v", modulePath, err1)
-			}
-			// Default major version to v0 if the modules experiment is enabled.
-			if cueexperiment.Flags.Modules {
-				modulePath += "@v0"
 			}
 		}
 	}

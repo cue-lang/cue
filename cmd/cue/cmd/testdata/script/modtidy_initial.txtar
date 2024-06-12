@@ -19,7 +19,7 @@ cmp stdout cue-cache-dir.files
 # Unused dependencies should not have their entire source downloaded or extracted.
 ! stdout 'unused\.com.*\.zip$'
 -- want-module --
-module: "main.org@v0"
+module: "main.org"
 language: {
 	version: "v0.8.0"
 }
@@ -47,10 +47,10 @@ deps: {
     "example.com@v0": "v0.0.1"
 }
 -- cue.mod/module.cue --
-module: "main.org@v0"
+module: "main.org"
 language: version: "v0.8.0"
 
-deps: "example.com@v0": v: "v0.0.1"
+deps: "example.com": v: "v0.0.1"
 deps: "unused.com@v0": v: "v0.2.4"
 
 -- main.cue --

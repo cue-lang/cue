@@ -157,6 +157,24 @@
       "parentUuid": "d11386e7_a4b9af12",
       "revId": "0ed1b31ef4a7d1ec1d3ff11cd9b8d2c300f12fae",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c457f05_62928229",
+        "filename": "cue/load/config.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-12T13:19:54Z",
+      "side": 1,
+      "message": "As discussed yesterday, I think the change should happen for `cue mod fix` too, so AFAICS this code will still remain valid when that happens, so the TODO here doesn\u0027t seem quite right. I\u0027ll raise an issue as suggested.",
+      "parentUuid": "81da6992_e47802e8",
+      "revId": "0ed1b31ef4a7d1ec1d3ff11cd9b8d2c300f12fae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

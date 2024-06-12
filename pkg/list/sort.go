@@ -218,7 +218,7 @@ func SortStable(list []cue.Value, cmp cue.Value) (sorted []cue.Value, err error)
 	return s.ret()
 }
 
-// Strings sorts a list of strings in increasing order.
+// SortStrings sorts a list of strings in increasing order.
 func SortStrings(a []string) []string {
 	sort.Strings(a)
 	return a

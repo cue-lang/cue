@@ -93,6 +93,18 @@ var p = &pkg.Package{
 			}
 		},
 	}, {
+		Name: "Reverse",
+		Params: []pkg.Param{
+			{Kind: adt.ListKind},
+		},
+		Result: adt.ListKind,
+		Func: func(c *pkg.CallCtxt) {
+			x := c.List(0)
+			if c.Do() {
+				c.Ret = Reverse(x)
+			}
+		},
+	}, {
 		Name: "MinItems",
 		Params: []pkg.Param{
 			{Kind: adt.ListKind},

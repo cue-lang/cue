@@ -76,7 +76,11 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 		if ref == nil {
 			return f
 		}
-		i, err := v.Lookup(ref...).Fields()
+		var selectors []cue.Selector
+		for _, r := range ref {
+			selectors = append(selectors, cue.Str(r))
+		}
+		i, err := v.LookupPath(cue.MakePath(selectors...)).Fields()
 		if err != nil {
 			d.errs = errors.Append(d.errs, errors.Promote(err, ""))
 			return nil
@@ -195,10 +199,6 @@ func (d *decoder) uint(n cue.Value) ast.Expr {
 	if err != nil {
 		d.errf(n, "invalid uint")
 	}
-	return n.Syntax(cue.Final()).(ast.Expr)
-}
-
-func (d *decoder) bool(n cue.Value) ast.Expr {
 	return n.Syntax(cue.Final()).(ast.Expr)
 }
 

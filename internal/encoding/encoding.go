@@ -240,7 +240,9 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 			i.doInterpret()
 		}
 	case build.JSON, build.JSONL:
-		i.next = json.NewDecoder(nil, path, r).Extract
+		b, err := io.ReadAll(r)
+		i.err = err
+		i.next = json.NewDecoder(nil, path, b).Extract
 		i.Next()
 	case build.YAML:
 		b, err := io.ReadAll(r)

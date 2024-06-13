@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"strings"
 	"testing"
 
 	"github.com/go-quicktest/qt"
@@ -122,7 +121,7 @@ func TestExtract(t *testing.T) {
 			qt.Assert(t, qt.Equals(out.String(), tc.out))
 
 			out = &bytes.Buffer{}
-			d := NewDecoder(nil, tc.name, strings.NewReader(tc.in))
+			d := NewDecoder(nil, tc.name, []byte(tc.in))
 			for {
 				e, err := d.Extract()
 				if err == io.EOF {

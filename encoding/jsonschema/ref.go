@@ -265,9 +265,6 @@ func (s *state) getNextSelector(v cue.Value, a []string) (l label, tail []string
 
 		return label{a[1], false}, a[2:]
 
-	default:
-		return label{elem, false}, a[1:]
-
 	case "additionalProperties",
 		"patternProperties",
 		"items",
@@ -278,6 +275,9 @@ func (s *state) getNextSelector(v cue.Value, a []string) (l label, tail []string
 
 		// Other known fields cannot be supported.
 		return label{}, nil
+
+	default:
+		return label{elem, false}, a[1:]
 	}
 }
 

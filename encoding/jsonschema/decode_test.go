@@ -29,6 +29,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
@@ -68,8 +69,8 @@ func TestDecode(t *testing.T) {
 				}
 			}
 
-			r := &cue.Runtime{}
-			var in *cue.Instance
+			ctx := cuecontext.New()
+			var v cue.Value
 			var out, errout []byte
 			outIndex := -1
 			errIndex := -1
@@ -77,9 +78,17 @@ func TestDecode(t *testing.T) {
 			for i, f := range a.Files {
 				switch path.Ext(f.Name) {
 				case ".json":
-					in, err = json.Decode(r, f.Name, f.Data)
+					expr, err := json.Extract(f.Name, f.Data)
+					if err != nil {
+						t.Fatal(err)
+					}
+					v = ctx.BuildExpr(expr)
 				case ".yaml":
-					in, err = yaml.Decode(r, f.Name, f.Data)
+					file, err := yaml.Extract(f.Name, f.Data)
+					if err != nil {
+						t.Fatal(err)
+					}
+					v = ctx.BuildFile(file)
 				case ".cue":
 					out = f.Data
 					outIndex = i
@@ -94,7 +103,7 @@ func TestDecode(t *testing.T) {
 
 			updated := false
 
-			expr, err := Extract(in, cfg)
+			expr, err := Extract(v, cfg)
 			if err != nil {
 				got := []byte(errors.Details(err, nil))
 
@@ -120,7 +129,8 @@ func TestDecode(t *testing.T) {
 
 				// verify the generated CUE.
 				if !bytes.Contains(a.Comment, []byte("#noverify")) {
-					if _, err = r.Compile(fullpath, b); err != nil {
+					v := ctx.CompileBytes(b, cue.Filename(fullpath))
+					if err := v.Err(); err != nil {
 						t.Fatal(errors.Details(err, nil))
 					}
 				}
@@ -160,26 +170,28 @@ func TestX(t *testing.T) {
 
 	a := txtar.Parse([]byte(data))
 
-	r := &cue.Runtime{}
-	var in *cue.Instance
+	ctx := cuecontext.New()
+	var v cue.Value
 	var err error
 	for _, f := range a.Files {
 		switch path.Ext(f.Name) {
 		case ".json":
-			in, err = json.Decode(r, f.Name, f.Data)
+			expr, err := json.Extract(f.Name, f.Data)
 			if err != nil {
 				t.Fatal(err)
 			}
+			v = ctx.BuildExpr(expr)
 		case ".yaml":
-			in, err = yaml.Decode(r, f.Name, f.Data)
+			file, err := yaml.Extract(f.Name, f.Data)
 			if err != nil {
 				t.Fatal(err)
 			}
+			v = ctx.BuildFile(file)
 		}
 	}
 
 	cfg := &Config{ID: "test"}
-	expr, err := Extract(in, cfg)
+	expr, err := Extract(v, cfg)
 	if err != nil {
 		t.Fatal(err)
 	}

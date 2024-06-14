@@ -34,6 +34,24 @@
       "parentUuid": "482249e4_c580e34c",
       "revId": "006ac58286520ea487a008964f7eecfb3fecfde5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a707684e_02ff74ac",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-06-14T10:47:15Z",
+      "side": 1,
+      "message": "I meant the \"//-style\" remark, since we don\u0027t have any other style of comments. But we should not remove godoc, of course.",
+      "parentUuid": "17274347_6c1b846b",
+      "revId": "006ac58286520ea487a008964f7eecfb3fecfde5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

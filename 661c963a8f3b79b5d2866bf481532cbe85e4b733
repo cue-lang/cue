@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e69e61c2_eedc27ef",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-14T07:55:10Z",
+      "side": 1,
+      "message": "Hi, thanks for this patch!\n\nPresumably this fixes https://github.com/cue-lang/cue/issues/722? If not, what bug is this fixing?\n\nI have had a fix at https://review.gerrithub.io/c/cue-lang/cue/+/1196134 for a few days, so it\u0027s slightly unfortunate timing. Note that I had to be careful to adjust the rest of the repository to update all formatted/generated CUE code without any regressions, though.\n\nI would suggest we continue with that patch given that it\u0027s more complete, unless you think your solution is the better approach. From a quick look, both solutions seem reasonable to me.",
+      "revId": "661c963a8f3b79b5d2866bf481532cbe85e4b733",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

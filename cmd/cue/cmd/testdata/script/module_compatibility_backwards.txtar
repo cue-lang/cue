@@ -17,10 +17,10 @@ env CUE_REGISTRY=$MEMREGISTRY+insecure
 
 # A module that was created before the modules experiment,
 # without a major version suffix nor a language version.
+cd ${WORK}/premodules
 
 # Downstream consumption via cue.mod/*/ works.
 # Downstream consumption via a registry is not possible as its module path lacks a major version suffix.
-cd ${WORK}/premodules
 exec cue export
 stdout '"downstream": "hello from premodules.example"'
 
@@ -56,11 +56,11 @@ exec cue mod publish v0.0.2
 
 
 # A module that was created with a language.version of v0.8.0.
+cd ${WORK}/v0.8.0-downstream-deps
 
 # Downstream consumption via a registry works.
 # Note that we need to point CUE_REGISTRY back to the contents inside _registry/ below.
 env CUE_REGISTRY=${ORIG_CUE_REGISTRY}
-cd ${WORK}/v0.8.0-downstream-deps
 exec cue export
 stdout '"downstream": "hello from v0.8.0.example"'
 env CUE_REGISTRY=$MEMREGISTRY+insecure

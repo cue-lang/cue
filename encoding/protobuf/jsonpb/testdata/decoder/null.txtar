@@ -55,7 +55,7 @@ a9: null
 a10: null
 
 -- data.cue --
-	// comment a0
+// comment a0
 a0: null
 
 // comment a1
@@ -88,7 +88,7 @@ a9: null
 // comment a10
 a10: null
 -- out/jsonpb/data.yaml --
-	// comment a0
+// comment a0
 a0: 0
 
 // comment a1
@@ -121,7 +121,7 @@ a9: true
 // comment a10
 a10: null
 -- out/jsonpb/data.cue --
-	// comment a0
+// comment a0
 a0: 0
 
 // comment a1

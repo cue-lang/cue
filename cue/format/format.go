@@ -315,8 +315,10 @@ func (f *formatter) printComment(cg *ast.CommentGroup) {
 	f.Print(cg)
 
 	printBlank := false
-	if cg.Doc && len(f.output) > 0 {
-		f.Print(newline)
+	if cg.Doc {
+		if len(f.output) > 0 {
+			f.Print(newline)
+		}
 		printBlank = true
 	}
 	for _, c := range cg.List {

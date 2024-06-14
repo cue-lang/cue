@@ -16,6 +16,24 @@
       "message": "To be a bit clearer, I suggest:\n\ncmd/cue: correctly import comments after a field key\n\nThe YAML decoder attached an inline key comment to the label,\nrather than to the entire field, which caused the comment to be printed\nbefore the colon character and cause weird formatting.\n\nThen teach cue/format to print an inline comment on a field colon.\n\nFixes #3214.",
       "revId": "f38ac456fb1a28cea4d427dfacd5227fe65fce73",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ecd3a5c_bb908d2e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-06-14T09:50:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a6b71a75_df18486a",
+      "revId": "f38ac456fb1a28cea4d427dfacd5227fe65fce73",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

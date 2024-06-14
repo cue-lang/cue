@@ -47,6 +47,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cueversion"
+	"cuelang.org/go/internal/mod/semver"
 	"cuelang.org/go/internal/registrytest"
 )
 
@@ -257,7 +258,11 @@ func TestScript(t *testing.T) {
 			e.Vars = append(e.Vars,
 				"GOPROXY="+srv.URL,
 				"GONOSUMDB=*", // GOPROXY is a private proxy
+
+				// The current language version which would be added by `cue mod init`, e.g. v0.10.0.
 				"CUE_LANGUAGE_VERSION="+cueversion.LanguageVersion(),
+				// A later language version which only increases the bugfix release, e.g. v0.10.99.
+				"CUE_LANGUAGE_VERSION_BUGFIX="+semver.MajorMinor(cueversion.LanguageVersion())+".99",
 			)
 			entries, err := os.ReadDir(e.WorkDir)
 			if err != nil {

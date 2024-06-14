@@ -401,7 +401,7 @@ outer:
 		if err != nil {
 			return err
 		}
-		d.addCommentsToNode(label, yk, 1)
+		d.addCommentsToNode(field, yk, 2)
 		field.Label = label
 
 		if mergeValues {

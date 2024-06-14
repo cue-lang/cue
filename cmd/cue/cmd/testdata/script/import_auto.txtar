@@ -1,6 +1,18 @@
 exec cue import -o - ./openapi.yaml
 cmp stdout expect-openapi
 
+# Issue #3214
+exec cue import -o - -f ./import1.yaml
+cmp stdout expect-stdout1
+
+-- import1.yaml --
+a: # inline comment for a
+  b: "value" # inline comment for b
+-- expect-stdout1 --
+a: // inline comment for a
+{
+	b: "value" // inline comment for b
+}
 -- expect-openapi --
 // An OpenAPI file
 

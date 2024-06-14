@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4e8fcf13_20121762",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-06-14T10:35:36Z",
+      "side": 1,
+      "message": "LGTM after one trivial change.",
+      "revId": "f5322fc81dccc8cb5bec3b8d864139d1b40e9d7e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "792089dc_0a30bc9c",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 572,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-06-14T10:35:36Z",
+      "side": 1,
+      "message": "Very minor nitpick, but please remove \"Note that\". To me that reads like some warning about the whole function, whereas it\u0027s just a comment that\u0027s directly applicable to the following few lines.",
+      "revId": "f5322fc81dccc8cb5bec3b8d864139d1b40e9d7e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

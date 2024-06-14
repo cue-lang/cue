@@ -16,6 +16,24 @@
       "message": "Kinda superfluous.",
       "revId": "006ac58286520ea487a008964f7eecfb3fecfde5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "17274347_6c1b846b",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-14T10:39:38Z",
+      "side": 1,
+      "message": "do you mean the remaining godoc? perhaps, but I don\u0027t want to get into it here, and I think removing any godoc is worse.",
+      "parentUuid": "482249e4_c580e34c",
+      "revId": "006ac58286520ea487a008964f7eecfb3fecfde5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

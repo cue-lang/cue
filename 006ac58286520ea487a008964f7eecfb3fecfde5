@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "482249e4_c580e34c",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-06-14T10:21:19Z",
+      "side": 1,
+      "message": "Kinda superfluous.",
+      "revId": "006ac58286520ea487a008964f7eecfb3fecfde5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

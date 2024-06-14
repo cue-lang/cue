@@ -52,6 +52,24 @@
       "parentUuid": "17274347_6c1b846b",
       "revId": "006ac58286520ea487a008964f7eecfb3fecfde5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "21808905_f145cb31",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-14T10:51:58Z",
+      "side": 1,
+      "message": "Ah. I actually think it\u0027s a good reminder, because API users might come from other languages where comments look different, e.g. Go, and the rest of the type (e.g. the Slash position) relates to the `//` prefix.",
+      "parentUuid": "a707684e_02ff74ac",
+      "revId": "006ac58286520ea487a008964f7eecfb3fecfde5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

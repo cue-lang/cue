@@ -9,11 +9,43 @@
 # cover scenarios where just one of them is too new,
 # as we should allow downstream consumption when only the module schema version is too new.
 
-# A module that was created with a language.version of v0.99.0 in the far future.
+# A module that was created with a language.version of ${CUE_LANGUAGE_VERSION_BUGFIX},
+# which is like the current ${CUE_LANGUAGE_VERSION} but with a higher bugfix release.
+# For example, if ${CUE_LANGUAGE_VERSION} is v0.10.0 or v0.10.5, ${CUE_LANGUAGE_VERSION_BUGFIX} is v0.10.99.
+# Even though the language spec should not change in bugfix releases,
+# we still treat the language version as a hard minimum following semver.
+cd ${WORK}/bugfix-newer
+env-fill cue.mod/pkg/bugfix-newer.example/cue.mod/module.cue
 
 # TODO(mvdan): downstream consumption via cue.mod/*/ works when it should not,
 # because we do not yet use language.version as a minimum for parsing or evaluating CUE.
+exec cue export
+stdout '"downstream": "hello from bugfix-newer.example"'
+
+# TODO(mvdan): test downstream consumption via a registry; note that _registry/ complains
+# because it is unable to parse the module.cue file with a schema that is too new.
+
+# Continue inside the module's own directory as if we had cloned it directly.
+cd ${WORK}
+mv bugfix-newer/cue.mod/pkg/bugfix-newer.example bugfix-newer-downstream-direct
+cd bugfix-newer-downstream-direct
+
+# Downstream consumption via `cue export` does not work as we don't support the language spec version.
+! exec cue export
+cmp stderr ${WORK}/bugfix-newer-toonew.stderr
+
+# Upstream development and publishing is forbidden as we don't have or understand the schema.
+! exec cue mod tidy --check
+cmp stderr ${WORK}/bugfix-newer-toonew.stderr
+! exec cue mod publish v0.0.2
+cmp stderr ${WORK}/bugfix-newer-toonew.stderr
+
+
+# A module that was created with a language.version of v0.99.0 in the far future.
 cd ${WORK}/v0.99.0
+
+# TODO(mvdan): downstream consumption via cue.mod/*/ works when it should not,
+# because we do not yet use language.version as a minimum for parsing or evaluating CUE.
 exec cue export
 stdout '"downstream": "hello from v0.99.0.example"'
 
@@ -34,6 +66,26 @@ cmp stderr ${WORK}/v0.99.0-toonew.stderr
 cmp stderr ${WORK}/v0.99.0-toonew.stderr
 ! exec cue mod publish v0.0.2
 cmp stderr ${WORK}/v0.99.0-toonew.stderr
+
+-- bugfix-newer-toonew.stderr --
+language version "v0.10.99" declared in module.cue is too new for current language version "v0.10.0"
+-- bugfix-newer/cue.mod/module.cue --
+module: "downstream.example"
+language: version: "v0.9.0"
+-- bugfix-newer/downstream.cue --
+package downstream
+import "bugfix-newer.example:root"
+downstream: root
+-- bugfix-newer/cue.mod/pkg/bugfix-newer.example/cue.mod/module.cue --
+module: "bugfix-newer.example"
+language: version: "${CUE_LANGUAGE_VERSION_BUGFIX}"
+-- bugfix-newer/cue.mod/pkg/bugfix-newer.example/root.cue --
+package root
+import "bugfix-newer.example/subpkg"
+subpkg
+-- bugfix-newer/cue.mod/pkg/bugfix-newer.example/subpkg/subpkg.cue --
+package subpkg
+"hello from bugfix-newer.example"
 
 -- v0.99.0-toonew.stderr --
 language version "v0.99.0" declared in module.cue is too new for current language version "v0.10.0"

@@ -314,6 +314,7 @@ func (f *formatter) decl(decl ast.Decl) {
 		} else {
 			f.print(blank, nooverride, n.Token)
 		}
+		f.visitComments(f.current.pos)
 
 		if mem := f.inlineField(n); mem != nil {
 			switch {

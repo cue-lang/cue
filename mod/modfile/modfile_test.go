@@ -360,7 +360,7 @@ module: "foo.com/bar"
 `,
 	want: &File{
 		Module:   "foo.com/bar",
-		Language: &Language{Version: "v0.9.0"},
+		Language: &Language{Version: "v0.10.0"},
 	},
 	wantDefaults: map[string]string{
 		"foo.com/bar": "v0",
@@ -372,7 +372,7 @@ module: "foo.com/bar"
 `,
 	want: &File{
 		Module:   "test.example",
-		Language: &Language{Version: "v0.9.0"},
+		Language: &Language{Version: "v0.10.0"},
 	},
 	wantDefaults: map[string]string{
 		"test.example": "v0",
@@ -385,7 +385,7 @@ module: ""
 `,
 	want: &File{
 		Module:   "test.example",
-		Language: &Language{Version: "v0.9.0"},
+		Language: &Language{Version: "v0.10.0"},
 	},
 	wantDefaults: map[string]string{
 		"test.example": "v0",
@@ -400,7 +400,7 @@ other: field: 123
 `,
 	want: &File{
 		Module:   "foo.com",
-		Language: &Language{Version: "v0.9.0"},
+		Language: &Language{Version: "v0.10.0"},
 		Custom: map[string]map[string]any{
 			"legacy": {
 				"some":  true,

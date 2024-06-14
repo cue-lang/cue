@@ -5,7 +5,7 @@ go 1.21
 require (
 	cuelabs.dev/go/oci/ociregistry v0.0.0-20240404174027-a39bec0462d2
 	github.com/cockroachdb/apd/v3 v3.2.1
-	github.com/emicklei/proto v1.10.0
+	github.com/emicklei/proto v1.13.2
 	github.com/go-quicktest/qt v1.101.0
 	github.com/google/go-cmp v0.6.0
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510

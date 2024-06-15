@@ -98,7 +98,7 @@ func MarshalStream(v cue.Value) (string, error) {
 // UnmarshalStream parses the JSON to a CUE instance.
 func UnmarshalStream(data []byte) (ast.Expr, error) {
 	var r cue.Runtime
-	d := cuejson.NewDecoder(&r, "", bytes.NewReader(data))
+	d := cuejson.NewDecoder(&r, "", data)
 
 	a := []ast.Expr{}
 	for {

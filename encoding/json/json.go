@@ -16,6 +16,7 @@
 package json
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -28,6 +29,7 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/source"
 )
 
 // Valid reports whether data is a valid JSON encoding.
@@ -60,7 +62,7 @@ func Extract(path string, data []byte) (ast.Expr, error) {
 	if err != nil {
 		return nil, err
 	}
-	patchExpr(expr)
+	patchExpr(expr, nil)
 	return expr, nil
 }
 
@@ -96,10 +98,15 @@ func extract(path string, b []byte) (ast.Expr, error) {
 //
 // The runtime may be nil if Decode isn't used.
 func NewDecoder(r *cue.Runtime, path string, src io.Reader) *Decoder {
+	b, err := source.ReadAll(path, src)
+	tokFile := token.NewFile(path, 0, len(b))
+	tokFile.SetLinesForContent(b)
 	return &Decoder{
-		r:    r,
-		path: path,
-		dec:  json.NewDecoder(src),
+		r:          r,
+		path:       path,
+		dec:        json.NewDecoder(bytes.NewReader(b)),
+		tokFile:    tokFile,
+		readAllErr: err,
 	}
 }
 
@@ -108,16 +115,24 @@ type Decoder struct {
 	r    *cue.Runtime
 	path string
 	dec  *json.Decoder
+
+	startOffset int
+	tokFile     *token.File
+	readAllErr  error
 }
 
 // Extract converts the current JSON value to a CUE ast. It returns io.EOF
 // if the input has been exhausted.
 func (d *Decoder) Extract() (ast.Expr, error) {
+	if d.readAllErr != nil {
+		return nil, d.readAllErr
+	}
+
 	expr, err := d.extract()
 	if err != nil {
 		return expr, err
 	}
-	patchExpr(expr)
+	patchExpr(expr, d.patchPos)
 	return expr, nil
 }
 
@@ -128,7 +143,7 @@ func (d *Decoder) extract() (ast.Expr, error) {
 		return nil, err
 	}
 	if err != nil {
-		pos := token.NewFile(d.path, -1, len(raw)).Pos(0, 0)
+		pos := d.tokFile.Pos(int(d.dec.InputOffset()), 0)
 		return nil, errors.Wrapf(err, pos, "invalid JSON for file %q", d.path)
 	}
 	expr, err := parser.ParseExpr(d.path, []byte(raw))
@@ -136,7 +151,15 @@ func (d *Decoder) extract() (ast.Expr, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	d.startOffset = int(d.dec.InputOffset()) - len(raw)
 	return expr, nil
+}
+
+func (d *Decoder) patchPos(n ast.Node) {
+	pos := n.Pos()
+	realPos := d.tokFile.Pos(pos.Offset()+d.startOffset, pos.RelPos())
+	ast.SetPos(n, realPos)
 }
 
 // Decode converts the current JSON value to a CUE instance. It returns io.EOF
@@ -155,7 +178,7 @@ func (d *Decoder) Decode() (*cue.Instance, error) {
 // TODO: some of the modifications are already done in format, but are
 // a package deal of a more aggressive simplify. Other pieces of modification
 // should probably be moved to format.
-func patchExpr(n ast.Node) {
+func patchExpr(n ast.Node, patchPos func(n ast.Node)) {
 	type info struct {
 		reflow bool
 	}
@@ -171,6 +194,10 @@ func patchExpr(n ast.Node) {
 	var beforeFn func(n ast.Node) bool
 
 	beforeFn = func(n ast.Node) bool {
+		if patchPos != nil {
+			patchPos(n)
+		}
+
 		isLarge := n.End().Offset()-n.Pos().Offset() > 50
 		descent := true
 

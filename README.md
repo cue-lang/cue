@@ -97,49 +97,37 @@ Some aspects of this are:
 
 #### Run with Docker
 
-The release binaries are published as a Docker image described by our [Dockerfile](Dockerfile):
-
 	docker run cuelang/cue version
 
 #### Install using Homebrew
-
-Using [Homebrew](https://brew.sh), you can install using the CUE Homebrew tap:
 
 	brew install cue-lang/tap/cue
 
 #### Install from Source
 
-You need [Go 1.21 or later](https://go.dev/doc/install) to build CUE from source.
-
-To download and install the `cue` command line tool, run:
+You need [Go 1.21 or later](https://go.dev/doc/install) to install CUE from source:
 
 	go install cuelang.org/go/cmd/cue@latest
 
-You can also build the tool locally from source via `go install ./cmd/cue`.
-Note that local release builds [lack version information](https://go.dev/issue/50603),
-so they should inject the version string, such as:
+You can also clone the repository and build it directly via `go install ./cmd/cue`.
+Note that local builds [lack version information](https://go.dev/issue/50603),
+so you should inject the version string when building a release, such as:
 
 	git switch -d v0.9.0
 	go install -ldflags='-X cuelang.org/go/cmd/cue/cmd.version=v0.9.0' ./cmd/cue
 
 ### Learning CUE
 
-The fastest way to learn the basics is to follow the
-[tutorial on basic language constructs](https://cuelang.org/docs/tour/).
+The fastest way to learn the basics is to follow the [tour on the website](https://cuelang.org/docs/tour/).
 
-A more elaborate tutorial demonstrating how to convert and restructure
-an existing set of Kubernetes configurations is available in
-[written form](https://github.com/cue-labs/cue-by-example/tree/main/003_kubernetes_tutorial).
+More documentation including various tutorials can be found [on the website](https://cuelang.org/docs/).
 
 ### References
 
-- [Language Specification](./doc/ref/spec.md): official CUE Language specification.
-
-- [API](https://pkg.go.dev/cuelang.org/go/cue): the API on pkg.go.dev
-
-- [Builtin packages](https://pkg.go.dev/cuelang.org/go/pkg): builtins available from CUE programs
-
-- [`cue` Command line reference](./doc/cmd/cue.md): the `cue` command
+- [Language Specification](https://cuelang.org/docs/reference/spec/): the official CUE Language specification
+- [Go API](https://pkg.go.dev/cuelang.org/go/cue): the Go API on pkg.go.dev
+- [Builtin packages](https://pkg.go.dev/cuelang.org/go/pkg): builtin functions available from CUE programs
+- [`cue` CLI](https://cuelang.org/docs/reference/cli/): the `cue` command line interface
 
 ### Go release support policy
 
@@ -155,19 +143,15 @@ To contribute, please read the [Contribution Guide](CONTRIBUTING.md).
 ## Code of Conduct
 
 Guidelines for participating in CUE community spaces and a reporting process for
-handling issues can be found in the [Code of
-Conduct](https://cuelang.org/docs/contribution_guidelines/conduct).
+handling issues can be found in the [Code of Conduct](https://cuelang.org/docs/contribution_guidelines/conduct).
 
 ## Contact
 
-You can get in touch with the cuelang community in the following ways:
-
 - Ask questions via [GitHub Discussions](https://github.com/cue-lang/cue/discussions)
-- Chat with us on our [Slack workspace](https://join.slack.com/t/cuelang/shared_invite/enQtNzQwODc3NzYzNTA0LTAxNWQwZGU2YWFiOWFiOWQ4MjVjNGQ2ZTNlMmIxODc4MDVjMDg5YmIyOTMyMjQ2MTkzMTU5ZjA1OGE0OGE1NmE).
-- Subscribe to our [Community Calendar](https://cuelang.org/s/community-calendar) for community calls, demos, office hours, etc
+- Chat with us on [Slack](https://join.slack.com/t/cuelang/shared_invite/enQtNzQwODc3NzYzNTA0LTAxNWQwZGU2YWFiOWFiOWQ4MjVjNGQ2ZTNlMmIxODc4MDVjMDg5YmIyOTMyMjQ2MTkzMTU5ZjA1OGE0OGE1NmE) and [Discord](https://discord.gg/Tnf2CdzRjr)
+- Subscribe to our [Community Calendar](https://cuelang.org/s/community-calendar) for community updates, demos, office hours, etc
 
 ---
 
 Unless otherwise noted, the CUE source files are distributed
 under the Apache 2.0 license found in the LICENSE file.
-

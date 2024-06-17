@@ -1,59 +1,14 @@
-
 # Contribution Guide
 
+There are many ways to contribute to CUE without writing code!
 
-The CUE project welcomes all contributors, and there are many ways that you can
-contribute that don't involve writing code!
-
-This document guides you through the process of contributing to the CUE project.
-
-
-### How can I contribute to the CUE project?
-
-There are many ways that you can contribute to the CUE project
-that don't involve writing code.
-
-* Using CUE is a form of contributing! Especially when combined with raising
-  issues, providing feedback, tell us what works well and what doesn't, pointing
-out gaps etc.
-* Adding your CUE-based project to [Unity](https://cuelabs.dev/unity/)
-  helps ensure that we don't create releases that unintentionally break
-configurations, but also gives a wide variety of scenarios in which to test bug
-fixes, performance improvements and the like.
-* Asking questions via GitHub discussions/Slack. This might seem somewhat
-  counterintuitive, but asking questions helps to identify gaps in
-documentation, or poor signposting from the CUE homepage.
-* Raising issues with bug reports and feature requests helps us to raise the
-  quality of future CUE releases. In the case of bug reports not least because
-it provides us with real-world test cases.
-* Helping to manage issues and answer discussions. Sometimes referred to as
-  "issue gardening", this helps to share the load of triaging new issues and
-feature requests. Having issues presented in a familiar "shape", format and
-voice is a _massive_ time saver when it comes to one of the core contributors
-fixing a bug, or considering a new feature.
-* Code contributions, the main focus of this guide. The CUE project is a little
-  different from that used by other open source projects so we cover this
-process in more detail below.
+* Ask or answer questions via GitHub discussions, Slack, and Discord
+* Raise issues such as bug reports or feature requests on GitHub
 * Contributing thoughts and use cases to proposals. CUE can be and is
   being used in many varied different ways. Sharing experience reports helps
 to shape proposals and designs.
-* Creating content. Whether it be writing blog posts, live streaming,
-  tweeting...  creating content is a great way of growing the CUE community.
-Different people have different ways of explaining things, and very often these
-different styles appeal to different people. That said, if you think there is
-core documentation or guides missing from the https://cuelang.org website
-[please raise an issue to let us
-know](https://github.com/cue-lang/cue/issues/new/choose): there is not
-substitute for good core content, and it means others are then free to write
-about more interesting use cases and applications for CUE.
-* Holding community events. Whether they be virtual online events or
-  (COVID-allowing) in-person meetups, sharing experiences about using CUE is a
-very valuable way of learning for many.
-
-Thank you to everyone who contributes to the CUE community in whatever form!
-Whilst GitHub doesn't have a good means of tracking contributions outside of
-code contributions, your contributions are greatly valued!
-
+* Create content: share blog posts, tutorials, videos, meetup talks, etc
+* Add your project to [Unity](https://cuelabs.dev/unity/) to help us test changes to CUE
 
 ## Before contributing code
 

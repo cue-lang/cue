@@ -19,6 +19,9 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"cuelabs.dev/go/oci/ociregistry"
 	"cuelabs.dev/go/oci/ociregistry/ocimem"
@@ -63,7 +66,27 @@ func runModRegistry(cmd *Command, args []string) error {
 	r := ocimem.NewWithConfig(&ocimem.Config{
 		ImmutableTags: true,
 	})
-	return http.Serve(l, ociserver.New(ociTagLoggerRegistry{r}, nil))
+
+	srv := http.Server{
+		Handler: ociserver.New(ociTagLoggerRegistry{r}, nil),
+	}
+	idleConnsClosed := make(chan struct{})
+	go func() {
+		sigint := make(chan os.Signal, 1)
+		signal.Notify(sigint, syscall.SIGINT, syscall.SIGTERM)
+		<-sigint
+
+		if err := srv.Shutdown(context.Background()); err != nil {
+			fmt.Printf("HTTP server Shutdown: %v\n", err)
+		}
+		close(idleConnsClosed)
+	}()
+
+	if err := srv.Serve(l); err != http.ErrServerClosed {
+		return err
+	}
+	<-idleConnsClosed
+	return nil
 }
 
 type ociTagLoggerRegistry struct {

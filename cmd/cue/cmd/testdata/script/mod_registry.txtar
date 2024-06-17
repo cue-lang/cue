@@ -1,0 +1,18 @@
+env CUE_REGISTRY=localhost:41331
+exec cue mod registry ${CUE_REGISTRY} &
+exec cue mod publish v0.0.1
+cmpenv stdout expect-stdout
+
+-- expect-stdout --
+published mod.example/blah@v0.0.1 to ${CUE_REGISTRY}/mod.example/blah:v0.0.1
+-- blah.cue --
+package blah
+blah: 42
+-- cue.mod/module.cue --
+module: "mod.example/blah@v0"
+language: {
+	version: "v0.9.0"
+}
+source: {
+	kind: "self"
+}

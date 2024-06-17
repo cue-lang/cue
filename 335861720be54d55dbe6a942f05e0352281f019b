@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a266915_abcc5a66",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-17T21:21:13Z",
+      "side": 1,
+      "message": "please wrap at 76 columns",
+      "revId": "335861720be54d55dbe6a942f05e0352281f019b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "87aa1252_4d3775fa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-17T21:21:13Z",
+      "side": 1,
+      "message": "Thanks! Just some thoughts.",
+      "revId": "335861720be54d55dbe6a942f05e0352281f019b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ef57716_f98ecfe6",
+        "filename": "cmd/cue/cmd/modregistry.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-17T21:21:13Z",
+      "side": 1,
+      "message": "you can remove this now, as we\u0027re adding a test :)",
+      "revId": "335861720be54d55dbe6a942f05e0352281f019b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abe1a86c_d2f74b15",
+        "filename": "cmd/cue/cmd/modregistry.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-17T21:21:13Z",
+      "side": 1,
+      "message": "if you flip the goroutines around - the main goroutine sets up the signal handler and calls shutdown, and the spawned goroutine calls Serve - then you don\u0027t need a channel to make sure the main goroutine stays alive while we shut down, since Shutdown blocks until it\u0027s done.",
+      "revId": "335861720be54d55dbe6a942f05e0352281f019b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1186d45_13b4e2ec",
+        "filename": "cmd/cue/cmd/modregistry.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-17T21:21:13Z",
+      "side": 1,
+      "message": "use a timeout context here, for example two seconds, as otherwise we might never stop.",
+      "revId": "335861720be54d55dbe6a942f05e0352281f019b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "934fef9d_3891d1d7",
+        "filename": "cmd/cue/cmd/modregistry.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-17T21:21:13Z",
+      "side": 1,
+      "message": "use `errors.Is` here",
+      "revId": "335861720be54d55dbe6a942f05e0352281f019b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "faf9a346_e5571be0",
+        "filename": "cmd/cue/cmd/testdata/script/issue3224.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-17T21:21:13Z",
+      "side": 1,
+      "message": "I would rename this to mod_registry.txtar, since it\u0027s the only test for this command so far, and it tests the basic functionality.",
+      "revId": "335861720be54d55dbe6a942f05e0352281f019b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90468099_0d17eb57",
+        "filename": "cmd/cue/cmd/testdata/script/issue3224.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-17T21:21:13Z",
+      "side": 1,
+      "message": "to deduplicate, move this up, and do `exec cue mod registry ${CUE_REGISTRY} \u0026`.\n\nalso, perhaps pick a higher port number to reduce the chances that it\u0027s already taken, and leave a TODO to use a random unused port, which `cue mod registry` already does without any arguments - it would just be a bit hard to do with testscript.",
+      "revId": "335861720be54d55dbe6a942f05e0352281f019b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

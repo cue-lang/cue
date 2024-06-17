@@ -16,17 +16,20 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"cuelabs.dev/go/oci/ociregistry"
 	"cuelabs.dev/go/oci/ociregistry/ocimem"
 	"cuelabs.dev/go/oci/ociregistry/ociserver"
 	"github.com/spf13/cobra"
 )
-
-// TODO: add testing for this command.
 
 func newModRegistryCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
@@ -63,7 +66,28 @@ func runModRegistry(cmd *Command, args []string) error {
 	r := ocimem.NewWithConfig(&ocimem.Config{
 		ImmutableTags: true,
 	})
-	return http.Serve(l, ociserver.New(ociTagLoggerRegistry{r}, nil))
+
+	srv := http.Server{
+		Handler: ociserver.New(ociTagLoggerRegistry{r}, nil),
+	}
+	var serveErr error
+	go func() {
+		if err := srv.Serve(l); !errors.Is(err, http.ErrServerClosed) {
+			serveErr = err
+		}
+	}()
+
+	sigint := make(chan os.Signal, 1)
+	signal.Notify(sigint, syscall.SIGINT, syscall.SIGTERM)
+	<-sigint
+
+	ctx, cancal := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancal()
+	if err := srv.Shutdown(ctx); err != nil {
+		fmt.Printf("HTTP server Shutdown: %v\n", err)
+		return err
+	}
+	return serveErr
 }
 
 type ociTagLoggerRegistry struct {

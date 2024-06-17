@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a13ad7a_47934bcd",
+        "filename": "encoding/json/json.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-06-17T17:08:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b3c4a26_0a145119",
+      "revId": "88066863de34ce9394402caaaaf38f4e6077f241",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a1c1c910_c06d10b8",
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a96d7b5_e4008892",
+        "filename": "encoding/json/json.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-06-17T17:08:45Z",
+      "side": 1,
+      "message": "oh i think we dont need this `+1`",
+      "parentUuid": "a1c1c910_c06d10b8",
+      "revId": "88066863de34ce9394402caaaaf38f4e6077f241",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "34c4626a_d635fa8a",
@@ -65,6 +101,24 @@
       "writtenOn": "2024-06-17T15:38:52Z",
       "side": 1,
       "message": "once you have undone the API change, this change can be reverted.",
+      "revId": "88066863de34ce9394402caaaaf38f4e6077f241",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd4293fb_f800f139",
+        "filename": "internal/encoding/encoding.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-06-17T17:08:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "34c4626a_d635fa8a",
       "revId": "88066863de34ce9394402caaaaf38f4e6077f241",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

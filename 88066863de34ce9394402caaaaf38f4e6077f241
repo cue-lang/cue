@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40e82d4d_4fc61711",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-17T15:38:52Z",
+      "side": 1,
+      "message": "SGTM but please undo the API change",
+      "revId": "88066863de34ce9394402caaaaf38f4e6077f241",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b3c4a26_0a145119",
+        "filename": "encoding/json/json.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-17T15:38:52Z",
+      "side": 1,
+      "message": "unfortunately this is a breaking API change - not a terribly hard one to fix for the user, but it\u0027s also one we can easily avoid. keep the `io.Reader`, but use `source.ReadAll` which will get you the `[]byte` while taking a shortcut if the input is a `bytes.Buffer`.\n\nthis will still mean that we require reading the entire input, including all jsonl lines, which means a \"streaming\" decode would no longer be possible. but that\u0027s a limitation in how we currently implement positions, and all decoders have this limitation, so I don\u0027t think we can do better in this regard right now.",
+      "revId": "88066863de34ce9394402caaaaf38f4e6077f241",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1c1c910_c06d10b8",
+        "filename": "encoding/json/json.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-17T15:38:52Z",
+      "side": 1,
+      "message": "can you document why we need this `+1`? at least it\u0027s not obvious to me",
+      "revId": "88066863de34ce9394402caaaaf38f4e6077f241",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34c4626a_d635fa8a",
+        "filename": "internal/encoding/encoding.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-17T15:38:52Z",
+      "side": 1,
+      "message": "once you have undone the API change, this change can be reverted.",
+      "revId": "88066863de34ce9394402caaaaf38f4e6077f241",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

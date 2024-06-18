@@ -143,7 +143,7 @@ func (d *decoder) parseSchema(schema cue.Value) *mapping {
 
 	m := &mapping{children: map[string]*fieldInfo{}}
 
-	i, err := schema.Fields()
+	i, err := schema.Fields(cue.Optional(true))
 	if err != nil {
 		d.addErr(err)
 		return nil

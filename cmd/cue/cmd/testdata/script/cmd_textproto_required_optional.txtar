@@ -1,0 +1,17 @@
+exec cue eval input.textproto schema-required.cue
+cmp stdout want-stdout-required
+
+! exec cue eval input.textproto schema-optional.cue
+cmp stderr want-stderr-optional
+
+-- input.textproto --
+f: 234
+-- schema-required.cue --
+f!: int64
+-- want-stdout-required --
+f: 234
+-- schema-optional.cue --
+f?: string
+-- want-stderr-optional --
+textproto: invalid string or bytes: invalid quote character 2:
+    ./input.textproto:1:1

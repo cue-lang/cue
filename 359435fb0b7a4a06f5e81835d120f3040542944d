@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8134fbf5_490e9e0f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-19T12:11:00Z",
+      "side": 1,
+      "message": "I\u0027m trying to debug the windows failure in https://github.com/rogpeppe/go-internal/pull/261, it\u0027s not your fault at all.",
+      "revId": "359435fb0b7a4a06f5e81835d120f3040542944d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

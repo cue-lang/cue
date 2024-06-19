@@ -26,75 +26,100 @@ func newExportCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "export",
 		Short: "output data in a standard format",
-		Long: `export evaluates the configuration found in the current
-directory and prints the emit value to stdout.
+		Long: `
+The export command evaluates a configuration and emits the value of one or more
+expressions.
 
-Examples:
-Evaluated and emit
-
-	# a single file
-	cue export config.cue
-
-	# multiple files: these are combined at the top-level. Order doesn't matter.
-	cue export file1.cue foo/file2.cue
-
-	# all files within the "cloud" package, including all files in the
-	# current directory and its ancestor directories that are marked with the
-	# same package, up to the root of the containing module.
-	cue export .:cloud
-
-	# the package name can be omitted if the directory only contains files for
-	# the "cloud" package.
-	cue export
-
-Emit value:
-For CUE files, the generated configuration is derived from the top-level
-single expression, the emit value. For example, the file
-
-	// config.cue
-	arg1: 1
-	arg2: "my string"
-
-	{
-		a: arg1
-		b: arg2
-	}
-
-yields the following JSON:
-
-	{
-		"arg1": 1,
-		"a": 1,
-		"arg2": "my string",
-		"b": "my string"
-	}
-
-In absence of arguments, the current directory is loaded as a package instance.
-A package instance for a directory contains all files in the directory and its
-ancestor directories, up to the module root, belonging to the same package. If
-a single package is not uniquely defined by the files in the current directory
-then the package name must be specified as an explicit argument using
-".:<package-name>" syntax.
+By default values are emitted to standard output encoded as JSON. A different
+destination can be selected using the --outfile/-o flag, and a different
+encoding can be specified with the --out flag.
 
 
-Formats
+Configurations
 
-The following formats are recognized:
+When invoked without any arguments the command evaluates the CUE package in the
+current directory. If more than one package is present in the current directory
+then a package path argument must be provided.
 
-    cue  output as CUE
-              Outputs any CUE value.
+Arguments can be CUE package paths, CUE files, non-CUE data files, or schema
+files in supported encodings. The contents of all arguments are unified to form
+the evaluated configuration unless multiple CUE package paths are mentioned.
+If multiple CUE package paths are mentioned then individual files of any kind
+cannot also be mentioned, and values are emitted from each package path.
+This unification has the implict effect of validating data in the unified
+configuration against all constraints that are present.
 
-   json  output as JSON
-              Outputs any CUE value.
+Packages are loaded as package instances. A package instance is the unification
+of all CUE files with the same package name found in the package's directory and
+every ancestor directory leading up to the module root.
 
-   yaml  output as YAML
-              Outputs any CUE value.
 
-   text  output as raw text
-              The evaluated value must be of type string.
+Emitted expressions
 
- binary  output as raw binary
-              The evaluated value must be of type string or bytes.
+The default expression whose value is emitted is the top-level of the evaluated
+configuration. A different expression can be specified with the --expression/-e
+flag, which can be repeated to emit the values of multiple expressions.
+
+The export command reports an error if the value of any expression to be emitted
+is incomplete - that is, if it contains any non-concrete values that cannot be
+represented in data-only encodings such as JSON.
+
+
+Package paths
+
+Package paths must be either absolute, or relative. Absolute package paths
+identify a specific CUE package within a module. The module may be the
+current module or one of its dependencies.
+
+Relative package paths start with "." or ".." and are resolved as if they were
+filesystem paths, relative to the current directory. If a package's name does
+not match the directory in which it is stored then its name must be provided as
+a suffix, separated from the package path with a ":" - as in "./foo/bar:baz".
+
+
+Supported encodings
+
+The following encodings are recognized by the --out flag:
+
+    "cue":    output as CUE    (can encode any value)
+    "json":   output as JSON   (can encode any value)
+    "toml":   output as TOML   (can encode any value)
+    "yaml":   output as YAML   (can encode any value)
+    "text":   output as text   (can only encode values of type string)
+    "binary": output as binary (can only encode values of type string or bytes)
+
+See "cue help filetypes" for more information on values accepted by --out.
+
+
+Examples
+
+- Export the contents of the only CUE package in the current directory as JSON:
+  $ cue export
+
+- Export the contents of an absolute package path as YAML:
+  $ cue export cue.example/foo/bar --out yaml
+
+- Export the contents of one of many CUE packages in the current directory
+  unified with a YAML file, emitting an expression other than the top-level as
+  JSON:
+  $ cue export .:example path/to/data.yml --expression aKey
+
+- Export the contents of one of many CUE packages in a different, relative
+  directory as TOML:
+  $ cue export ./relative/path/to/directory:example --out toml
+
+- Export the unified contents of multiple CUE files as CUE:
+  $ cue export config.cue dir/extraData.cue --out cue
+
+- Unify the contents of a CUE package and a TOML file, and emit the JSON
+  encoding of multiple expressions rather than the top-level of the evaluation:
+  $ cue export cue.example/some/package data.toml -e key1 -e key2
+
+
+More help
+
+An in-depth guide to the "cue export" command:
+    https://cuelang.org/docs/concept/using-the-cue-export-command/
 `,
 		// TODO: some formats are missing for sure, like "jsonl" or "textproto" from internal/filetypes/types.cue.
 		RunE: mkRunE(c, runExport),

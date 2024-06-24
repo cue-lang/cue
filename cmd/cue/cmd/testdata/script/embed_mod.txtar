@@ -1,0 +1,34 @@
+env CUE_EXPERIMENT=embed
+
+exec cue eval ./acme/foo
+cmp stdout out/eval
+
+-- want-stderr --
+no language version declared in module.cue; run 'cue mod fix'
+
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.8.0"
+
+-- acme/foo/embed.cue --
+@extern(embed)
+
+package foo
+
+a: _ @embed(file="test.json")
+
+b: _ @embed(file="x/test.json")
+
+-- acme/foo/test.json --
+{ "x": 34 }
+
+-- acme/foo/x/test.json --
+{ "x": 35 }
+
+-- out/eval --
+a: {
+    x: 34
+}
+b: {
+    x: 35
+}

@@ -434,7 +434,7 @@ func appendExpandedUnqualifiedPackagePath(pkgPaths []resolvedPackageArg, origp s
 		pkgName := f.Syntax.PackageName()
 		// 2. if pkgQual is "_", it looks for a package file with no package name.
 		// 3. if there's a package named after ip.Qualifier it chooses that
-		if pkgName == ip.Qualifier || (pkgQual == "_" && pkgName == "") {
+		if (pkgName != "" && pkgName == ip.Qualifier) || (pkgQual == "_" && pkgName == "") {
 			foundQualifier = true
 			return false
 		}

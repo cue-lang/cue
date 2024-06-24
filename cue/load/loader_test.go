@@ -470,7 +470,38 @@ display:.
 files:
     $CWD/testdata/testmod/multi3/other.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}}
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
+		// Test that we can explicitly ask for non-package
+		// CUE files by setting Config.Package to "_".
+		name: "ExplicitPackageWithUnqualifiedImportPath#4",
+		cfg: &Config{
+			Dir:     filepath.Join(testdataDir, "multi4"),
+			Package: "_",
+		},
+		args: []string{"."},
+		want: `path:   mod.test/test/multi4@v0:_
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/multi4
+display:.
+files:
+    $CWD/testdata/testmod/anon.cue
+    $CWD/testdata/testmod/multi4/nopackage1.cue
+    $CWD/testdata/testmod/multi4/nopackage2.cue`}, {
+		// Test what happens when there's a single CUE file
+		// with an explicit `package _` directive.
+		name: "ExplicitPackageWithUnqualifiedImportPath#5",
+		cfg: &Config{
+			Dir:     filepath.Join(testdataDir, "multi5"),
+			Package: "_",
+		},
+		args: []string{"."},
+		want: `err:    found packages "main" (file.cue) and "_" (nopackage.cue) in "multi5"
+path:   ""
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    ""
+display:""`}}
 	tdtest.Run(t, testCases, func(t *tdtest.T, tc *loadTest) {
 		pkgs := Instances(tc.args, tc.cfg)
 

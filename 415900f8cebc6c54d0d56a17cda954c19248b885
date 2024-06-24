@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "769c8516_bb5ddc48",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-24T09:45:12Z",
+      "side": 1,
+      "message": "I don\u0027t oppose this per se, but it is inconsistent - we haven\u0027t used markdown in `cue help` text before. See `cue help registryconfig` for a counterexample with multiple sections, where empty lines and indentation are used.",
+      "range": {
+        "startLine": 12,
+        "startChar": 15,
+        "endLine": 13,
+        "endChar": 34
+      },
+      "revId": "415900f8cebc6c54d0d56a17cda954c19248b885",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b135891_8b7716e2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-24T09:45:12Z",
+      "side": 1,
+      "message": "do we have an issue to track figuring out the -p flag and documenting it? that would be my only request to safely drop the current documentation - otherwise we\u0027ll likely forget about the flag over time.",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 28
+      },
+      "revId": "415900f8cebc6c54d0d56a17cda954c19248b885",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "822c0037_4d4aec7e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-24T09:45:12Z",
+      "side": 1,
+      "message": "In the commit message, could you explain what prompted this rewrite? For example, was it confusing as a new user to understand the purpose of the command, or how to use it?\n\nAlso, I think there is one crucial aspect missing from the docs: emitted values must be concrete. That is, `a: string` can be used with `cue def` or `cue eval`, but not with `cue export`.",
+      "revId": "415900f8cebc6c54d0d56a17cda954c19248b885",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

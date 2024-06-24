@@ -34,11 +34,7 @@ import (
 // representations of values, and defines the set of supported builtins. Any
 // operation that involves two Values should originate from the same Context.
 //
-// Use
-//
-//	ctx := cuecontext.New()
-//
-// to create a new Context.
+// Use [cuelang.org/go/cue/cuecontext.New] to create a new context.
 type Context runtime.Runtime
 
 func (c *Context) runtime() *runtime.Runtime {

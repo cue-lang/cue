@@ -49,6 +49,7 @@ func newAttr(k internal.AttrKind, a *ast.Attribute) Attribute {
 	x := internal.ParseAttrBody(a.Pos().Add(len(key)+1), body)
 	x.Name = key
 	x.Kind = k
+	x.Pos = a.Pos()
 	return Attribute{x}
 }
 

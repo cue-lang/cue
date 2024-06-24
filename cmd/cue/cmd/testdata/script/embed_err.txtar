@@ -1,0 +1,109 @@
+env CUE_EXPERIMENT=embed
+
+! exec cue eval
+cmp stdout out/std
+cmp stderr out/err
+
+-- test.cue --
+@extern(embed)
+
+package foo
+
+none: _@embed(type=foo)
+
+both: _ @embed(file=test.json, glob="x/*.*", type=yaml)
+
+dotdot: _ @embed(file="../test.json")
+
+abs: _ @embed(file=/input.yaml)
+
+ok: _ @embed(file=y/test.json, type=text)
+
+dir: _ @embed(glob="x", type=yaml)
+
+dirslash: _ @embed(glob="x/", type=yaml)
+
+dotdotglob: _ @embed(glob="../test.json", type=yaml)
+
+absglob: _ @embed(glob="/x/*.*", type=yaml)
+
+doublestar: _ @embed(glob="**/*.json")
+
+stream: _ @embed(file=test.ldjson)
+
+singlestream: _ @embed(file=single.ldjson)
+
+yamlstream: _ @embed(file=stream.yaml)
+
+textproto: _ @embed(file=test.textproto)
+
+norm1: _ @embed(file=./test.json)
+
+norm2: _ @embed(file="x/../test.json")
+
+norm3: _ @embed(file="x/../x/test.json")
+
+norm4: _ @embed(file="x//test.json")
+
+noTranslateBS: _ @embed(file="x\\test.json")
+
+-- test.json --
+{ "x": 34 }
+-- test.ldjson --
+{ "x": 35 }
+{ "x": 36 }
+-- single.ldjson --
+{ "x": 37 }
+-- stream.yaml --
+1
+---
+2
+-- input.yaml --
+a1: 2
+
+-- x/test.json --
+{ "x": 34 }
+-- x/input.yaml --
+a1: 2
+-- test.textproto --
+a: 1
+-- out/std --
+-- out/err --
+@embed: attribute must have file or glob field:
+    ./test.cue:5:8
+@embed: attribute cannot have both file and glob field:
+    ./test.cue:7:9
+@embed: cannot refer to parent directory:
+    ./test.cue:9:11
+@embed: only relative files are allowed:
+    ./test.cue:11:8
+@embed: failed to decode file: open y/test.json: no such file or directory:
+    ./test.cue:13:7
+@embed: failed to decode file: read x: is a directory:
+    ./test.cue:15:8
+@embed: path not normalized, use "x" instead:
+    ./test.cue:17:13
+@embed: cannot refer to parent directory:
+    ./test.cue:19:15
+@embed: only relative files are allowed:
+    ./test.cue:21:12
+@embed: double star not supported in glob:
+    ./test.cue:23:15
+@embed: streaming not implemented: found more than one value in file:
+    ./test.cue:25:11
+@embed: encoding "jsonl" not (yet) supported: requires support for streaming:
+    ./test.cue:27:17
+@embed: streaming not implemented: found more than one value in file:
+    ./test.cue:29:15
+@embed: encoding "textproto" not (yet) supported: requires support for schema-guided decoding:
+    ./test.cue:31:14
+@embed: path not normalized, use "test.json" instead:
+    ./test.cue:33:10
+@embed: path not normalized, use "test.json" instead:
+    ./test.cue:35:10
+@embed: path not normalized, use "x/test.json" instead:
+    ./test.cue:37:10
+@embed: path not normalized, use "x/test.json" instead:
+    ./test.cue:39:10
+@embed: failed to decode file: open x\test.json: no such file or directory:
+    ./test.cue:41:18

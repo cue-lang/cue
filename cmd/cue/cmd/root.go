@@ -30,6 +30,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/interpreter/embed"
 	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
@@ -211,6 +212,9 @@ For more information on writing CUE configuration files see cuelang.org.`,
 		// for `cue cmd mycmd`, so any sub-command suggestions might be confusing.
 		DisableSuggestions: true,
 	}
+
+	embedding := cuecontext.Interpreter(embed.New())
+	rootContextOptions = append(rootContextOptions, embedding)
 
 	c := &Command{
 		Command: cmd,

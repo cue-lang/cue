@@ -482,7 +482,7 @@ func ParseImportPath(p string) ImportPath {
 		} else {
 			parts.Qualifier = parts.Path
 		}
-		if !ast.IsValidIdent(parts.Qualifier) || strings.HasPrefix(parts.Qualifier, "#") {
+		if !ast.IsValidIdent(parts.Qualifier) || strings.HasPrefix(parts.Qualifier, "#") || parts.Qualifier == "_" {
 			parts.Qualifier = ""
 		}
 	}

@@ -1,0 +1,293 @@
+exec cue eval
+cmp stdout out/noembed
+
+env CUE_EXPERIMENT=embed
+
+exec cue eval
+cmp stdout out/eval
+
+exec cue export --out cue
+cmp stdout out/export
+
+exec cue vet
+cmp stdout out/vet
+
+-- test.cue --
+@extern(embed)
+
+package foo
+
+a: _ @embed(file="test.json")
+
+b: _ @embed(file="input.yaml")
+
+c: _ @embed(file="test.json", type=text)
+
+d: _ @embed(glob="y/*.*", type=yaml)
+
+d: _ @embed(glob="x/*.yaml") // merge into the same map
+
+f: _ @embed(file="openapi.json", type=openapi)
+
+g: _ @embed(file="openapi.json") // test no auto mode!
+
+
+special: {
+	// These are all valid.
+	underscoreFile: _ @embed(file="y/_test.json")
+	dotFile:        _ @embed(file="y/.test.json")
+	underscoreDir:  _ @embed(file="_y/test.json")
+	dotDir:         _ @embed(file=".y/test.json")
+
+	// TODO: fix nested modules are currently not supported, but we may opt to
+	// support them in the future. This is currently not handled. It should
+	// probably be up to the loader to provide a fs.FS that handles this
+	// according to spec.
+	nestedModJSON: _ @embed(file="a/b/foo.json")
+	nestedModFile: _ @embed(file="a/b/cue.mod/modules.cue")
+}
+
+-- test.json --
+{ "x": 34 }
+-- input.yaml --
+a1: 2
+
+-- y/test.json --
+{ "x": 34 }
+-- y/_test.json --
+{ "z": 45 }
+-- y/.test.json --
+{ "z": 46 }
+-- _y/test.json --
+{ "z": 47 }
+-- .y/test.json --
+{ "z": 48 }
+-- _z/test.json --
+-- x/input.yaml --
+a1: 2
+-- a/b/cue.mod/modules.cue --
+module: "acme.com"
+language: version: "v0.9.0"
+-- a/b/foo.json --
+{"a": 1, "b": 2}
+-- openapi.json --
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title":   "My OpenAPI",
+        "version": "v1alpha1"
+    },
+    "paths": {},
+    "components": {
+        "schemas": {
+            "Bar": {
+                "type": "object",
+                "required": [
+                    "foo"
+                ],
+                "properties": {
+                    "foo": {
+                        "$ref": "#/components/schemas/Foo"
+                    }
+                }
+            },
+            "Foo": {
+                "type": "object",
+                "required": [
+                    "a",
+                    "b"
+                ],
+                "properties": {
+                    "a": {
+                        "type": "integer"
+                    },
+                    "b": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "exclusiveMaximum": 10
+                    }
+                }
+            }
+        }
+    }
+}
+-- out/noembed --
+a: _
+b: _
+c: _
+d: _
+f: _
+g: _
+special: {
+    underscoreFile: _
+    dotFile:        _
+    underscoreDir:  _
+    dotDir:         _
+    nestedModJSON:  _
+    nestedModFile:  _
+}
+-- out/eval --
+a: {
+    x: 34
+}
+b: {
+    a1: 2
+}
+c: """
+    { "x": 34 }
+
+    """
+d: {
+    "y/.test.json": {
+        z: 46
+    }
+    "y/_test.json": {
+        z: 45
+    }
+    "x/input.yaml": {
+        a1: 2
+    }
+    "y/test.json": {
+        x: 34
+    }
+}
+f: {
+    info: {
+        title:   "My OpenAPI"
+        version: "v1alpha1"
+    }
+    #Bar: {
+        foo: {
+            a: int
+            b: uint & <10
+        }
+    }
+    #Foo: {
+        a: int
+        b: uint & <10
+    }
+}
+g: {
+    openapi: "3.0.0"
+    info: {
+        title:   "My OpenAPI"
+        version: "v1alpha1"
+    }
+    paths: {}
+    components: {
+        schemas: {
+            Bar: {
+                type: "object"
+                required: ["foo"]
+                properties: {
+                    foo: {
+                        $ref: "#/components/schemas/Foo"
+                    }
+                }
+            }
+            Foo: {
+                type: "object"
+                required: ["a", "b"]
+                properties: {
+                    a: {
+                        type: "integer"
+                    }
+                    b: {
+                        type:             "integer"
+                        minimum:          0
+                        exclusiveMaximum: 10
+                    }
+                }
+            }
+        }
+    }
+}
+special: {
+    underscoreFile: {
+        z: 45
+    }
+    dotFile: {
+        z: 46
+    }
+    underscoreDir: {
+        z: 47
+    }
+    dotDir: {
+        z: 48
+    }
+    nestedModJSON: {
+        a: 1
+        b: 2
+    }
+    nestedModFile: {
+        module: "acme.com"
+        language: {
+            version: "v0.9.0"
+        }
+    }
+}
+-- out/export --
+a: x:  34
+b: a1: 2
+c: """
+	{ "x": 34 }
+
+	"""
+d: {
+	"y/.test.json": z:  46
+	"y/_test.json": z:  45
+	"x/input.yaml": a1: 2
+	"y/test.json": x:   34
+}
+f: info: {
+	title:   "My OpenAPI"
+	version: "v1alpha1"
+}
+g: {
+	openapi: "3.0.0"
+	info: {
+		title:   "My OpenAPI"
+		version: "v1alpha1"
+	}
+	paths: {}
+	components: schemas: {
+		Bar: {
+			type: "object"
+			required: ["foo"]
+			properties: foo: $ref: "#/components/schemas/Foo"
+		}
+		Foo: {
+			type: "object"
+			required: ["a", "b"]
+			properties: {
+				a: type: "integer"
+				b: {
+					type:             "integer"
+					minimum:          0
+					exclusiveMaximum: 10
+				}
+			}
+		}
+	}
+}
+special: {
+	// These are all valid.
+	underscoreFile: z: 45
+	dotFile: z:        46
+	underscoreDir: z:  47
+	dotDir: z:         48
+
+	// TODO: fix nested modules are currently not supported, but we may opt to
+	// support them in the future. This is currently not handled. It should
+	// probably be up to the loader to provide a fs.FS that handles this
+	// according to spec.
+	nestedModJSON: {
+		a: 1
+		b: 2
+	}
+	nestedModFile: {
+		module: "acme.com"
+		language: version: "v0.9.0"
+	}
+}
+-- out/vet --

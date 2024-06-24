@@ -1,0 +1,34 @@
+# Test that the command-line "allow single package
+# even when the package name does not match the import
+# path" logic works correctly in the presence of an
+# non-package CUE file, which can never be part
+# of a package.
+
+cd foo
+# TODO(rog): this should succeed
+! exec cue export
+cmp stderr $WORK/want-stderr
+-- want-stderr --
+test.example/foo@v0: import failed: no dependency found for package "other.example/m":
+    ./foo.cue:8:8
+-- cue.mod/gen/other.example/m/m.cue --
+package m
+x: 20
+
+-- cue.mod/module.cue --
+module: "test.example"
+language: version: "v0.9.0"
+
+-- foo/foo.cue --
+// Note: the package name does not match the directory name,
+// which means that this is only resolvable with an explicit
+// qualifier when used as an import path, but is allowed
+// on the cue command line because there's only one
+// package in the directory.
+package bar
+
+import "other.example/m"
+
+x: m.x
+-- foo/unnamed.cue --
+import ()

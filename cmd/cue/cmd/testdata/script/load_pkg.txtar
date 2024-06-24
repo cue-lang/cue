@@ -36,8 +36,6 @@ cd ..
 -- data.cue --
 foo:3
 -- t.cue --
-package _
-
 foo: int
 bar: 3
 -- kube.cue --

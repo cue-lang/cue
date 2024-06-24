@@ -1,0 +1,34 @@
+# Test whether an import with a _ qualifer is allowed or not.
+
+# TODO(rog): this should fail; see https://cuelang.org/issue/3167
+exec cue export ./foo
+cmp stdout want-stdout
+
+# Check that it also fails with an explicit _ qualifier
+# specified on the command line.
+# TODO(rog): this should fail similarly.
+exec cue export other.example/m:_
+cmp stdout want-stdout
+-- want-stdout --
+{
+    "x": 20
+}
+-- cue.mod/gen/other.example/m/m.cue --
+package _
+x: 20
+
+-- cue.mod/module.cue --
+module: "test.example/foo"
+language: version: "v0.9.0"
+
+-- foo/foo.cue --
+// Note: the package name does not match the directory name,
+// which means that this is only resolvable with an explicit
+// qualifier when used as an import path, but is allowed
+// on the cue command line because there's only one
+// package in the directory.
+package bar
+
+import m "other.example/m:_"
+
+x: m.x

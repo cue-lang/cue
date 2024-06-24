@@ -52,6 +52,7 @@ type Attr struct {
 	Kind   AttrKind
 	Fields []KeyValue
 	Err    errors.Error
+	Pos    token.Pos
 }
 
 // NewNonExisting creates a non-existing attribute.
@@ -153,6 +154,7 @@ func ParseAttrBody(pos token.Pos, s string) (a Attr) {
 		tmpFile.AddLine(len(s) - 1)
 	}
 	a.Body = s
+	a.Pos = pos
 	var scan scanner.Scanner
 	scan.Init(tmpFile, []byte(s), nil, scanner.DontInsertCommas)
 	for {

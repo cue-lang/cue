@@ -128,10 +128,12 @@ type Config struct {
 	// Context specifies the context for the load operation.
 	Context *build.Context
 
-	// A Module is a collection of packages and instances that are within the
-	// directory hierarchy rooted at the module root. The module root can be
-	// marked with a cue.mod file.
-	// If this is a relative path, it will be interpreted relative to [Config.Dir].
+	// ModuleRoot is the directory that contains the cue.mod directory
+	// as well as all the packages which form part of the module being loaded.
+	//
+	// If left as the empty string, a module root is found by walking parent directories
+	// starting from [Config.Dir] until one is found containing a cue.mod directory.
+	// If it is a relative path, it will be interpreted relative to [Config.Dir].
 	ModuleRoot string
 
 	// Module specifies the module prefix. If not empty, this value must match

@@ -20,14 +20,12 @@
 // Values created from the same Context are not safe for concurrent use,
 // which we intend to change in the future.
 //
-// A Context defines the set of active packages, the translations of field
-// names to unique codes, as well as the set of builtins. Use
+// [Context] defines the set of active packages, the translations of field
+// names to unique codes, as well as the set of builtins.
+// Use [cuelang.org/go/cue/cuecontext.New] to create a new context.
 //
-//	import "cuelang.org/go/cue/cuecontext"
-//
-//	ctx := cuecontext.New()
-//
-// to obtain a context.
+// While a context can be used to build values, note that loading a module and its
+// dependencies should be done with the [cuelang.org/go/cue/load] package.
 //
 // Note that the following types are DEPRECATED and their usage should be
 // avoided if possible:

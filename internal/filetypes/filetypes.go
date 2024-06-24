@@ -260,6 +260,12 @@ func ParseFile(s string, mode Mode) (*build.File, error) {
 		}
 		return nil, errors.Newf(token.NoPos, "empty file name")
 	}
+
+	return ParseFileAndType(file, scope, mode)
+}
+
+// ParseFileAndType parses a file and type combo.
+func ParseFileAndType(file, scope string, mode Mode) (*build.File, error) {
 	// Quickly discard files which we aren't interested in.
 	// These cases are very common when loading `./...` in a large repository.
 	typesInit()

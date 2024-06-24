@@ -14,7 +14,7 @@ sub: _ @extern("foo.wasm1", abi=c, sig="func(int64, int64): int64")
 
 x: add(1, 2)
 -- out/wasm --
-can't load from external module: load "foo.wasm": file not found:
+@wasm: load "foo.wasm": file not found:
     ./a.cue:4:8
-can't load from external module: load "foo.wasm1": invalid file name:
+@wasm: load "foo.wasm1": invalid file name:
     ./a.cue:5:8

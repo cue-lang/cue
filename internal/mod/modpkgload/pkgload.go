@@ -252,6 +252,10 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 		pkg.err = fmt.Errorf("cannot determine package name from import path %q", pkg.path)
 		return
 	}
+	if pkgQual == "_" {
+		pkg.err = fmt.Errorf("_ is not a valid import path qualifier in %q", pkg.path)
+		return
+	}
 	importsMap := make(map[string]bool)
 	foundPackageFile := false
 	for _, loc := range pkg.locs {

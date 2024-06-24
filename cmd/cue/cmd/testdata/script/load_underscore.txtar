@@ -1,18 +1,17 @@
 # Test whether an import with a _ qualifer is allowed or not.
 
-# TODO(rog): this should fail; see https://cuelang.org/issue/3167
-exec cue export ./foo
-cmp stdout want-stdout
+! exec cue export ./foo
+cmp stderr want-stderr
 
 # Check that it also fails with an explicit _ qualifier
-# specified on the command line.
-# TODO(rog): this should fail similarly.
-exec cue export other.example/m:_
-cmp stdout want-stdout
--- want-stdout --
-{
-    "x": 20
-}
+# specified on the command line
+! exec cue export other.example/m:_
+cmp stderr want-stderr-2
+-- want-stderr --
+test.example/foo/foo@v0: import failed: cannot find package "other.example/m": _ is not a valid import path qualifier in "other.example/m:_":
+    ./foo/foo.cue:8:8
+-- want-stderr-2 --
+invalid import path qualifier _ in "other.example/m:_"
 -- cue.mod/gen/other.example/m/m.cue --
 package _
 x: 20

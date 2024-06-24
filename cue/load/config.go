@@ -316,6 +316,9 @@ func addImportQualifier(pkg importPath, name string) (importPath, error) {
 		return pkg, nil
 	}
 	ip := module.ParseImportPath(string(pkg))
+	if ip.Qualifier == "_" {
+		return "", fmt.Errorf("invalid import qualifier _ in %q", pkg)
+	}
 	if ip.ExplicitQualifier && ip.Qualifier != name {
 		return "", fmt.Errorf("non-matching package names (%s != %s)", ip.Qualifier, name)
 	}

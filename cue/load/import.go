@@ -374,6 +374,8 @@ func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
 	i.PkgName = parts.Qualifier
 	if i.PkgName == "" {
 		i.Err = errors.Append(i.Err, l.errPkgf([]token.Pos{pos}, "cannot determine package name for %q; set it explicitly with ':'", p))
+	} else if i.PkgName == "" {
+		i.Err = errors.Append(i.Err, l.errPkgf([]token.Pos{pos}, "_ is not a valid import path qualifier in %q", p))
 	}
 	i.DisplayPath = string(p)
 	i.ImportPath = string(p)

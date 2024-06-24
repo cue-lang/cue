@@ -1,0 +1,53 @@
+env CUE_EXPERIMENT=embed
+
+exec cue mod tidy
+exec cue eval ./acme/foo
+cmp stdout out/eval
+
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.8.0"
+
+-- acme/foo/embed.cue --
+@extern(embed)
+
+package foo
+
+import "example.com/e"
+
+a: _ @embed(file="test.json")
+
+b: _ @embed(file="x/test.json")
+
+c: e.a
+
+-- acme/foo/test.json --
+{ "x": 34 }
+
+-- acme/foo/x/test.json --
+{ "x": 35 }
+
+
+-- _registry/example.com_e_v0.0.1/cue.mod/module.cue --
+module: "example.com/e@v0"
+language: version: "v0.8.0"
+
+-- _registry/example.com_e_v0.0.1/main.cue --
+@extern(embed)
+
+package e
+
+a: _ @embed(file=foo.txt)
+-- _registry/example.com_e_v0.0.1/foo.txt --
+hello
+-- out/eval --
+a: {
+    x: 34
+}
+b: {
+    x: 35
+}
+c: """
+    hello
+
+    """

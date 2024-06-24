@@ -304,6 +304,9 @@ func appendExpandedPackageArg(c *Config, pkgPaths []resolvedPackageArg, p string
 	p = filepath.ToSlash(p)
 
 	ip := module.ParseImportPath(p)
+	if ip.Qualifier == "_" {
+		return nil, fmt.Errorf("invalid import path qualifier _ in %q", origp)
+	}
 
 	isRel := strings.HasPrefix(ip.Path, "./")
 	// Put argument in canonical form.

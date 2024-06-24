@@ -332,7 +332,7 @@ func (d *externDecorator) processADTNode(n adt.Node, scope *adt.Vertex) bool {
 
 	b, err := c.Compile(name, scope, &attr)
 	if err != nil {
-		err = errors.Newf(info.attr.Pos(), "can't load from external module: %v", err)
+		err = errors.Newf(info.attr.Pos(), "@%s: %v", info.extern, err)
 		d.errs = errors.Append(d.errs, err)
 		return true
 	}

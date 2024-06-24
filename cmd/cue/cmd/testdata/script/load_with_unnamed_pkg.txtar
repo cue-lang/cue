@@ -5,12 +5,12 @@
 # of a package.
 
 cd foo
-# TODO(rog): this should succeed
-! exec cue export
-cmp stderr $WORK/want-stderr
--- want-stderr --
-test.example/foo@v0: import failed: no dependency found for package "other.example/m":
-    ./foo.cue:8:8
+exec cue export
+cmp stdout $WORK/want-stdout
+-- want-stdout --
+{
+    "x": 20
+}
 -- cue.mod/gen/other.example/m/m.cue --
 package m
 x: 20

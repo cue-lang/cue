@@ -1,0 +1,199 @@
+exec cue eval
+cmp stdout out/eval
+
+exec cue export --out cue
+cmp stdout out/export
+
+exec cue vet
+cmp stdout out/vet
+
+-- test.cue --
+@extern(embed)
+
+package foo
+
+a: _ @embed(file="test.json")
+
+b: _ @embed(file="input.yaml")
+
+c: _ @embed(file="test.json", type=text)
+
+d: _ @embed(glob="y/*.*", type=yaml)
+
+d: _ @embed(glob="x/*.yaml") // merge into the same map
+
+f: _ @embed(file="openapi.json", type=openapi)
+
+g: _ @embed(file="openapi.json") // test no auto mode!
+
+h: _ @embed(file="a\\b/c.json")
+
+-- test.json --
+{ "x": 34 }
+-- input.yaml --
+a1: 2
+
+-- y/test.json --
+{ "x": 34 }
+-- x/input.yaml --
+a1: 2
+-- a\b/c.json --
+{ "x": 35 }
+-- openapi.json --
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title":   "My OpenAPI",
+        "version": "v1alpha1"
+    },
+    "paths": {},
+    "components": {
+        "schemas": {
+            "Bar": {
+                "type": "object",
+                "required": [
+                    "foo"
+                ],
+                "properties": {
+                    "foo": {
+                        "$ref": "#/components/schemas/Foo"
+                    }
+                }
+            },
+            "Foo": {
+                "type": "object",
+                "required": [
+                    "a",
+                    "b"
+                ],
+                "properties": {
+                    "a": {
+                        "type": "integer"
+                    },
+                    "b": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "exclusiveMaximum": 10
+                    }
+                }
+            }
+        }
+    }
+}
+-- out/eval --
+a: {
+    x: 34
+}
+b: {
+    a1: 2
+}
+c: """
+    { "x": 34 }
+
+    """
+d: {
+    "y/test.json": {
+        x: 34
+    }
+    "x/input.yaml": {
+        a1: 2
+    }
+}
+f: {
+    info: {
+        title:   "My OpenAPI"
+        version: "v1alpha1"
+    }
+    #Bar: {
+        foo: {
+            a: int
+            b: uint & <10
+        }
+    }
+    #Foo: {
+        a: int
+        b: uint & <10
+    }
+}
+g: {
+    openapi: "3.0.0"
+    info: {
+        title:   "My OpenAPI"
+        version: "v1alpha1"
+    }
+    paths: {}
+    components: {
+        schemas: {
+            Bar: {
+                type: "object"
+                required: ["foo"]
+                properties: {
+                    foo: {
+                        $ref: "#/components/schemas/Foo"
+                    }
+                }
+            }
+            Foo: {
+                type: "object"
+                required: ["a", "b"]
+                properties: {
+                    a: {
+                        type: "integer"
+                    }
+                    b: {
+                        type:             "integer"
+                        minimum:          0
+                        exclusiveMaximum: 10
+                    }
+                }
+            }
+        }
+    }
+}
+h: {
+    x: 35
+}
+-- out/export --
+a: x:  34
+b: a1: 2
+c: """
+	{ "x": 34 }
+
+	"""
+d: {
+	"y/test.json": x:   34
+	"x/input.yaml": a1: 2
+}
+f: info: {
+	title:   "My OpenAPI"
+	version: "v1alpha1"
+}
+g: {
+	openapi: "3.0.0"
+	info: {
+		title:   "My OpenAPI"
+		version: "v1alpha1"
+	}
+	paths: {}
+	components: schemas: {
+		Bar: {
+			type: "object"
+			required: ["foo"]
+			properties: foo: $ref: "#/components/schemas/Foo"
+		}
+		Foo: {
+			type: "object"
+			required: ["a", "b"]
+			properties: {
+				a: type: "integer"
+				b: {
+					type:             "integer"
+					minimum:          0
+					exclusiveMaximum: 10
+				}
+			}
+		}
+	}
+}
+h: x: 35
+-- out/vet --

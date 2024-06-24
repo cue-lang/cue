@@ -20,6 +20,9 @@ var Flags struct {
 	// EvalV3 enables the new evaluator. The new evaluator addresses various
 	// performance concerns.
 	EvalV3 bool
+
+	// Embed enabled file embedding.
+	Embed bool
 }
 
 // Init initializes Flags. Note: this isn't named "init" because we

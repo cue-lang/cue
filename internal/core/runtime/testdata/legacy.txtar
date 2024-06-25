@@ -5,9 +5,9 @@
 package foo
 
 
-Foo: _ @test(file1.xx, abi=c, sig="func(int)int")
+Foo: _ @extern(file1.xx, abi=c, sig="func(int)int")
 
-Rename: _ @test(file1.xx, name=Emaner, abi=c, sig="func(int)int")
+Rename: _ @extern(file1.xx, name=Emaner, abi=c, sig="func(int)int")
 
 -- file2.cue --
 @extern("test")
@@ -17,7 +17,7 @@ package foo
 
 Bar: {
 	@other()
-	@test(file2.xx, abi=c, sig="func(int)int")
+	@extern(file2.xx, abi=c, sig="func(int)int")
 	_
 }
 

@@ -13,14 +13,14 @@ package foo
 
 package foo
 
-Fn1: _ @extern("file1.xx" abi sig)
+Fn1: _ @test("file1.xx" abi sig)
 
 -- empty_extern.cue --
 @extern()
 
 package foo
 
-Fn2: _ @extern("file1.xx" abi sig)
+Fn2: _ @test("file1.xx" abi sig)
 
 
 -- unknown_interpreter.cue --
@@ -28,7 +28,7 @@ Fn2: _ @extern("file1.xx" abi sig)
 
 package foo
 
-Fn3: _ @extern("file1.xx" abi sig)
+Fn3: _ @wazem("file1.xx" abi sig)
 
 -- double_extern_a.cue --
 @extern("test")
@@ -36,7 +36,7 @@ Fn3: _ @extern("file1.xx" abi sig)
 
 package foo
 
-Fn4a: _ @extern("file1.xx")
+Fn4a: _ @test("file1.xx")
 
 -- double_extern_b.cue --
 @extern("test")
@@ -45,14 +45,14 @@ Fn4a: _ @extern("file1.xx")
 
 package foo
 
-Fn4b: _ @extern("file1.xx")
+Fn4b: _ @test("file1.xx")
 
 -- package_attr.cue --
 @extern("test")
 
 package foo
 
-@extern("file1.xx")
+@test("file1.xx")
 Fn5: _
 
 -- duplicate.cue --
@@ -61,12 +61,12 @@ Fn5: _
 package foo
 
 
-Fn6: _ @extern("file1.xx",sig=func(int)int) @extern("file1.xx", sig=func(int)bool)
+Fn6: _ @test("file1.xx",sig=func(int)int) @test("file1.xx", sig=func(int)bool)
 
 Fn7: {
-	@extern("file1.xx",sig=func(int)int)
+	@test("file1.xx",sig=func(int)int)
 	_
-} @extern("file1.xx", sig=func(int)bool)
+} @test("file1.xx", sig=func(int)bool)
 
 -- non_ident.cue --
 @extern("test")
@@ -74,9 +74,9 @@ Fn7: {
 package foo
 
 
-"a-b": _ @extern("file1.xx",sig=func(int)int)
+"a-b": _ @test("file1.xx",sig=func(int)int)
 
-[string]: _ @extern("file1.xx",sig=func(int)int)
+[string]: _ @test("file1.xx",sig=func(int)int)
 
 -- late_extern.cue --
 package foo
@@ -84,16 +84,16 @@ package foo
 @extern("test")
 
 
-Foo: _ @extern(file1.xx, abi=c, sig="func(int)int")
+Foo: _ @test(file1.xx, abi=c, sig="func(int)int")
 
 -- out/extern --
 only one file-level extern attribute allowed per file:
     ./double_extern_a.cue:2:1
 only one file-level extern attribute allowed per file:
     ./double_extern_b.cue:2:1
-duplicate extern attributes:
-    ./duplicate.cue:6:45
-duplicate extern attributes:
+duplicate @test attributes:
+    ./duplicate.cue:6:43
+duplicate @test attributes:
     ./duplicate.cue:11:3
 interpreter name must be non-empty:
     ./empty_extern.cue:1:1
@@ -105,7 +105,7 @@ can only define functions for fields with identifier names, found "a-b":
     ./non_ident.cue:6:10
 can only define functions for fields with identifier names, found [string]:
     ./non_ident.cue:8:13
-extern attribute not associated with field:
+@test attribute not associated with field:
     ./package_attr.cue:5:1
 no interpreter defined for "wazem":
     ./unknown_interpreter.cue:1:1

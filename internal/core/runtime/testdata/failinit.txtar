@@ -6,7 +6,7 @@
 package failinit
 
 
-foo: _ @extern("file.xx")
+foo: _ @test("file.xx")
 
 -- out/extern --
 TEST: fail initialization

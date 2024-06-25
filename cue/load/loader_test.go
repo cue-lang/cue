@@ -494,12 +494,14 @@ files:
 			Package: "_",
 		},
 		args: []string{"."},
-		want: `err:    found packages "main" (file.cue) and "_" (nopackage.cue) in "multi4"
-path:   ""
+		want: `path:   mod.test/test/multi4@v0:_
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
-dir:    ""
-display:""`}}
+dir:    $CWD/testdata/testmod/multi4
+display:.
+files:
+    $CWD/testdata/testmod/anon.cue
+    $CWD/testdata/testmod/multi4/nopackage.cue`}}
 	tdtest.Run(t, testCases, func(t *tdtest.T, tc *loadTest) {
 		pkgs := Instances(tc.args, tc.cfg)
 

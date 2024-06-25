@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "442d90e3_50aa153a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-25T12:37:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7cc1120f_a0b8b3c1",
+      "revId": "c1a36ccdc34978829231f6d5ef6c89e670990e05",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d594e2d5_367f0120",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-06-25T12:23:39Z",
       "side": 1,
       "message": "FWIW in the previous CL I meant adding the issue link to the TODO, like we\u0027ve done elsewhere and you\u0027ve done in load_underscore.txtar, so I wouldn\u0027t leave the (closed) issue link around.",
+      "revId": "c1a36ccdc34978829231f6d5ef6c89e670990e05",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c0ae1db_9c6e54f6",
+        "filename": "cmd/cue/cmd/testdata/script/load_with_unnamed_pkg.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-25T12:37:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d594e2d5_367f0120",
       "revId": "c1a36ccdc34978829231f6d5ef6c89e670990e05",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

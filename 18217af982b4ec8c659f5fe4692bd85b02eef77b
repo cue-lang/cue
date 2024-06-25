@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "52b71b2c_f0550fc4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-25T12:45:00Z",
+      "side": 1,
+      "message": "I didn\u0027t mention cue/load because the fixes are outside cue/load as well.",
+      "parentUuid": "c6d4e9a4_0a7458f1",
+      "revId": "18217af982b4ec8c659f5fe4692bd85b02eef77b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cb21f844_29a91d75",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-06-25T12:30:57Z",
       "side": 1,
       "message": "This commit message lacks information:\n\n1) Since when has this worked? We don\u0027t have to go back to ancient times, but whether or not this worked in v0.7.0 before all the modules work is a crucial piece of information.\n\n2) Note that a few users were using this as a trick to import JSON files as a package. Explain that those users should instead use the upcoming embedding support. @paul@myitcv.io already mentioned this in https://github.com/cue-lang/cue/issues/3167, and we shouldn\u0027t lose that information in the commit message.",
+      "revId": "18217af982b4ec8c659f5fe4692bd85b02eef77b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f159e619_34614593",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-25T12:45:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cb21f844_29a91d75",
       "revId": "18217af982b4ec8c659f5fe4692bd85b02eef77b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

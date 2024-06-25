@@ -999,6 +999,9 @@ func (f *File) PackageName() string {
 	for _, d := range f.Decls {
 		switch x := d.(type) {
 		case *Package:
+			if x.Name.Name == "_" {
+				return ""
+			}
 			return x.Name.Name
 		case *CommentGroup, *Attribute:
 		default:

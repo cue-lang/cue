@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "34e3b94d_bcef1bd2",
+        "filename": "cmd/cue/cmd/testdata/script/load_with_unnamed_pkg.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-25T11:17:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c4b09053_3571459f",
+      "revId": "a3eb433b0ceff12c0d76be21fa33d059125a07ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5b9fe0aa_564887ab",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "df587263_283c1523",
+        "filename": "cue/load/loader_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 474,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-25T11:17:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5b9fe0aa_564887ab",
+      "revId": "a3eb433b0ceff12c0d76be21fa33d059125a07ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "29135c2c_f9b16c5d",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-06-25T10:39:35Z",
       "side": 1,
       "message": "the names seem offset; the existing test #3 has testdata directory multi3, and then your test #4 has testdat directory multi, and your test #5 has testdata directory multi4. I would keep the numbers aligned for consistency.",
+      "revId": "a3eb433b0ceff12c0d76be21fa33d059125a07ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "335ab633_8931e491",
+        "filename": "cue/load/loader_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 493,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-25T11:17:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "29135c2c_f9b16c5d",
       "revId": "a3eb433b0ceff12c0d76be21fa33d059125a07ca",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

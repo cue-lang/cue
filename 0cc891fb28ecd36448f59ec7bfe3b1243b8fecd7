@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9ea09570_60a3b002",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-25T16:40:51Z",
+      "side": 1,
+      "message": "I would be happy to take a fs.FS as an argument here. But I don\u0027t have one.\n\nSo I\u0027m not sure what you suggest I do here?",
+      "parentUuid": "c64cf826_880325ec",
+      "revId": "0cc891fb28ecd36448f59ec7bfe3b1243b8fecd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b9e5a7db_907263e8",
         "filename": "cue/interpreter/embed/embed.go",
         "patchSetId": 8
@@ -31,6 +49,24 @@
       "writtenOn": "2024-06-25T15:53:26Z",
       "side": 1,
       "message": "This function doesn\u0027t take into account the directory that the filename should be interpreted relative to. This means that it doesn\u0027t work unless the filename is in the current directory.",
+      "revId": "0cc891fb28ecd36448f59ec7bfe3b1243b8fecd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9395802_31f8fd0f",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-25T16:40:51Z",
+      "side": 1,
+      "message": "Can you give an example?",
+      "parentUuid": "b9e5a7db_907263e8",
       "revId": "0cc891fb28ecd36448f59ec7bfe3b1243b8fecd7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

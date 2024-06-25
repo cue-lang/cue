@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d9d97bac_e4cec09c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-25T12:40:09Z",
+      "side": 1,
+      "message": "I think at this time it is fine to merge it.\n\nThe main thing is documentation and more tests. I\u0027ll add them in a separate CL.",
+      "parentUuid": "e3eb236c_36cc1182",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fde1a851_3aa1d574",
         "filename": "/COMMIT_MSG",
         "patchSetId": 2
@@ -31,6 +49,24 @@
       "writtenOn": "2024-06-25T10:32:17Z",
       "side": 1,
       "message": "given the commit title, I would expect this to be a \"fixes\"; if it is not on purpose, I would explain why above.",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84ddb40b_09e21100",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-25T12:40:09Z",
+      "side": 1,
+      "message": "#2031 speaks of embed and export directives. This only implements embed.",
+      "parentUuid": "fde1a851_3aa1d574",
       "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -105,6 +141,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "89499132_ba93a776",
+        "filename": "cmd/cue/cmd/testdata/script/embed.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-25T12:40:09Z",
+      "side": 1,
+      "message": "Done export at least. It is hooked in at the root command, though, so it is enabled everywhere.",
+      "parentUuid": "b64df599_9e062643",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fd7adf59_42ad3337",
         "filename": "cmd/cue/cmd/testdata/script/embed.txtar",
         "patchSetId": 2
@@ -116,6 +170,24 @@
       "writtenOn": "2024-06-25T10:32:17Z",
       "side": 1,
       "message": "I would like to see more edge cases, like:\n\n* unclean paths like `./input.yaml`, `x//input.yaml`, and `x/../input.yaml`\n* backslashes, like `x\\\\input.yaml`",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52b86cc2_f7c1c0f5",
+        "filename": "cmd/cue/cmd/testdata/script/embed.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-25T12:40:09Z",
+      "side": 1,
+      "message": "I\u0027ll add those in a separate test file.",
+      "parentUuid": "fd7adf59_42ad3337",
       "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -137,6 +209,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2172e85a_81dc4607",
+        "filename": "cmd/cue/cmd/testdata/script/embed.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-25T12:40:09Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "a120a040_49899c8e",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "69098268_0af6ab01",
@@ -150,6 +240,24 @@
       "writtenOn": "2024-06-25T09:43:28Z",
       "side": 1,
       "message": "Not sure of the exact phrasing, but it should not be Wasm here.",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f47485eb_c50487d2",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-25T12:40:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "69098268_0af6ab01",
       "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -171,6 +279,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e710fbb3_368a3002",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-25T12:40:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a10a45df_d880c623",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "03637561_b58fc8d8",
@@ -184,6 +310,24 @@
       "writtenOn": "2024-06-25T10:32:17Z",
       "side": 1,
       "message": "there are a good number of error edge cases here that don\u0027t seem to be covered by a test; this is perhaps not critical but at least add a TODO",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7accc75a_5178a56a",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-25T12:40:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "03637561_b58fc8d8",
       "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -207,6 +351,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d8605d03_cf27b143",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-25T12:40:09Z",
+      "side": 1,
+      "message": "Was for symmetry. And as it turns out, it was.",
+      "parentUuid": "450bbb1c_4f8c5716",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "eba75c8c_aaee85c9",
         "filename": "cue/interpreter/embed/embed.go",
         "patchSetId": 2
@@ -224,6 +386,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4a65d6fd_d40657ac",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-25T12:40:09Z",
+      "side": 1,
+      "message": "Without it, the Windows test will fail. I verified this by deliberately not including this before running the first CI test.",
+      "parentUuid": "eba75c8c_aaee85c9",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9a909565_fe8b3d76",
         "filename": "cue/interpreter/embed/embed.go",
         "patchSetId": 2
@@ -235,6 +415,24 @@
       "writtenOn": "2024-06-25T10:32:17Z",
       "side": 1,
       "message": "I would also include a test case for this, given how we\u0027ve had multiple bugs in the past due to oversights relating to multi-file inputs.",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f6a0995_e5043baf",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-25T12:40:09Z",
+      "side": 1,
+      "message": "Done.\n\nThey are completely forbidden. JSONL is forbidden explicitly now, even if it has exactly one value.",
+      "parentUuid": "9a909565_fe8b3d76",
       "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

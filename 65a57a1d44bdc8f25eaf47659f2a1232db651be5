@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "98b6a75c_95cc3eb3",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1004,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-25T12:48:49Z",
+      "side": 1,
+      "message": "I actually don\u0027t think that that needs changing. The PkgInfo.IsAnonymous method already copes with the _ package name.",
+      "parentUuid": "c89a7b63_771d4876",
+      "revId": "65a57a1d44bdc8f25eaf47659f2a1232db651be5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9c412080_04527651",
@@ -54,6 +72,48 @@
       "writtenOn": "2024-06-25T12:36:54Z",
       "side": 1,
       "message": "the length of these lines seems unnecessarily inconsistent",
+      "revId": "65a57a1d44bdc8f25eaf47659f2a1232db651be5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e1566ea_49da830b",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 3004,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-25T12:48:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b1e0d83e_8b325af3",
+      "revId": "65a57a1d44bdc8f25eaf47659f2a1232db651be5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d786c23_2dd8f5dd",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 3004,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-25T12:48:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9c412080_04527651",
+      "range": {
+        "startLine": 3003,
+        "startChar": 44,
+        "endLine": 3004,
+        "endChar": 8
+      },
       "revId": "65a57a1d44bdc8f25eaf47659f2a1232db651be5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

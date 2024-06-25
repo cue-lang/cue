@@ -122,6 +122,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "35ea6d00_a4ff6cc8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-25T12:48:47Z",
+      "side": 1,
+      "message": "Isn\u0027t the question how it fits into cue/load somewhat orthogonal?\n\nNote that the same holds for the wasm files.\n\nAlso whether to be explicit adding the embed interpreter or not is orthogonal. I would not add the interpretation by default either way as it seems wrong to add any default interpretation to attributes.",
+      "parentUuid": "d708237d_cb06a724",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b64df599_9e062643",

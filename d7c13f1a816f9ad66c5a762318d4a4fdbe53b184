@@ -158,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "caf9edf4_e3563a86",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-25T13:49:21Z",
+      "side": 1,
+      "message": "The command cue support is now hidden under experimental.",
+      "parentUuid": "35ea6d00_a4ff6cc8",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b64df599_9e062643",

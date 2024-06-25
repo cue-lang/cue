@@ -8,7 +8,7 @@
 package foo
 
 
-Foo: _ @extern(file.xx, abi=c, sig="func(int)int")
+Foo: _ @test(file.xx, abi=c, sig="func(int)int")
 
 -- extern/out --
 -- out/extern/config --

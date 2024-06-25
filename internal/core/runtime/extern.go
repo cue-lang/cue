@@ -245,14 +245,15 @@ func (d *externDecorator) markExternFieldAttr(kind string, decls []ast.Decl) (er
 
 		case *ast.Attribute:
 			key, body := x.Split()
-			if key != "extern" {
+			// Support old-style and new-style extern attributes.
+			if key != "extern" && key != kind {
 				break
 			}
 
 			lastField := len(fieldStack) - 1
 			if lastField < 0 {
 				errs = errors.Append(errs, errors.Newf(x.Pos(),
-					"extern attribute not associated with field"))
+					"@%s attribute not associated with field", kind))
 				return true
 			}
 
@@ -260,7 +261,7 @@ func (d *externDecorator) markExternFieldAttr(kind string, decls []ast.Decl) (er
 
 			if _, ok := d.fields[f]; ok {
 				errs = errors.Append(errs, errors.Newf(x.Pos(),
-					"duplicate extern attributes"))
+					"duplicate @%s attributes", kind))
 				return true
 			}
 

@@ -3,7 +3,7 @@
 
 package ok
 
-foo: _ @extern("file.xx", fail)
+foo: _ @test("file.xx", fail)
 -- out/extern --
 can't load from external module: TEST: fail compilation:
     ./compile.cue:5:8

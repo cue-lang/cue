@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5be27d85_4d431391",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-25T17:10:09Z",
+      "side": 1,
+      "message": "Yeah, I\u0027m not sure either. I\u0027m just grumbling without a good solution here. Maybe add a TODO?",
+      "parentUuid": "9ea09570_60a3b002",
+      "revId": "0cc891fb28ecd36448f59ec7bfe3b1243b8fecd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b9e5a7db_907263e8",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "Can you give an example?",
       "parentUuid": "b9e5a7db_907263e8",
+      "revId": "0cc891fb28ecd36448f59ec7bfe3b1243b8fecd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f416f484_e588cf97",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-25T17:10:09Z",
+      "side": 1,
+      "message": "When I first reviewed the code, compiler.fs wasn\u0027t set up as it is currently. It\u0027s fixed now.",
+      "parentUuid": "d9395802_31f8fd0f",
       "revId": "0cc891fb28ecd36448f59ec7bfe3b1243b8fecd7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

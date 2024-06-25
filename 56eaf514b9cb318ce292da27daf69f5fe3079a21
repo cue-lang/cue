@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35bd4f60_ea4797c8",
+        "filename": "cmd/cue/cmd/testdata/script/embed_mod.txtar",
+        "patchSetId": 13
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-25T17:10:09Z",
+      "side": 1,
+      "message": "This isn\u0027t used.",
+      "revId": "56eaf514b9cb318ce292da27daf69f5fe3079a21",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf0c7fe3_5383aeb5",
+        "filename": "cmd/cue/cmd/testdata/script/embed_mod.txtar",
+        "patchSetId": 13
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-25T17:10:09Z",
+      "side": 1,
+      "message": "I\u0027d like to see a module test that checks that embedding works inside an imported module, not just the main module.",
+      "revId": "56eaf514b9cb318ce292da27daf69f5fe3079a21",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "867598b2_70d382bc",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-25T17:10:09Z",
+      "side": 1,
+      "message": "This method is unused.",
+      "revId": "56eaf514b9cb318ce292da27daf69f5fe3079a21",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

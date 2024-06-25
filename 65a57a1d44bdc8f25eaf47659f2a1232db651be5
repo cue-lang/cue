@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c89a7b63_771d4876",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1004,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-25T12:36:54Z",
+      "side": 1,
+      "message": "Note that you need to adjust `internal.GetPackageInfo` accordingly. It is being phased out, but it should follow the same logic for now.",
+      "revId": "65a57a1d44bdc8f25eaf47659f2a1232db651be5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c412080_04527651",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 3004,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-25T12:36:54Z",
+      "side": 1,
+      "message": "would it not be more straightforward to say \"a CUE file without a package name\"?",
+      "range": {
+        "startLine": 3003,
+        "startChar": 44,
+        "endLine": 3004,
+        "endChar": 8
+      },
+      "revId": "65a57a1d44bdc8f25eaf47659f2a1232db651be5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1e0d83e_8b325af3",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 3004,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-25T12:36:54Z",
+      "side": 1,
+      "message": "the length of these lines seems unnecessarily inconsistent",
+      "revId": "65a57a1d44bdc8f25eaf47659f2a1232db651be5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

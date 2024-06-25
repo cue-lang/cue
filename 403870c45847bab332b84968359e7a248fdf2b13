@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6dce46a_82a7d2c4",
+        "filename": "cmd/cue/cmd/testdata/script/embed.txtar",
+        "patchSetId": 11
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-25T15:53:26Z",
+      "side": 1,
+      "message": "Let\u0027s have test cases for embeddings in modules too, and also where the embedding isn\u0027t in the current directory (neither case works currently). I\u0027d probably put those in different test files to avoid cluttering this one more.",
+      "revId": "403870c45847bab332b84968359e7a248fdf2b13",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

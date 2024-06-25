@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c64cf826_880325ec",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-25T15:53:26Z",
+      "side": 1,
+      "message": "This isn\u0027t going to work when the source is in an fs.FS. I suppose that cue/load already assumes that everything is in the OS file system but I\u0027ve been trying to gradually move away from that assumption, particularly in new code.",
+      "revId": "0cc891fb28ecd36448f59ec7bfe3b1243b8fecd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9e5a7db_907263e8",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-25T15:53:26Z",
+      "side": 1,
+      "message": "This function doesn\u0027t take into account the directory that the filename should be interpreted relative to. This means that it doesn\u0027t work unless the filename is in the current directory.",
+      "revId": "0cc891fb28ecd36448f59ec7bfe3b1243b8fecd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

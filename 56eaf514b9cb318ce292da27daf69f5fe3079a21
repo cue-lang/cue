@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4efa7b18_7e147652",
+        "filename": "cmd/cue/cmd/testdata/script/embed.txtar",
+        "patchSetId": 13
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-25T17:16:23Z",
+      "side": 1,
+      "message": "The proposal says \"Hidden files, like those starting with a dot, are not matched\", and also \"only files that are within the module may be embedded\" but I don\u0027t see any logic in the embed implementation that seems to implement those features.\n\nI\u0027d like to see tests that check the behaviour with respect to:\n\n- files starting with \".\" and glob patterns that match them\n- directories that are outside of the current module because they are excluded by filename (e.g. directories starting with \"_\" or \".\")\n- nested module directories (also by definition outside of the current module).",
+      "revId": "56eaf514b9cb318ce292da27daf69f5fe3079a21",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "35bd4f60_ea4797c8",
         "filename": "cmd/cue/cmd/testdata/script/embed_mod.txtar",
         "patchSetId": 13

@@ -1,6 +1,40 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3eb236c_36cc1182",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-25T10:32:17Z",
+      "side": 1,
+      "message": "Does this mean this CL is not ready to be merged, or that we will leave the issue open and consider the feature a WIP experiment to be completed by further commits?",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fde1a851_3aa1d574",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-25T10:32:17Z",
+      "side": 1,
+      "message": "given the commit title, I would expect this to be a \"fixes\"; if it is not on purpose, I would explain why above.",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "944a7ad8_d652dd07",
@@ -14,6 +48,57 @@
       "writtenOn": "2024-06-25T09:43:28Z",
       "side": 1,
       "message": "I like it (modulo recorded limitations).",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b64df599_9e062643",
+        "filename": "cmd/cue/cmd/testdata/script/embed.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-25T10:32:17Z",
+      "side": 1,
+      "message": "do we also want to ensure that others like `cue export` and `cue vet -c` also work?",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd7adf59_42ad3337",
+        "filename": "cmd/cue/cmd/testdata/script/embed.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-25T10:32:17Z",
+      "side": 1,
+      "message": "I would like to see more edge cases, like:\n\n* unclean paths like `./input.yaml`, `x//input.yaml`, and `x/../input.yaml`\n* backslashes, like `x\\\\input.yaml`",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a120a040_49899c8e",
+        "filename": "cmd/cue/cmd/testdata/script/embed.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-25T10:32:17Z",
+      "side": 1,
+      "message": "similar to the above, I would include more edge cases:\n\n* `./x/*.yaml`, `x//*.yaml`, `x/../*.yaml`, `x/../x/*.yaml`\n* `x\\\\*.yaml`\n* double star, e.g. `**/*.yaml`",
       "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -48,6 +133,74 @@
       "writtenOn": "2024-06-25T09:43:28Z",
       "side": 1,
       "message": "ditto.",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03637561_b58fc8d8",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-25T10:32:17Z",
+      "side": 1,
+      "message": "there are a good number of error edge cases here that don\u0027t seem to be covered by a test; this is perhaps not critical but at least add a TODO",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "450bbb1c_4f8c5716",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-25T10:32:17Z",
+      "side": 1,
+      "message": "is this method needed?",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eba75c8c_aaee85c9",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-25T10:32:17Z",
+      "side": 1,
+      "message": "I would like to see a test case with",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a909565_fe8b3d76",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-25T10:32:17Z",
+      "side": 1,
+      "message": "I would also include a test case for this, given how we\u0027ve had multiple bugs in the past due to oversights relating to multi-file inputs.",
       "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -34,6 +34,24 @@
       "parentUuid": "805c37bf_7c130168",
       "revId": "7842e74a8b71f58bfb888a9736da1ad7097dc9e7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4316117_4650e66d",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-25T15:45:30Z",
+      "side": 1,
+      "message": "Case in point: I had to further reduce the reliance on file path, so that the error messages generated were consistent:\n\nWindows: ... open y/test.json: The system cannot find the path specified.:\nUnix:    ... open y/test.json: no such file or directory:\n\nAnd in case of trying to open a directory:\n\nWindows: failed to decode file: read x: Incorrect function.:\nUnix:    failed to decode file: read x: is a directory:\n\nI\u0027ve updated the logic now to always use fs.FS and to catch some of these\nerrors manually so that error reporting is consistent.",
+      "parentUuid": "47edb9dd_d1132c55",
+      "revId": "7842e74a8b71f58bfb888a9736da1ad7097dc9e7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

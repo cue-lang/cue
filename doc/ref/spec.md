@@ -2996,7 +2996,12 @@ PackageClause  = "package" PackageName .
 PackageName    = identifier .
 ```
 
-The PackageName must not be the blank identifier or a definition identifier.
+The PackageName must not be a definition identifier.
+
+If the PackageName is the blank identifier (`_`), it is treated the same as if there
+were no package clause. This can be useful to allow adding
+package level attributes or doc comments to a non-package
+CUE file.
 
 ```
 package math

@@ -71,6 +71,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ae5bb2f8_9af86217",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-25T12:34:11Z",
+      "side": 1,
+      "message": "I forgot to say: this should be behind a CUE_EXPERIMENT, so that we can keep the liberty to change the design and implementation until finalized.",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b64df599_9e062643",
         "filename": "cmd/cue/cmd/testdata/script/embed.txtar",
         "patchSetId": 2

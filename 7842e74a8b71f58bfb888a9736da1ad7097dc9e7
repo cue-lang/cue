@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "805c37bf_7c130168",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-06-25T13:50:31Z",
+      "side": 1,
+      "message": "FYI Go 1.20 added https://pkg.go.dev/path/filepath#IsLocal for this kind of use case, I\u0027d definitely try to use it",
+      "revId": "7842e74a8b71f58bfb888a9736da1ad7097dc9e7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

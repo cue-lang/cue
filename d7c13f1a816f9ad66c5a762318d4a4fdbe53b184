@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "944a7ad8_d652dd07",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-06-25T09:43:28Z",
+      "side": 1,
+      "message": "I like it (modulo recorded limitations).",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69098268_0af6ab01",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-06-25T09:43:28Z",
+      "side": 1,
+      "message": "Not sure of the exact phrasing, but it should not be Wasm here.",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a10a45df_d880c623",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-06-25T09:43:28Z",
+      "side": 1,
+      "message": "ditto.",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

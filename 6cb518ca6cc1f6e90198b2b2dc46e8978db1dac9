@@ -16,6 +16,23 @@
       "message": "Please add a comment by way of reply about the Unity failure.",
       "revId": "6cb518ca6cc1f6e90198b2b2dc46e8978db1dac9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "00d70161_14b8aac2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-26T12:42:59Z",
+      "side": 1,
+      "message": "The Unity failure is because of https://review.gerrithub.io/c/cue-lang/cue/+/1196135 which has not been backported to v0.9.0.",
+      "revId": "6cb518ca6cc1f6e90198b2b2dc46e8978db1dac9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

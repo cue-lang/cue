@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50c119fa_5dc682d8",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-26T09:50:37Z",
+      "side": 1,
+      "message": "I don\u0027t see how this can work. isHidden is, on Windows at least, reliant on getting information on the file from its path. But the path here is relative to the root of `c.fs`, which means that it\u0027s _not_ relative to the current directory. I think we should either have higher level tests, not just unit tests for isHidden, and also tests for the Windows-specific behaviour.\n\nAlternatively (and I think I\u0027d prefer this option), just remove the Windows-specific code entirely. Go is highly security-conscious and doesn\u0027t appear to have any logic for checking for files with the hidden attribute under Windows, so we\u0027re probably OK not to do it here either.",
+      "revId": "d71724ae34c35010cf9584aae6252f129c65a24c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3b0185e_f90ff2bc",
+        "filename": "cue/interpreter/embed/hidden_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-26T09:50:37Z",
+      "side": 1,
+      "message": "What about `.foo/bar` as a test case?\nI suspect that the pattern \"*/*.txt\" should not match .txt files in dot-file subdirectories, but it looks like your logic doesn\u0027t cope with that possibility.",
+      "revId": "d71724ae34c35010cf9584aae6252f129c65a24c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

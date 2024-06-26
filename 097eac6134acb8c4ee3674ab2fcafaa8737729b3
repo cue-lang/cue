@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1436ffed_7c20e4bf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-26T09:50:37Z",
+      "side": 1,
+      "message": "I think excluding dot files from globs is indeed probably the right thing to do, but I wonder if it would be worth having an option to allow globs to match them.\nAlso, I think the logic could use some improvement, as mentioned in the comments.",
+      "revId": "097eac6134acb8c4ee3674ab2fcafaa8737729b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ebe4235_b2be999d",
+        "filename": "cmd/cue/cmd/testdata/script/embed.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-26T09:50:37Z",
+      "side": 1,
+      "message": "It would be nice to add this test case to the previous CL so we can see its behaviour change here.",
+      "revId": "097eac6134acb8c4ee3674ab2fcafaa8737729b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

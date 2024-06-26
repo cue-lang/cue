@@ -38,6 +38,8 @@ a1: 2
 
 -- y/test.json --
 { "x": 34 }
+-- y/.test.json --
+{ "z": 45 }
 -- x/input.yaml --
 a1: 2
 -- openapi.json --

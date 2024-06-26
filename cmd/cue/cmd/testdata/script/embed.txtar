@@ -133,9 +133,6 @@ c: """
 
     """
 d: {
-    "y/.test.json": {
-        z: 46
-    }
     "y/_test.json": {
         z: 45
     }
@@ -222,7 +219,6 @@ c: """
 
 	"""
 d: {
-	"y/.test.json": z:  46
 	"y/_test.json": z:  45
 	"x/input.yaml": a1: 2
 	"y/test.json": x:   34

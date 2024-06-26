@@ -87,12 +87,12 @@ deps: "other.com/something@v0": v: "v0.2.3"
 	parse:    Parse,
 	data: `
 module: "foo.com/bar@v0"
-language: version: "v0.9.0-alpha.0"
+language: version: "v0.9.2-alpha.0"
 source: kind: "git"
 `,
 	want: &File{
 		Language: &Language{
-			Version: "v0.9.0-alpha.0",
+			Version: "v0.9.2-alpha.0",
 		},
 		Module: "foo.com/bar@v0",
 		Source: &Source{
@@ -107,12 +107,12 @@ source: kind: "git"
 	parse:    Parse,
 	data: `
 module: "foo.com/bar@v0"
-language: version: "v0.9.0-alpha.0"
+language: version: "v0.9.2-alpha.0"
 source: kind: "self"
 `,
 	want: &File{
 		Language: &Language{
-			Version: "v0.9.0-alpha.0",
+			Version: "v0.9.2-alpha.0",
 		},
 		Module: "foo.com/bar@v0",
 		Source: &Source{
@@ -127,7 +127,7 @@ source: kind: "self"
 	parse:    Parse,
 	data: `
 module: "foo.com/bar@v0"
-language: version: "v0.9.0-alpha.0"
+language: version: "v0.9.2-alpha.0"
 source: kind: "bad"
 `,
 	wantError: `source.kind: 2 errors in empty disjunction:(.|\n)+`,
@@ -305,7 +305,7 @@ _foo: "blah.example"
 	parse:    Parse,
 	data: `
 module: "foo.com/bar"
-_foo: "v0.9.0"
+_foo: "v0.9.2"
 language: version: _foo
 `,
 	wantError: `invalid module.cue file syntax: references not allowed in data mode:
@@ -315,7 +315,7 @@ language: version: _foo
 	parse:    Parse,
 	data: `
 module: "foo.com/bar"
-let foo = "v0.9.0"
+let foo = "v0.9.2"
 language: version: foo
 `,
 	wantError: `invalid module.cue file syntax: references not allowed in data mode:
@@ -327,8 +327,8 @@ invalid module.cue file syntax: references not allowed in data mode:
 	parse:    Parse,
 	data: `
 module: "foo.com/bar"
-#x: "v0.9.0"
-language: version: "v0.9.0"
+#x: "v0.9.2"
+language: version: "v0.9.2"
 `,
 	wantError: `invalid module.cue file syntax: definitions not allowed in data mode:
     module.cue:3:1`,
@@ -337,12 +337,12 @@ language: version: "v0.9.0"
 	parse:    Parse,
 	data: `
 module: "foo.com/bar@v0"
-language: version: "v0.9.0"
+language: version: "v0.9.2"
 custom: "somewhere.com": foo: true
 `,
 	want: &File{
 		Module:   "foo.com/bar@v0",
-		Language: &Language{Version: "v0.9.0"},
+		Language: &Language{Version: "v0.9.2"},
 		Custom: map[string]map[string]any{
 			"somewhere.com": {
 				"foo": true,
@@ -360,7 +360,7 @@ module: "foo.com/bar"
 `,
 	want: &File{
 		Module:   "foo.com/bar",
-		Language: &Language{Version: "v0.9.0"},
+		Language: &Language{Version: "v0.9.2"},
 	},
 	wantDefaults: map[string]string{
 		"foo.com/bar": "v0",
@@ -372,7 +372,7 @@ module: "foo.com/bar"
 `,
 	want: &File{
 		Module:   "test.example",
-		Language: &Language{Version: "v0.9.0"},
+		Language: &Language{Version: "v0.9.2"},
 	},
 	wantDefaults: map[string]string{
 		"test.example": "v0",
@@ -385,7 +385,7 @@ module: ""
 `,
 	want: &File{
 		Module:   "test.example",
-		Language: &Language{Version: "v0.9.0"},
+		Language: &Language{Version: "v0.9.2"},
 	},
 	wantDefaults: map[string]string{
 		"test.example": "v0",
@@ -400,7 +400,7 @@ other: field: 123
 `,
 	want: &File{
 		Module:   "foo.com",
-		Language: &Language{Version: "v0.9.0"},
+		Language: &Language{Version: "v0.9.2"},
 		Custom: map[string]map[string]any{
 			"legacy": {
 				"some":  true,

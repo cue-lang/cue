@@ -107,6 +107,7 @@ import (
 // TODO: record files in build.Instance
 // TODO: support stream values
 // TODO: support schema-based decoding
+// TODO: maybe: option to include hidden files?
 
 // interpreter is a [cuecontext.ExternInterpreter] for embedded files.
 type interpreter struct{}
@@ -224,6 +225,10 @@ func (c *compiler) processGlob(glob, scope string, schema adt.Value) (adt.Expr, 
 	}
 
 	for _, f := range matches {
+		if c.isHidden(f) {
+			// TODO: allow option for including hidden files?
+			continue
+		}
 		expr, err := c.decodeFile(f, scope, schema)
 		if err != nil {
 			return nil, err

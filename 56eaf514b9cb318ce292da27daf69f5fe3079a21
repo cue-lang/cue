@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f2cce321_f93abc64",
+        "filename": "cmd/cue/cmd/testdata/script/embed.txtar",
+        "patchSetId": 13
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-26T07:23:16Z",
+      "side": 1,
+      "message": "Added TODOs for most of those, with some exceptions. See below. This was meant as an MVP, and we can do the rest in followup CLs.\n\nRegarding \"files within a module\":\n- it is not possible to import from any parent directory of a package, so by implication it is also not possible to import from parent directory of a module.\n- I added a TODO for excluding files within a module. I\u0027m not even sure if we support submodules, but if we do, this should really be a functionality of load. This does not seem to be the right place to duplicate this functionality.\n\nRegarding \"no hidden files\", this is explicitly mentioned for glob, as it has some security implications. (The mention of hidden files in the security section is written as and meant to be an anaphora referring to the text in the glob section.)\n\nI\u0027ll address hidden files in a followup CL, as it turns out to be not super simple.\n\nI\u0027m not sure why we should disallow directories starting with _. This seems CUE specific. Are there security concerns with that?\n\nTo your earlier point, it may be good to have the loader, or some other piece of functionality, give a fs.FS for a package or module with all current files.",
+      "parentUuid": "4efa7b18_7e147652",
+      "revId": "56eaf514b9cb318ce292da27daf69f5fe3079a21",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "35bd4f60_ea4797c8",
         "filename": "cmd/cue/cmd/testdata/script/embed_mod.txtar",
         "patchSetId": 13
@@ -31,6 +49,24 @@
       "writtenOn": "2024-06-25T17:10:09Z",
       "side": 1,
       "message": "This isn\u0027t used.",
+      "revId": "56eaf514b9cb318ce292da27daf69f5fe3079a21",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fc94ee3_aa19e487",
+        "filename": "cmd/cue/cmd/testdata/script/embed_mod.txtar",
+        "patchSetId": 13
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-26T07:23:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "35bd4f60_ea4797c8",
       "revId": "56eaf514b9cb318ce292da27daf69f5fe3079a21",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb3e9af2_09cc2072",
+        "filename": "cmd/cue/cmd/testdata/script/embed_mod.txtar",
+        "patchSetId": 13
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-26T07:23:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf0c7fe3_5383aeb5",
+      "revId": "56eaf514b9cb318ce292da27daf69f5fe3079a21",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "867598b2_70d382bc",
@@ -65,6 +119,24 @@
       "writtenOn": "2024-06-25T17:10:09Z",
       "side": 1,
       "message": "This method is unused.",
+      "revId": "56eaf514b9cb318ce292da27daf69f5fe3079a21",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13aa49b3_8f485f58",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-26T07:23:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "867598b2_70d382bc",
       "revId": "56eaf514b9cb318ce292da27daf69f5fe3079a21",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e4ae03f8_550c54aa",
+        "filename": "cmd/cue/cmd/testdata/script/embed.txtar",
+        "patchSetId": 13
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-26T09:37:42Z",
+      "side": 1,
+      "message": "To be clear, I think it would be worth adding tests that _show_ the current behaviour with respect to the above aspects even if support is not yet added, so when the TODOs are addressed, the test behaviour can be seen to change. Having a glob that matches files in a nested submodule is one such example (Go gives an error in such a case).",
+      "parentUuid": "7ecd05dd_e73be0a8",
+      "revId": "56eaf514b9cb318ce292da27daf69f5fe3079a21",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "35bd4f60_ea4797c8",
         "filename": "cmd/cue/cmd/testdata/script/embed_mod.txtar",
         "patchSetId": 13

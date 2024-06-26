@@ -33,6 +33,24 @@
       "message": "What about `.foo/bar` as a test case?\nI suspect that the pattern \"*/*.txt\" should not match .txt files in dot-file subdirectories, but it looks like your logic doesn\u0027t cope with that possibility.",
       "revId": "d71724ae34c35010cf9584aae6252f129c65a24c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b107cc9d_f2d92cac",
+        "filename": "cue/interpreter/embed/hidden_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-26T09:51:59Z",
+      "side": 1,
+      "message": "ha, gerrit removed my `*`. I meant the pattern `\"*.txt\"`.",
+      "parentUuid": "a3b0185e_f90ff2bc",
+      "revId": "d71724ae34c35010cf9584aae6252f129c65a24c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -232,30 +232,28 @@ func lookup(v cue.Value, sels ...cue.Selector) cue.Value {
 // should be at least this, because that's when we added the language.version
 // field itself.
 func EarliestClosedSchemaVersion() string {
-	return schemaVersionLimits()[0]
+	return earliestClosedSchemaVersion()
 }
 
 // LatestKnownSchemaVersion returns the language version
 // associated with the most recent known schema.
+//
+// Deprecated: use [cuelang.org/go/cue.LanguageVersion] instead.
 func LatestKnownSchemaVersion() string {
-	return schemaVersionLimits()[1]
+	return cueversion.LanguageVersion()
 }
 
-var schemaVersionLimits = sync.OnceValue(func() [2]string {
-	limits, _ := moduleSchemaDo(func(info *schemaInfo) ([2]string, error) {
+var earliestClosedSchemaVersion = sync.OnceValue(func() string {
+	earliest, _ := moduleSchemaDo(func(info *schemaInfo) (string, error) {
 		earliest := ""
-		latest := ""
 		for v := range info.Versions {
 			if earliest == "" || semver.Compare(v, earliest) < 0 {
 				earliest = v
 			}
-			if latest == "" || semver.Compare(v, latest) > 0 {
-				latest = v
-			}
 		}
-		return [2]string{earliest, latest}, nil
+		return earliest, nil
 	})
-	return limits
+	return earliest
 })
 
 // Parse verifies that the module file has correct syntax

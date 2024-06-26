@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7ecd05dd_e73be0a8",
+        "filename": "cmd/cue/cmd/testdata/script/embed.txtar",
+        "patchSetId": 13
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-26T09:33:52Z",
+      "side": 1,
+      "message": "\u003e I\u0027m not even sure if we support submodules, but if we do, this should really be a functionality of load.\n\nWe do support nested modules and I don\u0027t see how this functionality could be implemented by load. Happy to chat this through online if you like.\n\n\u003e I\u0027m not sure why we should disallow directories starting with _. \n\nI didn\u0027t say those directories should be disallowed, just that there should be tests that check the behaviour with respect to those directories, as they are treated somewhat specially in some places.",
+      "parentUuid": "f2cce321_f93abc64",
+      "revId": "56eaf514b9cb318ce292da27daf69f5fe3079a21",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "35bd4f60_ea4797c8",
         "filename": "cmd/cue/cmd/testdata/script/embed_mod.txtar",
         "patchSetId": 13

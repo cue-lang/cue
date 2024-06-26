@@ -143,12 +143,12 @@ To contribute, please read the [Contribution Guide](CONTRIBUTING.md).
 ## Code of Conduct
 
 Guidelines for participating in CUE community spaces and a reporting process for
-handling issues can be found in the [Code of Conduct](https://cuelang.org/docs/contribution_guidelines/conduct).
+handling issues can be found in the [Code of Conduct](https://cuelang.org/docs/reference/code-of-conduct/).
 
 ## Contact
 
 - Ask questions via [GitHub Discussions](https://github.com/cue-lang/cue/discussions)
-- Chat with us on [Slack](https://join.slack.com/t/cuelang/shared_invite/enQtNzQwODc3NzYzNTA0LTAxNWQwZGU2YWFiOWFiOWQ4MjVjNGQ2ZTNlMmIxODc4MDVjMDg5YmIyOTMyMjQ2MTkzMTU5ZjA1OGE0OGE1NmE) and [Discord](https://discord.gg/Tnf2CdzRjr)
+- Chat with us on [Slack](https://cuelang.org/s/slack) and [Discord](https://cuelang.org/s/discord)
 - Subscribe to our [Community Calendar](https://cuelang.org/s/community-calendar) for community updates, demos, office hours, etc
 
 ---

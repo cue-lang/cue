@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d13e5780_beab6707",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-26T10:02:45Z",
+      "side": 1,
+      "message": "crossed paths. I quick followed it with a change that takes the path relative to the dir stored in token.File.\n\nArguably that may be a relative path, but for it always is absolute, at least.",
+      "parentUuid": "50c119fa_5dc682d8",
+      "revId": "d71724ae34c35010cf9584aae6252f129c65a24c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a3b0185e_f90ff2bc",
         "filename": "cue/interpreter/embed/hidden_test.go",
         "patchSetId": 1

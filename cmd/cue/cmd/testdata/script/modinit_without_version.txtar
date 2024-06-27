@@ -1,13 +1,12 @@
 # Check that cue mod init is independent of the module version;
 # even though CUE's current module version will often be a v0 pseudo-version
 # or a pre-release, we will always use the current language version in init.
-env-fill want-module
 exec cue mod init foo.example
-cmp cue.mod/module.cue want-module
+cmpenv cue.mod/module.cue want-module
 
 # cue mod tidy should be a no-op after cue mod init
 exec cue mod tidy
-cmp cue.mod/module.cue want-module
+cmpenv cue.mod/module.cue want-module
 
 -- want-module --
 module: "foo.example"

@@ -1,0 +1,43 @@
+# Check we can initialize the module with an explicit version.
+
+# Set current version.
+exec cue mod init --language.version current foo.example
+cmpenv cue.mod/module.cue want-module-1
+rm cue.mod
+
+# Set specific version.
+exec cue mod init --language.version v0.9.2 foo.example
+cmp cue.mod/module.cue want-module-2
+rm cue.mod
+
+# Set version earlier than earliest module schema version.
+! exec cue mod init --language.version v0.4.3 foo.example
+cmp stderr want-stderr-3
+rm cue.mod
+
+# Set version too new.
+! exec cue mod init --language.version v2.3.4 foo.example
+cmp stderr want-stderr-4
+rm cue.mod
+
+# Set version that's incompatible with the source field.
+! exec cue mod init --language.version v0.8.0 --source self foo.example
+cmp stderr want-stderr-5
+rm cue.mod
+
+-- want-module-1 --
+module: "foo.example"
+language: {
+	version: "$CUE_LANGUAGE_VERSION"
+}
+-- want-module-2 --
+module: "foo.example"
+language: {
+	version: "v0.9.2"
+}
+-- want-stderr-3 --
+language version "v0.4.3" is too early for module.cue schema (earliest allowed is v0.8.0-alpha.0)
+-- want-stderr-4 --
+language version "v2.3.4" may not be after current language version v0.10.0
+-- want-stderr-5 --
+cannot parse result: invalid module.cue file: source field is not allowed at this language version; need at least v0.9.0-alpha.0

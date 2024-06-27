@@ -10,7 +10,7 @@ exec cue export .
 cmp stdout want-stdout-1
 
 # Check that the same thing happens when we use an
-# explicit @latest suffix.
+# explicit @current suffix.
 cp module-original cue.mod/module.cue
 exec cue mod get baz.org@latest
 cmp cue.mod/module.cue want-module-1

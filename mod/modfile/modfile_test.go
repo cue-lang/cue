@@ -500,7 +500,7 @@ language: {
 				Version: "v0.4.3",
 			},
 		},
-		wantError: `cannot round-trip module file: cannot find schema suitable for reading module file with language version "v0.4.3"`,
+		wantError: `cannot parse result: cannot find schema suitable for reading module file with language version "v0.4.3"`,
 	}, {
 		name: "WithInvalidModuleVersion",
 		file: &File{
@@ -509,7 +509,7 @@ language: {
 				Version: "badversion--",
 			},
 		},
-		wantError: `cannot round-trip module file: language version "badversion--" in module.cue is not valid semantic version`,
+		wantError: `cannot parse result: language version "badversion--" in module.cue is not valid semantic version`,
 	}, {
 		name: "WithNonNilEmptyDeps",
 		file: &File{

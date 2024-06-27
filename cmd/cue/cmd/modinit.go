@@ -22,7 +22,6 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
 )
@@ -45,6 +44,7 @@ in the module.
 
 	cmd.Flags().BoolP(string(flagForce), "f", false, "force moving old-style cue.mod file")
 	cmd.Flags().String(string(flagSource), "", "set the source field")
+	cmd.Flags().String(string(flagLanguageVersion), "current", "set the language version ('current' means current language version)")
 	return cmd
 }
 
@@ -84,8 +84,12 @@ func runModInit(cmd *Command, args []string) (err error) {
 			return err
 		}
 	}
-	mf.Language = &modfile.Language{
-		Version: cueversion.LanguageVersion(),
+	editFunc, err := addLanguageVersion(flagLanguageVersion.String(cmd))
+	if err != nil {
+		return err
+	}
+	if err := editFunc(mf); err != nil {
+		return err
 	}
 
 	err = os.Mkdir(mod, 0755)

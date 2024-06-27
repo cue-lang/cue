@@ -156,7 +156,7 @@ func (f *File) Format() ([]byte, error) {
 	// before formatting the output.
 	f1, err := ParseNonStrict(data, "-")
 	if err != nil {
-		return nil, fmt.Errorf("cannot round-trip module file: %v", strings.TrimSuffix(errors.Details(err, nil), "\n"))
+		return nil, fmt.Errorf("cannot parse result: %v", strings.TrimSuffix(errors.Details(err, nil), "\n"))
 	}
 	if f.Language != nil && f1.actualSchemaVersion == "v0.0.0" {
 		// It's not a legacy module file (because the language field is present)
@@ -363,7 +363,7 @@ func FixLegacy(modfile []byte, filename string) (*File, error) {
 	}
 	f, err = ParseNonStrict(data, "fixed-"+filename)
 	if err != nil {
-		return nil, fmt.Errorf("cannot round-trip fixed module file %q: %v", data, err)
+		return nil, fmt.Errorf("cannot parse resulting module file %q: %v", data, err)
 	}
 	return f, nil
 }

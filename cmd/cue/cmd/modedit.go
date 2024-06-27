@@ -21,6 +21,8 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"cuelang.org/go/internal/cueversion"
+	"cuelang.org/go/internal/mod/semver"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
 	"github.com/spf13/cobra"
@@ -54,8 +56,9 @@ Note that this command is not yet stable and may be changed.
 		RunE: mkRunE(c, editCmd.run),
 		Args: cobra.ExactArgs(0),
 	}
-	addFlagVar(cmd, flagFunc(editCmd.flagSource), "source", "set the source field")
+	addFlagVar(cmd, flagFunc(editCmd.flagSource), string(flagSource), "set the source field")
 	addFlagVar(cmd, boolFlagFunc(editCmd.flagDropSource), "drop-source", "remove the source field")
+	addFlagVar(cmd, flagFunc(editCmd.flagLanguageVersion), string(flagLanguageVersion), "set language.version ('latest' means latest known version)")
 	addFlagVar(cmd, flagFunc(editCmd.flagModule), "module", "set the module path")
 	addFlagVar(cmd, flagFunc(editCmd.flagRequire), "require", "add a required module@version")
 	addFlagVar(cmd, flagFunc(editCmd.flagDropRequire), "drop-require", "remove a requirement")
@@ -88,7 +91,7 @@ func (c *modEditCmd) run(cmd *Command, args []string) error {
 	}
 	newData, err := mf.Format()
 	if err != nil {
-		return fmt.Errorf("internal error: invalid module.cue file generated: %v", err)
+		return fmt.Errorf("invalid resulting module.cue file after edits: %v", err)
 	}
 	if bytes.Equal(newData, data) {
 		return nil
@@ -126,6 +129,38 @@ func (c *modEditCmd) flagDropSource(arg bool) error {
 		return nil
 	})
 	return nil
+}
+
+func (c *modEditCmd) flagLanguageVersion(arg string) error {
+	editFunc, err := addLanguageVersion(arg)
+	if err != nil {
+		return err
+	}
+	c.addEdit(editFunc)
+	return nil
+}
+
+func addLanguageVersion(v string) (func(*modfile.File) error, error) {
+	if v == "latest" {
+		v = cueversion.LanguageVersion()
+	} else {
+		if semver.Canonical(v) != v {
+			return nil, fmt.Errorf("language version %q is not canonical (must include major, minor and patch versions)", v)
+		}
+		if min := modfile.EarliestClosedSchemaVersion(); semver.Compare(v, min) < 0 {
+			return nil, fmt.Errorf("language version %q is too early for module.cue schema (earliest allowed is %s)", v, min)
+		}
+		if max := cueversion.LanguageVersion(); semver.Compare(v, max) > 0 {
+			return nil, fmt.Errorf("language version %q may not be after current language version %s", v, max)
+		}
+	}
+	return func(f *modfile.File) error {
+		if f.Language == nil {
+			f.Language = &modfile.Language{}
+		}
+		f.Language.Version = v
+		return nil
+	}, nil
 }
 
 func (c *modEditCmd) flagModule(arg string) error {

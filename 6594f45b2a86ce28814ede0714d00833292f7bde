@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "98ae1e18_378b5791",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-27T10:34:37Z",
+      "side": 1,
+      "message": "LGTM with a couple more minor nits.",
+      "revId": "6594f45b2a86ce28814ede0714d00833292f7bde",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

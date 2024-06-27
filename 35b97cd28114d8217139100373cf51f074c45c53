@@ -1,5 +1,40 @@
 {
-  "comments": [],
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "835d39a3_54af9a28",
+        "filename": "cmd/cue/cmd/testdata/script/embed.txtar",
+        "patchSetId": 15
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-27T10:34:37Z",
+      "side": 1,
+      "message": "```suggestion\n\t// TODO: nested modules are currently not supported, but we may opt to\n```",
+      "revId": "35b97cd28114d8217139100373cf51f074c45c53",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5be9a0da_d47d48af",
+        "filename": "cmd/cue/cmd/testdata/script/embed.txtar",
+        "patchSetId": 15
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-06-27T10:34:37Z",
+      "side": 1,
+      "message": "I presume you meant to use the conventional spelling for a module.cue file.\n\n```suggestion\n\tnestedModFile: _ @embed(file\u003d\"a/b/cue.mod/module.cue\")\n```",
+      "revId": "35b97cd28114d8217139100373cf51f074c45c53",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ],
   "submitRequirementResults": [
     {
       "submitRequirement": {

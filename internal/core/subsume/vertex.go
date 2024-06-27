@@ -88,11 +88,18 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 		panic(fmt.Sprintf("unexpected type %T", v))
 	}
 
-	xClosed := x.IsClosedStruct() && !s.IgnoreClosedness
+	xClosed := s.isClosedStruct(x)
 	// TODO: this should not close for taking defaults. Do a more principled
 	// makeover of this package before making it public, though.
-	yClosed := s.Final || s.Defaults ||
-		(y.IsClosedStruct() && !s.IgnoreClosedness)
+	yClosed := s.Final || s.Defaults || s.isClosedStruct(y)
+
+	if s.BackwardsCompatibility && s.isClosedStruct(x) && !s.isClosedStruct(y) {
+		// TODO: this could still be true if there is a catch-all constraint
+		// resolving to top. But there are probably other implications that
+		// demand this is false, especially if we allow for reflection.
+		s.errf("later version closes struct")
+		return false
+	}
 
 	if xClosed && !yClosed && !final {
 		return false
@@ -295,11 +302,18 @@ func (s *subsumer) verticesDev(x, y *adt.Vertex) bool {
 		panic(fmt.Sprintf("unexpected type %T", v))
 	}
 
-	xClosed := x.IsClosedStruct() && !s.IgnoreClosedness
+	xClosed := s.isClosedStruct(x)
 	// TODO: this should not close for taking defaults. Do a more principled
 	// makeover of this package before making it public, though.
-	yClosed := s.Final || s.Defaults ||
-		(y.IsClosedStruct() && !s.IgnoreClosedness)
+	yClosed := s.Final || s.Defaults || s.isClosedStruct(y)
+
+	if s.BackwardsCompatibility && s.isClosedStruct(x) && !s.isClosedStruct(y) {
+		// TODO: this could still be true if there is a catch-all constraint
+		// resolving to top. But there are probably other implications that
+		// demand this is false, especially if we allow for reflection.
+		s.errf("later version closes struct")
+		return false
+	}
 
 	if xClosed && !yClosed && !final {
 		return false
@@ -432,7 +446,7 @@ outer:
 		if apc == nil {
 			return true
 		}
-		if y.IsClosedList() || y.IsClosedList() || final {
+		if y.IsClosedList() || y.IsClosedStruct() || final {
 			// This is a special case where know that any allowed optional field
 			// in a must be bottom in y, which is strictly more specific.
 			return true
@@ -440,6 +454,14 @@ outer:
 		return false
 	}
 	if apc == nil {
+		if x.IsClosedList() || x.IsClosedStruct() || final {
+			// TODO: we should verify that there exist fields that match pattern
+			// constraints in this set that are not already fields. If this is
+			// not the case, we should mark this as inexact.
+			s.inexact = true
+			s.errf("pattern constraints in subsumed value not allowed")
+			return false
+		}
 		return true
 	}
 	if len(apc.Pairs) > len(bpc.Pairs) {
@@ -469,6 +491,16 @@ outerConstraint:
 	}
 
 	return true
+}
+
+func (s *subsumer) isClosedStruct(v *adt.Vertex) bool {
+	if s.IgnoreClosedness {
+		return false
+	}
+	if v.Closed {
+		return true
+	}
+	return v.IsClosedStruct()
 }
 
 func (s *subsumer) listVertices(x, y *adt.Vertex) bool {

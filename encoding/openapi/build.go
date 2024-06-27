@@ -605,6 +605,9 @@ func (b *builder) disjunction(a []cue.Value, f typeFunc) {
 			if i == j {
 				continue
 			}
+			// TODO: cue.Schema is buggy. This should really be cue.Open or
+			// cue.IgnoredClosed, or some other feature we should introduce at
+			// some point
 			err := v.Subsume(w, cue.Schema())
 			if err == nil || errors.Is(err, internal.ErrInexact) {
 				subsumed = append(subsumed, schemas[j])

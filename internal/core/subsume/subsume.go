@@ -44,6 +44,10 @@ type Profile struct {
 	// IgnoreClosedness ignores closedness of structs and is used for comparing
 	// APIs.
 	IgnoreClosedness bool
+
+	// API indicates that we are comparing for backwards compatibility of
+	// schema.
+	BackwardsCompatibility bool
 }
 
 var Simplify = Profile{
@@ -66,9 +70,16 @@ var FinalOpen = Profile{
 	IgnoreClosedness: true,
 }
 
+// Open is used for doing subsumption disregarding closedness. It can be used
+// for comparing disjuncts within closed structs, where closedness information
+// should be disregarded.
+var Open = Profile{
+	IgnoreClosedness: true,
+}
+
 // API is subsumption used for APIs.
 var API = Profile{
-	IgnoreClosedness: true,
+	BackwardsCompatibility: true,
 }
 
 // Value subsumes two values based on their logical (evaluated) values.

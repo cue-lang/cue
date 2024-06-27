@@ -1849,7 +1849,7 @@ func (v Value) Subsume(w Value, opts ...Option) error {
 	case o.final:
 		p = subsume.Final
 	case o.ignoreClosedness:
-		p = subsume.API
+		p = subsume.Open
 	}
 	if !o.raw {
 		p.Defaults = true
@@ -2103,7 +2103,7 @@ type options struct {
 	resolveReferences bool
 	showErrors        bool
 	final             bool
-	ignoreClosedness  bool // used for comparing APIs
+	ignoreClosedness  bool
 	docs              bool
 	disallowCycles    bool // implied by concrete
 }
@@ -2125,6 +2125,10 @@ func Final() Option {
 }
 
 // Schema specifies the input is a Schema. Used by Subsume.
+//
+// Note: this option really implements checking ignoring closedness. We may
+// replace this option with an appropriately named option in the future and
+// deprecate this one.
 func Schema() Option {
 	return func(o *options) {
 		o.ignoreClosedness = true

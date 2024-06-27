@@ -32,6 +32,7 @@ const (
 	subFinal
 	subNoOptional
 	subSchema
+	subOpen
 	subDefaults
 )
 
@@ -404,15 +405,40 @@ func TestValues(t *testing.T) {
 		710: {subsumes: false, in: `a: {foo: [...string]}, b: {}`, mode: subFinal},
 
 		// Schema values
-		800: {subsumes: true, in: `a: close({}), b: {foo: 1}`, mode: subSchema},
-		// TODO(eval): FIX
-		// 801: {subsumes: true, in: `a: {[string]: int}, b: {foo: 1}`, mode: subSchema},
+		800: {subsumes: false, in: `a: close({}), b: {foo: 1}`, mode: subSchema},
+		801: {subsumes: false, in: `a: close({}), b: {}`, mode: subSchema},
+
+		// TODO(eval): FIX?
+		// 802: {subsumes: true, in: `a: close({[string]: _}), b: {}`, mode: subSchema},
+		803: {subsumes: false, in: `a: {[string]: int}, b: {foo?: 1}`, mode: subSchema},
+
 		804: {subsumes: false, in: `a: {foo: 1}, b: {foo?: 1}`, mode: subSchema},
-		805: {subsumes: true, in: `a: close({}), b: {foo?: 1}`, mode: subSchema},
-		806: {subsumes: true, in: `a: close({}), b: close({foo?: 1})`, mode: subSchema},
+		805: {subsumes: false, in: `a: close({}), b: {foo?: 1}`, mode: subSchema},
+		806: {subsumes: false, in: `a: close({}), b: close({foo?: 1})`, mode: subSchema},
 		807: {subsumes: true, in: `a: {}, b: close({})`, mode: subSchema},
 		808: {subsumes: false, in: `a: {[string]: 1}, b: {foo: 2}`, mode: subSchema},
 		809: {subsumes: true, in: `a: {}, b: close({foo?: 1})`, mode: subSchema},
+
+		810: {subsumes: true, in: `a: close({foo?: 1}), b: close({})`, mode: subSchema},
+		811: {subsumes: false, in: `a: {foo?: 1}, b: {[string]: int}`, mode: subSchema},
+		812: {subsumes: true, in: `a: {foo?: int}, b: {[string]: 1}`, mode: subSchema},
+
+		813: {subsumes: true, in: `a: close({[string]: int}), b: close({})`, mode: subSchema, skip_v2: true},
+		814: {subsumes: false, in: `a: close({}), b: close({[string]: int})`, mode: subSchema, skip_v2: true},
+		815: {subsumes: false, in: `a: close({[string]: int}), b: close({[string]: int|string})`, mode: subSchema, skip_v2: true},
+		816: {subsumes: true, in: `a: close({[string]: int|string}), b: close({[string]: int})`, mode: subSchema, skip_v2: true},
+		817: {subsumes: true, in: `a: close({[string]: int|string}), b: close({[string]: string|int})`, mode: subSchema, skip_v2: true},
+
+		854: {subsumes: false, in: `a: {foo: 1}, b: {foo?: 1}`, mode: subOpen},
+		855: {subsumes: true, in: `a: close({}), b: {foo?: 1}`, mode: subOpen},
+		856: {subsumes: true, in: `a: close({}), b: close({foo?: 1})`, mode: subOpen},
+		857: {subsumes: true, in: `a: {}, b: close({})`, mode: subOpen},
+		858: {subsumes: false, in: `a: {[string]: 1}, b: {foo: 2}`, mode: subOpen},
+		859: {subsumes: true, in: `a: {}, b: close({foo?: 1})`, mode: subOpen},
+
+		860: {subsumes: true, in: `a: close({foo?: 1}), b: close({})`, mode: subOpen},
+		861: {subsumes: false, in: `a: {foo?: 1}, b: {[string]: int}`, mode: subOpen},
+		862: {subsumes: true, in: `a: {foo?: int}, b: {[string]: 1}`, mode: subOpen},
 
 		// Lists
 		950: {subsumes: true, in: `a: [], b: []`},
@@ -494,6 +520,8 @@ func TestValues(t *testing.T) {
 				err = Value(ctx, a, b)
 			case subSchema:
 				err = API.Value(ctx, a, b)
+			case subOpen:
+				err = Open.Value(ctx, a, b)
 			// TODO: see comments above.
 			// case subNoOptional:
 			// 	err = IgnoreOptional.Value(ctx, a, b)

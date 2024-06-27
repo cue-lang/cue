@@ -246,6 +246,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d56f4517_3712afe6",
+        "filename": "cmd/cue/cmd/testdata/script/embed.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-27T10:33:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "52b86cc2_f7c1c0f5",
+      "revId": "d7c13f1a816f9ad66c5a762318d4a4fdbe53b184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a120a040_49899c8e",

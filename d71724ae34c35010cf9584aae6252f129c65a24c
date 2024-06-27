@@ -69,6 +69,24 @@
       "parentUuid": "a3b0185e_f90ff2bc",
       "revId": "d71724ae34c35010cf9584aae6252f129c65a24c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a5604b2_60a09a74",
+        "filename": "cue/interpreter/embed/hidden_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-27T10:40:49Z",
+      "side": 1,
+      "message": "Yes it does. There is nothing special about /.txt. Note that this test doesn\u0027t test glob. It is a general test to exclude anything hidden, which would, indeed, end up excluding /.txt, regardless whether it was selected by /*.txt or another glob.",
+      "parentUuid": "b107cc9d_f2d92cac",
+      "revId": "d71724ae34c35010cf9584aae6252f129c65a24c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

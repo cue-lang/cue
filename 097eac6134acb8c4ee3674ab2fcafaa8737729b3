@@ -33,6 +33,24 @@
       "message": "It would be nice to add this test case to the previous CL so we can see its behaviour change here.",
       "revId": "097eac6134acb8c4ee3674ab2fcafaa8737729b3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aefb1eaa_4d1d6d40",
+        "filename": "cmd/cue/cmd/testdata/script/embed.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-06-27T10:40:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8ebe4235_b2be999d",
+      "revId": "097eac6134acb8c4ee3674ab2fcafaa8737729b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

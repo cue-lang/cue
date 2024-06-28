@@ -166,7 +166,7 @@ func TestCloseContext(t *testing.T) {
 			string: {1 1}`,
 
 		// Should be empty or string only, as all fields match.
-		allowed: "",
+		allowed: "_",
 	}, {
 		name: "multi patterns",
 		run: func(x *adt.FieldTester) {
@@ -196,7 +196,7 @@ func TestCloseContext(t *testing.T) {
 		},
 		arcs:     `a: {"foo" string}`,
 		patterns: `string: {string}`,
-		allowed:  "", // all fields
+		allowed:  "_", // all fields
 	}, {
 		name: "pattern defined before matching field",
 		run: func(x *adt.FieldTester) {
@@ -207,7 +207,7 @@ func TestCloseContext(t *testing.T) {
 		},
 		arcs:     `a: {"foo" string}`,
 		patterns: `string: {string}`,
-		allowed:  "", // all fields
+		allowed:  "_", // all fields
 	}, {
 		name: "shared on one level",
 		run: func(x *adt.FieldTester) {
@@ -227,6 +227,7 @@ func TestCloseContext(t *testing.T) {
 			string: {1 2}
 			>"a": {shared}
 			>"b": {shared}`,
+		allowed: "_",
 	}, {
 		// The same conjunct in different groups could result in the different
 		// closedness rules. Hence they should not be shared.
@@ -295,6 +296,7 @@ func TestCloseContext(t *testing.T) {
 			c: {"bar" 2 3 "baz"}`,
 
 		patterns: `string: {2 3}`,
+		allowed:  "_",
 	}, {
 		name: "conjunction in embedding",
 		run: func(x *adt.FieldTester) {

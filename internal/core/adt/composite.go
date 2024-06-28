@@ -1062,7 +1062,7 @@ func (v *Vertex) MatchAndInsert(ctx *OpContext, arc *Vertex) {
 					c.Env = &env
 
 					root := arc.rootCloseContext(ctx)
-					root.insertConjunct(ctx, root, c, c.CloseInfo, ArcMember, true, false)
+					root.insertConjunct(ctx, root, c, c.CloseInfo, ArcOptional, true, false)
 				}
 			}
 		}

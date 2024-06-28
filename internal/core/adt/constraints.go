@@ -93,7 +93,7 @@ func (n *nodeContext) insertConstraint(pattern Value, c Conjunct) bool {
 	}
 
 	if constraint == nil {
-		constraint = &Vertex{}
+		constraint = &Vertex{ArcType: ArcOptional}
 		pcs.Pairs = append(pcs.Pairs, PatternConstraint{
 			Pattern:    pattern,
 			Constraint: constraint,

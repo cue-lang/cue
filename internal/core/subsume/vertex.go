@@ -128,8 +128,7 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 			}
 
 			a = &adt.Vertex{Label: f}
-			x.MatchAndInsert(ctx, a)
-			a.Finalize(ctx)
+			s.matchAndInsert(x, a)
 
 			// If field a is optional and has value top, neither the
 			// omission of the field nor the field defined with any value
@@ -169,8 +168,7 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 			}
 
 			b = &adt.Vertex{Label: f}
-			y.MatchAndInsert(ctx, b)
-			b.Finalize(ctx)
+			s.matchAndInsert(y, b)
 		}
 
 		if s.values(a, b) {
@@ -211,7 +209,7 @@ outer:
 			}
 
 			b = &adt.Vertex{Label: f}
-			y.MatchAndInsert(ctx, b)
+			s.matchAndInsert(y, b)
 		} else if b.IsConstraint() {
 			if s.IgnoreOptional || s.Final {
 				continue
@@ -227,13 +225,10 @@ outer:
 		}
 
 		a := &adt.Vertex{Label: f}
-		x.MatchAndInsert(ctx, a)
-		if len(a.Conjuncts) == 0 {
-			// It is accepted and has no further constraints, so all good.
+		if !s.matchAndInsert(x, a) {
 			continue
 		}
 
-		a.Finalize(ctx)
 		b.Finalize(ctx)
 
 		if !s.vertices(a, b) {
@@ -242,6 +237,13 @@ outer:
 	}
 
 	return true
+}
+
+func (s *subsumer) matchAndInsert(from, to *adt.Vertex) bool {
+	to.ArcType = adt.ArcOptional
+	from.MatchAndInsert(s.ctx, to)
+	to.Finalize(s.ctx)
+	return len(to.Conjuncts) > 0
 }
 
 // verticesDev replaces vertices with the implementation of the new evaluator.
@@ -376,8 +378,7 @@ func (s *subsumer) verticesDev(x, y *adt.Vertex) bool {
 			// There is no explicit field, but the values of pattern constraints
 			// may still be relevant.
 			b = &adt.Vertex{Label: f}
-			y.MatchAndInsert(ctx, b)
-			b.Finalize(ctx)
+			s.matchAndInsert(y, b)
 		}
 
 		if s.values(a, b) {
@@ -426,13 +427,9 @@ outer:
 		}
 
 		a := &adt.Vertex{Label: f}
-		x.MatchAndInsert(ctx, a)
-		if len(a.Conjuncts) == 0 {
-			// It is accepted and has no further constraints, so all good.
+		if !s.matchAndInsert(x, a) {
 			continue
 		}
-
-		a.Finalize(ctx)
 
 		if !s.vertices(a, b) {
 			return false
@@ -451,7 +448,18 @@ outer:
 			// in a must be bottom in y, which is strictly more specific.
 			return true
 		}
-		return false
+		// If all patterns are constraint constraints, we are done if we can
+		// verify that the fields exist in b.
+		for _, p := range apc.Pairs {
+			ok, hasUnbounded := s.checkConcretePatterns(p.Pattern, p.Constraint, y)
+			if !ok {
+				if hasUnbounded {
+					s.inexact = true
+				}
+				return false
+			}
+		}
+		return true
 	}
 	if apc == nil {
 		if x.IsClosedList() || x.IsClosedStruct() || final {
@@ -474,6 +482,12 @@ outer:
 
 outerConstraint:
 	for _, p := range apc.Pairs {
+		ok, hasUnbounded := s.checkConcretePatterns(p.Pattern, p.Constraint, y)
+		if ok {
+			continue
+		} else if !hasUnbounded {
+			return false
+		}
 		for _, q := range bpc.Pairs {
 			if adt.Equal(s.ctx, p.Pattern, q.Pattern, 0) {
 				if !s.values(p.Constraint, q.Constraint) {
@@ -493,6 +507,39 @@ outerConstraint:
 	return true
 }
 
+// checkConcretePatterns checks whether the given concrete value of a pattern
+// constraint exists in the given Vertex. Note that if the pattern value exists
+// as an explicit field, we will already have checked this and we can safely
+// assume it subsumes.
+func (s *subsumer) checkConcretePatterns(pat adt.Value, constraint, y *adt.Vertex) (ok, hasUnbounded bool) {
+	pat = adt.Unwrap(pat)
+	switch x := pat.(type) {
+	case *adt.String, *adt.Num:
+		f := adt.LabelFromValue(s.ctx, nil, pat)
+		var b *adt.Vertex
+		b = y.Lookup(f)
+		if b == nil {
+			b = &adt.Vertex{Label: f}
+			if !s.matchAndInsert(y, b) {
+				return false, false
+			}
+		}
+		return s.vertices(constraint, b), false
+
+	case *adt.Disjunction:
+		for _, a := range x.Values {
+			ok, hasUnbounded = s.checkConcretePatterns(a, constraint, y)
+			if !ok {
+				return
+			}
+		}
+		return true, false
+
+	default:
+		return false, true
+	}
+}
+
 func (s *subsumer) isClosedStruct(v *adt.Vertex) bool {
 	if s.IgnoreClosedness {
 		return false
@@ -504,8 +551,6 @@ func (s *subsumer) isClosedStruct(v *adt.Vertex) bool {
 }
 
 func (s *subsumer) listVertices(x, y *adt.Vertex) bool {
-	ctx := s.ctx
-
 	if !y.IsData() && x.IsClosedList() && !y.IsClosedList() {
 		return false
 	}
@@ -521,8 +566,7 @@ func (s *subsumer) listVertices(x, y *adt.Vertex) bool {
 		return false
 	default:
 		a := &adt.Vertex{Label: adt.AnyIndex}
-		x.MatchAndInsert(ctx, a)
-		a.Finalize(ctx)
+		s.matchAndInsert(x, a)
 
 		// x must be open
 		for _, b := range yElems[len(xElems):] {
@@ -533,8 +577,7 @@ func (s *subsumer) listVertices(x, y *adt.Vertex) bool {
 
 		if !y.IsClosedList() {
 			b := &adt.Vertex{Label: adt.AnyIndex}
-			y.MatchAndInsert(ctx, b)
-			b.Finalize(ctx)
+			s.matchAndInsert(y, b)
 		}
 	}
 

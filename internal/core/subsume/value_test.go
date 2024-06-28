@@ -332,20 +332,30 @@ func TestValues(t *testing.T) {
 		},
 		438: {subsumes: true, in: `a: {}, b: {[_]: 6}`},
 
+		439: {subsumes: true, in: `a: close({[string]: 1}), b: close({foo?: 1})`, skip_v2: true},
+		440: {subsumes: false, in: `a: {[string]: 1}, b: foo?: 1`},
+		441: {subsumes: true, in: `a: #d: {[string]: 1}, b: #d: foo?: 1`, skip_v2: true},
+		442: {subsumes: true, in: `a: {["foo"]: 1}, b: foo?: 1`, skip_v2: true},
+		443: {subsumes: true, in: `a: {["foo"]: 1}, b: {["foo"]: 1}`, skip_v2: true},
+		444: {subsumes: true, in: `a: {["foo"|"bar"]: 1}, b: {foo?: 1, bar?: 1}`, skip_v2: true},
+		445: {subsumes: true, in: `a: {["foo"|"bar"]: 1}, b: {["foo"|"bar"]: 1}`, skip_v2: true},
+		446: {subsumes: true, in: `a: {["foo"|"bar"]: 1}, b: {["foo"]: 1, ["bar"]: 1}`, skip_v2: true},
+		447: {subsumes: true, in: `a: {["foo"]: 1, ["foo"|"bar"]: 1}, b: {["foo"]: 1, ["bar"]: 1}`, skip_v2: true},
+
 		// TODO: the subNoOptional mode used to be used by the equality check.
 		// Now this has its own implementation it is no longer necessary. Keep
 		// around for now in case we still need the more permissive equality
 		// check that can be created by using subsumption.
 		//
-		// 440: {subsumes: true, in: `a: {foo?: 1}, b: {}`, mode: subNoOptional},
-		// 441: {subsumes: true, in: `a: {}, b: {foo?: 1}`, mode: subNoOptional},
-		// 442: {subsumes: true, in: `a: {foo?: 1}, b: {foo: 1}`, mode: subNoOptional},
-		// 443: {subsumes: true, in: `a: {foo?: 1}, b: {foo?: 1}`, mode: subNoOptional},
-		// 444: {subsumes: false, in: `a: {foo: 1}, b: {foo?: 1}`, mode: subNoOptional},
-		// 445: {subsumes: true, in: `a: close({}), b: {foo?: 1}`, mode: subNoOptional},
-		// 446: {subsumes: true, in: `a: close({}), b: close({foo?: 1})`, mode: subNoOptional},
-		// 447: {subsumes: true, in: `a: {}, b: close({})`, mode: subNoOptional},
-		// 448: {subsumes: true, in: `a: {}, b: close({foo?: 1})`, mode: subNoOptional},
+		// 450: {subsumes: true, in: `a: {foo?: 1}, b: {}`, mode: subNoOptional},
+		// 451: {subsumes: true, in: `a: {}, b: {foo?: 1}`, mode: subNoOptional},
+		// 452: {subsumes: true, in: `a: {foo?: 1}, b: {foo: 1}`, mode: subNoOptional},
+		// 453: {subsumes: true, in: `a: {foo?: 1}, b: {foo?: 1}`, mode: subNoOptional},
+		// 454: {subsumes: false, in: `a: {foo: 1}, b: {foo?: 1}`, mode: subNoOptional},
+		// 455: {subsumes: true, in: `a: close({}), b: {foo?: 1}`, mode: subNoOptional},
+		// 456: {subsumes: true, in: `a: close({}), b: close({foo?: 1})`, mode: subNoOptional},
+		// 457: {subsumes: true, in: `a: {}, b: close({})`, mode: subNoOptional},
+		// 458: {subsumes: true, in: `a: {}, b: close({foo?: 1})`, mode: subNoOptional},
 
 		// embedded scalars
 		460: {subsumes: true, in: `a: {1, #foo: number}, b: {1, #foo: 1}`},

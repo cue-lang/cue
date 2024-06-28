@@ -592,6 +592,10 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 				// panic("unexpected allowed set")
 			}
 			pcs.Allowed = c.Expr
+			// Handle special case.
+			if pcs.Allowed == nil && c.isTotal {
+				pcs.Allowed = &Top{}
+			}
 			return
 		}
 		return

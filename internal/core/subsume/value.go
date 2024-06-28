@@ -172,12 +172,34 @@ func (s *subsumer) values(a, b adt.Value) (result bool) {
 
 	case *adt.Disjunction:
 
-		if s.LeftDefault {
-			a = adt.Default(a)
+		switch {
+		case x.NumDefaults == 0:
+			// Nothing to do.
+
+		case s.LeftDefault:
+			a := adt.Default(a)
 			var ok bool
 			x, ok = a.(*adt.Disjunction)
 			if !ok {
 				return s.values(a, b)
+			}
+
+		case s.BackwardsCompatibility:
+			// TODO: In backwards compatibility mode we should check that a
+			// value remains concrete. A default may probably be introduced for
+			// a new field that previously did not exist. Is this the correct
+			// place to put this, or does this belong in tools/apicheck?
+
+			fallthrough
+
+		default:
+			// If a has defaults, we need to ensure that the default values of
+			// b are strictly narrower.
+			a := adt.Default(a)
+			b := adt.Default(b)
+
+			if !s.values(a, b) {
+				return false
 			}
 		}
 

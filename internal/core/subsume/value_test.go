@@ -175,10 +175,14 @@ func TestValues(t *testing.T) {
 		// Defaults
 		150: {subsumes: false, in: `a: number | *1, b: number | *2`},
 		151: {subsumes: true, in: `a: number | *2, b: number | *2`},
-		152: {subsumes: true, in: `a: int | *float, b: int | *2.0`},
+		152: {subsumes: true, in: `a: int | *float, b: int | *2.0`}, // more specific default
 		153: {subsumes: false, in: `a: int | *2, b: int | *2.0`},
-		154: {subsumes: true, in: `a: number | *2 | *3, b: number | *2`},
-		155: {subsumes: true, in: `a: number, b: number | *2`},
+		154: {subsumes: true, in: `a: number | *2 | *3, b: number | *2`}, // eliminating default
+		155: {subsumes: true, in: `a: number, b: number | *2`},           // introducing default
+		156: {subsumes: true, in: `a: 1 | *2, b: 2`},                     // picking default
+		157: {subsumes: false, in: `a: *1 | 2, b: 2`},                    // default differs
+		158: {subsumes: false, in: `a: *1 | 2, b: 1 | 2`},                // widened default
+		159: {subsumes: false, in: `a: 1, b: *1 | 2`},                    // equal default, but widened value
 
 		// Bounds
 		170: {subsumes: true, in: `a: >=2, b: >=2`},
@@ -438,6 +442,15 @@ func TestValues(t *testing.T) {
 		815: {subsumes: false, in: `a: close({[string]: int}), b: close({[string]: int|string})`, mode: subSchema, skip_v2: true},
 		816: {subsumes: true, in: `a: close({[string]: int|string}), b: close({[string]: int})`, mode: subSchema, skip_v2: true},
 		817: {subsumes: true, in: `a: close({[string]: int|string}), b: close({[string]: string|int})`, mode: subSchema, skip_v2: true},
+
+		830: {subsumes: true, in: `a: 1 | *2, b: 2`, mode: subSchema},  // picking default
+		831: {subsumes: false, in: `a: *1 | 2, b: 2`, mode: subSchema}, // default differs
+		832: {subsumes: false, in: `a: 1, b: *1 | 2`, mode: subSchema}, // equal default, but widened value
+		// 833: {subsumes: true, in: `a: *1 | 2, b: 1 | 2`, mode: subSchema}, // TODO: allow introducing default?
+
+		// TODO: A regular value may not go from concrete to non-concrete, even if
+		// this means that the value is now more general.
+		// Do we test that here?
 
 		854: {subsumes: false, in: `a: {foo: 1}, b: {foo?: 1}`, mode: subOpen},
 		855: {subsumes: true, in: `a: close({}), b: {foo?: 1}`, mode: subOpen},

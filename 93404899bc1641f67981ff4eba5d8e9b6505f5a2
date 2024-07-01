@@ -54,6 +54,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b51ac158_9318a3f3",
+        "filename": "cmd/cue/cmd/modedit.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-01T16:12:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aa04feaf_31f3bce6",
+      "revId": "93404899bc1641f67981ff4eba5d8e9b6505f5a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ddb4c5cd_2e09f851",
@@ -67,6 +85,24 @@
       "writtenOn": "2024-07-01T12:22:41Z",
       "side": 1,
       "message": "I think this perhaps needs a TODO with a link to https://github.com/cue-lang/cue/issues/3145?",
+      "revId": "93404899bc1641f67981ff4eba5d8e9b6505f5a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "937a3c8f_0ba39883",
+        "filename": "cmd/cue/cmd/modedit.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-01T16:12:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ddb4c5cd_2e09f851",
       "revId": "93404899bc1641f67981ff4eba5d8e9b6505f5a2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -88,6 +124,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c94c315_63c109ab",
+        "filename": "cmd/cue/cmd/testdata/script/modedit_initial.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-01T16:12:30Z",
+      "side": 1,
+      "message": "Adjusted the error message a little to hopefully something slightly better.",
+      "parentUuid": "0f642d91_0d12e624",
+      "revId": "93404899bc1641f67981ff4eba5d8e9b6505f5a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "34017e0f_a8b049db",
@@ -105,6 +159,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5cd35a0a_e32093b4",
+        "filename": "cmd/cue/cmd/testdata/script/modinit_with_explicit_version.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-01T16:12:30Z",
+      "side": 1,
+      "message": "Ditto",
+      "parentUuid": "34017e0f_a8b049db",
+      "revId": "93404899bc1641f67981ff4eba5d8e9b6505f5a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f279e0c7_6da182c6",
@@ -118,6 +190,24 @@
       "writtenOn": "2024-07-01T12:22:41Z",
       "side": 1,
       "message": "What are these changes?",
+      "revId": "93404899bc1641f67981ff4eba5d8e9b6505f5a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "96db709b_972157ef",
+        "filename": "cmd/cue/cmd/testdata/script/modinit_without_version.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-01T16:12:30Z",
+      "side": 1,
+      "message": "I was using `cmpenv` in the other test rather than the equivalent `env-fill` followed by `cmp`, which seems more appropriate. This change is a just a drive-by change to make the two consistent.",
+      "parentUuid": "f279e0c7_6da182c6",
       "revId": "93404899bc1641f67981ff4eba5d8e9b6505f5a2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

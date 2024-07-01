@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef07be8a_af95af65",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-01T12:04:24Z",
+      "side": 1,
+      "message": "This could do with a comment to my mind to avoid the reader having to load the context of this.",
+      "revId": "31903cd0b4226664c1d3387ef2845b302d7cbb62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "909a1197_f21732e8",
+        "filename": "mod/modfile/modfile_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 548,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-01T12:04:24Z",
+      "side": 1,
+      "message": "Does this test carry any weight any more?",
+      "revId": "31903cd0b4226664c1d3387ef2845b302d7cbb62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0a902bf2_1a815cac",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-01T16:17:18Z",
+      "side": 1,
+      "message": "Then I suggest we add a TODO which says when we plan to remove this, i.e. v0.11.0?",
+      "parentUuid": "8702faf1_b91a4be0",
+      "revId": "31903cd0b4226664c1d3387ef2845b302d7cbb62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ef07be8a_af95af65",
         "filename": "mod/modfile/modfile.go",
         "patchSetId": 2

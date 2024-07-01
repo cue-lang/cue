@@ -35,7 +35,10 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 	if x == y {
 		return true
 	}
-	if x.ArcType < y.ArcType {
+	if a, b := x.ArcType, y.ArcType; a < b {
+		return false
+	} else if s.BackwardsCompatibility && a != b {
+		// See comments in verticesDev for rationale.
 		return false
 	}
 
@@ -252,6 +255,24 @@ func (s *subsumer) verticesDev(x, y *adt.Vertex) bool {
 		return true
 	}
 	if a, b := x.ArcType, y.ArcType; a < b {
+		return false
+	} else if s.BackwardsCompatibility && a != b {
+		// For backwards compatibility we disallow any change of the arc type.
+		// There are essentially three scenarios allowed by normal subsumption:
+		//
+		//         v1        -> v2
+		//      1. foo: int  -> foo!: int
+		//      2. foo: int  -> foo?: int
+		//      3. foo!: int -> foo?: int
+		//
+		// Making a previously provided field required (1) is clearly a breaking
+		// change in the general case. So we cannot allow this. Also making a
+		// previously provided field optional (2) seems tenuous, as it may
+		// change the semantics of an exported value. So we disallow this as
+		// well. The only remaining option, which on the surface seems safe, is
+		// to change a required field to an optional field (3). Such an API
+		// change is generally discouraged, though (see guidelines in Protobuf
+		// land, for instance), so we disallow this as well for concistency.
 		return false
 	}
 

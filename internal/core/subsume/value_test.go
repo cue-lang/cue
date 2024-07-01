@@ -452,6 +452,11 @@ func TestValues(t *testing.T) {
 		// this means that the value is now more general.
 		// Do we test that here?
 
+		// APIs disallow changes in arc type.
+		840: {subsumes: false, in: `a: foo?: 1, b: foo!: 1`, mode: subSchema},
+		841: {subsumes: false, in: `a: foo?: 1, b: foo: 1`, mode: subSchema},
+		842: {subsumes: false, in: `a: foo!: 1, b: foo: 1`, mode: subSchema},
+
 		854: {subsumes: false, in: `a: {foo: 1}, b: {foo?: 1}`, mode: subOpen},
 		855: {subsumes: true, in: `a: close({}), b: {foo?: 1}`, mode: subOpen},
 		856: {subsumes: true, in: `a: close({}), b: close({foo?: 1})`, mode: subOpen},

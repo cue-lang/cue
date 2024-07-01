@@ -122,6 +122,24 @@
       "message": "Does this test carry any weight any more?",
       "revId": "31903cd0b4226664c1d3387ef2845b302d7cbb62",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee0dbf8b_78ea1e0a",
+        "filename": "mod/modfile/modfile_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 548,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-01T19:16:17Z",
+      "side": 1,
+      "message": "Not really, but it at least demonstrates the change of behaviour, so I\u0027ll leave it for now.",
+      "parentUuid": "909a1197_f21732e8",
+      "revId": "31903cd0b4226664c1d3387ef2845b302d7cbb62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2093d5c4_0ccfe465",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-01T12:05:04Z",
+      "side": 1,
+      "message": "Given this is an experimental API, can we not simply remove this?",
+      "revId": "31903cd0b4226664c1d3387ef2845b302d7cbb62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ef07be8a_af95af65",
         "filename": "mod/modfile/modfile.go",
         "patchSetId": 2

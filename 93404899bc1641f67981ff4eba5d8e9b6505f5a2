@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1e2d2ba5_3d98a348",
+        "filename": "cmd/cue/cmd/modedit.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-01T14:56:41Z",
+      "side": 1,
+      "message": "\u003e Do we even need to support it as a value, given the default value?\n\nI think it\u0027s useful to support it as a value, as the language version is left unchanged if the `--language.version` flag is not specified, so AFAICS there is no way to explicitly ask to update to `cue.LanguageVersion()` without some equivalent to \"latest\".\n\nHow about \"current\" as an alternative spelling?",
+      "parentUuid": "120c10d8_bed9cb42",
+      "revId": "93404899bc1641f67981ff4eba5d8e9b6505f5a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ddb4c5cd_2e09f851",
         "filename": "cmd/cue/cmd/modedit.go",
         "patchSetId": 2

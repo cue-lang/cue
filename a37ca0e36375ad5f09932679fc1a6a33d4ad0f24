@@ -16,6 +16,24 @@
       "message": "For those people reviewing this CL/commit, I think a bit more commentary on the reasons for adding this change (per the linked issue) would help.",
       "revId": "a37ca0e36375ad5f09932679fc1a6a33d4ad0f24",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44b6572b_835a275d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-01T14:58:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14cfa84c_7c9caea7",
+      "revId": "a37ca0e36375ad5f09932679fc1a6a33d4ad0f24",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

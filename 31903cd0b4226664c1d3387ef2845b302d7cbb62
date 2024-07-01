@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8702faf1_b91a4be0",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-01T16:12:30Z",
+      "side": 1,
+      "message": "Yes, but I think it\u0027s nice to let people down gently, so given that it\u0027s trivial to do, I prefer to deprecate before removal so they should get a warning first.",
+      "parentUuid": "2093d5c4_0ccfe465",
+      "revId": "31903cd0b4226664c1d3387ef2845b302d7cbb62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ef07be8a_af95af65",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-07-01T12:04:24Z",
       "side": 1,
       "message": "This could do with a comment to my mind to avoid the reader having to load the context of this.",
+      "revId": "31903cd0b4226664c1d3387ef2845b302d7cbb62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "97d0c3d2_2e825c6b",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-01T16:12:30Z",
+      "side": 1,
+      "message": "I just moved it a bit closer to the associated function so the doc comment and the variable are clearly associated and the docs for one are visible with the other.",
+      "parentUuid": "ef07be8a_af95af65",
       "revId": "31903cd0b4226664c1d3387ef2845b302d7cbb62",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

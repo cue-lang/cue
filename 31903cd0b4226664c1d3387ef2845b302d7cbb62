@@ -54,6 +54,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "13ffca1e_74b8a41b",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-01T16:22:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a902bf2_1a815cac",
+      "revId": "31903cd0b4226664c1d3387ef2845b302d7cbb62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ef07be8a_af95af65",

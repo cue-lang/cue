@@ -1,0 +1,726 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f74ec9b0_6b5a7471",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "Thanks! I\u0027ve got a bunch of grammar nits and a few other thoughts. My main reservation is about the capitalization rule, but I don\u0027t think anything here should prevent us going ahead.",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "068457f2_0dc93f06",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "Maybe worth defining what you mean by \"API\" in this context, because it\u0027s commonly used to represent the surface area of a network server, but I don\u0027t think that\u0027s what it means here.",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3052e3da_d2612cc7",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "```suggestion\n// costs, but rather to define a contract that makes a clear division of the\n```",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02e241a1_6a39a456",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "I find this hard to parse.",
+      "range": {
+        "startLine": 31,
+        "startChar": 35,
+        "endLine": 32,
+        "endChar": 69
+      },
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58f05164_d5054f0e",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "I don\u0027t understand the difference between P2 and P3. That is, what\u0027s the distinction between \"passes validation against\" and \"successfully unifies with\" ?",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4bbc27a8_e8f47eba",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "Is this a core principle or not? The \"A stricter version of\" qualification sounds like it\u0027s not. When would this principle apply?",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7aa60289_363cc36c",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "Maybe put attributes and comments last there, as AFAIK there\u0027s no way currently to use those entities as part of a regular CUE computation?",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a497e4c_1d41fbb0",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "```suggestion\n// Unless noted otherwise, compatibility is defined here for what corresponds to\n```",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fef63f94_abcef23e",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "```suggestion\n// A principal characteristic of CUE is that it partially orders all its values.\n```",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a15b0b09_48e56193",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "```suggestion\n// Schema of newer API is compatible with an older version of itself if the older one\n```",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7584dba_a790b1da",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "It would be good to define what you mean by a Schema, as CUE itself has no such concept.",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d2e1c75_8e126325",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "```suggestion\n// non-existent fields within a definition to be equivalent to optional fields with an error value\n```\n\n?",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9dcf476_163788d1",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "```suggestion\n// would always result in an error and the addition of such fields cannot cannot\n```",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82c58f24_61c9d36f",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "It seems a bit odd that we\u0027re talking about regular fields on the left there, as I thought the compatibility principles were mainly concerned with \"pure schema\" definitions that don\u0027t contain any regular fields. Is that not still the case?",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "923b92f8_501466e9",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "Perhaps explicitly mention some changes that _are_ OK as well as ones that aren\u0027t? What\u0027s allowed might not be immediately obvious to readers less deeply familiar with CUE.",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4dc18bd_87195689",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "It would be nice to expand this a bit. Why is this not actually OK in practice? Have you got a link to such protobuf guidelines?\n\nAlso, I guess that `{foo!: int} -\u003e {foo: *5 | int}` is also not allowed for similar reasons, but maybe worth enumerating that too?",
+      "range": {
+        "startLine": 153,
+        "startChar": 17,
+        "endLine": 153,
+        "endChar": 70
+      },
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92bc1046_5672006e",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "```suggestion\n// version of this rule is to allow introducing concrete values, allowing it to\n```",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23b25ecf_01dc88a2",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "I think it would be worth defining what you actually mean by a \"template\" here. You say what purposes they can serve, but don\u0027t actually define what they are AFAICS (this seems to be first occurrence of the word \"template\" in the text).",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3446eaee_367456ea",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "```suggestion\n// values for schemas, they may tailor a schema for a specific use case, or they\n```",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "464a68d2_3b8bf233",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "Perhaps say that this can be direct or indirect? For example, a template might unify with another template which is itself unified with a schema.",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f79afb2_72dfd825",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "Again, it would be good to define exactly what is meant by a data value here, as CUE itself makes no such distinction.",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72ca2846_403b266d",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "```suggestion\n// This section defines rules for assigning compatible types, as defined in\n```\n\n?",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43e31f07_21e984bc",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "this seems to be saying \"a collection of CUE values ... is fallback or default value\" which doesn\u0027t quite make sense to me.",
+      "range": {
+        "startLine": 212,
+        "startChar": 68,
+        "endLine": 213,
+        "endChar": 64
+      },
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "114c9159_e10fbad7",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "Maybe provide an example of this, as the distinction between\n\n```\n\n@api(template)\n\npackage foo\n```\n\nand\n```\npackage foo\n\n@api(template)\n```\n\nmight not be obvious to readers (I _think_ that only the latter counts as a top-level value attribute).",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dbd1f010_59b53022",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "Perhaps provide some rationale for this?",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "273cccb7_4e0a97d9",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "It might be good to define what is meant by \"top level\" here.\n\nFor example, I\u0027d guess that in:\n\n```\npackage foo\n\n#A: {\n    a: int\n}\n\n#A\n```\n\n`a` counts as a top level field, but that\u0027s not necessarily obvious.\n\nIn general I\u0027m not entirely sure that the \"capital letter\" distinction is a great idea here, as it\u0027s the only place in CUE that makes such a distinction AFAIK, and the underlying ecosystem is by no means clear that concrete fields start with a lower case letters (case in point: almost all of the Kubernetes API uses upper case field names).\n\nI\u0027d be inclined to make data the default, requiring an `@api(template)` modifier for anything that\u0027s deliberately in between data and schema, regardless of the spelling of the field name.",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83d499a3_fb0c2fd2",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "```suggestion\n// is a definition.\n```",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0ee1d94_ea868945",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "What\u0027s a \"top-level constraint\" ?",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77306de1_a0663b42",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "```suggestion\n// packages they contain as well as the pairwise compatibility of these\n```",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69bbc13f_1bb814be",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "What does \"at least\" imply here? ISTM that it\u0027s probably redundant.",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa6af95a_33d7556e",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "Where the word \"generally\" is used, it would be nice to have an example or two of where things fall outside of that rule. As it is, it sounds like there\u0027s no actual rule here.",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bfdc5d01_f9aedf43",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "I don\u0027t really understand this. In what way is using a concrete value akin to using a default? This is in the Schema section, when would it be appropriate to use a concrete non-default value in a schema?",
+      "range": {
+        "startLine": 276,
+        "startChar": 3,
+        "endLine": 276,
+        "endChar": 70
+      },
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a42413e0_b4ee6ac9",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "```suggestion\n// make a concrete value valid, but it prevents the API from being used to\n```",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33dca154_a22ddacb",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "```suggestion\n// Using regular fields with non-concrete values in a schema can make regular fields behave similarly\n// to required fields if the schema is used to create concrete data. Using regular\n```\n\n?",
+      "range": {
+        "startLine": 281,
+        "startChar": 0,
+        "endLine": 282,
+        "endChar": 64
+      },
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad57f558_df48efb4",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "```suggestion\n// Consider this CUE:\n```",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d140f17a_c094d882",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "Maybe we should be avoiding the controversial slice syntax? https://github.com/cue-lang/cue/issues/772",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "adb68ddd_29772677",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "We should probably describe what we mean by \"the server\" at some point above. The model AIUI is that the CUE is describing the schema used by some particular piece of software that runs as a network-based RPC server, and in particular the schema of requests made to such a server. This seems to be the rationale behind the rules in this entire compatibility document, and it\u0027s certainly one possible way of using CUE (and surely the most common to date), but I don\u0027t think it\u0027s inevitable.\n\nAs an example counterpoint, consider a schema that defines the _response_ to an RPC call.\n\n```\n#Response: {\n    x!: int\n}\n```\n\nA client could legitimately be written that assumes that it is always going to receive an integer, but according to the CUE compatibility rules, the schema could\nlegitimately be widened to:\n\n```\n#Response: {\n    x!: string | int\n}\n```\n\nbut such a change would break the client\u0027s assumptions.\n\nAlso, the defaults might just as well describe the behaviour of a client when it receives the data - if a `Response` field was added, that\u0027s presumably what it would signify.",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a770950_5d70b147",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "```suggestion\n// not make `kind` a regular field in schema `#Foo`. This would work,\n// but the resulting schema would define the `kind` field instead\n// of just checking that it\u0027s present, meaning that validation\n// could succeed even when that field is not present.\n```\n\n?",
+      "range": {
+        "startLine": 325,
+        "startChar": 53,
+        "endLine": 327,
+        "endChar": 66
+      },
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93fa5626_c7a8d6a5",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "The concern I have about this pattern in practice is that it\u0027s pretty common for a definition to be used as part of many other definitions. This pattern does not allow specifying boilerplate fields of such a shared definition in such a way that all those other definitions take advantage of the template.\n\nExample:\n\n```\n#Foo: {\n\tsecure?: bool\n}\n\n#Use1: {\n\tx?: [... #Foo]\n\ty?: #Foo\n\tz?: #Use2 | null\n}\n\n#Use2: {\n\ta?: {\n\t\tfoo?: #Foo\n\t}\n\tb?: #Foo\n}\n```\nI suspect people will wish to default the `#Foo.secure` field to `true` across the entire configuration, but there\u0027s no easy way to do that without mirroring the entire definition structure as fields:\n\n```\nFoo: #Foo \u0026 {\n\tsecure: true\n}\n\nUse1: #Use1 \u0026 {\n\tx?: [... Foo]\n\ty?: Foo\n\tz?: Use2 | null\n}\n\nUse2: #Use2 \u0026 {\n\ta?: {\n\t\tfoo?: Foo\n\t}\n\tb?: Foo\n}\n```\n\ntbh I don\u0027t think there\u0027s any easy answer here, but I think it\u0027s a dilemma that might be worth pointing out.",
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31ab6f83_bd0a65a5",
+        "filename": "tools/apicheck/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T13:52:44Z",
+      "side": 1,
+      "message": "This also applies to templates and data too, right?",
+      "range": {
+        "startLine": 365,
+        "startChar": 58,
+        "endLine": 365,
+        "endChar": 68
+      },
+      "revId": "689ed509f7faf34a9862e7f8cb375553cccd8ce0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

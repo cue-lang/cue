@@ -91,15 +91,7 @@ checkoutCode: {
 			name: "Check we don't have \(dispatchTrailer) on a protected branch"
 			if:   "\(isProtectedBranch) && \(containsDispatchTrailer)"
 			run:  """
-				echo "\(_dispatchTrailerVariable) contains \(dispatchTrailer)"
-				echo "\(_dispatchTrailerVariable) value"
-				cat <<EOD
-				${{ \(_dispatchTrailerVariable) }}
-				EOD
-				echo "containsDispatchTrailer expression"
-				cat <<EOD
-				\(containsDispatchTrailer)
-				EOD
+				echo "\(_dispatchTrailerVariable) contains \(dispatchTrailer) but we are on a protected branch"
 				false
 				"""
 		},

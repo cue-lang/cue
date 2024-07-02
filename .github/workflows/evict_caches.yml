@@ -44,16 +44,7 @@ jobs:
           Dispatch-Trailer: {"type":"'))
         name: Check we don't have Dispatch-Trailer on a protected branch
         run: |-
-          echo "github.event.head_commit.message contains Dispatch-Trailer"
-          echo "github.event.head_commit.message value"
-          cat <<EOD
-          ${{ github.event.head_commit.message }}
-          EOD
-          echo "containsDispatchTrailer expression"
-          cat <<EOD
-          (contains(github.event.head_commit.message, '
-          Dispatch-Trailer: {"type":"'))
-          EOD
+          echo "github.event.head_commit.message contains Dispatch-Trailer but we are on a protected branch"
           false
       - name: Delete caches
         run: |-

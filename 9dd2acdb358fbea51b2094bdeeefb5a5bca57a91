@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae4468a1_35e89750",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T15:37:25Z",
+      "side": 1,
+      "message": "LGTM modulo a few minor suggestions. Clearly I don\u0027t _really_ have any idea of what\u0027s going on here 😊",
+      "revId": "9dd2acdb358fbea51b2094bdeeefb5a5bca57a91",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce068240_8fcc5847",
+        "filename": "internal/core/subsume/value_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T15:37:25Z",
+      "side": 1,
+      "message": "It would be nice to add these tests before the behavior-changing CL.",
+      "revId": "9dd2acdb358fbea51b2094bdeeefb5a5bca57a91",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "546a58fd_db24ee8c",
+        "filename": "internal/core/subsume/vertex.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T15:37:25Z",
+      "side": 1,
+      "message": "A doc comment would be nice to indicate intention here.",
+      "revId": "9dd2acdb358fbea51b2094bdeeefb5a5bca57a91",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "940ff780_cb739140",
+        "filename": "internal/core/subsume/vertex.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 451,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T15:37:25Z",
+      "side": 1,
+      "message": "\"constraint constraints\" ?",
+      "revId": "9dd2acdb358fbea51b2094bdeeefb5a5bca57a91",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

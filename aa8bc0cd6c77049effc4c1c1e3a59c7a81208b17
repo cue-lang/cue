@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1402b36_5033d246",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-07-02T10:44:19Z",
+      "side": 1,
+      "message": "Removed Windows support. PTAL",
+      "revId": "aa8bc0cd6c77049effc4c1c1e3a59c7a81208b17",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

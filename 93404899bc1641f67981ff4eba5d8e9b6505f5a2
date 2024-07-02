@@ -160,6 +160,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eec3f16f_946d5b4c",
+        "filename": "cmd/cue/cmd/testdata/script/modedit_initial.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T08:18:12Z",
+      "side": 1,
+      "message": "I added it to the umbrella issue for overly-verbose error messages: https://github.com/cue-lang/cue/issues/2952",
+      "parentUuid": "e4f8d76e_7f85a545",
+      "revId": "93404899bc1641f67981ff4eba5d8e9b6505f5a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "34017e0f_a8b049db",

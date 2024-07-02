@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e052e47d_1f845794",
+        "filename": "cmd/cue/cmd/modinit.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T08:18:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ce9f249_24bb45bd",
+      "revId": "8fad3f956daead24a024aa14721ce481f0eb6957",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0bf0ccd5_72c2c642",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-07-02T05:18:42Z",
       "side": 1,
       "message": "This edit is not intended, I don\u0027t think.",
+      "revId": "8fad3f956daead24a024aa14721ce481f0eb6957",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed2604af_e23f3c78",
+        "filename": "cmd/cue/cmd/testdata/script/modget_initial.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T08:18:12Z",
+      "side": 1,
+      "message": "Good catch. Done.",
+      "parentUuid": "0bf0ccd5_72c2c642",
       "revId": "8fad3f956daead24a024aa14721ce481f0eb6957",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

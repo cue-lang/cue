@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "780f9233_a279c4d8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T15:59:32Z",
+      "side": 1,
+      "message": "I\u0027m not convinced of the argument for disallowing a change from required to optional, tbh, but don\u0027t let that stop this landing.",
+      "revId": "758f1c69ce51ecf0afa505f49512037a55f913a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "932ea3e3_a6ee8744",
+        "filename": "internal/core/subsume/value_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 456,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T15:59:32Z",
+      "side": 1,
+      "message": "Again, please add the tests in a prior CL.",
+      "revId": "758f1c69ce51ecf0afa505f49512037a55f913a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b9bff9d_d7c2a9ef",
+        "filename": "internal/core/subsume/vertex.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 275,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T15:59:32Z",
+      "side": 1,
+      "message": "I just searched for those guidelines and found this:\n\n```\nIt is nearly impossible to safely change a field from required to optional. If there is any chance that a stale reader exists, it will consider messages without this field to be incomplete and may reject or drop them.\n```\n\nI guess that\u0027s what you\u0027re referring to.\n\nI\u0027m not entirely convinced. The rationale for not allowing a required field to be changed to optional is based on the possibility of having a stale reader that still expects the old message with the required field definitely provided.\n\nHowever ISTM that exactly the same scenario applies to _any_ stale reader that is expecting an older version of the schema.\n\nFor example, a schema might be defined as:\n\n```\n#S: {\n    a!: int\n}\n```\n\nand then be widened, within the API compatibility guidelines, to:\n\n```\n#S: {\n    a!: int | string\n}\n```\n\nbut perhaps there\u0027s a stale reader that expects only a numeric value for the field `a` and fails when it sees a string instead.\n\nI think this is an exactly analogous situation to the changing of a required field to an optional field - a stale reader is expecting a value that doesn\u0027t go outside the bounds of the original schema and fails when it does.\n\nIn the protobuf world, the API compatibility constraints are stricter: numeric values are encoded in a forward and backward compatible way, and it\u0027s not OK to change the type of a field in the above way.\n\nIf we go with the spirit of the protobuf guidelines, perhaps we can\u0027t change schemas at all... Or else we could just accept that this kind of breakage is part-and-parcel of relaxing any API schema and thus allow changing a required field to an optional field.",
+      "revId": "758f1c69ce51ecf0afa505f49512037a55f913a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -16,6 +16,24 @@
       "message": "Any particular reason you chose --language.version over --language-version? CUE field/selector syntax aside, --language.version as a flag sticks out like a sore thumb next to others like --inject-vars or --with-context. As a CLI user I would expect --language-version.\n\nIf we wanted CUE selector syntax, I would expect that to be as part of a value, like\n\n    cue mod edit --set language.version\u003dv0.11.0\n\nIf you are decided on keeping the current design, at least I would explain why in the commit message.",
       "revId": "1d2e0bd6f5d8da35270cae827fbf20aecacd67e7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed4be673_e229ce84",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T09:31:36Z",
+      "side": 1,
+      "message": "Yeah, that\u0027s a reasonable point. I chose `--language.version`, as you suspect, so there\u0027s a close correspondence between flag name and selector (we refer to \"language.version\" elsewhere in the help docs etc). In the future if we had more general `--set` functionality it would be easy to make `--language.version\u003dxxx` and alias for `--set language.version\u003dxxx`, but then that\u0027s easy enough with `--language-version` too.\n\nI don\u0027t have strong feelings at all though, so happy to change to use `--language-version`.",
+      "parentUuid": "becc3eb8_bc971783",
+      "revId": "1d2e0bd6f5d8da35270cae827fbf20aecacd67e7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

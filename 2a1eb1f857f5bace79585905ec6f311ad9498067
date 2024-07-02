@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "590f9948_ac5866df",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T15:39:18Z",
+      "side": 1,
+      "message": "\"fix default handling\"?\n\"fixes to default handling\" ?",
+      "revId": "2a1eb1f857f5bace79585905ec6f311ad9498067",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3da0e680_fa941bdd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T15:39:18Z",
+      "side": 1,
+      "message": "```suggestion\nvalues of a must subsume b as well. This was not\n```",
+      "revId": "2a1eb1f857f5bace79585905ec6f311ad9498067",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48a223e7_97903069",
+        "filename": "internal/core/subsume/value_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T15:39:18Z",
+      "side": 1,
+      "message": "Once again, it would be nice to add the tests before changing behavior.",
+      "revId": "2a1eb1f857f5bace79585905ec6f311ad9498067",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1019ffe4_e725fec0",
+        "filename": "internal/core/subsume/value_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 446,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T15:39:18Z",
+      "side": 1,
+      "message": "ditto.",
+      "revId": "2a1eb1f857f5bace79585905ec6f311ad9498067",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b9edec9_3937fdef",
+        "filename": "internal/core/subsume/value_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T15:32:04Z",
+      "side": 1,
+      "message": "Given that the tests don\u0027t try with (b, a) as well as (b, a), would it be worth having explicit tests that check the opposite order also satisfies the test?\n\ne.g.\n\n```\n{subsumes: false, in: `a: {foo: 1}, b: close({})`, mode: subSchema},\n```\n\nOr is the code consistent enough that it\u0027s highly unlikely that it wouldn\u0027t work as expected?",
+      "revId": "5264a9c9f546bad1d10fac2f791d39585fdddc38",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8314dd25_c9cb0d0f",
+        "filename": "internal/core/subsume/value_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 532,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-02T15:32:04Z",
+      "side": 1,
+      "message": "Maybe add a default here with a panic or failure so it\u0027s clear that one of the above cases must be hit for all the tests?",
+      "revId": "5264a9c9f546bad1d10fac2f791d39585fdddc38",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

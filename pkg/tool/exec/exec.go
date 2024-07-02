@@ -17,11 +17,11 @@ package exec
 import (
 	"fmt"
 	"os/exec"
-	"strings"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/task"
+	"github.com/kballard/go-shellquote"
 )
 
 func init() {
@@ -102,7 +102,6 @@ func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
 }
 
 func mkCommand(ctx *task.Context) (c *exec.Cmd, doc string, err error) {
-	var bin string
 	var args []string
 
 	v := ctx.Lookup("cmd")
@@ -112,37 +111,29 @@ func mkCommand(ctx *task.Context) (c *exec.Cmd, doc string, err error) {
 
 	switch v.Kind() {
 	case cue.StringKind:
+		var err error
 		str := ctx.String("cmd")
-		doc = str
-		list := strings.Fields(str)
-		bin = list[0]
-		args = append(args, list[1:]...)
-
-	case cue.ListKind:
-		list, _ := v.List()
-		if !list.Next() {
-			return nil, "", errors.New("empty command list")
-		}
-		bin, err = list.Value().String()
+		args, err = shellquote.Split(str)
 		if err != nil {
-			return nil, "", err
+			return nil, "", fmt.Errorf("failed to split cmd args: %w", err)
 		}
-		doc += bin
-		for list.Next() {
-			str, err := list.Value().String()
+	case cue.ListKind:
+		for iter, _ := v.List(); iter.Next(); {
+			str, err := iter.Value().String()
 			if err != nil {
 				return nil, "", err
 			}
 			args = append(args, str)
-			doc += " " + str
 		}
 	}
 
-	if bin == "" {
+	if len(args) == 0 || args[0] == "" {
 		return nil, "", errors.New("empty command")
 	}
 
-	cmd := exec.CommandContext(ctx.Context, bin, args...)
+	doc = shellquote.Join(args...)
+
+	cmd := exec.CommandContext(ctx.Context, args[0], args[1:]...)
 
 	cmd.Dir, _ = ctx.Obj.LookupPath(cue.ParsePath("dir")).String()
 

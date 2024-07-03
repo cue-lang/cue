@@ -33,6 +33,24 @@
       "message": "- Don\u0027t submit before https://review.gerrithub.io/c/cue-lang/cuelang.org/+/1196779.\n- Don\u0027t submit without aligning URL paths with https://review.gerrithub.io/c/cue-lang/cuelang.org/+/1196779.",
       "revId": "92cb28f8fd9d5cebdf8aa94ccf85f097088b6950",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ceae71a_a23f2ef2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-07-03T11:54:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9367b950_cfcf0113",
+      "revId": "92cb28f8fd9d5cebdf8aa94ccf85f097088b6950",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

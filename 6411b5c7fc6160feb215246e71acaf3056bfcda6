@@ -33,6 +33,23 @@
       "message": "Sorry, I really meant to say: please submit this after https://cuelang.org/cl/1196779 has been submitted.",
       "revId": "6411b5c7fc6160feb215246e71acaf3056bfcda6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "423a5fdb_3828d798",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-07-03T12:07:01Z",
+      "side": 1,
+      "message": "Flagging as a top-level, visible comment: please submit this after https://cuelang.org/cl/1196779 has been submitted.",
+      "revId": "6411b5c7fc6160feb215246e71acaf3056bfcda6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

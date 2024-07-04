@@ -3,6 +3,7 @@ package modpkgload
 import (
 	"context"
 	"fmt"
+	"io/fs"
 	"runtime"
 	"slices"
 	"sort"
@@ -76,14 +77,15 @@ func (f Flags) has(cond Flags) bool {
 }
 
 type Packages struct {
-	mainModuleVersion module.Version
-	mainModuleLoc     module.SourceLoc
-	pkgCache          par.Cache[string, *Package]
-	pkgs              []*Package
-	rootPkgs          []*Package
-	work              *par.Queue
-	requirements      *modrequirements.Requirements
-	registry          Registry
+	mainModuleVersion    module.Version
+	mainModuleLoc        module.SourceLoc
+	shouldIncludePkgFile func(pkgPath string, mod module.Version, fsys fs.FS, mf modimports.ModuleFile) bool
+	pkgCache             par.Cache[string, *Package]
+	pkgs                 []*Package
+	rootPkgs             []*Package
+	work                 *par.Queue
+	requirements         *modrequirements.Requirements
+	registry             Registry
 }
 
 type Package struct {
@@ -148,6 +150,12 @@ func (pkg *Package) Mod() module.Version {
 // and reg to download module contents.
 //
 // rootPkgPaths should only contain canonical import paths.
+//
+// The shouldIncludePkgFile function is used to determine whether a
+// given file in a package should be considered to be part of the build.
+// If it returns true for a package, the file's imports will be followed.
+// A nil value corresponds to a function that always returns true.
+// It may be called concurrently.
 func LoadPackages(
 	ctx context.Context,
 	mainModulePath string,
@@ -155,13 +163,15 @@ func LoadPackages(
 	rs *modrequirements.Requirements,
 	reg Registry,
 	rootPkgPaths []string,
+	shouldIncludePkgFile func(pkgPath string, mod module.Version, fsys fs.FS, mf modimports.ModuleFile) bool,
 ) *Packages {
 	pkgs := &Packages{
-		mainModuleVersion: module.MustNewVersion(mainModulePath, ""),
-		mainModuleLoc:     mainModuleLoc,
-		requirements:      rs,
-		registry:          reg,
-		work:              par.NewQueue(runtime.GOMAXPROCS(0)),
+		mainModuleVersion:    module.MustNewVersion(mainModulePath, ""),
+		mainModuleLoc:        mainModuleLoc,
+		shouldIncludePkgFile: shouldIncludePkgFile,
+		requirements:         rs,
+		registry:             reg,
+		work:                 par.NewQueue(runtime.GOMAXPROCS(0)),
 	}
 	inRoots := map[*Package]bool{}
 	pkgs.rootPkgs = make([]*Package, 0, len(rootPkgPaths))
@@ -247,7 +257,8 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 	if pkgs.mainModuleVersion.Path() == pkg.mod.Path() {
 		pkgs.applyPkgFlags(pkg, PkgInAll)
 	}
-	pkgQual := module.ParseImportPath(pkg.path).Qualifier
+	ip := module.ParseImportPath(pkg.path)
+	pkgQual := ip.Qualifier
 	if pkgQual == "" {
 		pkg.err = fmt.Errorf("cannot determine package name from import path %q", pkg.path)
 		return
@@ -258,16 +269,22 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 	}
 	importsMap := make(map[string]bool)
 	foundPackageFile := false
+	excludedPackageFiles := 0
 	for _, loc := range pkg.locs {
 		// Layer an iterator whose yield function keeps track of whether we have seen
 		// a single valid CUE file in the package directory.
 		// Otherwise we would have to iterate twice, causing twice as many io/fs operations.
 		pkgFileIter := func(yield func(modimports.ModuleFile, error) bool) {
-			yield2 := func(mf modimports.ModuleFile, err error) bool {
+			modimports.PackageFiles(loc.FS, loc.Dir, pkgQual)(func(mf modimports.ModuleFile, err error) bool {
+				ip1 := ip
+				ip1.Qualifier = mf.Syntax.PackageName()
+				if !pkgs.shouldIncludePkgFile(ip1.String(), pkg.mod, loc.FS, mf) {
+					excludedPackageFiles++
+					return true
+				}
 				foundPackageFile = err == nil
 				return yield(mf, err)
-			}
-			modimports.PackageFiles(loc.FS, loc.Dir, pkgQual)(yield2)
+			})
 		}
 		imports, err := modimports.AllImports(pkgFileIter)
 		if err != nil {
@@ -279,7 +296,11 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 		}
 	}
 	if !foundPackageFile {
-		pkg.err = fmt.Errorf("no files in package directory with package name %q", pkgQual)
+		if excludedPackageFiles > 0 {
+			pkg.err = fmt.Errorf("no files in package directory with package name %q (%d files were excluded)", pkgQual, excludedPackageFiles)
+		} else {
+			pkg.err = fmt.Errorf("no files in package directory with package name %q", pkgQual)
+		}
 		return
 	}
 	imports := make([]string, 0, len(importsMap))

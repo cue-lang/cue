@@ -1,0 +1,127 @@
+# Check that, for the purposes of `cue mod tidy`, build attributes are always considered
+# to be enabled in the main module but disabled in dependencies.
+exec cue mod tidy
+cmp cue.mod/module.cue want-module
+
+# Note that test.example.d3 should _not_ appear
+# in the dependencies because it's guarded by a build
+# tag that should be considered to be false.
+! grep test.example/d3 want-module
+
+# On the other hand, d4 _should_ appear in the
+# dependencies, because it's guarded by the negation
+# of a build tag.
+grep test.example/d4  want-module
+
+exec cue eval
+cmp stdout want-stdout-1
+exec cue eval -t prod
+cmp stdout want-stdout-2
+! exec cue eval -t notknown
+stderr 'tag "notknown" not used in any file'
+
+-- want-module --
+module: "main.org"
+language: {
+	version: "v0.9.2"
+}
+deps: {
+	"test.example/d1@v0": {
+		v:       "v0.0.1"
+		default: true
+	}
+	"test.example/d2@v0": {
+		v:       "v0.0.1"
+		default: true
+	}
+	"test.example/d4@v0": {
+		v:       "v0.0.1"
+		default: true
+	}
+}
+-- want-stdout-1 --
+prod: false
+x: {
+    self: "test.example/d2"
+}
+-- want-stdout-2 --
+prod: true
+x: {
+    self:        "test.example/d1"
+    prodenabled: false
+    y: {
+        self: "test.example/d4"
+    }
+}
+-- cue.mod/module.cue --
+module: "main.org"
+language: {
+	version: "v0.9.2"
+}
+-- foo_prod.cue --
+@if(prod)
+
+package foo
+
+import "test.example/d1"
+
+prod: true
+x: d1
+-- foo_nonprod.cue --
+@if(!prod)
+
+package foo
+
+import "test.example/d2"
+
+prod: false
+x: d2
+-- _registry/test.example_d1_v0.0.1/cue.mod/module.cue --
+module: "test.example/d1"
+language: version: "v0.9.2"
+
+-- _registry/test.example_d1_v0.0.1/x.cue --
+
+@if(prod)
+
+package d1
+
+import "test.example/d3"
+
+self: "test.example/d1"
+prodenabled: true
+y: d3
+
+-- _registry/test.example_d1_v0.0.1/y.cue --
+
+@if(!prod)
+
+package d1
+
+import "test.example/d4"
+
+self: "test.example/d1"
+prodenabled: false
+y: d4
+
+-- _registry/test.example_d2_v0.0.1/cue.mod/module.cue --
+module: "test.example/d2"
+language: version: "v0.9.2"
+
+-- _registry/test.example_d2_v0.0.1/x.cue --
+package d2
+self: "test.example/d2"
+
+-- _registry/test.example_d3_v0.0.1/cue.mod/module.cue --
+module: "test.example/d3"
+language: version: "v0.9.2"
+-- _registry/test.example_d3_v0.0.1/x.cue --
+package d3
+self: "test.example/d3"
+
+-- _registry/test.example_d4_v0.0.1/cue.mod/module.cue --
+module: "test.example/d4"
+language: version: "v0.9.2"
+-- _registry/test.example_d4_v0.0.1/x.cue --
+package d4
+self: "test.example/d4"

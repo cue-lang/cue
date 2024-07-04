@@ -17,13 +17,16 @@ package load
 import (
 	"context"
 	"fmt"
+	"io/fs"
 	"sort"
 	"strconv"
+	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/filetypes"
+	"cuelang.org/go/internal/mod/modimports"
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modrequirements"
 	"cuelang.org/go/mod/module"
@@ -102,7 +105,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 	if err != nil {
 		return []*build.Instance{c.newErrInstance(err)}
 	}
-	pkgs, err := loadPackages(ctx, c, synCache, expandedPaths, otherFiles)
+	pkgs, err := loadPackages(ctx, c, synCache, expandedPaths, otherFiles, tg)
 	if err != nil {
 		return []*build.Instance{c.newErrInstance(err)}
 	}
@@ -169,12 +172,20 @@ func Instances(args []string, c *Config) []*build.Instance {
 
 // loadPackages returns packages loaded from the given package list and also
 // including imports from the given build files.
-func loadPackages(ctx context.Context, cfg *Config, synCache *syntaxCache, pkgs []resolvedPackageArg, otherFiles []*build.File) (*modpkgload.Packages, error) {
+func loadPackages(
+	ctx context.Context,
+	cfg *Config,
+	synCache *syntaxCache,
+	pkgs []resolvedPackageArg,
+	otherFiles []*build.File,
+	tg *tagger,
+) (*modpkgload.Packages, error) {
 	if cfg.Registry == nil || cfg.modFile == nil || cfg.modFile.Module == "" {
 		return nil, nil
 	}
+	mainModPath := cfg.modFile.QualifiedModule()
 	reqs := modrequirements.NewRequirements(
-		cfg.modFile.QualifiedModule(),
+		mainModPath,
 		cfg.Registry,
 		cfg.modFile.DepVersions(),
 		cfg.modFile.DefaultMajorVersions(),
@@ -224,5 +235,25 @@ func loadPackages(ctx context.Context, cfg *Config, synCache *syntaxCache, pkgs 
 		reqs,
 		cfg.Registry,
 		pkgPathSlice,
+		func(pkgPath string, mod module.Version, fsys fs.FS, mf modimports.ModuleFile) bool {
+			if !cfg.Tools && strings.HasSuffix(mf.FilePath, "_tool.cue") {
+				return false
+			}
+			var tagIsSet func(string) bool
+			if mod.Path() == mainModPath || pkgPaths[pkgPath] {
+				tagIsSet = tg.tagIsSet
+			} else {
+				// The file is outside the main module and isn't mentioned explicitly
+				// on the command line, so treat all build tag keys as unset.
+				tagIsSet = func(string) bool {
+					return false
+				}
+			}
+			if err := shouldBuildFile(mf.Syntax, tagIsSet); err != nil {
+				// Later build logic should pick up and report the same error.
+				return false
+			}
+			return true
+		},
 	), nil
 }

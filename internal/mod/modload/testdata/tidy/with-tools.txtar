@@ -1,0 +1,68 @@
+# Test a scenario where there are _tool.cue files, both
+# in the main module and in the dependencies.
+
+-- tidy-check-error --
+module is not tidy: missing dependency providing package test.example/foo
+-- want --
+module: "main.org"
+language: {
+	version: "v0.9.2"
+}
+deps: {
+	"test.example/foo@v0": {
+		v:       "v0.0.1"
+		default: true
+	}
+	"test.example/toolonly@v0": {
+		v:       "v0.0.1"
+		default: true
+	}
+}
+-- cue.mod/module.cue --
+module: "main.org"
+language: {
+	version: "v0.9.2"
+}
+
+-- main.cue --
+package main
+import "test.example/foo"
+
+x: foo
+
+-- main_tool.cue --
+package main
+import "test.example/toolonly"
+
+x: toolonly
+
+-- _registry/test.example_foo_v0.0.1/cue.mod/module.cue --
+module: "test.example/foo"
+language: version: "v0.10.0"
+-- _registry/test.example_foo_v0.0.1/foo.cue --
+package foo
+
+-- _registry/test.example_foo_v0.0.1/foo_tool.cue --
+package foo
+
+import "test.example/nextleveltool"
+
+x: nextleveltool
+
+-- _registry/test.example_toolonly_v0.0.1/cue.mod/module.cue --
+module: "test.example/toolonly"
+language: version: "v0.10.0"
+
+-- _registry/test.example_toolonly_v0.0.1/x.cue --
+package toolonly
+
+-- _registry/test.example_nextleveltool_v0.0.1/cue.mod/module.cue --
+// Note: this module should _not_ be included because it's only imported
+// as result of the foo_tool.cue file inside the dependency test.example/foo,
+// not from the main module.
+
+module: "test.example/nextleveltool"
+language: version: "v0.10.0"
+
+-- _registry/test.example_nextleveltool_v0.0.1/x.cue --
+package nextleveltool

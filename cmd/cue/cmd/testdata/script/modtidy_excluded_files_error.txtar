@@ -1,0 +1,24 @@
+! exec cue mod tidy
+cmp stderr expect-stderr
+
+-- expect-stderr --
+failed to resolve "test.example/d1": no files in package directory with package name "d1" (1 files were excluded)
+-- cue.mod/module.cue --
+module: "test.example/main"
+language: version: "v0.9.2"
+
+-- main.cue --
+package main
+
+import "test.example/d1"
+
+x: d1
+
+-- _registry/test.example_d1_v0.0.1/cue.mod/module.cue --
+module: "test.example/d1"
+language: version: "v0.9.2"
+
+-- _registry/test.example_d1_v0.0.1/x.cue --
+@if(notused)
+
+package d1

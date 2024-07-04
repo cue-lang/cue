@@ -365,7 +365,7 @@ func importPathFromAbsDir(c *Config, absDir string, origPath string) (importPath
 }
 
 func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
-	dir, err := l.absDirFromImportPath(pos, p)
+	dir, modPath, err := l.absDirFromImportPath(pos, p)
 	i := l.cfg.Context.NewInstance(dir, l.loadFunc)
 	i.Err = errors.Append(i.Err, err)
 	i.Dir = dir
@@ -380,7 +380,7 @@ func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
 	i.DisplayPath = string(p)
 	i.ImportPath = string(p)
 	i.Root = l.cfg.ModuleRoot
-	i.Module = l.cfg.Module
+	i.Module = modPath
 
 	return i
 }
@@ -389,32 +389,32 @@ func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
 // and a package name. The root directory must be set.
 //
 // The returned directory may not exist.
-func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (string, errors.Error) {
-	dir, err := l.absDirFromImportPath1(pos, p)
+func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (dir string, modPath string, _ errors.Error) {
+	dir, modPath, err := l.absDirFromImportPath1(pos, p)
 	if err != nil {
 		// Any error trying to determine the package location
 		// is a PackageError.
-		return "", l.errPkgf([]token.Pos{pos}, "%s", err.Error())
+		return "", "", l.errPkgf([]token.Pos{pos}, "%s", err.Error())
 	}
-	return dir, nil
+	return dir, modPath, nil
 }
 
-func (l *loader) absDirFromImportPath1(pos token.Pos, p importPath) (absDir string, err error) {
+func (l *loader) absDirFromImportPath1(pos token.Pos, p importPath) (absDir string, modPath string, err error) {
 	if p == "" {
-		return "", fmt.Errorf("empty import path")
+		return "", "", fmt.Errorf("empty import path")
 	}
 	if l.cfg.ModuleRoot == "" {
-		return "", fmt.Errorf("cannot import %q (root undefined)", p)
+		return "", "", fmt.Errorf("cannot import %q (root undefined)", p)
 	}
 	if isStdlibPackage(string(p)) {
-		return "", fmt.Errorf("standard library import path %q cannot be imported as a CUE package", p)
+		return "", "", fmt.Errorf("standard library import path %q cannot be imported as a CUE package", p)
 	}
 	// Extract the package name.
 	parts := module.ParseImportPath(string(p))
 	unqualified := parts.Unqualified().String()
 	if l.cfg.Registry != nil {
 		if l.pkgs == nil {
-			return "", fmt.Errorf("imports are unavailable because there is no cue.mod/module.cue file")
+			return "", "", fmt.Errorf("imports are unavailable because there is no cue.mod/module.cue file")
 		}
 		// TODO predicate registry-aware lookup on module.cue-declared CUE version?
 
@@ -426,10 +426,10 @@ func (l *loader) absDirFromImportPath1(pos token.Pos, p importPath) (absDir stri
 		// should we not be using either the original path or the canonical path?
 		// The unqualified import path should only be used for filepath.FromSlash further below.
 		if pkg == nil {
-			return "", fmt.Errorf("no dependency found for package %q", unqualified)
+			return "", "", fmt.Errorf("no dependency found for package %q", unqualified)
 		}
 		if err := pkg.Error(); err != nil {
-			return "", fmt.Errorf("cannot find package %q: %v", unqualified, err)
+			return "", "", fmt.Errorf("cannot find package %q: %v", unqualified, err)
 		}
 		if mv := pkg.Mod(); mv.IsLocal() {
 			// It's a local package that's present inside one or both of the gen, usr or pkg
@@ -440,18 +440,18 @@ func (l *loader) absDirFromImportPath1(pos token.Pos, p importPath) (absDir stri
 		} else {
 			locs := pkg.Locations()
 			if len(locs) > 1 {
-				return "", fmt.Errorf("package %q unexpectedly found in multiple locations", unqualified)
+				return "", "", fmt.Errorf("package %q unexpectedly found in multiple locations", unqualified)
 			}
 			if len(locs) == 0 {
-				return "", fmt.Errorf("no location found for package %q", unqualified)
+				return "", "", fmt.Errorf("no location found for package %q", unqualified)
 			}
 			var err error
 			absDir, err = absPathForSourceLoc(locs[0])
 			if err != nil {
-				return "", fmt.Errorf("cannot determine source directory for package %q: %v", unqualified, err)
+				return "", "", fmt.Errorf("cannot determine source directory for package %q: %v", unqualified, err)
 			}
 		}
-		return absDir, nil
+		return absDir, pkg.Mod().Path(), nil
 	}
 
 	// Determine the directory without using the registry.
@@ -459,15 +459,18 @@ func (l *loader) absDirFromImportPath1(pos token.Pos, p importPath) (absDir stri
 	sub := filepath.FromSlash(unqualified)
 	switch hasPrefix := strings.HasPrefix(unqualified, l.cfg.Module); {
 	case hasPrefix && len(sub) == len(l.cfg.Module):
+		modPath = l.cfg.Module
 		absDir = l.cfg.ModuleRoot
 
 	case hasPrefix && unqualified[len(l.cfg.Module)] == '/':
+		modPath = l.cfg.Module
 		absDir = filepath.Join(l.cfg.ModuleRoot, sub[len(l.cfg.Module)+1:])
 
 	default:
+		modPath = "local"
 		absDir = filepath.Join(GenPath(l.cfg.ModuleRoot), sub)
 	}
-	return absDir, err
+	return absDir, modPath, err
 }
 
 func absPathForSourceLoc(loc module.SourceLoc) (string, error) {

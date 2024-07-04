@@ -14,6 +14,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"golang.org/x/tools/txtar"
 
+	"cuelang.org/go/internal/mod/modimports"
 	"cuelang.org/go/internal/mod/modrequirements"
 	"cuelang.org/go/internal/txtarfs"
 	"cuelang.org/go/mod/modfile"
@@ -63,6 +64,9 @@ func TestLoadPackages(t *testing.T) {
 					initialRequirements,
 					reg,
 					rootPackages,
+					func(pkgPath string, mod module.Version, fsys fs.FS, mf modimports.ModuleFile) bool {
+						return true
+					},
 				)
 				for _, pkg := range pkgs.All() {
 					printf("%s\n", pkg.ImportPath())

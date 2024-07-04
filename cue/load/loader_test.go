@@ -132,7 +132,7 @@ module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    ""
 display:""`}, {
-		name: "NoPackageName",
+		name: "NoMatchingPackageName",
 		cfg:  dirCfg,
 		args: []string{"./anon"},
 		want: `err:    build constraints exclude all CUE files in ./anon:
@@ -185,7 +185,7 @@ imports:
 		args: []string{"mod.test/test/hello:nonexist"},
 		want: `err:    cannot find package "mod.test/test/hello": no files in package directory with package name "nonexist"
 path:   mod.test/test/hello:nonexist
-module: mod.test/test@v0
+module: ""
 root:   $CWD/testdata/testmod
 dir:    ""
 display:mod.test/test/hello:nonexist`,
@@ -229,7 +229,7 @@ files:
 		want: `err:    cannot determine package name for "foo.com/bad-identifier"; set it explicitly with ':'
 cannot find package "foo.com/bad-identifier": cannot find module providing package foo.com/bad-identifier
 path:   foo.com/bad-identifier
-module: mod.test/test@v0
+module: ""
 root:   $CWD/testdata/testmod
 dir:    ""
 display:foo.com/bad-identifier`,
@@ -239,7 +239,7 @@ display:foo.com/bad-identifier`,
 		args: []string{"nonexisting"},
 		want: `err:    standard library import path "nonexisting" cannot be imported as a CUE package
 path:   nonexisting
-module: mod.test/test@v0
+module: ""
 root:   $CWD/testdata/testmod
 dir:    ""
 display:nonexisting`,
@@ -249,7 +249,7 @@ display:nonexisting`,
 		args: []string{"strconv"},
 		want: `err:    standard library import path "strconv" cannot be imported as a CUE package
 path:   strconv
-module: mod.test/test@v0
+module: ""
 root:   $CWD/testdata/testmod
 dir:    ""
 display:strconv`,
@@ -503,7 +503,43 @@ dir:    $CWD/testdata/testmod/multi5
 display:.
 files:
     $CWD/testdata/testmod/anon.cue
-    $CWD/testdata/testmod/multi5/nopackage.cue`}}
+    $CWD/testdata/testmod/multi5/nopackage.cue`}, {
+		// Check that imports are only considered from files
+		// that match the build paths.
+		name: "BuildTagsWithImports#1",
+		cfg: &Config{
+			Dir:  filepath.Join(testdataDir, "tagswithimports"),
+			Tags: []string{"prod"},
+		},
+		args: []string{"."},
+		want: `path:   mod.test/test/tagswithimports@v0
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/tagswithimports
+display:.
+files:
+    $CWD/testdata/testmod/tagswithimports/prod.cue
+imports:
+    mod.test/test/hello:test: $CWD/testdata/testmod/test.cue $CWD/testdata/testmod/hello/test.cue
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
+		// Check that imports are only considered from files
+		// that match the build paths. When we don't have the prod
+		// tag, the bad import path mentioned in testdata/testmod/tagswithimports/nonprod.cue
+		// surfaces in the errors.
+		name: "BuildTagsWithImports#2",
+		cfg: &Config{
+			Dir: filepath.Join(testdataDir, "tagswithimports"),
+		},
+		args: []string{"."},
+		want: `err:    mod.test/test/tagswithimports@v0: import failed: cannot find package "bad-import.example/foo": cannot find module providing package bad-import.example/foo:
+    $CWD/testdata/testmod/tagswithimports/nonprod.cue:5:8
+path:   mod.test/test/tagswithimports@v0
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/tagswithimports
+display:.
+files:
+    $CWD/testdata/testmod/tagswithimports/nonprod.cue`}}
 	tdtest.Run(t, testCases, func(t *tdtest.T, tc *loadTest) {
 		pkgs := Instances(tc.args, tc.cfg)
 

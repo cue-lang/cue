@@ -248,7 +248,15 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 	}
 
 	if !fp.c.AllCUEFiles {
-		if err := shouldBuildFile(pf, fp.tagger.tagIsSet); err != nil {
+		tagIsSet := fp.tagger.tagIsSet
+		if p.Module != fp.c.Module {
+			// The file is outside the main module so treat all build tag keys as unset.
+			// TODO also consider packages explicitly specified on the command line.
+			tagIsSet = func(string) bool {
+				return false
+			}
+		}
+		if err := shouldBuildFile(pf, tagIsSet); err != nil {
 			if !errors.Is(err, errExclude) {
 				fp.err = errors.Append(fp.err, err)
 			}

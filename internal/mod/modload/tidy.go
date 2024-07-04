@@ -10,7 +10,9 @@ import (
 	"path"
 	"runtime"
 	"slices"
+	"strings"
 
+	"cuelang.org/go/internal/buildattr"
 	"cuelang.org/go/internal/mod/modimports"
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modrequirements"
@@ -165,10 +167,32 @@ func modfileFromRequirements(old *modfile.File, rs *modrequirements.Requirements
 	return mf
 }
 
+// shouldIncludePkgFile reports whether a file from a package should be included
+// for dependency-analysis purposes.
+//
+// In general a file should always be considered unless it's a _tool.cue file
+// that's not in the main module.
+func (ld *loader) shouldIncludePkgFile(pkgPath string, mod module.Version, fsys fs.FS, mf modimports.ModuleFile) bool {
+	inMainModule := mod.Path() == ld.mainModule.Path()
+	if strings.HasSuffix(mf.FilePath, "_tool.cue") {
+		// _tool.cue files are only considered when they are part of the main module.
+		return inMainModule
+	}
+	ok, _, err := buildattr.ShouldBuildFile(mf.Syntax, func(string) bool {
+		// Keys of build attributes are considered always true when they're
+		// in the main module and false otherwise.
+		return inMainModule
+	})
+	if err != nil {
+		return false
+	}
+	return ok
+}
+
 func (ld *loader) resolveDependencies(ctx context.Context, rootPkgPaths []string, rs *modrequirements.Requirements) (*modrequirements.Requirements, *modpkgload.Packages, error) {
 	for {
 		logf("---- LOADING from requirements %q", rs.RootModules())
-		pkgs := modpkgload.LoadPackages(ctx, ld.mainModule.Path(), ld.mainModuleLoc, rs, ld.registry, rootPkgPaths)
+		pkgs := modpkgload.LoadPackages(ctx, ld.mainModule.Path(), ld.mainModuleLoc, rs, ld.registry, rootPkgPaths, ld.shouldIncludePkgFile)
 		if ld.checkTidy {
 			for _, pkg := range pkgs.All() {
 				err := pkg.Error()

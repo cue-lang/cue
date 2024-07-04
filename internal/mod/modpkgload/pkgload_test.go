@@ -63,6 +63,7 @@ func TestLoadPackages(t *testing.T) {
 					initialRequirements,
 					reg,
 					rootPackages,
+					nil,
 				)
 				for _, pkg := range pkgs.All() {
 					printf("%s\n", pkg.ImportPath())

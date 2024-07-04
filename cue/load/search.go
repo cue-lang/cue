@@ -406,7 +406,7 @@ func appendExpandedUnqualifiedPackagePath(pkgPaths []resolvedPackageArg, origp s
 				_err = err
 				return false
 			}
-			if err := shouldBuildFile(f.Syntax, tg); err != nil {
+			if err := shouldBuildFile(f.Syntax, tg.tagIsSet); err != nil {
 				// Later build logic should pick up and report the same error.
 				return true
 			}
@@ -522,7 +522,7 @@ func appendExpandedWildcardPackagePath(pkgPaths []resolvedPackageArg, pattern mo
 		if err != nil {
 			return false
 		}
-		if err := shouldBuildFile(f.Syntax, tg); err != nil {
+		if err := shouldBuildFile(f.Syntax, tg.tagIsSet); err != nil {
 			// Later build logic should pick up and report the same error.
 			return true
 		}

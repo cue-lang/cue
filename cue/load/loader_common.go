@@ -248,7 +248,7 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 	}
 
 	if !fp.c.AllCUEFiles {
-		if err := shouldBuildFile(pf, fp.tagger); err != nil {
+		if err := shouldBuildFile(pf, fp.tagger.tagIsSet); err != nil {
 			if !errors.Is(err, errExclude) {
 				fp.err = errors.Append(fp.err, err)
 			}

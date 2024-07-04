@@ -21,30 +21,56 @@ import (
 	"os/user"
 	"runtime"
 	"strings"
+	"sync"
 	"time"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/buildattr"
 	"cuelang.org/go/internal/cli"
 )
 
 type tagger struct {
-	cfg          *Config
+	cfg *Config
+	// tagMap holds true for all the tags in cfg.Tags that
+	// are not associated with a value.
+	tagMap map[string]bool
+	// tags keeps a record of all the @tag attibutes found in files.
 	tags         []*tag // tags found in files
-	buildTags    map[string]bool
 	replacements map[ast.Node]ast.Node
+
+	// mu guards the usedTags map.
+	mu sync.Mutex
+	// usedTags keeps a record of all the tag attributes found in files.
+	usedTags map[string]bool
 }
 
 func newTagger(c *Config) *tagger {
-	return &tagger{
-		cfg:       c,
-		buildTags: make(map[string]bool),
+	tagMap := map[string]bool{}
+	for _, t := range c.Tags {
+		if !strings.ContainsRune(t, '=') {
+			tagMap[t] = true
+		}
 	}
+	return &tagger{
+		cfg:      c,
+		tagMap:   tagMap,
+		usedTags: make(map[string]bool),
+	}
+}
+
+// tagIsSet reports whether the tag with the given key
+// is enabled. It also updates t.usedTags to
+// reflect that the tag has been seen.
+func (tg *tagger) tagIsSet(key string) bool {
+	tg.mu.Lock()
+	tg.usedTags[key] = true
+	tg.mu.Unlock()
+	return tg.tagMap[key]
 }
 
 // A TagVar represents an injection variable.
@@ -266,7 +292,7 @@ func (tg *tagger) injectTags(tags []string) errors.Error {
 	// Parses command line args
 	for _, s := range tags {
 		p := strings.Index(s, "=")
-		found := tg.buildTags[s]
+		found := tg.usedTags[s]
 		if p > 0 { // key-value
 			for _, t := range tg.tags {
 				if t.key == s[:p] {
@@ -327,102 +353,14 @@ func (tg *tagger) injectTags(tags []string) errors.Error {
 	return nil
 }
 
-// shouldBuildFile determines whether a File should be included based on its
-// attributes.
-func shouldBuildFile(f *ast.File, tagger *tagger) errors.Error {
-	tags := tagger.cfg.Tags
-
-	a, errs := getBuildAttr(f)
-	if errs != nil {
-		return errs
-	}
-	if a == nil {
-		return nil
-	}
-
-	_, body := a.Split()
-
-	expr, err := parser.ParseExpr("", body)
+func shouldBuildFile(f *ast.File, tagIsSet func(key string) bool) errors.Error {
+	ok, attr, err := buildattr.ShouldBuildFile(f, tagIsSet)
 	if err != nil {
-		return errors.Promote(err, "")
+		return err
 	}
-
-	tagMap := map[string]bool{}
-	for _, t := range tags {
-		tagMap[t] = !strings.ContainsRune(t, '=')
-	}
-
-	c := checker{tags: tagMap, tagger: tagger}
-	include := c.shouldInclude(expr)
-	if c.err != nil {
-		return c.err
-	}
-	if !include {
-		return excludeError{errors.Newf(a.Pos(), "@if(%s) did not match", body)}
+	if !ok {
+		_, body := attr.Split()
+		return excludeError{errors.Newf(attr.Pos(), "@if(%s) did not match", body)}
 	}
 	return nil
-}
-
-func getBuildAttr(f *ast.File) (*ast.Attribute, errors.Error) {
-	var a *ast.Attribute
-	for _, d := range f.Decls {
-		switch x := d.(type) {
-		case *ast.Attribute:
-			key, _ := x.Split()
-			if key != "if" {
-				continue
-			}
-			if a != nil {
-				err := errors.Newf(d.Pos(), "multiple @if attributes")
-				err = errors.Append(err,
-					errors.Newf(a.Pos(), "previous declaration here"))
-				return nil, err
-			}
-			a = x
-
-		case *ast.Package:
-			break
-		}
-	}
-	return a, nil
-}
-
-type checker struct {
-	tagger *tagger
-	tags   map[string]bool
-	err    errors.Error
-}
-
-func (c *checker) shouldInclude(expr ast.Expr) bool {
-	switch x := expr.(type) {
-	case *ast.Ident:
-		c.tagger.buildTags[x.Name] = true
-		return c.tags[x.Name]
-
-	case *ast.BinaryExpr:
-		switch x.Op {
-		case token.LAND:
-			return c.shouldInclude(x.X) && c.shouldInclude(x.Y)
-
-		case token.LOR:
-			return c.shouldInclude(x.X) || c.shouldInclude(x.Y)
-
-		default:
-			c.err = errors.Append(c.err, errors.Newf(token.NoPos,
-				"invalid operator %v", x.Op))
-			return false
-		}
-
-	case *ast.UnaryExpr:
-		if x.Op != token.NOT {
-			c.err = errors.Append(c.err, errors.Newf(token.NoPos,
-				"invalid operator %v", x.Op))
-		}
-		return !c.shouldInclude(x.X)
-
-	default:
-		c.err = errors.Append(c.err, errors.Newf(token.NoPos,
-			"invalid type %T in build attribute", expr))
-		return false
-	}
 }

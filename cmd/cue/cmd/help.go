@@ -96,6 +96,7 @@ func newHelpCmd(c *Command) *cobra.Command {
 
 var helpTopics = []*cobra.Command{
 	commandsHelp,
+	embedHelp,
 	environmentHelp,
 	filetypeHelp,
 	flagsHelp,
@@ -169,6 +170,21 @@ $ cue export ./pkg -d Foo foo.yaml
 # Unify data.json with schema.json.
 $ cue export data.json schema: schema.json
 `,
+}
+
+var embedHelp = &cobra.Command{
+	Use:   "embed",
+	Short: "file embedding",
+	Long: `
+The @embed directive can be used to load files of any type as part of CUE
+evaluation.
+
+Note: support for embed is experimental, and is enabled via
+CUE_EXPERIMENT=embed.
+
+For more details and discussion, see the proposal linked from
+https://cuelang.org/dicsussion/3264.
+`[1:],
 }
 
 var environmentHelp = &cobra.Command{

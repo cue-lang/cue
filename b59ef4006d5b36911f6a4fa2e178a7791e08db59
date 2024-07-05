@@ -33,6 +33,24 @@
       "message": "this godoc can very easily be two lines, one per sentence.",
       "revId": "b59ef4006d5b36911f6a4fa2e178a7791e08db59",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13a460bd_c89cd034",
+        "filename": "cue/load/tags.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-05T12:54:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "070353cb_b3736f89",
+      "revId": "b59ef4006d5b36911f6a4fa2e178a7791e08db59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

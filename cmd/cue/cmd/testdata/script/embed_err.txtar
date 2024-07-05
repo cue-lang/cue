@@ -47,6 +47,9 @@ norm4: _ @embed(file="x//test.json")
 
 noTranslateBS: _ @embed(file="x\\test.json")
 
+autoCUEfiletype: _ @embed(file="x.cue")
+explicitCUEfiletype: _ @embed(file=xcue, type=cue)
+
 -- test.json --
 { "x": 34 }
 -- test.ldjson --
@@ -67,6 +70,10 @@ a1: 2
 a1: 2
 -- test.textproto --
 a: 1
+-- x.cue --
+x: 5
+-- xcue --
+x: 5
 -- out/std --
 -- out/err --
 @embed: attribute must have file or glob field:

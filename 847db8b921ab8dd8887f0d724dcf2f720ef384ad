@@ -90,6 +90,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5a6c53b8_843cd0a9",
+        "filename": "cue/load/instances.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-05T11:23:14Z",
+      "side": 1,
+      "message": "Are you sure? I see `isTest` in fileProcessor.add, as well as a search for a _test.cue suffix in countCUEFiles. I can\u0027t say how well this all worked, given we don\u0027t seem to have testscripts for it, but at the very least the code is there.\n\nI\u0027m fine with leaving this for a subsequent CL as long as it\u0027s tracked somewhere - either as the same issue or as a new one, up to you.",
+      "parentUuid": "2e181ab1_9fc39245",
+      "revId": "847db8b921ab8dd8887f0d724dcf2f720ef384ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6ee68627_28ee1a61",
         "filename": "internal/mod/modpkgload/pkgload.go",
         "patchSetId": 1
@@ -119,6 +137,24 @@
       "side": 1,
       "message": "\u003e you seem to need \"always return false\" twice where \"always return true\" is only needed once\n\nI don\u0027t understand this. I don\u0027t think I use \"always return false\" anywhere, and \"always return true\" is only used once, implicitly by passing nil in the modpkgload tests themselves.\n\nI don\u0027t see how `IncludeNoFiles` would ever be useful in practice.\n\nFrom my p.o.v., including all files seems like a natural default, but given your difference of opinion, I\u0027ll just remove the defaulting behaviour. It\u0027s not public API anyway.",
       "parentUuid": "6ee68627_28ee1a61",
+      "revId": "847db8b921ab8dd8887f0d724dcf2f720ef384ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b6b1160_a9785cf8",
+        "filename": "internal/mod/modpkgload/pkgload.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-05T11:23:14Z",
+      "side": 1,
+      "message": "ah, I had gotten mixed up with shouldBuildFile, my bad. but removing the default given it\u0027s only used once seems good to me.",
+      "parentUuid": "77c66003_e6d8eb40",
       "revId": "847db8b921ab8dd8887f0d724dcf2f720ef384ad",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

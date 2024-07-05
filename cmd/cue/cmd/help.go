@@ -214,6 +214,9 @@ If an environment variable is unset or empty, sensible default setting is used.
 		evalv3
 			Enable the new CUE evaluator, addressing performance issues
 			and bringing a better disjunction algorithm.
+		embed
+			Enable support for embedded data files as described in
+			https://cuelang.org/discussion/3264.
 
 	CUE_DEBUG
 		Comma-separated list of debug flags to enable or disable, such as:

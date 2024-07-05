@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "f6ebd4cf_1dc79b45",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-05T11:16:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4045a2c9_f7f0790b",
+      "revId": "847db8b921ab8dd8887f0d724dcf2f720ef384ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "cc8bd2ea_6efbc598",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -54,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2e181ab1_9fc39245",
+        "filename": "cue/load/instances.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-05T11:16:49Z",
+      "side": 1,
+      "message": "That\u0027s a good point, although the Tests field is never actually used in the cue repo and there\u0027s not a single example of a `_test.cue` file in the code or tests currently...\n\nI\u0027ll add support for that in a subsequent CL - given the above, I don\u0027t think it needs to happen in this one.",
+      "parentUuid": "3ee16cd4_9e3538ee",
+      "revId": "847db8b921ab8dd8887f0d724dcf2f720ef384ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6ee68627_28ee1a61",
         "filename": "internal/mod/modpkgload/pkgload.go",
         "patchSetId": 1
@@ -65,6 +101,24 @@
       "writtenOn": "2024-07-05T08:35:25Z",
       "side": 1,
       "message": "nil as always true seems a bit subtle - and you seem to need \"always return false\" twice where \"always return true\" is only needed once.\n\nhow about requiring the func to never be nil, and exposing two funcs like `IncludeAllFiles` and `IncludeNoFiles` which can be used in all cases above in a very self-explanatory way? you\u0027re declaring the funcs anyway, just in various bits of inline code.",
+      "revId": "847db8b921ab8dd8887f0d724dcf2f720ef384ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77c66003_e6d8eb40",
+        "filename": "internal/mod/modpkgload/pkgload.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-05T11:16:49Z",
+      "side": 1,
+      "message": "\u003e you seem to need \"always return false\" twice where \"always return true\" is only needed once\n\nI don\u0027t understand this. I don\u0027t think I use \"always return false\" anywhere, and \"always return true\" is only used once, implicitly by passing nil in the modpkgload tests themselves.\n\nI don\u0027t see how `IncludeNoFiles` would ever be useful in practice.\n\nFrom my p.o.v., including all files seems like a natural default, but given your difference of opinion, I\u0027ll just remove the defaulting behaviour. It\u0027s not public API anyway.",
+      "parentUuid": "6ee68627_28ee1a61",
       "revId": "847db8b921ab8dd8887f0d724dcf2f720ef384ad",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -82,6 +136,24 @@
       "writtenOn": "2024-07-05T08:35:25Z",
       "side": 1,
       "message": "that\u0027s a nice new error; I don\u0027t see a test case for it though",
+      "revId": "847db8b921ab8dd8887f0d724dcf2f720ef384ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58cb9905_37309f95",
+        "filename": "internal/mod/modpkgload/pkgload.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-05T11:16:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "07e25cc5_83525ab0",
       "revId": "847db8b921ab8dd8887f0d724dcf2f720ef384ad",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4045a2c9_f7f0790b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-05T08:35:25Z",
+      "side": 1,
+      "message": "slightly over the limit even though you continue below",
+      "revId": "847db8b921ab8dd8887f0d724dcf2f720ef384ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc8bd2ea_6efbc598",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-05T08:35:25Z",
+      "side": 1,
+      "message": "SGTM in principle but I think you forgot about cfg.Tests. Or if you meant to tackle that in a separate commit, 3180 can\u0027t be fully fixed yet.",
+      "revId": "847db8b921ab8dd8887f0d724dcf2f720ef384ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ee16cd4_9e3538ee",
+        "filename": "cue/load/instances.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-05T08:35:25Z",
+      "side": 1,
+      "message": "what about cfg.Tests? note that the github issue also mentions the bug for cfg.Tools likely happens for cfg.Tests too. assuming you missed that, we would need a test case for them as well.",
+      "revId": "847db8b921ab8dd8887f0d724dcf2f720ef384ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ee68627_28ee1a61",
+        "filename": "internal/mod/modpkgload/pkgload.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-05T08:35:25Z",
+      "side": 1,
+      "message": "nil as always true seems a bit subtle - and you seem to need \"always return false\" twice where \"always return true\" is only needed once.\n\nhow about requiring the func to never be nil, and exposing two funcs like `IncludeAllFiles` and `IncludeNoFiles` which can be used in all cases above in a very self-explanatory way? you\u0027re declaring the funcs anyway, just in various bits of inline code.",
+      "revId": "847db8b921ab8dd8887f0d724dcf2f720ef384ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07e25cc5_83525ab0",
+        "filename": "internal/mod/modpkgload/pkgload.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-05T08:35:25Z",
+      "side": 1,
+      "message": "that\u0027s a nice new error; I don\u0027t see a test case for it though",
+      "revId": "847db8b921ab8dd8887f0d724dcf2f720ef384ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

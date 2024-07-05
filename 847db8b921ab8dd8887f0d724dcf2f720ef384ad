@@ -106,6 +106,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7eedd768_e4f96549",
+        "filename": "cue/load/instances.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-05T12:53:17Z",
+      "side": 1,
+      "message": "Yeah, there\u0027s code in cue/load for including _test.cue files but there\u0027s no way to include _test.cue files as part of regular evaluation. (I wasn\u0027t quite right in my assertion: cue/load.Config.Tests is set as part of `cue fix` and `cue fmt` but nowhere else, and all tests pass if the field is never set to true).\n\nI\u0027ve raised an issue to track this: https://github.com/cue-lang/cue/issues/3272",
+      "parentUuid": "5a6c53b8_843cd0a9",
+      "revId": "847db8b921ab8dd8887f0d724dcf2f720ef384ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6ee68627_28ee1a61",

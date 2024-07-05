@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f12f65d0_f8c1fb06",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-05T11:17:52Z",
+      "side": 1,
+      "message": "I had this in a draft and forgot to send the +2, my bad.",
+      "revId": "b59ef4006d5b36911f6a4fa2e178a7791e08db59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "070353cb_b3736f89",
+        "filename": "cue/load/tags.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-05T11:17:52Z",
+      "side": 1,
+      "message": "this godoc can very easily be two lines, one per sentence.",
+      "revId": "b59ef4006d5b36911f6a4fa2e178a7791e08db59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

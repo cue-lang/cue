@@ -38,13 +38,6 @@ special: {
 	dotFile:        _ @embed(file="y/.test.json")
 	underscoreDir:  _ @embed(file="_y/test.json")
 	dotDir:         _ @embed(file=".y/test.json")
-
-	// TODO: fix nested modules are currently not supported, but we may opt to
-	// support them in the future. This is currently not handled. It should
-	// probably be up to the loader to provide a fs.FS that handles this
-	// according to spec.
-	nestedModJSON: _ @embed(file="a/b/foo.json")
-	nestedModFile: _ @embed(file="a/b/cue.mod/modules.cue")
 }
 
 -- test.json --
@@ -123,8 +116,6 @@ special: {
     dotFile:        _
     underscoreDir:  _
     dotDir:         _
-    nestedModJSON:  _
-    nestedModFile:  _
 }
 -- out/eval --
 a: {
@@ -215,16 +206,6 @@ special: {
     dotDir: {
         z: 48
     }
-    nestedModJSON: {
-        a: 1
-        b: 2
-    }
-    nestedModFile: {
-        module: "acme.com"
-        language: {
-            version: "v0.9.0"
-        }
-    }
 }
 -- out/export --
 a: x:  34
@@ -276,18 +257,5 @@ special: {
 	dotFile: z:        46
 	underscoreDir: z:  47
 	dotDir: z:         48
-
-	// TODO: fix nested modules are currently not supported, but we may opt to
-	// support them in the future. This is currently not handled. It should
-	// probably be up to the loader to provide a fs.FS that handles this
-	// according to spec.
-	nestedModJSON: {
-		a: 1
-		b: 2
-	}
-	nestedModFile: {
-		module: "acme.com"
-		language: version: "v0.9.0"
-	}
 }
 -- out/vet --

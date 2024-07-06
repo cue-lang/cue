@@ -269,14 +269,19 @@ func ParseFileAndType(file, scope string, mode Mode) (*build.File, error) {
 	// Quickly discard files which we aren't interested in.
 	// These cases are very common when loading `./...` in a large repository.
 	typesInit()
-	if scope == "" {
+	if scope == "" && file != "-" {
 		ext := fileExt(file)
-		if file == "-" {
-			// not handled here
-		} else if ext == "" {
+		if ext == "" {
 			return nil, errors.Newf(token.NoPos, "no encoding specified for file %q", file)
-		} else if !knownExtensions[ext] {
+		}
+		f, ok := fileForExt[ext]
+		if !ok {
 			return nil, errors.Newf(token.NoPos, "unknown file extension %s", ext)
+		}
+		if mode == Input {
+			f1 := *f
+			f1.Filename = file
+			return &f1, nil
 		}
 	}
 	modeVal, fileVal, err := parseType(scope, mode)

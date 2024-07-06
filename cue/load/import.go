@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"os"
 	pathpkg "path"
 	"path/filepath"
 	"slices"
@@ -155,12 +154,17 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 				}
 				return retErr(errors.Wrapf(err, token.NoPos, "import failed reading dir %v", dir))
 			}
-			p.UnknownFiles = append(p.UnknownFiles, sd.unknownFiles...)
-			for _, f := range sd.buildFiles {
-				bf := *f
-				fp.add(dir, &bf, importComment)
+			for _, name := range sd.filenames {
+				file, err := filetypes.ParseFileAndType(name, "", filetypes.Input)
+				if err != nil {
+					p.UnknownFiles = append(p.UnknownFiles, &build.File{
+						Filename:      name,
+						ExcludeReason: errors.Newf(token.NoPos, "unknown filetype"),
+					})
+				} else {
+					fp.add(dir, file, importComment)
+				}
 			}
-
 			if p.PkgName == "" || !inModule || l.cfg.isModRoot(dir) || dir == d[0] {
 				break
 			}
@@ -210,33 +214,31 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	return all
 }
 
-func (l *loader) scanDir(dir string) cachedFileFiles {
-	sd := cachedFileFiles{}
+func (l *loader) scanDir(dir string) cachedDirFiles {
 	files, err := l.cfg.fileSystem.readDir(dir)
 	if err != nil {
-		sd.err = err
-		return sd
+		return cachedDirFiles{
+			err: err,
+		}
 	}
+	filenames := make([]string, 0, len(files))
 	for _, f := range files {
 		if f.IsDir() {
 			continue
 		}
-		if f.Name() == "-" {
-			if _, err := l.cfg.fileSystem.stat("-"); !os.IsNotExist(err) {
-				continue
-			}
+		name := f.Name()
+		if name == "-" {
+			// The name "-" has a special significance to the file types
+			// logic, but only when specified directly on the command line,
+			// so avoid that by making sure we don't see a naked "-"
+			// even when a file of that name is present in a directory.
+			name = "./-"
 		}
-		file, err := filetypes.ParseFile(f.Name(), filetypes.Input)
-		if err != nil {
-			sd.unknownFiles = append(sd.unknownFiles, &build.File{
-				Filename:      f.Name(),
-				ExcludeReason: errors.Newf(token.NoPos, "unknown filetype"),
-			})
-			continue // skip unrecognized file types
-		}
-		sd.buildFiles = append(sd.buildFiles, file)
+		filenames = append(filenames, name)
 	}
-	return sd
+	return cachedDirFiles{
+		filenames: filenames,
+	}
 }
 
 func setFileSource(cfg *Config, f *build.File) error {

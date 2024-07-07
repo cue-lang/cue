@@ -303,6 +303,8 @@ func (c *compiler) decodeFile(file, scope string, schema adt.Value) (adt.Expr, e
 	}
 
 	switch f.Encoding {
+	case build.CUE:
+		return nil, errors.Newf(c.pos, "encoding %q not (yet) supported", f.Encoding)
 	case build.JSONL:
 		return nil, errors.Newf(c.pos, "encoding %q not (yet) supported: requires support for streaming", f.Encoding)
 	case build.BinaryProto, build.TextProto:

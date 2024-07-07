@@ -114,3 +114,7 @@ x: 5
     ./test.cue:39:10
 @embed: open x\test.json: no such file or directory:
     ./test.cue:41:18
+@embed: encoding "cue" not (yet) supported:
+    ./test.cue:43:20
+@embed: encoding "cue" not (yet) supported:
+    ./test.cue:44:24

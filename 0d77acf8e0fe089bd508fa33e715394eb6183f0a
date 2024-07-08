@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e10076aa_3fc89502",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-08T14:46:19Z",
+      "side": 1,
+      "message": "is a test worthwhile? e.g. we already have dotFile",
+      "revId": "0d77acf8e0fe089bd508fa33e715394eb6183f0a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea4c42f3_0eec8b77",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-08T14:46:19Z",
+      "side": 1,
+      "message": "path.Join for consistency (you also use it below in the other bit of new code)",
+      "revId": "0d77acf8e0fe089bd508fa33e715394eb6183f0a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b96b3e38_f7c7df79",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-08T14:46:19Z",
+      "side": 1,
+      "message": "nit: I\u0027d use %q for filenames, as they may contain spaces or any other sort of odd characters. also elsewhere, including existing error messages.",
+      "revId": "0d77acf8e0fe089bd508fa33e715394eb6183f0a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

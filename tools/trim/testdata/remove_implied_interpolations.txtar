@@ -1,0 +1,18 @@
+-- in.cue --
+foo: [string]: {
+	a: string
+	b: "--\(a)--"
+}
+foo: entry: {
+	a: "insert"
+	b: "--insert--"
+}
+-- out/trim --
+== in.cue
+foo: [string]: {
+	a: string
+	b: "--\(a)--"
+}
+foo: entry: {
+	a: "insert"
+}

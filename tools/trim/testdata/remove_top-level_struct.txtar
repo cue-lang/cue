@@ -1,0 +1,29 @@
+-- in.cue --
+a: b: 3
+for k, v in a {
+	c: "\(k)": v
+}
+c: b: 3
+
+z: {
+
+	a: b: 3
+	for k, v in a {
+		c: "\(k)": v
+	}
+	c: b: 3
+}
+-- out/trim --
+== in.cue
+a: b: 3
+for k, v in a {
+	c: "\(k)": v
+}
+
+z: {
+
+	a: b: 3
+	for k, v in a {
+		c: "\(k)": v
+	}
+}

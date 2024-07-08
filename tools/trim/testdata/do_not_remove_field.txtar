@@ -1,0 +1,7 @@
+-- in.cue --
+{[_]: x: "hello"}
+a: x: "hello"
+-- out/trim --
+== in.cue
+{[_]: x: "hello"}
+a: {}

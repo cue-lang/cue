@@ -16,6 +16,24 @@
       "message": "Why do we not support cue? That seems like a somewhat gratuitous limitation.",
       "revId": "f94eba2270598bf8e5f2714247c82016f488abc7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "be2b4c89_ca1793ae",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-08T14:02:53Z",
+      "side": 1,
+      "message": "https://github.com/cue-lang/cue/issues/3258 motivates the open questions. Per the design doc, not against it: effectively punting for now, until such time as we more precisely define what it means, any limitations etc.",
+      "parentUuid": "486ef56a_b1b6c724",
+      "revId": "f94eba2270598bf8e5f2714247c82016f488abc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

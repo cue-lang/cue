@@ -57,7 +57,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           cache: false
-          go-version: 1.22.4
+          go-version: 1.22.5
       - name: Setup qemu
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
@@ -74,7 +74,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v5
         with:
           install-only: true
-          version: v1.26.1
+          version: v2.0.1
       - name: Run GoReleaser with CUE
         run: cue cmd release
         working-directory: ./internal/ci/goreleaser

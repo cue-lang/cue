@@ -16,6 +16,24 @@
       "message": "The other topics seem to be nouns.\n```suggestion\n\tShort: \"file embedding\",\n```",
       "revId": "a82d5c2f5f572feff78899193b85a5369b6ffb8b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b133044_7bba6126",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-08T11:55:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c6037665_c10c6ca7",
+      "revId": "a82d5c2f5f572feff78899193b85a5369b6ffb8b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

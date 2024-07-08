@@ -1,6 +1,40 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f96f3d9_1a90eb1d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-08T13:16:19Z",
+      "side": 1,
+      "message": "given that this test removes TestFiles, can you briefly mention what test will run these new txtar testdata files now? assuming it\u0027s an existing test, it\u0027s not obvious to me from looking at the diff.",
+      "revId": "8dc3b55354c3c0e70ee34c1a1e73d08217c36820",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aeb7967f_9bd96513",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-08T13:16:19Z",
+      "side": 1,
+      "message": "nit: keep the prose in the present consistently: \"Convert\" here, and you already have \"Remove\" in the next line.",
+      "revId": "8dc3b55354c3c0e70ee34c1a1e73d08217c36820",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "246c6d82_c661b459",

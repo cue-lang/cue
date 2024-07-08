@@ -170,6 +170,7 @@ modes: [string]: {
 		".yml":       tags.yaml
 		".txt":       tags.text
 		".go":        tags.go
+		".wasm":      tags.wasm
 		".proto":     tags.proto
 		".textproto": tags.textproto
 		".textpb":    tags.textproto // perhaps also pbtxt
@@ -356,6 +357,11 @@ tags: {
 		encoding:       "code"
 		interpretation: ""
 		tags: lang: "go"
+	}
+	wasm: {
+		encoding:       "code"
+		interpretation: ""
+		tags: lang: "wasm"
 	}
 	code: {
 		encoding:       "code"

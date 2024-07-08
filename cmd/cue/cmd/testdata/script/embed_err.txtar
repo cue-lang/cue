@@ -50,6 +50,12 @@ noTranslateBS: _ @embed(file="x\\test.json")
 autoCUEfiletype: _ @embed(file="x.cue")
 explicitCUEfiletype: _ @embed(file=xcue, type=cue)
 
+// intentional missing type arg
+unspecifiedFiletype1: _ @embed(glob=x/*.*)
+unspecifiedFiletype2: _ @embed(glob=x/*)
+unspecifiedFiletype3: _ @embed(glob=x/*.?son)
+unspecifiedFiletype4: _ @embed(glob=x/*.[j]son)
+
 -- test.json --
 { "x": 34 }
 -- test.ldjson --
@@ -116,3 +122,11 @@ x: 5
     ./test.cue:43:20
 @embed: encoding "cue" not (yet) supported:
     ./test.cue:44:24
+@embed: extension not fully specified; type argument required:
+    ./test.cue:47:25
+@embed: extension not fully specified; type argument required:
+    ./test.cue:48:25
+@embed: extension not fully specified; type argument required:
+    ./test.cue:49:25
+@embed: extension not fully specified; type argument required:
+    ./test.cue:50:25

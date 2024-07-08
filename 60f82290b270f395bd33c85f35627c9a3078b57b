@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7879961_728cc687",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-08T11:57:17Z",
+      "side": 1,
+      "message": "PTAL at the stack @rogpeppe@gmail.com - changes made with one exception where I defer to you.",
+      "revId": "60f82290b270f395bd33c85f35627c9a3078b57b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

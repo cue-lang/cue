@@ -139,7 +139,7 @@ type compiler struct {
 
 	// file system cache
 	dir string
-	fs  fs.FS
+	fs  fs.StatFS
 	pos token.Pos
 }
 
@@ -178,7 +178,7 @@ func (c *compiler) Compile(funcName string, scope adt.Value, a *internal.Attr) (
 	// TODO: obtain a fs.FS from load or something similar.
 	dir := filepath.Dir(pos.File().Name())
 	if c.dir != dir {
-		c.fs = os.DirFS(dir)
+		c.fs = os.DirFS(dir).(fs.StatFS) // Documented as implementing fs.StatFS
 		c.dir = dir
 	}
 
@@ -213,7 +213,7 @@ func (c *compiler) processGlob(glob, scope string, schema adt.Value) (adt.Expr, 
 	}
 
 	if strings.Contains(glob, "**") {
-		return nil, errors.Newf(c.pos, "double star not supported in glob")
+		return nil, errors.Newf(c.pos, "double star not (yet) supported in glob")
 	}
 
 	m := &adt.StructLit{}
@@ -224,6 +224,15 @@ func (c *compiler) processGlob(glob, scope string, schema adt.Value) (adt.Expr, 
 	}
 
 	for _, f := range matches {
+		// TODO: lots of stat calls happening in this MVP so another won't hurt.
+		// We don't support '**' initially, and '*' only matches files, so skip
+		// any directories.
+		if fi, err := c.fs.Stat(f); err != nil {
+			return nil, errors.Newf(c.pos, "failed to stat %s: %v", f, err)
+		} else if fi.IsDir() {
+			continue
+		}
+
 		expr, err := c.decodeFile(f, scope, schema)
 		if err != nil {
 			return nil, err

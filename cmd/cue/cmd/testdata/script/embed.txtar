@@ -23,14 +23,13 @@ b: _ @embed(file="input.yaml")
 
 c: _ @embed(file="test.json", type=text)
 
-d: _ @embed(glob="y/*.*", type=yaml)
+d: _ @embed(glob="y/*", type=yaml)
 
 d: _ @embed(glob="x/*.yaml") // merge into the same map
 
 f: _ @embed(file="openapi.json", type=openapi)
 
 g: _ @embed(file="openapi.json") // test no auto mode!
-
 
 special: {
 	// These are all valid.
@@ -61,6 +60,8 @@ a1: 2
 { "z": 47 }
 -- .y/test.json --
 { "z": 48 }
+-- y/subdir/another.json --
+{ "z": 49 }
 -- _z/test.json --
 -- x/input.yaml --
 a1: 2

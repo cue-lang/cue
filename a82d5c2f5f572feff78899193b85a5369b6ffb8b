@@ -16,6 +16,24 @@
       "message": "I think the comment is misleading here. When it says \"nested modules are currently not supported\", I\u0027m pretty sure it means \"the code does not currently correctly recognize module boundaries\". That is, these cases _should_ be errors but are not currently until the implementation is improved. I don\u0027t think we should remove them.",
       "revId": "a82d5c2f5f572feff78899193b85a5369b6ffb8b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b2eab68_318bfb32",
+        "filename": "cmd/cue/cmd/testdata/script/embed.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-08T11:55:50Z",
+      "side": 0,
+      "message": "Good catch. I was going to implement this right afterwards, but clearly got distracted and did another issue instead. Commit message also fixed.",
+      "parentUuid": "2afc63b8_1801e767",
+      "revId": "a82d5c2f5f572feff78899193b85a5369b6ffb8b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

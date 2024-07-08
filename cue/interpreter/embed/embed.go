@@ -216,6 +216,16 @@ func (c *compiler) processGlob(glob, scope string, schema adt.Value) (adt.Expr, 
 		return nil, errors.Newf(c.pos, "double star not (yet) supported in glob")
 	}
 
+	// If we do not have a type, ensure the extension of the base is fully
+	// specified, i.e. does not contain any meta characters as specified by
+	// path.Match.
+	if scope == "" {
+		ext := path.Ext(path.Base(glob))
+		if ext == "" || strings.ContainsAny(ext, "*?[]") || strings.Contains(ext, `\\`) {
+			return nil, errors.Newf(c.pos, "extension not fully specified; type argument required")
+		}
+	}
+
 	m := &adt.StructLit{}
 
 	matches, err := fs.Glob(c.fs, glob)

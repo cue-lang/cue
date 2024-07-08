@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc01ccfe_5ddf182d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-08T09:27:26Z",
+      "side": 1,
+      "message": "LGTM except that I don\u0027t think the two module boundary test cases should be removed.",
+      "revId": "21a9a156e9829a29dc26a33ec7a872b00148f682",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a26272ba_ee21a37f",
+        "filename": "cmd/cue/cmd/testdata/script/embed_err.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-08T09:27:26Z",
+      "side": 1,
+      "message": "I have to say the division of the test cases between embed.txtar and embed_err.txtar makes it awkward to see the change made when a case goes from\nerror to non-error or vice versa. These two cases don\u0027t fit the pattern of this\nfile where all the cases are errors, but I do see why you\u0027re doing it. I wish it were possible to combine the two files into one...",
+      "revId": "21a9a156e9829a29dc26a33ec7a872b00148f682",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+-- in.cue --
+foo: c: true
+foo: #M
+#M: c?: bool
+-- out/trim --
+== in.cue
+foo: c: true
+foo: #M
+#M: c?: bool

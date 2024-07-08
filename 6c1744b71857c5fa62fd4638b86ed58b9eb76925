@@ -69,6 +69,24 @@
       "parentUuid": "98ca5c84_e1c5f31a",
       "revId": "6c1744b71857c5fa62fd4638b86ed58b9eb76925",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "200228a5_fd2be26c",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-08T12:00:04Z",
+      "side": 1,
+      "message": "Thanks for the offline explanation. Fixed per your suggestion.",
+      "parentUuid": "9fa3b736_786adc03",
+      "revId": "6c1744b71857c5fa62fd4638b86ed58b9eb76925",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

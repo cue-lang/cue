@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "246c6d82_c661b459",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-07-08T13:01:53Z",
+      "side": 1,
+      "message": "The txtar file names were taken from the original names of the tests, but that does make them a bit \"wordy\". Not sure if the preference is for the test names to be explicit (so could be found using tools like \"find\"), or whether these names should be moved into comments in the txtar (so could be found using tools like \"grep\").",
+      "revId": "8dc3b55354c3c0e70ee34c1a1e73d08217c36820",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

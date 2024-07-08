@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "486ef56a_b1b6c724",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-07-08T13:52:45Z",
+      "side": 1,
+      "message": "Why do we not support cue? That seems like a somewhat gratuitous limitation.",
+      "revId": "f94eba2270598bf8e5f2714247c82016f488abc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

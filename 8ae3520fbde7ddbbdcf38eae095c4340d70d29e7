@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c428d5fd_904c44d2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-08T15:19:11Z",
+      "side": 1,
+      "message": "My understanding from the conversations before my holiday is that we\u0027ll be bumping LanguageVersion in the codebase with every release, including bugfix releases, and treat language.version from cue.mod/module.cue files as a hard minimum to compare LanguageVersion against, much like cmd/go treats its \"go\" directive as a hard minimum.\n\nThe latest patch hence removes a bunch of TODOs, as my previous thinking was that we would be more loose to ignore the bugfix version number in the comparison.",
+      "revId": "8ae3520fbde7ddbbdcf38eae095c4340d70d29e7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

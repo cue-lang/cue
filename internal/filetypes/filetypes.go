@@ -184,16 +184,6 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 					continue
 				}
 
-				// The CUE command works just fine without this (how?),
-				// but the API tests require this for some reason.
-				//
-				// This is almost certainly wrong, and in the wrong place.
-				//
-				// TODO(aram): why do we need this here?
-				if len(a) == 1 && strings.HasSuffix(a[0], ".wasm") {
-					continue
-				}
-
 				modeVal, fileVal, err = parseType("", Input)
 				if err != nil {
 					return nil, err

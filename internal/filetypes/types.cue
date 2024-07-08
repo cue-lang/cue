@@ -3,7 +3,7 @@
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
@@ -170,6 +170,7 @@ modes: [string]: {
 		".yml":       tags.yaml
 		".txt":       tags.text
 		".go":        tags.go
+		".wasm":      tags.wasm
 		".proto":     tags.proto
 		".textproto": tags.textproto
 		".textpb":    tags.textproto // perhaps also pbtxt
@@ -356,6 +357,11 @@ tags: {
 		encoding:       "code"
 		interpretation: ""
 		tags: lang: "go"
+	}
+	wasm: {
+		encoding:       "code"
+		interpretation: ""
+		tags: lang: "wasm"
 	}
 	code: {
 		encoding:       "code"

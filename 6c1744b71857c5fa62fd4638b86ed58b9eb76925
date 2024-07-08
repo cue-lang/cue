@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c7ed0a4_3debb95b",
+        "filename": "cmd/cue/cmd/testdata/script/embed_err.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-08T10:25:52Z",
+      "side": 1,
+      "message": "Perhaps have cases for other kinds of glob pattern characters too?",
+      "revId": "6c1744b71857c5fa62fd4638b86ed58b9eb76925",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98ca5c84_e1c5f31a",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-08T10:25:52Z",
+      "side": 1,
+      "message": "I don\u0027t understand why we\u0027re checking for an escaped backslash here specifically. Also, `]` isn\u0027t a metacharacter in itself.\nSo why not just:\n\n\n```suggestion\n\t\tif ext \u003d\u003d \"\" || strings.ContainsAny(ext, \"*?[\\\\\") {\n```",
+      "revId": "6c1744b71857c5fa62fd4638b86ed58b9eb76925",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+-- in.cue --
+foo: [string]: {
+	t: [string]: {
+		x: >=0 & <=5
+	}
+}
+
+foo: multipath: {
+	t: [string]: {
+		// Combined with the other constraints, we know the value must be 5 and
+		// thus the entry below can be eliminated.
+		x: >=5 & <=8 & int
+	}
+
+	t: u: { x: 5 }
+}
+
+group: {
+	for k, v in foo {
+		comp: "\(k)": v
+	}
+}
+-- out/trim --
+== in.cue
+foo: [string]: {
+	t: [string]: {
+		x: >=0 & <=5
+	}
+}
+
+foo: multipath: {
+	t: [string]: {
+		// Combined with the other constraints, we know the value must be 5 and
+		// thus the entry below can be eliminated.
+		x: >=5 & <=8 & int
+	}
+
+	t: u: {}
+}
+
+group: {
+	for k, v in foo {
+		comp: "\(k)": v
+	}
+}

@@ -1,0 +1,27 @@
+-- in.cue --
+foo: multipath: {
+	t: [string]: { x: 5 }
+
+	// Don't remove u!
+	t: u: { x: 5 }
+}
+
+group: {
+	for k, v in foo {
+		comp: "\(k)": v
+	}
+}
+-- out/trim --
+== in.cue
+foo: multipath: {
+	t: [string]: {x: 5}
+
+	// Don't remove u!
+	t: u: {}
+}
+
+group: {
+	for k, v in foo {
+		comp: "\(k)": v
+	}
+}

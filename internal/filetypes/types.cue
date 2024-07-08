@@ -170,6 +170,7 @@ modes: [string]: {
 		".yml":       tags.yaml
 		".txt":       tags.text
 		".go":        tags.go
+		".wasm":      tags.binary
 		".proto":     tags.proto
 		".textproto": tags.textproto
 		".textpb":    tags.textproto // perhaps also pbtxt

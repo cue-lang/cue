@@ -54,17 +54,6 @@ func TestWasm(t *testing.T) {
 
 		bi := t.Instance()
 
-		// the BuildInstance created above doesn't know about
-		// the .wasm files (why not?), so add them here.
-		for _, f := range t.Archive.Files {
-			if strings.HasSuffix(f.Name, ".wasm") {
-				bf := &build.File{
-					Filename: f.Name,
-				}
-				bi.UnknownFiles = append(bi.UnknownFiles, bf)
-			}
-		}
-
 		v := ctx.BuildInstance(bi)
 		err := v.Validate()
 

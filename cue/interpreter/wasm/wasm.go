@@ -71,19 +71,19 @@ type compiler struct {
 // attribute and returns it as an [adt.Builtin] with the given function
 // name.
 func (c *compiler) Compile(funcName string, scope adt.Value, a *internal.Attr) (adt.Expr, errors.Error) {
-	file, err := fileName(a)
+	baseFile, err := fileName(a)
 	if err != nil {
 		return nil, errors.Promote(err, "invalid attribute")
 	}
 	// TODO: once we have position information, make this
 	// error more user-friendly by returning the position.
-	if !strings.HasSuffix(file, "wasm") {
-		return nil, errors.Newf(token.NoPos, "load %q: invalid file name", file)
+	if !strings.HasSuffix(baseFile, "wasm") {
+		return nil, errors.Newf(token.NoPos, "load %q: invalid file name", baseFile)
 	}
 
-	file, found := findFile(file, c.b)
+	file, found := findFile(baseFile, c.b)
 	if !found {
-		return nil, errors.Newf(token.NoPos, "load %q: file not found", file)
+		return nil, errors.Newf(token.NoPos, "load %q: file not found", baseFile)
 	}
 
 	inst, err := c.instance(file)
@@ -118,16 +118,15 @@ func (c *compiler) instance(filename string) (inst *instance, err error) {
 	return inst, nil
 }
 
-// findFile searches the build.Instance for name. If found, it returnes
-// its full path name and true, otherwise it returns the original name
-// and false.
+// findFile searches the build.Instance for the given file name
+// and reports its fill name and whether it was found.
 func findFile(name string, b *build.Instance) (path string, found bool) {
-	for _, f := range b.UnknownFiles {
-		if f.Filename == name {
-			return filepath.Join(b.Dir, name), true
+	for _, f := range b.OrphanedFiles {
+		if filepath.Base(f.Filename) == name {
+			return f.Filename, true
 		}
 	}
-	return name, false
+	return "", false
 }
 
 // fileName returns the file name of the external module specified in a,

@@ -56,6 +56,9 @@ unspecifiedFiletype2: _ @embed(glob=x/*)
 unspecifiedFiletype3: _ @embed(glob=x/*.?son)
 unspecifiedFiletype4: _ @embed(glob=x/*.[j]son)
 
+nestedModJSON: _ @embed(file="a/b/foo.json")
+nestedModJSONWithGlob: _ @embed(glob="a/*/*.json")
+
 -- test.json --
 { "x": 34 }
 -- test.ldjson --
@@ -80,6 +83,11 @@ a: 1
 x: 5
 -- xcue --
 x: 5
+-- a/b/cue.mod/modules.cue --
+module: "acme.com"
+language: version: "v0.9.0"
+-- a/b/foo.json --
+{"a": 1, "b": 2}
 -- out/std --
 -- out/err --
 @embed: attribute must have file or glob field:
@@ -130,3 +138,7 @@ x: 5
     ./test.cue:49:25
 @embed: extension not fully specified; type argument required:
     ./test.cue:50:25
+@embed: cannot embed file a/b/foo.json: in different module:
+    ./test.cue:52:18
+@embed: cannot embed file a/b/foo.json: in different module:
+    ./test.cue:53:26

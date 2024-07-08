@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdcb8439_a3bd3fcf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-08T10:43:17Z",
+      "side": 1,
+      "message": "what did `cue mod resolve .` do before this change? did it fail? it would be good to clarify in the commit message.",
+      "revId": "54a691c1236d6e2b294fe65f60f932dd2920766c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -86,15 +86,13 @@ x: 5
     ./test.cue:11:8
 @embed: open y/test.json: no such file or directory:
     ./test.cue:13:13
-@embed: cannot embed directories:
-    ./test.cue:15:8
 @embed: path not normalized, use "x" instead:
     ./test.cue:17:13
 @embed: cannot refer to parent directory:
     ./test.cue:19:15
 @embed: only relative files are allowed:
     ./test.cue:21:12
-@embed: double star not supported in glob:
+@embed: double star not (yet) supported in glob:
     ./test.cue:23:15
 @embed: streaming not implemented: found more than one value in file:
     ./test.cue:25:11

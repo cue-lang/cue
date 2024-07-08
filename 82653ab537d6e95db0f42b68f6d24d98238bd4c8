@@ -16,6 +16,24 @@
       "message": "Shouldn\u0027t these be added to embed.txtar so that the output is generated?",
       "revId": "82653ab537d6e95db0f42b68f6d24d98238bd4c8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0c64d55_df0d5bfb",
+        "filename": "cmd/cue/cmd/testdata/script/embed_err.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-08T14:21:19Z",
+      "side": 1,
+      "message": "This CL is about adding a test case for something that shouldn\u0027t (according to the design) work, at least not initially. Really this CL doesn\u0027t carry much weight because we could easily have added these test cases at the time of fixing the implementation to no allow CUE file type for now.",
+      "parentUuid": "68f59603_4a40bfee",
+      "revId": "82653ab537d6e95db0f42b68f6d24d98238bd4c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

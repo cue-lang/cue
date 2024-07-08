@@ -95,19 +95,19 @@ is associated with a constraint.
 > 1. `q0 ∈ Q`, is the root node,
 > 1. `υ: Q → T` is the total node typing function,
 >     for a finite set of possible terms `T`.
-> 1. `δ: Label × Q → Q` is the partial feature function,
+> 1. `δ: Q × Label → Q` is the partial feature function,
 >
 > subject to the following conditions:
 >
 > 1. there is no node `q` or label `l` such that `δ(q, l) = q0` (root)
 > 2. for every node `q` in `Q` there is a path `π` (i.e. a sequence of
 >    members of Label) such that `δ(q0, π) = q` (unique root, correctness)
-> 3. there is no node `q` or path `π` such that `δ(q, π) = q` (no cycles)
+> 3. there is no node `q` or non-empty path `π` such that `δ(q, π) = q` (no cycles)
 >
 > where `δ` is extended to be defined on paths as follows:
 >
 > 1. `δ(q, ϵ) = q`, where `ϵ` is the empty path
-> 2. `δ(q, l∙π) = δ(δ(l, q), π)`
+> 2. `δ(q, l∙π) = δ(δ(q, l), π)`
 >
 > The _substructures_ of a typed feature structure are the
 > typed feature structures rooted at each node in the structure.

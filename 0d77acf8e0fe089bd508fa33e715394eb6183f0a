@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ffb19f5b_60065867",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-08T15:58:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e10076aa_3fc89502",
+      "revId": "0d77acf8e0fe089bd508fa33e715394eb6183f0a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ea4c42f3_0eec8b77",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "751bfc6e_844af975",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-08T15:58:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ea4c42f3_0eec8b77",
+      "revId": "0d77acf8e0fe089bd508fa33e715394eb6183f0a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b96b3e38_f7c7df79",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-07-08T14:46:19Z",
       "side": 1,
       "message": "nit: I\u0027d use %q for filenames, as they may contain spaces or any other sort of odd characters. also elsewhere, including existing error messages.",
+      "revId": "0d77acf8e0fe089bd508fa33e715394eb6183f0a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8656b3ee_6c377cdd",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-08T15:58:04Z",
+      "side": 1,
+      "message": "I followed Go\u0027s error message here exactly, but I tend to agree. Done.",
+      "parentUuid": "b96b3e38_f7c7df79",
       "revId": "0d77acf8e0fe089bd508fa33e715394eb6183f0a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

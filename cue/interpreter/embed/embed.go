@@ -202,6 +202,11 @@ func (c *compiler) processFile(file, scope string, schema adt.Value) (adt.Expr, 
 	if err != nil {
 		return nil, err
 	}
+	for dir := path.Dir(file); dir != "."; dir = path.Dir(dir) {
+		if _, err := c.fs.Stat(path.Join(dir, "cue.mod")); err == nil {
+			return nil, errors.Newf(c.pos, "cannot embed file %q: in different module", file)
+		}
+	}
 
 	return c.decodeFile(file, scope, schema)
 }
@@ -233,6 +238,7 @@ func (c *compiler) processGlob(glob, scope string, schema adt.Value) (adt.Expr, 
 		return nil, errors.Promote(err, "failed to match glob")
 	}
 
+	dirs := make(map[string]string)
 	for _, f := range matches {
 		// TODO: lots of stat calls happening in this MVP so another won't hurt.
 		// We don't support '**' initially, and '*' only matches files, so skip
@@ -241,6 +247,13 @@ func (c *compiler) processGlob(glob, scope string, schema adt.Value) (adt.Expr, 
 			return nil, errors.Newf(c.pos, "failed to stat %s: %v", f, err)
 		} else if fi.IsDir() {
 			continue
+		}
+		// Add all parents of the embedded file that
+		// aren't the current directory (if there's a cue.mod
+		// in the current directory, that's the current module
+		// not nested).
+		for dir := path.Dir(f); dir != "."; dir = path.Dir(dir) {
+			dirs[dir] = f
 		}
 
 		expr, err := c.decodeFile(f, scope, schema)
@@ -253,7 +266,13 @@ func (c *compiler) processGlob(glob, scope string, schema adt.Value) (adt.Expr, 
 			Value: expr,
 		})
 	}
-
+	// Check that none of the matches were in a nested module
+	// directory.
+	for dir, f := range dirs {
+		if _, err := c.fs.Stat(path.Join(dir, "cue.mod")); err == nil {
+			return nil, errors.Newf(c.pos, "cannot embed file %q: in different module", f)
+		}
+	}
 	return m, nil
 }
 
@@ -265,7 +284,7 @@ func (c *compiler) clean(s string) (string, errors.Error) {
 	if path.IsAbs(file) {
 		return "", errors.Newf(c.pos, "only relative files are allowed")
 	}
-	if strings.HasPrefix(file, "..") {
+	if file == ".." || strings.HasPrefix(file, "../") {
 		return "", errors.Newf(c.pos, "cannot refer to parent directory")
 	}
 	return file, nil

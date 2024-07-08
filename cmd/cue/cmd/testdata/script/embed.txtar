@@ -35,21 +35,17 @@ special: {
 	// These are all valid.
 	underscoreFile: _ @embed(file="y/_test.json")
 	dotFile:        _ @embed(file="y/.test.json")
+	dotdotFile:        _ @embed(file="..dotdot.json")
 	underscoreDir:  _ @embed(file="_y/test.json")
 	dotDir:         _ @embed(file=".y/test.json")
-
-	// TODO: fix nested modules are currently not supported, but we may opt to
-	// support them in the future. This is currently not handled. It should
-	// probably be up to the loader to provide a fs.FS that handles this
-	// according to spec.
-	nestedModJSON: _ @embed(file="a/b/foo.json")
 }
 
 -- test.json --
 { "x": 34 }
 -- input.yaml --
 a1: 2
-
+-- ..dotdot.json --
+{"dotdot": true}
 -- y/test.json --
 { "x": 34 }
 -- y/_test.json --
@@ -121,9 +117,9 @@ g: _
 special: {
     underscoreFile: _
     dotFile:        _
+    dotdotFile:     _
     underscoreDir:  _
     dotDir:         _
-    nestedModJSON:  _
 }
 -- out/eval --
 a: {
@@ -208,15 +204,14 @@ special: {
     dotFile: {
         z: 46
     }
+    dotdotFile: {
+        dotdot: true
+    }
     underscoreDir: {
         z: 47
     }
     dotDir: {
         z: 48
-    }
-    nestedModJSON: {
-        a: 1
-        b: 2
     }
 }
 -- out/export --
@@ -265,18 +260,10 @@ g: {
 }
 special: {
 	// These are all valid.
-	underscoreFile: z: 45
-	dotFile: z:        46
-	underscoreDir: z:  47
-	dotDir: z:         48
-
-	// TODO: fix nested modules are currently not supported, but we may opt to
-	// support them in the future. This is currently not handled. It should
-	// probably be up to the loader to provide a fs.FS that handles this
-	// according to spec.
-	nestedModJSON: {
-		a: 1
-		b: 2
-	}
+	underscoreFile: z:  45
+	dotFile: z:         46
+	dotdotFile: dotdot: true
+	underscoreDir: z:   47
+	dotDir: z:          48
 }
 -- out/vet --

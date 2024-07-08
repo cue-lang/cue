@@ -91,17 +91,14 @@ Some aspects of this are:
 
 ### Download and Install
 
+The full range of installation methods for the `cue` command are listed on the
+[cuelang.org site](https://cuelang.org/docs/introduction/installation/),
+including the official container image suitable for use with Docker.
+Here are two common ways to install the command:
+
 #### Release builds
 
-[Download](https://github.com/cue-lang/cue/releases) the latest release from GitHub.
-
-#### Run with Docker
-
-	docker run cuelang/cue version
-
-#### Install using Homebrew
-
-	brew install cue-lang/tap/cue
+Download the [latest release](https://github.com/cue-lang/cue/releases/latest/) from GitHub.
 
 #### Install from Source
 

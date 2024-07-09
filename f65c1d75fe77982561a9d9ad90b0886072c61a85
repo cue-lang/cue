@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fdf70f72_4d58875a",
+        "filename": "pkg/tool/exec/exec.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-09T11:55:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7b8ed450_b550aea3",
+      "revId": "f65c1d75fe77982561a9d9ad90b0886072c61a85",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "503f6ad5_ca384d32",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-07-09T11:40:21Z",
       "side": 1,
       "message": "I\u0027m not sure that \"directly\" adds much here.\n\n\n```suggestion\n\t// If any arguments include white space, use the list form.\n```",
+      "revId": "f65c1d75fe77982561a9d9ad90b0886072c61a85",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1fe7ccb5_9ba0072e",
+        "filename": "pkg/tool/exec/exec.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-09T11:55:50Z",
+      "side": 1,
+      "message": "Done; I added \"directly\" to imply that no splitting happens then, but I guess it\u0027s kinda obvious anyway.",
+      "parentUuid": "503f6ad5_ca384d32",
       "revId": "f65c1d75fe77982561a9d9ad90b0886072c61a85",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

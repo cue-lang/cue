@@ -64,7 +64,7 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 		case leftKind == BytesKind:
 			return cmpTonode(c, op, bytes.Compare(c.bytesValue(left, op), c.bytesValue(right, op)))
 
-		case leftKind&NumKind != 0 && rightKind&NumKind != 0:
+		case leftKind&NumberKind != 0 && rightKind&NumberKind != 0:
 			// n := c.newNum()
 			return cmpTonode(c, op, c.Num(left, op).X.Cmp(&c.Num(right, op).X))
 
@@ -102,7 +102,7 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 		case leftKind == BytesKind:
 			return cmpTonode(c, op, bytes.Compare(c.bytesValue(left, op), c.bytesValue(right, op)))
 
-		case leftKind&NumKind != 0 && rightKind&NumKind != 0:
+		case leftKind&NumberKind != 0 && rightKind&NumberKind != 0:
 			// n := c.newNum()
 			return cmpTonode(c, op, c.Num(left, op).X.Cmp(&c.Num(right, op).X))
 
@@ -131,7 +131,7 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 		case leftKind == BytesKind && rightKind == BytesKind:
 			return cmpTonode(c, op, bytes.Compare(c.bytesValue(left, op), c.bytesValue(right, op)))
 
-		case leftKind&NumKind != 0 && rightKind&NumKind != 0:
+		case leftKind&NumberKind != 0 && rightKind&NumberKind != 0:
 			// n := c.newNum(left, right)
 			return cmpTonode(c, op, c.Num(left, op).X.Cmp(&c.Num(right, op).X))
 		}
@@ -158,7 +158,7 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 
 	case AddOp:
 		switch {
-		case leftKind&NumKind != 0 && rightKind&NumKind != 0:
+		case leftKind&NumberKind != 0 && rightKind&NumberKind != 0:
 			return c.Add(c.Num(left, op), c.Num(right, op))
 
 		case leftKind == StringKind && rightKind == StringKind:
@@ -224,7 +224,7 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 	case MultiplyOp:
 		switch {
 		// float
-		case leftKind&NumKind != 0 && rightKind&NumKind != 0:
+		case leftKind&NumberKind != 0 && rightKind&NumberKind != 0:
 			return c.Mul(c.Num(left, op), c.Num(right, op))
 
 		case leftKind == StringKind && rightKind == IntKind:
@@ -280,7 +280,7 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 		}
 
 	case FloatQuotientOp:
-		if leftKind&NumKind != 0 && rightKind&NumKind != 0 {
+		if leftKind&NumberKind != 0 && rightKind&NumberKind != 0 {
 			return c.Quo(c.Num(left, op), c.Num(right, op))
 		}
 

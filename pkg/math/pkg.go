@@ -69,7 +69,7 @@ var p = &pkg.Package{
 	}, {
 		Name: "Floor",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
 		Result: adt.IntKind,
 		Func: func(c *pkg.CallCtxt) {
@@ -81,7 +81,7 @@ var p = &pkg.Package{
 	}, {
 		Name: "Ceil",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
 		Result: adt.IntKind,
 		Func: func(c *pkg.CallCtxt) {
@@ -93,7 +93,7 @@ var p = &pkg.Package{
 	}, {
 		Name: "Trunc",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
 		Result: adt.IntKind,
 		Func: func(c *pkg.CallCtxt) {
@@ -105,7 +105,7 @@ var p = &pkg.Package{
 	}, {
 		Name: "Round",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
 		Result: adt.IntKind,
 		Func: func(c *pkg.CallCtxt) {
@@ -117,7 +117,7 @@ var p = &pkg.Package{
 	}, {
 		Name: "RoundToEven",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
 		Result: adt.IntKind,
 		Func: func(c *pkg.CallCtxt) {
@@ -129,8 +129,8 @@ var p = &pkg.Package{
 	}, {
 		Name: "MultipleOf",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
+			{Kind: adt.NumberKind},
 		},
 		Result: adt.BoolKind,
 		Func: func(c *pkg.CallCtxt) {
@@ -142,9 +142,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Abs",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
@@ -154,9 +154,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Acosh",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -166,9 +166,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Asin",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -178,9 +178,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Acos",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -190,9 +190,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Asinh",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -202,9 +202,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Atan",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -214,10 +214,10 @@ var p = &pkg.Package{
 	}, {
 		Name: "Atan2",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			y, x := c.Float64(0), c.Float64(1)
 			if c.Do() {
@@ -227,9 +227,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Atanh",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -239,9 +239,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Cbrt",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
@@ -284,10 +284,10 @@ var p = &pkg.Package{
 	}, {
 		Name: "Copysign",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x, y := c.Decimal(0), c.Decimal(1)
 			if c.Do() {
@@ -297,10 +297,10 @@ var p = &pkg.Package{
 	}, {
 		Name: "Dim",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x, y := c.Decimal(0), c.Decimal(1)
 			if c.Do() {
@@ -310,9 +310,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Erf",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -322,9 +322,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Erfc",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -334,9 +334,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Erfinv",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -346,9 +346,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Erfcinv",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -358,9 +358,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Exp",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
@@ -370,9 +370,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Exp2",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
@@ -382,9 +382,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Expm1",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -394,9 +394,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Gamma",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -406,10 +406,10 @@ var p = &pkg.Package{
 	}, {
 		Name: "Hypot",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			p, q := c.Float64(0), c.Float64(1)
 			if c.Do() {
@@ -419,9 +419,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "J0",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -431,9 +431,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Y0",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -443,9 +443,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "J1",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -455,9 +455,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Y1",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -468,9 +468,9 @@ var p = &pkg.Package{
 		Name: "Jn",
 		Params: []pkg.Param{
 			{Kind: adt.IntKind},
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			n, x := c.Int(0), c.Float64(1)
 			if c.Do() {
@@ -481,9 +481,9 @@ var p = &pkg.Package{
 		Name: "Yn",
 		Params: []pkg.Param{
 			{Kind: adt.IntKind},
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			n, x := c.Int(0), c.Float64(1)
 			if c.Do() {
@@ -493,10 +493,10 @@ var p = &pkg.Package{
 	}, {
 		Name: "Ldexp",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 			{Kind: adt.IntKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			frac, exp := c.Float64(0), c.Int(1)
 			if c.Do() {
@@ -506,9 +506,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Log",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
@@ -518,9 +518,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Log10",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
@@ -530,9 +530,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Log2",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
@@ -542,9 +542,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Log1p",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -554,9 +554,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Logb",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -566,7 +566,7 @@ var p = &pkg.Package{
 	}, {
 		Name: "Ilogb",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
 		Result: adt.IntKind,
 		Func: func(c *pkg.CallCtxt) {
@@ -578,10 +578,10 @@ var p = &pkg.Package{
 	}, {
 		Name: "Mod",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x, y := c.Float64(0), c.Float64(1)
 			if c.Do() {
@@ -591,10 +591,10 @@ var p = &pkg.Package{
 	}, {
 		Name: "Pow",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x, y := c.Decimal(0), c.Decimal(1)
 			if c.Do() {
@@ -606,7 +606,7 @@ var p = &pkg.Package{
 		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			n := c.Int32(0)
 			if c.Do() {
@@ -616,10 +616,10 @@ var p = &pkg.Package{
 	}, {
 		Name: "Remainder",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x, y := c.Float64(0), c.Float64(1)
 			if c.Do() {
@@ -629,7 +629,7 @@ var p = &pkg.Package{
 	}, {
 		Name: "Signbit",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
 		Result: adt.BoolKind,
 		Func: func(c *pkg.CallCtxt) {
@@ -641,9 +641,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Cos",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -653,9 +653,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Sin",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -665,9 +665,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Sinh",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -677,9 +677,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Cosh",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -689,9 +689,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Sqrt",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -701,9 +701,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Tan",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
@@ -713,9 +713,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Tanh",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {

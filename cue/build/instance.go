@@ -93,6 +93,8 @@ type Instance struct {
 	// NOTICE: the below tags may change in the future.
 
 	// ImportComment is the path in the import comment on the package statement.
+	//
+	// Deprecated: CUE has never needed or supported import comments.
 	ImportComment string `api:"alpha"`
 
 	// AllTags are the build tags that can influence file selection in this

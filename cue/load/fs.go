@@ -28,7 +28,9 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/cueimports"
 	"cuelang.org/go/mod/module"
 )
 
@@ -177,6 +179,44 @@ func (fs *fileSystem) getOverlay(path string) *overlayFile {
 		return m[base]
 	}
 	return nil
+}
+
+// readCUE returns the contents of the given path as CUE file syntax.
+func (fs *fileSystem) readCUE(path string, importsOnly bool) (*ast.File, error) {
+	var parseMode parser.Option
+	if importsOnly {
+		parseMode = parser.ImportsOnly
+	}
+	var data []byte
+	if f := fs.getOverlay(path); f != nil {
+		if f.file != nil {
+			return f.file, nil
+		}
+		if f.isDir {
+			return nil, fmt.Errorf("%q is a directory", path)
+		}
+		data = f.contents
+	} else {
+		var err error
+		f, err := fs.openFile(path)
+		if err != nil {
+			return nil, err
+		}
+		defer f.Close()
+		if importsOnly {
+			data, err = cueimports.Read(f)
+		} else {
+			data, err = io.ReadAll(f)
+		}
+		if err != nil {
+			return nil, fmt.Errorf("read %s: %v", path, err)
+		}
+	}
+	pf, err := parser.ParseFile(path, data, parseMode)
+	if err != nil {
+		return nil, err
+	}
+	return pf, nil
 }
 
 func (fs *fileSystem) stat(path string) (iofs.FileInfo, errors.Error) {

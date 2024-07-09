@@ -23,6 +23,7 @@ import (
 	"strconv"
 	"strings"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
@@ -36,6 +37,15 @@ const (
 	allowAnonymous = 1 << iota
 	allowExcludedFiles
 )
+
+var errExclude = errors.New("file rejected")
+
+type cueError = errors.Error
+type excludeError struct {
+	cueError
+}
+
+func (e excludeError) Is(err error) bool { return err == errExclude }
 
 func rewriteFiles(p *build.Instance, root string, isLocal bool) {
 	p.Root = root
@@ -145,7 +155,7 @@ func (fp *fileProcessor) finalize(p *build.Instance) errors.Error {
 }
 
 // add adds the given file to the appropriate package in fp.
-func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (added bool) {
+func (fp *fileProcessor) add(root string, file *build.File, mode importMode) {
 	fullPath := file.Filename
 	if fullPath != "-" {
 		if !filepath.IsAbs(fullPath) {
@@ -160,42 +170,46 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 	p := fp.pkg // default package
 
 	// badFile := func(p *build.Instance, err errors.Error) bool {
-	badFile := func(err errors.Error) bool {
+	badFile := func(err errors.Error) {
 		fp.err = errors.Append(fp.err, err)
 		file.ExcludeReason = fp.err
 		p.InvalidFiles = append(p.InvalidFiles, file)
-		return true
+		return
 	}
 	if err := setFileSource(fp.c, file); err != nil {
-		return badFile(errors.Promote(err, ""))
+		badFile(errors.Promote(err, ""))
+		return
 	}
 
-	match, data, err := matchFile(fp.c, file, true, mode)
-	switch {
-	case match:
-
-	case err == nil:
+	if file.Encoding != build.CUE {
 		// Not a CUE file.
 		p.OrphanedFiles = append(p.OrphanedFiles, file)
-		return false
-
-	case !errors.Is(err, errExclude):
-		return badFile(err)
-
-	default:
-		file.ExcludeReason = err
-		if file.Interpretation == "" {
-			p.IgnoredFiles = append(p.IgnoredFiles, file)
-		} else {
-			p.OrphanedFiles = append(p.OrphanedFiles, file)
-		}
-		return false
+		return
 	}
-
-	pf, perr := parser.ParseFile(fullPath, data, parser.ImportsOnly)
+	if (mode & allowExcludedFiles) == 0 {
+		var badPrefix string
+		for _, prefix := range []string{".", "_"} {
+			if strings.HasPrefix(base, prefix) {
+				badPrefix = prefix
+			}
+		}
+		if badPrefix != "" {
+			file.ExcludeReason = errors.Newf(token.NoPos, "filename starts with a '%s'", badPrefix)
+			if file.Interpretation == "" {
+				p.IgnoredFiles = append(p.IgnoredFiles, file)
+			} else {
+				p.OrphanedFiles = append(p.OrphanedFiles, file)
+			}
+			return
+		}
+	}
+	// Note: when path is "-" (stdin), it will already have
+	// been read and file.Source set to the resulting data
+	// by setFileSource.
+	pf, perr := fp.readCUE(fullPath, file.Source)
 	if perr != nil {
 		badFile(errors.Promote(perr, "add failed"))
-		return true
+		return
 	}
 
 	pkg := pf.PackageName()
@@ -227,7 +241,7 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 	default:
 		file.ExcludeReason = excludeError{errors.Newf(pos, "no package name")}
 		p.IgnoredFiles = append(p.IgnoredFiles, file)
-		return false // don't mark as added
+		return
 	}
 
 	if !fp.c.AllCUEFiles {
@@ -245,7 +259,7 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 			}
 			file.ExcludeReason = err
 			p.IgnoredFiles = append(p.IgnoredFiles, file)
-			return false
+			return
 		}
 	}
 
@@ -258,14 +272,15 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 				file.ExcludeReason = excludeError{errors.Newf(pos,
 					"package is %s, want %s", pkg, p.PkgName)}
 				p.IgnoredFiles = append(p.IgnoredFiles, file)
-				return false
+				return
 			}
 			if !fp.allPackages {
-				return badFile(&MultiplePackageError{
+				badFile(&MultiplePackageError{
 					Dir:      p.Dir,
 					Packages: []string{p.PkgName, pkg},
 					Files:    []string{fp.firstFile, base},
 				})
+				return
 			}
 		}
 	}
@@ -306,7 +321,21 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 	default:
 		p.BuildFiles = append(p.BuildFiles, file)
 	}
-	return true
+}
+
+func (fp *fileProcessor) readCUE(fullPath string, src any) (*ast.File, error) {
+	switch src := src.(type) {
+	case []byte, string:
+		return parser.ParseFile(fullPath, src, parser.ImportsOnly)
+	case *ast.File:
+		return src, nil
+	case nil:
+		if fullPath == "-" {
+			panic("source unexpectedly not provided for stdin")
+		}
+		return fp.c.fileSystem.readCUE(fullPath, true)
+	}
+	return nil, errors.Newf(token.NoPos, "unsupported source type %T", src)
 }
 
 func cleanImports(m map[string][]token.Pos) ([]string, map[string][]token.Pos) {

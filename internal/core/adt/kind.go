@@ -80,7 +80,7 @@ const (
 	ScalarKinds      = NullKind | BoolKind |
 		IntKind | FloatKind | StringKind | BytesKind
 
-	CompositKind = StructKind | ListKind
+	CompositeKind = StructKind | ListKind
 )
 
 func kind(v Value) Kind {

@@ -1420,7 +1420,7 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flag
 		}
 
 	default:
-		if v.Kind().IsAnyOf(CompositKind) && v.Concreteness() > Concrete && state < conjuncts {
+		if v.Kind().IsAnyOf(CompositeKind) && v.Concreteness() > Concrete && state < conjuncts {
 			c.PopState(s)
 			c.AddBottom(cycle)
 			return nil

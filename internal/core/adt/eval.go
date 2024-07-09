@@ -1495,7 +1495,7 @@ func (n *nodeContext) getValidators(state vertexStatus) BaseValue {
 	switch len(a) {
 	case 0:
 		// Src is the combined input.
-		if state >= conjuncts || n.kind&^CompositKind == 0 {
+		if state >= conjuncts || n.kind&^CompositeKind == 0 {
 			v = &BasicType{K: n.kind}
 		}
 

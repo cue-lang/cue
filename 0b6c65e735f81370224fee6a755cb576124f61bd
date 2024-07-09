@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "50622c16_eabdc5e6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-07-09T11:32:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "43ffdd72_7ad4f6b5",
+      "revId": "0b6c65e735f81370224fee6a755cb576124f61bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5b45adc3_a14178ef",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "34c0b335_626413d9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-07-09T11:32:20Z",
+      "side": 1,
+      "message": "No - I was recording the steps I carried out. But it is confusing, and the steps are not important, so I\u0027ve totally rewritten the commit msg anyway.",
+      "parentUuid": "5b45adc3_a14178ef",
+      "revId": "0b6c65e735f81370224fee6a755cb576124f61bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6c0df03b_fad1e535",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-07-09T10:45:57Z",
       "side": 1,
       "message": "Isn\u0027t converting NumKind to NumberKind, and renaming the surviving NumKind to NumberKind, the same thing? I\u0027m a bit confused. Maybe I misunderstand the previous bullet item. my understanding is that there are only two actions here:\n\n1) replace all uses of NumKind with NumberKind\n2) remove NumKind",
+      "revId": "0b6c65e735f81370224fee6a755cb576124f61bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f86df2e_10cb9d2b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-07-09T11:32:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6c0df03b_fad1e535",
       "revId": "0b6c65e735f81370224fee6a755cb576124f61bd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

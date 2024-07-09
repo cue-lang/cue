@@ -102,7 +102,6 @@ type fileProcessor struct {
 	firstFile        string
 	firstCommentFile string
 	imported         map[string][]token.Pos
-	allTags          map[string]bool
 	ignoreOther      bool // ignore files from other packages
 	allPackages      bool
 
@@ -119,7 +118,6 @@ type fileProcessorConfig = Config
 func newFileProcessor(c *fileProcessorConfig, p *build.Instance, tg *tagger) *fileProcessor {
 	return &fileProcessor{
 		imported: make(map[string][]token.Pos),
-		allTags:  make(map[string]bool),
 		c:        c,
 		pkgs:     map[string]*build.Instance{"_": p},
 		pkg:      p,
@@ -150,11 +148,6 @@ func (fp *fileProcessor) finalize(p *build.Instance) errors.Error {
 		fp.err = errors.Append(fp.err, &NoFilesError{Package: p, ignored: len(p.IgnoredFiles) > 0})
 		return fp.err
 	}
-
-	for tag := range fp.allTags {
-		p.AllTags = append(p.AllTags, tag)
-	}
-	sort.Strings(p.AllTags)
 
 	p.ImportPaths, _ = cleanImports(fp.imported)
 
@@ -187,7 +180,7 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 		return badFile(errors.Promote(err, ""))
 	}
 
-	match, data, err := matchFile(fp.c, file, true, fp.allTags, mode)
+	match, data, err := matchFile(fp.c, file, true, mode)
 	switch {
 	case match:
 

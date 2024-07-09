@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e490d562_dcca4c9e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-09T11:32:14Z",
+      "side": 1,
+      "message": "Perhaps mention that NumberKind is also consistent with the predeclared name \"number\" in the spec.",
+      "revId": "e00ab3198ef1f9bbe3715d5897ab32500cd76abb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -186,6 +186,9 @@ func (c *syntaxCache) getSyntax(bf *build.File) ([]*ast.File, error) {
 	if ok {
 		return syntax.files, syntax.err
 	}
+	if bf.Encoding != build.CUE {
+		panic("syntax for non-CUE file")
+	}
 	d := encoding.NewDecoder(c.ctx, bf, &c.config)
 	for ; !d.Done(); d.Next() {
 		syntax.files = append(syntax.files, d.File())

@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43ffdd72_7ad4f6b5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-09T10:45:57Z",
+      "side": 1,
+      "message": "nit: you already mention this is the adt package, so you can just say kind.go as the filename.\n\nthen make this a single line and end with a period.",
+      "revId": "0b6c65e735f81370224fee6a755cb576124f61bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b45adc3_a14178ef",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-09T10:45:57Z",
+      "side": 1,
+      "message": "isn\u0027t the conversion backwards?",
+      "revId": "0b6c65e735f81370224fee6a755cb576124f61bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c0df03b_fad1e535",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-09T10:45:57Z",
+      "side": 1,
+      "message": "Isn\u0027t converting NumKind to NumberKind, and renaming the surviving NumKind to NumberKind, the same thing? I\u0027m a bit confused. Maybe I misunderstand the previous bullet item. my understanding is that there are only two actions here:\n\n1) replace all uses of NumKind with NumberKind\n2) remove NumKind",
+      "revId": "0b6c65e735f81370224fee6a755cb576124f61bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40d7f3df_cf7ca27c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-09T10:45:57Z",
+      "side": 1,
+      "message": "SGTM on the basis that \"number\" is used consistently elsewhere as well, such as the predeclared identifier in the spec.\n\nnot doing a +2 yet as I\u0027m not sure I understand the commit message",
+      "revId": "0b6c65e735f81370224fee6a755cb576124f61bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

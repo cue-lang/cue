@@ -205,21 +205,19 @@ func loadPackages(
 			// not a CUE file; assume it has no imports for now.
 			continue
 		}
-		syntaxes, err := synCache.getSyntax(f)
+		syntax, err := synCache.getSyntax(f)
 		if err != nil {
 			return nil, fmt.Errorf("cannot get syntax for %q: %v", f.Filename, err)
 		}
-		for _, syntax := range syntaxes {
-			for _, imp := range syntax.Imports {
-				pkgPath, err := strconv.Unquote(imp.Path.Value)
-				if err != nil {
-					// Should never happen.
-					return nil, fmt.Errorf("invalid import path %q in %s", imp.Path.Value, f.Filename)
-				}
-				// Canonicalize the path.
-				pkgPath = module.ParseImportPath(pkgPath).Canonical().String()
-				pkgPaths[pkgPath] = true
+		for _, imp := range syntax.Imports {
+			pkgPath, err := strconv.Unquote(imp.Path.Value)
+			if err != nil {
+				// Should never happen.
+				return nil, fmt.Errorf("invalid import path %q in %s", imp.Path.Value, f.Filename)
 			}
+			// Canonicalize the path.
+			pkgPath = module.ParseImportPath(pkgPath).Canonical().String()
+			pkgPaths[pkgPath] = true
 		}
 	}
 	// TODO use maps.Keys when we can.

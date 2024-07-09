@@ -4,6 +4,11 @@ cmp stderr cannotFail-stderr.golden
 exec cue cmd canFail
 cmp stdout canFail-stdout.golden
 
+# TODO(mvdan): the error message should quote the argument list
+# so that any arguments with spaces do not introduce ambiguity.
+! exec cue cmd withSpaces
+cmp stderr withSpaces-stderr.golden
+
 -- cue.mod/module.cue --
 module: "example.com"
 language: version: "v0.9.0"
@@ -18,6 +23,8 @@ hasStderr=false
 errNotFound:
 success=false
 hasStderr=true
+-- withSpaces-stderr.golden --
+task failed: command "false with an ignored argument" failed: exit status 1
 -- foo_tool.cue --
 package foo
 
@@ -54,4 +61,8 @@ command: canFail: {
 			hasStderr=\(errNotFound.stderr != "")
 			"""
 	}
+}
+
+command: withSpaces: exec.Run & {
+	cmd: ["false", "with an ignored argument"]
 }

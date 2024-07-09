@@ -16,4 +16,5 @@ command: errcode: {
 		kind:   "exec"
 		cmd:    "ls --badflags"
 		stderr: string // suppress error message
-	}}
+	}
+}

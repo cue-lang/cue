@@ -97,6 +97,8 @@ type Instance struct {
 
 	// AllTags are the build tags that can influence file selection in this
 	// directory.
+	//
+	// Deprecated: this field is not used.
 	AllTags []string `api:"alpha"`
 
 	// Incomplete reports whether any dependencies had an error.

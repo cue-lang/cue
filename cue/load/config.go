@@ -21,15 +21,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
-	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cueexperiment"
-	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/mod/modconfig"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
@@ -301,37 +298,6 @@ type Config struct {
 	Env []string
 
 	fileSystem *fileSystem
-
-	fileCache *fileCache
-}
-
-func newFileCache(c *Config) *fileCache {
-	return &fileCache{
-		config: encoding.Config{
-			// Note: no need to pass Stdin, as we take care
-			// always to pass a non-nil source when the file is "-".
-			ParseFile: c.ParseFile,
-		},
-		ctx:     cuecontext.New(),
-		entries: make(map[string]fileCacheEntry),
-	}
-}
-
-// fileCache caches data derived from the file system.
-type fileCache struct {
-	config  encoding.Config
-	ctx     *cue.Context
-	entries map[string]fileCacheEntry
-}
-
-type fileCacheEntry struct {
-	// TODO cache directory information too.
-
-	// file caches the work involved when decoding a file into an *ast.File.
-	// This can happen multiple times for the same file, for example when it is present in
-	// multiple different build instances in the same directory hierarchy.
-	file *ast.File
-	err  error
 }
 
 func (c *Config) stdin() io.Reader {
@@ -388,7 +354,7 @@ func (c Config) complete() (cfg *Config, err error) {
 
 	// TODO: we could populate this already with absolute file paths,
 	// but relative paths cannot be added. Consider what is reasonable.
-	fsys, err := newFileSystem(c.Dir, c.Overlay)
+	fsys, err := newFileSystem(&c)
 	if err != nil {
 		return nil, err
 	}

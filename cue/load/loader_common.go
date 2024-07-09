@@ -15,7 +15,6 @@
 package load
 
 import (
-	"bytes"
 	"cmp"
 	pathpkg "path"
 	"path/filepath"
@@ -23,8 +22,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"unicode"
-	"unicode/utf8"
 
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
@@ -36,13 +33,7 @@ import (
 type importMode uint
 
 const (
-	// If importComment is set, parse import comments on package statements.
-	// Import returns an error if it finds a comment it cannot understand
-	// or finds conflicting comments in multiple source files.
-	// See golang.org/s/go14customimport for more information.
-	importComment importMode = 1 << iota
-
-	allowAnonymous
+	allowAnonymous = 1 << iota
 	allowExcludedFiles
 )
 
@@ -99,11 +90,10 @@ func (s *importStack) Copy() []string {
 }
 
 type fileProcessor struct {
-	firstFile        string
-	firstCommentFile string
-	imported         map[string][]token.Pos
-	ignoreOther      bool // ignore files from other packages
-	allPackages      bool
+	firstFile   string
+	imported    map[string][]token.Pos
+	ignoreOther bool // ignore files from other packages
+	allPackages bool
 
 	c      *fileProcessorConfig
 	tagger *tagger
@@ -283,21 +273,6 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 	isTest := strings.HasSuffix(base, "_test"+cueSuffix)
 	isTool := strings.HasSuffix(base, "_tool"+cueSuffix)
 
-	if mode&importComment != 0 {
-		qcom, line := findImportComment(data)
-		if line != 0 {
-			com, err := strconv.Unquote(qcom)
-			if err != nil {
-				badFile(errors.Newf(pos, "%s:%d: cannot parse import comment", fullPath, line))
-			} else if p.ImportComment == "" {
-				p.ImportComment = com
-				fp.firstCommentFile = base
-			} else if p.ImportComment != com {
-				badFile(errors.Newf(pos, "found import comments %q (%s) and %q (%s) in %s", p.ImportComment, fp.firstCommentFile, com, base, p.Dir))
-			}
-		}
-	}
-
 	for _, spec := range pf.Imports {
 		quoted := spec.Path.Value
 		path, err := strconv.Unquote(quoted)
@@ -332,95 +307,6 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 		p.BuildFiles = append(p.BuildFiles, file)
 	}
 	return true
-}
-
-func findImportComment(data []byte) (s string, line int) {
-	// expect keyword package
-	word, data := parseWord(data)
-	if string(word) != "package" {
-		return "", 0
-	}
-
-	// expect package name
-	_, data = parseWord(data)
-
-	// now ready for import comment, a // comment
-	// beginning and ending on the current line.
-	for len(data) > 0 && (data[0] == ' ' || data[0] == '\t' || data[0] == '\r') {
-		data = data[1:]
-	}
-
-	var comment []byte
-	switch {
-	case bytes.HasPrefix(data, slashSlash):
-		i := bytes.Index(data, newline)
-		if i < 0 {
-			i = len(data)
-		}
-		comment = data[2:i]
-	}
-	comment = bytes.TrimSpace(comment)
-
-	// split comment into `import`, `"pkg"`
-	word, arg := parseWord(comment)
-	if string(word) != "import" {
-		return "", 0
-	}
-
-	line = 1 + bytes.Count(data[:cap(data)-cap(arg)], newline)
-	return strings.TrimSpace(string(arg)), line
-}
-
-var (
-	slashSlash = []byte("//")
-	newline    = []byte("\n")
-)
-
-// skipSpaceOrComment returns data with any leading spaces or comments removed.
-func skipSpaceOrComment(data []byte) []byte {
-	for len(data) > 0 {
-		switch data[0] {
-		case ' ', '\t', '\r', '\n':
-			data = data[1:]
-			continue
-		case '/':
-			if bytes.HasPrefix(data, slashSlash) {
-				i := bytes.Index(data, newline)
-				if i < 0 {
-					return nil
-				}
-				data = data[i+1:]
-				continue
-			}
-		}
-		break
-	}
-	return data
-}
-
-// parseWord skips any leading spaces or comments in data
-// and then parses the beginning of data as an identifier or keyword,
-// returning that word and what remains after the word.
-func parseWord(data []byte) (word, rest []byte) {
-	data = skipSpaceOrComment(data)
-
-	// Parse past leading word characters.
-	rest = data
-	for {
-		r, size := utf8.DecodeRune(rest)
-		if unicode.IsLetter(r) || '0' <= r && r <= '9' || r == '_' {
-			rest = rest[size:]
-			continue
-		}
-		break
-	}
-
-	word = data[:len(data)-len(rest)]
-	if len(word) == 0 {
-		return nil, nil
-	}
-
-	return word, rest
 }
 
 func cleanImports(m map[string][]token.Pos) ([]string, map[string][]token.Pos) {

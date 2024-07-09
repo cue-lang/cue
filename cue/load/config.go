@@ -309,8 +309,6 @@ func (c *Config) stdin() io.Reader {
 
 type importPath string
 
-type fsPath string
-
 func addImportQualifier(pkg importPath, name string) (importPath, error) {
 	if name == "" {
 		return pkg, nil

@@ -79,7 +79,7 @@ const (
 	// Kind.String to indicate NumberKind.
 
 	// NumberKind represents any kind of number.
-	NumberKind Kind = IntKind | FloatKind
+	NumberKind Kind = adt.NumberKind
 
 	// TopKind represents the top value.
 	TopKind Kind = adt.TopKind
@@ -332,7 +332,7 @@ func (v Value) getNum(k adt.Kind) (*adt.Num, errors.Error) {
 // 200 and exp == -2. Calling MantExp with a nil argument is an efficient way to
 // get the exponent of the receiver.
 func (v Value) MantExp(mant *big.Int) (exp int, err error) {
-	n, err := v.getNum(adt.NumKind)
+	n, err := v.getNum(adt.NumberKind)
 	if err != nil {
 		return 0, err
 	}
@@ -351,7 +351,7 @@ func (v Value) MantExp(mant *big.Int) (exp int, err error) {
 // Decimal is for internal use only. The Decimal type that is returned is
 // subject to change.
 func (v hiddenValue) Decimal() (d *internal.Decimal, err error) {
-	n, err := v.getNum(adt.NumKind)
+	n, err := v.getNum(adt.NumberKind)
 	if err != nil {
 		return nil, err
 	}
@@ -372,7 +372,7 @@ func (v Value) AppendInt(buf []byte, base int) ([]byte, error) {
 // AppendFloat appends to buf the string form of the floating-point number x.
 // It returns an error if v is not a number.
 func (v Value) AppendFloat(buf []byte, fmt byte, prec int) ([]byte, error) {
-	n, err := v.getNum(adt.NumKind)
+	n, err := v.getNum(adt.NumberKind)
 	if err != nil {
 		return nil, err
 	}
@@ -510,7 +510,7 @@ func init() {
 // by a float64 (|x| > math.MaxFloat64), the result is (+Inf, ErrAbove) or
 // (-Inf, ErrBelow), depending on the sign of x.
 func (v Value) Float64() (float64, error) {
-	n, err := v.getNum(adt.NumKind)
+	n, err := v.getNum(adt.NumberKind)
 	if err != nil {
 		return 0, err
 	}
@@ -929,7 +929,7 @@ func (v Value) marshalJSON() (b []byte, err error) {
 		return internaljson.Marshal(nil)
 	case adt.BoolKind:
 		return internaljson.Marshal(x.(*adt.Bool).B)
-	case adt.IntKind, adt.FloatKind, adt.NumKind:
+	case adt.IntKind, adt.FloatKind, adt.NumberKind:
 		b, err := x.(*adt.Num).X.MarshalText()
 		b = bytes.TrimLeft(b, "+")
 		return b, err

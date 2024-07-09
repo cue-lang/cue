@@ -47,9 +47,7 @@ func (e excludeError) Is(err error) bool { return err == errExclude }
 // If returnImports is true and name denotes a CUE file, matchFile reads
 // until the end of the imports (and returns that data) even though it only
 // considers text until the first non-comment.
-// If allTags is non-nil, matchFile records any encountered build tag
-// by setting allTags[tag] = true.
-func matchFile(cfg *Config, file *build.File, returnImports bool, allTags map[string]bool, mode importMode) (match bool, data []byte, err errors.Error) {
+func matchFile(cfg *Config, file *build.File, returnImports bool, mode importMode) (match bool, data []byte, err errors.Error) {
 	// Note: file.Source should already have been set by setFileSource just
 	// after the build.File value was created.
 	if file.Encoding != build.CUE {

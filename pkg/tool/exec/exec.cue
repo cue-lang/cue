@@ -19,6 +19,8 @@ Run: {
 	$id: *"tool/exec.Run" | "exec" // exec for backwards compatibility
 
 	// cmd is the command to run.
+	// Simple commands can use a string, which is split by whitespace characters.
+	// If any arguments include whitespace, use the list form directly.
 	cmd: string | [string, ...string]
 
 	// dir specifies the working directory of the command.

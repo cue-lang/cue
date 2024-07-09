@@ -69,7 +69,7 @@ var p = &pkg.Package{
 			{Kind: adt.StringKind},
 			{Kind: adt.IntKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			s, bitSize := c.String(0), c.Int(1)
 			if c.Do() {
@@ -122,7 +122,7 @@ var p = &pkg.Package{
 	}, {
 		Name: "FormatFloat",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
 			{Kind: adt.IntKind},
 			{Kind: adt.IntKind},
 			{Kind: adt.IntKind},

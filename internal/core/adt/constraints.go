@@ -182,7 +182,7 @@ func matchPatternValue(ctx *OpContext, pattern Value, f Feature, label Value) (r
 			str := label.(*String).Str
 			return x.validateStr(ctx, str)
 
-		case NumKind:
+		case NumberKind:
 			return x.validateInt(ctx, int64(f.Index()))
 		}
 

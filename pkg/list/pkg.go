@@ -160,7 +160,7 @@ var p = &pkg.Package{
 		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			xs := c.DecimalList(0)
 			if c.Do() {
@@ -172,7 +172,7 @@ var p = &pkg.Package{
 		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			xs := c.DecimalList(0)
 			if c.Do() {
@@ -184,7 +184,7 @@ var p = &pkg.Package{
 		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			xs := c.DecimalList(0)
 			if c.Do() {
@@ -196,7 +196,7 @@ var p = &pkg.Package{
 		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			xs := c.DecimalList(0)
 			if c.Do() {
@@ -206,9 +206,9 @@ var p = &pkg.Package{
 	}, {
 		Name: "Range",
 		Params: []pkg.Param{
-			{Kind: adt.NumKind},
-			{Kind: adt.NumKind},
-			{Kind: adt.NumKind},
+			{Kind: adt.NumberKind},
+			{Kind: adt.NumberKind},
+			{Kind: adt.NumberKind},
 		},
 		Result: adt.ListKind,
 		Func: func(c *pkg.CallCtxt) {
@@ -222,7 +222,7 @@ var p = &pkg.Package{
 		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 		},
-		Result: adt.NumKind,
+		Result: adt.NumberKind,
 		Func: func(c *pkg.CallCtxt) {
 			xs := c.DecimalList(0)
 			if c.Do() {

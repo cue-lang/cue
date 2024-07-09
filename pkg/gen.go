@@ -415,7 +415,7 @@ func (g *generator) goToCUE(typ types.Type) (cueKind string) {
 		"bigInt":
 		cueKind += "adt.IntKind"
 	case "float64", "bigRat", "bigFloat", "decimal":
-		cueKind += "adt.NumKind"
+		cueKind += "adt.NumberKind"
 	case "list", "decimalList", "stringList", "cueList":
 		cueKind += "adt.ListKind"
 	case "struct":

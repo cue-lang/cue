@@ -38,7 +38,7 @@ func predeclared(n *ast.Ident) adt.Expr {
 	case "float", "__float":
 		return &adt.BasicType{Src: n, K: adt.FloatKind}
 	case "number", "__number":
-		return &adt.BasicType{Src: n, K: adt.NumKind}
+		return &adt.BasicType{Src: n, K: adt.NumberKind}
 
 	case "len", "__len":
 		return lenBuiltin
@@ -136,8 +136,8 @@ func mkIntRange(a, b string) adt.Expr {
 }
 
 func mkFloatRange(a, b string) adt.Expr {
-	from := newBound(adt.GreaterEqualOp, adt.NumKind, parseFloat(a))
-	to := newBound(adt.LessEqualOp, adt.NumKind, parseFloat(b))
+	from := newBound(adt.GreaterEqualOp, adt.NumberKind, parseFloat(a))
+	to := newBound(adt.LessEqualOp, adt.NumberKind, parseFloat(b))
 	src := ast.NewBinExpr(token.AND, from.Src, to.Src)
 	return &adt.Conjunction{Src: src, Values: []adt.Value{from, to}}
 }

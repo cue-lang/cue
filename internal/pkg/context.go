@@ -295,7 +295,7 @@ func (c *CallCtxt) DecimalList(i int) (a []*apd.Decimal) {
 			}
 
 		default:
-			if k := w.Kind(); k&adt.NumKind == 0 {
+			if k := w.Kind(); k&adt.NumberKind == 0 {
 				err := c.ctx.NewErrf(
 					"invalid list element %d in argument %d to call: cannot use value %v (%s) as number",
 					j, i, w, k)

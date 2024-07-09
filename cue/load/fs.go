@@ -24,6 +24,7 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+	"sync"
 	"time"
 
 	"cuelang.org/go/cue"
@@ -31,9 +32,7 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/cueimports"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/mod/module"
 )
@@ -88,10 +87,6 @@ func (fs *fileSystem) getDir(dir string, create bool) map[string]*overlayFile {
 // paths required by most of the `cue/load` package
 // implementation.
 func (fs *fileSystem) ioFS(root string) iofs.FS {
-	dir := fs.getDir(root, false)
-	if dir == nil {
-		return module.OSDirFS(root)
-	}
 	return &ioFS{
 		fs:   fs,
 		root: root,
@@ -187,44 +182,6 @@ func (fs *fileSystem) getOverlay(path string) *overlayFile {
 		return m[base]
 	}
 	return nil
-}
-
-// readCUE returns the contents of the given path as CUE file syntax.
-func (fs *fileSystem) readCUE(path string, importsOnly bool) (*ast.File, error) {
-	var parseMode parser.Option
-	if importsOnly {
-		parseMode = parser.ImportsOnly
-	}
-	var data []byte
-	if f := fs.getOverlay(path); f != nil {
-		if f.file != nil {
-			return f.file, nil
-		}
-		if f.isDir {
-			return nil, fmt.Errorf("%q is a directory", path)
-		}
-		data = f.contents
-	} else {
-		var err error
-		f, err := fs.openFile(path)
-		if err != nil {
-			return nil, err
-		}
-		defer f.Close()
-		if importsOnly {
-			data, err = cueimports.Read(f)
-		} else {
-			data, err = io.ReadAll(f)
-		}
-		if err != nil {
-			return nil, fmt.Errorf("read %s: %v", path, err)
-		}
-	}
-	pf, err := parser.ParseFile(path, data, parseMode)
-	if err != nil {
-		return nil, err
-	}
-	return pf, nil
 }
 
 func (fs *fileSystem) stat(path string) (iofs.FileInfo, errors.Error) {
@@ -382,6 +339,49 @@ func (fs *ioFS) ReadFile(name string) ([]byte, error) {
 	return os.ReadFile(fpath)
 }
 
+var _ module.ReadCUEFS = (*ioFS)(nil)
+
+// ReadCUEFile implements [module.ReadCUEFS] by
+// reading and updating the syntax file cache, which
+// is shared with the cache used by the [fileSystem.getCUESyntax]
+// method.
+func (fs *ioFS) ReadCUEFile(path string) (*ast.File, error) {
+	fpath, err := fs.absPathFromFSPath(path)
+	if err != nil {
+		return nil, err
+	}
+	cache := fs.fs.fileCache
+	cache.mu.Lock()
+	entry, ok := cache.entries[fpath]
+	cache.mu.Unlock()
+	if ok {
+		return entry.file, entry.err
+	}
+	var data []byte
+	if fi := fs.fs.getOverlay(fpath); fi != nil {
+		if fi.file != nil {
+			// No need for a cache if we've got the contents in *ast.File
+			// form already.
+			return fi.file, nil
+		}
+		data = fi.contents
+	} else {
+		data, err = os.ReadFile(fpath)
+		if err != nil {
+			cache.mu.Lock()
+			defer cache.mu.Unlock()
+			cache.entries[fpath] = fileCacheEntry{nil, err}
+			return nil, err
+		}
+	}
+	return fs.fs.getCUESyntax(&build.File{
+		Filename: fpath,
+		Encoding: build.CUE,
+		//		Form:     build.Schema,
+		Source: data,
+	})
+}
+
 // ioFSFile implements [io/fs.File] for the overlay filesystem.
 type ioFSFile struct {
 	fs      *fileSystem
@@ -434,12 +434,14 @@ func (f *ioFSFile) ReadDir(n int) ([]iofs.DirEntry, error) {
 }
 
 func (fs *fileSystem) getCUESyntax(bf *build.File) (*ast.File, error) {
+	fs.fileCache.mu.Lock()
+	defer fs.fileCache.mu.Unlock()
 	if bf.Encoding != build.CUE {
 		panic("getCUESyntax called with non-CUE file encoding")
 	}
 	// When it's a regular CUE file with no funny stuff going on, we
 	// check and update the syntax cache.
-	useCache := bf.Form == build.Schema && bf.Interpretation == ""
+	useCache := bf.Form == "" && bf.Interpretation == ""
 	if useCache {
 		if syntax, ok := fs.fileCache.entries[bf.Filename]; ok {
 			return syntax.file, syntax.err
@@ -471,6 +473,7 @@ func newFileCache(c *Config) *fileCache {
 type fileCache struct {
 	config  encoding.Config
 	ctx     *cue.Context
+	mu      sync.Mutex
 	entries map[string]fileCacheEntry
 }
 

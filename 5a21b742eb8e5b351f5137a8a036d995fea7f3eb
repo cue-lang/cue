@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7ddea37_1ab304ea",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-09T09:04:47Z",
+      "side": 1,
+      "message": "I believe we borrowed this term from Go: https://go.dev/ref/spec#Composite_literals",
+      "revId": "5a21b742eb8e5b351f5137a8a036d995fea7f3eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -101,45 +101,43 @@ func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	return nil, fmt.Errorf("command %q failed: %v", doc, err)
 }
 
-func mkCommand(ctx *task.Context) (c *exec.Cmd, doc string, err error) {
-	var bin string
-	var args []string
-
+// mkCommand builds an [exec.Cmd] from a CUE task value,
+// also returning the full list of arguments as a string slice
+// so that it can be used in error messages.
+func mkCommand(ctx *task.Context) (c *exec.Cmd, doc []string, err error) {
 	v := ctx.Lookup("cmd")
 	if ctx.Err != nil {
-		return nil, "", ctx.Err
+		return nil, nil, ctx.Err
 	}
 
+	var bin string
+	var args []string
 	switch v.Kind() {
 	case cue.StringKind:
-		str := ctx.String("cmd")
-		doc = str
+		str, _ := v.String()
 		list := strings.Fields(str)
-		bin = list[0]
-		args = append(args, list[1:]...)
+		bin, args = list[0], list[1:]
 
 	case cue.ListKind:
 		list, _ := v.List()
 		if !list.Next() {
-			return nil, "", errors.New("empty command list")
+			return nil, nil, errors.New("empty command list")
 		}
 		bin, err = list.Value().String()
 		if err != nil {
-			return nil, "", err
+			return nil, nil, err
 		}
-		doc += bin
 		for list.Next() {
 			str, err := list.Value().String()
 			if err != nil {
-				return nil, "", err
+				return nil, nil, err
 			}
 			args = append(args, str)
-			doc += " " + str
 		}
 	}
 
 	if bin == "" {
-		return nil, "", errors.New("empty command")
+		return nil, nil, errors.New("empty command")
 	}
 
 	cmd := exec.CommandContext(ctx.Context, bin, args...)
@@ -153,7 +151,7 @@ func mkCommand(ctx *task.Context) (c *exec.Cmd, doc string, err error) {
 		v, _ := iter.Value().Default()
 		str, err := v.String()
 		if err != nil {
-			return nil, "", errors.Wrapf(err, v.Pos(),
+			return nil, nil, errors.Wrapf(err, v.Pos(),
 				"invalid environment variable value %q", v)
 		}
 		cmd.Env = append(cmd.Env, str)
@@ -170,11 +168,11 @@ func mkCommand(ctx *task.Context) (c *exec.Cmd, doc string, err error) {
 		case cue.IntKind, cue.FloatKind, cue.NumberKind:
 			str = fmt.Sprint(v)
 		default:
-			return nil, "", errors.Newf(v.Pos(),
+			return nil, nil, errors.Newf(v.Pos(),
 				"invalid environment variable value %q", v)
 		}
 		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", label, str))
 	}
 
-	return cmd, doc, nil
+	return cmd, append([]string{bin}, args...), nil
 }

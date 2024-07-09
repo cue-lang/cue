@@ -162,7 +162,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 						ExcludeReason: errors.Newf(token.NoPos, "unknown filetype"),
 					})
 				} else {
-					fp.add(dir, file, importComment)
+					fp.add(dir, file, 0)
 				}
 			}
 			if p.PkgName == "" || !inModule || l.cfg.isModRoot(dir) || dir == d[0] {
@@ -376,7 +376,7 @@ func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
 	i.PkgName = parts.Qualifier
 	if i.PkgName == "" {
 		i.Err = errors.Append(i.Err, l.errPkgf([]token.Pos{pos}, "cannot determine package name for %q; set it explicitly with ':'", p))
-	} else if i.PkgName == "" {
+	} else if i.PkgName == "_" {
 		i.Err = errors.Append(i.Err, l.errPkgf([]token.Pos{pos}, "_ is not a valid import path qualifier in %q", p))
 	}
 	i.DisplayPath = string(p)

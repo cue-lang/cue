@@ -148,13 +148,11 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 // addFiles populates p.Files by reading CUE syntax from p.BuildFiles.
 func (l *loader) addFiles(p *build.Instance) {
 	for _, bf := range p.BuildFiles {
-		files, err := l.syntaxCache.getSyntax(bf)
+		f, err := l.syntaxCache.getSyntax(bf)
 		if err != nil {
 			p.ReportError(errors.Promote(err, "load"))
 		}
-		for _, f := range files {
-			_ = p.AddSyntax(f)
-		}
+		_ = p.AddSyntax(f)
 	}
 }
 
@@ -165,14 +163,15 @@ type syntaxCache struct {
 }
 
 type syntaxCacheEntry struct {
-	err   error
-	files []*ast.File
+	err  error
+	file *ast.File
 }
 
 func newSyntaxCache(cfg *Config) *syntaxCache {
 	return &syntaxCache{
 		config: encoding.Config{
-			Stdin:     cfg.stdin(),
+			// Note: no need to pass Stdin, as we take care
+			// always to pass a non-nil source when the file is "-".
 			ParseFile: cfg.ParseFile,
 		},
 		ctx:   cuecontext.New(),
@@ -181,20 +180,19 @@ func newSyntaxCache(cfg *Config) *syntaxCache {
 }
 
 // getSyntax returns the CUE syntax corresponding to the file argument f.
-func (c *syntaxCache) getSyntax(bf *build.File) ([]*ast.File, error) {
+func (c *syntaxCache) getSyntax(bf *build.File) (*ast.File, error) {
 	syntax, ok := c.cache[bf.Filename]
 	if ok {
-		return syntax.files, syntax.err
+		return syntax.file, syntax.err
 	}
 	if bf.Encoding != build.CUE {
 		panic("syntax for non-CUE file")
 	}
 	d := encoding.NewDecoder(c.ctx, bf, &c.config)
-	for ; !d.Done(); d.Next() {
-		syntax.files = append(syntax.files, d.File())
-	}
-	d.Close()
+	defer d.Close()
+	// Note: CUE files can never have multiple file parts.
+	syntax.file = d.File()
 	syntax.err = d.Err()
 	c.cache[bf.Filename] = syntax
-	return syntax.files, syntax.err
+	return syntax.file, syntax.err
 }

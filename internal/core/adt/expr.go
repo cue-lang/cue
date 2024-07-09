@@ -466,7 +466,7 @@ func (x *BoundExpr) evaluate(ctx *OpContext, state combinedFlags) Value {
 	}
 
 	switch k := v.Kind(); k {
-	case IntKind, FloatKind, NumKind, StringKind, BytesKind:
+	case IntKind, FloatKind, NumberKind, StringKind, BytesKind:
 	case NullKind:
 		if x.Op != NotEqualOp {
 			err := ctx.NewPosf(pos(x.Expr),
@@ -474,7 +474,7 @@ func (x *BoundExpr) evaluate(ctx *OpContext, state combinedFlags) Value {
 			return &Bottom{Err: err}
 		}
 	default:
-		mask := IntKind | FloatKind | NumKind | StringKind | BytesKind
+		mask := IntKind | FloatKind | NumberKind | StringKind | BytesKind
 		if x.Op == NotEqualOp {
 			mask |= NullKind
 		}
@@ -592,8 +592,8 @@ func (x *BoundValue) Source() ast.Node { return x.Src }
 func (x *BoundValue) Kind() Kind {
 	k := x.Value.Kind()
 	switch k {
-	case IntKind, FloatKind, NumKind:
-		return NumKind
+	case IntKind, FloatKind, NumberKind:
+		return NumberKind
 
 	case NullKind:
 		if x.Op == NotEqualOp {
@@ -1242,14 +1242,14 @@ func (x *UnaryExpr) evaluate(c *OpContext, state combinedFlags) Value {
 			f.Src = x.Src
 			return &f
 		}
-		expectedKind = NumKind
+		expectedKind = NumberKind
 
 	case AddOp:
 		if v, ok := v.(*Num); ok {
 			// TODO: wrap in thunk to save position of '+'?
 			return v
 		}
-		expectedKind = NumKind
+		expectedKind = NumberKind
 
 	case NotOp:
 		if v, ok := v.(*Bool); ok {

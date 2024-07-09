@@ -1149,7 +1149,7 @@ func (c *OpContext) scalar(v Value) Value {
 	return v
 }
 
-var zero = &Num{K: NumKind}
+var zero = &Num{K: NumberKind}
 
 func (c *OpContext) Num(v Value, as interface{}) *Num {
 	v = Unwrap(v)
@@ -1158,7 +1158,7 @@ func (c *OpContext) Num(v Value, as interface{}) *Num {
 	}
 	x, ok := v.(*Num)
 	if !ok {
-		c.typeErrorAs(v, NumKind, as)
+		c.typeErrorAs(v, NumberKind, as)
 		return zero
 	}
 	return x
@@ -1236,7 +1236,7 @@ func (c *OpContext) ToBytes(v Value) []byte {
 
 // ToString returns the string value of a scalar value.
 func (c *OpContext) ToString(v Value) string {
-	return c.toStringValue(v, StringKind|NumKind|BytesKind|BoolKind, nil)
+	return c.toStringValue(v, StringKind|NumberKind|BytesKind|BoolKind, nil)
 
 }
 

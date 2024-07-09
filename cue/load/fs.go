@@ -27,8 +27,11 @@ import (
 	"time"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/cueimports"
 	"cuelang.org/go/mod/module"
 )
 
@@ -177,6 +180,58 @@ func (fs *fileSystem) getOverlay(path string) *overlayFile {
 		return m[base]
 	}
 	return nil
+}
+
+func (fs *fileSystem) getCUESyntax(fi *build.File) (*ast.File, error) {
+	switch src := fi.Source.(type) {
+	case []byte, string:
+		return parser.ParseFile(fi.Filename, src, parser.ImportsOnly)
+	case *ast.File:
+		return src, nil
+	case nil:
+		if fi.Filename == "-" {
+			panic("source unexpectedly not provided for stdin")
+		}
+		return fs.readCUE(fi.Filename, true)
+	}
+	return nil, errors.Newf(token.NoPos, "unsupported source type %T", fi.Source)
+}
+
+func (fs *fileSystem) readCUE(path string, importsOnly bool) (*ast.File, error) {
+	var parseMode parser.Option
+	if importsOnly {
+		parseMode = parser.ImportsOnly
+	}
+	var data []byte
+	if f := fs.getOverlay(path); f != nil {
+		if f.file != nil {
+			return f.file, nil
+		}
+		if f.isDir {
+			return nil, fmt.Errorf("%q is a directory", path)
+		}
+		data = f.contents
+	} else {
+		var err error
+		f, err := fs.openFile(path)
+		if err != nil {
+			return nil, err
+		}
+		defer f.Close()
+		if importsOnly {
+			data, err = cueimports.Read(f)
+		} else {
+			data, err = io.ReadAll(f)
+		}
+		if err != nil {
+			return nil, fmt.Errorf("read %s: %v", path, err)
+		}
+	}
+	pf, err := parser.ParseFile(path, data, parseMode)
+	if err != nil {
+		return nil, err
+	}
+	return pf, nil
 }
 
 func (fs *fileSystem) stat(path string) (iofs.FileInfo, errors.Error) {

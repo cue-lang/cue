@@ -1,6 +1,7 @@
 package modimports
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
 	"path"
@@ -214,26 +215,36 @@ func yieldPackageFile(fsys fs.FS, fpath string, selectPackage func(pkgName strin
 	pf := ModuleFile{
 		FilePath: fpath,
 	}
-	f, err := fsys.Open(fpath)
-	if err != nil {
-		return "", yield(pf, err)
+	var syntax *ast.File
+	var err error
+	if cueFS, ok := fsys.(module.ReadCUEFS); ok {
+		syntax, err = cueFS.ReadCUEFile(fpath)
+		if err != nil && !errors.Is(err, errors.ErrUnsupported) {
+			return "", yield(pf, err)
+		}
 	}
-	defer f.Close()
+	if syntax == nil {
+		f, err := fsys.Open(fpath)
+		if err != nil {
+			return "", yield(pf, err)
+		}
+		defer f.Close()
 
-	// Note that we use cueimports.Read before parser.ParseFile as cue/parser
-	// will always consume the whole input reader, which is often wasteful.
-	//
-	// TODO(mvdan): the need for cueimports.Read can go once cue/parser can work
-	// on a reader in a streaming manner.
-	data, err := cueimports.Read(f)
-	if err != nil {
-		return "", yield(pf, err)
-	}
-	// Add a leading "./" so that a parse error filename is consistent
-	// with the other error filenames created elsewhere in the codebase.
-	syntax, err := parser.ParseFile("./"+fpath, data, parser.ImportsOnly)
-	if err != nil {
-		return "", yield(pf, err)
+		// Note that we use cueimports.Read before parser.ParseFile as cue/parser
+		// will always consume the whole input reader, which is often wasteful.
+		//
+		// TODO(mvdan): the need for cueimports.Read can go once cue/parser can work
+		// on a reader in a streaming manner.
+		data, err := cueimports.Read(f)
+		if err != nil {
+			return "", yield(pf, err)
+		}
+		// Add a leading "./" so that a parse error filename is consistent
+		// with the other error filenames created elsewhere in the codebase.
+		syntax, err = parser.ParseFile("./"+fpath, data, parser.ImportsOnly)
+		if err != nil {
+			return "", yield(pf, err)
+		}
 	}
 
 	if !selectPackage(syntax.PackageName()) {

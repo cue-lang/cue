@@ -22,13 +22,9 @@ package load
 import (
 	"path/filepath"
 
-	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
-	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/mod/modpkgload"
 
 	// Trigger the unconditional loading of all core builtin packages if load
@@ -44,11 +40,6 @@ type loader struct {
 	stk    importStack
 	pkgs   *modpkgload.Packages
 
-	// syntaxCache caches the work involved when decoding a file into an *ast.File.
-	// This can happen multiple times for the same file, for example when it is present in
-	// multiple different build instances in the same directory hierarchy.
-	syntaxCache *syntaxCache
-
 	// dirCachedBuildFiles caches the work involved when reading a directory
 	// It is keyed by directory name.
 	// When we descend into subdirectories to load patterns such as ./...
@@ -62,13 +53,12 @@ type cachedDirFiles struct {
 	filenames []string
 }
 
-func newLoader(c *Config, tg *tagger, syntaxCache *syntaxCache, pkgs *modpkgload.Packages) *loader {
+func newLoader(c *Config, tg *tagger, pkgs *modpkgload.Packages) *loader {
 	return &loader{
 		cfg:                 c,
 		tagger:              tg,
 		pkgs:                pkgs,
 		dirCachedBuildFiles: make(map[string]cachedDirFiles),
-		syntaxCache:         syntaxCache,
 	}
 }
 
@@ -148,51 +138,10 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 // addFiles populates p.Files by reading CUE syntax from p.BuildFiles.
 func (l *loader) addFiles(p *build.Instance) {
 	for _, bf := range p.BuildFiles {
-		f, err := l.syntaxCache.getSyntax(bf)
+		f, err := l.cfg.fileSystem.getCUESyntax(bf)
 		if err != nil {
 			p.ReportError(errors.Promote(err, "load"))
 		}
 		_ = p.AddSyntax(f)
 	}
-}
-
-type syntaxCache struct {
-	config encoding.Config
-	ctx    *cue.Context
-	cache  map[string]syntaxCacheEntry
-}
-
-type syntaxCacheEntry struct {
-	err  error
-	file *ast.File
-}
-
-func newSyntaxCache(cfg *Config) *syntaxCache {
-	return &syntaxCache{
-		config: encoding.Config{
-			// Note: no need to pass Stdin, as we take care
-			// always to pass a non-nil source when the file is "-".
-			ParseFile: cfg.ParseFile,
-		},
-		ctx:   cuecontext.New(),
-		cache: make(map[string]syntaxCacheEntry),
-	}
-}
-
-// getSyntax returns the CUE syntax corresponding to the file argument f.
-func (c *syntaxCache) getSyntax(bf *build.File) (*ast.File, error) {
-	syntax, ok := c.cache[bf.Filename]
-	if ok {
-		return syntax.file, syntax.err
-	}
-	if bf.Encoding != build.CUE {
-		panic("syntax for non-CUE file")
-	}
-	d := encoding.NewDecoder(c.ctx, bf, &c.config)
-	defer d.Close()
-	// Note: CUE files can never have multiple file parts.
-	syntax.file = d.File()
-	syntax.err = d.Err()
-	c.cache[bf.Filename] = syntax
-	return syntax.file, syntax.err
 }

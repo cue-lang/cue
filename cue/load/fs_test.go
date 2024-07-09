@@ -32,7 +32,10 @@ func TestIOFS(t *testing.T) {
 		overlay[filepath.Join(dir, f)] = FromString(f + " overlay")
 	}
 
-	fsys, err := newFileSystem(filepath.Join(dir, "foo"), overlay)
+	fsys, err := newFileSystem(&Config{
+		Dir:     filepath.Join(dir, "foo"),
+		Overlay: overlay,
+	})
 	qt.Assert(t, qt.IsNil(err))
 	ffsys := fsys.ioFS(dir)
 	err = fstest.TestFS(ffsys, append(slices.Clip(onDiskFiles), overlayFiles...)...)

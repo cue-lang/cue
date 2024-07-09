@@ -23,10 +23,8 @@ import (
 	"strconv"
 	"strings"
 
-	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 )
 
@@ -206,7 +204,7 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) {
 	// Note: when path is "-" (stdin), it will already have
 	// been read and file.Source set to the resulting data
 	// by setFileSource.
-	pf, perr := fp.readCUE(fullPath, file.Source)
+	pf, perr := fp.c.fileSystem.getCUESyntax(file)
 	if perr != nil {
 		badFile(errors.Promote(perr, "add failed"))
 		return
@@ -321,21 +319,6 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) {
 	default:
 		p.BuildFiles = append(p.BuildFiles, file)
 	}
-}
-
-func (fp *fileProcessor) readCUE(fullPath string, src any) (*ast.File, error) {
-	switch src := src.(type) {
-	case []byte, string:
-		return parser.ParseFile(fullPath, src, parser.ImportsOnly)
-	case *ast.File:
-		return src, nil
-	case nil:
-		if fullPath == "-" {
-			panic("source unexpectedly not provided for stdin")
-		}
-		return fp.c.fileSystem.readCUE(fullPath, true)
-	}
-	return nil, errors.Newf(token.NoPos, "unsupported source type %T", src)
 }
 
 func cleanImports(m map[string][]token.Pos) ([]string, map[string][]token.Pos) {

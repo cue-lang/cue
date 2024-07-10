@@ -22,7 +22,6 @@ func TestIOFS(t *testing.T) {
 	for _, f := range onDiskFiles {
 		writeFile(t, filepath.Join(dir, f), f)
 	}
-	var fsys fileSystem
 	overlayFiles := []string{
 		"foo/bar/a",
 		"foo/bar/c",
@@ -33,7 +32,10 @@ func TestIOFS(t *testing.T) {
 		overlay[filepath.Join(dir, f)] = FromString(f + " overlay")
 	}
 
-	err := fsys.init(filepath.Join(dir, "foo"), overlay)
+	fsys, err := newFileSystem(&Config{
+		Dir:     filepath.Join(dir, "foo"),
+		Overlay: overlay,
+	})
 	qt.Assert(t, qt.IsNil(err))
 	ffsys := fsys.ioFS(dir)
 	err = fstest.TestFS(ffsys, append(slices.Clip(onDiskFiles), overlayFiles...)...)

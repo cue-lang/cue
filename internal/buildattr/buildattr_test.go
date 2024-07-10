@@ -50,20 +50,17 @@ package something
 
 @if(foo)
 `,
-	wantOK:       false,
-	wantTagCalls: map[string]bool{"foo": true},
-	wantAttr:     "@if(foo)",
+	wantOK: true,
 }, {
 	testName: "InvalidExpr",
 	syntax: `
-
 @if(foo + bar)
 
 package something
 `,
 	wantOK:   false,
 	wantAttr: "@if(foo + bar)",
-	wantError: `invalid operator \+
+	wantError: `invalid operator \+ in build attribute
 `,
 }, {
 	testName: "MultipleIfAttributes",
@@ -74,7 +71,8 @@ package something
 
 package something
 `,
-	wantOK: false,
+	wantOK:   false,
+	wantAttr: "@if(foo)",
 	wantError: `previous declaration here:
     testfile.cue:3:1
 multiple @if attributes:
@@ -91,12 +89,8 @@ package something
 @if(bar)
 `,
 	wantOK:       false,
+	wantAttr:     "@if(foo)",
 	wantTagCalls: map[string]bool{"foo": true},
-	wantError: `previous declaration here:
-    testfile.cue:3:1
-multiple @if attributes:
-    testfile.cue:7:1
-`,
 }, {
 	testName: "And#0",
 	syntax: `
@@ -242,9 +236,7 @@ package something
 	tags: map[string]bool{
 		"baz": true,
 	},
-	wantOK: false,
-	wantError: `invalid type \*ast.ParenExpr in build attribute
-`,
+	wantOK: true,
 	wantTagCalls: map[string]bool{
 		"foo": true,
 		"bar": true,

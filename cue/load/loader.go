@@ -49,19 +49,17 @@ type loader struct {
 	// multiple different build instances in the same directory hierarchy.
 	syntaxCache *syntaxCache
 
-	// dirCachedBuildFiles caches the work involved when reading a directory
-	// and determining what build files it contains.
-	// It is keyed by directory name.
-	// When we descend into subdirectories to load patterns such as ./...
-	// we often end up loading parent directories many times over;
-	// this cache amortizes that work.
-	dirCachedBuildFiles map[string]cachedFileFiles
+	// dirCachedBuildFiles caches the work involved when reading a
+	// directory. It is keyed by directory name. When we descend into
+	// subdirectories to load patterns such as ./... we often end up
+	// loading parent directories many times over; this cache
+	// amortizes that work.
+	dirCachedBuildFiles map[string]cachedDirFiles
 }
 
-type cachedFileFiles struct {
-	err          errors.Error
-	buildFiles   []*build.File
-	unknownFiles []*build.File
+type cachedDirFiles struct {
+	err       errors.Error
+	filenames []string
 }
 
 func newLoader(c *Config, tg *tagger, syntaxCache *syntaxCache, pkgs *modpkgload.Packages) *loader {
@@ -69,7 +67,7 @@ func newLoader(c *Config, tg *tagger, syntaxCache *syntaxCache, pkgs *modpkgload
 		cfg:                 c,
 		tagger:              tg,
 		pkgs:                pkgs,
-		dirCachedBuildFiles: map[string]cachedFileFiles{},
+		dirCachedBuildFiles: make(map[string]cachedDirFiles),
 		syntaxCache:         syntaxCache,
 	}
 }

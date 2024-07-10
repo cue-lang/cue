@@ -55,7 +55,7 @@ func getBuildAttr(f *ast.File) (*ast.Attribute, errors.Error) {
 			a = x
 
 		case *ast.Package:
-			break
+			return a, nil
 		}
 	}
 	return a, nil

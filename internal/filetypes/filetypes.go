@@ -78,7 +78,7 @@ func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
 	// isolation without interference from evaluating these files.
 	if mode == Input &&
 		b.Encoding == build.CUE &&
-		b.Form == build.Schema &&
+		b.Form == "" &&
 		b.Interpretation == "" {
 		return &FileInfo{
 			File: b,
@@ -175,11 +175,9 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 			if !fileVal.Exists() {
 				if len(a) == 1 && strings.HasSuffix(a[0], ".cue") {
 					// Handle majority case.
-					files = append(files, &build.File{
-						Filename: a[0],
-						Encoding: build.CUE,
-						Form:     build.Schema,
-					})
+					f := *fileForCUE
+					f.Filename = a[0]
+					files = append(files, &f)
 					hasFiles = true
 					continue
 				}
@@ -269,14 +267,19 @@ func ParseFileAndType(file, scope string, mode Mode) (*build.File, error) {
 	// Quickly discard files which we aren't interested in.
 	// These cases are very common when loading `./...` in a large repository.
 	typesInit()
-	if scope == "" {
+	if scope == "" && file != "-" {
 		ext := fileExt(file)
-		if file == "-" {
-			// not handled here
-		} else if ext == "" {
+		if ext == "" {
 			return nil, errors.Newf(token.NoPos, "no encoding specified for file %q", file)
-		} else if !knownExtensions[ext] {
+		}
+		f, ok := fileForExt[ext]
+		if !ok {
 			return nil, errors.Newf(token.NoPos, "unknown file extension %s", ext)
+		}
+		if mode == Input {
+			f1 := *f
+			f1.Filename = file
+			return &f1, nil
 		}
 	}
 	modeVal, fileVal, err := parseType(scope, mode)

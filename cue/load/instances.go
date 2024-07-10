@@ -96,7 +96,6 @@ func Instances(args []string, c *Config) []*build.Instance {
 		pkgArgs = pkgArgs1
 	}
 
-	synCache := newSyntaxCache(c)
 	tg := newTagger(c)
 	// Pass all arguments that look like packages to loadPackages
 	// so that they'll be available when looking up the packages
@@ -105,11 +104,11 @@ func Instances(args []string, c *Config) []*build.Instance {
 	if err != nil {
 		return []*build.Instance{c.newErrInstance(err)}
 	}
-	pkgs, err := loadPackages(ctx, c, synCache, expandedPaths, otherFiles, tg)
+	pkgs, err := loadPackages(ctx, c, expandedPaths, otherFiles, tg)
 	if err != nil {
 		return []*build.Instance{c.newErrInstance(err)}
 	}
-	l := newLoader(c, tg, synCache, pkgs)
+	l := newLoader(c, tg, pkgs)
 
 	if c.Context == nil {
 		c.Context = build.NewContext(
@@ -175,7 +174,6 @@ func Instances(args []string, c *Config) []*build.Instance {
 func loadPackages(
 	ctx context.Context,
 	cfg *Config,
-	synCache *syntaxCache,
 	pkgs []resolvedPackageArg,
 	otherFiles []*build.File,
 	tg *tagger,
@@ -205,7 +203,7 @@ func loadPackages(
 			// not a CUE file; assume it has no imports for now.
 			continue
 		}
-		syntax, err := synCache.getSyntax(f)
+		syntax, err := cfg.fileSystem.getCUESyntax(f)
 		if err != nil {
 			return nil, fmt.Errorf("cannot get syntax for %q: %v", f.Filename, err)
 		}

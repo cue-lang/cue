@@ -17,7 +17,7 @@ import (
 func ShouldBuildFile(f *ast.File, tagIsSet func(key string) bool) (bool, *ast.Attribute, errors.Error) {
 	a, err := getBuildAttr(f)
 	if err != nil {
-		return false, nil, err
+		return false, a, err
 	}
 	if a == nil {
 		return true, nil, nil
@@ -50,12 +50,12 @@ func getBuildAttr(f *ast.File) (*ast.Attribute, errors.Error) {
 				err := errors.Newf(d.Pos(), "multiple @if attributes")
 				err = errors.Append(err,
 					errors.Newf(a.Pos(), "previous declaration here"))
-				return nil, err
+				return a, err
 			}
 			a = x
 
 		case *ast.Package:
-			break
+			return a, nil
 		}
 	}
 	return a, nil
@@ -65,6 +65,9 @@ func shouldInclude(expr ast.Expr, tagIsSet func(key string) bool) (bool, errors.
 	switch x := expr.(type) {
 	case *ast.Ident:
 		return tagIsSet(x.Name), nil
+
+	case *ast.ParenExpr:
+		return shouldInclude(x.X, tagIsSet)
 
 	case *ast.BinaryExpr:
 		switch x.Op {
@@ -83,12 +86,12 @@ func shouldInclude(expr ast.Expr, tagIsSet func(key string) bool) (bool, errors.
 			return a || b, nil
 
 		default:
-			return false, errors.Newf(token.NoPos, "invalid operator %v", x.Op)
+			return false, errors.Newf(token.NoPos, "invalid operator %v in build attribute", x.Op)
 		}
 
 	case *ast.UnaryExpr:
 		if x.Op != token.NOT {
-			return false, errors.Newf(token.NoPos, "invalid operator %v", x.Op)
+			return false, errors.Newf(token.NoPos, "invalid operator %v in build attribute", x.Op)
 		}
 		v, err := shouldInclude(x.X, tagIsSet)
 		if err != nil {

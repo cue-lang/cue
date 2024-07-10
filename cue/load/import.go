@@ -71,7 +71,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	defer l.stk.Pop()
 
 	cfg := l.cfg
-	ctxt := &cfg.fileSystem
+	ctxt := cfg.fileSystem
 
 	if p.Err != nil {
 		return []*build.Instance{p}

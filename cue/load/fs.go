@@ -94,14 +94,16 @@ func (fs *fileSystem) ioFS(root string) iofs.FS {
 	}
 }
 
-func (fs *fileSystem) init(cwd string, overlay map[string]Source) error {
-	fs.cwd = cwd
-	fs.overlayDirs = map[string]map[string]*overlayFile{}
+func newFileSystem(cfg *Config) (*fileSystem, error) {
+	fs := &fileSystem{
+		cwd:         cfg.Dir,
+		overlayDirs: map[string]map[string]*overlayFile{},
+	}
 
 	// Organize overlay
-	for filename, src := range overlay {
+	for filename, src := range cfg.Overlay {
 		if !filepath.IsAbs(filename) {
-			return fmt.Errorf("non-absolute file path %q in overlay", filename)
+			return nil, fmt.Errorf("non-absolute file path %q in overlay", filename)
 		}
 		// TODO: do we need to further clean the path or check that the
 		// specified files are within the root/ absolute files?
@@ -109,7 +111,7 @@ func (fs *fileSystem) init(cwd string, overlay map[string]Source) error {
 		m := fs.getDir(dir, true)
 		b, file, err := src.contents()
 		if err != nil {
-			return err
+			return nil, err
 		}
 		m[base] = &overlayFile{
 			basename: base,
@@ -134,7 +136,7 @@ func (fs *fileSystem) init(cwd string, overlay map[string]Source) error {
 			}
 		}
 	}
-	return nil
+	return fs, nil
 }
 
 func (fs *fileSystem) makeAbs(path string) string {

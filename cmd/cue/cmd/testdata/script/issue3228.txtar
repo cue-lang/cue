@@ -1,0 +1,33 @@
+# This verifies that evaluation of build attributes is not order-dependent.
+
+! exec cue export
+cmp stderr error
+
+exec cue export -t C
+cmp stdout out
+
+exec cue export -t A -t B
+cmp stdout out
+
+exec cue export -t A -t C
+cmp stdout out
+
+# This fails.
+exec cue export -t B -t C
+cmp stdout out
+
+# This fails.
+exec cue export -t A -t B -t C
+cmp stdout out
+-- example.cue --
+@if( A && B || C )
+package example
+
+x: 1
+-- out --
+{
+    "x": 1
+}
+-- error --
+build constraints exclude all CUE files in .:
+    script-issue3228/example.cue: @if( A && B || C ) did not match

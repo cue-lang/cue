@@ -297,7 +297,7 @@ type Config struct {
 	// will be used.
 	Env []string
 
-	fileSystem fileSystem
+	fileSystem *fileSystem
 }
 
 func (c *Config) stdin() io.Reader {
@@ -354,9 +354,11 @@ func (c Config) complete() (cfg *Config, err error) {
 
 	// TODO: we could populate this already with absolute file paths,
 	// but relative paths cannot be added. Consider what is reasonable.
-	if err := c.fileSystem.init(c.Dir, c.Overlay); err != nil {
+	fsys, err := newFileSystem(&c)
+	if err != nil {
 		return nil, err
 	}
+	c.fileSystem = fsys
 
 	// TODO: determine root on a package basis. Maybe we even need a
 	// pkgname.cue.mod

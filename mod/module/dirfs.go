@@ -1,9 +1,10 @@
 package module
 
 import (
-	"go/ast"
 	"io/fs"
 	"os"
+
+	"cuelang.org/go/cue/ast"
 )
 
 // SourceLoc represents the location of some CUE source code.

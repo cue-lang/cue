@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c8a7f19_5d4fb61b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-07-10T20:51:55Z",
+      "side": 1,
+      "message": "@rogpeppe@gmail.com this change sounds like it might be related to (or fix?) cue-lang/cue#3228.",
+      "revId": "289901e568dc0ce366fb5426e1e75a80cc8ceb24",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

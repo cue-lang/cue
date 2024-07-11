@@ -183,7 +183,7 @@ Note: support for embed is experimental, and is enabled via
 CUE_EXPERIMENT=embed.
 
 For more details and discussion, see the proposal linked from
-https://cuelang.org/dicsussion/3264.
+https://cuelang.org/discussion/3264.
 `[1:],
 }
 

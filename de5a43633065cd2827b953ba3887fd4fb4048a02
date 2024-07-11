@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16f79790_67bb0a03",
+        "filename": "internal/filetypes/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T10:23:29Z",
+      "side": 1,
+      "message": "This appears to do a lot of work, only to leave 90% of it on the floor, which will likely increase init-time costs for most use cases where it has no benefit.\n\nWhy not make `fileForExt` a sync map with a `sync.Once` value that returns the `*build.File`? Then we get the benefit for all extensions in a lazy manner.",
+      "revId": "de5a43633065cd2827b953ba3887fd4fb4048a02",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

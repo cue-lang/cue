@@ -104,6 +104,22 @@ self: "test.example/d1"
 prodenabled: false
 y: d4
 
+-- _registry/test.example_d1_v0.0.1/a_tool.cue --
+
+package d1
+
+import "test.example/d5"
+
+y: d5
+
+-- _registry/test.example_d1_v0.0.1/a_test.cue --
+
+package d1
+
+import "test.example/d6"
+
+y: d6
+
 -- _registry/test.example_d2_v0.0.1/cue.mod/module.cue --
 module: "test.example/d2"
 language: version: "v0.9.2"
@@ -125,3 +141,17 @@ language: version: "v0.9.2"
 -- _registry/test.example_d4_v0.0.1/x.cue --
 package d4
 self: "test.example/d4"
+
+-- _registry/test.example_d5_v0.0.1/cue.mod/module.cue --
+module: "test.example/d5"
+language: version: "v0.9.2"
+-- _registry/test.example_d5_v0.0.1/x.cue --
+package d5
+self: "test.example/d5"
+
+-- _registry/test.example_d6_v0.0.1/cue.mod/module.cue --
+module: "test.example/d6"
+language: version: "v0.9.2"
+-- _registry/test.example_d6_v0.0.1/x.cue --
+package d6
+self: "test.example/d6"

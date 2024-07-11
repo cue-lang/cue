@@ -34,6 +34,24 @@
       "parentUuid": "e0fa31fb_68d20a88",
       "revId": "633cd747ff4d2bf5b452852aac45f2b37820ef14",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "41290334_7ab2fb74",
+        "filename": "cue/load/config.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-11T15:03:43Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "fe307964_d6fd9495",
+      "revId": "633cd747ff4d2bf5b452852aac45f2b37820ef14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

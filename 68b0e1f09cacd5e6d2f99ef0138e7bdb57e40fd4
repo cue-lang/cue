@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ff81daf_438fa7af",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T13:09:32Z",
+      "side": 1,
+      "message": "Per offline conversation, might be worth including a comment that a \"imports only\"-aware version could be implemented later if required?",
+      "revId": "68b0e1f09cacd5e6d2f99ef0138e7bdb57e40fd4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a468b33_68cdeb74",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T13:09:32Z",
+      "side": 1,
+      "message": "Having this around in the commit message is a bit clumsy to my mind. Let\u0027s just put it in a testscript test that is skipped, and reference that script from the commit message with a command that shows how to run it?\n\n(In any case if we were leaving this here, per an earlier review message, code is (by convention) 4-space indented as markdown syntax means/does nothing in commit messages, whereas code review systems generally understand 4 spaces as a code/literal block.)",
+      "revId": "68b0e1f09cacd5e6d2f99ef0138e7bdb57e40fd4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8e5e1d1_b3fc137d",
+        "filename": "internal/mod/modimports/modimports.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T13:09:32Z",
+      "side": 1,
+      "message": "For the uninitiated reader (like myself) I think it\u0027s worth documenting which code paths will cause this to return true vs otherwise.",
+      "revId": "68b0e1f09cacd5e6d2f99ef0138e7bdb57e40fd4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80ca57c1_d1ebaee3",
+        "filename": "internal/mod/modimports/modimports.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T13:09:32Z",
+      "side": 1,
+      "message": "For ease of reading, I think this should be `else` on previous `if`. Otherwise I would suggest a comment on why this is the correct logic.",
+      "revId": "68b0e1f09cacd5e6d2f99ef0138e7bdb57e40fd4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

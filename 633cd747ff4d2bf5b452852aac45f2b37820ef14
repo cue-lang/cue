@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "68ee0214_cbf729ad",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-11T12:05:27Z",
+      "side": 1,
+      "message": "Originally (before that CL) the `Instance.AllTags` field was populated from `//+build` comments, something that\u0027s never been a supported thing in CUE. It seems like it was a remnant of the original Go code this was derived from.\n\nSince that CL, the `AllTags` field has always remained empty and never populated.\n\nI\u0027ll add the above explanation to the commit message.",
+      "parentUuid": "bc7d1f81_b7c8aeaa",
+      "revId": "633cd747ff4d2bf5b452852aac45f2b37820ef14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "72abd73c_2893203d",
@@ -48,6 +66,48 @@
       "writtenOn": "2024-07-11T11:13:38Z",
       "side": 1,
       "message": "I would perhaps soften this to \"this field is not used.\"\n\nIs there some direction on what the user should consider instead?",
+      "range": {
+        "startLine": 100,
+        "startChar": 27,
+        "endLine": 100,
+        "endChar": 47
+      },
+      "revId": "633cd747ff4d2bf5b452852aac45f2b37820ef14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3cc80a06_e79f9e8a",
+        "filename": "cue/build/instance.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-11T12:05:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "72abd73c_2893203d",
+      "revId": "633cd747ff4d2bf5b452852aac45f2b37820ef14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe4ca97a_4fdcb4a9",
+        "filename": "cue/build/instance.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-11T12:05:27Z",
+      "side": 1,
+      "message": "I don\u0027t really understand why the field might be useful, tbh, and it has never been populated as it should be, so I don\u0027t see a useful suggestion to make.\n\nThese fields of the struct with `api:\"alpha\"` which I suspect is a signal that users shouldn\u0027t be relying on them. We could just remove it, but I err towards deprecation, at least to start with.",
+      "parentUuid": "960dfccb_d1cb22ce",
       "range": {
         "startLine": 100,
         "startChar": 27,

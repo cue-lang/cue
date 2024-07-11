@@ -1,0 +1,124 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "588a2ceb_703ed4ce",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T18:59:09Z",
+      "side": 1,
+      "message": "I think this should be expanded per our earlier conversation as to what is/isn\u0027t in scope here, and what our position is with respect to `_test.cue` files and the extent to which they are/aren\u0027t supported.\n\nPerhaps the clearest way to document this is with reference to the Go behaviour, and what CUE does/doesn\u0027t do by comparison.",
+      "revId": "caff82ef7dd9882ebf0f5fc915a51963f966e1dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "980a6c95_ee55a731",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_with_build_attrs.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T18:59:09Z",
+      "side": 1,
+      "message": "The additions to this test file should be documented as part of the explanation at the top of this test. Because they otherwise appear unrelated to the purpose of this test. \n\nIndeed does the file need to be renamed?",
+      "revId": "caff82ef7dd9882ebf0f5fc915a51963f966e1dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00515752_c0703b82",
+        "filename": "cmd/cue/cmd/testdata/script/test_files.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T18:59:09Z",
+      "side": 1,
+      "message": "Lots of \"currently\"",
+      "range": {
+        "startLine": 4,
+        "startChar": 7,
+        "endLine": 4,
+        "endChar": 16
+      },
+      "revId": "caff82ef7dd9882ebf0f5fc915a51963f966e1dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4479fab2_acda31cd",
+        "filename": "cue/load/instances.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T18:59:09Z",
+      "side": 1,
+      "message": "Is it correct that this logic applies for a named package? I\u0027m not clear how it being named is relevant to this calculation of whether to walk tests or not; that seems to be entirely determined by the main module.",
+      "range": {
+        "startLine": 240,
+        "startChar": 32,
+        "endLine": 240,
+        "endChar": 52
+      },
+      "revId": "caff82ef7dd9882ebf0f5fc915a51963f966e1dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8eb4ba63_57b438ff",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T18:59:09Z",
+      "side": 1,
+      "message": "Do we support `@if(ignore)`? If not, probably worth an issue and a TODO?",
+      "revId": "caff82ef7dd9882ebf0f5fc915a51963f966e1dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5ab00d2_56aa0d1a",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T18:59:09Z",
+      "side": 1,
+      "message": "Nit: you don\u0027t use this.",
+      "range": {
+        "startLine": 178,
+        "startChar": 114,
+        "endLine": 178,
+        "endChar": 117
+      },
+      "revId": "caff82ef7dd9882ebf0f5fc915a51963f966e1dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

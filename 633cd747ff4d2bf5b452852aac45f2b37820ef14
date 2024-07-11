@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0fa31fb_68d20a88",
+        "filename": "cue/load/config.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T11:19:35Z",
+      "side": 0,
+      "message": "Unrelated change?",
+      "revId": "633cd747ff4d2bf5b452852aac45f2b37820ef14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

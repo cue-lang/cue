@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "147c5943_5c2f9294",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T11:19:35Z",
+      "side": 1,
+      "message": "FYI the use of markdown in git commits is not really a thing that we benefit from, apart from when they are rendered via GitHub. In fact it hurts readability to my mind. \n\nThe use of backtick is fine for code, single quotes works just as well. Code blocks are by standard 4-spec indented. URLs I stick on a separate line (with no indenting because they tend to be long), so that surrounding text is not affected by weird wrapping:\n\n```\nImport comments were introduced in Go 1.4:\n\nhttps://docs.google.com/document/d/1jVFkZTcYbNLaTxXD9OcGfn7vYv5hWtPx9--lTx1gPMs/edit\n\nBut as far...\n```",
+      "revId": "24f7467119eac5f56806cd694525dba244246fd9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77c7b0df_d4167eed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T11:19:35Z",
+      "side": 1,
+      "message": "Nice",
+      "revId": "24f7467119eac5f56806cd694525dba244246fd9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e976977_0d2acbbe",
+        "filename": "cue/build/instance.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T11:19:35Z",
+      "side": 1,
+      "message": "Per https://go.dev/wiki/Deprecated: clean line (new paragraph) required.",
+      "revId": "24f7467119eac5f56806cd694525dba244246fd9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

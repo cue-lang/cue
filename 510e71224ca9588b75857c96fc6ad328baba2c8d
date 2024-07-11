@@ -22,6 +22,30 @@
       },
       "revId": "510e71224ca9588b75857c96fc6ad328baba2c8d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "33876b9c_14f3e303",
+        "filename": "internal/filetypes/types.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-11T12:05:27Z",
+      "side": 1,
+      "message": "Yeah, treating it as binary seems like a better approach, thanks. Done.",
+      "parentUuid": "94c17d43_3584fa73",
+      "range": {
+        "startLine": 362,
+        "startChar": 19,
+        "endLine": 362,
+        "endChar": 23
+      },
+      "revId": "510e71224ca9588b75857c96fc6ad328baba2c8d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

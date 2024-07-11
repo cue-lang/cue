@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba829b7b_349072a3",
+        "filename": "cue/load/loader_common.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T12:43:44Z",
+      "side": 1,
+      "message": "Might be worth mentioning the change to remove the return value here, just to make clear it\u0027s intentional in this change.",
+      "revId": "2203a2c372cfd30c7b9fc951f1ceaed7d78bc52f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8aeec4e2_b43da339",
+        "filename": "cue/load/loader_common.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T12:43:44Z",
+      "side": 1,
+      "message": "I understand the reasoning behind dropping the `matchFile` function, but it feels like the logic around files that begin with `.`, `_`, carving out directories that contain `cue.mod` etc, really belongs in a couple of core functions. The logic appears to be somewhat littered all over the place now.",
+      "revId": "2203a2c372cfd30c7b9fc951f1ceaed7d78bc52f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bacce30f_01402e83",
+        "filename": "cue/load/search.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T12:43:44Z",
+      "side": 1,
+      "message": "Unrelated to this change?",
+      "revId": "2203a2c372cfd30c7b9fc951f1ceaed7d78bc52f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

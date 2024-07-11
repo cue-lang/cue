@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a748e8c_efecb6e9",
+        "filename": "cue/load/loader.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T12:43:44Z",
+      "side": 1,
+      "message": "I\u0027m assuming this is tightening an existing invariant: worth updating the doc comment to that effect?",
+      "revId": "1bd5552cd241c80e53f542bed0d96c7bb7dfb98f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

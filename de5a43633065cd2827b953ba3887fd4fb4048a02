@@ -34,6 +34,24 @@
       "parentUuid": "16f79790_67bb0a03",
       "revId": "de5a43633065cd2827b953ba3887fd4fb4048a02",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "874e8de6_cc380006",
+        "filename": "internal/filetypes/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T11:04:09Z",
+      "side": 1,
+      "message": "Understood. Is there a good TODO left around somewhere for this sort of cleanup? If not, I\u0027d suggest we add one.",
+      "parentUuid": "dc73e70b_c8b04359",
+      "revId": "de5a43633065cd2827b953ba3887fd4fb4048a02",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

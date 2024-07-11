@@ -148,9 +148,11 @@ func CheckPathWithoutVersion(basePath string) (err error) {
 // ASCII digits, dots (U+002E), and dashes (U+002D);
 // it must contain at least one dot and cannot start with a dash.
 //
-// Second, there must be a final major version of the form
+// Second, there may be a final major version of the form
 // @vN where N looks numeric
 // (ASCII digits) and must not begin with a leading zero.
+// Without such a major version, the major version is assumed
+// to be v0.
 //
 // Third, no path element may begin with a dot.
 func CheckPath(mpath string) (err error) {
@@ -164,17 +166,18 @@ func CheckPath(mpath string) (err error) {
 	}()
 
 	basePath, vers, ok := SplitPathVersion(mpath)
-	if !ok {
-		return fmt.Errorf("no major version found in module path")
-	}
-	if semver.Major(vers) != vers {
-		return fmt.Errorf("path can contain major version only")
+	if ok {
+		if semver.Major(vers) != vers {
+			return fmt.Errorf("path can contain major version only")
+		}
+		if !tagPat.MatchString(vers) {
+			return fmt.Errorf("non-conforming version %q", vers)
+		}
+	} else {
+		basePath = mpath
 	}
 	if err := CheckPathWithoutVersion(basePath); err != nil {
 		return err
-	}
-	if !tagPat.MatchString(vers) {
-		return fmt.Errorf("non-conforming version %q", vers)
 	}
 	return nil
 }

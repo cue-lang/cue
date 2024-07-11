@@ -1,14 +1,15 @@
 exec cue mod init test.example
 cmp cue.mod/module.cue want-module
-
-# TODO this should not fail.
-! exec cue mod edit --module other.example
-cmp stderr want-stderr
+exec cue mod edit --module other.example
+cmp cue.mod/module.cue want-module-2
 
 -- want-module --
 module: "test.example"
 language: {
 	version: "v0.10.0"
 }
--- want-stderr --
-invalid argument "other.example" for "--module" flag: malformed module path "other.example": no major version found in module path
+-- want-module-2 --
+module: "other.example"
+language: {
+	version: "v0.10.0"
+}

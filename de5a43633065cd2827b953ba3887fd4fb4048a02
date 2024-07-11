@@ -52,6 +52,24 @@
       "parentUuid": "dc73e70b_c8b04359",
       "revId": "de5a43633065cd2827b953ba3887fd4fb4048a02",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "79602164_7ffad5e0",
+        "filename": "internal/filetypes/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-11T11:37:10Z",
+      "side": 1,
+      "message": "Actually I just thought of a way to do this without any additional runtime cost. I\u0027ve done that, so no TODO needed as such, although I think it might be worth an issue, so I\u0027ll make one.",
+      "parentUuid": "dc73e70b_c8b04359",
+      "revId": "de5a43633065cd2827b953ba3887fd4fb4048a02",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

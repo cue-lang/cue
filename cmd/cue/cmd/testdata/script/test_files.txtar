@@ -1,0 +1,96 @@
+# _test.cue files should be ignored apart from for
+# dependency analysis purposes. Note there is
+# currently no way to use test files from the command
+# line currently.
+
+exec cue export
+cmp stdout want-eval
+
+# When tidying, the d3 dependency should not
+# appear in the dependencies because it's
+# only present in a _test.go file in an external
+# dependency. The d2 dependency _should_
+# appear, because even though we don't currently
+# support _test.go files, we still want to consider
+# them as part of the main module.
+exec cue mod tidy
+cmp cue.mod/module.cue want-tidy
+
+-- want-eval --
+{
+    "x": {
+        "self": "d1"
+    }
+}
+-- want-tidy --
+module: "test.example/main"
+language: {
+	version: "v0.9.2"
+}
+deps: {
+	"test.example/d1@v0": {
+		v: "v0.0.1"
+	}
+	"test.example/d2@v0": {
+		v:       "v0.0.1"
+		default: true
+	}
+}
+-- cue.mod/module.cue --
+module: "test.example/main"
+language: version: "v0.9.2"
+
+deps: "test.example/d1": v: "v0.0.1"
+
+-- main.cue --
+package main
+
+import "test.example/d1"
+
+x: d1
+
+-- main_test.cue --
+package main
+
+import "test.example/d2"
+
+y: d3
+
+-- _registry/test.example_d1_v0.0.1/cue.mod/module.cue --
+module: "test.example/d1"
+language: version: "v0.9.2"
+
+-- _registry/test.example_d1_v0.0.1/x.cue --
+
+package d1
+
+self: "d1"
+
+-- _registry/test.example_d1_v0.0.1/x_test.cue --
+
+package d1
+
+import "test.example/d3"
+
+test: true
+x: d3
+
+-- _registry/test.example_d2_v0.0.1/cue.mod/module.cue --
+module: "test.example/d2"
+language: version: "v0.9.2"
+
+-- _registry/test.example_d2_v0.0.1/x.cue --
+
+package d2
+
+self: "d2"
+
+-- _registry/test.example_d3_v0.0.1/cue.mod/module.cue --
+module: "test.example/d3"
+language: version: "v0.9.2"
+
+-- _registry/test.example_d3_v0.0.1/x.cue --
+
+package d3
+
+self: "d3"

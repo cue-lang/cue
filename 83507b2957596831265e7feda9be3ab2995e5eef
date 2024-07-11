@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26b0dabf_bcafbf49",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T10:30:38Z",
+      "side": 1,
+      "message": "\"implemented\"",
+      "range": {
+        "startLine": 10,
+        "startChar": 16,
+        "endLine": 10,
+        "endChar": 25
+      },
+      "revId": "83507b2957596831265e7feda9be3ab2995e5eef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51961dcf_1f21ad95",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T10:30:38Z",
+      "side": 1,
+      "message": "I would explicitly mention which CL you are referring to here for clarity.",
+      "range": {
+        "startLine": 18,
+        "startChar": 1,
+        "endLine": 18,
+        "endChar": 15
+      },
+      "revId": "83507b2957596831265e7feda9be3ab2995e5eef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c8f41a1_4d0d0bc9",
+        "filename": "cue/load/import.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T10:30:38Z",
+      "side": 1,
+      "message": "What is \"that\" a reference to here? I couldn\u0027t follow.",
+      "range": {
+        "startLine": 233,
+        "startChar": 15,
+        "endLine": 233,
+        "endChar": 19
+      },
+      "revId": "83507b2957596831265e7feda9be3ab2995e5eef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f57f57d_e1abb3fd",
+        "filename": "cue/load/import.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T10:30:38Z",
+      "side": 1,
+      "message": "Again, what is \"that\" a reference to?",
+      "range": {
+        "startLine": 234,
+        "startChar": 26,
+        "endLine": 234,
+        "endChar": 30
+      },
+      "revId": "83507b2957596831265e7feda9be3ab2995e5eef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "38188b48_a5382dbf",
+        "filename": "cue/load/loader.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T10:30:38Z",
+      "side": 1,
+      "message": "Missing \u0027.\u0027",
+      "range": {
+        "startLine": 52,
+        "startChar": 72,
+        "endLine": 52,
+        "endChar": 73
+      },
+      "revId": "83507b2957596831265e7feda9be3ab2995e5eef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

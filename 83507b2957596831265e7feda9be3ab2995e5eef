@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6cc4053d_e629fe58",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-11T13:44:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "26b0dabf_bcafbf49",
+      "range": {
+        "startLine": 10,
+        "startChar": 16,
+        "endLine": 10,
+        "endChar": 25
+      },
+      "revId": "83507b2957596831265e7feda9be3ab2995e5eef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "51961dcf_1f21ad95",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-07-11T10:30:38Z",
       "side": 1,
       "message": "I would explicitly mention which CL you are referring to here for clarity.",
+      "range": {
+        "startLine": 18,
+        "startChar": 1,
+        "endLine": 18,
+        "endChar": 15
+      },
+      "revId": "83507b2957596831265e7feda9be3ab2995e5eef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ef6a61a_f89e4fc3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-11T13:44:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "51961dcf_1f21ad95",
       "range": {
         "startLine": 18,
         "startChar": 1,
@@ -70,6 +118,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "298e5ab6_6f69abd5",
+        "filename": "cue/load/import.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-11T13:44:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1c8f41a1_4d0d0bc9",
+      "range": {
+        "startLine": 233,
+        "startChar": 15,
+        "endLine": 233,
+        "endChar": 19
+      },
+      "revId": "83507b2957596831265e7feda9be3ab2995e5eef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1f57f57d_e1abb3fd",
@@ -93,6 +165,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e313661_7fd4b2fd",
+        "filename": "cue/load/import.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-11T13:44:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1f57f57d_e1abb3fd",
+      "range": {
+        "startLine": 234,
+        "startChar": 26,
+        "endLine": 234,
+        "endChar": 30
+      },
+      "revId": "83507b2957596831265e7feda9be3ab2995e5eef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "38188b48_a5382dbf",
@@ -106,6 +202,30 @@
       "writtenOn": "2024-07-11T10:30:38Z",
       "side": 1,
       "message": "Missing \u0027.\u0027",
+      "range": {
+        "startLine": 52,
+        "startChar": 72,
+        "endLine": 52,
+        "endChar": 73
+      },
+      "revId": "83507b2957596831265e7feda9be3ab2995e5eef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15a504a8_004e79fa",
+        "filename": "cue/load/loader.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-11T13:44:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "38188b48_a5382dbf",
       "range": {
         "startLine": 52,
         "startChar": 72,

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5be04a82_c2bbcf14",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T12:48:31Z",
+      "side": 1,
+      "message": "Perhaps a comment here on why it was different before? i.e. what\u0027s changed?",
+      "revId": "6e9e53171133cb5ce05d5465491ad0e8bd408fee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

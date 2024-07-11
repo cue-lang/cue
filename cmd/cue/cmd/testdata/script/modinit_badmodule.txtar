@@ -1,4 +1,4 @@
 ! exec cue mod init bad
 cmp stderr want-stderr
 -- want-stderr --
-invalid module name "bad": missing dot in first path element
+malformed module path "bad": missing dot in first path element

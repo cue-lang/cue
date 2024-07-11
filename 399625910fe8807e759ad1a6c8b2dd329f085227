@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce112b12_0687b89e",
+        "filename": "cmd/cue/cmd/testdata/script/modedit_nomajorversion.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T19:03:04Z",
+      "side": 1,
+      "message": "Please document the test.",
+      "revId": "399625910fe8807e759ad1a6c8b2dd329f085227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

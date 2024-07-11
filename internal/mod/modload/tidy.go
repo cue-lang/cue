@@ -174,9 +174,11 @@ func modfileFromRequirements(old *modfile.File, rs *modrequirements.Requirements
 // that's not in the main module.
 func (ld *loader) shouldIncludePkgFile(pkgPath string, mod module.Version, fsys fs.FS, mf modimports.ModuleFile) bool {
 	inMainModule := mod.Path() == ld.mainModule.Path()
-	if strings.HasSuffix(mf.FilePath, "_tool.cue") {
-		// _tool.cue files are only considered when they are part of the main module.
-		return inMainModule
+	if strings.HasSuffix(mf.FilePath, "_tool.cue") || strings.HasSuffix(mf.FilePath, "_test.cue") {
+		// _tool.cue and _test.cue files are only considered when they are part of the main module.
+		if !inMainModule {
+			return false
+		}
 	}
 	ok, _, err := buildattr.ShouldBuildFile(mf.Syntax, func(string) bool {
 		// Keys of build attributes are considered always true when they're

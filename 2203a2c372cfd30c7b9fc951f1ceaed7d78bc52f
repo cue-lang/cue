@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "563f9494_b1ff737a",
+        "filename": "cue/load/loader_common.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-11T13:05:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba829b7b_349072a3",
+      "revId": "2203a2c372cfd30c7b9fc951f1ceaed7d78bc52f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8aeec4e2_b43da339",
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e24d3e76_d22f6427",
+        "filename": "cue/load/loader_common.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-11T13:05:27Z",
+      "side": 1,
+      "message": "I don\u0027t think that\u0027s an accurate description. Technically the logic is in two places, rather deliberately: it\u0027s in the mod/... packages, and it\u0027s in this package. The aim is to refactor/remove `cue/load` in the medium term, and we don\u0027t want to spend lots of effort refactoring it until we decide on a design, so I think this is OK.",
+      "parentUuid": "8aeec4e2_b43da339",
+      "revId": "2203a2c372cfd30c7b9fc951f1ceaed7d78bc52f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bacce30f_01402e83",
@@ -65,6 +101,24 @@
       "writtenOn": "2024-07-11T12:43:44Z",
       "side": 1,
       "message": "Unrelated to this change?",
+      "revId": "2203a2c372cfd30c7b9fc951f1ceaed7d78bc52f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e1d35237_1d7475e3",
+        "filename": "cue/load/search.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-11T13:05:27Z",
+      "side": 1,
+      "message": "No, it\u0027s directly related to this change: the `match.go` file has now been removed. It contained this type definition and doesn\u0027t seem worth keeping the file around just for that, and this seems like the most appropriate place to put it as this is the place where functions are defined that actually use the type.",
+      "parentUuid": "bacce30f_01402e83",
       "revId": "2203a2c372cfd30c7b9fc951f1ceaed7d78bc52f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

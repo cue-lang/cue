@@ -16,6 +16,24 @@
       "message": "I\u0027m assuming this is tightening an existing invariant: worth updating the doc comment to that effect?",
       "revId": "1bd5552cd241c80e53f542bed0d96c7bb7dfb98f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "27fbc1f0_c19085b3",
+        "filename": "cue/load/loader.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-11T13:05:27Z",
+      "side": 1,
+      "message": "No, it\u0027s already an invariant - this just makes that invariant clear.",
+      "parentUuid": "5a748e8c_efecb6e9",
+      "revId": "1bd5552cd241c80e53f542bed0d96c7bb7dfb98f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

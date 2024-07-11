@@ -16,6 +16,24 @@
       "message": "This appears to do a lot of work, only to leave 90% of it on the floor, which will likely increase init-time costs for most use cases where it has no benefit.\n\nWhy not make `fileForExt` a sync map with a `sync.Once` value that returns the `*build.File`? Then we get the benefit for all extensions in a lazy manner.",
       "revId": "de5a43633065cd2827b953ba3887fd4fb4048a02",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc73e70b_c8b04359",
+        "filename": "internal/filetypes/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-11T10:42:01Z",
+      "side": 1,
+      "message": "I thought about doing that, and even started implementing it that way, but accessing via sync.Map has its own cost (at least an allocation on every access due to the string-\u003einterface conversion), it makes everything a little bit more complex, and in the end the extra cost is quite small: the old init function takes about 6442µs to execute; the new one 6979µs, an additional cost of ~10% (536µs) that\u0027s paid once only.\n\nIn the future, it would be nice to remove the runtime CUE evaluation entirely, perhaps relying a preprocessor and `go generate`, to reduce the init time cost to near zero, but I think this is OK for now. Note that this whole thing is _already_ lazy to a degree, so if the program doesn\u0027t actually invoke `cue/load`, we won\u0027t pay this cost.",
+      "parentUuid": "16f79790_67bb0a03",
+      "revId": "de5a43633065cd2827b953ba3887fd4fb4048a02",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

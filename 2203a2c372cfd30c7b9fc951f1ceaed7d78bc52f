@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "90fe1c48_0186bab5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T12:44:21Z",
+      "side": 1,
+      "message": "LGTM modulo suggestions/questions, but I\u0027d suggest a TODO on the point about the logic being littered all over the place.",
+      "revId": "2203a2c372cfd30c7b9fc951f1ceaed7d78bc52f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ba829b7b_349072a3",

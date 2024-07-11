@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "415fd1f1_00130b23",
+        "filename": "cmd/cue/cmd/testdata/script/modinit_badmodule.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T19:03:50Z",
+      "side": 1,
+      "message": "Please confirm in the commit message that these changes are expected.",
+      "revId": "a0d6a74dc229a0cd4a6df2a9f2b5138565d9d087",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

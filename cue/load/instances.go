@@ -235,12 +235,21 @@ func loadPackages(
 			if !cfg.Tools && strings.HasSuffix(mf.FilePath, "_tool.cue") {
 				return false
 			}
+			isTest := strings.HasSuffix(mf.FilePath, "_test.cue")
 			var tagIsSet func(string) bool
-			if mod.Path() == mainModPath || pkgPaths[pkgPath] {
+			if mod.Path() == mainModPath {
+				// In the main module.
+				if isTest && !cfg.Tests {
+					return false
+				}
 				tagIsSet = tg.tagIsSet
 			} else {
-				// The file is outside the main module and isn't mentioned explicitly
-				// on the command line, so treat all build tag keys as unset.
+				// Outside the main module.
+				if isTest {
+					// Don't traverse test files outside the main module
+					return false
+				}
+				// Treat all build tag keys as unset.
 				tagIsSet = func(string) bool {
 					return false
 				}

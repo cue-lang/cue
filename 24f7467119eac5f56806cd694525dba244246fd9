@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "4b2ebdf9_af2f4ec1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-11T12:05:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "147c5943_5c2f9294",
+      "revId": "24f7467119eac5f56806cd694525dba244246fd9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "77c7b0df_d4167eed",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 4
@@ -48,6 +66,24 @@
       "writtenOn": "2024-07-11T11:19:35Z",
       "side": 1,
       "message": "Per https://go.dev/wiki/Deprecated: clean line (new paragraph) required.",
+      "revId": "24f7467119eac5f56806cd694525dba244246fd9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b746594_5f4c9ee8",
+        "filename": "cue/build/instance.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-11T12:05:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8e976977_0d2acbbe",
       "revId": "24f7467119eac5f56806cd694525dba244246fd9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

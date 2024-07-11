@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc7d1f81_b7c8aeaa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T11:13:38Z",
+      "side": 1,
+      "message": "I can\u0027t see how this change is related to that CL, because that CL does nothing to change the usage or otherwise of the field. Please can you check the CL number and add a bit more context?",
+      "revId": "633cd747ff4d2bf5b452852aac45f2b37820ef14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72abd73c_2893203d",
+        "filename": "cue/build/instance.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T11:13:38Z",
+      "side": 1,
+      "message": "Per https://go.dev/wiki/Deprecated, this needs to be on a clear line, i.e. starting a new paragraph.",
+      "revId": "633cd747ff4d2bf5b452852aac45f2b37820ef14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "960dfccb_d1cb22ce",
+        "filename": "cue/build/instance.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-11T11:13:38Z",
+      "side": 1,
+      "message": "I would perhaps soften this to \"this field is not used.\"\n\nIs there some direction on what the user should consider instead?",
+      "range": {
+        "startLine": 100,
+        "startChar": 27,
+        "endLine": 100,
+        "endChar": 47
+      },
+      "revId": "633cd747ff4d2bf5b452852aac45f2b37820ef14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

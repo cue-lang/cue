@@ -18,7 +18,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -56,13 +55,7 @@ func runModInit(cmd *Command, args []string) (err error) {
 		}
 		modulePath = args[0]
 		if err := module.CheckPath(modulePath); err != nil {
-			// It might just be lacking a major version.
-			if err1 := module.CheckPathWithoutVersion(modulePath); err1 != nil {
-				if strings.Contains(modulePath, "@") {
-					err1 = err
-				}
-				return fmt.Errorf("invalid module name %q: %v", modulePath, err1)
-			}
+			return err
 		}
 	}
 

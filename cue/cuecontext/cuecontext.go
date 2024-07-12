@@ -101,6 +101,11 @@ func CUE_DEBUG(s string) Option {
 		panic(fmt.Errorf("cuecontext.CUE_DEBUG: %v", err))
 	}
 
+	return Debug(c)
+}
+
+// Debug indicates which debug config settings shoud be used.
+func Debug(c cuedebug.Config) Option {
 	return Option{func(r *runtime.Runtime) {
 		r.SetDebugOptions(&c)
 	}}

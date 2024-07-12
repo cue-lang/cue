@@ -26,7 +26,7 @@ import (
 )
 
 func TestLookupPath(t *testing.T) {
-	r := &cue.Runtime{}
+	ctx := cuecontext.New()
 
 	testCases := []struct {
 		in   string
@@ -107,7 +107,7 @@ func TestLookupPath(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.path.String(), func(t *testing.T) {
-			v := compileT(t, r, tc.in)
+			v := mustCompile(t, ctx, tc.in)
 
 			v = v.LookupPath(tc.path)
 
@@ -123,7 +123,7 @@ func TestLookupPath(t *testing.T) {
 				return
 			}
 
-			w := compileT(t, r, tc.out)
+			w := mustCompile(t, ctx, tc.out)
 
 			if k, d := diff.Diff(v, w); k != diff.Identity {
 				b := &bytes.Buffer{}
@@ -132,15 +132,6 @@ func TestLookupPath(t *testing.T) {
 			}
 		})
 	}
-}
-
-func compileT(t *testing.T, r *cue.Runtime, s string) cue.Value {
-	t.Helper()
-	inst, err := r.Compile("", s)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return inst.Value()
 }
 
 func TestHidden(t *testing.T) {

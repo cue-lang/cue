@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package subsume
+package subsume_test
 
 import (
 	"regexp"
@@ -24,6 +24,7 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/eval"
+	"cuelang.org/go/internal/core/subsume"
 	"cuelang.org/go/internal/cuetdtest"
 )
 
@@ -491,17 +492,17 @@ func TestValues(t *testing.T) {
 
 			switch tc.mode {
 			case subNone:
-				err = Value(ctx, a, b)
+				err = subsume.Value(ctx, a, b)
 			case subSchema:
-				err = API.Value(ctx, a, b)
+				err = subsume.API.Value(ctx, a, b)
 			// TODO: see comments above.
 			// case subNoOptional:
 			// 	err = IgnoreOptional.Value(ctx, a, b)
 			case subDefaults:
-				p := Profile{Defaults: true}
+				p := subsume.Profile{Defaults: true}
 				err = p.Value(ctx, a, b)
 			case subFinal:
-				err = Final.Value(ctx, a, b)
+				err = subsume.Final.Value(ctx, a, b)
 			}
 			got := err == nil
 

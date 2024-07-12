@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cue
+package cue_test
 
 import (
 	"fmt"
@@ -20,6 +20,7 @@ import (
 	"testing"
 	"time"
 
+	"cuelang.org/go/cue"
 	"cuelang.org/go/internal/cuetdtest"
 	"github.com/go-quicktest/qt"
 	"github.com/google/go-cmp/cmp"
@@ -260,14 +261,14 @@ func TestDecodeIntoCUEValue(t *testing.T) {
 		// This test doesn't fit within the table used by TestDecode
 		// because cue values aren't easily comparable with cmp.Diff.
 		var st struct {
-			X Value `json:"x"`
+			X cue.Value `json:"x"`
 		}
 		err := getValue(t, `x: string`).Decode(&st)
 		qt.Assert(t, qt.IsNil(err))
 		qt.Assert(t, qt.Equals(fmt.Sprint(st.X), "string"))
 
 		// Check we can decode into a top level value.
-		var v Value
+		var v cue.Value
 		err = getValue(t, `int`).Decode(&v)
 		qt.Assert(t, qt.IsNil(err))
 		qt.Assert(t, qt.Equals(fmt.Sprint(v), "int"))

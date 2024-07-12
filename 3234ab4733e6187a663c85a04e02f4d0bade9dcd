@@ -71,6 +71,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7d0f31e6_aceba4ff",
+        "filename": "cue/types_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-07-12T16:30:59Z",
+      "side": 1,
+      "message": "Yes and no. From looking through the code, and also verifying against tests that expect an error, my understanding is that parse fail would come out in the resulting cue.Value (which would be _|_ I think and value.Err() would produce the error). I wouldn\u0027t be enormously surprised if I\u0027m wrong, but I don\u0027t think we lose anything by this change - yes, CUE code that can\u0027t be parsed will now get further, but the error itself isn\u0027t lost; any subsequent use of the value would surely fail in the error case?",
+      "parentUuid": "0ae11854_573882a1",
+      "revId": "3234ab4733e6187a663c85a04e02f4d0bade9dcd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "307ea73f_7f243c82",
         "filename": "cue/types_test.go",
         "patchSetId": 3

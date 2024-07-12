@@ -51,6 +51,24 @@
       "parentUuid": "c8cd7616_c974bf5f",
       "revId": "719b132f5e689c0256859ad22ad25bde94a64ffd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "76ccb71e_25a20334",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-07-12T17:07:34Z",
+      "side": 1,
+      "message": "Yeah, my instinct is the same as yours. But then given the context API hides the error where the old cue.Runtime API does not, it made me think this must be done for a real reason, and presumably that\u0027s because of the way _|_ interacts with the rest of unification and evaluation.\nIt makes me think that what you (as a user of the API) might consider to be an error is very context dependent - it\u0027s certainly not the case that all errors are fatal - if it was then the normal \"tuple\" and returning nil,err pattern would be much more natural?",
+      "parentUuid": "2b6f3b67_df03defc",
+      "revId": "719b132f5e689c0256859ad22ad25bde94a64ffd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

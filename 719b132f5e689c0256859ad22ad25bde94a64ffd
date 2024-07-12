@@ -33,6 +33,24 @@
       "message": "It\u0027s actually not clear to me under what circumstances you should check for Err. If you\u0027ve wound up with _|_ then you\u0027ll know about it soon enough, surely?",
       "revId": "719b132f5e689c0256859ad22ad25bde94a64ffd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b6f3b67_df03defc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-12T16:51:10Z",
+      "side": 1,
+      "message": "My instinct is that it should be checked as a general rule. Otherwise, invalid syntax or other sort of human errors would cause confusing errors or behavior further down the code.\n\nIs there any reason not to check upfront, other than code verbosity? Go can be verbose with its error checks, but that\u0027s not particular to our Go API.",
+      "parentUuid": "c8cd7616_c974bf5f",
+      "revId": "719b132f5e689c0256859ad22ad25bde94a64ffd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

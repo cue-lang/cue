@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "efc6f398_6d3669f5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-12T09:00:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "588a2ceb_703ed4ce",
+      "revId": "caff82ef7dd9882ebf0f5fc915a51963f966e1dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "980a6c95_ee55a731",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "75a64b7e_081266f7",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_with_build_attrs.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-12T09:00:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "980a6c95_ee55a731",
+      "revId": "caff82ef7dd9882ebf0f5fc915a51963f966e1dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "00515752_c0703b82",
@@ -48,6 +84,30 @@
       "writtenOn": "2024-07-11T18:59:09Z",
       "side": 1,
       "message": "Lots of \"currently\"",
+      "range": {
+        "startLine": 4,
+        "startChar": 7,
+        "endLine": 4,
+        "endChar": 16
+      },
+      "revId": "caff82ef7dd9882ebf0f5fc915a51963f966e1dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a37bd871_96622474",
+        "filename": "cmd/cue/cmd/testdata/script/test_files.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-12T09:00:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "00515752_c0703b82",
       "range": {
         "startLine": 4,
         "startChar": 7,
@@ -81,6 +141,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "70493f10_f329aaab",
+        "filename": "cue/load/instances.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-12T09:00:14Z",
+      "side": 1,
+      "message": "Yes. Good catch.\n\nThis logic confused me, but after investigation, it seems that nothing actually relies on the \"explicitly mentioned on the command line\" logic, and it would be problematic to do so, as that would imply that the main module contains full dependencies (i.e. including tag, tool and test) sufficient evaluate any package in any module used by the main module, which is not necessarily true or desirable.\n\nI\u0027ve therefore removed this condition, which doesn\u0027t actually break anything, supporting the hypothesis that it doesn\u0027t actually get used.",
+      "parentUuid": "4479fab2_acda31cd",
+      "range": {
+        "startLine": 240,
+        "startChar": 32,
+        "endLine": 240,
+        "endChar": 52
+      },
+      "revId": "caff82ef7dd9882ebf0f5fc915a51963f966e1dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8eb4ba63_57b438ff",
@@ -98,6 +182,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4e2ebe9c_fe88312d",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-12T09:00:14Z",
+      "side": 1,
+      "message": "This is https://github.com/cue-lang/cue/issues/2962. I think that issue is probably sufficent.",
+      "parentUuid": "8eb4ba63_57b438ff",
+      "revId": "caff82ef7dd9882ebf0f5fc915a51963f966e1dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f5ab00d2_56aa0d1a",
@@ -111,6 +213,30 @@
       "writtenOn": "2024-07-11T18:59:09Z",
       "side": 1,
       "message": "Nit: you don\u0027t use this.",
+      "range": {
+        "startLine": 178,
+        "startChar": 114,
+        "endLine": 178,
+        "endChar": 117
+      },
+      "revId": "caff82ef7dd9882ebf0f5fc915a51963f966e1dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f121911c_d59bc0a7",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-12T09:00:14Z",
+      "side": 1,
+      "message": "Debugging remnant. Removed.",
+      "parentUuid": "f5ab00d2_56aa0d1a",
       "range": {
         "startLine": 178,
         "startChar": 114,

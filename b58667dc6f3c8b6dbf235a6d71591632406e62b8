@@ -16,6 +16,24 @@
       "message": "This comment is out of date now I believe given the changes made to remove the \"explicitly mentioned\" part of the condition.",
       "revId": "b58667dc6f3c8b6dbf235a6d71591632406e62b8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "27d7b876_2c18faae",
+        "filename": "cue/load/instances.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-12T09:12:10Z",
+      "side": 1,
+      "message": "Ha, good catch. Done.",
+      "parentUuid": "6a805733_cb03a6c0",
+      "revId": "b58667dc6f3c8b6dbf235a6d71591632406e62b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

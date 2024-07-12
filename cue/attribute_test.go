@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cue
+package cue_test
 
 import (
 	"fmt"
 	"testing"
 
+	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/cuetdtest"
 )
@@ -46,57 +47,57 @@ func TestAttributes(t *testing.T) {
 	`
 
 	testCases := []struct {
-		flags AttrKind
+		flags cue.AttrKind
 		path  string
 		out   string
 	}{{
-		flags: FieldAttr,
+		flags: cue.FieldAttr,
 		path:  "a.a",
 		out:   "[@foo(a,b,c=1)]",
 	}, {
-		flags: FieldAttr,
+		flags: cue.FieldAttr,
 		path:  "a.b",
 		out:   "[@bar(a,b,c,d=1) @foo(a,,d=1)]",
 	}, {
-		flags: DeclAttr,
+		flags: cue.DeclAttr,
 		path:  "b",
 		out:   "[@embed(foo)]",
 	}, {
-		flags: FieldAttr,
+		flags: cue.FieldAttr,
 		path:  "b",
 		out:   "[@field(foo)]",
 	}, {
-		flags: ValueAttr,
+		flags: cue.ValueAttr,
 		path:  "b",
 		out:   "[@field(foo) @embed(foo)]",
 	}, {
-		flags: ValueAttr,
+		flags: cue.ValueAttr,
 		path:  "c1",
 		out:   "[@step(1)]",
 	}, {
-		flags: DeclAttr,
+		flags: cue.DeclAttr,
 		path:  "c2",
 		out:   "[@step(2a)]",
 	}, {
-		flags: FieldAttr,
+		flags: cue.FieldAttr,
 		path:  "c2",
 		out:   "[@step(2b)]",
 	}, {
-		flags: DeclAttr,
+		flags: cue.DeclAttr,
 		path:  "",
 		out:   "[@step(2c)]",
 	}, {
-		flags: ValueAttr | FieldAttr,
+		flags: cue.ValueAttr | cue.FieldAttr,
 		path:  "c3",
 		out:   "[@step(3)]",
 	}, {
-		flags: ValueAttr | FieldAttr,
+		flags: cue.ValueAttr | cue.FieldAttr,
 		path:  "c4",
 		out:   "[]",
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.path, func(t *cuetdtest.M) {
-			v := getValue(t, config).LookupPath(ParsePath(tc.path))
+			v := getValue(t, config).LookupPath(cue.ParsePath(tc.path))
 			a := v.Attributes(tc.flags)
 			got := fmt.Sprint(a)
 			if got != tc.out {

@@ -16,6 +16,7 @@ package cue_test
 
 import (
 	"fmt"
+	"log"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
@@ -29,6 +30,9 @@ func ExampleContext() {
 		b: 3
 		"a+b": a + b
 	`)
+	if err := v.Err(); err != nil {
+		log.Fatal(err)
+	}
 
 	p("lookups")
 	p("a:     %v", v.LookupPath(cue.ParsePath("a")))

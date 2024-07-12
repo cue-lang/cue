@@ -16,6 +16,7 @@ package cue_test
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"cuelang.org/go/cue"
@@ -87,6 +88,9 @@ d: #C
 `
 
 	v := ctx.CompileString(file)
+	if err := v.Err(); err != nil {
+		log.Fatal(err)
+	}
 
 	a := v.LookupPath(cue.ParsePath("a"))
 	fmt.Println("a allows:")

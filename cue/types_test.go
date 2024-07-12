@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cue
+package cue_test
 
 import (
 	"bytes"
@@ -27,38 +27,38 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
+	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
-	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/tdtest"
 )
 
-func newRuntime(t *cuetdtest.M) *Runtime {
-	r := &Runtime{}
-	t.UpdateRuntime(r.runtime())
-	return r
-}
-
-func getValue(t *cuetdtest.M, body string) Value {
+func getValue(t *cuetdtest.M, body string) cue.Value {
 	t.Helper()
 
-	r := newRuntime(t)
+	ctx := t.Context()
+	return ctx.CompileString(body, cue.Filename("test"))
+}
 
-	inst, err := r.Compile("foo", body)
-	if err != nil {
-		t.Fatalf("unexpected parse error: %v", err)
+func mustCompile(t testing.TB, ctx *cue.Context, body string) cue.Value {
+	t.Helper()
+
+	val := ctx.CompileString(body, cue.Filename("test"))
+	if err := val.Err(); err != nil {
+		t.Fatal(err)
 	}
-	return inst.Value()
+	return val
 }
 
 func TestAPI(t *testing.T) {
 	testCases := []struct {
 		input string
-		fun   func(i *Instance) Value
+		fun   func(i cue.Value) cue.Value
 		want  string
 		skip  bool
 	}{{
@@ -68,7 +68,7 @@ func TestAPI(t *testing.T) {
 
 		v: {ction: foo: 1}
 				`,
-		fun: func(i *Instance) Value {
+		fun: func(i cue.Value) cue.Value {
 			runSpec := i.LookupDef("#runSpec")
 			v := i.Lookup("v")
 			res := runSpec.Unify(v)
@@ -84,7 +84,7 @@ func TestAPI(t *testing.T) {
 
 		v: {action: Foo: 1}
 				`,
-		fun: func(i *Instance) Value {
+		fun: func(i cue.Value) cue.Value {
 			runSpec := i.LookupDef("#runSpec")
 			v := i.Lookup("v")
 			res := runSpec.Unify(v)
@@ -97,7 +97,7 @@ func TestAPI(t *testing.T) {
 
 		w: {ction: foo: 1}
 					`,
-		fun: func(i *Instance) Value {
+		fun: func(i cue.Value) cue.Value {
 			runSpec := i.LookupDef("#runSpec")
 			v := runSpec.Lookup("v")
 			w := i.Lookup("w")
@@ -122,10 +122,8 @@ func TestAPI(t *testing.T) {
 		}
 		`,
 
-		fun: func(i *Instance) (val Value) {
-			v := i.Value()
-
-			sub := v.LookupPath(ParsePath("test"))
+		fun: func(v cue.Value) (val cue.Value) {
+			sub := v.LookupPath(cue.ParsePath("test"))
 			st, err := sub.Struct()
 			if err != nil {
 				panic(err)
@@ -146,14 +144,11 @@ func TestAPI(t *testing.T) {
 		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
 			t.TODO_V3()
 
-			r := newRuntime(t)
+			ctx := t.Context()
 
-			inst, err := r.Compile("in", tc.input)
-			if err != nil {
-				t.Fatal(err)
-			}
-			v := tc.fun(inst)
-			got := fmt.Sprintf("%+v", v)
+			valIn := mustCompile(t, ctx, tc.input)
+			valOut := tc.fun(valIn)
+			got := fmt.Sprintf("%+v", valOut)
 			if got != tc.want {
 				t.Errorf("got:\n%s\nwant:\n%s", got, tc.want)
 			}
@@ -164,8 +159,8 @@ func TestAPI(t *testing.T) {
 func TestValueType(t *testing.T) {
 	testCases := []struct {
 		value          string
-		kind           Kind
-		incompleteKind Kind
+		kind           cue.Kind
+		incompleteKind cue.Kind
 		json           string
 		valid          bool
 		concrete       bool
@@ -173,154 +168,154 @@ func TestValueType(t *testing.T) {
 		// pos            token.Pos
 	}{{ // Not a concrete value.
 		value:          `v: _`,
-		kind:           BottomKind,
-		incompleteKind: TopKind,
+		kind:           cue.BottomKind,
+		incompleteKind: cue.TopKind,
 	}, {
 		value:          `v: _|_`,
-		kind:           BottomKind,
-		incompleteKind: BottomKind,
+		kind:           cue.BottomKind,
+		incompleteKind: cue.BottomKind,
 		concrete:       true,
 	}, {
 		value:          `v: 1&2`,
-		kind:           BottomKind,
-		incompleteKind: BottomKind,
+		kind:           cue.BottomKind,
+		incompleteKind: cue.BottomKind,
 		concrete:       true,
 	}, {
 		value:          `v: b, b: 1&2`,
-		kind:           BottomKind,
-		incompleteKind: BottomKind,
+		kind:           cue.BottomKind,
+		incompleteKind: cue.BottomKind,
 		concrete:       true,
 	}, {
 		value:          `v: (b[a]), b: 1, a: 1`,
-		kind:           BottomKind,
-		incompleteKind: BottomKind,
+		kind:           cue.BottomKind,
+		incompleteKind: cue.BottomKind,
 		concrete:       true,
 	}, { // TODO: should be error{
 		value: `v: (b)
 			b: bool`,
-		kind:           BottomKind,
-		incompleteKind: BoolKind,
+		kind:           cue.BottomKind,
+		incompleteKind: cue.BoolKind,
 	}, {
 		value:          `v: ([][b]), b: "d"`,
-		kind:           BottomKind,
-		incompleteKind: BottomKind,
+		kind:           cue.BottomKind,
+		incompleteKind: cue.BottomKind,
 		concrete:       true,
 	}, {
 		value:          `v: null`,
-		kind:           NullKind,
-		incompleteKind: NullKind,
+		kind:           cue.NullKind,
+		incompleteKind: cue.NullKind,
 		concrete:       true,
 	}, {
 		value:          `v: true`,
-		kind:           BoolKind,
-		incompleteKind: BoolKind,
+		kind:           cue.BoolKind,
+		incompleteKind: cue.BoolKind,
 		concrete:       true,
 	}, {
 		value:          `v: false`,
-		kind:           BoolKind,
-		incompleteKind: BoolKind,
+		kind:           cue.BoolKind,
+		incompleteKind: cue.BoolKind,
 		concrete:       true,
 	}, {
 		value:          `v: bool`,
-		kind:           BottomKind,
-		incompleteKind: BoolKind,
+		kind:           cue.BottomKind,
+		incompleteKind: cue.BoolKind,
 	}, {
 		value:          `v: 2`,
-		kind:           IntKind,
-		incompleteKind: IntKind,
+		kind:           cue.IntKind,
+		incompleteKind: cue.IntKind,
 		concrete:       true,
 	}, {
 		value:          `v: 2.0`,
-		kind:           FloatKind,
-		incompleteKind: FloatKind,
+		kind:           cue.FloatKind,
+		incompleteKind: cue.FloatKind,
 		concrete:       true,
 	}, {
 		value:          `v: 2.0Mi`,
-		kind:           IntKind,
-		incompleteKind: IntKind,
+		kind:           cue.IntKind,
+		incompleteKind: cue.IntKind,
 		concrete:       true,
 	}, {
 		value:          `v: 14_000`,
-		kind:           IntKind,
-		incompleteKind: IntKind,
+		kind:           cue.IntKind,
+		incompleteKind: cue.IntKind,
 		concrete:       true,
 	}, {
 		value:          `v: >=0 & <5`,
-		kind:           BottomKind,
-		incompleteKind: NumberKind,
+		kind:           cue.BottomKind,
+		incompleteKind: cue.NumberKind,
 	}, {
 		value:          `v: float`,
-		kind:           BottomKind,
-		incompleteKind: FloatKind,
+		kind:           cue.BottomKind,
+		incompleteKind: cue.FloatKind,
 	}, {
 		value:          `v: "str"`,
-		kind:           StringKind,
-		incompleteKind: StringKind,
+		kind:           cue.StringKind,
+		incompleteKind: cue.StringKind,
 		concrete:       true,
 	}, {
 		value:          "v: '''\n'''",
-		kind:           BytesKind,
-		incompleteKind: BytesKind,
+		kind:           cue.BytesKind,
+		incompleteKind: cue.BytesKind,
 		concrete:       true,
 	}, {
 		value:          "v: string",
-		kind:           BottomKind,
-		incompleteKind: StringKind,
+		kind:           cue.BottomKind,
+		incompleteKind: cue.StringKind,
 	}, {
 		value:          `v: {}`,
-		kind:           StructKind,
-		incompleteKind: StructKind,
+		kind:           cue.StructKind,
+		incompleteKind: cue.StructKind,
 		concrete:       true,
 	}, {
 		value:          `v: close({})`,
-		kind:           StructKind,
-		incompleteKind: StructKind,
+		kind:           cue.StructKind,
+		incompleteKind: cue.StructKind,
 		concrete:       true,
 		closed:         true,
 	}, {
 		value:          `v: []`,
-		kind:           ListKind,
-		incompleteKind: ListKind,
+		kind:           cue.ListKind,
+		incompleteKind: cue.ListKind,
 		concrete:       true,
 		closed:         true,
 	}, {
 		value:          `v: [...int]`,
-		kind:           BottomKind,
-		incompleteKind: ListKind,
+		kind:           cue.BottomKind,
+		incompleteKind: cue.ListKind,
 		concrete:       false,
 	}, {
 		value:    `v: {a: int, b: [1][a]}.b`,
-		kind:     BottomKind,
+		kind:     cue.BottomKind,
 		concrete: false,
 	}, {
 		value: `import "time"
 		v: time.Time`,
-		kind:           BottomKind,
-		incompleteKind: StringKind,
+		kind:           cue.BottomKind,
+		incompleteKind: cue.StringKind,
 		concrete:       false,
 	}, {
 		value: `import "time"
 		v: {a: time.Time}.a`,
-		kind:           BottomKind,
-		incompleteKind: StringKind,
+		kind:           cue.BottomKind,
+		incompleteKind: cue.StringKind,
 		concrete:       false,
 	}, {
 		value: `import "time"
 			v: {a: time.Time & string}.a`,
-		kind:           BottomKind,
-		incompleteKind: StringKind,
+		kind:           cue.BottomKind,
+		incompleteKind: cue.StringKind,
 		concrete:       false,
 	}, {
 		value: `import "strings"
 			v: {a: strings.ContainsAny("D")}.a`,
-		kind:           BottomKind,
-		incompleteKind: StringKind,
+		kind:           cue.BottomKind,
+		incompleteKind: cue.StringKind,
 		concrete:       false,
 	}, {
 		value: `import "struct"
 		v: {a: struct.MaxFields(2) & {}}.a`,
-		kind:           StructKind, // Can determine a valid struct already.
-		incompleteKind: StructKind,
+		kind:           cue.StructKind, // Can determine a valid struct already.
+		incompleteKind: cue.StructKind,
 		concrete:       true,
 	}, {
 		value: `v: #Foo
@@ -328,16 +323,16 @@ func TestValueType(t *testing.T) {
 			name: string,
 			...
 		}`,
-		kind:           StructKind,
-		incompleteKind: StructKind,
+		kind:           cue.StructKind,
+		incompleteKind: cue.StructKind,
 		concrete:       true,
 	}, {
 		value: `v: #Foo
 			#Foo: {
 				name: string,
 			}`,
-		kind:           StructKind,
-		incompleteKind: StructKind,
+		kind:           cue.StructKind,
+		incompleteKind: cue.StructKind,
 		concrete:       true,
 		closed:         true,
 	}, {
@@ -345,19 +340,19 @@ func TestValueType(t *testing.T) {
 		#Foo: {
 			name: string,
 			}`,
-		incompleteKind: StructKind | IntKind,
+		incompleteKind: cue.StructKind | cue.IntKind,
 		// Hard to tell what is correct here, but For backwards compatibility,
 		// this is false.
 		closed: false,
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
-			inst := getValue(t, tc.value)
-			v := inst.Lookup("v")
+			val := getValue(t, tc.value)
+			v := val.Lookup("v")
 			if got := v.Kind(); got != tc.kind {
 				t.Errorf("Kind: got %x; want %x", int(got), int(tc.kind))
 			}
-			want := tc.incompleteKind | BottomKind
+			want := tc.incompleteKind | cue.BottomKind
 			if got := v.IncompleteKind(); got != want {
 				t.Errorf("IncompleteKind: got %x; want %x", int(got), int(want))
 			}
@@ -388,19 +383,19 @@ func TestInt(t *testing.T) {
 		value: "-1",
 		int:   -1,
 		uint:  0,
-		errU:  ErrAbove.Error(),
+		errU:  cue.ErrAbove.Error(),
 	}, {
 		value: "-111222333444555666777888999000",
 		int:   math.MinInt64,
 		uint:  0,
-		err:   ErrAbove.Error(),
-		errU:  ErrAbove.Error(),
+		err:   cue.ErrAbove.Error(),
+		errU:  cue.ErrAbove.Error(),
 	}, {
 		value: "111222333444555666777888999000",
 		int:   math.MaxInt64,
 		uint:  math.MaxUint64,
-		err:   ErrBelow.Error(),
-		errU:  ErrBelow.Error(),
+		err:   cue.ErrBelow.Error(),
+		errU:  cue.ErrBelow.Error(),
 	}, {
 		value:  "1.0",
 		err:    "cannot use value 1.0 (type float) as int",
@@ -456,7 +451,7 @@ func TestFloat(t *testing.T) {
 		exp     int
 		fmt     byte
 		prec    int
-		kind    Kind
+		kind    cue.Kind
 		err     string
 	}{{
 		value:   "1",
@@ -465,7 +460,7 @@ func TestFloat(t *testing.T) {
 		exp:     0,
 		float64: 1,
 		fmt:     'g',
-		kind:    IntKind,
+		kind:    cue.IntKind,
 	}, {
 		value:   "-1",
 		float:   "-1",
@@ -473,7 +468,7 @@ func TestFloat(t *testing.T) {
 		exp:     0,
 		float64: -1,
 		fmt:     'g',
-		kind:    IntKind,
+		kind:    cue.IntKind,
 	}, {
 		value:   "0.0",
 		float:   "0.0",
@@ -481,7 +476,7 @@ func TestFloat(t *testing.T) {
 		exp:     -1,
 		float64: 0.0,
 		fmt:     'g',
-		kind:    FloatKind,
+		kind:    cue.FloatKind,
 	}, {
 		value:   "1.0",
 		float:   "1.0",
@@ -489,7 +484,7 @@ func TestFloat(t *testing.T) {
 		exp:     -1,
 		float64: 1.0,
 		fmt:     'g',
-		kind:    FloatKind,
+		kind:    cue.FloatKind,
 	}, {
 		value:   "2.6",
 		float:   "2.6",
@@ -497,7 +492,7 @@ func TestFloat(t *testing.T) {
 		exp:     -1,
 		float64: 2.6,
 		fmt:     'g',
-		kind:    FloatKind,
+		kind:    cue.FloatKind,
 	}, {
 		value:   "20.600",
 		float:   "20.60",
@@ -506,7 +501,7 @@ func TestFloat(t *testing.T) {
 		float64: 20.60,
 		prec:    2,
 		fmt:     'f',
-		kind:    FloatKind,
+		kind:    cue.FloatKind,
 	}, {
 		value:   "1/0",
 		float:   "",
@@ -514,7 +509,7 @@ func TestFloat(t *testing.T) {
 		prec:    2,
 		fmt:     'f',
 		err:     "division by zero",
-		kind:    BottomKind,
+		kind:    cue.BottomKind,
 	}, {
 		value:   "1.797693134862315708145274237317043567982e+308",
 		float:   "1.8e+308",
@@ -523,8 +518,8 @@ func TestFloat(t *testing.T) {
 		float64: math.Inf(1),
 		prec:    2,
 		fmt:     'g',
-		err:     ErrAbove.Error(),
-		kind:    FloatKind,
+		err:     cue.ErrAbove.Error(),
+		kind:    cue.FloatKind,
 	}, {
 		value:   "-1.797693134862315708145274237317043567982e+308",
 		float:   "-1.8e+308",
@@ -533,8 +528,8 @@ func TestFloat(t *testing.T) {
 		float64: math.Inf(-1),
 		prec:    2,
 		fmt:     'g',
-		kind:    FloatKind,
-		err:     ErrBelow.Error(),
+		kind:    cue.FloatKind,
+		err:     cue.ErrBelow.Error(),
 	}, {
 		value:   "4.940656458412465441765687928682213723650e-324",
 		float:   "4.941e-324",
@@ -543,8 +538,8 @@ func TestFloat(t *testing.T) {
 		float64: 0,
 		prec:    4,
 		fmt:     'g',
-		kind:    FloatKind,
-		err:     ErrBelow.Error(),
+		kind:    cue.FloatKind,
+		err:     cue.ErrBelow.Error(),
 	}, {
 		value:   "-4.940656458412465441765687928682213723650e-324",
 		float:   "-4.940656458412465441765687928682213723650e-324",
@@ -553,8 +548,8 @@ func TestFloat(t *testing.T) {
 		float64: 0,
 		prec:    -1,
 		fmt:     'g',
-		kind:    FloatKind,
-		err:     ErrAbove.Error(),
+		kind:    cue.FloatKind,
+		err:     cue.ErrAbove.Error(),
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
@@ -768,7 +763,7 @@ func TestFields(t *testing.T) {
 		value string
 		res   string
 		err   string
-		opts  []Option
+		opts  []cue.Option
 
 		todoV3 bool
 	}{{
@@ -812,14 +807,14 @@ func TestFields(t *testing.T) {
 		_hidden: 3`,
 		res: `{step1:{},step2:{"prefix":3},}`,
 	}, {
-		opts: []Option{Final()},
+		opts: []cue.Option{cue.Final()},
 		value: `
 		step1: {}
 		if step1.value > 100 {
 		}`,
 		err: "undefined field: value",
 	}, {
-		opts: []Option{Concrete(true)},
+		opts: []cue.Option{cue.Concrete(true)},
 		value: `
 		step1: {}
 		if step1.value > 100 {
@@ -829,15 +824,15 @@ func TestFields(t *testing.T) {
 		value: `{a!: 1, b?: 2, c: 3}`,
 		err:   "a: field is required but not present",
 	}, {
-		opts:  []Option{Hidden(true)},
+		opts:  []cue.Option{cue.Hidden(true)},
 		value: `1, _a: 2`,
 		res:   `{_a:2,}`,
 	}, {
-		opts:  []Option{Definitions(true)},
+		opts:  []cue.Option{cue.Definitions(true)},
 		value: `1, #a: 2`,
 		res:   `{#a:2,}`,
 	}, {
-		opts:  []Option{Optional(true)},
+		opts:  []cue.Option{cue.Optional(true)},
 		value: `1, a?: 2`,
 		err:   "cannot use value 1 (type int) as struct",
 	}}
@@ -867,14 +862,14 @@ func TestFields(t *testing.T) {
 				want, err := iter.Value().MarshalJSON()
 				checkFatal(t.T, err, tc.err, "Obj.At2")
 
-				got, err := obj.LookupPath(MakePath(iter.Selector())).MarshalJSON()
+				got, err := obj.LookupPath(cue.MakePath(iter.Selector())).MarshalJSON()
 				checkFatal(t.T, err, tc.err, "Obj.At2")
 
 				if !bytes.Equal(got, want) {
 					t.Errorf("Lookup: got %q; want %q", got, want)
 				}
 			}
-			v := obj.LookupPath(MakePath(Str("non-existing")))
+			v := obj.LookupPath(cue.MakePath(cue.Str("non-existing")))
 			checkErr(t.T, v.Err(), "not found", "non-existing")
 		})
 	}
@@ -906,8 +901,8 @@ func TestAllFields(t *testing.T) {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
 			obj := getValue(t, tc.value)
 
-			var iter *Iterator // Verify that the returned iterator is a pointer.
-			iter, err := obj.Fields(All())
+			var iter *cue.Iterator // Verify that the returned iterator is a pointer.
+			iter, err := obj.Fields(cue.All())
 			checkFatal(t.T, err, tc.err, "init")
 
 			buf := []byte{'{'}
@@ -950,7 +945,7 @@ func TestFieldType(t *testing.T) {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
 			obj := getValue(t, tc.value)
 
-			iter, err := obj.Fields(All())
+			iter, err := obj.Fields(cue.All())
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -968,8 +963,8 @@ func TestFieldType(t *testing.T) {
 
 func TestLookup(t *testing.T) {
 	cuetdtest.FullMatrix.Do(t, func(t *cuetdtest.M) {
-		runtime := newRuntime(t)
-		inst, err := runtime.Compile("x.cue", `
+		ctx := t.Context()
+		val := mustCompile(t, ctx, `
 #V: {
 	x: int
 }
@@ -981,11 +976,7 @@ v: #X
 a: {
 	b!: 1
 	c: 2
-}
-`)
-		if err != nil {
-			t.Fatalf("compile: %v", err)
-		}
+}`)
 		// expr, err := parser.ParseExpr("lookup.cue", `v`, parser.DeclarationErrors, parser.AllErrors)
 		// if err != nil {
 		// 	log.Fatalf("parseExpr: %v", err)
@@ -1020,7 +1011,7 @@ a: {
 		}}
 		for _, tc := range testCases {
 			t.Run("", func(t *testing.T) {
-				v := inst.Lookup(tc.ref...)
+				v := val.Lookup(tc.ref...)
 
 				if got := fmt.Sprintf("%+v", v); got != tc.result {
 					t.Errorf("got %v; want %v", got, tc.result)
@@ -1031,7 +1022,7 @@ a: {
 					t.Errorf("got %v; want %v", got, tc.syntax)
 				}
 
-				v = inst.Lookup()
+				v = val.Lookup()
 				for _, ref := range tc.ref {
 					s, err := v.Struct()
 					if err != nil {
@@ -1045,7 +1036,7 @@ a: {
 
 					// Struct gets all fields. Skip tests with optional fields,
 					// as the result will differ.
-					if v.v.ArcType != adt.ArcMember {
+					if cue.ValueVertex(v).ArcType != adt.ArcMember {
 						return
 					}
 				}
@@ -1063,16 +1054,7 @@ a: {
 	})
 }
 
-func compileT(t *testing.T, r *Runtime, s string) *Instance {
-	t.Helper()
-	inst, err := r.Compile("", s)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return inst
-}
-
-func goValue(v Value) interface{} {
+func goValue(v cue.Value) interface{} {
 	var x interface{}
 	err := v.Decode(&x)
 	if err != nil {
@@ -1085,12 +1067,9 @@ func goValue(v Value) interface{} {
 func TestFill(t *testing.T) {
 	// TODO: run with matrix.
 
-	r := &Runtime{}
+	ctx := cuecontext.New()
 
-	inst, err := r.CompileExpr(ast.NewStruct("bar", ast.NewString("baz")))
-	if err != nil {
-		t.Fatal(err)
-	}
+	val := ctx.BuildExpr(ast.NewStruct("bar", ast.NewString("baz")))
 
 	testCases := []struct {
 		in   string
@@ -1121,7 +1100,7 @@ func TestFill(t *testing.T) {
 		in: `
 		foo: _
 		`,
-		x:    inst.Value(),
+		x:    val,
 		path: "foo",
 		out: `
 		{foo: {bar: "baz"}}
@@ -1134,10 +1113,10 @@ func TestFill(t *testing.T) {
 			path = strings.Split(tc.path, ",")
 		}
 
-		v := compileT(t, r, tc.in).Value()
+		v := mustCompile(t, ctx, tc.in)
 		v = v.Fill(tc.x, path...)
 
-		w := compileT(t, r, tc.out).Value()
+		w := mustCompile(t, ctx, tc.out)
 
 		if diff := cmp.Diff(goValue(v), goValue(w)); diff != "" {
 			t.Error(diff)
@@ -1149,9 +1128,9 @@ func TestFill(t *testing.T) {
 func TestFill2(t *testing.T) {
 	// TODO: run with matrix.
 
-	r := &Runtime{}
+	ctx := cuecontext.New()
 
-	root, err := r.Compile("test", `
+	root := mustCompile(t, ctx, `
 	#Provider: {
 		ID: string
 		notConcrete: bool
@@ -1160,18 +1139,11 @@ func TestFill2(t *testing.T) {
 	}
 	`)
 
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	spec := root.LookupDef("#Provider")
 	providerInstance := spec.Fill("12345", "ID")
-	root, err = root.Fill(providerInstance, "providers", "myprovider")
-	if err != nil {
-		t.Fatal(err)
-	}
+	root = root.Fill(providerInstance, "providers", "myprovider")
 
-	got := fmt.Sprintf("%#v", root.Value())
+	got := fmt.Sprintf("%#v", root)
 	want := `#Provider: {
 	ID:          string
 	notConcrete: bool
@@ -1193,17 +1165,14 @@ providers: {
 
 func TestFillPath(t *testing.T) {
 	cuetdtest.FullMatrix.Do(t, func(t *cuetdtest.M) {
-		r := newRuntime(t)
+		ctx := t.Context()
 
-		inst, err := r.CompileExpr(ast.NewStruct("bar", ast.NewString("baz")))
-		if err != nil {
-			t.Fatal(err)
-		}
+		val := ctx.BuildExpr(ast.NewStruct("bar", ast.NewString("baz")))
 
 		testCases := []struct {
 			in   string
 			x    interface{}
-			path Path
+			path cue.Path
 			out  string
 		}{{
 			in: `
@@ -1211,7 +1180,7 @@ func TestFillPath(t *testing.T) {
 		bar: foo
 		`,
 			x:    3,
-			path: ParsePath("foo"),
+			path: cue.ParsePath("foo"),
 			out: `
 		foo: 3
 		bar: 3
@@ -1222,7 +1191,7 @@ func TestFillPath(t *testing.T) {
 		bar: X
 		`,
 			x:    3,
-			path: ParsePath(`"#foo"`),
+			path: cue.ParsePath(`"#foo"`),
 			out: `
 		"#foo": 3
 		bar: 3
@@ -1233,7 +1202,7 @@ func TestFillPath(t *testing.T) {
 		bar: X.foo
 		`,
 			x:    3,
-			path: ParsePath(`"#foo".foo`),
+			path: cue.ParsePath(`"#foo".foo`),
 			out: `
 		"#foo": foo: 3
 		bar: 3
@@ -1244,7 +1213,7 @@ func TestFillPath(t *testing.T) {
 		bar: foo.#foo
 		`,
 			x:    3,
-			path: ParsePath("foo.#foo"),
+			path: cue.ParsePath("foo.#foo"),
 			out: `
 		foo: {
 			#foo: 3
@@ -1257,7 +1226,7 @@ func TestFillPath(t *testing.T) {
 		bar: foo._foo
 		`,
 			x:    3,
-			path: MakePath(Str("foo"), Hid("_foo", "_")),
+			path: cue.MakePath(cue.Str("foo"), cue.Hid("_foo", "_")),
 			out: `
 		foo: {
 			_foo: 3
@@ -1269,7 +1238,7 @@ func TestFillPath(t *testing.T) {
 		string
 		`,
 			x:    "foo",
-			path: ParsePath(""),
+			path: cue.ParsePath(""),
 			out: `
 		"foo"
 		`,
@@ -1277,8 +1246,8 @@ func TestFillPath(t *testing.T) {
 			in: `
 		foo: _
 		`,
-			x:    inst.Value(),
-			path: ParsePath("foo"),
+			x:    val,
+			path: cue.ParsePath("foo"),
 			out: `
 		{foo: {bar: "baz"}}
 		`,
@@ -1289,7 +1258,7 @@ func TestFillPath(t *testing.T) {
 		x: 1
 		`,
 			x:    ast.NewIdent("x"),
-			path: ParsePath("foo"),
+			path: cue.ParsePath("foo"),
 			out: `
 		{foo: 1, x: 1}
 		`,
@@ -1301,7 +1270,7 @@ func TestFillPath(t *testing.T) {
 		}
 		`,
 			x:    ast.NewIdent("x"),
-			path: ParsePath("foo.bar"),
+			path: cue.ParsePath("foo.bar"),
 			out: `
 		{foo: {bar: 1, x: 1}}
 		`,
@@ -1314,7 +1283,7 @@ func TestFillPath(t *testing.T) {
 		}
 		`,
 			x:    ast.NewIdent("x"),
-			path: ParsePath("foo.bar"),
+			path: cue.ParsePath("foo.bar"),
 			out: `
 		{foo: {bar: 1}, x: 1}
 		`,
@@ -1329,7 +1298,7 @@ func TestFillPath(t *testing.T) {
 				ast.NewIdent("x"), ast.NewString("1"),
 				ast.NewIdent("y"), ast.NewIdent("x"),
 			),
-			path: ParsePath("foo.bar"),
+			path: cue.ParsePath("foo.bar"),
 			out: `
 			{foo: {bar: {x: "1", y: "1"}}}
 			`,
@@ -1339,7 +1308,7 @@ func TestFillPath(t *testing.T) {
 		foo: x: 1
 		`,
 			x:    ast.NewIdent("x"),
-			path: ParsePath("foo.bar.baz"),
+			path: cue.ParsePath("foo.bar.baz"),
 			out: `
 		{foo: {x: 1, bar: baz: 1}}
 		`,
@@ -1354,17 +1323,17 @@ func TestFillPath(t *testing.T) {
 		}, {
 			in:   `[...int]`,
 			x:    1,
-			path: ParsePath("0"),
+			path: cue.ParsePath("0"),
 			out:  `[1]`,
 		}, {
 			in:   `[1, ...int]`,
 			x:    1,
-			path: ParsePath("1"),
+			path: cue.ParsePath("1"),
 			out:  `[1, 1]`,
 		}, {
 			in:   `a: {b: v: int, c: v: int}`,
 			x:    1,
-			path: MakePath(Str("a"), AnyString, Str("v")),
+			path: cue.MakePath(cue.Str("a"), cue.AnyString, cue.Str("v")),
 			out: `{
 	a: {
 		b: {
@@ -1378,7 +1347,7 @@ func TestFillPath(t *testing.T) {
 		}, {
 			in:   `a: [_]`,
 			x:    1,
-			path: MakePath(Str("a"), AnyIndex, Str("b")),
+			path: cue.MakePath(cue.Str("a"), cue.AnyIndex, cue.Str("b")),
 			out: `{
 	a: [{
 		b: 1
@@ -1387,21 +1356,21 @@ func TestFillPath(t *testing.T) {
 		}, {
 			in:   `a: 1`,
 			x:    1,
-			path: MakePath(Str("b").Optional()),
+			path: cue.MakePath(cue.Str("b").Optional()),
 			out:  `{a: 1}`,
 		}, {
 			in:   `b: int`,
 			x:    1,
-			path: MakePath(Str("b").Optional()),
+			path: cue.MakePath(cue.Str("b").Optional()),
 			out:  `{b: 1}`,
 		}}
 
 		for _, tc := range testCases {
 			t.Run("", func(t *testing.T) {
-				v := compileT(t, r, tc.in).Value()
+				v := mustCompile(t, ctx, tc.in)
 				v = v.FillPath(tc.path, tc.x)
 
-				w := compileT(t, r, tc.out).Value()
+				w := mustCompile(t, ctx, tc.out)
 
 				if diff := cmp.Diff(goValue(v), goValue(w)); diff != "" {
 					t.Error(diff)
@@ -1417,7 +1386,7 @@ func TestFillPathError(t *testing.T) {
 	testCases := []struct {
 		in   string
 		x    interface{}
-		path Path
+		path cue.Path
 		err  string
 	}{{
 		// unsupported type.
@@ -1428,15 +1397,15 @@ func TestFillPathError(t *testing.T) {
 
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
-			v := compileT(t.T, newRuntime(t), tc.in).Value()
+			ctx := t.Context()
+			v := mustCompile(t, ctx, tc.in)
 			v = v.FillPath(tc.path, tc.x)
 
 			err := v.Err()
 			if err == nil {
 				t.Errorf("unexpected success")
-			}
 
-			if got := err.Error(); !strings.Contains(got, tc.err) {
+			} else if got := err.Error(); !strings.Contains(got, tc.err) {
 				t.Errorf("\ngot:  %s\nwant: %s", got, tc.err)
 			}
 		})
@@ -1447,7 +1416,7 @@ func TestAllows(t *testing.T) {
 	testCases := []struct {
 		desc  string
 		in    string
-		sel   Selector
+		sel   cue.Selector
 		allow bool
 
 		todo_nosharing bool
@@ -1458,7 +1427,7 @@ func TestAllows(t *testing.T) {
 			a: int
 		}
 		`,
-		sel:   Str("b"),
+		sel:   cue.Str("b"),
 		allow: true,
 	}, {
 		desc: "disallow new field in definition",
@@ -1468,7 +1437,7 @@ func TestAllows(t *testing.T) {
 			a: int
 		}
 		`,
-		sel: Str("b"),
+		sel: cue.Str("b"),
 	}, {
 		desc: "disallow new field in explicitly closed struct",
 		in: `
@@ -1476,41 +1445,41 @@ func TestAllows(t *testing.T) {
 			a: int
 		})
 		`,
-		sel: Str("b"),
+		sel: cue.Str("b"),
 	}, {
 		desc: "allow field in pattern",
 		in: `
 				x: #X
 				#X: [>"a"]: 1
 				`,
-		sel:   Str("b"),
+		sel:   cue.Str("b"),
 		allow: true,
 	}, {
 		desc: "allow index in open list",
 		in: `
 		x: [...int]
 		`,
-		sel:   Index(100),
+		sel:   cue.Index(100),
 		allow: true,
 	}, {
 		desc: "disallow index in closed list",
 		in: `
 		x: []
 		`,
-		sel: Index(0),
+		sel: cue.Index(0),
 	}, {
 		desc: "allow existing index in closed list",
 		in: `
 		x: [1]
 		`,
-		sel:   Index(0),
+		sel:   cue.Index(0),
 		allow: true,
 	}, {
 		desc: "definition in non-def closed list",
 		in: `
 		x: [1]
 		`,
-		sel:   Def("#foo"),
+		sel:   cue.Def("#foo"),
 		allow: true,
 	}, {
 		// TODO(disallow)
@@ -1520,7 +1489,7 @@ func TestAllows(t *testing.T) {
 		x: [1]
 		#Def: [...int]
 		`,
-		sel:   Def("#foo"),
+		sel:   cue.Def("#foo"),
 		allow: true,
 	}, {
 		desc: "field in def open list",
@@ -1529,13 +1498,13 @@ func TestAllows(t *testing.T) {
 		x: [1]
 		#Def: [...int]
 		`,
-		sel: Str("foo"),
+		sel: cue.Str("foo"),
 	}, {
 		desc: "definition in open scalar",
 		in: `
 		x: 1
 		`,
-		sel:   Def("#foo"),
+		sel:   cue.Def("#foo"),
 		allow: true,
 	}, {
 		desc: "field in scalar",
@@ -1544,33 +1513,33 @@ func TestAllows(t *testing.T) {
 		x: 1
 		#Def: int
 		`,
-		sel: Str("foo"),
+		sel: cue.Str("foo"),
 	}, {
 		desc: "any index in closed list",
 		in: `
 		x: [1]
 		`,
-		sel: AnyIndex,
+		sel: cue.AnyIndex,
 	}, {
 		desc: "any index in open list",
 		in: `
 		x: [...int]
 			`,
-		sel:   AnyIndex,
+		sel:   cue.AnyIndex,
 		allow: true,
 	}, {
 		desc: "definition in open scalar",
 		in: `
 		x: 1
 		`,
-		sel:   anyDefinition,
+		sel:   cue.AnyDefinition,
 		allow: true,
 	}, {
 		desc: "field in open scalar",
 		in: `
 			x: 1
 			`,
-		sel: AnyString,
+		sel: cue.AnyString,
 
 		// TODO(v0.6.0)
 		// }, {
@@ -1580,54 +1549,54 @@ func TestAllows(t *testing.T) {
 		// 	x: 1
 		// 	#Def: int
 		// 	`,
-		// 	sel:   AnyDefinition,
+		// 	sel:   cue.AnyDefinition,
 		// 	allow: true,
 	}, {
 		desc: "allow field in any",
 		in: `
 			x: _
 			`,
-		sel:   AnyString,
+		sel:   cue.AnyString,
 		allow: true,
 	}, {
 		desc: "allow index in any",
 		in: `
 		x: _
 		`,
-		sel:   AnyIndex,
+		sel:   cue.AnyIndex,
 		allow: true,
 	}, {
 		desc: "allow index in disjunction",
 		in: `
 		x: [...int] | 1
 		`,
-		sel:   AnyIndex,
+		sel:   cue.AnyIndex,
 		allow: true,
 	}, {
 		desc: "allow index in disjunction",
 		in: `
 		x: [] | [...int]
 			`,
-		sel:   AnyIndex,
+		sel:   cue.AnyIndex,
 		allow: true,
 	}, {
 		desc: "disallow index in disjunction",
 		in: `
 		x: [1, 2] | [3, 2]
 		`,
-		sel: AnyIndex,
+		sel: cue.AnyIndex,
 	}, {
 		desc: "disallow index in non-list disjunction",
 		in: `
 		x: "foo" | 1
 		`,
-		sel: AnyIndex,
+		sel: cue.AnyIndex,
 	}, {
 		desc: "allow label in disjunction",
 		in: `
 		x: {} | 1
 		`,
-		sel:   AnyString,
+		sel:   cue.AnyString,
 		allow: true,
 	}, {
 		desc: "allow label in disjunction",
@@ -1635,7 +1604,7 @@ func TestAllows(t *testing.T) {
 		x: #Def
 		#Def: { a: 1 } | { b: 1, ... }
 		`,
-		sel:   AnyString,
+		sel:   cue.AnyString,
 		allow: true,
 
 		todo_nosharing: true,
@@ -1645,21 +1614,21 @@ func TestAllows(t *testing.T) {
 		x: #Def
 		#Def: { a: 1 } | { b: 1 }
 		`,
-		sel: AnyString,
+		sel: cue.AnyString,
 	}, {
 		desc: "pattern constraint",
 		in: `
 		x: #PC
 		#PC: [>"m"]: int
 		`,
-		sel: Str(""),
+		sel: cue.Str(""),
 	}, {
 		desc: "pattern constraint",
 		in: `
 		x: #PC
 		#PC: [>"m"]: int
 		`,
-		sel:   Str("z"),
+		sel:   cue.Str("z"),
 		allow: true,
 	}, {
 		desc: "any in pattern constraint",
@@ -1667,24 +1636,25 @@ func TestAllows(t *testing.T) {
 		x: #PC
 		#PC: [>"m"]: int
 		`,
-		sel: AnyString,
+		sel: cue.AnyString,
 	}, {
 		desc: "any in pattern constraint",
 		in: `
 		x: #PC
 		#PC: [>" "]: int
 		`,
-		sel: AnyString,
+		sel: cue.AnyString,
 	}}
 
-	path := ParsePath("x")
+	path := cue.ParsePath("x")
 
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.desc, func(t *cuetdtest.M) {
 			if tc.todo_nosharing {
 				t.TODO_NoSharing()
 			}
-			v := compileT(t.T, newRuntime(t), tc.in).Value()
+			ctx := t.Context()
+			v := mustCompile(t, ctx, tc.in)
 			v = v.LookupPath(path)
 
 			got := v.Allows(tc.sel)
@@ -1703,20 +1673,13 @@ func TestFillFloat(t *testing.T) {
 }`
 
 	filltest := func(x interface{}) {
-		r := &Runtime{}
-		i, err := r.Compile("test", `
+		ctx := cuecontext.New()
+		val := mustCompile(t, ctx, `
 	x: number
 	`)
-		if err != nil {
-			t.Fatal(err)
-		}
+		val = val.Fill(x, "x")
 
-		i, err = i.Fill(x, "x")
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		got := fmt.Sprint(i.Value())
+		got := fmt.Sprint(val)
 		if got != want {
 			t.Errorf("got:  %s\nwant: %s", got, want)
 		}
@@ -1753,8 +1716,8 @@ func TestValue_LookupDef(t *testing.T) {
 
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.def, func(t *cuetdtest.M) {
-			r := newRuntime(t)
-			v := compileT(t.T, r, tc.in).Value()
+			ctx := t.Context()
+			v := mustCompile(t, ctx, tc.in)
 			v = v.LookupDef(tc.def)
 			got := fmt.Sprint(v)
 
@@ -1813,7 +1776,7 @@ func TestDefaults(t *testing.T) {
 			}
 
 			op, val := d.Expr()
-			if op != OrOp {
+			if op != cue.OrOp {
 				return
 			}
 			vars := []string{}
@@ -1975,7 +1938,7 @@ func TestElem(t *testing.T) {
 			}
 
 			v := getValue(t, tc.value)
-			v.v.Finalize(v.ctx()) // TODO: do in instance.
+			cue.ValueVertex(v).Finalize(cue.ValueCtx(v)) // TODO: do in instance.
 			for _, p := range tc.path {
 				if p == "" {
 					var ok bool
@@ -1997,13 +1960,13 @@ func TestElem(t *testing.T) {
 }
 
 func TestSubsume(t *testing.T) {
-	a := ParsePath("a")
-	b := ParsePath("b")
+	a := cue.ParsePath("a")
+	b := cue.ParsePath("b")
 	testCases := []struct {
 		value   string
-		pathA   Path
-		pathB   Path
-		options []Option
+		pathA   cue.Path
+		pathB   cue.Path
+		options []cue.Option
 		want    bool
 	}{{
 		value: `4`,
@@ -2045,7 +2008,7 @@ func TestSubsume(t *testing.T) {
 		#Run: { action: "run", command: [...string] }
 		b: { action: "run", command: ["echo", "hello"] }
 		`,
-		pathA: ParsePath("#Run"),
+		pathA: cue.ParsePath("#Run"),
 		pathB: b,
 
 		// NOTE: this is for v0.2 compatibility. Logically a closed struct
@@ -2060,9 +2023,9 @@ func TestSubsume(t *testing.T) {
 			#Run: { action: "run", command: [...string] }
 			b: { action: "run", command: ["echo", "hello"] }
 			`,
-		pathA:   ParsePath("#Run"),
+		pathA:   cue.ParsePath("#Run"),
 		pathB:   b,
-		options: []Option{Final()},
+		options: []cue.Option{cue.Final()},
 		want:    true,
 	}, {
 		// default
@@ -2081,7 +2044,7 @@ func TestSubsume(t *testing.T) {
 			`,
 		pathA:   a,
 		pathB:   b,
-		options: []Option{Raw()},
+		options: []cue.Option{cue.Raw()},
 		want:    false,
 	}, {
 		value: `
@@ -2096,9 +2059,9 @@ func TestSubsume(t *testing.T) {
 				regex: string
 			}
 			`,
-		pathA:   ParsePath("#A"),
-		pathB:   ParsePath("#B"),
-		options: []Option{},
+		pathA:   cue.ParsePath("#A"),
+		pathB:   cue.ParsePath("#B"),
+		options: []cue.Option{},
 		want:    true,
 	}, {
 		value: `
@@ -2113,8 +2076,8 @@ func TestSubsume(t *testing.T) {
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
 			v := getValue(t, tc.value)
-			a := v.Value().LookupPath(tc.pathA)
-			b := v.Value().LookupPath(tc.pathB)
+			a := v.LookupPath(tc.pathA)
+			b := v.LookupPath(tc.pathB)
 			got := a.Subsume(b, tc.options...) == nil
 			if got != tc.want {
 				t.Errorf("got %v (%v); want %v (%v)", got, a, tc.want, b)
@@ -2248,8 +2211,8 @@ func TestUnify(t *testing.T) {
 	cuetdtest.FullMatrix.Do(t, func(m *cuetdtest.M) {
 		tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
 			v := getValue(m, tc.value)
-			x := v.LookupPath(ParsePath(tc.pathA))
-			y := v.LookupPath(ParsePath(tc.pathB))
+			x := v.LookupPath(cue.ParsePath(tc.pathA))
+			y := v.LookupPath(cue.ParsePath(tc.pathB))
 			b, err := x.Unify(y).MarshalJSON()
 			if err != nil {
 				t.Fatal(err)
@@ -2302,9 +2265,9 @@ func TestUnifyAccept(t *testing.T) {
 	cuetdtest.FullMatrix.Do(t, func(m *cuetdtest.M) {
 		tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
 			v := getValue(m, tc.value)
-			x := v.LookupPath(ParsePath("#v"))
-			y := v.LookupPath(ParsePath("#w"))
-			a := v.LookupPath(ParsePath("#accept"))
+			x := v.LookupPath(cue.ParsePath("#v"))
+			y := v.LookupPath(cue.ParsePath("#w"))
+			a := v.LookupPath(cue.ParsePath("#accept"))
 			b, err := x.UnifyAccept(y, a).MarshalJSON()
 			if err != nil {
 				t.Fatal(err)
@@ -2367,17 +2330,11 @@ func TestEquals(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
-			r := newRuntime(t)
+			ctx := t.Context()
 
-			a, err := r.Compile("a", tc.a)
-			if err != nil {
-				t.Fatal(err)
-			}
-			b, err := r.Compile("b", tc.b)
-			if err != nil {
-				t.Fatal(err)
-			}
-			got := a.Value().Equals(b.Value())
+			a := mustCompile(t, ctx, tc.a)
+			b := mustCompile(t, ctx, tc.b)
+			got := a.Equals(b)
 			if got != tc.want {
 				t.Errorf("got %v; want %v", got, tc.want)
 			}
@@ -2391,7 +2348,7 @@ func TestValidate(t *testing.T) {
 		desc string
 		in   string
 		err  bool
-		opts []Option
+		opts []cue.Option
 
 		skip bool
 	}{{
@@ -2409,20 +2366,20 @@ func TestValidate(t *testing.T) {
 		c: d: e: f: 5
 		g?: int
 		`,
-		opts: []Option{Concrete(true)},
+		opts: []cue.Option{cue.Concrete(true)},
 	}, {
 		desc: "definition error",
 		in: `
 			#b: 1 & 2
 			`,
-		opts: []Option{},
+		opts: []cue.Option{},
 		err:  true,
 	}, {
 		desc: "definition error okay if optional",
 		in: `
 			#b?: 1 & 2
 			`,
-		opts: []Option{},
+		opts: []cue.Option{},
 	}, {
 		desc: "definition with optional",
 		in: `
@@ -2431,14 +2388,14 @@ func TestValidate(t *testing.T) {
 				b?: >=0
 			}
 		`,
-		opts: []Option{Concrete(true)},
+		opts: []cue.Option{cue.Concrete(true)},
 	}, {
 		desc: "disjunction",
 		in:   `a: 1 | 2`,
 	}, {
 		desc: "disjunction concrete",
 		in:   `a: 1 | 2`,
-		opts: []Option{Concrete(true)},
+		opts: []cue.Option{cue.Concrete(true)},
 		err:  true,
 	}, {
 		desc: "incomplete concrete",
@@ -2446,7 +2403,7 @@ func TestValidate(t *testing.T) {
 	}, {
 		desc: "incomplete",
 		in:   `a: string`,
-		opts: []Option{Concrete(true)},
+		opts: []cue.Option{cue.Concrete(true)},
 		err:  true,
 	}, {
 		desc: "list",
@@ -2454,7 +2411,7 @@ func TestValidate(t *testing.T) {
 	}, {
 		desc: "list concrete",
 		in:   `a: [{b: string}, 3]`,
-		opts: []Option{Concrete(true)},
+		opts: []cue.Option{cue.Concrete(true)},
 		err:  true,
 	}, {
 		desc: "allow cycles",
@@ -2470,7 +2427,7 @@ func TestValidate(t *testing.T) {
 			b: a + 100
 			c: [c[1], c[0]]
 			`,
-		opts: []Option{DisallowCycles(true)},
+		opts: []cue.Option{cue.DisallowCycles(true)},
 		err:  true,
 
 		// TODO: in the new evaluator these are not considered to be cycles
@@ -2502,7 +2459,7 @@ func TestValidate(t *testing.T) {
 		}
 		instance1: #Schema1
 		`,
-		opts: []Option{Concrete(true)},
+		opts: []cue.Option{cue.Concrete(true)},
 	}, {
 		desc: "issue324",
 		in: `
@@ -2532,12 +2489,9 @@ func TestValidate(t *testing.T) {
 				t.TODO_V3()
 			}
 
-			r := newRuntime(t)
-
-			inst, err := r.Parse("validate", tc.in)
-			if err == nil {
-				err = inst.Value().Validate(tc.opts...)
-			}
+			ctx := t.Context()
+			val := ctx.CompileString(tc.in, cue.Filename("validate"))
+			err := val.Validate(tc.opts...)
 			if gotErr := err != nil; gotErr != tc.err {
 				t.Errorf("got %v; want %v", err, tc.err)
 			}
@@ -2568,13 +2522,10 @@ func TestPath(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, strings.Join(tc, "."), func(t *cuetdtest.M) {
-			r := newRuntime(t)
-			inst, err := r.Parse("config", config)
-			if err != nil {
-				t.Fatal(err)
-			}
+			ctx := t.Context()
+			val := mustCompile(t, ctx, config)
 
-			v := inst.Lookup(tc[0])
+			v := val.Lookup(tc[0])
 			for _, e := range tc[1:] {
 				if '0' <= e[0] && e[0] <= '9' {
 					i, err := strconv.Atoi(e)
@@ -2597,7 +2548,7 @@ func TestPath(t *testing.T) {
 					v = v.Lookup(e)
 				}
 			}
-			got := pathToStrings(v.Path())
+			got := cue.PathToStrings(v.Path())
 			if !reflect.DeepEqual(got, tc) {
 				t.Errorf("got %v; want %v", got, tc)
 			}
@@ -2666,7 +2617,7 @@ func TestValueLookup(t *testing.T) {
 				t.Errorf("exists: got %v; want %v", got, tc.notExists)
 			}
 
-			got := v.ctx().Str(v.v)
+			got := cue.ValueCtx(v).Str(cue.ValueVertex(v))
 			if tc.str == "" {
 				t.Fatalf("str empty, got %q", got)
 			}
@@ -2740,23 +2691,13 @@ func TestValueDoc(t *testing.T) {
 	`
 
 	cuetdtest.FullMatrix.Do(t, func(t *cuetdtest.M) {
-		r := newRuntime(t)
-		getInst := func(name, body string) *Instance {
-			inst, err := r.Compile("dir/file1.cue", body)
-			if err != nil {
-				t.Fatal(err)
-			}
-			return inst
-		}
-
-		inst := getInst("config", config)
-
-		v1 := inst.Value()
-		v2 := getInst("config2", config2).Value()
+		ctx := t.Context()
+		v1 := mustCompile(t, ctx, config)
+		v2 := mustCompile(t, ctx, config2)
 		both := v1.Unify(v2)
 
 		testCases := []struct {
-			val  Value
+			val  cue.Value
 			path string
 			doc  string
 			skip bool
@@ -2827,7 +2768,7 @@ Another Foo.
 			})
 		}
 		want := "foobar defines at least foo.\n"
-		if got := docStr(inst.Value().Doc()); got != want {
+		if got := docStr(v1.Doc()); got != want {
 			t.Errorf("pkg: got:\n%vwant:\n%v", got, want)
 		}
 	})
@@ -3017,8 +2958,8 @@ func TestMarshalJSON(t *testing.T) {
 		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%d/%v", i, tc.value), func(t *cuetdtest.M) {
 			t.TODO_V3()
 
-			inst := getValue(t, tc.value)
-			b, err := inst.Value().MarshalJSON()
+			val := getValue(t, tc.value)
+			b, err := val.MarshalJSON()
 			checkFatal(t.T, err, tc.err, "init")
 
 			if got := string(b); got != tc.json {
@@ -3095,40 +3036,40 @@ func TestWalk(t *testing.T) {
 		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%d/%v", i, tc.value), func(t *cuetdtest.M) {
 			t.TODO_V3()
 
-			inst := getValue(t, tc.value)
+			val := getValue(t, tc.value)
 			buf := []byte{}
 			stripComma := func() {
 				if n := len(buf) - 1; buf[n] == ',' {
 					buf = buf[:n]
 				}
 			}
-			inst.Value().Walk(func(v Value) bool {
+			val.Walk(func(v cue.Value) bool {
 				v = v.Eval()
-				if !v.v.Label.IsInt() {
+				if !cue.ValueVertex(v).Label.IsInt() {
 					if k, ok := v.Label(); ok {
 						buf = append(buf, k+":"...)
 					}
 				}
 				switch v.Kind() {
-				case StructKind:
+				case cue.StructKind:
 					buf = append(buf, '{')
-				case ListKind:
+				case cue.ListKind:
 					buf = append(buf, '[')
 				default:
-					if b := v.v.Bottom(); b != nil {
-						s := debugStr(v.ctx(), b)
+					if b := cue.ValueVertex(v).Bottom(); b != nil {
+						s := cue.DebugStr(cue.ValueCtx(v), b)
 						buf = append(buf, fmt.Sprint(s, ",")...)
 						return true
 					}
 					buf = append(buf, fmt.Sprint(v, ",")...)
 				}
 				return true
-			}, func(v Value) {
+			}, func(v cue.Value) {
 				switch v.Kind() {
-				case StructKind:
+				case cue.StructKind:
 					stripComma()
 					buf = append(buf, "},"...)
-				case ListKind:
+				case cue.ListKind:
 					stripComma()
 					buf = append(buf, "],"...)
 				}
@@ -3221,10 +3162,10 @@ func TestReferencePath(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
-			r := newRuntime(t)
+			ctx := t.Context()
 
-			inst, _ := r.Compile("in", tc.input) // getInstance(t, tc.input)
-			v := inst.Lookup("v", "w", "x")
+			val := ctx.CompileString(tc.input, cue.Filename("in"))
+			v := val.Lookup("v", "w", "x")
 
 			root, path := v.ReferencePath()
 			if got := path.String(); got != tc.want {
@@ -3268,7 +3209,7 @@ func TestReferencePath(t *testing.T) {
 }
 
 func TestZeroValueBuildInstance(t *testing.T) {
-	inst := Value{}.BuildInstance()
+	inst := cue.Value{}.BuildInstance()
 	if inst != nil {
 		t.Error("unexpected non-nil instance")
 	}
@@ -3316,12 +3257,9 @@ a: x: y: z: "x"`,
 				t.TODO_V3()
 			}
 
-			var c Context
-			(*runtime.Runtime)(&c).Init()
-			t.UpdateRuntime(c.runtime())
-
+			c := t.Context()
 			v := c.CompileString(tc.value)
-			v = v.LookupPath(ParsePath("a"))
+			v = v.LookupPath(cue.ParsePath("a"))
 			pos := v.Pos().String()
 			if pos != tc.pos {
 				t.Errorf("got %v; want %v", pos, tc.pos)
@@ -3333,7 +3271,7 @@ a: x: y: z: "x"`,
 func TestPathCorrection(t *testing.T) {
 	testCases := []struct {
 		input  string
-		lookup func(i *Instance) Value
+		lookup func(i cue.Value) cue.Value
 		want   string
 		skip   bool
 	}{{
@@ -3342,7 +3280,7 @@ func TestPathCorrection(t *testing.T) {
 				c: d: b
 			}
 			`,
-		lookup: func(i *Instance) Value {
+		lookup: func(i cue.Value) cue.Value {
 			op, a := i.Lookup("a", "b", "c", "d").Expr()
 			_ = op
 			return a[0] // structural cycle errors.
@@ -3357,7 +3295,7 @@ func TestPathCorrection(t *testing.T) {
 				c: 3
 			}
 			`,
-		lookup: func(i *Instance) Value {
+		lookup: func(i cue.Value) cue.Value {
 			op, a := i.Lookup("a").Expr()
 			_ = op
 			return a[0].Lookup("x")
@@ -3371,7 +3309,7 @@ func TestPathCorrection(t *testing.T) {
 			a: b: [...T]
 			T: int
 			`,
-		lookup: func(i *Instance) Value {
+		lookup: func(i cue.Value) cue.Value {
 			v, _ := i.Lookup("a", "b").Elem()
 			_, a := v.Expr()
 			return a[0]
@@ -3385,7 +3323,7 @@ func TestPathCorrection(t *testing.T) {
 				}
 				#T: int
 				`,
-		lookup: func(i *Instance) Value {
+		lookup: func(i cue.Value) cue.Value {
 			v := i.LookupDef("#S")
 			f, _ := v.LookupField("b")
 			v, _ = f.Value.Elem()
@@ -3401,7 +3339,7 @@ func TestPathCorrection(t *testing.T) {
 		}
 		#T: int
 		`,
-		lookup: func(i *Instance) Value {
+		lookup: func(i cue.Value) cue.Value {
 			v := i.LookupDef("#S")
 			f, _ := v.LookupField("a")
 			x := f.Value
@@ -3420,7 +3358,7 @@ func TestPathCorrection(t *testing.T) {
 			#T: {b: 3}
 		}
 		`,
-		lookup: func(i *Instance) Value {
+		lookup: func(i cue.Value) cue.Value {
 			f, _ := i.LookupField("#a")
 			_, a := f.Value.Expr() // &
 			_, a = a[0].Expr()     // |
@@ -3437,14 +3375,14 @@ func TestPathCorrection(t *testing.T) {
 			{b?: #T}
 		}`,
 		want: "#Struct.#T",
-		lookup: func(inst *Instance) Value {
+		lookup: func(val cue.Value) cue.Value {
 			// Locate Struct
-			i, _ := inst.Value().Fields(Definitions(true))
+			i, _ := val.Fields(cue.Definitions(true))
 			if !i.Next() {
 				t.Fatal("no fields")
 			}
 			// Locate b
-			i, _ = i.Value().Fields(Definitions(true), Optional(true))
+			i, _ = i.Value().Fields(cue.Definitions(true), cue.Optional(true))
 			if !(i.Next() && i.Next()) {
 				t.Fatal("no fields")
 			}
@@ -3464,11 +3402,11 @@ func TestPathCorrection(t *testing.T) {
 		}
 		`,
 		want: "#T.#S.#U",
-		lookup: func(inst *Instance) Value {
-			f, _ := inst.Value().LookupField("#A")
+		lookup: func(val cue.Value) cue.Value {
+			f, _ := val.LookupField("#A")
 			f, _ = f.Value.LookupField("#B")
 			v := f.Value
-			v = Dereference(v)
+			v = cue.Dereference(v)
 			v = v.Lookup("a")
 			return v
 		},
@@ -3486,11 +3424,11 @@ func TestPathCorrection(t *testing.T) {
 			}
 			`,
 		want: "#T.#S",
-		lookup: func(inst *Instance) Value {
-			f, _ := inst.Value().LookupField("#A")
+		lookup: func(val cue.Value) cue.Value {
+			f, _ := val.LookupField("#A")
 			f, _ = f.Value.LookupField("#B")
 			v := f.Value
-			v = Dereference(v)
+			v = cue.Dereference(v)
 			v, _ = v.Lookup("a").Elem()
 			return v
 		},
@@ -3506,10 +3444,10 @@ func TestPathCorrection(t *testing.T) {
 		}
 		`,
 		want: "#T.#S",
-		lookup: func(inst *Instance) Value {
-			f, _ := inst.Value().LookupField("#A")
+		lookup: func(val cue.Value) cue.Value {
+			f, _ := val.LookupField("#A")
 			v := f.Value.Lookup("b")
-			v = Dereference(v)
+			v = cue.Dereference(v)
 			v = v.Lookup("a")
 			return v
 		},
@@ -3529,8 +3467,8 @@ func TestPathCorrection(t *testing.T) {
 			#X // Disconnect top-level struct from the one visible by close.
 			`,
 		want: "#Tracing.#T",
-		lookup: func(inst *Instance) Value {
-			f, _ := inst.Value().LookupField("#Tracing")
+		lookup: func(val cue.Value) cue.Value {
+			f, _ := val.LookupField("#Tracing")
 			v := f.Value.Eval()
 			_, args := v.Expr()
 			v = args[1]
@@ -3544,9 +3482,9 @@ func TestPathCorrection(t *testing.T) {
 		b: 2
 		`,
 		want: "b",
-		lookup: func(inst *Instance) Value {
-			v := inst.Value().LookupPath(ParsePath("x.v"))
-			v = Dereference(v)
+		lookup: func(val cue.Value) cue.Value {
+			v := val.LookupPath(cue.ParsePath("x.v"))
+			v = cue.Dereference(v)
 			return v
 		},
 	}, {
@@ -3561,11 +3499,11 @@ func TestPathCorrection(t *testing.T) {
 		}
 		`,
 		want: "#T.#S.#U",
-		lookup: func(inst *Instance) Value {
-			f, _ := inst.Value().LookupField("#A")
+		lookup: func(val cue.Value) cue.Value {
+			f, _ := val.LookupField("#A")
 			f, _ = f.Value.LookupField("#B")
 			v := f.Value
-			v = Dereference(v)
+			v = cue.Dereference(v)
 			v = v.Lookup("a")
 			return v
 		},
@@ -3575,24 +3513,21 @@ func TestPathCorrection(t *testing.T) {
 			continue
 		}
 		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
-			r := newRuntime(t)
+			ctx := t.Context()
 
-			inst, err := r.Compile("in", tc.input)
-			if err != nil {
-				t.Fatal(err)
-			}
-			v := tc.lookup(inst)
-			gotInst, ref := v.Reference()
-			if gotInst != inst {
+			val := ctx.CompileString(tc.input, cue.Filename("in"))
+			v := tc.lookup(val)
+			gotVal, ref := v.ReferencePath()
+			if gotVal != val {
 				t.Error("reference not in original instance")
 			}
-			gotPath := strings.Join(ref, ".")
+			gotPath := strings.Join(cue.PathToStrings(ref), ".")
 			if gotPath != tc.want {
 				t.Errorf("got path %s; want %s", gotPath, tc.want)
 			}
 
 			x, p := v.ReferencePath()
-			if x.Value() != inst.Value() {
+			if x != val {
 				t.Error("reference not in original instance")
 			}
 			gotPath = p.String()
@@ -3861,9 +3796,9 @@ func TestExpr(t *testing.T) {
 	}
 }
 
-func exprStr(v Value) string {
+func exprStr(v cue.Value) string {
 	op, operands := v.Expr()
-	if op == NoOp {
+	if op == cue.NoOp {
 		return compactRawStr(operands[0])
 	}
 	s := op.String()
@@ -3878,8 +3813,8 @@ func exprStr(v Value) string {
 	return s
 }
 
-func compactRawStr(v Value) string {
-	ctx := v.ctx()
+func compactRawStr(v cue.Value) string {
+	ctx := cue.ValueCtx(v)
 	cfg := &debug.Config{Compact: true, Raw: true}
-	return debug.NodeString(ctx, v.v, cfg)
+	return debug.NodeString(ctx, cue.ValueVertex(v), cfg)
 }

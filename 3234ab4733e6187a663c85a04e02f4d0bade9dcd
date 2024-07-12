@@ -1,0 +1,208 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eaf38e48_a548bd9d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-12T16:13:54Z",
+      "side": 1,
+      "message": "nit: in Go, we refer to funcs like `Foo` rather than `Foo()` or `Foo(param)`, and likewise, we refer to methods like `Type.Foo`.\n\nthis is just like how godoc links work, so it\u0027s helpful to be consistent: https://tip.golang.org/doc/comment#doclinks",
+      "revId": "3234ab4733e6187a663c85a04e02f4d0bade9dcd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84a9c337_97493e8d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-12T16:13:54Z",
+      "side": 1,
+      "message": "SGTM except the new public API without an explanation.\n\nfor some context on my error check comments, the docs on https://pkg.go.dev/cuelang.org/go/cue@master#Context.CompileString say:\n\n\u003e The returned Value will represent an error, accessible through Err, if any error occurred.",
+      "revId": "3234ab4733e6187a663c85a04e02f4d0bade9dcd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6448fe72_973530c4",
+        "filename": "cue/cuecontext/cuecontext.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-12T16:13:54Z",
+      "side": 1,
+      "message": "Careful: this is new public API. Did you intend to expose new API to users?",
+      "revId": "3234ab4733e6187a663c85a04e02f4d0bade9dcd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ae11854_573882a1",
+        "filename": "cue/types_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-12T16:13:54Z",
+      "side": 1,
+      "message": "lacks an error check now.",
+      "revId": "3234ab4733e6187a663c85a04e02f4d0bade9dcd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "307ea73f_7f243c82",
+        "filename": "cue/types_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-12T16:13:54Z",
+      "side": 1,
+      "message": "error check",
+      "revId": "3234ab4733e6187a663c85a04e02f4d0bade9dcd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "836b6cb0_4ebfb8e4",
+        "filename": "cue/types_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1063,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-12T16:13:54Z",
+      "side": 1,
+      "message": "this also lacks an error check now.",
+      "revId": "3234ab4733e6187a663c85a04e02f4d0bade9dcd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2e00b22_e881aa42",
+        "filename": "cue/types_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1131,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-12T16:13:54Z",
+      "side": 1,
+      "message": "error check",
+      "revId": "3234ab4733e6187a663c85a04e02f4d0bade9dcd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d819a777_09d50330",
+        "filename": "cue/types_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1161,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-12T16:13:54Z",
+      "side": 1,
+      "message": "error check",
+      "revId": "3234ab4733e6187a663c85a04e02f4d0bade9dcd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "058d2042_6fd81e86",
+        "filename": "cue/types_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1669,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-12T16:13:54Z",
+      "side": 1,
+      "message": "error check",
+      "revId": "3234ab4733e6187a663c85a04e02f4d0bade9dcd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea6ca335_4b93761f",
+        "filename": "cue/types_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 3511,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-12T16:13:54Z",
+      "side": 1,
+      "message": "error check",
+      "revId": "3234ab4733e6187a663c85a04e02f4d0bade9dcd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ad0c1af_20c591f4",
+        "filename": "internal/diff/diff_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-12T16:13:54Z",
+      "side": 1,
+      "message": "error checks",
+      "revId": "3234ab4733e6187a663c85a04e02f4d0bade9dcd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "846256d7_0406060a",
+        "filename": "internal/diff/diff_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 453,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-12T16:13:54Z",
+      "side": 1,
+      "message": "these need error checks too",
+      "revId": "3234ab4733e6187a663c85a04e02f4d0bade9dcd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -72,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9e2fcd72_ad75e42a",
+        "filename": "cue/cuecontext/cuecontext.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-12T16:48:30Z",
+      "side": 1,
+      "message": "Agreed that it\u0027s an awkward situation. But the new exposed API not being usable by end users due to cuedebug.Config being internal isn\u0027t really making this solution any better - if anything, it\u0027s worse that users would see a new API via pkg.go.dev, but they would never be able to use it in practice.\n\nCUE_DEBUG as a Go API is public and that\u0027s OK because it effectively matches the string API that cmd/cue has via env vars. It\u0027s not perfect, but it\u0027s useful and it works. We might want a Go API that takes a struct as well, but we would need to expose the config struct in the API first - or do it as a follow-up patch so that the API is usable once shipped in a release.\n\nPerhaps this is one to talk to Marcel about?",
+      "parentUuid": "e00744b1_fce1fa2e",
+      "revId": "3234ab4733e6187a663c85a04e02f4d0bade9dcd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0ae11854_573882a1",
         "filename": "cue/types_test.go",
         "patchSetId": 3

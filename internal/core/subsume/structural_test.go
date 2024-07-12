@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package subsume
+package subsume_test
 
 import (
 	"regexp"
@@ -24,6 +24,7 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/eval"
+	"cuelang.org/go/internal/core/subsume"
 	"cuelang.org/go/internal/cuetdtest"
 )
 
@@ -483,7 +484,7 @@ func TestStructural(t *testing.T) {
 				}
 			}
 
-			err = Value(ctx, a, b)
+			err = subsume.Value(ctx, a, b)
 			got := err == nil
 
 			if got != tc.subsumes {

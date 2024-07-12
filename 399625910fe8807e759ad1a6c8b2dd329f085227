@@ -16,6 +16,24 @@
       "message": "Please document the test.",
       "revId": "399625910fe8807e759ad1a6c8b2dd329f085227",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd60f04a_0cb9f33e",
+        "filename": "cmd/cue/cmd/testdata/script/modedit_nomajorversion.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-12T09:00:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ce112b12_0687b89e",
+      "revId": "399625910fe8807e759ad1a6c8b2dd329f085227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

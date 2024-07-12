@@ -89,6 +89,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f38ea679_e6459775",
+        "filename": "cue/types_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-12T16:34:33Z",
+      "side": 1,
+      "message": "maybe I misunderstand, but the earlier code used r.Compile and checked the error, which should be equivalent to checking Value.Err, no?\n\nyou\u0027re right that in most cases letting the next operation fail is probably not terrible, but the old code checked for a compile error upfront, so IMHO we should keep doing the same - and it\u0027s best practice to do so anyway, so that errors are surfaced quickly and in a straightforward way.",
+      "parentUuid": "7d0f31e6_aceba4ff",
+      "revId": "3234ab4733e6187a663c85a04e02f4d0bade9dcd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "307ea73f_7f243c82",
         "filename": "cue/types_test.go",
         "patchSetId": 3

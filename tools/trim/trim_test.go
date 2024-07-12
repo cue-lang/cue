@@ -17,9 +17,7 @@ package trim
 import (
 	"testing"
 
-	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
 )
@@ -43,8 +41,7 @@ func TestTrimFiles(t *testing.T) {
 	test.Run(t, func(t *cuetxtar.Test) {
 
 		a := t.Instance()
-		ctx := cuecontext.New()
-		t.UpdateRuntime((*runtime.Runtime)(ctx))
+		ctx := t.Context()
 		val := ctx.BuildInstance(a)
 		// Note: don't check val.Err because there are deliberate
 		// errors in some tests.

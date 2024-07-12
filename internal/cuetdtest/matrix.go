@@ -17,6 +17,8 @@ package cuetdtest
 import (
 	"testing"
 
+	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuedebug"
@@ -35,16 +37,17 @@ func (t *M) Name() string     { return t.name }
 func (t *M) Fallback() string { return t.fallback }
 func (t *M) IsDefault() bool  { return t.name == DefaultVersion }
 
-// Runtime creates a runtime that is configured according to the matrix.
-func (t *M) Runtime() *runtime.Runtime {
-	r := runtime.New()
-	t.UpdateRuntime(r)
-	return r
-}
-
-func (t *M) UpdateRuntime(r *runtime.Runtime) {
+func (t *M) Context() *cue.Context {
+	ctx := cuecontext.New()
+	r := (*runtime.Runtime)(ctx)
 	r.SetVersion(t.version)
 	r.SetDebugOptions(&t.flags)
+	return ctx
+}
+
+// Runtime creates a runtime that is configured according to the matrix.
+func (t *M) Runtime() *runtime.Runtime {
+	return (*runtime.Runtime)(t.Context())
 }
 
 const DefaultVersion = "v2"

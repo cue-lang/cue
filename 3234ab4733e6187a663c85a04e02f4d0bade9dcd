@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e00744b1_fce1fa2e",
+        "filename": "cue/cuecontext/cuecontext.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-07-12T16:41:32Z",
+      "side": 1,
+      "message": "Yeah I did spot this would be public. And yet also not usable because cuedebug is in internal. Though Context.CUE_DEBUG is also public, uses the same code...\nVery open to suggestions here - it\u0027s really about porting the runtime/Runtime.SetDebugOptions functionality to cue.Context - there doesn\u0027t seem to be a good way to do this with cuedebug being internal. And the call site is in cuetdtest/M.Context so it\u0027s not like I can leave it private and elevate it via the export_test trick. ISTM the real problem is something that\u0027s internal (runtime.Runtime) being aliased to something that\u0027s not internal (cue.Context).",
+      "parentUuid": "6448fe72_973530c4",
+      "revId": "3234ab4733e6187a663c85a04e02f4d0bade9dcd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0ae11854_573882a1",
         "filename": "cue/types_test.go",
         "patchSetId": 3

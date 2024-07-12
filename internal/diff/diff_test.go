@@ -19,7 +19,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/internal/cuetdtest"
 )
 
@@ -405,27 +405,22 @@ a: x: "hello"
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.name, func(t *cuetdtest.M) {
-			var r cue.Runtime
-			t.UpdateRuntime((*runtime.Runtime)(&r))
-			x, err := r.Compile("x", tc.x)
-			if err != nil {
-				t.Fatal(err)
-			}
-			y, err := r.Compile("y", tc.y)
-			if err != nil {
-				t.Fatal(err)
-			}
+			ctx := t.Context()
+			// it is not fatal if x or y contain errors: some test cases
+			// rely on interacting with such errors.
+			x := ctx.CompileString(tc.x, cue.Filename("x"))
+			y := ctx.CompileString(tc.y, cue.Filename("y"))
 			p := tc.profile
 			if p == nil {
 				p = Schema
 			}
-			kind, script := p.Diff(x.Value(), y.Value())
+			kind, script := p.Diff(x, y)
 			if kind != tc.kind {
 				t.Fatalf("got %d; want %d", kind, tc.kind)
 			}
 			if script != nil {
 				w := &bytes.Buffer{}
-				err = Print(w, script)
+				err := Print(w, script)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -455,21 +450,18 @@ func TestX(t *testing.T) {
 		kind: Modified,
 		diff: ``,
 	}
-	var r cue.Runtime
-	x, err := r.Compile("x", tc.x)
-	if err != nil {
-		t.Fatal(err)
-	}
-	y, err := r.Compile("y", tc.y)
-	if err != nil {
-		t.Fatal(err)
-	}
-	kind, script := Diff(x.Value(), y.Value())
+	ctx := cuecontext.New()
+	// it is not fatal if x or y contain errors: some test cases
+	// rely on interacting with such errors.
+	x := ctx.CompileString(tc.x, cue.Filename("x"))
+	y := ctx.CompileString(tc.y, cue.Filename("y"))
+
+	kind, script := Diff(x, y)
 	if kind != tc.kind {
 		t.Fatalf("got %d; want %d", kind, tc.kind)
 	}
 	w := &bytes.Buffer{}
-	err = Print(w, script)
+	err := Print(w, script)
 	if err != nil {
 		t.Fatal(err)
 	}

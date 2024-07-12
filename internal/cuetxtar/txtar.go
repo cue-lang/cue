@@ -343,20 +343,15 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 
 // Runtime returns a new runtime based on the configuration of the test.
 func (t *Test) Runtime() *runtime.Runtime {
-	r := runtime.New()
-	if t.M != nil {
-		t.M.UpdateRuntime(r)
-	}
-	return r
+	return (*runtime.Runtime)(t.Context())
 }
 
 // Context returns a new cue.Context based on the configuration of the test.
 func (t *Test) Context() *cue.Context {
-	ctx := cuecontext.New()
 	if t.M != nil {
-		t.M.UpdateRuntime((*runtime.Runtime)(ctx))
+		return t.M.Context()
 	}
-	return ctx
+	return cuecontext.New()
 }
 
 func (x *TxTarTest) run(t *testing.T, f func(tc *Test)) {

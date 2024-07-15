@@ -16,6 +16,24 @@
       "message": "note that using the new ctx Compile APIs means you should still check for an error via the cue.Value.Err method.\n\nalso, nit: don\u0027t call values `inst`, as that is from the deprecated `cue.Instance`.",
       "revId": "fed43b04babeac63d69b5a14529a20b69556b7a4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b60423d8_9ab0e828",
+        "filename": "cue/types_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 972,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-07-15T10:28:27Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "5f211d62_62b00e90",
+      "revId": "fed43b04babeac63d69b5a14529a20b69556b7a4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

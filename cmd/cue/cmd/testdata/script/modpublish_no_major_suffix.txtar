@@ -14,9 +14,9 @@ exec cue mod publish v0.0.1
 
 # The inferred version is v0. Using any other major version will fail.
 ! exec cue mod publish v1.0.0
-stderr 'mismatched major version suffix'
+stderr 'publish version "v1.0.0" does not match implied major version "v0" in ".*module.cue"; must be v0.N.N'
 ! exec cue mod publish v2.0.0
-stderr 'mismatched major version suffix'
+stderr 'publish version "v2.0.0" does not match implied major version "v0" in ".*module.cue"; must be v0.N.N'
 
 # `cue mod fix` will not add add a major version suffix when missing.
 exec cue mod fix
@@ -28,9 +28,9 @@ cmp cue.mod/module.cue cue.mod/module.cue.edited-with-v0
 
 # Trying to publish with the wrong major version will fail.
 ! exec cue mod publish v1.0.0
-stderr 'mismatched major version suffix'
+stderr 'publish version "v1.0.0" does not match the major version "v0" declared in ".*module.cue"; must be v0.N.N'
 ! exec cue mod publish v2.0.0
-stderr 'mismatched major version suffix'
+stderr 'publish version "v2.0.0" does not match the major version "v0" declared in ".*module.cue"; must be v0.N.N'
 
 # Publishing with the right major version works.
 exec cue mod publish v0.0.2

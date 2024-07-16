@@ -141,7 +141,7 @@ func readModuleFile(fsys fs.FS, modRoot string) (module.Version, *modfile.File, 
 	}
 	mainModuleVersion, err := module.NewVersion(mf.QualifiedModule(), "")
 	if err != nil {
-		return module.Version{}, nil, fmt.Errorf("invalid module path %q: %v", mf.QualifiedModule(), err)
+		return module.Version{}, nil, fmt.Errorf("%s: invalid module path: %v", modFilePath, err)
 	}
 	return mainModuleVersion, mf, nil
 }

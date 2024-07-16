@@ -134,6 +134,20 @@ func runModUpload(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	if !semver.IsValid(args[0]) {
+		return fmt.Errorf("invalid publish version %q; must be valid semantic version (see http://semver.org)", args[0])
+	}
+	if semver.Canonical(args[0]) != args[0] {
+		return fmt.Errorf("publish version %q is not in canonical form", args[0])
+	}
+	if semver.Major(args[0]) != mf.MajorVersion() {
+		if strings.Contains(mf.Module, "@") {
+			return fmt.Errorf("publish version %q does not match the major version %q declared in %q; must be %s.N.N", args[0], mf.MajorVersion(), modPath, mf.MajorVersion())
+		} else {
+			return fmt.Errorf("publish version %q does not match implied major version \"v0\" in %q; must be v0.N.N", args[0], modPath)
+		}
+	}
+
 	mv, err := module.NewVersion(mf.QualifiedModule(), args[0])
 	if err != nil {
 		return fmt.Errorf("cannot form module version: %v", err)

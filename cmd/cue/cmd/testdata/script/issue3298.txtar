@@ -1,0 +1,26 @@
+[!unix] skip
+exec cp x/x.cue_actual x/x.cue
+exec cue export
+cmp stdout want-stdout
+
+rm x/x.cue
+exec ln -s x.cue_actual ./x/x.cue
+exec cue export .
+
+-- want-stdout --
+{
+    "self": "x"
+}
+-- cue.mod/module.cue --
+module: "example.com"
+
+language: version: "v0.9.0"
+-- main.cue --
+package main
+
+import "example.com/x"
+x
+-- x/x.cue_actual --
+package x
+
+self: "x"

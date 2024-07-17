@@ -1,0 +1,16 @@
+# When there's a syntax error encountered at an early
+# stage of processing, the error message should
+# point to the place in the file where the error was
+# encountered.
+
+! exec cue eval invalid.cue
+stderr invalid.cue:3:
+-- cue.mod/module.cue --
+module: "test.example"
+language: version: "v0.9.0"
+
+-- invalid.cue --
+package blah
+
+self: bad )
+syntax

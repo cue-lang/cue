@@ -276,13 +276,16 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 		// Otherwise we would have to iterate twice, causing twice as many io/fs operations.
 		pkgFileIter := func(yield func(modimports.ModuleFile, error) bool) {
 			modimports.PackageFiles(loc.FS, loc.Dir, pkgQual)(func(mf modimports.ModuleFile, err error) bool {
+				if err != nil {
+					return yield(mf, err)
+				}
 				ip1 := ip
 				ip1.Qualifier = mf.Syntax.PackageName()
 				if !pkgs.shouldIncludePkgFile(ip1.String(), pkg.mod, loc.FS, mf) {
 					excludedPackageFiles++
 					return true
 				}
-				foundPackageFile = err == nil
+				foundPackageFile = true
 				return yield(mf, err)
 			})
 		}

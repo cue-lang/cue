@@ -1,0 +1,14 @@
+! exec cue eval blah.cue
+cmpenv stderr want-stderr
+-- want-stderr --
+cannot get syntax for "$WORK/blah.cue": missing ',' in struct literal:
+    ./blah.cue:3:11
+-- cue.mod/module.cue --
+module: "test.example"
+language: version: "v0.9.0"
+
+-- blah.cue --
+package blah
+
+self: bad )
+syntax

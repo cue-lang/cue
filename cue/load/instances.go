@@ -205,7 +205,7 @@ func loadPackages(
 		}
 		syntax, err := cfg.fileSystem.getCUESyntax(f)
 		if err != nil {
-			return nil, fmt.Errorf("cannot get syntax for %q: %v", f.Filename, err)
+			return nil, fmt.Errorf("cannot get syntax for %q: %w", f.Filename, err)
 		}
 		for _, imp := range syntax.Imports {
 			pkgPath, err := strconv.Unquote(imp.Path.Value)

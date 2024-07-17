@@ -234,7 +234,7 @@ func (f *Form) appendEscapedRune(buf []byte, r rune) []byte {
 			buf = append(buf, byte(r))
 			return buf
 		}
-	} else if strconv.IsPrint(r) || f.graphicOnly && isInGraphicList(r) {
+	} else if strconv.IsPrint(r) || (f.graphicOnly && strconv.IsGraphic(r)) {
 		buf = utf8.AppendRune(buf, r)
 		return buf
 	}
@@ -318,52 +318,4 @@ func (f *Form) requiredHashCount(s string) int {
 		}
 	}
 	return hashCount
-}
-
-// isInGraphicList reports whether the rune is in the isGraphic list. This separation
-// from IsGraphic allows quoteWith to avoid two calls to IsPrint.
-// Should be called only if IsPrint fails.
-func isInGraphicList(r rune) bool {
-	// We know r must fit in 16 bits - see makeisprint.go.
-	if r > 0xFFFF {
-		return false
-	}
-	rr := uint16(r)
-	i := bsearch16(isGraphic, rr)
-	return i < len(isGraphic) && rr == isGraphic[i]
-}
-
-// bsearch16 returns the smallest i such that a[i] >= x.
-// If there is no such i, bsearch16 returns len(a).
-func bsearch16(a []uint16, x uint16) int {
-	i, j := 0, len(a)
-	for i < j {
-		h := i + (j-i)/2
-		if a[h] < x {
-			i = h + 1
-		} else {
-			j = h
-		}
-	}
-	return i
-}
-
-// isGraphic lists the graphic runes not matched by IsPrint.
-var isGraphic = []uint16{
-	0x00a0,
-	0x1680,
-	0x2000,
-	0x2001,
-	0x2002,
-	0x2003,
-	0x2004,
-	0x2005,
-	0x2006,
-	0x2007,
-	0x2008,
-	0x2009,
-	0x200a,
-	0x202f,
-	0x205f,
-	0x3000,
 }

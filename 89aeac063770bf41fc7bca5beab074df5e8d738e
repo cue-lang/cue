@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "82b534c9_149f0ea4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-18T16:32:46Z",
+      "side": 1,
+      "message": "nit: perhaps this CL would have been good to split in two, so that we see the change in error message. not important though.",
+      "revId": "89aeac063770bf41fc7bca5beab074df5e8d738e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

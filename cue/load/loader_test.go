@@ -539,7 +539,19 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/tagswithimports
 display:.
 files:
-    $CWD/testdata/testmod/tagswithimports/nonprod.cue`}}
+    $CWD/testdata/testmod/tagswithimports/nonprod.cue`}, {
+		name: "ModuleFileNonDirectory",
+		cfg: &Config{
+			Dir: testdata("testmod_legacymodfile"),
+		},
+		args: []string{"."},
+		want: `err:    cue.mod files are no longer supported; use cue.mod/module.cue
+path:   ""
+module: ""
+root:   ""
+dir:    ""
+display:""`},
+	}
 	tdtest.Run(t, testCases, func(t *tdtest.T, tc *loadTest) {
 		pkgs := Instances(tc.args, tc.cfg)
 

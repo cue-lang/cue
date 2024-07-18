@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5d00fe4_d27fd2cd",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-18T16:31:37Z",
+      "side": 1,
+      "message": "shouldn\u0027t our module path API already tell us whether or not the major version suffix was explicit? it seems a bit hacky to resort to strings.Contains.",
+      "revId": "2331cdb0ce8dc5e07ec19eb7357300d9adaaf86f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

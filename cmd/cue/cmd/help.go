@@ -119,21 +119,43 @@ the package in the current directory, provided there is a single
 named package in this directory.
 
 CUE packages are specified as an import path. An import path
-that is a rooted path --one that begins with a "." or ".."
-element-- is interpreted as a file system path and denotes the
+that is a rooted path -- one that begins with a "." or ".."
+element -- is interpreted as a file system path and denotes the
 package instance in that directory.
 
-Otherwise, the import path P denotes an external package found
-in cue.mod/{pkg|gen|usr}/P.
+Otherwise, the import path P is absolute and denotes a package that
+may be external, usually found in an external registry. It may also
+refer to a package in cue.mod/{pkg|gen|usr}/P - this is legacy
+behavior and may not be supported indefinitely.
 
-An import path may contain one or more "..." to match any
-subdirectory: pkg/... matches all packages below pkg, including
-pkg itself, while foo/.../bar matches all directories named bar
-within foo. In all cases, directories containing cue.mod
-directories are excluded from the result.
+An absolute import path is of the form P or P@vN where vN is the major
+version of the module containing the package. An import path is mapped
+to a registry location by consulting cue.mod/module.cue and the
+registry configuration (see "cue help modules" and "cue help
+registryconfig" for more details).
+
+An import may contain a ":name" suffix to indicate a specific
+package to load within a given path. It is necessary to specify this
+when there is more than one package at the path.
+
+For example, the following import path specifies a package
+named "other" in some external module with major version v1.
+
+	foo.example/bar/baz@v1:other
+
+A local import path may contain one or more "..." to match any
+subdirectory: pkg/... matches all packages below pkg, including pkg
+itself, while foo/.../bar matches all directories named bar within
+foo. In all cases, directories containing cue.mod directories are
+excluded from the result. "..." is not currently supported in external
+import paths.
 
 Directory and file names that begin with "." or "_" are ignored,
-unless explicitly listed as inputs.
+unless explicitly listed as inputs. File with names ending "_tool.cue"
+are ignored unless running "cue cmd" and they are in packages
+explicitly mentioned on the command line. Files with names ending
+"_test.cue" are ignored for the time being; they are reserved for
+future testing functionality.
 
 A package may also be specified as a list of .cue files.
 The special symbol '-' denotes stdin or stdout and defaults to

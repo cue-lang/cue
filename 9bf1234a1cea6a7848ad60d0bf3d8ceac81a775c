@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15d3f171_67b64bba",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-18T14:18:54Z",
+      "side": 1,
+      "message": "As a reminder: we don\u0027t use markdown in commit message for code blocks. 4 spaces of indentation, with clean lines before and after.",
+      "revId": "9bf1234a1cea6a7848ad60d0bf3d8ceac81a775c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

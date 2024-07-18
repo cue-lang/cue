@@ -279,9 +279,17 @@ A module is a collection of packages that are released, versioned, and
 distributed together. Modules are downloaded from OCI-compliant
 artifact registries.
 
+The Central Registry for CUE modules (` + modconfig.DefaultRegistry + `) is
+used as the source for external modules by default.
+
 For a detailed reference on modules:
 
 	https://cuelang.org/docs/reference/modules/
+
+For tutorials on how to use the Central Registry, see:
+
+	https://cuelang.org/docs/tutorial/working-with-the-central-registry/
+	https://cuelang.org/docs/tutorial/publishing-modules-to-the-central-registry/
 
 For a tutorial on how to work with a custom OCI registry for CUE modules:
 
@@ -303,8 +311,8 @@ Given a particular registry configuration, it's possible to work what registry a
 given module is stored in, and what repository within that registry, without
 making any network calls.
 
-If no explicit registry configuration is present, a default central registry
-(` + modconfig.DefaultRegistry + `) will be used for all modules.
+If no explicit registry configuration is present, a default Central Registry
+(` + modconfig.DefaultRegistry + `) is used for all modules.
 
 The simplest way of specifying a registry configuration is to set $CUE_REGISTRY
 to the hostname of that registry.

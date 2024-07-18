@@ -139,6 +139,24 @@
       "parentUuid": "9124d58b_4f32c663",
       "revId": "e4b2dc5c8d424b7afa0ce4e2252fa477946d11dc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "98467d6d_3debc52b",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-18T14:19:44Z",
+      "side": 1,
+      "message": "No, you make a very good point. Completely agree.",
+      "parentUuid": "5b4b5e4a_a9370d9f",
+      "revId": "e4b2dc5c8d424b7afa0ce4e2252fa477946d11dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

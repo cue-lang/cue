@@ -400,19 +400,21 @@ func (c Config) complete() (cfg *Config, err error) {
 // loadModule loads the module file, resolves and downloads module
 // dependencies. It sets c.Module if it's empty or checks it for
 // consistency with the module file otherwise.
+//
+// Note that this function is a no-op if a module file does not exist,
+// as it is still possible to load CUE without a module.
 func (c *Config) loadModule() error {
 	// TODO: also make this work if run from outside the module?
-	mod := filepath.Join(c.ModuleRoot, modDir)
-	info, cerr := c.fileSystem.stat(mod)
+	modDir := filepath.Join(c.ModuleRoot, modDir)
+	modFile := filepath.Join(modDir, moduleFile)
+	f, cerr := c.fileSystem.openFile(modFile)
 	if cerr != nil {
-		return nil
-	}
-	if !info.IsDir() {
-		return fmt.Errorf("cue.mod files are no longer supported; use cue.mod/module.cue")
-	}
-	mod = filepath.Join(mod, moduleFile)
-	f, cerr := c.fileSystem.openFile(mod)
-	if cerr != nil {
+		// If we could not load cue.mod/module.cue, check whether the reason was
+		// a legacy cue.mod file and give the user a clear error message.
+		info, cerr2 := c.fileSystem.stat(modDir)
+		if cerr2 == nil && !info.IsDir() {
+			return fmt.Errorf("cue.mod files are no longer supported; use cue.mod/module.cue")
+		}
 		return nil
 	}
 	defer f.Close()
@@ -431,7 +433,7 @@ func (c *Config) loadModule() error {
 		// module files have been discovered in the wild.
 		parseModFile = modfile.FixLegacy
 	}
-	mf, err := parseModFile(data, mod)
+	mf, err := parseModFile(data, modFile)
 	if err != nil {
 		return err
 	}

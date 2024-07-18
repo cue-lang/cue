@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a2706a6_6c0e2ded",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-18T14:19:14Z",
+      "side": 1,
+      "message": "Same reminder as previous CL in the stack.",
+      "revId": "239b10b4c70f0e579ea5761f78240d02e1398e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

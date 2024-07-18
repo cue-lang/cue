@@ -16,6 +16,24 @@
       "message": "shouldn\u0027t our module path API already tell us whether or not the major version suffix was explicit? it seems a bit hacky to resort to strings.Contains.",
       "revId": "2331cdb0ce8dc5e07ec19eb7357300d9adaaf86f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "18b58240_08d890f6",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-18T17:43:36Z",
+      "side": 1,
+      "message": "There\u0027s SplitPathVersion which does a bit more than that; yeah maybe it\u0027s better to use that. Done.",
+      "parentUuid": "a5d00fe4_d27fd2cd",
+      "revId": "2331cdb0ce8dc5e07ec19eb7357300d9adaaf86f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b94913c0_ed89d7c9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-18T09:06:35Z",
+      "side": 1,
+      "message": "LGTM but agreed with Paul :)",
+      "revId": "4a1916bc4514892f2455b714ea8ee7e362c464f3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "44bd2da2_3f4284cf",
@@ -31,6 +48,24 @@
       "writtenOn": "2024-07-18T04:59:40Z",
       "side": 1,
       "message": "This feels a little non-standard with lots of quotes. Why not:\n\n```\ncue.mod/module.cue: invalid module path \"\": path has no major version\n```",
+      "revId": "4a1916bc4514892f2455b714ea8ee7e362c464f3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58544232_781fb406",
+        "filename": "cmd/cue/cmd/testdata/script/modget_bad_modulepath.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-18T09:06:35Z",
+      "side": 1,
+      "message": "agreed; the module.cue path can\u0027t contain spaces or weird characters, so it\u0027s unnecessary quoting.",
+      "parentUuid": "44bd2da2_3f4284cf",
       "revId": "4a1916bc4514892f2455b714ea8ee7e362c464f3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

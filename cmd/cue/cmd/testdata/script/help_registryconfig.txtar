@@ -11,8 +11,8 @@ Given a particular registry configuration, it's possible to work what registry a
 given module is stored in, and what repository within that registry, without
 making any network calls.
 
-If no explicit registry configuration is present, a default central registry
-(registry.cue.works) will be used for all modules.
+If no explicit registry configuration is present, a default Central Registry
+(registry.cue.works) is used for all modules.
 
 The simplest way of specifying a registry configuration is to set $CUE_REGISTRY
 to the hostname of that registry.

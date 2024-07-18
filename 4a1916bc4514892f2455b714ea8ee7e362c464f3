@@ -68,6 +68,24 @@
       "parentUuid": "44bd2da2_3f4284cf",
       "revId": "4a1916bc4514892f2455b714ea8ee7e362c464f3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1cb178c4_22f23e84",
+        "filename": "cmd/cue/cmd/testdata/script/modget_bad_modulepath.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-18T14:13:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "58544232_781fb406",
+      "revId": "4a1916bc4514892f2455b714ea8ee7e362c464f3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

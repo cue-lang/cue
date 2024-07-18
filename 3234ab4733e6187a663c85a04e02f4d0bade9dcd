@@ -407,6 +407,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9df2c1cc_4b8dad40",
+        "filename": "cue/types_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 3511,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-18T08:29:22Z",
+      "side": 1,
+      "message": "Ah OK, I wasn\u0027t aware the two error checks weren\u0027t identical. SGTM, maybe leave a comment in as to why we continue even if there is an error.",
+      "parentUuid": "7cdaf5ea_bbabc484",
+      "revId": "3234ab4733e6187a663c85a04e02f4d0bade9dcd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8ad0c1af_20c591f4",
         "filename": "internal/diff/diff_test.go",
         "patchSetId": 3
@@ -442,6 +460,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "82b470ed_3b167c24",
+        "filename": "internal/diff/diff_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-18T08:29:22Z",
+      "side": 1,
+      "message": "ack, I\u0027d just leave a brief comment",
+      "parentUuid": "5d8575fe_2ff3b714",
+      "revId": "3234ab4733e6187a663c85a04e02f4d0bade9dcd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "846256d7_0406060a",
         "filename": "internal/diff/diff_test.go",
         "patchSetId": 3
@@ -471,6 +507,24 @@
       "side": 1,
       "message": "No - it should match the other diff test.",
       "parentUuid": "846256d7_0406060a",
+      "revId": "3234ab4733e6187a663c85a04e02f4d0bade9dcd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "988ee236_1fe2c3e2",
+        "filename": "internal/diff/diff_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 453,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-18T08:29:22Z",
+      "side": 1,
+      "message": "same, I\u0027d just leave a brief comment.",
+      "parentUuid": "43821a46_dba1128b",
       "revId": "3234ab4733e6187a663c85a04e02f4d0bade9dcd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

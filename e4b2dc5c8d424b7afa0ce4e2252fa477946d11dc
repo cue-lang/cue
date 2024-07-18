@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22a75beb_d0d191c4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-18T05:04:47Z",
+      "side": 1,
+      "message": "Per my other review, more detail and a before and after here will help the reader to quick see the impact of the change.",
+      "revId": "e4b2dc5c8d424b7afa0ce4e2252fa477946d11dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "589b28ff_bb3e26ec",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-18T05:04:47Z",
+      "side": 1,
+      "message": "Do we cover this in a test?",
+      "revId": "e4b2dc5c8d424b7afa0ce4e2252fa477946d11dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a73fcb0_b8f0395b",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-18T05:04:47Z",
+      "side": 1,
+      "message": "Do we cover this in a test?",
+      "revId": "e4b2dc5c8d424b7afa0ce4e2252fa477946d11dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9124d58b_4f32c663",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-18T05:04:47Z",
+      "side": 1,
+      "message": "You could avoid duplicating the construction of the error by having a variable for the major version, adjusting the value if `!strings.Contains(mf.Module, \"@\")`. Would read more cleanly to my mind.",
+      "revId": "e4b2dc5c8d424b7afa0ce4e2252fa477946d11dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+module: "test.example/foo"

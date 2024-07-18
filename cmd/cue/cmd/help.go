@@ -278,9 +278,16 @@ A module is a collection of packages that are released, versioned, and
 distributed together. Modules are downloaded from OCI-compliant
 artifact registries.
 
+There is a central registry for modules (` + modconfig.DefaultRegistry + `),
+which will be used as the source for external modules by default.
+
 For a detailed reference on modules:
 
 	https://cuelang.org/docs/reference/modules/
+
+For a tutorial on how to publish modules to the default central registry:
+
+	https://cuelang.org/docs/tutorial/publishing-modules-to-the-central-registry/
 
 For a tutorial on how to work with a custom OCI registry for CUE modules:
 

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7033f56a_66118f37",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-18T14:13:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "22a75beb_d0d191c4",
+      "revId": "e4b2dc5c8d424b7afa0ce4e2252fa477946d11dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "589b28ff_bb3e26ec",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-07-18T05:04:47Z",
       "side": 1,
       "message": "Do we cover this in a test?",
+      "revId": "e4b2dc5c8d424b7afa0ce4e2252fa477946d11dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "27ad6134_50fb4484",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-18T14:13:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "589b28ff_bb3e26ec",
       "revId": "e4b2dc5c8d424b7afa0ce4e2252fa477946d11dc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e6957ed_c4555a62",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-18T14:13:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a73fcb0_b8f0395b",
+      "revId": "e4b2dc5c8d424b7afa0ce4e2252fa477946d11dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9124d58b_4f32c663",
@@ -65,6 +119,24 @@
       "writtenOn": "2024-07-18T05:04:47Z",
       "side": 1,
       "message": "You could avoid duplicating the construction of the error by having a variable for the major version, adjusting the value if `!strings.Contains(mf.Module, \"@\")`. Would read more cleanly to my mind.",
+      "revId": "e4b2dc5c8d424b7afa0ce4e2252fa477946d11dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b4b5e4a_a9370d9f",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-18T14:13:17Z",
+      "side": 1,
+      "message": "I\u0027m not sure actually. The differences are subtle enough and the gain slight enough that I think it\u0027s probably better kept separate (and it\u0027s nice to have the whole text of the error for easy source grep). That said, I\u0027ve done a minor change to use a variable to make the two lines a bit more similar.\n\nUnless you want to suggest a change that brings the two error messages closer together in wording, perhaps?",
+      "parentUuid": "9124d58b_4f32c663",
       "revId": "e4b2dc5c8d424b7afa0ce4e2252fa477946d11dc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

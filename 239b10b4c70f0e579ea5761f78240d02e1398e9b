@@ -16,6 +16,24 @@
       "message": "Same reminder as previous CL in the stack.",
       "revId": "239b10b4c70f0e579ea5761f78240d02e1398e9b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73c905f0_538ed9c2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-18T16:20:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a2706a6_6c0e2ded",
+      "revId": "239b10b4c70f0e579ea5761f78240d02e1398e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

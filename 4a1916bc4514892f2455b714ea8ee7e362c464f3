@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bcb9d269_dbda1db4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-18T04:59:40Z",
+      "side": 1,
+      "message": "Including some more detail in the commit message would help here. What error message? Can you give a before an after? Otherwise the reader has to go and click through to find the details, and they\u0027re critical details to the fix itself. Specifically this change relates to when the module path is empty.",
+      "revId": "4a1916bc4514892f2455b714ea8ee7e362c464f3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44bd2da2_3f4284cf",
+        "filename": "cmd/cue/cmd/testdata/script/modget_bad_modulepath.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-18T04:59:40Z",
+      "side": 1,
+      "message": "This feels a little non-standard with lots of quotes. Why not:\n\n```\ncue.mod/module.cue: invalid module path \"\": path has no major version\n```",
+      "revId": "4a1916bc4514892f2455b714ea8ee7e362c464f3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

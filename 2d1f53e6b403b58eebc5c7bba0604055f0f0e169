@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0880c5e9_5cafd049",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-19T12:53:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "669d180a_4787e41e",
+      "revId": "2d1f53e6b403b58eebc5c7bba0604055f0f0e169",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d39872fb_d03e35c1",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-07-19T09:57:47Z",
       "side": 1,
       "message": "There is also https://cuelang.org/docs/tutorial/working-with-the-central-registry/. I would perhaps suggest that we list this one too, else having the link I suggested instead of the publish one (on the basis that more people will consume than publish).",
+      "revId": "2d1f53e6b403b58eebc5c7bba0604055f0f0e169",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba04e570_15302e1b",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-19T12:53:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d39872fb_d03e35c1",
       "revId": "2d1f53e6b403b58eebc5c7bba0604055f0f0e169",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

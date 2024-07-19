@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "54424b8d_a28c4d21",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-19T12:53:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bd1eba2b_b88ca4b0",
+      "range": {
+        "startLine": 126,
+        "startChar": 32,
+        "endLine": 126,
+        "endChar": 40
+      },
+      "revId": "3da1e495150e1d05f39b2e0a5e0ead3dfecd154c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8c326af4_6fc70496",
@@ -37,6 +61,24 @@
       "writtenOn": "2024-07-19T10:01:37Z",
       "side": 1,
       "message": "Simpler language: \"that might be removed at a later date.\"?",
+      "revId": "3da1e495150e1d05f39b2e0a5e0ead3dfecd154c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2a3c8c3_b9d0121f",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-19T12:53:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8c326af4_6fc70496",
       "revId": "3da1e495150e1d05f39b2e0a5e0ead3dfecd154c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

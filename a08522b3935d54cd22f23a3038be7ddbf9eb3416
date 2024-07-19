@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df7d76ec_a18d104d",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-19T08:09:32Z",
+      "side": 1,
+      "message": "this line break seems odd :)",
+      "revId": "a08522b3935d54cd22f23a3038be7ddbf9eb3416",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d949fff4_630bc123",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-19T08:09:32Z",
+      "side": 1,
+      "message": "nit: I\u0027d drop \"the\" here",
+      "range": {
+        "startLine": 134,
+        "startChar": 11,
+        "endLine": 134,
+        "endChar": 14
+      },
+      "revId": "a08522b3935d54cd22f23a3038be7ddbf9eb3416",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35a07768_47b7f6ba",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-19T08:09:32Z",
+      "side": 1,
+      "message": "perhaps say this is \"for the time being\", as they may be used by a potential `cue test` in the future?",
+      "range": {
+        "startLine": 157,
+        "startChar": 29,
+        "endLine": 157,
+        "endChar": 44
+      },
+      "revId": "a08522b3935d54cd22f23a3038be7ddbf9eb3416",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

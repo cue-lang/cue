@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd1eba2b_b88ca4b0",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-19T10:01:37Z",
+      "side": 1,
+      "message": "Do you want to introduce the concept of \"relative\" above for symmetry?",
+      "range": {
+        "startLine": 126,
+        "startChar": 32,
+        "endLine": 126,
+        "endChar": 40
+      },
+      "revId": "3da1e495150e1d05f39b2e0a5e0ead3dfecd154c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c326af4_6fc70496",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-19T10:01:37Z",
+      "side": 1,
+      "message": "Simpler language: \"that might be removed at a later date.\"?",
+      "revId": "3da1e495150e1d05f39b2e0a5e0ead3dfecd154c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

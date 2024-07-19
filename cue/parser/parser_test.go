@@ -81,6 +81,30 @@ func TestParse(t *testing.T) {
 		`,
 		`if=foo: 0, for=bar: 2, let=bar: 3, func=baz: 4`,
 	}, {
+		"keywords as selector",
+		`a : {
+			if: 0
+			for: 1
+			in: 2
+			where: 3
+			div: 4
+			quo: 5
+			func: 6
+			float: 7
+			null: if: func: let: 3
+		}, b: [
+			a.if,
+			a.for,
+			a.in,
+			a.where,
+			a.div,
+			a.quo,
+			a.func,
+			a.float,
+			a.null.if.func.let,
+		]`,
+		`a: {if: 0, for: 1, in: 2, where: 3, div: 4, quo: 5, func: 6, float: 7, null: {if: {func: {let: 3}}}}, b: [a.if, a.for, a.in, a.where, a.div, a.quo, a.func, a.float, a.null.if.func.let]`,
+	}, {}, {
 		"json",
 		`{
 			"a": 1,

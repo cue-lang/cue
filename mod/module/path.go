@@ -53,18 +53,10 @@ func firstPathOK(r rune) bool {
 
 // modPathOK reports whether r can appear in a module path element.
 // Paths can be ASCII letters, ASCII digits, and limited ASCII punctuation: - . _ and ~.
-//
-// This matches what "go get" has historically recognized in import paths,
-// and avoids confusing sequences like '%20' or '+' that would change meaning
-// if used in a URL.
-//
-// TODO(rsc): We would like to allow Unicode letters, but that requires additional
-// care in the safe encoding (see "escaped paths" above).
 func modPathOK(r rune) bool {
 	if r < utf8.RuneSelf {
-		return r == '-' || r == '.' || r == '_' || r == '~' ||
+		return r == '-' || r == '.' || r == '_' ||
 			'0' <= r && r <= '9' ||
-			'A' <= r && r <= 'Z' ||
 			'a' <= r && r <= 'z'
 	}
 	return false
@@ -134,7 +126,7 @@ func CheckPathWithoutVersion(basePath string) (err error) {
 	}
 	// Sanity check agreement with OCI specs.
 	if !basePathPat.MatchString(basePath) {
-		return fmt.Errorf("non-conforming path %q", basePath)
+		return fmt.Errorf("path does not conform to OCI repository name restrictions; see https://github.com/opencontainers/distribution-spec/blob/main/spec.md#pulling-manifests for details")
 	}
 	return nil
 }
@@ -267,10 +259,16 @@ func checkElem(elem string, kind pathKind) error {
 	if strings.Count(elem, ".") == len(elem) {
 		return fmt.Errorf("invalid path element %q", elem)
 	}
-	if elem[0] == '.' && kind == modulePath {
-		return fmt.Errorf("leading dot in path element")
-	}
-	if elem[len(elem)-1] == '.' {
+
+	if kind == modulePath {
+
+		if r := rune(elem[0]); r == '.' || r == '_' || r == '-' {
+			return fmt.Errorf("leading %q in path element", r)
+		}
+		if r := rune(elem[len(elem)-1]); r == '.' || r == '_' || r == '-' {
+			return fmt.Errorf("trailing %q in path element", r)
+		}
+	} else if elem[len(elem)-1] == '.' {
 		return fmt.Errorf("trailing dot in path element")
 	}
 	for _, r := range elem {

@@ -13,7 +13,6 @@ minFields: {
 	ok2: close({a: 1})
 	ok3: {a?: 1, a: 1}
 	ok5: {#a: int, a: #a & 1}
-	// TODO(mvdan): these should not fail.
 	ok6: {a!: 1}
 	ok7: {a!: 1, b!: 2}
 }
@@ -31,7 +30,6 @@ maxFields: {
 	ok8: {a!: 1, b?: 2}
 
 	fail1: {a: 1, b: 2}
-	// TODO(mvdan): these should not succeed.
 	fail2: {a!: 1, b!: 2}
 	fail3: {a: 1, b!: 2}
 }
@@ -48,6 +46,12 @@ minFields.failOptional1: invalid value {a?:1} (does not satisfy struct.MinFields
     ./in.cue:4:12
     ./in.cue:4:29
 maxFields.fail1: invalid value {a:1,b:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
+    ./in.cue:20:12
+    ./in.cue:20:29
+maxFields.fail2: invalid value {a!:1,b!:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
+    ./in.cue:20:12
+    ./in.cue:20:29
+maxFields.fail3: invalid value {a:1,b!:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
     ./in.cue:20:12
     ./in.cue:20:29
 
@@ -77,11 +81,11 @@ minFields: {
 	}
 	ok6: {
 		a!: 1
-	} & struct.MinFields(1)
+	}
 	ok7: {
 		a!: 1
 		b!: 2
-	} & struct.MinFields(1)
+	}
 }
 maxFields: {
 	ok1: {}
@@ -110,20 +114,14 @@ maxFields: {
 		b?: 2
 	}
 	fail1: _|_ // maxFields.fail1: invalid value {a:1,b:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1)
-	fail2: {
-		a!: 1
-		b!: 2
-	}
-	fail3: {
-		a:  1
-		b!: 2
-	}
+	fail2: _|_ // maxFields.fail2: invalid value {a!:1,b!:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1)
+	fail3: _|_ // maxFields.fail3: invalid value {a:1,b!:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1)
 }
 -- diff/-out/structs-v3<==>+out/structs --
 diff old new
 --- old
 +++ new
-@@ -2,15 +2,15 @@
+@@ -2,23 +2,21 @@
  minFields.fail1: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
      ./in.cue:4:12
      ./in.cue:4:29
@@ -139,10 +137,18 @@ diff old new
      ./in.cue:20:12
      ./in.cue:20:29
 -    ./in.cue:31:9
+ maxFields.fail2: invalid value {a!:1,b!:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
+     ./in.cue:20:12
+     ./in.cue:20:29
+-    ./in.cue:32:9
+ maxFields.fail3: invalid value {a:1,b!:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
+     ./in.cue:20:12
+     ./in.cue:20:29
+-    ./in.cue:33:9
  
  Result:
  import "struct"
-@@ -17,11 +17,9 @@
+@@ -25,11 +23,9 @@
  
  minFields: {
  	incomplete1: {} & struct.MinFields(1)
@@ -176,6 +182,14 @@ maxFields.fail1: invalid value {a:1,b:2} (does not satisfy struct.MaxFields(1)):
     ./in.cue:20:12
     ./in.cue:20:29
     ./in.cue:31:9
+maxFields.fail2: invalid value {a!:1,b!:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
+    ./in.cue:20:12
+    ./in.cue:20:29
+    ./in.cue:32:9
+maxFields.fail3: invalid value {a:1,b!:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1):
+    ./in.cue:20:12
+    ./in.cue:20:29
+    ./in.cue:33:9
 
 Result:
 import "struct"
@@ -205,11 +219,11 @@ minFields: {
 	}
 	ok6: {
 		a!: 1
-	} & struct.MinFields(1)
+	}
 	ok7: {
 		a!: 1
 		b!: 2
-	} & struct.MinFields(1)
+	}
 }
 maxFields: {
 	ok1: {}
@@ -238,12 +252,6 @@ maxFields: {
 		b?: 2
 	}
 	fail1: _|_ // maxFields.fail1: invalid value {a:1,b:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1)
-	fail2: {
-		a!: 1
-		b!: 2
-	}
-	fail3: {
-		a:  1
-		b!: 2
-	}
+	fail2: _|_ // maxFields.fail2: invalid value {a!:1,b!:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1)
+	fail3: _|_ // maxFields.fail3: invalid value {a:1,b!:2} (does not satisfy struct.MaxFields(1)): len(fields) > MaxFields(1) (2 > 1)
 }

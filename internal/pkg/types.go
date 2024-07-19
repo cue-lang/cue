@@ -46,11 +46,11 @@ func (s *Struct) Arcs() []*adt.Vertex {
 	return s.node.Arcs
 }
 
-// Len reports the number of regular string fields of s.
+// Len reports the number of regular and required string fields of s.
 func (s *Struct) Len() int {
 	count := 0
 	for _, a := range s.Arcs() {
-		if a.Label.IsString() && !s.node.IsOptional(a.Label) {
+		if a.Label.IsString() && (a.ArcType == adt.ArcMember || a.ArcType == adt.ArcRequired) {
 			count++
 		}
 	}

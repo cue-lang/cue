@@ -26,7 +26,7 @@ import (
 // It can only be used as a validator, for instance `MinFields(3)`.
 //
 // Only fields that are part of the data model count. This excludes hidden
-// fields, optional fields, and definitions.
+// fields, optional fields, and definitions, and includes required fields.
 func MinFields(object pkg.Struct, n int) (bool, error) {
 	count := object.Len()
 	code := adt.EvalError
@@ -46,7 +46,7 @@ func MinFields(object pkg.Struct, n int) (bool, error) {
 // It can only be used as a validator, for instance `MaxFields(3)`.
 //
 // Only fields that are part of the data model count. This excludes hidden
-// fields, optional fields, and definitions.
+// fields, optional fields, and definitions, and includes required fields.
 func MaxFields(object pkg.Struct, n int) (bool, error) {
 	count := object.Len()
 	if count > n {

@@ -916,17 +916,6 @@ func (v *Vertex) OptionalTypes() OptionalType {
 	return mask
 }
 
-// IsOptional reports whether a field is explicitly defined as optional,
-// as opposed to whether it is allowed by a pattern constraint.
-func (v *Vertex) IsOptional(label Feature) bool {
-	for _, a := range v.Arcs {
-		if a.Label == label {
-			return a.IsConstraint()
-		}
-	}
-	return false
-}
-
 func (v *Vertex) accepts(ok, required bool) bool {
 	return ok || (!required && !v.Closed)
 }

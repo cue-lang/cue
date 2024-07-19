@@ -16,6 +16,24 @@
       "message": "Neither this comment nor the method docs, mention that if the moduleFile doesn\u0027t exist (or is not a readable file) then no error is returned, and the method is a noop. I\u0027m not sure if it\u0027s a normal pattern in here, but I certainly found it surprising. Is it worth adding a comment / docs to make clear that this behaviour is intentional?",
       "revId": "8afbbdfb2ff3152a51209b11b2a4a70f233da256",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "292028f1_e819e27e",
+        "filename": "cue/load/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-19T12:13:08Z",
+      "side": 1,
+      "message": "You\u0027re right that it\u0027s a bit confusing. It is indeed intentional, and there are tests that fail if we do return this error. I\u0027ve added a godoc comment about it.",
+      "parentUuid": "6fa677d2_03f77104",
+      "revId": "8afbbdfb2ff3152a51209b11b2a4a70f233da256",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

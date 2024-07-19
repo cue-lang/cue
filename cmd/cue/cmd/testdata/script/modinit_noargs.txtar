@@ -7,7 +7,7 @@ exists cue.mod/usr
 exists cue.mod/pkg
 
 -- want-module.cue --
-module: ""
+module: "cue.example"
 language: {
 	version: "$CUE_LANGUAGE_VERSION"
 }

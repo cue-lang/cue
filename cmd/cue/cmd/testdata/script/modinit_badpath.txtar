@@ -14,10 +14,10 @@ cmp stderr want-stderr-3
 cmp stderr want-stderr-4
 
 -- want-stderr-1 --
-malformed module path "github.com/FooBar": non-conforming path "github.com/FooBar"
+malformed module path "github.com/FooBar": invalid char 'F'
 -- want-stderr-2 --
-malformed module path "github.com/foo/.bar": leading dot in path element
+malformed module path "github.com/foo/.bar": leading '.' in path element
 -- want-stderr-3 --
-malformed module path "github.com/foo/bar.": trailing dot in path element
+malformed module path "github.com/foo/bar.": trailing '.' in path element
 -- want-stderr-4 --
-malformed module path "github.com/foo..bar": non-conforming path "github.com/foo..bar"
+malformed module path "github.com/foo..bar": path does not conform to OCI repository name restrictions; see https://github.com/opencontainers/distribution-spec/blob/main/spec.md#pulling-manifests for details

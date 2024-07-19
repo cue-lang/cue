@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3293c3a5_fbbf2b5e",
+        "filename": "cue/literal/quote.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-07-19T10:14:39Z",
+      "side": 1,
+      "message": "I know this isn\u0027t the goal of this CL, so I\u0027m not asking for a change, but this is a good case where personally I\u0027d always add parenthesis so that the reader doesn\u0027t have to remember if \u0026\u0026 binds tighter than ||. IMO it never hurts to be more explicit in these cases and avoid any ambiguity or doubt in the mind of the future reader...\n...and 10 lines earlier there are explicit parens in an equivalent spot.",
+      "revId": "a93035957a569fe598b39b3563c9e41c76d619b1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

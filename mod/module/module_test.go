@@ -7,7 +7,7 @@ package module
 import (
 	"testing"
 
-	"cuelang.org/go/internal/tdtest"
+	"cuelang.org/go/internal/cuetest"
 	"github.com/go-quicktest/qt"
 )
 
@@ -72,19 +72,19 @@ var checkPathTests = []checkPathTest{{
 	fileErr:   `malformed file path "/x.y/z": empty path element`,
 }, {
 	path:      `x./z`,
-	modErr:    `trailing dot in path element`,
+	modErr:    `trailing '.' in path element`,
 	importErr: `malformed import path "x./z": trailing dot in path element`,
 	fileErr:   `malformed file path "x./z": trailing dot in path element`,
 }, {
 	path:   `.x/z`,
-	modErr: `leading dot in path element`,
+	modErr: `leading '.' in path element`,
 }, {
 	path:      `-x/z`,
 	modErr:    `leading dash`,
 	importErr: `malformed import path "-x/z": leading dash`,
 }, {
 	path:   `x..y/z`,
-	modErr: `non-conforming path "x..y/z"`,
+	modErr: `path does not conform to OCI repository name restrictions; see https://github.com/opencontainers/distribution-spec/blob/main/spec.md#pulling-manifests for details`,
 }, {
 	path:      `x.y/z/../../w`,
 	modErr:    `invalid path element ".."`,
@@ -115,14 +115,14 @@ var checkPathTests = []checkPathTest{{
 	path: `x.y/z/v2.0`,
 }, {
 	path:   `X.y/z`,
-	modErr: `invalid char 'X' in first path element`,
+	modErr: `invalid char 'X'`,
 }, {
 	path:      `!x.y/z`,
 	modErr:    `invalid char '!'`,
 	importErr: `malformed import path "!x.y/z": invalid char '!'`,
 }, {
 	path:   `_x.y/z`,
-	modErr: `invalid char '_' in first path element`,
+	modErr: `leading '_' in path element`,
 }, {
 	path:      `x.y!/z`,
 	modErr:    `invalid char '!'`,
@@ -175,10 +175,10 @@ var checkPathTests = []checkPathTest{{
 	importErr: `malformed import path "x.y,/z": invalid char ','`,
 }, {
 	path:   `x.y-/z`,
-	modErr: `non-conforming path "x.y-/z"`,
+	modErr: `trailing '-' in path element`,
 }, {
 	path:      `x.y./zt`,
-	modErr:    `trailing dot in path element`,
+	modErr:    `trailing '.' in path element`,
 	importErr: `malformed import path "x.y./zt": trailing dot in path element`,
 	fileErr:   `malformed file path "x.y./zt": trailing dot in path element`,
 }, {
@@ -233,7 +233,7 @@ var checkPathTests = []checkPathTest{{
 	importErr: `malformed import path "x.y^/z": invalid char '^'`,
 }, {
 	path:   `x.y_/z`,
-	modErr: `invalid char '_' in first path element`,
+	modErr: `trailing '_' in path element`,
 }, {
 	path:      "x.y`/z",
 	modErr:    "invalid char '`'",
@@ -249,7 +249,7 @@ var checkPathTests = []checkPathTest{{
 	importErr: `malformed import path "x.y}/z": invalid char '}'`,
 }, {
 	path:   `x.y~/z`,
-	modErr: `invalid char '~' in first path element`,
+	modErr: `invalid char '~'`,
 }, {
 	path:      `x.y/z!`,
 	modErr:    `invalid char '!'`,
@@ -302,7 +302,7 @@ var checkPathTests = []checkPathTest{{
 	importErr: `malformed import path "x.y/z,": invalid char ','`,
 }, {
 	path:   `x.y/z-`,
-	modErr: `non-conforming path "x.y/z-"`,
+	modErr: `trailing '-' in path element`,
 }, {
 	path: `x.y/z.t`,
 }, {
@@ -358,7 +358,7 @@ var checkPathTests = []checkPathTest{{
 	importErr: `malformed import path "x.y/z^": invalid char '^'`,
 }, {
 	path:   `x.y/z_`,
-	modErr: `non-conforming path "x.y/z_"`,
+	modErr: `trailing '_' in path element`,
 }, {
 	path:      "x.y/z`",
 	modErr:    "invalid char '`'",
@@ -374,7 +374,7 @@ var checkPathTests = []checkPathTest{{
 	importErr: `malformed import path "x.y/z}": invalid char '}'`,
 }, {
 	path:   `x.y/z~`,
-	modErr: `non-conforming path "x.y/z~"`,
+	modErr: `invalid char '~'`,
 }, {
 	path: `x.y/x.foo`,
 }, {
@@ -405,26 +405,26 @@ var checkPathTests = []checkPathTest{{
 	path: `x.y/calm1`,
 }, {
 	path:   `x.y/z~`,
-	modErr: `non-conforming path "x.y/z~"`,
+	modErr: `invalid char '~'`,
 }, {
 	path:      `x.y/z~0`,
-	modErr:    `trailing tilde and digits in path element`,
+	modErr:    `invalid char '~'`,
 	importErr: `malformed import path "x.y/z~0": trailing tilde and digits in path element`,
 }, {
 	path:      `x.y/z~09`,
-	modErr:    `trailing tilde and digits in path element`,
+	modErr:    `invalid char '~'`,
 	importErr: `malformed import path "x.y/z~09": trailing tilde and digits in path element`,
 }, {
 	path: `x.y/z09`,
 }, {
 	path:   `x.y/z09~`,
-	modErr: `non-conforming path "x.y/z09~"`,
+	modErr: `invalid char '~'`,
 }, {
 	path:   `x.y/z09~09z`,
-	modErr: `non-conforming path "x.y/z09~09z"`,
+	modErr: `invalid char '~'`,
 }, {
 	path:      `x.y/z09~09z~09`,
-	modErr:    `trailing tilde and digits in path element`,
+	modErr:    `invalid char '~'`,
 	importErr: `malformed import path "x.y/z09~09z~09": trailing tilde and digits in path element`,
 }, {
 	path:      `github.com/!123/logrus`,
@@ -455,10 +455,10 @@ var checkPathTests = []checkPathTest{{
 	fileErr:   `malformed file path "\\temp\\foo": invalid char '\\'`,
 }, {
 	path:   `.gitignore`,
-	modErr: `leading dot in path element`,
+	modErr: `leading '.' in path element`,
 }, {
 	path:   `.github/ISSUE_TEMPLATE`,
-	modErr: `leading dot in path element`,
+	modErr: `leading '.' in path element`,
 }, {
 	path:      `x☺y`,
 	modErr:    `invalid char '☺'`,
@@ -466,18 +466,18 @@ var checkPathTests = []checkPathTest{{
 	fileErr:   `malformed file path "x☺y": invalid char '☺'`,
 }, {
 	path:      `bar.com/foo.`,
-	modErr:    `trailing dot in path element`,
+	modErr:    `trailing '.' in path element`,
 	importErr: `malformed import path "bar.com/foo.": trailing dot in path element`,
 	fileErr:   `malformed file path "bar.com/foo.": trailing dot in path element`,
 }, {
 	path:   `bar.com/_foo`,
-	modErr: `non-conforming path "bar.com/_foo"`,
+	modErr: `leading '_' in path element`,
 }, {
 	path:   `bar.com/foo___x`,
-	modErr: `non-conforming path "bar.com/foo___x"`,
+	modErr: `path does not conform to OCI repository name restrictions; see https://github.com/opencontainers/distribution-spec/blob/main/spec.md#pulling-manifests for details`,
 }, {
 	path:   `bar.com/Sushi`,
-	modErr: `non-conforming path "bar.com/Sushi"`,
+	modErr: `invalid char 'S'`,
 }, {
 	path:      `rsc io/quote`,
 	modErr:    `invalid char ' '`,
@@ -490,21 +490,21 @@ var checkPathTests = []checkPathTest{{
 }}
 
 func TestCheckPathWithoutVersion(t *testing.T) {
-	tdtest.Run(t, checkPathTests, func(t *tdtest.T, test *checkPathTest) {
+	cuetest.Run(t, checkPathTests, func(t *cuetest.T, test *checkPathTest) {
 		t.Logf("path: `%s`", test.path)
 		t.Equal(errStr(CheckPathWithoutVersion(test.path)), test.modErr)
 	})
 }
 
 func TestCheckImportPath(t *testing.T) {
-	tdtest.Run(t, checkPathTests, func(t *tdtest.T, test *checkPathTest) {
+	cuetest.Run(t, checkPathTests, func(t *cuetest.T, test *checkPathTest) {
 		t.Logf("path: `%s`", test.path)
 		t.Equal(errStr(CheckImportPath(test.path)), test.importErr)
 	})
 }
 
 func TestCheckFilePath(t *testing.T) {
-	tdtest.Run(t, checkPathTests, func(t *tdtest.T, test *checkPathTest) {
+	cuetest.Run(t, checkPathTests, func(t *cuetest.T, test *checkPathTest) {
 		t.Logf("path: `%s`", test.path)
 		t.Equal(errStr(CheckFilePath(test.path)), test.fileErr)
 	})

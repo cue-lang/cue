@@ -1410,6 +1410,14 @@ L:
 				}
 				fallthrough
 			default:
+				if p.tok.IsKeyword() {
+					x = &ast.SelectorExpr{
+						X:   p.checkExpr(x),
+						Sel: p.parseKeyIdent(),
+					}
+					break
+				}
+
 				pos := p.pos
 				p.errorExpected(pos, "selector")
 				p.next() // make progress

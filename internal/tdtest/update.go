@@ -144,11 +144,15 @@ func (s *set[T]) getInfo(file string) *info {
 	def := ti.Uses[ident]
 	pos := def.Pos()
 
-	// - locate the CompositLit in the AST based on position.
-	v, ok := findVar(pos, f).(*ast.CompositeLit)
+	// - locate the CompositeLit in the AST based on position.
+	v0 := findVar(pos, f)
+	if v0 == nil {
+		t.Fatalf("cannot find composite literal in source code")
+	}
+	v, ok := v0.(*ast.CompositeLit)
 	if !ok {
 		// generics should avoid this.
-		t.Fatalf("expected composite literal, found %T", v)
+		t.Fatalf("expected composite literal, found %T", v0)
 	}
 	info.table = v
 
@@ -256,12 +260,23 @@ func (i *info) findCalls(block *ast.BlockStmt, names ...string) []*callInfo {
 	return a
 }
 
-func findVar(pos token.Pos, n ast.Node) (ret ast.Expr) {
-	ast.Inspect(n, func(n ast.Node) bool {
-		if as, ok := n.(*ast.AssignStmt); ok {
-			for i, v := range as.Lhs {
+func findVar(pos token.Pos, n0 ast.Node) (ret ast.Expr) {
+	ast.Inspect(n0, func(n ast.Node) bool {
+		if n == nil {
+			return true
+		}
+		switch n := n.(type) {
+		case *ast.AssignStmt:
+			for i, v := range n.Lhs {
 				if v.Pos() == pos {
-					ret = as.Rhs[i]
+					ret = n.Rhs[i]
+				}
+			}
+			return false
+		case *ast.ValueSpec:
+			for i, v := range n.Names {
+				if v.Pos() == pos {
+					ret = n.Values[i]
 				}
 			}
 			return false

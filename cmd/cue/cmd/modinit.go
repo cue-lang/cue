@@ -34,9 +34,8 @@ creating a new module rooted at the current directory. The cue.mod
 directory must not already exist. A legacy cue.mod file in the current
 directory is moved to the new subdirectory.
 
-A module name is optional, but if it is not given, a package
-within the module cannot import another package defined
-in the module.
+If the module name is not provided, a default module path (cue.example) will be
+used.
 `,
 		RunE: mkRunE(c, runModInit),
 	}
@@ -48,7 +47,7 @@ in the module.
 }
 
 func runModInit(cmd *Command, args []string) (err error) {
-	modulePath := ""
+	modulePath := "cue.example"
 	if len(args) > 0 {
 		if len(args) != 1 {
 			return fmt.Errorf("too many arguments")

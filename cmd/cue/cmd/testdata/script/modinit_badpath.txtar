@@ -1,0 +1,23 @@
+# Check that the error messages for a bad module path are reasonably
+# self-explanatory. See https://cuelang.org/issue/3022
+
+! exec cue mod init github.com/FooBar
+cmp stderr want-stderr-1
+
+! exec cue mod init github.com/foo/.bar
+cmp stderr want-stderr-2
+
+! exec cue mod init github.com/foo/bar.
+cmp stderr want-stderr-3
+
+! exec cue mod init github.com/foo..bar
+cmp stderr want-stderr-4
+
+-- want-stderr-1 --
+malformed module path "github.com/FooBar": non-conforming path "github.com/FooBar"
+-- want-stderr-2 --
+malformed module path "github.com/foo/.bar": leading dot in path element
+-- want-stderr-3 --
+malformed module path "github.com/foo/bar.": trailing dot in path element
+-- want-stderr-4 --
+malformed module path "github.com/foo..bar": non-conforming path "github.com/foo..bar"

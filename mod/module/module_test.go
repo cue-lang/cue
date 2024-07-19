@@ -7,6 +7,7 @@ package module
 import (
 	"testing"
 
+	"cuelang.org/go/internal/tdtest"
 	"github.com/go-quicktest/qt"
 )
 
@@ -43,30 +44,470 @@ func TestCheck(t *testing.T) {
 	}
 }
 
-var checkPathWithoutVersionTests = []struct {
-	path    string
-	wantErr string
-}{{
-	path:    "rsc io/quote",
-	wantErr: `invalid char ' '`,
+type checkPathTest struct {
+	path      string
+	modErr    string
+	importErr string
+	fileErr   string
+}
+
+var checkPathTests = []checkPathTest{{
+	path: `x.y/z`,
 }, {
-	path:    "foo.com@v0",
-	wantErr: `module path inappropriately contains major version`,
+	path: `x.y`,
 }, {
-	path: "foo.com/bar/baz",
+	path:      ``,
+	modErr:    `empty string`,
+	importErr: `malformed import path "": empty string`,
+	fileErr:   `malformed file path "": empty string`,
+}, {
+	path:      "x.y/\xffz",
+	modErr:    `invalid UTF-8`,
+	importErr: `malformed import path "x.y/\xffz": invalid UTF-8`,
+	fileErr:   `malformed file path "x.y/\xffz": invalid UTF-8`,
+}, {
+	path:      `/x.y/z`,
+	modErr:    `empty path element`,
+	importErr: `malformed import path "/x.y/z": empty path element`,
+	fileErr:   `malformed file path "/x.y/z": empty path element`,
+}, {
+	path:      `x./z`,
+	modErr:    `trailing dot in path element`,
+	importErr: `malformed import path "x./z": trailing dot in path element`,
+	fileErr:   `malformed file path "x./z": trailing dot in path element`,
+}, {
+	path:   `.x/z`,
+	modErr: `leading dot in path element`,
+}, {
+	path:      `-x/z`,
+	modErr:    `leading dash`,
+	importErr: `malformed import path "-x/z": leading dash`,
+}, {
+	path:   `x..y/z`,
+	modErr: `non-conforming path "x..y/z"`,
+}, {
+	path:      `x.y/z/../../w`,
+	modErr:    `invalid path element ".."`,
+	importErr: `malformed import path "x.y/z/../../w": invalid path element ".."`,
+	fileErr:   `malformed file path "x.y/z/../../w": invalid path element ".."`,
+}, {
+	path:      `x.y//z`,
+	modErr:    `double slash`,
+	importErr: `malformed import path "x.y//z": double slash`,
+	fileErr:   `malformed file path "x.y//z": double slash`,
+}, {
+	path:      `x.y/z//w`,
+	modErr:    `double slash`,
+	importErr: `malformed import path "x.y/z//w": double slash`,
+	fileErr:   `malformed file path "x.y/z//w": double slash`,
+}, {
+	path:      `x.y/z/`,
+	modErr:    `trailing slash`,
+	importErr: `malformed import path "x.y/z/": trailing slash`,
+	fileErr:   `malformed file path "x.y/z/": trailing slash`,
+}, {
+	path: `x.y/z/v0`,
+}, {
+	path: `x.y/z/v1`,
+}, {
+	path: `x.y/z/v2`,
+}, {
+	path: `x.y/z/v2.0`,
+}, {
+	path:   `X.y/z`,
+	modErr: `invalid char 'X' in first path element`,
+}, {
+	path:      `!x.y/z`,
+	modErr:    `invalid char '!'`,
+	importErr: `malformed import path "!x.y/z": invalid char '!'`,
+}, {
+	path:   `_x.y/z`,
+	modErr: `invalid char '_' in first path element`,
+}, {
+	path:      `x.y!/z`,
+	modErr:    `invalid char '!'`,
+	importErr: `malformed import path "x.y!/z": invalid char '!'`,
+}, {
+	path:      `x.y"/z`,
+	modErr:    `invalid char '"'`,
+	importErr: `malformed import path "x.y\"/z": invalid char '"'`,
+	fileErr:   `malformed file path "x.y\"/z": invalid char '"'`,
+}, {
+	path:      `x.y#/z`,
+	modErr:    `invalid char '#'`,
+	importErr: `malformed import path "x.y#/z": invalid char '#'`,
+}, {
+	path:      `x.y$/z`,
+	modErr:    `invalid char '$'`,
+	importErr: `malformed import path "x.y$/z": invalid char '$'`,
+}, {
+	path:      `x.y%/z`,
+	modErr:    `invalid char '%'`,
+	importErr: `malformed import path "x.y%/z": invalid char '%'`,
+}, {
+	path:      `x.y&/z`,
+	modErr:    `invalid char '&'`,
+	importErr: `malformed import path "x.y&/z": invalid char '&'`,
+}, {
+	path:      `x.y'/z`,
+	modErr:    `invalid char '\''`,
+	importErr: `malformed import path "x.y'/z": invalid char '\''`,
+	fileErr:   `malformed file path "x.y'/z": invalid char '\''`,
+}, {
+	path:      `x.y(/z`,
+	modErr:    `invalid char '('`,
+	importErr: `malformed import path "x.y(/z": invalid char '('`,
+}, {
+	path:      `x.y)/z`,
+	modErr:    `invalid char ')'`,
+	importErr: `malformed import path "x.y)/z": invalid char ')'`,
+}, {
+	path:      `x.y*/z`,
+	modErr:    `invalid char '*'`,
+	importErr: `malformed import path "x.y*/z": invalid char '*'`,
+	fileErr:   `malformed file path "x.y*/z": invalid char '*'`,
+}, {
+	path:   `x.y+/z`,
+	modErr: `invalid char '+'`,
+}, {
+	path:      `x.y,/z`,
+	modErr:    `invalid char ','`,
+	importErr: `malformed import path "x.y,/z": invalid char ','`,
+}, {
+	path:   `x.y-/z`,
+	modErr: `non-conforming path "x.y-/z"`,
+}, {
+	path:      `x.y./zt`,
+	modErr:    `trailing dot in path element`,
+	importErr: `malformed import path "x.y./zt": trailing dot in path element`,
+	fileErr:   `malformed file path "x.y./zt": trailing dot in path element`,
+}, {
+	path:      `x.y:/z`,
+	modErr:    `invalid char ':'`,
+	importErr: `malformed import path "x.y:/z": invalid char ':'`,
+	fileErr:   `malformed file path "x.y:/z": invalid char ':'`,
+}, {
+	path:      `x.y;/z`,
+	modErr:    `invalid char ';'`,
+	importErr: `malformed import path "x.y;/z": invalid char ';'`,
+	fileErr:   `malformed file path "x.y;/z": invalid char ';'`,
+}, {
+	path:      `x.y</z`,
+	modErr:    `invalid char '<'`,
+	importErr: `malformed import path "x.y</z": invalid char '<'`,
+	fileErr:   `malformed file path "x.y</z": invalid char '<'`,
+}, {
+	path:      `x.y=/z`,
+	modErr:    `invalid char '='`,
+	importErr: `malformed import path "x.y=/z": invalid char '='`,
+}, {
+	path:      `x.y>/z`,
+	modErr:    `invalid char '>'`,
+	importErr: `malformed import path "x.y>/z": invalid char '>'`,
+	fileErr:   `malformed file path "x.y>/z": invalid char '>'`,
+}, {
+	path:      `x.y?/z`,
+	modErr:    `invalid char '?'`,
+	importErr: `malformed import path "x.y?/z": invalid char '?'`,
+	fileErr:   `malformed file path "x.y?/z": invalid char '?'`,
+}, {
+	path:      `x.y@/z`,
+	modErr:    `invalid char '@'`,
+	importErr: `malformed import path "x.y@/z": invalid char '@'`,
+}, {
+	path:      `x.y[/z`,
+	modErr:    `invalid char '['`,
+	importErr: `malformed import path "x.y[/z": invalid char '['`,
+}, {
+	path:      `x.y\/z`,
+	modErr:    `invalid char '\\'`,
+	importErr: `malformed import path "x.y\\/z": invalid char '\\'`,
+	fileErr:   `malformed file path "x.y\\/z": invalid char '\\'`,
+}, {
+	path:      `x.y]/z`,
+	modErr:    `invalid char ']'`,
+	importErr: `malformed import path "x.y]/z": invalid char ']'`,
+}, {
+	path:      `x.y^/z`,
+	modErr:    `invalid char '^'`,
+	importErr: `malformed import path "x.y^/z": invalid char '^'`,
+}, {
+	path:   `x.y_/z`,
+	modErr: `invalid char '_' in first path element`,
+}, {
+	path:      "x.y`/z",
+	modErr:    "invalid char '`'",
+	importErr: "malformed import path \"x.y`/z\": invalid char '`'",
+	fileErr:   "malformed file path \"x.y`/z\": invalid char '`'",
+}, {
+	path:      `x.y{/z`,
+	modErr:    `invalid char '{'`,
+	importErr: `malformed import path "x.y{/z": invalid char '{'`,
+}, {
+	path:      `x.y}/z`,
+	modErr:    `invalid char '}'`,
+	importErr: `malformed import path "x.y}/z": invalid char '}'`,
+}, {
+	path:   `x.y~/z`,
+	modErr: `invalid char '~' in first path element`,
+}, {
+	path:      `x.y/z!`,
+	modErr:    `invalid char '!'`,
+	importErr: `malformed import path "x.y/z!": invalid char '!'`,
+}, {
+	path:      `x.y/z"`,
+	modErr:    `invalid char '"'`,
+	importErr: `malformed import path "x.y/z\"": invalid char '"'`,
+	fileErr:   `malformed file path "x.y/z\"": invalid char '"'`,
+}, {
+	path:      `x.y/z#`,
+	modErr:    `invalid char '#'`,
+	importErr: `malformed import path "x.y/z#": invalid char '#'`,
+}, {
+	path:      `x.y/z$`,
+	modErr:    `invalid char '$'`,
+	importErr: `malformed import path "x.y/z$": invalid char '$'`,
+}, {
+	path:      `x.y/z%`,
+	modErr:    `invalid char '%'`,
+	importErr: `malformed import path "x.y/z%": invalid char '%'`,
+}, {
+	path:      `x.y/z&`,
+	modErr:    `invalid char '&'`,
+	importErr: `malformed import path "x.y/z&": invalid char '&'`,
+}, {
+	path:      `x.y/z'`,
+	modErr:    `invalid char '\''`,
+	importErr: `malformed import path "x.y/z'": invalid char '\''`,
+	fileErr:   `malformed file path "x.y/z'": invalid char '\''`,
+}, {
+	path:      `x.y/z(`,
+	modErr:    `invalid char '('`,
+	importErr: `malformed import path "x.y/z(": invalid char '('`,
+}, {
+	path:      `x.y/z)`,
+	modErr:    `invalid char ')'`,
+	importErr: `malformed import path "x.y/z)": invalid char ')'`,
+}, {
+	path:      `x.y/z*`,
+	modErr:    `invalid char '*'`,
+	importErr: `malformed import path "x.y/z*": invalid char '*'`,
+	fileErr:   `malformed file path "x.y/z*": invalid char '*'`,
+}, {
+	path:   `x.y/z++`,
+	modErr: `invalid char '+'`,
+}, {
+	path:      `x.y/z,`,
+	modErr:    `invalid char ','`,
+	importErr: `malformed import path "x.y/z,": invalid char ','`,
+}, {
+	path:   `x.y/z-`,
+	modErr: `non-conforming path "x.y/z-"`,
+}, {
+	path: `x.y/z.t`,
+}, {
+	path: `x.y/z/t`,
+}, {
+	path:    `x.y/z:`,
+	modErr:  `invalid char ':'`,
+	fileErr: `malformed file path "x.y/z:": invalid char ':'`,
+}, {
+	path:      `x.y/z;`,
+	modErr:    `invalid char ';'`,
+	importErr: `malformed import path "x.y/z;": invalid char ';'`,
+	fileErr:   `malformed file path "x.y/z;": invalid char ';'`,
+}, {
+	path:      `x.y/z<`,
+	modErr:    `invalid char '<'`,
+	importErr: `malformed import path "x.y/z<": invalid char '<'`,
+	fileErr:   `malformed file path "x.y/z<": invalid char '<'`,
+}, {
+	path:      `x.y/z=`,
+	modErr:    `invalid char '='`,
+	importErr: `malformed import path "x.y/z=": invalid char '='`,
+}, {
+	path:      `x.y/z>`,
+	modErr:    `invalid char '>'`,
+	importErr: `malformed import path "x.y/z>": invalid char '>'`,
+	fileErr:   `malformed file path "x.y/z>": invalid char '>'`,
+}, {
+	path:      `x.y/z?`,
+	modErr:    `invalid char '?'`,
+	importErr: `malformed import path "x.y/z?": invalid char '?'`,
+	fileErr:   `malformed file path "x.y/z?": invalid char '?'`,
+}, {
+	path:      `x.y/z@`,
+	modErr:    `invalid char '@'`,
+	importErr: `malformed import path "x.y/z@": invalid char '@'`,
+}, {
+	path:      `x.y/z[`,
+	modErr:    `invalid char '['`,
+	importErr: `malformed import path "x.y/z[": invalid char '['`,
+}, {
+	path:      `x.y/z\`,
+	modErr:    `invalid char '\\'`,
+	importErr: `malformed import path "x.y/z\\": invalid char '\\'`,
+	fileErr:   `malformed file path "x.y/z\\": invalid char '\\'`,
+}, {
+	path:      `x.y/z]`,
+	modErr:    `invalid char ']'`,
+	importErr: `malformed import path "x.y/z]": invalid char ']'`,
+}, {
+	path:      `x.y/z^`,
+	modErr:    `invalid char '^'`,
+	importErr: `malformed import path "x.y/z^": invalid char '^'`,
+}, {
+	path:   `x.y/z_`,
+	modErr: `non-conforming path "x.y/z_"`,
+}, {
+	path:      "x.y/z`",
+	modErr:    "invalid char '`'",
+	importErr: "malformed import path \"x.y/z`\": invalid char '`'",
+	fileErr:   "malformed file path \"x.y/z`\": invalid char '`'",
+}, {
+	path:      `x.y/z{`,
+	modErr:    `invalid char '{'`,
+	importErr: `malformed import path "x.y/z{": invalid char '{'`,
+}, {
+	path:      `x.y/z}`,
+	modErr:    `invalid char '}'`,
+	importErr: `malformed import path "x.y/z}": invalid char '}'`,
+}, {
+	path:   `x.y/z~`,
+	modErr: `non-conforming path "x.y/z~"`,
+}, {
+	path: `x.y/x.foo`,
+}, {
+	path:      `x.y/aux.foo`,
+	modErr:    `"aux" disallowed as path element component on Windows`,
+	importErr: `malformed import path "x.y/aux.foo": "aux" disallowed as path element component on Windows`,
+	fileErr:   `malformed file path "x.y/aux.foo": "aux" disallowed as path element component on Windows`,
+}, {
+	path:      `x.y/prn`,
+	modErr:    `"prn" disallowed as path element component on Windows`,
+	importErr: `malformed import path "x.y/prn": "prn" disallowed as path element component on Windows`,
+	fileErr:   `malformed file path "x.y/prn": "prn" disallowed as path element component on Windows`,
+}, {
+	path: `x.y/prn2`,
+}, {
+	path: `x.y/com`,
+}, {
+	path:      `x.y/com1`,
+	modErr:    `"com1" disallowed as path element component on Windows`,
+	importErr: `malformed import path "x.y/com1": "com1" disallowed as path element component on Windows`,
+	fileErr:   `malformed file path "x.y/com1": "com1" disallowed as path element component on Windows`,
+}, {
+	path:      `x.y/com1.txt`,
+	modErr:    `"com1" disallowed as path element component on Windows`,
+	importErr: `malformed import path "x.y/com1.txt": "com1" disallowed as path element component on Windows`,
+	fileErr:   `malformed file path "x.y/com1.txt": "com1" disallowed as path element component on Windows`,
+}, {
+	path: `x.y/calm1`,
+}, {
+	path:   `x.y/z~`,
+	modErr: `non-conforming path "x.y/z~"`,
+}, {
+	path:      `x.y/z~0`,
+	modErr:    `trailing tilde and digits in path element`,
+	importErr: `malformed import path "x.y/z~0": trailing tilde and digits in path element`,
+}, {
+	path:      `x.y/z~09`,
+	modErr:    `trailing tilde and digits in path element`,
+	importErr: `malformed import path "x.y/z~09": trailing tilde and digits in path element`,
+}, {
+	path: `x.y/z09`,
+}, {
+	path:   `x.y/z09~`,
+	modErr: `non-conforming path "x.y/z09~"`,
+}, {
+	path:   `x.y/z09~09z`,
+	modErr: `non-conforming path "x.y/z09~09z"`,
+}, {
+	path:      `x.y/z09~09z~09`,
+	modErr:    `trailing tilde and digits in path element`,
+	importErr: `malformed import path "x.y/z09~09z~09": trailing tilde and digits in path element`,
+}, {
+	path:      `github.com/!123/logrus`,
+	modErr:    `invalid char '!'`,
+	importErr: `malformed import path "github.com/!123/logrus": invalid char '!'`,
+}, {
+	path:      `github.com/user/unicode/испытание`,
+	modErr:    `invalid char 'и'`,
+	importErr: `malformed import path "github.com/user/unicode/испытание": invalid char 'и'`,
+}, {
+	path:      `../x`,
+	modErr:    `invalid path element ".."`,
+	importErr: `malformed import path "../x": invalid path element ".."`,
+	fileErr:   `malformed file path "../x": invalid path element ".."`,
+}, {
+	path:      `./y`,
+	modErr:    `invalid path element "."`,
+	importErr: `malformed import path "./y": invalid path element "."`,
+	fileErr:   `malformed file path "./y": invalid path element "."`,
+}, {
+	path:    `x:y`,
+	modErr:  `invalid char ':'`,
+	fileErr: `malformed file path "x:y": invalid char ':'`,
+}, {
+	path:      `\temp\foo`,
+	modErr:    `invalid char '\\'`,
+	importErr: `malformed import path "\\temp\\foo": invalid char '\\'`,
+	fileErr:   `malformed file path "\\temp\\foo": invalid char '\\'`,
+}, {
+	path:   `.gitignore`,
+	modErr: `leading dot in path element`,
+}, {
+	path:   `.github/ISSUE_TEMPLATE`,
+	modErr: `leading dot in path element`,
+}, {
+	path:      `x☺y`,
+	modErr:    `invalid char '☺'`,
+	importErr: `malformed import path "x☺y": invalid char '☺'`,
+	fileErr:   `malformed file path "x☺y": invalid char '☺'`,
+}, {
+	path:      `bar.com/foo.`,
+	modErr:    `trailing dot in path element`,
+	importErr: `malformed import path "bar.com/foo.": trailing dot in path element`,
+	fileErr:   `malformed file path "bar.com/foo.": trailing dot in path element`,
+}, {
+	path:   `bar.com/_foo`,
+	modErr: `non-conforming path "bar.com/_foo"`,
+}, {
+	path:   `bar.com/foo___x`,
+	modErr: `non-conforming path "bar.com/foo___x"`,
+}, {
+	path:   `bar.com/Sushi`,
+	modErr: `non-conforming path "bar.com/Sushi"`,
+}, {
+	path:      `rsc io/quote`,
+	modErr:    `invalid char ' '`,
+	importErr: `malformed import path "rsc io/quote": invalid char ' '`,
+}, {
+	path:   `foo.com@v0`,
+	modErr: `module path inappropriately contains major version`,
+}, {
+	path: `foo.com/bar/baz`,
 }}
 
 func TestCheckPathWithoutVersion(t *testing.T) {
-	for _, test := range checkPathWithoutVersionTests {
-		t.Run(test.path, func(t *testing.T) {
-			err := CheckPathWithoutVersion(test.path)
-			if test.wantErr != "" {
-				qt.Assert(t, qt.ErrorMatches(err, test.wantErr))
-				return
-			}
-			qt.Assert(t, qt.IsNil(err))
-		})
-	}
+	tdtest.Run(t, checkPathTests, func(t *tdtest.T, test *checkPathTest) {
+		t.Logf("path: `%s`", test.path)
+		t.Equal(errStr(CheckPathWithoutVersion(test.path)), test.modErr)
+	})
+}
+
+func TestCheckImportPath(t *testing.T) {
+	tdtest.Run(t, checkPathTests, func(t *tdtest.T, test *checkPathTest) {
+		t.Logf("path: `%s`", test.path)
+		t.Equal(errStr(CheckImportPath(test.path)), test.importErr)
+	})
+}
+
+func TestCheckFilePath(t *testing.T) {
+	tdtest.Run(t, checkPathTests, func(t *tdtest.T, test *checkPathTest) {
+		t.Logf("path: `%s`", test.path)
+		t.Equal(errStr(CheckFilePath(test.path)), test.fileErr)
+	})
 }
 
 var newVersionTests = []struct {
@@ -193,8 +634,8 @@ func TestEscapeVersion(t *testing.T) {
 
 func TestEscapePath(t *testing.T) {
 	// Check invalid paths.
-	for _, tt := range checkPathWithoutVersionTests {
-		if tt.wantErr != "" {
+	for _, tt := range checkPathTests {
+		if tt.modErr != "" {
 			_, err := EscapePath(tt.path)
 			if err == nil {
 				t.Errorf("EscapePath(%q): succeeded, want error (invalid path)", tt.path)
@@ -360,4 +801,14 @@ func TestImportPathStringAddsQualifierWhenNoVersion(t *testing.T) {
 		Qualifier: "baz",
 	}
 	qt.Assert(t, qt.Equals(ip.String(), "foo.com/bar:baz"))
+}
+
+func errStr(err error) string {
+	if err == nil {
+		return ""
+	}
+	if e := err.Error(); e != "" {
+		return e
+	}
+	panic("non-nil error with empty string")
 }

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a18c1a76_e5ecae16",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-19T08:14:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df7d76ec_a18d104d",
+      "revId": "a08522b3935d54cd22f23a3038be7ddbf9eb3416",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d949fff4_630bc123",
@@ -41,6 +59,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7edea606_be79a433",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-19T08:14:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d949fff4_630bc123",
+      "range": {
+        "startLine": 134,
+        "startChar": 11,
+        "endLine": 134,
+        "endChar": 14
+      },
+      "revId": "a08522b3935d54cd22f23a3038be7ddbf9eb3416",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35a07768_47b7f6ba",
@@ -54,6 +96,30 @@
       "writtenOn": "2024-07-19T08:09:32Z",
       "side": 1,
       "message": "perhaps say this is \"for the time being\", as they may be used by a potential `cue test` in the future?",
+      "range": {
+        "startLine": 157,
+        "startChar": 29,
+        "endLine": 157,
+        "endChar": 44
+      },
+      "revId": "a08522b3935d54cd22f23a3038be7ddbf9eb3416",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f27987f_63774183",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-19T08:14:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "35a07768_47b7f6ba",
       "range": {
         "startLine": 157,
         "startChar": 29,

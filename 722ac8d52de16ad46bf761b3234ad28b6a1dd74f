@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4475e88_6b845d05",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-20T13:52:44Z",
+      "side": 1,
+      "message": "is the trailing slash here misplaced? I don\u0027t see it in the original messages. I think it was meant to be a double quote.",
+      "revId": "722ac8d52de16ad46bf761b3234ad28b6a1dd74f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1f06c1d_d56e7ade",
+        "filename": "cmd/cue/cmd/testdata/script/modinit_badpath.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-20T13:52:44Z",
+      "side": 1,
+      "message": "should we hint to the user why? e.g. in this case, I assume because uppercase is not allowed. \n\nalso: I find it slightly odd that we use \"char\" rather than \"character\".\n\nthis error message is unchanged in this CL, so feel free to leave it for a follow-up CL if you agree.",
+      "range": {
+        "startLine": 17,
+        "startChar": 43,
+        "endLine": 17,
+        "endChar": 59
+      },
+      "revId": "722ac8d52de16ad46bf761b3234ad28b6a1dd74f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b4e5070_2a8f153a",
+        "filename": "mod/module/path.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-20T13:52:44Z",
+      "side": 1,
+      "message": "nit: I might drop the last \"for details\" as it\u0027s unnecessary and it\u0027s also very easy to miss given the very long link.\n\nalso: I might swap `main` for `HEAD` to just point to whatever upstream\u0027s default branch name is.",
+      "revId": "722ac8d52de16ad46bf761b3234ad28b6a1dd74f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

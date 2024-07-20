@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7c24552_0768a2ea",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-07-20T17:12:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a36aff18_c469b6d1",
+      "revId": "8aef4017850cc209902247b7f9e39244f04a2dce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ce04c77f_19b6a25e",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-07-20T14:20:55Z",
       "side": 1,
       "message": "FYI, I think you are also fixing https://github.com/cue-lang/cue/issues/1518 and https://github.com/cue-lang/cue/issues/1598 here, as it seems to me like all have the same root cause - the parser incorrectly rejecting keywords as identifiers or labels. Would you agree?",
+      "revId": "8aef4017850cc209902247b7f9e39244f04a2dce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "26663e0b_cdaeb870",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-07-20T17:12:28Z",
+      "side": 1,
+      "message": "I think this change also fixes https://github.com/cue-lang/cue/issues/1518. But I failed to reproduce https://github.com/cue-lang/cue/issues/1598 with v0.4.3-beta.1 and the latest release.",
+      "parentUuid": "ce04c77f_19b6a25e",
       "revId": "8aef4017850cc209902247b7f9e39244f04a2dce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

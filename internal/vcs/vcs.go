@@ -17,6 +17,7 @@
 package vcs
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"os"
@@ -115,7 +116,10 @@ func runCmd(ctx context.Context, dir string, cmdName string, args ...string) (st
 	cmd.Dir = dir
 
 	out, err := cmd.Output()
-	if err != nil {
+	if exitErr, ok := err.(*exec.ExitError); ok {
+		// git's stderr often ends with a newline, which is unnecessary.
+		return "", fmt.Errorf("running %q %q: %v: %s", cmdName, args, err, bytes.TrimSpace(exitErr.Stderr))
+	} else if err != nil {
 		return "", fmt.Errorf("running %q %q: %v", cmdName, args, err)
 	}
 	return string(out), nil

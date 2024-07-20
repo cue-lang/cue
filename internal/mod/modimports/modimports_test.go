@@ -7,7 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	"cuelang.org/go/internal/txtarfs"
 	"github.com/go-quicktest/qt"
 	"github.com/google/go-cmp/cmp"
 	"golang.org/x/tools/txtar"
@@ -20,7 +19,8 @@ func TestAllPackageFiles(t *testing.T) {
 		t.Run(f, func(t *testing.T) {
 			ar, err := txtar.ParseFile(f)
 			qt.Assert(t, qt.IsNil(err))
-			tfs := txtarfs.FS(ar)
+			tfs, err := txtar.FS(ar)
+			qt.Assert(t, qt.IsNil(err))
 			want, err := fs.ReadFile(tfs, "want")
 			qt.Assert(t, qt.IsNil(err))
 			iter := AllModuleFiles(tfs, ".")
@@ -94,7 +94,8 @@ import (
 	"imported-from-sub.com/foo"
 )
 `))
-	tfs := txtarfs.FS(dirContents)
+	tfs, err := txtar.FS(dirContents)
+	qt.Assert(t, qt.IsNil(err))
 	imps, err := AllImports(PackageFiles(tfs, ".", "*"))
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.DeepEquals(imps, []string{

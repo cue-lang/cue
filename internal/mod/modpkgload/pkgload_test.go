@@ -16,7 +16,6 @@ import (
 
 	"cuelang.org/go/internal/mod/modimports"
 	"cuelang.org/go/internal/mod/modrequirements"
-	"cuelang.org/go/internal/txtarfs"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
 )
@@ -27,7 +26,8 @@ func TestLoadPackages(t *testing.T) {
 	for _, f := range files {
 		ar, err := txtar.ParseFile(f)
 		qt.Assert(t, qt.IsNil(err))
-		tfs := txtarfs.FS(ar)
+		tfs, err := txtar.FS(ar)
+		qt.Assert(t, qt.IsNil(err))
 		reg := testRegistry{tfs}
 		testDirs, _ := fs.Glob(tfs, "test[0-9]*")
 		for _, testDir := range testDirs {

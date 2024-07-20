@@ -26,7 +26,6 @@ import (
 	"cuelang.org/go/internal/cueconfig"
 	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/registrytest"
-	"cuelang.org/go/internal/txtarfs"
 	"cuelang.org/go/mod/modcache"
 	"cuelang.org/go/mod/module"
 )
@@ -60,7 +59,8 @@ language: version: "v0.8.0"
 -- r2/bar.example_v0.0.1/x/x.cue --
 package x
 `))
-	fsys := txtarfs.FS(modules)
+	fsys, err := txtar.FS(modules)
+	qt.Assert(t, qt.IsNil(err))
 	r1fs, err := fs.Sub(fsys, "r1")
 	qt.Assert(t, qt.IsNil(err))
 	r1, err := registrytest.New(r1fs, "")
@@ -136,16 +136,17 @@ func TestDefaultTransportSetsUserAgent(t *testing.T) {
 	// This test also checks that providing a nil Config.Transport
 	// does the right thing.
 
-	modules := txtar.Parse([]byte(`
+	regFS, err := txtar.FS(txtar.Parse([]byte(`
 -- bar.example_v0.0.1/cue.mod/module.cue --
 module: "bar.example@v0"
 language: version: "v0.8.0"
 -- bar.example_v0.0.1/x/x.cue --
 package x
-`))
+`)))
+	qt.Assert(t, qt.IsNil(err))
 	ctx := context.Background()
 	rmem := ocimem.NewWithConfig(&ocimem.Config{ImmutableTags: true})
-	err := registrytest.Upload(ctx, rmem, txtarfs.FS(modules))
+	err = registrytest.Upload(ctx, rmem, regFS)
 	qt.Assert(t, qt.IsNil(err))
 	rh := ociserver.New(rmem, nil)
 	agent := cueversion.UserAgent("cuelang.org/go")
@@ -192,16 +193,17 @@ func TestConcurrentTokenRefresh(t *testing.T) {
 	for i := range registries {
 		reg := &registries[i]
 		reg.mod = fmt.Sprintf("foo.mod%02d", i)
-		fsys := txtarfs.FS(txtar.Parse([]byte(fmt.Sprintf(`
+		fsys, err := txtar.FS(txtar.Parse([]byte(fmt.Sprintf(`
 -- %s_v0.0.1/cue.mod/module.cue --
 module: "%s@v0"
 language: version: "v0.8.0"
 -- %s_v0.0.1/bar/bar.cue --
 package bar
 `, reg.mod, reg.mod, reg.mod))))
+		qt.Assert(t, qt.IsNil(err))
 		mux := http.NewServeMux()
 		r := ocimem.New()
-		err := registrytest.Upload(context.Background(), r, fsys)
+		err = registrytest.Upload(context.Background(), r, fsys)
 		qt.Assert(t, qt.IsNil(err))
 		rh := ociserver.New(r, nil)
 		mux.HandleFunc("/v2/", func(w http.ResponseWriter, r *http.Request) {

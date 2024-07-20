@@ -17,7 +17,6 @@ import (
 	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/registrytest"
-	"cuelang.org/go/internal/txtarfs"
 	"cuelang.org/go/mod/modcache"
 )
 
@@ -76,14 +75,12 @@ func TestModuleFetch(t *testing.T) {
 		Name: "modfetch",
 	}
 	test.Run(t, func(t *cuetxtar.Test) {
-		rfs, err := fs.Sub(txtarfs.FS(t.Archive), "_registry")
-		if err != nil {
-			t.Fatal(err)
-		}
+		tfs, err := txtar.FS(t.Archive)
+		qt.Assert(t, qt.IsNil(err))
+		rfs, err := fs.Sub(tfs, "_registry")
+		qt.Assert(t, qt.IsNil(err))
 		r, err := registrytest.New(rfs, "")
-		if err != nil {
-			t.Fatal(err)
-		}
+		qt.Assert(t, qt.IsNil(err))
 		defer r.Close()
 
 		// We're testing that the default modconfig-based behavour works

@@ -16,7 +16,6 @@ import (
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/internal/registrytest"
-	"cuelang.org/go/internal/txtarfs"
 	"cuelang.org/go/mod/modregistry"
 	"cuelang.org/go/mod/module"
 )
@@ -24,7 +23,7 @@ import (
 func TestRequirements(t *testing.T) {
 	dir := t.TempDir()
 	ctx := context.Background()
-	r := newRegistry(t, `
+	registryFS, err := txtar.FS(txtar.Parse([]byte(`
 -- example.com_foo_v0.0.1/cue.mod/module.cue --
 module: "example.com/foo@v0"
 language: version: "v0.8.0"
@@ -32,7 +31,9 @@ deps: {
 	"foo.com/bar/hello@v0": v: "v0.2.3"
 	"bar.com@v0": v: "v0.5.0"
 }
-`)
+`)))
+	qt.Assert(t, qt.IsNil(err))
+	r := newRegistry(t, registryFS)
 	wantRequirements := []module.Version{
 		module.MustNewVersion("bar.com", "v0.5.0"),
 		module.MustNewVersion("foo.com/bar/hello", "v0.2.3"),
@@ -82,7 +83,7 @@ func TestFetch(t *testing.T) {
 		RemoveAll(dir)
 	})
 	ctx := context.Background()
-	registryContents := `
+	registryFS, err := txtar.FS(txtar.Parse([]byte(`
 -- example.com_foo_v0.0.1/cue.mod/module.cue --
 module: "example.com/foo@v0"
 language: version: "v0.8.0"
@@ -94,9 +95,10 @@ deps: {
 package example
 -- example.com_foo_v0.0.1/x/x.cue --
 package x
-`
-	r := newRegistry(t, registryContents)
-	wantContents, err := txtarContents(fsSub(txtarfs.FS(txtar.Parse([]byte(registryContents))), "example.com_foo_v0.0.1"))
+`)))
+	qt.Assert(t, qt.IsNil(err))
+	r := newRegistry(t, registryFS)
+	wantContents, err := txtarContents(fsSub(registryFS, "example.com_foo_v0.0.1"))
 	qt.Assert(t, qt.IsNil(err))
 	checkContents := func(t *testing.T, loc module.SourceLoc) bool {
 		gotContents, err := txtarContents(fsSub(loc.FS, loc.Dir))
@@ -177,8 +179,8 @@ func txtarContents(fsys fs.FS) ([]byte, error) {
 	return buf.Bytes(), err
 }
 
-func newRegistry(t *testing.T, registryContents string) ociregistry.Interface {
-	regSrv, err := registrytest.New(txtarfs.FS(txtar.Parse([]byte(registryContents))), "")
+func newRegistry(t *testing.T, fsys fs.FS) ociregistry.Interface {
+	regSrv, err := registrytest.New(fsys, "")
 	qt.Assert(t, qt.IsNil(err))
 	t.Cleanup(regSrv.Close)
 	regOCI, err := ociclient.New(regSrv.Host(), &ociclient.Options{

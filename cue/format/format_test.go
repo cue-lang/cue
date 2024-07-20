@@ -32,7 +32,6 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cuetest"
-	"cuelang.org/go/internal/txtarfs"
 )
 
 var (
@@ -57,7 +56,8 @@ func TestFiles(t *testing.T) {
 			}
 		}
 
-		tfs := txtarfs.FS(ar)
+		tfs, err := txtar.FS(ar)
+		qt.Assert(t, qt.IsNil(err))
 		inputFiles, err := fs.Glob(tfs, "*.input")
 		qt.Assert(t, qt.IsNil(err))
 

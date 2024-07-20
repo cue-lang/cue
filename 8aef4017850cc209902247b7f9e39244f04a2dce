@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a36aff18_c469b6d1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-20T14:20:55Z",
+      "side": 1,
+      "message": "Please clarify that this is you quoting the CUE language spec, as otherwise it seems like it\u0027s your own argument.",
+      "revId": "8aef4017850cc209902247b7f9e39244f04a2dce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce04c77f_19b6a25e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-20T14:20:55Z",
+      "side": 1,
+      "message": "FYI, I think you are also fixing https://github.com/cue-lang/cue/issues/1518 and https://github.com/cue-lang/cue/issues/1598 here, as it seems to me like all have the same root cause - the parser incorrectly rejecting keywords as identifiers or labels. Would you agree?",
+      "revId": "8aef4017850cc209902247b7f9e39244f04a2dce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e5e725e_634430b8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-20T14:20:55Z",
+      "side": 1,
+      "message": "SGTM, but adding @paul@myitcv.io for a second approval just in case I\u0027m misreading the spec, and given that he raised the first issue about this.",
+      "revId": "8aef4017850cc209902247b7f9e39244f04a2dce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

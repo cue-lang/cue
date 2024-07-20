@@ -11,7 +11,6 @@ import (
 
 	"cuelang.org/go/internal/mod/mvs"
 	"cuelang.org/go/internal/registrytest"
-	"cuelang.org/go/internal/txtarfs"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/modregistry"
 	"cuelang.org/go/mod/module"
@@ -215,7 +214,9 @@ func mustParseVersion(s string) module.Version {
 }
 
 func newRegistry(t *testing.T, registryContents string) Registry {
-	regSrv, err := registrytest.New(txtarfs.FS(txtar.Parse([]byte(registryContents))), "")
+	regFS, err := txtar.FS(txtar.Parse([]byte(registryContents)))
+	qt.Assert(t, qt.IsNil(err))
+	regSrv, err := registrytest.New(regFS, "")
 	qt.Assert(t, qt.IsNil(err))
 	t.Cleanup(regSrv.Close)
 	regOCI, err := ociclient.New(regSrv.Host(), &ociclient.Options{

@@ -25,23 +25,22 @@ import (
 	"time"
 
 	"github.com/go-quicktest/qt"
-
-	"cuelang.org/go/internal/txtarfs"
 	"golang.org/x/tools/txtar"
 )
-
-var testFS = txtarfs.FS(txtar.Parse([]byte(`
--- subdir/foo --
--- subdir/bar/baz --
--- bar.txt --
--- baz/something --
-`)))
 
 func TestGit(t *testing.T) {
 	skipIfNoExecutable(t, "git")
 	ctx := context.Background()
 	dir := t.TempDir()
-	err := copyFS(dir, testFS)
+
+	testFS, err := txtar.FS(txtar.Parse([]byte(`
+-- subdir/foo --
+-- subdir/bar/baz --
+-- bar.txt --
+-- baz/something --
+`)))
+	qt.Assert(t, qt.IsNil(err))
+	err = copyFS(dir, testFS)
 	qt.Assert(t, qt.IsNil(err))
 
 	// In the tests that follow, we are testing the scenario where a module is

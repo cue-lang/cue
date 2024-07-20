@@ -12,9 +12,9 @@ import (
 	"cuelabs.dev/go/oci/ociregistry"
 	"cuelabs.dev/go/oci/ociregistry/ociclient"
 	"cuelabs.dev/go/oci/ociregistry/ocifilter"
+	"github.com/go-quicktest/qt"
 	"golang.org/x/tools/txtar"
 
-	"cuelang.org/go/internal/txtarfs"
 	"cuelang.org/go/mod/modregistry"
 	"cuelang.org/go/mod/module"
 )
@@ -22,9 +22,7 @@ import (
 func TestRegistry(t *testing.T) {
 	const testDir = "testdata"
 	files, err := os.ReadDir(testDir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	qt.Assert(t, qt.IsNil(err))
 
 	for _, fi := range files {
 		name := fi.Name()
@@ -32,21 +30,17 @@ func TestRegistry(t *testing.T) {
 			continue
 		}
 		ar, err := txtar.ParseFile(filepath.Join(testDir, fi.Name()))
-		if err != nil {
-			t.Fatal(err)
-		}
+		qt.Assert(t, qt.IsNil(err))
 		t.Run(strings.TrimSuffix(name, ".txtar"), func(t *testing.T) {
-			r, err := New(txtarfs.FS(ar), "someprefix/other")
-			if err != nil {
-				t.Fatal(err)
-			}
+			tfs, err := txtar.FS(ar)
+			qt.Assert(t, qt.IsNil(err))
+			r, err := New(tfs, "someprefix/other")
+			qt.Assert(t, qt.IsNil(err))
 			defer r.Close()
 			client, err := ociclient.New(r.Host(), &ociclient.Options{
 				Insecure: true,
 			})
-			if err != nil {
-				t.Fatal(err)
-			}
+			qt.Assert(t, qt.IsNil(err))
 			runTest(t, ocifilter.Sub(client, "someprefix/other"), string(ar.Comment), ar)
 		})
 	}

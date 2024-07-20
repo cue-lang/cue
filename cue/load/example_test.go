@@ -26,7 +26,6 @@ import (
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/registrytest"
-	"cuelang.org/go/internal/txtarfs"
 )
 
 // Note that these examples may not be runnable on pkg.go.dev,
@@ -124,7 +123,7 @@ func Example_externalModules() {
 }
 
 func setUpModulesExample() (env []string, cleanup func()) {
-	registryArchive := txtar.Parse([]byte(`
+	registryFS, err := txtar.FS(txtar.Parse([]byte(`
 -- foo.example_v0.0.1/cue.mod/module.cue --
 module: "foo.example@v0"
 language: version: "v0.8.0"
@@ -132,9 +131,11 @@ language: version: "v0.8.0"
 package bar
 
 value: "world"
-`))
-
-	registry, err := registrytest.New(txtarfs.FS(registryArchive), "")
+`)))
+	if err != nil {
+		panic(err)
+	}
+	registry, err := registrytest.New(registryFS, "")
 	if err != nil {
 		panic(err)
 	}

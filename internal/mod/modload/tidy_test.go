@@ -17,7 +17,6 @@ import (
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/internal/registrytest"
-	"cuelang.org/go/internal/txtarfs"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/modregistry"
 	"cuelang.org/go/mod/module"
@@ -30,7 +29,8 @@ func TestTidy(t *testing.T) {
 		t.Run(f, func(t *testing.T) {
 			ar, err := txtar.ParseFile(f)
 			qt.Assert(t, qt.IsNil(err))
-			tfs := txtarfs.FS(ar)
+			tfs, err := txtar.FS(ar)
+			qt.Assert(t, qt.IsNil(err))
 			reg := newRegistry(t, tfs)
 
 			want, err := fs.ReadFile(tfs, "want")
@@ -68,7 +68,9 @@ func TestTidy(t *testing.T) {
 						file.Data = []byte(out.String())
 					}
 				}
-				err = CheckTidy(context.Background(), txtarfs.FS(ar), ".", reg)
+				tfs, err := txtar.FS(ar)
+				qt.Assert(t, qt.IsNil(err))
+				err = CheckTidy(context.Background(), tfs, ".", reg)
 				qt.Check(t, qt.IsNil(err), qt.Commentf("CheckTidy after a successful Tidy should not fail"))
 			}
 		})

@@ -11,8 +11,6 @@ import (
 	"github.com/go-quicktest/qt"
 	"github.com/google/go-cmp/cmp"
 	"golang.org/x/tools/txtar"
-
-	"cuelang.org/go/internal/txtarfs"
 )
 
 func TestUpdateVersions(t *testing.T) {
@@ -22,7 +20,8 @@ func TestUpdateVersions(t *testing.T) {
 		t.Run(f, func(t *testing.T) {
 			ar, err := txtar.ParseFile(f)
 			qt.Assert(t, qt.IsNil(err))
-			tfs := txtarfs.FS(ar)
+			tfs, err := txtar.FS(ar)
+			qt.Assert(t, qt.IsNil(err))
 			reg := newRegistry(t, tfs)
 
 			want, err := fs.ReadFile(tfs, "want")

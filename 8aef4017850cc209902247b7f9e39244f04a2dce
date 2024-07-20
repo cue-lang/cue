@@ -71,6 +71,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "5cf3b6de_f325649e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-07-20T17:29:33Z",
+      "side": 1,
+      "message": "Sorry I got the expected behavior and actual behavior sections described in #1598 reversed.\nHowever, I think according to the specification, cue does not require quotes for keyword labels when importing json, so we probably don\u0027t need to fix #1598.",
+      "parentUuid": "26663e0b_cdaeb870",
+      "revId": "8aef4017850cc209902247b7f9e39244f04a2dce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "2e5e725e_634430b8",

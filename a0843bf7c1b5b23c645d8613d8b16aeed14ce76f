@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64211524_cbd39361",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-20T14:14:59Z",
+      "side": 1,
+      "message": "An alternative would be to reserve `test` and `example` module path prefixes for local use, like Go did (https://github.com/golang/go/issues/37641#issuecomment-611074425), and then either of these could be the default.\n\nI don\u0027t feel too strongly either way - it seems like `test` and `example` are both TLDs reserved for the same purposes, so in practice, `example` and `cue.example` are both OK to use locally. I only wonder if we\u0027re making this decision deliberately, and if there was any good reason to diverge from Go here. Assuming there was some reasoning, it would be good to document it, at least in the commit message.",
+      "revId": "a0843bf7c1b5b23c645d8613d8b16aeed14ce76f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

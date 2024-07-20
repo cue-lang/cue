@@ -88,8 +88,6 @@ import (
 import "other"
 -- omitted.go --
 -- omitted --
--- y.cue --
-package y
 -- sub/x.cue --
 package x
 import (

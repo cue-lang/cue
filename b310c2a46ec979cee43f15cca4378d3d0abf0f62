@@ -16,6 +16,23 @@
       "message": "LGTM but I\u0027m going to loop in @rogpeppe@gmail.com who has a keener eye than my for correctness in this space.",
       "revId": "b310c2a46ec979cee43f15cca4378d3d0abf0f62",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0f6ecaf_8d28649f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-21T18:37:42Z",
+      "side": 1,
+      "message": "SGTM, but will wait for Rog to give this a look as well.",
+      "revId": "b310c2a46ec979cee43f15cca4378d3d0abf0f62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

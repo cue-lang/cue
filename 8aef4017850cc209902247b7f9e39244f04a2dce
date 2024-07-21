@@ -91,6 +91,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "856ede82_3ab122e6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-21T18:37:42Z",
+      "side": 1,
+      "message": "yeah you\u0027re right, 1598 is likely a \"no need to fix\" after this commit of yours, rather than being fixed by your commit. I\u0027ll leave a comment there once this commit is merged.",
+      "parentUuid": "5cf3b6de_f325649e",
+      "revId": "8aef4017850cc209902247b7f9e39244f04a2dce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "2e5e725e_634430b8",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1

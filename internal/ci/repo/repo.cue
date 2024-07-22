@@ -28,11 +28,14 @@ linuxMachine:   "ubuntu-22.04"
 macosMachine:   "macos-14"
 windowsMachine: "windows-2022"
 
-previousStableGo: "1.21.x"
-
 // Use the latest Go version for extra checks,
 // such as running tests with the data race detector.
-latestStableGo: "1.22.x"
+// This may be a release candidate if we are late into a Go release cycle.
+latestGo: "1.23.0-rc.2"
+
+// The list of all Go versions that we run our tests on.
+// This typically goes back one major Go version, as we support two at a time.
+matrixGo: ["1.22.x", latestGo]
 
 // Use a specific latest version for release builds.
 // Note that we don't want ".x" for the sake of reproducibility,

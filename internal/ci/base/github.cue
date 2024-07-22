@@ -100,7 +100,7 @@ checkoutCode: {
 
 earlyChecks: json.#step & {
 	name: "Early git and code sanity checks"
-	run: "./internal/ci/checks/commit.sh"
+	run: "go run ./internal/ci/checks"
 }
 
 curlGitHubAPI: {

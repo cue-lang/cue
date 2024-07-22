@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6777ac62_5e237b45",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-07-22T07:41:51Z",
+      "side": 1,
+      "message": "I had written 90% of a comment saying \"it would be nice to print out the exit code too\" before checking the source for ExitError.Error() and discovering that does exactly that already!",
+      "revId": "3fcf82338440b5109b927bf7703582187d67abad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -88,7 +88,7 @@ workflows: trybot: _repo.bashWorkflow & {
 	_testStrategy: {
 		"fail-fast": false
 		matrix: {
-			"go-version": [_repo.previousStableGo, _repo.latestStableGo]
+			"go-version": _repo.matrixGo
 			runner: [_repo.linuxMachine, _repo.macosMachine, _repo.windowsMachine]
 		}
 	}
@@ -97,7 +97,7 @@ workflows: trybot: _repo.bashWorkflow & {
 	// is running on Linux with the latest version of Go. This expression is often
 	// used to run certain steps just once per CI workflow, to avoid duplicated
 	// work.
-	_isLatestLinux: "(\(goVersion) == '\(_repo.latestStableGo)' && \(matrixRunner) == '\(_repo.linuxMachine)')"
+	_isLatestLinux: "(\(goVersion) == '\(_repo.latestGo)' && \(matrixRunner) == '\(_repo.linuxMachine)')"
 
 	_goGenerate: json.#step & {
 		name: "Generate"

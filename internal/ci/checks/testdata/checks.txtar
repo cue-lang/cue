@@ -1,0 +1,27 @@
+# The commit author is cueckoo@gmail.com.
+
+-- pass-short --
+this is a one-line commit message
+
+Signed-off-by: cueckoo <cueckoo@gmail.com>
+-- pass-long --
+this message is very long
+
+So it needs many more paragraphs
+to explain what it is doing.
+
+Fixes #123.
+
+Signed-off-by: cueckoo <cueckoo@gmail.com>
+
+-- fail-no-empty --
+This message forgot a title
+which is followed by an empty line.
+
+Signed-off-by: cueckoo <cueckoo@gmail.com>
+-- fail-no-signoff --
+this message lacks a signed-off-by trailer
+-- fail-different-signoff --
+this message is signed off by a different person
+
+Signed-off-by: Other Developer <other.developer@corp.com>

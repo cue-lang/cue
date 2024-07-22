@@ -16,6 +16,24 @@
       "message": "I had written 90% of a comment saying \"it would be nice to print out the exit code too\" before checking the source for ExitError.Error() and discovering that does exactly that already!",
       "revId": "3fcf82338440b5109b927bf7703582187d67abad",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ee98779_05abb041",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-22T07:52:12Z",
+      "side": 1,
+      "message": "yep indeed - exec.ExitError as a stringified error includes the exit code, but not stderr, as that could be huge so it\u0027s not a sane default. but we do know that git\u0027s stderr errors tend to be pretty good.",
+      "parentUuid": "6777ac62_5e237b45",
+      "revId": "3fcf82338440b5109b927bf7703582187d67abad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

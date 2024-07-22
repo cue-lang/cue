@@ -16,6 +16,24 @@
       "message": "Personally, I\u0027d definitely wrap this - maybe adding into cuetest a MustTxTarFS(testing.TB, *txtar.Archive) function.\nMight be worth doing the same wrapping for txtar.Parse, though that definitely gets into the realm of scope creep for this CL.",
       "revId": "2523c791615a1ddad41fbc1ba047beab0f5909b5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4b5656d_dca56aca",
+        "filename": "cue/format/format_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-22T08:01:12Z",
+      "side": 1,
+      "message": "I briefly thought about this, but personally for one added line I wouldn\u0027t bother. The diff is likely to mean more lines added in the end. If anything, this could be a generic \"must\" test helper func that works with any call returning `(T, error)`, as this verbosity has nothing to do with txtar per se. We have added a few such funcs in the past, but nothing widespread, as there\u0027s no such pattern in Go (yet), and quicktest has been OK for now.\n\nThere\u0027s another reason to keep the `qt.Assert` separate and explicit - one can add comments depending on the context of each test or func: https://pkg.go.dev/github.com/go-quicktest/qt#Commentf\n\nPerhaps @rogpeppe@gmail.com has thoughts.",
+      "parentUuid": "9e9d3618_6829bc59",
+      "revId": "2523c791615a1ddad41fbc1ba047beab0f5909b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

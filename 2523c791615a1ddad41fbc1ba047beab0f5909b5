@@ -34,6 +34,24 @@
       "parentUuid": "9e9d3618_6829bc59",
       "revId": "2523c791615a1ddad41fbc1ba047beab0f5909b5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e840029f_a7b78424",
+        "filename": "cue/format/format_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-07-22T08:26:39Z",
+      "side": 1,
+      "message": "Yeah I see your point - looking at the code surrounding the callsites, a Must would stand out unless you convert, well, everything. Sigh - Go needs an error monad.\n\nAside: I assumed the Commentf stuff was going to be normal code comments in the style of https://github.com/matryer/is, which is cute, but I think is actively harmful to abstraction/refactoring. Currently, across the whole of CUE, there are 8 uses of Commentf, and several hundred of Assert so that feature doesn\u0027t seem especially critical, but that\u0027s not by itself reason to make using it harder.",
+      "parentUuid": "c4b5656d_dca56aca",
+      "revId": "2523c791615a1ddad41fbc1ba047beab0f5909b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

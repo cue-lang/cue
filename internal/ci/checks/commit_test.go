@@ -17,8 +17,6 @@ package main
 import (
 	"io/fs"
 	"os/exec"
-	"path/filepath"
-	"runtime"
 	"testing"
 
 	"github.com/go-quicktest/qt"
@@ -26,17 +24,6 @@ import (
 )
 
 func TestCommits(t *testing.T) {
-	// We are removing the dependency on bash very soon.
-	if _, err := exec.LookPath("bash"); err != nil {
-		t.Skipf("cannot find bash: %v", err)
-	}
-	if runtime.GOOS != "linux" {
-		t.Skipf("running only on Linux as others may ship older Bash")
-	}
-
-	scriptPath, err := filepath.Abs("commit.sh")
-	qt.Assert(t, qt.IsNil(err))
-
 	archive, err := txtar.ParseFile("testdata/checks.txtar")
 	qt.Assert(t, qt.IsNil(err))
 	archiveFS, err := txtar.FS(archive)
@@ -63,11 +50,9 @@ func TestCommits(t *testing.T) {
 	for _, name := range passFiles {
 		t.Run(name, func(t *testing.T) {
 			dir := setupCommit(t, name)
-			cmd := exec.Command("bash", scriptPath)
-			cmd.Dir = dir
-			data, err := cmd.CombinedOutput()
+			err = checkCommit(dir)
 			t.Logf("error: %v", err)
-			qt.Assert(t, qt.IsNil(err), qt.Commentf("output: %q", data))
+			qt.Assert(t, qt.IsNil(err))
 		})
 	}
 
@@ -76,9 +61,7 @@ func TestCommits(t *testing.T) {
 	for _, name := range failFiles {
 		t.Run(name, func(t *testing.T) {
 			dir := setupCommit(t, name)
-			cmd := exec.Command("bash", scriptPath)
-			cmd.Dir = dir
-			err = cmd.Run()
+			err = checkCommit(dir)
 			t.Logf("error: %v", err)
 			qt.Assert(t, qt.IsNotNil(err))
 		})

@@ -103,7 +103,7 @@ jobs:
         run: go clean -testcache
       - if: (matrix.go-version == '1.23.0-rc.2' && matrix.runner == 'ubuntu-22.04')
         name: Early git and code sanity checks
-        run: ./internal/ci/checks/commit.sh
+        run: go run ./internal/ci/checks
       - if: (matrix.go-version == '1.23.0-rc.2' && matrix.runner == 'ubuntu-22.04')
         name: Generate
         run: go generate ./...

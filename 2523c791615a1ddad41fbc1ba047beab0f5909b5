@@ -70,6 +70,24 @@
       "parentUuid": "e840029f_a7b78424",
       "revId": "2523c791615a1ddad41fbc1ba047beab0f5909b5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6a42d77_ef19586a",
+        "filename": "cue/format/format_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-22T09:47:10Z",
+      "side": 1,
+      "message": "FWIW I think that keeping the error check separate is more consistent with the way that all the rest of the code works, so I think it\u0027s reasonable as we\u0027ve got it here.",
+      "parentUuid": "e840029f_a7b78424",
+      "revId": "2523c791615a1ddad41fbc1ba047beab0f5909b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

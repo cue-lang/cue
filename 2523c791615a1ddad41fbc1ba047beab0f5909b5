@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e9d3618_6829bc59",
+        "filename": "cue/format/format_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-07-22T07:53:23Z",
+      "side": 1,
+      "message": "Personally, I\u0027d definitely wrap this - maybe adding into cuetest a MustTxTarFS(testing.TB, *txtar.Archive) function.\nMight be worth doing the same wrapping for txtar.Parse, though that definitely gets into the realm of scope creep for this CL.",
+      "revId": "2523c791615a1ddad41fbc1ba047beab0f5909b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

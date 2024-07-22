@@ -88,6 +88,24 @@
       "parentUuid": "e840029f_a7b78424",
       "revId": "2523c791615a1ddad41fbc1ba047beab0f5909b5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "090da55c_43143735",
+        "filename": "cue/format/format_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-22T09:53:03Z",
+      "side": 1,
+      "message": "marking as done again, as I think we\u0027re in agreement now.",
+      "parentUuid": "a6a42d77_ef19586a",
+      "revId": "2523c791615a1ddad41fbc1ba047beab0f5909b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

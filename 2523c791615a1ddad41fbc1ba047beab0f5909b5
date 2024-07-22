@@ -52,6 +52,24 @@
       "parentUuid": "c4b5656d_dca56aca",
       "revId": "2523c791615a1ddad41fbc1ba047beab0f5909b5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5925be93_d7efca65",
+        "filename": "cue/format/format_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-22T08:37:39Z",
+      "side": 1,
+      "message": "Error handling needs some thinking in Go, yes - there have been some proposals in the past but they were all controversial. The current approach works, but it is a bit repetitive and verbose. I still think more proposals are coming from upstream. For the time being, we\u0027re going with qt, and we\u0027re trying to not steer too far from \"standard\" Go code.",
+      "parentUuid": "e840029f_a7b78424",
+      "revId": "2523c791615a1ddad41fbc1ba047beab0f5909b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

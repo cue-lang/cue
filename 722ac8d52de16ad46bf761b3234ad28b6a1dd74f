@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ddbd1a9_ad8a71e8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-22T12:30:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d4475e88_6b845d05",
+      "revId": "722ac8d52de16ad46bf761b3234ad28b6a1dd74f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b1f06c1d_d56e7ade",
@@ -41,6 +59,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2cc8b36_224043aa",
+        "filename": "cmd/cue/cmd/testdata/script/modinit_badpath.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-22T12:30:25Z",
+      "side": 1,
+      "message": "This comes exactly from the Go code. The logic only knows what characters are allowed, what characters aren\u0027t - it would be a reasonable amount more work to make a custom message for the various groups of characters that aren\u0027t allowed.\n\nI personally think that this is fine, and that \"char\" is a well-enough known synonym for \"character\" that there\u0027s no practical barrier to comprehension here.\n\nGiven the above, I think we can just leave as is.",
+      "parentUuid": "b1f06c1d_d56e7ade",
+      "range": {
+        "startLine": 17,
+        "startChar": 43,
+        "endLine": 17,
+        "endChar": 59
+      },
+      "revId": "722ac8d52de16ad46bf761b3234ad28b6a1dd74f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2b4e5070_2a8f153a",
@@ -54,6 +96,24 @@
       "writtenOn": "2024-07-20T13:52:44Z",
       "side": 1,
       "message": "nit: I might drop the last \"for details\" as it\u0027s unnecessary and it\u0027s also very easy to miss given the very long link.\n\nalso: I might swap `main` for `HEAD` to just point to whatever upstream\u0027s default branch name is.",
+      "revId": "722ac8d52de16ad46bf761b3234ad28b6a1dd74f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb8c5c41_d1441281",
+        "filename": "mod/module/path.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-22T12:30:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2b4e5070_2a8f153a",
       "revId": "722ac8d52de16ad46bf761b3234ad28b6a1dd74f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

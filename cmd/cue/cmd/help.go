@@ -581,7 +581,8 @@ Injecting files
 A "build" attribute defines a boolean expression that causes a file
 to only be included in a build if its expression evaluates to true.
 There may only be a single @if attribute per file and it must
-appear before a package clause.
+appear before a package clause, or before any CUE declarations
+if there is no package clause.
 
 The expression is a subset of CUE consisting only of identifiers
 and the operators &&, ||, !, where identifiers refer to tags
@@ -595,6 +596,19 @@ if the user includes the flag "-t prod" on the command line.
 
    package foo
 
+Ignoring files
+
+An "ignore" attribute causes a file to be unconditionally excluded
+from a build. The @ignore attribute must appear before a package
+clause or before any other CUE syntax if there is no package clause.
+
+For example:
+
+    @ignore()
+
+    // This file will be excluded for all purposes.
+
+    package foo
 
 Injecting values
 

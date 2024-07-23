@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa3dc545_ab5410a0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-23T13:14:56Z",
+      "side": 1,
+      "message": "perhaps mention that the syntax for `@ignore()` attributes is valid, it\u0027s just not used by the loader yet.",
+      "revId": "c610cd09ef30a4b960fcfb194cf94174c085a646",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "576bc5d4_ccbca4d1",
+        "filename": "internal/buildattr/buildattr_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-23T13:14:56Z",
+      "side": 1,
+      "message": "what about `@ignore()` without a package clause?",
+      "revId": "c610cd09ef30a4b960fcfb194cf94174c085a646",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

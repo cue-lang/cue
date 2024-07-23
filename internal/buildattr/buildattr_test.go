@@ -33,6 +33,21 @@ package something
 	wantTagCalls: map[string]bool{"foo": true},
 	wantAttr:     "@if(foo)",
 }, {
+	testName: "PackageWithComments",
+	syntax: `
+
+// Some comment
+
+@if(foo)
+
+// Other comment
+
+package something
+`,
+	wantOK:       false,
+	wantTagCalls: map[string]bool{"foo": true},
+	wantAttr:     "@if(foo)",
+}, {
 	testName: "PackageWithIfSuccess",
 	syntax: `
 @if(foo)
@@ -243,6 +258,70 @@ package something
 		"baz": true,
 	},
 	wantAttr: "@if(foo || (!bar && baz))",
+}, {
+	testName: "IgnoreOnly",
+	syntax: `
+@ignore()
+
+package something
+`,
+	wantOK: true,
+}, {
+	testName: "IgnoreWithBuildAttrs",
+	syntax: `
+@ignore()
+@if(blah)
+
+package something
+`,
+	wantOK: false,
+	wantTagCalls: map[string]bool{
+		"blah": true,
+	},
+	wantAttr: "@if(blah)",
+}, {
+	testName: "IgnoreWithMultipleEarlierIfs",
+	syntax: `
+@if(foo)
+@if(bar)
+@ignore()
+
+package something
+`,
+	wantOK: false,
+	wantError: `previous declaration here:
+    testfile.cue:2:1
+multiple @if attributes:
+    testfile.cue:3:1
+`,
+	wantAttr: "@if(foo)",
+}, {
+	testName: "IgnoreWithMultipleLaterIfs",
+	syntax: `
+@ignore()
+@if(foo)
+@if(bar)
+
+package something
+`,
+	wantOK: false,
+	wantError: `previous declaration here:
+    testfile.cue:3:1
+multiple @if attributes:
+    testfile.cue:4:1
+`,
+	wantAttr: "@if(foo)",
+}, {
+	testName: "IfAfterDeclaration",
+	syntax: `
+a: 1
+@if(foo)
+`,
+	wantOK: false,
+	wantTagCalls: map[string]bool{
+		"foo": true,
+	},
+	wantAttr: "@if(foo)",
 }}
 
 func TestShouldBuildFile(t *testing.T) {

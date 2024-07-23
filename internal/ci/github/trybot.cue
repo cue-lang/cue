@@ -158,12 +158,17 @@ workflows: trybot: _repo.bashWorkflow & {
 		// However, CUE does not have any such build tags yet, and we don't use
 		// dependencies that vary wildly between platforms.
 		// For now, to save CI resources, just run the checks on one matrix job.
+		//
+		// Also ensure that the end-to-end tests in ./internal/_e2e, which are only run
+		// on pushes to protected branches, still build correctly before merging.
+		//
 		// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
 		if:   "\(_isLatestLinux)"
 		name: "Check"
 		run: """
 			go vet ./...
 			go mod tidy
+			(cd internal/_e2e && go test -run=-)
 			"""
 	}
 

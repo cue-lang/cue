@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f289cfda_2bccfdc6",
+        "filename": "cmd/cue/cmd/flags.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-07-23T14:45:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8a93e60a_503088ed",
+      "revId": "46bb56d110ee1f76d8ccfa0f04b4f309c392c44b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8e1f40f5_eafea7b0",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-07-23T14:37:14Z",
       "side": 1,
       "message": "mention this in the commit message as the first one we fixed",
+      "revId": "46bb56d110ee1f76d8ccfa0f04b4f309c392c44b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "48da45dd_d10d6fb6",
+        "filename": "cmd/cue/cmd/trim.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-07-23T14:45:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8e1f40f5_eafea7b0",
       "revId": "46bb56d110ee1f76d8ccfa0f04b4f309c392c44b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

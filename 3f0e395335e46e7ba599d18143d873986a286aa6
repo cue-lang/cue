@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "947ae83e_060fda07",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-23T16:12:41Z",
+      "side": 1,
+      "message": "Added a TODO as suggested.",
+      "parentUuid": "78f8ade6_857975b3",
+      "revId": "3f0e395335e46e7ba599d18143d873986a286aa6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a2b1c9eb_eae8a596",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-07-23T13:20:52Z",
       "side": 1,
       "message": "Please explain in the commit message how the current behavior with symlinks compares to older CUE versions like v0.4 or v0.7, before we started work on \"new modules\". For example, did cmd/cue for those versions pass the same testscript, or were there any differences, and why?",
+      "revId": "3f0e395335e46e7ba599d18143d873986a286aa6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b3ee3a8_e13593ac",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-23T16:12:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a2b1c9eb_eae8a596",
       "revId": "3f0e395335e46e7ba599d18143d873986a286aa6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

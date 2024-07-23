@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ce9a6a8_22e895a4",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 603,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-23T13:17:40Z",
+      "side": 1,
+      "message": "if there is such a package clause, or must there be one?",
+      "range": {
+        "startLine": 602,
+        "startChar": 48,
+        "endLine": 603,
+        "endChar": 7
+      },
+      "revId": "72838a71064d859bd5d09e68cad93b34d673e922",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

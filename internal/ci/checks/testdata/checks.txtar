@@ -30,6 +30,32 @@ Signed-off-by: cueckoo <cueckoo@gmail.com>
 Co-authored-by: collaborator <collaborator@corp.com>
 Signed-off-by: collaborator <collaborator@corp.com>
 Signed-off-by: collaborator <collaborator@corp.com>
+-- pass-quoted-embed --
+this message quotes an `@embed()` snippet
+
+Signed-off-by: cueckoo <cueckoo@gmail.com>
+-- pass-longquoted-embed --
+this message quotes a longer `foo: string @embed()` snippet
+
+Signed-off-by: cueckoo <cueckoo@gmail.com>
+-- pass-blockquoted-embed --
+this message block-quotes a snippet of code
+
+    foo: string @embed()
+
+Signed-off-by: cueckoo <cueckoo@gmail.com>
+-- pass-version --
+versions like cuelang.org/go@v0.9.0 are okay
+
+Signed-off-by: cueckoo <cueckoo@gmail.com>
+-- pass-lone-at --
+lone @ characters are also okay
+
+Signed-off-by: cueckoo <cueckoo@gmail.com>
+-- pass-email --
+email addresses like foo@bar.com are okay
+
+Signed-off-by: cueckoo <cueckoo@gmail.com>
 
 -- fail-no-empty --
 This message forgot a title
@@ -42,3 +68,15 @@ this message lacks a signed-off-by trailer
 this message is signed off by a different person
 
 Signed-off-by: Other Developer <other.developer@corp.com>
+-- fail-unquoted-embed --
+This message does not quote an @embed() snippet.
+
+Signed-off-by: cueckoo <cueckoo@gmail.com>
+-- fail-leading-embed --
+@embed() may also be at the start.
+
+Signed-off-by: cueckoo <cueckoo@gmail.com>
+-- fail-mention --
+This is an explicit mention of @someone which we don't do.
+
+Signed-off-by: cueckoo <cueckoo@gmail.com>

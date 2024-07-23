@@ -358,9 +358,12 @@ func shouldBuildFile(f *ast.File, tagIsSet func(key string) bool) errors.Error {
 	if err != nil {
 		return err
 	}
-	if !ok {
-		_, body := attr.Split()
-		return excludeError{errors.Newf(attr.Pos(), "@if(%s) did not match", body)}
+	if ok {
+		return nil
 	}
-	return nil
+	if key, body := attr.Split(); key == "if" {
+		return excludeError{errors.Newf(attr.Pos(), "@if(%s) did not match", body)}
+	} else {
+		return excludeError{errors.Newf(attr.Pos(), "@ignore() attribute found")}
+	}
 }

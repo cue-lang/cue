@@ -265,7 +265,8 @@ package something
 
 package something
 `,
-	wantOK: true,
+	wantOK:   false,
+	wantAttr: "@ignore()",
 }, {
 	testName: "IgnoreWithBuildAttrs",
 	syntax: `
@@ -274,12 +275,14 @@ package something
 
 package something
 `,
-	wantOK: false,
-	wantTagCalls: map[string]bool{
-		"blah": true,
-	},
-	wantAttr: "@if(blah)",
+	wantOK:   false,
+	wantAttr: "@ignore()",
 }, {
+	// It's arguable whether multiple @if attributes
+	// should be an error when there's an @ignore
+	// attribute, but it's easily worked around by
+	// putting the @ignore attribute first, which should
+	// be fairly intuitive.
 	testName: "IgnoreWithMultipleEarlierIfs",
 	syntax: `
 @if(foo)
@@ -304,31 +307,23 @@ multiple @if attributes:
 
 package something
 `,
-	wantOK: false,
-	wantError: `previous declaration here:
-    testfile.cue:3:1
-multiple @if attributes:
-    testfile.cue:4:1
-`,
-	wantAttr: "@if(foo)",
+	wantOK:   false,
+	wantAttr: "@ignore()",
 }, {
 	testName: "IgnoreWithoutPackageClause",
 	syntax: `
 @ignore()
 a: 5
 `,
-	wantOK: true,
+	wantOK:   false,
+	wantAttr: "@ignore()",
 }, {
 	testName: "IfAfterDeclaration",
 	syntax: `
 a: 1
 @if(foo)
 `,
-	wantOK: false,
-	wantTagCalls: map[string]bool{
-		"foo": true,
-	},
-	wantAttr: "@if(foo)",
+	wantOK: true,
 }}
 
 func TestShouldBuildFile(t *testing.T) {

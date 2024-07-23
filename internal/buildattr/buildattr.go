@@ -9,14 +9,21 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
+// ShouldIgnoreFile reports whether a File contains an @ignore() file-level
+// attribute and hence should be ignored.
+func ShouldIgnoreFile(f *ast.File) bool {
+	ignore, _, _ := getBuildAttr(f)
+	return ignore
+}
+
 // ShouldBuildFile reports whether a File should be included based on its
 // attributes. It uses tagIsSet to determine whether a given attribute
 // key should be treated as set.
 //
 // It also returns the build attribute if one was found.
 func ShouldBuildFile(f *ast.File, tagIsSet func(key string) bool) (bool, *ast.Attribute, errors.Error) {
-	a, err := getBuildAttr(f)
-	if err != nil {
+	ignore, a, err := getBuildAttr(f)
+	if ignore || err != nil {
 		return false, a, err
 	}
 	if a == nil {
@@ -37,28 +44,33 @@ func ShouldBuildFile(f *ast.File, tagIsSet func(key string) bool) (bool, *ast.At
 	return include, a, nil
 }
 
-func getBuildAttr(f *ast.File) (*ast.Attribute, errors.Error) {
-	var a *ast.Attribute
+func getBuildAttr(f *ast.File) (ignore bool, a *ast.Attribute, err errors.Error) {
 	for _, d := range f.Decls {
 		switch x := d.(type) {
 		case *ast.Attribute:
-			key, _ := x.Split()
-			if key != "if" {
-				continue
+			switch key, _ := x.Split(); key {
+			case "ignore":
+				return true, x, nil
+			case "if":
+				if a != nil {
+					err := errors.Newf(d.Pos(), "multiple @if attributes")
+					err = errors.Append(err,
+						errors.Newf(a.Pos(), "previous declaration here"))
+					return false, a, err
+				}
+				a = x
 			}
-			if a != nil {
-				err := errors.Newf(d.Pos(), "multiple @if attributes")
-				err = errors.Append(err,
-					errors.Newf(a.Pos(), "previous declaration here"))
-				return a, err
-			}
-			a = x
-
 		case *ast.Package:
-			return a, nil
+			return false, a, nil
+		case *ast.CommentGroup:
+		default:
+			// If it's anything else, then we know we won't see a package
+			// clause so avoid scanning more than we need to (this
+			// could be a large file with no package clause)
+			return false, a, nil
 		}
 	}
-	return a, nil
+	return false, a, nil
 }
 
 func shouldInclude(expr ast.Expr, tagIsSet func(key string) bool) (bool, errors.Error) {

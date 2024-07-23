@@ -15,6 +15,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/spf13/pflag"
 )
 
@@ -114,17 +116,57 @@ func addInjectionFlags(f *pflag.FlagSet, auto, hidden bool) {
 
 type flagName string
 
+type unaddedFlagUse struct {
+	cmd  string
+	flag flagName
+}
+
+// TODO(ms) consider each of these in turn and either remove their
+// use, or add the flag to the flagset.
+var todoUnaddedFlagUse = map[unaddedFlagUse]struct{}{
+	{cmd: "def", flag: flagEscape}:           {},
+	{cmd: "def", flag: flagFiles}:            {},
+	{cmd: "eval", flag: flagEscape}:          {},
+	{cmd: "eval", flag: flagFiles}:           {},
+	{cmd: "eval", flag: flagInlineImports}:   {},
+	{cmd: "export", flag: flagFiles}:         {},
+	{cmd: "export", flag: flagInlineImports}: {},
+	{cmd: "import", flag: flagEscape}:        {},
+	{cmd: "import", flag: flagExpression}:    {},
+	{cmd: "import", flag: flagInlineImports}: {},
+	{cmd: "import", flag: flagOut}:           {},
+	{cmd: "vet", flag: flagEscape}:           {},
+	{cmd: "vet", flag: flagExpression}:       {},
+	{cmd: "vet", flag: flagFiles}:            {},
+	{cmd: "vet", flag: flagForce}:            {},
+	{cmd: "vet", flag: flagInlineImports}:    {},
+	{cmd: "vet", flag: flagOut}:              {},
+	{cmd: "vet", flag: flagOutFile}:          {},
+}
+
+func (f flagName) ensureAdded(cmd *Command) {
+	if cmd.Flags().Lookup(string(f)) == nil {
+		if _, found := todoUnaddedFlagUse[unaddedFlagUse{cmd.Name(), f}]; found {
+			return
+		}
+		panic(fmt.Sprintf("Cmd %q uses flag %q without adding it", cmd.Name(), f))
+	}
+}
+
 func (f flagName) Bool(cmd *Command) bool {
+	f.ensureAdded(cmd)
 	v, _ := cmd.Flags().GetBool(string(f))
 	return v
 }
 
 func (f flagName) String(cmd *Command) string {
+	f.ensureAdded(cmd)
 	v, _ := cmd.Flags().GetString(string(f))
 	return v
 }
 
 func (f flagName) StringArray(cmd *Command) []string {
+	f.ensureAdded(cmd)
 	v, _ := cmd.Flags().GetStringArray(string(f))
 	return v
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "be7c1e14_4e5b5119",
+        "filename": "internal/ci/checks/testdata/checks.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-23T16:13:29Z",
+      "side": 1,
+      "message": "Note: all of these fail test cases are first-line tests.",
+      "revId": "892eb5c909ab23ca98e6a9668bbfe98ffe7ebc22",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -66,10 +66,10 @@ func tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, checkTi
 	}
 	// TODO check that module path is well formed etc
 	origRs := modrequirements.NewRequirements(mf.QualifiedModule(), reg, mf.DepVersions(), mf.DefaultMajorVersions())
-	// Note: we can just ignore build tags and the fact that we might
+	// Note: we can ignore build tags and the fact that we might
 	// have _tool.cue and _test.cue files, because we want to include
-	// all of them.
-	rootPkgPaths, err := modimports.AllImports(modimports.AllModuleFiles(fsys, modRoot))
+	// all of those, but we do need to consider @ignore() attributes.
+	rootPkgPaths, err := modimports.AllImports(withoutIgnoredFiles(modimports.AllModuleFiles(fsys, modRoot)))
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +175,11 @@ func modfileFromRequirements(old *modfile.File, rs *modrequirements.Requirements
 //
 // In general a file should always be considered unless it's a _tool.cue file
 // that's not in the main module.
-func (ld *loader) shouldIncludePkgFile(pkgPath string, mod module.Version, fsys fs.FS, mf modimports.ModuleFile) bool {
+func (ld *loader) shouldIncludePkgFile(pkgPath string, mod module.Version, fsys fs.FS, mf modimports.ModuleFile) (_ok bool) {
+	if buildattr.ShouldIgnoreFile(mf.Syntax) {
+		// The file is marked to be explicitly ignored.
+		return false
+	}
 	if mod.Path() == ld.mainModule.Path() {
 		// All files in the main module are considered.
 		return true
@@ -714,6 +718,18 @@ func (ld *loader) spotCheckRoots(ctx context.Context, rs *modrequirements.Requir
 	}
 
 	return true
+}
+
+func withoutIgnoredFiles(iter func(func(modimports.ModuleFile, error) bool)) func(func(modimports.ModuleFile, error) bool) {
+	return func(yield func(modimports.ModuleFile, error) bool) {
+		// TODO for mf, err := range iter {
+		iter(func(mf modimports.ModuleFile, err error) bool {
+			if err == nil && buildattr.ShouldIgnoreFile(mf.Syntax) {
+				return true
+			}
+			return yield(mf, err)
+		})
+	}
 }
 
 func logf(f string, a ...any) {

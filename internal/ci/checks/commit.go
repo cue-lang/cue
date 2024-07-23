@@ -23,6 +23,11 @@ import (
 	"regexp"
 	"slices"
 	"strings"
+
+	"github.com/yuin/goldmark"
+	mdast "github.com/yuin/goldmark/ast"
+	mdextension "github.com/yuin/goldmark/extension"
+	mdtext "github.com/yuin/goldmark/text"
 )
 
 func main() {
@@ -81,6 +86,38 @@ func checkCommit(dir string) error {
 			authors, signers)
 	}
 
+	// Forbid @-mentioning any GitHub usernames in commit messages,
+	// as that will lead to notifications which are likely unintended.
+	// If one must include a similar-looking snippet, like @embed(),
+	// they can use markdown backticks or blockquotes to sidestep the issue.
+	//
+	// Note that we parse the body as markdown including git trailers, but that's okay.
+	// Note that GitHub does not interpret mentions in titles, but we still check them
+	// for the sake of being conservative and consistent.
+	md := goldmark.New(
+		goldmark.WithExtensions(mdextension.GFM),
+	)
+	docBody := []byte(body)
+	doc := md.Parser().Parse(mdtext.NewReader(docBody))
+	if err := mdast.Walk(doc, func(node mdast.Node, entering bool) (mdast.WalkStatus, error) {
+		if !entering {
+			return mdast.WalkContinue, nil
+		}
+		// Uncomment for some quick debugging.
+		// fmt.Printf("%T\n%q\n\n", node, node.Text(docBody))
+		switch node.(type) {
+		case *mdast.CodeSpan:
+			return mdast.WalkSkipChildren, nil
+		case *mdast.Text:
+			text := node.Text(docBody)
+			if m := rxUserMention.FindSubmatch(text); m != nil {
+				return mdast.WalkStop, fmt.Errorf("commit mentions %q; use backquotes or block quoting for code", m[2])
+			}
+		}
+		return mdast.WalkContinue, nil
+	}); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -91,7 +128,10 @@ func runCmd(dir string, exe string, args ...string) (string, error) {
 	return string(bytes.TrimSpace(out)), err
 }
 
-var rxExtractEmail = regexp.MustCompile(`.*<(.*)\>$`)
+var (
+	rxExtractEmail = regexp.MustCompile(`.*<(.*)\>$`)
+	rxUserMention  = regexp.MustCompile(`(^|\s)(@[a-z0-9][a-z0-9-]*)`)
+)
 
 func extractEmails(list string) []string {
 	lines := strings.Split(list, "\n")

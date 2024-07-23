@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26f700be_cf1907e4",
+        "filename": "internal/ci/checks/commit_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-23T08:45:00Z",
+      "side": 1,
+      "message": "Nit: feels like this block (and possibly following couple of lines) could be factored out?",
+      "revId": "068ab3a5b052030c32429b75fef92755d57ab8eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

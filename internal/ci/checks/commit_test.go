@@ -21,6 +21,8 @@ import (
 
 	"github.com/go-quicktest/qt"
 	"golang.org/x/tools/txtar"
+
+	"cuelang.org/go/internal/vcs"
 )
 
 func TestCommits(t *testing.T) {
@@ -36,6 +38,7 @@ func TestCommits(t *testing.T) {
 		t.Logf("commit:\n%s", commit)
 
 		dir := t.TempDir()
+		vcs.InitTestEnv(t)
 		mustRunCmd(t, dir, "git", "init")
 		mustRunCmd(t, dir, "git",
 			"-c", "user.email=cueckoo@gmail.com",

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "89b179ce_6751e10e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-23T16:12:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa3dc545_ab5410a0",
+      "revId": "c610cd09ef30a4b960fcfb194cf94174c085a646",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "576bc5d4_ccbca4d1",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-07-23T13:14:56Z",
       "side": 1,
       "message": "what about `@ignore()` without a package clause?",
+      "revId": "c610cd09ef30a4b960fcfb194cf94174c085a646",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a187f41_8dac5955",
+        "filename": "internal/buildattr/buildattr_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-23T16:12:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "576bc5d4_ccbca4d1",
       "revId": "c610cd09ef30a4b960fcfb194cf94174c085a646",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

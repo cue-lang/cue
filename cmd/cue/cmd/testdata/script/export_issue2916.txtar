@@ -1,0 +1,44 @@
+# https://cuelang.org/issue/2916
+#
+# The old evaluator does not correctly follow the rewrite rules for default
+# values:
+#
+# https://cuelang.org/docs/reference/spec/#default-values
+#
+# It then makes a further mistake by output different values for JSON or Yaml.
+#
+# The new evaluator correctly determines that the field is incomplete because
+# it is left with 3 | >=3.
+
+exec cue export file.cue --out json
+cmp stdout stdout.json.golden
+exec cue export file.cue --out yaml
+cmp stdout stdout.yaml.golden
+
+# This issue is already fixed in the new evaluator.
+env CUE_EXPERIMENT=evalv3
+
+! exec cue export file.cue --out json
+cmp stderr stderr.golden
+! exec cue export file.cue --out yaml
+cmp stderr stderr.golden
+-- file.cue --
+a: {
+	b: _
+	[_]: c:      uint | *1
+	[string]: c: >=3 | *3
+}
+-- stderr.golden --
+a.b.c: incomplete value >=3 & int | 3
+-- stdout.json.golden --
+{
+    "a": {
+        "b": {
+            "c": 3
+        }
+    }
+}
+-- stdout.yaml.golden --
+a:
+  b:
+    c: 1

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3df23b55_00a7a7c0",
+        "filename": "internal/vcs/vcs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-23T15:21:49Z",
+      "side": 1,
+      "message": "Is this VCS-specific? The name of the function doesn\u0027t suggest so, but I hold this lightly given it\u0027s internal.",
+      "range": {
+        "startLine": 151,
+        "startChar": 60,
+        "endLine": 151,
+        "endChar": 63
+      },
+      "revId": "2394c036ad0cf1bfcc856dc6ff3ecdf753b97aed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42b45f18_04320026",
+        "filename": ".github/workflows/trybot.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-07-23T16:06:40Z",
+      "side": 1,
+      "message": "Nit: isn\u0027t this more commonly spelt `go test -c`?",
+      "range": {
+        "startLine": 149,
+        "startChar": 31,
+        "endLine": 149,
+        "endChar": 45
+      },
+      "revId": "5c7afa3128c8d8bf032e2c7651c4ddbf74586bb6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

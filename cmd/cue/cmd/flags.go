@@ -15,6 +15,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/spf13/pflag"
 )
 
@@ -114,17 +116,26 @@ func addInjectionFlags(f *pflag.FlagSet, auto, hidden bool) {
 
 type flagName string
 
+func (f flagName) ensureAdded(cmd *Command) {
+	if cmd.Flags().Lookup(string(f)) == nil {
+		panic(fmt.Sprintf("Flag %q has not been added", f))
+	}
+}
+
 func (f flagName) Bool(cmd *Command) bool {
+	f.ensureAdded(cmd)
 	v, _ := cmd.Flags().GetBool(string(f))
 	return v
 }
 
 func (f flagName) String(cmd *Command) string {
+	f.ensureAdded(cmd)
 	v, _ := cmd.Flags().GetString(string(f))
 	return v
 }
 
 func (f flagName) StringArray(cmd *Command) []string {
+	f.ensureAdded(cmd)
 	v, _ := cmd.Flags().GetStringArray(string(f))
 	return v
 }

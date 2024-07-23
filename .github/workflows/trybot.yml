@@ -146,6 +146,7 @@ jobs:
         run: |-
           go vet ./...
           go mod tidy
+          (cd internal/_e2e && go test -run=-)
       - if: always()
         name: Check that git is clean at the end of the job
         run: test -z "$(git status --porcelain)" || (git status; git diff; false)

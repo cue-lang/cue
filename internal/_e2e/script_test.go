@@ -17,6 +17,7 @@ package e2e_test
 import (
 	"bytes"
 	"cmp"
+	"context"
 	cryptorand "crypto/rand"
 	"fmt"
 	"os"

@@ -21,6 +21,8 @@ import (
 
 	"github.com/go-quicktest/qt"
 	"golang.org/x/tools/txtar"
+
+	"cuelang.org/go/internal/vcs"
 )
 
 func TestCommits(t *testing.T) {
@@ -28,6 +30,8 @@ func TestCommits(t *testing.T) {
 	qt.Assert(t, qt.IsNil(err))
 	archiveFS, err := txtar.FS(archive)
 	qt.Assert(t, qt.IsNil(err))
+
+	vcs.InitTestEnv()
 
 	setupCommit := func(t *testing.T, name string) string {
 		commit, err := fs.ReadFile(archiveFS, name)

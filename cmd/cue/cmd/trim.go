@@ -87,6 +87,7 @@ removal.
 	}
 
 	addOutFlags(cmd.Flags(), false)
+	cmd.Flags().BoolP(string(flagDryRun), "n", false, "only run simulation")
 
 	return cmd
 }

@@ -23,6 +23,9 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
+	"strings"
+	"testing"
 	"time"
 )
 
@@ -132,4 +135,39 @@ type vcsNotFoundError struct {
 
 func (e *vcsNotFoundError) Error() string {
 	return fmt.Sprintf("%s VCS not found in any parent of %q", e.kind, e.dir)
+}
+
+func homeEnvName() string {
+	switch runtime.GOOS {
+	case "windows":
+		return "USERPROFILE"
+	case "plan9":
+		return "home"
+	default:
+		return "HOME"
+	}
+}
+
+// InitTestEnv sets up the environment so that any executed VCS command
+// won't be affected by the outer level environment.
+//
+// Note that this function is exposed so we can reuse it from other test packages
+// which also need to use Go tests with VCS systems.
+// Exposing a test helper is fine for now, given this is an internal package.
+func InitTestEnv(t testing.TB) {
+	t.Helper()
+	path := os.Getenv("PATH")
+	systemRoot := os.Getenv("SYSTEMROOT")
+	// First unset all environment variables to make a pristine environment.
+	for _, kv := range os.Environ() {
+		key, _, _ := strings.Cut(kv, "=")
+		t.Setenv(key, "")
+		os.Unsetenv(key)
+	}
+	os.Setenv("PATH", path)
+	os.Setenv(homeEnvName(), "/no-home")
+	// Must preserve SYSTEMROOT on Windows: https://github.com/golang/go/issues/25513 et al
+	if runtime.GOOS == "windows" {
+		os.Setenv("SYSTEMROOT", systemRoot)
+	}
 }

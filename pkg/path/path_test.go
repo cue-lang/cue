@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"reflect"
 	"runtime"
+	"slices"
 	"testing"
 )
 
@@ -111,7 +112,7 @@ var wincleantests = []PathTest{
 
 func TestClean(t *testing.T) {
 	testEachOS(t, []OS{Unix, Windows, Plan9}, func(t *testing.T, os OS) {
-		tests := append([]PathTest{}, cleantests...) // TODO: replace with slices.Clone
+		tests := slices.Clone(cleantests)
 		if os == Windows {
 			for i := range tests {
 				tests[i].result = FromSlash(tests[i].result, os)
@@ -562,7 +563,7 @@ var winreltests = []RelTests{
 
 func TestRel(t *testing.T) {
 	testEachOS(t, []OS{Unix, Windows}, func(t *testing.T, os OS) {
-		tests := append([]RelTests{}, reltests...)
+		tests := slices.Clone(reltests)
 		if os == Windows {
 			for i := range tests {
 				tests[i].want = FromSlash(tests[i].want, Windows)

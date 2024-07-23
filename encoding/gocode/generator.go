@@ -16,6 +16,7 @@ package gocode
 
 import (
 	"bytes"
+	"cmp"
 	"fmt"
 	"go/ast"
 	"go/format"
@@ -159,7 +160,7 @@ func Generate(pkgPath string, inst cue.InstanceOrValue, c *Config) (b []byte, er
 
 	g.exec(loadCode, map[string]string{
 		"runtime": g.RuntimeVar,
-		"prefix":  strValue(g.Prefix, defaultPrefix),
+		"prefix":  cmp.Or(g.Prefix, defaultPrefix),
 		"data":    string(b),
 	})
 
@@ -244,14 +245,14 @@ func (g *generator) decl(name string, v cue.Value) {
 	}
 
 	g.exec(stubCode, map[string]interface{}{
-		"prefix":  strValue(g.Prefix, defaultPrefix),
+		"prefix":  cmp.Or(g.Prefix, defaultPrefix),
 		"cueName": name,   // the field name of the CUE type
 		"goType":  goType, // the receiver or argument type
 		"zero":    zero,   // the zero value of the underlying type
 
 		// @go attribute options
 		"func":     isFunc,
-		"validate": lookupName(attr, "validate", strValue(g.ValidateName, "Validate")),
+		"validate": lookupName(attr, "validate", cmp.Or(g.ValidateName, "Validate")),
 		"complete": lookupName(attr, "complete", g.CompleteName),
 	})
 }
@@ -265,13 +266,6 @@ func lookupName(attr cue.Attribute, option, config string) string {
 		return ""
 	}
 	return name
-}
-
-func strValue(have, fallback string) string {
-	if have == "" {
-		return fallback
-	}
-	return have
 }
 
 func mappedGoTypes(s string) bool {

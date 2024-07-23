@@ -1,0 +1,101 @@
+[!unix] skip 'no symbolic links available for this test'
+
+# This test tests behaviour around symbolic links:
+# - symbolic links are followed for files that are directly part of the build.
+# - symbolic links are disallowed for embedded files.
+# - symbolic links are silently dropped when publishing modules.
+
+# Symbolic link is followed for a single file.
+symlink y.cue -> x.cue
+exec cue eval y.cue
+cmp stdout want-stdout-1
+
+# Symbolic link is followed when part of a package,
+# including when there are dependencies.
+symlink z.cue -> _p/z.cue
+! exec cue eval
+stderr 'cannot find package "deps.example/d1"'
+exec cue mod tidy
+cmp cue.mod/module.cue want-module
+exec cue eval
+cmp stdout want-stdout-2
+
+# Check what happens when a module with symlinks is
+# published to a registry.
+memregistry MEMREGISTRY
+env CUE_REGISTRY=test.example=$MEMREGISTRY+insecure,$CUE_REGISTRY
+exec cue mod publish v0.0.1
+cd _use_main
+exec cue mod tidy
+cmp cue.mod/module.cue $WORK/want-module-2
+exec cue eval
+cmp stdout $WORK/want-stdout-3
+
+-- want-stdout-1 --
+x: true
+-- want-module --
+module: "test.example/main"
+language: {
+	version: "v0.9.2"
+}
+source: {
+	kind: "self"
+}
+deps: {
+	"deps.example/d1@v0": {
+		v:       "v0.0.1"
+		default: true
+	}
+}
+-- want-module-2 --
+module: "test2.example/main"
+language: {
+	version: "v0.9.2"
+}
+deps: {
+	"test.example/main@v0": {
+		v:       "v0.0.1"
+		default: true
+	}
+}
+-- want-stdout-2 --
+x: true
+z: true
+dep: {
+    self: "deps.example/d1"
+}
+-- want-stdout-3 --
+x: true
+-- cue.mod/module.cue --
+module: "test.example/main"
+language: version: "v0.9.2"
+source: kind: "self"
+
+-- x.cue --
+package main
+
+x: true
+-- _p/z.cue --
+package main
+
+import "deps.example/d1"
+
+z: true
+dep: d1
+-- _use_main/main.cue --
+package main
+
+import "test.example/main"
+
+main
+-- _use_main/cue.mod/module.cue --
+module: "test2.example/main"
+language: version: "v0.9.2"
+
+-- _registry/deps.example_d1_v0.0.1/cue.mod/module.cue --
+module: "deps.example/d1"
+language: version: "v0.9.2"
+
+-- _registry/deps.example_d1_v0.0.1/x.cue --
+package d1
+self: "deps.example/d1"

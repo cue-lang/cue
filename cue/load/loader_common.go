@@ -94,7 +94,7 @@ func (s *importStack) Pop() {
 }
 
 func (s *importStack) Copy() []string {
-	return append([]string{}, *s...)
+	return slices.Clone(*s)
 }
 
 type fileProcessor struct {

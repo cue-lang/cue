@@ -16,6 +16,8 @@ package e2e_test
 
 import (
 	"bytes"
+	"cmp"
+	"context"
 	cryptorand "crypto/rand"
 	"fmt"
 	"os"
@@ -74,17 +76,17 @@ var (
 	// githubPublicRepo is a GitHub public repository
 	// with the "cue.works authz" GitHub App installed.
 	// The repository can be entirely empty, as it's only needed for authz.
-	githubPublicRepo = envOr("GITHUB_PUBLIC_REPO", "github.com/cue-labs-modules-testing/e2e-public")
+	githubPublicRepo = cmp.Or(os.Getenv("GITHUB_PUBLIC_REPO"), "github.com/cue-labs-modules-testing/e2e-public")
 
 	// githubPublicRepo is a GitHub private repository
 	// with the "cue.works authz" GitHub App installed.
 	// The repository can be entirely empty, as it's only needed for authz.
-	githubPrivateRepo = envOr("GITHUB_PRIVATE_REPO", "github.com/cue-labs-modules-testing/e2e-private")
+	githubPrivateRepo = cmp.Or(os.Getenv("GITHUB_PRIVATE_REPO"), "github.com/cue-labs-modules-testing/e2e-private")
 
 	// gcloudRegistry is an existing Google Cloud Artifact Registry repository
 	// to publish module versions to via "cue mod publish",
 	// and authenticated via gcloud's configuration in the host environment.
-	gcloudRegistry = envOr("GCLOUD_REGISTRY", "europe-west1-docker.pkg.dev/project-unity-377819/modules-e2e-registry")
+	gcloudRegistry = cmp.Or(os.Getenv("GCLOUD_REGISTRY"), "europe-west1-docker.pkg.dev/project-unity-377819/modules-e2e-registry")
 )
 
 func TestScript(t *testing.T) {
@@ -179,13 +181,6 @@ func TestScript(t *testing.T) {
 }
 
 func addr[T any](t T) *T { return &t }
-
-func envOr(name, fallback string) string {
-	if s := os.Getenv(name); s != "" {
-		return s
-	}
-	return fallback
-}
 
 func envMust(t *testing.T, name string) string {
 	if s := os.Getenv(name); s != "" {

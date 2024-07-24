@@ -17,9 +17,11 @@ package trim
 import (
 	"testing"
 
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
+	"github.com/go-quicktest/qt"
 )
 
 var (
@@ -43,14 +45,28 @@ func TestTrimFiles(t *testing.T) {
 		a := t.Instance()
 		ctx := t.Context()
 		val := ctx.BuildInstance(a)
-		// Note: don't check val.Err because there are deliberate
-		// errors in some tests.
+		// Note: don't require val.Err to be nil because there are deliberate
+		// errors in some tests, to ensure trim still works even with some errors.
+		hadError := val.Err() != nil
 
 		files := a.Files
 
 		err := Files(files, val, &Config{Trace: trace})
 		if err != nil {
 			t.WriteErrors(errors.Promote(err, ""))
+		}
+
+		// If the files could be built without an error before,
+		// they should still build without an error after trimming.
+		// This might not be true if, for example, unused imports are not removed.
+		// Note that we need a new build.Instance to build the ast.Files from scratch again.
+		if !hadError {
+			a := build.NewContext().NewInstance("", nil)
+			for _, file := range files {
+				a.AddSyntax(file)
+			}
+			val := ctx.BuildInstance(a)
+			qt.Assert(t, qt.IsNil(val.Err()))
 		}
 
 		for _, f := range files {

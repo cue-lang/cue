@@ -168,16 +168,19 @@ func (z *sanitizer) markUsed(s *scope, n *ast.Ident) bool {
 }
 
 func (z *sanitizer) cleanImports() {
-	z.file.VisitImports(func(d *ast.ImportDecl) {
-		k := 0
-		for _, s := range d.Specs {
-			if _, ok := z.referenced[s]; ok {
-				d.Specs[k] = s
-				k++
+	var fileImports []*ast.ImportSpec
+	z.file.VisitImports(func(decl *ast.ImportDecl) {
+		newLen := 0
+		for _, spec := range decl.Specs {
+			if _, ok := z.referenced[spec]; ok {
+				fileImports = append(fileImports, spec)
+				decl.Specs[newLen] = spec
+				newLen++
 			}
 		}
-		d.Specs = d.Specs[:k]
+		decl.Specs = decl.Specs[:newLen]
 	})
+	z.file.Imports = fileImports
 }
 
 func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {

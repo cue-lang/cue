@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cadba825_6bc5821e",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 456,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-07-24T16:00:04Z",
+      "side": 1,
+      "message": "Yep, this is really necessary sadly - the arc.group pointer must be shared into other structs.",
+      "revId": "b9efe905a1647c5b8ba6aebcd754152b2d5c8ccb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

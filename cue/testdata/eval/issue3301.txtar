@@ -1,0 +1,77 @@
+-- in.cue --
+object: #Leaf & {}
+
+#Base: {
+	extra?: {...}
+}
+
+#Mid: {
+	#Base
+}
+
+#Leaf: {
+	#Mid
+	extra?:  {...}
+	more?: int
+	if extra.foo != _|_ {
+		if more != _|_ {
+			foo: "bar"
+		}
+	}
+}
+-- out/eval --
+(struct){
+  object: (#struct){
+    extra?: (#struct){
+    }
+    more?: (int){ int }
+  }
+  #Base: (#struct){
+    extra?: (#struct){
+    }
+  }
+  #Mid: (#struct){
+    extra?: (#struct){
+    }
+  }
+  #Leaf: (#struct){
+    extra?: (#struct){
+    }
+    more?: (int){ int }
+  }
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  11
+Reused: 5
+Allocs: 6
+Retain: 7
+
+Unifications: 11
+Conjuncts:    25
+Disjuncts:    18
+-- out/compile --
+--- in.cue
+{
+  object: (〈0;#Leaf〉 & {})
+  #Base: {
+    extra?: {
+      ...
+    }
+  }
+  #Mid: {
+    〈1;#Base〉
+  }
+  #Leaf: {
+    〈1;#Mid〉
+    extra?: {
+      ...
+    }
+    more?: int
+    if (〈0;extra〉.foo != _|_(explicit error (_|_ literal) in source)) {
+      if (〈1;more〉 != _|_(explicit error (_|_ literal) in source)) {
+        foo: "bar"
+      }
+    }
+  }
+}

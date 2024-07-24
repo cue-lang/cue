@@ -16,6 +16,24 @@
       "message": "Did you manage to find all instances of TypeOf, and x :\u003d x, or is this just a first pass through?",
       "revId": "0d310ac945411da7a60465302092d306b924fcf0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "678bf0cd_19d5a558",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-24T15:56:51Z",
+      "side": 1,
+      "message": "I skimmed all occurrences I could find via a regular expression, so I\u0027m fairly confident this is all of them. But if I missed one or two it\u0027s fine, as this is just minor cleanup in bulk.",
+      "parentUuid": "5d724b29_96c1c261",
+      "revId": "0d310ac945411da7a60465302092d306b924fcf0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

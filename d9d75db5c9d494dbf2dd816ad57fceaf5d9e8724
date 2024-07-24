@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d241efd_e2b68c33",
+        "filename": "cue/ast/astutil/sanitize.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-24T15:54:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3adda3b6_c44a62d2",
+      "revId": "d9d75db5c9d494dbf2dd816ad57fceaf5d9e8724",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dcf57e4f_04f35216",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-07-24T15:51:58Z",
       "side": 1,
       "message": "I think the comment above this line should now be removed.",
+      "revId": "d9d75db5c9d494dbf2dd816ad57fceaf5d9e8724",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "36c8ae5b_ca546bdc",
+        "filename": "tools/trim/trim_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-24T15:54:48Z",
+      "side": 1,
+      "message": "Hm, it\u0027s still valid, because we don\u0027t require a nil error like most tests. but we do check the error value for later use. I\u0027ll update the comment.",
+      "parentUuid": "dcf57e4f_04f35216",
       "revId": "d9d75db5c9d494dbf2dd816ad57fceaf5d9e8724",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -433,17 +433,28 @@ func (cc *closeContext) linkNotify(ctx *OpContext, dst *Vertex, key *closeContex
 func (cc *closeContext) assignConjunct(ctx *OpContext, root *closeContext, c Conjunct, mode ArcType, check, checkClosed bool) (arc *closeContext, pos int, added bool) {
 	arc = cc.getKeyedCC(ctx, root, c.CloseInfo.CycleInfo, mode, checkClosed)
 
-	pos = len(*arc.group)
-
 	c.CloseInfo.cc = nil
-	added = !check || !hasConjunct(*arc.group, c)
+
+	var group ConjunctGroup
+	if arc.group != nil {
+		group = *arc.group
+	}
+	pos = len(group)
+
+	added = !check || !hasConjunct(group, c)
 	if added {
 		c.CloseInfo.cc = arc
 
 		if c.CloseInfo.cc.src != arc.src {
 			panic("Inconsistent src")
 		}
-		*arc.group = append(*arc.group, c)
+
+		group = append(group, c)
+		if arc.group == nil {
+			arc.group = &group
+		} else {
+			*arc.group = group
+		}
 	}
 
 	return arc, pos, added

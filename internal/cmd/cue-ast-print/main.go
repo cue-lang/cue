@@ -66,8 +66,8 @@ func (d *debugPrinter) newline() {
 }
 
 var (
-	typeTokenPos   = reflect.TypeOf((*token.Pos)(nil)).Elem()
-	typeTokenToken = reflect.TypeOf((*token.Token)(nil)).Elem()
+	typeTokenPos   = reflect.TypeFor[token.Pos]()
+	typeTokenToken = reflect.TypeFor[token.Token]()
 )
 
 func (d *debugPrinter) value(v reflect.Value) {

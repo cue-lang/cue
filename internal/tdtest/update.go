@@ -81,7 +81,7 @@ func (s *set[T]) getInfo(file string) *info {
 	}
 	info := &info{
 		t:       s.t,
-		tcType:  reflect.TypeOf(new(T)).Elem(),
+		tcType:  reflect.TypeFor[T](),
 		calls:   make(map[token.Position]*callInfo),
 		patches: make(map[ast.Node]ast.Expr),
 	}

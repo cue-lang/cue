@@ -1,5 +1,5 @@
 # Test what happens when there is an error an embedded file.
-# TODO the error should mention the name of the file where the error is.
+# The error should mention the name of the file where the error is.
 
 env CUE_EXPERIMENT=embed
 ! exec cue vet
@@ -12,6 +12,7 @@ cmp stderr want-stderr
 -- want-stderr --
 @embed: invalid string:
     ./x.cue:5:6
+    schema.json:10:7
 -- cue.mod/module.cue --
 module: "test.example"
 language: version: "v0.9.2"

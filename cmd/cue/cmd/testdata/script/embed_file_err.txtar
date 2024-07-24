@@ -1,0 +1,32 @@
+env CUE_EXPERIMENT=embed
+! exec cue vet
+cmp stderr want-stderr
+
+-- want-stderr --
+@embed: invalid string:
+    ./x.cue:5:6
+-- cue.mod/module.cue --
+module: "test.example"
+language: version: "v0.9.2"
+-- x.cue --
+@extern(embed)
+
+package x
+
+e: _ @embed(glob="*.json",type=jsonschema)
+
+-- schema.json --
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "additionalProperties": false,
+  "id": "https://example.test/example",
+  "required": ["x"],
+  "title": "example jsonschema",
+  "type": "object",
+  "properties": {
+    "x": {
+      "description": true,
+      "type": "number"
+    }
+  }
+}

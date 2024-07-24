@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d724b29_96c1c261",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-07-24T15:55:13Z",
+      "side": 1,
+      "message": "Did you manage to find all instances of TypeOf, and x :\u003d x, or is this just a first pass through?",
+      "revId": "0d310ac945411da7a60465302092d306b924fcf0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

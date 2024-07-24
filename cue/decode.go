@@ -76,7 +76,7 @@ func (d *decoder) clear(x reflect.Value) {
 	}
 }
 
-var valueType = reflect.TypeOf(Value{})
+var valueType = reflect.TypeFor[Value]()
 
 func (d *decoder) decode(x reflect.Value, v Value, isPtr bool) {
 	if !x.IsValid() {
@@ -310,7 +310,7 @@ func (d *decoder) interfaceValue(v Value) (x interface{}) {
 	return x
 }
 
-var textUnmarshalerType = reflect.TypeOf((*encoding.TextUnmarshaler)(nil)).Elem()
+var textUnmarshalerType = reflect.TypeFor[encoding.TextUnmarshaler]()
 
 // convertMap keeps an existing map and overwrites any entry found in v,
 // keeping other preexisting entries.

@@ -526,7 +526,6 @@ func (ld *loader) resolveMissingImports(ctx context.Context, pkgs *modpkgload.Pa
 	var pkgMods []pkgMod
 	work := par.NewQueue(runtime.GOMAXPROCS(0))
 	for _, pkg := range pkgs.All() {
-		pkg := pkg
 		if pkg.Error() == nil {
 			continue
 		}
@@ -689,7 +688,6 @@ func (ld *loader) spotCheckRoots(ctx context.Context, rs *modrequirements.Requir
 
 	work := par.NewQueue(runtime.GOMAXPROCS(0))
 	for m := range mods {
-		m := m
 		work.Add(func() {
 			if ctx.Err() != nil {
 				return

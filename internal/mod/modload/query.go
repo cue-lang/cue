@@ -95,7 +95,6 @@ func (ld *loader) queryLatestModules(ctx context.Context, pkgPath string, rs *mo
 	)
 	logf("initial module path %q", parts.Path)
 	for prefix := parts.Path; prefix != "."; prefix = path.Dir(prefix) {
-		prefix := prefix
 		work.Add(func() {
 			v, err := latestModuleForPrefix(prefix)
 			mu.Lock()

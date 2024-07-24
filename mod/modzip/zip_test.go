@@ -227,7 +227,6 @@ func TestCheckFiles(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, testPath := range testPaths {
-		testPath := testPath
 		name := strings.TrimSuffix(filepath.Base(testPath), ".txt")
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
@@ -281,7 +280,6 @@ func TestCheckDir(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, testPath := range testPaths {
-		testPath := testPath
 		name := strings.TrimSuffix(filepath.Base(testPath), ".txt")
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
@@ -332,7 +330,6 @@ func TestCheckZip(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, testPath := range testPaths {
-		testPath := testPath
 		name := strings.TrimSuffix(filepath.Base(testPath), ".txt")
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
@@ -383,7 +380,6 @@ func TestCreate(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, testInfo := range testInfos {
-		testInfo := testInfo
 		base := filepath.Base(testInfo.Name())
 		if filepath.Ext(base) != ".txt" {
 			continue
@@ -470,7 +466,6 @@ func TestCreateFromDir(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, testInfo := range testInfos {
-		testInfo := testInfo
 		base := filepath.Base(testInfo.Name())
 		if filepath.Ext(base) != ".txt" {
 			continue
@@ -749,7 +744,6 @@ func TestCreateSizeLimits(t *testing.T) {
 	})
 
 	for _, test := range tests {
-		test := test
 		t.Run(test.desc, func(t *testing.T) {
 			t.Parallel()
 
@@ -786,7 +780,6 @@ func TestUnzipSizeLimits(t *testing.T) {
 	}
 	t.Parallel()
 	for _, test := range sizeLimitTests {
-		test := test
 		t.Run(test.desc, func(t *testing.T) {
 			t.Parallel()
 			tmpZipFile := tempFile(t, "tmp.zip")
@@ -931,7 +924,6 @@ func TestUnzipSizeLimitsSpecial(t *testing.T) {
 			wantErr: "not a valid zip file",
 		},
 	} {
-		test := test
 		t.Run(test.desc, func(t *testing.T) {
 			t.Parallel()
 

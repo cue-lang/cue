@@ -560,8 +560,8 @@ func convertGoType(ctx *adt.OpContext, t reflect.Type) adt.Expr {
 }
 
 var (
-	jsonMarshaler = reflect.TypeOf(new(json.Marshaler)).Elem()
-	textMarshaler = reflect.TypeOf(new(encoding.TextMarshaler)).Elem()
+	jsonMarshaler = reflect.TypeFor[json.Marshaler]()
+	textMarshaler = reflect.TypeFor[encoding.TextMarshaler]()
 	topSentinel   = ast.NewIdent("_")
 )
 

@@ -1,6 +1,57 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "58b235a0_0002dadd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-25T08:33:55Z",
+      "side": 1,
+      "message": "nit: the package is internal/core/adt",
+      "revId": "b9efe905a1647c5b8ba6aebcd754152b2d5c8ccb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96ca3636_74015bcf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-25T08:33:55Z",
+      "side": 1,
+      "message": "Try to write the commit message as plain english, that is, without \"problem\" and \"solution\" sections. Here are two recent examples:\n\nhttps://review.gerrithub.io/c/cue-lang/cue/+/1198299\nhttps://review.gerrithub.io/c/cue-lang/cue/+/1198351",
+      "revId": "b9efe905a1647c5b8ba6aebcd754152b2d5c8ccb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d34a975e_24300b45",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-25T08:33:55Z",
+      "side": 1,
+      "message": "I don\u0027t see anything wrong here per se, but I also think Marcel is the only one able to properly review this. It\u0027s possible that this fix is correct and closeContext.group can be nil, but it\u0027s also possible that it should never be nil and we\u0027re violating some sort of assumption about what information must be available normally.\n\nEither way it would also be good for closeContext.group to be documented. As a pointer to a slice, we should document:\n* is it shared?\n* can it be nil?\n\nI\u0027d suggest bringing up this patch with him next time you speak to him - probably tomorrow.",
+      "revId": "b9efe905a1647c5b8ba6aebcd754152b2d5c8ccb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "cadba825_6bc5821e",
@@ -14,6 +65,24 @@
       "writtenOn": "2024-07-24T16:00:04Z",
       "side": 1,
       "message": "Yep, this is really necessary sadly - the arc.group pointer must be shared into other structs.",
+      "revId": "b9efe905a1647c5b8ba6aebcd754152b2d5c8ccb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c43d922_02090814",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 456,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-25T08:33:55Z",
+      "side": 1,
+      "message": "that makes sense - otherwise the field would be a slice rather than a pointer to a slice.",
+      "parentUuid": "cadba825_6bc5821e",
       "revId": "b9efe905a1647c5b8ba6aebcd754152b2d5c8ccb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

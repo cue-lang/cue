@@ -15,10 +15,8 @@ exists cpu.out
 exists mem.out
 
 # The flags should still work with 'cue cmd', which runs a command within a command.
-# TODO: this is currently broken, as we try to start pprof twice.
 rm cpu.out
-! exec cue cmd --cpuprofile=cpu.out hello
-stderr 'cpu profiling already in use'
+exec cue cmd --cpuprofile=cpu.out hello
 go tool pprof -top cpu.out
 stdout 'Type: cpu'
 

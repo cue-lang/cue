@@ -16,6 +16,24 @@
       "message": "oof, nice catch, this was super confusing.",
       "revId": "8145bdd3b238d888870ec43955137121eba07e89",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c744b9d5_544e3618",
+        "filename": "cmd/cue/cmd/testdata/script/help.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-07-26T10:00:17Z",
+      "side": 0,
+      "message": "I considered updating the `mod` summary text as well, to align it somehow, but given that this CL started with me noticing a \"fechtes\" typo in `cue help get`, doing so felt like a bit of a stretch :-)",
+      "parentUuid": "ef32f3a8_686c6c1e",
+      "revId": "8145bdd3b238d888870ec43955137121eba07e89",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

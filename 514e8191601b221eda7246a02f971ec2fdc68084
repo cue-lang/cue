@@ -16,6 +16,24 @@
       "message": "nit: `cmd/cue/get` is not a package, just say `cmd/cue` and mention \"get\" in the sentence afterwards.",
       "revId": "514e8191601b221eda7246a02f971ec2fdc68084",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "64d66fcf_2f9a32df",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-07-26T10:00:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e23caf87_7fef1242",
+      "revId": "514e8191601b221eda7246a02f971ec2fdc68084",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

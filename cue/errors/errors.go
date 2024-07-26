@@ -223,7 +223,7 @@ func (e *wrapped) Msg() (format string, args []interface{}) {
 }
 
 func (e *wrapped) Path() []string {
-	if p := Path(e.main); p != nil {
+	if p := e.main.Path(); p != nil {
 		return p
 	}
 	return Path(e.wrap)

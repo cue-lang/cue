@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b52bce8_ac9f023b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-07-26T13:56:28Z",
+      "side": 1,
+      "message": "Requesting early review on this. This change fixes the issue, but causes a lot of tests to fail, so I would like confirmation that this approach is acceptable before going through and updating expected test results.",
+      "revId": "06016f89e068481de7ea5a5a7571f045c5ecce19",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

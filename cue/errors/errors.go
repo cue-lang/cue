@@ -272,6 +272,14 @@ func (e *posError) Path() []string              { return nil }
 func (e *posError) InputPositions() []token.Pos { return nil }
 func (e *posError) Position() token.Pos         { return e.pos }
 
+func (e *posError) Error() string {
+	if e.pos == token.NoPos {
+		return e.Message.Error()
+	} else {
+		return fmt.Sprintf("at %s: %s", e.Position(), e.Message.Error())
+	}
+}
+
 // Append combines two errors, flattening Lists as necessary.
 func Append(a, b Error) Error {
 	switch x := a.(type) {

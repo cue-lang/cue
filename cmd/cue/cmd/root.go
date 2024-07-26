@@ -85,8 +85,18 @@ type Stats struct {
 	}
 }
 
+var hasRunCommand bool
+
 func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 	return func(cmd *cobra.Command, args []string) error {
+		// The init work below should only happen once per cmd/cue invocation;
+		// if it happens twice, we'll misbehave by writing stats twice
+		// or miscalculating pprof and stats numbers.
+		if hasRunCommand {
+			panic("cmd/cue/cmd.mkRunE init ran twice")
+		}
+		hasRunCommand = true
+
 		c.Command = cmd
 
 		statsEnc, err := statsEncoder(c)

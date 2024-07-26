@@ -136,13 +136,15 @@ func customCommand(c *Command, typ, name string, tools *cue.Instance) (*cobra.Co
 		Use:   usage,
 		Short: lookupString(o, "$short", short),
 		Long:  lookupString(o, "$long", long),
-		RunE: mkRunE(c, func(cmd *Command, args []string) error {
+		// Note that we don't use mkRunE here, as the parent func is already wrapped by
+		// another mkRunE call, and all Command initialization has already happened.
+		RunE: func(cmd *cobra.Command, args []string) error {
 			// TODO:
 			// - parse flags and env vars
 			// - constrain current config with config section
 
-			return doTasks(cmd, name, tools)
-		}),
+			return doTasks(c, name, tools)
+		},
 	}
 
 	// TODO: implement var/flag handling.

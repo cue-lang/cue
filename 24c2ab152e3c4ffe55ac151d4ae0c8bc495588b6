@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8df391f6_29253d7c",
+        "filename": "cmd/cue/cmd/testdata/script/embed_file_err.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-26T11:34:28Z",
+      "side": 1,
+      "message": "given that the name of this test is embed_file_err, do we also want to check other commands like `cue export` or `cue def`?",
+      "revId": "24c2ab152e3c4ffe55ac151d4ae0c8bc495588b6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

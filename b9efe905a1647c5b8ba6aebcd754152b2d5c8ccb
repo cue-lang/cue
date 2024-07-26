@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "81348e21_bdb3e45e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-07-26T13:58:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "58b235a0_0002dadd",
+      "revId": "b9efe905a1647c5b8ba6aebcd754152b2d5c8ccb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "96ca3636_74015bcf",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-07-25T08:33:55Z",
       "side": 1,
       "message": "Try to write the commit message as plain english, that is, without \"problem\" and \"solution\" sections. Here are two recent examples:\n\nhttps://review.gerrithub.io/c/cue-lang/cue/+/1198299\nhttps://review.gerrithub.io/c/cue-lang/cue/+/1198351",
+      "revId": "b9efe905a1647c5b8ba6aebcd754152b2d5c8ccb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "47de5439_f66a6586",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-07-26T13:58:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "96ca3636_74015bcf",
       "revId": "b9efe905a1647c5b8ba6aebcd754152b2d5c8ccb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

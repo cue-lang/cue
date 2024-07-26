@@ -16,6 +16,40 @@
       "message": "PTAL.",
       "revId": "99e20ad593cfa70614a06704b4c9d90b3be2def0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ccececfe_018cfaf9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-26T08:41:13Z",
+      "side": 1,
+      "message": "you might need to run `go generate` to appease CI.",
+      "revId": "99e20ad593cfa70614a06704b4c9d90b3be2def0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d0e418d_c3c22e36",
+        "filename": "cmd/cue/cmd/get.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-26T08:41:13Z",
+      "side": 1,
+      "message": "please be consistent with how existing help sections suggest other help sections, e.g. the end of `cue help modules`:\n\n```\nFor information on how to specify the CUE registry:\n\n\tcue help registryconfig\n```\n\nI also think that you should only suggest `cue help modules` here as an entrypoint to CUE modules, and then `cue help modules` should itself suggest `cue help mod` to see the commands that operate on CUE modules.",
+      "revId": "99e20ad593cfa70614a06704b4c9d90b3be2def0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

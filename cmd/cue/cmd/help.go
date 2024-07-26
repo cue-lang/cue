@@ -286,6 +286,10 @@ For a detailed reference on modules:
 
 	https://cuelang.org/docs/reference/modules/
 
+For information on commands that interact with modules:
+
+    cue help mod
+
 For tutorials on how to use the Central Registry, see:
 
 	https://cuelang.org/docs/tutorial/working-with-the-central-registry/

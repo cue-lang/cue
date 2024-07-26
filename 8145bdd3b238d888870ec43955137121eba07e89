@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef32f3a8_686c6c1e",
+        "filename": "cmd/cue/cmd/testdata/script/help.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-26T09:40:44Z",
+      "side": 0,
+      "message": "oof, nice catch, this was super confusing.",
+      "revId": "8145bdd3b238d888870ec43955137121eba07e89",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

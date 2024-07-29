@@ -334,7 +334,7 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 		if s := m.Name(); s != cuetdtest.DefaultVersion {
 			test.Name += "-" + s
 		}
-		test.run(t, func(tc *Test) {
+		test.run(m.T, func(tc *Test) {
 			tc.M = m
 			f(tc)
 		})
@@ -379,8 +379,9 @@ func (x *TxTarTest) run(t *testing.T, f func(tc *Test)) {
 
 			f(tc)
 
-			// Unconditionally output as an error.
-			t.Error(tc.buf.String())
+			// Unconditionally log the output and fail.
+			t.Log(tc.buf.String())
+			t.Error("DebugArchive tests always fail")
 		})
 		return
 	}

@@ -23,7 +23,7 @@ import (
 	"github.com/go-quicktest/qt"
 	gotoml "github.com/pelletier/go-toml/v2"
 
-	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/encoding/toml"
@@ -729,6 +729,9 @@ line two.\
 			}
 			qt.Assert(t, qt.IsNil(err))
 
+			file, err := astutil.ToFile(node)
+			qt.Assert(t, qt.IsNil(err))
+
 			node2, err := dec.Decode()
 			qt.Assert(t, qt.IsNil(node2))
 			qt.Assert(t, qt.Equals(err, io.EOF))
@@ -736,7 +739,7 @@ line two.\
 			wantFormatted, err := format.Source([]byte(test.wantCUE))
 			qt.Assert(t, qt.IsNil(err), qt.Commentf("wantCUE:\n%s", test.wantCUE))
 
-			formatted, err := format.Node(node)
+			formatted, err := format.Node(file)
 			qt.Assert(t, qt.IsNil(err))
 			t.Logf("CUE:\n%s", formatted)
 			qt.Assert(t, qt.Equals(string(formatted), string(wantFormatted)))
@@ -745,7 +748,7 @@ line two.\
 			ctx := cuecontext.New()
 			// TODO(mvdan): cue.Context can only build ast.Expr or ast.File, not ast.Node;
 			// it's then likely not the right choice for the interface to return ast.Node.
-			val := ctx.BuildFile(node.(*ast.File))
+			val := ctx.BuildFile(file)
 			qt.Assert(t, qt.IsNil(val.Err()))
 			qt.Assert(t, qt.IsNil(val.Validate()))
 

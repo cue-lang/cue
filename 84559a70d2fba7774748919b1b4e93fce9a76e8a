@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e39b5773_25b361b4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-29T16:21:34Z",
+      "side": 1,
+      "message": "LGTM modulo one potential simplification.",
+      "revId": "84559a70d2fba7774748919b1b4e93fce9a76e8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fdfe2f14_420d62ea",
+        "filename": "encoding/toml/encode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-29T16:21:34Z",
+      "side": 1,
+      "message": "Maybe comment saying why we can\u0027t just use ```\nvar val any\nerr :\u003d e.Decode(\u0026val)\n```",
+      "revId": "84559a70d2fba7774748919b1b4e93fce9a76e8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

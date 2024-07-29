@@ -764,6 +764,23 @@ line two.\
 			qt.Assert(t, qt.IsNil(err))
 			t.Logf("json.Marshal via CUE:\t%s\n", jsonCUE)
 			qt.Assert(t, qt.JSONEquals(jsonCUE, unmarshalTOML))
+
+			// Ensure that the decoded CUE can be re-encoded as TOML,
+			// and the resulting TOML is still JSON-equivalent.
+			t.Run("reencode", func(t *testing.T) {
+				sb := new(strings.Builder)
+				enc := toml.NewEncoder(sb)
+
+				err := enc.Encode(val)
+				qt.Assert(t, qt.IsNil(err))
+				cueTOML := sb.String()
+				t.Logf("reencoded TOML:\n%s", cueTOML)
+
+				var unmarshalCueTOML any
+				err = gotoml.Unmarshal([]byte(cueTOML), &unmarshalCueTOML)
+				qt.Assert(t, qt.IsNil(err))
+				qt.Assert(t, qt.JSONEquals(jsonCUE, unmarshalCueTOML))
+			})
 		})
 	}
 }

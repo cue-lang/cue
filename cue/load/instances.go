@@ -104,17 +104,24 @@ func Instances(args []string, c *Config) []*build.Instance {
 	if err != nil {
 		return []*build.Instance{c.newErrInstance(err)}
 	}
-	pkgs, err := loadPackages(ctx, c, expandedPaths, otherFiles, tg)
-	if err != nil {
-		return []*build.Instance{c.newErrInstance(err)}
+
+	var pkgs *modpkgload.Packages
+	if !c.NoImports {
+		pkgs, err = loadPackages(ctx, c, expandedPaths, otherFiles, tg)
+		if err != nil {
+			return []*build.Instance{c.newErrInstance(err)}
+		}
 	}
 	l := newLoader(c, tg, pkgs)
 
 	if c.Context == nil {
-		c.Context = build.NewContext(
-			build.Loader(l.loadFunc),
+		opts := []build.Option{
 			build.ParseFile(c.ParseFile),
-		)
+		}
+		if f := l.loadFunc(); l != nil {
+			opts = append(opts, build.Loader(f))
+		}
+		c.Context = build.NewContext(opts...)
 	}
 
 	a := []*build.Instance{}

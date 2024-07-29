@@ -249,6 +249,12 @@ type Config struct {
 	// a package.
 	Tools bool
 
+	// SkipImports causes the loading to ignore all imports and dependencies.
+	// The registry will never be consulted. Any external package paths
+	// mentioned on the command line will result in an error.
+	// The [cue/build.Instance.Imports] field will be empty.
+	SkipImports bool
+
 	// If DataFiles is set, the loader includes entries for directories that
 	// have no CUE files, but have recognized data files that could be converted
 	// to CUE.
@@ -376,20 +382,26 @@ func (c Config) complete() (cfg *Config, err error) {
 	} else if !filepath.IsAbs(c.ModuleRoot) {
 		c.ModuleRoot = filepath.Join(c.Dir, c.ModuleRoot)
 	}
-	// Note: if cueexperiment.Flags.Modules _isn't_ set but c.Registry
-	// is, we consider that a good enough hint that modules support
-	// should be enabled and hence don't return an error in that case.
-	if cueexperiment.Flags.Modules && c.Registry == nil {
-		registry, err := modconfig.NewRegistry(&modconfig.Config{
-			Env: c.Env,
-		})
-		if err != nil {
-			// If there's an error in the registry configuration,
-			// don't error immediately, but only when we actually
-			// need to resolve modules.
-			registry = errorRegistry{err}
+	if c.SkipImports {
+		// We should never use the registry in SkipImports mode
+		// but nil it out to be sure.
+		c.Registry = nil
+	} else {
+		// Note: if cueexperiment.Flags.Modules _isn't_ set but c.Registry
+		// is, we consider that a good enough hint that modules support
+		// should be enabled and hence don't return an error in that case.
+		if cueexperiment.Flags.Modules && c.Registry == nil {
+			registry, err := modconfig.NewRegistry(&modconfig.Config{
+				Env: c.Env,
+			})
+			if err != nil {
+				// If there's an error in the registry configuration,
+				// don't error immediately, but only when we actually
+				// need to resolve modules.
+				registry = errorRegistry{err}
+			}
+			c.Registry = registry
 		}
-		c.Registry = registry
 	}
 	if err := c.loadModule(); err != nil {
 		return nil, err

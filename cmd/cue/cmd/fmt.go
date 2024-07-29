@@ -64,20 +64,14 @@ given as explicit arguments.
 					Tools:       true,
 					AllCUEFiles: true,
 					Package:     "*",
+					SkipImports: true,
 				})
 				if len(builds) == 0 {
 					return errors.Newf(token.NoPos, "invalid args")
 				}
-
 				for _, inst := range builds {
 					if err := inst.Err; err != nil {
-						switch {
-						case errors.As(err, new(*load.PackageError)) && len(inst.BuildFiles) != 0:
-							// Ignore package errors if there are files to format.
-						case errors.As(err, new(*load.NoFilesError)):
-						default:
-							return err
-						}
+						return err
 					}
 					for _, file := range inst.BuildFiles {
 						shouldFormat := inst.User || file.Filename == "-" || filepath.Dir(file.Filename) == inst.Dir

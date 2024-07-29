@@ -1,0 +1,28 @@
+# Issue 3329: this failed with a "no dependency found" error.
+
+exec cue fmt ./...
+cmp bar/bar.cue bar.cue.golden
+cmp bar/nonpkg.cue nonpkg.cue.golden
+
+-- bar.cue.golden --
+package bar
+
+x: true
+-- nonpkg.cue.golden --
+import "cue.example/foo/bar"
+
+bar
+-- cue.mod/module.cue --
+module: "cue.example/foo"
+language: {
+	version: "v0.9.0"
+}
+-- bar/bar.cue --
+package bar
+
+   x: true
+
+-- bar/nonpkg.cue --
+import "cue.example/foo/bar"
+
+   bar

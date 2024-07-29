@@ -277,6 +277,20 @@ files:
 imports:
     mod.test/catch: $CWD/testdata/testmod/cue.mod/pkg/mod.test/catch/catch.cue
     mod.test/helper:helper1: $CWD/testdata/testmod/cue.mod/pkg/mod.test/helper/helper1.cue`}, {
+		name: "PackageWithImportsWithNoImportsConfig",
+		cfg: &Config{
+			Dir:       testdataDir,
+			Tools:     true,
+			NoImports: true,
+		},
+		args: []string{"./imports"},
+		want: `path:   mod.test/test/imports@v0
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/imports
+display:./imports
+files:
+    $CWD/testdata/testmod/imports/imports.cue`}, {
 		name: "OnlyToolFiles",
 		cfg:  dirCfg,
 		args: []string{"./toolonly"},

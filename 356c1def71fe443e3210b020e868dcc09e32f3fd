@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee02ae56_2391f57a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-29T16:36:48Z",
+      "side": 1,
+      "message": "```suggestion\nnodes from the parent\u0027s visit state, causing a significant amount\n```",
+      "revId": "356c1def71fe443e3210b020e868dcc09e32f3fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "373d08f1_1ddcfcae",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-29T16:36:48Z",
+      "side": 1,
+      "message": "```suggestion\nof repeated work when Config.Dynamic is true without changing the result.\n```",
+      "revId": "356c1def71fe443e3210b020e868dcc09e32f3fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

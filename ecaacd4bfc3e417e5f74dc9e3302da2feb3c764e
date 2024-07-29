@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab387335_c58ebcae",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-29T14:02:28Z",
+      "side": 1,
+      "message": "perhaps update this:\n\n\u003e Unconditionally log the output and fail.",
+      "revId": "ecaacd4bfc3e417e5f74dc9e3302da2feb3c764e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

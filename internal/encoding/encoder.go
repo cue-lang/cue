@@ -32,6 +32,7 @@ import (
 	"cuelang.org/go/encoding/openapi"
 	"cuelang.org/go/encoding/protobuf/jsonpb"
 	"cuelang.org/go/encoding/protobuf/textproto"
+	"cuelang.org/go/encoding/toml"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/pkg/encoding/yaml"
@@ -194,6 +195,11 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 			_, err = fmt.Fprint(w, str)
 			return err
 		}
+
+	case build.TOML:
+		e.concrete = true
+		enc := toml.NewEncoder(w)
+		e.encValue = enc.Encode
 
 	case build.TextProto:
 		// TODO: verify that the schema is given. Otherwise err out.

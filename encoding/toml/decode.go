@@ -55,7 +55,8 @@ type Decoder struct {
 	seenTableKeys map[rootedKey]bool
 
 	// topFile is the top-level CUE file we are decoding into.
-	topFile *ast.File
+	// TODO(mvdan): make an *ast.File once the decoder returns ast.Node rather than ast.Expr.
+	topFile *ast.StructLit
 
 	// openTableArrays keeps track of all the declared table arrays so that
 	// later headers can append a new table array element, or add a field
@@ -108,7 +109,7 @@ type openTableArray struct {
 // Decode parses the input stream as TOML and converts it to a CUE [*ast.File].
 // Because TOML files only contain a single top-level expression,
 // subsequent calls to this method may return [io.EOF].
-func (d *Decoder) Decode() (ast.Node, error) {
+func (d *Decoder) Decode() (ast.Expr, error) {
 	if d.decoded {
 		return nil, io.EOF
 	}
@@ -122,7 +123,7 @@ func (d *Decoder) Decode() (ast.Node, error) {
 	// Note that if the input is empty the result will be the same
 	// as for an empty table: an empty struct.
 	// The TOML spec and other decoders also work this way.
-	d.topFile = &ast.File{}
+	d.topFile = &ast.StructLit{}
 	for d.parser.NextExpression() {
 		if err := d.nextRootNode(d.parser.Expression()); err != nil {
 			return nil, err
@@ -167,7 +168,7 @@ func (d *Decoder) nextRootNode(tnode *toml.Node) error {
 		if d.currentTable != nil {
 			d.currentTable.Elts = append(d.currentTable.Elts, field)
 		} else {
-			d.topFile.Decls = append(d.topFile.Decls, field)
+			d.topFile.Elts = append(d.topFile.Elts, field)
 		}
 
 	case toml.Table:
@@ -196,7 +197,7 @@ func (d *Decoder) nextRootNode(tnode *toml.Node) error {
 			leafField.Value = d.currentTable
 		} else { // [new_table]
 			topField, leafField := inlineFields(keyElems, token.Newline)
-			d.topFile.Decls = append(d.topFile.Decls, topField)
+			d.topFile.Elts = append(d.topFile.Elts, topField)
 			leafField.Value = d.currentTable
 		}
 		d.currentTableKey = key
@@ -228,7 +229,7 @@ func (d *Decoder) nextRootNode(tnode *toml.Node) error {
 			if array == nil {
 				// [[new_array]] - at the top level
 				topField, leafField := inlineFields(keyElems, token.Newline)
-				d.topFile.Decls = append(d.topFile.Decls, topField)
+				d.topFile.Elts = append(d.topFile.Elts, topField)
 				leafField.Value = list
 			} else {
 				// [[last_array.new_array]] - on the last array element

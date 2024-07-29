@@ -36,15 +36,13 @@ const (
 	CUE         Encoding = "cue"
 	JSON        Encoding = "json"
 	YAML        Encoding = "yaml"
+	TOML        Encoding = "toml"
 	JSONL       Encoding = "jsonl"
 	Text        Encoding = "text"
 	Binary      Encoding = "binary"
 	Protobuf    Encoding = "proto"
 	TextProto   Encoding = "textproto"
 	BinaryProto Encoding = "pb"
-
-	// TODO:
-	// TOML
 
 	Code Encoding = "code" // Programming languages
 )

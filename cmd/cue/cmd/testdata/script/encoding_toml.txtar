@@ -1,0 +1,46 @@
+# Test that the TOML encoding is fully supported in cmd/cue.
+
+exec cue export --out toml .
+cmp stdout export.toml
+
+exec cue export --out json export.toml
+cmp stdout export.json
+
+exec cue import -o - export.toml
+cmp stdout import.cue
+exec cue import -o - toml .
+cmp stdout import.cue
+
+-- export.toml --
+message = 'Hello World!'
+
+[nested]
+a1 = 'one level'
+
+[nested.a2]
+b = 'two levels'
+-- export.json --
+{
+    "message": "Hello World!",
+    "nested": {
+        "a1": "one level",
+        "a2": {
+            "b": "two levels"
+        }
+    }
+}
+-- import.cue --
+message: "Hello World!"
+nested: a1: "one level"
+nested: a2: b: "two levels"
+-- data.cue --
+package hello
+
+_who: "World"
+-- hello.cue --
+package hello
+
+message: "Hello \(_who)!" // who declared in data.cue
+
+nested: a1: "one level"
+nested: a2: b: "two levels"

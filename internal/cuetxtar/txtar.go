@@ -361,6 +361,9 @@ func (x *TxTarTest) run(t *testing.T, f func(tc *Test)) {
 		archive := txtar.Parse([]byte(x.DebugArchive))
 
 		t.Run("", func(t *testing.T) {
+			if len(archive.Files) == 0 {
+				t.Fatal("DebugArchive contained no files.")
+			}
 			tc := &Test{
 				T:       t,
 				Archive: archive,

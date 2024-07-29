@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51e7522b_424237d1",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-29T13:21:40Z",
+      "side": 1,
+      "message": "nit: errors in Go tend to not have punctuation nor capitalization, so avoid the period for consistency",
+      "revId": "16dbb4a96490cb08d550463734b385e3dd3cd4a1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

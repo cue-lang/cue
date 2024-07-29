@@ -92,6 +92,7 @@ modes: input: {
 	extensions: ".json": interpretation: *"auto" | _
 	extensions: ".yaml": interpretation: *"auto" | _
 	extensions: ".yml": interpretation:  *"auto" | _
+	extensions: ".toml": interpretation: *"auto" | _
 }
 
 modes: export: {
@@ -168,6 +169,7 @@ modes: [string]: {
 		".ndjson":    tags.jsonl
 		".yaml":      tags.yaml
 		".yml":       tags.yaml
+		".toml":      tags.toml
 		".txt":       tags.text
 		".go":        tags.go
 		".wasm":      tags.binary
@@ -190,6 +192,11 @@ modes: [string]: {
 		stream:     *false | true
 		docs:       false
 		attributes: false
+	}
+
+	encodings: yaml: {
+		forms.graph
+		stream: false | *true
 	}
 
 	encodings: yaml: {
@@ -332,6 +339,7 @@ tags: {
 	json: encoding:      "json"
 	jsonl: encoding:     "jsonl"
 	yaml: encoding:      "yaml"
+	toml: encoding:      "toml"
 	proto: encoding:     "proto"
 	textproto: encoding: "textproto"
 	// "binpb":  encodings.binproto

@@ -37,6 +37,7 @@ import (
 	"cuelang.org/go/encoding/protobuf"
 	"cuelang.org/go/encoding/protobuf/jsonpb"
 	"cuelang.org/go/encoding/protobuf/textproto"
+	"cuelang.org/go/encoding/toml"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/filetypes"
@@ -246,6 +247,9 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 		b, err := io.ReadAll(r)
 		i.err = err
 		i.next = yaml.NewDecoder(path, b).Decode
+		i.Next()
+	case build.TOML:
+		i.next = toml.NewDecoder(r).Decode
 		i.Next()
 	case build.Text:
 		b, err := io.ReadAll(r)

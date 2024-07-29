@@ -16,6 +16,24 @@
       "message": "nit: the two lines above go just over the usual limit. note that in the gerrit diff preferences, if you enable \"fit to screen\", it shows you vertical bars for the usual line length limits, including commit messages.",
       "revId": "c9b684d2ef72890101491faf09db6a54c0c7b737",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd7dea75_6f3542c2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-29T13:49:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c5e9feae_0182e48e",
+      "revId": "c9b684d2ef72890101491faf09db6a54c0c7b737",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

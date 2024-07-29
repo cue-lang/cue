@@ -35,9 +35,9 @@ type Visitor struct {
 	// Feature is invoked for all field names.
 	Feature func(f adt.Feature, src adt.Node)
 
-	// Before is invoked for all invoked for all nodes in pre-order traversal.
-	// Return false prevents the visitor from visiting the nodes descendant
-	// elements.
+	// Before is invoked for all nodes in pre-order traversal.
+	// Returning false prevents the visitor from visiting the node's
+	// children.
 	Before func(adt.Node) bool
 }
 

@@ -54,6 +54,7 @@ the following modes:
    Mode       Extensions
    json       Look for JSON files (.json, .jsonl, .ldjson).
    yaml       Look for YAML files (.yaml .yml).
+   toml       Look for TOML files (.toml).
    text       Look for text files (.txt).
    binary     Look for files with extensions specified by --ext
               and interpret them as binary.
@@ -267,7 +268,7 @@ Example:
 
 func runImport(cmd *Command, args []string) (err error) {
 	c := &config{
-		fileFilter:     `\.(json|yaml|yml|jsonl|ldjson)$`,
+		fileFilter:     `\.(json|yaml|yml|toml|jsonl|ldjson)$`,
 		interpretation: build.Auto,
 		loadCfg:        &load.Config{DataFiles: true},
 	}
@@ -290,6 +291,8 @@ func runImport(cmd *Command, args []string) (err error) {
 			c.fileFilter = `\.(json|jsonl|ldjson)$`
 		case "yaml":
 			c.fileFilter = `\.(yaml|yml)$`
+		case "toml":
+			c.fileFilter = `\.toml$`
 		case "text":
 			c.fileFilter = `\.txt$`
 		case "binary":

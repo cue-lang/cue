@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0ba7877_1b7ecbc2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-29T13:16:54Z",
+      "side": 1,
+      "message": "how about \"internal/core/walk: clarify Visitor.Before documentation\"? this is a bit more specific, and also doesn\u0027t need a commit message body to slightly elaborate what you\u0027re doing here.",
+      "revId": "f140a8db3ff13ffcc378c81615936e6a1c8624e7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

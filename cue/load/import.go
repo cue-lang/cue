@@ -53,7 +53,7 @@ import (
 //	        is present.
 //	_       anonymous files (which may be marked with _)
 //	*       all packages
-func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
+func (l *loader) importPkg(pos token.Pos, p *build.Instance) (_ret []*build.Instance) {
 	retErr := func(errs errors.Error) []*build.Instance {
 		// XXX: move this loop to ReportError
 		for _, err := range errors.Errors(errs) {
@@ -270,7 +270,14 @@ func setFileSource(cfg *Config, f *build.File) error {
 	return nil
 }
 
-func (l *loader) loadFunc(pos token.Pos, path string) *build.Instance {
+func (l *loader) loadFunc() build.LoadFunc {
+	if l.cfg.NoImports {
+		return nil
+	}
+	return l._loadFunc
+}
+
+func (l *loader) _loadFunc(pos token.Pos, path string) *build.Instance {
 	impPath := importPath(path)
 	if isLocalImport(path) {
 		return l.cfg.newErrInstance(errors.Newf(pos, "relative import paths not allowed (%q)", path))
@@ -293,7 +300,7 @@ func (l *loader) newRelInstance(pos token.Pos, path, pkgName string) *build.Inst
 		panic(fmt.Errorf("non-relative import path %q passed to newRelInstance", path))
 	}
 
-	p := l.cfg.Context.NewInstance(path, l.loadFunc)
+	p := l.cfg.Context.NewInstance(path, l.loadFunc())
 	p.PkgName = pkgName
 	p.DisplayPath = filepath.ToSlash(path)
 	// p.ImportPath = string(dir) // compute unique ID.
@@ -369,7 +376,7 @@ func importPathFromAbsDir(c *Config, absDir string, origPath string) (importPath
 
 func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
 	dir, modPath, err := l.absDirFromImportPath(pos, p)
-	i := l.cfg.Context.NewInstance(dir, l.loadFunc)
+	i := l.cfg.Context.NewInstance(dir, l.loadFunc())
 	i.Err = errors.Append(i.Err, err)
 	i.Dir = dir
 

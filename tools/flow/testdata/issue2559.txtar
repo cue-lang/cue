@@ -1,0 +1,104 @@
+#IgnoreConcrete: true
+#InferTasks: true
+-- in.cue --
+package p
+
+import (
+	"list"
+	"tool/cli"
+)
+
+root: test: cli.Print & { text: "\(len(list.FlattenN(indir1, 10)))" }
+
+indir1: [if len(indir2) > 0 { indir2 }]
+indir2: [if len(indir3) > 0 { indir3 }]
+indir3: [if len(indir4) > 0 { indir4 }]
+indir4: indir5
+indir5: indir6
+indir6: indir7
+indir7: [for i in list.Range(1,20,4) {
+	#pair & {
+		one: n: 0
+		two: n: i
+	}
+}]
+
+#pair: {
+	one: #unit & {
+		n: <25
+	}
+	two: #unit & {
+		n: >=one.n
+		if n == one.n {
+			n: <= one.n
+		}
+	}
+	if two.n > one.n {
+		one: n: 0
+	}
+}
+
+#unit: {
+	n: int
+	#padding: {in: <10, out: "0\(in)"} | {in: >=10, out: "\(in)"}
+	str: (#padding & {in: n}).out
+}
+-- out/run/errors --
+-- out/run/t0 --
+graph TD
+  t0("root.test [Ready]")
+
+-- out/run/t1 --
+graph TD
+  t0("root.test [Terminated]")
+
+-- out/run/t1/value --
+{
+	$id:    "tool/cli.Print"
+	stdout: "foo"
+	text:   "5"
+}
+-- out/run/t1/stats --
+Leaks:  0
+Freed:  262168
+Reused: 262148
+Allocs: 20
+Retain: 352
+
+Unifications: 187362
+Conjuncts:    902602
+Disjuncts:    262432
+-- out/run/stats/totals --
+Leaks:  0
+Freed:  262168
+Reused: 262148
+Allocs: 20
+Retain: 352
+
+Unifications: 187362
+Conjuncts:    902602
+Disjuncts:    262432
+-- out/run/t2 --
+graph TD
+  t0("root.prepare [Terminated]")
+  t1("root.run [Terminated]")
+  t1-->t0
+
+-- out/run/t2/value --
+{
+	$id:    "run"
+	stdout: "foo"
+	env: {
+		input: "foo"
+	}
+}
+-- out/run/t2/stats --
+Leaks:  0
+Freed:  12
+Reused: 12
+Allocs: 0
+Retain: 0
+
+Unifications: 12
+Conjuncts:    20
+Disjuncts:    12

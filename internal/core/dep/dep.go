@@ -129,13 +129,16 @@ type Dependency struct {
 func (d *Dependency) Recurse() {
 	savedAll := d.visitor.all
 	savedTop := d.visitor.top
+	savedMarked := d.visitor.marked
 	d.visitor.all = d.visitor.recurse
 	d.visitor.top = true
+	d.visitor.marked = nil
 
 	d.visitor.visitReusingVisitor(d.Node, false)
 
 	d.visitor.all = savedAll
 	d.visitor.top = savedTop
+	d.visitor.marked = savedMarked
 }
 
 // Import returns the import reference or nil if the reference was within

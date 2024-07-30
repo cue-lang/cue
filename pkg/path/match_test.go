@@ -86,10 +86,9 @@ var matchTests = []MatchTest{
 	{"a[", "x", false, ErrBadPattern},
 	{"a/b[", "x", false, ErrBadPattern},
 	{"*x", "xxx", true, nil},
-	// TODO(mvdan): this should fail; right now "**" happens to behave like "*".
-	{"**", "ab/c", false, nil},
-	{"**/c", "ab/c", true, nil},
-	{"a/b/**", "", false, nil},
+	{"**", "ab/c", false, errStarStarDisallowed},
+	{"**/c", "ab/c", false, errStarStarDisallowed},
+	{"a/b/**", "", false, errStarStarDisallowed},
 	{"\\**", "*ab", true, nil},
 	{"[x**y]", "*", true, nil},
 }

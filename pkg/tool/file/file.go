@@ -21,6 +21,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/task"
+	pkgpath "cuelang.org/go/pkg/path"
 )
 
 func init() {
@@ -109,6 +110,11 @@ func (c *cmdGlob) Run(ctx *task.Context) (res interface{}, err error) {
 	glob := ctx.String("glob")
 	if ctx.Err != nil {
 		return nil, ctx.Err
+	}
+	// Validate that the glob pattern is valid per [pkgpath.Match].
+	// Note that we use Unix escaping semantics so that `\**` is not forbidden.
+	if _, err := pkgpath.Match(glob, "", pkgpath.Unix); err != nil {
+		return nil, err
 	}
 	m, err := filepath.Glob(glob)
 	for i, s := range m {

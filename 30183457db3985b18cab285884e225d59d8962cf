@@ -16,6 +16,24 @@
       "message": "nit: my personal preference would be to use `!\u003d` rather than `\u003e` . Having spent 5 mins reading and thinking about `vertexStatus`, it does look like they are ordered, so I can understand using `\u003e` . But, I can\u0027t find any `status++` or similar - it always seems to be `Vertex.updateStatus(some constant literal)`. So, I would prefer `!\u003d`, and then it\u0027s robust to reordering of the consts (and I think the rest of the code is too).",
       "revId": "30183457db3985b18cab285884e225d59d8962cf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61ce1142_59b8a937",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-30T13:22:08Z",
+      "side": 1,
+      "message": "I\u0027m not sure I agree. This catches negative v.status values (the type is int8), which your code wouldn\u0027t. So either method catches a form of edge case - I don\u0027t think either is particularly superior. I lean towards leaving as is given that I only wanted to clarify the constants.",
+      "parentUuid": "af7de185_c7688d0d",
+      "revId": "30183457db3985b18cab285884e225d59d8962cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -26,6 +26,7 @@ import (
 	"cuelang.org/go/internal/task"
 	"cuelang.org/go/internal/value"
 	"cuelang.org/go/pkg/internal"
+	"github.com/go-quicktest/qt"
 )
 
 func parse(t *testing.T, kind, expr string) cue.Value {
@@ -114,16 +115,31 @@ func TestCreate(t *testing.T) {
 }
 
 func TestGlob(t *testing.T) {
+	// Simple globbing against testdata.
 	v := parse(t, "tool/file.Glob", `{
 		glob: "testdata/input.*"
 	}`)
 	got, err := (*cmdGlob).Run(nil, &task.Context{Obj: v})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if want := map[string]interface{}{"files": []string{"testdata/input.foo"}}; !reflect.DeepEqual(got, want) {
-		t.Errorf("got %v; want %v", got, want)
-	}
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(got, any(map[string]any{"files": []string{"testdata/input.foo"}})))
+
+	// globstar or recursive globbing is not supported.
+	// TODO(mvdan): this should fail; right now "**" happens to behave like "*".
+	v = parse(t, "tool/file.Glob", `{
+		glob: "testdata/**/glob.leaf"
+	}`)
+	got, err = (*cmdGlob).Run(nil, &task.Context{Obj: v})
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(got, any(map[string]any{"files": []string{"testdata/glob1/glob.leaf"}})))
+
+	// Ensure we don't forbid patterns which look like globstar but are not.
+	// Note that we don't forbid `\**` as it only resembles a globstar on Windows.
+	v = parse(t, "tool/file.Glob", `{
+		glob: "testdata/glob1/\\**"
+	}`)
+	got, err = (*cmdGlob).Run(nil, &task.Context{Obj: v})
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(got, any(map[string]any{"files": []string{"testdata/glob1/*.leaf"}})))
 }
 
 func TestMkdir(t *testing.T) {

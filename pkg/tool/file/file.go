@@ -17,10 +17,12 @@ package file
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/task"
+	pkgpath "cuelang.org/go/pkg/path"
 )
 
 func init() {
@@ -109,6 +111,16 @@ func (c *cmdGlob) Run(ctx *task.Context) (res interface{}, err error) {
 	glob := ctx.String("glob")
 	if ctx.Err != nil {
 		return nil, ctx.Err
+	}
+	// Validate that the glob pattern is valid per [pkgpath.Match].
+	// Note that we use the current OS to match the semantics of [filepath.Glob],
+	// and since the APIs in this package are meant to support native paths.
+	os := pkgpath.Unix
+	if runtime.GOOS == "windows" {
+		os = pkgpath.Windows
+	}
+	if _, err := pkgpath.Match(glob, "", os); err != nil {
+		return nil, err
 	}
 	m, err := filepath.Glob(glob)
 	for i, s := range m {

@@ -119,8 +119,8 @@ func (c *Controller) runLoop() {
 			// Recompute the configuration, if necessary.
 			if c.updateValue() {
 				// initTasks was already called in New to catch initialization
-				// errors earlier.
-				c.initTasks()
+				// errors earlier and add stats.
+				c.initTasks(false)
 			}
 
 			c.updateTaskValue(t)

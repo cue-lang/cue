@@ -105,6 +105,16 @@ graph TD
 	b:   3
 	$id: "valToOut"
 }
+-- out/run/t1/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
 -- out/run/t2 --
 graph TD
   t0("root.a [Terminated]")
@@ -133,6 +143,16 @@ graph TD
 	$id:   "valToOut"
 	index: int
 }
+-- out/run/t2/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
 -- out/run/t3 --
 graph TD
   t0("root.a [Terminated]")
@@ -161,6 +181,16 @@ graph TD
 	//cue:path: root.concreteValueInGeneratedSubfield.index
 	let INDEX = int
 }
+-- out/run/t3/stats --
+Leaks:  1
+Freed:  0
+Reused: 0
+Allocs: 1
+Retain: 1
+
+Unifications: 1
+Conjuncts:    1
+Disjuncts:    1
 -- out/run/t4 --
 graph TD
   t0("root.a [Terminated]")
@@ -193,6 +223,16 @@ graph TD
 	//cue:path: root.concreteValueInGeneratedSubfield.index
 	let INDEX = int
 }
+-- out/run/t4/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
 -- out/run/t5 --
 graph TD
   t0("root.a [Terminated]")
@@ -218,6 +258,16 @@ graph TD
 	x:   3
 	$id: "valToOut"
 }
+-- out/run/t5/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
 -- out/run/t6 --
 graph TD
   t0("root.a [Terminated]")
@@ -247,6 +297,16 @@ graph TD
 	$id:        "valToOut"
 	incomplete: _
 }
+-- out/run/t6/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
 -- out/run/t7 --
 graph TD
   t0("root.a [Terminated]")
@@ -277,6 +337,16 @@ graph TD
 	//cue:path: root.indirectTaskRootReference.incomplete
 	let INCOMPLETE = _
 }
+-- out/run/t7/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
 -- out/run/t8 --
 graph TD
   t0("root.a [Terminated]")
@@ -310,6 +380,16 @@ graph TD
 	//cue:path: root.indirectTaskRootReference.incomplete
 	let INCOMPLETE = _
 }
+-- out/run/t8/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
 -- out/run/t9 --
 graph TD
   t0("root.a [Terminated]")
@@ -345,86 +425,6 @@ graph TD
 	//cue:path: root.indirectTaskRootReference.incomplete
 	let INCOMPLETE = _
 }
--- out/run/t1/stats --
-Leaks:  0
-Freed:  0
-Reused: 0
-Allocs: 0
-Retain: 0
-
-Unifications: 0
-Conjuncts:    0
-Disjuncts:    0
--- out/run/t2/stats --
-Leaks:  0
-Freed:  0
-Reused: 0
-Allocs: 0
-Retain: 0
-
-Unifications: 0
-Conjuncts:    0
-Disjuncts:    0
--- out/run/t3/stats --
-Leaks:  0
-Freed:  0
-Reused: 0
-Allocs: 0
-Retain: 0
-
-Unifications: 0
-Conjuncts:    0
-Disjuncts:    0
--- out/run/t4/stats --
-Leaks:  0
-Freed:  0
-Reused: 0
-Allocs: 0
-Retain: 0
-
-Unifications: 0
-Conjuncts:    0
-Disjuncts:    0
--- out/run/t5/stats --
-Leaks:  0
-Freed:  0
-Reused: 0
-Allocs: 0
-Retain: 0
-
-Unifications: 0
-Conjuncts:    0
-Disjuncts:    0
--- out/run/t6/stats --
-Leaks:  0
-Freed:  0
-Reused: 0
-Allocs: 0
-Retain: 0
-
-Unifications: 0
-Conjuncts:    0
-Disjuncts:    0
--- out/run/t7/stats --
-Leaks:  0
-Freed:  0
-Reused: 0
-Allocs: 0
-Retain: 0
-
-Unifications: 0
-Conjuncts:    0
-Disjuncts:    0
--- out/run/t8/stats --
-Leaks:  0
-Freed:  0
-Reused: 0
-Allocs: 0
-Retain: 0
-
-Unifications: 0
-Conjuncts:    0
-Disjuncts:    0
 -- out/run/t9/stats --
 Leaks:  0
 Freed:  0

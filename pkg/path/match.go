@@ -51,13 +51,19 @@ var ErrBadPattern = errors.New("syntax error in pattern")
 //
 // On Windows, escaping is disabled. Instead, '\\' is treated as
 // path separator.
+//
+// A pattern may not contain '**', as a wildcard matching separator characters
+// is not supported at this time.
 func Match(pattern, name string, o OS) (matched bool, err error) {
 	os := getOS(o)
 Pattern:
 	for len(pattern) > 0 {
 		var star bool
 		var chunk string
-		star, chunk, pattern = scanChunk(pattern, os)
+		star, chunk, pattern, err = scanChunk(pattern, os)
+		if err != nil {
+			return false, err
+		}
 		if star && chunk == "" {
 			// Trailing * matches rest of string unless it has a /.
 			return !strings.Contains(name, string(os.Separator)), nil
@@ -99,8 +105,11 @@ Pattern:
 
 // scanChunk gets the next segment of pattern, which is a non-star string
 // possibly preceded by a star.
-func scanChunk(pattern string, os os) (star bool, chunk, rest string) {
+func scanChunk(pattern string, os os) (star bool, chunk, rest string, _ error) {
 	for len(pattern) > 0 && pattern[0] == '*' {
+		if star {
+			return false, "", "", ErrBadPattern
+		}
 		pattern = pattern[1:]
 		star = true
 	}
@@ -126,7 +135,7 @@ Scan:
 			}
 		}
 	}
-	return star, pattern[0:i], pattern[i:]
+	return star, pattern[0:i], pattern[i:], nil
 }
 
 // matchChunk checks whether chunk matches the beginning of s.

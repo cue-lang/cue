@@ -124,13 +124,12 @@ func TestGlob(t *testing.T) {
 	qt.Assert(t, qt.DeepEquals(got, any(map[string]any{"files": []string{"testdata/input.foo"}})))
 
 	// globstar or recursive globbing is not supported.
-	// TODO(mvdan): this should fail; right now "**" happens to behave like "*".
 	v = parse(t, "tool/file.Glob", `{
 		glob: "testdata/**/glob.leaf"
 	}`)
 	got, err = (*cmdGlob).Run(nil, &task.Context{Obj: v})
-	qt.Assert(t, qt.IsNil(err))
-	qt.Assert(t, qt.DeepEquals(got, any(map[string]any{"files": []string{"testdata/glob1/glob.leaf"}})))
+	qt.Assert(t, qt.IsNotNil(err))
+	qt.Assert(t, qt.IsNil(got))
 }
 
 func TestMkdir(t *testing.T) {

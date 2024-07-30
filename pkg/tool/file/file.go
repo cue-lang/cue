@@ -17,6 +17,7 @@ package file
 import (
 	"os"
 	"path/filepath"
+	"strings"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
@@ -109,6 +110,9 @@ func (c *cmdGlob) Run(ctx *task.Context) (res interface{}, err error) {
 	glob := ctx.String("glob")
 	if ctx.Err != nil {
 		return nil, ctx.Err
+	}
+	if strings.Contains(glob, "**") {
+		return nil, filepath.ErrBadPattern
 	}
 	m, err := filepath.Glob(glob)
 	for i, s := range m {

@@ -19,6 +19,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"testing"
 
 	"cuelang.org/go/cue"
@@ -26,6 +27,7 @@ import (
 	"cuelang.org/go/internal/task"
 	"cuelang.org/go/internal/value"
 	"cuelang.org/go/pkg/internal"
+	"github.com/go-quicktest/qt"
 )
 
 func parse(t *testing.T, kind, expr string) cue.Value {
@@ -114,15 +116,47 @@ func TestCreate(t *testing.T) {
 }
 
 func TestGlob(t *testing.T) {
+	// Simple globbing against testdata.
 	v := parse(t, "tool/file.Glob", `{
 		glob: "testdata/input.*"
 	}`)
 	got, err := (*cmdGlob).Run(nil, &task.Context{Obj: v})
-	if err != nil {
-		t.Fatal(err)
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(got, any(map[string]any{"files": []string{"testdata/input.foo"}})))
+
+	// globstar or recursive globbing is not supported.
+	// TODO(mvdan): this should fail; right now "**" happens to behave like "*".
+	v = parse(t, "tool/file.Glob", `{
+		glob: "testdata/**/glob.leaf"
+	}`)
+	got, err = (*cmdGlob).Run(nil, &task.Context{Obj: v})
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(got, any(map[string]any{"files": []string{"testdata/glob1/glob.leaf"}})))
+}
+
+func TestGlobEscapeStar(t *testing.T) {
+	// `\**` is disallowed in a pattern on Windows, as the backslash is a path separator,
+	// hence `**` is treated as a globstar which is not yet supported.
+	// `\**` is allowed on other OSes as the first star is escaped, and only the second
+	// is treated as a wildcard. Thus such a pattern should match a file like `*.test`.
+	dir := t.TempDir()
+	leafFile := filepath.Join(dir, "*.test")
+	if runtime.GOOS != "windows" {
+		err := os.WriteFile(leafFile, nil, 0o666)
+		qt.Assert(t, qt.IsNil(err))
 	}
-	if want := map[string]interface{}{"files": []string{"testdata/input.foo"}}; !reflect.DeepEqual(got, want) {
-		t.Errorf("got %v; want %v", got, want)
+
+	v := parse(t, "tool/file.Glob", `{
+		glob: "`+filepath.ToSlash(dir)+`/\\**"
+	}`)
+	got, err := (*cmdGlob).Run(nil, &task.Context{Obj: v})
+	if runtime.GOOS == "windows" {
+		// TODO(mvdan): this should fail; right now "**" happens to behave like "*".
+		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.DeepEquals(got, any(map[string]any{"files": []string(nil)})))
+	} else {
+		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.DeepEquals(got, any(map[string]any{"files": []string{leafFile}})))
 	}
 }
 

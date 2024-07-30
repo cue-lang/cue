@@ -1,0 +1,71 @@
+#IgnoreConcrete: true
+#InferTasks: true
+-- in.cue --
+package p
+
+import "tool/cli"
+
+root: test: cli.Print & { text: data.str }
+
+data: {
+	str: ({in: 3, out: "0\(in)"}).out
+}
+-- out/run/errors --
+-- out/run/t0 --
+graph TD
+  t0("root.test [Ready]")
+
+-- out/run/t1 --
+graph TD
+  t0("root.test [Terminated]")
+
+-- out/run/t1/value --
+{
+	$id:    "tool/cli.Print"
+	stdout: "foo"
+	text:   "03"
+}
+-- out/run/t1/stats --
+Leaks:  7
+Freed:  15
+Reused: 13
+Allocs: 9
+Retain: 19
+
+Unifications: 20
+Conjuncts:    28
+Disjuncts:    29
+-- out/run/stats/totals --
+Leaks:  8
+Freed:  20
+Reused: 16
+Allocs: 12
+Retain: 24
+
+Unifications: 26
+Conjuncts:    33
+Disjuncts:    38
+-- out/run/t2 --
+graph TD
+  t0("root.prepare [Terminated]")
+  t1("root.run [Terminated]")
+  t1-->t0
+
+-- out/run/t2/value --
+{
+	$id:    "run"
+	stdout: "foo"
+	env: {
+		input: "foo"
+	}
+}
+-- out/run/t2/stats --
+Leaks:  0
+Freed:  12
+Reused: 12
+Allocs: 0
+Retain: 0
+
+Unifications: 12
+Conjuncts:    20
+Disjuncts:    12

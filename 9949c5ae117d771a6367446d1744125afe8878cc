@@ -33,6 +33,24 @@
       "message": "You forgot to remove this line. Also, _maybe_ move the `clone()` up to where the original write to w.Conjuncts happened?",
       "revId": "9949c5ae117d771a6367446d1744125afe8878cc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6bf2f7c6_d5b2394a",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 737,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-30T13:24:07Z",
+      "side": 1,
+      "message": "oops, nice catch. and done.",
+      "parentUuid": "5a0d1fcf_defd2e61",
+      "revId": "9949c5ae117d771a6367446d1744125afe8878cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

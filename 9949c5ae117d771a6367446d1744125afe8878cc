@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e3d9e0b_e5cdf6da",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-07-30T13:06:30Z",
+      "side": 1,
+      "message": "One oversight to fix, but otherwise LGTM.",
+      "revId": "9949c5ae117d771a6367446d1744125afe8878cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a0d1fcf_defd2e61",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 737,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-07-30T13:06:30Z",
+      "side": 1,
+      "message": "You forgot to remove this line. Also, _maybe_ move the `clone()` up to where the original write to w.Conjuncts happened?",
+      "revId": "9949c5ae117d771a6367446d1744125afe8878cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

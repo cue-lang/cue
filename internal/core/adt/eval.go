@@ -194,7 +194,7 @@ func (c *OpContext) unify(v *Vertex, flags combinedFlags) {
 		return
 
 	case evaluatingArcs:
-		Assertf(c, v.status > 0, "unexpected status %d", v.status)
+		Assertf(c, v.status > unprocessed, "unexpected status %d", v.status)
 		return
 
 	case 0:
@@ -1787,7 +1787,7 @@ func (n *nodeContext) addVertexConjuncts(c Conjunct, arc *Vertex, inline bool) {
 		closeInfo = closeInfo.SpawnRef(arc, IsDef(x), x)
 	}
 
-	if arc.status == 0 && !inline {
+	if arc.status == unprocessed && !inline {
 		// This is a rare condition, but can happen in certain
 		// evaluation orders. Unfortunately, adding this breaks
 		// resolution of cyclic mutually referring disjunctions. But it

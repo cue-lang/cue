@@ -502,7 +502,7 @@ func clone(v Vertex) Vertex {
 			case finalized:
 				v.Arcs[i] = arc
 
-			case 0:
+			case unprocessed:
 				a := *arc
 				v.Arcs[i] = &a
 

@@ -710,6 +710,34 @@ func regexpLocation(mapper *protocol.Mapper, re string) (protocol.Location, erro
 	return mapper.OffsetLocation(start, end)
 }
 
+// LineCol8Location derives a protocol.Location for the given buffer that
+// starts and ends at the provided line and byte column pairs (both 1-based).
+func (e *Editor) LineCol8Location(bufName string, startLine, startCol, endLine, endCol int) (protocol.Location, error) {
+	e.mu.Lock()
+	buf, ok := e.buffers[bufName]
+	e.mu.Unlock()
+	if !ok {
+		return protocol.Location{}, ErrUnknownBuffer
+	}
+	return lineCol8Location(buf.mapper, startLine, startCol, endLine, endCol)
+}
+
+func lineCol8Location(m *protocol.Mapper, startLine, startCol, endLine, endCol int) (protocol.Location, error) {
+	// Build a range
+	startPos, err := m.LineCol8Position(startLine, startCol)
+	if err != nil {
+		return protocol.Location{}, err
+	}
+	endPos, err := m.LineCol8Position(endLine, endCol)
+	if err != nil {
+		return protocol.Location{}, err
+	}
+	return m.RangeLocation(protocol.Range{
+		Start: startPos,
+		End:   endPos,
+	}), nil
+}
+
 // RegexpSearch returns the Location of the first match for re in the buffer
 // bufName. For convenience, RegexpSearch supports the following two modes:
 //  1. If re has no subgroups, return the position of the match for re itself.

@@ -7,6 +7,8 @@ package integration
 import (
 	"encoding/json"
 	"path"
+	"regexp"
+	"strconv"
 
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol/command"
@@ -126,6 +128,68 @@ func (e *Env) FileContent(name string) string {
 	return e.ReadWorkspaceFile(name)
 }
 
+type lineCol8Location struct {
+	name      string
+	startLine int
+	startCol  int
+	endLine   int
+	endCol    int
+}
+
+var (
+	lineCol8RangeRegexp = regexp.MustCompile(`(.*):(\d+):(\d+)-(\d+):(\d+)$`)
+	lineCol8PointRegexp = regexp.MustCompile(`(.*):(\d+):(\d+)$`)
+)
+
+func parseLineCol8Range(rng string) (file string, startLine, startCol, endLine, endCol int) {
+	var iVals []int
+	if m := lineCol8RangeRegexp.FindStringSubmatch(rng); m != nil {
+		// We have a range file:5:2-4:3
+		iVals = mustParseInts(m[2], m[3], m[4], m[5])
+		return m[1], iVals[0], iVals[1], iVals[2], iVals[3]
+	} else if m := lineCol8PointRegexp.FindStringSubmatch(rng); m != nil {
+		// We just have a point file:5:2
+		iVals = mustParseInts(m[2], m[3])
+		return m[1], iVals[0], iVals[1], iVals[0], iVals[1]
+	}
+	// otherwise we just have a filename
+	return rng, 0, 0, 0, 0
+}
+
+// mustParseInts parses the input strings in to give base 10 int values out. It
+// panics if the strings are not valid integers.
+func mustParseInts(in ...string) (out []int) {
+	for _, s := range in {
+		i, err := strconv.ParseInt(s, 10, 64)
+		if err != nil {
+			panic(err)
+		}
+		out = append(out, int(i))
+	}
+	return
+}
+
+// LineCol8Location derives a protocol.Location for the given file (which may
+// or may not be loaded in the editor) that starts and ends at the provided
+// line and byte column pairs (both 1-based). The format is:
+//
+//	"$startLine:$startCol-$endLine:$endCol"
+//
+// This follows the standard way of addressing a position in a file, extended
+// slightly by the addition of the ending line:col pair, separated by a '-'.
+func (e *Env) LineCol8Location(rng string) protocol.Location {
+	e.T.Helper()
+	file, startLine, startCol, endLine, endCol := parseLineCol8Range(rng)
+	loc, err := e.Editor.LineCol8Location(file, startLine, startCol, endLine, endCol)
+	if err == fake.ErrUnknownBuffer {
+		loc, err = e.Sandbox.Workdir.LineCol8Location(file, startLine, startCol, endLine, endCol)
+	}
+	if err != nil {
+		e.T.Fatalf("LineCol8Location: %v, %v", rng, err)
+	}
+	return loc
+}
+
 // RegexpSearch returns the starting position of the first match for re in the
 // buffer specified by name, calling t.Fatal on any error. It first searches
 // for the position in open buffers, then in workspace files.
@@ -171,6 +235,7 @@ func (e *Env) SaveBufferWithoutActions(name string) {
 // TODO(rfindley): rename this to just 'Definition'.
 func (e *Env) GoToDefinition(loc protocol.Location) []protocol.Location {
 	e.T.Helper()
+
 	locs, err := e.Editor.Definition(e.Ctx, loc)
 	if err != nil {
 		e.T.Fatal(err)

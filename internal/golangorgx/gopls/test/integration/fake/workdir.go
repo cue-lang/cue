@@ -170,6 +170,17 @@ func (w *Workdir) ReadFile(path string) ([]byte, error) {
 
 // RegexpSearch searches the file corresponding to path for the first position
 // matching re.
+func (w *Workdir) LineCol8Location(path string, startLine, startCol, endLine, endCol int) (protocol.Location, error) {
+	content, err := w.ReadFile(path)
+	if err != nil {
+		return protocol.Location{}, err
+	}
+	mapper := protocol.NewMapper(w.URI(path), content)
+	return lineCol8Location(mapper, startLine, startCol, endLine, endCol)
+}
+
+// RegexpSearch searches the file corresponding to path for the first position
+// matching re.
 func (w *Workdir) RegexpSearch(path string, re string) (protocol.Location, error) {
 	content, err := w.ReadFile(path)
 	if err != nil {

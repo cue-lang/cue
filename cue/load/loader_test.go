@@ -564,8 +564,105 @@ path:   ""
 module: ""
 root:   ""
 dir:    ""
-display:""`},
-	}
+display:""`}, {
+		// This test checks that files in parent directories
+		// do not result in irrelevant instances appearing
+		// in the result of Instances.
+		name: "Issue3306",
+		cfg: &Config{
+			Dir:     testdataDir,
+			Package: "*",
+		},
+		args: []string{"./issue3306/..."},
+		want: `path:   mod.test/test/issue3306@v0:_
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/issue3306
+display:./issue3306
+files:
+    $CWD/testdata/testmod/anon.cue
+
+path:   mod.test/test/issue3306@v0:test
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/issue3306
+display:./issue3306
+files:
+    $CWD/testdata/testmod/test.cue
+
+path:   mod.test/test/issue3306@v0:x
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/issue3306
+display:./issue3306
+files:
+    $CWD/testdata/testmod/issue3306/x.cue
+
+path:   mod.test/test/issue3306/a@v0:_
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/issue3306/a
+display:./issue3306/a
+files:
+    $CWD/testdata/testmod/anon.cue
+
+path:   mod.test/test/issue3306/a@v0:a
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/issue3306/a
+display:./issue3306/a
+files:
+    $CWD/testdata/testmod/issue3306/a/a.cue
+
+path:   mod.test/test/issue3306/a@v0:b
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/issue3306/a
+display:./issue3306/a
+files:
+    $CWD/testdata/testmod/issue3306/a/b.cue
+
+path:   mod.test/test/issue3306/a@v0:test
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/issue3306/a
+display:./issue3306/a
+files:
+    $CWD/testdata/testmod/test.cue
+
+path:   mod.test/test/issue3306/a@v0:x
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/issue3306/a
+display:./issue3306/a
+files:
+    $CWD/testdata/testmod/issue3306/x.cue
+    $CWD/testdata/testmod/issue3306/a/x.cue
+
+path:   mod.test/test/issue3306/x@v0:_
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/issue3306/x
+display:./issue3306/x
+files:
+    $CWD/testdata/testmod/anon.cue
+
+path:   mod.test/test/issue3306/x@v0:test
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/issue3306/x
+display:./issue3306/x
+files:
+    $CWD/testdata/testmod/test.cue
+
+path:   mod.test/test/issue3306/x@v0:x
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/issue3306/x
+display:./issue3306/x
+files:
+    $CWD/testdata/testmod/issue3306/x.cue
+    $CWD/testdata/testmod/issue3306/x/x.cue`}}
 	tdtest.Run(t, testCases, func(t *tdtest.T, tc *loadTest) {
 		pkgs := Instances(tc.args, tc.cfg)
 

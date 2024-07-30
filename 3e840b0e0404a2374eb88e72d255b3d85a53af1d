@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78e73a58_63c580aa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-30T07:10:05Z",
+      "side": 1,
+      "message": "remember that this patch also fixes https://github.com/cue-lang/cue/issues/728; perhaps double check with Paul\u0027s testscript there as well",
+      "revId": "3e840b0e0404a2374eb88e72d255b3d85a53af1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2391b619_daa24fc8",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-30T07:10:05Z",
+      "side": 1,
+      "message": "yay!",
+      "revId": "3e840b0e0404a2374eb88e72d255b3d85a53af1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dfd51842_fcca1c8b",
+        "filename": "cue/load/config.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-30T07:10:05Z",
+      "side": 1,
+      "message": "nit: I might call this \"SkipImports\", because otherwise it may seem like you\u0027re forbidding imports rather than ignoring them.",
+      "revId": "3e840b0e0404a2374eb88e72d255b3d85a53af1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09977a7f_9b60baa1",
+        "filename": "cue/load/loader_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-30T07:10:05Z",
+      "side": 1,
+      "message": "is Tools needed for this test?",
+      "revId": "3e840b0e0404a2374eb88e72d255b3d85a53af1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

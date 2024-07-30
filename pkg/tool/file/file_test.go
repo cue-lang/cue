@@ -125,13 +125,12 @@ func TestGlob(t *testing.T) {
 	qt.Assert(t, qt.DeepEquals(got, any(map[string]any{"files": []string{"testdata/input.foo"}})))
 
 	// globstar or recursive globbing is not supported.
-	// TODO(mvdan): this should fail; right now "**" happens to behave like "*".
 	v = parse(t, "tool/file.Glob", `{
 		glob: "testdata/**/glob.leaf"
 	}`)
 	got, err = (*cmdGlob).Run(nil, &task.Context{Obj: v})
-	qt.Assert(t, qt.IsNil(err))
-	qt.Assert(t, qt.DeepEquals(got, any(map[string]any{"files": []string{"testdata/glob1/glob.leaf"}})))
+	qt.Assert(t, qt.IsNotNil(err))
+	qt.Assert(t, qt.Equals(got, nil))
 }
 
 func TestGlobEscapeStar(t *testing.T) {
@@ -151,9 +150,8 @@ func TestGlobEscapeStar(t *testing.T) {
 	}`)
 	got, err := (*cmdGlob).Run(nil, &task.Context{Obj: v})
 	if runtime.GOOS == "windows" {
-		// TODO(mvdan): this should fail; right now "**" happens to behave like "*".
-		qt.Assert(t, qt.IsNil(err))
-		qt.Assert(t, qt.DeepEquals(got, any(map[string]any{"files": []string(nil)})))
+		qt.Assert(t, qt.IsNotNil(err))
+		qt.Assert(t, qt.Equals(got, nil))
 	} else {
 		qt.Assert(t, qt.IsNil(err))
 		qt.Assert(t, qt.DeepEquals(got, any(map[string]any{"files": []string{leafFile}})))

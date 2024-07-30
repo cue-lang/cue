@@ -33,6 +33,24 @@
       "message": "Maybe comment saying why we can\u0027t just use ```\nvar val any\nerr :\u003d e.Decode(\u0026val)\n```",
       "revId": "84559a70d2fba7774748919b1b4e93fce9a76e8a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d70fec1_e8065838",
+        "filename": "encoding/toml/encode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-30T11:41:40Z",
+      "side": 1,
+      "message": "Oops, yes we can, at least for now. The manual code can be resurrected if needed. I\u0027ll likely resurrect it with the second encoder which would keep comments, syntax details, etc.",
+      "parentUuid": "fdfe2f14_420d62ea",
+      "revId": "84559a70d2fba7774748919b1b4e93fce9a76e8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

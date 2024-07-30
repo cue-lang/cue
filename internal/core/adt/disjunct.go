@@ -15,6 +15,8 @@
 package adt
 
 import (
+	"slices"
+
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
@@ -505,9 +507,7 @@ func clone(v Vertex) Vertex {
 			case unprocessed:
 				a := *arc
 				v.Arcs[i] = &a
-
-				a.Conjuncts = make([]Conjunct, len(arc.Conjuncts))
-				copy(a.Conjuncts, arc.Conjuncts)
+				a.Conjuncts = slices.Clone(arc.Conjuncts)
 
 			default:
 				a := *arc
@@ -520,8 +520,7 @@ func clone(v Vertex) Vertex {
 	}
 
 	if a := v.Structs; len(a) > 0 {
-		v.Structs = make([]*StructInfo, len(a))
-		copy(v.Structs, a)
+		v.Structs = slices.Clone(a)
 	}
 
 	return v

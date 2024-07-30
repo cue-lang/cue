@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "01305145_4587d684",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-30T15:58:51Z",
+      "side": 1,
+      "message": "Yeah, I checked with that - it already passes, so no need to add it I think.",
+      "parentUuid": "78e73a58_63c580aa",
+      "revId": "3e840b0e0404a2374eb88e72d255b3d85a53af1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "2391b619_daa24fc8",
         "filename": "cmd/cue/cmd/fmt.go",
         "patchSetId": 3
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e1e8bc52_acddd4b2",
+        "filename": "cue/load/config.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-30T15:58:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dfd51842_fcca1c8b",
+      "revId": "3e840b0e0404a2374eb88e72d255b3d85a53af1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "09977a7f_9b60baa1",
@@ -65,6 +101,24 @@
       "writtenOn": "2024-07-30T07:10:05Z",
       "side": 1,
       "message": "is Tools needed for this test?",
+      "revId": "3e840b0e0404a2374eb88e72d255b3d85a53af1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "142a93c2_0cdaf781",
+        "filename": "cue/load/loader_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-30T15:58:51Z",
+      "side": 1,
+      "message": "Perhaps not strictly, but this is a \"no imports\" version of the previous test, which uses dirCfg which sets Tools, so I think it\u0027s worth keeping that equivalence.",
+      "parentUuid": "09977a7f_9b60baa1",
       "revId": "3e840b0e0404a2374eb88e72d255b3d85a53af1d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

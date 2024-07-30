@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"cmp"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -71,10 +72,7 @@ func defaultConfig() (*config, error) {
 }
 
 func getLang() language.Tag {
-	loc := os.Getenv("LC_ALL")
-	if loc == "" {
-		loc = os.Getenv("LANG")
-	}
+	loc := cmp.Or(os.Getenv("LC_ALL"), os.Getenv("LANG"))
 	loc, _, _ = strings.Cut(loc, ".")
 	return language.Make(loc)
 }

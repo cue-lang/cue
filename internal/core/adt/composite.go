@@ -16,6 +16,7 @@ package adt
 
 import (
 	"fmt"
+	"slices"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
@@ -727,13 +728,12 @@ func (v *Vertex) ToDataAll(ctx *OpContext) *Vertex {
 	w.BaseValue = toDataAll(ctx, w.BaseValue)
 	w.Arcs = arcs
 	w.isData = true
-	w.Conjuncts = make([]Conjunct, len(v.Conjuncts))
+	w.Conjuncts = slices.Clone(v.Conjuncts)
 	// TODO(perf): this is not strictly necessary for evaluation, but it can
 	// hurt performance greatly. Drawback is that it may disable ordering.
 	for _, s := range w.Structs {
 		s.Disable = true
 	}
-	copy(w.Conjuncts, v.Conjuncts)
 	for i, c := range w.Conjuncts {
 		if v, _ := c.x.(Value); v != nil {
 			w.Conjuncts[i].x = toDataAll(ctx, v).(Value)

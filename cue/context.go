@@ -15,6 +15,8 @@
 package cue
 
 import (
+	"cmp"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/build"
@@ -181,10 +183,7 @@ func (c *Context) BuildExpr(x ast.Expr, options ...BuildOption) Value {
 	// and the expression resulting from CompileString differently.
 	astutil.ResolveExpr(x, errFn)
 
-	pkgPath := cfg.ImportPath
-	if pkgPath == "" {
-		pkgPath = anonymousPkg
-	}
+	pkgPath := cmp.Or(cfg.ImportPath, anonymousPkg)
 
 	conjunct, err := compile.Expr(&cfg.Config, r, pkgPath, x)
 	if err != nil {

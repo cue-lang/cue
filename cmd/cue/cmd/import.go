@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"bytes"
+	"cmp"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -415,10 +416,7 @@ func protoMode(b *buildPlan) error {
 func genericMode(cmd *Command, b *buildPlan) error {
 	pkgFlag := flagPackage.String(cmd)
 	for _, pkg := range b.insts {
-		pkgName := pkgFlag
-		if pkgName == "" {
-			pkgName = pkg.PkgName
-		}
+		pkgName := cmp.Or(pkgFlag, pkg.PkgName)
 		// TODO: allow if there is a unique package name.
 		if pkgName == "" && len(b.insts) > 1 {
 			return fmt.Errorf("must specify package name with the -p flag")
@@ -435,10 +433,7 @@ func genericMode(cmd *Command, b *buildPlan) error {
 }
 
 func getFilename(b *buildPlan, f *ast.File, root string, force bool) (filename string, err error) {
-	cueFile := f.Filename
-	if out := flagOutFile.String(b.cmd); out != "" {
-		cueFile = out
-	}
+	cueFile := cmp.Or(flagOutFile.String(b.cmd), f.Filename)
 
 	if cueFile != "-" {
 		switch _, err := os.Stat(cueFile); {

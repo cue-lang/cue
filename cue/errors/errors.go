@@ -398,8 +398,7 @@ func (p list) sanitize() list {
 	if p == nil {
 		return p
 	}
-	a := make(list, len(p))
-	copy(a, p)
+	a := slices.Clone(p)
 	a.RemoveMultiples()
 	return a
 }

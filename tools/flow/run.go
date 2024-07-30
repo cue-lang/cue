@@ -120,7 +120,7 @@ func (c *Controller) runLoop() {
 			if c.updateValue() {
 				// initTasks was already called in New to catch initialization
 				// errors earlier.
-				c.initTasks()
+				c.initTasks(false)
 			}
 
 			c.updateTaskValue(t)

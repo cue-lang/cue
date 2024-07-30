@@ -29,7 +29,7 @@ import (
 // tasks. It can be run multiple times on increasingly more concrete
 // configurations to add more tasks, whereby the task pointers of previously
 // found tasks are preserved.
-func (c *Controller) initTasks() {
+func (c *Controller) initTasks(first bool) {
 	// Clear previous cache.
 	c.nodes = map[*adt.Vertex]*Task{}
 
@@ -47,7 +47,11 @@ func (c *Controller) initTasks() {
 	// Note that the list of tasks may grow as this loop progresses.
 	for i := 0; i < len(c.tasks); i++ {
 		t := c.tasks[i]
+		start := *c.opCtx.Stats()
 		c.markTaskDependencies(t, t.vertex())
+		if first {
+			t.stats.Add(c.opCtx.Stats().Since(start))
+		}
 	}
 
 	// Check if there are cycles in the task dependencies.

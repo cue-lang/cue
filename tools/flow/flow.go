@@ -242,8 +242,7 @@ func New(cfg *Config, inst cue.InstanceOrValue, f TaskFunc) *Controller {
 	if cfg != nil {
 		c.cfg = *cfg
 	}
-
-	c.initTasks()
+	c.initTasks(true)
 	return c
 
 }

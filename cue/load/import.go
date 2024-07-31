@@ -53,7 +53,7 @@ import (
 //	        is present.
 //	_       anonymous files (which may be marked with _)
 //	*       all packages
-func (l *loader) importPkg(pos token.Pos, p *build.Instance) (_ret []*build.Instance) {
+func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	retErr := func(errs errors.Error) []*build.Instance {
 		// XXX: move this loop to ReportError
 		for _, err := range errors.Errors(errs) {
@@ -192,6 +192,16 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) (_ret []*build.Inst
 			p.ReportError(errors.Promote(err, ""))
 		}
 
+		if len(p.BuildFiles) == 0 &&
+			len(p.IgnoredFiles) == 0 &&
+			len(p.OrphanedFiles) == 0 &&
+			len(p.InvalidFiles) == 0 &&
+			len(p.UnknownFiles) == 0 {
+			// The package has no files in it. This can happen
+			// when the default package added in newFileProcessor
+			// doesn't have any associated files.
+			continue
+		}
 		all = append(all, p)
 		rewriteFiles(p, cfg.ModuleRoot, false)
 		if errs := fp.finalize(p); errs != nil {

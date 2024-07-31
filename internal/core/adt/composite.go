@@ -718,6 +718,14 @@ func (v *Vertex) ToDataSingle() *Vertex {
 // ToDataAll returns a new v where v and all its descendents contain only
 // the regular fields.
 func (v *Vertex) ToDataAll(ctx *OpContext) *Vertex {
+	v.Finalize(ctx)
+
+	// TODO(mpvl): this is to work around a bug in the old evaluator, where
+	// finalize does not always work.
+	if v.status == evaluating && ctx.isDevVersion() {
+		return v.ToDataSingle()
+	}
+
 	arcs := make([]*Vertex, 0, len(v.Arcs))
 	for _, a := range v.Arcs {
 		if !a.IsDefined(ctx) {
@@ -756,8 +764,6 @@ func toDataAll(ctx *OpContext, v BaseValue) BaseValue {
 	case *Vertex:
 		return x.ToDataAll(ctx)
 
-	// The following cases are always erroneous, but we handle them anyway
-	// to avoid issues with the closedness algorithm down the line.
 	case *Disjunction:
 		d := *x
 		values := x.Values
@@ -1332,6 +1338,11 @@ type Conjunct struct {
 	// CloseInfo is a unique number that tracks a group of conjuncts that need
 	// belong to a single originating definition.
 	CloseInfo CloseInfo
+}
+
+// MakeConjunct creates a conjunct from current Environment and CloseInfo of c.
+func (c *OpContext) MakeConjunct(x Expr) Conjunct {
+	return MakeConjunct(c.e, x, c.ci)
 }
 
 // TODO(perf): replace with composite literal if this helps performance.

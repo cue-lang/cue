@@ -1,0 +1,832 @@
+-- in.cue --
+import "math"
+
+#Foo: {
+	a: int
+}
+
+match: {
+	[=~"^single"]: matchN(1, [#Foo])
+	singleOK: a: 2
+	singleErr: a: "foo"
+
+	[=~"^incomplete"]: matchN(1, [#Foo])
+	incompleteOK: a: int
+	incompleteErr: a: string
+
+	#A: {
+		a: int
+		b: _
+		...
+	}
+
+	defaults: {
+		// Because validators distribute over disjunctions, this validator may erase
+		// a default value. Nonethenless, it will be guaranteed that the value
+		// resulting from evaluation does not violate the validator.
+		// TODO(defaults): take this use case into consideration for the defaults
+		// rethink, as it seems less than ideal. Note that this typically not an
+		// issue if the schema matched against is not concrete.
+		[=~"^pickTop"]: matchN(1, [2])
+		pickTopOK1: *2 | int
+		pickTopOK2: int
+		pickTopErr: *3 | int // Final values taken.
+
+		// Nested default values will be evaluated and may not be overridden by
+		// values in the validator.
+		[=~"^pickNested1"]: matchN(1, [{a: 2}])
+		pickNested1OK1: a: *2 | int
+		pickNested1OK2: a: int
+		pickNested1Err: a: *3 | int
+
+		[=~"^pickNested2"]: matchN(1, [{a: <=2}])
+		pickNested2OK1: a: *2 | int
+		pickNested2OK2: a: int
+		pickNested2Err: a: *3 | int
+	}
+
+	// Stress test potential exponential behavior.
+	nestedOK: {
+		matchN(4, [#A, #A, #A, #A])
+
+		a: 2
+		b: {
+			matchN(4, [#A, #A, #A, #A])
+	
+			a: 3
+			b: matchN(4, [#A, #A, #A, #A])
+			b: a: 4
+			c: matchN(4, [#A, #A, #A, #A])
+			c: a: 5
+		}
+		c: {
+			matchN(4, [#A, #A, #A, #A])
+	
+			a: 3
+			b: matchN(4, [#A, #A, #A, #A])
+			b: a: 4
+			c: matchN(4, [#A, #A, #A, #A])
+			c: a: 5
+		}
+	}
+}
+
+not: {
+	[=~"^single"]: matchN(0, [#Foo])
+	singleOK: a: "foo"
+	singleErr: a: 2
+
+	[=~"^double"]: matchN(0, [matchN(0, [#Foo])])
+	doubleOK: a: 2
+	doubleErr: a: "foo"
+}
+
+oneOf: {
+	[=~"^multiple1"]: matchN(1, [math.MultipleOf(3), math.MultipleOf(5)])
+
+	multiple1Err1: 1
+
+	multiple1OK1: 3
+	multiple1OK2: 5
+
+	multiple1Err2: 15
+}
+
+anyOf: {
+	[=~"^multiple1"]: matchN(>0, [math.MultipleOf(3), math.MultipleOf(5)])
+
+	multiple1Err1: 1
+
+	multiple1OK1: 3
+	multiple1OK2: 5
+	multiple1OK3: 15
+}
+
+
+allOf: {
+	[=~"^multiple1"]: matchN(2, [math.MultipleOf(3), math.MultipleOf(5)])
+
+	multiple1Err1: 1
+	multiple1Err2: 3
+	multiple1Err3: 5
+
+	multiple1OK1: 15
+}
+-- out/eval/stats --
+Leaks:  3
+Freed:  505
+Reused: 497
+Allocs: 11
+Retain: 40
+
+Unifications: 496
+Conjuncts:    859
+Disjuncts:    545
+-- out/eval --
+Errors:
+match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+    ./in.cue:8:17
+    ./in.cue:8:24
+    ./in.cue:10:13
+match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+    ./in.cue:12:21
+    ./in.cue:12:28
+    ./in.cue:14:17
+match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:2}])): 0 matched, expected 1:
+    ./in.cue:36:23
+    ./in.cue:36:30
+    ./in.cue:39:19
+match.defaults.pickNested2Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:<=2}])): 0 matched, expected 1:
+    ./in.cue:41:23
+    ./in.cue:41:30
+    ./in.cue:44:19
+not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [{a:int}])): 1 matched, expected 0:
+    ./in.cue:74:17
+    ./in.cue:74:24
+    ./in.cue:76:13
+not.doubleErr: invalid value {a:"foo"} (does not satisfy matchN(0, [matchN(0, [#Foo])])): 1 matched, expected 0:
+    ./in.cue:78:17
+    ./in.cue:78:24
+    ./in.cue:80:13
+oneOf.multiple1Err1: invalid value 1 (does not satisfy matchN(1, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected 1:
+    ./in.cue:84:20
+    ./in.cue:84:27
+    ./in.cue:86:17
+oneOf.multiple1Err2: invalid value 15 (does not satisfy matchN(1, [math.MultipleOf(3),math.MultipleOf(5)])): 2 matched, expected 1:
+    ./in.cue:84:20
+    ./in.cue:84:27
+    ./in.cue:91:17
+anyOf.multiple1Err1: invalid value 1 (does not satisfy matchN(>0, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected >0:
+    ./in.cue:95:20
+    ./in.cue:95:27
+    ./in.cue:97:17
+allOf.multiple1Err1: invalid value 1 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected 2:
+    ./in.cue:106:20
+    ./in.cue:106:27
+    ./in.cue:108:17
+allOf.multiple1Err2: invalid value 3 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 1 matched, expected 2:
+    ./in.cue:106:20
+    ./in.cue:106:27
+    ./in.cue:109:17
+allOf.multiple1Err3: invalid value 5 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 1 matched, expected 2:
+    ./in.cue:106:20
+    ./in.cue:106:27
+    ./in.cue:110:17
+
+Result:
+(_|_){
+  // [eval]
+  #Foo: (#struct){
+    a: (int){ int }
+  }
+  match: (_|_){
+    // [eval]
+    singleOK: (struct){
+      a: (int){ 2 }
+    }
+    singleErr: (_|_){
+      // [eval] match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+      //     ./in.cue:8:17
+      //     ./in.cue:8:24
+      //     ./in.cue:10:13
+      a: (string){ "foo" }
+    }
+    incompleteOK: (struct){
+      a: (int){ int }
+    }
+    incompleteErr: (_|_){
+      // [eval] match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+      //     ./in.cue:12:21
+      //     ./in.cue:12:28
+      //     ./in.cue:14:17
+      a: (string){ string }
+    }
+    #A: (#struct){
+      a: (int){ int }
+      b: (_){ _ }
+    }
+    defaults: (_|_){
+      // [eval]
+      pickTopOK1: (int){ |(*(int){ 2 }, (int){ &(matchN(1, (#list){
+            0: (int){ 2 }
+          }), int) }) }
+      pickTopOK2: (int){ &(matchN(1, (#list){
+          0: (_|_){// 2
+          }
+        }), int) }
+      pickTopErr: (int){ &(matchN(1, (#list){
+          0: (int){ 2 }
+        }), int) }
+      pickNested1OK1: (struct){
+        a: (int){ |(*(int){ 2 }, (int){ int }) }
+      }
+      pickNested1OK2: (struct){
+        a: (int){ int }
+      }
+      pickNested1Err: (_|_){
+        // [eval] match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:2}])): 0 matched, expected 1:
+        //     ./in.cue:36:23
+        //     ./in.cue:36:30
+        //     ./in.cue:39:19
+        a: (int){ |(*(int){ 3 }, (int){ int }) }
+      }
+      pickNested2OK1: (struct){
+        a: (int){ |(*(int){ 2 }, (int){ int }) }
+      }
+      pickNested2OK2: (struct){
+        a: (int){ int }
+      }
+      pickNested2Err: (_|_){
+        // [eval] match.defaults.pickNested2Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:<=2}])): 0 matched, expected 1:
+        //     ./in.cue:41:23
+        //     ./in.cue:41:30
+        //     ./in.cue:44:19
+        a: (int){ |(*(int){ 3 }, (int){ int }) }
+      }
+    }
+    nestedOK: (struct){
+      a: (int){ 2 }
+      b: (struct){
+        a: (int){ 3 }
+        b: (struct){
+          a: (int){ 4 }
+        }
+        c: (struct){
+          a: (int){ 5 }
+        }
+      }
+      c: (struct){
+        a: (int){ 3 }
+        b: (struct){
+          a: (int){ 4 }
+        }
+        c: (struct){
+          a: (int){ 5 }
+        }
+      }
+    }
+  }
+  not: (_|_){
+    // [eval]
+    singleOK: (struct){
+      a: (string){ "foo" }
+    }
+    singleErr: (_|_){
+      // [eval] not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [{a:int}])): 1 matched, expected 0:
+      //     ./in.cue:74:17
+      //     ./in.cue:74:24
+      //     ./in.cue:76:13
+      a: (int){ 2 }
+    }
+    doubleOK: (struct){
+      a: (int){ 2 }
+    }
+    doubleErr: (_|_){
+      // [eval] not.doubleErr: invalid value {a:"foo"} (does not satisfy matchN(0, [matchN(0, [#Foo])])): 1 matched, expected 0:
+      //     ./in.cue:78:17
+      //     ./in.cue:78:24
+      //     ./in.cue:80:13
+      a: (string){ "foo" }
+    }
+  }
+  oneOf: (_|_){
+    // [eval]
+    multiple1Err1: (_|_){
+      // [eval] oneOf.multiple1Err1: invalid value 1 (does not satisfy matchN(1, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected 1:
+      //     ./in.cue:84:20
+      //     ./in.cue:84:27
+      //     ./in.cue:86:17
+    }
+    multiple1OK1: (int){ 3 }
+    multiple1OK2: (int){ 5 }
+    multiple1Err2: (_|_){
+      // [eval] oneOf.multiple1Err2: invalid value 15 (does not satisfy matchN(1, [math.MultipleOf(3),math.MultipleOf(5)])): 2 matched, expected 1:
+      //     ./in.cue:84:20
+      //     ./in.cue:84:27
+      //     ./in.cue:91:17
+    }
+  }
+  anyOf: (_|_){
+    // [eval]
+    multiple1Err1: (_|_){
+      // [eval] anyOf.multiple1Err1: invalid value 1 (does not satisfy matchN(>0, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected >0:
+      //     ./in.cue:95:20
+      //     ./in.cue:95:27
+      //     ./in.cue:97:17
+    }
+    multiple1OK1: (int){ 3 }
+    multiple1OK2: (int){ 5 }
+    multiple1OK3: (int){ 15 }
+  }
+  allOf: (_|_){
+    // [eval]
+    multiple1Err1: (_|_){
+      // [eval] allOf.multiple1Err1: invalid value 1 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected 2:
+      //     ./in.cue:106:20
+      //     ./in.cue:106:27
+      //     ./in.cue:108:17
+    }
+    multiple1Err2: (_|_){
+      // [eval] allOf.multiple1Err2: invalid value 3 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 1 matched, expected 2:
+      //     ./in.cue:106:20
+      //     ./in.cue:106:27
+      //     ./in.cue:109:17
+    }
+    multiple1Err3: (_|_){
+      // [eval] allOf.multiple1Err3: invalid value 5 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 1 matched, expected 2:
+      //     ./in.cue:106:20
+      //     ./in.cue:106:27
+      //     ./in.cue:110:17
+    }
+    multiple1OK1: (int){ 15 }
+  }
+}
+-- out/evalalpha --
+Errors:
+match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+    ./in.cue:8:17
+    ./in.cue:8:24
+match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+    ./in.cue:12:21
+    ./in.cue:12:28
+match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:2}])): 0 matched, expected 1:
+    ./in.cue:36:23
+    ./in.cue:36:30
+match.defaults.pickNested2Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:<=2}])): 0 matched, expected 1:
+    ./in.cue:41:23
+    ./in.cue:41:30
+not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [{a:int}])): 1 matched, expected 0:
+    ./in.cue:74:17
+    ./in.cue:74:24
+not.doubleErr: invalid value {a:"foo"} (does not satisfy matchN(0, [matchN(0, [{a:int}])])): 1 matched, expected 0:
+    ./in.cue:78:17
+    ./in.cue:78:24
+oneOf.multiple1Err1: invalid value 1 (does not satisfy matchN(1, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected 1:
+    ./in.cue:84:20
+    ./in.cue:84:27
+    ./in.cue:86:17
+oneOf.multiple1Err2: invalid value 15 (does not satisfy matchN(1, [math.MultipleOf(3),math.MultipleOf(5)])): 2 matched, expected 1:
+    ./in.cue:84:20
+    ./in.cue:84:27
+    ./in.cue:91:17
+anyOf.multiple1Err1: invalid value 1 (does not satisfy matchN(>0, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected >0:
+    ./in.cue:95:20
+    ./in.cue:95:27
+    ./in.cue:97:17
+allOf.multiple1Err1: invalid value 1 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected 2:
+    ./in.cue:106:20
+    ./in.cue:106:27
+    ./in.cue:108:17
+allOf.multiple1Err2: invalid value 3 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 1 matched, expected 2:
+    ./in.cue:106:20
+    ./in.cue:106:27
+    ./in.cue:109:17
+allOf.multiple1Err3: invalid value 5 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 1 matched, expected 2:
+    ./in.cue:106:20
+    ./in.cue:106:27
+    ./in.cue:110:17
+
+Result:
+(_|_){
+  // [eval]
+  #Foo: (#struct){
+    a: (int){ int }
+  }
+  match: (_|_){
+    // [eval]
+    singleOK: (struct){
+      a: (int){ 2 }
+    }
+    singleErr: (_|_){
+      // [eval] match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+      //     ./in.cue:8:17
+      //     ./in.cue:8:24
+      a: (string){ "foo" }
+    }
+    incompleteOK: (struct){
+      a: (int){ int }
+    }
+    incompleteErr: (_|_){
+      // [eval] match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+      //     ./in.cue:12:21
+      //     ./in.cue:12:28
+      a: (string){ string }
+    }
+    #A: (#struct){
+      a: (int){ int }
+      b: (_){ _ }
+    }
+    defaults: (_|_){
+      // [eval]
+      pickTopOK1: (int){ |(*(int){ 2 }, (int){ &(matchN(1, (#list){
+            0: (int){ 2 }
+          }), int) }) }
+      pickTopOK2: (int){ &(matchN(1, (#list){
+          0: (int){ 2 }
+        }), int) }
+      pickTopErr: (int){ &(matchN(1, (#list){
+          0: (int){ 2 }
+        }), int) }
+      pickNested1OK1: (struct){
+        a: (int){ |(*(int){ 2 }, (int){ int }) }
+      }
+      pickNested1OK2: (struct){
+        a: (int){ int }
+      }
+      pickNested1Err: (_|_){
+        // [eval] match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:2}])): 0 matched, expected 1:
+        //     ./in.cue:36:23
+        //     ./in.cue:36:30
+        a: (int){ |(*(int){ 3 }, (int){ int }) }
+      }
+      pickNested2OK1: (struct){
+        a: (int){ |(*(int){ 2 }, (int){ int }) }
+      }
+      pickNested2OK2: (struct){
+        a: (int){ int }
+      }
+      pickNested2Err: (_|_){
+        // [eval] match.defaults.pickNested2Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:<=2}])): 0 matched, expected 1:
+        //     ./in.cue:41:23
+        //     ./in.cue:41:30
+        a: (int){ |(*(int){ 3 }, (int){ int }) }
+      }
+    }
+    nestedOK: (struct){
+      a: (int){ 2 }
+      b: (struct){
+        a: (int){ 3 }
+        b: (struct){
+          a: (int){ 4 }
+        }
+        c: (struct){
+          a: (int){ 5 }
+        }
+      }
+      c: (struct){
+        a: (int){ 3 }
+        b: (struct){
+          a: (int){ 4 }
+        }
+        c: (struct){
+          a: (int){ 5 }
+        }
+      }
+    }
+  }
+  not: (_|_){
+    // [eval]
+    singleOK: (struct){
+      a: (string){ "foo" }
+    }
+    singleErr: (_|_){
+      // [eval] not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [{a:int}])): 1 matched, expected 0:
+      //     ./in.cue:74:17
+      //     ./in.cue:74:24
+      a: (int){ 2 }
+    }
+    doubleOK: (struct){
+      a: (int){ 2 }
+    }
+    doubleErr: (_|_){
+      // [eval] not.doubleErr: invalid value {a:"foo"} (does not satisfy matchN(0, [matchN(0, [{a:int}])])): 1 matched, expected 0:
+      //     ./in.cue:78:17
+      //     ./in.cue:78:24
+      a: (string){ "foo" }
+    }
+  }
+  oneOf: (_|_){
+    // [eval]
+    multiple1Err1: (_|_){
+      // [eval] oneOf.multiple1Err1: invalid value 1 (does not satisfy matchN(1, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected 1:
+      //     ./in.cue:84:20
+      //     ./in.cue:84:27
+      //     ./in.cue:86:17
+    }
+    multiple1OK1: (int){ 3 }
+    multiple1OK2: (int){ 5 }
+    multiple1Err2: (_|_){
+      // [eval] oneOf.multiple1Err2: invalid value 15 (does not satisfy matchN(1, [math.MultipleOf(3),math.MultipleOf(5)])): 2 matched, expected 1:
+      //     ./in.cue:84:20
+      //     ./in.cue:84:27
+      //     ./in.cue:91:17
+    }
+  }
+  anyOf: (_|_){
+    // [eval]
+    multiple1Err1: (_|_){
+      // [eval] anyOf.multiple1Err1: invalid value 1 (does not satisfy matchN(>0, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected >0:
+      //     ./in.cue:95:20
+      //     ./in.cue:95:27
+      //     ./in.cue:97:17
+    }
+    multiple1OK1: (int){ 3 }
+    multiple1OK2: (int){ 5 }
+    multiple1OK3: (int){ 15 }
+  }
+  allOf: (_|_){
+    // [eval]
+    multiple1Err1: (_|_){
+      // [eval] allOf.multiple1Err1: invalid value 1 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected 2:
+      //     ./in.cue:106:20
+      //     ./in.cue:106:27
+      //     ./in.cue:108:17
+    }
+    multiple1Err2: (_|_){
+      // [eval] allOf.multiple1Err2: invalid value 3 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 1 matched, expected 2:
+      //     ./in.cue:106:20
+      //     ./in.cue:106:27
+      //     ./in.cue:109:17
+    }
+    multiple1Err3: (_|_){
+      // [eval] allOf.multiple1Err3: invalid value 5 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 1 matched, expected 2:
+      //     ./in.cue:106:20
+      //     ./in.cue:106:27
+      //     ./in.cue:110:17
+    }
+    multiple1OK1: (int){ 15 }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -2,27 +2,21 @@
+ match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+     ./in.cue:8:17
+     ./in.cue:8:24
+-    ./in.cue:10:13
+ match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+     ./in.cue:12:21
+     ./in.cue:12:28
+-    ./in.cue:14:17
+ match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:2}])): 0 matched, expected 1:
+     ./in.cue:36:23
+     ./in.cue:36:30
+-    ./in.cue:39:19
+ match.defaults.pickNested2Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:<=2}])): 0 matched, expected 1:
+     ./in.cue:41:23
+     ./in.cue:41:30
+-    ./in.cue:44:19
+ not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [{a:int}])): 1 matched, expected 0:
+     ./in.cue:74:17
+     ./in.cue:74:24
+-    ./in.cue:76:13
+-not.doubleErr: invalid value {a:"foo"} (does not satisfy matchN(0, [matchN(0, [#Foo])])): 1 matched, expected 0:
++not.doubleErr: invalid value {a:"foo"} (does not satisfy matchN(0, [matchN(0, [{a:int}])])): 1 matched, expected 0:
+     ./in.cue:78:17
+     ./in.cue:78:24
+-    ./in.cue:80:13
+ oneOf.multiple1Err1: invalid value 1 (does not satisfy matchN(1, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected 1:
+     ./in.cue:84:20
+     ./in.cue:84:27
+@@ -63,7 +57,6 @@
+       // [eval] match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+       //     ./in.cue:8:17
+       //     ./in.cue:8:24
+-      //     ./in.cue:10:13
+       a: (string){ "foo" }
+     }
+     incompleteOK: (struct){
+@@ -73,7 +66,6 @@
+       // [eval] match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+       //     ./in.cue:12:21
+       //     ./in.cue:12:28
+-      //     ./in.cue:14:17
+       a: (string){ string }
+     }
+     #A: (#struct){
+@@ -86,8 +78,7 @@
+             0: (int){ 2 }
+           }), int) }) }
+       pickTopOK2: (int){ &(matchN(1, (#list){
+-          0: (_|_){// 2
+-          }
++          0: (int){ 2 }
+         }), int) }
+       pickTopErr: (int){ &(matchN(1, (#list){
+           0: (int){ 2 }
+@@ -102,7 +93,6 @@
+         // [eval] match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:2}])): 0 matched, expected 1:
+         //     ./in.cue:36:23
+         //     ./in.cue:36:30
+-        //     ./in.cue:39:19
+         a: (int){ |(*(int){ 3 }, (int){ int }) }
+       }
+       pickNested2OK1: (struct){
+@@ -115,7 +105,6 @@
+         // [eval] match.defaults.pickNested2Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:<=2}])): 0 matched, expected 1:
+         //     ./in.cue:41:23
+         //     ./in.cue:41:30
+-        //     ./in.cue:44:19
+         a: (int){ |(*(int){ 3 }, (int){ int }) }
+       }
+     }
+@@ -150,7 +139,6 @@
+       // [eval] not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [{a:int}])): 1 matched, expected 0:
+       //     ./in.cue:74:17
+       //     ./in.cue:74:24
+-      //     ./in.cue:76:13
+       a: (int){ 2 }
+     }
+     doubleOK: (struct){
+@@ -157,10 +145,9 @@
+       a: (int){ 2 }
+     }
+     doubleErr: (_|_){
+-      // [eval] not.doubleErr: invalid value {a:"foo"} (does not satisfy matchN(0, [matchN(0, [#Foo])])): 1 matched, expected 0:
++      // [eval] not.doubleErr: invalid value {a:"foo"} (does not satisfy matchN(0, [matchN(0, [{a:int}])])): 1 matched, expected 0:
+       //     ./in.cue:78:17
+       //     ./in.cue:78:24
+-      //     ./in.cue:80:13
+       a: (string){ "foo" }
+     }
+   }
+-- diff/explanation --
+The old evaluator does not correctly handle ToDataAll if a node is
+mid-evaluation. The new evaluator does.
+-- diff/todo/p3 --
+Missing error positions.
+-- out/compile --
+--- in.cue
+{
+  #Foo: {
+    a: int
+  }
+  match: {
+    [=~"^single"]: matchN(1, [
+      〈2;#Foo〉,
+    ])
+    singleOK: {
+      a: 2
+    }
+    singleErr: {
+      a: "foo"
+    }
+    [=~"^incomplete"]: matchN(1, [
+      〈2;#Foo〉,
+    ])
+    incompleteOK: {
+      a: int
+    }
+    incompleteErr: {
+      a: string
+    }
+    #A: {
+      a: int
+      b: _
+      ...
+    }
+    defaults: {
+      [=~"^pickTop"]: matchN(1, [
+        2,
+      ])
+      pickTopOK1: (*2|int)
+      pickTopOK2: int
+      pickTopErr: (*3|int)
+      [=~"^pickNested1"]: matchN(1, [
+        {
+          a: 2
+        },
+      ])
+      pickNested1OK1: {
+        a: (*2|int)
+      }
+      pickNested1OK2: {
+        a: int
+      }
+      pickNested1Err: {
+        a: (*3|int)
+      }
+      [=~"^pickNested2"]: matchN(1, [
+        {
+          a: <=2
+        },
+      ])
+      pickNested2OK1: {
+        a: (*2|int)
+      }
+      pickNested2OK2: {
+        a: int
+      }
+      pickNested2Err: {
+        a: (*3|int)
+      }
+    }
+    nestedOK: {
+      matchN(4, [
+        〈2;#A〉,
+        〈2;#A〉,
+        〈2;#A〉,
+        〈2;#A〉,
+      ])
+      a: 2
+      b: {
+        matchN(4, [
+          〈3;#A〉,
+          〈3;#A〉,
+          〈3;#A〉,
+          〈3;#A〉,
+        ])
+        a: 3
+        b: matchN(4, [
+          〈3;#A〉,
+          〈3;#A〉,
+          〈3;#A〉,
+          〈3;#A〉,
+        ])
+        b: {
+          a: 4
+        }
+        c: matchN(4, [
+          〈3;#A〉,
+          〈3;#A〉,
+          〈3;#A〉,
+          〈3;#A〉,
+        ])
+        c: {
+          a: 5
+        }
+      }
+      c: {
+        matchN(4, [
+          〈3;#A〉,
+          〈3;#A〉,
+          〈3;#A〉,
+          〈3;#A〉,
+        ])
+        a: 3
+        b: matchN(4, [
+          〈3;#A〉,
+          〈3;#A〉,
+          〈3;#A〉,
+          〈3;#A〉,
+        ])
+        b: {
+          a: 4
+        }
+        c: matchN(4, [
+          〈3;#A〉,
+          〈3;#A〉,
+          〈3;#A〉,
+          〈3;#A〉,
+        ])
+        c: {
+          a: 5
+        }
+      }
+    }
+  }
+  not: {
+    [=~"^single"]: matchN(0, [
+      〈2;#Foo〉,
+    ])
+    singleOK: {
+      a: "foo"
+    }
+    singleErr: {
+      a: 2
+    }
+    [=~"^double"]: matchN(0, [
+      matchN(0, [
+        〈3;#Foo〉,
+      ]),
+    ])
+    doubleOK: {
+      a: 2
+    }
+    doubleErr: {
+      a: "foo"
+    }
+  }
+  oneOf: {
+    [=~"^multiple1"]: matchN(1, [
+      〈import;math〉.MultipleOf(3),
+      〈import;math〉.MultipleOf(5),
+    ])
+    multiple1Err1: 1
+    multiple1OK1: 3
+    multiple1OK2: 5
+    multiple1Err2: 15
+  }
+  anyOf: {
+    [=~"^multiple1"]: matchN(>0, [
+      〈import;math〉.MultipleOf(3),
+      〈import;math〉.MultipleOf(5),
+    ])
+    multiple1Err1: 1
+    multiple1OK1: 3
+    multiple1OK2: 5
+    multiple1OK3: 15
+  }
+  allOf: {
+    [=~"^multiple1"]: matchN(2, [
+      〈import;math〉.MultipleOf(3),
+      〈import;math〉.MultipleOf(5),
+    ])
+    multiple1Err1: 1
+    multiple1Err2: 3
+    multiple1Err3: 5
+    multiple1OK1: 15
+  }
+}

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f28949d_c19e9745",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-31T11:14:52Z",
+      "side": 1,
+      "message": "as discussed already, done",
+      "parentUuid": "eb342784_18887800",
+      "revId": "9693e515502830bbc4842b40c21b210bdb6c1af1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fcf73ea4_694d80b5",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-07-31T09:20:18Z",
       "side": 1,
       "message": "The for loop is unnecessary here and makes the logic a little hard to follow from my p.o.v.\n\n```\nif len(pattern) \u003e 0 \u0026\u0026 pattern[0] \u003d\u003d \u0027*\u0027 {\n     pattern \u003d pattern[1:]\n     star \u003d true\n     if len(pattern) \u003e 0 \u0026\u0026 pattern[0] \u003d\u003d \u0027*\u0027 {\n         // ** is disallowed to allow for future functionality.\n         return ErrStarStarDisallowed\n     }\n}\n```",
+      "revId": "9693e515502830bbc4842b40c21b210bdb6c1af1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "faf68118_19f35883",
+        "filename": "pkg/path/match.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-31T11:14:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fcf73ea4_694d80b5",
       "revId": "9693e515502830bbc4842b40c21b210bdb6c1af1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1353d19_135341a4",
+        "filename": "pkg/path/match.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-31T11:14:52Z",
+      "side": 1,
+      "message": "as discussed already, done",
+      "parentUuid": "08fe1bf3_77ff2d4c",
+      "revId": "9693e515502830bbc4842b40c21b210bdb6c1af1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a63ea6be_b455b9bc",
@@ -69,6 +123,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8a7b2e7_1f808d65",
+        "filename": "pkg/path/match_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-31T11:14:52Z",
+      "side": 1,
+      "message": "as discussed already, done",
+      "parentUuid": "a63ea6be_b455b9bc",
+      "revId": "9693e515502830bbc4842b40c21b210bdb6c1af1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b79a7032_df4fb18b",
@@ -82,6 +154,24 @@
       "writtenOn": "2024-07-31T09:20:18Z",
       "side": 1,
       "message": "This isn\u0027t a sufficient test.",
+      "revId": "9693e515502830bbc4842b40c21b210bdb6c1af1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "034ad6f3_5cbddf56",
+        "filename": "pkg/tool/file/file.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-31T11:14:52Z",
+      "side": 1,
+      "message": "as discussed already, done",
+      "parentUuid": "b79a7032_df4fb18b",
       "revId": "9693e515502830bbc4842b40c21b210bdb6c1af1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,0 +1,16 @@
+
+exec cue fmt x.cue
+rm a/a.cue
+exec cue fmt x.cue
+
+-- a/a.cue --
+package a
+-- cue.mod/module.cue --
+module: "mod.com"
+language: version: "v0.9.2"
+-- x.cue --
+package x
+
+import "mod.com/a"
+
+x: 5

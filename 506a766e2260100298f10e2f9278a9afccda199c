@@ -16,6 +16,24 @@
       "message": "or qt.IsNil(err)",
       "revId": "506a766e2260100298f10e2f9278a9afccda199c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ecfe7130_f8da542f",
+        "filename": "pkg/tool/file/file_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-31T15:08:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1def6193_1c8f1983",
+      "revId": "506a766e2260100298f10e2f9278a9afccda199c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

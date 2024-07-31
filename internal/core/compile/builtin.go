@@ -28,6 +28,7 @@ var (
 	structParam = adt.Param{Value: &adt.BasicType{K: adt.StructKind}}
 	listParam   = adt.Param{Value: &adt.BasicType{K: adt.ListKind}}
 	intParam    = adt.Param{Value: &adt.BasicType{K: adt.IntKind}}
+	topParam    = adt.Param{Value: &adt.BasicType{K: adt.TopKind}}
 )
 
 var lenBuiltin = &adt.Builtin{

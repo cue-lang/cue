@@ -167,6 +167,14 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) {
 	// special * and _
 	p := fp.pkg // default package
 
+	// sameDir holds whether the file should be considered to be
+	// part of the same directory as the default package. This is
+	// true when the file is part of the original package directory
+	// or when allowExcludedFiles is specified, signifying that the
+	// file is part of an explicit set of files provided on the
+	// command line.
+	sameDir := filepath.Dir(fullPath) == p.Dir || (mode&allowExcludedFiles) != 0
+
 	// badFile := func(p *build.Instance, err errors.Error) bool {
 	badFile := func(err errors.Error) {
 		fp.err = errors.Append(fp.err, err)
@@ -181,7 +189,9 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) {
 
 	if file.Encoding != build.CUE {
 		// Not a CUE file.
-		p.OrphanedFiles = append(p.OrphanedFiles, file)
+		if sameDir {
+			p.OrphanedFiles = append(p.OrphanedFiles, file)
+		}
 		return
 	}
 	if (mode & allowExcludedFiles) == 0 {
@@ -192,6 +202,9 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) {
 			}
 		}
 		if badPrefix != "" {
+			if !sameDir {
+				return
+			}
 			file.ExcludeReason = errors.Newf(token.NoPos, "filename starts with a '%s'", badPrefix)
 			if file.Interpretation == "" {
 				p.IgnoredFiles = append(p.IgnoredFiles, file)
@@ -217,9 +230,18 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) {
 	pos := pf.Pos()
 
 	switch {
-	case pkg == p.PkgName, mode&allowAnonymous != 0:
+	case pkg == p.PkgName && (sameDir || pkg != "_"):
+		// We've got the exact package that's being looked for.
+		// It will already be present in fp.pkgs.
+	case mode&allowAnonymous != 0 && sameDir:
+		// It's an anonymous file that's not in a parent directory.
 	case fp.allPackages && pkg != "_":
 		q := fp.pkgs[pkg]
+		if q == nil && !sameDir {
+			// It's a file in a parent directory that doesn't correspond
+			// to a package in the original directory.
+			return
+		}
 		if q == nil {
 			q = &build.Instance{
 				PkgName: pkg,
@@ -235,10 +257,14 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) {
 		p = q
 
 	case pkg != "_":
-
+		// We're loading a single package and we either haven't matched
+		// the earlier selected package or we haven't selected a package
+		// yet. In either case, the default package is the one we want to use.
 	default:
-		file.ExcludeReason = excludeError{errors.Newf(pos, "no package name")}
-		p.IgnoredFiles = append(p.IgnoredFiles, file)
+		if sameDir {
+			file.ExcludeReason = excludeError{errors.Newf(pos, "no package name")}
+			p.IgnoredFiles = append(p.IgnoredFiles, file)
+		}
 		return
 	}
 

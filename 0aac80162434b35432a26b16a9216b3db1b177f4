@@ -16,6 +16,24 @@
       "message": "Let\u0027s add test cases for `\\**` and `[x**y]`",
       "revId": "0aac80162434b35432a26b16a9216b3db1b177f4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "906eef98_da658836",
+        "filename": "pkg/path/match_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-31T11:14:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0d949af8_b68a3ab1",
+      "revId": "0aac80162434b35432a26b16a9216b3db1b177f4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

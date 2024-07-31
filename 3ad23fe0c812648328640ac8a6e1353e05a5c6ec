@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8924a60_5eb62747",
+        "filename": "cue/load/loader_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 519,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-07-31T11:20:41Z",
+      "side": 0,
+      "message": "are these other test changes good? if so, perhaps mention them briefly in the commit message.",
+      "revId": "3ad23fe0c812648328640ac8a6e1353e05a5c6ec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

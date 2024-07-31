@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1def6193_1c8f1983",
+        "filename": "pkg/tool/file/file_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-31T14:57:51Z",
+      "side": 1,
+      "message": "or qt.IsNil(err)",
+      "revId": "506a766e2260100298f10e2f9278a9afccda199c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

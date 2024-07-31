@@ -307,7 +307,6 @@ files:
 		},
 		args: []string{"./toolonly"},
 		want: `err:    build constraints exclude all CUE files in ./toolonly:
-    anon.cue: no package name
     test.cue: package is test, want foo
     toolonly/foo_tool.cue: _tool.cue files excluded in non-cmd mode
 path:   mod.test/test/toolonly@v0:foo
@@ -499,7 +498,6 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/multi4
 display:.
 files:
-    $CWD/testdata/testmod/anon.cue
     $CWD/testdata/testmod/multi4/nopackage1.cue
     $CWD/testdata/testmod/multi4/nopackage2.cue`}, {
 		// Test what happens when there's a single CUE file
@@ -516,7 +514,6 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/multi5
 display:.
 files:
-    $CWD/testdata/testmod/anon.cue
     $CWD/testdata/testmod/multi5/nopackage.cue`}, {
 		// Check that imports are only considered from files
 		// that match the build paths.
@@ -570,41 +567,18 @@ display:""`}, {
 		// in the result of Instances.
 		name: "Issue3306",
 		cfg: &Config{
-			Dir:     testdataDir,
-			Package: "*",
+			Dir:         testdataDir,
+			Package:     "*",
+			SkipImports: true,
 		},
 		args: []string{"./issue3306/..."},
-		want: `path:   mod.test/test/issue3306@v0:_
-module: mod.test/test@v0
-root:   $CWD/testdata/testmod
-dir:    $CWD/testdata/testmod/issue3306
-display:./issue3306
-files:
-    $CWD/testdata/testmod/anon.cue
-
-path:   mod.test/test/issue3306@v0:test
-module: mod.test/test@v0
-root:   $CWD/testdata/testmod
-dir:    $CWD/testdata/testmod/issue3306
-display:./issue3306
-files:
-    $CWD/testdata/testmod/test.cue
-
-path:   mod.test/test/issue3306@v0:x
+		want: `path:   mod.test/test/issue3306@v0:x
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/issue3306
 display:./issue3306
 files:
     $CWD/testdata/testmod/issue3306/x.cue
-
-path:   mod.test/test/issue3306/a@v0:_
-module: mod.test/test@v0
-root:   $CWD/testdata/testmod
-dir:    $CWD/testdata/testmod/issue3306/a
-display:./issue3306/a
-files:
-    $CWD/testdata/testmod/anon.cue
 
 path:   mod.test/test/issue3306/a@v0:a
 module: mod.test/test@v0
@@ -622,14 +596,6 @@ display:./issue3306/a
 files:
     $CWD/testdata/testmod/issue3306/a/b.cue
 
-path:   mod.test/test/issue3306/a@v0:test
-module: mod.test/test@v0
-root:   $CWD/testdata/testmod
-dir:    $CWD/testdata/testmod/issue3306/a
-display:./issue3306/a
-files:
-    $CWD/testdata/testmod/test.cue
-
 path:   mod.test/test/issue3306/a@v0:x
 module: mod.test/test@v0
 root:   $CWD/testdata/testmod
@@ -638,22 +604,6 @@ display:./issue3306/a
 files:
     $CWD/testdata/testmod/issue3306/x.cue
     $CWD/testdata/testmod/issue3306/a/x.cue
-
-path:   mod.test/test/issue3306/x@v0:_
-module: mod.test/test@v0
-root:   $CWD/testdata/testmod
-dir:    $CWD/testdata/testmod/issue3306/x
-display:./issue3306/x
-files:
-    $CWD/testdata/testmod/anon.cue
-
-path:   mod.test/test/issue3306/x@v0:test
-module: mod.test/test@v0
-root:   $CWD/testdata/testmod
-dir:    $CWD/testdata/testmod/issue3306/x
-display:./issue3306/x
-files:
-    $CWD/testdata/testmod/test.cue
 
 path:   mod.test/test/issue3306/x@v0:x
 module: mod.test/test@v0

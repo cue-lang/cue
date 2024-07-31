@@ -1584,7 +1584,11 @@ func (p Param) Default() Value {
 }
 
 func (x *Builtin) WriteName(w io.Writer, c *OpContext) {
-	_, _ = fmt.Fprintf(w, "%s.%s", x.Package.StringValue(c), x.Name)
+	if x.Package != InvalidLabel {
+		_, _ = fmt.Fprintf(w, "%s.%s", x.Package.StringValue(c), x.Name)
+	} else {
+		_, _ = fmt.Fprintf(w, "%s", x.Name) // stdlib
+	}
 }
 
 // Kind here represents the case where Builtin is used as a Validator.

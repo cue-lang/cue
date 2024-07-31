@@ -1,0 +1,33 @@
+env CUE_EXPERIMENT=embed
+
+[!windows] cp reuse.json 'star/*.json'
+[!windows] exec cue export --out cue
+[!windows] cmp stdout out/export-unix
+
+[windows] exec cue export --out cue
+[windows] cmp stdout out/export-windows
+
+-- test.cue --
+@extern(embed)
+
+package foo
+
+// Unix OSes can have a file containing a star character, and we can match it.
+// Windows can still use these file paths and glob patterns, but they can't match
+// a file containing a star character, as such filenames are not allowed on Windows.
+
+globStar:       _ @embed(glob="star/*.json")
+globEscapeStar: _ @embed(glob="star/\\**", type=json)
+-- reuse.json --
+{"x": "to be reused for more names"}
+-- star/simple.json --
+{"x": "does not contain a star character"}
+-- out/export-unix --
+globStar: {
+	"star/*.json": x:      "to be reused for more names"
+	"star/simple.json": x: "does not contain a star character"
+}
+globEscapeStar: "star/*.json": x: "to be reused for more names"
+-- out/export-windows --
+globStar: "star/simple.json": x: "does not contain a star character"
+globEscapeStar: {}

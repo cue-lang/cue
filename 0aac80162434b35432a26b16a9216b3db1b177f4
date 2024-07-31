@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d949af8_b68a3ab1",
+        "filename": "pkg/path/match_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-31T09:21:27Z",
+      "side": 1,
+      "message": "Let\u0027s add test cases for `\\**` and `[x**y]`",
+      "revId": "0aac80162434b35432a26b16a9216b3db1b177f4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

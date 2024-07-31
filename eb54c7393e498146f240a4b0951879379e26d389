@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f42b0c1_8d1360a2",
+        "filename": "cmd/cue/cmd/testdata/script/embed_err.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-31T11:28:30Z",
+      "side": 1,
+      "message": "I wonder if it might be nice to include the actual pattern that had the problem.",
+      "revId": "eb54c7393e498146f240a4b0951879379e26d389",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8bda1940_9c2d0af2",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-31T11:28:30Z",
+      "side": 1,
+      "message": "```suggestion\n\t// Note that we use Unix match semantics because all embed\n\t// paths are Unix-like.\n```\n\n?",
+      "revId": "eb54c7393e498146f240a4b0951879379e26d389",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

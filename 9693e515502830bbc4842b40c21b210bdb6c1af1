@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb342784_18887800",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-31T09:20:18Z",
+      "side": 1,
+      "message": "This commit message should explicitly say that we\u0027re doing this for consistency with embed, and also it should call out clearly that this is a breaking change.",
+      "revId": "9693e515502830bbc4842b40c21b210bdb6c1af1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fcf73ea4_694d80b5",
+        "filename": "pkg/path/match.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-31T09:20:18Z",
+      "side": 1,
+      "message": "The for loop is unnecessary here and makes the logic a little hard to follow from my p.o.v.\n\n```\nif len(pattern) \u003e 0 \u0026\u0026 pattern[0] \u003d\u003d \u0027*\u0027 {\n     pattern \u003d pattern[1:]\n     star \u003d true\n     if len(pattern) \u003e 0 \u0026\u0026 pattern[0] \u003d\u003d \u0027*\u0027 {\n         // ** is disallowed to allow for future functionality.\n         return ErrStarStarDisallowed\n     }\n}\n```",
+      "revId": "9693e515502830bbc4842b40c21b210bdb6c1af1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08fe1bf3_77ff2d4c",
+        "filename": "pkg/path/match.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-31T09:20:18Z",
+      "side": 1,
+      "message": "It would be nice to mention something about the disallowed `**` syntax in the error.",
+      "revId": "9693e515502830bbc4842b40c21b210bdb6c1af1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a63ea6be_b455b9bc",
+        "filename": "pkg/path/match_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-31T09:20:18Z",
+      "side": 1,
+      "message": "Let\u0027s add test cases for:\n`\\**/c`\n`foo[a**b]bar`",
+      "revId": "9693e515502830bbc4842b40c21b210bdb6c1af1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b79a7032_df4fb18b",
+        "filename": "pkg/tool/file/file.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-31T09:20:18Z",
+      "side": 1,
+      "message": "This isn\u0027t a sufficient test.",
+      "revId": "9693e515502830bbc4842b40c21b210bdb6c1af1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

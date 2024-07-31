@@ -38,6 +38,8 @@ special: {
 	dotdotFile:        _ @embed(file="..dotdot.json")
 	underscoreDir:  _ @embed(file="_y/test.json")
 	dotDir:         _ @embed(file=".y/test.json")
+	fileStar:       _ @embed(glob="star/*.json")
+	globEscapeStar: _ @embed(glob="star/\\**", type=json)
 }
 
 -- test.json --
@@ -66,6 +68,8 @@ module: "acme.com"
 language: version: "v0.9.0"
 -- a/b/foo.json --
 {"a": 1, "b": 2}
+-- star/*.json --
+{"x": "filename contains a star character"}
 -- openapi.json --
 {
     "openapi": "3.0.0",
@@ -120,6 +124,8 @@ special: {
     dotdotFile:     _
     underscoreDir:  _
     dotDir:         _
+    fileStar:       _
+    globEscapeStar: _
 }
 -- out/eval --
 a: {
@@ -210,6 +216,16 @@ special: {
     dotDir: {
         z: 48
     }
+    fileStar: {
+        "star/*.json": {
+            x: "filename contains a star character"
+        }
+    }
+    globEscapeStar: {
+        "star/*.json": {
+            x: "filename contains a star character"
+        }
+    }
 }
 -- out/export --
 a: x:  34
@@ -261,5 +277,7 @@ special: {
 	dotdotFile: dotdot: true
 	underscoreDir: z:   47
 	dotDir: z:          48
+	fileStar: "star/*.json": x:       "filename contains a star character"
+	globEscapeStar: "star/*.json": x: "filename contains a star character"
 }
 -- out/vet --

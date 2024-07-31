@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6a98371_3d69c9ed",
+        "filename": "pkg/tool/file/file.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-31T11:25:56Z",
+      "side": 1,
+      "message": "Using Unix mode when we might be on Windows seems a bit awkward to me.\nThe `\\` character should count as a separator on Windows, not an escape character.\nThis means that a pattern with a trailing separator character will be considered invalid under Windows, which seems wrong.\n\nWhy not just use the current OS to do the check? After all, in Windows `x\\**` _should_ be forbidden, because at a later date that will probably be mean \"all files recursively under `x`.",
+      "revId": "9586855313ceee2441b49a5a259d593eac8f2330",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

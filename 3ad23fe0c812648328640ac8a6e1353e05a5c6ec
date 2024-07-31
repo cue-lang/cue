@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3dab8294_909bb101",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-31T12:15:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "38ca06c0_5d0bdc7c",
+      "range": {
+        "startLine": 12,
+        "startChar": 33,
+        "endLine": 12,
+        "endChar": 44
+      },
+      "revId": "3ad23fe0c812648328640ac8a6e1353e05a5c6ec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b8830c04_b6876932",
@@ -37,6 +61,24 @@
       "writtenOn": "2024-07-31T11:20:24Z",
       "side": 1,
       "message": "can you summarize what this test does with a brief comment? piecing this back together later on will be rather tricky.",
+      "revId": "3ad23fe0c812648328640ac8a6e1353e05a5c6ec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "796aef06_3e0e217a",
+        "filename": "cue/load/loader_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 568,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-07-31T12:15:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b8830c04_b6876932",
       "revId": "3ad23fe0c812648328640ac8a6e1353e05a5c6ec",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

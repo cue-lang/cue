@@ -100,6 +100,7 @@ import (
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/value"
+	pkgpath "cuelang.org/go/pkg/path"
 )
 
 // TODO: obtain a fs.FS from load or something similar
@@ -218,8 +219,10 @@ func (c *compiler) processGlob(glob, scope string, schema adt.Value) (adt.Expr, 
 		return nil, ce
 	}
 
-	if strings.Contains(glob, "**") {
-		return nil, errors.Newf(c.pos, "double star not (yet) supported in glob")
+	// Validate that the glob pattern is valid per [pkgpath.Match].
+	// Note that we use Unix escaping semantics so that `\**` is not forbidden.
+	if _, err := pkgpath.Match(glob, "", pkgpath.Unix); err != nil {
+		return nil, errors.Wrapf(err, c.pos, "invalid glob pattern")
 	}
 
 	// If we do not have a type, ensure the extension of the base is fully

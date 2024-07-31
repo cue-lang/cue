@@ -106,7 +106,7 @@ language: version: "v0.9.0"
     ./test.cue:19:15
 @embed: only relative files are allowed:
     ./test.cue:21:12
-@embed: double star not (yet) supported in glob:
+@embed: invalid glob pattern: '**' is not supported in patterns as of yet:
     ./test.cue:23:15
 @embed: streaming not implemented: found more than one value in file:
     ./test.cue:25:11

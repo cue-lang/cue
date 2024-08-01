@@ -30,7 +30,7 @@ type M struct {
 	name     string
 	fallback string
 	version  internal.EvaluatorVersion
-	flags    cuedebug.Config
+	Flags    cuedebug.Config
 }
 
 func (t *M) Name() string     { return t.name }
@@ -41,7 +41,7 @@ func (t *M) Context() *cue.Context {
 	ctx := cuecontext.New()
 	r := (*runtime.Runtime)(ctx)
 	r.SetVersion(t.version)
-	r.SetDebugOptions(&t.flags)
+	r.SetDebugOptions(&t.Flags)
 	return ctx
 }
 
@@ -61,7 +61,7 @@ var FullMatrix Matrix = []M{{
 	name:     "v3",
 	fallback: "v2",
 	version:  internal.DevVersion,
-	flags:    cuedebug.Config{Sharing: true},
+	Flags:    cuedebug.Config{Sharing: true},
 }, {
 	name:     "v3-noshare",
 	fallback: "v2",
@@ -96,13 +96,13 @@ func (t *M) TODO_V3() {
 }
 
 func (t *M) TODO_Sharing() {
-	if t.flags.Sharing {
+	if t.Flags.Sharing {
 		t.Skip("Skipping v3 with sharing")
 	}
 }
 
 func (t *M) TODO_NoSharing() {
-	if t.version == internal.DevVersion && !t.flags.Sharing {
+	if t.version == internal.DevVersion && !t.Flags.Sharing {
 		t.Skip("Skipping v3 without sharing")
 	}
 }

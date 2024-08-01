@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bffb76fc_e41dec11",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-01T12:26:53Z",
+      "side": 1,
+      "message": "Approved with one comment. Ideally, all blocks should have been removed when a scheduler is cleared. I guess this can occur when a scheduler is stopped prematurely, which could happen.",
+      "revId": "23d53947b5981f4509cadcd8646780c53c30b528",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed011d5f_0382eff9",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-01T12:26:53Z",
+      "side": 1,
+      "message": "Maybe add a todo whether this is safe to do. Ideally, these should all have been cleared.\n\nWhether this needs further attention or not, it is fine to do for now.",
+      "revId": "23d53947b5981f4509cadcd8646780c53c30b528",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

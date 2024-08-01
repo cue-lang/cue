@@ -50,6 +50,24 @@
       "message": "Maybe add a todo whether this is safe to do. Ideally, these should all have been cleared.\n\nWhether this needs further attention or not, it is fine to do for now.",
       "revId": "23d53947b5981f4509cadcd8646780c53c30b528",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ebc59534_4784139d",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-01T12:49:00Z",
+      "side": 1,
+      "message": "Matthew and I wondered about this too - whether the scheduler refcounting was buggy, or whether we should somehow forbid a blocking scheduler from being freed/cleared. but we couldn\u0027t figure out any fix in that direction and nothing failed, so... agreed with you that this is OK for now. but I\u0027ll add a TODO for sure.",
+      "parentUuid": "ed011d5f_0382eff9",
+      "revId": "23d53947b5981f4509cadcd8646780c53c30b528",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

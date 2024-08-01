@@ -16,6 +16,24 @@
       "message": "I\u0027d move this up, as generally we group private fields separately, like:\n\n```\n*testing.T\n\nFlags ...\n\nname ...\nfallback ...\nversion ...\n```\n\nperhaps also briefly document why Flags is exported, as otherwise it seems unnecessary to keep the code on master working.",
       "revId": "540b320981a6374abee03484da1efdcabc416040",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3da53ff4_f2be1056",
+        "filename": "internal/cuetdtest/matrix.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-01T09:52:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb1f7319_6e69a7e6",
+      "revId": "540b320981a6374abee03484da1efdcabc416040",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb1f7319_6e69a7e6",
+        "filename": "internal/cuetdtest/matrix.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-01T09:22:55Z",
+      "side": 1,
+      "message": "I\u0027d move this up, as generally we group private fields separately, like:\n\n```\n*testing.T\n\nFlags ...\n\nname ...\nfallback ...\nversion ...\n```\n\nperhaps also briefly document why Flags is exported, as otherwise it seems unnecessary to keep the code on master working.",
+      "revId": "540b320981a6374abee03484da1efdcabc416040",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -33,6 +33,24 @@
       "message": "The previous version had ID as the path to the test. Might it be worth setting ID to test.Name() ?\nOtherwise maybe just omit the `ID` field as it\u0027s entirely default zero at this point?",
       "revId": "dc8877542422310900767c24f4bb941b02835bce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc56fc33_08ac3860",
+        "filename": "encoding/jsonschema/decode_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-01T12:49:00Z",
+      "side": 1,
+      "message": "indeed this appears to do nothing; I had left this field in as a personal reminder to look again before finishing the entire stack, but I forgot :) removed.",
+      "parentUuid": "c6972816_2f6cc39f",
+      "revId": "dc8877542422310900767c24f4bb941b02835bce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

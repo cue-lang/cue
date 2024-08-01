@@ -1,0 +1,93 @@
+-- json-e.json --
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "https://www.sourcemeta.com/schemas/vendor/json-e@1.json",
+  "$comment": "https://json-e.js.org",
+  "$defs": {
+    "jsone-value": {
+      "oneOf": [
+        {
+          "$ref": "#"
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#"
+          }
+        }
+      ]
+    },
+    "jsone-array": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/jsone-value"
+      }
+    },
+    "jsone-object-array": {
+      "type": "array",
+      "items": {
+        "$ref": "#"
+      }
+    }
+  },
+  "additionalProperties": {
+    "$ref": "#/$defs/jsone-value"
+  },
+  "properties": {
+    "$else": {
+      "$ref": "#/$defs/jsone-value"
+    },
+    "$let": {
+      "type": "object",
+      "additionalProperties": {
+        "additionalProperties": {
+          "$ref": "#"
+        }
+      }
+    },
+    "$sort": {
+      "anyOf": [
+        {
+          "$ref": "#"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        }
+      ]
+    }
+  },
+  "title": "JSON-e templates",
+  "type": "object"
+}
+-- out/decode/cue --
+_schema
+_schema: {
+	// JSON-e templates
+	@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
+	@jsonschema(id="https://www.sourcemeta.com/schemas/vendor/json-e@1.json")
+	$else?: #["jsone-value"]
+	$let?: [string]: null | bool | number | string | [...] | {
+		[string]: _schema_1
+	}
+	$sort?: (_schema_5 | [...number]) & _
+	{[!~"^($else|$let|$sort)$"]: #["jsone-value"]}
+
+	#: "jsone-value": _schema_A | [..._schema_8]
+
+	#: "jsone-array": [...#["jsone-value"]]
+
+	#: "jsone-object-array": [..._schema_E]
+}
+
+let _schema_1 = _schema
+
+let _schema_5 = _schema
+
+let _schema_A = _schema
+
+let _schema_8 = _schema
+
+let _schema_E = _schema

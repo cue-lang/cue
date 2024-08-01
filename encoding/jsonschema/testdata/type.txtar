@@ -29,7 +29,7 @@
   "additionalProperties": false
 }
 
--- out.cue --
+-- out/decode/cue --
 // Main schema
 intString?: null | bool | int | string | [...]
 object?: {

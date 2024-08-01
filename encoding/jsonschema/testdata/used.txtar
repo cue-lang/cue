@@ -40,7 +40,7 @@
         }
     }
 }
--- out.cue --
+-- out/decode/cue --
 _
 
 #enum: "a" | "b" | "c"

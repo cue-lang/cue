@@ -1,4 +1,4 @@
-openapi
+#openapi
 
 -- type.yaml --
 components:
@@ -18,7 +18,7 @@ components:
       description: "The number to dial."
       type: string
 
--- out.cue --
+-- out/decode/cue --
 // A User uses something.
 #User: {
 	id?:   int

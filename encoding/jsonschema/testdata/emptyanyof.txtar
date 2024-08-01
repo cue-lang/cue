@@ -20,7 +20,7 @@
  }
 }
 
--- out.cue --
+-- out/decode/cue --
 _
 
 #shell: (string | ("bash" | "sh" | "cmd" | "powershell")) & string

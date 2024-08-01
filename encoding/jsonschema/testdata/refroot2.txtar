@@ -10,7 +10,7 @@
   }
 }
 
--- out.cue --
+-- out/decode/cue --
 _schema
 _schema: {
 	@jsonschema(schema="http://json-schema.org/draft-07/schema#")

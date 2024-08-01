@@ -67,7 +67,7 @@
   "additionalProperties": false
 }
 
--- out.cue --
+-- out/decode/cue --
 import "struct"
 
 // Main schema

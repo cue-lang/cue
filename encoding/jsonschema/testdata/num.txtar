@@ -38,7 +38,7 @@
   "additionalProperties": false
 }
 
--- out.cue --
+-- out/decode/cue --
 import (
 	"strings"
 	"math"

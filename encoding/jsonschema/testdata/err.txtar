@@ -13,8 +13,8 @@
   "additionalProperties": false
 }
 
--- out.err --
+-- out/decode/err --
 constraint not allowed because type string is excluded:
     type.json:9:9
--- out.cue --
+-- out/decode/cue --
 multi?: int & >=2 & <=3

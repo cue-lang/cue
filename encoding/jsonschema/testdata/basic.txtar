@@ -37,7 +37,7 @@
   }
 }
 
--- out.cue --
+-- out/decode/cue --
 import "strings"
 
 // Main schema

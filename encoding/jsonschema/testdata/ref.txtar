@@ -63,7 +63,7 @@
   }
 }
 
--- out.cue --
+-- out/decode/cue --
 import (
 	"acme.com/external.json:external"
 	"acme.com/external-foo.json:schema"

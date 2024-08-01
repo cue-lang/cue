@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9625a94_997a3c32",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-01T12:25:13Z",
+      "side": 1,
+      "message": "Nice.",
+      "revId": "dc8877542422310900767c24f4bb941b02835bce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6972816_2f6cc39f",
+        "filename": "encoding/jsonschema/decode_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-01T12:25:13Z",
+      "side": 1,
+      "message": "The previous version had ID as the path to the test. Might it be worth setting ID to test.Name() ?\nOtherwise maybe just omit the `ID` field as it\u0027s entirely default zero at this point?",
+      "revId": "dc8877542422310900767c24f4bb941b02835bce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

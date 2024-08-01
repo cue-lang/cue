@@ -31,6 +31,7 @@ import (
 	"cuelang.org/go/encoding/jsonschema"
 	"cuelang.org/go/encoding/yaml"
 	"cuelang.org/go/internal/astinternal"
+	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
 	_ "cuelang.org/go/pkg"
 )
@@ -41,8 +42,9 @@ import (
 // Set CUE_UPDATE=1 to update test files with the corresponding output.
 func TestDecode(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root: "./testdata",
-		Name: "decode",
+		Root:   "./testdata",
+		Name:   "decode",
+		Matrix: cuetdtest.FullMatrix,
 	}
 	test.Run(t, func(t *cuetxtar.Test) {
 		cfg := &jsonschema.Config{}

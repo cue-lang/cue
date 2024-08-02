@@ -91,13 +91,19 @@ func TestDecoder(t *testing.T) {
 		name: "RootKeysCharacters",
 		input: `
 			a-b = "dashes"
-			a_b = "underscores"
+			a_b = "underscore unquoted"
+			_   = "underscore quoted"
+			_ab = "underscore prefix quoted"
 			123 = "numbers"
+			x._.y._ = "underscores quoted"
 		`,
 		wantCUE: `
 			"a-b": "dashes"
-			a_b:   "underscores"
+			a_b:   "underscore unquoted"
+			"_":   "underscore quoted"
+			"_ab": "underscore prefix quoted"
 			"123": "numbers"
+			x: "_": y: "_": "underscores quoted"
 		`,
 	}, {
 		name: "RootKeysQuoted",

@@ -338,21 +338,13 @@ func decodeKey(key rootedKey, iter toml.Iterator) (rootedKey, []string) {
 // The "leaf" field, in this case "zzz", leaves its value as nil to be filled out.
 func inlineFields(names []string, relPos token.RelPos) (top, leaf *ast.Field) {
 	curField := &ast.Field{
-		Label: &ast.Ident{
-			// We let the caller configure whether the first field starts a new line,
-			// because that's not desirable for inline tables.
-			NamePos: token.NoPos.WithRel(relPos),
-			Name:    names[0],
-		},
+		Label: label(names[0], token.NoPos.WithRel(relPos)),
 	}
 
 	topField := curField
 	for _, elem := range names[1:] {
 		nextField := &ast.Field{
-			Label: &ast.Ident{
-				NamePos: token.NoPos.WithRel(token.Blank), // on the same line
-				Name:    elem,
-			},
+			Label: label(elem, token.NoPos.WithRel(token.Blank)), // on the same line
 		}
 		curField.Value = &ast.StructLit{Elts: []ast.Decl{nextField}}
 		curField = nextField
@@ -364,10 +356,27 @@ func inlineFields(names []string, relPos token.RelPos) (top, leaf *ast.Field) {
 //
 // TODO(mvdan): this exists in multiple packages; move to cue/literal or cue/ast?
 func quoteLabelIfNeeded(name string) string {
-	if ast.IsValidIdent(name) {
+	if name != "_" && ast.IsValidIdent(name) {
 		return name
 	}
 	return literal.Label.Quote(name)
+}
+
+// label creates an ast.Label that represents a key with exactly the literal string name.
+// This means a quoted string literal for the key "_", as TOML never means "top",
+// and identifiers for everything else, which cue/format knows how to quote accordingly.
+func label(name string, pos token.Pos) ast.Label {
+	if name == "_" {
+		return &ast.BasicLit{
+			ValuePos: pos,
+			Kind:     token.STRING,
+			Value:    `"_"`,
+		}
+	}
+	return &ast.Ident{
+		NamePos: pos,
+		Name:    name,
+	}
 }
 
 // decodeExpr decodes a single TOML value expression, found on the right side

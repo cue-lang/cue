@@ -218,12 +218,12 @@ info: {
 	version: *"v1alpha1" | string
 }
 #Bar: {
-	foo: #Foo
+	foo!: #Foo
 	...
 }
 #Foo: {
-	a: int
-	b: uint & <10
+	a!: int
+	b!: uint & <10
 	...
 }
 -- expect-cue2 --
@@ -232,12 +232,12 @@ info: {
 	version: *"v1" | string
 }
 #Bar: {
-	foo: #Foo
+	foo!: #Foo
 	...
 }
 #Foo: {
-	a: int
-	b: uint & <10
+	a!: int
+	b!: uint & <10
 	...
 }
 -- expect-cue3 --
@@ -251,17 +251,17 @@ info: {
 	version: (*"v1alpha1" | string) & (*"v1alpha1" | string)
 }
 #Bar: {
-	foo: #Foo
+	foo!: #Foo
 	...
 }
 #Foo: {
-	a: int
-	b: uint & <10
+	a!: int
+	b!: uint & <10
 	...
 }
 #Baz: {
-	a: int
-	b: uint & <10
+	a!: int
+	b!: uint & <10
 	...
 }
 -- expect-out.cue --

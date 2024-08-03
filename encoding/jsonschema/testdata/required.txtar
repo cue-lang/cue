@@ -1,0 +1,30 @@
+-- schema.json --
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "additionalProperties": false,
+  "id": "https://example.test/example",
+  "required": ["x", "z"],
+  "title": "example jsonschema",
+  "type": "object",
+  "properties": {
+    "x": {
+      "description": "A required field",
+      "type": "number"
+    },
+    "y": {
+      "description": "An optional field",
+      "type": "number"
+    }
+  }
+}
+
+-- out/decode/cue --
+// example jsonschema
+@jsonschema(schema="http://json-schema.org/draft-04/schema#")
+
+// A required field
+x!: number
+
+// An optional field
+y?: number
+z!: _

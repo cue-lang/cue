@@ -516,8 +516,9 @@ var constraints = []*constraint{
 			f := fields[str]
 			if f == nil && ok {
 				f := &ast.Field{
-					Label: ast.NewString(str),
-					Value: ast.NewIdent("_"),
+					Label:      ast.NewString(str),
+					Value:      ast.NewIdent("_"),
+					Constraint: token.NOT,
 				}
 				fields[str] = f
 				obj.Elts = append(obj.Elts, f)
@@ -526,6 +527,7 @@ var constraints = []*constraint{
 			if f.Optional == token.NoPos {
 				s.errf(n, "duplicate required field %q", str)
 			}
+			f.Constraint = token.NOT
 			f.Optional = token.NoPos
 		}
 	}),

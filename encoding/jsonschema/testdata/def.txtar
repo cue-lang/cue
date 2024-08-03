@@ -46,9 +46,9 @@ billing_address?:  #address
 shipping_address?: #address
 
 #address: {
-	street_address: string
-	city:           string
-	state:          string
+	street_address!: string
+	city!:           string
+	state!:          string
 	...
 }
 

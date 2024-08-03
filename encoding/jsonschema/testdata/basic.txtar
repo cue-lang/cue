@@ -47,7 +47,7 @@ import "strings"
 
 // A person is a human being.
 person?: {
-	name: string
+	name!: string
 
 	// where does this person live?
 	address?: strings.MinRunes(4) & strings.MaxRunes(20)

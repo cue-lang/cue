@@ -22,12 +22,12 @@ info: {
 }
 
 #Foo: {
-	a: int
-	b: int & <10 & >=0
+	a!: int
+	b!: int & <10 & >=0
 	...
 }
 #Bar: {
-	foo: #Foo
+	foo!: #Foo
 	...
 }
 -- openapi.yaml --

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4da8796c_d1e77caa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-05T17:35:51Z",
+      "side": 1,
+      "message": "I think this change also fixes https://github.com/cue-lang/cue/issues/3337",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 12
+      },
+      "revId": "9b00a928c8335ac38517ea42f79e76ad29bc2b62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -11,7 +11,7 @@
 exec cue export cue: empty
 cmp stdout as-cue.stdout
 ! exec cue export json: empty
-stderr '^panic: '
+stderr 'unexpected end of JSON input'
 ! exec cue export jsonl: empty
 stderr '^panic: '
 ! exec cue export yaml: empty
@@ -24,7 +24,7 @@ cmp stdout as-toml.stdout
 exec cue export cue: newlines
 cmp stdout as-cue.stdout
 ! exec cue export json: newlines
-stderr '^panic: '
+stderr 'unexpected end of JSON input'
 ! exec cue export jsonl: newlines
 stderr '^panic: '
 ! exec cue export yaml: newlines

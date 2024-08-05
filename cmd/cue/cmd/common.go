@@ -333,7 +333,7 @@ func (i *expressionIter) value() cue.Value {
 }
 
 type config struct {
-	outMode filetypes.Mode
+	mode filetypes.Mode
 
 	fileFilter     string
 	reFile         *regexp.Regexp
@@ -458,7 +458,7 @@ func (p *buildPlan) getDecoders(b *build.Instance) (schemas, values []*decoderIn
 		}
 		d := encoding.NewDecoder(p.cmd.ctx, f, &c)
 
-		fi, err := filetypes.FromFile(f, p.cfg.outMode)
+		fi, err := filetypes.FromFile(f, p.cfg.mode)
 		if err != nil {
 			return schemas, values, err
 		}
@@ -651,31 +651,46 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 func (b *buildPlan) parseFlags() (err error) {
 	b.mergeData = !b.cfg.noMerge && flagMerge.Bool(b.cmd)
 
-	out := flagOut.String(b.cmd)
-	outFile := flagOutFile.String(b.cmd)
-
-	if strings.Contains(out, ":") && strings.Contains(outFile, ":") {
-		return errors.Newf(token.NoPos,
-			"cannot specify qualifier in both --out and --outfile")
-	}
-	if outFile == "" {
-		outFile = "-"
-	}
-	if out != "" {
-		outFile = out + ":" + outFile
-	}
-	b.outFile, err = filetypes.ParseFile(outFile, b.cfg.outMode)
-	if err != nil {
-		return err
+	b.encConfig = &encoding.Config{
+		Mode:      b.cfg.mode,
+		Stdin:     b.cmd.InOrStdin(),
+		Stdout:    b.cmd.OutOrStdout(),
+		ProtoPath: flagProtoPath.StringArray(b.cmd),
+		AllErrors: flagAllErrors.Bool(b.cmd),
+		PkgName:   flagPackage.String(b.cmd),
+		Strict:    flagStrict.Bool(b.cmd),
 	}
 
-	for _, e := range flagExpression.StringArray(b.cmd) {
-		expr, err := parser.ParseExpr("--expression", e)
+	// For commands with an output mode, like `cue export` or `cue def`.
+	if b.cfg.mode != filetypes.Input {
+		out := flagOut.String(b.cmd)
+		outFile := flagOutFile.String(b.cmd)
+
+		if strings.Contains(out, ":") && strings.Contains(outFile, ":") {
+			return errors.Newf(token.NoPos,
+				"cannot specify qualifier in both --out and --outfile")
+		}
+		if outFile == "" {
+			outFile = "-"
+		}
+		if out != "" {
+			outFile = out + ":" + outFile
+		}
+		b.outFile, err = filetypes.ParseFile(outFile, b.cfg.mode)
 		if err != nil {
 			return err
 		}
-		b.expressions = append(b.expressions, expr)
+
+		for _, e := range flagExpression.StringArray(b.cmd) {
+			expr, err := parser.ParseExpr("--expression", e)
+			if err != nil {
+				return err
+			}
+			b.expressions = append(b.expressions, expr)
+		}
+		b.encConfig.Force = flagForce.Bool(b.cmd)
 	}
+
 	if s := flagSchema.String(b.cmd); s != "" {
 		b.schema, err = parser.ParseExpr("--schema", s)
 		if err != nil {
@@ -686,17 +701,12 @@ func (b *buildPlan) parseFlags() (err error) {
 		// Set a default file filter to only include json and yaml files
 		b.cfg.fileFilter = s
 	}
-	b.encConfig = &encoding.Config{
-		Force:         flagForce.Bool(b.cmd),
-		Mode:          b.cfg.outMode,
-		Stdin:         b.cmd.InOrStdin(),
-		Stdout:        b.cmd.OutOrStdout(),
-		ProtoPath:     flagProtoPath.StringArray(b.cmd),
-		AllErrors:     flagAllErrors.Bool(b.cmd),
-		PkgName:       flagPackage.String(b.cmd),
-		Strict:        flagStrict.Bool(b.cmd),
-		InlineImports: flagInlineImports.Bool(b.cmd),
-		EscapeHTML:    flagEscape.Bool(b.cmd),
+	// These flags exist only in specific output modes.
+	switch b.cfg.mode {
+	case filetypes.Export:
+		b.encConfig.EscapeHTML = flagEscape.Bool(b.cmd)
+	case filetypes.Def:
+		b.encConfig.InlineImports = flagInlineImports.Bool(b.cmd)
 	}
 	return nil
 }

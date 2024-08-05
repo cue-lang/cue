@@ -121,38 +121,12 @@ type unaddedFlagUse struct {
 	flag flagName
 }
 
-// TODO(ms) consider each of these in turn and either remove their
-// use, or add the flag to the flagset.
-var todoUnaddedFlagUse = map[unaddedFlagUse]struct{}{
-	{cmd: "def", flag: flagEscape}:           {},
-	{cmd: "def", flag: flagFiles}:            {},
-	{cmd: "eval", flag: flagEscape}:          {},
-	{cmd: "eval", flag: flagFiles}:           {},
-	{cmd: "eval", flag: flagInlineImports}:   {},
-	{cmd: "export", flag: flagFiles}:         {},
-	{cmd: "export", flag: flagInlineImports}: {},
-	{cmd: "import", flag: flagEscape}:        {},
-	{cmd: "import", flag: flagExpression}:    {},
-	{cmd: "import", flag: flagInlineImports}: {},
-	{cmd: "import", flag: flagOut}:           {},
-	{cmd: "vet", flag: flagEscape}:           {},
-	{cmd: "vet", flag: flagExpression}:       {},
-	{cmd: "vet", flag: flagFiles}:            {},
-	{cmd: "vet", flag: flagForce}:            {},
-	{cmd: "vet", flag: flagInlineImports}:    {},
-	{cmd: "vet", flag: flagOut}:              {},
-	{cmd: "vet", flag: flagOutFile}:          {},
-}
-
 // ensureAdded detects if a flag is being used without it first being
 // added to the flagSet. Because flagNames are global, it is quite
 // easy to accidentally use a flag in a command without adding it to
 // the flagSet.
 func (f flagName) ensureAdded(cmd *Command) {
 	if cmd.Flags().Lookup(string(f)) == nil {
-		if _, found := todoUnaddedFlagUse[unaddedFlagUse{cmd.Name(), f}]; found {
-			return
-		}
 		panic(fmt.Sprintf("Cmd %q uses flag %q without adding it", cmd.Name(), f))
 	}
 }

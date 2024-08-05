@@ -110,7 +110,7 @@ The following formats are recognized:
 }
 
 func runExport(cmd *Command, args []string) error {
-	b, err := parseArgs(cmd, args, &config{outMode: filetypes.Export})
+	b, err := parseArgs(cmd, args, &config{mode: filetypes.Export})
 	if err != nil {
 		return err
 	}

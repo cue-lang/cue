@@ -36,6 +36,7 @@ currently supported:
   Format       Extensions
 	JSON       .json .jsonl .ndjson
 	YAML       .yaml .yml
+	TOML       .toml
 	TEXT       .txt  (validate a single string value)
 
 To activate this mode, the non-cue files must be explicitly mentioned on the

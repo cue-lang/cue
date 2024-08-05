@@ -491,6 +491,7 @@ var filetypeHelp = &cobra.Command{
     cue         .cue            CUE source files.
     json        .json           JSON files.
     yaml        .yaml/.yml      YAML files.
+    toml        .toml           TOML files
     jsonl       .jsonl/.ldjson  Line-separated JSON values.
     jsonschema                  JSON Schema.
     openapi                     OpenAPI schema.

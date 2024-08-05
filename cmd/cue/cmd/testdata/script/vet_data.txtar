@@ -1,8 +1,14 @@
 ! exec cue vet schema.cue data.yaml
-cmp stderr vet-stderr
+cmp stderr yaml-stderr
 
 ! exec cue export schema.cue data.yaml
-cmp stderr export-stderr
+cmp stderr yaml-stderr
+
+# Ensure this also works for other encodings.
+
+# TODO(mvdan): note that TOML lacks position information still.
+! exec cue vet schema.cue data.toml
+cmp stderr toml-stderr
 
 -- schema.cue --
 #Language: {
@@ -19,12 +25,20 @@ languages:
     name: dutch
   - tag: no
     name: Norwegian
-
--- vet-stderr --
+-- data.toml --
+[[languages]]
+name = 'English'
+tag = 'en'
+[[languages]]
+name = 'dutch'
+tag = 'nl'
+[[languages]]
+name = 'Norwegian'
+tag = 'no'
+-- yaml-stderr --
 languages.1.name: invalid value "dutch" (out of bound =~"^\\p{Lu}"):
     ./schema.cue:3:8
     ./data.yaml:5:11
--- export-stderr --
+-- toml-stderr --
 languages.1.name: invalid value "dutch" (out of bound =~"^\\p{Lu}"):
     ./schema.cue:3:8
-    ./data.yaml:5:11

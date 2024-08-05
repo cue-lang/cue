@@ -140,7 +140,7 @@ func Repeat(x []cue.Value, count int) ([]cue.Value, error) {
 		return nil, fmt.Errorf("negative count")
 	}
 	var a []cue.Value
-	for i := 0; i < count; i++ {
+	for range count {
 		a = append(a, x...)
 	}
 	return a, nil

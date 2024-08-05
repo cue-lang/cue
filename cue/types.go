@@ -146,7 +146,7 @@ func (o *hiddenStructValue) Lookup(key string) Value {
 func (o *structValue) marshalJSON() (b []byte, err errors.Error) {
 	b = append(b, '{')
 	n := o.Len()
-	for i := 0; i < n; i++ {
+	for i := range n {
 		k, v := o.At(i)
 		s, err := internaljson.Marshal(k)
 		if err != nil {
@@ -1771,7 +1771,7 @@ func (v Value) FillPath(p Path, x interface{}) Value {
 			list := &adt.ListLit{}
 			any := &adt.Top{}
 			// TODO(perf): make this a constant thing. This will be possible with the query extension.
-			for k := 0; k < i; k++ {
+			for range i {
 				list.Elems = append(list.Elems, any)
 			}
 			list.Elems = append(list.Elems, expr, &adt.Ellipsis{})
@@ -2299,7 +2299,7 @@ func (v Value) Walk(before func(Value) bool, after func(Value)) {
 			omitHidden:      true,
 			omitDefinitions: true,
 		})
-		for i := 0; i < obj.Len(); i++ {
+		for i := range obj.Len() {
 			_, v := obj.At(i)
 			// TODO: should we error on required fields, or visit them anyway?
 			// Walk is not designed to error at this moment, though.

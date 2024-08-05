@@ -383,7 +383,7 @@ exit:
 //
 // Must be compliant with https://tools.ietf.org/html/rfc4627.
 func (s *Scanner) scanEscape(quote quoteInfo) (ok, interpolation bool) {
-	for i := 0; i < quote.numHash; i++ {
+	for range quote.numHash {
 		if s.ch != '#' {
 			return true, false
 		}
@@ -519,7 +519,7 @@ func (s *Scanner) consumeStringClose(ch rune, quote quoteInfo) (next rune, atEnd
 }
 
 func (s *Scanner) scanHashes(maxHash int) int {
-	for i := 0; i < maxHash; i++ {
+	for i := range maxHash {
 		if s.ch != '#' {
 			return i
 		}

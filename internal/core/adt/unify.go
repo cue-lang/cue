@@ -20,6 +20,7 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
+// TODO(mpvl): perhaps conjunctsProcessed is a better name for this.
 func (v *Vertex) isInitialized() bool {
 	return v.status == finalized || (v.state != nil && v.state.isInitialized)
 }

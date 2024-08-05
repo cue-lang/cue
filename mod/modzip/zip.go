@@ -841,7 +841,7 @@ func (e *zipError) Unwrap() error {
 func strToFold(s string) string {
 	// Fast path: all ASCII, no upper case.
 	// Most paths look like this already.
-	for i := 0; i < len(s); i++ {
+	for i := range len(s) {
 		c := s[i]
 		if c >= utf8.RuneSelf || 'A' <= c && c <= 'Z' {
 			goto Slow

@@ -313,7 +313,7 @@ func (d *Decoder) findArrayPrefix(key rootedKey) *openTableArray {
 // appending to the given parent key and returning the unquoted string elements.
 func decodeKey(key rootedKey, iter toml.Iterator) (rootedKey, []string) {
 	var elems []string
-	for i := 0; iter.Next(); i++ {
+	for iter.Next() {
 		name := string(iter.Node().Data)
 		// TODO(mvdan): use an append-like API once we have benchmarks
 		if len(key) > 0 {

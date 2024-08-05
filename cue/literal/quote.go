@@ -143,7 +143,7 @@ func (f Form) Append(buf []byte, s string) []byte {
 		copy(nBuf, buf)
 		buf = nBuf
 	}
-	for i := 0; i < f.hashCount; i++ {
+	for range f.hashCount {
 		buf = append(buf, '#')
 	}
 	if f.multiline {
@@ -169,7 +169,7 @@ func (f Form) Append(buf []byte, s string) []byte {
 	} else {
 		buf = append(buf, f.quote)
 	}
-	for i := 0; i < f.hashCount; i++ {
+	for range f.hashCount {
 		buf = append(buf, '#')
 	}
 
@@ -280,7 +280,7 @@ func (f *Form) appendEscapedRune(buf []byte, r rune) []byte {
 
 func (f *Form) appendEscape(buf []byte) []byte {
 	buf = append(buf, '\\')
-	for i := 0; i < f.hashCount; i++ {
+	for range f.hashCount {
 		buf = append(buf, '#')
 	}
 	return buf

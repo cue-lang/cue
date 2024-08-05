@@ -1,0 +1,63 @@
+# Test that the various encodings cope with empty files correctly.
+
+# TODO(mvdan): fix the panics below; see https://cuelang.org/issue/1790 and https://cuelang.org/issue/2714.
+
+# TODO(mvdan): cover more encodings: jsonschema, openapi, textproto, proto.
+
+# TODO(mvdan): json decoder errors seem to use absolute file paths,
+# which show the random directory names for each test run,
+# meaning that we can't cmp with a txtar file below.
+
+exec cue export cue: empty
+cmp stdout as-cue.stdout
+! exec cue export json: empty
+stderr '^panic: '
+! exec cue export jsonl: empty
+stderr '^panic: '
+! exec cue export yaml: empty
+stderr '^panic: '
+exec cue export toml: empty
+cmp stdout as-toml.stdout
+
+# Also test inputs which are just whitespace, like newlines.
+
+exec cue export cue: newlines
+cmp stdout as-cue.stdout
+! exec cue export json: newlines
+stderr '^panic: '
+! exec cue export jsonl: newlines
+stderr '^panic: '
+! exec cue export yaml: newlines
+stderr '^panic: '
+exec cue export toml: newlines
+cmp stdout as-toml.stdout
+
+# Also test inputs which are just comments.
+# Note that some languages support different syntaxes, or no comments at all.
+
+exec cue export cue: slash-comments
+cmp stdout as-cue.stdout
+! exec cue export json: slash-comments
+stderr 'invalid character ./. looking for beginning of value'
+! exec cue export jsonl: slash-comments
+stderr 'invalid character ./. looking for beginning of value'
+! exec cue export yaml: hash-comments
+stderr '^panic: '
+exec cue export toml: hash-comments
+cmp stdout as-toml.stdout
+
+-- as-cue.stdout --
+{}
+-- as-toml.stdout --
+{}
+-- empty --
+-- newlines --
+
+
+
+-- slash-comments --
+// Just two lines
+// of comments.
+-- hash-comments --
+# Just two lines
+# of comments.

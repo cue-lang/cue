@@ -47,7 +47,7 @@ var unmarshalTests = []struct {
 }{
 	{
 		"",
-		"",
+		"null",
 	},
 	{
 		"{}",
@@ -862,7 +862,7 @@ var decoderTests = []struct {
 	want string
 }{{
 	"",
-	"",
+	"null",
 }, {
 	"a: b",
 	`a: "b"`,

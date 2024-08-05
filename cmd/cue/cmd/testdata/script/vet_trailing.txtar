@@ -3,23 +3,23 @@
 
 # First, sanity check that other commands spot the trailing invalid syntax.
 ! exec cue eval   data-trailing-garbage.json
-stderr 'invalid JSON'
+stderr 'invalid JSON.*after top-level value'
 ! exec cue def    data-trailing-garbage.json
-stderr 'invalid JSON'
+stderr 'invalid JSON.*after top-level value'
 ! exec cue export data-trailing-garbage.json
-stderr 'invalid JSON'
+stderr 'invalid JSON.*after top-level value'
 ! exec cue eval   data-trailing-garbage.jsonl
-stderr 'invalid JSON'
+stderr 'invalid JSON.*looking for beginning of value'
 
 # Then, check that vet does too.
 ! exec cue vet schema.cue data-trailing-garbage.json
-stderr 'invalid JSON'
+stderr 'invalid JSON.*after top-level value'
 ! exec cue vet schema.cue data-trailing-garbage.jsonl
-stderr 'invalid JSON'
+stderr 'invalid JSON.*looking for beginning of value'
 
 # Check that even the last value is validated as well.
 ! exec cue vet schema.cue data-trailing-mismatch.json
-stderr 'foo: conflicting values "789" and int'
+stderr 'invalid JSON.*after top-level value'
 ! exec cue vet schema.cue data-trailing-mismatch.jsonl
 stderr 'foo: conflicting values "789" and int'
 

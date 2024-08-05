@@ -1,8 +1,12 @@
-exec cue vet schema.cue json: foo.data
+exec cue vet schema.cue jsonl: foo.data
 ! stderr .
 
-exec cue export schema.cue json: foo.data
+exec cue export schema.cue jsonl: foo.data
 cmp stdout export-stdout
+
+# Multiple JSON values should be rejected if we're not using jsonl.
+! exec cue vet schema.cue json: foo.data
+stderr 'invalid JSON.*after top-level value'
 
 -- schema.cue --
 [string]: string

@@ -16,6 +16,24 @@
       "message": "If this happens, will the error contain the name of the file that we failed to read?",
       "revId": "5fae3d942632bcf5cc2909d7635e542b04d47ec4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f69278a_e32b2df9",
+        "filename": "internal/encoding/encoding.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-05T17:06:42Z",
+      "side": 1,
+      "message": "I\u0027m not sure. The rest of the code has called ReadAll the same way for years, so I\u0027m not too worried right now. I\u0027ve added an item in my TODO list to check at a later time and, if there\u0027s a bug, fix it for all encodings that call ReadAll as a separate change.",
+      "parentUuid": "4b8fd4a3_f073614a",
+      "revId": "5fae3d942632bcf5cc2909d7635e542b04d47ec4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

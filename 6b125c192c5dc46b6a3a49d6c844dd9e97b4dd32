@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bb564ae_1637e85f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-05T08:12:08Z",
+      "side": 1,
+      "message": "It\u0027s going to take a while for me to get used to looking at this new form and not doing a double-take. I\u0027m not sure I like it, but that might change in time.",
+      "revId": "6b125c192c5dc46b6a3a49d6c844dd9e97b4dd32",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49766b1c_1fcff427",
+        "filename": "cue/ast/astutil/apply.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 474,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-05T08:12:08Z",
+      "side": 1,
+      "message": "I\u0027ve looked carefully at this, and I\u0027m 99% sure this could be turned into a plain `range i, cg :\u003d range c.cg` given that `c.cg` (which I would prefer to be renamed to `cgs` - it\u0027s plural) is a list of pointers.",
+      "revId": "6b125c192c5dc46b6a3a49d6c844dd9e97b4dd32",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

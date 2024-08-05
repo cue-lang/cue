@@ -120,10 +120,7 @@ func (d *decoder) Decode() (ast.Expr, error) {
 			// If the input is empty, we produce a single null literal with EOF.
 			// Note that when the input contains "---", we get an empty document
 			// with a null scalar value inside instead.
-			//
-			// TODO(mvdan): the old decoder seemingly intended to do this,
-			// but returned a "null" literal with io.EOF, which consumers ignored.
-			if false && !d.yamlNonEmpty {
+			if !d.yamlNonEmpty {
 				return &ast.BasicLit{
 					Kind:  token.NULL,
 					Value: "null",

@@ -33,6 +33,24 @@
       "message": "I think this still isn\u0027t quite right - I think we need logic for other underscore-prefixed identifiers too. For example, I think the following testscript should pass, but it does not:\n\n```\nexec cue export input.toml\ncmp stdout want-stdout\n\n-- want-stdout --\n{\n    \"_x\": \"something\"\n}\n-- input.toml --\n_x \u003d \"something\"\n```",
       "revId": "db05a7a4fb384265a439e79e37af678709ec39c0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c81c16c_049554d7",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 369,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-05T17:24:43Z",
+      "side": 1,
+      "message": "ah, good point, I was forgetting about hidden fields and exporting. done, I think.",
+      "parentUuid": "79b2ffee_d96a167c",
+      "revId": "db05a7a4fb384265a439e79e37af678709ec39c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

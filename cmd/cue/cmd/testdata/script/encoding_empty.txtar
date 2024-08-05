@@ -14,8 +14,8 @@ cmp stdout as-cue.stdout
 stderr 'unexpected end of JSON input'
 ! exec cue export jsonl: empty
 stderr '^panic: '
-! exec cue export yaml: empty
-stderr '^panic: '
+exec cue export yaml: empty
+cmp stdout as-yaml.stdout
 exec cue export toml: empty
 cmp stdout as-toml.stdout
 
@@ -27,8 +27,8 @@ cmp stdout as-cue.stdout
 stderr 'unexpected end of JSON input'
 ! exec cue export jsonl: newlines
 stderr '^panic: '
-! exec cue export yaml: newlines
-stderr '^panic: '
+exec cue export yaml: newlines
+cmp stdout as-yaml.stdout
 exec cue export toml: newlines
 cmp stdout as-toml.stdout
 
@@ -41,13 +41,15 @@ cmp stdout as-cue.stdout
 stderr 'invalid character ./. looking for beginning of value'
 ! exec cue export jsonl: slash-comments
 stderr 'invalid character ./. looking for beginning of value'
-! exec cue export yaml: hash-comments
-stderr '^panic: '
+exec cue export yaml: hash-comments
+cmp stdout as-yaml.stdout
 exec cue export toml: hash-comments
 cmp stdout as-toml.stdout
 
 -- as-cue.stdout --
 {}
+-- as-yaml.stdout --
+null
 -- as-toml.stdout --
 {}
 -- empty --

@@ -16,6 +16,24 @@
       "message": "Nice approach: I hadn\u0027t anticipated the flags could be tied to the `outMode` like this, but it makes sense, and the solution is much shorter than I expected.\nIt might however make sense to rename `config.outMode` to `config.mode`, given that we can have `outMode \u003d Input` which is a touch troubling.",
       "revId": "65e954cbb88c842befa32663e020f3371afedc92",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdfe2cb9_931bdf02",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-05T14:38:24Z",
+      "side": 1,
+      "message": "done; internal/encoding.Config calls it Mode too.",
+      "parentUuid": "b20620a0_ce5730be",
+      "revId": "65e954cbb88c842befa32663e020f3371afedc92",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

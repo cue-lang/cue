@@ -471,8 +471,7 @@ func (f *applier) After(c Cursor) bool {
 
 func (f *applier) visitComments(p Cursor, pos int8) {
 	c := &f.current
-	for i := 0; i < len(c.cg); i++ {
-		cg := c.cg[i]
+	for i, cg := range c.cg {
 		if cg.Position == pos {
 			continue
 		}

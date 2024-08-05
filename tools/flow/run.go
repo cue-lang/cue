@@ -222,7 +222,7 @@ func (c *Controller) updateTaskResults(t *Task) bool {
 			list := &adt.ListLit{}
 			any := &adt.Top{}
 			// TODO(perf): make this a constant thing. This will be possible with the query extension.
-			for k := 0; k < i; k++ {
+			for range i {
 				list.Elems = append(list.Elems, any)
 			}
 			list.Elems = append(list.Elems, expr, &adt.Ellipsis{})

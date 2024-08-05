@@ -142,7 +142,7 @@ func ParseQuotes(start, end string) (q QuoteInfo, nStart, nEnd int, err error) {
 // are replaced with the corresponding non-surrogate code points.
 func (q QuoteInfo) Unquote(s string) (string, error) {
 	if len(s) > 0 && !q.multiline {
-		if contains(s, '\n') || contains(s, '\r') {
+		if strings.ContainsAny(s, "\n\r") {
 			return "", errSyntax
 		}
 
@@ -264,16 +264,6 @@ func isSimple(s string, quote rune) bool {
 		}
 	}
 	return true
-}
-
-// contains reports whether the string contains the byte c.
-func contains(s string, c byte) bool {
-	for i := 0; i < len(s); i++ {
-		if s[i] == c {
-			return true
-		}
-	}
-	return false
 }
 
 const (

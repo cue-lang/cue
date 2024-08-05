@@ -64,7 +64,7 @@ func (w *Work[T]) Do(n int, f func(item T)) {
 	w.f = f
 	w.wait.L = &w.mu
 
-	for i := 0; i < n-1; i++ {
+	for range n - 1 {
 		go w.runner()
 	}
 	w.runner()

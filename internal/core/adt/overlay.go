@@ -193,9 +193,8 @@ func (ctx *overlayContext) cloneVertex(x *Vertex) *Vertex {
 }
 
 func (ctx *overlayContext) cloneNodeContext(n *nodeContext) *nodeContext {
-	if !n.isInitialized {
+	if !n.node.isInitialized() {
 		panic("unexpected uninitialized node")
-
 	}
 	d := n.ctx.newNodeContext(n.node)
 	d.underlying = n.underlying

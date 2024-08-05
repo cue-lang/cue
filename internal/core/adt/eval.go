@@ -1064,6 +1064,8 @@ type conjunct struct {
 
 type nodeContextState struct {
 	// isInitialized indicates whether conjuncts have been inserted in the node.
+	// Use node.isInitialized() to more generally check whether conjuncts have
+	// been processed.
 	isInitialized bool
 
 	// toComplete marks whether completeNodeTasks needs to be called on this

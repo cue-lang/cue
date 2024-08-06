@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ad2c939_c84fa67a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-06T08:26:03Z",
+      "side": 1,
+      "message": "should we then add a TODO to give either of the two better names? `n.isInitialized` versus `n.node.isInitialized()` both seem almost identical in purpose, but from what you describe, they do relatively different things.",
+      "revId": "c62ec230368037c6135dde35fcf6f89fb584a452",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "7d812908_99040ef3",
@@ -14,6 +31,23 @@
       "writtenOn": "2024-08-06T08:23:56Z",
       "side": 1,
       "message": "I spoke briefly with Marcel on this one - I think it\u0027s ready for review.",
+      "revId": "c62ec230368037c6135dde35fcf6f89fb584a452",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f78a4b3a_8bf646d7",
+        "filename": "cue/testdata/eval/issue3330.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-06T08:26:03Z",
+      "side": 1,
+      "message": "nit: trailing whitespace in a few lines",
       "revId": "c62ec230368037c6135dde35fcf6f89fb584a452",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -19,6 +19,7 @@
 package toml
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -130,6 +131,12 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 		}
 	}
 	if err := d.parser.Error(); err != nil {
+		var pe *toml.ParserError
+		if errors.As(err, &pe) {
+			shape := d.parser.Shape(d.parser.Range(pe.Highlight))
+			return nil, posErrorf(shape.Start, pe.Message)
+		}
+
 		return nil, err
 	}
 	return d.topFile, nil
@@ -176,7 +183,7 @@ func (d *Decoder) nextRootNode(tnode *toml.Node) error {
 		key, keyElems := decodeKey("", tnode.Key())
 		// All table keys must be unique, including for the top-level table.
 		if d.seenTableKeys[key] {
-			return fmt.Errorf("duplicate key: %s", key)
+			return d.nodeErrorf(tnode, "duplicate key: %s", key)
 		}
 		d.seenTableKeys[key] = true
 
@@ -189,7 +196,7 @@ func (d *Decoder) nextRootNode(tnode *toml.Node) error {
 		array := d.findArrayPrefix(key)
 		if array != nil { // [last_array.new_table]
 			if array.key == key {
-				return fmt.Errorf("cannot redeclare table array %q as a table", key)
+				return d.nodeErrorf(tnode, "cannot redeclare table array %q as a table", key)
 			}
 			subKeyElems := keyElems[array.level:]
 			topField, leafField := inlineFields(subKeyElems, token.Newline)
@@ -206,7 +213,7 @@ func (d *Decoder) nextRootNode(tnode *toml.Node) error {
 		// Table array elements always begin a new line.
 		key, keyElems := decodeKey("", tnode.Key())
 		if d.seenTableKeys[key] {
-			return fmt.Errorf("cannot redeclare key %q as a table array", key)
+			return d.nodeErrorf(tnode, "cannot redeclare key %q as a table array", key)
 		}
 		// Each struct inside a table array sits on separate lines.
 		d.currentTable = &ast.StructLit{
@@ -250,21 +257,31 @@ func (d *Decoder) nextRootNode(tnode *toml.Node) error {
 		}
 
 	default:
-		return fmt.Errorf("encoding/toml.Decoder.nextRootNode: unknown %s %#v", tnode.Kind, tnode)
+		return d.nodeErrorf(tnode, "encoding/toml.Decoder.nextRootNode: unknown %s %#v", tnode.Kind, tnode)
 	}
 	return nil
+}
+
+func (d *Decoder) nodeErrorf(tnode *toml.Node, format string, args ...any) error {
+	shape := d.parser.Shape(tnode.Raw)
+	return posErrorf(shape.Start, format, args...)
+}
+
+func posErrorf(pos toml.Position, format string, args ...any) error {
+	// TODO: support filename
+	return fmt.Errorf(strconv.Itoa(pos.Line)+":"+strconv.Itoa(pos.Column)+": "+format, args...)
 }
 
 // decodeField decodes a single table key and its value as a struct field.
 func (d *Decoder) decodeField(key rootedKey, tnode *toml.Node, relPos token.RelPos) (*ast.Field, error) {
 	key, keyElems := decodeKey(key, tnode.Key())
 	if d.findArray(key) != nil {
-		return nil, fmt.Errorf("cannot redeclare table array %q as a table", key)
+		return nil, d.nodeErrorf(tnode, "cannot redeclare table array %q as a table", key)
 	}
 	topField, leafField := inlineFields(keyElems, relPos)
 	// All table keys must be unique, including inner table ones.
 	if d.seenTableKeys[key] {
-		return nil, fmt.Errorf("duplicate key: %s", key)
+		return nil, d.nodeErrorf(tnode, "duplicate key: %s", key)
 	}
 	d.seenTableKeys[key] = true
 	value, err := d.decodeExpr(key, tnode.Value())
@@ -425,6 +442,6 @@ func (d *Decoder) decodeExpr(key rootedKey, tnode *toml.Node) (ast.Expr, error) 
 		return strct, nil
 	// TODO(mvdan): dates and times
 	default:
-		return nil, fmt.Errorf("encoding/toml.Decoder.decodeExpr: unknown %s %#v", tnode.Kind, tnode)
+		return nil, d.nodeErrorf(tnode, "encoding/toml.Decoder.decodeExpr: unknown %s %#v", tnode.Kind, tnode)
 	}
 }

@@ -54,7 +54,7 @@ func TestDecoder(t *testing.T) {
 		input: `
 			= "no key name"
 		`,
-		wantErr: "invalid character at start of key: =",
+		wantErr: "2:4: invalid character at start of key: =",
 	}, {
 		name: "RootKeysOne",
 		input: `
@@ -131,28 +131,28 @@ func TestDecoder(t *testing.T) {
 			foo = "same key"
 			foo = "same key"
 		`,
-		wantErr: `duplicate key: foo`,
+		wantErr: `1:1: duplicate key: foo`,
 	}, {
 		name: "KeysDuplicateQuoted",
 		input: `
 			"foo" = "same key"
 			foo = "same key"
 		`,
-		wantErr: `duplicate key: foo`,
+		wantErr: `1:1: duplicate key: foo`,
 	}, {
 		name: "KeysDuplicateWhitespace",
 		input: `
 			foo . bar = "same key"
 			foo.bar = "same key"
 		`,
-		wantErr: `duplicate key: foo\.bar`,
+		wantErr: `1:1: duplicate key: foo\.bar`,
 	}, {
 		name: "KeysDuplicateDots",
 		input: `
 			foo."bar.baz".zzz = "same key"
 			foo."bar.baz".zzz = "same key"
 		`,
-		wantErr: `duplicate key: foo\."bar\.baz"\.zzz`,
+		wantErr: `1:1: duplicate key: foo\."bar\.baz"\.zzz`,
 	}, {
 		name: "KeysNotDuplicateDots",
 		input: `
@@ -329,13 +329,13 @@ line two.\
 		input: `
 			point = {x = "same key", x = "same key"}
 		`,
-		wantErr: `duplicate key: point\.x`,
+		wantErr: `1:1: duplicate key: point\.x`,
 	}, {
 		name: "ArrayInlineTablesDuplicate",
 		input: `
 			point = [{}, {}, {x = "same key", x = "same key"}]
 		`,
-		wantErr: `duplicate key: point\.2\.x`,
+		wantErr: `1:1: duplicate key: point\.2\.x`,
 	}, {
 		name: "InlineTablesNotDuplicateScoping",
 		input: `
@@ -418,7 +418,7 @@ line two.\
 			[foo]
 			[foo]
 		`,
-		wantErr: `duplicate key: foo`,
+		wantErr: `1:1: duplicate key: foo`,
 	}, {
 		name: "TableKeysDuplicateOverlap",
 		input: `
@@ -427,7 +427,7 @@ line two.\
 			[foo.bar]
 			baz = "second leaf"
 		`,
-		wantErr: `duplicate key: foo.bar`,
+		wantErr: `1:1: duplicate key: foo.bar`,
 	}, {
 		name: "TableInnerKeysDuplicateSimple",
 		input: `
@@ -435,7 +435,7 @@ line two.\
 			bar = "same key"
 			bar = "same key"
 		`,
-		wantErr: `duplicate key: foo\.bar`,
+		wantErr: `1:1: duplicate key: foo\.bar`,
 	}, {
 		name: "TablesNotDuplicateScoping",
 		input: `
@@ -630,7 +630,7 @@ line two.\
 			[[foo]]
 			baz = "baz value"
 		`,
-		wantErr: `cannot redeclare key "foo" as a table array`,
+		wantErr: `1:1: cannot redeclare key "foo" as a table array`,
 	}, {
 		name: "RedeclareTableAsTableArray",
 		input: `
@@ -641,7 +641,7 @@ line two.\
 			[[foo]]
 			baz = "baz value"
 		`,
-		wantErr: `cannot redeclare key "foo" as a table array`,
+		wantErr: `1:1: cannot redeclare key "foo" as a table array`,
 	}, {
 		name: "RedeclareArrayAsTableArray",
 		input: `
@@ -651,7 +651,7 @@ line two.\
 			[[foo]]
 			baz = "baz value"
 		`,
-		wantErr: `cannot redeclare key "foo" as a table array`,
+		wantErr: `1:1: cannot redeclare key "foo" as a table array`,
 	}, {
 		name: "RedeclareTableArrayAsKey",
 		input: `
@@ -662,7 +662,7 @@ line two.\
 			[foo]
 			foo2 = "redeclaring"
 		`,
-		wantErr: `cannot redeclare table array "foo.foo2" as a table`,
+		wantErr: `1:1: cannot redeclare table array "foo.foo2" as a table`,
 	}, {
 		name: "RedeclareTableArrayAsTable",
 		input: `
@@ -673,7 +673,7 @@ line two.\
 			[foo]
 			baz = "baz value"
 		`,
-		wantErr: `cannot redeclare table array "foo" as a table`,
+		wantErr: `1:1: cannot redeclare table array "foo" as a table`,
 	}, {
 		name: "KeysNotDuplicateTableArrays",
 		input: `

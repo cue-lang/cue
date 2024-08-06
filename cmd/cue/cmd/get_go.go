@@ -370,10 +370,9 @@ func extract(cmd *Command, args []string) error {
 	root := binst.Root
 
 	cfg := &packages.Config{
-		Mode: packages.NeedName | packages.NeedFiles | packages.NeedCompiledGoFiles |
-			packages.NeedImports | packages.NeedTypes | packages.NeedTypesSizes |
-			packages.NeedSyntax | packages.NeedTypesInfo | packages.NeedDeps |
-			packages.NeedModule,
+		Mode: packages.NeedName | packages.NeedCompiledGoFiles |
+			packages.NeedImports | packages.NeedDeps | packages.NeedTypes |
+			packages.NeedSyntax | packages.NeedTypesInfo | packages.NeedModule,
 	}
 	pkgs, err := packages.Load(cfg, args...)
 	if err != nil {

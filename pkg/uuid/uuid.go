@@ -21,16 +21,20 @@ import (
 	"fmt"
 	"math/big"
 	"regexp"
+	"sync"
 
 	"github.com/google/uuid"
 )
 
-var valid = regexp.MustCompile(
-	"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
+var valid = sync.OnceValue(func() *regexp.Regexp {
+	return regexp.MustCompile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
+})
+
+// TODO(mvdan): should Valid not use [uuid.Validate]?
 
 // Valid can be used to define a valid Valid.
 func Valid(s string) error {
-	if !valid.MatchString(string(s)) {
+	if !valid().MatchString(string(s)) {
 		return fmt.Errorf("invalid UUID %q", s)
 	}
 	return nil

@@ -1,0 +1,41 @@
+# JSONL is also known as NDJSON, and it used to be known as LDJSON too.
+# We support all three names as extensions.
+
+cp input.jsonl input.none
+cp input.jsonl input.ndjson
+cp input.jsonl input.ldjson
+
+exec cue export input.jsonl
+cmp stdout export.stdout
+exec cue export jsonl: input.none
+cmp stdout export.stdout
+
+exec cue export input.ndjson
+cmp stdout export.stdout
+! exec cue export ndjson: input.none
+stderr 'unknown filetype ndjson'
+
+exec cue export input.ldjson
+cmp stdout export.stdout
+! exec cue export ldjson: input.none
+stderr 'unknown filetype ldjson'
+
+# Multiple JSON values are rejected on a regular JSON file.
+
+cp input.jsonl input.json
+! exec cue export input.json
+stderr 'invalid JSON .* after top-level value'
+! exec cue export json: input.none
+stderr 'invalid JSON .* after top-level value'
+
+-- input.jsonl --
+{"a": "one"}
+{"b": "two"}
+{"c1": "three", "c2": "four"}
+-- export.stdout --
+{
+    "a": "one",
+    "b": "two",
+    "c1": "three",
+    "c2": "four"
+}

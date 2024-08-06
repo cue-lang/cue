@@ -22,6 +22,30 @@
       },
       "revId": "9b00a928c8335ac38517ea42f79e76ad29bc2b62",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1be2a44_24309366",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-06T07:12:41Z",
+      "side": 1,
+      "message": "indeed, done - we briefly talked about this with Roger.",
+      "parentUuid": "4da8796c_d1e77caa",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 34,
+        "endChar": 12
+      },
+      "revId": "9b00a928c8335ac38517ea42f79e76ad29bc2b62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

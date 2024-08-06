@@ -1,0 +1,83 @@
+# JSONL is also known as NDJSON, and it used to be known as LDJSON too.
+# We support all three names as extensions.
+
+exec cue export input-jsonl.jsonl
+cmp stdout export.stdout
+exec cue export jsonl: input-none.none
+cmp stdout export.stdout
+
+exec cue export input-ndjson.ndjson
+cmp stdout export.stdout
+# TODO(mvdan): should we support ndjson as an alias for jsonl? it has become the more popular name.
+! exec cue export ndjson: input-none.none
+stderr 'unknown filetype ndjson'
+
+exec cue export input-ldjson.ldjson
+cmp stdout export.stdout
+! exec cue export ldjson: input-none.none
+stderr 'unknown filetype ldjson'
+
+# Multiple JSON values are rejected on a regular JSON file.
+
+! exec cue export input-many.json
+stderr 'invalid JSON .* after top-level value'
+! exec cue export json: input-none.none
+stderr 'invalid JSON .* after top-level value'
+exec cue export input-one.json
+cmp stdout export-one.stdout
+
+# Check that `cue import` supports all filenames too,
+# both by default and when loading JSON only.
+# TODO(mvdan): ndjson is not supported here, but it should.
+# TODO(mvdan): note that `cue import --dry-run` does not work,
+# so we need to use rm and stderr checks to ensure we create the files we expect.
+
+! exec cue import --list .
+stderr 'invalid JSON .*input-many.json.* after top-level value'
+rm input-many.json
+
+rm input-jsonl.cue input-ldjson.cue input-one.cue
+exec cue import --list .
+! stderr 'Skipping file.*already exists'
+exists input-jsonl.cue input-ldjson.cue input-one.cue
+! exists input-none.cue input-ndjson.cue
+
+rm input-jsonl.cue input-ldjson.cue input-one.cue
+exec cue import json --list .
+! stderr 'Skipping file.*already exists'
+exists input-jsonl.cue input-ldjson.cue input-one.cue
+! exists input-none.cue input-ndjson.cue
+
+-- input-none.none --
+{"a": "one"}
+{"b": "two"}
+{"c1": "three", "c2": "four"}
+-- input-jsonl.jsonl --
+{"a": "one"}
+{"b": "two"}
+{"c1": "three", "c2": "four"}
+-- input-ndjson.ndjson --
+{"a": "one"}
+{"b": "two"}
+{"c1": "three", "c2": "four"}
+-- input-ldjson.ldjson --
+{"a": "one"}
+{"b": "two"}
+{"c1": "three", "c2": "four"}
+-- export.stdout --
+{
+    "a": "one",
+    "b": "two",
+    "c1": "three",
+    "c2": "four"
+}
+-- input-one.json --
+{"a": "json one"}
+-- export-one.stdout --
+{
+    "a": "json one"
+}
+-- input-many.json --
+{"a": "json one"}
+{"b": "json two"}
+{"c1": "json three", "c2": "json four"}

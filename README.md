@@ -52,7 +52,8 @@ and default values.
 At the same time,
 data can be simplified by removing values implied by such detailed definitions.
 The merging of these two concepts enables
-many tasks to be handled in a principled way.
+many tasks to be handled in a principled way,
+using an elegant and concise syntax.
 
 Constraints provide a simple and well-defined, yet powerful, alternative
 to inheritance,

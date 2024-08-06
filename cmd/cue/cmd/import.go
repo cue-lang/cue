@@ -258,7 +258,7 @@ Example:
 	addOrphanFlags(cmd.Flags())
 
 	cmd.Flags().Bool(string(flagFiles), false, "split multiple entries into different files")
-	cmd.Flags().Bool(string(flagDryRun), false, "only run simulation")
+	cmd.Flags().Bool(string(flagDryRun), false, "show what files would be created")
 	cmd.Flags().BoolP(string(flagRecursive), "R", false, "recursively parse string values")
 	cmd.Flags().StringArray(string(flagExt), nil, "match files with these extensions")
 
@@ -442,7 +442,7 @@ func getFilename(b *buildPlan, f *ast.File, root string, force bool) (filename s
 			if !force {
 				// TODO: mimic old behavior: write to stderr, but do not exit
 				// with error code. Consider what is best to do here.
-				stderr := b.cmd.Command.OutOrStderr()
+				stderr := b.cmd.OutOrStderr()
 				if root != "" {
 					cueFile, _ = filepath.Rel(root, cueFile)
 				}
@@ -478,6 +478,19 @@ func handleFile(b *buildPlan, f *ast.File) (err error) {
 }
 
 func writeFile(p *buildPlan, f *ast.File, cueFile string) error {
+	if flagDryRun.Bool(p.cmd) {
+		origFile, err := filepath.Rel(rootWorkingDir, f.Filename)
+		if err != nil {
+			return err
+		}
+		cueFile, err := filepath.Rel(rootWorkingDir, cueFile)
+		if err != nil {
+			return err
+		}
+		stderr := p.cmd.OutOrStderr()
+		fmt.Fprintf(stderr, "importing %q into %q\n", origFile, cueFile)
+		return nil
+	}
 	b, err := format.Node(f, format.Simplify())
 	if err != nil {
 		return fmt.Errorf("error formatting file: %v", err)

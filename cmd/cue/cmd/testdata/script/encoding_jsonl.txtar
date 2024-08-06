@@ -32,21 +32,15 @@ cmp stdout export-one.stdout
 # TODO(mvdan): note that `cue import --dry-run` does not work,
 # so we need to use rm and stderr checks to ensure we create the files we expect.
 
-! exec cue import --list .
+! exec cue import --list --dry-run .
 stderr 'invalid JSON .*input-many.json.* after top-level value'
 rm input-many.json
 
-rm input-jsonl.cue input-ldjson.cue input-one.cue
-exec cue import --list .
-! stderr 'Skipping file.*already exists'
-exists input-jsonl.cue input-ldjson.cue input-one.cue
-! exists input-none.cue input-ndjson.cue
+exec cue import --list --dry-run .
+cmp stderr import.stderr
 
-rm input-jsonl.cue input-ldjson.cue input-one.cue
-exec cue import json --list .
-! stderr 'Skipping file.*already exists'
-exists input-jsonl.cue input-ldjson.cue input-one.cue
-! exists input-none.cue input-ndjson.cue
+exec cue import json --list --dry-run .
+cmp stderr import.stderr
 
 -- input-none.none --
 {"a": "one"}
@@ -81,3 +75,7 @@ exists input-jsonl.cue input-ldjson.cue input-one.cue
 {"a": "json one"}
 {"b": "json two"}
 {"c1": "json three", "c2": "json four"}
+-- import.stderr --
+importing "input-jsonl.cue" into "input-jsonl.cue"
+importing "input-ldjson.cue" into "input-ldjson.cue"
+importing "input-one.cue" into "input-one.cue"

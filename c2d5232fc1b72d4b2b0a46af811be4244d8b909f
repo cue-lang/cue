@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5d8b1ff_a31f06d3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-06T14:58:57Z",
+      "side": 1,
+      "message": "Hi, thanks for your patch! Sorry for the confusion but I had already started working on this - you might see that #3339 has been assigned to me for a week. You didn\u0027t spend much time here I hope, and my work-in-progress patch is quite similar, so I\u0027ll take a look at whether to adapt yours or finish mine. But either way, it\u0027s best not to duplicate work :)",
+      "revId": "c2d5232fc1b72d4b2b0a46af811be4244d8b909f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

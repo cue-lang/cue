@@ -2671,6 +2671,17 @@ b: "Hello \( a )!" // Hello World!
 
 Builtin functions are predeclared. They are called like any other function.
 
+A special kind of builtin function is a validator, which satisfies that
+another value has some property.
+A _validator_ returns a _validator function_ `f` that takes a single value `x`
+and returns `x` if `x` satisfies the property, or bottom otherwise.
+The validator function is invoked as `f(x)` as a result of unifying it with `x`.
+
+Note that a validator may not return a value other than `x` or bottom and thus
+cannot make a value it is unified with more specific.
+To avoid giving impropor results, validators should only be called on fully
+evaluated values.
+
 
 ### `len`
 
@@ -2773,6 +2784,47 @@ with `quo(x, y)` truncated towards zero.
 
 A zero divisor in either case results in bottom (an error).
 
+### `matchN`
+
+The builtin function `matchN(count, list)` is a validator.
+The validator function `f(x)` returned by `matchN` counts the how many of a
+given number of CUE values in the given `list` unify with `x` and returns
+`x` if the count unifies with `number`, or bottom otherwise.
+
+Note that the result of unification with the values is not returned.
+To avoid that the result is not compatible with the schema, `x` is evaluated
+to remove all references and default values before unifying it with the schema.
+
+```
+import "math"
+
+// oneOf
+a:  matchN(1, [math.MultipleOf(3), math.MultipleOf(5)])
+a1: 1   // error
+a2: 3   // ok
+a3: 5   // ok
+a4: 15  // error
+
+// anyOf
+b:  matchN(>0, [math.MultipleOf(3), math.MultipleOf(5)])
+b1: 1   // error
+b2: 3   // ok
+b3: 5   // ok
+b4: 15  // ok
+
+#X: a: int
+#Y: b: string
+
+c:  matchN(0, [#X]) // not(#X)
+c1: a: "str"        // ok
+c2: b: "str"        // error
+
+X: a: 2  // a must be 2
+
+// match without unifying
+d: matchN(1, [X])
+d: a: *3 | int // error: default picked before matching.
+```
 
 ## Cycles
 

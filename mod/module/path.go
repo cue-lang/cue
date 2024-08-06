@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"sync"
 	"unicode"
 	"unicode/utf8"
 
@@ -15,8 +16,12 @@ import (
 // The following regular expressions come from https://github.com/opencontainers/distribution-spec/blob/main/spec.md#pulling-manifests
 // and ensure that we can store modules inside OCI registries.
 var (
-	basePathPat = regexp.MustCompile(`^[a-z0-9]+((\.|_|__|-+)[a-z0-9]+)*(/[a-z0-9]+((\.|_|__|-+)[a-z0-9]+)*)*$`)
-	tagPat      = regexp.MustCompile(`^[a-zA-Z0-9_][a-zA-Z0-9._-]{0,127}$`)
+	basePathPat = sync.OnceValue(func() *regexp.Regexp {
+		return regexp.MustCompile(`^[a-z0-9]+((\.|_|__|-+)[a-z0-9]+)*(/[a-z0-9]+((\.|_|__|-+)[a-z0-9]+)*)*$`)
+	})
+	tagPat = sync.OnceValue(func() *regexp.Regexp {
+		return regexp.MustCompile(`^[a-zA-Z0-9_][a-zA-Z0-9._-]{0,127}$`)
+	})
 )
 
 // Check checks that a given module path, version pair is valid.
@@ -128,7 +133,7 @@ func CheckPathWithoutVersion(basePath string) (err error) {
 		}
 	}
 	// Sanity check agreement with OCI specs.
-	if !basePathPat.MatchString(basePath) {
+	if !basePathPat().MatchString(basePath) {
 		return fmt.Errorf("path does not conform to OCI repository name restrictions; see https://github.com/opencontainers/distribution-spec/blob/HEAD/spec.md#pulling-manifests")
 	}
 	return nil
@@ -165,7 +170,7 @@ func CheckPath(mpath string) (err error) {
 		if semver.Major(vers) != vers {
 			return fmt.Errorf("path can contain major version only")
 		}
-		if !tagPat.MatchString(vers) {
+		if !tagPat().MatchString(vers) {
 			return fmt.Errorf("non-conforming version %q", vers)
 		}
 	} else {

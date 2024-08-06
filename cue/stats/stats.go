@@ -18,6 +18,7 @@ package stats
 
 import (
 	"strings"
+	"sync"
 	"text/template"
 )
 
@@ -100,7 +101,8 @@ func (s Counts) Leaks() int64 {
 	return s.Allocs + s.Reused - s.Freed
 }
 
-var stats = template.Must(template.New("stats").Parse(`{{"" -}}
+var stats = sync.OnceValue(func() *template.Template {
+	return template.Must(template.New("stats").Parse(`{{"" -}}
 
 Leaks:  {{.Leaks}}
 Freed:  {{.Freed}}
@@ -111,10 +113,11 @@ Retain: {{.Retained}}
 Unifications: {{.Unifications}}
 Conjuncts:    {{.Conjuncts}}
 Disjuncts:    {{.Disjuncts}}`))
+})
 
 func (s Counts) String() string {
 	buf := &strings.Builder{}
-	err := stats.Execute(buf, s)
+	err := stats().Execute(buf, s)
 	if err != nil {
 		panic(err)
 	}

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "07bb91a0_790546f3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-07T06:31:24Z",
+      "side": 1,
+      "message": "LGTM with one slight concern.",
+      "revId": "bb9f5e168b8f52a8738a3a8812cc7705fc59ace9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aec3d6d7_085fb1c8",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 373,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-07T06:31:24Z",
+      "side": 1,
+      "message": "Is it possible that removing NeedFiles might cause us to run into https://github.com/golang/go/issues/56677 ?",
+      "revId": "bb9f5e168b8f52a8738a3a8812cc7705fc59ace9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -214,9 +214,9 @@ func (c *compiler) processFile(file, scope string, schema adt.Value) (adt.Expr, 
 }
 
 func (c *compiler) processGlob(glob, scope string, schema adt.Value) (adt.Expr, errors.Error) {
-	glob, ce := c.clean(glob)
-	if ce != nil {
-		return nil, ce
+	glob, cerr := c.clean(glob)
+	if cerr != nil {
+		return nil, cerr
 	}
 
 	// Validate that the glob pattern is valid per [pkgpath.Match].
@@ -251,10 +251,16 @@ func (c *compiler) processGlob(glob, scope string, schema adt.Value) (adt.Expr, 
 		// TODO: lots of stat calls happening in this MVP so another won't hurt.
 		// We don't support '**' initially, and '*' only matches files, so skip
 		// any directories.
-		if fi, err := c.fs.Stat(f); err != nil {
-			return nil, errors.Newf(c.pos, "failed to stat %s: %v", f, err)
-		} else if fi.IsDir() {
+		// TODO(mvdan): see the earlier TODO about io/fs.SymlinkFS.
+		info, err := os.Lstat(filepath.Join(c.dir, f))
+		if err != nil {
+			return nil, errors.Promote(err, "failed to stat file")
+		}
+		switch {
+		case info.IsDir():
 			continue
+		case !info.Mode().IsRegular():
+			return nil, errors.Newf(c.pos, "cannot embed irregular file %s", f)
 		}
 		// Add all parents of the embedded file that
 		// aren't the current directory (if there's a cue.mod
@@ -264,9 +270,9 @@ func (c *compiler) processGlob(glob, scope string, schema adt.Value) (adt.Expr, 
 			dirs[dir] = f
 		}
 
-		expr, err := c.decodeFile(f, scope, schema)
-		if err != nil {
-			return nil, err
+		expr, cerr := c.decodeFile(f, scope, schema)
+		if cerr != nil {
+			return nil, cerr
 		}
 
 		m.Decls = append(m.Decls, &adt.Field{
@@ -319,12 +325,20 @@ func (c *compiler) decodeFile(file, scope string, schema adt.Value) (adt.Expr, e
 	}
 	defer r.Close()
 
-	info, err := r.Stat()
+	// TODO(mvdan): Until https://go.dev/issue/49580 implements io/fs.SymlinkFS,
+	// we cannot rely on the io/fs interface to tell us whether a file is a symlink.
+	// Since the embed package mainly uses io/fs for the sake of consistent forward-slash
+	// filenames such as in error messages, but it always uses an os.DirFS,
+	// we can temporarily sidestep the os.DirFS and use os.Lstat directly.
+	info, err := os.Lstat(filepath.Join(c.dir, file))
 	if err != nil {
-		return nil, errors.Promote(err, "failed to decode file")
+		return nil, errors.Promote(err, "failed to stat file")
 	}
-	if info.IsDir() {
-		return nil, errors.Newf(c.pos, "cannot embed directories")
+	switch {
+	case info.IsDir():
+		return nil, errors.Newf(c.pos, "cannot embed directory %s", file)
+	case !info.Mode().IsRegular():
+		return nil, errors.Newf(c.pos, "cannot embed irregular file %s", file)
 	}
 	f.Source = r
 

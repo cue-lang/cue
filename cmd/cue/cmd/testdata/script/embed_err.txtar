@@ -163,7 +163,7 @@ language: version: "v0.9.0"
     ./test.cue:52:18
 @embed: cannot embed file "a/b/foo.json": in different module:
     ./test.cue:53:26
-@embed: cannot embed directories:
+@embed: cannot embed directory x:
     ./test.cue:55:14
 @embed: encoding "cue" not (yet) supported:
     ./test.cue:57:17
@@ -182,5 +182,7 @@ glob: _ @embed(glob="*.json")
 -- symlink/test.json --
 { "x": "symlink target file" }
 -- symlink/out/err --
-@embed: failed to stat symlink-broken.json: stat symlink-broken.json: no such file or directory:
+@embed: cannot embed irregular file symlink.json:
+    ./test.cue:5:9
+@embed: cannot embed irregular file symlink-broken.json:
     ./test.cue:7:9

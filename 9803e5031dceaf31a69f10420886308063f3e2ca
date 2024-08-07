@@ -52,6 +52,24 @@
       "parentUuid": "afcbf9a8_5158650a",
       "revId": "9803e5031dceaf31a69f10420886308063f3e2ca",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95e1fd54_cce30856",
+        "filename": "cmd/cue/cmd/import.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-07T12:41:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "04f02b35_7c0d9afd",
+      "revId": "9803e5031dceaf31a69f10420886308063f3e2ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

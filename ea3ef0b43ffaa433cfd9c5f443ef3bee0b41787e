@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ffe8ff9_91e5a1cc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-07T13:34:00Z",
+      "side": 1,
+      "message": "Well, to be fair, that restriction does result in highly awkward workarounds like the ones we see in the Bazel build, so it is a _bit_ problematic.",
+      "revId": "ea3ef0b43ffaa433cfd9c5f443ef3bee0b41787e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4a85d2d_0d16ecfa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-07T13:34:00Z",
+      "side": 1,
+      "message": "LGTM modulo the suggestion for another test (and I suspect the current logic might need updating in the light of the test result).",
+      "revId": "ea3ef0b43ffaa433cfd9c5f443ef3bee0b41787e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2b88175_0f4cf4d4",
+        "filename": "cmd/cue/cmd/testdata/script/embed_err.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-07T13:34:00Z",
+      "side": 1,
+      "message": "Could we add a test case that includes a directory symlink, and an embed file reference inside that?",
+      "revId": "ea3ef0b43ffaa433cfd9c5f443ef3bee0b41787e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

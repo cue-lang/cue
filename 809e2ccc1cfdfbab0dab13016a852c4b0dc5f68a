@@ -16,6 +16,24 @@
       "message": "FWIW I\u0027m not sure about that. I suspect it should be allowed in the same way that symlinks to CUE files outside the current module are allowed.",
       "revId": "809e2ccc1cfdfbab0dab13016a852c4b0dc5f68a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f09b6c1_170f35b6",
+        "filename": "cmd/cue/cmd/testdata/script/embed_err.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-07T13:31:04Z",
+      "side": 1,
+      "message": "I don\u0027t know, we already forbid embedding files outside the module as regular files, so I\u0027d disagree with supporting symlinks as a workaround for that limitation. I\u0027m not stating a fact though, I\u0027m only leaving a warning sign for ourselves in the future, so I don\u0027t think the wording needs to be precise.",
+      "parentUuid": "226b07c9_5f802583",
+      "revId": "809e2ccc1cfdfbab0dab13016a852c4b0dc5f68a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

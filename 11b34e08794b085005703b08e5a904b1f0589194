@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25fc5bf6_f62d90f6",
+        "filename": "encoding/toml/decode_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 733,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-07T11:48:45Z",
+      "side": 1,
+      "message": "tbh I think I\u0027d prefer to see the actual error messages in place without the leading tabs removed. I saw expected error messages like `cannot redeclare table array \"foo.foo2\" as a table: test.toml:6:1` and wondered why the line numbers were appearing on the same line as suffixes. But YMMV 😊",
+      "revId": "11b34e08794b085005703b08e5a904b1f0589194",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

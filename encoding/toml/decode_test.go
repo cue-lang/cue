@@ -52,9 +52,10 @@ func TestDecoder(t *testing.T) {
 	}, {
 		name: "RootKeyMissing",
 		input: `
+			# A comment to verify that parser positions work.
 			= "no key name"
 			`,
-		wantErr: "invalid character at start of key: =",
+		wantErr: "test.toml:2:1: invalid character at start of key: =",
 	}, {
 		name: "RootKeysOne",
 		input: `
@@ -131,28 +132,28 @@ func TestDecoder(t *testing.T) {
 			foo = "same key"
 			foo = "same key"
 			`,
-		wantErr: `duplicate key: foo`,
+		wantErr: `test.toml:2:1: duplicate key: foo`,
 	}, {
 		name: "KeysDuplicateQuoted",
 		input: `
 			"foo" = "same key"
 			foo = "same key"
 			`,
-		wantErr: `duplicate key: foo`,
+		wantErr: `test.toml:2:1: duplicate key: foo`,
 	}, {
 		name: "KeysDuplicateWhitespace",
 		input: `
 			foo . bar = "same key"
 			foo.bar = "same key"
 			`,
-		wantErr: `duplicate key: foo\.bar`,
+		wantErr: `test.toml:2:1: duplicate key: foo\.bar`,
 	}, {
 		name: "KeysDuplicateDots",
 		input: `
 			foo."bar.baz".zzz = "same key"
 			foo."bar.baz".zzz = "same key"
 			`,
-		wantErr: `duplicate key: foo\."bar\.baz"\.zzz`,
+		wantErr: `test.toml:2:1: duplicate key: foo\."bar\.baz"\.zzz`,
 	}, {
 		name: "KeysNotDuplicateDots",
 		input: `
@@ -329,13 +330,13 @@ line two.\
 		input: `
 			point = {x = "same key", x = "same key"}
 			`,
-		wantErr: `duplicate key: point\.x`,
+		wantErr: `test.toml:1:26: duplicate key: point\.x`,
 	}, {
 		name: "ArrayInlineTablesDuplicate",
 		input: `
 			point = [{}, {}, {x = "same key", x = "same key"}]
 			`,
-		wantErr: `duplicate key: point\.2\.x`,
+		wantErr: `test.toml:1:35: duplicate key: point\.2\.x`,
 	}, {
 		name: "InlineTablesNotDuplicateScoping",
 		input: `
@@ -418,7 +419,7 @@ line two.\
 			[foo]
 			[foo]
 			`,
-		wantErr: `duplicate key: foo`,
+		wantErr: `test.toml:2:2: duplicate key: foo`,
 	}, {
 		name: "TableKeysDuplicateOverlap",
 		input: `
@@ -427,7 +428,7 @@ line two.\
 			[foo.bar]
 			baz = "second leaf"
 			`,
-		wantErr: `duplicate key: foo.bar`,
+		wantErr: `test.toml:3:2: duplicate key: foo.bar`,
 	}, {
 		name: "TableInnerKeysDuplicateSimple",
 		input: `
@@ -435,7 +436,7 @@ line two.\
 			bar = "same key"
 			bar = "same key"
 			`,
-		wantErr: `duplicate key: foo\.bar`,
+		wantErr: `test.toml:3:1: duplicate key: foo\.bar`,
 	}, {
 		name: "TablesNotDuplicateScoping",
 		input: `
@@ -630,7 +631,7 @@ line two.\
 			[[foo]]
 			baz = "baz value"
 			`,
-		wantErr: `cannot redeclare key "foo" as a table array`,
+		wantErr: `test.toml:4:3: cannot redeclare key "foo" as a table array`,
 	}, {
 		name: "RedeclareTableAsTableArray",
 		input: `
@@ -641,7 +642,7 @@ line two.\
 			[[foo]]
 			baz = "baz value"
 			`,
-		wantErr: `cannot redeclare key "foo" as a table array`,
+		wantErr: `test.toml:5:3: cannot redeclare key "foo" as a table array`,
 	}, {
 		name: "RedeclareArrayAsTableArray",
 		input: `
@@ -651,7 +652,7 @@ line two.\
 			[[foo]]
 			baz = "baz value"
 			`,
-		wantErr: `cannot redeclare key "foo" as a table array`,
+		wantErr: `test.toml:4:3: cannot redeclare key "foo" as a table array`,
 	}, {
 		name: "RedeclareTableArrayAsKey",
 		input: `
@@ -662,7 +663,7 @@ line two.\
 			[foo]
 			foo2 = "redeclaring"
 			`,
-		wantErr: `cannot redeclare table array "foo.foo2" as a table`,
+		wantErr: `test.toml:6:1: cannot redeclare table array "foo.foo2" as a table`,
 	}, {
 		name: "RedeclareTableArrayAsTable",
 		input: `
@@ -673,7 +674,7 @@ line two.\
 			[foo]
 			baz = "baz value"
 			`,
-		wantErr: `cannot redeclare table array "foo" as a table`,
+		wantErr: `test.toml:5:2: cannot redeclare table array "foo" as a table`,
 	}, {
 		name: "KeysNotDuplicateTableArrays",
 		input: `
@@ -720,7 +721,7 @@ line two.\
 			t.Parallel()
 
 			input := unindentMultiline(test.input)
-			dec := toml.NewDecoder(strings.NewReader(input))
+			dec := toml.NewDecoder("test.toml", strings.NewReader(input))
 
 			node, err := dec.Decode()
 			if test.wantErr != "" {

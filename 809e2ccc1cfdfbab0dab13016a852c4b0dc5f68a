@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "226b07c9_5f802583",
+        "filename": "cmd/cue/cmd/testdata/script/embed_err.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-07T13:27:38Z",
+      "side": 1,
+      "message": "FWIW I\u0027m not sure about that. I suspect it should be allowed in the same way that symlinks to CUE files outside the current module are allowed.",
+      "revId": "809e2ccc1cfdfbab0dab13016a852c4b0dc5f68a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

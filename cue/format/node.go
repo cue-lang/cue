@@ -411,7 +411,7 @@ func (f *formatter) decl(decl ast.Decl) {
 			f.print(formfeed)
 		}
 		f.expr(n.Expr)
-		f.print(newline, noblank)
+		f.print(newline)
 
 	case *ast.Attribute:
 		f.print(n.At, n)

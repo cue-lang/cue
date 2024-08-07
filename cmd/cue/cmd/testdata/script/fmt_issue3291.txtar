@@ -1,0 +1,22 @@
+exec cue fmt file.cue
+cmp file.cue file.cue.gold
+-- file.cue --
+A: true
+B: [
+	1, // this comment is fine
+	2, // this comment is fine
+	if A {
+		3 // this comment ends up touching its element
+	},
+	4, // this comment is fine
+]
+-- file.cue.gold --
+A: true
+B: [
+	1, // this comment is fine
+	2, // this comment is fine
+	if A {
+		3 // this comment ends up touching its element
+	},
+	4, // this comment is fine
+]

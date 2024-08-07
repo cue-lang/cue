@@ -34,6 +34,24 @@
       "parentUuid": "a5d8b1ff_a31f06d3",
       "revId": "c2d5232fc1b72d4b2b0a46af811be4244d8b909f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3358f86_962cdbe9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-07T10:05:04Z",
+      "side": 1,
+      "message": "Thanks for understanding :) Please see https://review.gerrithub.io/c/cue-lang/cue/+/1199025. In particular, I think multiple of your positions weren\u0027t working properly, as they just pointed to `1:1`. I had also added filename support at the same time.",
+      "parentUuid": "27cfba6b_712c7b90",
+      "revId": "c2d5232fc1b72d4b2b0a46af811be4244d8b909f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

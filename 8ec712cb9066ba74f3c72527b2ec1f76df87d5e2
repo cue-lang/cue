@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2019abbb_e807dd30",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-07T04:58:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba82851b_bc90f5fd",
+      "range": {
+        "startLine": 7,
+        "startChar": 21,
+        "endLine": 7,
+        "endChar": 28
+      },
+      "revId": "8ec712cb9066ba74f3c72527b2ec1f76df87d5e2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "12806939_8ecd82a6",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-08-06T15:01:51Z",
       "side": 1,
       "message": "nit: Fixes",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 6
+      },
+      "revId": "8ec712cb9066ba74f3c72527b2ec1f76df87d5e2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c8fc6de_2ee6f676",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-07T04:58:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "12806939_8ecd82a6",
       "range": {
         "startLine": 12,
         "startChar": 0,
@@ -77,6 +125,24 @@
       "writtenOn": "2024-08-06T15:01:51Z",
       "side": 1,
       "message": "nit: \"An optional field\"",
+      "revId": "8ec712cb9066ba74f3c72527b2ec1f76df87d5e2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95e31499_7f5303bb",
+        "filename": "encoding/jsonschema/testdata/required.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-07T04:58:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "27369884_f7ed272e",
       "revId": "8ec712cb9066ba74f3c72527b2ec1f76df87d5e2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

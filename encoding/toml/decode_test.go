@@ -47,46 +47,46 @@ func TestDecoder(t *testing.T) {
 		name: "LoneComment",
 		input: `
 			# Just a comment
-		`,
+			`,
 		wantCUE: "",
 	}, {
 		name: "RootKeyMissing",
 		input: `
 			= "no key name"
-		`,
+			`,
 		wantErr: "invalid character at start of key: =",
 	}, {
 		name: "RootKeysOne",
 		input: `
 			key = "value"
-		`,
+			`,
 		wantCUE: `
 			key: "value"
-		`,
+			`,
 	}, {
 		name: "RootMultiple",
 		input: `
 			key1 = "value1"
 			key2 = "value2"
 			key3 = "value3"
-		`,
+			`,
 		wantCUE: `
 			key1: "value1"
 			key2: "value2"
 			key3: "value3"
-		`,
+			`,
 	}, {
 		name: "RootKeysDots",
 		input: `
 			a1       = "A"
 			b1.b2    = "B"
 			c1.c2.c3 = "C"
-		`,
+			`,
 		wantCUE: `
 			a1: "A"
 			b1: b2: "B"
 			c1: c2: c3: "C"
-		`,
+			`,
 	}, {
 		name: "RootKeysCharacters",
 		input: `
@@ -96,7 +96,7 @@ func TestDecoder(t *testing.T) {
 			_ab = "underscore prefix quoted"
 			123 = "numbers"
 			x._.y._ = "underscores quoted"
-		`,
+			`,
 		wantCUE: `
 			"a-b": "dashes"
 			a_b:   "underscore unquoted"
@@ -104,75 +104,75 @@ func TestDecoder(t *testing.T) {
 			"_ab": "underscore prefix quoted"
 			"123": "numbers"
 			x: "_": y: "_": "underscores quoted"
-		`,
+			`,
 	}, {
 		name: "RootKeysQuoted",
 		input: `
 			"1.2.3" = "quoted dots"
 			"foo bar" = "quoted space"
 			'foo "bar"' = "nested quotes"
-		`,
+			`,
 		wantCUE: `
 			"1.2.3":       "quoted dots"
 			"foo bar":     "quoted space"
 			"foo \"bar\"": "nested quotes"
-		`,
+			`,
 	}, {
 		name: "RootKeysMixed",
 		input: `
 			site."foo.com".title = "foo bar"
-		`,
+			`,
 		wantCUE: `
 			site: "foo.com": title: "foo bar"
-		`,
+			`,
 	}, {
 		name: "KeysDuplicateSimple",
 		input: `
 			foo = "same key"
 			foo = "same key"
-		`,
+			`,
 		wantErr: `duplicate key: foo`,
 	}, {
 		name: "KeysDuplicateQuoted",
 		input: `
 			"foo" = "same key"
 			foo = "same key"
-		`,
+			`,
 		wantErr: `duplicate key: foo`,
 	}, {
 		name: "KeysDuplicateWhitespace",
 		input: `
 			foo . bar = "same key"
 			foo.bar = "same key"
-		`,
+			`,
 		wantErr: `duplicate key: foo\.bar`,
 	}, {
 		name: "KeysDuplicateDots",
 		input: `
 			foo."bar.baz".zzz = "same key"
 			foo."bar.baz".zzz = "same key"
-		`,
+			`,
 		wantErr: `duplicate key: foo\."bar\.baz"\.zzz`,
 	}, {
 		name: "KeysNotDuplicateDots",
 		input: `
 			foo."bar.baz" = "different key"
 			"foo.bar".baz = "different key"
-		`,
+			`,
 		wantCUE: `
 			foo: "bar.baz": "different key"
 			"foo.bar": baz: "different key"
-		`,
+			`,
 	}, {
 		name: "BasicStrings",
 		input: `
 			escapes = "foo \"bar\" \n\t\\ baz"
 			unicode = "foo \u00E9"
-		`,
+			`,
 		wantCUE: `
 			escapes: "foo \"bar\" \n\t\\ baz"
 			unicode: "foo é"
-		`,
+			`,
 	}, {
 		// Leading tabs do matter in this test.
 		// TODO: use our own multiline strings where it gives better results.
@@ -191,14 +191,14 @@ escaped = """\
 line one \
 line two.\
 """
-		`,
+			`,
 		wantCUE: `
 			nested:           " can contain \"\" quotes "
 			four:             "\"four\""
 			double:           "line one\nline two"
 			double_indented:  "\tline one\n\tline two\n\t"
 			escaped:          "line one line two."
-		`,
+			`,
 	}, {
 		// TODO: we can probably do better in many cases, e.g. #""
 		name: "LiteralStrings",
@@ -207,13 +207,13 @@ line two.\
 			winpath2 = '\\ServerX\admin$\system32\'
 			quoted   = 'Tom "Dubs" Preston-Werner'
 			regex    = '<\i\c*\s*>'
-		`,
+			`,
 		wantCUE: `
 			winpath:  "C:\\Users\\nodejs\\templates"
 			winpath2: "\\\\ServerX\\admin$\\system32\\"
 			quoted:   "Tom \"Dubs\" Preston-Werner"
 			regex:    "<\\i\\c*\\s*>"
-		`,
+			`,
 	}, {
 		// Leading tabs do matter in this test.
 		// TODO: use our own multiline strings where it gives better results.
@@ -232,14 +232,14 @@ escaped = '''\
 line one \
 line two.\
 '''
-		`,
+			`,
 		wantCUE: `
 			nested:           " can contain '' quotes "
 			four:             "'four'"
 			double:           "line one\nline two"
 			double_indented:  "\tline one\n\tline two\n\t"
 			escaped:          "\\\nline one \\\nline two.\\\n"
-		`,
+			`,
 	}, {
 		name: "Integers",
 		input: `
@@ -251,7 +251,7 @@ line two.\
 			hexadecimal = 0xdeadBEEF
 			octal       = 0o755
 			binary      = 0b11010110
-		`,
+			`,
 		wantCUE: `
 			zero:        0
 			positive:    123
@@ -261,7 +261,7 @@ line two.\
 			hexadecimal: 0xdeadBEEF
 			octal:       0o755
 			binary:      0b11010110
-		`,
+			`,
 	}, {
 		name: "Floats",
 		input: `
@@ -272,7 +272,7 @@ line two.\
 			exponent_plus  = 5e+20
 			exponent_minus = -2E-4
 			exponent_dot   = 6.789e-30
-		`,
+			`,
 		wantCUE: `
 			pi:             3.1415
 			plus:           +1.23
@@ -281,17 +281,17 @@ line two.\
 			exponent_plus:  5e+20
 			exponent_minus: -2E-4
 			exponent_dot:   6.789e-30
-		`,
+			`,
 	}, {
 		name: "Bools",
 		input: `
 			positive = true
 			negative = false
-		`,
+			`,
 		wantCUE: `
 			positive: true
 			negative: false
-		`,
+			`,
 	}, {
 		name: "Arrays",
 		input: `
@@ -301,7 +301,7 @@ line two.\
 			nested_mixed  = [[1, 2], ["a", "b", "c"], {extra = "keys"}]
 			strings       = ["all", 'strings', """are the same""", '''type''']
 			mixed_numbers = [0.1, 0.2, 0.5, 1, 2, 5]
-		`,
+			`,
 		wantCUE: `
 			integers:      [1, 2, 3]
 			colors:        ["red", "yellow", "green"]
@@ -309,7 +309,7 @@ line two.\
 			nested_mixed:  [[1, 2], ["a", "b", "c"], {extra: "keys"}]
 			strings:       ["all", "strings", "are the same", "type"]
 			mixed_numbers: [0.1, 0.2, 0.5, 1, 2, 5]
-		`,
+			`,
 	}, {
 		name: "InlineTables",
 		input: `
@@ -317,24 +317,24 @@ line two.\
 			point  = {x = 1, y = 2}
 			animal = {type.name = "pug"}
 			deep   = {l1 = {l2 = {l3 = "leaf"}}}
-		`,
+			`,
 		wantCUE: `
 			empty:  {}
 			point:  {x: 1, y: 2}
 			animal: {type: name: "pug"}
 			deep:   {l1: {l2: {l3: "leaf"}}}
-		`,
+			`,
 	}, {
 		name: "InlineTablesDuplicate",
 		input: `
 			point = {x = "same key", x = "same key"}
-		`,
+			`,
 		wantErr: `duplicate key: point\.x`,
 	}, {
 		name: "ArrayInlineTablesDuplicate",
 		input: `
 			point = [{}, {}, {x = "same key", x = "same key"}]
-		`,
+			`,
 		wantErr: `duplicate key: point\.2\.x`,
 	}, {
 		name: "InlineTablesNotDuplicateScoping",
@@ -343,34 +343,34 @@ line two.\
 			struct1 = {sibling = "leaf"}
 			struct2 = {sibling = "leaf"}
 			arrays = [{sibling = "leaf"}, {sibling = "leaf"}]
-		`,
+			`,
 		wantCUE: `
 			repeat: {repeat: {repeat: "leaf"}}
 			struct1: {sibling: "leaf"}
 			struct2: {sibling: "leaf"}
 			arrays: [{sibling: "leaf"}, {sibling: "leaf"}]
-		`,
+			`,
 	}, {
 		name: "TablesEmpty",
 		input: `
 			[foo]
 			[bar]
-		`,
+			`,
 		wantCUE: `
 			foo: {}
 			bar: {}
-		`,
+			`,
 	}, {
 		name: "TablesOne",
 		input: `
 			[foo]
 			single = "single"
-		`,
+			`,
 		wantCUE: `
 			foo: {
 				single: "single"
 			}
-		`,
+			`,
 	}, {
 		name: "TablesMultiple",
 		input: `
@@ -382,7 +382,7 @@ line two.\
 			[bar]
 			bar1 = "bar1 value"
 			bar2 = "bar2 value"
-		`,
+			`,
 		wantCUE: `
 			root1: "root1 value"
 			root2: "root2 value"
@@ -394,7 +394,7 @@ line two.\
 				bar1: "bar1 value"
 				bar2: "bar2 value"
 			}
-		`,
+			`,
 	}, {
 		// A lot of these edge cases are covered by RootKeys tests already.
 		name: "TablesKeysComplex",
@@ -403,7 +403,7 @@ line two.\
 			one = "1"
 			[123-456]
 			two = "2"
-		`,
+			`,
 		wantCUE: `
 			foo: bar: "baz.zzz zzz": {
 				one: "1"
@@ -411,13 +411,13 @@ line two.\
 			"123-456": {
 				two: "2"
 			}
-		`,
+			`,
 	}, {
 		name: "TableKeysDuplicateSimple",
 		input: `
 			[foo]
 			[foo]
-		`,
+			`,
 		wantErr: `duplicate key: foo`,
 	}, {
 		name: "TableKeysDuplicateOverlap",
@@ -426,7 +426,7 @@ line two.\
 			bar = "leaf"
 			[foo.bar]
 			baz = "second leaf"
-		`,
+			`,
 		wantErr: `duplicate key: foo.bar`,
 	}, {
 		name: "TableInnerKeysDuplicateSimple",
@@ -434,7 +434,7 @@ line two.\
 			[foo]
 			bar = "same key"
 			bar = "same key"
-		`,
+			`,
 		wantErr: `duplicate key: foo\.bar`,
 	}, {
 		name: "TablesNotDuplicateScoping",
@@ -445,7 +445,7 @@ line two.\
 			sibling = "leaf"
 			[struct2]
 			sibling = "leaf"
-		`,
+			`,
 		wantCUE: `
 			repeat: {
 				repeat: repeat: "leaf"
@@ -456,30 +456,30 @@ line two.\
 			struct2: {
 				sibling: "leaf"
 			}
-		`,
+			`,
 	}, {
 		name: "ArrayTablesEmpty",
 		input: `
 			[[foo]]
-		`,
+			`,
 		wantCUE: `
 			foo: [
 				{},
 			]
-		`,
+			`,
 	}, {
 		name: "ArrayTablesOne",
 		input: `
 			[[foo]]
 			single = "single"
-		`,
+			`,
 		wantCUE: `
 			foo: [
 				{
 					single: "single"
 				},
 			]
-		`,
+			`,
 	}, {
 		name: "ArrayTablesMultiple",
 		input: `
@@ -493,7 +493,7 @@ line two.\
 			[[foo]]
 			[[foo]]
 			single = "single"
-		`,
+			`,
 		wantCUE: `
 			root: "root value"
 			foo: [
@@ -510,7 +510,7 @@ line two.\
 					single: "single"
 				},
 			]
-		`,
+			`,
 	}, {
 		name: "ArrayTablesSeparate",
 		input: `
@@ -520,7 +520,7 @@ line two.\
 			[[bar]]
 			bar1 = "bar1 value"
 			[[baz]]
-		`,
+			`,
 		wantCUE: `
 			root: "root value"
 			foo: [
@@ -536,7 +536,7 @@ line two.\
 			baz: [
 				{},
 			]
-		`,
+			`,
 	}, {
 		name: "ArrayTablesSubtable",
 		input: `
@@ -550,7 +550,7 @@ line two.\
 			sub2d = "sub2d value"
 			[[foo]]
 			foo2 = "foo2 value"
-		`,
+			`,
 		wantCUE: `
 			foo: [
 				{
@@ -569,7 +569,7 @@ line two.\
 					foo2: "foo2 value"
 				},
 			]
-		`,
+			`,
 	}, {
 		name: "ArrayTablesNested",
 		input: `
@@ -587,7 +587,7 @@ line two.\
 			nest3d = "nest3d value"
 			[[foo]]
 			foo2 = "foo2 value"
-		`,
+			`,
 		wantCUE: `
 			foo: [
 				{
@@ -620,7 +620,7 @@ line two.\
 					foo2: "foo2 value"
 				},
 			]
-		`,
+			`,
 	}, {
 		name: "RedeclareKeyAsTableArray",
 		input: `
@@ -629,7 +629,7 @@ line two.\
 			middle = "to ensure we don't rely on the last key"
 			[[foo]]
 			baz = "baz value"
-		`,
+			`,
 		wantErr: `cannot redeclare key "foo" as a table array`,
 	}, {
 		name: "RedeclareTableAsTableArray",
@@ -640,7 +640,7 @@ line two.\
 			middle = "to ensure we don't rely on the last key"
 			[[foo]]
 			baz = "baz value"
-		`,
+			`,
 		wantErr: `cannot redeclare key "foo" as a table array`,
 	}, {
 		name: "RedeclareArrayAsTableArray",
@@ -650,7 +650,7 @@ line two.\
 			middle = "to ensure we don't rely on the last key"
 			[[foo]]
 			baz = "baz value"
-		`,
+			`,
 		wantErr: `cannot redeclare key "foo" as a table array`,
 	}, {
 		name: "RedeclareTableArrayAsKey",
@@ -661,7 +661,7 @@ line two.\
 			middle = "to ensure we don't rely on the last key"
 			[foo]
 			foo2 = "redeclaring"
-		`,
+			`,
 		wantErr: `cannot redeclare table array "foo.foo2" as a table`,
 	}, {
 		name: "RedeclareTableArrayAsTable",
@@ -672,7 +672,7 @@ line two.\
 			middle = "to ensure we don't rely on the last key"
 			[foo]
 			baz = "baz value"
-		`,
+			`,
 		wantErr: `cannot redeclare table array "foo" as a table`,
 	}, {
 		name: "KeysNotDuplicateTableArrays",
@@ -689,7 +689,7 @@ line two.\
 			bar = "foo.2.nested.1.bar"
 			[[foo.nested]]
 			bar = "foo.2.nested.2.bar"
-		`,
+			`,
 		wantCUE: `
 			foo: [
 				{
@@ -713,13 +713,14 @@ line two.\
 					]
 				},
 			]
-		`,
+			`,
 	}}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 
-			dec := toml.NewDecoder(strings.NewReader(test.input))
+			input := unindentMultiline(test.input)
+			dec := toml.NewDecoder(strings.NewReader(input))
 
 			node, err := dec.Decode()
 			if test.wantErr != "" {
@@ -729,7 +730,7 @@ line two.\
 				qt.Assert(t, qt.Equals(test.wantCUE, ""))
 
 				// Validate that go-toml's Unmarshal also rejects this input.
-				err = gotoml.Unmarshal([]byte(test.input), new(any))
+				err = gotoml.Unmarshal([]byte(input), new(any))
 				qt.Assert(t, qt.IsNotNil(err))
 				return
 			}
@@ -763,7 +764,7 @@ line two.\
 			// We use JSON equality as some details such as which integer types are used
 			// are not actually relevant to an "equal data" check.
 			var unmarshalTOML any
-			err = gotoml.Unmarshal([]byte(test.input), &unmarshalTOML)
+			err = gotoml.Unmarshal([]byte(input), &unmarshalTOML)
 			qt.Assert(t, qt.IsNil(err))
 			jsonTOML, err := json.Marshal(unmarshalTOML)
 			qt.Assert(t, qt.IsNil(err))
@@ -792,4 +793,20 @@ line two.\
 			})
 		})
 	}
+}
+
+// unindentMultiline mimics CUE's behavior with `"""` multi-line strings,
+// where a leading newline is omitted, and any whitespace preceding the trailing newline
+// is removed from the start of all lines.
+func unindentMultiline(s string) string {
+	i := strings.LastIndexByte(s, '\n')
+	if i < 0 {
+		// Not a multi-line string.
+		return s
+	}
+	trim := s[i:]
+	s = strings.ReplaceAll(s, trim, "\n")
+	s = strings.TrimPrefix(s, "\n")
+	s = strings.TrimSuffix(s, "\n")
+	return s
 }

@@ -15,6 +15,7 @@
 package jsonschema
 
 import (
+	"fmt"
 	"net/url"
 	"path"
 	"strconv"
@@ -25,6 +26,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/mod/module"
 )
 
 func (d *decoder) parseRef(p token.Pos, str string) []string {
@@ -35,7 +37,7 @@ func (d *decoder) parseRef(p token.Pos, str string) []string {
 	}
 
 	if u.Host != "" || u.Path != "" {
-		d.addErr(errors.Newf(p, "external references (%s) not supported", str))
+		d.addErr(errors.Newf(p, "external references (%s) not supported in Root", str))
 		// TODO: handle
 		//    host:
 		//      If the host corresponds to a package known to cue,
@@ -47,18 +49,12 @@ func (d *decoder) parseRef(p token.Pos, str string) []string {
 		//      Look up on file system or relatively to authority location.
 		return nil
 	}
-
-	if !path.IsAbs(u.Fragment) {
-		d.addErr(errors.Newf(p, "anchors (%s) not supported", u.Fragment))
-		// TODO: support anchors
+	fragmentParts, err := splitFragment(u)
+	if err != nil {
+		d.addErr(errors.Newf(p, "%v", err))
 		return nil
 	}
-
-	// NOTE: Go bug?: url.URL has no raw representation of the fragment. This
-	// means that %2F gets translated to `/` before it can be split. This, in
-	// turn, means that field names cannot have a `/` as name.
-
-	return splitFragment(u)
+	return fragmentParts
 }
 
 // resolveURI parses a URI from n and resolves it in the current context.
@@ -99,15 +95,13 @@ const topSchema = "_schema"
 // The returned identifier (or first expression in a selection chain), is
 // hardwired to point to the resolved value. This will allow astutil.Sanitize
 // to automatically unshadow any shadowed variables.
-func (s *state) makeCUERef(n cue.Value, u *url.URL) ast.Expr {
-	a := splitFragment(u)
-
+func (s *state) makeCUERef(n cue.Value, u *url.URL, fragmentParts []string) (_e ast.Expr) {
 	switch fn := s.cfg.Map; {
 	case fn != nil:
 		// TODO: This block is only used in case s.cfg.Map is set, which is
 		// currently only used for OpenAPI. Handling should be brought more in
 		// line with JSON schema.
-		a, err := fn(n.Pos(), a)
+		a, err := fn(n.Pos(), fragmentParts)
 		if err != nil {
 			s.addErr(errors.Newf(n.Pos(), "invalid reference %q: %v", u, err))
 			return nil
@@ -141,7 +135,7 @@ func (s *state) makeCUERef(n cue.Value, u *url.URL) ast.Expr {
 			switch {
 			case u.Host == "" && u.Path == "",
 				s.id != nil && s.id.Host == u.Host && s.id.Path == u.Path:
-				if len(a) == 0 {
+				if len(fragmentParts) == 0 {
 					// refers to the top of the file. We will allow this by
 					// creating a helper schema as such:
 					//   _schema: {...}
@@ -155,33 +149,27 @@ func (s *state) makeCUERef(n cue.Value, u *url.URL) ast.Expr {
 					return ident
 				}
 
-				ident, a = s.getNextIdent(n, a)
+				ident, fragmentParts = s.getNextIdent(n, fragmentParts)
 
 			case u.Host != "":
 				// Reference not found within scope. Create an import reference.
-
-				// TODO: allow the configuration to specify a map from
-				// URI domain+paths to CUE packages.
 
 				// TODO: currently only $ids that are in scope can be
 				// referenced. We could consider doing an extra pass to record
 				// all '$id's in a file to be able to link to them even if they
 				// are not in scope.
-				p := u.Path
-
-				base := path.Base(p)
-				if !ast.IsValidIdent(base) {
-					base = strings.TrimSuffix(base, ".json")
-					if !ast.IsValidIdent(base) {
-						// Find something more clever to do there. For now just
-						// pick "schema" as the package name.
-						base = "schema"
-					}
-					p += ":" + base
+				importPath, err := s.cfg.MapURL(u)
+				if err != nil {
+					s.errf(n, "cannot determine import path from URL %q: %v", u, err)
+					return nil
 				}
-
-				ident = ast.NewIdent(base)
-				ident.Node = &ast.ImportSpec{Path: ast.NewString(u.Host + p)}
+				ip := module.ParseImportPath(importPath)
+				if ip.Qualifier == "" {
+					s.errf(n, "cannot determine package name from import path %q", importPath)
+					return nil
+				}
+				ident = ast.NewIdent(ip.Qualifier)
+				ident.Node = &ast.ImportSpec{Path: ast.NewString(importPath)}
 
 			default:
 				// Just a path, not sure what that means.
@@ -196,7 +184,7 @@ func (s *state) makeCUERef(n cue.Value, u *url.URL) ast.Expr {
 		}
 
 		if s.id.Host == u.Host && s.id.Path == u.Path {
-			if len(a) == 0 {
+			if len(fragmentParts) == 0 {
 				if len(s.idRef) == 0 {
 					// This is a reference to either root or a schema for which
 					// we do not yet support references. See Issue #386.
@@ -232,13 +220,13 @@ func (s *state) makeCUERef(n cue.Value, u *url.URL) ast.Expr {
 				}
 				return newSel(e, s.idRef[1])
 			}
-			ident, a = s.getNextIdent(n, a)
+			ident, fragmentParts = s.getNextIdent(n, fragmentParts)
 			ident.Node = s.obj
 			break
 		}
 	}
 
-	return s.newSel(ident, n, a)
+	return s.newSel(ident, n, fragmentParts)
 }
 
 // getNextSelector translates a JSON Reference path into a CUE path by consuming
@@ -377,20 +365,27 @@ func (s *state) linkReferences() {
 	}
 }
 
-// splitFragment splits the fragment part of a URI into path components. The
-// result may be an empty slice.
+// splitFragment splits the fragment part of a URI into path components
+// and removes the fragment part from u.
+// The result may be an empty slice.
 //
-// TODO: this requires RawFragment introduced in go1.15 to function properly.
-// As for now, CUE still uses go1.12.
-func splitFragment(u *url.URL) []string {
-	if u.Fragment == "" {
-		return nil
+// TODO: use u.RawFragment so that we can accept field names
+// that contain `/` characters.
+func splitFragment(u *url.URL) ([]string, error) {
+	frag := u.EscapedFragment()
+	if frag == "" {
+		return nil, nil
 	}
-	s := strings.TrimRight(u.Fragment[1:], "/")
-	if s == "" {
-		return nil
+	if !strings.HasPrefix(frag, "/") {
+		return nil, fmt.Errorf("anchors (%s) not supported", frag)
 	}
-	return strings.Split(s, "/")
+	u.Fragment = ""
+	u.RawFragment = ""
+
+	if s := strings.TrimRight(frag[1:], "/"); s != "" {
+		return strings.Split(s, "/"), nil
+	}
+	return nil, nil
 }
 
 func (d *decoder) mapRef(p token.Pos, str string, ref []string) []ast.Label {
@@ -437,4 +432,23 @@ func jsonSchemaRef(p token.Pos, a []string) ([]ast.Label, error) {
 		return []ast.Label{ast.NewIdent("#" + name)}, nil
 	}
 	return []ast.Label{ast.NewIdent(rootDefs), ast.NewString(name)}, nil
+}
+
+// DefaultMapURL implements the default schema ID to import
+// path mapping. It trims off any ".json" suffix and uses the
+// package name "schema" if the final component of the path
+// isn't a valid CUE identifier.
+func DefaultMapURL(u *url.URL) (importPath string, err error) {
+	p := u.Path
+	base := path.Base(p)
+	if !ast.IsValidIdent(base) {
+		base = strings.TrimSuffix(base, ".json")
+		if !ast.IsValidIdent(base) {
+			// Find something more clever to do there. For now just
+			// pick "schema" as the package name.
+			base = "schema"
+		}
+		p += ":" + base
+	}
+	return u.Host + p, nil
 }

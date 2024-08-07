@@ -16,6 +16,24 @@
       "message": "tbh I think I\u0027d prefer to see the actual error messages in place without the leading tabs removed. I saw expected error messages like `cannot redeclare table array \"foo.foo2\" as a table: test.toml:6:1` and wondered why the line numbers were appearing on the same line as suffixes. But YMMV 😊",
       "revId": "11b34e08794b085005703b08e5a904b1f0589194",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5450727_ff873d3d",
+        "filename": "encoding/toml/decode_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 733,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-07T11:55:38Z",
+      "side": 1,
+      "message": "yeah, fair enough. I wanted to avoid the verbosity but it isn\u0027t so bad with unindentMultiline. done.",
+      "parentUuid": "25fc5bf6_f62d90f6",
+      "revId": "11b34e08794b085005703b08e5a904b1f0589194",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -12,6 +12,7 @@ cmp stderr out/err
 cd symlink
 symlink symlink.json -> test.json
 symlink symlink-parent.json -> ../test.json
+symlink symlink-dir -> y
 exec cue eval .
 cmp stdout out/std
 
@@ -177,8 +178,14 @@ package symlink
 file: _ @embed(file=symlink.json)
 
 glob: _ @embed(glob="*.json")
+
+fileSymlinkDir: _ @embed(file=symlink-dir/test.json)
+
+globSymlinkDir: _ @embed(glob="symlink-dir/*.json")
 -- symlink/test.json --
 { "x": "symlink target file" }
+-- symlink/y/test.json --
+{ "y": "another symlink target file" }
 -- symlink/out/std --
 file: {
     x: "symlink target file"
@@ -192,5 +199,13 @@ glob: {
     }
     "test.json": {
         x: "symlink target file"
+    }
+}
+fileSymlinkDir: {
+    y: "another symlink target file"
+}
+globSymlinkDir: {
+    "symlink-dir/test.json": {
+        y: "another symlink target file"
     }
 }

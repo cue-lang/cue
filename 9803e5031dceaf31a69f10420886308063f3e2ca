@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "488e30f7_66dd7569",
+        "filename": "cmd/cue/cmd/import.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-07T06:36:06Z",
+      "side": 1,
+      "message": "FWIW we often don\u0027t quote filenames when they\u0027re known to be reasonable, as the escaped backslashes don\u0027t look great under Windows. Maybe consider a format like:\n\n```\n%s: imported from %s\n```\n\n?",
+      "revId": "9803e5031dceaf31a69f10420886308063f3e2ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

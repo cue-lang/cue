@@ -16,6 +16,24 @@
       "message": "Shouldn\u0027t we be using `cue/errors` to create proper position-oriented errors?\nOtherwise these errors will not fit into the regular CUE errors AFAICS.",
       "revId": "e8a092959e651c5aba34687920d5d97c60153f15",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ec8636d_adb19a43",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-07T11:42:38Z",
+      "side": 1,
+      "message": "good point, done, as discussed",
+      "parentUuid": "17c57bc8_bd7d9c86",
+      "revId": "e8a092959e651c5aba34687920d5d97c60153f15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -3,7 +3,7 @@ module cuelang.org/go
 go 1.22
 
 require (
-	cuelabs.dev/go/oci/ociregistry v0.0.0-20240703134027-fa95d0563666
+	cuelabs.dev/go/oci/ociregistry v0.0.0-20240807081548-8f707959b5b2
 	github.com/cockroachdb/apd/v3 v3.2.1
 	github.com/emicklei/proto v1.13.2
 	github.com/go-quicktest/qt v1.101.0
@@ -20,13 +20,13 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/tetratelabs/wazero v1.6.0
 	github.com/yuin/goldmark v1.7.4
-	golang.org/x/mod v0.19.0
-	golang.org/x/net v0.27.0
-	golang.org/x/oauth2 v0.21.0
-	golang.org/x/sync v0.7.0
-	golang.org/x/sys v0.22.0
-	golang.org/x/text v0.16.0
-	golang.org/x/tools v0.23.1-0.20240719173215-2fb3ebe9d9a9
+	golang.org/x/mod v0.20.0
+	golang.org/x/net v0.28.0
+	golang.org/x/oauth2 v0.22.0
+	golang.org/x/sync v0.8.0
+	golang.org/x/sys v0.23.0
+	golang.org/x/text v0.17.0
+	golang.org/x/tools v0.24.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 

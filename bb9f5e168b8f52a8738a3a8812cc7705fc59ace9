@@ -33,6 +33,24 @@
       "message": "Is it possible that removing NeedFiles might cause us to run into https://github.com/golang/go/issues/56677 ?",
       "revId": "bb9f5e168b8f52a8738a3a8812cc7705fc59ace9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45d7ff17_35ad5d4c",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 373,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-07T07:36:24Z",
+      "side": 1,
+      "message": "I would say unlikely; that issue concerns loading the runtime, which we\u0027re not interested in anyway, and we have extensive tests that all continue to pass. We\u0027re using the API as documented, so I think we\u0027re in the clear for now.",
+      "parentUuid": "aec3d6d7_085fb1c8",
+      "revId": "bb9f5e168b8f52a8738a3a8812cc7705fc59ace9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

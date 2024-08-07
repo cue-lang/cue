@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "57d333bf_fbc519ff",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-07T14:58:52Z",
+      "side": 1,
+      "message": "see https://github.com/cue-lang/cue/issues/3299#issuecomment-2273548675",
+      "parentUuid": "1ffe8ff9_91e5a1cc",
+      "revId": "ea3ef0b43ffaa433cfd9c5f443ef3bee0b41787e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "b4a85d2d_0d16ecfa",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-08-07T13:34:00Z",
       "side": 1,
       "message": "Could we add a test case that includes a directory symlink, and an embed file reference inside that?",
+      "revId": "ea3ef0b43ffaa433cfd9c5f443ef3bee0b41787e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "964dcaf2_4f71642c",
+        "filename": "cmd/cue/cmd/testdata/script/embed_err.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-07T14:58:52Z",
+      "side": 1,
+      "message": "did this in another CL, thanks.",
+      "parentUuid": "e2b88175_0f4cf4d4",
       "revId": "ea3ef0b43ffaa433cfd9c5f443ef3bee0b41787e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

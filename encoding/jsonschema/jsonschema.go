@@ -32,6 +32,8 @@
 package jsonschema
 
 import (
+	"net/url"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
@@ -42,6 +44,11 @@ import (
 // The generated CUE schema is guaranteed to deem valid any value that is
 // a valid instance of the source JSON schema.
 func Extract(data cue.InstanceOrValue, cfg *Config) (f *ast.File, err error) {
+	if cfg.MapURL == nil {
+		cfg1 := *cfg
+		cfg = &cfg1
+		cfg1.MapURL = DefaultMapURL
+	}
 	d := &decoder{cfg: cfg}
 
 	f = d.decode(data.Value())
@@ -75,6 +82,11 @@ type Config struct {
 	//    {"definitions", foo}   {#foo} or {#, foo}
 	//    {"$defs", foo}         {#foo} or {#, foo}
 	Map func(pos token.Pos, path []string) ([]ast.Label, error)
+
+	// MapURL maps a URL reference as found in $ref to
+	// an import path for a package.
+	// If this is nil, DefaultMapURL will be used.
+	MapURL func(u *url.URL) (importPath string, err error)
 
 	// TODO: configurability to make it compatible with OpenAPI, such as
 	// - locations of definitions: #/components/schemas, for instance.

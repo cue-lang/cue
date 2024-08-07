@@ -16,9 +16,12 @@ package jsonschema_test
 
 import (
 	"bytes"
+	"fmt"
+	"net/url"
 	"path"
 	"testing"
 
+	"github.com/go-quicktest/qt"
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue"
@@ -102,6 +105,56 @@ func TestDecode(t *testing.T) {
 			t.Writer("cue").Write(b)
 		}
 	})
+}
+
+func TestMapURL(t *testing.T) {
+	v := cuecontext.New().CompileString(`
+$schema: "xxx"
+type: "object"
+properties: x: $ref: "https://something.test/foo#/definitions/blah"
+`)
+	var calls []string
+	expr, err := jsonschema.Extract(v, &jsonschema.Config{
+		MapURL: func(u *url.URL) (string, error) {
+			calls = append(calls, u.String())
+			return "other.test/something:blah", nil
+		},
+	})
+	qt.Assert(t, qt.IsNil(err))
+	b, err := format.Node(expr, format.Simplify())
+	if err != nil {
+		t.Fatal(errors.Details(err, nil))
+	}
+	qt.Assert(t, qt.DeepEquals(calls, []string{"https://something.test/foo"}))
+	qt.Assert(t, qt.Equals(string(b), `
+import "other.test/something:blah"
+
+@jsonschema(schema="xxx")
+x?: blah.#blah
+...
+`[1:]))
+}
+
+func TestMapURLErrors(t *testing.T) {
+	v := cuecontext.New().CompileString(`
+$schema: "xxx"
+type: "object"
+properties: {
+	x: $ref: "https://something.test/foo#/definitions/x"
+	y: $ref: "https://something.test/foo#/definitions/y"
+}
+`, cue.Filename("foo.cue"))
+	_, err := jsonschema.Extract(v, &jsonschema.Config{
+		MapURL: func(u *url.URL) (string, error) {
+			return "", fmt.Errorf("some error")
+		},
+	})
+	qt.Assert(t, qt.Equals(errors.Details(err, nil), `
+cannot determine import path from URL "https://something.test/foo": some error:
+    foo.cue:5:5
+cannot determine import path from URL "https://something.test/foo": some error:
+    foo.cue:6:5
+`[1:]))
 }
 
 func TestX(t *testing.T) {

@@ -16,7 +16,6 @@ package jsonschema
 
 import (
 	"math/big"
-	"path"
 	"regexp"
 
 	"cuelang.org/go/cue"
@@ -261,14 +260,12 @@ var constraints = []*constraint{
 
 		u := s.resolveURI(n)
 
-		if u.Fragment != "" && !path.IsAbs(u.Fragment) {
-			s.addErr(errors.Newf(n.Pos(), "anchors (%s) not supported", u.Fragment))
-			// TODO: support anchors
+		fragmentParts, err := splitFragment(u)
+		if err != nil {
+			s.addErr(errors.Newf(n.Pos(), "%v", err))
 			return
 		}
-
-		expr := s.makeCUERef(n, u)
-
+		expr := s.makeCUERef(n, u, fragmentParts)
 		if expr == nil {
 			expr = &ast.BadExpr{From: n.Pos()}
 		}

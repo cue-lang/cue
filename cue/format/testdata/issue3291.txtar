@@ -1,0 +1,20 @@
+-- file.input --
+A: true
+B: [
+	1, // this comment is fine
+	2, // this comment is fine
+	if A {
+		3 // this comment ends up touching its element
+	},
+	4, // this comment is fine
+]
+-- file.golden --
+A: true
+B: [
+	1, // this comment is fine
+	2, // this comment is fine
+	if A {
+		3 // this comment ends up touching its element
+	},
+	4, // this comment is fine
+]

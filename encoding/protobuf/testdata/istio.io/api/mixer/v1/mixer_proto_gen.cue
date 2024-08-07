@@ -104,16 +104,16 @@ import (
 #ReferencedAttributes: {
 	// How an attribute's value was matched
 	#Condition: {
-		"CONDITION_UNSPECIFIED"// should not occur
+		"CONDITION_UNSPECIFIED" // should not occur
 		#enumValue: 0
 	} | {
-		"ABSENCE"// match when attribute doesn't exist
+		"ABSENCE" // match when attribute doesn't exist
 		#enumValue: 1
 	} | {
-		"EXACT"// match when attribute value is an exact byte-for-byte match
+		"EXACT" // match when attribute value is an exact byte-for-byte match
 		#enumValue: 2
 	} | {
-		"REGEX"// match when attribute value matches the included regex
+		"REGEX" // match when attribute value matches the included regex
 		#enumValue: 3
 	}
 
@@ -165,13 +165,13 @@ import (
 #HeaderOperation: {
 	// Operation type.
 	#Operation: {
-		"REPLACE"// replaces the header with the given name
+		"REPLACE" // replaces the header with the given name
 		#enumValue: 0
 	} | {
-		"REMOVE"// removes the header with the given name (the value is ignored)
+		"REMOVE" // removes the header with the given name (the value is ignored)
 		#enumValue: 1
 	} | {
-		"APPEND"// appends the value to the header value, or sets it if not present
+		"APPEND" // appends the value to the header value, or sets it if not present
 		#enumValue: 2
 	}
 

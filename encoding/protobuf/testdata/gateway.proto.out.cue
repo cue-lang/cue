@@ -404,19 +404,19 @@ package v1alpha3
 
 		// TLS protocol versions.
 		#TLSProtocol: {
-			"TLS_AUTO"// Automatically choose the optimal TLS version.
+			"TLS_AUTO" // Automatically choose the optimal TLS version.
 			#enumValue: 0
 		} | {
-			"TLSV1_0"// TLS version 1.0
+			"TLSV1_0" // TLS version 1.0
 			#enumValue: 1
 		} | {
-			"TLSV1_1"// TLS version 1.1
+			"TLSV1_1" // TLS version 1.1
 			#enumValue: 2
 		} | {
-			"TLSV1_2"// TLS version 1.2
+			"TLSV1_2" // TLS version 1.2
 			#enumValue: 3
 		} | {
-			"TLSV1_3"// TLS version 1.3
+			"TLSV1_3" // TLS version 1.3
 			#enumValue: 4
 		}
 

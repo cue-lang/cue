@@ -175,7 +175,7 @@ package descriptor
 			"TYPE_GROUP"
 			#enumValue: 10
 		} | {
-			"TYPE_MESSAGE"// Length-delimited aggregate.
+			"TYPE_MESSAGE" // Length-delimited aggregate.
 			#enumValue: 11
 		} | {
 			// New in version 2.
@@ -185,10 +185,10 @@ package descriptor
 		{"TYPE_ENUM", #enumValue: 14} |
 		{"TYPE_SFIXED32", #enumValue: 15} |
 		{"TYPE_SFIXED64", #enumValue: 16} | {
-			"TYPE_SINT32"// Uses ZigZag encoding.
+			"TYPE_SINT32" // Uses ZigZag encoding.
 			#enumValue: 17
 		} | {
-			"TYPE_SINT64"// Uses ZigZag encoding.
+			"TYPE_SINT64" // Uses ZigZag encoding.
 			#enumValue: 18
 		}
 
@@ -362,14 +362,14 @@ package descriptor
 
 	// Generated classes can be optimized for speed or code size.
 	#OptimizeMode: {
-		"SPEED"// Generate complete code for parsing, serialization,
+		"SPEED" // Generate complete code for parsing, serialization,
 		#enumValue: 1
 	} | {
 		// etc.
-		"CODE_SIZE"// Use ReflectionOps to implement these methods.
+		"CODE_SIZE" // Use ReflectionOps to implement these methods.
 		#enumValue: 2
 	} | {
-		"LITE_RUNTIME"// Generate code using MessageLite and the lite runtime.
+		"LITE_RUNTIME" // Generate code using MessageLite and the lite runtime.
 		#enumValue: 3
 	}
 
@@ -674,10 +674,10 @@ package descriptor
 	// or neither? HTTP based RPC implementation may choose GET verb for safe
 	// methods, and PUT verb for idempotent methods instead of the default POST.
 	#IdempotencyLevel: {"IDEMPOTENCY_UNKNOWN", #enumValue: 0} | {
-		"NO_SIDE_EFFECTS"// implies idempotent
+		"NO_SIDE_EFFECTS" // implies idempotent
 		#enumValue: 1
 	} | {
-		"IDEMPOTENT"// idempotent, but may have side effects
+		"IDEMPOTENT" // idempotent, but may have side effects
 		#enumValue: 2
 	}
 

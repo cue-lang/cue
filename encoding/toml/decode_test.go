@@ -25,6 +25,7 @@ import (
 
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/encoding/toml"
 )
@@ -52,9 +53,10 @@ func TestDecoder(t *testing.T) {
 	}, {
 		name: "RootKeyMissing",
 		input: `
+			# A comment to verify that parser positions work.
 			= "no key name"
 			`,
-		wantErr: "invalid character at start of key: =",
+		wantErr: `invalid character at start of key: =: test.toml:2:1`,
 	}, {
 		name: "RootKeysOne",
 		input: `
@@ -131,28 +133,28 @@ func TestDecoder(t *testing.T) {
 			foo = "same key"
 			foo = "same key"
 			`,
-		wantErr: `duplicate key: foo`,
+		wantErr: `duplicate key: foo: test.toml:2:1`,
 	}, {
 		name: "KeysDuplicateQuoted",
 		input: `
 			"foo" = "same key"
 			foo = "same key"
 			`,
-		wantErr: `duplicate key: foo`,
+		wantErr: `duplicate key: foo: test.toml:2:1`,
 	}, {
 		name: "KeysDuplicateWhitespace",
 		input: `
 			foo . bar = "same key"
 			foo.bar = "same key"
 			`,
-		wantErr: `duplicate key: foo\.bar`,
+		wantErr: `duplicate key: foo\.bar: test.toml:2:1`,
 	}, {
 		name: "KeysDuplicateDots",
 		input: `
 			foo."bar.baz".zzz = "same key"
 			foo."bar.baz".zzz = "same key"
 			`,
-		wantErr: `duplicate key: foo\."bar\.baz"\.zzz`,
+		wantErr: `duplicate key: foo\."bar\.baz"\.zzz: test.toml:2:1`,
 	}, {
 		name: "KeysNotDuplicateDots",
 		input: `
@@ -329,13 +331,13 @@ line two.\
 		input: `
 			point = {x = "same key", x = "same key"}
 			`,
-		wantErr: `duplicate key: point\.x`,
+		wantErr: `duplicate key: point\.x: test.toml:1:26`,
 	}, {
 		name: "ArrayInlineTablesDuplicate",
 		input: `
 			point = [{}, {}, {x = "same key", x = "same key"}]
 			`,
-		wantErr: `duplicate key: point\.2\.x`,
+		wantErr: `duplicate key: point\.2\.x: test.toml:1:35`,
 	}, {
 		name: "InlineTablesNotDuplicateScoping",
 		input: `
@@ -418,7 +420,7 @@ line two.\
 			[foo]
 			[foo]
 			`,
-		wantErr: `duplicate key: foo`,
+		wantErr: `duplicate key: foo: test.toml:2:2`,
 	}, {
 		name: "TableKeysDuplicateOverlap",
 		input: `
@@ -427,7 +429,7 @@ line two.\
 			[foo.bar]
 			baz = "second leaf"
 			`,
-		wantErr: `duplicate key: foo.bar`,
+		wantErr: `duplicate key: foo.bar: test.toml:3:2`,
 	}, {
 		name: "TableInnerKeysDuplicateSimple",
 		input: `
@@ -435,7 +437,7 @@ line two.\
 			bar = "same key"
 			bar = "same key"
 			`,
-		wantErr: `duplicate key: foo\.bar`,
+		wantErr: `duplicate key: foo\.bar: test.toml:3:1`,
 	}, {
 		name: "TablesNotDuplicateScoping",
 		input: `
@@ -630,7 +632,7 @@ line two.\
 			[[foo]]
 			baz = "baz value"
 			`,
-		wantErr: `cannot redeclare key "foo" as a table array`,
+		wantErr: `cannot redeclare key "foo" as a table array: test.toml:4:3`,
 	}, {
 		name: "RedeclareTableAsTableArray",
 		input: `
@@ -641,7 +643,7 @@ line two.\
 			[[foo]]
 			baz = "baz value"
 			`,
-		wantErr: `cannot redeclare key "foo" as a table array`,
+		wantErr: `cannot redeclare key "foo" as a table array: test.toml:5:3`,
 	}, {
 		name: "RedeclareArrayAsTableArray",
 		input: `
@@ -651,7 +653,7 @@ line two.\
 			[[foo]]
 			baz = "baz value"
 			`,
-		wantErr: `cannot redeclare key "foo" as a table array`,
+		wantErr: `cannot redeclare key "foo" as a table array: test.toml:4:3`,
 	}, {
 		name: "RedeclareTableArrayAsKey",
 		input: `
@@ -662,7 +664,7 @@ line two.\
 			[foo]
 			foo2 = "redeclaring"
 			`,
-		wantErr: `cannot redeclare table array "foo.foo2" as a table`,
+		wantErr: `cannot redeclare table array "foo.foo2" as a table: test.toml:6:1`,
 	}, {
 		name: "RedeclareTableArrayAsTable",
 		input: `
@@ -673,7 +675,7 @@ line two.\
 			[foo]
 			baz = "baz value"
 			`,
-		wantErr: `cannot redeclare table array "foo" as a table`,
+		wantErr: `cannot redeclare table array "foo" as a table: test.toml:5:2`,
 	}, {
 		name: "KeysNotDuplicateTableArrays",
 		input: `
@@ -720,11 +722,17 @@ line two.\
 			t.Parallel()
 
 			input := unindentMultiline(test.input)
-			dec := toml.NewDecoder(strings.NewReader(input))
+			dec := toml.NewDecoder("test.toml", strings.NewReader(input))
 
 			node, err := dec.Decode()
 			if test.wantErr != "" {
-				qt.Assert(t, qt.ErrorMatches(err, test.wantErr))
+				// To make the "want error" strings less verbose,
+				// remove the trailing newline and inline all positions.
+				// TODO(mvdan): perhaps errors.Config should have a "compact" mode.
+				gotErr := strings.TrimSpace(errors.Details(err, nil))
+				gotErr = strings.ReplaceAll(gotErr, "\n    ", " ")
+
+				qt.Assert(t, qt.Matches(gotErr, test.wantErr))
 				qt.Assert(t, qt.IsNil(node))
 				// We don't continue, so we can't expect any decoded CUE.
 				qt.Assert(t, qt.Equals(test.wantCUE, ""))

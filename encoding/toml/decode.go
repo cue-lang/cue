@@ -27,17 +27,18 @@ import (
 	toml "github.com/pelletier/go-toml/v2/unstable"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 )
 
-// TODO(mvdan): filename, schema, and decode options
+// TODO(mvdan): schema and decode options
 
 // NewDecoder creates a decoder from a stream of TOML input.
-func NewDecoder(r io.Reader) *Decoder {
+func NewDecoder(filename string, r io.Reader) *Decoder {
 	// Note that we don't consume the reader here,
 	// as there's no need, and we can't return an error either.
-	return &Decoder{r: r, seenTableKeys: make(map[string]bool)}
+	return &Decoder{r: r, filename: filename, seenTableKeys: make(map[string]bool)}
 }
 
 // Decoder implements the decoding state.
@@ -46,6 +47,8 @@ func NewDecoder(r io.Reader) *Decoder {
 // subsequent calls to [Decoder.Decode] may return [io.EOF].
 type Decoder struct {
 	r io.Reader
+
+	filename string
 
 	decoded bool // whether [Decoder.Decoded] has been called already
 	parser  toml.Parser
@@ -57,6 +60,9 @@ type Decoder struct {
 	// topFile is the top-level CUE file we are decoding into.
 	// TODO(mvdan): make an *ast.File once the decoder returns ast.Node rather than ast.Expr.
 	topFile *ast.StructLit
+
+	// tokenFile is used to create positions which can be used for error values and syntax tree nodes.
+	tokenFile *token.File
 
 	// openTableArrays keeps track of all the declared table arrays so that
 	// later headers can append a new table array element, or add a field
@@ -104,7 +110,6 @@ type openTableArray struct {
 
 // TODO(mvdan): support decoding comments
 // TODO(mvdan): support ast.Node positions
-// TODO(mvdan): support error positions
 
 // Decode parses the input stream as TOML and converts it to a CUE [*ast.File].
 // Because TOML files only contain a single top-level expression,
@@ -119,6 +124,8 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 	if err != nil {
 		return nil, err
 	}
+	d.tokenFile = token.NewFile(d.filename, 0, len(data))
+	d.tokenFile.SetLinesForContent(data)
 	d.parser.Reset(data)
 	// Note that if the input is empty the result will be the same
 	// as for an empty table: an empty struct.
@@ -130,9 +137,27 @@ func (d *Decoder) Decode() (ast.Expr, error) {
 		}
 	}
 	if err := d.parser.Error(); err != nil {
+		if err, ok := err.(*toml.ParserError); ok {
+			shape := d.parser.Shape(d.parser.Range(err.Highlight))
+			return nil, d.posErrf(shape.Start, "%s", err.Message)
+		}
 		return nil, err
 	}
 	return d.topFile, nil
+}
+
+func (d *Decoder) nodeErrf(tnode *toml.Node, format string, args ...any) error {
+	if tnode.Raw.Length == 0 {
+		// Otherwise the Shape method call below happily returns a position like 1:1,
+		// which is worse than no position information as it confuses the user.
+		panic("Decoder.errf was given an empty toml.Node as position")
+	}
+	pos := d.parser.Shape(tnode.Raw).Start
+	return d.posErrf(pos, format, args...)
+}
+
+func (d *Decoder) posErrf(pos toml.Position, format string, args ...any) error {
+	return errors.Newf(d.tokenFile.Pos(pos.Offset, token.NoRelPos), format, args...)
 }
 
 // nextRootNode is called for every top-level expression from the TOML parser.
@@ -176,7 +201,7 @@ func (d *Decoder) nextRootNode(tnode *toml.Node) error {
 		key, keyElems := decodeKey("", tnode.Key())
 		// All table keys must be unique, including for the top-level table.
 		if d.seenTableKeys[key] {
-			return fmt.Errorf("duplicate key: %s", key)
+			return d.nodeErrf(tnode.Child(), "duplicate key: %s", key)
 		}
 		d.seenTableKeys[key] = true
 
@@ -189,7 +214,7 @@ func (d *Decoder) nextRootNode(tnode *toml.Node) error {
 		array := d.findArrayPrefix(key)
 		if array != nil { // [last_array.new_table]
 			if array.key == key {
-				return fmt.Errorf("cannot redeclare table array %q as a table", key)
+				return d.nodeErrf(tnode.Child(), "cannot redeclare table array %q as a table", key)
 			}
 			subKeyElems := keyElems[array.level:]
 			topField, leafField := inlineFields(subKeyElems, token.Newline)
@@ -206,7 +231,7 @@ func (d *Decoder) nextRootNode(tnode *toml.Node) error {
 		// Table array elements always begin a new line.
 		key, keyElems := decodeKey("", tnode.Key())
 		if d.seenTableKeys[key] {
-			return fmt.Errorf("cannot redeclare key %q as a table array", key)
+			return d.nodeErrf(tnode.Child(), "cannot redeclare key %q as a table array", key)
 		}
 		// Each struct inside a table array sits on separate lines.
 		d.currentTable = &ast.StructLit{
@@ -259,12 +284,12 @@ func (d *Decoder) nextRootNode(tnode *toml.Node) error {
 func (d *Decoder) decodeField(key rootedKey, tnode *toml.Node, relPos token.RelPos) (*ast.Field, error) {
 	key, keyElems := decodeKey(key, tnode.Key())
 	if d.findArray(key) != nil {
-		return nil, fmt.Errorf("cannot redeclare table array %q as a table", key)
+		return nil, d.nodeErrf(tnode.Child().Next(), "cannot redeclare table array %q as a table", key)
 	}
 	topField, leafField := inlineFields(keyElems, relPos)
 	// All table keys must be unique, including inner table ones.
 	if d.seenTableKeys[key] {
-		return nil, fmt.Errorf("duplicate key: %s", key)
+		return nil, d.nodeErrf(tnode.Child().Next(), "duplicate key: %s", key)
 	}
 	d.seenTableKeys[key] = true
 	value, err := d.decodeExpr(key, tnode.Value())

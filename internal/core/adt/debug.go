@@ -648,6 +648,15 @@ func (m *mermaidContext) pstr(cc *closeContext) string {
 	flags.WriteByte(cc.arcType.String()[0])
 	io.Copy(w, flags)
 
+	// Show the origin of the closeContext.
+	indentOnNewline(w, 3)
+	ptr = fmt.Sprintf("%p", cc.origin)
+	if cc.origin != nil {
+		ptr = ptr[len(ptr)-sigPtrLen:]
+	}
+	w.WriteString("R:")
+	w.WriteString(ptr)
+
 	w.WriteString(close)
 
 	switch {

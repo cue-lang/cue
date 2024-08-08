@@ -67,7 +67,7 @@ Allocs: 209
 Retain: 0
 
 Unifications: 194
-Conjuncts:    1097
+Conjuncts:    1034
 Disjuncts:    0
 -- out/evalalpha --
 Errors:
@@ -203,7 +203,7 @@ diff old new
 -Conjuncts:    2709
 -Disjuncts:    1414
 +Unifications: 194
-+Conjuncts:    1097
++Conjuncts:    1034
 +Disjuncts:    0
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new

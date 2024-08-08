@@ -410,26 +410,85 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 		}
 	}
 
-	if d, ok := arc.BaseValue.(*Disjunction); ok && false {
-		n.scheduleConjunct(MakeConjunct(c.Env, d, closeInfo), closeInfo)
-	} else {
-		for i := 0; i < len(arc.Conjuncts); i++ {
-			c := arc.Conjuncts[i]
+	// TODO(perf): buffer or use stack.
+	var a []*closeContext
+	a = appendPrefix(n.ctx, a, closeInfo.cc)
 
-			// Note that we are resetting the tree here. We hereby assume that
-			// closedness conflicts resulting from unifying the referenced arc were
-			// already caught there and that we can ignore further errors here.
-			// c.CloseInfo = closeInfo
-
-			// We can use the original, but we know it will not be used
-
-			n.scheduleConjunct(c, closeInfo)
-		}
+	// Use explicit index in case Conjuncts grows during iteration.
+	for i := 0; i < len(arc.Conjuncts); i++ {
+		c := arc.Conjuncts[i]
+		n.insertAndSkipConjuncts(a, c, closeInfo)
 	}
 
 	if state := arc.getBareState(n.ctx); state != nil {
 		n.toComplete = true
 	}
+}
+
+// appendPrefix records the closeContext from the root of the current node to
+// cc by walking up the parent chain and storing the results ancestor first.
+// This is used to split conjunct trees into a forrest of types.
+func appendPrefix(ctx *OpContext, a []*closeContext, cc *closeContext) []*closeContext {
+	if cc.parent != nil {
+		a = appendPrefix(ctx, a, cc.parent)
+	}
+	a = append(a, cc)
+	return a
+}
+
+// insertAndSkipConjuncts analyzes the conjunct tree represented by c and splits
+// it into branches from the point where it deviates from the conjunct branch
+// represented by skip.
+//
+// TODO(evalv3): Consider this example:
+//
+//	#A: {
+//		b: {} // error only reported here.
+//		c: b & {
+//			// error (g not allowed) not reported here, as it would be okay if b
+//			// were valid. Instead, it is reported at b only. This is conform
+//			// the spec.
+//			d: 1
+//		}
+//	}
+//	x: #A
+//	x: b: g: 1
+//
+// We could also report an error at g by tracing if a conjunct crosses a isDef
+// boundary between the root of c and the cc of the conjunct.
+// Not doing so might have an effect on the outcome of disjunctions. This may be
+// okay (ideally closedness is not modal), but something to consider. For now,
+// we should probably copy whatever v2 was doing.
+func (n *nodeContext) insertAndSkipConjuncts(skip []*closeContext, c Conjunct, id CloseInfo) {
+	if c.CloseInfo.cc == nil {
+		n.scheduleConjunct(c, id)
+		return
+	}
+
+	root := c.CloseInfo.cc.origin
+
+	// TODO(perf): closeContexts should be exact prefixes. So instead of
+	// searching the list, we could test them incrementally. This seems more
+	// robust for now as the data structure might slightly change and cause
+	// disalignment.
+	for _, s := range skip {
+		if root == s.origin {
+			switch x := c.Elem().(type) {
+			case *ConjunctGroup:
+				for _, c := range *x {
+					n.insertAndSkipConjuncts(skip, c, id)
+				}
+
+			default:
+				// TODO: do leaf conjuncts that match need different treatment
+				// from those that don't? Right now, we treat them the same.
+				n.scheduleConjunct(c, id)
+			}
+			return
+		}
+	}
+
+	n.scheduleConjunct(c, id)
 }
 
 func (n *nodeContext) addNotify2(v *Vertex, c CloseInfo) []receiver {

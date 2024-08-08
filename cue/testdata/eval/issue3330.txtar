@@ -50,24 +50,14 @@ Errors:
 eliminated.x: conflicting values null and {} (mismatched types null and struct):
     ./in.cue:21:10
     ./in.cue:22:5
-issue3330.0.0.field: conflicting values null and {} (mismatched types null and struct):
-    ./in.cue:5:15
-    ./in.cue:9:10
-issue3330.0.0.field.n: field not allowed:
-    ./in.cue:10:10
-    ./in.cue:10:20
 eliminated.x.n: field not allowed:
     ./in.cue:23:5
     ./in.cue:23:16
-simplified.out.field.n: field not allowed:
-    ./in.cue:31:21
-    ./in.cue:31:12
 
 Result:
 (_|_){
   // [eval]
-  issue3330: (_|_){
-    // [eval]
+  issue3330: (struct){
     #A: (#struct){
       let empty#1 = (#struct){
       }
@@ -75,13 +65,14 @@ Result:
         n: (int){ 3 }
       }
     }
-    out: (_|_){
-      // [eval] issue3330.0.0.field: conflicting values null and {} (mismatched types null and struct):
-      //     ./in.cue:5:15
-      //     ./in.cue:9:10
-      // issue3330.0.0.field.n: field not allowed:
-      //     ./in.cue:10:10
-      //     ./in.cue:10:20
+    out: (#list){
+      0: (#struct){
+        let empty#1 = (#struct){
+        }
+        field: (#struct){
+          n: (int){ 3 }
+        }
+      }
     }
   }
   eliminated: (_|_){
@@ -110,8 +101,7 @@ Result:
       //     ./in.cue:23:16
     }
   }
-  simplified: (_|_){
-    // [eval]
+  simplified: (struct){
     #struct: (#struct){
       field: (#struct){
         n: (int){ 3 }
@@ -119,15 +109,9 @@ Result:
       g: (#struct){
       }
     }
-    out: (_|_){
-      // [eval]
-      field: (_|_){
-        // [eval]
-        n: (_|_){
-          // [eval] simplified.out.field.n: field not allowed:
-          //     ./in.cue:31:21
-          //     ./in.cue:31:12
-        }
+    out: (#struct){
+      field: (#struct){
+        n: (int){ 3 }
       }
       g: (#struct){
       }
@@ -138,7 +122,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,18 +1,25 @@
+@@ -1,11 +1,8 @@
  Errors:
 -eliminated.x: 2 errors in empty disjunction:
 -eliminated.x: conflicting values null and {n:3} (mismatched types null and struct):
@@ -146,53 +130,13 @@ diff old new
 +    ./in.cue:21:10
      ./in.cue:22:5
 -    ./in.cue:23:14
-+issue3330.0.0.field: conflicting values null and {} (mismatched types null and struct):
-+    ./in.cue:5:15
-+    ./in.cue:9:10
-+issue3330.0.0.field.n: field not allowed:
-+    ./in.cue:10:10
-+    ./in.cue:10:20
  eliminated.x.n: field not allowed:
 -    ./in.cue:21:10
 -    ./in.cue:22:14
      ./in.cue:23:5
      ./in.cue:23:16
-+simplified.out.field.n: field not allowed:
-+    ./in.cue:31:21
-+    ./in.cue:31:12
  
- Result:
- (_|_){
-   // [eval]
--  issue3330: (struct){
-+  issue3330: (_|_){
-+    // [eval]
-     #A: (#struct){
-       let empty#1 = (#struct){
-       }
-@@ -20,14 +27,13 @@
-         n: (int){ 3 }
-       }
-     }
--    out: (#list){
--      0: (#struct){
--        let empty#1 = (#struct){
--        }
--        field: (#struct){
--          n: (int){ 3 }
--        }
--      }
-+    out: (_|_){
-+      // [eval] issue3330.0.0.field: conflicting values null and {} (mismatched types null and struct):
-+      //     ./in.cue:5:15
-+      //     ./in.cue:9:10
-+      // issue3330.0.0.field.n: field not allowed:
-+      //     ./in.cue:10:10
-+      //     ./in.cue:10:20
-     }
-   }
-   eliminated: (_|_){
-@@ -35,36 +41,29 @@
+@@ -35,31 +32,23 @@
      #empty: (#struct){
      }
      x: (_|_){
@@ -225,47 +169,15 @@ diff old new
 -      // eliminated.x.n: field not allowed:
 -      //     ./in.cue:21:10
 -      //     ./in.cue:22:14
--      //     ./in.cue:23:5
--      //     ./in.cue:23:16
--    }
--  }
--  simplified: (struct){
 +      // [eval] eliminated.x: conflicting values null and {} (mismatched types null and struct):
 +      //     ./in.cue:21:10
 +      //     ./in.cue:22:5
 +      // eliminated.x.n: field not allowed:
-+      //     ./in.cue:23:5
-+      //     ./in.cue:23:16
-+    }
-+  }
-+  simplified: (_|_){
-+    // [eval]
-     #struct: (#struct){
-       field: (#struct){
-         n: (int){ 3 }
-@@ -72,9 +71,15 @@
-       g: (#struct){
-       }
+       //     ./in.cue:23:5
+       //     ./in.cue:23:16
      }
--    out: (#struct){
--      field: (#struct){
--        n: (int){ 3 }
-+    out: (_|_){
-+      // [eval]
-+      field: (_|_){
-+        // [eval]
-+        n: (_|_){
-+          // [eval] simplified.out.field.n: field not allowed:
-+          //     ./in.cue:31:21
-+          //     ./in.cue:31:12
-+        }
-       }
-       g: (#struct){
-       }
--- diff/todo/p1 --
-References of structs within a definition that are usually allowed are
-now triggered by refering to a definition outside of that definition.
-Both "issue3330" and "simplified" should not have any errors.
+-- diff/todo/p3 --
+Small differences in error output. Empty disjunction error.
 -- out/eval --
 Errors:
 eliminated.x: 2 errors in empty disjunction:

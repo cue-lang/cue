@@ -295,6 +295,12 @@ func (v *Vertex) rootCloseContext(ctx *OpContext) *closeContext {
 		}
 		v.cc.incDependent(ctx, ROOT, nil) // matched in REF(decrement:nodeDone)
 	}
+	v.cc.origin = v.cc
+	if p := v.Parent; p != nil {
+		pcc := p.rootCloseContext(ctx)
+		v.cc.origin = pcc.origin
+	}
+
 	return v.cc
 }
 

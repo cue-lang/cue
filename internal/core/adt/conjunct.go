@@ -312,6 +312,7 @@ loop2:
 			// Can be added unconditionally to patterns.
 			ci.cc.isDef = false
 			ci.cc.isClosed = false
+			ci.cc.isDefOrig = false
 
 		case *DynamicField:
 			if x.ArcType == ArcMember {

@@ -10,6 +10,12 @@ stderr 'x3.json:1:1'
 ! exec cue export x4.json
 stderr 'x4.json:1:1'
 
+! exec cue export x5.jsonl
+# TODO(mvdan): the position below seems to be incorrect,
+# as it points to the end of the previous value instead.
+stderr 'x5.jsonl:6:2'
+# stderr 'x5.jsonl:8:12'
+
 -- x1.json --
 {
   "foo": true,
@@ -24,3 +30,13 @@ stderr 'x4.json:1:1'
 baz: false
 
 -- x4.json --
+-- x5.jsonl --
+{
+"foo": true
+}
+{
+"bar": false
+}
+{
+"invalid": ]
+}

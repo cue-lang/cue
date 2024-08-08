@@ -87,6 +87,16 @@ func extract(path string, b []byte) (ast.Expr, error) {
 		}
 		var x interface{}
 		err := json.Unmarshal(b, &x)
+
+		if len(b) > 0 {
+			var synErr *json.SyntaxError
+			if errors.As(err, &synErr) {
+				tokFile := token.NewFile(path, 0, len(b))
+				tokFile.SetLinesForContent(b)
+				p = tokFile.Pos(int(synErr.Offset-1), token.NoRelPos)
+			}
+		}
+
 		return nil, errors.Wrapf(err, p, "invalid JSON for file %q", path)
 	}
 	return expr, nil

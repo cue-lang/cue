@@ -202,7 +202,8 @@ type closeContext struct {
 
 	// isDef indicates whether the closeContext is created as part of a
 	// definition.
-	isDef bool
+	isDef     bool
+	isDefOrig bool
 
 	// hasEllipsis indicates whether the node contains an ellipsis.
 	hasEllipsis bool
@@ -392,7 +393,8 @@ func (cc *closeContext) getKeyedCC(ctx *OpContext, key *closeContext, c CycleInf
 		arcType: mode,
 		group:   group,
 
-		isDef:                cc.isDef,
+		isDef:                cc.isDef,     // XXX: inherit isDef?
+		isDefOrig:            cc.isDefOrig, // XXX: inherit isDef?
 		isEmbed:              cc.isEmbed,
 		needsCloseInSchedule: cc,
 	}
@@ -484,6 +486,7 @@ func (c CloseInfo) spawnCloseContext(ctx *OpContext, t closeNodeType) (CloseInfo
 	switch t {
 	case closeDef:
 		c.cc.isDef = true
+		c.cc.isDefOrig = true
 	case closeEmbed:
 		c.cc.isEmbed = true
 	}

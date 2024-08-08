@@ -322,6 +322,7 @@ func (ctx *overlayContext) initCloneCC(x *closeContext) {
 	o.conjunctCount = x.conjunctCount
 	o.disjunctCount = x.disjunctCount
 	o.isDef = x.isDef
+	o.isDefOrig = x.isDefOrig
 	o.hasEllipsis = x.hasEllipsis
 	o.hasTop = x.hasTop
 	o.hasNonTop = x.hasNonTop

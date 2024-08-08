@@ -88,13 +88,11 @@ func extract(path string, b []byte) (ast.Expr, error) {
 		var x interface{}
 		err := json.Unmarshal(b, &x)
 
-		if len(b) > 0 {
-			var synErr *json.SyntaxError
-			if errors.As(err, &synErr) {
-				tokFile := token.NewFile(path, 0, len(b))
-				tokFile.SetLinesForContent(b)
-				p = tokFile.Pos(int(synErr.Offset-1), token.NoRelPos)
-			}
+		// If encoding/json has a position, prefer that, as it relates to json.Unmarshal's error message.
+		if synErr, ok := err.(*json.SyntaxError); ok && len(b) > 0 {
+			tokFile := token.NewFile(path, 0, len(b))
+			tokFile.SetLinesForContent(b)
+			p = tokFile.Pos(int(synErr.Offset-1), token.NoRelPos)
 		}
 
 		return nil, errors.Wrapf(err, p, "invalid JSON for file %q", path)
@@ -153,11 +151,14 @@ func (d *Decoder) extract() (ast.Expr, error) {
 		return nil, err
 	}
 	if err != nil {
-		pos := d.tokFile.Pos(int(d.dec.InputOffset()), 0)
+		pos := token.NoPos
+		// When decoding into a RawMessage, encoding/json should only error due to syntax errors.
+		if synErr, ok := err.(*json.SyntaxError); ok {
+			pos = d.tokFile.Pos(int(synErr.Offset-1), token.NoRelPos)
+		}
 		return nil, errors.Wrapf(err, pos, "invalid JSON for file %q", d.path)
 	}
 	expr, err := parser.ParseExpr(d.path, []byte(raw))
-
 	if err != nil {
 		return nil, err
 	}

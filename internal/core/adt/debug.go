@@ -648,7 +648,7 @@ func (m *mermaidContext) pstr(cc *closeContext) string {
 			flags.WriteByte(flag)
 		}
 	}
-	addFlag(cc.isDef, '#')
+	addFlag(cc.isDefOrig, '#')
 	addFlag(cc.isEmbed, 'E')
 	addFlag(cc.isClosed, 'c')
 	addFlag(cc.isClosedOnce, 'C')

@@ -200,9 +200,13 @@ type closeContext struct {
 
 	arcType ArcType
 
-	// isDef indicates whether the closeContext is created as part of a
-	// definition.
+	// isDef is true when isDefOrig is true or when isDef is true for any of its
+	// child nodes, recursively.
 	isDef bool
+
+	// isDefOrig indicates whether the closeContext is created as part of a
+	// definition. This value propagates to itself and parents through isDef.
+	isDefOrig bool
 
 	// hasEllipsis indicates whether the node contains an ellipsis.
 	hasEllipsis bool
@@ -393,6 +397,7 @@ func (cc *closeContext) getKeyedCC(ctx *OpContext, key *closeContext, c CycleInf
 		group:   group,
 
 		isDef:                cc.isDef,
+		isDefOrig:            cc.isDefOrig,
 		isEmbed:              cc.isEmbed,
 		needsCloseInSchedule: cc,
 	}
@@ -484,6 +489,7 @@ func (c CloseInfo) spawnCloseContext(ctx *OpContext, t closeNodeType) (CloseInfo
 	switch t {
 	case closeDef:
 		c.cc.isDef = true
+		c.cc.isDefOrig = true
 	case closeEmbed:
 		c.cc.isEmbed = true
 	}

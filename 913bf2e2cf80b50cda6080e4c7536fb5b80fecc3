@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bcf0feee_46e88f32",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-08T13:56:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "04981c71_9c656b45",
+      "revId": "913bf2e2cf80b50cda6080e4c7536fb5b80fecc3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "97597f1d_7478286c",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-08-08T12:42:36Z",
       "side": 1,
       "message": "can you please move this under cue/format/testdata? for example, see issue1544.txtar in that directory.",
+      "revId": "913bf2e2cf80b50cda6080e4c7536fb5b80fecc3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c831f50_dbddf94f",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_issue3291.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-08T13:56:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "97597f1d_7478286c",
       "revId": "913bf2e2cf80b50cda6080e4c7536fb5b80fecc3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -157,6 +157,11 @@ type closeContext struct {
 	// Used to recursively insert Vertices.
 	parent *closeContext
 
+	// points to the closeContext this closeContext originates when following
+	// the reverse or ARC/EVAL dependencies corresponding to parent vertices.
+	// This is used to compute the prefix path when resolving a reference.
+	origin *closeContext
+
 	// overlay is used to temporarily link a closeContext to its "overlay" copy,
 	// as it is used in a corresponding disjunction.
 	overlay *closeContext
@@ -387,6 +392,7 @@ func (cc *closeContext) getKeyedCC(ctx *OpContext, key *closeContext, c CycleInf
 	}, mode, false, checkClosed)
 
 	arc := &closeContext{
+		origin:          cc.origin,
 		generation:      cc.generation,
 		parent:          parent,
 		parentConjuncts: parent,
@@ -483,6 +489,9 @@ func (c CloseInfo) spawnCloseContext(ctx *OpContext, t closeNodeType) (CloseInfo
 		src:             cc.src,
 		parentConjuncts: cc,
 	}
+
+	// By definition, a spawned closeContext is its own root.
+	c.cc.origin = c.cc
 
 	cc.incDependent(ctx, PARENT, c.cc) // REF(decrement: spawn)
 

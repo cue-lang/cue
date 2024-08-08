@@ -766,9 +766,6 @@ Result:
 }
 -- out/evalalpha --
 Errors:
-issue3330.let.ok.0.0.field: conflicting values null and {} (mismatched types null and struct):
-    ./reroot.cue:6:16
-    ./reroot.cue:8:11
 nested.err1.x.b.f: field not allowed:
     ./reroot.cue:114:6
 nested.err2.x.b.g: field not allowed:
@@ -783,31 +780,14 @@ a.q.e: field not allowed:
 issue852.a.Foo: field not allowed:
     ./in.cue:23:16
     ./in.cue:28:5
-issue3330.let.ok.0.0.field.n: field not allowed:
-    ./reroot.cue:9:11
-    ./reroot.cue:9:21
-issue3330.matthew.ok1.out.field.n: field not allowed:
-    ./reroot.cue:16:22
-    ./reroot.cue:16:13
-issue3331.original.ok.0.0.c.d: field not allowed:
-    ./reroot.cue:36:7
-    ./reroot.cue:37:5
 nested.err1.x.#V.c.d: field not allowed:
     ./reroot.cue:122:8
     ./reroot.cue:118:5
 nested.err1.x.#V.c.f: field not allowed:
     ./reroot.cue:122:8
     ./reroot.cue:114:6
-nested.err1.x.#V.c.g: field not allowed:
-    ./reroot.cue:122:8
 nested.err1.x.b.g: field not allowed:
     ./reroot.cue:122:8
-nested.err2.x.c.d: field not allowed:
-    ./reroot.cue:129:6
-    ./reroot.cue:133:4
-nested.err2.x.c.g: field not allowed:
-    ./reroot.cue:129:6
-    ./reroot.cue:137:8
 inline.err1.age1: field not allowed:
     ./reroot.cue:143:8
     ./reroot.cue:145:3
@@ -913,12 +893,9 @@ Result:
       key: (string){ "foo" }
     }
   }
-  issue3330: (_|_){
-    // [eval]
-    let: (_|_){
-      // [eval]
-      ok: (_|_){
-        // [eval]
+  issue3330: (struct){
+    let: (struct){
+      ok: (struct){
         #struct: (#struct){
           let empty#1 = (#struct){
           }
@@ -926,20 +903,19 @@ Result:
             n: (int){ 3 }
           }
         }
-        out: (_|_){
-          // [eval] issue3330.let.ok.0.0.field: conflicting values null and {} (mismatched types null and struct):
-          //     ./reroot.cue:6:16
-          //     ./reroot.cue:8:11
-          // issue3330.let.ok.0.0.field.n: field not allowed:
-          //     ./reroot.cue:9:11
-          //     ./reroot.cue:9:21
+        out: (#list){
+          0: (#struct){
+            let empty#1 = (#struct){
+            }
+            field: (#struct){
+              n: (int){ 3 }
+            }
+          }
         }
       }
     }
-    matthew: (_|_){
-      // [eval]
-      ok1: (_|_){
-        // [eval]
+    matthew: (struct){
+      ok1: (struct){
         #struct: (#struct){
           field: (#struct){
             n: (int){ 3 }
@@ -947,15 +923,9 @@ Result:
           g: (#struct){
           }
         }
-        out: (_|_){
-          // [eval]
-          field: (_|_){
-            // [eval]
-            n: (_|_){
-              // [eval] issue3330.matthew.ok1.out.field.n: field not allowed:
-              //     ./reroot.cue:16:22
-              //     ./reroot.cue:16:13
-            }
+        out: (#struct){
+          field: (#struct){
+            n: (int){ 3 }
           }
           g: (#struct){
           }
@@ -986,15 +956,17 @@ Result:
       }
     }
   }
-  issue3331: (_|_){
-    // [eval]
-    original: (_|_){
-      // [eval]
-      ok: (_|_){
-        // [eval] issue3331.original.ok.0.0.c.d: field not allowed:
-        //     ./reroot.cue:36:7
-        //     ./reroot.cue:37:5
+  issue3331: (struct){
+    original: (struct){
+      ok: (#list){
         #A: (#struct){
+          let b#2 = (#struct){
+          }
+          c: (#struct){
+            d: (int){ 1 }
+          }
+        }
+        0: (#struct){
           let b#2 = (#struct){
           }
           c: (#struct){
@@ -1167,10 +1139,7 @@ Result:
               //     ./reroot.cue:122:8
               //     ./reroot.cue:114:6
             }
-            g: (_|_){
-              // [eval] nested.err1.x.#V.c.g: field not allowed:
-              //     ./reroot.cue:122:8
-            }
+            g: (int){ 1 }
           }
         }
         #V: (_|_){
@@ -1187,10 +1156,7 @@ Result:
               //     ./reroot.cue:122:8
               //     ./reroot.cue:114:6
             }
-            g: (_|_){
-              // [eval] nested.err1.x.#V.c.g: field not allowed:
-              //     ./reroot.cue:122:8
-            }
+            g: (int){ 1 }
           }
         }
       }
@@ -1233,18 +1199,9 @@ Result:
             //     ./reroot.cue:137:8
           }
         }
-        c: (_|_){
-          // [eval]
-          d: (_|_){
-            // [eval] nested.err2.x.c.d: field not allowed:
-            //     ./reroot.cue:129:6
-            //     ./reroot.cue:133:4
-          }
-          g: (_|_){
-            // [eval] nested.err2.x.c.g: field not allowed:
-            //     ./reroot.cue:129:6
-            //     ./reroot.cue:137:8
-          }
+        c: (#struct){
+          d: (int){ 1 }
+          g: (int){ 1 }
         }
       }
     }
@@ -1282,11 +1239,8 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,72 +1,60 @@
+@@ -1,72 +1,40 @@
  Errors:
-+issue3330.let.ok.0.0.field: conflicting values null and {} (mismatched types null and struct):
-+    ./reroot.cue:6:16
-+    ./reroot.cue:8:11
 +nested.err1.x.b.f: field not allowed:
 +    ./reroot.cue:114:6
 +nested.err2.x.b.g: field not allowed:
@@ -1314,15 +1268,6 @@ diff old new
 -    ./in.cue:26:5
 +    ./in.cue:23:16
      ./in.cue:28:5
-+issue3330.let.ok.0.0.field.n: field not allowed:
-+    ./reroot.cue:9:11
-+    ./reroot.cue:9:21
-+issue3330.matthew.ok1.out.field.n: field not allowed:
-+    ./reroot.cue:16:22
-+    ./reroot.cue:16:13
-+issue3331.original.ok.0.0.c.d: field not allowed:
-+    ./reroot.cue:36:7
-+    ./reroot.cue:37:5
  nested.err1.x.#V.c.d: field not allowed:
 -    ./reroot.cue:112:5
 -    ./reroot.cue:114:6
@@ -1346,8 +1291,6 @@ diff old new
 -    ./reroot.cue:123:6
 +    ./reroot.cue:122:8
 +    ./reroot.cue:114:6
-+nested.err1.x.#V.c.g: field not allowed:
-+    ./reroot.cue:122:8
  nested.err1.x.b.g: field not allowed:
 -    ./reroot.cue:112:5
 -    ./reroot.cue:114:6
@@ -1374,12 +1317,6 @@ diff old new
 -    ./reroot.cue:136:5
 -    ./reroot.cue:137:8
 +    ./reroot.cue:122:8
-+nested.err2.x.c.d: field not allowed:
-+    ./reroot.cue:129:6
-+    ./reroot.cue:133:4
-+nested.err2.x.c.g: field not allowed:
-+    ./reroot.cue:129:6
-+    ./reroot.cue:137:8
 +inline.err1.age1: field not allowed:
 +    ./reroot.cue:143:8
 +    ./reroot.cue:145:3
@@ -1399,7 +1336,7 @@ diff old new
        #Items: (#struct){
        }
        #Base: (#struct){
-@@ -76,31 +64,36 @@
+@@ -76,31 +44,36 @@
          }
        }
        #Extended: (#struct){
@@ -1457,7 +1394,7 @@ diff old new
        }
      }
    }
-@@ -110,8 +103,8 @@
+@@ -110,8 +83,8 @@
    #A: (#struct){
      b: (int){ int }
      q: (#struct){
@@ -1467,7 +1404,7 @@ diff old new
      }
    }
    a: (_|_){
-@@ -120,21 +113,17 @@
+@@ -120,21 +93,17 @@
      q: (_|_){
        // [eval]
        c: (int){ 2 }
@@ -1491,7 +1428,7 @@ diff old new
      //     ./in.cue:28:5
      #A: (#struct){
      }
-@@ -142,8 +131,7 @@
+@@ -142,8 +111,7 @@
        // [eval]
        Foo: (_|_){
          // [eval] issue852.a.Foo: field not allowed:
@@ -1501,90 +1438,17 @@ diff old new
          //     ./in.cue:28:5
        }
      }
-@@ -154,13 +142,16 @@
+@@ -154,8 +122,8 @@
        foo: (int){ int }
      }
      d: (#struct){
 -      key: (string){ "foo" }
        foo: (int){ 3 }
--    }
--  }
--  issue3330: (struct){
--    let: (struct){
--      ok: (struct){
 +      key: (string){ "foo" }
-+    }
-+  }
-+  issue3330: (_|_){
-+    // [eval]
-+    let: (_|_){
-+      // [eval]
-+      ok: (_|_){
-+        // [eval]
-         #struct: (#struct){
-           let empty#1 = (#struct){
-           }
-@@ -168,29 +159,36 @@
-             n: (int){ 3 }
-           }
-         }
--        out: (#list){
--          0: (#struct){
--            let empty#1 = (#struct){
--            }
--            field: (#struct){
--              n: (int){ 3 }
--            }
--          }
--        }
--      }
--    }
--    matthew: (struct){
--      ok1: (struct){
--        #struct: (#struct){
--          field: (#struct){
--            n: (int){ 3 }
--          }
--          g: (#struct){
--          }
--        }
--        out: (#struct){
--          field: (#struct){
--            n: (int){ 3 }
-+        out: (_|_){
-+          // [eval] issue3330.let.ok.0.0.field: conflicting values null and {} (mismatched types null and struct):
-+          //     ./reroot.cue:6:16
-+          //     ./reroot.cue:8:11
-+          // issue3330.let.ok.0.0.field.n: field not allowed:
-+          //     ./reroot.cue:9:11
-+          //     ./reroot.cue:9:21
-+        }
-+      }
-+    }
-+    matthew: (_|_){
-+      // [eval]
-+      ok1: (_|_){
-+        // [eval]
-+        #struct: (#struct){
-+          field: (#struct){
-+            n: (int){ 3 }
-+          }
-+          g: (#struct){
-+          }
-+        }
-+        out: (_|_){
-+          // [eval]
-+          field: (_|_){
-+            // [eval]
-+            n: (_|_){
-+              // [eval] issue3330.matthew.ok1.out.field.n: field not allowed:
-+              //     ./reroot.cue:16:22
-+              //     ./reroot.cue:16:13
-+            }
-           }
-           g: (#struct){
-           }
-@@ -211,27 +209,25 @@
+     }
+   }
+   issue3330: (struct){
+@@ -211,11 +179,11 @@
            g: (#struct){
            }
          }
@@ -1593,45 +1457,15 @@ diff old new
 -            n: (int){ 3 }
 -          }
 -          g: (#struct){
--          }
--        }
--      }
--    }
--  }
--  issue3331: (struct){
--    original: (struct){
--      ok: (#list){
--        #A: (#struct){
--          let b#2 = (#struct){
--          }
--          c: (#struct){
--            d: (int){ 1 }
--          }
--        }
--        0: (#struct){
 +        out2: (struct){
 +          field: (struct){
 +            n: (int){ 3 }
 +          }
 +          g: (struct){
-+          }
-+        }
-+      }
-+    }
-+  }
-+  issue3331: (_|_){
-+    // [eval]
-+    original: (_|_){
-+      // [eval]
-+      ok: (_|_){
-+        // [eval] issue3331.original.ok.0.0.c.d: field not allowed:
-+        //     ./reroot.cue:36:7
-+        //     ./reroot.cue:37:5
-+        #A: (#struct){
-           let b#2 = (#struct){
            }
-           c: (#struct){
-@@ -261,8 +257,7 @@
+         }
+       }
+@@ -261,8 +229,7 @@
        }
      }
    }
@@ -1641,7 +1475,7 @@ diff old new
      embed: (struct){
        err1: (struct){
          #A: (#struct){
-@@ -299,17 +294,15 @@
+@@ -299,17 +266,15 @@
              c: (int){ 2 }
            }
          }
@@ -1666,7 +1500,7 @@ diff old new
          X: (struct){
            a: (struct){
              e: (int){ 1 }
-@@ -317,24 +310,13 @@
+@@ -317,24 +282,13 @@
            b: (struct){
            }
          }
@@ -1698,7 +1532,7 @@ diff old new
            }
          }
          #X: (#struct){
-@@ -397,17 +379,11 @@
+@@ -397,17 +351,11 @@
            // [eval]
            f: (_|_){
              // [eval] nested.err1.x.b.f: field not allowed:
@@ -1718,7 +1552,7 @@ diff old new
            }
          }
          v: (_|_){
-@@ -414,26 +390,19 @@
+@@ -414,27 +362,17 @@
            // [eval]
            c: (_|_){
              // [eval]
@@ -1742,6 +1576,7 @@ diff old new
 -              //     ./reroot.cue:118:5
 -              //     ./reroot.cue:122:8
 -              //     ./reroot.cue:123:6
+-            }
 +            d: (_|_){
 +              // [eval] nested.err1.x.#V.c.d: field not allowed:
 +              //     ./reroot.cue:122:8
@@ -1752,13 +1587,11 @@ diff old new
 +              //     ./reroot.cue:122:8
 +              //     ./reroot.cue:114:6
 +            }
-+            g: (_|_){
-+              // [eval] nested.err1.x.#V.c.g: field not allowed:
-+              //     ./reroot.cue:122:8
-             }
++            g: (int){ 1 }
            }
          }
-@@ -441,24 +410,19 @@
+         #V: (_|_){
+@@ -441,25 +379,17 @@
            // [eval]
            c: (_|_){
              // [eval]
@@ -1780,6 +1613,7 @@ diff old new
 -              //     ./reroot.cue:118:5
 -              //     ./reroot.cue:122:8
 -              //     ./reroot.cue:123:6
+-            }
 +            d: (_|_){
 +              // [eval] nested.err1.x.#V.c.d: field not allowed:
 +              //     ./reroot.cue:122:8
@@ -1790,13 +1624,11 @@ diff old new
 +              //     ./reroot.cue:122:8
 +              //     ./reroot.cue:114:6
 +            }
-+            g: (_|_){
-+              // [eval] nested.err1.x.#V.c.g: field not allowed:
-+              //     ./reroot.cue:122:8
-             }
++            g: (int){ 1 }
            }
          }
-@@ -469,14 +433,14 @@
+       }
+@@ -469,14 +399,14 @@
          }
          v: (#struct){
            c: (#struct){
@@ -1815,38 +1647,24 @@ diff old new
            }
          }
        }
-@@ -499,19 +463,27 @@
+@@ -499,19 +429,18 @@
            // [eval]
            g: (_|_){
              // [eval] nested.err2.x.b.g: field not allowed:
 -            //     ./reroot.cue:128:6
 -            //     ./reroot.cue:136:5
--            //     ./reroot.cue:137:8
--          }
--        }
--        c: (#struct){
--          g: (int){ 1 }
+             //     ./reroot.cue:137:8
+           }
+         }
+         c: (#struct){
++          d: (int){ 1 }
+           g: (int){ 1 }
 -          d: (int){ 1 }
 -        }
 -      }
 -    }
 -  }
 -  inline: (struct){
-+            //     ./reroot.cue:137:8
-+          }
-+        }
-+        c: (_|_){
-+          // [eval]
-+          d: (_|_){
-+            // [eval] nested.err2.x.c.d: field not allowed:
-+            //     ./reroot.cue:129:6
-+            //     ./reroot.cue:133:4
-+          }
-+          g: (_|_){
-+            // [eval] nested.err2.x.c.g: field not allowed:
-+            //     ./reroot.cue:129:6
-+            //     ./reroot.cue:137:8
-+          }
 +        }
 +      }
 +    }
@@ -1856,7 +1674,7 @@ diff old new
      #x: (#struct){
        y: (#struct){
          z?: (#struct){
-@@ -519,13 +491,23 @@
+@@ -519,13 +448,23 @@
          }
        }
      }
@@ -1889,8 +1707,17 @@ diff old new
  }
 -- diff/todo/p2 --
 Positions / reordering
+
+indirect.embed.b1.d: should be an error, but is not an error in either version.
 -- diff/todo/p0 --
-Various closedness issues.
+issue3325.ok.broken.items."my-item": should not be an error
+-- diff/todo/p1 --
+Should be an error, but are not:
+  indirect.closed.err1.Y.a.e
+  nested.err1.x.v.c.d
+  nested.err1.x.v.c.f
+-- diff/explanation --
+inline.err*.age*: fields are now correctly not allowed.
 -- out/compile --
 --- embed.cue
 {

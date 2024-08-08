@@ -1,0 +1,26 @@
+! exec cue export x1.json
+stderr 'x1*.json:4:3'
+
+! exec cue export x2.json
+stderr 'x2.json:1:6'
+
+! exec cue export x3.json
+stderr 'x3.json:1:1'
+
+! exec cue export x4.json
+stderr 'x4.json:1:1'
+
+-- x1.json --
+{
+  "foo": true,
+  "bar": 2
+  "baz": false
+}
+
+-- x2.json --
+"baz": false
+
+-- x3.json --
+baz: false
+
+-- x4.json --

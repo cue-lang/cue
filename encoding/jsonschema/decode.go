@@ -241,7 +241,7 @@ const (
 var coreToCUE = []cue.Kind{
 	nullType:   cue.NullKind,
 	boolType:   cue.BoolKind,
-	numType:    cue.FloatKind,
+	numType:    cue.NumberKind, // Note: both int and float.
 	stringType: cue.StringKind,
 	arrayType:  cue.ListKind,
 	objectType: cue.StructKind,
@@ -254,8 +254,12 @@ func kindToAST(k cue.Kind) ast.Expr {
 		return ast.NewNull()
 	case cue.BoolKind:
 		return ast.NewIdent("bool")
-	case cue.FloatKind:
+	case cue.NumberKind:
 		return ast.NewIdent("number")
+	case cue.IntKind:
+		return ast.NewIdent("int")
+	case cue.FloatKind:
+		return ast.NewIdent("float")
 	case cue.StringKind:
 		return ast.NewIdent("string")
 	case cue.ListKind:
@@ -263,7 +267,7 @@ func kindToAST(k cue.Kind) ast.Expr {
 	case cue.StructKind:
 		return ast.NewStruct(&ast.Ellipsis{})
 	}
-	return nil
+	panic(fmt.Errorf("unexpected kind %v", k))
 }
 
 var coreTypeName = []string{
@@ -301,6 +305,9 @@ func (s *state) add(n cue.Value, t coreType, x ast.Expr) {
 }
 
 func (s *state) setTypeUsed(n cue.Value, t coreType) {
+	if int(t) >= len(s.types) {
+		panic(fmt.Errorf("type out of range %v/%v", int(t), len(s.types)))
+	}
 	s.types[t].setTypeUsed(n, t)
 }
 

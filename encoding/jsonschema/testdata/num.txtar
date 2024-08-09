@@ -37,7 +37,6 @@
   },
   "additionalProperties": false
 }
-
 -- out/decode/cue --
 import (
 	"strings"

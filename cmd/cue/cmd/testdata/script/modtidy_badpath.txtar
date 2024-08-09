@@ -1,0 +1,56 @@
+# When the module resolution logic queries a registry for possible
+# module matches, it tries many possible prefixes. Some prefixes
+# might not be legitimate repository names even though they
+# are OK to use as package names. In such a case, a registry
+# might not return a 404 error, but some other kind of error.
+# The OCI proxy is one such registry.
+
+# TODO fix this so it works OK.
+! exec cue mod tidy
+cmp stderr want-stderr
+
+# TODO enable these assertions.
+# cmp cue.mod/module.cue want-module
+# exec cue export
+# cmp stdout want-stdout
+
+-- want-stderr --
+failed to resolve "test.example/foo/BarBaz": module test.example/foo/BarBaz: invalid OCI request: name invalid: invalid repository name
+-- want-module --
+module: "cue.example@v0"
+language: {
+	version: "v0.9.2"
+}
+deps: {
+	"test.example/foo@v0": {
+		v:       "v0.0.1"
+		default: true
+	}
+}
+-- cue.mod/module.cue --
+module: "cue.example@v0"
+language: version: "v0.9.2"
+
+-- want-stdout --
+{
+    "self": "test.example/foo/BarBaz"
+}
+-- main.cue --
+package main
+
+// Note: test.example/foo/BarBaz is an illegal module path
+// (because it contains upper case) but is OK as a package path.
+import "test.example/foo/BarBaz"
+
+BarBaz
+
+-- _registry_proxy --
+true
+-- _registry/test.example_foo_v0.0.1/cue.mod/module.cue --
+module: "test.example/foo@v0"
+language: version: "v0.9.2"
+
+-- _registry/test.example_foo_v0.0.1/BarBaz/x.cue --
+package BarBaz
+
+self: "test.example/foo/BarBaz"

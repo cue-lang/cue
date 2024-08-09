@@ -893,21 +893,19 @@ func (n *nodeContext) insertPattern(pattern Value, c Conjunct) {
 	// Collect patterns in root vertex. This allows comparing disjuncts for
 	// equality as well as inserting new arcs down the line as they are
 	// inserted.
-	if !n.insertConstraint(pattern, c) {
-		return
-	}
-
-	// Match against full set of arcs from root, but insert in current vertex.
-	// Hypothesis: this may not be necessary. Maybe for closedness.
-	// TODO: may need to replicate the closedContext for patterns.
-	// Also: Conjuncts for matching other arcs in this node may be different
-	// for matching arcs using v.foo?, if we need to ensure that conjuncts
-	// from arcs and patterns are grouped under the same vertex.
-	// TODO: verify. See test Pattern 1b
-	for _, a := range n.node.Arcs {
-		if matchPattern(n.ctx, pattern, a.Label) {
-			// TODO: is it necessary to check for uniqueness here?
-			n.addConstraint(a, a.ArcType, c, true)
+	if n.insertConstraint(pattern, c) {
+		// Match against full set of arcs from root, but insert in current vertex.
+		// Hypothesis: this may not be necessary. Maybe for closedness.
+		// TODO: may need to replicate the closedContext for patterns.
+		// Also: Conjuncts for matching other arcs in this node may be different
+		// for matching arcs using v.foo?, if we need to ensure that conjuncts
+		// from arcs and patterns are grouped under the same vertex.
+		// TODO: verify. See test Pattern 1b
+		for _, a := range n.node.Arcs {
+			if matchPattern(n.ctx, pattern, a.Label) {
+				// TODO: is it necessary to check for uniqueness here?
+				n.addConstraint(a, a.ArcType, c, true)
+			}
 		}
 	}
 

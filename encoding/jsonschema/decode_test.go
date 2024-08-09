@@ -150,8 +150,6 @@ properties: {
 	qt.Assert(t, qt.Equals(errors.Details(err, nil), `
 cannot determine import path from URL "https://something.test/foo": some error:
     foo.cue:4:5
-cannot determine import path from URL "https://something.test/foo": some error:
-    foo.cue:5:5
 `[1:]))
 }
 

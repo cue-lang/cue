@@ -160,7 +160,12 @@ func (s *state) makeCUERef(n cue.Value, u *url.URL, fragmentParts []string) (_e 
 				// are not in scope.
 				importPath, err := s.cfg.MapURL(u)
 				if err != nil {
-					s.errf(n, "cannot determine import path from URL %q: %v", u, err)
+					ustr := u.String()
+					// Avoid producing many errors for the same URL.
+					if !s.mapURLErrors[ustr] {
+						s.mapURLErrors[ustr] = true
+						s.errf(n, "cannot determine import path from URL %q: %v", ustr, err)
+					}
 					return nil
 				}
 				ip := module.ParseImportPath(importPath)

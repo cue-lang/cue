@@ -551,15 +551,7 @@ func (m *mermaidContext) cc(cc *closeContext) {
 		case PARENT:
 			w = node
 			name = m.pstr(d.dependency)
-		case EVAL:
-			if cc.Label().IsLet() {
-				// Do not show eval links for let nodes, as they never depend
-				// on the parent node. Alternatively, link them to the root
-				// node instead.
-				return
-			}
-			fallthrough
-		case ARC, NOTIFY, DISJUNCT, COMP:
+		case EVAL, ARC, NOTIFY, DISJUNCT, COMP:
 			w = global
 			indentLevel = 1
 			name = m.pstr(d.dependency)

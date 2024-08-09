@@ -28,6 +28,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -36,6 +37,7 @@ import (
 	"cuelabs.dev/go/oci/ociregistry/ociclient"
 	"cuelabs.dev/go/oci/ociregistry/ocimem"
 	"cuelabs.dev/go/oci/ociregistry/ociref"
+	"cuelabs.dev/go/oci/ociregistry/ociserver"
 	"github.com/google/shlex"
 	"github.com/rogpeppe/go-internal/goproxytest"
 	"github.com/rogpeppe/go-internal/gotooltest"
@@ -287,20 +289,43 @@ func TestScript(t *testing.T) {
 				if data, err := os.ReadFile(filepath.Join(e.WorkDir, "_registry"+regID+"_prefix")); err == nil {
 					prefix = strings.TrimSpace(string(data))
 				}
+				useProxy := false
+				proxyFile := filepath.Join(e.WorkDir, "_registry"+regID+"_proxy")
+				if data, err := os.ReadFile(proxyFile); err == nil {
+					useProxy, err = strconv.ParseBool(strings.TrimSpace(string(data)))
+					if err != nil {
+						return fmt.Errorf("invalid contents of proxy file %q: %v", proxyFile, err)
+					}
+				}
 				reg, err := registrytest.New(os.DirFS(registryDir), prefix)
 				if err != nil {
 					return fmt.Errorf("cannot start test registry server: %v", err)
 				}
+				e.Defer(reg.Close)
 				if prefix != "" {
 					prefix = "/" + prefix
 				}
+				regHost := reg.Host()
+				if useProxy {
+					// Use a proxy for the registry, mirroring the way that the Central Registry
+					// works.
+					proxyClient, err := ociclient.New(regHost, &ociclient.Options{
+						Insecure: true,
+					})
+					if err != nil {
+						return fmt.Errorf("cannot create oci proxy client")
+					}
+					reg2 := httptest.NewServer(ociserver.New(proxyClient, nil))
+					reg2URL, _ := url.Parse(reg2.URL)
+					regHost = reg2URL.Host
+					e.Defer(reg2.Close)
+				}
 				e.Vars = append(e.Vars,
-					"CUE_REGISTRY"+regID+"="+reg.Host()+prefix+"+insecure",
+					"CUE_REGISTRY"+regID+"="+regHost+prefix+"+insecure",
 					// This enables some tests to construct their own malformed
 					// CUE_REGISTRY values that still refer to the test registry.
-					"DEBUG_REGISTRY"+regID+"_HOST="+reg.Host(),
+					"DEBUG_REGISTRY"+regID+"_HOST="+regHost,
 				)
-				e.Defer(reg.Close)
 			}
 			return nil
 		},

@@ -59,6 +59,7 @@ func TestDecode(t *testing.T) {
 				return []ast.Label{ast.NewIdent("#" + a[len(a)-1])}, nil
 			}
 		}
+		cfg.Strict = t.HasTag("strict")
 
 		ctx := t.Context()
 		var v cue.Value

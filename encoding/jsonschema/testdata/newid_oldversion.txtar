@@ -1,0 +1,11 @@
+#strict
+-- definition.json --
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "http://example.test",
+  "type": "string"
+}
+-- out/decode/err --
+use of $id not allowed in older schema version http://json-schema.org/draft-04/schema#:
+    definition.json:3:3
+-- out/decode/cue --

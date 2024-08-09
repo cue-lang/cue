@@ -49,7 +49,10 @@ func Extract(data cue.InstanceOrValue, cfg *Config) (f *ast.File, err error) {
 		cfg = &cfg1
 		cfg1.MapURL = DefaultMapURL
 	}
-	d := &decoder{cfg: cfg}
+	d := &decoder{
+		cfg:          cfg,
+		mapURLErrors: make(map[string]bool),
+	}
 
 	f = d.decode(data.Value())
 	if d.errs != nil {

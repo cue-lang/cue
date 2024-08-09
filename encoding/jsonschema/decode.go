@@ -40,9 +40,10 @@ const rootDefs = "#"
 
 // A decoder converts JSON schema to CUE.
 type decoder struct {
-	cfg   *Config
-	errs  errors.Error
-	numID int // for creating unique numbers: increment on each use
+	cfg          *Config
+	errs         errors.Error
+	numID        int // for creating unique numbers: increment on each use
+	mapURLErrors map[string]bool
 }
 
 // addImport registers

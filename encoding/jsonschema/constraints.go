@@ -121,28 +121,8 @@ var constraints = []*constraint{
 		s.jsonschema, _ = s.strValue(n)
 	}),
 
-	p0("$id", func(n cue.Value, s *state) {
-		// URL: https://domain.com/schemas/foo.json
-		// anchors: #identifier
-		//
-		// TODO: mark identifiers.
-
-		// Resolution must be relative to parent $id
-		// https://tools.ietf.org/html/draft-handrews-json-schema-02#section-8.2.2
-		u := s.resolveURI(n)
-		if u == nil {
-			return
-		}
-
-		if u.Fragment != "" {
-			if s.cfg.Strict {
-				s.errf(n, "$id URI may not contain a fragment")
-			}
-			return
-		}
-		s.id = u
-		s.idPos = n.Pos()
-	}),
+	p0("$id", idConstraint),
+	p0("id", idConstraint), // Backward compatibility with draft-04
 
 	// Generic constraint
 
@@ -699,6 +679,29 @@ var constraints = []*constraint{
 			s.add(n, arrayType, ast.NewCall(ast.NewSel(list, "UniqueItems")))
 		}
 	}),
+}
+
+func idConstraint(n cue.Value, s *state) {
+	// URL: https://domain.com/schemas/foo.json
+	// anchors: #identifier
+	//
+	// TODO: mark identifiers.
+
+	// Resolution must be relative to parent $id
+	// https://tools.ietf.org/html/draft-handrews-json-schema-02#section-8.2.2
+	u := s.resolveURI(n)
+	if u == nil {
+		return
+	}
+
+	if u.Fragment != "" {
+		if s.cfg.Strict {
+			s.errf(n, "$id URI may not contain a fragment")
+		}
+		return
+	}
+	s.id = u
+	s.idPos = n.Pos()
 }
 
 func clearPos(e ast.Expr) ast.Expr {

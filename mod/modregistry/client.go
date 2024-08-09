@@ -31,6 +31,7 @@ import (
 	"strings"
 
 	"cuelabs.dev/go/oci/ociregistry"
+	"cuelabs.dev/go/oci/ociregistry/ociref"
 	"cuelang.org/go/internal/mod/semver"
 	digest "github.com/opencontainers/go-digest"
 	specs "github.com/opencontainers/image-spec/specs-go"
@@ -173,7 +174,7 @@ func (c *Client) GetModuleWithManifest(m module.Version, contents []byte, mediaT
 // sorted in semver order.
 // If m has a major version suffix, only versions with that major version will
 // be returned.
-func (c *Client) ModuleVersions(ctx context.Context, m string) ([]string, error) {
+func (c *Client) ModuleVersions(ctx context.Context, m string) (_req []string, _err0 error) {
 	mpath, major, hasMajor := module.SplitPathVersion(m)
 	if !hasMajor {
 		mpath = m
@@ -186,6 +187,12 @@ func (c *Client) ModuleVersions(ctx context.Context, m string) ([]string, error)
 		return nil, err
 	}
 	versions := []string{}
+	if !ociref.IsValidRepository(loc.Repository) {
+		// If it's not a valid repository, it can't be used in an OCI
+		// request, so return an empty slice rather than the
+		// "invalid OCI request" error that a registry can return.
+		return nil, nil
+	}
 	// Note: do not use c.repoName because that always expects
 	// a module path with a major version.
 	iter := loc.Registry.Tags(ctx, loc.Repository, "")

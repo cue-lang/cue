@@ -1,0 +1,13 @@
+# Test that we can use a "number" type constraint with a numeric enum.
+# See issue #3173.
+
+# TODO fix this so it works.
+
+-- type.json --
+{
+    "type": "number",
+    "enum": [ 1, 2, 3]
+}
+-- out/decode/err --
+constraint not allowed because type number is excluded:
+    type.json:2:5

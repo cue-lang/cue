@@ -336,6 +336,7 @@ type state struct {
 	exclusiveMax bool // For OpenAPI and legacy support.
 	jsonschema   string
 	id           *url.URL // base URI for $ref
+	idPos        token.Pos
 
 	definitions []ast.Decl
 
@@ -362,9 +363,19 @@ type refs struct {
 	refs  []*ast.Ident
 }
 
+func (s *state) idTag() *ast.Attribute {
+	return &ast.Attribute{
+		At:   s.idPos,
+		Text: fmt.Sprintf("@jsonschema(id=%q)", s.id)}
+}
+
 func (s *state) object(n cue.Value) *ast.StructLit {
 	if s.obj == nil {
 		s.obj = &ast.StructLit{}
+
+		if s.id != nil {
+			s.obj.Elts = append(s.obj.Elts, s.idTag())
+		}
 		s.add(n, objectType, s.obj)
 	}
 	return s.obj
@@ -382,7 +393,8 @@ func (s *state) hasConstraints() bool {
 	return len(s.patterns) > 0 ||
 		s.title != "" ||
 		s.description != "" ||
-		s.obj != nil
+		s.obj != nil ||
+		s.id != nil
 }
 
 const allTypes = cue.NullKind | cue.BoolKind | cue.NumberKind | cue.IntKind |
@@ -498,6 +510,17 @@ outer:
 	}
 
 	s.linkReferences()
+
+	// If an "$id" exists and has not been included in any object constraints
+	if s.id != nil && s.obj == nil {
+		if st, ok := e.(*ast.StructLit); ok {
+			st.Elts = append([]ast.Decl{s.idTag()}, st.Elts...)
+		} else {
+			st = &ast.StructLit{Elts: []ast.Decl{s.idTag()}}
+			st.Elts = append(st.Elts, &ast.EmbedDecl{Expr: e})
+			e = st
+		}
+	}
 
 	return e
 }

@@ -15,7 +15,6 @@
 package jsonschema
 
 import (
-	"fmt"
 	"math/big"
 	"path"
 	"regexp"
@@ -143,13 +142,7 @@ var constraints = []*constraint{
 			return
 		}
 		s.id = u
-
-		obj := s.object(n)
-
-		// TODO: handle the case where this is always defined and we don't want
-		// to include the default value.
-		obj.Elts = append(obj.Elts, &ast.Attribute{
-			Text: fmt.Sprintf("@jsonschema(id=%q)", u)})
+		s.idPos = n.Pos()
 	}),
 
 	// Generic constraint

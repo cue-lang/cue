@@ -770,10 +770,6 @@ nested.err1.x.b.f: field not allowed:
     ./reroot.cue:114:6
 nested.err2.x.b.g: field not allowed:
     ./reroot.cue:137:8
-issue3325.ok.broken.items."my-item": field not allowed:
-    ./embed.cue:2:25
-    ./embed.cue:2:10
-    ./embed.cue:15:10
 a.q.e: field not allowed:
     ./in.cue:7:3
     ./in.cue:15:3
@@ -798,10 +794,8 @@ inline.err2.age2: field not allowed:
 Result:
 (_|_){
   // [eval]
-  issue3325: (_|_){
-    // [eval]
-    ok: (_|_){
-      // [eval]
+  issue3325: (struct){
+    ok: (struct){
       #Items: (#struct){
       }
       #Base: (#struct){
@@ -819,17 +813,12 @@ Result:
         }
         name: (string){ "base" }
       }
-      broken: (_|_){
-        // [eval]
+      broken: (#struct){
         name: (string){ "base" }
         type: (string){ "extended" }
-        items: (_|_){
-          // [eval]
-          "my-item": (_|_){
-            // [eval] issue3325.ok.broken.items."my-item": field not allowed:
-            //     ./embed.cue:2:25
-            //     ./embed.cue:2:10
-            //     ./embed.cue:15:10
+        items: (#struct){
+          "my-item": (#struct){
+            name: (string){ "my-item" }
           }
         }
       }
@@ -1239,16 +1228,12 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,72 +1,40 @@
+@@ -1,66 +1,28 @@
  Errors:
 +nested.err1.x.b.f: field not allowed:
 +    ./reroot.cue:114:6
 +nested.err2.x.b.g: field not allowed:
 +    ./reroot.cue:137:8
-+issue3325.ok.broken.items."my-item": field not allowed:
-+    ./embed.cue:2:25
-+    ./embed.cue:2:10
-+    ./embed.cue:15:10
  a.q.e: field not allowed:
 -    ./in.cue:1:5
 -    ./in.cue:6:5
@@ -1326,17 +1311,7 @@ diff old new
  
  Result:
  (_|_){
-   // [eval]
--  issue3325: (struct){
--    ok: (struct){
-+  issue3325: (_|_){
-+    // [eval]
-+    ok: (_|_){
-+      // [eval]
-       #Items: (#struct){
-       }
-       #Base: (#struct){
-@@ -76,31 +44,36 @@
+@@ -76,13 +38,13 @@
          }
        }
        #Extended: (#struct){
@@ -1347,13 +1322,6 @@ diff old new
 -            name: (string){ "my-item" }
 -          }
 -        }
--      }
--      broken: (#struct){
--        name: (string){ "base" }
--        type: (string){ "extended" }
--        items: (#struct){
--          "my-item": (#struct){
--            name: (string){ "my-item" }
 +        type: (string){ "extended" }
 +        items: (#struct){
 +          "my-item": (#struct){
@@ -1361,19 +1329,10 @@ diff old new
 +          }
 +        }
 +        name: (string){ "base" }
-+      }
-+      broken: (_|_){
-+        // [eval]
-+        name: (string){ "base" }
-+        type: (string){ "extended" }
-+        items: (_|_){
-+          // [eval]
-+          "my-item": (_|_){
-+            // [eval] issue3325.ok.broken.items."my-item": field not allowed:
-+            //     ./embed.cue:2:25
-+            //     ./embed.cue:2:10
-+            //     ./embed.cue:15:10
-           }
+       }
+       broken: (#struct){
+         name: (string){ "base" }
+@@ -94,13 +56,13 @@
          }
        }
        works: (#struct){
@@ -1394,7 +1353,7 @@ diff old new
        }
      }
    }
-@@ -110,8 +83,8 @@
+@@ -110,8 +72,8 @@
    #A: (#struct){
      b: (int){ int }
      q: (#struct){
@@ -1404,7 +1363,7 @@ diff old new
      }
    }
    a: (_|_){
-@@ -120,21 +93,17 @@
+@@ -120,21 +82,17 @@
      q: (_|_){
        // [eval]
        c: (int){ 2 }
@@ -1428,7 +1387,7 @@ diff old new
      //     ./in.cue:28:5
      #A: (#struct){
      }
-@@ -142,8 +111,7 @@
+@@ -142,8 +100,7 @@
        // [eval]
        Foo: (_|_){
          // [eval] issue852.a.Foo: field not allowed:
@@ -1438,7 +1397,7 @@ diff old new
          //     ./in.cue:28:5
        }
      }
-@@ -154,8 +122,8 @@
+@@ -154,8 +111,8 @@
        foo: (int){ int }
      }
      d: (#struct){
@@ -1448,7 +1407,7 @@ diff old new
      }
    }
    issue3330: (struct){
-@@ -211,11 +179,11 @@
+@@ -211,11 +168,11 @@
            g: (#struct){
            }
          }
@@ -1465,7 +1424,7 @@ diff old new
            }
          }
        }
-@@ -261,8 +229,7 @@
+@@ -261,8 +218,7 @@
        }
      }
    }
@@ -1475,7 +1434,7 @@ diff old new
      embed: (struct){
        err1: (struct){
          #A: (#struct){
-@@ -299,17 +266,15 @@
+@@ -299,17 +255,15 @@
              c: (int){ 2 }
            }
          }
@@ -1500,7 +1459,7 @@ diff old new
          X: (struct){
            a: (struct){
              e: (int){ 1 }
-@@ -317,24 +282,13 @@
+@@ -317,24 +271,13 @@
            b: (struct){
            }
          }
@@ -1532,7 +1491,7 @@ diff old new
            }
          }
          #X: (#struct){
-@@ -397,17 +351,11 @@
+@@ -397,17 +340,11 @@
            // [eval]
            f: (_|_){
              // [eval] nested.err1.x.b.f: field not allowed:
@@ -1552,7 +1511,7 @@ diff old new
            }
          }
          v: (_|_){
-@@ -414,27 +362,17 @@
+@@ -414,27 +351,17 @@
            // [eval]
            c: (_|_){
              // [eval]
@@ -1591,7 +1550,7 @@ diff old new
            }
          }
          #V: (_|_){
-@@ -441,25 +379,17 @@
+@@ -441,25 +368,17 @@
            // [eval]
            c: (_|_){
              // [eval]
@@ -1628,7 +1587,7 @@ diff old new
            }
          }
        }
-@@ -469,14 +399,14 @@
+@@ -469,14 +388,14 @@
          }
          v: (#struct){
            c: (#struct){
@@ -1647,7 +1606,7 @@ diff old new
            }
          }
        }
-@@ -499,19 +429,18 @@
+@@ -499,19 +418,18 @@
            // [eval]
            g: (_|_){
              // [eval] nested.err2.x.b.g: field not allowed:
@@ -1674,7 +1633,7 @@ diff old new
      #x: (#struct){
        y: (#struct){
          z?: (#struct){
-@@ -519,13 +448,23 @@
+@@ -519,13 +437,23 @@
          }
        }
      }
@@ -1709,8 +1668,6 @@ diff old new
 Positions / reordering
 
 indirect.embed.b1.d: should be an error, but is not an error in either version.
--- diff/todo/p0 --
-issue3325.ok.broken.items."my-item": should not be an error
 -- diff/todo/p1 --
 Should be an error, but are not:
   indirect.closed.err1.Y.a.e

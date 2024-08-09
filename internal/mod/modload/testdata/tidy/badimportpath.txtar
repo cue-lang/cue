@@ -3,7 +3,7 @@
 -- tidy-check-error --
 module is not tidy: missing dependency providing package x.com/Foo--bar@v0
 -- want --
-error: failed to resolve "x.com/Foo--bar@v0": cannot obtain versions for module "x.com/Foo--bar@v0": module x.com/Foo--bar@v0: invalid OCI request: name invalid: invalid repository name
+error: failed to resolve "x.com/Foo--bar@v0": cannot find module providing package x.com/Foo--bar@v0
 -- cue.mod/module.cue --
 language: version: "v0.8.0"
 module: "main.org@v0"

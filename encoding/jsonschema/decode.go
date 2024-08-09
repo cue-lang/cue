@@ -40,9 +40,10 @@ const rootDefs = "#"
 
 // A decoder converts JSON schema to CUE.
 type decoder struct {
-	cfg   *Config
-	errs  errors.Error
-	numID int // for creating unique numbers: increment on each use
+	cfg          *Config
+	errs         errors.Error
+	numID        int // for creating unique numbers: increment on each use
+	mapURLErrors map[string]bool
 }
 
 // addImport registers
@@ -428,40 +429,56 @@ func (s *state) finalize() (e ast.Expr) {
 		return !ok
 	})
 
+	type excludeInfo struct {
+		pos      token.Pos
+		typIndex int
+	}
+	var excluded []excludeInfo
+	npossible := 0
+	nexcluded := 0
 	for i, t := range s.types {
 		k := coreToCUE[i]
 		isAllowed := s.allowedTypes&k != 0
 		if len(t.constraints) > 0 {
+			npossible++
 			if t.typ == nil && !isAllowed {
+				nexcluded++
 				for _, c := range t.constraints {
-					s.addErr(errors.Newf(c.Pos(),
-						"constraint not allowed because type %s is excluded",
-						coreTypeName[i],
-					))
+					excluded = append(excluded, excludeInfo{c.Pos(), i})
 				}
 				continue
 			}
 			x := ast.NewBinExpr(token.AND, t.constraints...)
 			disjuncts = append(disjuncts, x)
 		} else if s.usedTypes&k != 0 {
+			npossible++
 			continue
 		} else if t.typ != nil {
+			npossible++
 			if !isAllowed {
-				s.addErr(errors.Newf(t.typ.Pos(),
-					"constraint not allowed because type %s is excluded",
-					coreTypeName[i],
-				))
+				nexcluded++
+				excluded = append(excluded, excludeInfo{t.typ.Pos(), i})
 				continue
 			}
 			disjuncts = append(disjuncts, t.typ)
 		} else if types&k != 0 {
+			npossible++
 			x := kindToAST(k)
 			if x != nil {
 				disjuncts = append(disjuncts, x)
 			}
 		}
 	}
-
+	if nexcluded == npossible {
+		// All possibilities have been excluded: this is an impossible
+		// schema.
+		for _, e := range excluded {
+			s.addErr(errors.Newf(e.pos,
+				"constraint not allowed because type %s is excluded",
+				coreTypeName[e.typIndex],
+			))
+		}
+	}
 	conjuncts = append(conjuncts, s.all.constraints...)
 
 	obj := s.obj

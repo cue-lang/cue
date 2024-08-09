@@ -5,17 +5,12 @@
 # might not return a 404 error, but some other kind of error.
 # The OCI proxy is one such registry.
 
-# TODO fix this so it works OK.
-! exec cue mod tidy
-cmp stderr want-stderr
+exec cue mod tidy
 
-# TODO enable these assertions.
-# cmp cue.mod/module.cue want-module
-# exec cue export
-# cmp stdout want-stdout
+cmp cue.mod/module.cue want-module
+exec cue export
+cmp stdout want-stdout
 
--- want-stderr --
-failed to resolve "test.example/foo/BarBaz": module test.example/foo/BarBaz: invalid OCI request: name invalid: invalid repository name
 -- want-module --
 module: "cue.example@v0"
 language: {

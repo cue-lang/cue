@@ -21,6 +21,7 @@
 -- out/decode/cue --
 // example jsonschema
 @jsonschema(schema="http://json-schema.org/draft-04/schema#")
+@jsonschema(id="https://example.test/example")
 
 // A required field
 x!: number

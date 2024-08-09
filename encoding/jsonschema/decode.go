@@ -575,13 +575,14 @@ func (s *state) schema(n cue.Value, idRef ...label) ast.Expr {
 // caller is a logical operator like anyOf, allOf, oneOf, or not.
 func (s *state) schemaState(n cue.Value, types cue.Kind, idRef []label, isLogical bool) (ast.Expr, *state) {
 	state := &state{
-		up:           s,
-		isSchema:     s.isSchema,
-		decoder:      s.decoder,
-		allowedTypes: types,
-		path:         s.path,
-		idRef:        idRef,
-		pos:          n,
+		up:            s,
+		schemaVersion: s.schemaVersion,
+		isSchema:      s.isSchema,
+		decoder:       s.decoder,
+		allowedTypes:  types,
+		path:          s.path,
+		idRef:         idRef,
+		pos:           n,
 	}
 	if isLogical {
 		state.parent = s
@@ -604,7 +605,7 @@ func (s *state) schemaState(n cue.Value, types cue.Kind, idRef []label, isLogica
 				return
 			}
 			if c.phase == pass {
-				c.fn(value, state)
+				c.fn(key, value, state)
 			}
 		})
 	}

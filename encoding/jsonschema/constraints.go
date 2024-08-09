@@ -45,7 +45,7 @@ type constraint struct {
 
 // A constraintFunc converts a given JSON Schema constraint (specified in n)
 // to a CUE constraint recorded in state.
-type constraintFunc func(n cue.Value, s *state)
+type constraintFunc func(key string, n cue.Value, s *state)
 
 func p0(name string, f constraintFunc) *constraint {
 	return &constraint{key: name, fn: f}
@@ -78,7 +78,7 @@ func init() {
 	}
 }
 
-func addDefinitions(n cue.Value, s *state) {
+func addDefinitions(key string, n cue.Value, s *state) {
 	if n.Kind() != cue.StructKind {
 		s.errf(n, `"definitions" expected an object, found %s`, n.Kind())
 	}
@@ -115,7 +115,7 @@ func addDefinitions(n cue.Value, s *state) {
 var constraints = []*constraint{
 	// Meta data.
 
-	p0("$schema", func(n cue.Value, s *state) {
+	p0("$schema", func(key string, n cue.Value, s *state) {
 		// Identifies this as a JSON schema and specifies its version.
 		// TODO: extract version.
 
@@ -134,32 +134,12 @@ var constraints = []*constraint{
 		s.schemaVersion = sv
 	}),
 
-	p0("$id", func(n cue.Value, s *state) {
-		// URL: https://domain.com/schemas/foo.json
-		// anchors: #identifier
-		//
-		// TODO: mark identifiers.
-
-		// Resolution must be relative to parent $id
-		// https://tools.ietf.org/html/draft-handrews-json-schema-02#section-8.2.2
-		u := s.resolveURI(n)
-		if u == nil {
-			return
-		}
-
-		if u.Fragment != "" {
-			if s.cfg.Strict {
-				s.errf(n, "$id URI may not contain a fragment")
-			}
-			return
-		}
-		s.id = u
-		s.idPos = n.Pos()
-	}),
+	p0("$id", idConstraint),
+	p0("id", idConstraint), // Draft-04 only
 
 	// Generic constraint
 
-	p1("type", func(n cue.Value, s *state) {
+	p1("type", func(key string, n cue.Value, s *state) {
 		var types cue.Kind
 		set := func(n cue.Value) {
 			str, ok := s.strValue(n)
@@ -210,7 +190,7 @@ var constraints = []*constraint{
 		s.allowedTypes &= types
 	}),
 
-	p1("enum", func(n cue.Value, s *state) {
+	p1("enum", func(key string, n cue.Value, s *state) {
 		var a []ast.Expr
 		for _, x := range s.listItems("enum", n, true) {
 			a = append(a, s.value(x))
@@ -219,17 +199,17 @@ var constraints = []*constraint{
 	}),
 
 	// TODO: only allow for OpenAPI.
-	p1("nullable", func(n cue.Value, s *state) {
+	p1("nullable", func(key string, n cue.Value, s *state) {
 		null := ast.NewNull()
 		setPos(null, n)
 		s.nullable = null
 	}),
 
-	p1d("const", 6, func(n cue.Value, s *state) {
+	p1d("const", 6, func(key string, n cue.Value, s *state) {
 		s.all.add(n, s.value(n))
 	}),
 
-	p1("default", func(n cue.Value, s *state) {
+	p1("default", func(key string, n cue.Value, s *state) {
 		sc := *s
 		s.default_ = sc.value(n)
 		// TODO: must validate that the default is subsumed by the normal value,
@@ -237,13 +217,13 @@ var constraints = []*constraint{
 		s.examples = append(s.examples, s.default_)
 	}),
 
-	p1("deprecated", func(n cue.Value, s *state) {
+	p1("deprecated", func(key string, n cue.Value, s *state) {
 		if s.boolValue(n) {
 			s.deprecated = true
 		}
 	}),
 
-	p1("examples", func(n cue.Value, s *state) {
+	p1("examples", func(key string, n cue.Value, s *state) {
 		if n.Kind() != cue.ListKind {
 			s.errf(n, `value of "examples" must be an array, found %v`, n.Kind())
 		}
@@ -255,20 +235,20 @@ var constraints = []*constraint{
 		// }
 	}),
 
-	p1("description", func(n cue.Value, s *state) {
+	p1("description", func(key string, n cue.Value, s *state) {
 		s.description, _ = s.strValue(n)
 	}),
 
-	p1("title", func(n cue.Value, s *state) {
+	p1("title", func(key string, n cue.Value, s *state) {
 		s.title, _ = s.strValue(n)
 	}),
 
-	p1d("$comment", 7, func(n cue.Value, s *state) {
+	p1d("$comment", 7, func(key string, n cue.Value, s *state) {
 	}),
 
 	p1("$defs", addDefinitions),
 	p1("definitions", addDefinitions),
-	p1("$ref", func(n cue.Value, s *state) {
+	p1("$ref", func(key string, n cue.Value, s *state) {
 		s.usedTypes = allTypes
 
 		u := s.resolveURI(n)
@@ -306,7 +286,7 @@ var constraints = []*constraint{
 	// This is not necessary if the values are mutually exclusive/ have a
 	// discriminator.
 
-	p2("allOf", func(n cue.Value, s *state) {
+	p2("allOf", func(key string, n cue.Value, s *state) {
 		var a []ast.Expr
 		for _, v := range s.listItems("allOf", n, false) {
 			x, sub := s.schemaState(v, s.allowedTypes, nil, true)
@@ -321,7 +301,7 @@ var constraints = []*constraint{
 		}
 	}),
 
-	p2("anyOf", func(n cue.Value, s *state) {
+	p2("anyOf", func(key string, n cue.Value, s *state) {
 		var types cue.Kind
 		var a []ast.Expr
 		for _, v := range s.listItems("anyOf", n, false) {
@@ -335,7 +315,7 @@ var constraints = []*constraint{
 		}
 	}),
 
-	p2("oneOf", func(n cue.Value, s *state) {
+	p2("oneOf", func(key string, n cue.Value, s *state) {
 		var types cue.Kind
 		var a []ast.Expr
 		hasSome := false
@@ -364,7 +344,7 @@ var constraints = []*constraint{
 
 	// String constraints
 
-	p1("pattern", func(n cue.Value, s *state) {
+	p1("pattern", func(key string, n cue.Value, s *state) {
 		str, _ := n.String()
 		if _, err := regexp.Compile(str); err != nil {
 			if s.cfg.Strict {
@@ -376,26 +356,26 @@ var constraints = []*constraint{
 		s.add(n, stringType, &ast.UnaryExpr{Op: token.MAT, X: s.string(n)})
 	}),
 
-	p1("minLength", func(n cue.Value, s *state) {
+	p1("minLength", func(key string, n cue.Value, s *state) {
 		s.usedTypes |= cue.StringKind
 		min := s.number(n)
 		strings := s.addImport(n, "strings")
 		s.add(n, stringType, ast.NewCall(ast.NewSel(strings, "MinRunes"), min))
 	}),
 
-	p1("maxLength", func(n cue.Value, s *state) {
+	p1("maxLength", func(key string, n cue.Value, s *state) {
 		s.usedTypes |= cue.StringKind
 		max := s.number(n)
 		strings := s.addImport(n, "strings")
 		s.add(n, stringType, ast.NewCall(ast.NewSel(strings, "MaxRunes"), max))
 	}),
 
-	p1d("contentMediaType", 7, func(n cue.Value, s *state) {
+	p1d("contentMediaType", 7, func(key string, n cue.Value, s *state) {
 		// TODO: only mark as used if it generates something.
 		// s.usedTypes |= cue.StringKind
 	}),
 
-	p1d("contentEncoding", 7, func(n cue.Value, s *state) {
+	p1d("contentEncoding", 7, func(key string, n cue.Value, s *state) {
 		// TODO: only mark as used if it generates something.
 		// s.usedTypes |= cue.StringKind
 		// 7bit, 8bit, binary, quoted-printable and base64.
@@ -406,7 +386,7 @@ var constraints = []*constraint{
 
 	// Number constraints
 
-	p2("minimum", func(n cue.Value, s *state) {
+	p2("minimum", func(key string, n cue.Value, s *state) {
 		s.usedTypes |= cue.NumberKind
 		op := token.GEQ
 		if s.exclusiveMin {
@@ -415,7 +395,7 @@ var constraints = []*constraint{
 		s.add(n, numType, &ast.UnaryExpr{Op: op, X: s.number(n)})
 	}),
 
-	p1("exclusiveMinimum", func(n cue.Value, s *state) {
+	p1("exclusiveMinimum", func(key string, n cue.Value, s *state) {
 		if n.Kind() == cue.BoolKind {
 			s.exclusiveMin = true
 			return
@@ -424,7 +404,7 @@ var constraints = []*constraint{
 		s.add(n, numType, &ast.UnaryExpr{Op: token.GTR, X: s.number(n)})
 	}),
 
-	p2("maximum", func(n cue.Value, s *state) {
+	p2("maximum", func(key string, n cue.Value, s *state) {
 		s.usedTypes |= cue.NumberKind
 		op := token.LEQ
 		if s.exclusiveMax {
@@ -433,7 +413,7 @@ var constraints = []*constraint{
 		s.add(n, numType, &ast.UnaryExpr{Op: op, X: s.number(n)})
 	}),
 
-	p1("exclusiveMaximum", func(n cue.Value, s *state) {
+	p1("exclusiveMaximum", func(key string, n cue.Value, s *state) {
 		if n.Kind() == cue.BoolKind {
 			s.exclusiveMax = true
 			return
@@ -442,7 +422,7 @@ var constraints = []*constraint{
 		s.add(n, numType, &ast.UnaryExpr{Op: token.LSS, X: s.number(n)})
 	}),
 
-	p1("multipleOf", func(n cue.Value, s *state) {
+	p1("multipleOf", func(key string, n cue.Value, s *state) {
 		s.usedTypes |= cue.NumberKind
 		multiple := s.number(n)
 		var x big.Int
@@ -456,7 +436,7 @@ var constraints = []*constraint{
 
 	// Object constraints
 
-	p1("properties", func(n cue.Value, s *state) {
+	p1("properties", func(key string, n cue.Value, s *state) {
 		s.usedTypes |= cue.StructKind
 		obj := s.object(n)
 
@@ -489,7 +469,7 @@ var constraints = []*constraint{
 		})
 	}),
 
-	p2("required", func(n cue.Value, s *state) {
+	p2("required", func(key string, n cue.Value, s *state) {
 		if n.Kind() != cue.ListKind {
 			s.errf(n, `value of "required" must be list of strings, found %v`, n.Kind())
 			return
@@ -535,7 +515,7 @@ var constraints = []*constraint{
 		}
 	}),
 
-	p1d("propertyNames", 6, func(n cue.Value, s *state) {
+	p1d("propertyNames", 6, func(key string, n cue.Value, s *state) {
 		// [=~pattern]: _
 		if names, _ := s.schemaState(n, cue.StringKind, nil, false); !isAny(names) {
 			s.usedTypes |= cue.StructKind
@@ -545,14 +525,14 @@ var constraints = []*constraint{
 	}),
 
 	// TODO: reenable when we have proper non-monotonic contraint validation.
-	// p1("minProperties", func(n cue.Value, s *state) {
+	// p1("minProperties", func(key string, n cue.Value, s *state) {
 	// 	s.usedTypes |= cue.StructKind
 
 	// 	pkg := s.addImport(n, "struct")
 	// 	s.addConjunct(n, ast.NewCall(ast.NewSel(pkg, "MinFields"), s.uint(n)))
 	// }),
 
-	p1("maxProperties", func(n cue.Value, s *state) {
+	p1("maxProperties", func(key string, n cue.Value, s *state) {
 		s.usedTypes |= cue.StructKind
 
 		pkg := s.addImport(n, "struct")
@@ -560,7 +540,7 @@ var constraints = []*constraint{
 		s.add(n, objectType, x)
 	}),
 
-	p1("dependencies", func(n cue.Value, s *state) {
+	p1("dependencies", func(key string, n cue.Value, s *state) {
 		s.usedTypes |= cue.StructKind
 
 		// Schema and property dependencies.
@@ -575,7 +555,7 @@ var constraints = []*constraint{
 		*/
 	}),
 
-	p2("patternProperties", func(n cue.Value, s *state) {
+	p2("patternProperties", func(key string, n cue.Value, s *state) {
 		s.usedTypes |= cue.StructKind
 		if n.Kind() != cue.StructKind {
 			s.errf(n, `value of "patternProperties" must be an object, found %v`, n.Kind())
@@ -597,7 +577,7 @@ var constraints = []*constraint{
 		})
 	}),
 
-	p3("additionalProperties", func(n cue.Value, s *state) {
+	p3("additionalProperties", func(key string, n cue.Value, s *state) {
 		switch n.Kind() {
 		case cue.BoolKind:
 			s.closeStruct = !s.boolValue(n)
@@ -628,7 +608,7 @@ var constraints = []*constraint{
 
 	// Array constraints.
 
-	p1("items", func(n cue.Value, s *state) {
+	p1("items", func(key string, n cue.Value, s *state) {
 		s.usedTypes |= cue.ListKind
 		switch n.Kind() {
 		case cue.StructKind:
@@ -651,7 +631,7 @@ var constraints = []*constraint{
 		}
 	}),
 
-	p1("additionalItems", func(n cue.Value, s *state) {
+	p1("additionalItems", func(key string, n cue.Value, s *state) {
 		switch n.Kind() {
 		case cue.BoolKind:
 			// TODO: support
@@ -668,7 +648,7 @@ var constraints = []*constraint{
 		}
 	}),
 
-	p1("contains", func(n cue.Value, s *state) {
+	p1("contains", func(key string, n cue.Value, s *state) {
 		s.usedTypes |= cue.ListKind
 		list := s.addImport(n, "list")
 		// TODO: Passing non-concrete values is not yet supported in CUE.
@@ -680,7 +660,7 @@ var constraints = []*constraint{
 
 	// TODO: min/maxContains
 
-	p1("minItems", func(n cue.Value, s *state) {
+	p1("minItems", func(key string, n cue.Value, s *state) {
 		s.usedTypes |= cue.ListKind
 		a := []ast.Expr{}
 		p, err := n.Uint64()
@@ -697,21 +677,63 @@ var constraints = []*constraint{
 		// s.addConjunct(n, ast.NewCall(ast.NewSel(list, "MinItems"), clearPos(s.uint(n))))
 	}),
 
-	p1("maxItems", func(n cue.Value, s *state) {
+	p1("maxItems", func(key string, n cue.Value, s *state) {
 		s.usedTypes |= cue.ListKind
 		list := s.addImport(n, "list")
 		x := ast.NewCall(ast.NewSel(list, "MaxItems"), clearPos(s.uint(n)))
 		s.add(n, arrayType, x)
-
 	}),
 
-	p1("uniqueItems", func(n cue.Value, s *state) {
+	p1("uniqueItems", func(key string, n cue.Value, s *state) {
 		s.usedTypes |= cue.ListKind
 		if s.boolValue(n) {
 			list := s.addImport(n, "list")
 			s.add(n, arrayType, ast.NewCall(ast.NewSel(list, "UniqueItems")))
 		}
 	}),
+}
+
+func idConstraint(key string, n cue.Value, s *state) {
+	// URL: https://domain.com/schemas/foo.json
+	// anchors: #identifier
+	//
+	// TODO: mark identifiers.
+
+	// Draft-06 renamed the id field to $id.
+	if key == "id" {
+		// old-style id field.
+		if s.schemaVersion >= versionDraft06 {
+			if s.cfg.Strict {
+				// TODO: value is not the correct position, albeit close. Fix this.
+				s.warnf(n.Pos(), "use of old-style id field")
+			}
+			return
+		}
+	} else {
+		// new-style $id field
+		if s.schemaVersion < versionDraft07 {
+			if s.cfg.Strict {
+				s.warnf(n.Pos(), "use of $id not allowed in older schema version %v", s.schemaVersion)
+			}
+			return
+		}
+	}
+
+	// Resolution must be relative to parent $id
+	// https://tools.ietf.org/html/draft-handrews-json-schema-02#section-8.2.2
+	u := s.resolveURI(n)
+	if u == nil {
+		return
+	}
+
+	if u.Fragment != "" {
+		if s.cfg.Strict {
+			s.errf(n, "$id URI may not contain a fragment")
+		}
+		return
+	}
+	s.id = u
+	s.idPos = n.Pos()
 }
 
 func clearPos(e ast.Expr) ast.Expr {

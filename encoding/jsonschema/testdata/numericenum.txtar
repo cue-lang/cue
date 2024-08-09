@@ -8,6 +8,5 @@
     "type": "number",
     "enum": [ 1, 2, 3]
 }
--- out/decode/err --
-constraint not allowed because type number is excluded:
-    type.json:2:5
+-- out/decode/cue --
+1 | 2 | 3

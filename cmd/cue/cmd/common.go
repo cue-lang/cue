@@ -517,7 +517,7 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 
 	for _, b := range builds {
 		if b.Err != nil {
-			return nil, b.Err
+			return nil, suggestModCommand(b.Err)
 		}
 		switch {
 		case !b.User:

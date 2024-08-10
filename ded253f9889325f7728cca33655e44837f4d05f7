@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8986194d_1ca0d662",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-10T13:03:08Z",
+      "side": 1,
+      "message": "I don\u0027t see anything wrong here but will need another pass.",
+      "revId": "ded253f9889325f7728cca33655e44837f4d05f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41ee88c4_2de87fc3",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-10T13:03:08Z",
+      "side": 1,
+      "message": "forest?",
+      "range": {
+        "startLine": 430,
+        "startChar": 47,
+        "endLine": 430,
+        "endChar": 54
+      },
+      "revId": "ded253f9889325f7728cca33655e44837f4d05f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

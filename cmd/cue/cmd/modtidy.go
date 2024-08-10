@@ -102,7 +102,10 @@ func suggestModCommand(err error) error {
 	notTidyErr := new(modload.ErrModuleNotTidy)
 	switch {
 	case errors.Is(err, modfile.ErrNoLanguageVersion):
-		err = fmt.Errorf("%w; run 'cue mod fix'", err)
+		// TODO(mvdan): note that we cannot use standard Go error wrapping here via %w
+		// as then errors.Print calls errors.Errors which reaches for the first CUE error
+		// via errors.As, skipping over any non-CUE-wrapped errors.
+		err = fmt.Errorf("%v; run 'cue mod fix'", err)
 	case errors.As(err, &notTidyErr):
 		if notTidyErr.Reason == "" {
 			err = fmt.Errorf("module is not tidy, use 'cue mod tidy'")

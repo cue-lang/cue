@@ -118,7 +118,20 @@ var constraints = []*constraint{
 	p0("$schema", func(n cue.Value, s *state) {
 		// Identifies this as a JSON schema and specifies its version.
 		// TODO: extract version.
-		s.jsonschema, _ = s.strValue(n)
+
+		s.schemaVersion = versionDraft07 // Reasonable default version.
+		str, ok := s.strValue(n)
+		if !ok {
+			// If there's no $schema value, use the default.
+			return
+		}
+		sv, err := parseSchemaVersion(str)
+		if err != nil {
+			s.errf(n, "invalid $schema URL %q: %v", str, err)
+			return
+		}
+		s.schemaVersionPresent = true
+		s.schemaVersion = sv
 	}),
 
 	p0("$id", func(n cue.Value, s *state) {

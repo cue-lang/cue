@@ -117,8 +117,9 @@ func (d *decoder) schema(ref []ast.Label, v cue.Value) (a []ast.Decl) {
 	expr, state := root.schemaState(v, allTypes, nil, false)
 
 	tags := []string{}
-	if state.jsonschema != "" {
-		tags = append(tags, fmt.Sprintf("schema=%q", state.jsonschema))
+	if state.schemaVersionPresent {
+		// TODO use cue/literal.String
+		tags = append(tags, fmt.Sprintf("schema=%q", state.schemaVersion))
 	}
 
 	if name == nil {
@@ -341,9 +342,12 @@ type state struct {
 	deprecated   bool
 	exclusiveMin bool // For OpenAPI and legacy support.
 	exclusiveMax bool // For OpenAPI and legacy support.
-	jsonschema   string
-	id           *url.URL // base URI for $ref
-	idPos        token.Pos
+
+	schemaVersion        schemaVersion
+	schemaVersionPresent bool
+
+	id    *url.URL // base URI for $ref
+	idPos token.Pos
 
 	definitions []ast.Decl
 

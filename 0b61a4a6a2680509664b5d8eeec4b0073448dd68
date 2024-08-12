@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee10994d_205ea970",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2674,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-12T07:43:54Z",
+      "side": 1,
+      "message": "I think I rarely if ever see \"satisfy\" used as a verb. I think that \"tests\" reads better here.",
+      "revId": "0b61a4a6a2680509664b5d8eeec4b0073448dd68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9efcf210_553f5b67",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2682,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-12T07:43:54Z",
+      "side": 1,
+      "message": "Spelling: impropor",
+      "revId": "0b61a4a6a2680509664b5d8eeec4b0073448dd68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f545ded0_e7662e8f",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2790,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-12T07:43:54Z",
+      "side": 1,
+      "message": "The wording here seems a bit confused. I think \"...counts how many of the CUE values in the given...\" is what you intended.",
+      "revId": "0b61a4a6a2680509664b5d8eeec4b0073448dd68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ceff9c6_a35b3cff",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2803,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-12T07:43:54Z",
+      "side": 1,
+      "message": "should these examples all be `\u0026 a` ?",
+      "revId": "0b61a4a6a2680509664b5d8eeec4b0073448dd68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

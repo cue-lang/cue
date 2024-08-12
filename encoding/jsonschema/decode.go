@@ -453,9 +453,6 @@ func (s *state) finalize() (e ast.Expr) {
 			}
 			x := ast.NewBinExpr(token.AND, t.constraints...)
 			disjuncts = append(disjuncts, x)
-		} else if s.usedTypes&k != 0 {
-			npossible++
-			continue
 		} else if t.typ != nil {
 			npossible++
 			if !isAllowed {
@@ -463,7 +460,9 @@ func (s *state) finalize() (e ast.Expr) {
 				excluded = append(excluded, excludeInfo{t.typ.Pos(), i})
 				continue
 			}
-			disjuncts = append(disjuncts, t.typ)
+			if s.usedTypes&k == 0 {
+				disjuncts = append(disjuncts, t.typ)
+			}
 		} else if types&k != 0 {
 			npossible++
 			x := kindToAST(k)

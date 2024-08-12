@@ -3,7 +3,7 @@
 // Issue #734
 -- github-workflow.json --
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
     "obj1": {
       "oneOf": [
@@ -23,7 +23,7 @@
   }
 }
 -- out/decode/cue --
-@jsonschema(schema="http://json-schema.org/draft-07/schema")
+@jsonschema(schema="http://json-schema.org/draft-07/schema#")
 _
 
 #obj1: null | {

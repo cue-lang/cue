@@ -109,7 +109,6 @@ func TestDecode(t *testing.T) {
 
 func TestMapURL(t *testing.T) {
 	v := cuecontext.New().CompileString(`
-$schema: "xxx"
 type: "object"
 properties: x: $ref: "https://something.test/foo#/definitions/blah"
 `)
@@ -129,7 +128,6 @@ properties: x: $ref: "https://something.test/foo#/definitions/blah"
 	qt.Assert(t, qt.Equals(string(b), `
 import "other.test/something:blah"
 
-@jsonschema(schema="xxx")
 x?: blah.#blah
 ...
 `[1:]))
@@ -137,7 +135,6 @@ x?: blah.#blah
 
 func TestMapURLErrors(t *testing.T) {
 	v := cuecontext.New().CompileString(`
-$schema: "xxx"
 type: "object"
 properties: {
 	x: $ref: "https://something.test/foo#/definitions/x"
@@ -151,9 +148,9 @@ properties: {
 	})
 	qt.Assert(t, qt.Equals(errors.Details(err, nil), `
 cannot determine import path from URL "https://something.test/foo": some error:
-    foo.cue:5:5
+    foo.cue:4:5
 cannot determine import path from URL "https://something.test/foo": some error:
-    foo.cue:6:5
+    foo.cue:5:5
 `[1:]))
 }
 

@@ -16,6 +16,24 @@
       "message": "nit: trailing period",
       "revId": "fcf35f059641be4c66170f3d48d8d8fdd02153d1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15228631_0e01a25d",
+        "filename": "mod/modregistry/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-12T15:24:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "05ce8f27_a0bbc056",
+      "revId": "fcf35f059641be4c66170f3d48d8d8fdd02153d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

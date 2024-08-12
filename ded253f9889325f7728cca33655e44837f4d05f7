@@ -70,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee02f996_92e57aab",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-12T16:55:18Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "1fd31a4b_07a29852",
+      "revId": "ded253f9889325f7728cca33655e44837f4d05f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c72949e4_b6e2bb05",
@@ -218,6 +236,24 @@
       "side": 1,
       "message": "We already use root to indicate something else. I removed it from the language here. I guess we use \"root\" as a concept (the root closeContext corresponding to a vertex) and root as a general term for the root of a tree in general.\n\nI\u0027m not saying the new text is better, but at least root is removed.",
       "parentUuid": "168527af_4634dc7f",
+      "revId": "ded253f9889325f7728cca33655e44837f4d05f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ea30960_8796e732",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-12T16:55:18Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "94ef35f8_4748446d",
       "revId": "ded253f9889325f7728cca33655e44837f4d05f7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

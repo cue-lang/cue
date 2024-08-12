@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05ce8f27_a0bbc056",
+        "filename": "mod/modregistry/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-12T15:03:29Z",
+      "side": 1,
+      "message": "nit: trailing period",
+      "revId": "fcf35f059641be4c66170f3d48d8d8fdd02153d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

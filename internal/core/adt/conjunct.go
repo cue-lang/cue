@@ -701,7 +701,16 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 				return
 			}
 		}
-		n.updateNodeType(x.Kind(), x, id)
+		kind := x.Kind()
+		n.updateNodeType(kind, x, id)
+		// A validator that is inserted in a closeContext should behave like top
+		// in the sense that the closeContext should not be closed if no other
+		// value is present that would erase top (cc.hasNonTop): if a field is
+		// only associated with a validator, we leave it to the validator to
+		// decide what fields are allowed.
+		if kind&(ListKind|StructKind) != 0 {
+			id.cc.hasTop = true
+		}
 		n.checks = append(n.checks, x)
 
 	case *Vertex:

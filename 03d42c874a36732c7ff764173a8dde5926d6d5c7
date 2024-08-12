@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8e262a6_13f75e27",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-12T09:56:49Z",
+      "side": 1,
+      "message": "LGTM. Nice, but I think it\u0027s worth splitting out the evaluator changes into their own CL.",
+      "revId": "03d42c874a36732c7ff764173a8dde5926d6d5c7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d221773_28b4f7f0",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 763,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-12T09:56:49Z",
+      "side": 1,
+      "message": "This might be required for the matchN builtin, but doesn\u0027t seem directly part of that implementation. Maybe better to add these evaluator changes as a separate CL that includes a description of why they are being done?",
+      "revId": "03d42c874a36732c7ff764173a8dde5926d6d5c7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1598105_756c7dcf",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1335,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-12T09:56:49Z",
+      "side": 1,
+      "message": "Doc comment please.",
+      "revId": "03d42c874a36732c7ff764173a8dde5926d6d5c7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "893db916_e5818786",
+        "filename": "internal/core/compile/validator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-12T09:56:49Z",
+      "side": 1,
+      "message": "nit: I\u0027d put this helper function at the end along with the others.",
+      "revId": "03d42c874a36732c7ff764173a8dde5926d6d5c7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "727f358b_a4e549e3",
+        "filename": "internal/core/compile/validator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-12T09:56:49Z",
+      "side": 1,
+      "message": "Is what always true?",
+      "revId": "03d42c874a36732c7ff764173a8dde5926d6d5c7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0feefac_047853d8",
+        "filename": "internal/core/compile/validator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-12T09:56:49Z",
+      "side": 1,
+      "message": "Or perhaps consider supporting \"all\" to mean \"all\"  😊",
+      "revId": "03d42c874a36732c7ff764173a8dde5926d6d5c7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

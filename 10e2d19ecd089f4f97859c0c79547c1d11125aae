@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "988e49a7_5b958ef7",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-12T12:59:29Z",
+      "side": 1,
+      "message": "nit: make this a godoc link",
+      "range": {
+        "startLine": 88,
+        "startChar": 20,
+        "endLine": 88,
+        "endChar": 33
+      },
+      "revId": "10e2d19ecd089f4f97859c0c79547c1d11125aae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3feaddf_f6d40ee2",
+        "filename": "encoding/jsonschema/ref.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-12T12:59:29Z",
+      "side": 1,
+      "message": "briefly document what this default behavior is via a godoc?",
+      "revId": "10e2d19ecd089f4f97859c0c79547c1d11125aae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

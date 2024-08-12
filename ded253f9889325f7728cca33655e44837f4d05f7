@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1fd31a4b_07a29852",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-12T16:32:35Z",
+      "side": 1,
+      "message": "Yes, they are different. Each node is associated with a tree of closeContext. This method returns the root of that tree, hence the name root.\n\nThe origin corresponds to the first closeContext that added structure from which some context originated. This does not have to be the current node, nor does it have to correspond to the root of another node. So these two are quite different.\n\nThe easiest way to to explain, perhaps, is by mean of a graphical representation of how vertices and closeContexts relate. We can do that \"offline\".",
+      "parentUuid": "9e27286d_1eabc9f3",
+      "revId": "ded253f9889325f7728cca33655e44837f4d05f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c72949e4_b6e2bb05",
         "filename": "internal/core/adt/conjunct.go",
         "patchSetId": 1
@@ -65,6 +83,24 @@
       "writtenOn": "2024-08-12T08:06:40Z",
       "side": 1,
       "message": "would the `a` here, and below in `appendPrefix` be a bit clearer if it was named `ctxs` ?",
+      "revId": "ded253f9889325f7728cca33655e44837f4d05f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5eb00c3_dc5a9b70",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 414,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-12T16:32:35Z",
+      "side": 1,
+      "message": "It\u0027s kinda a Go idiom to use short variables for either standard (\"a\" for array) arguments or variables that live in short scopes. If neither is the case I prefer full names, so closeContexts, in this case.",
+      "parentUuid": "c72949e4_b6e2bb05",
       "revId": "ded253f9889325f7728cca33655e44837f4d05f7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -92,6 +128,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf01c7c0_1a2b0703",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-12T16:32:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "41ee88c4_2de87fc3",
+      "range": {
+        "startLine": 430,
+        "startChar": 47,
+        "endLine": 430,
+        "endChar": 54
+      },
+      "revId": "ded253f9889325f7728cca33655e44837f4d05f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ab050af7_cce39f1d",
@@ -105,6 +165,24 @@
       "writtenOn": "2024-08-12T07:48:39Z",
       "side": 1,
       "message": "it seems to me like ctx is unused here",
+      "revId": "ded253f9889325f7728cca33655e44837f4d05f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "89df9d24_dff70b22",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 431,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-12T16:32:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ab050af7_cce39f1d",
       "revId": "ded253f9889325f7728cca33655e44837f4d05f7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -128,6 +206,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "94ef35f8_4748446d",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-12T16:32:35Z",
+      "side": 1,
+      "message": "We already use root to indicate something else. I removed it from the language here. I guess we use \"root\" as a concept (the root closeContext corresponding to a vertex) and root as a general term for the root of a tree in general.\n\nI\u0027m not saying the new text is better, but at least root is removed.",
+      "parentUuid": "168527af_4634dc7f",
+      "revId": "ded253f9889325f7728cca33655e44837f4d05f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7e2cb71f_e725e0c0",
         "filename": "internal/core/adt/fields.go",
         "patchSetId": 1
@@ -139,6 +235,24 @@
       "writtenOn": "2024-08-12T08:06:40Z",
       "side": 1,
       "message": "couldn\u0027t this be lifted into the declaration above?",
+      "revId": "ded253f9889325f7728cca33655e44837f4d05f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a1ebab6_ed7dcc30",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-12T16:32:35Z",
+      "side": 1,
+      "message": "Indeed, this is a left-over from code changes. Fixed.",
+      "parentUuid": "7e2cb71f_e725e0c0",
       "revId": "ded253f9889325f7728cca33655e44837f4d05f7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

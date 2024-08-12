@@ -1,0 +1,128 @@
+-- type.json --
+{
+  "type": "object",
+  "properties": {
+    "e0": {
+      "type": [
+        "integer"
+      ],
+      "minimum": 2,
+      "maximum": 3,
+      "maxLength": 5
+    },
+    "e1": {
+      "enum": [
+        "cover",
+        "contain"
+      ],
+      "type": [
+        "array",
+        "boolean",
+        "number",
+        "object",
+        "string",
+        "null"
+      ]
+    },
+    "e2": {
+      "title": "none",
+      "type": "string",
+      "enum": [
+        "none"
+      ],
+      "required": [
+        "none"
+      ]
+    },
+    "e3": {
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minLength": 1
+    },
+    "e4": {
+      "type": "array",
+      "description": "Main authors of the plugin",
+      "items": {
+        "type": "string",
+        "uniqueItems": true
+      }
+    },
+    "e5": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "e6": {
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9 _.-]+$"
+      },
+      "type": "array",
+      "pattern": "^[A-Za-z0-9 _.-]+$"
+    },
+    "e7": {
+      "type": [
+        "boolean",
+        "object"
+      ],
+      "anyOf": [
+        {
+          "type": "boolean",
+          "enum": [
+            true,
+            {}
+          ]
+        },
+        {
+          "type": "object",
+          "allOf": [
+            {
+              "properties": {
+                "disableFix": {
+                  "type": "boolean"
+                }
+              }
+            }
+          ],
+          "properties": {
+            "ignoreMediaFeatureNames": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+-- out/decode/err --
+constraint not allowed because type string is excluded:
+    type.json:10:7
+constraint not allowed because type array is excluded:
+    type.json:18:9
+constraint not allowed because type bool is excluded:
+    type.json:19:9
+constraint not allowed because type number is excluded:
+    type.json:20:9
+constraint not allowed because type object is excluded:
+    type.json:21:9
+constraint not allowed because type null is excluded:
+    type.json:23:9
+constraint not allowed because type object is excluded:
+    type.json:32:7
+constraint not allowed because type string is excluded:
+    type.json:44:7
+constraint not allowed because type array is excluded:
+    type.json:51:9
+constraint not allowed because type string is excluded:
+    type.json:64:7
+constraint not allowed because type bool is excluded:
+    type.json:68:9

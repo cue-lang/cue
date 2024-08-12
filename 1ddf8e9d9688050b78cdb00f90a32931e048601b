@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "583e861a_6ad89fe8",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-12T15:02:31Z",
+      "side": 1,
+      "message": "would the file exist as anything other than \"true\"? perhaps just use its presence as the boolean value.",
+      "revId": "1ddf8e9d9688050b78cdb00f90a32931e048601b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c3cc03f_afbe3036",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_badpath.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-12T15:02:31Z",
+      "side": 1,
+      "message": "... one such case? can you omit the noun in a sentence like this?",
+      "revId": "1ddf8e9d9688050b78cdb00f90a32931e048601b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

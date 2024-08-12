@@ -39,6 +39,23 @@
       },
       "revId": "ded253f9889325f7728cca33655e44837f4d05f7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab050af7_cce39f1d",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 431,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-12T07:48:39Z",
+      "side": 1,
+      "message": "it seems to me like ctx is unused here",
+      "revId": "ded253f9889325f7728cca33655e44837f4d05f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

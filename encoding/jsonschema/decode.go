@@ -332,8 +332,15 @@ type state struct {
 	all      constraintInfo // values and oneOf etc.
 	nullable *ast.BasicLit  // nullable
 
-	usedTypes    cue.Kind
+	// allowedTypes holds all the set of types that
+	// this node is allowed to be.
 	allowedTypes cue.Kind
+
+	// knownTypes holds the set of types that this node
+	// is known to be one of by virtue of the constraints inside
+	// all. This is used to avoid adding redundant elements
+	// to the disjunction created by [state.finalize].
+	knownTypes cue.Kind
 
 	default_     ast.Expr
 	examples     []ast.Expr
@@ -413,14 +420,14 @@ const allTypes = cue.NullKind | cue.BoolKind | cue.NumberKind | cue.IntKind |
 
 // finalize constructs a CUE type from the collected constraints.
 func (s *state) finalize() (e ast.Expr) {
+	if s.allowedTypes == 0 {
+		// Nothing is possible.
+		s.addErr(errors.Newf(s.pos.Pos(), "constraints are not possible to satisfy"))
+		return &ast.BottomLit{}
+	}
+
 	conjuncts := []ast.Expr{}
 	disjuncts := []ast.Expr{}
-
-	types := s.allowedTypes &^ s.usedTypes
-	if types == allTypes {
-		disjuncts = append(disjuncts, ast.NewIdent("_"))
-		types = 0
-	}
 
 	// Sort literal structs and list last for nicer formatting.
 	sort.SliceStable(s.types[arrayType].constraints, func(i, j int) bool {
@@ -437,59 +444,55 @@ func (s *state) finalize() (e ast.Expr) {
 		typIndex int
 	}
 	var excluded []excludeInfo
-	npossible := 0
-	nexcluded := 0
-	for i, t := range s.types {
-		k := coreToCUE[i]
-		isAllowed := s.allowedTypes&k != 0
-		if len(t.constraints) > 0 {
-			npossible++
-			if t.typ == nil && !isAllowed {
-				// TODO this implies a redundant constraint, which is technically allowed,
-				// but in practice probably represents a mistake. We could provide
-				// a mode that warns about such likely errors.
-				nexcluded++
-				for _, c := range t.constraints {
-					excluded = append(excluded, excludeInfo{c.Pos(), i})
-				}
-				continue
-			}
-			x := ast.NewBinExpr(token.AND, t.constraints...)
-			disjuncts = append(disjuncts, x)
-		} else if s.usedTypes&k != 0 {
-			npossible++
-			continue
-		} else if t.typ != nil {
-			npossible++
-			if !isAllowed {
-				// TODO this implies a redundant type constraint, which is technically allowed,
-				// but in practice probably represents a mistake. We could provide
-				// a mode that warns about such likely errors.
-				nexcluded++
-				excluded = append(excluded, excludeInfo{t.typ.Pos(), i})
-				continue
-			}
-			disjuncts = append(disjuncts, t.typ)
-		} else if types&k != 0 {
-			npossible++
-			x := kindToAST(k)
-			if x != nil {
-				disjuncts = append(disjuncts, x)
+
+	needsTypeDisjunction := s.allowedTypes != s.knownTypes
+	if !needsTypeDisjunction {
+		for i, t := range s.types {
+			k := coreToCUE[i]
+			if len(t.constraints) > 0 && (t.typ != nil || s.allowedTypes&k != 0) {
+				// We need to include at least one type-specific
+				// constraint in the disjunction.
+				needsTypeDisjunction = true
+				break
 			}
 		}
 	}
-	if nexcluded == npossible {
-		// All possibilities have been excluded: this is an impossible
-		// schema.
-		for _, e := range excluded {
-			s.addErr(errors.Newf(e.pos,
-				"constraint not allowed because type %s is excluded",
-				coreTypeName[e.typIndex],
-			))
+
+	if needsTypeDisjunction {
+		npossible := 0
+		nexcluded := 0
+		for i, t := range s.types {
+			k := coreToCUE[i]
+			if len(t.constraints) > 0 {
+				npossible++
+				if t.typ == nil && s.allowedTypes&k == 0 {
+					nexcluded++
+					for _, c := range t.constraints {
+						excluded = append(excluded, excludeInfo{c.Pos(), i})
+					}
+					continue
+				}
+				x := ast.NewBinExpr(token.AND, t.constraints...)
+				disjuncts = append(disjuncts, x)
+			} else if (s.allowedTypes & k) != 0 {
+				npossible++
+				if (s.knownTypes & k) != 0 {
+					disjuncts = append(disjuncts, kindToAST(k))
+				}
+			}
+		}
+		if nexcluded == npossible {
+			// All possibilities have been excluded: this is an impossible
+			// schema.
+			for _, e := range excluded {
+				s.addErr(errors.Newf(e.pos,
+					"constraint not allowed because type %s is excluded",
+					coreTypeName[e.typIndex],
+				))
+			}
 		}
 	}
 	conjuncts = append(conjuncts, s.all.constraints...)
-
 	obj := s.obj
 	if obj == nil {
 		obj, _ = s.types[objectType].typ.(*ast.StructLit)
@@ -506,7 +509,7 @@ func (s *state) finalize() (e ast.Expr) {
 	}
 
 	if len(conjuncts) == 0 {
-		e = &ast.BottomLit{}
+		e = ast.NewIdent("_")
 	} else {
 		e = ast.NewBinExpr(token.AND, conjuncts...)
 	}
@@ -522,7 +525,7 @@ outer:
 		// check conditions where default can be skipped.
 		switch x := s.default_.(type) {
 		case *ast.ListLit:
-			if s.usedTypes == cue.ListKind && len(x.Elts) == 0 {
+			if s.allowedTypes == cue.ListKind && len(x.Elts) == 0 {
 				break outer
 			}
 		}
@@ -555,6 +558,10 @@ outer:
 		}
 	}
 
+	// Now that we've expressed the schema as actual syntax,
+	// all the allowed types are actually explicit and will not
+	// need to be mentioned again.
+	s.knownTypes = s.allowedTypes
 	return e
 }
 
@@ -593,15 +600,19 @@ func (s *state) schema(n cue.Value, idRef ...label) ast.Expr {
 	return expr
 }
 
-// schemaState is a low-level API for schema. isLogical specifies whether the
-// caller is a logical operator like anyOf, allOf, oneOf, or not.
-func (s *state) schemaState(n cue.Value, types cue.Kind, idRef []label, isLogical bool) (ast.Expr, *state) {
+// schemaState returns a new state value derived from s.
+// n holds the JSONSchema node to translate to a schema.
+// types holds the set of possible types that the value can hold.
+// idRef holds the path to the value.
+// isLogical specifies whether the caller is a logical operator like anyOf, allOf, oneOf, or not.
+func (s *state) schemaState(n cue.Value, types cue.Kind, idRef []label, isLogical bool) (_e ast.Expr, _ *state) {
 	state := &state{
 		up:            s,
 		schemaVersion: s.schemaVersion,
 		isSchema:      s.isSchema,
 		decoder:       s.decoder,
 		allowedTypes:  types,
+		knownTypes:    allTypes,
 		path:          s.path,
 		idRef:         idRef,
 		pos:           n,
@@ -637,8 +648,6 @@ func (s *state) schemaState(n cue.Value, types cue.Kind, idRef []label, isLogica
 
 func (s *state) value(n cue.Value) ast.Expr {
 	k := n.Kind()
-	s.usedTypes |= k
-	s.allowedTypes &= k
 	switch k {
 	case cue.ListKind:
 		a := []ast.Expr{}

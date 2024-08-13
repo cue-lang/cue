@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25d3da02_c96b1b5e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T09:43:29Z",
+      "side": 1,
+      "message": "nit: reflow these paragraphs under 72",
+      "revId": "66e2e8261eab031df6bd83ee0aec774a3b281b59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "472219ee_94dec37f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T09:43:29Z",
+      "side": 1,
+      "message": "Looks like this fix needs a test :)",
+      "revId": "66e2e8261eab031df6bd83ee0aec774a3b281b59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

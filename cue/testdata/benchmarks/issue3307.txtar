@@ -1,0 +1,69 @@
+-- in.cue --
+if _request.enabled {
+    r1: {
+        k1: 0
+        k2: 0
+        k3: 0
+        k4: 0
+        k5: 0
+        k6: 0
+        k7: 0
+        k8: 0
+        k9: 0
+        k10: 0
+        k11: 0
+        k12: 0
+        k13: 0
+        k14: 0
+        k15: 0
+        k16: 0
+        k17: 0
+    }
+}
+
+_request: enabled: _
+-- out/eval/stats --
+Leaks:  0
+Freed:  21
+Reused: 16
+Allocs: 5
+Retain: 72
+
+Unifications: 21
+Conjuncts:    3
+Disjuncts:    93
+-- out/eval --
+(_|_){
+  // [incomplete] incomplete bool: _
+  _request: (struct){
+    enabled: (_){ _ }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  if 〈0;_request〉.enabled {
+    r1: {
+      k1: 0
+      k2: 0
+      k3: 0
+      k4: 0
+      k5: 0
+      k6: 0
+      k7: 0
+      k8: 0
+      k9: 0
+      k10: 0
+      k11: 0
+      k12: 0
+      k13: 0
+      k14: 0
+      k15: 0
+      k16: 0
+      k17: 0
+    }
+  }
+  _request: {
+    enabled: _
+  }
+}

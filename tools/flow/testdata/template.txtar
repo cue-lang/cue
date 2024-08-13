@@ -36,6 +36,79 @@ graph TD
   t1("root.convert [Ready]")
   t1-->t0
 
+-- out/run/t1/value --
+{
+	$id:    "tool/http.Do"
+	method: "GET"
+	stdout: "foo"
+	url:    "https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
+	request: {
+		body: ""
+	}
+}
+-- out/run/t1/stats --
+Leaks:  0
+Freed:  47
+Reused: 40
+Allocs: 7
+Retain: 0
+
+Unifications: 26
+Conjuncts:    59
+Disjuncts:    47
+-- out/run/t2 --
+graph TD
+  t0("root.get [Terminated]")
+  t1("root.convert [Terminated]")
+  t1-->t0
+
+-- out/run/t2/value --
+{
+	$id: "tool/exec.Run"
+	cmd: "go run cuelang.org/go/cmd/cue import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue"
+	env: {} | []
+	stdout:      "foo"
+	stderr:      null
+	stdin:       (*null | string | bytes) & GET.response.body
+	success:     bool
+	mustSucceed: true
+
+	//cue:path: root.get
+	let GET = {
+		$id:    "tool/http.Do"
+		method: "GET"
+		url:    string
+		request: {
+			body: *bytes | string
+		}
+	} & {
+		request: {
+			body: ""
+		}
+		stdout: "foo"
+		url:    "https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
+	}
+}
+-- out/run/t2/stats --
+Leaks:  0
+Freed:  47
+Reused: 47
+Allocs: 0
+Retain: 0
+
+Unifications: 26
+Conjuncts:    63
+Disjuncts:    47
+-- out/run/stats/totals --
+Leaks:  0
+Freed:  94
+Reused: 87
+Allocs: 7
+Retain: 0
+
+Unifications: 52
+Conjuncts:    122
+Disjuncts:    94
 -- out/run-v3/t1/value --
 {
 	$id:    "tool/http.Do"
@@ -107,79 +180,6 @@ diff old new
  
 -- diff/value/p3 --
 Reordering.
--- out/run/t1/value --
-{
-	$id:    "tool/http.Do"
-	method: "GET"
-	stdout: "foo"
-	url:    "https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
-	request: {
-		body: ""
-	}
-}
--- out/run/t1/stats --
-Leaks:  0
-Freed:  47
-Reused: 40
-Allocs: 7
-Retain: 0
-
-Unifications: 26
-Conjuncts:    70
-Disjuncts:    47
--- out/run/t2 --
-graph TD
-  t0("root.get [Terminated]")
-  t1("root.convert [Terminated]")
-  t1-->t0
-
--- out/run/t2/value --
-{
-	$id: "tool/exec.Run"
-	cmd: "go run cuelang.org/go/cmd/cue import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue"
-	env: {} | []
-	stdout:      "foo"
-	stderr:      null
-	stdin:       (*null | string | bytes) & GET.response.body
-	success:     bool
-	mustSucceed: true
-
-	//cue:path: root.get
-	let GET = {
-		$id:    "tool/http.Do"
-		method: "GET"
-		url:    string
-		request: {
-			body: *bytes | string
-		}
-	} & {
-		request: {
-			body: ""
-		}
-		stdout: "foo"
-		url:    "https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
-	}
-}
--- out/run/t2/stats --
-Leaks:  0
-Freed:  47
-Reused: 47
-Allocs: 0
-Retain: 0
-
-Unifications: 26
-Conjuncts:    74
-Disjuncts:    47
--- out/run/stats/totals --
-Leaks:  0
-Freed:  94
-Reused: 87
-Allocs: 7
-Retain: 0
-
-Unifications: 52
-Conjuncts:    144
-Disjuncts:    94
 -- out/run/t3 --
 graph TD
   t0("root.get [Terminated]")

@@ -79,12 +79,6 @@ Unifications: 47
 Conjuncts:    425
 Disjuncts:    184
 -- out/evalalpha --
-Errors:
-issue2351.let.param: conflicting values [{}] and "foo" (mismatched types list and string):
-    ./issue2351.cue:2:15
-    ./issue2351.cue:4:19
-
-Result:
 (_|_){
   // [eval]
   conjunct: (struct){
@@ -116,9 +110,7 @@ Result:
   issue2351: (_|_){
     // [eval]
     let: (_|_){
-      // [eval] issue2351.let.param: conflicting values [{}] and "foo" (mismatched types list and string):
-      //     ./issue2351.cue:2:15
-      //     ./issue2351.cue:4:19
+      // [eval]
       let _param#1 = (string){ "foo" }
     }
     hidden: (#list){
@@ -179,16 +171,18 @@ diff old new
 diff old new
 --- old
 +++ new
-@@ -1,7 +1,6 @@
- Errors:
+@@ -1,10 +1,3 @@
+-Errors:
 -issue2351.let.param: conflicting values "foo" and [{}] (mismatched types string and list):
-+issue2351.let.param: conflicting values [{}] and "foo" (mismatched types list and string):
-     ./issue2351.cue:2:15
+-    ./issue2351.cue:2:15
 -    ./issue2351.cue:3:2
-     ./issue2351.cue:4:19
- 
- Result:
-@@ -22,14 +21,13 @@
+-    ./issue2351.cue:4:19
+-
+-Result:
+ (_|_){
+   // [eval]
+   conjunct: (struct){
+@@ -22,14 +15,13 @@
          string
          #early: (string){ |(*(string){ "X" }, (string){ string }) }
        }) }
@@ -210,18 +204,19 @@ diff old new
    }
    handleComprehensions: (struct){
      #sub2: (int){ 2 }
-@@ -37,9 +35,8 @@
+@@ -37,10 +29,7 @@
    issue2351: (_|_){
      // [eval]
      let: (_|_){
 -      // [eval] issue2351.let.param: conflicting values "foo" and [{}] (mismatched types string and list):
-+      // [eval] issue2351.let.param: conflicting values [{}] and "foo" (mismatched types list and string):
-       //     ./issue2351.cue:2:15
+-      //     ./issue2351.cue:2:15
 -      //     ./issue2351.cue:3:2
-       //     ./issue2351.cue:4:19
+-      //     ./issue2351.cue:4:19
++      // [eval]
        let _param#1 = (string){ "foo" }
      }
-@@ -67,7 +64,7 @@
+     hidden: (#list){
+@@ -67,7 +56,7 @@
          }
        }
      }

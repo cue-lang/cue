@@ -327,15 +327,11 @@ selfReferential.acrossOr.t1.p1.o.retry: field not allowed:
     ./in.cue:125:17
 selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
     ./in.cue:117:14
-selfReferential.acrossOr.t1.p1.0.reject: structural cycle:
-    ./in.cue:133:14
 selfReferential.acrossOr.t1.p1.2.retry: structural cycle:
     ./in.cue:133:14
 selfReferential.acrossOr.t1.p2.o.retry: field not allowed:
     ./in.cue:139:11
     ./in.cue:143:17
-selfReferential.acrossOr.t1.p2.0.reject: structural cycle:
-    ./in.cue:139:14
 selfReferential.acrossOr.t1.p2.2.retry: structural cycle:
     ./in.cue:139:14
 selfReferential.acrossOr.t1.p3.o.retry: field not allowed:
@@ -343,14 +339,6 @@ selfReferential.acrossOr.t1.p3.o.retry: field not allowed:
     ./in.cue:163:17
 selfReferential.acrossOr.t1.p3.0.reject: structural cycle:
     ./in.cue:153:14
-selfReferential.acrossOr.t2.p1.2.b: structural cycle:
-    ./in.cue:167:8
-selfReferential.acrossOr.t2.p2.2.b: structural cycle:
-    ./in.cue:178:8
-selfReferential.acrossOr.t2.p3.2.b: structural cycle:
-    ./in.cue:193:8
-issue1881.p1.0.reject: structural cycle:
-    ./in.cue:205:14
 issue1881.p1.2.retry.output: structural cycle:
     ./in.cue:205:14
 issue1881.p2.o.retry: field not allowed:
@@ -523,20 +511,17 @@ Result:
             reject: (string){ string }
             resource: (string){ string }
             retry: (_|_){
-              // [structural cycle] selfReferential.acrossOr.t1.p1.0.reject: structural cycle:
-              //     ./in.cue:133:14
+              // [structural cycle]
             }
           }
           #Output: (_|_){
-            // [structural cycle] selfReferential.acrossOr.t1.p1.0.reject: structural cycle:
-            //     ./in.cue:133:14
+            // [structural cycle]
           }
         }
         p2: (_|_){
           // [eval]
           #Output: (_|_){
-            // [structural cycle] selfReferential.acrossOr.t1.p2.0.reject: structural cycle:
-            //     ./in.cue:139:14
+            // [structural cycle]
           }
           o: (_|_){
             // [eval] selfReferential.acrossOr.t1.p2.o.retry: field not allowed:
@@ -555,24 +540,21 @@ Result:
             reject: (string){ string }
             resource: (string){ string }
             retry: (_|_){
-              // [structural cycle] selfReferential.acrossOr.t1.p2.0.reject: structural cycle:
-              //     ./in.cue:139:14
+              // [structural cycle]
             }
           }
         }
         p3: (_|_){
           // [eval]
           #Output: (_|_){
-            // [structural cycle] selfReferential.acrossOr.t1.p3.0.reject: structural cycle:
-            //     ./in.cue:153:14
+            // [structural cycle]
           }
           #AllOutputs: (_|_){
             // [structural cycle]
             reject: (string){ string }
             resource: (string){ string }
             retry: (_|_){
-              // [structural cycle] selfReferential.acrossOr.t1.p3.0.reject: structural cycle:
-              //     ./in.cue:153:14
+              // [structural cycle]
             }
           }
           o: (_|_){
@@ -594,12 +576,11 @@ Result:
         p1: (_|_){
           // [structural cycle]
           d: (_|_){
-            // [structural cycle] selfReferential.acrossOr.t2.p1.2.b: structural cycle:
-            //     ./in.cue:167:8
+            // [structural cycle]
           }
           o: (_|_){
-            // [structural cycle] selfReferential.acrossOr.t2.p1.2.b: structural cycle:
-            //     ./in.cue:167:8
+            // [structural cycle]
+            b: (int){ 2 }
           }
           #A: (_|_){
             // [structural cycle]
@@ -608,8 +589,7 @@ Result:
             d3: (_|_){
               // [structural cycle]
               b: (_|_){
-                // [structural cycle] selfReferential.acrossOr.t2.p1.2.b: structural cycle:
-                //     ./in.cue:167:8
+                // [structural cycle]
               }
             }
           }
@@ -617,12 +597,11 @@ Result:
         p2: (_|_){
           // [structural cycle]
           o: (_|_){
-            // [structural cycle] selfReferential.acrossOr.t2.p2.2.b: structural cycle:
-            //     ./in.cue:178:8
+            // [structural cycle]
+            b: (int){ 2 }
           }
           d: (_|_){
-            // [structural cycle] selfReferential.acrossOr.t2.p2.2.b: structural cycle:
-            //     ./in.cue:178:8
+            // [structural cycle]
           }
           #A: (_|_){
             // [structural cycle]
@@ -631,8 +610,7 @@ Result:
             d3: (_|_){
               // [structural cycle]
               b: (_|_){
-                // [structural cycle] selfReferential.acrossOr.t2.p2.2.b: structural cycle:
-                //     ./in.cue:178:8
+                // [structural cycle]
               }
             }
           }
@@ -640,8 +618,8 @@ Result:
         p3: (_|_){
           // [structural cycle]
           o: (_|_){
-            // [structural cycle] selfReferential.acrossOr.t2.p3.2.b: structural cycle:
-            //     ./in.cue:193:8
+            // [structural cycle]
+            b: (int){ 2 }
           }
           #A: (_|_){
             // [structural cycle]
@@ -650,14 +628,12 @@ Result:
             d3: (_|_){
               // [structural cycle]
               b: (_|_){
-                // [structural cycle] selfReferential.acrossOr.t2.p3.2.b: structural cycle:
-                //     ./in.cue:193:8
+                // [structural cycle]
               }
             }
           }
           d: (_|_){
-            // [structural cycle] selfReferential.acrossOr.t2.p3.2.b: structural cycle:
-            //     ./in.cue:193:8
+            // [structural cycle]
           }
         }
       }
@@ -694,14 +670,12 @@ Result:
         retry: (_|_){
           // [structural cycle]
           output: (_|_){
-            // [structural cycle] issue1881.p1.0.reject: structural cycle:
-            //     ./in.cue:205:14
+            // [structural cycle]
           }
         }
       }
       #Output: (_|_){
-        // [structural cycle] issue1881.p1.0.reject: structural cycle:
-        //     ./in.cue:205:14
+        // [structural cycle]
       }
     }
     p2: (_|_){
@@ -713,8 +687,7 @@ Result:
         retry: (_|_){
           // [structural cycle]
           output: (_|_){
-            // [structural cycle] issue1881.p2.2.retry: structural cycle:
-            //     ./in.cue:219:14
+            // [structural cycle]
           }
         }
       }
@@ -731,8 +704,7 @@ Result:
         }
       }
       #Output: (_|_){
-        // [structural cycle] issue1881.p2.2.retry: structural cycle:
-        //     ./in.cue:219:14
+        // [structural cycle]
       }
     }
     p3: (_|_){
@@ -744,14 +716,12 @@ Result:
         retry: (_|_){
           // [structural cycle]
           output: (_|_){
-            // [structural cycle] issue1881.p3.2.retry: structural cycle:
-            //     ./in.cue:231:14
+            // [structural cycle]
           }
         }
       }
       #Output: (_|_){
-        // [structural cycle] issue1881.p3.2.retry: structural cycle:
-        //     ./in.cue:231:14
+        // [structural cycle]
       }
       o: (_|_){
         // [eval] issue1881.p3.o.retry: field not allowed:
@@ -836,7 +806,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,5 +1,52 @@
+@@ -1,5 +1,40 @@
  Errors:
 -selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle
 +issue1881.p1.o.retry: field not allowed:
@@ -845,15 +815,11 @@ diff old new
 +    ./in.cue:125:17
 +selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
 +    ./in.cue:117:14
-+selfReferential.acrossOr.t1.p1.0.reject: structural cycle:
-+    ./in.cue:133:14
 +selfReferential.acrossOr.t1.p1.2.retry: structural cycle:
 +    ./in.cue:133:14
 +selfReferential.acrossOr.t1.p2.o.retry: field not allowed:
 +    ./in.cue:139:11
 +    ./in.cue:143:17
-+selfReferential.acrossOr.t1.p2.0.reject: structural cycle:
-+    ./in.cue:139:14
 +selfReferential.acrossOr.t1.p2.2.retry: structural cycle:
 +    ./in.cue:139:14
 +selfReferential.acrossOr.t1.p3.o.retry: field not allowed:
@@ -861,14 +827,6 @@ diff old new
 +    ./in.cue:163:17
 +selfReferential.acrossOr.t1.p3.0.reject: structural cycle:
 +    ./in.cue:153:14
-+selfReferential.acrossOr.t2.p1.2.b: structural cycle:
-+    ./in.cue:167:8
-+selfReferential.acrossOr.t2.p2.2.b: structural cycle:
-+    ./in.cue:178:8
-+selfReferential.acrossOr.t2.p3.2.b: structural cycle:
-+    ./in.cue:193:8
-+issue1881.p1.0.reject: structural cycle:
-+    ./in.cue:205:14
 +issue1881.p1.2.retry.output: structural cycle:
 +    ./in.cue:205:14
 +issue1881.p2.o.retry: field not allowed:
@@ -890,7 +848,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -19,7 +66,9 @@
+@@ -19,7 +54,9 @@
    B: (struct){
      a: (struct){
        parent: (string){ "" }
@@ -901,7 +859,7 @@ diff old new
        }
      }
    }
-@@ -52,17 +101,17 @@
+@@ -52,17 +89,17 @@
        }
      }
      _e: (#struct){
@@ -930,7 +888,7 @@ diff old new
        }
      }
      e: (#struct){
-@@ -112,15 +161,14 @@
+@@ -112,15 +149,14 @@
        }
      }
      list: (struct){
@@ -949,7 +907,7 @@ diff old new
          }
        }
      }
-@@ -127,116 +175,168 @@
+@@ -127,116 +163,156 @@
      insertionError: (_|_){
        // [eval]
        A: (_|_){
@@ -1088,20 +1046,17 @@ diff old new
 +            reject: (string){ string }
 +            resource: (string){ string }
 +            retry: (_|_){
-+              // [structural cycle] selfReferential.acrossOr.t1.p1.0.reject: structural cycle:
-+              //     ./in.cue:133:14
++              // [structural cycle]
 +            }
 +          }
 +          #Output: (_|_){
-+            // [structural cycle] selfReferential.acrossOr.t1.p1.0.reject: structural cycle:
-+            //     ./in.cue:133:14
++            // [structural cycle]
 +          }
 +        }
 +        p2: (_|_){
 +          // [eval]
 +          #Output: (_|_){
-+            // [structural cycle] selfReferential.acrossOr.t1.p2.0.reject: structural cycle:
-+            //     ./in.cue:139:14
++            // [structural cycle]
 +          }
 +          o: (_|_){
 +            // [eval] selfReferential.acrossOr.t1.p2.o.retry: field not allowed:
@@ -1120,24 +1075,21 @@ diff old new
 +            reject: (string){ string }
 +            resource: (string){ string }
 +            retry: (_|_){
-+              // [structural cycle] selfReferential.acrossOr.t1.p2.0.reject: structural cycle:
-+              //     ./in.cue:139:14
++              // [structural cycle]
 +            }
 +          }
 +        }
 +        p3: (_|_){
 +          // [eval]
 +          #Output: (_|_){
-+            // [structural cycle] selfReferential.acrossOr.t1.p3.0.reject: structural cycle:
-+            //     ./in.cue:153:14
++            // [structural cycle]
 +          }
 +          #AllOutputs: (_|_){
 +            // [structural cycle]
 +            reject: (string){ string }
 +            resource: (string){ string }
 +            retry: (_|_){
-+              // [structural cycle] selfReferential.acrossOr.t1.p3.0.reject: structural cycle:
-+              //     ./in.cue:153:14
++              // [structural cycle]
 +            }
 +          }
 +          o: (_|_){
@@ -1159,12 +1111,11 @@ diff old new
 +        p1: (_|_){
 +          // [structural cycle]
 +          d: (_|_){
-+            // [structural cycle] selfReferential.acrossOr.t2.p1.2.b: structural cycle:
-+            //     ./in.cue:167:8
++            // [structural cycle]
 +          }
 +          o: (_|_){
-+            // [structural cycle] selfReferential.acrossOr.t2.p1.2.b: structural cycle:
-+            //     ./in.cue:167:8
++            // [structural cycle]
++            b: (int){ 2 }
 +          }
 +          #A: (_|_){
 +            // [structural cycle]
@@ -1173,8 +1124,7 @@ diff old new
 +            d3: (_|_){
 +              // [structural cycle]
 +              b: (_|_){
-+                // [structural cycle] selfReferential.acrossOr.t2.p1.2.b: structural cycle:
-+                //     ./in.cue:167:8
++                // [structural cycle]
 +              }
 +            }
 +          }
@@ -1182,12 +1132,11 @@ diff old new
 +        p2: (_|_){
 +          // [structural cycle]
 +          o: (_|_){
-+            // [structural cycle] selfReferential.acrossOr.t2.p2.2.b: structural cycle:
-+            //     ./in.cue:178:8
++            // [structural cycle]
++            b: (int){ 2 }
 +          }
 +          d: (_|_){
-+            // [structural cycle] selfReferential.acrossOr.t2.p2.2.b: structural cycle:
-+            //     ./in.cue:178:8
++            // [structural cycle]
 +          }
 +          #A: (_|_){
 +            // [structural cycle]
@@ -1196,8 +1145,7 @@ diff old new
 +            d3: (_|_){
 +              // [structural cycle]
 +              b: (_|_){
-+                // [structural cycle] selfReferential.acrossOr.t2.p2.2.b: structural cycle:
-+                //     ./in.cue:178:8
++                // [structural cycle]
 +              }
 +            }
 +          }
@@ -1205,8 +1153,8 @@ diff old new
 +        p3: (_|_){
 +          // [structural cycle]
 +          o: (_|_){
-+            // [structural cycle] selfReferential.acrossOr.t2.p3.2.b: structural cycle:
-+            //     ./in.cue:193:8
++            // [structural cycle]
++            b: (int){ 2 }
 +          }
 +          #A: (_|_){
 +            // [structural cycle]
@@ -1215,19 +1163,17 @@ diff old new
 +            d3: (_|_){
 +              // [structural cycle]
 +              b: (_|_){
-+                // [structural cycle] selfReferential.acrossOr.t2.p3.2.b: structural cycle:
-+                //     ./in.cue:193:8
++                // [structural cycle]
 +              }
 +            }
 +          }
 +          d: (_|_){
-+            // [structural cycle] selfReferential.acrossOr.t2.p3.2.b: structural cycle:
-+            //     ./in.cue:193:8
++            // [structural cycle]
 +          }
          }
        }
      }
-@@ -251,84 +351,102 @@
+@@ -251,84 +327,96 @@
        }
      }
    }
@@ -1330,14 +1276,12 @@ diff old new
 +        retry: (_|_){
 +          // [structural cycle]
 +          output: (_|_){
-+            // [structural cycle] issue1881.p1.0.reject: structural cycle:
-+            //     ./in.cue:205:14
++            // [structural cycle]
 +          }
 +        }
 +      }
 +      #Output: (_|_){
-+        // [structural cycle] issue1881.p1.0.reject: structural cycle:
-+        //     ./in.cue:205:14
++        // [structural cycle]
 +      }
 +    }
 +    p2: (_|_){
@@ -1349,8 +1293,7 @@ diff old new
 +        retry: (_|_){
 +          // [structural cycle]
 +          output: (_|_){
-+            // [structural cycle] issue1881.p2.2.retry: structural cycle:
-+            //     ./in.cue:219:14
++            // [structural cycle]
 +          }
 +        }
 +      }
@@ -1367,8 +1310,7 @@ diff old new
 +        }
 +      }
 +      #Output: (_|_){
-+        // [structural cycle] issue1881.p2.2.retry: structural cycle:
-+        //     ./in.cue:219:14
++        // [structural cycle]
 +      }
 +    }
 +    p3: (_|_){
@@ -1380,14 +1322,12 @@ diff old new
 +        retry: (_|_){
 +          // [structural cycle]
 +          output: (_|_){
-+            // [structural cycle] issue1881.p3.2.retry: structural cycle:
-+            //     ./in.cue:231:14
++            // [structural cycle]
 +          }
 +        }
 +      }
 +      #Output: (_|_){
-+        // [structural cycle] issue1881.p3.2.retry: structural cycle:
-+        //     ./in.cue:231:14
++        // [structural cycle]
 +      }
 +      o: (_|_){
 +        // [eval] issue1881.p3.o.retry: field not allowed:
@@ -1408,7 +1348,7 @@ diff old new
      t1: (struct){
        p1: (struct){
          D: (struct){
-@@ -361,40 +479,34 @@
+@@ -361,40 +449,34 @@
          }
        }
      }

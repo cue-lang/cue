@@ -1253,8 +1253,7 @@ Result:
     use: (_|_){
       // [eval]
       field: (_|_){
-        // [eval] issue3332.use.field.0: field not allowed:
-        //     ./validation.cue:6:11
+        // [eval]
         0: (_|_){
           // [eval] issue3332.use.field.0: field not allowed:
           //     ./validation.cue:6:11
@@ -1674,7 +1673,7 @@ diff old new
      #x: (#struct){
        y: (#struct){
          z?: (#struct){
-@@ -519,22 +439,39 @@
+@@ -519,22 +439,38 @@
          }
        }
      }
@@ -1718,8 +1717,7 @@ diff old new
 +    use: (_|_){
 +      // [eval]
 +      field: (_|_){
-+        // [eval] issue3332.use.field.0: field not allowed:
-+        //     ./validation.cue:6:11
++        // [eval]
 +        0: (_|_){
 +          // [eval] issue3332.use.field.0: field not allowed:
 +          //     ./validation.cue:6:11

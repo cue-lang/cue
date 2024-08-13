@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "68195fde_466c14c1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T15:07:53Z",
+      "side": 1,
+      "message": "not sure if you saw this :) for example, it\u0027s possible that a value had an error and, due to the comprehension and many fields, the very same error was repeated many times. In such a case, your \u003d\u003d pointer comparison would avoid the repetition.\n\nwe don\u0027t have to get to the bottom of it - it\u0027s just that \u003d\u003d only compares the pointers, so for instance two valueErrors that were constructed separately (different pointers) but contain the same details would not be deduplicated by \u003d\u003d. Which I think is fine, as we shouldn\u0027t be creating duplicate errors in general.",
+      "parentUuid": "309daefa_82521d70",
+      "revId": "4323f70b5e2f270b4184fd5936db6b5c056881ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e02c5d76_38557d15",
         "filename": "/COMMIT_MSG",
         "patchSetId": 1

@@ -54,7 +54,7 @@
 // # Limitations
 //
 // The embed interpreter currently does not support:
-// - stream values, such as .ldjson or YAML streams.
+// - stream values, such as .ndjson or YAML streams.
 // - schema-based decoding, such as needed for textproto
 //
 // # Example

@@ -41,9 +41,9 @@ absglob: _ @embed(glob="/x/*.*", type=yaml)
 
 doublestar: _ @embed(glob="**/*.json")
 
-stream: _ @embed(file=test.ldjson)
+stream: _ @embed(file=test.ndjson)
 
-singlestream: _ @embed(file=single.ldjson)
+singlestream: _ @embed(file=single.ndjson)
 
 yamlstream: _ @embed(file=stream.yaml)
 
@@ -80,10 +80,10 @@ invalidPattern: _ @embed(glob="x[")
 
 -- test.json --
 { "x": 34 }
--- test.ldjson --
+-- test.ndjson --
 { "x": 35 }
 { "x": 36 }
--- single.ldjson --
+-- single.ndjson --
 { "x": 37 }
 -- stream.yaml --
 1

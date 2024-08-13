@@ -274,16 +274,24 @@ func (e *posError) Position() token.Pos         { return e.pos }
 
 // Append combines two errors, flattening Lists as necessary.
 func Append(a, b Error) Error {
-	switch x := a.(type) {
+	switch a := a.(type) {
 	case nil:
 		return b
 	case list:
-		return appendToList(x, b)
+		return appendToList(a, b)
 	}
-	// Preserve order of errors.
-	list := appendToList(nil, a)
-	list = appendToList(list, b)
-	return list
+	switch b := b.(type) {
+	case nil:
+		return a
+	case list:
+		list := appendToList(nil, a)
+		list = appendToList(list, b)
+		return list
+	}
+	if a == b {
+		return a
+	}
+	return list{a, b}
 }
 
 // Errors reports the individual errors associated with an error, which is

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "690edfde_c6f978e8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T13:22:20Z",
+      "side": 1,
+      "message": "SGTM modulo the stringer file belonging to an earlier CL.",
+      "revId": "ebb209bb16995bd0152bda02163de8af8672e511",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -72,7 +72,7 @@ _schema: {
 	$let?: [string]: null | bool | number | string | [...] | {
 		[string]: _schema_1
 	}
-	$sort?: (_schema_5 | [...number]) & _
+	$sort?: _schema_5 | [...number]
 	{[!~"^($else|$let|$sort)$"]: #["jsone-value"]}
 
 	#: "jsone-value": _schema_A | [..._schema_8]

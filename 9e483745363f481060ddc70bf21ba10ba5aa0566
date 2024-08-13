@@ -41,6 +41,48 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "78e4c4e0_94e18d47",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-13T14:35:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d35cc2d6_27457703",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 6
+      },
+      "revId": "9e483745363f481060ddc70bf21ba10ba5aa0566",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "041107e7_556170e6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-13T14:35:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "88feaf5f_c867dd8d",
+      "revId": "9e483745363f481060ddc70bf21ba10ba5aa0566",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "91945d3c_afc50358",
@@ -58,6 +100,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dac50846_d6b3dc66",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 451,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-13T14:35:01Z",
+      "side": 1,
+      "message": "The plan is to add several different kinds of flag with different effects, including the ability to turn this off, but for now Strict implies strict checking of fields but errors on impossible constraints are always errors. We\u0027ll change this in a future CL, but I don\u0027t want to do it right now.",
+      "parentUuid": "91945d3c_afc50358",
+      "revId": "9e483745363f481060ddc70bf21ba10ba5aa0566",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4af556a4_d432f37e",
@@ -71,6 +131,24 @@
       "writtenOn": "2024-08-13T13:27:33Z",
       "side": 1,
       "message": "should this be `\u003e\u003d` to be a bit more defensive?",
+      "revId": "9e483745363f481060ddc70bf21ba10ba5aa0566",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "23810955_48ce26ad",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 482,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-13T14:35:01Z",
+      "side": 1,
+      "message": "If nexcluded is greater than npossible, something serious has gone wrong, and it\u0027s easy to verify by inspection that it can never be the case (there\u0027s never an `nexcluded++` that isn\u0027t preceded by `npossible++`.\nSo I don\u0027t think it\u0027s worthwhile.",
+      "parentUuid": "4af556a4_d432f37e",
       "revId": "9e483745363f481060ddc70bf21ba10ba5aa0566",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

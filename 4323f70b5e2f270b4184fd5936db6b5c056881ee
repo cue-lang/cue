@@ -35,6 +35,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a42fdb1b_7c029fc8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-13T12:32:08Z",
+      "side": 1,
+      "message": "I would also fix CombineErrors, additionally.",
+      "revId": "4323f70b5e2f270b4184fd5936db6b5c056881ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5e18316a_1fcdd587",
@@ -48,6 +65,23 @@
       "writtenOn": "2024-08-13T12:27:10Z",
       "side": 1,
       "message": "are you missing a \"fixes\" for issue 3307?",
+      "revId": "4323f70b5e2f270b4184fd5936db6b5c056881ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f44d96b9_7e2ccdb8",
+        "filename": "cue/testdata/eval/issue3307.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-13T12:32:08Z",
+      "side": 1,
+      "message": "Since this is benchmark-like test, I would it in the benchmarks directory.",
       "revId": "4323f70b5e2f270b4184fd5936db6b5c056881ee",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

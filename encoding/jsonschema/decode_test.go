@@ -121,6 +121,7 @@ properties: x: $ref: "https://something.test/foo#/definitions/blah"
 		},
 	})
 	qt.Assert(t, qt.IsNil(err))
+
 	b, err := format.Node(expr, format.Simplify())
 	if err != nil {
 		t.Fatal(errors.Details(err, nil))

@@ -1,0 +1,10 @@
+-- type.json --
+{
+    "allOf": [
+        { "type": "object" },
+        { "type": "string" }
+    ]
+}
+-- out/decode/err --
+constraint not allowed because type string is excluded:
+    type.json:4:11

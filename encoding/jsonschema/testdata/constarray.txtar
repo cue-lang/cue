@@ -1,0 +1,10 @@
+-- type.json --
+{
+    "type": "array",
+    "const": [
+        1
+    ]
+}
+
+-- out/decode/cue --
+[1]

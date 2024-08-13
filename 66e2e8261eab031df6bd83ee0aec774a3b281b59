@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "61760e3a_85ee84c0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-13T13:16:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "25d3da02_c96b1b5e",
+      "revId": "66e2e8261eab031df6bd83ee0aec774a3b281b59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "472219ee_94dec37f",
@@ -49,6 +67,24 @@
       "side": 1,
       "message": "Sorry, only now I realise you hadn\u0027t yet requested my review here. That\u0027s probably why.",
       "parentUuid": "472219ee_94dec37f",
+      "revId": "66e2e8261eab031df6bd83ee0aec774a3b281b59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b35e9d0a_a1fe9696",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-13T13:16:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "324d606d_79a2867f",
       "revId": "66e2e8261eab031df6bd83ee0aec774a3b281b59",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

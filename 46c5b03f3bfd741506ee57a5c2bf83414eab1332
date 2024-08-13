@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4a957a9_4c4b2c62",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T13:29:22Z",
+      "side": 1,
+      "message": "can you clarify how it\u0027s wrong?",
+      "revId": "46c5b03f3bfd741506ee57a5c2bf83414eab1332",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -583,7 +583,7 @@ y: Y & Y_1
 }
 == Final
 {
-	comprehension: _|_ // comprehension: key value of dynamic field must be concrete, found _|_(invalid interpolation: invalid interpolation: comprehension.filepath: undefined field: name (and 1 more errors)) (and 2 more errors)
+	comprehension: _|_ // comprehension: key value of dynamic field must be concrete, found _|_(invalid interpolation: invalid interpolation: comprehension.filepath: undefined field: name) (and 1 more errors)
 	complete: {
 		x: "a foo z"
 		run: {
@@ -599,7 +599,7 @@ y: Y & Y_1
 			name: "two"
 		}
 	}]
-	files: _|_ // files: key value of dynamic field must be concrete, found _|_(invalid interpolation: invalid interpolation: filepath: undefined field: name (and 1 more errors)) (and 5 more errors)
+	files: _|_ // files: key value of dynamic field must be concrete, found _|_(invalid interpolation: invalid interpolation: filepath: undefined field: name) (and 3 more errors)
 	scoped: {
 		direct: {
 			a: 1
@@ -625,20 +625,20 @@ y: Y & Y_1
 	x: "foo"
 	incomplete: {
 		a: {
-			x: _|_ // invalid interpolation: incomplete.a.x: non-concrete value string (type string) (and 1 more errors)
+			x: _|_ // invalid interpolation: incomplete.a.x: non-concrete value string (type string)
 			run: {
 				a: string
 			}
 		}
 		b: {
-			x: _|_ // invalid interpolation: incomplete.b.x: non-concrete value string (type string) (and 1 more errors)
+			x: _|_ // invalid interpolation: incomplete.b.x: non-concrete value string (type string)
 			run: {
 				a: string
 			}
 		}
 		c: {
-			x:  _|_ // invalid interpolation: incomplete.c.x: non-concrete value string (type string) (and 1 more errors)
-			x2: _|_ // invalid interpolation: incomplete.c.x2: non-concrete value string (type string) (and 1 more errors)
+			x:  _|_ // invalid interpolation: incomplete.c.x: non-concrete value string (type string)
+			x2: _|_ // invalid interpolation: incomplete.c.x2: non-concrete value string (type string)
 			run: {
 				a: string
 			}
@@ -647,8 +647,8 @@ y: Y & Y_1
 			}
 		}
 		d: {
-			x:  _|_ // invalid interpolation: incomplete.d.x: non-concrete value string (type string) (and 1 more errors)
-			x2: _|_ // invalid interpolation: incomplete.d.x2: non-concrete value string (type string) (and 1 more errors)
+			x:  _|_ // invalid interpolation: incomplete.d.x: non-concrete value string (type string)
+			x2: _|_ // invalid interpolation: incomplete.d.x2: non-concrete value string (type string)
 			run: {
 				a: string
 			}
@@ -895,7 +895,7 @@ y: Y & Y_1
 diff old new
 --- old
 +++ new
-@@ -216,72 +216,72 @@
+@@ -216,23 +216,23 @@
  }
  == Final
  {

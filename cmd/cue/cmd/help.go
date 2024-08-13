@@ -518,7 +518,7 @@ var filetypeHelp = &cobra.Command{
     json        .json           JSON files.
     yaml        .yaml/.yml      YAML files.
     toml        .toml           TOML files
-    jsonl       .jsonl/.ldjson  Line-separated JSON values.
+    jsonl       .jsonl/.ndjson  Line-separated JSON values.
     jsonschema                  JSON Schema.
     openapi                     OpenAPI schema.
 	pb                          Use Protobuf mappings (e.g. json+pb)

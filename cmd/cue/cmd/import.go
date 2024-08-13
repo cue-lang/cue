@@ -53,7 +53,7 @@ more info). This behavior can be overridden by specifying one of
 the following modes:
 
    Mode       Extensions
-   json       Look for JSON files (.json, .jsonl, .ldjson).
+   json       Look for JSON files (.json .jsonl .ndjson).
    yaml       Look for YAML files (.yaml .yml).
    toml       Look for TOML files (.toml).
    text       Look for text files (.txt).
@@ -269,7 +269,7 @@ Example:
 
 func runImport(cmd *Command, args []string) (err error) {
 	c := &config{
-		fileFilter:     `\.(json|yaml|yml|toml|jsonl|ldjson)$`,
+		fileFilter:     `\.(json|yaml|yml|toml|jsonl|ndjson|ldjson)$`,
 		interpretation: build.Auto,
 		loadCfg:        &load.Config{DataFiles: true},
 	}
@@ -289,7 +289,7 @@ func runImport(cmd *Command, args []string) (err error) {
 		case "proto":
 			c.fileFilter = `\.proto$`
 		case "json":
-			c.fileFilter = `\.(json|jsonl|ldjson)$`
+			c.fileFilter = `\.(json|jsonl|ndjson|ldjson)$`
 		case "yaml":
 			c.fileFilter = `\.(yaml|yml)$`
 		case "toml":

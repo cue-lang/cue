@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "309daefa_82521d70",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T12:27:10Z",
+      "side": 1,
+      "message": "can you explain briefly why we were trying to add/append the same error 43 million times? or perhaps why a simple `\u003d\u003d` pointer comparison is enough?",
+      "revId": "4323f70b5e2f270b4184fd5936db6b5c056881ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "04912126_73e2c6ae",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T12:27:10Z",
+      "side": 1,
+      "message": "(I know I\u0027m not added as a reviewer, but I saw it in passing)",
+      "revId": "4323f70b5e2f270b4184fd5936db6b5c056881ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e18316a_1fcdd587",
+        "filename": "cue/testdata/eval/issue3307.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T12:27:10Z",
+      "side": 1,
+      "message": "are you missing a \"fixes\" for issue 3307?",
+      "revId": "4323f70b5e2f270b4184fd5936db6b5c056881ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

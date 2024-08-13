@@ -1,0 +1,10 @@
+
+-- type.json --
+{
+    "type": "object",
+    "const": {"a": 1}
+}
+
+-- out/decode/cue --
+a: 1
+...

@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cfb0b28_56557632",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-13T14:35:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "19cd0413_5dbacfb6",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 10
+      },
+      "revId": "a6e791f981e6131f71a9ced859a64f43d9577a04",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a75756d2_185b5369",
@@ -37,6 +61,24 @@
       "writtenOn": "2024-08-13T13:47:47Z",
       "side": 1,
       "message": "assuming these are lists, indent their continuations for readability, e.g:\n\n```\n- this is one\n  list element\n- this is another\n  list element\n```",
+      "revId": "a6e791f981e6131f71a9ced859a64f43d9577a04",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e590cdb_c01526e3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-13T14:35:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a75756d2_185b5369",
       "revId": "a6e791f981e6131f71a9ced859a64f43d9577a04",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -75,6 +117,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b17242c_4369745d",
+        "filename": "encoding/jsonschema/constraints.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 555,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-13T14:35:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0335b334_68db74dd",
+      "revId": "a6e791f981e6131f71a9ced859a64f43d9577a04",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5907e974_87a3f821",
@@ -88,6 +148,30 @@
       "writtenOn": "2024-08-13T13:47:47Z",
       "side": 1,
       "message": "I think \"all\" is extra here - just \"the set of types\" seems to make sense to me. alternatively \"all the sets of types\", but that doesn\u0027t seem to be right with the type of the field.",
+      "range": {
+        "startLine": 336,
+        "startChar": 23,
+        "endLine": 336,
+        "endChar": 43
+      },
+      "revId": "a6e791f981e6131f71a9ced859a64f43d9577a04",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "69ad0cd5_37eee8bb",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-13T14:35:01Z",
+      "side": 1,
+      "message": "Yeah, editing error. Fixed.",
+      "parentUuid": "5907e974_87a3f821",
       "range": {
         "startLine": 336,
         "startChar": 23,
@@ -115,6 +199,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "327eb663_dbf1bd14",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 482,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-13T14:35:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "de9fcf9b_b2acad23",
+      "revId": "a6e791f981e6131f71a9ced859a64f43d9577a04",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6cea9f4c_48d0b1c5",
@@ -132,6 +234,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c3570a9_2469f0f0",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 515,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-13T14:35:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6cea9f4c_48d0b1c5",
+      "revId": "a6e791f981e6131f71a9ced859a64f43d9577a04",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aa4a0410_09cdecfd",
@@ -145,6 +265,24 @@
       "writtenOn": "2024-08-13T13:47:47Z",
       "side": 1,
       "message": "this seems unrelated; I\u0027d undo it",
+      "revId": "a6e791f981e6131f71a9ced859a64f43d9577a04",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf10cfab_bbdb1d9c",
+        "filename": "encoding/jsonschema/decode_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-13T14:35:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aa4a0410_09cdecfd",
       "revId": "a6e791f981e6131f71a9ced859a64f43d9577a04",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

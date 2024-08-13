@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d35cc2d6_27457703",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T13:27:33Z",
+      "side": 1,
+      "message": "perhaps say \"real schema found on the internet\" to be clearer",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 6
+      },
+      "revId": "9e483745363f481060ddc70bf21ba10ba5aa0566",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "88feaf5f_c867dd8d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T13:27:33Z",
+      "side": 1,
+      "message": "line lengths",
+      "revId": "9e483745363f481060ddc70bf21ba10ba5aa0566",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91945d3c_afc50358",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 451,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T13:27:33Z",
+      "side": 1,
+      "message": "I thought we already had a \"strict\" mode? if that\u0027s not the right boolean, perhaps it needs a different name, because this is the kind of extra checking that I would expect \"strict\" to do.",
+      "revId": "9e483745363f481060ddc70bf21ba10ba5aa0566",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4af556a4_d432f37e",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 482,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T13:27:33Z",
+      "side": 1,
+      "message": "should this be `\u003e\u003d` to be a bit more defensive?",
+      "revId": "9e483745363f481060ddc70bf21ba10ba5aa0566",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

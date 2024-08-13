@@ -204,7 +204,9 @@ var constraints = []*constraint{
 		}
 		s.knownTypes &= types
 		s.allowedTypes &= types
-		s.all.add(n, ast.NewBinExpr(token.OR, a...))
+		if len(a) > 0 {
+			s.all.add(n, ast.NewBinExpr(token.OR, a...))
+		}
 	}),
 
 	// TODO: only allow for OpenAPI.

@@ -1,0 +1,8 @@
+-- type.json --
+{
+  "type": "object",
+  "enum": ["x"]
+}
+-- out/decode/err --
+constraints are not possible to satisfy:
+    type.json:1:1

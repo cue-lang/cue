@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "e02c5d76_38557d15",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-13T12:37:15Z",
+      "side": 1,
+      "message": "Add:\n\nFixes #3307\n\nAssuming that it fixes it.",
+      "revId": "4323f70b5e2f270b4184fd5936db6b5c056881ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "04912126_73e2c6ae",
@@ -48,6 +65,23 @@
       "writtenOn": "2024-08-13T12:32:08Z",
       "side": 1,
       "message": "I would also fix CombineErrors, additionally.",
+      "revId": "4323f70b5e2f270b4184fd5936db6b5c056881ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ca91e34_683163d7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-13T12:37:15Z",
+      "side": 1,
+      "message": "Would be great to include this in v0.10",
       "revId": "4323f70b5e2f270b4184fd5936db6b5c056881ee",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

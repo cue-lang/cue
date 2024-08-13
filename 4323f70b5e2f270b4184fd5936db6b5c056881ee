@@ -37,6 +37,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "a967425a_f58c29dd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-13T13:47:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e02c5d76_38557d15",
+      "revId": "4323f70b5e2f270b4184fd5936db6b5c056881ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "04912126_73e2c6ae",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -103,6 +121,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "49689b23_8c7bc6f2",
+        "filename": "cue/errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-13T13:47:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f1621aef_7ef02052",
+      "revId": "4323f70b5e2f270b4184fd5936db6b5c056881ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5e18316a_1fcdd587",
@@ -133,6 +169,42 @@
       "writtenOn": "2024-08-13T12:32:08Z",
       "side": 1,
       "message": "Since this is benchmark-like test, I would it in the benchmarks directory.",
+      "revId": "4323f70b5e2f270b4184fd5936db6b5c056881ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "32c5af8a_ed5c54da",
+        "filename": "cue/testdata/eval/issue3307.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-13T13:47:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5e18316a_1fcdd587",
+      "revId": "4323f70b5e2f270b4184fd5936db6b5c056881ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c2c09ab_f25ff912",
+        "filename": "cue/testdata/eval/issue3307.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-13T13:47:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f44d96b9_7e2ccdb8",
       "revId": "4323f70b5e2f270b4184fd5936db6b5c056881ee",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

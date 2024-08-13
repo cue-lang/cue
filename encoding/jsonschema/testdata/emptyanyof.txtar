@@ -23,4 +23,4 @@
 -- out/decode/cue --
 _
 
-#shell: (string | ("bash" | "sh" | "cmd" | "powershell")) & string
+#shell: string | ("bash" | "sh" | "cmd" | "powershell")

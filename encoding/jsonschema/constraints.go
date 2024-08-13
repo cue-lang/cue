@@ -192,9 +192,18 @@ var constraints = []*constraint{
 
 	p1("enum", func(key string, n cue.Value, s *state) {
 		var a []ast.Expr
+		var types cue.Kind
 		for _, x := range s.listItems("enum", n, true) {
+			if (s.allowedTypes & x.Kind()) == 0 {
+				// Enum value is redundant because it's
+				// not in the allowed type set.
+				continue
+			}
 			a = append(a, s.value(x))
+			types |= x.Kind()
 		}
+		s.knownTypes &= types
+		s.allowedTypes &= types
 		s.all.add(n, ast.NewBinExpr(token.OR, a...))
 	}),
 
@@ -207,6 +216,8 @@ var constraints = []*constraint{
 
 	p1d("const", 6, func(key string, n cue.Value, s *state) {
 		s.all.add(n, s.value(n))
+		s.allowedTypes &= n.Kind()
+		s.knownTypes &= n.Kind()
 	}),
 
 	p1("default", func(key string, n cue.Value, s *state) {
@@ -249,8 +260,6 @@ var constraints = []*constraint{
 	p1("$defs", addDefinitions),
 	p1("definitions", addDefinitions),
 	p1("$ref", func(key string, n cue.Value, s *state) {
-		s.usedTypes = allTypes
-
 		u := s.resolveURI(n)
 
 		fragmentParts, err := splitFragment(u)
@@ -288,15 +297,26 @@ var constraints = []*constraint{
 
 	p2("allOf", func(key string, n cue.Value, s *state) {
 		var a []ast.Expr
+		var knownTypes cue.Kind
 		for _, v := range s.listItems("allOf", n, false) {
 			x, sub := s.schemaState(v, s.allowedTypes, nil, true)
 			s.allowedTypes &= sub.allowedTypes
-			s.usedTypes |= sub.usedTypes
 			if sub.hasConstraints() {
+				// This might seem a little odd, since the actual
+				// types are the intersection of the known types
+				// of the allOf members. However, knownTypes
+				// is really there to avoid adding redundant disjunctions.
+				// So if we have (int & string) & (disjunction)
+				// we definitely don't have to add int or string to
+				// disjunction.
+				knownTypes |= sub.knownTypes
 				a = append(a, x)
 			}
 		}
+		// TODO maybe give an error/warning if s.allowedTypes == 0
+		// as that's a known-impossible assertion?
 		if len(a) > 0 {
+			s.knownTypes &= knownTypes
 			s.all.add(n, ast.NewBinExpr(token.AND, a...))
 		}
 	}),
@@ -304,19 +324,23 @@ var constraints = []*constraint{
 	p2("anyOf", func(key string, n cue.Value, s *state) {
 		var types cue.Kind
 		var a []ast.Expr
+		var knownTypes cue.Kind
 		for _, v := range s.listItems("anyOf", n, false) {
 			x, sub := s.schemaState(v, s.allowedTypes, nil, true)
 			types |= sub.allowedTypes
+			knownTypes |= sub.knownTypes
 			a = append(a, x)
 		}
 		s.allowedTypes &= types
 		if len(a) > 0 {
+			s.knownTypes &= knownTypes
 			s.all.add(n, ast.NewBinExpr(token.OR, a...))
 		}
 	}),
 
 	p2("oneOf", func(key string, n cue.Value, s *state) {
 		var types cue.Kind
+		var knownTypes cue.Kind
 		var a []ast.Expr
 		hasSome := false
 		for _, v := range s.listItems("oneOf", n, false) {
@@ -329,12 +353,15 @@ var constraints = []*constraint{
 			}
 
 			if !isAny(x) {
+				knownTypes |= sub.knownTypes
 				a = append(a, x)
 			}
 		}
+		// TODO if there are no elements in the oneOf, validation
+		// should fail.
 		s.allowedTypes &= types
 		if len(a) > 0 && hasSome {
-			s.usedTypes = allTypes
+			s.knownTypes &= knownTypes
 			s.all.add(n, ast.NewBinExpr(token.OR, a...))
 		}
 
@@ -352,19 +379,16 @@ var constraints = []*constraint{
 			}
 			return
 		}
-		s.usedTypes |= cue.StringKind
 		s.add(n, stringType, &ast.UnaryExpr{Op: token.MAT, X: s.string(n)})
 	}),
 
 	p1("minLength", func(key string, n cue.Value, s *state) {
-		s.usedTypes |= cue.StringKind
 		min := s.number(n)
 		strings := s.addImport(n, "strings")
 		s.add(n, stringType, ast.NewCall(ast.NewSel(strings, "MinRunes"), min))
 	}),
 
 	p1("maxLength", func(key string, n cue.Value, s *state) {
-		s.usedTypes |= cue.StringKind
 		max := s.number(n)
 		strings := s.addImport(n, "strings")
 		s.add(n, stringType, ast.NewCall(ast.NewSel(strings, "MaxRunes"), max))
@@ -372,12 +396,10 @@ var constraints = []*constraint{
 
 	p1d("contentMediaType", 7, func(key string, n cue.Value, s *state) {
 		// TODO: only mark as used if it generates something.
-		// s.usedTypes |= cue.StringKind
 	}),
 
 	p1d("contentEncoding", 7, func(key string, n cue.Value, s *state) {
 		// TODO: only mark as used if it generates something.
-		// s.usedTypes |= cue.StringKind
 		// 7bit, 8bit, binary, quoted-printable and base64.
 		// RFC 2054, part 6.1.
 		// https://tools.ietf.org/html/rfc2045
@@ -387,7 +409,6 @@ var constraints = []*constraint{
 	// Number constraints
 
 	p2("minimum", func(key string, n cue.Value, s *state) {
-		s.usedTypes |= cue.NumberKind
 		op := token.GEQ
 		if s.exclusiveMin {
 			op = token.GTR
@@ -400,12 +421,10 @@ var constraints = []*constraint{
 			s.exclusiveMin = true
 			return
 		}
-		s.usedTypes |= cue.NumberKind
 		s.add(n, numType, &ast.UnaryExpr{Op: token.GTR, X: s.number(n)})
 	}),
 
 	p2("maximum", func(key string, n cue.Value, s *state) {
-		s.usedTypes |= cue.NumberKind
 		op := token.LEQ
 		if s.exclusiveMax {
 			op = token.LSS
@@ -418,12 +437,10 @@ var constraints = []*constraint{
 			s.exclusiveMax = true
 			return
 		}
-		s.usedTypes |= cue.NumberKind
 		s.add(n, numType, &ast.UnaryExpr{Op: token.LSS, X: s.number(n)})
 	}),
 
 	p1("multipleOf", func(key string, n cue.Value, s *state) {
-		s.usedTypes |= cue.NumberKind
 		multiple := s.number(n)
 		var x big.Int
 		_, _ = n.MantExp(&x)
@@ -437,7 +454,6 @@ var constraints = []*constraint{
 	// Object constraints
 
 	p1("properties", func(key string, n cue.Value, s *state) {
-		s.usedTypes |= cue.StructKind
 		obj := s.object(n)
 
 		if n.Kind() != cue.StructKind {
@@ -474,8 +490,6 @@ var constraints = []*constraint{
 			s.errf(n, `value of "required" must be list of strings, found %v`, n.Kind())
 			return
 		}
-
-		s.usedTypes |= cue.StructKind
 
 		// TODO: detect that properties is defined somewhere.
 		// s.errf(n, `"required" without a "properties" field`)
@@ -518,7 +532,6 @@ var constraints = []*constraint{
 	p1d("propertyNames", 6, func(key string, n cue.Value, s *state) {
 		// [=~pattern]: _
 		if names, _ := s.schemaState(n, cue.StringKind, nil, false); !isAny(names) {
-			s.usedTypes |= cue.StructKind
 			x := ast.NewStruct(ast.NewList(names), ast.NewIdent("_"))
 			s.add(n, objectType, x)
 		}
@@ -526,14 +539,12 @@ var constraints = []*constraint{
 
 	// TODO: reenable when we have proper non-monotonic contraint validation.
 	// p1("minProperties", func(key string, n cue.Value, s *state) {
-	// 	s.usedTypes |= cue.StructKind
 
 	// 	pkg := s.addImport(n, "struct")
 	// 	s.addConjunct(n, ast.NewCall(ast.NewSel(pkg, "MinFields"), s.uint(n)))
 	// }),
 
 	p1("maxProperties", func(key string, n cue.Value, s *state) {
-		s.usedTypes |= cue.StructKind
 
 		pkg := s.addImport(n, "struct")
 		x := ast.NewCall(ast.NewSel(pkg, "MaxFields"), s.uint(n))
@@ -541,7 +552,6 @@ var constraints = []*constraint{
 	}),
 
 	p1("dependencies", func(key string, n cue.Value, s *state) {
-		s.usedTypes |= cue.StructKind
 
 		// Schema and property dependencies.
 		// TODO: the easiest implementation is with comprehensions.
@@ -556,7 +566,6 @@ var constraints = []*constraint{
 	}),
 
 	p2("patternProperties", func(key string, n cue.Value, s *state) {
-		s.usedTypes |= cue.StructKind
 		if n.Kind() != cue.StructKind {
 			s.errf(n, `value of "patternProperties" must be an object, found %v`, n.Kind())
 		}
@@ -583,7 +592,6 @@ var constraints = []*constraint{
 			s.closeStruct = !s.boolValue(n)
 
 		case cue.StructKind:
-			s.usedTypes |= cue.StructKind
 			s.closeStruct = true
 			obj := s.object(n)
 			if len(obj.Elts) == 0 {
@@ -609,7 +617,6 @@ var constraints = []*constraint{
 	// Array constraints.
 
 	p1("items", func(key string, n cue.Value, s *state) {
-		s.usedTypes |= cue.ListKind
 		switch n.Kind() {
 		case cue.StructKind:
 			elem := s.schema(n)
@@ -638,7 +645,6 @@ var constraints = []*constraint{
 
 		case cue.StructKind:
 			if s.list != nil {
-				s.usedTypes |= cue.ListKind
 				elem := s.schema(n)
 				s.list.Elts = append(s.list.Elts, &ast.Ellipsis{Type: elem})
 			}
@@ -649,7 +655,6 @@ var constraints = []*constraint{
 	}),
 
 	p1("contains", func(key string, n cue.Value, s *state) {
-		s.usedTypes |= cue.ListKind
 		list := s.addImport(n, "list")
 		// TODO: Passing non-concrete values is not yet supported in CUE.
 		if x := s.schema(n); !isAny(x) {
@@ -661,7 +666,6 @@ var constraints = []*constraint{
 	// TODO: min/maxContains
 
 	p1("minItems", func(key string, n cue.Value, s *state) {
-		s.usedTypes |= cue.ListKind
 		a := []ast.Expr{}
 		p, err := n.Uint64()
 		if err != nil {
@@ -678,14 +682,12 @@ var constraints = []*constraint{
 	}),
 
 	p1("maxItems", func(key string, n cue.Value, s *state) {
-		s.usedTypes |= cue.ListKind
 		list := s.addImport(n, "list")
 		x := ast.NewCall(ast.NewSel(list, "MaxItems"), clearPos(s.uint(n)))
 		s.add(n, arrayType, x)
 	}),
 
 	p1("uniqueItems", func(key string, n cue.Value, s *state) {
-		s.usedTypes |= cue.ListKind
 		if s.boolValue(n) {
 			list := s.addImport(n, "list")
 			s.add(n, arrayType, ast.NewCall(ast.NewSel(list, "UniqueItems")))

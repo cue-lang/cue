@@ -6,5 +6,7 @@
     ]
 }
 -- out/decode/err --
-constraint not allowed because type string is excluded:
-    type.json:4:11
+constraints are not possible to satisfy:
+    type.json:1:1
+constraints are not possible to satisfy:
+    type.json:4:9

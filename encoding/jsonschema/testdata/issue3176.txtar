@@ -20,7 +20,7 @@ import "strings"
 
 ({
 	...
-} | strings.MaxRunes(3)) & {
+} | strings.MaxRunes(3)) & (string | {
 	{[=~"^x-" & !~"^()$"]: string}
 	...
-}
+})

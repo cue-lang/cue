@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c813332_cb32c5d1",
+        "filename": "encoding/jsonschema/constraints.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 707,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T09:40:24Z",
+      "side": 1,
+      "message": "can you elaborate a bit in this TODO? looking at the testdata, this shows up as `3:3`, which appears right to me.",
+      "revId": "0bd5fe010ce15f1292bf53c7f872240c304c4956",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a98c418_0c5b5fce",
+        "filename": "encoding/jsonschema/constraints.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 708,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T09:40:24Z",
+      "side": 1,
+      "message": "mention that it\u0027s not OK just for newer schema versions?",
+      "revId": "0bd5fe010ce15f1292bf53c7f872240c304c4956",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "573da4a5_ad44cd9b",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T09:32:56Z",
+      "side": 1,
+      "message": "a passing thought, and this issue already existed before - isn\u0027t using %q for CUE syntax technically wrong, because %q is Go syntax? i.e. I think we should be using cue/literal.String and so on.",
+      "revId": "e1d0578e4acc1b3e5302f5f4d472904cd7626358",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62e308a2_e8f5e938",
+        "filename": "encoding/jsonschema/version.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T09:32:56Z",
+      "side": 1,
+      "message": "I\u0027d make the first value `_ schemaVersion \u003d iota` or `versionInvalid schemaVersion \u003d iota`, to prevent using versionDraft04 by mistake as the zero value. Or if you do intend versionDraft04 to be the default/zero value, I\u0027d briefly document that.",
+      "revId": "e1d0578e4acc1b3e5302f5f4d472904cd7626358",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9b1f7f3_ae371f2b",
+        "filename": "encoding/jsonschema/version.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T09:32:56Z",
+      "side": 1,
+      "message": "shouldn\u0027t you check that the rest of the URL is empty? e.g. no query, no user and password, no fragment, etc.\n\nif these URLs always follow the same format, I might even be tempted to normalize the URL (if needed) and then expect it to exactly match one of the known URL strings.",
+      "revId": "e1d0578e4acc1b3e5302f5f4d472904cd7626358",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d3045de_49cb0747",
+        "filename": "encoding/jsonschema/version.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T09:32:56Z",
+      "side": 1,
+      "message": "nit: place these as comments and use `stringer -linecomment`? mainly to keep the source of truth all in one place and to prevent some human error.",
+      "revId": "e1d0578e4acc1b3e5302f5f4d472904cd7626358",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

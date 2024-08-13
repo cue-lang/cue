@@ -1,0 +1,26 @@
+-- definition.json --
+{
+	"oneOf": [
+		{
+			"type": "object"
+		},
+		{
+			"maxLength": 3,
+			"type": "string"
+		}
+	],
+	"patternProperties": {
+		"^x-": {
+			"type": "string"
+		}
+	}
+}
+-- out/decode/cue --
+import "strings"
+
+({
+	...
+} | strings.MaxRunes(3)) & {
+	{[=~"^x-" & !~"^()$"]: string}
+	...
+}

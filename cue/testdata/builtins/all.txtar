@@ -31,8 +31,6 @@ Errors:
 fatalArg.x: invalid operands "eee" and 'eee' to '+' (type string and bytes):
     ./in.cue:2:9
     ./in.cue:2:17
-fatalChild.0.a: undefined field: c:
-    ./in.cue:8:17
 
 Result:
 (_|_){
@@ -50,8 +48,7 @@ Result:
     #b: (#struct){
     }
     x: (_|_){
-      // [eval] fatalChild.0.a: undefined field: c:
-      //     ./in.cue:8:17
+      // [eval]
     }
   }
   okIncompleteChild: (struct){
@@ -70,26 +67,23 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -2,7 +2,7 @@
+@@ -2,8 +2,6 @@
  fatalArg.x: invalid operands "eee" and 'eee' to '+' (type string and bytes):
      ./in.cue:2:9
      ./in.cue:2:17
 -fatalChild.x.a: undefined field: c:
-+fatalChild.0.a: undefined field: c:
-     ./in.cue:8:17
+-    ./in.cue:8:17
  
  Result:
-@@ -21,11 +21,8 @@
-     #b: (#struct){
+ (_|_){
+@@ -22,10 +20,6 @@
      }
      x: (_|_){
--      // [eval]
+       // [eval]
 -      a: (_|_){
 -        // [eval] fatalChild.x.a: undefined field: c:
 -        //     ./in.cue:8:17
 -      }
-+      // [eval] fatalChild.0.a: undefined field: c:
-+      //     ./in.cue:8:17
      }
    }
    okIncompleteChild: (struct){

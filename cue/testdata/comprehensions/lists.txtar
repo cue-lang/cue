@@ -36,9 +36,7 @@ Result:
     }
   }
   b: (_|_){
-    // [eval] a.1.b: conflicting values 3 and 2:
-    //     ./in.cue:1:17
-    //     ./in.cue:1:21
+    // [eval]
   }
 }
 -- out/compile --

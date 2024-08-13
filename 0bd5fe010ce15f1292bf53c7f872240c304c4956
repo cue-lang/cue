@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "083562c6_64676950",
+        "filename": "encoding/jsonschema/constraints.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 707,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-13T13:16:33Z",
+      "side": 1,
+      "message": "I just copied the TODO from elsewhere in the logic, but it does seem OK. Not quite sure why, but I\u0027ll take it 😊",
+      "parentUuid": "4c813332_cb32c5d1",
+      "revId": "0bd5fe010ce15f1292bf53c7f872240c304c4956",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2a98c418_0c5b5fce",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-08-13T09:40:24Z",
       "side": 1,
       "message": "mention that it\u0027s not OK just for newer schema versions?",
+      "revId": "0bd5fe010ce15f1292bf53c7f872240c304c4956",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cff18184_af16eda3",
+        "filename": "encoding/jsonschema/constraints.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 708,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-13T13:16:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2a98c418_0c5b5fce",
       "revId": "0bd5fe010ce15f1292bf53c7f872240c304c4956",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

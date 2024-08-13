@@ -69,6 +69,24 @@
       "parentUuid": "9c3cc03f_afbe3036",
       "revId": "1ddf8e9d9688050b78cdb00f90a32931e048601b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "74873425_27bc4bda",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_badpath.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-13T12:04:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "155b52e6_6b321074",
+      "revId": "1ddf8e9d9688050b78cdb00f90a32931e048601b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,152 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19cd0413_5dbacfb6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T13:47:47Z",
+      "side": 1,
+      "message": "https://cuelang.org/issue/3176",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 10
+      },
+      "revId": "a6e791f981e6131f71a9ced859a64f43d9577a04",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a75756d2_185b5369",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T13:47:47Z",
+      "side": 1,
+      "message": "assuming these are lists, indent their continuations for readability, e.g:\n\n```\n- this is one\n  list element\n- this is another\n  list element\n```",
+      "revId": "a6e791f981e6131f71a9ced859a64f43d9577a04",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5fd00fa_78711c44",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T13:47:47Z",
+      "side": 1,
+      "message": "Thanks for exanding the docs as well!",
+      "revId": "a6e791f981e6131f71a9ced859a64f43d9577a04",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0335b334_68db74dd",
+        "filename": "encoding/jsonschema/constraints.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 555,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T13:47:47Z",
+      "side": 1,
+      "message": "remove these leading empty lines now?",
+      "revId": "a6e791f981e6131f71a9ced859a64f43d9577a04",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5907e974_87a3f821",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T13:47:47Z",
+      "side": 1,
+      "message": "I think \"all\" is extra here - just \"the set of types\" seems to make sense to me. alternatively \"all the sets of types\", but that doesn\u0027t seem to be right with the type of the field.",
+      "range": {
+        "startLine": 336,
+        "startChar": 23,
+        "endLine": 336,
+        "endChar": 43
+      },
+      "revId": "a6e791f981e6131f71a9ced859a64f43d9577a04",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de9fcf9b_b2acad23",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 482,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T13:47:47Z",
+      "side": 1,
+      "message": "nit: the parentheses aren\u0027t necessary, and we don\u0027t use them elsewhere, e.g. on line 467 - gofmt removes the spaces around `\u0026` so I think it\u0027s already readable and obvious.",
+      "revId": "a6e791f981e6131f71a9ced859a64f43d9577a04",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6cea9f4c_48d0b1c5",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 515,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T13:47:47Z",
+      "side": 1,
+      "message": "can you very briefly document why we represent zero conjuncts as top? we used to represent them as bottom, and it\u0027s not obvious to me why either is correct.",
+      "revId": "a6e791f981e6131f71a9ced859a64f43d9577a04",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa4a0410_09cdecfd",
+        "filename": "encoding/jsonschema/decode_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-13T13:47:47Z",
+      "side": 1,
+      "message": "this seems unrelated; I\u0027d undo it",
+      "revId": "a6e791f981e6131f71a9ced859a64f43d9577a04",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -284,3 +284,36 @@ func Contains(a []cue.Value, v cue.Value) bool {
 	}
 	return false
 }
+
+// MatchN is a validator that checks that the number of elements in the given
+// list that unifies with the schema "matchValue" matches "n".
+// "n" may be a number constraint and does not have to be a concrete number.
+// Likewise, "matchValue" will usually be a non-concrete value.
+func MatchN(ctx *pkg.CallCtxt, list []cue.Value, n pkg.Schema, matchValue pkg.Schema) (bool, error) {
+	if !ctx.IsValidator() {
+		return false, errors.Newf(
+			token.NoPos,
+			"list.MatchN is a validator and should not be used as a function")
+	}
+
+	var nmatch int64
+	for _, w := range list {
+		if cue.Value(matchValue).Unify(w).Validate() == nil {
+			nmatch++
+		}
+	}
+
+	if err := cue.Value(n).Unify(ctx.ConstInt64(nmatch)).Validate(); err != nil {
+		return false, pkg.ValidationError{B: &adt.Bottom{
+			Code: adt.EvalError,
+			Err: errors.Newf(
+				token.NoPos,
+				"number of matched elements is %d: does not satisfy %v",
+				nmatch,
+				cue.Value(n),
+			),
+		}}
+	}
+
+	return true, nil
+}

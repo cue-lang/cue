@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/pkg"
+	"cuelang.org/go/internal/value"
 )
 
 // Drop reports the suffix of list x after the first n elements,
@@ -283,4 +284,34 @@ func Contains(a []cue.Value, v cue.Value) bool {
 		}
 	}
 	return false
+}
+
+// MatchN is a validator that checks that the number of elements in the given
+// list that unifies with the schema "matchValue" matches "n".
+// "n" may be a number constraint and does not have to be a concrete number.
+// Likewise, "matchValue" will usually be a non-concrete value.
+func MatchN(list []cue.Value, n pkg.Schema, matchValue pkg.Schema) (bool, error) {
+	var nmatch int64
+	for _, w := range list {
+		if matchValue.Unify(w).Validate() == nil {
+			nmatch++
+		}
+	}
+
+	r, _ := value.ToInternal(n)
+	ctx := (*cue.Context)(r)
+
+	if err := n.Unify(ctx.Encode(nmatch)).Validate(); err != nil {
+		return false, pkg.ValidationError{B: &adt.Bottom{
+			Code: adt.EvalError,
+			Err: errors.Newf(
+				token.NoPos,
+				"number of matched elements is %d: does not satisfy %v",
+				nmatch,
+				n,
+			),
+		}}
+	}
+
+	return true, nil
 }

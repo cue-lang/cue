@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e57172bf_bf1230fa",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-14T07:33:32Z",
+      "side": 1,
+      "message": "Nit picking, but this leaves open the possibility that the user could think that just embedding `file\u003dfoo.cue` would work, simply because no `type\u003dcue` is necessary (though it\u0027s likely you need to have a \"special\" sort of mind to reach this conclusion ;) ). So maybe reword as \"Note that embedding cue files is not supported at this time.\"",
+      "revId": "a3dcaa6b3a0f09c8322e1b328477e8877e101c1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

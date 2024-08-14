@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e7bf15d_55d241af",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-14T13:37:54Z",
+      "side": 1,
+      "message": "SGTM but we\u0027ve fairly consistently used snake_case.go for Go filenames, not kebab-case.go. I know some txtar files are inconsistent, but with Go we\u0027ve been fairly consistent. Plus, filenames like kebab-case_test.go or kebab-case_unix.go are rather ugly.",
+      "revId": "a6eaf4cbabda42c418b15a6297438c6aeeeeabac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

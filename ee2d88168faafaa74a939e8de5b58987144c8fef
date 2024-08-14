@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f00f5d91_57c68bcf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-14T15:22:03Z",
+      "side": 1,
+      "message": "Note that this happened in the cuelang.org repo too, at https://review.gerrithub.io/c/cue-lang/cuelang.org/+/1196611.",
+      "revId": "ee2d88168faafaa74a939e8de5b58987144c8fef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

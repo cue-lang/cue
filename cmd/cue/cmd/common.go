@@ -107,7 +107,7 @@ type buildPlan struct {
 	orphaned       []*decoderInfo
 	orphanInstance *build.Instance
 	// imported files are files that were orphaned in the build instance, but
-	// were placed in the instance by using one the --files, --list or --path
+	// were placed in the instance by using one the --files, --list or --merge
 	// flags.
 	imported []*ast.File
 

@@ -49,6 +49,11 @@ func (c *CallCtxt) Do() bool {
 	return c.Err == nil
 }
 
+// ConstInt64 returns a constant cue.Value from go int64
+func (c *CallCtxt) ConstInt64(n int64) cue.Value {
+	return value.Make(c.ctx, c.ctx.NewInt64(n))
+}
+
 func (c *CallCtxt) Value(i int) cue.Value {
 	v := value.Make(c.ctx, c.args[i])
 	// TODO: remove default
@@ -57,6 +62,11 @@ func (c *CallCtxt) Value(i int) cue.Value {
 		c.errcf(adt.IncompleteError, "non-concrete argument %d", i)
 	}
 	return v
+}
+
+func (c *CallCtxt) Constraint(i int) Constraint {
+	v := value.Make(c.ctx, c.args[i])
+	return Constraint(v)
 }
 
 func (c *CallCtxt) Struct(i int) Struct {

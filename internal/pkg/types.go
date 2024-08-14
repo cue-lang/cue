@@ -15,8 +15,13 @@
 package pkg
 
 import (
+	"cuelang.org/go/cue"
 	"cuelang.org/go/internal/core/adt"
 )
+
+// Constraint is a cue.Value that allows a non-concrete value
+// to be passed as a function argument.
+type Constraint cue.Value
 
 // List represents a CUE list, which can be open or closed.
 type List struct {

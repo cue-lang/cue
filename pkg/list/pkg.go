@@ -156,6 +156,20 @@ var p = &pkg.Package{
 			}
 		},
 	}, {
+		Name: "MatchN",
+		Params: []pkg.Param{
+			{Kind: adt.ListKind},
+			{Kind: adt.TopKind},
+			{Kind: adt.TopKind},
+		},
+		Result: adt.BoolKind,
+		Func: func(c *pkg.CallCtxt) {
+			list, n, matchValue := c.List(0), c.Constraint(1), c.Constraint(2)
+			if c.Do() {
+				c.Ret, c.Err = MatchN(c, list, n, matchValue)
+			}
+		},
+	}, {
 		Name: "Avg",
 		Params: []pkg.Param{
 			{Kind: adt.ListKind},

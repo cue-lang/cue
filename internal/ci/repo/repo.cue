@@ -31,7 +31,7 @@ windowsMachine: "windows-2022"
 // Use the latest Go version for extra checks,
 // such as running tests with the data race detector.
 // This may be a release candidate if we are late into a Go release cycle.
-latestGo: "1.23.0-rc.2"
+latestGo: "1.23.x"
 
 // The list of all Go versions that we run our tests on.
 // This typically goes back one major Go version, as we support two at a time.
@@ -40,7 +40,7 @@ matrixGo: ["1.22.x", latestGo]
 // Use a specific latest version for release builds.
 // Note that we don't want ".x" for the sake of reproducibility,
 // so we instead pin a specific Go release.
-pinnedReleaseGo: "1.22.5"
+pinnedReleaseGo: "1.23.0"
 
 goreleaserVersion: "v2.0.1"
 

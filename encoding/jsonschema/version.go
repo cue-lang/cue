@@ -11,11 +11,11 @@ type schemaVersion int
 const (
 	versionUnknown schemaVersion = iota // unknown
 	versionDraft04                      // http://json-schema.org/draft-04/schema#
-	versionDraft05                      //	http://json-schema.org/draft-05/schema#
-	versionDraft06                      //	http://json-schema.org/draft-06/schema#
-	versionDraft07                      //	http://json-schema.org/draft-07/schema#
-	version2019_09                      // https://json-schema.org/draft/2019-09/schema
-	version2020_12                      // https://json-schema.org/draft/2020-12/schema
+	// Note: draft 05 never existed and should not be used.
+	versionDraft06 // http://json-schema.org/draft-06/schema#
+	versionDraft07 // http://json-schema.org/draft-07/schema#
+	version2019_09 // https://json-schema.org/draft/2019-09/schema
+	version2020_12 // https://json-schema.org/draft/2020-12/schema
 
 	numVersions // unknown
 )

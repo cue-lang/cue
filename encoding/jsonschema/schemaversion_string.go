@@ -10,17 +10,16 @@ func _() {
 	var x [1]struct{}
 	_ = x[versionUnknown-0]
 	_ = x[versionDraft04-1]
-	_ = x[versionDraft05-2]
-	_ = x[versionDraft06-3]
-	_ = x[versionDraft07-4]
-	_ = x[version2019_09-5]
-	_ = x[version2020_12-6]
-	_ = x[numVersions-7]
+	_ = x[versionDraft06-2]
+	_ = x[versionDraft07-3]
+	_ = x[version2019_09-4]
+	_ = x[version2020_12-5]
+	_ = x[numVersions-6]
 }
 
-const _schemaVersion_name = "unknownhttp://json-schema.org/draft-04/schema#http://json-schema.org/draft-05/schema#http://json-schema.org/draft-06/schema#http://json-schema.org/draft-07/schema#https://json-schema.org/draft/2019-09/schemahttps://json-schema.org/draft/2020-12/schemaunknown"
+const _schemaVersion_name = "unknownhttp://json-schema.org/draft-04/schema#http://json-schema.org/draft-06/schema#http://json-schema.org/draft-07/schema#https://json-schema.org/draft/2019-09/schemahttps://json-schema.org/draft/2020-12/schemaunknown"
 
-var _schemaVersion_index = [...]uint16{0, 7, 46, 85, 124, 163, 207, 251, 258}
+var _schemaVersion_index = [...]uint8{0, 7, 46, 85, 124, 168, 212, 219}
 
 func (i schemaVersion) String() string {
 	if i < 0 || i >= schemaVersion(len(_schemaVersion_index)-1) {

@@ -54,6 +54,16 @@ func (c *CallCtxt) Schema(i int) Schema {
 	return value.Make(c.ctx, c.args[i])
 }
 
+// IsValidator return true if the current call is a validator.
+func (c *CallCtxt) IsValidator() bool {
+	return c.ctx.IsValidator
+}
+
+// ConstInt64 returns a constant cue.Value from go int64
+func (c *CallCtxt) ConstInt64(n int64) cue.Value {
+	return value.Make(c.ctx, c.ctx.NewInt64(n))
+}
+
 // Value returns a finalized cue.Value for the ith argument.
 func (c *CallCtxt) Value(i int) cue.Value {
 	v := value.Make(c.ctx, c.args[i])

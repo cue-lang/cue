@@ -66,13 +66,13 @@ func (b *buildPlan) parsePlacementFlags() error {
 		if b.useContext {
 			return fmt.Errorf(
 				"flag %q must be used with at least one of flag %q, %q, or %q",
-				flagWithContext, flagPath, flagList, flagFiles,
+				flagWithContext, flagMerge, flagList, flagFiles,
 			)
 		}
 	} else if b.schema != nil {
 		return fmt.Errorf(
 			"cannot combine --%s flag with flag %q, %q, or %q",
-			flagSchema, flagPath, flagList, flagFiles,
+			flagSchema, flagMerge, flagList, flagFiles,
 		)
 	}
 	return nil
@@ -129,7 +129,7 @@ func (b *buildPlan) placeOrphans(i *build.Instance, a []*decoderInfo) error {
 		if b.importing && len(objs) > 1 && len(b.path) == 0 && !b.useList {
 			return fmt.Errorf(
 				"%s, %s, or %s flag needed to handle multiple objects in file %s",
-				flagPath, flagList, flagFiles, shortFile(i.Root, di.file))
+				flagMerge, flagList, flagFiles, shortFile(i.Root, di.file))
 		}
 
 		if !b.useList && len(b.path) == 0 && !b.useContext {

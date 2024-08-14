@@ -1,0 +1,58 @@
+-- in.cue --
+import "list"
+
+t1: {
+	[=~"^l"]: [1, 2, 3, "str", [1], { foo: 1 }]
+
+	l1: list.MatchN(1, string)
+	l2: list.MatchN(3, number)
+	l3: list.MatchN(>=1, number)
+	l4: list.MatchN(1, [int])
+	l5: list.MatchN(1, {foo: int})
+	l6: list.MatchN(1, 1)
+	l7: list.MatchN(1, "str")
+	l8: list.MatchN(>0, "str")
+	l9: list.MatchN(1, {foo: 1})
+	l10: list.MatchN(0, #TOO)
+	l11: list.MatchN(0, [string])
+}
+#TOO: {too: int}
+-- out/list --
+t1: {
+	l1: [1, 2, 3, "str", [1], {
+		foo: 1
+	}]
+	l2: [1, 2, 3, "str", [1], {
+		foo: 1
+	}]
+	l3: [1, 2, 3, "str", [1], {
+		foo: 1
+	}]
+	l4: [1, 2, 3, "str", [1], {
+		foo: 1
+	}]
+	l5: [1, 2, 3, "str", [1], {
+		foo: 1
+	}]
+	l6: [1, 2, 3, "str", [1], {
+		foo: 1
+	}]
+	l7: [1, 2, 3, "str", [1], {
+		foo: 1
+	}]
+	l8: [1, 2, 3, "str", [1], {
+		foo: 1
+	}]
+	l9: [1, 2, 3, "str", [1], {
+		foo: 1
+	}]
+	l10: [1, 2, 3, "str", [1], {
+		foo: 1
+	}]
+	l11: [1, 2, 3, "str", [1], {
+		foo: 1
+	}]
+}
+#TOO: {
+	too: int
+}

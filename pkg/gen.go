@@ -315,10 +315,18 @@ func (g *generator) genFunc(fn *types.Func) {
 
 	fmt.Fprintf(g.w, "Name: %q,\n", fn.Name())
 
+	var passCallCtx bool
 	args := []string{}
 	vals := []string{}
 	kind := []string{}
-	for i := 0; i < params.Len(); i++ {
+
+	var i int
+	// Allow a *pkg.CallCtxt value as the first parameter.
+	if params.Len() > 1 && g.goKind(params.At(0).Type()) == "cuelang.org/go/internal/pkg.CallCtxt" {
+		passCallCtx = true
+		i++
+	}
+	for ; i < params.Len(); i++ {
 		param := params.At(i)
 		typ := strings.Title(g.goKind(param.Type()))
 		argKind := g.goToCUE(param.Type())
@@ -350,6 +358,10 @@ func (g *generator) genFunc(fn *types.Func) {
 	}
 	fmt.Fprintln(g.w, "if c.Do() {")
 	defer fmt.Fprintln(g.w, "}")
+
+	if passCallCtx {
+		argList = strings.Join([]string{"c", argList}, ", ")
+	}
 	if results.Len() == 1 {
 		fmt.Fprintf(g.w, "c.Ret = %s(%s)", fn.Name(), argList)
 	} else {
@@ -374,6 +386,8 @@ func (g *generator) goKind(typ types.Type) string {
 		return "error"
 	case "github.com/cockroachdb/apd/v3.Decimal":
 		return "decimal"
+	case "cuelang.org/go/internal/pkg.Constraint":
+		return "constraint"
 	case "cuelang.org/go/internal/pkg.List":
 		return "cueList"
 	case "cuelang.org/go/internal/pkg.Struct":

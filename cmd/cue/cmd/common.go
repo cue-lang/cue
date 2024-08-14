@@ -142,12 +142,18 @@ func (b *buildPlan) instances() iterator {
 			e:    err,
 			i:    -1,
 		}
-	default:
+	case b.instance != nil:
 		i = &instanceIterator{
 			a: []*instance{b.instance},
 			i: -1,
 		}
 		b.instance = nil
+	default:
+		// No instances; return an iterator with zero values.
+		// This can happen when the input is an empty jsonl file, for example.
+		// Zero iteration may not make much sense in some scenarios like export,
+		// but an empty jsonl file is valid, so doing nothing seems reasonable.
+		i = &instanceIterator{}
 	}
 	if len(b.expressions) > 0 {
 		return &expressionIter{

@@ -1,6 +1,7 @@
 # Test that the various encodings cope with empty files correctly.
-
-# TODO(mvdan): fix the panics below; see https://cuelang.org/issue/1790 and https://cuelang.org/issue/2714.
+# Note that empty files or inputs have different meanings per encoding.
+# For example, in CUE and TOML they mean an empty struct or object,
+# in JSON they are invalid, and in JSONL they are a stream of zero values.
 
 # TODO(mvdan): cover more encodings: jsonschema, openapi, textproto, proto.
 
@@ -12,8 +13,8 @@ exec cue export cue: empty
 cmp stdout as-cue.stdout
 ! exec cue export json: empty
 stderr 'unexpected end of JSON input'
-! exec cue export jsonl: empty
-stderr '^panic: '
+exec cue export jsonl: empty
+cmp stdout as-jsonl.stdout
 exec cue export yaml: empty
 cmp stdout as-yaml.stdout
 exec cue export toml: empty
@@ -25,8 +26,8 @@ exec cue export cue: newlines
 cmp stdout as-cue.stdout
 ! exec cue export json: newlines
 stderr 'unexpected end of JSON input'
-! exec cue export jsonl: newlines
-stderr '^panic: '
+exec cue export jsonl: newlines
+cmp stdout as-jsonl.stdout
 exec cue export yaml: newlines
 cmp stdout as-yaml.stdout
 exec cue export toml: newlines
@@ -48,6 +49,7 @@ cmp stdout as-toml.stdout
 
 -- as-cue.stdout --
 {}
+-- as-jsonl.stdout --
 -- as-yaml.stdout --
 null
 -- as-toml.stdout --

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad95d3a9_d86283df",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-14T10:08:57Z",
+      "side": 1,
+      "message": "Okay for now, but see Daniel\u0027s comments. Would be good to get a better understanding of this.",
+      "revId": "ee85bb9330f96a27f1e0ac96ae80fcecf61cc5b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

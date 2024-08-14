@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db81f303_5df492ae",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-08-14T14:23:25Z",
+      "side": 1,
+      "message": "PTAL. I\u0027m pretty sure I\u0027m correct to fix the `cue help flags` text, but I only updated `common.go` because it /appeared/ to make the same mistake as the help text - I haven\u0027t reviewed the code around the comment to make sure that the new comment definitely applies.",
+      "revId": "18d2e4e5bdf3d3dfc756321366a1844094d863cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

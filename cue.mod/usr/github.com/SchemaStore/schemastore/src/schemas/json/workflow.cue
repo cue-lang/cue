@@ -1,6 +1,6 @@
 package json
 
-#job:  ((#Workflow & {}).jobs & {x: _}).x
+#job:  ((#Workflow & {jobs: _}).jobs & {x: _}).x
 #step: ((#job & {steps: _}).steps & [_])[0]
 
 // CUE does not properly encode a JSON Schema oneOf; see

@@ -18,31 +18,37 @@ import "strings"
 	// files, tags, or branch changes. For a list of available
 	// events, see
 	// https://help.github.com/en/github/automating-your-workflow-with-github-actions/events-that-trigger-workflows.
-	on: #event | [...#event] & [_, ...] | {
+	on!: #event | [...#event] & [_, ...] | {
 		// Runs your workflow anytime the branch_protection_rule event
 		// occurs. More than one activity type triggers this event.
-		branch_protection_rule?: #eventObject & {
-			types?: #types & [..."created" | "edited" | "deleted"] | *["created", "edited", "deleted"]
+		branch_protection_rule?: #eventObject & (null | bool | number | string | [...] | {
+			types?: #types & (null | bool | number | string | [..."created" | "edited" | "deleted"] | {
+				...
+			}) | *["created", "edited", "deleted"]
 			...
-		}
+		})
 
 		// Runs your workflow anytime the check_run event occurs. More
 		// than one activity type triggers this event. For information
 		// about the REST API, see
 		// https://developer.github.com/v3/checks/runs.
-		check_run?: #eventObject & {
-			types?: #types & [..."created" | "rerequested" | "completed" | "requested_action"] | *["created", "rerequested", "completed", "requested_action"]
+		check_run?: #eventObject & (null | bool | number | string | [...] | {
+			types?: #types & (null | bool | number | string | [..."created" | "rerequested" | "completed" | "requested_action"] | {
+				...
+			}) | *["created", "rerequested", "completed", "requested_action"]
 			...
-		}
+		})
 
 		// Runs your workflow anytime the check_suite event occurs. More
 		// than one activity type triggers this event. For information
 		// about the REST API, see
 		// https://developer.github.com/v3/checks/suites/.
-		check_suite?: #eventObject & {
-			types?: #types & [..."completed" | "requested" | "rerequested"] | *["completed", "requested", "rerequested"]
+		check_suite?: #eventObject & (null | bool | number | string | [...] | {
+			types?: #types & (null | bool | number | string | [..."completed" | "requested" | "rerequested"] | {
+				...
+			}) | *["completed", "requested", "rerequested"]
 			...
-		}
+		})
 
 		// Runs your workflow anytime someone creates a branch or tag,
 		// which triggers the create event. For information about the
@@ -74,19 +80,23 @@ import "strings"
 		// than one activity type triggers this event. For information
 		// about the GraphQL API, see
 		// https://docs.github.com/en/graphql/guides/using-the-graphql-api-for-discussions
-		discussion?: #eventObject & {
-			types?: #types & [..."created" | "edited" | "deleted" | "transferred" | "pinned" | "unpinned" | "labeled" | "unlabeled" | "locked" | "unlocked" | "category_changed" | "answered" | "unanswered"] | *["created", "edited", "deleted", "transferred", "pinned", "unpinned", "labeled", "unlabeled", "locked", "unlocked", "category_changed", "answered", "unanswered"]
+		discussion?: #eventObject & (null | bool | number | string | [...] | {
+			types?: #types & (null | bool | number | string | [..."created" | "edited" | "deleted" | "transferred" | "pinned" | "unpinned" | "labeled" | "unlabeled" | "locked" | "unlocked" | "category_changed" | "answered" | "unanswered"] | {
+				...
+			}) | *["created", "edited", "deleted", "transferred", "pinned", "unpinned", "labeled", "unlabeled", "locked", "unlocked", "category_changed", "answered", "unanswered"]
 			...
-		}
+		})
 
 		// Runs your workflow anytime the discussion_comment event occurs.
 		// More than one activity type triggers this event. For
 		// information about the GraphQL API, see
 		// https://docs.github.com/en/graphql/guides/using-the-graphql-api-for-discussions
-		discussion_comment?: #eventObject & {
-			types?: #types & [..."created" | "edited" | "deleted"] | *["created", "edited", "deleted"]
+		discussion_comment?: #eventObject & (null | bool | number | string | [...] | {
+			types?: #types & (null | bool | number | string | [..."created" | "edited" | "deleted"] | {
+				...
+			}) | *["created", "edited", "deleted"]
 			...
-		}
+		})
 
 		// Runs your workflow anytime when someone forks a repository,
 		// which triggers the fork event. For information about the REST
@@ -102,46 +112,56 @@ import "strings"
 		// than one activity type triggers this event. For information
 		// about the REST API, see
 		// https://developer.github.com/v3/issues/comments/.
-		issue_comment?: #eventObject & {
-			types?: #types & [..."created" | "edited" | "deleted"] | *["created", "edited", "deleted"]
+		issue_comment?: #eventObject & (null | bool | number | string | [...] | {
+			types?: #types & (null | bool | number | string | [..."created" | "edited" | "deleted"] | {
+				...
+			}) | *["created", "edited", "deleted"]
 			...
-		}
+		})
 
 		// Runs your workflow anytime the issues event occurs. More than
 		// one activity type triggers this event. For information about
 		// the REST API, see https://developer.github.com/v3/issues.
-		issues?: #eventObject & {
-			types?: #types & [..."opened" | "edited" | "deleted" | "transferred" | "pinned" | "unpinned" | "closed" | "reopened" | "assigned" | "unassigned" | "labeled" | "unlabeled" | "locked" | "unlocked" | "milestoned" | "demilestoned"] | *["opened", "edited", "deleted", "transferred", "pinned", "unpinned", "closed", "reopened", "assigned", "unassigned", "labeled", "unlabeled", "locked", "unlocked", "milestoned", "demilestoned"]
+		issues?: #eventObject & (null | bool | number | string | [...] | {
+			types?: #types & (null | bool | number | string | [..."opened" | "edited" | "deleted" | "transferred" | "pinned" | "unpinned" | "closed" | "reopened" | "assigned" | "unassigned" | "labeled" | "unlabeled" | "locked" | "unlocked" | "milestoned" | "demilestoned"] | {
+				...
+			}) | *["opened", "edited", "deleted", "transferred", "pinned", "unpinned", "closed", "reopened", "assigned", "unassigned", "labeled", "unlabeled", "locked", "unlocked", "milestoned", "demilestoned"]
 			...
-		}
+		})
 
 		// Runs your workflow anytime the label event occurs. More than
 		// one activity type triggers this event. For information about
 		// the REST API, see
 		// https://developer.github.com/v3/issues/labels/.
-		label?: #eventObject & {
-			types?: #types & [..."created" | "edited" | "deleted"] | *["created", "edited", "deleted"]
+		label?: #eventObject & (null | bool | number | string | [...] | {
+			types?: #types & (null | bool | number | string | [..."created" | "edited" | "deleted"] | {
+				...
+			}) | *["created", "edited", "deleted"]
 			...
-		}
+		})
 
 		// Runs your workflow when a pull request is added to a merge
 		// queue, which adds the pull request to a merge group. For
 		// information about the merge queue, see
 		// https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/merging-a-pull-request-with-a-merge-queue
 		// .
-		merge_group?: #eventObject & {
-			types?: #types & [..."checks_requested"] | *["checks_requested"]
+		merge_group?: #eventObject & (null | bool | number | string | [...] | {
+			types?: #types & (null | bool | number | string | [..."checks_requested"] | {
+				...
+			}) | *["checks_requested"]
 			...
-		}
+		})
 
 		// Runs your workflow anytime the milestone event occurs. More
 		// than one activity type triggers this event. For information
 		// about the REST API, see
 		// https://developer.github.com/v3/issues/milestones/.
-		milestone?: #eventObject & {
-			types?: #types & [..."created" | "closed" | "opened" | "edited" | "deleted"] | *["created", "closed", "opened", "edited", "deleted"]
+		milestone?: #eventObject & (null | bool | number | string | [...] | {
+			types?: #types & (null | bool | number | string | [..."created" | "closed" | "opened" | "edited" | "deleted"] | {
+				...
+			}) | *["created", "closed", "opened", "edited", "deleted"]
 			...
-		}
+		})
 
 		// Runs your workflow anytime someone pushes to a GitHub
 		// Pages-enabled branch, which triggers the page_build event. For
@@ -152,28 +172,34 @@ import "strings"
 		// Runs your workflow anytime the project event occurs. More than
 		// one activity type triggers this event. For information about
 		// the REST API, see https://developer.github.com/v3/projects/.
-		project?: #eventObject & {
-			types?: #types & [..."created" | "updated" | "closed" | "reopened" | "edited" | "deleted"] | *["created", "updated", "closed", "reopened", "edited", "deleted"]
+		project?: #eventObject & (null | bool | number | string | [...] | {
+			types?: #types & (null | bool | number | string | [..."created" | "updated" | "closed" | "reopened" | "edited" | "deleted"] | {
+				...
+			}) | *["created", "updated", "closed", "reopened", "edited", "deleted"]
 			...
-		}
+		})
 
 		// Runs your workflow anytime the project_card event occurs. More
 		// than one activity type triggers this event. For information
 		// about the REST API, see
 		// https://developer.github.com/v3/projects/cards.
-		project_card?: #eventObject & {
-			types?: #types & [..."created" | "moved" | "converted" | "edited" | "deleted"] | *["created", "moved", "converted", "edited", "deleted"]
+		project_card?: #eventObject & (null | bool | number | string | [...] | {
+			types?: #types & (null | bool | number | string | [..."created" | "moved" | "converted" | "edited" | "deleted"] | {
+				...
+			}) | *["created", "moved", "converted", "edited", "deleted"]
 			...
-		}
+		})
 
 		// Runs your workflow anytime the project_column event occurs.
 		// More than one activity type triggers this event. For
 		// information about the REST API, see
 		// https://developer.github.com/v3/projects/columns.
-		project_column?: #eventObject & {
-			types?: #types & [..."created" | "updated" | "moved" | "deleted"] | *["created", "updated", "moved", "deleted"]
+		project_column?: #eventObject & (null | bool | number | string | [...] | {
+			types?: #types & (null | bool | number | string | [..."created" | "updated" | "moved" | "deleted"] | {
+				...
+			}) | *["created", "updated", "moved", "deleted"]
 			...
-		}
+		})
 
 		// Runs your workflow anytime someone makes a private repository
 		// public, which triggers the public event. For information about
@@ -195,11 +221,13 @@ import "strings"
 		// The permissions for the GITHUB_TOKEN in forked repositories is
 		// read-only. For more information about the GITHUB_TOKEN, see
 		// https://help.github.com/en/articles/virtual-environments-for-github-actions.
-		pull_request?: #ref & {
-			types?: #types & [..."assigned" | "unassigned" | "labeled" | "unlabeled" | "opened" | "edited" | "closed" | "reopened" | "synchronize" | "converted_to_draft" | "ready_for_review" | "locked" | "unlocked" | "milestoned" | "demilestoned" | "review_requested" | "review_request_removed" | "auto_merge_enabled" | "auto_merge_disabled"] | *["opened", "synchronize", "reopened"]
+		pull_request?: #ref & (null | bool | number | string | [...] | {
+			types?: #types & (null | bool | number | string | [..."assigned" | "unassigned" | "labeled" | "unlabeled" | "opened" | "edited" | "closed" | "reopened" | "synchronize" | "converted_to_draft" | "ready_for_review" | "locked" | "unlocked" | "milestoned" | "demilestoned" | "review_requested" | "review_request_removed" | "auto_merge_enabled" | "auto_merge_disabled"] | {
+				...
+			}) | *["opened", "synchronize", "reopened"]
 
 			{[=~"^(branche|tag|path)s(-ignore)?$" & !~"^(types)$"]: [...]}
-		}
+		})
 
 		// Runs your workflow anytime the pull_request_review event
 		// occurs. More than one activity type triggers this event. For
@@ -217,10 +245,12 @@ import "strings"
 		// The permissions for the GITHUB_TOKEN in forked repositories is
 		// read-only. For more information about the GITHUB_TOKEN, see
 		// https://help.github.com/en/articles/virtual-environments-for-github-actions.
-		pull_request_review?: #eventObject & {
-			types?: #types & [..."submitted" | "edited" | "dismissed"] | *["submitted", "edited", "dismissed"]
+		pull_request_review?: #eventObject & (null | bool | number | string | [...] | {
+			types?: #types & (null | bool | number | string | [..."submitted" | "edited" | "dismissed"] | {
+				...
+			}) | *["submitted", "edited", "dismissed"]
 			...
-		}
+		})
 
 		// Runs your workflow anytime a comment on a pull request's
 		// unified diff is modified, which triggers the
@@ -239,10 +269,12 @@ import "strings"
 		// The permissions for the GITHUB_TOKEN in forked repositories is
 		// read-only. For more information about the GITHUB_TOKEN, see
 		// https://help.github.com/en/articles/virtual-environments-for-github-actions.
-		pull_request_review_comment?: #eventObject & {
-			types?: #types & [..."created" | "edited" | "deleted"] | *["created", "edited", "deleted"]
+		pull_request_review_comment?: #eventObject & (null | bool | number | string | [...] | {
+			types?: #types & (null | bool | number | string | [..."created" | "edited" | "deleted"] | {
+				...
+			}) | *["created", "edited", "deleted"]
 			...
-		}
+		})
 
 		// This event is similar to pull_request, except that it runs in
 		// the context of the base repository of the pull request, rather
@@ -252,11 +284,13 @@ import "strings"
 		// the base repository are run. For example, this event allows
 		// you to create workflows that label and comment on pull
 		// requests, based on the contents of the event payload.
-		pull_request_target?: #ref & {
-			types?: #types & [..."assigned" | "unassigned" | "labeled" | "unlabeled" | "opened" | "edited" | "closed" | "reopened" | "synchronize" | "converted_to_draft" | "ready_for_review" | "locked" | "unlocked" | "review_requested" | "review_request_removed" | "auto_merge_enabled" | "auto_merge_disabled"] | *["opened", "synchronize", "reopened"]
+		pull_request_target?: #ref & (null | bool | number | string | [...] | {
+			types?: #types & (null | bool | number | string | [..."assigned" | "unassigned" | "labeled" | "unlabeled" | "opened" | "edited" | "closed" | "reopened" | "synchronize" | "converted_to_draft" | "ready_for_review" | "locked" | "unlocked" | "review_requested" | "review_request_removed" | "auto_merge_enabled" | "auto_merge_disabled"] | {
+				...
+			}) | *["opened", "synchronize", "reopened"]
 
 			{[=~"^(branche|tag|path)s(-ignore)?$" & !~"^(types)$"]: _}
-		}
+		})
 
 		// Runs your workflow when someone pushes to a repository branch,
 		// which triggers the push event.
@@ -265,27 +299,31 @@ import "strings"
 		// commit object. You can retrieve the full commit object using
 		// the REST API. For more information, see
 		// https://developer.github.com/v3/repos/commits/#get-a-single-commit.
-		push?: #ref & {
+		push?: #ref & (null | bool | number | string | [...] | {
 			{[=~"^(branche|tag|path)s(-ignore)?$" & !~"^()$"]: [...string]}
-		}
+		})
 
 		// Runs your workflow anytime a package is published or updated.
 		// For more information, see
 		// https://help.github.com/en/github/managing-packages-with-github-packages.
-		registry_package?: #eventObject & {
-			types?: #types & [..."published" | "updated"] | *["published", "updated"]
+		registry_package?: #eventObject & (null | bool | number | string | [...] | {
+			types?: #types & (null | bool | number | string | [..."published" | "updated"] | {
+				...
+			}) | *["published", "updated"]
 			...
-		}
+		})
 
 		// Runs your workflow anytime the release event occurs. More than
 		// one activity type triggers this event. For information about
 		// the REST API, see
 		// https://developer.github.com/v3/repos/releases/ in the GitHub
 		// Developer documentation.
-		release?: #eventObject & {
-			types?: #types & [..."published" | "unpublished" | "created" | "edited" | "deleted" | "prereleased" | "released"] | *["published", "unpublished", "created", "edited", "deleted", "prereleased", "released"]
+		release?: #eventObject & (null | bool | number | string | [...] | {
+			types?: #types & (null | bool | number | string | [..."published" | "unpublished" | "created" | "edited" | "deleted" | "prereleased" | "released"] | {
+				...
+			}) | *["published", "unpublished", "created", "edited", "deleted", "prereleased", "released"]
 			...
-		}
+		})
 
 		// Runs your workflow anytime the status of a Git commit changes,
 		// which triggers the status event. For information about the
@@ -319,7 +357,7 @@ import "strings"
 					// The value of this parameter is a string specifying the data
 					// type of the input. This must be one of: boolean, number, or
 					// string.
-					type: "boolean" | "number" | "string"
+					type!: "boolean" | "number" | "string"
 
 					// The default value is used when an input parameter isn't
 					// specified in a workflow file.
@@ -332,11 +370,11 @@ import "strings"
 			// refer to a secret.
 			secrets?: null | bool | number | string | [...] | {
 				{[=~"^[_a-zA-Z][a-zA-Z0-9_-]*$" & !~"^()$"]: null | bool | number | string | [...] | {
-										// A string description of the secret parameter.
-										description?: string
+					// A string description of the secret parameter.
+					description?: string
 
 					// A boolean specifying whether the secret must be supplied.
-					required: bool
+					required!: bool
 				}}
 			}
 			...
@@ -355,7 +393,7 @@ import "strings"
 			inputs?: {
 				{[=~"^[_a-zA-Z][a-zA-Z0-9_-]*$" & !~"^()$"]: {
 					// A string description of the input parameter.
-					description: string
+					description!: string
 
 					// A string shown to users using the deprecated input.
 					deprecationMessage?: string
@@ -385,13 +423,15 @@ import "strings"
 		// pull_request workflow generates build artifacts, you can
 		// create a new workflow that uses workflow_run to analyze the
 		// results and add a comment to the original pull request.
-		workflow_run?: #eventObject & {
-			types?:     #types & [..."requested" | "completed" | "in_progress"] | *["requested", "completed"]
+		workflow_run?: #eventObject & (null | bool | number | string | [...] | {
+			types?: #types & (null | bool | number | string | [..."requested" | "completed" | "in_progress"] | {
+				...
+			}) | *["requested", "completed"]
 			workflows?: [...string] & [_, ...]
 
 			{[=~"^branches(-ignore)?$" & !~"^(types|workflows)$"]: _}
 			...
-		}
+		})
 
 		// You can use the GitHub API to trigger a webhook event called
 		// repository_dispatch when you want to trigger a workflow for
@@ -453,7 +493,7 @@ import "strings"
 	// You can run an unlimited number of jobs as long as you are
 	// within the workflow usage limits. For more information, see
 	// https://help.github.com/en/github/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions#usage-limits.
-	jobs: {
+	jobs!: {
 		{[=~"^[_a-zA-Z][a-zA-Z0-9_-]*$" & !~"^()$"]: #normalJob | #reusableWorkflowCallJob}
 	}
 
@@ -473,7 +513,7 @@ import "strings"
 		// in progress, the queued job or workflow will be pending. Any
 		// previously pending job or workflow in the concurrency group
 		// will be canceled.
-		group: string
+		group!: string
 
 		// To cancel any currently running job or workflow in the same
 		// concurrency group, specify cancel-in-progress: true.
@@ -487,7 +527,7 @@ import "strings"
 	#container: {
 		// The Docker image to use as the container to run the action. The
 		// value can be the Docker Hub image name or a registry name.
-		image: string
+		image!: string
 
 		// If the image's container registry requires authentication to
 		// pull the image, you can use credentials to set a map of the
@@ -554,7 +594,7 @@ import "strings"
 
 	#environment: {
 		// The name of the environment configured in the repo.
-		name: string
+		name!: string
 
 		// A deployment URL
 		url?: string
@@ -563,7 +603,7 @@ import "strings"
 	#event: "branch_protection_rule" | "check_run" | "check_suite" | "create" | "delete" | "deployment" | "deployment_status" | "discussion" | "discussion_comment" | "fork" | "gollum" | "issue_comment" | "issues" | "label" | "merge_group" | "milestone" | "page_build" | "project" | "project_card" | "project_column" | "public" | "pull_request" | "pull_request_review" | "pull_request_review_comment" | "pull_request_target" | "push" | "registry_package" | "release" | "status" | "watch" | "workflow_call" | "workflow_dispatch" | "workflow_run" | "repository_dispatch"
 
 	#eventObject: null | {
-			...
+		...
 	}
 
 	#expressionSyntax: =~"""
@@ -594,7 +634,7 @@ import "strings"
 		...
 	}
 
-	#shell: (string | ("bash" | "pwsh" | "python" | "sh" | "cmd" | "powershell")) & string
+	#shell: string | ("bash" | "pwsh" | "python" | "sh" | "cmd" | "powershell")
 
 	#types: [_, ...]
 
@@ -604,7 +644,7 @@ import "strings"
 
 	#matrix: {
 		{[=~"^(in|ex)clude$" & !~"^()$"]: #expressionSyntax | [...{
-							[string]: #configuration
+			[string]: #configuration
 		}] & [_, ...]}
 		{[!~"^(in|ex)clude$" & !~"^()$"]: [...#configuration] & [_, ...] | #expressionSyntax}
 	} | #expressionSyntax
@@ -628,7 +668,7 @@ import "strings"
 		// '{owner}/{repo}/{path}/{filename}@{ref}'. {ref} can be a SHA,
 		// a release tag, or a branch name. Using the commit SHA is the
 		// safest for stability and security.
-		uses: =~"^(.+/)+(.+)\\.(ya?ml)(@.+)?$"
+		uses!: =~"^(.+/)+(.+)\\.(ya?ml)(@.+)?$"
 
 		// A map of inputs that are passed to the called workflow. Any
 		// inputs that you pass must match the input specifications
@@ -648,7 +688,7 @@ import "strings"
 		// A strategy creates a build matrix for your jobs. You can define
 		// different variations of an environment to run each job in.
 		strategy?: {
-			matrix: #matrix
+			matrix!: #matrix
 
 			// When set to true, GitHub cancels all in-progress jobs if any
 			// matrix job fails. Default: true
@@ -684,11 +724,11 @@ import "strings"
 
 		// The type of machine to run the job on. The machine can be
 		// either a GitHub-hosted runner, or a self-hosted runner.
-		"runs-on": (string | [string] & [_, ...] & [...] | {
-			group?:  string
+		"runs-on"!: string | [string] & [_, ...] | {
+			group?: string
 			labels?: string | [...string]
 			...
-		} | #stringContainingExpressionSyntax | #expressionSyntax) & _
+		} | #stringContainingExpressionSyntax | #expressionSyntax
 
 		// The environment that the job references.
 		environment?: string | #environment
@@ -726,10 +766,10 @@ import "strings"
 		// provides built-in steps to set up and complete a job.
 		// Must contain either `uses` or `run`
 		steps?: [...({
-			uses: string
+			uses!: string
 			...
 		} | {
-			run: string
+			run!: string
 			...
 		}) & {
 			// A unique identifier for the step. You can use the id to
@@ -794,11 +834,11 @@ import "strings"
 			// parameter is a key/value pair. Input parameters are set as
 			// environment variables. The variable is prefixed with INPUT_
 			// and converted to upper case.
-			with?: #env & {
+			with?: #env & (null | bool | number | string | [...] | {
 				args?:       string
 				entrypoint?: string
 				...
-			}
+			})
 
 			// Sets environment variables for steps to use in the virtual
 			// environment. You can also set environment variables for the
@@ -821,7 +861,7 @@ import "strings"
 		// A strategy creates a build matrix for your jobs. You can define
 		// different variations of an environment to run each job in.
 		strategy?: {
-			matrix: #matrix
+			matrix!: #matrix
 
 			// When set to true, GitHub cancels all in-progress jobs if any
 			// matrix job fails. Default: true

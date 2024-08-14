@@ -94,12 +94,7 @@ func (c *askCmd) Run(ctx *task.Context) (res interface{}, err error) {
 
 	switch v := ctx.Lookup("response"); v.IncompleteKind() {
 	case cue.BoolKind:
-		switch strings.ToLower(response) {
-		case "yes":
-			update["response"] = true
-		default:
-			update["response"] = false
-		}
+		update["response"] = strings.ToLower(response) == "yes"
 	case cue.StringKind:
 		// already set above
 	}

@@ -103,7 +103,7 @@ Pattern:
 		// Before returning false with no error,
 		// check that the remainder of the pattern is syntactically valid.
 		for len(pattern) > 0 {
-			_, chunk, pattern, err = scanChunk(pattern, os)
+			_, _, pattern, err = scanChunk(pattern, os)
 			if err != nil {
 				return false, err
 			}

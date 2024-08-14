@@ -33,6 +33,23 @@
       "message": "Nice find! I actually tripped over this a few days ago as I was writing a `cue import` testscript. I just assumed I was misunderstanding the help text.",
       "revId": "18d2e4e5bdf3d3dfc756321366a1844094d863cc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e98137a_fc650422",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-14T14:43:47Z",
+      "side": 1,
+      "message": "Note that there are some errors in orphans.go which mention flagPath. I suspect at least one of them is wrong too?",
+      "revId": "18d2e4e5bdf3d3dfc756321366a1844094d863cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

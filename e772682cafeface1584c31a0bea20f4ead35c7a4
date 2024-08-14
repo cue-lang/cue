@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0913f1b_37e3386f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-14T13:46:09Z",
+      "side": 1,
+      "message": "just one more nit: perhaps consider e.g. constraint_string.go rather than constraints_string.go, as we tend to use the singular form, and the func names are singular too. but not important either way.",
+      "revId": "e772682cafeface1584c31a0bea20f4ead35c7a4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

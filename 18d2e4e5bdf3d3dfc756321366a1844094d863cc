@@ -50,6 +50,24 @@
       "message": "Note that there are some errors in orphans.go which mention flagPath. I suspect at least one of them is wrong too?",
       "revId": "18d2e4e5bdf3d3dfc756321366a1844094d863cc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc5d79f6_8f1b4377",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-08-14T15:31:10Z",
+      "side": 1,
+      "message": "I\u0027ve changed 3 of the 4 mentions of `flagPath` in `orphans.go`. Please re-review, as I have no confidence that I understand the context in which they appeared, and have only updated them based on assumptions drawn from the immediate context of the rest of this change. I.e. \"those 3 flags should appear together, and if `path` is mentioned as well, then it\u0027s a mistake\".",
+      "parentUuid": "1e98137a_fc650422",
+      "revId": "18d2e4e5bdf3d3dfc756321366a1844094d863cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

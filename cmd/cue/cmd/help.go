@@ -483,12 +483,12 @@ Handling multiple documents or streams
 
 To handle multi-document files, such as JSON Lines or YAML
 files with document separators (---), the user must specify
-a the --path, --list, or --files flag.
-The --path flag merges each element into a single package as
+the --merge, --list, or --files flag.
+The --merge flag merges each element into a single package as
 if each element was defined in a separate file. The --list flag
 concatenates each entry in a file into a list.
-Using --list flag in combination with the --path flag
-concatenates entries with the same path into a list, instead of
+Using the --list flag in combination with the --merge flag
+concatenates entries with the same path into a list instead of
 unifying them.
 Finally, the --files option causes each entry to be written to
 a different file. The -files flag may only be used in

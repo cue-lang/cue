@@ -34,7 +34,7 @@ func TestMain(m *testing.M) {
 	cachedGobin := os.Getenv("CUE_CACHED_GOBIN")
 	if cachedGobin == "" {
 		// Install the cmd/cue version into a cached GOBIN so we can reuse it.
-		// TODO: use "go tool cue" once we can rely on Go 1.22's tool dependency tracking in go.mod.
+		// TODO: use "go tool cue" once we can rely on Go's tool dependency tracking in go.mod.
 		// See: https://go.dev/issue/48429
 		cacheDir, err := os.UserCacheDir()
 		if err != nil {

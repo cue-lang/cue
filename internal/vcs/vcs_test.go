@@ -138,6 +138,7 @@ func TestGit(t *testing.T) {
 	err = os.WriteFile(filepath.Join(dir, "bar.txt"), []byte("something else"), 0o666)
 	qt.Assert(t, qt.IsNil(err))
 	statuschanged, err := v.Status(ctx)
+	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.IsTrue(statuschanged.Uncommitted))
 	status1, err := v.Status(ctx, subdir)
 	qt.Assert(t, qt.IsNil(err))

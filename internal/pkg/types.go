@@ -15,8 +15,12 @@
 package pkg
 
 import (
+	"cuelang.org/go/cue"
 	"cuelang.org/go/internal/core/adt"
 )
+
+// Constraint is a cue.Value allowing incomplete value
+type Constraint cue.Value
 
 // List represents a CUE list, which can be open or closed.
 type List struct {

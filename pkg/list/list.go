@@ -284,3 +284,31 @@ func Contains(a []cue.Value, v cue.Value) bool {
 	}
 	return false
 }
+
+// MatchN is a validator that checks that the number of elements in the given
+// list that unifies with the constraint "matchValue" matches "n".
+// "n" may be a number constraint and does not have to be a concrete number.
+func MatchN(ctx *pkg.CallCtxt, list []cue.Value, n pkg.Constraint, matchValue pkg.Constraint) (bool, error) {
+	var nmatch int64
+
+	for _, w := range list {
+		if cue.Value(matchValue).Unify(w).Validate() != nil {
+			continue
+		}
+		nmatch++
+	}
+
+	if err := cue.Value(n).Unify(ctx.ConstInt64(nmatch)).Validate(); err != nil {
+		return false, pkg.ValidationError{B: &adt.Bottom{
+			Code: adt.EvalError,
+			Err: errors.Newf(
+				token.NoPos,
+				"number of matched elements is %d: does not satisfy %v",
+				nmatch,
+				cue.Value(n),
+			),
+		}}
+	}
+
+	return true, nil
+}

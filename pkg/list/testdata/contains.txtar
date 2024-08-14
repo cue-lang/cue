@@ -1,0 +1,40 @@
+// Issue #3367
+-- in.cue --
+import "list"
+
+t1: {
+	l: [1, 2, 3, "str", [1], { foo: 1 }]
+
+	l: list.Contains(string)
+	l: list.Contains(number)
+	l: list.Contains([int])
+	l: list.Contains({foo: int})
+	l: list.Contains(1)
+	l: list.Contains("str")
+	l: list.Contains({foo: 1})
+
+	lt: list.Contains(l, "str")
+	lt: list.Contains(l, 2)
+	lt: list.Contains(l, [1])
+	lt: list.Contains(l, {foo: 1})
+	lt: list.Contains(l, number)
+	lt: list.Contains(l, string)
+	lt: list.Contains(l, [int])
+	lt: list.Contains(l, [...])
+	lt: list.Contains(l, { foo: int })
+
+	lf: list.Contains(l, #TOO)
+	lf: list.Contains(l, [string])
+}
+#TOO: {too: int}
+-- out/list --
+t1: {
+	l: [1, 2, 3, "str", [1], {
+		foo: 1
+	}]
+	lt: true
+	lf: false
+}
+#TOO: {
+	too: int
+}

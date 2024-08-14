@@ -59,6 +59,11 @@ func (c *CallCtxt) Value(i int) cue.Value {
 	return v
 }
 
+func (c *CallCtxt) Constraint(i int) Constraint {
+	v := value.Make(c.ctx, c.args[i])
+	return Constraint(v)
+}
+
 func (c *CallCtxt) Struct(i int) Struct {
 	x := c.args[i]
 	switch v, ok := x.(*adt.Vertex); {

@@ -150,7 +150,7 @@ var p = &pkg.Package{
 		},
 		Result: adt.BoolKind,
 		Func: func(c *pkg.CallCtxt) {
-			a, v := c.List(0), c.Value(1)
+			a, v := c.List(0), c.Constraint(1)
 			if c.Do() {
 				c.Ret = Contains(a, v)
 			}

@@ -274,11 +274,23 @@ func UniqueItems(a []cue.Value) bool {
 	return true
 }
 
-// Contains reports whether v is contained in a. The value must be a
-// comparable value.
-func Contains(a []cue.Value, v cue.Value) bool {
+// Contains reports whether a contains any value satisfying c.
+func Contains(a []cue.Value, c pkg.Constraint) bool {
+	v := cue.Value(c)
+
+	cmp := func(w cue.Value) bool {
+		if err := v.Unify(w).Validate(); err != nil {
+			return false
+		}
+		return true
+	}
+	// use v.Equals for concrete scalar
+	if v.IsConcrete() && v.Kind() != cue.StructKind && v.Kind() != cue.ListKind {
+		cmp = v.Equals
+	}
+
 	for _, w := range a {
-		if v.Equals(w) {
+		if cmp(w) {
 			return true
 		}
 	}

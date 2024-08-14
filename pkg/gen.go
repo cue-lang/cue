@@ -374,6 +374,8 @@ func (g *generator) goKind(typ types.Type) string {
 		return "error"
 	case "github.com/cockroachdb/apd/v3.Decimal":
 		return "decimal"
+	case "cuelang.org/go/internal/pkg.Constraint":
+		return "constraint"
 	case "cuelang.org/go/internal/pkg.List":
 		return "cueList"
 	case "cuelang.org/go/internal/pkg.Struct":

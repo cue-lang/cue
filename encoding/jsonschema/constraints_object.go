@@ -69,6 +69,7 @@ func constraintMaxProperties(key string, n cue.Value, s *state) {
 	x := ast.NewCall(ast.NewSel(pkg, "MaxFields"), s.uint(n))
 	s.add(n, objectType, x)
 }
+
 func constraintPatternProperties(key string, n cue.Value, s *state) {
 	if n.Kind() != cue.StructKind {
 		s.errf(n, `value of "patternProperties" must be an object, found %v`, n.Kind())
@@ -125,7 +126,7 @@ func constraintProperties(key string, n cue.Value, s *state) {
 func constraintPropertyNames(key string, n cue.Value, s *state) {
 	// [=~pattern]: _
 	if names, _ := s.schemaState(n, cue.StringKind, nil, false); !isAny(names) {
-		x := ast.NewStruct(ast.NewList(names), ast.NewIdent("_"))
+		x := ast.NewStruct(ast.NewList(names), top())
 		s.add(n, objectType, x)
 	}
 }
@@ -159,7 +160,7 @@ func constraintRequired(key string, n cue.Value, s *state) {
 		if f == nil && ok {
 			f := &ast.Field{
 				Label:      ast.NewString(str),
-				Value:      ast.NewIdent("_"),
+				Value:      top(),
 				Constraint: token.NOT,
 			}
 			fields[str] = f

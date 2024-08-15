@@ -1,0 +1,12 @@
+-- type.json --
+{
+    "$defs": {
+        "foo": true
+    },
+    "$ref": "#/$defs/foo",
+    "type": "string"
+}
+-- out/decode/cue --
+#foo & string
+
+#foo: _

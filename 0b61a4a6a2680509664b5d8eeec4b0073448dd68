@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3c2ddad_e7e65ded",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2674,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-15T14:18:05Z",
+      "side": 1,
+      "message": "Changed to Rog\u0027s suggestion.",
+      "parentUuid": "ee10994d_205ea970",
+      "revId": "0b61a4a6a2680509664b5d8eeec4b0073448dd68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5738c4ed_dcf6c1d9",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec8c0afc_25a1d4e3",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2676,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-15T14:18:05Z",
+      "side": 1,
+      "message": "I wrote it like this to have an idiom where I can easily relate x to the output of a validator. But the changes you made to matchN read nice. So modified it as suggested.",
+      "parentUuid": "5738c4ed_dcf6c1d9",
+      "revId": "0b61a4a6a2680509664b5d8eeec4b0073448dd68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9efcf210_553f5b67",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-08-12T07:43:54Z",
       "side": 1,
       "message": "Spelling: impropor",
+      "revId": "0b61a4a6a2680509664b5d8eeec4b0073448dd68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1ec245b_af678535",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2682,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-15T14:18:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9efcf210_553f5b67",
       "revId": "0b61a4a6a2680509664b5d8eeec4b0073448dd68",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -82,6 +136,42 @@
       "writtenOn": "2024-08-12T09:41:59Z",
       "side": 1,
       "message": "As suggested above, I\u0027d suggest naming this a \"validator\" rather than a \"validator function\".\n\nSomething like this, perhaps?\n\n\u003e The builtin validator function `matchN(count, list)` returns\n\u003e a validator that checks that for a given value `x`, the\n\u003e number of CUE values in the given `list` that unify with `x`\n\u003e unifies with `count`.",
+      "revId": "0b61a4a6a2680509664b5d8eeec4b0073448dd68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "53701b57_4c50ece6",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2790,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-15T14:18:05Z",
+      "side": 1,
+      "message": "changed into Roger\u0027s suggestion.",
+      "parentUuid": "f545ded0_e7662e8f",
+      "revId": "0b61a4a6a2680509664b5d8eeec4b0073448dd68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8548bca8_1e5f9a0a",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2790,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-15T14:18:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a020ee6d_9a37522e",
       "revId": "0b61a4a6a2680509664b5d8eeec4b0073448dd68",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -139,6 +229,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4e5784be_729facce",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2796,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-15T14:18:05Z",
+      "side": 1,
+      "message": "changed to expressions, which hopefully makes the intent clearer.",
+      "parentUuid": "c0d261e8_c0b971a7",
+      "revId": "0b61a4a6a2680509664b5d8eeec4b0073448dd68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5ceff9c6_a35b3cff",
         "filename": "doc/ref/spec.md",
         "patchSetId": 1
@@ -150,6 +258,24 @@
       "writtenOn": "2024-08-12T07:43:54Z",
       "side": 1,
       "message": "should these examples all be `\u0026 a` ?",
+      "revId": "0b61a4a6a2680509664b5d8eeec4b0073448dd68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6bb10e5e_eed61479",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2803,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-15T14:18:05Z",
+      "side": 1,
+      "message": "Yes, good point.",
+      "parentUuid": "5ceff9c6_a35b3cff",
       "revId": "0b61a4a6a2680509664b5d8eeec4b0073448dd68",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -167,6 +293,30 @@
       "writtenOn": "2024-08-12T09:41:59Z",
       "side": 1,
       "message": "I think this would be clearer without X and the extra field:\n\nFor example:\n```\n// match without unifying\nd: matchN(1, [2])\nd: *3 | int // error: default picked before matching.\n```",
+      "range": {
+        "startLine": 2822,
+        "startChar": 0,
+        "endLine": 2827,
+        "endChar": 0
+      },
+      "revId": "0b61a4a6a2680509664b5d8eeec4b0073448dd68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "606f7945_763d127f",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2827,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-15T14:18:05Z",
+      "side": 1,
+      "message": "Except that the extra field is relevant. Since validators are distributed over disjuncts, just like any other values, the behavior is somewhat different. The default picking therefore only relevant for sub fields.\n\nI don\u0027t see any good way around this right now, but it is something we should consider in our redesign of defaults.",
+      "parentUuid": "544863c7_54966c1c",
       "range": {
         "startLine": 2822,
         "startChar": 0,

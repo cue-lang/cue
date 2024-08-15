@@ -42,7 +42,7 @@ matrixGo: ["1.22.x", latestGo]
 // so we instead pin a specific Go release.
 pinnedReleaseGo: "1.23.0"
 
-goreleaserVersion: "v2.0.1"
+goreleaserVersion: "v2.2.0"
 
 // zeroReleaseTagSuffix is the suffix used to identify all "zero" releases.
 // When we create a release branch for v0.$X.0, it's likely that commits on the

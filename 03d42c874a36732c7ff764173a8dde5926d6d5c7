@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "40ae6b61_be566178",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 763,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-15T13:54:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9d221773_28b4f7f0",
+      "revId": "03d42c874a36732c7ff764173a8dde5926d6d5c7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a1598105_756c7dcf",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-08-12T09:56:49Z",
       "side": 1,
       "message": "Doc comment please.",
+      "revId": "03d42c874a36732c7ff764173a8dde5926d6d5c7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aef0e88b_90aae448",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1335,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-15T13:54:33Z",
+      "side": 1,
+      "message": "Done.\n\nNote that without this wrapper, this functionality is not available from outside this package.",
+      "parentUuid": "a1598105_756c7dcf",
       "revId": "03d42c874a36732c7ff764173a8dde5926d6d5c7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ee1a099_de09965c",
+        "filename": "internal/core/compile/validator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-15T13:54:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "893db916_e5818786",
+      "revId": "03d42c874a36732c7ff764173a8dde5926d6d5c7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "727f358b_a4e549e3",
@@ -86,6 +140,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8a4ba80_7d909f70",
+        "filename": "internal/core/compile/validator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-15T13:54:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "727f358b_a4e549e3",
+      "revId": "03d42c874a36732c7ff764173a8dde5926d6d5c7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a0feefac_047853d8",
@@ -99,6 +171,24 @@
       "writtenOn": "2024-08-12T09:56:49Z",
       "side": 1,
       "message": "Or perhaps consider supporting \"all\" to mean \"all\"  😊",
+      "revId": "03d42c874a36732c7ff764173a8dde5926d6d5c7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5aca86b9_422c19d8",
+        "filename": "internal/core/compile/validator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-15T13:54:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a0feefac_047853d8",
       "revId": "03d42c874a36732c7ff764173a8dde5926d6d5c7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -16,6 +16,24 @@
       "message": "I have approximately no idea what all of this is about, but erm, let\u0027s gamble; try merging!",
       "revId": "1005354db9889d6831b992b5843f965b28cfb0dc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2280b442_aa44017d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-15T16:45:38Z",
+      "side": 1,
+      "message": "https://goreleaser.com/ is a tool we use to build release binaries and publish a release to github, as well as publishing to Docker, Homebrew, etc. This updates us to use the latest version of goreleaser, which also needs a couple of config changes to be happy. This change is fairly safe and small, and we\u0027ll test out the release process in the first alpha anyway, so I indeed agree it\u0027s low risk.",
+      "parentUuid": "eec4421b_96dcfbc9",
+      "revId": "1005354db9889d6831b992b5843f965b28cfb0dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

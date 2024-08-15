@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "67bda17d_2a3ea367",
+        "filename": "encoding/jsonschema/constraints.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-15T16:13:30Z",
+      "side": 1,
+      "message": "No, I don\u0027t think so. The stage is a property of the constraint\u0027s implementation (and one that can change over time). The point of this ordering is to make it easy to add new constraints, to check whether a given constraint exists, or to cross-reference against other lists in linear time.",
+      "parentUuid": "5feb6a0d_9f59b72a",
+      "revId": "79077dc816f10579299596866a7745b69437e241",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b9083976_f582f071",
@@ -54,6 +72,24 @@
       "writtenOn": "2024-08-15T16:06:28Z",
       "side": 1,
       "message": "vfrom, vbetween, and vto seem to not be used at all, at least not yet? ok to keep if you are definitely going to use them in a follow-up CL, but otherwise I\u0027d stash them away for now.",
+      "revId": "79077dc816f10579299596866a7745b69437e241",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cac2c42b_8c99fbc5",
+        "filename": "encoding/jsonschema/version.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-15T16:13:30Z",
+      "side": 1,
+      "message": "Both vfrom and vto _are_ used in this CL and will be used more later. vbetween will be used later and is trivial enough that i think it\u0027s worth keeping around.",
+      "parentUuid": "eefc7186_ce63a147",
       "revId": "79077dc816f10579299596866a7745b69437e241",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -31,37 +31,14 @@ type constraint struct {
 	// "required" and thus must have a lower phase number than the latter.
 	phase int
 
-	// Indicates the draft number in which this constraint is defined.
-	draft int
-	fn    constraintFunc
+	// versions holds the versions for which this constraint is defined.
+	versions versionSet
+	fn       constraintFunc
 }
 
 // A constraintFunc converts a given JSON Schema constraint (specified in n)
 // to a CUE constraint recorded in state.
 type constraintFunc func(key string, n cue.Value, s *state)
-
-func p0(name string, f constraintFunc) *constraint {
-	return &constraint{key: name, fn: f}
-}
-
-func p1d(name string, draft int, f constraintFunc) *constraint {
-	return &constraint{key: name, phase: 1, draft: draft, fn: f}
-}
-
-func p1(name string, f constraintFunc) *constraint {
-	return &constraint{key: name, phase: 1, fn: f}
-}
-
-func p2(name string, f constraintFunc) *constraint {
-	return &constraint{key: name, phase: 2, fn: f}
-}
-
-func p3(name string, f constraintFunc) *constraint {
-	return &constraint{key: name, phase: 3, fn: f}
-}
-
-// TODO:
-// writeOnly, readOnly
 
 var constraintMap = map[string]*constraint{}
 
@@ -74,47 +51,77 @@ func init() {
 // Note: the following table is ordered lexically by keyword name.
 // The various implementations are grouped by kind in the constaint-*.go files.
 
+const numPhases = 5
+
 var constraints = []*constraint{
-	p1d("$comment", 7, constraintComment),
-	p1("$defs", constraintAddDefinitions),
-	p0("$id", constraintID),
+	p2d("$comment", constraintComment, vfrom(versionDraft07)),
+	p2("$defs", constraintAddDefinitions),
+	p1d("$id", constraintID, vfrom(versionDraft06)),
 	p0("$schema", constraintSchema),
-	p1("$ref", constraintRef),
-	p1("additionalItems", constraintAdditionalItems),
-	p3("additionalProperties", constraintAdditionalProperties),
-	p2("allOf", constraintAllOf),
-	p2("anyOf", constraintAnyOf),
-	p1d("const", 6, constraintConst),
-	p1("contains", constraintContains),
-	p1d("contentEncoding", 7, constraintContentEncoding),
-	p1d("contentMediaType", 7, constraintContentMediaType),
-	p1("default", constraintDefault),
-	p1("definitions", constraintAddDefinitions),
-	p1("dependencies", constraintDependencies),
-	p1("deprecated", constraintDeprecated),
-	p1("description", constraintDescription),
-	p1("enum", constraintEnum),
-	p1("examples", constraintExamples),
-	p1("exclusiveMaximum", constraintExclusiveMaximum),
-	p1("exclusiveMinimum", constraintExclusiveMinimum),
-	p0("id", constraintID),
-	p1("items", constraintItems),
-	p1("minItems", constraintMinItems),
-	p1("maxItems", constraintMaxItems),
-	p1("maxLength", constraintMaxLength),
-	p1("maxProperties", constraintMaxProperties),
-	p2("maximum", constraintMaximum),
-	p1("minLength", constraintMinLength),
-	p2("minimum", constraintMinimum),
-	p1("multipleOf", constraintMultipleOf),
-	p2("oneOf", constraintOneOf),
-	p1("nullable", constraintNullable),
-	p1("pattern", constraintPattern),
-	p2("patternProperties", constraintPatternProperties),
-	p1("properties", constraintProperties),
-	p1d("propertyNames", 6, constraintPropertyNames),
-	p2("required", constraintRequired),
-	p1("title", constraintTitle),
-	p1("type", constraintType),
-	p1("uniqueItems", constraintUniqueItems),
+	p2("$ref", constraintRef),
+	p2("additionalItems", constraintAdditionalItems),
+	p4("additionalProperties", constraintAdditionalProperties),
+	p3("allOf", constraintAllOf),
+	p3("anyOf", constraintAnyOf),
+	p2d("const", constraintConst, vfrom(versionDraft06)),
+	p2d("contains", constraintContains, vfrom(versionDraft06)),
+	p2d("contentEncoding", constraintContentEncoding, vfrom(versionDraft07)),
+	p2d("contentMediaType", constraintContentMediaType, vfrom(versionDraft07)),
+	p2("default", constraintDefault),
+	p2("definitions", constraintAddDefinitions),
+	p2("dependencies", constraintDependencies),
+	p2("deprecated", constraintDeprecated),
+	p2("description", constraintDescription),
+	p2("enum", constraintEnum),
+	p2d("examples", constraintExamples, vfrom(versionDraft06)),
+	p2("exclusiveMaximum", constraintExclusiveMaximum),
+	p2("exclusiveMinimum", constraintExclusiveMinimum),
+	p1d("id", constraintID, vto(versionDraft04)),
+	p2("items", constraintItems),
+	p2("minItems", constraintMinItems),
+	p2("maxItems", constraintMaxItems),
+	p2("maxLength", constraintMaxLength),
+	p2("maxProperties", constraintMaxProperties),
+	p3("maximum", constraintMaximum),
+	p2("minLength", constraintMinLength),
+	p3("minimum", constraintMinimum),
+	p2("multipleOf", constraintMultipleOf),
+	p3("oneOf", constraintOneOf),
+	p2("nullable", constraintNullable),
+	p2("pattern", constraintPattern),
+	p3("patternProperties", constraintPatternProperties),
+	p2("properties", constraintProperties),
+	p2d("propertyNames", constraintPropertyNames, vfrom(versionDraft06)),
+	p3("required", constraintRequired),
+	p2("title", constraintTitle),
+	p2("type", constraintType),
+	p2("uniqueItems", constraintUniqueItems),
+}
+
+func p0(name string, f constraintFunc) *constraint {
+	return &constraint{key: name, phase: 0, versions: allVersions, fn: f}
+}
+
+func p1(name string, f constraintFunc) *constraint {
+	return &constraint{key: name, phase: 1, versions: allVersions, fn: f}
+}
+
+func p2(name string, f constraintFunc) *constraint {
+	return &constraint{key: name, phase: 2, versions: allVersions, fn: f}
+}
+
+func p3(name string, f constraintFunc) *constraint {
+	return &constraint{key: name, phase: 3, versions: allVersions, fn: f}
+}
+
+func p4(name string, f constraintFunc) *constraint {
+	return &constraint{key: name, phase: 4, versions: allVersions, fn: f}
+}
+
+func p1d(name string, f constraintFunc, versions versionSet) *constraint {
+	return &constraint{key: name, phase: 1, versions: versions, fn: f}
+}
+
+func p2d(name string, f constraintFunc, versions versionSet) *constraint {
+	return &constraint{key: name, phase: 2, versions: versions, fn: f}
 }

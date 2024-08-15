@@ -105,7 +105,10 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 }
 
 func (d *decoder) schema(ref []ast.Label, v cue.Value) (a []ast.Decl) {
-	root := state{decoder: d}
+	root := state{
+		decoder:       d,
+		schemaVersion: defaultVersion,
+	}
 
 	var name ast.Label
 	inner := len(ref) - 1
@@ -636,7 +639,7 @@ func (s *state) schemaState(n cue.Value, types cue.Kind, idRef []label, isLogica
 	}
 
 	// do multiple passes over the constraints to ensure they are done in order.
-	for pass := 0; pass < 4; pass++ {
+	for pass := 0; pass < numPhases; pass++ {
 		state.processMap(n, func(key string, value cue.Value) {
 			// Convert each constraint into a either a value or a functor.
 			c := constraintMap[key]
@@ -647,9 +650,16 @@ func (s *state) schemaState(n cue.Value, types cue.Kind, idRef []label, isLogica
 				}
 				return
 			}
-			if c.phase == pass {
-				c.fn(key, value, state)
+			if c.phase != pass {
+				return
 			}
+			if !c.versions.contains(state.schemaVersion) {
+				if s.cfg.Strict {
+					s.warnf(value.Pos(), "constraint %q is not supported in JSON schema version %v", key, state.schemaVersion)
+				}
+				return
+			}
+			c.fn(key, value, state)
 		})
 	}
 

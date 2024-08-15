@@ -26,25 +26,6 @@ func constraintID(key string, n cue.Value, s *state) {
 	//
 	// TODO: mark identifiers.
 
-	// Draft-06 renamed the id field to $id.
-	if key == "id" {
-		// old-style id field.
-		if s.schemaVersion >= versionDraft06 {
-			if s.cfg.Strict {
-				s.warnf(n.Pos(), "use of old-style id field not allowed in schema version %v", s.schemaVersion)
-			}
-			return
-		}
-	} else {
-		// new-style $id field
-		if s.schemaVersion < versionDraft07 {
-			if s.cfg.Strict {
-				s.warnf(n.Pos(), "use of $id not allowed in older schema version %v", s.schemaVersion)
-			}
-			return
-		}
-	}
-
 	// Resolution must be relative to parent $id
 	// https://tools.ietf.org/html/draft-handrews-json-schema-02#section-8.2.2
 	u := s.resolveURI(n)
@@ -62,11 +43,9 @@ func constraintID(key string, n cue.Value, s *state) {
 	s.idPos = n.Pos()
 }
 
+// constraintSchema implements $schema, which
+// identifies this as a JSON schema and specifies its version.
 func constraintSchema(key string, n cue.Value, s *state) {
-	// Identifies this as a JSON schema and specifies its version.
-	// TODO: extract version.
-
-	s.schemaVersion = versionDraft07 // Reasonable default version.
 	str, ok := s.strValue(n)
 	if !ok {
 		// If there's no $schema value, use the default.

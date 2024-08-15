@@ -116,6 +116,24 @@
       "parentUuid": "eefc7186_ce63a147",
       "revId": "79077dc816f10579299596866a7745b69437e241",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3bd5ada_d448a667",
+        "filename": "encoding/jsonschema/version.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-15T16:14:53Z",
+      "side": 1,
+      "message": "my bad, I was using Ctrl+F but it wasn\u0027t finding anything. maybe I hadn\u0027t expanded the rest of the files properly.",
+      "parentUuid": "cac2c42b_8c99fbc5",
+      "revId": "79077dc816f10579299596866a7745b69437e241",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -17,8 +17,6 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
-	"cuelang.org/go/internal/cueexperiment"
-	tpyaml "cuelang.org/go/internal/third_party/yaml"
 )
 
 // TODO(mvdan): we should sanity check that the decoder always produces valid CUE,
@@ -33,20 +31,6 @@ import (
 type Decoder interface {
 	// Decode consumes a YAML value and returns it in CUE syntax tree node.
 	Decode() (ast.Expr, error)
-}
-
-// NewDecoder is a temporary constructor compatible with both the old and new yaml decoders.
-// Note that the signature matches the new yaml decoder, as the old signature can only error
-// when reading a source that isn't []byte.
-func NewDecoder(filename string, b []byte) Decoder {
-	if cueexperiment.Flags.YAMLV3Decoder {
-		return newDecoder(filename, b)
-	}
-	dec, err := tpyaml.NewDecoder(filename, b)
-	if err != nil {
-		panic(err) // should never happen as we give it []byte
-	}
-	return dec
 }
 
 // decoder wraps a [yaml.Decoder] to extract CUE syntax tree nodes.
@@ -87,11 +71,11 @@ type decoder struct {
 // With json we can use RawMessage to know the size of the input
 // before we extract into ast.Expr, but unfortunately, yaml.Node has no size.
 
-// newDecoder creates a decoder for YAML values to extract CUE syntax tree nodes.
+// NewDecoder creates a decoder for YAML values to extract CUE syntax tree nodes.
 //
 // The filename is used for position information in CUE syntax tree nodes
 // as well as any errors encountered while decoding YAML.
-func newDecoder(filename string, b []byte) *decoder {
+func NewDecoder(filename string, b []byte) *decoder {
 	// Note that yaml.v3 can insert a null node just past the end of the input
 	// in some edge cases, so we pretend that there's an extra newline
 	// so that we don't panic when handling such a position.

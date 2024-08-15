@@ -32,14 +32,9 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal"
-	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/encoding/yaml"
 )
-
-// These tests are only for the new YAML decoder.
-// The old YAML decoder has its own tests in internal/third_party/yaml.
-func init() { cueexperiment.Flags.YAMLV3Decoder = true }
 
 var unmarshalTests = []struct {
 	data string

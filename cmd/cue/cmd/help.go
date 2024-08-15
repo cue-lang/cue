@@ -273,8 +273,6 @@ If an environment variable is unset or empty, sensible default setting is used.
 		modules (default true)
 			Enable support for the Modules and package management proposal
 			as described in https://cuelang.org/discussion/2939.
-		yamlv3decoder (default true)
-			Enable the new YAML decoder based on yaml.v3.
 		evalv3
 			Enable the new CUE evaluator, addressing performance issues
 			and bringing a better disjunction algorithm.

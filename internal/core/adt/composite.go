@@ -760,8 +760,18 @@ func toDataAll(ctx *OpContext, v BaseValue) BaseValue {
 	// to avoid issues with the closedness algorithm down the line.
 	case *Disjunction:
 		d := *x
-		d.Values = make([]Value, len(x.Values))
-		for i, v := range x.Values {
+		values := x.Values
+		// Data mode involves taking default values and if there is an
+		// unambiguous default value, we should convert that to data as well.
+		switch x.NumDefaults {
+		case 0:
+		case 1:
+			return toDataAll(ctx, values[0])
+		default:
+			values = values[:x.NumDefaults]
+		}
+		d.Values = make([]Value, len(values))
+		for i, v := range values {
 			switch x := v.(type) {
 			case *Vertex:
 				d.Values[i] = x.ToDataAll(ctx)

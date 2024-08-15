@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbee8503_406ab6f6",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_types.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-15T10:39:06Z",
+      "side": 1,
+      "message": "It would have been nice to add these test cases in a previous CL so we could see how the results change.",
+      "revId": "b033007797c6644630dc5826729c51cc29f1204d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -522,7 +522,7 @@ func (s *state) finalize() (e ast.Expr) {
 		// s.allowedTypes is non-zero (so we know that
 		// it's not bottom) and we need _some_ expression
 		// to be part of the subequent syntax, we use top.
-		e = ast.NewIdent("_")
+		e = top()
 	} else {
 		e = ast.NewBinExpr(token.AND, conjuncts...)
 	}
@@ -578,11 +578,6 @@ outer:
 	return e
 }
 
-func isAny(s ast.Expr) bool {
-	i, ok := s.(*ast.Ident)
-	return ok && i.Name == "_"
-}
-
 func (s *state) comment() *ast.CommentGroup {
 	// Create documentation.
 	doc := strings.TrimSpace(s.title)
@@ -618,7 +613,7 @@ func (s *state) schema(n cue.Value, idRef ...label) ast.Expr {
 // types holds the set of possible types that the value can hold.
 // idRef holds the path to the value.
 // isLogical specifies whether the caller is a logical operator like anyOf, allOf, oneOf, or not.
-func (s *state) schemaState(n cue.Value, types cue.Kind, idRef []label, isLogical bool) (_e ast.Expr, _ *state) {
+func (s *state) schemaState(n cue.Value, types cue.Kind, idRef []label, isLogical bool) (ast.Expr, *state) {
 	state := &state{
 		up:            s,
 		schemaVersion: s.schemaVersion,
@@ -632,6 +627,16 @@ func (s *state) schemaState(n cue.Value, types cue.Kind, idRef []label, isLogica
 	}
 	if isLogical {
 		state.parent = s
+	}
+	if n.Kind() == cue.BoolKind {
+		if vfrom(versionDraft06).contains(state.schemaVersion) {
+			// From draft-06 onwards, boolean values signify a schema that always passes or fails.
+			if state.boolValue(n) {
+				return top(), state
+			}
+			return &ast.BottomLit{}, state
+		}
+		return s.errf(n, "boolean schemas not supported in %v", state.schemaVersion), state
 	}
 
 	if n.Kind() != cue.StructKind {
@@ -755,10 +760,19 @@ func excludeFields(decls []ast.Decl) ast.Expr {
 	return &ast.UnaryExpr{Op: token.NMAT, X: ast.NewString(re)}
 }
 
+func top() ast.Expr {
+	return ast.NewIdent("_")
+}
+
+func isAny(s ast.Expr) bool {
+	i, ok := s.(*ast.Ident)
+	return ok && i.Name == "_"
+}
+
 func addTag(field ast.Label, tag, value string) *ast.Field {
 	return &ast.Field{
 		Label: field,
-		Value: ast.NewIdent("_"),
+		Value: top(),
 		Attrs: []*ast.Attribute{
 			{Text: fmt.Sprintf("@%s(%s)", tag, value)},
 		},

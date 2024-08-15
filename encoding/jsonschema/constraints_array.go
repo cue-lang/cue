@@ -82,7 +82,7 @@ func constraintMinItems(key string, n cue.Value, s *state) {
 		s.errf(n, "invalid uint")
 	}
 	for ; p > 0; p-- {
-		a = append(a, ast.NewIdent("_"))
+		a = append(a, top())
 	}
 	s.add(n, arrayType, ast.NewList(append(a, &ast.Ellipsis{})...))
 

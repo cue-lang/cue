@@ -1,0 +1,10 @@
+-- type.json --
+{
+	"anyOf": [
+		true,
+		false
+	]
+}
+
+-- out/decode/cue --
+_ | _|_

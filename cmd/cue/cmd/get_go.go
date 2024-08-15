@@ -432,9 +432,9 @@ func (e *extractor) addPackage(p *packages.Package) {
 func (e *extractor) recordTypeInfo(p *packages.Package) {
 	for _, f := range p.Syntax {
 		ast.Inspect(f, func(n ast.Node) bool {
-			switch x := n.(type) {
+			switch n := n.(type) {
 			case *ast.StructType:
-				e.orig[p.TypesInfo.TypeOf(x)] = x
+				e.orig[p.TypesInfo.TypeOf(n)] = n
 			}
 			return true
 		})
@@ -451,9 +451,9 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 
 	for _, f := range p.Syntax {
 		for _, d := range f.Decls {
-			switch x := d.(type) {
+			switch d := d.(type) {
 			case *ast.GenDecl:
-				e.recordConsts(x)
+				e.recordConsts(d)
 			}
 		}
 	}
@@ -504,9 +504,9 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 
 		decls := []cueast.Decl{}
 		for _, d := range f.Decls {
-			switch x := d.(type) {
+			switch d := d.(type) {
 			case *ast.GenDecl:
-				decls = append(decls, e.reportDecl(x)...)
+				decls = append(decls, e.reportDecl(d)...)
 			}
 		}
 
@@ -960,30 +960,31 @@ func supportedType(stack []types.Type, t types.Type) (ok bool) {
 		}
 	}
 
+	// Note that underlying types are never aliases.
 	t = t.Underlying()
-	switch x := t.(type) {
+	switch t := t.(type) {
 	case *types.Basic:
-		return x.Kind() != types.Invalid
+		return t.Kind() != types.Invalid
 	case *types.Named:
 		return true
 	case *types.Pointer:
-		return supportedType(stack, x.Elem())
+		return supportedType(stack, t.Elem())
 	case *types.Slice:
-		return supportedType(stack, x.Elem())
+		return supportedType(stack, t.Elem())
 	case *types.Array:
-		return supportedType(stack, x.Elem())
+		return supportedType(stack, t.Elem())
 	case *types.Map:
-		if b, ok := x.Key().Underlying().(*types.Basic); !ok || b.Kind() != types.String {
+		if b, ok := t.Key().Underlying().(*types.Basic); !ok || b.Kind() != types.String {
 			return false
 		}
-		return supportedType(stack, x.Elem())
+		return supportedType(stack, t.Elem())
 	case *types.Struct:
 		// Eliminate structs with fields for which all fields are filtered.
-		if x.NumFields() == 0 {
+		if t.NumFields() == 0 {
 			return true
 		}
-		for i := 0; i < x.NumFields(); i++ {
-			f := x.Field(i)
+		for i := 0; i < t.NumFields(); i++ {
+			f := t.Field(i)
 			if f.Exported() && supportedType(stack, f.Type()) {
 				return true
 			}
@@ -1034,10 +1035,10 @@ func (e *extractor) makeField(name string, kind fieldKind, expr types.Type, doc 
 	return f, string(b)
 }
 
-func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
-	switch x := expr.(type) {
+func (e *extractor) makeType(typ types.Type) (result cueast.Expr) {
+	switch typ := types.Unalias(typ).(type) {
 	case *types.Named:
-		obj := x.Obj()
+		obj := typ.Obj()
 		if obj.Pkg() == nil {
 			return e.ident("_", false)
 		}
@@ -1156,7 +1157,7 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 		return &cueast.BinaryExpr{
 			X:  cueast.NewNull(),
 			Op: cuetoken.OR,
-			Y:  e.makeType(x.Elem()),
+			Y:  e.makeType(typ.Elem()),
 		}
 
 	case *types.Struct:
@@ -1164,7 +1165,7 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 			Lbrace: cuetoken.Blank.Pos(),
 			Rbrace: cuetoken.Newline.Pos(),
 		}
-		e.addFields(x, st)
+		e.addFields(typ, st)
 		return st
 
 	case *types.Slice:
@@ -1172,13 +1173,13 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 		// even though byte is an alias for the basic type uint8.
 		// TODO: reconsider this; both encoding/json and the future v2
 		// encode []uint8, or anything assignable to []byte, as bytes.
-		if x.Elem() == typeByte {
+		if typ.Elem() == typeByte {
 			return e.ident("bytes", false)
 		}
-		return cueast.NewList(&cueast.Ellipsis{Type: e.makeType(x.Elem())})
+		return cueast.NewList(&cueast.Ellipsis{Type: e.makeType(typ.Elem())})
 
 	case *types.Array:
-		if x.Elem() == typeByte {
+		if typ.Elem() == typeByte {
 			// TODO: no way to constrain lengths of bytes for now, as regexps
 			// operate on Unicode, not bytes. So we need
 			//     fmt.Fprint(e.w, fmt.Sprintf("=~ '^\C{%d}$'", x.Len())),
@@ -1189,21 +1190,21 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 			return &cueast.BinaryExpr{
 				X: &cueast.BasicLit{
 					Kind:  cuetoken.INT,
-					Value: strconv.Itoa(int(x.Len())),
+					Value: strconv.Itoa(int(typ.Len())),
 				},
 				Op: cuetoken.MUL,
-				Y:  cueast.NewList(e.makeType(x.Elem())),
+				Y:  cueast.NewList(e.makeType(typ.Elem())),
 			}
 		}
 
 	case *types.Map:
-		if b, ok := x.Key().Underlying().(*types.Basic); !ok || b.Kind() != types.String {
-			panic(fmt.Sprintf("unsupported map key type %T", x.Key()))
+		if b, ok := typ.Key().Underlying().(*types.Basic); !ok || b.Kind() != types.String {
+			panic(fmt.Sprintf("unsupported map key type %T", typ.Key()))
 		}
 
 		f := &cueast.Field{
 			Label: cueast.NewList(e.ident("string", false)),
-			Value: e.makeType(x.Elem()),
+			Value: e.makeType(typ.Elem()),
 		}
 		cueast.SetRelPos(f, cuetoken.Blank)
 		return &cueast.StructLit{
@@ -1213,7 +1214,7 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 		}
 
 	case *types.Basic:
-		switch x.Kind() {
+		switch typ.Kind() {
 		case types.Uintptr, types.UnsafePointer:
 			return e.ident("uint64", false)
 		case types.Byte:
@@ -1221,19 +1222,19 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 		case types.Complex64, types.Complex128:
 			return e.ident("_", false)
 		}
-		return e.ident(x.Name(), false)
+		return e.ident(typ.Name(), false)
 
 	case *types.Union:
 		var exprs []cueast.Expr
-		for i := 0; i < x.Len(); i++ {
-			exprs = append(exprs, e.makeType(x.Term(i).Type()))
+		for i := 0; i < typ.Len(); i++ {
+			exprs = append(exprs, e.makeType(typ.Term(i).Type()))
 		}
 		return cueast.NewBinExpr(cuetoken.OR, exprs...)
 
 	case *types.Interface:
 		// TODO(uhthomas): Should interfaces with methods (IsMethodSet)
 		// be set to top?
-		if !x.IsComparable() {
+		if !typ.IsComparable() {
 			return e.ident("_", false)
 		}
 
@@ -1248,17 +1249,17 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 		// 	int | string
 		//
 		var exprs []cueast.Expr
-		for i := 0; i < x.NumEmbeddeds(); i++ {
-			exprs = append(exprs, e.makeType(x.EmbeddedType(i)))
+		for i := 0; i < typ.NumEmbeddeds(); i++ {
+			exprs = append(exprs, e.makeType(typ.EmbeddedType(i)))
 		}
 		return cueast.NewBinExpr(cuetoken.OR, exprs...)
 
 	case *types.TypeParam:
-		return e.makeType(x.Constraint())
+		return e.makeType(typ.Constraint())
 
 	default:
 		// record error
-		panic(fmt.Sprintf("unsupported type %T", x))
+		panic(fmt.Sprintf("unsupported type %T", typ))
 	}
 }
 
@@ -1302,19 +1303,17 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 				}
 				typ = p.Elem()
 			}
-			if _, ok := typ.(*types.Named); ok {
+			switch typ := types.Unalias(typ).(type) {
+			case *types.Named:
 				embed := &cueast.EmbedDecl{Expr: e.makeType(typ)}
 				if i > 0 {
 					cueast.SetRelPos(embed, cuetoken.NewSection)
 				}
 				add(embed)
-			} else {
-				switch x := typ.(type) {
-				case *types.Struct:
-					e.addFields(x, st)
-				default:
-					panic(fmt.Sprintf("unimplemented embedding for type %T", x))
-				}
+			case *types.Struct:
+				e.addFields(typ, st)
+			default:
+				panic(fmt.Sprintf("unimplemented embedding for type %T", x))
 			}
 			continue
 		}

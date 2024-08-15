@@ -16,6 +16,24 @@
       "message": "Thanks very much for this contribution. The code looks great in itself, but after some reflection we have come to the conclusion that allowing non-concrete arguments to list.Contains is probably not the right approach. In particular, unification is not the same operation as equality, and having both under the same hood doesn\u0027t seem quite right.\n\nAs an example of this awkwardness, consider this snippet:\n\n```\nimport \"list\"\n\n#t: {\n\t_x: string\t\t// This should be concrete\n\ty: list.Contains(_x)\n}\n\nx: #t\nx: y: [\"a\", \"b\", \"c\"]\n```\n\nImagine this in the context of a large configuration where for some reason we have not made `_x` concrete. This was a mistake, and currently we\u0027ll get an error from `list.Contains` to signify that. With this CL landed, there will be no error.\n\nThere is also an issue regarding struct values. This example currently fails (correctly):\n\n```\nimport \"list\"\n\nx: list.Contains({a: 1})\nx: [{a: 1, b: 1}]\n```\n\nbut with this CL it will pass. We can\u0027t tell from the arguments whether the user wants to check for exact equality or for unification.\n\nWith the above points in mind, and also bearing in mind newer jsonschema features such as `minContains` (https://json-schema.org/draft/2020-12/json-schema-validation#name-mincontains) we think the right approach at this point is to implement a new list package validator function: `MatchN`.\n\nI\u0027ve raised issue https://cuelang.org/issue/3370 to track that. If you wish to move that forward, you\u0027d be more than welcome!\nI suspect you could reuse a bunch of this code.\n\nThanks again for your contribution!",
       "revId": "66e861a7a1ec6cff8a1670115b58f10bb5b56b57",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e23606f1_13aeb66d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-15T13:35:26Z",
+      "side": 1,
+      "message": "You\u0027re right, this really isn\u0027t the right solution and I\u0027m happy to move #3370 forward.",
+      "parentUuid": "fb826f67_0ab7fa79",
+      "revId": "66e861a7a1ec6cff8a1670115b58f10bb5b56b57",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

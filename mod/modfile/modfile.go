@@ -248,15 +248,6 @@ var earliestClosedSchemaVersion = sync.OnceValue(func() string {
 	return earliest
 })
 
-// LatestKnownSchemaVersion returns the language version
-// associated with the most recent known schema.
-//
-// Deprecated: use [cuelang.org/go/cue.LanguageVersion] instead. This
-// function will be removed in v0.11.
-func LatestKnownSchemaVersion() string {
-	return cueversion.LanguageVersion()
-}
-
 // Parse verifies that the module file has correct syntax
 // and follows the schema following the required language.version field.
 // The file name is used for error messages.

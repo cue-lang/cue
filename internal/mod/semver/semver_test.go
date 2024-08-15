@@ -169,21 +169,6 @@ func TestSort(t *testing.T) {
 	}
 }
 
-func TestMax(t *testing.T) {
-	for i, ti := range tests {
-		for j, tj := range tests {
-			max := Max(ti.in, tj.in)
-			want := Canonical(ti.in)
-			if i < j {
-				want = Canonical(tj.in)
-			}
-			if max != want {
-				t.Errorf("Max(%q, %q) = %q, want %q", ti.in, tj.in, max, want)
-			}
-		}
-	}
-}
-
 var (
 	v1 = "v1.0.0+metadata-dash"
 	v2 = "v1.0.0+metadata-dash1"

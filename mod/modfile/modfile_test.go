@@ -23,7 +23,6 @@ import (
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/cuetest"
-	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/mod/module"
 )
 
@@ -543,10 +542,6 @@ language: {
 
 func TestEarliestClosedSchemaVersion(t *testing.T) {
 	qt.Assert(t, qt.Equals(EarliestClosedSchemaVersion(), "v0.8.0-alpha.0"))
-}
-
-func TestLatestKnownSchemaVersion(t *testing.T) {
-	qt.Assert(t, qt.Equals(LatestKnownSchemaVersion(), cueversion.LanguageVersion()))
 }
 
 func parseVersions(vs ...string) []module.Version {

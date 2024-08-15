@@ -247,6 +247,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ba385848_fb9c49a9",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2796,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-15T17:25:51Z",
+      "side": 1,
+      "message": "I still don\u0027t quite get it. When are expressions _not_ removed when passing a value around, unless they\u0027re part of a pattern constraint or non-concrete value?\n\nI\u0027m wondering what the result of this would be, for example:\n\n```\nx: matchN(1, [{a: 1, b: 2}])\nx: {a!: int, b!: a+1}\n```\n\nWould this be an error because the expressions cannot be removed without evaluating them?\n\nWhat about something like this?\n\n```\nx: matchN(1, [{a!: 1}])\nx: {\n\ta: int\n\t_x: a \u0026 2\n}\n```",
+      "parentUuid": "4e5784be_729facce",
+      "revId": "0b61a4a6a2680509664b5d8eeec4b0073448dd68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5ceff9c6_a35b3cff",
         "filename": "doc/ref/spec.md",
         "patchSetId": 1
@@ -317,6 +335,30 @@
       "side": 1,
       "message": "Except that the extra field is relevant. Since validators are distributed over disjuncts, just like any other values, the behavior is somewhat different. The default picking therefore only relevant for sub fields.\n\nI don\u0027t see any good way around this right now, but it is something we should consider in our redesign of defaults.",
       "parentUuid": "544863c7_54966c1c",
+      "range": {
+        "startLine": 2822,
+        "startChar": 0,
+        "endLine": 2827,
+        "endChar": 0
+      },
+      "revId": "0b61a4a6a2680509664b5d8eeec4b0073448dd68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "89a6a3c9_310fda56",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2827,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-15T17:25:51Z",
+      "side": 1,
+      "message": "Oh wow, that\u0027s interesting. So the result of my example is a non-concrete value for `d` (`matchN(1, [2])`) rather than a conflict due to the `matchN`. Food for thought!",
+      "parentUuid": "606f7945_763d127f",
       "range": {
         "startLine": 2822,
         "startChar": 0,

@@ -15,6 +15,10 @@ var Flags struct {
 
 	// YAMLV3Decoder swaps the old internal/third_party/yaml decoder with the new
 	// decoder implemented in internal/encoding/yaml on top of yaml.v3.
+	// We keep it around for v0.11 for the sake of not breaking users
+	// with CUE_EXPERIMENT=yamlv3decoder=1 who must still suppport older CUE versions,
+	// but currently the feature is always enabled.
+	// TODO(mvdan): remove for v0.12.
 	YAMLV3Decoder bool `envflag:"default:true"`
 
 	// EvalV3 enables the new evaluator. The new evaluator addresses various

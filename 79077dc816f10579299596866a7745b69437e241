@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5feb6a0d_9f59b72a",
+        "filename": "encoding/jsonschema/constraints.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-15T16:06:28Z",
+      "side": 1,
+      "message": "does it make sense to sort the constraints by stage first, then by name?",
+      "revId": "79077dc816f10579299596866a7745b69437e241",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9083976_f582f071",
+        "filename": "encoding/jsonschema/version.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-15T16:06:28Z",
+      "side": 1,
+      "message": "vto",
+      "range": {
+        "startLine": 50,
+        "startChar": 3,
+        "endLine": 50,
+        "endChar": 8
+      },
+      "revId": "79077dc816f10579299596866a7745b69437e241",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eefc7186_ce63a147",
+        "filename": "encoding/jsonschema/version.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-15T16:06:28Z",
+      "side": 1,
+      "message": "vfrom, vbetween, and vto seem to not be used at all, at least not yet? ok to keep if you are definitely going to use them in a follow-up CL, but otherwise I\u0027d stash them away for now.",
+      "revId": "79077dc816f10579299596866a7745b69437e241",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

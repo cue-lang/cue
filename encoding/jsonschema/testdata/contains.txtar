@@ -1,0 +1,13 @@
+-- list.yaml --
+type: object
+properties:
+  p1:
+    type: array
+    contains: {}
+
+additionalProperties: false
+
+-- out/decode/cue --
+import "list"
+
+p1?: list.MatchN(>=1, _)

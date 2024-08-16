@@ -19,6 +19,11 @@ properties:
     contains:
       const: 3
 
+  too:
+    type: array
+    contains:
+      type: string
+
   size:
     type: array
     minItems: 3
@@ -40,6 +45,7 @@ import "list"
 
 foo?: [...string]
 tuple?: [string, int, 2]
-has?: list.Contains(3)
+has?: list.MatchN(>=1, 3)
+too?: list.MatchN(>=1, string)
 size?: list.UniqueItems() & list.MaxItems(9) & [_, _, _, ...]
 additional?: [int, int, ...string]

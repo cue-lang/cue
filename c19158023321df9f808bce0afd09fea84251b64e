@@ -1,0 +1,146 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f733854_058d89da",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-16T11:27:26Z",
+      "side": 1,
+      "message": "This looks great to me! Thanks very much for doing this, and so quickly. I have a few minor comments and suggestions and I think Marcel should take a look before it lands but otherwise 👍",
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5ebf18a_a8a61d2f",
+        "filename": "internal/pkg/types.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-16T11:27:26Z",
+      "side": 1,
+      "message": "```suggestion\n// Constraint is a cue.Value that allows a non-concrete value\n// to be passed as a function argument.\n```\n?",
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "79245381_aa620759",
+        "filename": "pkg/gen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-16T11:27:26Z",
+      "side": 1,
+      "message": "```suggestion\n\t// Allow a *pkg.CallCtxt value as the first parameter.\n```\n?",
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b12d1bb_f1926fc9",
+        "filename": "pkg/list/list.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-16T11:27:26Z",
+      "side": 1,
+      "message": "```suggestion\n// \"n\" may be a number constraint and does not have to be a concrete number.\n// Likewise, matchValue will usually be a non-concrete value.\n```\n\nAlso, I suspect we should follow the lead of the newly proposed `matchN` builtin function (see https://review.gerrithub.io/c/cue-lang/cue/+/1198923) and finalize `list` before unifying.",
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94c70ae4_c2b3fca3",
+        "filename": "pkg/list/list.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-16T11:27:26Z",
+      "side": 1,
+      "message": "```suggestion\n\t\tif cue.Value(matchValue).Unify(w).Validate() \u003d\u003d nil {\n\t\t\tnmatch++\n\t\t}\n\t}\n```",
+      "range": {
+        "startLine": 295,
+        "startChar": 0,
+        "endLine": 299,
+        "endChar": 0
+      },
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2b9e7ae_adbdde35",
+        "filename": "pkg/list/list.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-16T11:27:26Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t\t\tn.Pos(),\n```\n\nAlso, perhaps we should include the position for the constraint and perhaps for the list itself, although perhaps that last happens naturally?",
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6bdf09ca_f4186a41",
+        "filename": "pkg/list/testdata/matchn.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-16T11:27:26Z",
+      "side": 1,
+      "message": "I don\u0027t get why these aren\u0027t errors rather than just being false.",
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bfc4988_eacaf466",
+        "filename": "pkg/list/testdata/matchn_err.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-16T11:27:26Z",
+      "side": 1,
+      "message": "It\u0027s interesting that these errors don\u0027t mention the position of the actual list data, but I suspect that\u0027s just a general shortcoming of the new evaluator and will be fixed elsewhere in time.",
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -34,6 +34,24 @@
       "parentUuid": "40f33d65_688d6773",
       "revId": "2b49638dfe2d4aa22dc9f73809f94638d42cf960",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09ab0f49_a86dd867",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 637,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-16T10:48:26Z",
+      "side": 1,
+      "message": "Ha, it published even though I hadn\u0027t clicked \"Save\"! What I intended to say was:\n\nSure, why not? Done.",
+      "parentUuid": "89bcc2f7_c17b8665",
+      "revId": "2b49638dfe2d4aa22dc9f73809f94638d42cf960",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

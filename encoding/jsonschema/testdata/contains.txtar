@@ -1,13 +1,45 @@
 -- list.yaml --
+$schema: "https://json-schema.org/draft/2019-09/schema"
 type: object
+
 properties:
   p1:
     type: array
     contains: {}
+
+  p2:
+    type: array
+    contains: {}
+    minContains: 0
+
+  p3:
+    type: array
+    contains: {}
+    maxContains: 6
+
+  p4:
+    type: array
+    contains: {}
+    minContains: 3
+    maxContains: 6
+
+  # If "contains" is not present within the same schema object, then this keyword has no effect.
+  p5:
+    type: array
+    minContains: 6
+  p6:
+    type: array
+    maxContains: 6
 
 additionalProperties: false
 
 -- out/decode/cue --
 import "list"
 
+@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
 p1?: list.MatchN(>=1, _)
+p2?: list.MatchN(>=0, _)
+p3?: list.MatchN(>=1 & <=6, _)
+p4?: list.MatchN(>=3 & <=6, _)
+p5?: [...]
+p6?: [...]

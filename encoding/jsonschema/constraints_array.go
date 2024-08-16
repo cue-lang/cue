@@ -40,11 +40,12 @@ func constraintAdditionalItems(key string, n cue.Value, s *state) {
 
 func constraintContains(key string, n cue.Value, s *state) {
 	list := s.addImport(n, "list")
-	// TODO: Passing non-concrete values is not yet supported in CUE.
-	if x := s.schema(n); !isAny(x) {
-		x := ast.NewCall(ast.NewSel(list, "Contains"), clearPos(x))
-		s.add(n, arrayType, x)
-	}
+	x := s.schema(n)
+	x = ast.NewCall(ast.NewSel(list, "MatchN"), &ast.UnaryExpr{
+		Op: token.GEQ,
+		X:  ast.NewLit(token.INT, "1"),
+	}, clearPos(x))
+	s.add(n, arrayType, x)
 }
 
 func constraintItems(key string, n cue.Value, s *state) {

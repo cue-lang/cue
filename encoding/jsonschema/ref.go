@@ -89,8 +89,6 @@ func (s *state) resolveURI(n cue.Value) *url.URL {
 	return u
 }
 
-const topSchema = "_schema"
-
 // makeCUERef converts a URI into a CUE reference for the current location.
 // The returned identifier (or first expression in a selection chain), is
 // hardwired to point to the resolved value. This will allow astutil.Sanitize
@@ -136,17 +134,8 @@ func (s *state) makeCUERef(n cue.Value, u *url.URL, fragmentParts []string) (_e 
 			case u.Host == "" && u.Path == "",
 				s.id != nil && s.id.Host == u.Host && s.id.Path == u.Path:
 				if len(fragmentParts) == 0 {
-					// refers to the top of the file. We will allow this by
-					// creating a helper schema as such:
-					//   _schema: {...}
-					//   _schema
-					// This is created at the finalization stage if
-					// hasSelfReference is set.
-					s.hasSelfReference = true
-
-					ident = ast.NewIdent(topSchema)
-					ident.Node = s.obj
-					return ident
+					// Refers to the top of the file.
+					return s.rootRef()
 				}
 
 				ident, fragmentParts = s.getNextIdent(n, fragmentParts)
@@ -202,16 +191,8 @@ func (s *state) makeCUERef(n cue.Value, u *url.URL, fragmentParts []string) (_e 
 					// state above the root state that we need to update.
 					s = s.up
 
-					// refers to the top of the file. We will allow this by
-					// creating a helper schema as such:
-					//   _schema: {...}
-					//   _schema
-					// This is created at the finalization stage if
-					// hasSelfReference is set.
-					s.hasSelfReference = true
-					ident = ast.NewIdent(topSchema)
-					ident.Node = s.obj
-					return ident
+					// Refers to the top of the file.
+					return s.rootRef()
 				}
 
 				x := s.idRef[0]
@@ -226,7 +207,6 @@ func (s *state) makeCUERef(n cue.Value, u *url.URL, fragmentParts []string) (_e 
 				return newSel(e, s.idRef[1])
 			}
 			ident, fragmentParts = s.getNextIdent(n, fragmentParts)
-			ident.Node = s.obj
 			break
 		}
 	}

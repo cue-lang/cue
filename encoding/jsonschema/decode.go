@@ -44,6 +44,10 @@ type decoder struct {
 	errs         errors.Error
 	numID        int // for creating unique numbers: increment on each use
 	mapURLErrors map[string]bool
+	// self holds the struct literal that will eventually be embedded
+	// in the top level file. It is only set when decoder.rootRef is
+	// called.
+	self *ast.StructLit
 }
 
 // addImport registers
@@ -169,17 +173,36 @@ func (d *decoder) schema(ref []ast.Label, v cue.Value) (a []ast.Decl) {
 		expr = ast.NewStruct(ref[i], expr)
 	}
 
-	if root.hasSelfReference {
+	if root.self != nil {
+		root.self.Elts = a
 		return []ast.Decl{
-			&ast.EmbedDecl{Expr: ast.NewIdent(topSchema)},
+			&ast.EmbedDecl{Expr: d.rootRef()},
 			&ast.Field{
-				Label: ast.NewIdent(topSchema),
-				Value: &ast.StructLit{Elts: a},
+				Label: d.rootRef(),
+				Value: root.self,
 			},
 		}
 	}
 
 	return a
+}
+
+// We will allow this by rootRef refers to the top of the file. The
+// implement this by creating a helper schema like this:
+//
+//	_schema: {...}
+//	_schema
+//
+// This is created at the finalization stage, signaled by d.self being
+// set.
+func (d *decoder) rootRef() *ast.Ident {
+	ident := ast.NewIdent("_schema")
+	if d.self == nil {
+		d.self = &ast.StructLit{}
+	}
+	// Ensure that all self-references refer to the same node.
+	ident.Node = d.self
+	return ident
 }
 
 func (d *decoder) errf(n cue.Value, format string, args ...interface{}) ast.Expr {
@@ -363,8 +386,7 @@ type state struct {
 	definitions []ast.Decl
 
 	// Used for inserting definitions, properties, etc.
-	hasSelfReference bool
-	obj              *ast.StructLit
+	obj *ast.StructLit
 	// Complete at finalize.
 	fieldRefs map[label]refs
 

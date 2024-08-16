@@ -70,24 +70,14 @@ _schema: {
 	@jsonschema(id="https://www.sourcemeta.com/schemas/vendor/json-e@1.json")
 	$else?: #["jsone-value"]
 	$let?: [string]: null | bool | number | string | [...] | {
-		[string]: _schema_1
+		[string]: _schema
 	}
-	$sort?: _schema_5 | [...number]
+	$sort?: _schema | [...number]
 	{[!~"^($else|$let|$sort)$"]: #["jsone-value"]}
 
-	#: "jsone-value": _schema_A | [..._schema_8]
+	#: "jsone-value": _schema | [..._schema]
 
 	#: "jsone-array": [...#["jsone-value"]]
 
-	#: "jsone-object-array": [..._schema_E]
+	#: "jsone-object-array": [..._schema]
 }
-
-let _schema_1 = _schema
-
-let _schema_5 = _schema
-
-let _schema_A = _schema
-
-let _schema_8 = _schema
-
-let _schema_E = _schema

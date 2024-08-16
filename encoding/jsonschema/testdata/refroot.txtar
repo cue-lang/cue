@@ -19,9 +19,7 @@ _schema: {
 	null | bool | number | string | [...] | {
 		@jsonschema(id="http://cuelang.org/go/encoding/openapi/testdata/order.json")
 		value?: _
-		next?:  _schema_1
+		next?:  _schema
 		...
 	}
 }
-
-let _schema_1 = _schema

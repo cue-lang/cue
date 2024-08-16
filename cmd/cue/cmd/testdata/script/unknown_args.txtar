@@ -1,0 +1,15 @@
+! exec cue unknown
+! stdout .
+cmp stderr unknown_cmd.out
+
+! exec cue --unknown
+! stdout .
+cmp stderr unknown_flag.out
+
+-- unknown_cmd.out --
+no commands defined
+Ensure custom commands are defined in a "_tool.cue" file.
+Run 'cue help cmd' to list available custom commands.
+Run 'cue help' to see the built-in 'cue' commands.
+-- unknown_flag.out --
+unknown flag: --unknown

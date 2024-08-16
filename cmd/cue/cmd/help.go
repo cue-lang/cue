@@ -36,8 +36,9 @@ import (
 // but knows how to load custom commands in `cue help cmd`.
 func newHelpCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "help [command]",
-		Short: "show help text for a command or topic",
+		Use:    "help [command]",
+		Short:  "show help text for a command or topic",
+		Hidden: true, // not shown as a runnable command in `cue help`
 		Run: func(_ *cobra.Command, args []string) {
 			findCmd := func() (*cobra.Command, bool) {
 				cmd, rest, err := c.Root().Find(args)
@@ -90,9 +91,50 @@ func newHelpCmd(c *Command) *cobra.Command {
 	return cmd
 }
 
-// TODO(mvdan): having the help topics as top-level commands means that `cue topic`
-// is taken and works as well as `cue help topic`, which is unnecessary.
-// Consider removing support for the short form at some point.
+// We use a custom Cobra help text template for the sake of being a bit more
+// in control of its formatting, as well as the contents of the root `cue help`.
+//
+// TODO(mvdan): the text below should not jump straight into `cue cmd`,
+// and instead give a high level overview of CUE and its commands.
+var helpTemplate = `
+{{- if not .HasParent}}{{/* Special template for the root help. */ -}}
+cue evaluates CUE files, an extension of JSON, and sends them
+to user-defined commands for processing.
+
+Commands are defined in CUE as follows:
+
+	import "tool/exec"
+	command: deploy: {
+		exec.Run
+		cmd:   "kubectl"
+		args:  ["-f", "deploy"]
+		in:    json.Encode(userValue) // encode the emitted configuration.
+	}
+
+cue can also combine the results of http or grpc request with the input
+configuration for further processing. For more information on defining commands
+run 'cue help cmd' or go to cuelang.org/pkg/cmd.
+
+For more information on writing CUE configuration files see cuelang.org.
+
+Usage:
+  {{.CommandPath}} [command]
+
+Available Commands:{{range .Commands}}{{if .IsAvailableCommand}}
+  {{rpad .Name .NamePadding }} {{.Short}}{{end}}{{end}}
+
+Use "{{.CommandPath}} help [command]" for more information about a command.
+
+{{/* We want to show additional help topics from the root command's help text
+     even though they are only reachable via 'cue help'. */ -}}
+Additional help topics:{{range .Commands}}{{if eq .Name "help"}}{{range .Commands}}
+  {{rpad .CommandPath .CommandPathPadding}} {{.Short}}{{end}}{{end}}{{end}}
+{{else}}{{/* Subcommands use a fairly standard template. */ -}}
+{{with (or .Long .Short)}}{{. | trimTrailingWhitespaces}}
+
+{{end}}{{if or .Runnable .HasSubCommands}}{{.UsageString}}{{end}}
+{{- end -}}
+`
 
 var helpTopics = []*cobra.Command{
 	commandsHelp,

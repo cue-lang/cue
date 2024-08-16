@@ -64,6 +64,8 @@ var constraints = []*constraint{
 	p3("allOf", constraintAllOf),
 	p3("anyOf", constraintAnyOf),
 	p2d("const", constraintConst, vfrom(versionDraft06)),
+	p1d("minContains", constraintMinContains, vfrom(version2019_09)),
+	p1d("maxContains", constraintMaxContains, vfrom(version2019_09)),
 	p2d("contains", constraintContains, vfrom(versionDraft06)),
 	p2d("contentEncoding", constraintContentEncoding, vfrom(versionDraft07)),
 	p2d("contentMediaType", constraintContentMediaType, vfrom(versionDraft07)),

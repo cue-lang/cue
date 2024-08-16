@@ -15,6 +15,8 @@
 package jsonschema
 
 import (
+	"strconv"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
@@ -38,13 +40,44 @@ func constraintAdditionalItems(key string, n cue.Value, s *state) {
 	}
 }
 
+func constraintMinContains(key string, n cue.Value, s *state) {
+	p, err := n.Uint64()
+	if err != nil {
+		s.errf(n, `value of "minContains" must be a non-negative integer value`)
+	}
+	s.minContains = &p
+}
+
+func constraintMaxContains(key string, n cue.Value, s *state) {
+	p, err := n.Uint64()
+	if err != nil {
+		s.errf(n, `value of "maxContains" must be a non-negative integer value`)
+	}
+	s.maxContains = &p
+}
+
 func constraintContains(key string, n cue.Value, s *state) {
 	list := s.addImport(n, "list")
-	if x := s.schema(n); !isAny(x) {
-		x := ast.NewCall(ast.NewSel(list, "MatchN"), &ast.UnaryExpr{
+	if x := s.schema(n); !isAny(x) || s.minContains != nil || s.maxContains != nil {
+		var c ast.Expr
+
+		min := 1
+		if s.minContains != nil {
+			min = int(*s.minContains)
+		}
+		c = &ast.UnaryExpr{
 			Op: token.GEQ,
-			X:  ast.NewLit(token.INT, "1"),
-		}, clearPos(x))
+			X:  ast.NewLit(token.INT, strconv.Itoa(min)),
+		}
+
+		if s.maxContains != nil {
+			c = ast.NewBinExpr(token.AND, c, &ast.UnaryExpr{
+				Op: token.LEQ,
+				X:  ast.NewLit(token.INT, strconv.Itoa(int(*s.maxContains))),
+			})
+		}
+
+		x := ast.NewCall(ast.NewSel(list, "MatchN"), c, clearPos(x))
 		s.add(n, arrayType, x)
 	}
 }

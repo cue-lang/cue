@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40f33d65_688d6773",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 637,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-16T09:48:01Z",
+      "side": 1,
+      "message": "have a `func bottom` for consistency, even if used just once?",
+      "revId": "2b49638dfe2d4aa22dc9f73809f94638d42cf960",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

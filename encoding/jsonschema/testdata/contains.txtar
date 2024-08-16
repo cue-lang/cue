@@ -1,0 +1,13 @@
+-- schema.yaml --
+type: object
+properties:
+  p1:
+    type: array
+    contains: {}
+
+additionalProperties: false
+
+-- out/decode/extract --
+import "list"
+
+p1?: list.MatchN(>=1, _)

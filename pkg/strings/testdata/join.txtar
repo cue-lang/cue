@@ -1,0 +1,6 @@
+-- in.cue --
+import "strings"
+
+disjunctDefault:  strings.Join(*["Hello", "World!"] | int, " ")
+-- out/strings --
+disjunctDefault: "Hello World!"

@@ -1,0 +1,59 @@
+-- in.cue --
+import (
+	"list"
+	"strings"
+	"text/template"
+)
+
+Len: len(*[1, 2, 3] | 0)
+Close: close(*{} | 0)
+And: and(*[1, 1] | int)
+Or: or(*[1, 1] | int)
+Div: div(*5 | string, 2)
+Mod: mod(*5 | string, 2)
+Quo: quo(*5 | string, 2)
+Rem: rem(*5 | string, 2)
+-- out/compile --
+--- in.cue
+{
+  Len: len((*[
+    1,
+    2,
+    3,
+  ]|0))
+  Close: close((*{}|0))
+  And: and((*[
+    1,
+    1,
+  ]|int))
+  Or: or((*[
+    1,
+    1,
+  ]|int))
+  Div: div((*5|string), 2)
+  Mod: mod((*5|string), 2)
+  Quo: quo((*5|string), 2)
+  Rem: rem((*5|string), 2)
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  45
+Reused: 40
+Allocs: 5
+Retain: 0
+
+Unifications: 25
+Conjuncts:    52
+Disjuncts:    45
+-- out/eval --
+(struct){
+  Len: (int){ 3 }
+  Close: (struct){
+  }
+  And: (int){ 1 }
+  Or: (int){ 1 }
+  Div: (int){ 2 }
+  Mod: (int){ 1 }
+  Quo: (int){ 2 }
+  Rem: (int){ 1 }
+}

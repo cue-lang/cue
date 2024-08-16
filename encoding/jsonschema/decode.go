@@ -376,6 +376,9 @@ type state struct {
 	exclusiveMin bool // For OpenAPI and legacy support.
 	exclusiveMax bool // For OpenAPI and legacy support.
 
+	minContains *uint64
+	maxContains *uint64
+
 	schemaVersion        schemaVersion
 	schemaVersionPresent bool
 

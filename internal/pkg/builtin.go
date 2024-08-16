@@ -44,12 +44,13 @@ import (
 //	[]T
 //	map[string]T
 type Builtin struct {
-	Name   string
-	Pkg    adt.Feature
-	Params []Param
-	Result adt.Kind
-	Func   func(c *CallCtxt)
-	Const  string
+	Name        string
+	Pkg         adt.Feature
+	Params      []Param
+	Result      adt.Kind
+	NonConcrete bool
+	Func        func(c *CallCtxt)
+	Const       string
 }
 
 type Param struct {
@@ -119,10 +120,11 @@ func ToBuiltin(b *Builtin) *adt.Builtin {
 	}
 
 	x := &adt.Builtin{
-		Params:  params,
-		Result:  b.Result,
-		Package: b.Pkg,
-		Name:    b.Name,
+		Params:      params,
+		Result:      b.Result,
+		NonConcrete: b.NonConcrete,
+		Package:     b.Pkg,
+		Name:        b.Name,
 	}
 	x.Func = func(ctx *adt.OpContext, args []adt.Value) (ret adt.Expr) {
 		// call, _ := ctx.Source().(*ast.CallExpr)

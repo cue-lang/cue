@@ -123,10 +123,11 @@ func main() {
 }
 
 type generator struct {
-	dir        string
-	w          *bytes.Buffer
-	cuePkgPath string
-	first      bool
+	dir         string
+	w           *bytes.Buffer
+	cuePkgPath  string
+	first       bool
+	nonConcrete bool
 }
 
 func generate(pkg *packages.Package) error {
@@ -298,6 +299,7 @@ func (g *generator) processGo(pkg *packages.Package) error {
 var errorType = types.Universe.Lookup("error").Type()
 
 func (g *generator) genFunc(fn *types.Func) {
+	g.nonConcrete = false
 	sign := fn.Type().(*types.Signature)
 	if sign.Recv() != nil {
 		return
@@ -334,6 +336,9 @@ func (g *generator) genFunc(fn *types.Func) {
 	fmt.Fprintf(g.w, "\n},\n")
 
 	fmt.Fprintf(g.w, "Result: %s,\n", g.goToCUE(results.At(0).Type()))
+	if g.nonConcrete {
+		fmt.Fprintf(g.w, "NonConcrete: true,\n")
+	}
 
 	argList := strings.Join(args, ", ")
 	valList := strings.Join(vals, ", ")
@@ -378,6 +383,9 @@ func (g *generator) goKind(typ types.Type) string {
 		return "cueList"
 	case "cuelang.org/go/internal/pkg.Struct":
 		return "struct"
+	case "cuelang.org/go/internal/pkg.Schema":
+		g.nonConcrete = true
+		return "schema"
 	case "[]*github.com/cockroachdb/apd/v3.Decimal":
 		return "decimalList"
 	case "cuelang.org/go/cue.Value":

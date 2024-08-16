@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "9c7ba4ee_52a56366",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-16T12:11:56Z",
+      "side": 1,
+      "message": "Fix applied.",
+      "parentUuid": "59a0a567_eb560c1f",
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "7f733854_058d89da",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "75dc9394_d625c14d",
+        "filename": "internal/pkg/types.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-16T12:11:56Z",
+      "side": 1,
+      "message": "Fix applied.",
+      "parentUuid": "e5ebf18a_a8a61d2f",
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "79245381_aa620759",
@@ -65,6 +101,24 @@
       "writtenOn": "2024-08-16T11:27:26Z",
       "side": 1,
       "message": "```suggestion\n\t// Allow a *pkg.CallCtxt value as the first parameter.\n```\n?",
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7648df5c_643ae959",
+        "filename": "pkg/gen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-16T12:11:56Z",
+      "side": 1,
+      "message": "Fix applied.",
+      "parentUuid": "79245381_aa620759",
       "revId": "c19158023321df9f808bce0afd09fea84251b64e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -99,6 +153,30 @@
       "writtenOn": "2024-08-16T11:27:26Z",
       "side": 1,
       "message": "```suggestion\n\t\tif cue.Value(matchValue).Unify(w).Validate() \u003d\u003d nil {\n\t\t\tnmatch++\n\t\t}\n\t}\n```",
+      "range": {
+        "startLine": 295,
+        "startChar": 0,
+        "endLine": 299,
+        "endChar": 0
+      },
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f6e2ffa_ba2ce93c",
+        "filename": "pkg/list/list.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-16T12:11:56Z",
+      "side": 1,
+      "message": "Fix applied.",
+      "parentUuid": "94c70ae4_c2b3fca3",
       "range": {
         "startLine": 295,
         "startChar": 0,

@@ -19,6 +19,7 @@ package main
 
 import (
 	"flag"
+	"log"
 	"os"
 
 	"fmt"
@@ -33,13 +34,27 @@ import (
 )
 
 func main() {
-	flag.Parse()
-	args := flag.Args()
-	if len(args) != 1 {
-		// We could support multiple arguments or stdin if useful.
-		panic("expecting exactly one argument")
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: cue-ast-print [file.cue]\n")
+		os.Exit(2)
 	}
-	file, err := parser.ParseFile(args[0], nil, parser.ParseComments)
+	flag.Parse()
+	var filename string
+	var src any
+	switch flag.NArg() {
+	case 0:
+		filename = "<stdin>"
+		data, err := io.ReadAll(os.Stdin)
+		if err != nil {
+			log.Fatal(err)
+		}
+		src = data
+	case 1:
+		filename = flag.Arg(0)
+	default:
+		flag.Usage()
+	}
+	file, err := parser.ParseFile(filename, src, parser.ParseComments)
 	if err != nil {
 		panic(err)
 	}
@@ -48,7 +63,7 @@ func main() {
 
 func debugPrint(w io.Writer, node ast.Node) {
 	d := &debugPrinter{w: w}
-	d.value(reflect.ValueOf(node))
+	d.value(reflect.ValueOf(node), nil)
 	d.newline()
 }
 
@@ -70,7 +85,7 @@ var (
 	typeTokenToken = reflect.TypeFor[token.Token]()
 )
 
-func (d *debugPrinter) value(v reflect.Value) {
+func (d *debugPrinter) value(v reflect.Value, impliedType reflect.Type) {
 	// Skip over interface types.
 	if v.Kind() == reflect.Interface {
 		v = v.Elem()
@@ -90,7 +105,7 @@ func (d *debugPrinter) value(v reflect.Value) {
 	switch t {
 	// Simple types which can stringify themselves.
 	case typeTokenPos, typeTokenToken:
-		d.printf("%s(%q)", t, v.Interface())
+		d.printf("%s(%q)", t, v)
 		return
 	}
 
@@ -99,23 +114,35 @@ func (d *debugPrinter) value(v reflect.Value) {
 		// We assume all other kinds are basic in practice, like string or bool.
 		if t.PkgPath() != "" {
 			// Mention defined and non-predeclared types, for clarity.
-			d.printf("%s(%#v)", t, v.Interface())
+			d.printf("%s(%#v)", t, v)
 		} else {
-			d.printf("%#v", v.Interface())
+			d.printf("%#v", v)
 		}
 	case reflect.Slice:
-		d.printf("%s{", origType)
-		d.level++
-		for i := 0; i < v.Len(); i++ {
-			d.newline()
-			ev := v.Index(i)
-			d.value(ev)
+		if origType != impliedType {
+			d.printf("%s", origType)
 		}
-		d.level--
-		d.newline()
+		d.printf("{")
+		if v.Len() > 0 {
+			d.level++
+			for i := 0; i < v.Len(); i++ {
+				d.newline()
+				ev := v.Index(i)
+				// Note: a slice literal implies the type of its elements
+				// so we can avoid mentioning the type
+				// of each element if it matches.
+				d.value(ev, t.Elem())
+			}
+			d.level--
+			d.newline()
+		}
 		d.printf("}")
 	case reflect.Struct:
-		d.printf("%s{", origType)
+		if origType != impliedType {
+			d.printf("%s", origType)
+		}
+		d.printf("{")
+		printed := false
 		d.level++
 		for i := 0; i < v.NumField(); i++ {
 			f := t.Field(i)
@@ -127,22 +154,26 @@ func (d *debugPrinter) value(v reflect.Value) {
 			case "Scope", "Node", "Unresolved":
 				continue
 			}
+			printed = true
 			d.newline()
 			d.printf("%s: ", f.Name)
-			d.value(v.Field(i))
+			d.value(v.Field(i), nil)
 		}
 		val := v.Addr().Interface()
 		if val, ok := val.(ast.Node); ok {
 			// Comments attached to a node aren't a regular field, but are still useful.
 			// The majority of nodes won't have comments, so skip them when empty.
 			if comments := ast.Comments(val); len(comments) > 0 {
+				printed = true
 				d.newline()
 				d.printf("Comments: ")
-				d.value(reflect.ValueOf(comments))
+				d.value(reflect.ValueOf(comments), nil)
 			}
 		}
 		d.level--
-		d.newline()
+		if printed {
+			d.newline()
+		}
 		d.printf("}")
 	}
 }

@@ -1131,6 +1131,11 @@ func (c *OpContext) RawElems(v Value) []*Vertex {
 }
 
 func (c *OpContext) list(v Value) *Vertex {
+	if v != nil {
+		if a, ok := c.getDefault(v); ok {
+			v = a
+		}
+	}
 	x, ok := v.(*Vertex)
 	if !ok || !x.IsList() {
 		c.typeError(v, ListKind)

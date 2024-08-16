@@ -81,6 +81,7 @@ var closeBuiltin = &adt.Builtin{
 	Name:   "close",
 	Params: []adt.Param{structParam},
 	Result: adt.StructKind,
+	// Noncrete: true, // TODO: should probably be noncrete
 	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
 		s, ok := args[0].(*adt.Vertex)
 		if !ok {
@@ -98,9 +99,10 @@ var closeBuiltin = &adt.Builtin{
 }
 
 var andBuiltin = &adt.Builtin{
-	Name:   "and",
-	Params: []adt.Param{listParam},
-	Result: adt.IntKind,
+	Name:        "and",
+	Params:      []adt.Param{listParam},
+	Result:      adt.IntKind,
+	NonConcrete: true,
 	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
 		list := c.RawElems(args[0])
 		if len(list) == 0 {
@@ -115,9 +117,10 @@ var andBuiltin = &adt.Builtin{
 }
 
 var orBuiltin = &adt.Builtin{
-	Name:   "or",
-	Params: []adt.Param{listParam},
-	Result: adt.IntKind,
+	Name:        "or",
+	Params:      []adt.Param{listParam},
+	Result:      adt.IntKind,
+	NonConcrete: true,
 	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
 		d := []adt.Disjunct{}
 		for _, c := range c.RawElems(args[0]) {

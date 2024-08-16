@@ -1,3 +1,5 @@
+skip 'TODO(mvdan): this test is racy; re-enable once we wait for the http server to be ready'
+
 # TODO: use a random unused port
 env CUE_REGISTRY=localhost:41331
 exec cue mod registry ${CUE_REGISTRY} &

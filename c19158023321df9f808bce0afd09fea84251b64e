@@ -53,6 +53,40 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f933accc_ab0ef15c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-16T13:04:00Z",
+      "side": 1,
+      "message": "Hi Haoqixu, thanks for your contributions!\n\nThis is on the right track. Supporting Schema/Constraints in calls is not entirely trivial, though. CL https://review.gerrithub.io/c/cue-lang/cue/+/1194425 was bumping into a similar issue and made some very similar changes to what you are doing! \n\nI suggest we check that in first, which should make your case a bit easier.",
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7f06fbb_70765a43",
+        "filename": "internal/pkg/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-16T13:04:00Z",
+      "side": 1,
+      "message": "Doc comment.",
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e5ebf18a_a8a61d2f",
@@ -83,6 +117,24 @@
       "writtenOn": "2024-08-16T12:11:56Z",
       "side": 1,
       "message": "Fix applied.",
+      "parentUuid": "e5ebf18a_a8a61d2f",
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47f2cb91_98650713",
+        "filename": "internal/pkg/types.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-16T13:04:00Z",
+      "side": 1,
+      "message": "All cue.Values allow non-concrete values. Also, not all constraints are cue.Values.",
       "parentUuid": "e5ebf18a_a8a61d2f",
       "revId": "c19158023321df9f808bce0afd09fea84251b64e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
@@ -200,6 +252,40 @@
       "writtenOn": "2024-08-16T11:27:26Z",
       "side": 1,
       "message": "```suggestion\n\t\t\t\tn.Pos(),\n```\n\nAlso, perhaps we should include the position for the constraint and perhaps for the list itself, although perhaps that last happens naturally?",
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e06b228_78d8c978",
+        "filename": "pkg/list/testdata/matchn.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-16T13:04:00Z",
+      "side": 1,
+      "message": "Ideally, please use a different field per test case. If you want them to apply to the same list, you can write `[\u003d~\"^l\"]: [ ... ]`, for instance to mix in some value with all variants.",
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c630f93d_631ca014",
+        "filename": "pkg/list/testdata/matchn.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-16T13:04:00Z",
+      "side": 1,
+      "message": "`matchN` is only allowed to be used as a validator. In general, this is probably where we want to go. Ideally, this is enforced in MatchN as well.\n\nAt the very least, though, tests should not pass the list as a first argument.",
       "revId": "c19158023321df9f808bce0afd09fea84251b64e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

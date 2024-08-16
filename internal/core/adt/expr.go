@@ -1520,7 +1520,12 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 		cond := state.conditions() | allAncestorsProcessed | concreteKnown
 		state = combineMode(cond, runMode).withVertexStatus(state.vertexStatus())
 
-		expr := c.value(a, state)
+		var expr Value
+		if b.NonConcrete {
+			expr = c.evalState(a, state)
+		} else {
+			expr = c.value(a, state)
+		}
 
 		switch v := expr.(type) {
 		case nil:
@@ -1558,7 +1563,12 @@ type Builtin struct {
 	// TODO:  make these values for better type checking.
 	Params []Param
 	Result Kind
-	Func   func(c *OpContext, args []Value) Expr
+
+	// NonConcrete should be set to true if a builtin supports non-concrete
+	// arguments. By default, all arguments are checked to be concrete.
+	NonConcrete bool
+
+	Func func(c *OpContext, args []Value) Expr
 
 	Package Feature
 	Name    string

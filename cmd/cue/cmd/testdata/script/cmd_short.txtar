@@ -2,13 +2,11 @@ exec cue cmd hello
 stdout 'Hello world!'
 ! stderr .
 
-exec cue hello
-stdout 'Hello world!'
-cmp stderr stderr-warning
+! exec cue hello
+cmp stderr short-stderr
 
--- stderr-warning --
-The short-form 'cue hello' is deprecated; use 'cue cmd hello'.
-See: https://cuelang.org/issue/2519
+-- short-stderr --
+unknown command "hello" for "cue"
 -- task_tool.cue --
 package home
 

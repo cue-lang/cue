@@ -35,9 +35,7 @@ stdout -count=1 '^The cue tools supports the following file types:$'
 
 ! exec cue filetypes
 ! stdout .
-stderr -count=1 '^no commands defined'
-# TODO(mvdan): once `cue somecmd` is phased out, we can give a better error message here.
-# stderr -count=1 '^unknown command'
+stderr -count=1 '^unknown command'
 
 # Requesting help for missing commands and sub-commands fails and prints the help text.
 

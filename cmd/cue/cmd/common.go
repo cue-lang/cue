@@ -385,7 +385,7 @@ func newBuildPlan(cmd *Command, cfg *config) (p *buildPlan, err error) {
 	}
 	cfg.reFile = re
 
-	setTags(cfg.loadCfg, cmd.Flags(), cmd.Parent().Flags())
+	setTags(cfg.loadCfg, cmd.Flags())
 
 	return p, nil
 }
@@ -394,16 +394,11 @@ func (p *buildPlan) matchFile(file string) bool {
 	return p.cfg.reFile.MatchString(file)
 }
 
-func setTags(cfg *load.Config, flags ...*pflag.FlagSet) {
-	// setTags usually receives a subcommmand's flags, plus the parent (root) command's flags,
-	// so that we can support "cue cmd -t foo=bar mycmd" as well as the short form "cue -t foo=bar mycmd".
-	// TODO: once we remove "cue cmd" short-hand support, go back to a single FlagSet parameter.
-	for _, f := range flags {
-		tags, _ := f.GetStringArray(string(flagInject))
-		cfg.Tags = append(cfg.Tags, tags...)
-		if b, _ := f.GetBool(string(flagInjectVars)); b {
-			cfg.TagVars = load.DefaultTagVars()
-		}
+func setTags(cfg *load.Config, flags *pflag.FlagSet) {
+	tags, _ := flags.GetStringArray(string(flagInject))
+	cfg.Tags = append(cfg.Tags, tags...)
+	if b, _ := flags.GetBool(string(flagInjectVars)); b {
+		cfg.TagVars = load.DefaultTagVars()
 	}
 }
 
@@ -780,8 +775,7 @@ func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 	}
 	loadCfg := *cfg.loadCfg
 	loadCfg.Tools = true
-	f := cmd.cmd.Flags()
-	setTags(&loadCfg, f, cmd.cmd.Parent().Flags())
+	setTags(&loadCfg, cmd.cmdCmd.Flags())
 
 	binst := loadFromArgs(args, &loadCfg)
 	if len(binst) == 0 {

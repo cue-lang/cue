@@ -19,7 +19,6 @@ import (
 
 	"cuelang.org/go/cue/errors"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 )
 
 // TODO: generate long description from documentation.
@@ -135,48 +134,26 @@ again).
 Run "cue help commands" for more details on tasks and workflow commands.
 `,
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {
-			// The behavior when there's no known subcommand is different
-			// depending on whether we ran via `cue cmd` or the `cue` shortcut.
-			isRootCmd := cmd.Command == cmd.root
-
 			if len(args) == 0 {
-				// `cue` should print the top-level help like `cue -h`,
-				// but `cue cmd` should explain that a custom command is required.
-				if isRootCmd {
-					return pflag.ErrHelp
-				}
 				w := cmd.OutOrStderr()
 				fmt.Fprintln(w, "cmd must be run as one of its subcommands")
 				fmt.Fprintln(w, "Run 'cue help cmd' for known subcommands.")
 				return ErrPrintedError
 			}
 			tools, err := buildTools(cmd, args[1:])
-			if err != nil && !isRootCmd {
-				// `cue cmd` fails immediately if there is no CUE package,
-				// but `cue` does not in order to always show a useful error in `cue typo`.
+			if err != nil {
 				return err
 			}
 			sub, err := customCommand(cmd, commandSection, args[0], tools)
 			if err != nil {
 				w := cmd.OutOrStderr()
-				cmdline := "cue"
-				if !isRootCmd {
-					cmdline += " cmd"
-				}
 				fmt.Fprint(w, errors.Details(err, &errors.Config{Cwd: rootWorkingDir}))
 				fmt.Fprintln(w, `Ensure custom commands are defined in a "_tool.cue" file.`)
 				fmt.Fprintln(w, "Run 'cue help cmd' to list available custom commands.")
-				if isRootCmd {
-					fmt.Fprintln(w, "Run 'cue help' to see the built-in 'cue' commands.")
-				}
 				return ErrPrintedError
 			}
 			// Presumably the *cobra.Command argument should be cmd.Command,
 			// as that is the one which will have the right settings applied.
-			if isRootCmd {
-				cmd.PrintErrf("The short-form 'cue %[1]s' is deprecated; use 'cue cmd %[1]s'.\n", args[0])
-				cmd.PrintErrf("See: https://cuelang.org/issue/2519\n")
-			}
 			return sub.RunE(cmd.Command, args[1:])
 		}),
 	}

@@ -190,11 +190,6 @@ func New(args []string) (*Command, error) {
 		// TODO: the short help text below seems to refer to `cue cmd`, like helpTemplate.
 		Short: "cue emits configuration files to user-defined commands.",
 
-		// ArbitraryArgs allows us to forward the top-level RunE to cmdCmd.RunE,
-		// which supports `cue mycmd` as a short-cut for `cue cmd mycmd`.
-		// Without ArbitraryArgs, cobra fails with "unknown command" errors.
-		Args: cobra.ArbitraryArgs,
-
 		// We print errors ourselves in Main, which allows for ErrPrintedError.
 		// Similarly, we don't want to print the entire help text on any error.
 		// We can explicitly trigger help on certain errors via pflag.ErrHelp.
@@ -203,6 +198,7 @@ func New(args []string) (*Command, error) {
 
 		// We currently support top-level custom commands like `cue mycmd` as an alias
 		// for `cue cmd mycmd`, so any sub-command suggestions might be confusing.
+		// TODO(mvdan): remove this and test it, as we no longer support `cue mycmd`.
 		DisableSuggestions: true,
 	}
 
@@ -214,14 +210,9 @@ func New(args []string) (*Command, error) {
 		root:    cmd,
 		ctx:     cuecontext.New(rootContextOptions...),
 	}
-
-	cmdCmd := newCmdCmd(c)
-	c.cmd = cmdCmd
+	c.cmdCmd = newCmdCmd(c)
 
 	addGlobalFlags(cmd.PersistentFlags())
-	// We add the injection flags to the root command for the sake of the short form "cue -t foo=bar mycmd".
-	// Note that they are not persistent, so that they aren't inherited by sub-commands like "cue fmt".
-	addInjectionFlags(cmd.Flags(), false, true)
 
 	// Cobra's --help flag shows up in help text by default, which is unnecessary.
 	cmd.InitDefaultHelpFlag()
@@ -240,7 +231,7 @@ func New(args []string) (*Command, error) {
 	cmd.SetHelpTemplate(helpTemplate)
 
 	for _, sub := range []*cobra.Command{
-		cmdCmd,
+		c.cmdCmd,
 		newCompletionCmd(c),
 		newEvalCmd(c),
 		newDefCmd(c),
@@ -260,9 +251,6 @@ func New(args []string) (*Command, error) {
 	} {
 		cmd.AddCommand(sub)
 	}
-
-	// For `cue mycmd` to be a shortcut for `cue cmd mycmd`.
-	cmd.RunE = cmdCmd.RunE
 
 	cmd.SetArgs(args)
 	return c, nil
@@ -303,8 +291,8 @@ type Command struct {
 
 	root *cobra.Command
 
-	// Subcommands
-	cmd *cobra.Command
+	// _tool.cue subcommands.
+	cmdCmd *cobra.Command
 
 	ctx *cue.Context
 

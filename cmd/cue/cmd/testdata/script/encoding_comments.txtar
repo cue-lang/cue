@@ -1,0 +1,84 @@
+# Test that the various encodings support encoding comments from CUE.
+# Note that some encodings have no support for comments, like JSON.
+# This is meant mainly as an end-to-end smoke test; specific edge cases
+# should be tested in each encoding package.
+
+# TODO(mvdan): test importing comments into CUE as well.
+# TODO(mvdan): interesting that comments at the start and end of a file are lost.
+
+exec cue export --out cue .
+cmp stdout as-cue.stdout
+
+exec cue export --out json .
+cmp stdout as-json.stdout
+
+# TODO(mvdan): YAML should support exporting comments.
+exec cue export --out yaml .
+cmp stdout as-yaml.stdout
+
+# TODO(mvdan): TOML should support exporting comments.
+exec cue export --out toml .
+cmp stdout as-toml.stdout
+
+-- hello.cue --
+// comment at the start of a file
+
+// Package hello is an example.
+package hello
+
+// top-level comment before a simple field
+foo: "bar"
+
+// top-level comment before a struct
+hello: {
+	// comment in a struct field
+	world: "message"
+}
+
+// top-level comment before a list
+list: [
+	1,
+	// comment in a list element
+	2,
+	3,
+]
+
+// comment at the end of a file
+-- as-cue.stdout --
+// top-level comment before a simple field
+foo: "bar"
+
+// top-level comment before a struct
+hello: {
+	// comment in a struct field
+	world: "message"
+}
+
+// top-level comment before a list
+list: [1, 2, 3]
+-- as-json.stdout --
+{
+    "foo": "bar",
+    "hello": {
+        "world": "message"
+    },
+    "list": [
+        1,
+        2,
+        3
+    ]
+}
+-- as-yaml.stdout --
+foo: bar
+hello:
+  world: message
+list:
+  - 1
+  - 2
+  - 3
+-- as-toml.stdout --
+foo = 'bar'
+list = [1, 2, 3]
+
+[hello]
+world = 'message'

@@ -33,6 +33,24 @@
       "message": "I don\u0027t _think_ we need this restriction any more. AIUI this means that:\n\n```\n{\n    \"contains\": true,\n    \"type\": \"array\"\n}\n```\nwill not result in any constraints, but it should do (it should not allow the empty array).\nOf course, we could represent this case in a different way (for example as `[_, ...]`) but I think it\u0027s reasonable to be consistent with other `contains` instances here.\n\nLet\u0027s add a test case for the above snippet, please.",
       "revId": "5bade93282b6b1300ace4b804b38f977457cd698",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "efed6ae2_2a14fe0f",
+        "filename": "encoding/jsonschema/constraints_array.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-19T05:16:45Z",
+      "side": 1,
+      "message": "indeed. we still need to check whether there is at least one element even when the schema is any. Done.",
+      "parentUuid": "ae5f445f_4ff403c6",
+      "revId": "5bade93282b6b1300ace4b804b38f977457cd698",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

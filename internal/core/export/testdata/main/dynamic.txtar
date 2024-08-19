@@ -141,7 +141,7 @@ This is probably okay.
 	}
 }
 == Final
-_|_ // key value of dynamic field must be concrete, found string (and 2 more errors)
+_|_ // key value of dynamic field must be concrete, found string (and 1 more errors)
 == All
 {
 	x:     string
@@ -247,7 +247,7 @@ diff old new
 +}
  == Final
 -_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
-+_|_ // key value of dynamic field must be concrete, found string (and 2 more errors)
++_|_ // key value of dynamic field must be concrete, found string (and 1 more errors)
  == All
 -_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
 +{

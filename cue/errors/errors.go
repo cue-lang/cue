@@ -313,15 +313,30 @@ func Errors(err error) []Error {
 }
 
 func appendToList(a list, err Error) list {
-	switch x := err.(type) {
+	switch b := err.(type) {
 	case nil:
 		return a
 	case list:
 		if a == nil {
-			return x
+			return b
 		}
-		return append(a, x...)
+		known := make(map[error]struct{}, len(a))
+		for _, aErr := range a {
+			known[aErr] = struct{}{}
+		}
+		for _, bErr := range b {
+			if _, found := known[bErr]; !found {
+				a = append(a, bErr)
+				known[bErr] = struct{}{}
+			}
+		}
+		return a
 	default:
+		for _, aErr := range a {
+			if aErr == err {
+				return a
+			}
+		}
 		return append(a, err)
 	}
 }

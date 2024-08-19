@@ -366,7 +366,7 @@ was known to compile and is known to be correct.
 		}
 		selfRefValue: {
 			struct: {
-				a: _|_ // valueAlias.selfRefValue.struct.a: incomplete list: _ (and 3 more errors)
+				a: _|_ // valueAlias.selfRefValue.struct.a: incomplete list: _ (and 1 more errors)
 			}
 			pattern: {
 				a: {}
@@ -516,7 +516,7 @@ diff old new
  		selfRefValue: {
  			struct: {
 -				a: _|_ // cycle error
-+				a: _|_ // valueAlias.selfRefValue.struct.a: incomplete list: _ (and 3 more errors)
++				a: _|_ // valueAlias.selfRefValue.struct.a: incomplete list: _ (and 1 more errors)
  			}
  			pattern: {
  				a: {}

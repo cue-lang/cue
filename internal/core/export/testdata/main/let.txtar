@@ -915,7 +915,7 @@ diff old new
 -			name: "two"
 -		}
 -	}]
--	files: _|_ // invalid interpolation: cycle error (and 3 more errors)
+-	files: _|_ // invalid interpolation: cycle error (and 1 more errors)
 +	comprehension: _|_ // comprehension: key value of dynamic field must be concrete, found _|_(invalid interpolation: invalid interpolation: comprehension.filepath: undefined field: name) (and 1 more errors)
 +	complete: {
 +		x: "a foo z"
@@ -1173,7 +1173,7 @@ Improved error messages.
 			name: "two"
 		}
 	}]
-	files: _|_ // invalid interpolation: cycle error (and 3 more errors)
+	files: _|_ // invalid interpolation: cycle error (and 1 more errors)
 	scoped: {
 		direct: {
 			a: 1

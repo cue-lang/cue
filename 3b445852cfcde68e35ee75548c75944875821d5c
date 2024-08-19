@@ -22,6 +22,30 @@
       },
       "revId": "3b445852cfcde68e35ee75548c75944875821d5c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "06937ad9_008b222f",
+        "filename": "internal/core/compile/validator.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-19T15:11:56Z",
+      "side": 1,
+      "message": "Yes, typo. Thanks for catching this!",
+      "parentUuid": "0efa6dec_1a501838",
+      "range": {
+        "startLine": 33,
+        "startChar": 21,
+        "endLine": 33,
+        "endChar": 26
+      },
+      "revId": "3b445852cfcde68e35ee75548c75944875821d5c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

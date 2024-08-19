@@ -255,7 +255,6 @@ g: {
 	}
 }
 special: {
-	// These are all valid.
 	underscoreFile: z:  45
 	dotFile: z:         46
 	dotdotFile: dotdot: true

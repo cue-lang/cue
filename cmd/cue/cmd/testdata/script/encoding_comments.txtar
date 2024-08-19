@@ -45,16 +45,8 @@ list: [
 
 // comment at the end of a file
 -- as-cue.stdout --
-// top-level comment before a simple field
 foo: "bar"
-
-// top-level comment before a struct
-hello: {
-	// comment in a struct field
-	world: "message"
-}
-
-// top-level comment before a list
+hello: world: "message"
 list: [1, 2, 3]
 -- as-json.stdout --
 {

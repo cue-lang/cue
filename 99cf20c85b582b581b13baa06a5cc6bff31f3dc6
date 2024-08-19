@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3827e9f2_157939d0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-19T14:33:30Z",
+      "side": 1,
+      "message": "Fixes...?",
+      "revId": "99cf20c85b582b581b13baa06a5cc6bff31f3dc6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "710630af_784198bf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-19T14:33:30Z",
+      "side": 1,
+      "message": "Usually we would place evalv3-win regression tests in cue/tests, but since v2 panics, I think a testscript is correct.",
+      "revId": "99cf20c85b582b581b13baa06a5cc6bff31f3dc6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21a8a4b8_db94f809",
+        "filename": "cmd/cue/cmd/testdata/script/eval_issue3376.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-19T14:33:30Z",
+      "side": 1,
+      "message": "nit: at least do an `stderr` check for the panic message, to be very clear about the expectation.",
+      "revId": "99cf20c85b582b581b13baa06a5cc6bff31f3dc6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e8eaae7_e0db950c",
+        "filename": "cmd/cue/cmd/testdata/script/eval_issue3376.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-19T14:33:30Z",
+      "side": 1,
+      "message": "you never check against this?",
+      "revId": "99cf20c85b582b581b13baa06a5cc6bff31f3dc6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

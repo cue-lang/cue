@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "03306681_6a938340",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-19T09:10:40Z",
+      "side": 1,
+      "message": "Add the `IsValidator` method to `pkg.CallCtxt`, which allows the validator to check if it is called as a validator.",
+      "revId": "019ab76342ac2f54fda5ed731bce5952b0e78e4a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

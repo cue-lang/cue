@@ -328,6 +328,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c11914f7_d15f3a90",
+        "filename": "pkg/list/list.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-19T09:10:40Z",
+      "side": 1,
+      "message": "it seems unnecessary, because `BuiltinValidator.validate()` will attach source positions to the validation errors.",
+      "parentUuid": "c2b9e7ae_adbdde35",
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5e06b228_78d8c978",
@@ -341,6 +359,24 @@
       "writtenOn": "2024-08-16T13:04:00Z",
       "side": 1,
       "message": "Ideally, please use a different field per test case. If you want them to apply to the same list, you can write `[\u003d~\"^l\"]: [ ... ]`, for instance to mix in some value with all variants.",
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99f2a434_299dac7d",
+        "filename": "pkg/list/testdata/matchn.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-19T09:10:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5e06b228_78d8c978",
       "revId": "c19158023321df9f808bce0afd09fea84251b64e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -362,6 +398,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b358ee7_92f7650f",
+        "filename": "pkg/list/testdata/matchn.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-19T09:10:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c630f93d_631ca014",
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6bdf09ca_f4186a41",
@@ -375,6 +429,24 @@
       "writtenOn": "2024-08-16T11:27:26Z",
       "side": 1,
       "message": "I don\u0027t get why these aren\u0027t errors rather than just being false.",
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "60e6b0e9_f91e6847",
+        "filename": "pkg/list/testdata/matchn.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-19T09:10:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6bdf09ca_f4186a41",
       "revId": "c19158023321df9f808bce0afd09fea84251b64e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

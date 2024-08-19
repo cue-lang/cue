@@ -1,0 +1,129 @@
+# https://cuelang.org/issue/3376
+#
+# The old evaluator does not correctly handle the difference in order of
+# declarations. To the extent that scenario2 gives an error:
+#
+# items.a: cannot add to field _:
+#     ./scenario2.cue:1:32
+#
+# and scenario4 results in a SIGSEV.
+#
+# The new evaluator correctly results in no errors in these cases.
+
+# evalv2 - scenario 1
+exec cue eval ./scenario1.cue
+
+# evalv2 - scenario 2
+#
+# This should not fail but it does. Fixed in evalv3
+! exec cue eval ./scenario2.cue
+
+# evalv2 - scenario 3
+exec cue eval ./scenario3.cue
+
+# evalv2 - scenario 4
+#
+# This should not fail but it does with a SIGSEV. Fixed in evalv3
+! exec cue eval ./scenario4.cue
+
+env CUE_EXPERIMENT=evalv3
+
+# evalv3 - scenario 1
+exec cue eval ./scenario1.cue
+
+# evalv3 - scenario 2
+exec cue eval ./scenario2.cue
+
+# evalv3 - scenario 3
+exec cue eval ./scenario3.cue
+
+# evalv3 - scenario 4
+exec cue eval ./scenario4.cue
+
+-- scenario1.cue --
+#Item: {
+  id!: string
+  deps: [...or(known_ids)] | or(known_ids)
+}
+
+known_ids: [for k,v in items { v.id } ]
+
+items: [string]: #Item
+
+items: [Key=_]: { id: (Key) + "-id" }
+
+items: a: deps: items.b.id
+items: b: deps: []
+items: c: deps: [items.a.id, items.b.id]
+
+-- scenario2.cue --
+known_ids: [for k,v in items { v.id } ]
+
+#Item: {
+  id!: string
+  deps: [...or(known_ids)] | or(known_ids)
+}
+
+
+items: [string]: #Item
+
+items: [Key=_]: { id: (Key) + "-id" }
+
+items: a: deps: items.b.id
+items: b: deps: []
+items: c: deps: [items.a.id, items.b.id]
+
+-- scenario3.cue --
+#Item: {
+  id!: string
+  deps?: [...or(known_ids)] | or(known_ids)
+}
+
+known_ids: [for k,v in items { v.id } ]
+
+items: [string]: #Item
+
+items: [Key=_]: { id: (Key) + "-id" }
+
+items: a: deps: items.b.id
+items: b: deps: []
+items: c: deps: [items.a.id, items.b.id]
+items: d: _
+
+-- scenario4.cue --
+known_ids: [for k,v in items { v.id } ]
+
+#Item: {
+  id!: string
+  deps?: [...or(known_ids)] | or(known_ids)
+}
+
+items: [string]: #Item
+
+items: [Key=_]: { id: (Key) + "-id" }
+
+items: a: deps: items.b.id
+items: b: deps: []
+items: c: deps: [items.a.id, items.b.id]
+items: d: _
+
+-- stdout.golden --
+#Item: {
+    id!: string
+    deps: [] | "a-id" | "b-id" | "c-id"
+}
+known_ids: ["a-id", "b-id", "c-id"]
+items: {
+    a: {
+        id:   "a-id"
+        deps: "b-id"
+    }
+    b: {
+        id: "b-id"
+        deps: []
+    }
+    c: {
+        id: "c-id"
+        deps: ["a-id", "b-id"]
+    }
+}

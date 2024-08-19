@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "87c606d8_1e954a7a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-19T16:15:38Z",
+      "side": 1,
+      "message": "This is currently a straw-man CL.\n\nAlternatives include:\n\n1. changing the `list` error type to be a struct and keeping the map inside so that we don\u0027t have to rebuild it every time.\n2. making the argument that if we avoid duplicates then the list of errors should be very small anyway, so we don\u0027t need to use a map/set at all, and could just do the \"dumb\" N^2 list traversal.\n3. using a map instead of list, and encoding the order-of-addition in the map values (so something like `struct { err error; index int }`) and then reconstructing the original order only when necessary.",
+      "revId": "7b733f87b390dc59ff18c82f3cabc432783b0293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

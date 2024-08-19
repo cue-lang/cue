@@ -70,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e94b0e31_e6920268",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-19T07:54:31Z",
+      "side": 1,
+      "message": "Thank you for the information. I think `pkg.Constraint` in this CL doesn\u0027t handle `disjunctions/defaults` as expected. To prevent redundant efforts, I intend to implement `list.MatchN` using `pkg.Schema` from https://review.gerrithub.io/c/cue-lang/cue/+/1194425.",
+      "parentUuid": "f933accc_ab0ef15c",
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c7f06fbb_70765a43",
@@ -83,6 +101,24 @@
       "writtenOn": "2024-08-16T13:04:00Z",
       "side": 1,
       "message": "Doc comment.",
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74a028f0_cf2c5954",
+        "filename": "internal/pkg/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-19T07:54:31Z",
+      "side": 1,
+      "message": "TODO: remove and use pkg.Schema",
+      "parentUuid": "c7f06fbb_70765a43",
       "revId": "c19158023321df9f808bce0afd09fea84251b64e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -136,6 +172,24 @@
       "side": 1,
       "message": "All cue.Values allow non-concrete values. Also, not all constraints are cue.Values.",
       "parentUuid": "e5ebf18a_a8a61d2f",
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43a1be80_a2af3218",
+        "filename": "internal/pkg/types.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-19T07:54:31Z",
+      "side": 1,
+      "message": "TODO: remove and use pkg.Schema",
+      "parentUuid": "47f2cb91_98650713",
       "revId": "c19158023321df9f808bce0afd09fea84251b64e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

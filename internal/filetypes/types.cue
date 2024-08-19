@@ -100,7 +100,7 @@ modes: export: {
 		encoding: *"json" | _
 	}
 	FileInfo: {
-		docs:       true | *false
+		docs:       *true | false
 		attributes: true | *false
 	}
 	encodings: cue: {
@@ -114,7 +114,7 @@ modes: output: {
 		encoding: *"cue" | _
 	}
 	FileInfo: {
-		docs:       true | *false
+		docs:       *true | false
 		attributes: true | *false
 	}
 	encodings: cue: {
@@ -128,7 +128,7 @@ modes: eval: {
 		encoding: *"cue" | _
 	}
 	FileInfo: {
-		docs:       true | *false
+		docs:       *true | false
 		attributes: true | *false
 	}
 	encodings: cue: {

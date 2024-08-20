@@ -19,10 +19,10 @@
 -- out/decode/extract --
 @jsonschema(schema="http://json-schema.org/draft-07/schema#")
 @jsonschema(id="https://test.example/foo")
-{
+matchN(1, [{
 	@jsonschema(id="https://1.test.example/string")
 	string
-} | {
+}, {
 	@jsonschema(id="https://2.test.example/object")
 	...
-}
+}])

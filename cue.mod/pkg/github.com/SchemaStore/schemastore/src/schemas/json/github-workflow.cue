@@ -18,7 +18,7 @@ import "strings"
 	// files, tags, or branch changes. For a list of available
 	// events, see
 	// https://help.github.com/en/github/automating-your-workflow-with-github-actions/events-that-trigger-workflows.
-	on!: #event | [...#event] & [_, ...] | {
+	on!: matchN(1, [#event, [...#event] & [_, ...], {
 		// Runs your workflow anytime the branch_protection_rule event
 		// occurs. More than one activity type triggers this event.
 		branch_protection_rule?: #eventObject & (null | bool | number | string | [...] | {
@@ -460,7 +460,7 @@ import "strings"
 		schedule?: [...null | bool | number | string | [...] | {
 			cron?: string
 		}] & [_, ...]
-	}
+	}])
 
 	// A map of environment variables that are available to all jobs
 	// and steps in the workflow.
@@ -482,7 +482,7 @@ import "strings"
 	// will be canceled. To also cancel any currently running job or
 	// workflow in the same concurrency group, specify
 	// cancel-in-progress: true.
-	concurrency?: string | #concurrency
+	concurrency?: matchN(1, [string, #concurrency])
 
 	// A workflow run is made up of one or more jobs. Jobs run in
 	// parallel by default. To run jobs sequentially, you can define
@@ -494,7 +494,7 @@ import "strings"
 	// within the workflow usage limits. For more information, see
 	// https://help.github.com/en/github/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions#usage-limits.
 	jobs!: {
-		{[=~"^[_a-zA-Z][a-zA-Z0-9_-]*$" & !~"^()$"]: #normalJob | #reusableWorkflowCallJob}
+		{[=~"^[_a-zA-Z][a-zA-Z0-9_-]*$" & !~"^()$"]: matchN(1, [#normalJob, #reusableWorkflowCallJob])}
 	}
 
 	// The name for workflow runs generated from the workflow. GitHub
@@ -517,12 +517,12 @@ import "strings"
 
 		// To cancel any currently running job or workflow in the same
 		// concurrency group, specify cancel-in-progress: true.
-		"cancel-in-progress"?: bool | #expressionSyntax
+		"cancel-in-progress"?: matchN(1, [bool, #expressionSyntax])
 	}
 
-	#configuration: string | number | bool | {
+	#configuration: matchN(1, [string, number, bool, {
 		[string]: #configuration
-	} | [...#configuration]
+	}, [...#configuration]])
 
 	#container: {
 		// The Docker image to use as the container to run the action. The
@@ -567,7 +567,7 @@ import "strings"
 		"working-directory"?: #["working-directory"]
 	}
 
-	#permissions: "read-all" | "write-all" | #["permissions-event"]
+	#permissions: matchN(1, ["read-all" | "write-all", #["permissions-event"]])
 
 	#: "permissions-event": {
 		actions?:               #["permissions-level"]
@@ -588,9 +588,9 @@ import "strings"
 
 	#: "permissions-level": "read" | "write" | "none"
 
-	#env: {
+	#env: matchN(1, [{
 		[string]: bool | number | string
-	} | #stringContainingExpressionSyntax
+	}, #stringContainingExpressionSyntax])
 
 	#environment: {
 		// The name of the environment configured in the repo.
@@ -634,20 +634,21 @@ import "strings"
 		...
 	}
 
-	#shell: string | ("bash" | "pwsh" | "python" | "sh" | "cmd" | "powershell")
+	#shell: matchN(>=1, [string, "bash" | "pwsh" | "python" | "sh" | "cmd" | "powershell"])
 
 	#types: [_, ...]
 
 	#: "working-directory": string
 
-	#jobNeeds: [...#name] & [_, ...] | #name
+	#jobNeeds: matchN(1, [[...#name] & [_, ...], #name])
 
-	#matrix: {
-		{[=~"^(in|ex)clude$" & !~"^()$"]: #expressionSyntax | [...{
+	#matrix: matchN(1, [{
+		{[=~"^(in|ex)clude$" & !~"^()$"]: matchN(1, [#expressionSyntax, [...{
 			[string]: #configuration
-		}] & [_, ...]}
-		{[!~"^(in|ex)clude$" & !~"^()$"]: [...#configuration] & [_, ...] | #expressionSyntax}
-	} | #expressionSyntax
+		}] & [_, ...]])
+		}
+		{[!~"^(in|ex)clude$" & !~"^()$"]: matchN(1, [[...#configuration] & [_, ...], #expressionSyntax])}
+	}, #expressionSyntax])
 
 	#reusableWorkflowCallJob: {
 		// The name of the job displayed on GitHub.
@@ -683,7 +684,7 @@ import "strings"
 		// 'secrets' to provide a map of secrets that are passed to the
 		// called workflow. Any secrets that you pass must match the
 		// names defined in the called workflow.
-		secrets?: #env | "inherit"
+		secrets?: matchN(1, [#env, "inherit"])
 
 		// A strategy creates a build matrix for your jobs. You can define
 		// different variations of an environment to run each job in.
@@ -713,7 +714,7 @@ import "strings"
 		// will be canceled. To also cancel any currently running job or
 		// workflow in the same concurrency group, specify
 		// cancel-in-progress: true.
-		concurrency?: string | #concurrency
+		concurrency?: matchN(1, [string, #concurrency])
 	}
 
 	#normalJob: {
@@ -724,14 +725,14 @@ import "strings"
 
 		// The type of machine to run the job on. The machine can be
 		// either a GitHub-hosted runner, or a self-hosted runner.
-		"runs-on"!: string | [string] & [_, ...] | {
+		"runs-on"!: matchN(>=1, [string, matchN(>=1, [[string] & [_, ...]]), {
 			group?: string
-			labels?: string | [...string]
+			labels?: matchN(1, [string, [...string]])
 			...
-		} | #stringContainingExpressionSyntax | #expressionSyntax
+		}, #stringContainingExpressionSyntax, #expressionSyntax])
 
 		// The environment that the job references.
-		environment?: string | #environment
+		environment?: matchN(1, [string, #environment])
 
 		// A map of outputs for a job. Job outputs are available to all
 		// downstream jobs that depend on this job.
@@ -765,13 +766,13 @@ import "strings"
 		// environment variables are not preserved between steps. GitHub
 		// provides built-in steps to set up and complete a job.
 		// Must contain either `uses` or `run`
-		steps?: [...({
+		steps?: [...matchN(2, [matchN(1, [{
 			uses!: string
 			...
-		} | {
+		}, {
 			run!: string
 			...
-		}) & {
+		}]), {
 			// A unique identifier for the step. You can use the id to
 			// reference the step in contexts. For more information, see
 			// https://help.github.com/en/articles/contexts-and-expression-syntax-for-github-actions.
@@ -847,16 +848,16 @@ import "strings"
 
 			// Prevents a job from failing when a step fails. Set to true to
 			// allow a job to pass when this step fails.
-			"continue-on-error"?: bool | #expressionSyntax | *false
+			"continue-on-error"?: matchN(1, [bool, #expressionSyntax]) | *false
 
 			// The maximum number of minutes to run the step before killing
 			// the process.
-			"timeout-minutes"?: number | #expressionSyntax
-		}] & [_, ...]
+			"timeout-minutes"?: matchN(1, [number, #expressionSyntax])
+		}])] & [_, ...]
 
 		// The maximum number of minutes to let a workflow run before
 		// GitHub automatically cancels it. Default: 360
-		"timeout-minutes"?: number | #expressionSyntax | *360
+		"timeout-minutes"?: matchN(1, [number, #expressionSyntax]) | *360
 
 		// A strategy creates a build matrix for your jobs. You can define
 		// different variations of an environment to run each job in.
@@ -876,7 +877,7 @@ import "strings"
 
 		// Prevents a workflow run from failing when a job fails. Set to
 		// true to allow a workflow run to pass when this job fails.
-		"continue-on-error"?: bool | #expressionSyntax
+		"continue-on-error"?: matchN(1, [bool, #expressionSyntax])
 
 		// A container to run any steps in a job that don't already
 		// specify a container. If you have steps that use both script
@@ -886,7 +887,7 @@ import "strings"
 		// If you do not set a container, all steps will run directly on
 		// the host specified by runs-on unless a step refers to an
 		// action configured to run in a container.
-		container?: string | #container
+		container?: matchN(1, [string, #container])
 
 		// Additional containers to host services for a job in a workflow.
 		// These are useful for creating databases or cache services like
@@ -918,6 +919,6 @@ import "strings"
 		// will be canceled. To also cancel any currently running job or
 		// workflow in the same concurrency group, specify
 		// cancel-in-progress: true.
-		concurrency?: string | #concurrency
+		concurrency?: matchN(1, [string, #concurrency])
 	}
 }

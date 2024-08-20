@@ -9,8 +9,8 @@ name: TryBot
       - release-branch.*
     tags-ignore:
       - v*
-  pull_request: {}
   workflow_dispatch: {}
+  pull_request: {}
 jobs:
   test:
     strategy:
@@ -24,13 +24,13 @@ jobs:
           - macos-14
           - windows-2022
     runs-on: ${{ matrix.runner }}
-    defaults:
-      run:
-        shell: bash
     if: |-
       (contains(github.event.head_commit.message, '
       Dispatch-Trailer: {"type":"trybot"')) || ! (contains(github.event.head_commit.message, '
       Dispatch-Trailer: {"type":"'))
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -41,8 +41,8 @@ jobs:
         run: touch -t 202211302355 $(find * -type d)
       - name: Restore git file modification times
         uses: chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe
-      - id: DispatchTrailer
-        name: Try to extract Dispatch-Trailer
+      - name: Try to extract Dispatch-Trailer
+        id: DispatchTrailer
         run: |-
           x="$(git log -1 --pretty='%(trailers:key=Dispatch-Trailer,valueonly)')"
           if [[ "$x" == "" ]]
@@ -58,11 +58,11 @@ jobs:
           echo "value<<EOD" >> $GITHUB_OUTPUT
           echo "$x" >> $GITHUB_OUTPUT
           echo "EOD" >> $GITHUB_OUTPUT
-      - if: |-
+      - name: Check we don't have Dispatch-Trailer on a protected branch
+        if: |-
           ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) && (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"'))
-        name: Check we don't have Dispatch-Trailer on a protected branch
         run: |-
           echo "github.event.head_commit.message contains Dispatch-Trailer but we are on a protected branch"
           false
@@ -71,73 +71,73 @@ jobs:
         with:
           cache: false
           go-version: ${{ matrix.go-version }}
-      - id: go-mod-cache-dir
-        name: Get go mod cache directory
+      - name: Get go mod cache directory
+        id: go-mod-cache-dir
         run: echo "dir=$(go env GOMODCACHE)" >> ${GITHUB_OUTPUT}
-      - id: go-cache-dir
-        name: Get go build/test cache directory
+      - name: Get go build/test cache directory
+        id: go-cache-dir
         run: echo "dir=$(go env GOCACHE)" >> ${GITHUB_OUTPUT}
-      - if: |-
+      - with:
+          path: |-
+            ${{ steps.go-mod-cache-dir.outputs.dir }}/cache/download
+            ${{ steps.go-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-${{ matrix.go-version }}-${{ github.run_id }}
+          restore-keys: ${{ runner.os }}-${{ matrix.go-version }}
+        if: |-
           (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test'))
         uses: actions/cache@v4
-        with:
+      - with:
           path: |-
             ${{ steps.go-mod-cache-dir.outputs.dir }}/cache/download
             ${{ steps.go-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-${{ matrix.go-version }}-${{ github.run_id }}
           restore-keys: ${{ runner.os }}-${{ matrix.go-version }}
-      - if: |-
+        uses: actions/cache/restore@v4
+        if: |-
           ! (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test'))
-        uses: actions/cache/restore@v4
-        with:
-          path: |-
-            ${{ steps.go-mod-cache-dir.outputs.dir }}/cache/download
-            ${{ steps.go-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-${{ matrix.go-version }}-${{ github.run_id }}
-          restore-keys: ${{ runner.os }}-${{ matrix.go-version }}
       - if: |-
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || github.ref == 'refs/heads/ci/test')
         run: go clean -testcache
-      - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
-        name: Early git and code sanity checks
+      - name: Early git and code sanity checks
+        if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
         run: go run ./internal/ci/checks
-      - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
-        name: Generate
+      - name: Generate
         run: go generate ./...
-      - if: |-
+        if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
+      - name: Test
+        if: |-
           ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || !(matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
-        name: Test
         run: go test ./...
-      - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
-        name: Test with -race
-        run: go test -race ./...
+      - name: Test with -race
         env:
           GORACE: atexit_sleep_ms=10
+        if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
+        run: go test -race ./...
       - name: Test with -tags=cuewasm
         run: go test -tags cuewasm ./cmd/cue/cmd ./cue/interpreter/wasm
       - name: gcloud auth for end-to-end tests
         id: auth
+        uses: google-github-actions/auth@v2
         if: |-
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
-        uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.E2E_GCLOUD_KEY }}
-      - if: |-
+      - name: gcloud setup for end-to-end tests
+        if: |-
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
-        name: gcloud setup for end-to-end tests
         uses: google-github-actions/setup-gcloud@v2
-      - if: |-
-          github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
-          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
-        name: End-to-end test
+      - name: End-to-end test
         env:
           CUE_TEST_LOGINS: ${{ secrets.E2E_CUE_LOGINS }}
+        if: |-
+          github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
+          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
         run: |-
           cd internal/_e2e
           go test -race
@@ -147,6 +147,6 @@ jobs:
           go vet ./...
           go mod tidy
           (cd internal/_e2e && go test -run=-)
-      - if: always()
-        name: Check that git is clean at the end of the job
+      - name: Check that git is clean at the end of the job
+        if: always()
         run: test -z "$(git status --porcelain)" || (git status; git diff; false)

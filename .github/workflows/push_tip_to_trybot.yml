@@ -10,10 +10,6 @@ concurrency: push_tip_to_trybot
 jobs:
   push:
     runs-on: ubuntu-22.04
-    defaults:
-      run:
-        shell: bash
-    if: ${{github.repository == 'cue-lang/cue'}}
     steps:
       - name: Write netrc file for cueckoo Gerrithub
         run: |-
@@ -49,3 +45,7 @@ jobs:
           	 echo "Giving up"
           	 exit 1
           fi
+    defaults:
+      run:
+        shell: bash
+    if: ${{github.repository == 'cue-lang/cue'}}

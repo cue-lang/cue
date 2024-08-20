@@ -1,4 +1,4 @@
--- definition.json --
+-- schema.json --
 {
 	"oneOf": [
 		{
@@ -15,7 +15,7 @@
 		}
 	}
 }
--- out/decode/cue --
+-- out/decode/extract --
 import "strings"
 
 ({

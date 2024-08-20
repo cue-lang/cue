@@ -1,10 +1,11 @@
 #strict
--- definition.json --
+-- schema.json --
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "$id": "http://example.test",
   "type": "string"
 }
--- out/decode/err --
+-- out/decode/extract --
+ERROR:
 constraint "$id" is not supported in JSON schema version http://json-schema.org/draft-04/schema#:
-    definition.json:3:3
+    schema.json:3:3

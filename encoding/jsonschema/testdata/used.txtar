@@ -1,4 +1,4 @@
--- used.json --
+-- schema.json --
 {
     "$defs": {
         "enum": {
@@ -40,7 +40,7 @@
         }
     }
 }
--- out/decode/cue --
+-- out/decode/extract --
 _
 
 #enum: "a" | "b" | "c"

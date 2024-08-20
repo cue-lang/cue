@@ -1,4 +1,4 @@
--- type.json --
+-- schema.json --
 {
   "type": "object",
   "title": "Main schema",
@@ -29,7 +29,7 @@
   "additionalProperties": false
 }
 
--- out/decode/cue --
+-- out/decode/extract --
 // Main schema
 intString?: null | bool | int | string | [...]
 object?: {

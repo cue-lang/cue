@@ -1,4 +1,4 @@
--- emptyanyof.json --
+-- schema.json --
 {
  "$defs": {
    "shell": {
@@ -20,7 +20,7 @@
  }
 }
 
--- out/decode/cue --
+-- out/decode/extract --
 _
 
 #shell: string | ("bash" | "sh" | "cmd" | "powershell")

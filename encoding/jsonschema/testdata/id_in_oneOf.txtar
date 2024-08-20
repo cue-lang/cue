@@ -16,7 +16,7 @@
   ]
 }
 
--- out/decode/cue --
+-- out/decode/extract --
 @jsonschema(schema="http://json-schema.org/draft-07/schema#")
 @jsonschema(id="https://test.example/foo")
 {

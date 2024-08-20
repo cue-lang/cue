@@ -18,7 +18,7 @@
   }
 }
 
--- out/decode/cue --
+-- out/decode/extract --
 // example jsonschema
 @jsonschema(schema="http://json-schema.org/draft-04/schema#")
 @jsonschema(id="https://example.test/example")

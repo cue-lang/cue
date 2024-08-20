@@ -17,8 +17,10 @@ package jsonschema_test
 import (
 	"bytes"
 	"fmt"
+	"io/fs"
 	"net/url"
 	"path"
+	"strings"
 	"testing"
 
 	"github.com/go-quicktest/qt"
@@ -62,50 +64,69 @@ func TestDecode(t *testing.T) {
 		cfg.Strict = t.HasTag("strict")
 
 		ctx := t.Context()
-		var v cue.Value
 
-		for _, f := range t.Archive.Files {
-			switch path.Ext(f.Name) {
-			case ".json":
-				expr, err := json.Extract(f.Name, f.Data)
-				if err != nil {
-					t.Fatal(err)
-				}
-				v = ctx.BuildExpr(expr)
-			case ".yaml":
-				file, err := yaml.Extract(f.Name, f.Data)
-				if err != nil {
-					t.Fatal(err)
-				}
-				v = ctx.BuildFile(file)
-			}
+		fsys, err := txtar.FS(t.Archive)
+		if err != nil {
+			t.Fatal(err)
+		}
+		v, err := readSchema(ctx, fsys)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := v.Err(); err != nil {
+			t.Fatal(err)
 		}
 
+		w := t.Writer("extract")
 		expr, err := jsonschema.Extract(v, cfg)
 		if err != nil {
-			got := []byte(errors.Details(err, nil))
-			got = append(bytes.TrimSpace(got), '\n')
-			t.Writer("err").Write(got)
+			got := "ERROR:\n" + errors.Details(err, nil)
+			w.Write([]byte(strings.TrimSpace(got) + "\n"))
+			return
+		}
+		if expr == nil {
+			t.Fatal("no expression was extracted")
 		}
 
-		if expr != nil {
-			b, err := format.Node(expr, format.Simplify())
-			if err != nil {
+		b, err := format.Node(expr, format.Simplify())
+		if err != nil {
+			t.Fatal(errors.Details(err, nil))
+		}
+		if !t.HasTag("noverify") {
+			// Verify the generated CUE.
+			v := ctx.CompileBytes(b, cue.Filename("generated.cue"))
+			if err := v.Err(); err != nil {
 				t.Fatal(errors.Details(err, nil))
 			}
-
-			// verify the generated CUE.
-			if !t.HasTag("noverify") {
-				v := ctx.CompileBytes(b, cue.Filename("generated.cue"))
-				if err := v.Err(); err != nil {
-					t.Fatal(errors.Details(err, nil))
-				}
-			}
-
-			b = append(bytes.TrimSpace(b), '\n')
-			t.Writer("cue").Write(b)
+			// TODO run some instance verification tests.
 		}
+
+		b = append(bytes.TrimSpace(b), '\n')
+		w.Write(b)
+
 	})
+}
+
+func readSchema(ctx *cue.Context, fsys fs.FS) (cue.Value, error) {
+	jsonData, jsonErr := fs.ReadFile(fsys, "schema.json")
+	yamlData, yamlErr := fs.ReadFile(fsys, "schema.yaml")
+	switch {
+	case jsonErr == nil && yamlErr == nil:
+		return cue.Value{}, fmt.Errorf("cannot define both schema.json and schema.yaml")
+	case jsonErr == nil:
+		expr, err := json.Extract("schema.json", jsonData)
+		if err != nil {
+			return cue.Value{}, err
+		}
+		return ctx.BuildExpr(expr), nil
+	case yamlErr == nil:
+		file, err := yaml.Extract("schema.yaml", yamlData)
+		if err != nil {
+			return cue.Value{}, err
+		}
+		return ctx.BuildFile(file), nil
+	}
+	return cue.Value{}, fmt.Errorf("no schema.yaml or schema.json file found for test")
 }
 
 func TestMapURL(t *testing.T) {

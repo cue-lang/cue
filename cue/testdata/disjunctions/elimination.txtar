@@ -669,7 +669,7 @@ issue770: {
   preserveClosedness: (struct){
     small: (struct){
       p1: (struct){
-        #A: (#struct){ |(*(#struct){
+        #A: (#struct){ |((#struct){
             a: (string){ string }
           }, (#struct){
             a: (string){ string }
@@ -686,7 +686,7 @@ issue770: {
           }) }
       }
       p2: (struct){
-        #A: (#struct){ |(*(#struct){
+        #A: (#struct){ |((#struct){
             a: (string){ string }
           }, (#struct){
             a: (string){ string }
@@ -705,24 +705,13 @@ issue770: {
     }
     medium: (struct){
       p1: (struct){
-        #A: (#struct){ |(*(#struct){
+        #A: (#struct){ |((#struct){
             a: (string){ string }
           }, (#struct){
             a: (string){ string }
             c: (int){ int }
           }, (#struct){
             a: (string){ string }
-            d: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-            b: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-            b: (string){ string }
-            c: (int){ int }
-          }, (#struct){
-            a: (string){ string }
-            b: (string){ string }
             d: (string){ string }
           }) }
         #B: (#struct){ |(*(#struct){
@@ -749,24 +738,13 @@ issue770: {
           }) }
       }
       p2: (struct){
-        #A: (#struct){ |(*(#struct){
+        #A: (#struct){ |((#struct){
             a: (string){ string }
           }, (#struct){
             a: (string){ string }
             c: (int){ int }
           }, (#struct){
             a: (string){ string }
-            d: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-            b: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-            b: (string){ string }
-            c: (int){ int }
-          }, (#struct){
-            a: (string){ string }
-            b: (string){ string }
             d: (string){ string }
           }) }
         #B: (#struct){ |(*(#struct){
@@ -793,24 +771,13 @@ issue770: {
           }) }
       }
       p3: (struct){
-        #A: (#struct){ |(*(#struct){
+        #A: (#struct){ |((#struct){
             a: (string){ string }
           }, (#struct){
             a: (string){ string }
             c: (int){ int }
           }, (#struct){
             a: (string){ string }
-            d: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-            b: (string){ string }
-          }, (#struct){
-            a: (string){ string }
-            b: (string){ string }
-            c: (int){ int }
-          }, (#struct){
-            a: (string){ string }
-            b: (string){ string }
             d: (string){ string }
           }) }
         #B: (#struct){ |(*(#struct){
@@ -879,12 +846,9 @@ issue770: {
       }
     }
     t4: (struct){
-      o: (#struct){ |((#struct){
-          b: (string){ "test" }
-          a: (null){ null }
-        }, (#struct){
-          b: (string){ "test" }
-        }) }
+      o: (#struct){
+        b: (string){ "test" }
+      }
       #D: (#struct){ |((#struct){
           a: (null){ null }
         }, (#struct){
@@ -1060,34 +1024,15 @@ issue770: {
     }
     full: (struct){
       Foo: (#struct){
-        spec: (#struct){ |(*(#struct){
-            foo: (#struct){
-              min: (int){ |(*(int){ 10 }, (int){ int }) }
-              max: (int){ |(*(int){ 20 }, (int){ int }) }
-            }
-          }, (#struct){
-            foo: (struct){
-            }
-            bar: (#struct){
-              min: (int){ |(*(int){ 30 }, (int){ int }) }
-              max: (int){ |(*(int){ 40 }, (int){ int }) }
-            }
-          }) }
+        spec: (#struct){
+          foo: (#struct){
+            min: (int){ |(*(int){ 10 }, (int){ int }) }
+            max: (int){ |(*(int){ 20 }, (int){ int }) }
+          }
+        }
         resource: (#struct){
           _X: (#struct){
-            spec: (#struct){ |(*(#struct){
-                foo: (#struct){
-                  min: (int){ |(*(int){ 10 }, (int){ int }) }
-                  max: (int){ |(*(int){ 20 }, (int){ int }) }
-                }
-              }, (#struct){
-                foo: (struct){
-                }
-                bar: (#struct){
-                  min: (int){ |(*(int){ 30 }, (int){ int }) }
-                  max: (int){ |(*(int){ 40 }, (int){ int }) }
-                }
-              }) }
+            spec: ~(issue2209.full.Foo.spec)
           }
           spec: (#struct){ |(*(#struct){
               minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
@@ -1582,10 +1527,61 @@ diff old new
                      //     ./in.cue:138:32
                      c: (int){ 1 }
                      d: (int){ 1 }
-@@ -249,38 +185,60 @@
+@@ -205,24 +141,24 @@
+   preserveClosedness: (struct){
+     small: (struct){
+       p1: (struct){
+-        #A: (#struct){ |(*(#struct){
+-            a: (string){ string }
+-          }, (#struct){
+-            a: (string){ string }
+-            b: (int){ int }
+-          }) }
+-        #B: (#struct){ |(*(#struct){
+-          }, (#struct){
+-            b: (int){ int }
+-          }, (#struct){
+-            a: (string){ string }
+-          }, (#struct){
+-            a: (string){ string }
+-            b: (int){ int }
+-          }) }
+-      }
+-      p2: (struct){
+-        #A: (#struct){ |(*(#struct){
++        #A: (#struct){ |((#struct){
++            a: (string){ string }
++          }, (#struct){
++            a: (string){ string }
++            b: (int){ int }
++          }) }
++        #B: (#struct){ |(*(#struct){
++          }, (#struct){
++            b: (int){ int }
++          }, (#struct){
++            a: (string){ string }
++          }, (#struct){
++            a: (string){ string }
++            b: (int){ int }
++          }) }
++      }
++      p2: (struct){
++        #A: (#struct){ |((#struct){
+             a: (string){ string }
            }, (#struct){
              a: (string){ string }
-             d: (string){ string }
+@@ -241,40 +177,40 @@
+     }
+     medium: (struct){
+       p1: (struct){
+-        #A: (#struct){ |(*(#struct){
+-            a: (string){ string }
+-          }, (#struct){
+-            a: (string){ string }
+-            c: (int){ int }
+-          }, (#struct){
+-            a: (string){ string }
+-            d: (string){ string }
 -          }) }
 -        #B: (#struct){ |(*(#struct){
 -          }, (#struct){
@@ -1612,22 +1608,13 @@ diff old new
 -      }
 -      p2: (struct){
 -        #A: (#struct){ |(*(#struct){
--            a: (string){ string }
--          }, (#struct){
--            a: (string){ string }
--            c: (int){ int }
--          }, (#struct){
--            a: (string){ string }
++        #A: (#struct){ |((#struct){
++            a: (string){ string }
 +          }, (#struct){
 +            a: (string){ string }
-+            b: (string){ string }
-+          }, (#struct){
-+            a: (string){ string }
-+            b: (string){ string }
 +            c: (int){ int }
 +          }, (#struct){
 +            a: (string){ string }
-+            b: (string){ string }
 +            d: (string){ string }
 +          }) }
 +        #B: (#struct){ |(*(#struct){
@@ -1654,46 +1641,20 @@ diff old new
 +          }) }
 +      }
 +      p2: (struct){
-+        #A: (#struct){ |(*(#struct){
-+            a: (string){ string }
-+          }, (#struct){
-+            a: (string){ string }
-+            c: (int){ int }
-+          }, (#struct){
-+            a: (string){ string }
-+            d: (string){ string }
-+          }, (#struct){
-+            a: (string){ string }
-+            b: (string){ string }
-+          }, (#struct){
-+            a: (string){ string }
-+            b: (string){ string }
-+            c: (int){ int }
-+          }, (#struct){
-+            a: (string){ string }
-+            b: (string){ string }
-             d: (string){ string }
-           }) }
-         #B: (#struct){ |(*(#struct){
-@@ -315,6 +273,17 @@
++        #A: (#struct){ |((#struct){
+             a: (string){ string }
            }, (#struct){
              a: (string){ string }
-             d: (string){ string }
-+          }, (#struct){
-+            a: (string){ string }
-+            b: (string){ string }
-+          }, (#struct){
-+            a: (string){ string }
-+            b: (string){ string }
-+            c: (int){ int }
-+          }, (#struct){
-+            a: (string){ string }
-+            b: (string){ string }
-+            d: (string){ string }
+@@ -307,7 +243,7 @@
            }) }
-         #B: (#struct){ |(*(#struct){
+       }
+       p3: (struct){
+-        #A: (#struct){ |(*(#struct){
++        #A: (#struct){ |((#struct){
+             a: (string){ string }
            }, (#struct){
-@@ -349,10 +318,6 @@
+             a: (string){ string }
+@@ -349,10 +285,6 @@
        #type: (#struct){
          fieldName: ((string|struct)){ |((string){ string }, (#struct){
              foo: (string){ string }
@@ -1704,23 +1665,7 @@ diff old new
            }) }
        }
        #subtype: ((string|struct)){ |((string){ string }, (#struct){
-@@ -386,9 +351,12 @@
-       }
-     }
-     t4: (struct){
--      o: (#struct){
--        b: (string){ "test" }
--      }
-+      o: (#struct){ |((#struct){
-+          b: (string){ "test" }
-+          a: (null){ null }
-+        }, (#struct){
-+          b: (string){ "test" }
-+        }) }
-       #D: (#struct){ |((#struct){
-           a: (null){ null }
-         }, (#struct){
-@@ -432,12 +400,8 @@
+@@ -432,12 +364,8 @@
      #T: (list){
        0: (string){ "d" }
      }
@@ -1735,7 +1680,7 @@ diff old new
    }
    issue1940: (struct){
      #T: (#list){
-@@ -446,53 +410,26 @@
+@@ -446,53 +374,26 @@
        }
      }
      #A: (#struct){
@@ -1802,7 +1747,7 @@ diff old new
        t1: (struct){
          #SpecFoo: (#struct){
            foo: (#struct){
-@@ -555,185 +492,118 @@
+@@ -555,48 +456,45 @@
              x: (int){ 1 }
            }
          }
@@ -1888,13 +1833,12 @@ diff old new
 +    }
 +    full: (struct){
        Foo: (#struct){
--        spec: (#struct){
--          foo: (#struct){
--            min: (int){ |(*(int){ 10 }, (int){ int }) }
--            max: (int){ |(*(int){ 20 }, (int){ int }) }
--          }
--        }
--        resource: (#struct){
+         spec: (#struct){
+           foo: (#struct){
+@@ -605,135 +503,52 @@
+           }
+         }
+         resource: (#struct){
 -          spec: (#struct){ |(*(#struct){
 -              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
 -              maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
@@ -2024,34 +1968,8 @@ diff old new
 -                }
 -              }) }
 -          }
-+        spec: (#struct){ |(*(#struct){
-+            foo: (#struct){
-+              min: (int){ |(*(int){ 10 }, (int){ int }) }
-+              max: (int){ |(*(int){ 20 }, (int){ int }) }
-+            }
-+          }, (#struct){
-+            foo: (struct){
-+            }
-+            bar: (#struct){
-+              min: (int){ |(*(int){ 30 }, (int){ int }) }
-+              max: (int){ |(*(int){ 40 }, (int){ int }) }
-+            }
-+          }) }
-+        resource: (#struct){
 +          _X: (#struct){
-+            spec: (#struct){ |(*(#struct){
-+                foo: (#struct){
-+                  min: (int){ |(*(int){ 10 }, (int){ int }) }
-+                  max: (int){ |(*(int){ 20 }, (int){ int }) }
-+                }
-+              }, (#struct){
-+                foo: (struct){
-+                }
-+                bar: (#struct){
-+                  min: (int){ |(*(int){ 30 }, (int){ int }) }
-+                  max: (int){ |(*(int){ 40 }, (int){ int }) }
-+                }
-+              }) }
++            spec: ~(issue2209.full.Foo.spec)
 +          }
 +          spec: (#struct){ |(*(#struct){
 +              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
@@ -2099,7 +2017,7 @@ diff old new
          }
        }
        #Abstract: (#struct){
-@@ -749,34 +619,34 @@
+@@ -749,34 +564,34 @@
              }
            }) }
          resource: (#struct){
@@ -2162,7 +2080,7 @@ diff old new
          }
        }
        _#Spec: (#struct){ |(*(#struct){
-@@ -803,36 +673,36 @@
+@@ -803,36 +618,36 @@
          }
        }
        _Thing: (#struct){
@@ -2228,7 +2146,7 @@ diff old new
        }
        #Constrained: (#struct){
          spec: (#struct){ |(*(#struct){
-@@ -916,19 +786,19 @@
+@@ -916,19 +731,19 @@
            common: (int){ 3 }
          }
          #FormFoo: (#struct){
@@ -2255,7 +2173,7 @@ diff old new
            }) }
        }
        #Input: (#struct){
-@@ -977,10 +847,23 @@
+@@ -977,10 +792,23 @@
      }
      full: (struct){
        metrics: (#list){
@@ -2283,7 +2201,7 @@ diff old new
          1: (#struct){
            id: (string){ "bar" }
            value: (int){ 80 }
-@@ -1031,13 +914,11 @@
+@@ -1031,13 +859,11 @@
        }
      }
    }
@@ -2299,7 +2217,7 @@ diff old new
        0: (#struct){
          name: (string){ "FooBarFoo" }
        }
-@@ -1047,19 +928,8 @@
+@@ -1047,19 +873,8 @@
        2: (#struct){
          name: (string){ "FooQuuxFoo" }
        }
@@ -2321,7 +2239,7 @@ diff old new
        }
      }
    }
-@@ -1078,10 +948,10 @@
+@@ -1078,10 +893,10 @@
          v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
        }
        c: (#struct){
@@ -2349,7 +2267,6 @@ issue2263.full: missing elimination, may be lack of closeContext
 -- diff/todo/p2 --
 noChildError.issue1808.#type: one disjunction options eliminated due to earlier detected structural cycle. May be okay, but investigate.
 issue2209.simplified.full._X: ditto
-preserveClosedness.medium.p*: missing elimination of disjuncts / needs default elimination.
 -- diff/todo/p3 --
 issue2209.simplified.t2.BAZ: error reported in wrong location.
 -- diff/explanation --

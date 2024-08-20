@@ -118,7 +118,7 @@ Leaks:  59
 Freed:  92
 Reused: 89
 Allocs: 62
-Retain: 129
+Retain: 127
 
 Unifications: 139
 Conjuncts:    274

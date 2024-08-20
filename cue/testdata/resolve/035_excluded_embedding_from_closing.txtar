@@ -77,11 +77,10 @@ Conjuncts:    29
 Disjuncts:    21
 -- out/evalalpha --
 Errors:
+V.b.extra: field not allowed:
+    ./in.cue:11:5
 V.c.e: field not allowed:
     ./in.cue:10:5
-V.b.extra: field not allowed:
-    ./in.cue:7:5
-    ./in.cue:11:5
 
 Result:
 (_|_){
@@ -114,7 +113,6 @@ Result:
       // [eval]
       extra: (_|_){
         // [eval] V.b.extra: field not allowed:
-        //     ./in.cue:7:5
         //     ./in.cue:11:5
       }
       open: (int){ int }
@@ -131,24 +129,21 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,14 +1,9 @@
+@@ -1,13 +1,7 @@
  Errors:
-+V.c.e: field not allowed:
-+    ./in.cue:10:5
  V.b.extra: field not allowed:
 -    ./in.cue:6:10
-     ./in.cue:7:5
+-    ./in.cue:7:5
 -    ./in.cue:9:4
      ./in.cue:11:5
--V.c.e: field not allowed:
+ V.c.e: field not allowed:
 -    ./in.cue:3:2
 -    ./in.cue:4:6
 -    ./in.cue:9:4
--    ./in.cue:10:5
+     ./in.cue:10:5
  
  Result:
- (_|_){
-@@ -29,33 +24,28 @@
+@@ -29,33 +23,27 @@
    }
    V: (_|_){
      // [eval]
@@ -176,7 +171,7 @@ diff old new
        extra: (_|_){
          // [eval] V.b.extra: field not allowed:
 -        //     ./in.cue:6:10
-         //     ./in.cue:7:5
+-        //     ./in.cue:7:5
 -        //     ./in.cue:9:4
          //     ./in.cue:11:5
        }

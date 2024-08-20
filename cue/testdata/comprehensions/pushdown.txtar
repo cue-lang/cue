@@ -1706,7 +1706,7 @@ Leaks:  15
 Freed:  405
 Reused: 399
 Allocs: 21
-Retain: 101
+Retain: 102
 
 Unifications: 406
 Conjuncts:    652

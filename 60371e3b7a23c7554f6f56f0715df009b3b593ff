@@ -16,6 +16,24 @@
       "message": "Ideally it would not add the errors again, but I can see how this is tricky and that this solution should anyway be implemented as a last line of defense.",
       "revId": "60371e3b7a23c7554f6f56f0715df009b3b593ff",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c69f3ca_625230e1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-20T11:13:36Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "5494b3ad_2e10ae75",
+      "revId": "60371e3b7a23c7554f6f56f0715df009b3b593ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

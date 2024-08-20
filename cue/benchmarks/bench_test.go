@@ -15,42 +15,45 @@
 package benchmarks
 
 import (
+	"io/fs"
 	"os"
 	"path/filepath"
 	"testing"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 	"golang.org/x/tools/txtar"
 )
 
-func Benchmark(b *testing.B) {
-	entries, err := os.ReadDir(".")
-	if err != nil {
-		b.Fatal(err)
-	}
+var (
+	matrix = cuetdtest.FullMatrix
+)
 
-	for _, entry := range entries {
-		name := entry.Name()
-		if entry.IsDir() || filepath.Ext(name) != ".txtar" {
-			continue
+func Benchmark(b *testing.B) {
+	root := "../testdata/benchmarks"
+	err := filepath.WalkDir(root, func(fullpath string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return err
 		}
 
-		a, err := txtar.ParseFile(name)
+		if entry.IsDir() || filepath.Ext(fullpath) != ".txtar" {
+			return nil
+		}
+
+		a, err := txtar.ParseFile(fullpath)
 		if err != nil {
-			b.Fatal(err)
+			return err
 		}
 
 		inst := cuetxtar.Load(a, b.TempDir())[0]
 		if inst.Err != nil {
-			b.Fatal(inst.Err)
+			return inst.Err
 		}
 
 		r := runtime.New()
-
 		v, err := r.Build(nil, inst)
 		if err != nil {
 			b.Fatal(err)
@@ -83,19 +86,24 @@ func Benchmark(b *testing.B) {
 			if err != nil {
 				b.Fatal(err)
 			}
-			os.WriteFile(name, txtar.Format(a), info.Mode())
+			os.WriteFile(fullpath, txtar.Format(a), info.Mode())
 		}
 
-		b.Run(name, func(b *testing.B) {
-			b.ReportAllocs()
-			for i := 0; i < b.N; i++ {
-				inst := cue.Build(cuetxtar.Load(a, b.TempDir()))[0]
-				if inst.Err != nil {
-					b.Fatal(inst.Err)
-				}
-
-				inst.Value().Validate()
+		b.Run(entry.Name(), func(b *testing.B) {
+			for _, m := range matrix {
+				b.Run(m.Name(), func(b *testing.B) {
+					b.ReportAllocs()
+					for i := 0; i < b.N; i++ {
+						ctx := m.Context()
+						value := ctx.BuildInstance(cuetxtar.Load(a, b.TempDir())[0])
+						value.Validate()
+					}
+				})
 			}
 		})
+		return nil
+	})
+	if err != nil {
+		b.Fatal(err)
 	}
 }

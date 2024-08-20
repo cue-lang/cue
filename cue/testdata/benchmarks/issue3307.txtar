@@ -1,3 +1,14 @@
+-- stats.txt --
+Leaks:  0
+Freed:  22
+Reused: 17
+Allocs: 5
+Retain: 76
+
+Unifications: 22
+Conjuncts:    3
+Disjuncts:    98
+
 -- in.cue --
 if _request.enabled {
     r1: {
@@ -18,20 +29,21 @@ if _request.enabled {
         k15: 0
         k16: 0
         k17: 0
+        k18: 0
     }
 }
 
 _request: enabled: _
 -- out/eval/stats --
 Leaks:  0
-Freed:  21
-Reused: 16
+Freed:  22
+Reused: 17
 Allocs: 5
-Retain: 72
+Retain: 76
 
-Unifications: 21
+Unifications: 22
 Conjuncts:    3
-Disjuncts:    93
+Disjuncts:    98
 -- out/eval --
 (_|_){
   // [incomplete] incomplete bool: _
@@ -61,6 +73,7 @@ Disjuncts:    93
       k15: 0
       k16: 0
       k17: 0
+      k18: 0
     }
   }
   _request: {

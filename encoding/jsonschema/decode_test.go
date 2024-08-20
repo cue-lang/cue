@@ -45,6 +45,20 @@ import (
 // JSON schema to CUE and compares it against the output.
 //
 // Set CUE_UPDATE=1 to update test files with the corresponding output.
+//
+// Each test extracts the JSON Schema from a schema file (either
+// schema.json or schema.yaml) and writes the result to
+// out/decode/extract.
+//
+// If there are any files in the "test" directory in the txtar, each one
+// is extracted and validated against the extracted schema. If the file
+// name starts with "err-" it is expected to fail, otherwise it is
+// expected to succeed.
+//
+// The #noverify tag in the txtar header causes verification and
+// instance tests to be skipped.
+//
+// The #openapi tag in the txtar header enables OpenAPI extraction mode.
 func TestDecode(t *testing.T) {
 	test := cuetxtar.TxTarTest{
 		Root:   "./testdata",

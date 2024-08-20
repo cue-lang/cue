@@ -82,15 +82,14 @@ Leaks:  2
 Freed:  48
 Reused: 45
 Allocs: 5
-Retain: 8
+Retain: 7
 
 Unifications: 50
 Conjuncts:    102
 Disjuncts:    54
 -- out/evalalpha --
 Errors:
-_schema_1: structural cycle:
-    ./in.cue:32:8
+_schema_1: structural cycle
 
 Result:
 (_|_){
@@ -120,37 +119,38 @@ Result:
   schema: (_|_){
     // [structural cycle]
     next: (_|_){
-      // [structural cycle] _schema_1: structural cycle:
-      //     ./in.cue:32:8
+      // [structural cycle] _schema_1: structural cycle
     }
   }
   let _schema_1#2 = (_|_){
-    // [structural cycle] _schema_1: structural cycle:
-    //     ./in.cue:32:8
+    // [structural cycle] _schema_1: structural cycle
   }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,5 +1,6 @@
+@@ -1,5 +1,5 @@
  Errors:
 -schema.next: structural cycle
-+_schema_1: structural cycle:
-+    ./in.cue:32:8
++_schema_1: structural cycle
  
  Result:
  (_|_){
-@@ -29,7 +30,8 @@
+@@ -29,11 +29,10 @@
    schema: (_|_){
      // [structural cycle]
      next: (_|_){
 -      // [structural cycle] schema.next: structural cycle
-+      // [structural cycle] _schema_1: structural cycle:
-+      //     ./in.cue:32:8
++      // [structural cycle] _schema_1: structural cycle
      }
    }
    let _schema_1#2 = (_|_){
+-    // [structural cycle] _schema_1: structural cycle:
+-    //     ./in.cue:32:8
++    // [structural cycle] _schema_1: structural cycle
+   }
+ }
 -- diff/todo/p3 --
 Structural cycle reported in different location. Seems fine, as
 ultimately we need to print the paths of the cycle anyway.

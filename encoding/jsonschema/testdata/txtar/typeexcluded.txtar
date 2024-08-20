@@ -120,11 +120,11 @@ e3?: list.UniqueItems() & [_, ...] & [...strings.MinRunes(1)]
 e4?: [...string]
 e5?: int & >=0
 e6?: [...=~"^[A-Za-z0-9 _.-]+$"]
-e7?: true | {
+e7?: matchN(>=1, [true, matchN(1, [{
 	disableFix?: bool
 	...
-} & {
+}]) & {
 	ignoreMediaFeatureNames?: list.UniqueItems() & [_, ...] & [...string]
 	...
-}
+}])
 ...

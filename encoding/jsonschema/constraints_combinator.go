@@ -15,6 +15,8 @@
 package jsonschema
 
 import (
+	"strconv"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
@@ -23,9 +25,14 @@ import (
 // Constraint combinators.
 
 func constraintAllOf(key string, n cue.Value, s *state) {
-	var a []ast.Expr
 	var knownTypes cue.Kind
-	for _, v := range s.listItems("allOf", n, false) {
+	items := s.listItems("allOf", n, false)
+	if len(items) == 0 {
+		s.errf(n, "allOf requires at least one subschema")
+		return
+	}
+	a := make([]ast.Expr, 0, len(items))
+	for _, v := range items {
 		x, sub := s.schemaState(v, s.allowedTypes, nil, true)
 		s.allowedTypes &= sub.allowedTypes
 		if sub.hasConstraints() {
@@ -44,33 +51,60 @@ func constraintAllOf(key string, n cue.Value, s *state) {
 	// as that's a known-impossible assertion?
 	if len(a) > 0 {
 		s.knownTypes &= knownTypes
-		s.all.add(n, ast.NewBinExpr(token.AND, a...))
+		s.all.add(n, ast.NewCall(
+			ast.NewIdent("matchN"),
+			// TODO it would be nice to be able to use a special sentinel "all" value
+			// here rather than redundantly encoding the length of the list.
+			&ast.BasicLit{
+				Kind:  token.INT,
+				Value: strconv.Itoa(len(items)),
+			},
+			ast.NewList(a...),
+		))
 	}
 }
 
 func constraintAnyOf(key string, n cue.Value, s *state) {
 	var types cue.Kind
-	var a []ast.Expr
 	var knownTypes cue.Kind
-	for _, v := range s.listItems("anyOf", n, false) {
+	items := s.listItems("anyOf", n, false)
+	if len(items) == 0 {
+		s.errf(n, "anyOf requires at least one subschema")
+		return
+	}
+	a := make([]ast.Expr, 0, len(items))
+	for _, v := range items {
 		x, sub := s.schemaState(v, s.allowedTypes, nil, true)
 		types |= sub.allowedTypes
 		knownTypes |= sub.knownTypes
 		a = append(a, x)
 	}
 	s.allowedTypes &= types
-	if len(a) > 0 {
-		s.knownTypes &= knownTypes
-		s.all.add(n, ast.NewBinExpr(token.OR, a...))
-	}
+	s.knownTypes &= knownTypes
+	s.all.add(n, ast.NewCall(
+		ast.NewIdent("matchN"),
+		&ast.UnaryExpr{
+			Op: token.GEQ,
+			X: &ast.BasicLit{
+				Kind:  token.INT,
+				Value: "1",
+			},
+		},
+		ast.NewList(a...),
+	))
 }
 
 func constraintOneOf(key string, n cue.Value, s *state) {
 	var types cue.Kind
 	var knownTypes cue.Kind
-	var a []ast.Expr
 	hasSome := false
-	for _, v := range s.listItems("oneOf", n, false) {
+	items := s.listItems("oneOf", n, false)
+	if len(items) == 0 {
+		s.errf(n, "oneOf requires at least one subschema")
+		return
+	}
+	a := make([]ast.Expr, 0, len(items))
+	for _, v := range items {
 		x, sub := s.schemaState(v, s.allowedTypes, nil, true)
 		types |= sub.allowedTypes
 
@@ -89,7 +123,14 @@ func constraintOneOf(key string, n cue.Value, s *state) {
 	s.allowedTypes &= types
 	if len(a) > 0 && hasSome {
 		s.knownTypes &= knownTypes
-		s.all.add(n, ast.NewBinExpr(token.OR, a...))
+		s.all.add(n, ast.NewCall(
+			ast.NewIdent("matchN"),
+			&ast.BasicLit{
+				Kind:  token.INT,
+				Value: "1",
+			},
+			ast.NewList(a...),
+		))
 	}
 
 	// TODO: oneOf({a:x}, {b:y}, ..., not(anyOf({a:x}, {b:y}, ...))),

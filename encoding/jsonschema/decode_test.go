@@ -68,6 +68,10 @@ func TestDecode(t *testing.T) {
 	test.Run(t, func(t *cuetxtar.Test) {
 		cfg := &jsonschema.Config{}
 
+		if t.HasTag("brokenInV2") && t.M.Name() == "v2" {
+			t.Skip("skipping because test is broken under the v2 evaluator")
+		}
+
 		if t.HasTag("openapi") {
 			cfg.Root = "#/components/schemas/"
 			cfg.Map = func(p token.Pos, a []string) ([]ast.Label, error) {
@@ -119,7 +123,7 @@ func TestDecode(t *testing.T) {
 		// Verify that the generated CUE compiles.
 		schemav := ctx.CompileBytes(b, cue.Filename("generated.cue"))
 		if err := schemav.Err(); err != nil {
-			t.Fatal(errors.Details(err, nil))
+			t.Fatal(errors.Details(err, nil), qt.Commentf("generated code: %q", b))
 		}
 		testEntries, err := fs.ReadDir(fsys, "test")
 		if err != nil {
@@ -168,7 +172,7 @@ func TestDecode(t *testing.T) {
 				}
 			} else {
 				if err := rv.Err(); err != nil {
-					t.Fatalf("test %v unexpectedly fails", file)
+					t.Fatalf("test %v unexpectedly fails: %v", file, errors.Details(err, nil))
 				}
 			}
 		}

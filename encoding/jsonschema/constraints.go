@@ -49,7 +49,7 @@ func init() {
 }
 
 // Note: the following table is ordered lexically by keyword name.
-// The various implementations are grouped by kind in the constaint-*.go files.
+// The various implementations are grouped by kind in the constraint-*.go files.
 
 const numPhases = 5
 

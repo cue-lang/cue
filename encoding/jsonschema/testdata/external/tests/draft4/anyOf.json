@@ -97,22 +97,14 @@
 				"data": {
 					"bar": 2
 				},
-				"valid": true,
-				"skip": {
-					"v2": "incomplete value {bar:2} | {bar:2,foo!:string}\n",
-					"v3": "incomplete value {bar:2} | {bar:2,foo!:string}\n"
-				}
+				"valid": true
 			},
 			{
 				"description": "second anyOf valid (complex)",
 				"data": {
 					"foo": "baz"
 				},
-				"valid": true,
-				"skip": {
-					"v2": "incomplete value {foo:\"baz\",bar!:int} | {foo:\"baz\"}\n",
-					"v3": "incomplete value {foo:\"baz\",bar!:int} | {foo:\"baz\"}\n"
-				}
+				"valid": true
 			},
 			{
 				"description": "both anyOf valid (complex)",

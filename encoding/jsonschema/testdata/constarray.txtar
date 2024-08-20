@@ -1,4 +1,4 @@
--- type.json --
+-- schema.json --
 {
     "type": "array",
     "const": [
@@ -6,5 +6,5 @@
     ]
 }
 
--- out/decode/cue --
+-- out/decode/extract --
 [1]

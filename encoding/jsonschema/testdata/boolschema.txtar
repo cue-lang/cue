@@ -1,4 +1,4 @@
--- type.json --
+-- schema.json --
 {
 	"anyOf": [
 		true,
@@ -6,5 +6,5 @@
 	]
 }
 
--- out/decode/cue --
+-- out/decode/extract --
 _ | _|_

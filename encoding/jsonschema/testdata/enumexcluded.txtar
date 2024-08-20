@@ -1,8 +1,9 @@
--- type.json --
+-- schema.json --
 {
   "type": "object",
   "enum": ["x"]
 }
--- out/decode/err --
+-- out/decode/extract --
+ERROR:
 constraints are not possible to satisfy:
-    type.json:1:1
+    schema.json:1:1

@@ -3,10 +3,10 @@
 
 # TODO fix this so it works.
 
--- type.json --
+-- schema.json --
 {
     "type": "number",
     "enum": [ 1, 2, 3]
 }
--- out/decode/cue --
+-- out/decode/extract --
 1 | 2 | 3

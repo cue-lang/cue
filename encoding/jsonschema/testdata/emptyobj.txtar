@@ -1,7 +1,7 @@
 // Objects without properties should convert correctly.
 //
 // Issue #734
--- github-workflow.json --
+-- schema.json --
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
@@ -22,7 +22,7 @@
     }
   }
 }
--- out/decode/cue --
+-- out/decode/extract --
 @jsonschema(schema="http://json-schema.org/draft-07/schema#")
 _
 

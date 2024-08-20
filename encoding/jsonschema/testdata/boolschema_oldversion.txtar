@@ -1,9 +1,10 @@
--- type.json --
+-- schema.json --
 {
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"anyOf": [true]
 }
 
--- out/decode/err --
+-- out/decode/extract --
+ERROR:
 boolean schemas not supported in http://json-schema.org/draft-04/schema#:
-    type.json:3:12
+    schema.json:3:12

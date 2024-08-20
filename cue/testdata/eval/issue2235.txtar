@@ -104,11 +104,11 @@ Leaks:  3
 Freed:  101
 Reused: 84
 Allocs: 20
-Retain: 72
+Retain: 69
 
 Unifications: 104
 Conjuncts:    271
-Disjuncts:    161
+Disjuncts:    160
 -- out/evalalpha --
 (struct){
   shorewallParams: (#struct){

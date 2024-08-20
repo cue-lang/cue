@@ -80,7 +80,7 @@ Conjuncts:    425
 Disjuncts:    184
 -- out/evalalpha --
 Errors:
-issue2351.let.param: conflicting values [{}] and "foo" (mismatched types list and string):
+issue2351.let.param: conflicting values "foo" and [{}] (mismatched types string and list):
     ./issue2351.cue:2:15
     ./issue2351.cue:4:19
 
@@ -116,7 +116,7 @@ Result:
   issue2351: (_|_){
     // [eval]
     let: (_|_){
-      // [eval] issue2351.let.param: conflicting values [{}] and "foo" (mismatched types list and string):
+      // [eval] issue2351.let.param: conflicting values "foo" and [{}] (mismatched types string and list):
       //     ./issue2351.cue:2:15
       //     ./issue2351.cue:4:19
       let _param#1 = (string){ "foo" }
@@ -181,8 +181,7 @@ diff old new
 +++ new
 @@ -1,7 +1,6 @@
  Errors:
--issue2351.let.param: conflicting values "foo" and [{}] (mismatched types string and list):
-+issue2351.let.param: conflicting values [{}] and "foo" (mismatched types list and string):
+ issue2351.let.param: conflicting values "foo" and [{}] (mismatched types string and list):
      ./issue2351.cue:2:15
 -    ./issue2351.cue:3:2
      ./issue2351.cue:4:19
@@ -210,12 +209,9 @@ diff old new
    }
    handleComprehensions: (struct){
      #sub2: (int){ 2 }
-@@ -37,9 +35,8 @@
-   issue2351: (_|_){
-     // [eval]
+@@ -39,7 +37,6 @@
      let: (_|_){
--      // [eval] issue2351.let.param: conflicting values "foo" and [{}] (mismatched types string and list):
-+      // [eval] issue2351.let.param: conflicting values [{}] and "foo" (mismatched types list and string):
+       // [eval] issue2351.let.param: conflicting values "foo" and [{}] (mismatched types string and list):
        //     ./issue2351.cue:2:15
 -      //     ./issue2351.cue:3:2
        //     ./issue2351.cue:4:19

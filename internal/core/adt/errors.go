@@ -176,17 +176,22 @@ func CombineErrors(src ast.Node, x, y Value) *Bottom {
 	a, _ := Unwrap(x).(*Bottom)
 	b, _ := Unwrap(y).(*Bottom)
 
-	if a == b && isCyclePlaceholder(a) {
-		return a
-	}
 	switch {
-	case a != nil && b != nil:
-	case a != nil:
-		return a
-	case b != nil:
-		return b
-	default:
+	case a == nil && b == nil:
 		return nil
+	case a == nil:
+		return b
+	case b == nil:
+		return a
+	case a == b && isCyclePlaceholder(a):
+		return a
+	case a == b:
+		// Don't return a (or b) because they may have other non-nil fields.
+		return &Bottom{
+			Src:  src,
+			Err:  a.Err,
+			Code: a.Code,
+		}
 	}
 
 	if a.Code != b.Code {

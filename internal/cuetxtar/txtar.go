@@ -23,6 +23,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
@@ -416,6 +417,14 @@ func (x *TxTarTest) run(t *testing.T, f func(tc *Test)) {
 			if err != nil {
 				t.Fatalf("error parsing txtar file: %v", err)
 			}
+
+			// Record ordering of files in the archive to preserve that ordering
+			// later.
+			ordering := map[string]int{}
+			for i, f := range a.Files {
+				ordering[f.Name] = i
+			}
+
 			tc := &Test{
 				T:       t,
 				Archive: a,
@@ -472,6 +481,7 @@ func (x *TxTarTest) run(t *testing.T, f func(tc *Test)) {
 			}
 			f(tc)
 
+			// Keep the position of the fallback files.
 			index := make(map[string]int, len(a.Files))
 			for i, f := range a.Files {
 				index[f.Name] = i
@@ -605,6 +615,25 @@ func (x *TxTarTest) run(t *testing.T, f func(tc *Test)) {
 			a.Files = files
 
 			if update {
+				slices.SortStableFunc(a.Files, func(i, j txtar.File) int {
+					p, ok := ordering[i.Name]
+					if !ok {
+						p = len(a.Files)
+					}
+					q, ok := ordering[j.Name]
+					if !ok {
+						q = len(a.Files)
+					}
+					switch {
+					case p < q:
+						return -1
+					case p > q:
+						return 1
+					default:
+						return 0
+					}
+				})
+
 				err = os.WriteFile(fullpath, txtar.Format(a), 0644)
 				if err != nil {
 					t.Fatal(err)

@@ -33,9 +33,9 @@ import (
 	"cuelang.org/go/encoding/protobuf/jsonpb"
 	"cuelang.org/go/encoding/protobuf/textproto"
 	"cuelang.org/go/encoding/toml"
+	"cuelang.org/go/encoding/yaml"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/filetypes"
-	"cuelang.org/go/pkg/encoding/yaml"
 )
 
 // An Encoder converts CUE to various file formats, including CUE itself.
@@ -182,17 +182,18 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 	case build.YAML:
 		e.concrete = true
 		streamed := false
+		// TODO(mvdan): use a NewEncoder API like in TOML below.
 		e.encValue = func(v cue.Value) error {
 			if streamed {
 				fmt.Fprintln(w, "---")
 			}
 			streamed = true
 
-			str, err := yaml.Marshal(v)
+			b, err := yaml.Encode(v)
 			if err != nil {
 				return err
 			}
-			_, err = fmt.Fprint(w, str)
+			_, err = w.Write(b)
 			return err
 		}
 

@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "537355f0_ef1ede33",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 25
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-20T11:27:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e210d055_776bd53e",
+      "range": {
+        "startLine": 34,
+        "startChar": 6,
+        "endLine": 34,
+        "endChar": 50
+      },
+      "revId": "8d15ad467de4a47ee93d9b1eafe25c658d0620bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "effff10c_0bbbdfb9",
@@ -37,6 +61,24 @@
       "writtenOn": "2024-08-20T10:14:27Z",
       "side": 1,
       "message": "is this sentence unfinished, or just missing a period?",
+      "revId": "8d15ad467de4a47ee93d9b1eafe25c658d0620bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb198753_b59ef937",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 25
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-20T11:27:20Z",
+      "side": 1,
+      "message": "missing a period.",
+      "parentUuid": "effff10c_0bbbdfb9",
       "revId": "8d15ad467de4a47ee93d9b1eafe25c658d0620bf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -60,6 +102,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f907da0c_f65dff81",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 25
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-20T11:27:20Z",
+      "side": 1,
+      "message": "The unparseable comment above was referring to this. I wanted to include Noam\u0027s original message as is as much as possible. But I could redistribute the text if you prefer. The removes the attribution of the text, though.",
+      "parentUuid": "d33d8431_2b881d59",
+      "revId": "8d15ad467de4a47ee93d9b1eafe25c658d0620bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6f440dc3_53b116e5",
         "filename": "pkg/encoding/yaml/manual.go",
         "patchSetId": 25
@@ -71,6 +131,24 @@
       "writtenOn": "2024-08-20T10:14:27Z",
       "side": 1,
       "message": "note that these are technically Go API breaking changes given that these packages are non-internal and non-experimental. This is intentional until we can do https://github.com/cue-lang/cue/issues/3218, but I\u0027ll need to remember to make a mention of this in the release notes.",
+      "revId": "8d15ad467de4a47ee93d9b1eafe25c658d0620bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fafb640c_b984c39e",
+        "filename": "pkg/encoding/yaml/manual.go",
+        "patchSetId": 25
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-20T11:27:20Z",
+      "side": 1,
+      "message": "Makes sense.\n\nThis will not be an issue if you make your alias change, though.",
+      "parentUuid": "6f440dc3_53b116e5",
       "revId": "8d15ad467de4a47ee93d9b1eafe25c658d0620bf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

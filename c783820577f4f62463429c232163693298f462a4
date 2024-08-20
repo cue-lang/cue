@@ -16,6 +16,24 @@
       "message": "Confirming here via a comment, I think it\u0027s a problem to change this default behaviour. So, per what I understand from the conclusion of the offline conversation, we should default to exporting docs/comments (for all encodings).",
       "revId": "c783820577f4f62463429c232163693298f462a4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "92dc00ef_fba4dbf0",
+        "filename": "cmd/cue/cmd/testdata/script/encoding_comments.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-20T08:12:29Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "39f038dd_527b98c5",
+      "revId": "c783820577f4f62463429c232163693298f462a4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

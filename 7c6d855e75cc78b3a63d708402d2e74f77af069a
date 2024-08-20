@@ -37,6 +37,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "f652442f_6b1301b5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-08-20T09:17:17Z",
+      "side": 1,
+      "message": "I\u0027d suggest we pick up in https://github.com/cue-lang/cue/issues/3385 before going any further here. There is a sufficient lack of clarity to my mind to suggest we first get agreement before attempting a fix. And an issue seems a better place for that analysis and discussion.",
+      "revId": "7c6d855e75cc78b3a63d708402d2e74f77af069a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "c65da061_d8362d40",
         "filename": "cmd/cue/cmd/help.go",
         "patchSetId": 3

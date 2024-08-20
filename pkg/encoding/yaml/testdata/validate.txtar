@@ -1,12 +1,120 @@
 -- in.cue --
 import "encoding/yaml"
 
-t1: yaml.Validate("a: 2", {a!: int} | {b!: int})
+#test: {
+	fn: _
+
+	data1: "a: 2"
+	t1: [string]: data1
+	t1: ok1: fn({a!: int} | {b!: int})
+	t1: ok2: fn(close({a: int}) | close({b: int}))
+
+	#A: {a: int}
+	#B: {b: int}
+	t1: ok3: fn(#A | #B)
+
+	data2: "'foo'"
+	t2: [string]: data2
+	t2: ok1: fn(*int | string)
+	t2: ok2: fn(string)
+}
+
+validate: #test & {
+	fn: yaml.Validate
+}
+
+validatePartial: #test & {
+	fn: yaml.ValidatePartial
+}
 -- out/yaml --
+Errors:
+#test.t1.ok1: cannot call non-function fn (type _):
+    ./in.cue:8:11
+#test.t1.ok2: cannot call non-function fn (type _):
+    ./in.cue:9:11
+#test.t1.ok3: cannot call non-function fn (type _):
+    ./in.cue:13:11
+#test.t2.ok1: cannot call non-function fn (type _):
+    ./in.cue:17:11
+#test.t2.ok2: cannot call non-function fn (type _):
+    ./in.cue:18:11
+
+Result:
 import "encoding/yaml"
 
-t1: yaml.Validate("a: 2", {
-	a!: int
-} | {
-	b!: int
-})
+#test: {
+	fn:    _
+	data1: "a: 2"
+	t1: {
+		ok1: _|_ // #test.t1.ok1: cannot call non-function fn (type _)
+		ok2: _|_ // #test.t1.ok2: cannot call non-function fn (type _)
+		ok3: _|_ // #test.t1.ok3: cannot call non-function fn (type _)
+	}
+	#A: {
+		a: int
+	}
+	#B: {
+		b: int
+	}
+	data2: "'foo'"
+	t2: {
+		ok1: _|_ // #test.t2.ok1: cannot call non-function fn (type _)
+		ok2: _|_ // #test.t2.ok2: cannot call non-function fn (type _)
+	}
+}
+validate: {
+	fn:    yaml.Validate
+	data1: "a: 2"
+	t1: {
+		ok1: fn({
+			a!: int
+		} | {
+			b!: int
+		}) & data1
+		ok2: fn(close({
+			a: int
+		}) | close({
+			b: int
+		})) & data1
+		ok3: fn(#A | #B) & data1
+	}
+	#A: {
+		a: int
+	}
+	#B: {
+		b: int
+	}
+	data2: "'foo'"
+	t2: {
+		ok1: fn(*int | string) & data2
+		ok2: fn(string) & data2
+	}
+}
+validatePartial: {
+	fn:    yaml.ValidatePartial
+	data1: "a: 2"
+	t1: {
+		ok1: fn({
+			a!: int
+		} | {
+			b!: int
+		}) & data1
+		ok2: fn(close({
+			a: int
+		}) | close({
+			b: int
+		})) & data1
+		ok3: fn(#A | #B) & data1
+	}
+	#A: {
+		a: int
+	}
+	#B: {
+		b: int
+	}
+	data2: "'foo'"
+	t2: {
+		ok1: fn(*int | string) & data2
+		ok2: fn(string) & data2
+	}
+}

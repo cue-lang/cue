@@ -92,18 +92,67 @@ func TestDecode(t *testing.T) {
 		if err != nil {
 			t.Fatal(errors.Details(err, nil))
 		}
-		if !t.HasTag("noverify") {
-			// Verify the generated CUE.
-			v := ctx.CompileBytes(b, cue.Filename("generated.cue"))
-			if err := v.Err(); err != nil {
-				t.Fatal(errors.Details(err, nil))
-			}
-			// TODO run some instance verification tests.
-		}
-
 		b = append(bytes.TrimSpace(b), '\n')
 		w.Write(b)
+		if t.HasTag("noverify") {
+			return
+		}
+		// Verify that the generated CUE compiles.
+		schemav := ctx.CompileBytes(b, cue.Filename("generated.cue"))
+		if err := schemav.Err(); err != nil {
+			t.Fatal(errors.Details(err, nil))
+		}
+		testEntries, err := fs.ReadDir(fsys, "test")
+		if err != nil {
+			return
+		}
+		for _, e := range testEntries {
+			file := path.Join("test", e.Name())
+			var v cue.Value
+			base := ""
+			testData, err := fs.ReadFile(fsys, file)
+			if err != nil {
+				t.Fatal(err)
+			}
+			switch {
+			case strings.HasSuffix(file, ".json"):
+				expr, err := json.Extract(file, testData)
+				if err != nil {
+					t.Fatal(err)
+				}
+				v = ctx.BuildExpr(expr)
+				base = strings.TrimSuffix(e.Name(), ".json")
 
+			case strings.HasSuffix(file, ".yaml"):
+				file, err := yaml.Extract(file, testData)
+				if err != nil {
+					t.Fatal(err)
+				}
+				v = ctx.BuildFile(file)
+				base = strings.TrimSuffix(e.Name(), ".yaml")
+			default:
+				t.Fatalf("unknown file encoding for test file %v", file)
+			}
+			if err := v.Err(); err != nil {
+				t.Fatalf("error building expression for test %v: %v", file, err)
+			}
+			rv := schemav.Unify(v)
+			if strings.HasPrefix(e.Name(), "err-") {
+				err := rv.Err()
+				if err == nil {
+					t.Fatalf("test %v unexpectedly passes", file)
+				}
+				if t.M.IsDefault() {
+					// The error results of the different evaluators can vary,
+					// so only test the exact results for the default evaluator.
+					t.Writer(path.Join("testerr", base)).Write([]byte(errors.Details(err, nil)))
+				}
+			} else {
+				if err := rv.Err(); err != nil {
+					t.Fatalf("test %v unexpectedly fails", file)
+				}
+			}
+		}
 	})
 }
 

@@ -33,6 +33,23 @@
       "message": "isn\u0027t this a change to how the `and` and `or` builtins work? then I would expect changes to test files, even if this means adding new tests in an earlier CL. For example, I would assume that `and(int, \u003e5)` used to be an error and it no longer should be.",
       "revId": "cb391fd23d998b19ecb3747e5dcd9dad26ca8f94",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b40747f_5b4e148d",
+        "filename": "internal/pkg/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-20T10:12:26Z",
+      "side": 1,
+      "message": "did you consider `type Schema \u003d cue.Value`? this should still work with pkg/gen.go as long as we use the new go/types alias tracking (opt-in in Go 1.22, opt-out in Go 1.23), and then it means fewer lines of code and less breakage for any Go users currently passing cue.Value to these exposed Go APIs. So I\u0027d definitely do it.\n\nI can help with those changes, it can be as a CL on top of your stack for example.",
+      "revId": "cb391fd23d998b19ecb3747e5dcd9dad26ca8f94",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

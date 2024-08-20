@@ -1,0 +1,33 @@
+Check that fields are quoted correctly if they are named after
+the matchN builtin.
+
+-- schema.json --
+{
+    "type": "object",
+    "properties": {
+        "matchN": {
+            "oneOf": [
+                {
+                    "const": 1
+                },
+                {
+                    "const": 2
+                }
+            ]
+        }
+    }
+}
+-- out/decode/extract --
+"matchN"?: matchN(1, [1, 2])
+...
+-- test/ok1.json --
+{"matchN": 1}
+-- test/ok2.json --
+{"matchN": 2}
+-- test/err-nomatch.json --
+{"matchN": 3}
+-- out/decode/testerr/err-nomatch --
+matchN: invalid value 3 (does not satisfy matchN(1, [1,2])): 0 matched, expected 1:
+    generated.cue:1:12
+    generated.cue:1:19
+    test/err-nomatch.json:1:12

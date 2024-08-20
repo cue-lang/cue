@@ -123,6 +123,7 @@ const (
 	taskWAITING // task is blocked on a property of an arc to hold
 	taskSUCCESS
 	taskFAILED
+	taskCANCELLED
 )
 
 type schedState uint8
@@ -405,9 +406,6 @@ processNextTask:
 		}
 
 		switch {
-		case t.defunct:
-			continue
-
 		case t.state == taskRUNNING:
 			// TODO: we could store the current referring node that caused
 			// the cycle and then proceed up the stack to mark all tasks
@@ -671,6 +669,12 @@ func (s *scheduler) insertTask(t *task) {
 
 func runTask(t *task, mode runMode) {
 	if t.defunct {
+		if t.state != taskCANCELLED {
+			t.state = taskCANCELLED
+			if t.id.cc != nil {
+				t.id.cc.decDependent(t.node.ctx, TASK, nil)
+			}
+		}
 		return
 	}
 	t.node.Logf("============ RUNTASK %v %v", t.run.name, t.x)

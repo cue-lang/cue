@@ -39,7 +39,7 @@
 -- out/decode/extract --
 // Main schema
 intOrString1?: int | string
-intOrString2?: int | string
-intOrString3?: int | string
-disjunction?:  int | string | int & >=3
+intOrString2?: matchN(1, [int, string])
+intOrString3?: matchN(>=1, [int, string])
+disjunction?: matchN(1, [matchN(>=1, [int, string]), int & >=3])
 ...

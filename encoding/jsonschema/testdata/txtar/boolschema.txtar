@@ -1,3 +1,4 @@
+#noverify
 -- schema.json --
 {
 	"anyOf": [
@@ -7,4 +8,4 @@
 }
 
 -- out/decode/extract --
-_ | _|_
+matchN(>=1, [_, _|_])

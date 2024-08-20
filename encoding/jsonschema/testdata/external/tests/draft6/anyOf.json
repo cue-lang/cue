@@ -89,11 +89,17 @@
 				false
 			]
 		},
+		"skip": {
+			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:2:17\n"
+		},
 		"tests": [
 			{
 				"description": "any value is valid",
 				"data": "foo",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -106,8 +112,7 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: 2 errors in empty disjunction:\nexplicit error (_|_ literal) in source:\n    generated.cue:2:1\nexplicit error (_|_ literal) in source:\n    generated.cue:2:7\n",
-			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:2:1\nexplicit error (_|_ literal) in source:\n    generated.cue:2:7\n"
+			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:2:14\n"
 		},
 		"tests": [
 			{
@@ -115,7 +120,6 @@
 				"data": "foo",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			}
@@ -153,22 +157,14 @@
 				"data": {
 					"bar": 2
 				},
-				"valid": true,
-				"skip": {
-					"v2": "incomplete value {bar:2} | {bar:2,foo!:string}\n",
-					"v3": "incomplete value {bar:2} | {bar:2,foo!:string}\n"
-				}
+				"valid": true
 			},
 			{
 				"description": "second anyOf valid (complex)",
 				"data": {
 					"foo": "baz"
 				},
-				"valid": true,
-				"skip": {
-					"v2": "incomplete value {foo:\"baz\",bar!:int} | {foo:\"baz\"}\n",
-					"v3": "incomplete value {foo:\"baz\",bar!:int} | {foo:\"baz\"}\n"
-				}
+				"valid": true
 			},
 			{
 				"description": "both anyOf valid (complex)",

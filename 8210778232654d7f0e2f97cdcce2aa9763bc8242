@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7fae14b3_4eebaecd",
+        "filename": "cue/testdata/benchmarks/issue3307.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-20T13:07:42Z",
+      "side": 1,
+      "message": "Added an 18th field. This makes the test take \u003e8s on my machine without the fix, which is pretty visible. Happy to move this change to a different CL in this chain if you\u0027d prefer.",
+      "revId": "8210778232654d7f0e2f97cdcce2aa9763bc8242",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

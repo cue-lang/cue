@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71ba97a8_2d1948a0",
+        "filename": "internal/core/compile/builtin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-20T10:07:04Z",
+      "side": 1,
+      "message": "did you mean NonConcrete here? I guess you renamed the field at some point.",
+      "revId": "cb391fd23d998b19ecb3747e5dcd9dad26ca8f94",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba018c1e_8a6586a7",
+        "filename": "internal/core/compile/builtin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-20T10:07:04Z",
+      "side": 1,
+      "message": "isn\u0027t this a change to how the `and` and `or` builtins work? then I would expect changes to test files, even if this means adding new tests in an earlier CL. For example, I would assume that `and(int, \u003e5)` used to be an error and it no longer should be.",
+      "revId": "cb391fd23d998b19ecb3747e5dcd9dad26ca8f94",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

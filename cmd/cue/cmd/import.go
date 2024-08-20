@@ -596,6 +596,7 @@ func tryParse(str string) (s ast.Expr, pkg string) {
 		return nil, ""
 	}
 
+	// TODO(mvdan): move from pkg/encoding/yaml to encoding/yaml.
 	if expr, err := pkgyaml.Unmarshal(b); err == nil {
 		switch expr.(type) {
 		case *ast.StructLit, *ast.ListLit:

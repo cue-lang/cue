@@ -109,6 +109,7 @@ func EncodeStream(iter cue.Iterator) ([]byte, error) {
 // Validate validates the YAML and confirms it matches the constraints
 // specified by v. For YAML streams, all values must match v.
 func Validate(b []byte, v cue.Value) error {
+	// TODO(mvdan): encoding/yaml should not import pkg/encoding/yaml.
 	_, err := pkgyaml.Validate(b, v)
 	return err
 }

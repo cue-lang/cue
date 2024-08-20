@@ -16,6 +16,23 @@
       "message": "Add the `IsValidator` method to `pkg.CallCtxt`, which allows the validator to check if it is called as a validator.",
       "revId": "019ab76342ac2f54fda5ed731bce5952b0e78e4a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7a61fe1_f9d74a41",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-20T10:08:23Z",
+      "side": 1,
+      "message": "Hi, I\u0027ve cc-ed you on https://review.gerrithub.io/c/cue-lang/cue/+/1199684/2 and https://review.gerrithub.io/c/cue-lang/cue/+/1194425/25 to show the new `pkg.Schema` type, which is very similar to your `pkg.Constraint`. I thought this would be relevant and helpful for this change. Thanks for your patience!",
+      "revId": "019ab76342ac2f54fda5ed731bce5952b0e78e4a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

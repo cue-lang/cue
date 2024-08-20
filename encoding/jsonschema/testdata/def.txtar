@@ -1,6 +1,6 @@
 // This test tests the conversion and ordering of definitions.
 
--- definition.json --
+-- schema.json --
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
 
@@ -38,7 +38,7 @@
   }
 }
 
--- out/decode/cue --
+-- out/decode/extract --
 @jsonschema(schema="http://json-schema.org/draft-07/schema#")
 @jsonschema(id="http://cuelang.org/go/encoding/openapi/testdata/order.json")
 person?:           #["per-son"]

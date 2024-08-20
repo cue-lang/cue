@@ -1,6 +1,6 @@
 #openapi
 
--- type.yaml --
+-- schema.yaml --
 components:
   schemas:
     User:
@@ -18,7 +18,7 @@ components:
       description: "The number to dial."
       type: string
 
--- out/decode/cue --
+-- out/decode/extract --
 // A User uses something.
 #User: {
 	id?:   int

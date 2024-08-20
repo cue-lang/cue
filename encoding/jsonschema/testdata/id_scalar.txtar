@@ -6,7 +6,7 @@
   "type": "string"
 }
 
--- out/decode/cue --
+-- out/decode/extract --
 @jsonschema(schema="http://json-schema.org/draft-07/schema#")
 @jsonschema(id="http://cuelang.org/go/encoding/openapi/testdata/id_scalar.json")
 string

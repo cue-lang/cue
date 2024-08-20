@@ -2,7 +2,7 @@
 
 #noverify
 
--- definition.json --
+-- schema.json --
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
 
@@ -63,7 +63,7 @@
   }
 }
 
--- out/decode/cue --
+-- out/decode/extract --
 import (
 	"acme.com/external.json:external"
 	"acme.com/external-foo.json:schema"

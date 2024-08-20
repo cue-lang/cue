@@ -1,4 +1,4 @@
--- json-e.json --
+-- schema.json --
 {
   "$schema": "https://json-schema.org/draft/2019-09/schema",
   "$id": "https://www.sourcemeta.com/schemas/vendor/json-e@1.json",
@@ -62,7 +62,7 @@
   "title": "JSON-e templates",
   "type": "object"
 }
--- out/decode/cue --
+-- out/decode/extract --
 _schema
 _schema: {
 	// JSON-e templates

@@ -1,4 +1,4 @@
--- list.yaml --
+-- schema.yaml --
 type: object
 
 properties:
@@ -35,7 +35,7 @@ properties:
 
 additionalProperties: false
 
--- out/decode/cue --
+-- out/decode/extract --
 import "list"
 
 foo?: [...string]

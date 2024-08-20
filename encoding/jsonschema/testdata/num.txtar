@@ -1,4 +1,4 @@
--- type.json --
+-- schema.json --
 {
   "type": "object",
 
@@ -37,7 +37,7 @@
   },
   "additionalProperties": false
 }
--- out/decode/cue --
+-- out/decode/extract --
 import (
 	"strings"
 	"math"

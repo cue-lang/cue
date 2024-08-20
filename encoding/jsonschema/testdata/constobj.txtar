@@ -1,10 +1,10 @@
 
--- type.json --
+-- schema.json --
 {
     "type": "object",
     "const": {"a": 1}
 }
 
--- out/decode/cue --
+-- out/decode/extract --
 a: 1
 ...

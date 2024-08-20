@@ -71,6 +71,32 @@ var needFix = map[string]string{
 	"DIR/NAME": "reason",
 }
 
+// skipDebugDepErrors is a temporary hack to skip tests that are known to have
+// counter errors.
+// TODO: These counters should all go to zero.
+var skipDebugDepErrors = map[string]int{
+	"benchmarks/issue1684":     8,
+	"benchmarks/listdedup":     1,
+	"builtins/default":         1,
+	"comprehensions/pushdown":  3,
+	"cycle/chain":              4,
+	"cycle/compbottom2":        4,
+	"cycle/disjunction":        7,
+	"cycle/issue990":           1,
+	"cycle/structural":         18,
+	"disjunctions/edge":        1,
+	"disjunctions/elimination": 8,
+	"disjunctions/embed":       6,
+	"disjunctions/errors":      2,
+	"eval/conjuncts":           3,
+	"eval/issue2146":           4,
+	"eval/issue3301":           1,
+	"eval/issue599":            1,
+	"export/031":               1,
+	"fulleval/054_issue312":    1,
+	"scalars/embed":            1,
+}
+
 func TestEvalAlpha(t *testing.T) {
 	// TODO: remove use of externalDeps for processing. Currently, enabling
 	// this would fix some issues, but also introduce some closedness bugs.
@@ -78,7 +104,7 @@ func TestEvalAlpha(t *testing.T) {
 	// externalDeps to agitate pending dependencies is replaced with a
 	// dedicated mechanism.
 	//
-	// adt.DebugDeps = true // check unmatched dependencies.
+	adt.DebugDeps = true // check unmatched dependencies.
 
 	flags := cuedebug.Config{
 		Sharing: true,
@@ -153,7 +179,18 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, flags cued
 	v.Finalize(ctx)
 
 	// Print discrepancies in dependencies.
-	if m := ctx.ErrorGraphs; len(m) > 0 {
+	m := ctx.ErrorGraphs
+	name := t.T.Name()[len("TestEvalAlpha/"):]
+	expectErrs := skipDebugDepErrors[name]
+
+	if len(m) != expectErrs {
+		if expectErrs == 0 {
+			t.Errorf("unexpected node errors: %d", len(m))
+		} else {
+			t.Errorf("unexpected number of node errors: got %d; expected %d",
+				len(m), expectErrs)
+		}
+
 		errorCount += 1 // Could use len(m), but this seems more useful.
 		i := 0
 		keys := make([]string, len(m))
@@ -161,7 +198,6 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, flags cued
 			keys[i] = k
 			i++
 		}
-		t.Errorf("unexpected node errors: %d", len(ctx.ErrorGraphs))
 		sort.Strings(keys)
 		for _, s := range keys {
 			t.Errorf("  -- path: %s", s)

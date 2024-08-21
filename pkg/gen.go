@@ -14,6 +14,11 @@
 
 //go:build ignore
 
+// Since our go.mod still has 'go 1.22', but we want to use go/types.Alias
+// to differentiate cue.Value from pkg.Schema, we enable it explicitly.
+// TODO(mvdan): this can be removed once we bump go.mod to 'go 1.23'.
+//go:debug gotypesalias=1
+
 // gen.go generates the pkg.go files inside the packages under the pkg directory.
 //
 // It takes the list of packages from the packages.txt.
@@ -365,31 +370,28 @@ func (g *generator) genFunc(fn *types.Func) {
 // TODO(mvdan): goKind and goToCUE still use a lot of strings; simplify.
 
 func (g *generator) goKind(typ types.Type) string {
-	if ptr, ok := typ.(*types.Pointer); ok {
-		typ = ptr.Elem()
-	}
 	switch str := types.TypeString(typ, nil); str {
-	case "math/big.Int":
+	case "*math/big.Int":
 		return "bigInt"
-	case "math/big.Float":
+	case "*math/big.Float":
 		return "bigFloat"
-	case "math/big.Rat":
+	case "*math/big.Rat":
 		return "bigRat"
 	case "cuelang.org/go/internal/core/adt.Bottom":
 		return "error"
-	case "github.com/cockroachdb/apd/v3.Decimal":
+	case "*cuelang.org/go/internal.Decimal":
 		return "decimal"
 	case "cuelang.org/go/internal/pkg.List":
 		return "cueList"
 	case "cuelang.org/go/internal/pkg.Struct":
 		return "struct"
-	case "cuelang.org/go/internal/pkg.Schema":
-		g.nonConcrete = true
-		return "schema"
-	case "[]*github.com/cockroachdb/apd/v3.Decimal":
+	case "[]*cuelang.org/go/internal.Decimal":
 		return "decimalList"
 	case "cuelang.org/go/cue.Value":
 		return "value"
+	case "cuelang.org/go/internal/pkg.Schema":
+		g.nonConcrete = true
+		return "schema"
 	case "cuelang.org/go/cue.List":
 		return "list"
 	case "[]string":

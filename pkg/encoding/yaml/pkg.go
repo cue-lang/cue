@@ -71,9 +71,9 @@ var p = &pkg.Package{
 		Result:      adt.BoolKind,
 		NonConcrete: true,
 		Func: func(c *pkg.CallCtxt) {
-			b, schema := c.Bytes(0), c.Schema(1)
+			b, v := c.Bytes(0), c.Schema(1)
 			if c.Do() {
-				c.Ret, c.Err = Validate(b, schema)
+				c.Ret, c.Err = Validate(b, v)
 			}
 		},
 	}, {
@@ -85,9 +85,9 @@ var p = &pkg.Package{
 		Result:      adt.BoolKind,
 		NonConcrete: true,
 		Func: func(c *pkg.CallCtxt) {
-			b, schema := c.Bytes(0), c.Schema(1)
+			b, v := c.Bytes(0), c.Schema(1)
 			if c.Do() {
-				c.Ret, c.Err = ValidatePartial(b, schema)
+				c.Ret, c.Err = ValidatePartial(b, v)
 			}
 		},
 	}},

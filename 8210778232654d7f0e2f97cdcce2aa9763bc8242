@@ -38,6 +38,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "65c57703_eb8da54a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-21T09:09:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1b8dcff8_5b01b3dc",
+      "revId": "8210778232654d7f0e2f97cdcce2aa9763bc8242",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "05ee2095_45d526b3",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -49,6 +67,24 @@
       "writtenOn": "2024-08-21T08:38:53Z",
       "side": 1,
       "message": "Will the benchmarks still be run",
+      "revId": "8210778232654d7f0e2f97cdcce2aa9763bc8242",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8dd33596_95cb6b56",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-21T09:09:04Z",
+      "side": 1,
+      "message": "Yep, a `go test -bench\u003d. ./...` will run the benchmarks, and a normal `go test ./...` will still run the eval+compile tests on the benchmark txtars.",
+      "parentUuid": "05ee2095_45d526b3",
       "revId": "8210778232654d7f0e2f97cdcce2aa9763bc8242",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

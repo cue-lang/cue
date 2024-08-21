@@ -152,6 +152,8 @@ func openDebugGraph(ctx *OpContext, v *Vertex, name string) {
 // dependencies are balanced.
 type depKind int
 
+//go:generate go run golang.org/x/tools/cmd/stringer -type=depKind
+
 const (
 	// PARENT dependencies are used to track the completion of parent
 	// closedContexts within the closedness tree.
@@ -199,37 +201,6 @@ const (
 	// TEST is used for testing notifications.
 	TEST // Always refers to self.
 )
-
-func (k depKind) String() string {
-	switch k {
-	case PARENT:
-		return "PARENT"
-	case ARC:
-		return "ARC"
-	case NOTIFY:
-		return "NOTIFY"
-	case TASK:
-		return "TASK"
-	case DISJUNCT:
-		return "DISJUNCT"
-	case EVAL:
-		return "EVAL"
-	case COMP:
-		return "COMP"
-	case ROOT:
-		return "ROOT"
-
-	case INIT:
-		return "INIT"
-	case DEFER:
-		return "DEFER"
-	case SHARED:
-		return "SHARED"
-	case TEST:
-		return "TEST"
-	}
-	panic("unreachable")
-}
 
 // ccDep is used to record counters which is used for debugging only.
 // It is purpose is to be precise about matching inc/dec as well as to be able

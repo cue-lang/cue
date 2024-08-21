@@ -89,6 +89,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3c7e10e_5e65742d",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 498,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-21T11:50:40Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "53203a4f_4aaa899a",
+      "revId": "f40e19c0e8c716ae2274f15226ad0c9f7eedca4d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "df2d3d42_9ba13633",

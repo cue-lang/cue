@@ -13,25 +13,16 @@ type Logger interface {
 
 type EventKind int
 
+//go:generate go run golang.org/x/tools/cmd/stringer -type=EventKind -linecomment
+
 const (
-	NoEvent EventKind = iota
-	KindClientSendRequest
-	KindClientRecvResponse
+	NoEvent                EventKind = iota
+	KindClientSendRequest            // http client->
+	KindClientRecvResponse           // http client<-
 
 	// TODO KindServerRecvRequest
 	// TODO KindServerSendResponse
 )
-
-func (k EventKind) String() string {
-	switch k {
-	case KindClientSendRequest:
-		return "http client->"
-	case KindClientRecvResponse:
-		return "http client<-"
-	default:
-		return "unknown"
-	}
-}
 
 // Request represents an HTTP request.
 type Request struct {

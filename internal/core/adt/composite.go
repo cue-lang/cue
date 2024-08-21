@@ -499,6 +499,8 @@ func (s *StructInfo) useForAccept() bool {
 // vertexStatus indicates the evaluation progress of a Vertex.
 type vertexStatus int8
 
+//go:generate go run golang.org/x/tools/cmd/stringer -type=vertexStatus
+
 const (
 	// unprocessed indicates a Vertex has not been processed before.
 	// Value must be nil.
@@ -528,25 +530,6 @@ const (
 	// are save to use without further consideration.
 	finalized
 )
-
-func (s vertexStatus) String() string {
-	switch s {
-	case unprocessed:
-		return "unprocessed"
-	case evaluating:
-		return "evaluating"
-	case partial:
-		return "partial"
-	case conjuncts:
-		return "conjuncts"
-	case evaluatingArcs:
-		return "evaluatingArcs"
-	case finalized:
-		return "finalized"
-	default:
-		return "unknown"
-	}
-}
 
 func (v *Vertex) Status() vertexStatus {
 	return v.status

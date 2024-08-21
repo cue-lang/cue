@@ -494,6 +494,9 @@ func (x *TxTarTest) run(t *testing.T, f func(tc *Test)) {
 					continue
 				}
 				if j, ok := index[sub.fallback]; ok {
+					if _, ok := ordering[sub.name]; !ok {
+						ordering[sub.name] = j
+					}
 					fallback := a.Files[j].Data
 
 					result := sub.buf.Bytes()
@@ -502,6 +505,9 @@ func (x *TxTarTest) run(t *testing.T, f func(tc *Test)) {
 					}
 
 					diffName := "diff/-" + sub.name + "<==>+" + sub.fallback
+					if _, ok := ordering[diffName]; !ok {
+						ordering[diffName] = j
+					}
 					switch diff := diff.Diff("old", fallback, "new", result); {
 					case len(diff) > 0:
 						tc.outFiles = append(tc.outFiles, file{
@@ -540,27 +546,8 @@ func (x *TxTarTest) run(t *testing.T, f func(tc *Test)) {
 				}
 			}
 
-			// Insert results of this test at first location of any existing
-			// test or at end of list otherwise.
-			k := len(a.Files)
-			for _, sub := range tc.outFiles {
-				if i, ok := index[sub.name]; ok {
-					k = i
-					break
-				}
-				if i, ok := index[sub.fallback]; ok {
-					k = i
-					break
-				}
-			}
-
 			// Filter files up to k from the original list.
 			files := make([]txtar.File, 0, len(a.Files))
-			for _, f := range a.Files[:k] {
-				if _, ok := index[f.Name]; ok {
-					files = append(files, f)
-				}
-			}
 
 			for _, sub := range tc.outFiles {
 				result := sub.buf.Bytes()
@@ -607,7 +594,7 @@ func (x *TxTarTest) run(t *testing.T, f func(tc *Test)) {
 
 			// Add remaining unrelated files, ignoring files that were already
 			// added.
-			for _, f := range a.Files[k:] {
+			for _, f := range a.Files {
 				if _, ok := index[f.Name]; ok {
 					files = append(files, f)
 				}

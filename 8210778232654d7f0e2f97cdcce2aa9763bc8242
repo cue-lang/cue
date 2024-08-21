@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b8dcff8_5b01b3dc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-21T08:48:38Z",
+      "side": 1,
+      "message": "Ok, yep, I\u0027ll move it out to cue.",
+      "parentUuid": "92271b52_3979ed69",
+      "revId": "8210778232654d7f0e2f97cdcce2aa9763bc8242",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "05ee2095_45d526b3",
@@ -66,6 +84,24 @@
       "side": 1,
       "message": "8s without the fix, I reckon. With the fix this is fast? In that case it is fine.\n\nAside from that, this seems to be an unrelated change.",
       "parentUuid": "7fae14b3_4eebaecd",
+      "revId": "8210778232654d7f0e2f97cdcce2aa9763bc8242",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "37d4f106_7df51747",
+        "filename": "cue/testdata/benchmarks/issue3307.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-21T08:48:38Z",
+      "side": 1,
+      "message": "Yep, it\u0027s fast with the fix. But I agree it\u0027s quite unrelated. I\u0027ll move it to a different CL.",
+      "parentUuid": "41b840e5_2bf3668b",
       "revId": "8210778232654d7f0e2f97cdcce2aa9763bc8242",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

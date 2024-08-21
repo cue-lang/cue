@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e85b0c9c_09e60643",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 423,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-21T10:39:03Z",
+      "side": 1,
+      "message": "It\u0027s a bit clearer if this creation of `ordering` is moved down to where `index` is created - indeed, they\u0027re actually the same, so you could create one and then use the new `maps.Clone` function.",
+      "revId": "f40e19c0e8c716ae2274f15226ad0c9f7eedca4d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c94488a2_dad2b266",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 498,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-21T10:39:03Z",
+      "side": 1,
+      "message": "Given that `ordering` and `index` start off the same, won\u0027t this mean that `ordering[sub.name] \u003d\u003d ordering[sub.fallback]` ? If so, I\u0027m surprised I\u0027m not seeing a tie-break in the stablesortfunc to do a final order by name.",
+      "revId": "f40e19c0e8c716ae2274f15226ad0c9f7eedca4d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df2d3d42_9ba13633",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-21T10:39:03Z",
+      "side": 1,
+      "message": "I think this comment now goes away?",
+      "revId": "f40e19c0e8c716ae2274f15226ad0c9f7eedca4d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

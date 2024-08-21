@@ -51,7 +51,7 @@ func (c *CallCtxt) Do() bool {
 
 // Schema returns the ith argument as is, without converting it to a cue.Value.
 func (c *CallCtxt) Schema(i int) Schema {
-	return Schema(value.Make(c.ctx, c.args[i]))
+	return value.Make(c.ctx, c.args[i])
 }
 
 // Value returns a finalized cue.Value for the ith argument.

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d6bdfb8_fa529d8a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 26
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-21T10:07:23Z",
+      "side": 1,
+      "message": "please submit and I will do the alias tweak on top.",
+      "revId": "7a0f07988692ceb560415a51f59e4f02bb794acd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

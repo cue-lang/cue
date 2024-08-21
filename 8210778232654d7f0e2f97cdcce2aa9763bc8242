@@ -1,6 +1,40 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "92271b52_3979ed69",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-21T08:38:53Z",
+      "side": 1,
+      "message": "Good idea to move it out of testdata.\n\nIt seems somewhat unconventional to have a separate benchmark directory. Why not put this in cue or internal/core/adt?\n\nI don\u0027t feel strongly about this, though.",
+      "revId": "8210778232654d7f0e2f97cdcce2aa9763bc8242",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "05ee2095_45d526b3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-21T08:38:53Z",
+      "side": 1,
+      "message": "Will the benchmarks still be run",
+      "revId": "8210778232654d7f0e2f97cdcce2aa9763bc8242",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "7fae14b3_4eebaecd",
@@ -14,6 +48,24 @@
       "writtenOn": "2024-08-20T13:07:42Z",
       "side": 1,
       "message": "Added an 18th field. This makes the test take \u003e8s on my machine without the fix, which is pretty visible. Happy to move this change to a different CL in this chain if you\u0027d prefer.",
+      "revId": "8210778232654d7f0e2f97cdcce2aa9763bc8242",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "41b840e5_2bf3668b",
+        "filename": "cue/testdata/benchmarks/issue3307.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-21T08:38:53Z",
+      "side": 1,
+      "message": "8s without the fix, I reckon. With the fix this is fast? In that case it is fine.\n\nAside from that, this seems to be an unrelated change.",
+      "parentUuid": "7fae14b3_4eebaecd",
       "revId": "8210778232654d7f0e2f97cdcce2aa9763bc8242",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -41,7 +41,7 @@ import (
 func getValue(t *cuetdtest.M, body string) cue.Value {
 	t.Helper()
 
-	ctx := t.Context()
+	ctx := t.CueContext()
 	return ctx.CompileString(body, cue.Filename("test"))
 }
 
@@ -144,7 +144,7 @@ func TestAPI(t *testing.T) {
 		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
 			t.TODO_V3()
 
-			ctx := t.Context()
+			ctx := t.CueContext()
 
 			valIn := mustCompile(t, ctx, tc.input)
 			valOut := tc.fun(valIn)
@@ -963,7 +963,7 @@ func TestFieldType(t *testing.T) {
 
 func TestLookup(t *testing.T) {
 	cuetdtest.FullMatrix.Do(t, func(t *cuetdtest.M) {
-		ctx := t.Context()
+		ctx := t.CueContext()
 		val := mustCompile(t, ctx, `
 #V: {
 	x: int
@@ -1168,7 +1168,7 @@ providers: {
 
 func TestFillPath(t *testing.T) {
 	cuetdtest.FullMatrix.Do(t, func(t *cuetdtest.M) {
-		ctx := t.Context()
+		ctx := t.CueContext()
 
 		val := ctx.BuildExpr(ast.NewStruct("bar", ast.NewString("baz")))
 		if err := val.Err(); err != nil {
@@ -1403,7 +1403,7 @@ func TestFillPathError(t *testing.T) {
 
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
-			ctx := t.Context()
+			ctx := t.CueContext()
 			v := mustCompile(t, ctx, tc.in)
 			v = v.FillPath(tc.path, tc.x)
 
@@ -1659,7 +1659,7 @@ func TestAllows(t *testing.T) {
 			if tc.todo_nosharing {
 				t.TODO_NoSharing()
 			}
-			ctx := t.Context()
+			ctx := t.CueContext()
 			v := mustCompile(t, ctx, tc.in)
 			v = v.LookupPath(path)
 
@@ -1722,7 +1722,7 @@ func TestValue_LookupDef(t *testing.T) {
 
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.def, func(t *cuetdtest.M) {
-			ctx := t.Context()
+			ctx := t.CueContext()
 			v := mustCompile(t, ctx, tc.in)
 			v = v.LookupDef(tc.def)
 			got := fmt.Sprint(v)
@@ -2336,7 +2336,7 @@ func TestEquals(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
-			ctx := t.Context()
+			ctx := t.CueContext()
 
 			a := mustCompile(t, ctx, tc.a)
 			b := mustCompile(t, ctx, tc.b)
@@ -2495,7 +2495,7 @@ func TestValidate(t *testing.T) {
 				t.TODO_V3()
 			}
 
-			ctx := t.Context()
+			ctx := t.CueContext()
 			val := ctx.CompileString(tc.in, cue.Filename("validate"))
 			err := val.Validate(tc.opts...)
 			if gotErr := err != nil; gotErr != tc.err {
@@ -2528,7 +2528,7 @@ func TestPath(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, strings.Join(tc, "."), func(t *cuetdtest.M) {
-			ctx := t.Context()
+			ctx := t.CueContext()
 			val := mustCompile(t, ctx, config)
 
 			v := val.Lookup(tc[0])
@@ -2697,7 +2697,7 @@ func TestValueDoc(t *testing.T) {
 	`
 
 	cuetdtest.FullMatrix.Do(t, func(t *cuetdtest.M) {
-		ctx := t.Context()
+		ctx := t.CueContext()
 		v1 := mustCompile(t, ctx, config)
 		v2 := mustCompile(t, ctx, config2)
 		both := v1.Unify(v2)
@@ -3168,7 +3168,7 @@ func TestReferencePath(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
-			ctx := t.Context()
+			ctx := t.CueContext()
 
 			val := ctx.CompileString(tc.input, cue.Filename("in"))
 			v := val.Lookup("v", "w", "x")
@@ -3263,7 +3263,7 @@ a: x: y: z: "x"`,
 				t.TODO_V3()
 			}
 
-			c := t.Context()
+			c := t.CueContext()
 			v := c.CompileString(tc.value)
 			v = v.LookupPath(cue.ParsePath("a"))
 			pos := v.Pos().String()
@@ -3519,7 +3519,7 @@ func TestPathCorrection(t *testing.T) {
 			continue
 		}
 		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
-			ctx := t.Context()
+			ctx := t.CueContext()
 
 			// don't use mustCompile because some test cases here need to
 			// inspect the value error.

@@ -78,7 +78,7 @@ func formatNode(t *testing.T, n ast.Node) []byte {
 // different from parsed or evaluated CUE, such as having Vertex values.
 func TestGenerated(t *testing.T) {
 	cuetdtest.FullMatrix.Do(t, func(t *cuetdtest.M) {
-		ctx := t.Context()
+		ctx := t.CueContext()
 
 		testCases := []struct {
 			in  func(ctx *adt.OpContext) (adt.Expr, error)
@@ -349,7 +349,7 @@ func TestFromAPI(t *testing.T) {
 	// Issue #1204
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
-			ctx := t.Context()
+			ctx := t.CueContext()
 
 			v := ctx.BuildExpr(tc.expr)
 

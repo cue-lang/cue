@@ -94,7 +94,7 @@ func Benchmark(b *testing.B) {
 				b.Run(m.Name(), func(b *testing.B) {
 					b.ReportAllocs()
 					for i := 0; i < b.N; i++ {
-						ctx := m.Context()
+						ctx := m.CueContext()
 						value := ctx.BuildInstance(cuetxtar.Load(a, b.TempDir())[0])
 						value.Validate()
 					}

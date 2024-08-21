@@ -624,7 +624,7 @@ func (x *TxTarTest) run(t *testing.T, f func(tc *Test)) {
 					if !ok {
 						q = len(a.Files)
 					}
-					return q - p
+					return p - q
 				})
 
 				err = os.WriteFile(fullpath, txtar.Format(a), 0644)

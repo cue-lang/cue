@@ -405,7 +405,7 @@ a: x: "hello"
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.name, func(t *cuetdtest.M) {
-			ctx := t.Context()
+			ctx := t.CueContext()
 			// it is not fatal if x or y contain errors: some test cases
 			// rely on interacting with such errors.
 			x := ctx.CompileString(tc.x, cue.Filename("x"))

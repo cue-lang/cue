@@ -127,6 +127,10 @@ type Test struct {
 	hasGold bool
 }
 
+// Ensure that Test always implements testing.TB.
+// Note that testing.TB may gain new methods in future Go releases.
+var _ testing.TB = (*Test)(nil)
+
 // Write implements [io.Writer] by writing to the output for the test,
 // which will be tested against the main golden file.
 func (t *Test) Write(b []byte) (n int, err error) {
@@ -345,13 +349,13 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 
 // Runtime returns a new runtime based on the configuration of the test.
 func (t *Test) Runtime() *runtime.Runtime {
-	return (*runtime.Runtime)(t.Context())
+	return (*runtime.Runtime)(t.CueContext())
 }
 
-// Context returns a new cue.Context based on the configuration of the test.
-func (t *Test) Context() *cue.Context {
+// CueContext returns a new cue.CueContext based on the configuration of the test.
+func (t *Test) CueContext() *cue.Context {
 	if t.M != nil {
-		return t.M.Context()
+		return t.M.CueContext()
 	}
 	return cuecontext.New()
 }

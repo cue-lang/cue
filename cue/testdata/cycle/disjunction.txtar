@@ -186,8 +186,6 @@ issue3042.data.secret.infra.0.name: field not allowed:
 issue3042.data.secret.infra.0.name: invalid value "bar1" (out of bound =~"^foo"):
     ./issue3042.cue:4:8
     ./issue3042.cue:10:12
-issue3042.data.secret.infra.name: cyclic reference to field name:
-    ./issue3042.cue:5:22
 issue3042.data.secret: field not allowed:
     ./issue3042.cue:5:57
     ./issue3042.cue:8:3
@@ -307,8 +305,6 @@ Result:
       // issue3042.data.secret.infra.0.name: invalid value "bar1" (out of bound =~"^foo"):
       //     ./issue3042.cue:4:8
       //     ./issue3042.cue:10:12
-      // issue3042.data.secret.infra.name: cyclic reference to field name:
-      //     ./issue3042.cue:5:22
       // issue3042.data.secret: field not allowed:
       //     ./issue3042.cue:5:57
       //     ./issue3042.cue:8:3
@@ -328,7 +324,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,62 @@
+@@ -1,9 +1,60 @@
  Errors:
  cycle.a: structural cycle
 +issue3042.data: conflicting values [...#nesting] and {secret:{infra:[{name:"bar1"}]}} (mismatched types list and struct):
@@ -373,8 +369,6 @@ diff old new
 +issue3042.data.secret.infra.0.name: invalid value "bar1" (out of bound =~"^foo"):
 +    ./issue3042.cue:4:8
 +    ./issue3042.cue:10:12
-+issue3042.data.secret.infra.name: cyclic reference to field name:
-+    ./issue3042.cue:5:22
 +issue3042.data.secret: field not allowed:
 +    ./issue3042.cue:5:57
 +    ./issue3042.cue:8:3
@@ -392,7 +386,7 @@ diff old new
    cycle: (_|_){
      // [structural cycle]
      a: (_|_){
-@@ -58,22 +111,72 @@
+@@ -58,22 +109,70 @@
      x: (#list){
      }
    }
@@ -458,8 +452,6 @@ diff old new
 +      // issue3042.data.secret.infra.0.name: invalid value "bar1" (out of bound =~"^foo"):
 +      //     ./issue3042.cue:4:8
 +      //     ./issue3042.cue:10:12
-+      // issue3042.data.secret.infra.name: cyclic reference to field name:
-+      //     ./issue3042.cue:5:22
 +      // issue3042.data.secret: field not allowed:
 +      //     ./issue3042.cue:5:57
 +      //     ./issue3042.cue:8:3

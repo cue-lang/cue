@@ -16,6 +16,24 @@
       "message": "I\u0027m never keen on blocks of commented-out-code. But given the TODO, both before and after, I can be persuaded this isn\u0027t a big problem here.",
       "revId": "9659a01509d3a1ba9a881972cdf4ad443524fbfe",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a533f74_7be9169c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-21T09:27:53Z",
+      "side": 1,
+      "message": "It is quite tricky to find out where errors can be improved. These blocks should be removed when the evaluator is done, but as for now, it is useful to keep them around for various reasons.",
+      "parentUuid": "77ac6fb3_9733e921",
+      "revId": "9659a01509d3a1ba9a881972cdf4ad443524fbfe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

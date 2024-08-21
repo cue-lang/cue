@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77ac6fb3_9733e921",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-21T09:11:51Z",
+      "side": 1,
+      "message": "I\u0027m never keen on blocks of commented-out-code. But given the TODO, both before and after, I can be persuaded this isn\u0027t a big problem here.",
+      "revId": "9659a01509d3a1ba9a881972cdf4ad443524fbfe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -230,7 +230,7 @@ y: conflicting values 4 and 2:
 		if tc.todo_v3 {
 			t.M.TODO_V3()
 		}
-		r := t.M.Runtime()
+		r := t.M.CueRuntime()
 		ctx := eval.NewContext(r, nil)
 
 		f, err := parser.ParseFile("test", tc.in)

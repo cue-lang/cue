@@ -57,7 +57,7 @@ if false {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		r := t.Runtime()
+		r := t.CueRuntime()
 		a := t.Instance()
 
 		pkgID := a.ID()

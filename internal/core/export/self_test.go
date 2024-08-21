@@ -49,7 +49,7 @@ func TestSelfContained(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		r := t.Context()
+		r := t.CueContext()
 
 		a := t.Instances()
 

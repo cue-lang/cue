@@ -63,7 +63,7 @@ func TestDecode(t *testing.T) {
 		}
 		cfg.Strict = t.HasTag("strict")
 
-		ctx := t.Context()
+		ctx := t.CueContext()
 
 		fsys, err := txtar.FS(t.Archive)
 		if err != nil {

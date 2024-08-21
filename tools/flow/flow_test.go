@@ -48,7 +48,7 @@ func TestFlow(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		v := t.Context().BuildInstance(t.Instance())
+		v := t.CueContext().BuildInstance(t.Instance())
 		if err := v.Err(); err != nil {
 			t.Fatal(errors.Details(err, nil))
 		}

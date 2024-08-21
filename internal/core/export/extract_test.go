@@ -36,7 +36,7 @@ func TestExtract(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		r := t.Runtime()
+		r := t.CueRuntime()
 		a := t.Instance()
 
 		v, err := compile.Files(nil, r, "", a.Files...)

@@ -464,7 +464,7 @@ func TestValues(t *testing.T) {
 			if tc.skip_v2 && t.IsDefault() {
 				t.Skipf("skipping v2 test")
 			}
-			r := t.Runtime()
+			r := t.CueRuntime()
 
 			file, err := parser.ParseFile("subsume", tc.in)
 			if err != nil {

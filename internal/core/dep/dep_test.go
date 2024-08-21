@@ -45,7 +45,7 @@ func TestVisit(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		val := t.Context().BuildInstance(t.Instance())
+		val := t.CueContext().BuildInstance(t.Instance())
 		if val.Err() != nil {
 			t.Fatal(val.Err())
 		}

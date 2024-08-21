@@ -458,7 +458,7 @@ func TestStructural(t *testing.T) {
 		key := strings.Trim(m[1], cutset) + " ⊑ " + strings.Trim(m[2], cutset)
 
 		cuetdtest.FullMatrix.Run(t, strconv.Itoa(i)+"/"+key, func(t *cuetdtest.M) {
-			r := t.Runtime()
+			r := t.CueRuntime()
 
 			file, err := parser.ParseFile("subsume", tc.in)
 			if err != nil {

@@ -35,11 +35,15 @@ type M struct {
 	version  internal.EvaluatorVersion
 }
 
+// Ensure that M always implements testing.TB.
+// Note that testing.TB may gain new methods in future Go releases.
+var _ testing.TB = (*M)(nil)
+
 func (t *M) Name() string     { return t.name }
 func (t *M) Fallback() string { return t.fallback }
 func (t *M) IsDefault() bool  { return t.name == DefaultVersion }
 
-func (t *M) Context() *cue.Context {
+func (t *M) CueContext() *cue.Context {
 	ctx := cuecontext.New()
 	r := (*runtime.Runtime)(ctx)
 	r.SetVersion(t.version)
@@ -47,9 +51,9 @@ func (t *M) Context() *cue.Context {
 	return ctx
 }
 
-// Runtime creates a runtime that is configured according to the matrix.
-func (t *M) Runtime() *runtime.Runtime {
-	return (*runtime.Runtime)(t.Context())
+// CueRuntime creates a runtime that is configured according to the matrix.
+func (t *M) CueRuntime() *runtime.Runtime {
+	return (*runtime.Runtime)(t.CueContext())
 }
 
 const DefaultVersion = "v2"

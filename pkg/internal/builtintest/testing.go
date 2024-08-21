@@ -39,7 +39,7 @@ func Run(name string, t *testing.T) {
 	re := regexp.MustCompile(` \(and \d* more errors\)`)
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		r := t.Runtime()
+		r := t.CueRuntime()
 		a := t.Instance()
 
 		v, errs := r.Build(nil, a)

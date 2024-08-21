@@ -43,7 +43,7 @@ func TestTrimFiles(t *testing.T) {
 	test.Run(t, func(t *cuetxtar.Test) {
 
 		a := t.Instance()
-		ctx := t.Context()
+		ctx := t.CueContext()
 		val := ctx.BuildInstance(a)
 		// Note: don't require val.Err to be nil because there are deliberate
 		// errors in some tests, to ensure trim still works even with some errors.

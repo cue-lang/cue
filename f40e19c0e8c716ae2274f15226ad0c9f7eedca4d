@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2fb1608e_3683e3d7",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 423,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-21T11:19:11Z",
+      "side": 1,
+      "message": "Nice. Done.",
+      "parentUuid": "e85b0c9c_09e60643",
+      "revId": "f40e19c0e8c716ae2274f15226ad0c9f7eedca4d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c94488a2_dad2b266",
@@ -55,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "53203a4f_4aaa899a",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 498,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-21T11:19:11Z",
+      "side": 1,
+      "message": "Yes, there will be multiple entries in ordering with the same number. I\u0027m relying on StableSort + the fact that files are added to the archive in a certain order to ensure a fixed ordering for the tie breaker.\nIn fact, the ordering for new files isn\u0027t all that important, but ideally they are close to related files. This is what that does. Note that preexisting files will always have different ordering numbers.\n\nThe ordering[sub.name] is necessary, because it would otherwise be sorted to the end of the file.",
+      "parentUuid": "5dd3a027_1d79ac4b",
+      "revId": "f40e19c0e8c716ae2274f15226ad0c9f7eedca4d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "df2d3d42_9ba13633",
         "filename": "internal/cuetxtar/txtar.go",
         "patchSetId": 1
@@ -66,6 +102,24 @@
       "writtenOn": "2024-08-21T10:39:03Z",
       "side": 1,
       "message": "I think this comment now goes away?",
+      "revId": "f40e19c0e8c716ae2274f15226ad0c9f7eedca4d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9183fc0b_7cef5150",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-21T11:19:11Z",
+      "side": 1,
+      "message": "Indeed.",
+      "parentUuid": "df2d3d42_9ba13633",
       "revId": "f40e19c0e8c716ae2274f15226ad0c9f7eedca4d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

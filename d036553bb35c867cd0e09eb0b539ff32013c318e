@@ -16,6 +16,24 @@
       "message": "You can just do `return q - p` here.",
       "revId": "d036553bb35c867cd0e09eb0b539ff32013c318e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f31960ef_12c4d626",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 627,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-21T08:55:24Z",
+      "side": 1,
+      "message": "Good point! For some reason I thought it required a fixed sign. Done.",
+      "parentUuid": "84837dec_6813afec",
+      "revId": "d036553bb35c867cd0e09eb0b539ff32013c318e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

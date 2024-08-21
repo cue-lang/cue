@@ -176,6 +176,8 @@ func (s schedState) String() string {
 // runMode indicates how to proceed after a condition could not be met.
 type runMode uint8
 
+//go:generate go run golang.org/x/tools/cmd/stringer -type=runMode
+
 const (
 	// ignore indicates that the new evaluator should not do any processing.
 	// This is mostly used in the transition from old to new evaluator and
@@ -195,20 +197,6 @@ const (
 	// complete the evaluation of a Vertex.
 	finalize
 )
-
-func (r runMode) String() string {
-	switch r {
-	case ignore:
-		return "ignore"
-	case attemptOnly:
-		return "attemptOnly"
-	case yield:
-		return "yield"
-	case finalize:
-		return "finalize"
-	}
-	return "unknown"
-}
 
 // condition is a bit mask of states that a task may depend on.
 //

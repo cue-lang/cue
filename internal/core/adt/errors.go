@@ -42,44 +42,30 @@ import (
 // control flow. No other aspects of an error may influence control flow.
 type ErrorCode int8
 
+//go:generate go run golang.org/x/tools/cmd/stringer -type=ErrorCode -linecomment
+
 const (
 	// An EvalError is a fatal evaluation error.
-	EvalError ErrorCode = iota
+	EvalError ErrorCode = iota // eval
 
 	// A UserError is a fatal error originating from the user.
-	UserError
+	UserError // user
 
 	// StructuralCycleError means a structural cycle was found. Structural
 	// cycles are permanent errors, but they are not passed up recursively,
 	// as a unification of a value with a structural cycle with one that
 	// doesn't may still give a useful result.
-	StructuralCycleError
+	StructuralCycleError // structural cycle
 
 	// IncompleteError means an evaluation could not complete because of
 	// insufficient information that may still be added later.
-	IncompleteError
+	IncompleteError // incomplete
 
 	// A CycleError indicates a reference error. It is considered to be
 	// an incomplete error, as reference errors may be broken by providing
 	// a concrete value.
-	CycleError
+	CycleError // cycle
 )
-
-func (c ErrorCode) String() string {
-	switch c {
-	case EvalError:
-		return "eval"
-	case UserError:
-		return "user"
-	case StructuralCycleError:
-		return "structural cycle"
-	case IncompleteError:
-		return "incomplete"
-	case CycleError:
-		return "cycle"
-	}
-	return "unknown"
-}
 
 // Bottom represents an error or bottom symbol.
 //

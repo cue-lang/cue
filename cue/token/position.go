@@ -115,35 +115,31 @@ var NoPos = Pos{}
 // RelPos indicates the relative position of token to the previous token.
 type RelPos int
 
+//go:generate go run golang.org/x/tools/cmd/stringer -type=RelPos -linecomment
+
 const (
 	// NoRelPos indicates no relative position is specified.
-	NoRelPos RelPos = iota
+	NoRelPos RelPos = iota // invalid
 
 	// Elided indicates that the token for which this position is defined is
 	// not rendered at all.
-	Elided
+	Elided // elided
 
 	// NoSpace indicates there is no whitespace before this token.
-	NoSpace
+	NoSpace // nospace
 
 	// Blank means there is horizontal space before this token.
-	Blank
+	Blank // blank
 
 	// Newline means there is a single newline before this token.
-	Newline
+	Newline // newline
 
 	// NewSection means there are two or more newlines before this token.
-	NewSection
+	NewSection // section
 
 	relMask  = 0xf
 	relShift = 4
 )
-
-var relNames = []string{
-	"invalid", "elided", "nospace", "blank", "newline", "section",
-}
-
-func (p RelPos) String() string { return relNames[p] }
 
 func (p RelPos) Pos() Pos {
 	return Pos{nil, int(p)}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0e5370f_3c1782c3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-21T09:01:27Z",
+      "side": 1,
+      "message": "It\u0027s a pity there isn\u0027t any test for this. Presumably we\u0027re not at a point where we can error if reference counts don\u0027t return to 0 by the end of evaluation?",
+      "revId": "cae79fd4b6fc9e7fcb0897c02daf61489094f5f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

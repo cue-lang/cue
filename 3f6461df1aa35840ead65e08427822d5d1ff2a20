@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f25c648_25fd861a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-21T12:33:15Z",
+      "side": 1,
+      "message": "FYI haoqixu as this might affect some of your other changes.",
+      "revId": "3f6461df1aa35840ead65e08427822d5d1ff2a20",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

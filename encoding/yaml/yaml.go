@@ -23,7 +23,6 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	cueyaml "cuelang.org/go/internal/encoding/yaml"
-	"cuelang.org/go/internal/pkg"
 	"cuelang.org/go/internal/source"
 	pkgyaml "cuelang.org/go/pkg/encoding/yaml"
 )
@@ -110,6 +109,6 @@ func EncodeStream(iter cue.Iterator) ([]byte, error) {
 // Validate validates the YAML and confirms it matches the constraints
 // specified by v. For YAML streams, all values must match v.
 func Validate(b []byte, v cue.Value) error {
-	_, err := pkgyaml.Validate(b, pkg.Schema(v))
+	_, err := pkgyaml.Validate(b, v)
 	return err
 }

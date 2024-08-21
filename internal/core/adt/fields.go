@@ -801,15 +801,15 @@ func (n *nodeContext) insertArcCC(f Feature, mode ArcType, c Conjunct, id CloseI
 
 	defer n.ctx.PopArc(n.ctx.PushArc(v))
 
-	// TODO: this block is not strictly needed. Removing it slightly changes the
-	// paths at which errors are reported, arguably, but not clearly, for the
-	// better. Investigate this once the new evaluator is done.
-	if v.ArcType == ArcNotPresent {
-		// It was already determined before that this arc may not be present.
-		// This case can only manifest itself if we have a cycle.
-		n.node.reportFieldCycleError(n.ctx, pos(c.x), f)
-		return v, nil
-	}
+	// TODO: reporting the cycle error here results in better error paths.
+	// However, it causes the reference counting mechanism to be faulty.
+	// Reevaluate once the new evaluator is done.
+	// if v.ArcType == ArcNotPresent {
+	// 	// It was already determined before that this arc may not be present.
+	// 	// This case can only manifest itself if we have a cycle.
+	// 	n.node.reportFieldCycleError(n.ctx, pos(c.x), f)
+	// 	return v, nil
+	// }
 
 	if v.cc == nil {
 		v.cc = v.rootCloseContext(n.ctx)

@@ -208,15 +208,15 @@ issue2052: full: {
 	d: #Depth & {#in: tree}
 }
 -- out/evalalpha/stats --
-Leaks:  19985
+Leaks:  19997
 Freed:  1462
 Reused: 1461
-Allocs: 19986
+Allocs: 19998
 Retain: 0
 
-Unifications: 7496
-Conjuncts:    107414
-Disjuncts:    13651
+Unifications: 7504
+Conjuncts:    107530
+Disjuncts:    13655
 -- out/evalalpha --
 Errors:
 issue2052.t1.#Depth: adding field #basic not allowed as field set was already referenced:
@@ -725,18 +725,18 @@ diff old new
 -Reused: 1801
 -Allocs: 84
 -Retain: 185
-+Leaks:  19985
++Leaks:  19997
 +Freed:  1462
 +Reused: 1461
-+Allocs: 19986
++Allocs: 19998
 +Retain: 0
  
 -Unifications: 800
 -Conjuncts:    3175
 -Disjuncts:    1974
-+Unifications: 7496
-+Conjuncts:    107414
-+Disjuncts:    13651
++Unifications: 7504
++Conjuncts:    107530
++Disjuncts:    13655
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old

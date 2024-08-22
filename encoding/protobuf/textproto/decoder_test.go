@@ -32,8 +32,6 @@ func TestParse(t *testing.T) {
 		Name: "decode",
 	}
 
-	r := cue.Runtime{}
-
 	d := textproto.NewDecoder()
 
 	test.Run(t, func(t *cuetxtar.Test) {
@@ -46,12 +44,11 @@ func TestParse(t *testing.T) {
 		for _, f := range t.Archive.Files {
 			switch {
 			case strings.HasSuffix(f.Name, ".cue"):
-				inst, err := r.Compile(f.Name, f.Data)
-				if err != nil {
+				schema = t.CueContext().CompileBytes(f.Data)
+				if err := schema.Err(); err != nil {
 					t.WriteErrors(errors.Promote(err, "test"))
 					return
 				}
-				schema = inst.Value()
 
 			case strings.HasSuffix(f.Name, ".textproto"):
 				filename = f.Name

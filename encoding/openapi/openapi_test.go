@@ -310,16 +310,15 @@ func walk(om *openapi.OrderedMap) {
 
 // TODO: move OpenAPI testing to txtar and allow errors.
 func TestIssue1234(t *testing.T) {
-	var r cue.Runtime
-	inst, err := r.Compile("test", `
+	val := cuecontext.New().CompileString(`
 #Test: or([])
 
 	`)
-	if err != nil {
+	if err := val.Err(); err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = openapi.Gen(inst, &openapi.Config{})
+	_, err := openapi.Gen(val, &openapi.Config{})
 	if err == nil {
 		t.Fatal("expected error")
 	}
@@ -329,14 +328,13 @@ func TestIssue1234(t *testing.T) {
 func TestX(t *testing.T) {
 	t.Skip()
 
-	var r cue.Runtime
-	inst, err := r.Compile("test", `
+	val := cuecontext.New().CompileString(`
 	`)
-	if err != nil {
+	if err := val.Err(); err != nil {
 		t.Fatal(err)
 	}
 
-	b, err := openapi.Gen(inst, &openapi.Config{
+	b, err := openapi.Gen(val, &openapi.Config{
 		// ExpandReferences: true,
 	})
 	if err != nil {

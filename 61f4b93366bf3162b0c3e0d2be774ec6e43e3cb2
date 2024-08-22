@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "be6e0a99_306f93cf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-22T10:24:46Z",
+      "side": 1,
+      "message": "All good, just one query / suggestion.",
+      "revId": "61f4b93366bf3162b0c3e0d2be774ec6e43e3cb2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "627288ee_9c9ecbc3",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-22T10:24:46Z",
+      "side": 1,
+      "message": "Is this idiomatic? Personally, I think I would trip myself up trying to remember which comes first - the `err` bit or the `invalid` bit? I agree with your change to `ErrInvalid`, but if it were me, I\u0027d also change `invalidError` to `errInvalid`.",
+      "revId": "61f4b93366bf3162b0c3e0d2be774ec6e43e3cb2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

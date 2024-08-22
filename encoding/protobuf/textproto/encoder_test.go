@@ -30,8 +30,6 @@ func TestEncode(t *testing.T) {
 		Name: "encode",
 	}
 
-	r := cue.Runtime{}
-
 	test.Run(t, func(t *cuetxtar.Test) {
 		// TODO: use high-level API.
 
@@ -40,16 +38,16 @@ func TestEncode(t *testing.T) {
 		for _, f := range t.Archive.Files {
 			switch {
 			case strings.HasSuffix(f.Name, ".cue"):
-				inst, err := r.Compile(f.Name, f.Data)
-				if err != nil {
+				val := t.CueContext().CompileBytes(f.Data)
+				if err := val.Err(); err != nil {
 					t.WriteErrors(errors.Promote(err, "test"))
 					return
 				}
 				switch f.Name {
 				case "schema.cue":
-					schema = inst.Value()
+					schema = val
 				case "value.cue":
-					value = inst.Value()
+					value = val
 				}
 			}
 		}

@@ -21,6 +21,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
@@ -36,8 +37,6 @@ func TestParse(t *testing.T) {
 		Name: "jsonpb",
 	}
 
-	r := cue.Runtime{}
-
 	test.Run(t, func(t *cuetxtar.Test) {
 		// TODO: use high-level API.
 
@@ -47,12 +46,11 @@ func TestParse(t *testing.T) {
 		for _, f := range t.Archive.Files {
 			switch {
 			case f.Name == "schema.cue":
-				inst, err := r.Compile(f.Name, f.Data)
-				if err != nil {
+				schema = t.CueContext().CompileBytes(f.Data, cue.Filename(f.Name))
+				if err := schema.Err(); err != nil {
 					t.WriteErrors(errors.Promote(err, "test"))
 					return
 				}
-				schema = inst.Value()
 				continue
 
 			case strings.HasPrefix(f.Name, "out/"):
@@ -109,9 +107,8 @@ func TestX(t *testing.T) {
 	if strings.TrimSpace(data) == "" {
 		t.Skip()
 	}
-	var r cue.Runtime
-	inst, err := r.Compile("schema", schema)
-	if err != nil {
+	val := cuecontext.New().CompileString(schema)
+	if err := val.Err(); err != nil {
 		t.Fatal(err)
 	}
 
@@ -120,7 +117,7 @@ func TestX(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := jsonpb.NewDecoder(inst.Value()).RewriteFile(file); err != nil {
+	if err := jsonpb.NewDecoder(val).RewriteFile(file); err != nil {
 		t.Fatal(err)
 	}
 

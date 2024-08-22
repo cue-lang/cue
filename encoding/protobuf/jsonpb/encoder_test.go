@@ -32,8 +32,6 @@ func TestEncoder(t *testing.T) {
 		Name: "jsonpb",
 	}
 
-	r := cue.Runtime{}
-
 	test.Run(t, func(t *cuetxtar.Test) {
 		// TODO: use high-level API.
 
@@ -41,16 +39,14 @@ func TestEncoder(t *testing.T) {
 		var file *ast.File
 
 		for _, f := range t.Archive.Files {
-			switch {
-			case f.Name == "schema.cue":
-				inst, err := r.Compile(f.Name, f.Data)
-				if err != nil {
+			switch f.Name {
+			case "schema.cue":
+				schema = t.CueContext().CompileBytes(f.Data)
+				if err := schema.Err(); err != nil {
 					t.WriteErrors(errors.Promote(err, "test"))
 					return
 				}
-				schema = inst.Value()
-
-			case f.Name == "value.cue":
+			case "value.cue":
 				f, err := parser.ParseFile(f.Name, f.Data, parser.ParseComments)
 				if err != nil {
 					t.WriteErrors(errors.Promote(err, "test"))
@@ -61,11 +57,10 @@ func TestEncoder(t *testing.T) {
 		}
 
 		if !schema.Exists() {
-			inst, err := r.CompileFile(file)
-			if err != nil {
+			schema = t.CueContext().BuildFile(file)
+			if err := schema.Err(); err != nil {
 				t.WriteErrors(errors.Promote(err, "test"))
 			}
-			schema = inst.Value()
 		}
 
 		err := jsonpb.NewEncoder(schema).RewriteFile(file)

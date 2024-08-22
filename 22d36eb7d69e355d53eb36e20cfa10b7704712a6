@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9979a5cc_ab2322f9",
+        "filename": "pkg/gen.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-22T12:02:37Z",
+      "side": 1,
+      "message": "Very good point. There is. It is not pretty or intuitive, but for now it is probably the best solution:\n\nThere is an internal function (in package \"cuelang.org/go/internal/value\") that allows accessing the runtime for any CUE value. From this you can construct a cue.Context, with which you can create new values:\n\n\tvar x cue.Value\n\t\n\tr, _ :\u003d value.ToInternal(x)\n\tctx :\u003d (*cue.Context)(r)\n\tctx.Encode(nmatch)\n\nAs said, not pretty, but it will work.\n\nGranted, I like your solution and it can come in handy later. Taking the suggested approach, however, allows us to punt on details until later. For instance, perhaps it is sufficient to have a cue.Value.Context() method (though that may not always work), although supplying such a method has its drawbacks.\n\nThat said, if you strongly prefer to keep the CallCtx, we can work on ironing that out a bit. An alternative would be to do the CallCtx in a followup CL. Up to you.",
+      "parentUuid": "82b5d3be_373b7a77",
+      "revId": "22d36eb7d69e355d53eb36e20cfa10b7704712a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ad395389_240ecb32",
         "filename": "pkg/list/list.go",
         "patchSetId": 5

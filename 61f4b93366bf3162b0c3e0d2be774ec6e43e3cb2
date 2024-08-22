@@ -33,6 +33,24 @@
       "message": "Is this idiomatic? Personally, I think I would trip myself up trying to remember which comes first - the `err` bit or the `invalid` bit? I agree with your change to `ErrInvalid`, but if it were me, I\u0027d also change `invalidError` to `errInvalid`.",
       "revId": "61f4b93366bf3162b0c3e0d2be774ec6e43e3cb2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "72e699c3_19b4c61c",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-22T10:30:31Z",
+      "side": 1,
+      "message": "Ah, I forgot to rename invalidError to errInvalid for consistency here. Thanks.\n\nAnd yeah, Go has a bit of a general rule to name errors like ErrFooBar. It\u0027s not a strict rule, but staticcheck does warn about it, and we might as well follow it consistently where possible rather than have a mix of formats.",
+      "parentUuid": "627288ee_9c9ecbc3",
+      "revId": "61f4b93366bf3162b0c3e0d2be774ec6e43e3cb2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

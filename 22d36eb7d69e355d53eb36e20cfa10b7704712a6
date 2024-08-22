@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "82b5d3be_373b7a77",
+        "filename": "pkg/gen.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-22T08:52:14Z",
+      "side": 1,
+      "message": "I\u0027m wondering if there is an alternative method for handling `nmatch` (of type int64) in `list.MatchN()`, aside from using `pkg.CallCtxt.ConstInt64()` for its conversion to a Cue value. If no other options exist, this adjustment appears to be essential.",
+      "parentUuid": "afdd108d_e64f4175",
+      "revId": "22d36eb7d69e355d53eb36e20cfa10b7704712a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ad395389_240ecb32",
         "filename": "pkg/list/list.go",
         "patchSetId": 5

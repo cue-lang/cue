@@ -4,6 +4,15 @@ package p
 -- comments_only.cue --
 // some
 // comment lines
+-- imports.cue --
+package p
+
+import "foo"
+
+import (
+	"bar"
+	name "baz"
+)
 -- out/debugprint/empty.cue --
 *ast.File{
 	Filename: "empty.cue"
@@ -44,6 +53,95 @@ package p
 					Text: "// comment lines"
 				}
 			}
+		}
+	}
+}
+-- out/debugprint/imports.cue --
+*ast.File{
+	Filename: "imports.cue"
+	Decls: []ast.Decl{
+		*ast.Package{
+			PackagePos: token.Pos("imports.cue:1:1")
+			Name: *ast.Ident{
+				NamePos: token.Pos("imports.cue:1:9")
+				Name: "p"
+			}
+		}
+		*ast.ImportDecl{
+			Import: token.Pos("imports.cue:3:1")
+			Lparen: token.Pos("-")
+			Specs: []*ast.ImportSpec{
+				{
+					Name: nil
+					Path: *ast.BasicLit{
+						ValuePos: token.Pos("imports.cue:3:8")
+						Kind: token.Token("STRING")
+						Value: "\"foo\""
+					}
+					EndPos: token.Pos("-")
+				}
+			}
+			Rparen: token.Pos("-")
+		}
+		*ast.ImportDecl{
+			Import: token.Pos("imports.cue:5:1")
+			Lparen: token.Pos("imports.cue:5:8")
+			Specs: []*ast.ImportSpec{
+				{
+					Name: nil
+					Path: *ast.BasicLit{
+						ValuePos: token.Pos("imports.cue:6:2")
+						Kind: token.Token("STRING")
+						Value: "\"bar\""
+					}
+					EndPos: token.Pos("-")
+				}
+				{
+					Name: *ast.Ident{
+						NamePos: token.Pos("imports.cue:7:2")
+						Name: "name"
+					}
+					Path: *ast.BasicLit{
+						ValuePos: token.Pos("imports.cue:7:7")
+						Kind: token.Token("STRING")
+						Value: "\"baz\""
+					}
+					EndPos: token.Pos("-")
+				}
+			}
+			Rparen: token.Pos("imports.cue:8:1")
+		}
+	}
+	Imports: []*ast.ImportSpec{
+		{
+			Name: nil
+			Path: *ast.BasicLit{
+				ValuePos: token.Pos("imports.cue:3:8")
+				Kind: token.Token("STRING")
+				Value: "\"foo\""
+			}
+			EndPos: token.Pos("-")
+		}
+		{
+			Name: nil
+			Path: *ast.BasicLit{
+				ValuePos: token.Pos("imports.cue:6:2")
+				Kind: token.Token("STRING")
+				Value: "\"bar\""
+			}
+			EndPos: token.Pos("-")
+		}
+		{
+			Name: *ast.Ident{
+				NamePos: token.Pos("imports.cue:7:2")
+				Name: "name"
+			}
+			Path: *ast.BasicLit{
+				ValuePos: token.Pos("imports.cue:7:7")
+				Kind: token.Token("STRING")
+				Value: "\"baz\""
+			}
+			EndPos: token.Pos("-")
 		}
 	}
 }

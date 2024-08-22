@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "add44d1f_3afd30e2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-22T07:02:06Z",
+      "side": 1,
+      "message": "Fine, but I really think a different name to CueRuntime needs to be found that\u0027s less confusing (or the deprecated cue/Runtime type needs ripping out).",
+      "revId": "df3d75674d1a71d00a50a4f2429cd4ae57705a27",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bfe92578_38efadb6",
+        "filename": "internal/cuetdtest/matrix.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-22T07:02:06Z",
+      "side": 1,
+      "message": "Given that the type cue/Runtime still exists, I am not a fan of this name.",
+      "revId": "df3d75674d1a71d00a50a4f2429cd4ae57705a27",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

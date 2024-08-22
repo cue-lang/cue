@@ -12,16 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cue
+package cue_test
 
 import (
 	"fmt"
 	"testing"
+
+	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 )
 
 func TestPaths(t *testing.T) {
-	var r Runtime
-	inst, _ := r.Compile("", `
+	val := cuecontext.New().CompileString(`
 		#Foo:   a: b: 1
 		"#Foo": c: d: 2
 		_foo: b: 5
@@ -36,116 +38,115 @@ func TestPaths(t *testing.T) {
 		x: y: X.a
 	`)
 	testCases := []struct {
-		path Path
+		path cue.Path
 		out  string
 		str  string
 		err  bool
 	}{{
-		path: MakePath(Str("list"), AnyIndex),
+		path: cue.MakePath(cue.Str("list"), cue.AnyIndex),
 		out:  "int",
 		str:  "list.[_]",
 	}, {
 
-		path: MakePath(Def("#Foo"), Str("a"), Str("b")),
+		path: cue.MakePath(cue.Def("#Foo"), cue.Str("a"), cue.Str("b")),
 		out:  "1",
 		str:  "#Foo.a.b",
 	}, {
-		path: ParsePath(`#Foo.a.b`),
+		path: cue.ParsePath(`#Foo.a.b`),
 		out:  "1",
 		str:  "#Foo.a.b",
 	}, {
-		path: ParsePath(`"#Foo".c.d`),
+		path: cue.ParsePath(`"#Foo".c.d`),
 		out:  "2",
 		str:  `"#Foo".c.d`,
 	}, {
 		// fallback Def(Foo) -> Def(#Foo)
-		path: MakePath(Def("Foo"), Str("a"), Str("b")),
+		path: cue.MakePath(cue.Def("Foo"), cue.Str("a"), cue.Str("b")),
 		out:  "1",
 		str:  "#Foo.a.b",
 	}, {
-		path: MakePath(Str("b"), Index(2)),
+		path: cue.MakePath(cue.Str("b"), cue.Index(2)),
 		out:  "6",
 		str:  "b[2]", // #Foo.b.2
 	}, {
-		path: MakePath(Str("c"), Str("#Foo")),
+		path: cue.MakePath(cue.Str("c"), cue.Str("#Foo")),
 		out:  "7",
 		str:  `c."#Foo"`,
 	}, {
-		path: MakePath(Hid("_foo", "_"), Str("b")),
+		path: cue.MakePath(cue.Hid("_foo", "_"), cue.Str("b")),
 		out:  "5",
 		str:  `_foo.b`,
 	}, {
-		path: ParsePath("#Foo.a.b"),
+		path: cue.ParsePath("#Foo.a.b"),
 		str:  "#Foo.a.b",
 		out:  "1",
 	}, {
-		path: ParsePath("#Foo.a.c"),
+		path: cue.ParsePath("#Foo.a.c"),
 		str:  "#Foo.a.c",
 		out:  `_|_ // field not found: c`,
 	}, {
-		path: ParsePath(`b[2]`),
+		path: cue.ParsePath(`b[2]`),
 		str:  `b[2]`,
 		out:  "6",
 	}, {
-		path: ParsePath(`c."#Foo"`),
+		path: cue.ParsePath(`c."#Foo"`),
 		str:  `c."#Foo"`,
 		out:  "7",
 	}, {
-		path: ParsePath("foo._foo"),
+		path: cue.ParsePath("foo._foo"),
 		str:  "_|_",
 		err:  true,
 		out:  `_|_ // invalid path: hidden label _foo not allowed`,
 	}, {
-		path: ParsePath(`c."#Foo`),
+		path: cue.ParsePath(`c."#Foo`),
 		str:  "_|_",
 		err:  true,
 		out:  `_|_ // string literal not terminated`,
 	}, {
-		path: ParsePath(`b[a]`),
+		path: cue.ParsePath(`b[a]`),
 		str:  "_|_",
 		err:  true,
 		out:  `_|_ // non-constant expression a`,
 	}, {
-		path: ParsePath(`b['1']`),
+		path: cue.ParsePath(`b['1']`),
 		str:  "_|_",
 		err:  true,
 		out:  `_|_ // invalid string index '1'`,
 	}, {
-		path: ParsePath(`b[3T]`),
+		path: cue.ParsePath(`b[3T]`),
 		str:  "_|_",
 		err:  true,
 		out:  `_|_ // int label out of range (3000000000000 not >=0 and <= 268435454)`,
 	}, {
-		path: ParsePath(`b[3.3]`),
+		path: cue.ParsePath(`b[3.3]`),
 		str:  "_|_",
 		err:  true,
 		out:  `_|_ // invalid literal 3.3`,
 	}, {
-		path: MakePath(Str("map"), AnyString),
+		path: cue.MakePath(cue.Str("map"), cue.AnyString),
 		out:  "int",
 		str:  "map.[_]",
 	}, {
-		path: MakePath(Str("list"), AnyIndex),
+		path: cue.MakePath(cue.Str("list"), cue.AnyIndex),
 		out:  "int",
 		str:  "list.[_]",
 	}, {
-		path: ParsePath("x.y"),
+		path: cue.ParsePath("x.y"),
 		out:  "{\n\tb: 0\n}",
 		str:  "x.y",
 	}, {
-		path: ParsePath("x.y.b"),
+		path: cue.ParsePath("x.y.b"),
 		out:  "0",
 		str:  "x.y.b",
 	}}
 
-	v := inst.Value()
 	for _, tc := range testCases {
 		t.Run(tc.str, func(t *testing.T) {
 			if gotErr := tc.path.Err() != nil; gotErr != tc.err {
 				t.Errorf("error: got %v; want %v", gotErr, tc.err)
 			}
 
-			w := v.LookupPath(tc.path)
+			w := val.LookupPath(tc.path)
 
 			if got := fmt.Sprint(w); got != tc.out {
 				t.Errorf("Value: got %v; want %v", got, tc.out)
@@ -167,8 +168,8 @@ func TestPaths(t *testing.T) {
 }
 
 var selectorTests = []struct {
-	sel          Selector
-	stype        SelectorType
+	sel          cue.Selector
+	stype        cue.SelectorType
 	string       string
 	unquoted     string
 	index        int
@@ -178,78 +179,78 @@ var selectorTests = []struct {
 	isString     bool
 	pkgPath      string
 }{{
-	sel:      Str("foo"),
-	stype:    StringLabel,
+	sel:      cue.Str("foo"),
+	stype:    cue.StringLabel,
 	string:   "foo",
 	unquoted: "foo",
 	isString: true,
 }, {
-	sel:      Str("_foo"),
-	stype:    StringLabel,
+	sel:      cue.Str("_foo"),
+	stype:    cue.StringLabel,
 	string:   `"_foo"`,
 	unquoted: "_foo",
 	isString: true,
 }, {
-	sel:      Str(`a "b`),
-	stype:    StringLabel,
+	sel:      cue.Str(`a "b`),
+	stype:    cue.StringLabel,
 	string:   `"a \"b"`,
 	unquoted: `a "b`,
 	isString: true,
 }, {
-	sel:    Index(5),
-	stype:  IndexLabel,
+	sel:    cue.Index(5),
+	stype:  cue.IndexLabel,
 	string: "5",
 	index:  5,
 }, {
-	sel:          Def("foo"),
-	stype:        DefinitionLabel,
+	sel:          cue.Def("foo"),
+	stype:        cue.DefinitionLabel,
 	string:       "#foo",
 	isDefinition: true,
 }, {
-	sel:          Str("foo").Optional(),
-	stype:        StringLabel | OptionalConstraint,
+	sel:          cue.Str("foo").Optional(),
+	stype:        cue.StringLabel | cue.OptionalConstraint,
 	string:       "foo?",
 	unquoted:     "foo",
 	isString:     true,
 	isConstraint: true,
 }, {
-	sel:          Str("foo").Required(),
-	stype:        StringLabel | RequiredConstraint,
+	sel:          cue.Str("foo").Required(),
+	stype:        cue.StringLabel | cue.RequiredConstraint,
 	string:       "foo!",
 	unquoted:     "foo",
 	isString:     true,
 	isConstraint: true,
 }, {
-	sel:          Def("foo").Required().Optional(),
-	stype:        DefinitionLabel | OptionalConstraint,
+	sel:          cue.Def("foo").Required().Optional(),
+	stype:        cue.DefinitionLabel | cue.OptionalConstraint,
 	string:       "#foo?",
 	isDefinition: true,
 	isConstraint: true,
 }, {
-	sel:          Def("foo").Optional().Required(),
-	stype:        DefinitionLabel | RequiredConstraint,
+	sel:          cue.Def("foo").Optional().Required(),
+	stype:        cue.DefinitionLabel | cue.RequiredConstraint,
 	string:       "#foo!",
 	isDefinition: true,
 	isConstraint: true,
 }, {
-	sel:          AnyString,
-	stype:        StringLabel | PatternConstraint,
+	sel:          cue.AnyString,
+	stype:        cue.StringLabel | cue.PatternConstraint,
 	string:       "[_]",
 	isConstraint: true,
 }, {
-	sel:          AnyIndex,
-	stype:        IndexLabel | PatternConstraint,
+	sel:          cue.AnyIndex,
+	stype:        cue.IndexLabel | cue.PatternConstraint,
 	string:       "[_]",
 	isConstraint: true,
 }, {
-	sel:      Hid("_foo", "example.com"),
-	stype:    HiddenLabel,
+	sel:      cue.Hid("_foo", "example.com"),
+	stype:    cue.HiddenLabel,
 	string:   "_foo",
 	isHidden: true,
 	pkgPath:  "example.com",
 }, {
-	sel:          Hid("_#foo", "example.com"),
-	stype:        HiddenDefinitionLabel,
+	sel:          cue.Hid("_#foo", "example.com"),
+	stype:        cue.HiddenDefinitionLabel,
 	string:       "_#foo",
 	isHidden:     true,
 	isDefinition: true,
@@ -275,7 +276,7 @@ func TestSelector(t *testing.T) {
 					t.Errorf("unexpected sel.Unquoted result; got %q want %q", got, want)
 				}
 			}
-			if sel.Type() != IndexLabel {
+			if sel.Type() != cue.IndexLabel {
 				checkPanic(t, "Index called on non-index selector", func() {
 					sel.Index()
 				})
@@ -304,16 +305,16 @@ func TestSelector(t *testing.T) {
 }
 
 func TestSelectorTypeString(t *testing.T) {
-	if got, want := InvalidSelectorType.String(), "NoLabels"; got != want {
+	if got, want := cue.InvalidSelectorType.String(), "NoLabels"; got != want {
 		t.Errorf("unexpected SelectorType.String result; got %q want %q", got, want)
 	}
-	if got, want := PatternConstraint.String(), "PatternConstraint"; got != want {
+	if got, want := cue.PatternConstraint.String(), "PatternConstraint"; got != want {
 		t.Errorf("unexpected SelectorType.String result; got %q want %q", got, want)
 	}
-	if got, want := (StringLabel | OptionalConstraint).String(), "StringLabel|OptionalConstraint"; got != want {
+	if got, want := (cue.StringLabel | cue.OptionalConstraint).String(), "StringLabel|OptionalConstraint"; got != want {
 		t.Errorf("unexpected SelectorType.String result; got %q want %q", got, want)
 	}
-	if got, want := SelectorType(255).String(), "StringLabel|IndexLabel|DefinitionLabel|HiddenLabel|HiddenDefinitionLabel|OptionalConstraint|RequiredConstraint|PatternConstraint"; got != want {
+	if got, want := cue.SelectorType(255).String(), "StringLabel|IndexLabel|DefinitionLabel|HiddenLabel|HiddenDefinitionLabel|OptionalConstraint|RequiredConstraint|PatternConstraint"; got != want {
 		t.Errorf("unexpected SelectorType.String result; got %q want %q", got, want)
 	}
 }

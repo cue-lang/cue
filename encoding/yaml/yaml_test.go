@@ -18,8 +18,6 @@ import (
 	"strings"
 	"testing"
 
-	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
 )
@@ -98,7 +96,7 @@ null
 }, null]`,
 		isStream: true,
 	}}
-	r := &cue.Runtime{}
+	ctx := cuecontext.New()
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			f, err := Extract(tc.name, tc.yaml)
@@ -110,15 +108,11 @@ null
 				t.Errorf("Extract:\ngot  %q\nwant %q", got, tc.want)
 			}
 
-			inst, err := Decode(r, tc.name, tc.yaml)
+			file, err := Extract(tc.name, tc.yaml)
 			if err != nil {
 				t.Fatal(err)
 			}
-			n := inst.Value().Syntax()
-			if s, ok := n.(*ast.StructLit); ok {
-				n = &ast.File{Decls: s.Elts}
-			}
-			b, _ = format.Node(n)
+			b, _ = format.Node(file)
 			if got := strings.TrimSpace(string(b)); got != tc.want {
 				t.Errorf("Decode:\ngot  %q\nwant %q", got, tc.want)
 			}
@@ -128,9 +122,9 @@ null
 				yamlOut = tc.yamlOut
 			}
 
-			inst, _ = r.Compile(tc.name, tc.want)
+			wantVal := ctx.CompileString(tc.want)
 			if !tc.isStream {
-				b, err = Encode(inst.Value())
+				b, err = Encode(wantVal)
 				if err != nil {
 					t.Error(err)
 				}
@@ -138,7 +132,7 @@ null
 					t.Errorf("Encode:\ngot  %q\nwant %q", got, yamlOut)
 				}
 			} else {
-				iter, _ := inst.Value().List()
+				iter, _ := wantVal.List()
 				b, err := EncodeStream(iter)
 				if err != nil {
 					t.Error(err)

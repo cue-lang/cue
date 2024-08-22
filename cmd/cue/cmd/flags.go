@@ -116,11 +116,6 @@ func addInjectionFlags(f *pflag.FlagSet, auto, hidden bool) {
 
 type flagName string
 
-type unaddedFlagUse struct {
-	cmd  string
-	flag flagName
-}
-
 // ensureAdded detects if a flag is being used without it first being
 // added to the flagSet. Because flagNames are global, it is quite
 // easy to accidentally use a flag in a command without adding it to

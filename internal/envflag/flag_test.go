@@ -36,7 +36,7 @@ func invalid[T comparable](want T) func(t *testing.T) {
 	return func(t *testing.T) {
 		var x T
 		err := Init(&x, "TEST_VAR")
-		qt.Assert(t, qt.ErrorIs(err, InvalidError))
+		qt.Assert(t, qt.ErrorIs(err, ErrInvalid))
 		qt.Assert(t, qt.Equals(x, want))
 	}
 }

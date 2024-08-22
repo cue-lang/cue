@@ -95,7 +95,7 @@ func (c *Codec) Encode(v cue.Value, x interface{}) error {
 	return v.Decode(x)
 }
 
-var defaultCodec = New(value.ConvertToRuntime(cuecontext.New()), nil)
+var defaultCodec = New(cuecontext.New(), nil)
 
 // Validate calls Validate on a default Codec for the type of x.
 func Validate(x interface{}) error {

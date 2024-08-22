@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "970b502f_0b92d380",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-22T13:23:34Z",
+      "side": 1,
+      "message": "PTAL; pretty sure but not 100% that this change to Valid is good.",
+      "revId": "f495401e5c816f39e7410fbd968f0939fe18d4d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

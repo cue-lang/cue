@@ -223,10 +223,7 @@ Disjuncts:    51
       #Foo: (#struct){
         a!: (int){ int }
       }
-      b: (_|_){
-        // [incomplete] reference.case1.b: cannot reference optional field: a:
-        //     ./in.cue:43:10
-      }
+      b: (int){ int }
     }
     toWithinDefinition: (struct){
       b: (int){ int }
@@ -235,26 +232,17 @@ Disjuncts:    51
       b: (#struct){
         a!: (int){ int }
       }
-      c: (_|_){
-        // [incomplete] reference.toFieldFromDefinition.c: cannot reference optional field: a:
-        //     ./in.cue:54:9
-      }
+      c: (int){ int }
     }
     toNonDefinition: (struct){
       x: (struct){
         y!: (_){ _ }
       }
-      b: (_|_){
-        // [incomplete] reference.toNonDefinition.b: cannot reference optional field: y:
-        //     ./in.cue:58:8
-      }
+      b: (_){ _ }
     }
     toConcrete: (struct){
       a!: (int){ 1 }
-      b: (_|_){
-        // [incomplete] reference.toConcrete.b: cannot reference optional field: a:
-        //     ./in.cue:62:6
-      }
+      b: (int){ 2 }
     }
   }
   #Foo: (#struct){
@@ -274,18 +262,6 @@ diff old new
          }
          b!: (int){ int }
        }
-@@ -61,10 +59,7 @@
-       }
-     }
-     toWithinDefinition: (struct){
--      b: (_|_){
--        // [incomplete] reference.toWithinDefinition.b: cannot reference optional field: a:
--        //     ./in.cue:50:11
--      }
-+      b: (int){ int }
-     }
-     toFieldFromDefinition: (struct){
-       b: (#struct){
 -- diff/todo/p2 --
 Missing position.
 -- out/eval --
@@ -346,41 +322,26 @@ Missing position.
       #Foo: (#struct){
         a!: (int){ int }
       }
-      b: (_|_){
-        // [incomplete] reference.case1.b: cannot reference optional field: a:
-        //     ./in.cue:43:10
-      }
+      b: (int){ int }
     }
     toWithinDefinition: (struct){
-      b: (_|_){
-        // [incomplete] reference.toWithinDefinition.b: cannot reference optional field: a:
-        //     ./in.cue:50:11
-      }
+      b: (int){ int }
     }
     toFieldFromDefinition: (struct){
       b: (#struct){
         a!: (int){ int }
       }
-      c: (_|_){
-        // [incomplete] reference.toFieldFromDefinition.c: cannot reference optional field: a:
-        //     ./in.cue:54:9
-      }
+      c: (int){ int }
     }
     toNonDefinition: (struct){
       x: (struct){
         y!: (_){ _ }
       }
-      b: (_|_){
-        // [incomplete] reference.toNonDefinition.b: cannot reference optional field: y:
-        //     ./in.cue:58:8
-      }
+      b: (_){ _ }
     }
     toConcrete: (struct){
       a!: (int){ 1 }
-      b: (_|_){
-        // [incomplete] reference.toConcrete.b: cannot reference optional field: a:
-        //     ./in.cue:62:6
-      }
+      b: (int){ 2 }
     }
   }
   #Foo: (#struct){

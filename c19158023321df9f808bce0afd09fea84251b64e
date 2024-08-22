@@ -318,6 +318,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba0413fd_4efafcc2",
+        "filename": "pkg/list/list.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-22T04:24:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "19f03a48_dbc08a77",
+      "revId": "c19158023321df9f808bce0afd09fea84251b64e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "94c70ae4_c2b3fca3",

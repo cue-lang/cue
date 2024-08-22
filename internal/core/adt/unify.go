@@ -727,10 +727,19 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 
 handleArcType:
 	switch arc.ArcType {
-	case ArcMember:
+	case ArcMember, ArcRequired:
 		return arcReturn
 
-	case ArcOptional, ArcRequired:
+	case ArcOptional:
+		// Technically, this failure also applies to required fields. We assume
+		// however, that if a reference field that is made regular will already
+		// result in an error, so that piling up another error is not strictly
+		// necessary. Note that the spec allows for eliding an error if it is
+		// guaranteed another error is generated elsewhere. This does not
+		// properly cover the case where a reference is made directly within the
+		// definition, but this is fine for the purpose it serves.
+		// TODO(refRequired): revisit whether referencing required fields should
+		// fail.
 		label := f.SelectorString(c.Runtime)
 		b := &Bottom{
 			Code: IncompleteError,

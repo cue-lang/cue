@@ -948,7 +948,9 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, flags combinedFl
 			c.unify(a, deprecated(c, partial))
 		}
 
-		if a.IsConstraint() {
+		// TODO(refRequired): see comment in unify.go:Vertex.lookup near the
+		// namesake TODO.
+		if a.ArcType == ArcOptional {
 			code := IncompleteError
 			if hasCycle {
 				code = CycleError

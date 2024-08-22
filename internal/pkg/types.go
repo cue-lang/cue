@@ -74,10 +74,7 @@ func (s *Struct) IsOpen() bool {
 	}
 	// The equivalent code for the old implementation.
 	ot := s.node.OptionalTypes()
-	if ot&^adt.HasDynamic != 0 {
-		return true
-	}
-	return false
+	return ot&^adt.HasDynamic != 0
 }
 
 // A ValidationError indicates an error that is only valid if a builtin is used

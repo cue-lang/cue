@@ -67,7 +67,7 @@ func Parse[T any](flags *T, env string) error {
 			v, err := strconv.ParseBool(valueStr)
 			if err != nil {
 				// Invalid format, return an error immediately.
-				return invalidError{
+				return errInvalid{
 					fmt.Errorf("invalid bool value for %s: %v", name, err),
 				}
 			}
@@ -85,11 +85,11 @@ func Parse[T any](flags *T, env string) error {
 	return errors.Join(errs...)
 }
 
-// An InvalidError indicates a malformed input string.
-var InvalidError = errors.New("invalid value")
+// An ErrInvalid indicates a malformed input string.
+var ErrInvalid = errors.New("invalid value")
 
-type invalidError struct{ error }
+type errInvalid struct{ error }
 
-func (invalidError) Is(err error) bool {
-	return err == InvalidError
+func (errInvalid) Is(err error) bool {
+	return err == ErrInvalid
 }

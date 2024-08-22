@@ -948,7 +948,15 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, flags combinedFl
 			c.unify(a, deprecated(c, partial))
 		}
 
-		if a.IsConstraint() {
+		// Technically, this failure also applies to required fields. We assume
+		// however, that if a reference field that is made regular will already
+		// result in an error, so that piling up another error is not strictly
+		// necessary. Note that the spec allows for eliding an error if it is
+		// guaranteed another error is generated elsewhere. This does not
+		// properly cover the case where a reference is made directly within the
+		// definition, but this is fine for the purpose it serves.
+		// TODO: revisit whether referencing required fields should fail.
+		if a.ArcType == ArcOptional {
 			code := IncompleteError
 			if hasCycle {
 				code = CycleError

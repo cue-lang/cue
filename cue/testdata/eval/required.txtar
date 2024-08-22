@@ -207,11 +207,11 @@ Leaks:  0
 Freed:  66
 Reused: 58
 Allocs: 8
-Retain: 13
+Retain: 10
 
 Unifications: 66
-Conjuncts:    92
-Disjuncts:    79
+Conjuncts:    90
+Disjuncts:    76
 -- out/evalalpha --
 (_|_){
   // [eval]
@@ -269,10 +269,7 @@ Disjuncts:    79
         #Foo: (#struct){
           a!: (int){ int }
         }
-        b: (_|_){
-          // [incomplete] reference.toWithinDefinition.p1.b: cannot reference optional field: a:
-          //     ./in.cue:43:11
-        }
+        b: (int){ int }
       }
       p2: (struct){
         b: (int){ int }
@@ -289,10 +286,7 @@ Disjuncts:    79
         b: (#struct){
           a!: (int){ int }
         }
-        c: (_|_){
-          // [incomplete] reference.toFieldFromDefinition.p1.c: cannot reference optional field: a:
-          //     ./in.cue:52:8
-        }
+        c: (int){ int }
       }
       p2: (struct){
         c: (int){ int }
@@ -309,10 +303,7 @@ Disjuncts:    79
         x: (struct){
           y!: (_){ _ }
         }
-        b: (_|_){
-          // [incomplete] reference.toNonDefinition.p1.b: cannot reference optional field: y:
-          //     ./in.cue:61:8
-        }
+        b: (_){ _ }
       }
       p2: (struct){
         b: (_){ _ }
@@ -324,16 +315,10 @@ Disjuncts:    79
     toConcrete: (struct){
       p1: (struct){
         a!: (int){ 1 }
-        b: (_|_){
-          // [incomplete] reference.toConcrete.p1.b: cannot reference optional field: a:
-          //     ./in.cue:69:6
-        }
+        b: (int){ 2 }
       }
       p2: (struct){
-        b: (_|_){
-          // [incomplete] reference.toConcrete.p2.b: cannot reference optional field: a:
-          //     ./in.cue:72:6
-        }
+        b: (int){ 2 }
         a!: (int){ 1 }
       }
     }
@@ -352,42 +337,6 @@ diff old new
          }
          b!: (int){ int }
        }
-@@ -62,10 +60,7 @@
-         }
-       }
-       p2: (struct){
--        b: (_|_){
--          // [incomplete] reference.toWithinDefinition.p2.b: cannot reference optional field: a:
--          //     ./in.cue:46:11
--        }
-+        b: (int){ int }
-         #Foo: (#struct){
-           a!: (int){ int }
-         }
-@@ -85,10 +80,7 @@
-         }
-       }
-       p2: (struct){
--        c: (_|_){
--          // [incomplete] reference.toFieldFromDefinition.p2.c: cannot reference optional field: a:
--          //     ./in.cue:55:8
--        }
-+        c: (int){ int }
-         b: (#struct){
-           a!: (int){ int }
-         }
-@@ -108,10 +100,7 @@
-         }
-       }
-       p2: (struct){
--        b: (_|_){
--          // [incomplete] reference.toNonDefinition.p2.b: cannot reference optional field: y:
--          //     ./in.cue:64:8
--        }
-+        b: (_){ _ }
-         x: (struct){
-           y!: (_){ _ }
-         }
 -- diff/todo/p2 --
 Missing position.
 -- out/eval --
@@ -449,16 +398,10 @@ Missing position.
         #Foo: (#struct){
           a!: (int){ int }
         }
-        b: (_|_){
-          // [incomplete] reference.toWithinDefinition.p1.b: cannot reference optional field: a:
-          //     ./in.cue:43:11
-        }
+        b: (int){ int }
       }
       p2: (struct){
-        b: (_|_){
-          // [incomplete] reference.toWithinDefinition.p2.b: cannot reference optional field: a:
-          //     ./in.cue:46:11
-        }
+        b: (int){ int }
         #Foo: (#struct){
           a!: (int){ int }
         }
@@ -472,16 +415,10 @@ Missing position.
         b: (#struct){
           a!: (int){ int }
         }
-        c: (_|_){
-          // [incomplete] reference.toFieldFromDefinition.p1.c: cannot reference optional field: a:
-          //     ./in.cue:52:8
-        }
+        c: (int){ int }
       }
       p2: (struct){
-        c: (_|_){
-          // [incomplete] reference.toFieldFromDefinition.p2.c: cannot reference optional field: a:
-          //     ./in.cue:55:8
-        }
+        c: (int){ int }
         b: (#struct){
           a!: (int){ int }
         }
@@ -495,16 +432,10 @@ Missing position.
         x: (struct){
           y!: (_){ _ }
         }
-        b: (_|_){
-          // [incomplete] reference.toNonDefinition.p1.b: cannot reference optional field: y:
-          //     ./in.cue:61:8
-        }
+        b: (_){ _ }
       }
       p2: (struct){
-        b: (_|_){
-          // [incomplete] reference.toNonDefinition.p2.b: cannot reference optional field: y:
-          //     ./in.cue:64:8
-        }
+        b: (_){ _ }
         x: (struct){
           y!: (_){ _ }
         }
@@ -513,16 +444,10 @@ Missing position.
     toConcrete: (struct){
       p1: (struct){
         a!: (int){ 1 }
-        b: (_|_){
-          // [incomplete] reference.toConcrete.p1.b: cannot reference optional field: a:
-          //     ./in.cue:69:6
-        }
+        b: (int){ 2 }
       }
       p2: (struct){
-        b: (_|_){
-          // [incomplete] reference.toConcrete.p2.b: cannot reference optional field: a:
-          //     ./in.cue:72:6
-        }
+        b: (int){ 2 }
         a!: (int){ 1 }
       }
     }

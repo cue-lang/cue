@@ -85,11 +85,11 @@ func Parse[T any](flags *T, env string) error {
 	return errors.Join(errs...)
 }
 
-// An InvalidError indicates a malformed input string.
-var InvalidError = errors.New("invalid value")
+// An ErrInvalid indicates a malformed input string.
+var ErrInvalid = errors.New("invalid value")
 
 type invalidError struct{ error }
 
 func (invalidError) Is(err error) bool {
-	return err == InvalidError
+	return err == ErrInvalid
 }

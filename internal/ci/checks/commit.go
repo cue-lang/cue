@@ -51,7 +51,7 @@ func checkCommit(dir string) error {
 	// line because each commit must be signed-off.
 	lines := strings.Split(body, "\n")
 	if len(lines) > 1 && lines[1] != "" {
-		return fmt.Errorf("The second line of a commit message must be blank")
+		return fmt.Errorf("the second line of a commit message must be blank")
 	}
 
 	// All authors, including co-authors, must have a signed-off trailer by email.

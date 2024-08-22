@@ -36,7 +36,6 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
-	"cuelang.org/go/internal/value"
 )
 
 var requestedVersion = os.Getenv("CUE_SYNTAX_OVERRIDE")
@@ -810,10 +809,11 @@ func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 		inst = cue.Merge(insts...)
 	}
 
-	r := value.ConvertToRuntime(inst.Value().Context())
+	ctx := inst.Value().Context()
 	for _, b := range binst {
 		for _, i := range b.Imports {
-			if _, err := r.Build(i); err != nil {
+			val := ctx.BuildInstance(i)
+			if err := val.Err(); err != nil {
 				return nil, err
 			}
 		}

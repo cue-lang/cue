@@ -301,7 +301,9 @@ func typeSignature(params, results []types.Type) *types.Signature {
 	for i, result := range results {
 		resultVars[i] = types.NewParam(token.NoPos, nil, "", result)
 	}
-	return types.NewSignature(
+	return types.NewSignatureType(
+		nil,
+		nil,
 		nil,
 		types.NewTuple(paramVars...),
 		types.NewTuple(resultVars...),

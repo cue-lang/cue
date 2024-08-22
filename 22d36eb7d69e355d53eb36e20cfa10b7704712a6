@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "218aa768_2f3e3829",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-22T07:49:25Z",
+      "side": 1,
+      "message": "Starting looking really good. One small comment.\n\nThanks!",
+      "revId": "22d36eb7d69e355d53eb36e20cfa10b7704712a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "afdd108d_e64f4175",
+        "filename": "pkg/gen.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-22T07:49:25Z",
+      "side": 1,
+      "message": "I would revert these changes. See later comments.",
+      "revId": "22d36eb7d69e355d53eb36e20cfa10b7704712a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad395389_240ecb32",
+        "filename": "pkg/list/list.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-22T07:49:25Z",
+      "side": 1,
+      "message": "It is probably not worth it to add all this machinery just to disallow list.MatchN as a function. \n\nI appreciate the effort, but for now I would say let\u0027s allow it as a boolean function and we deal with fixing it later. There are a lot of validators like this already!\n\nI think it already helps a lot that the tests, which often serve as examples, show the proper usage. Thanks for that!\n\nI\u0027m also not certain whether it is a bad idea to allow it as a function. Maybe it is fine.",
+      "revId": "22d36eb7d69e355d53eb36e20cfa10b7704712a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

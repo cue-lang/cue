@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ce38091_6a8e0bb4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-22T17:21:40Z",
+      "side": 1,
+      "message": "Thanks for your patience.\n\nOne more caveat. We are starting to use \"match\" very specifically to mean unification of a schema against a finalized value (one where defaults are \"expanded\"). The issue with doing plain unification is that it could be that a value that is ultimately exported is actually NOT compatible with the matched schema.\n\nThis code probably doesn\u0027t handle that. However, it probably makes more sense that any non-schema arguments to functions are finalized. The Value method makes an attempt at that, but I don\u0027t think the List method does. Either way, this should probably not be handled in this function.\n\nConsidering that this is either way a pretty pathological edge case, I suggest we just check it in. Just beware that this may be an issue and that we will likely change the semantics.",
+      "revId": "8494988313ea84999eb8e49653cfa54db7a26785",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -33,6 +33,24 @@
       "message": "Given that the type cue/Runtime still exists, I am not a fan of this name.",
       "revId": "df3d75674d1a71d00a50a4f2429cd4ae57705a27",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2d106c9_cfa4fd4f",
+        "filename": "internal/cuetdtest/matrix.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-22T08:00:56Z",
+      "side": 1,
+      "message": "I mistook runtime.Runtime for the deprecated cue.Runtime; reverted this.",
+      "parentUuid": "bfe92578_38efadb6",
+      "revId": "df3d75674d1a71d00a50a4f2429cd4ae57705a27",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

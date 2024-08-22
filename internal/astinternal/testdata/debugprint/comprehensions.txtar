@@ -1,0 +1,109 @@
+-- comprehensions.cue --
+if condition {
+	a: true
+}
+for k, v in input if v > 2 {
+	(k): v
+}
+-- out/debugprint/comprehensions.cue --
+*ast.File{
+	Filename: "comprehensions.cue"
+	Decls: []ast.Decl{
+		*ast.Comprehension{
+			Clauses: []ast.Clause{
+				*ast.IfClause{
+					If: token.Pos("comprehensions.cue:1:1")
+					Condition: *ast.Ident{
+						NamePos: token.Pos("comprehensions.cue:1:4")
+						Name: "condition"
+					}
+				}
+			}
+			Value: *ast.StructLit{
+				Lbrace: token.Pos("comprehensions.cue:1:14")
+				Elts: []ast.Decl{
+					*ast.Field{
+						Label: *ast.Ident{
+							NamePos: token.Pos("comprehensions.cue:2:2")
+							Name: "a"
+						}
+						Optional: token.Pos("-")
+						Constraint: token.Token("ILLEGAL")
+						TokenPos: token.Pos("comprehensions.cue:2:3")
+						Token: token.Token(":")
+						Value: *ast.BasicLit{
+							ValuePos: token.Pos("comprehensions.cue:2:5")
+							Kind: token.Token("true")
+							Value: "true"
+						}
+						Attrs: []*ast.Attribute{}
+					}
+				}
+				Rbrace: token.Pos("comprehensions.cue:3:1")
+			}
+		}
+		*ast.Comprehension{
+			Clauses: []ast.Clause{
+				*ast.ForClause{
+					For: token.Pos("comprehensions.cue:4:1")
+					Key: *ast.Ident{
+						NamePos: token.Pos("comprehensions.cue:4:5")
+						Name: "k"
+					}
+					Colon: token.Pos("comprehensions.cue:4:6")
+					Value: *ast.Ident{
+						NamePos: token.Pos("comprehensions.cue:4:8")
+						Name: "v"
+					}
+					In: token.Pos("comprehensions.cue:4:10")
+					Source: *ast.Ident{
+						NamePos: token.Pos("comprehensions.cue:4:13")
+						Name: "input"
+					}
+				}
+				*ast.IfClause{
+					If: token.Pos("comprehensions.cue:4:19")
+					Condition: *ast.BinaryExpr{
+						X: *ast.Ident{
+							NamePos: token.Pos("comprehensions.cue:4:22")
+							Name: "v"
+						}
+						OpPos: token.Pos("comprehensions.cue:4:24")
+						Op: token.Token(">")
+						Y: *ast.BasicLit{
+							ValuePos: token.Pos("comprehensions.cue:4:26")
+							Kind: token.Token("INT")
+							Value: "2"
+						}
+					}
+				}
+			}
+			Value: *ast.StructLit{
+				Lbrace: token.Pos("comprehensions.cue:4:28")
+				Elts: []ast.Decl{
+					*ast.Field{
+						Label: *ast.ParenExpr{
+							Lparen: token.Pos("comprehensions.cue:5:2")
+							X: *ast.Ident{
+								NamePos: token.Pos("comprehensions.cue:5:3")
+								Name: "k"
+							}
+							Rparen: token.Pos("comprehensions.cue:5:4")
+						}
+						Optional: token.Pos("-")
+						Constraint: token.Token("ILLEGAL")
+						TokenPos: token.Pos("comprehensions.cue:5:5")
+						Token: token.Token(":")
+						Value: *ast.Ident{
+							NamePos: token.Pos("comprehensions.cue:5:7")
+							Name: "v"
+						}
+						Attrs: []*ast.Attribute{}
+					}
+				}
+				Rbrace: token.Pos("comprehensions.cue:6:1")
+			}
+		}
+	}
+	Imports: []*ast.ImportSpec{}
+}

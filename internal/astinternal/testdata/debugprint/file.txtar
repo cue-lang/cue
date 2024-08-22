@@ -1,0 +1,49 @@
+-- empty.cue --
+-- package_only.cue --
+package p
+-- comments_only.cue --
+// some
+// comment lines
+-- out/debugprint/empty.cue --
+*ast.File{
+	Filename: "empty.cue"
+	Decls: []ast.Decl{}
+	Imports: []*ast.ImportSpec{}
+}
+-- out/debugprint/package_only.cue --
+*ast.File{
+	Filename: "package_only.cue"
+	Decls: []ast.Decl{
+		*ast.Package{
+			PackagePos: token.Pos("package_only.cue:1:1")
+			Name: *ast.Ident{
+				NamePos: token.Pos("package_only.cue:1:9")
+				Name: "p"
+			}
+		}
+	}
+	Imports: []*ast.ImportSpec{}
+}
+-- out/debugprint/comments_only.cue --
+*ast.File{
+	Filename: "comments_only.cue"
+	Decls: []ast.Decl{}
+	Imports: []*ast.ImportSpec{}
+	Comments: []*ast.CommentGroup{
+		{
+			Doc: false
+			Line: false
+			Position: 0
+			List: []*ast.Comment{
+				{
+					Slash: token.Pos("comments_only.cue:1:1")
+					Text: "// some"
+				}
+				{
+					Slash: token.Pos("comments_only.cue:2:1")
+					Text: "// comment lines"
+				}
+			}
+		}
+	}
+}

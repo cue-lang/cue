@@ -1,0 +1,208 @@
+-- fields.cue --
+a: 1 @xml(,attr)
+b: 2 @foo(a,b=4) @go(Foo)
+c!: d?: string
+X=e: [Y=string]: int
+#Schema: {
+	name: string
+	...
+}
+embed: {
+	#Schema
+}
+-- out/debugprint/fields.cue --
+*ast.File{
+	Filename: "fields.cue"
+	Decls: []ast.Decl{
+		*ast.Field{
+			Label: *ast.Ident{
+				NamePos: token.Pos("fields.cue:1:1")
+				Name: "a"
+			}
+			Optional: token.Pos("-")
+			Constraint: token.Token("ILLEGAL")
+			TokenPos: token.Pos("fields.cue:1:2")
+			Token: token.Token(":")
+			Value: *ast.BasicLit{
+				ValuePos: token.Pos("fields.cue:1:4")
+				Kind: token.Token("INT")
+				Value: "1"
+			}
+			Attrs: []*ast.Attribute{
+				{
+					At: token.Pos("fields.cue:1:6")
+					Text: "@xml(,attr)"
+				}
+			}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				NamePos: token.Pos("fields.cue:2:1")
+				Name: "b"
+			}
+			Optional: token.Pos("-")
+			Constraint: token.Token("ILLEGAL")
+			TokenPos: token.Pos("fields.cue:2:2")
+			Token: token.Token(":")
+			Value: *ast.BasicLit{
+				ValuePos: token.Pos("fields.cue:2:4")
+				Kind: token.Token("INT")
+				Value: "2"
+			}
+			Attrs: []*ast.Attribute{
+				{
+					At: token.Pos("fields.cue:2:6")
+					Text: "@foo(a,b=4)"
+				}
+				{
+					At: token.Pos("fields.cue:2:18")
+					Text: "@go(Foo)"
+				}
+			}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				NamePos: token.Pos("fields.cue:3:1")
+				Name: "c"
+			}
+			Optional: token.Pos("fields.cue:3:2")
+			Constraint: token.Token("!")
+			TokenPos: token.Pos("fields.cue:3:3")
+			Token: token.Token(":")
+			Value: *ast.StructLit{
+				Lbrace: token.Pos("-")
+				Elts: []ast.Decl{
+					*ast.Field{
+						Label: *ast.Ident{
+							NamePos: token.Pos("fields.cue:3:5")
+							Name: "d"
+						}
+						Optional: token.Pos("fields.cue:3:6")
+						Constraint: token.Token("?")
+						TokenPos: token.Pos("fields.cue:3:7")
+						Token: token.Token(":")
+						Value: *ast.Ident{
+							NamePos: token.Pos("fields.cue:3:9")
+							Name: "string"
+						}
+						Attrs: []*ast.Attribute{}
+					}
+				}
+				Rbrace: token.Pos("-")
+			}
+			Attrs: []*ast.Attribute{}
+		}
+		*ast.Field{
+			Label: *ast.Alias{
+				Ident: *ast.Ident{
+					NamePos: token.Pos("fields.cue:4:1")
+					Name: "X"
+				}
+				Equal: token.Pos("fields.cue:4:2")
+				Expr: *ast.Ident{
+					NamePos: token.Pos("fields.cue:4:3")
+					Name: "e"
+				}
+			}
+			Optional: token.Pos("-")
+			Constraint: token.Token("ILLEGAL")
+			TokenPos: token.Pos("fields.cue:4:4")
+			Token: token.Token(":")
+			Value: *ast.StructLit{
+				Lbrace: token.Pos("-")
+				Elts: []ast.Decl{
+					*ast.Field{
+						Label: *ast.ListLit{
+							Lbrack: token.Pos("fields.cue:4:6")
+							Elts: []ast.Expr{
+								*ast.Alias{
+									Ident: *ast.Ident{
+										NamePos: token.Pos("fields.cue:4:7")
+										Name: "Y"
+									}
+									Equal: token.Pos("fields.cue:4:8")
+									Expr: *ast.Ident{
+										NamePos: token.Pos("fields.cue:4:9")
+										Name: "string"
+									}
+								}
+							}
+							Rbrack: token.Pos("fields.cue:4:15")
+						}
+						Optional: token.Pos("-")
+						Constraint: token.Token("ILLEGAL")
+						TokenPos: token.Pos("fields.cue:4:16")
+						Token: token.Token(":")
+						Value: *ast.Ident{
+							NamePos: token.Pos("fields.cue:4:18")
+							Name: "int"
+						}
+						Attrs: []*ast.Attribute{}
+					}
+				}
+				Rbrace: token.Pos("-")
+			}
+			Attrs: []*ast.Attribute{}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				NamePos: token.Pos("fields.cue:5:1")
+				Name: "#Schema"
+			}
+			Optional: token.Pos("-")
+			Constraint: token.Token("ILLEGAL")
+			TokenPos: token.Pos("fields.cue:5:8")
+			Token: token.Token(":")
+			Value: *ast.StructLit{
+				Lbrace: token.Pos("fields.cue:5:10")
+				Elts: []ast.Decl{
+					*ast.Field{
+						Label: *ast.Ident{
+							NamePos: token.Pos("fields.cue:6:2")
+							Name: "name"
+						}
+						Optional: token.Pos("-")
+						Constraint: token.Token("ILLEGAL")
+						TokenPos: token.Pos("fields.cue:6:6")
+						Token: token.Token(":")
+						Value: *ast.Ident{
+							NamePos: token.Pos("fields.cue:6:8")
+							Name: "string"
+						}
+						Attrs: []*ast.Attribute{}
+					}
+					*ast.Ellipsis{
+						Ellipsis: token.Pos("fields.cue:7:2")
+						Type: nil
+					}
+				}
+				Rbrace: token.Pos("fields.cue:8:1")
+			}
+			Attrs: []*ast.Attribute{}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				NamePos: token.Pos("fields.cue:9:1")
+				Name: "embed"
+			}
+			Optional: token.Pos("-")
+			Constraint: token.Token("ILLEGAL")
+			TokenPos: token.Pos("fields.cue:9:6")
+			Token: token.Token(":")
+			Value: *ast.StructLit{
+				Lbrace: token.Pos("fields.cue:9:8")
+				Elts: []ast.Decl{
+					*ast.EmbedDecl{
+						Expr: *ast.Ident{
+							NamePos: token.Pos("fields.cue:10:2")
+							Name: "#Schema"
+						}
+					}
+				}
+				Rbrace: token.Pos("fields.cue:11:1")
+			}
+			Attrs: []*ast.Attribute{}
+		}
+	}
+	Imports: []*ast.ImportSpec{}
+}

@@ -1,0 +1,76 @@
+-- unify.txtar --
+unification: b & c & d
+disjunctoin: b | c | *d
+-- out/debugprint/unify.txtar --
+*ast.File{
+	Filename: "unify.txtar"
+	Decls: []ast.Decl{
+		*ast.Field{
+			Label: *ast.Ident{
+				NamePos: token.Pos("unify.txtar:1:1")
+				Name: "unification"
+			}
+			Optional: token.Pos("-")
+			Constraint: token.Token("ILLEGAL")
+			TokenPos: token.Pos("unify.txtar:1:12")
+			Token: token.Token(":")
+			Value: *ast.BinaryExpr{
+				X: *ast.BinaryExpr{
+					X: *ast.Ident{
+						NamePos: token.Pos("unify.txtar:1:14")
+						Name: "b"
+					}
+					OpPos: token.Pos("unify.txtar:1:16")
+					Op: token.Token("&")
+					Y: *ast.Ident{
+						NamePos: token.Pos("unify.txtar:1:18")
+						Name: "c"
+					}
+				}
+				OpPos: token.Pos("unify.txtar:1:20")
+				Op: token.Token("&")
+				Y: *ast.Ident{
+					NamePos: token.Pos("unify.txtar:1:22")
+					Name: "d"
+				}
+			}
+			Attrs: []*ast.Attribute{}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				NamePos: token.Pos("unify.txtar:2:1")
+				Name: "disjunctoin"
+			}
+			Optional: token.Pos("-")
+			Constraint: token.Token("ILLEGAL")
+			TokenPos: token.Pos("unify.txtar:2:12")
+			Token: token.Token(":")
+			Value: *ast.BinaryExpr{
+				X: *ast.BinaryExpr{
+					X: *ast.Ident{
+						NamePos: token.Pos("unify.txtar:2:14")
+						Name: "b"
+					}
+					OpPos: token.Pos("unify.txtar:2:16")
+					Op: token.Token("|")
+					Y: *ast.Ident{
+						NamePos: token.Pos("unify.txtar:2:18")
+						Name: "c"
+					}
+				}
+				OpPos: token.Pos("unify.txtar:2:20")
+				Op: token.Token("|")
+				Y: *ast.UnaryExpr{
+					OpPos: token.Pos("unify.txtar:2:22")
+					Op: token.Token("*")
+					X: *ast.Ident{
+						NamePos: token.Pos("unify.txtar:2:23")
+						Name: "d"
+					}
+				}
+			}
+			Attrs: []*ast.Attribute{}
+		}
+	}
+	Imports: []*ast.ImportSpec{}
+}

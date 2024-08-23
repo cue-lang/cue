@@ -6,7 +6,6 @@ cmp stderr yaml-stderr
 
 # Ensure this also works for other encodings.
 
-# TODO(mvdan): note that TOML lacks position information still.
 ! exec cue vet schema.cue data.toml
 cmp stderr toml-stderr
 
@@ -42,3 +41,4 @@ languages.1.name: invalid value "dutch" (out of bound =~"^\\p{Lu}"):
 -- toml-stderr --
 languages.1.name: invalid value "dutch" (out of bound =~"^\\p{Lu}"):
     ./schema.cue:3:8
+    ./data.toml:5:8

@@ -42,7 +42,7 @@ color = "gray"
 	Elts: []ast.Decl{
 		*ast.Field{
 			Label: *ast.Ident{
-				NamePos: token.Pos("-")
+				NamePos: token.Pos("example.toml:4:1")
 				Name: "title"
 			}
 			Optional: token.Pos("-")
@@ -50,7 +50,7 @@ color = "gray"
 			TokenPos: token.Pos("-")
 			Token: token.Token("ILLEGAL")
 			Value: *ast.BasicLit{
-				ValuePos: token.Pos("-")
+				ValuePos: token.Pos("example.toml:4:9")
 				Kind: token.Token("STRING")
 				Value: "\"TOML Example\""
 			}
@@ -58,7 +58,7 @@ color = "gray"
 		}
 		*ast.Field{
 			Label: *ast.Ident{
-				NamePos: token.Pos("-")
+				NamePos: token.Pos("example.toml:6:2")
 				Name: "owner"
 			}
 			Optional: token.Pos("-")
@@ -70,7 +70,7 @@ color = "gray"
 				Elts: []ast.Decl{
 					*ast.Field{
 						Label: *ast.Ident{
-							NamePos: token.Pos("-")
+							NamePos: token.Pos("example.toml:7:1")
 							Name: "name"
 						}
 						Optional: token.Pos("-")
@@ -78,7 +78,7 @@ color = "gray"
 						TokenPos: token.Pos("-")
 						Token: token.Token("ILLEGAL")
 						Value: *ast.BasicLit{
-							ValuePos: token.Pos("-")
+							ValuePos: token.Pos("example.toml:7:8")
 							Kind: token.Token("STRING")
 							Value: "\"Tom Preston-Werner\""
 						}
@@ -91,7 +91,7 @@ color = "gray"
 		}
 		*ast.Field{
 			Label: *ast.Ident{
-				NamePos: token.Pos("-")
+				NamePos: token.Pos("example.toml:11:2")
 				Name: "database"
 			}
 			Optional: token.Pos("-")
@@ -103,7 +103,7 @@ color = "gray"
 				Elts: []ast.Decl{
 					*ast.Field{
 						Label: *ast.Ident{
-							NamePos: token.Pos("-")
+							NamePos: token.Pos("example.toml:12:1")
 							Name: "enabled"
 						}
 						Optional: token.Pos("-")
@@ -119,7 +119,7 @@ color = "gray"
 					}
 					*ast.Field{
 						Label: *ast.Ident{
-							NamePos: token.Pos("-")
+							NamePos: token.Pos("example.toml:13:1")
 							Name: "ports"
 						}
 						Optional: token.Pos("-")
@@ -130,17 +130,17 @@ color = "gray"
 							Lbrack: token.Pos("-")
 							Elts: []ast.Expr{
 								*ast.BasicLit{
-									ValuePos: token.Pos("-")
+									ValuePos: token.Pos("example.toml:13:11")
 									Kind: token.Token("INT")
 									Value: "8000"
 								}
 								*ast.BasicLit{
-									ValuePos: token.Pos("-")
+									ValuePos: token.Pos("example.toml:13:17")
 									Kind: token.Token("INT")
 									Value: "8001"
 								}
 								*ast.BasicLit{
-									ValuePos: token.Pos("-")
+									ValuePos: token.Pos("example.toml:13:23")
 									Kind: token.Token("INT")
 									Value: "8002"
 								}
@@ -151,7 +151,7 @@ color = "gray"
 					}
 					*ast.Field{
 						Label: *ast.Ident{
-							NamePos: token.Pos("-")
+							NamePos: token.Pos("example.toml:14:1")
 							Name: "data"
 						}
 						Optional: token.Pos("-")
@@ -165,12 +165,12 @@ color = "gray"
 									Lbrack: token.Pos("-")
 									Elts: []ast.Expr{
 										*ast.BasicLit{
-											ValuePos: token.Pos("-")
+											ValuePos: token.Pos("example.toml:14:11")
 											Kind: token.Token("STRING")
 											Value: "\"delta\""
 										}
 										*ast.BasicLit{
-											ValuePos: token.Pos("-")
+											ValuePos: token.Pos("example.toml:14:20")
 											Kind: token.Token("STRING")
 											Value: "\"phi\""
 										}
@@ -181,7 +181,7 @@ color = "gray"
 									Lbrack: token.Pos("-")
 									Elts: []ast.Expr{
 										*ast.BasicLit{
-											ValuePos: token.Pos("-")
+											ValuePos: token.Pos("example.toml:14:29")
 											Kind: token.Token("FLOAT")
 											Value: "3.14"
 										}
@@ -195,7 +195,7 @@ color = "gray"
 					}
 					*ast.Field{
 						Label: *ast.Ident{
-							NamePos: token.Pos("-")
+							NamePos: token.Pos("example.toml:15:1")
 							Name: "temp_targets"
 						}
 						Optional: token.Pos("-")
@@ -203,11 +203,11 @@ color = "gray"
 						TokenPos: token.Pos("-")
 						Token: token.Token("ILLEGAL")
 						Value: *ast.StructLit{
-							Lbrace: token.Pos("-")
+							Lbrace: token.Pos("example.toml:15:16")
 							Elts: []ast.Decl{
 								*ast.Field{
 									Label: *ast.Ident{
-										NamePos: token.Pos("-")
+										NamePos: token.Pos("example.toml:15:18")
 										Name: "cpu"
 									}
 									Optional: token.Pos("-")
@@ -215,7 +215,7 @@ color = "gray"
 									TokenPos: token.Pos("-")
 									Token: token.Token("ILLEGAL")
 									Value: *ast.BasicLit{
-										ValuePos: token.Pos("-")
+										ValuePos: token.Pos("example.toml:15:24")
 										Kind: token.Token("FLOAT")
 										Value: "79.5"
 									}
@@ -223,7 +223,7 @@ color = "gray"
 								}
 								*ast.Field{
 									Label: *ast.Ident{
-										NamePos: token.Pos("-")
+										NamePos: token.Pos("example.toml:15:30")
 										Name: "case"
 									}
 									Optional: token.Pos("-")
@@ -231,7 +231,7 @@ color = "gray"
 									TokenPos: token.Pos("-")
 									Token: token.Token("ILLEGAL")
 									Value: *ast.BasicLit{
-										ValuePos: token.Pos("-")
+										ValuePos: token.Pos("example.toml:15:37")
 										Kind: token.Token("FLOAT")
 										Value: "72.0"
 									}
@@ -249,7 +249,7 @@ color = "gray"
 		}
 		*ast.Field{
 			Label: *ast.Ident{
-				NamePos: token.Pos("-")
+				NamePos: token.Pos("example.toml:17:2")
 				Name: "servers"
 			}
 			Optional: token.Pos("-")
@@ -265,7 +265,7 @@ color = "gray"
 		}
 		*ast.Field{
 			Label: *ast.Ident{
-				NamePos: token.Pos("-")
+				NamePos: token.Pos("example.toml:19:2")
 				Name: "servers"
 			}
 			Optional: token.Pos("-")
@@ -277,7 +277,7 @@ color = "gray"
 				Elts: []ast.Decl{
 					*ast.Field{
 						Label: *ast.Ident{
-							NamePos: token.Pos("-")
+							NamePos: token.Pos("example.toml:19:10")
 							Name: "alpha"
 						}
 						Optional: token.Pos("-")
@@ -289,7 +289,7 @@ color = "gray"
 							Elts: []ast.Decl{
 								*ast.Field{
 									Label: *ast.Ident{
-										NamePos: token.Pos("-")
+										NamePos: token.Pos("example.toml:20:1")
 										Name: "ip"
 									}
 									Optional: token.Pos("-")
@@ -297,7 +297,7 @@ color = "gray"
 									TokenPos: token.Pos("-")
 									Token: token.Token("ILLEGAL")
 									Value: *ast.BasicLit{
-										ValuePos: token.Pos("-")
+										ValuePos: token.Pos("example.toml:20:6")
 										Kind: token.Token("STRING")
 										Value: "\"10.0.0.1\""
 									}
@@ -305,7 +305,7 @@ color = "gray"
 								}
 								*ast.Field{
 									Label: *ast.Ident{
-										NamePos: token.Pos("-")
+										NamePos: token.Pos("example.toml:21:1")
 										Name: "role"
 									}
 									Optional: token.Pos("-")
@@ -313,7 +313,7 @@ color = "gray"
 									TokenPos: token.Pos("-")
 									Token: token.Token("ILLEGAL")
 									Value: *ast.BasicLit{
-										ValuePos: token.Pos("-")
+										ValuePos: token.Pos("example.toml:21:8")
 										Kind: token.Token("STRING")
 										Value: "\"frontend\""
 									}
@@ -331,7 +331,7 @@ color = "gray"
 		}
 		*ast.Field{
 			Label: *ast.Ident{
-				NamePos: token.Pos("-")
+				NamePos: token.Pos("example.toml:23:2")
 				Name: "servers"
 			}
 			Optional: token.Pos("-")
@@ -343,7 +343,7 @@ color = "gray"
 				Elts: []ast.Decl{
 					*ast.Field{
 						Label: *ast.Ident{
-							NamePos: token.Pos("-")
+							NamePos: token.Pos("example.toml:23:10")
 							Name: "beta"
 						}
 						Optional: token.Pos("-")
@@ -355,7 +355,7 @@ color = "gray"
 							Elts: []ast.Decl{
 								*ast.Field{
 									Label: *ast.Ident{
-										NamePos: token.Pos("-")
+										NamePos: token.Pos("example.toml:24:1")
 										Name: "ip"
 									}
 									Optional: token.Pos("-")
@@ -363,7 +363,7 @@ color = "gray"
 									TokenPos: token.Pos("-")
 									Token: token.Token("ILLEGAL")
 									Value: *ast.BasicLit{
-										ValuePos: token.Pos("-")
+										ValuePos: token.Pos("example.toml:24:6")
 										Kind: token.Token("STRING")
 										Value: "\"10.0.0.2\""
 									}
@@ -371,7 +371,7 @@ color = "gray"
 								}
 								*ast.Field{
 									Label: *ast.Ident{
-										NamePos: token.Pos("-")
+										NamePos: token.Pos("example.toml:25:1")
 										Name: "role"
 									}
 									Optional: token.Pos("-")
@@ -379,7 +379,7 @@ color = "gray"
 									TokenPos: token.Pos("-")
 									Token: token.Token("ILLEGAL")
 									Value: *ast.BasicLit{
-										ValuePos: token.Pos("-")
+										ValuePos: token.Pos("example.toml:25:8")
 										Kind: token.Token("STRING")
 										Value: "\"backend\""
 									}
@@ -397,7 +397,7 @@ color = "gray"
 		}
 		*ast.Field{
 			Label: *ast.Ident{
-				NamePos: token.Pos("-")
+				NamePos: token.Pos("example.toml:27:3")
 				Name: "products"
 			}
 			Optional: token.Pos("-")
@@ -412,7 +412,7 @@ color = "gray"
 						Elts: []ast.Decl{
 							*ast.Field{
 								Label: *ast.Ident{
-									NamePos: token.Pos("-")
+									NamePos: token.Pos("example.toml:28:1")
 									Name: "name"
 								}
 								Optional: token.Pos("-")
@@ -420,7 +420,7 @@ color = "gray"
 								TokenPos: token.Pos("-")
 								Token: token.Token("ILLEGAL")
 								Value: *ast.BasicLit{
-									ValuePos: token.Pos("-")
+									ValuePos: token.Pos("example.toml:28:8")
 									Kind: token.Token("STRING")
 									Value: "\"Hammer\""
 								}
@@ -428,7 +428,7 @@ color = "gray"
 							}
 							*ast.Field{
 								Label: *ast.Ident{
-									NamePos: token.Pos("-")
+									NamePos: token.Pos("example.toml:29:1")
 									Name: "sku"
 								}
 								Optional: token.Pos("-")
@@ -436,7 +436,7 @@ color = "gray"
 								TokenPos: token.Pos("-")
 								Token: token.Token("ILLEGAL")
 								Value: *ast.BasicLit{
-									ValuePos: token.Pos("-")
+									ValuePos: token.Pos("example.toml:29:7")
 									Kind: token.Token("INT")
 									Value: "738594937"
 								}
@@ -455,7 +455,7 @@ color = "gray"
 						Elts: []ast.Decl{
 							*ast.Field{
 								Label: *ast.Ident{
-									NamePos: token.Pos("-")
+									NamePos: token.Pos("example.toml:34:1")
 									Name: "name"
 								}
 								Optional: token.Pos("-")
@@ -463,7 +463,7 @@ color = "gray"
 								TokenPos: token.Pos("-")
 								Token: token.Token("ILLEGAL")
 								Value: *ast.BasicLit{
-									ValuePos: token.Pos("-")
+									ValuePos: token.Pos("example.toml:34:8")
 									Kind: token.Token("STRING")
 									Value: "\"Nail\""
 								}
@@ -471,7 +471,7 @@ color = "gray"
 							}
 							*ast.Field{
 								Label: *ast.Ident{
-									NamePos: token.Pos("-")
+									NamePos: token.Pos("example.toml:35:1")
 									Name: "sku"
 								}
 								Optional: token.Pos("-")
@@ -479,7 +479,7 @@ color = "gray"
 								TokenPos: token.Pos("-")
 								Token: token.Token("ILLEGAL")
 								Value: *ast.BasicLit{
-									ValuePos: token.Pos("-")
+									ValuePos: token.Pos("example.toml:35:7")
 									Kind: token.Token("INT")
 									Value: "284758393"
 								}
@@ -487,7 +487,7 @@ color = "gray"
 							}
 							*ast.Field{
 								Label: *ast.Ident{
-									NamePos: token.Pos("-")
+									NamePos: token.Pos("example.toml:37:1")
 									Name: "color"
 								}
 								Optional: token.Pos("-")
@@ -495,7 +495,7 @@ color = "gray"
 								TokenPos: token.Pos("-")
 								Token: token.Token("ILLEGAL")
 								Value: *ast.BasicLit{
-									ValuePos: token.Pos("-")
+									ValuePos: token.Pos("example.toml:37:9")
 									Kind: token.Token("STRING")
 									Value: "\"gray\""
 								}

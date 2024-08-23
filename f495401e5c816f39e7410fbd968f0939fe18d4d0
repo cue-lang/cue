@@ -33,6 +33,24 @@
       "message": "Yeah, fwiw, based on this and the previous CL in the chain, I totally agree that having a validator \"mechanism\" that can\u0027t lead to this sort of inconsistency is absolutely desirable.",
       "revId": "f495401e5c816f39e7410fbd968f0939fe18d4d0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2f82ab4_f2167d83",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-23T08:17:05Z",
+      "side": 1,
+      "message": "ack, agreed. there\u0027s a slim chance I\u0027m missing something, but for the sake of not getting blocked on Paul or Marcel, I\u0027ll merge and ask for forgiveness later and fix it up if I got it wrong :)",
+      "parentUuid": "1f9e4b5f_81097517",
+      "revId": "f495401e5c816f39e7410fbd968f0939fe18d4d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

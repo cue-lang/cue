@@ -15,19 +15,26 @@
 package toml_test
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
+	"path"
+	"reflect"
 	"strings"
 	"testing"
 
 	"github.com/go-quicktest/qt"
 	gotoml "github.com/pelletier/go-toml/v2"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/toml"
+	"cuelang.org/go/internal/astinternal"
+	"cuelang.org/go/internal/cuetxtar"
 )
 
 func TestDecoder(t *testing.T) {
@@ -857,4 +864,37 @@ func unindentMultiline(s string) string {
 	s = strings.TrimPrefix(s, "\n")
 	s = strings.TrimSuffix(s, "\n")
 	return s
+}
+
+var (
+	typNode = reflect.TypeFor[ast.Node]()
+	typPos  = reflect.TypeFor[token.Pos]()
+)
+
+func TestDecoderTxtar(t *testing.T) {
+	test := cuetxtar.TxTarTest{
+		Root: "testdata",
+		Name: "decode",
+	}
+
+	test.Run(t, func(t *cuetxtar.Test) {
+		for _, file := range t.Archive.Files {
+			if strings.HasPrefix(file.Name, "out/") {
+				continue
+			}
+			dec := toml.NewDecoder(file.Name, bytes.NewReader(file.Data))
+			node, err := dec.Decode()
+			qt.Assert(t, qt.IsNil(err))
+
+			// Show all valid node positions.
+			out := astinternal.AppendDebug(nil, node, astinternal.DebugConfig{
+				OmitEmpty: true,
+				Filter: func(v reflect.Value) bool {
+					t := v.Type()
+					return t.Implements(typNode) || t.Kind() == reflect.Slice || t == typPos
+				},
+			})
+			t.Writer(path.Join(file.Name, "positions")).Write(out)
+		}
+	})
 }

@@ -1,34 +1,94 @@
 -- in.cue --
-a: {
+t1: a: {
 	foo?: int
 
 	b: foo
 }
--- out/compile --
---- in.cue
-{
-  a: {
-    foo?: int
-    b: 〈0;foo〉
-  }
+t2: a: {
+	b: foo
+
+	foo?: int
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  4
-Reused: 1
-Allocs: 3
-Retain: 0
+Freed:  9
+Reused: 4
+Allocs: 5
+Retain: 1
 
-Unifications: 4
-Conjuncts:    4
-Disjuncts:    4
+Unifications: 9
+Conjuncts:    9
+Disjuncts:    10
+-- out/evalalpha --
+(struct){
+  t1: (struct){
+    a: (struct){
+      foo?: (int){ int }
+      b: (_|_){
+        // [incomplete] t1.a.b: cannot reference optional field: foo:
+        //     ./in.cue:4:5
+      }
+    }
+  }
+  t2: (struct){
+    a: (struct){
+      b: (int){ int }
+      foo?: (int){ int }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -10,10 +10,7 @@
+   }
+   t2: (struct){
+     a: (struct){
+-      b: (_|_){
+-        // [incomplete] t2.a.b: cannot reference optional field: foo:
+-        //     ./in.cue:7:5
+-      }
++      b: (int){ int }
+       foo?: (int){ int }
+     }
+   }
+-- diff/todo/p1 --
+t2: reference resolves to optional field.
 -- out/eval --
 (struct){
-  a: (struct){
-    foo?: (int){ int }
-    b: (_|_){
-      // [incomplete] a.b: cannot reference optional field: foo:
-      //     ./in.cue:4:5
+  t1: (struct){
+    a: (struct){
+      foo?: (int){ int }
+      b: (_|_){
+        // [incomplete] t1.a.b: cannot reference optional field: foo:
+        //     ./in.cue:4:5
+      }
+    }
+  }
+  t2: (struct){
+    a: (struct){
+      b: (_|_){
+        // [incomplete] t2.a.b: cannot reference optional field: foo:
+        //     ./in.cue:7:5
+      }
+      foo?: (int){ int }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  t1: {
+    a: {
+      foo?: int
+      b: 〈0;foo〉
+    }
+  }
+  t2: {
+    a: {
+      b: 〈0;foo〉
+      foo?: int
     }
   }
 }

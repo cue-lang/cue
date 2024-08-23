@@ -687,7 +687,7 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 				break
 			}
 		}
-		arcState.completeNodeTasks(attemptOnly)
+		arcState.completeNodeTasks(yield)
 
 		// Child nodes, if pending and derived from a comprehension, may
 		// still cause this arc to become not pending.
@@ -701,11 +701,18 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 
 		switch runMode {
 		case ignore, attemptOnly:
+			// TODO(cycle): ideally, we should be able to require known the
+			// arcType at this point, but that does not seem to work. Revisit
+			// once we have the structural cycle detection in place.
+
 			// TODO: should we avoid notifying ArcPending vertices here?
 			if task != nil {
 				arcState.addNotify2(task.node.node, task.id)
 			}
-			return arcReturn
+			if arc.ArcType == ArcPending {
+				return arcReturn
+			}
+			goto handleArcType
 
 		case yield:
 			arcState.process(needs, yield)
@@ -718,6 +725,7 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 		}
 	}
 
+handleArcType:
 	switch arc.ArcType {
 	case ArcMember:
 		return arcReturn

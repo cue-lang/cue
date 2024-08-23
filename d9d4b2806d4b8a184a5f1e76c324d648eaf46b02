@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "691d6a1a_e459e531",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-23T08:02:56Z",
+      "side": 1,
+      "message": "nit: can you consistently say \"evalv3\" for clarity?",
+      "revId": "d9d4b2806d4b8a184a5f1e76c324d648eaf46b02",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3773340e_891422ec",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 704,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-23T08:02:56Z",
+      "side": 1,
+      "message": "knowing? or otherwise I can\u0027t really understand this sentence",
+      "range": {
+        "startLine": 704,
+        "startChar": 57,
+        "endLine": 704,
+        "endChar": 62
+      },
+      "revId": "d9d4b2806d4b8a184a5f1e76c324d648eaf46b02",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

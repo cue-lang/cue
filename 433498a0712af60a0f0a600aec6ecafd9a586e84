@@ -1,0 +1,107 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8a33179_ac4f73f5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-23T08:09:48Z",
+      "side": 1,
+      "message": "nit: required properties, as that\u0027s what they are called in jsonschema.",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 6
+      },
+      "revId": "433498a0712af60a0f0a600aec6ecafd9a586e84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "892d06ac_b05094eb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-23T08:09:48Z",
+      "side": 1,
+      "message": "\u003e with required fields\n\nwould seem clearer to me. can you also give a very brief example, such as references within a definition or hidden field which do not form part of the root config data?",
+      "range": {
+        "startLine": 21,
+        "startChar": 47,
+        "endLine": 22,
+        "endChar": 6
+      },
+      "revId": "433498a0712af60a0f0a600aec6ecafd9a586e84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "262425f6_06c4ea64",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-23T08:09:48Z",
+      "side": 1,
+      "message": "could you rewrite the paragraph to not say \"this\" to refer to multiple things? I find it slightly confusing.",
+      "revId": "433498a0712af60a0f0a600aec6ecafd9a586e84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b54df157_9e54525a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-23T08:09:48Z",
+      "side": 1,
+      "message": "discrepancy",
+      "range": {
+        "startLine": 34,
+        "startChar": 22,
+        "endLine": 34,
+        "endChar": 33
+      },
+      "revId": "433498a0712af60a0f0a600aec6ecafd9a586e84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3740ddf_ff8ec37a",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 958,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-23T08:09:48Z",
+      "side": 1,
+      "message": "perhaps deduplicate this relatively large comment with something like \"see Vertex.lookup\" (or the other way around)?\n\nalso, I would be a bit clearer on when or why we would revisit this - for example, once we\u0027re looking at the query proposal.",
+      "revId": "433498a0712af60a0f0a600aec6ecafd9a586e84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

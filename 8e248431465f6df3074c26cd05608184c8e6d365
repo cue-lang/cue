@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "866ffc23_d7d0f2c7",
+        "filename": "internal/astinternal/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-23T13:07:29Z",
+      "side": 1,
+      "message": "I realise this is mainly just a moving of code, and this suggestion is 100% personal-taste-cosmetic, so a nit at most: when the case blocks get long like they are in this switch, I find it\u0027s nice to have a blank line before each new `case` line.\n\nI\u0027ve also never seen `default` appear anywhere other than at the end - I just went to the language spec to check that it doesn\u0027t do weird things. TIL!",
+      "revId": "8e248431465f6df3074c26cd05608184c8e6d365",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

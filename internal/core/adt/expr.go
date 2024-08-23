@@ -997,7 +997,7 @@ func (x *SelectorExpr) resolve(c *OpContext, state combinedFlags) *Vertex {
 	// - attempt: if we ensure that errors are propagated in pending arcs.
 	// - require: if we want to ensure that all arcs
 	//  are known now.
-	n := c.node(x, x.X, x.Sel.IsRegular(), attempt(partial, needFieldSetKnown))
+	n := c.node(x, x.X, x.Sel.IsRegular(), require(partial, needFieldSetKnown))
 	if n == emptyNode {
 		return n
 	}
@@ -1037,7 +1037,7 @@ func (x *IndexExpr) resolve(ctx *OpContext, state combinedFlags) *Vertex {
 	// order of evaluation is slightly off, causing too much to be evaluated.
 	// This may especially result in incorrect results when using embedded
 	// scalars.
-	n := ctx.node(x, x.X, true, attempt(partial, needFieldSetKnown))
+	n := ctx.node(x, x.X, true, require(partial, needFieldSetKnown))
 	i := ctx.value(x.Index, require(partial, scalarKnown))
 	if n == emptyNode {
 		return n

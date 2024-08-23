@@ -90,7 +90,6 @@ var skipDebugDepErrors = map[string]int{
 	"disjunctions/errors":      2,
 	"eval/conjuncts":           3,
 	"eval/issue2146":           4,
-	"eval/issue3301":           1,
 	"eval/issue599":            1,
 	"export/031":               1,
 	"fulleval/054_issue312":    1,

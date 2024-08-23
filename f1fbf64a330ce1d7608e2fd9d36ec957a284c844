@@ -16,6 +16,24 @@
       "message": "Do we already have good test coverage like this for optional fields?",
       "revId": "f1fbf64a330ce1d7608e2fd9d36ec957a284c844",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ffd6bb4d_f0c2015c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-23T08:07:40Z",
+      "side": 1,
+      "message": "I\u0027ve added a test for this in another CL that focusses on fixing the optional field referencing bug that we uncovered yesterday.",
+      "parentUuid": "40fd6d36_b68377d0",
+      "revId": "f1fbf64a330ce1d7608e2fd9d36ec957a284c844",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

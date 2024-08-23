@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1dda7619_1745a711",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 999,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-23T08:01:05Z",
+      "side": 1,
+      "message": "is this TODO about require vs attempt done now?",
+      "revId": "52499875ea678736ca909deb67d48360389612b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -15,6 +15,7 @@
 package toml_test
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
 	"strings"
@@ -28,6 +29,8 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/encoding/toml"
+	"cuelang.org/go/internal/astinternal"
+	"cuelang.org/go/internal/cuetxtar"
 )
 
 func TestDecoder(t *testing.T) {
@@ -859,4 +862,25 @@ func unindentMultiline(s string) string {
 	s = strings.TrimPrefix(s, "\n")
 	s = strings.TrimSuffix(s, "\n")
 	return s
+}
+
+func TestDecoderDebugPrint(t *testing.T) {
+	test := cuetxtar.TxTarTest{
+		Root: "testdata",
+		Name: "debugprint",
+	}
+
+	test.Run(t, func(t *cuetxtar.Test) {
+		for _, file := range t.Archive.Files {
+			if strings.HasPrefix(file.Name, "out/") {
+				continue
+			}
+			dec := toml.NewDecoder(file.Name, bytes.NewReader(file.Data))
+			node, err := dec.Decode()
+			qt.Assert(t, qt.IsNil(err))
+
+			w := t.Writer(file.Name)
+			astinternal.DebugPrint(w, node)
+		}
+	})
 }

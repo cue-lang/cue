@@ -1,0 +1,514 @@
+-- example.toml --
+# This is a TOML document.
+# Copied from various examples from the TOML spec website.
+
+title = "TOML Example"
+
+[owner]
+name = "Tom Preston-Werner"
+# TODO: support dates
+# dob = 1979-05-27T07:32:00-08:00
+
+[database]
+enabled = true
+ports = [ 8000, 8001, 8002 ]
+data = [ ["delta", "phi"], [3.14] ]
+temp_targets = { cpu = 79.5, case = 72.0 }
+
+[servers]
+
+[servers.alpha]
+ip = "10.0.0.1"
+role = "frontend"
+
+[servers.beta]
+ip = "10.0.0.2"
+role = "backend"
+
+[[products]]
+name = "Hammer"
+sku = 738594937
+
+[[products]]  # empty table within the array
+
+[[products]]
+name = "Nail"
+sku = 284758393
+
+color = "gray"
+-- out/debugprint/example.toml --
+*ast.StructLit{
+	Lbrace: token.Pos("-")
+	Elts: []ast.Decl{
+		*ast.Field{
+			Label: *ast.Ident{
+				NamePos: token.Pos("-")
+				Name: "title"
+			}
+			Optional: token.Pos("-")
+			Constraint: token.Token("ILLEGAL")
+			TokenPos: token.Pos("-")
+			Token: token.Token("ILLEGAL")
+			Value: *ast.BasicLit{
+				ValuePos: token.Pos("-")
+				Kind: token.Token("STRING")
+				Value: "\"TOML Example\""
+			}
+			Attrs: []*ast.Attribute{}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				NamePos: token.Pos("-")
+				Name: "owner"
+			}
+			Optional: token.Pos("-")
+			Constraint: token.Token("ILLEGAL")
+			TokenPos: token.Pos("-")
+			Token: token.Token("ILLEGAL")
+			Value: *ast.StructLit{
+				Lbrace: token.Pos("-")
+				Elts: []ast.Decl{
+					*ast.Field{
+						Label: *ast.Ident{
+							NamePos: token.Pos("-")
+							Name: "name"
+						}
+						Optional: token.Pos("-")
+						Constraint: token.Token("ILLEGAL")
+						TokenPos: token.Pos("-")
+						Token: token.Token("ILLEGAL")
+						Value: *ast.BasicLit{
+							ValuePos: token.Pos("-")
+							Kind: token.Token("STRING")
+							Value: "\"Tom Preston-Werner\""
+						}
+						Attrs: []*ast.Attribute{}
+					}
+				}
+				Rbrace: token.Pos("-")
+			}
+			Attrs: []*ast.Attribute{}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				NamePos: token.Pos("-")
+				Name: "database"
+			}
+			Optional: token.Pos("-")
+			Constraint: token.Token("ILLEGAL")
+			TokenPos: token.Pos("-")
+			Token: token.Token("ILLEGAL")
+			Value: *ast.StructLit{
+				Lbrace: token.Pos("-")
+				Elts: []ast.Decl{
+					*ast.Field{
+						Label: *ast.Ident{
+							NamePos: token.Pos("-")
+							Name: "enabled"
+						}
+						Optional: token.Pos("-")
+						Constraint: token.Token("ILLEGAL")
+						TokenPos: token.Pos("-")
+						Token: token.Token("ILLEGAL")
+						Value: *ast.BasicLit{
+							ValuePos: token.Pos("-")
+							Kind: token.Token("true")
+							Value: "true"
+						}
+						Attrs: []*ast.Attribute{}
+					}
+					*ast.Field{
+						Label: *ast.Ident{
+							NamePos: token.Pos("-")
+							Name: "ports"
+						}
+						Optional: token.Pos("-")
+						Constraint: token.Token("ILLEGAL")
+						TokenPos: token.Pos("-")
+						Token: token.Token("ILLEGAL")
+						Value: *ast.ListLit{
+							Lbrack: token.Pos("-")
+							Elts: []ast.Expr{
+								*ast.BasicLit{
+									ValuePos: token.Pos("-")
+									Kind: token.Token("INT")
+									Value: "8000"
+								}
+								*ast.BasicLit{
+									ValuePos: token.Pos("-")
+									Kind: token.Token("INT")
+									Value: "8001"
+								}
+								*ast.BasicLit{
+									ValuePos: token.Pos("-")
+									Kind: token.Token("INT")
+									Value: "8002"
+								}
+							}
+							Rbrack: token.Pos("-")
+						}
+						Attrs: []*ast.Attribute{}
+					}
+					*ast.Field{
+						Label: *ast.Ident{
+							NamePos: token.Pos("-")
+							Name: "data"
+						}
+						Optional: token.Pos("-")
+						Constraint: token.Token("ILLEGAL")
+						TokenPos: token.Pos("-")
+						Token: token.Token("ILLEGAL")
+						Value: *ast.ListLit{
+							Lbrack: token.Pos("-")
+							Elts: []ast.Expr{
+								*ast.ListLit{
+									Lbrack: token.Pos("-")
+									Elts: []ast.Expr{
+										*ast.BasicLit{
+											ValuePos: token.Pos("-")
+											Kind: token.Token("STRING")
+											Value: "\"delta\""
+										}
+										*ast.BasicLit{
+											ValuePos: token.Pos("-")
+											Kind: token.Token("STRING")
+											Value: "\"phi\""
+										}
+									}
+									Rbrack: token.Pos("-")
+								}
+								*ast.ListLit{
+									Lbrack: token.Pos("-")
+									Elts: []ast.Expr{
+										*ast.BasicLit{
+											ValuePos: token.Pos("-")
+											Kind: token.Token("FLOAT")
+											Value: "3.14"
+										}
+									}
+									Rbrack: token.Pos("-")
+								}
+							}
+							Rbrack: token.Pos("-")
+						}
+						Attrs: []*ast.Attribute{}
+					}
+					*ast.Field{
+						Label: *ast.Ident{
+							NamePos: token.Pos("-")
+							Name: "temp_targets"
+						}
+						Optional: token.Pos("-")
+						Constraint: token.Token("ILLEGAL")
+						TokenPos: token.Pos("-")
+						Token: token.Token("ILLEGAL")
+						Value: *ast.StructLit{
+							Lbrace: token.Pos("-")
+							Elts: []ast.Decl{
+								*ast.Field{
+									Label: *ast.Ident{
+										NamePos: token.Pos("-")
+										Name: "cpu"
+									}
+									Optional: token.Pos("-")
+									Constraint: token.Token("ILLEGAL")
+									TokenPos: token.Pos("-")
+									Token: token.Token("ILLEGAL")
+									Value: *ast.BasicLit{
+										ValuePos: token.Pos("-")
+										Kind: token.Token("FLOAT")
+										Value: "79.5"
+									}
+									Attrs: []*ast.Attribute{}
+								}
+								*ast.Field{
+									Label: *ast.Ident{
+										NamePos: token.Pos("-")
+										Name: "case"
+									}
+									Optional: token.Pos("-")
+									Constraint: token.Token("ILLEGAL")
+									TokenPos: token.Pos("-")
+									Token: token.Token("ILLEGAL")
+									Value: *ast.BasicLit{
+										ValuePos: token.Pos("-")
+										Kind: token.Token("FLOAT")
+										Value: "72.0"
+									}
+									Attrs: []*ast.Attribute{}
+								}
+							}
+							Rbrace: token.Pos("-")
+						}
+						Attrs: []*ast.Attribute{}
+					}
+				}
+				Rbrace: token.Pos("-")
+			}
+			Attrs: []*ast.Attribute{}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				NamePos: token.Pos("-")
+				Name: "servers"
+			}
+			Optional: token.Pos("-")
+			Constraint: token.Token("ILLEGAL")
+			TokenPos: token.Pos("-")
+			Token: token.Token("ILLEGAL")
+			Value: *ast.StructLit{
+				Lbrace: token.Pos("-")
+				Elts: []ast.Decl{}
+				Rbrace: token.Pos("-")
+			}
+			Attrs: []*ast.Attribute{}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				NamePos: token.Pos("-")
+				Name: "servers"
+			}
+			Optional: token.Pos("-")
+			Constraint: token.Token("ILLEGAL")
+			TokenPos: token.Pos("-")
+			Token: token.Token("ILLEGAL")
+			Value: *ast.StructLit{
+				Lbrace: token.Pos("-")
+				Elts: []ast.Decl{
+					*ast.Field{
+						Label: *ast.Ident{
+							NamePos: token.Pos("-")
+							Name: "alpha"
+						}
+						Optional: token.Pos("-")
+						Constraint: token.Token("ILLEGAL")
+						TokenPos: token.Pos("-")
+						Token: token.Token("ILLEGAL")
+						Value: *ast.StructLit{
+							Lbrace: token.Pos("-")
+							Elts: []ast.Decl{
+								*ast.Field{
+									Label: *ast.Ident{
+										NamePos: token.Pos("-")
+										Name: "ip"
+									}
+									Optional: token.Pos("-")
+									Constraint: token.Token("ILLEGAL")
+									TokenPos: token.Pos("-")
+									Token: token.Token("ILLEGAL")
+									Value: *ast.BasicLit{
+										ValuePos: token.Pos("-")
+										Kind: token.Token("STRING")
+										Value: "\"10.0.0.1\""
+									}
+									Attrs: []*ast.Attribute{}
+								}
+								*ast.Field{
+									Label: *ast.Ident{
+										NamePos: token.Pos("-")
+										Name: "role"
+									}
+									Optional: token.Pos("-")
+									Constraint: token.Token("ILLEGAL")
+									TokenPos: token.Pos("-")
+									Token: token.Token("ILLEGAL")
+									Value: *ast.BasicLit{
+										ValuePos: token.Pos("-")
+										Kind: token.Token("STRING")
+										Value: "\"frontend\""
+									}
+									Attrs: []*ast.Attribute{}
+								}
+							}
+							Rbrace: token.Pos("-")
+						}
+						Attrs: []*ast.Attribute{}
+					}
+				}
+				Rbrace: token.Pos("-")
+			}
+			Attrs: []*ast.Attribute{}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				NamePos: token.Pos("-")
+				Name: "servers"
+			}
+			Optional: token.Pos("-")
+			Constraint: token.Token("ILLEGAL")
+			TokenPos: token.Pos("-")
+			Token: token.Token("ILLEGAL")
+			Value: *ast.StructLit{
+				Lbrace: token.Pos("-")
+				Elts: []ast.Decl{
+					*ast.Field{
+						Label: *ast.Ident{
+							NamePos: token.Pos("-")
+							Name: "beta"
+						}
+						Optional: token.Pos("-")
+						Constraint: token.Token("ILLEGAL")
+						TokenPos: token.Pos("-")
+						Token: token.Token("ILLEGAL")
+						Value: *ast.StructLit{
+							Lbrace: token.Pos("-")
+							Elts: []ast.Decl{
+								*ast.Field{
+									Label: *ast.Ident{
+										NamePos: token.Pos("-")
+										Name: "ip"
+									}
+									Optional: token.Pos("-")
+									Constraint: token.Token("ILLEGAL")
+									TokenPos: token.Pos("-")
+									Token: token.Token("ILLEGAL")
+									Value: *ast.BasicLit{
+										ValuePos: token.Pos("-")
+										Kind: token.Token("STRING")
+										Value: "\"10.0.0.2\""
+									}
+									Attrs: []*ast.Attribute{}
+								}
+								*ast.Field{
+									Label: *ast.Ident{
+										NamePos: token.Pos("-")
+										Name: "role"
+									}
+									Optional: token.Pos("-")
+									Constraint: token.Token("ILLEGAL")
+									TokenPos: token.Pos("-")
+									Token: token.Token("ILLEGAL")
+									Value: *ast.BasicLit{
+										ValuePos: token.Pos("-")
+										Kind: token.Token("STRING")
+										Value: "\"backend\""
+									}
+									Attrs: []*ast.Attribute{}
+								}
+							}
+							Rbrace: token.Pos("-")
+						}
+						Attrs: []*ast.Attribute{}
+					}
+				}
+				Rbrace: token.Pos("-")
+			}
+			Attrs: []*ast.Attribute{}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				NamePos: token.Pos("-")
+				Name: "products"
+			}
+			Optional: token.Pos("-")
+			Constraint: token.Token("ILLEGAL")
+			TokenPos: token.Pos("-")
+			Token: token.Token("ILLEGAL")
+			Value: *ast.ListLit{
+				Lbrack: token.Pos("-")
+				Elts: []ast.Expr{
+					*ast.StructLit{
+						Lbrace: token.Pos("-")
+						Elts: []ast.Decl{
+							*ast.Field{
+								Label: *ast.Ident{
+									NamePos: token.Pos("-")
+									Name: "name"
+								}
+								Optional: token.Pos("-")
+								Constraint: token.Token("ILLEGAL")
+								TokenPos: token.Pos("-")
+								Token: token.Token("ILLEGAL")
+								Value: *ast.BasicLit{
+									ValuePos: token.Pos("-")
+									Kind: token.Token("STRING")
+									Value: "\"Hammer\""
+								}
+								Attrs: []*ast.Attribute{}
+							}
+							*ast.Field{
+								Label: *ast.Ident{
+									NamePos: token.Pos("-")
+									Name: "sku"
+								}
+								Optional: token.Pos("-")
+								Constraint: token.Token("ILLEGAL")
+								TokenPos: token.Pos("-")
+								Token: token.Token("ILLEGAL")
+								Value: *ast.BasicLit{
+									ValuePos: token.Pos("-")
+									Kind: token.Token("INT")
+									Value: "738594937"
+								}
+								Attrs: []*ast.Attribute{}
+							}
+						}
+						Rbrace: token.Pos("-")
+					}
+					*ast.StructLit{
+						Lbrace: token.Pos("-")
+						Elts: []ast.Decl{}
+						Rbrace: token.Pos("-")
+					}
+					*ast.StructLit{
+						Lbrace: token.Pos("-")
+						Elts: []ast.Decl{
+							*ast.Field{
+								Label: *ast.Ident{
+									NamePos: token.Pos("-")
+									Name: "name"
+								}
+								Optional: token.Pos("-")
+								Constraint: token.Token("ILLEGAL")
+								TokenPos: token.Pos("-")
+								Token: token.Token("ILLEGAL")
+								Value: *ast.BasicLit{
+									ValuePos: token.Pos("-")
+									Kind: token.Token("STRING")
+									Value: "\"Nail\""
+								}
+								Attrs: []*ast.Attribute{}
+							}
+							*ast.Field{
+								Label: *ast.Ident{
+									NamePos: token.Pos("-")
+									Name: "sku"
+								}
+								Optional: token.Pos("-")
+								Constraint: token.Token("ILLEGAL")
+								TokenPos: token.Pos("-")
+								Token: token.Token("ILLEGAL")
+								Value: *ast.BasicLit{
+									ValuePos: token.Pos("-")
+									Kind: token.Token("INT")
+									Value: "284758393"
+								}
+								Attrs: []*ast.Attribute{}
+							}
+							*ast.Field{
+								Label: *ast.Ident{
+									NamePos: token.Pos("-")
+									Name: "color"
+								}
+								Optional: token.Pos("-")
+								Constraint: token.Token("ILLEGAL")
+								TokenPos: token.Pos("-")
+								Token: token.Token("ILLEGAL")
+								Value: *ast.BasicLit{
+									ValuePos: token.Pos("-")
+									Kind: token.Token("STRING")
+									Value: "\"gray\""
+								}
+								Attrs: []*ast.Attribute{}
+							}
+						}
+						Rbrace: token.Pos("-")
+					}
+				}
+				Rbrack: token.Pos("-")
+			}
+			Attrs: []*ast.Attribute{}
+		}
+	}
+	Rbrace: token.Pos("-")
+}

@@ -16,6 +16,24 @@
       "message": "is this TODO about require vs attempt done now?",
       "revId": "52499875ea678736ca909deb67d48360389612b8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4add1af_aef951a4",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 999,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-23T08:22:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1dda7619_1745a711",
+      "revId": "52499875ea678736ca909deb67d48360389612b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

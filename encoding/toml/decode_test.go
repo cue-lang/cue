@@ -803,8 +803,6 @@ line two.\
 
 			// Ensure that the CUE node can be compiled into a cue.Value and validated.
 			ctx := cuecontext.New()
-			// TODO(mvdan): cue.Context can only build ast.Expr or ast.File, not ast.Node;
-			// it's then likely not the right choice for the interface to return ast.Node.
 			val := ctx.BuildFile(file)
 			qt.Assert(t, qt.IsNil(val.Err()))
 			qt.Assert(t, qt.IsNil(val.Validate()))

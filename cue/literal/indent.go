@@ -19,7 +19,7 @@ import "strings"
 // IndentTabs takes a quoted string and reindents it for the given indentation.
 // If a string is not a multiline string it will return the string as is.
 func IndentTabs(s string, n int) string {
-	indent := tabs(n)
+	indent := strings.Repeat("\t", n)
 
 	qi, _, _, err := ParseQuotes(s, s)
 	if err != nil || !qi.multiline || qi.whitespace == indent {

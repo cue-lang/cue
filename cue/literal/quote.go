@@ -48,29 +48,15 @@ type Form struct {
 // WithTabIndent returns a new Form with indentation set to the given number
 // of tabs. The result will be a multiline string.
 func (f Form) WithTabIndent(n int) Form {
-	f.indent = tabs(n)
+	f.indent = strings.Repeat("\t", n)
 	f.multiline = true
 	return f
-}
-
-const tabIndent = "\t\t\t\t\t\t\t\t\t\t\t\t"
-
-func tabs(n int) string {
-	if n < len(tabIndent) {
-		return tabIndent[:n]
-	}
-	return strings.Repeat("\t", n)
 }
 
 // WithOptionalIndent is like WithTabIndent, but only returns a multiline
 // strings if it doesn't contain any newline characters.
 func (f Form) WithOptionalTabIndent(tabs int) Form {
-	// TODO(mvdan): remove this optimization once Go 1.23 lands with https://go.dev/cl/536615
-	if tabs < len(tabIndent) {
-		f.indent = tabIndent[:tabs]
-	} else {
-		f.indent = strings.Repeat("\t", tabs)
-	}
+	f.indent = strings.Repeat("\t", tabs)
 	f.auto = true
 	return f
 }

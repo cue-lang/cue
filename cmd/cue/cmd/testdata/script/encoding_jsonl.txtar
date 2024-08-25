@@ -28,8 +28,6 @@ cmp stdout export-one.stdout
 
 # Check that `cue import` supports all filenames too,
 # both by default and when loading JSON only.
-# TODO(mvdan): note that `cue import --dry-run` does not work,
-# so we need to use rm and stderr checks to ensure we create the files we expect.
 
 ! exec cue import --list --dry-run .
 stderr 'invalid JSON .*input-many.json.* after top-level value'

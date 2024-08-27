@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "13b89ced_e0ba0b37",
+        "filename": "internal/astinternal/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-27T09:25:11Z",
+      "side": 1,
+      "message": "Okie doke. FWIW, I don\u0027t think I\u0027d classify this as a \"debugging API\" now that it\u0027s part of CI.",
+      "parentUuid": "0ea28cdd_601c8bbc",
+      "revId": "8e248431465f6df3074c26cd05608184c8e6d365",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "866ffc23_d7d0f2c7",

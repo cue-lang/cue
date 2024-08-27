@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "97f34db1_046e4dd5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-27T08:57:52Z",
+      "side": 1,
+      "message": "LGTM with a few minor suggestions, thanks!",
+      "revId": "c92933cf4a4fe7e0db494fa5ecf0cc5e9b2d7929",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a660c3ca_6597ec6f",
+        "filename": "encoding/jsonschema/constraints_array.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-27T08:57:52Z",
+      "side": 1,
+      "message": "maybe return early to avoid setting minContains to zero?",
+      "revId": "c92933cf4a4fe7e0db494fa5ecf0cc5e9b2d7929",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd9cf03b_f5bf8eab",
+        "filename": "encoding/jsonschema/constraints_array.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-27T08:57:52Z",
+      "side": 1,
+      "message": "ditto.",
+      "revId": "c92933cf4a4fe7e0db494fa5ecf0cc5e9b2d7929",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "728f0233_c5064acc",
+        "filename": "encoding/jsonschema/constraints_array.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-27T08:57:52Z",
+      "side": 1,
+      "message": "Why not continue to use uint64 ? Then we won\u0027t need the type conversions to int (which might potentially overflow on a 32 bit machine).",
+      "revId": "c92933cf4a4fe7e0db494fa5ecf0cc5e9b2d7929",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "976df219_5c713710",
+        "filename": "encoding/jsonschema/constraints_array.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-27T08:57:52Z",
+      "side": 1,
+      "message": "```suggestion\n\tvar c ast.Expr \u003d \u0026ast.UnaryExpr{\n```\n?",
+      "revId": "c92933cf4a4fe7e0db494fa5ecf0cc5e9b2d7929",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

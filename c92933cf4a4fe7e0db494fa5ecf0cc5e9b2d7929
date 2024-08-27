@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4f5af89d_4b8f6347",
+        "filename": "encoding/jsonschema/constraints_array.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-27T11:39:58Z",
+      "side": 1,
+      "message": "What I mean is that if it\u0027s not a valid integer, we\u0027ll both generate an error _and_ set `s.minContains` to a non-nil pointer to zero. Doing that might lead to misleading error messages later, so it seems a bit more defensive to return early just after calling `errf`.",
+      "parentUuid": "47e4426c_884e6770",
+      "revId": "c92933cf4a4fe7e0db494fa5ecf0cc5e9b2d7929",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bd9cf03b_f5bf8eab",
         "filename": "encoding/jsonschema/constraints_array.go",
         "patchSetId": 5
@@ -84,6 +102,24 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "bd9cf03b_f5bf8eab",
+      "revId": "c92933cf4a4fe7e0db494fa5ecf0cc5e9b2d7929",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47129afd_89ed1bb6",
+        "filename": "encoding/jsonschema/constraints_array.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-27T11:39:58Z",
+      "side": 1,
+      "message": "ditto 😊",
+      "parentUuid": "1cc4fd34_a4867e21",
       "revId": "c92933cf4a4fe7e0db494fa5ecf0cc5e9b2d7929",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

@@ -54,6 +54,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd1e2261_dcb883ab",
+        "filename": "internal/astinternal/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-27T09:28:23Z",
+      "side": 1,
+      "message": "Do you mean that it\u0027s being tested by CI? I meant debugging API in terms of it being internal and only to be used by debugging tools (like cue-ast-print) or tests, so it will never be reachable by any \"production\" stuff like cmd/cue or exported APIs.",
+      "parentUuid": "13b89ced_e0ba0b37",
+      "revId": "8e248431465f6df3074c26cd05608184c8e6d365",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "866ffc23_d7d0f2c7",

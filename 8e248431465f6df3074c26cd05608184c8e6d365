@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ea28cdd_601c8bbc",
+        "filename": "internal/astinternal/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-27T09:12:03Z",
+      "side": 1,
+      "message": "I tend to agree with you in principle. However, since this is an internal API that is really only used with buffers or stdout/stderr right now, the errors really don\u0027t matter at all for now. Adding error handling would be adding a good number of lines of code for little benefit.\n\nIf I were pressed to deal with the errors, I would probably rewrite this API to be append-like, such as `func AppendDebug(dst []byte, node ast.Node) []byte`, since `append` never fails, unlike `io.Writer.Write`. There\u0027s no particular reason why I avoided that here, I think just out of habit. Since it\u0027s an internal API, we can change it like that whenever we like.\n\nI\u0027ve added a note to the godoc as you suggest.",
+      "parentUuid": "3d0f65c2_81ad0ee0",
+      "revId": "8e248431465f6df3074c26cd05608184c8e6d365",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "866ffc23_d7d0f2c7",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-08-23T13:07:29Z",
       "side": 1,
       "message": "I realise this is mainly just a moving of code, and this suggestion is 100% personal-taste-cosmetic, so a nit at most: when the case blocks get long like they are in this switch, I find it\u0027s nice to have a blank line before each new `case` line.\n\nI\u0027ve also never seen `default` appear anywhere other than at the end - I just went to the language spec to check that it doesn\u0027t do weird things. TIL!",
+      "revId": "8e248431465f6df3074c26cd05608184c8e6d365",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba169fb8_17d145b2",
+        "filename": "internal/astinternal/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-27T09:12:03Z",
+      "side": 1,
+      "message": "Sure, I\u0027ll add the empty lines. I agree they can help, I had them in the other switch but not here. I would prefer to keep this as a \"just move code\" change, but I also don\u0027t feel like it\u0027s a significant enough change to mean another commit.\n\nDefault cases can be anywhere indeed, the only behavior that is affected by the order of switch cases is `fallthrough`. There is a general consensus to leave `default` as either the last case (most common) or the first case though, for the sake of readability. I\u0027m personally happy with either - I tend to use it as the last case when it\u0027s the error case or the most complex case, and I tend to use it as the first when it\u0027s the easy or \"base\" case, like here.",
+      "parentUuid": "866ffc23_d7d0f2c7",
       "revId": "8e248431465f6df3074c26cd05608184c8e6d365",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

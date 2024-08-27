@@ -71,6 +71,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dbfda5a8_c7c57519",
+        "filename": "encoding/jsonschema/constraints_array.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-27T12:00:27Z",
+      "side": 1,
+      "message": "Thank you for the explanation! That sounds reasonable.",
+      "parentUuid": "4f5af89d_4b8f6347",
+      "revId": "c92933cf4a4fe7e0db494fa5ecf0cc5e9b2d7929",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bd9cf03b_f5bf8eab",
@@ -120,6 +138,24 @@
       "side": 1,
       "message": "ditto 😊",
       "parentUuid": "1cc4fd34_a4867e21",
+      "revId": "c92933cf4a4fe7e0db494fa5ecf0cc5e9b2d7929",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce7fd927_83b2e626",
+        "filename": "encoding/jsonschema/constraints_array.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-27T12:00:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "47129afd_89ed1bb6",
       "revId": "c92933cf4a4fe7e0db494fa5ecf0cc5e9b2d7929",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

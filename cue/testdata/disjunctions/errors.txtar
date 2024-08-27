@@ -31,16 +31,26 @@ explicitDefaultError: {
 	if a != "" {
 	}
 }
+
+issue2916: {
+	b: _
+	[_]: c:      uint | *1
+	[string]: c: >=3 | *3
+}
+issue3157: {
+	foo: *42 | _
+	foo: *43 | bool
+}
 -- out/eval/stats --
 Leaks:  0
-Freed:  40
-Reused: 32
-Allocs: 8
+Freed:  57
+Reused: 48
+Allocs: 9
 Retain: 0
 
-Unifications: 28
-Conjuncts:    56
-Disjuncts:    40
+Unifications: 33
+Conjuncts:    77
+Disjuncts:    57
 -- out/evalalpha --
 Errors:
 issue516.x.match: field not allowed:
@@ -112,6 +122,14 @@ Result:
     //     ./in.cue:28:5
     a: (string){ string }
   }
+  issue2916: (struct){
+    b: (struct){
+      c: (int){ |((int){ &(>=3, int) }, (int){ 3 }) }
+    }
+  }
+  issue3157: (struct){
+    foo: ((bool|int)){ |((int){ 43 }, (bool){ bool }) }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -182,6 +200,19 @@ diff old new
          metrics: (struct){
            foo: (struct){
            }
+@@ -86,10 +70,10 @@
+   }
+   issue2916: (struct){
+     b: (struct){
+-      c: (int){ |(*(int){ 3 }, (int){ &(>=3, int) }) }
++      c: (int){ |((int){ &(>=3, int) }, (int){ 3 }) }
+     }
+   }
+   issue3157: (struct){
+-    foo: ((bool|int)){ |(*(int){ 43 }, (bool){ bool }) }
++    foo: ((bool|int)){ |((int){ 43 }, (bool){ bool }) }
+   }
+ }
 -- diff/todo/p1 --
 issue570.results.result: Spurious error: field not allowed
 This is probably due to the disjunction in the #Output field.
@@ -192,6 +223,7 @@ Missing error positions.
 The additional "field not allowed" error is correct and a message corresponding
 to one of the conjuncts failing.
 issue516.x.match: changes are okay and arguably better.
+issue2916 and issue3157: the old evaluator incorrectly kept a default in the output.
 -- out/eval --
 Errors:
 issue516.x: 2 errors in empty disjunction:
@@ -279,6 +311,14 @@ Result:
     //     ./in.cue:28:5
     a: (string){ string }
   }
+  issue2916: (struct){
+    b: (struct){
+      c: (int){ |(*(int){ 3 }, (int){ &(>=3, int) }) }
+    }
+  }
+  issue3157: (struct){
+    foo: ((bool|int)){ |(*(int){ 43 }, (bool){ bool }) }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -320,5 +360,18 @@ Result:
   explicitDefaultError: {
     a: (string|*_|_(explicit error (_|_ literal) in source))
     if (〈0;a〉 != "") {}
+  }
+  issue2916: {
+    b: _
+    [_]: {
+      c: (&(int, >=0)|*1)
+    }
+    [string]: {
+      c: (>=3|*3)
+    }
+  }
+  issue3157: {
+    foo: (*42|_)
+    foo: (*43|bool)
   }
 }

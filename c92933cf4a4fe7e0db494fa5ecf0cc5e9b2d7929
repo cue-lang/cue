@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "47e4426c_884e6770",
+        "filename": "encoding/jsonschema/constraints_array.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-27T09:52:28Z",
+      "side": 1,
+      "message": "According to https://json-schema.org/draft/2019-09/draft-handrews-json-schema-validation-02#rfc.section.6.4.5, zero should be allowed.",
+      "parentUuid": "a660c3ca_6597ec6f",
+      "revId": "c92933cf4a4fe7e0db494fa5ecf0cc5e9b2d7929",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bd9cf03b_f5bf8eab",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-08-27T08:57:52Z",
       "side": 1,
       "message": "ditto.",
+      "revId": "c92933cf4a4fe7e0db494fa5ecf0cc5e9b2d7929",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1cc4fd34_a4867e21",
+        "filename": "encoding/jsonschema/constraints_array.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-27T09:52:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bd9cf03b_f5bf8eab",
       "revId": "c92933cf4a4fe7e0db494fa5ecf0cc5e9b2d7929",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3df3bac9_9d0bc7d6",
+        "filename": "encoding/jsonschema/constraints_array.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-27T09:52:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "728f0233_c5064acc",
+      "revId": "c92933cf4a4fe7e0db494fa5ecf0cc5e9b2d7929",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "976df219_5c713710",
@@ -82,6 +136,24 @@
       "writtenOn": "2024-08-27T08:57:52Z",
       "side": 1,
       "message": "```suggestion\n\tvar c ast.Expr \u003d \u0026ast.UnaryExpr{\n```\n?",
+      "revId": "c92933cf4a4fe7e0db494fa5ecf0cc5e9b2d7929",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "76dc18d4_6db083c4",
+        "filename": "encoding/jsonschema/constraints_array.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-08-27T09:52:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "976df219_5c713710",
       "revId": "c92933cf4a4fe7e0db494fa5ecf0cc5e9b2d7929",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

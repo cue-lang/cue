@@ -1,0 +1,329 @@
+-- in.cue --
+#TimeSpan: {
+	start:    float
+	duration: float
+	end:      float
+
+	start:    end - duration
+	duration: end - start
+	end:      start + duration
+
+	start: <=end
+}
+
+examples: [string]: #TimeSpan
+
+examples: eg1: {
+    start: 10.0
+    duration: 2.1
+}
+
+examples: eg2: {
+    start: 10.0
+}
+
+examples: eg3: {
+    end: 10.0
+}
+-- out/evalalpha/stats --
+Leaks:  19
+Freed:  0
+Reused: 0
+Allocs: 19
+Retain: 0
+
+Unifications: 19
+Conjuncts:    98
+Disjuncts:    0
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  0
+-Freed:  18
+-Reused: 12
+-Allocs: 6
+-Retain: 269
++Leaks:  19
++Freed:  0
++Reused: 0
++Allocs: 19
++Retain: 0
+ 
+-Unifications: 18
+-Conjuncts:    354
+-Disjuncts:    19
++Unifications: 19
++Conjuncts:    98
++Disjuncts:    0
+-- out/eval/stats --
+Leaks:  0
+Freed:  18
+Reused: 12
+Allocs: 6
+Retain: 269
+
+Unifications: 18
+Conjuncts:    354
+Disjuncts:    19
+-- out/evalalpha --
+(struct){
+  #TimeSpan: (#struct){
+    start: (_|_){
+      // [incomplete] #TimeSpan.start: non-concrete value end for bound <=:
+      //     ./in.cue:10:11
+      // #TimeSpan.start: non-concrete value float in operand to -:
+      //     ./in.cue:6:12
+      //     ./in.cue:4:12
+      // #TimeSpan.duration: non-concrete value float in operand to -:
+      //     ./in.cue:7:12
+      //     ./in.cue:4:12
+    }
+    duration: (_|_){
+      // [incomplete] #TimeSpan.start: non-concrete value end for bound <=:
+      //     ./in.cue:10:11
+      // #TimeSpan.duration: non-concrete value float in operand to -:
+      //     ./in.cue:7:12
+      //     ./in.cue:4:12
+    }
+    end: (_|_){
+      // [incomplete] #TimeSpan.start: non-concrete value end for bound <=:
+      //     ./in.cue:10:11
+      // #TimeSpan.start: non-concrete value float in operand to -:
+      //     ./in.cue:6:12
+      //     ./in.cue:4:12
+      // #TimeSpan.duration: non-concrete value float in operand to -:
+      //     ./in.cue:7:12
+      //     ./in.cue:4:12
+    }
+  }
+  examples: (struct){
+    eg1: (#struct){
+      start: (float){ 10.0 }
+      duration: (float){ 2.1 }
+      end: (float){ 12.1 }
+    }
+    eg2: (#struct){
+      start: (_|_){
+        // [incomplete] examples.eg2.start: non-concrete value end for bound <=:
+        //     ./in.cue:10:11
+        // examples.eg2.duration: non-concrete value float in operand to -:
+        //     ./in.cue:7:12
+        //     ./in.cue:4:12
+      }
+      duration: (_|_){
+        // [incomplete] examples.eg2.start: non-concrete value end for bound <=:
+        //     ./in.cue:10:11
+        // examples.eg2.duration: non-concrete value float in operand to -:
+        //     ./in.cue:7:12
+        //     ./in.cue:4:12
+      }
+      end: (_|_){
+        // [incomplete] examples.eg2.start: non-concrete value end for bound <=:
+        //     ./in.cue:10:11
+        // examples.eg2.duration: non-concrete value float in operand to -:
+        //     ./in.cue:7:12
+        //     ./in.cue:4:12
+      }
+    }
+    eg3: (#struct){
+      end: (_|_){
+        // [incomplete] examples.eg3.duration: non-concrete value <=10.0 & float in operand to -:
+        //     ./in.cue:7:12
+        //     ./in.cue:10:9
+      }
+      start: (_|_){
+        // [incomplete] examples.eg3.duration: non-concrete value <=10.0 & float in operand to -:
+        //     ./in.cue:7:12
+        //     ./in.cue:10:9
+      }
+      duration: (_|_){
+        // [incomplete] examples.eg3.duration: non-concrete value <=10.0 & float in operand to -:
+        //     ./in.cue:7:12
+        //     ./in.cue:10:9
+      }
+    }
+  }
+}
+-- diff/explanation --
+the new evaluator includes positions with the cycle error and the old evaluator does not.
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,15 +1,31 @@
+ (struct){
+   #TimeSpan: (#struct){
+     start: (_|_){
+-      // [cycle] cycle error
++      // [incomplete] #TimeSpan.start: non-concrete value end for bound <=:
++      //     ./in.cue:10:11
++      // #TimeSpan.start: non-concrete value float in operand to -:
++      //     ./in.cue:6:12
++      //     ./in.cue:4:12
++      // #TimeSpan.duration: non-concrete value float in operand to -:
++      //     ./in.cue:7:12
++      //     ./in.cue:4:12
+     }
+     duration: (_|_){
+-      // [cycle] cycle error:
+-      //     ./in.cue:7:12
++      // [incomplete] #TimeSpan.start: non-concrete value end for bound <=:
++      //     ./in.cue:10:11
++      // #TimeSpan.duration: non-concrete value float in operand to -:
++      //     ./in.cue:7:12
++      //     ./in.cue:4:12
+     }
+     end: (_|_){
+-      // [cycle] cycle error:
+-      //     ./in.cue:8:12
++      // [incomplete] #TimeSpan.start: non-concrete value end for bound <=:
++      //     ./in.cue:10:11
++      // #TimeSpan.start: non-concrete value float in operand to -:
++      //     ./in.cue:6:12
++      //     ./in.cue:4:12
++      // #TimeSpan.duration: non-concrete value float in operand to -:
++      //     ./in.cue:7:12
++      //     ./in.cue:4:12
+     }
+   }
+   examples: (struct){
+@@ -20,26 +36,42 @@
+     }
+     eg2: (#struct){
+       start: (_|_){
+-        // [cycle] cycle error
+-      }
+-      duration: (_|_){
+-        // [cycle] cycle error:
+-        //     ./in.cue:7:12
+-      }
+-      end: (_|_){
+-        // [cycle] cycle error
++        // [incomplete] examples.eg2.start: non-concrete value end for bound <=:
++        //     ./in.cue:10:11
++        // examples.eg2.duration: non-concrete value float in operand to -:
++        //     ./in.cue:7:12
++        //     ./in.cue:4:12
++      }
++      duration: (_|_){
++        // [incomplete] examples.eg2.start: non-concrete value end for bound <=:
++        //     ./in.cue:10:11
++        // examples.eg2.duration: non-concrete value float in operand to -:
++        //     ./in.cue:7:12
++        //     ./in.cue:4:12
++      }
++      end: (_|_){
++        // [incomplete] examples.eg2.start: non-concrete value end for bound <=:
++        //     ./in.cue:10:11
++        // examples.eg2.duration: non-concrete value float in operand to -:
++        //     ./in.cue:7:12
++        //     ./in.cue:4:12
+       }
+     }
+     eg3: (#struct){
+       end: (_|_){
+-        // [cycle] cycle error:
+-        //     ./in.cue:8:12
+-      }
+-      start: (_|_){
+-        // [cycle] cycle error
+-      }
+-      duration: (_|_){
+-        // [cycle] cycle error
++        // [incomplete] examples.eg3.duration: non-concrete value <=10.0 & float in operand to -:
++        //     ./in.cue:7:12
++        //     ./in.cue:10:9
++      }
++      start: (_|_){
++        // [incomplete] examples.eg3.duration: non-concrete value <=10.0 & float in operand to -:
++        //     ./in.cue:7:12
++        //     ./in.cue:10:9
++      }
++      duration: (_|_){
++        // [incomplete] examples.eg3.duration: non-concrete value <=10.0 & float in operand to -:
++        //     ./in.cue:7:12
++        //     ./in.cue:10:9
+       }
+     }
+   }
+-- out/eval --
+(struct){
+  #TimeSpan: (#struct){
+    start: (_|_){
+      // [cycle] cycle error
+    }
+    duration: (_|_){
+      // [cycle] cycle error:
+      //     ./in.cue:7:12
+    }
+    end: (_|_){
+      // [cycle] cycle error:
+      //     ./in.cue:8:12
+    }
+  }
+  examples: (struct){
+    eg1: (#struct){
+      start: (float){ 10.0 }
+      duration: (float){ 2.1 }
+      end: (float){ 12.1 }
+    }
+    eg2: (#struct){
+      start: (_|_){
+        // [cycle] cycle error
+      }
+      duration: (_|_){
+        // [cycle] cycle error:
+        //     ./in.cue:7:12
+      }
+      end: (_|_){
+        // [cycle] cycle error
+      }
+    }
+    eg3: (#struct){
+      end: (_|_){
+        // [cycle] cycle error:
+        //     ./in.cue:8:12
+      }
+      start: (_|_){
+        // [cycle] cycle error
+      }
+      duration: (_|_){
+        // [cycle] cycle error
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #TimeSpan: {
+    start: float
+    duration: float
+    end: float
+    start: (〈0;end〉 - 〈0;duration〉)
+    duration: (〈0;end〉 - 〈0;start〉)
+    end: (〈0;start〉 + 〈0;duration〉)
+    start: <=〈0;end〉
+  }
+  examples: {
+    [string]: 〈1;#TimeSpan〉
+  }
+  examples: {
+    eg1: {
+      start: 10.0
+      duration: 2.1
+    }
+  }
+  examples: {
+    eg2: {
+      start: 10.0
+    }
+  }
+  examples: {
+    eg3: {
+      end: 10.0
+    }
+  }
+}

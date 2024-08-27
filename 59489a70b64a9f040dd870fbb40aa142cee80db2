@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07d064cb_ced083e6",
+        "filename": "internal/astinternal/debug_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-27T08:32:14Z",
+      "side": 1,
+      "message": "(fwiw, this is what triggered me to go digging into errors - the fact that there\u0027s no `qt.Assert` on the result of `DebugPrint`).",
+      "revId": "59489a70b64a9f040dd870fbb40aa142cee80db2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

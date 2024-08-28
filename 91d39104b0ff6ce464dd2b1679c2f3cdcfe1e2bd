@@ -16,6 +16,24 @@
       "message": "FWIW, I\u0027d just like to record I\u0027m not a fan of this.\n\nThe test output, which we would wish to review as part of reviewing a CL (and so need to be able to understand and review diffs thereof too):\n\n1. does not state what properties are being asserted,\n2. gives no guidance as to what is right or wrong - essentially the reviewer has to blindly trust (i.e. not review) any diff of the txtar content, or go on gut instinct (or some sort of prior knowledge).\n\nEssentially this is a memory dump, albeit pretty printed. As such, it is as verbose as possible: no \"DRY\"-ing up is possible, no abstraction or factorisation is possible.",
       "revId": "91d39104b0ff6ce464dd2b1679c2f3cdcfe1e2bd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "43731999_a90af4cc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-28T09:09:05Z",
+      "side": 1,
+      "message": "It does not state what properties are being tested, because we\u0027re not testing just one or a few properties. In the case of the next CL, what matters is the comments which appear. The higher level property test is vet_data.txtar which checks that one such position is present and used for an error message. Manually testing that all positions are correctly decoded would be rather error prone; printing them all and skimming/reviewing the output or the output diff is a more general solution, even if more verbose.\n\nI intend to use this \"ast debug print\" test to check other properties of the decoded AST in the near future, such as:\n* are we decoding the right relative positions?\n* are we missing any other useful positions? (some basic literals do right now due to an upstream bug)\n* are decoded comments being attached to the right nodes? (note that formatting in CUE might work OK even if the comment is attached to a slightly incorrect node)\n\nYou\u0027re right that the output is rather verbose and the reviewer needs to have some understanding of the intended behavior. For this reason I try to summarize what\u0027s happening in the commit message, and explain any oddities in the txtar diff. For example, do you find the next commit to be confusing?\n\nWe use a similar technique in some cue evaluator and compiler tests; the input is CUE, and the generated outputs are the result of compilation and evaluation. They are fairly verbose and technical, and they don\u0027t explicitly state every property they are testing. They are a \"state of the world\" demonstration, so that we can check and demonstrate that changes to the evaluator only result in diffs to those output files which seem correct or reasonable, and nothing more.\n\nWhat would you suggest for properly testing positions? As I mentioned on Discord when you last brought this up, checking for every node/kind position would be a chunk of manual test code that would be error prone, as I might forget to check for some of them, e.g. with the test here I quickly noticed that boolean literals don\u0027t have positions for now.\n\nThat said, I\u0027m open to ideas to refining this a bit. For example, I could teach DebugPrint to ignore zero values for token.Pos and token.Token, as well as empty lists, so that lines like the ones below would be omitted:\n\n```\nTokenPos: token.Pos(\"-\")\nToken: token.Token(\"ILLEGAL\")\n[...]\nAttrs: []*ast.Attribute{}\n```\n\nI personally find these useful to see what fields aren\u0027t filled in, e.g. for boolean literals, the position is missing.",
+      "parentUuid": "3f0d57f9_a64f5b60",
+      "revId": "91d39104b0ff6ce464dd2b1679c2f3cdcfe1e2bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -7,28 +7,28 @@ import (
 )
 
 func TestVFrom(t *testing.T) {
-	qt.Assert(t, qt.IsTrue(vfrom(versionDraft04).contains(versionDraft04)))
-	qt.Assert(t, qt.IsTrue(vfrom(versionDraft04).contains(versionDraft06)))
-	qt.Assert(t, qt.IsTrue(vfrom(versionDraft04).contains(version2020_12)))
-	qt.Assert(t, qt.IsFalse(vfrom(versionDraft06).contains(versionDraft04)))
+	qt.Assert(t, qt.IsTrue(vfrom(VersionDraft4).contains(VersionDraft4)))
+	qt.Assert(t, qt.IsTrue(vfrom(VersionDraft4).contains(VersionDraft6)))
+	qt.Assert(t, qt.IsTrue(vfrom(VersionDraft4).contains(VersionDraft2020_12)))
+	qt.Assert(t, qt.IsFalse(vfrom(VersionDraft6).contains(VersionDraft4)))
 }
 
 func TestVTo(t *testing.T) {
-	qt.Assert(t, qt.IsTrue(vto(versionDraft04).contains(versionDraft04)))
-	qt.Assert(t, qt.IsFalse(vto(versionDraft04).contains(versionDraft06)))
-	qt.Assert(t, qt.IsTrue(vto(versionDraft06).contains(versionDraft04)))
-	qt.Assert(t, qt.IsFalse(vto(versionDraft06).contains(versionDraft07)))
+	qt.Assert(t, qt.IsTrue(vto(VersionDraft4).contains(VersionDraft4)))
+	qt.Assert(t, qt.IsFalse(vto(VersionDraft4).contains(VersionDraft6)))
+	qt.Assert(t, qt.IsTrue(vto(VersionDraft6).contains(VersionDraft4)))
+	qt.Assert(t, qt.IsFalse(vto(VersionDraft6).contains(VersionDraft7)))
 }
 
 func TestVBetween(t *testing.T) {
-	qt.Assert(t, qt.IsFalse(vbetween(versionDraft06, version2019_09).contains(versionDraft04)))
-	qt.Assert(t, qt.IsTrue(vbetween(versionDraft06, version2019_09).contains(versionDraft06)))
-	qt.Assert(t, qt.IsTrue(vbetween(versionDraft06, version2019_09).contains(version2019_09)))
-	qt.Assert(t, qt.IsFalse(vbetween(versionDraft06, version2019_09).contains(version2020_12)))
+	qt.Assert(t, qt.IsFalse(vbetween(VersionDraft6, VersionDraft2019_09).contains(VersionDraft4)))
+	qt.Assert(t, qt.IsTrue(vbetween(VersionDraft6, VersionDraft2019_09).contains(VersionDraft6)))
+	qt.Assert(t, qt.IsTrue(vbetween(VersionDraft6, VersionDraft2019_09).contains(VersionDraft2019_09)))
+	qt.Assert(t, qt.IsFalse(vbetween(VersionDraft6, VersionDraft2019_09).contains(VersionDraft2020_12)))
 }
 
 func TestVSet(t *testing.T) {
-	qt.Assert(t, qt.IsTrue(vset(versionDraft06).contains(versionDraft06)))
-	qt.Assert(t, qt.IsFalse(vset(versionDraft06).contains(versionDraft04)))
-	qt.Assert(t, qt.IsFalse(vset(versionDraft06).contains(versionDraft07)))
+	qt.Assert(t, qt.IsTrue(vset(VersionDraft6).contains(VersionDraft6)))
+	qt.Assert(t, qt.IsFalse(vset(VersionDraft6).contains(VersionDraft4)))
+	qt.Assert(t, qt.IsFalse(vset(VersionDraft6).contains(VersionDraft7)))
 }

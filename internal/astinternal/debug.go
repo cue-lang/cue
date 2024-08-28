@@ -27,29 +27,38 @@ import (
 	"cuelang.org/go/internal"
 )
 
-// DebugPrint writes a multi-line Go-like representation of a syntax tree node,
+// AppendDebug writes a multi-line Go-like representation of a syntax tree node,
 // including node position information and any relevant Go types.
-//
-// Note that since this is an internal debugging API, [io.Writer] errors are ignored,
-// as it is assumed that the caller is using a [bytes.Buffer] or directly
-// writing to standard output.
-func DebugPrint(w io.Writer, node ast.Node) {
-	d := &debugPrinter{w: w}
-	d.value(reflect.ValueOf(node), nil)
-	d.newline()
+func AppendDebug(dst []byte, node ast.Node, config DebugConfig) []byte {
+	d := &debugPrinter{cfg: config}
+	dst = d.value(dst, reflect.ValueOf(node), nil)
+	dst = d.newline(dst)
+	return dst
+}
+
+// DebugConfig configures the behavior of [AppendDebug].
+type DebugConfig struct {
+	// Filter is called before each value in a syntax tree.
+	// Values for which the function returns false are omitted.
+	Filter func(reflect.Value) bool
+
+	// OmitEmpty causes empty strings, empty structs, empty lists,
+	// nil pointers, invalid positions, and missing tokens to be omitted.
+	OmitEmpty bool
 }
 
 type debugPrinter struct {
 	w     io.Writer
+	cfg   DebugConfig
 	level int
 }
 
-func (d *debugPrinter) printf(format string, args ...any) {
-	fmt.Fprintf(d.w, format, args...)
+func (d *debugPrinter) printf(dst []byte, format string, args ...any) []byte {
+	return fmt.Appendf(dst, format, args...)
 }
 
-func (d *debugPrinter) newline() {
-	fmt.Fprintf(d.w, "\n%s", strings.Repeat("\t", d.level))
+func (d *debugPrinter) newline(dst []byte) []byte {
+	return fmt.Appendf(dst, "\n%s", strings.Repeat("\t", d.level))
 }
 
 var (
@@ -57,15 +66,20 @@ var (
 	typeTokenToken = reflect.TypeFor[token.Token]()
 )
 
-func (d *debugPrinter) value(v reflect.Value, impliedType reflect.Type) {
+func (d *debugPrinter) value(dst []byte, v reflect.Value, impliedType reflect.Type) []byte {
+	if d.cfg.Filter != nil && !d.cfg.Filter(v) {
+		return dst
+	}
 	// Skip over interface types.
 	if v.Kind() == reflect.Interface {
 		v = v.Elem()
 	}
 	// Indirecting a nil interface gives a zero value.
 	if !v.IsValid() {
-		d.printf("nil")
-		return
+		if !d.cfg.OmitEmpty {
+			dst = d.printf(dst, "nil")
+		}
+		return dst
 	}
 
 	// We print the original pointer type if there was one.
@@ -74,54 +88,72 @@ func (d *debugPrinter) value(v reflect.Value, impliedType reflect.Type) {
 	v = reflect.Indirect(v)
 	// Indirecting a nil pointer gives a zero value.
 	if !v.IsValid() {
-		d.printf("nil")
-		return
+		if !d.cfg.OmitEmpty {
+			dst = d.printf(dst, "nil")
+		}
+		return dst
+	}
+
+	if d.cfg.OmitEmpty && v.IsZero() {
+		return dst
 	}
 
 	t := v.Type()
 	switch t {
 	// Simple types which can stringify themselves.
 	case typeTokenPos, typeTokenToken:
-		d.printf("%s(%q)", t, v)
-		return
+		dst = d.printf(dst, "%s(%q)", t, v)
+		return dst
 	}
 
+	undoValue := len(dst)
 	switch t.Kind() {
 	default:
 		// We assume all other kinds are basic in practice, like string or bool.
 		if t.PkgPath() != "" {
 			// Mention defined and non-predeclared types, for clarity.
-			d.printf("%s(%#v)", t, v)
+			dst = d.printf(dst, "%s(%#v)", t, v)
 		} else {
-			d.printf("%#v", v)
+			dst = d.printf(dst, "%#v", v)
 		}
 
 	case reflect.Slice:
 		if origType != impliedType {
-			d.printf("%s", origType)
+			dst = d.printf(dst, "%s", origType)
 		}
-		d.printf("{")
-		if v.Len() > 0 {
-			d.level++
-			for i := 0; i < v.Len(); i++ {
-				d.newline()
-				ev := v.Index(i)
-				// Note: a slice literal implies the type of its elements
-				// so we can avoid mentioning the type
-				// of each element if it matches.
-				d.value(ev, t.Elem())
+		dst = d.printf(dst, "{")
+		d.level++
+		anyElems := false
+		for i := 0; i < v.Len(); i++ {
+			ev := v.Index(i)
+			undoElem := len(dst)
+			dst = d.newline(dst)
+			// Note: a slice literal implies the type of its elements
+			// so we can avoid mentioning the type
+			// of each element if it matches.
+			if dst2 := d.value(dst, ev, t.Elem()); len(dst2) == len(dst) {
+				dst = dst[:undoElem]
+			} else {
+				dst = dst2
+				anyElems = true
 			}
-			d.level--
-			d.newline()
 		}
-		d.printf("}")
+		d.level--
+		if !anyElems && d.cfg.OmitEmpty {
+			dst = dst[:undoValue]
+		} else {
+			if anyElems {
+				dst = d.newline(dst)
+			}
+			dst = d.printf(dst, "}")
+		}
 
 	case reflect.Struct:
 		if origType != impliedType {
-			d.printf("%s", origType)
+			dst = d.printf(dst, "%s", origType)
 		}
-		d.printf("{")
-		printed := false
+		dst = d.printf(dst, "{")
+		anyElems := false
 		d.level++
 		for i := 0; i < v.NumField(); i++ {
 			f := t.Field(i)
@@ -133,28 +165,38 @@ func (d *debugPrinter) value(v reflect.Value, impliedType reflect.Type) {
 			case "Scope", "Node", "Unresolved":
 				continue
 			}
-			printed = true
-			d.newline()
-			d.printf("%s: ", f.Name)
-			d.value(v.Field(i), nil)
+			undoElem := len(dst)
+			dst = d.newline(dst)
+			dst = d.printf(dst, "%s: ", f.Name)
+			if dst2 := d.value(dst, v.Field(i), nil); len(dst2) == len(dst) {
+				dst = dst[:undoElem]
+			} else {
+				dst = dst2
+				anyElems = true
+			}
 		}
 		val := v.Addr().Interface()
 		if val, ok := val.(ast.Node); ok {
 			// Comments attached to a node aren't a regular field, but are still useful.
 			// The majority of nodes won't have comments, so skip them when empty.
 			if comments := ast.Comments(val); len(comments) > 0 {
-				printed = true
-				d.newline()
-				d.printf("Comments: ")
-				d.value(reflect.ValueOf(comments), nil)
+				anyElems = true
+				dst = d.newline(dst)
+				dst = d.printf(dst, "Comments: ")
+				dst = d.value(dst, reflect.ValueOf(comments), nil)
 			}
 		}
 		d.level--
-		if printed {
-			d.newline()
+		if !anyElems && d.cfg.OmitEmpty {
+			dst = dst[:undoValue]
+		} else {
+			if anyElems {
+				dst = d.newline(dst)
+			}
+			dst = d.printf(dst, "}")
 		}
-		d.printf("}")
 	}
+	return dst
 }
 
 func DebugStr(x interface{}) (out string) {

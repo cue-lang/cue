@@ -206,3 +206,117 @@ embed: {
 	}
 	Imports: []*ast.ImportSpec{}
 }
+-- out/debugprint/fields.cue/omitempty-strings --
+*ast.File{
+	Filename: "fields.cue"
+	Decls: []ast.Decl{
+		*ast.Field{
+			Label: *ast.Ident{
+				Name: "a"
+			}
+			Value: *ast.BasicLit{
+				Value: "1"
+			}
+			Attrs: []*ast.Attribute{
+				{
+					Text: "@xml(,attr)"
+				}
+			}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				Name: "b"
+			}
+			Value: *ast.BasicLit{
+				Value: "2"
+			}
+			Attrs: []*ast.Attribute{
+				{
+					Text: "@foo(a,b=4)"
+				}
+				{
+					Text: "@go(Foo)"
+				}
+			}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				Name: "c"
+			}
+			Value: *ast.StructLit{
+				Elts: []ast.Decl{
+					*ast.Field{
+						Label: *ast.Ident{
+							Name: "d"
+						}
+						Value: *ast.Ident{
+							Name: "string"
+						}
+					}
+				}
+			}
+		}
+		*ast.Field{
+			Label: *ast.Alias{
+				Ident: *ast.Ident{
+					Name: "X"
+				}
+				Expr: *ast.Ident{
+					Name: "e"
+				}
+			}
+			Value: *ast.StructLit{
+				Elts: []ast.Decl{
+					*ast.Field{
+						Label: *ast.ListLit{
+							Elts: []ast.Expr{
+								*ast.Alias{
+									Ident: *ast.Ident{
+										Name: "Y"
+									}
+									Expr: *ast.Ident{
+										Name: "string"
+									}
+								}
+							}
+						}
+						Value: *ast.Ident{
+							Name: "int"
+						}
+					}
+				}
+			}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				Name: "#Schema"
+			}
+			Value: *ast.StructLit{
+				Elts: []ast.Decl{
+					*ast.Field{
+						Label: *ast.Ident{
+							Name: "name"
+						}
+						Value: *ast.Ident{
+							Name: "string"
+						}
+					}
+				}
+			}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				Name: "embed"
+			}
+			Value: *ast.StructLit{
+				Elts: []ast.Decl{
+					*ast.EmbedDecl{
+						Expr: *ast.Ident{
+							Name: "#Schema"
+						}
+					}
+				}
+			}
+		}
+	}
+}

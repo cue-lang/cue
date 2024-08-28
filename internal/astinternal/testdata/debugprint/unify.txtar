@@ -74,3 +74,47 @@ disjunctoin: b | c | *d
 	}
 	Imports: []*ast.ImportSpec{}
 }
+-- out/debugprint/unify.txtar/omitempty-strings --
+*ast.File{
+	Filename: "unify.txtar"
+	Decls: []ast.Decl{
+		*ast.Field{
+			Label: *ast.Ident{
+				Name: "unification"
+			}
+			Value: *ast.BinaryExpr{
+				X: *ast.BinaryExpr{
+					X: *ast.Ident{
+						Name: "b"
+					}
+					Y: *ast.Ident{
+						Name: "c"
+					}
+				}
+				Y: *ast.Ident{
+					Name: "d"
+				}
+			}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				Name: "disjunctoin"
+			}
+			Value: *ast.BinaryExpr{
+				X: *ast.BinaryExpr{
+					X: *ast.Ident{
+						Name: "b"
+					}
+					Y: *ast.Ident{
+						Name: "c"
+					}
+				}
+				Y: *ast.UnaryExpr{
+					X: *ast.Ident{
+						Name: "d"
+					}
+				}
+			}
+		}
+	}
+}

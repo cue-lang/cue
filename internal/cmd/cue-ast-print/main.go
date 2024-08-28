@@ -30,10 +30,17 @@ import (
 
 func main() {
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "usage: cue-ast-print [file.cue]\n")
-		os.Exit(2)
+		fmt.Fprintf(flag.CommandLine.Output(), "usage: cue-ast-print [flags] [file.cue]\n")
+		flag.PrintDefaults()
 	}
+
+	var cfg astinternal.DebugConfig
+	flag.BoolVar(&cfg.OmitEmpty, "omitempty", false, "omit empty and invalid values")
+	// Note that DebugConfig also has a Filter func, but that doesn't lend itself well
+	// to a command line flag. Perhaps we could provide some commonly used filters,
+	// such as "positions only" or "skip positions".
 	flag.Parse()
+
 	var filename string
 	var src any
 	switch flag.NArg() {
@@ -53,5 +60,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	astinternal.DebugPrint(os.Stdout, file)
+	out := astinternal.AppendDebug(nil, file, cfg)
+	os.Stdout.Write(out)
 }

@@ -15,9 +15,12 @@
 package astinternal_test
 
 import (
+	"path"
+	"reflect"
 	"strings"
 	"testing"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/cuetxtar"
@@ -39,8 +42,29 @@ func TestDebugPrint(t *testing.T) {
 			f, err := parser.ParseFile(file.Name, file.Data, parser.ParseComments)
 			qt.Assert(t, qt.IsNil(err))
 
-			w := t.Writer(file.Name)
-			astinternal.DebugPrint(w, f)
+			// The full syntax tree, as printed by default.
+			full := astinternal.AppendDebug(nil, f, astinternal.DebugConfig{})
+			t.Writer(file.Name).Write(full)
+
+			// A syntax tree which omits any empty values,
+			// and is only interested in showing string fields.
+			// We allow ast.Nodes and slices to not stop too early.
+			typNode := reflect.TypeFor[ast.Node]()
+			strings := astinternal.AppendDebug(nil, f, astinternal.DebugConfig{
+				OmitEmpty: true,
+				Filter: func(v reflect.Value) bool {
+					if v.Type().Implements(typNode) {
+						return true
+					}
+					switch v.Kind() {
+					case reflect.Slice, reflect.String:
+						return true
+					default:
+						return false
+					}
+				},
+			})
+			t.Writer(path.Join(file.Name, "omitempty-strings")).Write(strings)
 		}
 	})
 }

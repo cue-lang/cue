@@ -1,0 +1,56 @@
+[
+	{
+		"description": "maxLength validation",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"maxLength": 2
+		},
+		"tests": [
+			{
+				"description": "shorter is valid",
+				"data": "f",
+				"valid": true
+			},
+			{
+				"description": "exact length is valid",
+				"data": "fo",
+				"valid": true
+			},
+			{
+				"description": "too long is invalid",
+				"data": "foo",
+				"valid": false
+			},
+			{
+				"description": "ignores non-strings",
+				"data": 100,
+				"valid": true
+			},
+			{
+				"description": "two graphemes is long enough",
+				"data": "💩💩",
+				"valid": true
+			}
+		]
+	},
+	{
+		"description": "maxLength validation with a decimal",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"maxLength": 2.0
+		},
+		"tests": [
+			{
+				"description": "shorter is valid",
+				"data": "f",
+				"valid": true,
+				"skip": "6 errors in empty disjunction:\nconflicting values \"f\" and [...] (mismatched types string and list):\n    generated.cue:4:1\n    generated.cue:4:48\n    instance.json:1:1\nconflicting values \"f\" and bool (mismatched types string and bool):\n    generated.cue:4:1\n    generated.cue:4:8\n    instance.json:1:1\nconflicting values \"f\" and null (mismatched types string and null):\n    generated.cue:4:1\n    instance.json:1:1\nconflicting values \"f\" and number (mismatched types string and number):\n    generated.cue:4:1\n    generated.cue:4:15\n    instance.json:1:1\nconflicting values \"f\" and {...} (mismatched types string and struct):\n    generated.cue:4:1\n    generated.cue:4:56\n    instance.json:1:1\ncannot use 2.0 (type float) as int in argument 2 to strings.MaxRunes:\n    generated.cue:4:41\n"
+			},
+			{
+				"description": "too long is invalid",
+				"data": "foo",
+				"valid": false
+			}
+		]
+	}
+]

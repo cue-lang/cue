@@ -75,6 +75,11 @@ func TestDecode(t *testing.T) {
 				return []ast.Label{ast.NewIdent("#" + a[len(a)-1])}, nil
 			}
 		}
+		if versStr, ok := t.Value("version"); ok {
+			vers, err := jsonschema.ParseVersion(versStr)
+			qt.Assert(t, qt.IsNil(err))
+			cfg.DefaultVersion = vers
+		}
 		cfg.Strict = t.HasTag("strict")
 
 		ctx := t.CueContext()

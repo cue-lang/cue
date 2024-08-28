@@ -111,7 +111,7 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 func (d *decoder) schema(ref []ast.Label, v cue.Value) (a []ast.Decl) {
 	root := state{
 		decoder:       d,
-		schemaVersion: defaultVersion,
+		schemaVersion: d.cfg.DefaultVersion,
 	}
 
 	var name ast.Label
@@ -379,7 +379,7 @@ type state struct {
 	minContains *uint64
 	maxContains *uint64
 
-	schemaVersion        schemaVersion
+	schemaVersion        Version
 	schemaVersionPresent bool
 
 	id    *url.URL // base URI for $ref
@@ -653,8 +653,8 @@ func (s *state) schemaState(n cue.Value, types cue.Kind, idRef []label, isLogica
 		state.parent = s
 	}
 	if n.Kind() == cue.BoolKind {
-		if vfrom(versionDraft06).contains(state.schemaVersion) {
-			// From draft-06 onwards, boolean values signify a schema that always passes or fails.
+		if vfrom(VersionDraft6).contains(state.schemaVersion) {
+			// From draft6 onwards, boolean values signify a schema that always passes or fails.
 			if state.boolValue(n) {
 				return top(), state
 			}

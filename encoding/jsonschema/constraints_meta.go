@@ -51,7 +51,7 @@ func constraintSchema(key string, n cue.Value, s *state) {
 		// If there's no $schema value, use the default.
 		return
 	}
-	sv, err := parseSchemaVersion(str)
+	sv, err := ParseVersion(str)
 	if err != nil {
 		s.errf(n, "invalid $schema URL %q: %v", str, err)
 		return

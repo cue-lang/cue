@@ -61,7 +61,7 @@ import (
 // The #openapi tag in the txtar header enables OpenAPI extraction mode.
 func TestDecode(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root:   "./testdata",
+		Root:   "./testdata/txtar",
 		Name:   "decode",
 		Matrix: cuetdtest.FullMatrix,
 	}

@@ -1,0 +1,78 @@
+[
+	{
+		"description": "minProperties validation",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2020-12/schema",
+			"minProperties": 1
+		},
+		"skip": "extract error: unsupported constraint \"minProperties\"",
+		"tests": [
+			{
+				"description": "longer is valid",
+				"data": {
+					"foo": 1,
+					"bar": 2
+				},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "exact length is valid",
+				"data": {
+					"foo": 1
+				},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "too short is invalid",
+				"data": {},
+				"valid": false,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "ignores arrays",
+				"data": [],
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "ignores strings",
+				"data": "",
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "ignores other non-objects",
+				"data": 12,
+				"valid": true,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "minProperties validation with a decimal",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2020-12/schema",
+			"minProperties": 1.0
+		},
+		"skip": "extract error: unsupported constraint \"minProperties\"",
+		"tests": [
+			{
+				"description": "longer is valid",
+				"data": {
+					"foo": 1,
+					"bar": 2
+				},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "too short is invalid",
+				"data": {},
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	}
+]

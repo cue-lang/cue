@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -e
+
+# main as of Sun May 19 19:01:03 2024 +0300
+COMMIT=9fc880bfb6d8ccd093bc82431f17d13681ffae8e
+
+# This script pulls in the external JSON Schema tests.
+
+# First check that the tests pass as is.
+go test
+
+# Then fetch the new tests.
+go run vendor_external.go -- $COMMIT
+
+# Then update the test results.
+CUE_UPDATE=1 go test

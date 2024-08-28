@@ -86,16 +86,16 @@ func extract(path string, b []byte) (ast.Expr, error) {
 			p = pos[0]
 		}
 		var x interface{}
-		err := json.Unmarshal(b, &x)
+		err1 := json.Unmarshal(b, &x)
 
 		// If encoding/json has a position, prefer that, as it relates to json.Unmarshal's error message.
-		if synErr, ok := err.(*json.SyntaxError); ok && len(b) > 0 {
+		if synErr, ok := err1.(*json.SyntaxError); ok && len(b) > 0 {
 			tokFile := token.NewFile(path, 0, len(b))
 			tokFile.SetLinesForContent(b)
 			p = tokFile.Pos(int(synErr.Offset-1), token.NoRelPos)
 		}
 
-		return nil, errors.Wrapf(err, p, "invalid JSON for file %q", path)
+		return nil, errors.Wrapf(err, p, "invalid JSON for file %q: %v", path, err)
 	}
 	return expr, nil
 }
@@ -156,7 +156,7 @@ func (d *Decoder) extract() (ast.Expr, error) {
 		if synErr, ok := err.(*json.SyntaxError); ok {
 			pos = d.tokFile.Pos(int(synErr.Offset-1), token.NoRelPos)
 		}
-		return nil, errors.Wrapf(err, pos, "invalid JSON for file %q", d.path)
+		return nil, errors.Wrapf(err, pos, "1invalid JSON for file %q", d.path)
 	}
 	expr, err := parser.ParseExpr(d.path, []byte(raw))
 	if err != nil {

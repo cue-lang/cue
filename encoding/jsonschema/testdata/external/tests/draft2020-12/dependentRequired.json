@@ -1,0 +1,217 @@
+[
+	{
+		"description": "single dependency",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2020-12/schema",
+			"dependentRequired": {
+				"bar": [
+					"foo"
+				]
+			}
+		},
+		"skip": "extract error: unsupported constraint \"dependentRequired\"",
+		"tests": [
+			{
+				"description": "neither",
+				"data": {},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "nondependant",
+				"data": {
+					"foo": 1
+				},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "with dependency",
+				"data": {
+					"foo": 1,
+					"bar": 2
+				},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "missing dependency",
+				"data": {
+					"bar": 2
+				},
+				"valid": false,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "ignores arrays",
+				"data": [
+					"bar"
+				],
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "ignores strings",
+				"data": "foobar",
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "ignores other non-objects",
+				"data": 12,
+				"valid": true,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "empty dependents",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2020-12/schema",
+			"dependentRequired": {
+				"bar": []
+			}
+		},
+		"skip": "extract error: unsupported constraint \"dependentRequired\"",
+		"tests": [
+			{
+				"description": "empty object",
+				"data": {},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "object with one property",
+				"data": {
+					"bar": 2
+				},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "non-object is valid",
+				"data": 1,
+				"valid": true,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "multiple dependents required",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2020-12/schema",
+			"dependentRequired": {
+				"quux": [
+					"foo",
+					"bar"
+				]
+			}
+		},
+		"skip": "extract error: unsupported constraint \"dependentRequired\"",
+		"tests": [
+			{
+				"description": "neither",
+				"data": {},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "nondependants",
+				"data": {
+					"foo": 1,
+					"bar": 2
+				},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "with dependencies",
+				"data": {
+					"foo": 1,
+					"bar": 2,
+					"quux": 3
+				},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "missing dependency",
+				"data": {
+					"foo": 1,
+					"quux": 2
+				},
+				"valid": false,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "missing other dependency",
+				"data": {
+					"bar": 1,
+					"quux": 2
+				},
+				"valid": false,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "missing both dependencies",
+				"data": {
+					"quux": 1
+				},
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "dependencies with escaped characters",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2020-12/schema",
+			"dependentRequired": {
+				"foo\nbar": [
+					"foo\rbar"
+				],
+				"foo\"bar": [
+					"foo'bar"
+				]
+			}
+		},
+		"skip": "extract error: unsupported constraint \"dependentRequired\"",
+		"tests": [
+			{
+				"description": "CRLF",
+				"data": {
+					"foo\nbar": 1,
+					"foo\rbar": 2
+				},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "quoted quotes",
+				"data": {
+					"foo'bar": 1,
+					"foo\"bar": 2
+				},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "CRLF missing dependent",
+				"data": {
+					"foo\nbar": 1,
+					"foo": 2
+				},
+				"valid": false,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "quoted quotes missing dependent",
+				"data": {
+					"foo\"bar": 2
+				},
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	}
+]

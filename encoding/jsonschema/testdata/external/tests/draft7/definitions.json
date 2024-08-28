@@ -1,0 +1,35 @@
+[
+	{
+		"description": "validate definition against metaschema",
+		"schema": {
+			"$ref": "http://json-schema.org/draft-07/schema#"
+		},
+		"skip": "extract error: cannot compile resulting schema: package \"json-schema.org/draft-07/schema\" imported but not defined in :\n    generated.cue:1:8\n",
+		"tests": [
+			{
+				"description": "valid definition schema",
+				"data": {
+					"definitions": {
+						"foo": {
+							"type": "integer"
+						}
+					}
+				},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "invalid definition schema",
+				"data": {
+					"definitions": {
+						"foo": {
+							"type": 1
+						}
+					}
+				},
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	}
+]

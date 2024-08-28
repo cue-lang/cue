@@ -1,0 +1,53 @@
+[
+	{
+		"description": "unknown format",
+		"schema": {
+			"format": "unknown"
+		},
+		"skip": "extract error: unsupported constraint \"format\"",
+		"tests": [
+			{
+				"description": "unknown formats ignore integers",
+				"data": 12,
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "unknown formats ignore floats",
+				"data": 13.7,
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "unknown formats ignore objects",
+				"data": {},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "unknown formats ignore arrays",
+				"data": [],
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "unknown formats ignore booleans",
+				"data": false,
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "unknown formats ignore nulls",
+				"data": null,
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "unknown formats ignore strings",
+				"data": "string",
+				"valid": true,
+				"skip": "could not compile schema"
+			}
+		]
+	}
+]

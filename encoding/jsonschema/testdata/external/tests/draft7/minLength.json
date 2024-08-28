@@ -1,0 +1,54 @@
+[
+	{
+		"description": "minLength validation",
+		"schema": {
+			"minLength": 2
+		},
+		"tests": [
+			{
+				"description": "longer is valid",
+				"data": "foo",
+				"valid": true
+			},
+			{
+				"description": "exact length is valid",
+				"data": "fo",
+				"valid": true
+			},
+			{
+				"description": "too short is invalid",
+				"data": "f",
+				"valid": false
+			},
+			{
+				"description": "ignores non-strings",
+				"data": 1,
+				"valid": true
+			},
+			{
+				"description": "one grapheme is not long enough",
+				"data": "💩",
+				"valid": false
+			}
+		]
+	},
+	{
+		"description": "minLength validation with a decimal",
+		"schema": {
+			"minLength": 2.0
+		},
+		"tests": [
+			{
+				"description": "longer is valid",
+				"data": "foo",
+				"valid": true,
+				"skip": "6 errors in empty disjunction:\nconflicting values \"foo\" and [...] (mismatched types string and list):\n    generated.cue:3:1\n    generated.cue:3:48\n    instance.json:1:1\nconflicting values \"foo\" and bool (mismatched types string and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values \"foo\" and null (mismatched types string and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values \"foo\" and number (mismatched types string and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values \"foo\" and {...} (mismatched types string and struct):\n    generated.cue:3:1\n    generated.cue:3:56\n    instance.json:1:1\ncannot use 2.0 (type float) as int in argument 2 to strings.MinRunes:\n    generated.cue:3:41\n"
+			},
+			{
+				"description": "too short is invalid",
+				"data": "f",
+				"valid": false
+			}
+		]
+	}
+]

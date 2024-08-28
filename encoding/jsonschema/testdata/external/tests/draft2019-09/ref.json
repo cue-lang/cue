@@ -1,0 +1,1358 @@
+[
+	{
+		"description": "root pointer ref",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"properties": {
+				"foo": {
+					"$ref": "#"
+				}
+			},
+			"additionalProperties": false
+		},
+		"tests": [
+			{
+				"description": "match",
+				"data": {
+					"foo": false
+				},
+				"valid": true
+			},
+			{
+				"description": "recursive match",
+				"data": {
+					"foo": {
+						"foo": false
+					}
+				},
+				"valid": true
+			},
+			{
+				"description": "mismatch",
+				"data": {
+					"bar": false
+				},
+				"valid": false,
+				"skip": "unexpected success"
+			},
+			{
+				"description": "recursive mismatch",
+				"data": {
+					"foo": {
+						"bar": false
+					}
+				},
+				"valid": false,
+				"skip": "unexpected success"
+			}
+		]
+	},
+	{
+		"description": "relative pointer ref to object",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"properties": {
+				"foo": {
+					"type": "integer"
+				},
+				"bar": {
+					"$ref": "#/properties/foo"
+				}
+			}
+		},
+		"skip": "extract error: cannot compile resulting schema: bar: reference \"foo\" not found:\n    generated.cue:4:10\n",
+		"tests": [
+			{
+				"description": "match",
+				"data": {
+					"bar": 3
+				},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "mismatch",
+				"data": {
+					"bar": true
+				},
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "relative pointer ref to array",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"items": [
+				{
+					"type": "integer"
+				},
+				{
+					"$ref": "#/items/0"
+				}
+			]
+		},
+		"skip": "extract error: referring to field \"items\" not yet supported",
+		"tests": [
+			{
+				"description": "match array",
+				"data": [
+					1,
+					2
+				],
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "mismatch array",
+				"data": [
+					1,
+					"foo"
+				],
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "escaped pointer ref",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$defs": {
+				"tilde~field": {
+					"type": "integer"
+				},
+				"slash/field": {
+					"type": "integer"
+				},
+				"percent%field": {
+					"type": "integer"
+				}
+			},
+			"properties": {
+				"tilde": {
+					"$ref": "#/$defs/tilde~0field"
+				},
+				"slash": {
+					"$ref": "#/$defs/slash~1field"
+				},
+				"percent": {
+					"$ref": "#/$defs/percent%25field"
+				}
+			}
+		},
+		"tests": [
+			{
+				"description": "slash invalid",
+				"data": {
+					"slash": "aoeu"
+				},
+				"valid": false
+			},
+			{
+				"description": "tilde invalid",
+				"data": {
+					"tilde": "aoeu"
+				},
+				"valid": false
+			},
+			{
+				"description": "percent invalid",
+				"data": {
+					"percent": "aoeu"
+				},
+				"valid": false
+			},
+			{
+				"description": "slash valid",
+				"data": {
+					"slash": 123
+				},
+				"valid": true,
+				"skip": "6 errors in empty disjunction:\nconflicting values [...] and {slash:123} (mismatched types list and struct):\n    generated.cue:2:33\n    instance.json:1:1\nconflicting values bool and {slash:123} (mismatched types bool and struct):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and {slash:123} (mismatched types null and struct):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and {slash:123} (mismatched types number and struct):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and {slash:123} (mismatched types string and struct):\n    generated.cue:2:24\n    instance.json:1:1\nslash: undefined field: \"slash~1field\":\n    generated.cue:4:14\n"
+			},
+			{
+				"description": "tilde valid",
+				"data": {
+					"tilde": 123
+				},
+				"valid": true,
+				"skip": "6 errors in empty disjunction:\nconflicting values [...] and {tilde:123} (mismatched types list and struct):\n    generated.cue:2:33\n    instance.json:1:1\nconflicting values bool and {tilde:123} (mismatched types bool and struct):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and {tilde:123} (mismatched types null and struct):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and {tilde:123} (mismatched types number and struct):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and {tilde:123} (mismatched types string and struct):\n    generated.cue:2:24\n    instance.json:1:1\ntilde: undefined field: \"tilde~0field\":\n    generated.cue:3:14\n"
+			},
+			{
+				"description": "percent valid",
+				"data": {
+					"percent": 123
+				},
+				"valid": true,
+				"skip": "6 errors in empty disjunction:\nconflicting values [...] and {percent:123} (mismatched types list and struct):\n    generated.cue:2:33\n    instance.json:1:1\nconflicting values bool and {percent:123} (mismatched types bool and struct):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and {percent:123} (mismatched types null and struct):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and {percent:123} (mismatched types number and struct):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and {percent:123} (mismatched types string and struct):\n    generated.cue:2:24\n    instance.json:1:1\npercent: undefined field: \"percent%25field\":\n    generated.cue:5:14\n"
+			}
+		]
+	},
+	{
+		"description": "nested refs",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$defs": {
+				"a": {
+					"type": "integer"
+				},
+				"b": {
+					"$ref": "#/$defs/a"
+				},
+				"c": {
+					"$ref": "#/$defs/b"
+				}
+			},
+			"$ref": "#/$defs/c"
+		},
+		"tests": [
+			{
+				"description": "nested ref valid",
+				"data": 5,
+				"valid": true
+			},
+			{
+				"description": "nested ref invalid",
+				"data": "a",
+				"valid": false
+			}
+		]
+	},
+	{
+		"description": "ref applies alongside sibling keywords",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$defs": {
+				"reffed": {
+					"type": "array"
+				}
+			},
+			"properties": {
+				"foo": {
+					"$ref": "#/$defs/reffed",
+					"maxItems": 2
+				}
+			}
+		},
+		"tests": [
+			{
+				"description": "ref valid, maxItems valid",
+				"data": {
+					"foo": []
+				},
+				"valid": true
+			},
+			{
+				"description": "ref valid, maxItems invalid",
+				"data": {
+					"foo": [
+						1,
+						2,
+						3
+					]
+				},
+				"valid": false
+			},
+			{
+				"description": "ref invalid",
+				"data": {
+					"foo": "string"
+				},
+				"valid": false
+			}
+		]
+	},
+	{
+		"description": "remote ref, containing refs itself",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$ref": "https://json-schema.org/draft/2019-09/schema"
+		},
+		"skip": "extract error: cannot compile resulting schema: package \"json-schema.org/draft/2019-09/schema\" imported but not defined in :\n    generated.cue:1:8\n",
+		"tests": [
+			{
+				"description": "remote ref valid",
+				"data": {
+					"minLength": 1
+				},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "remote ref invalid",
+				"data": {
+					"minLength": -1
+				},
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "property named $ref that is not a reference",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"properties": {
+				"$ref": {
+					"type": "string"
+				}
+			}
+		},
+		"tests": [
+			{
+				"description": "property named $ref valid",
+				"data": {
+					"$ref": "a"
+				},
+				"valid": true
+			},
+			{
+				"description": "property named $ref invalid",
+				"data": {
+					"$ref": 2
+				},
+				"valid": false
+			}
+		]
+	},
+	{
+		"description": "property named $ref, containing an actual $ref",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"properties": {
+				"$ref": {
+					"$ref": "#/$defs/is-string"
+				}
+			},
+			"$defs": {
+				"is-string": {
+					"type": "string"
+				}
+			}
+		},
+		"tests": [
+			{
+				"description": "property named $ref valid",
+				"data": {
+					"$ref": "a"
+				},
+				"valid": true
+			},
+			{
+				"description": "property named $ref invalid",
+				"data": {
+					"$ref": 2
+				},
+				"valid": false
+			}
+		]
+	},
+	{
+		"description": "$ref to boolean schema true",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$ref": "#/$defs/bool",
+			"$defs": {
+				"bool": true
+			}
+		},
+		"tests": [
+			{
+				"description": "any value is valid",
+				"data": "foo",
+				"valid": true
+			}
+		]
+	},
+	{
+		"description": "$ref to boolean schema false",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$ref": "#/$defs/bool",
+			"$defs": {
+				"bool": false
+			}
+		},
+		"skip": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:4:8\n",
+		"tests": [
+			{
+				"description": "any value is invalid",
+				"data": "foo",
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "Recursive references between schemas",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$id": "http://localhost:1234/draft2019-09/tree",
+			"description": "tree of nodes",
+			"type": "object",
+			"properties": {
+				"meta": {
+					"type": "string"
+				},
+				"nodes": {
+					"type": "array",
+					"items": {
+						"$ref": "node"
+					}
+				}
+			},
+			"required": [
+				"meta",
+				"nodes"
+			],
+			"$defs": {
+				"node": {
+					"$id": "http://localhost:1234/draft2019-09/node",
+					"description": "node",
+					"type": "object",
+					"properties": {
+						"value": {
+							"type": "number"
+						},
+						"subtree": {
+							"$ref": "tree"
+						}
+					},
+					"required": [
+						"value"
+					]
+				}
+			}
+		},
+		"skip": "extract error: cannot compile resulting schema: builtin package \"localhost:1234/draft2019-09/node\" undefined:\n    generated.cue:1:8\n_schema.nodes: reference \"node\" not found:\n    generated.cue:9:14\n",
+		"tests": [
+			{
+				"description": "valid tree",
+				"data": {
+					"meta": "root",
+					"nodes": [
+						{
+							"value": 1,
+							"subtree": {
+								"meta": "child",
+								"nodes": [
+									{
+										"value": 1.1
+									},
+									{
+										"value": 1.2
+									}
+								]
+							}
+						},
+						{
+							"value": 2,
+							"subtree": {
+								"meta": "child",
+								"nodes": [
+									{
+										"value": 2.1
+									},
+									{
+										"value": 2.2
+									}
+								]
+							}
+						}
+					]
+				},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "invalid tree",
+				"data": {
+					"meta": "root",
+					"nodes": [
+						{
+							"value": 1,
+							"subtree": {
+								"meta": "child",
+								"nodes": [
+									{
+										"value": "string is invalid"
+									},
+									{
+										"value": 1.2
+									}
+								]
+							}
+						},
+						{
+							"value": 2,
+							"subtree": {
+								"meta": "child",
+								"nodes": [
+									{
+										"value": 2.1
+									},
+									{
+										"value": 2.2
+									}
+								]
+							}
+						}
+					]
+				},
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "refs with quote",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"properties": {
+				"foo\"bar": {
+					"$ref": "#/$defs/foo%22bar"
+				}
+			},
+			"$defs": {
+				"foo\"bar": {
+					"type": "number"
+				}
+			}
+		},
+		"tests": [
+			{
+				"description": "object with numbers is valid",
+				"data": {
+					"foo\"bar": 1
+				},
+				"valid": true,
+				"skip": "6 errors in empty disjunction:\nconflicting values [...] and {\"foo\\\"bar\":1} (mismatched types list and struct):\n    generated.cue:2:33\n    instance.json:1:1\nconflicting values bool and {\"foo\\\"bar\":1} (mismatched types bool and struct):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and {\"foo\\\"bar\":1} (mismatched types null and struct):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and {\"foo\\\"bar\":1} (mismatched types number and struct):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and {\"foo\\\"bar\":1} (mismatched types string and struct):\n    generated.cue:2:24\n    instance.json:1:1\n\"foo\\\"bar\": undefined field: \"foo%22bar\":\n    generated.cue:3:17\n"
+			},
+			{
+				"description": "object with strings is invalid",
+				"data": {
+					"foo\"bar": "1"
+				},
+				"valid": false
+			}
+		]
+	},
+	{
+		"description": "ref creates new scope when adjacent to keywords",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$defs": {
+				"A": {
+					"unevaluatedProperties": false
+				}
+			},
+			"properties": {
+				"prop1": {
+					"type": "string"
+				}
+			},
+			"$ref": "#/$defs/A"
+		},
+		"skip": "extract error: unsupported constraint \"unevaluatedProperties\"",
+		"tests": [
+			{
+				"description": "referenced subschema doesn't see annotations from properties",
+				"data": {
+					"prop1": "match"
+				},
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "naive replacement of $ref with its destination is not correct",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$defs": {
+				"a_string": {
+					"type": "string"
+				}
+			},
+			"enum": [
+				{
+					"$ref": "#/$defs/a_string"
+				}
+			]
+		},
+		"tests": [
+			{
+				"description": "do not evaluate the $ref inside the enum, matching any string",
+				"data": "this is a string",
+				"valid": false
+			},
+			{
+				"description": "do not evaluate the $ref inside the enum, definition exact match",
+				"data": {
+					"type": "string"
+				},
+				"valid": false,
+				"skip": "unexpected success"
+			},
+			{
+				"description": "match the enum exactly",
+				"data": {
+					"$ref": "#/$defs/a_string"
+				},
+				"valid": true
+			}
+		]
+	},
+	{
+		"description": "refs with relative uris and defs",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$id": "http://example.com/schema-relative-uri-defs1.json",
+			"properties": {
+				"foo": {
+					"$id": "schema-relative-uri-defs2.json",
+					"$defs": {
+						"inner": {
+							"properties": {
+								"bar": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"$ref": "#/$defs/inner"
+				}
+			},
+			"$ref": "schema-relative-uri-defs2.json"
+		},
+		"skip": "extract error: cannot compile resulting schema: package \"example.com/schema-relative-uri-defs2.json:schema\" imported but not defined in :\n    generated.cue:1:8\n",
+		"tests": [
+			{
+				"description": "invalid on inner field",
+				"data": {
+					"foo": {
+						"bar": 1
+					},
+					"bar": "a"
+				},
+				"valid": false,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "invalid on outer field",
+				"data": {
+					"foo": {
+						"bar": "a"
+					},
+					"bar": 1
+				},
+				"valid": false,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "valid on both fields",
+				"data": {
+					"foo": {
+						"bar": "a"
+					},
+					"bar": "a"
+				},
+				"valid": true,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "relative refs with absolute uris and defs",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$id": "http://example.com/schema-refs-absolute-uris-defs1.json",
+			"properties": {
+				"foo": {
+					"$id": "http://example.com/schema-refs-absolute-uris-defs2.json",
+					"$defs": {
+						"inner": {
+							"properties": {
+								"bar": {
+									"type": "string"
+								}
+							}
+						}
+					},
+					"$ref": "#/$defs/inner"
+				}
+			},
+			"$ref": "schema-refs-absolute-uris-defs2.json"
+		},
+		"skip": "extract error: cannot compile resulting schema: package \"example.com/schema-refs-absolute-uris-defs2.json:schema\" imported but not defined in :\n    generated.cue:1:8\n",
+		"tests": [
+			{
+				"description": "invalid on inner field",
+				"data": {
+					"foo": {
+						"bar": 1
+					},
+					"bar": "a"
+				},
+				"valid": false,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "invalid on outer field",
+				"data": {
+					"foo": {
+						"bar": "a"
+					},
+					"bar": 1
+				},
+				"valid": false,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "valid on both fields",
+				"data": {
+					"foo": {
+						"bar": "a"
+					},
+					"bar": "a"
+				},
+				"valid": true,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "$id must be resolved against nearest parent, not just immediate parent",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$id": "http://example.com/a.json",
+			"$defs": {
+				"x": {
+					"$id": "http://example.com/b/c.json",
+					"not": {
+						"$defs": {
+							"y": {
+								"$id": "d.json",
+								"type": "number"
+							}
+						}
+					}
+				}
+			},
+			"allOf": [
+				{
+					"$ref": "http://example.com/b/d.json"
+				}
+			]
+		},
+		"skip": "extract error: unsupported constraint \"not\"",
+		"tests": [
+			{
+				"description": "number is valid",
+				"data": 1,
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "non-number is invalid",
+				"data": "a",
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "order of evaluation: $id and $ref",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$comment": "$id must be evaluated before $ref to get the proper $ref destination",
+			"$id": "https://example.com/draft2019-09/ref-and-id1/base.json",
+			"$ref": "int.json",
+			"$defs": {
+				"bigint": {
+					"$comment": "canonical uri: https://example.com/draft2019-09/ref-and-id1/int.json",
+					"$id": "int.json",
+					"maximum": 10
+				},
+				"smallint": {
+					"$comment": "canonical uri: https://example.com/draft2019-09/ref-and-id1-int.json",
+					"$id": "/draft2019-09/ref-and-id1-int.json",
+					"maximum": 2
+				}
+			}
+		},
+		"skip": "extract error: cannot compile resulting schema: package \"example.com/draft2019-09/ref-and-id1/int.json:int\" imported but not defined in :\n    generated.cue:1:8\n",
+		"tests": [
+			{
+				"description": "data is valid against first definition",
+				"data": 5,
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "data is invalid against first definition",
+				"data": 50,
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "order of evaluation: $id and $anchor and $ref",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$comment": "$id must be evaluated before $ref to get the proper $ref destination",
+			"$id": "https://example.com/draft2019-09/ref-and-id2/base.json",
+			"$ref": "#bigint",
+			"$defs": {
+				"bigint": {
+					"$comment": "canonical uri: https://example.com/draft2019-09/ref-and-id2/base.json#/$defs/bigint; another valid uri for this location: https://example.com/ref-and-id2/base.json#bigint",
+					"$anchor": "bigint",
+					"maximum": 10
+				},
+				"smallint": {
+					"$comment": "canonical uri: https://example.com/draft2019-09/ref-and-id2#/$defs/smallint; another valid uri for this location: https://example.com/ref-and-id2/#bigint",
+					"$id": "/draft2019-09/ref-and-id2/",
+					"$anchor": "bigint",
+					"maximum": 2
+				}
+			}
+		},
+		"skip": "extract error: anchors (bigint) not supported (and 2 more errors)",
+		"tests": [
+			{
+				"description": "data is valid against first definition",
+				"data": 5,
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "data is invalid against first definition",
+				"data": 50,
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "simple URN base URI with $ref via the URN",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$comment": "URIs do not have to have HTTP(s) schemes",
+			"$id": "urn:uuid:deadbeef-1234-ffff-ffff-4321feebdaed",
+			"minimum": 30,
+			"properties": {
+				"foo": {
+					"$ref": "urn:uuid:deadbeef-1234-ffff-ffff-4321feebdaed"
+				}
+			}
+		},
+		"tests": [
+			{
+				"description": "valid under the URN IDed schema",
+				"data": {
+					"foo": 37
+				},
+				"valid": true
+			},
+			{
+				"description": "invalid under the URN IDed schema",
+				"data": {
+					"foo": 12
+				},
+				"valid": false
+			}
+		]
+	},
+	{
+		"description": "simple URN base URI with JSON pointer",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$comment": "URIs do not have to have HTTP(s) schemes",
+			"$id": "urn:uuid:deadbeef-1234-00ff-ff00-4321feebdaed",
+			"properties": {
+				"foo": {
+					"$ref": "#/$defs/bar"
+				}
+			},
+			"$defs": {
+				"bar": {
+					"type": "string"
+				}
+			}
+		},
+		"tests": [
+			{
+				"description": "a string is valid",
+				"data": {
+					"foo": "bar"
+				},
+				"valid": true
+			},
+			{
+				"description": "a non-string is invalid",
+				"data": {
+					"foo": 12
+				},
+				"valid": false
+			}
+		]
+	},
+	{
+		"description": "URN base URI with NSS",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$comment": "RFC 8141 §2.2",
+			"$id": "urn:example:1/406/47452/2",
+			"properties": {
+				"foo": {
+					"$ref": "#/$defs/bar"
+				}
+			},
+			"$defs": {
+				"bar": {
+					"type": "string"
+				}
+			}
+		},
+		"tests": [
+			{
+				"description": "a string is valid",
+				"data": {
+					"foo": "bar"
+				},
+				"valid": true
+			},
+			{
+				"description": "a non-string is invalid",
+				"data": {
+					"foo": 12
+				},
+				"valid": false
+			}
+		]
+	},
+	{
+		"description": "URN base URI with r-component",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$comment": "RFC 8141 §2.3.1",
+			"$id": "urn:example:foo-bar-baz-qux?+CCResolve:cc=uk",
+			"properties": {
+				"foo": {
+					"$ref": "#/$defs/bar"
+				}
+			},
+			"$defs": {
+				"bar": {
+					"type": "string"
+				}
+			}
+		},
+		"tests": [
+			{
+				"description": "a string is valid",
+				"data": {
+					"foo": "bar"
+				},
+				"valid": true
+			},
+			{
+				"description": "a non-string is invalid",
+				"data": {
+					"foo": 12
+				},
+				"valid": false
+			}
+		]
+	},
+	{
+		"description": "URN base URI with q-component",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$comment": "RFC 8141 §2.3.2",
+			"$id": "urn:example:weather?=op=map\u0026lat=39.56\u0026lon=-104.85\u0026datetime=1969-07-21T02:56:15Z",
+			"properties": {
+				"foo": {
+					"$ref": "#/$defs/bar"
+				}
+			},
+			"$defs": {
+				"bar": {
+					"type": "string"
+				}
+			}
+		},
+		"tests": [
+			{
+				"description": "a string is valid",
+				"data": {
+					"foo": "bar"
+				},
+				"valid": true
+			},
+			{
+				"description": "a non-string is invalid",
+				"data": {
+					"foo": 12
+				},
+				"valid": false
+			}
+		]
+	},
+	{
+		"description": "URN base URI with URN and JSON pointer ref",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$id": "urn:uuid:deadbeef-1234-0000-0000-4321feebdaed",
+			"properties": {
+				"foo": {
+					"$ref": "urn:uuid:deadbeef-1234-0000-0000-4321feebdaed#/$defs/bar"
+				}
+			},
+			"$defs": {
+				"bar": {
+					"type": "string"
+				}
+			}
+		},
+		"tests": [
+			{
+				"description": "a string is valid",
+				"data": {
+					"foo": "bar"
+				},
+				"valid": true
+			},
+			{
+				"description": "a non-string is invalid",
+				"data": {
+					"foo": 12
+				},
+				"valid": false
+			}
+		]
+	},
+	{
+		"description": "URN base URI with URN and anchor ref",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$id": "urn:uuid:deadbeef-1234-ff00-00ff-4321feebdaed",
+			"properties": {
+				"foo": {
+					"$ref": "urn:uuid:deadbeef-1234-ff00-00ff-4321feebdaed#something"
+				}
+			},
+			"$defs": {
+				"bar": {
+					"$anchor": "something",
+					"type": "string"
+				}
+			}
+		},
+		"skip": "extract error: anchors (something) not supported (and 1 more errors)",
+		"tests": [
+			{
+				"description": "a string is valid",
+				"data": {
+					"foo": "bar"
+				},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "a non-string is invalid",
+				"data": {
+					"foo": 12
+				},
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "URN ref with nested pointer ref",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$ref": "urn:uuid:deadbeef-4321-ffff-ffff-1234feebdaed",
+			"$defs": {
+				"foo": {
+					"$id": "urn:uuid:deadbeef-4321-ffff-ffff-1234feebdaed",
+					"$defs": {
+						"bar": {
+							"type": "string"
+						}
+					},
+					"$ref": "#/$defs/bar"
+				}
+			}
+		},
+		"tests": [
+			{
+				"description": "a string is valid",
+				"data": "bar",
+				"valid": true,
+				"skip": "conflicting values \"bar\" and {_schema:{#foo:string},#foo:string} (mismatched types string and struct):\n    generated.cue:2:1\n    instance.json:1:1\n"
+			},
+			{
+				"description": "a non-string is invalid",
+				"data": 12,
+				"valid": false
+			}
+		]
+	},
+	{
+		"description": "ref to if",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$ref": "http://example.com/ref/if",
+			"if": {
+				"$id": "http://example.com/ref/if",
+				"type": "integer"
+			}
+		},
+		"skip": "extract error: unsupported constraint \"if\"",
+		"tests": [
+			{
+				"description": "a non-integer is invalid due to the $ref",
+				"data": "foo",
+				"valid": false,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "an integer is valid",
+				"data": 12,
+				"valid": true,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "ref to then",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$ref": "http://example.com/ref/then",
+			"then": {
+				"$id": "http://example.com/ref/then",
+				"type": "integer"
+			}
+		},
+		"skip": "extract error: unsupported constraint \"then\"",
+		"tests": [
+			{
+				"description": "a non-integer is invalid due to the $ref",
+				"data": "foo",
+				"valid": false,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "an integer is valid",
+				"data": 12,
+				"valid": true,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "ref to else",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$ref": "http://example.com/ref/else",
+			"else": {
+				"$id": "http://example.com/ref/else",
+				"type": "integer"
+			}
+		},
+		"skip": "extract error: unsupported constraint \"else\"",
+		"tests": [
+			{
+				"description": "a non-integer is invalid due to the $ref",
+				"data": "foo",
+				"valid": false,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "an integer is valid",
+				"data": 12,
+				"valid": true,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "ref with absolute-path-reference",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$id": "http://example.com/ref/absref.json",
+			"$defs": {
+				"a": {
+					"$id": "http://example.com/ref/absref/foobar.json",
+					"type": "number"
+				},
+				"b": {
+					"$id": "http://example.com/absref/foobar.json",
+					"type": "string"
+				}
+			},
+			"$ref": "/absref/foobar.json"
+		},
+		"skip": "extract error: cannot compile resulting schema: package \"example.com/absref/foobar.json:foobar\" imported but not defined in :\n    generated.cue:1:8\n",
+		"tests": [
+			{
+				"description": "a string is valid",
+				"data": "foo",
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "an integer is invalid",
+				"data": 12,
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "$id with file URI still resolves pointers - *nix",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$id": "file:///folder/file.json",
+			"$defs": {
+				"foo": {
+					"type": "number"
+				}
+			},
+			"$ref": "#/$defs/foo"
+		},
+		"tests": [
+			{
+				"description": "number is valid",
+				"data": 1,
+				"valid": true
+			},
+			{
+				"description": "non-number is invalid",
+				"data": "a",
+				"valid": false
+			}
+		]
+	},
+	{
+		"description": "$id with file URI still resolves pointers - windows",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$id": "file:///c:/folder/file.json",
+			"$defs": {
+				"foo": {
+					"type": "number"
+				}
+			},
+			"$ref": "#/$defs/foo"
+		},
+		"tests": [
+			{
+				"description": "number is valid",
+				"data": 1,
+				"valid": true
+			},
+			{
+				"description": "non-number is invalid",
+				"data": "a",
+				"valid": false
+			}
+		]
+	},
+	{
+		"description": "empty tokens in $ref json-pointer",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$defs": {
+				"": {
+					"$defs": {
+						"": {
+							"type": "number"
+						}
+					}
+				}
+			},
+			"allOf": [
+				{
+					"$ref": "#/$defs//$defs/"
+				}
+			]
+		},
+		"skip": "extract error: cannot refer to $defs section: must refer to one of its elements",
+		"tests": [
+			{
+				"description": "number is valid",
+				"data": 1,
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "non-number is invalid",
+				"data": "a",
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "$ref with $recursiveAnchor",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2019-09/schema",
+			"$id": "https://example.com/schemas/unevaluated-items-are-disallowed",
+			"$ref": "/schemas/unevaluated-items-are-allowed",
+			"$recursiveAnchor": true,
+			"unevaluatedItems": false,
+			"$defs": {
+				"/schemas/unevaluated-items-are-allowed": {
+					"$schema": "https://json-schema.org/draft/2019-09/schema",
+					"$id": "/schemas/unevaluated-items-are-allowed",
+					"$recursiveAnchor": true,
+					"type": "array",
+					"items": [
+						{
+							"type": "string"
+						},
+						{
+							"$ref": "#"
+						}
+					]
+				}
+			}
+		},
+		"skip": "extract error: unsupported constraint \"$recursiveAnchor\" (and 2 more errors)",
+		"tests": [
+			{
+				"description": "extra items allowed for inner arrays",
+				"data": [
+					"foo",
+					[
+						"bar",
+						[],
+						8
+					]
+				],
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "extra items disallowed for root",
+				"data": [
+					"foo",
+					[
+						"bar",
+						[],
+						8
+					],
+					8
+				],
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	}
+]

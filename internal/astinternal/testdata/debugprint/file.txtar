@@ -145,3 +145,91 @@ import (
 		}
 	}
 }
+-- out/debugprint/empty.cue/omitempty-strings --
+*ast.File{
+	Filename: "empty.cue"
+}
+-- out/debugprint/package_only.cue/omitempty-strings --
+*ast.File{
+	Filename: "package_only.cue"
+	Decls: []ast.Decl{
+		*ast.Package{
+			Name: *ast.Ident{
+				Name: "p"
+			}
+		}
+	}
+}
+-- out/debugprint/comments_only.cue/omitempty-strings --
+*ast.File{
+	Filename: "comments_only.cue"
+	Comments: []*ast.CommentGroup{
+		{
+			List: []*ast.Comment{
+				{
+					Text: "// some"
+				}
+				{
+					Text: "// comment lines"
+				}
+			}
+		}
+	}
+}
+-- out/debugprint/imports.cue/omitempty-strings --
+*ast.File{
+	Filename: "imports.cue"
+	Decls: []ast.Decl{
+		*ast.Package{
+			Name: *ast.Ident{
+				Name: "p"
+			}
+		}
+		*ast.ImportDecl{
+			Specs: []*ast.ImportSpec{
+				{
+					Path: *ast.BasicLit{
+						Value: "\"foo\""
+					}
+				}
+			}
+		}
+		*ast.ImportDecl{
+			Specs: []*ast.ImportSpec{
+				{
+					Path: *ast.BasicLit{
+						Value: "\"bar\""
+					}
+				}
+				{
+					Name: *ast.Ident{
+						Name: "name"
+					}
+					Path: *ast.BasicLit{
+						Value: "\"baz\""
+					}
+				}
+			}
+		}
+	}
+	Imports: []*ast.ImportSpec{
+		{
+			Path: *ast.BasicLit{
+				Value: "\"foo\""
+			}
+		}
+		{
+			Path: *ast.BasicLit{
+				Value: "\"bar\""
+			}
+		}
+		{
+			Name: *ast.Ident{
+				Name: "name"
+			}
+			Path: *ast.BasicLit{
+				Value: "\"baz\""
+			}
+		}
+	}
+}

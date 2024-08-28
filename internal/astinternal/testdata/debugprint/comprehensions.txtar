@@ -107,3 +107,69 @@ for k, v in input if v > 2 {
 	}
 	Imports: []*ast.ImportSpec{}
 }
+-- out/debugprint/comprehensions.cue/omitempty-strings --
+*ast.File{
+	Filename: "comprehensions.cue"
+	Decls: []ast.Decl{
+		*ast.Comprehension{
+			Clauses: []ast.Clause{
+				*ast.IfClause{
+					Condition: *ast.Ident{
+						Name: "condition"
+					}
+				}
+			}
+			Value: *ast.StructLit{
+				Elts: []ast.Decl{
+					*ast.Field{
+						Label: *ast.Ident{
+							Name: "a"
+						}
+						Value: *ast.BasicLit{
+							Value: "true"
+						}
+					}
+				}
+			}
+		}
+		*ast.Comprehension{
+			Clauses: []ast.Clause{
+				*ast.ForClause{
+					Key: *ast.Ident{
+						Name: "k"
+					}
+					Value: *ast.Ident{
+						Name: "v"
+					}
+					Source: *ast.Ident{
+						Name: "input"
+					}
+				}
+				*ast.IfClause{
+					Condition: *ast.BinaryExpr{
+						X: *ast.Ident{
+							Name: "v"
+						}
+						Y: *ast.BasicLit{
+							Value: "2"
+						}
+					}
+				}
+			}
+			Value: *ast.StructLit{
+				Elts: []ast.Decl{
+					*ast.Field{
+						Label: *ast.ParenExpr{
+							X: *ast.Ident{
+								Name: "k"
+							}
+						}
+						Value: *ast.Ident{
+							Name: "v"
+						}
+					}
+				}
+			}
+		}
+	}
+}

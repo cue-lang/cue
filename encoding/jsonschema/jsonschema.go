@@ -44,10 +44,12 @@ import (
 // The generated CUE schema is guaranteed to deem valid any value that is
 // a valid instance of the source JSON schema.
 func Extract(data cue.InstanceOrValue, cfg *Config) (f *ast.File, err error) {
+	cfg = ref(*cfg)
 	if cfg.MapURL == nil {
-		cfg1 := *cfg
-		cfg = &cfg1
-		cfg1.MapURL = DefaultMapURL
+		cfg.MapURL = DefaultMapURL
+	}
+	if cfg.DefaultVersion == VersionUnknown {
+		cfg.DefaultVersion = VersionDraft7
 	}
 	d := &decoder{
 		cfg:          cfg,
@@ -60,6 +62,10 @@ func Extract(data cue.InstanceOrValue, cfg *Config) (f *ast.File, err error) {
 	}
 	return f, nil
 }
+
+// DefaultVersion defines the default schema version used when
+// there is no $schema field and no explicit [Config.DefaultVersion].
+const DefaultVersion = VersionDraft7
 
 // A Config configures a JSON Schema encoding or decoding.
 type Config struct {
@@ -100,5 +106,14 @@ type Config struct {
 	// them.
 	Strict bool
 
+	// DefaultVersion holds the default schema version to use
+	// when no $schema field is present. If it is zero, [DefaultVersion]
+	// will be used.
+	DefaultVersion Version
+
 	_ struct{} // prohibit casting from different type.
+}
+
+func ref[T any](x T) *T {
+	return &x
 }

@@ -1,0 +1,11 @@
+#version: http://json-schema.org/draft-04/schema#
+#strict
+-- schema.json --
+{
+  "$id": "http://example.test",
+  "type": "string"
+}
+-- out/decode/extract --
+ERROR:
+constraint "$id" is not supported in JSON schema version http://json-schema.org/draft-04/schema#:
+    schema.json:2:3

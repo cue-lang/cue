@@ -344,7 +344,7 @@ func FixLegacy(modfile []byte, filename string) (*File, error) {
 			// If there's a legacy module file, the CUE code
 			// is unlikely to be using new language features,
 			// so keep the language version fixed rather than
-			// using cueversion.LanguageVersion().
+			// using [cueversion.LanguageVersion].
 			// See https://cuelang.org/issue/3222.
 			Version: "v0.9.0",
 		},

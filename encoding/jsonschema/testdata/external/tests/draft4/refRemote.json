@@ -1,0 +1,254 @@
+[
+	{
+		"description": "remote ref",
+		"schema": {
+			"$ref": "http://localhost:1234/integer.json"
+		},
+		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/integer.json:integer\":\n    generated.cue:1:8\n",
+		"tests": [
+			{
+				"description": "remote ref valid",
+				"data": 1,
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "remote ref invalid",
+				"data": "a",
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "fragment within remote ref",
+		"schema": {
+			"$ref": "http://localhost:1234/subSchemas.json#/definitions/integer"
+		},
+		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/subSchemas.json:subSchemas\":\n    generated.cue:1:8\n",
+		"tests": [
+			{
+				"description": "remote fragment valid",
+				"data": 1,
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "remote fragment invalid",
+				"data": "a",
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "ref within remote ref",
+		"schema": {
+			"$ref": "http://localhost:1234/subSchemas.json#/definitions/refToInteger"
+		},
+		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/subSchemas.json:subSchemas\":\n    generated.cue:1:8\n",
+		"tests": [
+			{
+				"description": "ref within ref valid",
+				"data": 1,
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "ref within ref invalid",
+				"data": "a",
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "base URI change",
+		"schema": {
+			"id": "http://localhost:1234/",
+			"items": {
+				"id": "baseUriChange/",
+				"items": {
+					"$ref": "folderInteger.json"
+				}
+			}
+		},
+		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/baseUriChange/folderInteger.json:folderInteger\":\n    generated.cue:1:8\n",
+		"tests": [
+			{
+				"description": "base URI change ref valid",
+				"data": [
+					[
+						1
+					]
+				],
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "base URI change ref invalid",
+				"data": [
+					[
+						"a"
+					]
+				],
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "base URI change - change folder",
+		"schema": {
+			"id": "http://localhost:1234/scope_change_defs1.json",
+			"type": "object",
+			"properties": {
+				"list": {
+					"$ref": "#/definitions/baz"
+				}
+			},
+			"definitions": {
+				"baz": {
+					"id": "baseUriChangeFolder/",
+					"type": "array",
+					"items": {
+						"$ref": "folderInteger.json"
+					}
+				}
+			}
+		},
+		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/baseUriChangeFolder/folderInteger.json:folderInteger\":\n    generated.cue:1:8\n",
+		"tests": [
+			{
+				"description": "number is valid",
+				"data": {
+					"list": [
+						1
+					]
+				},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "string is invalid",
+				"data": {
+					"list": [
+						"a"
+					]
+				},
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "base URI change - change folder in subschema",
+		"schema": {
+			"id": "http://localhost:1234/scope_change_defs2.json",
+			"type": "object",
+			"properties": {
+				"list": {
+					"$ref": "#/definitions/baz/definitions/bar"
+				}
+			},
+			"definitions": {
+				"baz": {
+					"id": "baseUriChangeFolderInSubschema/",
+					"definitions": {
+						"bar": {
+							"type": "array",
+							"items": {
+								"$ref": "folderInteger.json"
+							}
+						}
+					}
+				}
+			}
+		},
+		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/baseUriChangeFolderInSubschema/folderInteger.json:folderInteger\":\n    generated.cue:1:8\n",
+		"tests": [
+			{
+				"description": "number is valid",
+				"data": {
+					"list": [
+						1
+					]
+				},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "string is invalid",
+				"data": {
+					"list": [
+						"a"
+					]
+				},
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "root ref in remote ref",
+		"schema": {
+			"id": "http://localhost:1234/object",
+			"type": "object",
+			"properties": {
+				"name": {
+					"$ref": "name.json#/definitions/orNull"
+				}
+			}
+		},
+		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/name.json:name\":\n    generated.cue:1:8\n",
+		"tests": [
+			{
+				"description": "string is valid",
+				"data": {
+					"name": "foo"
+				},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "null is valid",
+				"data": {
+					"name": null
+				},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "object is invalid",
+				"data": {
+					"name": {
+						"name": null
+					}
+				},
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "Location-independent identifier in remote ref",
+		"schema": {
+			"$ref": "http://localhost:1234/locationIndependentIdentifierDraft4.json#/definitions/refToInteger"
+		},
+		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/locationIndependentIdentifierDraft4.json:locationIndependentIdentifierDraft4\":\n    generated.cue:1:8\n",
+		"tests": [
+			{
+				"description": "integer is valid",
+				"data": 1,
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "string is invalid",
+				"data": "foo",
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	}
+]

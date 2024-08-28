@@ -1,0 +1,64 @@
+[
+	{
+		"description": "schema that uses custom metaschema with with no validation vocabulary",
+		"schema": {
+			"$id": "https://schema/using/no/validation",
+			"$schema": "http://localhost:1234/draft2019-09/metaschema-no-validation.json",
+			"properties": {
+				"badProperty": false,
+				"numberProperty": {
+					"minimum": 10
+				}
+			}
+		},
+		"skip": "extract error: invalid $schema URL \"http://localhost:1234/draft2019-09/metaschema-no-validation.json\": $schema URI not recognized",
+		"tests": [
+			{
+				"description": "applicator vocabulary still works",
+				"data": {
+					"badProperty": "this property should not exist"
+				},
+				"valid": false,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "no validation: valid number",
+				"data": {
+					"numberProperty": 20
+				},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "no validation: invalid number, but it still validates",
+				"data": {
+					"numberProperty": 1
+				},
+				"valid": true,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "ignore unrecognized optional vocabulary",
+		"schema": {
+			"$schema": "http://localhost:1234/draft2019-09/metaschema-optional-vocabulary.json",
+			"type": "number"
+		},
+		"skip": "extract error: invalid $schema URL \"http://localhost:1234/draft2019-09/metaschema-optional-vocabulary.json\": $schema URI not recognized",
+		"tests": [
+			{
+				"description": "string value",
+				"data": "foobar",
+				"valid": false,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "number value",
+				"data": 20,
+				"valid": true,
+				"skip": "could not compile schema"
+			}
+		]
+	}
+]

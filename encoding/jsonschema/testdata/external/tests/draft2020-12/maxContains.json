@@ -1,0 +1,141 @@
+[
+	{
+		"description": "maxContains without contains is ignored",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2020-12/schema",
+			"maxContains": 1
+		},
+		"tests": [
+			{
+				"description": "one item valid against lone maxContains",
+				"data": [
+					1
+				],
+				"valid": true
+			},
+			{
+				"description": "two items still valid against lone maxContains",
+				"data": [
+					1,
+					2
+				],
+				"valid": true
+			}
+		]
+	},
+	{
+		"description": "maxContains with contains",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2020-12/schema",
+			"contains": {
+				"const": 1
+			},
+			"maxContains": 1
+		},
+		"tests": [
+			{
+				"description": "empty data",
+				"data": [],
+				"valid": false
+			},
+			{
+				"description": "all elements match, valid maxContains",
+				"data": [
+					1
+				],
+				"valid": true
+			},
+			{
+				"description": "all elements match, invalid maxContains",
+				"data": [
+					1,
+					1
+				],
+				"valid": false
+			},
+			{
+				"description": "some elements match, valid maxContains",
+				"data": [
+					1,
+					2
+				],
+				"valid": true
+			},
+			{
+				"description": "some elements match, invalid maxContains",
+				"data": [
+					1,
+					2,
+					1
+				],
+				"valid": false
+			}
+		]
+	},
+	{
+		"description": "maxContains with contains, value with a decimal",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2020-12/schema",
+			"contains": {
+				"const": 1
+			},
+			"maxContains": 1.0
+		},
+		"skip": "extract error: value of \"maxContains\" must be a non-negative integer value",
+		"tests": [
+			{
+				"description": "one element matches, valid maxContains",
+				"data": [
+					1
+				],
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "too many elements match, invalid maxContains",
+				"data": [
+					1,
+					1
+				],
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	},
+	{
+		"description": "minContains \u003c maxContains",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2020-12/schema",
+			"contains": {
+				"const": 1
+			},
+			"minContains": 1,
+			"maxContains": 3
+		},
+		"tests": [
+			{
+				"description": "actual \u003c minContains \u003c maxContains",
+				"data": [],
+				"valid": false
+			},
+			{
+				"description": "minContains \u003c actual \u003c maxContains",
+				"data": [
+					1,
+					1
+				],
+				"valid": true
+			},
+			{
+				"description": "minContains \u003c maxContains \u003c actual",
+				"data": [
+					1,
+					1,
+					1,
+					1
+				],
+				"valid": false
+			}
+		]
+	}
+]

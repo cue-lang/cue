@@ -1,0 +1,162 @@
+[
+	{
+		"description": "validation of duration strings",
+		"schema": {
+			"$schema": "https://json-schema.org/draft/2020-12/schema",
+			"format": "duration"
+		},
+		"skip": "extract error: unsupported constraint \"format\"",
+		"tests": [
+			{
+				"description": "all string formats ignore integers",
+				"data": 12,
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "all string formats ignore floats",
+				"data": 13.7,
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "all string formats ignore objects",
+				"data": {},
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "all string formats ignore arrays",
+				"data": [],
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "all string formats ignore booleans",
+				"data": false,
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "all string formats ignore nulls",
+				"data": null,
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "a valid duration string",
+				"data": "P4DT12H30M5S",
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "an invalid duration string",
+				"data": "PT1D",
+				"valid": false,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "no elements present",
+				"data": "P",
+				"valid": false,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "no time elements present",
+				"data": "P1YT",
+				"valid": false,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "no date or time elements present",
+				"data": "PT",
+				"valid": false,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "elements out of order",
+				"data": "P2D1Y",
+				"valid": false,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "missing time separator",
+				"data": "P1D2H",
+				"valid": false,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "time element in the date position",
+				"data": "P2S",
+				"valid": false,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "four years duration",
+				"data": "P4Y",
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "zero time, in seconds",
+				"data": "PT0S",
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "zero time, in days",
+				"data": "P0D",
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "one month duration",
+				"data": "P1M",
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "one minute duration",
+				"data": "PT1M",
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "one and a half days, in hours",
+				"data": "PT36H",
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "one and a half days, in days and hours",
+				"data": "P1DT12H",
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "two weeks",
+				"data": "P2W",
+				"valid": true,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "weeks cannot be combined with other units",
+				"data": "P1Y2W",
+				"valid": false,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "invalid non-ASCII '২' (a Bengali 2)",
+				"data": "P২Y",
+				"valid": false,
+				"skip": "could not compile schema"
+			},
+			{
+				"description": "element without unit",
+				"data": "P1",
+				"valid": false,
+				"skip": "could not compile schema"
+			}
+		]
+	}
+]

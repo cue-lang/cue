@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "62c2d4e9_34d16ade",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-28T14:36:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8a33179_ac4f73f5",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 6
+      },
+      "revId": "433498a0712af60a0f0a600aec6ecafd9a586e84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "892d06ac_b05094eb",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-08-23T08:09:48Z",
       "side": 1,
       "message": "\u003e with required fields\n\nwould seem clearer to me. can you also give a very brief example, such as references within a definition or hidden field which do not form part of the root config data?",
+      "range": {
+        "startLine": 21,
+        "startChar": 47,
+        "endLine": 22,
+        "endChar": 6
+      },
+      "revId": "433498a0712af60a0f0a600aec6ecafd9a586e84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2425e113_6b5a7af1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-28T14:36:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "892d06ac_b05094eb",
       "range": {
         "startLine": 21,
         "startChar": 47,
@@ -64,6 +112,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8e10828_5f11cbc5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-28T14:36:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "262425f6_06c4ea64",
+      "revId": "433498a0712af60a0f0a600aec6ecafd9a586e84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b54df157_9e54525a",
@@ -87,6 +153,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "01b5dfc3_1e90a604",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-28T14:36:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b54df157_9e54525a",
+      "range": {
+        "startLine": 34,
+        "startChar": 22,
+        "endLine": 34,
+        "endChar": 33
+      },
+      "revId": "433498a0712af60a0f0a600aec6ecafd9a586e84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c3740ddf_ff8ec37a",
@@ -100,6 +190,24 @@
       "writtenOn": "2024-08-23T08:09:48Z",
       "side": 1,
       "message": "perhaps deduplicate this relatively large comment with something like \"see Vertex.lookup\" (or the other way around)?\n\nalso, I would be a bit clearer on when or why we would revisit this - for example, once we\u0027re looking at the query proposal.",
+      "revId": "433498a0712af60a0f0a600aec6ecafd9a586e84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0698f018_50e862e1",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 958,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-08-28T14:36:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3740ddf_ff8ec37a",
       "revId": "433498a0712af60a0f0a600aec6ecafd9a586e84",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

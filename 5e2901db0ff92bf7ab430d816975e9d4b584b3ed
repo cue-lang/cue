@@ -33,6 +33,24 @@
       "message": "I kinda preferred the old version here, because it\u0027s talking about f specifically.\nAlso, it fits with the expression in the following line.",
       "revId": "5e2901db0ff92bf7ab430d816975e9d4b584b3ed",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "716cb2dc_1461c6e2",
+        "filename": "cue/token/position.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-28T15:04:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a2189514_69ddd0d0",
+      "revId": "5e2901db0ff92bf7ab430d816975e9d4b584b3ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

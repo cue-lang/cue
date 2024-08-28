@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f0d57f9_a64f5b60",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-28T08:04:42Z",
+      "side": 1,
+      "message": "FWIW, I\u0027d just like to record I\u0027m not a fan of this.\n\nThe test output, which we would wish to review as part of reviewing a CL (and so need to be able to understand and review diffs thereof too):\n\n1. does not state what properties are being asserted,\n2. gives no guidance as to what is right or wrong - essentially the reviewer has to blindly trust (i.e. not review) any diff of the txtar content, or go on gut instinct (or some sort of prior knowledge).\n\nEssentially this is a memory dump, albeit pretty printed. As such, it is as verbose as possible: no \"DRY\"-ing up is possible, no abstraction or factorisation is possible.",
+      "revId": "91d39104b0ff6ce464dd2b1679c2f3cdcfe1e2bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -267,7 +267,7 @@ func (c *Controller) Run(ctx context.Context) error {
 
 // Value returns the value managed by the controller.
 //
-// It is safe to use the value only after Run() has returned.
+// It is safe to use the value only after [Controller.Run] has returned.
 // It panics if the flow is running.
 func (c *Controller) Value() cue.Value {
 	if !c.done.Load() {

@@ -149,7 +149,7 @@ func (d *Dependency) Import() *adt.ImportReference {
 
 // IsRoot reports whether the dependency is referenced by the root of the
 // original Vertex passed to any of the Visit* functions, and not one of its
-// descendent arcs. This always returns true for Visit().
+// descendent arcs. This always returns true for [Visit].
 func (d *Dependency) IsRoot() bool {
 	return d.top
 }

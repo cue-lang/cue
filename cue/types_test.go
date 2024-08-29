@@ -38,11 +38,8 @@ import (
 	"cuelang.org/go/internal/tdtest"
 )
 
-func getValue(t *cuetdtest.M, body string) cue.Value {
-	t.Helper()
-
-	ctx := t.CueContext()
-	return ctx.CompileString(body, cue.Filename("test"))
+func getValue(m *cuetdtest.M, body string) cue.Value {
+	return m.CueContext().CompileString(body, cue.Filename("test"))
 }
 
 func mustCompile(t testing.TB, ctx *cue.Context, body string) cue.Value {
@@ -141,10 +138,10 @@ func TestAPI(t *testing.T) {
 		if tc.skip {
 			continue
 		}
-		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
-			t.TODO_V3()
+		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
+			m.TODO_V3(t)
 
-			ctx := t.CueContext()
+			ctx := m.CueContext()
 
 			valIn := mustCompile(t, ctx, tc.input)
 			valOut := tc.fun(valIn)
@@ -153,6 +150,7 @@ func TestAPI(t *testing.T) {
 				t.Errorf("got:\n%s\nwant:\n%s", got, tc.want)
 			}
 		})
+
 	}
 }
 
@@ -346,8 +344,8 @@ func TestValueType(t *testing.T) {
 		closed: false,
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
-			val := getValue(t, tc.value)
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
+			val := getValue(m, tc.value)
 			v := val.Lookup("v")
 			if got := v.Kind(); got != tc.kind {
 				t.Errorf("Kind: got %x; want %x", int(got), int(tc.kind))
@@ -363,6 +361,7 @@ func TestValueType(t *testing.T) {
 				t.Errorf("IsClosed: got %v; want %v", got, tc.closed)
 			}
 		})
+
 	}
 }
 
@@ -413,14 +412,14 @@ func TestInt(t *testing.T) {
 		notInt: true,
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
-			n := getValue(t, tc.value)
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
+			n := getValue(m, tc.value)
 			base := 10
 			if tc.base > 0 {
 				base = tc.base
 			}
 			b, err := n.AppendInt(nil, base)
-			if checkFailed(t.T, err, tc.err, "append") {
+			if checkFailed(t, err, tc.err, "append") {
 				want := tc.value
 				if got := string(b); got != want {
 					t.Errorf("append: got %v; want %v", got, want)
@@ -428,17 +427,18 @@ func TestInt(t *testing.T) {
 			}
 
 			vi, err := n.Int64()
-			checkErr(t.T, err, tc.err, "Int64")
+			checkErr(t, err, tc.err, "Int64")
 			if vi != tc.int {
 				t.Errorf("Int64: got %v; want %v", vi, tc.int)
 			}
 
 			vu, err := n.Uint64()
-			checkErr(t.T, err, tc.errU, "Uint64")
+			checkErr(t, err, tc.errU, "Uint64")
 			if vu != uint64(tc.uint) {
 				t.Errorf("Uint64: got %v; want %v", vu, tc.uint)
 			}
 		})
+
 	}
 }
 
@@ -552,8 +552,8 @@ func TestFloat(t *testing.T) {
 		err:     cue.ErrAbove.Error(),
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
-			n := getValue(t, tc.value)
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
+			n := getValue(m, tc.value)
 			if n.Kind() != tc.kind {
 				t.Fatal("Not a number")
 			}
@@ -575,11 +575,12 @@ func TestFloat(t *testing.T) {
 			}
 
 			f, err := n.Float64()
-			checkErr(t.T, err, tc.err, "Float64")
+			checkErr(t, err, tc.err, "Float64")
 			if f != tc.float64 {
 				t.Errorf("Float64: got %v; want %v", f, tc.float64)
 			}
 		})
+
 	}
 }
 
@@ -603,26 +604,27 @@ func TestString(t *testing.T) {
 		err:   "non-concrete value string",
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
-			str, err := getValue(t, tc.value).String()
-			checkFatal(t.T, err, tc.err, "init")
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
+			str, err := getValue(m, tc.value).String()
+			checkFatal(t, err, tc.err, "init")
 			if str != tc.str {
 				t.Errorf("String: got %q; want %q", str, tc.str)
 			}
 
-			b, err := getValue(t, tc.value).Bytes()
-			checkFatal(t.T, err, tc.err, "init")
+			b, err := getValue(m, tc.value).Bytes()
+			checkFatal(t, err, tc.err, "init")
 			if got := string(b); got != tc.str {
 				t.Errorf("Bytes: got %q; want %q", got, tc.str)
 			}
 
-			r, err := getValue(t, tc.value).Reader()
-			checkFatal(t.T, err, tc.err, "init")
+			r, err := getValue(m, tc.value).Reader()
+			checkFatal(t, err, tc.err, "init")
 			b, _ = io.ReadAll(r)
 			if got := string(b); got != tc.str {
 				t.Errorf("Reader: got %q; want %q", got, tc.str)
 			}
 		})
+
 	}
 }
 
@@ -640,10 +642,11 @@ func TestError(t *testing.T) {
 		err:   "",
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
-			err := getValue(t, tc.value).Err()
-			checkErr(t.T, err, tc.err, "init")
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
+			err := getValue(m, tc.value).Err()
+			checkErr(t, err, tc.err, "init")
 		})
+
 	}
 }
 
@@ -664,16 +667,17 @@ func TestNull(t *testing.T) {
 		err:   "non-concrete value _",
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
-			v := getValue(t, tc.value).Lookup("v")
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
+			v := getValue(m, tc.value).Lookup("v")
 			err := v.Null()
-			checkErr(t.T, err, tc.err, "init")
+			checkErr(t, err, tc.err, "init")
 			wantBool := err == nil
 			gotBool := v.IsNull()
 			if wantBool != gotBool {
 				t.Fatalf("IsNull reported %v, but Null reported: %v", gotBool, err)
 			}
 		})
+
 	}
 }
 
@@ -698,14 +702,15 @@ func TestBool(t *testing.T) {
 		err:   "non-concrete value bool",
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
-			got, err := getValue(t, tc.value).Bool()
-			if checkErr(t.T, err, tc.err, "init") {
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
+			got, err := getValue(m, tc.value).Bool()
+			if checkErr(t, err, tc.err, "init") {
 				if got != tc.bool {
 					t.Errorf("got %v; want %v", got, tc.bool)
 				}
 			}
 		})
+
 	}
 }
 
@@ -735,18 +740,18 @@ func TestList(t *testing.T) {
 		err:   "cannot convert incomplete value",
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
-			l, err := getValue(t, tc.value).List()
-			checkFatal(t.T, err, tc.err, "init")
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
+			l, err := getValue(m, tc.value).List()
+			checkFatal(t, err, tc.err, "init")
 
 			buf := []byte{'['}
 			for wantIdx := 0; l.Next(); wantIdx++ {
-				// Ensure that we can get each index as well.
+
 				if got := l.Selector().Index(); got != wantIdx {
 					t.Errorf("Index got %v; want %v", got, wantIdx)
 				}
 				b, err := l.Value().MarshalJSON()
-				checkFatal(t.T, err, tc.err, "list.Value")
+				checkFatal(t, err, tc.err, "list.Value")
 				buf = append(buf, b...)
 				buf = append(buf, ',')
 			}
@@ -755,6 +760,7 @@ func TestList(t *testing.T) {
 				t.Errorf("got %v; want %v", got, tc.res)
 			}
 		})
+
 	}
 }
 
@@ -837,18 +843,18 @@ func TestFields(t *testing.T) {
 		err:   "cannot use value 1 (type int) as struct",
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
-			obj := getValue(t, tc.value)
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
+			obj := getValue(m, tc.value)
 
 			iter, err := obj.Fields(tc.opts...)
-			checkFatal(t.T, err, tc.err, "init")
+			checkFatal(t, err, tc.err, "init")
 
 			buf := []byte{'{'}
 			for iter.Next() {
 				buf = append(buf, iter.Selector().String()...)
 				buf = append(buf, ':')
 				b, err := iter.Value().MarshalJSON()
-				checkFatal(t.T, err, tc.err, "Obj.At")
+				checkFatal(t, err, tc.err, "Obj.At")
 				buf = append(buf, b...)
 				buf = append(buf, ',')
 			}
@@ -860,18 +866,19 @@ func TestFields(t *testing.T) {
 			iter, _ = obj.Fields(tc.opts...)
 			for iter.Next() {
 				want, err := iter.Value().MarshalJSON()
-				checkFatal(t.T, err, tc.err, "Obj.At2")
+				checkFatal(t, err, tc.err, "Obj.At2")
 
 				got, err := obj.LookupPath(cue.MakePath(iter.Selector())).MarshalJSON()
-				checkFatal(t.T, err, tc.err, "Obj.At2")
+				checkFatal(t, err, tc.err, "Obj.At2")
 
 				if !bytes.Equal(got, want) {
 					t.Errorf("Lookup: got %q; want %q", got, want)
 				}
 			}
 			v := obj.LookupPath(cue.MakePath(cue.Str("non-existing")))
-			checkErr(t.T, v.Err(), "not found", "non-existing")
+			checkErr(t, v.Err(), "not found", "non-existing")
 		})
+
 	}
 }
 
@@ -898,19 +905,19 @@ func TestAllFields(t *testing.T) {
 		res:   `{a!:1,b?:2,c:3,}`,
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
-			obj := getValue(t, tc.value)
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
+			obj := getValue(m, tc.value)
 
-			var iter *cue.Iterator // Verify that the returned iterator is a pointer.
+			var iter *cue.Iterator
 			iter, err := obj.Fields(cue.All())
-			checkFatal(t.T, err, tc.err, "init")
+			checkFatal(t, err, tc.err, "init")
 
 			buf := []byte{'{'}
 			for iter.Next() {
 				buf = append(buf, iter.Selector().String()...)
 				buf = append(buf, ':')
 				b, err := iter.Value().MarshalJSON()
-				checkFatal(t.T, err, tc.err, "Obj.At")
+				checkFatal(t, err, tc.err, "Obj.At")
 				buf = append(buf, b...)
 				buf = append(buf, ',')
 			}
@@ -919,6 +926,7 @@ func TestAllFields(t *testing.T) {
 				t.Errorf("got %v; want %v", got, tc.res)
 			}
 		})
+
 	}
 }
 
@@ -942,8 +950,8 @@ func TestFieldType(t *testing.T) {
 		StringLabel`,
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
-			obj := getValue(t, tc.value)
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
+			obj := getValue(m, tc.value)
 
 			iter, err := obj.Fields(cue.All())
 			if err != nil {
@@ -958,12 +966,13 @@ func TestFieldType(t *testing.T) {
 				t.Errorf("got:%v\nwant:%v", got, tc.want)
 			}
 		})
+
 	}
 }
 
 func TestLookup(t *testing.T) {
-	cuetdtest.FullMatrix.Do(t, func(t *cuetdtest.M) {
-		ctx := t.CueContext()
+	cuetdtest.FullMatrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
+		ctx := m.CueContext()
 		val := mustCompile(t, ctx, `
 #V: {
 	x: int
@@ -1167,8 +1176,8 @@ providers: {
 }
 
 func TestFillPath(t *testing.T) {
-	cuetdtest.FullMatrix.Do(t, func(t *cuetdtest.M) {
-		ctx := t.CueContext()
+	cuetdtest.FullMatrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
+		ctx := m.CueContext()
 
 		val := ctx.BuildExpr(ast.NewStruct("bar", ast.NewString("baz")))
 		if err := val.Err(); err != nil {
@@ -1402,8 +1411,8 @@ func TestFillPathError(t *testing.T) {
 	}}
 
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
-			ctx := t.CueContext()
+		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
+			ctx := m.CueContext()
 			v := mustCompile(t, ctx, tc.in)
 			v = v.FillPath(tc.path, tc.x)
 
@@ -1415,6 +1424,7 @@ func TestFillPathError(t *testing.T) {
 				t.Errorf("\ngot:  %s\nwant: %s", got, tc.err)
 			}
 		})
+
 	}
 }
 
@@ -1655,11 +1665,11 @@ func TestAllows(t *testing.T) {
 	path := cue.ParsePath("x")
 
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.desc, func(t *cuetdtest.M) {
+		cuetdtest.FullMatrix.Run(t, tc.desc, func(t *testing.T, m *cuetdtest.M) {
 			if tc.todo_nosharing {
-				t.TODO_NoSharing()
+				m.TODO_NoSharing(t)
 			}
-			ctx := t.CueContext()
+			ctx := m.CueContext()
 			v := mustCompile(t, ctx, tc.in)
 			v = v.LookupPath(path)
 
@@ -1668,6 +1678,7 @@ func TestAllows(t *testing.T) {
 				t.Errorf("got %v; want %v", got, tc.allow)
 			}
 		})
+
 	}
 }
 
@@ -1721,8 +1732,8 @@ func TestValue_LookupDef(t *testing.T) {
 	}}
 
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.def, func(t *cuetdtest.M) {
-			ctx := t.CueContext()
+		cuetdtest.FullMatrix.Run(t, tc.def, func(t *testing.T, m *cuetdtest.M) {
+			ctx := m.CueContext()
 			v := mustCompile(t, ctx, tc.in)
 			v = v.LookupDef(tc.def)
 			got := fmt.Sprint(v)
@@ -1731,6 +1742,7 @@ func TestValue_LookupDef(t *testing.T) {
 				t.Errorf("\ngot:  %s\nwant: %s", got, tc.out)
 			}
 		})
+
 	}
 }
 
@@ -1768,8 +1780,8 @@ func TestDefaults(t *testing.T) {
 		ok:    false,
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
-			v := getValue(t, "a: "+tc.value).Lookup("a")
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
+			v := getValue(m, "a: "+tc.value).Lookup("a")
 
 			v = v.Eval()
 			d, ok := v.Default()
@@ -1793,6 +1805,7 @@ func TestDefaults(t *testing.T) {
 				t.Errorf("value: got %v; want %v", got, tc.val)
 			}
 		})
+
 	}
 }
 
@@ -1821,14 +1834,15 @@ func TestLen(t *testing.T) {
 		length: "_|_ // len not supported for type int",
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.input, func(t *cuetdtest.M) {
-			v := getValue(t, "a: "+tc.input).Lookup("a")
+		cuetdtest.FullMatrix.Run(t, tc.input, func(t *testing.T, m *cuetdtest.M) {
+			v := getValue(m, "a: "+tc.input).Lookup("a")
 
 			length := v.Len()
 			if got := fmt.Sprint(length); got != tc.length {
 				t.Errorf("length: got %v; want %v", got, tc.length)
 			}
 		})
+
 	}
 }
 
@@ -1874,12 +1888,12 @@ func TestTemplate(t *testing.T) {
 		skip: true, // TODO: reordering
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
+		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
 			if tc.skip {
-				t.TODO_V3()
+				m.TODO_V3(t)
 			}
 
-			v := getValue(t, tc.value)
+			v := getValue(m, tc.value)
 			for _, p := range tc.path {
 				if p == "" {
 					v = v.Template()("label")
@@ -1895,6 +1909,7 @@ func TestTemplate(t *testing.T) {
 				t.Errorf("\n got: %q\nwant: %q", got, tc.want)
 			}
 		})
+
 	}
 }
 
@@ -1938,13 +1953,13 @@ func TestElem(t *testing.T) {
 		skip: true, // TODO(p3): Skip because this is just a reordering.
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
+		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
 			if tc.skip {
-				t.TODO_V3()
+				m.TODO_V3(t)
 			}
 
-			v := getValue(t, tc.value)
-			cue.ValueVertex(v).Finalize(cue.ValueCtx(v)) // TODO: do in instance.
+			v := getValue(m, tc.value)
+			cue.ValueVertex(v).Finalize(cue.ValueCtx(v))
 			for _, p := range tc.path {
 				if p == "" {
 					var ok bool
@@ -1957,11 +1972,12 @@ func TestElem(t *testing.T) {
 				}
 			}
 			got := fmt.Sprint(v)
-			// got := debug.NodeString(v.ctx(), v.v, &debug.Config{Compact: true})
+
 			if got != tc.want {
 				t.Errorf("\n got: %q\nwant: %q", got, tc.want)
 			}
 		})
+
 	}
 }
 
@@ -2080,8 +2096,8 @@ func TestSubsume(t *testing.T) {
 		want:  false,
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
-			v := getValue(t, tc.value)
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
+			v := getValue(m, tc.value)
 			a := v.LookupPath(tc.pathA)
 			b := v.LookupPath(tc.pathB)
 			got := a.Subsume(b, tc.options...) == nil
@@ -2089,6 +2105,7 @@ func TestSubsume(t *testing.T) {
 				t.Errorf("got %v (%v); want %v (%v)", got, a, tc.want, b)
 			}
 		})
+
 	}
 }
 
@@ -2143,8 +2160,8 @@ func TestSubsumes(t *testing.T) {
 		want:  true,
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.value, func(t *cuetdtest.M) {
-			v := getValue(t, tc.value)
+		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
+			v := getValue(m, tc.value)
 			a := v.Lookup(tc.pathA...)
 			b := v.Lookup(tc.pathB...)
 			got := a.Subsumes(b)
@@ -2152,6 +2169,7 @@ func TestSubsumes(t *testing.T) {
 				t.Errorf("got %v (%v); want %v (%v)", got, a, tc.want, b)
 			}
 		})
+
 	}
 }
 
@@ -2214,7 +2232,7 @@ func TestUnify(t *testing.T) {
 		want:  `{}`,
 	}}
 	// TODO(tdtest): use cuetest.Run when supported.
-	cuetdtest.FullMatrix.Do(t, func(m *cuetdtest.M) {
+	cuetdtest.FullMatrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
 		tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
 			v := getValue(m, tc.value)
 			x := v.LookupPath(cue.ParsePath(tc.pathA))
@@ -2268,7 +2286,7 @@ func TestUnifyAccept(t *testing.T) {
 		want: `{"b":1}`,
 	}}
 	// TODO(tdtest): use cuetest.Run when supported.
-	cuetdtest.FullMatrix.Do(t, func(m *cuetdtest.M) {
+	cuetdtest.FullMatrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
 		tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
 			v := getValue(m, tc.value)
 			x := v.LookupPath(cue.ParsePath("#v"))
@@ -2335,8 +2353,8 @@ func TestEquals(t *testing.T) {
 		true,
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
-			ctx := t.CueContext()
+		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
+			ctx := m.CueContext()
 
 			a := mustCompile(t, ctx, tc.a)
 			b := mustCompile(t, ctx, tc.b)
@@ -2345,6 +2363,7 @@ func TestEquals(t *testing.T) {
 				t.Errorf("got %v; want %v", got, tc.want)
 			}
 		})
+
 	}
 }
 
@@ -2490,18 +2509,19 @@ func TestValidate(t *testing.T) {
 		`,
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.desc, func(t *cuetdtest.M) {
+		cuetdtest.FullMatrix.Run(t, tc.desc, func(t *testing.T, m *cuetdtest.M) {
 			if tc.skip {
-				t.TODO_V3()
+				m.TODO_V3(t)
 			}
 
-			ctx := t.CueContext()
+			ctx := m.CueContext()
 			val := ctx.CompileString(tc.in, cue.Filename("validate"))
 			err := val.Validate(tc.opts...)
 			if gotErr := err != nil; gotErr != tc.err {
 				t.Errorf("got %v; want %v", err, tc.err)
 			}
 		})
+
 	}
 }
 
@@ -2527,8 +2547,8 @@ func TestPath(t *testing.T) {
 		mkpath("b", `"4b"`),
 	}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, strings.Join(tc, "."), func(t *cuetdtest.M) {
-			ctx := t.CueContext()
+		cuetdtest.FullMatrix.Run(t, strings.Join(tc, "."), func(t *testing.T, m *cuetdtest.M) {
+			ctx := m.CueContext()
 			val := mustCompile(t, ctx, config)
 
 			v := val.Lookup(tc[0])
@@ -2559,6 +2579,7 @@ func TestPath(t *testing.T) {
 				t.Errorf("got %v; want %v", got, tc)
 			}
 		})
+
 	}
 }
 
@@ -2617,8 +2638,8 @@ func TestValueLookup(t *testing.T) {
 		str:    "cannot use value 0 (type int) as struct",
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.str, func(t *cuetdtest.M) {
-			v := getValue(t, tc.config).Lookup(tc.path...)
+		cuetdtest.FullMatrix.Run(t, tc.str, func(t *testing.T, m *cuetdtest.M) {
+			v := getValue(m, tc.config).Lookup(tc.path...)
 			if got := !v.Exists(); got != tc.notExists {
 				t.Errorf("exists: got %v; want %v", got, tc.notExists)
 			}
@@ -2631,6 +2652,7 @@ func TestValueLookup(t *testing.T) {
 				t.Errorf("\n got %v\nwant %v", got, tc.str)
 			}
 		})
+
 	}
 }
 
@@ -2696,8 +2718,8 @@ func TestValueDoc(t *testing.T) {
 	Foo: {}
 	`
 
-	cuetdtest.FullMatrix.Do(t, func(t *cuetdtest.M) {
-		ctx := t.CueContext()
+	cuetdtest.FullMatrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
+		ctx := m.CueContext()
 		v1 := mustCompile(t, ctx, config)
 		v2 := mustCompile(t, ctx, config2)
 		both := v1.Unify(v2)
@@ -2763,7 +2785,7 @@ Another Foo.
 		}}
 		for _, tc := range testCases {
 			if tc.skip {
-				t.TODO_V3()
+				m.TODO_V3(t)
 			}
 			t.Run("field:"+tc.path, func(t *testing.T) {
 				v := tc.val.Lookup(strings.Split(tc.path, " ")...)
@@ -2961,17 +2983,18 @@ func TestMarshalJSON(t *testing.T) {
 		err: "cue: marshal error: V2: cannot convert incomplete value \"|((string){ \\\"x\\\" }, (string){ \\\"y\\\" })\" to JSON",
 	}}
 	for i, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%d/%v", i, tc.value), func(t *cuetdtest.M) {
-			t.TODO_V3()
+		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%d/%v", i, tc.value), func(t *testing.T, m *cuetdtest.M) {
+			m.TODO_V3(t)
 
-			val := getValue(t, tc.value)
+			val := getValue(m, tc.value)
 			b, err := val.MarshalJSON()
-			checkFatal(t.T, err, tc.err, "init")
+			checkFatal(t, err, tc.err, "init")
 
 			if got := string(b); got != tc.json {
 				t.Errorf("\n got %v;\nwant %v", got, tc.json)
 			}
 		})
+
 	}
 }
 
@@ -3039,10 +3062,10 @@ func TestWalk(t *testing.T) {
 		out:   `{a:2,b:3,c:["A","B"]}`,
 	}}
 	for i, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%d/%v", i, tc.value), func(t *cuetdtest.M) {
-			t.TODO_V3()
+		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%d/%v", i, tc.value), func(t *testing.T, m *cuetdtest.M) {
+			m.TODO_V3(t)
 
-			val := getValue(t, tc.value)
+			val := getValue(m, tc.value)
 			buf := []byte{}
 			stripComma := func() {
 				if n := len(buf) - 1; buf[n] == ',' {
@@ -3085,6 +3108,7 @@ func TestWalk(t *testing.T) {
 				t.Errorf("\n got %v;\nwant %v", got, tc.out)
 			}
 		})
+
 	}
 }
 
@@ -3167,8 +3191,8 @@ func TestReferencePath(t *testing.T) {
 		alt:            "3.14159265358979323846264338327950288419716939937510582097494459",
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
-			ctx := t.CueContext()
+		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
+			ctx := m.CueContext()
 
 			val := ctx.CompileString(tc.input, cue.Filename("in"))
 			v := val.Lookup("v", "w", "x")
@@ -3211,6 +3235,7 @@ func TestReferencePath(t *testing.T) {
 				}
 			}
 		})
+
 	}
 }
 
@@ -3258,12 +3283,12 @@ a: x: y: z: "x"`,
 		pos: "3:4",
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
+		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
 			if tc.skip {
-				t.TODO_V3()
+				m.TODO_V3(t)
 			}
 
-			c := t.CueContext()
+			c := m.CueContext()
 			v := c.CompileString(tc.value)
 			v = v.LookupPath(cue.ParsePath("a"))
 			pos := v.Pos().String()
@@ -3271,6 +3296,7 @@ a: x: y: z: "x"`,
 				t.Errorf("got %v; want %v", pos, tc.pos)
 			}
 		})
+
 	}
 }
 
@@ -3518,11 +3544,9 @@ func TestPathCorrection(t *testing.T) {
 		if tc.skip {
 			continue
 		}
-		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
-			ctx := t.CueContext()
+		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
+			ctx := m.CueContext()
 
-			// don't use mustCompile because some test cases here need to
-			// inspect the value error.
 			val := ctx.CompileString(tc.input, cue.Filename("in"))
 			v := tc.lookup(val)
 			gotVal, ref := v.ReferencePath()
@@ -3544,6 +3568,7 @@ func TestPathCorrection(t *testing.T) {
 			}
 
 		})
+
 	}
 }
 
@@ -3794,13 +3819,14 @@ func TestExpr(t *testing.T) {
 		want:  `.(〈〉 "a")`,
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.input, func(t *cuetdtest.M) {
-			v := getValue(t, tc.input).Lookup("v")
+		cuetdtest.FullMatrix.Run(t, tc.input, func(t *testing.T, m *cuetdtest.M) {
+			v := getValue(m, tc.input).Lookup("v")
 			got := exprStr(v)
 			if got != tc.want {
 				t.Errorf("\n got %v;\nwant %v", got, tc.want)
 			}
 		})
+
 	}
 }
 

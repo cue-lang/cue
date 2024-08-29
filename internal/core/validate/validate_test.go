@@ -228,7 +228,7 @@ y: conflicting values 4 and 2:
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {
 		if tc.todo_v3 {
-			t.M.TODO_V3()
+			t.M.TODO_V3(t)
 		}
 		r := t.M.Runtime()
 		ctx := eval.NewContext(r, nil)

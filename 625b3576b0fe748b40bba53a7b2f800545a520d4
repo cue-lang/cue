@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "71f010a5_753a0c68",
+        "filename": "internal/astinternal/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-29T11:31:16Z",
+      "side": 1,
+      "message": "Sure.",
+      "parentUuid": "9c3399cc_1edcbf5a",
+      "revId": "625b3576b0fe748b40bba53a7b2f800545a520d4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9d42f2be_5262c6d1",
         "filename": "internal/astinternal/debug.go",
         "patchSetId": 1
@@ -48,6 +66,24 @@
       "writtenOn": "2024-08-29T11:26:41Z",
       "side": 1,
       "message": "Arguably an unrelated fix, but I think this needs to be:\n\n\tif !v.IsValid() || (v.Kind() \u003d\u003d reflect.Pointer \u0026\u0026 v.IsNil()) {\n\nbecause otherwise when we\u0027ve got a nil non-interface type, the reflect.Indirect call below results in a zero value which then panics on the v.Type method.",
+      "revId": "625b3576b0fe748b40bba53a7b2f800545a520d4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5174a64_96b3b2cf",
+        "filename": "internal/astinternal/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-29T11:31:16Z",
+      "side": 1,
+      "message": "Checking before (with IsNil) or after (with IsValid) the indirection gives the same resulting behavior I think. I again don\u0027t have a strong opinion here. But using both IsValid and IsNil at the same time seems redundant.",
+      "parentUuid": "9d42f2be_5262c6d1",
       "revId": "625b3576b0fe748b40bba53a7b2f800545a520d4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -77,6 +113,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7836f30b_d022d4ad",
+        "filename": "internal/astinternal/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-29T11:31:16Z",
+      "side": 1,
+      "message": "I personally prefer to keep all append-like operations as assignments, for consistency, but I don\u0027t have a strong opinion either way.",
+      "parentUuid": "3f63bc35_8ce2781c",
+      "range": {
+        "startLine": 105,
+        "startChar": 0,
+        "endLine": 107,
+        "endChar": 0
+      },
+      "revId": "625b3576b0fe748b40bba53a7b2f800545a520d4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8a4e2bcd_df20b070",
         "filename": "internal/astinternal/debug.go",
         "patchSetId": 1
@@ -88,6 +148,24 @@
       "writtenOn": "2024-08-29T11:26:41Z",
       "side": 1,
       "message": "I\u0027m not really keen on how verbose the explicit append operators are making this, particularly as we\u0027ve got a nice helper type that can be used to avoid it.\n\nHow about putting the byte slice inside the debugPrinter and wrapping debugPrinter.value with a helper so it always reports whether it printed something?\n\n```\nfunc (d *debugPrinter) value(v reflect.Value, impliedType reflect.Type) bool {\n\tpos :\u003d d.pos()\n\td.value0(v, impliedType)\n\treturn d.pos() \u003e pos\n}\n```\n\nThe pos method is just:\n\n```\nfunc (d *debugPrinter) pos() int {\n\treturn len(d.buf)\n}\n```\n\nThen the \"undo\" logic becomes quite a bit simpler:\n\n```\nfor i :\u003d 0; i \u003c v.Len(); i++ {\n\tev :\u003d v.Index(i)\n\tpos :\u003d d.pos()\n\td.newline(dst)\n\tif d.value(ev, t.Elem()) {\n\t\tanyElems \u003d true\n\t} else {\n\t\td.rewind(pos)\n\t}\n}\n```\n\nThe rewind method is just:\n\n```\nfunc (d *debugPrinter) rewind(pos int) {\n    d.buf \u003d d.buf[pos]\n}\n```\n\nThen we can still use `d.printf` as before etc.",
+      "revId": "625b3576b0fe748b40bba53a7b2f800545a520d4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2579c897_cc024b63",
+        "filename": "internal/astinternal/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-29T11:31:16Z",
+      "side": 1,
+      "message": "I was trying to lean into append-like APIs here, even for the internal methods. I\u0027m personally not too fussed by the assignments and parameters and results everywhere, but I\u0027d be fine with internal state as well, like you say.",
+      "parentUuid": "8a4e2bcd_df20b070",
       "revId": "625b3576b0fe748b40bba53a7b2f800545a520d4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

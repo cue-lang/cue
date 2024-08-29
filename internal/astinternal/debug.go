@@ -31,9 +31,10 @@ import (
 // including node position information and any relevant Go types.
 func AppendDebug(dst []byte, node ast.Node, config DebugConfig) []byte {
 	d := &debugPrinter{cfg: config}
-	dst = d.value(dst, reflect.ValueOf(node), nil)
-	dst = d.newline(dst)
-	return dst
+	if d.value(reflect.ValueOf(node), nil) {
+		d.newline()
+	}
+	return d.buf
 }
 
 // DebugConfig configures the behavior of [AppendDebug].
@@ -49,16 +50,9 @@ type DebugConfig struct {
 
 type debugPrinter struct {
 	w     io.Writer
+	buf   []byte
 	cfg   DebugConfig
 	level int
-}
-
-func (d *debugPrinter) printf(dst []byte, format string, args ...any) []byte {
-	return fmt.Appendf(dst, format, args...)
-}
-
-func (d *debugPrinter) newline(dst []byte) []byte {
-	return fmt.Appendf(dst, "\n%s", strings.Repeat("\t", d.level))
 }
 
 var (
@@ -66,100 +60,102 @@ var (
 	typeTokenToken = reflect.TypeFor[token.Token]()
 )
 
-func (d *debugPrinter) value(dst []byte, v reflect.Value, impliedType reflect.Type) []byte {
+// value produces the given value, omitting type information if
+// its type is the same as implied type. It reports whether
+// anything was produced.
+func (d *debugPrinter) value(v reflect.Value, impliedType reflect.Type) bool {
+	start := d.pos()
+	d.value0(v, impliedType)
+	return d.pos() > start
+}
+
+func (d *debugPrinter) value0(v reflect.Value, impliedType reflect.Type) {
 	if d.cfg.Filter != nil && !d.cfg.Filter(v) {
-		return dst
+		return
 	}
 	// Skip over interface types.
 	if v.Kind() == reflect.Interface {
 		v = v.Elem()
 	}
-	// Indirecting a nil interface gives a zero value.
-	if !v.IsValid() {
+	// Indirecting a nil interface gives a zero value. We
+	// can also have a nil pointer inside a non-nil interface.
+	if !v.IsValid() || (v.Kind() == reflect.Pointer && v.IsNil()) {
 		if !d.cfg.OmitEmpty {
-			dst = d.printf(dst, "nil")
+			d.printf("nil")
 		}
-		return dst
+		return
 	}
 
 	// We print the original pointer type if there was one.
 	origType := v.Type()
 
 	v = reflect.Indirect(v)
-	// Indirecting a nil pointer gives a zero value.
-	if !v.IsValid() {
-		if !d.cfg.OmitEmpty {
-			dst = d.printf(dst, "nil")
-		}
-		return dst
-	}
 
 	if d.cfg.OmitEmpty && v.IsZero() {
-		return dst
+		return
 	}
 
 	t := v.Type()
 	switch t {
 	// Simple types which can stringify themselves.
 	case typeTokenPos, typeTokenToken:
-		dst = d.printf(dst, "%s(%q)", t, v)
+		d.printf("%s(%q)", t, v)
 		// Show relative positions too, if there are any, as they affect formatting.
 		if t == typeTokenPos {
 			pos := v.Interface().(token.Pos)
 			if pos.HasRelPos() {
-				dst = d.printf(dst, ".WithRel(%q)", pos.RelPos())
+				d.printf(".WithRel(%q)", pos.RelPos())
 			}
 		}
-		return dst
+		return
 	}
 
-	undoValue := len(dst)
+	valueStart := d.pos()
 	switch t.Kind() {
 	default:
 		// We assume all other kinds are basic in practice, like string or bool.
 		if t.PkgPath() != "" {
 			// Mention defined and non-predeclared types, for clarity.
-			dst = d.printf(dst, "%s(%#v)", t, v)
+			d.printf("%s(%#v)", t, v)
 		} else {
-			dst = d.printf(dst, "%#v", v)
+			d.printf("%#v", v)
 		}
 
 	case reflect.Slice:
 		if origType != impliedType {
-			dst = d.printf(dst, "%s", origType)
+			d.printf("%s", origType)
 		}
-		dst = d.printf(dst, "{")
+		d.printf("{")
 		d.level++
 		anyElems := false
 		for i := 0; i < v.Len(); i++ {
 			ev := v.Index(i)
-			undoElem := len(dst)
-			dst = d.newline(dst)
+			elemStart := d.pos()
+			d.newline()
 			// Note: a slice literal implies the type of its elements
 			// so we can avoid mentioning the type
 			// of each element if it matches.
-			if dst2 := d.value(dst, ev, t.Elem()); len(dst2) == len(dst) {
-				dst = dst[:undoElem]
-			} else {
-				dst = dst2
+			if d.value(ev, t.Elem()) {
 				anyElems = true
+			} else {
+				d.truncate(elemStart)
 			}
 		}
 		d.level--
 		if !anyElems && d.cfg.OmitEmpty {
-			dst = dst[:undoValue]
+			d.truncate(valueStart)
 		} else {
 			if anyElems {
-				dst = d.newline(dst)
+				d.newline()
 			}
-			dst = d.printf(dst, "}")
+			d.printf("}")
 		}
 
 	case reflect.Struct:
 		if origType != impliedType {
-			dst = d.printf(dst, "%s", origType)
+			d.printf("%s", origType)
 		}
-		dst = d.printf(dst, "{")
+		d.printf("{")
 		anyElems := false
 		d.level++
 		for i := 0; i < v.NumField(); i++ {
@@ -172,14 +168,13 @@ func (d *debugPrinter) value(dst []byte, v reflect.Value, impliedType reflect.Ty
 			case "Scope", "Node", "Unresolved":
 				continue
 			}
-			undoElem := len(dst)
-			dst = d.newline(dst)
-			dst = d.printf(dst, "%s: ", f.Name)
-			if dst2 := d.value(dst, v.Field(i), nil); len(dst2) == len(dst) {
-				dst = dst[:undoElem]
-			} else {
-				dst = dst2
+			elemStart := d.pos()
+			d.newline()
+			d.printf("%s: ", f.Name)
+			if d.value(v.Field(i), nil) {
 				anyElems = true
+			} else {
+				d.truncate(elemStart)
 			}
 		}
 		val := v.Addr().Interface()
@@ -188,22 +183,37 @@ func (d *debugPrinter) value(dst []byte, v reflect.Value, impliedType reflect.Ty
 			// The majority of nodes won't have comments, so skip them when empty.
 			if comments := ast.Comments(val); len(comments) > 0 {
 				anyElems = true
-				dst = d.newline(dst)
-				dst = d.printf(dst, "Comments: ")
-				dst = d.value(dst, reflect.ValueOf(comments), nil)
+				d.newline()
+				d.printf("Comments: ")
+				d.value(reflect.ValueOf(comments), nil)
 			}
 		}
 		d.level--
 		if !anyElems && d.cfg.OmitEmpty {
-			dst = dst[:undoValue]
+			d.truncate(valueStart)
 		} else {
 			if anyElems {
-				dst = d.newline(dst)
+				d.newline()
 			}
-			dst = d.printf(dst, "}")
+			d.printf("}")
 		}
 	}
-	return dst
+}
+
+func (d *debugPrinter) printf(format string, args ...any) {
+	d.buf = fmt.Appendf(d.buf, format, args...)
+}
+
+func (d *debugPrinter) newline() {
+	d.buf = fmt.Appendf(d.buf, "\n%s", strings.Repeat("\t", d.level))
+}
+
+func (d *debugPrinter) pos() int {
+	return len(d.buf)
+}
+
+func (d *debugPrinter) truncate(pos int) {
+	d.buf = d.buf[:pos]
 }
 
 func DebugStr(x interface{}) (out string) {

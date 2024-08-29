@@ -3030,7 +3030,7 @@ func TestWalk(t *testing.T) {
 		out:   `[int]`,
 	}, {
 		value: `3 * [1, 2]`,
-		out:   `[1,2,1,2,1,2]`,
+		out:   `_|_(invalid operands 3 and [1,2] to '*' (type int and list))`,
 	}, {
 		value: `{}`,
 		out:   `{}`,

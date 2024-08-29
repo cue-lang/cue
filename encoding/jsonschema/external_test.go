@@ -1,12 +1,9 @@
 package jsonschema_test
 
 import (
-	"bytes"
-	stdjson "encoding/json"
 	"fmt"
 	"os"
 	"path"
-	"path/filepath"
 	"sort"
 	"strings"
 	"testing"
@@ -23,10 +20,12 @@ import (
 	"cuelang.org/go/internal/cuetest"
 )
 
+const testDir = "testdata/external"
+
 // TestExternal runs the externally defined JSON Schema test suite,
 // as defined in https://github.com/json-schema-org/JSON-Schema-Test-Suite.
 func TestExternal(t *testing.T) {
-	tests, err := externaltest.ReadTestDir("testdata/external")
+	tests, err := externaltest.ReadTestDir(testDir)
 	qt.Assert(t, qt.IsNil(err))
 
 	t.Logf("read %d test files", len(tests))
@@ -49,19 +48,11 @@ func TestExternal(t *testing.T) {
 	if !cuetest.UpdateGoldenFiles {
 		return
 	}
-	for filename, schemas := range tests {
-		filename = filepath.Join("testdata/external", filename)
-		data, err := stdjson.MarshalIndent(schemas, "", "\t")
-		qt.Assert(t, qt.IsNil(err))
-		data = append(data, '\n')
-		oldData, err := os.ReadFile(filename)
-		qt.Assert(t, qt.IsNil(err))
-		if bytes.Equal(oldData, data) {
-			continue
-		}
-		err = os.WriteFile(filename, data, 0o666)
-		qt.Assert(t, qt.IsNil(err))
+	if t.Failed() {
+		t.Fatalf("not writing test data back because of test failures")
 	}
+	err = externaltest.WriteTestDir(testDir, tests)
+	qt.Assert(t, qt.IsNil(err))
 }
 
 func runExternalSchemaTests(t *testing.T, filename string, s *externaltest.Schema) {
@@ -96,21 +87,15 @@ func runExternalSchemaTests(t *testing.T, filename string, s *externaltest.Schem
 	}
 
 	if extractErr != nil {
-		if cuetest.UpdateGoldenFiles {
-			s.Skip = fmt.Sprintf("extract error: %v", extractErr)
-			for _, t := range s.Tests {
-				t.Skip = "could not compile schema"
-			}
-			return
+		for _, test := range s.Tests {
+			t.Run("", func(t *testing.T) {
+				testFailed(t, &test.Skip, "could not compile schema")
+			})
 		}
-		if s.Skip != "" {
-			t.SkipNow()
-		}
-		t.Fatalf("extract error: %v", extractErr)
+		testFailed(t, &s.Skip, fmt.Sprintf("extract error: %v", extractErr))
+		return
 	}
-	if s.Skip != "" {
-		t.Errorf("unexpected test success on skipped test")
-	}
+	testSucceeded(t, &s.Skip)
 
 	for _, test := range s.Tests {
 		t.Run("", func(t *testing.T) {
@@ -126,42 +111,53 @@ func runExternalSchemaTests(t *testing.T, filename string, s *externaltest.Schem
 			qt.Assert(t, qt.IsNil(instv.Err()))
 			err = instv.Unify(schemav).Err()
 			if test.Valid {
-				if cuetest.UpdateGoldenFiles {
-					if err == nil {
-						test.Skip = ""
-					} else {
-						test.Skip = errors.Details(err, nil)
-					}
-					return
-				}
 				if err != nil {
-					if test.Skip != "" {
-						t.SkipNow()
-					}
-					t.Fatalf("error: %v", errors.Details(err, nil))
-				} else if test.Skip != "" {
-					t.Error("unexpectedly more correct behavior (test success) on skipped test")
+					testFailed(t, &test.Skip, errors.Details(err, nil))
+				} else {
+					testSucceeded(t, &test.Skip)
 				}
 			} else {
-				if cuetest.UpdateGoldenFiles {
-					if err != nil {
-						test.Skip = ""
-					} else {
-						test.Skip = "unexpected success"
-					}
-					return
-				}
 				if err == nil {
-					if test.Skip != "" {
-						t.SkipNow()
-					}
-					t.Fatal("unexpected success")
-				} else if test.Skip != "" {
-					t.Error("unexpectedly more correct behavior (test failure) on skipped test")
+					testFailed(t, &test.Skip, "unexpected success")
+				} else {
+					testSucceeded(t, &test.Skip)
 				}
 			}
 		})
 	}
+}
+
+// testFailed marks the current test as failed with the
+// given error message, and updates the
+// skip field pointed to by skipField if necessary.
+func testFailed(t *testing.T, skipField *string, errStr string) {
+	if cuetest.UpdateGoldenFiles {
+		if *skipField == "" && !allowRegressions() {
+			t.Fatalf("test regression; was succeeding, now failing: %v", errStr)
+		}
+		*skipField = errStr
+		return
+	}
+	if *skipField != "" {
+		t.SkipNow()
+	}
+	t.Fatal(errStr)
+}
+
+// testFails marks the current test as succeeded and updates the
+// skip field pointed to by skipField if necessary.
+func testSucceeded(t *testing.T, skipField *string) {
+	if cuetest.UpdateGoldenFiles {
+		*skipField = ""
+		return
+	}
+	if *skipField != "" {
+		t.Fatalf("unexpectedly more correct behavior (test success) on skipped test")
+	}
+}
+
+func allowRegressions() bool {
+	return os.Getenv("CUE_ALLOW_REGRESSIONS") != ""
 }
 
 var extVersionToVersion = map[string]jsonschema.Version{

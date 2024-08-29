@@ -1,8 +1,13 @@
 //go:build ignore
 
+// This command copies external JSON Schema tests into the local
+// repository. It tries to maintain existing test-skip information
+// to avoid unintentional regressions.
+
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io/fs"
@@ -12,11 +17,13 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+
+	"cuelang.org/go/encoding/jsonschema/internal/externaltest"
 )
 
 const (
 	testRepo = "git@github.com:json-schema-org/JSON-Schema-Test-Suite"
-	testDir  = "testdata/external/tests"
+	testDir  = "testdata/external"
 )
 
 func main() {
@@ -47,8 +54,15 @@ func doVendor(commit string) error {
 	if err := runCmd(tmpDir, "git", "checkout", "-q", commit); err != nil {
 		return err
 	}
+	logf("reading old test data")
+	oldTests, err := externaltest.ReadTestDir(testDir)
+	if err != nil && !errors.Is(err, externaltest.ErrNotFound) {
+		return err
+	}
 	logf("copying files to %s", testDir)
-	if err := os.RemoveAll(testDir); err != nil {
+
+	testSubdir := filepath.Join(testDir, "tests")
+	if err := os.RemoveAll(testSubdir); err != nil {
 		return err
 	}
 	fsys := os.DirFS(filepath.Join(tmpDir, "tests"))
@@ -67,19 +81,70 @@ func doVendor(commit string) error {
 		if !strings.HasSuffix(filename, ".json") {
 			return nil
 		}
-		if err := os.MkdirAll(filepath.Join(testDir, path.Dir(filename)), 0o777); err != nil {
+		if err := os.MkdirAll(filepath.Join(testSubdir, path.Dir(filename)), 0o777); err != nil {
 			return err
 		}
 		data, err := fs.ReadFile(fsys, filename)
 		if err != nil {
 			return err
 		}
-		if err := os.WriteFile(filepath.Join(testDir, filename), data, 0o666); err != nil {
+		if err := os.WriteFile(filepath.Join(testSubdir, filename), data, 0o666); err != nil {
 			return err
 		}
 		return nil
 	})
+
+	// Read the test data back that we've just written and attempt
+	// to populate skip data from the original test data.
+	// As indexes are not necessarily stable (new test cases
+	// might be inserted in the middle of an array, we try
+	// first to look up the skip info by JSON data, and then
+	// by test description.
+	byJSON := make(map[skipKey]string)
+	byDescription := make(map[skipKey]string)
+
+	for filename, schemas := range oldTests {
+		for _, schema := range schemas {
+			byJSON[skipKey{filename, string(schema.Schema), ""}] = schema.Skip
+			byDescription[skipKey{filename, schema.Description, ""}] = schema.Skip
+			for _, test := range schema.Tests {
+				byJSON[skipKey{filename, string(schema.Schema), string(test.Data)}] = test.Skip
+				byDescription[skipKey{filename, schema.Description, test.Description}] = schema.Skip
+			}
+		}
+	}
+
+	newTests, err := externaltest.ReadTestDir(testDir)
+	if err != nil {
+		return err
+	}
+
+	for filename, schemas := range newTests {
+		for _, schema := range schemas {
+			skip, ok := byJSON[skipKey{filename, string(schema.Schema), ""}]
+			if !ok {
+				skip, _ = byDescription[skipKey{filename, schema.Description, ""}]
+			}
+			schema.Skip = skip
+			for _, test := range schema.Tests {
+				skip, ok := byJSON[skipKey{filename, string(schema.Schema), string(test.Data)}]
+				if !ok {
+					skip, _ = byDescription[skipKey{filename, schema.Description, test.Description}]
+				}
+				test.Skip = skip
+			}
+		}
+	}
+	if err := externaltest.WriteTestDir(testDir, newTests); err != nil {
+		return err
+	}
 	return err
+}
+
+type skipKey struct {
+	filename string
+	schema   string
+	test     string
 }
 
 func runCmd(dir string, name string, args ...string) error {

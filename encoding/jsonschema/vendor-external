@@ -12,6 +12,3 @@ go test
 
 # Then fetch the new tests.
 go run vendor_external.go -- $COMMIT
-
-# Then update the test results.
-CUE_UPDATE=1 go test

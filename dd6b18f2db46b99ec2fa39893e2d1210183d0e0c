@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fcd437fa_bb224d1f",
+        "filename": "internal/astinternal/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-29T21:17:21Z",
+      "side": 1,
+      "message": "If you\u0027re going to switch pointers from IsValid to IsNil, please switch interfaces too. Using different mechanisms for both kinds of indirection seems odd.",
+      "revId": "dd6b18f2db46b99ec2fa39893e2d1210183d0e0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

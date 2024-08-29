@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4499f726_79a2fc65",
+        "filename": "internal/astinternal/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-29T21:17:21Z",
+      "side": 0,
+      "message": "you really don\u0027t like my tendency to keep helpers near the receiver type :P",
+      "revId": "b123f2b053ec8b8f8b95d7802a713ba38d58fecb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

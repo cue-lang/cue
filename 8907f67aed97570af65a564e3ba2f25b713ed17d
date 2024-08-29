@@ -1,6 +1,40 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "a28f92fb_ca2f337a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-29T12:12:14Z",
+      "side": 1,
+      "message": "I would mention that\n\n1) we cannot \"fix\" those users to the list APIs\n2) that we don\u0027t expect any people will be broken, as list arithmetic has been phased out for years, and cuego expressions tend to be simple",
+      "revId": "8907f67aed97570af65a564e3ba2f25b713ed17d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3953ad3_53b21d17",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-29T12:12:14Z",
+      "side": 1,
+      "message": "Unity fails because one of the downstream projects we test uses list addition. I will look into that - it probably means sending upstream a \"cue fix\" patch and then updating Unity to the new version of upstream.",
+      "revId": "8907f67aed97570af65a564e3ba2f25b713ed17d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "fc074a6d_819165ee",
@@ -14,6 +48,41 @@
       "writtenOn": "2024-08-29T12:06:50Z",
       "side": 1,
       "message": "AIUI, this bit, and there\u0027s a similar chunk further down, shows that evalv3 copes just fine with this change, but v2 does not - v2 incorrectly errors with the cycle error.",
+      "revId": "8907f67aed97570af65a564e3ba2f25b713ed17d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1741cdf_32e9dfd9",
+        "filename": "cue/testdata/cycle/chain.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 758,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-29T12:12:14Z",
+      "side": 1,
+      "message": "SGTM - but I think this needs a mention in the commit message.",
+      "parentUuid": "fc074a6d_819165ee",
+      "revId": "8907f67aed97570af65a564e3ba2f25b713ed17d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e385ea7_5e81f092",
+        "filename": "cue/types_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 3033,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-29T12:12:14Z",
+      "side": 1,
+      "message": "can you add an \"invalid operands\" test case for adding two lists too, for the sake of good test coverage?",
       "revId": "8907f67aed97570af65a564e3ba2f25b713ed17d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

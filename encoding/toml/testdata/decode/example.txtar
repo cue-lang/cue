@@ -41,7 +41,7 @@ color = "gray"
 	Elts: []ast.Decl{
 		*ast.Field{
 			Label: *ast.Ident{
-				NamePos: token.Pos("example.toml:4:1").WithRel("newline")
+				NamePos: token.Pos("example.toml:4:1", newline)
 			}
 			Value: *ast.BasicLit{
 				ValuePos: token.Pos("example.toml:4:9")
@@ -49,38 +49,38 @@ color = "gray"
 		}
 		*ast.Field{
 			Label: *ast.Ident{
-				NamePos: token.Pos("example.toml:6:2").WithRel("newline")
+				NamePos: token.Pos("example.toml:6:2", newline)
 			}
 			Value: *ast.StructLit{
-				Lbrace: token.Pos("-").WithRel("blank")
+				Lbrace: token.Pos("-", blank)
 				Elts: []ast.Decl{
 					*ast.Field{
 						Label: *ast.Ident{
-							NamePos: token.Pos("example.toml:7:1").WithRel("newline")
+							NamePos: token.Pos("example.toml:7:1", newline)
 						}
 						Value: *ast.BasicLit{
 							ValuePos: token.Pos("example.toml:7:8")
 						}
 					}
 				}
-				Rbrace: token.Pos("-").WithRel("newline")
+				Rbrace: token.Pos("-", newline)
 			}
 		}
 		*ast.Field{
 			Label: *ast.Ident{
-				NamePos: token.Pos("example.toml:11:2").WithRel("newline")
+				NamePos: token.Pos("example.toml:11:2", newline)
 			}
 			Value: *ast.StructLit{
-				Lbrace: token.Pos("-").WithRel("blank")
+				Lbrace: token.Pos("-", blank)
 				Elts: []ast.Decl{
 					*ast.Field{
 						Label: *ast.Ident{
-							NamePos: token.Pos("example.toml:12:1").WithRel("newline")
+							NamePos: token.Pos("example.toml:12:1", newline)
 						}
 					}
 					*ast.Field{
 						Label: *ast.Ident{
-							NamePos: token.Pos("example.toml:13:1").WithRel("newline")
+							NamePos: token.Pos("example.toml:13:1", newline)
 						}
 						Value: *ast.ListLit{
 							Elts: []ast.Expr{
@@ -98,7 +98,7 @@ color = "gray"
 					}
 					*ast.Field{
 						Label: *ast.Ident{
-							NamePos: token.Pos("example.toml:14:1").WithRel("newline")
+							NamePos: token.Pos("example.toml:14:1", newline)
 						}
 						Value: *ast.ListLit{
 							Elts: []ast.Expr{
@@ -124,14 +124,14 @@ color = "gray"
 					}
 					*ast.Field{
 						Label: *ast.Ident{
-							NamePos: token.Pos("example.toml:15:1").WithRel("newline")
+							NamePos: token.Pos("example.toml:15:1", newline)
 						}
 						Value: *ast.StructLit{
 							Lbrace: token.Pos("example.toml:15:16")
 							Elts: []ast.Decl{
 								*ast.Field{
 									Label: *ast.Ident{
-										NamePos: token.Pos("example.toml:15:18").WithRel("blank")
+										NamePos: token.Pos("example.toml:15:18", blank)
 									}
 									Value: *ast.BasicLit{
 										ValuePos: token.Pos("example.toml:15:24")
@@ -139,45 +139,45 @@ color = "gray"
 								}
 								*ast.Field{
 									Label: *ast.Ident{
-										NamePos: token.Pos("example.toml:15:30").WithRel("blank")
+										NamePos: token.Pos("example.toml:15:30", blank)
 									}
 									Value: *ast.BasicLit{
 										ValuePos: token.Pos("example.toml:15:37")
 									}
 								}
 							}
-							Rbrace: token.Pos("-").WithRel("blank")
+							Rbrace: token.Pos("-", blank)
 						}
 					}
 				}
-				Rbrace: token.Pos("-").WithRel("newline")
+				Rbrace: token.Pos("-", newline)
 			}
 		}
 		*ast.Field{
 			Label: *ast.Ident{
-				NamePos: token.Pos("example.toml:17:2").WithRel("newline")
+				NamePos: token.Pos("example.toml:17:2", newline)
 			}
 			Value: *ast.StructLit{
-				Lbrace: token.Pos("-").WithRel("blank")
-				Rbrace: token.Pos("-").WithRel("newline")
+				Lbrace: token.Pos("-", blank)
+				Rbrace: token.Pos("-", newline)
 			}
 		}
 		*ast.Field{
 			Label: *ast.Ident{
-				NamePos: token.Pos("example.toml:19:2").WithRel("newline")
+				NamePos: token.Pos("example.toml:19:2", newline)
 			}
 			Value: *ast.StructLit{
 				Elts: []ast.Decl{
 					*ast.Field{
 						Label: *ast.Ident{
-							NamePos: token.Pos("example.toml:19:10").WithRel("blank")
+							NamePos: token.Pos("example.toml:19:10", blank)
 						}
 						Value: *ast.StructLit{
-							Lbrace: token.Pos("-").WithRel("blank")
+							Lbrace: token.Pos("-", blank)
 							Elts: []ast.Decl{
 								*ast.Field{
 									Label: *ast.Ident{
-										NamePos: token.Pos("example.toml:20:1").WithRel("newline")
+										NamePos: token.Pos("example.toml:20:1", newline)
 									}
 									Value: *ast.BasicLit{
 										ValuePos: token.Pos("example.toml:20:6")
@@ -185,14 +185,14 @@ color = "gray"
 								}
 								*ast.Field{
 									Label: *ast.Ident{
-										NamePos: token.Pos("example.toml:21:1").WithRel("newline")
+										NamePos: token.Pos("example.toml:21:1", newline)
 									}
 									Value: *ast.BasicLit{
 										ValuePos: token.Pos("example.toml:21:8")
 									}
 								}
 							}
-							Rbrace: token.Pos("-").WithRel("newline")
+							Rbrace: token.Pos("-", newline)
 						}
 					}
 				}
@@ -200,20 +200,20 @@ color = "gray"
 		}
 		*ast.Field{
 			Label: *ast.Ident{
-				NamePos: token.Pos("example.toml:23:2").WithRel("newline")
+				NamePos: token.Pos("example.toml:23:2", newline)
 			}
 			Value: *ast.StructLit{
 				Elts: []ast.Decl{
 					*ast.Field{
 						Label: *ast.Ident{
-							NamePos: token.Pos("example.toml:23:10").WithRel("blank")
+							NamePos: token.Pos("example.toml:23:10", blank)
 						}
 						Value: *ast.StructLit{
-							Lbrace: token.Pos("-").WithRel("blank")
+							Lbrace: token.Pos("-", blank)
 							Elts: []ast.Decl{
 								*ast.Field{
 									Label: *ast.Ident{
-										NamePos: token.Pos("example.toml:24:1").WithRel("newline")
+										NamePos: token.Pos("example.toml:24:1", newline)
 									}
 									Value: *ast.BasicLit{
 										ValuePos: token.Pos("example.toml:24:6")
@@ -221,14 +221,14 @@ color = "gray"
 								}
 								*ast.Field{
 									Label: *ast.Ident{
-										NamePos: token.Pos("example.toml:25:1").WithRel("newline")
+										NamePos: token.Pos("example.toml:25:1", newline)
 									}
 									Value: *ast.BasicLit{
 										ValuePos: token.Pos("example.toml:25:8")
 									}
 								}
 							}
-							Rbrace: token.Pos("-").WithRel("newline")
+							Rbrace: token.Pos("-", newline)
 						}
 					}
 				}
@@ -236,17 +236,17 @@ color = "gray"
 		}
 		*ast.Field{
 			Label: *ast.Ident{
-				NamePos: token.Pos("example.toml:27:3").WithRel("newline")
+				NamePos: token.Pos("example.toml:27:3", newline)
 			}
 			Value: *ast.ListLit{
-				Lbrack: token.Pos("-").WithRel("blank")
+				Lbrack: token.Pos("-", blank)
 				Elts: []ast.Expr{
 					*ast.StructLit{
-						Lbrace: token.Pos("-").WithRel("newline")
+						Lbrace: token.Pos("-", newline)
 						Elts: []ast.Decl{
 							*ast.Field{
 								Label: *ast.Ident{
-									NamePos: token.Pos("example.toml:28:1").WithRel("newline")
+									NamePos: token.Pos("example.toml:28:1", newline)
 								}
 								Value: *ast.BasicLit{
 									ValuePos: token.Pos("example.toml:28:8")
@@ -254,25 +254,25 @@ color = "gray"
 							}
 							*ast.Field{
 								Label: *ast.Ident{
-									NamePos: token.Pos("example.toml:29:1").WithRel("newline")
+									NamePos: token.Pos("example.toml:29:1", newline)
 								}
 								Value: *ast.BasicLit{
 									ValuePos: token.Pos("example.toml:29:7")
 								}
 							}
 						}
-						Rbrace: token.Pos("-").WithRel("newline")
+						Rbrace: token.Pos("-", newline)
 					}
 					*ast.StructLit{
-						Lbrace: token.Pos("-").WithRel("newline")
-						Rbrace: token.Pos("-").WithRel("newline")
+						Lbrace: token.Pos("-", newline)
+						Rbrace: token.Pos("-", newline)
 					}
 					*ast.StructLit{
-						Lbrace: token.Pos("-").WithRel("newline")
+						Lbrace: token.Pos("-", newline)
 						Elts: []ast.Decl{
 							*ast.Field{
 								Label: *ast.Ident{
-									NamePos: token.Pos("example.toml:34:1").WithRel("newline")
+									NamePos: token.Pos("example.toml:34:1", newline)
 								}
 								Value: *ast.BasicLit{
 									ValuePos: token.Pos("example.toml:34:8")
@@ -280,7 +280,7 @@ color = "gray"
 							}
 							*ast.Field{
 								Label: *ast.Ident{
-									NamePos: token.Pos("example.toml:35:1").WithRel("newline")
+									NamePos: token.Pos("example.toml:35:1", newline)
 								}
 								Value: *ast.BasicLit{
 									ValuePos: token.Pos("example.toml:35:7")
@@ -288,17 +288,17 @@ color = "gray"
 							}
 							*ast.Field{
 								Label: *ast.Ident{
-									NamePos: token.Pos("example.toml:37:1").WithRel("newline")
+									NamePos: token.Pos("example.toml:37:1", newline)
 								}
 								Value: *ast.BasicLit{
 									ValuePos: token.Pos("example.toml:37:9")
 								}
 							}
 						}
-						Rbrace: token.Pos("-").WithRel("newline")
+						Rbrace: token.Pos("-", newline)
 					}
 				}
-				Rbrack: token.Pos("-").WithRel("newline")
+				Rbrack: token.Pos("-", newline)
 			}
 		}
 	}

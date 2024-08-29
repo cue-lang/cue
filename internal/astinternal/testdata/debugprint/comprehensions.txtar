@@ -12,66 +12,66 @@ for k, v in input if v > 2 {
 		*ast.Comprehension{
 			Clauses: []ast.Clause{
 				*ast.IfClause{
-					If: token.Pos("comprehensions.cue:1:1").WithRel("nospace")
+					If: token.Pos("comprehensions.cue:1:1", nospace)
 					Condition: *ast.Ident{
-						NamePos: token.Pos("comprehensions.cue:1:4").WithRel("blank")
+						NamePos: token.Pos("comprehensions.cue:1:4", blank)
 						Name: "condition"
 					}
 				}
 			}
 			Value: *ast.StructLit{
-				Lbrace: token.Pos("comprehensions.cue:1:14").WithRel("blank")
+				Lbrace: token.Pos("comprehensions.cue:1:14", blank)
 				Elts: []ast.Decl{
 					*ast.Field{
 						Label: *ast.Ident{
-							NamePos: token.Pos("comprehensions.cue:2:2").WithRel("newline")
+							NamePos: token.Pos("comprehensions.cue:2:2", newline)
 							Name: "a"
 						}
 						Optional: token.Pos("-")
 						Constraint: token.Token("ILLEGAL")
-						TokenPos: token.Pos("comprehensions.cue:2:3").WithRel("nospace")
+						TokenPos: token.Pos("comprehensions.cue:2:3", nospace)
 						Token: token.Token(":")
 						Value: *ast.BasicLit{
-							ValuePos: token.Pos("comprehensions.cue:2:5").WithRel("blank")
+							ValuePos: token.Pos("comprehensions.cue:2:5", blank)
 							Kind: token.Token("true")
 							Value: "true"
 						}
 						Attrs: []*ast.Attribute{}
 					}
 				}
-				Rbrace: token.Pos("comprehensions.cue:3:1").WithRel("newline")
+				Rbrace: token.Pos("comprehensions.cue:3:1", newline)
 			}
 		}
 		*ast.Comprehension{
 			Clauses: []ast.Clause{
 				*ast.ForClause{
-					For: token.Pos("comprehensions.cue:4:1").WithRel("newline")
+					For: token.Pos("comprehensions.cue:4:1", newline)
 					Key: *ast.Ident{
-						NamePos: token.Pos("comprehensions.cue:4:5").WithRel("blank")
+						NamePos: token.Pos("comprehensions.cue:4:5", blank)
 						Name: "k"
 					}
-					Colon: token.Pos("comprehensions.cue:4:6").WithRel("nospace")
+					Colon: token.Pos("comprehensions.cue:4:6", nospace)
 					Value: *ast.Ident{
-						NamePos: token.Pos("comprehensions.cue:4:8").WithRel("blank")
+						NamePos: token.Pos("comprehensions.cue:4:8", blank)
 						Name: "v"
 					}
-					In: token.Pos("comprehensions.cue:4:10").WithRel("blank")
+					In: token.Pos("comprehensions.cue:4:10", blank)
 					Source: *ast.Ident{
-						NamePos: token.Pos("comprehensions.cue:4:13").WithRel("blank")
+						NamePos: token.Pos("comprehensions.cue:4:13", blank)
 						Name: "input"
 					}
 				}
 				*ast.IfClause{
-					If: token.Pos("comprehensions.cue:4:19").WithRel("blank")
+					If: token.Pos("comprehensions.cue:4:19", blank)
 					Condition: *ast.BinaryExpr{
 						X: *ast.Ident{
-							NamePos: token.Pos("comprehensions.cue:4:22").WithRel("blank")
+							NamePos: token.Pos("comprehensions.cue:4:22", blank)
 							Name: "v"
 						}
-						OpPos: token.Pos("comprehensions.cue:4:24").WithRel("blank")
+						OpPos: token.Pos("comprehensions.cue:4:24", blank)
 						Op: token.Token(">")
 						Y: *ast.BasicLit{
-							ValuePos: token.Pos("comprehensions.cue:4:26").WithRel("blank")
+							ValuePos: token.Pos("comprehensions.cue:4:26", blank)
 							Kind: token.Token("INT")
 							Value: "2"
 						}
@@ -79,29 +79,29 @@ for k, v in input if v > 2 {
 				}
 			}
 			Value: *ast.StructLit{
-				Lbrace: token.Pos("comprehensions.cue:4:28").WithRel("blank")
+				Lbrace: token.Pos("comprehensions.cue:4:28", blank)
 				Elts: []ast.Decl{
 					*ast.Field{
 						Label: *ast.ParenExpr{
-							Lparen: token.Pos("comprehensions.cue:5:2").WithRel("newline")
+							Lparen: token.Pos("comprehensions.cue:5:2", newline)
 							X: *ast.Ident{
-								NamePos: token.Pos("comprehensions.cue:5:3").WithRel("nospace")
+								NamePos: token.Pos("comprehensions.cue:5:3", nospace)
 								Name: "k"
 							}
-							Rparen: token.Pos("comprehensions.cue:5:4").WithRel("nospace")
+							Rparen: token.Pos("comprehensions.cue:5:4", nospace)
 						}
 						Optional: token.Pos("-")
 						Constraint: token.Token("ILLEGAL")
-						TokenPos: token.Pos("comprehensions.cue:5:5").WithRel("nospace")
+						TokenPos: token.Pos("comprehensions.cue:5:5", nospace)
 						Token: token.Token(":")
 						Value: *ast.Ident{
-							NamePos: token.Pos("comprehensions.cue:5:7").WithRel("blank")
+							NamePos: token.Pos("comprehensions.cue:5:7", blank)
 							Name: "v"
 						}
 						Attrs: []*ast.Attribute{}
 					}
 				}
-				Rbrace: token.Pos("comprehensions.cue:6:1").WithRel("newline")
+				Rbrace: token.Pos("comprehensions.cue:6:1", newline)
 			}
 		}
 	}

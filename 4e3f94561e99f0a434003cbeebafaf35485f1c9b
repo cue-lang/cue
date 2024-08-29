@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5632b050_d12e6e77",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-29T21:19:09Z",
+      "side": 1,
+      "message": "nit: it\u0027s `.WithRel`",
+      "revId": "4e3f94561e99f0a434003cbeebafaf35485f1c9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

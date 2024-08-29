@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc074a6d_819165ee",
+        "filename": "cue/testdata/cycle/chain.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 758,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-29T12:06:50Z",
+      "side": 1,
+      "message": "AIUI, this bit, and there\u0027s a similar chunk further down, shows that evalv3 copes just fine with this change, but v2 does not - v2 incorrectly errors with the cycle error.",
+      "revId": "8907f67aed97570af65a564e3ba2f25b713ed17d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

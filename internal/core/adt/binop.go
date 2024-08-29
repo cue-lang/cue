@@ -171,51 +171,6 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 			copy(b, ba)
 			copy(b[len(ba):], bb)
 			return c.newBytes(b)
-
-		case leftKind == ListKind && rightKind == ListKind:
-			// TODO: get rid of list addition. Semantically it is somewhat
-			// unclear and, as it turns out, it is also hard to get right.
-			// Simulate addition with comprehensions now.
-			if err := c.Err(); err != nil {
-				return err
-			}
-
-			x := MakeIdentLabel(c, "x", "")
-
-			// for x in expr { x }
-			forClause := func(src Expr) *Comprehension {
-				s := &StructLit{Decls: []Decl{
-					&FieldReference{UpCount: 1, Label: x},
-				}}
-				return &Comprehension{
-					Clauses: []Yielder{
-						&ForClause{
-							Value: x,
-							Src:   src,
-						},
-					},
-					Value: s,
-				}
-			}
-
-			list := &ListLit{
-				Elems: []Elem{
-					forClause(left),
-					forClause(right),
-				},
-			}
-
-			n := c.newInlineVertex(nil, nil, MakeConjunct(c.Env(0), list, c.ci))
-			n.CompleteArcs(c)
-
-			// NOTE: if we set isData to true, whoever processes the result will
-			// avoid having to process the expressions again. This improves
-			// performance. It also change the a potential cycle error message
-			// to a more concrete messages as if this result was unified as is.
-			// TODO: uncomment this and see if we like the result.
-			// n.isData = true
-
-			return n
 		}
 
 	case SubtractOp:
@@ -242,41 +197,6 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 		case leftKind == IntKind && rightKind == BytesKind:
 			const as = "bytes multiplication"
 			return c.newBytes(bytes.Repeat(c.bytesValue(right, as), int(c.uint64(left, as))))
-
-		case leftKind == ListKind && rightKind == IntKind:
-			left, right = right, left
-			fallthrough
-
-		case leftKind == IntKind && rightKind == ListKind:
-			// TODO: get rid of list multiplication.
-
-			list := &ListLit{}
-			x := MakeIdentLabel(c, "x", "")
-
-			for i := c.uint64(left, "list multiplier"); i > 0; i-- {
-				st := &StructLit{Decls: []Decl{
-					&FieldReference{UpCount: 1, Label: x},
-				}}
-				list.Elems = append(list.Elems,
-					&Comprehension{
-						Clauses: []Yielder{
-							&ForClause{
-								Value: x,
-								Src:   right,
-							},
-						},
-						Value: st,
-					},
-				)
-			}
-			if err := c.Err(); err != nil {
-				return err
-			}
-
-			n := c.newInlineVertex(nil, nil, MakeConjunct(c.Env(0), list, c.ci))
-			n.CompleteArcs(c)
-
-			return n
 		}
 
 	case FloatQuotientOp:

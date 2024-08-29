@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5386b5a5_de54899e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-29T12:08:36Z",
+      "side": 1,
+      "message": "or even leave this comment in the fix code itself - up to you.",
+      "parentUuid": "4af5c244_8499f494",
+      "revId": "e802a11634400370c014fa01a7acb629e125e762",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1d2e27c5_3ac49862",
         "filename": "tools/fix/fix.go",
         "patchSetId": 1

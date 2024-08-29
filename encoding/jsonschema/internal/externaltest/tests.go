@@ -2,8 +2,11 @@ package externaltest
 
 import (
 	"bytes"
+	"encoding/json"
 	stdjson "encoding/json"
+	"fmt"
 	"os"
+	"path/filepath"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
@@ -27,7 +30,53 @@ type Test struct {
 	Skip        string             `json:"skip,omitempty"`
 }
 
+func ParseTestData(data []byte) ([]*Schema, error) {
+	var schemas []*Schema
+	if err := json.Unmarshal(data, &schemas); err != nil {
+		return nil, err
+	}
+	return schemas, nil
+}
+
+// WriteTestDir writes test data files as read by ReadTestDir
+// to the given directory. The keys of tests are filenames relative
+// to dir.
+func WriteTestDir(dir string, tests map[string][]*Schema) error {
+	for filename, schemas := range tests {
+		filename = filepath.Join(dir, filename)
+		data, err := stdjson.MarshalIndent(schemas, "", "\t")
+		if err != nil {
+			return err
+		}
+		if err != nil {
+			return err
+		}
+		data = append(data, '\n')
+		oldData, err := os.ReadFile(filename)
+		if err != nil {
+			return err
+		}
+		if bytes.Equal(oldData, data) {
+			continue
+		}
+		err = os.WriteFile(filename, data, 0o666)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+var ErrNotFound = fmt.Errorf("no external JSON schema tests found")
+
+// ReadTestDir reads all the external tests from the given directory.
 func ReadTestDir(dir string) (tests map[string][]*Schema, err error) {
+	if _, err := os.Stat(dir); err != nil {
+		if os.IsNotExist(err) {
+			return nil, ErrNotFound
+		}
+		return nil, err
+	}
 	os.Setenv("CUE_EXPERIMENT", "embed")
 	inst := load.Instances([]string{"."}, &load.Config{
 		Dir: dir,

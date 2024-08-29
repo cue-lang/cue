@@ -1,12 +1,14 @@
 -- in.cue --
 package main
 
+import "list"
+
 #d1: {
 	as: [...string]
 
 	#c: [
 		#f1 & {
-			"as": ["go"] + as
+			"as": list.Concat([["go"], as])
 		},
 	]
 }
@@ -41,15 +43,15 @@ package main
 	from: #c1
 }
 -- out/eval/stats --
-Leaks:  9
-Freed:  55
-Reused: 41
-Allocs: 23
-Retain: 14
+Leaks:  0
+Freed:  85
+Reused: 70
+Allocs: 15
+Retain: 7
 
-Unifications: 52
-Conjuncts:    120
-Disjuncts:    66
+Unifications: 65
+Conjuncts:    159
+Disjuncts:    92
 -- out/evalalpha --
 (struct){
   #d1: (#struct){
@@ -239,9 +241,12 @@ Reordering
     ]
     #c: [
       (〈2;#f1〉 & {
-        as: ([
-          "go",
-        ] + 〈2;as〉)
+        as: 〈import;list〉.Concat([
+          [
+            "go",
+          ],
+          〈3;as〉,
+        ])
       }),
     ]
   }

@@ -404,8 +404,8 @@ a: x: "hello"
 		y:    `1 & 4`,
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.name, func(t *cuetdtest.M) {
-			ctx := t.CueContext()
+		cuetdtest.FullMatrix.Run(t, tc.name, func(t *testing.T, m *cuetdtest.M) {
+			ctx := m.CueContext()
 			// it is not fatal if x or y contain errors: some test cases
 			// rely on interacting with such errors.
 			x := ctx.CompileString(tc.x, cue.Filename("x"))

@@ -44,58 +44,57 @@ func File(f *ast.File, o ...Option) *ast.File {
 		f(&options)
 	}
 
-	// Rewrite integer division operations to use builtins.
 	f = astutil.Apply(f, func(c astutil.Cursor) bool {
 		n := c.Node()
-		switch x := n.(type) {
+		switch n := n.(type) {
 		case *ast.BinaryExpr:
-			switch x.Op {
+			switch n.Op {
 			case token.IDIV, token.IMOD, token.IQUO, token.IREM:
-				ast.SetRelPos(x.X, token.NoSpace)
+				// Rewrite integer division operations to use builtins.
+				ast.SetRelPos(n.X, token.NoSpace)
 				c.Replace(&ast.CallExpr{
 					// Use the __foo version to prevent accidental shadowing.
-					Fun:  ast.NewIdent("__" + x.Op.String()),
-					Args: []ast.Expr{x.X, x.Y},
+					Fun:  ast.NewIdent("__" + n.Op.String()),
+					Args: []ast.Expr{n.X, n.Y},
 				})
+
+			case token.ADD, token.MUL:
+				// The fix here only works when at least one argument is a
+				// literal list. It would be better to be able to use CUE
+				// to infer type information, and then apply the fix to
+				// all places where we infer a list argument.
+				x, y := n.X, n.Y
+				_, xIsList := x.(*ast.ListLit)
+				_, yIsList := y.(*ast.ListLit)
+				if !(xIsList || yIsList) {
+					break
+				}
+				pkg := c.Import("list")
+				if pkg == nil {
+					break
+				}
+				if n.Op == token.ADD {
+					// Rewrite list addition to use list.Concat
+					ast.SetRelPos(x, token.NoSpace)
+					c.Replace(&ast.CallExpr{
+						Fun:  ast.NewSel(pkg, "Concat"),
+						Args: []ast.Expr{ast.NewList(x, y)},
+					})
+				} else {
+					// Rewrite list multiplication to use list.Repeat
+					if !xIsList {
+						x, y = y, x
+					}
+					ast.SetRelPos(x, token.NoSpace)
+					c.Replace(&ast.CallExpr{
+						Fun:  ast.NewSel(pkg, "Repeat"),
+						Args: []ast.Expr{x, y},
+					})
+				}
 			}
 		}
 		return true
 	}, nil).(*ast.File)
-
-	// TODO: we are probably reintroducing slices. Disable for now.
-	//
-	// Rewrite slice expression.
-	// f = astutil.Apply(f, func(c astutil.Cursor) bool {
-	// 	n := c.Node()
-	// 	getVal := func(n ast.Expr) ast.Expr {
-	// 		if n == nil {
-	// 			return nil
-	// 		}
-	// 		if id, ok := n.(*ast.Ident); ok && id.Name == "_" {
-	// 			return nil
-	// 		}
-	// 		return n
-	// 	}
-	// 	switch x := n.(type) {
-	// 	case *ast.SliceExpr:
-	// 		ast.SetRelPos(x.X, token.NoRelPos)
-
-	// 		lo := getVal(x.Low)
-	// 		hi := getVal(x.High)
-	// 		if lo == nil { // a[:j]
-	// 			lo = mustParseExpr("0")
-	// 			astutil.CopyMeta(lo, x.Low)
-	// 		}
-	// 		if hi == nil { // a[i:]
-	// 			hi = ast.NewCall(ast.NewIdent("len"), x.X)
-	// 			astutil.CopyMeta(lo, x.High)
-	// 		}
-	// 		if pkg := c.Import("list"); pkg != nil {
-	// 			c.Replace(ast.NewCall(ast.NewSel(pkg, "Slice"), x.X, lo, hi))
-	// 		}
-	// 	}
-	// 	return true
-	// }, nil).(*ast.File)
 
 	if options.simplify {
 		f = simplify(f)

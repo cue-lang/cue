@@ -326,10 +326,10 @@ func loadWithConfig(a *txtar.Archive, dir string, cfg load.Config, args ...strin
 // for more details.
 func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 	if x.Matrix == nil {
-		x.run(t, f)
+		x.run(t, nil, f)
 		return
 	}
-	x.Matrix.Do(t, func(m *cuetdtest.M) {
+	x.Matrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
 		test := *x
 		if s := m.Fallback(); s != "" {
 			test.Fallback = test.Name
@@ -340,8 +340,7 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 		if s := m.Name(); s != cuetdtest.DefaultVersion {
 			test.Name += "-" + s
 		}
-		test.run(m.T, func(tc *Test) {
-			tc.M = m
+		test.run(t, m, func(tc *Test) {
 			f(tc)
 		})
 	})
@@ -360,7 +359,7 @@ func (t *Test) CueContext() *cue.Context {
 	return cuecontext.New()
 }
 
-func (x *TxTarTest) run(t *testing.T, f func(tc *Test)) {
+func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 	t.Helper()
 
 	if x.DebugArchive != "" {
@@ -372,6 +371,7 @@ func (x *TxTarTest) run(t *testing.T, f func(tc *Test)) {
 			}
 			tc := &Test{
 				T:       t,
+				M:       m,
 				Archive: archive,
 				Dir:     "/tmp",
 
@@ -425,6 +425,7 @@ func (x *TxTarTest) run(t *testing.T, f func(tc *Test)) {
 
 			tc := &Test{
 				T:       t,
+				M:       m,
 				Archive: a,
 				Dir:     filepath.Dir(filepath.Join(dir, fullpath)),
 

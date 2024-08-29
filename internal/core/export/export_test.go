@@ -77,8 +77,8 @@ func formatNode(t *testing.T, n ast.Node) []byte {
 // TestGenerated tests conversions of generated Go structs, which may be
 // different from parsed or evaluated CUE, such as having Vertex values.
 func TestGenerated(t *testing.T) {
-	cuetdtest.FullMatrix.Do(t, func(t *cuetdtest.M) {
-		ctx := t.CueContext()
+	cuetdtest.FullMatrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
+		ctx := m.CueContext()
 
 		testCases := []struct {
 			in  func(ctx *adt.OpContext) (adt.Expr, error)
@@ -348,23 +348,25 @@ func TestFromAPI(t *testing.T) {
 	}}
 	// Issue #1204
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
-			ctx := t.CueContext()
+		t.Run("", func(t *testing.T) {
+			cuetdtest.FullMatrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
+				ctx := m.CueContext()
 
-			v := ctx.BuildExpr(tc.expr)
+				v := ctx.BuildExpr(tc.expr)
 
-			r, x := value.ToInternal(v)
-			file, err := export.Def(r, "foo", x)
+				r, x := value.ToInternal(v)
+				file, err := export.Def(r, "foo", x)
 
-			if err != nil {
-				t.Fatal(err)
-			}
+				if err != nil {
+					t.Fatal(err)
+				}
 
-			got := astinternal.DebugStr(file)
-			if got != tc.out {
-				t.Errorf("got:  %s\nwant: %s", got, tc.out)
-			}
+				got := astinternal.DebugStr(file)
+				if got != tc.out {
+					t.Errorf("got:  %s\nwant: %s", got, tc.out)
+				}
 
+			})
 		})
 	}
 }

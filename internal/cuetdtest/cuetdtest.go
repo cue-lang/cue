@@ -34,9 +34,8 @@ type T struct {
 
 // Run creates a new table-driven test using the CUE testing defaults.
 func Run[TC any](t *testing.T, table []TC, fn func(t *T, tc *TC)) {
-	FullMatrix.Do(t, func(m *M) {
-		tdtest.Run(m.T, table, func(t *tdtest.T, tc *TC) {
-			m.T = t.T
+	FullMatrix.Do(t, func(t *testing.T, m *M) {
+		tdtest.Run(t, table, func(t *tdtest.T, tc *TC) {
 			if !m.IsDefault() {
 				// Do not update table-driven tests if this is not the default
 				// test.

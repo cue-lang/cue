@@ -96,14 +96,13 @@ func TestAttributes(t *testing.T) {
 		out:   "[]",
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.path, func(t *cuetdtest.M) {
-			v := getValue(t, config).LookupPath(cue.ParsePath(tc.path))
+		cuetdtest.FullMatrix.Run(t, tc.path, func(t *testing.T, m *cuetdtest.M) {
+			v := getValue(m, config).LookupPath(cue.ParsePath(tc.path))
 			a := v.Attributes(tc.flags)
 			got := fmt.Sprint(a)
 			if got != tc.out {
 				t.Errorf("got %v; want %v", got, tc.out)
 			}
-
 		})
 	}
 }
@@ -137,8 +136,8 @@ func TestAttributeErr(t *testing.T) {
 		err:  errors.New(`attribute "bar" does not exist`),
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.path+"-"+tc.attr, func(t *cuetdtest.M) {
-			v := getValue(t, config).Lookup("a", tc.path)
+		cuetdtest.FullMatrix.Run(t, tc.path+"-"+tc.attr, func(t *testing.T, m *cuetdtest.M) {
+			v := getValue(m, config).Lookup("a", tc.path)
 			a := v.Attribute(tc.attr)
 			err := a.Err()
 			if !cmpError(err, tc.err) {
@@ -152,8 +151,8 @@ func TestAttributeName(t *testing.T) {
 	const config = `
 	a: 0 @foo(a,b,c=1) @bar()
 	`
-	cuetdtest.FullMatrix.Do(t, func(t *cuetdtest.M) {
-		v := getValue(t, config).Lookup("a")
+	cuetdtest.FullMatrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
+		v := getValue(m, config).Lookup("a")
 		a := v.Attribute("foo")
 		if got, want := a.Name(), "foo"; got != want {
 			t.Errorf("got %v; want %v", got, want)
@@ -210,8 +209,8 @@ func TestAttributeString(t *testing.T) {
 		err:  errors.New("field does not exist"),
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%s.%s:%d", tc.path, tc.attr, tc.pos), func(t *cuetdtest.M) {
-			v := getValue(t, config).Lookup("a", tc.path)
+		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%s.%s:%d", tc.path, tc.attr, tc.pos), func(t *testing.T, m *cuetdtest.M) {
+			v := getValue(m, config).Lookup("a", tc.path)
 			a := v.Attribute(tc.attr)
 			got, err := a.String(tc.pos)
 			if !cmpError(err, tc.err) {
@@ -221,6 +220,7 @@ func TestAttributeString(t *testing.T) {
 				t.Errorf("str: got %v; want %v", got, tc.str)
 			}
 		})
+
 	}
 }
 
@@ -270,8 +270,8 @@ func TestAttributeArg(t *testing.T) {
 		raw: "  s=  spaces in value  ",
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%d", tc.pos), func(t *cuetdtest.M) {
-			v := getValue(t, config).Lookup("a")
+		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%d", tc.pos), func(t *testing.T, m *cuetdtest.M) {
+			v := getValue(m, config).Lookup("a")
 			a := v.Attribute("foo")
 			key, val := a.Arg(tc.pos)
 			raw := a.RawArg(tc.pos)
@@ -285,6 +285,7 @@ func TestAttributeArg(t *testing.T) {
 				t.Errorf("unexpected raw value; got %q want %q", got, want)
 			}
 		})
+
 	}
 }
 
@@ -327,8 +328,8 @@ func TestAttributeInt(t *testing.T) {
 		err:  errors.New(`strconv.ParseInt: parsing "c=1": invalid syntax`),
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%s.%s:%d", tc.path, tc.attr, tc.pos), func(t *cuetdtest.M) {
-			v := getValue(t, config).Lookup("a", tc.path)
+		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%s.%s:%d", tc.path, tc.attr, tc.pos), func(t *testing.T, m *cuetdtest.M) {
+			v := getValue(m, config).Lookup("a", tc.path)
 			a := v.Attribute(tc.attr)
 			got, err := a.Int(tc.pos)
 			if !cmpError(err, tc.err) {
@@ -338,6 +339,7 @@ func TestAttributeInt(t *testing.T) {
 				t.Errorf("val: got %v; want %v", got, tc.val)
 			}
 		})
+
 	}
 }
 
@@ -384,8 +386,8 @@ func TestAttributeFlag(t *testing.T) {
 		err:  errors.New("field does not exist"),
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%s.%s:%d", tc.path, tc.attr, tc.pos), func(t *cuetdtest.M) {
-			v := getValue(t, config).Lookup("a", tc.path)
+		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%s.%s:%d", tc.path, tc.attr, tc.pos), func(t *testing.T, m *cuetdtest.M) {
+			v := getValue(m, config).Lookup("a", tc.path)
 			a := v.Attribute(tc.attr)
 			got, err := a.Flag(tc.pos, tc.flag)
 			if !cmpError(err, tc.err) {
@@ -395,6 +397,7 @@ func TestAttributeFlag(t *testing.T) {
 				t.Errorf("val: got %v; want %v", got, tc.val)
 			}
 		})
+
 	}
 }
 
@@ -459,8 +462,8 @@ func TestAttributeLookup(t *testing.T) {
 		err:  errors.New("field does not exist"),
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%s.%s:%d", tc.path, tc.attr, tc.pos), func(t *cuetdtest.M) {
-			v := getValue(t, config).Lookup("a", tc.path)
+		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%s.%s:%d", tc.path, tc.attr, tc.pos), func(t *testing.T, m *cuetdtest.M) {
+			v := getValue(m, config).Lookup("a", tc.path)
 			a := v.Attribute(tc.attr)
 			got, _, err := a.Lookup(tc.pos, tc.key)
 			if !cmpError(err, tc.err) {
@@ -470,5 +473,6 @@ func TestAttributeLookup(t *testing.T) {
 				t.Errorf("val: got %v; want %v", got, tc.val)
 			}
 		})
+
 	}
 }

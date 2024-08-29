@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eca21738_66bb2b50",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-29T13:50:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a28f92fb_ca2f337a",
+      "revId": "8907f67aed97570af65a564e3ba2f25b713ed17d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d3953ad3_53b21d17",
@@ -83,6 +101,24 @@
       "writtenOn": "2024-08-29T12:12:14Z",
       "side": 1,
       "message": "can you add an \"invalid operands\" test case for adding two lists too, for the sake of good test coverage?",
+      "revId": "8907f67aed97570af65a564e3ba2f25b713ed17d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "19bcadfc_1f7dac3a",
+        "filename": "cue/types_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 3033,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-29T13:50:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e385ea7_5e81f092",
       "revId": "8907f67aed97570af65a564e3ba2f25b713ed17d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

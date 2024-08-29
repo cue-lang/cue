@@ -24,9 +24,9 @@ import (
 	"cuelang.org/go/internal/cuedebug"
 )
 
+// M represents a point in the evaluation matrix of possible
+// runtime configurations.
 type M struct {
-	*testing.T
-
 	// Flags is public to allow tests to customise e.g. logging.
 	Flags cuedebug.Config
 
@@ -34,10 +34,6 @@ type M struct {
 	fallback string
 	version  internal.EvaluatorVersion
 }
-
-// Ensure that M always implements testing.TB.
-// Note that testing.TB may gain new methods in future Go releases.
-var _ testing.TB = (*M)(nil)
 
 func (t *M) Name() string     { return t.name }
 func (t *M) Fallback() string { return t.fallback }
@@ -78,37 +74,37 @@ var SmallMatrix Matrix = FullMatrix[:2]
 
 var DefaultOnlyMatrix Matrix = FullMatrix[:1]
 
-// Run runs a test with the given name f for each configuration in the matrix.
-func (m Matrix) Run(t *testing.T, name string, f func(t *M)) {
+// Run runs a subtest with the given name that
+// invokes a further subtest for each configuration in the matrix.
+func (m Matrix) Run(t *testing.T, name string, f func(t *testing.T, m *M)) {
 	t.Run(name, func(t *testing.T) {
 		m.Do(t, f)
 	})
 }
 
-// Do runs f for each configuration in the matrix.
-func (m Matrix) Do(t *testing.T, f func(t *M)) {
+// Do runs f in a subtest for each configuration in the matrix.
+func (m Matrix) Do(t *testing.T, f func(t *testing.T, m *M)) {
 	for _, c := range m {
 		t.Run(c.name, func(t *testing.T) {
-			c.T = t
-			f(&c)
+			f(t, &c)
 		})
 	}
 }
 
-func (t *M) TODO_V3() {
-	if t.version == internal.DevVersion {
+func (m *M) TODO_V3(t testing.TB) {
+	if m.version == internal.DevVersion {
 		t.Skip("Skipping v3")
 	}
 }
 
-func (t *M) TODO_Sharing() {
-	if t.Flags.Sharing {
+func (m *M) TODO_Sharing(t testing.TB) {
+	if m.Flags.Sharing {
 		t.Skip("Skipping v3 with sharing")
 	}
 }
 
-func (t *M) TODO_NoSharing() {
-	if t.version == internal.DevVersion && !t.Flags.Sharing {
+func (m *M) TODO_NoSharing(t testing.TB) {
+	if m.version == internal.DevVersion && !m.Flags.Sharing {
 		t.Skip("Skipping v3 without sharing")
 	}
 }

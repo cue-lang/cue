@@ -77,8 +77,8 @@ func formatNode(t *testing.T, n ast.Node) []byte {
 // TestGenerated tests conversions of generated Go structs, which may be
 // different from parsed or evaluated CUE, such as having Vertex values.
 func TestGenerated(t *testing.T) {
-	cuetdtest.FullMatrix.Do(t, func(t *cuetdtest.M) {
-		ctx := t.CueContext()
+	cuetdtest.FullMatrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
+		ctx := m.CueContext()
 
 		testCases := []struct {
 			in  func(ctx *adt.OpContext) (adt.Expr, error)
@@ -348,8 +348,8 @@ func TestFromAPI(t *testing.T) {
 	}}
 	// Issue #1204
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, "", func(t *cuetdtest.M) {
-			ctx := t.CueContext()
+		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
+			ctx := m.CueContext()
 
 			v := ctx.BuildExpr(tc.expr)
 

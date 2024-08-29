@@ -460,11 +460,11 @@ func TestValues(t *testing.T) {
 		const cutset = "\n ,"
 		key := strings.Trim(m[1], cutset) + " ⊑ " + strings.Trim(m[2], cutset)
 
-		cuetdtest.FullMatrix.Run(t, strconv.Itoa(i)+"/"+key, func(t *cuetdtest.M) {
-			if tc.skip_v2 && t.IsDefault() {
+		cuetdtest.FullMatrix.Run(t, strconv.Itoa(i)+"/"+key, func(t *testing.T, m *cuetdtest.M) {
+			if tc.skip_v2 && m.IsDefault() {
 				t.Skipf("skipping v2 test")
 			}
-			r := t.Runtime()
+			r := m.Runtime()
 
 			file, err := parser.ParseFile("subsume", tc.in)
 			if err != nil {

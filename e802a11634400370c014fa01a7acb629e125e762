@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "62889d2e_bf4e8b91",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-29T13:39:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5386b5a5_de54899e",
+      "revId": "e802a11634400370c014fa01a7acb629e125e762",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1d2e27c5_3ac49862",
@@ -53,6 +71,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc88b40f_0948ce6c",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-29T13:39:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1d2e27c5_3ac49862",
+      "revId": "e802a11634400370c014fa01a7acb629e125e762",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5cab2888_e95dc470",
@@ -66,6 +102,24 @@
       "writtenOn": "2024-08-29T12:08:19Z",
       "side": 1,
       "message": "I would do this as part of the same astutil.Apply, and make the switch on n.Op have two cases. It will save you a few lines of code, but most importantly, it means you only walk the entire syntax tree once for this fix, rather than twice. Given how similar the two rewrites are, I think it\u0027s worth it.\n\nI think you can even reuse much of the code that does the rewrite itself. The only difference between the two is the name of the function.",
+      "revId": "e802a11634400370c014fa01a7acb629e125e762",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "925fbfa1_6bdc2bb6",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-29T13:39:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5cab2888_e95dc470",
       "revId": "e802a11634400370c014fa01a7acb629e125e762",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

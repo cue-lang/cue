@@ -3027,7 +3027,10 @@ func TestWalk(t *testing.T) {
 		out:   `[int]`,
 	}, {
 		value: `3 * [1, 2]`,
-		out:   `[1,2,1,2,1,2]`,
+		out:   `_|_(Multiplication of lists is superseded by list.Repeat; see https://cuelang.org/e/v0.11-list-arithmetic)`,
+	}, {
+		value: `[7, 8] + [1, 2]`,
+		out:   `_|_(Addition of lists is superseded by list.Concat; see https://cuelang.org/e/v0.11-list-arithmetic)`,
 	}, {
 		value: `{}`,
 		out:   `{}`,

@@ -7,30 +7,30 @@ disjunctoin: b | c | *d
 	Decls: []ast.Decl{
 		*ast.Field{
 			Label: *ast.Ident{
-				NamePos: token.Pos("unify.txtar:1:1")
+				NamePos: token.Pos("unify.txtar:1:1").WithRel("nospace")
 				Name: "unification"
 			}
 			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
-			TokenPos: token.Pos("unify.txtar:1:12")
+			TokenPos: token.Pos("unify.txtar:1:12").WithRel("nospace")
 			Token: token.Token(":")
 			Value: *ast.BinaryExpr{
 				X: *ast.BinaryExpr{
 					X: *ast.Ident{
-						NamePos: token.Pos("unify.txtar:1:14")
+						NamePos: token.Pos("unify.txtar:1:14").WithRel("blank")
 						Name: "b"
 					}
-					OpPos: token.Pos("unify.txtar:1:16")
+					OpPos: token.Pos("unify.txtar:1:16").WithRel("blank")
 					Op: token.Token("&")
 					Y: *ast.Ident{
-						NamePos: token.Pos("unify.txtar:1:18")
+						NamePos: token.Pos("unify.txtar:1:18").WithRel("blank")
 						Name: "c"
 					}
 				}
-				OpPos: token.Pos("unify.txtar:1:20")
+				OpPos: token.Pos("unify.txtar:1:20").WithRel("blank")
 				Op: token.Token("&")
 				Y: *ast.Ident{
-					NamePos: token.Pos("unify.txtar:1:22")
+					NamePos: token.Pos("unify.txtar:1:22").WithRel("blank")
 					Name: "d"
 				}
 			}
@@ -38,33 +38,33 @@ disjunctoin: b | c | *d
 		}
 		*ast.Field{
 			Label: *ast.Ident{
-				NamePos: token.Pos("unify.txtar:2:1")
+				NamePos: token.Pos("unify.txtar:2:1").WithRel("newline")
 				Name: "disjunctoin"
 			}
 			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
-			TokenPos: token.Pos("unify.txtar:2:12")
+			TokenPos: token.Pos("unify.txtar:2:12").WithRel("nospace")
 			Token: token.Token(":")
 			Value: *ast.BinaryExpr{
 				X: *ast.BinaryExpr{
 					X: *ast.Ident{
-						NamePos: token.Pos("unify.txtar:2:14")
+						NamePos: token.Pos("unify.txtar:2:14").WithRel("blank")
 						Name: "b"
 					}
-					OpPos: token.Pos("unify.txtar:2:16")
+					OpPos: token.Pos("unify.txtar:2:16").WithRel("blank")
 					Op: token.Token("|")
 					Y: *ast.Ident{
-						NamePos: token.Pos("unify.txtar:2:18")
+						NamePos: token.Pos("unify.txtar:2:18").WithRel("blank")
 						Name: "c"
 					}
 				}
-				OpPos: token.Pos("unify.txtar:2:20")
+				OpPos: token.Pos("unify.txtar:2:20").WithRel("blank")
 				Op: token.Token("|")
 				Y: *ast.UnaryExpr{
-					OpPos: token.Pos("unify.txtar:2:22")
+					OpPos: token.Pos("unify.txtar:2:22").WithRel("blank")
 					Op: token.Token("*")
 					X: *ast.Ident{
-						NamePos: token.Pos("unify.txtar:2:23")
+						NamePos: token.Pos("unify.txtar:2:23").WithRel("nospace")
 						Name: "d"
 					}
 				}

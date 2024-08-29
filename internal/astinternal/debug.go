@@ -103,6 +103,13 @@ func (d *debugPrinter) value(dst []byte, v reflect.Value, impliedType reflect.Ty
 	// Simple types which can stringify themselves.
 	case typeTokenPos, typeTokenToken:
 		dst = d.printf(dst, "%s(%q)", t, v)
+		// Show relative positions too, if there are any, as they affect formatting.
+		if t == typeTokenPos {
+			pos := v.Interface().(token.Pos)
+			if pos.HasRelPos() {
+				dst = d.printf(dst, ".WithRel(%q)", pos.RelPos())
+			}
+		}
 		return dst
 	}
 

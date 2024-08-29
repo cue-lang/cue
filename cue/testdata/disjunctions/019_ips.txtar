@@ -3,7 +3,9 @@
 #name: ips
 #evalFull
 -- in.cue --
-IP: 4 * [ uint8]
+import "list"
+
+IP: list.Repeat([uint8], 4)
 
 Private:
 	*[ 192, 168, uint8, uint8] |
@@ -23,9 +25,9 @@ MyIP: [10, 10, 10, 10]
 -- out/compile --
 --- in.cue
 {
-  IP: (4 * [
+  IP: 〈import;list〉.Repeat([
     &(int, >=0, <=255),
-  ])
+  ], 4)
   Private: (*[
     192,
     168,
@@ -55,15 +57,15 @@ MyIP: [10, 10, 10, 10]
   ])
 }
 -- out/eval/stats --
-Leaks:  3
-Freed:  54
-Reused: 48
-Allocs: 9
-Retain: 6
+Leaks:  0
+Freed:  61
+Reused: 55
+Allocs: 6
+Retain: 1
 
-Unifications: 48
-Conjuncts:    111
-Disjuncts:    60
+Unifications: 52
+Conjuncts:    115
+Disjuncts:    62
 -- out/eval --
 (struct){
   IP: (#list){

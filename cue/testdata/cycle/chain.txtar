@@ -30,7 +30,7 @@ chain: t2: p1: {
 	X: 1
 
 	// Reference X through x.x0 before X is inserted.
-	for v in [0, X] + [] {
+	for v in list.Concat([[0, X], []]) {
 		x: "x\(v)": {}
 	}
 
@@ -41,7 +41,7 @@ chain: t2: p1: {
 
 chain: t2: p2: {
 	// Reference X through x.x0 before X is inserted.
-	for v in [0, X] + [] {
+	for v in list.Concat([[0, X], []]) {
 		x: "x\(v)": {}
 	}
 
@@ -208,14 +208,14 @@ issue2052: full: {
 	d: #Depth & {#in: tree}
 }
 -- out/evalalpha/stats --
-Leaks:  19997
+Leaks:  19999
 Freed:  1462
 Reused: 1461
-Allocs: 19998
+Allocs: 20000
 Retain: 0
 
-Unifications: 7504
-Conjuncts:    107530
+Unifications: 7506
+Conjuncts:    107540
 Disjuncts:    13655
 -- out/evalalpha --
 Errors:
@@ -720,22 +720,22 @@ diff old new
 --- old
 +++ new
 @@ -1,9 +1,9 @@
--Leaks:  70
--Freed:  1815
--Reused: 1801
--Allocs: 84
--Retain: 185
-+Leaks:  19997
+-Leaks:  56
+-Freed:  1830
+-Reused: 1816
+-Allocs: 70
+-Retain: 169
++Leaks:  19999
 +Freed:  1462
 +Reused: 1461
-+Allocs: 19998
++Allocs: 20000
 +Retain: 0
  
--Unifications: 800
--Conjuncts:    3175
--Disjuncts:    1974
-+Unifications: 7504
-+Conjuncts:    107530
+-Unifications: 801
+-Conjuncts:    3177
+-Disjuncts:    1979
++Unifications: 7506
++Conjuncts:    107540
 +Disjuncts:    13655
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -755,7 +755,28 @@ diff old new
    chain: (struct){
      t1: (struct){
        #maxiter: (int){ 2 }
-@@ -47,148 +55,148 @@
+@@ -27,15 +35,11 @@
+           }
+         }
+       }
+-      p2: (_|_){
+-        // [incomplete] 1: invalid interpolation: cycle error referencing X:
+-        //     ./in.cue:44:6
+-        //     ./in.cue:43:28
+-        x: (_|_){
+-          // [incomplete] 1: invalid interpolation: cycle error referencing X:
+-          //     ./in.cue:44:6
+-          //     ./in.cue:43:28
+-          x0: (struct){
++      p2: (struct){
++        x: (struct){
++          x0: (struct){
++          }
++          x1: (struct){
+           }
+         }
+         X: (int){ 1 }
+@@ -51,148 +55,148 @@
        }
      }
    }
@@ -1041,7 +1062,7 @@ diff old new
          #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
          #funcFactory: (#struct){
            #next: (_){ _ }
-@@ -335,49 +343,7 @@
+@@ -339,49 +343,7 @@
          }
          cow: (string){ "moo" }
        }
@@ -1092,7 +1113,7 @@ diff old new
          #in: (#struct){
            a: (#struct){
              foo: (string){ "bar" }
-@@ -389,6 +355,142 @@
+@@ -393,6 +355,142 @@
            }
            cow: (string){ "moo" }
          }
@@ -1236,15 +1257,15 @@ diff old new
      }
    }
 -- out/eval/stats --
-Leaks:  70
-Freed:  1815
-Reused: 1801
-Allocs: 84
-Retain: 185
+Leaks:  56
+Freed:  1830
+Reused: 1816
+Allocs: 70
+Retain: 169
 
-Unifications: 800
-Conjuncts:    3175
-Disjuncts:    1974
+Unifications: 801
+Conjuncts:    3177
+Disjuncts:    1979
 -- diff/todo/p1 --
 issue2052.*.#Depth: incorrect error message:
 	"adding field #basic not allowed as field set was already referenced"
@@ -1280,11 +1301,15 @@ issue2052.full.d: "cannot add field #maxiter: was already used"
           }
         }
       }
-      p2: (struct){
-        x: (struct){
+      p2: (_|_){
+        // [incomplete] 1: invalid interpolation: cycle error referencing X:
+        //     ./in.cue:44:6
+        //     ./in.cue:43:28
+        x: (_|_){
+          // [incomplete] 1: invalid interpolation: cycle error referencing X:
+          //     ./in.cue:44:6
+          //     ./in.cue:43:28
           x0: (struct){
-          }
-          x1: (struct){
           }
         }
         X: (int){ 1 }
@@ -1676,10 +1701,13 @@ issue2052.full.d: "cannot add field #maxiter: was already used"
     t2: {
       p1: {
         X: 1
-        for _, v in ([
-          0,
-          〈1;X〉,
-        ] + []) {
+        for _, v in 〈import;list〉.Concat([
+          [
+            0,
+            〈2;X〉,
+          ],
+          [],
+        ]) {
           x: {
             "x\(〈2;v〉)": {}
           }
@@ -1692,10 +1720,13 @@ issue2052.full.d: "cannot add field #maxiter: was already used"
   chain: {
     t2: {
       p2: {
-        for _, v in ([
-          0,
-          〈1;X〉,
-        ] + []) {
+        for _, v in 〈import;list〉.Concat([
+          [
+            0,
+            〈2;X〉,
+          ],
+          [],
+        ]) {
           x: {
             "x\(〈2;v〉)": {}
           }

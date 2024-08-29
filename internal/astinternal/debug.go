@@ -58,11 +58,6 @@ type debugPrinter struct {
 	level int
 }
 
-var (
-	typeTokenPos   = reflect.TypeFor[token.Pos]()
-	typeTokenToken = reflect.TypeFor[token.Token]()
-)
-
 // value produces the given value, omitting type information if
 // its type is the same as implied type. It reports whether
 // anything was produced.
@@ -99,17 +94,18 @@ func (d *debugPrinter) value0(v reflect.Value, impliedType reflect.Type) {
 	}
 
 	t := v.Type()
-	switch t {
+	switch v := v.Interface().(type) {
 	// Simple types which can stringify themselves.
-	case typeTokenPos, typeTokenToken:
-		d.printf("%s(%q)", t, v)
+	case token.Pos:
+		d.printf("%s(%q", t, v)
 		// Show relative positions too, if there are any, as they affect formatting.
-		if t == typeTokenPos {
-			pos := v.Interface().(token.Pos)
-			if pos.HasRelPos() {
-				d.printf(".WithRel(%q)", pos.RelPos())
-			}
+		if v.HasRelPos() {
+			d.printf(", %v", v.RelPos())
 		}
+		d.printf(")")
+		return
+	case token.Token:
+		d.printf("%s(%q)", t, v)
 		return
 	}
 

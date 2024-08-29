@@ -2,6 +2,7 @@
 
 -- in.cue --
 import "strings"
+import "list"
 
 intEmbed: {
 	a1: {
@@ -26,7 +27,7 @@ listEmbed: {
 		[1, 2]
 		#foo: 1
 	}
-	b4: b3 + b3
+	b4: list.Concat([b3, b3])
 	b5: b3[1]
 	b6: b3[5]
 	b7: b4[a1] // 1
@@ -151,19 +152,19 @@ selfRefInEmbed: t1: {
 }
 
 -- out/eval/stats --
-Leaks:  11
-Freed:  121
-Reused: 114
-Allocs: 18
+Leaks:  10
+Freed:  135
+Reused: 128
+Allocs: 17
 Retain: 57
 
-Unifications: 128
-Conjuncts:    297
-Disjuncts:    164
+Unifications: 141
+Conjuncts:    313
+Disjuncts:    178
 -- out/evalalpha --
 Errors:
 listEmbed.b6: index out of range [5] with length 2:
-    ./in.cue:28:9
+    ./in.cue:29:9
 
 Result:
 (_|_){
@@ -197,7 +198,7 @@ Result:
     b5: (int){ 2 }
     b6: (_|_){
       // [eval] listEmbed.b6: index out of range [5] with length 2:
-      //     ./in.cue:28:9
+      //     ./in.cue:29:9
     }
     b7: (int){ 1 }
   }
@@ -222,8 +223,8 @@ Result:
     sum: (struct){
       out: (_|_){
         // [incomplete] outPattern.sum.out: non-concrete value int in operand to +:
-        //     ./in.cue:43:8
         //     ./in.cue:44:8
+        //     ./in.cue:45:8
       }
       #a: (int){ int }
       #b: (int){ int }
@@ -237,8 +238,8 @@ Result:
   arithmetic: (struct){
     sum: (_|_){
       // [incomplete] arithmetic.sum: non-concrete value int in operand to +:
-      //     ./in.cue:52:3
-      //     ./in.cue:53:7
+      //     ./in.cue:53:3
+      //     ./in.cue:54:7
       #a: (int){ int }
       #b: (int){ int }
     }
@@ -378,7 +379,7 @@ diff old new
  Errors:
 -listEmbed.b6: invalid list index 5 (out of bounds):
 +listEmbed.b6: index out of range [5] with length 2:
-     ./in.cue:28:9
+     ./in.cue:29:9
  
  Result:
 @@ -12,10 +12,7 @@
@@ -399,7 +400,7 @@ diff old new
      b6: (_|_){
 -      // [eval] listEmbed.b6: invalid list index 5 (out of bounds):
 +      // [eval] listEmbed.b6: index out of range [5] with length 2:
-       //     ./in.cue:28:9
+       //     ./in.cue:29:9
      }
      b7: (int){ 1 }
 @@ -69,9 +66,9 @@
@@ -420,7 +421,7 @@ Improved error message.
 -- out/eval --
 Errors:
 listEmbed.b6: invalid list index 5 (out of bounds):
-    ./in.cue:28:9
+    ./in.cue:29:9
 
 Result:
 (_|_){
@@ -457,7 +458,7 @@ Result:
     b5: (int){ 2 }
     b6: (_|_){
       // [eval] listEmbed.b6: invalid list index 5 (out of bounds):
-      //     ./in.cue:28:9
+      //     ./in.cue:29:9
     }
     b7: (int){ 1 }
   }
@@ -482,8 +483,8 @@ Result:
     sum: (struct){
       out: (_|_){
         // [incomplete] outPattern.sum.out: non-concrete value int in operand to +:
-        //     ./in.cue:43:8
         //     ./in.cue:44:8
+        //     ./in.cue:45:8
       }
       #a: (int){ int }
       #b: (int){ int }
@@ -497,8 +498,8 @@ Result:
   arithmetic: (struct){
     sum: (_|_){
       // [incomplete] arithmetic.sum: non-concrete value int in operand to +:
-      //     ./in.cue:52:3
-      //     ./in.cue:53:7
+      //     ./in.cue:53:3
+      //     ./in.cue:54:7
       #a: (int){ int }
       #b: (int){ int }
     }
@@ -658,7 +659,10 @@ Result:
       ]
       #foo: 1
     }
-    b4: (〈0;b3〉 + 〈0;b3〉)
+    b4: 〈import;list〉.Concat([
+      〈1;b3〉,
+      〈1;b3〉,
+    ])
     b5: 〈0;b3〉[1]
     b6: 〈0;b3〉[5]
     b7: 〈0;b4〉[〈0;a1〉]

@@ -1,4 +1,6 @@
 -- in.cue --
+import "list"
+
 expr: error1: {
 	a: 3
 	a: a + 1
@@ -9,11 +11,11 @@ expr: error2: {
 }
 list: error1: {
 	a: ["1", "2"]
-	a: a + ["3"]
+	a: list.Concat([a, ["3"]])
 }
 
 list: error2: {
-	a: ["3"] + a
+	a: list.Concat([["3"], a])
 	a: ["1", "2"]
 }
 
@@ -263,28 +265,27 @@ issue1729: t2: {
 }
 
 -- out/eval/stats --
-Leaks:  14
-Freed:  414
-Reused: 405
-Allocs: 23
-Retain: 27
+Leaks:  0
+Freed:  432
+Reused: 423
+Allocs: 9
+Retain: 15
 
-Unifications: 236
-Conjuncts:    686
-Disjuncts:    439
+Unifications: 240
+Conjuncts:    663
+Disjuncts:    447
 -- out/evalalpha --
 Errors:
 expr.error1.a: conflicting values 4 and 3:
-    ./in.cue:2:5
-    ./in.cue:3:5
+    ./in.cue:4:5
+    ./in.cue:5:5
 expr.error2.a: conflicting values 4 and 3:
-    ./in.cue:6:5
-    ./in.cue:7:5
-list.error1.a: adding field 2 not allowed as field set was already referenced
-list.error2.a: adding field 2 not allowed as field set was already referenced
-list.error2.a.0: conflicting values "3" and "1":
-    ./in.cue:15:6
-    ./in.cue:16:6
+    ./in.cue:8:5
+    ./in.cue:9:5
+list.error1.0: structural cycle:
+    ./in.cue:13:17
+list.error2.1: structural cycle:
+    ./in.cue:17:17
 
 Result:
 (_|_){
@@ -295,49 +296,33 @@ Result:
       // [eval]
       a: (_|_){
         // [eval] expr.error1.a: conflicting values 4 and 3:
-        //     ./in.cue:2:5
-        //     ./in.cue:3:5
+        //     ./in.cue:4:5
+        //     ./in.cue:5:5
       }
     }
     error2: (_|_){
       // [eval]
       a: (_|_){
         // [eval] expr.error2.a: conflicting values 4 and 3:
-        //     ./in.cue:6:5
-        //     ./in.cue:7:5
+        //     ./in.cue:8:5
+        //     ./in.cue:9:5
       }
     }
   }
   list: (_|_){
-    // [eval]
+    // [structural cycle]
     error1: (_|_){
-      // [eval]
+      // [structural cycle]
       a: (_|_){
-        // [eval] list.error1.a: adding field 2 not allowed as field set was already referenced
-        0: (string){ "1" }
-        1: (string){ "2" }
+        // [structural cycle] list.error1.0: structural cycle:
+        //     ./in.cue:13:17
       }
     }
     error2: (_|_){
-      // [eval]
+      // [structural cycle]
       a: (_|_){
-        // [eval] list.error2.a: adding field 2 not allowed as field set was already referenced
-        // list.error2.a.0: conflicting values "3" and "1":
-        //     ./in.cue:15:6
-        //     ./in.cue:16:6
-        0: (_|_){
-          // [eval] list.error2.a.0: conflicting values "3" and "1":
-          //     ./in.cue:15:6
-          //     ./in.cue:16:6
-        }
-        1: (_|_){
-          // [eval] list.error2.a.1: conflicting values "1" and "2":
-          //     ./in.cue:16:6
-          //     ./in.cue:16:11
-          // list.error2.a.1: conflicting values "3" and "2":
-          //     ./in.cue:15:6
-          //     ./in.cue:16:11
-        }
+        // [structural cycle] list.error2.1: structural cycle:
+        //     ./in.cue:17:17
       }
     }
   }
@@ -649,71 +634,41 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -5,23 +5,11 @@
+@@ -5,6 +5,10 @@
  expr.error2.a: conflicting values 4 and 3:
-     ./in.cue:6:5
-     ./in.cue:7:5
--list.error1.a: element at index 2 not allowed by earlier comprehension or reference cycle
--list.error2.a: element at index 2 not allowed by earlier comprehension or reference cycle
-+list.error1.a: adding field 2 not allowed as field set was already referenced
-+list.error2.a: adding field 2 not allowed as field set was already referenced
- list.error2.a.0: conflicting values "3" and "1":
-     ./in.cue:15:6
-     ./in.cue:16:6
--list.error2.a.1: conflicting values "1" and "2":
--    ./in.cue:16:6
--    ./in.cue:16:11
--list.error2.a.1: conflicting values "3" and "2":
--    ./in.cue:15:6
--    ./in.cue:16:11
--list.error2.a.2: conflicting values "1" and "2":
--    ./in.cue:16:6
--    ./in.cue:16:11
--list.error2.a.2: conflicting values "3" and "2":
--    ./in.cue:15:6
--    ./in.cue:16:11
+     ./in.cue:8:5
+     ./in.cue:9:5
++list.error1.0: structural cycle:
++    ./in.cue:13:17
++list.error2.1: structural cycle:
++    ./in.cue:17:17
  
  Result:
  (_|_){
-@@ -50,16 +38,18 @@
+@@ -33,17 +37,15 @@
      error1: (_|_){
-       // [eval]
+       // [structural cycle]
        a: (_|_){
--        // [eval] list.error1.a: element at index 2 not allowed by earlier comprehension or reference cycle
-+        // [eval] list.error1.a: adding field 2 not allowed as field set was already referenced
-         0: (string){ "1" }
-         1: (string){ "2" }
--        2: (string){ "3" }
+-        // [structural cycle]
+-        0: (string){ "1" }
+-        1: (string){ "2" }
 -      }
 -    }
 -    error2: (_|_){
--      // [eval]
+-      // [structural cycle]
 -      a: (_|_){
--        // [eval] list.error2.a: element at index 2 not allowed by earlier comprehension or reference cycle
+-        // [structural cycle]
+-        0: (string){ "1" }
+-        1: (string){ "2" }
++        // [structural cycle] list.error1.0: structural cycle:
++        //     ./in.cue:13:17
 +      }
 +    }
 +    error2: (_|_){
-+      // [eval]
++      // [structural cycle]
 +      a: (_|_){
-+        // [eval] list.error2.a: adding field 2 not allowed as field set was already referenced
-+        // list.error2.a.0: conflicting values "3" and "1":
-+        //     ./in.cue:15:6
-+        //     ./in.cue:16:6
-         0: (_|_){
-           // [eval] list.error2.a.0: conflicting values "3" and "1":
-           //     ./in.cue:15:6
-@@ -73,14 +63,6 @@
-           //     ./in.cue:15:6
-           //     ./in.cue:16:11
-         }
--        2: (_|_){
--          // [eval] list.error2.a.2: conflicting values "1" and "2":
--          //     ./in.cue:16:6
--          //     ./in.cue:16:11
--          // list.error2.a.2: conflicting values "3" and "2":
--          //     ./in.cue:15:6
--          //     ./in.cue:16:11
--        }
++        // [structural cycle] list.error2.1: structural cycle:
++        //     ./in.cue:17:17
        }
      }
    }
@@ -722,28 +677,11 @@ list.error*: different error messages.
 -- out/eval --
 Errors:
 expr.error1.a: conflicting values 4 and 3:
-    ./in.cue:2:5
-    ./in.cue:3:5
+    ./in.cue:4:5
+    ./in.cue:5:5
 expr.error2.a: conflicting values 4 and 3:
-    ./in.cue:6:5
-    ./in.cue:7:5
-list.error1.a: element at index 2 not allowed by earlier comprehension or reference cycle
-list.error2.a: element at index 2 not allowed by earlier comprehension or reference cycle
-list.error2.a.0: conflicting values "3" and "1":
-    ./in.cue:15:6
-    ./in.cue:16:6
-list.error2.a.1: conflicting values "1" and "2":
-    ./in.cue:16:6
-    ./in.cue:16:11
-list.error2.a.1: conflicting values "3" and "2":
-    ./in.cue:15:6
-    ./in.cue:16:11
-list.error2.a.2: conflicting values "1" and "2":
-    ./in.cue:16:6
-    ./in.cue:16:11
-list.error2.a.2: conflicting values "3" and "2":
-    ./in.cue:15:6
-    ./in.cue:16:11
+    ./in.cue:8:5
+    ./in.cue:9:5
 
 Result:
 (_|_){
@@ -754,55 +692,35 @@ Result:
       // [eval]
       a: (_|_){
         // [eval] expr.error1.a: conflicting values 4 and 3:
-        //     ./in.cue:2:5
-        //     ./in.cue:3:5
+        //     ./in.cue:4:5
+        //     ./in.cue:5:5
       }
     }
     error2: (_|_){
       // [eval]
       a: (_|_){
         // [eval] expr.error2.a: conflicting values 4 and 3:
-        //     ./in.cue:6:5
-        //     ./in.cue:7:5
+        //     ./in.cue:8:5
+        //     ./in.cue:9:5
       }
     }
   }
   list: (_|_){
-    // [eval]
+    // [structural cycle]
     error1: (_|_){
-      // [eval]
+      // [structural cycle]
       a: (_|_){
-        // [eval] list.error1.a: element at index 2 not allowed by earlier comprehension or reference cycle
+        // [structural cycle]
         0: (string){ "1" }
         1: (string){ "2" }
-        2: (string){ "3" }
       }
     }
     error2: (_|_){
-      // [eval]
+      // [structural cycle]
       a: (_|_){
-        // [eval] list.error2.a: element at index 2 not allowed by earlier comprehension or reference cycle
-        0: (_|_){
-          // [eval] list.error2.a.0: conflicting values "3" and "1":
-          //     ./in.cue:15:6
-          //     ./in.cue:16:6
-        }
-        1: (_|_){
-          // [eval] list.error2.a.1: conflicting values "1" and "2":
-          //     ./in.cue:16:6
-          //     ./in.cue:16:11
-          // list.error2.a.1: conflicting values "3" and "2":
-          //     ./in.cue:15:6
-          //     ./in.cue:16:11
-        }
-        2: (_|_){
-          // [eval] list.error2.a.2: conflicting values "1" and "2":
-          //     ./in.cue:16:6
-          //     ./in.cue:16:11
-          // list.error2.a.2: conflicting values "3" and "2":
-          //     ./in.cue:15:6
-          //     ./in.cue:16:11
-        }
+        // [structural cycle]
+        0: (string){ "1" }
+        1: (string){ "2" }
       }
     }
   }
@@ -1131,16 +1049,22 @@ Result:
         "1",
         "2",
       ]
-      a: (〈0;a〉 + [
-        "3",
+      a: 〈import;list〉.Concat([
+        〈1;a〉,
+        [
+          "3",
+        ],
       ])
     }
   }
   list: {
     error2: {
-      a: ([
-        "3",
-      ] + 〈0;a〉)
+      a: 〈import;list〉.Concat([
+        [
+          "3",
+        ],
+        〈1;a〉,
+      ])
       a: [
         "1",
         "2",

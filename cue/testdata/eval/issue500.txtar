@@ -2,6 +2,7 @@
 package x
 
 import "strings"
+import "list"
 
 a: strings.Join(strings.Split("test", "")[1:], "")
 
@@ -10,25 +11,25 @@ b: strings.Join(["t", "e", "s", "t"][1:], "")
 c: ["t", "e", "s", "t"][1:]
 d: strings.Join(c, "")
 
-e: strings.Join(["a"]+["b"], "")
+e: strings.Join(list.Concat([["a"], ["b"]]), "")
 
-f: ["a"] + ["b"]
+f: list.Concat([["a"], ["b"]])
 g: strings.Join(f, "")
 
-h: strings.Join(3*["a"], "")
+h: strings.Join(list.Repeat(["a"], 3), "")
 
-i: 3 * ["b"]
+i: list.Repeat(["b"], 3)
 j: strings.Join(i, "")
 -- out/eval/stats --
-Leaks:  16
-Freed:  34
-Reused: 31
-Allocs: 19
-Retain: 22
+Leaks:  2
+Freed:  55
+Reused: 50
+Allocs: 7
+Retain: 6
 
-Unifications: 50
-Conjuncts:    66
-Disjuncts:    46
+Unifications: 57
+Conjuncts:    74
+Disjuncts:    61
 -- out/eval --
 (struct){
   a: (string){ "est" }
@@ -70,22 +71,28 @@ Disjuncts:    46
     "t",
   ][1:]
   d: 〈import;strings〉.Join(〈0;c〉, "")
-  e: 〈import;strings〉.Join(([
-    "a",
-  ] + [
-    "b",
+  e: 〈import;strings〉.Join(〈import;list〉.Concat([
+    [
+      "a",
+    ],
+    [
+      "b",
+    ],
   ]), "")
-  f: ([
-    "a",
-  ] + [
-    "b",
+  f: 〈import;list〉.Concat([
+    [
+      "a",
+    ],
+    [
+      "b",
+    ],
   ])
   g: 〈import;strings〉.Join(〈0;f〉, "")
-  h: 〈import;strings〉.Join((3 * [
+  h: 〈import;strings〉.Join(〈import;list〉.Repeat([
     "a",
-  ]), "")
-  i: (3 * [
+  ], 3), "")
+  i: 〈import;list〉.Repeat([
     "b",
-  ])
+  ], 3)
   j: 〈import;strings〉.Join(〈0;i〉, "")
 }

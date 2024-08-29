@@ -3,7 +3,9 @@
 #name: list types
 #evalPartial
 -- in.cue --
-l0: 3 * [int]
+import "list"
+
+l0: list.Repeat([int], 3)
 l0: [1, 2, 3]
 l2: [...{a: int}]
 l2: [{a: 1}, {a: 2, b: 3}]
@@ -12,10 +14,10 @@ l2: [{a: 1}, {a: 2, b: 3}]
 // l3: <=10*[int]
 // l3: [1, 2, 3, ...]
 
-s1: (6 * [int])[2:3]
+s1: (list.Repeat([int], 6))[2:3]
 s2: [0, 2, 3][1:2]
 
-i1: (6 * [int])[2]
+i1: (list.Repeat([int], 6))[2]
 i2: [0, 2, 3][2]
 
 t0: [...{a: 8}]
@@ -23,7 +25,7 @@ t0: [{}]
 t1: [...]
 t1: [...int]
 
-e0: 2 * [{}]
+e0: list.Repeat([{}], 2)
 e0: [{}]
 e1: [...int]
 e1: [...float]
@@ -51,9 +53,9 @@ e1: [..._|_ // conflicting values int and float (mismatched types int and float)
 -- out/compile --
 --- in.cue
 {
-  l0: (3 * [
+  l0: 〈import;list〉.Repeat([
     int,
-  ])
+  ], 3)
   l0: [
     1,
     2,
@@ -73,17 +75,17 @@ e1: [..._|_ // conflicting values int and float (mismatched types int and float)
       b: 3
     },
   ]
-  s1: (6 * [
+  s1: 〈import;list〉.Repeat([
     int,
-  ])[2:3]
+  ], 6)[2:3]
   s2: [
     0,
     2,
     3,
   ][1:2]
-  i1: (6 * [
+  i1: 〈import;list〉.Repeat([
     int,
-  ])[2]
+  ], 6)[2]
   i2: [
     0,
     2,
@@ -103,9 +105,9 @@ e1: [..._|_ // conflicting values int and float (mismatched types int and float)
   t1: [
     ...int,
   ]
-  e0: (2 * [
+  e0: 〈import;list〉.Repeat([
     {},
-  ])
+  ], 2)
   e0: [
     {},
   ]
@@ -117,15 +119,15 @@ e1: [..._|_ // conflicting values int and float (mismatched types int and float)
   ]
 }
 -- out/eval/stats --
-Leaks:  15
-Freed:  26
-Reused: 23
-Allocs: 18
-Retain: 20
+Leaks:  3
+Freed:  54
+Reused: 50
+Allocs: 7
+Retain: 7
 
-Unifications: 41
-Conjuncts:    75
-Disjuncts:    45
+Unifications: 57
+Conjuncts:    99
+Disjuncts:    60
 -- out/eval --
 Errors:
 e0: incompatible list lengths (1 and 2)

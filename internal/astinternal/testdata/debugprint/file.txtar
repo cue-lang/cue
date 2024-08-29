@@ -24,9 +24,9 @@ import (
 	Filename: "package_only.cue"
 	Decls: []ast.Decl{
 		*ast.Package{
-			PackagePos: token.Pos("package_only.cue:1:1").WithRel("nospace")
+			PackagePos: token.Pos("package_only.cue:1:1", nospace)
 			Name: *ast.Ident{
-				NamePos: token.Pos("package_only.cue:1:9").WithRel("blank")
+				NamePos: token.Pos("package_only.cue:1:9", blank)
 				Name: "p"
 			}
 		}
@@ -45,11 +45,11 @@ import (
 			Position: 0
 			List: []*ast.Comment{
 				{
-					Slash: token.Pos("comments_only.cue:1:1").WithRel("newline")
+					Slash: token.Pos("comments_only.cue:1:1", newline)
 					Text: "// some"
 				}
 				{
-					Slash: token.Pos("comments_only.cue:2:1").WithRel("newline")
+					Slash: token.Pos("comments_only.cue:2:1", newline)
 					Text: "// comment lines"
 				}
 			}
@@ -61,20 +61,20 @@ import (
 	Filename: "imports.cue"
 	Decls: []ast.Decl{
 		*ast.Package{
-			PackagePos: token.Pos("imports.cue:1:1").WithRel("nospace")
+			PackagePos: token.Pos("imports.cue:1:1", nospace)
 			Name: *ast.Ident{
-				NamePos: token.Pos("imports.cue:1:9").WithRel("blank")
+				NamePos: token.Pos("imports.cue:1:9", blank)
 				Name: "p"
 			}
 		}
 		*ast.ImportDecl{
-			Import: token.Pos("imports.cue:3:1").WithRel("section")
+			Import: token.Pos("imports.cue:3:1", section)
 			Lparen: token.Pos("-")
 			Specs: []*ast.ImportSpec{
 				{
 					Name: nil
 					Path: *ast.BasicLit{
-						ValuePos: token.Pos("imports.cue:3:8").WithRel("blank")
+						ValuePos: token.Pos("imports.cue:3:8", blank)
 						Kind: token.Token("STRING")
 						Value: "\"foo\""
 					}
@@ -84,13 +84,13 @@ import (
 			Rparen: token.Pos("-")
 		}
 		*ast.ImportDecl{
-			Import: token.Pos("imports.cue:5:1").WithRel("section")
-			Lparen: token.Pos("imports.cue:5:8").WithRel("blank")
+			Import: token.Pos("imports.cue:5:1", section)
+			Lparen: token.Pos("imports.cue:5:8", blank)
 			Specs: []*ast.ImportSpec{
 				{
 					Name: nil
 					Path: *ast.BasicLit{
-						ValuePos: token.Pos("imports.cue:6:2").WithRel("newline")
+						ValuePos: token.Pos("imports.cue:6:2", newline)
 						Kind: token.Token("STRING")
 						Value: "\"bar\""
 					}
@@ -98,25 +98,25 @@ import (
 				}
 				{
 					Name: *ast.Ident{
-						NamePos: token.Pos("imports.cue:7:2").WithRel("newline")
+						NamePos: token.Pos("imports.cue:7:2", newline)
 						Name: "name"
 					}
 					Path: *ast.BasicLit{
-						ValuePos: token.Pos("imports.cue:7:7").WithRel("blank")
+						ValuePos: token.Pos("imports.cue:7:7", blank)
 						Kind: token.Token("STRING")
 						Value: "\"baz\""
 					}
 					EndPos: token.Pos("-")
 				}
 			}
-			Rparen: token.Pos("imports.cue:8:1").WithRel("newline")
+			Rparen: token.Pos("imports.cue:8:1", newline)
 		}
 	}
 	Imports: []*ast.ImportSpec{
 		{
 			Name: nil
 			Path: *ast.BasicLit{
-				ValuePos: token.Pos("imports.cue:3:8").WithRel("blank")
+				ValuePos: token.Pos("imports.cue:3:8", blank)
 				Kind: token.Token("STRING")
 				Value: "\"foo\""
 			}
@@ -125,7 +125,7 @@ import (
 		{
 			Name: nil
 			Path: *ast.BasicLit{
-				ValuePos: token.Pos("imports.cue:6:2").WithRel("newline")
+				ValuePos: token.Pos("imports.cue:6:2", newline)
 				Kind: token.Token("STRING")
 				Value: "\"bar\""
 			}
@@ -133,11 +133,11 @@ import (
 		}
 		{
 			Name: *ast.Ident{
-				NamePos: token.Pos("imports.cue:7:2").WithRel("newline")
+				NamePos: token.Pos("imports.cue:7:2", newline)
 				Name: "name"
 			}
 			Path: *ast.BasicLit{
-				ValuePos: token.Pos("imports.cue:7:7").WithRel("blank")
+				ValuePos: token.Pos("imports.cue:7:7", blank)
 				Kind: token.Token("STRING")
 				Value: "\"baz\""
 			}

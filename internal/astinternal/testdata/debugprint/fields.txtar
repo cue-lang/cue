@@ -16,73 +16,73 @@ embed: {
 	Decls: []ast.Decl{
 		*ast.Field{
 			Label: *ast.Ident{
-				NamePos: token.Pos("fields.cue:1:1").WithRel("nospace")
+				NamePos: token.Pos("fields.cue:1:1", nospace)
 				Name: "a"
 			}
 			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
-			TokenPos: token.Pos("fields.cue:1:2").WithRel("nospace")
+			TokenPos: token.Pos("fields.cue:1:2", nospace)
 			Token: token.Token(":")
 			Value: *ast.BasicLit{
-				ValuePos: token.Pos("fields.cue:1:4").WithRel("blank")
+				ValuePos: token.Pos("fields.cue:1:4", blank)
 				Kind: token.Token("INT")
 				Value: "1"
 			}
 			Attrs: []*ast.Attribute{
 				{
-					At: token.Pos("fields.cue:1:6").WithRel("blank")
+					At: token.Pos("fields.cue:1:6", blank)
 					Text: "@xml(,attr)"
 				}
 			}
 		}
 		*ast.Field{
 			Label: *ast.Ident{
-				NamePos: token.Pos("fields.cue:2:1").WithRel("newline")
+				NamePos: token.Pos("fields.cue:2:1", newline)
 				Name: "b"
 			}
 			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
-			TokenPos: token.Pos("fields.cue:2:2").WithRel("nospace")
+			TokenPos: token.Pos("fields.cue:2:2", nospace)
 			Token: token.Token(":")
 			Value: *ast.BasicLit{
-				ValuePos: token.Pos("fields.cue:2:4").WithRel("blank")
+				ValuePos: token.Pos("fields.cue:2:4", blank)
 				Kind: token.Token("INT")
 				Value: "2"
 			}
 			Attrs: []*ast.Attribute{
 				{
-					At: token.Pos("fields.cue:2:6").WithRel("blank")
+					At: token.Pos("fields.cue:2:6", blank)
 					Text: "@foo(a,b=4)"
 				}
 				{
-					At: token.Pos("fields.cue:2:18").WithRel("blank")
+					At: token.Pos("fields.cue:2:18", blank)
 					Text: "@go(Foo)"
 				}
 			}
 		}
 		*ast.Field{
 			Label: *ast.Ident{
-				NamePos: token.Pos("fields.cue:3:1").WithRel("newline")
+				NamePos: token.Pos("fields.cue:3:1", newline)
 				Name: "c"
 			}
-			Optional: token.Pos("fields.cue:3:2").WithRel("nospace")
+			Optional: token.Pos("fields.cue:3:2", nospace)
 			Constraint: token.Token("!")
-			TokenPos: token.Pos("fields.cue:3:3").WithRel("nospace")
+			TokenPos: token.Pos("fields.cue:3:3", nospace)
 			Token: token.Token(":")
 			Value: *ast.StructLit{
 				Lbrace: token.Pos("-")
 				Elts: []ast.Decl{
 					*ast.Field{
 						Label: *ast.Ident{
-							NamePos: token.Pos("fields.cue:3:5").WithRel("blank")
+							NamePos: token.Pos("fields.cue:3:5", blank)
 							Name: "d"
 						}
-						Optional: token.Pos("fields.cue:3:6").WithRel("nospace")
+						Optional: token.Pos("fields.cue:3:6", nospace)
 						Constraint: token.Token("?")
-						TokenPos: token.Pos("fields.cue:3:7").WithRel("nospace")
+						TokenPos: token.Pos("fields.cue:3:7", nospace)
 						Token: token.Token(":")
 						Value: *ast.Ident{
-							NamePos: token.Pos("fields.cue:3:9").WithRel("blank")
+							NamePos: token.Pos("fields.cue:3:9", blank)
 							Name: "string"
 						}
 						Attrs: []*ast.Attribute{}
@@ -95,46 +95,46 @@ embed: {
 		*ast.Field{
 			Label: *ast.Alias{
 				Ident: *ast.Ident{
-					NamePos: token.Pos("fields.cue:4:1").WithRel("newline")
+					NamePos: token.Pos("fields.cue:4:1", newline)
 					Name: "X"
 				}
-				Equal: token.Pos("fields.cue:4:2").WithRel("nospace")
+				Equal: token.Pos("fields.cue:4:2", nospace)
 				Expr: *ast.Ident{
-					NamePos: token.Pos("fields.cue:4:3").WithRel("nospace")
+					NamePos: token.Pos("fields.cue:4:3", nospace)
 					Name: "e"
 				}
 			}
 			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
-			TokenPos: token.Pos("fields.cue:4:4").WithRel("nospace")
+			TokenPos: token.Pos("fields.cue:4:4", nospace)
 			Token: token.Token(":")
 			Value: *ast.StructLit{
 				Lbrace: token.Pos("-")
 				Elts: []ast.Decl{
 					*ast.Field{
 						Label: *ast.ListLit{
-							Lbrack: token.Pos("fields.cue:4:6").WithRel("blank")
+							Lbrack: token.Pos("fields.cue:4:6", blank)
 							Elts: []ast.Expr{
 								*ast.Alias{
 									Ident: *ast.Ident{
-										NamePos: token.Pos("fields.cue:4:7").WithRel("nospace")
+										NamePos: token.Pos("fields.cue:4:7", nospace)
 										Name: "Y"
 									}
-									Equal: token.Pos("fields.cue:4:8").WithRel("nospace")
+									Equal: token.Pos("fields.cue:4:8", nospace)
 									Expr: *ast.Ident{
-										NamePos: token.Pos("fields.cue:4:9").WithRel("nospace")
+										NamePos: token.Pos("fields.cue:4:9", nospace)
 										Name: "string"
 									}
 								}
 							}
-							Rbrack: token.Pos("fields.cue:4:15").WithRel("nospace")
+							Rbrack: token.Pos("fields.cue:4:15", nospace)
 						}
 						Optional: token.Pos("-")
 						Constraint: token.Token("ILLEGAL")
-						TokenPos: token.Pos("fields.cue:4:16").WithRel("nospace")
+						TokenPos: token.Pos("fields.cue:4:16", nospace)
 						Token: token.Token(":")
 						Value: *ast.Ident{
-							NamePos: token.Pos("fields.cue:4:18").WithRel("blank")
+							NamePos: token.Pos("fields.cue:4:18", blank)
 							Name: "int"
 						}
 						Attrs: []*ast.Attribute{}
@@ -146,60 +146,60 @@ embed: {
 		}
 		*ast.Field{
 			Label: *ast.Ident{
-				NamePos: token.Pos("fields.cue:5:1").WithRel("newline")
+				NamePos: token.Pos("fields.cue:5:1", newline)
 				Name: "#Schema"
 			}
 			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
-			TokenPos: token.Pos("fields.cue:5:8").WithRel("nospace")
+			TokenPos: token.Pos("fields.cue:5:8", nospace)
 			Token: token.Token(":")
 			Value: *ast.StructLit{
-				Lbrace: token.Pos("fields.cue:5:10").WithRel("blank")
+				Lbrace: token.Pos("fields.cue:5:10", blank)
 				Elts: []ast.Decl{
 					*ast.Field{
 						Label: *ast.Ident{
-							NamePos: token.Pos("fields.cue:6:2").WithRel("newline")
+							NamePos: token.Pos("fields.cue:6:2", newline)
 							Name: "name"
 						}
 						Optional: token.Pos("-")
 						Constraint: token.Token("ILLEGAL")
-						TokenPos: token.Pos("fields.cue:6:6").WithRel("nospace")
+						TokenPos: token.Pos("fields.cue:6:6", nospace)
 						Token: token.Token(":")
 						Value: *ast.Ident{
-							NamePos: token.Pos("fields.cue:6:8").WithRel("blank")
+							NamePos: token.Pos("fields.cue:6:8", blank)
 							Name: "string"
 						}
 						Attrs: []*ast.Attribute{}
 					}
 					*ast.Ellipsis{
-						Ellipsis: token.Pos("fields.cue:7:2").WithRel("newline")
+						Ellipsis: token.Pos("fields.cue:7:2", newline)
 						Type: nil
 					}
 				}
-				Rbrace: token.Pos("fields.cue:8:1").WithRel("newline")
+				Rbrace: token.Pos("fields.cue:8:1", newline)
 			}
 			Attrs: []*ast.Attribute{}
 		}
 		*ast.Field{
 			Label: *ast.Ident{
-				NamePos: token.Pos("fields.cue:9:1").WithRel("newline")
+				NamePos: token.Pos("fields.cue:9:1", newline)
 				Name: "embed"
 			}
 			Optional: token.Pos("-")
 			Constraint: token.Token("ILLEGAL")
-			TokenPos: token.Pos("fields.cue:9:6").WithRel("nospace")
+			TokenPos: token.Pos("fields.cue:9:6", nospace)
 			Token: token.Token(":")
 			Value: *ast.StructLit{
-				Lbrace: token.Pos("fields.cue:9:8").WithRel("blank")
+				Lbrace: token.Pos("fields.cue:9:8", blank)
 				Elts: []ast.Decl{
 					*ast.EmbedDecl{
 						Expr: *ast.Ident{
-							NamePos: token.Pos("fields.cue:10:2").WithRel("newline")
+							NamePos: token.Pos("fields.cue:10:2", newline)
 							Name: "#Schema"
 						}
 					}
 				}
-				Rbrace: token.Pos("fields.cue:11:1").WithRel("newline")
+				Rbrace: token.Pos("fields.cue:11:1", newline)
 			}
 			Attrs: []*ast.Attribute{}
 		}

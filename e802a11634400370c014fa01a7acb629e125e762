@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4af5c244_8499f494",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-29T12:08:19Z",
+      "side": 1,
+      "message": "perhaps mention that we don\u0027t do a less naive detection for now, as a better mechanism would only be possible at a later time once evalv3 is settled?",
+      "revId": "e802a11634400370c014fa01a7acb629e125e762",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d2e27c5_3ac49862",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-29T12:08:19Z",
+      "side": 1,
+      "message": "nit: don\u0027t use switches for a single case, because you can early return to unindent the rest, like:\n\n```\nn, ok :\u003d n.(*ast.BinaryExpr)\nif !ok {\n    return true\n}\n```",
+      "revId": "e802a11634400370c014fa01a7acb629e125e762",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5cab2888_e95dc470",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-29T12:08:19Z",
+      "side": 1,
+      "message": "I would do this as part of the same astutil.Apply, and make the switch on n.Op have two cases. It will save you a few lines of code, but most importantly, it means you only walk the entire syntax tree once for this fix, rather than twice. Given how similar the two rewrites are, I think it\u0027s worth it.\n\nI think you can even reuse much of the code that does the rewrite itself. The only difference between the two is the name of the function.",
+      "revId": "e802a11634400370c014fa01a7acb629e125e762",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

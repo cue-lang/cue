@@ -27,84 +27,83 @@ func TestFile(t *testing.T) {
 		in       string
 		out      string
 		simplify bool
-	}{{
-		name: "rewrite integer division",
-		in: `package foo
+	}{
+		{
+			name: "rewrite integer division",
+			in: `package foo
 
 a: 1 div 2
 b: 3 mod 5
 c: 2 quo 9
 d: 1.0 rem 1.0 // pass on illegal values.
 `,
-		out: `package foo
+			out: `package foo
 
 a: __div(1, 2)
 b: __mod(3, 5)
 c: __quo(2, 9)
 d: __rem(1.0, 1.0) // pass on illegal values.
 `,
-	}, {
-		simplify: true,
-		in: `
-		x1: 3 & _
-		x2: _ | {[string]: int}
-		x3: 4 & (9 | _)
-		x4: (_ | 9) & 4
-		x5: (_ & 9) & 4
-		x6: 4 & (_ & 9)
-		`,
-		out: `x1: 3
+		},
+
+		{
+			name:     "simplify literal tops",
+			simplify: true,
+			in: `
+x1: 3 & _
+x2: _ | {[string]: int}
+x3: 4 & (9 | _)
+x4: (_ | 9) & 4
+x5: (_ & 9) & 4
+x6: 4 & (_ & 9)
+`,
+			out: `x1: 3
 x2: _
 x3: 4
 x4: 4
 x5: 9 & 4
 x6: 4 & 9
 `,
+		},
 
-		// 	}, {
-		// 		name: "slice",
-		// 		in: `package foo
+		{
+			name: "rewrite list addition",
+			in: `a: [7]
+b: a + a
+c: a + [8]
+d: [9] + a
+e: [0] + [1]
+`,
+			out: `import list6c6973 "list"
 
-		// // keep comment
-		// l[3:4] // and this one
+a: [7]
+b: a + a
+c: list6c6973.Concat([a, [8]])
+d: list6c6973.Concat([[9], a])
+e: list6c6973.Concat([[0], [1]])
+`,
+		},
 
-		// a: len(l[3:4])
-		// b: len(l[a:_])
-		// c: len(l[_:x])
-		// d: len(l[_:_])
-		// `,
-		// 		out: `package foo
+		{
+			name: "rewrite list multiplication",
+			in: `a: [7]
+b: a * 3
+c: 4
+d: [7] * c
+e: c * [8]
+f: [9] * 5
+`,
+			out: `import list6c6973 "list"
 
-		// import list6c6973 "list"
-
-		// // keep comment
-		// list6c6973.Slice(l, 3, 4)// and this one
-
-		// a: len(list6c6973.Slice(l, 3, 4))
-		// b: len(list6c6973.Slice(l, a, len(l)))
-		// c: len(list6c6973.Slice(l, 0, x))
-		// d: len(list6c6973.Slice(l, 0, len(l)))
-		// `,
-		// 	}, {
-		// 		name: "slice2",
-		// 		in: `package foo
-
-		// import "list"
-
-		// a: list.Contains("foo")
-		// b: len(l[_:_])
-		// `,
-		// 		out: `package foo
-
-		// import (
-		// 	"list"
-		// 	list6c6973 "list"
-		// )
-
-		// a: list.Contains("foo")
-		// b: len(list6c6973.Slice(l, 0, len(l)))
-		// `,
-	}}
+a: [7]
+b: a * 3
+c: 4
+d: list6c6973.Repeat([7], c)
+e: list6c6973.Repeat([8], c)
+f: list6c6973.Repeat([9], 5)
+`,
+		},
+	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			f, err := parser.ParseFile("", tc.in, parser.ParseComments)

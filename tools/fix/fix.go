@@ -62,40 +62,61 @@ func File(f *ast.File, o ...Option) *ast.File {
 		return true
 	}, nil).(*ast.File)
 
-	// TODO: we are probably reintroducing slices. Disable for now.
-	//
-	// Rewrite slice expression.
-	// f = astutil.Apply(f, func(c astutil.Cursor) bool {
-	// 	n := c.Node()
-	// 	getVal := func(n ast.Expr) ast.Expr {
-	// 		if n == nil {
-	// 			return nil
-	// 		}
-	// 		if id, ok := n.(*ast.Ident); ok && id.Name == "_" {
-	// 			return nil
-	// 		}
-	// 		return n
-	// 	}
-	// 	switch x := n.(type) {
-	// 	case *ast.SliceExpr:
-	// 		ast.SetRelPos(x.X, token.NoRelPos)
+	// Rewrite list addition to use list.Concat
+	f = astutil.Apply(f, func(c astutil.Cursor) bool {
+		n := c.Node()
+		switch n := n.(type) {
+		case *ast.BinaryExpr:
+			switch n.Op {
+			case token.ADD:
+				_, xIsList := n.X.(*ast.ListLit)
+				_, yIsList := n.Y.(*ast.ListLit)
+				if !(xIsList || yIsList) {
+					break
+				}
+				ast.SetRelPos(n.X, token.NoSpace)
+				pkg := c.Import("list")
+				if pkg == nil {
+					break
+				}
+				c.Replace(&ast.CallExpr{
+					Fun:  ast.NewSel(pkg, "Concat"),
+					Args: []ast.Expr{ast.NewList(n.X, n.Y)},
+				})
+			}
+		}
+		return true
+	}, nil).(*ast.File)
 
-	// 		lo := getVal(x.Low)
-	// 		hi := getVal(x.High)
-	// 		if lo == nil { // a[:j]
-	// 			lo = mustParseExpr("0")
-	// 			astutil.CopyMeta(lo, x.Low)
-	// 		}
-	// 		if hi == nil { // a[i:]
-	// 			hi = ast.NewCall(ast.NewIdent("len"), x.X)
-	// 			astutil.CopyMeta(lo, x.High)
-	// 		}
-	// 		if pkg := c.Import("list"); pkg != nil {
-	// 			c.Replace(ast.NewCall(ast.NewSel(pkg, "Slice"), x.X, lo, hi))
-	// 		}
-	// 	}
-	// 	return true
-	// }, nil).(*ast.File)
+	// Rewrite list multiplication to use list.Repeat
+	f = astutil.Apply(f, func(c astutil.Cursor) bool {
+		n := c.Node()
+		switch n := n.(type) {
+		case *ast.BinaryExpr:
+			switch n.Op {
+			case token.MUL:
+				x, y := n.X, n.Y
+				_, xIsList := x.(*ast.ListLit)
+				_, yIsList := y.(*ast.ListLit)
+				if !(xIsList || yIsList) {
+					break
+				}
+				if !xIsList {
+					x, y = y, x
+				}
+				ast.SetRelPos(x, token.NoSpace)
+				pkg := c.Import("list")
+				if pkg == nil {
+					break
+				}
+				c.Replace(&ast.CallExpr{
+					Fun:  ast.NewSel(pkg, "Repeat"),
+					Args: []ast.Expr{x, y},
+				})
+			}
+		}
+		return true
+	}, nil).(*ast.File)
 
 	if options.simplify {
 		f = simplify(f)

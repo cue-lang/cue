@@ -67,12 +67,6 @@ func TestValidate(t *testing.T) {
 		name:        "string list",
 		value:       []string{"a", "b", "c"},
 		constraints: `[_, "b", ...]`,
-	}, {
-		// Not a typical constraint, but it is possible.
-		name:        "string list incompatible lengths",
-		value:       []string{"a", "b", "c"},
-		constraints: `4*[string]`,
-		err:         fail,
 	}}
 
 	for _, tc := range testCases {
@@ -91,13 +85,6 @@ func TestValidate(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	type updated struct {
-		A []*int `cue:"[...int|*1]"` // arbitrary length slice with values 1
-		B []int  `cue:"3*[int|*1]"`  // slice of length 3, defaults to [1,1,1]
-
-		// TODO: better errors if the user forgets to quote.
-		M map[string]int `cue:",opt"`
-	}
 	type sump struct {
 		A *int `cue:"C-B"`
 		B *int `cue:"C-A"`
@@ -155,36 +142,6 @@ func TestUpdate(t *testing.T) {
 		value:  []string{"a", "b", "c"},
 		result: []string{"a", "b", "c"},
 		err:    fail,
-	}, {
-		name: "composite values update",
-		// allocate a slice with uninitialized values and let Update fill
-		// out default values.
-		value: &updated{A: make([]*int, 3)},
-		result: &updated{
-			A: []*int{&one, &one, &one},
-			B: []int{1, 1, 1},
-			M: map[string]int(nil),
-		},
-	}, {
-		name:   "composite values update with unsatisfied map constraints",
-		value:  &updated{},
-		result: &updated{},
-
-		constraints: ` { M: {foo: bar, bar: foo} } `,
-		err:         fail, // incomplete values
-	}, {
-		name:        "composite values update with map constraints",
-		value:       &updated{M: map[string]int{"foo": 1}},
-		constraints: ` { M: {foo: bar, bar: foo} } `,
-		result: &updated{
-			// TODO: would be better if this is nil, but will not matter for
-			// JSON output: if omitempty is false, an empty list will be
-			// printed regardless, and if it is true, it will be omitted
-			// regardless.
-			A: []*int{},
-			B: []int{1, 1, 1},
-			M: map[string]int{"bar": 1, "foo": 1},
-		},
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

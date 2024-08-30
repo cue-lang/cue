@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e759619a_f714a3b2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-30T14:18:18Z",
+      "side": 1,
+      "message": "I made this comment late, but please see: https://github.com/cue-lang/cue/issues/3405#issuecomment-2320909428\n\nmy use of \"good\" and \"bad\" in the package and directory names is also odd. there\u0027s nothing wrong with multiple packages per directory. \"one\" and \"many\", for example, would be more intuitive. and we would then check that the multiple packages in \"many\" get fixed too.",
+      "revId": "0c88a1b137787c0dabd962ea95ed60f2d5cef55e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -132,15 +132,15 @@ bare: {
 	}
 }
 -- out/eval/stats --
-Leaks:  8
-Freed:  535
-Reused: 530
-Allocs: 13
-Retain: 52
+Leaks:  11
+Freed:  520
+Reused: 515
+Allocs: 16
+Retain: 50
 
-Unifications: 531
-Conjuncts:    918
-Disjuncts:    585
+Unifications: 519
+Conjuncts:    894
+Disjuncts:    570
 -- out/eval --
 Errors:
 match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
@@ -191,22 +191,6 @@ allOf.multiple1Err3: invalid value 5 (does not satisfy matchN(2, [math.MultipleO
     ./in.cue:106:20
     ./in.cue:106:27
     ./in.cue:110:17
-bare.embed.t1.a: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-    ./in.cue:117:7
-    ./in.cue:117:6
-    ./in.cue:117:14
-bare.embed.t1.b: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-    ./in.cue:117:7
-    ./in.cue:117:14
-    ./in.cue:118:6
-bare.embed.t2.a: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-    ./in.cue:122:7
-    ./in.cue:122:6
-    ./in.cue:122:14
-bare.embed.t2.b: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-    ./in.cue:122:7
-    ./in.cue:121:6
-    ./in.cue:122:14
 
 Result:
 (_|_){
@@ -375,39 +359,27 @@ Result:
     }
     multiple1OK1: (int){ 15 }
   }
-  bare: (_|_){
-    // [eval]
-    embed: (_|_){
-      // [eval]
-      t1: (_|_){
-        // [eval]
-        a: (_|_){
-          // [eval] bare.embed.t1.a: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-          //     ./in.cue:117:7
-          //     ./in.cue:117:6
-          //     ./in.cue:117:14
-        }
-        b: (_|_){
-          // [eval] bare.embed.t1.b: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-          //     ./in.cue:117:7
-          //     ./in.cue:117:14
-          //     ./in.cue:118:6
-        }
+  bare: (struct){
+    embed: (struct){
+      t1: (struct){
+        a: (_){ matchN(1, (#list){
+            0: (_|_){// >10
+            }
+          }) }
+        b: (_){ matchN(1, (#list){
+            0: (_|_){// >10
+            }
+          }) }
       }
-      t2: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval] bare.embed.t2.b: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-          //     ./in.cue:122:7
-          //     ./in.cue:121:6
-          //     ./in.cue:122:14
-        }
-        a: (_|_){
-          // [eval] bare.embed.t2.a: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-          //     ./in.cue:122:7
-          //     ./in.cue:122:6
-          //     ./in.cue:122:14
-        }
+      t2: (struct){
+        b: (_){ matchN(1, (#list){
+            0: (_|_){// >10
+            }
+          }) }
+        a: (_){ matchN(1, (#list){
+            0: (_|_){// >10
+            }
+          }) }
       }
     }
     direct: (struct){
@@ -478,18 +450,6 @@ allOf.multiple1Err3: invalid value 5 (does not satisfy matchN(2, [math.MultipleO
     ./in.cue:106:20
     ./in.cue:106:27
     ./in.cue:110:17
-bare.embed.t1.a: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-    ./in.cue:117:7
-    ./in.cue:117:14
-bare.embed.t1.b: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-    ./in.cue:117:7
-    ./in.cue:117:14
-bare.embed.t2.a: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-    ./in.cue:122:7
-    ./in.cue:122:14
-bare.embed.t2.b: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-    ./in.cue:122:7
-    ./in.cue:122:14
 
 Result:
 (_|_){
@@ -651,35 +611,23 @@ Result:
     }
     multiple1OK1: (int){ 15 }
   }
-  bare: (_|_){
-    // [eval]
-    embed: (_|_){
-      // [eval]
-      t1: (_|_){
-        // [eval]
-        a: (_|_){
-          // [eval] bare.embed.t1.a: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-          //     ./in.cue:117:7
-          //     ./in.cue:117:14
-        }
-        b: (_|_){
-          // [eval] bare.embed.t1.b: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-          //     ./in.cue:117:7
-          //     ./in.cue:117:14
-        }
+  bare: (struct){
+    embed: (struct){
+      t1: (struct){
+        a: (_){ matchN(1, (#list){
+            0: (number){ >10 }
+          }) }
+        b: (_){ matchN(1, (#list){
+            0: (number){ >10 }
+          }) }
       }
-      t2: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval] bare.embed.t2.b: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-          //     ./in.cue:122:7
-          //     ./in.cue:122:14
-        }
-        a: (_|_){
-          // [eval] bare.embed.t2.a: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-          //     ./in.cue:122:7
-          //     ./in.cue:122:14
-        }
+      t2: (struct){
+        b: (_){ matchN(1, (#list){
+            0: (number){ >10 }
+          }) }
+        a: (_){ matchN(1, (#list){
+            0: (number){ >10 }
+          }) }
       }
     }
     direct: (struct){
@@ -735,27 +683,7 @@ diff old new
  oneOf.multiple1Err1: invalid value 1 (does not satisfy matchN(1, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected 1:
      ./in.cue:84:20
      ./in.cue:84:27
-@@ -49,19 +43,15 @@
-     ./in.cue:110:17
- bare.embed.t1.a: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-     ./in.cue:117:7
--    ./in.cue:117:6
-     ./in.cue:117:14
- bare.embed.t1.b: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-     ./in.cue:117:7
-     ./in.cue:117:14
--    ./in.cue:118:6
- bare.embed.t2.a: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-     ./in.cue:122:7
--    ./in.cue:122:6
-     ./in.cue:122:14
- bare.embed.t2.b: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-     ./in.cue:122:7
--    ./in.cue:121:6
-     ./in.cue:122:14
- 
- Result:
-@@ -79,7 +69,6 @@
+@@ -63,7 +57,6 @@
        // [eval] match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
        //     ./in.cue:8:17
        //     ./in.cue:8:24
@@ -763,7 +691,7 @@ diff old new
        a: (string){ "foo" }
      }
      incompleteOK: (struct){
-@@ -89,7 +78,6 @@
+@@ -73,7 +66,6 @@
        // [eval] match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
        //     ./in.cue:12:21
        //     ./in.cue:12:28
@@ -771,7 +699,7 @@ diff old new
        a: (string){ string }
      }
      #A: (#struct){
-@@ -102,8 +90,7 @@
+@@ -86,8 +78,7 @@
              0: (int){ 2 }
            }), int) }) }
        pickTopOK2: (int){ &(matchN(1, (#list){
@@ -781,7 +709,7 @@ diff old new
          }), int) }
        pickTopErr: (int){ &(matchN(1, (#list){
            0: (int){ 2 }
-@@ -118,7 +105,6 @@
+@@ -102,7 +93,6 @@
          // [eval] match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:2}])): 0 matched, expected 1:
          //     ./in.cue:36:23
          //     ./in.cue:36:30
@@ -789,7 +717,7 @@ diff old new
          a: (int){ |(*(int){ 3 }, (int){ int }) }
        }
        pickNested2OK1: (struct){
-@@ -131,7 +117,6 @@
+@@ -115,7 +105,6 @@
          // [eval] match.defaults.pickNested2Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:<=2}])): 0 matched, expected 1:
          //     ./in.cue:41:23
          //     ./in.cue:41:30
@@ -797,7 +725,7 @@ diff old new
          a: (int){ |(*(int){ 3 }, (int){ int }) }
        }
      }
-@@ -166,7 +151,6 @@
+@@ -150,7 +139,6 @@
        // [eval] not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [{a:int}])): 1 matched, expected 0:
        //     ./in.cue:74:17
        //     ./in.cue:74:24
@@ -805,7 +733,7 @@ diff old new
        a: (int){ 2 }
      }
      doubleOK: (struct){
-@@ -173,10 +157,9 @@
+@@ -157,10 +145,9 @@
        a: (int){ 2 }
      }
      doubleErr: (_|_){
@@ -817,37 +745,42 @@ diff old new
        a: (string){ "foo" }
      }
    }
-@@ -240,7 +223,6 @@
-         a: (_|_){
-           // [eval] bare.embed.t1.a: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-           //     ./in.cue:117:7
--          //     ./in.cue:117:6
-           //     ./in.cue:117:14
-         }
-         b: (_|_){
-@@ -247,7 +229,6 @@
-           // [eval] bare.embed.t1.b: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-           //     ./in.cue:117:7
-           //     ./in.cue:117:14
--          //     ./in.cue:118:6
-         }
+@@ -219,22 +206,18 @@
+     embed: (struct){
+       t1: (struct){
+         a: (_){ matchN(1, (#list){
+-            0: (_|_){// >10
+-            }
+-          }) }
+-        b: (_){ matchN(1, (#list){
+-            0: (_|_){// >10
+-            }
+-          }) }
+-      }
+-      t2: (struct){
+-        b: (_){ matchN(1, (#list){
+-            0: (_|_){// >10
+-            }
+-          }) }
+-        a: (_){ matchN(1, (#list){
+-            0: (_|_){// >10
+-            }
++            0: (number){ >10 }
++          }) }
++        b: (_){ matchN(1, (#list){
++            0: (number){ >10 }
++          }) }
++      }
++      t2: (struct){
++        b: (_){ matchN(1, (#list){
++            0: (number){ >10 }
++          }) }
++        a: (_){ matchN(1, (#list){
++            0: (number){ >10 }
+           }) }
        }
-       t2: (_|_){
-@@ -255,13 +236,11 @@
-         b: (_|_){
-           // [eval] bare.embed.t2.b: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-           //     ./in.cue:122:7
--          //     ./in.cue:121:6
-           //     ./in.cue:122:14
-         }
-         a: (_|_){
-           // [eval] bare.embed.t2.a: invalid value {} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
-           //     ./in.cue:122:7
--          //     ./in.cue:122:6
-           //     ./in.cue:122:14
-         }
-       }
-@@ -269,22 +248,18 @@
+     }
+@@ -241,22 +224,18 @@
      direct: (struct){
        t1: (struct){
          a: (_){ matchN(1, (#list){
@@ -857,20 +790,24 @@ diff old new
 -        b: (_){ matchN(1, (#list){
 -            0: (_|_){// >10
 -            }
-+            0: (number){ >10 }
-+          }) }
-+        b: (_){ matchN(1, (#list){
-+            0: (number){ >10 }
-           }) }
-       }
-       t2: (struct){
-         b: (_){ matchN(1, (#list){
+-          }) }
+-      }
+-      t2: (struct){
+-        b: (_){ matchN(1, (#list){
 -            0: (_|_){// >10
 -            }
 -          }) }
 -        a: (_){ matchN(1, (#list){
 -            0: (_|_){// >10
 -            }
++            0: (number){ >10 }
++          }) }
++        b: (_){ matchN(1, (#list){
++            0: (number){ >10 }
++          }) }
++      }
++      t2: (struct){
++        b: (_){ matchN(1, (#list){
 +            0: (number){ >10 }
 +          }) }
 +        a: (_){ matchN(1, (#list){

@@ -16,6 +16,24 @@
       "message": "Curious that this didn\u0027t break any tests. :shrug:",
       "revId": "8d375cdeecc971580e6cf369bf15913353efcef3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2182c26_09a5c31d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-30T09:44:56Z",
+      "side": 1,
+      "message": "If you look at the original patch I link to, it switched all tests over to the new form, but didn\u0027t add any test for the backwards compatibility hack itself. It seems like it was done to provide a softer transition for any existing generated/decoded protobuf. That soft transition should be long done by now.",
+      "parentUuid": "873e4d18_e3b1e47f",
+      "revId": "8d375cdeecc971580e6cf369bf15913353efcef3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

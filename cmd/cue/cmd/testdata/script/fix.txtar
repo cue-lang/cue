@@ -1,0 +1,17 @@
+exec cue fix ./...
+cmp good/good.cue good/good.cue.fixed
+
+-- good/good.cue --
+package good
+
+out: ["foo"] + ["bar"]
+-- good/good.cue.fixed --
+package good
+
+import list6c6973 "list"
+
+out: list6c6973.Concat([["foo"], ["bar"]])
+-- bad/bad1.cue --
+package bad1
+-- bad/bad2.cue --
+package bad2

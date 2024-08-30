@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3e4eaa9_3cf226ac",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-30T16:03:21Z",
+      "side": 1,
+      "message": "Before either of you ask \"why not `cue def --inline-imports`\": it\u0027s similar, more powerful, and definitely useful. But because it\u0027s more powerful and uses the evaluator, it also renders it useless when the evaluator blows up :)",
+      "revId": "a02c1dc97d86209cc82dfcb84caa2367232b4b0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

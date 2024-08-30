@@ -1976,6 +1976,7 @@ func (n *nodeContext) addValueConjunct(env *Environment, v Value, id CloseInfo) 
 		}
 		n.updateNodeType(x.Kind(), x, id)
 		n.checks = append(n.checks, x)
+		n.hasTop = true // TODO(validatorType): see namesake TODO in conjunct.go.
 
 	case *Vertex:
 	// handled above.

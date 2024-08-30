@@ -713,6 +713,13 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 		}
 		n.checks = append(n.checks, x)
 
+		// We use hasTop here to ensure that validation considers the ultimate
+		// value of embedded validators, rather than assuming that the struct in
+		// which an expression is embedded is always a struct.
+		// TODO(validatorType): a more precise alternative would be to determine
+		// the basic type of the expression and schedule a conjunct for that.
+		n.hasTop = true
+
 	case *Vertex:
 	// handled above.
 

@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "b009e53d_6bf620de",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-30T12:17:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0bb50014_f603c8be",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "a00d5455_54596c57",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 3
@@ -31,6 +49,24 @@
       "writtenOn": "2024-08-30T09:17:08Z",
       "side": 1,
       "message": "Mostly minor stuff, but I do think you should use `//go:generate` here.",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "944d4b3a_3d21d73d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-30T12:17:19Z",
+      "side": 1,
+      "message": "As discussed online, I\u0027ll do that in the next CL.",
+      "parentUuid": "a00d5455_54596c57",
       "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "08fefa2e_59985435",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-30T12:17:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0eceff40_bf404c6f",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2adcc007_4f96cdf8",
@@ -65,6 +119,24 @@
       "writtenOn": "2024-08-30T09:17:08Z",
       "side": 1,
       "message": "shouldn\u0027t this be jsonAST? otherwise it\u0027s confusing against the schemaAST value below.",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "30d42663_9864a93b",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-30T12:17:19Z",
+      "side": 1,
+      "message": "Well, it is the AST for the jsonschema data (not to be confused with the JSON instance data), but fair enough, done.",
+      "parentUuid": "2adcc007_4f96cdf8",
       "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5cf6a81b_5bf2b6e1",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-30T12:17:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "245a7dd1_00648676",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b621214c_3bc4c6ee",
@@ -99,6 +189,24 @@
       "writtenOn": "2024-08-30T09:17:08Z",
       "side": 1,
       "message": "nit: schemaValue for consistency with your other camelCase names",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "25330777_4ba0dbfa",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-30T12:17:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b621214c_3bc4c6ee",
       "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +228,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f173969_bc033914",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-30T12:17:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8525d2ea_eb4ec908",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c5d7ce99_c4cc5852",
@@ -133,6 +259,24 @@
       "writtenOn": "2024-08-30T09:17:08Z",
       "side": 1,
       "message": "could you not use the description as the name? they don\u0027t seem to be too long",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c00909a_474258ab",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-30T12:17:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c5d7ce99_c4cc5852",
       "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -154,6 +298,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a2e29cb_c23cda35",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-30T12:17:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "61a93142_a8f4c08c",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ac618850_7ebafe2e",
@@ -167,6 +329,24 @@
       "writtenOn": "2024-08-30T09:17:08Z",
       "side": 1,
       "message": "is there a particular reason why you use Error rather than Fatal here? the behavior seems the same to me, as this is a subtest, so I\u0027m a bit surprised by the inconsistency",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a6a8dbf_a5e09edb",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-30T12:17:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ac618850_7ebafe2e",
       "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -188,6 +368,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "15667b08_f1e8ddb8",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-30T12:17:19Z",
+      "side": 1,
+      "message": "We already have ParseVersion which parses the official URIs that denote a version. I toyed with the idea of having some other kind of parse, but these names really aren\u0027t official, and this is used only in this test, so I don\u0027t think it\u0027s worthwhile, at least for now.",
+      "parentUuid": "73236537_e00f3415",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "05f289db_3a2a9cd5",
@@ -201,6 +399,24 @@
       "writtenOn": "2024-08-30T09:17:08Z",
       "side": 1,
       "message": "please please remember to add the copyright header to all new Go files. none of the new files in this CL seem to have it.",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee7ae1c0_a8ca28c0",
+        "filename": "encoding/jsonschema/internal/externaltest/tests.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-30T12:17:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "05f289db_3a2a9cd5",
       "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -222,6 +438,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e60d5f26_b2fa7250",
+        "filename": "encoding/jsonschema/testdata/external/config.cue",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-30T12:17:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e109e293_04666421",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "76e6c21e_0e95a741",
@@ -235,6 +469,24 @@
       "writtenOn": "2024-08-30T09:17:08Z",
       "side": 1,
       "message": "this seems like it should go at the top of the file?",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1b19c2b_3de6b51d",
+        "filename": "encoding/jsonschema/vendor-external",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-30T12:17:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "76e6c21e_0e95a741",
       "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -256,6 +508,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0db64bc_d411ecaa",
+        "filename": "encoding/jsonschema/vendor-external",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-30T12:17:19Z",
+      "side": 1,
+      "message": "As discussed, this will happen in the next CL.",
+      "parentUuid": "0f41c7f8_6c762a60",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0e01c8d1_75b74cf9",
@@ -269,6 +539,24 @@
       "writtenOn": "2024-08-30T09:17:08Z",
       "side": 1,
       "message": "do you want to leave a TODO to use `os.CopyFS` as added in Go 1.23? Or is it not worth it, as you would have to layer an io.FS to do the filtering of files?",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "376a2fb6_33dff2de",
+        "filename": "encoding/jsonschema/vendor_external.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-30T12:17:19Z",
+      "side": 1,
+      "message": "Yeah, I\u0027m not convinced it\u0027s worth it.",
+      "parentUuid": "0e01c8d1_75b74cf9",
       "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

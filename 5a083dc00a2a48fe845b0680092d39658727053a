@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0df4679e_4250cb27",
+        "filename": "encoding/jsonschema/vendor_external.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-30T09:20:45Z",
+      "side": 1,
+      "message": "unclosed parenthesis?",
+      "range": {
+        "startLine": 99,
+        "startChar": 42,
+        "endLine": 99,
+        "endChar": 43
+      },
+      "revId": "5a083dc00a2a48fe845b0680092d39658727053a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

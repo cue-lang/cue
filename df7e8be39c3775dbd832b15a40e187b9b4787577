@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00e5463a_f27219a2",
+        "filename": "encoding/jsonschema/vendor-external",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-30T09:20:45Z",
+      "side": 0,
+      "message": "now that this script does little more than `go test` and what I suggest would be `go generate`, I honestly think the script should be removed as redundant.",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

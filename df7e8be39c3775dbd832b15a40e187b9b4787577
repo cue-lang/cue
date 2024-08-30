@@ -16,6 +16,24 @@
       "message": "now that this script does little more than `go test` and what I suggest would be `go generate`, I honestly think the script should be removed as redundant.",
       "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "148a3a32_260e937d",
+        "filename": "encoding/jsonschema/vendor-external",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-30T12:17:19Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "00e5463a_f27219a2",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

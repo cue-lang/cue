@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "690605b2_c21be369",
+        "filename": "internal/cuetdtest/matrix.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-30T08:25:52Z",
+      "side": 1,
+      "message": "could you please add a short godoc for this now? I like your description of \"a point in the matrix\".",
+      "revId": "dfb07c2356f55e97c28581ae19407671fb6300d2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

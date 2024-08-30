@@ -1,0 +1,33 @@
+exec cue fix ./...
+# Make sure we fix all files in a directory, even if they're a mix of packages (or no packages).
+cmp p/one.cue p/one.cue.fixed
+cmp p/two.cue p/two.cue.fixed
+# TODO: the following cmp fails because of a bug in fix/fix.go
+! cmp p/three.cue p/three.cue.fixed
+# TODO: the added imports have unnecessary name-mangling. https://cuelang.org/issue/3408
+-- p/one.cue --
+package one
+
+out: ["foo"] + ["bar"]
+-- p/two.cue --
+package two
+
+out: 3 * ["baz"]
+-- p/three.cue --
+out: ["a"] + ((["a"]*7) + ["gh"])
+-- p/one.cue.fixed --
+package one
+
+import list6c6973 "list"
+
+out: list6c6973.Concat([["foo"], ["bar"]])
+-- p/two.cue.fixed --
+package two
+
+import list6c6973 "list"
+
+out: list6c6973.Repeat(["baz"], 3)
+-- p/three.cue.fixed --
+import list6c6973 "list"
+
+out: list6c6973.Concat([["a"], (list6c6973.Concat([(list6c6973.Repeat(["a"], 7)), ["gh"]]))])

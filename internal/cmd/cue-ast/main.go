@@ -22,8 +22,12 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"slices"
 
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/internal/astinternal"
 )
@@ -38,6 +42,11 @@ usage of cue-ast:
     Write multi-line Go-like representations of CUE syntax trees.
 
       -omitempty    omit empty and invalid values
+
+  cue-ast join [flags] [inputs]
+
+    Join the input package instance as a single file.
+    Joining multiple package instances is not supported yet.
 
 See 'cue help inputs' as well.
 `[1:])
@@ -71,6 +80,42 @@ See 'cue help inputs' as well.
 				os.Stdout.Write(out)
 			}
 		}
+	case "join":
+		// TODO: add a flag drop comments, which is useful when reducing bug reproducers.
+		flag.CommandLine.Parse(args)
+
+		var jointImports []*ast.ImportSpec
+		var jointFields []ast.Decl
+		insts := load.Instances(flag.Args(), &load.Config{})
+		if len(insts) != 1 {
+			log.Fatal("joining multiple instances is not possible yet")
+		}
+		inst := insts[0]
+		if err := inst.Err; err != nil {
+			log.Fatal(errors.Details(err, nil))
+		}
+		for _, file := range inst.Files {
+			jointImports = slices.Concat(jointImports, file.Imports)
+
+			fields := file.Decls[len(file.Preamble()):]
+			jointFields = slices.Concat(jointFields, fields)
+		}
+		// TODO: we should sort and deduplicate imports.
+		joint := &ast.File{Decls: slices.Concat([]ast.Decl{
+			&ast.ImportDecl{Specs: jointImports},
+		}, jointFields)}
+
+		// Sanitize the resulting file so that, for example,
+		// multiple packages imported as the same name avoid collisions.
+		if err := astutil.Sanitize(joint); err != nil {
+			log.Fatal(err)
+		}
+
+		out, err := format.Node(joint)
+		if err != nil {
+			log.Fatal(err)
+		}
+		os.Stdout.Write(out)
 	default:
 		flag.Usage()
 	}

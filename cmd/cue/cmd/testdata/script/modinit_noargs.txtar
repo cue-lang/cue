@@ -1,5 +1,3 @@
-# TODO we might want to deprecate or remove the ability to create
-# module file with an empty module directive.
 exec cue mod init
 env-fill want-module.cue
 cmp cue.mod/module.cue want-module.cue

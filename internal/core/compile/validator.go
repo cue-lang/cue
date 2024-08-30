@@ -18,6 +18,7 @@ package compile
 
 import (
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/validate"
 )
 
 // matchN is a validator that checks that the number of schemas in the given
@@ -25,9 +26,10 @@ import (
 // of the validator. Note that this number may itself be a number constraint
 // and does not have to be a concrete number.
 var matchNBuiltin = &adt.Builtin{
-	Name:   "matchN",
-	Params: []adt.Param{topParam, intParam, listParam}, // varargs
-	Result: adt.BoolKind,
+	Name:        "matchN",
+	Params:      []adt.Param{topParam, intParam, listParam}, // varargs
+	Result:      adt.BoolKind,
+	NonConcrete: true,
 	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
 		if !c.IsValidator {
 			return c.NewErrf("matchN is a validator and should not be used as a function")
@@ -40,13 +42,17 @@ var matchNBuiltin = &adt.Builtin{
 
 		constraints := c.Elems(args[2])
 
-		var count int64
+		var count, possibleCount int64
 		for _, check := range constraints {
 			v := unifyValidator(c, self, check)
-			if err := bottom(c, v); err == nil {
+			if err := validate.Validate(c, v, finalCfg); err == nil {
 				// TODO: is it always true that the lack of an error signifies
 				// success?
 				count++
+			} else {
+				if err.IsIncomplete() {
+					possibleCount++
+				}
 			}
 		}
 
@@ -54,13 +60,15 @@ var matchNBuiltin = &adt.Builtin{
 		// TODO: consider a mode to require "all" to pass, for instance by
 		// supporting the value null or "all".
 
-		b := checkNum(c, bound, count)
+		b := checkNum(c, bound, count, count+possibleCount)
 		if b != nil {
 			return b
 		}
 		return &adt.Bool{B: true}
 	},
 }
+
+var finalCfg = &validate.Config{Final: true}
 
 // finalizeSelf ensures a value is fully evaluated and then strips it of any
 // of its validators or default values.
@@ -80,15 +88,42 @@ func unifyValidator(c *adt.OpContext, self, check adt.Value) *adt.Vertex {
 	return v
 }
 
-func checkNum(ctx *adt.OpContext, bound adt.Expr, count int64) *adt.Bottom {
-	n := adt.Vertex{}
-	n.AddConjunct(ctx.MakeConjunct(bound))
-	n.AddConjunct(ctx.MakeConjunct(ctx.NewInt64(count)))
-	n.Finalize(ctx)
-
+func checkNum(ctx *adt.OpContext, bound adt.Value, count, maxCount int64) *adt.Bottom {
+	cnt := ctx.NewInt64(count)
+	n := unifyValidator(ctx, bound, cnt)
 	b, _ := n.BaseValue.(*adt.Bottom)
 	if b != nil {
-		return ctx.NewErrf("%d matched, expected %v", count, bound)
+		b := ctx.NewErrf("%d matched, expected %v", count, bound)
+
+		// By default we should mark the error as incomplete, but check if we
+		// know for sure it will fail.
+		switch bound := bound.(type) {
+		case *adt.Num:
+			if i, err := bound.X.Int64(); err == nil && i > count && i <= maxCount {
+				b.Code = adt.IncompleteError
+			}
+
+		case *adt.BoundValue:
+			v := &adt.Vertex{}
+			v.AddConjunct(ctx.MakeConjunct(bound))
+			v.AddConjunct(ctx.MakeConjunct(&adt.BoundValue{
+				Op:    adt.GreaterEqualOp,
+				Value: cnt,
+			}))
+			v.AddConjunct(ctx.MakeConjunct(&adt.BoundValue{
+				Op:    adt.LessEqualOp,
+				Value: ctx.NewInt64(maxCount),
+			}))
+			v.Finalize(ctx)
+			if _, ok := v.BaseValue.(*adt.Bottom); !ok {
+				b.Code = adt.IncompleteError
+			}
+
+		default:
+			b.Code = adt.IncompleteError
+		}
+
+		return b
 	}
 	return nil
 }

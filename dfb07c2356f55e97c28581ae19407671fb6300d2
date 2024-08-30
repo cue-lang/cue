@@ -16,6 +16,24 @@
       "message": "could you please add a short godoc for this now? I like your description of \"a point in the matrix\".",
       "revId": "dfb07c2356f55e97c28581ae19407671fb6300d2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "457e0523_e33b7aff",
+        "filename": "internal/cuetdtest/matrix.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-08-30T12:17:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "690605b2_c21be369",
+      "revId": "dfb07c2356f55e97c28581ae19407671fb6300d2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

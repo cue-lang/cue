@@ -1,0 +1,276 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0bb50014_f603c8be",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-30T09:17:08Z",
+      "side": 1,
+      "message": "nit: indent with four spaces rather than using triple backticks, which is still the same in terms of markdown, but it\u0027s much nicer when reading in plaintext",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a00d5455_54596c57",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-30T09:17:08Z",
+      "side": 1,
+      "message": "Mostly minor stuff, but I do think you should use `//go:generate` here.",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0eceff40_bf404c6f",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-30T09:17:08Z",
+      "side": 1,
+      "message": "was this only needed for debugging?",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2adcc007_4f96cdf8",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-30T09:17:08Z",
+      "side": 1,
+      "message": "shouldn\u0027t this be jsonAST? otherwise it\u0027s confusing against the schemaAST value below.",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "245a7dd1_00648676",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-30T09:17:08Z",
+      "side": 1,
+      "message": "ditto: I\u0027d call this jsonValue.",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b621214c_3bc4c6ee",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-30T09:17:08Z",
+      "side": 1,
+      "message": "nit: schemaValue for consistency with your other camelCase names",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8525d2ea_eb4ec908",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-30T09:17:08Z",
+      "side": 1,
+      "message": "should you give the s.Skip reason as an argument to t.Skip, to show the reason in the terminal output?",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5d7ce99_c4cc5852",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-30T09:17:08Z",
+      "side": 1,
+      "message": "could you not use the description as the name? they don\u0027t seem to be too long",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61a93142_a8f4c08c",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-30T09:17:08Z",
+      "side": 1,
+      "message": "nit: instValue",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac618850_7ebafe2e",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-30T09:17:08Z",
+      "side": 1,
+      "message": "is there a particular reason why you use Error rather than Fatal here? the behavior seems the same to me, as this is a subtest, so I\u0027m a bit surprised by the inconsistency",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "73236537_e00f3415",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-30T09:17:08Z",
+      "side": 1,
+      "message": "it might be nice to have this as part of the exposed Version API, either as ParseVersion or as a method like UnmarshalText; add a TODO?",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05f289db_3a2a9cd5",
+        "filename": "encoding/jsonschema/internal/externaltest/tests.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-30T09:17:08Z",
+      "side": 1,
+      "message": "please please remember to add the copyright header to all new Go files. none of the new files in this CL seem to have it.",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e109e293_04666421",
+        "filename": "encoding/jsonschema/testdata/external/config.cue",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-30T09:17:08Z",
+      "side": 1,
+      "message": "perhaps this warrants a TODO to use some form of recursive or extended globbing when it\u0027s available :)",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76e6c21e_0e95a741",
+        "filename": "encoding/jsonschema/vendor-external",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-30T09:17:08Z",
+      "side": 1,
+      "message": "this seems like it should go at the top of the file?",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f41c7f8_6c762a60",
+        "filename": "encoding/jsonschema/vendor-external",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-30T09:17:08Z",
+      "side": 1,
+      "message": "I think this line (and the commit hash) need to go into a `//go:generate` line somewhere in this package, and this script should call `go generate` here. This has multiple advantages:\n\n1) The usual `go generate ./...` and `go test ./...` workflow just work, without anyone having to know about these two programs\n2) CI will run the generator, so it will complain if it produces different output\n3) One can choose to use `go generate` to update the vendored code and nothing else - not running the tests etc.",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e01c8d1_75b74cf9",
+        "filename": "encoding/jsonschema/vendor_external.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-08-30T09:17:08Z",
+      "side": 1,
+      "message": "do you want to leave a TODO to use `os.CopyFS` as added in Go 1.23? Or is it not worth it, as you would have to layer an io.FS to do the filtering of files?",
+      "revId": "df7e8be39c3775dbd832b15a40e187b9b4787577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

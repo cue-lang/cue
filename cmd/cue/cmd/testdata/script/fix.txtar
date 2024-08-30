@@ -1,0 +1,24 @@
+exec cue fix ./...
+cmp p/one.cue p/one.cue.fixed
+cmp p/two.cue p/two.cue.fixed
+
+-- p/one.cue --
+package one
+
+out: ["foo"] + ["bar"]
+-- p/two.cue --
+package two
+
+out: 3 * ["baz"]
+-- p/one.cue.fixed --
+package one
+
+import list6c6973 "list"
+
+out: list6c6973.Concat([["foo"], ["bar"]])
+-- p/two.cue.fixed --
+package two
+
+import list6c6973 "list"
+
+out: list6c6973.Repeat(["baz"], 3)

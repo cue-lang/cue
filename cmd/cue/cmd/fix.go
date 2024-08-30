@@ -74,8 +74,9 @@ func runFixAll(cmd *Command, args []string) error {
 	}
 
 	instances := load.Instances(args, &load.Config{
-		Tests: true,
-		Tools: true,
+		Tests:   true,
+		Tools:   true,
+		Package: "*",
 	})
 
 	errs := fix.Instances(instances, opts...)

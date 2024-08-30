@@ -33,6 +33,24 @@
       "message": "Also, yikes, we had no testscript for `cue fix` yet! So this is the first one 😭",
       "revId": "0c88a1b137787c0dabd962ea95ed60f2d5cef55e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "396875cc_230ea925",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-08-30T14:26:22Z",
+      "side": 1,
+      "message": "Yes, absolutely. Sorry - didn\u0027t read your existing test properly at all. Hopefully better now.",
+      "parentUuid": "e759619a_f714a3b2",
+      "revId": "0c88a1b137787c0dabd962ea95ed60f2d5cef55e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

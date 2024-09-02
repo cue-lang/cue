@@ -137,7 +137,7 @@ func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, filename string, s *ex
 
 			instValue := ctx.BuildExpr(instAST)
 			qt.Assert(t, qt.IsNil(instValue.Err()))
-			err = instValue.Unify(schemaValue).Err()
+			err = instValue.Unify(schemaValue).Validate(cue.Concrete(true))
 			if test.Valid {
 				if err != nil {
 					testFailed(t, m, &test.Skip, test, errors.Details(err, nil))

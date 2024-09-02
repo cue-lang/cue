@@ -59,3 +59,9 @@ func constraintSchema(key string, n cue.Value, s *state) {
 	s.schemaVersionPresent = true
 	s.schemaVersion = sv
 }
+
+func constraintTODO(key string, n cue.Value, s *state) {
+	if s.cfg.Strict {
+		s.errf(n, `keyword %q not yet implemented`, key)
+	}
+}

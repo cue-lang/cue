@@ -5,8 +5,8 @@
 			"format": "email"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -71,8 +71,8 @@
 			"format": "ipv4"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -137,8 +137,8 @@
 			"format": "ipv6"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -203,8 +203,8 @@
 			"format": "hostname"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -269,8 +269,8 @@
 			"format": "date-time"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -335,8 +335,8 @@
 			"format": "uri"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{

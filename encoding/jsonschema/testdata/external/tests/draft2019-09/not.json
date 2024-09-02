@@ -353,8 +353,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{

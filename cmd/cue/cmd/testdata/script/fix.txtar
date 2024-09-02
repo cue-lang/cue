@@ -3,7 +3,6 @@ exec cue fix ./...
 cmp p/one.cue p/one.cue.fixed
 cmp p/two.cue p/two.cue.fixed
 cmp p/three.cue p/three.cue.fixed
-# TODO: the added imports have unnecessary name-mangling. https://cuelang.org/issue/3408
 -- p/one.cue --
 package one
 
@@ -17,16 +16,16 @@ out: ["a"] + ((["a"]*7) + ["gh"])
 -- p/one.cue.fixed --
 package one
 
-import list6c6973 "list"
+import "list"
 
-out: list6c6973.Concat([["foo"], ["bar"]])
+out: list.Concat([["foo"], ["bar"]])
 -- p/two.cue.fixed --
 package two
 
-import list6c6973 "list"
+import "list"
 
-out: list6c6973.Repeat(["baz"], 3)
+out: list.Repeat(["baz"], 3)
 -- p/three.cue.fixed --
-import list6c6973 "list"
+import "list"
 
-out: list6c6973.Concat([["a"], (list6c6973.Concat([(list6c6973.Repeat(["a"], 7)), ["gh"]]))])
+out: list.Concat([["a"], (list.Concat([(list.Repeat(["a"], 7)), ["gh"]]))])

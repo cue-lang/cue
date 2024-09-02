@@ -9,13 +9,17 @@
 				]
 			}
 		},
-		"skip": "extract error: unsupported constraint \"dependentRequired\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"dependentRequired\""
+		},
 		"tests": [
 			{
 				"description": "neither",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "nondependant",
@@ -23,7 +27,9 @@
 					"foo": 1
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "with dependency",
@@ -32,7 +38,9 @@
 					"bar": 2
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "missing dependency",
@@ -40,7 +48,9 @@
 					"bar": 2
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "ignores arrays",
@@ -48,19 +58,25 @@
 					"bar"
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "ignores strings",
 				"data": "foobar",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "ignores other non-objects",
 				"data": 12,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -72,13 +88,17 @@
 				"bar": []
 			}
 		},
-		"skip": "extract error: unsupported constraint \"dependentRequired\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"dependentRequired\""
+		},
 		"tests": [
 			{
 				"description": "empty object",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "object with one property",
@@ -86,13 +106,17 @@
 					"bar": 2
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "non-object is valid",
 				"data": 1,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -107,13 +131,17 @@
 				]
 			}
 		},
-		"skip": "extract error: unsupported constraint \"dependentRequired\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"dependentRequired\""
+		},
 		"tests": [
 			{
 				"description": "neither",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "nondependants",
@@ -122,7 +150,9 @@
 					"bar": 2
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "with dependencies",
@@ -132,7 +162,9 @@
 					"quux": 3
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "missing dependency",
@@ -141,7 +173,9 @@
 					"quux": 2
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "missing other dependency",
@@ -150,7 +184,9 @@
 					"quux": 2
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "missing both dependencies",
@@ -158,7 +194,9 @@
 					"quux": 1
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -175,7 +213,9 @@
 				]
 			}
 		},
-		"skip": "extract error: unsupported constraint \"dependentRequired\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"dependentRequired\""
+		},
 		"tests": [
 			{
 				"description": "CRLF",
@@ -184,7 +224,9 @@
 					"foo\rbar": 2
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "quoted quotes",
@@ -193,7 +235,9 @@
 					"foo\"bar": 2
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "CRLF missing dependent",
@@ -202,7 +246,9 @@
 					"foo": 2
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "quoted quotes missing dependent",
@@ -210,7 +256,9 @@
 					"foo\"bar": 2
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

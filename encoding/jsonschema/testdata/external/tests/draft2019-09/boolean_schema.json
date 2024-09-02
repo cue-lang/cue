@@ -57,37 +57,49 @@
 	{
 		"description": "boolean schema 'false'",
 		"schema": false,
-		"skip": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:2:1\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:2:1\n"
+		},
 		"tests": [
 			{
 				"description": "number is invalid",
 				"data": 1,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "string is invalid",
 				"data": "foo",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "boolean true is invalid",
 				"data": true,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "boolean false is invalid",
 				"data": false,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "null is invalid",
 				"data": null,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "object is invalid",
@@ -95,13 +107,17 @@
 					"foo": "bar"
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "empty object is invalid",
 				"data": {},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "array is invalid",
@@ -109,13 +125,17 @@
 					"foo"
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "empty array is invalid",
 				"data": [],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

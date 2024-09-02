@@ -11,7 +11,9 @@
 				}
 			}
 		},
-		"skip": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/metaschema-no-validation.json\": $schema URI not recognized",
+		"skip": {
+			"v2": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/metaschema-no-validation.json\": $schema URI not recognized"
+		},
 		"tests": [
 			{
 				"description": "applicator vocabulary still works",
@@ -19,7 +21,9 @@
 					"badProperty": "this property should not exist"
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "no validation: valid number",
@@ -27,7 +31,9 @@
 					"numberProperty": 20
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "no validation: invalid number, but it still validates",
@@ -35,7 +41,9 @@
 					"numberProperty": 1
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -45,19 +53,25 @@
 			"$schema": "http://localhost:1234/draft2020-12/metaschema-optional-vocabulary.json",
 			"type": "number"
 		},
-		"skip": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/metaschema-optional-vocabulary.json\": $schema URI not recognized",
+		"skip": {
+			"v2": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/metaschema-optional-vocabulary.json\": $schema URI not recognized"
+		},
 		"tests": [
 			{
 				"description": "string value",
 				"data": "foobar",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "number value",
 				"data": 20,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

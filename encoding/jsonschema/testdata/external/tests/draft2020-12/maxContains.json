@@ -81,7 +81,9 @@
 			},
 			"maxContains": 1.0
 		},
-		"skip": "extract error: value of \"maxContains\" must be a non-negative integer value",
+		"skip": {
+			"v2": "extract error: value of \"maxContains\" must be a non-negative integer value"
+		},
 		"tests": [
 			{
 				"description": "one element matches, valid maxContains",
@@ -89,7 +91,9 @@
 					1
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "too many elements match, invalid maxContains",
@@ -98,7 +102,9 @@
 					1
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},

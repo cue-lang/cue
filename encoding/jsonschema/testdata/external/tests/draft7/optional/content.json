@@ -14,7 +14,9 @@
 				"description": "an invalid JSON document",
 				"data": "{:}",
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "ignores non-strings",
@@ -38,7 +40,9 @@
 				"description": "an invalid base64 string (% is not a valid character)",
 				"data": "eyJmb28iOi%iYmFyIn0K",
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "ignores non-strings",
@@ -63,13 +67,17 @@
 				"description": "a validly-encoded invalid JSON document",
 				"data": "ezp9Cg==",
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "an invalid base64 string that is valid JSON",
 				"data": "{}",
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "ignores non-strings",

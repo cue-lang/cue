@@ -46,19 +46,25 @@
 			"type": "string",
 			"pattern": "^\\cC$"
 		},
-		"skip": "extract error: unsupported regexp: error parsing regexp: invalid escape sequence: `\\c`",
+		"skip": {
+			"v2": "extract error: unsupported regexp: error parsing regexp: invalid escape sequence: `\\c`"
+		},
 		"tests": [
 			{
 				"description": "does not match",
 				"data": "\\cC",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "matches",
 				"data": "\u0003",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -69,19 +75,25 @@
 			"type": "string",
 			"pattern": "^\\cc$"
 		},
-		"skip": "extract error: unsupported regexp: error parsing regexp: invalid escape sequence: `\\c`",
+		"skip": {
+			"v2": "extract error: unsupported regexp: error parsing regexp: invalid escape sequence: `\\c`"
+		},
 		"tests": [
 			{
 				"description": "does not match",
 				"data": "\\cc",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "matches",
 				"data": "\u0003",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -197,7 +209,9 @@
 				"description": "Line tabulation matches",
 				"data": "\u000b",
 				"valid": true,
-				"skip": "invalid value \"\\v\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+				"skip": {
+					"v2": "invalid value \"\\v\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+				}
 			},
 			{
 				"description": "Form feed matches",
@@ -208,13 +222,17 @@
 				"description": "latin-1 non-breaking-space matches",
 				"data": " ",
 				"valid": true,
-				"skip": "invalid value \"\\u00a0\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+				"skip": {
+					"v2": "invalid value \"\\u00a0\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+				}
 			},
 			{
 				"description": "zero-width whitespace matches",
 				"data": "\ufeff",
 				"valid": true,
-				"skip": "invalid value \"\\ufeff\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+				"skip": {
+					"v2": "invalid value \"\\ufeff\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+				}
 			},
 			{
 				"description": "line feed matches (line terminator)",
@@ -225,13 +243,17 @@
 				"description": "paragraph separator matches (line terminator)",
 				"data": "\u2029",
 				"valid": true,
-				"skip": "invalid value \"\\u2029\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+				"skip": {
+					"v2": "invalid value \"\\u2029\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+				}
 			},
 			{
 				"description": "EM SPACE matches (Space_Separator)",
 				"data": " ",
 				"valid": true,
-				"skip": "invalid value \"\\u2003\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+				"skip": {
+					"v2": "invalid value \"\\u2003\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+				}
 			},
 			{
 				"description": "Non-whitespace control does not match",
@@ -267,7 +289,9 @@
 				"description": "Line tabulation does not match",
 				"data": "\u000b",
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "Form feed does not match",
@@ -278,13 +302,17 @@
 				"description": "latin-1 non-breaking-space does not match",
 				"data": " ",
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "zero-width whitespace does not match",
 				"data": "\ufeff",
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "line feed does not match (line terminator)",
@@ -295,13 +323,17 @@
 				"description": "paragraph separator does not match (line terminator)",
 				"data": "\u2029",
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "EM SPACE does not match (Space_Separator)",
 				"data": " ",
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "Non-whitespace control matches",
@@ -321,31 +353,41 @@
 			"$schema": "https://json-schema.org/draft/2020-12/schema",
 			"pattern": "\\p{Letter}cole"
 		},
-		"skip": "extract error: unsupported regexp: error parsing regexp: invalid character class range: `\\p{Letter}`",
+		"skip": {
+			"v2": "extract error: unsupported regexp: error parsing regexp: invalid character class range: `\\p{Letter}`"
+		},
 		"tests": [
 			{
 				"description": "ascii character in json string",
 				"data": "Les hivers de mon enfance etaient des saisons longues, longues. Nous vivions en trois lieux: l'ecole, l'eglise et la patinoire; mais la vraie vie etait sur la patinoire.",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "literal unicode character in json string",
 				"data": "Les hivers de mon enfance étaient des saisons longues, longues. Nous vivions en trois lieux: l'école, l'église et la patinoire; mais la vraie vie était sur la patinoire.",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "unicode character in hex format in string",
 				"data": "Les hivers de mon enfance étaient des saisons longues, longues. Nous vivions en trois lieux: l'école, l'église et la patinoire; mais la vraie vie était sur la patinoire.",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "unicode matching is case-sensitive",
 				"data": "LES HIVERS DE MON ENFANCE ÉTAIENT DES SAISONS LONGUES, LONGUES. NOUS VIVIONS EN TROIS LIEUX: L'ÉCOLE, L'ÉGLISE ET LA PATINOIRE; MAIS LA VRAIE VIE ÉTAIT SUR LA PATINOIRE.",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -432,13 +474,17 @@
 			"$schema": "https://json-schema.org/draft/2020-12/schema",
 			"format": "regex"
 		},
-		"skip": "extract error: unsupported constraint \"format\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"format\""
+		},
 		"tests": [
 			{
 				"description": "when used as a pattern",
 				"data": "\\a",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -448,25 +494,33 @@
 			"$schema": "https://json-schema.org/draft/2020-12/schema",
 			"pattern": "^\\p{digit}+$"
 		},
-		"skip": "extract error: unsupported regexp: error parsing regexp: invalid character class range: `\\p{digit}`",
+		"skip": {
+			"v2": "extract error: unsupported regexp: error parsing regexp: invalid character class range: `\\p{digit}`"
+		},
 		"tests": [
 			{
 				"description": "ascii digits",
 				"data": "42",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "ascii non-digits",
 				"data": "-%#",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "non-ascii digits (BENGALI DIGIT FOUR, BENGALI DIGIT TWO)",
 				"data": "৪২",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -508,7 +562,9 @@
 					"L'ÉCOLE": "PAS DE VRAIE VIE"
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			}
 		]
 	},
@@ -536,7 +592,9 @@
 					"l'école": "pas de vraie vie"
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "unicode character in hex format in string",
@@ -544,7 +602,9 @@
 					"l'école": "pas de vraie vie"
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "unicode matching is case-sensitive",
@@ -552,7 +612,9 @@
 					"L'ÉCOLE": "PAS DE VRAIE VIE"
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			}
 		]
 	},
@@ -573,7 +635,9 @@
 					"l'école": "pas de vraie vie"
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "unicode character in hex format in string",
@@ -581,7 +645,9 @@
 					"l'école": "pas de vraie vie"
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "ascii characters match",
@@ -616,7 +682,9 @@
 					"-%#": "spending the year dead for tax reasons"
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "non-ascii digits (BENGALI DIGIT FOUR, BENGALI DIGIT TWO)",
@@ -624,7 +692,9 @@
 					"৪২": "khajit has wares if you have coin"
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			}
 		]
 	},
@@ -652,7 +722,9 @@
 					"-%#": "spending the year dead for tax reasons"
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "non-ascii digits (BENGALI DIGIT FOUR, BENGALI DIGIT TWO)",

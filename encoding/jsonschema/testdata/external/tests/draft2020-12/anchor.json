@@ -11,19 +11,25 @@
 				}
 			}
 		},
-		"skip": "extract error: anchors (foo) not supported (and 1 more errors)",
+		"skip": {
+			"v2": "extract error: anchors (foo) not supported (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "match",
 				"data": 1,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "mismatch",
 				"data": "a",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -40,19 +46,25 @@
 				}
 			}
 		},
-		"skip": "extract error: anchors (foo) not supported (and 1 more errors)",
+		"skip": {
+			"v2": "extract error: anchors (foo) not supported (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "match",
 				"data": 1,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "mismatch",
 				"data": "a",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -74,19 +86,25 @@
 				}
 			}
 		},
-		"skip": "extract error: anchors (foo) not supported (and 1 more errors)",
+		"skip": {
+			"v2": "extract error: anchors (foo) not supported (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "match",
 				"data": 1,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "mismatch",
 				"data": "a",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -113,19 +131,25 @@
 			},
 			"$ref": "child1#my_anchor"
 		},
-		"skip": "extract error: unsupported constraint \"$anchor\" (and 4 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$anchor\" (and 4 more errors)"
+		},
 		"tests": [
 			{
 				"description": "$ref resolves to /$defs/A/allOf/1",
 				"data": "a",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "$ref does not resolve to /$defs/A/allOf/0",
 				"data": 1,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

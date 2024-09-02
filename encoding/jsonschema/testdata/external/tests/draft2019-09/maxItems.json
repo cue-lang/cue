@@ -43,7 +43,9 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"maxItems": 2.0
 		},
-		"skip": "extract error: invalid uint",
+		"skip": {
+			"v2": "extract error: invalid uint"
+		},
 		"tests": [
 			{
 				"description": "shorter is valid",
@@ -51,7 +53,9 @@
 					1
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "too long is invalid",
@@ -61,7 +65,9 @@
 					3
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

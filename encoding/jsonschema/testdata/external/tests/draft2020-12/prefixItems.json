@@ -12,7 +12,9 @@
 				}
 			]
 		},
-		"skip": "extract error: unsupported constraint \"prefixItems\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"prefixItems\""
+		},
 		"tests": [
 			{
 				"description": "correct types",
@@ -21,7 +23,9 @@
 					"foo"
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "wrong types",
@@ -30,7 +34,9 @@
 					1
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "incomplete array of items",
@@ -38,7 +44,9 @@
 					1
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "array with additional items",
@@ -48,13 +56,17 @@
 					true
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "empty array",
 				"data": [],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "JavaScript pseudo-array is valid",
@@ -64,7 +76,9 @@
 					"length": 2
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -77,7 +91,9 @@
 				false
 			]
 		},
-		"skip": "extract error: unsupported constraint \"prefixItems\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"prefixItems\""
+		},
 		"tests": [
 			{
 				"description": "array with one item is valid",
@@ -85,7 +101,9 @@
 					1
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "array with two items is invalid",
@@ -94,13 +112,17 @@
 					"foo"
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "empty array is valid",
 				"data": [],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -114,7 +136,9 @@
 				}
 			]
 		},
-		"skip": "extract error: unsupported constraint \"prefixItems\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"prefixItems\""
+		},
 		"tests": [
 			{
 				"description": "only the first item is validated",
@@ -124,7 +148,9 @@
 					false
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -138,7 +164,9 @@
 				}
 			]
 		},
-		"skip": "extract error: unsupported constraint \"prefixItems\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"prefixItems\""
+		},
 		"tests": [
 			{
 				"description": "allows null elements",
@@ -146,7 +174,9 @@
 					null
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

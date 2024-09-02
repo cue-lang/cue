@@ -203,15 +203,15 @@ func testName(s string) string {
 // testFailed marks the current test as failed with the
 // given error message, and updates the
 // skip field pointed to by skipField if necessary.
-func testFailed(t *testing.T, skipField *string, p positioner, errStr string) {
+func testFailed(t *testing.T, skipField *externaltest.Skip, p positioner, errStr string) {
 	if cuetest.UpdateGoldenFiles {
-		if *skipField == "" && !allowRegressions() {
+		if *skipField == nil && !allowRegressions() {
 			t.Fatalf("test regression; was succeeding, now failing: %v", errStr)
 		}
-		*skipField = errStr
+		*skipField = externaltest.Skip{"v2": errStr}
 		return
 	}
-	if *skipField != "" {
+	if *skipField != nil {
 		t.Skipf("skipping due to known error: %v", *skipField)
 	}
 	t.Fatal(errStr)
@@ -219,12 +219,12 @@ func testFailed(t *testing.T, skipField *string, p positioner, errStr string) {
 
 // testFails marks the current test as succeeded and updates the
 // skip field pointed to by skipField if necessary.
-func testSucceeded(t *testing.T, skipField *string, p positioner) {
+func testSucceeded(t *testing.T, skipField *externaltest.Skip, p positioner) {
 	if cuetest.UpdateGoldenFiles {
-		*skipField = ""
+		*skipField = nil
 		return
 	}
-	if *skipField != "" {
+	if *skipField != nil {
 		t.Fatalf("unexpectedly more correct behavior (test success) on skipped test")
 	}
 }

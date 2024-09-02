@@ -5,19 +5,25 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"$ref": "http://localhost:1234/draft2019-09/integer.json"
 		},
-		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/integer.json:integer\":\n    generated.cue:1:8\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/integer.json:integer\":\n    generated.cue:1:8\n"
+		},
 		"tests": [
 			{
 				"description": "remote ref valid",
 				"data": 1,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "remote ref invalid",
 				"data": "a",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -27,19 +33,25 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"$ref": "http://localhost:1234/draft2019-09/subSchemas.json#/$defs/integer"
 		},
-		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/subSchemas.json:subSchemas\":\n    generated.cue:1:8\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/subSchemas.json:subSchemas\":\n    generated.cue:1:8\n"
+		},
 		"tests": [
 			{
 				"description": "remote fragment valid",
 				"data": 1,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "remote fragment invalid",
 				"data": "a",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -49,19 +61,25 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"$ref": "http://localhost:1234/draft2019-09/locationIndependentIdentifier.json#foo"
 		},
-		"skip": "extract error: anchors (foo) not supported",
+		"skip": {
+			"v2": "extract error: anchors (foo) not supported"
+		},
 		"tests": [
 			{
 				"description": "remote anchor valid",
 				"data": 1,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "remote anchor invalid",
 				"data": "a",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -71,19 +89,25 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"$ref": "http://localhost:1234/draft2019-09/subSchemas.json#/$defs/refToInteger"
 		},
-		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/subSchemas.json:subSchemas\":\n    generated.cue:1:8\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/subSchemas.json:subSchemas\":\n    generated.cue:1:8\n"
+		},
 		"tests": [
 			{
 				"description": "ref within ref valid",
 				"data": 1,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "ref within ref invalid",
 				"data": "a",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -99,7 +123,9 @@
 				}
 			}
 		},
-		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/baseUriChange/folderInteger.json:folderInteger\":\n    generated.cue:1:8\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/baseUriChange/folderInteger.json:folderInteger\":\n    generated.cue:1:8\n"
+		},
 		"tests": [
 			{
 				"description": "base URI change ref valid",
@@ -109,7 +135,9 @@
 					]
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "base URI change ref invalid",
@@ -119,7 +147,9 @@
 					]
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -144,7 +174,9 @@
 				}
 			}
 		},
-		"skip": "extract error: cannot determine package name from import path \"localhost:1234/draft2019-09/baseUriChangeFolder/\"",
+		"skip": {
+			"v2": "extract error: cannot determine package name from import path \"localhost:1234/draft2019-09/baseUriChangeFolder/\""
+		},
 		"tests": [
 			{
 				"description": "number is valid",
@@ -154,7 +186,9 @@
 					]
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "string is invalid",
@@ -164,7 +198,9 @@
 					]
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -193,7 +229,9 @@
 				}
 			}
 		},
-		"skip": "extract error: cannot determine package name from import path \"localhost:1234/draft2019-09/baseUriChangeFolderInSubschema/\"",
+		"skip": {
+			"v2": "extract error: cannot determine package name from import path \"localhost:1234/draft2019-09/baseUriChangeFolderInSubschema/\""
+		},
 		"tests": [
 			{
 				"description": "number is valid",
@@ -203,7 +241,9 @@
 					]
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "string is invalid",
@@ -213,7 +253,9 @@
 					]
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -229,7 +271,9 @@
 				}
 			}
 		},
-		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/name-defs.json:schema\":\n    generated.cue:1:8\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/name-defs.json:schema\":\n    generated.cue:1:8\n"
+		},
 		"tests": [
 			{
 				"description": "string is valid",
@@ -237,7 +281,9 @@
 					"name": "foo"
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "null is valid",
@@ -245,7 +291,9 @@
 					"name": null
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "object is invalid",
@@ -255,7 +303,9 @@
 					}
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -266,7 +316,9 @@
 			"$id": "http://localhost:1234/draft2019-09/schema-remote-ref-ref-defs1.json",
 			"$ref": "ref-and-defs.json"
 		},
-		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/ref-and-defs.json:schema\":\n    generated.cue:1:8\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/ref-and-defs.json:schema\":\n    generated.cue:1:8\n"
+		},
 		"tests": [
 			{
 				"description": "invalid",
@@ -274,7 +326,9 @@
 					"bar": 1
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "valid",
@@ -282,7 +336,9 @@
 					"bar": "a"
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -292,19 +348,25 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"$ref": "http://localhost:1234/draft2019-09/locationIndependentIdentifier.json#/$defs/refToInteger"
 		},
-		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/locationIndependentIdentifier.json:locationIndependentIdentifier\":\n    generated.cue:1:8\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/locationIndependentIdentifier.json:locationIndependentIdentifier\":\n    generated.cue:1:8\n"
+		},
 		"tests": [
 			{
 				"description": "integer is valid",
 				"data": 1,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "string is invalid",
 				"data": "foo",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -319,7 +381,9 @@
 				}
 			}
 		},
-		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/nested/foo-ref-string.json:schema\":\n    generated.cue:1:8\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/nested/foo-ref-string.json:schema\":\n    generated.cue:1:8\n"
+		},
 		"tests": [
 			{
 				"description": "number is invalid",
@@ -329,7 +393,9 @@
 					}
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "string is valid",
@@ -339,7 +405,9 @@
 					}
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -349,19 +417,25 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"$ref": "http://localhost:1234/different-id-ref-string.json"
 		},
-		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/different-id-ref-string.json:schema\":\n    generated.cue:1:8\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/different-id-ref-string.json:schema\":\n    generated.cue:1:8\n"
+		},
 		"tests": [
 			{
 				"description": "number is invalid",
 				"data": 1,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "string is valid",
 				"data": "foo",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -371,19 +445,25 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"$ref": "http://localhost:1234/urn-ref-string.json"
 		},
-		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/urn-ref-string.json:schema\":\n    generated.cue:1:8\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/urn-ref-string.json:schema\":\n    generated.cue:1:8\n"
+		},
 		"tests": [
 			{
 				"description": "number is invalid",
 				"data": 1,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "string is valid",
 				"data": "foo",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -393,19 +473,25 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"$ref": "http://localhost:1234/nested-absolute-ref-to-string.json"
 		},
-		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/nested-absolute-ref-to-string.json:schema\":\n    generated.cue:1:8\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/nested-absolute-ref-to-string.json:schema\":\n    generated.cue:1:8\n"
+		},
 		"tests": [
 			{
 				"description": "number is invalid",
 				"data": 1,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "string is valid",
 				"data": "foo",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -415,19 +501,25 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"$ref": "http://localhost:1234/draft2019-09/detached-ref.json#/$defs/foo"
 		},
-		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/detached-ref.json:schema\":\n    generated.cue:1:8\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/detached-ref.json:schema\":\n    generated.cue:1:8\n"
+		},
 		"tests": [
 			{
 				"description": "number is valid",
 				"data": 1,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "non-number is invalid",
 				"data": "a",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

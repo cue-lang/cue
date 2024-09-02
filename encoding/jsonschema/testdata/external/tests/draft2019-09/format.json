@@ -5,43 +5,57 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"format": "email"
 		},
-		"skip": "extract error: unsupported constraint \"format\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"format\""
+		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -51,43 +65,57 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"format": "idn-email"
 		},
-		"skip": "extract error: unsupported constraint \"format\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"format\""
+		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -97,43 +125,57 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"format": "regex"
 		},
-		"skip": "extract error: unsupported constraint \"format\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"format\""
+		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -143,43 +185,57 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"format": "ipv4"
 		},
-		"skip": "extract error: unsupported constraint \"format\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"format\""
+		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -189,43 +245,57 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"format": "ipv6"
 		},
-		"skip": "extract error: unsupported constraint \"format\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"format\""
+		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -235,43 +305,57 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"format": "idn-hostname"
 		},
-		"skip": "extract error: unsupported constraint \"format\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"format\""
+		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -281,43 +365,57 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"format": "hostname"
 		},
-		"skip": "extract error: unsupported constraint \"format\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"format\""
+		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -327,43 +425,57 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"format": "date"
 		},
-		"skip": "extract error: unsupported constraint \"format\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"format\""
+		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -373,43 +485,57 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"format": "date-time"
 		},
-		"skip": "extract error: unsupported constraint \"format\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"format\""
+		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -419,43 +545,57 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"format": "time"
 		},
-		"skip": "extract error: unsupported constraint \"format\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"format\""
+		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -465,43 +605,57 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"format": "json-pointer"
 		},
-		"skip": "extract error: unsupported constraint \"format\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"format\""
+		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -511,43 +665,57 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"format": "relative-json-pointer"
 		},
-		"skip": "extract error: unsupported constraint \"format\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"format\""
+		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -557,43 +725,57 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"format": "iri"
 		},
-		"skip": "extract error: unsupported constraint \"format\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"format\""
+		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -603,43 +785,57 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"format": "iri-reference"
 		},
-		"skip": "extract error: unsupported constraint \"format\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"format\""
+		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -649,43 +845,57 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"format": "uri"
 		},
-		"skip": "extract error: unsupported constraint \"format\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"format\""
+		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -695,43 +905,57 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"format": "uri-reference"
 		},
-		"skip": "extract error: unsupported constraint \"format\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"format\""
+		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -741,43 +965,57 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"format": "uri-template"
 		},
-		"skip": "extract error: unsupported constraint \"format\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"format\""
+		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -787,43 +1025,57 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"format": "uuid"
 		},
-		"skip": "extract error: unsupported constraint \"format\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"format\""
+		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -833,43 +1085,57 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"format": "duration"
 		},
-		"skip": "extract error: unsupported constraint \"format\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"format\""
+		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

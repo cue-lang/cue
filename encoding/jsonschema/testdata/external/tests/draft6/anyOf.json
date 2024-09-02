@@ -105,13 +105,17 @@
 				false
 			]
 		},
-		"skip": "extract error: cannot compile resulting schema: 2 errors in empty disjunction:\nexplicit error (_|_ literal) in source:\n    generated.cue:2:1\nexplicit error (_|_ literal) in source:\n    generated.cue:2:7\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: 2 errors in empty disjunction:\nexplicit error (_|_ literal) in source:\n    generated.cue:2:1\nexplicit error (_|_ literal) in source:\n    generated.cue:2:7\n"
+		},
 		"tests": [
 			{
 				"description": "any value is invalid",
 				"data": "foo",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},

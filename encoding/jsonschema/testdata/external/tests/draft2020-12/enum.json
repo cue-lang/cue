@@ -68,7 +68,9 @@
 					"boo": 42
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			}
 		]
 	},
@@ -158,13 +160,17 @@
 					"foo": "foo"
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "missing all properties is invalid",
 				"data": {},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			}
 		]
 	},
@@ -338,7 +344,9 @@
 				"description": "float zero is valid",
 				"data": 0.0,
 				"valid": true,
-				"skip": "conflicting values 0.0 and 0 (mismatched types float and int):\n    generated.cue:2:1\n    instance.json:1:1\n"
+				"skip": {
+					"v2": "conflicting values 0.0 and 0 (mismatched types float and int):\n    generated.cue:2:1\n    instance.json:1:1\n"
+				}
 			}
 		]
 	},
@@ -373,7 +381,9 @@
 					0.0
 				],
 				"valid": true,
-				"skip": "0: conflicting values 0.0 and 0 (mismatched types float and int):\n    generated.cue:2:1\n    generated.cue:2:2\n    instance.json:1:2\n"
+				"skip": {
+					"v2": "0: conflicting values 0.0 and 0 (mismatched types float and int):\n    generated.cue:2:1\n    generated.cue:2:2\n    instance.json:1:2\n"
+				}
 			}
 		]
 	},
@@ -400,7 +410,9 @@
 				"description": "float one is valid",
 				"data": 1.0,
 				"valid": true,
-				"skip": "conflicting values 1.0 and 1 (mismatched types float and int):\n    generated.cue:2:1\n    instance.json:1:1\n"
+				"skip": {
+					"v2": "conflicting values 1.0 and 1 (mismatched types float and int):\n    generated.cue:2:1\n    instance.json:1:1\n"
+				}
 			}
 		]
 	},
@@ -435,7 +447,9 @@
 					1.0
 				],
 				"valid": true,
-				"skip": "0: conflicting values 1.0 and 1 (mismatched types float and int):\n    generated.cue:2:1\n    generated.cue:2:2\n    instance.json:1:2\n"
+				"skip": {
+					"v2": "0: conflicting values 1.0 and 1 (mismatched types float and int):\n    generated.cue:2:1\n    generated.cue:2:2\n    instance.json:1:2\n"
+				}
 			}
 		]
 	},

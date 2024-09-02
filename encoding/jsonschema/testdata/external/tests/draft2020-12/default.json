@@ -79,7 +79,9 @@
 					"alpha": 5
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "missing properties are not filled in with the default",

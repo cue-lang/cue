@@ -551,17 +551,15 @@ func (h *hoister) hoist(f *ast.File) {
 				return false
 			}
 
-			pkg := c.Import("encoding/" + enc)
-			if pkg == nil {
-				return false
+			importIdent := &ast.Ident{
+				Name: enc,
+				Node: ast.NewImport(nil, "encoding/"+enc),
 			}
 
 			// found a replaceable string
 			dataField := h.uniqueName(name, "_", "cue_")
 
-			f.Value = ast.NewCall(
-				ast.NewSel(pkg, "Marshal"),
-				ast.NewIdent(dataField))
+			f.Value = ast.NewCall(ast.NewSel(importIdent, "Marshal"), ast.NewIdent(dataField))
 
 			// TODO: use definitions instead
 			c.InsertAfter(astutil.ApplyRecursively(&ast.LetClause{
@@ -571,6 +569,7 @@ func (h *hoister) hoist(f *ast.File) {
 		}
 		return true
 	})
+	astutil.Sanitize(f)
 }
 
 func tryParse(str string) (s ast.Expr, pkg string) {

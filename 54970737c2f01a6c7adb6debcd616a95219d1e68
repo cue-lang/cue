@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41520e5f_2d80dc67",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-02T08:55:15Z",
+      "side": 1,
+      "message": "Can you also add a file without a package? In theory `Package: \"*\"` should load those files as well, but just to triple check. We basically want `cue fix ./...` to fix all CUE files in the module.",
+      "revId": "54970737c2f01a6c7adb6debcd616a95219d1e68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22c5c2d8_c10eb157",
+        "filename": "cmd/cue/cmd/testdata/script/fix.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-02T08:55:15Z",
+      "side": 1,
+      "message": "add a brief comment above this to mention that we want to make sure we fix all packages in each directory.",
+      "revId": "54970737c2f01a6c7adb6debcd616a95219d1e68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f407fbe_eb839ae4",
+        "filename": "cmd/cue/cmd/testdata/script/fix.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-02T08:55:15Z",
+      "side": 1,
+      "message": "can you add a TODO about the wonky import names pointing to https://cuelang.org/issue/3408 for clarity?",
+      "revId": "54970737c2f01a6c7adb6debcd616a95219d1e68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

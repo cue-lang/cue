@@ -7,28 +7,16 @@
 				"type": "integer"
 			}
 		},
-		"skip": {
-			"v2": "extract error: unsupported constraint \"not\"",
-			"v3": "extract error: unsupported constraint \"not\""
-		},
 		"tests": [
 			{
 				"description": "allowed",
 				"data": "foo",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "disallowed",
 				"data": 1,
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -43,37 +31,21 @@
 				]
 			}
 		},
-		"skip": {
-			"v2": "extract error: unsupported constraint \"not\"",
-			"v3": "extract error: unsupported constraint \"not\""
-		},
 		"tests": [
 			{
 				"description": "valid",
 				"data": "foo",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "mismatch",
 				"data": 1,
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "other mismatch",
 				"data": true,
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -90,41 +62,25 @@
 				}
 			}
 		},
-		"skip": {
-			"v2": "extract error: unsupported constraint \"not\"",
-			"v3": "extract error: unsupported constraint \"not\""
-		},
 		"tests": [
 			{
 				"description": "match",
 				"data": 1,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "other match",
 				"data": {
 					"foo": 1
 				},
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "mismatch",
 				"data": {
 					"foo": "bar"
 				},
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -138,10 +94,6 @@
 				}
 			}
 		},
-		"skip": {
-			"v2": "extract error: unsupported constraint \"not\"",
-			"v3": "extract error: unsupported constraint \"not\""
-		},
 		"tests": [
 			{
 				"description": "property present",
@@ -149,11 +101,7 @@
 					"foo": 1,
 					"bar": 2
 				},
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "property absent",
@@ -161,11 +109,7 @@
 					"bar": 1,
 					"baz": 2
 				},
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -175,95 +119,55 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"not": {}
 		},
-		"skip": {
-			"v2": "extract error: unsupported constraint \"not\"",
-			"v3": "extract error: unsupported constraint \"not\""
-		},
 		"tests": [
 			{
 				"description": "number is invalid",
 				"data": 1,
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "string is invalid",
 				"data": "foo",
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "boolean true is invalid",
 				"data": true,
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "boolean false is invalid",
 				"data": false,
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "null is invalid",
 				"data": null,
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "object is invalid",
 				"data": {
 					"foo": "bar"
 				},
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "empty object is invalid",
 				"data": {},
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "array is invalid",
 				"data": [
 					"foo"
 				],
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "empty array is invalid",
 				"data": [],
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -273,95 +177,55 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"not": true
 		},
-		"skip": {
-			"v2": "extract error: unsupported constraint \"not\"",
-			"v3": "extract error: unsupported constraint \"not\""
-		},
 		"tests": [
 			{
 				"description": "number is invalid",
 				"data": 1,
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "string is invalid",
 				"data": "foo",
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "boolean true is invalid",
 				"data": true,
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "boolean false is invalid",
 				"data": false,
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "null is invalid",
 				"data": null,
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "object is invalid",
 				"data": {
 					"foo": "bar"
 				},
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "empty object is invalid",
 				"data": {},
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "array is invalid",
 				"data": [
 					"foo"
 				],
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "empty array is invalid",
 				"data": [],
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -372,8 +236,7 @@
 			"not": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"not\"",
-			"v3": "extract error: unsupported constraint \"not\""
+			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:2:12\n"
 		},
 		"tests": [
 			{
@@ -381,7 +244,6 @@
 				"data": 1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -390,7 +252,6 @@
 				"data": "foo",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -399,7 +260,6 @@
 				"data": true,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -408,7 +268,6 @@
 				"data": false,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -417,7 +276,6 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -428,7 +286,6 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -437,7 +294,6 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
 					"v3": "could not compile schema"
 				}
 			},
@@ -448,7 +304,7 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
+					"v2": "invalid value [\"foo\"] (does not satisfy matchN(0, _|_(explicit error (_|_ literal) in source))): 0 matched, expected 0:\n    generated.cue:2:1\n    generated.cue:1:1\n    generated.cue:2:8\n    instance.json:1:1\n",
 					"v3": "could not compile schema"
 				}
 			},
@@ -457,7 +313,7 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
+					"v2": "invalid value [] (does not satisfy matchN(0, _|_(explicit error (_|_ literal) in source))): 0 matched, expected 0:\n    generated.cue:2:1\n    generated.cue:1:1\n    generated.cue:2:8\n    instance.json:1:1\n",
 					"v3": "could not compile schema"
 				}
 			}
@@ -471,19 +327,11 @@
 				"not": {}
 			}
 		},
-		"skip": {
-			"v2": "extract error: unsupported constraint \"not\"",
-			"v3": "extract error: unsupported constraint \"not\""
-		},
 		"tests": [
 			{
 				"description": "any value is valid",
 				"data": "foo",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -505,8 +353,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"not\"",
-			"v3": "extract error: unsupported constraint \"not\""
+			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
+			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
 		},
 		"tests": [
 			{

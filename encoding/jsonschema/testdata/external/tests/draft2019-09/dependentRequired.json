@@ -10,8 +10,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"dependentRequired\"",
-			"v3": "extract error: unsupported constraint \"dependentRequired\""
+			"v2": "extract error: keyword \"dependentRequired\" not yet implemented",
+			"v3": "extract error: keyword \"dependentRequired\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -97,8 +97,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"dependentRequired\"",
-			"v3": "extract error: unsupported constraint \"dependentRequired\""
+			"v2": "extract error: keyword \"dependentRequired\" not yet implemented",
+			"v3": "extract error: keyword \"dependentRequired\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -144,8 +144,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"dependentRequired\"",
-			"v3": "extract error: unsupported constraint \"dependentRequired\""
+			"v2": "extract error: keyword \"dependentRequired\" not yet implemented",
+			"v3": "extract error: keyword \"dependentRequired\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -233,8 +233,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"dependentRequired\"",
-			"v3": "extract error: unsupported constraint \"dependentRequired\""
+			"v2": "extract error: keyword \"dependentRequired\" not yet implemented",
+			"v3": "extract error: keyword \"dependentRequired\" not yet implemented"
 		},
 		"tests": [
 			{

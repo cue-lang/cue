@@ -96,8 +96,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"contentSchema\"",
-			"v3": "extract error: unsupported constraint \"contentSchema\""
+			"v2": "extract error: keyword \"contentSchema\" not yet implemented",
+			"v3": "extract error: keyword \"contentSchema\" not yet implemented"
 		},
 		"tests": [
 			{

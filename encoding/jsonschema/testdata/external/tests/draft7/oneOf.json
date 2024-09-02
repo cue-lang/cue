@@ -185,14 +185,22 @@
 				"data": {
 					"bar": 2
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v2": "incomplete value {bar:2} | {bar:2,foo!:string}\n",
+					"v3": "incomplete value {bar:2} | {bar:2,foo!:string}\n"
+				}
 			},
 			{
 				"description": "second oneOf valid (complex)",
 				"data": {
 					"foo": "baz"
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v2": "incomplete value {foo:\"baz\",bar!:int} | {foo:\"baz\"}\n",
+					"v3": "incomplete value {foo:\"baz\",bar!:int} | {foo:\"baz\"}\n"
+				}
 			},
 			{
 				"description": "both oneOf valid (complex)",
@@ -268,11 +276,7 @@
 				"data": {
 					"bar": 2
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "first valid - valid",
@@ -280,7 +284,11 @@
 					"foo": 1,
 					"bar": 2
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v2": "incomplete value {foo:1,bar:2} | {foo:1,bar:2,baz!:_}\n",
+					"v3": "incomplete value {foo:1,bar:2} | {foo:1,bar:2,baz!:_}\n"
+				}
 			},
 			{
 				"description": "second valid - valid",
@@ -288,7 +296,11 @@
 					"foo": 1,
 					"baz": 3
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v2": "incomplete value {foo:1,baz:3,bar!:_} | {foo:1,baz:3}\n",
+					"v3": "incomplete value {foo:1,baz:3,bar!:_} | {foo:1,baz:3}\n"
+				}
 			},
 			{
 				"description": "both valid - invalid",
@@ -334,14 +346,22 @@
 				"data": {
 					"bar": 8
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v2": "incomplete value {bar:8,baz?:_} | {bar:8,foo!:_}\n",
+					"v3": "incomplete value {bar:8,baz?:_} | {bar:8,foo!:_}\n"
+				}
 			},
 			{
 				"description": "second oneOf valid",
 				"data": {
 					"foo": "foo"
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v2": "incomplete value {foo:\"foo\",bar!:_,baz?:_} | {foo:\"foo\"}\n",
+					"v3": "incomplete value {foo:\"foo\",bar!:_,baz?:_} | {foo:\"foo\"}\n"
+				}
 			},
 			{
 				"description": "both oneOf valid",
@@ -349,22 +369,14 @@
 					"foo": "foo",
 					"bar": 8
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "neither oneOf valid",
 				"data": {
 					"baz": "quux"
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},

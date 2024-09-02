@@ -411,11 +411,7 @@
 						}
 					]
 				],
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "fewer items is valid",
@@ -433,7 +429,7 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "incompatible list lengths (2 and 3)\n",
+					"v2": "incompatible list lengths (2 and 3)\n0: incompatible list lengths (1 and 2)\n1: incompatible list lengths (1 and 2)\n",
 					"v3": "incompatible list lengths (2 and 3):\n    generated.cue:2:1\n"
 				}
 			}

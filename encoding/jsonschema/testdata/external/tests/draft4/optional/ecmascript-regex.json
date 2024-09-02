@@ -44,7 +44,8 @@
 			"pattern": "^\\cC$"
 		},
 		"skip": {
-			"v2": "extract error: unsupported regexp: error parsing regexp: invalid escape sequence: `\\c`"
+			"v2": "extract error: unsupported regexp: error parsing regexp: invalid escape sequence: `\\c`",
+			"v3": "extract error: unsupported regexp: error parsing regexp: invalid escape sequence: `\\c`"
 		},
 		"tests": [
 			{
@@ -52,7 +53,8 @@
 				"data": "\\cC",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -60,7 +62,8 @@
 				"data": "\u0003",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -72,7 +75,8 @@
 			"pattern": "^\\cc$"
 		},
 		"skip": {
-			"v2": "extract error: unsupported regexp: error parsing regexp: invalid escape sequence: `\\c`"
+			"v2": "extract error: unsupported regexp: error parsing regexp: invalid escape sequence: `\\c`",
+			"v3": "extract error: unsupported regexp: error parsing regexp: invalid escape sequence: `\\c`"
 		},
 		"tests": [
 			{
@@ -80,7 +84,8 @@
 				"data": "\\cc",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -88,7 +93,8 @@
 				"data": "\u0003",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -201,7 +207,8 @@
 				"data": "\u000b",
 				"valid": true,
 				"skip": {
-					"v2": "invalid value \"\\v\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    instance.json:1:1\n"
+					"v2": "invalid value \"\\v\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    instance.json:1:1\n",
+					"v3": "invalid value \"\\v\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -214,7 +221,8 @@
 				"data": " ",
 				"valid": true,
 				"skip": {
-					"v2": "invalid value \"\\u00a0\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    instance.json:1:1\n"
+					"v2": "invalid value \"\\u00a0\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    instance.json:1:1\n",
+					"v3": "invalid value \"\\u00a0\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -222,7 +230,8 @@
 				"data": "\ufeff",
 				"valid": true,
 				"skip": {
-					"v2": "invalid value \"\\ufeff\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    instance.json:1:1\n"
+					"v2": "invalid value \"\\ufeff\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    instance.json:1:1\n",
+					"v3": "invalid value \"\\ufeff\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -235,7 +244,8 @@
 				"data": "\u2029",
 				"valid": true,
 				"skip": {
-					"v2": "invalid value \"\\u2029\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    instance.json:1:1\n"
+					"v2": "invalid value \"\\u2029\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    instance.json:1:1\n",
+					"v3": "invalid value \"\\u2029\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -243,7 +253,8 @@
 				"data": " ",
 				"valid": true,
 				"skip": {
-					"v2": "invalid value \"\\u2003\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    instance.json:1:1\n"
+					"v2": "invalid value \"\\u2003\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    instance.json:1:1\n",
+					"v3": "invalid value \"\\u2003\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -280,7 +291,8 @@
 				"data": "\u000b",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -293,7 +305,8 @@
 				"data": " ",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -301,7 +314,8 @@
 				"data": "\ufeff",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -314,7 +328,8 @@
 				"data": "\u2029",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -322,7 +337,8 @@
 				"data": " ",
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -343,7 +359,8 @@
 			"pattern": "\\p{Letter}cole"
 		},
 		"skip": {
-			"v2": "extract error: unsupported regexp: error parsing regexp: invalid character class range: `\\p{Letter}`"
+			"v2": "extract error: unsupported regexp: error parsing regexp: invalid character class range: `\\p{Letter}`",
+			"v3": "extract error: unsupported regexp: error parsing regexp: invalid character class range: `\\p{Letter}`"
 		},
 		"tests": [
 			{
@@ -351,7 +368,8 @@
 				"data": "Les hivers de mon enfance etaient des saisons longues, longues. Nous vivions en trois lieux: l'ecole, l'eglise et la patinoire; mais la vraie vie etait sur la patinoire.",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -359,7 +377,8 @@
 				"data": "Les hivers de mon enfance étaient des saisons longues, longues. Nous vivions en trois lieux: l'école, l'église et la patinoire; mais la vraie vie était sur la patinoire.",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -367,7 +386,8 @@
 				"data": "Les hivers de mon enfance étaient des saisons longues, longues. Nous vivions en trois lieux: l'école, l'église et la patinoire; mais la vraie vie était sur la patinoire.",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -375,7 +395,8 @@
 				"data": "LES HIVERS DE MON ENFANCE ÉTAIENT DES SAISONS LONGUES, LONGUES. NOUS VIVIONS EN TROIS LIEUX: L'ÉCOLE, L'ÉGLISE ET LA PATINOIRE; MAIS LA VRAIE VIE ÉTAIT SUR LA PATINOIRE.",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -460,7 +481,8 @@
 			"pattern": "^\\p{digit}+$"
 		},
 		"skip": {
-			"v2": "extract error: unsupported regexp: error parsing regexp: invalid character class range: `\\p{digit}`"
+			"v2": "extract error: unsupported regexp: error parsing regexp: invalid character class range: `\\p{digit}`",
+			"v3": "extract error: unsupported regexp: error parsing regexp: invalid character class range: `\\p{digit}`"
 		},
 		"tests": [
 			{
@@ -468,7 +490,8 @@
 				"data": "42",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -476,7 +499,8 @@
 				"data": "-%#",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -484,7 +508,8 @@
 				"data": "৪২",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -504,7 +529,10 @@
 				"data": {
 					"l'ecole": "pas de vraie vie"
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3": "invalid regexp: error parsing regexp: invalid character class range: `\\p{Letter}`:\n    generated.cue:2:36\n"
+				}
 			},
 			{
 				"description": "literal unicode character in json string",
@@ -527,7 +555,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			}
 		]
@@ -556,7 +585,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -566,7 +596,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -576,7 +607,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			}
 		]
@@ -598,7 +630,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -608,7 +641,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -644,7 +678,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -654,7 +689,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			}
 		]
@@ -674,7 +710,10 @@
 				"data": {
 					"42": "life, the universe, and everything"
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3": "invalid regexp: error parsing regexp: invalid character class range: `\\p{digit}`:\n    generated.cue:2:34\n"
+				}
 			},
 			{
 				"description": "ascii non-digits",
@@ -683,7 +722,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{

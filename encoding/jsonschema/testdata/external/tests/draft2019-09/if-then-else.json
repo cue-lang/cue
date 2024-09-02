@@ -8,7 +8,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"if\""
+			"v2": "extract error: unsupported constraint \"if\"",
+			"v3": "extract error: unsupported constraint \"if\""
 		},
 		"tests": [
 			{
@@ -16,7 +17,8 @@
 				"data": 0,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -24,7 +26,8 @@
 				"data": "hello",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -38,7 +41,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"then\""
+			"v2": "extract error: unsupported constraint \"then\"",
+			"v3": "extract error: unsupported constraint \"then\""
 		},
 		"tests": [
 			{
@@ -46,7 +50,8 @@
 				"data": 0,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -54,7 +59,8 @@
 				"data": "hello",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -68,7 +74,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"else\""
+			"v2": "extract error: unsupported constraint \"else\"",
+			"v3": "extract error: unsupported constraint \"else\""
 		},
 		"tests": [
 			{
@@ -76,7 +83,8 @@
 				"data": 0,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -84,7 +92,8 @@
 				"data": "hello",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -101,7 +110,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"if\" (and 1 more errors)"
+			"v2": "extract error: unsupported constraint \"if\" (and 1 more errors)",
+			"v3": "extract error: unsupported constraint \"if\" (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -109,7 +119,8 @@
 				"data": -1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -117,7 +128,8 @@
 				"data": -100,
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -125,7 +137,8 @@
 				"data": 3,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -142,7 +155,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"if\" (and 1 more errors)"
+			"v2": "extract error: unsupported constraint \"if\" (and 1 more errors)",
+			"v3": "extract error: unsupported constraint \"if\" (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -150,7 +164,8 @@
 				"data": -1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -158,7 +173,8 @@
 				"data": 4,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -166,7 +182,8 @@
 				"data": 3,
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -186,7 +203,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"if\" (and 2 more errors)"
+			"v2": "extract error: unsupported constraint \"if\" (and 2 more errors)",
+			"v3": "extract error: unsupported constraint \"if\" (and 2 more errors)"
 		},
 		"tests": [
 			{
@@ -194,7 +212,8 @@
 				"data": -1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -202,7 +221,8 @@
 				"data": -100,
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -210,7 +230,8 @@
 				"data": 4,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -218,7 +239,8 @@
 				"data": 3,
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -246,7 +268,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"if\" (and 2 more errors)"
+			"v2": "extract error: unsupported constraint \"if\" (and 2 more errors)",
+			"v3": "extract error: unsupported constraint \"if\" (and 2 more errors)"
 		},
 		"tests": [
 			{
@@ -254,7 +277,8 @@
 				"data": -100,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -262,7 +286,8 @@
 				"data": 3,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -280,7 +305,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"if\" (and 2 more errors)"
+			"v2": "extract error: unsupported constraint \"if\" (and 2 more errors)",
+			"v3": "extract error: unsupported constraint \"if\" (and 2 more errors)"
 		},
 		"tests": [
 			{
@@ -288,7 +314,8 @@
 				"data": "then",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -296,7 +323,8 @@
 				"data": "else",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -314,7 +342,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"if\" (and 2 more errors)"
+			"v2": "extract error: unsupported constraint \"if\" (and 2 more errors)",
+			"v3": "extract error: unsupported constraint \"if\" (and 2 more errors)"
 		},
 		"tests": [
 			{
@@ -322,7 +351,8 @@
 				"data": "then",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -330,7 +360,8 @@
 				"data": "else",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -350,7 +381,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"then\" (and 2 more errors)"
+			"v2": "extract error: unsupported constraint \"then\" (and 2 more errors)",
+			"v3": "extract error: unsupported constraint \"then\" (and 2 more errors)"
 		},
 		"tests": [
 			{
@@ -358,7 +390,8 @@
 				"data": "yes",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -366,7 +399,8 @@
 				"data": "other",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -374,7 +408,8 @@
 				"data": "no",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -382,7 +417,8 @@
 				"data": "invalid",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]

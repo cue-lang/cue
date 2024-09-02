@@ -5,7 +5,8 @@
 			"format": "json-pointer"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: unsupported constraint \"format\"",
+			"v3": "extract error: unsupported constraint \"format\""
 		},
 		"tests": [
 			{
@@ -13,7 +14,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -21,7 +23,8 @@
 				"data": 13.7,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -29,7 +32,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -37,7 +41,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -45,7 +50,8 @@
 				"data": false,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -53,7 +59,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -61,7 +68,8 @@
 				"data": "/foo/bar~0/baz~1/%a",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -69,7 +77,8 @@
 				"data": "/foo/bar~",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -77,7 +86,8 @@
 				"data": "/foo//bar",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -85,7 +95,8 @@
 				"data": "/foo/bar/",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -93,7 +104,8 @@
 				"data": "",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -101,7 +113,8 @@
 				"data": "/foo",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -109,7 +122,8 @@
 				"data": "/foo/0",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -117,7 +131,8 @@
 				"data": "/",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -125,7 +140,8 @@
 				"data": "/a~1b",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -133,7 +149,8 @@
 				"data": "/c%d",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -141,7 +158,8 @@
 				"data": "/e^f",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -149,7 +167,8 @@
 				"data": "/g|h",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -157,7 +176,8 @@
 				"data": "/i\\j",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -165,7 +185,8 @@
 				"data": "/k\"l",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -173,7 +194,8 @@
 				"data": "/ ",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -181,7 +203,8 @@
 				"data": "/m~0n",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -189,7 +212,8 @@
 				"data": "/foo/-",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -197,7 +221,8 @@
 				"data": "/foo/-/bar",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -205,7 +230,8 @@
 				"data": "/~1~0~0~1~1",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -213,7 +239,8 @@
 				"data": "/~1.1",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -221,7 +248,8 @@
 				"data": "/~0.1",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -229,7 +257,8 @@
 				"data": "#",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -237,7 +266,8 @@
 				"data": "#/",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -245,7 +275,8 @@
 				"data": "#a",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -253,7 +284,8 @@
 				"data": "/~0~",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -261,7 +293,8 @@
 				"data": "/~0/~",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -269,7 +302,8 @@
 				"data": "/~2",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -277,7 +311,8 @@
 				"data": "/~-1",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -285,7 +320,8 @@
 				"data": "/~~",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -293,7 +329,8 @@
 				"data": "a",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -301,7 +338,8 @@
 				"data": "0",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -309,7 +347,8 @@
 				"data": "a/a",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]

@@ -12,7 +12,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: anchors (foo) not supported (and 1 more errors)"
+			"v2": "extract error: anchors (foo) not supported (and 1 more errors)",
+			"v3": "extract error: anchors (foo) not supported (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -20,7 +21,8 @@
 				"data": 1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -28,7 +30,8 @@
 				"data": "a",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -47,7 +50,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: anchors (foo) not supported (and 1 more errors)"
+			"v2": "extract error: anchors (foo) not supported (and 1 more errors)",
+			"v3": "extract error: anchors (foo) not supported (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -55,7 +59,8 @@
 				"data": 1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -63,7 +68,8 @@
 				"data": "a",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -87,7 +93,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: anchors (foo) not supported (and 1 more errors)"
+			"v2": "extract error: anchors (foo) not supported (and 1 more errors)",
+			"v3": "extract error: anchors (foo) not supported (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -95,7 +102,8 @@
 				"data": 1,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -103,7 +111,8 @@
 				"data": "a",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -132,7 +141,8 @@
 			"$ref": "child1#my_anchor"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"$anchor\" (and 4 more errors)"
+			"v2": "extract error: unsupported constraint \"$anchor\" (and 4 more errors)",
+			"v3": "extract error: unsupported constraint \"$anchor\" (and 4 more errors)"
 		},
 		"tests": [
 			{
@@ -140,7 +150,8 @@
 				"data": "a",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -148,7 +159,8 @@
 				"data": 1,
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]

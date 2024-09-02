@@ -42,7 +42,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"not\" (and 1 more errors)"
+			"v2": "extract error: unsupported constraint \"not\" (and 1 more errors)",
+			"v3": "extract error: unsupported constraint \"not\" (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -50,7 +51,8 @@
 				"data": "a string",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -58,7 +60,8 @@
 				"data": null,
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -66,7 +69,8 @@
 				"data": 1,
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]

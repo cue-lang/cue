@@ -74,13 +74,13 @@ c: a + [8]
 d: [9] + a
 e: [0] + [1]
 `,
-			out: `import list6c6973 "list"
+			out: `import "list"
 
 a: [7]
 b: a + a
-c: list6c6973.Concat([a, [8]])
-d: list6c6973.Concat([[9], a])
-e: list6c6973.Concat([[0], [1]])
+c: list.Concat([a, [8]])
+d: list.Concat([[9], a])
+e: list.Concat([[0], [1]])
 `,
 		},
 
@@ -93,14 +93,14 @@ d: [7] * c
 e: c * [8]
 f: [9] * 5
 `,
-			out: `import list6c6973 "list"
+			out: `import "list"
 
 a: [7]
 b: a * 3
 c: 4
-d: list6c6973.Repeat([7], c)
-e: list6c6973.Repeat([8], c)
-f: list6c6973.Repeat([9], 5)
+d: list.Repeat([7], c)
+e: list.Repeat([8], c)
+f: list.Repeat([9], 5)
 `,
 		},
 	}
@@ -115,9 +115,9 @@ f: list6c6973.Repeat([9], 5)
 			if tc.simplify {
 				opts = append(opts, Simplify())
 			}
-			n := File(f, opts...)
+			File(f, opts...)
 
-			b, err := format.Node(n)
+			b, err := format.Node(f)
 			if err != nil {
 				t.Fatal(err)
 			}

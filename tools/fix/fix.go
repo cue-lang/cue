@@ -38,7 +38,7 @@ func Simplify() Option {
 }
 
 // File applies fixes to f and returns it. It alters the original f.
-func File(f *ast.File, o ...Option) *ast.File {
+func File(f *ast.File, o ...Option) {
 	var options options
 	for _, f := range o {
 		f(&options)
@@ -72,27 +72,27 @@ func File(f *ast.File, o ...Option) *ast.File {
 				if !(xIsList || yIsList) {
 					break
 				}
-				pkg := c.Import("list")
-				if pkg == nil {
-					break
-				}
 				if n.Op == token.ADD {
 					// Rewrite list addition to use list.Concat
 					ast.SetRelPos(x, token.NoSpace)
-					c.Replace(&ast.CallExpr{
-						Fun:  ast.NewSel(pkg, "Concat"),
-						Args: []ast.Expr{ast.NewList(x, y)},
-					})
+					c.Replace(ast.NewCall(
+						ast.NewSel(&ast.Ident{
+							Name: "list",
+							Node: ast.NewImport(nil, "list"),
+						}, "Concat"), ast.NewList(x, y)),
+					)
 				} else {
 					// Rewrite list multiplication to use list.Repeat
 					if !xIsList {
 						x, y = y, x
 					}
 					ast.SetRelPos(x, token.NoSpace)
-					c.Replace(&ast.CallExpr{
-						Fun:  ast.NewSel(pkg, "Repeat"),
-						Args: []ast.Expr{x, y},
-					})
+					c.Replace(ast.NewCall(
+						ast.NewSel(&ast.Ident{
+							Name: "list",
+							Node: ast.NewImport(nil, "list"),
+						}, "Repeat"), x, y),
+					)
 				}
 			}
 		}
@@ -103,5 +103,5 @@ func File(f *ast.File, o ...Option) *ast.File {
 		f = simplify(f)
 	}
 
-	return f
+	astutil.Sanitize(f)
 }

@@ -23,11 +23,7 @@
 				"data": {
 					"bar": 1
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "ignores arrays",
@@ -92,11 +88,7 @@
 					"foo\nbar": "1",
 					"foo\"bar": "1"
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -124,22 +116,14 @@
 			{
 				"description": "none of the properties mentioned",
 				"data": {},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "__proto__ present",
 				"data": {
 					"__proto__": "foo"
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "toString present",
@@ -148,11 +132,7 @@
 						"length": 37
 					}
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "constructor present",
@@ -161,11 +141,7 @@
 						"length": 37
 					}
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "all present",

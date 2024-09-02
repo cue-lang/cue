@@ -15,6 +15,7 @@
 package jsonschema_test
 
 import (
+	stdjson "encoding/json"
 	"fmt"
 	"os"
 	"path"
@@ -28,6 +29,7 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/jsonschema"
 	"cuelang.org/go/encoding/jsonschema/internal/externaltest"
@@ -100,23 +102,32 @@ func runExternalSchemaTests(t *testing.T, filename string, s *externaltest.Schem
 		qt.Assert(t, qt.IsNil(err))
 		schemaValue = ctx.CompileBytes(b, cue.Filename("generated.cue"))
 		if err := schemaValue.Err(); err != nil {
+			t.Logf("extracted schema: %q", b)
 			extractErr = fmt.Errorf("cannot compile resulting schema: %v", errors.Details(err, nil))
 		}
 	}
 
 	if extractErr != nil {
+		t.Logf("location: %v", testdataPos(s))
+		t.Logf("txtar:\n%s", schemaFailureTxtar(s))
 		for _, test := range s.Tests {
 			t.Run("", func(t *testing.T) {
-				testFailed(t, &test.Skip, "could not compile schema")
+				testFailed(t, &test.Skip, test, "could not compile schema")
 			})
 		}
-		testFailed(t, &s.Skip, fmt.Sprintf("extract error: %v", extractErr))
+		testFailed(t, &s.Skip, s, fmt.Sprintf("extract error: %v", extractErr))
 		return
 	}
-	testSucceeded(t, &s.Skip)
+	testSucceeded(t, &s.Skip, s)
 
 	for _, test := range s.Tests {
 		t.Run(testName(test.Description), func(t *testing.T) {
+			defer func() {
+				if t.Failed() || testing.Verbose() {
+					t.Logf("txtar:\n%s", testCaseTxtar(s, test))
+				}
+			}()
+			t.Logf("location: %v", testdataPos(test))
 			instAST, err := json.Extract("instance.json", test.Data)
 			if err != nil {
 				t.Fatal(err)
@@ -129,19 +140,58 @@ func runExternalSchemaTests(t *testing.T, filename string, s *externaltest.Schem
 			err = instValue.Unify(schemaValue).Err()
 			if test.Valid {
 				if err != nil {
-					testFailed(t, &test.Skip, errors.Details(err, nil))
+					testFailed(t, &test.Skip, test, errors.Details(err, nil))
 				} else {
-					testSucceeded(t, &test.Skip)
+					testSucceeded(t, &test.Skip, test)
 				}
 			} else {
 				if err == nil {
-					testFailed(t, &test.Skip, "unexpected success")
+					testFailed(t, &test.Skip, test, "unexpected success")
 				} else {
-					testSucceeded(t, &test.Skip)
+					testSucceeded(t, &test.Skip, test)
 				}
 			}
 		})
 	}
+}
+
+// testCaseTxtar returns a testscript that runs the given test.
+func testCaseTxtar(s *externaltest.Schema, test *externaltest.Test) string {
+	var buf strings.Builder
+	fmt.Fprintf(&buf, "env CUE_EXPERIMENT=evalv3\n")
+	fmt.Fprintf(&buf, "exec cue def json+jsonschema: schema.json\n")
+	if !test.Valid {
+		buf.WriteString("! ")
+	}
+	// TODO add $schema when one isn't already present?
+	fmt.Fprintf(&buf, "exec cue vet -c instance.json json+jsonschema: schema.json\n")
+	fmt.Fprintf(&buf, "\n")
+	fmt.Fprintf(&buf, "-- schema.json --\n%s\n", indentJSON(s.Schema))
+	fmt.Fprintf(&buf, "-- instance.json --\n%s\n", indentJSON(test.Data))
+	return buf.String()
+}
+
+// testCaseTxtar returns a testscript that decodes the given schema.
+func schemaFailureTxtar(s *externaltest.Schema) string {
+	var buf strings.Builder
+	fmt.Fprintf(&buf, "env CUE_EXPERIMENT=evalv3\n")
+	fmt.Fprintf(&buf, "exec cue def -o schema.cue json+jsonschema: schema.json\n")
+	fmt.Fprintf(&buf, "exec cat schema.cue\n")
+	fmt.Fprintf(&buf, "exec cue vet schema.cue\n")
+	fmt.Fprintf(&buf, "-- schema.json --\n%s\n", indentJSON(s.Schema))
+	return buf.String()
+}
+
+func indentJSON(x stdjson.RawMessage) []byte {
+	data, err := stdjson.MarshalIndent(x, "", "\t")
+	if err != nil {
+		panic(err)
+	}
+	return data
+}
+
+type positioner interface {
+	Pos() token.Pos
 }
 
 // testName returns a test name that doesn't contain any
@@ -153,7 +203,7 @@ func testName(s string) string {
 // testFailed marks the current test as failed with the
 // given error message, and updates the
 // skip field pointed to by skipField if necessary.
-func testFailed(t *testing.T, skipField *string, errStr string) {
+func testFailed(t *testing.T, skipField *string, p positioner, errStr string) {
 	if cuetest.UpdateGoldenFiles {
 		if *skipField == "" && !allowRegressions() {
 			t.Fatalf("test regression; was succeeding, now failing: %v", errStr)
@@ -169,7 +219,7 @@ func testFailed(t *testing.T, skipField *string, errStr string) {
 
 // testFails marks the current test as succeeded and updates the
 // skip field pointed to by skipField if necessary.
-func testSucceeded(t *testing.T, skipField *string) {
+func testSucceeded(t *testing.T, skipField *string, p positioner) {
 	if cuetest.UpdateGoldenFiles {
 		*skipField = ""
 		return
@@ -177,6 +227,12 @@ func testSucceeded(t *testing.T, skipField *string) {
 	if *skipField != "" {
 		t.Fatalf("unexpectedly more correct behavior (test success) on skipped test")
 	}
+}
+
+func testdataPos(p positioner) token.Position {
+	pp := p.Pos().Position()
+	pp.Filename = path.Join(testDir, pp.Filename)
+	return pp
 }
 
 func allowRegressions() bool {

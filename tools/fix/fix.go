@@ -44,7 +44,10 @@ func File(f *ast.File, o ...Option) *ast.File {
 		f(&options)
 	}
 
-	f = astutil.Apply(f, func(c astutil.Cursor) bool {
+	// Make sure we use the "after" function, and not the "before",
+	// because "before" will stop recursion early which creates
+	// problems with nested expressions.
+	f = astutil.Apply(f, nil, func(c astutil.Cursor) bool {
 		n := c.Node()
 		switch n := n.(type) {
 		case *ast.BinaryExpr:
@@ -94,7 +97,7 @@ func File(f *ast.File, o ...Option) *ast.File {
 			}
 		}
 		return true
-	}, nil).(*ast.File)
+	}).(*ast.File)
 
 	if options.simplify {
 		f = simplify(f)

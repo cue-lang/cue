@@ -6,8 +6,8 @@
 			"format": "uri"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{

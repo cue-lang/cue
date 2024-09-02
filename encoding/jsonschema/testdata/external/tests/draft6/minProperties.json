@@ -5,8 +5,8 @@
 			"minProperties": 1
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"minProperties\"",
-			"v3": "extract error: unsupported constraint \"minProperties\""
+			"v2": "extract error: keyword \"minProperties\" not yet implemented",
+			"v3": "extract error: keyword \"minProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -76,8 +76,8 @@
 			"minProperties": 1.0
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"minProperties\"",
-			"v3": "extract error: unsupported constraint \"minProperties\""
+			"v2": "extract error: keyword \"minProperties\" not yet implemented",
+			"v3": "extract error: keyword \"minProperties\" not yet implemented"
 		},
 		"tests": [
 			{

@@ -202,8 +202,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"if\" (and 1 more errors)",
-			"v3": "extract error: unsupported constraint \"if\" (and 1 more errors)"
+			"v2": "extract error: keyword \"if\" not yet implemented (and 1 more errors)",
+			"v3": "extract error: keyword \"if\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
 			{

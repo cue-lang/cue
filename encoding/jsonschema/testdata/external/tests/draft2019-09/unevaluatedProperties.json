@@ -639,8 +639,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"not\" (and 1 more errors)",
-			"v3": "extract error: unsupported constraint \"not\" (and 1 more errors)"
+			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
+			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
 		},
 		"tests": [
 			{

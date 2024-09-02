@@ -136,3 +136,15 @@ func constraintOneOf(key string, n cue.Value, s *state) {
 	// TODO: oneOf({a:x}, {b:y}, ..., not(anyOf({a:x}, {b:y}, ...))),
 	// can be translated to {} | {a:x}, {b:y}, ...
 }
+
+func constraintNot(key string, n cue.Value, s *state) {
+	subSchema := s.schema(n)
+	s.all.add(n, ast.NewCall(
+		ast.NewIdent("matchN"),
+		&ast.BasicLit{
+			Kind:  token.INT,
+			Value: "0",
+		},
+		ast.NewList(subSchema),
+	))
+}

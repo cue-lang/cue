@@ -17,10 +17,7 @@
           "allOf": [
             {
               "not": {
-                "required": [
-                  "branches",
-                  "branches-ignore"
-                ]
+                "type": "string"
               }
             }
           ]
@@ -38,7 +35,9 @@
 @jsonschema(schema="http://json-schema.org/draft-07/schema#")
 _
 
-#ref: null | {
+#ref: matchN(1, [matchN(1, [matchN(0, [string]) & {
+	...
+}]), null]) & (null | {
 	branches?: {
 		...
 	}
@@ -46,4 +45,4 @@ _
 		...
 	}
 	...
-}
+})

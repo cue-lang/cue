@@ -26,13 +26,13 @@ import (
 	"github.com/go-quicktest/qt"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/jsonschema"
 	"cuelang.org/go/encoding/jsonschema/internal/externaltest"
+	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetest"
 )
 
@@ -52,14 +52,14 @@ func TestExternal(t *testing.T) {
 	// Group the tests under a single subtest so that we can use
 	// t.Parallel and still guarantee that all tests have completed
 	// by the end.
-	t.Run("tests", func(t *testing.T) {
+	cuetdtest.SmallMatrix.Run(t, "tests", func(t *testing.T, m *cuetdtest.M) {
 		// Run tests in deterministic order so we get some consistency between runs.
 		for _, filename := range sortedKeys(tests) {
 			schemas := tests[filename]
 			t.Run(testName(filename), func(t *testing.T) {
 				for _, s := range schemas {
 					t.Run(testName(s.Description), func(t *testing.T) {
-						runExternalSchemaTests(t, filename, s)
+						runExternalSchemaTests(t, m, filename, s)
 					})
 				}
 			})
@@ -75,9 +75,9 @@ func TestExternal(t *testing.T) {
 	qt.Assert(t, qt.IsNil(err))
 }
 
-func runExternalSchemaTests(t *testing.T, filename string, s *externaltest.Schema) {
+func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, filename string, s *externaltest.Schema) {
 	t.Logf("file %v", path.Join("testdata/external", filename))
-	ctx := cuecontext.New()
+	ctx := m.CueContext()
 	jsonAST, err := json.Extract("schema.json", s.Schema)
 	qt.Assert(t, qt.IsNil(err))
 	jsonValue := ctx.BuildExpr(jsonAST)
@@ -112,13 +112,13 @@ func runExternalSchemaTests(t *testing.T, filename string, s *externaltest.Schem
 		t.Logf("txtar:\n%s", schemaFailureTxtar(s))
 		for _, test := range s.Tests {
 			t.Run("", func(t *testing.T) {
-				testFailed(t, &test.Skip, test, "could not compile schema")
+				testFailed(t, m, &test.Skip, test, "could not compile schema")
 			})
 		}
-		testFailed(t, &s.Skip, s, fmt.Sprintf("extract error: %v", extractErr))
+		testFailed(t, m, &s.Skip, s, fmt.Sprintf("extract error: %v", extractErr))
 		return
 	}
-	testSucceeded(t, &s.Skip, s)
+	testSucceeded(t, m, &s.Skip, s)
 
 	for _, test := range s.Tests {
 		t.Run(testName(test.Description), func(t *testing.T) {
@@ -140,15 +140,15 @@ func runExternalSchemaTests(t *testing.T, filename string, s *externaltest.Schem
 			err = instValue.Unify(schemaValue).Err()
 			if test.Valid {
 				if err != nil {
-					testFailed(t, &test.Skip, test, errors.Details(err, nil))
+					testFailed(t, m, &test.Skip, test, errors.Details(err, nil))
 				} else {
-					testSucceeded(t, &test.Skip, test)
+					testSucceeded(t, m, &test.Skip, test)
 				}
 			} else {
 				if err == nil {
-					testFailed(t, &test.Skip, test, "unexpected success")
+					testFailed(t, m, &test.Skip, test, "unexpected success")
 				} else {
-					testSucceeded(t, &test.Skip, test)
+					testSucceeded(t, m, &test.Skip, test)
 				}
 			}
 		})
@@ -203,28 +203,34 @@ func testName(s string) string {
 // testFailed marks the current test as failed with the
 // given error message, and updates the
 // skip field pointed to by skipField if necessary.
-func testFailed(t *testing.T, skipField *externaltest.Skip, p positioner, errStr string) {
+func testFailed(t *testing.T, m *cuetdtest.M, skipField *externaltest.Skip, p positioner, errStr string) {
 	if cuetest.UpdateGoldenFiles {
 		if *skipField == nil && !allowRegressions() {
 			t.Fatalf("test regression; was succeeding, now failing: %v", errStr)
 		}
-		*skipField = externaltest.Skip{"v2": errStr}
+		if *skipField == nil {
+			*skipField = make(externaltest.Skip)
+		}
+		(*skipField)[m.Name()] = errStr
 		return
 	}
-	if *skipField != nil {
-		t.Skipf("skipping due to known error: %v", *skipField)
+	if reason := (*skipField)[m.Name()]; reason != "" {
+		t.Skipf("skipping due to known error: %v", reason)
 	}
 	t.Fatal(errStr)
 }
 
 // testFails marks the current test as succeeded and updates the
 // skip field pointed to by skipField if necessary.
-func testSucceeded(t *testing.T, skipField *externaltest.Skip, p positioner) {
+func testSucceeded(t *testing.T, m *cuetdtest.M, skipField *externaltest.Skip, p positioner) {
 	if cuetest.UpdateGoldenFiles {
-		*skipField = nil
+		delete(*skipField, m.Name())
+		if len(*skipField) == 0 {
+			*skipField = nil
+		}
 		return
 	}
-	if *skipField != nil {
+	if reason := (*skipField)[m.Name()]; reason != "" {
 		t.Fatalf("unexpectedly more correct behavior (test success) on skipped test")
 	}
 }

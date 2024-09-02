@@ -6,7 +6,8 @@
 			"format": "email"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: unsupported constraint \"format\"",
+			"v3": "extract error: unsupported constraint \"format\""
 		},
 		"tests": [
 			{
@@ -14,7 +15,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -22,7 +24,8 @@
 				"data": 13.7,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -30,7 +33,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -38,7 +42,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -46,7 +51,8 @@
 				"data": false,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -54,7 +60,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -66,7 +73,8 @@
 			"format": "idn-email"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: unsupported constraint \"format\"",
+			"v3": "extract error: unsupported constraint \"format\""
 		},
 		"tests": [
 			{
@@ -74,7 +82,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -82,7 +91,8 @@
 				"data": 13.7,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -90,7 +100,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -98,7 +109,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -106,7 +118,8 @@
 				"data": false,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -114,7 +127,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -126,7 +140,8 @@
 			"format": "regex"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: unsupported constraint \"format\"",
+			"v3": "extract error: unsupported constraint \"format\""
 		},
 		"tests": [
 			{
@@ -134,7 +149,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -142,7 +158,8 @@
 				"data": 13.7,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -150,7 +167,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -158,7 +176,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -166,7 +185,8 @@
 				"data": false,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -174,7 +194,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -186,7 +207,8 @@
 			"format": "ipv4"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: unsupported constraint \"format\"",
+			"v3": "extract error: unsupported constraint \"format\""
 		},
 		"tests": [
 			{
@@ -194,7 +216,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -202,7 +225,8 @@
 				"data": 13.7,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -210,7 +234,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -218,7 +243,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -226,7 +252,8 @@
 				"data": false,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -234,7 +261,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -246,7 +274,8 @@
 			"format": "ipv6"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: unsupported constraint \"format\"",
+			"v3": "extract error: unsupported constraint \"format\""
 		},
 		"tests": [
 			{
@@ -254,7 +283,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -262,7 +292,8 @@
 				"data": 13.7,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -270,7 +301,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -278,7 +310,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -286,7 +319,8 @@
 				"data": false,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -294,7 +328,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -306,7 +341,8 @@
 			"format": "idn-hostname"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: unsupported constraint \"format\"",
+			"v3": "extract error: unsupported constraint \"format\""
 		},
 		"tests": [
 			{
@@ -314,7 +350,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -322,7 +359,8 @@
 				"data": 13.7,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -330,7 +368,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -338,7 +377,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -346,7 +386,8 @@
 				"data": false,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -354,7 +395,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -366,7 +408,8 @@
 			"format": "hostname"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: unsupported constraint \"format\"",
+			"v3": "extract error: unsupported constraint \"format\""
 		},
 		"tests": [
 			{
@@ -374,7 +417,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -382,7 +426,8 @@
 				"data": 13.7,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -390,7 +435,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -398,7 +444,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -406,7 +453,8 @@
 				"data": false,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -414,7 +462,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -426,7 +475,8 @@
 			"format": "date"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: unsupported constraint \"format\"",
+			"v3": "extract error: unsupported constraint \"format\""
 		},
 		"tests": [
 			{
@@ -434,7 +484,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -442,7 +493,8 @@
 				"data": 13.7,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -450,7 +502,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -458,7 +511,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -466,7 +520,8 @@
 				"data": false,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -474,7 +529,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -486,7 +542,8 @@
 			"format": "date-time"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: unsupported constraint \"format\"",
+			"v3": "extract error: unsupported constraint \"format\""
 		},
 		"tests": [
 			{
@@ -494,7 +551,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -502,7 +560,8 @@
 				"data": 13.7,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -510,7 +569,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -518,7 +578,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -526,7 +587,8 @@
 				"data": false,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -534,7 +596,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -546,7 +609,8 @@
 			"format": "time"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: unsupported constraint \"format\"",
+			"v3": "extract error: unsupported constraint \"format\""
 		},
 		"tests": [
 			{
@@ -554,7 +618,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -562,7 +627,8 @@
 				"data": 13.7,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -570,7 +636,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -578,7 +645,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -586,7 +654,8 @@
 				"data": false,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -594,7 +663,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -606,7 +676,8 @@
 			"format": "json-pointer"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: unsupported constraint \"format\"",
+			"v3": "extract error: unsupported constraint \"format\""
 		},
 		"tests": [
 			{
@@ -614,7 +685,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -622,7 +694,8 @@
 				"data": 13.7,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -630,7 +703,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -638,7 +712,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -646,7 +721,8 @@
 				"data": false,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -654,7 +730,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -666,7 +743,8 @@
 			"format": "relative-json-pointer"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: unsupported constraint \"format\"",
+			"v3": "extract error: unsupported constraint \"format\""
 		},
 		"tests": [
 			{
@@ -674,7 +752,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -682,7 +761,8 @@
 				"data": 13.7,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -690,7 +770,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -698,7 +779,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -706,7 +788,8 @@
 				"data": false,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -714,7 +797,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -726,7 +810,8 @@
 			"format": "iri"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: unsupported constraint \"format\"",
+			"v3": "extract error: unsupported constraint \"format\""
 		},
 		"tests": [
 			{
@@ -734,7 +819,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -742,7 +828,8 @@
 				"data": 13.7,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -750,7 +837,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -758,7 +846,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -766,7 +855,8 @@
 				"data": false,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -774,7 +864,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -786,7 +877,8 @@
 			"format": "iri-reference"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: unsupported constraint \"format\"",
+			"v3": "extract error: unsupported constraint \"format\""
 		},
 		"tests": [
 			{
@@ -794,7 +886,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -802,7 +895,8 @@
 				"data": 13.7,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -810,7 +904,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -818,7 +913,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -826,7 +922,8 @@
 				"data": false,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -834,7 +931,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -846,7 +944,8 @@
 			"format": "uri"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: unsupported constraint \"format\"",
+			"v3": "extract error: unsupported constraint \"format\""
 		},
 		"tests": [
 			{
@@ -854,7 +953,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -862,7 +962,8 @@
 				"data": 13.7,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -870,7 +971,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -878,7 +980,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -886,7 +989,8 @@
 				"data": false,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -894,7 +998,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -906,7 +1011,8 @@
 			"format": "uri-reference"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: unsupported constraint \"format\"",
+			"v3": "extract error: unsupported constraint \"format\""
 		},
 		"tests": [
 			{
@@ -914,7 +1020,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -922,7 +1029,8 @@
 				"data": 13.7,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -930,7 +1038,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -938,7 +1047,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -946,7 +1056,8 @@
 				"data": false,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -954,7 +1065,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -966,7 +1078,8 @@
 			"format": "uri-template"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: unsupported constraint \"format\"",
+			"v3": "extract error: unsupported constraint \"format\""
 		},
 		"tests": [
 			{
@@ -974,7 +1087,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -982,7 +1096,8 @@
 				"data": 13.7,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -990,7 +1105,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -998,7 +1114,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1006,7 +1123,8 @@
 				"data": false,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1014,7 +1132,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -1026,7 +1145,8 @@
 			"format": "uuid"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: unsupported constraint \"format\"",
+			"v3": "extract error: unsupported constraint \"format\""
 		},
 		"tests": [
 			{
@@ -1034,7 +1154,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1042,7 +1163,8 @@
 				"data": 13.7,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1050,7 +1172,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1058,7 +1181,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1066,7 +1190,8 @@
 				"data": false,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1074,7 +1199,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -1086,7 +1212,8 @@
 			"format": "duration"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: unsupported constraint \"format\"",
+			"v3": "extract error: unsupported constraint \"format\""
 		},
 		"tests": [
 			{
@@ -1094,7 +1221,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1102,7 +1230,8 @@
 				"data": 13.7,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1110,7 +1239,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1118,7 +1248,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1126,7 +1257,8 @@
 				"data": false,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1134,7 +1266,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]

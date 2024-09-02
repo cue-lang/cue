@@ -29,7 +29,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -85,7 +86,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			}
 		]
@@ -232,7 +234,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: reference \"strings\" in label expression refers to field against which it would be matched:\n    generated.cue:5:3\n"
+			"v2": "extract error: cannot compile resulting schema: reference \"strings\" in label expression refers to field against which it would be matched:\n    generated.cue:5:3\n",
+			"v3": "extract error: cannot compile resulting schema: reference \"strings\" in label expression refers to field against which it would be matched:\n    generated.cue:5:3\n"
 		},
 		"tests": [
 			{
@@ -242,7 +245,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -253,7 +257,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -276,7 +281,8 @@
 			"additionalProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"dependentSchemas\""
+			"v2": "extract error: unsupported constraint \"dependentSchemas\"",
+			"v3": "extract error: unsupported constraint \"dependentSchemas\""
 		},
 		"tests": [
 			{
@@ -286,7 +292,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -296,7 +303,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -307,7 +315,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]

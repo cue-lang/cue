@@ -6,7 +6,8 @@
 			"format": "uri"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: unsupported constraint \"format\"",
+			"v3": "extract error: unsupported constraint \"format\""
 		},
 		"tests": [
 			{
@@ -14,7 +15,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -22,7 +24,8 @@
 				"data": 13.7,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -30,7 +33,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -38,7 +42,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -46,7 +51,8 @@
 				"data": false,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -54,7 +60,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -62,7 +69,8 @@
 				"data": "http://foo.bar/?baz=qux#quux",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -70,7 +78,8 @@
 				"data": "http://foo.com/blah_(wikipedia)_blah#cite-1",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -78,7 +87,8 @@
 				"data": "http://foo.bar/?q=Test%20URL-encoded%20stuff",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -86,7 +96,8 @@
 				"data": "http://xn--nw2a.xn--j6w193g/",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -94,7 +105,8 @@
 				"data": "http://-.~_!$\u0026'()*+,;=:%40:80%2f::::::@example.com",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -102,7 +114,8 @@
 				"data": "http://223.255.255.254",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -110,7 +123,8 @@
 				"data": "ftp://ftp.is.co.za/rfc/rfc1808.txt",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -118,7 +132,8 @@
 				"data": "http://www.ietf.org/rfc/rfc2396.txt",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -126,7 +141,8 @@
 				"data": "ldap://[2001:db8::7]/c=GB?objectClass?one",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -134,7 +150,8 @@
 				"data": "mailto:John.Doe@example.com",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -142,7 +159,8 @@
 				"data": "news:comp.infosystems.www.servers.unix",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -150,7 +168,8 @@
 				"data": "tel:+1-816-555-1212",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -158,7 +177,8 @@
 				"data": "urn:oasis:names:specification:docbook:dtd:xml:4.1.2",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -166,7 +186,8 @@
 				"data": "//foo.bar/?baz=qux#quux",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -174,7 +195,8 @@
 				"data": "/abc",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -182,7 +204,8 @@
 				"data": "\\\\WINDOWS\\fileshare",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -190,7 +213,8 @@
 				"data": "abc",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -198,7 +222,8 @@
 				"data": "http:// shouldfail.com",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -206,7 +231,8 @@
 				"data": ":// should fail",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -214,7 +240,8 @@
 				"data": "bar,baz:foo",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]

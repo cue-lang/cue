@@ -6,7 +6,8 @@
 			"format": "uuid"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: unsupported constraint \"format\"",
+			"v3": "extract error: unsupported constraint \"format\""
 		},
 		"tests": [
 			{
@@ -14,7 +15,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -22,7 +24,8 @@
 				"data": 13.7,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -30,7 +33,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -38,7 +42,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -46,7 +51,8 @@
 				"data": false,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -54,7 +60,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -62,7 +69,8 @@
 				"data": "2EB8AA08-AA98-11EA-B4AA-73B441D16380",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -70,7 +78,8 @@
 				"data": "2eb8aa08-aa98-11ea-b4aa-73b441d16380",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -78,7 +87,8 @@
 				"data": "2eb8aa08-AA98-11ea-B4Aa-73B441D16380",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -86,7 +96,8 @@
 				"data": "00000000-0000-0000-0000-000000000000",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -94,7 +105,8 @@
 				"data": "2eb8aa08-aa98-11ea-b4aa-73b441d1638",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -102,7 +114,8 @@
 				"data": "2eb8aa08-aa98-11ea-73b441d16380",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -110,7 +123,8 @@
 				"data": "2eb8aa08-aa98-11ea-b4ga-73b441d16380",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -118,7 +132,8 @@
 				"data": "2eb8aa08aa9811eab4aa73b441d16380",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -126,7 +141,8 @@
 				"data": "2eb8aa08aa98-11ea-b4aa73b441d16380",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -134,7 +150,8 @@
 				"data": "2eb8-aa08-aa98-11ea-b4aa73b44-1d16380",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -142,7 +159,8 @@
 				"data": "2eb8aa08aa9811eab4aa73b441d16380----",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -150,7 +168,8 @@
 				"data": "98d80576-482e-427f-8434-7f86890ab222",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -158,7 +177,8 @@
 				"data": "99c17cbb-656f-564a-940f-1a4568f03487",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -166,7 +186,8 @@
 				"data": "99c17cbb-656f-664a-940f-1a4568f03487",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -174,7 +195,8 @@
 				"data": "99c17cbb-656f-f64a-940f-1a4568f03487",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]

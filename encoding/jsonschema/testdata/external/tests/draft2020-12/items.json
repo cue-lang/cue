@@ -49,7 +49,8 @@
 			"items": true
 		},
 		"skip": {
-			"v2": "extract error: value of \"items\" must be an object or array"
+			"v2": "extract error: value of \"items\" must be an object or array",
+			"v3": "extract error: value of \"items\" must be an object or array"
 		},
 		"tests": [
 			{
@@ -61,7 +62,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -69,7 +71,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -81,7 +84,8 @@
 			"items": false
 		},
 		"skip": {
-			"v2": "extract error: value of \"items\" must be an object or array"
+			"v2": "extract error: value of \"items\" must be an object or array",
+			"v3": "extract error: value of \"items\" must be an object or array"
 		},
 		"tests": [
 			{
@@ -93,7 +97,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -101,7 +106,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -145,7 +151,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"prefixItems\" (and 3 more errors)"
+			"v2": "extract error: unsupported constraint \"prefixItems\" (and 3 more errors)",
+			"v3": "extract error: unsupported constraint \"prefixItems\" (and 3 more errors)"
 		},
 		"tests": [
 			{
@@ -178,7 +185,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -219,7 +227,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -255,7 +264,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -283,7 +293,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -314,7 +325,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -333,7 +345,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -467,7 +480,8 @@
 			"items": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"prefixItems\" (and 1 more errors)"
+			"v2": "extract error: unsupported constraint \"prefixItems\" (and 1 more errors)",
+			"v3": "extract error: unsupported constraint \"prefixItems\" (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -475,7 +489,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -485,7 +500,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -496,7 +512,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -508,7 +525,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -521,7 +539,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -544,7 +563,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"prefixItems\""
+			"v2": "extract error: unsupported constraint \"prefixItems\"",
+			"v3": "extract error: unsupported constraint \"prefixItems\""
 		},
 		"tests": [
 			{
@@ -555,7 +575,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -566,7 +587,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -585,7 +607,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"prefixItems\""
+			"v2": "extract error: unsupported constraint \"prefixItems\"",
+			"v3": "extract error: unsupported constraint \"prefixItems\""
 		},
 		"tests": [
 			{
@@ -597,7 +620,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -608,7 +632,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -623,7 +648,8 @@
 			"items": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"prefixItems\" (and 1 more errors)"
+			"v2": "extract error: unsupported constraint \"prefixItems\" (and 1 more errors)",
+			"v3": "extract error: unsupported constraint \"prefixItems\" (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -635,7 +661,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -645,7 +672,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]

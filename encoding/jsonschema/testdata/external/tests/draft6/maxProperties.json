@@ -56,7 +56,8 @@
 			"maxProperties": 2.0
 		},
 		"skip": {
-			"v2": "extract error: invalid uint"
+			"v2": "extract error: invalid uint",
+			"v3": "extract error: invalid uint"
 		},
 		"tests": [
 			{
@@ -66,7 +67,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -78,7 +80,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]

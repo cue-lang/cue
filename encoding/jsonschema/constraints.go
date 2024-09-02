@@ -88,6 +88,7 @@ var constraints = []*constraint{
 	p2("minLength", constraintMinLength),
 	p3("minimum", constraintMinimum),
 	p2("multipleOf", constraintMultipleOf),
+	p3("not", constraintNot),
 	p3("oneOf", constraintOneOf),
 	p2("nullable", constraintNullable),
 	p2("pattern", constraintPattern),

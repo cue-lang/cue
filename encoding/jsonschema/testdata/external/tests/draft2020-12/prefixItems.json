@@ -13,8 +13,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"prefixItems\"",
-			"v3": "extract error: unsupported constraint \"prefixItems\""
+			"v2": "extract error: keyword \"prefixItems\" not yet implemented",
+			"v3": "extract error: keyword \"prefixItems\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -99,8 +99,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"prefixItems\"",
-			"v3": "extract error: unsupported constraint \"prefixItems\""
+			"v2": "extract error: keyword \"prefixItems\" not yet implemented",
+			"v3": "extract error: keyword \"prefixItems\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -148,8 +148,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"prefixItems\"",
-			"v3": "extract error: unsupported constraint \"prefixItems\""
+			"v2": "extract error: keyword \"prefixItems\" not yet implemented",
+			"v3": "extract error: keyword \"prefixItems\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -178,8 +178,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"prefixItems\"",
-			"v3": "extract error: unsupported constraint \"prefixItems\""
+			"v2": "extract error: keyword \"prefixItems\" not yet implemented",
+			"v3": "extract error: keyword \"prefixItems\" not yet implemented"
 		},
 		"tests": [
 			{

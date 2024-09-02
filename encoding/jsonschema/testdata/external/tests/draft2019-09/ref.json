@@ -624,8 +624,8 @@
 			"$ref": "#/$defs/A"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -1256,8 +1256,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"if\"",
-			"v3": "extract error: unsupported constraint \"if\""
+			"v2": "extract error: keyword \"if\" not yet implemented",
+			"v3": "extract error: keyword \"if\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -1291,8 +1291,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"then\"",
-			"v3": "extract error: unsupported constraint \"then\""
+			"v2": "extract error: keyword \"then\" not yet implemented",
+			"v3": "extract error: keyword \"then\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -1326,8 +1326,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"else\"",
-			"v3": "extract error: unsupported constraint \"else\""
+			"v2": "extract error: keyword \"else\" not yet implemented",
+			"v3": "extract error: keyword \"else\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -1512,8 +1512,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"$recursiveAnchor\" (and 2 more errors)",
-			"v3": "extract error: unsupported constraint \"$recursiveAnchor\" (and 2 more errors)"
+			"v2": "extract error: keyword \"$recursiveAnchor\" not yet implemented (and 2 more errors)",
+			"v3": "extract error: keyword \"$recursiveAnchor\" not yet implemented (and 2 more errors)"
 		},
 		"tests": [
 			{

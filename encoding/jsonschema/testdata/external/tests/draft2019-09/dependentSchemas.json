@@ -17,8 +17,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"dependentSchemas\"",
-			"v3": "extract error: unsupported constraint \"dependentSchemas\""
+			"v2": "extract error: keyword \"dependentSchemas\" not yet implemented",
+			"v3": "extract error: keyword \"dependentSchemas\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -121,8 +121,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"dependentSchemas\"",
-			"v3": "extract error: unsupported constraint \"dependentSchemas\""
+			"v2": "extract error: keyword \"dependentSchemas\" not yet implemented",
+			"v3": "extract error: keyword \"dependentSchemas\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -186,8 +186,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"dependentSchemas\"",
-			"v3": "extract error: unsupported constraint \"dependentSchemas\""
+			"v2": "extract error: keyword \"dependentSchemas\" not yet implemented",
+			"v3": "extract error: keyword \"dependentSchemas\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -259,8 +259,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"dependentSchemas\"",
-			"v3": "extract error: unsupported constraint \"dependentSchemas\""
+			"v2": "extract error: keyword \"dependentSchemas\" not yet implemented",
+			"v3": "extract error: keyword \"dependentSchemas\" not yet implemented"
 		},
 		"tests": [
 			{

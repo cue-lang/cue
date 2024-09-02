@@ -7,8 +7,8 @@
 			"unevaluatedProperties": true
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -44,8 +44,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -89,8 +89,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -128,8 +128,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -170,8 +170,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -213,8 +213,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -264,8 +264,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -317,8 +317,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -366,8 +366,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -416,8 +416,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\" (and 1 more errors)",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\" (and 1 more errors)"
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -490,8 +490,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -583,8 +583,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -639,8 +639,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -695,8 +695,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"if\" (and 3 more errors)",
-			"v3": "extract error: unsupported constraint \"if\" (and 3 more errors)"
+			"v2": "extract error: keyword \"if\" not yet implemented (and 3 more errors)",
+			"v3": "extract error: keyword \"if\" not yet implemented (and 3 more errors)"
 		},
 		"tests": [
 			{
@@ -777,8 +777,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"if\" (and 2 more errors)",
-			"v3": "extract error: unsupported constraint \"if\" (and 2 more errors)"
+			"v2": "extract error: keyword \"if\" not yet implemented (and 2 more errors)",
+			"v3": "extract error: keyword \"if\" not yet implemented (and 2 more errors)"
 		},
 		"tests": [
 			{
@@ -859,8 +859,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"if\" (and 2 more errors)",
-			"v3": "extract error: unsupported constraint \"if\" (and 2 more errors)"
+			"v2": "extract error: keyword \"if\" not yet implemented (and 2 more errors)",
+			"v3": "extract error: keyword \"if\" not yet implemented (and 2 more errors)"
 		},
 		"tests": [
 			{
@@ -938,8 +938,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"dependentSchemas\" (and 1 more errors)",
-			"v3": "extract error: unsupported constraint \"dependentSchemas\" (and 1 more errors)"
+			"v2": "extract error: keyword \"dependentSchemas\" not yet implemented (and 1 more errors)",
+			"v3": "extract error: keyword \"dependentSchemas\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -983,8 +983,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -1034,8 +1034,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -1088,8 +1088,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -1151,8 +1151,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"$recursiveAnchor\" (and 3 more errors)",
-			"v3": "extract error: unsupported constraint \"$recursiveAnchor\" (and 3 more errors)"
+			"v2": "extract error: keyword \"$recursiveAnchor\" not yet implemented (and 3 more errors)",
+			"v3": "extract error: keyword \"$recursiveAnchor\" not yet implemented (and 3 more errors)"
 		},
 		"tests": [
 			{
@@ -1205,8 +1205,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -1238,8 +1238,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -1273,8 +1273,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\" (and 1 more errors)",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\" (and 1 more errors)"
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -1320,8 +1320,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\" (and 1 more errors)",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\" (and 1 more errors)"
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -1367,8 +1367,8 @@
 			"unevaluatedProperties": true
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\" (and 1 more errors)",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\" (and 1 more errors)"
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -1414,8 +1414,8 @@
 			"unevaluatedProperties": true
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\" (and 1 more errors)",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\" (and 1 more errors)"
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -1463,8 +1463,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\" (and 1 more errors)",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\" (and 1 more errors)"
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -1512,8 +1512,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\" (and 1 more errors)",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\" (and 1 more errors)"
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -1573,8 +1573,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -1628,8 +1628,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -1690,8 +1690,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -1743,8 +1743,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -1886,8 +1886,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -2060,8 +2060,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\" (and 1 more errors)",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\" (and 1 more errors)"
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -2316,8 +2316,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -2385,8 +2385,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -2414,8 +2414,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedProperties\"",
-			"v3": "extract error: unsupported constraint \"unevaluatedProperties\""
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -2456,8 +2456,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"if\" (and 1 more errors)",
-			"v3": "extract error: unsupported constraint \"if\" (and 1 more errors)"
+			"v2": "extract error: keyword \"if\" not yet implemented (and 1 more errors)",
+			"v3": "extract error: keyword \"if\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -2502,8 +2502,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"dependentSchemas\" (and 1 more errors)",
-			"v3": "extract error: unsupported constraint \"dependentSchemas\" (and 1 more errors)"
+			"v2": "extract error: keyword \"dependentSchemas\" not yet implemented (and 1 more errors)",
+			"v3": "extract error: keyword \"dependentSchemas\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
 			{

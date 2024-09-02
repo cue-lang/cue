@@ -5,8 +5,8 @@
 			"format": "email"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -71,8 +71,8 @@
 			"format": "idn-email"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -137,8 +137,8 @@
 			"format": "regex"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -203,8 +203,8 @@
 			"format": "ipv4"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -269,8 +269,8 @@
 			"format": "ipv6"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -335,8 +335,8 @@
 			"format": "idn-hostname"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -401,8 +401,8 @@
 			"format": "hostname"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -467,8 +467,8 @@
 			"format": "date"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -533,8 +533,8 @@
 			"format": "date-time"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -599,8 +599,8 @@
 			"format": "time"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -665,8 +665,8 @@
 			"format": "json-pointer"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -731,8 +731,8 @@
 			"format": "relative-json-pointer"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -797,8 +797,8 @@
 			"format": "iri"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -863,8 +863,8 @@
 			"format": "iri-reference"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -929,8 +929,8 @@
 			"format": "uri"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -995,8 +995,8 @@
 			"format": "uri-reference"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -1061,8 +1061,8 @@
 			"format": "uri-template"
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"format\"",
-			"v3": "extract error: unsupported constraint \"format\""
+			"v2": "extract error: keyword \"format\" not yet implemented",
+			"v3": "extract error: keyword \"format\" not yet implemented"
 		},
 		"tests": [
 			{

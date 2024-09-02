@@ -16,8 +16,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"$dynamicRef\" (and 1 more errors)",
-			"v3": "extract error: unsupported constraint \"$dynamicRef\" (and 1 more errors)"
+			"v2": "extract error: keyword \"$dynamicRef\" not yet implemented (and 1 more errors)",
+			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -63,8 +63,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"$dynamicRef\" (and 1 more errors)",
-			"v3": "extract error: unsupported constraint \"$dynamicRef\" (and 1 more errors)"
+			"v2": "extract error: keyword \"$dynamicRef\" not yet implemented (and 1 more errors)",
+			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -167,8 +167,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)",
-			"v3": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)"
+			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 2 more errors)",
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 2 more errors)"
 		},
 		"tests": [
 			{
@@ -225,8 +225,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)",
-			"v3": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)"
+			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 2 more errors)",
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 2 more errors)"
 		},
 		"tests": [
 			{
@@ -286,8 +286,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)",
-			"v3": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)"
+			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 2 more errors)",
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 2 more errors)"
 		},
 		"tests": [
 			{
@@ -343,8 +343,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"$anchor\" (and 2 more errors)",
-			"v3": "extract error: unsupported constraint \"$anchor\" (and 2 more errors)"
+			"v2": "extract error: keyword \"$anchor\" not yet implemented (and 2 more errors)",
+			"v3": "extract error: keyword \"$anchor\" not yet implemented (and 2 more errors)"
 		},
 		"tests": [
 			{
@@ -388,8 +388,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)",
-			"v3": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)"
+			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 2 more errors)",
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 2 more errors)"
 		},
 		"tests": [
 			{
@@ -434,8 +434,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"$dynamicAnchor\" (and 3 more errors)",
-			"v3": "extract error: unsupported constraint \"$dynamicAnchor\" (and 3 more errors)"
+			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 3 more errors)",
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 3 more errors)"
 		},
 		"tests": [
 			{
@@ -488,8 +488,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)",
-			"v3": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)"
+			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 2 more errors)",
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 2 more errors)"
 		},
 		"tests": [
 			{
@@ -562,8 +562,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)",
-			"v3": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)"
+			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 2 more errors)",
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 2 more errors)"
 		},
 		"tests": [
 			{
@@ -645,8 +645,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"if\" (and 6 more errors)",
-			"v3": "extract error: unsupported constraint \"if\" (and 6 more errors)"
+			"v2": "extract error: keyword \"if\" not yet implemented (and 6 more errors)",
+			"v3": "extract error: keyword \"if\" not yet implemented (and 6 more errors)"
 		},
 		"tests": [
 			{
@@ -748,8 +748,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"if\" (and 3 more errors)",
-			"v3": "extract error: unsupported constraint \"if\" (and 3 more errors)"
+			"v2": "extract error: keyword \"if\" not yet implemented (and 3 more errors)",
+			"v3": "extract error: keyword \"if\" not yet implemented (and 3 more errors)"
 		},
 		"tests": [
 			{
@@ -791,8 +791,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"$dynamicAnchor\" (and 1 more errors)",
-			"v3": "extract error: unsupported constraint \"$dynamicAnchor\" (and 1 more errors)"
+			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 1 more errors)",
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -847,8 +847,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"$dynamicAnchor\"",
-			"v3": "extract error: unsupported constraint \"$dynamicAnchor\""
+			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented",
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -920,8 +920,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"$dynamicAnchor\"",
-			"v3": "extract error: unsupported constraint \"$dynamicAnchor\""
+			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented",
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -993,8 +993,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"$dynamicAnchor\"",
-			"v3": "extract error: unsupported constraint \"$dynamicAnchor\""
+			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented",
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented"
 		},
 		"tests": [
 			{
@@ -1088,8 +1088,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"$dynamicRef\" (and 1 more errors)",
-			"v3": "extract error: unsupported constraint \"$dynamicRef\" (and 1 more errors)"
+			"v2": "extract error: keyword \"$dynamicRef\" not yet implemented (and 1 more errors)",
+			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -1159,8 +1159,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"$dynamicRef\" (and 2 more errors)",
-			"v3": "extract error: unsupported constraint \"$dynamicRef\" (and 2 more errors)"
+			"v2": "extract error: keyword \"$dynamicRef\" not yet implemented (and 2 more errors)",
+			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 2 more errors)"
 		},
 		"tests": [
 			{

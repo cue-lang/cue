@@ -62,6 +62,24 @@
       "message": "Whatever happened to \"if\" ? 😊",
       "revId": "62a7010e00319e9ae2d6cc061e6a7cf316c1b45a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dce86ecd_10be6e7e",
+        "filename": "internal/core/compile/validator.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-09-02T08:09:50Z",
+      "side": 1,
+      "message": "Originally thought I would need more cases.\n\nChanged back, although I often find switch easier to read anyway.",
+      "parentUuid": "03f21c14_c60a3e43",
+      "revId": "62a7010e00319e9ae2d6cc061e6a7cf316c1b45a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -105,7 +105,9 @@
 					"foo": []
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "patternProperty validates nonproperty",

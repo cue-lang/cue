@@ -19,9 +19,8 @@ allTests: [_]: [... #Schema]
 	// skip is not part of the orginal test data, but
 	// is inserted by our test logic (when CUE_UPDATE=1)
 	// to indicate which tests are passing and which
-	// are failing. The text indicates some reason as to
-	// why the schema is skipped.
-	skip?: string
+	// are failing. See #Skip for details.
+	skip?: #Skip
 }
 
 #Test: {
@@ -35,5 +34,15 @@ allTests: [_]: [... #Schema]
 	// to indicate which tests are passing and which
 	// are failing. The text indicates some reason as to
 	// why the test is skipped.
-	skip?: string
+	skip?: #Skip
+}
+
+// #Skip indicates that a test or schema should be skipped
+// in the external test. The text indicates some reason as to
+// why the schema is skipped for a given evaluator version.
+//
+// If all fields are empty, the skip field itself should be omitted.
+#Skip: {
+	v2?: string
+	v3?: string
 }

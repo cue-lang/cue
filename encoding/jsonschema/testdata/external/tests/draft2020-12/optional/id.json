@@ -33,7 +33,9 @@
 				}
 			]
 		},
-		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/id/my_identifier.json:my_identifier\":\n    generated.cue:1:8\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/id/my_identifier.json:my_identifier\":\n    generated.cue:1:8\n"
+		},
 		"tests": [
 			{
 				"description": "exact match to enum, and type matches",
@@ -42,19 +44,25 @@
 					"type": "null"
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "match $ref to $id",
 				"data": "a string to match #/$defs/id_in_enum",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "no match on enum or $ref to $id",
 				"data": 1,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

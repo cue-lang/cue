@@ -7,19 +7,25 @@
 				"type": "integer"
 			}
 		},
-		"skip": "extract error: unsupported constraint \"not\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"not\""
+		},
 		"tests": [
 			{
 				"description": "allowed",
 				"data": "foo",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "disallowed",
 				"data": 1,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -34,25 +40,33 @@
 				]
 			}
 		},
-		"skip": "extract error: unsupported constraint \"not\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"not\""
+		},
 		"tests": [
 			{
 				"description": "valid",
 				"data": "foo",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "mismatch",
 				"data": 1,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "other mismatch",
 				"data": true,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -69,13 +83,17 @@
 				}
 			}
 		},
-		"skip": "extract error: unsupported constraint \"not\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"not\""
+		},
 		"tests": [
 			{
 				"description": "match",
 				"data": 1,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "other match",
@@ -83,7 +101,9 @@
 					"foo": 1
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "mismatch",
@@ -91,7 +111,9 @@
 					"foo": "bar"
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -105,7 +127,9 @@
 				}
 			}
 		},
-		"skip": "extract error: unsupported constraint \"not\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"not\""
+		},
 		"tests": [
 			{
 				"description": "property present",
@@ -114,7 +138,9 @@
 					"bar": 2
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "property absent",
@@ -123,7 +149,9 @@
 					"baz": 2
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -133,37 +161,49 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"not": {}
 		},
-		"skip": "extract error: unsupported constraint \"not\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"not\""
+		},
 		"tests": [
 			{
 				"description": "number is invalid",
 				"data": 1,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "string is invalid",
 				"data": "foo",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "boolean true is invalid",
 				"data": true,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "boolean false is invalid",
 				"data": false,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "null is invalid",
 				"data": null,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "object is invalid",
@@ -171,13 +211,17 @@
 					"foo": "bar"
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "empty object is invalid",
 				"data": {},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "array is invalid",
@@ -185,13 +229,17 @@
 					"foo"
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "empty array is invalid",
 				"data": [],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -201,37 +249,49 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"not": true
 		},
-		"skip": "extract error: unsupported constraint \"not\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"not\""
+		},
 		"tests": [
 			{
 				"description": "number is invalid",
 				"data": 1,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "string is invalid",
 				"data": "foo",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "boolean true is invalid",
 				"data": true,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "boolean false is invalid",
 				"data": false,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "null is invalid",
 				"data": null,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "object is invalid",
@@ -239,13 +299,17 @@
 					"foo": "bar"
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "empty object is invalid",
 				"data": {},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "array is invalid",
@@ -253,13 +317,17 @@
 					"foo"
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "empty array is invalid",
 				"data": [],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -269,37 +337,49 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"not": false
 		},
-		"skip": "extract error: unsupported constraint \"not\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"not\""
+		},
 		"tests": [
 			{
 				"description": "number is valid",
 				"data": 1,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "string is valid",
 				"data": "foo",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "boolean true is valid",
 				"data": true,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "boolean false is valid",
 				"data": false,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "null is valid",
 				"data": null,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "object is valid",
@@ -307,13 +387,17 @@
 					"foo": "bar"
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "empty object is valid",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "array is valid",
@@ -321,13 +405,17 @@
 					"foo"
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "empty array is valid",
 				"data": [],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -339,13 +427,17 @@
 				"not": {}
 			}
 		},
-		"skip": "extract error: unsupported constraint \"not\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"not\""
+		},
 		"tests": [
 			{
 				"description": "any value is valid",
 				"data": "foo",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -366,7 +458,9 @@
 				"unevaluatedProperties": false
 			}
 		},
-		"skip": "extract error: unsupported constraint \"not\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"not\""
+		},
 		"tests": [
 			{
 				"description": "unevaluated property",
@@ -374,7 +468,9 @@
 					"bar": 1
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "annotations are still collected inside a 'not'",
@@ -382,7 +478,9 @@
 					"foo": 1
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

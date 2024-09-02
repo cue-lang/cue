@@ -6,7 +6,9 @@
 				"maxLength": 3
 			}
 		},
-		"skip": "extract error: cannot compile resulting schema: reference \"strings\" in label expression refers to field against which it would be matched:\n    generated.cue:4:3\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: reference \"strings\" in label expression refers to field against which it would be matched:\n    generated.cue:4:3\n"
+		},
 		"tests": [
 			{
 				"description": "all property names valid",
@@ -15,7 +17,9 @@
 					"foo": {}
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "some property names invalid",
@@ -24,13 +28,17 @@
 					"foobar": {}
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "object without properties is valid",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "ignores arrays",
@@ -41,19 +49,25 @@
 					4
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "ignores strings",
 				"data": "foobar",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "ignores other non-objects",
 				"data": 12,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -80,7 +94,9 @@
 					"aaA": {}
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "object without properties is valid",

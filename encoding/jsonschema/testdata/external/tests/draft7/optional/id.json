@@ -32,7 +32,9 @@
 				}
 			]
 		},
-		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/id/my_identifier.json:my_identifier\":\n    generated.cue:1:8\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/id/my_identifier.json:my_identifier\":\n    generated.cue:1:8\n"
+		},
 		"tests": [
 			{
 				"description": "exact match to enum, and type matches",
@@ -41,19 +43,25 @@
 					"type": "null"
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "match $ref to id",
 				"data": "a string to match #/definitions/id_in_enum",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "no match on enum or $ref to id",
 				"data": 1,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -75,19 +83,25 @@
 				"$ref": "#/definitions/const_not_anchor"
 			}
 		},
-		"skip": "extract error: unsupported constraint \"if\" (and 2 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"if\" (and 2 more errors)"
+		},
 		"tests": [
 			{
 				"description": "skip traversing definition for a valid result",
 				"data": "skip not_a_real_anchor",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "const at const_not_anchor does not match",
 				"data": 1,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -109,19 +123,25 @@
 				"$ref": "#/definitions/const_not_id"
 			}
 		},
-		"skip": "extract error: unsupported constraint \"if\" (and 2 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"if\" (and 2 more errors)"
+		},
 		"tests": [
 			{
 				"description": "skip traversing definition for a valid result",
 				"data": "skip not_a_real_id",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "const at const_not_id does not match",
 				"data": 1,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

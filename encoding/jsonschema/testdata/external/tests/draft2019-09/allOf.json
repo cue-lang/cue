@@ -41,7 +41,9 @@
 					"foo": "baz"
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "mismatch first",
@@ -49,7 +51,9 @@
 					"bar": 2
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "wrong type",
@@ -113,7 +117,9 @@
 					"baz": null
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "mismatch first allOf",
@@ -122,7 +128,9 @@
 					"baz": null
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "mismatch second allOf",
@@ -131,7 +139,9 @@
 					"bar": 2
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "mismatch both",
@@ -139,7 +149,9 @@
 					"bar": 2
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			}
 		]
 	},
@@ -200,7 +212,9 @@
 				"description": "any value is invalid",
 				"data": "foo",
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			}
 		]
 	},
@@ -218,7 +232,9 @@
 				"description": "any value is invalid",
 				"data": "foo",
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			}
 		]
 	},

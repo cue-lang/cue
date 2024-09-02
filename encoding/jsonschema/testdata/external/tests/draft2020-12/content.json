@@ -95,55 +95,73 @@
 				}
 			}
 		},
-		"skip": "extract error: unsupported constraint \"contentSchema\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"contentSchema\""
+		},
 		"tests": [
 			{
 				"description": "a valid base64-encoded JSON document",
 				"data": "eyJmb28iOiAiYmFyIn0K",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "another valid base64-encoded JSON document",
 				"data": "eyJib28iOiAyMCwgImZvbyI6ICJiYXoifQ==",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "an invalid base64-encoded JSON document; validates true",
 				"data": "eyJib28iOiAyMH0=",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "an empty object as a base64-encoded JSON document; validates true",
 				"data": "e30=",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "an empty array as a base64-encoded JSON document",
 				"data": "W10=",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "a validly-encoded invalid JSON document; validates true",
 				"data": "ezp9Cg==",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "an invalid base64 string that is valid JSON; validates true",
 				"data": "{}",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "ignores non-strings",
 				"data": 100,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

@@ -15,7 +15,9 @@
 				}
 			}
 		},
-		"skip": "extract error: unsupported constraint \"$dynamicRef\" (and 1 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$dynamicRef\" (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "An array of strings is valid",
@@ -24,7 +26,9 @@
 					"bar"
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "An array containing non-strings is invalid",
@@ -33,7 +37,9 @@
 					42
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -53,7 +59,9 @@
 				}
 			}
 		},
-		"skip": "extract error: unsupported constraint \"$dynamicRef\" (and 1 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$dynamicRef\" (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "An array of strings is valid",
@@ -62,7 +70,9 @@
 					"bar"
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "An array containing non-strings is invalid",
@@ -71,7 +81,9 @@
 					42
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -91,7 +103,9 @@
 				}
 			}
 		},
-		"skip": "extract error: anchors (items) not supported (and 1 more errors)",
+		"skip": {
+			"v2": "extract error: anchors (items) not supported (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "An array of strings is valid",
@@ -100,7 +114,9 @@
 					"bar"
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "An array containing non-strings is invalid",
@@ -109,7 +125,9 @@
 					42
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -139,7 +157,9 @@
 				}
 			}
 		},
-		"skip": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)"
+		},
 		"tests": [
 			{
 				"description": "An array of strings is valid",
@@ -148,7 +168,9 @@
 					"bar"
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "An array containing non-strings is invalid",
@@ -157,7 +179,9 @@
 					42
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -188,7 +212,9 @@
 				}
 			}
 		},
-		"skip": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)"
+		},
 		"tests": [
 			{
 				"description": "An array of strings is invalid",
@@ -197,7 +223,9 @@
 					"bar"
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "An array of numbers is valid",
@@ -206,7 +234,9 @@
 					42
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -240,7 +270,9 @@
 				}
 			}
 		},
-		"skip": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)"
+		},
 		"tests": [
 			{
 				"description": "An array of strings is valid",
@@ -249,7 +281,9 @@
 					"bar"
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "An array containing non-strings is invalid",
@@ -258,7 +292,9 @@
 					42
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -288,7 +324,9 @@
 				}
 			}
 		},
-		"skip": "extract error: unsupported constraint \"$anchor\" (and 2 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$anchor\" (and 2 more errors)"
+		},
 		"tests": [
 			{
 				"description": "Any array is valid",
@@ -297,7 +335,9 @@
 					42
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -327,7 +367,9 @@
 				}
 			}
 		},
-		"skip": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)"
+		},
 		"tests": [
 			{
 				"description": "Any array is valid",
@@ -336,7 +378,9 @@
 					42
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -367,7 +411,9 @@
 				}
 			}
 		},
-		"skip": "extract error: unsupported constraint \"$dynamicAnchor\" (and 3 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$dynamicAnchor\" (and 3 more errors)"
+		},
 		"tests": [
 			{
 				"description": "Any array is valid",
@@ -376,7 +422,9 @@
 					42
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -415,7 +463,9 @@
 				}
 			}
 		},
-		"skip": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)"
+		},
 		"tests": [
 			{
 				"description": "The recursive part is valid against the root",
@@ -428,7 +478,9 @@
 					}
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "The recursive part is not valid against the root",
@@ -441,7 +493,9 @@
 					}
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -480,7 +534,9 @@
 				}
 			}
 		},
-		"skip": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$dynamicAnchor\" (and 2 more errors)"
+		},
 		"tests": [
 			{
 				"description": "The recursive part doesn't need to validate against the root",
@@ -493,7 +549,9 @@
 					}
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -557,7 +615,9 @@
 				}
 			}
 		},
-		"skip": "extract error: unsupported constraint \"if\" (and 6 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"if\" (and 6 more errors)"
+		},
 		"tests": [
 			{
 				"description": "number list with number values",
@@ -568,7 +628,9 @@
 					]
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "number list with string values",
@@ -579,7 +641,9 @@
 					]
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "string list with number values",
@@ -590,7 +654,9 @@
 					]
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "string list with string values",
@@ -601,7 +667,9 @@
 					]
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -645,25 +713,33 @@
 				}
 			}
 		},
-		"skip": "extract error: unsupported constraint \"if\" (and 3 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"if\" (and 3 more errors)"
+		},
 		"tests": [
 			{
 				"description": "string matches /$defs/thingy, but the $dynamicRef does not stop here",
 				"data": "a string",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "first_scope is not in dynamic scope for the $dynamicRef",
 				"data": 42,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "/then/$defs/thingy is the final stop for the $dynamicRef",
 				"data": null,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -676,7 +752,9 @@
 			"$ref": "tree.json",
 			"unevaluatedProperties": false
 		},
-		"skip": "extract error: unsupported constraint \"$dynamicAnchor\" (and 1 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$dynamicAnchor\" (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "instance with misspelled field",
@@ -688,7 +766,9 @@
 					]
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "instance with correct field",
@@ -700,7 +780,9 @@
 					]
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -723,7 +805,9 @@
 				}
 			}
 		},
-		"skip": "extract error: unsupported constraint \"$dynamicAnchor\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$dynamicAnchor\""
+		},
 		"tests": [
 			{
 				"description": "incorrect parent schema",
@@ -731,7 +815,9 @@
 					"a": true
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "incorrect extended schema",
@@ -743,7 +829,9 @@
 					]
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "correct extended schema",
@@ -755,7 +843,9 @@
 					]
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -784,7 +874,9 @@
 				}
 			]
 		},
-		"skip": "extract error: unsupported constraint \"$dynamicAnchor\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$dynamicAnchor\""
+		},
 		"tests": [
 			{
 				"description": "incorrect parent schema",
@@ -792,7 +884,9 @@
 					"a": true
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "incorrect extended schema",
@@ -804,7 +898,9 @@
 					]
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "correct extended schema",
@@ -816,7 +912,9 @@
 					]
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -845,7 +943,9 @@
 				}
 			]
 		},
-		"skip": "extract error: unsupported constraint \"$dynamicAnchor\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$dynamicAnchor\""
+		},
 		"tests": [
 			{
 				"description": "incorrect parent schema",
@@ -853,7 +953,9 @@
 					"a": true
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "incorrect extended schema",
@@ -865,7 +967,9 @@
 					]
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "correct extended schema",
@@ -877,7 +981,9 @@
 					]
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -886,19 +992,25 @@
 		"schema": {
 			"$ref": "http://localhost:1234/draft2020-12/detached-dynamicref.json#/$defs/foo"
 		},
-		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/detached-dynamicref.json:schema\":\n    generated.cue:1:8\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/detached-dynamicref.json:schema\":\n    generated.cue:1:8\n"
+		},
 		"tests": [
 			{
 				"description": "number is valid",
 				"data": 1,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "non-number is invalid",
 				"data": "a",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -919,7 +1031,9 @@
 				}
 			}
 		},
-		"skip": "extract error: unsupported constraint \"$dynamicRef\" (and 1 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$dynamicRef\" (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "follow $dynamicRef to a true schema",
@@ -927,7 +1041,9 @@
 					"true": 1
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "follow $dynamicRef to a false schema",
@@ -935,7 +1051,9 @@
 					"false": 1
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -981,7 +1099,9 @@
 				}
 			}
 		},
-		"skip": "extract error: unsupported constraint \"$dynamicRef\" (and 2 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$dynamicRef\" (and 2 more errors)"
+		},
 		"tests": [
 			{
 				"description": "integer property passes",
@@ -991,7 +1111,9 @@
 					}
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "string property fails",
@@ -1001,7 +1123,9 @@
 					}
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

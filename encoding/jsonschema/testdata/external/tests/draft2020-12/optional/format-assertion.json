@@ -6,19 +6,25 @@
 			"$schema": "http://localhost:1234/draft2020-12/format-assertion-false.json",
 			"format": "ipv4"
 		},
-		"skip": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/format-assertion-false.json\": $schema URI not recognized (and 1 more errors)",
+		"skip": {
+			"v2": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/format-assertion-false.json\": $schema URI not recognized (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "format-assertion: false: valid string",
 				"data": "127.0.0.1",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "format-assertion: false: invalid string",
 				"data": "not-an-ipv4",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -29,19 +35,25 @@
 			"$schema": "http://localhost:1234/draft2020-12/format-assertion-true.json",
 			"format": "ipv4"
 		},
-		"skip": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/format-assertion-true.json\": $schema URI not recognized (and 1 more errors)",
+		"skip": {
+			"v2": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/format-assertion-true.json\": $schema URI not recognized (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "format-assertion: true: valid string",
 				"data": "127.0.0.1",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "format-assertion: true: invalid string",
 				"data": "not-an-ipv4",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

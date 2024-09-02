@@ -33,7 +33,9 @@
 				}
 			]
 		},
-		"skip": "extract error: unsupported constraint \"$anchor\" (and 1 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$anchor\" (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "exact match to enum, and type matches",
@@ -42,7 +44,9 @@
 					"type": "null"
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "in implementations that strip $anchor, this may match either $def",
@@ -50,19 +54,25 @@
 					"type": "null"
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "match $ref to $anchor",
 				"data": "a string to match #/$defs/anchor_in_enum",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "no match on enum or $ref to $anchor",
 				"data": 1,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

@@ -41,7 +41,9 @@
 				}
 			}
 		},
-		"skip": "extract error: unsupported constraint \"$dynamicRef\" (and 2 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$dynamicRef\" (and 2 more errors)"
+		},
 		"tests": [
 			{
 				"description": "integer property passes",
@@ -51,7 +53,9 @@
 					}
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "string property fails",
@@ -61,7 +65,9 @@
 					}
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

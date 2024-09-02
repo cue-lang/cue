@@ -10,7 +10,9 @@
 			},
 			"additionalProperties": false
 		},
-		"skip": "extract error: unsupported constraint \"$recursiveRef\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$recursiveRef\""
+		},
 		"tests": [
 			{
 				"description": "match",
@@ -18,7 +20,9 @@
 					"foo": false
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "recursive match",
@@ -28,7 +32,9 @@
 					}
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "mismatch",
@@ -36,7 +42,9 @@
 					"bar": false
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "recursive mismatch",
@@ -46,7 +54,9 @@
 					}
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -81,13 +91,17 @@
 				}
 			]
 		},
-		"skip": "extract error: unsupported constraint \"$recursiveAnchor\" (and 1 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$recursiveAnchor\" (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "integer matches at the outer level",
 				"data": 1,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "single level match",
@@ -95,7 +109,9 @@
 					"foo": "hi"
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "integer does not match as a property value",
@@ -103,7 +119,9 @@
 					"foo": 1
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "two levels, properties match with inner definition",
@@ -113,7 +131,9 @@
 					}
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "two levels, no match",
@@ -123,7 +143,9 @@
 					}
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -159,13 +181,17 @@
 				}
 			]
 		},
-		"skip": "extract error: unsupported constraint \"$recursiveAnchor\" (and 2 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$recursiveAnchor\" (and 2 more errors)"
+		},
 		"tests": [
 			{
 				"description": "integer matches at the outer level",
 				"data": 1,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "single level match",
@@ -173,7 +199,9 @@
 					"foo": "hi"
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "integer now matches as a property value",
@@ -181,7 +209,9 @@
 					"foo": 1
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "two levels, properties match with inner definition",
@@ -191,7 +221,9 @@
 					}
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "two levels, properties match with $recursiveRef",
@@ -201,7 +233,9 @@
 					}
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -237,13 +271,17 @@
 				}
 			]
 		},
-		"skip": "extract error: unsupported constraint \"$recursiveAnchor\" (and 2 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$recursiveAnchor\" (and 2 more errors)"
+		},
 		"tests": [
 			{
 				"description": "integer matches at the outer level",
 				"data": 1,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "single level match",
@@ -251,7 +289,9 @@
 					"foo": "hi"
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "integer does not match as a property value",
@@ -259,7 +299,9 @@
 					"foo": 1
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "two levels, properties match with inner definition",
@@ -269,7 +311,9 @@
 					}
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "two levels, integer does not match as a property value",
@@ -279,7 +323,9 @@
 					}
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -314,13 +360,17 @@
 				}
 			]
 		},
-		"skip": "extract error: unsupported constraint \"$recursiveAnchor\" (and 1 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$recursiveAnchor\" (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "integer matches at the outer level",
 				"data": 1,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "single level match",
@@ -328,7 +378,9 @@
 					"foo": "hi"
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "integer does not match as a property value",
@@ -336,7 +388,9 @@
 					"foo": 1
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "two levels, properties match with inner definition",
@@ -346,7 +400,9 @@
 					}
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "two levels, integer does not match as a property value",
@@ -356,7 +412,9 @@
 					}
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -390,7 +448,9 @@
 				}
 			]
 		},
-		"skip": "extract error: unsupported constraint \"$recursiveAnchor\" (and 1 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$recursiveAnchor\" (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "leaf node does not match; no recursion",
@@ -398,7 +458,9 @@
 					"foo": true
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "leaf node matches: recursion uses the inner schema",
@@ -408,7 +470,9 @@
 					}
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "leaf node does not match: recursion uses the inner schema",
@@ -418,7 +482,9 @@
 					}
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -451,7 +517,9 @@
 				}
 			]
 		},
-		"skip": "extract error: unsupported constraint \"$recursiveAnchor\" (and 1 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"$recursiveAnchor\" (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "leaf node does not match; no recursion",
@@ -459,7 +527,9 @@
 					"foo": true
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "leaf node matches: recursion only uses inner schema",
@@ -469,7 +539,9 @@
 					}
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "leaf node does not match: recursion only uses inner schema",
@@ -479,7 +551,9 @@
 					}
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -520,7 +594,9 @@
 				"$ref": "recursiveRef8_inner.json"
 			}
 		},
-		"skip": "extract error: unsupported constraint \"if\" (and 4 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"if\" (and 4 more errors)"
+		},
 		"tests": [
 			{
 				"description": "recurse to anyLeafNode - floats are allowed",
@@ -528,7 +604,9 @@
 					"alpha": 1.1
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "recurse to integerNode - floats are not allowed",
@@ -536,7 +614,9 @@
 					"november": 1.1
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -577,7 +657,9 @@
 				"$ref": "main.json#/$defs/inner"
 			}
 		},
-		"skip": "extract error: unsupported constraint \"if\" (and 4 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"if\" (and 4 more errors)"
+		},
 		"tests": [
 			{
 				"description": "numeric node",
@@ -585,7 +667,9 @@
 					"alpha": 1.1
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "integer node",
@@ -593,7 +677,9 @@
 					"november": 1.1
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

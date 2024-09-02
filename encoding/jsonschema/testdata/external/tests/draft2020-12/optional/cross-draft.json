@@ -6,7 +6,9 @@
 			"type": "array",
 			"$ref": "http://localhost:1234/draft2019-09/ignore-prefixItems.json"
 		},
-		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/ignore-prefixItems.json:schema\":\n    generated.cue:1:8\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2019-09/ignore-prefixItems.json:schema\":\n    generated.cue:1:8\n"
+		},
 		"tests": [
 			{
 				"description": "first item not a string is valid",
@@ -17,7 +19,9 @@
 					3
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

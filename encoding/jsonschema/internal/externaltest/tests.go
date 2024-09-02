@@ -2,7 +2,6 @@ package externaltest
 
 import (
 	"bytes"
-	"encoding/json"
 	stdjson "encoding/json"
 	"fmt"
 	"os"
@@ -20,7 +19,7 @@ type Schema struct {
 	Description string             `json:"description"`
 	Comment     string             `json:"comment,omitempty"`
 	Schema      stdjson.RawMessage `json:"schema"`
-	Skip        string             `json:"skip,omitempty"`
+	Skip        Skip               `json:"skip,omitempty"`
 	Tests       []*Test            `json:"tests"`
 }
 
@@ -30,8 +29,16 @@ type Test struct {
 	Comment     string             `json:"comment,omitempty"`
 	Data        stdjson.RawMessage `json:"data"`
 	Valid       bool               `json:"valid"`
-	Skip        string             `json:"skip,omitempty"`
+	Skip        Skip               `json:"skip,omitempty"`
 }
+
+// Skip records information about whether a given schema
+// or test will be skipped when testing. If not present,
+// the test will be expected to pass.
+//
+// Each key in the map represents the name of a point
+// in the cuetdtest matrix.
+type Skip map[string]string
 
 type location struct {
 	root cue.Value
@@ -40,14 +47,6 @@ type location struct {
 
 func (loc location) Pos() token.Pos {
 	return loc.root.LookupPath(loc.path).Pos()
-}
-
-func ParseTestData(data []byte) ([]*Schema, error) {
-	var schemas []*Schema
-	if err := json.Unmarshal(data, &schemas); err != nil {
-		return nil, err
-	}
-	return schemas, nil
 }
 
 // WriteTestDir writes test data files as read by ReadTestDir

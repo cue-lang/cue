@@ -32,7 +32,9 @@
 				}
 			]
 		},
-		"skip": "extract error: constraint \"const\" is not supported in JSON schema version http://json-schema.org/draft-04/schema#",
+		"skip": {
+			"v2": "extract error: constraint \"const\" is not supported in JSON schema version http://json-schema.org/draft-04/schema#"
+		},
 		"tests": [
 			{
 				"description": "exact match to enum, and type matches",
@@ -41,19 +43,25 @@
 					"type": "null"
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "match $ref to id",
 				"data": "a string to match #/definitions/id_in_enum",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "no match on enum or $ref to id",
 				"data": 1,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

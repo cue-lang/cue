@@ -15,6 +15,8 @@
 package jsonschema
 
 import (
+	"fmt"
+
 	"cuelang.org/go/cue"
 )
 
@@ -44,6 +46,9 @@ var constraintMap = map[string]*constraint{}
 
 func init() {
 	for _, c := range constraints {
+		if _, ok := constraintMap[c.key]; ok {
+			panic(fmt.Errorf("duplicate constraint entry for %q", c.key))
+		}
 		constraintMap[c.key] = c
 	}
 }
@@ -54,38 +59,51 @@ func init() {
 const numPhases = 5
 
 var constraints = []*constraint{
+	todo("$anchor", vfrom(VersionDraft2019_09)),
 	p2d("$comment", constraintComment, vfrom(VersionDraft7)),
 	p2("$defs", constraintAddDefinitions),
+	todo("$dynamicAnchor", vfrom(VersionDraft2020_12)),
+	todo("$dynamicRef", vfrom(VersionDraft2020_12)),
 	p1d("$id", constraintID, vfrom(VersionDraft6)),
 	p0("$schema", constraintSchema),
 	p2("$ref", constraintRef),
-	p2("additionalItems", constraintAdditionalItems),
+	todo("$recursiveAnchor", vbetween(VersionDraft2019_09, VersionDraft2020_12)),
+	todo("$recursiveRef", vbetween(VersionDraft2019_09, VersionDraft2020_12)),
+	todo("$vocabulary", vfrom(VersionDraft2019_09)),
+	p2d("additionalItems", constraintAdditionalItems, vto(VersionDraft2019_09)),
 	p4("additionalProperties", constraintAdditionalProperties),
 	p3("allOf", constraintAllOf),
 	p3("anyOf", constraintAnyOf),
 	p2d("const", constraintConst, vfrom(VersionDraft6)),
-	p1d("minContains", constraintMinContains, vfrom(VersionDraft2019_09)),
-	p1d("maxContains", constraintMaxContains, vfrom(VersionDraft2019_09)),
 	p2d("contains", constraintContains, vfrom(VersionDraft6)),
 	p2d("contentEncoding", constraintContentEncoding, vfrom(VersionDraft7)),
 	p2d("contentMediaType", constraintContentMediaType, vfrom(VersionDraft7)),
+	todo("contentSchema", vfrom(VersionDraft2019_09)),
 	p2("default", constraintDefault),
 	p2("definitions", constraintAddDefinitions),
 	p2("dependencies", constraintDependencies),
+	todo("dependentRequired", vfrom(VersionDraft2019_09)),
+	todo("dependentSchemas", vfrom(VersionDraft2019_09)),
 	p2("deprecated", constraintDeprecated),
 	p2("description", constraintDescription),
+	todo("else", vfrom(VersionDraft7)),
 	p2("enum", constraintEnum),
 	p2d("examples", constraintExamples, vfrom(VersionDraft6)),
 	p2("exclusiveMaximum", constraintExclusiveMaximum),
 	p2("exclusiveMinimum", constraintExclusiveMinimum),
+	todo("format", allVersions),
 	p1d("id", constraintID, vto(VersionDraft4)),
+	todo("if", vfrom(VersionDraft7)),
 	p2("items", constraintItems),
-	p2("minItems", constraintMinItems),
+	p1d("maxContains", constraintMaxContains, vfrom(VersionDraft2019_09)),
 	p2("maxItems", constraintMaxItems),
 	p2("maxLength", constraintMaxLength),
 	p2("maxProperties", constraintMaxProperties),
 	p3("maximum", constraintMaximum),
+	p1d("minContains", constraintMinContains, vfrom(VersionDraft2019_09)),
+	p2("minItems", constraintMinItems),
 	p2("minLength", constraintMinLength),
+	todo("minProperties", allVersions),
 	p3("minimum", constraintMinimum),
 	p2("multipleOf", constraintMultipleOf),
 	p3("not", constraintNot),
@@ -93,12 +111,22 @@ var constraints = []*constraint{
 	p2("nullable", constraintNullable),
 	p2("pattern", constraintPattern),
 	p3("patternProperties", constraintPatternProperties),
+	todo("prefixItems", vfrom(VersionDraft2020_12)),
 	p2("properties", constraintProperties),
 	p2d("propertyNames", constraintPropertyNames, vfrom(VersionDraft6)),
+	todo("readOnly", vfrom(VersionDraft7)),
 	p3("required", constraintRequired),
+	todo("then", vfrom(VersionDraft7)),
 	p2("title", constraintTitle),
 	p2("type", constraintType),
+	todo("unevaluatedItems", vfrom(VersionDraft2019_09)),
+	todo("unevaluatedProperties", vfrom(VersionDraft2019_09)),
 	p2("uniqueItems", constraintUniqueItems),
+	todo("writeOnly", vfrom(VersionDraft7)),
+}
+
+func todo(name string, versions versionSet) *constraint {
+	return &constraint{key: name, phase: 1, versions: versions, fn: constraintTODO}
 }
 
 func p0(name string, f constraintFunc) *constraint {

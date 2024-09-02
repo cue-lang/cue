@@ -46,6 +46,9 @@ type Cursor interface {
 	// Import reports an opaque identifier that refers to the given package. It
 	// may only be called if the input to apply was an ast.File. If the import
 	// does not exist, it will be added.
+	//
+	// Deprecated: use [ast.NewImport] as an [ast.Ident.Node], and then
+	// [Sanitize].
 	Import(path string) *ast.Ident
 
 	// Replace replaces the current Node with n.
@@ -120,6 +123,8 @@ func (c *cursor) Parent() Cursor { return c.parent }
 func (c *cursor) Index() int     { return c.index }
 func (c *cursor) Node() ast.Node { return c.node }
 
+// Deprecated: use [ast.NewImport] as an [ast.Ident.Node], and then
+// [Sanitize].
 func (c *cursor) Import(importPath string) *ast.Ident {
 	info := fileInfo(c)
 	if info == nil {

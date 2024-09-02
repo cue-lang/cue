@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c105921_00c0dcb2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-09-02T09:53:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "41520e5f_2d80dc67",
+      "revId": "54970737c2f01a6c7adb6debcd616a95219d1e68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "22c5c2d8_c10eb157",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "78ec4f40_ff273fe3",
+        "filename": "cmd/cue/cmd/testdata/script/fix.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-09-02T09:53:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "22c5c2d8_c10eb157",
+      "revId": "54970737c2f01a6c7adb6debcd616a95219d1e68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4f407fbe_eb839ae4",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-09-02T08:55:15Z",
       "side": 1,
       "message": "can you add a TODO about the wonky import names pointing to https://cuelang.org/issue/3408 for clarity?",
+      "revId": "54970737c2f01a6c7adb6debcd616a95219d1e68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5f98e1f_08cb2ce5",
+        "filename": "cmd/cue/cmd/testdata/script/fix.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-09-02T09:53:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4f407fbe_eb839ae4",
       "revId": "54970737c2f01a6c7adb6debcd616a95219d1e68",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

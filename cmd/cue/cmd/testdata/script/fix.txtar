@@ -2,8 +2,7 @@ exec cue fix ./...
 # Make sure we fix all files in a directory, even if they're a mix of packages (or no packages).
 cmp p/one.cue p/one.cue.fixed
 cmp p/two.cue p/two.cue.fixed
-# TODO: the following cmp fails because of a bug in fix/fix.go
-! cmp p/three.cue p/three.cue.fixed
+cmp p/three.cue p/three.cue.fixed
 # TODO: the added imports have unnecessary name-mangling. https://cuelang.org/issue/3408
 -- p/one.cue --
 package one

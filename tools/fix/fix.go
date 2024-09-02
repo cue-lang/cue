@@ -72,27 +72,27 @@ func File(f *ast.File, o ...Option) *ast.File {
 				if !(xIsList || yIsList) {
 					break
 				}
-				pkg := c.Import("list")
-				if pkg == nil {
-					break
-				}
 				if n.Op == token.ADD {
 					// Rewrite list addition to use list.Concat
 					ast.SetRelPos(x, token.NoSpace)
-					c.Replace(&ast.CallExpr{
-						Fun:  ast.NewSel(pkg, "Concat"),
-						Args: []ast.Expr{ast.NewList(x, y)},
-					})
+					c.Replace(ast.NewCall(
+						ast.NewSel(&ast.Ident{
+							Name: "list",
+							Node: ast.NewImport(nil, "list"),
+						}, "Concat"), ast.NewList(x, y)),
+					)
 				} else {
 					// Rewrite list multiplication to use list.Repeat
 					if !xIsList {
 						x, y = y, x
 					}
 					ast.SetRelPos(x, token.NoSpace)
-					c.Replace(&ast.CallExpr{
-						Fun:  ast.NewSel(pkg, "Repeat"),
-						Args: []ast.Expr{x, y},
-					})
+					c.Replace(ast.NewCall(
+						ast.NewSel(&ast.Ident{
+							Name: "list",
+							Node: ast.NewImport(nil, "list"),
+						}, "Repeat"), x, y),
+					)
 				}
 			}
 		}
@@ -103,5 +103,15 @@ func File(f *ast.File, o ...Option) *ast.File {
 		f = simplify(f)
 	}
 
+	err := astutil.Sanitize(f)
+	// TODO: this File method is public, and its signature was fixed
+	// before we started calling Sanitize. Ideally, we want to return
+	// this error, but that would require deprecating this File method,
+	// and creating a new one, which might happen in due course if we
+	// also discover that we need to be a bit more flexible than just
+	// accepting a File.
+	if err != nil {
+		panic(err)
+	}
 	return f
 }

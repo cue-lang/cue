@@ -5,7 +5,8 @@
 			"minProperties": 1
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"minProperties\""
+			"v2": "extract error: unsupported constraint \"minProperties\"",
+			"v3": "extract error: unsupported constraint \"minProperties\""
 		},
 		"tests": [
 			{
@@ -16,7 +17,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -26,7 +28,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -34,7 +37,8 @@
 				"data": {},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -42,7 +46,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -50,7 +55,8 @@
 				"data": "",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -58,7 +64,8 @@
 				"data": 12,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]

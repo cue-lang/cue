@@ -6,7 +6,8 @@
 			"unevaluatedItems": true
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedItems\""
+			"v2": "extract error: unsupported constraint \"unevaluatedItems\"",
+			"v3": "extract error: unsupported constraint \"unevaluatedItems\""
 		},
 		"tests": [
 			{
@@ -14,7 +15,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -24,7 +26,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -36,7 +39,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedItems\""
+			"v2": "extract error: unsupported constraint \"unevaluatedItems\"",
+			"v3": "extract error: unsupported constraint \"unevaluatedItems\""
 		},
 		"tests": [
 			{
@@ -44,7 +48,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -54,7 +59,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -68,7 +74,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedItems\""
+			"v2": "extract error: unsupported constraint \"unevaluatedItems\"",
+			"v3": "extract error: unsupported constraint \"unevaluatedItems\""
 		},
 		"tests": [
 			{
@@ -76,7 +83,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -86,7 +94,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -96,7 +105,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -111,7 +121,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedItems\""
+			"v2": "extract error: unsupported constraint \"unevaluatedItems\"",
+			"v3": "extract error: unsupported constraint \"unevaluatedItems\""
 		},
 		"tests": [
 			{
@@ -122,7 +133,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -139,7 +151,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"prefixItems\" (and 1 more errors)"
+			"v2": "extract error: unsupported constraint \"prefixItems\" (and 1 more errors)",
+			"v3": "extract error: unsupported constraint \"prefixItems\" (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -149,7 +162,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -160,7 +174,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -178,7 +193,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"prefixItems\" (and 2 more errors)"
+			"v2": "extract error: unsupported constraint \"prefixItems\" (and 2 more errors)",
+			"v3": "extract error: unsupported constraint \"prefixItems\" (and 2 more errors)"
 		},
 		"tests": [
 			{
@@ -189,7 +205,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -206,7 +223,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedItems\""
+			"v2": "extract error: unsupported constraint \"unevaluatedItems\"",
+			"v3": "extract error: unsupported constraint \"unevaluatedItems\""
 		},
 		"tests": [
 			{
@@ -220,7 +238,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -232,7 +251,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -259,7 +279,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"prefixItems\" (and 2 more errors)"
+			"v2": "extract error: unsupported constraint \"prefixItems\" (and 2 more errors)",
+			"v3": "extract error: unsupported constraint \"prefixItems\" (and 2 more errors)"
 		},
 		"tests": [
 			{
@@ -270,7 +291,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -282,7 +304,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -304,7 +327,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedItems\""
+			"v2": "extract error: unsupported constraint \"unevaluatedItems\"",
+			"v3": "extract error: unsupported constraint \"unevaluatedItems\""
 		},
 		"tests": [
 			{
@@ -315,7 +339,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -326,7 +351,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -337,7 +363,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -359,7 +386,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedItems\" (and 2 more errors)"
+			"v2": "extract error: unsupported constraint \"unevaluatedItems\" (and 2 more errors)",
+			"v3": "extract error: unsupported constraint \"unevaluatedItems\" (and 2 more errors)"
 		},
 		"tests": [
 			{
@@ -369,7 +397,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -381,7 +410,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -405,7 +435,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedItems\" (and 2 more errors)"
+			"v2": "extract error: unsupported constraint \"unevaluatedItems\" (and 2 more errors)",
+			"v3": "extract error: unsupported constraint \"unevaluatedItems\" (and 2 more errors)"
 		},
 		"tests": [
 			{
@@ -415,7 +446,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -427,7 +459,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -463,7 +496,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"prefixItems\" (and 3 more errors)"
+			"v2": "extract error: unsupported constraint \"prefixItems\" (and 3 more errors)",
+			"v3": "extract error: unsupported constraint \"prefixItems\" (and 3 more errors)"
 		},
 		"tests": [
 			{
@@ -474,7 +508,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -486,7 +521,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -498,7 +534,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -511,7 +548,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -546,7 +584,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"prefixItems\" (and 3 more errors)"
+			"v2": "extract error: unsupported constraint \"prefixItems\" (and 3 more errors)",
+			"v3": "extract error: unsupported constraint \"prefixItems\" (and 3 more errors)"
 		},
 		"tests": [
 			{
@@ -557,7 +596,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -569,7 +609,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -596,7 +637,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"prefixItems\" (and 2 more errors)"
+			"v2": "extract error: unsupported constraint \"prefixItems\" (and 2 more errors)",
+			"v3": "extract error: unsupported constraint \"prefixItems\" (and 2 more errors)"
 		},
 		"tests": [
 			{
@@ -607,7 +649,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -651,7 +694,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"prefixItems\" (and 4 more errors)"
+			"v2": "extract error: unsupported constraint \"prefixItems\" (and 4 more errors)",
+			"v3": "extract error: unsupported constraint \"prefixItems\" (and 4 more errors)"
 		},
 		"tests": [
 			{
@@ -663,7 +707,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -676,7 +721,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -689,7 +735,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -703,7 +750,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -718,7 +766,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedItems\""
+			"v2": "extract error: unsupported constraint \"unevaluatedItems\"",
+			"v3": "extract error: unsupported constraint \"unevaluatedItems\""
 		},
 		"tests": [
 			{
@@ -726,7 +775,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -736,7 +786,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -764,7 +815,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"prefixItems\" (and 2 more errors)"
+			"v2": "extract error: unsupported constraint \"prefixItems\" (and 2 more errors)",
+			"v3": "extract error: unsupported constraint \"prefixItems\" (and 2 more errors)"
 		},
 		"tests": [
 			{
@@ -775,7 +827,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -787,7 +840,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -815,7 +869,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedItems\" (and 2 more errors)"
+			"v2": "extract error: unsupported constraint \"unevaluatedItems\" (and 2 more errors)",
+			"v3": "extract error: unsupported constraint \"unevaluatedItems\" (and 2 more errors)"
 		},
 		"tests": [
 			{
@@ -826,7 +881,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -838,7 +894,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -880,7 +937,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"$dynamicAnchor\" (and 5 more errors)"
+			"v2": "extract error: unsupported constraint \"$dynamicAnchor\" (and 5 more errors)",
+			"v3": "extract error: unsupported constraint \"$dynamicAnchor\" (and 5 more errors)"
 		},
 		"tests": [
 			{
@@ -891,7 +949,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -903,7 +962,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -924,7 +984,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"prefixItems\" (and 1 more errors)"
+			"v2": "extract error: unsupported constraint \"prefixItems\" (and 1 more errors)",
+			"v3": "extract error: unsupported constraint \"prefixItems\" (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -934,7 +995,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -969,7 +1031,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"prefixItems\" (and 2 more errors)"
+			"v2": "extract error: unsupported constraint \"prefixItems\" (and 2 more errors)",
+			"v3": "extract error: unsupported constraint \"prefixItems\" (and 2 more errors)"
 		},
 		"tests": [
 			{
@@ -981,7 +1044,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -994,7 +1058,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -1012,7 +1077,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"prefixItems\" (and 1 more errors)"
+			"v2": "extract error: unsupported constraint \"prefixItems\" (and 1 more errors)",
+			"v3": "extract error: unsupported constraint \"prefixItems\" (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -1023,7 +1089,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1034,7 +1101,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1046,7 +1114,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -1072,7 +1141,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedItems\""
+			"v2": "extract error: unsupported constraint \"unevaluatedItems\"",
+			"v3": "extract error: unsupported constraint \"unevaluatedItems\""
 		},
 		"tests": [
 			{
@@ -1086,7 +1156,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1100,7 +1171,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -1131,7 +1203,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"if\" (and 2 more errors)"
+			"v2": "extract error: unsupported constraint \"if\" (and 2 more errors)",
+			"v3": "extract error: unsupported constraint \"if\" (and 2 more errors)"
 		},
 		"tests": [
 			{
@@ -1139,7 +1212,8 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1150,7 +1224,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1164,7 +1239,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1179,7 +1255,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1190,7 +1267,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1201,7 +1279,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1215,7 +1294,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1229,7 +1309,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -1241,7 +1322,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedItems\""
+			"v2": "extract error: unsupported constraint \"unevaluatedItems\"",
+			"v3": "extract error: unsupported constraint \"unevaluatedItems\""
 		},
 		"tests": [
 			{
@@ -1249,7 +1331,8 @@
 				"data": true,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1257,7 +1340,8 @@
 				"data": 123,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1265,7 +1349,8 @@
 				"data": 1.0,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1273,7 +1358,8 @@
 				"data": {},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1281,7 +1367,8 @@
 				"data": "foo",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1289,7 +1376,8 @@
 				"data": null,
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -1303,7 +1391,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unevaluatedItems\""
+			"v2": "extract error: unsupported constraint \"unevaluatedItems\"",
+			"v3": "extract error: unsupported constraint \"unevaluatedItems\""
 		},
 		"tests": [
 			{
@@ -1313,7 +1402,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -1332,7 +1422,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"if\" (and 1 more errors)"
+			"v2": "extract error: unsupported constraint \"if\" (and 1 more errors)",
+			"v3": "extract error: unsupported constraint \"if\" (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -1342,7 +1433,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -1352,7 +1444,8 @@
 				],
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]

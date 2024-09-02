@@ -13,7 +13,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unknown-keyword\""
+			"v2": "extract error: unsupported constraint \"unknown-keyword\"",
+			"v3": "extract error: unsupported constraint \"unknown-keyword\""
 		},
 		"tests": [
 			{
@@ -23,7 +24,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -33,7 +35,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -54,7 +57,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unknown-keyword\""
+			"v2": "extract error: unsupported constraint \"unknown-keyword\"",
+			"v3": "extract error: unsupported constraint \"unknown-keyword\""
 		},
 		"tests": [
 			{
@@ -64,7 +68,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -74,7 +79,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -92,7 +98,8 @@
 			"$ref": "#/examples/0"
 		},
 		"skip": {
-			"v2": "extract error: reference to non-existing value \"examples\""
+			"v2": "extract error: reference to non-existing value \"examples\"",
+			"v3": "extract error: reference to non-existing value \"examples\""
 		},
 		"tests": [
 			{
@@ -100,7 +107,8 @@
 				"data": "a string",
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -108,7 +116,8 @@
 				"data": 42,
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]

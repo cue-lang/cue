@@ -195,7 +195,9 @@
 				"else": true
 			}
 		},
-		"skip": "extract error: unsupported constraint \"if\" (and 1 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"if\" (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "any non-empty array is valid",
@@ -203,13 +205,17 @@
 					"foo"
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "empty array is invalid",
 				"data": [],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},

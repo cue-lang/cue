@@ -114,8 +114,8 @@ func doVendor(commit string) error {
 	// might be inserted in the middle of an array), we try
 	// first to look up the skip info by JSON data, and then
 	// by test description.
-	byJSON := make(map[skipKey]string)
-	byDescription := make(map[skipKey]string)
+	byJSON := make(map[skipKey]externaltest.Skip)
+	byDescription := make(map[skipKey]externaltest.Skip)
 
 	for filename, schemas := range oldTests {
 		for _, schema := range schemas {

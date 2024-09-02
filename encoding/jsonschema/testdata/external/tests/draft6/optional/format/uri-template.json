@@ -4,67 +4,89 @@
 		"schema": {
 			"format": "uri-template"
 		},
-		"skip": "extract error: unsupported constraint \"format\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"format\""
+		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "a valid uri-template",
 				"data": "http://example.com/dictionary/{term:1}/{term}",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "an invalid uri-template",
 				"data": "http://example.com/dictionary/{term:1}/{term",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "a valid uri-template without variables",
 				"data": "http://example.com/dictionary",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "a valid relative uri-template",
 				"data": "dictionary/{term:1}/{term}",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

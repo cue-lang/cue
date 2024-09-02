@@ -32,7 +32,9 @@
 					"bar": false
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "recursive mismatch",
@@ -42,7 +44,9 @@
 					}
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			}
 		]
 	},
@@ -58,7 +62,9 @@
 				}
 			}
 		},
-		"skip": "extract error: cannot compile resulting schema: bar: reference \"foo\" not found:\n    generated.cue:4:10\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: bar: reference \"foo\" not found:\n    generated.cue:4:10\n"
+		},
 		"tests": [
 			{
 				"description": "match",
@@ -66,7 +72,9 @@
 					"bar": 3
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "mismatch",
@@ -74,7 +82,9 @@
 					"bar": true
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -90,7 +100,9 @@
 				}
 			]
 		},
-		"skip": "extract error: referring to field \"items\" not yet supported",
+		"skip": {
+			"v2": "extract error: referring to field \"items\" not yet supported"
+		},
 		"tests": [
 			{
 				"description": "match array",
@@ -99,7 +111,9 @@
 					2
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "mismatch array",
@@ -108,7 +122,9 @@
 					"foo"
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -166,7 +182,9 @@
 					"slash": 123
 				},
 				"valid": true,
-				"skip": "6 errors in empty disjunction:\nconflicting values [...] and {slash:123} (mismatched types list and struct):\n    generated.cue:2:33\n    instance.json:1:1\nconflicting values bool and {slash:123} (mismatched types bool and struct):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and {slash:123} (mismatched types null and struct):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and {slash:123} (mismatched types number and struct):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and {slash:123} (mismatched types string and struct):\n    generated.cue:2:24\n    instance.json:1:1\nslash: undefined field: \"slash~1field\":\n    generated.cue:4:14\n"
+				"skip": {
+					"v2": "6 errors in empty disjunction:\nconflicting values [...] and {slash:123} (mismatched types list and struct):\n    generated.cue:2:33\n    instance.json:1:1\nconflicting values bool and {slash:123} (mismatched types bool and struct):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and {slash:123} (mismatched types null and struct):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and {slash:123} (mismatched types number and struct):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and {slash:123} (mismatched types string and struct):\n    generated.cue:2:24\n    instance.json:1:1\nslash: undefined field: \"slash~1field\":\n    generated.cue:4:14\n"
+				}
 			},
 			{
 				"description": "tilde valid",
@@ -174,7 +192,9 @@
 					"tilde": 123
 				},
 				"valid": true,
-				"skip": "6 errors in empty disjunction:\nconflicting values [...] and {tilde:123} (mismatched types list and struct):\n    generated.cue:2:33\n    instance.json:1:1\nconflicting values bool and {tilde:123} (mismatched types bool and struct):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and {tilde:123} (mismatched types null and struct):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and {tilde:123} (mismatched types number and struct):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and {tilde:123} (mismatched types string and struct):\n    generated.cue:2:24\n    instance.json:1:1\ntilde: undefined field: \"tilde~0field\":\n    generated.cue:3:14\n"
+				"skip": {
+					"v2": "6 errors in empty disjunction:\nconflicting values [...] and {tilde:123} (mismatched types list and struct):\n    generated.cue:2:33\n    instance.json:1:1\nconflicting values bool and {tilde:123} (mismatched types bool and struct):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and {tilde:123} (mismatched types null and struct):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and {tilde:123} (mismatched types number and struct):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and {tilde:123} (mismatched types string and struct):\n    generated.cue:2:24\n    instance.json:1:1\ntilde: undefined field: \"tilde~0field\":\n    generated.cue:3:14\n"
+				}
 			},
 			{
 				"description": "percent valid",
@@ -182,7 +202,9 @@
 					"percent": 123
 				},
 				"valid": true,
-				"skip": "6 errors in empty disjunction:\nconflicting values [...] and {percent:123} (mismatched types list and struct):\n    generated.cue:2:33\n    instance.json:1:1\nconflicting values bool and {percent:123} (mismatched types bool and struct):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and {percent:123} (mismatched types null and struct):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and {percent:123} (mismatched types number and struct):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and {percent:123} (mismatched types string and struct):\n    generated.cue:2:24\n    instance.json:1:1\npercent: undefined field: \"percent%25field\":\n    generated.cue:5:14\n"
+				"skip": {
+					"v2": "6 errors in empty disjunction:\nconflicting values [...] and {percent:123} (mismatched types list and struct):\n    generated.cue:2:33\n    instance.json:1:1\nconflicting values bool and {percent:123} (mismatched types bool and struct):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and {percent:123} (mismatched types null and struct):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and {percent:123} (mismatched types number and struct):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and {percent:123} (mismatched types string and struct):\n    generated.cue:2:24\n    instance.json:1:1\npercent: undefined field: \"percent%25field\":\n    generated.cue:5:14\n"
+				}
 			}
 		]
 	},
@@ -252,7 +274,9 @@
 					]
 				},
 				"valid": true,
-				"skip": "5 errors in empty disjunction:\nconflicting values [...] and {foo:[1,2,3]} (mismatched types list and struct):\n    generated.cue:3:33\n    instance.json:1:1\nconflicting values bool and {foo:[1,2,3]} (mismatched types bool and struct):\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values null and {foo:[1,2,3]} (mismatched types null and struct):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values number and {foo:[1,2,3]} (mismatched types number and struct):\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values string and {foo:[1,2,3]} (mismatched types string and struct):\n    generated.cue:3:24\n    instance.json:1:1\n"
+				"skip": {
+					"v2": "5 errors in empty disjunction:\nconflicting values [...] and {foo:[1,2,3]} (mismatched types list and struct):\n    generated.cue:3:33\n    instance.json:1:1\nconflicting values bool and {foo:[1,2,3]} (mismatched types bool and struct):\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values null and {foo:[1,2,3]} (mismatched types null and struct):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values number and {foo:[1,2,3]} (mismatched types number and struct):\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values string and {foo:[1,2,3]} (mismatched types string and struct):\n    generated.cue:3:24\n    instance.json:1:1\n"
+				}
 			},
 			{
 				"description": "ref invalid",
@@ -286,19 +310,25 @@
 				}
 			]
 		},
-		"skip": "extract error: constraint \"$comment\" is not supported in JSON schema version http://json-schema.org/draft-04/schema# (and 1 more errors)",
+		"skip": {
+			"v2": "extract error: constraint \"$comment\" is not supported in JSON schema version http://json-schema.org/draft-04/schema# (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "$ref resolves to /definitions/base_foo, data does not validate",
 				"data": "a",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "$ref resolves to /definitions/base_foo, data validates",
 				"data": 1,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -307,7 +337,9 @@
 		"schema": {
 			"$ref": "http://json-schema.org/draft-04/schema#"
 		},
-		"skip": "extract error: cannot compile resulting schema: package \"json-schema.org/draft-04/schema\" imported but not defined in :\n    generated.cue:1:8\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: package \"json-schema.org/draft-04/schema\" imported but not defined in :\n    generated.cue:1:8\n"
+		},
 		"tests": [
 			{
 				"description": "remote ref valid",
@@ -315,7 +347,9 @@
 					"minLength": 1
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "remote ref invalid",
@@ -323,7 +357,9 @@
 					"minLength": -1
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -424,7 +460,9 @@
 				}
 			}
 		},
-		"skip": "extract error: cannot compile resulting schema: builtin package \"localhost:1234/node\" undefined:\n    generated.cue:1:8\n_schema.nodes: reference \"node\" not found:\n    generated.cue:8:14\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: builtin package \"localhost:1234/node\" undefined:\n    generated.cue:1:8\n_schema.nodes: reference \"node\" not found:\n    generated.cue:8:14\n"
+		},
 		"tests": [
 			{
 				"description": "valid tree",
@@ -462,7 +500,9 @@
 					]
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "invalid tree",
@@ -500,7 +540,9 @@
 					]
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -525,7 +567,9 @@
 					"foo\"bar": 1
 				},
 				"valid": true,
-				"skip": "6 errors in empty disjunction:\nconflicting values [...] and {\"foo\\\"bar\":1} (mismatched types list and struct):\n    generated.cue:2:33\n    instance.json:1:1\nconflicting values bool and {\"foo\\\"bar\":1} (mismatched types bool and struct):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and {\"foo\\\"bar\":1} (mismatched types null and struct):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and {\"foo\\\"bar\":1} (mismatched types number and struct):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and {\"foo\\\"bar\":1} (mismatched types string and struct):\n    generated.cue:2:24\n    instance.json:1:1\n\"foo\\\"bar\": undefined field: \"foo%22bar\":\n    generated.cue:3:17\n"
+				"skip": {
+					"v2": "6 errors in empty disjunction:\nconflicting values [...] and {\"foo\\\"bar\":1} (mismatched types list and struct):\n    generated.cue:2:33\n    instance.json:1:1\nconflicting values bool and {\"foo\\\"bar\":1} (mismatched types bool and struct):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and {\"foo\\\"bar\":1} (mismatched types null and struct):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and {\"foo\\\"bar\":1} (mismatched types number and struct):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and {\"foo\\\"bar\":1} (mismatched types string and struct):\n    generated.cue:2:24\n    instance.json:1:1\n\"foo\\\"bar\": undefined field: \"foo%22bar\":\n    generated.cue:3:17\n"
+				}
 			},
 			{
 				"description": "object with strings is invalid",
@@ -551,19 +595,25 @@
 				}
 			}
 		},
-		"skip": "extract error: $id URI may not contain a fragment (and 1 more errors)",
+		"skip": {
+			"v2": "extract error: $id URI may not contain a fragment (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "match",
 				"data": 1,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "mismatch",
 				"data": "a",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -588,19 +638,25 @@
 				}
 			}
 		},
-		"skip": "extract error: $id URI may not contain a fragment (and 1 more errors)",
+		"skip": {
+			"v2": "extract error: $id URI may not contain a fragment (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "match",
 				"data": 1,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "mismatch",
 				"data": "a",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -656,19 +712,25 @@
 				}
 			]
 		},
-		"skip": "extract error: unsupported constraint \"not\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"not\""
+		},
 		"tests": [
 			{
 				"description": "number is valid",
 				"data": 1,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "non-number is invalid",
 				"data": "a",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -746,19 +808,25 @@
 				}
 			]
 		},
-		"skip": "extract error: cannot refer to definitions section: must refer to one of its elements",
+		"skip": {
+			"v2": "extract error: cannot refer to definitions section: must refer to one of its elements"
+		},
 		"tests": [
 			{
 				"description": "number is valid",
 				"data": 1,
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "non-number is invalid",
 				"data": "a",
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

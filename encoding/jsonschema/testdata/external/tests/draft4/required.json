@@ -24,7 +24,9 @@
 					"bar": 1
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "ignores arrays",
@@ -90,7 +92,9 @@
 					"foo\"bar": "1"
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			}
 		]
 	},
@@ -119,7 +123,9 @@
 				"description": "none of the properties mentioned",
 				"data": {},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "__proto__ present",
@@ -127,7 +133,9 @@
 					"__proto__": "foo"
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "toString present",
@@ -137,7 +145,9 @@
 					}
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "constructor present",
@@ -147,7 +157,9 @@
 					}
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "all present",

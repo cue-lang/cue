@@ -26,7 +26,9 @@
 				"description": "both oneOf valid",
 				"data": 3,
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "neither oneOf valid",
@@ -63,7 +65,9 @@
 				"description": "both oneOf valid",
 				"data": "foo",
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			}
 		]
 	},
@@ -81,7 +85,9 @@
 				"description": "any value is invalid",
 				"data": "foo",
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			}
 		]
 	},
@@ -116,7 +122,9 @@
 				"description": "any value is invalid",
 				"data": "foo",
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			}
 		]
 	},
@@ -134,7 +142,9 @@
 				"description": "any value is invalid",
 				"data": "foo",
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			}
 		]
 	},
@@ -186,7 +196,9 @@
 					"bar": 2
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "neither oneOf valid (complex)",
@@ -218,7 +230,9 @@
 				"description": "both valid - invalid",
 				"data": 123,
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			}
 		]
 	},
@@ -248,7 +262,9 @@
 					"bar": 2
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "first valid - valid",
@@ -274,7 +290,9 @@
 					"baz": 3
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			}
 		]
 	},
@@ -323,7 +341,9 @@
 					"bar": 8
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "neither oneOf valid",
@@ -331,7 +351,9 @@
 					"baz": "quux"
 				},
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			}
 		]
 	},

@@ -24,25 +24,32 @@ import (
 	"path"
 	"sort"
 
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/jsonschema/internal/externaltest"
 )
 
-var list = flag.Bool("list", false, "list all failed tests")
+var list = flag.String("list", "", "list all failed tests for a given evaluator version")
+
+const testDir = "testdata/external"
 
 func main() {
-	tests, err := externaltest.ReadTestDir("testdata/external")
+	tests, err := externaltest.ReadTestDir(testDir)
 	if err != nil {
 		log.Fatal(err)
 	}
 	flag.Parse()
-	if *list {
-		listFailures(tests)
+	if *list != "" {
+		listFailures(*list, tests)
 	} else {
-		showStats(tests)
+		fmt.Printf("v2:\n")
+		showStats("v2", tests)
+		fmt.Println()
+		fmt.Printf("v3:\n")
+		showStats("v3", tests)
 	}
 }
 
-func showStats(tests map[string][]*externaltest.Schema) {
+func showStats(version string, tests map[string][]*externaltest.Schema) {
 	schemaOK := 0
 	schemaTot := 0
 	testOK := 0
@@ -52,48 +59,57 @@ func showStats(tests map[string][]*externaltest.Schema) {
 	for _, schemas := range tests {
 		for _, schema := range schemas {
 			schemaTot++
-			if schema.Skip == "" {
+			if schema.Skip[version] == "" {
 				schemaOK++
 			}
 			for _, test := range schema.Tests {
 				testTot++
-				if test.Skip == "" {
+				if test.Skip[version] == "" {
 					testOK++
 				}
-				if schema.Skip == "" {
+				if schema.Skip[version] == "" {
 					schemaOKTestTot++
-					if test.Skip == "" {
+					if test.Skip[version] == "" {
 						schemaOKTestOK++
 					}
 				}
 			}
 		}
 	}
-	fmt.Printf("schema extract (pass / total): %d / %d = %.1f%%\n", schemaOK, schemaTot, percent(schemaOK, schemaTot))
-	fmt.Printf("tests (pass / total): %d / %d = %.1f%%\n", testOK, testTot, percent(testOK, testTot))
-	fmt.Printf("tests on extracted schemas (pass / total): %d / %d = %.1f%%\n", schemaOKTestOK, schemaOKTestTot, percent(schemaOKTestOK, schemaOKTestTot))
+	fmt.Printf("\tschema extract (pass / total): %d / %d = %.1f%%\n", schemaOK, schemaTot, percent(schemaOK, schemaTot))
+	fmt.Printf("\ttests (pass / total): %d / %d = %.1f%%\n", testOK, testTot, percent(testOK, testTot))
+	fmt.Printf("\ttests on extracted schemas (pass / total): %d / %d = %.1f%%\n", schemaOKTestOK, schemaOKTestTot, percent(schemaOKTestOK, schemaOKTestTot))
 }
 
-func listFailures(tests map[string][]*externaltest.Schema) {
+func listFailures(version string, tests map[string][]*externaltest.Schema) {
 	for _, filename := range sortedKeys(tests) {
 		schemas := tests[filename]
-		filename = path.Join("testdata/external", filename)
 		for _, schema := range schemas {
-			if schema.Skip != "" {
-				fmt.Printf("%s: schema fail (%s)\n", filename, schema.Description)
+			if schema.Skip[version] != "" {
+				fmt.Printf("%s: schema fail (%s)\n", testdataPos(schema), schema.Description)
 				continue
 			}
 			for _, test := range schema.Tests {
-				if test.Skip != "" {
+				if test.Skip[version] != "" {
 					reason := "fail"
 					if !test.Valid {
 						reason = "unexpected success"
 					}
-					fmt.Printf("%s: %s (%s; %s)\n", filename, reason, schema.Description, test.Description)
+					fmt.Printf("%s: %s (%s; %s)\n", testdataPos(test), reason, schema.Description, test.Description)
 				}
 			}
 		}
 	}
+}
+
+type positioner interface {
+	Pos() token.Pos
+}
+
+func testdataPos(p positioner) token.Position {
+	pp := p.Pos().Position()
+	pp.Filename = path.Join(testDir, pp.Filename)
+	return pp
 }
 
 func percent(a, b int) float64 {

@@ -12,7 +12,9 @@
 				}
 			}
 		},
-		"skip": "extract error: unsupported constraint \"unknown-keyword\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"unknown-keyword\""
+		},
 		"tests": [
 			{
 				"description": "match",
@@ -20,7 +22,9 @@
 					"bar": 3
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "mismatch",
@@ -28,7 +32,9 @@
 					"bar": true
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -47,7 +53,9 @@
 				}
 			}
 		},
-		"skip": "extract error: unsupported constraint \"unknown-keyword\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"unknown-keyword\""
+		},
 		"tests": [
 			{
 				"description": "match",
@@ -55,7 +63,9 @@
 					"bar": 3
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "mismatch",
@@ -63,7 +73,9 @@
 					"bar": true
 				},
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -79,19 +91,25 @@
 			],
 			"$ref": "#/examples/0"
 		},
-		"skip": "extract error: reference to non-existing value \"examples\"",
+		"skip": {
+			"v2": "extract error: reference to non-existing value \"examples\""
+		},
 		"tests": [
 			{
 				"description": "match",
 				"data": "a string",
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "mismatch",
 				"data": 42,
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

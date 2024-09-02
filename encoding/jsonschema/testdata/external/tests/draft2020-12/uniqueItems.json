@@ -39,7 +39,9 @@
 					1
 				],
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "false is not equal to zero",
@@ -112,7 +114,9 @@
 					}
 				],
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "unique array of nested objects is valid",
@@ -324,7 +328,9 @@
 					}
 				],
 				"valid": false,
-				"skip": "unexpected success"
+				"skip": {
+					"v2": "unexpected success"
+				}
 			},
 			{
 				"description": "{\"a\": false} and {\"a\": 0} are unique",
@@ -366,7 +372,9 @@
 			],
 			"uniqueItems": true
 		},
-		"skip": "extract error: unsupported constraint \"prefixItems\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"prefixItems\""
+		},
 		"tests": [
 			{
 				"description": "[false, true] from items array is valid",
@@ -375,7 +383,9 @@
 					true
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "[true, false] from items array is valid",
@@ -384,7 +394,9 @@
 					false
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "[false, false] from items array is not valid",
@@ -393,7 +405,9 @@
 					false
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "[true, true] from items array is not valid",
@@ -402,7 +416,9 @@
 					true
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "unique array extended from [false, true] is valid",
@@ -413,7 +429,9 @@
 					"bar"
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "unique array extended from [true, false] is valid",
@@ -424,7 +442,9 @@
 					"bar"
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "non-unique array extended from [false, true] is not valid",
@@ -435,7 +455,9 @@
 					"foo"
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "non-unique array extended from [true, false] is not valid",
@@ -446,7 +468,9 @@
 					"foo"
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -465,7 +489,9 @@
 			"uniqueItems": true,
 			"items": false
 		},
-		"skip": "extract error: unsupported constraint \"prefixItems\" (and 1 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"prefixItems\" (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "[false, true] from items array is valid",
@@ -474,7 +500,9 @@
 					true
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "[true, false] from items array is valid",
@@ -483,7 +511,9 @@
 					false
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "[false, false] from items array is not valid",
@@ -492,7 +522,9 @@
 					false
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "[true, true] from items array is not valid",
@@ -501,7 +533,9 @@
 					true
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "extra items are invalid even if unique",
@@ -511,7 +545,9 @@
 					null
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -710,7 +746,9 @@
 			],
 			"uniqueItems": false
 		},
-		"skip": "extract error: unsupported constraint \"prefixItems\"",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"prefixItems\""
+		},
 		"tests": [
 			{
 				"description": "[false, true] from items array is valid",
@@ -719,7 +757,9 @@
 					true
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "[true, false] from items array is valid",
@@ -728,7 +768,9 @@
 					false
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "[false, false] from items array is valid",
@@ -737,7 +779,9 @@
 					false
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "[true, true] from items array is valid",
@@ -746,7 +790,9 @@
 					true
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "unique array extended from [false, true] is valid",
@@ -757,7 +803,9 @@
 					"bar"
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "unique array extended from [true, false] is valid",
@@ -768,7 +816,9 @@
 					"bar"
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "non-unique array extended from [false, true] is valid",
@@ -779,7 +829,9 @@
 					"foo"
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "non-unique array extended from [true, false] is valid",
@@ -790,7 +842,9 @@
 					"foo"
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -809,7 +863,9 @@
 			"uniqueItems": false,
 			"items": false
 		},
-		"skip": "extract error: unsupported constraint \"prefixItems\" (and 1 more errors)",
+		"skip": {
+			"v2": "extract error: unsupported constraint \"prefixItems\" (and 1 more errors)"
+		},
 		"tests": [
 			{
 				"description": "[false, true] from items array is valid",
@@ -818,7 +874,9 @@
 					true
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "[true, false] from items array is valid",
@@ -827,7 +885,9 @@
 					false
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "[false, false] from items array is valid",
@@ -836,7 +896,9 @@
 					false
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "[true, true] from items array is valid",
@@ -845,7 +907,9 @@
 					true
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "extra items are invalid even if unique",
@@ -855,7 +919,9 @@
 					null
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

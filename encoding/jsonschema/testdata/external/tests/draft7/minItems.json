@@ -37,7 +37,9 @@
 		"schema": {
 			"minItems": 1.0
 		},
-		"skip": "extract error: invalid uint",
+		"skip": {
+			"v2": "extract error: invalid uint"
+		},
 		"tests": [
 			{
 				"description": "longer is valid",
@@ -46,13 +48,17 @@
 					2
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "too short is invalid",
 				"data": [],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

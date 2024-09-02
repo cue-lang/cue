@@ -6,7 +6,9 @@
 			"type": "array",
 			"$ref": "http://localhost:1234/draft2020-12/prefixItems.json"
 		},
-		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/prefixItems.json:prefixItems\":\n    generated.cue:1:8\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft2020-12/prefixItems.json:prefixItems\":\n    generated.cue:1:8\n"
+		},
 		"tests": [
 			{
 				"description": "first item not a string is invalid",
@@ -17,7 +19,9 @@
 					3
 				],
 				"valid": false,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			},
 			{
 				"description": "first item is a string is valid",
@@ -28,7 +32,9 @@
 					3
 				],
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	},
@@ -47,7 +53,9 @@
 				}
 			]
 		},
-		"skip": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft7/ignore-dependentRequired.json:schema\":\n    generated.cue:1:8\n",
+		"skip": {
+			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/draft7/ignore-dependentRequired.json:schema\":\n    generated.cue:1:8\n"
+		},
 		"tests": [
 			{
 				"description": "missing bar is valid",
@@ -56,7 +64,9 @@
 					"foo": "any value"
 				},
 				"valid": true,
-				"skip": "could not compile schema"
+				"skip": {
+					"v2": "could not compile schema"
+				}
 			}
 		]
 	}

@@ -14,13 +14,15 @@
 
 package exec
 
-// Run executes the given shell command.
+// Run executes a program with the given arguments.
 Run: {
 	$id: *"tool/exec.Run" | "exec" // exec for backwards compatibility
 
-	// cmd is the command to run.
+	// cmd is a non-empty list holding the program name to run
+	// and the arguments to be passed to it.
+	//
 	// Simple commands can use a string, which is split by white space characters.
-	// If any arguments include white space, use the list form.
+	// If any arguments include white space, or for clarity, use the list form.
 	cmd: string | [string, ...string]
 
 	// dir specifies the working directory of the command.

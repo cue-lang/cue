@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc135221_bfcbfcee",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-09-02T08:14:26Z",
+      "side": 1,
+      "message": "\"package instance\". So presumably there\u0027s no attempt to make this work across multiple packages? And if the input is a directory and there are multiple packages in the directory this will fail? I think it would be nice in the Usage text to be clear on these intentional limitations because it\u0027s not clear to me from the code (though I\u0027m 99% sure this is just me not being familiar enough with the APIs).",
+      "revId": "a02c1dc97d86209cc82dfcb84caa2367232b4b0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "e3e4eaa9_3cf226ac",

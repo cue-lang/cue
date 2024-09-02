@@ -624,7 +624,25 @@ import "strings"
 
 	#path: #globs
 
-	#ref: null | {
+	#ref: matchN(1, [matchN(3, [matchN(0, [null | bool | number | string | [...] | {
+		branches!:          _
+		"branches-ignore"!: _
+		...
+	}]) & {
+		...
+	}, matchN(0, [null | bool | number | string | [...] | {
+		tags!:          _
+		"tags-ignore"!: _
+		...
+	}]) & {
+		...
+	}, matchN(0, [null | bool | number | string | [...] | {
+		paths!:          _
+		"paths-ignore"!: _
+		...
+	}]) & {
+		...
+	}]), null]) & (null | {
 		branches?:          #branch
 		"branches-ignore"?: #branch
 		tags?:              #branch
@@ -632,7 +650,7 @@ import "strings"
 		paths?:             #path
 		"paths-ignore"?:    #path
 		...
-	}
+	})
 
 	#shell: matchN(>=1, [string, "bash" | "pwsh" | "python" | "sh" | "cmd" | "powershell"])
 

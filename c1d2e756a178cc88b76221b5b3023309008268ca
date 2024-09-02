@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abb7c1c0_5a56633a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-02T10:36:44Z",
+      "side": 1,
+      "message": "Should we deprecate astutil\u0027s cursor Import method in favor of Sanitize for this reason?",
+      "revId": "c1d2e756a178cc88b76221b5b3023309008268ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

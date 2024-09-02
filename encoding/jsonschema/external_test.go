@@ -40,6 +40,7 @@ import (
 // The commit below references the JSON schema test main branch as of Sun May 19 19:01:03 2024 +0300
 
 //go:generate go run vendor_external.go -- 9fc880bfb6d8ccd093bc82431f17d13681ffae8e
+//go:generate go run teststats.go -o external_teststats.txt
 
 const testDir = "testdata/external"
 

@@ -2,24 +2,24 @@ exec cue import -o - --recursive ./import/data.json
 cmp stdout expect-stdout
 -- expect-stdout --
 import (
-	json656e63 "encoding/json"
-	yaml656e63 "encoding/yaml"
+	"encoding/json"
+	"encoding/yaml"
 )
 
 foo: {
 	name:  "something"
-	json1: json656e63.Marshal(_cue_json1)
+	json1: json.Marshal(_cue_json1)
 	let _cue_json1 = [1, 2]
-	json2: json656e63.Marshal(_cue_json2)
+	json2: json.Marshal(_cue_json2)
 	let _cue_json2 = {
 		key: "value"
 	}
-	yaml1: yaml656e63.Marshal(_cue_yaml1)
+	yaml1: yaml.Marshal(_cue_yaml1)
 	let _cue_yaml1 = {
 		a: "b"
 		c: "d"
 	}
-	yaml2: yaml656e63.Marshal(_cue_yaml2)
+	yaml2: yaml.Marshal(_cue_yaml2)
 	let _cue_yaml2 = [
 		"one",
 		"two",

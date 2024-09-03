@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cfb50f22_532a152a",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-03T11:42:00Z",
+      "side": 1,
+      "message": "here you probably want to enforce that e.g. `deprecated:whatever` is not allowed by ensuring strings.Cut returned false.",
+      "revId": "a7acd1e7508cbcc0f901aed658b1052b4fcd202b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b519576_96f258b1",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-03T11:42:00Z",
+      "side": 1,
+      "message": "nice wording :)",
+      "revId": "a7acd1e7508cbcc0f901aed658b1052b4fcd202b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd57f91f_e1cbe74c",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-03T11:42:00Z",
+      "side": 1,
+      "message": "nit: this is slightly misleading, as you can set it to the default value. how about \"cannot change deprecated flag\"?",
+      "range": {
+        "startLine": 99,
+        "startChar": 43,
+        "endLine": 99,
+        "endChar": 46
+      },
+      "revId": "a7acd1e7508cbcc0f901aed658b1052b4fcd202b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -30,13 +30,21 @@ const (
 	VersionDraft7       // http://json-schema.org/draft-07/schema#
 	VersionDraft2019_09 // https://json-schema.org/draft/2019-09/schema
 	VersionDraft2020_12 // https://json-schema.org/draft/2020-12/schema
+	VersionOpenAPI3_0   // OpenAPI 3.0
 
 	numVersions // unknown
 )
 
+var (
+	openAPI3_0    = vset(VersionOpenAPI3_0)
+	notOpenAPI3_0 = allVersions &^ vset(VersionOpenAPI3_0)
+)
+
 type versionSet int
 
-const allVersions = versionSet(1<<numVersions-1) &^ (1 << VersionUnknown)
+// allVersions includes all regular versions of JSON Schema.
+// It does not include OpenAPI v3.0
+const allVersions = versionSet(1<<numVersions-1) &^ (1 << VersionUnknown) &^ (1 << VersionOpenAPI3_0)
 
 // contains reports whether m contains the version v.
 func (m versionSet) contains(v Version) bool {
@@ -70,7 +78,9 @@ func ParseVersion(sv string) (Version, error) {
 	// If this linear search is ever a performance issue, we could
 	// build a map, but it doesn't seem worthwhile for now.
 	for i := Version(1); i < numVersions; i++ {
-		if sv == i.String() {
+		// Note: OpenAPI doesn't have a schema URI in the
+		// same way as the other schema versions.
+		if i != VersionOpenAPI3_0 && sv == i.String() {
 			return i, nil
 		}
 	}

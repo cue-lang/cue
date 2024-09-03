@@ -16,6 +16,24 @@
       "message": "nit: My understanding is that Go applies the user\u0027s umask all the time. As such, I tend to believe we should always be using 0666 and 0777, and leave it up to the user. Doing 0644 does not guarantee the result will be 0644. I run a umask of 0077 for example, so for me, this code would create a file with 0600.\nThat said, it\u0027s quite possible this logic is unsafe on windows - I\u0027ve not checked.",
       "revId": "dccd72c04e655922b00e137dd839e4dd8e5b3219",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a976432_b2e4d4c3",
+        "filename": "cmd/cue/cmd/fix.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-09-03T09:12:26Z",
+      "side": 1,
+      "message": "Drive-by comment: matches my understanding too FWIW.",
+      "parentUuid": "e22f678d_abe2cb5a",
+      "revId": "dccd72c04e655922b00e137dd839e4dd8e5b3219",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

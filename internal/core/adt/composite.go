@@ -328,8 +328,12 @@ func (v *Vertex) updateArcType(t ArcType) {
 	if (s != nil || v.isFinal()) && s.ctx.isDevVersion() {
 		c := s.ctx
 		if s.scheduler.frozen.meets(arcTypeKnown) {
+			p := token.NoPos
+			if src := c.Source(); src != nil {
+				p = src.Pos()
+			}
 			parent := v.Parent
-			parent.reportFieldCycleError(c, c.Source().Pos(), v.Label)
+			parent.reportFieldCycleError(c, p, v.Label)
 			return
 		}
 	}

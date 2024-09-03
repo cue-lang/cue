@@ -16,16 +16,24 @@ okIncompleteChild: {
 	b: {}
 	x: and([{a: b.c}, {b: 1}])
 }
+-- issue3412.cue --
+andInPattern: {
+	out: {
+		[and(#constraints)]: _
+		someKey: {}
+	}
+	#constraints: [=~"^.*$"]
+}
 -- out/eval/stats --
 Leaks:  2
-Freed:  12
-Reused: 8
-Allocs: 6
-Retain: 2
+Freed:  18
+Reused: 12
+Allocs: 8
+Retain: 3
 
-Unifications: 14
-Conjuncts:    17
-Disjuncts:    14
+Unifications: 20
+Conjuncts:    27
+Disjuncts:    21
 -- out/evalalpha --
 Errors:
 fatalArg.x: invalid operands "eee" and 'eee' to '+' (type string and bytes):
@@ -63,6 +71,15 @@ Result:
         //     ./in.cue:16:16
       }
       b: (int){ 1 }
+    }
+  }
+  andInPattern: (struct){
+    out: (struct){
+      someKey: (struct){
+      }
+    }
+    #constraints: (#list){
+      0: (string){ =~"^.*$" }
     }
   }
 }
@@ -137,6 +154,15 @@ Result:
       b: (int){ 1 }
     }
   }
+  andInPattern: (struct){
+    out: (struct){
+      someKey: (struct){
+      }
+    }
+    #constraints: (#list){
+      0: (string){ =~"^.*$" }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -162,5 +188,17 @@ Result:
         b: 1
       },
     ])
+  }
+}
+--- issue3412.cue
+{
+  andInPattern: {
+    out: {
+      [and(〈1;#constraints〉)]: _
+      someKey: {}
+    }
+    #constraints: [
+      =~"^.*$",
+    ]
   }
 }

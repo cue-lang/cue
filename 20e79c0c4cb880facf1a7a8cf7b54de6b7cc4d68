@@ -34,6 +34,24 @@
       "parentUuid": "3974f62e_42f0b71e",
       "revId": "20e79c0c4cb880facf1a7a8cf7b54de6b7cc4d68",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0321b00a_09a8ab14",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-09-03T11:06:40Z",
+      "side": 1,
+      "message": "Erm, well, the discussion on Discord on this point arrived at:\n\n\u003e In this case I lean towards just dropping it. But I can\u0027t say there is any particular science behind that answer. Just a hunch.\n\nIt seems that no one felt strongly it _should_ be guarded by language version?",
+      "parentUuid": "764a1159_a55724f7",
+      "revId": "20e79c0c4cb880facf1a7a8cf7b54de6b7cc4d68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

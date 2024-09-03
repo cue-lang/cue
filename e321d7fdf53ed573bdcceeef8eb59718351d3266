@@ -16,6 +16,24 @@
       "message": "Cool, only one thought: there are a couple of places only where the optional `o` is being used - as in 0o666. According to https://go.dev/ref/spec#Integer_literals that `o` is optional, and the vast majority of cases it\u0027s not used, so as you\u0027re here, it might be worth removing it so they\u0027re all the same.",
       "revId": "e321d7fdf53ed573bdcceeef8eb59718351d3266",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a332145_061c99a7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-03T12:03:58Z",
+      "side": 1,
+      "message": "The `0o` form was added later on in Go for consistency and readability - we now have `0b` and `0x`, so `0o` is nicer than `0`. So I would suggest the opposite - that we transition to `0o`. I didn\u0027t do this here to avoid the noise, but gofumpt does it :)",
+      "parentUuid": "2f7fff84_5aed54d3",
+      "revId": "e321d7fdf53ed573bdcceeef8eb59718351d3266",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

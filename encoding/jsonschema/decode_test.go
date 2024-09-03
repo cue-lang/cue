@@ -58,7 +58,9 @@ import (
 // The #noverify tag in the txtar header causes verification and
 // instance tests to be skipped.
 //
-// The #openapi tag in the txtar header enables OpenAPI extraction mode.
+// The #version: <version> tag selects the default schema version URI to use.
+// As a special case, when this is "openapi", OpenAPI extraction
+// mode is enabled.
 func TestDecode(t *testing.T) {
 	test := cuetxtar.TxTarTest{
 		Root:   "./testdata/txtar",
@@ -72,17 +74,20 @@ func TestDecode(t *testing.T) {
 			t.Skip("skipping because test is broken under the v2 evaluator")
 		}
 
-		if t.HasTag("openapi") {
-			cfg.Root = "#/components/schemas/"
-			cfg.Map = func(p token.Pos, a []string) ([]ast.Label, error) {
-				// Just for testing: does not validate the path.
-				return []ast.Label{ast.NewIdent("#" + a[len(a)-1])}, nil
-			}
-		}
 		if versStr, ok := t.Value("version"); ok {
-			vers, err := jsonschema.ParseVersion(versStr)
-			qt.Assert(t, qt.IsNil(err))
-			cfg.DefaultVersion = vers
+			if versStr == "openapi" {
+				// OpenAPI doesn't have a JSON Schema URI so it gets a special case.
+				cfg.DefaultVersion = jsonschema.VersionOpenAPI
+				cfg.Root = "#/components/schemas/"
+				cfg.Map = func(p token.Pos, a []string) ([]ast.Label, error) {
+					// Just for testing: does not validate the path.
+					return []ast.Label{ast.NewIdent("#" + a[len(a)-1])}, nil
+				}
+			} else {
+				vers, err := jsonschema.ParseVersion(versStr)
+				qt.Assert(t, qt.IsNil(err))
+				cfg.DefaultVersion = vers
+			}
 		}
 		cfg.Strict = t.HasTag("strict")
 

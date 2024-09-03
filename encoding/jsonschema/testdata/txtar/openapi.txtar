@@ -1,4 +1,4 @@
-#openapi
+#version: openapi
 
 -- schema.yaml --
 components:

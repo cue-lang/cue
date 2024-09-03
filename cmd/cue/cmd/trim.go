@@ -181,7 +181,7 @@ func runTrim(cmd *Command, args []string) error {
 				filename = dst
 			}
 
-			err = os.WriteFile(filename, b, 0644)
+			err = os.WriteFile(filename, b, 0666)
 			if err != nil {
 				return err
 			}

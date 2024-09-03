@@ -259,7 +259,7 @@ func (e *extractor) extractTest(x *ast.CompositeLit) {
 
 	e.a.Comment = e.header.Bytes()
 
-	_ = os.Mkdir(e.dir, 0755)
+	_ = os.Mkdir(e.dir, 0777)
 
 	name := fmt.Sprintf("%03d", e.count)
 	if e.name != "" {
@@ -268,7 +268,7 @@ func (e *extractor) extractTest(x *ast.CompositeLit) {
 	name = strings.ReplaceAll(name, " ", "_")
 	name = strings.ReplaceAll(name, ":", "_")
 	filename := filepath.Join(e.dir, name+".txtar")
-	err := os.WriteFile(filename, txtar.Format(e.a), 0644)
+	err := os.WriteFile(filename, txtar.Format(e.a), 0666)
 	if err != nil {
 		e.fatalf("Could not write file: %v", err)
 	}

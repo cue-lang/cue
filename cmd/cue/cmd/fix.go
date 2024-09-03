@@ -104,7 +104,7 @@ func runFixAll(cmd *Command, args []string) error {
 					return err
 				}
 			} else {
-				if err := os.WriteFile(f.Filename, b, 0644); err != nil {
+				if err := os.WriteFile(f.Filename, b, 0666); err != nil {
 					errs = errors.Append(errs, errors.Promote(err, "write"))
 				}
 			}

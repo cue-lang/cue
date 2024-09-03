@@ -971,7 +971,7 @@ func TestFiles(t *testing.T) {
 			}
 			got := cueStr(expr)
 			if cuetest.UpdateGoldenFiles {
-				os.WriteFile(filename, []byte(got), 0644)
+				os.WriteFile(filename, []byte(got), 0666)
 				return
 			}
 			b, err := os.ReadFile(filename)

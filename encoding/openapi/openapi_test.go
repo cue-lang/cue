@@ -251,7 +251,7 @@ func TestParseDefinitions(t *testing.T) {
 
 				wantFile := filepath.Join("testdata", tc.out)
 				if cuetest.UpdateGoldenFiles {
-					_ = os.WriteFile(wantFile, out.Bytes(), 0644)
+					_ = os.WriteFile(wantFile, out.Bytes(), 0666)
 					return
 				}
 

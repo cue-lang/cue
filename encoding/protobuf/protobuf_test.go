@@ -57,7 +57,7 @@ func TestExtractDefinitions(t *testing.T) {
 
 			wantFile := filepath.Join("testdata", filepath.Base(file)+".out.cue")
 			if cuetest.UpdateGoldenFiles {
-				_ = os.WriteFile(wantFile, out.Bytes(), 0644)
+				_ = os.WriteFile(wantFile, out.Bytes(), 0666)
 				return
 			}
 
@@ -102,8 +102,8 @@ func TestBuild(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			_ = os.MkdirAll(filepath.Dir(f.Filename), 0755)
-			err = os.WriteFile(f.Filename, b, 0644)
+			_ = os.MkdirAll(filepath.Dir(f.Filename), 0777)
+			err = os.WriteFile(f.Filename, b, 0666)
 			if err != nil {
 				t.Fatal(err)
 			}

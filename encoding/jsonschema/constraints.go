@@ -58,101 +58,100 @@ func init() {
 
 const numPhases = 5
 
+// Note: OpenAPI is excluded from version sets by default, as it does not fit in
+// the linear progression of the rest of the JSON Schema versions.
+
 var constraints = []*constraint{
-	todo("$anchor", vfrom(VersionDraft2019_09)),
-	p2d("$comment", constraintComment, vfrom(VersionDraft7)),
-	p2("$defs", constraintAddDefinitions),
-	todo("$dynamicAnchor", vfrom(VersionDraft2020_12)),
-	todo("$dynamicRef", vfrom(VersionDraft2020_12)),
-	p1d("$id", constraintID, vfrom(VersionDraft6)),
-	todo("$recursiveAnchor", vbetween(VersionDraft2019_09, VersionDraft2020_12)),
-	todo("$recursiveRef", vbetween(VersionDraft2019_09, VersionDraft2020_12)),
-	p2("$ref", constraintRef),
-	p0("$schema", constraintSchema),
-	todo("$vocabulary", vfrom(VersionDraft2019_09)),
-	p2d("additionalItems", constraintAdditionalItems, vto(VersionDraft2019_09)),
-	p4("additionalProperties", constraintAdditionalProperties),
-	p3("allOf", constraintAllOf),
-	p3("anyOf", constraintAnyOf),
-	p2d("const", constraintConst, vfrom(VersionDraft6)),
-	p2d("contains", constraintContains, vfrom(VersionDraft6)),
-	p2d("contentEncoding", constraintContentEncoding, vfrom(VersionDraft7)),
-	p2d("contentMediaType", constraintContentMediaType, vfrom(VersionDraft7)),
-	todo("contentSchema", vfrom(VersionDraft2019_09)),
-	p2("default", constraintDefault),
-	p2("definitions", constraintAddDefinitions),
-	p2("dependencies", constraintDependencies),
-	todo("dependentRequired", vfrom(VersionDraft2019_09)),
-	todo("dependentSchemas", vfrom(VersionDraft2019_09)),
-	p2("deprecated", constraintDeprecated),
-	p2("description", constraintDescription),
-	todo("else", vfrom(VersionDraft7)),
-	p2("enum", constraintEnum),
-	p2d("examples", constraintExamples, vfrom(VersionDraft6)),
-	p2("exclusiveMaximum", constraintExclusiveMaximum),
-	p2("exclusiveMinimum", constraintExclusiveMinimum),
-	todo("format", allVersions),
-	p1d("id", constraintID, vto(VersionDraft4)),
-	todo("if", vfrom(VersionDraft7)),
-	p2("items", constraintItems),
-	p1d("maxContains", constraintMaxContains, vfrom(VersionDraft2019_09)),
-	p2("maxItems", constraintMaxItems),
-	p2("maxLength", constraintMaxLength),
-	p2("maxProperties", constraintMaxProperties),
-	p3("maximum", constraintMaximum),
-	p1d("minContains", constraintMinContains, vfrom(VersionDraft2019_09)),
-	p2("minItems", constraintMinItems),
-	p2("minLength", constraintMinLength),
-	todo("minProperties", allVersions),
-	p3("minimum", constraintMinimum),
-	p2("multipleOf", constraintMultipleOf),
-	p3("not", constraintNot),
-	p2("nullable", constraintNullable),
-	p3("oneOf", constraintOneOf),
-	p2("pattern", constraintPattern),
-	p3("patternProperties", constraintPatternProperties),
-	todo("prefixItems", vfrom(VersionDraft2020_12)),
-	p2("properties", constraintProperties),
-	p2d("propertyNames", constraintPropertyNames, vfrom(VersionDraft6)),
-	todo("readOnly", vfrom(VersionDraft7)),
-	p3("required", constraintRequired),
-	todo("then", vfrom(VersionDraft7)),
-	p2("title", constraintTitle),
-	p2("type", constraintType),
-	todo("unevaluatedItems", vfrom(VersionDraft2019_09)),
-	todo("unevaluatedProperties", vfrom(VersionDraft2019_09)),
-	p2("uniqueItems", constraintUniqueItems),
-	todo("writeOnly", vfrom(VersionDraft7)),
+	pTODO("$anchor", vfrom(VersionDraft2019_09)),
+	p2("$comment", constraintComment, vfrom(VersionDraft7)),
+	p2("$defs", constraintAddDefinitions, allVersions),
+	pTODO("$dynamicAnchor", vfrom(VersionDraft2020_12)),
+	pTODO("$dynamicRef", vfrom(VersionDraft2020_12)),
+	p1("$id", constraintID, vfrom(VersionDraft6)),
+	pTODO("$recursiveAnchor", vbetween(VersionDraft2019_09, VersionDraft2020_12)),
+	pTODO("$recursiveRef", vbetween(VersionDraft2019_09, VersionDraft2020_12)),
+	p2("$ref", constraintRef, allVersions|openAPI),
+	p0("$schema", constraintSchema, allVersions),
+	pTODO("$vocabulary", vfrom(VersionDraft2019_09)),
+	p2("additionalItems", constraintAdditionalItems, vto(VersionDraft2019_09)),
+	p4("additionalProperties", constraintAdditionalProperties, allVersions|openAPI),
+	p3("allOf", constraintAllOf, allVersions|openAPI),
+	p3("anyOf", constraintAnyOf, allVersions|openAPI),
+	p2("const", constraintConst, vfrom(VersionDraft6)),
+	p2("contains", constraintContains, vfrom(VersionDraft6)),
+	p2("contentEncoding", constraintContentEncoding, vfrom(VersionDraft7)),
+	p2("contentMediaType", constraintContentMediaType, vfrom(VersionDraft7)),
+	pTODO("contentSchema", vfrom(VersionDraft2019_09)),
+	p2("default", constraintDefault, allVersions|openAPI),
+	p2("definitions", constraintAddDefinitions, allVersions),
+	p2("dependencies", constraintDependencies, allVersions),
+	pTODO("dependentRequired", vfrom(VersionDraft2019_09)),
+	pTODO("dependentSchemas", vfrom(VersionDraft2019_09)),
+	p2("deprecated", constraintDeprecated, vfrom(VersionDraft2019_09)|openAPI),
+	p2("description", constraintDescription, allVersions|openAPI),
+	pTODO("discriminator", vset(VersionOpenAPI)),
+	pTODO("else", vfrom(VersionDraft7)),
+	p2("enum", constraintEnum, allVersions|openAPI),
+	pTODO("example", vset(VersionOpenAPI)),
+	p2("examples", constraintExamples, vfrom(VersionDraft6)),
+	p2("exclusiveMaximum", constraintExclusiveMaximum, allVersions|openAPI),
+	p2("exclusiveMinimum", constraintExclusiveMinimum, allVersions|openAPI),
+	pTODO("externalDocs", vset(VersionOpenAPI)),
+	pTODO("format", allVersions|openAPI),
+	p1("id", constraintID, vto(VersionDraft4)&^openAPI),
+	pTODO("if", vfrom(VersionDraft7)),
+	p2("items", constraintItems, allVersions|openAPI),
+	p1("maxContains", constraintMaxContains, vfrom(VersionDraft2019_09)),
+	p2("maxItems", constraintMaxItems, allVersions|openAPI),
+	p2("maxLength", constraintMaxLength, allVersions|openAPI),
+	p2("maxProperties", constraintMaxProperties, allVersions|openAPI),
+	p3("maximum", constraintMaximum, allVersions|openAPI),
+	p1("minContains", constraintMinContains, vfrom(VersionDraft2019_09)),
+	p2("minItems", constraintMinItems, allVersions|openAPI),
+	p2("minLength", constraintMinLength, allVersions|openAPI),
+	pTODO("minProperties", allVersions|openAPI),
+	p3("minimum", constraintMinimum, allVersions|openAPI),
+	p2("multipleOf", constraintMultipleOf, allVersions|openAPI),
+	p3("not", constraintNot, allVersions|openAPI),
+	p2("nullable", constraintNullable, vset(VersionOpenAPI)),
+	p3("oneOf", constraintOneOf, allVersions|openAPI),
+	p2("pattern", constraintPattern, allVersions|openAPI),
+	p3("patternProperties", constraintPatternProperties, allVersions),
+	pTODO("prefixItems", vfrom(VersionDraft2020_12)),
+	p2("properties", constraintProperties, allVersions|openAPI),
+	p2("propertyNames", constraintPropertyNames, vfrom(VersionDraft6)),
+	pTODO("readOnly", vfrom(VersionDraft7)|openAPI),
+	p3("required", constraintRequired, allVersions|openAPI),
+	pTODO("then", vfrom(VersionDraft7)),
+	p2("title", constraintTitle, allVersions|openAPI),
+	p2("type", constraintType, allVersions|openAPI),
+	pTODO("unevaluatedItems", vfrom(VersionDraft2019_09)),
+	pTODO("unevaluatedProperties", vfrom(VersionDraft2019_09)),
+	p2("uniqueItems", constraintUniqueItems, allVersions|openAPI),
+	pTODO("writeOnly", vfrom(VersionDraft7)|openAPI),
+	pTODO("xml", vset(VersionOpenAPI)),
 }
 
-func todo(name string, versions versionSet) *constraint {
+func pTODO(name string, versions versionSet) *constraint {
 	return &constraint{key: name, phase: 1, versions: versions, fn: constraintTODO}
 }
 
-func p0(name string, f constraintFunc) *constraint {
-	return &constraint{key: name, phase: 0, versions: allVersions, fn: f}
+func p0(name string, f constraintFunc, versions versionSet) *constraint {
+	return &constraint{key: name, phase: 0, versions: versions, fn: f}
 }
 
-func p1(name string, f constraintFunc) *constraint {
-	return &constraint{key: name, phase: 1, versions: allVersions, fn: f}
-}
-
-func p2(name string, f constraintFunc) *constraint {
-	return &constraint{key: name, phase: 2, versions: allVersions, fn: f}
-}
-
-func p3(name string, f constraintFunc) *constraint {
-	return &constraint{key: name, phase: 3, versions: allVersions, fn: f}
-}
-
-func p4(name string, f constraintFunc) *constraint {
-	return &constraint{key: name, phase: 4, versions: allVersions, fn: f}
-}
-
-func p1d(name string, f constraintFunc, versions versionSet) *constraint {
+func p1(name string, f constraintFunc, versions versionSet) *constraint {
 	return &constraint{key: name, phase: 1, versions: versions, fn: f}
 }
 
-func p2d(name string, f constraintFunc, versions versionSet) *constraint {
+func p2(name string, f constraintFunc, versions versionSet) *constraint {
 	return &constraint{key: name, phase: 2, versions: versions, fn: f}
+}
+
+func p3(name string, f constraintFunc, versions versionSet) *constraint {
+	return &constraint{key: name, phase: 3, versions: versions, fn: f}
+}
+
+func p4(name string, f constraintFunc, versions versionSet) *constraint {
+	return &constraint{key: name, phase: 4, versions: versions, fn: f}
 }

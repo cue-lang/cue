@@ -15,6 +15,7 @@
 package openapi
 
 import (
+	"fmt"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -41,15 +42,28 @@ func Extract(data cue.InstanceOrValue, c *Config) (*ast.File, error) {
 		}
 	}
 
-	js, err := jsonschema.Extract(data, &jsonschema.Config{
-		Root: oapiSchemas,
-		Map:  openAPIMapping,
-	})
-	if err != nil {
-		return nil, err
-	}
-
 	v := data.Value()
+	versionValue := v.LookupPath(cue.MakePath(cue.Str("openapi")))
+	if versionValue.Err() != nil {
+		return nil, fmt.Errorf("openapi field is required but not found")
+	}
+	version, err := versionValue.String()
+	if err != nil {
+		return nil, fmt.Errorf("invalid openapi field (must be string): %v", err)
+	}
+	// A simple prefix match is probably OK for now, following
+	// the same logic used by internal/encoding.isOpenAPI.
+	// The specification says that the patch version should be disregarded:
+	// https://swagger.io/specification/v3/
+	var schemaVersion jsonschema.Version
+	switch {
+	case strings.HasPrefix(version, "3.0."):
+		schemaVersion = jsonschema.VersionOpenAPI
+	case strings.HasPrefix(version, "3.1."):
+		schemaVersion = jsonschema.VersionDraft2020_12
+	default:
+		return nil, fmt.Errorf("unknown OpenAPI version %q", version)
+	}
 
 	doc, _ := v.LookupPath(cue.MakePath(cue.Str("info"), cue.Str("title"))).String() // Required
 	if s, _ := v.LookupPath(cue.MakePath(cue.Str("info"), cue.Str("description"))).String(); s != "" {
@@ -65,6 +79,14 @@ func Extract(data cue.InstanceOrValue, c *Config) (*ast.File, error) {
 		add(cg)
 	}
 
+	js, err := jsonschema.Extract(data, &jsonschema.Config{
+		Root:           oapiSchemas,
+		Map:            openAPIMapping,
+		DefaultVersion: schemaVersion,
+	})
+	if err != nil {
+		return nil, err
+	}
 	preamble := js.Preamble()
 	body := js.Decls[len(preamble):]
 	for _, d := range preamble {

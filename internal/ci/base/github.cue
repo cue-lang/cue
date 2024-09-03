@@ -15,14 +15,32 @@ bashWorkflow: json.#Workflow & {
 	jobs: [string]: defaults: run: shell: "bash"
 }
 
-installGo: json.#step & {
-	name: "Install Go"
-	uses: "actions/setup-go@v5"
-	with: {
-		// We do our own caching in setupGoActionsCaches.
-		cache:        false
-		"go-version": string
+installGo: {
+	#setupGo: json.#step & {
+		name: "Install Go"
+		uses: "actions/setup-go@v5"
+		with: {
+			// We do our own caching in setupGoActionsCaches.
+			cache:        false
+			"go-version": string
+		}
 	}
+
+	[
+		#setupGo,
+
+		{
+			json.#step & {
+				name: "Set common go env vars"
+				run: """
+					go env -w GOTOOLCHAIN=local
+
+					# Dump env for good measure
+					go env
+					"""
+			}
+		},
+	]
 }
 
 checkoutCode: {
@@ -100,7 +118,7 @@ checkoutCode: {
 
 earlyChecks: json.#step & {
 	name: "Early git and code sanity checks"
-	run: "go run ./internal/ci/checks"
+	run:  "go run ./internal/ci/checks"
 }
 
 curlGitHubAPI: {

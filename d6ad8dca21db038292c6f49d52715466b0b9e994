@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "193dee65_2a3b4bac",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-03T07:20:05Z",
+      "side": 1,
+      "message": "nit: reflow so it\u0027s under 76",
+      "revId": "d6ad8dca21db038292c6f49d52715466b0b9e994",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

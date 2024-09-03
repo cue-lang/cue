@@ -35,7 +35,7 @@ import (
 )
 
 // Package parameters
-githubRepositoryPath:   *(URLPath & {#url: githubRepositoryURL, _}) | string
+githubRepositoryPath: *(URLPath & {#url: githubRepositoryURL, _}) | string
 githubRepositoryURL:    *("https://github.com/" + githubRepositoryPath) | string
 gerritHubHostname:      "review.gerrithub.io"
 gerritHubRepositoryURL: *("https://\(gerritHubHostname)/a/" + githubRepositoryPath) | string
@@ -67,7 +67,7 @@ codeReview: #codeReview & {
 // Define some shared keys and human-readable names.
 //
 // trybot.key and unity.key are shared with
-// github.com/cue-sh/tools/cmd/cueckoo.  The keys are used across various CUE
+// github.com/cue-lang/contrib-tools/cmd/cueckoo.  The keys are used across various CUE
 // workflows and their consistency in those various locations is therefore
 // crucial. As such, we assert specific values for the keys here rather than
 // just deriving values from the human-readable names.

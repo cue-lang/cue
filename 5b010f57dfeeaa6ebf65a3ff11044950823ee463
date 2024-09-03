@@ -46,6 +46,30 @@
       },
       "revId": "5b010f57dfeeaa6ebf65a3ff11044950823ee463",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3595fbcb_dd030990",
+        "filename": "cue.mod/pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue",
+        "patchSetId": 6
+      },
+      "lineNbr": 643,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-03T12:45:16Z",
+      "side": 1,
+      "message": "Ah my bad, I can\u0027t read.",
+      "parentUuid": "e86e5fd5_9da42aac",
+      "range": {
+        "startLine": 633,
+        "startChar": 1,
+        "endLine": 643,
+        "endChar": 8
+      },
+      "revId": "5b010f57dfeeaa6ebf65a3ff11044950823ee463",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

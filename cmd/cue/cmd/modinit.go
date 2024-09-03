@@ -84,7 +84,7 @@ func runModInit(cmd *Command, args []string) (err error) {
 		return err
 	}
 
-	err = os.Mkdir(mod, 0755)
+	err = os.Mkdir(mod, 0777)
 	if err != nil && !os.IsExist(err) {
 		return err
 	}
@@ -97,10 +97,10 @@ func runModInit(cmd *Command, args []string) (err error) {
 		return err
 	}
 
-	if err = os.Mkdir(filepath.Join(mod, "usr"), 0755); err != nil {
+	if err = os.Mkdir(filepath.Join(mod, "usr"), 0777); err != nil {
 		return err
 	}
-	if err = os.Mkdir(filepath.Join(mod, "pkg"), 0755); err != nil {
+	if err = os.Mkdir(filepath.Join(mod, "pkg"), 0777); err != nil {
 		return err
 	}
 

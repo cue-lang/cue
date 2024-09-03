@@ -155,7 +155,7 @@ func extract(args []string) {
 			if err != nil {
 				log.Fatal(err)
 			}
-			err = os.WriteFile(lastPkg+".go", b, 0644)
+			err = os.WriteFile(lastPkg+".go", b, 0666)
 			if err != nil {
 				log.Fatal(err)
 			}

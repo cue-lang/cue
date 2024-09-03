@@ -68,7 +68,7 @@ func OpenNodeGraph(title, path, code, out, graph string) {
 	}
 	numberOpened++
 
-	err := os.MkdirAll(path, 0755)
+	err := os.MkdirAll(path, 0777)
 	if err != nil {
 		log.Fatal(err)
 	}

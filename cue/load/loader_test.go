@@ -731,7 +731,7 @@ package %s
 
 x: 1
 `, string(c))
-		err := os.WriteFile(filepath.Join(testDir, string(c)+".cue"), []byte(contents), 0o644)
+		err := os.WriteFile(filepath.Join(testDir, string(c)+".cue"), []byte(contents), 0o666)
 		qt.Assert(t, qt.IsNil(err))
 	}
 

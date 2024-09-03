@@ -58,7 +58,7 @@ func main() {
 		}
 
 		goFile := filepath.Join("testdata", d.Name(), "cue_gen.go")
-		if err := os.WriteFile(goFile, b, 0644); err != nil {
+		if err := os.WriteFile(goFile, b, 0666); err != nil {
 			log.Fatal(err)
 		}
 	}

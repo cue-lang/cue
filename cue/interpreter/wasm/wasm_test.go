@@ -117,7 +117,7 @@ func check(t *testing.T, dir string, got string) {
 	golden := filepath.Join("testdata", dir) + ".golden"
 
 	if cuetest.UpdateGoldenFiles {
-		os.WriteFile(golden, []byte(got), 0644)
+		os.WriteFile(golden, []byte(got), 0666)
 	}
 
 	want := string(must(os.ReadFile(golden))(t))

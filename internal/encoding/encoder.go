@@ -310,7 +310,7 @@ func writer(f *build.File, cfg *Config) (_ io.Writer, close func() error, err er
 			// Swap O_EXCL for O_TRUNC to allow replacing an entire existing file.
 			mode = os.O_WRONLY | os.O_CREATE | os.O_TRUNC
 		}
-		f, err := os.OpenFile(path, mode, 0o644)
+		f, err := os.OpenFile(path, mode, 0o666)
 		if err != nil {
 			if errors.Is(err, fs.ErrExist) {
 				return errors.Wrapf(fs.ErrExist, token.NoPos, "error writing %q", path)

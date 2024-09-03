@@ -223,7 +223,7 @@ func formatFile(file *build.File, opts []format.Option, doDiff, check bool, cmd 
 	case file.Filename == "-":
 		// already wrote the formatted source to stdout above
 	default:
-		if err := os.WriteFile(file.Filename, formatted, 0644); err != nil {
+		if err := os.WriteFile(file.Filename, formatted, 0666); err != nil {
 			return false, err
 		}
 	}

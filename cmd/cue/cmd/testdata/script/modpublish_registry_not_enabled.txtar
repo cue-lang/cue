@@ -2,4 +2,4 @@ env CUE_EXPERIMENT=modules=false
 ! exec cue mod publish v1.0.0
 cmp stderr want-stderr
 -- want-stderr --
-modules experiment not enabled (enable with CUE_EXPERIMENT=modules)
+cannot parse CUE_EXPERIMENT: cannot change default value of deprecated flag "modules"

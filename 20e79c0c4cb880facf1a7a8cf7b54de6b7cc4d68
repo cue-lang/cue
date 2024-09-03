@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3974f62e_42f0b71e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-09-03T05:09:33Z",
+      "side": 1,
+      "message": "As a mild suggestion (but this could go in the cuelang.org page) I would explain why we haven\u0027t guarded this change on the `language.version` of a CUE module.",
+      "revId": "20e79c0c4cb880facf1a7a8cf7b54de6b7cc4d68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

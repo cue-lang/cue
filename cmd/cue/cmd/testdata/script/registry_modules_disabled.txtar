@@ -1,35 +1,5 @@
-# When CUE_EXPERIMENT is disabled, the CUE_REGISTRY
-# variable is ignored, as are the new fields in module.cue
+# When CUE_EXPERIMENT is disabled, we cannot use the cue command.
 
 env CUE_EXPERIMENT=modules=false
-exec cue export .
-cmp stdout expect-stdout
-
--- expect-stdout --
-"cue.mod/pkg source"
--- main.cue --
-package main
-import "example.com/e"
-
-e.foo
-
--- cue.mod/module.cue --
-module: "test.org"
-language: version: "v0.9.0"
-// This should be ignored.
-deps: "example.com/e": v: "v0.0.1"
--- cue.mod/pkg/example.com/e/cue.mod/module.cue --
-module: "example.com/e"
-language: version: "v0.8.0"
--- cue.mod/pkg/example.com/e/main.cue --
-package e
-foo: "cue.mod/pkg source"
-
--- _registry/example.com_e_v0.0.1/cue.mod/module.cue --
-module: "example.com/e@v0"
-language: version: "v0.8.0"
-
--- _registry/example.com_e_v0.0.1/main.cue --
-package e
-
-foo: "registry source"
+! exec cue export .
+stderr 'cannot change default value of deprecated flag "modules"'

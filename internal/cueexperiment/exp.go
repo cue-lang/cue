@@ -11,7 +11,7 @@ import (
 // When adding, deleting, or modifying entries below,
 // update cmd/cue/cmd/help.go as well for `cue help environment`.
 var Flags struct {
-	Modules bool `envflag:"default:true"`
+	Modules bool `envflag:"deprecated,default:true"`
 
 	// YAMLV3Decoder swaps the old internal/third_party/yaml decoder with the new
 	// decoder implemented in internal/encoding/yaml on top of yaml.v3.

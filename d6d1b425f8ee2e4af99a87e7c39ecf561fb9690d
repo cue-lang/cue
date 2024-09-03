@@ -16,6 +16,24 @@
       "message": "just use `ast.Node`?",
       "revId": "d6d1b425f8ee2e4af99a87e7c39ecf561fb9690d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af230c5d_c9e6e1bb",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-03T10:32:14Z",
+      "side": 1,
+      "message": "Node requires way more than just Pos, so we can\u0027t use it here.",
+      "parentUuid": "c8e606dc_f7cf9a20",
+      "revId": "d6d1b425f8ee2e4af99a87e7c39ecf561fb9690d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

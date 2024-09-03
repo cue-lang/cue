@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd1ab6a8_e4c9279d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-03T12:12:58Z",
+      "side": 1,
+      "message": "It might be time to stabilize the new-modules API in cue/load too.",
+      "revId": "dfe13af1c40c0a297384d763285b99b605777fad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -434,8 +434,6 @@ func (ctx *overlayContext) cloneScheduler(dst, src *nodeContext) {
 	ds.completed = ss.completed
 	ds.needs = ss.needs
 	ds.provided = ss.provided
-	ds.frozen = ss.frozen
-	ds.isFrozen = ss.isFrozen
 	ds.counters = ss.counters
 
 	ss.blocking = ss.blocking[:0]

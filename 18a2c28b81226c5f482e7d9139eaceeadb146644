@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "849323ad_8f9a2205",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-03T11:31:09Z",
+      "side": 1,
+      "message": "Sorry, I hit +2 too early.",
+      "revId": "18a2c28b81226c5f482e7d9139eaceeadb146644",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0a0b157_bb81a08f",
+        "filename": "encoding/jsonschema/constraints_combinator.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-03T11:31:09Z",
+      "side": 1,
+      "message": "I believe you do this by assigning ast.Ident.Node to resolve to the buildin, and calling astutil.Sanitize at the end so it can figure out how to resolve any ambiguities, missing imports, etc. cc @matthew@cue.works",
+      "revId": "18a2c28b81226c5f482e7d9139eaceeadb146644",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1abde253_4fd70d02",
+        "filename": "encoding/jsonschema/decode_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-03T11:31:09Z",
+      "side": 1,
+      "message": "mention this in the commit message?",
+      "revId": "18a2c28b81226c5f482e7d9139eaceeadb146644",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

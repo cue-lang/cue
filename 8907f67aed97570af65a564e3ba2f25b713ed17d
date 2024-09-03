@@ -55,6 +55,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "b24d624f_0a96746e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-09-03T12:13:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d3953ad3_53b21d17",
+      "revId": "8907f67aed97570af65a564e3ba2f25b713ed17d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "fc074a6d_819165ee",
         "filename": "cue/testdata/cycle/chain.txtar",
         "patchSetId": 1

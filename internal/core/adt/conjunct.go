@@ -90,7 +90,13 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		}
 
 		if id.cc.src != n.node {
-			panic("inconsistent state: nodes differ")
+			// TODO(#3406): raise a panic again.
+			//		out: d & { d }
+			//		d: {
+			//			kind: "foo" | "bar"
+			//			{ kind: "foo" } | { kind: "bar" }
+			//		}
+			// panic("inconsistent state: nodes differ")
 		}
 	default:
 

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3a16f72_6ac4fb61",
+        "filename": "cue/types_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 3033,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-09-03T12:14:54Z",
+      "side": 1,
+      "message": "Demonstration of the specific error message.",
+      "revId": "12241a652951e45f3b588a4694cd7c65aea50066",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

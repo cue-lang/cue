@@ -89,7 +89,7 @@ Mkdir: {
 	createParents: bool | *false
 
 	// Directory mode and permission bits (before umask).
-	permissions: int | *0o755
+	permissions: int | *0o777
 }
 
 // MkdirAll creates a directory at the specified path along with any necessary

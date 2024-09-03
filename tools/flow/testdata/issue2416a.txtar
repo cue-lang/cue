@@ -75,7 +75,7 @@ graph TD
 	path:          "output"
 	createParents: true
 	stdout:        "foo"
-	permissions:   493
+	permissions:   511
 }
 -- out/run-v3/t2/value --
 {
@@ -84,7 +84,7 @@ graph TD
 		path:          "output"
 		createParents: true
 		stdout:        "foo"
-		permissions:   493
+		permissions:   511
 	}
 	$id:         "tool/file.Create"
 	filename:    "output/dns-records.zone"
@@ -107,7 +107,7 @@ diff old new
  		path:          "output"
 @@ -7,6 +6,7 @@
  		stdout:        "foo"
- 		permissions:   493
+ 		permissions:   511
  	}
 +	$id:         "tool/file.Create"
  	filename:    "output/dns-records.zone"
@@ -139,7 +139,7 @@ graph TD
 		path:          "output"
 		createParents: true
 		stdout:        "foo"
-		permissions:   493
+		permissions:   511
 	}
 	filename:    "output/dns-records.zone"
 	permissions: 438

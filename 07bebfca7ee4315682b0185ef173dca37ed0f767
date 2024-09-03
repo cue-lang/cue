@@ -118,6 +118,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1c8ce2c_4d7ebfa0",
+        "filename": "encoding/jsonschema/version.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-03T16:11:53Z",
+      "side": 1,
+      "message": "As it turns out, the special case isn\u0027t needed anyway with your suggestion in place.",
+      "parentUuid": "2bb1fd1b_badbbd2c",
+      "revId": "07bebfca7ee4315682b0185ef173dca37ed0f767",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0d89b032_21f6f37c",

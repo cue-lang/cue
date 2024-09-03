@@ -16,6 +16,24 @@
       "message": "you really don\u0027t like my tendency to keep helpers near the receiver type :P",
       "revId": "b123f2b053ec8b8f8b95d7802a713ba38d58fecb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "454bd719_22469568",
+        "filename": "internal/astinternal/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-03T12:32:48Z",
+      "side": 0,
+      "message": "Yeah, in general I think code reads more nicely top-down, with the leaf (helper) functions towards the end, because they\u0027re less important for understanding the code at a high level. I\u0027m happy to hear arguments why this isn\u0027t a great viewpoint though 😊",
+      "parentUuid": "4499f726_79a2fc65",
+      "revId": "b123f2b053ec8b8f8b95d7802a713ba38d58fecb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

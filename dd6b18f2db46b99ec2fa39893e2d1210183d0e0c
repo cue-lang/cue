@@ -16,6 +16,24 @@
       "message": "If you\u0027re going to switch pointers from IsValid to IsNil, please switch interfaces too. Using different mechanisms for both kinds of indirection seems odd.",
       "revId": "dd6b18f2db46b99ec2fa39893e2d1210183d0e0c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a88a18f7_174e6e33",
+        "filename": "internal/astinternal/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-03T12:32:48Z",
+      "side": 1,
+      "message": "That doesn\u0027t work, because `v.Elem().IsNil()` when `v` is a nil interface will panic.",
+      "parentUuid": "fcd437fa_bb224d1f",
+      "revId": "dd6b18f2db46b99ec2fa39893e2d1210183d0e0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "342d32d1_a849583d",
+        "filename": "encoding/jsonschema/version.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-03T15:44:00Z",
+      "side": 1,
+      "message": "should this be split up, e.g. `numJSONSchemaVersions`? for example, allVersions and ParseVersion both need to special case VersionOpenAPI, which hints in that direction.",
+      "revId": "07bebfca7ee4315682b0185ef173dca37ed0f767",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "622a1ce3_5c985351",
+        "filename": "encoding/jsonschema/version.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-03T15:44:00Z",
+      "side": 1,
+      "message": "nit: this can be openAPI",
+      "range": {
+        "startLine": 46,
+        "startChar": 77,
+        "endLine": 46,
+        "endChar": 98
+      },
+      "revId": "07bebfca7ee4315682b0185ef173dca37ed0f767",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e74423d_ac710c06",
+        "filename": "encoding/jsonschema/version.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-03T15:44:00Z",
+      "side": 1,
+      "message": "nit: use the openAPI bitset",
+      "revId": "07bebfca7ee4315682b0185ef173dca37ed0f767",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d89b032_21f6f37c",
+        "filename": "encoding/openapi/decode.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-03T15:44:00Z",
+      "side": 1,
+      "message": "can you briefly document why we do a prefix match rather than something a bit more strict?",
+      "revId": "07bebfca7ee4315682b0185ef173dca37ed0f767",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

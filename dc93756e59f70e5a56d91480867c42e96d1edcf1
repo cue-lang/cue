@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb6fc630_fe418cd4",
+        "filename": "encoding/jsonschema/internal/externaltest/tests.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-03T07:12:33Z",
+      "side": 1,
+      "message": "Interesting, I was expecting a struct here.",
+      "revId": "dc93756e59f70e5a56d91480867c42e96d1edcf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76bd0416_73f85bc3",
+        "filename": "encoding/jsonschema/teststats.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-03T07:12:33Z",
+      "side": 1,
+      "message": "same as before; I would expect you to use ast.Node here.",
+      "revId": "dc93756e59f70e5a56d91480867c42e96d1edcf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

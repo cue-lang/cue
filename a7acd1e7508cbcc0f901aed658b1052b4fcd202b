@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "dbd4a7b0_586350cf",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-03T12:00:31Z",
+      "side": 1,
+      "message": "Not a huge issue because this isn\u0027t dealing with arbitrary user-provided tags, but done anyway.",
+      "parentUuid": "cfb50f22_532a152a",
+      "revId": "a7acd1e7508cbcc0f901aed658b1052b4fcd202b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "2b519576_96f258b1",
         "filename": "internal/envflag/flag.go",
         "patchSetId": 1
@@ -48,6 +66,30 @@
       "writtenOn": "2024-09-03T11:42:00Z",
       "side": 1,
       "message": "nit: this is slightly misleading, as you can set it to the default value. how about \"cannot change deprecated flag\"?",
+      "range": {
+        "startLine": 99,
+        "startChar": 43,
+        "endLine": 99,
+        "endChar": 46
+      },
+      "revId": "a7acd1e7508cbcc0f901aed658b1052b4fcd202b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8926691a_2689609c",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-03T12:00:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd57f91f_e1cbe74c",
       "range": {
         "startLine": 99,
         "startChar": 43,

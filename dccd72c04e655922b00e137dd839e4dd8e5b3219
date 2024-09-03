@@ -34,6 +34,24 @@
       "parentUuid": "e22f678d_abe2cb5a",
       "revId": "dccd72c04e655922b00e137dd839e4dd8e5b3219",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9721f5b_f21055e3",
+        "filename": "cmd/cue/cmd/fix.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-03T10:04:41Z",
+      "side": 1,
+      "message": "This is existing code, and the issue exists elsewhere too, so I\u0027ll do a search and replace fix in a follow-up commit.",
+      "parentUuid": "2a976432_b2e4d4c3",
+      "revId": "dccd72c04e655922b00e137dd839e4dd8e5b3219",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -24,6 +24,10 @@ func Init[T any](flags *T, envVar string) error {
 // The struct field tag may contain a default value other than the zero value,
 // such as `envflag:"default:true"` to set a boolean field to true by default.
 //
+// The tag may be marked as deprecated with `envflag:"deprecated"`
+// which will cause Parse to return an error if the user attempts to set
+// its value to anything but the default value.
+//
 // The string may contain a comma-separated list of name=value pairs values
 // representing the boolean fields in the struct type T. If the value is omitted
 // entirely, the value is assumed to be name=true.
@@ -34,25 +38,35 @@ func Init[T any](flags *T, envVar string) error {
 func Parse[T any](flags *T, env string) error {
 	// Collect the field indices and set the default values.
 	indexByName := make(map[string]int)
+	deprecated := make(map[string]bool)
 	fv := reflect.ValueOf(flags).Elem()
 	ft := fv.Type()
 	for i := 0; i < ft.NumField(); i++ {
 		field := ft.Field(i)
+		name := strings.ToLower(field.Name)
 		defaultValue := false
 		if tagStr, ok := field.Tag.Lookup("envflag"); ok {
-			defaultStr, ok := strings.CutPrefix(tagStr, "default:")
-			// TODO: consider panicking for these error types.
-			if !ok {
-				return fmt.Errorf("expected tag like `envflag:\"default:true\"`: %s", tagStr)
+			for _, f := range strings.Split(tagStr, ",") {
+				key, rest, hasRest := strings.Cut(f, ":")
+				switch key {
+				case "default":
+					v, err := strconv.ParseBool(rest)
+					if err != nil {
+						return fmt.Errorf("invalid default bool value for %s: %v", field.Name, err)
+					}
+					defaultValue = v
+					fv.Field(i).SetBool(defaultValue)
+				case "deprecated":
+					if hasRest {
+						return fmt.Errorf("cannot have a value for deprecated tag")
+					}
+					deprecated[name] = true
+				default:
+					return fmt.Errorf("unknown envflag tag %q", f)
+				}
 			}
-			v, err := strconv.ParseBool(defaultStr)
-			if err != nil {
-				return fmt.Errorf("invalid default bool value for %s: %v", field.Name, err)
-			}
-			defaultValue = v
-			fv.Field(i).SetBool(defaultValue)
 		}
-		indexByName[strings.ToLower(field.Name)] = i
+		indexByName[name] = i
 	}
 
 	if env == "" {
@@ -80,6 +94,16 @@ func Parse[T any](flags *T, env string) error {
 			errs = append(errs, fmt.Errorf("unknown %s", elem))
 			continue
 		}
+		if deprecated[name] {
+			// We allow setting deprecated flags to their default value so
+			// that bold explorers will not be penalised for their
+			// experimentation.
+			if fv.Field(index).Bool() != value {
+				errs = append(errs, fmt.Errorf("cannot change default value of deprecated flag %q", name))
+			}
+			continue
+		}
+
 		fv.Field(index).SetBool(value)
 	}
 	return errors.Join(errs...)

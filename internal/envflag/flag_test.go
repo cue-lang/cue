@@ -14,6 +14,11 @@ type testFlags struct {
 	DefaultTrue  bool `envflag:"default:true"`
 }
 
+type deprecatedFlags struct {
+	Foo bool `envflag:"deprecated"`
+	Bar bool `envflag:"deprecated,default:true"`
+}
+
 func success[T comparable](want T) func(t *testing.T) {
 	return func(t *testing.T) {
 		var x T
@@ -54,7 +59,7 @@ var tests = []struct {
 }, {
 	testName: "Unknown",
 	envVal:   "ratchet",
-	test: failure[testFlags](testFlags{DefaultTrue: true},
+	test: failure(testFlags{DefaultTrue: true},
 		"cannot parse TEST_VAR: unknown ratchet"),
 }, {
 	testName: "Set",
@@ -73,7 +78,7 @@ var tests = []struct {
 }, {
 	testName: "SetWithUnknown",
 	envVal:   "foo,other",
-	test: failure[testFlags](testFlags{
+	test: failure(testFlags{
 		Foo:         true,
 		DefaultTrue: true,
 	}, "cannot parse TEST_VAR: unknown other"),
@@ -108,6 +113,30 @@ var tests = []struct {
 	testName: "Invalid",
 	envVal:   "foo=2,BarBaz=true",
 	test:     invalid(testFlags{DefaultTrue: true}),
+}, {
+	testName: "DeprecatedWithFalseDefault",
+	envVal:   "foo=1",
+	test: failure(deprecatedFlags{
+		Bar: true,
+	}, `cannot parse TEST_VAR: cannot change default value of deprecated flag "foo"`),
+}, {
+	testName: "DeprecatedNoopWhenSameAndFalseDefault",
+	envVal:   "foo=false",
+	test: success(deprecatedFlags{
+		Bar: true,
+	}),
+}, {
+	testName: "DeprecatedWithTrueDefault",
+	envVal:   "bar=0",
+	test: failure(deprecatedFlags{
+		Bar: true,
+	}, `cannot parse TEST_VAR: cannot change default value of deprecated flag "bar"`),
+}, {
+	testName: "DeprecatedNoopWhenSameAndTrueDefault",
+	envVal:   "bar=1",
+	test: success(deprecatedFlags{
+		Bar: true,
+	}),
 }}
 
 func TestInit(t *testing.T) {

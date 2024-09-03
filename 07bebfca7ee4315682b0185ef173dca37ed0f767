@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e24c3668_48bc81ee",
+        "filename": "encoding/jsonschema/version.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-03T16:10:54Z",
+      "side": 1,
+      "message": "Yeah, not a bad idea. Done.",
+      "parentUuid": "342d32d1_a849583d",
+      "revId": "07bebfca7ee4315682b0185ef173dca37ed0f767",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "622a1ce3_5c985351",
@@ -31,6 +49,30 @@
       "writtenOn": "2024-09-03T15:44:00Z",
       "side": 1,
       "message": "nit: this can be openAPI",
+      "range": {
+        "startLine": 46,
+        "startChar": 77,
+        "endLine": 46,
+        "endChar": 98
+      },
+      "revId": "07bebfca7ee4315682b0185ef173dca37ed0f767",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84dbe991_0e6895b2",
+        "filename": "encoding/jsonschema/version.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-03T16:10:54Z",
+      "side": 1,
+      "message": "Not necessary with the above change.",
+      "parentUuid": "622a1ce3_5c985351",
       "range": {
         "startLine": 46,
         "startChar": 77,
@@ -58,6 +100,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2bb1fd1b_badbbd2c",
+        "filename": "encoding/jsonschema/version.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-03T16:10:54Z",
+      "side": 1,
+      "message": "you mean like `if openAPI.contains(i)` ?\nI\u0027m not sure tbh - it\u0027s semantically exactly equivalent, slightly longer and I don\u0027t think it\u0027s easier to understand particularly.",
+      "parentUuid": "7e74423d_ac710c06",
+      "revId": "07bebfca7ee4315682b0185ef173dca37ed0f767",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0d89b032_21f6f37c",
@@ -71,6 +131,24 @@
       "writtenOn": "2024-09-03T15:44:00Z",
       "side": 1,
       "message": "can you briefly document why we do a prefix match rather than something a bit more strict?",
+      "revId": "07bebfca7ee4315682b0185ef173dca37ed0f767",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7835d97_061263b3",
+        "filename": "encoding/openapi/decode.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-03T16:10:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0d89b032_21f6f37c",
       "revId": "07bebfca7ee4315682b0185ef173dca37ed0f767",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

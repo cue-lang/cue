@@ -132,16 +132,22 @@ issue641: {
 		}
 	}
 }
+-- issue3406.cue --
+issue3406: {
+	out: d & { d }
+	d: kind: "foo" | "bar"
+	d: { kind: "foo" } | { kind: "bar" }
+}
 -- out/eval/stats --
 Leaks:  0
-Freed:  304
-Reused: 292
+Freed:  347
+Reused: 335
 Allocs: 12
 Retain: 0
 
-Unifications: 147
-Conjuncts:    564
-Disjuncts:    304
+Unifications: 158
+Conjuncts:    633
+Disjuncts:    347
 -- out/evalalpha --
 Errors:
 f.name: conflicting values "int" and "str":
@@ -300,6 +306,18 @@ Result:
         }
       }
     }
+  }
+  issue3406: (struct){
+    out: (struct){ |((struct){
+        kind: (string){ "foo" }
+      }, (struct){
+        kind: (string){ "bar" }
+      }) }
+    d: (struct){ |((struct){
+        kind: (string){ "foo" }
+      }, (struct){
+        kind: (string){ "bar" }
+      }) }
   }
 }
 -- diff/-out/evalalpha<==>+out/eval --
@@ -530,6 +548,18 @@ Result:
       }
     }
   }
+  issue3406: (struct){
+    out: (struct){ |((struct){
+        kind: (string){ "foo" }
+      }, (struct){
+        kind: (string){ "bar" }
+      }) }
+    d: (struct){ |((struct){
+        kind: (string){ "foo" }
+      }, (struct){
+        kind: (string){ "bar" }
+      }) }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -714,5 +744,21 @@ Result:
         })
       })
     }
+  }
+}
+--- issue3406.cue
+{
+  issue3406: {
+    out: (〈0;d〉 & {
+      〈1;d〉
+    })
+    d: {
+      kind: ("foo"|"bar")
+    }
+    d: ({
+      kind: "foo"
+    }|{
+      kind: "bar"
+    })
   }
 }

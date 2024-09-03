@@ -1,6 +1,6 @@
 -- schema.json --
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
 
   "type": "object",
   "title": "Main schema",
@@ -43,7 +43,7 @@ import "strings"
 // Main schema
 //
 // Specify who you are and all.
-@jsonschema(schema="http://json-schema.org/draft-07/schema#")
+@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
 
 // A person is a human being.
 person?: {

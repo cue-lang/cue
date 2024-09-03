@@ -22,6 +22,30 @@
       },
       "revId": "5b010f57dfeeaa6ebf65a3ff11044950823ee463",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e86e5fd5_9da42aac",
+        "filename": "cue.mod/pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue",
+        "patchSetId": 6
+      },
+      "lineNbr": 643,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-03T12:43:42Z",
+      "side": 1,
+      "message": "No. One is \"tags-ignore\" and the other is \"paths-ignore\".\n\nIt\u0027s generated from the following JSON Schema code:\n\n```\n          \"allOf\": [\n            {\n              \"not\": {\n                \"required\": [\"branches\", \"branches-ignore\"]\n              }\n            },\n            {\n              \"not\": {\n                \"required\": [\"tags\", \"tags-ignore\"]\n              }\n            },\n            {\n              \"not\": {\n                \"required\": [\"paths\", \"paths-ignore\"]\n              }\n            }\n          ]\n        },\n```\n\nThe ellipses could be omitted though, and probably should be.",
+      "parentUuid": "70429bdc_20c13f03",
+      "range": {
+        "startLine": 633,
+        "startChar": 1,
+        "endLine": 643,
+        "endChar": 8
+      },
+      "revId": "5b010f57dfeeaa6ebf65a3ff11044950823ee463",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

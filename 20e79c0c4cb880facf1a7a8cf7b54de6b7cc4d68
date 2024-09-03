@@ -52,6 +52,24 @@
       "parentUuid": "764a1159_a55724f7",
       "revId": "20e79c0c4cb880facf1a7a8cf7b54de6b7cc4d68",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6160a70b_3bafc2d6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-03T11:26:09Z",
+      "side": 1,
+      "message": "I think we can put the rationale on both the commit message and the website. Something like:\n\n\u003e Note that this breaking language change is not based on `language.version` from `cue.mod/module.cue`; the language spec has not mentioned arithmetic on lists for years, and aligning the evaluator with the spec has been planned for some time. Moreover, every CUE configuration should be able to switch to `list.Concat` and `list.Repeat`, for example via `cue fix`.",
+      "parentUuid": "0321b00a_09a8ab14",
+      "revId": "20e79c0c4cb880facf1a7a8cf7b54de6b7cc4d68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

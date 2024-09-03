@@ -16,6 +16,24 @@
       "message": "nit: it\u0027s `.WithRel`",
       "revId": "4e3f94561e99f0a434003cbeebafaf35485f1c9b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f354ffc_37209297",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-03T12:34:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5632b050_d12e6e77",
+      "revId": "4e3f94561e99f0a434003cbeebafaf35485f1c9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

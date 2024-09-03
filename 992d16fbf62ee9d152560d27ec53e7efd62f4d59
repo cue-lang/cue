@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48abb144_094fef24",
+        "filename": "cue/ast/astutil/apply.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-03T07:04:21Z",
+      "side": 1,
+      "message": "nit: linkify these, like:\n\n```\n// Deprecated: use [ast.NewImport] as an [ast.Ident.Node], and then\n// call [Sanitize].\n```\n\n(the last is in the very same package)",
+      "revId": "992d16fbf62ee9d152560d27ec53e7efd62f4d59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

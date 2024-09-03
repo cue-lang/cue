@@ -89,7 +89,7 @@ func runFixAll(cmd *Command, args []string) error {
 
 	for _, i := range instances {
 		for _, f := range i.Files {
-			if done[f] || !strings.HasSuffix(f.Filename, ".cue") {
+			if done[f] || (f.Filename != "-" && !strings.HasSuffix(f.Filename, ".cue")) {
 				continue
 			}
 			done[f] = true
@@ -99,9 +99,14 @@ func runFixAll(cmd *Command, args []string) error {
 				errs = errors.Append(errs, errors.Promote(err, "format"))
 			}
 
-			err = os.WriteFile(f.Filename, b, 0644)
-			if err != nil {
-				errs = errors.Append(errs, errors.Promote(err, "write"))
+			if f.Filename == "-" {
+				if _, err := cmd.OutOrStdout().Write(b); err != nil {
+					return err
+				}
+			} else {
+				if err := os.WriteFile(f.Filename, b, 0644); err != nil {
+					errs = errors.Append(errs, errors.Promote(err, "write"))
+				}
 			}
 		}
 	}

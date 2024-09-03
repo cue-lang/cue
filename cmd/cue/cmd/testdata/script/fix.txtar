@@ -1,8 +1,14 @@
-exec cue fix ./...
+# Just like other commands, we can fix with stdin/stdout.
+stdin p/three.cue
+exec cue fix -
+cmp stdout p/three.cue.fixed
+
 # Make sure we fix all files in a directory, even if they're a mix of packages (or no packages).
+exec cue fix ./...
 cmp p/one.cue p/one.cue.fixed
 cmp p/two.cue p/two.cue.fixed
 cmp p/three.cue p/three.cue.fixed
+
 -- p/one.cue --
 package one
 

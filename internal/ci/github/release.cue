@@ -42,11 +42,14 @@ workflows: release: _repo.bashWorkflow & {
 	jobs: goreleaser: {
 		"runs-on": _repo.linuxMachine
 		if:        "${{github.repository == '\(_repo.githubRepositoryPath)'}}"
+
+		let installGo = _repo.installGo & {
+			#setupGo: with: "go-version": _repo.pinnedReleaseGo
+			_
+		}
 		steps: [
 			for v in _repo.checkoutCode {v},
-			_repo.installGo & {
-				with: "go-version": _repo.pinnedReleaseGo
-			},
+			for v in installGo {v},
 			json.#step & {
 				name: "Setup qemu"
 				uses: "docker/setup-qemu-action@v3"

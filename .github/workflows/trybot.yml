@@ -71,6 +71,12 @@ jobs:
         with:
           cache: false
           go-version: ${{ matrix.go-version }}
+      - name: Set common go env vars
+        run: |-
+          go env -w GOTOOLCHAIN=local
+
+          # Dump env for good measure
+          go env
       - name: Get go mod cache directory
         id: go-mod-cache-dir
         run: echo "dir=$(go env GOMODCACHE)" >> ${GITHUB_OUTPUT}

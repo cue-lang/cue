@@ -43,6 +43,11 @@ workflows: trybot: _repo.bashWorkflow & {
 				_
 			}
 
+			let installGo = _repo.installGo & {
+				#setupGo: with: "go-version": goVersionVal
+				_
+			}
+
 			// Only run the trybot workflow if we have the trybot trailer, or
 			// if we have no special trailers. Note this condition applies
 			// after and in addition to the "on" condition above.
@@ -51,9 +56,7 @@ workflows: trybot: _repo.bashWorkflow & {
 			steps: [
 				for v in _repo.checkoutCode {v},
 
-				_repo.installGo & {
-					with: "go-version": goVersionVal
-				},
+				for v in installGo {v},
 
 				// cachePre must come after installing Node and Go, because the cache locations
 				// are established by running each tool.

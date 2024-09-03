@@ -15,14 +15,51 @@ bashWorkflow: json.#Workflow & {
 	jobs: [string]: defaults: run: shell: "bash"
 }
 
-installGo: json.#step & {
-	name: "Install Go"
-	uses: "actions/setup-go@v5"
-	with: {
-		// We do our own caching in setupGoActionsCaches.
-		cache:        false
-		"go-version": string
+installGo: {
+	#setupGo: json.#step & {
+		name: "Install Go"
+		uses: "actions/setup-go@v5"
+		with: {
+			// We do our own caching in setupGoActionsCaches.
+			cache:        false
+			"go-version": string
+		}
 	}
+
+	// Why set GOTOOLCHAIN here? As opposed to an environment variable
+	// elsewhere? No perfect answer to this question but here is the thinking:
+	//
+	// Setting the variable here localises it with the installation of Go. Doing
+	// it elsewhere creates distance between the two steps which are
+	// intrinsically related. And it's also hard to do: "when we use this step,
+	// also ensure that we establish an environment variable in the job for
+	// GOTOOLCHAIN".
+	//
+	// Environment variables can only be set at a workflow, job or step level.
+	// Given we currently use a matrix strategy which varies the Go version,
+	// that rules out using an environment variable based approach, because the
+	// Go version is only available at runtime via GitHub actions provided
+	// context. Whether we should instead be templating multiple workflows (i.e.
+	// exploding the matrix ourselves) is a different question, but one that
+	// has performance implications.
+	//
+	// So as clumsy as it is to use a step "template" that includes more than
+	// one step, it's the best option available to us for now.
+	[
+		#setupGo,
+
+		{
+			json.#step & {
+				name: "Set common go env vars"
+				run: """
+					go env -w GOTOOLCHAIN=local
+
+					# Dump env for good measure
+					go env
+					"""
+			}
+		},
+	]
 }
 
 checkoutCode: {
@@ -100,7 +137,7 @@ checkoutCode: {
 
 earlyChecks: json.#step & {
 	name: "Early git and code sanity checks"
-	run: "go run ./internal/ci/checks"
+	run:  "go run ./internal/ci/checks"
 }
 
 curlGitHubAPI: {

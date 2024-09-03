@@ -23,12 +23,10 @@ func TestInit(t *testing.T) {
 	qt.Assert(t, qt.IsTrue(Flags.Modules))
 	qt.Assert(t, qt.IsTrue(Flags.YAMLV3Decoder))
 
-	// Check that we can disable the YAML v3 experiment.
+	// Check that we cannot disable the YAML v3 experiment.
 	t.Setenv("CUE_EXPERIMENT", "yamlv3decoder=0")
 	err = initAlways()
-	qt.Assert(t, qt.IsNil(err))
-	qt.Assert(t, qt.IsTrue(Flags.Modules))
-	qt.Assert(t, qt.IsFalse(Flags.YAMLV3Decoder))
+	qt.Assert(t, qt.ErrorMatches(err, `cannot parse CUE_EXPERIMENT: cannot change default value of deprecated flag "yamlv3decoder"`))
 
 	// Check that we cannot disable the modules experiment.
 	t.Setenv("CUE_EXPERIMENT", "modules=0")

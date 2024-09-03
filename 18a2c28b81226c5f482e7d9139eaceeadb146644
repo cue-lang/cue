@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a546af8_16f012c7",
+        "filename": "encoding/jsonschema/constraints_combinator.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-03T11:53:07Z",
+      "side": 1,
+      "message": "It turns out that it just happens naturally anyway. I added a test case (oneOfWithMatchNField) to verify that, and removed the TODO.",
+      "parentUuid": "c0a0b157_bb81a08f",
+      "revId": "18a2c28b81226c5f482e7d9139eaceeadb146644",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1abde253_4fd70d02",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-09-03T11:31:09Z",
       "side": 1,
       "message": "mention this in the commit message?",
+      "revId": "18a2c28b81226c5f482e7d9139eaceeadb146644",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "853b637a_d7643230",
+        "filename": "encoding/jsonschema/decode_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-03T11:53:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1abde253_4fd70d02",
       "revId": "18a2c28b81226c5f482e7d9139eaceeadb146644",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

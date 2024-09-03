@@ -16,6 +16,24 @@
       "message": "As a mild suggestion (but this could go in the cuelang.org page) I would explain why we haven\u0027t guarded this change on the `language.version` of a CUE module.",
       "revId": "20e79c0c4cb880facf1a7a8cf7b54de6b7cc4d68",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "764a1159_a55724f7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-09-03T09:47:00Z",
+      "side": 1,
+      "message": "If that rationale could go either here on Gerrit or in the commit message, please, I\u0027ll adapt it for the FAQ page.",
+      "parentUuid": "3974f62e_42f0b71e",
+      "revId": "20e79c0c4cb880facf1a7a8cf7b54de6b7cc4d68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

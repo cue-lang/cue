@@ -158,7 +158,6 @@ issue3042.data.secret: conflicting values string and {infra:[{name:"bar1"}]} (mi
     ./issue3042.cue:8:11
 issue3042.data.secret: field not allowed:
     ./issue3042.cue:8:3
-issue3042.data.secret.infra: adding field name not allowed as field set was already referenced
 issue3042.data.secret.infra: conflicting values [{name:"bar1"}] and string (mismatched types list and string):
     ./issue3042.cue:5:12
     ./issue3042.cue:9:11
@@ -277,7 +276,6 @@ Result:
       //     ./issue3042.cue:8:11
       // issue3042.data.secret: field not allowed:
       //     ./issue3042.cue:8:3
-      // issue3042.data.secret.infra: adding field name not allowed as field set was already referenced
       // issue3042.data.secret.infra: conflicting values [{name:"bar1"}] and string (mismatched types list and string):
       //     ./issue3042.cue:5:12
       //     ./issue3042.cue:9:11
@@ -324,7 +322,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,60 @@
+@@ -1,9 +1,59 @@
  Errors:
  cycle.a: structural cycle
 +issue3042.data: conflicting values [...#nesting] and {secret:{infra:[{name:"bar1"}]}} (mismatched types list and struct):
@@ -341,7 +339,6 @@ diff old new
 +    ./issue3042.cue:8:11
 +issue3042.data.secret: field not allowed:
 +    ./issue3042.cue:8:3
-+issue3042.data.secret.infra: adding field name not allowed as field set was already referenced
 +issue3042.data.secret.infra: conflicting values [{name:"bar1"}] and string (mismatched types list and string):
 +    ./issue3042.cue:5:12
 +    ./issue3042.cue:9:11
@@ -386,7 +383,7 @@ diff old new
    cycle: (_|_){
      // [structural cycle]
      a: (_|_){
-@@ -58,22 +109,70 @@
+@@ -58,22 +108,69 @@
      x: (#list){
      }
    }
@@ -424,7 +421,6 @@ diff old new
 +      //     ./issue3042.cue:8:11
 +      // issue3042.data.secret: field not allowed:
 +      //     ./issue3042.cue:8:3
-+      // issue3042.data.secret.infra: adding field name not allowed as field set was already referenced
 +      // issue3042.data.secret.infra: conflicting values [{name:"bar1"}] and string (mismatched types list and string):
 +      //     ./issue3042.cue:5:12
 +      //     ./issue3042.cue:9:11

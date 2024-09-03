@@ -19,7 +19,7 @@ var Flags struct {
 	// with CUE_EXPERIMENT=yamlv3decoder=1 who must still suppport older CUE versions,
 	// but currently the feature is always enabled.
 	// TODO(mvdan): remove for v0.12.
-	YAMLV3Decoder bool `envflag:"default:true"`
+	YAMLV3Decoder bool `envflag:"deprecated,default:true"`
 
 	// EvalV3 enables the new evaluator. The new evaluator addresses various
 	// performance concerns.

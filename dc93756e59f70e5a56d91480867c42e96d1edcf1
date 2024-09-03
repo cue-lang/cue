@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0a89ccb_ea75e2d1",
+        "filename": "encoding/jsonschema/internal/externaltest/tests.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-03T10:35:03Z",
+      "side": 1,
+      "message": "Yeah, in the first iteration I actually made it a struct, but then I ended up needing to export Version from `cuetdtest.M` and then I realised that it made more sense to just index on `M.Name()` and use a map, so that\u0027s what I went with (and it leaves things open to using more matrix points without changing the code much).",
+      "parentUuid": "bb6fc630_fe418cd4",
+      "revId": "dc93756e59f70e5a56d91480867c42e96d1edcf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "76bd0416_73f85bc3",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-09-03T07:12:33Z",
       "side": 1,
       "message": "same as before; I would expect you to use ast.Node here.",
+      "revId": "dc93756e59f70e5a56d91480867c42e96d1edcf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a7dda93_7d497fed",
+        "filename": "encoding/jsonschema/teststats.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-03T10:35:03Z",
+      "side": 1,
+      "message": "Again, Node requires way more than just `Pos`, which is the only method we have available here.",
+      "parentUuid": "76bd0416_73f85bc3",
       "revId": "dc93756e59f70e5a56d91480867c42e96d1edcf1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

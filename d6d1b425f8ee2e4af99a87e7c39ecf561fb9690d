@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8e606dc_f7cf9a20",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-03T07:10:45Z",
+      "side": 1,
+      "message": "just use `ast.Node`?",
+      "revId": "d6d1b425f8ee2e4af99a87e7c39ecf561fb9690d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

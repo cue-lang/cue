@@ -10,7 +10,7 @@ import (
 // #codeReview defines the schema of a codereview.cfg file that
 // sits at the root of a repository. codereview.cfg is the configuration
 // file that drives golang.org/x/review/git-codereview. This config
-// file is also used by github.com/cue-sh/tools/cmd/cueckoo.
+// file is also used by github.com/cue-lang/contrib-tools/cmd/cueckoo.
 #codeReview: {
 	gerrit?:      string
 	github?:      string

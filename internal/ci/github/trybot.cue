@@ -52,7 +52,7 @@ workflows: trybot: _repo.bashWorkflow & {
 				for v in _repo.checkoutCode {v},
 
 				_repo.installGo & {
-					with: "go-version": goVersionVal
+					#goVersion: goVersionVal
 				},
 
 				// cachePre must come after installing Node and Go, because the cache locations

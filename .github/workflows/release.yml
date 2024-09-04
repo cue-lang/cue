@@ -53,11 +53,11 @@ jobs:
         run: |-
           echo "github.event.head_commit.message contains Dispatch-Trailer but we are on a protected branch"
           false
-      - name: Install Go
-        uses: actions/setup-go@v5
-        with:
-          cache: false
-          go-version: 1.23.0
+      - name: Set GOTOOLCHAIN
+        run: |-
+          export GOTOOLCHAIN=1.23.0
+          echo "GOTOOLCHAIN=1.23.0" >> $GITHUB_OUTPUT
+          go env
       - name: Setup qemu
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx

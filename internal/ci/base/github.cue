@@ -16,13 +16,12 @@ bashWorkflow: json.#Workflow & {
 }
 
 installGo: json.#step & {
-	name: "Install Go"
-	uses: "actions/setup-go@v5"
-	with: {
-		// We do our own caching in setupGoActionsCaches.
-		cache:        false
-		"go-version": string
-	}
+	#goVersion!: string
+	name:        "Set GOTOOLCHAIN"
+	run:         """
+		echo "GOTOOLCHAIN=\(#goVersion)" >> $GITHUB_OUTPUT
+		go env
+		"""
 }
 
 checkoutCode: {
@@ -100,7 +99,7 @@ checkoutCode: {
 
 earlyChecks: json.#step & {
 	name: "Early git and code sanity checks"
-	run: "go run ./internal/ci/checks"
+	run:  "go run ./internal/ci/checks"
 }
 
 curlGitHubAPI: {

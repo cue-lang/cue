@@ -45,7 +45,7 @@ workflows: release: _repo.bashWorkflow & {
 		steps: [
 			for v in _repo.checkoutCode {v},
 			_repo.installGo & {
-				with: "go-version": _repo.pinnedReleaseGo
+				#goVersion: _repo.pinnedReleaseGo
 			},
 			json.#step & {
 				name: "Setup qemu"

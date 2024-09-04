@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "67761e82_43247308",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-04T07:41:41Z",
+      "side": 1,
+      "message": "The setting of the env var SGTM, although I don\u0027t think adding one more job step is the best way to go about it.",
+      "revId": "94edecf4c5e8e8d0128a6b0d74524b139d616652",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad8ad3d6_3d41a0cd",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-04T07:41:41Z",
+      "side": 1,
+      "message": "I would have expected this env var to be set up globally on each workflow or job, which would be less noisy - e.g. setup-go already runs `go env`, and the method here results in one more job step.\n\nAre you doing it this way so that every installGo consumer MUST also include the env var? Could we not do that via a CUE constraint/validation on the global env vars?",
+      "revId": "94edecf4c5e8e8d0128a6b0d74524b139d616652",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

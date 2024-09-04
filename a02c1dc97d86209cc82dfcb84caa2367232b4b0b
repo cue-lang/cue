@@ -33,6 +33,40 @@
       "message": "Before either of you ask \"why not `cue def --inline-imports`\": it\u0027s similar, more powerful, and definitely useful. But because it\u0027s more powerful and uses the evaluator, it also renders it useless when the evaluator blows up :)",
       "revId": "a02c1dc97d86209cc82dfcb84caa2367232b4b0b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "72d12b8b_cc0e6e51",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-04T09:18:44Z",
+      "side": 1,
+      "message": "LGTM modulo one issue.",
+      "revId": "a02c1dc97d86209cc82dfcb84caa2367232b4b0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06b554ca_d9fcbedc",
+        "filename": "internal/cmd/cue-ast-tool/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-04T09:18:44Z",
+      "side": 1,
+      "message": "In general this is not sufficient, because some identifiers might vary according to file-level scope. I\u0027d suggest using `astutil.Sanitize` before producing the output.\n\nAs an example, this testscript demonstrates it producing incorrect output as is:\n\n```\nexec cue-ast-tool join .\n-- x.cue --\npackage p\n\nimport foo \"list\"\n\nx: foo.Concat([[1], [2, 3]])\n\n-- y.cue --\npackage p\n\nimport foo \"strconv\"\n\ny: foo.Atoi(\"12434\")\n```",
+      "revId": "a02c1dc97d86209cc82dfcb84caa2367232b4b0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

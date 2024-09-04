@@ -51,6 +51,24 @@
       "parentUuid": "ad8ad3d6_3d41a0cd",
       "revId": "94edecf4c5e8e8d0128a6b0d74524b139d616652",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9de819df_76c63ed0",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-09-04T08:47:00Z",
+      "side": 1,
+      "message": "Per our offline discussion, and the comment I\u0027ve added in PS3, I think we\u0027re best to go with this approach for now.",
+      "parentUuid": "ad8ad3d6_3d41a0cd",
+      "revId": "94edecf4c5e8e8d0128a6b0d74524b139d616652",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -16,6 +16,24 @@
       "message": "From my p.o.v. the \"-tool\" suffix is redundant on this command nam. How about just `cue-ast` instead? FWIW I\u0027ve already renamed my version locally to `cue-ast` because `cue-ast-print` was a bit unwieldy.\n\nAlso, unless you\u0027ve got another subcommand in mind at this point I\u0027m not convinced that splitting into subcommands is worthwhile: the usage and functionality of both `print` and `join` is similar enough that I think either just a `-join` flag or just making join the default for multi-file inputs would work well.",
       "revId": "0047626a0f64950b0f50f9ba8ea2d5bb080e83b3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0f546f3_d668b787",
+        "filename": "internal/cmd/cue-ast-tool/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-04T09:17:43Z",
+      "side": 1,
+      "message": "\u003e I\u0027m not convinced that splitting into subcommands is worthwhile\n\nActually, I just realised that `join` prints CUE source where `print` prints the AST form, so I take that back. I still think the command should be named `cue-ast` though.",
+      "parentUuid": "f3afbbbc_b5054fc4",
+      "revId": "0047626a0f64950b0f50f9ba8ea2d5bb080e83b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

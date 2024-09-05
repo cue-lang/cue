@@ -177,20 +177,14 @@
 				"data": {
 					"bar": 2
 				},
-				"valid": true,
-				"skip": {
-					"v3": "invalid value {bar:2} (does not satisfy matchN(1, [null | bool | number | string | [] | {bar!:int},null | bool | number | string | [] | {foo!:string}])): 2 matched, expected 1:\n    generated.cue:2:1\n    generated.cue:2:8\n    instance.json:1:1\n"
-				}
+				"valid": true
 			},
 			{
 				"description": "second oneOf valid (complex)",
 				"data": {
 					"foo": "baz"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "invalid value {foo:\"baz\"} (does not satisfy matchN(1, [null | bool | number | string | [] | {bar!:int},null | bool | number | string | [] | {foo!:string}])): 2 matched, expected 1:\n    generated.cue:2:1\n    generated.cue:2:8\n    instance.json:1:1\n"
-				}
+				"valid": true
 			},
 			{
 				"description": "both oneOf valid (complex)",
@@ -320,20 +314,14 @@
 				"data": {
 					"bar": 8
 				},
-				"valid": true,
-				"skip": {
-					"v3": "invalid value {bar:8} (does not satisfy matchN(1, [null | bool | number | string | [] | {bar!:_,baz?:_},null | bool | number | string | [] | {foo!:_}])): 2 matched, expected 1:\n    generated.cue:2:1\n    generated.cue:2:8\n    instance.json:1:1\n"
-				}
+				"valid": true
 			},
 			{
 				"description": "second oneOf valid",
 				"data": {
 					"foo": "foo"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "invalid value {foo:\"foo\"} (does not satisfy matchN(1, [null | bool | number | string | [] | {bar!:_,baz?:_},null | bool | number | string | [] | {foo!:_}])): 2 matched, expected 1:\n    generated.cue:2:1\n    generated.cue:2:8\n    instance.json:1:1\n"
-				}
+				"valid": true
 			},
 			{
 				"description": "both oneOf valid",

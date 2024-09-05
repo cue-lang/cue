@@ -16,6 +16,24 @@
       "message": "A comment might be good here to remind future readers why we\u0027re doing this.",
       "revId": "a17a3a6b3c527eee5d7d563d76783f828d1ded0e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aabbdfd8_e74785a3",
+        "filename": "internal/core/adt/simplify.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-09-05T13:14:18Z",
+      "side": 1,
+      "message": "Hmmm, it is probably not correct to do this for NonConcrete validators.\n\nI bet this bug is even a consequence of the introduction of NonConcrete validators.",
+      "parentUuid": "d6152fc2_b7d25e4a",
+      "revId": "a17a3a6b3c527eee5d7d563d76783f828d1ded0e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

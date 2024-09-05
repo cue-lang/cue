@@ -129,15 +129,15 @@ issue3418: t3: {
 }
 
 -- out/eval/stats --
-Leaks:  5
-Freed:  67
-Reused: 61
-Allocs: 11
+Leaks:  0
+Freed:  77
+Reused: 70
+Allocs: 7
 Retain: 8
 
-Unifications: 72
-Conjuncts:    138
-Disjuncts:    77
+Unifications: 77
+Conjuncts:    145
+Disjuncts:    87
 -- out/evalalpha --
 Errors:
 issue3418.0: conflicting values 2 and 1:
@@ -270,24 +270,42 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,10 +1,12 @@
+@@ -1,28 +1,12 @@
  Errors:
+-callOfCallToValidator.e: cannot call previously called validator b:
+-    ./in.cue:94:5
+-issue3418.t1: invalid value "foo" (does not satisfy matchN(1, _|_(issue3418.0: conflicting values 2 and 1))): conflicting values 2 and 1:
+-    ./issue3418.cue:1:24
+-    ./issue3418.cue:1:16
+-    ./issue3418.cue:1:31
 +issue3418.0: conflicting values 2 and 1:
-+    ./issue3418.cue:1:35
-+    ./issue3418.cue:1:37
-+issue3418.t3.0: conflicting values 2 and 1:
-+    ./issue3418.cue:6:16
-+    ./issue3418.cue:6:18
- callOfCallToValidator.e: cannot call previously called validator b:
-     ./in.cue:94:5
--issue3418.t2: invalid value "foo" (does not satisfy matchN(1, _|_(issue3418.0: conflicting values 2 and 1))): 0 matched, expected 1:
+     ./issue3418.cue:1:35
+     ./issue3418.cue:1:37
+-issue3418.t2: invalid value "foo" (does not satisfy matchN(1, _|_(issue3418.0: conflicting values 2 and 1))): conflicting values 2 and 1:
 -    ./issue3418.cue:2:41
 -    ./issue3418.cue:2:16
 -    ./issue3418.cue:2:48
+-    ./issue3418.cue:2:52
+-    ./issue3418.cue:2:54
+-issue3418.t3.x: invalid value "foo" (does not satisfy matchN(1, _|_(issue3418.t3.0: conflicting values 2 and 1))): conflicting values 2 and 1:
+-    ./issue3418.cue:10:5
+-    ./issue3418.cue:4:5
+-    ./issue3418.cue:5:5
+-    ./issue3418.cue:6:5
+-    ./issue3418.cue:9:5
+-    ./issue3418.cue:10:12
+-    ./issue3418.cue:10:16
+-    ./issue3418.cue:10:18
+-    ./issue3418.cue:11:5
++issue3418.t3.0: conflicting values 2 and 1:
++    ./issue3418.cue:6:16
++    ./issue3418.cue:6:18
++callOfCallToValidator.e: cannot call previously called validator b:
++    ./in.cue:94:5
  
  Result:
  (_|_){
-@@ -24,7 +26,6 @@
+@@ -42,7 +26,6 @@
        kv: (_|_){
          // [incomplete] incompleteError2.MyType.kv: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
          //     ./in.cue:22:7
@@ -295,7 +313,7 @@ diff old new
          //     ./in.cue:22:24
        }
      }
-@@ -48,7 +49,6 @@
+@@ -66,7 +49,6 @@
        kv: (_|_){
          // [incomplete] violation.#MyType.kv: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
          //     ./in.cue:49:7
@@ -303,7 +321,7 @@ diff old new
          //     ./in.cue:49:24
        }
      }
-@@ -95,15 +95,10 @@
+@@ -113,15 +95,10 @@
          0: (int){ 1 }
        }
      }
@@ -320,48 +338,75 @@ diff old new
          //     ./in.cue:112:20
        }
      }
-@@ -110,15 +105,23 @@
-   }
+@@ -129,18 +106,12 @@
    issue3418: (_|_){
      // [eval]
--    t1: (string){ "foo" }
-+    t1: (_|_){
+     t1: (_|_){
+-      // [eval] issue3418.t1: invalid value "foo" (does not satisfy matchN(1, _|_(issue3418.0: conflicting values 2 and 1))): conflicting values 2 and 1:
+-      //     ./issue3418.cue:1:24
+-      //     ./issue3418.cue:1:16
+-      //     ./issue3418.cue:1:31
 +      // [eval] issue3418.0: conflicting values 2 and 1:
-+      //     ./issue3418.cue:1:35
-+      //     ./issue3418.cue:1:37
-+    }
+       //     ./issue3418.cue:1:35
+       //     ./issue3418.cue:1:37
+     }
      t2: (_|_){
--      // [eval] issue3418.t2: invalid value "foo" (does not satisfy matchN(1, _|_(issue3418.0: conflicting values 2 and 1))): 0 matched, expected 1:
+-      // [eval] issue3418.t2: invalid value "foo" (does not satisfy matchN(1, _|_(issue3418.0: conflicting values 2 and 1))): conflicting values 2 and 1:
 -      //     ./issue3418.cue:2:41
 -      //     ./issue3418.cue:2:16
 -      //     ./issue3418.cue:2:48
--    }
--    t3: (struct){
--      x: (string){ "foo" }
 +      // [eval] issue3418.0: conflicting values 2 and 1:
-+      //     ./issue3418.cue:2:52
-+      //     ./issue3418.cue:2:54
-+    }
-+    t3: (_|_){
-+      // [eval]
-+      x: (_|_){
+       //     ./issue3418.cue:2:52
+       //     ./issue3418.cue:2:54
+     }
+@@ -147,16 +118,9 @@
+     t3: (_|_){
+       // [eval]
+       x: (_|_){
+-        // [eval] issue3418.t3.x: invalid value "foo" (does not satisfy matchN(1, _|_(issue3418.t3.0: conflicting values 2 and 1))): conflicting values 2 and 1:
+-        //     ./issue3418.cue:10:5
+-        //     ./issue3418.cue:4:5
+-        //     ./issue3418.cue:5:5
+-        //     ./issue3418.cue:6:5
+-        //     ./issue3418.cue:9:5
+-        //     ./issue3418.cue:10:12
+-        //     ./issue3418.cue:10:16
+-        //     ./issue3418.cue:10:18
+-        //     ./issue3418.cue:11:5
 +        // [eval] issue3418.t3.0: conflicting values 2 and 1:
 +        //     ./issue3418.cue:6:16
 +        //     ./issue3418.cue:6:18
-+      }
+       }
      }
    }
- }
 -- diff/todo/p2 --
 Missing error at incomplete1: index 0 is erased.
 -- out/eval --
 Errors:
 callOfCallToValidator.e: cannot call previously called validator b:
     ./in.cue:94:5
-issue3418.t2: invalid value "foo" (does not satisfy matchN(1, _|_(issue3418.0: conflicting values 2 and 1))): 0 matched, expected 1:
+issue3418.t1: invalid value "foo" (does not satisfy matchN(1, _|_(issue3418.0: conflicting values 2 and 1))): conflicting values 2 and 1:
+    ./issue3418.cue:1:24
+    ./issue3418.cue:1:16
+    ./issue3418.cue:1:31
+    ./issue3418.cue:1:35
+    ./issue3418.cue:1:37
+issue3418.t2: invalid value "foo" (does not satisfy matchN(1, _|_(issue3418.0: conflicting values 2 and 1))): conflicting values 2 and 1:
     ./issue3418.cue:2:41
     ./issue3418.cue:2:16
     ./issue3418.cue:2:48
+    ./issue3418.cue:2:52
+    ./issue3418.cue:2:54
+issue3418.t3.x: invalid value "foo" (does not satisfy matchN(1, _|_(issue3418.t3.0: conflicting values 2 and 1))): conflicting values 2 and 1:
+    ./issue3418.cue:10:5
+    ./issue3418.cue:4:5
+    ./issue3418.cue:5:5
+    ./issue3418.cue:6:5
+    ./issue3418.cue:9:5
+    ./issue3418.cue:10:12
+    ./issue3418.cue:10:16
+    ./issue3418.cue:10:18
+    ./issue3418.cue:11:5
 
 Result:
 (_|_){
@@ -467,15 +512,36 @@ Result:
   }
   issue3418: (_|_){
     // [eval]
-    t1: (string){ "foo" }
+    t1: (_|_){
+      // [eval] issue3418.t1: invalid value "foo" (does not satisfy matchN(1, _|_(issue3418.0: conflicting values 2 and 1))): conflicting values 2 and 1:
+      //     ./issue3418.cue:1:24
+      //     ./issue3418.cue:1:16
+      //     ./issue3418.cue:1:31
+      //     ./issue3418.cue:1:35
+      //     ./issue3418.cue:1:37
+    }
     t2: (_|_){
-      // [eval] issue3418.t2: invalid value "foo" (does not satisfy matchN(1, _|_(issue3418.0: conflicting values 2 and 1))): 0 matched, expected 1:
+      // [eval] issue3418.t2: invalid value "foo" (does not satisfy matchN(1, _|_(issue3418.0: conflicting values 2 and 1))): conflicting values 2 and 1:
       //     ./issue3418.cue:2:41
       //     ./issue3418.cue:2:16
       //     ./issue3418.cue:2:48
+      //     ./issue3418.cue:2:52
+      //     ./issue3418.cue:2:54
     }
-    t3: (struct){
-      x: (string){ "foo" }
+    t3: (_|_){
+      // [eval]
+      x: (_|_){
+        // [eval] issue3418.t3.x: invalid value "foo" (does not satisfy matchN(1, _|_(issue3418.t3.0: conflicting values 2 and 1))): conflicting values 2 and 1:
+        //     ./issue3418.cue:10:5
+        //     ./issue3418.cue:4:5
+        //     ./issue3418.cue:5:5
+        //     ./issue3418.cue:6:5
+        //     ./issue3418.cue:9:5
+        //     ./issue3418.cue:10:12
+        //     ./issue3418.cue:10:16
+        //     ./issue3418.cue:10:18
+        //     ./issue3418.cue:11:5
+      }
     }
   }
 }

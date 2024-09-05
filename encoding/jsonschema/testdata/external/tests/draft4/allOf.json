@@ -301,10 +301,7 @@
 			{
 				"description": "allOf: false, anyOf: true, oneOf: true",
 				"data": 15,
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "allOf: true, anyOf: false, oneOf: false",

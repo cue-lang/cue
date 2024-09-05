@@ -104,9 +104,7 @@ modes: export: {
 		docs:       true | *false
 		attributes: true | *false
 	}
-	encodings: cue: {
-		*forms.data | _
-	}
+	encodings: cue: forms.data
 }
 
 // TODO(mvdan): this "output" mode appears to be unused at the moment.
@@ -118,9 +116,7 @@ modes: output: {
 		docs:       true | *false
 		attributes: true | *false
 	}
-	encodings: cue: {
-		*forms.data | _
-	}
+	encodings: cue: forms.data
 }
 
 // eval is a legacy mode
@@ -132,9 +128,7 @@ modes: eval: {
 		docs:       true | *false
 		attributes: true | *false
 	}
-	encodings: cue: {
-		*forms.final | _
-	}
+	encodings: cue: forms.final
 }
 
 modes: def: {
@@ -145,9 +139,7 @@ modes: def: {
 		docs:       *true | false
 		attributes: *true | false
 	}
-	encodings: cue: {
-		*forms.schema | _
-	}
+	encodings: cue: forms.schema
 }
 
 // A Encoding indicates a file format for representing a program.
@@ -266,7 +258,6 @@ forms: schema: {
 	constraints:  *true | false
 	keepDefaults: *true | false
 	imports:      *true | false
-	optional:     *true | false
 }
 
 forms: final: {

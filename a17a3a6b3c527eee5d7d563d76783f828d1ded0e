@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6152fc2_b7d25e4a",
+        "filename": "internal/core/adt/simplify.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-05T12:49:24Z",
+      "side": 1,
+      "message": "A comment might be good here to remind future readers why we\u0027re doing this.",
+      "revId": "a17a3a6b3c527eee5d7d563d76783f828d1ded0e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -89,7 +89,7 @@ jobs:
           		echo Latest commit: $sha
 
           		echo "Trigger workflow on cue-lang/cue"
-          		curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" --fail-with-body -X POST https://api.github.com/repos/cue-lang/cue/actions/workflows/trybot.yml/dispatches -d "{\"ref\":\"$j\"}"
+          		curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" --fail-with-body -X POST https://api.github.com/repos/cue-lang/cue/actions/workflows/trybot.yaml/dispatches -d "{\"ref\":\"$j\"}"
 
           		# Ensure that the trybot repo has the latest commit for
           		# this branch.  If the force-push results in a commit
@@ -121,7 +121,7 @@ jobs:
           			# We are up-to-date, i.e. the push did nothing, hence we need to trigger a workflow_dispatch
           			# in the trybot repo.
           			echo "Trigger workflow on cue-lang/cue-trybot"
-          			curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" --fail-with-body -X POST https://api.github.com/repos/cue-lang/cue-trybot/actions/workflows/trybot.yml/dispatches -d "{\"ref\":\"$j\"}"
+          			curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" --fail-with-body -X POST https://api.github.com/repos/cue-lang/cue-trybot/actions/workflows/trybot.yaml/dispatches -d "{\"ref\":\"$j\"}"
           		else
           			echo "Force-push to cue-lang/cue-trybot did work; nothing to do"
           		fi

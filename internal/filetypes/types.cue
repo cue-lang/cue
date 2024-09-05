@@ -26,6 +26,7 @@ package build
 	encoding!:       #Encoding
 	interpretation?: #Interpretation
 	form?:           #Form
+	// Note: tags includes values for non-boolean tags only.
 	tags?: [string]: string
 }
 
@@ -162,23 +163,23 @@ modes: [string]: {
 	// extensions maps a file extension to its associated default file properties.
 	extensions: {
 		// "":           _
-		".cue":       tags.cue
-		".json":      tags.json
-		".jsonl":     tags.jsonl
-		".ldjson":    tags.jsonl
-		".ndjson":    tags.jsonl
-		".yaml":      tags.yaml
-		".yml":       tags.yaml
-		".toml":      tags.toml
-		".txt":       tags.text
-		".go":        tags.go
-		".wasm":      tags.binary
-		".proto":     tags.proto
-		".textproto": tags.textproto
-		".textpb":    tags.textproto // perhaps also pbtxt
+		".cue":       tagInfo.cue
+		".json":      tagInfo.json
+		".jsonl":     tagInfo.jsonl
+		".ldjson":    tagInfo.jsonl
+		".ndjson":    tagInfo.jsonl
+		".yaml":      tagInfo.yaml
+		".yml":       tagInfo.yaml
+		".toml":      tagInfo.toml
+		".txt":       tagInfo.text
+		".go":        tagInfo.go
+		".wasm":      tagInfo.binary
+		".proto":     tagInfo.proto
+		".textproto": tagInfo.textproto
+		".textpb":    tagInfo.textproto // perhaps also pbtxt
 
 		// TODO: jsonseq,
-		// ".pb":        tags.binpb // binarypb
+		// ".pb":        tagInfo.binpb // binarypb
 	}
 
 	// encodings: "": error("no encoding specified")
@@ -327,8 +328,8 @@ interpretations: pb: {
 	stream: true
 }
 
-// tags maps command line tags to file properties.
-tags: {
+// tagInfo maps command line tags to file properties.
+tagInfo: {
 	schema: form: "schema"
 	graph: form:  "graph"
 	dag: form:    "dag"

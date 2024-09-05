@@ -224,6 +224,23 @@ y: conflicting values 4 and 2:
 		}
 		`,
 		out: "",
+	}, {
+		name: "indirect resolved disjunction using matchN",
+		cfg:  &validate.Config{Final: true},
+		in: `
+			x: {}
+			x: matchN(0, [bool | {x!: _}])
+		`,
+		out: "",
+		// TODO: add this test once the new evaluator correctly reports the
+		// error position.
+		// }, {
+		// 	name: "indirect resolved disjunction",
+		// 	cfg:  &validate.Config{Final: true},
+		// 	in: `
+		// 		x: {bar: 2}
+		// 		x: string | {foo!: string}
+		// 	`,
 	}}
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {

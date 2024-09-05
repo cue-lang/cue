@@ -55,7 +55,7 @@ botGerritHubUser:                   *botGitHubUser | string
 botGerritHubUserPasswordSecretsKey: *(strings.ToUpper(botGitHubUser) + "_GERRITHUB_PASSWORD") | string
 botGerritHubUserEmail:              *botGitHubUserEmail | string
 
-workflowFileExtension: ".yml"
+workflowFileExtension: ".yaml"
 
 linuxMachine: string
 

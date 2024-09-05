@@ -1066,7 +1066,7 @@ func (c *compiler) parse(l *ast.BasicLit) (n adt.Expr) {
 	case token.STRING:
 		info, nStart, _, err := literal.ParseQuotes(s, s)
 		if err != nil {
-			return c.errf(l, err.Error())
+			return c.errf(l, "%s", err.Error())
 		}
 		s := s[nStart:]
 		return parseString(c, l, info, s)

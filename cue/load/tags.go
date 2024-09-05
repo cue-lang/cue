@@ -241,7 +241,7 @@ func findTags(b *build.Instance) (tags []*tag, errs errors.Error) {
 			if f, ok := n.(*ast.Field); ok {
 				for _, a := range f.Attrs {
 					if key, _ := a.Split(); key == "tag" {
-						errs = errors.Append(errs, errors.Newf(a.Pos(), msg))
+						errs = errors.Append(errs, errors.Newf(a.Pos(), "%s", msg))
 						// TODO: add position of x.
 					}
 				}

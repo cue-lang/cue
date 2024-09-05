@@ -320,7 +320,7 @@ func parseType(scope string, mode Mode) (modeVal, fileVal cue.Value, _ error) {
 			if ok {
 				fileVal = fileVal.FillPath(cue.MakePath(cue.Str("tags"), cue.Str(tagName)), tagVal)
 			} else {
-				info := typesValue.LookupPath(cue.MakePath(cue.Str("tags"), cue.Str(tag)))
+				info := typesValue.LookupPath(cue.MakePath(cue.Str("tagInfo"), cue.Str(tag)))
 				if !info.Exists() {
 					return cue.Value{}, cue.Value{}, errors.Newf(token.NoPos, "unknown filetype %s", tag)
 				}

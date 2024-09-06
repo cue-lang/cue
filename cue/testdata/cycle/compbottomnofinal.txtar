@@ -384,8 +384,6 @@ Disjuncts:    215
       #Y: (_|_){
         // [incomplete] small.p1.#Y: undefined field: port:
         //     ./in.cue:28:50
-        // small.p1.#X.port: cyclic reference to field port:
-        //     ./in.cue:31:4
       }
       #X: (_|_){
         // [incomplete] small.p1.#X.port: cyclic reference to field port:
@@ -409,8 +407,6 @@ Disjuncts:    215
       #Y: (_|_){
         // [incomplete] medium.p1.#Y: undefined field: port:
         //     ./in.cue:58:50
-        // medium.p1.#X.port: cyclic reference to field port:
-        //     ./in.cue:70:4
       }
       Y: (struct){
       }
@@ -423,8 +419,6 @@ Disjuncts:    215
       #Y: (_|_){
         // [incomplete] medium.p2.#Y: undefined field: port:
         //     ./in.cue:80:50
-        // medium.p2.#X.port: cyclic reference to field port:
-        //     ./in.cue:86:4
       }
       #X: (_|_){
         // [incomplete] medium.p2.#X.port: cyclic reference to field port:
@@ -439,8 +433,6 @@ Disjuncts:    215
       #Y: (_|_){
         // [incomplete] medium.p3.#Y: undefined field: port:
         //     ./in.cue:108:50
-        // medium.p3.#X.port: cyclic reference to field port:
-        //     ./in.cue:114:4
       }
       #X: (_|_){
         // [incomplete] medium.p3.#X.port: cyclic reference to field port:
@@ -455,9 +447,7 @@ Disjuncts:    215
         //     ./in.cue:134:4
       }
       #Y: (_|_){
-        // [incomplete] medium.p4.#X.port: cyclic reference to field port:
-        //     ./in.cue:134:4
-        // medium.p4.#Y: undefined field: port:
+        // [incomplete] medium.p4.#Y: undefined field: port:
         //     ./in.cue:142:50
       }
     }
@@ -496,8 +486,6 @@ Disjuncts:    215
       X: (_|_){
         // [incomplete] large.p1.X: undefined field: port:
         //     ./in.cue:199:33
-        // large.p1.#X.port: cyclic reference to field port:
-        //     ./in.cue:211:4
       }
       #X: (_|_){
         // [incomplete] large.p1.#X.port: cyclic reference to field port:
@@ -514,8 +502,6 @@ Disjuncts:    215
       X: (_|_){
         // [incomplete] large.p2.X: undefined field: port:
         //     ./in.cue:235:33
-        // large.p2.#X.port: cyclic reference to field port:
-        //     ./in.cue:252:4
       }
       Y: (struct){
         userinfo: (string){ "user" }
@@ -536,8 +522,6 @@ Disjuncts:    215
       X: (_|_){
         // [incomplete] large.p3.X: undefined field: port:
         //     ./in.cue:276:33
-        // large.p3.#X.port: cyclic reference to field port:
-        //     ./in.cue:288:4
       }
       #X: (_|_){
         // [incomplete] large.p3.#X.port: cyclic reference to field port:
@@ -558,8 +542,6 @@ Disjuncts:    215
       X: (_|_){
         // [incomplete] large.p4.X: undefined field: port:
         //     ./in.cue:317:33
-        // large.p4.#X.port: cyclic reference to field port:
-        //     ./in.cue:329:4
       }
       #X: (_|_){
         // [incomplete] large.p4.#X.port: cyclic reference to field port:
@@ -582,7 +564,7 @@ Disjuncts:    215
 diff old new
 --- old
 +++ new
-@@ -1,35 +1,36 @@
+@@ -1,35 +1,34 @@
  (struct){
    minimal: (struct){
      a: (_|_){
@@ -622,8 +604,6 @@ diff old new
 +      #Y: (_|_){
 +        // [incomplete] small.p1.#Y: undefined field: port:
 +        //     ./in.cue:28:50
-+        // small.p1.#X.port: cyclic reference to field port:
-+        //     ./in.cue:31:4
 +      }
 +      #X: (_|_){
 +        // [incomplete] small.p1.#X.port: cyclic reference to field port:
@@ -641,7 +621,7 @@ diff old new
        }
      }
    }
-@@ -36,65 +37,69 @@
+@@ -36,65 +35,61 @@
    medium: (struct){
      #userHostPort: (string){ "^(:(?P<port>\\d+))?$" }
      p1: (struct){
@@ -675,8 +655,6 @@ diff old new
 +      #Y: (_|_){
 +        // [incomplete] medium.p1.#Y: undefined field: port:
 +        //     ./in.cue:58:50
-+        // medium.p1.#X.port: cyclic reference to field port:
-+        //     ./in.cue:70:4
 +      }
 +      Y: (struct){
 +      }
@@ -689,8 +667,6 @@ diff old new
 +      #Y: (_|_){
 +        // [incomplete] medium.p2.#Y: undefined field: port:
 +        //     ./in.cue:80:50
-+        // medium.p2.#X.port: cyclic reference to field port:
-+        //     ./in.cue:86:4
 +      }
 +      #X: (_|_){
 +        // [incomplete] medium.p2.#X.port: cyclic reference to field port:
@@ -724,8 +700,6 @@ diff old new
 -        // [cycle] medium.p4.#X: cycle with field Y.port:
 -        //     ./in.cue:134:7
 +        //     ./in.cue:108:50
-+        // medium.p3.#X.port: cyclic reference to field port:
-+        //     ./in.cue:114:4
 +      }
 +      #X: (_|_){
 +        // [incomplete] medium.p3.#X.port: cyclic reference to field port:
@@ -740,9 +714,7 @@ diff old new
 +        //     ./in.cue:134:4
 +      }
 +      #Y: (_|_){
-+        // [incomplete] medium.p4.#X.port: cyclic reference to field port:
-+        //     ./in.cue:134:4
-+        // medium.p4.#Y: undefined field: port:
++        // [incomplete] medium.p4.#Y: undefined field: port:
 +        //     ./in.cue:142:50
        }
      }
@@ -763,7 +735,7 @@ diff old new
        }
        Y: (struct){
        }
-@@ -101,14 +106,14 @@
+@@ -101,14 +96,14 @@
      }
      p6: (struct){
        #X: (_|_){
@@ -786,7 +758,7 @@ diff old new
        }
      }
    }
-@@ -115,81 +120,91 @@
+@@ -115,81 +110,83 @@
    large: (struct){
      #userHostPort: (string){ "^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)(:(?P<port>\\d+))?$" }
      p1: (struct){
@@ -872,8 +844,6 @@ diff old new
 +      X: (_|_){
 +        // [incomplete] large.p1.X: undefined field: port:
 +        //     ./in.cue:199:33
-+        // large.p1.#X.port: cyclic reference to field port:
-+        //     ./in.cue:211:4
 +      }
 +      #X: (_|_){
 +        // [incomplete] large.p1.#X.port: cyclic reference to field port:
@@ -890,8 +860,6 @@ diff old new
 +      X: (_|_){
 +        // [incomplete] large.p2.X: undefined field: port:
 +        //     ./in.cue:235:33
-+        // large.p2.#X.port: cyclic reference to field port:
-+        //     ./in.cue:252:4
 +      }
 +      Y: (struct){
 +        userinfo: (string){ "user" }
@@ -912,8 +880,6 @@ diff old new
 +      X: (_|_){
 +        // [incomplete] large.p3.X: undefined field: port:
 +        //     ./in.cue:276:33
-+        // large.p3.#X.port: cyclic reference to field port:
-+        //     ./in.cue:288:4
 +      }
 +      #X: (_|_){
 +        // [incomplete] large.p3.#X.port: cyclic reference to field port:
@@ -934,8 +900,6 @@ diff old new
 +      X: (_|_){
 +        // [incomplete] large.p4.X: undefined field: port:
 +        //     ./in.cue:317:33
-+        // large.p4.#X.port: cyclic reference to field port:
-+        //     ./in.cue:329:4
 +      }
 +      #X: (_|_){
 +        // [incomplete] large.p4.#X.port: cyclic reference to field port:

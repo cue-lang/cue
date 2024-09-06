@@ -16,15 +16,15 @@ package pkg1
 
 Object: "World"
 -- out/eval/stats --
-Leaks:  2
-Freed:  2
+Leaks:  0
+Freed:  4
 Reused: 0
 Allocs: 4
-Retain: 3
+Retain: 1
 
 Unifications: 4
-Conjuncts:    5
-Disjuncts:    4
+Conjuncts:    6
+Disjuncts:    5
 -- out/eval --
 (string){
   "Hello World!"

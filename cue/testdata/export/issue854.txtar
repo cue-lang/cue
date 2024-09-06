@@ -25,15 +25,15 @@ package c
   theb: 〈import;"mod.test/b"〉.name
 }
 -- out/eval/stats --
-Leaks:  4
-Freed:  2
-Reused: 0
-Allocs: 6
-Retain: 8
+Leaks:  0
+Freed:  7
+Reused: 2
+Allocs: 5
+Retain: 0
 
-Unifications: 6
-Conjuncts:    8
-Disjuncts:    8
+Unifications: 7
+Conjuncts:    9
+Disjuncts:    7
 -- out/eval --
 (struct){
   theb: (_|_){

@@ -25,15 +25,15 @@ package baz
 
 x: 1
 -- out/eval/stats --
-Leaks:  2
-Freed:  9
-Reused: 6
+Leaks:  0
+Freed:  15
+Reused: 10
 Allocs: 5
-Retain: 4
+Retain: 2
 
-Unifications: 11
-Conjuncts:    25
-Disjuncts:    13
+Unifications: 15
+Conjuncts:    29
+Disjuncts:    17
 -- out/evalalpha --
 (struct){
   z: (int){ 3 }

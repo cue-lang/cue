@@ -32,15 +32,15 @@ package pkg
 
 #D: {_val: f: 3}
 -- out/eval/stats --
-Leaks:  1
-Freed:  29
+Leaks:  0
+Freed:  30
 Reused: 24
 Allocs: 6
-Retain: 2
+Retain: 0
 
 Unifications: 30
 Conjuncts:    40
-Disjuncts:    31
+Disjuncts:    30
 -- out/evalalpha --
 Errors:
 e._name.c: field not allowed:

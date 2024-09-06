@@ -23,15 +23,15 @@ Settings: {}
 -- out/ --
 
 -- out/eval/stats --
-Leaks:  1
-Freed:  4
+Leaks:  0
+Freed:  6
 Reused: 1
-Allocs: 4
-Retain: 2
+Allocs: 5
+Retain: 1
 
-Unifications: 5
-Conjuncts:    6
-Disjuncts:    6
+Unifications: 6
+Conjuncts:    7
+Disjuncts:    7
 -- out/eval --
 (struct){
   a: (int){ 1 }

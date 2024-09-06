@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "871aebd7_6fc5e1f9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-06T14:24:43Z",
+      "side": 1,
+      "message": "Submitting this because it\u0027s really annoying me as I use Go tip.",
+      "revId": "944aea10c4cbc5bfb1b00d5c940775ddd604fe8e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

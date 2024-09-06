@@ -136,7 +136,8 @@ var orBuiltin = &adt.Builtin{
 			// status if the source is open.
 			return &adt.Bottom{
 				Code: adt.IncompleteError,
-				Err:  errors.Newf(c.Pos(), "empty list in call to or"),
+				// TODO: get and set Vertex
+				Err: errors.Newf(c.Pos(), "empty list in call to or"),
 			}
 		}
 		v := &adt.Vertex{}

@@ -83,7 +83,11 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state combinedFlags) Value {
 				for ; v.Parent != nil && v.ArcType == ArcPending; v = v.Parent {
 				}
 				err := c.Newf("cycle with field %v", r)
-				b := &Bottom{Code: CycleError, Err: err}
+				b := &Bottom{
+					Code: CycleError,
+					Err:  err,
+					Node: v,
+				}
 				v.setValue(c, v.status, b)
 				return b
 				// TODO: use this instead, as is usual for incomplete errors,
@@ -872,6 +876,7 @@ func (n *nodeContext) completeArcs(state vertexStatus) {
 				n.node.AddErr(ctx, &Bottom{
 					Src:  c.expr.Source(),
 					Code: CycleError,
+					Node: n.node,
 					Err: ctx.NewPosf(pos(c.expr),
 						"circular dependency in evaluation of conditionals: %v changed after evaluation",
 						ctx.Str(c.expr)),
@@ -1567,7 +1572,10 @@ func (n *nodeContext) addErr(err errors.Error) {
 	n.assertInitialized()
 
 	if err != nil {
-		n.addBottom(&Bottom{Err: err})
+		n.addBottom(&Bottom{
+			Err:  err,
+			Node: n.node,
+		})
 	}
 }
 
@@ -2152,6 +2160,7 @@ func (n *nodeContext) insertField(f Feature, mode ArcType, x Conjunct) *Vertex {
 	default:
 		n.addBottom(&Bottom{
 			Code: IncompleteError,
+			Node: n.node,
 			Err: ctx.NewPosf(pos(x.Field()),
 				"cannot add field %s: was already used",
 				f.SelectorString(ctx)),

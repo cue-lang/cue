@@ -54,11 +54,12 @@ r1:     "r1"
 ["s-q"]
 ["s-r"]
 ["s-q1"]
+["s-q1" r1]
 -- diff/-out/doc-v3<==>+out/doc --
 diff old new
 --- old
 +++ new
-@@ -8,9 +8,7 @@
+@@ -8,7 +8,6 @@
  [q1]
  [r]
  [r1]
@@ -66,14 +67,9 @@ diff old new
  [y]
  ["s-q"]
  ["s-r"]
- ["s-q1"]
--["s-q1" r1]
 -- diff/out/todo/p3 --
 One missing entry is the result of the new evaluator not generating a
 bogus field for a failed dynamic field.
-The second one results from the fact that the new evaluator does not
-resolve `r1`, but rather propagates the error of the top-level node.
-This is probably okay.
 -- out/doc --
 []
 [x]
@@ -141,7 +137,7 @@ This is probably okay.
 	}
 }
 == Final
-_|_ // key value of dynamic field must be concrete, found string (and 2 more errors)
+_|_ // key value of dynamic field must be concrete, found string (and 3 more errors)
 == All
 {
 	x:     string
@@ -247,7 +243,7 @@ diff old new
 +}
  == Final
 -_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
-+_|_ // key value of dynamic field must be concrete, found string (and 2 more errors)
++_|_ // key value of dynamic field must be concrete, found string (and 3 more errors)
  == All
 -_|_ // invalid non-ground value string (must be concrete string) (and 1 more errors)
 +{

@@ -135,6 +135,7 @@ func processDynamic(ctx *OpContext, t *task, mode runMode) {
 	if v.Concreteness() != Concrete {
 		n.addBottom(&Bottom{
 			Code: IncompleteError,
+			Node: n.node,
 			Err: ctx.NewPosf(pos(field.Key),
 				"key value of dynamic field must be concrete, found %v", v),
 		})

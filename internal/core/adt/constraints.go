@@ -162,7 +162,8 @@ func matchPatternValue(ctx *OpContext, pattern Value, f Feature, label Value) (r
 				addPositions(err, c)
 			}
 			ctx.AddBottom(&Bottom{
-				Err: err,
+				Err:  err,
+				Node: ctx.vertex,
 			})
 		}
 		if ctx.errs == nil {

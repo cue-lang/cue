@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15e461cb_7ab18c1c",
+        "filename": "cue/testdata/cycle/structural.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 2534,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-09-06T15:05:04Z",
+      "side": 0,
+      "message": "should this section be manually salvaged?",
+      "revId": "3988f4f92e2a3b67d8c14a0005a37b1ae69167b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

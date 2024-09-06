@@ -753,7 +753,7 @@ func (c *OpContext) evalState(v Expr, state combinedFlags) (result Value) {
 						}
 						err := c.Newf("cycle with field %v", x)
 						b := &Bottom{Code: CycleError, Err: err}
-						v.setValue(c, v.status, b)
+						s.setBaseValue(b)
 						return b
 						// TODO: use this instead, as is usual for incomplete errors,
 						// and also move this block one scope up to also apply to

@@ -32,12 +32,14 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 		return &Bottom{
 			Code: IncompleteError,
 			Err:  c.Newf(msg, left, op),
+			Node: c.vertex,
 		}
 	}
 	if right.Concreteness() > Concrete {
 		return &Bottom{
 			Code: IncompleteError,
 			Err:  c.Newf(msg, right, op),
+			Node: c.vertex,
 		}
 	}
 

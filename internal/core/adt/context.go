@@ -382,7 +382,11 @@ func (c *OpContext) addErrf(code ErrorCode, pos token.Pos, msg string, args ...i
 }
 
 func (c *OpContext) addErr(code ErrorCode, err errors.Error) {
-	c.AddBottom(&Bottom{Code: code, Err: err})
+	c.AddBottom(&Bottom{
+		Code: code,
+		Err:  err,
+		Node: c.vertex,
+	})
 }
 
 // AddBottom records an error in OpContext.
@@ -393,7 +397,10 @@ func (c *OpContext) AddBottom(b *Bottom) {
 // AddErr records an error in OpContext. It returns errors collected so far.
 func (c *OpContext) AddErr(err errors.Error) *Bottom {
 	if err != nil {
-		c.AddBottom(&Bottom{Err: err})
+		c.AddBottom(&Bottom{
+			Err:  err,
+			Node: c.vertex,
+		})
 	}
 	return c.errs
 }
@@ -404,7 +411,12 @@ func (c *OpContext) NewErrf(format string, args ...interface{}) *Bottom {
 	// TODO: consider renaming ot NewBottomf: this is now confusing as we also
 	// have Newf.
 	err := c.Newf(format, args...)
-	return &Bottom{Src: c.src, Err: err, Code: EvalError}
+	return &Bottom{
+		Src:  c.src,
+		Err:  err,
+		Code: EvalError,
+		Node: c.vertex,
+	}
 }
 
 // AddErrf records an error in OpContext. It returns errors collected so far.
@@ -615,6 +627,7 @@ func (c *OpContext) Evaluate(env *Environment, x Expr) (result Value, complete b
 		val = &Bottom{
 			Code: IncompleteError,
 			Err:  c.Newf("UNANTICIPATED ERROR"),
+			Node: env.Vertex,
 		}
 
 	}
@@ -639,6 +652,7 @@ func (c *OpContext) evaluateRec(v Conjunct, state combinedFlags) Value {
 		val = &Bottom{
 			Code: IncompleteError,
 			Err:  c.Newf("UNANTICIPATED ERROR"),
+			Node: c.vertex,
 		}
 	}
 	_ = c.PopState(s)
@@ -961,6 +975,7 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, flags combinedFl
 				Permanent: x.status >= conjuncts,
 				Err: c.NewPosf(pos,
 					"cannot reference optional field: %s", label),
+				Node: x,
 			})
 		}
 	} else {
@@ -1007,6 +1022,7 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, flags combinedFl
 			Code:      code,
 			Permanent: permanent,
 			Err:       err,
+			Node:      x,
 		})
 	}
 	return a

@@ -190,6 +190,8 @@ Result:
   incomplete: (_|_){
     // [incomplete] incomplete: undefined field: d:
     //     ./in.cue:16:7
+    // incomplete: undefined field: d:
+    //     ./in.cue:23:21
     list: (#list){
       0: (int){ 1 }
       1: (int){ 2 }
@@ -268,16 +270,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -31,8 +31,6 @@
-   incomplete: (_|_){
-     // [incomplete] incomplete: undefined field: d:
-     //     ./in.cue:16:7
--    // incomplete: undefined field: d:
--    //     ./in.cue:23:21
-     list: (#list){
-       0: (int){ 1 }
-       1: (int){ 2 }
-@@ -66,17 +64,23 @@
+@@ -66,17 +66,23 @@
    issue1972: (_|_){
      // [eval]
      err1: (_|_){

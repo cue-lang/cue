@@ -87,11 +87,18 @@ Result:
       //     ./in.cue:7:5
       //     ./in.cue:3:35
       //     ./in.cue:5:5
+      // non-concrete value int in operand to <:
+      //     ./in.cue:10:5
+      //     ./in.cue:3:35
+      //     ./in.cue:5:5
     }
   }
   fib: (_|_){
     // [incomplete] fib: non-concrete value int in operand to >=:
     //     ./in.cue:7:5
+    //     ./in.cue:5:5
+    // fib: non-concrete value int in operand to <:
+    //     ./in.cue:10:5
     //     ./in.cue:5:5
     n: (int){ int }
   }
@@ -150,24 +157,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -16,10 +12,6 @@
-       //     ./in.cue:7:5
-       //     ./in.cue:3:35
-       //     ./in.cue:5:5
--      // non-concrete value int in operand to <:
--      //     ./in.cue:10:5
--      //     ./in.cue:3:35
--      //     ./in.cue:5:5
-     }
-   }
-   fib: (_|_){
-@@ -26,33 +18,23 @@
-     // [incomplete] fib: non-concrete value int in operand to >=:
-     //     ./in.cue:7:5
-     //     ./in.cue:5:5
--    // fib: non-concrete value int in operand to <:
--    //     ./in.cue:10:5
--    //     ./in.cue:5:5
+@@ -32,27 +28,20 @@
      n: (int){ int }
    }
    fib1: (int){ 1 }

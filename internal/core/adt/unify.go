@@ -626,10 +626,6 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 		// proceed with partial data, in which case a "pending" arc will be
 		// created to be completed later.
 
-		// Report error for now.
-		if state.hasErr() {
-			c.AddBottom(state.getErr())
-		}
 		// TODO: ideally this should not be run at this point. Consider under
 		// which circumstances this is still necessary, and at least ensure
 		// this will not be run if node v currently has a running task.

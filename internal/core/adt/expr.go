@@ -846,6 +846,8 @@ func (x *ImportReference) resolve(ctx *OpContext, state combinedFlags) *Vertex {
 	v := ctx.Runtime.LoadImport(path)
 	if v == nil {
 		ctx.addErrf(EvalError, x.Src.Pos(), "cannot find package %q", path)
+	} else if !v.isFinal() && ctx.isDevVersion() {
+		v.Finalize(ctx)
 	}
 	return v
 }

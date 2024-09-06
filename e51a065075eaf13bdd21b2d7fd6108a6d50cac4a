@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be6b4e29_e274606e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-06T13:27:43Z",
+      "side": 1,
+      "message": "nit: indent instead of the triple backquotes",
+      "revId": "e51a065075eaf13bdd21b2d7fd6108a6d50cac4a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

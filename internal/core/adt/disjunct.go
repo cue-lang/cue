@@ -210,7 +210,7 @@ func (n *nodeContext) expandDisjuncts(
 			n.disjuncts = append(n.disjuncts, n)
 		}
 		if n.node.BaseValue == nil {
-			n.node.BaseValue = n.getValidators(state)
+			n.setBaseValue(n.getValidators(state))
 		}
 
 		n.usedDefault = append(n.usedDefault, defaultInfo{

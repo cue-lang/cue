@@ -851,6 +851,18 @@ func (v *Vertex) setValue(ctx *OpContext, state vertexStatus, value BaseValue) *
 	return nil
 }
 
+func (n *nodeContext) setBaseValue(value BaseValue) {
+	n.node.BaseValue = value
+}
+
+// swapBaseValue swaps the BaseValue of a node with the given value and returns
+// the previous value.
+func (n *nodeContext) swapBaseValue(value BaseValue) (saved BaseValue) {
+	saved = n.node.BaseValue
+	n.setBaseValue(value)
+	return saved
+}
+
 // ToVertex wraps v in a new Vertex, if necessary.
 func ToVertex(v Value) *Vertex {
 	switch x := v.(type) {

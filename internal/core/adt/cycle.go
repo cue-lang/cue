@@ -611,14 +611,14 @@ func assertStructuralCycle(n *nodeContext) bool {
 }
 
 func (n *nodeContext) reportCycleError() {
-	n.node.BaseValue = CombineErrors(nil,
+	n.setBaseValue(CombineErrors(nil,
 		n.node.Value(),
 		&Bottom{
 			Code:  StructuralCycleError,
 			Err:   n.ctx.Newf("structural cycle"),
 			Value: n.node.Value(),
 			// TODO: probably, this should have the referenced arc.
-		})
+		}))
 	n.node.Arcs = nil
 }
 

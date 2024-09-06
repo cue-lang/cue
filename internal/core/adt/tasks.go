@@ -332,7 +332,7 @@ func (n *nodeContext) updateListType(list Expr, id CloseInfo, isClosed bool, ell
 		m = &ListMarker{
 			IsOpen: true,
 		}
-		n.node.setValue(n.ctx, conjuncts, m)
+		n.setBaseValue(m)
 	}
 	m.IsOpen = m.IsOpen && !isClosed
 

@@ -823,7 +823,7 @@ func (n *nodeContext) completeArcs(state vertexStatus) {
 				}
 
 				if err := a.Bottom(); err != nil {
-					n.node.AddChildError(err)
+					n.AddChildError(err)
 				}
 			}
 

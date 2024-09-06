@@ -317,7 +317,7 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 
 	case 1:
 		d := cross[0].node
-		n.node.BaseValue = d
+		n.setBaseValue(d)
 		n.defaultMode = cross[0].defaultMode
 
 	default:
@@ -419,9 +419,7 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode) (*node
 
 	v := d.node
 
-	saved := n.node.BaseValue
-	n.node.BaseValue = v
-	defer func() { n.node.BaseValue = saved }()
+	defer n.setBaseValue(n.swapBaseValue(v))
 
 	// Clear relevant scheduler states.
 	// TODO: do something more principled: just ensure that a node that has
@@ -487,7 +485,7 @@ func (n *nodeContext) finalizeDisjunctions() {
 	}
 
 	v := n.node
-	v.BaseValue = d
+	n.setBaseValue(d)
 
 	// The conjuncts will have too much information. Better have no
 	// information than incorrect information.

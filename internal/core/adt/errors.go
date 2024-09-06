@@ -131,7 +131,8 @@ func isIncomplete(v *Vertex) bool {
 //
 // If x is not already an error, the value is recorded in the error for
 // reference.
-func (v *Vertex) AddChildError(recursive *Bottom) {
+func (n *nodeContext) AddChildError(recursive *Bottom) {
+	v := n.node
 	v.ChildErrors = CombineErrors(nil, v.ChildErrors, recursive)
 	if recursive.IsIncomplete() {
 		return
@@ -139,13 +140,13 @@ func (v *Vertex) AddChildError(recursive *Bottom) {
 	x := v.BaseValue
 	err, _ := x.(*Bottom)
 	if err == nil {
-		v.BaseValue = &Bottom{
+		n.setBaseValue(&Bottom{
 			Code:         recursive.Code,
 			Value:        v,
 			HasRecursive: true,
 			ChildError:   true,
 			Err:          recursive.Err,
-		}
+		})
 		return
 	}
 
@@ -154,7 +155,7 @@ func (v *Vertex) AddChildError(recursive *Bottom) {
 		err.Code = recursive.Code
 	}
 
-	v.BaseValue = err
+	n.setBaseValue(err)
 }
 
 // CombineErrors combines two errors that originate at the same Vertex.

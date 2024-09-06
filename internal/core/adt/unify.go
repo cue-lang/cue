@@ -260,7 +260,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		if b := n.node.Bottom(); b != nil {
 			err = CombineErrors(nil, b, err)
 		}
-		n.node.BaseValue = err
+		n.setBaseValue(err)
 	}
 
 	if mode == attemptOnly {
@@ -434,7 +434,7 @@ func (n *nodeContext) updateScalar() {
 	// Set BaseValue to scalar, but only if it was not set before. Most notably,
 	// errors should not be discarded.
 	if n.scalar != nil && (!n.node.IsErr() || isCyclePlaceholder(n.node.BaseValue)) {
-		n.node.BaseValue = n.scalar
+		n.setBaseValue(n.scalar)
 		n.signal(scalarKnown)
 	}
 }
@@ -521,7 +521,7 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 		if !a.Label.IsLet() && a.ArcType <= ArcRequired {
 			a := a.DerefValue()
 			if err := a.Bottom(); err != nil {
-				n.node.AddChildError(err)
+				n.AddChildError(err)
 			}
 			success = true // other arcs are irrelevant
 		}

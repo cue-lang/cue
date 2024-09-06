@@ -41,8 +41,13 @@ Result:
   let _bar#1 = (_){ _ }
 }
 -- out/evalalpha --
+Errors:
+undefined field: missing:
+    ./in.cue:4:8
+
+Result:
 (_|_){
-  // [incomplete] undefined field: missing:
+  // [eval] undefined field: missing:
   //     ./in.cue:4:8
   foo: (_|_){
     // [incomplete] undefined field: missing:
@@ -50,24 +55,15 @@ Result:
   }
   bar: (#struct){
   }
-  let _bar#1 = (_|_){
-    // [incomplete] undefined field: missing:
-    //     ./in.cue:4:8
-  }
+  let _bar#1 = (_){ _ }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,13 +1,14 @@
--Errors:
--undefined field: missing:
--    ./in.cue:4:8
--
--Result:
+@@ -6,7 +6,10 @@
  (_|_){
--  // [eval] undefined field: missing:
-+  // [incomplete] undefined field: missing:
+   // [eval] undefined field: missing:
    //     ./in.cue:4:8
 -  foo: (string){ string }
 +  foo: (_|_){
@@ -76,11 +72,6 @@ diff old new
 +  }
    bar: (#struct){
    }
--  let _bar#1 = (_){ _ }
-+  let _bar#1 = (_|_){
-+    // [incomplete] undefined field: missing:
-+    //     ./in.cue:4:8
-+  }
- }
+   let _bar#1 = (_){ _ }
 -- diff/todo/p2 --
 Let seems to have misplaced error, even though it does not affect outcome.

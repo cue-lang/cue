@@ -1196,7 +1196,10 @@ func (v *Vertex) AddConjunct(c Conjunct) *Bottom {
 		// change the order of fields in some cases.
 		//
 		// This is likely a bug in the evaluator and should not happen.
-		return &Bottom{Err: errors.Newf(token.NoPos, "cannot add conjunct")}
+		return &Bottom{
+			Err:  errors.Newf(token.NoPos, "cannot add conjunct"),
+			Node: v,
+		}
 	}
 	if !v.hasConjunct(c) {
 		v.addConjunctUnchecked(c)

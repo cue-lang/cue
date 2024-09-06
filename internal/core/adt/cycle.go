@@ -617,6 +617,7 @@ func (n *nodeContext) reportCycleError() {
 			Code:  StructuralCycleError,
 			Err:   n.ctx.Newf("structural cycle"),
 			Value: n.node.Value(),
+			Node:  n.node,
 			// TODO: probably, this should have the referenced arc.
 		}))
 	n.node.Arcs = nil

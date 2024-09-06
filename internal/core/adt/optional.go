@@ -104,7 +104,8 @@ func matchBulk(c *OpContext, env *Environment, p *BulkOptionalField, f Feature, 
 				err.AddPosition(c.Elem())
 			}
 			c.AddBottom(&Bottom{
-				Err: err,
+				Err:  err,
+				Node: c.vertex,
 			})
 		}
 		if c.errs == nil {

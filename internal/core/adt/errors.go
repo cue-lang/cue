@@ -86,6 +86,11 @@ type Bottom struct {
 	ForCycle     bool // this is a for cycle
 	// Value holds the computed value so far in case
 	Value Value
+
+	// Node marks the node at which an error occurred. This is used to
+	// determine the package to which an error belongs.
+	// TODO: use a more precise mechanism for tracking the package.
+	Node *Vertex
 }
 
 func (x *Bottom) Source() ast.Node        { return x.Src }
@@ -146,6 +151,7 @@ func (n *nodeContext) AddChildError(recursive *Bottom) {
 			HasRecursive: true,
 			ChildError:   true,
 			Err:          recursive.Err,
+			Node:         n.node,
 		})
 		return
 	}
@@ -229,6 +235,7 @@ func NewRequiredNotPresentError(ctx *OpContext, v *Vertex) *Bottom {
 	b := &Bottom{
 		Code: IncompleteError,
 		Err:  err,
+		Node: v,
 	}
 	ctx.PopArc(saved)
 	return b
@@ -275,6 +282,7 @@ func (v *Vertex) reportFieldError(c *OpContext, pos token.Pos, f Feature, intMsg
 	b := &Bottom{
 		Code: code,
 		Err:  err,
+		Node: v,
 	}
 	// TODO: yield failure
 	c.AddBottom(b) // TODO: unify error mechanism.

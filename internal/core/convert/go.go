@@ -71,7 +71,8 @@ func toValue(e adt.Expr) adt.Value {
 func compileExpr(ctx *adt.OpContext, expr ast.Expr) adt.Value {
 	c, err := compile.Expr(nil, ctx, pkgID(), expr)
 	if err != nil {
-		return &adt.Bottom{Err: errors.Promote(err, "compile")}
+		return &adt.Bottom{
+			Err: errors.Promote(err, "compile")}
 	}
 	return adt.Resolve(ctx, c)
 }

@@ -471,7 +471,10 @@ func (x *BoundExpr) evaluate(ctx *OpContext, state combinedFlags) Value {
 		if x.Op != NotEqualOp {
 			err := ctx.NewPosf(pos(x.Expr),
 				"cannot use null for bound %s", x.Op)
-			return &Bottom{Err: err}
+			return &Bottom{
+				Err:  err,
+				Node: ctx.vertex,
+			}
 		}
 	default:
 		mask := IntKind | FloatKind | NumberKind | StringKind | BytesKind
@@ -485,7 +488,10 @@ func (x *BoundExpr) evaluate(ctx *OpContext, state combinedFlags) Value {
 		}
 		err := ctx.NewPosf(pos(x.Expr),
 			"invalid value %s (type %s) for bound %s", v, k, x.Op)
-		return &Bottom{Err: err}
+		return &Bottom{
+			Err:  err,
+			Node: ctx.vertex,
+		}
 	}
 
 	if v, ok := x.Expr.(Value); ok {
@@ -622,7 +628,12 @@ func (x *BoundValue) validate(c *OpContext, y Value) *Bottom {
 		// predeclared identifier such as `int`.
 		err := c.Newf("invalid value %v (out of bound %s)", y, x)
 		err.AddPosition(y)
-		return &Bottom{Src: c.src, Err: err, Code: EvalError}
+		return &Bottom{
+			Src:  c.src,
+			Err:  err,
+			Code: EvalError,
+			Node: c.vertex,
+		}
 
 	default:
 		panic(fmt.Sprintf("unsupported type %T", v))
@@ -1107,7 +1118,11 @@ func (x *SliceExpr) evaluate(c *OpContext, state combinedFlags) Value {
 		for i, a := range v.Arcs[lo:hi] {
 			label, err := MakeLabel(a.Source(), int64(i), IntLabel)
 			if err != nil {
-				c.AddBottom(&Bottom{Src: a.Source(), Err: err})
+				c.AddBottom(&Bottom{
+					Src:  a.Source(),
+					Err:  err,
+					Node: v,
+				})
 				return nil
 			}
 			arc := *a
@@ -1173,6 +1188,7 @@ func (x *Interpolation) evaluate(c *OpContext, state combinedFlags) Value {
 	if err := c.Err(); err != nil {
 		err = &Bottom{
 			Code: err.Code,
+			Node: c.vertex,
 			Err:  errors.Wrapf(err.Err, pos(x), "invalid interpolation"),
 		}
 		// c.AddBottom(err)
@@ -1758,7 +1774,11 @@ func validateWithBuiltin(c *OpContext, src token.Pos, b *Builtin, args []Value) 
 		vErr.AddPosition(v)
 	}
 
-	return &Bottom{Code: severeness, Err: errors.Wrap(vErr, err)}
+	return &Bottom{
+		Code: severeness,
+		Err:  errors.Wrap(vErr, err),
+		Node: c.vertex,
+	}
 }
 
 // A Disjunction represents a disjunction, where each disjunct may or may not
@@ -1992,6 +2012,7 @@ func (x *ForClause) yield(s *compState) {
 				Code:     CycleError,
 				ForCycle: true,
 				Value:    n,
+				Node:     n,
 				Err:      errors.Newf(pos(x.Src), "comprehension source references itself"),
 			})
 			return

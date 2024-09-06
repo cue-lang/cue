@@ -469,6 +469,7 @@ func (n *nodeContext) makeError() {
 	b := &Bottom{
 		Code: code,
 		Err:  n.disjunctError(),
+		Node: n.node,
 	}
 	n.node.SetValue(n.ctx, b)
 }

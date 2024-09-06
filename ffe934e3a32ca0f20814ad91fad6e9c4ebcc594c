@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "309c6415_70ad1e3e",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 862,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-09-06T14:19:14Z",
+      "side": 1,
+      "message": "Given these 3 methods are very similar to each other, it seems likely someone might find them and decide to combine them all. I\u0027m guessing the purpose of keeping them separate is when adding debugging printlns / breakpoints etc. In which case it might be worth adding a comment to make sure these are not accidentally merged together.",
+      "revId": "ffe934e3a32ca0f20814ad91fad6e9c4ebcc594c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

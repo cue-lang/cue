@@ -317,6 +317,40 @@ line two.\
 			negative: false
 			`,
 	}, {
+		name: "DateTimes",
+		input: `
+			offsetDateTime1 = 1979-05-27T07:32:00Z
+			offsetDateTime2 = 1979-05-27T00:32:00-07:00
+			offsetDateTime3 = 1979-05-27T00:32:00.999999-07:00
+			localDateTime1 = 1979-05-27T07:32:00
+			localDateTime2 = 1979-05-27T00:32:00.999999
+			localDate1 = 1979-05-27
+			localTime1 = 07:32:00
+			localTime2 = 00:32:00.999999
+
+			inlineArray = [1979-05-27, 07:32:00]
+
+			notActuallyDate = "1979-05-27"
+			notActuallyTime = "07:32:00"
+			inlineArrayNotActually = ["1979-05-27", "07:32:00"]
+			`,
+		wantCUE: `
+			import "time"
+
+			offsetDateTime1: "1979-05-27T07:32:00Z" & time.Format(time.RFC3339)
+			offsetDateTime2: "1979-05-27T00:32:00-07:00" & time.Format(time.RFC3339)
+			offsetDateTime3: "1979-05-27T00:32:00.999999-07:00" & time.Format(time.RFC3339)
+			localDateTime1: "1979-05-27T07:32:00" & time.Format("2006-01-02T15:04:05")
+			localDateTime2: "1979-05-27T00:32:00.999999" & time.Format("2006-01-02T15:04:05")
+			localDate1: "1979-05-27" & time.Format(time.RFC3339Date)
+			localTime1: "07:32:00" & time.Format("15:04:05")
+			localTime2: "00:32:00.999999" & time.Format("15:04:05")
+			inlineArray: ["1979-05-27" & time.Format(time.RFC3339Date), "07:32:00" & time.Format("15:04:05")]
+			notActuallyDate: "1979-05-27"
+			notActuallyTime: "07:32:00"
+			inlineArrayNotActually: ["1979-05-27", "07:32:00"]
+			`,
+	}, {
 		name: "Arrays",
 		input: `
 			integers      = [1, 2, 3]

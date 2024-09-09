@@ -16,6 +16,24 @@
       "message": "should this section be manually salvaged?",
       "revId": "3988f4f92e2a3b67d8c14a0005a37b1ae69167b3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4d9818b_5f0da41b",
+        "filename": "cue/testdata/cycle/structural.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 2534,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-09T08:04:22Z",
+      "side": 0,
+      "message": "Very well spotted. I definitely did not intend to delete `diff/todo` entries. I have no idea how I managed that - I\u0027m pretty sure I only added the test case and then re-ran the tests with `CUE_UPDATE\u003d1`. But I re-added this stuff now and I no longer see the issue, so... Not sure :) Fixed, thanks!",
+      "parentUuid": "15e461cb_7ab18c1c",
+      "revId": "3988f4f92e2a3b67d8c14a0005a37b1ae69167b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

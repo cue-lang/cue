@@ -1,9 +1,8 @@
 # Check that we cannot specify an arbitary unknown key-value pair
 # in a filetype.
-# TODO fix this test.
 
-exec cue export cue+foo=bar: x.cue
-# cmp stderr expect-stderr
+! exec cue export cue+foo=bar: x.cue
+cmp stderr expect-stderr
 -- x.cue --
 true
 -- expect-stderr --

@@ -79,7 +79,7 @@ func addGlobalFlags(f *pflag.FlagSet) {
 	f.BoolP(string(flagIgnore), "i", false,
 		"proceed in the presence of errors")
 	f.Bool(string(flagStrict), false,
-		"report errors for lossy mappings")
+		"report errors for lossy mappings (deprecated: use +strict filetype instead)")
 	f.BoolP(string(flagVerbose), "v", false,
 		"print information about progress")
 	f.BoolP(string(flagAllErrors), "E", false, "print all available errors")

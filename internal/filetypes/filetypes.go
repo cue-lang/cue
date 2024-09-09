@@ -15,7 +15,9 @@
 package filetypes
 
 import (
+	"fmt"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -314,21 +316,57 @@ func parseType(scope string, mode Mode) (modeVal, fileVal cue.Value, _ error) {
 	modeVal = typesValue.LookupPath(cue.MakePath(cue.Str("modes"), cue.Str(mode.String())))
 	fileVal = modeVal.LookupPath(cue.MakePath(cue.Str("File")))
 
-	if scope != "" {
-		for _, tag := range strings.Split(scope, "+") {
-			tagName, tagVal, ok := strings.Cut(tag, "=")
-			if ok {
-				fileVal = fileVal.FillPath(cue.MakePath(cue.Str("tags"), cue.Str(tagName)), tagVal)
-			} else {
-				info := typesValue.LookupPath(cue.MakePath(cue.Str("tagInfo"), cue.Str(tag)))
-				if !info.Exists() {
-					return cue.Value{}, cue.Value{}, errors.Newf(token.NoPos, "unknown filetype %s", tag)
-				}
+	if scope == "" {
+		return modeVal, fileVal, nil
+	}
+	var otherTags []string
+	for _, tag := range strings.Split(scope, "+") {
+		tagName, _, ok := strings.Cut(tag, "=")
+		if ok {
+			otherTags = append(otherTags, tag)
+		} else {
+			info := typesValue.LookupPath(cue.MakePath(cue.Str("tagInfo"), cue.Str(tagName)))
+			if info.Exists() {
 				fileVal = fileVal.Unify(info)
+			} else {
+				// The tag might only be available when all the
+				// other tags have been evaluated.
+				otherTags = append(otherTags, tag)
 			}
 		}
 	}
-
+	if len(otherTags) == 0 {
+		return modeVal, fileVal, nil
+	}
+	// There are tags that aren't mentioned in tagInfo.
+	// They might still be valid, but just only valid within the file types that
+	// have been specified above, so look at the schema that we've got
+	// and see if it specifies any tags.
+	allowedTags := fileVal.LookupPath(cue.MakePath(cue.Str("tags")))
+	allowedBoolTags := fileVal.LookupPath(cue.MakePath(cue.Str("boolTags")))
+	for _, tag := range otherTags {
+		tagName, tagVal, hasValue := strings.Cut(tag, "=")
+		tagNamePath := cue.MakePath(cue.Str(tagName)).Optional()
+		tagSchema := allowedTags.LookupPath(tagNamePath)
+		if tagSchema.Exists() {
+			fileVal = fileVal.FillPath(cue.MakePath(cue.Str("tags"), cue.Str(tagName)), tagVal)
+			continue
+		}
+		if !allowedBoolTags.LookupPath(tagNamePath).Exists() {
+			return cue.Value{}, cue.Value{}, errors.Newf(token.NoPos, "unknown filetype %s", tagName)
+		}
+		tagValBool := true
+		if hasValue {
+			// It's a boolean tag and an explicit value has been specified.
+			// Allow the usual boolean string values.
+			t, err := strconv.ParseBool(tagVal)
+			if err != nil {
+				return cue.Value{}, cue.Value{}, fmt.Errorf("invalid boolean value for tag %q", tagName)
+			}
+			tagValBool = t
+		}
+		fileVal = fileVal.FillPath(cue.MakePath(cue.Str("boolTags"), cue.Str(tagName)), tagValBool)
+	}
 	return modeVal, fileVal, nil
 }
 

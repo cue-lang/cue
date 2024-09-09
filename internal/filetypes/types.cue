@@ -28,6 +28,7 @@ package build
 	form?:           #Form
 	// Note: tags includes values for non-boolean tags only.
 	tags?: [string]: string
+	boolTags?: [string]: bool
 }
 
 // Default is the file used for stdin and stdout. The settings depend
@@ -327,7 +328,6 @@ tagInfo: {
 	data: form:   "data"
 
 	cue: encoding: "cue"
-
 	json: encoding:      "json"
 	jsonl: encoding:     "jsonl"
 	yaml: encoding:      "yaml"
@@ -363,7 +363,6 @@ tagInfo: {
 		interpretation: ""
 		tags: lang: *"" | string
 	}
-
 	auto: {
 		interpretation: "auto"
 		encoding:       *"json" | _
@@ -371,6 +370,11 @@ tagInfo: {
 	jsonschema: {
 		interpretation: "jsonschema"
 		encoding:       *"json" | _
+		boolTags: {
+			strict: *false | bool
+			strictKeywords: *strict | bool
+			strictFeatures: *strict | bool
+		}
 	}
 	openapi: {
 		interpretation: "openapi"

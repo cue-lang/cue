@@ -20,8 +20,6 @@ package encoding
 import (
 	"fmt"
 	"io"
-	"net/url"
-	"strings"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
@@ -57,18 +55,16 @@ type Decoder struct {
 	expr           ast.Expr
 	file           *ast.File
 	filename       string // may change on iteration for some formats
-	id             string
 	index          int
 	err            error
 }
 
-type interpretFunc func(cue.Value) (file *ast.File, id string, err error)
+type interpretFunc func(cue.Value) (file *ast.File, err error)
 type rewriteFunc func(*ast.File) (file *ast.File, err error)
 
-// ID returns a canonical identifier for the decoded object or "" if no such
-// identifier could be found.
+// Deprecated: this method always returns the empty string.
 func (i *Decoder) ID() string {
-	return i.id
+	return ""
 }
 func (i *Decoder) Filename() string { return i.filename }
 
@@ -110,7 +106,7 @@ func (i *Decoder) doInterpret() {
 			i.err = err
 			return
 		}
-		i.file, i.id, i.err = i.interpretFunc(v)
+		i.file, i.err = i.interpretFunc(v)
 	}
 }
 
@@ -206,14 +202,14 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 	case build.Auto:
 		openAPI := openAPIFunc(cfg, f)
 		jsonSchema := jsonSchemaFunc(cfg, f)
-		i.interpretFunc = func(v cue.Value) (file *ast.File, id string, err error) {
+		i.interpretFunc = func(v cue.Value) (file *ast.File, err error) {
 			switch i.interpretation = Detect(v); i.interpretation {
 			case build.JSONSchema:
 				return jsonSchema(v)
 			case build.OpenAPI:
 				return openAPI(v)
 			}
-			return i.file, "", i.err
+			return i.file, i.err
 		}
 	case build.OpenAPI:
 		i.interpretation = build.OpenAPI
@@ -291,21 +287,8 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 }
 
 func jsonSchemaFunc(cfg *Config, f *build.File) interpretFunc {
-	return func(v cue.Value) (file *ast.File, id string, err error) {
-		id = f.Tags["id"]
-		if id == "" {
-			id, _ = v.LookupPath(cue.MakePath(cue.Str("$id"))).String()
-		}
-		if id != "" {
-			u, err := url.Parse(id)
-			if err != nil {
-				return nil, "", errors.Wrapf(err, token.NoPos, "invalid id")
-			}
-			u.Scheme = ""
-			id = strings.TrimPrefix(u.String(), "//")
-		}
+	return func(v cue.Value) (file *ast.File, err error) {
 		cfg := &jsonschema.Config{
-			ID:      id,
 			PkgName: cfg.PkgName,
 
 			Strict: cfg.Strict,
@@ -313,17 +296,17 @@ func jsonSchemaFunc(cfg *Config, f *build.File) interpretFunc {
 		file, err = jsonschema.Extract(v, cfg)
 		// TODO: simplify currently erases file line info. Reintroduce after fix.
 		// file, err = simplify(file, err)
-		return file, id, err
+		return file, err
 	}
 }
 
 func openAPIFunc(c *Config, f *build.File) interpretFunc {
 	cfg := &openapi.Config{PkgName: c.PkgName}
-	return func(v cue.Value) (file *ast.File, id string, err error) {
+	return func(v cue.Value) (file *ast.File, err error) {
 		file, err = openapi.Extract(v, cfg)
 		// TODO: simplify currently erases file line info. Reintroduce after fix.
 		// file, err = simplify(file, err)
-		return file, "", err
+		return file, err
 	}
 }
 

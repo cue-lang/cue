@@ -7,5 +7,5 @@
 }
 -- out/decode/extract --
 ERROR:
-constraint "$id" is not supported in JSON schema version http://json-schema.org/draft-04/schema#:
+keyword "$id" is not supported in JSON schema version http://json-schema.org/draft-04/schema#:
     schema.json:2:3

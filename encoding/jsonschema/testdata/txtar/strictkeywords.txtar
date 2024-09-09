@@ -1,0 +1,12 @@
+#strictKeywords
+-- schema.json --
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "number",
+  "$dynamicAnchor": "bar",
+  "foo": true
+}
+-- out/decode/extract --
+ERROR:
+unknown keyword "foo":
+    schema.json:5:3

@@ -33,8 +33,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: constraint \"const\" is not supported in JSON schema version http://json-schema.org/draft-04/schema#",
-			"v3": "extract error: constraint \"const\" is not supported in JSON schema version http://json-schema.org/draft-04/schema#"
+			"v2": "extract error: keyword \"const\" is not supported in JSON schema version http://json-schema.org/draft-04/schema#",
+			"v3": "extract error: keyword \"const\" is not supported in JSON schema version http://json-schema.org/draft-04/schema#"
 		},
 		"tests": [
 			{

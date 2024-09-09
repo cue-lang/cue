@@ -16,6 +16,24 @@
       "message": "nit: indent instead of the triple backquotes",
       "revId": "e51a065075eaf13bdd21b2d7fd6108a6d50cac4a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "11d93f95_9dff23f9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-09T15:12:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "be6b4e29_e274606e",
+      "revId": "e51a065075eaf13bdd21b2d7fd6108a6d50cac4a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

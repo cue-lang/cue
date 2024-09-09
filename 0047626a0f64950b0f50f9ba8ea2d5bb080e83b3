@@ -34,6 +34,24 @@
       "parentUuid": "f3afbbbc_b5054fc4",
       "revId": "0047626a0f64950b0f50f9ba8ea2d5bb080e83b3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b543196_024130ac",
+        "filename": "internal/cmd/cue-ast-tool/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-09T14:31:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d0f546f3_d668b787",
+      "revId": "0047626a0f64950b0f50f9ba8ea2d5bb080e83b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

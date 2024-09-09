@@ -90,6 +90,8 @@ func TestDecode(t *testing.T) {
 			}
 		}
 		cfg.Strict = t.HasTag("strict")
+		cfg.StrictKeywords = t.HasTag("strictKeywords")
+		cfg.StrictFeatures = t.HasTag("strictFeatures")
 
 		ctx := t.CueContext()
 

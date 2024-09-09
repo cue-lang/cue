@@ -13,8 +13,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unknown-keyword\"",
-			"v3": "extract error: unsupported constraint \"unknown-keyword\""
+			"v2": "extract error: unknown keyword \"unknown-keyword\"",
+			"v3": "extract error: unknown keyword \"unknown-keyword\""
 		},
 		"tests": [
 			{
@@ -57,8 +57,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"unknown-keyword\"",
-			"v3": "extract error: unsupported constraint \"unknown-keyword\""
+			"v2": "extract error: unknown keyword \"unknown-keyword\"",
+			"v3": "extract error: unknown keyword \"unknown-keyword\""
 		},
 		"tests": [
 			{

@@ -42,8 +42,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: unsupported constraint \"array_of_schemas\" (and 1 more errors)",
-			"v3": "extract error: unsupported constraint \"array_of_schemas\" (and 1 more errors)"
+			"v2": "extract error: unknown keyword \"array_of_schemas\" (and 1 more errors)",
+			"v3": "extract error: unknown keyword \"array_of_schemas\" (and 1 more errors)"
 		},
 		"tests": [
 			{

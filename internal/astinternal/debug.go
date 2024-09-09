@@ -71,23 +71,25 @@ func (d *debugPrinter) value0(v reflect.Value, impliedType reflect.Type) {
 	if d.cfg.Filter != nil && !d.cfg.Filter(v) {
 		return
 	}
-	// Skip over interface types.
-	if v.Kind() == reflect.Interface {
-		v = v.Elem()
-	}
-	// Indirecting a nil interface gives a zero value. We
-	// can also have a nil pointer inside a non-nil interface.
-	if !v.IsValid() || (v.Kind() == reflect.Pointer && v.IsNil()) {
-		if !d.cfg.OmitEmpty {
-			d.printf("nil")
+	// Skip over interfaces and pointers, stopping early if nil.
+	concreteType := v.Type()
+	for {
+		k := v.Kind()
+		if k != reflect.Interface && k != reflect.Pointer {
+			break
 		}
-		return
+		if v.IsNil() {
+			if !d.cfg.OmitEmpty {
+				d.printf("nil")
+			}
+			return
+		}
+		v = v.Elem()
+		if k == reflect.Interface {
+			// For example, *ast.Ident can be the concrete type behind an ast.Expr.
+			concreteType = v.Type()
+		}
 	}
-
-	// We print the original pointer type if there was one.
-	origType := v.Type()
-
-	v = reflect.Indirect(v)
 
 	if d.cfg.OmitEmpty && v.IsZero() {
 		return
@@ -121,8 +123,9 @@ func (d *debugPrinter) value0(v reflect.Value, impliedType reflect.Type) {
 
 	case reflect.Slice, reflect.Struct:
 		valueStart := d.pos()
-		if origType != impliedType {
-			d.printf("%s", origType)
+		// We print the concrete type when it differs from an implied type.
+		if concreteType != impliedType {
+			d.printf("%s", concreteType)
 		}
 		d.printf("{")
 		d.level++

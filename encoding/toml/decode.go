@@ -23,6 +23,7 @@ import (
 	"io"
 	"strconv"
 	"strings"
+	"time"
 
 	toml "github.com/pelletier/go-toml/v2/unstable"
 
@@ -463,7 +464,38 @@ func (d *Decoder) decodeExpr(rkey rootedKey, tnode *toml.Node) (ast.Expr, error)
 			strct.Elts = append(strct.Elts, field)
 		}
 		expr = strct
-	// TODO(mvdan): dates and times
+	case toml.LocalDate, toml.LocalTime, toml.LocalDateTime, toml.DateTime:
+		// CUE does not have native date nor time literal kinds,
+		// so we decode these as strings exactly as they came in
+		// and we validate them with time.Format using the corresponding format string.
+		// Not only does this ensure that the resulting CUE can be used with our time package,
+		// but it also means that we can roundtrip a TOML timestamp without confusing it for a string.
+		var format ast.Expr
+		switch tnode.Kind {
+		case toml.LocalDate:
+			// TODO(mvdan): rename time.RFC3339Date to time.DateOnly to mirror Go
+			format = ast.NewSel(&ast.Ident{
+				Name: "time",
+				Node: ast.NewImport(nil, "time"),
+			}, "RFC3339Date")
+		case toml.LocalTime:
+			// TODO(mvdan): add TimeOnly to CUE's time package to mirror Go
+			format = ast.NewString(time.TimeOnly)
+		case toml.LocalDateTime:
+			// RFC3339 minus the timezone; this seems like a format peculiar to TOML.
+			format = ast.NewString("2006-01-02T15:04:05")
+		default: // DateTime
+			format = ast.NewSel(&ast.Ident{
+				Name: "time",
+				Node: ast.NewImport(nil, "time"),
+			}, "RFC3339")
+		}
+		expr = ast.NewBinExpr(token.AND, ast.NewString(data), ast.NewCall(
+			ast.NewSel(&ast.Ident{
+				Name: "time",
+				Node: ast.NewImport(nil, "time"),
+			}, "Format"), format),
+		)
 	default:
 		return nil, fmt.Errorf("encoding/toml.Decoder.decodeExpr: unknown %s %#v", tnode.Kind, tnode)
 	}

@@ -329,8 +329,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: constraint \"$comment\" is not supported in JSON schema version http://json-schema.org/draft-04/schema# (and 1 more errors)",
-			"v3": "extract error: constraint \"$comment\" is not supported in JSON schema version http://json-schema.org/draft-04/schema# (and 1 more errors)"
+			"v2": "extract error: keyword \"$comment\" is not supported in JSON schema version http://json-schema.org/draft-04/schema# (and 1 more errors)",
+			"v3": "extract error: keyword \"$comment\" is not supported in JSON schema version http://json-schema.org/draft-04/schema# (and 1 more errors)"
 		},
 		"tests": [
 			{

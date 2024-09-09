@@ -82,18 +82,6 @@ out.subs.subs.#p: invalid structural cycle
 This seems to be the result of incorrect handling of disjunctions.
 -- diff/todo/p3 --
 Reordering
--- diff/todo/p3 --
-Reordering
--- out/evalalpha/stats --
-Leaks:  2604
-Freed:  263
-Reused: 263
-Allocs: 2604
-Retain: 0
-
-Unifications: 239
-Conjuncts:    8656
-Disjuncts:    522
 -- out/evalalpha/stats --
 Leaks:  2075
 Freed:  218

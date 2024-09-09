@@ -454,8 +454,20 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 			}
 
 			update := false
-
-			for i, f := range a.Files {
+			// Track the position of the fallback files, and remove duplicates.
+			index := make(map[string]int, len(a.Files))
+			files := make([]txtar.File, 0, len(a.Files))
+			for _, f := range a.Files {
+				i := len(files)
+				if prev, ok := index[f.Name]; ok {
+					// Duplicate txtar file entry; replace the previous file.
+					files[prev] = f
+					i = prev
+					update = true
+				} else {
+					files = append(files, f)
+					index[f.Name] = i
+				}
 				hasPrefix := func(s string) bool {
 					// It's either "\(tc.prefix)" or "\(tc.prefix)/..." but not some other name
 					// that happens to start with tc.prefix.
@@ -474,17 +486,12 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 					}
 					if cuetest.FormatTxtar {
 						update = true
-						a.Files[i].Data = ff
+						files[i].Data = ff
 					}
 				}
 			}
+			a.Files = files
 			f(tc)
-
-			// Track the position of the fallback files.
-			index := make(map[string]int, len(a.Files))
-			for i, f := range a.Files {
-				index[f.Name] = i
-			}
 
 			// Record ordering of files in the archive to preserve that ordering
 			// later.
@@ -549,7 +556,7 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 				}
 			}
 
-			files := make([]txtar.File, 0, len(a.Files))
+			files = files[:0:0]
 
 			for _, sub := range tc.outFiles {
 				result := sub.buf.Bytes()

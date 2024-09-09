@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "69ce8a96_b66feb63",
+        "filename": "internal/astinternal/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-09T20:24:55Z",
+      "side": 1,
+      "message": "good point - done",
+      "parentUuid": "ad519185_855a3600",
+      "revId": "5c72b22296564cc8dccf2598a86ffdb6abb679ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "24cba66b_d693ebaf",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-09-09T16:31:45Z",
       "side": 1,
       "message": "I have to say I do find this quite a bit harder to grok than the other version (a loop is generally harder to understand than non-loop code for me), and it\u0027s rather more general than it needs to be (I guess it\u0027ll deal with arbitrary levels of indirection, and _technically_ could even loop forever although that\u0027s not going to happen in this case).\n\nThat said, I don\u0027t mind - happy to go with this if you think it really is nicer.",
+      "revId": "5c72b22296564cc8dccf2598a86ffdb6abb679ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "20473615_a0f57882",
+        "filename": "internal/astinternal/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-09T20:24:55Z",
+      "side": 1,
+      "message": "I agree that the loop is unnecessary in practice, but the alternative is two if blocks with almost exactly the same body, so that seemed slightly worse.\n\nI do find the existing version a bit inconsistent and hard to understand - it mixes Indirect with Elem, and it mixes IsValid with IsNil. From reading the reflect docs, I find it easier to prove to myself what the new code does.",
+      "parentUuid": "24cba66b_d693ebaf",
       "revId": "5c72b22296564cc8dccf2598a86ffdb6abb679ed",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

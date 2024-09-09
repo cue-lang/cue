@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "6711906b_ad8ab4e5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-09T14:31:56Z",
+      "side": 1,
+      "message": "Potentially it could make sense to join many instances, e.g. inlining imports, but for now I\u0027m avoiding this for the sake of having something that works well enough for my debugging needs. I\u0027ve clarified the help text.",
+      "parentUuid": "dc135221_bfcbfcee",
+      "revId": "a02c1dc97d86209cc82dfcb84caa2367232b4b0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "e3e4eaa9_3cf226ac",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 2
@@ -65,6 +83,24 @@
       "writtenOn": "2024-09-04T09:18:44Z",
       "side": 1,
       "message": "In general this is not sufficient, because some identifiers might vary according to file-level scope. I\u0027d suggest using `astutil.Sanitize` before producing the output.\n\nAs an example, this testscript demonstrates it producing incorrect output as is:\n\n```\nexec cue-ast-tool join .\n-- x.cue --\npackage p\n\nimport foo \"list\"\n\nx: foo.Concat([[1], [2, 3]])\n\n-- y.cue --\npackage p\n\nimport foo \"strconv\"\n\ny: foo.Atoi(\"12434\")\n```",
+      "revId": "a02c1dc97d86209cc82dfcb84caa2367232b4b0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "211c8ba9_5b14618f",
+        "filename": "internal/cmd/cue-ast-tool/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-09T14:31:56Z",
+      "side": 1,
+      "message": "well spotted; done.",
+      "parentUuid": "06b554ca_d9fcbedc",
       "revId": "a02c1dc97d86209cc82dfcb84caa2367232b4b0b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

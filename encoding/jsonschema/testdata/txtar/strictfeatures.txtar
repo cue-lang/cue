@@ -1,0 +1,12 @@
+#strictFeatures
+-- schema.json --
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "number",
+  "$dynamicAnchor": "bar",
+  "foo": true
+}
+-- out/decode/extract --
+ERROR:
+keyword "$dynamicAnchor" not yet implemented:
+    schema.json:4:3

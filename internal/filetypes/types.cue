@@ -26,7 +26,9 @@ package build
 	encoding!:       #Encoding
 	interpretation?: #Interpretation
 	form?:           #Form
-	tags?: [string]: string
+	// Note: tags includes values for non-boolean tags only.
+	tags?: [string]:     string
+	boolTags?: [string]: bool
 }
 
 // Default is the file used for stdin and stdout. The settings depend
@@ -264,6 +266,11 @@ interpretations: auto: forms.schema
 interpretations: jsonschema: {
 	forms.schema
 	encoding: *"json" | _
+	boolTags: {
+		strict:         *false | bool
+		strictKeywords: *strict | bool
+		strictFeatures: *strict | bool
+	}
 }
 
 interpretations: openapi: {

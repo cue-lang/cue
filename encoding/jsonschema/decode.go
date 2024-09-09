@@ -673,9 +673,9 @@ func (s *state) schemaState(n cue.Value, types cue.Kind, idRef []label, isLogica
 			// Convert each constraint into a either a value or a functor.
 			c := constraintMap[key]
 			if c == nil {
-				if pass == 0 && s.cfg.Strict {
+				if pass == 0 && s.cfg.StrictKeywords {
 					// TODO: value is not the correct position, albeit close. Fix this.
-					s.warnf(value.Pos(), "unsupported constraint %q", key)
+					s.warnf(value.Pos(), "unknown keyword %q", key)
 				}
 				return
 			}
@@ -683,8 +683,8 @@ func (s *state) schemaState(n cue.Value, types cue.Kind, idRef []label, isLogica
 				return
 			}
 			if !c.versions.contains(state.schemaVersion) {
-				if s.cfg.Strict {
-					s.warnf(value.Pos(), "constraint %q is not supported in JSON schema version %v", key, state.schemaVersion)
+				if s.cfg.StrictKeywords {
+					s.warnf(value.Pos(), "keyword %q is not supported in JSON schema version %v", key, state.schemaVersion)
 				}
 				return
 			}

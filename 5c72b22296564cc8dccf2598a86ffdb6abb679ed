@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad519185_855a3600",
+        "filename": "internal/astinternal/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-09T16:31:45Z",
+      "side": 1,
+      "message": "concreteType might be more apt - after all the interface type _is_ the actual type, just not the one we want to print.",
+      "revId": "5c72b22296564cc8dccf2598a86ffdb6abb679ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "24cba66b_d693ebaf",
+        "filename": "internal/astinternal/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-09T16:31:45Z",
+      "side": 1,
+      "message": "I have to say I do find this quite a bit harder to grok than the other version (a loop is generally harder to understand than non-loop code for me), and it\u0027s rather more general than it needs to be (I guess it\u0027ll deal with arbitrary levels of indirection, and _technically_ could even loop forever although that\u0027s not going to happen in this case).\n\nThat said, I don\u0027t mind - happy to go with this if you think it really is nicer.",
+      "revId": "5c72b22296564cc8dccf2598a86ffdb6abb679ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

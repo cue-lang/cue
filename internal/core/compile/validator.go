@@ -68,6 +68,44 @@ var matchNBuiltin = &adt.Builtin{
 	},
 }
 
+// matchIf is a validator that checks that if the first argument unifies with
+// self, the second argument also unifies with self, otherwise the third
+// argument unifies with self.
+// The same finalization heuristics are applied to self as are applied
+// in matchN.
+var matchIfBuiltin = &adt.Builtin{
+	Name:        "matchIf",
+	Params:      []adt.Param{topParam, topParam, topParam, topParam},
+	Result:      adt.BoolKind,
+	NonConcrete: true,
+	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
+		if !c.IsValidator {
+			return c.NewErrf("matchIf is a validator and should not be used as a function")
+		}
+
+		self := finalizeSelf(c, args[0])
+		if err := bottom(c, self); err != nil {
+			return &adt.Bool{B: false}
+		}
+		ifSchema, thenSchema, elseSchema := args[1], args[2], args[3]
+		v := unifyValidator(c, self, ifSchema)
+		var chosenSchema adt.Value
+		if err := validate.Validate(c, v, finalCfg); err == nil {
+			chosenSchema = thenSchema
+		} else {
+			chosenSchema = elseSchema
+		}
+		v = unifyValidator(c, self, chosenSchema)
+		err := validate.Validate(c, v, finalCfg)
+		if err == nil {
+			return &adt.Bool{B: true}
+		}
+		// TODO should we also include in the error something about the fact that
+		// the if condition passed or failed?
+		return err
+	},
+}
+
 var finalCfg = &validate.Config{Final: true}
 
 // finalizeSelf ensures a value is fully evaluated and then strips it of any

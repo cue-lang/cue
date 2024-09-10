@@ -597,7 +597,7 @@ func (e *extractor) importCUEFiles(p *packages.Package, dstDir, args string) err
 			if !ok {
 				return nil
 			}
-			f, err := parser.ParseFile(path, nil)
+			f, err := parser.ParseFile(path, nil, parser.PackageClauseOnly)
 			if err != nil {
 				return err
 			}

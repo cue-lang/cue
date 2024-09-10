@@ -21,13 +21,16 @@
 package main
 
 import (
+	"archive/zip"
+	"bytes"
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"io/fs"
 	"log"
+	"net/http"
 	"os"
-	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
@@ -45,6 +48,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "usage: vendor-external commit\n")
 		os.Exit(2)
 	}
+	log.SetFlags(log.Lshortfile | log.Ltime | log.Lmicroseconds)
 	flag.Parse()
 	if flag.NArg() != 1 {
 		flag.Usage()
@@ -55,31 +59,42 @@ func main() {
 }
 
 func doVendor(commit string) error {
-	tmpDir, err := os.MkdirTemp("", "")
+	// Fetch a commit from GitHub via their archive ZIP endpoint, which is a lot faster
+	// than git cloning just to retrieve a single commit's files.
+	// See: https://docs.github.com/en/rest/repos/contents?apiVersion=2022-11-28#download-a-repository-archive-zip
+	zipURL := fmt.Sprintf("https://github.com/json-schema-org/JSON-Schema-Test-Suite/archive/%s.zip", commit)
+	log.Printf("fetching %s", zipURL)
+	resp, err := http.Get(zipURL)
 	if err != nil {
 		return err
 	}
-	defer os.RemoveAll(tmpDir)
-	logf("cloning %s", testRepo)
-	if err := runCmd(tmpDir, "git", "clone", "-q", testRepo, "."); err != nil {
+	defer resp.Body.Close()
+	zipBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
 		return err
 	}
-	logf("checking out commit %s", commit)
-	if err := runCmd(tmpDir, "git", "checkout", "-q", commit); err != nil {
-		return err
-	}
-	logf("reading old test data")
+
+	log.Printf("reading old test data")
 	oldTests, err := externaltest.ReadTestDir(testDir)
 	if err != nil && !errors.Is(err, externaltest.ErrNotFound) {
 		return err
 	}
-	logf("copying files to %s", testDir)
 
+	log.Printf("copying files to %s", testDir)
 	testSubdir := filepath.Join(testDir, "tests")
 	if err := os.RemoveAll(testSubdir); err != nil {
 		return err
 	}
-	fsys := os.DirFS(filepath.Join(tmpDir, "tests"))
+	zipr, err := zip.NewReader(bytes.NewReader(zipBytes), int64(len(zipBytes)))
+	if err != nil {
+		return err
+	}
+	// Note that GitHub produces archives with a top-level directory representing
+	// the name of the repository and the version which was retrieved.
+	fsys, err := fs.Sub(zipr, fmt.Sprintf("JSON-Schema-Test-Suite-%s/tests", commit))
+	if err != nil {
+		return err
+	}
 	err = fs.WalkDir(fsys, ".", func(filename string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -107,6 +122,9 @@ func doVendor(commit string) error {
 		}
 		return nil
 	})
+	if err != nil {
+		return err
+	}
 
 	// Read the test data back that we've just written and attempt
 	// to populate skip data from the original test data.
@@ -152,23 +170,12 @@ func doVendor(commit string) error {
 	if err := externaltest.WriteTestDir(testDir, newTests); err != nil {
 		return err
 	}
-	return err
+	log.Printf("finished")
+	return nil
 }
 
 type skipKey struct {
 	filename string
 	schema   string
 	test     string
-}
-
-func runCmd(dir string, name string, args ...string) error {
-	c := exec.Command(name, args...)
-	c.Dir = dir
-	c.Stdout = os.Stdout
-	c.Stderr = os.Stderr
-	return c.Run()
-}
-
-func logf(f string, a ...any) {
-	fmt.Fprintf(os.Stderr, "%s\n", fmt.Sprintf(f, a...))
 }

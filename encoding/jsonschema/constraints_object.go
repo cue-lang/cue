@@ -70,6 +70,12 @@ func constraintMaxProperties(key string, n cue.Value, s *state) {
 	s.add(n, objectType, x)
 }
 
+func constraintMinProperties(key string, n cue.Value, s *state) {
+	pkg := s.addImport(n, "struct")
+	x := ast.NewCall(ast.NewSel(pkg, "MinFields"), s.uint(n))
+	s.add(n, objectType, x)
+}
+
 func constraintPatternProperties(key string, n cue.Value, s *state) {
 	if n.Kind() != cue.StructKind {
 		s.errf(n, `value of "patternProperties" must be an object, found %v`, n.Kind())

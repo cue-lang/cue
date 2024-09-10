@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01dec594_112c5381",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-10T10:14:45Z",
+      "side": 1,
+      "message": "LGTM modulo one thought.",
+      "revId": "47dc33187bd0250ceeb3b52c5a1c876365f44906",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8bf38d8_eb78b278",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-10T10:14:45Z",
+      "side": 1,
+      "message": "I wonder if it might just be better to error in this case, as it probably represents a user error and just removing the other entry might not be enough\n(also, we probably want to be told about this even when we\u0027re not running with `CUE_UPDATE\u003d1`).",
+      "revId": "47dc33187bd0250ceeb3b52c5a1c876365f44906",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e5de842_a1b0ed81",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 559,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-10T10:14:45Z",
+      "side": 1,
+      "message": "Simpler and equivalent?\n```suggestion\n\t\t\tfiles \u003d nil\n```",
+      "revId": "47dc33187bd0250ceeb3b52c5a1c876365f44906",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

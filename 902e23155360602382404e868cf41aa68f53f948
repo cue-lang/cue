@@ -16,6 +16,24 @@
       "message": "I\u0027d gently push against this removal because I think we should start using this sooner than later; I fixed bugs recently where we would e.g. mistake json for jsonl, and internal/encoding could use this boolean to sanity check that we only allow streaming (i.e. zero or more than one values) for encodings where Stream\u003d\u003dtrue.\n\nLeave this behind with something like this?\n\n```\n// TODO(mvdan): use this boolean in internal/encoding to ensure that we only allow\n// encoding and decoding streams (e.g. zero or more than one values) for encodings\n// where Stream is true; otherwise we should always work with exactly one value.\n```",
       "revId": "902e23155360602382404e868cf41aa68f53f948",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0a88585_456f88b2",
+        "filename": "internal/filetypes/filetypes.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-10T12:43:53Z",
+      "side": 0,
+      "message": "I\u0027ve just reverted for now.",
+      "parentUuid": "3891a8a4_43823121",
+      "revId": "902e23155360602382404e868cf41aa68f53f948",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

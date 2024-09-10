@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7af2dc9_8d78761e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-10T12:33:18Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "36bb6991_a47224af",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 33
+      },
+      "revId": "08533a9beb0c3b2f70d3c1b42537451ffe4fc64f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e188e5e1_7159739f",
@@ -41,6 +65,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7292c8b_58eecf0c",
+        "filename": "cue/build/file.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-10T12:33:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e188e5e1_7159739f",
+      "revId": "08533a9beb0c3b2f70d3c1b42537451ffe4fc64f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "812d4af2_fb2902d2",
@@ -54,6 +96,24 @@
       "writtenOn": "2024-09-10T11:27:22Z",
       "side": 1,
       "message": "Does this mean that specifying one tag may unlock access to some boolean tags?\n\nCan it also unlock access to more string (non-boolean) tags? From the code below, I think the answer to this question is \"yes\", for example for `code+lang\u003djs`?\n\nI assume there is just one level of this as defined by the CUE, e.g. we can\u0027t have tag A unlock tag B which then unlocks tag C?",
+      "revId": "08533a9beb0c3b2f70d3c1b42537451ffe4fc64f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3e97e76_02253534",
+        "filename": "internal/filetypes/filetypes.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-10T12:33:18Z",
+      "side": 1,
+      "message": "\u003e Does this mean that specifying one tag may unlock access to some boolean tags?\n\u003e \n\u003e Can it also unlock access to more string (non-boolean) tags? From the code below, I think the answer to this question is \"yes\", for example for code+lang\u003djs?\n\nYes to both of these.\n\n\u003e I assume there is just one level of this as defined by the CUE, e.g. we can\u0027t have tag A unlock tag B which then unlocks tag C?\n\nAlso correct. We could potentially allow this by looping until `otherTags` doesn\u0027t change, but it seems like overkill for now - this functionality could always be added later. Also, this kind of looping seems like it would be hard to do with non-CUE logic at runtime (which we eventually want to change this package to use), whereas the current single-level tag-enabling shouldn\u0027t be too hard to do as a static table.",
+      "parentUuid": "812d4af2_fb2902d2",
       "revId": "08533a9beb0c3b2f70d3c1b42537451ffe4fc64f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

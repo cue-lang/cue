@@ -53,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "940f9cf2_708adb05",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T16:32:50Z",
+      "side": 1,
+      "message": "As a bonus point, failing and leaving it to the user is also what https://pkg.go.dev/golang.org/x/tools/txtar#FS does.",
+      "parentUuid": "6cd1295a_0e3341a4",
+      "revId": "47dc33187bd0250ceeb3b52c5a1c876365f44906",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4e5de842_a1b0ed81",

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb36bdb8_16db1e68",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-10T12:33:18Z",
+      "side": 1,
+      "message": "In general I\u0027m fairly sure that Marcel is more OK with camel case these days (as witness the recent `matchN` builtin). I\u0027ll mention it though.",
+      "parentUuid": "6ab9fbc7_6d68fed3",
+      "revId": "382e6c5f6b1aff837a07a2aeaee1fbb7d448cf99",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2c593095_99b6aefa",
@@ -53,6 +71,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb160aa4_b57afa4b",
+        "filename": "cmd/cue/cmd/flags.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-10T12:33:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bcedf902_1e65abf2",
+      "revId": "382e6c5f6b1aff837a07a2aeaee1fbb7d448cf99",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "01f16458_1158e0ce",
@@ -66,6 +102,24 @@
       "writtenOn": "2024-09-10T11:31:23Z",
       "side": 1,
       "message": "Use the `// Deprecated: xxx` form, otherwise tools like staticcheck won\u0027t pick it up",
+      "revId": "382e6c5f6b1aff837a07a2aeaee1fbb7d448cf99",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5c66f49_e801c77c",
+        "filename": "internal/encoding/encoding.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-10T12:33:18Z",
+      "side": 1,
+      "message": "I don\u0027t really want staticcheck to pick it up, as it\u0027s really down to a policy decision as to when to remove the command-line `--strict` flag (and that has its own TODO in cmd/cue).",
+      "parentUuid": "01f16458_1158e0ce",
       "revId": "382e6c5f6b1aff837a07a2aeaee1fbb7d448cf99",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -101,6 +155,24 @@
       "side": 1,
       "message": "I meant `cue help filetypes` here.",
       "parentUuid": "e392f5e2_caec21d4",
+      "revId": "382e6c5f6b1aff837a07a2aeaee1fbb7d448cf99",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4635e60a_68b99ab9",
+        "filename": "internal/encoding/encoding.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-10T12:33:18Z",
+      "side": 1,
+      "message": "I did actually start off by doing that. The reason is that setting `cfg.Strict` to true also sets `StrictFeatures` and `StrictKeywords` to true, but that means that `jsonschema+strict+strictFeatures\u003d0:` does not disable `StrictFeatures` because there\u0027s no way for `encoding/jsonschema` to know which flags were explicitly specified.\n\nInstead, we rely on the logic inside `internal/filetypes/types.cue` to populate both the `strictFeatures` and `strictKeywords` tags correctly with respect to the `strict` tag.\n\nI\u0027m pretty sure all this is tested in cmd/cue/cmd/testdata/script/def_jsonschema.txtar\n\nI\u0027ve added a comment here to explain this.",
+      "parentUuid": "71f370f6_cc9b1ca1",
       "revId": "382e6c5f6b1aff837a07a2aeaee1fbb7d448cf99",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

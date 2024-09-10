@@ -179,6 +179,11 @@ func TestFromFile(t *testing.T) {
 				Encoding:       build.JSON,
 				Interpretation: "jsonschema",
 				Form:           build.Schema,
+				BoolTags: map[string]bool{
+					"strict":         false,
+					"strictFeatures": false,
+					"strictKeywords": false,
+				},
 			},
 			Definitions:  true,
 			Data:         true,
@@ -324,8 +329,8 @@ func TestParseFile(t *testing.T) {
 		out: &build.File{
 			Filename:       "-",
 			Encoding:       build.JSON,
-			Form:           build.Schema,
 			Interpretation: build.OpenAPI,
+			Form:           build.Schema,
 		},
 	}, {
 		in: "cue:file.json",
@@ -347,6 +352,9 @@ func TestParseFile(t *testing.T) {
 			Encoding: build.Code,
 			Tags:     map[string]string{"lang": "js"},
 		},
+	}, {
+		in:  "json+lang=js:foo.x",
+		out: `unknown filetype lang`,
 	}, {
 		in:  "foo:file.bar",
 		out: `unknown filetype foo`,
@@ -409,6 +417,26 @@ func TestParseArgs(t *testing.T) {
 				Encoding:       build.JSON,
 				Form:           build.Schema,
 				Interpretation: "jsonschema",
+				BoolTags: map[string]bool{
+					"strict":         false,
+					"strictFeatures": false,
+					"strictKeywords": false,
+				},
+			},
+		},
+	}, {
+		in: "jsonschema+strict: bar.schema",
+		out: []*build.File{
+			{
+				Filename:       "bar.schema",
+				Encoding:       "json",
+				Interpretation: "jsonschema",
+				Form:           build.Schema,
+				BoolTags: map[string]bool{
+					"strict":         true,
+					"strictFeatures": true,
+					"strictKeywords": true,
+				},
 			},
 		},
 	}, {

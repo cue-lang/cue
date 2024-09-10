@@ -14,7 +14,7 @@
 
 package path
 
-// OS must be a valid runtime.GOOS value or "unix".
+// OS must be a valid [runtime.GOOS] value or "unix".
 type OS string
 
 const (

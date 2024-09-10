@@ -24,7 +24,7 @@ import (
 
 // Instances modifies all files contained in the given build instances at once.
 //
-// It also applies fix.File.
+// It also applies the fixes from [File].
 func Instances(a []*build.Instance, o ...Option) errors.Error {
 	cwd, _ := os.Getwd()
 

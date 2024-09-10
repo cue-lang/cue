@@ -216,7 +216,7 @@ func NewExtractor(c *Config) *Extractor {
 }
 
 // Err returns the errors accumulated during testing. The returned error may be
-// of type cuelang.org/go/cue/errors.List.
+// of type [errors.List].
 func (b *Extractor) Err() error {
 	return b.errs
 }
@@ -402,7 +402,7 @@ func (b *Extractor) getInst(p *protoConverter) *build.Instance {
 
 // Extract parses a single proto file and returns its contents translated to a CUE
 // file. If src is not nil, it will use this as the contents of the file. It may
-// be a string, []byte or io.Reader. Otherwise Extract will open the given file
+// be a string, []byte or [io.Reader]. Otherwise Extract will open the given file
 // name at the fully qualified path.
 //
 // Extract assumes the proto file compiles with protoc and may not report an error

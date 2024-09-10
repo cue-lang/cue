@@ -776,7 +776,7 @@ func walkBinary(e *ast.BinaryExpr) (has6, has7, has8 bool, maxProblem int) {
 	case *ast.BinaryExpr:
 		if l.Op.Precedence() < e.Op.Precedence() {
 			// parens will be inserted.
-			// pretend this is an *syntax.ParenExpr and do nothing.
+			// pretend this is an *ast.ParenExpr and do nothing.
 			break
 		}
 		h6, h7, h8, mp := walkBinary(l)
@@ -792,7 +792,7 @@ func walkBinary(e *ast.BinaryExpr) (has6, has7, has8 bool, maxProblem int) {
 	case *ast.BinaryExpr:
 		if r.Op.Precedence() <= e.Op.Precedence() {
 			// parens will be inserted.
-			// pretend this is an *syntax.ParenExpr and do nothing.
+			// pretend this is an *ast.ParenExpr and do nothing.
 			break
 		}
 		h6, h7, h8, mp := walkBinary(r)
@@ -901,7 +901,7 @@ func (f *formatter) binaryExpr(x *ast.BinaryExpr, prec1, cutoff, depth int) {
 	prec := x.Op.Precedence()
 	if prec < prec1 {
 		// parenthesis needed
-		// Note: The parser inserts a syntax.ParenExpr node; thus this case
+		// Note: The parser inserts a ast.ParenExpr node; thus this case
 		//       can only occur if the AST is created in a different way.
 		// defer p.pushComment(nil).pop()
 		f.print(token.LPAREN, nooverride)
@@ -945,7 +945,7 @@ func (f *formatter) possibleSelectorExpr(expr ast.Expr, prec1, depth int) bool {
 	return false
 }
 
-// selectorExpr handles an *syntax.SelectorExpr node and returns whether x spans
+// selectorExpr handles an [*ast.SelectorExpr] node and returns whether x spans
 // multiple lines.
 func (f *formatter) selectorExpr(x *ast.SelectorExpr, depth int) bool {
 	f.expr1(x.X, token.HighestPrec, depth)

@@ -276,7 +276,7 @@ e2: c*t.z
 	}
 
 	// parse pretty printed original
-	// (//line comments must be interpreted even w/o syntax.ParseComments set)
+	// (//line comments must be interpreted even w/o parser.ParseComments set)
 	f2, err := parser.ParseFile("", b, parser.AllErrors, parser.ParseComments)
 	if err != nil {
 		t.Fatalf("%s\n%s", err, b)

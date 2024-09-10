@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08b784c0_cfc3679b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T11:05:55Z",
+      "side": 1,
+      "message": "I was also confused by this some time ago, and I agree it doesn\u0027t seem to be useful right now. If it becomes useful in the future, we should do it properly with tests too.",
+      "revId": "d8f1ffd5f226350b047064e72db22bc092bb8456",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -71,7 +71,7 @@
 import "struct"
 
 // Main schema
-fields?: struct.MaxFields(10) & {
+fields?: struct.MaxFields(10) & struct.MinFields(3) & {
 	[=~"^\\P{Lu}"]: _
 }
 additional?: {

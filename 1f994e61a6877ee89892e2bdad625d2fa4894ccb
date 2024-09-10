@@ -16,6 +16,24 @@
       "message": "If we\u0027re linkifying internal function doc comments, then maybe this should be too?\n\n\n```suggestion\n\tlastTok token.Token // last token printed ([token.ILLEGAL] if it\u0027s whitespace)\n```",
       "revId": "1f994e61a6877ee89892e2bdad625d2fa4894ccb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d56f56b0_1e4e201e",
+        "filename": "cue/format/printer.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T14:24:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "22933ed9_ea62bb47",
+      "revId": "1f994e61a6877ee89892e2bdad625d2fa4894ccb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

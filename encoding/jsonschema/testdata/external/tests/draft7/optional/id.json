@@ -87,28 +87,16 @@
 				"$ref": "#/definitions/const_not_anchor"
 			}
 		},
-		"skip": {
-			"v2": "extract error: keyword \"if\" not yet implemented (and 2 more errors)",
-			"v3": "extract error: keyword \"if\" not yet implemented (and 2 more errors)"
-		},
 		"tests": [
 			{
 				"description": "skip traversing definition for a valid result",
 				"data": "skip not_a_real_anchor",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "const at const_not_anchor does not match",
 				"data": 1,
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -130,28 +118,16 @@
 				"$ref": "#/definitions/const_not_id"
 			}
 		},
-		"skip": {
-			"v2": "extract error: keyword \"if\" not yet implemented (and 2 more errors)",
-			"v3": "extract error: keyword \"if\" not yet implemented (and 2 more errors)"
-		},
 		"tests": [
 			{
 				"description": "skip traversing definition for a valid result",
 				"data": "skip not_a_real_id",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "const at const_not_id does not match",
 				"data": 1,
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	}

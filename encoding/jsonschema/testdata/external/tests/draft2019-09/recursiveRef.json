@@ -632,8 +632,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"if\" not yet implemented (and 4 more errors)",
-			"v3": "extract error: keyword \"if\" not yet implemented (and 4 more errors)"
+			"v2": "extract error: keyword \"$recursiveAnchor\" not yet implemented (and 3 more errors)",
+			"v3": "extract error: keyword \"$recursiveAnchor\" not yet implemented (and 3 more errors)"
 		},
 		"tests": [
 			{
@@ -698,8 +698,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"if\" not yet implemented (and 4 more errors)",
-			"v3": "extract error: keyword \"if\" not yet implemented (and 4 more errors)"
+			"v2": "extract error: keyword \"$recursiveAnchor\" not yet implemented (and 3 more errors)",
+			"v3": "extract error: keyword \"$recursiveAnchor\" not yet implemented (and 3 more errors)"
 		},
 		"tests": [
 			{

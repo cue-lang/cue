@@ -7,28 +7,16 @@
 				"const": 0
 			}
 		},
-		"skip": {
-			"v2": "extract error: keyword \"if\" not yet implemented",
-			"v3": "extract error: keyword \"if\" not yet implemented"
-		},
 		"tests": [
 			{
 				"description": "valid when valid against lone if",
 				"data": 0,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "valid when invalid against lone if",
 				"data": "hello",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -40,28 +28,16 @@
 				"const": 0
 			}
 		},
-		"skip": {
-			"v2": "extract error: keyword \"then\" not yet implemented",
-			"v3": "extract error: keyword \"then\" not yet implemented"
-		},
 		"tests": [
 			{
 				"description": "valid when valid against lone then",
 				"data": 0,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "valid when invalid against lone then",
 				"data": "hello",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -73,28 +49,16 @@
 				"const": 0
 			}
 		},
-		"skip": {
-			"v2": "extract error: keyword \"else\" not yet implemented",
-			"v3": "extract error: keyword \"else\" not yet implemented"
-		},
 		"tests": [
 			{
 				"description": "valid when valid against lone else",
 				"data": 0,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "valid when invalid against lone else",
 				"data": "hello",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -109,37 +73,21 @@
 				"minimum": -10
 			}
 		},
-		"skip": {
-			"v2": "extract error: keyword \"if\" not yet implemented (and 1 more errors)",
-			"v3": "extract error: keyword \"if\" not yet implemented (and 1 more errors)"
-		},
 		"tests": [
 			{
 				"description": "valid through then",
 				"data": -1,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "invalid through then",
 				"data": -100,
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "valid when if test fails",
 				"data": 3,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -154,37 +102,21 @@
 				"multipleOf": 2
 			}
 		},
-		"skip": {
-			"v2": "extract error: keyword \"if\" not yet implemented (and 1 more errors)",
-			"v3": "extract error: keyword \"if\" not yet implemented (and 1 more errors)"
-		},
 		"tests": [
 			{
 				"description": "valid when if test passes",
 				"data": -1,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "valid through else",
 				"data": 4,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "invalid through else",
 				"data": 3,
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -202,46 +134,26 @@
 				"multipleOf": 2
 			}
 		},
-		"skip": {
-			"v2": "extract error: keyword \"if\" not yet implemented (and 2 more errors)",
-			"v3": "extract error: keyword \"if\" not yet implemented (and 2 more errors)"
-		},
 		"tests": [
 			{
 				"description": "valid through then",
 				"data": -1,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "invalid through then",
 				"data": -100,
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "valid through else",
 				"data": 4,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "invalid through else",
 				"data": 3,
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -267,28 +179,16 @@
 				}
 			]
 		},
-		"skip": {
-			"v2": "extract error: keyword \"if\" not yet implemented (and 2 more errors)",
-			"v3": "extract error: keyword \"if\" not yet implemented (and 2 more errors)"
-		},
 		"tests": [
 			{
 				"description": "valid, but would have been invalid through then",
 				"data": -100,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "valid, but would have been invalid through else",
 				"data": 3,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -304,28 +204,16 @@
 				"const": "else"
 			}
 		},
-		"skip": {
-			"v2": "extract error: keyword \"if\" not yet implemented (and 2 more errors)",
-			"v3": "extract error: keyword \"if\" not yet implemented (and 2 more errors)"
-		},
 		"tests": [
 			{
 				"description": "boolean schema true in if always chooses the then path (valid)",
 				"data": "then",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "boolean schema true in if always chooses the then path (invalid)",
 				"data": "else",
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -342,8 +230,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"if\" not yet implemented (and 2 more errors)",
-			"v3": "extract error: keyword \"if\" not yet implemented (and 2 more errors)"
+			"v2": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:2:9\n",
+			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:2:9\n"
 		},
 		"tests": [
 			{
@@ -380,46 +268,26 @@
 				"maxLength": 4
 			}
 		},
-		"skip": {
-			"v2": "extract error: keyword \"then\" not yet implemented (and 2 more errors)",
-			"v3": "extract error: keyword \"then\" not yet implemented (and 2 more errors)"
-		},
 		"tests": [
 			{
 				"description": "yes redirects to then and passes",
 				"data": "yes",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "other redirects to else and passes",
 				"data": "other",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "no redirects to then and fails",
 				"data": "no",
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "invalid redirects to else and fails",
 				"data": "invalid",
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	}

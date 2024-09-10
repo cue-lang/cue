@@ -31,7 +31,7 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
-// New is a convenience wrapper for errors.New in the core library.
+// New is a convenience wrapper for [errors.New] in the core library.
 // It does not return a CUE error.
 func New(msg string) error {
 	return errors.New(msg)

@@ -109,7 +109,7 @@ func Loader(f LoadFunc) Option {
 // ParseFile is called to read and parse each file
 // when building syntax tree.
 // It must be safe to call ParseFile simultaneously from multiple goroutines.
-// If ParseFile is nil, the loader will uses parser.ParseFile.
+// If f is nil, the loader will use [cuelang.org/go/cue/parser.ParseFile].
 //
 // ParseFile should parse the source from src and use filename only for
 // recording position information.

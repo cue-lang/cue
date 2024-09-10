@@ -91,7 +91,7 @@ func (s *state) resolveURI(n cue.Value) *url.URL {
 
 // makeCUERef converts a URI into a CUE reference for the current location.
 // The returned identifier (or first expression in a selection chain), is
-// hardwired to point to the resolved value. This will allow astutil.Sanitize
+// hardwired to point to the resolved value. This will allow [astutil.Sanitize]
 // to automatically unshadow any shadowed variables.
 func (s *state) makeCUERef(n cue.Value, u *url.URL, fragmentParts []string) (_e ast.Expr) {
 	switch fn := s.cfg.Map; {
@@ -322,7 +322,7 @@ func (s *state) getNextIdent(v cue.Value, a []string) (resolved *ast.Ident, tail
 }
 
 // linkReferences resolves identifiers to relevant nodes. This allows
-// astutil.Sanitize to unshadow nodes if necessary.
+// [astutil.Sanitize] to unshadow nodes if necessary.
 func (s *state) linkReferences() {
 	for _, r := range s.fieldRefs {
 		if r.field == nil {

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cec645e2_bdf86b80",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T11:17:14Z",
+      "side": 1,
+      "message": "Joining File and FileInfo SGTM. I also didn\u0027t clearly see why we needed to separate the two, other than one of them being a subset of the other\u0027s fields.\n\nAll the other simplifications and cleanups SGTM, minus the removal of Stream, because I really want to use it sooner than later. If you add the TODO as suggested above, I can send a patch later this week to start using it. I think the existing true/false values for it are correct.",
+      "revId": "42405fef9a29721313ed4bcf1acd9ec829c2ddfb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1cd12db_a9174d2f",
+        "filename": "internal/filetypes/types.cue",
+        "patchSetId": 5
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T11:17:14Z",
+      "side": 1,
+      "message": "nit: the formatting doesn\u0027t look right now, re-run `cue fmt`?",
+      "revId": "42405fef9a29721313ed4bcf1acd9ec829c2ddfb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

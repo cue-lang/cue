@@ -179,8 +179,7 @@ func extractDeclAttrs(attrs []*ast.Attribute, n ast.Node) []*ast.Attribute {
 	switch x := n.(type) {
 	case nil:
 	case *ast.File:
-		info := internal.GetPackageInfo(x)
-		attrs = appendDeclAttrs(attrs, x.Decls[info.Index:])
+		attrs = appendDeclAttrs(attrs, x.Decls[len(x.Preamble()):])
 	case *ast.StructLit:
 		attrs = appendDeclAttrs(attrs, x.Elts)
 	}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f323c00_f2317e55",
+        "filename": "internal/filetypes/types.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T11:35:00Z",
+      "side": 1,
+      "message": "remember that you should update the docs in `cue help filetypes` now, to clarify the non-zero default.",
+      "revId": "f6c99901020f2882774034a883d6c6235eb65848",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

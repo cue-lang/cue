@@ -16,6 +16,24 @@
       "message": "```suggestion\n\t// the name of the repository and the version which was retrieved.\n```",
       "revId": "6360375e2e45ae73f221f9319aa8d9cfcdf1d55b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5454de5_3ba37c51",
+        "filename": "encoding/jsonschema/vendor_external.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T14:24:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bbdc0ffe_8e3abf3c",
+      "revId": "6360375e2e45ae73f221f9319aa8d9cfcdf1d55b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

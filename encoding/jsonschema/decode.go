@@ -385,6 +385,10 @@ type state struct {
 	minContains *uint64
 	maxContains *uint64
 
+	ifConstraint   ast.Expr
+	thenConstraint ast.Expr
+	elseConstraint ast.Expr
+
 	schemaVersion        Version
 	schemaVersionPresent bool
 
@@ -459,6 +463,7 @@ func (s *state) finalize() (e ast.Expr) {
 		s.addErr(errors.Newf(s.pos.Pos(), "constraints are not possible to satisfy"))
 		return bottom()
 	}
+	s.addIfThenElse()
 
 	conjuncts := []ast.Expr{}
 	disjuncts := []ast.Expr{}
@@ -606,6 +611,24 @@ outer:
 	// need to be mentioned again.
 	s.knownTypes = s.allowedTypes
 	return e
+}
+
+func (s *state) addIfThenElse() {
+	if s.ifConstraint == nil || (s.thenConstraint == nil && s.elseConstraint == nil) {
+		return
+	}
+	if s.thenConstraint == nil {
+		s.thenConstraint = top()
+	}
+	if s.elseConstraint == nil {
+		s.elseConstraint = top()
+	}
+	s.all.add(s.pos, ast.NewCall(
+		ast.NewIdent("matchIf"),
+		s.ifConstraint,
+		s.thenConstraint,
+		s.elseConstraint,
+	))
 }
 
 func (s *state) comment() *ast.CommentGroup {

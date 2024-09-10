@@ -148,3 +148,15 @@ func constraintNot(key string, n cue.Value, s *state) {
 		ast.NewList(subSchema),
 	))
 }
+
+func constraintIf(key string, n cue.Value, s *state) {
+	s.ifConstraint = s.schema(n)
+}
+
+func constraintThen(key string, n cue.Value, s *state) {
+	s.thenConstraint = s.schema(n)
+}
+
+func constraintElse(key string, n cue.Value, s *state) {
+	s.elseConstraint = s.schema(n)
+}

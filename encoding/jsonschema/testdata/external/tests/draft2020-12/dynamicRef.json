@@ -645,8 +645,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"if\" not yet implemented (and 6 more errors)",
-			"v3": "extract error: keyword \"if\" not yet implemented (and 6 more errors)"
+			"v2": "extract error: keyword \"$dynamicRef\" not yet implemented (and 3 more errors)",
+			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 3 more errors)"
 		},
 		"tests": [
 			{
@@ -748,8 +748,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"if\" not yet implemented (and 3 more errors)",
-			"v3": "extract error: keyword \"if\" not yet implemented (and 3 more errors)"
+			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 3 more errors)",
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 3 more errors)"
 		},
 		"tests": [
 			{

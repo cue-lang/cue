@@ -201,10 +201,6 @@
 				"else": true
 			}
 		},
-		"skip": {
-			"v2": "extract error: keyword \"if\" not yet implemented (and 1 more errors)",
-			"v3": "extract error: keyword \"if\" not yet implemented (and 1 more errors)"
-		},
 		"tests": [
 			{
 				"description": "any non-empty array is valid",
@@ -213,18 +209,14 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "6 errors in empty disjunction:\nconflicting values [\"foo\"] and {...} (mismatched types list and struct):\n    generated.cue:4:1\n    generated.cue:4:72\n    instance.json:1:1\nconflicting values bool and [\"foo\"] (mismatched types bool and list):\n    generated.cue:4:8\n    instance.json:1:1\nconflicting values null and [\"foo\"] (mismatched types null and list):\n    generated.cue:4:1\n    instance.json:1:1\nconflicting values number and [\"foo\"] (mismatched types number and list):\n    generated.cue:4:15\n    instance.json:1:1\nconflicting values string and [\"foo\"] (mismatched types string and list):\n    generated.cue:4:24\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:4:58\n",
+					"v3": "conflicting values [\"foo\"] and {...} (mismatched types list and struct):\n    generated.cue:4:72\n    instance.json:1:1\nconflicting values bool and [\"foo\"] (mismatched types bool and list):\n    generated.cue:4:8\n    instance.json:1:1\nconflicting values null and [\"foo\"] (mismatched types null and list):\n    generated.cue:4:1\n    instance.json:1:1\nconflicting values number and [\"foo\"] (mismatched types number and list):\n    generated.cue:4:15\n    instance.json:1:1\nconflicting values string and [\"foo\"] (mismatched types string and list):\n    generated.cue:4:24\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:4:58\n"
 				}
 			},
 			{
 				"description": "empty array is invalid",
 				"data": [],
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},

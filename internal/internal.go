@@ -429,19 +429,3 @@ func GenPath(root string) string {
 }
 
 var ErrInexact = errors.New("inexact subsumption")
-
-func DecorateError(info error, err errors.Error) errors.Error {
-	return &decorated{cueError: err, info: info}
-}
-
-type cueError = errors.Error
-
-type decorated struct {
-	cueError
-
-	info error
-}
-
-func (e *decorated) Is(err error) bool {
-	return errors.Is(e.info, err) || errors.Is(e.cueError, err)
-}

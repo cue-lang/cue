@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70092188_58f4dd81",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 467,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-10T10:10:45Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t// CUE does not have native date nor time literal kinds,\n```",
+      "revId": "d8b9ff5697ee81859f7c8f4c716a7a0cc92f9284",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "72ba0142_b706b829",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 472,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-10T10:10:45Z",
+      "side": 1,
+      "message": "unfinished sentence",
+      "revId": "d8b9ff5697ee81859f7c8f4c716a7a0cc92f9284",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98845bd3_1329f12c",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 482,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-10T10:10:45Z",
+      "side": 1,
+      "message": "This momentarily confused me.\n\n```suggestion\n\t\t\t// TODO(mvdan): add TimeOnly to CUE time package to mirror Go\n```",
+      "revId": "d8b9ff5697ee81859f7c8f4c716a7a0cc92f9284",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb0a7b7b_53a9428f",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 483,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-10T10:10:45Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t\tformat \u003d ast.NewString(time.TimeOnly)\n```\n?",
+      "revId": "d8b9ff5697ee81859f7c8f4c716a7a0cc92f9284",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

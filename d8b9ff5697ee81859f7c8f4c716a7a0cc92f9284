@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8892cd59_83c9e9f0",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 467,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T14:59:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70092188_58f4dd81",
+      "revId": "d8b9ff5697ee81859f7c8f4c716a7a0cc92f9284",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "72ba0142_b706b829",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-09-10T10:10:45Z",
       "side": 1,
       "message": "unfinished sentence",
+      "revId": "d8b9ff5697ee81859f7c8f4c716a7a0cc92f9284",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a904fad9_0a0683d6",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 472,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T14:59:01Z",
+      "side": 1,
+      "message": "ah, these docs were written before the time.Format rewrite. updated.",
+      "parentUuid": "72ba0142_b706b829",
       "revId": "d8b9ff5697ee81859f7c8f4c716a7a0cc92f9284",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "377d822d_b47ae04e",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 482,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T14:59:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "98845bd3_1329f12c",
+      "revId": "d8b9ff5697ee81859f7c8f4c716a7a0cc92f9284",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eb0a7b7b_53a9428f",
@@ -65,6 +119,24 @@
       "writtenOn": "2024-09-10T10:10:45Z",
       "side": 1,
       "message": "```suggestion\n\t\t\tformat \u003d ast.NewString(time.TimeOnly)\n```\n?",
+      "revId": "d8b9ff5697ee81859f7c8f4c716a7a0cc92f9284",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42fa0805_08c7b2c3",
+        "filename": "encoding/toml/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 483,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T14:59:01Z",
+      "side": 1,
+      "message": "Oh, using Go constants to generate CUE? Perhaps a bit too clever, but why not :)",
+      "parentUuid": "eb0a7b7b_53a9428f",
       "revId": "d8b9ff5697ee81859f7c8f4c716a7a0cc92f9284",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

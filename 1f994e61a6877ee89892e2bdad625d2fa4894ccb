@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22933ed9_ea62bb47",
+        "filename": "cue/format/printer.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-10T10:20:39Z",
+      "side": 1,
+      "message": "If we\u0027re linkifying internal function doc comments, then maybe this should be too?\n\n\n```suggestion\n\tlastTok token.Token // last token printed ([token.ILLEGAL] if it\u0027s whitespace)\n```",
+      "revId": "1f994e61a6877ee89892e2bdad625d2fa4894ccb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

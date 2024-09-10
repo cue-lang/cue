@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36bb6991_a47224af",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T11:27:22Z",
+      "side": 1,
+      "message": "Ty instinct was to suggest using strings with e.g. `*\"false\" | \"true\"`, but then you don\u0027t really get the flag.Bool-like behavior of `+strict` being short for `+strict\u003dtrue`, which makes it kinda ugly. So I agree with you on separating boolean tags from string tags (all others).",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 33
+      },
+      "revId": "08533a9beb0c3b2f70d3c1b42537451ffe4fc64f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e188e5e1_7159739f",
+        "filename": "cue/build/file.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T11:27:22Z",
+      "side": 1,
+      "message": "add `e.g.` or `for example` to the inline comment be clear?",
+      "revId": "08533a9beb0c3b2f70d3c1b42537451ffe4fc64f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "812d4af2_fb2902d2",
+        "filename": "internal/filetypes/filetypes.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T11:27:22Z",
+      "side": 1,
+      "message": "Does this mean that specifying one tag may unlock access to some boolean tags?\n\nCan it also unlock access to more string (non-boolean) tags? From the code below, I think the answer to this question is \"yes\", for example for `code+lang\u003djs`?\n\nI assume there is just one level of this as defined by the CUE, e.g. we can\u0027t have tag A unlock tag B which then unlocks tag C?",
+      "revId": "08533a9beb0c3b2f70d3c1b42537451ffe4fc64f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

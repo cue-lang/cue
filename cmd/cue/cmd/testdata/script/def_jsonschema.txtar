@@ -10,6 +10,14 @@ exec cue def jsonschema: bad.json
 ! exec cue def jsonschema: bad.json --strict
 cmp stderr expect-stderr
 
+! exec cue def jsonschema+strict: bad.json
+cmp stderr expect-stderr
+
+# With only strict features, it should error only for the
+# unimplemented feature and not for the unknown keyword.
+! exec cue def jsonschema+strictFeatures: bad.json
+cmp stderr expect-stderr-strict-features
+
 ! exec cue export data.yaml schema.json
 cmp stderr expect-stderr2
 
@@ -62,12 +70,19 @@ import "strings"
 
 -- bad.json --
 {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "number",
-  "foo": "bar"
+  "$dynamicAnchor": "bar",
+  "foo": true
 }
 -- expect-stderr --
+keyword "$dynamicAnchor" not yet implemented:
+    ./bad.json:4:3
 unknown keyword "foo":
-    ./bad.json:3:3
+    ./bad.json:5:3
+-- expect-stderr-strict-features --
+keyword "$dynamicAnchor" not yet implemented:
+    ./bad.json:4:3
 -- data.yaml --
 age: twenty
 

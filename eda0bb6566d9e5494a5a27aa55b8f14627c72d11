@@ -16,6 +16,24 @@
       "message": "SGTM but will leave it to Marcel to approve.\n\nHow would one leave either \"if\" or \"else\" empty, by giving top? For example, doing an \"if-then\" without an \"else\" is rather common. Perhaps we should have an example for that.",
       "revId": "eda0bb6566d9e5494a5a27aa55b8f14627c72d11",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7d8ed48_5a5fe202",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-10T13:30:34Z",
+      "side": 1,
+      "message": "Yeah, just by giving top. We can add varargs support later if needed, I think.",
+      "parentUuid": "87b1fe6e_842a7a2c",
+      "revId": "eda0bb6566d9e5494a5a27aa55b8f14627c72d11",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

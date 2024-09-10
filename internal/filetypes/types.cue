@@ -32,7 +32,7 @@ package build
 
 // Default is the file used for stdin and stdout. The settings depend
 // on the file mode.
-#Default: #File & {
+#Default: #FileInfo & {
 	filename: *"-" | string
 }
 
@@ -68,12 +68,16 @@ package build
 fileForExtVanilla: modes.input.extensions
 
 // modes sets defaults for different operational modes.
+// The key corresponds to the Go internal/filetypes.Mode type.
 modes: [string]: {
-	// TODO(mvdan): Document these once they are better understood.
-	// Perhaps make them required as well.
-	File:     #File
-	FileInfo: #FileInfo
-	Default:  #Default
+	// FileInfo holds the base file information for this mode.
+	// This will be unified with information derived from the
+	// file extension and any filetype tags explicitly provided.
+	FileInfo!: #FileInfo
+
+	// Default holds the base file information for standard input
+	// or output, where we don't have any file extension available.
+	Default!: #Default
 }
 
 // input defines modes for input, such as import, eval, vet or def.
@@ -99,18 +103,6 @@ modes: input: {
 modes: export: {
 	Default: {
 		encoding: *"json" | _
-	}
-	FileInfo: {
-		docs:       true | *false
-		attributes: true | *false
-	}
-	encodings: cue: forms.data
-}
-
-// TODO(mvdan): this "output" mode appears to be unused at the moment.
-modes: output: {
-	Default: {
-		encoding: *"cue" | _
 	}
 	FileInfo: {
 		docs:       true | *false
@@ -148,8 +140,12 @@ modes: def: {
 // An Interpretation determines how a certain program should be interpreted.
 // For instance, data may be interpreted as describing a schema, which itself
 // can be converted to a CUE schema.
+// This corresponds to the Go cue/build.Interpretation type.
 #Interpretation: string
-#Form:           string
+
+// A Form specifies the form in which a program should be represented.
+// It corresponds to the Go cue/build.Form type.
+#Form: string
 
 modes: [string]: {
 	// extensions maps a file extension to its associated default file properties.
@@ -185,11 +181,6 @@ modes: [string]: {
 		stream:     *false | true
 		docs:       false
 		attributes: false
-	}
-
-	encodings: yaml: {
-		forms.graph
-		stream: false | *true
 	}
 
 	encodings: yaml: {
@@ -234,11 +225,6 @@ modes: [string]: {
 		stream:   false
 	}
 
-	// encodings: binproto: {
-	//  forms.DataEncoding
-	//  encoding: "binproto"
-	// }
-
 	encodings: code: {
 		forms.schema
 		stream: false
@@ -249,9 +235,9 @@ modes: [string]: {
 forms: [Name=string]: #FileInfo
 
 forms: schema: {
-	form:   *"schema" | "final" | "graph"
-	stream: true | *false
+	form: *"schema" | "final" | "graph"
 
+	stream:       true | *false
 	incomplete:   *true | false
 	definitions:  *true | false
 	optional:     *true | false
@@ -298,11 +284,11 @@ forms: data: {
 	optional:    false
 }
 
-interpretations: [Name=string]: #FileInfo
-
-interpretations: auto: {
-	forms.schema
+interpretations: [Name=string]: #FileInfo & {
+	interpretation: Name
 }
+
+interpretations: auto: forms.schema
 
 interpretations: jsonschema: {
 	forms.schema
@@ -326,8 +312,7 @@ tagInfo: {
 	dag: form:    "dag"
 	data: form:   "data"
 
-	cue: encoding: "cue"
-
+	cue: encoding:       "cue"
 	json: encoding:      "json"
 	jsonl: encoding:     "jsonl"
 	yaml: encoding:      "yaml"
@@ -363,17 +348,9 @@ tagInfo: {
 		interpretation: ""
 		tags: lang: *"" | string
 	}
-
-	auto: {
-		interpretation: "auto"
-		encoding:       *"json" | _
+	auto: interpretations.auto & {
+		encoding: *"json" | string
 	}
-	jsonschema: {
-		interpretation: "jsonschema"
-		encoding:       *"json" | _
-	}
-	openapi: {
-		interpretation: "openapi"
-		encoding:       *"json" | _
-	}
+	jsonschema: interpretations.jsonschema
+	openapi:    interpretations.openapi
 }

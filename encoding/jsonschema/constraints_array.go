@@ -41,7 +41,7 @@ func constraintAdditionalItems(key string, n cue.Value, s *state) {
 }
 
 func constraintMinContains(key string, n cue.Value, s *state) {
-	p, err := n.Uint64()
+	p, err := uint64Value(n)
 	if err != nil {
 		s.errf(n, `value of "minContains" must be a non-negative integer value`)
 		return
@@ -50,7 +50,7 @@ func constraintMinContains(key string, n cue.Value, s *state) {
 }
 
 func constraintMaxContains(key string, n cue.Value, s *state) {
-	p, err := n.Uint64()
+	p, err := uint64Value(n)
 	if err != nil {
 		s.errf(n, `value of "maxContains" must be a non-negative integer value`)
 		return
@@ -112,7 +112,7 @@ func constraintMaxItems(key string, n cue.Value, s *state) {
 
 func constraintMinItems(key string, n cue.Value, s *state) {
 	a := []ast.Expr{}
-	p, err := n.Uint64()
+	p, err := uint64Value(n)
 	if err != nil {
 		s.errf(n, "invalid uint")
 	}

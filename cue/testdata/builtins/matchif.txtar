@@ -1,0 +1,282 @@
+-- in.cue --
+regularFields: {
+	[_]: matchIf({x!: >2}, {y!: 5}, {y!: 1})
+	ok1: {x: 10, y: 5}
+	ok2: {x: 11, y: 5}
+	ok3: {x: 2, y: 1}
+	ok4: {x: 1, y: 1}
+	err1: {x: 10, y: 6}
+	err2: {x: 11, y: 6}
+	err3: {x: 2, y: 5}
+	err4: {x: 1, y: 2}
+}
+-- out/eval/stats --
+Leaks:  24
+Freed:  74
+Reused: 69
+Allocs: 29
+Retain: 24
+
+Unifications: 98
+Conjuncts:    154
+Disjuncts:    98
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -2,22 +2,18 @@
+ regularFields.err1: invalid value {x:10,y:6} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 5 and 6:
+     ./in.cue:2:7
+     ./in.cue:2:30
+-    ./in.cue:7:8
+     ./in.cue:7:19
+ regularFields.err2: invalid value {x:11,y:6} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 5 and 6:
+     ./in.cue:2:7
+     ./in.cue:2:30
+-    ./in.cue:8:8
+     ./in.cue:8:19
+ regularFields.err3: invalid value {x:2,y:5} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 1 and 5:
+     ./in.cue:2:7
+     ./in.cue:2:39
+-    ./in.cue:9:8
+     ./in.cue:9:18
+ regularFields.err4: invalid value {x:1,y:2} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 1 and 2:
+     ./in.cue:2:7
+     ./in.cue:2:39
+-    ./in.cue:10:8
+     ./in.cue:10:18
+ 
+ Result:
+@@ -45,7 +41,6 @@
+       // [eval] regularFields.err1: invalid value {x:10,y:6} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 5 and 6:
+       //     ./in.cue:2:7
+       //     ./in.cue:2:30
+-      //     ./in.cue:7:8
+       //     ./in.cue:7:19
+       x: (int){ 10 }
+       y: (int){ 6 }
+@@ -54,7 +49,6 @@
+       // [eval] regularFields.err2: invalid value {x:11,y:6} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 5 and 6:
+       //     ./in.cue:2:7
+       //     ./in.cue:2:30
+-      //     ./in.cue:8:8
+       //     ./in.cue:8:19
+       x: (int){ 11 }
+       y: (int){ 6 }
+@@ -63,7 +57,6 @@
+       // [eval] regularFields.err3: invalid value {x:2,y:5} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 1 and 5:
+       //     ./in.cue:2:7
+       //     ./in.cue:2:39
+-      //     ./in.cue:9:8
+       //     ./in.cue:9:18
+       x: (int){ 2 }
+       y: (int){ 5 }
+@@ -72,7 +65,6 @@
+       // [eval] regularFields.err4: invalid value {x:1,y:2} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 1 and 2:
+       //     ./in.cue:2:7
+       //     ./in.cue:2:39
+-      //     ./in.cue:10:8
+       //     ./in.cue:10:18
+       x: (int){ 1 }
+       y: (int){ 2 }
+-- out/eval --
+Errors:
+regularFields.err1: invalid value {x:10,y:6} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 5 and 6:
+    ./in.cue:2:7
+    ./in.cue:2:30
+    ./in.cue:7:8
+    ./in.cue:7:19
+regularFields.err2: invalid value {x:11,y:6} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 5 and 6:
+    ./in.cue:2:7
+    ./in.cue:2:30
+    ./in.cue:8:8
+    ./in.cue:8:19
+regularFields.err3: invalid value {x:2,y:5} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 1 and 5:
+    ./in.cue:2:7
+    ./in.cue:2:39
+    ./in.cue:9:8
+    ./in.cue:9:18
+regularFields.err4: invalid value {x:1,y:2} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 1 and 2:
+    ./in.cue:2:7
+    ./in.cue:2:39
+    ./in.cue:10:8
+    ./in.cue:10:18
+
+Result:
+(_|_){
+  // [eval]
+  regularFields: (_|_){
+    // [eval]
+    ok1: (struct){
+      x: (int){ 10 }
+      y: (int){ 5 }
+    }
+    ok2: (struct){
+      x: (int){ 11 }
+      y: (int){ 5 }
+    }
+    ok3: (struct){
+      x: (int){ 2 }
+      y: (int){ 1 }
+    }
+    ok4: (struct){
+      x: (int){ 1 }
+      y: (int){ 1 }
+    }
+    err1: (_|_){
+      // [eval] regularFields.err1: invalid value {x:10,y:6} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 5 and 6:
+      //     ./in.cue:2:7
+      //     ./in.cue:2:30
+      //     ./in.cue:7:8
+      //     ./in.cue:7:19
+      x: (int){ 10 }
+      y: (int){ 6 }
+    }
+    err2: (_|_){
+      // [eval] regularFields.err2: invalid value {x:11,y:6} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 5 and 6:
+      //     ./in.cue:2:7
+      //     ./in.cue:2:30
+      //     ./in.cue:8:8
+      //     ./in.cue:8:19
+      x: (int){ 11 }
+      y: (int){ 6 }
+    }
+    err3: (_|_){
+      // [eval] regularFields.err3: invalid value {x:2,y:5} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 1 and 5:
+      //     ./in.cue:2:7
+      //     ./in.cue:2:39
+      //     ./in.cue:9:8
+      //     ./in.cue:9:18
+      x: (int){ 2 }
+      y: (int){ 5 }
+    }
+    err4: (_|_){
+      // [eval] regularFields.err4: invalid value {x:1,y:2} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 1 and 2:
+      //     ./in.cue:2:7
+      //     ./in.cue:2:39
+      //     ./in.cue:10:8
+      //     ./in.cue:10:18
+      x: (int){ 1 }
+      y: (int){ 2 }
+    }
+  }
+}
+-- out/evalalpha --
+Errors:
+regularFields.err1: invalid value {x:10,y:6} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 5 and 6:
+    ./in.cue:2:7
+    ./in.cue:2:30
+    ./in.cue:7:19
+regularFields.err2: invalid value {x:11,y:6} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 5 and 6:
+    ./in.cue:2:7
+    ./in.cue:2:30
+    ./in.cue:8:19
+regularFields.err3: invalid value {x:2,y:5} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 1 and 5:
+    ./in.cue:2:7
+    ./in.cue:2:39
+    ./in.cue:9:18
+regularFields.err4: invalid value {x:1,y:2} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 1 and 2:
+    ./in.cue:2:7
+    ./in.cue:2:39
+    ./in.cue:10:18
+
+Result:
+(_|_){
+  // [eval]
+  regularFields: (_|_){
+    // [eval]
+    ok1: (struct){
+      x: (int){ 10 }
+      y: (int){ 5 }
+    }
+    ok2: (struct){
+      x: (int){ 11 }
+      y: (int){ 5 }
+    }
+    ok3: (struct){
+      x: (int){ 2 }
+      y: (int){ 1 }
+    }
+    ok4: (struct){
+      x: (int){ 1 }
+      y: (int){ 1 }
+    }
+    err1: (_|_){
+      // [eval] regularFields.err1: invalid value {x:10,y:6} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 5 and 6:
+      //     ./in.cue:2:7
+      //     ./in.cue:2:30
+      //     ./in.cue:7:19
+      x: (int){ 10 }
+      y: (int){ 6 }
+    }
+    err2: (_|_){
+      // [eval] regularFields.err2: invalid value {x:11,y:6} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 5 and 6:
+      //     ./in.cue:2:7
+      //     ./in.cue:2:30
+      //     ./in.cue:8:19
+      x: (int){ 11 }
+      y: (int){ 6 }
+    }
+    err3: (_|_){
+      // [eval] regularFields.err3: invalid value {x:2,y:5} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 1 and 5:
+      //     ./in.cue:2:7
+      //     ./in.cue:2:39
+      //     ./in.cue:9:18
+      x: (int){ 2 }
+      y: (int){ 5 }
+    }
+    err4: (_|_){
+      // [eval] regularFields.err4: invalid value {x:1,y:2} (does not satisfy matchIf({x!:>2}, {y!:5}, {y!:1})): conflicting values 1 and 2:
+      //     ./in.cue:2:7
+      //     ./in.cue:2:39
+      //     ./in.cue:10:18
+      x: (int){ 1 }
+      y: (int){ 2 }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  regularFields: {
+    [_]: matchIf({
+      x!: >2
+    }, {
+      y!: 5
+    }, {
+      y!: 1
+    })
+    ok1: {
+      x: 10
+      y: 5
+    }
+    ok2: {
+      x: 11
+      y: 5
+    }
+    ok3: {
+      x: 2
+      y: 1
+    }
+    ok4: {
+      x: 1
+      y: 1
+    }
+    err1: {
+      x: 10
+      y: 6
+    }
+    err2: {
+      x: 11
+      y: 6
+    }
+    err3: {
+      x: 2
+      y: 5
+    }
+    err4: {
+      x: 1
+      y: 2
+    }
+  }
+}

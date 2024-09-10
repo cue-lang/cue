@@ -138,11 +138,6 @@ type PkgInfo struct {
 	Name    string
 }
 
-// IsAnonymous reports whether the package is anonymous.
-func (p *PkgInfo) IsAnonymous() bool {
-	return p.Name == "" || p.Name == "_"
-}
-
 func GetPackageInfo(f *ast.File) PkgInfo {
 	for i, d := range f.Decls {
 		switch x := d.(type) {

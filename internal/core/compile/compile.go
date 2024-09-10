@@ -275,7 +275,7 @@ func (c *compiler) compileFiles(a []*ast.File) *adt.Vertex { // Or value?
 	// - anything in an anonymous file
 	//
 	for _, f := range a {
-		if p := internal.GetPackageInfo(f); p.IsAnonymous() {
+		if f.PackageName() == "" {
 			continue
 		}
 		for _, d := range f.Decls {

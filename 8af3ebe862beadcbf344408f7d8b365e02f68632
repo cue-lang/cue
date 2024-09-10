@@ -18,6 +18,40 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7da5b84_65c5bb9d",
+        "filename": "encoding/jsonschema/testdata/external/tests/draft2019-09/contains.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-10T13:45:51Z",
+      "side": 1,
+      "message": "This is failing for the same reason as https://github.com/cue-lang/cue/issues/3420",
+      "revId": "8af3ebe862beadcbf344408f7d8b365e02f68632",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "814bffe9_432493b8",
+        "filename": "encoding/jsonschema/testdata/external/tests/draft7/ref.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 1286,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-10T13:45:51Z",
+      "side": 1,
+      "message": "FWIW this different error is caused by the generated schema looking like this:\n\n```\nimport \"example.com/ref/if\"\n\nmatchN(2, [if])\n```\n\nThis looks like an unrelated issue: we should probably avoid using CUE keywords for package identifiers.",
+      "revId": "8af3ebe862beadcbf344408f7d8b365e02f68632",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6e9515bf_da82e9d1",
@@ -31,6 +65,24 @@
       "writtenOn": "2024-09-10T13:19:04Z",
       "side": 1,
       "message": "is this to be expected? at least the error is odd.",
+      "revId": "8af3ebe862beadcbf344408f7d8b365e02f68632",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8c5794e_144b3423",
+        "filename": "encoding/jsonschema/testdata/external/tests/draft7/ref.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 1367,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-10T13:45:51Z",
+      "side": 1,
+      "message": "No, it\u0027s not expected: this highlights a limitation in the implementation, but not (AFAICS) one that\u0027s related to if/then/else. The reference is to a schema that\u0027s defined directly inside a schema (in this case the schema itself - see that `\"$id\": \"..../else\"` field), which is something we don\u0027t support well as yet.\n\nI don\u0027t think this should hold up this CL.",
+      "parentUuid": "6e9515bf_da82e9d1",
       "revId": "8af3ebe862beadcbf344408f7d8b365e02f68632",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -92,7 +92,6 @@ func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
 			KeepDefaults: true,
 			Incomplete:   true,
 			Imports:      true,
-			Stream:       true,
 			Docs:         true,
 			Attributes:   true,
 		}, nil
@@ -312,7 +311,7 @@ func toFile(modeVal, fileVal cue.Value, filename string) (*build.File, error) {
 
 func parseType(scope string, mode Mode) (modeVal, fileVal cue.Value, _ error) {
 	modeVal = typesValue.LookupPath(cue.MakePath(cue.Str("modes"), cue.Str(mode.String())))
-	fileVal = modeVal.LookupPath(cue.MakePath(cue.Str("File")))
+	fileVal = modeVal.LookupPath(cue.MakePath(cue.Str("FileInfo")))
 
 	if scope != "" {
 		for _, tag := range strings.Split(scope, "+") {

@@ -56,8 +56,8 @@ func TestFromFile(t *testing.T) {
 		out: &FileInfo{
 			File: &build.File{
 				Filename: "",
-				Encoding: "cue",
-				Form:     "schema",
+				Encoding: build.CUE,
+				Form:     build.Schema,
 			},
 			Definitions:  true,
 			Data:         true,
@@ -83,8 +83,8 @@ func TestFromFile(t *testing.T) {
 		out: &FileInfo{
 			File: &build.File{
 				Filename: "",
-				Encoding: "cue",
-				Form:     "data",
+				Encoding: build.CUE,
+				Form:     build.Data,
 			},
 			Data:       true,
 			Docs:       true,
@@ -107,8 +107,8 @@ func TestFromFile(t *testing.T) {
 		out: &FileInfo{
 			File: &build.File{
 				Filename: "foo.yaml",
-				Encoding: "yaml",
-				Form:     "graph",
+				Encoding: build.YAML,
+				Form:     build.Graph,
 			},
 			Data:       true,
 			References: true,
@@ -121,14 +121,14 @@ func TestFromFile(t *testing.T) {
 		name: "yaml+openapi",
 		in: build.File{
 			Filename:       "foo.yaml",
-			Interpretation: "openapi",
+			Interpretation: build.OpenAPI,
 		},
 		out: &FileInfo{
 			File: &build.File{
 				Filename:       "foo.yaml",
-				Encoding:       "yaml",
-				Interpretation: "openapi",
-				Form:           "schema",
+				Encoding:       build.YAML,
+				Interpretation: build.OpenAPI,
+				Form:           build.Schema,
 			},
 			Definitions:  true,
 			Data:         true,
@@ -151,9 +151,9 @@ func TestFromFile(t *testing.T) {
 		out: &FileInfo{
 			File: &build.File{
 				Filename:       "data.json",
-				Encoding:       "json",
-				Interpretation: "auto",
-				Form:           "schema",
+				Encoding:       build.JSON,
+				Interpretation: build.Auto,
+				Form:           build.Schema,
 			},
 			Definitions:  true,
 			Data:         true,
@@ -176,9 +176,9 @@ func TestFromFile(t *testing.T) {
 		out: &FileInfo{
 			File: &build.File{
 				Filename:       "foo.json",
-				Encoding:       "json",
+				Encoding:       build.JSON,
 				Interpretation: "jsonschema",
-				Form:           "schema",
+				Form:           build.Schema,
 			},
 			Definitions:  true,
 			Data:         true,
@@ -196,15 +196,15 @@ func TestFromFile(t *testing.T) {
 		name: "JSONOpenAPI",
 		in: build.File{
 			Filename:       "foo.json",
-			Interpretation: "openapi",
+			Interpretation: build.OpenAPI,
 		},
 		mode: Def,
 		out: &FileInfo{
 			File: &build.File{
 				Filename:       "foo.json",
-				Encoding:       "json",
-				Interpretation: "openapi",
-				Form:           "schema",
+				Encoding:       build.JSON,
+				Interpretation: build.OpenAPI,
+				Form:           build.Schema,
 			},
 			Definitions:  true,
 			Data:         true,
@@ -222,15 +222,15 @@ func TestFromFile(t *testing.T) {
 		name: "OpenAPIDefaults",
 		in: build.File{
 			Filename:       "-",
-			Interpretation: "openapi",
+			Interpretation: build.OpenAPI,
 		},
 		mode: Def,
 		out: &FileInfo{
 			File: &build.File{
 				Filename:       "-",
-				Encoding:       "json",
-				Interpretation: "openapi",
-				Form:           "schema",
+				Encoding:       build.JSON,
+				Interpretation: build.OpenAPI,
+				Form:           build.Schema,
 			},
 			Definitions:  true,
 			Data:         true,
@@ -253,8 +253,8 @@ func TestFromFile(t *testing.T) {
 		out: &FileInfo{
 			File: &build.File{
 				Filename: "foo.go",
-				Encoding: "code",
-				Form:     "schema",
+				Encoding: build.Code,
+				Form:     build.Schema,
 				Tags:     map[string]string{"lang": "go"},
 			},
 			Definitions:  true,
@@ -266,7 +266,6 @@ func TestFromFile(t *testing.T) {
 			KeepDefaults: true,
 			Incomplete:   true,
 			Imports:      true,
-			Stream:       false,
 			Docs:         true,
 			Attributes:   true,
 		},
@@ -290,8 +289,8 @@ func TestParseFile(t *testing.T) {
 		mode: Input,
 		out: &build.File{
 			Filename:       "file.json",
-			Encoding:       "json",
-			Interpretation: "auto",
+			Encoding:       build.JSON,
+			Interpretation: build.Auto,
 		},
 	}, {
 		in:   ".json",
@@ -302,49 +301,50 @@ func TestParseFile(t *testing.T) {
 		mode: Input,
 		out: &build.File{
 			Filename:       ".json.yaml",
-			Encoding:       "yaml",
-			Interpretation: "auto",
+			Encoding:       build.YAML,
+			Interpretation: build.Auto,
 		},
 	}, {
 		in:   "file.json",
 		mode: Def,
 		out: &build.File{
 			Filename: "file.json",
-			Encoding: "json",
+			Encoding: build.JSON,
 		},
 	}, {
 		in: "schema:file.json",
 		out: &build.File{
 			Filename:       "file.json",
-			Encoding:       "json",
-			Interpretation: "auto",
-			Form:           "schema",
+			Encoding:       build.JSON,
+			Interpretation: build.Auto,
+			Form:           build.Schema,
 		},
 	}, {
 		in: "openapi:-",
 		out: &build.File{
 			Filename:       "-",
-			Encoding:       "json",
-			Interpretation: "openapi",
+			Encoding:       build.JSON,
+			Form:           build.Schema,
+			Interpretation: build.OpenAPI,
 		},
 	}, {
 		in: "cue:file.json",
 		out: &build.File{
 			Filename: "file.json",
-			Encoding: "cue",
+			Encoding: build.CUE,
 		},
 	}, {
 		in: "cue+schema:-",
 		out: &build.File{
 			Filename: "-",
-			Encoding: "cue",
-			Form:     "schema",
+			Encoding: build.CUE,
+			Form:     build.Schema,
 		},
 	}, {
 		in: "code+lang=js:foo.x",
 		out: &build.File{
 			Filename: "foo.x",
-			Encoding: "code",
+			Encoding: build.Code,
 			Tags:     map[string]string{"lang": "js"},
 		},
 	}, {
@@ -358,14 +358,14 @@ func TestParseFile(t *testing.T) {
 		mode: Input,
 		out: &build.File{
 			Filename: "-",
-			Encoding: "cue",
+			Encoding: build.CUE,
 		},
 	}, {
 		in:   "-",
 		mode: Export,
 		out: &build.File{
 			Filename: "-",
-			Encoding: "json",
+			Encoding: build.JSON,
 		},
 	}}
 	for _, tc := range testCases {
@@ -385,36 +385,37 @@ func TestParseArgs(t *testing.T) {
 		out: []*build.File{
 			{
 				Filename:       "foo.json",
-				Encoding:       "json",
-				Interpretation: "auto",
+				Encoding:       build.JSON,
+				Interpretation: build.Auto,
 			},
 			{
 				Filename:       "baz.yaml",
-				Encoding:       "yaml",
-				Interpretation: "auto",
+				Encoding:       build.YAML,
+				Interpretation: build.Auto,
 			},
 		},
 	}, {
 		in: "data: foo.cue",
 		out: []*build.File{
-			{Filename: "foo.cue", Encoding: "cue", Form: "data"},
+			{Filename: "foo.cue", Encoding: build.CUE, Form: build.Data},
 		},
 	}, {
 		in: "json: foo.json bar.data jsonschema: bar.schema",
 		out: []*build.File{
-			{Filename: "foo.json", Encoding: "json"}, // no auto!
-			{Filename: "bar.data", Encoding: "json"},
+			{Filename: "foo.json", Encoding: build.JSON}, // no auto!
+			{Filename: "bar.data", Encoding: build.JSON},
 			{
 				Filename:       "bar.schema",
-				Encoding:       "json",
+				Encoding:       build.JSON,
+				Form:           build.Schema,
 				Interpretation: "jsonschema",
 			},
 		},
 	}, {
 		in: `json: c:\foo.json c:\path\to\file.dat`,
 		out: []*build.File{
-			{Filename: `c:\foo.json`, Encoding: "json"},
-			{Filename: `c:\path\to\file.dat`, Encoding: "json"},
+			{Filename: `c:\foo.json`, Encoding: build.JSON},
+			{Filename: `c:\path\to\file.dat`, Encoding: build.JSON},
 		},
 	}, {
 		in:  "json: json+schema: bar.schema",

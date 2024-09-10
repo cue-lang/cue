@@ -483,6 +483,9 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 			// Track the position of the fallback files.
 			index := make(map[string]int, len(a.Files))
 			for i, f := range a.Files {
+				if _, ok := index[f.Name]; ok {
+					t.Errorf("duplicated txtar file entry %s", f.Name)
+				}
 				index[f.Name] = i
 			}
 

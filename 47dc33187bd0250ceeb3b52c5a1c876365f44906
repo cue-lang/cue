@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6cd1295a_0e3341a4",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T16:32:10Z",
+      "side": 1,
+      "message": "good point. for the cue/load loading, the last file wins, so my logic to \"fix\" the txtar by replacing the first entry with the last duplicate works for that, but other logic might use the first entry instead. so leaving it to the user to fix is probably best.\n\nbonus points, there\u0027s much less added code, as the repairing logic was non-trivial.\n\nand yeah, setting `update \u003d true` when CUE_UPDATE\u003d1 wasn\u0027t set was already a bit weird. this was me trying to be helpful for the user and fixing the problem rather than reporting it, but you raise a good point.",
+      "parentUuid": "b8bf38d8_eb78b278",
+      "revId": "47dc33187bd0250ceeb3b52c5a1c876365f44906",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4e5de842_a1b0ed81",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-09-10T10:14:45Z",
       "side": 1,
       "message": "Simpler and equivalent?\n```suggestion\n\t\t\tfiles \u003d nil\n```",
+      "revId": "47dc33187bd0250ceeb3b52c5a1c876365f44906",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8ad6172_f889ea27",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 559,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T16:32:10Z",
+      "side": 1,
+      "message": "good point - but no longer relevant",
+      "parentUuid": "4e5de842_a1b0ed81",
       "revId": "47dc33187bd0250ceeb3b52c5a1c876365f44906",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

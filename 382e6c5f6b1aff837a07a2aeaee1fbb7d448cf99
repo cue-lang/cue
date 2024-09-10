@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c593095_99b6aefa",
+        "filename": "cmd/cue/cmd/flags.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T11:31:23Z",
+      "side": 1,
+      "message": "can we give a CLI arguments example instead? otherwise this is not immediately obvious to the reader who is not already familiar with `cue help inputs`",
+      "revId": "382e6c5f6b1aff837a07a2aeaee1fbb7d448cf99",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01f16458_1158e0ce",
+        "filename": "internal/encoding/encoding.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T11:31:23Z",
+      "side": 1,
+      "message": "Use the `// Deprecated: xxx` form, otherwise tools like staticcheck won\u0027t pick it up",
+      "revId": "382e6c5f6b1aff837a07a2aeaee1fbb7d448cf99",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e392f5e2_caec21d4",
+        "filename": "internal/encoding/encoding.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T11:31:23Z",
+      "side": 1,
+      "message": "why is this not `cfg.Strict || f.BoolTags[\"strict\"] || f.BoolTags[\"strictFeatures\"]`? AFAICT `f.BoolTags[\"strict\"]` as documented by `cue help inputs` is not wired up. We might need better tests for neither/either/both of these boolean tags.",
+      "revId": "382e6c5f6b1aff837a07a2aeaee1fbb7d448cf99",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

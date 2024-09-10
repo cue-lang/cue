@@ -33,6 +33,24 @@
       "message": "nit: the formatting doesn\u0027t look right now, re-run `cue fmt`?",
       "revId": "42405fef9a29721313ed4bcf1acd9ec829c2ddfb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b10a29b5_3fc7fe27",
+        "filename": "internal/filetypes/types.cue",
+        "patchSetId": 5
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-10T12:12:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a1cd12db_a9174d2f",
+      "revId": "42405fef9a29721313ed4bcf1acd9ec829c2ddfb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

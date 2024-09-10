@@ -20,8 +20,10 @@ package jsonschema
 
 import (
 	"fmt"
+	"math"
 	"net/url"
 	"sort"
+	"strconv"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -221,12 +223,16 @@ func (d *decoder) number(n cue.Value) ast.Expr {
 	return n.Syntax(cue.Final()).(ast.Expr)
 }
 
-func (d *decoder) uint(n cue.Value) ast.Expr {
-	_, err := n.Uint64()
+func (d *decoder) uint(nv cue.Value) ast.Expr {
+	n, err := uint64Value(nv)
 	if err != nil {
-		d.errf(n, "invalid uint")
+		d.errf(nv, "invalid uint")
 	}
-	return n.Syntax(cue.Final()).(ast.Expr)
+	return &ast.BasicLit{
+		ValuePos: nv.Pos(),
+		Kind:     token.FLOAT,
+		Value:    strconv.FormatUint(n, 10),
+	}
 }
 
 func (d *decoder) boolValue(n cue.Value) bool {
@@ -810,4 +816,26 @@ func addTag(field ast.Label, tag, value string) *ast.Field {
 func setPos(e ast.Expr, v cue.Value) ast.Expr {
 	ast.SetPos(e, v.Pos())
 	return e
+}
+
+// uint64Value is like v.Uint64 except that it
+// also allows floating point constants, as long
+// as they have no fractional part.
+func uint64Value(v cue.Value) (uint64, error) {
+	n, err := v.Uint64()
+	if err == nil {
+		return n, nil
+	}
+	f, err := v.Float64()
+	if err != nil {
+		return 0, err
+	}
+	intPart, fracPart := math.Modf(f)
+	if fracPart != 0 {
+		return 0, errors.Newf(v.Pos(), "%v is not a whole number", v)
+	}
+	if intPart < 0 || intPart > math.MaxUint64 {
+		return 0, errors.Newf(v.Pos(), "%v is out of bounds", v)
+	}
+	return uint64(intPart), nil
 }

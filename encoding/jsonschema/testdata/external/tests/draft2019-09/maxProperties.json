@@ -57,21 +57,13 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"maxProperties": 2.0
 		},
-		"skip": {
-			"v2": "extract error: invalid uint",
-			"v3": "extract error: invalid uint"
-		},
 		"tests": [
 			{
 				"description": "shorter is valid",
 				"data": {
 					"foo": 1
 				},
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "too long is invalid",
@@ -80,11 +72,7 @@
 					"bar": 2,
 					"baz": 3
 				},
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},

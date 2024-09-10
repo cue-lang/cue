@@ -181,7 +181,7 @@ func TestFromFile(t *testing.T) {
 				Form:           build.Schema,
 				BoolTags: map[string]bool{
 					"strict":         false,
-					"strictFeatures": false,
+					"strictFeatures": true,
 					"strictKeywords": false,
 				},
 			},
@@ -419,7 +419,7 @@ func TestParseArgs(t *testing.T) {
 				Interpretation: "jsonschema",
 				BoolTags: map[string]bool{
 					"strict":         false,
-					"strictFeatures": false,
+					"strictFeatures": true,
 					"strictKeywords": false,
 				},
 			},
@@ -436,6 +436,21 @@ func TestParseArgs(t *testing.T) {
 					"strict":         true,
 					"strictFeatures": true,
 					"strictKeywords": true,
+				},
+			},
+		},
+	}, {
+		in: "jsonschema+strictFeatures=0: bar.schema",
+		out: []*build.File{
+			{
+				Filename:       "bar.schema",
+				Encoding:       "json",
+				Interpretation: "jsonschema",
+				Form:           build.Schema,
+				BoolTags: map[string]bool{
+					"strict":         false,
+					"strictFeatures": false,
+					"strictKeywords": false,
 				},
 			},
 		},

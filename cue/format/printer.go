@@ -39,7 +39,7 @@ type printer struct {
 	pos     token.Position // current pos in AST
 	lineout line
 
-	lastTok token.Token // last token printed (syntax.ILLEGAL if it's whitespace)
+	lastTok token.Token // last token printed ([token.ILLEGAL] if it's whitespace)
 
 	output           []byte
 	indent           int
@@ -98,7 +98,7 @@ func (p *printer) Print(v interface{}) {
 			// the previous and the current token must be
 			// separated by a blank otherwise they combine
 			// into a different incorrect token sequence
-			// (except for syntax.INT followed by a '.' this
+			// (except for token.INT followed by a '.' this
 			// should never happen because it is taken care
 			// of via binary expression formatting)
 			if p.allowed&blank != 0 {

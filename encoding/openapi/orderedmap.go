@@ -115,7 +115,7 @@ func (m *OrderedMap) find(key string) *ast.Field {
 
 // Set sets a key value pair. If a pair with the same key already existed, it
 // will be replaced with the new value. Otherwise, the new value is added to
-// the end. The value must be of type string, ast.Expr, or *OrderedMap.
+// the end. The value must be of type string, [ast.Expr], or [*OrderedMap].
 //
 // Deprecated: use cuelang.org/go/cue/ast to manipulate ASTs.
 func (m *OrderedMap) Set(key string, x interface{}) {
@@ -173,7 +173,7 @@ func (m *OrderedMap) getMap(key string) *OrderedMap {
 	return (*OrderedMap)(f.Value.(*ast.StructLit))
 }
 
-// MarshalJSON implements json.Marshaler.
+// MarshalJSON implements [encoding/json.Marshaler].
 func (m *OrderedMap) MarshalJSON() (b []byte, err error) {
 	// This is a pointer receiever to enforce that we only store pointers to
 	// OrderedMap in the output.

@@ -39,14 +39,14 @@ type Option func(*options)
 type options struct {
 }
 
-// NewDecoder returns a new Decoder
+// NewDecoder returns a new [Decoder].
 func NewDecoder(option ...Option) *Decoder {
 	d := &Decoder{}
 	_ = d.m // work around linter bug.
 	return d
 }
 
-// A Decoder caches conversions of cue.Value between calls to its methods.
+// A Decoder caches conversions of [cue.Value] between calls to its methods.
 type Decoder struct {
 	m map[*adt.Vertex]*mapping
 }

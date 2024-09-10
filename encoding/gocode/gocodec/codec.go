@@ -54,7 +54,7 @@ func New[Ctx *cue.Runtime | *cue.Context](ctx Ctx, c *Config) *Codec {
 //
 // The type represented by x is converted as the underlying type. Specific
 // values, such as map or slice elements or field values of structs are ignored.
-// If x is of type reflect.Type, the type represented by x is extracted.
+// If x is of type [reflect.Type], the type represented by x is extracted.
 //
 // Fields of structs can be annoted using additional constrains using the 'cue'
 // field tag. The value of the tag is a CUE expression, which may contain
@@ -78,7 +78,7 @@ func (c *Codec) ExtractType(x interface{}) (cue.Value, error) {
 
 // Decode converts x to a CUE value.
 //
-// If x is of type reflect.Value it will convert the value represented by x.
+// If x is of type [reflect.Value] it will convert the value represented by x.
 func (c *Codec) Decode(x interface{}) (cue.Value, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
@@ -147,7 +147,7 @@ func (c *Codec) Validate(v cue.Value, x interface{}) error {
 // initialized.
 //
 // Complete does a JSON round trip. This means that data not preserved in such a
-// round trip, such as the location name of a time.Time, is lost after a
+// round trip, such as the location name of a [time.Time], is lost after a
 // successful update.
 func (c *Codec) Complete(v cue.Value, x interface{}) error {
 	c.mutex.RLock()

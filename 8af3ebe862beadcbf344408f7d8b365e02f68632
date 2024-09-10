@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6da42fc_084ad159",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T13:19:04Z",
+      "side": 1,
+      "message": "Surprisingly small change and nice stats improvement.\n\nAll those \"imported but not defined\" errors don\u0027t look right though.",
+      "revId": "8af3ebe862beadcbf344408f7d8b365e02f68632",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e9515bf_da82e9d1",
+        "filename": "encoding/jsonschema/testdata/external/tests/draft7/ref.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 1367,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T13:19:04Z",
+      "side": 1,
+      "message": "is this to be expected? at least the error is odd.",
+      "revId": "8af3ebe862beadcbf344408f7d8b365e02f68632",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

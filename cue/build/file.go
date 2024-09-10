@@ -16,14 +16,24 @@ package build
 
 import "cuelang.org/go/cue/errors"
 
+// Note: the json tags in File correspond directly to names
+// used in the encoding/filetypes package, which unmarshals
+// results from CUE into a build.File.
+
 // A File represents a file that is part of the build process.
 type File struct {
 	Filename string `json:"filename"`
 
-	Encoding       Encoding          `json:"encoding,omitempty"`
-	Interpretation Interpretation    `json:"interpretation,omitempty"`
-	Form           Form              `json:"form,omitempty"`
-	Tags           map[string]string `json:"tags,omitempty"` // code=go
+	Encoding       Encoding       `json:"encoding,omitempty"`
+	Interpretation Interpretation `json:"interpretation,omitempty"`
+	Form           Form           `json:"form,omitempty"`
+	// Tags holds key-value pairs relating to the encoding
+	// conventions to use for the file.
+	Tags map[string]string `json:"tags,omitempty"` // e.g. code+lang=go
+
+	// BoolTags holds boolean-valued tags relating to the
+	// encoding conventions to use for the file.
+	BoolTags map[string]bool `json:"boolTags,omitempty"`
 
 	ExcludeReason errors.Error `json:"-"`
 	Source        interface{}  `json:"-"` // TODO: swap out with concrete type.

@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ab9fbc7_6d68fed3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T11:34:44Z",
+      "side": 1,
+      "message": "I also imagine we are OK with exposing `camelCase` options to `cue help filetypes`; we don\u0027t have any yet, but we also didn\u0027t really need to. `jsonschema` read just as fine as `jsonSchema`, but `strictfeatures` is not as nice.\n\nYou might still want to run this by Marcel when you can; it\u0027s possible he prefers to continue with all-lowercase.",
+      "revId": "382e6c5f6b1aff837a07a2aeaee1fbb7d448cf99",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2c593095_99b6aefa",
@@ -14,6 +31,24 @@
       "writtenOn": "2024-09-10T11:31:23Z",
       "side": 1,
       "message": "can we give a CLI arguments example instead? otherwise this is not immediately obvious to the reader who is not already familiar with `cue help inputs`",
+      "revId": "382e6c5f6b1aff837a07a2aeaee1fbb7d448cf99",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bcedf902_1e65abf2",
+        "filename": "cmd/cue/cmd/flags.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T11:34:44Z",
+      "side": 1,
+      "message": "I meant `cue help filetypes` here.",
+      "parentUuid": "2c593095_99b6aefa",
       "revId": "382e6c5f6b1aff837a07a2aeaee1fbb7d448cf99",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -48,6 +83,24 @@
       "writtenOn": "2024-09-10T11:31:23Z",
       "side": 1,
       "message": "why is this not `cfg.Strict || f.BoolTags[\"strict\"] || f.BoolTags[\"strictFeatures\"]`? AFAICT `f.BoolTags[\"strict\"]` as documented by `cue help inputs` is not wired up. We might need better tests for neither/either/both of these boolean tags.",
+      "revId": "382e6c5f6b1aff837a07a2aeaee1fbb7d448cf99",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71f370f6_cc9b1ca1",
+        "filename": "internal/encoding/encoding.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-10T11:34:44Z",
+      "side": 1,
+      "message": "I meant `cue help filetypes` here.",
+      "parentUuid": "e392f5e2_caec21d4",
       "revId": "382e6c5f6b1aff837a07a2aeaee1fbb7d448cf99",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

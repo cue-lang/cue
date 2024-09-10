@@ -5,7 +5,10 @@ cmp stdout expect-stdout
 exec cue def schema.json -p schema -l '#Person:'
 cmp stdout expect-stdout
 
-exec cue def jsonschema: bad.json
+! exec cue def jsonschema: bad.json
+cmp stderr expect-stderr-strict-features
+
+exec cue def jsonschema+strictFeatures=0: bad.json
 
 ! exec cue def jsonschema: bad.json --strict
 cmp stderr expect-stderr

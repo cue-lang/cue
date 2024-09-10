@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bbdc0ffe_8e3abf3c",
+        "filename": "encoding/jsonschema/vendor_external.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-10T10:04:29Z",
+      "side": 1,
+      "message": "```suggestion\n\t// the name of the repository and the version which was retrieved.\n```",
+      "revId": "6360375e2e45ae73f221f9319aa8d9cfcdf1d55b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -138,7 +138,7 @@ func (s *subsumer) getError() (err errors.Error) {
 	}
 	err = s.errs
 	if s.inexact {
-		err = internal.DecorateError(internal.ErrInexact, err)
+		err = errors.Wrap(err, internal.ErrInexact)
 	}
 	return err
 }

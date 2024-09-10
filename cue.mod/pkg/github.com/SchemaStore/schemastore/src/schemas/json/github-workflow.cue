@@ -1,6 +1,9 @@
 package json
 
-import "strings"
+import (
+	"struct"
+	"strings"
+)
 
 #Workflow: {
 	@jsonschema(schema="http://json-schema.org/draft-07/schema#")
@@ -493,7 +496,7 @@ import "strings"
 	// You can run an unlimited number of jobs as long as you are
 	// within the workflow usage limits. For more information, see
 	// https://help.github.com/en/github/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions#usage-limits.
-	jobs!: {
+	jobs!: struct.MinFields(1) & {
 		{[=~"^[_a-zA-Z][a-zA-Z0-9_-]*$" & !~"^()$"]: matchN(1, [#normalJob, #reusableWorkflowCallJob])}
 	}
 
@@ -562,9 +565,11 @@ import "strings"
 		options?: string
 	}
 
-	#defaults: run?: {
-		shell?:               #shell
-		"working-directory"?: #["working-directory"]
+	#defaults: struct.MinFields(1) & {
+		run?: struct.MinFields(1) & {
+			shell?:               #shell
+			"working-directory"?: #["working-directory"]
+		}
 	}
 
 	#permissions: matchN(1, ["read-all" | "write-all", #["permissions-event"]])
@@ -660,7 +665,7 @@ import "strings"
 
 	#jobNeeds: matchN(1, [[...#name] & [_, ...], #name])
 
-	#matrix: matchN(1, [{
+	#matrix: matchN(1, [struct.MinFields(1) & {
 		{[=~"^(in|ex)clude$" & !~"^()$"]: matchN(1, [#expressionSyntax, [...{
 			[string]: #configuration
 		}] & [_, ...]])
@@ -754,7 +759,7 @@ import "strings"
 
 		// A map of outputs for a job. Job outputs are available to all
 		// downstream jobs that depend on this job.
-		outputs?: {
+		outputs?: struct.MinFields(1) & {
 			[string]: string
 		}
 

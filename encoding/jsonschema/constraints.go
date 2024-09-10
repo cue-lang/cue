@@ -109,7 +109,7 @@ var constraints = []*constraint{
 	p1("minContains", constraintMinContains, vfrom(VersionDraft2019_09)),
 	p2("minItems", constraintMinItems, allVersions|openAPI),
 	p2("minLength", constraintMinLength, allVersions|openAPI),
-	p1("minProperties", constraintTODO, allVersions|openAPI),
+	p1("minProperties", constraintMinProperties, allVersions|openAPI),
 	p3("minimum", constraintMinimum, allVersions|openAPI),
 	p2("multipleOf", constraintMultipleOf, allVersions|openAPI),
 	p3("not", constraintNot, allVersions|openAPI),

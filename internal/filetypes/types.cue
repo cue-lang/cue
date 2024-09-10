@@ -26,13 +26,12 @@ package build
 	encoding!:       #Encoding
 	interpretation?: #Interpretation
 	form?:           #Form
-	// Note: tags includes values for non-boolean tags only.
 	tags?: [string]: string
 }
 
 // Default is the file used for stdin and stdout. The settings depend
 // on the file mode.
-#Default: #File & {
+#Default: #FileInfo & {
 	filename: *"-" | string
 }
 
@@ -52,7 +51,6 @@ package build
 	keepDefaults?: bool          // select/allow default values
 	incomplete?:   bool          // permit incomplete values
 	imports?:      bool          // don't expand/allow imports
-	stream?:       bool          // permit streaming
 	docs?:         bool          // show/allow docs
 	attributes?:   bool          // include/allow attributes
 }
@@ -68,12 +66,18 @@ package build
 fileForExtVanilla: modes.input.extensions
 
 // modes sets defaults for different operational modes.
+// The key corresponds to the Go internal/filetypes.Mode type.
 modes: [string]: {
 	// TODO(mvdan): Document these once they are better understood.
-	// Perhaps make them required as well.
-	File:     #File
-	FileInfo: #FileInfo
-	Default:  #Default
+
+	// FileInfo holds the base file information for this mode.
+	// This will be unified with information derived from the
+	// file extension and any filetype tags explicitly provided.
+	FileInfo!: #FileInfo
+
+	// Default holds the base file information for standard input
+	// or output, where we don't have any file extension available.
+	Default!:  #Default
 }
 
 // input defines modes for input, such as import, eval, vet or def.
@@ -99,18 +103,6 @@ modes: input: {
 modes: export: {
 	Default: {
 		encoding: *"json" | _
-	}
-	FileInfo: {
-		docs:       true | *false
-		attributes: true | *false
-	}
-	encodings: cue: forms.data
-}
-
-// TODO(mvdan): this "output" mode appears to be unused at the moment.
-modes: output: {
-	Default: {
-		encoding: *"cue" | _
 	}
 	FileInfo: {
 		docs:       true | *false
@@ -148,7 +140,11 @@ modes: def: {
 // An Interpretation determines how a certain program should be interpreted.
 // For instance, data may be interpreted as describing a schema, which itself
 // can be converted to a CUE schema.
+// This corresponds to the Go cue/build.Interpretation type.
 #Interpretation: string
+
+// A Form specifies the form in which a program should be represented.
+// It corresponds to the Go cue/build.Form type.
 #Form:           string
 
 modes: [string]: {
@@ -176,46 +172,19 @@ modes: [string]: {
 
 	// encodings: "": error("no encoding specified")
 
-	encodings: cue: {
-		stream: false
-	}
-
 	encodings: json: {
 		forms.data
-		stream:     *false | true
 		docs:       false
 		attributes: false
 	}
 
-	encodings: yaml: {
-		forms.graph
-		stream: false | *true
-	}
-
-	encodings: yaml: {
-		forms.graph
-		stream: false | *true
-	}
-
-	encodings: jsonl: {
-		forms.data
-		stream: true
-	}
-
-	encodings: text: {
-		forms.data
-		stream: false
-	}
-
-	encodings: binary: {
-		forms.data
-		stream: false
-	}
-
-	encodings: toml: {
-		forms.data
-		stream: false
-	}
+	encodings: cue: {}
+	encodings: yaml:   forms.graph
+	encodings: jsonl:  forms.data
+	encodings: text:   forms.data
+	encodings: binary: forms.data
+	encodings: toml:   forms.data
+	encodings: code:   forms.schema
 
 	encodings: proto: {
 		forms.schema
@@ -225,32 +194,20 @@ modes: [string]: {
 	encodings: textproto: {
 		forms.data
 		encoding: "textproto"
-		stream:   false
 	}
 
 	encodings: binarypb: {
 		forms.data
 		encoding: "binarypb"
-		stream:   false
 	}
 
-	// encodings: binproto: {
-	//  forms.DataEncoding
-	//  encoding: "binproto"
-	// }
-
-	encodings: code: {
-		forms.schema
-		stream: false
-	}
 }
 
 // forms defines schema for all forms. It does not include the form ID.
 forms: [Name=string]: #FileInfo
 
 forms: schema: {
-	form:   *"schema" | "final" | "graph"
-	stream: true | *false
+	form: *"schema" | "final" | "graph"
 
 	incomplete:   *true | false
 	definitions:  *true | false
@@ -298,11 +255,11 @@ forms: data: {
 	optional:    false
 }
 
-interpretations: [Name=string]: #FileInfo
-
-interpretations: auto: {
-	forms.schema
+interpretations: [Name=string]: #FileInfo & {
+	interpretation: Name
 }
+
+interpretations: auto: forms.schema
 
 interpretations: jsonschema: {
 	forms.schema
@@ -314,10 +271,7 @@ interpretations: openapi: {
 	encoding: *"json" | _
 }
 
-interpretations: pb: {
-	forms.data
-	stream: true
-}
+interpretations: pb: forms.data
 
 // tagInfo maps command line tags to file properties.
 tagInfo: {
@@ -326,8 +280,7 @@ tagInfo: {
 	dag: form:    "dag"
 	data: form:   "data"
 
-	cue: encoding: "cue"
-
+	cue: encoding:       "cue"
 	json: encoding:      "json"
 	jsonl: encoding:     "jsonl"
 	yaml: encoding:      "yaml"
@@ -363,17 +316,9 @@ tagInfo: {
 		interpretation: ""
 		tags: lang: *"" | string
 	}
-
-	auto: {
-		interpretation: "auto"
-		encoding:       *"json" | _
+	auto: interpretations.auto & {
+		encoding: *"json" | string
 	}
-	jsonschema: {
-		interpretation: "jsonschema"
-		encoding:       *"json" | _
-	}
-	openapi: {
-		interpretation: "openapi"
-		encoding:       *"json" | _
-	}
+	jsonschema: interpretations.jsonschema
+	openapi:    interpretations.openapi
 }

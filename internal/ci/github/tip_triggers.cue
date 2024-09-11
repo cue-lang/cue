@@ -15,11 +15,11 @@
 package github
 
 // The tip_triggers workflow. This fires for each new commit that hits the
-// default branch.
+// default branch or the default branch's test branch.
 workflows: tip_triggers: _repo.bashWorkflow & {
 
 	name: "Triggers on push to tip"
-	on: push: branches: [_repo.defaultBranch]
+	on: push: branches: [_repo.defaultBranch, _repo.testDefaultBranch]
 	jobs: push: {
 		"runs-on": _repo.linuxMachine
 		if:        "${{github.repository == '\(_repo.githubRepositoryPath)'}}"
@@ -39,6 +39,12 @@ workflows: tip_triggers: _repo.bashWorkflow & {
 						}
 					}
 				}
+			},
+			_repo.workflowDispatch & {
+				name:                          "Trigger tip.cuelang.org build"
+				#githubRepositoryPath:         _repo.cuelangRepositoryPath
+				#botGitHubUserTokenSecretsKey: "CUECKOO_GITHUB_PAT"
+				#workflowID:                   "trybot.yaml"
 			},
 		]
 	}

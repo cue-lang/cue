@@ -329,9 +329,9 @@ func (g *generator) genFunc(fn *types.Func) {
 	kind := []string{}
 	for i := 0; i < params.Len(); i++ {
 		param := params.At(i)
-		typ := strings.Title(g.goKind(param.Type()))
-		argKind := g.goToCUE(param.Type())
-		vals = append(vals, fmt.Sprintf("c.%s(%d)", typ, len(args)))
+		methodName := g.callCtxtGetter(param.Type())
+		argKind := g.adtKind(param.Type())
+		vals = append(vals, fmt.Sprintf("c.%s(%d)", methodName, len(args)))
 		args = append(args, param.Name())
 		kind = append(kind, argKind)
 	}
@@ -342,7 +342,7 @@ func (g *generator) genFunc(fn *types.Func) {
 	}
 	fmt.Fprintf(g.w, "\n},\n")
 
-	fmt.Fprintf(g.w, "Result: %s,\n", g.goToCUE(results.At(0).Type()))
+	fmt.Fprintf(g.w, "Result: %s,\n", g.adtKind(results.At(0).Type()))
 	if g.nonConcrete {
 		fmt.Fprintf(g.w, "NonConcrete: true,\n")
 	}
@@ -369,85 +369,84 @@ func (g *generator) genFunc(fn *types.Func) {
 	}
 }
 
-// TODO(mvdan): goKind and goToCUE still use a lot of strings; simplify.
-
-func (g *generator) goKind(typ types.Type) string {
-	switch str := types.TypeString(typ, nil); str {
-	case "*math/big.Int":
-		return "bigInt"
-	case "*math/big.Float":
-		return "bigFloat"
-	case "*math/big.Rat":
-		return "bigRat"
-	case "cuelang.org/go/internal/core/adt.Bottom":
-		return "error"
-	case "*cuelang.org/go/internal.Decimal":
-		return "decimal"
-	case "cuelang.org/go/internal/pkg.List":
-		return "cueList"
-	case "cuelang.org/go/internal/pkg.Struct":
-		return "struct"
-	case "[]*cuelang.org/go/internal.Decimal":
-		return "decimalList"
-	case "cuelang.org/go/cue.Value":
-		return "value"
-	case "cuelang.org/go/internal/pkg.Schema":
-		g.nonConcrete = true
-		return "schema"
-	case "cuelang.org/go/cue.List":
-		return "list"
-	case "[]string":
-		return "stringList"
-	case "[]byte":
-		return "bytes"
-	case "[]cuelang.org/go/cue.Value":
-		return "list"
-	case "io.Reader":
-		return "reader"
-	case "time.Time":
-		return "string"
-	default:
-		return str
+func indirect(typ types.Type) types.Type {
+	if typ, ok := typ.(*types.Pointer); ok {
+		return typ.Elem()
 	}
+	return typ
 }
 
-func (g *generator) goToCUE(typ types.Type) (cueKind string) {
-	// TODO: detect list and structs types for return values.
-	switch k := g.goKind(typ); k {
-	case "error":
-		cueKind += "adt.BottomKind"
-	case "bool":
-		cueKind += "adt.BoolKind"
-	case "bytes", "reader":
-		cueKind += "adt.BytesKind|adt.StringKind"
-	case "string":
-		cueKind += "adt.StringKind"
-	case "int", "int8", "int16", "int32", "rune", "int64",
-		"uint", "byte", "uint8", "uint16", "uint32", "uint64",
-		"bigInt":
-		cueKind += "adt.IntKind"
-	case "float64", "bigRat", "bigFloat", "decimal":
-		cueKind += "adt.NumberKind"
-	case "list", "decimalList", "stringList", "cueList":
-		cueKind += "adt.ListKind"
-	case "struct":
-		cueKind += "adt.StructKind"
-	case "value":
-		// Must use callCtxt.value method for these types and resolve manually.
-		cueKind += "adt.TopKind" // TODO: can be more precise
-	default:
-		switch {
-		case strings.HasPrefix(k, "[]"):
-			cueKind += "adt.ListKind"
-		case strings.HasPrefix(k, "map["):
-			cueKind += "adt.StructKind"
-		default:
-			// log.Println("Unknown type:", k)
-			// Must use callCtxt.value method for these types and resolve manually.
-			cueKind += "adt.TopKind" // TODO: can be more precise
+// callCtxtGetter names the method from [cuelang.org/go/internal/pkg.CallCtxt]
+// which can be used to fetch a parameter of the given type.
+func (g *generator) callCtxtGetter(typ types.Type) string {
+	typ = indirect(typ)
+	switch typ := typ.(type) {
+	case *types.Basic:
+		return strings.Title(typ.String()) // "int" turns into "Int"
+	case *types.Map:
+		return "Struct"
+	case *types.Slice:
+		switch indirect(typ.Elem()).String() {
+		case "byte":
+			return "Bytes"
+		case "string":
+			return "StringList"
+		case "cuelang.org/go/internal.Decimal":
+			return "DecimalList"
 		}
+		return "List"
 	}
-	return cueKind
+	switch typ.String() {
+	case "math/big.Int":
+		return "BigInt"
+	case "math/big.Float":
+		return "BigFloat"
+	case "cuelang.org/go/internal.Decimal":
+		return "Decimal"
+	case "cuelang.org/go/internal/pkg.List":
+		return "CueList"
+	case "cuelang.org/go/internal/pkg.Struct":
+		return "Struct"
+	case "cuelang.org/go/cue.Value",
+		"cuelang.org/go/cue/ast.Expr":
+		return "Value"
+	case "cuelang.org/go/internal/pkg.Schema":
+		g.nonConcrete = true
+		return "Schema"
+	case "io.Reader":
+		return "Reader"
+	case "error":
+		return "Bottom" // for [generator.cueTypeExpression]
+	}
+	return "Value" // for [generator.cueTypeExpression]
+}
+
+// adtKind provides a Go expression string which describes
+// a [cuelang.org/go/internal/core/adt.Kind] value for the given type.
+func (g *generator) adtKind(typ types.Type) string {
+	// TODO: detect list and structs types for return values.
+	switch name := g.callCtxtGetter(typ); name {
+	case "Bottom", "Bool", "String", "Struct", "Int", "List":
+		return "adt." + name + "Kind"
+	case "Int8", "Int16", "Int32", "Rune", "Int64",
+		"Uint", "Byte", "Uint8", "Uint16", "Uint32", "Uint64",
+		"BigInt":
+		return "adt.IntKind"
+	case "Float64", "BigFloat", "Decimal":
+		return "adt.NumberKind"
+	case "Complex128":
+		return "adt.TopKind" // TODO(mvdan): what should we return here?
+	case "DecimalList", "StringList", "CueList":
+		return "adt.ListKind"
+	case "Bytes", "Reader":
+		return "adt.BytesKind | adt.StringKind"
+	case "Value", "Schema":
+		// Must use the CallCtxt.Value method for these types and resolve manually.
+		return "adt.TopKind" // TODO: can be more precise
+	default:
+		log.Fatal("unknown CallCtxt type: ", name)
+		return ""
+	}
 }
 
 var errNoCUEFiles = errors.New("no CUE files in directory")

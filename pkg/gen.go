@@ -410,7 +410,17 @@ func (g *generator) callCtxtGetter(typ types.Type) string {
 	case "error":
 		return "Bottom" // for [generator.cueTypeExpression]
 	}
-	return "Value" // for [generator.cueTypeExpression]
+	// Some builtin functions return custom types, like [cuelang.org/go/pkg/time.Split].
+	// Inspect the underlying type behind any pointer and return an appropriate shape.
+	if ptr, ok := typ.(*types.Pointer); ok {
+		typ = ptr.Elem()
+	}
+	switch typ.Underlying().(type) {
+	case *types.Struct: // e.g. [cuelang.org/go/pkg/time.Parts]
+		return "Struct"
+	}
+	log.Fatal("unknown Go type: ", typ.String())
+	return ""
 }
 
 // adtKind provides a Go expression string which describes

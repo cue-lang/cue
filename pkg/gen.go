@@ -408,9 +408,16 @@ func (g *generator) callCtxtGetter(typ types.Type) string {
 	case "io.Reader":
 		return "Reader"
 	case "error":
-		return "Bottom" // for [generator.cueTypeExpression]
+		return "Bottom" // for [generator.adtKind]
+
+	// Some builtin functions return custom types, like [cuelang.org/go/pkg/time.Split].
+	// TODO: we can simplify this once the CUE API declarations in ./pkg/...
+	// use CUE function signatures to validate their parameters and results.
+	case "*cuelang.org/go/pkg/time.Parts":
+		return "Struct"
 	}
-	return "Value" // for [generator.cueTypeExpression]
+	log.Fatal("unknown Go type: ", typ.String())
+	return ""
 }
 
 // adtKind provides a Go expression string which describes

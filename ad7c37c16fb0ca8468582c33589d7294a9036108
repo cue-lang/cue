@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "20f972ef_9b021ee8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-09-11T13:15:23Z",
+      "side": 1,
+      "message": "PTAL. I\u0027ll hold off (force) pushing this commit to `cue-lang/cue:ci/test` until you\u0027ve done a sense check on the change.",
+      "revId": "ad7c37c16fb0ca8468582c33589d7294a9036108",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

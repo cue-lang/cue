@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // TODO: make this package public in cuelang.org/go/encoding
-// once stabalized.
+// once stabilized.
 
 package encoding
 
@@ -308,12 +308,30 @@ func jsonSchemaFunc(cfg *Config, f *build.File) interpretFunc {
 }
 
 func openAPIFunc(c *Config, f *build.File) interpretFunc {
-	cfg := &openapi.Config{PkgName: c.PkgName}
 	return func(v cue.Value) (file *ast.File, err error) {
-		file, err = openapi.Extract(v, cfg)
+		tags := boolTagsForFile(f, build.JSONSchema)
+		file, err = openapi.Extract(v, &openapi.Config{
+			PkgName: c.PkgName,
+
+			// Note: don't populate Strict (see more detailed
+			// comment in jsonSchemaFunc)
+
+			StrictKeywords: c.Strict || tags["strictKeywords"],
+			StrictFeatures: c.Strict || tags["strictFeatures"],
+		})
 		// TODO: simplify currently erases file line info. Reintroduce after fix.
 		// file, err = simplify(file, err)
 		return file, err
+	}
+}
+
+func protobufJSONFunc(cfg *Config, file *build.File) rewriteFunc {
+	return func(f *ast.File) (*ast.File, error) {
+		if !cfg.Schema.Exists() {
+			return f, errors.Newf(token.NoPos,
+				"no schema specified for protobuf interpretation.")
+		}
+		return f, jsonpb.NewDecoder(cfg.Schema).RewriteFile(f)
 	}
 }
 
@@ -342,16 +360,6 @@ func boolTagsForFile(f *build.File, interp build.Interpretation) map[string]bool
 	}
 	maps.Copy(tags, f.BoolTags)
 	return tags
-}
-
-func protobufJSONFunc(cfg *Config, file *build.File) rewriteFunc {
-	return func(f *ast.File) (*ast.File, error) {
-		if !cfg.Schema.Exists() {
-			return f, errors.Newf(token.NoPos,
-				"no schema specified for protobuf interpretation.")
-		}
-		return f, jsonpb.NewDecoder(cfg.Schema).RewriteFile(f)
-	}
 }
 
 func shouldValidate(i *filetypes.FileInfo) bool {

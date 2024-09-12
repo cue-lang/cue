@@ -1,0 +1,99 @@
+! exec cue def openapi: openapi.json
+cmp stderr expect-stderr-1
+
+! exec cue def openapi.json
+cmp stderr expect-stderr-1
+
+! exec cue def openapi+strictFeatures: openapi.json
+cmp stderr expect-stderr-1
+
+# We can disable strictFeatures to enable best effort mode.
+exec cue def openapi+strictFeatures=0: openapi.json
+cmp stdout expect-out.cue
+
+# Bad keywords are still always bad with OpenAPI 3.0.
+! exec cue def openapi-badkeyword.json
+cmp stderr expect-stderr-2
+! exec cue def openapi+strictKeywords=0: openapi-badkeyword.json
+cmp stderr expect-stderr-2
+
+# Keywords should be less strict in OpenAPI 3.1, because
+# it mirrors JSON Schema.
+exec cue def openapi3.1-badkeyword.json
+
+# We can enable strict keyword checking similarly
+# to jsonschema, with either strict or strictKeywords:
+! exec cue def openapi+strictKeywords: openapi3.1-badkeyword.json
+cmp stderr expect-stderr-3
+! exec cue def openapi+strict: openapi3.1-badkeyword.json
+cmp stderr expect-stderr-3
+
+-- openapi.json --
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title":   "My OpenAPI",
+        "version": "v1alpha1"
+    },
+    "paths": {},
+    "components": {
+        "schemas": {
+            "Bar": {
+                "type": "object",
+                "x-foo": "always allowed",
+                "xml": "maybe we will never implement this"
+            }
+        }
+    }
+}
+-- openapi-badkeyword.json --
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title":   "My OpenAPI",
+        "version": "v1alpha1"
+    },
+    "paths": {},
+    "components": {
+        "schemas": {
+            "Bar": {
+                "type": "object",
+                "unknown": "never OK"
+            }
+        }
+    }
+}
+-- openapi3.1-badkeyword.json --
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title":   "My OpenAPI",
+        "version": "v1alpha1"
+    },
+    "paths": {},
+    "components": {
+        "schemas": {
+            "Bar": {
+                "type": "object",
+                "unknown": "usually OK"
+            }
+        }
+    }
+}
+-- expect-stderr-1 --
+keyword "xml" not yet implemented:
+    ./openapi.json:13:17
+-- expect-out.cue --
+info: {
+	title:   *"My OpenAPI" | string
+	version: *"v1alpha1" | string
+}
+#Bar: {
+	...
+}
+-- expect-stderr-2 --
+unknown keyword "unknown":
+    ./openapi-badkeyword.json:12:17
+-- expect-stderr-3 --
+unknown keyword "unknown":
+    ./openapi3.1-badkeyword.json:12:17

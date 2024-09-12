@@ -317,6 +317,34 @@ func openAPIFunc(c *Config, f *build.File) interpretFunc {
 	}
 }
 
+func openAPIFunc(c *Config, f *build.File) interpretFunc {
+	return func(v cue.Value) (file *ast.File, err error) {
+		tags := boolTagsForFile(f, build.JSONSchema)
+		file, err = openapi.Extract(v, &openapi.Config{
+			PkgName: c.PkgName,
+
+			// Note: don't populate Strict (see more detailed
+			// comment in jsonSchemaFunc)
+
+			StrictKeywords: c.Strict || tags["strictKeywords"],
+			StrictFeatures: c.Strict || tags["strictFeatures"],
+		})
+		// TODO: simplify currently erases file line info. Reintroduce after fix.
+		// file, err = simplify(file, err)
+		return file, err
+	}
+}
+
+func protobufJSONFunc(cfg *Config, file *build.File) rewriteFunc {
+	return func(f *ast.File) (*ast.File, error) {
+		if !cfg.Schema.Exists() {
+			return f, errors.Newf(token.NoPos,
+				"no schema specified for protobuf interpretation.")
+		}
+		return f, jsonpb.NewDecoder(cfg.Schema).RewriteFile(f)
+	}
+}
+
 func boolTagsForFile(f *build.File, interp build.Interpretation) map[string]bool {
 	if f.Interpretation != build.Auto {
 		return f.BoolTags
@@ -342,16 +370,6 @@ func boolTagsForFile(f *build.File, interp build.Interpretation) map[string]bool
 	}
 	maps.Copy(tags, f.BoolTags)
 	return tags
-}
-
-func protobufJSONFunc(cfg *Config, file *build.File) rewriteFunc {
-	return func(f *ast.File) (*ast.File, error) {
-		if !cfg.Schema.Exists() {
-			return f, errors.Newf(token.NoPos,
-				"no schema specified for protobuf interpretation.")
-		}
-		return f, jsonpb.NewDecoder(cfg.Schema).RewriteFile(f)
-	}
 }
 
 func shouldValidate(i *filetypes.FileInfo) bool {

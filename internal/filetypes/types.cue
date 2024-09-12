@@ -304,6 +304,11 @@ interpretations: jsonschema: {
 interpretations: openapi: {
 	forms.schema
 	encoding: *"json" | _
+	boolTags: {
+		strict:         *false | bool
+		strictKeywords: *strict | bool
+		strictFeatures: *true | bool
+	}
 }
 
 interpretations: pb: {

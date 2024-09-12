@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0d4c19c_a54fcb64",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-12T16:28:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1d708aef_75d941ef",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 16
+      },
+      "revId": "826e0c39388b86c8ff5378348e4402e5ed68d5dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "be1d3286_c54962d5",
@@ -37,6 +61,24 @@
       "writtenOn": "2024-09-12T15:50:02Z",
       "side": 1,
       "message": "SGTM but why not only add this logic when the jsonschema decoder is in \"openapi mode\"? i.e. if only openapi has this `x-` prefix rule, it should apply to openapi files but not really to jsonschema files. not that it\u0027s going to be harmful when applied to jsonschema files, but it seems like a surprising choice.",
+      "revId": "826e0c39388b86c8ff5378348e4402e5ed68d5dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "184ef3e2_bea1d9ad",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-12T16:28:42Z",
+      "side": 1,
+      "message": "I explained why I made that choice in the commit message. I think it seems reasonable to exclude \"x-\" keywords from the strict keyword checking, as that checking is purely within our remit and more like a \"lint\" style check than anything else.",
+      "parentUuid": "be1d3286_c54962d5",
       "revId": "826e0c39388b86c8ff5378348e4402e5ed68d5dc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

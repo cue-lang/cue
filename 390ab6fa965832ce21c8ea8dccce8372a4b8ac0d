@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "898e4086_3d74bc76",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-12T15:46:22Z",
+      "side": 1,
+      "message": "could you split this paragraph? it\u0027s a bit large",
+      "revId": "390ab6fa965832ce21c8ea8dccce8372a4b8ac0d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5fbae961_ce1909b9",
+        "filename": "internal/encoding/encoding.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-12T15:46:22Z",
+      "side": 1,
+      "message": "it\u0027s very odd that you\u0027re doing `i.interpretation \u003d Detect(v)` twice in a row. Surely this is unnecessary? if it is necessary, at minimum it needs a short comment, but I would also imagine it\u0027s due to bad design somewhere.",
+      "revId": "390ab6fa965832ce21c8ea8dccce8372a4b8ac0d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca0db70c_e1547661",
+        "filename": "internal/encoding/encoding.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-12T15:46:22Z",
+      "side": 1,
+      "message": "this code would be much simpler if you modified f.BoolTags directly, and I assume there\u0027s a good reason not to do that... briefly mention it?",
+      "revId": "390ab6fa965832ce21c8ea8dccce8372a4b8ac0d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "edb2b69e_e6bb48ab",
+        "filename": "internal/filetypes/filetypes.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-12T15:46:22Z",
+      "side": 1,
+      "message": "why not return these errors? all other APIs in this func return errors, as does the caller in internal/encoding, so the panics are an odd choice. unless you\u0027re 100% sure that they will not happen in practice, in which case I would briefly document that in the code or godoc.",
+      "revId": "390ab6fa965832ce21c8ea8dccce8372a4b8ac0d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

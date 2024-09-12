@@ -699,6 +699,13 @@ func (s *state) schemaState(n cue.Value, types cue.Kind, idRef []label, isLogica
 	// do multiple passes over the constraints to ensure they are done in order.
 	for pass := 0; pass < numPhases; pass++ {
 		state.processMap(n, func(key string, value cue.Value) {
+			if strings.HasPrefix(key, "x-") {
+				// A keyword starting with a leading x- is clearly
+				// not intended to be a valid keyword, and is explicitly
+				// allowed by OpenAPI. It seems reasonable that
+				// this is not an error even with StrictKeywords enabled.
+				return
+			}
 			// Convert each constraint into a either a value or a functor.
 			c := constraintMap[key]
 			if c == nil {

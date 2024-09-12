@@ -25,6 +25,7 @@ import (
 	"os"
 	"path"
 	"sort"
+	"strings"
 
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/jsonschema/internal/externaltest"
@@ -56,21 +57,31 @@ func main() {
 		listFailures(outw, *list, tests)
 	} else {
 		fmt.Fprintf(outw, "v2:\n")
-		showStats(outw, "v2", tests)
+		showStats(outw, "v2", false, tests)
 		fmt.Fprintf(outw, "\n")
 		fmt.Fprintf(outw, "v3:\n")
-		showStats(outw, "v3", tests)
+		showStats(outw, "v3", false, tests)
+		fmt.Fprintf(outw, "\nOptional tests\n\n")
+		fmt.Fprintf(outw, "v2:\n")
+		showStats(outw, "v2", true, tests)
+		fmt.Fprintf(outw, "\n")
+		fmt.Fprintf(outw, "v3:\n")
+		showStats(outw, "v3", true, tests)
 	}
 }
 
-func showStats(outw io.Writer, version string, tests map[string][]*externaltest.Schema) {
+func showStats(outw io.Writer, version string, showOptional bool, tests map[string][]*externaltest.Schema) {
 	schemaOK := 0
 	schemaTot := 0
 	testOK := 0
 	testTot := 0
 	schemaOKTestOK := 0
 	schemaOKTestTot := 0
-	for _, schemas := range tests {
+	for filename, schemas := range tests {
+		isOptional := strings.Contains(filename, "/optional/")
+		if isOptional != showOptional {
+			continue
+		}
 		for _, schema := range schemas {
 			schemaTot++
 			if schema.Skip[version] == "" {

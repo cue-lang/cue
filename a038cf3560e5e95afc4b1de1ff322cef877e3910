@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "68370792_d7928ebe",
+        "filename": "pkg/gen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 372,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-12T09:27:46Z",
+      "side": 1,
+      "message": "now gone.",
+      "parentUuid": "1cfcc0bb_6703234f",
+      "revId": "a038cf3560e5e95afc4b1de1ff322cef877e3910",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b9e1d4bd_efa92e85",
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3609c1a0_36d09cf3",
+        "filename": "pkg/gen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-12T09:27:46Z",
+      "side": 1,
+      "message": "this was me trying to avoid the repetitive `Foo returns X` - most functions return some value. I\u0027ve reworded it in any case.",
+      "parentUuid": "b9e1d4bd_efa92e85",
+      "revId": "a038cf3560e5e95afc4b1de1ff322cef877e3910",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "57daeaf3_f22fb640",
@@ -65,6 +101,24 @@
       "writtenOn": "2024-09-12T08:23:41Z",
       "side": 1,
       "message": "I don\u0027t get why the `indirect` here. We don\u0027t really want to support `[]*byte` or `[]*string`, and I don\u0027t think we want to support `[]internal.Decimal` either, so why not lose the indirect call? It\u0027d be kinda nice to lose the string-based logic here too, but maybe that\u0027s tricky.\n\ntbh I\u0027m not really sure about the `indirect` call above either. We know exactly which types we expect to be pointers and which we don\u0027t, and I think it\u0027s good to be precise here, as it could catch mistakes earlier and it shows intent better.\n\nFor the top level switch, I\u0027d probably divide the cases into pointer and non-pointer sections, much as you\u0027ve done with slices here, making the \"fuzzy\" indirect call unnecessary.",
+      "revId": "a038cf3560e5e95afc4b1de1ff322cef877e3910",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7c579df_977dae68",
+        "filename": "pkg/gen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-12T09:27:46Z",
+      "side": 1,
+      "message": "Fair enough on not handling `[]*byte` etc. The original code had `*` in the type strings so I\u0027ve reverted to that. I have not added code to handle `*types.Pointer` separately because it would add a dozen lines of code for little reason - unlike handling maps and slices, the string stuff for pointers is not so bad.",
+      "parentUuid": "57daeaf3_f22fb640",
       "revId": "a038cf3560e5e95afc4b1de1ff322cef877e3910",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

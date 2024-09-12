@@ -83,6 +83,9 @@ func Extract(data cue.InstanceOrValue, c *Config) (*ast.File, error) {
 		Root:           oapiSchemas,
 		Map:            openAPIMapping,
 		DefaultVersion: schemaVersion,
+		StrictFeatures: c.StrictFeatures,
+		// OpenAPI 3.0 is stricter than JSON Schema about allowed keywords.
+		StrictKeywords: schemaVersion == jsonschema.VersionOpenAPI || c.StrictKeywords,
 	})
 	if err != nil {
 		return nil, err

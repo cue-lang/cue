@@ -335,9 +335,17 @@ func boolTagsForFile(f *build.File, interp build.Interpretation) map[string]bool
 }
 
 func openAPIFunc(c *Config, f *build.File) interpretFunc {
-	cfg := &openapi.Config{PkgName: c.PkgName}
 	return func(v cue.Value) (file *ast.File, err error) {
-		file, err = openapi.Extract(v, cfg)
+		tags := boolTagsForFile(f, build.JSONSchema)
+		file, err = openapi.Extract(v, &openapi.Config{
+			PkgName: c.PkgName,
+
+			// Note: don't populate Strict (see more detailed
+			// comment in jsonSchemaFunc)
+
+			StrictKeywords: c.Strict || tags["strictKeywords"],
+			StrictFeatures: c.Strict || tags["strictFeatures"],
+		})
 		// TODO: simplify currently erases file line info. Reintroduce after fix.
 		// file, err = simplify(file, err)
 		return file, err

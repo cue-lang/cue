@@ -1,0 +1,13 @@
+Invalid perl syntax should result in failure when #strictFeatures
+is enabled.
+#strictFeatures
+
+-- schema.json --
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "pattern": "^(?![ \\t\\n]*\\(default(.*)\\))[\\s\\S]*"
+}
+-- out/decode/extract --
+ERROR:
+unsupported Perl regexp syntax in "^(?![ \\t\\n]*\\(default(.*)\\))[\\s\\S]*": error parsing regexp: invalid or unsupported Perl syntax: `(?!`:
+    schema.json:3:5

@@ -1,0 +1,11 @@
+Invalid perl syntax should not result in failure when #strictFeatures
+isn't enabled.
+
+-- schema.json --
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "pattern": "^(?![ \\t\\n]*\\(default(.*)\\))[\\s\\S]*"
+}
+-- out/decode/extract --
+@jsonschema(schema="https://json-schema.org/draft/2020-12/schema")
+_

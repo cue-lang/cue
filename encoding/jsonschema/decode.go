@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"math"
 	"net/url"
+	"regexp/syntax"
 	"sort"
 	"strconv"
 	"strings"
@@ -254,6 +255,31 @@ func (d *decoder) strValue(n cue.Value) (s string, ok bool) {
 		return "", false
 	}
 	return s, true
+}
+
+func (d *decoder) regexpValue(n cue.Value) (ast.Expr, bool) {
+	s, ok := d.strValue(n)
+	if !ok {
+		return nil, false
+	}
+	_, err := syntax.Parse(s, syntax.Perl)
+	if err == nil {
+		return d.string(n), true
+	}
+	var regErr *syntax.Error
+	if errors.As(err, &regErr) && regErr.Code == syntax.ErrInvalidPerlOp {
+		// It's Perl syntax that we'll never support because the CUE evaluation
+		// engine uses Go's regexp implementation and because the missing
+		// features are usually not there for good reason (e.g. exponential
+		// runtime). In other words, this is a missing feature but not an invalid
+		// regular expression as such.
+		if d.cfg.StrictFeatures {
+			d.errf(n, "unsupported Perl regexp syntax in %q: %v", s, err)
+		}
+		return nil, false
+	}
+	d.errf(n, "invalid regexp %q: %v", s, err)
+	return nil, false
 }
 
 // const draftCutoff = 5

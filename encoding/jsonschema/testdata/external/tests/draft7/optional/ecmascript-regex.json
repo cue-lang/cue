@@ -44,8 +44,8 @@
 			"pattern": "^\\cC$"
 		},
 		"skip": {
-			"v2": "extract error: unsupported regexp: error parsing regexp: invalid escape sequence: `\\c`",
-			"v3": "extract error: unsupported regexp: error parsing regexp: invalid escape sequence: `\\c`"
+			"v2": "extract error: invalid regexp \"^\\\\cC$\": error parsing regexp: invalid escape sequence: `\\c`",
+			"v3": "extract error: invalid regexp \"^\\\\cC$\": error parsing regexp: invalid escape sequence: `\\c`"
 		},
 		"tests": [
 			{
@@ -75,8 +75,8 @@
 			"pattern": "^\\cc$"
 		},
 		"skip": {
-			"v2": "extract error: unsupported regexp: error parsing regexp: invalid escape sequence: `\\c`",
-			"v3": "extract error: unsupported regexp: error parsing regexp: invalid escape sequence: `\\c`"
+			"v2": "extract error: invalid regexp \"^\\\\cc$\": error parsing regexp: invalid escape sequence: `\\c`",
+			"v3": "extract error: invalid regexp \"^\\\\cc$\": error parsing regexp: invalid escape sequence: `\\c`"
 		},
 		"tests": [
 			{
@@ -359,8 +359,8 @@
 			"pattern": "\\p{Letter}cole"
 		},
 		"skip": {
-			"v2": "extract error: unsupported regexp: error parsing regexp: invalid character class range: `\\p{Letter}`",
-			"v3": "extract error: unsupported regexp: error parsing regexp: invalid character class range: `\\p{Letter}`"
+			"v2": "extract error: invalid regexp \"\\\\p{Letter}cole\": error parsing regexp: invalid character class range: `\\p{Letter}`",
+			"v3": "extract error: invalid regexp \"\\\\p{Letter}cole\": error parsing regexp: invalid character class range: `\\p{Letter}`"
 		},
 		"tests": [
 			{
@@ -481,8 +481,8 @@
 			"pattern": "^\\p{digit}+$"
 		},
 		"skip": {
-			"v2": "extract error: unsupported regexp: error parsing regexp: invalid character class range: `\\p{digit}`",
-			"v3": "extract error: unsupported regexp: error parsing regexp: invalid character class range: `\\p{digit}`"
+			"v2": "extract error: invalid regexp \"^\\\\p{digit}+$\": error parsing regexp: invalid character class range: `\\p{digit}`",
+			"v3": "extract error: invalid regexp \"^\\\\p{digit}+$\": error parsing regexp: invalid character class range: `\\p{digit}`"
 		},
 		"tests": [
 			{

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b1970ba_ea3088ef",
+        "filename": "encoding/openapi/openapi.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-12T15:53:40Z",
+      "side": 1,
+      "message": "\"implicitly always true\" only applies to internal/encoding aka cmd/cue and cue/load, but not to direct Go users of encoding/openapi, right? if that\u0027s the case, then I think this godoc is a bit misleading, because the person reading it is the user of the encoding/openapi Go API.",
+      "revId": "f1bf4555fc23ac6038a07cb6cf1059592255e15d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

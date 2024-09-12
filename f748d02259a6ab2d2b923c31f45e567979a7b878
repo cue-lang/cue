@@ -33,6 +33,24 @@
       "message": "Maybe just remove this case and remove `strconv.ParseComplex128` (the only place that complex numbers are used) as it doesn\u0027t work and probably never has?",
       "revId": "f748d02259a6ab2d2b923c31f45e567979a7b878",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58016f86_fd2ad772",
+        "filename": "pkg/gen.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-12T13:46:50Z",
+      "side": 1,
+      "message": "very well spotted, it doesn\u0027t work and we never had tests for it. I will do this in a separate CL because it deserves its own commit message and it\u0027s not really related to the refactor.",
+      "parentUuid": "faf52d13_15f74fb0",
+      "revId": "f748d02259a6ab2d2b923c31f45e567979a7b878",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

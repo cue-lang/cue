@@ -329,8 +329,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$comment\" is not supported in JSON schema version http://json-schema.org/draft-06/schema# (and 1 more errors)",
-			"v3": "extract error: keyword \"$comment\" is not supported in JSON schema version http://json-schema.org/draft-06/schema# (and 1 more errors)"
+			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/sibling_id/foo.json:foo\":\n    generated.cue:1:8\n",
+			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/sibling_id/foo.json:foo\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
 			{
@@ -674,8 +674,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: $id URI may not contain a fragment (and 1 more errors)",
-			"v3": "extract error: $id URI may not contain a fragment (and 1 more errors)"
+			"v2": "extract error: anchors (foo) not supported",
+			"v3": "extract error: anchors (foo) not supported"
 		},
 		"tests": [
 			{
@@ -715,8 +715,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: $id URI may not contain a fragment (and 1 more errors)",
-			"v3": "extract error: $id URI may not contain a fragment (and 1 more errors)"
+			"v2": "extract error: anchors (foo) not supported",
+			"v3": "extract error: anchors (foo) not supported"
 		},
 		"tests": [
 			{
@@ -761,8 +761,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: $id URI may not contain a fragment (and 1 more errors)",
-			"v3": "extract error: $id URI may not contain a fragment (and 1 more errors)"
+			"v2": "extract error: anchors (foo) not supported",
+			"v3": "extract error: anchors (foo) not supported"
 		},
 		"tests": [
 			{
@@ -993,32 +993,20 @@
 				}
 			}
 		},
-		"skip": {
-			"v2": "extract error: keyword \"$comment\" is not supported in JSON schema version http://json-schema.org/draft-06/schema#",
-			"v3": "extract error: keyword \"$comment\" is not supported in JSON schema version http://json-schema.org/draft-06/schema#"
-		},
 		"tests": [
 			{
 				"description": "valid under the URN IDed schema",
 				"data": {
 					"foo": 37
 				},
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "invalid under the URN IDed schema",
 				"data": {
 					"foo": 12
 				},
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -1038,32 +1026,20 @@
 				}
 			}
 		},
-		"skip": {
-			"v2": "extract error: keyword \"$comment\" is not supported in JSON schema version http://json-schema.org/draft-06/schema#",
-			"v3": "extract error: keyword \"$comment\" is not supported in JSON schema version http://json-schema.org/draft-06/schema#"
-		},
 		"tests": [
 			{
 				"description": "a string is valid",
 				"data": {
 					"foo": "bar"
 				},
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "a non-string is invalid",
 				"data": {
 					"foo": 12
 				},
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -1083,32 +1059,20 @@
 				}
 			}
 		},
-		"skip": {
-			"v2": "extract error: keyword \"$comment\" is not supported in JSON schema version http://json-schema.org/draft-06/schema#",
-			"v3": "extract error: keyword \"$comment\" is not supported in JSON schema version http://json-schema.org/draft-06/schema#"
-		},
 		"tests": [
 			{
 				"description": "a string is valid",
 				"data": {
 					"foo": "bar"
 				},
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "a non-string is invalid",
 				"data": {
 					"foo": 12
 				},
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -1128,32 +1092,20 @@
 				}
 			}
 		},
-		"skip": {
-			"v2": "extract error: keyword \"$comment\" is not supported in JSON schema version http://json-schema.org/draft-06/schema#",
-			"v3": "extract error: keyword \"$comment\" is not supported in JSON schema version http://json-schema.org/draft-06/schema#"
-		},
 		"tests": [
 			{
 				"description": "a string is valid",
 				"data": {
 					"foo": "bar"
 				},
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "a non-string is invalid",
 				"data": {
 					"foo": 12
 				},
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -1173,32 +1125,20 @@
 				}
 			}
 		},
-		"skip": {
-			"v2": "extract error: keyword \"$comment\" is not supported in JSON schema version http://json-schema.org/draft-06/schema#",
-			"v3": "extract error: keyword \"$comment\" is not supported in JSON schema version http://json-schema.org/draft-06/schema#"
-		},
 		"tests": [
 			{
 				"description": "a string is valid",
 				"data": {
 					"foo": "bar"
 				},
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "a non-string is invalid",
 				"data": {
 					"foo": 12
 				},
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -1251,8 +1191,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: anchors (something) not supported (and 1 more errors)",
-			"v3": "extract error: anchors (something) not supported (and 1 more errors)"
+			"v2": "extract error: anchors (something) not supported",
+			"v3": "extract error: anchors (something) not supported"
 		},
 		"tests": [
 			{

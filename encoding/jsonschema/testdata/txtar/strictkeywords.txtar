@@ -1,10 +1,15 @@
 #strictKeywords
+
+Note: x-bar does _not_ cause an error even with StrictKeywords
+enabled.
+
 -- schema.json --
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "number",
   "$dynamicAnchor": "bar",
-  "foo": true
+  "foo": true,
+  "x-bar": true
 }
 -- out/decode/extract --
 ERROR:

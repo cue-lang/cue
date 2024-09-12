@@ -18,6 +18,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/go-quicktest/qt"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 
@@ -476,4 +477,13 @@ func TestParseArgs(t *testing.T) {
 			check(t, tc.out, files, err)
 		})
 	}
+}
+
+func TestDefaultTagsForInterpretation(t *testing.T) {
+	tags := DefaultTagsForInterpretation(build.JSONSchema, Input)
+	qt.Assert(t, qt.DeepEquals(tags, map[string]bool{
+		"strict":         false,
+		"strictFeatures": true,
+		"strictKeywords": false,
+	}))
 }

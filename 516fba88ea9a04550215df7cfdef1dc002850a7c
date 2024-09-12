@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b620bc65_1ef05791",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-12T16:59:20Z",
+      "side": 1,
+      "message": "how about using https://pkg.go.dev/regexp/syntax#Parse? because regexp.Compile builds the state machine which we don\u0027t use here at all",
+      "revId": "516fba88ea9a04550215df7cfdef1dc002850a7c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb2ff784_0c8894b1",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-12T16:59:20Z",
+      "side": 1,
+      "message": "expand why we\u0027ll never support it? because CUE doesn\u0027t?",
+      "revId": "516fba88ea9a04550215df7cfdef1dc002850a7c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

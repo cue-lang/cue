@@ -674,8 +674,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: $id URI may not contain a fragment (and 1 more errors)",
-			"v3": "extract error: $id URI may not contain a fragment (and 1 more errors)"
+			"v2": "extract error: anchors (foo) not supported",
+			"v3": "extract error: anchors (foo) not supported"
 		},
 		"tests": [
 			{
@@ -715,8 +715,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: $id URI may not contain a fragment (and 1 more errors)",
-			"v3": "extract error: $id URI may not contain a fragment (and 1 more errors)"
+			"v2": "extract error: anchors (foo) not supported",
+			"v3": "extract error: anchors (foo) not supported"
 		},
 		"tests": [
 			{
@@ -761,8 +761,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: $id URI may not contain a fragment (and 1 more errors)",
-			"v3": "extract error: $id URI may not contain a fragment (and 1 more errors)"
+			"v2": "extract error: anchors (foo) not supported",
+			"v3": "extract error: anchors (foo) not supported"
 		},
 		"tests": [
 			{
@@ -1239,8 +1239,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: anchors (something) not supported (and 1 more errors)",
-			"v3": "extract error: anchors (something) not supported (and 1 more errors)"
+			"v2": "extract error: anchors (something) not supported",
+			"v3": "extract error: anchors (something) not supported"
 		},
 		"tests": [
 			{

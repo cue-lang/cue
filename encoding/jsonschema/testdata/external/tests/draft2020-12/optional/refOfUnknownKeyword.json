@@ -13,8 +13,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unknown keyword \"unknown-keyword\"",
-			"v3": "extract error: unknown keyword \"unknown-keyword\""
+			"v2": "extract error: cannot compile resulting schema: bar: reference \"_X0\" not found:\n    generated.cue:3:8\n",
+			"v3": "extract error: cannot compile resulting schema: bar: reference \"_X0\" not found:\n    generated.cue:3:8\n"
 		},
 		"tests": [
 			{
@@ -57,8 +57,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: unknown keyword \"unknown-keyword\"",
-			"v3": "extract error: unknown keyword \"unknown-keyword\""
+			"v2": "extract error: cannot compile resulting schema: bar: reference \"foo\" not found:\n    generated.cue:4:10\n",
+			"v3": "extract error: cannot compile resulting schema: bar: reference \"foo\" not found:\n    generated.cue:4:10\n"
 		},
 		"tests": [
 			{

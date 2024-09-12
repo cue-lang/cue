@@ -15,7 +15,6 @@
 package jsonschema
 
 import (
-	"regexp"
 	"sync"
 
 	"cuelang.org/go/cue"
@@ -50,17 +49,11 @@ func constraintMinLength(key string, n cue.Value, s *state) {
 }
 
 func constraintPattern(key string, n cue.Value, s *state) {
-	str, _ := s.strValue(n)
-	if _, err := regexp.Compile(str); err != nil {
-		if s.cfg.StrictFeatures {
-			// TODO check if the error is only because of an unsupported
-			// regexp feature (e.g. perl regexp) or because the regexp is just
-			// bad. If the latter, this should be an error even if Strict is false.
-			s.errf(n, "unsupported regexp: %v", err)
-		}
+	str, ok := s.regexpValue(n)
+	if !ok {
 		return
 	}
-	s.add(n, stringType, &ast.UnaryExpr{Op: token.MAT, X: s.string(n)})
+	s.add(n, stringType, &ast.UnaryExpr{Op: token.MAT, X: str})
 }
 
 type formatFuncInfo struct {

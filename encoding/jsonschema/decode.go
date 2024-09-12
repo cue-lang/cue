@@ -22,6 +22,8 @@ import (
 	"fmt"
 	"math"
 	"net/url"
+	"regexp"
+	"regexp/syntax"
 	"sort"
 	"strconv"
 	"strings"
@@ -254,6 +256,27 @@ func (d *decoder) strValue(n cue.Value) (s string, ok bool) {
 		return "", false
 	}
 	return s, true
+}
+
+func (d *decoder) regexpValue(n cue.Value) (ast.Expr, bool) {
+	s, ok := d.strValue(n)
+	if !ok {
+		return nil, false
+	}
+	_, err := regexp.Compile(s)
+	if err == nil {
+		return d.string(n), true
+	}
+	var regErr *syntax.Error
+	if errors.As(err, &regErr) && regErr.Code == syntax.ErrInvalidPerlOp {
+		// It's Perl syntax that we'll never support - i.e. a missing feature
+		if d.cfg.StrictFeatures {
+			d.errf(n, "unsupported Perl regexp syntax in %q: %v", s, err)
+		}
+		return nil, false
+	}
+	d.errf(n, "invalid regexp %q: %v", s, err)
+	return nil, false
 }
 
 // const draftCutoff = 5

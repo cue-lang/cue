@@ -5,81 +5,49 @@
 			"$schema": "https://json-schema.org/draft/2020-12/schema",
 			"format": "idn-hostname"
 		},
-		"skip": {
-			"v2": "extract error: keyword \"format\" not yet implemented",
-			"v3": "extract error: keyword \"format\" not yet implemented"
-		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "a valid host name (example.test in Hangul)",
 				"data": "실례.테스트",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "illegal first char U+302E Hangul single dot tone mark",
 				"data": "〮실례.테스트",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -87,8 +55,8 @@
 				"data": "실〮례.테스트",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -96,8 +64,8 @@
 				"data": "실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실실례례테스트례례례례례례례례례례례례례례례례례테스트례례례례례례례례례례례례례례례례례례례테스트례례례례례례례례례례례례테스트례례실례.테스트",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -106,19 +74,15 @@
 				"data": "-\u003e $1.00 \u003c--",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
 				"description": "valid Chinese Punycode",
 				"comment": "https://tools.ietf.org/html/rfc5890#section-2.3.2.1 https://tools.ietf.org/html/rfc5891#section-4.4",
 				"data": "xn--ihqwcrb4cv8a8dqg056pqjye",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "invalid Punycode",
@@ -126,8 +90,8 @@
 				"data": "xn--X",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -136,8 +100,8 @@
 				"data": "XN--aa---o47jg78q",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -146,8 +110,8 @@
 				"data": "-hello",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -156,8 +120,8 @@
 				"data": "hello-",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -166,8 +130,8 @@
 				"data": "-hello-",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -176,8 +140,8 @@
 				"data": "ःhello",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -186,8 +150,8 @@
 				"data": "̀hello",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -196,29 +160,21 @@
 				"data": "҈hello",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
 				"description": "Exceptions that are PVALID, left-to-right chars",
 				"comment": "https://tools.ietf.org/html/rfc5891#section-4.2.2 https://tools.ietf.org/html/rfc5892#section-2.6",
 				"data": "ßς་〇",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "Exceptions that are PVALID, right-to-left chars",
 				"comment": "https://tools.ietf.org/html/rfc5891#section-4.2.2 https://tools.ietf.org/html/rfc5892#section-2.6",
 				"data": "۽۾",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "Exceptions that are DISALLOWED, right-to-left chars",
@@ -226,8 +182,8 @@
 				"data": "ـߺ",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -236,8 +192,8 @@
 				"data": "〱〲〳〴〵〮〯〻",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -246,8 +202,8 @@
 				"data": "a·l",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -256,8 +212,8 @@
 				"data": "·l",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -266,8 +222,8 @@
 				"data": "l·a",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -276,19 +232,15 @@
 				"data": "l·",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
 				"description": "MIDDLE DOT with surrounding 'l's",
 				"comment": "https://tools.ietf.org/html/rfc5891#section-4.2.3.3 https://tools.ietf.org/html/rfc5892#appendix-A.3",
 				"data": "l·l",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "Greek KERAIA not followed by Greek",
@@ -296,8 +248,8 @@
 				"data": "α͵S",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -306,19 +258,15 @@
 				"data": "α͵",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
 				"description": "Greek KERAIA followed by Greek",
 				"comment": "https://tools.ietf.org/html/rfc5891#section-4.2.3.3 https://tools.ietf.org/html/rfc5892#appendix-A.4",
 				"data": "α͵β",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "Hebrew GERESH not preceded by Hebrew",
@@ -326,8 +274,8 @@
 				"data": "A׳ב",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -336,19 +284,15 @@
 				"data": "׳ב",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
 				"description": "Hebrew GERESH preceded by Hebrew",
 				"comment": "https://tools.ietf.org/html/rfc5891#section-4.2.3.3 https://tools.ietf.org/html/rfc5892#appendix-A.5",
 				"data": "א׳ב",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "Hebrew GERSHAYIM not preceded by Hebrew",
@@ -356,8 +300,8 @@
 				"data": "A״ב",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -366,19 +310,15 @@
 				"data": "״ב",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
 				"description": "Hebrew GERSHAYIM preceded by Hebrew",
 				"comment": "https://tools.ietf.org/html/rfc5891#section-4.2.3.3 https://tools.ietf.org/html/rfc5892#appendix-A.6",
 				"data": "א״ב",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "KATAKANA MIDDLE DOT with no Hiragana, Katakana, or Han",
@@ -386,8 +326,8 @@
 				"data": "def・abc",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -396,39 +336,27 @@
 				"data": "・",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
 				"description": "KATAKANA MIDDLE DOT with Hiragana",
 				"comment": "https://tools.ietf.org/html/rfc5891#section-4.2.3.3 https://tools.ietf.org/html/rfc5892#appendix-A.7",
 				"data": "・ぁ",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "KATAKANA MIDDLE DOT with Katakana",
 				"comment": "https://tools.ietf.org/html/rfc5891#section-4.2.3.3 https://tools.ietf.org/html/rfc5892#appendix-A.7",
 				"data": "・ァ",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "KATAKANA MIDDLE DOT with Han",
 				"comment": "https://tools.ietf.org/html/rfc5891#section-4.2.3.3 https://tools.ietf.org/html/rfc5892#appendix-A.7",
 				"data": "・丈",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "Arabic-Indic digits mixed with Extended Arabic-Indic digits",
@@ -436,29 +364,21 @@
 				"data": "ب٠۰",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
 				"description": "Arabic-Indic digits not mixed with Extended Arabic-Indic digits",
 				"comment": "https://tools.ietf.org/html/rfc5891#section-4.2.3.3 https://tools.ietf.org/html/rfc5892#appendix-A.8",
 				"data": "ب٠ب",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "Extended Arabic-Indic digits not mixed with Arabic-Indic digits",
 				"comment": "https://tools.ietf.org/html/rfc5891#section-4.2.3.3 https://tools.ietf.org/html/rfc5892#appendix-A.9",
 				"data": "۰0",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "ZERO WIDTH JOINER not preceded by Virama",
@@ -466,8 +386,8 @@
 				"data": "क‍ष",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -476,84 +396,52 @@
 				"data": "‍ष",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
 				"description": "ZERO WIDTH JOINER preceded by Virama",
 				"comment": "https://tools.ietf.org/html/rfc5891#section-4.2.3.3 https://tools.ietf.org/html/rfc5892#appendix-A.2 https://www.unicode.org/review/pr-37.pdf",
 				"data": "क्‍ष",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "ZERO WIDTH NON-JOINER preceded by Virama",
 				"comment": "https://tools.ietf.org/html/rfc5891#section-4.2.3.3 https://tools.ietf.org/html/rfc5892#appendix-A.1",
 				"data": "क्‌ष",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "ZERO WIDTH NON-JOINER not preceded by Virama but matches regexp",
 				"comment": "https://tools.ietf.org/html/rfc5891#section-4.2.3.3 https://tools.ietf.org/html/rfc5892#appendix-A.1 https://www.w3.org/TR/alreq/#h_disjoining_enforcement",
 				"data": "بي‌بي",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "single label",
 				"data": "hostname",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "single label with hyphen",
 				"data": "host-name",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "single label with digits",
 				"data": "h0stn4me",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "single label starting with digit",
 				"data": "1host",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "single label ending with digit",
 				"data": "hostnam3",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			}
 		]
 	}

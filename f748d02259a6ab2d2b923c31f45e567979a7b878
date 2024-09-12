@@ -16,6 +16,23 @@
       "message": "PTAL.",
       "revId": "f748d02259a6ab2d2b923c31f45e567979a7b878",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "faf52d13_15f74fb0",
+        "filename": "pkg/gen.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-12T10:34:22Z",
+      "side": 1,
+      "message": "Maybe just remove this case and remove `strconv.ParseComplex128` (the only place that complex numbers are used) as it doesn\u0027t work and probably never has?",
+      "revId": "f748d02259a6ab2d2b923c31f45e567979a7b878",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

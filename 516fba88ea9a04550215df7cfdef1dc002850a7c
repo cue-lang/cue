@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "82425520_c1a7a5da",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-12T17:24:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b620bc65_1ef05791",
+      "revId": "516fba88ea9a04550215df7cfdef1dc002850a7c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bb2ff784_0c8894b1",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-09-12T16:59:20Z",
       "side": 1,
       "message": "expand why we\u0027ll never support it? because CUE doesn\u0027t?",
+      "revId": "516fba88ea9a04550215df7cfdef1dc002850a7c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad167c80_d9974e18",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-12T17:24:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb2ff784_0c8894b1",
       "revId": "516fba88ea9a04550215df7cfdef1dc002850a7c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

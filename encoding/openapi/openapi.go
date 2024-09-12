@@ -81,6 +81,16 @@ type Config struct {
 	// OpenAPI Schema. It is an error for an CUE value to refer to itself
 	// if this option is used.
 	ExpandReferences bool
+
+	// StrictFeatures reports an error for features that are known
+	// to be unsupported.
+	StrictFeatures bool
+
+	// StrictKeywords reports an error when unknown keywords
+	// are encountered. For OpenAPI 3.0, this is implicitly always
+	// true, as that specification explicitly prohibits unknown keywords
+	// other than "x-" prefixed keywords.
+	StrictKeywords bool
 }
 
 type Generator = Config

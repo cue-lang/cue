@@ -42,8 +42,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: unknown keyword \"array_of_schemas\" (and 1 more errors)",
-			"v3": "extract error: unknown keyword \"array_of_schemas\" (and 1 more errors)"
+			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/unknownKeyword/my_identifier.json:my_identifier\":\n    generated.cue:1:8\n",
+			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/unknownKeyword/my_identifier.json:my_identifier\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
 			{

@@ -431,8 +431,6 @@ func (g *generator) adtKind(typ types.Type) string {
 		return "adt.IntKind"
 	case "Float64", "BigFloat", "Decimal":
 		return "adt.NumberKind"
-	case "Complex128":
-		return "adt.TopKind" // TODO(mvdan): what should we return here?
 	case "DecimalList", "StringList", "CueList":
 		return "adt.ListKind"
 	case "Bytes", "Reader":

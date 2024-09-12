@@ -8,6 +8,11 @@ cmp stdout expect-stdout
 ! exec cue def jsonschema: bad.json
 cmp stderr expect-stderr-strict-features
 
+# The default strictness modes should apply even when
+# we haven't explicitly specifed the jsonschema file type.
+# TODO this succeeds unexpectedly right now (issue 3446).
+exec cue def bad.json
+
 exec cue def jsonschema+strictFeatures=0: bad.json
 
 ! exec cue def jsonschema: bad.json --strict

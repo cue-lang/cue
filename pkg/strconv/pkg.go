@@ -51,19 +51,6 @@ var p = &pkg.Package{
 			}
 		},
 	}, {
-		Name: "ParseComplex",
-		Params: []pkg.Param{
-			{Kind: adt.StringKind},
-			{Kind: adt.IntKind},
-		},
-		Result: adt.TopKind,
-		Func: func(c *pkg.CallCtxt) {
-			s, bitSize := c.String(0), c.Int(1)
-			if c.Do() {
-				c.Ret, c.Err = ParseComplex(s, bitSize)
-			}
-		},
-	}, {
 		Name: "ParseFloat",
 		Params: []pkg.Param{
 			{Kind: adt.StringKind},

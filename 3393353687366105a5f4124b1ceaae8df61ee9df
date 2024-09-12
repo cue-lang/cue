@@ -34,6 +34,24 @@
       "parentUuid": "f84995e0_8f6b953e",
       "revId": "3393353687366105a5f4124b1ceaae8df61ee9df",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f06a6c2_2d9e427b",
+        "filename": "pkg/gen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-12T14:15:25Z",
+      "side": 1,
+      "message": "Good points. I made it a special case to at least get the easy win for now - but I was mainly concerned about not having a default \"top\" case.",
+      "parentUuid": "133bdb08_7c2f3d31",
+      "revId": "3393353687366105a5f4124b1ceaae8df61ee9df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

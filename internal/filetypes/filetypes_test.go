@@ -130,6 +130,11 @@ func TestFromFile(t *testing.T) {
 				Encoding:       build.YAML,
 				Interpretation: build.OpenAPI,
 				Form:           build.Schema,
+				BoolTags: map[string]bool{
+					"strict":         false,
+					"strictFeatures": true,
+					"strictKeywords": false,
+				},
 			},
 			Definitions:  true,
 			Data:         true,
@@ -211,6 +216,11 @@ func TestFromFile(t *testing.T) {
 				Encoding:       build.JSON,
 				Interpretation: build.OpenAPI,
 				Form:           build.Schema,
+				BoolTags: map[string]bool{
+					"strict":         false,
+					"strictFeatures": true,
+					"strictKeywords": false,
+				},
 			},
 			Definitions:  true,
 			Data:         true,
@@ -237,6 +247,11 @@ func TestFromFile(t *testing.T) {
 				Encoding:       build.JSON,
 				Interpretation: build.OpenAPI,
 				Form:           build.Schema,
+				BoolTags: map[string]bool{
+					"strict":         false,
+					"strictFeatures": true,
+					"strictKeywords": false,
+				},
 			},
 			Definitions:  true,
 			Data:         true,
@@ -332,6 +347,11 @@ func TestParseFile(t *testing.T) {
 			Encoding:       build.JSON,
 			Interpretation: build.OpenAPI,
 			Form:           build.Schema,
+			BoolTags: map[string]bool{
+				"strict":         false,
+				"strictFeatures": true,
+				"strictKeywords": false,
+			},
 		},
 	}, {
 		in: "cue:file.json",

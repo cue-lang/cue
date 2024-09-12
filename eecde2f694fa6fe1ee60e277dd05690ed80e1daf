@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08097656_b47d1332",
+        "filename": "internal/internal.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-12T07:55:00Z",
+      "side": 1,
+      "message": "doc comment please.",
+      "revId": "eecde2f694fa6fe1ee60e277dd05690ed80e1daf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

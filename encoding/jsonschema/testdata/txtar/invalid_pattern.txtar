@@ -1,0 +1,11 @@
+Invalid patterns should result in failure
+
+-- schema.json --
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "pattern": 1234
+}
+-- out/decode/extract --
+ERROR:
+invalid string:
+    schema.json:3:5

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f38eff9_0c542af0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-12T16:18:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "898e4086_3d74bc76",
+      "revId": "390ab6fa965832ce21c8ea8dccce8372a4b8ac0d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5fbae961_ce1909b9",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-09-12T15:46:22Z",
       "side": 1,
       "message": "it\u0027s very odd that you\u0027re doing `i.interpretation \u003d Detect(v)` twice in a row. Surely this is unnecessary? if it is necessary, at minimum it needs a short comment, but I would also imagine it\u0027s due to bad design somewhere.",
+      "revId": "390ab6fa965832ce21c8ea8dccce8372a4b8ac0d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "274febd0_effd910d",
+        "filename": "internal/encoding/encoding.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-12T16:18:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fbae961_ce1909b9",
       "revId": "390ab6fa965832ce21c8ea8dccce8372a4b8ac0d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f696a667_6340ba51",
+        "filename": "internal/encoding/encoding.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-12T16:18:40Z",
+      "side": 1,
+      "message": "It just seems a bit sleazy to side-effect the File from within the interpretFunc when there\u0027s no clear invariant in the code that we can\u0027t invoke two interpretFuncs using the same File. Also, the File has been passed in from external code, so we don\u0027t know for sure that something isn\u0027t reading it concurrently. I know in practice it\u0027ll be fine, but I think I prefer the relatively small additional complexity that comes from following good practice.\n\nI added a comment.",
+      "parentUuid": "ca0db70c_e1547661",
+      "revId": "390ab6fa965832ce21c8ea8dccce8372a4b8ac0d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "edb2b69e_e6bb48ab",
@@ -65,6 +119,24 @@
       "writtenOn": "2024-09-12T15:46:22Z",
       "side": 1,
       "message": "why not return these errors? all other APIs in this func return errors, as does the caller in internal/encoding, so the panics are an odd choice. unless you\u0027re 100% sure that they will not happen in practice, in which case I would briefly document that in the code or godoc.",
+      "revId": "390ab6fa965832ce21c8ea8dccce8372a4b8ac0d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99cdd6e0_d9bc9952",
+        "filename": "internal/filetypes/filetypes.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-12T16:18:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "edb2b69e_e6bb48ab",
       "revId": "390ab6fa965832ce21c8ea8dccce8372a4b8ac0d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

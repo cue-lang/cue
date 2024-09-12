@@ -5,117 +5,73 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"format": "email"
 		},
-		"skip": {
-			"v2": "extract error: keyword \"format\" not yet implemented",
-			"v3": "extract error: keyword \"format\" not yet implemented"
-		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "a valid e-mail address",
 				"data": "joe.bloggs@example.com",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "an invalid e-mail address",
 				"data": "2962",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
 				"description": "tilde in local part is valid",
 				"data": "te~st@example.com",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "tilde before local part is valid",
 				"data": "~test@example.com",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "tilde after local part is valid",
 				"data": "test~@example.com",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "dot before local part is not valid",
 				"data": ".test@example.com",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -123,26 +79,22 @@
 				"data": "test.@example.com",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
 				"description": "two separated dots inside local part are valid",
 				"data": "te.s.t@example.com",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "two subsequent dots inside local part are not valid",
 				"data": "te..st@example.com",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			}
 		]

@@ -5,81 +5,49 @@
 			"$schema": "https://json-schema.org/draft/2020-12/schema",
 			"format": "duration"
 		},
-		"skip": {
-			"v2": "extract error: keyword \"format\" not yet implemented",
-			"v3": "extract error: keyword \"format\" not yet implemented"
-		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "a valid duration string",
 				"data": "P4DT12H30M5S",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "an invalid duration string",
 				"data": "PT1D",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -87,8 +55,8 @@
 				"data": "P",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -96,8 +64,8 @@
 				"data": "P1YT",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -105,8 +73,8 @@
 				"data": "PT",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -114,8 +82,8 @@
 				"data": "P2D1Y",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -123,8 +91,8 @@
 				"data": "P1D2H",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -132,89 +100,57 @@
 				"data": "P2S",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
 				"description": "four years duration",
 				"data": "P4Y",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "zero time, in seconds",
 				"data": "PT0S",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "zero time, in days",
 				"data": "P0D",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "one month duration",
 				"data": "P1M",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "one minute duration",
 				"data": "PT1M",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "one and a half days, in hours",
 				"data": "PT36H",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "one and a half days, in days and hours",
 				"data": "P1DT12H",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "two weeks",
 				"data": "P2W",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "weeks cannot be combined with other units",
 				"data": "P1Y2W",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -222,8 +158,8 @@
 				"data": "P২Y",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -231,8 +167,8 @@
 				"data": "P1",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			}
 		]

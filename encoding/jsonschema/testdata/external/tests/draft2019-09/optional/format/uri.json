@@ -5,189 +5,109 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"format": "uri"
 		},
-		"skip": {
-			"v2": "extract error: keyword \"format\" not yet implemented",
-			"v3": "extract error: keyword \"format\" not yet implemented"
-		},
 		"tests": [
 			{
 				"description": "all string formats ignore integers",
 				"data": 12,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "all string formats ignore floats",
 				"data": 13.7,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "all string formats ignore objects",
 				"data": {},
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "all string formats ignore arrays",
 				"data": [],
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "all string formats ignore booleans",
 				"data": false,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "all string formats ignore nulls",
 				"data": null,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "a valid URL with anchor tag",
 				"data": "http://foo.bar/?baz=qux#quux",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "a valid URL with anchor tag and parentheses",
 				"data": "http://foo.com/blah_(wikipedia)_blah#cite-1",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "a valid URL with URL-encoded stuff",
 				"data": "http://foo.bar/?q=Test%20URL-encoded%20stuff",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "a valid puny-coded URL ",
 				"data": "http://xn--nw2a.xn--j6w193g/",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "a valid URL with many special characters",
 				"data": "http://-.~_!$\u0026'()*+,;=:%40:80%2f::::::@example.com",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "a valid URL based on IPv4",
 				"data": "http://223.255.255.254",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "a valid URL with ftp scheme",
 				"data": "ftp://ftp.is.co.za/rfc/rfc1808.txt",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "a valid URL for a simple text file",
 				"data": "http://www.ietf.org/rfc/rfc2396.txt",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "a valid URL ",
 				"data": "ldap://[2001:db8::7]/c=GB?objectClass?one",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "a valid mailto URI",
 				"data": "mailto:John.Doe@example.com",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "a valid newsgroup URI",
 				"data": "news:comp.infosystems.www.servers.unix",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "a valid tel URI",
 				"data": "tel:+1-816-555-1212",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "a valid URN",
 				"data": "urn:oasis:names:specification:docbook:dtd:xml:4.1.2",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "an invalid protocol-relative URI Reference",
 				"data": "//foo.bar/?baz=qux#quux",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -195,8 +115,8 @@
 				"data": "/abc",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -204,8 +124,8 @@
 				"data": "\\\\WINDOWS\\fileshare",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -213,8 +133,8 @@
 				"data": "abc",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -222,8 +142,8 @@
 				"data": "http:// shouldfail.com",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -231,8 +151,8 @@
 				"data": ":// should fail",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			},
 			{
@@ -240,8 +160,8 @@
 				"data": "bar,baz:foo",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			}
 		]

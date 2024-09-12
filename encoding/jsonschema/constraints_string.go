@@ -49,7 +49,7 @@ func constraintMinLength(key string, n cue.Value, s *state) {
 }
 
 func constraintPattern(key string, n cue.Value, s *state) {
-	str, _ := n.String()
+	str, _ := s.strValue(n)
 	if _, err := regexp.Compile(str); err != nil {
 		if s.cfg.StrictFeatures {
 			// TODO check if the error is only because of an unsupported

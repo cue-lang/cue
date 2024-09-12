@@ -495,18 +495,14 @@
 			"$schema": "https://json-schema.org/draft/2020-12/schema",
 			"format": "regex"
 		},
-		"skip": {
-			"v2": "extract error: keyword \"format\" not yet implemented",
-			"v3": "extract error: keyword \"format\" not yet implemented"
-		},
 		"tests": [
 			{
 				"description": "when used as a pattern",
 				"data": "\\a",
 				"valid": false,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "unexpected success",
+					"v3": "unexpected success"
 				}
 			}
 		]

@@ -97,7 +97,7 @@ var constraints = []*constraint{
 	p2("exclusiveMaximum", constraintExclusiveMaximum, allVersions|openAPI),
 	p2("exclusiveMinimum", constraintExclusiveMinimum, allVersions|openAPI),
 	p1("externalDocs", constraintTODO, openAPI),
-	p1("format", constraintTODO, allVersions|openAPI),
+	p1("format", constraintFormat, allVersions|openAPI),
 	p1("id", constraintID, vto(VersionDraft4)),
 	p1("if", constraintIf, vfrom(VersionDraft7)),
 	p2("items", constraintItems, allVersions|openAPI),

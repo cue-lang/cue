@@ -16,6 +16,24 @@
       "message": "This feels a little bit dubious. There are lots of Go struct types that don\u0027t translate well to CUE. I wonder if we should have a method that, if implemented, indicates the CUE kind, implement that for `pkg/time.Parts`, and check for it here. Otherwise, returning top seems reasonable to me. As a more general thing, this kind of issue is why I tried to add func signatures ages back, so we can actually declare the proper signatures of each function. Then AFAICS defaulting to Value here would be fine because an additional signature could provide more specific information.\n\nAlternatively, perhaps just special-case time.Parts, as that\u0027s the only place that triggers this case?",
       "revId": "3393353687366105a5f4124b1ceaae8df61ee9df",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "133bdb08_7c2f3d31",
+        "filename": "pkg/gen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-12T14:14:41Z",
+      "side": 1,
+      "message": "Good points. I made it a special case to at lea",
+      "parentUuid": "f84995e0_8f6b953e",
+      "revId": "3393353687366105a5f4124b1ceaae8df61ee9df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -225,6 +225,24 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 	return files, nil
 }
 
+// DefaultTagsForInterpretation returns any tags that would be set by default
+// in the given interpretation in the given mode.
+func DefaultTagsForInterpretation(interp build.Interpretation, mode Mode) map[string]bool {
+	if interp == "" {
+		return nil
+	}
+	// TODO this could be done once only.
+	mv, fv, err := parseType(string(interp), mode)
+	if err != nil {
+		panic(err)
+	}
+	f, err := toFile(mv, fv, "-")
+	if err != nil {
+		panic(err)
+	}
+	return f.BoolTags
+}
+
 // ParseFile parses a single-argument file specifier, such as when a file is
 // passed to a command line argument.
 //

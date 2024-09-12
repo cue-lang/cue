@@ -20,6 +20,7 @@ package encoding
 import (
 	"fmt"
 	"io"
+	"maps"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
@@ -199,6 +200,7 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 		openAPI := openAPIFunc(cfg, f)
 		jsonSchema := jsonSchemaFunc(cfg, f)
 		i.interpretFunc = func(v cue.Value) (file *ast.File, err error) {
+			i.interpretation = Detect(v)
 			switch i.interpretation = Detect(v); i.interpretation {
 			case build.JSONSchema:
 				return jsonSchema(v)
@@ -284,6 +286,7 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 
 func jsonSchemaFunc(cfg *Config, f *build.File) interpretFunc {
 	return func(v cue.Value) (file *ast.File, err error) {
+		tags := boolTagsForFile(f, build.JSONSchema)
 		cfg := &jsonschema.Config{
 			PkgName: cfg.PkgName,
 
@@ -294,8 +297,8 @@ func jsonSchemaFunc(cfg *Config, f *build.File) interpretFunc {
 			// The strictKeywords and strictFeatures tags are
 			// set by internal/filetypes from the strict tag when appropriate.
 
-			StrictKeywords: cfg.Strict || f.BoolTags["strictKeywords"],
-			StrictFeatures: cfg.Strict || f.BoolTags["strictFeatures"],
+			StrictKeywords: cfg.Strict || tags["strictKeywords"],
+			StrictFeatures: cfg.Strict || tags["strictFeatures"],
 		}
 		file, err = jsonschema.Extract(v, cfg)
 		// TODO: simplify currently erases file line info. Reintroduce after fix.
@@ -312,6 +315,33 @@ func openAPIFunc(c *Config, f *build.File) interpretFunc {
 		// file, err = simplify(file, err)
 		return file, err
 	}
+}
+
+func boolTagsForFile(f *build.File, interp build.Interpretation) map[string]bool {
+	if f.Interpretation != build.Auto {
+		return f.BoolTags
+	}
+	defaultTags := filetypes.DefaultTagsForInterpretation(interp, filetypes.Input)
+	if len(defaultTags) == 0 {
+		return f.BoolTags
+	}
+	// Set values for tags that have a default value but aren't
+	// present in f.Tags.
+	var tags map[string]bool
+	for tag, val := range defaultTags {
+		if _, ok := f.BoolTags[tag]; ok {
+			continue
+		}
+		if tags == nil {
+			tags = make(map[string]bool)
+		}
+		tags[tag] = val
+	}
+	if tags == nil {
+		return f.BoolTags
+	}
+	maps.Copy(tags, f.BoolTags)
+	return tags
 }
 
 func protobufJSONFunc(cfg *Config, file *build.File) rewriteFunc {

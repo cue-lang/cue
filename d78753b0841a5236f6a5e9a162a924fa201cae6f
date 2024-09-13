@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f695fa8_3de202c7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-13T10:12:43Z",
+      "side": 1,
+      "message": "Note that this test doubles as \"the Gerrit repo is readable anonymously\", which is also good to have. Because CI runs off of GitHub, if we somehow mess up the Gerrit permissions or make the repo vanish, we wouldn\u0027t notice until the first GOPROXY\u003ddirect user (like proxy.golang.org itself) notices.",
+      "revId": "d78753b0841a5236f6a5e9a162a924fa201cae6f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

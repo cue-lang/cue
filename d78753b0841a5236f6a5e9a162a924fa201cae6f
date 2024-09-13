@@ -16,6 +16,40 @@
       "message": "Note that this test doubles as \"the Gerrit repo is readable anonymously\", which is also good to have. Because CI runs off of GitHub, if we somehow mess up the Gerrit permissions or make the repo vanish, we wouldn\u0027t notice until the first GOPROXY\u003ddirect user (like proxy.golang.org itself) notices.",
       "revId": "d78753b0841a5236f6a5e9a162a924fa201cae6f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "462b1ffa_095484a1",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 3
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-13T10:28:37Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t\tcd $(mktemp -d)\n```\n?\n\nThen we can just use plain filenames and the diff output won\u0027t include random tmpfile names.",
+      "revId": "d78753b0841a5236f6a5e9a162a924fa201cae6f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19730ae4_41ee7a8b",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 3
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-13T10:28:37Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t\tsed \u0027s/^/^    /\u0027 github.txt\n```\n\n?\nJust to make them stand out visually.",
+      "revId": "d78753b0841a5236f6a5e9a162a924fa201cae6f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

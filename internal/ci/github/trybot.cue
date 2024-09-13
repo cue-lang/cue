@@ -77,6 +77,7 @@ workflows: trybot: _repo.bashWorkflow & {
 				_goTestWasm,
 				for v in _e2eTestSteps {v},
 				_goCheck,
+				_checkTags,
 				_repo.checkGitClean,
 			]
 		}
@@ -167,11 +168,37 @@ workflows: trybot: _repo.bashWorkflow & {
 		//
 		// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
 		if:   "\(_isLatestLinux)"
-		name: "Check"
+		name: "Go checks"
 		run: """
 			go vet ./...
 			go mod tidy
 			(cd internal/_e2e && go test -run=-)
+			"""
+	}
+
+	_checkTags: json.#step & {
+		// Ensure that GitHub and Gerrit agree on the full list of available tags.
+		// This way, if there is any discrepancy, we will get a useful go-cmp diff.
+		//
+		// We use `git ls-remote` to list all tags from each remote git repository
+		// because it does not depend on custom REST API endpoints and is very fast.
+		// Note that it sorts tag names as strings, which is not the best, but works OK.
+		if:   "\(_isLatestLinux)"
+		name: "Check all git tags are available"
+		run: """
+			cd $(mktemp -d)
+
+			git ls-remote --tags https://github.com/cue-lang/cue >github.txt
+			echo "GitHub tags:"
+			sed 's/^/^    /' github.txt
+
+			git ls-remote --tags https://review.gerrithub.io/cue-lang/cue >gerrit.txt
+
+			if ! diff -u github.txt gerrit.txt; then
+				echo "GitHub and Gerrit do not agree on the list of tags!"
+				echo "Did you forget about refs/attic branches? https://github.com/cue-lang/cue/wiki/Notes-for-project-maintainers"
+				exit 1
+			fi
 			"""
 	}
 

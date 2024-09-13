@@ -148,11 +148,28 @@ jobs:
           cd internal/_e2e
           go test -race
       - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
-        name: Check
+        name: Go checks
         run: |-
           go vet ./...
           go mod tidy
           (cd internal/_e2e && go test -run=-)
+      - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
+        name: Check all git tags are available
+        run: |-
+          export GIT_TERMINAL_PROMPT=0 # do not prompt for any credentials
+          tmp=$(mktemp -d)
+
+          git ls-remote --tags https://github.com/cue-lang/cue >"$tmp/github.txt"
+          echo "GitHub tags:"
+          cat "$tmp/github.txt"
+
+          git ls-remote --tags https://review.gerrithub.io/a/cue-lang/cue >"$tmp/gerrit.txt"
+
+          if ! diff -u "$tmp/github.txt" "$tmp/gerrit.txt"; then
+          	echo "GitHub and Gerrit do not agree on the list of tags!"
+          	echo "Did you forget about refs/attic branches? https://github.com/cue-lang/cue/wiki/Notes-for-project-maintainers"
+          	exit 1
+          fi
       - name: Check that git is clean at the end of the job
         if: always()
         run: test -z "$(git status --porcelain)" || (git status; git diff; false)

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2dd878a8_4cd7e9ba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-16T19:10:04Z",
+      "side": 1,
+      "message": "does it make sense to sanity check all names to be valid? presumably anything other than an ASCII letter, digit, or dash should be considered invalid.",
+      "revId": "30cb695ab9324e9e7d28d00a464cd3ecf57bbffa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

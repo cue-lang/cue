@@ -1,0 +1,13 @@
+#version: openapi
+
+-- schema.yaml --
+components:
+  schemas:
+    DateTime:
+        type: string
+        format: date-time
+
+-- out/decode/extract --
+ERROR:
+unknown format "date-time":
+    schema.yaml:5:9

@@ -67,7 +67,7 @@ var formatFuncs = sync.OnceValue(func() map[string]formatFuncInfo {
 		"byte":                  {openAPI, formatTODO},
 		"data":                  {openAPI, formatTODO},
 		"date":                  {vfrom(VersionDraft7), formatTODO},
-		"date-time ":            {allVersions | openAPI, formatTODO},
+		"date-time":             {allVersions | openAPI, formatTODO},
 		"double":                {openAPI, formatTODO},
 		"duration":              {vfrom(VersionDraft2019_09), formatTODO},
 		"email":                 {allVersions | openAPI, formatTODO},

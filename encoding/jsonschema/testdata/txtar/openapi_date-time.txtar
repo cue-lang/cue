@@ -8,6 +8,4 @@ components:
         format: date-time
 
 -- out/decode/extract --
-ERROR:
-unknown format "date-time":
-    schema.yaml:5:9
+#DateTime: string

@@ -19,45 +19,28 @@ import (
 	"os"
 	"path/filepath"
 
-	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/encoding/gocode"
 	_ "cuelang.org/go/pkg"
 )
 
 func main() {
-	dirs, err := os.ReadDir("testdata")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	cwd, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, d := range dirs {
-		if !d.IsDir() || d.Name() == "cue.mod" {
-			continue
-		}
-		dir := filepath.Join(cwd, "testdata")
-		pkg := "." + string(filepath.Separator) + d.Name()
-		inst := cue.Build(load.Instances([]string{pkg}, &load.Config{
-			Dir:        dir,
-			ModuleRoot: dir,
-			Module:     "cuelang.org/go/encoding/gocode/testdata@v0",
-		}))[0]
+	insts := load.Instances([]string{"./..."}, &load.Config{
+		Dir: "testdata",
+	})
+	ctx := cuecontext.New()
+	for _, inst := range insts {
 		if err := inst.Err; err != nil {
 			log.Fatal(err)
 		}
 
-		goPkg := "./testdata/" + d.Name()
-		b, err := gocode.Generate(goPkg, inst, nil)
+		b, err := gocode.Generate(inst.Dir, ctx.BuildInstance(inst), nil)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		goFile := filepath.Join("testdata", d.Name(), "cue_gen.go")
+		goFile := filepath.Join(inst.Dir, "cue_gen.go")
 		if err := os.WriteFile(goFile, b, 0666); err != nil {
 			log.Fatal(err)
 		}

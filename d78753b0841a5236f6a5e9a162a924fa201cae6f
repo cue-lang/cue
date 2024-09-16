@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9cf32b1_cbbae4b8",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 3
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-16T12:01:18Z",
+      "side": 1,
+      "message": "good point, done",
+      "parentUuid": "462b1ffa_095484a1",
+      "revId": "d78753b0841a5236f6a5e9a162a924fa201cae6f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "19730ae4_41ee7a8b",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-09-13T10:28:37Z",
       "side": 1,
       "message": "```suggestion\n\t\t\tsed \u0027s/^/^    /\u0027 github.txt\n```\n\n?\nJust to make them stand out visually.",
+      "revId": "d78753b0841a5236f6a5e9a162a924fa201cae6f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6dca9a1_75cee75e",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 3
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-16T12:01:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "19730ae4_41ee7a8b",
       "revId": "d78753b0841a5236f6a5e9a162a924fa201cae6f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

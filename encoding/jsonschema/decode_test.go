@@ -79,6 +79,7 @@ func TestDecode(t *testing.T) {
 				// OpenAPI doesn't have a JSON Schema URI so it gets a special case.
 				cfg.DefaultVersion = jsonschema.VersionOpenAPI
 				cfg.Root = "#/components/schemas/"
+				cfg.StrictKeywords = true // OpenAPI always uses strict keywords
 				cfg.Map = func(p token.Pos, a []string) ([]ast.Label, error) {
 					// Just for testing: does not validate the path.
 					return []ast.Label{ast.NewIdent("#" + a[len(a)-1])}, nil
@@ -90,7 +91,7 @@ func TestDecode(t *testing.T) {
 			}
 		}
 		cfg.Strict = t.HasTag("strict")
-		cfg.StrictKeywords = t.HasTag("strictKeywords")
+		cfg.StrictKeywords = cfg.StrictKeywords || t.HasTag("strictKeywords")
 		cfg.StrictFeatures = t.HasTag("strictFeatures")
 
 		ctx := t.CueContext()

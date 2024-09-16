@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bcb5f713_d7abb789",
+        "filename": "encoding/jsonschema/decode_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-16T19:08:45Z",
+      "side": 1,
+      "message": "it seems to me like these changes are unrelated and should go in a different commit, or at the very least should be mentioned in the commit message",
+      "revId": "937f23cd1faa34bd2d2ed8e7b9e48ce8e2794448",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

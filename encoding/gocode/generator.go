@@ -109,7 +109,7 @@ func Generate(pkgPath string, inst cue.InstanceOrValue, c *Config) (b []byte, er
 	pkgName := inst.Value().BuildInstance().PkgName
 	if pkgPath != "" {
 		loadCfg := &packages.Config{
-			Mode: packages.NeedName | packages.NeedFiles | packages.NeedCompiledGoFiles | packages.NeedImports | packages.NeedTypes | packages.NeedTypesSizes | packages.NeedSyntax | packages.NeedTypesInfo | packages.NeedDeps,
+			Mode: packages.NeedName | packages.NeedTypes | packages.NeedTypesInfo,
 		}
 		pkgs, err := packages.Load(loadCfg, pkgPath)
 		if err != nil {

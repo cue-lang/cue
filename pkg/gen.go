@@ -42,7 +42,6 @@ import (
 	"log"
 	"math/big"
 	"os"
-	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -57,9 +56,6 @@ import (
 )
 
 const genFile = "pkg.go"
-
-//go:embed packages.txt
-var packagesStr string
 
 type headerParams struct {
 	GoPkg  string
@@ -99,20 +95,8 @@ func main() {
 	log.SetFlags(log.Lshortfile)
 	log.SetOutput(os.Stdout)
 
-	var packagesList []string
-	for _, pkg := range strings.Fields(packagesStr) {
-		if pkg == "path" {
-			// TODO remove this special case. Currently the path
-			// pkg.go file cannot be generated automatically but that
-			// will be possible when we can attach arbitrary signatures
-			// to builtin functions.
-			continue
-		}
-		packagesList = append(packagesList, path.Join(pkgParent, pkg))
-	}
-
 	cfg := &packages.Config{Mode: packages.NeedName | packages.NeedFiles | packages.NeedTypes | packages.NeedSyntax}
-	pkgs, err := packages.Load(cfg, packagesList...)
+	pkgs, err := packages.Load(cfg, "./...")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "load: %v\n", err)
 		os.Exit(1)
@@ -121,8 +105,20 @@ func main() {
 		os.Exit(1)
 	}
 	for _, pkg := range pkgs {
-		if err := generate(pkg); err != nil {
-			log.Fatalf("%s: %v", pkg, err)
+		switch {
+		case pkg.PkgPath == pkgParent:
+			// The pkg package itself should not be generated.
+		case strings.Contains(pkg.PkgPath, "/internal"):
+			// Internal packages are not for public use.
+		case pkg.PkgPath == "cuelang.org/go/pkg/path":
+			// TODO remove this special case. Currently the path
+			// pkg.go file cannot be generated automatically but that
+			// will be possible when we can attach arbitrary signatures
+			// to builtin functions.
+		default:
+			if err := generate(pkg); err != nil {
+				log.Fatalf("%s: %v", pkg, err)
+			}
 		}
 	}
 }

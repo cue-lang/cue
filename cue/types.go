@@ -2260,7 +2260,7 @@ func (o *options) updateOptions(opts []Option) {
 }
 
 // Validate reports any errors, recursively. The returned error may represent
-// more than one error, retrievable with errors.Errors, if more than one
+// more than one error, retrievable with [errors.Errors], if more than one
 // exists.
 //
 // Note that by default not all errors are reported, unless options like

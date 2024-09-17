@@ -130,5 +130,5 @@ func LabelName(l Label) (name string, isIdent bool, err error) {
 }
 
 // ErrIsExpression reports whether a label is an expression.
-// This error is never returned directly. Use errors.Is.
+// This error is never returned directly. Use [errors.Is].
 var ErrIsExpression = errors.New("not a concrete label")

@@ -1,0 +1,20 @@
+-- schema.json --
+{
+    "anyOf": [
+        {
+            "type": "string",
+            "enum": [
+                1,
+                2
+            ]
+        },
+        {
+            "type": "boolean"
+        },
+        {
+            "type": "number"
+        }
+    ]
+}
+-- out/decode/extract --
+matchN(>=1, [bool, number])

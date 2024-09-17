@@ -778,7 +778,7 @@ import (
 
 		// The type of machine to run the job on. The machine can be
 		// either a GitHub-hosted runner, or a self-hosted runner.
-		"runs-on"!: matchN(>=1, [string, matchN(>=1, [[string] & [_, ...]]), {
+		"runs-on"!: matchN(>=1, [string, [string] & [_, ...] & [...], {
 			group?: string
 			labels?: matchN(1, [string, [...string]])
 			...

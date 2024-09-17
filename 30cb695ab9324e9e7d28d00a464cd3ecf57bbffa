@@ -16,6 +16,24 @@
       "message": "does it make sense to sanity check all names to be valid? presumably anything other than an ASCII letter, digit, or dash should be considered invalid.",
       "revId": "30cb695ab9324e9e7d28d00a464cd3ecf57bbffa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "59b805a4_78a11284",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-17T12:10:25Z",
+      "side": 1,
+      "message": "I\u0027m not sure that\u0027s really worthwhile. This set of strings should be pretty stable over time, and when we add support for the various formats, we\u0027ll have assurance that the spellings are as they should be. There are lots of ways the names could be misspelled while still sticking to that character set.",
+      "parentUuid": "2dd878a8_4cd7e9ba",
+      "revId": "30cb695ab9324e9e7d28d00a464cd3ecf57bbffa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

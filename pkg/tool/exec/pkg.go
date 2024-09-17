@@ -67,9 +67,7 @@ var p = &pkg.Package{
 		$id: *"tool/exec.Run" | "exec"
 		cmd: string | [string, ...string]
 		dir?: string
-		env: {
-			[string]: string
-		} | [...=~"="]
+		env: {[string]: string} | [...=~"="]
 		stdout:      *null | string | bytes
 		stderr:      *null | string | bytes
 		stdin:       *null | string | bytes

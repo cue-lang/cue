@@ -50,12 +50,10 @@ import (
 
 	"golang.org/x/tools/go/packages"
 
-	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/build"
-	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/ast"
 	cueformat "cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal"
-	pkginternal "cuelang.org/go/pkg/internal"
 )
 
 const genFile = "pkg.go"
@@ -217,25 +215,28 @@ func (g *generator) processCUE() error {
 	// Note: we avoid using the cue/load and the cuecontext packages
 	// because they depend on the standard library which is what this
 	// command is generating - cyclic dependencies are undesirable in general.
-	ctx := pkginternal.NewContext()
-	val, err := loadCUEPackage(ctx, g.dir, g.cuePkgPath)
+	// We only need to load the declarations from one CUE file if it exists.
+	expr, err := loadCUEDecls(g.dir)
 	if err != nil {
-		if errors.Is(err, errNoCUEFiles) {
-			return nil
-		}
-		errors.Print(os.Stderr, err, nil)
 		return fmt.Errorf("error processing %s: %v", g.cuePkgPath, err)
 	}
-
-	v := val.Syntax(cue.Raw())
-	// fmt.Printf("%T\n", v)
-	// fmt.Println(astinternal.DebugStr(v))
-	n := internal.ToExpr(v)
-	b, err := cueformat.Node(n)
+	if expr == nil { // No syntax to add.
+		return nil
+	}
+	b, err := cueformat.Node(expr)
 	if err != nil {
 		return err
 	}
+
+	// Compact the CUE by removing empty lines. This requires re-formatting to align fields.
+	// TODO(mvdan): provide a "compact" option in cue/format for this purpose?
 	b = bytes.ReplaceAll(b, []byte("\n\n"), []byte("\n"))
+	b, err = cueformat.Source(b)
+	if err != nil {
+		return err
+	}
+	b = bytes.TrimSpace(b) // no trailing newline
+
 	// Try to use a Go string with backquotes, for readability.
 	// If not possible due to cueSrc itself having backquotes,
 	// use a single-line double-quoted string, removing tabs for brevity.
@@ -460,38 +461,28 @@ func (g *generator) adtKind(typ types.Type) string {
 	return ""
 }
 
-var errNoCUEFiles = errors.New("no CUE files in directory")
-
-// loadCUEPackage loads a CUE package as a value. We avoid using cue/load because
-// that depends on the standard library and as this generator is generating the standard
-// library, we don't want that cyclic dependency.
-// It only has to deal with the fairly limited subset of CUE packages that are
-// present inside pkg/....
-func loadCUEPackage(ctx *cue.Context, dir string, pkgPath string) (cue.Value, error) {
-	inst := &build.Instance{
-		PkgName:     path.Base(pkgPath),
-		Dir:         dir,
-		DisplayPath: pkgPath,
-		ImportPath:  pkgPath,
-	}
+// loadCUEDecls parses a single CUE file from a directory and returns its contents
+// as an expression, typically a struct holding all of a file's declarations.
+// If there are no CUE files, it returns (nil, nil).
+func loadCUEDecls(dir string) (ast.Expr, error) {
 	cuefiles, err := filepath.Glob(filepath.Join(dir, "*.cue"))
-	if err != nil {
-		return cue.Value{}, err
+	if err != nil || len(cuefiles) == 0 {
+		return nil, err
 	}
 	if len(cuefiles) == 0 {
-		return cue.Value{}, errNoCUEFiles
+		return nil, nil
 	}
-	for _, file := range cuefiles {
-		if err := inst.AddFile(file, nil); err != nil {
-			return cue.Value{}, err
-		}
+	if len(cuefiles) > 1 {
+		// Supporting multiple CUE files would require merging declarations.
+		return nil, fmt.Errorf("multiple CUE files not supported in this generator")
 	}
-	if err := inst.Complete(); err != nil {
-		return cue.Value{}, err
-	}
-	vals, err := ctx.BuildInstances([]*build.Instance{inst})
+	src, err := os.ReadFile(cuefiles[0])
 	if err != nil {
-		return cue.Value{}, err
+		return nil, err
 	}
-	return vals[0], nil
+	file, err := parser.ParseFile(cuefiles[0], src)
+	if err != nil {
+		return nil, err
+	}
+	return internal.ToExpr(file), nil
 }

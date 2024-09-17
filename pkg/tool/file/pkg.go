@@ -148,13 +148,13 @@ var p = &pkg.Package{
 	Append: {
 		$id:         "tool/file.Append"
 		filename:    !=""
-		permissions: int | *438
+		permissions: int | *0o666
 		contents:    bytes | string
 	}
 	Create: {
 		$id:         "tool/file.Create"
 		filename:    !=""
-		permissions: int | *438
+		permissions: int | *0o666
 		contents:    bytes | string
 	}
 	Glob: {
@@ -166,7 +166,7 @@ var p = &pkg.Package{
 		$id:           "tool/file.Mkdir"
 		path:          string
 		createParents: bool | *false
-		permissions:   int | *511
+		permissions:   int | *0o777
 	}
 	MkdirAll: Mkdir & {
 		createParents: true

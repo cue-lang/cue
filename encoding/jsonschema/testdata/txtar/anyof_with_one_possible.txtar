@@ -1,0 +1,17 @@
+-- schema.json --
+{
+    "anyOf": [
+        {
+            "type": "string",
+            "enum": [
+                1,
+                2
+            ]
+        },
+        {
+            "type": "boolean"
+        }
+    ]
+}
+-- out/decode/extract --
+bool

@@ -75,9 +75,22 @@ func constraintAnyOf(key string, n cue.Value, s *state) {
 	a := make([]ast.Expr, 0, len(items))
 	for _, v := range items {
 		x, sub := s.schemaState(v, s.allowedTypes, nil, true)
+		if sub.allowedTypes == 0 {
+			// Nothing is allowed; omit.
+			continue
+		}
 		types |= sub.allowedTypes
 		knownTypes |= sub.knownTypes
 		a = append(a, x)
+	}
+	if len(a) == 0 {
+		// Nothing at all is allowed.
+		s.allowedTypes = 0
+		return
+	}
+	if len(a) == 1 {
+		s.all.add(n, a[0])
+		return
 	}
 	s.allowedTypes &= types
 	s.knownTypes &= knownTypes
@@ -106,6 +119,10 @@ func constraintOneOf(key string, n cue.Value, s *state) {
 	a := make([]ast.Expr, 0, len(items))
 	for _, v := range items {
 		x, sub := s.schemaState(v, s.allowedTypes, nil, true)
+		if sub.allowedTypes == 0 {
+			// Nothing is allowed; omit
+			continue
+		}
 		types |= sub.allowedTypes
 
 		// TODO: make more finegrained by making it two pass.

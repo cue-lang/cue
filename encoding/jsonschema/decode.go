@@ -126,6 +126,9 @@ func (d *decoder) schema(ref []ast.Label, v cue.Value) (a []ast.Decl) {
 	}
 
 	expr, state := root.schemaState(v, allTypes, nil, false)
+	if state.allowedTypes == 0 {
+		d.addErr(errors.Newf(state.pos.Pos(), "constraints are not possible to satisfy"))
+	}
 
 	tags := []string{}
 	if state.schemaVersionPresent {
@@ -486,7 +489,7 @@ const allTypes = cue.NullKind | cue.BoolKind | cue.NumberKind | cue.IntKind |
 func (s *state) finalize() (e ast.Expr) {
 	if s.allowedTypes == 0 {
 		// Nothing is possible.
-		s.addErr(errors.Newf(s.pos.Pos(), "constraints are not possible to satisfy"))
+		//s.addErr(errors.Newf(s.pos.Pos(), "constraints are not possible to satisfy"))
 		return bottom()
 	}
 	s.addIfThenElse()

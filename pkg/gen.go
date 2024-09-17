@@ -303,7 +303,10 @@ func (g *generator) processGo(pkg *packages.Package) error {
 	return nil
 }
 
-var errorType = types.Universe.Lookup("error").Type()
+var (
+	typeError = types.Universe.Lookup("error").Type()
+	typeByte  = types.Universe.Lookup("byte").Type()
+)
 
 func (g *generator) genFunc(fn *types.Func) {
 	g.nonConcrete = false
@@ -313,7 +316,7 @@ func (g *generator) genFunc(fn *types.Func) {
 	}
 	params := sign.Params()
 	results := sign.Results()
-	if results == nil || (results.Len() != 1 && results.At(1).Type() != errorType) {
+	if results == nil || (results.Len() != 1 && results.At(1).Type() != typeError) {
 		fmt.Printf("Dropped func %s.%s: must have one return value or a value and an error %v\n", g.cuePkgPath, fn.Name(), sign)
 		return
 	}
@@ -375,8 +378,6 @@ func (g *generator) callCtxtGetter(typ types.Type) string {
 	switch typ := typ.(type) {
 	case *types.Basic:
 		return strings.Title(typ.String()) // "int" turns into "Int"
-	case *types.Map:
-		return "Struct"
 	case *types.Slice:
 		switch typ.Elem().String() {
 		case "byte":
@@ -407,16 +408,8 @@ func (g *generator) callCtxtGetter(typ types.Type) string {
 		return "Schema"
 	case "io.Reader":
 		return "Reader"
-	case "error":
-		return "Bottom" // for [generator.adtKind]
-
-	// Some builtin functions return custom types, like [cuelang.org/go/pkg/time.Split].
-	// TODO: we can simplify this once the CUE API declarations in ./pkg/...
-	// use CUE function signatures to validate their parameters and results.
-	case "*cuelang.org/go/pkg/time.Parts":
-		return "Struct"
 	}
-	log.Fatal("unknown Go type: ", typ.String())
+	log.Fatal("callCtxtGetter: unhandled Go type ", typ.String())
 	return ""
 }
 
@@ -424,26 +417,47 @@ func (g *generator) callCtxtGetter(typ types.Type) string {
 // a [cuelang.org/go/internal/core/adt.Kind] value for the given type.
 func (g *generator) adtKind(typ types.Type) string {
 	// TODO: detect list and structs types for return values.
-	switch name := g.callCtxtGetter(typ); name {
-	case "Bottom", "Bool", "String", "Struct", "Int", "List":
-		return "adt." + name + "Kind"
-	case "Int8", "Int16", "Int32", "Rune", "Int64",
-		"Uint", "Byte", "Uint8", "Uint16", "Uint32", "Uint64",
-		"BigInt":
-		return "adt.IntKind"
-	case "Float64", "BigFloat", "Decimal":
-		return "adt.NumberKind"
-	case "DecimalList", "StringList", "CueList":
+	switch typ := typ.(type) {
+	case *types.Slice:
+		if typ.Elem() == typeByte {
+			return "adt.BytesKind | adt.StringKind"
+		}
 		return "adt.ListKind"
-	case "Bytes", "Reader":
-		return "adt.BytesKind | adt.StringKind"
-	case "Value", "Schema":
-		// Must use the CallCtxt.Value method for these types and resolve manually.
-		return "adt.TopKind" // TODO: can be more precise
-	default:
-		log.Fatal("unknown CallCtxt type: ", name)
-		return ""
+	case *types.Map:
+		return "adt.StructKind"
+	case *types.Basic:
+		if typ.Info()&types.IsInteger != 0 {
+			return "adt.IntKind"
+		}
+		if typ.Kind() == types.Float64 {
+			return "adt.NumberKind"
+		}
+		return "adt." + strings.Title(typ.String()) + "Kind" // "bool" turns into "adt.BoolKind"
 	}
+	switch typ.String() {
+	case "error":
+		return "adt.BottomKind"
+	case "io.Reader":
+		return "adt.BytesKind | adt.StringKind"
+	case "cuelang.org/go/internal/pkg.Struct":
+		return "adt.StructKind"
+	case "cuelang.org/go/internal/pkg.List":
+		return "adt.ListKind"
+	case "*math/big.Int":
+		return "adt.IntKind"
+	case "*cuelang.org/go/internal.Decimal", "*math/big.Float":
+		return "adt.NumberKind"
+	case "cuelang.org/go/cue.Value", "cuelang.org/go/cue/ast.Expr", "cuelang.org/go/internal/pkg.Schema":
+		return "adt.TopKind" // TODO: can be more precise
+
+	// Some builtin functions return custom types, like [cuelang.org/go/pkg/time.Split].
+	// TODO: we can simplify this once the CUE API declarations in ./pkg/...
+	// use CUE function signatures to validate their parameters and results.
+	case "*cuelang.org/go/pkg/time.Parts":
+		return "adt.StructKind"
+	}
+	log.Fatal("adtKind: unhandled Go type ", typ.String())
+	return ""
 }
 
 var errNoCUEFiles = errors.New("no CUE files in directory")

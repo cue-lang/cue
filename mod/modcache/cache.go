@@ -92,7 +92,7 @@ func (c *cache) writeDiskCache(ctx context.Context, file string, data []byte) er
 
 // downloadDir returns the directory for storing.
 // An error will be returned if the module path or version cannot be escaped.
-// An error satisfying errors.Is(err, fs.ErrNotExist) will be returned
+// An error satisfying [errors.Is](err, [fs.ErrNotExist]) will be returned
 // along with the directory if the directory does not exist or if the directory
 // is not completely populated.
 func (c *cache) downloadDir(m module.Version) (string, error) {

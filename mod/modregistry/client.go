@@ -107,7 +107,7 @@ func NewClientWithResolver(resolver Resolver) *Client {
 }
 
 // GetModule returns the module instance for the given version.
-// It returns an error that satisfies errors.Is(ErrNotFound) if the
+// It returns an error that satisfies [errors.Is]([ErrNotFound]) if the
 // module is not present in the store at this version.
 func (c *Client) GetModule(ctx context.Context, m module.Version) (*Module, error) {
 	loc, err := c.resolve(m)

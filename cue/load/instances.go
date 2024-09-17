@@ -30,12 +30,6 @@ import (
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modrequirements"
 	"cuelang.org/go/mod/module"
-
-	// Trigger the unconditional loading of all core builtin packages if load
-	// is used. This was deemed the simplest way to avoid having to import
-	// this line explicitly, and thus breaking existing code, for the majority
-	// of cases, while not introducing an import cycle.
-	_ "cuelang.org/go/pkg"
 )
 
 // Instances returns the instances named by the command line arguments 'args'.

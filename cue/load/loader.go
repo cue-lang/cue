@@ -26,12 +26,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/mod/modpkgload"
-
-	// Trigger the unconditional loading of all core builtin packages if load
-	// is used. This was deemed the simplest way to avoid having to import
-	// this line explicitly, and thus breaking existing code, for the majority
-	// of cases, while not introducing an import cycle.
-	_ "cuelang.org/go/pkg"
 )
 
 type loader struct {

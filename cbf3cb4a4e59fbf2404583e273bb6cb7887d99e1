@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aea65fda_a224283d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-18T08:05:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5512bedd_f4abd9f2",
+      "revId": "cbf3cb4a4e59fbf2404583e273bb6cb7887d99e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "103c8e99_3d1d928b",
@@ -49,6 +67,24 @@
       "writtenOn": "2024-09-18T07:35:20Z",
       "side": 1,
       "message": "isn\u0027t `[_, ...] \u0026 [...]` redundant, i.e. equivalent to `[_, ...]`?",
+      "revId": "cbf3cb4a4e59fbf2404583e273bb6cb7887d99e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "94f69ef7_af7467d1",
+        "filename": "cue.mod/pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue",
+        "patchSetId": 3
+      },
+      "lineNbr": 781,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-18T08:05:12Z",
+      "side": 1,
+      "message": "It is, but the logic isn\u0027t clever enough to figure that out yet (one thing at a time!). It would be nice if we could rely on the evaluator to do that simplification, tbh.",
+      "parentUuid": "103c8e99_3d1d928b",
       "revId": "cbf3cb4a4e59fbf2404583e273bb6cb7887d99e1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

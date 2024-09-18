@@ -67,7 +67,6 @@ workflows: trybot: _repo.bashWorkflow & {
 					// so we only need to run them on one of the matrix jobs.
 					if: _isLatestLinux
 				},
-				_goGenerate,
 				_goTest & {
 					if: "\(_repo.isProtectedBranch) || !\(_isLatestLinux)"
 				},
@@ -78,6 +77,12 @@ workflows: trybot: _repo.bashWorkflow & {
 				for v in _e2eTestSteps {v},
 				_goCheck,
 				_checkTags,
+				// Run code generation towards the very end, to ensure it succeeds and makes no changes.
+				// Note that doing this before any Go tests or checks may lead to test cache misses,
+				// as Go uses modtimes to approximate whether files have been modified.
+				// Moveover, Go test failures on CI due to changed generated code are very confusing
+				// as the user might not notice that checkGitClean is also failing towards the end.
+				_goGenerate,
 				_repo.checkGitClean,
 			]
 		}

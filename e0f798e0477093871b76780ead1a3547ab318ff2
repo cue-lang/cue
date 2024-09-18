@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61b23d5e_32cac0e6",
+        "filename": "pkg/gen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-18T08:10:18Z",
+      "side": 1,
+      "message": "// If there are no CUE files, it returns (nil, nil).\n\n?",
+      "revId": "e0f798e0477093871b76780ead1a3547ab318ff2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

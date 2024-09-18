@@ -110,9 +110,6 @@ jobs:
       - name: Early git and code sanity checks
         if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
         run: go run ./internal/ci/checks
-      - name: Generate
-        run: go generate ./...
-        if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
       - name: Test
         if: |-
           ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
@@ -169,6 +166,9 @@ jobs:
           	echo "Did you forget about refs/attic branches? https://github.com/cue-lang/cue/wiki/Notes-for-project-maintainers"
           	exit 1
           fi
+      - name: Generate
+        run: go generate ./...
+        if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
       - name: Check that git is clean at the end of the job
         if: always()
         run: test -z "$(git status --porcelain)" || (git status; git diff; false)

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "103c8e99_3d1d928b",
+        "filename": "cue.mod/pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue",
+        "patchSetId": 3
+      },
+      "lineNbr": 781,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-18T07:35:20Z",
+      "side": 1,
+      "message": "isn\u0027t `[_, ...] \u0026 [...]` redundant, i.e. equivalent to `[_, ...]`?",
+      "revId": "cbf3cb4a4e59fbf2404583e273bb6cb7887d99e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

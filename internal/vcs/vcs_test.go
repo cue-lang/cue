@@ -51,8 +51,8 @@ func TestGit(t *testing.T) {
 	_, err = New("git", subdir)
 	qt.Assert(t, qt.ErrorMatches(err, `git VCS not found in any parent of ".+"`))
 
-	InitTestEnv(t)
-	mustRunCmd(t, dir, "git", "init")
+	env := TestEnv()
+	mustRunCmd(t, dir, env, "git", "init")
 	v, err := New("git", subdir)
 	qt.Assert(t, qt.IsNil(err))
 
@@ -63,13 +63,13 @@ func TestGit(t *testing.T) {
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.IsTrue(statusuncommitted.Uncommitted))
 
-	mustRunCmd(t, dir, "git", "add", ".")
+	mustRunCmd(t, dir, env, "git", "add", ".")
 	statusuncommitted, err = v.Status(ctx, subdir)
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.IsTrue(statusuncommitted.Uncommitted))
 
 	commitTime := time.Now().Truncate(time.Second)
-	mustRunCmd(t, dir, "git",
+	mustRunCmd(t, dir, env, "git",
 		"-c", "user.email=cueckoo@gmail.com",
 		"-c", "user.name=cueckoo",
 		"commit", "-m", "something",
@@ -186,9 +186,10 @@ func TestGit(t *testing.T) {
 	qt.Assert(t, qt.IsTrue(statusmissing.Uncommitted))
 }
 
-func mustRunCmd(t *testing.T, dir string, exe string, args ...string) {
+func mustRunCmd(t *testing.T, dir string, env []string, exe string, args ...string) {
 	c := exec.Command(exe, args...)
 	c.Dir = dir
+	c.Env = env
 	data, err := c.CombinedOutput()
 	qt.Assert(t, qt.IsNil(err), qt.Commentf("output: %q", data))
 }

@@ -38,9 +38,9 @@ func TestCommits(t *testing.T) {
 		t.Logf("commit:\n%s", commit)
 
 		dir := t.TempDir()
-		vcs.InitTestEnv(t)
-		mustRunCmd(t, dir, "git", "init")
-		mustRunCmd(t, dir, "git",
+		env := vcs.TestEnv()
+		mustRunCmd(t, dir, env, "git", "init")
+		mustRunCmd(t, dir, env, "git",
 			"-c", "user.email=cueckoo@gmail.com",
 			"-c", "user.name=cueckoo",
 			"commit", "--allow-empty", "-m", string(commit),
@@ -71,9 +71,10 @@ func TestCommits(t *testing.T) {
 	}
 }
 
-func mustRunCmd(t *testing.T, dir string, exe string, args ...string) {
+func mustRunCmd(t *testing.T, dir string, env []string, exe string, args ...string) {
 	cmd := exec.Command(exe, args...)
 	cmd.Dir = dir
+	cmd.Env = env
 	data, err := cmd.CombinedOutput()
 	qt.Assert(t, qt.IsNil(err), qt.Commentf("output: %q", data))
 }

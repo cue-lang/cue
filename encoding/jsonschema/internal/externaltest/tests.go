@@ -91,6 +91,9 @@ func ReadTestDir(dir string) (tests map[string][]*Schema, err error) {
 	os.Setenv("CUE_EXPERIMENT", "embed")
 	inst := load.Instances([]string{"."}, &load.Config{
 		Dir: dir,
+		// Just like in the cue/load tests, prevent Go tests from walking up to the root
+		// directory of the git repository, as that almost always causes test cache misses.
+		ModuleRoot: dir,
 	})[0]
 	if err := inst.Err; err != nil {
 		return nil, err

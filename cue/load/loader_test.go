@@ -635,8 +635,10 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod
 display:.
 files:
-    $CWD/testdata/testmod/test.cue`,
-	}}
+    $CWD/testdata/testmod/anon.cue
+    $CWD/testdata/testmod/test.cue
+imports:
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}}
 	tdtest.Run(t, testCases, func(t *tdtest.T, tc *loadTest) {
 		pkgs := Instances(tc.args, tc.cfg)
 

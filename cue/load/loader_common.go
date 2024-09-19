@@ -243,15 +243,13 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) {
 			return
 		}
 		if q == nil {
-			q = &build.Instance{
-				PkgName: pkg,
-
-				Dir:         p.Dir,
-				DisplayPath: p.DisplayPath,
-				ImportPath:  p.ImportPath + ":" + pkg,
-				Root:        p.Root,
-				Module:      p.Module,
-			}
+			// Copy the original instance including private fields,
+			// because the private fields include the loadFunc, without which
+			// the import logic will not work.
+			q0 := *p
+			q = &q0
+			q.PkgName = pkg
+			q.ImportPath += ":" + pkg
 			fp.pkgs[pkg] = q
 		}
 		p = q

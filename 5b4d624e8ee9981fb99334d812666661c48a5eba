@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f6d5cb7_a5d263c0",
+        "filename": "pkg/encoding/toml/testdata/marshal.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-19T07:54:45Z",
+      "side": 1,
+      "message": "I suspect that the reason these don\u0027t show error messages is that\nthe errors are incompleteness errors, not permanent errors, and the\ntests are doing the equivalent of a `cue eval` not a `cue export`, which\nmeans that it\u0027ll leave function calls with incomplete errors in place,\nbecause they could be made more specific (and hence correct) later.\n\nSo, perhaps remove the TODO?",
+      "revId": "5b4d624e8ee9981fb99334d812666661c48a5eba",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

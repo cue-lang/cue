@@ -17,6 +17,8 @@ package http
 import (
 	"encoding/pem"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -30,10 +32,13 @@ import (
 )
 
 func newTLSServer() *httptest.Server {
-	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		resp := `{"foo": "bar"}`
 		w.Write([]byte(resp))
 	}))
+	// The TLS errors produced by TestTLS would otherwise print noise to stderr.
+	server.Config.ErrorLog = log.New(io.Discard, "", 0)
+	server.StartTLS()
 	return server
 }
 

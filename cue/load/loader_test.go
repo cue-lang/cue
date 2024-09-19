@@ -612,7 +612,31 @@ dir:    $CWD/testdata/testmod/issue3306/x
 display:./issue3306/x
 files:
     $CWD/testdata/testmod/issue3306/x.cue
-    $CWD/testdata/testmod/issue3306/x/x.cue`}}
+    $CWD/testdata/testmod/issue3306/x/x.cue`}, {
+		// This test checks that when we use Package: "*",
+		// we can still use imported packages.
+		name: "AllPackagesWithImports",
+		cfg: &Config{
+			Dir:     testdataDir,
+			Package: "*",
+		},
+		args: []string{"."},
+		want: `path:   mod.test/test@v0:_
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod
+display:.
+files:
+    $CWD/testdata/testmod/anon.cue
+
+path:   mod.test/test@v0:test
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod
+display:.
+files:
+    $CWD/testdata/testmod/test.cue`,
+	}}
 	tdtest.Run(t, testCases, func(t *tdtest.T, tc *loadTest) {
 		pkgs := Instances(tc.args, tc.cfg)
 

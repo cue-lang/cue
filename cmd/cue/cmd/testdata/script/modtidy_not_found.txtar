@@ -6,7 +6,7 @@ module: "main.org@v0"
 language: version: "v0.10.0"
 
 -- want-stderr --
-path "other.test" has no major version
+no versions found for module other.test@v0
 -- main.cue --
 package main
 

@@ -1,0 +1,20 @@
+! exec cue mod get other.test@v0
+cmp stderr want-stderr
+
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.10.0"
+
+-- want-stderr --
+path "other.test" has no major version
+-- main.cue --
+package main
+
+import "other.test/foo"
+x: foo
+
+-- _registry/example.com_v0.0.1/cue.mod/module.cue --
+module: "example.com@v0"
+language: version: "v0.8.0"
+-- _registry/example.com_v0.0.1/top.cue --
+package main

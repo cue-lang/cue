@@ -16,6 +16,24 @@
       "message": "I suspect that the reason these don\u0027t show error messages is that\nthe errors are incompleteness errors, not permanent errors, and the\ntests are doing the equivalent of a `cue eval` not a `cue export`, which\nmeans that it\u0027ll leave function calls with incomplete errors in place,\nbecause they could be made more specific (and hence correct) later.\n\nSo, perhaps remove the TODO?",
       "revId": "5b4d624e8ee9981fb99334d812666661c48a5eba",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b878fdf_f584bb92",
+        "filename": "pkg/encoding/toml/testdata/marshal.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-19T08:54:03Z",
+      "side": 1,
+      "message": "hm. I thought it might be something like that. I would like to see more errors, but I guess export semantics would mean I wouldn\u0027t see the rest of the resulting value, so this is OK for now.",
+      "parentUuid": "0f6d5cb7_a5d263c0",
+      "revId": "5b4d624e8ee9981fb99334d812666661c48a5eba",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

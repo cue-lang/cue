@@ -13,6 +13,7 @@ import (
 	_ "cuelang.org/go/pkg/encoding/csv"
 	_ "cuelang.org/go/pkg/encoding/hex"
 	_ "cuelang.org/go/pkg/encoding/json"
+	_ "cuelang.org/go/pkg/encoding/toml"
 	_ "cuelang.org/go/pkg/encoding/yaml"
 	_ "cuelang.org/go/pkg/html"
 	_ "cuelang.org/go/pkg/list"

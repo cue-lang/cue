@@ -1,0 +1,165 @@
+-- in.cue --
+import "encoding/toml"
+
+marshal: {
+	_input: {
+		rootKey: r1: "foo"
+		rootKeys: {
+			r1: "foo"
+			r2: "bar"
+			r3: "baz"
+		}
+		rootKeysDots: {
+			a1: "foo"
+			b1: b2: "bar"
+			c1: c2: c3: "baz"
+		}
+		subtables: {
+			tables: [
+				{table1: "foo"},
+				{table2: "bar"},
+				{subtable: {sub1: "baz"}}
+			]
+		}
+		complexKeys: "123-456": " foo bar ": "value"
+		defaults: key: string | *"default"
+
+		failIncomplete: key: string | "nondefault"
+		failRequired: key!: "foo"
+	}
+	for name, value in _input {
+		output: (name): toml.Marshal(value)
+	}
+}
+
+unmarshal: {
+	_input: {
+		rootKeysDots: """
+			a1       = "A"
+			b1.b2    = "B"
+			c1.c2.c3 = "C"
+			"""
+		subtables: """
+			[[tables]]
+			table1 = 'foo'
+			[[tables]]
+			table2 = 'bar'
+			[[tables]]
+			[tables.subtable]
+			sub1 = 'baz'
+			"""
+		complexKeys: """
+			[123-456]
+			' foo bar ' = 'value'
+			"""
+		defaultEmpty: string | *""
+
+		failIncomplete: string | ""
+		failBadSyntax: """
+			= "no key name"
+			"""
+		failDuplicate: """
+			foo = "same key"
+			foo = "same key"
+			"""
+	}
+	for name, value in _input {
+		output: (name): toml.Unmarshal(value)
+	}
+}
+
+-- out/toml --
+Errors:
+unmarshal.output.failBadSyntax: error in call to encoding/toml.Unmarshal: invalid character at start of key: =:
+    ./in.cue:66:19
+    1:1
+unmarshal.output.failDuplicate: error in call to encoding/toml.Unmarshal: duplicate key: foo:
+    ./in.cue:66:19
+    2:1
+
+Result:
+import "encoding/toml"
+
+marshal: {
+	output: {
+		rootKey: """
+			r1 = 'foo'
+
+			"""
+		rootKeys: """
+			r1 = 'foo'
+			r2 = 'bar'
+			r3 = 'baz'
+
+			"""
+		rootKeysDots: """
+			a1 = 'foo'
+
+			[b1]
+			b2 = 'bar'
+
+			[c1]
+			[c1.c2]
+			c3 = 'baz'
+
+			"""
+		subtables: """
+			[[tables]]
+			table1 = 'foo'
+
+			[[tables]]
+			table2 = 'bar'
+
+			[[tables]]
+			[tables.subtable]
+			sub1 = 'baz'
+
+			"""
+		complexKeys: """
+			[123-456]
+			' foo bar ' = 'value'
+
+			"""
+		defaults: """
+			key = 'default'
+
+			"""
+		failIncomplete: toml.Marshal(value)
+		failRequired:   toml.Marshal(value)
+	}
+}
+unmarshal: {
+	output: {
+		rootKeysDots: {
+			a1: "A"
+			b1: {
+				b2: "B"
+			}
+			c1: {
+				c2: {
+					c3: "C"
+				}
+			}
+		}
+		subtables: {
+			tables: [{
+				table1: "foo"
+			}, {
+				table2: "bar"
+			}, {
+				subtable: {
+					sub1: "baz"
+				}
+			}]
+		}
+		complexKeys: {
+			"123-456": {
+				" foo bar ": "value"
+			}
+		}
+		defaultEmpty: {}
+		failIncomplete: toml.Unmarshal(value)
+		failBadSyntax:  _|_ // unmarshal.output.failBadSyntax: error in call to encoding/toml.Unmarshal: invalid character at start of key: =
+		failDuplicate:  _|_ // unmarshal.output.failDuplicate: error in call to encoding/toml.Unmarshal: duplicate key: foo
+	}
+}

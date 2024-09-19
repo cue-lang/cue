@@ -20,6 +20,7 @@ import (
 	"cuelabs.dev/go/oci/ociregistry/ocimem"
 	"cuelabs.dev/go/oci/ociregistry/ociserver"
 	"github.com/go-quicktest/qt"
+	"golang.org/x/oauth2"
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/tools/txtar"
 
@@ -210,14 +211,14 @@ package bar
 			auth := r.Header.Get("Authorization")
 			if !strings.HasPrefix(auth, fmt.Sprintf("Bearer access_%d_", i)) {
 				w.WriteHeader(401)
-				w.Write([]byte(fmt.Sprintf("server %d: unexpected auth header: %s", i, auth)))
+				fmt.Fprintf(w, "server %d: unexpected auth header: %s", i, auth)
 				return
 			}
 			rh.ServeHTTP(w, r)
 		})
 		mux.HandleFunc("/login/oauth/token", func(w http.ResponseWriter, r *http.Request) {
 			ctr := atomic.AddInt32(&counter, 1)
-			writeJSON(w, 200, wireToken{
+			writeJSON(w, 200, oauth2.Token{
 				AccessToken:  fmt.Sprintf("access_%d_%d", i, ctr),
 				TokenType:    "Bearer",
 				RefreshToken: fmt.Sprintf("refresh_%d", ctr),
@@ -332,13 +333,4 @@ func writeJSON(w http.ResponseWriter, statusCode int, v any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 	w.Write(b)
-}
-
-// wireToken describes the JSON encoding for an OAuth 2.0 token
-// as specified in the RFC 6749.
-type wireToken struct {
-	AccessToken  string `json:"access_token,omitempty"`
-	TokenType    string `json:"token_type,omitempty"`
-	RefreshToken string `json:"refresh_token,omitempty"`
-	ExpiresIn    int    `json:"expires_in,omitempty"`
 }

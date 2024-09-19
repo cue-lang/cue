@@ -150,6 +150,10 @@ func resolveUpdateVersions(ctx context.Context, reg Registry, rs *modrequirement
 					possibleVersions = append(possibleVersions, v)
 				}
 			}
+			if len(possibleVersions) == 0 {
+				setError(fmt.Errorf("no versions found for module %s", v))
+				return
+			}
 			chosen := latestVersion(possibleVersions)
 			mv, err := module.NewVersion(mpath, chosen)
 			if err != nil {

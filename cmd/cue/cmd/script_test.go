@@ -96,11 +96,7 @@ func TestLatest(t *testing.T) {
 }
 
 func TestScript(t *testing.T) {
-	srv, err := goproxytest.NewServer(filepath.Join("testdata", "mod"), "")
-	if err != nil {
-		t.Fatalf("cannot start proxy: %v", err)
-	}
-	t.Cleanup(srv.Close)
+	srv := goproxytest.NewTestServer(t, filepath.Join("testdata", "mod"), "")
 	p := testscript.Params{
 		Dir:                 filepath.Join("testdata", "script"),
 		UpdateScripts:       cuetest.UpdateGoldenFiles,

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c473b6f2_b7a6aea8",
+        "filename": "go.sum",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-20T11:08:13Z",
+      "side": 1,
+      "message": "We should tag a release of this soon. There\u0027s a bunch of good stuff gone in recently.",
+      "revId": "297aead9d0e42208e03c2a05f1d2b0a785cf86d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

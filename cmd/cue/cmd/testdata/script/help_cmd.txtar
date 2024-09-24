@@ -8,6 +8,14 @@ cmp stdout cue-help-cmd.stdout
 exec cue help cmd hello
 cmp stdout cue-help-cmd-hello.stdout
 
+exec cue help cmd hello .
+cmp stdout cue-help-cmd-hello.stdout
+
+mkdir subdir
+cp task_tool.cue subdir
+exec cue help cmd hello ./subdir
+cmp stdout cue-help-cmd-hello.stdout
+
 ! exec cue help cmd missing
 stderr -count=1 'Unknown cmd command: missing'
 stderr -count=1 '^Available Commands:$'

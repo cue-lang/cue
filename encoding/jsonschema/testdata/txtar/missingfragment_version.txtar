@@ -7,6 +7,6 @@
   "type": "string"
 }
 -- out/decode/extract --
-ERROR:
-invalid $schema URL "http://json-schema.org/draft-04/schema": $schema URI not recognized:
-    schema.json:2:3
+@jsonschema(schema="http://json-schema.org/draft-04/schema#")
+@jsonschema(id="http://example.test")
+string

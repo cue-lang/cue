@@ -180,7 +180,6 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) {
 		fp.err = errors.Append(fp.err, err)
 		file.ExcludeReason = fp.err
 		p.InvalidFiles = append(p.InvalidFiles, file)
-		return
 	}
 	if err := setFileSource(fp.c, file); err != nil {
 		badFile(errors.Promote(err, ""))

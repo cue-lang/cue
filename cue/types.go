@@ -127,7 +127,7 @@ func (o *hiddenStructValue) Lookup(key string) Value {
 		}
 	}
 	if i == len {
-		x := mkErr(o.v.idx, o.obj, 0, "field not found: %v", key)
+		x := mkErr(o.obj, 0, "field not found: %v", key)
 		x.NotExists = true
 		// TODO: more specifically we should test whether the values that
 		// are addressable from the root of the configuration can support the
@@ -180,7 +180,7 @@ func toMarshalErr(v Value, b *adt.Bottom) error {
 
 func marshalErrf(v Value, src adt.Node, code adt.ErrorCode, msg string, args ...interface{}) error {
 	arguments := append([]interface{}{code, msg}, args...)
-	b := mkErr(v.idx, src, arguments...)
+	b := mkErr(src, arguments...)
 	return toMarshalErr(v, b)
 }
 
@@ -962,8 +962,7 @@ func (v Value) Syntax(opts ...Option) ast.Node {
 	if v.v == nil {
 		return nil
 	}
-	var o options = getOptions(opts)
-	// var inst *Instance
+	o := getOptions(opts)
 
 	p := export.Profile{
 		Simplify:        !o.raw,
@@ -1251,11 +1250,11 @@ func (v Value) checkKind(ctx *adt.OpContext, want adt.Kind) *adt.Bottom {
 	k := x.Kind()
 	if want != adt.BottomKind {
 		if k&want == adt.BottomKind {
-			return mkErr(v.idx, x, "cannot use value %v (type %s) as %s",
+			return mkErr(x, "cannot use value %v (type %s) as %s",
 				ctx.Str(x), k, want)
 		}
 		if !adt.IsConcrete(x) {
-			return mkErr(v.idx, x, adt.IncompleteError, "non-concrete value %v", k)
+			return mkErr(x, adt.IncompleteError, "non-concrete value %v", k)
 		}
 	}
 	return nil
@@ -1298,7 +1297,7 @@ func (v Value) Len() Value {
 		}
 	}
 	const msg = "len not supported for type %v"
-	return remakeValue(v, nil, mkErr(v.idx, v.v, msg, v.Kind()))
+	return remakeValue(v, nil, mkErr(v.v, msg, v.Kind()))
 
 }
 
@@ -1735,7 +1734,7 @@ func (v Value) FillPath(p Path, x interface{}) Value {
 	}
 	ctx := v.ctx()
 	if err := p.Err(); err != nil {
-		return newErrValue(v, mkErr(v.idx, nil, 0, "invalid path: %v", err))
+		return newErrValue(v, mkErr(nil, 0, "invalid path: %v", err))
 	}
 	var expr adt.Expr
 	switch x := x.(type) {

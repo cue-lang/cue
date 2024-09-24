@@ -18,7 +18,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/internal/core/runtime"
 )
 
 func (v Value) toErr(b *adt.Bottom) (err errors.Error) {
@@ -96,7 +95,7 @@ var errNotExists = &adt.Bottom{
 	Err:       errors.Newf(token.NoPos, "undefined value"),
 }
 
-func mkErr(idx *runtime.Runtime, src adt.Node, args ...interface{}) *adt.Bottom {
+func mkErr(src adt.Node, args ...interface{}) *adt.Bottom {
 	var e *adt.Bottom
 	var code adt.ErrorCode = -1
 outer:

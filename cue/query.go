@@ -74,7 +74,7 @@ outer:
 		if err, ok := sel.sel.(pathError); ok {
 			x = &adt.Bottom{Err: err.Error}
 		} else {
-			x = mkErr(v.idx, n, adt.EvalError, "field not found: %v", sel.sel)
+			x = mkErr(n, adt.EvalError, "field not found: %v", sel.sel)
 			if n.Accept(ctx, f) {
 				x.Code = adt.IncompleteError
 			}

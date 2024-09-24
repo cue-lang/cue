@@ -426,8 +426,6 @@ func (n *nodeContext) completeNodeTasks(mode runMode) {
 
 		cc.decDependent(n.ctx, ROOT, nil) // REF(decrement:nodeDone)
 	}
-
-	return
 }
 
 func (n *nodeContext) updateScalar() {

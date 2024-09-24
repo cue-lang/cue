@@ -17,7 +17,6 @@ package astinternal
 import (
 	"fmt"
 	gotoken "go/token"
-	"io"
 	"reflect"
 	"strconv"
 	"strings"
@@ -52,7 +51,6 @@ type DebugConfig struct {
 }
 
 type debugPrinter struct {
-	w     io.Writer
 	buf   []byte
 	cfg   DebugConfig
 	level int

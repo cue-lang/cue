@@ -58,10 +58,12 @@ func newHelpCmd(c *Command) *cobra.Command {
 				//	["cmd", "mycmd"]
 				//	["cmd", "mycmd", "./mypkg"]
 				//
-				// We want to skip the first two arguments in pkgArgs.
-				pkgArgs := args[1:]
-				if len(pkgArgs) > 0 {
-					pkgArgs = pkgArgs[1:]
+				// In the third case, we want to load ["./mypkg"]
+				// and we want to look up the help for ["cmd", "mycmd"].
+				var pkgArgs []string
+				if len(args) > 2 {
+					pkgArgs = args[2:]
+					args = args[:2]
 				}
 
 				tools, err := buildTools(c, pkgArgs)

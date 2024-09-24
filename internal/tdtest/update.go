@@ -53,27 +53,18 @@ type callInfo struct {
 	fieldName string
 }
 
-var (
-	once    sync.Once
-	pkgs    []*packages.Package
-	pkgsErr error
-)
+var loadPackages = sync.OnceValues(func() ([]*packages.Package, error) {
+	cfg := &packages.Config{
+		Mode: packages.NeedFiles |
+			packages.NeedDeps |
+			packages.NeedTypes |
+			packages.NeedTypesInfo |
+			packages.NeedSyntax,
+		Tests: true,
+	}
 
-func initPackages() ([]*packages.Package, error) {
-	once.Do(func() {
-		cfg := &packages.Config{
-			Mode: packages.NeedFiles |
-				packages.NeedDeps |
-				packages.NeedTypes |
-				packages.NeedTypesInfo |
-				packages.NeedSyntax,
-			Tests: true,
-		}
-
-		pkgs, pkgsErr = packages.Load(cfg, ".")
-	})
-	return pkgs, pkgsErr
-}
+	return packages.Load(cfg, ".")
+})
 
 func (s *set[T]) getInfo(file string) *info {
 	if s.info != nil {
@@ -89,7 +80,7 @@ func (s *set[T]) getInfo(file string) *info {
 
 	t := s.t
 
-	pkgs, pkgsErr = initPackages()
+	pkgs, pkgsErr := loadPackages()
 	if pkgsErr != nil {
 		t.Fatalf("load: %v\n", pkgsErr)
 	}

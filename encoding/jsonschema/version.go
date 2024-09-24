@@ -16,6 +16,7 @@ package jsonschema
 
 import (
 	"fmt"
+	"strings"
 )
 
 //go:generate go run golang.org/x/tools/cmd/stringer -type=Version -linecomment
@@ -74,10 +75,15 @@ func vto(v Version) versionSet {
 
 // ParseVersion parses a version URI that defines a JSON Schema version.
 func ParseVersion(sv string) (Version, error) {
+	// Ignore a trailing empty fragment: it's a common error
+	// to omit or supply such a fragment and it's not entirely
+	// clear whether comparison should or should not
+	// be sensitive to its presence or absence.
+	sv = strings.TrimSuffix(sv, "#")
 	// If this linear search is ever a performance issue, we could
 	// build a map, but it doesn't seem worthwhile for now.
 	for i := Version(1); i < numJSONSchemaVersions; i++ {
-		if sv == i.String() {
+		if sv == strings.TrimSuffix(i.String(), "#") {
 			return i, nil
 		}
 	}

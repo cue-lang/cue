@@ -167,7 +167,6 @@ Global Flags:
   -E, --all-errors   print all available errors
   -i, --ignore       proceed in the presence of errors
   -s, --simplify     simplify output
-      --strict       report errors for lossy mappings (deprecated: use "jsonschema+strict:" filetype instead; see cue help filetypes)
       --trace        trace computation
   -v, --verbose      print information about progress
 
@@ -182,6 +181,5 @@ Global Flags:
   -E, --all-errors   print all available errors
   -i, --ignore       proceed in the presence of errors
   -s, --simplify     simplify output
-      --strict       report errors for lossy mappings (deprecated: use "jsonschema+strict:" filetype instead; see cue help filetypes)
       --trace        trace computation
   -v, --verbose      print information about progress

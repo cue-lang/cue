@@ -1,0 +1,12 @@
+// This tests that we can use an ID without the conventional empty fragment that's
+// present in the canonical URI.
+-- schema.json --
+{
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "id": "http://example.test",
+  "type": "string"
+}
+-- out/decode/extract --
+ERROR:
+invalid $schema URL "http://json-schema.org/draft-04/schema": $schema URI not recognized:
+    schema.json:2:3

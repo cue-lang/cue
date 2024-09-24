@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b36f8f7e_a99ac6fe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-24T10:51:05Z",
+      "side": 1,
+      "message": "I would also mention explicitly what the spec says about this, for clarity.",
+      "revId": "b3f8fd5c73ea4ad042bbedf302f7bdf3fe4e5ba7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

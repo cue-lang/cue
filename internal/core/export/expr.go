@@ -15,8 +15,9 @@
 package export
 
 import (
+	"cmp"
 	"fmt"
-	"sort"
+	"slices"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
@@ -184,17 +185,20 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 	// Sort fields in case features lists are missing to ensure
 	// predictability. Also sort in reverse order, so that bugs
 	// are more likely exposed.
-	sort.Slice(fields, func(i, j int) bool {
-		return fields[i] > fields[j]
+	slices.SortFunc(fields, func(f1, f2 adt.Feature) int {
+		return -cmp.Compare(f1, f2)
 	})
 
 	if adt.DebugSort == 0 {
 		m := sortArcs(extractFeatures(e.structs))
-		sort.SliceStable(fields, func(i, j int) bool {
-			if m[fields[j]] == 0 {
-				return m[fields[i]] != 0
+		slices.SortStableFunc(fields, func(f1, f2 adt.Feature) int {
+			if m[f2] == 0 {
+				if m[f1] == 0 {
+					return +1
+				}
+				return -1
 			}
-			return m[fields[i]] > m[fields[j]]
+			return -cmp.Compare(m[f1], m[f2])
 		})
 	} else {
 		adt.DebugSortFields(e.ctx, fields)

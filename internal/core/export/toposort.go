@@ -15,7 +15,8 @@
 package export
 
 import (
-	"sort"
+	"cmp"
+	"slices"
 
 	"cuelang.org/go/internal/core/adt"
 )
@@ -88,7 +89,7 @@ func sortedArcsFromMap(m map[adt.Feature]int) []adt.Feature {
 		a = append(a, k)
 	}
 
-	sort.Slice(a, func(i, j int) bool { return m[a[i]] > m[a[j]] })
+	slices.SortFunc(a, func(a1, a2 adt.Feature) int { return -cmp.Compare(m[a1], m[a2]) })
 
 	return a
 }

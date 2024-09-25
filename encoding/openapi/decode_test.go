@@ -28,11 +28,14 @@ import (
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/openapi"
 	"cuelang.org/go/encoding/yaml"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cuetest"
 )
 
@@ -57,17 +60,18 @@ func TestDecode(t *testing.T) {
 
 			cfg := &openapi.Config{PkgName: "foo"}
 
-			r := &cue.Runtime{}
-			var in *cue.Instance
+			var inFile *ast.File
 			var out, errout []byte
 			outIndex := -1
 
 			for i, f := range a.Files {
 				switch path.Ext(f.Name) {
 				case ".json":
-					in, err = json.Decode(r, f.Name, f.Data)
+					var inExpr ast.Expr
+					inExpr, err = json.Extract(f.Name, f.Data)
+					inFile = internal.ToFile(inExpr)
 				case ".yaml":
-					in, err = yaml.Decode(r, f.Name, f.Data)
+					inFile, err = yaml.Extract(f.Name, f.Data)
 				case ".cue":
 					out = f.Data
 					outIndex = i
@@ -78,8 +82,13 @@ func TestDecode(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+			ctx := cuecontext.New()
+			in := ctx.BuildFile(inFile)
+			if err := in.Err(); err != nil {
+				t.Fatal(err)
+			}
 
-			expr, err := openapi.Extract(in, cfg)
+			gotFile, err := openapi.Extract(in, cfg)
 			if err != nil && errout == nil {
 				t.Fatal(errors.Details(err, nil))
 			}
@@ -91,15 +100,16 @@ func TestDecode(t *testing.T) {
 				t.Error(diff)
 			}
 
-			if expr != nil {
-				b, err := format.Node(expr, format.Simplify())
-				if err != nil {
-					t.Fatal(err)
+			if gotFile != nil {
+				// verify the generated CUE.
+				v := ctx.BuildFile(gotFile, cue.Filename(fullpath))
+				if err := v.Err(); err != nil {
+					t.Fatal(errors.Details(err, nil))
 				}
 
-				// verify the generated CUE.
-				if _, err = r.Compile(fullpath, b); err != nil {
-					t.Fatal(errors.Details(err, nil))
+				b, err := format.Node(gotFile, format.Simplify())
+				if err != nil {
+					t.Fatal(err)
 				}
 
 				b = bytes.TrimSpace(b)

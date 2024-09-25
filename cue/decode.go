@@ -118,7 +118,7 @@ func (d *decoder) decode(x reflect.Value, v Value, isPtr bool) {
 	ij, it, x := indirect(x, v.IsNull())
 
 	if ij != nil {
-		b, err := v.marshalJSON()
+		b, err := v.appendJSON(nil)
 		d.addErr(err)
 		d.addErr(ij.UnmarshalJSON(b))
 		return

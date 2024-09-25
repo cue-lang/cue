@@ -143,7 +143,7 @@ func (o *hiddenStructValue) Lookup(key string) Value {
 
 // MarshalJSON returns a valid JSON encoding or reports an error if any of the
 // fields is invalid.
-func (o *structValue) marshalJSON() (b []byte, err error) {
+func (o *structValue) appendJSON(b []byte) ([]byte, error) {
 	b = append(b, '{')
 	n := o.Len()
 	for i := range n {
@@ -154,11 +154,10 @@ func (o *structValue) marshalJSON() (b []byte, err error) {
 		}
 		b = append(b, s...)
 		b = append(b, ':')
-		bb, err := v.marshalJSON()
+		b, err = v.appendJSON(b)
 		if err != nil {
 			return nil, err
 		}
-		b = append(b, bb...)
 		if i < n-1 {
 			b = append(b, ',')
 		}
@@ -294,15 +293,15 @@ func (i *hiddenIterator) IsDefinition() bool {
 
 // marshalJSON iterates over the list and generates JSON output. HasNext
 // will return false after this operation.
-func marshalList(l *Iterator) (b []byte, err error) {
+func listAppendJSON(b []byte, l *Iterator) ([]byte, error) {
 	b = append(b, '[')
 	if l.Next() {
 		for i := 0; ; i++ {
-			x, err := l.Value().marshalJSON()
+			var err error
+			b, err = l.Value().appendJSON(b)
 			if err != nil {
 				return nil, err
 			}
-			b = append(b, x...)
 			if !l.Next() {
 				break
 			}
@@ -901,17 +900,17 @@ func (v Value) IncompleteKind() Kind {
 
 // MarshalJSON marshalls this value into valid JSON.
 func (v Value) MarshalJSON() (b []byte, err error) {
-	b, err = v.marshalJSON()
+	b, err = v.appendJSON(nil)
 	if err != nil {
 		return nil, unwrapJSONError(err)
 	}
 	return b, nil
 }
 
-func (v Value) marshalJSON() (b []byte, err error) {
+func (v Value) appendJSON(b []byte) ([]byte, error) {
 	v, _ = v.Default()
 	if v.v == nil {
-		return []byte("null"), nil
+		return append(b, "null"...), nil
 	}
 	ctx := newContext(v.idx)
 	x := v.eval(ctx)
@@ -926,26 +925,29 @@ func (v Value) marshalJSON() (b []byte, err error) {
 	// TODO: implement marshalles in value.
 	switch k := x.Kind(); k {
 	case adt.NullKind:
-		return []byte("null"), nil
+		return append(b, "null"...), nil
 	case adt.BoolKind:
-		return internaljson.Marshal(x.(*adt.Bool).B)
+		b2, err := internaljson.Marshal(x.(*adt.Bool).B)
+		return append(b, b2...), err
 	case adt.IntKind, adt.FloatKind, adt.NumberKind:
-		b, err := x.(*adt.Num).X.MarshalText()
-		b = bytes.TrimLeft(b, "+")
-		return b, err
+		b2, err := x.(*adt.Num).X.MarshalText()
+		b2 = bytes.TrimLeft(b2, "+")
+		return append(b, b2...), err
 	case adt.StringKind:
-		return internaljson.Marshal(x.(*adt.String).Str)
+		b2, err := internaljson.Marshal(x.(*adt.String).Str)
+		return append(b, b2...), err
 	case adt.BytesKind:
-		return internaljson.Marshal(x.(*adt.Bytes).B)
+		b2, err := internaljson.Marshal(x.(*adt.Bytes).B)
+		return append(b, b2...), err
 	case adt.ListKind:
 		i, _ := v.List()
-		return marshalList(&i)
+		return listAppendJSON(b, &i)
 	case adt.StructKind:
 		obj, err := v.structValData(ctx)
 		if err != nil {
 			return nil, toMarshalErr(v, err)
 		}
-		return obj.marshalJSON()
+		return obj.appendJSON(b)
 	case adt.BottomKind:
 		return nil, toMarshalErr(v, x.(*adt.Bottom))
 	default:

@@ -155,7 +155,7 @@ func (o *structValue) appendJSON(b []byte) ([]byte, error) {
 		}
 		b = append(b, s...)
 		b = append(b, ':')
-		b, err = v.appendJSON(b)
+		b, err = v.appendJSON(o.ctx, b)
 		if err != nil {
 			return nil, err
 		}
@@ -299,7 +299,7 @@ func listAppendJSON(b []byte, l *Iterator) ([]byte, error) {
 	if l.Next() {
 		for i := 0; ; i++ {
 			var err error
-			b, err = l.Value().appendJSON(b)
+			b, err = l.Value().appendJSON(l.ctx, b)
 			if err != nil {
 				return nil, err
 			}
@@ -901,19 +901,19 @@ func (v Value) IncompleteKind() Kind {
 
 // MarshalJSON marshalls this value into valid JSON.
 func (v Value) MarshalJSON() (b []byte, err error) {
-	b, err = v.appendJSON(nil)
+	ctx := newContext(v.idx)
+	b, err = v.appendJSON(ctx, nil)
 	if err != nil {
 		return nil, unwrapJSONError(err)
 	}
 	return b, nil
 }
 
-func (v Value) appendJSON(b []byte) ([]byte, error) {
+func (v Value) appendJSON(ctx *adt.OpContext, b []byte) ([]byte, error) {
 	v, _ = v.Default()
 	if v.v == nil {
 		return append(b, "null"...), nil
 	}
-	ctx := newContext(v.idx)
 	x := v.eval(ctx)
 
 	if _, ok := x.(adt.Resolver); ok {

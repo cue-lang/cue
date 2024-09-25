@@ -911,7 +911,7 @@ func (v Value) MarshalJSON() (b []byte, err error) {
 func (v Value) marshalJSON() (b []byte, err error) {
 	v, _ = v.Default()
 	if v.v == nil {
-		return internaljson.Marshal(nil)
+		return []byte("null"), nil
 	}
 	ctx := newContext(v.idx)
 	x := v.eval(ctx)
@@ -926,7 +926,7 @@ func (v Value) marshalJSON() (b []byte, err error) {
 	// TODO: implement marshalles in value.
 	switch k := x.Kind(); k {
 	case adt.NullKind:
-		return internaljson.Marshal(nil)
+		return []byte("null"), nil
 	case adt.BoolKind:
 		return internaljson.Marshal(x.(*adt.Bool).B)
 	case adt.IntKind, adt.FloatKind, adt.NumberKind:

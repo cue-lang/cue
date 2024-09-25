@@ -148,6 +148,7 @@ func (o *structValue) appendJSON(b []byte) ([]byte, error) {
 	n := o.Len()
 	for i := range n {
 		k, v := o.At(i)
+		// Do not use json.Marshal as it escapes HTML.
 		s, err := internaljson.Marshal(k)
 		if err != nil {
 			return nil, err
@@ -927,17 +928,20 @@ func (v Value) appendJSON(b []byte) ([]byte, error) {
 	case adt.NullKind:
 		return append(b, "null"...), nil
 	case adt.BoolKind:
-		b2, err := internaljson.Marshal(x.(*adt.Bool).B)
+		b2, err := json.Marshal(x.(*adt.Bool).B)
 		return append(b, b2...), err
 	case adt.IntKind, adt.FloatKind, adt.NumberKind:
+		// TODO(mvdan): MarshalText does not guarantee valid JSON,
+		// but apd.Decimal does not expose a MarshalJSON method either.
 		b2, err := x.(*adt.Num).X.MarshalText()
 		b2 = bytes.TrimLeft(b2, "+")
 		return append(b, b2...), err
 	case adt.StringKind:
+		// Do not use json.Marshal as it escapes HTML.
 		b2, err := internaljson.Marshal(x.(*adt.String).Str)
 		return append(b, b2...), err
 	case adt.BytesKind:
-		b2, err := internaljson.Marshal(x.(*adt.Bytes).B)
+		b2, err := json.Marshal(x.(*adt.Bytes).B)
 		return append(b, b2...), err
 	case adt.ListKind:
 		i, _ := v.List()

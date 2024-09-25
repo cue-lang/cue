@@ -28,7 +28,6 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
-	internalvalue "cuelang.org/go/internal/value"
 )
 
 type buildContext struct {
@@ -77,7 +76,6 @@ type typeFunc func(b *builder, a cue.Value)
 
 func schemas(g *Generator, inst cue.InstanceOrValue) (schemas *ast.StructLit, err error) {
 	val := inst.Value()
-	_, isInstance := inst.(*cue.Instance)
 	var fieldFilter *regexp.Regexp
 	if g.FieldFilter != "" {
 		fieldFilter, err = regexp.Compile(g.FieldFilter)
@@ -110,37 +108,6 @@ func schemas(g *Generator, inst cue.InstanceOrValue) (schemas *ast.StructLit, er
 		schemas:      &OrderedMap{},
 		externalRefs: map[string]*externalType{},
 		fieldFilter:  fieldFilter,
-	}
-	if g.ReferenceFunc != nil {
-		if !isInstance {
-			panic("cannot use ReferenceFunc along with cue.Value")
-		}
-		if g.NameFunc != nil {
-			panic("cannot specify both ReferenceFunc and NameFunc")
-		}
-
-		c.nameFunc = func(val cue.Value, path cue.Path) string {
-			sels := path.Selectors()
-			labels := make([]string, len(sels))
-			for i, sel := range sels {
-				labels[i] = selectorLabel(sel) // TODO this is arguably incorrect.
-			}
-			inst, ok := c.imports[val]
-			if !ok {
-				r, n := internalvalue.ToInternal(val)
-				buildInst := r.GetInstanceFromNode(n)
-				var err error
-				inst, err = (*cue.Runtime)(r).Build(buildInst)
-				if err != nil {
-					panic("cannot build instance from value")
-				}
-				if c.imports == nil {
-					c.imports = make(map[cue.Value]*cue.Instance)
-				}
-				c.imports[val] = inst
-			}
-			return g.ReferenceFunc(inst, labels)
-		}
 	}
 
 	switch g.Version {

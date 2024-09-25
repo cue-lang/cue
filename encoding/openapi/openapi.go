@@ -36,16 +36,6 @@ type Config struct {
 	// Info may be a *ast.StructLit or any type that marshals to JSON.
 	Info interface{}
 
-	// ReferenceFunc allows users to specify an alternative representation
-	// for references. An empty string tells the generator to expand the type
-	// in place and, if applicable, not generate a schema for that entity.
-	//
-	// If this field is non-nil and a cue.Value is passed as the InstanceOrValue,
-	// there will be a panic.
-	//
-	// Deprecated: use NameFunc instead.
-	ReferenceFunc func(inst *cue.Instance, path []string) string
-
 	// NameFunc allows users to specify an alternative representation
 	// for references. It is called with the value passed to the top level
 	// method or function and the path to the entity being generated.

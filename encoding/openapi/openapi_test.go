@@ -25,7 +25,6 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
@@ -42,38 +41,20 @@ func TestParseDefinitions(t *testing.T) {
 	resolveRefs := &openapi.Config{Info: info, ExpandReferences: true}
 
 	testCases := []struct {
-		in, out      string
-		variant      string
-		instanceOnly bool
-		valueOnly    bool
-		config       *openapi.Config
-		err          string
+		in, out string
+		variant string
+		config  *openapi.Config
+		err     string
 	}{{
 		in:     "structural.cue",
 		out:    "structural.json",
 		config: resolveRefs,
 	}, {
-		in:           "structural.cue",
-		variant:      "+ReferenceFunc",
-		out:          "structural.json",
-		instanceOnly: true,
+		in:  "protobuf.cue",
+		out: "protobuf.json",
 		config: &openapi.Config{
 			Info:             info,
 			ExpandReferences: true,
-			ReferenceFunc: func(v *cue.Instance, path []string) string {
-				return strings.Join(path, "_")
-			},
-		},
-	}, {
-		in:           "protobuf.cue",
-		out:          "protobuf.json",
-		instanceOnly: true,
-		config: &openapi.Config{
-			Info:             info,
-			ExpandReferences: true,
-			ReferenceFunc: func(p *cue.Instance, path []string) string {
-				return strings.Join(path, ".")
-			},
 		},
 	}, {
 		in:     "nested.cue",
@@ -161,20 +142,6 @@ func TestParseDefinitions(t *testing.T) {
 			},
 		},
 	}, {
-		in:           "oneof.cue",
-		out:          "oneof-funcs.json",
-		variant:      "+ReferenceFunc",
-		instanceOnly: true,
-		config: &openapi.Config{
-			Info: info,
-			ReferenceFunc: func(v *cue.Instance, path []string) string {
-				return strings.ToUpper(strings.Join(path, "_"))
-			},
-			DescriptionFunc: func(v cue.Value) string {
-				return "Randomly picked description from a set of size one."
-			},
-		},
-	}, {
 		in:  "refs.cue",
 		out: "refs.json",
 		config: &openapi.Config{
@@ -185,21 +152,6 @@ func TestParseDefinitions(t *testing.T) {
 					return ""
 				}
 				return strings.TrimPrefix(path.String(), "#")
-			},
-		},
-	}, {
-		in:           "refs.cue",
-		out:          "refs.json",
-		variant:      "+ReferenceFunc",
-		instanceOnly: true,
-		config: &openapi.Config{
-			Info: info,
-			ReferenceFunc: func(v *cue.Instance, path []string) string {
-				switch {
-				case strings.HasPrefix(path[0], "Excluded"):
-					return ""
-				}
-				return strings.Join(path, ".")
 			},
 		},
 	}, {
@@ -268,27 +220,12 @@ func TestParseDefinitions(t *testing.T) {
 			inst := load.Instances([]string{filename}, &load.Config{
 				Dir: "./testdata",
 			})[0]
-			if !tc.valueOnly {
-				t.Run("Instance", func(t *testing.T) {
-					// Old style call, with *cue.Instance.
-					inst := cue.Build([]*build.Instance{inst})[0]
-					if inst.Err != nil {
-						t.Fatal(errors.Details(inst.Err, nil))
-					}
-					run(t, inst)
-				})
+			ctx := cuecontext.New()
+			v := ctx.BuildInstance(inst)
+			if err := v.Err(); err != nil {
+				t.Fatal(errors.Details(err, nil))
 			}
-			if !tc.instanceOnly {
-				t.Run("Value", func(t *testing.T) {
-					// New style call, with cue.Value
-					ctx := cuecontext.New()
-					v := ctx.BuildInstance(inst)
-					if err := v.Err(); err != nil {
-						t.Fatal(errors.Details(err, nil))
-					}
-					run(t, v)
-				})
-			}
+			run(t, v)
 		})
 	}
 }

@@ -154,7 +154,7 @@ func (o *structValue) marshalJSON() (b []byte, err error) {
 		}
 		b = append(b, s...)
 		b = append(b, ':')
-		bb, err := internaljson.Marshal(v)
+		bb, err := v.marshalJSON()
 		if err != nil {
 			return nil, err
 		}
@@ -298,7 +298,7 @@ func marshalList(l *Iterator) (b []byte, err error) {
 	b = append(b, '[')
 	if l.Next() {
 		for i := 0; ; i++ {
-			x, err := internaljson.Marshal(l.Value())
+			x, err := l.Value().marshalJSON()
 			if err != nil {
 				return nil, err
 			}

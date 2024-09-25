@@ -143,20 +143,20 @@ func (o *hiddenStructValue) Lookup(key string) Value {
 
 // MarshalJSON returns a valid JSON encoding or reports an error if any of the
 // fields is invalid.
-func (o *structValue) marshalJSON() (b []byte, err errors.Error) {
+func (o *structValue) marshalJSON() (b []byte, err error) {
 	b = append(b, '{')
 	n := o.Len()
 	for i := range n {
 		k, v := o.At(i)
 		s, err := internaljson.Marshal(k)
 		if err != nil {
-			return nil, unwrapJSONError(err)
+			return nil, err
 		}
 		b = append(b, s...)
 		b = append(b, ':')
 		bb, err := internaljson.Marshal(v)
 		if err != nil {
-			return nil, unwrapJSONError(err)
+			return nil, err
 		}
 		b = append(b, bb...)
 		if i < n-1 {
@@ -294,13 +294,13 @@ func (i *hiddenIterator) IsDefinition() bool {
 
 // marshalJSON iterates over the list and generates JSON output. HasNext
 // will return false after this operation.
-func marshalList(l *Iterator) (b []byte, err errors.Error) {
+func marshalList(l *Iterator) (b []byte, err error) {
 	b = append(b, '[')
 	if l.Next() {
 		for i := 0; ; i++ {
 			x, err := internaljson.Marshal(l.Value())
 			if err != nil {
-				return nil, unwrapJSONError(err)
+				return nil, err
 			}
 			b = append(b, x...)
 			if !l.Next() {

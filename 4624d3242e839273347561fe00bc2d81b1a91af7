@@ -16,6 +16,24 @@
       "message": "It would be nice to see the results from the new benchmark for each incremental change in the CL stack, perhaps? Given that\u0027s presumably what this is targeted at.",
       "revId": "4624d3242e839273347561fe00bc2d81b1a91af7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "872edbda_dd2980ea",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-25T21:53:55Z",
+      "side": 1,
+      "message": "i have done that for the changes which affect the benchmark. this one does not, it\u0027s entirely unrelated to the issue and benchmark, as it relates to converting go values. i just found this weirdness while reading the other code.",
+      "parentUuid": "a57f7bf8_d21b69c5",
+      "revId": "4624d3242e839273347561fe00bc2d81b1a91af7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

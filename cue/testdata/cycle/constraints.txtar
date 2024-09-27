@@ -445,11 +445,11 @@ Conjuncts:    321
 Disjuncts:    147
 -- out/evalalpha --
 Errors:
-mutuallyTriggeringCycle.t1.x.c.b.b.b.b: structural cycle
-noCancelSelfInvoke.t1.x.c.b.b.b: structural cycle
+mutuallyTriggeringCycle.t1.x.c.b.b.b.b.b.b: structural cycle
+noCancelSelfInvoke.t1.x.c.b.b.b.b.b: structural cycle
 noCancelSelfInvoke.t1.x.c.c: structural cycle
 selfTriggerCycle.issue1503.#T.a.b.link: structural cycle
-selfTriggerCycle.long1.a.c.b.c.b.c.b.c.b: structural cycle
+selfTriggerCycle.long1.a.c.b.c.b.c.b: structural cycle
 selfTriggerCycle.t1.#T.b.b: structural cycle
 selfTriggerCycle.t2.b.c.a: structural cycle
 
@@ -649,7 +649,13 @@ Result:
             b: (_|_){
               // [structural cycle]
               b: (_|_){
-                // [structural cycle] noCancelSelfInvoke.t1.x.c.b.b.b: structural cycle
+                // [structural cycle]
+                b: (_|_){
+                  // [structural cycle]
+                  b: (_|_){
+                    // [structural cycle] noCancelSelfInvoke.t1.x.c.b.b.b.b.b: structural cycle
+                  }
+                }
               }
             }
           }
@@ -664,7 +670,15 @@ Result:
     // [structural cycle]
     t1: (_|_){
       // [structural cycle]
-      a: ~(selfTriggerCycle.t1.#T)
+      a: (_|_){
+        // [structural cycle]
+        b: (_|_){
+          // [structural cycle]
+          b: (_|_){
+            // [structural cycle] selfTriggerCycle.t1.#T.b.b: structural cycle
+          }
+        }
+      }
       #T: (_|_){
         // [structural cycle]
         b: (_|_){
@@ -704,13 +718,7 @@ Result:
                 c: (_|_){
                   // [structural cycle]
                   b: (_|_){
-                    // [structural cycle]
-                    c: (_|_){
-                      // [structural cycle]
-                      b: (_|_){
-                        // [structural cycle] selfTriggerCycle.long1.a.c.b.c.b.c.b.c.b: structural cycle
-                      }
-                    }
+                    // [structural cycle] selfTriggerCycle.long1.a.c.b.c.b.c.b: structural cycle
                   }
                 }
               }
@@ -733,18 +741,33 @@ Result:
                 // [structural cycle]
                 two: (_|_){
                   // [structural cycle]
-                  link: ~(selfTriggerCycle.issue1503.#T)
+                  link: (_|_){
+                    // [structural cycle]
+                    a: (_|_){
+                      // [structural cycle]
+                      b: (_|_){
+                        // [structural cycle]
+                        link: (_|_){
+                          // [structural cycle] selfTriggerCycle.issue1503.#T.a.b.link: structural cycle
+                        }
+                      }
+                    }
+                  }
                 }
                 b: (_|_){
                   // [structural cycle]
-                  link: ~(selfTriggerCycle.issue1503.#T)
+                  link: (_|_){
+                    // [structural cycle]
+                  }
                 }
               }
             }
           }
           b: (_|_){
             // [structural cycle]
-            link: ~(selfTriggerCycle.issue1503.#T)
+            link: (_|_){
+              // [structural cycle]
+            }
           }
         }
       }
@@ -779,7 +802,13 @@ Result:
               b: (_|_){
                 // [structural cycle]
                 b: (_|_){
-                  // [structural cycle] mutuallyTriggeringCycle.t1.x.c.b.b.b.b: structural cycle
+                  // [structural cycle]
+                  b: (_|_){
+                    // [structural cycle]
+                    b: (_|_){
+                      // [structural cycle] mutuallyTriggeringCycle.t1.x.c.b.b.b.b.b.b: structural cycle
+                    }
+                  }
                 }
               }
             }
@@ -793,7 +822,20 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -198,18 +198,18 @@
+@@ -1,9 +1,9 @@
+ Errors:
+-mutuallyTriggeringCycle.t1.x.c.b.b.b.b: structural cycle
+-noCancelSelfInvoke.t1.x.c.b.b.b: structural cycle
++mutuallyTriggeringCycle.t1.x.c.b.b.b.b.b.b: structural cycle
++noCancelSelfInvoke.t1.x.c.b.b.b.b.b: structural cycle
+ noCancelSelfInvoke.t1.x.c.c: structural cycle
+ selfTriggerCycle.issue1503.#T.a.b.link: structural cycle
+-selfTriggerCycle.long1.a.c.b.c.b.c.b.c.b: structural cycle
++selfTriggerCycle.long1.a.c.b.c.b.c.b: structural cycle
+ selfTriggerCycle.t1.#T.b.b: structural cycle
+ selfTriggerCycle.t2.b.c.a: structural cycle
+ 
+@@ -198,18 +198,24 @@
          // [structural cycle]
          c: (_|_){
            // [structural cycle]
@@ -802,7 +844,13 @@ diff old new
 +            b: (_|_){
 +              // [structural cycle]
 +              b: (_|_){
-+                // [structural cycle] noCancelSelfInvoke.t1.x.c.b.b.b: structural cycle
++                // [structural cycle]
++                b: (_|_){
++                  // [structural cycle]
++                  b: (_|_){
++                    // [structural cycle] noCancelSelfInvoke.t1.x.c.b.b.b.b.b: structural cycle
++                  }
++                }
 +              }
 +            }
 +          }
@@ -821,21 +869,32 @@ diff old new
          }
        }
      }
-@@ -218,12 +218,7 @@
-     // [structural cycle]
-     t1: (_|_){
-       // [structural cycle]
--      a: (_|_){
--        // [structural cycle]
--        b: (_|_){
--          // [structural cycle]
--        }
--      }
-+      a: ~(selfTriggerCycle.t1.#T)
-       #T: (_|_){
+@@ -222,6 +228,9 @@
          // [structural cycle]
          b: (_|_){
-@@ -284,21 +279,26 @@
+           // [structural cycle]
++          b: (_|_){
++            // [structural cycle] selfTriggerCycle.t1.#T.b.b: structural cycle
++          }
+         }
+       }
+       #T: (_|_){
+@@ -263,13 +272,7 @@
+                 c: (_|_){
+                   // [structural cycle]
+                   b: (_|_){
+-                    // [structural cycle]
+-                    c: (_|_){
+-                      // [structural cycle]
+-                      b: (_|_){
+-                        // [structural cycle] selfTriggerCycle.long1.a.c.b.c.b.c.b.c.b: structural cycle
+-                      }
+-                    }
++                    // [structural cycle] selfTriggerCycle.long1.a.c.b.c.b.c.b: structural cycle
+                   }
+                 }
+               }
+@@ -284,20 +287,40 @@
          // [structural cycle]
          a: (_|_){
            // [structural cycle]
@@ -853,26 +912,54 @@ diff old new
 -                two: (struct){
 -                }
 -              }
--            }
 +              a: (_|_){
 +                // [structural cycle]
 +                two: (_|_){
 +                  // [structural cycle]
-+                  link: ~(selfTriggerCycle.issue1503.#T)
++                  link: (_|_){
++                    // [structural cycle]
++                    a: (_|_){
++                      // [structural cycle]
++                      b: (_|_){
++                        // [structural cycle]
++                        link: (_|_){
++                          // [structural cycle] selfTriggerCycle.issue1503.#T.a.b.link: structural cycle
++                        }
++                      }
++                    }
++                  }
 +                }
 +                b: (_|_){
 +                  // [structural cycle]
-+                  link: ~(selfTriggerCycle.issue1503.#T)
++                  link: (_|_){
++                    // [structural cycle]
++                  }
 +                }
 +              }
 +            }
 +          }
 +          b: (_|_){
 +            // [structural cycle]
-+            link: ~(selfTriggerCycle.issue1503.#T)
++            link: (_|_){
++              // [structural cycle]
+             }
            }
          }
-       }
+@@ -333,7 +356,13 @@
+               b: (_|_){
+                 // [structural cycle]
+                 b: (_|_){
+-                  // [structural cycle] mutuallyTriggeringCycle.t1.x.c.b.b.b.b: structural cycle
++                  // [structural cycle]
++                  b: (_|_){
++                    // [structural cycle]
++                    b: (_|_){
++                      // [structural cycle] mutuallyTriggeringCycle.t1.x.c.b.b.b.b.b.b: structural cycle
++                    }
++                  }
+                 }
+               }
+             }
 -- diff/todo/p2 --
 issue1503: cycle detected too late (but not super late)
 selfTriggerCycle.t1.a.b.b: cycle detected slightly too late

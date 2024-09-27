@@ -892,8 +892,12 @@ issue770: {
     #T: (list){
       0: (string){ "d" }
     }
-    x: ~(noHang.#T)
-    #X: ~(noHang.#T)
+    x: (list){
+      0: (string){ "d" }
+    }
+    #X: (list){
+      0: (string){ "d" }
+    }
   }
   issue1940: (struct){
     #T: (#list){
@@ -902,13 +906,21 @@ issue770: {
       }
     }
     #A: (#struct){
-      type: ~(issue1940.#T)
+      type: (#list){
+        0: (string){ "d" }
+        1: (list){
+        }
+      }
     }
     #B: (#struct){
     }
     #C: (#struct){
       x: (#struct){
-        type: ~(issue1940.#T)
+        type: (#list){
+          0: (string){ "d" }
+          1: (list){
+          }
+        }
       }
     }
   }
@@ -1032,7 +1044,12 @@ issue770: {
         }
         resource: (#struct){
           _X: (#struct){
-            spec: ~(issue2209.full.Foo.spec)
+            spec: (#struct){
+              foo: (#struct){
+                min: (int){ |(*(int){ 10 }, (int){ int }) }
+                max: (int){ |(*(int){ 20 }, (int){ int }) }
+              }
+            }
           }
           spec: (#struct){ |(*(#struct){
               minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
@@ -1060,7 +1077,12 @@ issue770: {
         }
         resource: (#struct){
           _X: (#struct){
-            spec: ~(issue2209.full.Bar.spec)
+            spec: (#struct){
+              bar: (#struct){
+                min: (int){ |(*(int){ 30 }, (int){ int }) }
+                max: (int){ |(*(int){ 40 }, (int){ int }) }
+              }
+            }
           }
           spec: (#struct){ |(*(#struct){
               minFoo?: (null){ null }
@@ -1665,50 +1687,12 @@ diff old new
            }) }
        }
        #subtype: ((string|struct)){ |((string){ string }, (#struct){
-@@ -432,12 +364,8 @@
-     #T: (list){
-       0: (string){ "d" }
-     }
--    x: (list){
--      0: (string){ "d" }
--    }
--    #X: (list){
--      0: (string){ "d" }
--    }
-+    x: ~(noHang.#T)
-+    #X: ~(noHang.#T)
-   }
-   issue1940: (struct){
-     #T: (#list){
-@@ -446,53 +374,26 @@
+@@ -464,35 +396,16 @@
        }
      }
-     #A: (#struct){
--      type: (#list){
--        0: (string){ "d" }
--        1: (list){
--        }
--      }
-+      type: ~(issue1940.#T)
-     }
-     #B: (#struct){
-     }
-     #C: (#struct){
-       x: (#struct){
--        type: (#list){
--          0: (string){ "d" }
--          1: (list){
--          }
--        }
--      }
--    }
--  }
+   }
 -  issue1417: (_|_){
 -    // [eval]
-+        type: ~(issue1940.#T)
-+      }
-+    }
-+  }
 +  issue1417: (struct){
      #ID: (string){ |((string){ &(!~"^a", =~"^a") }, (string){ &(!~"^a", !~"[A-Z]") }, (string){ &(=~"^ab$", =~"^a") }, (string){ &(=~"^ab$", !~"[A-Z]") }, (string){ &(=~"^aB$", =~"^a") }, (string){ &(=~"^aB$", !~"[A-Z]") }) }
 -    ids: (_|_){
@@ -1747,7 +1731,7 @@ diff old new
        t1: (struct){
          #SpecFoo: (#struct){
            foo: (#struct){
-@@ -555,48 +456,45 @@
+@@ -555,48 +468,45 @@
              x: (int){ 1 }
            }
          }
@@ -1835,7 +1819,7 @@ diff old new
        Foo: (#struct){
          spec: (#struct){
            foo: (#struct){
-@@ -605,135 +503,52 @@
+@@ -605,135 +515,62 @@
            }
          }
          resource: (#struct){
@@ -1969,7 +1953,12 @@ diff old new
 -              }) }
 -          }
 +          _X: (#struct){
-+            spec: ~(issue2209.full.Foo.spec)
++            spec: (#struct){
++              foo: (#struct){
++                min: (int){ |(*(int){ 10 }, (int){ int }) }
++                max: (int){ |(*(int){ 20 }, (int){ int }) }
++              }
++            }
 +          }
 +          spec: (#struct){ |(*(#struct){
 +              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
@@ -1997,7 +1986,12 @@ diff old new
 +        }
 +        resource: (#struct){
 +          _X: (#struct){
-+            spec: ~(issue2209.full.Bar.spec)
++            spec: (#struct){
++              bar: (#struct){
++                min: (int){ |(*(int){ 30 }, (int){ int }) }
++                max: (int){ |(*(int){ 40 }, (int){ int }) }
++              }
++            }
 +          }
 +          spec: (#struct){ |(*(#struct){
 +              minFoo?: (null){ null }
@@ -2017,7 +2011,7 @@ diff old new
          }
        }
        #Abstract: (#struct){
-@@ -749,34 +564,34 @@
+@@ -749,34 +586,34 @@
              }
            }) }
          resource: (#struct){
@@ -2080,7 +2074,7 @@ diff old new
          }
        }
        _#Spec: (#struct){ |(*(#struct){
-@@ -803,36 +618,36 @@
+@@ -803,36 +640,36 @@
          }
        }
        _Thing: (#struct){
@@ -2146,7 +2140,7 @@ diff old new
        }
        #Constrained: (#struct){
          spec: (#struct){ |(*(#struct){
-@@ -916,19 +731,19 @@
+@@ -916,19 +753,19 @@
            common: (int){ 3 }
          }
          #FormFoo: (#struct){
@@ -2173,7 +2167,7 @@ diff old new
            }) }
        }
        #Input: (#struct){
-@@ -977,10 +792,23 @@
+@@ -977,10 +814,23 @@
      }
      full: (struct){
        metrics: (#list){
@@ -2201,7 +2195,7 @@ diff old new
          1: (#struct){
            id: (string){ "bar" }
            value: (int){ 80 }
-@@ -1031,13 +859,11 @@
+@@ -1031,13 +881,11 @@
        }
      }
    }
@@ -2217,7 +2211,7 @@ diff old new
        0: (#struct){
          name: (string){ "FooBarFoo" }
        }
-@@ -1047,19 +873,8 @@
+@@ -1047,19 +895,8 @@
        2: (#struct){
          name: (string){ "FooQuuxFoo" }
        }
@@ -2239,7 +2233,7 @@ diff old new
        }
      }
    }
-@@ -1078,10 +893,10 @@
+@@ -1078,10 +915,10 @@
          v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
        }
        c: (#struct){

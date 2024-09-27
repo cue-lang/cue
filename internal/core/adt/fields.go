@@ -756,6 +756,11 @@ func (cc *closeContext) insertConjunct(ctx *OpContext, key *closeContext, c Conj
 		return
 	}
 
+	switch id.CycleType {
+	case NoCycle, IsOptional:
+		n.hasNonCyclic = true
+	}
+
 	if key.src.isInProgress() {
 		c.CloseInfo.cc = nil
 		id.cc = arc

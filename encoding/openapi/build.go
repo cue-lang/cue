@@ -147,7 +147,7 @@ func schemas(g *Generator, inst cue.InstanceOrValue) (schemas *ast.StructLit, er
 		if ref == "" {
 			continue
 		}
-		c.schemas.Set(ref, c.build(sel, i.Value()))
+		c.schemas.setExpr(ref, c.build(sel, i.Value()))
 	}
 
 	// keep looping until a fixed point is reached.
@@ -168,7 +168,7 @@ func schemas(g *Generator, inst cue.InstanceOrValue) (schemas *ast.StructLit, er
 			last := len(sels) - 1
 			c.path = sels[:last]
 			name := sels[last]
-			c.schemas.Set(ext.ref, c.build(name, cue.Dereference(ext.value)))
+			c.schemas.setExpr(ext.ref, c.build(name, cue.Dereference(ext.value)))
 		}
 	}
 
@@ -752,9 +752,9 @@ func (b *builder) object(v cue.Value) {
 			if ref == "" {
 				continue
 			}
-			b.ctx.schemas.Set(ref, schema)
+			b.ctx.schemas.setExpr(ref, schema)
 		case !b.isNonCore() || len(schema.Elts) > 0:
-			properties.Set(label, schema)
+			properties.setExpr(label, schema)
 		}
 	}
 
@@ -1127,13 +1127,13 @@ func setType(t *oaSchema, b *builder) {
 	if b.typ != "" {
 		if b.core == nil || (b.core.typ != b.typ && !b.ctx.structural) {
 			if !t.exists("type") {
-				t.Set("type", ast.NewString(b.typ))
+				t.setExpr("type", ast.NewString(b.typ))
 			}
 		}
 	}
 	if b.format != "" {
 		if b.core == nil || b.core.format != b.format {
-			t.Set("format", ast.NewString(b.format))
+			t.setExpr("format", ast.NewString(b.format))
 		}
 	}
 }
@@ -1156,7 +1156,7 @@ func (b *builder) setSingle(key string, v ast.Expr, drop bool) {
 			b.failf(cue.Value{}, "more than one value added for key %q", key)
 		}
 	}
-	b.singleFields.Set(key, v)
+	b.singleFields.setExpr(key, v)
 }
 
 func (b *builder) set(key string, v ast.Expr) {
@@ -1167,7 +1167,7 @@ func (b *builder) set(key string, v ast.Expr) {
 		b.current = &OrderedMap{}
 		b.allOf = append(b.allOf, (*ast.StructLit)(b.current))
 	}
-	b.current.Set(key, v)
+	b.current.setExpr(key, v)
 }
 
 func (b *builder) kv(key string, value ast.Expr) *ast.StructLit {
@@ -1208,14 +1208,14 @@ func (b *builder) finish() *ast.StructLit {
 			exprs = append(exprs, s)
 		}
 		t = &OrderedMap{}
-		t.Set("allOf", ast.NewList(exprs...))
+		t.setExpr("allOf", ast.NewList(exprs...))
 	}
 	if b.singleFields != nil {
 		b.singleFields.Elts = append(b.singleFields.Elts, t.Elts...)
 		t = b.singleFields
 	}
 	if b.deprecated {
-		t.Set("deprecated", ast.NewBool(true))
+		t.setExpr("deprecated", ast.NewBool(true))
 	}
 	setType(t, b)
 	sortSchema((*ast.StructLit)(t))

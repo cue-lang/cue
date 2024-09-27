@@ -47,28 +47,6 @@ func (m *OrderedMap) find(key string) *ast.Field {
 	return nil
 }
 
-// Set sets a key value pair. If a pair with the same key already existed, it
-// will be replaced with the new value. Otherwise, the new value is added to
-// the end. The value must be of type string, [ast.Expr], or [*OrderedMap].
-//
-// Deprecated: use cuelang.org/go/cue/ast to manipulate ASTs.
-func (m *OrderedMap) Set(key string, x interface{}) {
-	switch x := x.(type) {
-	case *OrderedMap:
-		m.setExpr(key, (*ast.StructLit)(x))
-	case string:
-		m.setExpr(key, ast.NewString(x))
-	case ast.Expr:
-		m.setExpr(key, x)
-	default:
-		v, err := toCUE("Set", x)
-		if err != nil {
-			panic(err)
-		}
-		m.setExpr(key, v)
-	}
-}
-
 func (m *OrderedMap) setExpr(key string, expr ast.Expr) {
 	if f := m.find(key); f != nil {
 		f.Value = expr

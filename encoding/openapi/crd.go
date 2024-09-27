@@ -77,7 +77,7 @@ func (b *builder) coreSchema() *ast.StructLit {
 		p := &OrderedMap{}
 		for _, k := range b.keys {
 			sub := b.properties[k]
-			p.Set(k, sub.coreSchemaWithName(cue.Str(k)))
+			p.setExpr(k, sub.coreSchemaWithName(cue.Str(k)))
 		}
 		if p.len() > 0 || b.items != nil {
 			b.setType("object", "")

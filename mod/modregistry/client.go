@@ -28,6 +28,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 
 	"cuelabs.dev/go/oci/ociregistry"
@@ -163,8 +164,9 @@ func (c *Client) GetModuleWithManifest(m module.Version, contents []byte, mediaT
 	if !isModule(manifest) {
 		return nil, fmt.Errorf("%v does not resolve to a manifest (media type is %q)", m, mediaType)
 	}
-	if !isModuleFile(moduleFileLayer(manifest)) {
-		return nil, fmt.Errorf("unexpected media type %q for module file blob", manifest.Layers[1].MediaType)
+	moduleLayer := moduleFileLayer(manifest)
+	if !isModuleFile(moduleLayer) {
+		return nil, fmt.Errorf("unexpected media type %q for module file blob", moduleLayer.MediaType)
 	}
 	// TODO check that the other blobs are of the expected type (application/zip).
 	return &Module{
@@ -239,7 +241,7 @@ type checkedModule struct {
 
 // putCheckedModule is like [Client.PutModule] except that it allows the
 // caller to do some additional checks (see [CheckModule] for more info).
-func (c *Client) putCheckedModule(ctx context.Context, m *checkedModule, meta *Metadata) error {
+func (c *Client) putCheckedModule(ctx context.Context, m *checkedModule, meta *Metadata, orasDescriptors []ocispec.Descriptor) error {
 	var annotations map[string]string
 	if meta != nil {
 		annotations0, err := meta.annotations()
@@ -269,22 +271,26 @@ func (c *Client) putCheckedModule(ctx context.Context, m *checkedModule, meta *M
 		MediaType: ocispec.MediaTypeImageManifest,
 		Config:    configDesc,
 		// One for self, one for module file.
-		Layers: []ocispec.Descriptor{{
-			Digest:    selfDigest,
-			MediaType: "application/zip",
-			Size:      m.size,
-		}, {
-			Digest:    digest.FromBytes(m.modFileContent),
-			MediaType: moduleFileMediaType,
-			Size:      int64(len(m.modFileContent)),
-		}},
+		Layers: append(
+			orasDescriptors,
+			ocispec.Descriptor{
+				Digest:    selfDigest,
+				MediaType: "application/zip",
+				Size:      m.size,
+			},
+			ocispec.Descriptor{
+				Digest:    digest.FromBytes(m.modFileContent),
+				MediaType: moduleFileMediaType,
+				Size:      int64(len(m.modFileContent)),
+			},
+		),
 		Annotations: annotations,
 	}
 
-	if _, err := loc.Registry.PushBlob(ctx, loc.Repository, manifest.Layers[0], io.NewSectionReader(m.blobr, 0, m.size)); err != nil {
+	if _, err := loc.Registry.PushBlob(ctx, loc.Repository, zipContentLayer(manifest), io.NewSectionReader(m.blobr, 0, m.size)); err != nil {
 		return fmt.Errorf("cannot push module contents: %v", err)
 	}
-	if _, err := loc.Registry.PushBlob(ctx, loc.Repository, manifest.Layers[1], bytes.NewReader(m.modFileContent)); err != nil {
+	if _, err := loc.Registry.PushBlob(ctx, loc.Repository, moduleFileLayer(manifest), bytes.NewReader(m.modFileContent)); err != nil {
 		return fmt.Errorf("cannot push cue.mod/module.cue contents: %v", err)
 	}
 	manifestData, err := json.Marshal(manifest)
@@ -313,7 +319,20 @@ func (c *Client) PutModuleWithMetadata(ctx context.Context, m module.Version, r 
 	if err != nil {
 		return err
 	}
-	return c.anduin.putCheckedModule(ctx, cm, meta)
+
+	repackZip, err := os.CreateTemp("", "cue-repack-publish-")
+	if err != nil {
+		return fmt.Errorf("unable to create temp repack zip file: %v", err)
+	}
+	defer os.Remove(repackZip.Name())
+	defer repackZip.Close()
+
+	orasDescriptors, err := c.anduin.repackZipFile(repackZip, ctx, cm)
+	if err != nil {
+		return err
+	}
+
+	return c.putCheckedModule(ctx, cm, meta, orasDescriptors)
 }
 
 // checkModule checks a module's zip file before uploading it.
@@ -392,7 +411,7 @@ func (m *Module) Version() module.Version {
 
 // ModuleFile returns the contents of the cue.mod/module.cue file.
 func (m *Module) ModuleFile(ctx context.Context) ([]byte, error) {
-	r, err := m.loc.Registry.GetBlob(ctx, m.loc.Repository, (moduleFileLayer(&m.manifest)).Digest)
+	r, err := m.loc.Registry.GetBlob(ctx, m.loc.Repository, moduleFileLayer(&m.manifest).Digest)
 	if err != nil {
 		return nil, err
 	}
@@ -411,7 +430,7 @@ func (m *Module) Metadata() (*Metadata, error) {
 // and the contents should not be assumed to be correct until the close
 // error has been checked.
 func (m *Module) GetZip(ctx context.Context) (io.ReadCloser, error) {
-	return m.loc.Registry.GetBlob(ctx, m.loc.Repository, (zipContentLayer(&m.manifest)).Digest)
+	return m.loc.Registry.GetBlob(ctx, m.loc.Repository, zipContentLayer(&m.manifest).Digest)
 }
 
 // ManifestDigest returns the digest of the manifest representing

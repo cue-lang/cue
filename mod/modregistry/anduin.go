@@ -8,7 +8,6 @@ import (
 	"archive/zip"
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -18,7 +17,6 @@ import (
 	"strings"
 
 	"github.com/opencontainers/go-digest"
-	specs "github.com/opencontainers/image-spec/specs-go"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 )
 
@@ -28,29 +26,22 @@ type anduinPatch struct {
 	originalClient *Client
 }
 
-// PutModuleWithMetadata
+// repackZipFile
 // Override default put module function to make restructure OCI layer. The goal is to make it compatible with both Oras and Cue cli
 // The expected layers are as following:
 //  1. All file with annotations of oras
-//  2. Cue module file (compatible layer with cue)
-//  3. ZIP file with only *.cue file included (compatible layer with cue)
+//  2. ZIP file with only *.cue file included (compatible layer with cue)
+//  3. Cue module file (compatible layer with cue)
 //
 // Note: *.cue will be duplicated because Oras will not pull cue layers
-func (p *anduinPatch) putCheckedModule(ctx context.Context, m *checkedModule, meta *Metadata) error {
+// Function should return a list of oras layer descriptors
+func (p *anduinPatch) repackZipFile(repackZip *os.File, ctx context.Context, m *checkedModule) ([]ocispec.Descriptor, error) {
 	logf("using patched `putCheckedModule`")
 
 	loc, err := p.originalClient.resolve(m.mv)
 	if err != nil {
-		return err
+		return nil, err
 	}
-
-	// repack zip file with only *.cue files
-	repackZip, err := os.CreateTemp("", "cue-repack-publish-")
-	if err != nil {
-		return nil
-	}
-	defer os.Remove(repackZip.Name())
-	defer repackZip.Close()
 
 	zw := zip.NewWriter(repackZip)
 
@@ -101,78 +92,33 @@ func (p *anduinPatch) putCheckedModule(ctx context.Context, m *checkedModule, me
 			return nil
 		}()
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 	}
 
-	// flush all buffered zip
 	if err := zw.Close(); err != nil {
-		return fmt.Errorf("cannot flush repack zip file: %v", err)
+		return nil, fmt.Errorf("cannot flush repack zip file: %v", err)
 	}
-	zipStat, err := repackZip.Stat()
-	if err != nil {
-		return fmt.Errorf("cannot calculate repack zip file stat: %v", err)
+	if _, err := repackZip.Seek(0, io.SeekStart); err != nil {
+		return nil, fmt.Errorf("cannot rewind repack zip file: %v", err)
 	}
-	totalZrSize := zipStat.Size()
-	logf("total repack zip file: %d", totalZrSize)
-
-	// copy of original put checked module
-	annotations, err := extractAnnotationMap(meta)
+	fileStat, err := repackZip.Stat()
 	if err != nil {
-		return err
+		return nil, fmt.Errorf("cannot calculate repack zip file stat: %v", err)
 	}
-
-	zipDigest, err := digest.FromReader(io.NewSectionReader(repackZip, 0, totalZrSize))
+	zr, err := zip.NewReader(repackZip, fileStat.Size())
 	if err != nil {
-		return fmt.Errorf("cannot read module zip file: %v", err)
-	}
-	_, err = repackZip.Seek(0, io.SeekStart) // rewind seek
-	if err != nil {
-		return fmt.Errorf("cannot rewind repack zip file: %v", err)
+		return nil, fmt.Errorf("cannot create repack file reader: %v", err)
 	}
 
-	configDesc, err := p.originalClient.scratchConfig(ctx, loc, moduleArtifactType)
-	if err != nil {
-		return fmt.Errorf("cannot make scratch config: %v", err)
-	}
+	logf("total repack zip file: %d", fileStat.Size())
+	// update checkedModule
+	m.blobr = repackZip
+	m.size = fileStat.Size()
+	m.zipr = zr
 
-	manifest := &ocispec.Manifest{
-		Versioned: specs.Versioned{
-			SchemaVersion: 2,
-		},
-		MediaType: ocispec.MediaTypeImageManifest,
-		Config:    configDesc,
-		Layers: append(orasLayers,
-			ocispec.Descriptor{
-				Digest:    digest.FromBytes(m.modFileContent),
-				MediaType: moduleFileMediaType,
-				Size:      int64(len(m.modFileContent)),
-			},
-			ocispec.Descriptor{
-				Digest:    zipDigest,
-				MediaType: "application/zip",
-				Size:      totalZrSize,
-			},
-		),
-		Annotations: annotations,
-	}
-
-	if _, err := loc.Registry.PushBlob(ctx, loc.Repository, moduleFileLayer(manifest), bytes.NewReader(m.modFileContent)); err != nil {
-		return fmt.Errorf("cannot push cue.mod/module.cue contents: %v", err)
-	}
-	if _, err := loc.Registry.PushBlob(ctx, loc.Repository, zipContentLayer(manifest), io.NewSectionReader(repackZip, 0, totalZrSize)); err != nil {
-		return fmt.Errorf("cannot push module contents: %v", err)
-	}
-	manifestData, err := json.Marshal(manifest)
-	if err != nil {
-		return fmt.Errorf("cannot marshal manifest: %v", err)
-	}
-	if _, err := loc.Registry.PushManifest(ctx, loc.Repository, loc.Tag, manifestData, ocispec.MediaTypeImageManifest); err != nil {
-		return fmt.Errorf("cannot tag %v: %v", m.mv, err)
-	}
-
-	return nil
+	return orasLayers, nil
 }
 
 func addFileToRepack(zr *zip.Writer, name string, r io.Reader) error {
@@ -184,21 +130,14 @@ func addFileToRepack(zr *zip.Writer, name string, r io.Reader) error {
 	return err
 }
 
-func extractAnnotationMap(meta *Metadata) (map[string]string, error) {
-	if meta == nil {
-		return nil, nil
-	}
-	return meta.annotations()
-}
-
 func zipContentLayer(m *ocispec.Manifest) ocispec.Descriptor {
 	layerLen := len(m.Layers)
-	return m.Layers[layerLen-1]
+	return m.Layers[layerLen-2]
 }
 
 func moduleFileLayer(m *ocispec.Manifest) ocispec.Descriptor {
 	layerLen := len(m.Layers)
-	return m.Layers[layerLen-2]
+	return m.Layers[layerLen-1]
 }
 
 func logf(f string, a ...any) {

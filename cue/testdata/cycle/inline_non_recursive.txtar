@@ -70,91 +70,48 @@ Unifications: 194
 Conjuncts:    1034
 Disjuncts:    0
 -- out/evalalpha --
-Errors:
-structural cycle:
-    ./in.cue:10:8
-structural cycle:
-    ./in.cue:21:9
-structural cycle:
-    ./in.cue:32:15
-structural cycle:
-    ./in.cue:43:15
-structural cycle:
-    ./in.cue:56:8
-
-Result:
-(_|_){
-  // [structural cycle]
-  ok1: (_|_){
-    // [structural cycle]
+(struct){
+  ok1: (struct){
     f: (struct){
       in: (number){ number }
       out: (number){ number }
     }
     k00: (int){ 0 }
     k10: (int){ 0 }
-    k20: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:10:8
-    }
-    k30: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:10:8
-    }
+    k20: (int){ 0 }
+    k30: (int){ 0 }
   }
-  ok2: (_|_){
-    // [structural cycle]
+  ok2: (struct){
     f: (struct){
       in: (number){ number }
       out: (number){ number }
     }
     k00: (int){ 0 }
     k10: (int){ 0 }
-    k20: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:21:9
-    }
-    k30: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:21:9
-    }
+    k20: (int){ 0 }
+    k30: (int){ 0 }
   }
-  ok3: (_|_){
-    // [structural cycle]
+  ok3: (struct){
     f: (struct){
       in: (number){ number }
       out: (number){ number }
     }
     k00: (int){ 0 }
     k10: (int){ 0 }
-    k20: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:32:15
-    }
-    k30: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:32:15
-    }
+    k20: (int){ 0 }
+    k30: (int){ 0 }
   }
-  ok4: (_|_){
-    // [structural cycle]
+  ok4: (struct){
     f: (struct){
       in: (number){ number }
       out: (number){ number }
     }
     k00: (int){ 0 }
     k10: (int){ 0 }
-    k20: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:43:15
-    }
-    k30: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:43:15
-    }
+    k20: (int){ 0 }
+    k30: (int){ 0 }
   }
-  issue1708: (_|_){
-    // [structural cycle]
+  issue1708: (struct){
     #add10: (#struct){
       in: (number){ number }
       a10: (#struct){
@@ -173,14 +130,8 @@ Result:
     }
     k00: (int){ 0 }
     k10: (int){ 10 }
-    k20: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:56:8
-    }
-    k30: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:56:8
-    }
+    k20: (int){ 20 }
+    k30: (int){ 30 }
   }
 }
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
@@ -209,138 +160,7 @@ diff old new
 diff old new
 --- old
 +++ new
-@@ -1,45 +1,88 @@
--(struct){
--  ok1: (struct){
--    f: (struct){
--      in: (number){ number }
--      out: (number){ number }
--    }
--    k00: (int){ 0 }
--    k10: (int){ 0 }
--    k20: (int){ 0 }
--    k30: (int){ 0 }
--  }
--  ok2: (struct){
--    f: (struct){
--      in: (number){ number }
--      out: (number){ number }
--    }
--    k00: (int){ 0 }
--    k10: (int){ 0 }
--    k20: (int){ 0 }
--    k30: (int){ 0 }
--  }
--  ok3: (struct){
--    f: (struct){
--      in: (number){ number }
--      out: (number){ number }
--    }
--    k00: (int){ 0 }
--    k10: (int){ 0 }
--    k20: (int){ 0 }
--    k30: (int){ 0 }
--  }
--  ok4: (struct){
--    f: (struct){
--      in: (number){ number }
--      out: (number){ number }
--    }
--    k00: (int){ 0 }
--    k10: (int){ 0 }
--    k20: (int){ 0 }
--    k30: (int){ 0 }
--  }
--  issue1708: (struct){
-+Errors:
-+structural cycle:
-+    ./in.cue:10:8
-+structural cycle:
-+    ./in.cue:21:9
-+structural cycle:
-+    ./in.cue:32:15
-+structural cycle:
-+    ./in.cue:43:15
-+structural cycle:
-+    ./in.cue:56:8
-+
-+Result:
-+(_|_){
-+  // [structural cycle]
-+  ok1: (_|_){
-+    // [structural cycle]
-+    f: (struct){
-+      in: (number){ number }
-+      out: (number){ number }
-+    }
-+    k00: (int){ 0 }
-+    k10: (int){ 0 }
-+    k20: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:10:8
-+    }
-+    k30: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:10:8
-+    }
-+  }
-+  ok2: (_|_){
-+    // [structural cycle]
-+    f: (struct){
-+      in: (number){ number }
-+      out: (number){ number }
-+    }
-+    k00: (int){ 0 }
-+    k10: (int){ 0 }
-+    k20: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:21:9
-+    }
-+    k30: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:21:9
-+    }
-+  }
-+  ok3: (_|_){
-+    // [structural cycle]
-+    f: (struct){
-+      in: (number){ number }
-+      out: (number){ number }
-+    }
-+    k00: (int){ 0 }
-+    k10: (int){ 0 }
-+    k20: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:32:15
-+    }
-+    k30: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:32:15
-+    }
-+  }
-+  ok4: (_|_){
-+    // [structural cycle]
-+    f: (struct){
-+      in: (number){ number }
-+      out: (number){ number }
-+    }
-+    k00: (int){ 0 }
-+    k10: (int){ 0 }
-+    k20: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:43:15
-+    }
-+    k30: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:43:15
-+    }
-+  }
-+  issue1708: (_|_){
-+    // [structural cycle]
-     #add10: (#struct){
-       in: (number){ number }
-       a10: (#struct){
-@@ -48,19 +91,23 @@
+@@ -48,14 +48,12 @@
            // [incomplete] issue1708.#add10.a10.o: non-concrete value number in operand to +:
            //     ./in.cue:52:20
            //     ./in.cue:51:7
@@ -356,19 +176,6 @@ diff old new
        }
      }
      k00: (int){ 0 }
-     k10: (int){ 10 }
--    k20: (int){ 20 }
--    k30: (int){ 30 }
-+    k20: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:56:8
-+    }
-+    k30: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:56:8
-+    }
-   }
- }
 -- diff/todo/p3 --
 Error positions.
 Incorrect path due to structure sharing.

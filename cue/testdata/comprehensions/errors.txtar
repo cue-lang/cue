@@ -68,9 +68,7 @@ Result:
   // [eval]
   circularIf: (struct){
     #list: (#struct){
-      tail: ((null|struct)){ |(*(null){ null }, (#struct){
-          tail: (null){ null }
-        }) }
+      tail: (null){ null }
     }
   }
   circularFor: (_|_){
@@ -116,7 +114,18 @@ diff old new
  circularFor.#list: cannot range over tail != null (found bool, want list or struct):
      ./in.cue:12:12
  intField: integer fields not supported:
-@@ -35,10 +34,6 @@
+@@ -13,9 +12,7 @@
+   // [eval]
+   circularIf: (struct){
+     #list: (#struct){
+-      tail: ((null|struct)){ |(*(null){ null }, (#struct){
+-          tail: (null){ null }
+-        }) }
++      tail: (null){ null }
+     }
+   }
+   circularFor: (_|_){
+@@ -35,10 +32,6 @@
    intField: (_|_){
      // [eval] intField: integer fields not supported:
      //     ./in.cue:27:4
@@ -127,7 +136,7 @@ diff old new
    }
    conflictRangingOverSelf: (_|_){
      // [eval]
-@@ -49,7 +44,6 @@
+@@ -49,7 +42,6 @@
          // [eval] conflictRangingOverSelf.x.age: conflicting values int and "age" (mismatched types int and string):
          //     ./in.cue:36:9
          //     ./in.cue:40:3

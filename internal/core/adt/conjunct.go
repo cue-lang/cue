@@ -191,6 +191,8 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 
 	case *DisjunctionExpr:
 		n.unshare()
+		id := id
+		id.setOptionalV3(n)
 
 		// TODO(perf): reuse envDisjunct values so that we can also reuse the
 		// disjunct slice.
@@ -299,6 +301,11 @@ loop2:
 				n.aStruct = s
 				n.aStructID = ci
 			}
+			ci := ci
+			if x.ArcType == ArcOptional {
+				ci.setOptionalV3(n)
+			}
+
 			fc := MakeConjunct(childEnv, x, ci)
 			// fc.CloseInfo.cc = nil // TODO: should we add this?
 			n.insertArc(x.Label, x.ArcType, fc, ci, true)
@@ -328,6 +335,8 @@ loop2:
 			n.scheduleTask(handleDynamic, childEnv, x, ci)
 
 		case *BulkOptionalField:
+			ci := ci
+			ci.setOptionalV3(n)
 
 			// All do not depend on each other, so can be added at once.
 			n.scheduleTask(handlePatternConstraint, childEnv, x, ci)
@@ -615,6 +624,9 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 	case *Disjunction:
 		// TODO(perf): reuse envDisjunct values so that we can also reuse the
 		// disjunct slice.
+		id := id
+		id.setOptionalV3(n)
+
 		d := envDisjunct{
 			env:     env,
 			cloneID: id,

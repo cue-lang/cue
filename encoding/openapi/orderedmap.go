@@ -18,22 +18,19 @@ import (
 	"cuelang.org/go/cue/ast"
 )
 
-// An OrderedMap is a set of key-value pairs that preserves the order in which
+// An orderedMap is a set of key-value pairs that preserves the order in which
 // items were added.
 //
 // Deprecated: the API now returns an ast.File. This allows OpenAPI to be
 // represented as JSON, YAML, or CUE data, in addition to being able to use
 // all the ast-related tooling.
-type OrderedMap ast.StructLit
+type orderedMap ast.StructLit
 
-// TODO: these functions are here to support backwards compatibility with Istio.
-// At some point, once this is removed from Istio, this can be removed.
-
-func (m *OrderedMap) len() int {
+func (m *orderedMap) len() int {
 	return len(m.Elts)
 }
 
-func (m *OrderedMap) find(key string) *ast.Field {
+func (m *orderedMap) find(key string) *ast.Field {
 	for _, v := range m.Elts {
 		f, ok := v.(*ast.Field)
 		if !ok {
@@ -47,7 +44,7 @@ func (m *OrderedMap) find(key string) *ast.Field {
 	return nil
 }
 
-func (m *OrderedMap) setExpr(key string, expr ast.Expr) {
+func (m *orderedMap) setExpr(key string, expr ast.Expr) {
 	if f := m.find(key); f != nil {
 		f.Value = expr
 		return
@@ -59,15 +56,15 @@ func (m *OrderedMap) setExpr(key string, expr ast.Expr) {
 }
 
 // exists reports whether a key-value pair exists for the given key.
-func (m *OrderedMap) exists(key string) bool {
+func (m *orderedMap) exists(key string) bool {
 	return m.find(key) != nil
 }
 
 // exists reports whether a key-value pair exists for the given key.
-func (m *OrderedMap) getMap(key string) *OrderedMap {
+func (m *orderedMap) getMap(key string) *orderedMap {
 	f := m.find(key)
 	if f == nil {
 		return nil
 	}
-	return (*OrderedMap)(f.Value.(*ast.StructLit))
+	return (*orderedMap)(f.Value.(*ast.StructLit))
 }

@@ -91,11 +91,15 @@ func Gen(inst cue.InstanceOrValue, c *Config) ([]byte, error) {
 	if c == nil {
 		c = defaultConfig
 	}
-	all, err := c.All(inst)
+	all, err := schemas(c, inst)
 	if err != nil {
 		return nil, err
 	}
-	return internaljson.Marshal(all)
+	top, err := c.compose(inst, all)
+	if err != nil {
+		return nil, err
+	}
+	return internaljson.Marshal((*OrderedMap)(top))
 }
 
 // Generate generates the set of OpenAPI schema for all top-level types of the
@@ -103,6 +107,9 @@ func Gen(inst cue.InstanceOrValue, c *Config) ([]byte, error) {
 //
 // Note: only a limited number of top-level types are supported so far.
 func Generate(inst cue.InstanceOrValue, c *Config) (*ast.File, error) {
+	if c == nil {
+		c = defaultConfig
+	}
 	all, err := schemas(c, inst)
 	if err != nil {
 		return nil, err
@@ -112,19 +119,6 @@ func Generate(inst cue.InstanceOrValue, c *Config) (*ast.File, error) {
 		return nil, err
 	}
 	return &ast.File{Decls: top.Elts}, nil
-}
-
-// All generates an OpenAPI definition from the given instance.
-//
-// Note: only a limited number of top-level types are supported so far.
-// Deprecated: use Generate
-func (g *Generator) All(inst cue.InstanceOrValue) (*OrderedMap, error) {
-	all, err := schemas(g, inst)
-	if err != nil {
-		return nil, err
-	}
-	top, err := g.compose(inst, all)
-	return (*OrderedMap)(top), err
 }
 
 func toCUE(name string, x interface{}) (v ast.Expr, err error) {

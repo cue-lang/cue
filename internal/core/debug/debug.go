@@ -70,6 +70,9 @@ type printer struct {
 	indent string
 	cfg    *Config
 
+	// keep track of vertices to avoid cycles.
+	stack []*adt.Vertex
+
 	// modes:
 	// - show vertex
 	// - show original conjuncts
@@ -144,7 +147,30 @@ func (w *printer) printShared(v *adt.Vertex) (x *adt.Vertex, ok bool) {
 		w.shared(s)
 		return v, true
 	}
+	if !w.pushVertex(v) {
+		if s != nil {
+			w.shared(s)
+			w.string(" =>")
+		}
+		w.shared(v)
+		return v, true
+	}
 	return v, false
+}
+
+func (w *printer) pushVertex(v *adt.Vertex) bool {
+	for _, x := range w.stack {
+		if x == v {
+			w.string("<TODO: unmarked structural cycle>")
+			return false
+		}
+	}
+	w.stack = append(w.stack, v)
+	return true
+}
+
+func (w *printer) popVertex() {
+	w.stack = w.stack[:len(w.stack)-1]
 }
 
 func (w *printer) shortError(errs errors.Error) {
@@ -201,6 +227,7 @@ func (w *printer) node(n adt.Node) {
 		if ok {
 			return
 		}
+		defer w.popVertex()
 
 		var kind adt.Kind
 		if x.BaseValue != nil {

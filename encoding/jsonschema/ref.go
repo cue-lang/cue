@@ -138,7 +138,7 @@ func (s *state) makeCUERef(n cue.Value, u *url.URL, fragmentParts []string) (_e 
 					return s.rootRef()
 				}
 
-				ident, fragmentParts = s.getNextIdent(n, fragmentParts)
+				ident, fragmentParts = s.getNextIdent(n.Pos(), fragmentParts)
 
 			case u.Host != "":
 				// Reference not found within scope. Create an import reference.
@@ -206,22 +206,22 @@ func (s *state) makeCUERef(n cue.Value, u *url.URL, fragmentParts []string) (_e 
 				}
 				return newSel(e, s.idRef[1])
 			}
-			ident, fragmentParts = s.getNextIdent(n, fragmentParts)
+			ident, fragmentParts = s.getNextIdent(n.Pos(), fragmentParts)
 			ident.Node = s.obj
 			break
 		}
 	}
 
-	return s.newSel(ident, n, fragmentParts)
+	return s.newSel(n.Pos(), ident, fragmentParts)
 }
 
 // getNextSelector translates a JSON Reference path into a CUE path by consuming
 // the first path elements and returning the corresponding CUE label.
-func (s *state) getNextSelector(v cue.Value, a []string) (l label, tail []string) {
+func (s *state) getNextSelector(pos token.Pos, a []string) (l label, tail []string) {
 	switch elem := a[0]; elem {
 	case "$defs", "definitions":
 		if len(a) == 1 {
-			s.errf(v, "cannot refer to %s section: must refer to one of its elements", a[0])
+			s.warnf(pos, "cannot refer to %s section: must refer to one of its elements", a[0])
 			return label{}, nil
 		}
 
@@ -233,7 +233,7 @@ func (s *state) getNextSelector(v cue.Value, a []string) (l label, tail []string
 
 	case "properties":
 		if len(a) == 1 {
-			s.errf(v, "cannot refer to %s section: must refer to one of its elements", a[0])
+			s.warnf(pos, "cannot refer to %s section: must refer to one of its elements", a[0])
 			return label{}, nil
 		}
 
@@ -245,7 +245,7 @@ func (s *state) getNextSelector(v cue.Value, a []string) (l label, tail []string
 		"additionalItems":
 		// TODO: as a temporary workaround, include the schema verbatim.
 		// TODO: provide definitions for these in CUE.
-		s.errf(v, "referring to field %q not yet supported", elem)
+		s.warnf(pos, "referring to field %q not yet supported", elem)
 
 		// Other known fields cannot be supported.
 		return label{}, nil
@@ -255,12 +255,12 @@ func (s *state) getNextSelector(v cue.Value, a []string) (l label, tail []string
 	}
 }
 
-// newSel converts a JSON Reference path and initial CUE identifier to
-// a CUE selection path.
-func (s *state) newSel(e ast.Expr, v cue.Value, a []string) ast.Expr {
+// newSel converts an initial CUE identifier and a relative JSON Reference path
+// to a CUE selection path.
+func (s *state) newSel(pos token.Pos, e ast.Expr, a []string) ast.Expr {
 	for len(a) > 0 {
 		var label label
-		label, a = s.getNextSelector(v, a)
+		label, a = s.getNextSelector(pos, a)
 		e = newSel(e, label)
 	}
 	return e
@@ -310,8 +310,8 @@ func (s *state) setRef(lab label, r refs) {
 
 // getNextIdent gets the first CUE reference from a JSON Reference path and
 // converts it to a CUE identifier.
-func (s *state) getNextIdent(v cue.Value, a []string) (resolved *ast.Ident, tail []string) {
-	lab, a := s.getNextSelector(v, a)
+func (s *state) getNextIdent(pos token.Pos, a []string) (resolved *ast.Ident, tail []string) {
+	lab, a := s.getNextSelector(pos, a)
 
 	x := s.getRef(lab)
 	ident := ast.NewIdent(x.ident)

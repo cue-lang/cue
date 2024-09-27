@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4854176b_7609489f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-27T14:18:11Z",
+      "side": 1,
+      "message": "This behavior was never documented, so perhaps it wasn\u0027t intended, but the ship has sailed I think - it\u0027s likely users already rely on this.",
+      "revId": "2c8d2d93381a2454b7b3d281ae853b251d36e0da",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

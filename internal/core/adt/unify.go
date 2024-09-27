@@ -438,6 +438,8 @@ func (n *nodeContext) updateScalar() {
 }
 
 func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
+	// TODO: this can go when lookup vs evaluation distinction
+	// has been improved.
 	if n.node.status == evaluatingArcs {
 		// NOTE: this was an "incomplete" error pre v0.6. If this is a problem
 		// we could make this a CycleError. Technically, this may be correct,

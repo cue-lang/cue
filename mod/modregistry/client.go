@@ -163,11 +163,7 @@ func (c *Client) GetModuleWithManifest(m module.Version, contents []byte, mediaT
 	if !isModule(manifest) {
 		return nil, fmt.Errorf("%v does not resolve to a manifest (media type is %q)", m, mediaType)
 	}
-	// TODO check type of manifest too.
-	if n := len(manifest.Layers); n != 2 {
-		return nil, fmt.Errorf("module manifest should refer to exactly two blobs, but got %d", n)
-	}
-	if !isModuleFile(manifest.Layers[1]) {
+	if !isModuleFile(moduleFileLayer(manifest)) {
 		return nil, fmt.Errorf("unexpected media type %q for module file blob", manifest.Layers[1].MediaType)
 	}
 	// TODO check that the other blobs are of the expected type (application/zip).
@@ -238,6 +234,7 @@ type checkedModule struct {
 	zipr           *zip.Reader
 	modFile        *modfile.File
 	modFileContent []byte
+	validFiles     []string
 }
 
 // putCheckedModule is like [Client.PutModule] except that it allows the
@@ -327,7 +324,7 @@ func (c *Client) PutModuleWithMetadata(ctx context.Context, m module.Version, r 
 // Note that the returned [CheckedModule] value contains r, so will
 // be invalidated if r is closed.
 func checkModule(m module.Version, blobr io.ReaderAt, size int64) (*checkedModule, error) {
-	zipr, modf, _, err := modzip.CheckZip(m, blobr, size)
+	zipr, modf, stats, err := modzip.CheckZip(m, blobr, size)
 	if err != nil {
 		return nil, fmt.Errorf("module zip file check failed: %v", err)
 	}
@@ -342,6 +339,7 @@ func checkModule(m module.Version, blobr io.ReaderAt, size int64) (*checkedModul
 		zipr:           zipr,
 		modFile:        mf,
 		modFileContent: modFileContent,
+		validFiles:     stats.Valid,
 	}, nil
 }
 
@@ -394,7 +392,7 @@ func (m *Module) Version() module.Version {
 
 // ModuleFile returns the contents of the cue.mod/module.cue file.
 func (m *Module) ModuleFile(ctx context.Context) ([]byte, error) {
-	r, err := m.loc.Registry.GetBlob(ctx, m.loc.Repository, m.manifest.Layers[1].Digest)
+	r, err := m.loc.Registry.GetBlob(ctx, m.loc.Repository, (moduleFileLayer(&m.manifest)).Digest)
 	if err != nil {
 		return nil, err
 	}
@@ -413,7 +411,7 @@ func (m *Module) Metadata() (*Metadata, error) {
 // and the contents should not be assumed to be correct until the close
 // error has been checked.
 func (m *Module) GetZip(ctx context.Context) (io.ReadCloser, error) {
-	return m.loc.Registry.GetBlob(ctx, m.loc.Repository, m.manifest.Layers[0].Digest)
+	return m.loc.Registry.GetBlob(ctx, m.loc.Repository, (zipContentLayer(&m.manifest)).Digest)
 }
 
 // ManifestDigest returns the digest of the manifest representing

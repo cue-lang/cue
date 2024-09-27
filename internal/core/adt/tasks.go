@@ -110,7 +110,7 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 
 	// A reference that points to itself indicates equality. In that case
 	// we are done computing and we can return the arc as is.
-	ci, skip := t.node.markCycle(d, t.env, r, t.id)
+	ci, skip := t.node.detectCycleV3(d, t.env, r, t.id)
 	if skip {
 		return
 	}
@@ -119,6 +119,18 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 		return
 	}
 
+	// TODO: consider moving this to within if arc.nonRooted below.
+	if b, ok := d.BaseValue.(*Bottom); ok && b.Code == StructuralCycleError {
+		// TODO: ensure better positioning information.
+		ctx.AddBottom(b)
+		return
+	}
+
+	if arc.nonRooted {
+		if arc.status == finalized {
+			ci.Refs = nil
+		}
+	}
 	c := MakeConjunct(t.env, t.x, ci)
 	t.node.scheduleVertexConjuncts(c, arc, ci)
 }
@@ -217,8 +229,10 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 				label, err := MakeLabel(x.Source(), index, IntLabel)
 				n.addErr(err)
 				index++
-				c := MakeConjunct(e, x.Value, t.id)
-				n.insertArc(label, ArcMember, c, t.id, true)
+				id := t.id
+				// id.setOptional(t.node)
+				c := MakeConjunct(e, x.Value, id)
+				n.insertArc(label, ArcMember, c, id, true)
 			})
 			hasComprehension = true
 			if err != nil {
@@ -237,7 +251,10 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 				elem = &Top{}
 			}
 
-			c := MakeConjunct(t.env, elem, t.id)
+			id := t.id
+			id.setOptionalV3(t.node)
+
+			c := MakeConjunct(t.env, elem, id)
 			pat := &BoundValue{
 				Op:    GreaterEqualOp,
 				Value: n.ctx.NewInt64(index, x),

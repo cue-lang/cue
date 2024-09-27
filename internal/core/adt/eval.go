@@ -1090,9 +1090,10 @@ type nodeContextState struct {
 
 	// State info
 
-	hasTop      bool
-	hasCycle    bool // has conjunct with structural cycle
-	hasNonCycle bool // has conjunct without structural cycle
+	hasTop       bool
+	hasCycle     bool // has conjunct with structural cycle
+	hasNonCycle  bool // has material conjuncts without structural cycle
+	hasNonCyclic bool // has non-cyclic conjuncts at start of field processing
 
 	isShared      bool      // set if we are currently structure sharing.
 	noSharing     bool      // set if structure sharing is not allowed

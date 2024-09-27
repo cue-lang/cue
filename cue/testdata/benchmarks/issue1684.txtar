@@ -62,15 +62,15 @@ nestedClosed: passing: {
 	D: {id: {}} | {[string]: D}
 }
 -- out/evalalpha/stats --
-Leaks:  2533
-Freed:  612
-Reused: 612
-Allocs: 2533
+Leaks:  2135
+Freed:  658
+Reused: 658
+Allocs: 2135
 Retain: 0
 
-Unifications: 707
-Conjuncts:    5373
-Disjuncts:    1102
+Unifications: 475
+Conjuncts:    4781
+Disjuncts:    918
 -- out/evalalpha --
 (struct){
   #Secret: (#struct){
@@ -128,12 +128,6 @@ Disjuncts:    1102
               id: (struct){
               }
             }, (struct){
-              id: (struct){ |((struct){
-                  id: (struct){
-                  }
-                }, (struct){
-                }) }
-            }, (struct){
             }) }
         }, (struct){
         }) }
@@ -149,63 +143,61 @@ diff old new
 -Freed:  1064333
 -Reused: 1064282
 -Allocs: 51
-+Leaks:  2533
-+Freed:  612
-+Reused: 612
-+Allocs: 2533
++Leaks:  2135
++Freed:  658
++Reused: 658
++Allocs: 2135
  Retain: 0
  
 -Unifications: 792123
 -Conjuncts:    2480117
 -Disjuncts:    1064333
-+Unifications: 707
-+Conjuncts:    5373
-+Disjuncts:    1102
++Unifications: 475
++Conjuncts:    4781
++Disjuncts:    918
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -54,35 +54,11 @@
-               id: (struct){
-               }
-             }, (struct){
--            }) }
--        }, (struct){
--          id: (struct){ |((struct){
--              id: (struct){
--              }
--            }, (struct){
--            }) }
--        }, (struct){
--          id: (struct){ |((struct){
--              id: (struct){
--              }
--            }, (struct){
--            }) }
--        }, (struct){
--          id: (struct){ |((struct){
--              id: (struct){
--              }
--            }, (struct){
--            }) }
--        }, (struct){
--          id: (struct){ |((struct){
--              id: (struct){
--              }
--            }, (struct){
--            }) }
--        }, (struct){
--          id: (struct){ |((struct){
--              id: (struct){
--              }
-+              id: (struct){ |((struct){
-+                  id: (struct){
-+                  }
-+                }, (struct){
-+                }) }
+@@ -56,36 +56,6 @@
              }, (struct){
              }) }
          }, (struct){
+-          id: (struct){ |((struct){
+-              id: (struct){
+-              }
+-            }, (struct){
+-            }) }
+-        }, (struct){
+-          id: (struct){ |((struct){
+-              id: (struct){
+-              }
+-            }, (struct){
+-            }) }
+-        }, (struct){
+-          id: (struct){ |((struct){
+-              id: (struct){
+-              }
+-            }, (struct){
+-            }) }
+-        }, (struct){
+-          id: (struct){ |((struct){
+-              id: (struct){
+-              }
+-            }, (struct){
+-            }) }
+-        }, (struct){
+-          id: (struct){ |((struct){
+-              id: (struct){
+-              }
+-            }, (struct){
+-            }) }
+-        }, (struct){
+         }) }
+     }
+   }
+-- diff/explanation --
+New algorithm is better at trimming recursive disjunctions.
 -- out/eval/stats --
 Leaks:  0
 Freed:  1064333

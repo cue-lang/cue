@@ -197,8 +197,8 @@ func (c *Config) compose(inst cue.InstanceOrValue, schemas *ast.StructLit) (x *a
 			)
 		} else {
 			m := (*OrderedMap)(info)
-			m.Set("title", ast.NewString(title))
-			m.Set("version", ast.NewString(version))
+			m.setExpr("title", ast.NewString(title))
+			m.setExpr("version", ast.NewString(version))
 		}
 
 	case *ast.StructLit:

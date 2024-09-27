@@ -126,7 +126,7 @@ func (s *state) makeCUERef(n cue.Value, u *url.URL, fragmentParts []string) (_e 
 		return sel
 	}
 
-	var ident *ast.Ident
+	var refExpr ast.Expr
 
 	for ; ; s = s.up {
 		if s.up == nil {
@@ -138,7 +138,7 @@ func (s *state) makeCUERef(n cue.Value, u *url.URL, fragmentParts []string) (_e 
 					return s.rootRef()
 				}
 
-				ident, fragmentParts = s.getNextIdent(n.Pos(), fragmentParts)
+				refExpr, fragmentParts = s.getNextIdent(n.Pos(), fragmentParts)
 
 			case u.Host != "":
 				// Reference not found within scope. Create an import reference.
@@ -147,7 +147,7 @@ func (s *state) makeCUERef(n cue.Value, u *url.URL, fragmentParts []string) (_e 
 				// referenced. We could consider doing an extra pass to record
 				// all '$id's in a file to be able to link to them even if they
 				// are not in scope.
-				importPath, err := s.cfg.MapURL(u)
+				importPath, refPath, err := s.cfg.MapURL(u)
 				if err != nil {
 					ustr := u.String()
 					// Avoid producing many errors for the same URL.
@@ -162,8 +162,13 @@ func (s *state) makeCUERef(n cue.Value, u *url.URL, fragmentParts []string) (_e 
 					s.errf(n, "cannot determine package name from import path %q", importPath)
 					return nil
 				}
-				ident = ast.NewIdent(ip.Qualifier)
+				ident := ast.NewIdent(ip.Qualifier)
 				ident.Node = &ast.ImportSpec{Path: ast.NewString(importPath)}
+				refExpr, err = pathRefSyntax(refPath, ident)
+				if err != nil {
+					s.errf(n, "invalid CUE path for URL %q: %v", u, err)
+					return nil
+				}
 
 			default:
 				// Just a path, not sure what that means.
@@ -206,13 +211,14 @@ func (s *state) makeCUERef(n cue.Value, u *url.URL, fragmentParts []string) (_e 
 				}
 				return newSel(e, s.idRef[1])
 			}
-			ident, fragmentParts = s.getNextIdent(n.Pos(), fragmentParts)
+			ident, fragmentParts0 := s.getNextIdent(n.Pos(), fragmentParts)
 			ident.Node = s.obj
+			refExpr, fragmentParts = ident, fragmentParts0
 			break
 		}
 	}
 
-	return s.newSel(n.Pos(), ident, fragmentParts)
+	return s.newSel(n.Pos(), refExpr, fragmentParts)
 }
 
 // getNextSelector translates a JSON Reference path into a CUE path by consuming
@@ -424,7 +430,7 @@ func jsonSchemaRef(p token.Pos, a []string) ([]ast.Label, error) {
 // path mapping. It trims off any ".json" suffix and uses the
 // package name "schema" if the final component of the path
 // isn't a valid CUE identifier.
-func DefaultMapURL(u *url.URL) (importPath string, err error) {
+func DefaultMapURL(u *url.URL) (string, cue.Path, error) {
 	p := u.Path
 	base := path.Base(p)
 	if !ast.IsValidIdent(base) {
@@ -436,5 +442,32 @@ func DefaultMapURL(u *url.URL) (importPath string, err error) {
 		}
 		p += ":" + base
 	}
-	return u.Host + p, nil
+	return u.Host + p, cue.Path{}, nil
+}
+
+// pathRefSyntax returns the syntax for an expression which
+// looks up the path inside the given root expression's value.
+// It returns an error if the path contains any elements with
+// type [cue.OptionalConstraint], [cue.RequiredConstraint], or [cue.PatternConstraint],
+// none of which are expressible as a CUE index expression.
+//
+// TODO implement this properly and move to a method on [cue.Path].
+func pathRefSyntax(cuePath cue.Path, root ast.Expr) (ast.Expr, error) {
+	expr := root
+	for _, sel := range cuePath.Selectors() {
+		switch sel.LabelType() {
+		case cue.StringLabel, cue.DefinitionLabel:
+			ident := sel.String()
+			if !ast.IsValidIdent(ident) {
+				return nil, fmt.Errorf("cannot form expression for path %q", cuePath)
+			}
+			expr = &ast.SelectorExpr{
+				X:   expr,
+				Sel: ast.NewIdent(sel.String()),
+			}
+		default:
+			return nil, fmt.Errorf("cannot form expression for path %q", cuePath)
+		}
+	}
+	return expr, nil
 }

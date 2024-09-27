@@ -99,7 +99,11 @@ func Gen(inst cue.InstanceOrValue, c *Config) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return internaljson.Marshal((*OrderedMap)(top))
+	topValue := inst.Value().Context().BuildExpr(top)
+	if err := topValue.Err(); err != nil {
+		return nil, err
+	}
+	return internaljson.Marshal(topValue)
 }
 
 // Generate generates the set of OpenAPI schema for all top-level types of the

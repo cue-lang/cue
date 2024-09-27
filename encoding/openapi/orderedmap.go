@@ -16,11 +16,10 @@ package openapi
 
 import (
 	"cuelang.org/go/cue/ast"
-	internaljson "cuelang.org/go/internal/encoding/json"
 )
 
 // An OrderedMap is a set of key-value pairs that preserves the order in which
-// items were added. It marshals to JSON as an object.
+// items were added.
 //
 // Deprecated: the API now returns an ast.File. This allows OpenAPI to be
 // represented as JSON, YAML, or CUE data, in addition to being able to use
@@ -93,11 +92,4 @@ func (m *OrderedMap) getMap(key string) *OrderedMap {
 		return nil
 	}
 	return (*OrderedMap)(f.Value.(*ast.StructLit))
-}
-
-// MarshalJSON implements [encoding/json.Marshaler].
-func (m *OrderedMap) MarshalJSON() (b []byte, err error) {
-	// This is a pointer receiever to enforce that we only store pointers to
-	// OrderedMap in the output.
-	return internaljson.Encode((*ast.StructLit)(m))
 }

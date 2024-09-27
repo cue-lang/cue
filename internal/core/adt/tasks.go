@@ -97,7 +97,7 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 	// would be a pretty significant rework, though.
 
 	arc := r.resolve(ctx, oldOnly(0))
-	if arc == nil {
+	if arc == nil || arc == emptyNode {
 		// TODO: yield instead?
 		return
 	}

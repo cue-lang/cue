@@ -224,15 +224,6 @@ func (c *Config) compose(inst cue.InstanceOrValue, schemas *ast.StructLit) (x *a
 	), errs
 }
 
-// Schemas extracts component/schemas from the CUE top-level types.
-func (g *Generator) Schemas(inst cue.InstanceOrValue) (*OrderedMap, error) {
-	comps, err := schemas(g, inst)
-	if err != nil {
-		return nil, err
-	}
-	return (*OrderedMap)(comps), err
-}
-
 var defaultConfig = &Config{}
 
 // TODO

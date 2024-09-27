@@ -15,11 +15,7 @@
 package openapi
 
 import (
-	"fmt"
-
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/literal"
-	"cuelang.org/go/cue/token"
 	internaljson "cuelang.org/go/internal/encoding/json"
 )
 
@@ -31,72 +27,11 @@ import (
 // all the ast-related tooling.
 type OrderedMap ast.StructLit
 
-// KeyValue associates a value with a key.
-type KeyValue struct {
-	Key   string
-	Value interface{}
-}
-
 // TODO: these functions are here to support backwards compatibility with Istio.
 // At some point, once this is removed from Istio, this can be removed.
 
-func fromLegacy(x interface{}) ast.Expr {
-	switch x := x.(type) {
-	case *OrderedMap:
-		return (*ast.StructLit)(x)
-	case []*OrderedMap:
-		a := make([]ast.Expr, len(x))
-		for i, v := range x {
-			a[i] = fromLegacy(v)
-		}
-		return ast.NewList(a...)
-	case string:
-		return ast.NewString(x)
-	case ast.Expr:
-		return x
-	default:
-		panic(fmt.Sprintf("unsupported type %T", x))
-	}
-}
-
-func toLegacy(x ast.Expr) interface{} {
-	switch x := x.(type) {
-	case *ast.StructLit:
-		return (*OrderedMap)(x)
-	case *ast.ListLit:
-		a := make([]*OrderedMap, len(x.Elts))
-		for i, v := range x.Elts {
-			e, ok := v.(*ast.StructLit)
-			if !ok {
-				return x
-			}
-			a[i] = (*OrderedMap)(e)
-		}
-		return a
-	case *ast.BasicLit:
-		if x.Kind == token.STRING {
-			str, err := literal.Unquote(x.Value)
-			if err != nil {
-				return x
-			}
-			return str
-		}
-	}
-	return x
-}
-
 func (m *OrderedMap) len() int {
 	return len(m.Elts)
-}
-
-// Pairs returns the KeyValue pairs associated with m.
-func (m *OrderedMap) Pairs() []KeyValue {
-	kvs := make([]KeyValue, len(m.Elts))
-	for i, e := range m.Elts {
-		kvs[i].Key = label(e)
-		kvs[i].Value = toLegacy(e.(*ast.Field).Value)
-	}
-	return kvs
 }
 
 func (m *OrderedMap) find(key string) *ast.Field {
@@ -144,19 +79,6 @@ func (m *OrderedMap) setExpr(key string, expr ast.Expr) {
 		Label: ast.NewString(key),
 		Value: expr,
 	})
-}
-
-// SetAll replaces existing key-value pairs with the given ones. The keys must
-// be unique.
-func (m *OrderedMap) SetAll(kvs []KeyValue) {
-	var a []ast.Decl
-	for _, kv := range kvs {
-		a = append(a, &ast.Field{
-			Label: ast.NewString(kv.Key),
-			Value: fromLegacy(kv.Value),
-		})
-	}
-	m.Elts = a
 }
 
 // exists reports whether a key-value pair exists for the given key.

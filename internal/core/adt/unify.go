@@ -283,15 +283,6 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 
 		result := w.unify(c, needs, mode)
 
-		// Set control fields that are referenced without dereferencing.
-		if w.Closed {
-			v.Closed = true
-		}
-		if w.HasEllipsis {
-			v.HasEllipsis = true
-		}
-		v.status = w.status
-
 		return result
 	}
 

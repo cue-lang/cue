@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11e0d33b_57681764",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-27T14:17:33Z",
+      "side": 1,
+      "message": "can you mention that this API was first added in v0.10.0?\n\nthis makes the breaking change rather unfortunate, as the API was already stable, but I still agree with you it\u0027s probably OK as it\u0027s only been a few weeks. But calling this out explicitly is good context to have, and it will help me when writing the release notes.",
+      "revId": "083f27bd26d84322267be6a25fcb9d2a6c0bd662",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83947b5f_1885c439",
+        "filename": "encoding/jsonschema/ref.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 448,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-27T14:17:33Z",
+      "side": 1,
+      "message": "I\u0027m confused by the comma after this word",
+      "range": {
+        "startLine": 448,
+        "startChar": 54,
+        "endLine": 448,
+        "endChar": 59
+      },
+      "revId": "083f27bd26d84322267be6a25fcb9d2a6c0bd662",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0d42137_af13184e",
+        "filename": "encoding/jsonschema/ref.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 452,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-27T14:17:33Z",
+      "side": 1,
+      "message": "is it worth leaving a TODO here about the query proposal, which will likely affect this?",
+      "revId": "083f27bd26d84322267be6a25fcb9d2a6c0bd662",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "656bca0e_92340367",
+        "filename": "encoding/jsonschema/ref.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 461,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-27T14:17:33Z",
+      "side": 1,
+      "message": "won\u0027t this always return false for definition labels?",
+      "revId": "083f27bd26d84322267be6a25fcb9d2a6c0bd662",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

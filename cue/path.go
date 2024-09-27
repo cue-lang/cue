@@ -258,6 +258,7 @@ type selector interface {
 }
 
 // A Path is series of selectors to query a CUE value.
+// The zero value corresponds to an empty path.
 type Path struct {
 	path []Selector
 }

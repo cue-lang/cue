@@ -64,17 +64,6 @@ Retain: 0
 Unifications: 15
 Conjuncts:    43
 Disjuncts:    4
--- out/evalalpha --
-(struct){
-  #T: (list){
-    0: (string){ "d" }
-  }
-  x: ~(#T)
-  y: ~(#T)
-  z: ~(#T)
-  v: ~(#T)
-  #X: ~(#T)
-}
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -96,6 +85,17 @@ diff old new
 +Unifications: 15
 +Conjuncts:    43
 +Disjuncts:    4
+-- out/evalalpha --
+(struct){
+  #T: (list){
+    0: (string){ "d" }
+  }
+  x: ~(#T)
+  y: ~(#T)
+  z: ~(#T)
+  v: ~(#T)
+  #X: ~(#T)
+}
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old

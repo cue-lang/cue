@@ -152,6 +152,38 @@ inline: acrossFields: ok1: {
     }
   }
 }
+-- out/evalalpha/stats --
+Leaks:  104
+Freed:  0
+Reused: 0
+Allocs: 104
+Retain: 0
+
+Unifications: 100
+Conjuncts:    498
+Disjuncts:    0
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  247
+-Freed:  141
+-Reused: 136
+-Allocs: 252
+-Retain: 834
++Leaks:  104
++Freed:  0
++Reused: 0
++Allocs: 104
++Retain: 0
+ 
+-Unifications: 388
+-Conjuncts:    1307
+-Disjuncts:    707
++Unifications: 100
++Conjuncts:    498
++Disjuncts:    0
 -- out/eval/stats --
 Leaks:  247
 Freed:  141
@@ -272,15 +304,7 @@ structural cycle:
 structural cycle:
     ./x.cue:20:9
 in: structural cycle:
-    ./x.cue:34:17
-in: structural cycle:
-    ./x.cue:35:17
-in: structural cycle:
     ./x.cue:38:17
-in: structural cycle:
-    ./x.cue:49:17
-in: structural cycle:
-    ./x.cue:50:17
 in: structural cycle:
     ./x.cue:54:17
 
@@ -311,7 +335,7 @@ Result:
         nn: (int){ int }
         out: (_|_){
           // [structural cycle] structural cycle:
-          //     ./x.cue:12:24
+          //     ./x.cue:15:9
         }
       }
       f: (_|_){
@@ -352,11 +376,11 @@ Result:
         }
         k20: (_|_){
           // [structural cycle] in: structural cycle:
-          //     ./x.cue:34:17
+          //     ./x.cue:38:17
         }
         k30: (_|_){
           // [structural cycle] in: structural cycle:
-          //     ./x.cue:35:17
+          //     ./x.cue:38:17
         }
       }
       ok1: (_|_){
@@ -372,11 +396,11 @@ Result:
         }
         k20: (_|_){
           // [structural cycle] in: structural cycle:
-          //     ./x.cue:49:17
+          //     ./x.cue:54:17
         }
         k30: (_|_){
           // [structural cycle] in: structural cycle:
-          //     ./x.cue:50:17
+          //     ./x.cue:54:17
         }
       }
     }
@@ -386,7 +410,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -2,11 +2,23 @@
+@@ -2,11 +2,15 @@
  structural cycle:
      ./x.cue:6:9
  structural cycle:
@@ -397,21 +421,13 @@ diff old new
      ./x.cue:20:9
  in: structural cycle:
 -    ./x.cue:30:8
-+    ./x.cue:34:17
-+in: structural cycle:
-+    ./x.cue:35:17
-+in: structural cycle:
 +    ./x.cue:38:17
-+in: structural cycle:
-+    ./x.cue:49:17
-+in: structural cycle:
-+    ./x.cue:50:17
 +in: structural cycle:
 +    ./x.cue:54:17
  
  Result:
  (_|_){
-@@ -28,7 +40,7 @@
+@@ -28,7 +32,7 @@
        // [structural cycle]
        f2: (_|_){
          // [structural cycle] structural cycle:
@@ -420,16 +436,7 @@ diff old new
        }
        fRec: (_|_){
          // [structural cycle]
-@@ -35,7 +47,7 @@
-         nn: (int){ int }
-         out: (_|_){
-           // [structural cycle] structural cycle:
--          //     ./x.cue:15:9
-+          //     ./x.cue:12:24
-         }
-       }
-       f: (_|_){
-@@ -72,26 +84,36 @@
+@@ -72,26 +76,36 @@
          k00: (int){ 0 }
          k10: (_|_){
            // [structural cycle] in: structural cycle:
@@ -449,11 +456,11 @@ diff old new
 +        }
 +        k20: (_|_){
 +          // [structural cycle] in: structural cycle:
-+          //     ./x.cue:34:17
++          //     ./x.cue:38:17
 +        }
 +        k30: (_|_){
 +          // [structural cycle] in: structural cycle:
-+          //     ./x.cue:35:17
++          //     ./x.cue:38:17
 +        }
 +      }
 +      ok1: (_|_){
@@ -472,11 +479,11 @@ diff old new
 +        }
 +        k20: (_|_){
 +          // [structural cycle] in: structural cycle:
-+          //     ./x.cue:49:17
++          //     ./x.cue:54:17
 +        }
 +        k30: (_|_){
 +          // [structural cycle] in: structural cycle:
-+          //     ./x.cue:50:17
++          //     ./x.cue:54:17
 +        }
        }
      }

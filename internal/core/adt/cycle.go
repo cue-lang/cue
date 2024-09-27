@@ -575,20 +575,30 @@ func getNonCyclicCount(c Conjunct) int {
 	}
 }
 
-// updateCyclicStatus looks for proof of non-cyclic conjuncts to override
+// updateCyclicStatusV3 looks for proof of non-cyclic conjuncts to override
 // a structural cycle.
-func (n *nodeContext) updateCyclicStatus(c CloseInfo) {
+func (n *nodeContext) updateCyclicStatusV3(c CloseInfo) {
 	if !c.IsCyclic {
 		n.hasNonCycle = true
 		for _, c := range n.cyclicConjuncts {
-			if n.ctx.isDevVersion() {
-				ci := c.c.CloseInfo
-				ci.cc = n.node.rootCloseContext(n.ctx)
-				n.scheduleVertexConjuncts(c.c, c.arc, ci)
-				n.node.cc.decDependent(n.ctx, DEFER, nil)
-			} else {
-				n.addVertexConjuncts(c.c, c.arc, false)
-			}
+			ci := c.c.CloseInfo
+			ci.cc = n.node.rootCloseContext(n.ctx)
+			n.scheduleVertexConjuncts(c.c, c.arc, ci)
+			n.node.cc.decDependent(n.ctx, DEFER, nil)
+		}
+		n.cyclicConjuncts = n.cyclicConjuncts[:0]
+	}
+}
+
+// updateCyclicStatus looks for proof of non-cyclic conjuncts to override
+// a structural cycle.
+func (n *nodeContext) updateCyclicStatus(c CloseInfo) {
+	unreachableForDev(n.ctx)
+
+	if !c.IsCyclic {
+		n.hasNonCycle = true
+		for _, c := range n.cyclicConjuncts {
+			n.addVertexConjuncts(c.c, c.arc, false)
 		}
 		n.cyclicConjuncts = n.cyclicConjuncts[:0]
 	}
@@ -611,15 +621,16 @@ func assertStructuralCycle(n *nodeContext) bool {
 }
 
 func (n *nodeContext) reportCycleError() {
+	b := &Bottom{
+		Code:  StructuralCycleError,
+		Err:   n.ctx.Newf("structural cycle"),
+		Value: n.node.Value(),
+		Node:  n.node,
+		// TODO: probably, this should have the referenced arc.
+	}
 	n.setBaseValue(CombineErrors(nil,
 		n.node.Value(),
-		&Bottom{
-			Code:  StructuralCycleError,
-			Err:   n.ctx.Newf("structural cycle"),
-			Value: n.node.Value(),
-			Node:  n.node,
-			// TODO: probably, this should have the referenced arc.
-		}))
+		b))
 	n.node.Arcs = nil
 }
 

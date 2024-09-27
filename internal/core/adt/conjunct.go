@@ -181,7 +181,7 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		n.unshare()
 
 		// At this point we known we have at least an empty list.
-		n.updateCyclicStatus(id)
+		n.updateCyclicStatusV3(id)
 
 		env := &Environment{
 			Up:     env,
@@ -234,7 +234,7 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 func (n *nodeContext) scheduleStruct(env *Environment,
 	s *StructLit,
 	ci CloseInfo) {
-	n.updateCyclicStatus(ci)
+	n.updateCyclicStatusV3(ci)
 
 	// NOTE: This is a crucial point in the code:
 	// Unification dereferencing happens here. The child nodes are set to
@@ -537,7 +537,7 @@ func (n *nodeContext) addNotify2(v *Vertex, c CloseInfo) []receiver {
 // Literal conjuncts
 
 func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInfo) {
-	n.updateCyclicStatus(id)
+	n.updateCyclicStatusV3(id)
 
 	ctx := n.ctx
 
@@ -571,7 +571,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 			panic(fmt.Sprintf("invalid type %T", x.BaseValue))
 
 		case *ListMarker:
-			n.updateCyclicStatus(id)
+			n.updateCyclicStatusV3(id)
 
 			// TODO: arguably we know now that the type _must_ be a list.
 			n.scheduleTask(handleListVertex, env, x, id)

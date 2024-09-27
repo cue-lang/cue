@@ -683,14 +683,14 @@ Result:
   }
 }
 -- out/evalalpha/stats --
-Leaks:  288
+Leaks:  278
 Freed:  16
 Reused: 16
-Allocs: 288
+Allocs: 278
 Retain: 0
 
-Unifications: 258
-Conjuncts:    1989
+Unifications: 248
+Conjuncts:    1883
 Disjuncts:    44
 -- out/evalalpha --
 Errors:
@@ -980,8 +980,6 @@ Result:
               d: (struct){
                 b: (int){ 2 }
               }
-              a: (int){ 1 }
-              b: (int){ 2 }
             }
           }
           z: (struct){
@@ -1005,8 +1003,6 @@ Result:
               d: (struct){
                 b: (int){ 2 }
               }
-              a: (int){ 1 }
-              b: (int){ 2 }
             }
           }
           y: (struct){
@@ -1030,8 +1026,6 @@ Result:
               d: (struct){
                 b: (int){ 2 }
               }
-              a: (int){ 1 }
-              b: (int){ 2 }
             }
           }
           y: (struct){
@@ -1080,8 +1074,6 @@ Result:
               d: (struct){
                 b: (int){ 2 }
               }
-              a: (int){ 1 }
-              b: (int){ 2 }
             }
           }
           y: (struct){
@@ -1105,8 +1097,6 @@ Result:
               d: (struct){
                 b: (int){ 2 }
               }
-              a: (int){ 1 }
-              b: (int){ 2 }
             }
           }
           z: (struct){
@@ -1138,17 +1128,17 @@ diff old new
 -Reused: 273
 -Allocs: 16
 -Retain: 170
-+Leaks:  288
++Leaks:  278
 +Freed:  16
 +Reused: 16
-+Allocs: 288
++Allocs: 278
 +Retain: 0
  
 -Unifications: 269
 -Conjuncts:    1619
 -Disjuncts:    436
-+Unifications: 258
-+Conjuncts:    1989
++Unifications: 248
++Conjuncts:    1883
 +Disjuncts:    44
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -1274,7 +1264,7 @@ diff old new
      t0: (struct){
        ok: (struct){
          c: (struct){
-@@ -270,134 +252,130 @@
+@@ -270,134 +252,124 @@
          }
        }
      }
@@ -1439,8 +1429,6 @@ diff old new
 +              d: (struct){
 +                b: (int){ 2 }
 +              }
-+              a: (int){ 1 }
-+              b: (int){ 2 }
 +            }
 +          }
 +          z: (struct){
@@ -1464,8 +1452,6 @@ diff old new
 +              d: (struct){
 +                b: (int){ 2 }
 +              }
-+              a: (int){ 1 }
-+              b: (int){ 2 }
 +            }
 +          }
 +          y: (struct){
@@ -1489,8 +1475,6 @@ diff old new
 +              d: (struct){
 +                b: (int){ 2 }
 +              }
-+              a: (int){ 1 }
-+              b: (int){ 2 }
 +            }
 +          }
 +          y: (struct){
@@ -1533,7 +1517,7 @@ diff old new
              }
            }
          }
-@@ -407,23 +385,23 @@
+@@ -407,23 +379,21 @@
                d: (struct){
                  b: (int){ 2 }
                }
@@ -1554,8 +1538,6 @@ diff old new
 -            }
 -            b: (int){ 2 }
 -            a: (int){ 1 }
-+              a: (int){ 1 }
-+              b: (int){ 2 }
 +            }
 +          }
 +          y: (struct){
@@ -1574,8 +1556,19 @@ diff old new
            }
          }
          check: (struct){
+@@ -432,8 +402,6 @@
+               d: (struct){
+                 b: (int){ 2 }
+               }
+-              a: (int){ 1 }
+-              b: (int){ 2 }
+             }
+           }
+           z: (struct){
 -- diff/explanation --
 Bug fixes
+-- diff/todo/p0 --
+mutual.t4.p1: dropped fields. See comment in cycle.go that references this bug.
 -- diff/todo/p2 --
 Reordering / positions.
 -- out/compile --

@@ -500,6 +500,9 @@ func (n *nodeContext) processComprehensionInner(d *envYield, state vertexStatus)
 	}
 
 	id := d.id
+	// TODO: should we treat comprehension values as optional?
+	// It seems so, but it causes some hangs.
+	// id.setOptional(nil)
 
 	for _, env := range d.envs {
 		if n.node.ArcType == ArcNotPresent {

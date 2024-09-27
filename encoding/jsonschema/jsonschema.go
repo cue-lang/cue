@@ -97,9 +97,9 @@ type Config struct {
 	Map func(pos token.Pos, path []string) ([]ast.Label, error)
 
 	// MapURL maps a URL reference as found in $ref to
-	// an import path for a package.
+	// an import path for a package and a path within that package.
 	// If this is nil, [DefaultMapURL] will be used.
-	MapURL func(u *url.URL) (importPath string, err error)
+	MapURL func(u *url.URL) (importPath string, path cue.Path, err error)
 
 	// TODO: configurability to make it compatible with OpenAPI, such as
 	// - locations of definitions: #/components/schemas, for instance.

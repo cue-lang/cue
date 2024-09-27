@@ -89,6 +89,7 @@ func (w *compactPrinter) node(n adt.Node) {
 		case *adt.Vertex:
 			if v, ok := w.printShared(x); !ok {
 				w.node(v)
+				w.popVertex()
 			}
 
 		case adt.Value:

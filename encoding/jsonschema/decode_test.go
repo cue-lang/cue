@@ -216,9 +216,9 @@ properties: x: $ref: "https://something.test/foo#/definitions/blah"
 `)
 	var calls []string
 	expr, err := jsonschema.Extract(v, &jsonschema.Config{
-		MapURL: func(u *url.URL) (string, error) {
+		MapURL: func(u *url.URL) (string, cue.Path, error) {
 			calls = append(calls, u.String())
-			return "other.test/something:blah", nil
+			return "other.test/something:blah", cue.ParsePath("#Foo.bar"), nil
 		},
 	})
 	qt.Assert(t, qt.IsNil(err))
@@ -230,7 +230,7 @@ properties: x: $ref: "https://something.test/foo#/definitions/blah"
 	qt.Assert(t, qt.Equals(string(b), `
 import "other.test/something:blah"
 
-x?: blah.#blah
+x?: blah.#Foo.bar.#blah
 ...
 `[1:]))
 }
@@ -244,8 +244,8 @@ properties: {
 }
 `, cue.Filename("foo.cue"))
 	_, err := jsonschema.Extract(v, &jsonschema.Config{
-		MapURL: func(u *url.URL) (string, error) {
-			return "", fmt.Errorf("some error")
+		MapURL: func(u *url.URL) (string, cue.Path, error) {
+			return "", cue.Path{}, fmt.Errorf("some error")
 		},
 	})
 	qt.Assert(t, qt.Equals(errors.Details(err, nil), `

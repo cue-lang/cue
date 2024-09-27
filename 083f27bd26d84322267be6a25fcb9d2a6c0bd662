@@ -41,6 +41,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "99ef1d66_4af223d7",
+        "filename": "encoding/jsonschema/ref.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 448,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-27T14:21:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "83947b5f_1885c439",
+      "range": {
+        "startLine": 448,
+        "startChar": 54,
+        "endLine": 448,
+        "endChar": 59
+      },
+      "revId": "083f27bd26d84322267be6a25fcb9d2a6c0bd662",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e0d42137_af13184e",
@@ -58,6 +82,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8f9032c_a9a4a029",
+        "filename": "encoding/jsonschema/ref.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 452,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-27T14:21:24Z",
+      "side": 1,
+      "message": "As it\u0027s only an internal function for now, I think that\u0027s OK (`LookupPath` doesn\u0027t have any wording about it currently).",
+      "parentUuid": "e0d42137_af13184e",
+      "revId": "083f27bd26d84322267be6a25fcb9d2a6c0bd662",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "656bca0e_92340367",
@@ -71,6 +113,24 @@
       "writtenOn": "2024-09-27T14:17:33Z",
       "side": 1,
       "message": "won\u0027t this always return false for definition labels?",
+      "revId": "083f27bd26d84322267be6a25fcb9d2a6c0bd662",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5f0bba2_853d70c0",
+        "filename": "encoding/jsonschema/ref.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 461,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-09-27T14:21:24Z",
+      "side": 1,
+      "message": "No, because definition labels are counted as valid identifiers.",
+      "parentUuid": "656bca0e_92340367",
       "revId": "083f27bd26d84322267be6a25fcb9d2a6c0bd662",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

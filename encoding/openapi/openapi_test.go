@@ -191,11 +191,10 @@ func TestParseDefinitions(t *testing.T) {
 				if tc.err != "" {
 					t.Fatal("unexpected success:", tc.err)
 				} else {
-					all, err := tc.config.All(inst)
+					_, err := openapi.Generate(inst, tc.config)
 					if err != nil {
 						t.Fatal(err)
 					}
-					walk(all)
 				}
 
 				var out = &bytes.Buffer{}
@@ -227,21 +226,6 @@ func TestParseDefinitions(t *testing.T) {
 			}
 			run(t, v)
 		})
-	}
-}
-
-// walk traverses an openapi.OrderedMap. This is a helper function
-// used to ensure that a generated OpenAPI value is well-formed.
-func walk(om *openapi.OrderedMap) {
-	for _, p := range om.Pairs() {
-		switch p := p.Value.(type) {
-		case *openapi.OrderedMap:
-			walk(p)
-		case []*openapi.OrderedMap:
-			for _, om := range p {
-				walk(om)
-			}
-		}
 	}
 }
 

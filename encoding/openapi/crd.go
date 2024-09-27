@@ -74,7 +74,7 @@ func (b *builder) coreSchema() *ast.StructLit {
 		}
 
 	case cue.StructKind:
-		p := &OrderedMap{}
+		p := &orderedMap{}
 		for _, k := range b.keys {
 			sub := b.properties[k]
 			p.setExpr(k, sub.coreSchemaWithName(cue.Str(k)))

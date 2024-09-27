@@ -172,7 +172,6 @@ func (c *Config) compose(inst cue.InstanceOrValue, schemas *ast.StructLit) (x *a
 		}
 	}
 
-	// Support of OrderedMap is mostly for backwards compatibility.
 	switch x := c.Info.(type) {
 	case nil:
 		if title == "" {
@@ -196,17 +195,13 @@ func (c *Config) compose(inst cue.InstanceOrValue, schemas *ast.StructLit) (x *a
 				"version", ast.NewString(version),
 			)
 		} else {
-			m := (*OrderedMap)(info)
+			m := (*orderedMap)(info)
 			m.setExpr("title", ast.NewString(title))
 			m.setExpr("version", ast.NewString(version))
 		}
 
 	case *ast.StructLit:
 		info = x
-	case *OrderedMap:
-		info = (*ast.StructLit)(x)
-	case OrderedMap:
-		info = (*ast.StructLit)(&x)
 	default:
 		x, err := toCUE("info section", x)
 		if err != nil {

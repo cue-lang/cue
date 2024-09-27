@@ -201,7 +201,7 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 
 	l := t.x.(*ListLit)
 
-	n.updateCyclicStatus(t.id)
+	n.updateCyclicStatusV3(t.id)
 
 	var ellipsis Node
 

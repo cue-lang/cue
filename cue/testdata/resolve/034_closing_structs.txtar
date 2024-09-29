@@ -59,6 +59,71 @@ Retain: 15
 Unifications: 50
 Conjuncts:    115
 Disjuncts:    50
+-- out/evalalpha --
+(struct){
+  op: (struct){
+    x: (int){ int }
+  }
+  ot: (struct){
+    x: (int){ int }
+  }
+  cp: (#struct){
+    x: (int){ int }
+  }
+  ct: (#struct){
+    x: (int){ int }
+  }
+  opot: (struct){
+    x: (int){ int }
+  }
+  otop: (struct){
+    x: (int){ int }
+  }
+  opcp: (#struct){
+    x: (int){ int }
+  }
+  cpop: (#struct){
+    x: (int){ int }
+  }
+  opct: (#struct){
+    x: (int){ int }
+  }
+  ctop: (#struct){
+    x: (int){ int }
+  }
+  otcp: (#struct){
+    x: (int){ int }
+  }
+  cpot: (#struct){
+    x: (int){ int }
+  }
+  otct: (#struct){
+    x: (int){ int }
+  }
+  ctot: (#struct){
+    x: (int){ int }
+  }
+  cpct: (#struct){
+    x: (int){ int }
+  }
+  ctcp: (#struct){
+    x: (int){ int }
+  }
+  ctct: ~(ct)
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -47,7 +47,5 @@
+   ctcp: (#struct){
+     x: (int){ int }
+   }
+-  ctct: (#struct){
+-    x: (int){ int }
+-  }
++  ctct: ~(ct)
+ }
 -- out/eval --
 (struct){
   op: (struct){

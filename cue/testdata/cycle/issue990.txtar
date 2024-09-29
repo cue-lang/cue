@@ -102,24 +102,16 @@ Result:
   // [structural cycle]
   #AC: (#struct){
     k: (string){ "simple" }
-    d: (#struct){
-      n: (string){ string }
-    }
+    d: ~(#C)
   }
   #AS: (#struct){
     k: (string){ "complex" }
-    d: (#struct){
-      n: (string){ string }
-      r: (#struct){
-      }
-    }
+    d: ~(#S)
   }
   #R: (#struct){
     a: (#struct){
       k: (string){ "simple" }
-      d: (#struct){
-        n: (string){ string }
-      }
+      d: ~(#C)
     }
   }
   #S: (#struct){
@@ -131,14 +123,7 @@ Result:
     n: (string){ string }
   }
   #sub: (#struct){
-    #p: (#struct){
-      k: (string){ "complex" }
-      d: (#struct){
-        n: (string){ string }
-        r: (#struct){
-        }
-      }
-    }
+    #p: ~(#AS)
     dict: (#struct){
     }
     let subs#1multi = (〈3;#sub〉 & {
@@ -286,7 +271,7 @@ diff old new
 diff old new
 --- old
 +++ new
-@@ -1,4 +1,10 @@
+@@ -1,32 +1,23 @@
 -(struct){
 +Errors:
 +out.subs.subs: structural cycle:
@@ -297,9 +282,19 @@ diff old new
 +  // [structural cycle]
    #AC: (#struct){
      k: (string){ "simple" }
-     d: (#struct){
-@@ -14,19 +20,12 @@
-     }
+-    d: (#struct){
+-      n: (string){ string }
+-    }
++    d: ~(#C)
+   }
+   #AS: (#struct){
+     k: (string){ "complex" }
+-    d: (#struct){
+-      n: (string){ string }
+-      r: (#struct){
+-      }
+-    }
++    d: ~(#S)
    }
    #R: (#struct){
 -    a: (#struct){ |((#struct){
@@ -317,14 +312,28 @@ diff old new
 -      }) }
 +    a: (#struct){
 +      k: (string){ "simple" }
-+      d: (#struct){
-+        n: (string){ string }
-+      }
++      d: ~(#C)
 +    }
    }
    #S: (#struct){
      n: (string){ string }
-@@ -53,195 +52,116 @@
+@@ -37,14 +28,7 @@
+     n: (string){ string }
+   }
+   #sub: (#struct){
+-    #p: (#struct){
+-      k: (string){ "complex" }
+-      d: (#struct){
+-        n: (string){ string }
+-        r: (#struct){
+-        }
+-      }
+-    }
++    #p: ~(#AS)
+     dict: (#struct){
+     }
+     let subs#1multi = (〈3;#sub〉 & {
+@@ -53,195 +37,116 @@
    }
    _test: (struct){
      c1: (#struct){

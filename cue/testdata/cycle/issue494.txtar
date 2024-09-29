@@ -79,13 +79,7 @@ Result:
       }
     }
   }
-  d: (#struct){
-    ben: (#list){
-      0: (#struct){
-        pos: (int){ 0 }
-      }
-    }
-  }
+  d: ~(#d)
   e: (struct){
     ben: (#list){
       0: (struct){
@@ -132,7 +126,22 @@ diff old new
  
  Result:
  (_|_){
-@@ -61,12 +63,9 @@
+@@ -41,13 +43,7 @@
+       }
+     }
+   }
+-  d: (#struct){
+-    ben: (#list){
+-      0: (#struct){
+-        pos: (int){ 0 }
+-      }
+-    }
+-  }
++  d: ~(#d)
+   e: (struct){
+     ben: (#list){
+       0: (struct){
+@@ -61,12 +57,9 @@
    f: (_|_){
      // [eval]
      ben: (_|_){
@@ -148,7 +157,7 @@ diff old new
        }
      }
    }
-@@ -73,9 +72,9 @@
+@@ -73,9 +66,9 @@
    g: (_|_){
      // [eval]
      ben: (_|_){

@@ -271,13 +271,7 @@ Result:
       // [structural cycle] letCycleWithAnd.0: structural cycle:
       //     ./in.cue:67:9
     }
-    c: (_|_){
-      // [structural cycle]
-      d: (_|_){
-        // [structural cycle] letCycleWithAnd.0: structural cycle:
-        //     ./in.cue:67:9
-      }
-    }
+    c: ~(letCycleWithAnd.a)
   }
   closeCycle: (_|_){
     // [structural cycle]
@@ -522,7 +516,7 @@ diff old new
        //     ./in.cue:56:9
      }
    }
-@@ -102,24 +121,33 @@
+@@ -102,57 +121,58 @@
      #A: (_|_){
        // [structural cycle]
        a: (_|_){
@@ -546,6 +540,8 @@ diff old new
 -    }
 -    c: (struct){
 -      d: (struct){
+-      }
+-    }
 +      // [structural cycle] forCycle.0.b: structural cycle:
 +      //     ./in.cue:62:9
 +    }
@@ -563,15 +559,8 @@ diff old new
 +      // [structural cycle] letCycleWithAnd.0: structural cycle:
 +      //     ./in.cue:67:9
 +    }
-+    c: (_|_){
-+      // [structural cycle]
-+      d: (_|_){
-+        // [structural cycle] letCycleWithAnd.0: structural cycle:
-+        //     ./in.cue:67:9
-       }
-     }
++    c: ~(letCycleWithAnd.a)
    }
-@@ -126,33 +154,31 @@
    closeCycle: (_|_){
      // [structural cycle]
      a: (_|_){
@@ -625,7 +614,7 @@ diff old new
      }
    }
    embedCycle: (_|_){
-@@ -173,25 +199,31 @@
+@@ -173,25 +193,31 @@
    listAddCycle: (_|_){
      // [structural cycle]
      a: (_|_){
@@ -671,7 +660,7 @@ diff old new
      }
    }
    closeFail: (_|_){
-@@ -201,21 +233,21 @@
+@@ -201,21 +227,21 @@
      }
      x: (_|_){
        // [eval]

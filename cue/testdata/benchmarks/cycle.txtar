@@ -53,6 +53,54 @@ Retain: 1
 Unifications: 15
 Conjuncts:    30
 Disjuncts:    26
+-- out/evalalpha --
+(struct){
+  sameValues: (struct){
+    SmustBeF: (struct){
+      T: (string){ string }
+      F: (struct){
+        x: (string){ string }
+      }
+      S: ~(sameValues.SmustBeF.F)
+    }
+    CmustBeA: (struct){
+      A: (struct){
+        x: (#list){
+          0: (string){ string }
+        }
+      }
+      C: ~(sameValues.CmustBeA.A)
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -5,9 +5,7 @@
+       F: (struct){
+         x: (string){ string }
+       }
+-      S: (struct){
+-        x: (string){ string }
+-      }
++      S: ~(sameValues.SmustBeF.F)
+     }
+     CmustBeA: (struct){
+       A: (struct){
+@@ -15,11 +13,7 @@
+           0: (string){ string }
+         }
+       }
+-      C: (struct){
+-        x: (#list){
+-          0: (string){ string }
+-        }
+-      }
++      C: ~(sameValues.CmustBeA.A)
+     }
+   }
+ }
 -- out/eval --
 (struct){
   sameValues: (struct){

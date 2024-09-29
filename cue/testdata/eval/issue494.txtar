@@ -24,6 +24,63 @@ Retain: 0
 Unifications: 26
 Conjuncts:    56
 Disjuncts:    28
+-- out/evalalpha --
+(struct){
+  _Q: (#list){
+    0: (struct){
+      pos: (int){ 0 }
+    }
+    1: (struct){
+      pos: (int){ 1 }
+    }
+  }
+  a: (struct){
+    ben: (#list){
+      0: (struct){
+        pos: (int){ 0 }
+      }
+    }
+  }
+  b: (struct){
+    ben: (#list){
+      0: (struct){
+        pos: (int){ 0 }
+      }
+    }
+  }
+  c: (struct){
+    ben: (#list){
+      0: (struct){
+        l: (int){ 1 }
+      }
+    }
+  }
+  #d: (#struct){
+    ben: (#list){
+      0: (#struct){
+        pos: (int){ 0 }
+      }
+    }
+  }
+  d: ~(#d)
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -35,11 +35,5 @@
+       }
+     }
+   }
+-  d: (#struct){
+-    ben: (#list){
+-      0: (#struct){
+-        pos: (int){ 0 }
+-      }
+-    }
+-  }
++  d: ~(#d)
+ }
 -- out/eval --
 (struct){
   _Q: (#list){

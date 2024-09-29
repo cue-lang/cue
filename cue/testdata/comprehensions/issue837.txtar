@@ -102,26 +102,10 @@ Result:
     ref: (#struct){
       kind: (string){ "deployment" }
     }
-    description: (#struct){
-      service: (#struct){
-        ref: (#struct){
-          kind: (string){ "service" }
-        }
-        description: (_|_){
-          // [incomplete] #ServiceManifest.description: undefined field: service:
-          //     ./in.cue:5:28
-        }
-      }
-      hsize: (_|_){
-        // [incomplete] #ServiceManifest.description: undefined field: service:
-        //     ./in.cue:5:28
-      }
-    }
+    description: ~(#KumoriKinds.deployment)
   }
   #Manifest: (#struct){
-    ref: (#struct){
-      kind: (string){ |((string){ "service" }, (string){ "deployment" }) }
-    }
+    ref: ~(#ManifestRef)
     description: (_|_){
       // [incomplete] #Manifest.description: unresolved disjunction "service" | "deployment" (type string):
       //     ./in.cue:5:15
@@ -133,15 +117,7 @@ Result:
   #KindsNames: (string){ |((string){ "service" }, (string){ "deployment" }) }
   #KumoriKinds: (#struct){
     deployment: (#struct){
-      service: (#struct){
-        ref: (#struct){
-          kind: (string){ "service" }
-        }
-        description: (_|_){
-          // [incomplete] #ServiceManifest.description: undefined field: service:
-          //     ./in.cue:5:28
-        }
-      }
+      service: ~(#ServiceManifest)
       hsize: (_|_){
         // [incomplete] #ServiceManifest.description: undefined field: service:
         //     ./in.cue:5:28
@@ -151,26 +127,7 @@ Result:
   #DoDeploy: (_|_){
     // [eval]
     _params: (#struct){
-      manifest: (#struct){
-        ref: (#struct){
-          kind: (string){ "deployment" }
-        }
-        description: (#struct){
-          service: (#struct){
-            ref: (#struct){
-              kind: (string){ "service" }
-            }
-            description: (_|_){
-              // [incomplete] #ServiceManifest.description: undefined field: service:
-              //     ./in.cue:5:28
-            }
-          }
-          hsize: (_|_){
-            // [incomplete] #ServiceManifest.description: undefined field: service:
-            //     ./in.cue:5:28
-          }
-        }
-      }
+      manifest: ~(#DeploymentManifest)
     }
     deployment: (_|_){
       // [eval]
@@ -250,9 +207,7 @@ Result:
   #RelabelService: (_|_){
     // [eval]
     _params: (#struct){
-      hsize: (#struct){
-        $_instances: (number){ |(*(int){ 1 }, (number){ >=0 }) }
-      }
+      hsize: ~(#RoleSize)
     }
     out: (_|_){
       // [eval]
@@ -266,15 +221,7 @@ Result:
     $_instances: (number){ |(*(int){ 1 }, (number){ >=0 }) }
   }
   #Deployment: (#struct){
-    service: (#struct){
-      ref: (#struct){
-        kind: (string){ "service" }
-      }
-      description: (_|_){
-        // [incomplete] #ServiceManifest.description: undefined field: service:
-        //     ./in.cue:5:28
-      }
-    }
+    service: ~(#ServiceManifest)
     hsize: (_|_){
       // [incomplete] #ServiceManifest.description: undefined field: service:
       //     ./in.cue:5:28
@@ -322,64 +269,79 @@ diff old new
  
  Result:
  (_|_){
-@@ -19,11 +32,13 @@
-           kind: (string){ "service" }
-         }
-         description: (_|_){
+@@ -13,24 +26,10 @@
+     ref: (#struct){
+       kind: (string){ "deployment" }
+     }
+-    description: (#struct){
+-      service: (#struct){
+-        ref: (#struct){
+-          kind: (string){ "service" }
+-        }
+-        description: (_|_){
 -          // [incomplete] #DeploymentManifest.description.service.description: undefined field: service:
 -          //     ./in.cue:5:28
 -        }
 -      }
 -      hsize: (#struct){
-+          // [incomplete] #ServiceManifest.description: undefined field: service:
-+          //     ./in.cue:5:28
-+        }
-+      }
-+      hsize: (_|_){
-+        // [incomplete] #ServiceManifest.description: undefined field: service:
-+        //     ./in.cue:5:28
-       }
-     }
+-      }
+-    }
++    description: ~(#KumoriKinds.deployment)
    }
-@@ -47,11 +62,13 @@
-           kind: (string){ "service" }
-         }
-         description: (_|_){
+   #Manifest: (#struct){
+-    ref: (#struct){
+-      kind: (string){ |((string){ "service" }, (string){ "deployment" }) }
+-    }
++    ref: ~(#ManifestRef)
+     description: (_|_){
+       // [incomplete] #Manifest.description: unresolved disjunction "service" | "deployment" (type string):
+       //     ./in.cue:5:15
+@@ -42,16 +41,10 @@
+   #KindsNames: (string){ |((string){ "service" }, (string){ "deployment" }) }
+   #KumoriKinds: (#struct){
+     deployment: (#struct){
+-      service: (#struct){
+-        ref: (#struct){
+-          kind: (string){ "service" }
+-        }
+-        description: (_|_){
 -          // [incomplete] #KumoriKinds.deployment.service.description: undefined field: service:
 -          //     ./in.cue:5:28
 -        }
 -      }
 -      hsize: (#struct){
-+          // [incomplete] #ServiceManifest.description: undefined field: service:
-+          //     ./in.cue:5:28
-+        }
-+      }
++      service: ~(#ServiceManifest)
 +      hsize: (_|_){
 +        // [incomplete] #ServiceManifest.description: undefined field: service:
 +        //     ./in.cue:5:28
        }
      }
    }
-@@ -68,11 +85,13 @@
-               kind: (string){ "service" }
-             }
-             description: (_|_){
+@@ -58,58 +51,32 @@
+   #DoDeploy: (_|_){
+     // [eval]
+     _params: (#struct){
+-      manifest: (#struct){
+-        ref: (#struct){
+-          kind: (string){ "deployment" }
+-        }
+-        description: (#struct){
+-          service: (#struct){
+-            ref: (#struct){
+-              kind: (string){ "service" }
+-            }
+-            description: (_|_){
 -              // [incomplete] #DoDeploy._params.manifest.description.service.description: undefined field: service:
 -              //     ./in.cue:5:28
 -            }
 -          }
 -          hsize: (#struct){
-+              // [incomplete] #ServiceManifest.description: undefined field: service:
-+              //     ./in.cue:5:28
-+            }
-+          }
-+          hsize: (_|_){
-+            // [incomplete] #ServiceManifest.description: undefined field: service:
-+            //     ./in.cue:5:28
-           }
-         }
-       }
-@@ -81,35 +100,26 @@
+-          }
+-        }
+-      }
++      manifest: ~(#DeploymentManifest)
+     }
+     deployment: (_|_){
        // [eval]
        description: (_|_){
          // [eval]
@@ -434,7 +396,7 @@ diff old new
          }
        }
      }
-@@ -125,15 +135,38 @@
+@@ -125,15 +92,38 @@
        description: (_|_){
          // [eval]
          let configed#2 = (_|_){
@@ -480,19 +442,32 @@ diff old new
          }
        }
      }
-@@ -162,11 +195,13 @@
-         kind: (string){ "service" }
-       }
-       description: (_|_){
+@@ -141,9 +131,7 @@
+   #RelabelService: (_|_){
+     // [eval]
+     _params: (#struct){
+-      hsize: (#struct){
+-        $_instances: (number){ |(*(int){ 1 }, (number){ >=0 }) }
+-      }
++      hsize: ~(#RoleSize)
+     }
+     out: (_|_){
+       // [eval]
+@@ -157,16 +145,10 @@
+     $_instances: (number){ |(*(int){ 1 }, (number){ >=0 }) }
+   }
+   #Deployment: (#struct){
+-    service: (#struct){
+-      ref: (#struct){
+-        kind: (string){ "service" }
+-      }
+-      description: (_|_){
 -        // [incomplete] #Deployment.service.description: undefined field: service:
 -        //     ./in.cue:5:28
 -      }
 -    }
 -    hsize: (#struct){
-+        // [incomplete] #ServiceManifest.description: undefined field: service:
-+        //     ./in.cue:5:28
-+      }
-+    }
++    service: ~(#ServiceManifest)
 +    hsize: (_|_){
 +      // [incomplete] #ServiceManifest.description: undefined field: service:
 +      //     ./in.cue:5:28

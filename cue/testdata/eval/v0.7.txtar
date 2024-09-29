@@ -819,14 +819,7 @@ Result:
     }
     t2: (struct){
       ok: (struct){
-        foo: (#struct){
-          a: (#struct){
-            b: (#struct){
-              C: (int){ 1 }
-              D: (int){ 2 }
-            }
-          }
-        }
+        foo: ~(dynamic.t2.ok.#X)
         #X: (#struct){
           a: (#struct){
             b: (#struct){
@@ -968,10 +961,7 @@ Result:
             }
           }
           y: (struct){
-            c: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
+            c: ~(mutual.t4.ok.p0.z.d)
           }
         }
         p1: (struct){
@@ -993,10 +983,7 @@ Result:
             b: (int){ 2 }
           }
           y: (struct){
-            c: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
+            c: ~(mutual.t4.ok.p1.z.d)
           }
         }
         p2: (struct){
@@ -1010,10 +997,7 @@ Result:
             }
           }
           y: (struct){
-            c: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
+            c: ~(mutual.t4.ok.p2.z.d)
           }
           z: (struct){
             d: (struct){
@@ -1035,10 +1019,7 @@ Result:
             }
           }
           y: (struct){
-            c: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
+            c: ~(mutual.t4.ok.p3.z.d)
           }
           z: (struct){
             d: (struct){
@@ -1068,10 +1049,7 @@ Result:
             }
           }
           y: (struct){
-            c: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
+            c: ~(mutual.t4.ok.p4.z.d)
           }
         }
         p5: (struct){
@@ -1085,10 +1063,7 @@ Result:
             }
           }
           y: (struct){
-            c: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
+            c: ~(mutual.t4.ok.p5.z.d)
           }
           z: (struct){
             d: (struct){
@@ -1118,10 +1093,7 @@ Result:
             b: (int){ 2 }
           }
           y: (struct){
-            c: (struct){
-              a: (int){ 1 }
-              b: (int){ 2 }
-            }
+            c: ~(mutual.t4.ok.check.z.d)
           }
         }
       }
@@ -1264,7 +1236,23 @@ diff old new
            }
            #A: (#struct){
              a: (int){ int }
-@@ -202,8 +185,7 @@
+@@ -141,14 +124,7 @@
+     }
+     t2: (struct){
+       ok: (struct){
+-        foo: (#struct){
+-          a: (#struct){
+-            b: (#struct){
+-              C: (int){ 1 }
+-              D: (int){ 2 }
+-            }
+-          }
+-        }
++        foo: ~(dynamic.t2.ok.#X)
+         #X: (#struct){
+           a: (#struct){
+             b: (#struct){
+@@ -202,8 +178,7 @@
        }
      }
    }
@@ -1274,7 +1262,7 @@ diff old new
      t0: (struct){
        ok: (struct){
          c: (struct){
-@@ -270,134 +252,130 @@
+@@ -270,135 +245,116 @@
          }
        }
      }
@@ -1406,6 +1394,7 @@ diff old new
 -          y: (struct){
 -            c: (struct){
 -              a: (int){ 1 }
+-            }
 +    t4: (struct){
 +      ok: (struct){
 +        p0: (struct){
@@ -1427,10 +1416,7 @@ diff old new
 +            }
 +          }
 +          y: (struct){
-+            c: (struct){
-+              a: (int){ 1 }
-+              b: (int){ 2 }
-+            }
++            c: ~(mutual.t4.ok.p0.z.d)
 +          }
 +        }
 +        p1: (struct){
@@ -1452,10 +1438,7 @@ diff old new
 +            b: (int){ 2 }
 +          }
 +          y: (struct){
-+            c: (struct){
-+              a: (int){ 1 }
-+              b: (int){ 2 }
-+            }
++            c: ~(mutual.t4.ok.p1.z.d)
 +          }
 +        }
 +        p2: (struct){
@@ -1469,10 +1452,7 @@ diff old new
 +            }
 +          }
 +          y: (struct){
-+            c: (struct){
-+              a: (int){ 1 }
-+              b: (int){ 2 }
-+            }
++            c: ~(mutual.t4.ok.p2.z.d)
 +          }
 +          z: (struct){
 +            d: (struct){
@@ -1494,10 +1474,7 @@ diff old new
 +            }
 +          }
 +          y: (struct){
-+            c: (struct){
-+              a: (int){ 1 }
-+              b: (int){ 2 }
-+            }
++            c: ~(mutual.t4.ok.p3.z.d)
 +          }
 +          z: (struct){
 +            d: (struct){
@@ -1527,13 +1504,11 @@ diff old new
 +            }
 +          }
 +          y: (struct){
-+            c: (struct){
-+              a: (int){ 1 }
-+              b: (int){ 2 }
-             }
++            c: ~(mutual.t4.ok.p4.z.d)
            }
          }
-@@ -407,23 +385,23 @@
+         p5: (struct){
+@@ -407,23 +363,20 @@
                d: (struct){
                  b: (int){ 2 }
                }
@@ -1559,10 +1534,7 @@ diff old new
 +            }
 +          }
 +          y: (struct){
-+            c: (struct){
-+              a: (int){ 1 }
-+              b: (int){ 2 }
-+            }
++            c: ~(mutual.t4.ok.p5.z.d)
 +          }
 +          z: (struct){
 +            d: (struct){
@@ -1574,6 +1546,18 @@ diff old new
            }
          }
          check: (struct){
+@@ -445,10 +398,7 @@
+             b: (int){ 2 }
+           }
+           y: (struct){
+-            c: (struct){
+-              a: (int){ 1 }
+-              b: (int){ 2 }
+-            }
++            c: ~(mutual.t4.ok.check.z.d)
+           }
+         }
+       }
 -- diff/explanation --
 Bug fixes
 -- diff/todo/p2 --

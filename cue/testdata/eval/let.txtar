@@ -335,16 +335,8 @@ Result:
         "\(〈0;let X#1F〉)": 〈0;let X#1F〉
       }
     }
-    "0": (struct){
-      let X#1Fmulti = 〈1;x〉
-      "2": (int){ 2 }
-      "1": (int){ 1 }
-    }
-    "1": (struct){
-      let X#1Fmulti = 〈1;x〉
-      "2": (int){ 2 }
-      "1": (int){ 1 }
-    }
+    "0": ~(nestedFor.X#1E)
+    "1": ~(nestedFor.X#1E)
   }
   keepDescending: (struct){
     t1: (struct){
@@ -501,25 +493,26 @@ diff old new
      }
    }
    nestedFor: (struct){
-@@ -190,13 +166,13 @@
+@@ -188,16 +164,8 @@
+         "\(〈0;let X#1F〉)": 〈0;let X#1F〉
+       }
      }
-     "0": (struct){
-       let X#1Fmulti = 〈1;x〉
+-    "0": (struct){
+-      let X#1Fmulti = 〈1;x〉
 -      "1": (int){ 1 }
 -      "2": (int){ 2 }
-+      "2": (int){ 2 }
-+      "1": (int){ 1 }
-     }
-     "1": (struct){
-       let X#1Fmulti = 〈1;x〉
+-    }
+-    "1": (struct){
+-      let X#1Fmulti = 〈1;x〉
 -      "1": (int){ 1 }
 -      "2": (int){ 2 }
-+      "2": (int){ 2 }
-+      "1": (int){ 1 }
-     }
+-    }
++    "0": ~(nestedFor.X#1E)
++    "1": ~(nestedFor.X#1E)
    }
    keepDescending: (struct){
-@@ -234,8 +210,8 @@
+     t1: (struct){
+@@ -234,8 +202,8 @@
        b: (string){ "e" }
      }
      let T#23multi = 〈1;v〉

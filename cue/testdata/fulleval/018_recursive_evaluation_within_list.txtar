@@ -69,10 +69,7 @@ Disjuncts:    31
 -- out/evalalpha --
 (struct){
   l: (#list){
-    0: (struct){
-      c: (string){ "t" }
-      d: (string){ "t" }
-    }
+    0: ~(a)
   }
   a: (struct){
     c: (string){ "t" }
@@ -83,10 +80,7 @@ Disjuncts:    31
     c: (string){ string }
   }
   l1: (#list){
-    0: (struct){
-      c: (string){ "t" }
-      d: (string){ "st" }
-    }
+    0: ~(a1)
   }
   a1: (struct){
     c: (string){ "t" }
@@ -105,14 +99,14 @@ Disjuncts:    31
 diff old new
 --- old
 +++ new
-@@ -1,13 +1,13 @@
+@@ -1,13 +1,10 @@
  (struct){
    l: (#list){
-     0: (struct){
-+      c: (string){ "t" }
-       d: (string){ "t" }
+-    0: (struct){
+-      d: (string){ "t" }
 -      c: (string){ "t" }
-     }
+-    }
++    0: ~(a)
    }
    a: (struct){
 +    c: (string){ "t" }
@@ -121,14 +115,15 @@ diff old new
    }
    b: (struct){
      d: (string){ string }
-@@ -15,13 +15,13 @@
+@@ -14,14 +11,11 @@
+     c: (string){ string }
    }
    l1: (#list){
-     0: (struct){
-+      c: (string){ "t" }
-       d: (string){ "st" }
+-    0: (struct){
+-      d: (string){ "st" }
 -      c: (string){ "t" }
-     }
+-    }
++    0: ~(a1)
    }
    a1: (struct){
 +    c: (string){ "t" }

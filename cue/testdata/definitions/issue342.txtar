@@ -37,6 +37,45 @@ Retain: 2
 Unifications: 18
 Conjuncts:    33
 Disjuncts:    24
+-- out/evalalpha --
+(struct){
+  X: (struct){
+    #Simple: (#struct){
+      ref: (string){ string }
+    }
+    #Complex: (#struct){ |((#struct){
+        ref: (string){ string }
+      }, (#struct){
+        local: (string){ string }
+      }) }
+    var: (string){ "XXX" }
+    test_1: (#struct){ |((#struct){
+        ref: (string){ string }
+      }, (#struct){
+        local: (string){ string }
+      }) }
+    test_3_XXX: (#struct){
+      ref: (string){ "FOO" }
+    }
+    test_2_XXX: ~(X.#Simple)
+  }
+  Z: (string){ "FOO" }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -17,9 +17,7 @@
+     test_3_XXX: (#struct){
+       ref: (string){ "FOO" }
+     }
+-    test_2_XXX: (#struct){
+-      ref: (string){ string }
+-    }
++    test_2_XXX: ~(X.#Simple)
+   }
+   Z: (string){ "FOO" }
+ }
 -- out/eval --
 (struct){
   X: (struct){

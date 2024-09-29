@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a1fec146_e88f13fb",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 580,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-09-29T09:55:13Z",
+      "side": 1,
+      "message": "I think that is a bit overkill / busy work. This isn\u0027t much of a problem in practice. The old evaluator typically keeps working during the development on v3, and if it keeps working by porting to v3 that is only a benefit. 😊",
+      "parentUuid": "7a82401b_09a4af1d",
+      "revId": "aa664c46de563e708b4f1c449e68325814210b11",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2ea4407a_d93048dc",
         "filename": "internal/core/adt/cycle.go",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2024-09-27T13:32:37Z",
       "side": 1,
       "message": "cosmetic nit: These lines are short enough to flatten together?",
+      "revId": "aa664c46de563e708b4f1c449e68325814210b11",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4dd10050_4cd4345a",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 633,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-09-29T09:55:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2ea4407a_d93048dc",
       "revId": "aa664c46de563e708b4f1c449e68325814210b11",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

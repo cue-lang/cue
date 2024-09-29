@@ -90,18 +90,7 @@ type Instance struct {
 	// ancestor directories, up to the module file.
 	Dir string
 
-	// NOTICE: the below tags may change in the future.
-
-	// ImportComment is the path in the import comment on the package statement.
-	//
-	// Deprecated: CUE has never needed or supported import comments.
-	ImportComment string `api:"alpha"`
-
-	// AllTags are the build tags that can influence file selection in this
-	// directory.
-	//
-	// Deprecated: this field is not used.
-	AllTags []string `api:"alpha"`
+	// NOTICE: the below struct field tags may change in the future.
 
 	// Incomplete reports whether any dependencies had an error.
 	Incomplete bool `api:"alpha"`

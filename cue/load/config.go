@@ -260,10 +260,6 @@ type Config struct {
 	// to CUE.
 	DataFiles bool
 
-	// StdRoot specifies an alternative directory for standard libraries.
-	// Deprecated: this has no effect.
-	StdRoot string
-
 	// ParseFile is called to read and parse each file when preparing a
 	// package's syntax tree. It must be safe to call ParseFile simultaneously
 	// from multiple goroutines. If ParseFile is nil, the loader will uses

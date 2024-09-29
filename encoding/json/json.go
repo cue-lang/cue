@@ -66,18 +66,6 @@ func Extract(path string, data []byte) (ast.Expr, error) {
 	return expr, nil
 }
 
-// Decode parses JSON-encoded data to a CUE value, using path for position
-// information.
-//
-// Deprecated: use Extract and build using cue.Context.BuildExpr.
-func Decode(r *cue.Runtime, path string, data []byte) (*cue.Instance, error) {
-	expr, err := extract(path, data)
-	if err != nil {
-		return nil, err
-	}
-	return r.CompileExpr(expr)
-}
-
 func extract(path string, b []byte) (ast.Expr, error) {
 	expr, err := parser.ParseExpr(path, b)
 	if err != nil || !json.Valid(b) {
@@ -104,13 +92,12 @@ func extract(path string, b []byte) (ast.Expr, error) {
 // information with each node. The runtime may be nil if the decoder
 // is only used to extract to CUE ast objects.
 //
-// The runtime may be nil if Decode isn't used.
+// The runtime argument is a historical remnant and unused.
 func NewDecoder(r *cue.Runtime, path string, src io.Reader) *Decoder {
 	b, err := source.ReadAll(path, src)
 	tokFile := token.NewFile(path, 0, len(b))
 	tokFile.SetLinesForContent(b)
 	return &Decoder{
-		r:          r,
 		path:       path,
 		dec:        json.NewDecoder(bytes.NewReader(b)),
 		tokFile:    tokFile,
@@ -120,7 +107,6 @@ func NewDecoder(r *cue.Runtime, path string, src io.Reader) *Decoder {
 
 // A Decoder converts JSON values to CUE.
 type Decoder struct {
-	r    *cue.Runtime
 	path string
 	dec  *json.Decoder
 
@@ -171,18 +157,6 @@ func (d *Decoder) patchPos(n ast.Node) {
 	pos := n.Pos()
 	realPos := d.tokFile.Pos(pos.Offset()+d.startOffset, pos.RelPos())
 	ast.SetPos(n, realPos)
-}
-
-// Decode converts the current JSON value to a CUE instance. It returns io.EOF
-// if the input has been exhausted.
-//
-// Deprecated: use Extract and build with cue.Context.BuildExpr.
-func (d *Decoder) Decode() (*cue.Instance, error) {
-	expr, err := d.Extract()
-	if err != nil {
-		return nil, err
-	}
-	return d.r.CompileExpr(expr)
 }
 
 // patchExpr simplifies the AST parsed from JSON.

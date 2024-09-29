@@ -1,0 +1,2025 @@
+# This file has fine-grained sharing tests.
+
+-- in.cue --
+// In each case, the number of output nodes should be linear in the input size.
+//
+// This means that in each case, the next line should not retrigger the
+// computation of the previous field.
+
+// 26 Nodes computed:
+// f1: 5
+// f2+: +3 each
+binexpr: {
+	f1: { out: x: 2 }
+	f2: { out: x: f1.out.x + 1 }
+	f3: { out: x: f2.out.x + 1 }
+	f4: { out: x: f3.out.x + 1 }
+	f5: { out: x: f4.out.x + 1 }
+	f6: { out: x: f5.out.x + 1 }
+	f7: { out: x: f6.out.x + 1 }
+	f8: { out: x: f7.out.x + 1 }
+}
+
+// 26 Nodes computed:
+// f1: 5
+// f2+: +3 each
+parenthesized: {
+	f1: { out: x: 2 }
+	f2: { out: x: (f1.out).x + 1 }
+	f3: { out: x: (f2.out).x + 1 }
+	f4: { out: x: (f3.out).x + 1 }
+	f5: { out: x: (f4.out).x + 1 }
+	f6: { out: x: (f5.out).x + 1 }
+	f7: { out: x: (f6.out).x + 1 }
+	f8: { out: x: (f7.out).x + 1 }
+}
+
+// TODO(perf): fix
+// 82 Nodes computed [O(n^2)]:
+// f1: 5
+// fn: +(n*2 + 1)
+// SHOULD BE:
+// 26 Nodes computed:
+// f1: 5
+// f2+: +3 each
+embedded: {
+	f1: { out: x: 2 }
+	f2: { out: x: {f1.out}.x + 1 }
+	f3: { out: x: {f2.out}.x + 1 }
+	f4: { out: x: {f3.out}.x + 1 }
+	f5: { out: x: {f4.out}.x + 1 }
+	f6: { out: x: {f5.out}.x + 1 }
+	f7: { out: x: {f6.out}.x + 1 }
+	f8: { out: x: {f7.out}.x + 1 }
+}
+
+// TODO(perf): fix
+// 82 Nodes computed [O(n^2)]:
+// f1: 5
+// fn: +(n*2 + 1) each
+// SHOULD BE:
+// 26 Nodes computed:
+// f1: 5
+// f2+: +3 each
+embeddedWithEmpty: {
+	f1: { out: x: 2 }
+	f2: { out: x: {f1.out & {}}.x + 1 }
+	f3: { out: x: {f2.out & {}}.x + 1 }
+	f4: { out: x: {f3.out & {}}.x + 1 }
+	f5: { out: x: {f4.out & {}}.x + 1 }
+	f6: { out: x: {f5.out & {}}.x + 1 }
+	f7: { out: x: {f6.out & {}}.x + 1 }
+	f8: { out: x: {f7.out & {}}.x + 1 }
+}
+
+// TODO(perf): fix
+// This will visualize O(n^2) output size unless CUE allows for a bit more
+// sophisticated sharing.
+weave: {
+	f:  X={
+		out: in + 1
+		in:  X.ref.out + 1
+		ref: _ & {}
+	}
+	f8: f&{ ref: f7 }
+	f7: f&{ ref: f6 }
+	f6: f&{ ref: f5 }
+	f5: f&{ ref: f4 }
+	f4: f&{ ref: f3 }
+	f3: f&{ ref: f2 }
+	f2: f&{ ref: f1 }
+	f1: { out: 2 }
+}
+
+// TODO(perf): fix
+// This will visualize O(n^2) output size unless CUE supports fine-grained
+// sharing.
+weaveExtraField: {
+	f:  X={
+		out: in + 1
+		in:  X.ref.out + 1
+		ref: {y: 4} // Cannot share because of this, but sub arcs still can be.
+	}
+	f8: f&{ ref: f7 }
+	f7: f&{ ref: f6 }
+	f6: f&{ ref: f5 }
+	f5: f&{ ref: f4 }
+	f4: f&{ ref: f3 }
+	f3: f&{ ref: f2 }
+	f2: f&{ ref: f1 }
+	f1: { out: 2 }
+}
+-- out/eval/stats --
+Leaks:  112
+Freed:  340
+Reused: 308
+Allocs: 144
+Retain: 428
+
+Unifications: 452
+Conjuncts:    853
+Disjuncts:    720
+-- out/evalalpha --
+(struct){
+  binexpr: (struct){
+    f1: (struct){
+      out: (struct){
+        x: (int){ 2 }
+      }
+    }
+    f2: (struct){
+      out: (struct){
+        x: (int){ 3 }
+      }
+    }
+    f3: (struct){
+      out: (struct){
+        x: (int){ 4 }
+      }
+    }
+    f4: (struct){
+      out: (struct){
+        x: (int){ 5 }
+      }
+    }
+    f5: (struct){
+      out: (struct){
+        x: (int){ 6 }
+      }
+    }
+    f6: (struct){
+      out: (struct){
+        x: (int){ 7 }
+      }
+    }
+    f7: (struct){
+      out: (struct){
+        x: (int){ 8 }
+      }
+    }
+    f8: (struct){
+      out: (struct){
+        x: (int){ 9 }
+      }
+    }
+  }
+  parenthesized: (struct){
+    f1: (struct){
+      out: (struct){
+        x: (int){ 2 }
+      }
+    }
+    f2: (struct){
+      out: (struct){
+        x: (int){ 3 }
+      }
+    }
+    f3: (struct){
+      out: (struct){
+        x: (int){ 4 }
+      }
+    }
+    f4: (struct){
+      out: (struct){
+        x: (int){ 5 }
+      }
+    }
+    f5: (struct){
+      out: (struct){
+        x: (int){ 6 }
+      }
+    }
+    f6: (struct){
+      out: (struct){
+        x: (int){ 7 }
+      }
+    }
+    f7: (struct){
+      out: (struct){
+        x: (int){ 8 }
+      }
+    }
+    f8: (struct){
+      out: (struct){
+        x: (int){ 9 }
+      }
+    }
+  }
+  embedded: (struct){
+    f1: (struct){
+      out: (struct){
+        x: (int){ 2 }
+      }
+    }
+    f2: (struct){
+      out: (struct){
+        x: (int){ 3 }
+      }
+    }
+    f3: (struct){
+      out: (struct){
+        x: (int){ 4 }
+      }
+    }
+    f4: (struct){
+      out: (struct){
+        x: (int){ 5 }
+      }
+    }
+    f5: (struct){
+      out: (struct){
+        x: (int){ 6 }
+      }
+    }
+    f6: (struct){
+      out: (struct){
+        x: (int){ 7 }
+      }
+    }
+    f7: (struct){
+      out: (struct){
+        x: (int){ 8 }
+      }
+    }
+    f8: (struct){
+      out: (struct){
+        x: (int){ 9 }
+      }
+    }
+  }
+  embeddedWithEmpty: (struct){
+    f1: (struct){
+      out: (struct){
+        x: (int){ 2 }
+      }
+    }
+    f2: (struct){
+      out: (struct){
+        x: (int){ 3 }
+      }
+    }
+    f3: (struct){
+      out: (struct){
+        x: (int){ 4 }
+      }
+    }
+    f4: (struct){
+      out: (struct){
+        x: (int){ 5 }
+      }
+    }
+    f5: (struct){
+      out: (struct){
+        x: (int){ 6 }
+      }
+    }
+    f6: (struct){
+      out: (struct){
+        x: (int){ 7 }
+      }
+    }
+    f7: (struct){
+      out: (struct){
+        x: (int){ 8 }
+      }
+    }
+    f8: (struct){
+      out: (struct){
+        x: (int){ 9 }
+      }
+    }
+  }
+  weave: (struct){
+    f: (struct){
+      out: (_|_){
+        // [incomplete] weave.f.in: undefined field: out:
+        //     ./in.cue:78:14
+      }
+      in: (_|_){
+        // [incomplete] weave.f.in: undefined field: out:
+        //     ./in.cue:78:14
+      }
+      ref: (struct){
+      }
+    }
+    f8: (struct){
+      ref: (struct){
+        ref: (struct){
+          ref: (struct){
+            ref: (struct){
+              ref: (struct){
+                ref: (struct){
+                  ref: (struct){
+                    out: (int){ 2 }
+                  }
+                  out: (int){ 4 }
+                  in: (int){ 3 }
+                }
+                out: (int){ 6 }
+                in: (int){ 5 }
+              }
+              out: (int){ 8 }
+              in: (int){ 7 }
+            }
+            out: (int){ 10 }
+            in: (int){ 9 }
+          }
+          out: (int){ 12 }
+          in: (int){ 11 }
+        }
+        out: (int){ 14 }
+        in: (int){ 13 }
+      }
+      out: (int){ 16 }
+      in: (int){ 15 }
+    }
+    f7: (struct){
+      ref: (struct){
+        ref: (struct){
+          ref: (struct){
+            ref: (struct){
+              ref: (struct){
+                ref: (struct){
+                  out: (int){ 2 }
+                }
+                out: (int){ 4 }
+                in: (int){ 3 }
+              }
+              out: (int){ 6 }
+              in: (int){ 5 }
+            }
+            out: (int){ 8 }
+            in: (int){ 7 }
+          }
+          out: (int){ 10 }
+          in: (int){ 9 }
+        }
+        out: (int){ 12 }
+        in: (int){ 11 }
+      }
+      out: (int){ 14 }
+      in: (int){ 13 }
+    }
+    f6: (struct){
+      ref: (struct){
+        ref: (struct){
+          ref: (struct){
+            ref: (struct){
+              ref: (struct){
+                out: (int){ 2 }
+              }
+              out: (int){ 4 }
+              in: (int){ 3 }
+            }
+            out: (int){ 6 }
+            in: (int){ 5 }
+          }
+          out: (int){ 8 }
+          in: (int){ 7 }
+        }
+        out: (int){ 10 }
+        in: (int){ 9 }
+      }
+      out: (int){ 12 }
+      in: (int){ 11 }
+    }
+    f5: (struct){
+      ref: (struct){
+        ref: (struct){
+          ref: (struct){
+            ref: (struct){
+              out: (int){ 2 }
+            }
+            out: (int){ 4 }
+            in: (int){ 3 }
+          }
+          out: (int){ 6 }
+          in: (int){ 5 }
+        }
+        out: (int){ 8 }
+        in: (int){ 7 }
+      }
+      out: (int){ 10 }
+      in: (int){ 9 }
+    }
+    f4: (struct){
+      ref: (struct){
+        ref: (struct){
+          ref: (struct){
+            out: (int){ 2 }
+          }
+          out: (int){ 4 }
+          in: (int){ 3 }
+        }
+        out: (int){ 6 }
+        in: (int){ 5 }
+      }
+      out: (int){ 8 }
+      in: (int){ 7 }
+    }
+    f3: (struct){
+      ref: (struct){
+        ref: (struct){
+          out: (int){ 2 }
+        }
+        out: (int){ 4 }
+        in: (int){ 3 }
+      }
+      out: (int){ 6 }
+      in: (int){ 5 }
+    }
+    f2: (struct){
+      ref: (struct){
+        out: (int){ 2 }
+      }
+      out: (int){ 4 }
+      in: (int){ 3 }
+    }
+    f1: (struct){
+      out: (int){ 2 }
+    }
+  }
+  weaveExtraField: (struct){
+    f: (struct){
+      out: (_|_){
+        // [incomplete] weaveExtraField.f.in: undefined field: out:
+        //     ./in.cue:97:14
+      }
+      in: (_|_){
+        // [incomplete] weaveExtraField.f.in: undefined field: out:
+        //     ./in.cue:97:14
+      }
+      ref: (struct){
+        y: (int){ 4 }
+      }
+    }
+    f8: (struct){
+      ref: (struct){
+        y: (int){ 4 }
+        ref: (struct){
+          y: (int){ 4 }
+          ref: (struct){
+            y: (int){ 4 }
+            ref: (struct){
+              y: (int){ 4 }
+              ref: (struct){
+                y: (int){ 4 }
+                ref: (struct){
+                  y: (int){ 4 }
+                  ref: (struct){
+                    y: (int){ 4 }
+                    out: (int){ 2 }
+                  }
+                  out: (int){ 4 }
+                  in: (int){ 3 }
+                }
+                out: (int){ 6 }
+                in: (int){ 5 }
+              }
+              out: (int){ 8 }
+              in: (int){ 7 }
+            }
+            out: (int){ 10 }
+            in: (int){ 9 }
+          }
+          out: (int){ 12 }
+          in: (int){ 11 }
+        }
+        out: (int){ 14 }
+        in: (int){ 13 }
+      }
+      out: (int){ 16 }
+      in: (int){ 15 }
+    }
+    f7: (struct){
+      ref: (struct){
+        y: (int){ 4 }
+        ref: (struct){
+          y: (int){ 4 }
+          ref: (struct){
+            y: (int){ 4 }
+            ref: (struct){
+              y: (int){ 4 }
+              ref: (struct){
+                y: (int){ 4 }
+                ref: (struct){
+                  y: (int){ 4 }
+                  out: (int){ 2 }
+                }
+                out: (int){ 4 }
+                in: (int){ 3 }
+              }
+              out: (int){ 6 }
+              in: (int){ 5 }
+            }
+            out: (int){ 8 }
+            in: (int){ 7 }
+          }
+          out: (int){ 10 }
+          in: (int){ 9 }
+        }
+        out: (int){ 12 }
+        in: (int){ 11 }
+      }
+      out: (int){ 14 }
+      in: (int){ 13 }
+    }
+    f6: (struct){
+      ref: (struct){
+        y: (int){ 4 }
+        ref: (struct){
+          y: (int){ 4 }
+          ref: (struct){
+            y: (int){ 4 }
+            ref: (struct){
+              y: (int){ 4 }
+              ref: (struct){
+                y: (int){ 4 }
+                out: (int){ 2 }
+              }
+              out: (int){ 4 }
+              in: (int){ 3 }
+            }
+            out: (int){ 6 }
+            in: (int){ 5 }
+          }
+          out: (int){ 8 }
+          in: (int){ 7 }
+        }
+        out: (int){ 10 }
+        in: (int){ 9 }
+      }
+      out: (int){ 12 }
+      in: (int){ 11 }
+    }
+    f5: (struct){
+      ref: (struct){
+        y: (int){ 4 }
+        ref: (struct){
+          y: (int){ 4 }
+          ref: (struct){
+            y: (int){ 4 }
+            ref: (struct){
+              y: (int){ 4 }
+              out: (int){ 2 }
+            }
+            out: (int){ 4 }
+            in: (int){ 3 }
+          }
+          out: (int){ 6 }
+          in: (int){ 5 }
+        }
+        out: (int){ 8 }
+        in: (int){ 7 }
+      }
+      out: (int){ 10 }
+      in: (int){ 9 }
+    }
+    f4: (struct){
+      ref: (struct){
+        y: (int){ 4 }
+        ref: (struct){
+          y: (int){ 4 }
+          ref: (struct){
+            y: (int){ 4 }
+            out: (int){ 2 }
+          }
+          out: (int){ 4 }
+          in: (int){ 3 }
+        }
+        out: (int){ 6 }
+        in: (int){ 5 }
+      }
+      out: (int){ 8 }
+      in: (int){ 7 }
+    }
+    f3: (struct){
+      ref: (struct){
+        y: (int){ 4 }
+        ref: (struct){
+          y: (int){ 4 }
+          out: (int){ 2 }
+        }
+        out: (int){ 4 }
+        in: (int){ 3 }
+      }
+      out: (int){ 6 }
+      in: (int){ 5 }
+    }
+    f2: (struct){
+      ref: (struct){
+        y: (int){ 4 }
+        out: (int){ 2 }
+      }
+      out: (int){ 4 }
+      in: (int){ 3 }
+    }
+    f1: (struct){
+      out: (int){ 2 }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -170,148 +170,148 @@
+   weave: (struct){
+     f: (struct){
+       out: (_|_){
+-        // [cycle] cycle error:
+-        //     ./in.cue:77:8
+-      }
+-      in: (_|_){
+-        // [incomplete] weave.f.in: undefined field: out:
+-        //     ./in.cue:78:14
+-      }
+-      ref: (struct){
+-      }
+-    }
+-    f8: (struct){
+-      out: (int){ 16 }
+-      in: (int){ 15 }
+-      ref: (struct){
+-        out: (int){ 14 }
+-        in: (int){ 13 }
+-        ref: (struct){
+-          out: (int){ 12 }
+-          in: (int){ 11 }
+-          ref: (struct){
+-            out: (int){ 10 }
+-            in: (int){ 9 }
+-            ref: (struct){
+-              out: (int){ 8 }
+-              in: (int){ 7 }
+-              ref: (struct){
+-                out: (int){ 6 }
+-                in: (int){ 5 }
+-                ref: (struct){
+-                  out: (int){ 4 }
+-                  in: (int){ 3 }
+-                  ref: (struct){
+-                    out: (int){ 2 }
+-                  }
+-                }
+-              }
+-            }
+-          }
+-        }
+-      }
+-    }
+-    f7: (struct){
+-      out: (int){ 14 }
+-      in: (int){ 13 }
+-      ref: (struct){
+-        out: (int){ 12 }
+-        in: (int){ 11 }
+-        ref: (struct){
+-          out: (int){ 10 }
+-          in: (int){ 9 }
+-          ref: (struct){
+-            out: (int){ 8 }
+-            in: (int){ 7 }
+-            ref: (struct){
+-              out: (int){ 6 }
+-              in: (int){ 5 }
+-              ref: (struct){
+-                out: (int){ 4 }
+-                in: (int){ 3 }
+-                ref: (struct){
+-                  out: (int){ 2 }
+-                }
+-              }
+-            }
+-          }
+-        }
+-      }
+-    }
+-    f6: (struct){
+-      out: (int){ 12 }
+-      in: (int){ 11 }
+-      ref: (struct){
+-        out: (int){ 10 }
+-        in: (int){ 9 }
+-        ref: (struct){
+-          out: (int){ 8 }
+-          in: (int){ 7 }
+-          ref: (struct){
+-            out: (int){ 6 }
+-            in: (int){ 5 }
+-            ref: (struct){
+-              out: (int){ 4 }
+-              in: (int){ 3 }
+-              ref: (struct){
+-                out: (int){ 2 }
+-              }
+-            }
+-          }
+-        }
+-      }
+-    }
+-    f5: (struct){
+-      out: (int){ 10 }
+-      in: (int){ 9 }
+-      ref: (struct){
+-        out: (int){ 8 }
+-        in: (int){ 7 }
+-        ref: (struct){
+-          out: (int){ 6 }
+-          in: (int){ 5 }
+-          ref: (struct){
+-            out: (int){ 4 }
+-            in: (int){ 3 }
+-            ref: (struct){
+-              out: (int){ 2 }
+-            }
+-          }
+-        }
+-      }
+-    }
+-    f4: (struct){
+-      out: (int){ 8 }
+-      in: (int){ 7 }
+-      ref: (struct){
+-        out: (int){ 6 }
+-        in: (int){ 5 }
+-        ref: (struct){
+-          out: (int){ 4 }
+-          in: (int){ 3 }
+-          ref: (struct){
+-            out: (int){ 2 }
+-          }
+-        }
+-      }
+-    }
+-    f3: (struct){
+-      out: (int){ 6 }
+-      in: (int){ 5 }
+-      ref: (struct){
+-        out: (int){ 4 }
+-        in: (int){ 3 }
+-        ref: (struct){
+-          out: (int){ 2 }
+-        }
+-      }
+-    }
+-    f2: (struct){
+-      out: (int){ 4 }
+-      in: (int){ 3 }
+-      ref: (struct){
+-        out: (int){ 2 }
+-      }
++        // [incomplete] weave.f.in: undefined field: out:
++        //     ./in.cue:78:14
++      }
++      in: (_|_){
++        // [incomplete] weave.f.in: undefined field: out:
++        //     ./in.cue:78:14
++      }
++      ref: (struct){
++      }
++    }
++    f8: (struct){
++      ref: (struct){
++        ref: (struct){
++          ref: (struct){
++            ref: (struct){
++              ref: (struct){
++                ref: (struct){
++                  ref: (struct){
++                    out: (int){ 2 }
++                  }
++                  out: (int){ 4 }
++                  in: (int){ 3 }
++                }
++                out: (int){ 6 }
++                in: (int){ 5 }
++              }
++              out: (int){ 8 }
++              in: (int){ 7 }
++            }
++            out: (int){ 10 }
++            in: (int){ 9 }
++          }
++          out: (int){ 12 }
++          in: (int){ 11 }
++        }
++        out: (int){ 14 }
++        in: (int){ 13 }
++      }
++      out: (int){ 16 }
++      in: (int){ 15 }
++    }
++    f7: (struct){
++      ref: (struct){
++        ref: (struct){
++          ref: (struct){
++            ref: (struct){
++              ref: (struct){
++                ref: (struct){
++                  out: (int){ 2 }
++                }
++                out: (int){ 4 }
++                in: (int){ 3 }
++              }
++              out: (int){ 6 }
++              in: (int){ 5 }
++            }
++            out: (int){ 8 }
++            in: (int){ 7 }
++          }
++          out: (int){ 10 }
++          in: (int){ 9 }
++        }
++        out: (int){ 12 }
++        in: (int){ 11 }
++      }
++      out: (int){ 14 }
++      in: (int){ 13 }
++    }
++    f6: (struct){
++      ref: (struct){
++        ref: (struct){
++          ref: (struct){
++            ref: (struct){
++              ref: (struct){
++                out: (int){ 2 }
++              }
++              out: (int){ 4 }
++              in: (int){ 3 }
++            }
++            out: (int){ 6 }
++            in: (int){ 5 }
++          }
++          out: (int){ 8 }
++          in: (int){ 7 }
++        }
++        out: (int){ 10 }
++        in: (int){ 9 }
++      }
++      out: (int){ 12 }
++      in: (int){ 11 }
++    }
++    f5: (struct){
++      ref: (struct){
++        ref: (struct){
++          ref: (struct){
++            ref: (struct){
++              out: (int){ 2 }
++            }
++            out: (int){ 4 }
++            in: (int){ 3 }
++          }
++          out: (int){ 6 }
++          in: (int){ 5 }
++        }
++        out: (int){ 8 }
++        in: (int){ 7 }
++      }
++      out: (int){ 10 }
++      in: (int){ 9 }
++    }
++    f4: (struct){
++      ref: (struct){
++        ref: (struct){
++          ref: (struct){
++            out: (int){ 2 }
++          }
++          out: (int){ 4 }
++          in: (int){ 3 }
++        }
++        out: (int){ 6 }
++        in: (int){ 5 }
++      }
++      out: (int){ 8 }
++      in: (int){ 7 }
++    }
++    f3: (struct){
++      ref: (struct){
++        ref: (struct){
++          out: (int){ 2 }
++        }
++        out: (int){ 4 }
++        in: (int){ 3 }
++      }
++      out: (int){ 6 }
++      in: (int){ 5 }
++    }
++    f2: (struct){
++      ref: (struct){
++        out: (int){ 2 }
++      }
++      out: (int){ 4 }
++      in: (int){ 3 }
+     }
+     f1: (struct){
+       out: (int){ 2 }
+@@ -320,177 +320,177 @@
+   weaveExtraField: (struct){
+     f: (struct){
+       out: (_|_){
+-        // [cycle] cycle error:
+-        //     ./in.cue:96:8
+-      }
+-      in: (_|_){
+-        // [incomplete] weaveExtraField.f.in: undefined field: out:
+-        //     ./in.cue:97:14
+-      }
+-      ref: (struct){
+-        y: (int){ 4 }
+-      }
+-    }
+-    f8: (struct){
+-      out: (int){ 16 }
+-      in: (int){ 15 }
+-      ref: (struct){
+-        y: (int){ 4 }
+-        out: (int){ 14 }
+-        in: (int){ 13 }
+-        ref: (struct){
+-          y: (int){ 4 }
+-          out: (int){ 12 }
+-          in: (int){ 11 }
+-          ref: (struct){
+-            y: (int){ 4 }
+-            out: (int){ 10 }
+-            in: (int){ 9 }
+-            ref: (struct){
+-              y: (int){ 4 }
+-              out: (int){ 8 }
+-              in: (int){ 7 }
+-              ref: (struct){
+-                y: (int){ 4 }
+-                out: (int){ 6 }
+-                in: (int){ 5 }
+-                ref: (struct){
+-                  y: (int){ 4 }
+-                  out: (int){ 4 }
+-                  in: (int){ 3 }
++        // [incomplete] weaveExtraField.f.in: undefined field: out:
++        //     ./in.cue:97:14
++      }
++      in: (_|_){
++        // [incomplete] weaveExtraField.f.in: undefined field: out:
++        //     ./in.cue:97:14
++      }
++      ref: (struct){
++        y: (int){ 4 }
++      }
++    }
++    f8: (struct){
++      ref: (struct){
++        y: (int){ 4 }
++        ref: (struct){
++          y: (int){ 4 }
++          ref: (struct){
++            y: (int){ 4 }
++            ref: (struct){
++              y: (int){ 4 }
++              ref: (struct){
++                y: (int){ 4 }
++                ref: (struct){
++                  y: (int){ 4 }
+                   ref: (struct){
+                     y: (int){ 4 }
+                     out: (int){ 2 }
+                   }
+-                }
+-              }
+-            }
+-          }
+-        }
+-      }
+-    }
+-    f7: (struct){
+-      out: (int){ 14 }
+-      in: (int){ 13 }
+-      ref: (struct){
+-        y: (int){ 4 }
+-        out: (int){ 12 }
+-        in: (int){ 11 }
+-        ref: (struct){
+-          y: (int){ 4 }
+-          out: (int){ 10 }
+-          in: (int){ 9 }
+-          ref: (struct){
+-            y: (int){ 4 }
+-            out: (int){ 8 }
+-            in: (int){ 7 }
+-            ref: (struct){
+-              y: (int){ 4 }
+-              out: (int){ 6 }
+-              in: (int){ 5 }
+-              ref: (struct){
+-                y: (int){ 4 }
+-                out: (int){ 4 }
+-                in: (int){ 3 }
+-                ref: (struct){
+-                  y: (int){ 4 }
+-                  out: (int){ 2 }
+-                }
+-              }
+-            }
+-          }
+-        }
+-      }
+-    }
+-    f6: (struct){
+-      out: (int){ 12 }
+-      in: (int){ 11 }
+-      ref: (struct){
+-        y: (int){ 4 }
+-        out: (int){ 10 }
+-        in: (int){ 9 }
+-        ref: (struct){
+-          y: (int){ 4 }
+-          out: (int){ 8 }
+-          in: (int){ 7 }
+-          ref: (struct){
+-            y: (int){ 4 }
+-            out: (int){ 6 }
+-            in: (int){ 5 }
+-            ref: (struct){
+-              y: (int){ 4 }
+-              out: (int){ 4 }
+-              in: (int){ 3 }
+-              ref: (struct){
+-                y: (int){ 4 }
+-                out: (int){ 2 }
+-              }
+-            }
+-          }
+-        }
+-      }
+-    }
+-    f5: (struct){
+-      out: (int){ 10 }
+-      in: (int){ 9 }
+-      ref: (struct){
+-        y: (int){ 4 }
+-        out: (int){ 8 }
+-        in: (int){ 7 }
+-        ref: (struct){
+-          y: (int){ 4 }
+-          out: (int){ 6 }
+-          in: (int){ 5 }
+-          ref: (struct){
+-            y: (int){ 4 }
+-            out: (int){ 4 }
+-            in: (int){ 3 }
+-            ref: (struct){
+-              y: (int){ 4 }
+-              out: (int){ 2 }
+-            }
+-          }
+-        }
+-      }
+-    }
+-    f4: (struct){
+-      out: (int){ 8 }
+-      in: (int){ 7 }
+-      ref: (struct){
+-        y: (int){ 4 }
+-        out: (int){ 6 }
+-        in: (int){ 5 }
+-        ref: (struct){
+-          y: (int){ 4 }
+-          out: (int){ 4 }
+-          in: (int){ 3 }
+-          ref: (struct){
+-            y: (int){ 4 }
+-            out: (int){ 2 }
+-          }
+-        }
+-      }
+-    }
+-    f3: (struct){
+-      out: (int){ 6 }
+-      in: (int){ 5 }
+-      ref: (struct){
+-        y: (int){ 4 }
+-        out: (int){ 4 }
+-        in: (int){ 3 }
+-        ref: (struct){
+-          y: (int){ 4 }
+-          out: (int){ 2 }
+-        }
+-      }
+-    }
+-    f2: (struct){
+-      out: (int){ 4 }
+-      in: (int){ 3 }
+-      ref: (struct){
+-        y: (int){ 4 }
+-        out: (int){ 2 }
+-      }
++                  out: (int){ 4 }
++                  in: (int){ 3 }
++                }
++                out: (int){ 6 }
++                in: (int){ 5 }
++              }
++              out: (int){ 8 }
++              in: (int){ 7 }
++            }
++            out: (int){ 10 }
++            in: (int){ 9 }
++          }
++          out: (int){ 12 }
++          in: (int){ 11 }
++        }
++        out: (int){ 14 }
++        in: (int){ 13 }
++      }
++      out: (int){ 16 }
++      in: (int){ 15 }
++    }
++    f7: (struct){
++      ref: (struct){
++        y: (int){ 4 }
++        ref: (struct){
++          y: (int){ 4 }
++          ref: (struct){
++            y: (int){ 4 }
++            ref: (struct){
++              y: (int){ 4 }
++              ref: (struct){
++                y: (int){ 4 }
++                ref: (struct){
++                  y: (int){ 4 }
++                  out: (int){ 2 }
++                }
++                out: (int){ 4 }
++                in: (int){ 3 }
++              }
++              out: (int){ 6 }
++              in: (int){ 5 }
++            }
++            out: (int){ 8 }
++            in: (int){ 7 }
++          }
++          out: (int){ 10 }
++          in: (int){ 9 }
++        }
++        out: (int){ 12 }
++        in: (int){ 11 }
++      }
++      out: (int){ 14 }
++      in: (int){ 13 }
++    }
++    f6: (struct){
++      ref: (struct){
++        y: (int){ 4 }
++        ref: (struct){
++          y: (int){ 4 }
++          ref: (struct){
++            y: (int){ 4 }
++            ref: (struct){
++              y: (int){ 4 }
++              ref: (struct){
++                y: (int){ 4 }
++                out: (int){ 2 }
++              }
++              out: (int){ 4 }
++              in: (int){ 3 }
++            }
++            out: (int){ 6 }
++            in: (int){ 5 }
++          }
++          out: (int){ 8 }
++          in: (int){ 7 }
++        }
++        out: (int){ 10 }
++        in: (int){ 9 }
++      }
++      out: (int){ 12 }
++      in: (int){ 11 }
++    }
++    f5: (struct){
++      ref: (struct){
++        y: (int){ 4 }
++        ref: (struct){
++          y: (int){ 4 }
++          ref: (struct){
++            y: (int){ 4 }
++            ref: (struct){
++              y: (int){ 4 }
++              out: (int){ 2 }
++            }
++            out: (int){ 4 }
++            in: (int){ 3 }
++          }
++          out: (int){ 6 }
++          in: (int){ 5 }
++        }
++        out: (int){ 8 }
++        in: (int){ 7 }
++      }
++      out: (int){ 10 }
++      in: (int){ 9 }
++    }
++    f4: (struct){
++      ref: (struct){
++        y: (int){ 4 }
++        ref: (struct){
++          y: (int){ 4 }
++          ref: (struct){
++            y: (int){ 4 }
++            out: (int){ 2 }
++          }
++          out: (int){ 4 }
++          in: (int){ 3 }
++        }
++        out: (int){ 6 }
++        in: (int){ 5 }
++      }
++      out: (int){ 8 }
++      in: (int){ 7 }
++    }
++    f3: (struct){
++      ref: (struct){
++        y: (int){ 4 }
++        ref: (struct){
++          y: (int){ 4 }
++          out: (int){ 2 }
++        }
++        out: (int){ 4 }
++        in: (int){ 3 }
++      }
++      out: (int){ 6 }
++      in: (int){ 5 }
++    }
++    f2: (struct){
++      ref: (struct){
++        y: (int){ 4 }
++        out: (int){ 2 }
++      }
++      out: (int){ 4 }
++      in: (int){ 3 }
+     }
+     f1: (struct){
+       out: (int){ 2 }
+-- out/eval --
+(struct){
+  binexpr: (struct){
+    f1: (struct){
+      out: (struct){
+        x: (int){ 2 }
+      }
+    }
+    f2: (struct){
+      out: (struct){
+        x: (int){ 3 }
+      }
+    }
+    f3: (struct){
+      out: (struct){
+        x: (int){ 4 }
+      }
+    }
+    f4: (struct){
+      out: (struct){
+        x: (int){ 5 }
+      }
+    }
+    f5: (struct){
+      out: (struct){
+        x: (int){ 6 }
+      }
+    }
+    f6: (struct){
+      out: (struct){
+        x: (int){ 7 }
+      }
+    }
+    f7: (struct){
+      out: (struct){
+        x: (int){ 8 }
+      }
+    }
+    f8: (struct){
+      out: (struct){
+        x: (int){ 9 }
+      }
+    }
+  }
+  parenthesized: (struct){
+    f1: (struct){
+      out: (struct){
+        x: (int){ 2 }
+      }
+    }
+    f2: (struct){
+      out: (struct){
+        x: (int){ 3 }
+      }
+    }
+    f3: (struct){
+      out: (struct){
+        x: (int){ 4 }
+      }
+    }
+    f4: (struct){
+      out: (struct){
+        x: (int){ 5 }
+      }
+    }
+    f5: (struct){
+      out: (struct){
+        x: (int){ 6 }
+      }
+    }
+    f6: (struct){
+      out: (struct){
+        x: (int){ 7 }
+      }
+    }
+    f7: (struct){
+      out: (struct){
+        x: (int){ 8 }
+      }
+    }
+    f8: (struct){
+      out: (struct){
+        x: (int){ 9 }
+      }
+    }
+  }
+  embedded: (struct){
+    f1: (struct){
+      out: (struct){
+        x: (int){ 2 }
+      }
+    }
+    f2: (struct){
+      out: (struct){
+        x: (int){ 3 }
+      }
+    }
+    f3: (struct){
+      out: (struct){
+        x: (int){ 4 }
+      }
+    }
+    f4: (struct){
+      out: (struct){
+        x: (int){ 5 }
+      }
+    }
+    f5: (struct){
+      out: (struct){
+        x: (int){ 6 }
+      }
+    }
+    f6: (struct){
+      out: (struct){
+        x: (int){ 7 }
+      }
+    }
+    f7: (struct){
+      out: (struct){
+        x: (int){ 8 }
+      }
+    }
+    f8: (struct){
+      out: (struct){
+        x: (int){ 9 }
+      }
+    }
+  }
+  embeddedWithEmpty: (struct){
+    f1: (struct){
+      out: (struct){
+        x: (int){ 2 }
+      }
+    }
+    f2: (struct){
+      out: (struct){
+        x: (int){ 3 }
+      }
+    }
+    f3: (struct){
+      out: (struct){
+        x: (int){ 4 }
+      }
+    }
+    f4: (struct){
+      out: (struct){
+        x: (int){ 5 }
+      }
+    }
+    f5: (struct){
+      out: (struct){
+        x: (int){ 6 }
+      }
+    }
+    f6: (struct){
+      out: (struct){
+        x: (int){ 7 }
+      }
+    }
+    f7: (struct){
+      out: (struct){
+        x: (int){ 8 }
+      }
+    }
+    f8: (struct){
+      out: (struct){
+        x: (int){ 9 }
+      }
+    }
+  }
+  weave: (struct){
+    f: (struct){
+      out: (_|_){
+        // [cycle] cycle error:
+        //     ./in.cue:77:8
+      }
+      in: (_|_){
+        // [incomplete] weave.f.in: undefined field: out:
+        //     ./in.cue:78:14
+      }
+      ref: (struct){
+      }
+    }
+    f8: (struct){
+      out: (int){ 16 }
+      in: (int){ 15 }
+      ref: (struct){
+        out: (int){ 14 }
+        in: (int){ 13 }
+        ref: (struct){
+          out: (int){ 12 }
+          in: (int){ 11 }
+          ref: (struct){
+            out: (int){ 10 }
+            in: (int){ 9 }
+            ref: (struct){
+              out: (int){ 8 }
+              in: (int){ 7 }
+              ref: (struct){
+                out: (int){ 6 }
+                in: (int){ 5 }
+                ref: (struct){
+                  out: (int){ 4 }
+                  in: (int){ 3 }
+                  ref: (struct){
+                    out: (int){ 2 }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    f7: (struct){
+      out: (int){ 14 }
+      in: (int){ 13 }
+      ref: (struct){
+        out: (int){ 12 }
+        in: (int){ 11 }
+        ref: (struct){
+          out: (int){ 10 }
+          in: (int){ 9 }
+          ref: (struct){
+            out: (int){ 8 }
+            in: (int){ 7 }
+            ref: (struct){
+              out: (int){ 6 }
+              in: (int){ 5 }
+              ref: (struct){
+                out: (int){ 4 }
+                in: (int){ 3 }
+                ref: (struct){
+                  out: (int){ 2 }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    f6: (struct){
+      out: (int){ 12 }
+      in: (int){ 11 }
+      ref: (struct){
+        out: (int){ 10 }
+        in: (int){ 9 }
+        ref: (struct){
+          out: (int){ 8 }
+          in: (int){ 7 }
+          ref: (struct){
+            out: (int){ 6 }
+            in: (int){ 5 }
+            ref: (struct){
+              out: (int){ 4 }
+              in: (int){ 3 }
+              ref: (struct){
+                out: (int){ 2 }
+              }
+            }
+          }
+        }
+      }
+    }
+    f5: (struct){
+      out: (int){ 10 }
+      in: (int){ 9 }
+      ref: (struct){
+        out: (int){ 8 }
+        in: (int){ 7 }
+        ref: (struct){
+          out: (int){ 6 }
+          in: (int){ 5 }
+          ref: (struct){
+            out: (int){ 4 }
+            in: (int){ 3 }
+            ref: (struct){
+              out: (int){ 2 }
+            }
+          }
+        }
+      }
+    }
+    f4: (struct){
+      out: (int){ 8 }
+      in: (int){ 7 }
+      ref: (struct){
+        out: (int){ 6 }
+        in: (int){ 5 }
+        ref: (struct){
+          out: (int){ 4 }
+          in: (int){ 3 }
+          ref: (struct){
+            out: (int){ 2 }
+          }
+        }
+      }
+    }
+    f3: (struct){
+      out: (int){ 6 }
+      in: (int){ 5 }
+      ref: (struct){
+        out: (int){ 4 }
+        in: (int){ 3 }
+        ref: (struct){
+          out: (int){ 2 }
+        }
+      }
+    }
+    f2: (struct){
+      out: (int){ 4 }
+      in: (int){ 3 }
+      ref: (struct){
+        out: (int){ 2 }
+      }
+    }
+    f1: (struct){
+      out: (int){ 2 }
+    }
+  }
+  weaveExtraField: (struct){
+    f: (struct){
+      out: (_|_){
+        // [cycle] cycle error:
+        //     ./in.cue:96:8
+      }
+      in: (_|_){
+        // [incomplete] weaveExtraField.f.in: undefined field: out:
+        //     ./in.cue:97:14
+      }
+      ref: (struct){
+        y: (int){ 4 }
+      }
+    }
+    f8: (struct){
+      out: (int){ 16 }
+      in: (int){ 15 }
+      ref: (struct){
+        y: (int){ 4 }
+        out: (int){ 14 }
+        in: (int){ 13 }
+        ref: (struct){
+          y: (int){ 4 }
+          out: (int){ 12 }
+          in: (int){ 11 }
+          ref: (struct){
+            y: (int){ 4 }
+            out: (int){ 10 }
+            in: (int){ 9 }
+            ref: (struct){
+              y: (int){ 4 }
+              out: (int){ 8 }
+              in: (int){ 7 }
+              ref: (struct){
+                y: (int){ 4 }
+                out: (int){ 6 }
+                in: (int){ 5 }
+                ref: (struct){
+                  y: (int){ 4 }
+                  out: (int){ 4 }
+                  in: (int){ 3 }
+                  ref: (struct){
+                    y: (int){ 4 }
+                    out: (int){ 2 }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    f7: (struct){
+      out: (int){ 14 }
+      in: (int){ 13 }
+      ref: (struct){
+        y: (int){ 4 }
+        out: (int){ 12 }
+        in: (int){ 11 }
+        ref: (struct){
+          y: (int){ 4 }
+          out: (int){ 10 }
+          in: (int){ 9 }
+          ref: (struct){
+            y: (int){ 4 }
+            out: (int){ 8 }
+            in: (int){ 7 }
+            ref: (struct){
+              y: (int){ 4 }
+              out: (int){ 6 }
+              in: (int){ 5 }
+              ref: (struct){
+                y: (int){ 4 }
+                out: (int){ 4 }
+                in: (int){ 3 }
+                ref: (struct){
+                  y: (int){ 4 }
+                  out: (int){ 2 }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    f6: (struct){
+      out: (int){ 12 }
+      in: (int){ 11 }
+      ref: (struct){
+        y: (int){ 4 }
+        out: (int){ 10 }
+        in: (int){ 9 }
+        ref: (struct){
+          y: (int){ 4 }
+          out: (int){ 8 }
+          in: (int){ 7 }
+          ref: (struct){
+            y: (int){ 4 }
+            out: (int){ 6 }
+            in: (int){ 5 }
+            ref: (struct){
+              y: (int){ 4 }
+              out: (int){ 4 }
+              in: (int){ 3 }
+              ref: (struct){
+                y: (int){ 4 }
+                out: (int){ 2 }
+              }
+            }
+          }
+        }
+      }
+    }
+    f5: (struct){
+      out: (int){ 10 }
+      in: (int){ 9 }
+      ref: (struct){
+        y: (int){ 4 }
+        out: (int){ 8 }
+        in: (int){ 7 }
+        ref: (struct){
+          y: (int){ 4 }
+          out: (int){ 6 }
+          in: (int){ 5 }
+          ref: (struct){
+            y: (int){ 4 }
+            out: (int){ 4 }
+            in: (int){ 3 }
+            ref: (struct){
+              y: (int){ 4 }
+              out: (int){ 2 }
+            }
+          }
+        }
+      }
+    }
+    f4: (struct){
+      out: (int){ 8 }
+      in: (int){ 7 }
+      ref: (struct){
+        y: (int){ 4 }
+        out: (int){ 6 }
+        in: (int){ 5 }
+        ref: (struct){
+          y: (int){ 4 }
+          out: (int){ 4 }
+          in: (int){ 3 }
+          ref: (struct){
+            y: (int){ 4 }
+            out: (int){ 2 }
+          }
+        }
+      }
+    }
+    f3: (struct){
+      out: (int){ 6 }
+      in: (int){ 5 }
+      ref: (struct){
+        y: (int){ 4 }
+        out: (int){ 4 }
+        in: (int){ 3 }
+        ref: (struct){
+          y: (int){ 4 }
+          out: (int){ 2 }
+        }
+      }
+    }
+    f2: (struct){
+      out: (int){ 4 }
+      in: (int){ 3 }
+      ref: (struct){
+        y: (int){ 4 }
+        out: (int){ 2 }
+      }
+    }
+    f1: (struct){
+      out: (int){ 2 }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  binexpr: {
+    f1: {
+      out: {
+        x: 2
+      }
+    }
+    f2: {
+      out: {
+        x: (〈2;f1〉.out.x + 1)
+      }
+    }
+    f3: {
+      out: {
+        x: (〈2;f2〉.out.x + 1)
+      }
+    }
+    f4: {
+      out: {
+        x: (〈2;f3〉.out.x + 1)
+      }
+    }
+    f5: {
+      out: {
+        x: (〈2;f4〉.out.x + 1)
+      }
+    }
+    f6: {
+      out: {
+        x: (〈2;f5〉.out.x + 1)
+      }
+    }
+    f7: {
+      out: {
+        x: (〈2;f6〉.out.x + 1)
+      }
+    }
+    f8: {
+      out: {
+        x: (〈2;f7〉.out.x + 1)
+      }
+    }
+  }
+  parenthesized: {
+    f1: {
+      out: {
+        x: 2
+      }
+    }
+    f2: {
+      out: {
+        x: (〈2;f1〉.out.x + 1)
+      }
+    }
+    f3: {
+      out: {
+        x: (〈2;f2〉.out.x + 1)
+      }
+    }
+    f4: {
+      out: {
+        x: (〈2;f3〉.out.x + 1)
+      }
+    }
+    f5: {
+      out: {
+        x: (〈2;f4〉.out.x + 1)
+      }
+    }
+    f6: {
+      out: {
+        x: (〈2;f5〉.out.x + 1)
+      }
+    }
+    f7: {
+      out: {
+        x: (〈2;f6〉.out.x + 1)
+      }
+    }
+    f8: {
+      out: {
+        x: (〈2;f7〉.out.x + 1)
+      }
+    }
+  }
+  embedded: {
+    f1: {
+      out: {
+        x: 2
+      }
+    }
+    f2: {
+      out: {
+        x: ({
+          〈3;f1〉.out
+        }.x + 1)
+      }
+    }
+    f3: {
+      out: {
+        x: ({
+          〈3;f2〉.out
+        }.x + 1)
+      }
+    }
+    f4: {
+      out: {
+        x: ({
+          〈3;f3〉.out
+        }.x + 1)
+      }
+    }
+    f5: {
+      out: {
+        x: ({
+          〈3;f4〉.out
+        }.x + 1)
+      }
+    }
+    f6: {
+      out: {
+        x: ({
+          〈3;f5〉.out
+        }.x + 1)
+      }
+    }
+    f7: {
+      out: {
+        x: ({
+          〈3;f6〉.out
+        }.x + 1)
+      }
+    }
+    f8: {
+      out: {
+        x: ({
+          〈3;f7〉.out
+        }.x + 1)
+      }
+    }
+  }
+  embeddedWithEmpty: {
+    f1: {
+      out: {
+        x: 2
+      }
+    }
+    f2: {
+      out: {
+        x: ({
+          (〈3;f1〉.out & {})
+        }.x + 1)
+      }
+    }
+    f3: {
+      out: {
+        x: ({
+          (〈3;f2〉.out & {})
+        }.x + 1)
+      }
+    }
+    f4: {
+      out: {
+        x: ({
+          (〈3;f3〉.out & {})
+        }.x + 1)
+      }
+    }
+    f5: {
+      out: {
+        x: ({
+          (〈3;f4〉.out & {})
+        }.x + 1)
+      }
+    }
+    f6: {
+      out: {
+        x: ({
+          (〈3;f5〉.out & {})
+        }.x + 1)
+      }
+    }
+    f7: {
+      out: {
+        x: ({
+          (〈3;f6〉.out & {})
+        }.x + 1)
+      }
+    }
+    f8: {
+      out: {
+        x: ({
+          (〈3;f7〉.out & {})
+        }.x + 1)
+      }
+    }
+  }
+  weave: {
+    f: {
+      out: (〈0;in〉 + 1)
+      in: (〈1〉.ref.out + 1)
+      ref: (_ & {})
+    }
+    f8: (〈0;f〉 & {
+      ref: 〈1;f7〉
+    })
+    f7: (〈0;f〉 & {
+      ref: 〈1;f6〉
+    })
+    f6: (〈0;f〉 & {
+      ref: 〈1;f5〉
+    })
+    f5: (〈0;f〉 & {
+      ref: 〈1;f4〉
+    })
+    f4: (〈0;f〉 & {
+      ref: 〈1;f3〉
+    })
+    f3: (〈0;f〉 & {
+      ref: 〈1;f2〉
+    })
+    f2: (〈0;f〉 & {
+      ref: 〈1;f1〉
+    })
+    f1: {
+      out: 2
+    }
+  }
+  weaveExtraField: {
+    f: {
+      out: (〈0;in〉 + 1)
+      in: (〈1〉.ref.out + 1)
+      ref: {
+        y: 4
+      }
+    }
+    f8: (〈0;f〉 & {
+      ref: 〈1;f7〉
+    })
+    f7: (〈0;f〉 & {
+      ref: 〈1;f6〉
+    })
+    f6: (〈0;f〉 & {
+      ref: 〈1;f5〉
+    })
+    f5: (〈0;f〉 & {
+      ref: 〈1;f4〉
+    })
+    f4: (〈0;f〉 & {
+      ref: 〈1;f3〉
+    })
+    f3: (〈0;f〉 & {
+      ref: 〈1;f2〉
+    })
+    f2: (〈0;f〉 & {
+      ref: 〈1;f1〉
+    })
+    f1: {
+      out: 2
+    }
+  }
+}

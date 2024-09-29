@@ -100,9 +100,7 @@ Result:
   a: (string){ "foo" }
   e: (int){ 2 }
   b: (string){ "bar" }
-  c: (struct){
-    a: (int){ 1 }
-  }
+  c: ~(bar)
   withError: (_|_){
     // [eval]
     issue799: (_|_){
@@ -197,7 +195,18 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -81,6 +81,8 @@
+@@ -17,9 +17,7 @@
+   a: (string){ "foo" }
+   e: (int){ 2 }
+   b: (string){ "bar" }
+-  c: (struct){
+-    a: (int){ 1 }
+-  }
++  c: ~(bar)
+   withError: (_|_){
+     // [eval]
+     issue799: (_|_){
+@@ -81,6 +79,8 @@
            // [incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
            //     ./in.cue:59:8
            //     ./in.cue:59:11
@@ -206,7 +215,7 @@ diff old new
          }
          #ID: (_|_){
            // [incomplete] noCycleError.foo.bar.#ID: invalid interpolation: non-concrete value string (type string):
-@@ -97,6 +99,9 @@
+@@ -97,6 +97,9 @@
        }
      }
    }
@@ -216,7 +225,7 @@ diff old new
    foo: (struct){
      b: (struct){
        c: (struct){
-@@ -104,7 +109,4 @@
+@@ -104,7 +107,4 @@
        }
      }
    }

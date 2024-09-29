@@ -425,12 +425,7 @@ Result:
     _e: (#struct){
       f2: (#struct){
         a: (#struct){
-          t: (#struct){
-            f1: (#struct){
-            }
-            f2: (#struct){
-            }
-          }
+          t: ~(issue1666.#E)
         }
       }
       f1: (#struct){
@@ -447,12 +442,7 @@ Result:
       }
       f2: (#struct){
         a: (#struct){
-          t: (#struct){
-            f1: (#struct){
-            }
-            f2: (#struct){
-            }
-          }
+          t: ~(issue1666.#E)
         }
       }
     }
@@ -901,7 +891,7 @@ diff old new
        }
      }
    }
-@@ -52,17 +101,17 @@
+@@ -52,17 +101,12 @@
        }
      }
      _e: (#struct){
@@ -918,19 +908,28 @@ diff old new
 -        }
 +      f2: (#struct){
 +        a: (#struct){
-+          t: (#struct){
-+            f1: (#struct){
-+            }
-+            f2: (#struct){
-+            }
-+          }
++          t: ~(issue1666.#E)
 +        }
 +      }
 +      f1: (#struct){
        }
      }
      e: (#struct){
-@@ -112,15 +161,14 @@
+@@ -76,12 +120,7 @@
+       }
+       f2: (#struct){
+         a: (#struct){
+-          t: (#struct){
+-            f1: (#struct){
+-            }
+-            f2: (#struct){
+-            }
+-          }
++          t: ~(issue1666.#E)
+         }
+       }
+     }
+@@ -112,15 +151,14 @@
        }
      }
      list: (struct){
@@ -949,7 +948,7 @@ diff old new
          }
        }
      }
-@@ -127,116 +175,168 @@
+@@ -127,116 +165,168 @@
      insertionError: (_|_){
        // [eval]
        A: (_|_){
@@ -1227,7 +1226,7 @@ diff old new
          }
        }
      }
-@@ -251,84 +351,102 @@
+@@ -251,84 +341,102 @@
        }
      }
    }
@@ -1408,7 +1407,7 @@ diff old new
      t1: (struct){
        p1: (struct){
          D: (struct){
-@@ -361,40 +479,34 @@
+@@ -361,40 +469,34 @@
          }
        }
      }

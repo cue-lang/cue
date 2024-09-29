@@ -66,13 +66,7 @@ Result:
       }
     }
     out: (#list){
-      0: (#struct){
-        let empty#1 = (#struct){
-        }
-        field: (#struct){
-          n: (int){ 3 }
-        }
-      }
+      0: ~(issue3330.#A)
     }
   }
   eliminated: (_|_){
@@ -136,7 +130,22 @@ diff old new
      ./in.cue:23:5
      ./in.cue:23:16
  
-@@ -35,31 +32,23 @@
+@@ -21,13 +18,7 @@
+       }
+     }
+     out: (#list){
+-      0: (#struct){
+-        let empty#1 = (#struct){
+-        }
+-        field: (#struct){
+-          n: (int){ 3 }
+-        }
+-      }
++      0: ~(issue3330.#A)
+     }
+   }
+   eliminated: (_|_){
+@@ -35,31 +26,23 @@
      #empty: (#struct){
      }
      x: (_|_){

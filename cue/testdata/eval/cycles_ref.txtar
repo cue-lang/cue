@@ -17,6 +17,36 @@ Retain: 3
 Unifications: 12
 Conjuncts:    24
 Disjuncts:    15
+-- out/evalalpha --
+(struct){
+  a: (int){ 200 }
+  b: (int){ 100 }
+  c: (struct){
+    b: (int){ 2 }
+    a: (int){ 1 }
+  }
+  d: ~(e)
+  e: (struct){
+    a: (int){ 1 }
+    b: (int){ 2 }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -5,10 +5,7 @@
+     b: (int){ 2 }
+     a: (int){ 1 }
+   }
+-  d: (struct){
+-    a: (int){ 1 }
+-    b: (int){ 2 }
+-  }
++  d: ~(e)
+   e: (struct){
+     a: (int){ 1 }
+     b: (int){ 2 }
 -- out/eval --
 (struct){
   a: (int){ 200 }

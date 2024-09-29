@@ -907,9 +907,7 @@ issue770: {
     #B: (#struct){
     }
     #C: (#struct){
-      x: (#struct){
-        type: ~(issue1940.#T)
-      }
+      x: ~(issue1940.#A)
     }
   }
   issue1417: (struct){
@@ -939,36 +937,20 @@ issue770: {
           }
         }
         out: (struct){ |((struct){
-            X: (#struct){
-              bar: (#struct){
-                min: (int){ 1 }
-              }
-            }
+            X: ~(issue2209.simplified.t1.spec)
             nullFoo: (null){ null }
             minFoo: (int){ int }
           }, (struct){
             minBar: (int){ int }
-            X: (#struct){
-              bar: (#struct){
-                min: (int){ 1 }
-              }
-            }
+            X: ~(issue2209.simplified.t1.spec)
             nullFoo: (null){ null }
           }, (struct){
-            X: (#struct){
-              bar: (#struct){
-                min: (int){ 1 }
-              }
-            }
+            X: ~(issue2209.simplified.t1.spec)
             nullBar: (null){ null }
             minFoo: (int){ int }
           }, (struct){
             minBar: (int){ int }
-            X: (#struct){
-              bar: (#struct){
-                min: (int){ 1 }
-              }
-            }
+            X: ~(issue2209.simplified.t1.spec)
             nullBar: (null){ null }
           }) }
       }
@@ -1279,18 +1261,12 @@ issue770: {
         }
       }
       #summarizeReturn: (#struct){
-        in: (#struct){
-          forms: (list){
-          }
-        }
+        in: ~(issue2246.full.#Input)
         out: (#list){
         }
       }
       #compute: (#struct){
-        in: (#struct){
-          forms: (list){
-          }
-        }
+        in: ~(issue2246.full.#Input)
         out: (#list){
         }
       }
@@ -1680,7 +1656,7 @@ diff old new
    }
    issue1940: (struct){
      #T: (#list){
-@@ -446,53 +374,26 @@
+@@ -446,53 +374,24 @@
        }
      }
      #A: (#struct){
@@ -1694,7 +1670,7 @@ diff old new
      #B: (#struct){
      }
      #C: (#struct){
-       x: (#struct){
+-      x: (#struct){
 -        type: (#list){
 -          0: (string){ "d" }
 -          1: (list){
@@ -1705,8 +1681,7 @@ diff old new
 -  }
 -  issue1417: (_|_){
 -    // [eval]
-+        type: ~(issue1940.#T)
-+      }
++      x: ~(issue1940.#A)
 +    }
 +  }
 +  issue1417: (struct){
@@ -1747,7 +1722,58 @@ diff old new
        t1: (struct){
          #SpecFoo: (#struct){
            foo: (#struct){
-@@ -555,48 +456,45 @@
+@@ -510,36 +409,20 @@
+           }
+         }
+         out: (struct){ |((struct){
+-            X: (#struct){
+-              bar: (#struct){
+-                min: (int){ 1 }
+-              }
+-            }
+-            nullFoo: (null){ null }
+-            minFoo: (int){ int }
+-          }, (struct){
+-            minBar: (int){ int }
+-            X: (#struct){
+-              bar: (#struct){
+-                min: (int){ 1 }
+-              }
+-            }
+-            nullFoo: (null){ null }
+-          }, (struct){
+-            X: (#struct){
+-              bar: (#struct){
+-                min: (int){ 1 }
+-              }
+-            }
+-            nullBar: (null){ null }
+-            minFoo: (int){ int }
+-          }, (struct){
+-            minBar: (int){ int }
+-            X: (#struct){
+-              bar: (#struct){
+-                min: (int){ 1 }
+-              }
+-            }
++            X: ~(issue2209.simplified.t1.spec)
++            nullFoo: (null){ null }
++            minFoo: (int){ int }
++          }, (struct){
++            minBar: (int){ int }
++            X: ~(issue2209.simplified.t1.spec)
++            nullFoo: (null){ null }
++          }, (struct){
++            X: ~(issue2209.simplified.t1.spec)
++            nullBar: (null){ null }
++            minFoo: (int){ int }
++          }, (struct){
++            minBar: (int){ int }
++            X: ~(issue2209.simplified.t1.spec)
+             nullBar: (null){ null }
+           }) }
+       }
+@@ -555,48 +438,45 @@
              x: (int){ 1 }
            }
          }
@@ -1835,7 +1861,7 @@ diff old new
        Foo: (#struct){
          spec: (#struct){
            foo: (#struct){
-@@ -605,135 +503,52 @@
+@@ -605,135 +485,52 @@
            }
          }
          resource: (#struct){
@@ -2017,7 +2043,7 @@ diff old new
          }
        }
        #Abstract: (#struct){
-@@ -749,34 +564,34 @@
+@@ -749,34 +546,34 @@
              }
            }) }
          resource: (#struct){
@@ -2080,7 +2106,7 @@ diff old new
          }
        }
        _#Spec: (#struct){ |(*(#struct){
-@@ -803,36 +618,36 @@
+@@ -803,36 +600,36 @@
          }
        }
        _Thing: (#struct){
@@ -2146,7 +2172,7 @@ diff old new
        }
        #Constrained: (#struct){
          spec: (#struct){ |(*(#struct){
-@@ -916,19 +731,19 @@
+@@ -916,19 +713,19 @@
            common: (int){ 3 }
          }
          #FormFoo: (#struct){
@@ -2173,7 +2199,28 @@ diff old new
            }) }
        }
        #Input: (#struct){
-@@ -977,10 +792,23 @@
+@@ -936,18 +733,12 @@
+         }
+       }
+       #summarizeReturn: (#struct){
+-        in: (#struct){
+-          forms: (list){
+-          }
+-        }
++        in: ~(issue2246.full.#Input)
+         out: (#list){
+         }
+       }
+       #compute: (#struct){
+-        in: (#struct){
+-          forms: (list){
+-          }
+-        }
++        in: ~(issue2246.full.#Input)
+         out: (#list){
+         }
+       }
+@@ -977,10 +768,23 @@
      }
      full: (struct){
        metrics: (#list){
@@ -2201,7 +2248,7 @@ diff old new
          1: (#struct){
            id: (string){ "bar" }
            value: (int){ 80 }
-@@ -1031,13 +859,11 @@
+@@ -1031,13 +835,11 @@
        }
      }
    }
@@ -2217,7 +2264,7 @@ diff old new
        0: (#struct){
          name: (string){ "FooBarFoo" }
        }
-@@ -1047,19 +873,8 @@
+@@ -1047,19 +849,8 @@
        2: (#struct){
          name: (string){ "FooQuuxFoo" }
        }
@@ -2239,7 +2286,7 @@ diff old new
        }
      }
    }
-@@ -1078,10 +893,10 @@
+@@ -1078,10 +869,10 @@
          v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
        }
        c: (#struct){

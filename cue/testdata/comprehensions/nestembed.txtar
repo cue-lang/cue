@@ -27,6 +27,49 @@ Retain: 0
 Unifications: 18
 Conjuncts:    26
 Disjuncts:    18
+-- out/evalalpha --
+(struct){
+  DeleteThis: (#list){
+    0: (string){ "this" }
+    1: (string){ "that" }
+  }
+  useful_infra: (struct){
+    gcp: (struct){
+      cluters: (int){ 10 }
+    }
+    aws: (struct){
+      clusters: (int){ 20 }
+    }
+    this: (struct){
+      clusters: (int){ 1 }
+    }
+    that: (struct){
+      clusters: (int){ 2 }
+    }
+  }
+  New_infra: (struct){
+    gcp: ~(useful_infra.gcp)
+    aws: ~(useful_infra.aws)
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -18,11 +18,7 @@
+     }
+   }
+   New_infra: (struct){
+-    gcp: (struct){
+-      cluters: (int){ 10 }
+-    }
+-    aws: (struct){
+-      clusters: (int){ 20 }
+-    }
++    gcp: ~(useful_infra.gcp)
++    aws: ~(useful_infra.aws)
+   }
+ }
 -- out/eval --
 (struct){
   DeleteThis: (#list){

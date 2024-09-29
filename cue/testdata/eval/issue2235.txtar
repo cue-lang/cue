@@ -150,27 +150,7 @@ Disjuncts:    160
         }
       }
     }
-    objects: (#struct){
-      namespaced: (#struct){
-        ingress: (#struct){
-          Service: (#struct){
-            "admin-nginx-ingress-controller": (#struct){
-              spec: (#struct){
-                externalIPs: (#list){
-                  0: (string){ "127.0.0.1" }
-                }
-              }
-              metadata: (#struct){
-                labels: (#struct){
-                  "ingress-class": (string){ "admin" }
-                  stack: (string){ "ingress" }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+    objects: ~(#Cluster.globalIngressControllers.admin.objects)
   }
   clusters: (struct){
     foo: (#struct){
@@ -202,27 +182,7 @@ Disjuncts:    160
           }
         }
       }
-      objects: (#struct){
-        namespaced: (#struct){
-          ingress: (#struct){
-            Service: (#struct){
-              "admin-nginx-ingress-controller": (#struct){
-                spec: (#struct){
-                  externalIPs: (#list){
-                    0: (string){ "127.0.0.1" }
-                  }
-                }
-                metadata: (#struct){
-                  labels: (#struct){
-                    "ingress-class": (string){ "admin" }
-                    stack: (string){ "ingress" }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+      objects: ~(clusters.foo.globalIngressControllers.admin.objects)
     }
   }
   #GlobalIngressController: (_|_){
@@ -243,10 +203,7 @@ Disjuncts:    160
     }
   }
   t1: (struct){
-    params: (struct){
-      a: (struct){
-      }
-    }
+    params: ~(t1.x.y)
     x: (struct){
       y: (struct){
         a: (struct){
@@ -288,7 +245,61 @@ Disjuncts:    160
 diff old new
 --- old
 +++ new
-@@ -114,20 +114,17 @@
+@@ -38,27 +38,7 @@
+         }
+       }
+     }
+-    objects: (#struct){
+-      namespaced: (#struct){
+-        ingress: (#struct){
+-          Service: (#struct){
+-            "admin-nginx-ingress-controller": (#struct){
+-              spec: (#struct){
+-                externalIPs: (#list){
+-                  0: (string){ "127.0.0.1" }
+-                }
+-              }
+-              metadata: (#struct){
+-                labels: (#struct){
+-                  "ingress-class": (string){ "admin" }
+-                  stack: (string){ "ingress" }
+-                }
+-              }
+-            }
+-          }
+-        }
+-      }
+-    }
++    objects: ~(#Cluster.globalIngressControllers.admin.objects)
+   }
+   clusters: (struct){
+     foo: (#struct){
+@@ -90,44 +70,21 @@
+           }
+         }
+       }
+-      objects: (#struct){
+-        namespaced: (#struct){
+-          ingress: (#struct){
+-            Service: (#struct){
+-              "admin-nginx-ingress-controller": (#struct){
+-                spec: (#struct){
+-                  externalIPs: (#list){
+-                    0: (string){ "127.0.0.1" }
+-                  }
+-                }
+-                metadata: (#struct){
+-                  labels: (#struct){
+-                    "ingress-class": (string){ "admin" }
+-                    stack: (string){ "ingress" }
+-                  }
+-                }
+-              }
+-            }
+-          }
+-        }
+-      }
++      objects: ~(clusters.foo.globalIngressControllers.admin.objects)
      }
    }
    #GlobalIngressController: (_|_){
@@ -312,6 +323,18 @@ diff old new
            }
          }
        }
+@@ -134,10 +91,7 @@
+     }
+   }
+   t1: (struct){
+-    params: (struct){
+-      a: (struct){
+-      }
+-    }
++    params: ~(t1.x.y)
+     x: (struct){
+       y: (struct){
+         a: (struct){
 -- diff/todo/p2 --
 Different, but okay, error message, but missing some positions
 -- out/eval --

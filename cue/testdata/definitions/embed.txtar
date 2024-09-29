@@ -103,9 +103,7 @@ Result:
     }
   }
   #Deployment: (#struct){
-    spec: (#struct){
-      replicas: (int){ int }
-    }
+    spec: ~(#Spec)
   }
   #Spec: (#struct){
     replicas: (int){ int }
@@ -211,7 +209,18 @@ diff old new
  
  Result:
  (_|_){
-@@ -37,8 +34,6 @@
+@@ -20,9 +17,7 @@
+     }
+   }
+   #Deployment: (#struct){
+-    spec: (#struct){
+-      replicas: (int){ int }
+-    }
++    spec: ~(#Spec)
+   }
+   #Spec: (#struct){
+     replicas: (int){ int }
+@@ -37,8 +32,6 @@
        // [eval]
        b: (_|_){
          // [eval] recloseSimple.a.b: field not allowed:
@@ -220,7 +229,7 @@ diff old new
          //     ./in.cue:17:6
          //     ./in.cue:17:15
        }
-@@ -51,21 +46,20 @@
+@@ -51,21 +44,20 @@
        y: (int){ int }
      }
      #a: (#struct){
@@ -245,7 +254,7 @@ diff old new
      }
    }
    reclose2: (struct){
-@@ -74,15 +68,15 @@
+@@ -74,15 +66,15 @@
        y: (int){ int }
      }
      a: (#struct){
@@ -264,7 +273,7 @@ diff old new
      }
    }
    reclose3: (struct){
-@@ -97,12 +91,12 @@
+@@ -97,12 +89,12 @@
        Name: (string){ string }
      }
      #A: (#struct){

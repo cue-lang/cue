@@ -66,6 +66,61 @@ Retain: 0
 Unifications: 23
 Conjuncts:    28
 Disjuncts:    23
+-- out/evalalpha --
+(struct){
+  reg: (struct){
+    foo: (int){ 1 }
+    bar: (struct){
+      baz: (int){ 3 }
+    }
+  }
+  #def: (#struct){
+    a: (int){ 1 }
+    sub: (#struct){
+      foo: (int){ 1 }
+      bar: (#struct){
+        baz: (int){ 3 }
+      }
+    }
+  }
+  val: ~(#def)
+  #def2: (#struct){
+    a: (#struct){
+      b: (int){ int }
+    }
+  }
+  val2: ~(#def2)
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -14,23 +14,11 @@
+       }
+     }
+   }
+-  val: (#struct){
+-    a: (int){ 1 }
+-    sub: (#struct){
+-      foo: (int){ 1 }
+-      bar: (#struct){
+-        baz: (int){ 3 }
+-      }
+-    }
+-  }
++  val: ~(#def)
+   #def2: (#struct){
+     a: (#struct){
+       b: (int){ int }
+     }
+   }
+-  val2: (#struct){
+-    a: (#struct){
+-      b: (int){ int }
+-    }
+-  }
++  val2: ~(#def2)
+ }
 -- out/eval --
 (struct){
   reg: (struct){

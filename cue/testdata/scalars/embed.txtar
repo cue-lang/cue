@@ -208,10 +208,7 @@ Result:
       #bar: (string){ "bar" }
     }
     s2: (#list){
-      0: (string){
-        "foo"
-        #bar: (string){ "bar" }
-      }
+      0: ~(stringEmbed.s1)
       1: (string){
         "bar"
         #baz: (int){ 4 }
@@ -403,7 +400,19 @@ diff old new
        //     ./in.cue:29:9
      }
      b7: (int){ 1 }
-@@ -69,9 +66,9 @@
+@@ -47,10 +44,7 @@
+       #bar: (string){ "bar" }
+     }
+     s2: (#list){
+-      0: (string){
+-        "foo"
+-        #bar: (string){ "bar" }
+-      }
++      0: ~(stringEmbed.s1)
+       1: (string){
+         "bar"
+         #baz: (int){ 4 }
+@@ -69,9 +63,9 @@
        #b: (int){ int }
      }
      used: (struct){

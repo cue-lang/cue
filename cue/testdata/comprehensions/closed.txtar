@@ -206,9 +206,7 @@ Result:
         n: (string){ "c" }
       }
       X: (#struct){
-        test: (#struct){
-          n: (string){ "c" }
-        }
+        test: ~(dedupTodo.out.c)
       }
     }
   }
@@ -264,7 +262,7 @@ diff old new
        }
      }
    }
-@@ -109,7 +99,7 @@
+@@ -109,13 +99,11 @@
        c: (_){ _ }
      }
      out: (#struct){
@@ -273,6 +271,13 @@ diff old new
          n: (string){ "c" }
        }
        X: (#struct){
+-        test: (#struct){
+-          n: (string){ "c" }
+-        }
++        test: ~(dedupTodo.out.c)
+       }
+     }
+   }
 -- diff/todo/p3 --
 Missing error positions.
 -- diff/explanation --

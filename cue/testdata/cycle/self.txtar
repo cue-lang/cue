@@ -338,10 +338,7 @@ Result:
     ok2: (struct){
       Y: (struct){
       }
-      a: (struct){
-        b: (struct){
-        }
-      }
+      a: ~(selfEmbed.ok2.x)
       x: (struct){
         b: (struct){
         }
@@ -378,10 +375,7 @@ Result:
       }
       Y: (struct){
       }
-      a: (struct){
-        b: (struct){
-        }
-      }
+      a: ~(selfEmbed.ok6.x)
     }
   }
   disjSelf: (struct){
@@ -672,6 +666,30 @@ diff old new
        }
      }
    }
+@@ -59,10 +61,7 @@
+     ok2: (struct){
+       Y: (struct){
+       }
+-      a: (struct){
+-        b: (struct){
+-        }
+-      }
++      a: ~(selfEmbed.ok2.x)
+       x: (struct){
+         b: (struct){
+         }
+@@ -99,10 +98,7 @@
+       }
+       Y: (struct){
+       }
+-      a: (struct){
+-        b: (struct){
+-        }
+-      }
++      a: ~(selfEmbed.ok6.x)
+     }
+   }
+   disjSelf: (struct){
 -- diff/todo/p3 --
 list.error*: different error messages.
 -- out/eval --

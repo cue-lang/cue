@@ -943,10 +943,7 @@ Result:
         b: (bool){ true }
         c: (int){ 4 }
       }
-      y: (#struct){
-        b: (bool){ true }
-        c: (int){ 4 }
-      }
+      y: ~(provideIncompleteSuccess.t1.x)
     }
     t2: (struct){
       #a: (#struct){
@@ -1015,24 +1012,9 @@ Result:
         }
       }
     }
-    b: (struct){
-      y: (struct){
-        z: (struct){
-          a: (int){ 1 }
-          b: (int){ 2 }
-        }
-      }
-    }
-    c: (struct){
-      z: (struct){
-        a: (int){ 1 }
-        b: (int){ 2 }
-      }
-    }
-    d: (struct){
-      a: (int){ 1 }
-      b: (int){ 2 }
-    }
+    b: ~(midwayReferences.a.x)
+    c: ~(midwayReferences.a.x.y)
+    d: ~(midwayReferences.a.x.y.z)
   }
   closedCheck: (struct){
     success1: (struct){
@@ -1135,13 +1117,7 @@ Result:
           }
         }
       }
-      E: (#struct){
-        e: (bool){ bool }
-        f: (_|_){
-          // [incomplete] voidEliminationSuccess.derefRef2.#F.f: operand e of '!' not concrete (was bool):
-          //     ./in.cue:389:7
-        }
-      }
+      E: ~(voidEliminationSuccess.derefRef2.#F)
       #F: (#struct){
         e: (bool){ bool }
         f: (_|_){
@@ -1521,16 +1497,14 @@ diff old new
      t1: (struct){
        #a: (_|_){
          // [incomplete] provideIncompleteSuccess.t1.#a: incomplete bool: bool:
-@@ -188,16 +167,15 @@
+@@ -188,16 +167,12 @@
          b: (bool){ bool }
        }
        x: (#struct){
 -        c: (int){ 4 }
 -        b: (bool){ true }
-+        b: (bool){ true }
-+        c: (int){ 4 }
-       }
-       y: (#struct){
+-      }
+-      y: (#struct){
 -        c: (int){ 4 }
 -        b: (bool){ true }
 -      }
@@ -1540,12 +1514,13 @@ diff old new
 +        b: (bool){ true }
 +        c: (int){ 4 }
 +      }
++      y: ~(provideIncompleteSuccess.t1.x)
 +    }
 +    t2: (struct){
        #a: (#struct){
          c: (int){ 4 }
          b: (bool){ true }
-@@ -204,17 +182,8 @@
+@@ -204,17 +179,8 @@
        }
        #c: (#struct){
        }
@@ -1565,7 +1540,7 @@ diff old new
          }
          b: (bool){ true }
        }
-@@ -244,9 +213,22 @@
+@@ -244,9 +210,22 @@
    }
    cyclicError: (struct){
      a: (_|_){
@@ -1591,16 +1566,50 @@ diff old new
      }
    }
    midwayReferences: (struct){
-@@ -383,7 +365,7 @@
-       E: (#struct){
-         e: (bool){ bool }
-         f: (_|_){
--          // [incomplete] voidEliminationSuccess.derefRef2.E.f: operand e of '!' not concrete (was bool):
-+          // [incomplete] voidEliminationSuccess.derefRef2.#F.f: operand e of '!' not concrete (was bool):
-           //     ./in.cue:389:7
+@@ -260,24 +239,9 @@
          }
        }
-@@ -403,17 +385,10 @@
+     }
+-    b: (struct){
+-      y: (struct){
+-        z: (struct){
+-          a: (int){ 1 }
+-          b: (int){ 2 }
+-        }
+-      }
+-    }
+-    c: (struct){
+-      z: (struct){
+-        a: (int){ 1 }
+-        b: (int){ 2 }
+-      }
+-    }
+-    d: (struct){
+-      a: (int){ 1 }
+-      b: (int){ 2 }
+-    }
++    b: ~(midwayReferences.a.x)
++    c: ~(midwayReferences.a.x.y)
++    d: ~(midwayReferences.a.x.y.z)
+   }
+   closedCheck: (struct){
+     success1: (struct){
+@@ -380,13 +344,7 @@
+           }
+         }
+       }
+-      E: (#struct){
+-        e: (bool){ bool }
+-        f: (_|_){
+-          // [incomplete] voidEliminationSuccess.derefRef2.E.f: operand e of '!' not concrete (was bool):
+-          //     ./in.cue:389:7
+-        }
+-      }
++      E: ~(voidEliminationSuccess.derefRef2.#F)
+       #F: (#struct){
+         e: (bool){ bool }
+         f: (_|_){
+@@ -403,17 +361,10 @@
          }
        }
        E: (_|_){
@@ -1619,7 +1628,7 @@ diff old new
        }
      }
      derefDisj2: (struct){
-@@ -424,17 +399,10 @@
+@@ -424,17 +375,10 @@
          }
        }
        E: (_|_){
@@ -1638,7 +1647,7 @@ diff old new
        }
      }
      bulk1: (struct){
-@@ -557,9 +525,7 @@
+@@ -557,9 +501,7 @@
            // [eval]
            e: (_|_){
              // [eval] structShare.err1.x.d.e: field not allowed:
@@ -1649,7 +1658,7 @@ diff old new
              //     ./in.cue:578:9
            }
          }
-@@ -583,13 +549,13 @@
+@@ -583,13 +525,13 @@
        }
        envs: (struct){
          e1: (#struct){
@@ -1667,7 +1676,7 @@ diff old new
          }
        }
      }
-@@ -626,9 +592,8 @@
+@@ -626,9 +568,8 @@
      _c: (struct){
        y: (int){ 1 }
      }

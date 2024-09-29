@@ -141,12 +141,7 @@ Disjuncts:    126
       }
     }
     #NetworkPolicy: (#struct){
-      spec: (#struct){
-        ingress: (list){
-        }
-        egress: (list){
-        }
-      }
+      spec: ~(networkingv1.#NetworkPolicySpec)
     }
     #NetworkPolicySpec: (#struct){
       ingress: (list){
@@ -185,11 +180,7 @@ Disjuncts:    126
   }
   foo: (struct){
     #Values: (#struct){
-      global: (#struct){
-        auth0: (#struct){
-          enabled: (bool){ bool }
-        }
-      }
+      global: ~(global_config.#GlobalConfig)
     }
   }
   #Config: (#struct){
@@ -222,14 +213,7 @@ Disjuncts:    126
       }
     }
   }
-  #NetworkPolicy: (#struct){
-    spec: (#struct){
-      ingress: (list){
-      }
-      egress: (list){
-      }
-    }
-  }
+  #NetworkPolicy: ~(networkingv1.#NetworkPolicy)
   #Flux: (#struct){
     charts: (#struct){
       foo: (#struct){
@@ -243,36 +227,7 @@ Disjuncts:    126
     formatOutput: (#struct){
       foo: (#struct){
       }
-      "ns/network": (#struct){
-        spec: (#struct){
-          ingress: (#list){
-            0: (#struct){
-              from: (#list){
-                0: (#struct){
-                  namespaceSelector: (#struct){
-                    matchLabels: (#struct){
-                      tenant: (string){ string }
-                    }
-                  }
-                }
-              }
-            }
-          }
-          egress: (#list){
-            0: (#struct){
-              to: (#list){
-                0: (#struct){
-                  namespaceSelector: (#struct){
-                    matchLabels: (#struct){
-                      tenant: (string){ string }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+      "ns/network": ~(#Flux._outputs(:config)."ns/network")
     }
     _outputs(:config): (#struct){
       foo: (#struct){
@@ -330,7 +285,34 @@ Disjuncts:    126
 diff old new
 --- old
 +++ new
-@@ -64,7 +64,7 @@
+@@ -7,12 +7,7 @@
+       }
+     }
+     #NetworkPolicy: (#struct){
+-      spec: (#struct){
+-        ingress: (list){
+-        }
+-        egress: (list){
+-        }
+-      }
++      spec: ~(networkingv1.#NetworkPolicySpec)
+     }
+     #NetworkPolicySpec: (#struct){
+       ingress: (list){
+@@ -51,11 +46,7 @@
+   }
+   foo: (struct){
+     #Values: (#struct){
+-      global: (#struct){
+-        auth0: (#struct){
+-          enabled: (bool){ bool }
+-        }
+-      }
++      global: ~(global_config.#GlobalConfig)
+     }
+   }
+   #Config: (#struct){
+@@ -64,7 +55,7 @@
      }
      auth0: (_|_){
        // [incomplete] #Config.auth0: incomplete bool: bool:
@@ -339,7 +321,7 @@ diff old new
        enabled: (bool){ bool }
      }
      charts: (#struct){
-@@ -73,7 +73,7 @@
+@@ -73,7 +64,7 @@
            auth0: (#struct){
              enabled: (_|_){
                // [incomplete] #Config.auth0: incomplete bool: bool:
@@ -348,18 +330,29 @@ diff old new
              }
            }
          }
-@@ -83,7 +83,7 @@
+@@ -83,45 +74,19 @@
        auth0: (#struct){
          enabled: (_|_){
            // [incomplete] #Config.auth0: incomplete bool: bool:
 -          //     ./in.cue:41:12
+-        }
+-      }
+-    }
+-  }
+-  #NetworkPolicy: (#struct){
+-    spec: (#struct){
+-      ingress: (list){
+-      }
+-      egress: (list){
+-      }
+-    }
+-  }
 +          //     ./in.cue:58:12
-         }
-       }
-     }
-@@ -97,31 +97,12 @@
-     }
-   }
++        }
++      }
++    }
++  }
++  #NetworkPolicy: ~(networkingv1.#NetworkPolicy)
    #Flux: (#struct){
 -    tenant: (#struct){
 -      id: (string){ string }
@@ -395,7 +388,45 @@ diff old new
          }
        }
      }
-@@ -193,5 +174,21 @@
+@@ -128,36 +93,7 @@
+     formatOutput: (#struct){
+       foo: (#struct){
+       }
+-      "ns/network": (#struct){
+-        spec: (#struct){
+-          ingress: (#list){
+-            0: (#struct){
+-              from: (#list){
+-                0: (#struct){
+-                  namespaceSelector: (#struct){
+-                    matchLabels: (#struct){
+-                      tenant: (string){ string }
+-                    }
+-                  }
+-                }
+-              }
+-            }
+-          }
+-          egress: (#list){
+-            0: (#struct){
+-              to: (#list){
+-                0: (#struct){
+-                  namespaceSelector: (#struct){
+-                    matchLabels: (#struct){
+-                      tenant: (string){ string }
+-                    }
+-                  }
+-                }
+-              }
+-            }
+-          }
+-        }
+-      }
++      "ns/network": ~(#Flux._outputs(:config)."ns/network")
+     }
+     _outputs(:config): (#struct){
+       foo: (#struct){
+@@ -193,5 +129,21 @@
          }
        }
      }

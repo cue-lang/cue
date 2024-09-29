@@ -595,18 +595,10 @@ Result:
       #D: (#struct){
       }
       #E: (#struct){
-        t: (#struct){
-          object: (#struct){
-            y: (#struct){
-            }
-          }
-        }
+        t: ~(noCyclePattern.t6.#T)
       }
       #T: (#struct){
-        object: (#struct){
-          y: (#struct){
-          }
-        }
+        object: ~(noCyclePattern.t6.#S)
       }
       #S: (#struct){
         y: (#struct){
@@ -793,7 +785,30 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -198,18 +198,18 @@
+@@ -149,18 +149,10 @@
+       #D: (#struct){
+       }
+       #E: (#struct){
+-        t: (#struct){
+-          object: (#struct){
+-            y: (#struct){
+-            }
+-          }
+-        }
+-      }
+-      #T: (#struct){
+-        object: (#struct){
+-          y: (#struct){
+-          }
+-        }
++        t: ~(noCyclePattern.t6.#T)
++      }
++      #T: (#struct){
++        object: ~(noCyclePattern.t6.#S)
+       }
+       #S: (#struct){
+         y: (#struct){
+@@ -198,18 +190,18 @@
          // [structural cycle]
          c: (_|_){
            // [structural cycle]
@@ -821,7 +836,7 @@ diff old new
          }
        }
      }
-@@ -218,12 +218,7 @@
+@@ -218,12 +210,7 @@
      // [structural cycle]
      t1: (_|_){
        // [structural cycle]
@@ -835,7 +850,7 @@ diff old new
        #T: (_|_){
          // [structural cycle]
          b: (_|_){
-@@ -284,21 +279,26 @@
+@@ -284,21 +271,26 @@
          // [structural cycle]
          a: (_|_){
            // [structural cycle]

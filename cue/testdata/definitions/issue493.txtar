@@ -20,6 +20,49 @@ Retain: 0
 Unifications: 20
 Conjuncts:    38
 Disjuncts:    24
+-- out/evalalpha --
+(struct){
+  #Artifact: (#struct){
+    body: (_){ _ }
+    other: (#struct){
+    }
+  }
+  #App: ~(#Artifact)
+  #Atom: ~(#Artifact)
+  #Both: (#struct){
+    body: (_){ _ }
+    other: (#struct){
+    }
+  }
+  t1: (#struct){
+    body: (int){ 3 }
+    other: (#struct){
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -4,16 +4,8 @@
+     other: (#struct){
+     }
+   }
+-  #App: (#struct){
+-    body: (_){ _ }
+-    other: (#struct){
+-    }
+-  }
+-  #Atom: (#struct){
+-    body: (_){ _ }
+-    other: (#struct){
+-    }
+-  }
++  #App: ~(#Artifact)
++  #Atom: ~(#Artifact)
+   #Both: (#struct){
+     body: (_){ _ }
+     other: (#struct){
 -- out/eval --
 (struct){
   #Artifact: (#struct){

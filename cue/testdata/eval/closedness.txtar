@@ -913,13 +913,7 @@ Result:
           }
         }
         out: (#list){
-          0: (#struct){
-            let empty#1 = (#struct){
-            }
-            field: (#struct){
-              n: (int){ 3 }
-            }
-          }
+          0: ~(issue3330.let.ok.#struct)
         }
       }
     }
@@ -948,13 +942,7 @@ Result:
           g: (#struct){
           }
         }
-        out: (#struct){
-          field: (#struct){
-            n: (int){ 3 }
-          }
-          g: (#struct){
-          }
-        }
+        out: ~(issue3330.matthew.ok2.#struct)
         out2: (struct){
           field: (struct){
             n: (int){ 3 }
@@ -975,13 +963,7 @@ Result:
             d: (int){ 1 }
           }
         }
-        0: (#struct){
-          let b#2 = (#struct){
-          }
-          c: (#struct){
-            d: (int){ 1 }
-          }
-        }
+        0: ~(issue3331.original.ok.#A)
       }
     }
     variant1: (struct){
@@ -994,13 +976,7 @@ Result:
           }
         }
         0: (#list){
-          0: (#struct){
-            let b#3 = (#struct){
-            }
-            c: (#struct){
-              d: (int){ 1 }
-            }
-          }
+          0: ~(issue3331.variant1.ok.#A)
         }
       }
     }
@@ -1015,10 +991,7 @@ Result:
               c: (int){ 2 }
             }
           }
-          zx: (#struct){
-            b: (int){ 1 }
-            c: (int){ 2 }
-          }
+          zx: ~(indirect.embed.err1.#A.x.a)
         }
         #x: (#struct){
           a: (#struct){
@@ -1030,18 +1003,7 @@ Result:
             c: (int){ 2 }
           }
         }
-        b: (#struct){
-          x: (#struct){
-            a: (#struct){
-              b: (int){ 1 }
-              c: (int){ 2 }
-            }
-          }
-          zx: (#struct){
-            b: (int){ 1 }
-            c: (int){ 2 }
-          }
-        }
+        b: ~(indirect.embed.err1.#A)
         b1: (#struct){
           d: (int){ 1 }
           b: (int){ 1 }
@@ -1084,25 +1046,11 @@ Result:
           }
         }
       }
-      x: (#struct){
-        b: (#struct){
-        }
-        #B: (#struct){
-          c: (#struct){
-            d: (int){ 1 }
-          }
-        }
-      }
+      x: ~(nested.ok1.#A)
     }
     embed: (struct){
       ok: (struct){
-        x: (#struct){
-          d: (#struct){
-            e: (int){ int }
-          }
-          b: (#struct){
-          }
-        }
+        x: ~(nested.embed.ok.#A)
         #A: (#struct){
           d: (#struct){
             e: (int){ int }
@@ -1134,23 +1082,7 @@ Result:
             //     ./reroot.cue:122:8
           }
         }
-        v: (_|_){
-          // [eval]
-          c: (_|_){
-            // [eval]
-            d: (_|_){
-              // [eval] nested.err1.x.#V.c.d: field not allowed:
-              //     ./reroot.cue:122:8
-              //     ./reroot.cue:118:5
-            }
-            f: (_|_){
-              // [eval] nested.err1.x.#V.c.f: field not allowed:
-              //     ./reroot.cue:122:8
-              //     ./reroot.cue:114:6
-            }
-            g: (int){ 1 }
-          }
-        }
+        v: ~(nested.err1.x.#V)
         #V: (_|_){
           // [eval]
           c: (_|_){
@@ -1173,12 +1105,7 @@ Result:
         b: (#struct){
           f: (int){ 1 }
         }
-        v: (#struct){
-          c: (#struct){
-            d: (int){ 1 }
-            f: (int){ 1 }
-          }
-        }
+        v: ~(nested.err1.#A.#V)
         #V: (#struct){
           c: (#struct){
             d: (int){ 1 }
@@ -1437,15 +1364,38 @@ diff old new
      }
    }
    issue3330: (struct){
-@@ -211,11 +168,11 @@
+@@ -169,13 +126,7 @@
+           }
+         }
+         out: (#list){
+-          0: (#struct){
+-            let empty#1 = (#struct){
+-            }
+-            field: (#struct){
+-              n: (int){ 3 }
+-            }
+-          }
++          0: ~(issue3330.let.ok.#struct)
+         }
+       }
+     }
+@@ -204,18 +155,12 @@
            g: (#struct){
            }
          }
+-        out: (#struct){
+-          field: (#struct){
+-            n: (int){ 3 }
+-          }
+-          g: (#struct){
+-          }
+-        }
 -        out2: (#struct){
 -          field: (#struct){
 -            n: (int){ 3 }
 -          }
 -          g: (#struct){
++        out: ~(issue3330.matthew.ok2.#struct)
 +        out2: (struct){
 +          field: (struct){
 +            n: (int){ 3 }
@@ -1454,21 +1404,88 @@ diff old new
            }
          }
        }
-@@ -261,8 +218,7 @@
+@@ -231,13 +176,7 @@
+             d: (int){ 1 }
+           }
+         }
+-        0: (#struct){
+-          let b#2 = (#struct){
+-          }
+-          c: (#struct){
+-            d: (int){ 1 }
+-          }
+-        }
++        0: ~(issue3331.original.ok.#A)
        }
      }
-   }
+     variant1: (struct){
+@@ -250,32 +189,22 @@
+           }
+         }
+         0: (#list){
+-          0: (#struct){
+-            let b#3 = (#struct){
+-            }
+-            c: (#struct){
+-              d: (int){ 1 }
+-            }
+-          }
+-        }
+-      }
+-    }
+-  }
 -  indirect: (_|_){
 -    // [eval]
+-    embed: (struct){
+-      err1: (struct){
+-        #A: (#struct){
+-          x: (#struct){
+-            a: (#struct){
+-              b: (int){ 1 }
+-              c: (int){ 2 }
+-            }
+-          }
+-          zx: (#struct){
+-            b: (int){ 1 }
+-            c: (int){ 2 }
+-          }
++          0: ~(issue3331.variant1.ok.#A)
++        }
++      }
++    }
++  }
 +  indirect: (struct){
-     embed: (struct){
-       err1: (struct){
-         #A: (#struct){
-@@ -299,17 +255,15 @@
++    embed: (struct){
++      err1: (struct){
++        #A: (#struct){
++          x: (#struct){
++            a: (#struct){
++              b: (int){ 1 }
++              c: (int){ 2 }
++            }
++          }
++          zx: ~(indirect.embed.err1.#A.x.a)
+         }
+         #x: (#struct){
+           a: (#struct){
+@@ -287,29 +216,16 @@
              c: (int){ 2 }
            }
          }
+-        b: (#struct){
+-          x: (#struct){
+-            a: (#struct){
+-              b: (int){ 1 }
+-              c: (int){ 2 }
+-            }
+-          }
+-          zx: (#struct){
+-            b: (int){ 1 }
+-            c: (int){ 2 }
+-          }
+-        }
 -        b1: (struct){
++        b: ~(indirect.embed.err1.#A)
 +        b1: (#struct){
 +          d: (int){ 1 }
            b: (int){ 1 }
@@ -1489,7 +1506,7 @@ diff old new
          X: (struct){
            a: (struct){
              e: (int){ 1 }
-@@ -317,24 +271,13 @@
+@@ -317,24 +233,13 @@
            b: (struct){
            }
          }
@@ -1521,7 +1538,38 @@ diff old new
            }
          }
          #X: (#struct){
-@@ -397,17 +340,11 @@
+@@ -354,25 +259,11 @@
+           }
+         }
+       }
+-      x: (#struct){
+-        b: (#struct){
+-        }
+-        #B: (#struct){
+-          c: (#struct){
+-            d: (int){ 1 }
+-          }
+-        }
+-      }
+-    }
+-    embed: (struct){
+-      ok: (struct){
+-        x: (#struct){
+-          d: (#struct){
+-            e: (int){ int }
+-          }
+-          b: (#struct){
+-          }
+-        }
++      x: ~(nested.ok1.#A)
++    }
++    embed: (struct){
++      ok: (struct){
++        x: ~(nested.embed.ok.#A)
+         #A: (#struct){
+           d: (#struct){
+             e: (int){ int }
+@@ -397,69 +288,29 @@
            // [eval]
            f: (_|_){
              // [eval] nested.err1.x.b.f: field not allowed:
@@ -1537,14 +1585,12 @@ diff old new
 -            //     ./reroot.cue:114:6
 -            //     ./reroot.cue:122:8
 -            //     ./reroot.cue:123:6
-+            //     ./reroot.cue:122:8
-           }
-         }
-         v: (_|_){
-@@ -414,27 +351,17 @@
-           // [eval]
-           c: (_|_){
-             // [eval]
+-          }
+-        }
+-        v: (_|_){
+-          // [eval]
+-          c: (_|_){
+-            // [eval]
 -            f: (_|_){
 -              // [eval] nested.err1.x.v.c.f: field not allowed:
 -              //     ./reroot.cue:112:5
@@ -1566,21 +1612,13 @@ diff old new
 -              //     ./reroot.cue:122:8
 -              //     ./reroot.cue:123:6
 -            }
-+            d: (_|_){
-+              // [eval] nested.err1.x.#V.c.d: field not allowed:
-+              //     ./reroot.cue:122:8
-+              //     ./reroot.cue:118:5
-+            }
-+            f: (_|_){
-+              // [eval] nested.err1.x.#V.c.f: field not allowed:
-+              //     ./reroot.cue:122:8
-+              //     ./reroot.cue:114:6
-+            }
-+            g: (int){ 1 }
-           }
-         }
+-          }
+-        }
++            //     ./reroot.cue:122:8
++          }
++        }
++        v: ~(nested.err1.x.#V)
          #V: (_|_){
-@@ -441,25 +368,17 @@
            // [eval]
            c: (_|_){
              // [eval]
@@ -1594,8 +1632,8 @@ diff old new
 -              //     ./reroot.cue:123:6
 -            }
 -            g: (int){ 1 }
--            d: (_|_){
--              // [eval] nested.err1.x.#V.c.d: field not allowed:
+             d: (_|_){
+               // [eval] nested.err1.x.#V.c.d: field not allowed:
 -              //     ./reroot.cue:112:5
 -              //     ./reroot.cue:114:6
 -              //     ./reroot.cue:117:7
@@ -1603,8 +1641,6 @@ diff old new
 -              //     ./reroot.cue:122:8
 -              //     ./reroot.cue:123:6
 -            }
-+            d: (_|_){
-+              // [eval] nested.err1.x.#V.c.d: field not allowed:
 +              //     ./reroot.cue:122:8
 +              //     ./reroot.cue:118:5
 +            }
@@ -1617,16 +1653,17 @@ diff old new
            }
          }
        }
-@@ -469,14 +388,14 @@
+@@ -467,16 +318,11 @@
+         b: (#struct){
+           f: (int){ 1 }
          }
-         v: (#struct){
-           c: (#struct){
+-        v: (#struct){
+-          c: (#struct){
 -            f: (int){ 1 }
 -            d: (int){ 1 }
-+            d: (int){ 1 }
-+            f: (int){ 1 }
-           }
-         }
+-          }
+-        }
++        v: ~(nested.err1.#A.#V)
          #V: (#struct){
            c: (#struct){
 -            f: (int){ 1 }
@@ -1636,7 +1673,7 @@ diff old new
            }
          }
        }
-@@ -499,19 +418,18 @@
+@@ -499,19 +345,18 @@
            // [eval]
            g: (_|_){
              // [eval] nested.err2.x.b.g: field not allowed:
@@ -1663,7 +1700,7 @@ diff old new
      #x: (#struct){
        y: (#struct){
          z?: (#struct){
-@@ -519,13 +437,23 @@
+@@ -519,13 +364,23 @@
          }
        }
      }

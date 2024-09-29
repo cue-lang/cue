@@ -283,16 +283,12 @@ Disjuncts:    76
         #Foo: (#struct){
           a!: (int){ int }
         }
-        b: (#struct){
-          a!: (int){ int }
-        }
+        b: ~(reference.toFieldFromDefinition.p1.#Foo)
         c: (int){ int }
       }
       p2: (struct){
         c: (int){ int }
-        b: (#struct){
-          a!: (int){ int }
-        }
+        b: ~(reference.toFieldFromDefinition.p2.#Foo)
         #Foo: (#struct){
           a!: (int){ int }
         }
@@ -337,6 +333,29 @@ diff old new
          }
          b!: (int){ int }
        }
+@@ -70,16 +68,12 @@
+         #Foo: (#struct){
+           a!: (int){ int }
+         }
+-        b: (#struct){
+-          a!: (int){ int }
+-        }
+-        c: (int){ int }
+-      }
+-      p2: (struct){
+-        c: (int){ int }
+-        b: (#struct){
+-          a!: (int){ int }
+-        }
++        b: ~(reference.toFieldFromDefinition.p1.#Foo)
++        c: (int){ int }
++      }
++      p2: (struct){
++        c: (int){ int }
++        b: ~(reference.toFieldFromDefinition.p2.#Foo)
+         #Foo: (#struct){
+           a!: (int){ int }
+         }
 -- diff/todo/p2 --
 Missing position.
 -- out/eval --

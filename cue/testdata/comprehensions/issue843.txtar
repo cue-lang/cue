@@ -99,11 +99,7 @@ Disjuncts:    92
       }
     }, (#struct){
       do: (string){ "f2" }
-      from: (_){
-        _
-        #c: (list){
-        }
-      }
+      from: ~(#c1)
     }) }
   #f1: (#struct){
     do: (string){ "f1" }
@@ -112,11 +108,7 @@ Disjuncts:    92
   }
   #f2: (#struct){
     do: (string){ "f2" }
-    from: (_){
-      _
-      #c: (list){
-      }
-    }
+    from: ~(#c1)
   }
 }
 -- diff/-out/evalalpha<==>+out/eval --
@@ -163,6 +155,31 @@ diff old new
        }
      }
    }
+@@ -44,11 +44,7 @@
+       }
+     }, (#struct){
+       do: (string){ "f2" }
+-      from: (_){
+-        _
+-        #c: (list){
+-        }
+-      }
++      from: ~(#c1)
+     }) }
+   #f1: (#struct){
+     do: (string){ "f1" }
+@@ -57,10 +53,6 @@
+   }
+   #f2: (#struct){
+     do: (string){ "f2" }
+-    from: (_){
+-      _
+-      #c: (list){
+-      }
+-    }
++    from: ~(#c1)
+   }
+ }
 -- diff/todo/p3 --
 Reordering
 -- out/eval --

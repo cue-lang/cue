@@ -42,6 +42,335 @@ Retain: 0
 Unifications: 53
 Conjuncts:    407
 Disjuncts:    40
+-- out/evalalpha --
+(struct){
+  A: (#struct){ |((#struct){
+      #steps: ~(#Script)
+      a: (int){ 1 }
+    }, (#struct){
+      #steps: ~(#Script)
+      a: (int){ 1 }
+      b: (int){ 2 }
+    }, (#struct){
+      #steps: ~(#Script)
+      b: (int){ 2 }
+    }) }
+  B: (struct){
+    #steps: (#struct){
+      mount: (#list){
+        0: (#struct){ |((#struct){
+            #steps: ~(#Script)
+            a: (int){ 1 }
+          }, (#struct){
+            #steps: ~(#Script)
+            a: (int){ 1 }
+            b: (int){ 2 }
+          }, (#struct){
+            #steps: ~(#Script)
+            b: (int){ 2 }
+          }) }
+      }
+    }
+  }
+  C: (struct){
+    #steps: (#struct){
+      mount: (#list){
+        0: (#struct){ |((#struct){
+            #steps: (#struct){
+              mount: (#list){
+                0: (#struct){ |((#struct){
+                    #steps: ~(#Script)
+                    a: (int){ 1 }
+                  }, (#struct){
+                    #steps: ~(#Script)
+                    a: (int){ 1 }
+                    b: (int){ 2 }
+                  }, (#struct){
+                    #steps: ~(#Script)
+                    b: (int){ 2 }
+                  }) }
+              }
+            }
+            a: (int){ 1 }
+          }, (#struct){
+            #steps: (#struct){
+              mount: (#list){
+                0: (#struct){ |((#struct){
+                    #steps: ~(#Script)
+                    a: (int){ 1 }
+                  }, (#struct){
+                    #steps: ~(#Script)
+                    a: (int){ 1 }
+                    b: (int){ 2 }
+                  }, (#struct){
+                    #steps: ~(#Script)
+                    b: (int){ 2 }
+                  }) }
+              }
+            }
+            a: (int){ 1 }
+            b: (int){ 2 }
+          }, (#struct){
+            #steps: (#struct){
+              mount: (#list){
+                0: (#struct){ |((#struct){
+                    #steps: ~(#Script)
+                    a: (int){ 1 }
+                  }, (#struct){
+                    #steps: ~(#Script)
+                    a: (int){ 1 }
+                    b: (int){ 2 }
+                  }, (#struct){
+                    #steps: ~(#Script)
+                    b: (int){ 2 }
+                  }) }
+              }
+            }
+            b: (int){ 2 }
+          }) }
+      }
+    }
+  }
+  #Script: (#struct){
+    mount: (list){
+    }
+  }
+  #Task: (#struct){ |((#struct){
+      #steps: ~(#Script)
+      a: (int){ 1 }
+    }, (#struct){
+      #steps: ~(#Script)
+      a: (int){ 1 }
+      b: (int){ 2 }
+    }, (#struct){
+      #steps: ~(#Script)
+      b: (int){ 2 }
+    }) }
+  #ref: (#struct){ |((#struct){
+      a: (int){ 1 }
+    }, (#struct){
+      b: (int){ 2 }
+    }) }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,22 +1,13 @@
+ (struct){
+   A: (#struct){ |((#struct){
+-      #steps: (#struct){
+-        mount: (list){
+-        }
+-      }
+-      a: (int){ 1 }
+-    }, (#struct){
+-      #steps: (#struct){
+-        mount: (list){
+-        }
+-      }
+-      a: (int){ 1 }
+-      b: (int){ 2 }
+-    }, (#struct){
+-      #steps: (#struct){
+-        mount: (list){
+-        }
+-      }
++      #steps: ~(#Script)
++      a: (int){ 1 }
++    }, (#struct){
++      #steps: ~(#Script)
++      a: (int){ 1 }
++      b: (int){ 2 }
++    }, (#struct){
++      #steps: ~(#Script)
+       b: (int){ 2 }
+     }) }
+   B: (struct){
+@@ -23,23 +14,14 @@
+     #steps: (#struct){
+       mount: (#list){
+         0: (#struct){ |((#struct){
+-            #steps: (#struct){
+-              mount: (list){
+-              }
+-            }
+-            a: (int){ 1 }
+-          }, (#struct){
+-            #steps: (#struct){
+-              mount: (list){
+-              }
+-            }
+-            a: (int){ 1 }
+-            b: (int){ 2 }
+-          }, (#struct){
+-            #steps: (#struct){
+-              mount: (list){
+-              }
+-            }
++            #steps: ~(#Script)
++            a: (int){ 1 }
++          }, (#struct){
++            #steps: ~(#Script)
++            a: (int){ 1 }
++            b: (int){ 2 }
++          }, (#struct){
++            #steps: ~(#Script)
+             b: (int){ 2 }
+           }) }
+       }
+@@ -52,76 +34,49 @@
+             #steps: (#struct){
+               mount: (#list){
+                 0: (#struct){ |((#struct){
+-                    #steps: (#struct){
+-                      mount: (list){
+-                      }
+-                    }
+-                    a: (int){ 1 }
+-                  }, (#struct){
+-                    #steps: (#struct){
+-                      mount: (list){
+-                      }
+-                    }
+-                    a: (int){ 1 }
+-                    b: (int){ 2 }
+-                  }, (#struct){
+-                    #steps: (#struct){
+-                      mount: (list){
+-                      }
+-                    }
+-                    b: (int){ 2 }
+-                  }) }
+-              }
+-            }
+-            a: (int){ 1 }
+-          }, (#struct){
+-            #steps: (#struct){
+-              mount: (#list){
+-                0: (#struct){ |((#struct){
+-                    #steps: (#struct){
+-                      mount: (list){
+-                      }
+-                    }
+-                    a: (int){ 1 }
+-                  }, (#struct){
+-                    #steps: (#struct){
+-                      mount: (list){
+-                      }
+-                    }
+-                    a: (int){ 1 }
+-                    b: (int){ 2 }
+-                  }, (#struct){
+-                    #steps: (#struct){
+-                      mount: (list){
+-                      }
+-                    }
+-                    b: (int){ 2 }
+-                  }) }
+-              }
+-            }
+-            a: (int){ 1 }
+-            b: (int){ 2 }
+-          }, (#struct){
+-            #steps: (#struct){
+-              mount: (#list){
+-                0: (#struct){ |((#struct){
+-                    #steps: (#struct){
+-                      mount: (list){
+-                      }
+-                    }
+-                    a: (int){ 1 }
+-                  }, (#struct){
+-                    #steps: (#struct){
+-                      mount: (list){
+-                      }
+-                    }
+-                    a: (int){ 1 }
+-                    b: (int){ 2 }
+-                  }, (#struct){
+-                    #steps: (#struct){
+-                      mount: (list){
+-                      }
+-                    }
++                    #steps: ~(#Script)
++                    a: (int){ 1 }
++                  }, (#struct){
++                    #steps: ~(#Script)
++                    a: (int){ 1 }
++                    b: (int){ 2 }
++                  }, (#struct){
++                    #steps: ~(#Script)
++                    b: (int){ 2 }
++                  }) }
++              }
++            }
++            a: (int){ 1 }
++          }, (#struct){
++            #steps: (#struct){
++              mount: (#list){
++                0: (#struct){ |((#struct){
++                    #steps: ~(#Script)
++                    a: (int){ 1 }
++                  }, (#struct){
++                    #steps: ~(#Script)
++                    a: (int){ 1 }
++                    b: (int){ 2 }
++                  }, (#struct){
++                    #steps: ~(#Script)
++                    b: (int){ 2 }
++                  }) }
++              }
++            }
++            a: (int){ 1 }
++            b: (int){ 2 }
++          }, (#struct){
++            #steps: (#struct){
++              mount: (#list){
++                0: (#struct){ |((#struct){
++                    #steps: ~(#Script)
++                    a: (int){ 1 }
++                  }, (#struct){
++                    #steps: ~(#Script)
++                    a: (int){ 1 }
++                    b: (int){ 2 }
++                  }, (#struct){
++                    #steps: ~(#Script)
+                     b: (int){ 2 }
+                   }) }
+               }
+@@ -136,23 +91,14 @@
+     }
+   }
+   #Task: (#struct){ |((#struct){
+-      #steps: (#struct){
+-        mount: (list){
+-        }
+-      }
+-      a: (int){ 1 }
+-    }, (#struct){
+-      #steps: (#struct){
+-        mount: (list){
+-        }
+-      }
+-      a: (int){ 1 }
+-      b: (int){ 2 }
+-    }, (#struct){
+-      #steps: (#struct){
+-        mount: (list){
+-        }
+-      }
++      #steps: ~(#Script)
++      a: (int){ 1 }
++    }, (#struct){
++      #steps: ~(#Script)
++      a: (int){ 1 }
++      b: (int){ 2 }
++    }, (#struct){
++      #steps: ~(#Script)
+       b: (int){ 2 }
+     }) }
+   #ref: (#struct){ |((#struct){
 -- out/eval --
 (struct){
   A: (#struct){ |((#struct){

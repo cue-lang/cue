@@ -18,6 +18,31 @@ Retain: 0
 Unifications: 8
 Conjuncts:    13
 Disjuncts:    8
+-- out/evalalpha --
+(struct){
+  #A: (_){ _ }
+  #N: (#struct){
+    _E: (#struct){
+      name: (string){ "hello" }
+    }
+  }
+  l: ~(#N)
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -5,9 +5,5 @@
+       name: (string){ "hello" }
+     }
+   }
+-  l: (#struct){
+-    _E: (#struct){
+-      name: (string){ "hello" }
+-    }
+-  }
++  l: ~(#N)
+ }
 -- out/eval --
 (struct){
   #A: (_){ _ }

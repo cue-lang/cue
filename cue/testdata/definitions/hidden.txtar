@@ -90,9 +90,7 @@ Result:
       f: (int){ 3 }
     }
   }
-  g: (struct){
-    f: (int){ 4 }
-  }
+  g: ~(f._val(:foo))
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -116,7 +114,7 @@ diff old new
      _name(:foo): (struct){
        d: (int){ int }
      }
-@@ -22,32 +17,33 @@
+@@ -22,35 +17,34 @@
      _val(:foo): (struct){
        f: (int){ 4 }
      }
@@ -153,14 +151,20 @@ diff old new
 -    }
 -    _val(:foo): (struct){
 -      f: (int){ 4 }
+-    }
+-  }
+-  g: (struct){
+-    f: (int){ 4 }
+-  }
 +    _val(:foo): (struct){
 +      f: (int){ 4 }
 +    }
 +    _val(mod.test/pkg): (#struct){
 +      f: (int){ 3 }
-     }
-   }
-   g: (struct){
++    }
++  }
++  g: ~(f._val(:foo))
+ }
 -- diff/todo/p2 --
 Reordering / missing positions.
 -- out/eval --

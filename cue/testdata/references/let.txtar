@@ -442,17 +442,13 @@ Disjuncts:    121
         let x#E = (struct){
           a: (int){ 1 }
         }
-        0: (struct){
-          a: (int){ 1 }
-        }
+        0: ~(scalarReference.inList.p0.x#E)
       }
       p1: (#list){
         let x#F = (struct){
           a: (int){ 1 }
         }
-        0: (struct){
-          a: (int){ 1 }
-        }
+        0: ~(scalarReference.inList.p1.x#F)
       }
     }
   }
@@ -494,6 +490,26 @@ diff old new
          //     ./in.cue:54:17
        }
      }
+@@ -145,17 +145,13 @@
+         let x#E = (struct){
+           a: (int){ 1 }
+         }
+-        0: (struct){
+-          a: (int){ 1 }
+-        }
++        0: ~(scalarReference.inList.p0.x#E)
+       }
+       p1: (#list){
+         let x#F = (struct){
+           a: (int){ 1 }
+         }
+-        0: (struct){
+-          a: (int){ 1 }
+-        }
++        0: ~(scalarReference.inList.p1.x#F)
+       }
+     }
+   }
 -- diff/todo/p3 --
 Investigate let divergence. Probably okay.
 -- out/eval --

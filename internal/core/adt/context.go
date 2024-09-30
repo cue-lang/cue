@@ -89,6 +89,12 @@ func (c *OpContext) isDevVersion() bool {
 	return c.Version == internal.DevVersion
 }
 
+// IsValidator reports whether the context is being evaluated
+// as part of a validator function call.
+func (c *OpContext) IsValidator() bool {
+	return c.isValidator
+}
+
 // An OpContext holds context associated with an on-going CUE
 // evaluation. It functions both as an optimized memory store,
 // amortizing allocations during an evaluation, and as a record of the
@@ -199,7 +205,7 @@ type OpContext struct {
 	// is wrapped in an internal.ValidationError, it will only be interpreted
 	// as an error if this is true.
 	// TODO: strictly separate validators and functions.
-	IsValidator bool
+	isValidator bool
 
 	overlays []overlayFrame
 

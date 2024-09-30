@@ -1715,15 +1715,15 @@ func (x *Builtin) call(call *CallContext) Expr {
 
 	// Arguments to functions are open. This mostly matters for NonConcrete
 	// builtins.
-	saved := c.IsValidator
-	c.IsValidator = call.isValidator
+	saved := c.isValidator
+	c.isValidator = call.isValidator
 	ci := c.ci
 	c.ci.FromEmbed = false
 	c.ci.FromDef = false
 	defer func() {
 		c.ci.FromDef = ci.FromDef
 		c.ci.FromEmbed = ci.FromEmbed
-		c.IsValidator = saved
+		c.isValidator = saved
 	}()
 
 	if x.RawFunc != nil {

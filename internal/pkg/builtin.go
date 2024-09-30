@@ -170,7 +170,7 @@ func ToBuiltin(b *Builtin) *adt.Builtin {
 			return nil
 		}
 		if c.Err != nil {
-			if _, ok := c.Err.(ValidationError); !ok || c.ctx.IsValidator {
+			if _, ok := c.Err.(ValidationError); !ok || c.ctx.IsValidator() {
 				return nil
 			}
 		}
@@ -206,7 +206,7 @@ func processErr(call *CallCtxt, errVal interface{}, ret adt.Expr) adt.Expr {
 	switch err := errVal.(type) {
 	case nil:
 	case ValidationError:
-		if call.ctx.IsValidator {
+		if call.ctx.IsValidator() {
 			ret = err.B
 		}
 	case *adt.Bottom:

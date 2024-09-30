@@ -203,6 +203,9 @@ func (c *OpContext) isDevVersion() bool {
 // operates on values that are created with the Runtime with which an OpContext
 // is associated. An OpContext is not goroutine safe and only one goroutine may
 // use an OpContext at a time.
+//
+// An OpContext is typically used for an entire operation involving CUE values,
+// such as any call to exported Go APIs like methods on [cue.Value].
 type OpContext struct {
 	Runtime
 	Format func(Runtime, Node) string

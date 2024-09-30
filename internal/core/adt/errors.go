@@ -340,30 +340,26 @@ func (c *OpContext) AddPosition(n Node) {
 	}
 }
 
+// NewErrf creates a *Bottom value and returns it. The returned value uses the
+// current source as the point of origin of the error.
+//
+// TODO: This method name is confusing, as we also have Newf: consider
+// renaming to NewBottomf.
+func (c *OpContext) NewErrf(format string, args ...interface{}) *Bottom {
+	return &Bottom{
+		Src:  c.src,
+		Err:  c.Newf(format, args...),
+		Code: EvalError,
+		Node: c.vertex,
+	}
+}
+
+// Newf returns an error recorded at the current position.
 func (c *OpContext) Newf(format string, args ...interface{}) *ValueError {
 	return c.NewPosf(c.pos(), format, args...)
 }
 
-func appendNodePositions(a []token.Pos, n Node) []token.Pos {
-	if p := pos(n); p != token.NoPos {
-		a = append(a, p)
-	}
-	if v, ok := n.(*Vertex); ok {
-		for _, c := range v.Conjuncts {
-			switch x := c.x.(type) {
-			case *ConjunctGroup:
-				for _, c := range *x {
-					a = appendNodePositions(a, c.Elem())
-				}
-
-			default:
-				a = appendNodePositions(a, c.Elem())
-			}
-		}
-	}
-	return a
-}
-
+// NewPosf returns an error recorded at the given position.
 func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *ValueError {
 	var a []token.Pos
 	if len(c.positions) > 0 {
@@ -397,6 +393,26 @@ func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *Va
 		auxpos:  a,
 		Message: errors.NewMessagef(format, args...),
 	}
+}
+
+func appendNodePositions(a []token.Pos, n Node) []token.Pos {
+	if p := pos(n); p != token.NoPos {
+		a = append(a, p)
+	}
+	if v, ok := n.(*Vertex); ok {
+		for _, c := range v.Conjuncts {
+			switch x := c.x.(type) {
+			case *ConjunctGroup:
+				for _, c := range *x {
+					a = appendNodePositions(a, c.Elem())
+				}
+
+			default:
+				a = appendNodePositions(a, c.Elem())
+			}
+		}
+	}
+	return a
 }
 
 func (e *ValueError) Error() string {

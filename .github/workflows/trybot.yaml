@@ -167,7 +167,12 @@ jobs:
           	exit 1
           fi
       - name: Generate
-        run: go generate ./...
+        env:
+          CUE_TEST_LOGINS: ${{ secrets.E2E_CUE_LOGINS }}
+        run: |-
+          export CUE_CONFIG_DIR=$(mktemp -d)
+          echo "$CUE_TEST_LOGINS" > $CUE_CONFIG_DIR/logins.json
+          go generate ./...
         if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
       - name: Check that git is clean at the end of the job
         if: always()

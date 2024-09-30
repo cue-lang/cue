@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a477632_75606db6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-09-30T11:34:45Z",
+      "side": 1,
+      "message": "Adding Marcel to double check this reuse of OpContext is sane.",
+      "revId": "e8a2e2fc39397289be165e06152e7cf60f5db21d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

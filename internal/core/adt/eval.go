@@ -578,7 +578,7 @@ func (n *nodeContext) reportConflict(v1, v2 Node, k1, k2 Kind, ids ...posInfo) {
 	err := &ConflictError{
 		baseError: baseError{
 			r:       ctx.Runtime,
-			format:  ctx.Format,
+			format:  ctx.format,
 			v:       ctx.errNode(),
 			pos:     token.NoPos,
 			altPath: ctx.makeAltPath(),

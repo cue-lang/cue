@@ -78,7 +78,7 @@ func New(v *Vertex, cfg *Config) *OpContext {
 	ctx := &OpContext{
 		opID:        contextGeneration.Add(1),
 		Runtime:     cfg.Runtime,
-		Format:      cfg.Format,
+		format:      cfg.Format,
 		vertex:      v,
 		taskContext: schedConfig,
 	}
@@ -129,7 +129,7 @@ func (c *OpContext) isDevVersion() bool {
 // errors and vertex to be restored.
 type OpContext struct {
 	Runtime
-	Format func(Runtime, Node) string
+	format func(Runtime, Node) string
 
 	cuedebug.Config
 	Version internal.EvaluatorVersion // Copied from Runtime
@@ -427,7 +427,16 @@ func (c *OpContext) PushState(env *Environment, src ast.Node) (saved frame) {
 	return saved
 }
 
-func (c *OpContext) PushConjunct(x Conjunct) (saved frame) {
+func (c *OpContext) PopState(s frame) *Bottom {
+	err := c.errs
+	c.e = s.env
+	c.errs = s.err
+	c.src = s.src
+	c.ci = s.ci
+	return err
+}
+
+func (c *OpContext) pushConjunct(x Conjunct) (saved frame) {
 	src := x.Expr().Source()
 
 	saved.env = c.e
@@ -445,14 +454,8 @@ func (c *OpContext) PushConjunct(x Conjunct) (saved frame) {
 	return saved
 }
 
-// PopState restores a state pushed by [OpContext.PushState].
-func (c *OpContext) PopState(s frame) *Bottom {
-	err := c.errs
-	c.e = s.env
-	c.errs = s.err
-	c.src = s.src
-	c.ci = s.ci
-	return err
+func (c *OpContext) popConjunct(s frame) *Bottom {
+	return c.PopState(s)
 }
 
 // PushArc signals c that arc v is currently being processed for the purpose
@@ -502,7 +505,7 @@ func (c *OpContext) Resolve(x Conjunct, r Resolver) (v *Vertex, b *Bottom) {
 }
 
 func (c *OpContext) resolveState(x Conjunct, r Resolver, state Flags) (*Vertex, *Bottom) {
-	s := c.PushConjunct(x)
+	s := c.pushConjunct(x)
 
 	arc := r.resolve(c, state)
 
@@ -1370,10 +1373,15 @@ func (c *OpContext) newList(src ast.Node, parent *Vertex) *Vertex {
 // String reports a string of x, for use in errors or debugging.
 // Use [OpContext.Str] instead for %s format arguments, as it delays the work.
 func (c *OpContext) String(x Node) string {
-	if c.Format == nil {
+	if c.format == nil {
 		return fmt.Sprintf("%T", x)
 	}
-	return c.Format(c.Runtime, x)
+	return c.format(c.Runtime, x)
+}
+
+// Str reports a string of x via a [fmt.Stringer], for use in errors or debugging.
+func (c *OpContext) Str(x Node) fmt.Stringer {
+	return Formatter{X: x, F: c.format, R: c.Runtime}
 }
 
 // Formatter wraps an adt.Node with the necessary information to print it.
@@ -1397,11 +1405,6 @@ type Formatter struct {
 }
 
 func (f Formatter) String() string { return f.F(f.R, f.X) }
-
-// Str reports a string of x via a [fmt.Stringer], for use in errors or debugging.
-func (c *OpContext) Str(x Node) fmt.Stringer {
-	return Formatter{X: x, F: c.Format, R: c.Runtime}
-}
 
 // NewList returns a new list for the given values.
 func (c *OpContext) NewList(values ...Value) *Vertex {

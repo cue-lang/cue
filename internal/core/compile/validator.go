@@ -32,7 +32,7 @@ var matchNBuiltin = &adt.Builtin{
 	Func: func(call adt.BuiltinCallContext) adt.Expr {
 		c := call.OpContext()
 
-		if !c.IsValidator {
+		if !c.IsValidator() {
 			return c.NewErrf("matchN is a validator and should not be used as a function")
 		}
 
@@ -99,7 +99,7 @@ var matchIfBuiltin = &adt.Builtin{
 	Func: func(call adt.BuiltinCallContext) adt.Expr {
 		c := call.OpContext()
 
-		if !c.IsValidator {
+		if !c.IsValidator() {
 			return c.NewErrf("matchIf is a validator and should not be used as a function")
 		}
 

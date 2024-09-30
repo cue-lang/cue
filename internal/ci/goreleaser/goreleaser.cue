@@ -3,7 +3,7 @@ package goreleaser
 config: {
 	#latest: bool @tag(latest, type=bool)
 
-	version: 2
+	version:      2
 	project_name: "cue"
 	// Note that gomod.proxy is ignored by `goreleaser release --snapshot`,
 	// which we use in CI to test the goreleaser config and build,
@@ -30,7 +30,6 @@ config: {
 		goos: *[
 			"darwin",
 			"linux",
-			"windows",
 		] | _
 		goarch: *[
 			"amd64",
@@ -68,82 +67,8 @@ config: {
 		// For those reasons, let goreleaser create the release, but leaving it as a draft.
 		draft: true
 	}
-	checksum: name_template: "checksums.txt"
+	checksum: name_template:    "checksums.txt"
 	snapshot: version_template: "{{ .Tag }}-next"
 	// As explained above, we write our own release notes.
 	changelog: disable: true
-
-	brews: [{
-		if !#latest {
-			skip_upload: true
-		}
-		repository: {
-			owner: "cue-lang"
-			name:  "homebrew-tap"
-		}
-		commit_author: {
-			name:  "cueckoo"
-			email: "noreply@cuelang.org"
-		}
-		homepage:    "https://cuelang.org"
-		description: "CUE is an open source data constraint language which aims to simplify tasks involving defining and using data."
-		test: """
-			system \"#{bin}/cue version\"
-
-			"""
-	}]
-
-	dockers: [{
-		image_templates: [
-			"docker.io/cuelang/cue:{{ .Version }}-amd64",
-		]
-		dockerfile: "cmd/cue/Dockerfile"
-		use:        "buildx"
-		build_flag_templates: [
-			"--platform=linux/amd64",
-			"--label=org.opencontainers.image.title={{ .ProjectName }}",
-			"--label=org.opencontainers.image.description={{ .ProjectName }}",
-			"--label=org.opencontainers.image.url=https://github.com/cue-lang/cue",
-			"--label=org.opencontainers.image.source=https://github.com/cue-lang/cue",
-			"--label=org.opencontainers.image.version={{ .Version }}",
-			"--label=org.opencontainers.image.created={{ time \"2006-01-02T15:04:05Z07:00\" }}",
-			"--label=org.opencontainers.image.revision={{ .FullCommit }}",
-			"--label=org.opencontainers.image.licenses=Apache 2.0",
-		]
-	}, {
-		image_templates: [
-			"docker.io/cuelang/cue:{{ .Version }}-arm64",
-		]
-		goarch:     "arm64"
-		dockerfile: "cmd/cue/Dockerfile"
-		use:        "buildx"
-		build_flag_templates: [
-			"--platform=linux/arm64",
-			"--label=org.opencontainers.image.title={{ .ProjectName }}",
-			"--label=org.opencontainers.image.description={{ .ProjectName }}",
-			"--label=org.opencontainers.image.url=https://github.com/cue-lang/cue",
-			"--label=org.opencontainers.image.source=https://github.com/cue-lang/cue",
-			"--label=org.opencontainers.image.version={{ .Version }}",
-			"--label=org.opencontainers.image.created={{ time \"2006-01-02T15:04:05Z07:00\" }}",
-			"--label=org.opencontainers.image.revision={{ .FullCommit }}",
-			"--label=org.opencontainers.image.licenses=Apache 2.0",
-		]
-	}]
-
-	docker_manifests: [
-		{
-			name_template: "docker.io/cuelang/cue:{{ .Version }}"
-			image_templates: [
-				"docker.io/cuelang/cue:{{ .Version }}-amd64",
-				"docker.io/cuelang/cue:{{ .Version }}-arm64",
-			]
-		},
-		if #latest {
-			name_template: "docker.io/cuelang/cue:latest"
-			image_templates: [
-				"docker.io/cuelang/cue:{{ .Version }}-amd64",
-				"docker.io/cuelang/cue:{{ .Version }}-arm64",
-			]
-		},
-	]
 }

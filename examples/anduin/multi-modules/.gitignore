@@ -1,0 +1,3 @@
+cue.cache/
+data/
+!cue.mod/module.cue

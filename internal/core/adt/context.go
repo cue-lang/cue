@@ -205,10 +205,36 @@ func (c *OpContext) IsValidator() bool {
 	return c.isValidator
 }
 
-// An OpContext implements CUE's unification operation. It only
-// operates on values that are created with the Runtime with which an OpContext
-// is associated. An OpContext is not goroutine safe and only one goroutine may
-// use an OpContext at a time.
+// An OpContext holds context associated with an on-going CUE
+// evaluation. It functions both as an optimized memory store,
+// amortizing allocations during an evaluation, and as a record of the
+// current state within an evaluation.
+//
+// It should only be used on values that are created with the Runtime
+// with which an OpContext is created.
+//
+// An OpContext is not goroutine safe and only one goroutine may use an
+// OpContext at a time.
+//
+// An OpContext is typically used for an entire operation involving CUE
+// values that are derived from the same [cue.Context], such as any call
+// to exported Go APIs like methods on [cue.Value].
+//
+// An OpContext stores:
+// - any errors encountered during the evaluation
+// - the current vertex and its parents
+// - statistics on evaluation operations
+//
+// The recorded set of errors is added to by calls to Newf, NewErrf, and
+// any other operation that encounters an error.
+//
+// The current vertex is modified by calling [OpContext.PushArc], which
+// must be balanced by a corresponding call to [OpContext.PopArc].
+//
+// The entire state, including all errors and the current vertex, can be
+// pushed by calling [OpContext.PushState], which must be balanced by a
+// corresponding call to [OpContext.PopState], causing the original
+// errors and vertex to be restored.
 type OpContext struct {
 	Runtime
 	format func(Runtime, Node) string

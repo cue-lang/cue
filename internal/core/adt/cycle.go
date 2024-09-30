@@ -679,7 +679,7 @@ func sharedTargetHasInProgressCycle(c *OpContext, w *Vertex) bool {
 		// points to a vertex currently on the evaluation stack,
 		// calling w.unify would recurse and trigger a structural
 		// cycle on w.
-		saved := c.PushConjunct(MakeConjunct(t.env, t.x, t.id))
+		saved := c.pushConjunct(MakeConjunct(t.env, t.x, t.id))
 		arc := r.resolve(c, Flags{condition: fieldSetKnown, mode: ignore})
 		c.PopState(saved)
 		if arc == nil || arc == emptyNode {

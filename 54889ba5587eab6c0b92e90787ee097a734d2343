@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57ddf064_065a0954",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-09-30T08:17:40Z",
+      "side": 1,
+      "message": "A colleague of ours would point out this line is \"too long\". ;)",
+      "revId": "54889ba5587eab6c0b92e90787ee097a734d2343",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

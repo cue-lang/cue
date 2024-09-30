@@ -1020,7 +1020,7 @@ func (ctx *OpContext) addPositions(c Conjunct) {
 func (ctx *OpContext) notAllowedError(v, arc *Vertex) {
 	defer ctx.PopArc(ctx.PushArc(arc))
 
-	defer ctx.ReleasePositions(ctx.MarkPositions())
+	defer ctx.releasePositions(ctx.markPositions())
 
 	for _, c := range arc.Conjuncts {
 		ctx.addPositions(c)

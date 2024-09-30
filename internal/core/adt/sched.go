@@ -704,7 +704,7 @@ func runTask(t *task, mode runMode) {
 	if t.env != nil {
 		id := t.id
 		id.cc = nil // this is done to avoid struct args from passing fields up.
-		s := ctx.PushConjunct(MakeConjunct(t.env, t.x, id))
+		s := ctx.pushConjunct(MakeConjunct(t.env, t.x, id))
 		defer ctx.PopState(s)
 	}
 

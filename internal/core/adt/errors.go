@@ -324,13 +324,13 @@ func (c *OpContext) errNode() *Vertex {
 	return c.vertex
 }
 
-// MarkPositions marks the current position stack.
-func (c *OpContext) MarkPositions() int {
+// markPositions marks the current position stack.
+func (c *OpContext) markPositions() int {
 	return len(c.positions)
 }
 
-// ReleasePositions sets the position state to one from a call to MarkPositions.
-func (c *OpContext) ReleasePositions(p int) {
+// releasePositions sets the position state to one from a call to markPositions.
+func (c *OpContext) releasePositions(p int) {
 	c.positions = c.positions[:p]
 }
 

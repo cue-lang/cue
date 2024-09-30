@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d46726ea_18b2b3da",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-09-30T08:15:03Z",
+      "side": 1,
+      "message": "Whilst I don\u0027t doubt this CL improves matters, would it not be better to have the resolvers all return the same value on error? Otherwise this fix may need to occur in several places?",
+      "revId": "888d1d079c58b8063c2108b420155fa7a37f422c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

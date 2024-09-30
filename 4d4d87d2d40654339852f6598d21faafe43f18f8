@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8cb0afbe_e6c737da",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-09-30T09:55:52Z",
+      "side": 1,
+      "message": "I think it might be worth expanding this a little. In my head, there is only one call stack. The way I read this, you\u0027re thinking of multiple call stacks ... which implies continuations or something like that? Maybe a brief example just showing how these stacks exist would be very helpful.",
+      "revId": "4d4d87d2d40654339852f6598d21faafe43f18f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0679d352_9ec1d075",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-09-30T09:55:52Z",
+      "side": 1,
+      "message": "Ahh nice. This is similar to my attempt in tinycue to look for evidence of new data that hasn\u0027t been used before in previous cycles. But I think your formulation is better, simpler, and easier to get right.",
+      "revId": "4d4d87d2d40654339852f6598d21faafe43f18f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c20eb6d4_2a8f8c5e",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-09-30T09:55:52Z",
+      "side": 1,
+      "message": "What does \"the references are cleared\" mean? Which references?",
+      "revId": "4d4d87d2d40654339852f6598d21faafe43f18f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e48ab44_d01d8771",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-09-30T09:55:52Z",
+      "side": 1,
+      "message": "Do you mean a \"direct parent\"? I was expecting to read \"ancestor\" here. I wonder what I\u0027m missing.",
+      "revId": "4d4d87d2d40654339852f6598d21faafe43f18f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c098bf52_e823c45b",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-09-30T09:55:52Z",
+      "side": 1,
+      "message": "I think you may have deleted examples 2 and 3 and not corrected the numbering!",
+      "revId": "4d4d87d2d40654339852f6598d21faafe43f18f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c895a6f8_05560db3",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-09-30T09:55:52Z",
+      "side": 1,
+      "message": "Does this example need `c` to be cyclic? Given `b: _`, I would have thought `a` is cyclic on its own. In which case to me, adding `c` to the example confuses me more than helps.",
+      "revId": "4d4d87d2d40654339852f6598d21faafe43f18f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "395fc2d4_454c3154",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-09-30T09:55:52Z",
+      "side": 1,
+      "message": "Thank you for all this documentation - I really like it.",
+      "revId": "4d4d87d2d40654339852f6598d21faafe43f18f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d40975bc_0624d668",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 546,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-09-30T09:55:52Z",
+      "side": 1,
+      "message": "My only quibble is about naming - `markCycle` and `markCyclic` are very very similar. I wonder if this one - `markCycle` is really more about detecting cycles?",
+      "revId": "4d4d87d2d40654339852f6598d21faafe43f18f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "540b167e_ed9e4f65",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 655,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-09-30T09:55:52Z",
+      "side": 1,
+      "message": "Maybe a TODO here to either eventually get rid of, or use, `n`?",
+      "revId": "4d4d87d2d40654339852f6598d21faafe43f18f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

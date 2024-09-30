@@ -3,15 +3,15 @@ package base
 // This file contains gerrithub related definitions etc
 
 import (
-	encjson "encoding/json"
+	"encoding/json"
 	"strings"
 
-	"github.com/SchemaStore/schemastore/src/schemas/json"
+	"github.com/cue-tmp/jsonschema-pub/exp1/githubactions"
 )
 
 // trybotWorkflows is a template for trybot-based repos
 trybotWorkflows: {
-	(trybot.key): json.#Workflow & {
+	(trybot.key): githubactions.#Workflow & {
 		on: workflow_dispatch: {}
 	}
 	"\(trybot.key)_dispatch":    trybotDispatchWorkflow
@@ -45,7 +45,7 @@ trybotDispatchWorkflow: bashWorkflow & {
 		(trybot.key): {
 			"runs-on": linuxMachine
 
-			let goodDummyData = [if encjson.Marshal(#dummyDispatch) != _|_ {true}, false][0]
+			let goodDummyData = [if json.Marshal(#dummyDispatch) != _|_ {true}, false][0]
 
 			// We set the "on" conditions above, but this would otherwise mean we
 			// run for all dispatch events.
@@ -68,7 +68,7 @@ trybotDispatchWorkflow: bashWorkflow & {
 			steps: [
 				writeNetrcFile,
 
-				json.#step & {
+				githubactions.#Step & {
 					name: "Write fake payload"
 					id:   "payload"
 					if:   "github.repository == '\(githubRepositoryPath)' && \(isTestDefaultBranch)"
@@ -80,7 +80,7 @@ trybotDispatchWorkflow: bashWorkflow & {
 					run: #"""
 						cat <<EOD >> $GITHUB_OUTPUT
 						value<<DOE
-						\#(*encjson.Marshal(#dummyDispatch) | "null")
+						\#(*json.Marshal(#dummyDispatch) | "null")
 						DOE
 						EOD
 						"""#
@@ -97,7 +97,7 @@ trybotDispatchWorkflow: bashWorkflow & {
 				for v in cases {
 					let localBranchExpr = "local_${{ \(v.expr).targetBranch }}"
 					let targetBranchExpr = "${{ \(v.expr).targetBranch }}"
-					json.#step & {
+					githubactions.#Step & {
 						name: "Trigger \(trybot.name) (\(v.nameSuffix))"
 						if:   "github.event.client_payload.type \(v.condition) '\(trybot.key)'"
 						run:  """
@@ -174,7 +174,7 @@ pushTipToTrybotWorkflow: bashWorkflow & {
 	jobs: push: {
 		steps: [
 			writeNetrcFile,
-			json.#step & {
+			githubactions.#Step & {
 				name: "Push tip to trybot"
 				run:  """
 						mkdir tmpgit
@@ -248,7 +248,7 @@ evictCaches: bashWorkflow & {
 			steps: [
 				for v in checkoutCode {v},
 
-				json.#step & {
+				githubactions.#Step & {
 					name: "Delete caches"
 					run:  """
 						set -x
@@ -269,7 +269,7 @@ evictCaches: bashWorkflow & {
 						"""
 				},
 
-				json.#step & {
+				githubactions.#Step & {
 					name: "Trigger workflow runs to repopulate caches"
 					let branchPatterns = strings.Join(protectedBranchPatterns, " ")
 
@@ -343,7 +343,7 @@ evictCaches: bashWorkflow & {
 	}
 }
 
-writeNetrcFile: json.#step & {
+writeNetrcFile: githubactions.#Step & {
 	name: "Write netrc file for \(botGerritHubUser) Gerrithub"
 	run:  """
 			cat <<EOD > ~/.netrc

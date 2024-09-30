@@ -199,6 +199,12 @@ func (c *OpContext) isDevVersion() bool {
 	return c.Version == internal.DevVersion
 }
 
+// IsValidator reports whether the context is being evaluated
+// as part of a validator function call.
+func (c *OpContext) IsValidator() bool {
+	return c.isValidator
+}
+
 // An OpContext implements CUE's unification operation. It only
 // operates on values that are created with the Runtime with which an OpContext
 // is associated. An OpContext is not goroutine safe and only one goroutine may
@@ -271,7 +277,7 @@ type OpContext struct {
 	// is wrapped in an internal.ValidationError, it will only be interpreted
 	// as an error if this is true.
 	// TODO: strictly separate validators and functions.
-	IsValidator bool
+	isValidator bool
 
 	// ErrorGraphs contains an analysis, represented as a Mermaid graph, for
 	// each node that has an error.

@@ -1677,10 +1677,10 @@ func (x *Builtin) call(c *OpContext, p token.Pos, validate bool, args []Value) E
 			args[i] = n
 		}
 	}
-	saved := c.IsValidator
-	c.IsValidator = validate
+	saved := c.isValidator
+	c.isValidator = validate
 	ret := x.Func(c, args)
-	c.IsValidator = saved
+	c.isValidator = saved
 
 	return ret
 }

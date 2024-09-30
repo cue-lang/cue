@@ -699,7 +699,7 @@ func runTask(t *task, mode runMode) {
 		// This is done to avoid struct args from passing fields up.
 		// Use [task.updateCI] to get the current CloseInfo with this field
 		// restored.
-		s := ctx.PushConjunct(MakeConjunct(t.env, t.x, id))
+		s := ctx.pushConjunct(MakeConjunct(t.env, t.x, id))
 		defer ctx.PopState(s)
 	}
 

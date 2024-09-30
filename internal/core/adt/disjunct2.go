@@ -346,10 +346,10 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 			c := n.ctx
 			path := c.PathToString(n.defaultAttemptInCycle.Path())
 
-			index := c.MarkPositions()
+			index := c.markPositions()
 			c.AddPosition(n.defaultAttemptInCycle)
 			err := c.Newf("ambiguous default elimination by referencing %v", path)
-			c.ReleasePositions(index)
+			c.releasePositions(index)
 
 			b := &Bottom{Code: CycleError, Err: err}
 			n.setBaseValue(b)
@@ -638,10 +638,10 @@ func (n *nodeContext) finalizeDisjunctions() {
 		c := n.ctx
 		path := c.PathToString(n.defaultAttemptInCycle.Path())
 
-		index := c.MarkPositions()
+		index := c.markPositions()
 		c.AddPosition(n.defaultAttemptInCycle)
 		err := c.Newf("cycle across unresolved disjunction referenced by %v", path)
-		c.ReleasePositions(index)
+		c.releasePositions(index)
 
 		b := &Bottom{Code: CycleError, Err: err}
 		n.setBaseValue(b)

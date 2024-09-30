@@ -1187,7 +1187,7 @@ func (v *Vertex) Accept(ctx *OpContext, f Feature) bool {
 	}
 
 	// TODO(perf): collect positions in error.
-	defer ctx.ReleasePositions(ctx.MarkPositions())
+	defer ctx.releasePositions(ctx.markPositions())
 
 	return v.accepts(Accept(ctx, v, f))
 }

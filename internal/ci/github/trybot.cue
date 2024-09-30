@@ -17,7 +17,7 @@ package github
 import (
 	"list"
 
-	"github.com/SchemaStore/schemastore/src/schemas/json"
+	"github.com/cue-tmp/jsonschema-pub/exp1/githubactions"
 )
 
 // The trybot workflow.
@@ -108,20 +108,27 @@ workflows: trybot: _repo.bashWorkflow & {
 	// work.
 	_isLatestLinux: "(\(goVersion) == '\(_repo.latestGo)' && \(matrixRunner) == '\(_repo.linuxMachine)')"
 
-	_goGenerate: json.#step & {
+	_goGenerate: githubactions.#Step & {
 		name: "Generate"
-		run:  "go generate ./..."
+		env: {
+			CUE_LOGINS: "${{ secrets.NOTCUECKOO_CUE_LOGINS }}"
+		}
+		run:  """
+			export CUE_CONFIG_DIR=$(mktemp -d)
+			echo "$CUE_LOGINS" > $CUE_CONFIG_DIR/logins.json
+			go generate ./...
+			"""
 		// The Go version corresponds to the precise version specified in
 		// the matrix. Skip windows for now until we work out why re-gen is flaky
 		if: _isLatestLinux
 	}
 
-	_goTest: json.#step & {
+	_goTest: githubactions.#Step & {
 		name: "Test"
 		run:  "go test ./..."
 	}
 
-	_e2eTestSteps: [... json.#step & {
+	_e2eTestSteps: [... githubactions.#Step & {
 		// The end-to-end tests require a github token secret and are a bit slow,
 		// so we only run them on pushes to protected branches and on one
 		// environment in the source repo.
@@ -161,7 +168,7 @@ workflows: trybot: _repo.bashWorkflow & {
 		},
 	]
 
-	_goCheck: json.#step & {
+	_goCheck: githubactions.#Step & {
 		// These checks can vary between platforms, as different code can be built
 		// based on GOOS and GOARCH build tags.
 		// However, CUE does not have any such build tags yet, and we don't use
@@ -181,7 +188,7 @@ workflows: trybot: _repo.bashWorkflow & {
 			"""
 	}
 
-	_checkTags: json.#step & {
+	_checkTags: githubactions.#Step & {
 		// Ensure that GitHub and Gerrit agree on the full list of available tags.
 		// This way, if there is any discrepancy, we will get a useful go-cmp diff.
 		//
@@ -207,13 +214,13 @@ workflows: trybot: _repo.bashWorkflow & {
 			"""
 	}
 
-	_goTestRace: json.#step & {
+	_goTestRace: githubactions.#Step & {
 		name: "Test with -race"
 		env: GORACE: "atexit_sleep_ms=10" // Otherwise every Go package being tested sleeps for 1s; see https://go.dev/issues/20364.
 		run: "go test -race ./..."
 	}
 
-	_goTestWasm: json.#step & {
+	_goTestWasm: githubactions.#Step & {
 		name: "Test with -tags=cuewasm"
 		// The wasm interpreter is only bundled into cmd/cue with the cuewasm build tag.
 		// Test the related packages with the build tag enabled as well.

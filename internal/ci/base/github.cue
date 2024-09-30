@@ -3,20 +3,20 @@ package base
 // This file contains aspects principally related to GitHub workflows
 
 import (
-	encjson "encoding/json"
+	"encoding/json"
 	"list"
 	"strings"
 	"strconv"
 
-	"github.com/SchemaStore/schemastore/src/schemas/json"
+	"github.com/cue-tmp/jsonschema-pub/exp1/githubactions"
 )
 
-bashWorkflow: json.#Workflow & {
+bashWorkflow: githubactions.#Workflow & {
 	jobs: [string]: defaults: run: shell: "bash"
 }
 
 installGo: {
-	#setupGo: json.#step & {
+	#setupGo: githubactions.#Step & {
 		name: "Install Go"
 		uses: "actions/setup-go@v5"
 		with: {
@@ -49,7 +49,7 @@ installGo: {
 		#setupGo,
 
 		{
-			json.#step & {
+			githubactions.#Step & {
 				name: "Set common go env vars"
 				run: """
 					go env -w GOTOOLCHAIN=local
@@ -63,7 +63,7 @@ installGo: {
 }
 
 checkoutCode: {
-	#actionsCheckout: json.#step & {
+	#actionsCheckout: githubactions.#Step & {
 		name: "Checkout code"
 		uses: "actions/checkout@v4"
 
@@ -90,17 +90,17 @@ checkoutCode: {
 		// per the bug report at https://github.com/MestreLion/git-tools/issues/47,
 		// so we first reset all directory timestamps to a static time as a fallback.
 		// TODO(mvdan): May be unnecessary once the Go bug above is fixed.
-		json.#step & {
+		githubactions.#Step & {
 			name: "Reset git directory modification times"
 			run:  "touch -t 202211302355 $(find * -type d)"
 		},
-		json.#step & {
+		githubactions.#Step & {
 			name: "Restore git file modification times"
 			uses: "chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe"
 		},
 
 		{
-			json.#step & {
+			githubactions.#Step & {
 				name: "Try to extract \(dispatchTrailer)"
 				id:   dispatchTrailerStepID
 				run:  """
@@ -124,7 +124,7 @@ checkoutCode: {
 
 		// Safety nets to flag if we ever have a Dispatch-Trailer slip through the
 		// net and make it to master
-		json.#step & {
+		githubactions.#Step & {
 			name: "Check we don't have \(dispatchTrailer) on a protected branch"
 			if:   "\(isProtectedBranch) && \(containsDispatchTrailer)"
 			run:  """
@@ -135,7 +135,7 @@ checkoutCode: {
 	]
 }
 
-earlyChecks: json.#step & {
+earlyChecks: githubactions.#Step & {
 	name: "Early git and code sanity checks"
 	run:  *"go run cuelang.org/go/internal/ci/checks@v0.11.0-0.dev.0.20240903133435-46fb300df650" | string
 }
@@ -177,7 +177,7 @@ setupGoActionsCaches: {
 
 	let cacheRestoreKeys = "\(#os)-\(#goVersion)"
 
-	let cacheStep = json.#step & {
+	let cacheStep = githubactions.#Step & {
 		with: {
 			path: strings.Join(cacheDirs, "\n")
 
@@ -197,12 +197,12 @@ setupGoActionsCaches: {
 	[
 		// TODO: once https://github.com/actions/setup-go/issues/54 is fixed,
 		// we could use `go env` outputs from the setup-go step.
-		json.#step & {
+		githubactions.#Step & {
 			name: "Get go mod cache directory"
 			id:   goModCacheDirID
 			run:  #"echo "dir=$(go env GOMODCACHE)" >> ${GITHUB_OUTPUT}"#
 		},
-		json.#step & {
+		githubactions.#Step & {
 			name: "Get go build/test cache directory"
 			id:   goCacheDirID
 			run:  #"echo "dir=$(go env GOCACHE)" >> ${GITHUB_OUTPUT}"#
@@ -240,7 +240,7 @@ setupGoActionsCaches: {
 			//
 			// Critically we only want to do this in the main repo, not the trybot
 			// repo.
-			json.#step & {
+			githubactions.#Step & {
 				if:  "github.repository == '\(githubRepositoryPath)' && (\(isProtectedBranch) || github.ref == 'refs/heads/\(testDefaultBranch)')"
 				run: "go clean -testcache"
 			}
@@ -270,13 +270,13 @@ isReleaseTag: {
 	(_matchPattern & {variable: "github.ref", pattern: "refs/tags/\(releaseTagPattern)"}).expr
 }
 
-checkGitClean: json.#step & {
+checkGitClean: githubactions.#Step & {
 	name: "Check that git is clean at the end of the job"
 	if:   "always()"
 	run:  "test -z \"$(git status --porcelain)\" || (git status; git diff; false)"
 }
 
-repositoryDispatch: json.#step & {
+repositoryDispatch: githubactions.#Step & {
 	#githubRepositoryPath:         *githubRepositoryPath | string
 	#botGitHubUserTokenSecretsKey: *botGitHubUserTokenSecretsKey | string
 	#arg:                          _
@@ -285,11 +285,11 @@ repositoryDispatch: json.#step & {
 
 	name: string
 	run:  #"""
-			\#(_curlGitHubAPI) --fail --request POST --data-binary \#(strconv.Quote(encjson.Marshal(#arg))) https://api.github.com/repos/\#(#githubRepositoryPath)/dispatches
+			\#(_curlGitHubAPI) --fail --request POST --data-binary \#(strconv.Quote(json.Marshal(#arg))) https://api.github.com/repos/\#(#githubRepositoryPath)/dispatches
 			"""#
 }
 
-workflowDispatch: json.#step & {
+workflowDispatch: githubactions.#Step & {
 	#githubRepositoryPath:         *githubRepositoryPath | string
 	#botGitHubUserTokenSecretsKey: *botGitHubUserTokenSecretsKey | string
 	#workflowID:                   string
@@ -303,7 +303,7 @@ workflowDispatch: json.#step & {
 
 	name: string
 	run:  #"""
-			\#(_curlGitHubAPI) --fail --request POST --data-binary \#(strconv.Quote(encjson.Marshal(#params))) https://api.github.com/repos/\#(#githubRepositoryPath)/actions/workflows/\#(#workflowID)/dispatches
+			\#(_curlGitHubAPI) --fail --request POST --data-binary \#(strconv.Quote(json.Marshal(#params))) https://api.github.com/repos/\#(#githubRepositoryPath)/actions/workflows/\#(#workflowID)/dispatches
 			"""#
 }
 

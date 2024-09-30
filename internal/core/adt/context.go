@@ -212,9 +212,9 @@ type OpContext struct {
 	// ==== Debugging ====
 	logID int // sequence number for log messages
 
-	// ErrorGraphs contains an analysis, represented as a Mermaid graph, for
+	// errorGraphs contains an analysis, represented as a Mermaid graph, for
 	// each node that has an error.
-	ErrorGraphs map[string]string
+	errorGraphs map[string]string
 
 	currentDisjunctionID int // sequence number for call to processDisjunctions
 
@@ -224,6 +224,12 @@ type OpContext struct {
 	// necessary to get the right path for incomplete errors in the presence of
 	// structure sharing.
 	altPath []*Vertex // stack of selectors
+}
+
+// ErrorGraphs returns an analysis, represented as a Mermaid graph, for
+// each node that has an error.
+func (c *OpContext) ErrorGraphs() map[string]string {
+	return c.errorGraphs
 }
 
 func (c *OpContext) CloseInfo() CloseInfo         { return c.ci }

@@ -234,7 +234,7 @@ language: version: "v0.9.0"
 
 	out := debug.NodeString(r, v, nil)
 	if adt.OpenGraphs {
-		for p, g := range ctx.ErrorGraphs {
+		for p, g := range ctx.ErrorGraphs() {
 			path := filepath.Join(".debug/TestX", p)
 			adt.OpenNodeGraph("TestX", path, in, out, g)
 		}

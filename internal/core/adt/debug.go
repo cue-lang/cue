@@ -32,11 +32,11 @@ import (
 func RecordDebugGraph(ctx *OpContext, v *Vertex, name string) {
 	graph, hasError := CreateMermaidGraph(ctx, v, true)
 	if hasError {
-		if ctx.ErrorGraphs == nil {
-			ctx.ErrorGraphs = map[string]string{}
+		if ctx.errorGraphs == nil {
+			ctx.errorGraphs = map[string]string{}
 		}
 		path := ctx.PathToString(v.Path())
-		ctx.ErrorGraphs[path] = graph
+		ctx.errorGraphs[path] = graph
 	}
 }
 

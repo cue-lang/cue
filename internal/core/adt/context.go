@@ -245,9 +245,9 @@ type OpContext struct {
 	// ==== Debugging ====
 	logID int // sequence number for log messages
 
-	// ErrorGraphs contains an analysis, represented as a Mermaid graph, for
+	// errorGraphs contains an analysis, represented as a Mermaid graph, for
 	// each node that has an error.
-	ErrorGraphs map[string]string
+	errorGraphs map[string]string
 
 	currentDisjunctionID int // sequence number for call to processDisjunctions
 
@@ -263,6 +263,12 @@ type OpContext struct {
 	// do not share the runtime's mutable cached template.
 	// See [OpContext.importInstance].
 	importInstances map[*Vertex]*Vertex
+}
+
+// ErrorGraphs returns an analysis, represented as a Mermaid graph, for
+// each node that has an error.
+func (c *OpContext) ErrorGraphs() map[string]string {
+	return c.errorGraphs
 }
 
 func (c *OpContext) CloseInfo() CloseInfo         { return c.ci }

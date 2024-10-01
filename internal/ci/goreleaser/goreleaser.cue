@@ -3,7 +3,7 @@ package goreleaser
 config: {
 	#latest: bool @tag(latest, type=bool)
 
-	version: 2
+	version:      2
 	project_name: "cue"
 	// Note that gomod.proxy is ignored by `goreleaser release --snapshot`,
 	// which we use in CI to test the goreleaser config and build,
@@ -68,7 +68,7 @@ config: {
 		// For those reasons, let goreleaser create the release, but leaving it as a draft.
 		draft: true
 	}
-	checksum: name_template: "checksums.txt"
+	checksum: name_template:    "checksums.txt"
 	snapshot: version_template: "{{ .Tag }}-next"
 	// As explained above, we write our own release notes.
 	changelog: disable: true

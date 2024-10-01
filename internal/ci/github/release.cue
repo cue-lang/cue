@@ -84,7 +84,7 @@ workflows: release: _repo.bashWorkflow & {
 				// is defined with the release command in CUE.
 				name: "Run GoReleaser with CUE"
 				env: GITHUB_TOKEN: "${{ secrets.CUECKOO_GITHUB_PAT }}"
-				_run:                 "cue cmd release"
+				_run:                "cue cmd release"
 				"working-directory": "./internal/ci/goreleaser"
 			},
 			_repo.repositoryDispatch & {

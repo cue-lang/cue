@@ -52,6 +52,24 @@
       "parentUuid": "dc9c7bc1_766939b4",
       "revId": "aaa585811285192a2752aee0f6e00c138a13d770",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc424d5c_78b17931",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-01T11:20:30Z",
+      "side": 1,
+      "message": "Adjusted the docs accordingly, as discussed online.",
+      "parentUuid": "64a84c88_c680b997",
+      "revId": "aaa585811285192a2752aee0f6e00c138a13d770",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

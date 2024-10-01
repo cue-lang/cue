@@ -103,6 +103,13 @@ func (b *buildPlan) placeOrphans(i *build.Instance, a []*decoderInfo) error {
 		// Filter only need to filter files that can stream:
 		for ; !d.Done(); d.Next() {
 			if f := d.File(); f != nil {
+				// ignore null when importing YAML with --list flag in combination with the --path flag
+				if di.file.Encoding == build.YAML && b.importing && b.useList && len(b.path) > 0 {
+					if lit, ok := internal.ToExpr(f).(*ast.BasicLit); ok && lit.Value == "null" {
+						continue
+					}
+				}
+
 				f.Filename = newName(d.Filename(), 0)
 				objs = append(objs, f)
 			}

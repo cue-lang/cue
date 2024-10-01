@@ -31,6 +31,10 @@ type RegistryLogin struct {
 	// These fields mirror [oauth2.Token].
 	// We don't directly reference the type so we can be in control of our file format.
 	// Note that Expiry is a pointer, so omitempty can work as intended.
+	// TODO(mvdan): drop the pointer once we can use json's omitzero: https://go.dev/issue/45669
+	// Note that we store Expiry at rest as an absolute timestamp in UTC,
+	// rather than the ExpiresIn field following the RFC's wire format,
+	// a duration in seconds relative to the current time which is not useful at rest.
 
 	AccessToken string `json:"access_token"`
 

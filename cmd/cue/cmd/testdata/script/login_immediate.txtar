@@ -14,7 +14,7 @@ grep -count=1 '"access_token"' cueconfig/logins.json
 # Ensure the contents of the token look correct.
 grep -count=1 '"access_token": "secret-access-token"' cueconfig/logins.json
 grep -count=1 '"token_type": "Bearer"' cueconfig/logins.json
-# TODO(mvdan): oauthregistry does not provide expires_in correctly.
-! grep '"expiry": ' cueconfig/logins.json
+# TODO(mvdan): store expiry timestamps in UTC for consistency.
+grep '"expiry": "20..-..-..T' cueconfig/logins.json
 # oauthregistry does not give a refresh token, and we use encoding/json's omitempty.
 ! grep '"refresh_token"' cueconfig/logins.json

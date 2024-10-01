@@ -518,7 +518,7 @@ func newMockRegistryOauth(mode string) *httptest.Server {
 			writeJSON(w, http.StatusOK, oauth2.Token{
 				AccessToken: staticAccessToken,
 				TokenType:   "Bearer",
-				Expiry:      time.Now().Add(time.Hour),
+				ExpiresIn:   int64(time.Hour / time.Second), // 1h in seconds
 			})
 		default:
 			panic(fmt.Sprintf("unknown mode: %q", mode))

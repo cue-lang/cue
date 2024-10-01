@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5b6392f_6f890ac0",
+        "filename": "cmd/cue/cmd/testdata/script/login_immediate.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-01T09:59:48Z",
+      "side": 1,
+      "message": "you\u0027re grepping for \"expires\" but the comment talks about \"expires_in\". Why that discrepancy?",
+      "revId": "2b87d09029002dd2645048b05a6e09a7bbd22929",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

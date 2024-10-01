@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b80a52bf_c3afdf94",
+        "filename": "cue.mod/module.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-01T14:27:57Z",
+      "side": 1,
+      "message": "Indeed!",
+      "parentUuid": "bbe4f5ae_3d2c812d",
+      "revId": "a6f10fdac670ab2ef01e9976a11539513e68d98f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b561ea75_17b410fa",

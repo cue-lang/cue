@@ -16,6 +16,24 @@
       "message": "you\u0027re grepping for \"expires\" but the comment talks about \"expires_in\". Why that discrepancy?",
       "revId": "2b87d09029002dd2645048b05a6e09a7bbd22929",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0dbbd2d4_25599313",
+        "filename": "cmd/cue/cmd/testdata/script/login_immediate.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-01T10:09:39Z",
+      "side": 1,
+      "message": "the oauth2 RFC only describes the wire format, which is expires_in as a duration in seconds.\n\nthe Go oauth2.Token type has that wire format field as ExpiresIn, as well as a sibling Expiry time.Time field as an absolute timestamp, which is populated relative to time.Now when the client obtains a token from the server.\n\nWe store the Expiry field at rest, not ExpiresIn, because the latter is relative - so it\u0027s useless at rest.\n\nSo the TODO is right, even if a bit brief. the test server sent the wrong field (expiry rather than expires_in) so the client logic assumed there wasn\u0027t any token expiration.\n\nI\u0027ve added one more CL in this stack (https://review.gerrithub.io/c/cue-lang/cue/+/1202038) to document the difference between the two fields. I believe we already documented this in the registry code (as it also must store absolute timestamps at rest in Postgres) but I had not made a similar note in cmd/cue for logins.json yet.",
+      "parentUuid": "e5b6392f_6f890ac0",
+      "revId": "2b87d09029002dd2645048b05a6e09a7bbd22929",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

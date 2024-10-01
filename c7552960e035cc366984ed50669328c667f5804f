@@ -16,6 +16,24 @@
       "message": "Perhaps round up to a second if the result is zero? Or is that never going to be a possibility?",
       "revId": "c7552960e035cc366984ed50669328c667f5804f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09622535_024399f2",
+        "filename": "cmd/cue/cmd/login.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-01T10:57:53Z",
+      "side": 1,
+      "message": "Sorry, what do you mean? Yes, expiry may be zero if an access token never expires, even though in practice that will never appen. But if it does happen, the UTC and Truncate methods will maintain the IsZero()\u003d\u003dtrue property, so it will still work as a non-expiring token just fine. We don\u0027t want to round up to one second, because that would turn a token that never expires into a token that expires immediately.",
+      "parentUuid": "b5a1aa9b_f88ef025",
+      "revId": "c7552960e035cc366984ed50669328c667f5804f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -97,6 +97,9 @@ inside $CUE_CONFIG_DIR; see 'cue help environment'.
 				return fmt.Errorf("cannot obtain the OAuth2 token: %v", err)
 			}
 
+			// For consistency, store timestamps in UTC.
+			tok.Expiry = tok.Expiry.UTC()
+
 			_, err = cueconfig.UpdateRegistryLogin(loginsPath, host.Name, tok)
 
 			if err != nil {

@@ -16,6 +16,24 @@
       "message": "As a general comment: I think there are definitely pros and cons of capturing this sort of information in tests. Certainly, when developing these sorts of algorithms, I absolutely can understand this sort of debug output is essential for understanding what\u0027s going on and what has changed. I\u0027ve spent many hours staring at the debug output of TinyCUE, for example.\nBut for a reviewer, it\u0027s very difficult to look at any changes to this debug output and have enough context and understanding to do anything other than wave them through. I find it almost impossible to tell whether a change is good/intentional or bad/unseen. This gets even more problematic when there really are important changes to test output kept in our txtars.\nI wonder if, at some point in the future, this debug output should be separated out somehow so that reviewers have an easier time finding signal in noise.",
       "revId": "57bfe76b217d423fe5283bef3144dabdfeb97a56",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bfda3b90_46ae8ca2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-01T12:23:26Z",
+      "side": 1,
+      "message": "Yeah. At the very least, we should have \"regular CUE\" as test output. The existing test output could be marked as for a specific implementation.\n\nAlternatively, we could ultimately generate regular CUE with comments to complement any missing information.",
+      "parentUuid": "215cd70d_88dbf7b6",
+      "revId": "57bfe76b217d423fe5283bef3144dabdfeb97a56",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

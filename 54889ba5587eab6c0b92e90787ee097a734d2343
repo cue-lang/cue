@@ -16,6 +16,24 @@
       "message": "A colleague of ours would point out this line is \"too long\". ;)",
       "revId": "54889ba5587eab6c0b92e90787ee097a734d2343",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46ff2c02_e3e31217",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-01T11:31:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "57ddf064_065a0954",
+      "revId": "54889ba5587eab6c0b92e90787ee097a734d2343",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "43c83dea_2f01e952",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-01T13:55:01Z",
+      "side": 1,
+      "message": "very nice!",
+      "revId": "a6f10fdac670ab2ef01e9976a11539513e68d98f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bbe4f5ae_3d2c812d",
+        "filename": "cue.mod/module.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-01T13:55:01Z",
+      "side": 1,
+      "message": "I guess we\u0027ll have to rewrite this path at some point?",
+      "revId": "a6f10fdac670ab2ef01e9976a11539513e68d98f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b561ea75_17b410fa",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-01T13:55:01Z",
+      "side": 1,
+      "message": "please document that this central registry token does not have write access to anything, and is only here because we need a login to pull dependencies.",
+      "revId": "a6f10fdac670ab2ef01e9976a11539513e68d98f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

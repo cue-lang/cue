@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7411df80_b7a07a1c",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-01T12:03:57Z",
+      "side": 1,
+      "message": "cosmetic: I think you didn\u0027t mean to combine these 2 items onto one line?",
+      "revId": "216c157822d0f32bc433e9d22d90378eeb348b20",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

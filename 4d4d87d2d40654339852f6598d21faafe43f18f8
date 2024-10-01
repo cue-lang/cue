@@ -38,6 +38,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "38b745bd_46ed3676",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-01T12:03:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "77326741_64d599e3",
+      "revId": "4d4d87d2d40654339852f6598d21faafe43f18f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "0679d352_9ec1d075",
         "filename": "internal/core/adt/cycle.go",
         "patchSetId": 3
@@ -88,6 +106,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae5c2991_f9663682",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-01T12:03:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "388cfa22_40766bd4",
+      "revId": "4d4d87d2d40654339852f6598d21faafe43f18f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4e48ab44_d01d8771",
@@ -119,6 +155,24 @@
       "side": 1,
       "message": "Yep. Not missing anything. Corrected.",
       "parentUuid": "4e48ab44_d01d8771",
+      "revId": "4d4d87d2d40654339852f6598d21faafe43f18f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0272d7ad_9a19c838",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-01T12:03:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8f8d6943_00af844b",
       "revId": "4d4d87d2d40654339852f6598d21faafe43f18f8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -195,6 +249,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "7fdb25d2_5f49c9a6",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-01T12:03:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a27a7b0_604e8d28",
+      "revId": "4d4d87d2d40654339852f6598d21faafe43f18f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "395fc2d4_454c3154",
         "filename": "internal/core/adt/cycle.go",
         "patchSetId": 3
@@ -245,6 +317,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2eed2d4e_d4ed98af",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 546,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-01T12:03:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "accecb53_f6798289",
+      "revId": "4d4d87d2d40654339852f6598d21faafe43f18f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "540b167e_ed9e4f65",
@@ -276,6 +366,24 @@
       "side": 1,
       "message": "Was the comment of the method not enough to explain it?",
       "parentUuid": "540b167e_ed9e4f65",
+      "revId": "4d4d87d2d40654339852f6598d21faafe43f18f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ef4d65e_6197adf5",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 655,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-01T12:03:57Z",
+      "side": 1,
+      "message": "My apologies - I failed to read the method comment, and yes, it\u0027s entirely sufficient - please feel free to remove the new comment if you wish.",
+      "parentUuid": "f1ce0870_2a9f3096",
       "revId": "4d4d87d2d40654339852f6598d21faafe43f18f8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

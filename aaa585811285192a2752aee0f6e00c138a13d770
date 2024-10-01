@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d7da204_9d409a0f",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-01T10:10:40Z",
+      "side": 1,
+      "message": "It passes errors up the call stack during evaluation. It does not collect all errors. There are (too) many wasy to create errors. Not just Newf and NewErrf.",
+      "revId": "aaa585811285192a2752aee0f6e00c138a13d770",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

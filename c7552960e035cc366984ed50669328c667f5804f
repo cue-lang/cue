@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5a1aa9b_f88ef025",
+        "filename": "cmd/cue/cmd/login.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-01T10:43:40Z",
+      "side": 1,
+      "message": "Perhaps round up to a second if the result is zero? Or is that never going to be a possibility?",
+      "revId": "c7552960e035cc366984ed50669328c667f5804f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

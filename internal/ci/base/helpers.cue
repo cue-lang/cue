@@ -14,8 +14,8 @@ import (
 _matchPattern: {
 	variable: string
 	pattern:  string
-	expr:     [
-			if strings.HasSuffix(pattern, "*") {
+	expr: [
+		if strings.HasSuffix(pattern, "*") {
 			let prefix = strings.TrimSuffix(pattern, "*")
 			"startsWith(\(variable), '\(prefix)')"
 		},

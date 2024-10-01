@@ -3,7 +3,7 @@ module cuelang.org/go
 go 1.22.0
 
 require (
-	cuelabs.dev/go/oci/ociregistry v0.0.0-20240807094312-a32ad29eed79
+	cuelabs.dev/go/oci/ociregistry v0.0.0-20240906074133-82eb438dd565
 	github.com/cockroachdb/apd/v3 v3.2.1
 	github.com/emicklei/proto v1.13.2
 	github.com/go-quicktest/qt v1.101.0
@@ -13,9 +13,9 @@ require (
 	github.com/kr/pretty v0.3.1
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0
-	github.com/pelletier/go-toml/v2 v2.2.2
+	github.com/pelletier/go-toml/v2 v2.2.3
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20230328191034-3462fbc510c0
-	github.com/rogpeppe/go-internal v1.12.1-0.20240920093810-3a65db189041
+	github.com/rogpeppe/go-internal v1.13.1
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/tetratelabs/wazero v1.6.0

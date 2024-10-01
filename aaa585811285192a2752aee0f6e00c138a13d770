@@ -16,6 +16,24 @@
       "message": "It passes errors up the call stack during evaluation. It does not collect all errors. There are (too) many wasy to create errors. Not just Newf and NewErrf.",
       "revId": "aaa585811285192a2752aee0f6e00c138a13d770",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc9c7bc1_766939b4",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-01T10:23:50Z",
+      "side": 1,
+      "message": "I\u0027m not sure I entirely understand what this implies for this doc comment. What does \"passes errors up the call stack during evaluation\" mean from the p.o.v. of this type?",
+      "parentUuid": "4d7da204_9d409a0f",
+      "revId": "aaa585811285192a2752aee0f6e00c138a13d770",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

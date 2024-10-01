@@ -68,6 +68,24 @@
       "message": "please document that this central registry token does not have write access to anything, and is only here because we need a login to pull dependencies.",
       "revId": "a6f10fdac670ab2ef01e9976a11539513e68d98f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "12cd7db1_1602cc51",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-01T14:28:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b561ea75_17b410fa",
+      "revId": "a6f10fdac670ab2ef01e9976a11539513e68d98f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -34,6 +34,24 @@
       "parentUuid": "b5a1aa9b_f88ef025",
       "revId": "c7552960e035cc366984ed50669328c667f5804f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1945088c_b26fbf15",
+        "filename": "cmd/cue/cmd/login.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-01T14:36:00Z",
+      "side": 1,
+      "message": "I was wondering about truncating a \u003e0 but \u003c1s expiry down to zero, but as you mentioned online, it probably doesn\u0027t make any different in practice.",
+      "parentUuid": "09622535_024399f2",
+      "revId": "c7552960e035cc366984ed50669328c667f5804f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

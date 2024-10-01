@@ -110,7 +110,7 @@ workflows: trybot: _repo.bashWorkflow & {
 
 	_goGenerate: _registryReadOnlyAccessStep & {
 		name: "Generate"
-		_run:  "go generate ./..."
+		_run: "go generate ./..."
 		// The Go version corresponds to the precise version specified in
 		// the matrix. Skip windows for now until we work out why re-gen is flaky
 		if: _isLatestLinux

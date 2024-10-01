@@ -52,6 +52,24 @@
       "parentUuid": "09622535_024399f2",
       "revId": "c7552960e035cc366984ed50669328c667f5804f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c569749_b48b720e",
+        "filename": "cmd/cue/cmd/login.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-01T14:36:52Z",
+      "side": 1,
+      "message": "After a Discord chat - you meant a non-zero expiry timestamp that\u0027s less than one second away. That could in theory happen, although in practice it won\u0027t, because such a token is useless unless it\u0027s valid for at least a handful of minutes.\n\nThe truncation might cause a super-short-lived token to expire in 0.0s rather than e.g. 0.9s, but that\u0027s still the same end result - the token expires immediately. So I won\u0027t add defensive code given that it\u0027s not a practical issue and that the added code doesn\u0027t seem worth it - and is hard to test.",
+      "parentUuid": "09622535_024399f2",
+      "revId": "c7552960e035cc366984ed50669328c667f5804f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

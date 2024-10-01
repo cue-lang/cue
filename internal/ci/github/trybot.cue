@@ -108,19 +108,9 @@ workflows: trybot: _repo.bashWorkflow & {
 	// work.
 	_isLatestLinux: "(\(goVersion) == '\(_repo.latestGo)' && \(matrixRunner) == '\(_repo.linuxMachine)')"
 
-	_goGenerate: githubactions.#Step & {
+	_goGenerate: _registryReadOnlyAccessStep & {
 		name: "Generate"
-		env: {
-			// Note: this token has read-only access to the registry
-			// and is used only because we need some credentials
-			// to pull dependencies from the Central Registry.
-			CUE_LOGINS: "${{ secrets.NOTCUECKOO_CUE_LOGINS }}"
-		}
-		run:  """
-			export CUE_CONFIG_DIR=$(mktemp -d)
-			echo "$CUE_LOGINS" > $CUE_CONFIG_DIR/logins.json
-			go generate ./...
-			"""
+		_run:  "go generate ./..."
 		// The Go version corresponds to the precise version specified in
 		// the matrix. Skip windows for now until we work out why re-gen is flaky
 		if: _isLatestLinux

@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "17bd0281_bca3aae5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-01T15:09:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2c664464_939990cb",
+      "range": {
+        "startLine": 11,
+        "startChar": 4,
+        "endLine": 11,
+        "endChar": 15
+      },
+      "revId": "9a38f1db8b1cfbfb65cd1bd60116f98209f9f644",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f818bd02_607e7b5a",
@@ -47,6 +71,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "de24e2fa_4e7852c1",
+        "filename": "internal/ci/github/logins.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-01T15:09:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f818bd02_607e7b5a",
+      "range": {
+        "startLine": 22,
+        "startChar": 15,
+        "endLine": 22,
+        "endChar": 23
+      },
+      "revId": "9a38f1db8b1cfbfb65cd1bd60116f98209f9f644",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dd665f0c_3980e995",
@@ -60,6 +108,24 @@
       "writtenOn": "2024-10-01T15:05:37Z",
       "side": 1,
       "message": "missing period?",
+      "revId": "9a38f1db8b1cfbfb65cd1bd60116f98209f9f644",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a642b4d9_03748f20",
+        "filename": "internal/ci/github/logins.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-01T15:09:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd665f0c_3980e995",
       "revId": "9a38f1db8b1cfbfb65cd1bd60116f98209f9f644",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

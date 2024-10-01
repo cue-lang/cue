@@ -9,18 +9,18 @@ cmp stdout output-noempty-list-fixedpath.cue
 
 exec cue import --outfile=- --list                              input-withempty.yaml
 cmp stdout output-withempty-list.cue
-! exec cue import --outfile=-        --path=strings.ToLower(kind) input-withempty.yaml
+exec cue import --outfile=-        --path=strings.ToLower(kind) input-withempty.yaml
 cmp stdout output-withempty-exprpath.cue
-! exec cue import --outfile=- --list --path=strings.ToLower(kind) input-withempty.yaml
+exec cue import --outfile=- --list --path=strings.ToLower(kind) input-withempty.yaml
 cmp stdout output-withempty-list-exprpath.cue
 exec cue import --outfile=- --list --path=fixedpath:            input-withempty.yaml
 cmp stdout output-withempty-list-fixedpath.cue
 
 exec cue import --outfile=- --list                              input-withnull.yaml
 cmp stdout output-withnull-list.cue
-! exec cue import --outfile=-        --path=strings.ToLower(kind) input-withnull.yaml
+exec cue import --outfile=-        --path=strings.ToLower(kind) input-withnull.yaml
 cmp stdout output-withnull-exprpath.cue
-! exec cue import --outfile=- --list --path=strings.ToLower(kind) input-withnull.yaml
+exec cue import --outfile=- --list --path=strings.ToLower(kind) input-withnull.yaml
 cmp stdout output-withnull-list-exprpath.cue
 exec cue import --outfile=- --list --path=fixedpath:            input-withnull.yaml
 cmp stdout output-withnull-list-fixedpath.cue
@@ -38,7 +38,7 @@ cmp stdout output-missing-key-typopath.cue
 
 exec cue import --outfile=- --with-context --path='"number-\(index+1)"' input-withempty.yaml
 cmp stdout output-withempty-witcontext-index.cue
-! exec cue import --outfile=- --with-context --path='"number-\(index+1)"' --path=data.kind input-withempty.yaml
+exec cue import --outfile=- --with-context --path='"number-\(index+1)"' --path=data.kind input-withempty.yaml
 cmp stdout output-withempty-witcontext-index-kind.cue
 
 -- input-noempty.yaml --
@@ -94,7 +94,18 @@ kind: Other
 	kind: "Other"
 }]
 -- output-withempty-exprpath.cue --
+deployment: kind: "Deployment"
+deployment: kind: "Deployment"
+other: kind:      "Other"
 -- output-withempty-list-exprpath.cue --
+deployment: [{
+	kind: "Deployment"
+}, {
+	kind: "Deployment"
+}]
+other: [{
+	kind: "Other"
+}]
 -- output-withempty-list-fixedpath.cue --
 fixedpath: [{
 	kind: "Deployment"
@@ -121,7 +132,18 @@ kind: Other
 	kind: "Other"
 }]
 -- output-withnull-exprpath.cue --
+deployment: kind: "Deployment"
+deployment: kind: "Deployment"
+other: kind:      "Other"
 -- output-withnull-list-exprpath.cue --
+deployment: [{
+	kind: "Deployment"
+}, {
+	kind: "Deployment"
+}]
+other: [{
+	kind: "Other"
+}]
 -- output-withnull-list-fixedpath.cue --
 fixedpath: [{
 	kind: "Deployment"
@@ -168,3 +190,6 @@ fixedpath: [{
 "number-3": kind: "Deployment"
 "number-4": kind: "Other"
 -- output-withempty-witcontext-index-kind.cue --
+"number-1": Deployment: kind: "Deployment"
+"number-3": Deployment: kind: "Deployment"
+"number-4": Other: kind: "Other"

@@ -34,6 +34,24 @@
       "parentUuid": "4d7da204_9d409a0f",
       "revId": "aaa585811285192a2752aee0f6e00c138a13d770",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64a84c88_c680b997",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-01T10:54:14Z",
+      "side": 1,
+      "message": "It does not collect \"any error\". It just passes errors between points where Push* and Pop* are called.",
+      "parentUuid": "dc9c7bc1_766939b4",
+      "revId": "aaa585811285192a2752aee0f6e00c138a13d770",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

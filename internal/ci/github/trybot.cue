@@ -153,12 +153,12 @@ workflows: trybot: _repo.bashWorkflow & {
 		},
 		{
 			name: "End-to-end test"
-			// The secret is the fine-grained access token "cue-lang/cue ci e2e for modules-testing"
-			// owned by the porcuepine bot account with read+write access to repo administration and code
-			// on the entire cue-labs-modules-testing org. Note that porcuepine is also an org admin,
-			// since otherwise the repo admin access to create and delete repos does not work.
 			env: {
-				CUE_TEST_LOGINS: "${{ secrets.E2E_CUE_LOGINS }}"
+				// E2E_PORCUEPINE_CUE_LOGINS is the logins.json resulting from doing a `cue login`
+				// with registry.cue.works as the GitHub porcuepine user.
+				// TODO(mvdan): remove the E2E_CUE_LOGINS secret once all uses are gone,
+				// i.e. once the release branch for v0.10 is deleted.
+				CUE_TEST_LOGINS: "${{ secrets.E2E_PORCUEPINE_CUE_LOGINS }}"
 			}
 			// Our regular tests run with both `go test ./...` and `go test -race ./...`.
 			// The end-to-end tests should only be run once, given the slowness and API rate limits.

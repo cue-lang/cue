@@ -16,6 +16,24 @@
       "message": "Whilst I don\u0027t doubt this CL improves matters, would it not be better to have the resolvers all return the same value on error? Otherwise this fix may need to occur in several places?",
       "revId": "888d1d079c58b8063c2108b420155fa7a37f422c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9779eab4_4f55ea5f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-01T11:31:38Z",
+      "side": 1,
+      "message": "Agreed. Added a TODO of this. A change like that is somewhat error prone, so I prefer to clean this up after V3 is done and be a bit more defensive now.",
+      "parentUuid": "d46726ea_18b2b3da",
+      "revId": "888d1d079c58b8063c2108b420155fa7a37f422c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

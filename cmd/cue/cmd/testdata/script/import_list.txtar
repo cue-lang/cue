@@ -12,6 +12,10 @@ cmpenv import3/data.cue expect3
 # Issue #2721
 exec cue import -f --list issue2721/empty.yaml
 cmp issue2721/empty.cue issue2721/empty.cue.golden
+
+# Issue #3464
+exec cue import -o - -f -l "\(strings.ToLower(kind))" --list ./import4.yaml
+cmp stdout expect-stdout4
 -- expect-stdout1 --
 service: [{
 	kind: "Service"
@@ -59,3 +63,15 @@ language: version: "v0.9.0"
 -- issue2721/empty.yaml --
 -- issue2721/empty.cue.golden --
 [null]
+-- import4.yaml --
+---
+kind: Deployment
+---
+---
+kind: Deployment
+-- expect-stdout4 --
+deployment: [{
+	kind: "Deployment"
+}, {
+	kind: "Deployment"
+}]

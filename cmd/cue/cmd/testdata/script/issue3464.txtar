@@ -11,7 +11,7 @@ exec cue import --outfile=- --list                              input-withempty.
 cmp stdout output-withempty-list.cue
 ! exec cue import --outfile=-        --path=strings.ToLower(kind) input-withempty.yaml
 cmp stdout output-withempty-exprpath.cue
-! exec cue import --outfile=- --list --path=strings.ToLower(kind) input-withempty.yaml
+exec cue import --outfile=- --list --path=strings.ToLower(kind) input-withempty.yaml
 cmp stdout output-withempty-list-exprpath.cue
 exec cue import --outfile=- --list --path=fixedpath:            input-withempty.yaml
 cmp stdout output-withempty-list-fixedpath.cue
@@ -20,7 +20,7 @@ exec cue import --outfile=- --list                              input-withnull.y
 cmp stdout output-withnull-list.cue
 ! exec cue import --outfile=-        --path=strings.ToLower(kind) input-withnull.yaml
 cmp stdout output-withnull-exprpath.cue
-! exec cue import --outfile=- --list --path=strings.ToLower(kind) input-withnull.yaml
+exec cue import --outfile=- --list --path=strings.ToLower(kind) input-withnull.yaml
 cmp stdout output-withnull-list-exprpath.cue
 exec cue import --outfile=- --list --path=fixedpath:            input-withnull.yaml
 cmp stdout output-withnull-list-fixedpath.cue
@@ -90,10 +90,18 @@ kind: Other
 }]
 -- output-withempty-exprpath.cue --
 -- output-withempty-list-exprpath.cue --
+deployment: [{
+	kind: "Deployment"
+}, {
+	kind: "Deployment"
+}]
+other: [{
+	kind: "Other"
+}]
 -- output-withempty-list-fixedpath.cue --
 fixedpath: [{
 	kind: "Deployment"
-}, null, {
+}, {
 	kind: "Deployment"
 }, {
 	kind: "Other"
@@ -117,10 +125,18 @@ kind: Other
 }]
 -- output-withnull-exprpath.cue --
 -- output-withnull-list-exprpath.cue --
+deployment: [{
+	kind: "Deployment"
+}, {
+	kind: "Deployment"
+}]
+other: [{
+	kind: "Other"
+}]
 -- output-withnull-list-fixedpath.cue --
 fixedpath: [{
 	kind: "Deployment"
-}, null, {
+}, {
 	kind: "Deployment"
 }, {
 	kind: "Other"

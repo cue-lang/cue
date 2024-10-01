@@ -6,4 +6,15 @@ oauthregistry immediate-success
 
 exec cue login
 stdout 'open:.*user_code=user-code'
-grep 'secret-access-token' cueconfig/logins.json
+
+# Ensure that only one token is stored.
+grep -count=1 '"registries": {' cueconfig/logins.json
+grep -count=1 '"access_token"' cueconfig/logins.json
+
+# Ensure the contents of the token look correct.
+grep -count=1 '"access_token": "secret-access-token"' cueconfig/logins.json
+grep -count=1 '"token_type": "Bearer"' cueconfig/logins.json
+# TODO(mvdan): oauthregistry does not provide expires_in correctly.
+! grep '"expiry": ' cueconfig/logins.json
+# oauthregistry does not give a refresh token, and we use encoding/json's omitempty.
+! grep '"refresh_token"' cueconfig/logins.json

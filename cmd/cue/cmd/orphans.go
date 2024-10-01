@@ -164,6 +164,8 @@ func placeOrphans(b *buildPlan, d *encoding.Decoder, pkg string, objs ...*ast.Fi
 	filename := d.Filename()
 
 	index := newIndex()
+
+OBJS_LOOP:
 	for i, file := range objs {
 		if i == 0 {
 			astutil.CopyMeta(f, file)
@@ -175,6 +177,10 @@ func placeOrphans(b *buildPlan, d *encoding.Decoder, pkg string, objs ...*ast.Fi
 
 		switch {
 		case len(b.path) > 0:
+			var isNull bool
+			if lit, ok := expr.(*ast.BasicLit); ok && lit.Value == "null" {
+				isNull = true
+			}
 			expr := expr
 			if b.useContext {
 				expr = ast.NewStruct(
@@ -220,6 +226,9 @@ func placeOrphans(b *buildPlan, d *encoding.Decoder, pkg string, objs ...*ast.Fi
 					default:
 						var arg interface{} = l
 						if err := l.Err(); err != nil {
+							if isNull {
+								continue OBJS_LOOP
+							}
 							arg = err
 						}
 						return nil, fmt.Errorf(

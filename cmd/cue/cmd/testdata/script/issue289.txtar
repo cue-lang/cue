@@ -1,7 +1,7 @@
 # TODO: error message could be improved.
 
-! exec cue import test.yaml -p kube -l 'strings.ToCamel(kind)' -l metadata.name -f
-cmp stderr expect-stderr
+exec cue import test.yaml -p kube -l 'strings.ToCamel(kind)' -l metadata.name -f
+cmp stdout expect-stdout
 
 -- test.yaml --
 apiVersion: v1
@@ -12,5 +12,4 @@ spec:
   type: NodePort
 ---
 # EMPTY FILE
--- expect-stderr --
-error evaluating label strings.ToCamel(kind): reference "kind" not found
+-- expect-stdout --

@@ -235,67 +235,43 @@
 			"$schema": "https://json-schema.org/draft/2019-09/schema",
 			"not": false
 		},
-		"skip": {
-			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:2:12\n"
-		},
 		"tests": [
 			{
 				"description": "number is valid",
 				"data": 1,
-				"valid": true,
-				"skip": {
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "string is valid",
 				"data": "foo",
-				"valid": true,
-				"skip": {
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "boolean true is valid",
 				"data": true,
-				"valid": true,
-				"skip": {
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "boolean false is valid",
 				"data": false,
-				"valid": true,
-				"skip": {
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "null is valid",
 				"data": null,
-				"valid": true,
-				"skip": {
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "object is valid",
 				"data": {
 					"foo": "bar"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "empty object is valid",
 				"data": {},
-				"valid": true,
-				"skip": {
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "array is valid",
@@ -304,8 +280,7 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "invalid value [\"foo\"] (does not satisfy matchN(0, _|_(explicit error (_|_ literal) in source))): 0 matched, expected 0:\n    generated.cue:2:1\n    generated.cue:1:1\n    generated.cue:2:8\n    instance.json:1:1\n",
-					"v3": "could not compile schema"
+					"v2": "invalid value [\"foo\"] (does not satisfy matchN(0, _|_(explicit error (_|_ literal) in source))): 0 matched, expected 0:\n    generated.cue:2:1\n    generated.cue:1:1\n    generated.cue:2:8\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -313,8 +288,7 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "invalid value [] (does not satisfy matchN(0, _|_(explicit error (_|_ literal) in source))): 0 matched, expected 0:\n    generated.cue:2:1\n    generated.cue:1:1\n    generated.cue:2:8\n    instance.json:1:1\n",
-					"v3": "could not compile schema"
+					"v2": "invalid value [] (does not satisfy matchN(0, _|_(explicit error (_|_ literal) in source))): 0 matched, expected 0:\n    generated.cue:2:1\n    generated.cue:1:1\n    generated.cue:2:8\n    instance.json:1:1\n"
 				}
 			}
 		]

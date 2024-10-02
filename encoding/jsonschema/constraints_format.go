@@ -18,11 +18,12 @@ import (
 	"sync"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 )
 
 type formatFuncInfo struct {
 	versions versionSet
-	f        func(s *state)
+	f        func(n cue.Value, s *state)
 }
 
 var formatFuncs = sync.OnceValue(func() map[string]formatFuncInfo {
@@ -43,17 +44,19 @@ var formatFuncs = sync.OnceValue(func() map[string]formatFuncInfo {
 		"int64":                 {openAPI, formatTODO},
 		"ipv4":                  {allVersions | openAPI, formatTODO},
 		"ipv6":                  {allVersions | openAPI, formatTODO},
-		"iri":                   {vfrom(VersionDraft7), formatTODO},
-		"iri-reference":         {vfrom(VersionDraft7), formatTODO},
+		"iri":                   {vfrom(VersionDraft7), formatURI},
+		"iri-reference":         {vfrom(VersionDraft7), formatURIReference},
 		"json-pointer":          {vfrom(VersionDraft6), formatTODO},
 		"password":              {openAPI, formatTODO},
 		"regex":                 {vfrom(VersionDraft7), formatTODO},
 		"relative-json-pointer": {vfrom(VersionDraft7), formatTODO},
 		"time":                  {vfrom(VersionDraft7), formatTODO},
-		"uri":                   {allVersions | openAPI, formatTODO},
-		"uri-reference":         {vfrom(VersionDraft6), formatTODO},
-		"uri-template":          {vfrom(VersionDraft6), formatTODO},
-		"uuid":                  {vfrom(VersionDraft2019_09), formatTODO},
+		// TODO we should probably disallow non-ASCII URIs (IRIs) but
+		// this is good enough for now.
+		"uri":           {allVersions | openAPI, formatURI},
+		"uri-reference": {vfrom(VersionDraft6), formatURIReference},
+		"uri-template":  {vfrom(VersionDraft6), formatTODO},
+		"uuid":          {vfrom(VersionDraft2019_09), formatTODO},
 	}
 })
 
@@ -79,7 +82,15 @@ func constraintFormat(key string, n cue.Value, s *state) {
 		}
 		return
 	}
-	finfo.f(s)
+	finfo.f(n, s)
 }
 
-func formatTODO(s *state) {}
+func formatURI(n cue.Value, s *state) {
+	s.add(n, stringType, ast.NewSel(s.addImport(n, "net"), "AbsURL"))
+}
+
+func formatURIReference(n cue.Value, s *state) {
+	s.add(n, stringType, ast.NewSel(s.addImport(n, "net"), "URL"))
+}
+
+func formatTODO(n cue.Value, s *state) {}

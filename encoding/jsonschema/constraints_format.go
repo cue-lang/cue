@@ -48,7 +48,7 @@ var formatFuncs = sync.OnceValue(func() map[string]formatFuncInfo {
 		"iri-reference":         {vfrom(VersionDraft7), formatURIReference},
 		"json-pointer":          {vfrom(VersionDraft6), formatTODO},
 		"password":              {openAPI, formatTODO},
-		"regex":                 {vfrom(VersionDraft7), formatTODO},
+		"regex":                 {vfrom(VersionDraft7), formatRegex},
 		"relative-json-pointer": {vfrom(VersionDraft7), formatTODO},
 		"time":                  {vfrom(VersionDraft7), formatTODO},
 		// TODO we should probably disallow non-ASCII URIs (IRIs) but
@@ -98,6 +98,12 @@ func formatDateTime(n cue.Value, s *state) {
 	// allows lower-case "T" and "Z", and leap seconds, but
 	// it's not bad for now.
 	s.add(n, stringType, ast.NewSel(s.addImport(n, "time"), "Time"))
+}
+
+func formatRegex(n cue.Value, s *state) {
+	// TODO this is a bit stricter than the spec, because the spec
+	// allows Perl idioms such as back-references.
+	s.add(n, stringType, ast.NewSel(s.addImport(n, "regexp"), "Valid"))
 }
 
 func formatTODO(n cue.Value, s *state) {}

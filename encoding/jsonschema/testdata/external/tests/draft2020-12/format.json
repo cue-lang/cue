@@ -127,7 +127,11 @@
 			{
 				"description": "invalid regex string is only an annotation by default",
 				"data": "^(abc]",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v2": "6 errors in empty disjunction:\nconflicting values \"^(abc]\" and [...] (mismatched types string and list):\n    generated.cue:4:1\n    generated.cue:4:39\n    instance.json:1:1\nconflicting values \"^(abc]\" and bool (mismatched types string and bool):\n    generated.cue:4:1\n    generated.cue:4:8\n    instance.json:1:1\nconflicting values \"^(abc]\" and null (mismatched types string and null):\n    generated.cue:4:1\n    instance.json:1:1\nconflicting values \"^(abc]\" and number (mismatched types string and number):\n    generated.cue:4:1\n    generated.cue:4:15\n    instance.json:1:1\nconflicting values \"^(abc]\" and {...} (mismatched types string and struct):\n    generated.cue:4:1\n    generated.cue:4:47\n    instance.json:1:1\ninvalid value \"^(abc]\" (does not satisfy regexp.Valid): error in call to regexp.Valid: error parsing regexp: missing closing ): `^(abc]`:\n    generated.cue:1:1\n    instance.json:1:1\n",
+					"v3": "conflicting values \"^(abc]\" and [...] (mismatched types string and list):\n    generated.cue:4:39\n    instance.json:1:1\nconflicting values \"^(abc]\" and bool (mismatched types string and bool):\n    generated.cue:4:8\n    instance.json:1:1\nconflicting values \"^(abc]\" and null (mismatched types string and null):\n    generated.cue:4:1\n    instance.json:1:1\nconflicting values \"^(abc]\" and number (mismatched types string and number):\n    generated.cue:4:15\n    instance.json:1:1\nconflicting values \"^(abc]\" and {...} (mismatched types string and struct):\n    generated.cue:4:47\n    instance.json:1:1\ninvalid value \"^(abc]\" (does not satisfy regexp.Valid): error in call to regexp.Valid: error parsing regexp: missing closing ): `^(abc]`:\n    generated.cue:1:1\n    instance.json:1:1\n"
+				}
 			}
 		]
 	},

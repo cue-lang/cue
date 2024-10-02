@@ -291,8 +291,8 @@ func TestDiff(t *testing.T) {
 -     o?: 3
 +     o?: 4
 -     #od?: 1
-+     #od: 1
 -     oc?: 5
++     #od: 1
 +     #oc?: 5
   }
 `,

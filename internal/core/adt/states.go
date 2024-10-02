@@ -294,6 +294,15 @@ func (v *Vertex) allChildConjunctsKnown() bool {
 		return true
 	}
 
+	if v.status == finalized {
+		// This can happen, for instance, if this is called on a parent of a
+		// rooted node that is marked as a parent for a dynamic node.
+		// In practice this should be handled by the caller, but we add this
+		// as an extra safeguard.
+		// TODO: remove this check at some point.
+		return true
+	}
+
 	return v.state.meets(fieldConjunctsKnown | allAncestorsProcessed)
 }
 

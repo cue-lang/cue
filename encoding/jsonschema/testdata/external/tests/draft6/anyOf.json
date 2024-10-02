@@ -89,17 +89,11 @@
 				false
 			]
 		},
-		"skip": {
-			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:2:17\n"
-		},
 		"tests": [
 			{
 				"description": "any value is valid",
 				"data": "foo",
-				"valid": true,
-				"skip": {
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -111,17 +105,11 @@
 				false
 			]
 		},
-		"skip": {
-			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:2:14\n"
-		},
 		"tests": [
 			{
 				"description": "any value is invalid",
 				"data": "foo",
-				"valid": false,
-				"skip": {
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},

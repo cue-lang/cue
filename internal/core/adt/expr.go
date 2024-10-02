@@ -88,6 +88,28 @@ func (x *StructLit) evaluate(c *OpContext, state combinedFlags) Value {
 	// used in a context where more conjuncts are added. It may also lead
 	// to disjuncts being in a partially expanded state, leading to
 	// misaligned nodeContexts.
+
+	// TODO(evalv3): to be fully compatible correct, we should not always
+	// finalize the arcs here. This is a temporary fix. For now, we have to do
+	// this as we need a mechanism to set the arcTypeKnown bit without
+	// finalizing the arcs, as they may depend on the completion of sub fields.
+	// See, for instance:
+	//
+	// 		chainSuccess: a: {
+	// 			raises?: {}
+	// 			if raises == _|_ {
+	// 				ret: a: 1
+	// 			}
+	// 			ret?: {}
+	// 			if ret != _|_ {
+	// 				foo: a: 1
+	// 			}
+	// 		}
+	//
+	// This would also require changing the arcType process in ForClause.yield.
+	//
+	// v.completeArcs(c, state)
+
 	v.CompleteArcs(c)
 	return v
 }
@@ -294,8 +316,18 @@ func (x *ListLit) Source() ast.Node {
 
 func (x *ListLit) evaluate(c *OpContext, state combinedFlags) Value {
 	e := c.Env(0)
+	// Pass conditions but at least set fieldSetKnown.
 	v := c.newInlineVertex(e.Vertex, nil, Conjunct{e, x, c.ci})
-	v.CompleteArcs(c)
+	v.CompleteArcsOnly(c)
+
+	// TODO(evalv3): evaluating more aggressively yields some improvements, but
+	// breaks other tests. Consider using this approach, though.
+	// mode := state.runMode()
+	// if mode == finalize {
+	// 	v.completeArcs(c, allKnown)
+	// } else {
+	// 	v.completeArcs(c, fieldSetKnown)
+	// }
 	return v
 }
 
@@ -2036,6 +2068,7 @@ func (x *ForClause) yield(s *compState) {
 		}
 
 		if c.isDevVersion() {
+			// TODO(evalv3): See comment in StructLit.evaluate.
 			c.require(a, arcTypeKnown)
 		} else {
 			if !a.isDefined() {

@@ -310,49 +310,23 @@ issue2367: {
 }
 
 -- out/evalalpha/stats --
-Leaks:  546
-Freed:  15
-Reused: 15
-Allocs: 546
+Leaks:  790
+Freed:  56
+Reused: 56
+Allocs: 790
 Retain: 0
 
-Unifications: 497
-Conjuncts:    2032
-Disjuncts:    46
+Unifications: 494
+Conjuncts:    2966
+Disjuncts:    198
 -- out/evalalpha --
 Errors:
-issue1881.p1.o.retry: field not allowed:
-    ./in.cue:197:17
-selfReferential.acrossOr.t1.p1.o.retry: field not allowed:
-    ./in.cue:125:17
 selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
     ./in.cue:117:14
-selfReferential.acrossOr.t1.p1.2.retry: structural cycle:
-    ./in.cue:133:14
-selfReferential.acrossOr.t1.p2.2.retry: structural cycle:
-    ./in.cue:139:14
-selfReferential.acrossOr.t1.p3.2.retry: structural cycle:
-    ./in.cue:153:14
-selfReferential.acrossOr.t2.p1.2.b: structural cycle:
-    ./in.cue:167:8
-selfReferential.acrossOr.t2.p2.2.b: structural cycle:
-    ./in.cue:178:8
-selfReferential.acrossOr.t2.p3.2.b: structural cycle:
-    ./in.cue:193:8
-issue1881.p1.2.retry: structural cycle:
-    ./in.cue:205:14
-issue1881.p1.2.retry.output: structural cycle:
-    ./in.cue:205:14
-issue1881.p2.2.retry: structural cycle:
-    ./in.cue:219:14
-issue1881.p3.2.retry: structural cycle:
-    ./in.cue:231:14
 siblingInsertion.t2.p1.deployment: adding field logging not allowed as field set was already referenced:
     ./in.cue:277:21
 siblingInsertion.t2.p2.deployment: adding field logging not allowed as field set was already referenced:
     ./in.cue:292:21
-issue2367.0: structural cycle:
-    ./in.cue:308:11
 
 Result:
 (_|_){
@@ -476,147 +450,171 @@ Result:
         foo: (int){ 1 }
       }
     }
-    acrossOr: (_|_){
-      // [eval]
-      t1: (_|_){
-        // [eval]
-        p1: (_|_){
-          // [eval]
-          o: (_|_){
-            // [eval] selfReferential.acrossOr.t1.p1.o.retry: field not allowed:
-            //     ./in.cue:125:17
-            // selfReferential.acrossOr.t1.p1.2.retry: structural cycle:
-            //     ./in.cue:133:14
-            retry: (_|_){
-              // [eval] selfReferential.acrossOr.t1.p1.o.retry: field not allowed:
-              //     ./in.cue:125:17
+    acrossOr: (struct){
+      t1: (struct){
+        p1: (struct){
+          o: (#struct){
+            retry: (#struct){
+              reject: (string){ "ok" }
             }
           }
-          #AllOutputs: (_|_){
-            // [structural cycle]
+          #AllOutputs: (#struct){
             reject: (string){ string }
             resource: (string){ string }
-            retry: (_|_){
-              // [structural cycle] selfReferential.acrossOr.t1.p1.2.retry: structural cycle:
-              //     ./in.cue:133:14
+            retry: (#struct){ |((struct){
+                struct
+                reject: (_|_){// &[〈1;config〉]
+                }
+              }, (struct){
+                struct
+                resource: (_|_){// &[〈1;config〉]
+                }
+              }, (struct){
+                struct
+                retry: (_|_){// &[〈1;config〉]
+                }
+              }) }
+          }
+          #Output: (#struct){ |((struct){
+              struct
+              reject: (_|_){// &[〈1;config〉]
+              }
+            }, (struct){
+              struct
+              resource: (_|_){// &[〈1;config〉]
+              }
+            }, (struct){
+              struct
+              retry: (_|_){// &[〈1;config〉]
+              }
+            }) }
+        }
+        p2: (struct){
+          #Output: (#struct){ |((struct){
+              struct
+              reject: (_|_){// &[〈1;config〉]
+              }
+            }, (struct){
+              struct
+              resource: (_|_){// &[〈1;config〉]
+              }
+            }, (struct){
+              struct
+              retry: (_|_){// &[〈1;config〉]
+              }
+            }) }
+          o: (#struct){
+            retry: (#struct){
+              reject: (string){ "ok" }
             }
           }
-          #Output: (_|_){
-            // [structural cycle] selfReferential.acrossOr.t1.p1.2.retry: structural cycle:
-            //     ./in.cue:133:14
+          #AllOutputs: (#struct){
+            reject: (string){ string }
+            resource: (string){ string }
+            retry: (#struct){ |((struct){
+                struct
+                reject: (_|_){// &[〈1;config〉]
+                }
+              }, (struct){
+                struct
+                resource: (_|_){// &[〈1;config〉]
+                }
+              }, (struct){
+                struct
+                retry: (_|_){// &[〈1;config〉]
+                }
+              }) }
           }
         }
-        p2: (_|_){
-          // [structural cycle]
-          #Output: (_|_){
-            // [structural cycle] selfReferential.acrossOr.t1.p2.2.retry: structural cycle:
-            //     ./in.cue:139:14
-          }
-          o: (_|_){
-            // [structural cycle] selfReferential.acrossOr.t1.p2.2.retry: structural cycle:
-            //     ./in.cue:139:14
-          }
-          #AllOutputs: (_|_){
-            // [structural cycle]
+        p3: (struct){
+          #Output: (#struct){ |((struct){
+              struct
+              reject: (_|_){// &[〈1;config〉]
+              }
+            }, (struct){
+              struct
+              resource: (_|_){// &[〈1;config〉]
+              }
+            }, (struct){
+              struct
+              retry: (_|_){// &[〈1;config〉]
+              }
+            }) }
+          #AllOutputs: (#struct){
             reject: (string){ string }
             resource: (string){ string }
-            retry: (_|_){
-              // [structural cycle] selfReferential.acrossOr.t1.p2.2.retry: structural cycle:
-              //     ./in.cue:139:14
+            retry: (#struct){ |((struct){
+                struct
+                reject: (_|_){// &[〈1;config〉]
+                }
+              }, (struct){
+                struct
+                resource: (_|_){// &[〈1;config〉]
+                }
+              }, (struct){
+                struct
+                retry: (_|_){// &[〈1;config〉]
+                }
+              }) }
+          }
+          o: (#struct){
+            retry: (#struct){
+              reject: (string){ "ok" }
             }
-          }
-        }
-        p3: (_|_){
-          // [structural cycle]
-          #Output: (_|_){
-            // [structural cycle] selfReferential.acrossOr.t1.p3.2.retry: structural cycle:
-            //     ./in.cue:153:14
-          }
-          #AllOutputs: (_|_){
-            // [structural cycle]
-            reject: (string){ string }
-            resource: (string){ string }
-            retry: (_|_){
-              // [structural cycle] selfReferential.acrossOr.t1.p3.2.retry: structural cycle:
-              //     ./in.cue:153:14
-            }
-          }
-          o: (_|_){
-            // [structural cycle] selfReferential.acrossOr.t1.p3.2.retry: structural cycle:
-            //     ./in.cue:153:14
           }
         }
       }
-      t2: (_|_){
-        // [structural cycle]
-        p1: (_|_){
-          // [structural cycle]
-          d: (_|_){
-            // [structural cycle] selfReferential.acrossOr.t2.p1.2.b: structural cycle:
-            //     ./in.cue:167:8
+      t2: (struct){
+        p1: (struct){
+          d: ((int|string|struct)){ |((int){ int }, (string){ string }, (struct){
+              struct
+              b: (_|_){// &[〈2;d〉]
+              }
+            }) }
+          o: (struct){
+            b: (int){ 2 }
           }
-          o: (_|_){
-            // [structural cycle] selfReferential.acrossOr.t2.p1.2.b: structural cycle:
-            //     ./in.cue:167:8
-          }
-          #A: (_|_){
-            // [structural cycle]
+          #A: (#struct){
             d1: (int){ int }
             d2: (string){ string }
-            d3: (_|_){
-              // [structural cycle]
-              b: (_|_){
-                // [structural cycle] selfReferential.acrossOr.t2.p1.2.b: structural cycle:
-                //     ./in.cue:167:8
-              }
+            d3: (#struct){
+              b: ((int|string)){ |((int){ int }, (string){ string }) }
             }
           }
         }
-        p2: (_|_){
-          // [structural cycle]
-          o: (_|_){
-            // [structural cycle] selfReferential.acrossOr.t2.p2.2.b: structural cycle:
-            //     ./in.cue:178:8
+        p2: (struct){
+          o: (struct){
+            b: (int){ 2 }
           }
-          d: (_|_){
-            // [structural cycle] selfReferential.acrossOr.t2.p2.2.b: structural cycle:
-            //     ./in.cue:178:8
-          }
-          #A: (_|_){
-            // [structural cycle]
+          d: ((int|string|struct)){ |((int){ int }, (string){ string }, (struct){
+              struct
+              b: (_|_){// &[〈2;d〉]
+              }
+            }) }
+          #A: (#struct){
             d1: (int){ int }
             d2: (string){ string }
-            d3: (_|_){
-              // [structural cycle]
-              b: (_|_){
-                // [structural cycle] selfReferential.acrossOr.t2.p2.2.b: structural cycle:
-                //     ./in.cue:178:8
-              }
+            d3: (#struct){
+              b: ((int|string)){ |((int){ int }, (string){ string }) }
             }
           }
         }
-        p3: (_|_){
-          // [structural cycle]
-          o: (_|_){
-            // [structural cycle] selfReferential.acrossOr.t2.p3.2.b: structural cycle:
-            //     ./in.cue:193:8
+        p3: (struct){
+          o: (struct){
+            b: (int){ 2 }
           }
-          #A: (_|_){
-            // [structural cycle]
+          #A: (#struct){
             d1: (int){ int }
             d2: (string){ string }
-            d3: (_|_){
-              // [structural cycle]
-              b: (_|_){
-                // [structural cycle] selfReferential.acrossOr.t2.p3.2.b: structural cycle:
-                //     ./in.cue:193:8
-              }
+            d3: (#struct){
+              b: ((int|string)){ |((int){ int }, (string){ string }) }
             }
           }
-          d: (_|_){
-            // [structural cycle] selfReferential.acrossOr.t2.p3.2.b: structural cycle:
-            //     ./in.cue:193:8
-          }
+          d: ((int|string|struct)){ |((int){ int }, (string){ string }, (struct){
+              struct
+              b: (_|_){// &[〈2;d〉]
+              }
+            }) }
         }
       }
     }
@@ -631,81 +629,80 @@ Result:
       }
     }
   }
-  issue1881: (_|_){
-    // [eval]
-    p1: (_|_){
-      // [eval]
-      o: (_|_){
-        // [eval] issue1881.p1.o.retry: field not allowed:
-        //     ./in.cue:197:17
-        // issue1881.p1.2.retry.output: structural cycle:
-        //     ./in.cue:205:14
-        retry: (_|_){
-          // [eval] issue1881.p1.o.retry: field not allowed:
-          //     ./in.cue:197:17
-        }
-      }
-      #AllOutputs: (_|_){
-        // [structural cycle]
-        reject: (string){ string }
-        resource: (string){ string }
-        retry: (_|_){
-          // [structural cycle]
-          output: (_|_){
-            // [structural cycle] issue1881.p1.2.retry: structural cycle:
-            //     ./in.cue:205:14
+  issue1881: (struct){
+    p1: (struct){
+      o: (#struct){
+        retry: (#struct){
+          output: (#struct){
+            reject: (string){ "ok" }
           }
         }
       }
-      #Output: (_|_){
-        // [structural cycle] issue1881.p1.2.retry: structural cycle:
-        //     ./in.cue:205:14
+      #AllOutputs: (#struct){
+        reject: (string){ string }
+        resource: (string){ string }
+        retry: (#struct){
+          output: (#struct){ |((#struct){
+              reject: (string){ string }
+            }, (#struct){
+              resource: (string){ string }
+            }) }
+        }
       }
+      #Output: (#struct){ |((#struct){
+          reject: (string){ string }
+        }, (#struct){
+          resource: (string){ string }
+        }) }
     }
-    p2: (_|_){
-      // [structural cycle]
-      #AllOutputs: (_|_){
-        // [structural cycle]
+    p2: (struct){
+      #AllOutputs: (#struct){
         reject: (string){ string }
         resource: (string){ string }
-        retry: (_|_){
-          // [structural cycle]
-          output: (_|_){
-            // [structural cycle] issue1881.p2.2.retry: structural cycle:
-            //     ./in.cue:219:14
+        retry: (#struct){
+          output: (#struct){ |((#struct){
+              reject: (string){ string }
+            }, (#struct){
+              resource: (string){ string }
+            }) }
+        }
+      }
+      o: (#struct){
+        retry: (#struct){
+          output: (#struct){
+            reject: (string){ "ok" }
           }
         }
       }
-      o: (_|_){
-        // [structural cycle] issue1881.p2.2.retry: structural cycle:
-        //     ./in.cue:219:14
-      }
-      #Output: (_|_){
-        // [structural cycle] issue1881.p2.2.retry: structural cycle:
-        //     ./in.cue:219:14
-      }
+      #Output: (#struct){ |((#struct){
+          reject: (string){ string }
+        }, (#struct){
+          resource: (string){ string }
+        }) }
     }
-    p3: (_|_){
-      // [structural cycle]
-      #AllOutputs: (_|_){
-        // [structural cycle]
+    p3: (struct){
+      #AllOutputs: (#struct){
         reject: (string){ string }
         resource: (string){ string }
-        retry: (_|_){
-          // [structural cycle]
-          output: (_|_){
-            // [structural cycle] issue1881.p3.2.retry: structural cycle:
-            //     ./in.cue:231:14
-          }
+        retry: (#struct){
+          output: (#struct){ |((#struct){
+              reject: (string){ string }
+            }, (#struct){
+              resource: (string){ string }
+            }) }
         }
       }
-      #Output: (_|_){
-        // [structural cycle] issue1881.p3.2.retry: structural cycle:
-        //     ./in.cue:231:14
-      }
-      o: (_|_){
-        // [structural cycle] issue1881.p3.2.retry: structural cycle:
-        //     ./in.cue:231:14
+      #Output: (#struct){ |((#struct){
+          reject: (string){ string }
+        }, (#struct){
+          resource: (string){ string }
+        }) }
+      o: (#struct){
+        retry: (#struct){
+          output: (#struct){
+            reject: (string){ "ok" }
+          }
+        }
       }
     }
   }
@@ -769,54 +766,27 @@ Result:
       }
     }
   }
-  issue2367: (_|_){
-    // [structural cycle] issue2367.0: structural cycle:
-    //     ./in.cue:308:11
+  issue2367: (struct){
+    a: (_){ _ }
   }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,5 +1,36 @@
+@@ -1,5 +1,10 @@
  Errors:
 -selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle
-+issue1881.p1.o.retry: field not allowed:
-+    ./in.cue:197:17
-+selfReferential.acrossOr.t1.p1.o.retry: field not allowed:
-+    ./in.cue:125:17
 +selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
 +    ./in.cue:117:14
-+selfReferential.acrossOr.t1.p1.2.retry: structural cycle:
-+    ./in.cue:133:14
-+selfReferential.acrossOr.t1.p2.2.retry: structural cycle:
-+    ./in.cue:139:14
-+selfReferential.acrossOr.t1.p3.2.retry: structural cycle:
-+    ./in.cue:153:14
-+selfReferential.acrossOr.t2.p1.2.b: structural cycle:
-+    ./in.cue:167:8
-+selfReferential.acrossOr.t2.p2.2.b: structural cycle:
-+    ./in.cue:178:8
-+selfReferential.acrossOr.t2.p3.2.b: structural cycle:
-+    ./in.cue:193:8
-+issue1881.p1.2.retry: structural cycle:
-+    ./in.cue:205:14
-+issue1881.p1.2.retry.output: structural cycle:
-+    ./in.cue:205:14
-+issue1881.p2.2.retry: structural cycle:
-+    ./in.cue:219:14
-+issue1881.p3.2.retry: structural cycle:
-+    ./in.cue:231:14
 +siblingInsertion.t2.p1.deployment: adding field logging not allowed as field set was already referenced:
 +    ./in.cue:277:21
 +siblingInsertion.t2.p2.deployment: adding field logging not allowed as field set was already referenced:
 +    ./in.cue:292:21
-+issue2367.0: structural cycle:
-+    ./in.cue:308:11
  
  Result:
  (_|_){
-@@ -19,7 +50,9 @@
+@@ -19,7 +24,9 @@
    B: (struct){
      a: (struct){
        parent: (string){ "" }
@@ -827,7 +797,7 @@ diff old new
        }
      }
    }
-@@ -52,17 +85,12 @@
+@@ -52,17 +59,12 @@
        }
      }
      _e: (#struct){
@@ -851,7 +821,7 @@ diff old new
        }
      }
      e: (#struct){
-@@ -76,12 +104,7 @@
+@@ -76,12 +78,7 @@
        }
        f2: (#struct){
          a: (#struct){
@@ -865,7 +835,7 @@ diff old new
          }
        }
      }
-@@ -112,15 +135,14 @@
+@@ -112,15 +109,14 @@
        }
      }
      list: (struct){
@@ -884,7 +854,7 @@ diff old new
          }
        }
      }
-@@ -127,116 +149,152 @@
+@@ -127,9 +123,9 @@
      insertionError: (_|_){
        // [eval]
        A: (_|_){
@@ -893,19 +863,13 @@ diff old new
 +        //     ./in.cue:117:14
          foo: (int){ 1 }
 -        foo3: (int){ 1 }
--      }
--    }
--    acrossOr: (struct){
--      t1: (struct){
--        p1: (struct){
--          o: (#struct){
--            retry: (#struct){
--              reject: (string){ "ok" }
--            }
--          }
--          #AllOutputs: (#struct){
--            reject: (string){ string }
--            resource: (string){ string }
+       }
+     }
+     acrossOr: (struct){
+@@ -143,52 +139,100 @@
+           #AllOutputs: (#struct){
+             reject: (string){ string }
+             resource: (string){ string }
 -            retry: (#struct){ |((#struct){
 -                reject: (string){ string }
 -              }, (#struct){
@@ -952,17 +916,107 @@ diff old new
 -                reject: (string){ string }
 -              }, (#struct){
 -                resource: (string){ string }
--              }) }
--          }
--          o: (#struct){
--            retry: (#struct){
--              reject: (string){ "ok" }
--            }
--          }
--        }
--      }
--      t2: (struct){
--        p1: (struct){
++            retry: (#struct){ |((struct){
++                struct
++                reject: (_|_){// &[〈1;config〉]
++                }
++              }, (struct){
++                struct
++                resource: (_|_){// &[〈1;config〉]
++                }
++              }, (struct){
++                struct
++                retry: (_|_){// &[〈1;config〉]
++                }
++              }) }
++          }
++          #Output: (#struct){ |((struct){
++              struct
++              reject: (_|_){// &[〈1;config〉]
++              }
++            }, (struct){
++              struct
++              resource: (_|_){// &[〈1;config〉]
++              }
++            }, (struct){
++              struct
++              retry: (_|_){// &[〈1;config〉]
++              }
++            }) }
++        }
++        p2: (struct){
++          #Output: (#struct){ |((struct){
++              struct
++              reject: (_|_){// &[〈1;config〉]
++              }
++            }, (struct){
++              struct
++              resource: (_|_){// &[〈1;config〉]
++              }
++            }, (struct){
++              struct
++              retry: (_|_){// &[〈1;config〉]
++              }
++            }) }
++          o: (#struct){
++            retry: (#struct){
++              reject: (string){ "ok" }
++            }
++          }
++          #AllOutputs: (#struct){
++            reject: (string){ string }
++            resource: (string){ string }
++            retry: (#struct){ |((struct){
++                struct
++                reject: (_|_){// &[〈1;config〉]
++                }
++              }, (struct){
++                struct
++                resource: (_|_){// &[〈1;config〉]
++                }
++              }, (struct){
++                struct
++                retry: (_|_){// &[〈1;config〉]
++                }
++              }) }
++          }
++        }
++        p3: (struct){
++          #Output: (#struct){ |((struct){
++              struct
++              reject: (_|_){// &[〈1;config〉]
++              }
++            }, (struct){
++              struct
++              resource: (_|_){// &[〈1;config〉]
++              }
++            }, (struct){
++              struct
++              retry: (_|_){// &[〈1;config〉]
++              }
++            }) }
++          #AllOutputs: (#struct){
++            reject: (string){ string }
++            resource: (string){ string }
++            retry: (#struct){ |((struct){
++                struct
++                reject: (_|_){// &[〈1;config〉]
++                }
++              }, (struct){
++                struct
++                resource: (_|_){// &[〈1;config〉]
++                }
++              }, (struct){
++                struct
++                retry: (_|_){// &[〈1;config〉]
++                }
+               }) }
+           }
+           o: (#struct){
+@@ -200,43 +244,55 @@
+       }
+       t2: (struct){
+         p1: (struct){
 -          d: ((int|string)){ |((int){ int }, (string){ string }) }
 -          o: (struct){
 -            b: (int){ 2 }
@@ -1000,318 +1054,69 @@ diff old new
 -            }
 -          }
 -          d: ((int|string)){ |((int){ int }, (string){ string }) }
-+      }
-+    }
-+    acrossOr: (_|_){
-+      // [eval]
-+      t1: (_|_){
-+        // [eval]
-+        p1: (_|_){
-+          // [eval]
-+          o: (_|_){
-+            // [eval] selfReferential.acrossOr.t1.p1.o.retry: field not allowed:
-+            //     ./in.cue:125:17
-+            // selfReferential.acrossOr.t1.p1.2.retry: structural cycle:
-+            //     ./in.cue:133:14
-+            retry: (_|_){
-+              // [eval] selfReferential.acrossOr.t1.p1.o.retry: field not allowed:
-+              //     ./in.cue:125:17
-+            }
++          d: ((int|string|struct)){ |((int){ int }, (string){ string }, (struct){
++              struct
++              b: (_|_){// &[〈2;d〉]
++              }
++            }) }
++          o: (struct){
++            b: (int){ 2 }
 +          }
-+          #AllOutputs: (_|_){
-+            // [structural cycle]
-+            reject: (string){ string }
-+            resource: (string){ string }
-+            retry: (_|_){
-+              // [structural cycle] selfReferential.acrossOr.t1.p1.2.retry: structural cycle:
-+              //     ./in.cue:133:14
-+            }
-+          }
-+          #Output: (_|_){
-+            // [structural cycle] selfReferential.acrossOr.t1.p1.2.retry: structural cycle:
-+            //     ./in.cue:133:14
-+          }
-+        }
-+        p2: (_|_){
-+          // [structural cycle]
-+          #Output: (_|_){
-+            // [structural cycle] selfReferential.acrossOr.t1.p2.2.retry: structural cycle:
-+            //     ./in.cue:139:14
-+          }
-+          o: (_|_){
-+            // [structural cycle] selfReferential.acrossOr.t1.p2.2.retry: structural cycle:
-+            //     ./in.cue:139:14
-+          }
-+          #AllOutputs: (_|_){
-+            // [structural cycle]
-+            reject: (string){ string }
-+            resource: (string){ string }
-+            retry: (_|_){
-+              // [structural cycle] selfReferential.acrossOr.t1.p2.2.retry: structural cycle:
-+              //     ./in.cue:139:14
-+            }
-+          }
-+        }
-+        p3: (_|_){
-+          // [structural cycle]
-+          #Output: (_|_){
-+            // [structural cycle] selfReferential.acrossOr.t1.p3.2.retry: structural cycle:
-+            //     ./in.cue:153:14
-+          }
-+          #AllOutputs: (_|_){
-+            // [structural cycle]
-+            reject: (string){ string }
-+            resource: (string){ string }
-+            retry: (_|_){
-+              // [structural cycle] selfReferential.acrossOr.t1.p3.2.retry: structural cycle:
-+              //     ./in.cue:153:14
-+            }
-+          }
-+          o: (_|_){
-+            // [structural cycle] selfReferential.acrossOr.t1.p3.2.retry: structural cycle:
-+            //     ./in.cue:153:14
-+          }
-+        }
-+      }
-+      t2: (_|_){
-+        // [structural cycle]
-+        p1: (_|_){
-+          // [structural cycle]
-+          d: (_|_){
-+            // [structural cycle] selfReferential.acrossOr.t2.p1.2.b: structural cycle:
-+            //     ./in.cue:167:8
-+          }
-+          o: (_|_){
-+            // [structural cycle] selfReferential.acrossOr.t2.p1.2.b: structural cycle:
-+            //     ./in.cue:167:8
-+          }
-+          #A: (_|_){
-+            // [structural cycle]
++          #A: (#struct){
 +            d1: (int){ int }
 +            d2: (string){ string }
-+            d3: (_|_){
-+              // [structural cycle]
-+              b: (_|_){
-+                // [structural cycle] selfReferential.acrossOr.t2.p1.2.b: structural cycle:
-+                //     ./in.cue:167:8
-+              }
++            d3: (#struct){
++              b: ((int|string)){ |((int){ int }, (string){ string }) }
 +            }
 +          }
 +        }
-+        p2: (_|_){
-+          // [structural cycle]
-+          o: (_|_){
-+            // [structural cycle] selfReferential.acrossOr.t2.p2.2.b: structural cycle:
-+            //     ./in.cue:178:8
++        p2: (struct){
++          o: (struct){
++            b: (int){ 2 }
 +          }
-+          d: (_|_){
-+            // [structural cycle] selfReferential.acrossOr.t2.p2.2.b: structural cycle:
-+            //     ./in.cue:178:8
-+          }
-+          #A: (_|_){
-+            // [structural cycle]
++          d: ((int|string|struct)){ |((int){ int }, (string){ string }, (struct){
++              struct
++              b: (_|_){// &[〈2;d〉]
++              }
++            }) }
++          #A: (#struct){
 +            d1: (int){ int }
 +            d2: (string){ string }
-+            d3: (_|_){
-+              // [structural cycle]
-+              b: (_|_){
-+                // [structural cycle] selfReferential.acrossOr.t2.p2.2.b: structural cycle:
-+                //     ./in.cue:178:8
-+              }
++            d3: (#struct){
++              b: ((int|string)){ |((int){ int }, (string){ string }) }
 +            }
 +          }
 +        }
-+        p3: (_|_){
-+          // [structural cycle]
-+          o: (_|_){
-+            // [structural cycle] selfReferential.acrossOr.t2.p3.2.b: structural cycle:
-+            //     ./in.cue:193:8
++        p3: (struct){
++          o: (struct){
++            b: (int){ 2 }
 +          }
-+          #A: (_|_){
-+            // [structural cycle]
++          #A: (#struct){
 +            d1: (int){ int }
 +            d2: (string){ string }
-+            d3: (_|_){
-+              // [structural cycle]
-+              b: (_|_){
-+                // [structural cycle] selfReferential.acrossOr.t2.p3.2.b: structural cycle:
-+                //     ./in.cue:193:8
-+              }
++            d3: (#struct){
++              b: ((int|string)){ |((int){ int }, (string){ string }) }
 +            }
 +          }
-+          d: (_|_){
-+            // [structural cycle] selfReferential.acrossOr.t2.p3.2.b: structural cycle:
-+            //     ./in.cue:193:8
-+          }
++          d: ((int|string|struct)){ |((int){ int }, (string){ string }, (struct){
++              struct
++              b: (_|_){// &[〈2;d〉]
++              }
++            }) }
          }
        }
      }
-@@ -251,84 +309,86 @@
+@@ -328,7 +384,8 @@
        }
      }
    }
--  issue1881: (struct){
--    p1: (struct){
--      o: (#struct){
--        retry: (#struct){
--          output: (#struct){
--            reject: (string){ "ok" }
--          }
--        }
--      }
--      #AllOutputs: (#struct){
--        reject: (string){ string }
--        resource: (string){ string }
--        retry: (#struct){
--          output: (#struct){ |((#struct){
--              reject: (string){ string }
--            }, (#struct){
--              resource: (string){ string }
--            }) }
--        }
--      }
--      #Output: (#struct){ |((#struct){
--          reject: (string){ string }
--        }, (#struct){
--          resource: (string){ string }
--        }) }
--    }
--    p2: (struct){
--      #AllOutputs: (#struct){
--        reject: (string){ string }
--        resource: (string){ string }
--        retry: (#struct){
--          output: (#struct){ |((#struct){
--              reject: (string){ string }
--            }, (#struct){
--              resource: (string){ string }
--            }) }
--        }
--      }
--      o: (#struct){
--        retry: (#struct){
--          output: (#struct){
--            reject: (string){ "ok" }
--          }
--        }
--      }
--      #Output: (#struct){ |((#struct){
--          reject: (string){ string }
--        }, (#struct){
--          resource: (string){ string }
--        }) }
--    }
--    p3: (struct){
--      #AllOutputs: (#struct){
--        reject: (string){ string }
--        resource: (string){ string }
--        retry: (#struct){
--          output: (#struct){ |((#struct){
--              reject: (string){ string }
--            }, (#struct){
--              resource: (string){ string }
--            }) }
--        }
--      }
--      #Output: (#struct){ |((#struct){
--          reject: (string){ string }
--        }, (#struct){
--          resource: (string){ string }
--        }) }
--      o: (#struct){
--        retry: (#struct){
--          output: (#struct){
--            reject: (string){ "ok" }
--          }
--        }
--      }
--    }
--  }
 -  siblingInsertion: (struct){
-+  issue1881: (_|_){
-+    // [eval]
-+    p1: (_|_){
-+      // [eval]
-+      o: (_|_){
-+        // [eval] issue1881.p1.o.retry: field not allowed:
-+        //     ./in.cue:197:17
-+        // issue1881.p1.2.retry.output: structural cycle:
-+        //     ./in.cue:205:14
-+        retry: (_|_){
-+          // [eval] issue1881.p1.o.retry: field not allowed:
-+          //     ./in.cue:197:17
-+        }
-+      }
-+      #AllOutputs: (_|_){
-+        // [structural cycle]
-+        reject: (string){ string }
-+        resource: (string){ string }
-+        retry: (_|_){
-+          // [structural cycle]
-+          output: (_|_){
-+            // [structural cycle] issue1881.p1.2.retry: structural cycle:
-+            //     ./in.cue:205:14
-+          }
-+        }
-+      }
-+      #Output: (_|_){
-+        // [structural cycle] issue1881.p1.2.retry: structural cycle:
-+        //     ./in.cue:205:14
-+      }
-+    }
-+    p2: (_|_){
-+      // [structural cycle]
-+      #AllOutputs: (_|_){
-+        // [structural cycle]
-+        reject: (string){ string }
-+        resource: (string){ string }
-+        retry: (_|_){
-+          // [structural cycle]
-+          output: (_|_){
-+            // [structural cycle] issue1881.p2.2.retry: structural cycle:
-+            //     ./in.cue:219:14
-+          }
-+        }
-+      }
-+      o: (_|_){
-+        // [structural cycle] issue1881.p2.2.retry: structural cycle:
-+        //     ./in.cue:219:14
-+      }
-+      #Output: (_|_){
-+        // [structural cycle] issue1881.p2.2.retry: structural cycle:
-+        //     ./in.cue:219:14
-+      }
-+    }
-+    p3: (_|_){
-+      // [structural cycle]
-+      #AllOutputs: (_|_){
-+        // [structural cycle]
-+        reject: (string){ string }
-+        resource: (string){ string }
-+        retry: (_|_){
-+          // [structural cycle]
-+          output: (_|_){
-+            // [structural cycle] issue1881.p3.2.retry: structural cycle:
-+            //     ./in.cue:231:14
-+          }
-+        }
-+      }
-+      #Output: (_|_){
-+        // [structural cycle] issue1881.p3.2.retry: structural cycle:
-+        //     ./in.cue:231:14
-+      }
-+      o: (_|_){
-+        // [structural cycle] issue1881.p3.2.retry: structural cycle:
-+        //     ./in.cue:231:14
-+      }
-+    }
-+  }
 +  siblingInsertion: (_|_){
 +    // [eval]
      t1: (struct){
        p1: (struct){
          D: (struct){
-@@ -361,40 +421,34 @@
+@@ -361,35 +418,28 @@
          }
        }
      }
@@ -1344,12 +1149,6 @@ diff old new
 -              ENV: (string){ "True" }
 -            }
 -          }
--        }
--      }
--    }
--  }
--  issue2367: (struct){
--    a: (_){ _ }
 +    t2: (_|_){
 +      // [eval]
 +      p1: (_|_){
@@ -1372,15 +1171,9 @@ diff old new
 +        deployment: (_|_){
 +          // [eval] siblingInsertion.t2.p2.deployment: adding field logging not allowed as field set was already referenced:
 +          //     ./in.cue:292:21
-+        }
-+      }
-+    }
-+  }
-+  issue2367: (_|_){
-+    // [structural cycle] issue2367.0: structural cycle:
-+    //     ./in.cue:308:11
-   }
- }
+         }
+       }
+     }
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -1391,18 +1184,18 @@ diff old new
 -Reused: 1260
 -Allocs: 60
 -Retain: 145
-+Leaks:  546
-+Freed:  15
-+Reused: 15
-+Allocs: 546
++Leaks:  790
++Freed:  56
++Reused: 56
++Allocs: 790
 +Retain: 0
  
 -Unifications: 832
 -Conjuncts:    2525
 -Disjuncts:    1404
-+Unifications: 497
-+Conjuncts:    2032
-+Disjuncts:    46
++Unifications: 494
++Conjuncts:    2966
++Disjuncts:    198
 -- out/eval/stats --
 Leaks:  50
 Freed:  1270
@@ -1413,11 +1206,12 @@ Retain: 145
 Unifications: 832
 Conjuncts:    2525
 Disjuncts:    1404
+-- diff/explanation --
+B.a.children: now correctly marked as incomplete
 -- diff/todo/p0 --
 selfReferential.list.panels: invalid incomplete error: related to "or" builtin
-selfReferential.acrossOr: many errors: related to "or" builtin
-issue1881: differences: related to "or" builtin
-...
+siblingInsertion.t2: errors
+acrossOr.t1.p1.o.retry: invalid incomplete error: related to "or" builtin
 -- out/eval --
 Errors:
 selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle

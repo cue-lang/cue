@@ -283,9 +283,9 @@ expr.error2.a: conflicting values 4 and 3:
     ./in.cue:8:5
     ./in.cue:9:5
 list.error1.0: structural cycle:
-    ./in.cue:13:17
+    ./in.cue:13:5
 list.error2.1: structural cycle:
-    ./in.cue:17:17
+    ./in.cue:17:5
 
 Result:
 (_|_){
@@ -315,14 +315,14 @@ Result:
       // [structural cycle]
       a: (_|_){
         // [structural cycle] list.error1.0: structural cycle:
-        //     ./in.cue:13:17
+        //     ./in.cue:13:5
       }
     }
     error2: (_|_){
       // [structural cycle]
       a: (_|_){
         // [structural cycle] list.error2.1: structural cycle:
-        //     ./in.cue:17:17
+        //     ./in.cue:17:5
       }
     }
   }
@@ -633,9 +633,9 @@ diff old new
      ./in.cue:8:5
      ./in.cue:9:5
 +list.error1.0: structural cycle:
-+    ./in.cue:13:17
++    ./in.cue:13:5
 +list.error2.1: structural cycle:
-+    ./in.cue:17:17
++    ./in.cue:17:5
  
  Result:
  (_|_){
@@ -655,14 +655,14 @@ diff old new
 -        0: (string){ "1" }
 -        1: (string){ "2" }
 +        // [structural cycle] list.error1.0: structural cycle:
-+        //     ./in.cue:13:17
++        //     ./in.cue:13:5
 +      }
 +    }
 +    error2: (_|_){
 +      // [structural cycle]
 +      a: (_|_){
 +        // [structural cycle] list.error2.1: structural cycle:
-+        //     ./in.cue:17:17
++        //     ./in.cue:17:5
        }
      }
    }

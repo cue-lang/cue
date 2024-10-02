@@ -68,18 +68,68 @@ builtinCyclePerm5: {
 		host:        #components.host
 	}
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  37
-Reused: 30
-Allocs: 7
-Retain: 34
+-- matchn.cue --
+// This should not be a structural cycle, as the list type is "optional".
+issue3410: {
+	_s
+	_s: {
+		#x: matchN(1, [_s, [..._s]])
+	}
+}
+issue3420: {
+	matches1: {
+		#S: matchN(1, [_, _|_])
+		s: 2
+	}
+}
+issue3443: {
+	matchIf: {
+		#S: matchIf({x?: "b"}, {n?: #S & (int | {})}, _)
+	}
+	noCycle: {
+		// This is not a structural cycle, and should not hang, as n? is optional.
+		#S: matchN(1, [{n?: #S & (int | {})}])
 
-Unifications: 37
-Conjuncts:    53
-Disjuncts:    61
--- out/eval --
-(struct){
+		// TODO: hang! This hangs with v2 and v3
+		// s: #S
+		// s: n: n: _
+	}
+
+	noCycle2: {
+		#S: matchN(1, [{n?: (int | #S)}])
+	}
+
+	cycleButOkay: {
+		// This correct CUE, as matchN allows for schema to be errors. We should
+		// probably have a vet rule to catch this,though.
+		#S: matchN(1, [{n: #S}])
+
+		// This is not an error as the result is structure shared. Not sure if
+		// this should be accepted.
+		s: #S
+		s: n: n: _
+	}
+}
+-- todo/p1 --
+issue3443.noCycle: fix hang
+-- out/eval/stats --
+Leaks:  8
+Freed:  70
+Reused: 62
+Allocs: 16
+Retain: 45
+
+Unifications: 78
+Conjuncts:    111
+Disjuncts:    105
+-- out/evalalpha --
+Errors:
+issue3443.matchIf.#S: cannot call non-function matchIf (type struct):
+    ./matchn.cue:16:7
+
+Result:
+(_|_){
+  // [eval]
   builtinCyclePerm0: (struct){
     X: (string){ "mod.test" }
     Y: (struct){
@@ -134,6 +184,293 @@ Disjuncts:    61
       host: (string){ "mod.test" }
     }
   }
+  issue3410: (struct){
+    _s: (struct){
+      #x: (_){ matchN(1, (#list){
+          0: (_|_){// &[〈2;_s〉]
+          }
+          1: (_|_){// &[[
+            //   ...〈3;_s〉,
+            // ]]
+          }
+        }) }
+    }
+    #x: (_){ matchN(1, (#list){
+        0: (_|_){// &[〈2;_s〉]
+        }
+        1: (_|_){// &[[
+          //   ...〈3;_s〉,
+          // ]]
+        }
+      }) }
+  }
+  issue3420: (struct){
+    matches1: (struct){
+      #S: (_){ matchN(1, (#list){
+          0: (_|_){// &[_]
+          }
+          1: (_|_){// &[_|_(explicit error (_|_ literal) in source)]
+          }
+        }) }
+      s: (int){ 2 }
+    }
+  }
+  issue3443: (_|_){
+    // [eval]
+    matchIf: (_|_){
+      // [eval]
+      #S: (_|_){
+        // [eval] issue3443.matchIf.#S: cannot call non-function matchIf (type struct):
+        //     ./matchn.cue:16:7
+      }
+    }
+    noCycle: (struct){
+      #S: (_){ matchN(1, (#list){
+          0: (_|_){// &[{
+            //   n?: (〈2;#S〉 & (int|{}))
+            // }]
+          }
+        }) }
+    }
+    noCycle2: (struct){
+      #S: (_){ matchN(1, (#list){
+          0: (_|_){// &[{
+            //   n?: (int|〈2;#S〉)
+            // }]
+          }
+        }) }
+    }
+    cycleButOkay: (struct){
+      #S: (_){ matchN(1, (#list){
+          0: (_|_){// &[{
+            //   n: 〈2;#S〉
+            // }]
+          }
+        }) }
+      s: (#struct){
+        n: (struct){
+          n: (_){ _ }
+        }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -62,20 +62,20 @@
+   issue3410: (struct){
+     _s: (struct){
+       #x: (_){ matchN(1, (#list){
+-          0: (_|_){// 〈2;_s〉
+-          }
+-          1: (_|_){// [
++          0: (_|_){// &[〈2;_s〉]
++          }
++          1: (_|_){// &[[
+             //   ...〈3;_s〉,
+-            // ]
++            // ]]
+           }
+         }) }
+     }
+     #x: (_){ matchN(1, (#list){
+-        0: (_|_){// 〈2;_s〉
+-        }
+-        1: (_|_){// [
++        0: (_|_){// &[〈2;_s〉]
++        }
++        1: (_|_){// &[[
+           //   ...〈3;_s〉,
+-          // ]
++          // ]]
+         }
+       }) }
+   }
+@@ -82,9 +82,9 @@
+   issue3420: (struct){
+     matches1: (struct){
+       #S: (_){ matchN(1, (#list){
+-          0: (_|_){// _
+-          }
+-          1: (_|_){// _|_(explicit error (_|_ literal) in source)
++          0: (_|_){// &[_]
++          }
++          1: (_|_){// &[_|_(explicit error (_|_ literal) in source)]
+           }
+         }) }
+       s: (int){ 2 }
+@@ -101,28 +101,28 @@
+     }
+     noCycle: (struct){
+       #S: (_){ matchN(1, (#list){
+-          0: (_|_){// {
++          0: (_|_){// &[{
+             //   n?: (〈2;#S〉 & (int|{}))
+-            // }
++            // }]
+           }
+         }) }
+     }
+     noCycle2: (struct){
+       #S: (_){ matchN(1, (#list){
+-          0: (_|_){// {
++          0: (_|_){// &[{
+             //   n?: (int|〈2;#S〉)
+-            // }
++            // }]
+           }
+         }) }
+     }
+     cycleButOkay: (struct){
+       #S: (_){ matchN(1, (#list){
+-          0: (_|_){// {
++          0: (_|_){// &[{
+             //   n: 〈2;#S〉
+-            // }
+-          }
+-        }) }
+-      s: (struct){
++            // }]
++          }
++        }) }
++      s: (#struct){
+         n: (struct){
+           n: (_){ _ }
+         }
+-- out/eval --
+Errors:
+issue3443.matchIf.#S: cannot call non-function matchIf (type struct):
+    ./matchn.cue:16:7
+
+Result:
+(_|_){
+  // [eval]
+  builtinCyclePerm0: (struct){
+    X: (string){ "mod.test" }
+    Y: (struct){
+      #components: (#struct){
+        host: (string){ "mod.test" }
+      }
+      host: (string){ "mod.test" }
+    }
+  }
+  builtinCyclePerm1: (struct){
+    X: (string){ "mod.test" }
+    Y: (struct){
+      #components: (#struct){
+        host: (string){ "mod.test" }
+      }
+      host: (string){ "mod.test" }
+    }
+  }
+  builtinCyclePerm2: (struct){
+    Y: (struct){
+      #components: (#struct){
+        host: (string){ "mod.test" }
+      }
+      host: (string){ "mod.test" }
+    }
+    X: (string){ "mod.test" }
+  }
+  builtinCyclePerm3: (struct){
+    Y: (struct){
+      #components: (#struct){
+        host: (string){ "mod.test" }
+      }
+      host: (string){ "mod.test" }
+    }
+    X: (string){ "mod.test" }
+  }
+  builtinCyclePerm4: (struct){
+    X: (string){ "mod.test" }
+    Y: (struct){
+      #components: (#struct){
+        host: (string){ "mod.test" }
+      }
+      host: (string){ "mod.test" }
+    }
+  }
+  builtinCyclePerm5: (struct){
+    X: (string){ "mod.test" }
+    Y: (struct){
+      #components: (#struct){
+        host: (string){ "mod.test" }
+      }
+      host: (string){ "mod.test" }
+    }
+  }
+  issue3410: (struct){
+    _s: (struct){
+      #x: (_){ matchN(1, (#list){
+          0: (_|_){// 〈2;_s〉
+          }
+          1: (_|_){// [
+            //   ...〈3;_s〉,
+            // ]
+          }
+        }) }
+    }
+    #x: (_){ matchN(1, (#list){
+        0: (_|_){// 〈2;_s〉
+        }
+        1: (_|_){// [
+          //   ...〈3;_s〉,
+          // ]
+        }
+      }) }
+  }
+  issue3420: (struct){
+    matches1: (struct){
+      #S: (_){ matchN(1, (#list){
+          0: (_|_){// _
+          }
+          1: (_|_){// _|_(explicit error (_|_ literal) in source)
+          }
+        }) }
+      s: (int){ 2 }
+    }
+  }
+  issue3443: (_|_){
+    // [eval]
+    matchIf: (_|_){
+      // [eval]
+      #S: (_|_){
+        // [eval] issue3443.matchIf.#S: cannot call non-function matchIf (type struct):
+        //     ./matchn.cue:16:7
+      }
+    }
+    noCycle: (struct){
+      #S: (_){ matchN(1, (#list){
+          0: (_|_){// {
+            //   n?: (〈2;#S〉 & (int|{}))
+            // }
+          }
+        }) }
+    }
+    noCycle2: (struct){
+      #S: (_){ matchN(1, (#list){
+          0: (_|_){// {
+            //   n?: (int|〈2;#S〉)
+            // }
+          }
+        }) }
+    }
+    cycleButOkay: (struct){
+      #S: (_){ matchN(1, (#list){
+          0: (_|_){// {
+            //   n: 〈2;#S〉
+            // }
+          }
+        }) }
+      s: (struct){
+        n: (struct){
+          n: (_){ _ }
+        }
+      }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -184,6 +521,65 @@ Disjuncts:    61
     Y: {
       #components: 〈import;regexp〉.FindNamedSubmatch("^(?P<host>[[:alnum:].]+)$", 〈1;X〉)
       host: 〈0;#components〉.host
+    }
+  }
+}
+--- matchn.cue
+{
+  issue3410: {
+    〈0;_s〉
+    _s: {
+      #x: matchN(1, [
+        〈2;_s〉,
+        [
+          ...〈3;_s〉,
+        ],
+      ])
+    }
+  }
+  issue3420: {
+    matches1: {
+      #S: matchN(1, [
+        _,
+        _|_(explicit error (_|_ literal) in source),
+      ])
+      s: 2
+    }
+  }
+  issue3443: {
+    matchIf: {
+      #S: 〈1;matchIf〉({
+        x?: "b"
+      }, {
+        n?: (〈1;#S〉 & (int|{}))
+      }, _)
+    }
+    noCycle: {
+      #S: matchN(1, [
+        {
+          n?: (〈2;#S〉 & (int|{}))
+        },
+      ])
+    }
+    noCycle2: {
+      #S: matchN(1, [
+        {
+          n?: (int|〈2;#S〉)
+        },
+      ])
+    }
+    cycleButOkay: {
+      #S: matchN(1, [
+        {
+          n: 〈2;#S〉
+        },
+      ])
+      s: 〈0;#S〉
+      s: {
+        n: {
+          n: _
+        }
+      }
     }
   }
 }

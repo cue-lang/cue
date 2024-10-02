@@ -222,33 +222,28 @@ func (d *differ) diffStruct(x, y cue.Value) (Kind, *EditScript) {
 	// We assume that the order of the elements of each value indicate an edge
 	// in the graph. This means that only the next unprocessed nodes can be
 	// those with no incoming edges.
-	xMap := make(map[string]int32, sx.Len())
-	yMap := make(map[string]int32, sy.Len())
+	xMap := make(map[string]struct{}, sx.Len())
+	yMap := make(map[string]int, sy.Len())
 	for i := 0; i < sx.Len(); i++ {
 		f, ok := d.field(sx, i)
-		if !ok {
-			continue
+		if ok {
+			xMap[f.Selector] = struct{}{}
 		}
-		xMap[f.Selector] = int32(i + 1)
 	}
 	for i := 0; i < sy.Len(); i++ {
 		f, ok := d.field(sy, i)
-		if !ok {
-			continue
+		if ok {
+			yMap[f.Selector] = i + 1
 		}
-		yMap[f.Selector] = int32(i + 1)
 	}
 
 	edits := []Edit{}
 	differs := false
 
-	var xi, yi int
-	var xf, yf cue.FieldInfo
-	var ok bool
-	for xi < sx.Len() || yi < sy.Len() {
+	for xi, yi := 0, 0; xi < sx.Len() || yi < sy.Len(); {
 		// Process zero nodes
 		for ; xi < sx.Len(); xi++ {
-			xf, ok = d.field(sx, xi)
+			xf, ok := d.field(sx, xi)
 			if !ok {
 				continue
 			}
@@ -260,7 +255,7 @@ func (d *differ) diffStruct(x, y cue.Value) (Kind, *EditScript) {
 			differs = true
 		}
 		for ; yi < sy.Len(); yi++ {
-			yf, ok = d.field(sy, yi)
+			yf, ok := d.field(sy, yi)
 			if !ok {
 				continue
 			}
@@ -268,8 +263,7 @@ func (d *differ) diffStruct(x, y cue.Value) (Kind, *EditScript) {
 				// already done
 				continue
 			}
-			xp := xMap[yf.Selector]
-			if xp > 0 {
+			if _, ok := xMap[yf.Selector]; ok {
 				break
 			}
 			yMap[yf.Selector] = 0
@@ -278,13 +272,11 @@ func (d *differ) diffStruct(x, y cue.Value) (Kind, *EditScript) {
 		}
 
 		// Compare nodes
-		var ok bool
 		for ; xi < sx.Len(); xi++ {
-			xf, ok = d.field(sx, xi)
+			xf, ok := d.field(sx, xi)
 			if !ok {
 				continue
 			}
-
 			yp := yMap[xf.Selector]
 			if yp == 0 {
 				break
@@ -292,29 +284,23 @@ func (d *differ) diffStruct(x, y cue.Value) (Kind, *EditScript) {
 			// If yp != xi+1, the topological sort was not possible.
 			yMap[xf.Selector] = 0
 
-			yf, ok := d.field(sy, int(yp-1))
+			yf, ok := d.field(sy, yp-1)
 			if !ok {
 				continue
 			}
 
-			kind := Identity
+			var kind Kind
 			var script *EditScript
 			switch {
-			case xf.IsDefinition != yf.IsDefinition,
-				xf.IsOptional != yf.IsOptional:
+			case xf.IsDefinition != yf.IsDefinition, xf.IsOptional != yf.IsOptional:
 				kind = Modified
-
 			default:
-				xv := xf.Value
-				yv := yf.Value
 				// TODO(perf): consider evaluating lazily.
-				kind, script = d.diffValue(xv, yv)
+				kind, script = d.diffValue(xf.Value, yf.Value)
 			}
 
-			edits = append(edits, Edit{kind, int32(xi + 1), yp, script})
-			if kind != Identity {
-				differs = true
-			}
+			edits = append(edits, Edit{kind, int32(xi + 1), int32(yp), script})
+			differs = differs || kind != Identity
 		}
 	}
 	if !differs {

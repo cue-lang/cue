@@ -1125,6 +1125,13 @@ func (x *SliceExpr) evaluate(c *OpContext, state combinedFlags) Value {
 				})
 				return nil
 			}
+			if v.IsDynamic {
+				// If the list is dynamic, there is no need to recompute the
+				// arcs.
+				a.Label = label
+				n.Arcs = append(n.Arcs, a)
+				continue
+			}
 			arc := *a
 			arc.Parent = n
 			arc.Label = label

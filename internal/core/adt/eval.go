@@ -54,8 +54,6 @@ func (c *OpContext) Stats() *stats.Counts {
 // 	return e.NewContext(v)
 // }
 
-var structSentinel = &StructMarker{}
-
 var incompleteSentinel = &Bottom{
 	Code: IncompleteError,
 	Err:  errors.Newf(token.NoPos, "incomplete"),
@@ -1551,7 +1549,6 @@ type envList struct {
 	id      CloseInfo
 	ignore  bool // has a self-referencing comprehension and is postponed
 	self    bool // was added as a postponed self-referencing comprehension
-	index   int
 }
 
 type envCheck struct {
@@ -2481,9 +2478,7 @@ outer:
 			IsOpen: isOpen,
 		})
 	} else {
-		if expr, _ := m.Src.(ast.Expr); expr != nil {
-			sources = append(sources, expr)
-		}
+		sources = append(sources, m.Src)
 		m.Src = ast.NewBinExpr(token.AND, sources...)
 		m.IsOpen = m.IsOpen && isOpen
 	}

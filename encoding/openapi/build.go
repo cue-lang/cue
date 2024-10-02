@@ -56,11 +56,6 @@ type buildContext struct {
 	// TODO: consider an option in the CUE API where optional fields are
 	// recursively evaluated.
 	cycleNodes []*adt.Vertex
-
-	// imports caches values as returned by cue.Value.ReferencePath
-	// for use by ReferenceFunc. It's only initialised when ReferenceFunc
-	// is non-nil.
-	imports map[cue.Value]*cue.Instance
 }
 
 type externalType struct {

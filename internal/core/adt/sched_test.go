@@ -181,9 +181,6 @@ func TestScheduler(t *testing.T) {
 
 		log   string // A lot
 		state string // A textual representation of the task state
-
-		// err holds all errors or "" if none.
-		err string
 	}
 
 	cases := []testCase{{

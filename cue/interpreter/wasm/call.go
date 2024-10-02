@@ -75,10 +75,7 @@ func encNumber(typ cue.Value, val cue.Value) (r uint64) {
 
 func decBool(v uint64) bool {
 	u := api.DecodeU32(v)
-	if u == 1 {
-		return true
-	}
-	return false
+	return u == 1
 }
 
 // decNumber decodes the the Wasm/System V ABI encoding of the

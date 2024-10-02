@@ -268,7 +268,7 @@ func TestX(t *testing.T) {
 		LogEval: 1,    // Uncomment to turn logging off
 	}
 
-	var version internal.EvaluatorVersion
+	version := internal.DefaultVersion
 	version = internal.DevVersion // comment to use default implementation.
 
 	in := `

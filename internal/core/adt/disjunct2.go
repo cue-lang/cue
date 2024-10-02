@@ -578,15 +578,6 @@ outer:
 	return append(a, x)
 }
 
-// isPartialNode reports whether a node must be evaluated as a partial node.
-func isPartialNode(d *nodeContext) bool {
-	if d.node.status == finalized {
-		return true
-	}
-	// TODO: further optimizations
-	return false
-}
-
 // findIntersections reports the closeContext, relative to the two given
 // disjunction holds, that should be used in comparing the arc set.
 // x and y MUST both be originating from the same disjunct hole. This ensures

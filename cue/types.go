@@ -944,7 +944,7 @@ func (v Value) appendJSON(ctx *adt.OpContext, b []byte) ([]byte, error) {
 		b2, err := json.Marshal(x.(*adt.Bytes).B)
 		return append(b, b2...), err
 	case adt.ListKind:
-		i, _ := v.List()
+		i := v.mustList(ctx)
 		return listAppendJSON(b, &i)
 	case adt.StructKind:
 		obj, err := v.structValData(ctx)
@@ -1327,13 +1327,19 @@ func (v Value) List() (Iterator, error) {
 	if err := v.checkKind(ctx, adt.ListKind); err != nil {
 		return Iterator{idx: v.idx, ctx: ctx}, v.toErr(err)
 	}
+	return v.mustList(ctx), nil
+}
+
+// mustList is like [Value.List], but reusing ctx and leaving it to the caller
+// to apply defaults and check the kind.
+func (v Value) mustList(ctx *adt.OpContext) Iterator {
 	arcs := []*adt.Vertex{}
 	for _, a := range v.v.Elems() {
 		if a.Label.IsInt() {
 			arcs = append(arcs, a)
 		}
 	}
-	return Iterator{idx: v.idx, ctx: ctx, val: v, arcs: arcs}, nil
+	return Iterator{idx: v.idx, ctx: ctx, val: v, arcs: arcs}
 }
 
 // Null reports an error if v is not null.

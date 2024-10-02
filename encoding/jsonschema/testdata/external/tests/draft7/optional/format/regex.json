@@ -43,11 +43,7 @@
 			{
 				"description": "a regular expression with unclosed parens is invalid",
 				"data": "^(abc]",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	}

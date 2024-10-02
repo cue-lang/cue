@@ -58,48 +58,40 @@
 			{
 				"description": "a valid date-time with a leap second, UTC",
 				"data": "1998-12-31T23:59:60Z",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v2": "6 errors in empty disjunction:\nconflicting values \"1998-12-31T23:59:60Z\" and [...] (mismatched types string and list):\n    generated.cue:3:1\n    generated.cue:3:36\n    instance.json:1:1\nconflicting values \"1998-12-31T23:59:60Z\" and bool (mismatched types string and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values \"1998-12-31T23:59:60Z\" and null (mismatched types string and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values \"1998-12-31T23:59:60Z\" and number (mismatched types string and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values \"1998-12-31T23:59:60Z\" and {...} (mismatched types string and struct):\n    generated.cue:3:1\n    generated.cue:3:44\n    instance.json:1:1\ninvalid value \"1998-12-31T23:59:60Z\" (does not satisfy time.Time): error in call to time.Time: invalid time \"1998-12-31T23:59:60Z\":\n    generated.cue:1:1\n    instance.json:1:1\n",
+					"v3": "conflicting values \"1998-12-31T23:59:60Z\" and [...] (mismatched types string and list):\n    generated.cue:3:36\n    instance.json:1:1\nconflicting values \"1998-12-31T23:59:60Z\" and bool (mismatched types string and bool):\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values \"1998-12-31T23:59:60Z\" and null (mismatched types string and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values \"1998-12-31T23:59:60Z\" and number (mismatched types string and number):\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values \"1998-12-31T23:59:60Z\" and {...} (mismatched types string and struct):\n    generated.cue:3:44\n    instance.json:1:1\ninvalid value \"1998-12-31T23:59:60Z\" (does not satisfy time.Time): error in call to time.Time: invalid time \"1998-12-31T23:59:60Z\":\n    generated.cue:1:1\n    instance.json:1:1\n"
+				}
 			},
 			{
 				"description": "a valid date-time with a leap second, with minus offset",
 				"data": "1998-12-31T15:59:60.123-08:00",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v2": "6 errors in empty disjunction:\nconflicting values \"1998-12-31T15:59:60.123-08:00\" and [...] (mismatched types string and list):\n    generated.cue:3:1\n    generated.cue:3:36\n    instance.json:1:1\nconflicting values \"1998-12-31T15:59:60.123-08:00\" and bool (mismatched types string and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values \"1998-12-31T15:59:60.123-08:00\" and null (mismatched types string and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values \"1998-12-31T15:59:60.123-08:00\" and number (mismatched types string and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values \"1998-12-31T15:59:60.123-08:00\" and {...} (mismatched types string and struct):\n    generated.cue:3:1\n    generated.cue:3:44\n    instance.json:1:1\ninvalid value \"1998-12-31T15:59:60.123-08:00\" (does not satisfy time.Time): error in call to time.Time: invalid time \"1998-12-31T15:59:60.123-08:00\":\n    generated.cue:1:1\n    instance.json:1:1\n",
+					"v3": "conflicting values \"1998-12-31T15:59:60.123-08:00\" and [...] (mismatched types string and list):\n    generated.cue:3:36\n    instance.json:1:1\nconflicting values \"1998-12-31T15:59:60.123-08:00\" and bool (mismatched types string and bool):\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values \"1998-12-31T15:59:60.123-08:00\" and null (mismatched types string and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values \"1998-12-31T15:59:60.123-08:00\" and number (mismatched types string and number):\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values \"1998-12-31T15:59:60.123-08:00\" and {...} (mismatched types string and struct):\n    generated.cue:3:44\n    instance.json:1:1\ninvalid value \"1998-12-31T15:59:60.123-08:00\" (does not satisfy time.Time): error in call to time.Time: invalid time \"1998-12-31T15:59:60.123-08:00\":\n    generated.cue:1:1\n    instance.json:1:1\n"
+				}
 			},
 			{
 				"description": "an invalid date-time past leap second, UTC",
 				"data": "1998-12-31T23:59:61Z",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "an invalid date-time with leap second on a wrong minute, UTC",
 				"data": "1998-12-31T23:58:60Z",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "an invalid date-time with leap second on a wrong hour, UTC",
 				"data": "1998-12-31T22:59:60Z",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "an invalid day in date-time string",
 				"data": "1990-02-31T15:59:59.123-08:00",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "an invalid offset in date-time string",
@@ -113,70 +105,46 @@
 			{
 				"description": "an invalid closing Z after time-zone offset",
 				"data": "1963-06-19T08:30:06.28123+01:00Z",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "an invalid date-time string",
 				"data": "06/19/1963 08:30:06 PST",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "case-insensitive T and Z",
 				"data": "1963-06-19t08:30:06.283185z",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v2": "6 errors in empty disjunction:\nconflicting values \"1963-06-19t08:30:06.283185z\" and [...] (mismatched types string and list):\n    generated.cue:3:1\n    generated.cue:3:36\n    instance.json:1:1\nconflicting values \"1963-06-19t08:30:06.283185z\" and bool (mismatched types string and bool):\n    generated.cue:3:1\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values \"1963-06-19t08:30:06.283185z\" and null (mismatched types string and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values \"1963-06-19t08:30:06.283185z\" and number (mismatched types string and number):\n    generated.cue:3:1\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values \"1963-06-19t08:30:06.283185z\" and {...} (mismatched types string and struct):\n    generated.cue:3:1\n    generated.cue:3:44\n    instance.json:1:1\ninvalid value \"1963-06-19t08:30:06.283185z\" (does not satisfy time.Time): error in call to time.Time: invalid time \"1963-06-19t08:30:06.283185z\":\n    generated.cue:1:1\n    instance.json:1:1\n",
+					"v3": "conflicting values \"1963-06-19t08:30:06.283185z\" and [...] (mismatched types string and list):\n    generated.cue:3:36\n    instance.json:1:1\nconflicting values \"1963-06-19t08:30:06.283185z\" and bool (mismatched types string and bool):\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values \"1963-06-19t08:30:06.283185z\" and null (mismatched types string and null):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values \"1963-06-19t08:30:06.283185z\" and number (mismatched types string and number):\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values \"1963-06-19t08:30:06.283185z\" and {...} (mismatched types string and struct):\n    generated.cue:3:44\n    instance.json:1:1\ninvalid value \"1963-06-19t08:30:06.283185z\" (does not satisfy time.Time): error in call to time.Time: invalid time \"1963-06-19t08:30:06.283185z\":\n    generated.cue:1:1\n    instance.json:1:1\n"
+				}
 			},
 			{
 				"description": "only RFC3339 not all of ISO 8601 are valid",
 				"data": "2013-350T01:01:01",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "invalid non-padded month dates",
 				"data": "1963-6-19T08:30:06.283185Z",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "invalid non-padded day dates",
 				"data": "1963-06-1T08:30:06.283185Z",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "invalid non-ASCII '৪' (a Bengali 4) in date portion",
 				"data": "1963-06-1৪T00:00:00Z",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "invalid non-ASCII '৪' (a Bengali 4) in time portion",
 				"data": "1963-06-11T0৪:00:00Z",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	}

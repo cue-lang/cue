@@ -204,17 +204,24 @@ func (d *differ) diffValue(x, y cue.Value) (Kind, *EditScript) {
 	return Identity, nil
 }
 
-func (d *differ) field(s *cue.Struct, i int) (_ cue.FieldInfo, ok bool) {
-	f := s.Field(i)
-	if d.cfg.SkipHidden && f.IsHidden {
-		return cue.FieldInfo{}, false
+type field struct {
+	sel cue.Selector
+	val cue.Value
+}
+
+// TODO(mvdan): use slices.Collect once we swap cue.Iterator for a Go iterator
+func (d *differ) collectFields(v cue.Value) []field {
+	iter, _ := v.Fields(cue.Hidden(!d.cfg.SkipHidden), cue.Definitions(true), cue.Optional(true))
+	var fields []field
+	for iter.Next() {
+		fields = append(fields, field{iter.Selector(), iter.Value()})
 	}
-	return f, true
+	return fields
 }
 
 func (d *differ) diffStruct(x, y cue.Value) (Kind, *EditScript) {
-	sx, _ := x.Struct()
-	sy, _ := y.Struct()
+	xFields := d.collectFields(x)
+	yFields := d.collectFields(y)
 
 	// Best-effort topological sort, prioritizing x over y, using a variant of
 	// Kahn's algorithm (see, for instance
@@ -222,81 +229,63 @@ func (d *differ) diffStruct(x, y cue.Value) (Kind, *EditScript) {
 	// We assume that the order of the elements of each value indicate an edge
 	// in the graph. This means that only the next unprocessed nodes can be
 	// those with no incoming edges.
-	xMap := make(map[string]struct{}, sx.Len())
-	yMap := make(map[string]int, sy.Len())
-	for i := 0; i < sx.Len(); i++ {
-		f, ok := d.field(sx, i)
-		if ok {
-			xMap[f.Selector] = struct{}{}
-		}
+	xMap := make(map[cue.Selector]struct{}, len(xFields))
+	yMap := make(map[cue.Selector]int, len(yFields))
+	for _, f := range xFields {
+		xMap[f.sel] = struct{}{}
 	}
-	for i := 0; i < sy.Len(); i++ {
-		f, ok := d.field(sy, i)
-		if ok {
-			yMap[f.Selector] = i + 1
-		}
+	for i, f := range yFields {
+		yMap[f.sel] = i + 1
 	}
 
 	edits := []Edit{}
 	differs := false
 
-	for xi, yi := 0, 0; xi < sx.Len() || yi < sy.Len(); {
+	for xi, yi := 0, 0; xi < len(xFields) || yi < len(yFields); {
 		// Process zero nodes
-		for ; xi < sx.Len(); xi++ {
-			xf, ok := d.field(sx, xi)
-			if !ok {
-				continue
-			}
-			yp := yMap[xf.Selector]
+		for ; xi < len(xFields); xi++ {
+			xf := xFields[xi]
+			yp := yMap[xf.sel]
 			if yp > 0 {
 				break
 			}
 			edits = append(edits, Edit{UniqueX, int32(xi + 1), 0, nil})
 			differs = true
 		}
-		for ; yi < sy.Len(); yi++ {
-			yf, ok := d.field(sy, yi)
-			if !ok {
-				continue
-			}
-			if yMap[yf.Selector] == 0 {
+		for ; yi < len(yFields); yi++ {
+			yf := yFields[yi]
+			if yMap[yf.sel] == 0 {
 				// already done
 				continue
 			}
-			if _, ok := xMap[yf.Selector]; ok {
+			if _, ok := xMap[yf.sel]; ok {
 				break
 			}
-			yMap[yf.Selector] = 0
+			yMap[yf.sel] = 0
 			edits = append(edits, Edit{UniqueY, 0, int32(yi + 1), nil})
 			differs = true
 		}
 
 		// Compare nodes
-		for ; xi < sx.Len(); xi++ {
-			xf, ok := d.field(sx, xi)
-			if !ok {
-				continue
-			}
-			yp := yMap[xf.Selector]
+		for ; xi < len(xFields); xi++ {
+			xf := xFields[xi]
+			yp := yMap[xf.sel]
 			if yp == 0 {
 				break
 			}
 			// If yp != xi+1, the topological sort was not possible.
-			yMap[xf.Selector] = 0
+			yMap[xf.sel] = 0
 
-			yf, ok := d.field(sy, yp-1)
-			if !ok {
-				continue
-			}
+			yf := yFields[yp-1]
 
 			var kind Kind
 			var script *EditScript
 			switch {
-			case xf.IsDefinition != yf.IsDefinition, xf.IsOptional != yf.IsOptional:
+			case xf.sel.IsDefinition() != yf.sel.IsDefinition(), xf.sel.ConstraintType() != yf.sel.ConstraintType():
 				kind = Modified
 			default:
 				// TODO(perf): consider evaluating lazily.
-				kind, script = d.diffValue(xf.Value, yf.Value)
+				kind, script = d.diffValue(xf.val, yf.val)
 			}
 
 			edits = append(edits, Edit{kind, int32(xi + 1), int32(yp), script})

@@ -32,7 +32,7 @@ var formatFuncs = sync.OnceValue(func() map[string]formatFuncInfo {
 		"byte":                  {openAPI, formatTODO},
 		"data":                  {openAPI, formatTODO},
 		"date":                  {vfrom(VersionDraft7), formatTODO},
-		"date-time":             {allVersions | openAPI, formatTODO},
+		"date-time":             {allVersions | openAPI, formatDateTime},
 		"double":                {openAPI, formatTODO},
 		"duration":              {vfrom(VersionDraft2019_09), formatTODO},
 		"email":                 {allVersions | openAPI, formatTODO},
@@ -91,6 +91,13 @@ func formatURI(n cue.Value, s *state) {
 
 func formatURIReference(n cue.Value, s *state) {
 	s.add(n, stringType, ast.NewSel(s.addImport(n, "net"), "URL"))
+}
+
+func formatDateTime(n cue.Value, s *state) {
+	// TODO this is a bit stricter than the spec, because the spec
+	// allows lower-case "T" and "Z", and leap seconds, but
+	// it's not bad for now.
+	s.add(n, stringType, ast.NewSel(s.addImport(n, "time"), "Time"))
 }
 
 func formatTODO(n cue.Value, s *state) {}

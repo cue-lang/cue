@@ -8,4 +8,6 @@ components:
         format: date-time
 
 -- out/decode/extract --
-#DateTime: string
+import "time"
+
+#DateTime: time.Time

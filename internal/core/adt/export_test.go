@@ -91,7 +91,7 @@ func (x *FieldTester) Def(sub ...declaration) declaration {
 func (x *FieldTester) spawn(t closeNodeType, sub ...declaration) declaration {
 	return func(cc *closeContext) {
 		ci := CloseInfo{cc: cc}
-		ci, dc := ci.spawnCloseContext(x.n.ctx, t)
+		_, dc := ci.spawnCloseContext(x.n.ctx, t)
 
 		dc.incDependent(x.n.ctx, TEST, nil)
 		for _, sfn := range sub {

@@ -15,6 +15,7 @@
 package net
 
 import (
+	"errors"
 	"net/url"
 )
 
@@ -47,4 +48,24 @@ func QueryEscape(s string) string {
 // digits.
 func QueryUnescape(s string) (string, error) {
 	return url.QueryUnescape(s)
+}
+
+// URL validates that s is a valid relative or absolute URL.
+// Note: this does also allow non-ASCII characters.
+func URL(s string) (bool, error) {
+	_, err := url.Parse(s)
+	return err == nil, err
+}
+
+// URL validates that s is an absolute URL.
+// Note: this does also allow non-ASCII characters.
+func AbsURL(s string) (bool, error) {
+	u, err := url.Parse(s)
+	if err != nil {
+		return false, err
+	}
+	if !u.IsAbs() {
+		return false, errors.New("URL is not absolute")
+	}
+	return true, nil
 }

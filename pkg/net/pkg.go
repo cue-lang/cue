@@ -285,5 +285,29 @@ var p = &pkg.Package{
 				c.Ret, c.Err = QueryUnescape(s)
 			}
 		},
+	}, {
+		Name: "URL",
+		Params: []pkg.Param{
+			{Kind: adt.StringKind},
+		},
+		Result: adt.BoolKind,
+		Func: func(c *pkg.CallCtxt) {
+			s := c.String(0)
+			if c.Do() {
+				c.Ret, c.Err = URL(s)
+			}
+		},
+	}, {
+		Name: "AbsURL",
+		Params: []pkg.Param{
+			{Kind: adt.StringKind},
+		},
+		Result: adt.BoolKind,
+		Func: func(c *pkg.CallCtxt) {
+			s := c.String(0)
+			if c.Do() {
+				c.Ret, c.Err = AbsURL(s)
+			}
+		},
 	}},
 }

@@ -72,29 +72,17 @@
 			{
 				"description": "an invalid relative IRI Reference",
 				"data": "/abc",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "an invalid IRI",
 				"data": "\\\\WINDOWS\\filëßåré",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "an invalid IRI though valid IRI reference",
 				"data": "âππ",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	}

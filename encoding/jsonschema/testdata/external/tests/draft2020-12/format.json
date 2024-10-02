@@ -655,7 +655,11 @@
 			{
 				"description": "invalid uri string is only an annotation by default",
 				"data": "//foo.bar/?baz=qux#quux",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v2": "6 errors in empty disjunction:\nconflicting values \"//foo.bar/?baz=qux#quux\" and [...] (mismatched types string and list):\n    generated.cue:4:1\n    generated.cue:4:37\n    instance.json:1:1\nconflicting values \"//foo.bar/?baz=qux#quux\" and bool (mismatched types string and bool):\n    generated.cue:4:1\n    generated.cue:4:8\n    instance.json:1:1\nconflicting values \"//foo.bar/?baz=qux#quux\" and null (mismatched types string and null):\n    generated.cue:4:1\n    instance.json:1:1\nconflicting values \"//foo.bar/?baz=qux#quux\" and number (mismatched types string and number):\n    generated.cue:4:1\n    generated.cue:4:15\n    instance.json:1:1\nconflicting values \"//foo.bar/?baz=qux#quux\" and {...} (mismatched types string and struct):\n    generated.cue:4:1\n    generated.cue:4:45\n    instance.json:1:1\ninvalid value \"//foo.bar/?baz=qux#quux\" (does not satisfy net.AbsURL): error in call to net.AbsURL: URL \"//foo.bar/?baz=qux#quux\" is not absolute:\n    generated.cue:1:1\n    instance.json:1:1\n",
+					"v3": "conflicting values \"//foo.bar/?baz=qux#quux\" and [...] (mismatched types string and list):\n    generated.cue:4:37\n    instance.json:1:1\nconflicting values \"//foo.bar/?baz=qux#quux\" and bool (mismatched types string and bool):\n    generated.cue:4:8\n    instance.json:1:1\nconflicting values \"//foo.bar/?baz=qux#quux\" and null (mismatched types string and null):\n    generated.cue:4:1\n    instance.json:1:1\nconflicting values \"//foo.bar/?baz=qux#quux\" and number (mismatched types string and number):\n    generated.cue:4:15\n    instance.json:1:1\nconflicting values \"//foo.bar/?baz=qux#quux\" and {...} (mismatched types string and struct):\n    generated.cue:4:45\n    instance.json:1:1\ninvalid value \"//foo.bar/?baz=qux#quux\" (does not satisfy net.AbsURL): error in call to net.AbsURL: URL \"//foo.bar/?baz=qux#quux\" is not absolute:\n    generated.cue:1:1\n    instance.json:1:1\n"
+				}
 			}
 		]
 	},

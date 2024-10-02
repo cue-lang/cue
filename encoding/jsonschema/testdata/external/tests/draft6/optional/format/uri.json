@@ -103,65 +103,37 @@
 			{
 				"description": "an invalid protocol-relative URI Reference",
 				"data": "//foo.bar/?baz=qux#quux",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "an invalid relative URI Reference",
 				"data": "/abc",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "an invalid URI",
 				"data": "\\\\WINDOWS\\fileshare",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "an invalid URI though valid URI reference",
 				"data": "abc",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "an invalid URI with spaces",
 				"data": "http:// shouldfail.com",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "an invalid URI with spaces and missing scheme",
 				"data": ":// should fail",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "an invalid URI with comma in scheme",
 				"data": "bar,baz:foo",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	}

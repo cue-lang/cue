@@ -84,29 +84,29 @@ func (p *printer) printf(format string, args ...interface{}) {
 }
 
 func (p *printer) script(e *EditScript) {
-	switch e.x.Kind() {
+	switch e.X.Kind() {
 	case cue.StructKind:
 		p.printStruct(e)
 	case cue.ListKind:
 		p.printList(e)
 	default:
-		p.printElem("-", e.x)
-		p.printElem("+", e.y)
+		p.printElem("-", e.X)
+		p.printElem("+", e.Y)
 	}
 }
 
 func (p *printer) findRun(es *EditScript, i int) (start, end int) {
 	lastEnd := i
 
-	for ; i < es.Len() && es.edits[i].kind == Identity; i++ {
+	for ; i < len(es.Edits) && es.Edits[i].Kind == Identity; i++ {
 	}
 	start = i
 
 	// Find end of run
 	include := p.context
-	for ; i < es.Len(); i++ {
-		e := es.edits[i]
-		if e.kind != Identity {
+	for ; i < len(es.Edits); i++ {
+		e := es.Edits[i]
+		if e.Kind != Identity {
 			include = p.context + 1
 			continue
 		}
@@ -138,7 +138,7 @@ func (p *printer) printStruct(es *EditScript) {
 	}()
 
 	var start, i int
-	for i < es.Len() {
+	for i < len(es.Edits) {
 		lastEnd := i
 		// Find provisional start of run.
 		start, i = p.findRun(es, i)
@@ -146,7 +146,7 @@ func (p *printer) printStruct(es *EditScript) {
 		p.printSkipped(start - lastEnd)
 		p.printFieldRun(es, start, i)
 	}
-	p.printSkipped(es.Len() - i)
+	p.printSkipped(len(es.Edits) - i)
 }
 
 func (p *printer) printList(es *EditScript) {
@@ -157,11 +157,11 @@ func (p *printer) printList(es *EditScript) {
 		p.println("]")
 	}()
 
-	x := getElems(es.x)
-	y := getElems(es.y)
+	x := getElems(es.X)
+	y := getElems(es.Y)
 
 	var start, i int
-	for i < es.Len() {
+	for i < len(es.Edits) {
 		lastEnd := i
 		// Find provisional start of run.
 		start, i = p.findRun(es, i)
@@ -169,7 +169,7 @@ func (p *printer) printList(es *EditScript) {
 		p.printSkipped(start - lastEnd)
 		p.printElemRun(es, x, y, start, i)
 	}
-	p.printSkipped(es.Len() - i)
+	p.printSkipped(len(es.Edits) - i)
 }
 
 func getElems(x cue.Value) (a []cue.Value) {
@@ -194,63 +194,63 @@ func (p *printer) printValue(v cue.Value) {
 func (p *printer) printFieldRun(es *EditScript, start, end int) {
 	// Determine max field len.
 	for i := start; i < end; i++ {
-		e := es.edits[i]
+		e := es.Edits[i]
 
-		switch e.kind {
+		switch e.Kind {
 		case UniqueX:
-			p.printField("-", es, es.LabelX(i), es.ValueX(i))
+			p.printField("-", e.XSel.String(), es.X.LookupPath(cue.MakePath(e.XSel)))
 
 		case UniqueY:
-			p.printField("+", es, es.LabelY(i), es.ValueY(i))
+			p.printField("+", e.YSel.String(), es.Y.LookupPath(cue.MakePath(e.YSel)))
 
 		case Modified:
-			if e.sub != nil {
-				io.WriteString(p, es.LabelX(i))
-				io.WriteString(p, " ")
-				p.script(e.sub)
+			if e.Sub != nil {
+				io.WriteString(p, e.XSel.String())
+				io.WriteString(p, ": ")
+				p.script(e.Sub)
 				break
 			}
 			// TODO: show per-line differences for multiline strings.
-			p.printField("-", es, es.LabelX(i), es.ValueX(i))
-			p.printField("+", es, es.LabelY(i), es.ValueY(i))
+			p.printField("-", e.XSel.String(), es.X.LookupPath(cue.MakePath(e.XSel)))
+			p.printField("+", e.YSel.String(), es.Y.LookupPath(cue.MakePath(e.YSel)))
 
 		case Identity:
 			// TODO: write on one line
-			p.printField("", es, es.LabelX(i), es.ValueX(i))
+			p.printField("", e.XSel.String(), es.X.LookupPath(cue.MakePath(e.XSel)))
 		}
 	}
 }
 
-func (p *printer) printField(prefix string, es *EditScript, label string, v cue.Value) {
+func (p *printer) printField(prefix string, label string, v cue.Value) {
 	p.prefix = prefix
 	io.WriteString(p, label)
-	io.WriteString(p, " ")
+	io.WriteString(p, ": ")
 	p.printValue(v)
 	io.WriteString(p, "\n")
 	p.prefix = ""
 }
 
 func (p *printer) printElemRun(es *EditScript, x, y []cue.Value, start, end int) {
-	for _, e := range es.edits[start:end] {
-		switch e.kind {
+	for _, e := range es.Edits[start:end] {
+		switch e.Kind {
 		case UniqueX:
-			p.printElem("-", x[e.XPos()])
+			p.printElem("-", x[e.XSel.Index()])
 
 		case UniqueY:
-			p.printElem("+", y[e.YPos()])
+			p.printElem("+", y[e.YSel.Index()])
 
 		case Modified:
-			if e.sub != nil {
-				p.script(e.sub)
+			if e.Sub != nil {
+				p.script(e.Sub)
 				break
 			}
 			// TODO: show per-line differences for multiline strings.
-			p.printElem("-", x[e.XPos()])
-			p.printElem("+", y[e.YPos()])
+			p.printElem("-", x[e.XSel.Index()])
+			p.printElem("+", y[e.YSel.Index()])
 
 		case Identity:
 			// TODO: write on one line
-			p.printElem("", x[e.XPos()])
+			p.printElem("", x[e.XSel.Index()])
 		}
 	}
 }

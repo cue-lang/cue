@@ -58,7 +58,7 @@ func (p *Profile) Diff(x, y cue.Value) (Kind, *EditScript) {
 	d := differ{cfg: *p}
 	k, es := d.diffValue(x, y)
 	if k == Modified && es == nil {
-		es = &EditScript{x: x, y: y}
+		es = &EditScript{X: x, Y: y}
 	}
 	return k, es
 }
@@ -80,88 +80,17 @@ const (
 // EditScript represents the series of differences between two CUE values.
 // x and y must be either both list or struct.
 type EditScript struct {
-	x, y  cue.Value
-	edits []Edit
-}
-
-// Len returns the number of edits.
-func (es *EditScript) Len() int {
-	return len(es.edits)
-}
-
-// Label returns a string representation of the label.
-func (es *EditScript) LabelX(i int) string {
-	e := es.edits[i]
-	p := e.XPos()
-	if p < 0 {
-		return ""
-	}
-	return label(es.x, p)
-}
-
-func (es *EditScript) LabelY(i int) string {
-	e := es.edits[i]
-	p := e.YPos()
-	if p < 0 {
-		return ""
-	}
-	return label(es.y, p)
-}
-
-// TODO: support label expressions.
-func label(v cue.Value, i int) string {
-	st, err := v.Struct()
-	if err != nil {
-		return ""
-	}
-
-	// TODO: return formatted expression for optionals.
-	f := st.Field(i)
-	str := f.Selector
-	if f.IsOptional {
-		str += "?"
-	}
-	str += ":"
-	return str
-}
-
-// ValueX returns the value of X involved at step i.
-func (es *EditScript) ValueX(i int) (v cue.Value) {
-	p := es.edits[i].XPos()
-	if p < 0 {
-		return v
-	}
-	st, err := es.x.Struct()
-	if err != nil {
-		return v
-	}
-	return st.Field(p).Value
-}
-
-// ValueY returns the value of Y involved at step i.
-func (es *EditScript) ValueY(i int) (v cue.Value) {
-	p := es.edits[i].YPos()
-	if p < 0 {
-		return v
-	}
-	st, err := es.y.Struct()
-	if err != nil {
-		return v
-	}
-	return st.Field(p).Value
+	X, Y  cue.Value
+	Edits []Edit
 }
 
 // Edit represents a single operation within an edit-script.
 type Edit struct {
-	kind Kind
-	xPos int32       // 0 if UniqueY
-	yPos int32       // 0 if UniqueX
-	sub  *EditScript // non-nil if Modified
+	Kind Kind
+	XSel cue.Selector // valid if UniqueY
+	YSel cue.Selector // valid if UniqueX
+	Sub  *EditScript  // non-nil if Modified
 }
-
-func (e Edit) Kind() Kind { return e.kind }
-func (e Edit) XPos() int  { return int(e.xPos - 1) }
-func (e Edit) YPos() int  { return int(e.yPos - 1) }
 
 type differ struct {
 	cfg Profile
@@ -249,7 +178,7 @@ func (d *differ) diffStruct(x, y cue.Value) (Kind, *EditScript) {
 			if yp > 0 {
 				break
 			}
-			edits = append(edits, Edit{UniqueX, int32(xi + 1), 0, nil})
+			edits = append(edits, Edit{UniqueX, xf.sel, cue.Selector{}, nil})
 			differs = true
 		}
 		for ; yi < len(yFields); yi++ {
@@ -262,7 +191,7 @@ func (d *differ) diffStruct(x, y cue.Value) (Kind, *EditScript) {
 				break
 			}
 			yMap[yf.sel] = 0
-			edits = append(edits, Edit{UniqueY, 0, int32(yi + 1), nil})
+			edits = append(edits, Edit{UniqueY, cue.Selector{}, yf.sel, nil})
 			differs = true
 		}
 
@@ -288,14 +217,14 @@ func (d *differ) diffStruct(x, y cue.Value) (Kind, *EditScript) {
 				kind, script = d.diffValue(xf.val, yf.val)
 			}
 
-			edits = append(edits, Edit{kind, int32(xi + 1), int32(yp), script})
+			edits = append(edits, Edit{kind, xf.sel, yf.sel, script})
 			differs = differs || kind != Identity
 		}
 	}
 	if !differs {
 		return Identity, nil
 	}
-	return Modified, &EditScript{x: x, y: y, edits: edits}
+	return Modified, &EditScript{X: x, Y: y, Edits: edits}
 }
 
 // TODO: right now we do a simple element-by-element comparison. Instead,
@@ -307,7 +236,7 @@ func (d *differ) diffList(x, y cue.Value) (Kind, *EditScript) {
 
 	edits := []Edit{}
 	differs := false
-	i := int32(1)
+	i := 0
 
 	for {
 		// TODO: This would be much easier with a Next/Done API.
@@ -316,7 +245,7 @@ func (d *differ) diffList(x, y cue.Value) (Kind, *EditScript) {
 		if !hasX {
 			for hasY {
 				differs = true
-				edits = append(edits, Edit{UniqueY, 0, i, nil})
+				edits = append(edits, Edit{UniqueY, cue.Selector{}, cue.Index(i), nil})
 				hasY = iy.Next()
 				i++
 			}
@@ -325,7 +254,7 @@ func (d *differ) diffList(x, y cue.Value) (Kind, *EditScript) {
 		if !hasY {
 			for hasX {
 				differs = true
-				edits = append(edits, Edit{UniqueX, i, 0, nil})
+				edits = append(edits, Edit{UniqueX, cue.Index(i), cue.Selector{}, nil})
 				hasX = ix.Next()
 				i++
 			}
@@ -337,11 +266,11 @@ func (d *differ) diffList(x, y cue.Value) (Kind, *EditScript) {
 		if kind != Identity {
 			differs = true
 		}
-		edits = append(edits, Edit{kind, i, i, script})
+		edits = append(edits, Edit{kind, cue.Index(i), cue.Index(i), script})
 		i++
 	}
 	if !differs {
 		return Identity, nil
 	}
-	return Modified, &EditScript{x: x, y: y, edits: edits}
+	return Modified, &EditScript{X: x, Y: y, Edits: edits}
 }

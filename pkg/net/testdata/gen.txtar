@@ -31,11 +31,26 @@ t25: net.IPv6 & "2001:db8::1234567"
 t26: net.IPv6("2001:db8::1")
 t27: net.IPv6() & "23.23.23.23"
 t28: net.IP("0:0:0:0:0:0:23.23.23.23")
+t29: net.URL & "/foo/bar"
+t30: net.URL & "%"
+t31: net.URL & "https://foo.com/bar"
+t32: net.AbsURL & "/foo/bar"
+t33: net.AbsURL & "https://foo.com/bar"
+t34: net.AbsURL & "%"
 -- out/net --
 Errors:
 t25: invalid value "2001:db8::1234567" (does not satisfy net.IPv6):
     ./in.cue:27:6
     ./in.cue:27:17
+t30: invalid value "%" (does not satisfy net.URL): error in call to net.URL: parse "%": invalid URL escape "%":
+    ./in.cue:32:6
+    ./in.cue:32:16
+t32: invalid value "/foo/bar" (does not satisfy net.AbsURL): error in call to net.AbsURL: URL is not absolute:
+    ./in.cue:34:6
+    ./in.cue:34:19
+t34: invalid value "%" (does not satisfy net.AbsURL): error in call to net.AbsURL: parse "%": invalid URL escape "%":
+    ./in.cue:36:6
+    ./in.cue:36:19
 t9: invalid value "23.23.23.2333" (does not satisfy net.IPv4):
     ./in.cue:11:6
     ./in.cue:11:17
@@ -79,3 +94,9 @@ t25: _|_ // t25: invalid value "2001:db8::1234567" (does not satisfy net.IPv6)
 t26: true
 t27: _|_ // t27: invalid value "23.23.23.23" (does not satisfy net.IPv6)
 t28: true
+t29: "/foo/bar"
+t30: _|_ // t30: invalid value "%" (does not satisfy net.URL): t30: error in call to net.URL: parse "%": invalid URL escape "%"
+t31: "https://foo.com/bar"
+t32: _|_ // t32: invalid value "/foo/bar" (does not satisfy net.AbsURL): t32: error in call to net.AbsURL: URL is not absolute
+t33: "https://foo.com/bar"
+t34: _|_ // t34: invalid value "%" (does not satisfy net.AbsURL): t34: error in call to net.AbsURL: parse "%": invalid URL escape "%"

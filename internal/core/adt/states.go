@@ -243,8 +243,9 @@ func stateCompletions(s *scheduler) condition {
 	s.node.Logf("=== stateCompletions: %v  %v", v.Label, s.completed)
 	if x.meets(allAncestorsProcessed) {
 		x |= conditionsUsingCounters &^ s.provided
-		// If we have a pending arc, a sub arc may still cause the arc to
-		// become not pending. For instance, if 'a' is pending in the following
+		// If we have a pending or constraint arc, a sub arc may still cause the
+		// arc to become a member. For instance, if 'a' is pending in the
+		// following
 		//   if x != _!_ {
 		//       a: b: 1
 		//   }

@@ -152,7 +152,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	// Note that if mode is final, we will guarantee that the conditions for
 	// this if clause are met down the line. So we assume this is already the
 	// case and set the signal accordingly if so.
-	if v.Label.IsLet() || v.IsDynamic || v.Parent.allChildConjunctsKnown() || mode == finalize {
+	if !v.Rooted() || v.Parent.allChildConjunctsKnown() || mode == finalize {
 		n.signal(allAncestorsProcessed)
 	}
 

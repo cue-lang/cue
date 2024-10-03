@@ -96,13 +96,39 @@ package adt
 // There are two key types of structural cycles: referencing an ancestor and
 // repeated mixing in of cyclic types. We track these separately.
 //
-// The first kind is relatively easy to detect by simply checking if a resolved
-// reference is a direct parent, or is a node that is currently under
+// We also keep track the non-cyclicity of conjuncts a bit differently for these
+// cases.
+//
+// ### Ancestor References
+//
+// Ancestor references are relatively easy to detect by simply checking if a
+// resolved reference is a direct parent, or is a node that is currently under
 // evaluation.
 //
-// For the second kind, we need to maintain a per-conjunct list of references.
-// When a reference was previously resolved in a conjunct, we may have a cycle
-// and will mark the conjunct as such.
+// An ancestor cycle is considered to be a structural cycle if there are no
+// new sibling conjuncts associated with new structure.
+//
+// ### Reoccurring references
+//
+// For reoccuring references, we need to maintain a per-conjunct list of
+// references. When a reference was previously resolved in a conjunct, we may
+// have a cycle and will mark the conjunct as such.
+//
+// A references from a reoccurring reference is a structural cycle if there are
+// no incoming arcs from any non-cyclic conjunct. This need for this subtle
+// distinction can be clarified by an example;
+//
+// 		crossRefNoCycle: t4: {
+// 			T: X={
+// 				y: X.x
+// 			}
+//			// Here C.x.y must consider any incoming arc: here T originates from
+//			// a non-cyclic conjunct, but once evaluated it becomes cyclic and
+//			// will be the only conjunct. This is not a cycle, though. We must
+//			// take into account that T was introduced from a non-cyclic
+//			// conjunct.
+// 			C: T & { x: T }
+// 		}
 //
 //
 // ## OPTIONAL PATHS
@@ -605,7 +631,7 @@ func (n *nodeContext) detectCycleV3(arc *Vertex, env *Environment, x Resolver, c
 				return ci, false
 			}
 
-			return n.markCyclicV3(arc, env, x, ci)
+			return n.markCyclicPathV3(arc, env, x, ci)
 		}
 	}
 
@@ -627,8 +653,26 @@ func (n *nodeContext) markCyclicV3(arc *Vertex, env *Environment, x Resolver, ci
 	ci.IsCyclic = true
 
 	n.hasCycle = true
+	n.hasAncestorCycle = true
 
 	if !n.hasNonCycle && env != nil {
+		// TODO: investigate if we can get rid of cyclicConjuncts in the new
+		// evaluator.
+		v := Conjunct{env, x, ci}
+		n.node.cc.incDependent(n.ctx, DEFER, nil)
+		n.cyclicConjuncts = append(n.cyclicConjuncts, cyclicConjunct{v, arc})
+		return ci, true
+	}
+	return ci, false
+}
+
+func (n *nodeContext) markCyclicPathV3(arc *Vertex, env *Environment, x Resolver, ci CloseInfo) (CloseInfo, bool) {
+	ci.CycleType = IsCyclic
+	ci.IsCyclic = true
+
+	n.hasCycle = true
+
+	if !n.hasNonCyclic && env != nil {
 		// TODO: investigate if we can get rid of cyclicConjuncts in the new
 		// evaluator.
 		v := Conjunct{env, x, ci}
@@ -1020,15 +1064,26 @@ func (n *nodeContext) updateCyclicStatus(c CloseInfo) {
 	}
 }
 
-func assertStructuralCycle(n *nodeContext) bool {
+func assertStructuralCycleV3(n *nodeContext) bool {
 	// TODO: is this the right place to put it?
-	if n.ctx.isDevVersion() {
-		for range n.cyclicConjuncts {
-			n.node.cc.decDependent(n.ctx, DEFER, nil)
-		}
-		n.cyclicConjuncts = n.cyclicConjuncts[:0]
+	for range n.cyclicConjuncts {
+		n.node.cc.decDependent(n.ctx, DEFER, nil)
+	}
+	n.cyclicConjuncts = n.cyclicConjuncts[:0]
+
+	if n.hasAncestorCycle && !n.hasNonCycle {
+		n.reportCycleError()
+		return true
 	}
 
+	if n.hasCycle && !n.hasNonCyclic {
+		n.reportCycleError()
+		return true
+	}
+	return false
+}
+
+func assertStructuralCycle(n *nodeContext) bool {
 	if n.hasCycle && !n.hasNonCycle {
 		n.reportCycleError()
 		return true

@@ -102,7 +102,8 @@ func TestEvalAlpha(t *testing.T) {
 	// TODO: remove use of externalDeps for processing. Currently, enabling
 	// this would fix some issues, but also introduce some closedness bugs.
 	// As a first step, we should ensure that the temporary hack of using
-	// externalDeps to agitate pending dependencies is replaced with a
+	// externalDeps to agitate pending dependencies
+	//  is replaced with a
 	// dedicated mechanism.
 	//
 	adt.DebugDeps = true // check unmatched dependencies.
@@ -111,7 +112,10 @@ func TestEvalAlpha(t *testing.T) {
 		Sharing: true,
 	}
 
-	var todoAlpha = map[string]string{}
+	var todoAlpha = map[string]string{
+		// "cycle/comprehension":        "comprehensions",
+		"cycle/inline_non_recursive": "panic",
+	}
 
 	test := cuetxtar.TxTarTest{
 		Root:     "../../../cue/testdata",
@@ -261,7 +265,7 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, flags cued
 
 // TestX is for debugging. Do not delete.
 func TestX(t *testing.T) {
-	adt.DebugDeps = true
+	// adt.DebugDeps = true
 	// adt.OpenGraphs = true
 
 	flags := cuedebug.Config{

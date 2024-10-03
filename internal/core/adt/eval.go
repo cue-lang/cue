@@ -1119,10 +1119,11 @@ type nodeContextState struct {
 
 	// State info
 
-	hasTop       bool
-	hasCycle     bool // has conjunct with structural cycle
-	hasNonCycle  bool // has material conjuncts without structural cycle
-	hasNonCyclic bool // has non-cyclic conjuncts at start of field processing
+	hasTop               bool
+	hasAnyCyclicConjunct bool // has conjunct with structural cycle
+	hasAncestorCycle     bool // has conjunct with structural cycle to an ancestor
+	hasNonCycle          bool // has material conjuncts without structural cycle
+	hasNonCyclic         bool // has non-cyclic conjuncts at start of field processing
 
 	isShared      bool      // set if we are currently structure sharing.
 	noSharing     bool      // set if structure sharing is not allowed
@@ -2235,7 +2236,7 @@ func (n *nodeContext) expandOne(state vertexStatus) (done bool) {
 	unreachableForDev(n.ctx)
 
 	// Don't expand incomplete expressions if we detected a cycle.
-	if n.done() || (n.hasCycle && !n.hasNonCycle) {
+	if n.done() || (n.hasAnyCyclicConjunct && !n.hasNonCycle) {
 		return false
 	}
 

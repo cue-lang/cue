@@ -222,7 +222,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		}
 
 		switch {
-		case assertStructuralCycle(n):
+		case assertStructuralCycleV3(n):
 		// TODO: consider bailing on error if n.errs != nil.
 		case n.completeAllArcs(needs, mode):
 		}

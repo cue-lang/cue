@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3a02ea3_94b9dd9c",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 619,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-03T11:16:43Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t// TODO: do something more principled here.\n```",
+      "revId": "b05d49e7041e946f7fa9778c6fd97fc4b3e9a985",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f232ea3_368ae1c1",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 637,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-03T11:16:43Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t\t// TODO(spec): we generally allow optional fields alongside embedded\n```\n?",
+      "revId": "b05d49e7041e946f7fa9778c6fd97fc4b3e9a985",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

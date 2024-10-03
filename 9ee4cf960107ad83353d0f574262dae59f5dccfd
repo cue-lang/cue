@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "32c4cd21_b2dde596",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 521,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-10-03T17:30:13Z",
+      "side": 1,
+      "message": "It is not trivial to determine whether the decoded schema is referenced as a definition because CUE allows expressions passed in --path flags. The approach used here is not accurate if paths contain any expressions.",
+      "range": {
+        "startLine": 518,
+        "startChar": 0,
+        "endLine": 521,
+        "endChar": 2
+      },
+      "revId": "9ee4cf960107ad83353d0f574262dae59f5dccfd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

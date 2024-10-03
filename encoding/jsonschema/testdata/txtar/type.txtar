@@ -32,11 +32,8 @@
 -- out/decode/extract --
 // Main schema
 intString?: null | bool | int | string | [...]
-object?: {
-	...
-} | *{
+object?: {} | *{
 	foo: "bar"
 	baz: 1.3
-	...
 }
 numOrList?: matchN(1, [number, [...number]]) | *[1, 2, 3]

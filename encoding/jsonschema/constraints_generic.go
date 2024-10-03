@@ -173,7 +173,6 @@ func constraintType(key string, n cue.Value, s *state) {
 		case "object":
 			types |= cue.StructKind
 			s.setTypeUsed(n, objectType)
-
 		default:
 			s.errf(n, "unknown type %q", n)
 		}

@@ -231,7 +231,6 @@ properties: x: $ref: "https://something.test/foo#/definitions/blah"
 import "other.test/something:blah"
 
 x?: blah.#Foo.bar.#blah
-...
 `[1:]))
 }
 

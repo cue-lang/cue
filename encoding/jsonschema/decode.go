@@ -125,6 +125,10 @@ func (d *decoder) schema(ref []ast.Label, v cue.Value) (a []ast.Decl) {
 		root.isSchema = true
 	}
 
+	if d.cfg.DecodeAsDefinition {
+		root.isSchema = true
+	}
+
 	expr, state := root.schemaState(v, allTypes, nil, false)
 	if state.allowedTypes == 0 {
 		d.addErr(errors.Newf(state.pos.Pos(), "constraints are not possible to satisfy"))
@@ -163,7 +167,7 @@ func (d *decoder) schema(ref []ast.Label, v cue.Value) (a []ast.Decl) {
 		}
 
 		a = append(a, f)
-	} else if st, ok := expr.(*ast.StructLit); ok {
+	} else if st, ok := expr.(*ast.StructLit); ok && len(st.Elts) > 0 {
 		a = append(a, st.Elts...)
 	} else {
 		a = append(a, &ast.EmbedDecl{Expr: expr})
@@ -309,7 +313,7 @@ var coreToCUE = []cue.Kind{
 	objectType: cue.StructKind,
 }
 
-func kindToAST(k cue.Kind) ast.Expr {
+func (s *state) kindToAST(k cue.Kind) ast.Expr {
 	switch k {
 	case cue.NullKind:
 		// TODO: handle OpenAPI restrictions.
@@ -327,7 +331,10 @@ func kindToAST(k cue.Kind) ast.Expr {
 	case cue.ListKind:
 		return ast.NewList(&ast.Ellipsis{})
 	case cue.StructKind:
-		return ast.NewStruct(&ast.Ellipsis{})
+		if s.isSchema {
+			return ast.NewStruct(&ast.Ellipsis{})
+		}
+		return ast.NewStruct()
 	}
 	panic(fmt.Errorf("unexpected kind %v", k))
 }
@@ -348,8 +355,8 @@ type constraintInfo struct {
 	constraints []ast.Expr
 }
 
-func (c *constraintInfo) setTypeUsed(n cue.Value, t coreType) {
-	c.typ = kindToAST(coreToCUE[t])
+func (c *constraintInfo) setTypeUsed(s *state, n cue.Value, t coreType) {
+	c.typ = s.kindToAST(coreToCUE[t])
 	setPos(c.typ, n)
 	ast.SetRelPos(c.typ, token.NoRelPos)
 }
@@ -370,7 +377,7 @@ func (s *state) setTypeUsed(n cue.Value, t coreType) {
 	if int(t) >= len(s.types) {
 		panic(fmt.Errorf("type out of range %v/%v", int(t), len(s.types)))
 	}
-	s.types[t].setTypeUsed(n, t)
+	s.types[t].setTypeUsed(s, n, t)
 }
 
 type state struct {
@@ -457,11 +464,12 @@ func (s *state) idTag() *ast.Attribute {
 func (s *state) object(n cue.Value) *ast.StructLit {
 	if s.obj == nil {
 		s.obj = &ast.StructLit{}
+		s.add(n, objectType, s.obj)
 
 		if s.id != nil {
 			s.obj.Elts = append(s.obj.Elts, s.idTag())
+			ast.SetPos(s.obj, s.idPos)
 		}
-		s.add(n, objectType, s.obj)
 	}
 	return s.obj
 }
@@ -547,7 +555,7 @@ func (s *state) finalize() (e ast.Expr) {
 			case allowed:
 				npossible++
 				if s.knownTypes&k != 0 {
-					disjuncts = append(disjuncts, kindToAST(k))
+					disjuncts = append(disjuncts, s.kindToAST(k))
 				}
 			}
 		}
@@ -569,7 +577,7 @@ func (s *state) finalize() (e ast.Expr) {
 	}
 	if obj != nil {
 		// TODO: may need to explicitly close.
-		if !s.closeStruct {
+		if !s.closeStruct && s.isSchema {
 			obj.Elts = append(obj.Elts, &ast.Ellipsis{})
 		}
 	}
@@ -778,8 +786,6 @@ func (s *state) value(n cue.Value) ast.Expr {
 				Value: s.value(n),
 			})
 		})
-		// TODO: only open when s.isSchema?
-		a = append(a, &ast.Ellipsis{})
 		return setPos(&ast.StructLit{Elts: a}, n)
 
 	default:

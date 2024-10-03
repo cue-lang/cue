@@ -124,6 +124,10 @@ type Config struct {
 	// will be used.
 	DefaultVersion Version
 
+	// DecodeAsDefinition specifies whether the decoded value will be
+	// referenced as a definition.
+	DecodeAsDefinition bool
+
 	_ struct{} // prohibit casting from different type.
 }
 

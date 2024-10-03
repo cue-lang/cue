@@ -515,6 +515,12 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 		return nil, err
 	}
 
+	for _, label := range p.path {
+		if internal.IsDefinition(label) {
+			p.encConfig.DecodeAsDefinition = true
+		}
+	}
+
 	for _, b := range builds {
 		if b.Err != nil {
 			return nil, suggestModCommand(b.Err)

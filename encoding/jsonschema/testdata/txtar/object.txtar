@@ -87,13 +87,11 @@ patterns?: {
 	{[=~"^\\P{Lu}" & !~"^(foo|bar)$"]: string}
 
 	{[=~"^\\P{Lo}" & !~"^(foo|bar)$"]: int}
-	...
 }
 patternsNoProps?: {
 	{[=~"^\\P{Lu}" & !~"^()$"]: string}
 
 	{[=~"^\\P{Lo}" & !~"^()$"]: int}
-	...
 }
 complex?: {
 	foo?: number
@@ -107,5 +105,4 @@ complex?: {
 multi?: >=7 | struct.MaxFields(5) & {
 	foo?: number
 	bar?: number
-	...
 }

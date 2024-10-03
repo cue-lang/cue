@@ -149,6 +149,8 @@ type Config struct {
 	ProtoPath     []string
 	Format        []format.Option
 	ParseFile     func(name string, src interface{}) (*ast.File, error)
+
+	DecodeAsDefinition bool
 }
 
 // NewDecoder returns a stream of non-rooted data expressions. The encoding
@@ -301,6 +303,8 @@ func jsonSchemaFunc(cfg *Config, f *build.File) interpretFunc {
 
 			StrictKeywords: cfg.Strict || tags["strictKeywords"],
 			StrictFeatures: cfg.Strict || tags["strictFeatures"],
+
+			DecodeAsDefinition: cfg.DecodeAsDefinition,
 		}
 		file, err = jsonschema.Extract(v, cfg)
 		// TODO: simplify currently erases file line info. Reintroduce after fix.

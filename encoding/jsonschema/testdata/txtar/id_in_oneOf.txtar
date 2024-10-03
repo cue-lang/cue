@@ -24,5 +24,4 @@ matchN(1, [{
 	string
 }, {
 	@jsonschema(id="https://2.test.example/object")
-	...
 }])

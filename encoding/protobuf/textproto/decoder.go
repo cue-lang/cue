@@ -393,7 +393,7 @@ func (d *decoder) decodeValue(f *fieldInfo, n *pbast.Node) (x ast.Expr) {
 
 	switch f.ValueType {
 	case pbinternal.String, pbinternal.Bytes:
-		s, err := unquote.Unquote(n)
+		s, _, err := unquote.Unquote(n)
 		if err != nil {
 			d.addErrf(n.Start, "invalid string or bytes: %v", err)
 		}

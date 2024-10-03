@@ -188,15 +188,15 @@ issue3474: topValidator: failType: {
 }
 
 -- out/eval/stats --
-Leaks:  6
-Freed:  104
-Reused: 98
+Leaks:  5
+Freed:  109
+Reused: 102
 Allocs: 12
 Retain: 12
 
-Unifications: 110
-Conjuncts:    215
-Disjuncts:    118
+Unifications: 114
+Conjuncts:    222
+Disjuncts:    123
 -- out/evalalpha --
 Errors:
 issue3418.0: conflicting values 2 and 1:
@@ -220,6 +220,9 @@ issue3474.topValidator.fail.A: invalid value 1 (does not satisfy matchN(1, [>10]
     ./issue3474.cue:41:5
     ./issue3474.cue:41:12
     ./issue3474.cue:43:12
+issue3474.topValidator.failType.A: invalid value {C:1} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
+    ./issue3474.cue:53:5
+    ./issue3474.cue:53:12
 
 Result:
 (_|_){
@@ -351,7 +354,6 @@ Result:
       // [eval]
       ok: (struct){
         A: (struct){
-          struct.MinFields(1)
           B: (bool){ true }
         }
       }
@@ -400,11 +402,12 @@ Result:
             0: (number){ >10 }
           }), int) }
       }
-      failType: (struct){
-        A: (_){
-          matchN(1, (#list){
-            0: (number){ >10 }
-          })
+      failType: (_|_){
+        // [eval]
+        A: (_|_){
+          // [eval] issue3474.topValidator.failType.A: invalid value {C:1} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
+          //     ./issue3474.cue:53:5
+          //     ./issue3474.cue:53:12
           C: (int){ 1 }
         }
       }
@@ -415,7 +418,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,27 +1,24 @@
+@@ -1,32 +1,28 @@
  Errors:
 +issue3418.0: conflicting values 2 and 1:
 +    ./issue3418.cue:1:35
@@ -451,9 +454,14 @@ diff old new
      ./issue3474.cue:41:12
 -    ./issue3474.cue:42:5
      ./issue3474.cue:43:12
+ issue3474.topValidator.failType.A: invalid value {C:1} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
+     ./issue3474.cue:53:5
+     ./issue3474.cue:53:12
+-    ./issue3474.cue:54:5
  
  Result:
-@@ -42,7 +39,6 @@
+ (_|_){
+@@ -46,7 +42,6 @@
        kv: (_|_){
          // [incomplete] incompleteError2.MyType.kv: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
          //     ./in.cue:22:7
@@ -461,7 +469,7 @@ diff old new
          //     ./in.cue:22:24
        }
      }
-@@ -66,7 +62,6 @@
+@@ -70,7 +65,6 @@
        kv: (_|_){
          // [incomplete] violation.#MyType.kv: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
          //     ./in.cue:49:7
@@ -469,7 +477,7 @@ diff old new
          //     ./in.cue:49:24
        }
      }
-@@ -113,15 +108,10 @@
+@@ -117,15 +111,10 @@
          0: (int){ 1 }
        }
      }
@@ -486,7 +494,7 @@ diff old new
          //     ./in.cue:112:20
        }
      }
-@@ -128,25 +118,31 @@
+@@ -132,25 +121,31 @@
    }
    issue3418: (_|_){
      // [eval]
@@ -532,7 +540,7 @@ diff old new
      }
    }
    issue3474: (_|_){
-@@ -162,10 +158,9 @@
+@@ -165,10 +160,9 @@
        failAfter: (_|_){
          // [eval]
          A: (_|_){
@@ -544,7 +552,7 @@ diff old new
            C: (bool){ true }
            B: (bool){ true }
          }
-@@ -175,7 +170,6 @@
+@@ -178,7 +172,6 @@
            // [incomplete] issue3474.structValidator.incomplete.A: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
            //     ./issue3474.cue:20:5
            //     ./issue3474.cue:20:22
@@ -552,7 +560,7 @@ diff old new
          }
        }
        failClosed: (_|_){
-@@ -184,7 +178,6 @@
+@@ -187,7 +180,6 @@
            // [eval] issue3474.structValidator.failClosed.#A: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
            //     ./issue3474.cue:27:6
            //     ./issue3474.cue:27:23
@@ -560,7 +568,7 @@ diff old new
          }
        }
      }
-@@ -199,18 +192,19 @@
+@@ -202,14 +194,12 @@
            // [eval] issue3474.topValidator.fail.A: invalid value 1 (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
            //     ./issue3474.cue:41:5
            //     ./issue3474.cue:41:12
@@ -575,12 +583,12 @@ diff old new
 +            0: (number){ >10 }
            }), int) }
        }
-       failType: (struct){
--        A: (struct){
-+        A: (_){
-+          matchN(1, (#list){
-+            0: (number){ >10 }
-+          })
+       failType: (_|_){
+@@ -218,7 +208,6 @@
+           // [eval] issue3474.topValidator.failType.A: invalid value {C:1} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
+           //     ./issue3474.cue:53:5
+           //     ./issue3474.cue:53:12
+-          //     ./issue3474.cue:54:5
            C: (int){ 1 }
          }
        }
@@ -610,6 +618,10 @@ issue3474.topValidator.fail.A: invalid value 1 (does not satisfy matchN(1, [>10]
     ./issue3474.cue:41:12
     ./issue3474.cue:42:5
     ./issue3474.cue:43:12
+issue3474.topValidator.failType.A: invalid value {C:1} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
+    ./issue3474.cue:53:5
+    ./issue3474.cue:53:12
+    ./issue3474.cue:54:5
 
 Result:
 (_|_){
@@ -742,7 +754,6 @@ Result:
       // [eval]
       ok: (struct){
         A: (struct){
-          struct.MinFields(1)
           B: (bool){ true }
         }
       }
@@ -796,8 +807,13 @@ Result:
             }
           }), int) }
       }
-      failType: (struct){
-        A: (struct){
+      failType: (_|_){
+        // [eval]
+        A: (_|_){
+          // [eval] issue3474.topValidator.failType.A: invalid value {C:1} (does not satisfy matchN(1, [>10])): 0 matched, expected 1:
+          //     ./issue3474.cue:53:5
+          //     ./issue3474.cue:53:12
+          //     ./issue3474.cue:54:5
           C: (int){ 1 }
         }
       }

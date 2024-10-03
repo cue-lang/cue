@@ -285,11 +285,11 @@ Leaks:  1
 Freed:  158
 Reused: 149
 Allocs: 10
-Retain: 73
+Retain: 67
 
 Unifications: 159
 Conjuncts:    169
-Disjuncts:    210
+Disjuncts:    204
 -- out/evalalpha --
 (struct){
   self: (struct){
@@ -490,14 +490,14 @@ Disjuncts:    210
           raises: (_|_){
             // [cycle] sameStruct.cycleFail.t3.p1.raises: mutual dependency
           }
-          ret: (_){ _ }
+          ret: (struct){
+          }
         }
         p2: (struct){
           ret: (_|_){
             // [cycle] sameStruct.cycleFail.t3.p2.ret: mutual dependency
           }
-          raises: (_){
-            _
+          raises: (struct){
             a: (int){ 1 }
           }
         }
@@ -685,14 +685,14 @@ diff old new
 +          raises: (_|_){
 +            // [cycle] sameStruct.cycleFail.t3.p1.raises: mutual dependency
 +          }
-+          ret: (_){ _ }
++          ret: (struct){
++          }
 +        }
 +        p2: (struct){
 +          ret: (_|_){
 +            // [cycle] sameStruct.cycleFail.t3.p2.ret: mutual dependency
 +          }
-+          raises: (_){
-+            _
++          raises: (struct){
 +            a: (int){ 1 }
 +          }
          }

@@ -83,18 +83,18 @@ This seems to be the result of incorrect handling of disjunctions.
 -- diff/todo/p3 --
 Reordering
 -- out/evalalpha/stats --
-Leaks:  2075
-Freed:  218
-Reused: 218
-Allocs: 2075
+Leaks:  1369
+Freed:  139
+Reused: 139
+Allocs: 1369
 Retain: 0
 
-Unifications: 205
-Conjuncts:    6343
-Disjuncts:    436
+Unifications: 173
+Conjuncts:    4434
+Disjuncts:    278
 -- out/evalalpha --
 Errors:
-out.subs.subs: structural cycle:
+out.subs: structural cycle:
     ./in.cue:34:17
 
 Result:
@@ -241,7 +241,7 @@ Result:
     }
   }
   out: (_|_){
-    // [structural cycle] out.subs.subs: structural cycle:
+    // [structural cycle] out.subs: structural cycle:
     //     ./in.cue:34:17
   }
 }
@@ -255,18 +255,18 @@ diff old new
 -Reused: 3200
 -Allocs: 25
 -Retain: 26
-+Leaks:  2075
-+Freed:  218
-+Reused: 218
-+Allocs: 2075
++Leaks:  1369
++Freed:  139
++Reused: 139
++Allocs: 1369
 +Retain: 0
  
 -Unifications: 2577
 -Conjuncts:    12017
 -Disjuncts:    3244
-+Unifications: 205
-+Conjuncts:    6343
-+Disjuncts:    436
++Unifications: 173
++Conjuncts:    4434
++Disjuncts:    278
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
@@ -274,7 +274,7 @@ diff old new
 @@ -1,32 +1,23 @@
 -(struct){
 +Errors:
-+out.subs.subs: structural cycle:
++out.subs: structural cycle:
 +    ./in.cue:34:17
 +
 +Result:
@@ -612,7 +612,7 @@ diff old new
 +    }
 +  }
 +  out: (_|_){
-+    // [structural cycle] out.subs.subs: structural cycle:
++    // [structural cycle] out.subs: structural cycle:
 +    //     ./in.cue:34:17
    }
  }

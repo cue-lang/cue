@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c55b7c1_2c609819",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-04T16:32:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70ed3eab_91bf3486",
+      "revId": "d6c0171973277fc383125323b9ef6e5cb4551360",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "136ee0d0_2ebd1257",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-10-04T14:53:11Z",
       "side": 1,
       "message": "why are we regressing in this percentage for some of these fixes?",
+      "revId": "d6c0171973277fc383125323b9ef6e5cb4551360",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b769387e_6d06aa0b",
+        "filename": "encoding/jsonschema/external_teststats.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-04T16:32:55Z",
+      "side": 1,
+      "message": "That\u0027s because the spec says that for the latest version (2020-12), format specifiers are ignored by default, but that\u0027s probably not what the semantics we wish (or at any rate, we could add a flag, but we\u0027d probably want the default be to check formats rather than the other way around).\n\nThe place where we see the regression is fairly clear: https://review.gerrithub.io/c/cue-lang/cue/+/1202108/1/encoding/jsonschema/testdata/external/tests/draft2020-12/format.json",
+      "parentUuid": "136ee0d0_2ebd1257",
       "revId": "d6c0171973277fc383125323b9ef6e5cb4551360",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -119,6 +119,7 @@ func (n *nodeContext) scheduleConjuncts() {
 	root.decDependent(ctx, INIT, nil)
 }
 
+// TODO(evalv3): consider not returning a result at all.
 func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	if c.LogEval > 0 {
 		c.nest++
@@ -281,7 +282,12 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		v.ChildErrors = nil
 		v.Arcs = nil
 
-		result := w.unify(c, needs, mode)
+		result := true
+		if n.isShared && n.sharedID.CycleType == NoCycle {
+			// We unify here to proactively detect cycles. We do not need to,
+			// nor should we, if have have already found one.
+			result = w.unify(c, needs, mode)
+		}
 
 		// Set control fields that are referenced without dereferencing.
 		if w.Closed {
@@ -312,10 +318,6 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	if n.completed&(subFieldsProcessed) != 0 {
 		n.node.HasEllipsis = n.node.cc.hasEllipsis
 
-		n.node.updateStatus(finalized)
-
-		defer n.unmarkOptional(n.markOptional())
-
 		// The next piece of code addresses the following case.
 		// order matters
 		// c1: c: [string]: f2
@@ -326,6 +328,10 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 				c.Constraint.Finalize(n.ctx)
 			}
 		}
+
+		n.node.updateStatus(finalized)
+
+		defer n.unmarkOptional(n.markOptional())
 
 		if DebugDeps {
 			RecordDebugGraph(n.ctx, n.node, "Finalize")

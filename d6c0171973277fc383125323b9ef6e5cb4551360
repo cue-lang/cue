@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70ed3eab_91bf3486",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-04T14:53:11Z",
+      "side": 1,
+      "message": "did you forget to reference https://github.com/cue-lang/cue/issues/3479 or any other jsonschema issue?",
+      "revId": "d6c0171973277fc383125323b9ef6e5cb4551360",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "136ee0d0_2ebd1257",
+        "filename": "encoding/jsonschema/external_teststats.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-04T14:53:11Z",
+      "side": 1,
+      "message": "why are we regressing in this percentage for some of these fixes?",
+      "revId": "d6c0171973277fc383125323b9ef6e5cb4551360",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

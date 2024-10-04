@@ -629,10 +629,10 @@ Result:
 }
 -- out/evalalpha --
 Errors:
-match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [~(#Foo)])): 0 matched, expected 1:
     ./in.cue:8:17
     ./in.cue:8:24
-match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [~(#Foo)])): 0 matched, expected 1:
     ./in.cue:12:21
     ./in.cue:12:28
 match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:2}])): 0 matched, expected 1:
@@ -641,7 +641,7 @@ match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matc
 match.defaults.pickNested2Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:<=2}])): 0 matched, expected 1:
     ./in.cue:41:23
     ./in.cue:41:30
-not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [{a:int}])): 1 matched, expected 0:
+not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [~(#Foo)])): 1 matched, expected 0:
     ./in.cue:74:17
     ./in.cue:74:24
 not.doubleErr: invalid value {a:"foo"} (does not satisfy matchN(0, [matchN(0, [#Foo])])): 1 matched, expected 0:
@@ -699,7 +699,7 @@ Result:
       a: (int){ 2 }
     }
     singleErr: (_|_){
-      // [eval] match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+      // [eval] match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [~(#Foo)])): 0 matched, expected 1:
       //     ./in.cue:8:17
       //     ./in.cue:8:24
       a: (string){ "foo" }
@@ -708,7 +708,7 @@ Result:
       a: (int){ int }
     }
     incompleteErr: (_|_){
-      // [eval] match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+      // [eval] match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [~(#Foo)])): 0 matched, expected 1:
       //     ./in.cue:12:21
       //     ./in.cue:12:28
       a: (string){ string }
@@ -782,7 +782,7 @@ Result:
       a: (string){ "foo" }
     }
     singleErr: (_|_){
-      // [eval] not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [{a:int}])): 1 matched, expected 0:
+      // [eval] not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [~(#Foo)])): 1 matched, expected 0:
       //     ./in.cue:74:17
       //     ./in.cue:74:24
       a: (int){ 2 }
@@ -1015,12 +1015,15 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -2,27 +2,21 @@
- match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+@@ -1,28 +1,22 @@
+ Errors:
+-match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
++match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [~(#Foo)])): 0 matched, expected 1:
      ./in.cue:8:17
      ./in.cue:8:24
 -    ./in.cue:10:13
- match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+-match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
++match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [~(#Foo)])): 0 matched, expected 1:
      ./in.cue:12:21
      ./in.cue:12:28
 -    ./in.cue:14:17
@@ -1032,7 +1035,8 @@ diff old new
      ./in.cue:41:23
      ./in.cue:41:30
 -    ./in.cue:44:19
- not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [{a:int}])): 1 matched, expected 0:
+-not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [{a:int}])): 1 matched, expected 0:
++not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [~(#Foo)])): 1 matched, expected 0:
      ./in.cue:74:17
      ./in.cue:74:24
 -    ./in.cue:76:13
@@ -1067,16 +1071,24 @@ diff old new
  
  Result:
  (_|_){
-@@ -83,7 +72,6 @@
-       // [eval] match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+@@ -80,10 +69,9 @@
+       a: (int){ 2 }
+     }
+     singleErr: (_|_){
+-      // [eval] match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
++      // [eval] match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [~(#Foo)])): 0 matched, expected 1:
        //     ./in.cue:8:17
        //     ./in.cue:8:24
 -      //     ./in.cue:10:13
        a: (string){ "foo" }
      }
      incompleteOK: (struct){
-@@ -93,7 +81,6 @@
-       // [eval] match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+@@ -90,10 +78,9 @@
+       a: (int){ int }
+     }
+     incompleteErr: (_|_){
+-      // [eval] match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
++      // [eval] match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [~(#Foo)])): 0 matched, expected 1:
        //     ./in.cue:12:21
        //     ./in.cue:12:28
 -      //     ./in.cue:14:17
@@ -1108,8 +1120,12 @@ diff old new
          a: (int){ |(*(int){ 3 }, (int){ int }) }
        }
      }
-@@ -170,7 +155,6 @@
-       // [eval] not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [{a:int}])): 1 matched, expected 0:
+@@ -167,10 +152,9 @@
+       a: (string){ "foo" }
+     }
+     singleErr: (_|_){
+-      // [eval] not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [{a:int}])): 1 matched, expected 0:
++      // [eval] not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [~(#Foo)])): 1 matched, expected 0:
        //     ./in.cue:74:17
        //     ./in.cue:74:24
 -      //     ./in.cue:76:13

@@ -126,11 +126,6 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 		return
 	}
 
-	if arc.nonRooted {
-		if arc.status == finalized {
-			ci.Refs = nil
-		}
-	}
 	c := MakeConjunct(t.env, t.x, ci)
 	t.node.scheduleVertexConjuncts(c, arc, ci)
 }

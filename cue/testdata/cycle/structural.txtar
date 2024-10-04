@@ -554,14 +554,14 @@ n2: n1 & {a: n1}
 n3: n1 & {n1}
 n4: n1 & {x: n1 & {y: n1 & {z: int}}}
 -- out/evalalpha/stats --
-Leaks:  1794
+Leaks:  1795
 Freed:  432
 Reused: 432
-Allocs: 1794
+Allocs: 1795
 Retain: 0
 
-Unifications: 1137
-Conjuncts:    6052
+Unifications: 1138
+Conjuncts:    6059
 Disjuncts:    1043
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -573,17 +573,17 @@ diff old new
 -Reused: 817
 -Allocs: 27
 -Retain: 64
-+Leaks:  1794
++Leaks:  1795
 +Freed:  432
 +Reused: 432
-+Allocs: 1794
++Allocs: 1795
 +Retain: 0
  
 -Unifications: 658
 -Conjuncts:    1282
 -Disjuncts:    880
-+Unifications: 1137
-+Conjuncts:    6052
++Unifications: 1138
++Conjuncts:    6059
 +Disjuncts:    1043
 -- out/eval/stats --
 Leaks:  15
@@ -1696,7 +1696,12 @@ Result:
       }
       C: (struct){
         x: ~(crossRefNoCycle.t5.T)
-        y: ~(crossRefNoCycle.t5.T)
+        y: (struct){
+          y: (_|_){
+            // [incomplete] crossRefNoCycle.t5.C.y.y: undefined field: x:
+            //     ./in.cue:544:8
+          }
+        }
       }
     }
   }
@@ -2527,28 +2532,28 @@ diff old new
        }
      }
      t5: (struct){
-@@ -1165,18 +1097,8 @@
+@@ -1165,6 +1097,7 @@
          }
        }
        C: (struct){
--        y: (struct){
--          y: (_|_){
--            // [incomplete] crossRefNoCycle.t5.C.y.y: undefined field: x:
--            //     ./in.cue:544:8
--          }
--        }
++        x: ~(crossRefNoCycle.t5.T)
+         y: (struct){
+           y: (_|_){
+             // [incomplete] crossRefNoCycle.t5.C.y.y: undefined field: x:
+@@ -1171,12 +1104,6 @@
+             //     ./in.cue:544:8
+           }
+         }
 -        x: (struct){
 -          y: (_|_){
 -            // [incomplete] crossRefNoCycle.t5.C.x.y: undefined field: x:
 -            //     ./in.cue:544:8
 -          }
 -        }
-+        x: ~(crossRefNoCycle.t5.T)
-+        y: ~(crossRefNoCycle.t5.T)
        }
      }
    }
-@@ -1199,19 +1121,19 @@
+@@ -1199,19 +1126,19 @@
      }
    }
    n4: (struct){

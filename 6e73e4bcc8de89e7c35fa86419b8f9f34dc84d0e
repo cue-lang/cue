@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0e430b9_b8a90935",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-04T14:46:52Z",
+      "side": 1,
+      "message": "add a summary - why in this package and not net/url, for example? and why are both useful?",
+      "revId": "6e73e4bcc8de89e7c35fa86419b8f9f34dc84d0e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

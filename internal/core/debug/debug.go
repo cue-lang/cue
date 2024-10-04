@@ -142,13 +142,16 @@ func (w *printer) printShared(v *adt.Vertex) (x *adt.Vertex, ok bool) {
 	isCyclic := v.IsCyclic
 	s, ok := v.BaseValue.(*adt.Vertex)
 	v = v.DerefValue()
+	if !v.Rooted() {
+		useReference = false
+	}
 	isCyclic = isCyclic || v.IsCyclic
 	_ = isCyclic
 	// NOTE(debug): use this line instead of the following to expand shared
 	// cases where it is safe to do so.
 	// if useReference && isCyclic && ok && len(v.Arcs) > 0 {
 	if useReference && ok && len(v.Arcs) > 0 {
-		w.shared(s)
+		w.shared(v)
 		return v, true
 	}
 	if !w.pushVertex(v) {

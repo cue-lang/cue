@@ -16,6 +16,24 @@
       "message": "did you forget to reference https://github.com/cue-lang/cue/issues/3479 or any other jsonschema issue?",
       "revId": "6ccb039ad12ec17d431f9df83b5e8887a643a643",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "52f65629_043eb732",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-04T16:32:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2d49c238_0e2911cb",
+      "revId": "6ccb039ad12ec17d431f9df83b5e8887a643a643",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

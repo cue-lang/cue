@@ -153,14 +153,14 @@ inline: acrossFields: ok1: {
   }
 }
 -- out/evalalpha/stats --
-Leaks:  104
+Leaks:  92
 Freed:  0
 Reused: 0
-Allocs: 104
+Allocs: 92
 Retain: 0
 
-Unifications: 100
-Conjuncts:    498
+Unifications: 88
+Conjuncts:    409
 Disjuncts:    0
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -172,17 +172,17 @@ diff old new
 -Reused: 136
 -Allocs: 252
 -Retain: 834
-+Leaks:  104
++Leaks:  92
 +Freed:  0
 +Reused: 0
-+Allocs: 104
++Allocs: 92
 +Retain: 0
  
 -Unifications: 388
 -Conjuncts:    1307
 -Disjuncts:    707
-+Unifications: 100
-+Conjuncts:    498
++Unifications: 88
++Conjuncts:    409
 +Disjuncts:    0
 -- out/eval/stats --
 Leaks:  247
@@ -304,9 +304,9 @@ structural cycle:
 structural cycle:
     ./x.cue:20:9
 in: structural cycle:
-    ./x.cue:38:17
+    ./x.cue:34:17
 in: structural cycle:
-    ./x.cue:54:17
+    ./x.cue:49:17
 
 Result:
 (_|_){
@@ -372,15 +372,15 @@ Result:
         k00: (int){ 0 }
         k10: (_|_){
           // [structural cycle] in: structural cycle:
-          //     ./x.cue:38:17
+          //     ./x.cue:34:17
         }
         k20: (_|_){
           // [structural cycle] in: structural cycle:
-          //     ./x.cue:38:17
+          //     ./x.cue:34:17
         }
         k30: (_|_){
           // [structural cycle] in: structural cycle:
-          //     ./x.cue:38:17
+          //     ./x.cue:34:17
         }
       }
       ok1: (_|_){
@@ -392,15 +392,15 @@ Result:
         k00: (int){ 0 }
         k10: (_|_){
           // [structural cycle] in: structural cycle:
-          //     ./x.cue:54:17
+          //     ./x.cue:49:17
         }
         k20: (_|_){
           // [structural cycle] in: structural cycle:
-          //     ./x.cue:54:17
+          //     ./x.cue:49:17
         }
         k30: (_|_){
           // [structural cycle] in: structural cycle:
-          //     ./x.cue:54:17
+          //     ./x.cue:49:17
         }
       }
     }
@@ -421,9 +421,9 @@ diff old new
      ./x.cue:20:9
  in: structural cycle:
 -    ./x.cue:30:8
-+    ./x.cue:38:17
++    ./x.cue:34:17
 +in: structural cycle:
-+    ./x.cue:54:17
++    ./x.cue:49:17
  
  Result:
  (_|_){
@@ -452,15 +452,15 @@ diff old new
 -        }
 -      }
 -      ok1: (struct){
-+          //     ./x.cue:38:17
++          //     ./x.cue:34:17
 +        }
 +        k20: (_|_){
 +          // [structural cycle] in: structural cycle:
-+          //     ./x.cue:38:17
++          //     ./x.cue:34:17
 +        }
 +        k30: (_|_){
 +          // [structural cycle] in: structural cycle:
-+          //     ./x.cue:38:17
++          //     ./x.cue:34:17
 +        }
 +      }
 +      ok1: (_|_){
@@ -475,15 +475,15 @@ diff old new
 -        k30: (int){ 0 }
 +        k10: (_|_){
 +          // [structural cycle] in: structural cycle:
-+          //     ./x.cue:54:17
++          //     ./x.cue:49:17
 +        }
 +        k20: (_|_){
 +          // [structural cycle] in: structural cycle:
-+          //     ./x.cue:54:17
++          //     ./x.cue:49:17
 +        }
 +        k30: (_|_){
 +          // [structural cycle] in: structural cycle:
-+          //     ./x.cue:54:17
++          //     ./x.cue:49:17
 +        }
        }
      }

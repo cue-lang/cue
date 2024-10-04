@@ -153,14 +153,14 @@ inline: acrossFields: ok1: {
   }
 }
 -- out/evalalpha/stats --
-Leaks:  92
+Leaks:  113
 Freed:  0
 Reused: 0
-Allocs: 92
+Allocs: 113
 Retain: 0
 
-Unifications: 88
-Conjuncts:    409
+Unifications: 109
+Conjuncts:    588
 Disjuncts:    0
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -172,17 +172,17 @@ diff old new
 -Reused: 136
 -Allocs: 252
 -Retain: 834
-+Leaks:  92
++Leaks:  113
 +Freed:  0
 +Reused: 0
-+Allocs: 92
++Allocs: 113
 +Retain: 0
  
 -Unifications: 388
 -Conjuncts:    1307
 -Disjuncts:    707
-+Unifications: 88
-+Conjuncts:    409
++Unifications: 109
++Conjuncts:    588
 +Disjuncts:    0
 -- out/eval/stats --
 Leaks:  247
@@ -295,6 +295,8 @@ Result:
 }
 -- out/evalalpha --
 Errors:
+inline.acrossFields.fail1.k10: conflicting values 4 and 1:
+    ./x.cue:30:8
 structural cycle:
     ./x.cue:6:9
 structural cycle:
@@ -304,15 +306,15 @@ structural cycle:
 structural cycle:
     ./x.cue:20:9
 in: structural cycle:
-    ./x.cue:34:17
+    ./x.cue:35:17
 in: structural cycle:
     ./x.cue:49:17
 
 Result:
 (_|_){
-  // [structural cycle]
+  // [eval]
   inline: (_|_){
-    // [structural cycle]
+    // [eval]
     small: (_|_){
       // [structural cycle]
       f: (_|_){
@@ -358,9 +360,9 @@ Result:
       }
     }
     acrossFields: (_|_){
-      // [structural cycle]
+      // [eval]
       fail1: (_|_){
-        // [structural cycle]
+        // [eval]
         f: (struct){
           in: (number){ number }
           out: (_|_){
@@ -371,16 +373,16 @@ Result:
         }
         k00: (int){ 0 }
         k10: (_|_){
-          // [structural cycle] in: structural cycle:
-          //     ./x.cue:34:17
+          // [eval] inline.acrossFields.fail1.k10: conflicting values 4 and 1:
+          //     ./x.cue:30:8
         }
         k20: (_|_){
           // [structural cycle] in: structural cycle:
-          //     ./x.cue:34:17
+          //     ./x.cue:35:17
         }
         k30: (_|_){
           // [structural cycle] in: structural cycle:
-          //     ./x.cue:34:17
+          //     ./x.cue:35:17
         }
       }
       ok1: (_|_){
@@ -410,7 +412,10 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -2,11 +2,15 @@
+@@ -1,18 +1,24 @@
+ Errors:
++inline.acrossFields.fail1.k10: conflicting values 4 and 1:
++    ./x.cue:30:8
  structural cycle:
      ./x.cue:6:9
  structural cycle:
@@ -421,13 +426,21 @@ diff old new
      ./x.cue:20:9
  in: structural cycle:
 -    ./x.cue:30:8
-+    ./x.cue:34:17
++    ./x.cue:35:17
 +in: structural cycle:
 +    ./x.cue:49:17
  
  Result:
  (_|_){
-@@ -28,7 +32,7 @@
+-  // [structural cycle]
++  // [eval]
+   inline: (_|_){
+-    // [structural cycle]
++    // [eval]
+     small: (_|_){
+       // [structural cycle]
+       f: (_|_){
+@@ -28,7 +34,7 @@
        // [structural cycle]
        f2: (_|_){
          // [structural cycle] structural cycle:
@@ -436,10 +449,23 @@ diff old new
        }
        fRec: (_|_){
          // [structural cycle]
-@@ -72,26 +76,36 @@
+@@ -58,9 +64,9 @@
+       }
+     }
+     acrossFields: (_|_){
+-      // [structural cycle]
++      // [eval]
+       fail1: (_|_){
+-        // [structural cycle]
++        // [eval]
+         f: (struct){
+           in: (number){ number }
+           out: (_|_){
+@@ -71,27 +77,37 @@
+         }
          k00: (int){ 0 }
          k10: (_|_){
-           // [structural cycle] in: structural cycle:
+-          // [structural cycle] in: structural cycle:
 -          //     ./x.cue:30:8
 -        }
 -        k20: (_|_){
@@ -452,15 +478,16 @@ diff old new
 -        }
 -      }
 -      ok1: (struct){
-+          //     ./x.cue:34:17
++          // [eval] inline.acrossFields.fail1.k10: conflicting values 4 and 1:
++          //     ./x.cue:30:8
 +        }
 +        k20: (_|_){
 +          // [structural cycle] in: structural cycle:
-+          //     ./x.cue:34:17
++          //     ./x.cue:35:17
 +        }
 +        k30: (_|_){
 +          // [structural cycle] in: structural cycle:
-+          //     ./x.cue:34:17
++          //     ./x.cue:35:17
 +        }
 +      }
 +      ok1: (_|_){

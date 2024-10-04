@@ -621,7 +621,7 @@ b7.b.0.0: conflicting values 1 and [a] (mismatched types int and list):
 b7.b.0.0.0: structural cycle
 c1.a.c: structural cycle
 d1.r: structural cycle
-d3.x.indirect: structural cycle
+d3.x.0: structural cycle
 e1.a.c: structural cycle
 e1.b.c: structural cycle
 e2.a.c: structural cycle
@@ -1261,12 +1261,12 @@ Result:
         b: (_|_){
           // [structural cycle]
           c: (_|_){
-            // [structural cycle] d3.x.indirect: structural cycle
+            // [structural cycle] d3.x.0: structural cycle
           }
         }
       }
       indirect: (_|_){
-        // [structural cycle] d3.x.indirect: structural cycle
+        // [structural cycle] d3.x.0: structural cycle
       }
     }
   }
@@ -1781,7 +1781,7 @@ diff old new
 +b7.b.0.0.0: structural cycle
 +c1.a.c: structural cycle
 +d1.r: structural cycle
-+d3.x.indirect: structural cycle
++d3.x.0: structural cycle
  e1.a.c: structural cycle
  e1.b.c: structural cycle
  e2.a.c: structural cycle
@@ -2143,7 +2143,7 @@ diff old new
            // [structural cycle]
            c: (_|_){
 -            // [structural cycle] d3.x.a.b.c: structural cycle
-+            // [structural cycle] d3.x.indirect: structural cycle
++            // [structural cycle] d3.x.0: structural cycle
            }
          }
        }
@@ -2152,7 +2152,7 @@ diff old new
 -        //     ./in.cue:316:12
 -      }
 -      i: (int){ 0 }
-+        // [structural cycle] d3.x.indirect: structural cycle
++        // [structural cycle] d3.x.0: structural cycle
 +      }
      }
    }

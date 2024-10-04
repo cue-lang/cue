@@ -113,9 +113,7 @@ Disjuncts:    69
       }
       y: (struct){
         let X#2 = (struct){
-          b: (struct){
-            q: (int){ 1 }
-          }
+          b: ~(t2.x1.a)
           c: (int){ 1 }
         }
         v: (int){ 1 }
@@ -127,9 +125,7 @@ Disjuncts:    69
       }
       y: (struct){
         let X#2 = (struct){
-          b: (struct){
-            r: (int){ 2 }
-          }
+          b: ~(t2.x2.a)
           c: (int){ 1 }
         }
         v: (int){ 1 }
@@ -142,10 +138,7 @@ Disjuncts:    69
       }
       y: (struct){
         let X#2 = (struct){
-          b: (struct){
-            q: (int){ 1 }
-            r: (int){ 2 }
-          }
+          b: ~(t2.xy.a)
           c: (int){ 1 }
         }
         v: (int){ 1 }
@@ -157,18 +150,67 @@ Disjuncts:    69
 diff old new
 --- old
 +++ new
-@@ -85,9 +85,12 @@
-         r: (int){ 2 }
+@@ -57,37 +57,33 @@
        }
        y: (struct){
+         let X#2 = (struct){
+-          b: (struct){
+-            q: (int){ 1 }
+-          }
+-          c: (int){ 1 }
+-        }
+-        v: (int){ 1 }
+-      }
+-    }
+-    x2: (struct){
+-      a: (struct){
+-        r: (int){ 2 }
+-      }
+-      y: (struct){
+-        let X#2 = (struct){
+-          b: (struct){
+-            r: (int){ 2 }
+-          }
+-          c: (int){ 1 }
+-        }
+-        v: (int){ 1 }
+-      }
+-    }
+-    xy: (struct){
+-      a: (struct){
+-        q: (int){ 1 }
+-        r: (int){ 2 }
+-      }
+-      y: (struct){
 -        let X#2multi = {
 -          b: 〈2;a〉
 -          c: 1
++          b: ~(t2.x1.a)
++          c: (int){ 1 }
++        }
++        v: (int){ 1 }
++      }
++    }
++    x2: (struct){
++      a: (struct){
++        r: (int){ 2 }
++      }
++      y: (struct){
 +        let X#2 = (struct){
-+          b: (struct){
-+            q: (int){ 1 }
-+            r: (int){ 2 }
-+          }
++          b: ~(t2.x2.a)
++          c: (int){ 1 }
++        }
++        v: (int){ 1 }
++      }
++    }
++    xy: (struct){
++      a: (struct){
++        q: (int){ 1 }
++        r: (int){ 2 }
++      }
++      y: (struct){
++        let X#2 = (struct){
++          b: ~(t2.xy.a)
 +          c: (int){ 1 }
          }
          v: (int){ 1 }

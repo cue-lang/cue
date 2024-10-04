@@ -144,12 +144,6 @@ func (n *nodeContext) shareIfPossible(c Conjunct, arc *Vertex, id CloseInfo) boo
 		return false
 	}
 
-	// If an arc is a computed intermediate result and not part of a CUE output,
-	// it should not be shared.
-	if n.node.nonRooted || arc.nonRooted {
-		return false
-	}
-
 	n.share(c, arc, id)
 	return true
 }

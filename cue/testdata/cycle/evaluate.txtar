@@ -137,13 +137,13 @@ disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
     ./in.cue:56:9
 b: structural cycle:
     ./in.cue:62:6
-d: structural cycle:
+closeCycle.c: structural cycle:
     ./in.cue:73:11
 structural cycle:
     ./in.cue:85:12
-0.0: structural cycle:
+listAddCycle.c: structural cycle:
     ./in.cue:91:5
-0.a.b: structural cycle:
+listMulCycle.c: structural cycle:
     ./in.cue:97:5
 closeFail.x.b: field not allowed:
     ./in.cue:105:6
@@ -249,15 +249,15 @@ Result:
   closeCycle: (_|_){
     // [structural cycle]
     a: (_|_){
-      // [structural cycle] d: structural cycle:
+      // [structural cycle] closeCycle.c: structural cycle:
       //     ./in.cue:73:11
     }
     b: (_|_){
-      // [structural cycle] d: structural cycle:
+      // [structural cycle] closeCycle.c: structural cycle:
       //     ./in.cue:73:11
     }
     c: (_|_){
-      // [structural cycle] d: structural cycle:
+      // [structural cycle] closeCycle.c: structural cycle:
       //     ./in.cue:73:11
     }
   }
@@ -292,30 +292,30 @@ Result:
   listAddCycle: (_|_){
     // [structural cycle]
     a: (_|_){
-      // [structural cycle] 0.0: structural cycle:
+      // [structural cycle] listAddCycle.c: structural cycle:
       //     ./in.cue:91:5
     }
     b: (_|_){
-      // [structural cycle] 0.0: structural cycle:
+      // [structural cycle] listAddCycle.c: structural cycle:
       //     ./in.cue:91:5
     }
     c: (_|_){
-      // [structural cycle] 0.0: structural cycle:
+      // [structural cycle] listAddCycle.c: structural cycle:
       //     ./in.cue:91:5
     }
   }
   listMulCycle: (_|_){
     // [structural cycle]
     a: (_|_){
-      // [structural cycle] 0.a.b: structural cycle:
+      // [structural cycle] listMulCycle.c: structural cycle:
       //     ./in.cue:97:5
     }
     b: (_|_){
-      // [structural cycle] 0.a.b: structural cycle:
+      // [structural cycle] listMulCycle.c: structural cycle:
       //     ./in.cue:97:5
     }
     c: (_|_){
-      // [structural cycle] 0.a.b: structural cycle:
+      // [structural cycle] listMulCycle.c: structural cycle:
       //     ./in.cue:97:5
     }
   }
@@ -375,7 +375,7 @@ diff old new
 -    ./in.cue:56:9
  b: structural cycle:
      ./in.cue:62:6
--closeCycle.c: structural cycle:
+ closeCycle.c: structural cycle:
 -    ./in.cue:73:15
 -structCycle.c: structural cycle:
 -    ./in.cue:79:14
@@ -383,13 +383,12 @@ diff old new
 -    ./in.cue:85:11
 -printCycle.a.X.X: structural cycle:
 -    ./in.cue:113:6
-+d: structural cycle:
 +    ./in.cue:73:11
 +structural cycle:
 +    ./in.cue:85:12
-+0.0: structural cycle:
++listAddCycle.c: structural cycle:
 +    ./in.cue:91:5
-+0.a.b: structural cycle:
++listMulCycle.c: structural cycle:
 +    ./in.cue:97:5
 +closeFail.x.b: field not allowed:
 +    ./in.cue:105:6
@@ -505,15 +504,15 @@ diff old new
 -    c: (_|_){
 -      // [structural cycle] closeCycle.c: structural cycle:
 -      //     ./in.cue:73:15
-+      // [structural cycle] d: structural cycle:
++      // [structural cycle] closeCycle.c: structural cycle:
 +      //     ./in.cue:73:11
 +    }
 +    b: (_|_){
-+      // [structural cycle] d: structural cycle:
++      // [structural cycle] closeCycle.c: structural cycle:
 +      //     ./in.cue:73:11
 +    }
 +    c: (_|_){
-+      // [structural cycle] d: structural cycle:
++      // [structural cycle] closeCycle.c: structural cycle:
 +      //     ./in.cue:73:11
      }
    }
@@ -577,15 +576,15 @@ diff old new
 -    }
 -    c: (_|_){
 -      // [structural cycle]
-+      // [structural cycle] 0.0: structural cycle:
++      // [structural cycle] listAddCycle.c: structural cycle:
 +      //     ./in.cue:91:5
 +    }
 +    b: (_|_){
-+      // [structural cycle] 0.0: structural cycle:
++      // [structural cycle] listAddCycle.c: structural cycle:
 +      //     ./in.cue:91:5
 +    }
 +    c: (_|_){
-+      // [structural cycle] 0.0: structural cycle:
++      // [structural cycle] listAddCycle.c: structural cycle:
 +      //     ./in.cue:91:5
      }
    }
@@ -599,15 +598,15 @@ diff old new
 -    }
 -    c: (_|_){
 -      // [structural cycle]
-+      // [structural cycle] 0.a.b: structural cycle:
++      // [structural cycle] listMulCycle.c: structural cycle:
 +      //     ./in.cue:97:5
 +    }
 +    b: (_|_){
-+      // [structural cycle] 0.a.b: structural cycle:
++      // [structural cycle] listMulCycle.c: structural cycle:
 +      //     ./in.cue:97:5
 +    }
 +    c: (_|_){
-+      // [structural cycle] 0.a.b: structural cycle:
++      // [structural cycle] listMulCycle.c: structural cycle:
 +      //     ./in.cue:97:5
      }
    }

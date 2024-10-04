@@ -221,14 +221,16 @@ Result:
       //     ./in.cue:56:9
     }
   }
-  forCycle: (struct){
-    #A: (#struct){
-      a: ~(forCycle.#B)
-    }
-    #B: (struct){
-      struct
-      b: (_|_){// &[〈1;x〉]
+  forCycle: (_|_){
+    // [structural cycle]
+    #A: (_|_){
+      // [structural cycle]
+      a: (_|_){
+        // [structural cycle]
       }
+    }
+    #B: (_|_){
+      // [structural cycle]
     }
   }
   letCycleWithAnd: (struct){
@@ -449,7 +451,7 @@ diff old new
          }
          x: (struct){
            y: (string){ "" }
-@@ -85,30 +81,26 @@
+@@ -85,15 +81,15 @@
    disjunctionCycle: (_|_){
      // [eval]
      a: (_|_){
@@ -462,21 +464,6 @@ diff old new
 -    }
 -    c: (_|_){
 -      // [eval] disjunctionCycle.c: cannot use 1 (type int) as list in argument 1 to and:
--      //     ./in.cue:56:9
--    }
--  }
--  forCycle: (_|_){
--    // [structural cycle]
--    #A: (_|_){
--      // [structural cycle]
--      a: (_|_){
--        // [structural cycle] b: structural cycle:
--        //     ./in.cue:62:6
--      }
--    }
--    #B: (_|_){
--      // [structural cycle] b: structural cycle:
--      //     ./in.cue:62:6
 +      // [eval] disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
 +      //     ./in.cue:56:9
 +    }
@@ -486,21 +473,26 @@ diff old new
 +    }
 +    c: (_|_){
 +      // [eval] disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
-+      //     ./in.cue:56:9
-+    }
-+  }
-+  forCycle: (struct){
-+    #A: (#struct){
-+      a: ~(forCycle.#B)
-+    }
-+    #B: (struct){
-+      struct
-+      b: (_|_){// &[〈1;x〉]
-+      }
+       //     ./in.cue:56:9
+     }
+   }
+@@ -102,13 +98,11 @@
+     #A: (_|_){
+       // [structural cycle]
+       a: (_|_){
+-        // [structural cycle] b: structural cycle:
+-        //     ./in.cue:62:6
++        // [structural cycle]
+       }
+     }
+     #B: (_|_){
+-      // [structural cycle] b: structural cycle:
+-      //     ./in.cue:62:6
++      // [structural cycle]
      }
    }
    letCycleWithAnd: (struct){
-@@ -118,41 +110,34 @@
+@@ -118,41 +112,34 @@
      }
      b: (struct){
      }
@@ -562,7 +554,7 @@ diff old new
      }
    }
    embedCycle: (_|_){
-@@ -159,39 +144,45 @@
+@@ -159,39 +146,45 @@
      // [structural cycle]
      a: (_|_){
        // [structural cycle] embedCycle: structural cycle:
@@ -631,7 +623,7 @@ diff old new
      }
    }
    closeFail: (_|_){
-@@ -201,21 +192,22 @@
+@@ -201,21 +194,22 @@
      }
      x: (_|_){
        // [eval]
@@ -661,9 +653,6 @@ diff old new
  }
 -- diff/todo/p1 --
 letCycleOK.t2: spurious error
-forCycle.0.b: missing structural cycle error
-    This is not the end of the world, as any usage of the generated type
-    will trigger the error.
 -- out/eval --
 Errors:
 closeCycle.a: structural cycle

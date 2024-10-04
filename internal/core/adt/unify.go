@@ -281,7 +281,10 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		v.ChildErrors = nil
 		v.Arcs = nil
 
-		result := w.unify(c, needs, mode)
+		result := true
+		if n.isShared && n.sharedID.CycleType == NoCycle {
+			result = w.unify(c, needs, mode)
+		}
 
 		// Set control fields that are referenced without dereferencing.
 		if w.Closed {
@@ -312,10 +315,6 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	if n.completed&(subFieldsProcessed) != 0 {
 		n.node.HasEllipsis = n.node.cc.hasEllipsis
 
-		n.node.updateStatus(finalized)
-
-		defer n.unmarkOptional(n.markOptional())
-
 		// The next piece of code addresses the following case.
 		// order matters
 		// c1: c: [string]: f2
@@ -326,6 +325,10 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 				c.Constraint.Finalize(n.ctx)
 			}
 		}
+
+		n.node.updateStatus(finalized)
+
+		defer n.unmarkOptional(n.markOptional())
 
 		if DebugDeps {
 			RecordDebugGraph(n.ctx, n.node, "Finalize")

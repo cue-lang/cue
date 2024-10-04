@@ -310,14 +310,14 @@ issue2367: {
 }
 
 -- out/evalalpha/stats --
-Leaks:  786
-Freed:  56
-Reused: 56
-Allocs: 786
+Leaks:  782
+Freed:  60
+Reused: 60
+Allocs: 782
 Retain: 0
 
-Unifications: 487
-Conjuncts:    2953
+Unifications: 499
+Conjuncts:    3043
 Disjuncts:    196
 -- out/evalalpha --
 Errors:
@@ -461,47 +461,23 @@ Result:
           #AllOutputs: (#struct){
             reject: (string){ string }
             resource: (string){ string }
-            retry: (#struct){ |((struct){
-                struct
-                reject: (_|_){// &[〈1;config〉]
-                }
-              }, (struct){
-                struct
-                resource: (_|_){// &[〈1;config〉]
-                }
-              }, (struct){
-                struct
-                retry: (_|_){// &[〈1;config〉]
-                }
+            retry: (#struct){ |((#struct){
+                reject: (string){ string }
+              }, (#struct){
+                resource: (string){ string }
               }) }
           }
-          #Output: (#struct){ |((struct){
-              struct
-              reject: (_|_){// &[〈1;config〉]
-              }
-            }, (struct){
-              struct
-              resource: (_|_){// &[〈1;config〉]
-              }
-            }, (struct){
-              struct
-              retry: (_|_){// &[〈1;config〉]
-              }
+          #Output: (#struct){ |((#struct){
+              reject: (string){ string }
+            }, (#struct){
+              resource: (string){ string }
             }) }
         }
         p2: (struct){
-          #Output: (#struct){ |((struct){
-              struct
-              reject: (_|_){// &[〈1;config〉]
-              }
-            }, (struct){
-              struct
-              resource: (_|_){// &[〈1;config〉]
-              }
-            }, (struct){
-              struct
-              retry: (_|_){// &[〈1;config〉]
-              }
+          #Output: (#struct){ |((#struct){
+              reject: (string){ string }
+            }, (#struct){
+              resource: (string){ string }
             }) }
           o: (#struct){
             retry: (#struct){
@@ -511,50 +487,26 @@ Result:
           #AllOutputs: (#struct){
             reject: (string){ string }
             resource: (string){ string }
-            retry: (#struct){ |((struct){
-                struct
-                reject: (_|_){// &[〈1;config〉]
-                }
-              }, (struct){
-                struct
-                resource: (_|_){// &[〈1;config〉]
-                }
-              }, (struct){
-                struct
-                retry: (_|_){// &[〈1;config〉]
-                }
+            retry: (#struct){ |((#struct){
+                reject: (string){ string }
+              }, (#struct){
+                resource: (string){ string }
               }) }
           }
         }
         p3: (struct){
-          #Output: (#struct){ |((struct){
-              struct
-              reject: (_|_){// &[〈1;config〉]
-              }
-            }, (struct){
-              struct
-              resource: (_|_){// &[〈1;config〉]
-              }
-            }, (struct){
-              struct
-              retry: (_|_){// &[〈1;config〉]
-              }
+          #Output: (#struct){ |((#struct){
+              reject: (string){ string }
+            }, (#struct){
+              resource: (string){ string }
             }) }
           #AllOutputs: (#struct){
             reject: (string){ string }
             resource: (string){ string }
-            retry: (#struct){ |((struct){
-                struct
-                reject: (_|_){// &[〈1;config〉]
-                }
-              }, (struct){
-                struct
-                resource: (_|_){// &[〈1;config〉]
-                }
-              }, (struct){
-                struct
-                retry: (_|_){// &[〈1;config〉]
-                }
+            retry: (#struct){ |((#struct){
+                reject: (string){ string }
+              }, (#struct){
+                resource: (string){ string }
               }) }
           }
           o: (#struct){
@@ -566,11 +518,7 @@ Result:
       }
       t2: (struct){
         p1: (struct){
-          d: ((int|string|struct)){ |((int){ int }, (string){ string }, (struct){
-              struct
-              b: (_|_){// &[〈2;d〉]
-              }
-            }) }
+          d: ((int|string)){ |((int){ int }, (string){ string }) }
           o: (struct){
             b: (int){ 2 }
           }
@@ -586,11 +534,7 @@ Result:
           o: (struct){
             b: (int){ 2 }
           }
-          d: ((int|string|struct)){ |((int){ int }, (string){ string }, (struct){
-              struct
-              b: (_|_){// &[〈2;d〉]
-              }
-            }) }
+          d: ((int|string)){ |((int){ int }, (string){ string }) }
           #A: (#struct){
             d1: (int){ int }
             d2: (string){ string }
@@ -610,11 +554,7 @@ Result:
               b: ((int|string)){ |((int){ int }, (string){ string }) }
             }
           }
-          d: ((int|string|struct)){ |((int){ int }, (string){ string }, (struct){
-              struct
-              b: (_|_){// &[〈2;d〉]
-              }
-            }) }
+          d: ((int|string)){ |((int){ int }, (string){ string }) }
         }
       }
     }
@@ -646,6 +586,8 @@ Result:
               reject: (string){ string }
             }, (#struct){
               resource: (string){ string }
+            }, (#struct){
+              retry: ~(issue1881.p1.#AllOutputs.retry)
             }) }
         }
       }
@@ -653,6 +595,8 @@ Result:
           reject: (string){ string }
         }, (#struct){
           resource: (string){ string }
+        }, (#struct){
+          retry: ~(issue1881.p1.#AllOutputs.retry)
         }) }
     }
     p2: (struct){
@@ -866,247 +810,32 @@ diff old new
        }
      }
      acrossOr: (struct){
-@@ -143,52 +139,100 @@
-           #AllOutputs: (#struct){
-             reject: (string){ string }
-             resource: (string){ string }
--            retry: (#struct){ |((#struct){
--                reject: (string){ string }
--              }, (#struct){
--                resource: (string){ string }
--              }) }
--          }
--          #Output: (#struct){ |((#struct){
--              reject: (string){ string }
--            }, (#struct){
--              resource: (string){ string }
+@@ -268,13 +264,17 @@
+               reject: (string){ string }
+             }, (#struct){
+               resource: (string){ string }
 -            }) }
 -        }
--        p2: (struct){
--          #Output: (#struct){ |((#struct){
--              reject: (string){ string }
--            }, (#struct){
--              resource: (string){ string }
--            }) }
--          o: (#struct){
--            retry: (#struct){
--              reject: (string){ "ok" }
--            }
--          }
--          #AllOutputs: (#struct){
--            reject: (string){ string }
--            resource: (string){ string }
--            retry: (#struct){ |((#struct){
--                reject: (string){ string }
--              }, (#struct){
--                resource: (string){ string }
--              }) }
--          }
--        }
--        p3: (struct){
--          #Output: (#struct){ |((#struct){
--              reject: (string){ string }
--            }, (#struct){
--              resource: (string){ string }
--            }) }
--          #AllOutputs: (#struct){
--            reject: (string){ string }
--            resource: (string){ string }
--            retry: (#struct){ |((#struct){
--                reject: (string){ string }
--              }, (#struct){
--                resource: (string){ string }
-+            retry: (#struct){ |((struct){
-+                struct
-+                reject: (_|_){// &[〈1;config〉]
-+                }
-+              }, (struct){
-+                struct
-+                resource: (_|_){// &[〈1;config〉]
-+                }
-+              }, (struct){
-+                struct
-+                retry: (_|_){// &[〈1;config〉]
-+                }
-+              }) }
-+          }
-+          #Output: (#struct){ |((struct){
-+              struct
-+              reject: (_|_){// &[〈1;config〉]
-+              }
-+            }, (struct){
-+              struct
-+              resource: (_|_){// &[〈1;config〉]
-+              }
-+            }, (struct){
-+              struct
-+              retry: (_|_){// &[〈1;config〉]
-+              }
+-      }
+-      #Output: (#struct){ |((#struct){
+-          reject: (string){ string }
+-        }, (#struct){
+-          resource: (string){ string }
++            }, (#struct){
++              retry: ~(issue1881.p1.#AllOutputs.retry)
 +            }) }
 +        }
-+        p2: (struct){
-+          #Output: (#struct){ |((struct){
-+              struct
-+              reject: (_|_){// &[〈1;config〉]
-+              }
-+            }, (struct){
-+              struct
-+              resource: (_|_){// &[〈1;config〉]
-+              }
-+            }, (struct){
-+              struct
-+              retry: (_|_){// &[〈1;config〉]
-+              }
-+            }) }
-+          o: (#struct){
-+            retry: (#struct){
-+              reject: (string){ "ok" }
-+            }
-+          }
-+          #AllOutputs: (#struct){
-+            reject: (string){ string }
-+            resource: (string){ string }
-+            retry: (#struct){ |((struct){
-+                struct
-+                reject: (_|_){// &[〈1;config〉]
-+                }
-+              }, (struct){
-+                struct
-+                resource: (_|_){// &[〈1;config〉]
-+                }
-+              }, (struct){
-+                struct
-+                retry: (_|_){// &[〈1;config〉]
-+                }
-+              }) }
-+          }
-+        }
-+        p3: (struct){
-+          #Output: (#struct){ |((struct){
-+              struct
-+              reject: (_|_){// &[〈1;config〉]
-+              }
-+            }, (struct){
-+              struct
-+              resource: (_|_){// &[〈1;config〉]
-+              }
-+            }, (struct){
-+              struct
-+              retry: (_|_){// &[〈1;config〉]
-+              }
-+            }) }
-+          #AllOutputs: (#struct){
-+            reject: (string){ string }
-+            resource: (string){ string }
-+            retry: (#struct){ |((struct){
-+                struct
-+                reject: (_|_){// &[〈1;config〉]
-+                }
-+              }, (struct){
-+                struct
-+                resource: (_|_){// &[〈1;config〉]
-+                }
-+              }, (struct){
-+                struct
-+                retry: (_|_){// &[〈1;config〉]
-+                }
-               }) }
-           }
-           o: (#struct){
-@@ -200,43 +244,55 @@
-       }
-       t2: (struct){
-         p1: (struct){
--          d: ((int|string)){ |((int){ int }, (string){ string }) }
--          o: (struct){
--            b: (int){ 2 }
--          }
--          #A: (#struct){
--            d1: (int){ int }
--            d2: (string){ string }
--            d3: (#struct){
--              b: ((int|string)){ |((int){ int }, (string){ string }) }
--            }
--          }
--        }
--        p2: (struct){
--          o: (struct){
--            b: (int){ 2 }
--          }
--          d: ((int|string)){ |((int){ int }, (string){ string }) }
--          #A: (#struct){
--            d1: (int){ int }
--            d2: (string){ string }
--            d3: (#struct){
--              b: ((int|string)){ |((int){ int }, (string){ string }) }
--            }
--          }
--        }
--        p3: (struct){
--          o: (struct){
--            b: (int){ 2 }
--          }
--          #A: (#struct){
--            d1: (int){ int }
--            d2: (string){ string }
--            d3: (#struct){
--              b: ((int|string)){ |((int){ int }, (string){ string }) }
--            }
--          }
--          d: ((int|string)){ |((int){ int }, (string){ string }) }
-+          d: ((int|string|struct)){ |((int){ int }, (string){ string }, (struct){
-+              struct
-+              b: (_|_){// &[〈2;d〉]
-+              }
-+            }) }
-+          o: (struct){
-+            b: (int){ 2 }
-+          }
-+          #A: (#struct){
-+            d1: (int){ int }
-+            d2: (string){ string }
-+            d3: (#struct){
-+              b: ((int|string)){ |((int){ int }, (string){ string }) }
-+            }
-+          }
-+        }
-+        p2: (struct){
-+          o: (struct){
-+            b: (int){ 2 }
-+          }
-+          d: ((int|string|struct)){ |((int){ int }, (string){ string }, (struct){
-+              struct
-+              b: (_|_){// &[〈2;d〉]
-+              }
-+            }) }
-+          #A: (#struct){
-+            d1: (int){ int }
-+            d2: (string){ string }
-+            d3: (#struct){
-+              b: ((int|string)){ |((int){ int }, (string){ string }) }
-+            }
-+          }
-+        }
-+        p3: (struct){
-+          o: (struct){
-+            b: (int){ 2 }
-+          }
-+          #A: (#struct){
-+            d1: (int){ int }
-+            d2: (string){ string }
-+            d3: (#struct){
-+              b: ((int|string)){ |((int){ int }, (string){ string }) }
-+            }
-+          }
-+          d: ((int|string|struct)){ |((int){ int }, (string){ string }, (struct){
-+              struct
-+              b: (_|_){// &[〈2;d〉]
-+              }
-+            }) }
-         }
-       }
++      }
++      #Output: (#struct){ |((#struct){
++          reject: (string){ string }
++        }, (#struct){
++          resource: (string){ string }
++        }, (#struct){
++          retry: ~(issue1881.p1.#AllOutputs.retry)
+         }) }
      }
-@@ -328,7 +384,8 @@
+     p2: (struct){
+@@ -328,7 +328,8 @@
        }
      }
    }
@@ -1116,7 +845,7 @@ diff old new
      t1: (struct){
        p1: (struct){
          D: (struct){
-@@ -361,35 +418,28 @@
+@@ -361,35 +362,28 @@
          }
        }
      }
@@ -1184,17 +913,17 @@ diff old new
 -Reused: 1260
 -Allocs: 60
 -Retain: 145
-+Leaks:  786
-+Freed:  56
-+Reused: 56
-+Allocs: 786
++Leaks:  782
++Freed:  60
++Reused: 60
++Allocs: 782
 +Retain: 0
  
 -Unifications: 832
 -Conjuncts:    2525
 -Disjuncts:    1404
-+Unifications: 487
-+Conjuncts:    2953
++Unifications: 499
++Conjuncts:    3043
 +Disjuncts:    196
 -- out/eval/stats --
 Leaks:  50
@@ -1211,7 +940,9 @@ B.a.children: now correctly marked as incomplete
 -- diff/todo/p0 --
 selfReferential.list.panels: invalid incomplete error: related to "or" builtin
 siblingInsertion.t2: errors
-acrossOr.t1.p1.o.retry: invalid incomplete error: related to "or" builtin
+-- diff/todo/p2 --
+issue1881.#AllOutputs.retry: additional entry.
+Might be error in practice and okay.
 -- out/eval --
 Errors:
 selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle

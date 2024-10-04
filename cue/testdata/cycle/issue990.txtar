@@ -83,15 +83,15 @@ This seems to be the result of incorrect handling of disjunctions.
 -- diff/todo/p3 --
 Reordering
 -- out/evalalpha/stats --
-Leaks:  1369
-Freed:  139
-Reused: 139
-Allocs: 1369
+Leaks:  1392
+Freed:  141
+Reused: 141
+Allocs: 1392
 Retain: 0
 
-Unifications: 173
-Conjuncts:    4434
-Disjuncts:    278
+Unifications: 183
+Conjuncts:    4545
+Disjuncts:    284
 -- out/evalalpha --
 Errors:
 out.subs: structural cycle:
@@ -109,10 +109,13 @@ Result:
     d: ~(#S)
   }
   #R: (#struct){
-    a: (#struct){
-      k: (string){ "simple" }
-      d: ~(#C)
-    }
+    a: (#struct){ |((#struct){
+        k: (string){ "simple" }
+        d: ~(#C)
+      }, (#struct){
+        k: (string){ "complex" }
+        d: ~(#S)
+      }) }
   }
   #S: (#struct){
     n: (string){ string }
@@ -255,23 +258,23 @@ diff old new
 -Reused: 3200
 -Allocs: 25
 -Retain: 26
-+Leaks:  1369
-+Freed:  139
-+Reused: 139
-+Allocs: 1369
++Leaks:  1392
++Freed:  141
++Reused: 141
++Allocs: 1392
 +Retain: 0
  
 -Unifications: 2577
 -Conjuncts:    12017
 -Disjuncts:    3244
-+Unifications: 173
-+Conjuncts:    4434
-+Disjuncts:    278
++Unifications: 183
++Conjuncts:    4545
++Disjuncts:    284
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,32 +1,23 @@
+@@ -1,31 +1,25 @@
 -(struct){
 +Errors:
 +out.subs: structural cycle:
@@ -297,27 +300,24 @@ diff old new
 +    d: ~(#S)
    }
    #R: (#struct){
--    a: (#struct){ |((#struct){
--        k: (string){ "simple" }
+     a: (#struct){ |((#struct){
+         k: (string){ "simple" }
 -        d: (#struct){
 -          n: (string){ string }
 -        }
--      }, (#struct){
--        k: (string){ "complex" }
++        d: ~(#C)
+       }, (#struct){
+         k: (string){ "complex" }
 -        d: (#struct){
 -          n: (string){ string }
 -          r: (#struct){
 -          }
 -        }
--      }) }
-+    a: (#struct){
-+      k: (string){ "simple" }
-+      d: ~(#C)
-+    }
++        d: ~(#S)
+       }) }
    }
    #S: (#struct){
-     n: (string){ string }
-@@ -37,14 +28,7 @@
+@@ -37,14 +31,7 @@
      n: (string){ string }
    }
    #sub: (#struct){
@@ -333,7 +333,7 @@ diff old new
      dict: (#struct){
      }
      let subs#1multi = (〈3;#sub〉 & {
-@@ -53,195 +37,116 @@
+@@ -53,195 +40,116 @@
    }
    _test: (struct){
      c1: (#struct){

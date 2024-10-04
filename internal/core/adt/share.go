@@ -86,6 +86,13 @@ func (n *nodeContext) shareIfPossible(c Conjunct, arc *Vertex, id CloseInfo) boo
 		return false
 	}
 
+	// We do not allowing sharing if the conjunct has a cycle. Sharing is only
+	// possible if there is a single conjunct. We want to further evaluate this
+	// conjunct to force recognition of a structural cycle.
+	if id.CycleType == IsCyclic {
+		return false
+	}
+
 	if n.noSharing || n.isShared || n.ctx.errs != nil {
 		return false
 	}

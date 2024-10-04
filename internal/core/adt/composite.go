@@ -707,12 +707,6 @@ func (v *Vertex) ToDataSingle() *Vertex {
 func (v *Vertex) ToDataAll(ctx *OpContext) *Vertex {
 	v.Finalize(ctx)
 
-	// TODO(mpvl): this is to work around a bug in the old evaluator, where
-	// finalize does not always work.
-	if v.status == evaluating && ctx.isDevVersion() {
-		return v.ToDataSingle()
-	}
-
 	arcs := make([]*Vertex, 0, len(v.Arcs))
 	for _, a := range v.Arcs {
 		if !a.IsDefined(ctx) {

@@ -693,6 +693,20 @@ func (n *nodeContext) hasAncestorV3(arc *Vertex) bool {
 		return true
 	}
 
+	// TODO(evalv3): replace the use of the old status mechanism.
+	// the depth counters is an alternative mechanism to the status used in
+	// the v2 evaluator. It is slightly more precise:
+	//    - it allows detecting reference cycles as well (state evaluating is
+	//      no longer used in v3)
+	//    - it can capture cycles across inline structs, which do not have
+	//      Parent set.
+	// TODO: ensure that evalDepth is cleared when a node is finalized.
+	if s := arc.state; s != nil && arc.status != finalized {
+		if s.evalDepth > 0 && s.evalDepth < n.ctx.evalDepth {
+			return true
+		}
+	}
+
 	// 	TODO: insert test conditions for Bloom filter that guarantee that all
 	// 	parent nodes have been marked as "hot", in which case we can avoid this
 	// 	traversal.

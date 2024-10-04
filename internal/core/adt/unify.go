@@ -210,6 +210,12 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		}
 	}
 
+	if v, ok := n.node.BaseValue.(*Vertex); ok && n.sharedID.CycleType == NoCycle {
+		// We unify here to proactively detect cycles. We do not need to,
+		// nor should we, if have have already found one.
+		v.unify(n.ctx, needs, mode)
+	}
+
 	// At this point, no more conjuncts will be added, so we could decrement
 	// the notification counters.
 
@@ -282,13 +288,6 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		v.ChildErrors = nil
 		v.Arcs = nil
 
-		result := true
-		if n.isShared && n.sharedID.CycleType == NoCycle {
-			// We unify here to proactively detect cycles. We do not need to,
-			// nor should we, if have have already found one.
-			result = w.unify(c, needs, mode)
-		}
-
 		// Set control fields that are referenced without dereferencing.
 		if w.Closed {
 			v.Closed = true
@@ -298,7 +297,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		}
 		v.status = w.status
 
-		return result
+		return true
 	}
 
 	// TODO: adding this is wrong, but it should not cause the snippet below

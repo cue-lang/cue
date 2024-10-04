@@ -275,6 +275,10 @@ func (c *CallCtxt) getList(i int) *adt.Vertex {
 	switch v, ok := x.(*adt.Vertex); {
 	case ok && v.IsList():
 		v.Finalize(c.ctx)
+		if err := v.Bottom(); err != nil {
+			c.Err = &callError{err}
+			return nil
+		}
 		return v
 
 	case v != nil:

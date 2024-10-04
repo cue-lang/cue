@@ -93,7 +93,9 @@ Result:
     let B#1 = (#struct){
       open: (int){ int }
     }
-    b: ~(#S.B#1)
+    b: (#struct){
+      open: (int){ int }
+    }
   }
   V: (_|_){
     // [eval]
@@ -139,14 +141,7 @@ diff old new
      ./in.cue:10:5
  
  Result:
-@@ -23,39 +17,31 @@
-     let B#1 = (#struct){
-       open: (int){ int }
-     }
--    b: (#struct){
--      open: (int){ int }
--    }
-+    b: ~(#S.B#1)
+@@ -29,33 +23,27 @@
    }
    V: (_|_){
      // [eval]

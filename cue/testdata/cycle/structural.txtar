@@ -1329,7 +1329,7 @@ Result:
       cheeseburger: (float){ 3.00 }
       fries: (float){ 2.00 }
       sprite: (float){ 1.00 }
-      total: (int){ 18 }
+      total: (int){ 12 }
     }
   }
   listOptOK: (struct){
@@ -2206,6 +2206,15 @@ diff old new
      }
    }
    fieldsSumInfinite: (struct){
+@@ -753,7 +731,7 @@
+       cheeseburger: (float){ 3.00 }
+       fries: (float){ 2.00 }
+       sprite: (float){ 1.00 }
+-      total: (int){ 18 }
++      total: (int){ 12 }
+     }
+   }
+   listOptOK: (struct){
 @@ -767,9 +745,7 @@
        head: (int){ 3 }
        tail: (struct){

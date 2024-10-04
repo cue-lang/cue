@@ -135,6 +135,8 @@ letCycleFail.t1.a.X: structural cycle:
     ./in.cue:33:11
 disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
     ./in.cue:56:9
+b: structural cycle:
+    ./in.cue:62:6
 closeCycle.d: structural cycle:
     ./in.cue:73:11
 embedCycle: structural cycle:
@@ -226,11 +228,13 @@ Result:
     #A: (_|_){
       // [structural cycle]
       a: (_|_){
-        // [structural cycle]
+        // [structural cycle] b: structural cycle:
+        //     ./in.cue:62:6
       }
     }
     #B: (_|_){
-      // [structural cycle]
+      // [structural cycle] b: structural cycle:
+      //     ./in.cue:62:6
     }
   }
   letCycleWithAnd: (struct){
@@ -345,51 +349,51 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,47 +1,47 @@
+@@ -1,47 +1,49 @@
  Errors:
 -closeCycle.a: structural cycle
 -closeCycle.b.d: structural cycle
+-closeFail.x.b: field not allowed:
+-    ./in.cue:104:6
+-    ./in.cue:105:12
+-    ./in.cue:106:6
+-    ./in.cue:107:5
+-letCycleFail.t1.a.c: structural cycle
+-structCycle.a: structural cycle
+-structCycle.b.d: structural cycle
+-disjunctionCycle.a: cannot use 1 (type int) as list in argument 1 to and:
+-    ./in.cue:56:9
 +printCycle.a.X: structural cycle
 +structCycle.c: structural cycle
 +letCycleOK.t2.a.X: structural cycle:
 +    ./in.cue:23:11
 +letCycleFail.t1.a.X: structural cycle:
 +    ./in.cue:33:11
-+disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
-+    ./in.cue:56:9
+ disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
+     ./in.cue:56:9
+-disjunctionCycle.c: cannot use 1 (type int) as list in argument 1 to and:
+-    ./in.cue:56:9
+ b: structural cycle:
+     ./in.cue:62:6
+-closeCycle.c: structural cycle:
+-    ./in.cue:73:15
+-structCycle.c: structural cycle:
+-    ./in.cue:79:14
 +closeCycle.d: structural cycle:
 +    ./in.cue:73:11
-+embedCycle: structural cycle:
+ embedCycle: structural cycle:
+-    ./in.cue:85:11
+-printCycle.a.X.X: structural cycle:
+-    ./in.cue:113:6
 +    ./in.cue:85:12
 +listAddCycle.0.0: structural cycle:
 +    ./in.cue:91:5
 +listMulCycle.0.a.b: structural cycle:
 +    ./in.cue:97:5
- closeFail.x.b: field not allowed:
++closeFail.x.b: field not allowed:
 +    ./in.cue:105:6
-     ./in.cue:104:6
--    ./in.cue:105:12
--    ./in.cue:106:6
-     ./in.cue:107:5
--letCycleFail.t1.a.c: structural cycle
--structCycle.a: structural cycle
--structCycle.b.d: structural cycle
--disjunctionCycle.a: cannot use 1 (type int) as list in argument 1 to and:
--    ./in.cue:56:9
--disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
--    ./in.cue:56:9
--disjunctionCycle.c: cannot use 1 (type int) as list in argument 1 to and:
--    ./in.cue:56:9
--b: structural cycle:
--    ./in.cue:62:6
--closeCycle.c: structural cycle:
--    ./in.cue:73:15
--structCycle.c: structural cycle:
--    ./in.cue:79:14
--embedCycle: structural cycle:
--    ./in.cue:85:11
--printCycle.a.X.X: structural cycle:
--    ./in.cue:113:6
++    ./in.cue:104:6
++    ./in.cue:107:5
  
  Result:
  (_|_){
@@ -420,7 +424,7 @@ diff old new
        }
      }
    }
-@@ -56,20 +56,16 @@
+@@ -56,20 +58,16 @@
            // [structural cycle] letCycleFail.t1.a.X: structural cycle
          }
          c: (_|_){
@@ -451,7 +455,7 @@ diff old new
          }
          x: (struct){
            y: (string){ "" }
-@@ -85,15 +81,15 @@
+@@ -85,15 +83,15 @@
    disjunctionCycle: (_|_){
      // [eval]
      a: (_|_){
@@ -476,23 +480,7 @@ diff old new
        //     ./in.cue:56:9
      }
    }
-@@ -102,13 +98,11 @@
-     #A: (_|_){
-       // [structural cycle]
-       a: (_|_){
--        // [structural cycle] b: structural cycle:
--        //     ./in.cue:62:6
-+        // [structural cycle]
-       }
-     }
-     #B: (_|_){
--      // [structural cycle] b: structural cycle:
--      //     ./in.cue:62:6
-+      // [structural cycle]
-     }
-   }
-   letCycleWithAnd: (struct){
-@@ -118,41 +112,34 @@
+@@ -118,41 +116,34 @@
      }
      b: (struct){
      }
@@ -554,7 +542,7 @@ diff old new
      }
    }
    embedCycle: (_|_){
-@@ -159,39 +146,45 @@
+@@ -159,39 +150,45 @@
      // [structural cycle]
      a: (_|_){
        // [structural cycle] embedCycle: structural cycle:
@@ -623,7 +611,7 @@ diff old new
      }
    }
    closeFail: (_|_){
-@@ -201,21 +194,22 @@
+@@ -201,21 +198,22 @@
      }
      x: (_|_){
        // [eval]

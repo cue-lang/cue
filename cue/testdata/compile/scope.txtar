@@ -113,7 +113,9 @@ Result:
   let B#1 = (struct){
     open: (int){ int }
   }
-  f: ~(B#1)
+  f: (struct){
+    open: (int){ int }
+  }
   schema: (_|_){
     // [structural cycle]
     next: (_|_){
@@ -135,14 +137,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -23,17 +23,14 @@
-   let B#1 = (struct){
-     open: (int){ int }
-   }
--  f: (struct){
--    open: (int){ int }
--  }
-+  f: ~(B#1)
+@@ -29,11 +29,10 @@
    schema: (_|_){
      // [structural cycle]
      next: (_|_){

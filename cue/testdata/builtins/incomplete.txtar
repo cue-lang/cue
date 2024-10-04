@@ -202,7 +202,7 @@ Result:
         //     ./in.cue:50:17
       }
       max: (_|_){
-        // [incomplete] 0: operand param of '+' not concrete (was int):
+        // [incomplete] incompleteArgDecimalList.#a.transformed: operand param of '+' not concrete (was int):
         //     ./in.cue:50:17
       }
     }
@@ -221,7 +221,7 @@ Result:
         //     ./in.cue:58:16
       }
       joined: (_|_){
-        // [incomplete] 0: non-concrete value string in operand to +:
+        // [incomplete] incompleteArgStringList.#a.transformed: non-concrete value string in operand to +:
         //     ./in.cue:59:16
         //     ./in.cue:58:16
       }
@@ -307,7 +307,7 @@ diff old new
        }
        max: (_|_){
 -        // [incomplete] incompleteArgDecimalList.#a.0: operand param of '+' not concrete (was int):
-+        // [incomplete] 0: operand param of '+' not concrete (was int):
++        // [incomplete] incompleteArgDecimalList.#a.transformed: operand param of '+' not concrete (was int):
          //     ./in.cue:50:17
        }
      }
@@ -316,7 +316,7 @@ diff old new
        }
        joined: (_|_){
 -        // [incomplete] incompleteArgStringList.#a.0: non-concrete value string in operand to +:
-+        // [incomplete] 0: non-concrete value string in operand to +:
++        // [incomplete] incompleteArgStringList.#a.transformed: non-concrete value string in operand to +:
          //     ./in.cue:59:16
          //     ./in.cue:58:16
        }

@@ -214,6 +214,12 @@ func SimplifyValidator(ctx *OpContext, v, w Validator) Validator {
 				return nil
 			}
 			for i, a := range x.Args {
+				if v, ok := a.(*Vertex); ok {
+					v.Finalize(ctx)
+				}
+				if v, ok := y.Args[i].(*Vertex); ok {
+					v.Finalize(ctx)
+				}
 				if !Equal(ctx, a, y.Args[i], CheckStructural) {
 					return nil
 				}

@@ -74,6 +74,8 @@ var SmallMatrix Matrix = FullMatrix[:2]
 
 var DefaultOnlyMatrix Matrix = FullMatrix[:1]
 
+var DevOnlyMatrix Matrix = FullMatrix[1:2]
+
 // Run runs a subtest with the given name that
 // invokes a further subtest for each configuration in the matrix.
 func (m Matrix) Run(t *testing.T, name string, f func(t *testing.T, m *M)) {

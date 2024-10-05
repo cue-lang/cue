@@ -195,6 +195,7 @@ func New(v *Vertex, cfg *Config) *OpContext {
 	return ctx
 }
 
+// See also: unreachableForDev
 func (c *OpContext) isDevVersion() bool {
 	return c.Version == internal.DevVersion
 }
@@ -873,7 +874,7 @@ func (c *OpContext) unifyNode(v Expr, state combinedFlags) (result Value) {
 				n.process(arcTypeKnown, yield)
 			}
 		} else {
-			if v.isUndefined() || state.vertexStatus() > v.status {
+			if v.isUndefined() || state.vertexStatus() > v.Status() {
 				c.unify(v, state)
 			}
 		}

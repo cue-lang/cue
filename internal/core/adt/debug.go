@@ -404,7 +404,7 @@ func (m *mermaidContext) vertex(v *Vertex) *mermaidVertex {
 
 	var status string
 	switch {
-	case v.status == finalized:
+	case v.Status() == finalized:
 		status = "finalized"
 	case v.state == nil:
 		status = "ready"

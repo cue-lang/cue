@@ -29,6 +29,8 @@ import (
 // and comprehension sources.
 func (v *visitor) dynamic(n *adt.Vertex, top bool) {
 	found := false
+	// TODO: Consider if we should only visit the conjuncts of the disjunction
+	// for dynamic mode.
 	n.VisitLeafConjuncts(func(c adt.Conjunct) bool {
 		if v.marked[c.Expr()] {
 			found = true
@@ -45,6 +47,7 @@ func (v *visitor) dynamic(n *adt.Vertex, top bool) {
 		return
 	}
 
+	n = n.DerefValue()
 	for _, a := range n.Arcs {
 		if !a.IsDefined(v.ctxt) || a.Label.IsLet() {
 			continue

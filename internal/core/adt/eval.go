@@ -689,6 +689,8 @@ func (n *nodeContext) validateValue(state vertexStatus) {
 // incompleteErrors reports all errors from uncompleted conjuncts.
 // If final is true, errors are permanent and reported to parents.
 func (n *nodeContext) incompleteErrors(final bool) *Bottom {
+	unreachableForDev(n.ctx)
+
 	// collect incomplete errors.
 	var err *Bottom // n.incomplete
 	for _, d := range n.dynamicFields {
@@ -1474,7 +1476,7 @@ func (n *nodeContext) hasErr() bool {
 	if n.node.ChildErrors != nil {
 		return true
 	}
-	if n.node.status > evaluating && n.node.IsErr() {
+	if n.node.Status() > evaluating && n.node.IsErr() {
 		return true
 	}
 	return n.ctx.HasErr() || n.errs != nil

@@ -22,12 +22,14 @@ import (
 	"text/tabwriter"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/dep"
 	"cuelang.org/go/internal/core/eval"
+	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/value"
@@ -35,9 +37,10 @@ import (
 
 func TestVisit(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root:   "./testdata",
-		Name:   "dependencies",
-		Matrix: cuetdtest.SmallMatrix,
+		Root: "./testdata",
+		Name: "dependencies",
+		// Matrix: cuetdtest.SmallMatrix,
+		Matrix: cuetdtest.DevOnlyMatrix,
 
 		ToDo: map[string]string{
 			"dependencies-v3/inline": "error",
@@ -45,7 +48,15 @@ func TestVisit(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		val := t.CueContext().BuildInstance(t.Instance())
+		flags := cuedebug.Config{
+			Sharing: true,
+			// LogEval: 1,
+		}
+		ctx := t.CueContext()
+		r := (*runtime.Runtime)(ctx)
+		r.SetDebugOptions(&flags)
+
+		val := ctx.BuildInstance(t.Instance())
 		if val.Err() != nil {
 			t.Fatal(val.Err())
 		}
@@ -117,9 +128,16 @@ func testVisit(t *testing.T, w io.Writer, ctxt *adt.OpContext, v *adt.Vertex, cf
 
 // DO NOT REMOVE: for Testing purposes.
 func TestX(t *testing.T) {
+	version := internal.DefaultVersion
+	version = internal.DevVersion
+	flags := cuedebug.Config{
+		Sharing: true,
+		LogEval: 1,
+	}
+
 	cfg := &dep.Config{
 		Dynamic: true,
-		// Recurse: true,
+		// Descend: true,
 	}
 
 	in := `
@@ -129,7 +147,10 @@ func TestX(t *testing.T) {
 		t.Skip()
 	}
 
-	v := cuecontext.New().CompileString(in)
+	r := runtime.NewWithSettings(version, flags)
+	ctx := (*cue.Context)(r)
+
+	v := ctx.CompileString(in)
 	if err := v.Err(); err != nil {
 		t.Fatal(err)
 	}
@@ -137,6 +158,9 @@ func TestX(t *testing.T) {
 	aVal := v.LookupPath(cue.MakePath(cue.Str("a")))
 
 	r, n := value.ToInternal(aVal)
+
+	out := debug.NodeString(r, n, nil)
+	t.Error(out)
 
 	ctxt := eval.NewContext(r, n)
 

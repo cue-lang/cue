@@ -547,13 +547,13 @@ func (v *Vertex) ForceDone() {
 
 // IsUnprocessed reports whether v is unprocessed.
 func (v *Vertex) IsUnprocessed() bool {
-	return v.status == unprocessed
+	return v.Status() == unprocessed
 }
 
 func (v *Vertex) updateStatus(s vertexStatus) {
 	if !isCyclePlaceholder(v.BaseValue) {
 		if !v.IsErr() && v.state != nil {
-			Assertf(v.state.ctx, v.status <= s+1, "attempt to regress status from %d to %d", v.Status(), s)
+			Assertf(v.state.ctx, v.Status() <= s+1, "attempt to regress status from %d to %d", v.Status(), s)
 		}
 	}
 
@@ -677,8 +677,7 @@ func (v *Vertex) isFinal() bool {
 	// TODO(deref): the accounting of what is final should be recorded
 	// in the original node. Remove this dereference once the old
 	// evaluator has been removed.
-	v = v.DerefValue()
-	return v.status == finalized
+	return v.Status() == finalized
 }
 
 func (x *Vertex) IsConcrete() bool {

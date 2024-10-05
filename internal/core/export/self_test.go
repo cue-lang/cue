@@ -26,6 +26,8 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/core/export"
+	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/diff"
@@ -152,7 +154,7 @@ func doDiff(t *testing.T, v, w cue.Value) {
 func TestSC(t *testing.T) {
 	in := `
 -- cue.mod/module.cue --
-module: "mod.test/a"
+module: "example.com"
 language: version: "v0.9.0"
 -- in.cue --
 	`
@@ -166,11 +168,17 @@ language: version: "v0.9.0"
 		t.Fatal(instance.Err)
 	}
 
-	r := cuecontext.New()
+	version := cuecontext.EvalDefault
+	version = cuecontext.EvalExperiment // Uncomment for eval V3
+	r := cuecontext.New(cuecontext.EvaluatorVersion(version))
+	(*runtime.Runtime)(r).SetDebugOptions(&cuedebug.Config{
+		Sharing: true,
+		LogEval: 1,
+	})
 
 	v := buildFile(t, r, instance)
 
-	// v = v.LookupPath(cue.ParsePath("a.b"))
+	v = v.LookupPath(cue.ParsePath("a.b"))
 
 	var tValue types.Value
 	v.Core(&tValue)

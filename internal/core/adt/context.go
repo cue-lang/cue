@@ -195,6 +195,7 @@ func New(v *Vertex, cfg *Config) *OpContext {
 	return ctx
 }
 
+// See also: unreachableForDev
 func (c *OpContext) isDevVersion() bool {
 	return c.Version == internal.DevVersion
 }
@@ -766,6 +767,7 @@ func (c *OpContext) evalState(v Expr, state combinedFlags) (result Value) {
 
 				v := arc
 				if v.ArcType == ArcPending {
+					// XXX: replace with evalDept
 					if v.status == evaluating {
 						for ; v.Parent != nil && v.ArcType == ArcPending; v = v.Parent {
 						}
@@ -873,7 +875,7 @@ func (c *OpContext) unifyNode(v Expr, state combinedFlags) (result Value) {
 				n.process(arcTypeKnown, yield)
 			}
 		} else {
-			if v.isUndefined() || state.vertexStatus() > v.status {
+			if v.isUndefined() || state.vertexStatus() > v.Status() {
 				c.unify(v, state)
 			}
 		}

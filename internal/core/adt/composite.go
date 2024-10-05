@@ -536,6 +536,7 @@ const (
 )
 
 func (v *Vertex) Status() vertexStatus {
+	v = v.DerefValue()
 	return v.status
 }
 

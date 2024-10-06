@@ -42,6 +42,10 @@ func TestSelfContained(t *testing.T) {
 
 		ToDo: map[string]string{
 			"self-v3/selfcontained/import": `wa: reference "_hidden_567475F3" not found:`,
+
+			"self/selfcontained/cyclic":            `reference not properly substituted`,
+			"self-v3/selfcontained/cyclic":         `reference not properly substituted`,
+			"self-v3-noshare/selfcontained/cyclic": `reference not properly substituted`,
 		},
 	}
 

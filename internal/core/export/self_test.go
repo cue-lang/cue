@@ -41,10 +41,7 @@ func TestSelfContained(t *testing.T) {
 		Matrix: cuetdtest.FullMatrix,
 
 		ToDo: map[string]string{
-			"self-v3/selfcontained/errors":                     "reordering",
-			"self-v3/selfcontained/import":                     `wa: reference "_hidden_567475F3" not found:`,
-			"self-v3/selfcontained/splitcomprehension":         "reference not found",
-			"self-v3-noshare/selfcontained/splitcomprehension": "reference not found",
+			"self-v3/selfcontained/import": `wa: reference "_hidden_567475F3" not found:`,
 		},
 	}
 

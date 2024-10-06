@@ -880,12 +880,13 @@ func (v Value) Kind() Kind {
 	if v.v == nil {
 		return BottomKind
 	}
-	c := v.v.BaseValue
-	if !v.v.IsConcrete() {
+	w := v.v.DerefValue()
+	c := w.BaseValue
+	if !w.IsConcrete() {
 		return BottomKind
 	}
 	// TODO: perhaps we should not consider open lists as "incomplete".
-	if v.IncompleteKind() == adt.ListKind && !v.v.IsClosedList() {
+	if v.IncompleteKind() == adt.ListKind && !w.IsClosedList() {
 		return BottomKind
 	}
 	return c.Kind()
@@ -1188,13 +1189,14 @@ func (v Value) IsConcrete() bool {
 	if v.v == nil {
 		return false // any is neither concrete, not a list or struct.
 	}
-	if b := v.v.Bottom(); b != nil {
+	w := v.v.DerefValue()
+	if b := w.Bottom(); b != nil {
 		return !b.IsIncomplete()
 	}
-	if !adt.IsConcrete(v.v) {
+	if !adt.IsConcrete(w) {
 		return false
 	}
-	if v.IncompleteKind() == adt.ListKind && !v.v.IsClosedList() {
+	if v.IncompleteKind() == adt.ListKind && !w.IsClosedList() {
 		return false
 	}
 	return true

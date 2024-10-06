@@ -1,0 +1,20 @@
+#path: a.b.#def
+
+The trick here is that we hoist values that are both cyclic as well as a
+definition. The behavior of the definition should be retained, and the
+cyclic references should be substituted accordingly.
+-- in.cue --
+a: b: #def: {
+	opt?: #def
+
+	list: [...#def]
+}
+-- out/self/default --
+X.#def
+
+let X = {
+	#def: {
+		opt?: #def
+		list: [...#def]
+	}
+}

@@ -116,7 +116,7 @@ func testVisit(t *testing.T, w io.Writer, ctxt *adt.OpContext, v *adt.Vertex, cf
 		if i := d.Import(); i != nil {
 			path := i.ImportPath.StringValue(ctxt)
 			str = fmt.Sprintf("%q.%s", path, str)
-		} else if !d.Node.Rooted() {
+		} else if d.Node.IsDetached() {
 			str = "**non-rooted**"
 		}
 
@@ -129,7 +129,7 @@ func testVisit(t *testing.T, w io.Writer, ctxt *adt.OpContext, v *adt.Vertex, cf
 // DO NOT REMOVE: for Testing purposes.
 func TestX(t *testing.T) {
 	version := internal.DefaultVersion
-	version = internal.DevVersion
+	// version = internal.DevVersion // Uncomment for eval V3
 	flags := cuedebug.Config{
 		Sharing: true,
 		LogEval: 1,

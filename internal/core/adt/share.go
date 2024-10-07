@@ -58,6 +58,20 @@ func (n *nodeContext) finalizeSharing() {
 		n.sharedID.cc.decDependent(n.ctx, SHARED, n.node.cc)
 		n.sharedID.cc = nil
 	}
+	if n.isShared {
+		v := n.node.BaseValue.(*Vertex)
+		if v.Parent == n.node.Parent {
+			v.unify(n.ctx, needTasksDone, finalize)
+			if !v.Rooted() && v.MayAttach() {
+				n.isShared = false
+				n.node.Arcs = v.Arcs
+				n.node.BaseValue = v.BaseValue
+				n.node.status = v.status
+				n.node.Closed = v.Closed
+				n.node.HasEllipsis = v.HasEllipsis
+			}
+		}
+	}
 }
 
 func (n *nodeContext) share(c Conjunct, arc *Vertex, id CloseInfo) {
@@ -70,6 +84,14 @@ func (n *nodeContext) share(c Conjunct, arc *Vertex, id CloseInfo) {
 	n.isShared = true
 	n.shared = c
 	n.sharedID = id
+
+	if arc.IsDetached() && !arc.anonymous { // Second check necessary  ? XXX
+		// If the status is just "conjuncts", we could just take over the arcs.
+		arc.Parent = n.node.Parent
+		for _, a := range arc.Arcs {
+			a.Parent = n.node
+		}
+	}
 
 	// At this point, the node may still be unshared at a later point. For this
 	// purpose we need to keep the retain count above zero until all conjuncts

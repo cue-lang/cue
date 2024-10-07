@@ -206,7 +206,19 @@ type Vertex struct {
 	// Used for cycle detection.
 	IsDynamic bool
 
+	// nonRooted indicates that this Vertex originates within the context of
+	// a dynamic, or inlined, Vertex (e.g. `{out: ...}.out``). Note that,
+	// through reappropriation, this Vertex may become rooted down the line.
+	// Use the !IsDetached method to determine whether this Vertex became
+	// rooted.
 	nonRooted bool // indicates that there is no path from the root of the tree.
+
+	// anonymous indicates that this Vertex is being computed within a
+	// addressable context, or in other words, a context for which there is
+	// a path from the root of the file. Typically, the only addressable
+	// contexts are fields. Examples of fields that are not addressable are
+	// the for source of comprehensions and let fields or let clauses.
+	anonymous bool
 
 	// hasPendingArc is set if this Vertex has a void arc (e.g. for comprehensions)
 	hasPendingArc bool
@@ -307,13 +319,20 @@ func (v *Vertex) rootCloseContext(ctx *OpContext) *closeContext {
 // newInlineVertex creates a Vertex that is needed for computation, but for
 // which there is no CUE path defined from the root Vertex.
 func (ctx *OpContext) newInlineVertex(parent *Vertex, v BaseValue, a ...Conjunct) *Vertex {
-	return &Vertex{
-		Parent:    parent,
+	n := &Vertex{
 		BaseValue: v,
 		IsDynamic: true,
 		ArcType:   ArcMember,
 		Conjuncts: a,
 	}
+	if !ctx.isDevVersion() {
+		n.Parent = parent
+	}
+	if ctx.inDetached > 0 {
+		n.anonymous = true
+	}
+	return n
+
 }
 
 // updateArcType updates v.ArcType if t is more restrictive.
@@ -367,10 +386,30 @@ func (v *Vertex) IsDefined(c *OpContext) bool {
 	return v.isDefined()
 }
 
-// Rooted reports whether there is a path from the root of the tree to this
-// Vertex.
+// Rooted reports if it is known there is a path from the root of the tree to
+// this Vertex. If this returns false, it may still be rooted if the node
+// originated from an inline struct, but was later reappropriated.
 func (v *Vertex) Rooted() bool {
 	return !v.nonRooted && !v.Label.IsLet() && !v.IsDynamic
+}
+
+// IsDetached reports whether this Vertex does not have a path from the root.
+func (v *Vertex) IsDetached() bool {
+	// v might have resulted from an inline struct that was subsequently shared.
+	// In this case, it is still rooted.
+	for ; v != nil; v = v.Parent {
+		if v.Rooted() {
+			return false
+		}
+	}
+
+	return true
+}
+
+// MayAttach reports whether this Vertex may attach to another arc.
+// The behavior is undefined if IsDetached is true.
+func (v *Vertex) MayAttach() bool {
+	return !v.Label.IsLet() && !v.anonymous
 }
 
 type ArcType uint8
@@ -1171,6 +1210,7 @@ func (v *Vertex) GetArc(c *OpContext, f Feature, t ArcType) (arc *Vertex, isNew 
 		Label:     f,
 		ArcType:   t,
 		nonRooted: v.IsDynamic || v.Label.IsLet() || v.nonRooted,
+		anonymous: v.anonymous || v.Label.IsLet(),
 	}
 	v.Arcs = append(v.Arcs, arc)
 	if t == ArcPending {

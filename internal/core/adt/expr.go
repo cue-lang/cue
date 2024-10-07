@@ -1979,7 +1979,9 @@ func (c *OpContext) forSource(x Expr) *Vertex {
 
 	// TODO: always get the vertex. This allows a whole bunch of trickery
 	// down the line.
+	c.inDetached++
 	v := c.unifyNode(x, state)
+	c.inDetached--
 
 	node, ok := v.(*Vertex)
 	if ok && c.isDevVersion() {
@@ -2096,6 +2098,7 @@ func (x *ForClause) yield(s *compState) {
 			// processing, eluding the deallocation step.
 			status:    finalized,
 			IsDynamic: true,
+			anonymous: true,
 			ArcType:   ArcMember,
 		}
 
@@ -2104,6 +2107,7 @@ func (x *ForClause) yield(s *compState) {
 				Label:     x.Value,
 				BaseValue: a,
 				IsDynamic: true,
+				anonymous: true,
 				ArcType:   ArcPending,
 			}
 			n.Arcs = append(n.Arcs, b)
@@ -2113,6 +2117,7 @@ func (x *ForClause) yield(s *compState) {
 			v := &Vertex{
 				Label:     x.Key,
 				IsDynamic: true,
+				anonymous: true,
 			}
 			key := a.Label.ToValue(c)
 			v.AddConjunct(MakeRootConjunct(c.Env(0), key))
@@ -2172,6 +2177,7 @@ func (x *LetClause) yield(s *compState) {
 		{
 			Label:     x.Label,
 			IsDynamic: true,
+			anonymous: true,
 			Conjuncts: []Conjunct{{c.Env(0), x.Expr, c.ci}},
 		},
 	}}

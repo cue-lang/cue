@@ -263,6 +263,11 @@ type OpContext struct {
 	// enabled.
 	inConstraint int
 
+	// inDetached indicates that inline structs evaluated in the current context
+	// should never be shared. This is the case, for instance, with the source
+	// for the for clause in a comprehension.
+	inDetached int
+
 	// inValidator defines whether full evaluation need to be enforced, for
 	// instance when comparing against bottom.
 	inValidator int

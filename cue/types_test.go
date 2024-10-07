@@ -277,9 +277,9 @@ func TestValueType(t *testing.T) {
 		closed:         true,
 	}, {
 		value:          `v: [...int]`,
-		kind:           cue.BottomKind,
+		kind:           cue.ListKind,
 		incompleteKind: cue.ListKind,
-		concrete:       false,
+		concrete:       true,
 	}, {
 		value:    `v: {a: int, b: [1][a]}.b`,
 		kind:     cue.BottomKind,

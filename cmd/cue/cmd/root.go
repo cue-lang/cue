@@ -243,6 +243,7 @@ func New(args []string) (*Command, error) {
 		newFmtCmd(c),
 		newGetCmd(c),
 		newImportCmd(c),
+		newLoginCmd(c),
 		newModCmd(c),
 		newTrimCmd(c),
 		newVersionCmd(c),
@@ -250,7 +251,7 @@ func New(args []string) (*Command, error) {
 
 		// Hidden
 		newAddCmd(c),
-		newLoginCmd(c),
+		newLSPCmd(c),
 	} {
 		cmd.AddCommand(sub)
 	}

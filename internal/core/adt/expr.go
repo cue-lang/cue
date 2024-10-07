@@ -1979,7 +1979,9 @@ func (c *OpContext) forSource(x Expr) *Vertex {
 
 	// TODO: always get the vertex. This allows a whole bunch of trickery
 	// down the line.
+	c.inDetached++
 	v := c.unifyNode(x, state)
+	c.inDetached--
 
 	node, ok := v.(*Vertex)
 	if ok && c.isDevVersion() {
@@ -2094,25 +2096,28 @@ func (x *ForClause) yield(s *compState) {
 			// Using Finalized here ensures that no nodeContext is allocated,
 			// preventing a leak, as this "helper" struct bypasses normal
 			// processing, eluding the deallocation step.
-			status:    finalized,
-			IsDynamic: true,
-			ArcType:   ArcMember,
+			status:         finalized,
+			IsDynamic:      true,
+			notAddressable: true,
+			ArcType:        ArcMember,
 		}
 
 		if x.Value != InvalidLabel {
 			b := &Vertex{
-				Label:     x.Value,
-				BaseValue: a,
-				IsDynamic: true,
-				ArcType:   ArcPending,
+				Label:          x.Value,
+				BaseValue:      a,
+				IsDynamic:      true,
+				notAddressable: true,
+				ArcType:        ArcPending,
 			}
 			n.Arcs = append(n.Arcs, b)
 		}
 
 		if x.Key != InvalidLabel {
 			v := &Vertex{
-				Label:     x.Key,
-				IsDynamic: true,
+				Label:          x.Key,
+				IsDynamic:      true,
+				notAddressable: true,
 			}
 			key := a.Label.ToValue(c)
 			v.AddConjunct(MakeRootConjunct(c.Env(0), key))
@@ -2170,9 +2175,10 @@ func (x *LetClause) yield(s *compState) {
 	c := s.ctx
 	n := &Vertex{Arcs: []*Vertex{
 		{
-			Label:     x.Label,
-			IsDynamic: true,
-			Conjuncts: []Conjunct{{c.Env(0), x.Expr, c.ci}},
+			Label:          x.Label,
+			IsDynamic:      true,
+			notAddressable: true,
+			Conjuncts:      []Conjunct{{c.Env(0), x.Expr, c.ci}},
 		},
 	}}
 

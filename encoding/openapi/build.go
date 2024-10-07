@@ -486,13 +486,8 @@ func isConcrete(v cue.Value) bool {
 	if !v.IsConcrete() {
 		return false
 	}
-	if v.Kind() == cue.StructKind {
-		return false // TODO: handle struct kinds
-	}
-	for list, _ := v.List(); list.Next(); {
-		if !isConcrete(list.Value()) {
-			return false
-		}
+	if v.Kind() == cue.StructKind || v.Kind() == cue.ListKind {
+		return false // TODO: handle struct and list kinds
 	}
 	return true
 }

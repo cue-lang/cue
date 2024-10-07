@@ -30,6 +30,71 @@
                   "type": "array",
                   "minItems": 1,
                   "maxItems": 3
+               },
+               "closedConcreteList": {
+                  "type": "array",
+                  "items": [
+                     {
+                        "type": "integer",
+                        "enum": [
+                           1
+                        ]
+                     },
+                     {
+                        "type": "integer",
+                        "enum": [
+                           2
+                        ]
+                     },
+                     {
+                        "type": "integer",
+                        "enum": [
+                           3
+                        ]
+                     }
+                  ],
+                  "enum": [
+                     [
+                        1,
+                        2,
+                        3
+                     ]
+                  ],
+                  "default": [
+                     1,
+                     2,
+                     3
+                  ]
+               },
+               "openConcreteList": {
+                  "type": "array",
+                  "minItems": 3,
+                  "items": [
+                     {
+                        "type": "integer",
+                        "enum": [
+                           1
+                        ]
+                     },
+                     {
+                        "type": "integer",
+                        "enum": [
+                           2
+                        ]
+                     },
+                     {
+                        "type": "integer",
+                        "enum": [
+                           3
+                        ]
+                     }
+                  ],
+                  "default": [
+                     1,
+                     2,
+                     3
+                  ],
+                  "additionalItems": {}
                }
             }
          },

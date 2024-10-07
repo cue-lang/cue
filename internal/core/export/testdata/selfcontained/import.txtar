@@ -160,15 +160,6 @@ diff old new
  //cue:path: "mod.test/a/pkg".a.b
  let B = {
  	c: {
-@@ -42,7 +45,7 @@
- let W = {
- 	a: _hidden_567475F3
- 	_hidden_567475F3: {
--		a: 1
-+		a: b
- 	}
- 	b: 1
- 	x: {
 -- diff/self/todo/p2 --
 Investigate differences.
 We assign p2, because the differences only appear with sharing off.
@@ -217,7 +208,7 @@ let F = {
 let W = {
 	a: _hidden_567475F3
 	_hidden_567475F3: {
-		a: 1
+		a: b
 	}
 	b: 1
 	x: {

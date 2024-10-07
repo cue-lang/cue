@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e8dce77_4f100e3a",
+        "filename": "internal/diff/diff.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-07T08:51:32Z",
+      "side": 1,
+      "message": "We should probably document that `cue.Selector` is a comparable type (at least it is when it isn\u0027t an error), because otherwise it\u0027s not entirely obvious that this is OK.",
+      "revId": "07afcc85bfe5954304995bf47b4be7a8d2b0edbe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

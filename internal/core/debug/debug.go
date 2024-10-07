@@ -142,7 +142,7 @@ func (w *printer) printShared(v *adt.Vertex) (x *adt.Vertex, ok bool) {
 	isCyclic := v.IsCyclic
 	s, ok := v.BaseValue.(*adt.Vertex)
 	v = v.DerefValue()
-	if !v.Rooted() {
+	if v.IsDetached() || !v.MayAttach() {
 		useReference = false
 	}
 	isCyclic = isCyclic || v.IsCyclic

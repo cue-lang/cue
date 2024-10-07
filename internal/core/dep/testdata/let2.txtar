@@ -23,6 +23,25 @@ a: b: {
 }
 -- out/dependencies/field --
 line  reference    path of resulting vertex
+-- out/dependencies-v3/all --
+line  reference    path of resulting vertex
+12:   X1        => v.w
+13:   X2        => v.w
+14:   X3.w      => v.w
+20:   Y1        => v
+21:   Y2        => v
+-- diff/-out/dependencies-v3/all<==>+out/dependencies/all --
+diff old new
+--- old
++++ new
+@@ -2,5 +2,5 @@
+ 12:   X1        => v.w
+ 13:   X2        => v.w
+ 14:   X3.w      => v.w
+-7:    v         => v
+-8:    v         => v
++20:   Y1        => v
++21:   Y2        => v
 -- out/dependencies/all --
 line  reference    path of resulting vertex
 12:   X1        => v.w

@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "499adeb5_06ab6432",
+        "filename": "cue/interpreter/wasm/call.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-07T15:07:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "625e34b3_bd3ab5b9",
+      "revId": "45caee12f30828fcce1a8bf53736d132b20c7785",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "67761b09_c55506fc",
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3a945a2_3d161ebd",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 2481,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-07T15:07:35Z",
+      "side": 1,
+      "message": "well spotted, done.",
+      "parentUuid": "67761b09_c55506fc",
+      "revId": "45caee12f30828fcce1a8bf53736d132b20c7785",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8c417e73_b7729a7b",
@@ -65,6 +101,24 @@
       "writtenOn": "2024-10-07T09:01:15Z",
       "side": 1,
       "message": "I actually prefer the original here. I think it\u0027s easier to think about when the Err check is a separate statement.",
+      "revId": "45caee12f30828fcce1a8bf53736d132b20c7785",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44b8e26b_6b52912c",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 712,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-07T15:07:35Z",
+      "side": 1,
+      "message": "I\u0027m a bit on the fence about this one. Reverted.",
+      "parentUuid": "8c417e73_b7729a7b",
       "revId": "45caee12f30828fcce1a8bf53736d132b20c7785",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

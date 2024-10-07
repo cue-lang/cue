@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8e78559_64541500",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-07T09:01:15Z",
+      "side": 1,
+      "message": "LGTM with a few minor thoughts.",
+      "revId": "45caee12f30828fcce1a8bf53736d132b20c7785",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "625e34b3_bd3ab5b9",
+        "filename": "cue/interpreter/wasm/call.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-07T09:01:15Z",
+      "side": 1,
+      "message": "```suggestion\n\treturn api.DecodeU32(v) \u003d\u003d 1\n```",
+      "revId": "45caee12f30828fcce1a8bf53736d132b20c7785",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67761b09_c55506fc",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 2481,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-07T09:01:15Z",
+      "side": 1,
+      "message": "This change doesn\u0027t seem like a no-op to me. What if m.Src is nil ?\nOr can we assume that it\u0027s always non-nil?",
+      "revId": "45caee12f30828fcce1a8bf53736d132b20c7785",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c417e73_b7729a7b",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 712,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-07T09:01:15Z",
+      "side": 1,
+      "message": "I actually prefer the original here. I think it\u0027s easier to think about when the Err check is a separate statement.",
+      "revId": "45caee12f30828fcce1a8bf53736d132b20c7785",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

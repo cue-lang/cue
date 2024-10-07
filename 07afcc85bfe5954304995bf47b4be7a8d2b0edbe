@@ -16,6 +16,24 @@
       "message": "We should probably document that `cue.Selector` is a comparable type (at least it is when it isn\u0027t an error), because otherwise it\u0027s not entirely obvious that this is OK.",
       "revId": "07afcc85bfe5954304995bf47b4be7a8d2b0edbe",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9ab4ea0_7a08dded",
+        "filename": "internal/diff/diff.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-07T13:34:20Z",
+      "side": 1,
+      "message": "hm. the compiler and tests would already complain if the selectors weren\u0027t comparable. I\u0027m not too sure about documenting that the type will remain comparable forever; we might want to break that rule in the future. for now I\u0027m happy to lean on Hyrum\u0027s law; if a type is comparable today, users will over time start relying on that fact, so I\u0027m just like any other user.\n\nwe don\u0027t currently make it a habit to mark and document types as comparable or non-comparable, so I\u0027m not going to start here right now. but I\u0027m happy to be part of a gradual change if we want to do so.",
+      "parentUuid": "7e8dce77_4f100e3a",
+      "revId": "07afcc85bfe5954304995bf47b4be7a8d2b0edbe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

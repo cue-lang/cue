@@ -884,10 +884,6 @@ func (v Value) Kind() Kind {
 	if !v.v.IsConcrete() {
 		return BottomKind
 	}
-	// TODO: perhaps we should not consider open lists as "incomplete".
-	if v.IncompleteKind() == adt.ListKind && !v.v.IsClosedList() {
-		return BottomKind
-	}
 	return c.Kind()
 }
 
@@ -1192,9 +1188,6 @@ func (v Value) IsConcrete() bool {
 		return !b.IsIncomplete()
 	}
 	if !adt.IsConcrete(v.v) {
-		return false
-	}
-	if v.IncompleteKind() == adt.ListKind && !v.v.IsClosedList() {
 		return false
 	}
 	return true

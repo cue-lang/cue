@@ -487,17 +487,12 @@ outer:
 // structs are not supported as the result of a struct enum depends on how
 // conjunctions and disjunctions are distributed. We could consider still doing
 // this if we define a normal form.
-func isConcrete(v cue.Value) bool {
+func isConcrete(v cue.Value) (_ok bool) {
 	if !v.IsConcrete() {
 		return false
 	}
-	if v.Kind() == cue.StructKind {
-		return false // TODO: handle struct kinds
-	}
-	for list, _ := v.List(); list.Next(); {
-		if !isConcrete(list.Value()) {
-			return false
-		}
+	if v.Kind() == cue.StructKind || v.Kind() == cue.ListKind {
+		return false // TODO: handle struct and list kinds
 	}
 	return true
 }

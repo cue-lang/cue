@@ -245,7 +245,7 @@ y: conflicting values 4 and 2:
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {
 		if tc.todo_v3 {
-			t.M.TODO_V3(t)
+			t.M.TODO_V3(t) // P1: cycle error missing? Other error.
 		}
 		r := t.M.Runtime()
 		ctx := eval.NewContext(r, nil)

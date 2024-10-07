@@ -139,7 +139,7 @@ func TestAPI(t *testing.T) {
 			continue
 		}
 		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
-			m.TODO_V3(t)
+			m.TODO_V3(t) // P1: faulty closedness
 
 			ctx := m.CueContext()
 
@@ -1873,7 +1873,7 @@ func TestTemplate(t *testing.T) {
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
 			if tc.skip {
-				m.TODO_V3(t)
+				m.TODO_V3(t) // P2: reordering
 			}
 
 			v := getValue(m, tc.value)
@@ -1937,7 +1937,7 @@ func TestElem(t *testing.T) {
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
 			if tc.skip {
-				m.TODO_V3(t)
+				m.TODO_V3(t) // P2: reordering
 			}
 
 			v := getValue(m, tc.value)
@@ -2489,7 +2489,7 @@ func TestValidate(t *testing.T) {
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.desc, func(t *testing.T, m *cuetdtest.M) {
 			if tc.skip {
-				m.TODO_V3(t)
+				m.TODO_V3(t) // P1: wrong results
 			}
 
 			ctx := m.CueContext()
@@ -2760,7 +2760,7 @@ Another Foo.
 		}}
 		for _, tc := range testCases {
 			if tc.skip {
-				m.TODO_V3(t)
+				m.TODO_V3(t) // P2: reordering
 			}
 			t.Run("field:"+tc.path, func(t *testing.T) {
 				v := tc.val.Lookup(strings.Split(tc.path, " ")...)
@@ -2959,7 +2959,7 @@ func TestMarshalJSON(t *testing.T) {
 	}}
 	for i, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%d/%v", i, tc.value), func(t *testing.T, m *cuetdtest.M) {
-			m.TODO_V3(t)
+			m.TODO_V3(t) // P1: wrong output
 
 			val := getValue(m, tc.value)
 			b, err := val.MarshalJSON()
@@ -3040,7 +3040,7 @@ func TestWalk(t *testing.T) {
 	}}
 	for i, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%d/%v", i, tc.value), func(t *testing.T, m *cuetdtest.M) {
-			m.TODO_V3(t)
+			m.TODO_V3(t) // P1: missing undefined field
 
 			val := getValue(m, tc.value)
 			buf := []byte{}
@@ -3260,7 +3260,7 @@ a: x: y: z: "x"`,
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
 			if tc.skip {
-				m.TODO_V3(t)
+				m.TODO_V3(t) // P3: different position
 			}
 
 			c := m.CueContext()

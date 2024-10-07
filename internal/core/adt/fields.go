@@ -335,10 +335,11 @@ func (n *nodeContext) getArc(f Feature, mode ArcType) (arc *Vertex, isNew bool) 
 	}
 
 	arc = &Vertex{
-		Parent:    v,
-		Label:     f,
-		ArcType:   mode,
-		nonRooted: v.IsDynamic || v.Label.IsLet() || v.nonRooted,
+		Parent:         v,
+		Label:          f,
+		ArcType:        mode,
+		nonRooted:      v.IsDynamic || v.Label.IsLet() || v.nonRooted,
+		notAddressable: v.notAddressable || v.Label.IsLet(),
 	}
 	if n.scheduler.frozen&fieldSetKnown != 0 {
 		b := n.ctx.NewErrf("adding field %v not allowed as field set was already referenced", f)

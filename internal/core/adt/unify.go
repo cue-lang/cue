@@ -317,14 +317,26 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	if n.completed&(subFieldsProcessed) != 0 {
 		n.node.HasEllipsis = n.node.cc.hasEllipsis
 
-		// The next piece of code addresses the following case.
-		// order matters
-		// c1: c: [string]: f2
-		// f2: c1
-		// Also: cycle/issue990
+		// The next piece of code used to address the following case
+		// (order matters)
+		//
+		// 		c1: c: [string]: f2
+		// 		f2: c1
+		// 		Also: cycle/issue990
+		//
+		// However, with recent changes, it no longer matters. Simultaneously,
+		// this causes a hang in the following case:
+		//
+		// 		_self: x: [...and(x)]
+		// 		_self
+		// 		x: [1]
+		//
+		// For this reason we disable it now. It may be the case that we need
+		// to enable it for computing disjunctions.
+		//
 		if pc := n.node.PatternConstraints; pc != nil {
 			for _, c := range pc.Pairs {
-				c.Constraint.Finalize(n.ctx)
+				c.Constraint.unify(n.ctx, allKnown, attemptOnly)
 			}
 		}
 

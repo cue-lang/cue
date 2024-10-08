@@ -288,6 +288,33 @@ package adt
 //
 // and thus is non-cyclic.
 //
+// ## EDGE CASES
+//
+// This section lists several edge cases, including interactions with the
+// detection of self-reference cycles.
+//
+// Self-reference cycles, like `a: a`, evaluate to top. The evaluator detects
+// this cases and drop such conjuncts, effectively treating them as top.
+//
+// ### Self-referencing patterns
+//
+// Self-references in patterns are typically handled automatically. But there
+// are some edge cases where the are not:
+//
+// 		_self: x: [...and(x)]
+// 		_self
+// 		x: [1]
+//
+// Patterns are recorded in Vertex values that are themselves evaluated to
+// allow them to be compared, such as in subsumption or filtering disjunctions.
+// In the above case, `x` may be evaluated to be inserted in the pattern
+// Vertex, but because the pattern is not itself `x`, node identity cannot be
+// used to detect a self-reference.
+//
+// The current solution is to mark a node as a pattern constraint and treat
+// structural cycles to such nodes as "reference cycles". As pattern constraints
+// are optional, it is safe to ignore such errors.
+//
 // ## CORRECTNESS
 //
 // ### The algorithm will terminate

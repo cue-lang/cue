@@ -93,7 +93,10 @@ func (n *nodeContext) insertConstraint(pattern Value, c Conjunct) bool {
 	}
 
 	if constraint == nil {
-		constraint = &Vertex{}
+		constraint = &Vertex{
+			// See "Self-referencing patterns" in cycle.go
+			IsPatternConstraint: true,
+		}
 		pcs.Pairs = append(pcs.Pairs, PatternConstraint{
 			Pattern:    pattern,
 			Constraint: constraint,

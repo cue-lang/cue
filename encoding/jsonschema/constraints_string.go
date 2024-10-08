@@ -35,13 +35,13 @@ func constraintContentMediaType(key string, n cue.Value, s *state) {
 }
 
 func constraintMaxLength(key string, n cue.Value, s *state) {
-	max := s.number(n)
+	max := s.uint(n)
 	strings := s.addImport(n, "strings")
 	s.add(n, stringType, ast.NewCall(ast.NewSel(strings, "MaxRunes"), max))
 }
 
 func constraintMinLength(key string, n cue.Value, s *state) {
-	min := s.number(n)
+	min := s.uint(n)
 	strings := s.addImport(n, "strings")
 	s.add(n, stringType, ast.NewCall(ast.NewSel(strings, "MinRunes"), min))
 }

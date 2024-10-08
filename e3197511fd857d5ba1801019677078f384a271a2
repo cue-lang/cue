@@ -16,6 +16,24 @@
       "message": "Ok, I\u0027ve seen that later in this chain, this gets improved again.",
       "revId": "e3197511fd857d5ba1801019677078f384a271a2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7f8429e_c830dac5",
+        "filename": "internal/core/adt/eval_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-08T11:06:52Z",
+      "side": 1,
+      "message": "Also, as long as they are not fixed, it is in the line of expectation that they will fluctuate a bit.",
+      "parentUuid": "42b0905e_4bb2cd26",
+      "revId": "e3197511fd857d5ba1801019677078f384a271a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -84,12 +84,6 @@ func (p *Profile) Value(ctx *adt.OpContext, a, b adt.Value) errors.Error {
 	return nil // ignore errors here even if there are some.
 }
 
-// Check reports whether b is an instance of a.
-func (p *Profile) Check(ctx *adt.OpContext, a, b adt.Value) bool {
-	s := subsumer{ctx: ctx, Profile: *p}
-	return s.values(a, b)
-}
-
 func isBottom(x adt.Node) bool {
 	b, _ := x.(*adt.Bottom)
 	return b != nil

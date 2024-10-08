@@ -1839,22 +1839,6 @@ func (v Value) Subsume(w Value, opts ...Option) error {
 	return p.Value(ctx, v.v, w.v)
 }
 
-// Deprecated: use [Value.Subsume].
-//
-// Subsumes reports whether w is an instance of v.
-//
-// Without options, Subsumes checks whether v is a backwards compatible schema
-// of w.
-//
-// By default, Subsumes tests whether two values are compatible
-// Value v and w must be obtained from the same build.
-// TODO: remove this requirement.
-func (v hiddenValue) Subsumes(w Value) bool {
-	ctx := v.ctx()
-	p := subsume.Profile{Defaults: true}
-	return p.Check(ctx, v.v, w.v)
-}
-
 func allowed(ctx *adt.OpContext, parent, n *adt.Vertex) *adt.Bottom {
 	if !parent.IsClosedList() && !parent.IsClosedStruct() {
 		return nil

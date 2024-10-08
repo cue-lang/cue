@@ -43,7 +43,7 @@ func TestX(t *testing.T) {
 	b := parse(t, ctx, lt)
 
 	p := Profile{Defaults: true}
-	err := p.Check(ctx, a, b)
+	err := p.Value(ctx, a, b)
 	t.Error(err)
 }
 

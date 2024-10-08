@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "981bc402_6d3b4d4d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-08T09:25:37Z",
+      "side": 1,
+      "message": "s/racs/arcs/",
+      "range": {
+        "startLine": 10,
+        "startChar": 47,
+        "endLine": 10,
+        "endChar": 51
+      },
+      "revId": "a47380232fa90786839754f409d299834a48ee87",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

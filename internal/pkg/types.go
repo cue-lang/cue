@@ -62,7 +62,7 @@ func (s *Struct) Len() int {
 	return count
 }
 
-// IsOpen reports whether s allows more fields than are currently defined.
+// IsOpen reports whether s is open or has pattern constraints.
 func (s *Struct) IsOpen() bool {
 	if !s.node.IsClosedStruct() {
 		return true
@@ -72,9 +72,20 @@ func (s *Struct) IsOpen() bool {
 	if s.node.PatternConstraints != nil && len(s.node.PatternConstraints.Pairs) > 0 {
 		return true
 	}
+
 	// The equivalent code for the old implementation.
 	ot := s.node.OptionalTypes()
 	return ot&^adt.HasDynamic != 0
+}
+
+func (s Struct) NumOptional() (count int) {
+	// If we have any optional arcs, we allow more fields.
+	for _, a := range s.node.Arcs {
+		if a.ArcType != adt.ArcMember && a.Label.IsRegular() {
+			count++
+		}
+	}
+	return count
 }
 
 // A ValidationError indicates an error that is only valid if a builtin is used

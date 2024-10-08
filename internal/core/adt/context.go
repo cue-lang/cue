@@ -542,14 +542,23 @@ func (c *OpContext) Lookup(env *Environment, r Resolver) (*Vertex, *Bottom) {
 //
 // TODO(errors): return boolean instead: only the caller has enough information
 // to generate a proper error message.
-func (c *OpContext) Validate(check Validator, value Value) *Bottom {
+func (c *OpContext) Validate(check Conjunct, value Value) *Bottom {
 	// TODO: use a position stack to push both values.
-	saved := c.src
+
+	// TODO(evalv3): move to PushConjunct once the migration is complete.
+	// Using PushConjunct also saves and restores the error, which may be
+	// impactful, so we want to do this in a separate commit.
+	// saved := c.PushConjunct(check)
+
+	src := c.src
+	ci := c.ci
 	c.src = check.Source()
+	c.ci = check.CloseInfo
 
-	err := check.validate(c, value)
+	err := check.x.(Validator).validate(c, value)
 
-	c.src = saved
+	c.src = src
+	c.ci = ci
 
 	return err
 }

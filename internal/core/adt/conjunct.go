@@ -693,7 +693,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 			k := 0
 			match := false
 			for _, c := range n.checks {
-				if y, ok := c.(*BoundValue); ok {
+				if y, ok := c.x.(*BoundValue); ok {
 					switch z := SimplifyBounds(ctx, n.kind, x, y); {
 					case z == y:
 						match = true
@@ -706,15 +706,16 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 			}
 			n.checks = n.checks[:k]
 			if !match {
-				n.checks = append(n.checks, x)
+				n.checks = append(n.checks, MakeConjunct(env, x, id))
 			}
 			return
 		}
 
 	case Validator:
 		// This check serves as simplifier, but also to remove duplicates.
+		cx := MakeConjunct(env, x, id)
 		for i, y := range n.checks {
-			if b := SimplifyValidator(ctx, x, y); b != nil {
+			if b, ok := SimplifyValidator(ctx, cx, y); ok {
 				n.checks[i] = b
 				return
 			}
@@ -729,7 +730,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 		if kind&(ListKind|StructKind) != 0 {
 			id.cc.hasTop = true
 		}
-		n.checks = append(n.checks, x)
+		n.checks = append(n.checks, cx)
 
 		// We use set the type of the validator argument here to ensure that
 		// validation considers the ultimate value of embedded validators,

@@ -43,11 +43,7 @@
 			{
 				"description": "longer is valid",
 				"data": "foo",
-				"valid": true,
-				"skip": {
-					"v2": "6 errors in empty disjunction:\nconflicting values \"foo\" and [...] (mismatched types string and list):\n    generated.cue:4:1\n    generated.cue:4:48\n    instance.json:1:1\nconflicting values \"foo\" and bool (mismatched types string and bool):\n    generated.cue:4:1\n    generated.cue:4:8\n    instance.json:1:1\nconflicting values \"foo\" and null (mismatched types string and null):\n    generated.cue:4:1\n    instance.json:1:1\nconflicting values \"foo\" and number (mismatched types string and number):\n    generated.cue:4:1\n    generated.cue:4:15\n    instance.json:1:1\nconflicting values \"foo\" and {...} (mismatched types string and struct):\n    generated.cue:4:1\n    generated.cue:4:56\n    instance.json:1:1\ncannot use 2.0 (type float) as int in argument 2 to strings.MinRunes:\n    generated.cue:4:41\n",
-					"v3": "conflicting values \"foo\" and [...] (mismatched types string and list):\n    generated.cue:4:48\n    instance.json:1:1\nconflicting values \"foo\" and bool (mismatched types string and bool):\n    generated.cue:4:8\n    instance.json:1:1\nconflicting values \"foo\" and null (mismatched types string and null):\n    generated.cue:4:1\n    instance.json:1:1\nconflicting values \"foo\" and number (mismatched types string and number):\n    generated.cue:4:15\n    instance.json:1:1\nconflicting values \"foo\" and {...} (mismatched types string and struct):\n    generated.cue:4:56\n    instance.json:1:1\ncannot use 2.0 (type float) as int in argument 2 to strings.MinRunes:\n    generated.cue:4:41\n"
-				}
+				"valid": true
 			},
 			{
 				"description": "too short is invalid",

@@ -60,7 +60,7 @@ func constraintMultipleOf(key string, n cue.Value, s *state) {
 	var x big.Int
 	_, _ = n.MantExp(&x)
 	if x.Cmp(big.NewInt(0)) != 1 {
-		s.errf(n, `"multipleOf" value must be < 0; found %s`, n)
+		s.errf(n, `"multipleOf" value must be > 0; found %s`, n)
 	}
 	math := s.addImport(n, "math")
 	s.add(n, numType, ast.NewCall(ast.NewSel(math, "MultipleOf"), multiple))

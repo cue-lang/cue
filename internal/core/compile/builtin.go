@@ -99,12 +99,13 @@ var closeBuiltin = &adt.Builtin{
 }
 
 var andBuiltin = &adt.Builtin{
-	Name:        "and",
-	Params:      []adt.Param{listParam},
-	Result:      adt.IntKind,
-	NonConcrete: true,
-	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
-		list := c.RawElems(args[0])
+	Name:   "and",
+	Params: []adt.Param{listParam},
+	Result: adt.IntKind,
+	RawFunc: func(c *adt.OpContext, args []adt.Expr) adt.Value {
+		// Pass through the cycle information from evaluating the first argument.
+		v := c.EvaluateKeepState(args[0])
+		list := c.RawElems(v)
 		if len(list) == 0 {
 			return &adt.Top{}
 		}

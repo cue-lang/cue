@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42c81e39_ead587ba",
+        "filename": "internal/core/debug/debug.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-08T10:29:12Z",
+      "side": 1,
+      "message": "I think it might be nicer to write:\n```\nv1 :\u003d v0.DerefValue()\nuseReference :\u003d v0.IsShared \u0026\u0026 !v1.Rooted()\n```\nit makes it a lot clearer that the `IsShared` and `Rooted()` properties are from different vertices.",
+      "revId": "6c36d8ea8adf3c493be775a7d01876d3efd7075f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

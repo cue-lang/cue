@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bdb4547d_02a11301",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-08T10:20:48Z",
+      "side": 1,
+      "message": "You didn\u0027t want:\n```\nresult :\u003d n.isShared \u0026\u0026 n.sharedID.CycleType \u003d\u003d NoCycle \u0026\u0026 w.unify(c, needs, more)\n```\n?",
+      "revId": "c2a03d5b5c0105309bdd88346eba66ac47ac91a3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

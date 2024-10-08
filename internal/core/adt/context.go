@@ -656,6 +656,20 @@ func (c *OpContext) Evaluate(env *Environment, x Expr) (result Value, complete b
 	return val, true
 }
 
+// EvaluateKeepState does an evaluate, but leaves any errors an cycle info
+// within the context.
+func (c *OpContext) EvaluateKeepState(x Expr) (result Value) {
+	src := c.src
+	c.src = x.Source()
+
+	result, ci := c.evalStateCI(x, final(partial, concreteKnown))
+
+	c.src = src
+	c.ci = ci
+
+	return result
+}
+
 func (c *OpContext) evaluateRec(v Conjunct, state combinedFlags) Value {
 	x := v.Expr()
 	s := c.PushConjunct(v)
@@ -687,10 +701,18 @@ func (c *OpContext) value(x Expr, state combinedFlags) (result Value) {
 }
 
 func (c *OpContext) evalState(v Expr, state combinedFlags) (result Value) {
+	result, _ = c.evalStateCI(v, state)
+	return result
+}
+
+func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci CloseInfo) {
 	savedSrc := c.src
 	c.src = v.Source()
 	err := c.errs
 	c.errs = nil
+	// Save the old CloseInfo and restore after evaluate to avoid detecting
+	// spurious cycles.
+	saved := c.ci
 
 	defer func() {
 		c.errs = CombineErrors(c.src, c.errs, err)
@@ -721,23 +743,29 @@ func (c *OpContext) evalState(v Expr, state combinedFlags) (result Value) {
 			result = c.errs
 		}
 		c.src = savedSrc
+
+		// TODO(evalv3): this c.ci should be passed to the caller who may need
+		// it to continue cycle detection for partially evaluated values.
+		// Either this or we must prove that this is covered by structural cycle
+		// detection.
+		c.ci = saved
 	}()
 
 	switch x := v.(type) {
 	case Value:
-		return x
+		return x, c.ci
 
 	case Evaluator:
 		v := x.evaluate(c, state)
-		return v
+		return v, c.ci
 
 	case Resolver:
 		arc := x.resolve(c, state)
 		if c.HasErr() {
-			return nil
+			return nil, c.ci
 		}
 		if arc == nil {
-			return nil
+			return nil, c.ci
 		}
 		// TODO(deref): what is the right level of dereferencing here?
 		// DerefValue seems to work too.
@@ -748,9 +776,6 @@ func (c *OpContext) evalState(v Expr, state combinedFlags) (result Value) {
 		// TODO: is this indirect necessary?
 		// arc = arc.Indirect()
 
-		// Save the old CloseInfo and restore after evaluate to avoid detecting
-		// spurious cycles.
-		saved := c.ci
 		n := arc.state
 		if c.isDevVersion() {
 			n = arc.getState(c)
@@ -787,7 +812,7 @@ func (c *OpContext) evalState(v Expr, state combinedFlags) (result Value) {
 						err := c.Newf("cycle with field %v", x)
 						b := &Bottom{Code: CycleError, Err: err}
 						s.setBaseValue(b)
-						return b
+						return b, c.ci
 						// TODO: use this instead, as is usual for incomplete errors,
 						// and also move this block one scope up to also apply to
 						// defined arcs. In both cases, though, doing so results in
@@ -796,13 +821,13 @@ func (c *OpContext) evalState(v Expr, state combinedFlags) (result Value) {
 						// return nil
 					}
 					c.undefinedFieldError(v, IncompleteError)
-					return nil
+					return nil, c.ci
 				}
 			}
 		}
 		v := c.evaluate(arc, x, state)
-		c.ci = saved
-		return v
+
+		return v, c.ci
 
 	default:
 		// This can only happen, really, if v == nil, which is not allowed.

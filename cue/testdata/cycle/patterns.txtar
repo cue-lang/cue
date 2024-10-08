@@ -1,3 +1,4 @@
+// Excluded from V2, which no longer passes.
 Lots of cycle-reference goodness.
 
 -- in.cue --
@@ -9,6 +10,19 @@ c: a:        int
 a:        b
 b: [string]: int
 c: a:        int
+
+-- issue3326.cue --
+issue3326: {
+	// This issue triggered a cyclic evaluation in pattern constraints.
+	//
+	// It seems like there is still an issue as the evaluation of `x` in
+	// `and` may trigger a cyclic evaluation of `and`. However, `and` only
+	// does a shallow evaluation, and inserting `x`'s conjuncts into itself
+	// is identified as idempotent and thus further evaluation is skipped.
+	_self: x: [...and(x)]
+	_self
+	x: [1]
+}
 -- out/eval/stats --
 Leaks:  0
 Freed:  7
@@ -19,6 +33,47 @@ Retain: 2
 Unifications: 7
 Conjuncts:    59
 Disjuncts:    9
+-- out/evalalpha --
+(struct){
+  a: (struct){
+    a: (int){ int }
+  }
+  b: (struct){
+    a: (int){ int }
+  }
+  c: (struct){
+    a: (int){ int }
+  }
+  issue3326: (struct){
+    _self: (struct){
+      x: (list){
+      }
+    }
+    x: (#list){
+      0: (int){ 1 }
+    }
+    a: (int){ int }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -8,4 +8,14 @@
+   c: (struct){
+     a: (int){ int }
+   }
++  issue3326: (struct){
++    _self: (struct){
++      x: (list){
++      }
++    }
++    x: (#list){
++      0: (int){ 1 }
++    }
++    a: (int){ int }
++  }
+ }
 -- out/eval --
 (struct){
   a: (struct){
@@ -49,5 +104,19 @@ Disjuncts:    9
   }
   c: {
     a: int
+  }
+}
+--- issue3326.cue
+{
+  issue3326: {
+    _self: {
+      x: [
+        ...and(〈1;x〉),
+      ]
+    }
+    〈0;_self〉
+    x: [
+      1,
+    ]
   }
 }

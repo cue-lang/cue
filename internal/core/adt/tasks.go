@@ -85,7 +85,12 @@ func processExpr(ctx *OpContext, t *task, mode runMode) {
 	x := t.x.(Expr)
 
 	state := combineMode(concreteKnown, mode)
-	v := ctx.evalState(x, state)
+	v, ci := ctx.evalStateCI(x, state)
+	if ci.CycleType == IsCyclic && t.node.node.IsPatternConstraint {
+		// This is an optional cycle that we will ignore.
+		return
+	}
+	t.id.CycleInfo = ci.CycleInfo
 	t.node.insertValueConjunct(t.env, v, t.id)
 }
 

@@ -68,7 +68,8 @@ var alwaysSkip = map[string]string{
 }
 
 var needFix = map[string]string{
-	"DIR/NAME": "reason",
+	"DIR/NAME":       "reason",
+	"cycle/patterns": "cycle detection in v2",
 }
 
 // skipDebugDepErrors is a temporary hack to skip tests that are known to have
@@ -80,9 +81,9 @@ var skipDebugDepErrors = map[string]int{
 	"comprehensions/pushdown":  3,
 	"cycle/chain":              4,
 	"cycle/compbottom2":        4,
-	"cycle/comprehension":      3,
+	"cycle/comprehension":      2,
 	"cycle/disjunction":        4,
-	"cycle/issue990":           2,
+	"cycle/issue990":           1,
 	"cycle/structural":         17,
 	"disjunctions/edge":        1,
 	"disjunctions/elimination": 8,
@@ -91,7 +92,6 @@ var skipDebugDepErrors = map[string]int{
 	"eval/conjuncts":           3,
 	"eval/disjunctions":        1,
 	"eval/issue2146":           4,
-	"eval/issue599":            1,
 	"export/031":               1,
 	"fulleval/054_issue312":    1,
 	"scalars/embed":            1,

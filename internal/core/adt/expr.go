@@ -1596,7 +1596,10 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 	if result == nil {
 		return nil
 	}
-	return c.evalState(result, state.withVertexStatus(partial))
+	v, ci := c.evalStateCI(result, state.withVertexStatus(partial))
+	// c.ci = ci
+	_ = ci
+	return v
 }
 
 // A Builtin is a value representing a native function call.

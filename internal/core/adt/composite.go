@@ -206,6 +206,10 @@ type Vertex struct {
 	// Used for cycle detection.
 	IsDynamic bool
 
+	// IsPatternConstraint indicates that this Vertex is an entry in
+	// Vertex.PatternConstraints.
+	IsPatternConstraint bool
+
 	// nonRooted indicates that this Vertex originates within the context of
 	// a dynamic, or inlined, Vertex (e.g. `{out: ...}.out``). Note that,
 	// through reappropriation, this Vertex may become rooted down the line.

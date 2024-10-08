@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4f638df_289f6244",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-08T09:32:14Z",
+      "side": 1,
+      "message": "Something went wrong with this line?",
+      "revId": "f17f8c6058c8dc98b2f02497aef74ec7885d1b19",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c890f2e8_35599ca5",
+        "filename": "internal/core/adt/simplify.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-08T09:32:14Z",
+      "side": 1,
+      "message": "cosmetic nit: now that you\u0027re using y.Args[i] twice, personally I\u0027d bring it out to `b :\u003d y.Args[i]`",
+      "revId": "f17f8c6058c8dc98b2f02497aef74ec7885d1b19",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

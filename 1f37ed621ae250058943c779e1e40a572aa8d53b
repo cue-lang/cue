@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2dd29e1_764b1f79",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-08T08:25:03Z",
+      "side": 1,
+      "message": "It seems to me that the property you care about here (linear behaviour) isn\u0027t really tested by the test; it\u0027s possibly tested indirectly via the stats, but I do think this would be clearer if it was a normal go test and not a txtar so that you could then have some code that programmatically increases the number of terms in each expr and detects if the number of evaluations is increasing non-linearly.\nI know that\u0027s a major departure from the current txtar style, but I think it would lead to a better test.",
+      "revId": "1f37ed621ae250058943c779e1e40a572aa8d53b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

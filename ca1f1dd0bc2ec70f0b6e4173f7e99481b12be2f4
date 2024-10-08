@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2f71e3b_14e6f719",
+        "filename": "encoding/jsonschema/testdata/txtar/issue3176.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-08T15:17:11Z",
+      "side": 1,
+      "message": "I\u0027ve no idea why this formatting change was made.",
+      "revId": "ca1f1dd0bc2ec70f0b6e4173f7e99481b12be2f4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

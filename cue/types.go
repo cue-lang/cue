@@ -1037,26 +1037,6 @@ func (v Value) Doc() []*ast.CommentGroup {
 	return export.ExtractDoc(v.v)
 }
 
-// Split returns a list of values from which v originated such that
-// the unification of all these values equals v and for all returned values.
-// It will also split unchecked unifications (embeddings), so unifying the
-// split values may fail if actually unified.
-// Source returns a non-nil value.
-//
-// Deprecated: use [Value.Expr].
-func (v hiddenValue) Split() []Value {
-	if v.v == nil {
-		return nil
-	}
-	a := []Value{}
-	v.v.VisitLeafConjuncts(func(x adt.Conjunct) bool {
-		env, expr := x.EnvExpr()
-		a = append(a, remakeValue(v, env, expr))
-		return true
-	})
-	return a
-}
-
 // Source returns the original node for this value. The return value may not
 // be an [ast.Expr]. For instance, a struct kind may be represented by a
 // struct literal, a field comprehension, or a file. It returns nil for

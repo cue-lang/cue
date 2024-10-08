@@ -146,7 +146,7 @@ func (c *Config) compose(inst cue.InstanceOrValue, schemas *ast.StructLit) (x *a
 	var info *ast.StructLit
 
 	for i, _ := val.Fields(cue.Definitions(true)); i.Next(); {
-		if i.IsDefinition() {
+		if i.Selector().IsDefinition() {
 			continue
 		}
 		label := i.Label()

@@ -259,20 +259,13 @@ func (i *Iterator) Selector() Selector {
 // Label reports the label of the value if i iterates over struct fields and ""
 // otherwise.
 //
-// Slated to be deprecated: use [Iterator.Selector] and [Selector.String].
+// Deprecated: use [Iterator.Selector] and [Selector.String].
 // Note that this will give more accurate string representations.
 func (i *hiddenIterator) Label() string {
 	if i.f == 0 {
 		return ""
 	}
 	return i.idx.LabelStr(i.f)
-}
-
-// IsHidden reports if a field is hidden from the data model.
-//
-// Deprecated: use i.Selector().PkgPath() != ""
-func (i *hiddenIterator) IsHidden() bool {
-	return i.f.IsHidden()
 }
 
 // IsOptional reports if a field is optional.
@@ -283,13 +276,6 @@ func (i *Iterator) IsOptional() bool {
 // FieldType reports the type of the field.
 func (i *Iterator) FieldType() SelectorType {
 	return featureToSelType(i.f, i.arcType)
-}
-
-// IsDefinition reports if a field is a definition.
-//
-// Deprecated: use i.Selector().IsDefinition()
-func (i *hiddenIterator) IsDefinition() bool {
-	return i.f.IsDef()
 }
 
 // marshalJSON iterates over the list and generates JSON output. HasNext

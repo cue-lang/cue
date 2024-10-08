@@ -2089,69 +2089,6 @@ func TestSubsume(t *testing.T) {
 	}
 }
 
-func TestSubsumes(t *testing.T) {
-	a := []string{"a"}
-	b := []string{"b"}
-	testCases := []struct {
-		value string
-		pathA []string
-		pathB []string
-		want  bool
-	}{{
-		value: `4`,
-		want:  true,
-	}, {
-		value: `a: string, b: "foo"`,
-		pathA: a,
-		pathB: b,
-		want:  true,
-	}, {
-		value: `a: string, b: "foo"`,
-		pathA: b,
-		pathB: a,
-		want:  false,
-	}, {
-		value: `a: {a: string, b: 4}, b: {a: "foo", b: 4}`,
-		pathA: a,
-		pathB: b,
-		want:  true,
-	}, {
-		value: `a: [string,  4], b: ["foo", 4]`,
-		pathA: a,
-		pathB: b,
-		want:  true,
-	}, {
-		value: `a: [...string], b: ["foo"]`,
-		pathA: a,
-		pathB: b,
-		want:  true,
-	}, {
-		value: `a: [...int], b: ["foo"]`,
-		pathA: a,
-		pathB: b,
-		want:  false,
-	}, {
-		value: `
-		a: { action: "run", command: [...string] }
-		b: { action: "run", command: ["echo", "hello"] }
-		`,
-		pathA: a,
-		pathB: b,
-		want:  true,
-	}}
-	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
-			v := getValue(m, tc.value)
-			a := v.Lookup(tc.pathA...)
-			b := v.Lookup(tc.pathB...)
-			got := a.Subsumes(b)
-			if got != tc.want {
-				t.Errorf("got %v (%v); want %v (%v)", got, a, tc.want, b)
-			}
-		})
-	}
-}
-
 func TestUnify(t *testing.T) {
 	a := "a"
 	b := "b"

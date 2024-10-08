@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "89924f28_22ea72a9",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-08T14:16:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c4814905_7a2b6a03",
+      "revId": "8b7291d4c9b77adfa5264ab84f233ef9b2732b19",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "43ba4254_9406749b",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "553a9141_057b8af4",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-08T14:16:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "43ba4254_9406749b",
+      "revId": "8b7291d4c9b77adfa5264ab84f233ef9b2732b19",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ea6a66b5_6504d78d",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-10-08T10:04:21Z",
       "side": 1,
       "message": "cosmetic:\nI would definitely be tempted to rename these to be more explicit, e.g. `hasCycle` \u003d\u003e `hasAnyCyclicConjunct` and similar for the other fields.\nThe reason is in the use sites (e.g. assertStructuralCycleV3) I find it rather confusing to see both `n.hasCycle` and `n.hasNonCycle` - with more explicit names it is more immediately obvious why one isn\u0027t the negation of the other.\n\nI would also be tempted to add some helper methods such as `hasOnlyCyclicConjunctions` which I think would make `assertStructuralCycleV3` more readable as the final `if` there becomes `if n.hasOnlyCyclicConjuncts() {...`",
+      "revId": "8b7291d4c9b77adfa5264ab84f233ef9b2732b19",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af7156d5_074e2688",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 1128,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-08T14:16:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ea6a66b5_6504d78d",
       "revId": "8b7291d4c9b77adfa5264ab84f233ef9b2732b19",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

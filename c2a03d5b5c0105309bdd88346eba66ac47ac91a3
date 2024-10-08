@@ -16,6 +16,24 @@
       "message": "You didn\u0027t want:\n```\nresult :\u003d n.isShared \u0026\u0026 n.sharedID.CycleType \u003d\u003d NoCycle \u0026\u0026 w.unify(c, needs, more)\n```\n?",
       "revId": "c2a03d5b5c0105309bdd88346eba66ac47ac91a3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1ac5caf_50341bcf",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-08T14:23:49Z",
+      "side": 1,
+      "message": "Not really, as cycles can be okay. The point here is not to test success, but to see if we need to proactively search for cycles, which we don\u0027t need to if we already have one. But TBH, I don\u0027t think the result is used anywhere.\n\nNeed to clean that up. Added todo.",
+      "parentUuid": "bdb4547d_02a11301",
+      "revId": "c2a03d5b5c0105309bdd88346eba66ac47ac91a3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

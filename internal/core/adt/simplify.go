@@ -202,16 +202,16 @@ func test(ctx *OpContext, op Op, a, b Value) bool {
 // Currently this only checks for pure equality. In the future this can be used
 // to simplify certain builtin validators analogously to how we simplify bounds
 // now.
-func SimplifyValidator(ctx *OpContext, v, w Validator) Validator {
-	switch x := v.(type) {
+func SimplifyValidator(ctx *OpContext, v, w Conjunct) (c Conjunct, ok bool) {
+	switch x := v.x.(type) {
 	case *BuiltinValidator:
-		switch y := w.(type) {
+		switch y := w.x.(type) {
 		case *BuiltinValidator:
 			if x == y {
-				return x
+				return v, true
 			}
 			if x.Builtin != y.Builtin || len(x.Args) != len(y.Args) {
-				return nil
+				return c, false
 			}
 			for i, a := range x.Args {
 				b := y.Args[i]
@@ -222,11 +222,11 @@ func SimplifyValidator(ctx *OpContext, v, w Validator) Validator {
 					v.Finalize(ctx)
 				}
 				if !Equal(ctx, a, b, CheckStructural) {
-					return nil
+					return c, false
 				}
 			}
-			return x
+			return v, true
 		}
 	}
-	return nil
+	return c, false
 }

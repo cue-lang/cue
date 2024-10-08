@@ -717,7 +717,7 @@ func isEqualNodeValue(x, y *nodeContext) bool {
 	// Assume that checks are added in the same order.
 	for i, c := range x.checks {
 		d := y.checks[i]
-		if !Equal(x.ctx, c, d, CheckStructural) {
+		if !Equal(x.ctx, c.x.(Value), d.x.(Value), CheckStructural) {
 			return false
 		}
 	}

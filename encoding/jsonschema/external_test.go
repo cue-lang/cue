@@ -70,7 +70,7 @@ func TestExternal(t *testing.T) {
 		return
 	}
 	if t.Failed() {
-		t.Fatalf("not writing test data back because of test failures")
+		t.Fatalf("not writing test data back because of test failures (try CUE_UPDATE=force to proceed regardless of test regressions)")
 	}
 	err = externaltest.WriteTestDir(testDir, tests)
 	qt.Assert(t, qt.IsNil(err))
@@ -208,7 +208,7 @@ func testName(s string) string {
 // skip field pointed to by skipField if necessary.
 func testFailed(t *testing.T, m *cuetdtest.M, skipField *externaltest.Skip, p positioner, errStr string) {
 	if cuetest.UpdateGoldenFiles {
-		if *skipField == nil && !allowRegressions() {
+		if *skipField == nil && cuetest.ForceUpdateGoldenFiles {
 			t.Fatalf("test regression; was succeeding, now failing: %v", errStr)
 		}
 		if *skipField == nil {
@@ -242,10 +242,6 @@ func testdataPos(p positioner) token.Position {
 	pp := p.Pos().Position()
 	pp.Filename = path.Join(testDir, pp.Filename)
 	return pp
-}
-
-func allowRegressions() bool {
-	return os.Getenv("CUE_ALLOW_REGRESSIONS") != ""
 }
 
 var extVersionToVersion = map[string]jsonschema.Version{

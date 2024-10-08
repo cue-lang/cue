@@ -103,7 +103,9 @@ func (s *subsumer) values(a, b adt.Value) (result bool) {
 
 	case *adt.BuiltinValidator:
 		state := s.ctx.PushState(s.ctx.Env(0), b.Source())
-		b1 := s.ctx.Validate(x, b)
+		// TODO: is this always correct?
+		cx := adt.MakeRootConjunct(s.ctx.Env(0), x)
+		b1 := s.ctx.Validate(cx, b)
 		if b1 != nil {
 			s.errs = errors.Append(s.errs, b1.Err)
 		}

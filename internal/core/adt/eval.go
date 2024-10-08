@@ -657,7 +657,8 @@ func (n *nodeContext) validateValue(state vertexStatus) {
 		// serious errors and would like to know about all errors anyway.
 
 		if n.lowerBound != nil {
-			if b := ctx.Validate(n.lowerBound, v); b != nil {
+			c := MakeRootConjunct(nil, n.lowerBound)
+			if b := ctx.Validate(c, v); b != nil {
 				// TODO(errors): make Validate return boolean and generate
 				// optimized conflict message. Also track and inject IDs
 				// to determine origin location.s
@@ -669,7 +670,8 @@ func (n *nodeContext) validateValue(state vertexStatus) {
 			}
 		}
 		if n.upperBound != nil {
-			if b := ctx.Validate(n.upperBound, v); b != nil {
+			c := MakeRootConjunct(nil, n.upperBound)
+			if b := ctx.Validate(c, v); b != nil {
 				// TODO(errors): make Validate return boolean and generate
 				// optimized conflict message. Also track and inject IDs
 				// to determine origin location.s
@@ -1051,8 +1053,14 @@ type nodeContext struct {
 	vLists []*Vertex
 	exprs  []envExpr
 
-	checks     []Validator // BuiltinValidator, other bound values.
-	postChecks []envCheck  // Check non-monotonic constraints, among other things.
+	// Checks is a list of conjuncts, as we need to preserve the context in
+	// which it was evaluated. The conjunct is always a validator (and thus
+	// a Value). We need to keep track of the CloseInfo, however, to be able
+	// to catch cycles when evaluating BuiltinValidators.
+	// TODO: introduce ValueConjunct to get better compile time type checking.
+	checks []Conjunct
+
+	postChecks []envCheck // Check non-monotonic constraints, among other things.
 
 	// Disjunction handling
 	disjunctions []envDisjunct
@@ -1510,7 +1518,7 @@ func (n *nodeContext) getValidators(state vertexStatus) BaseValue {
 	}
 	for _, c := range n.checks {
 		// Drop !=x if x is out of bounds with another bound.
-		if b, _ := c.(*BoundValue); b != nil && b.Op == NotEqualOp {
+		if b, _ := c.x.(*BoundValue); b != nil && b.Op == NotEqualOp {
 			if n.upperBound != nil &&
 				SimplifyBounds(ctx, n.kind, n.upperBound, b) != nil {
 				continue
@@ -1520,8 +1528,9 @@ func (n *nodeContext) getValidators(state vertexStatus) BaseValue {
 				continue
 			}
 		}
-		a = append(a, c)
-		kind &= c.Kind()
+		v := c.x.(Value)
+		a = append(a, v)
+		kind &= v.Kind()
 	}
 
 	if kind&^n.kind != 0 {
@@ -1987,8 +1996,9 @@ func (n *nodeContext) addValueConjunct(env *Environment, v Value, id CloseInfo) 
 			// This check serves as simplifier, but also to remove duplicates.
 			k := 0
 			match := false
+			cx := MakeConjunct(env, x, id)
 			for _, c := range n.checks {
-				if y, ok := c.(*BoundValue); ok {
+				if y, ok := c.x.(*BoundValue); ok {
 					switch z := SimplifyBounds(ctx, n.kind, x, y); {
 					case z == y:
 						match = true
@@ -2001,21 +2011,22 @@ func (n *nodeContext) addValueConjunct(env *Environment, v Value, id CloseInfo) 
 			}
 			n.checks = n.checks[:k]
 			if !match {
-				n.checks = append(n.checks, x)
+				n.checks = append(n.checks, cx)
 			}
 			return
 		}
 
 	case Validator:
 		// This check serves as simplifier, but also to remove duplicates.
+		cx := MakeConjunct(env, x, id)
 		for i, y := range n.checks {
-			if b := SimplifyValidator(ctx, x, y); b != nil {
+			if b, ok := SimplifyValidator(ctx, cx, y); ok {
 				n.checks[i] = b
 				return
 			}
 		}
 		n.updateNodeType(x.Kind(), x, id)
-		n.checks = append(n.checks, x)
+		n.checks = append(n.checks, cx)
 		// TODO(validatorType): see namesake TODO in conjunct.go.
 		k := x.Kind()
 		if k == TopKind {

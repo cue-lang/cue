@@ -16,6 +16,24 @@
       "message": "It seems to me that the property you care about here (linear behaviour) isn\u0027t really tested by the test; it\u0027s possibly tested indirectly via the stats, but I do think this would be clearer if it was a normal go test and not a txtar so that you could then have some code that programmatically increases the number of terms in each expr and detects if the number of evaluations is increasing non-linearly.\nI know that\u0027s a major departure from the current txtar style, but I think it would lead to a better test.",
       "revId": "1f37ed621ae250058943c779e1e40a572aa8d53b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec4e3caa_88541938",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-08T09:03:23Z",
+      "side": 1,
+      "message": "Maybe that would be nicer, but it is quite an effort!\n\nAlso\n- the linear behavior is visualized in the last case, where the structure will collapse once we have structure sharing.\n- we will down the line more aggressively visualize the shared nodes, making it clear sharing is going on\n- once we have made this work, we can increase the test size, so that if any case fails, it will certainly blow up the counters.\n\nThese are all simple things. So although an explicit test is nicer, it saves a lot of work!",
+      "parentUuid": "a2dd29e1_764b1f79",
+      "revId": "1f37ed621ae250058943c779e1e40a572aa8d53b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -44,7 +44,7 @@ import (
 // TestDecode reads the testdata/*.txtar files, converts the contained
 // JSON schema to CUE and compares it against the output.
 //
-// Set CUE_UPDATE=1 to update test files with the corresponding output.
+// Set CUE_UPDATE=1 to update test files with the corresponding output,
 //
 // Each test extracts the JSON Schema from a schema file (either
 // schema.json or schema.yaml) and writes the result to

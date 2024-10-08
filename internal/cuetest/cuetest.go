@@ -52,11 +52,21 @@ var (
 	}
 )
 
-// UpdateGoldenFiles determines whether testscript scripts should update txtar
-// archives in the event of cmp failures.
-// It is controlled by setting CUE_UPDATE to a non-empty string like "true".
-// It corresponds to testscript.Params.UpdateGoldenFiles; see its docs for details.
+// UpdateGoldenFiles determines whether tests should update expected
+// output in test files in the event of comparison failures (for example
+// after a cmp failure in a testscript-based test). It is controlled by
+// setting CUE_UPDATE to a non-empty string like "1" or "true". It
+// corresponds to testscript.Params.UpdateGoldenFiles; see its docs for
+// details.
+//
+// In some cases, tests might refuse to perform some updates by default.
+// The special value "force" can be used to force updates in that situation.
 var UpdateGoldenFiles = os.Getenv(envUpdate) != ""
+
+// ForceUpdateGoldenFiles determines whether tests should update
+// expected output in test files even when they would not be updated
+// usually (for example when there are test regressions).
+var ForceUpdateGoldenFiles = os.Getenv(envUpdate) == "force"
 
 // FormatTxtar ensures that .cue files in txtar test archives are well
 // formatted, updating the archive as required prior to running a test.

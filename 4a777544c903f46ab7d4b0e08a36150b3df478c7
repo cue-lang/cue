@@ -16,6 +16,24 @@
       "message": "huh, what\u0027s with this formatting regression? not huge but still puzzling",
       "revId": "4a777544c903f46ab7d4b0e08a36150b3df478c7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d947d1f6_8b0a6091",
+        "filename": "encoding/jsonschema/testdata/txtar/issue3176.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-09T15:23:44Z",
+      "side": 1,
+      "message": "Yeah, I actually added a comment on this very line in patchset 1. I\u0027ve no idea!",
+      "parentUuid": "af31d955_55aba242",
+      "revId": "4a777544c903f46ab7d4b0e08a36150b3df478c7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -528,6 +528,9 @@ type StructInfo struct {
 	Disable bool
 
 	Embedding bool
+
+	// Decl is the parent which contains this Struct
+	Decl Decl
 }
 
 // TODO(perf): this could be much more aggressive for eliminating structs that
@@ -1339,6 +1342,10 @@ func (v *Vertex) AddStruct(s *StructLit, env *Environment, ci CloseInfo) *Struct
 		StructLit: s,
 		Env:       env,
 		CloseInfo: ci,
+		Decl:      env.Vertex,
+	}
+	if cc := ci.cc; cc != nil && cc.decl != nil {
+		info.Decl = cc.decl
 	}
 	for _, t := range v.Structs {
 		if *t == info { // TODO: check for different identity.

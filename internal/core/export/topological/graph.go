@@ -35,6 +35,8 @@ type Node struct {
 	Feature      adt.Feature
 	Outgoing     Nodes
 	Incoming     Nodes
+	File         string
+	StructInfo   *adt.StructInfo
 	sccNodeState *sccNodeState
 	ecNodeState  *ecNodeState
 	name         string
@@ -60,6 +62,243 @@ func (nodes Nodes) Features() []adt.Feature {
 		features[idx] = node.Feature
 	}
 	return features
+}
+
+func compareStructInfosByFilenameOffset(a, b *adt.StructInfo) int {
+	aSrc, bSrc := a.Src, b.Src
+	switch {
+	case aSrc == nil && bSrc == nil:
+		return 0
+	case aSrc == nil:
+		return 1
+	case bSrc == nil:
+		return -1
+	}
+
+	aPos, bPos := aSrc.Pos(), bSrc.Pos()
+	if c := cmp.Compare(aPos.Filename(), bPos.Filename()); c != 0 {
+		return c
+	}
+	return cmp.Compare(aPos.Offset(), bPos.Offset())
+}
+
+func exprsInParent(v *adt.Vertex) map[adt.Node]struct{} {
+	var parentExprs map[adt.Node]struct{}
+	if parent := v.Parent; parent != nil && v.Label != adt.InvalidLabel {
+		for _, arc := range parent.Arcs {
+			debug("parent arc %p\n", arc)
+			arc.VisitAllConjuncts(func(c adt.Conjunct, isLeaf bool) {
+				debug(" parent arc conjunct: expr: %p :: %T; field: %p :: %T\n", c.Expr(), c.Expr(), c.Field(), c.Field())
+				field, isField := c.Field().(*adt.Field)
+				if isField && field.Label == v.Label {
+					debug("  matches self\n")
+				}
+				if bin, ok := c.Expr().(*adt.BinaryExpr); ok {
+					debug("  binary x: %p :: %T; y: %p :: %T\n", bin.X, bin.X, bin.Y, bin.Y)
+				}
+				if isField && field.Label == v.Label {
+					if parentExprs == nil {
+						parentExprs = make(map[adt.Node]struct{})
+					}
+					parentExprs[c.Expr()] = struct{}{}
+				}
+			})
+		}
+	}
+	return parentExprs
+}
+
+func dynamicFieldsFeatures(v *adt.Vertex, parentExprs map[adt.Node]struct{}, builder *GraphBuilder) map[*adt.DynamicField][]adt.Feature {
+	// Find all fields which have been created as a result of
+	// successful evaluation of a dynamic field name.
+	var dynamicFields map[*adt.DynamicField][]adt.Feature
+	for _, arc := range v.Arcs {
+		debug("self arc %p\n", arc)
+		builder.EnsureNode(arc.Label)
+		arc.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+			debug(" self arc conjunct: expr: %p :: %T; field: %p :: %T\n", c.Expr(), c.Expr(), c.Field(), c.Field())
+			if _, found := parentExprs[c.Field()]; !found {
+				for refs := c.CloseInfo.CycleInfo.Refs; refs != nil; refs = refs.Next {
+					debug("  %p :: %T  =  %v\n", refs.Ref, refs.Ref, refs.Ref)
+					if _, found = parentExprs[refs.Ref]; found {
+						parentExprs[c.Field()] = struct{}{}
+					}
+				}
+			}
+			if dynField, ok := c.Field().(*adt.DynamicField); ok {
+				if dynamicFields == nil {
+					dynamicFields = make(map[*adt.DynamicField][]adt.Feature)
+				}
+				dynamicFields[dynField] = append(dynamicFields[dynField], arc.Label)
+			}
+			return true
+		})
+	}
+	return dynamicFields
+}
+
+func VertexFeatures(indexer adt.StringIndexer, v *adt.Vertex) []adt.Feature {
+	debug("\n*** V (%s %v %p) ***\n", v.Label.RawString(indexer), v.Label, v)
+	// The vertex v could be an implicit conjunction of several
+	// declarations. Consider:
+	//
+	// x: c: _
+	// x: b: _
+	//
+	// In this case, we want to guarantee the result is:
+	//
+	//	x: {
+	//	   c: _
+	//	   b: _
+	//	}
+	//
+	// To detect this scenario, we need to look at the parent vertex's
+	// arc's conjuncts and find any structLits that correspond to our
+	// vertex's own label. We later sort all structLits by filename and
+	// offset, and then add extra edges to the graph of features to
+	// ensure this ordering is honoured.
+	parentExprs := exprsInParent(v)
+	builder := NewGraphBuilder()
+	dynamicFields := dynamicFieldsFeatures(v, parentExprs, builder)
+
+	structs := v.Structs
+	outgoing := make(map[adt.Decl][]*adt.StructInfo)
+	nonRoots := make(map[adt.Decl]struct{})
+	for idx, s := range structs {
+		parentDecl := s.Decl
+		debug(" %d from %p; %d children\n", idx, parentDecl, len(s.Decls))
+		outgoing[parentDecl] = append(outgoing[parentDecl], s)
+		for _, child := range s.Decls {
+			nonRoots[child] = struct{}{}
+		}
+	}
+
+	var explictUnifications []*adt.StructInfo
+	var implicitUnifications []*adt.StructInfo
+	for _, s := range structs {
+		if _, found := nonRoots[s.Decl]; found {
+			continue
+		}
+		if _, found := parentExprs[s.StructLit]; found {
+			implicitUnifications = append(implicitUnifications, s)
+		} else {
+			allNotFound := true
+			for _, decl := range s.Decls {
+				if _, found := parentExprs[decl]; found {
+					allNotFound = false
+					break
+				}
+			}
+			if allNotFound {
+				explictUnifications = append(explictUnifications, s)
+			} else {
+				implicitUnifications = append(implicitUnifications, s)
+			}
+		}
+	}
+	slices.SortFunc(implicitUnifications, compareStructInfosByFilenameOffset)
+
+	debug("structs: %v\n", structs)
+	debug("implicitly unified: %v\n", implicitUnifications)
+	debug("explicitly unified: %v\n", explictUnifications)
+	debug("outgoing:  %v\n", outgoing)
+
+	for _, s := range explictUnifications {
+		debug("starting explict root\n")
+		addEdges(builder, dynamicFields, outgoing, nil, false, s)
+	}
+
+	currentFilename := ""
+	var accumulated []adt.Feature
+	for _, s := range implicitUnifications {
+		var previous []adt.Feature
+		if s.Src == nil && currentFilename != "" {
+			currentFilename = ""
+			accumulated = accumulated[:0]
+		} else if s.Src != nil {
+			if fileName := s.Src.Pos().Filename(); fileName != currentFilename {
+				currentFilename = fileName
+				accumulated = accumulated[:0]
+			}
+		}
+		previous = append(previous, accumulated...)
+		debug("starting implicit root\n")
+		accumulated = append(accumulated, addEdges(builder, dynamicFields, outgoing, previous, true, s)...)
+	}
+	debug("edges: %v\n", builder.edgesSet)
+	return builder.Build().Sort(indexer)
+}
+
+func addEdges(builder *GraphBuilder, dynamicFields map[*adt.DynamicField][]adt.Feature, outgoing map[adt.Decl][]*adt.StructInfo, previous []adt.Feature, skipExistingFeatures bool, s *adt.StructInfo) []adt.Feature {
+	debug("--- S %p (%p :: %T) (sl: %p) (skip? %v) ---\n", s, s.Decl, s.Decl, s.StructLit, skipExistingFeatures)
+	debug(" previous: %v\n", previous)
+	var next []adt.Feature
+
+	filename := ""
+	if src := s.Src; src != nil {
+		filename = src.Pos().Filename()
+	}
+	debug(" filename: %s\n", filename)
+
+	for idx, decl := range s.Decls {
+		debug(" %p / %d: d (%p :: %T)\n", s, idx, decl, decl)
+
+		currentLabel := adt.InvalidLabel
+		switch decl := decl.(type) {
+		case *adt.Field:
+			currentLabel = decl.Label
+		case *adt.DynamicField:
+			// This struct contains a dynamic field. If that dynamic
+			// field was successfully evaluated into a field, then
+			// insert that field into this chain.
+			if labels := dynamicFields[decl]; len(labels) > 0 {
+				currentLabel = labels[0]
+				dynamicFields[decl] = labels[1:]
+			}
+		}
+		if currentLabel != adt.InvalidLabel {
+			debug("  label %v\n", currentLabel)
+
+			node, exists := builder.nodesByFeature[currentLabel]
+			if exists && node.StructInfo == s {
+				debug("    skipping 1\n")
+			} else if exists && skipExistingFeatures && filename != "" && node.File == filename {
+				debug("    skipping 2\n")
+			} else {
+				debug("    %v %v\n", node, exists)
+				node = builder.EnsureNode(currentLabel)
+				if filename != "" {
+					node.File = filename
+				}
+				node.StructInfo = s
+				next = append(next, currentLabel)
+				for _, prevLabel := range previous {
+					builder.AddEdge(prevLabel, currentLabel)
+				}
+				previous = next
+				next = nil
+			}
+		}
+
+		if nextStructs := outgoing[decl]; len(nextStructs) != 0 {
+			debug("  nextStructs: %v\n", nextStructs)
+			_, isBinary := decl.(*adt.BinaryExpr)
+			for _, s1 := range nextStructs {
+				edges := addEdges(builder, dynamicFields, outgoing, previous, skipExistingFeatures, s1)
+				if isBinary {
+					next = append(next, edges...)
+				} else {
+					previous = edges
+				}
+			}
+			if isBinary {
+				previous = next
+				next = nil
+			}
+		}
+	}
+
+	return previous
 }
 
 type edge struct {
@@ -335,5 +574,5 @@ func appendNodes(indexerCmp *indexerComparison, nodesSorted, nodesReady, nodesEn
 }
 
 func debug(formatting string, args ...any) {
-	//	fmt.Printf(formatting, args...)
+	// fmt.Printf(formatting, args...)
 }

@@ -90,16 +90,25 @@ dedupTodo: {
 	}
 }
 
+-- v3issues.cue --
+issue3483: {
+	#Schema: schemaField: int
+	out1: out2: #Schema & {
+		if false {
+			schemaField: 3
+		}
+	}
+}
 -- out/eval/stats --
 Leaks:  2
-Freed:  70
-Reused: 64
+Freed:  76
+Reused: 70
 Allocs: 8
 Retain: 3
 
-Unifications: 58
-Conjuncts:    103
-Disjuncts:    71
+Unifications: 64
+Conjuncts:    112
+Disjuncts:    77
 -- out/evalalpha --
 Errors:
 noEraseDefinition.a.0.b: field not allowed:
@@ -210,6 +219,16 @@ Result:
       }
     }
   }
+  issue3483: (struct){
+    #Schema: (#struct){
+      schemaField: (int){ int }
+    }
+    out1: (struct){
+      out2: (#struct){
+        schemaField: (int){ int }
+      }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -281,7 +300,7 @@ diff old new
 -- diff/todo/p3 --
 Missing error positions.
 -- diff/explanation --
-dedupTodo.out: the new evaluator correctly marks this as closed.
+dedupTodo.out.c: the new evaluator correctly marks this as closed.
 -- out/eval --
 Errors:
 disallowed.vErr.d: field not allowed:
@@ -404,6 +423,16 @@ Result:
       }
     }
   }
+  issue3483: (struct){
+    #Schema: (#struct){
+      schemaField: (int){ int }
+    }
+    out1: (struct){
+      out2: (#struct){
+        schemaField: (int){ int }
+      }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -508,6 +537,21 @@ Result:
       c: {
         n: string
       }
+    }
+  }
+}
+--- v3issues.cue
+{
+  issue3483: {
+    #Schema: {
+      schemaField: int
+    }
+    out1: {
+      out2: (〈1;#Schema〉 & {
+        if false {
+          schemaField: 3
+        }
+      })
     }
   }
 }

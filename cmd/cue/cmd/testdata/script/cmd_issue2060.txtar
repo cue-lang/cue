@@ -136,11 +136,11 @@ StrokesName: ZenStrokes1
 PlatformName: Linux
 CommandBindingsCount: 1
 CommandBindings:
-  - CmdName: CursorMoveToLineForward
+  - BindingsMax: 0
+    CmdName: CursorMoveToLineForward
     CmdHumanName: Cursor Down
     EditorCmdText: '"command": "move", "args": test'
     BindingsCount: 1
-    BindingsMax: 0
     Bindings:
       - DefText: Down
         BindText: Down

@@ -24,7 +24,7 @@ Bar: {
 -- extern/out --
 -- out/extern --
 {
-	Foo:    implFoo1
 	Bar:    implBar2
+	Foo:    implFoo1
 	Rename: implEmaner1
 }

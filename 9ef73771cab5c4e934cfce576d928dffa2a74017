@@ -16,6 +16,24 @@
       "message": "or say `CUE_UPDATE\u003d1 go test`? the package is implied given that it\u0027s the same directory, plus you give the user the command they can use to re-generate them.",
       "revId": "9ef73771cab5c4e934cfce576d928dffa2a74017",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5de4dac1_522e97be",
+        "filename": "encoding/jsonschema/external_teststats.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-09T15:23:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "57af8c2d_0ac0cbcf",
+      "revId": "9ef73771cab5c4e934cfce576d928dffa2a74017",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

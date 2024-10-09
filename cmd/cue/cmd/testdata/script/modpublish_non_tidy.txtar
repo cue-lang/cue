@@ -25,17 +25,17 @@ module: "main.org@v1"
 language: version: "v0.9.0"
 source: kind: "self"
 -- cue.mod/module.cue.tidy --
-module: "main.org@v1"
-language: {
-	version: "v0.9.0"
-}
-source: {
-	kind: "self"
-}
 deps: {
 	"example.com@v0": {
 		v: "v0.0.1"
 	}
+}
+language: {
+	version: "v0.9.0"
+}
+module: "main.org@v1"
+source: {
+	kind: "self"
 }
 -- main.cue --
 package main

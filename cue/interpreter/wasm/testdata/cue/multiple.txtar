@@ -30,15 +30,15 @@ c2: fact(9)
 -- basic.wasm --
 -- basic1.wasm --
 -- out/wasm --
-neg32:   neg32()
-add:     add
-x0:      3
-x1:      1
 isPrime: is_prime()
 fact:    fact()
 a0:      -42
 b1:      true
 b2:      false
 c1:      5040
-x2:      101
 c2:      362880
+neg32:   neg32()
+add:     add
+x0:      3
+x1:      1
+x2:      101

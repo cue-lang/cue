@@ -22,7 +22,7 @@ language: {
 	version: "$CUE_LANGUAGE_VERSION"
 }
 -- want-module-experiment.cue --
-module: "foo.com/bar"
 language: {
-	version: "$CUE_LANGUAGE_VERSION"
+	version: "v0.11.0"
 }
+module: "foo.com/bar"

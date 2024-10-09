@@ -4,20 +4,20 @@
 -- tidy-check-error --
 module is not tidy: missing dependency providing package test.example/foo
 -- want --
-module: "main.org"
+deps: {
+	"test.example/foo@v0": {
+		default: true
+		v:       "v0.0.1"
+	}
+	"test.example/toolonly@v0": {
+		default: true
+		v:       "v0.0.1"
+	}
+}
 language: {
 	version: "v0.9.2"
 }
-deps: {
-	"test.example/foo@v0": {
-		v:       "v0.0.1"
-		default: true
-	}
-	"test.example/toolonly@v0": {
-		v:       "v0.0.1"
-		default: true
-	}
-}
+module: "main.org"
 -- cue.mod/module.cue --
 module: "main.org"
 language: {

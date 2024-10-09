@@ -467,11 +467,7 @@ func TestFormat(t *testing.T) {
 				},
 			},
 		},
-		want: `module: "foo.com/bar@v0"
-language: {
-	version: "v0.8.0"
-}
-deps: {
+		want: `deps: {
 	"example.com@v1": {
 		v: "v1.2.3"
 	}
@@ -479,6 +475,10 @@ deps: {
 		v: "v0.2.3"
 	}
 }
+language: {
+	version: "v0.8.0"
+}
+module: "foo.com/bar@v0"
 `}, {
 		name: "WithoutLanguage",
 		file: &File{
@@ -487,10 +487,10 @@ deps: {
 				Version: "v0.8.0",
 			},
 		},
-		want: `module: "foo.com/bar@v0"
-language: {
+		want: `language: {
 	version: "v0.8.0"
 }
+module: "foo.com/bar@v0"
 `}, {
 		name: "WithVersionTooEarly",
 		file: &File{
@@ -518,10 +518,10 @@ language: {
 			},
 			Deps: map[string]*Dep{},
 		},
-		want: `module: "foo.com/bar@v0"
-language: {
+		want: `language: {
 	version: "v0.8.0"
 }
+module: "foo.com/bar@v0"
 `,
 	}}
 	cuetest.Run(t, tests, func(t *cuetest.T, test *formatTest) {

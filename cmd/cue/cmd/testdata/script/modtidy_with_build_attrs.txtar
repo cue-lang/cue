@@ -24,24 +24,24 @@ cmp stdout want-stdout-2
 stderr 'tag "notknown" not used in any file'
 
 -- want-module --
-module: "main.org"
+deps: {
+	"test.example/d1@v0": {
+		default: true
+		v:       "v0.0.1"
+	}
+	"test.example/d2@v0": {
+		default: true
+		v:       "v0.0.1"
+	}
+	"test.example/d4@v0": {
+		default: true
+		v:       "v0.0.1"
+	}
+}
 language: {
 	version: "v0.9.2"
 }
-deps: {
-	"test.example/d1@v0": {
-		v:       "v0.0.1"
-		default: true
-	}
-	"test.example/d2@v0": {
-		v:       "v0.0.1"
-		default: true
-	}
-	"test.example/d4@v0": {
-		v:       "v0.0.1"
-		default: true
-	}
-}
+module: "main.org"
 -- want-stdout-1 --
 prod: false
 x: {

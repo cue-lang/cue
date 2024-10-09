@@ -65,13 +65,13 @@ Go: {
 }
 -- out/stats.yaml --
 CUE:
-  Unifications: 4
-  Disjuncts: 6
-  Conjuncts: 8
-  Freed: 6
-  Reused: 2
   Allocs: 4
+  Conjuncts: 8
+  Disjuncts: 6
+  Freed: 6
   Retained: 0
+  Reused: 2
+  Unifications: 4
 Go:
   AllocBytes: 300456
   AllocObjects: 100123

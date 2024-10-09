@@ -3,16 +3,16 @@
 -- tidy-check-error --
 module is not tidy: missing dependency providing package .*
 -- want --
-module: "main.org@v0"
+deps: {
+	"example.com@v1": {
+		default: true
+		v:       "v1.0.0"
+	}
+}
 language: {
 	version: "v0.8.5"
 }
-deps: {
-	"example.com@v1": {
-		v:       "v1.0.0"
-		default: true
-	}
-}
+module: "main.org@v0"
 -- cue.mod/module.cue --
 module: "main.org@v0"
 language: {

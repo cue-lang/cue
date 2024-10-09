@@ -96,10 +96,10 @@ downstream: root
 -- premodules/cue.mod/pkg/premodules.example/cue.mod/module.cue --
 module: "premodules.example"
 -- premodules-module.cue.fixed --
-module: "premodules.example"
 language: {
 	version: "v0.9.0"
 }
+module: "premodules.example"
 -- premodules/cue.mod/pkg/premodules.example/root.cue --
 package root
 import "premodules.example/subpkg"

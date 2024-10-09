@@ -26,15 +26,15 @@ cmp stderr want-stderr-5
 rm cue.mod
 
 -- want-module-1 --
-module: "foo.example"
 language: {
 	version: "$CUE_LANGUAGE_VERSION"
 }
--- want-module-2 --
 module: "foo.example"
+-- want-module-2 --
 language: {
 	version: "v0.9.2"
 }
+module: "foo.example"
 -- want-stderr-3 --
 language version "v0.4.3" is too early for module.cue schema (earliest allowed is v0.8.0-alpha.0)
 -- want-stderr-4 --

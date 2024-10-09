@@ -44,10 +44,6 @@ cmp stdout want-stdout-1
 stderr 'other requirements prevent changing module baz.org@v0 to version v0.5.0 \(actual selected version: v0.10.1\)'
 
 -- want-module-1 --
-module: "main.org@v0"
-language: {
-	version: "v0.8.0"
-}
 deps: {
 	"bar.com@v0": {
 		v: "v0.5.0"
@@ -59,10 +55,14 @@ deps: {
 		v: "v0.0.1"
 	}
 	"foo.com/bar/hello@v0": {
-		v:       "v0.2.3"
 		default: true
+		v:       "v0.2.3"
 	}
 }
+language: {
+	version: "v0.8.0"
+}
+module: "main.org@v0"
 -- want-stdout-1 --
 {
     "main": "main",
@@ -72,10 +72,6 @@ deps: {
     "example.com@v0": "v0.0.1"
 }
 -- want-module-2 --
-module: "main.org@v0"
-language: {
-	version: "v0.8.0"
-}
 deps: {
 	"bar.com@v0": {
 		v: "v0.5.0"
@@ -87,10 +83,14 @@ deps: {
 		v: "v0.0.1"
 	}
 	"foo.com/bar/hello@v0": {
-		v:       "v0.2.3"
 		default: true
+		v:       "v0.2.3"
 	}
 }
+language: {
+	version: "v0.8.0"
+}
+module: "main.org@v0"
 -- want-stdout-2 --
 {
     "main": "main",

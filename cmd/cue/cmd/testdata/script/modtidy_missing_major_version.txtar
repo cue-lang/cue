@@ -6,10 +6,10 @@ exec cue mod tidy --check
 exec cue mod tidy
 cmp cue.mod/module.cue want-cue.mod
 -- want-cue.mod --
-module: "main.org"
 language: {
 	version: "v0.8.100"
 }
+module: "main.org"
 -- cue.mod/module.cue --
 module: "main.org"
 language: version: "v0.8.100"

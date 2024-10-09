@@ -4,10 +4,6 @@
 -- tidy-check-error --
 module is not tidy: missing dependency providing package example.com.*
 -- want --
-module: "main.org@v0"
-language: {
-	version: "v0.8.100"
-}
 deps: {
 	"bar.com@v0": {
 		v: "v0.5.0"
@@ -22,6 +18,10 @@ deps: {
 		v: "v0.2.3"
 	}
 }
+language: {
+	version: "v0.8.100"
+}
+module: "main.org@v0"
 -- cue.mod/module.cue --
 module: "main.org@v0"
 language: {

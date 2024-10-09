@@ -91,7 +91,7 @@ func TestGenerated(t *testing.T) {
 				}
 				return convert.GoValueToValue(ctx, in, false), nil
 			},
-			out: `Terminals: [{Name: "Name", Description: "Desc"}]`,
+			out: `Terminals: [{Description: "Desc", Name: "Name"}]`,
 		}, {
 			in: func(ctx *adt.OpContext) (adt.Expr, error) {
 				in := &C{
@@ -105,7 +105,7 @@ func TestGenerated(t *testing.T) {
 				in := []*A{{Name: "Name", Description: "Desc"}}
 				return convert.GoValueToValue(ctx, in, false), nil
 			},
-			out: `[{Name: "Name", Description: "Desc"}]`,
+			out: `[{Description: "Desc", Name: "Name"}]`,
 		}, {
 			in: func(ctx *adt.OpContext) (adt.Expr, error) {
 				in := []*A{{Name: "Name", Description: "Desc"}}

@@ -395,6 +395,11 @@ _|_ // shadowRef.e1.x.x: structural cycle
 == All
 {
 	shadowRef: {
+		e1: {
+			x: {
+				x: _|_ // shadowRef.e1.x.x: structural cycle
+			}
+		}
 		t1: {
 			x: {
 				x: null
@@ -427,11 +432,6 @@ _|_ // shadowRef.e1.x.x: structural cycle
 				x: null
 			}
 		}
-		e1: {
-			x: {
-				x: _|_ // shadowRef.e1.x.x: structural cycle
-			}
-		}
 	}
 	shadowAlias: {
 		t1: {
@@ -462,6 +462,15 @@ _|_ // shadowRef.e1.x.x: structural cycle
 		}
 	}
 	shadowField: {
+		issue2378: {
+			a: {
+				b: 0
+				d: {
+					b: 1
+					c: A & a.z
+				}
+			}
+		}
 		t1: {
 			z: {
 				b: 0
@@ -475,8 +484,8 @@ _|_ // shadowRef.e1.x.x: structural cycle
 			z: {
 				b: 0
 				d: {
-					b: 1
 					A: 1
+					b: 1
 					c: 0
 				}
 			}
@@ -486,8 +495,8 @@ _|_ // shadowRef.e1.x.x: structural cycle
 				z: {
 					b: 0
 					d: {
-						b: 1
 						A: 1
+						b: 1
 						c: 0
 					}
 				}
@@ -515,15 +524,6 @@ _|_ // shadowRef.e1.x.x: structural cycle
 				c: 0
 			}
 		}
-		issue2378: {
-			a: {
-				b: 0
-				d: {
-					b: 1
-					c: A & a.z
-				}
-			}
-		}
 	}
 }
 == Eval
@@ -532,7 +532,7 @@ _|_ // shadowRef.e1.x.x: structural cycle
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,9 @@
+@@ -1,15 +1,15 @@
  == Simplified
 -_|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)
 +_|_ // shadowRef.e1.x.x: structural cycle
@@ -545,15 +545,13 @@ diff old new
  == All
  {
  	shadowRef: {
-@@ -41,7 +41,7 @@
- 		}
  		e1: {
  			x: {
 -				x: _|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)
 +				x: _|_ // shadowRef.e1.x.x: structural cycle
  			}
  		}
- 	}
+ 		t1: {
 @@ -139,4 +139,4 @@
  	}
  }
@@ -570,6 +568,11 @@ _|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)
 == All
 {
 	shadowRef: {
+		e1: {
+			x: {
+				x: _|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)
+			}
+		}
 		t1: {
 			x: {
 				x: null
@@ -602,11 +605,6 @@ _|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)
 				x: null
 			}
 		}
-		e1: {
-			x: {
-				x: _|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)
-			}
-		}
 	}
 	shadowAlias: {
 		t1: {
@@ -637,6 +635,15 @@ _|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)
 		}
 	}
 	shadowField: {
+		issue2378: {
+			a: {
+				b: 0
+				d: {
+					b: 1
+					c: A & a.z
+				}
+			}
+		}
 		t1: {
 			z: {
 				b: 0
@@ -650,8 +657,8 @@ _|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)
 			z: {
 				b: 0
 				d: {
-					b: 1
 					A: 1
+					b: 1
 					c: 0
 				}
 			}
@@ -661,8 +668,8 @@ _|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)
 				z: {
 					b: 0
 					d: {
-						b: 1
 						A: 1
+						b: 1
 						c: 0
 					}
 				}
@@ -688,15 +695,6 @@ _|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)
 			x: {
 				b: 0
 				c: 0
-			}
-		}
-		issue2378: {
-			a: {
-				b: 0
-				d: {
-					b: 1
-					c: A & a.z
-				}
 			}
 		}
 	}

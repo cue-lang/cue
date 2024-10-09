@@ -3,15 +3,15 @@
 -- versions --
 bar.com@v0.0.2
 -- want --
-module: "main.org@v0"
-language: {
-	version: "v0.8.0"
-}
 deps: {
 	"bar.com@v0": {
 		v: "v0.0.2"
 	}
 }
+language: {
+	version: "v0.8.0"
+}
+module: "main.org@v0"
 -- cue.mod/module.cue --
 module: "main.org@v0"
 language: version: "v0.8.0"

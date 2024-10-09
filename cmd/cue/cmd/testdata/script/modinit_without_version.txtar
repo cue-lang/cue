@@ -9,7 +9,7 @@ exec cue mod tidy
 cmpenv cue.mod/module.cue want-module
 
 -- want-module --
-module: "foo.example"
 language: {
 	version: "$CUE_LANGUAGE_VERSION"
 }
+module: "foo.example"

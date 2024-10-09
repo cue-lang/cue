@@ -7,15 +7,15 @@ exec cue export .
 cmp stdout want-stdout
 
 -- want-module --
-module: "main.example"
-language: {
-	version: "v0.8.0"
-}
 deps: {
 	"foo.org/bar@v2": {
 		v: "v2.0.0"
 	}
 }
+language: {
+	version: "v0.8.0"
+}
+module: "main.example"
 -- want-stdout --
 {
     "foo.org/bar@v2": "v2.0.0"

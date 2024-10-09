@@ -45,58 +45,58 @@ cmp stderr want-stderr-10
 module: "main.org@v0"
 language: version: "v0.9.0-alpha.0"
 -- want-module-0 --
-module: "main.org@v0"
 language: {
 	version: "v0.9.0-alpha.0"
 }
+module: "main.org@v0"
 source: {
 	kind: "self"
 }
 -- want-module-1 --
-module: "main.org@v0"
 language: {
 	version: "v0.9.0-alpha.0"
 }
+module: "main.org@v0"
 source: {
 	kind: "git"
 }
 -- want-module-2 --
-module: "main.org@v0"
 language: {
 	version: "v0.9.0-alpha.0"
 }
+module: "main.org@v0"
 -- want-module-3 --
-module: "main.org@v0"
-language: {
-	version: "v0.9.0-alpha.0"
-}
 deps: {
 	"foo.bar@v0": {
 		v: "v0.2.3"
 	}
 }
+language: {
+	version: "v0.9.0-alpha.0"
+}
+module: "main.org@v0"
 -- want-stderr --
 invalid argument "bad-module!" for "--require" flag: invalid module path@version "bad-module!"
 -- want-module-4 --
+language: {
+	version: "v0.9.0-alpha.0"
+}
 module: "main.org@v0"
-language: {
-	version: "v0.9.0-alpha.0"
-}
 -- want-module-5 --
-module: "othermain.org@v1"
 language: {
 	version: "v0.9.0-alpha.0"
 }
--- want-module-6 --
 module: "othermain.org@v1"
+-- want-module-6 --
 language: {
 	version: "v0.9.2"
 }
--- want-module-7 --
 module: "othermain.org@v1"
+-- want-module-7 --
 language: {
 	version: "$CUE_LANGUAGE_VERSION"
 }
+module: "othermain.org@v1"
 -- want-stderr-8 --
 invalid argument "v0.4.3" for "--language-version" flag: language version "v0.4.3" is too early for module.cue schema (earliest allowed is v0.8.0-alpha.0)
 -- want-stderr-9 --

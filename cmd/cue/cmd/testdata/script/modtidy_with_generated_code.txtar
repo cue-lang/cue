@@ -10,15 +10,15 @@ cmp cue.mod/module.cue want-module
 exec cue export .
 cmp stdout want-stdout
 -- want-module --
-module: "main.org@v0"
-language: {
-	version: "v0.8.0"
-}
 deps: {
 	"example.com@v0": {
 		v: "v0.0.1"
 	}
 }
+language: {
+	version: "v0.8.0"
+}
+module: "main.org@v0"
 -- want-stdout --
 {
     "example.com": "v0.0.1",

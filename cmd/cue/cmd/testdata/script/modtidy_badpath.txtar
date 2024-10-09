@@ -12,16 +12,16 @@ exec cue export
 cmp stdout want-stdout
 
 -- want-module --
-module: "cue.example@v0"
+deps: {
+	"test.example/foo@v0": {
+		default: true
+		v:       "v0.0.1"
+	}
+}
 language: {
 	version: "v0.9.2"
 }
-deps: {
-	"test.example/foo@v0": {
-		v:       "v0.0.1"
-		default: true
-	}
-}
+module: "cue.example@v0"
 -- cue.mod/module.cue --
 module: "cue.example@v0"
 language: version: "v0.9.2"

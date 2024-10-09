@@ -62,6 +62,161 @@ func (nodes Nodes) Features() []adt.Feature {
 	return features
 }
 
+func compareStructInfosByFilenameOffset(a, b *adt.StructInfo) int {
+	aSrc, bSrc := a.Src, b.Src
+	switch {
+	case aSrc == nil && bSrc == nil:
+		return 0
+	case aSrc == nil:
+		return 1
+	case bSrc == nil:
+		return -1
+	}
+
+	aPos, bPos := aSrc.Pos(), bSrc.Pos()
+	if c := cmp.Compare(aPos.Filename(), bPos.Filename()); c != 0 {
+		return c
+	}
+	return cmp.Compare(aPos.Offset(), bPos.Offset())
+}
+
+func structLitsInParent(v *adt.Vertex) map[*adt.StructLit]struct{} {
+	var parentStructLits map[*adt.StructLit]struct{}
+	if parent := v.Parent; parent != nil && v.Label != adt.InvalidLabel {
+		for _, arc := range parent.Arcs {
+			arc.VisitAllConjuncts(func(c adt.Conjunct, isLeaf bool) {
+				expr, isStructInfo := c.Expr().(*adt.StructLit)
+				field, isField := c.Field().(*adt.Field)
+				if isStructInfo && isField && field.Label == v.Label {
+					if parentStructLits == nil {
+						parentStructLits = make(map[*adt.StructLit]struct{})
+					}
+					parentStructLits[expr] = struct{}{}
+				}
+			})
+		}
+	}
+	return parentStructLits
+}
+
+func dynamicFieldsFeatures(v *adt.Vertex, builder *GraphBuilder) map[*adt.DynamicField][]adt.Feature {
+	// Find all fields which have been created as a result of
+	// successful evaluation of a dynamic field name.
+	var dynamicFields map[*adt.DynamicField][]adt.Feature
+	for _, arc := range v.Arcs {
+		builder.EnsureNode(arc.Label)
+		arc.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+			if dynField, ok := c.Field().(*adt.DynamicField); ok {
+				if dynamicFields == nil {
+					dynamicFields = make(map[*adt.DynamicField][]adt.Feature)
+				}
+				dynamicFields[dynField] = append(dynamicFields[dynField], arc.Label)
+			}
+			return true
+		})
+	}
+	return dynamicFields
+}
+
+func VertexFeatures(indexer adt.StringIndexer, v *adt.Vertex) []adt.Feature {
+	// The vertex v could be an implicit conjunction of several
+	// declarations. Consider:
+	//
+	// x: c: _
+	// x: b: _
+	//
+	// In this case, we want to guarantee the result is:
+	//
+	//	x: {
+	//	   c: _
+	//	   b: _
+	//	}
+	//
+	// To detect this scenario, we need to look at the parent vertex's
+	// arc's conjuncts and find any structLits that correspond to our
+	// vertex's own label. We later sort all structLits by filename and
+	// offset, and then add extra edges to the graph of features to
+	// ensure this ordering is honoured.
+	parentStructLits := structLitsInParent(v)
+	builder := NewGraphBuilder()
+	dynamicFields := dynamicFieldsFeatures(v, builder)
+
+	structs := v.Structs
+	outgoing := make(map[adt.Decl][]*adt.StructInfo)
+	var roots []*adt.StructInfo
+	for _, s := range structs {
+		parentDecl := s.Decl
+		if parentDecl == nil || parentDecl == v {
+			roots = append(roots, s)
+		} else {
+			outgoing[parentDecl] = append(outgoing[parentDecl], s)
+		}
+	}
+	slices.SortFunc(roots, compareStructInfosByFilenameOffset)
+
+	var accumulated []adt.Feature
+	for _, s := range roots {
+		var previous []adt.Feature
+		_, foundInParent := parentStructLits[s.StructLit]
+		if foundInParent {
+			previous = append(previous, accumulated...)
+		}
+		next := addEdges(builder, dynamicFields, outgoing, previous, s)
+		if foundInParent {
+			accumulated = append(accumulated, next...)
+		}
+	}
+
+	return builder.Build().Sort(indexer)
+}
+
+func addEdges(builder *GraphBuilder, dynamicFields map[*adt.DynamicField][]adt.Feature, outgoing map[adt.Decl][]*adt.StructInfo, previous []adt.Feature, s *adt.StructInfo) []adt.Feature {
+	var next []adt.Feature
+
+	for _, decl := range s.Decls {
+		if nextStructs := outgoing[decl]; len(nextStructs) != 0 {
+			_, isBinary := decl.(*adt.BinaryExpr)
+			for _, s1 := range nextStructs {
+				edges := addEdges(builder, dynamicFields, outgoing, previous, s1)
+				if isBinary {
+					next = append(next, edges...)
+				} else {
+					previous = edges
+				}
+			}
+			if isBinary {
+				previous = next
+				next = nil
+			}
+		}
+
+		currentLabel := adt.InvalidLabel
+		switch decl := decl.(type) {
+		case *adt.Field:
+			currentLabel = decl.Label
+		case *adt.DynamicField:
+			// This struct contains a dynamic field. If that dynamic
+			// field was successfully evaluated into a field, then
+			// insert that field into this chain.
+			if labels := dynamicFields[decl]; len(labels) > 0 {
+				currentLabel = labels[0]
+				dynamicFields[decl] = labels[1:]
+			}
+		}
+		if currentLabel != adt.InvalidLabel {
+			builder.EnsureNode(currentLabel)
+			next = append(next, currentLabel)
+			for _, prevLabel := range previous {
+				builder.AddEdge(prevLabel, currentLabel)
+			}
+			previous = next
+			next = nil
+		}
+	}
+
+	return previous
+}
+
 type edge struct {
 	from adt.Feature
 	to   adt.Feature

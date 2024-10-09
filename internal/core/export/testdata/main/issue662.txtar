@@ -41,6 +41,8 @@ reordering
 [#GraphFieldConfig]
 [#GraphFieldConfig lineColor]
 [#GraphFieldConfig drawStyle]
+-- diff/value/explanation --
+reordering
 -- out/value-v3 --
 == Simplified
 {}
@@ -112,8 +114,6 @@ diff old new
 +		lineColor?: string
  	}
  }
--- diff/value/explanation --
-reordering
 -- out/value --
 == Simplified
 {}

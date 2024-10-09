@@ -138,6 +138,49 @@ diff old new
  parse.err.a: error in call to uuid.Parse: invalid UUID format:
      ./in.cue:35:13
  parse.err.b: error in call to uuid.Parse: invalid UUID length: 30:
+@@ -35,11 +32,6 @@
+ 	c: "{123e4567-e89b-12d3-a456-426655440000"
+ }
+ valid: {
+-	err: {
+-		a: _|_ // valid.err.a: invalid value "052ef62d_7223_58b6_a551_c1deee46d401" (does not satisfy uuid.Valid): valid.err.a: invalid UUID format
+-		b: _|_ // valid.err.b: invalid value "052ef62d-7223-58b6-a551-c1deee" (does not satisfy uuid.Valid): valid.err.b: invalid UUID length: 30
+-		c: _|_ // valid.err.c: invalid value "{123e4567-e89b-12d3-a456-426655440000" (does not satisfy uuid.Valid): valid.err.c: invalid UUID length: 37
+-	}
+ 	ok: {
+ 		a: "052ef62d-7223-58b6-a551-c1deee46d401"
+ 		b: "052EF62D-7223-58B6-A551-C1DEEE46D401"
+@@ -47,13 +39,13 @@
+ 		d: "{123e4567-e89b-12d3-a456-426655440000}"
+ 		e: "123e4567e89b12d3a456426655440000"
+ 	}
++	err: {
++		a: _|_ // valid.err.a: invalid value "052ef62d_7223_58b6_a551_c1deee46d401" (does not satisfy uuid.Valid): valid.err.a: invalid UUID format
++		b: _|_ // valid.err.b: invalid value "052ef62d-7223-58b6-a551-c1deee" (does not satisfy uuid.Valid): valid.err.b: invalid UUID length: 30
++		c: _|_ // valid.err.c: invalid value "{123e4567-e89b-12d3-a456-426655440000" (does not satisfy uuid.Valid): valid.err.c: invalid UUID length: 37
++	}
+ }
+ parse: {
+-	err: {
+-		a: _|_ // parse.err.a: error in call to uuid.Parse: invalid UUID format
+-		b: _|_ // parse.err.b: error in call to uuid.Parse: invalid UUID length: 30
+-		c: _|_ // parse.err.c: error in call to uuid.Parse: invalid UUID length: 37
+-	}
+ 	ok: {
+ 		a: "052ef62d-7223-58b6-a551-c1deee46d401"
+ 		b: "052ef62d-7223-58b6-a551-c1deee46d401"
+@@ -61,6 +53,11 @@
+ 		d: "123e4567-e89b-12d3-a456-426655440000"
+ 		e: "123e4567-e89b-12d3-a456-426655440000"
+ 	}
++	err: {
++		a: _|_ // parse.err.a: error in call to uuid.Parse: invalid UUID format
++		b: _|_ // parse.err.b: error in call to uuid.Parse: invalid UUID length: 30
++		c: _|_ // parse.err.c: error in call to uuid.Parse: invalid UUID length: 37
++	}
+ }
+ fromInt: {
+ 	a: "052ef62d-7223-58b6-a551-c1deee46d401"
 -- diff/todo/p2 --
 Missing error positions.
 -- out/uuid --
@@ -178,6 +221,11 @@ invalidTable: {
 	c: "{123e4567-e89b-12d3-a456-426655440000"
 }
 valid: {
+	err: {
+		a: _|_ // valid.err.a: invalid value "052ef62d_7223_58b6_a551_c1deee46d401" (does not satisfy uuid.Valid): valid.err.a: invalid UUID format
+		b: _|_ // valid.err.b: invalid value "052ef62d-7223-58b6-a551-c1deee" (does not satisfy uuid.Valid): valid.err.b: invalid UUID length: 30
+		c: _|_ // valid.err.c: invalid value "{123e4567-e89b-12d3-a456-426655440000" (does not satisfy uuid.Valid): valid.err.c: invalid UUID length: 37
+	}
 	ok: {
 		a: "052ef62d-7223-58b6-a551-c1deee46d401"
 		b: "052EF62D-7223-58B6-A551-C1DEEE46D401"
@@ -185,24 +233,19 @@ valid: {
 		d: "{123e4567-e89b-12d3-a456-426655440000}"
 		e: "123e4567e89b12d3a456426655440000"
 	}
-	err: {
-		a: _|_ // valid.err.a: invalid value "052ef62d_7223_58b6_a551_c1deee46d401" (does not satisfy uuid.Valid): valid.err.a: invalid UUID format
-		b: _|_ // valid.err.b: invalid value "052ef62d-7223-58b6-a551-c1deee" (does not satisfy uuid.Valid): valid.err.b: invalid UUID length: 30
-		c: _|_ // valid.err.c: invalid value "{123e4567-e89b-12d3-a456-426655440000" (does not satisfy uuid.Valid): valid.err.c: invalid UUID length: 37
-	}
 }
 parse: {
+	err: {
+		a: _|_ // parse.err.a: error in call to uuid.Parse: invalid UUID format
+		b: _|_ // parse.err.b: error in call to uuid.Parse: invalid UUID length: 30
+		c: _|_ // parse.err.c: error in call to uuid.Parse: invalid UUID length: 37
+	}
 	ok: {
 		a: "052ef62d-7223-58b6-a551-c1deee46d401"
 		b: "052ef62d-7223-58b6-a551-c1deee46d401"
 		c: "123e4567-e89b-12d3-a456-426655440000"
 		d: "123e4567-e89b-12d3-a456-426655440000"
 		e: "123e4567-e89b-12d3-a456-426655440000"
-	}
-	err: {
-		a: _|_ // parse.err.a: error in call to uuid.Parse: invalid UUID format
-		b: _|_ // parse.err.b: error in call to uuid.Parse: invalid UUID length: 30
-		c: _|_ // parse.err.c: error in call to uuid.Parse: invalid UUID length: 37
 	}
 }
 fromInt: {

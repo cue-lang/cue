@@ -155,7 +155,7 @@ func TestEncodeType(t *testing.T) {
 			B string `json:"b,omitempty"`
 			C []bool
 		}{},
-		out: `{a: int64, b?: string, C?: *null|[...bool]}`,
+		out: `{C?: *null|[...bool], a: int64, b?: string}`,
 	}, {
 		name: "CUEValue#1",
 		x: struct {

@@ -4,14 +4,13 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//	http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 package topological
 
 import (
@@ -35,6 +34,7 @@ type Node struct {
 	Feature      adt.Feature
 	Outgoing     Nodes
 	Incoming     Nodes
+	structMeta   *structMeta
 	sccNodeState *sccNodeState
 	ecNodeState  *ecNodeState
 	name         string
@@ -335,5 +335,5 @@ func appendNodes(indexerCmp *indexerComparison, nodesSorted, nodesReady, nodesEn
 }
 
 func debug(formatting string, args ...any) {
-	//	fmt.Printf(formatting, args...)
+	// fmt.Printf(formatting, args...)
 }

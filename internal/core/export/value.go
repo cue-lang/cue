@@ -411,7 +411,8 @@ func (e *exporter) structComposite(v *adt.Vertex, attrs []*ast.Attribute) ast.Ex
 	}
 
 	p := e.cfg
-	for _, label := range VertexFeatures(e.ctx, v) {
+	features := VertexFeatures(e.ctx, v)
+	for _, label := range features {
 		show := false
 		switch label.Typ() {
 		case adt.StringLabel:

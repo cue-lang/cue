@@ -99,16 +99,27 @@ issue3483: {
 		}
 	}
 }
+issue3486: {
+	#schema: {}
+
+	if true {
+		out: {
+			#schema
+			// This field should be allowed as #schema is embedded.
+			extra: "foo"
+		}
+	}
+}
 -- out/eval/stats --
 Leaks:  2
-Freed:  76
-Reused: 70
+Freed:  80
+Reused: 74
 Allocs: 8
 Retain: 3
 
-Unifications: 64
-Conjuncts:    112
-Disjuncts:    77
+Unifications: 68
+Conjuncts:    118
+Disjuncts:    81
 -- out/evalalpha --
 Errors:
 noEraseDefinition.a.0.b: field not allowed:
@@ -229,12 +240,19 @@ Result:
       }
     }
   }
+  issue3486: (struct){
+    #schema: (#struct){
+    }
+    out: (#struct){
+      extra: (string){ "foo" }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,15 +1,10 @@
+@@ -1,20 +1,10 @@
  Errors:
 +noEraseDefinition.a.0.b: field not allowed:
 +    ./in.cue:55:17
@@ -246,6 +264,11 @@ diff old new
      ./in.cue:28:4
 -    ./in.cue:32:8
      ./in.cue:32:14
+-issue3486.out.extra: field not allowed:
+-    ./v3issues.cue:10:11
+-    ./v3issues.cue:12:2
+-    ./v3issues.cue:14:4
+-    ./v3issues.cue:16:4
 -noEraseDefinition.a.0.b: field not allowed:
 -    ./in.cue:54:17
 -    ./in.cue:55:7
@@ -253,7 +276,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -45,11 +40,8 @@
+@@ -50,11 +40,8 @@
        // [eval]
        d: (_|_){
          // [eval] disallowed.vErr.d: field not allowed:
@@ -266,7 +289,7 @@ diff old new
          //     ./in.cue:32:14
        }
      }
-@@ -78,13 +70,11 @@
+@@ -83,13 +70,11 @@
        // [eval]
        0: (_|_){
          // [eval]
@@ -281,7 +304,7 @@ diff old new
        }
      }
    }
-@@ -109,13 +99,11 @@
+@@ -114,13 +99,11 @@
        c: (_){ _ }
      }
      out: (#struct){
@@ -297,6 +320,29 @@ diff old new
        }
      }
    }
+@@ -134,19 +117,11 @@
+       }
+     }
+   }
+-  issue3486: (_|_){
+-    // [eval]
++  issue3486: (struct){
+     #schema: (#struct){
+     }
+-    out: (_|_){
+-      // [eval]
+-      extra: (_|_){
+-        // [eval] issue3486.out.extra: field not allowed:
+-        //     ./v3issues.cue:10:11
+-        //     ./v3issues.cue:12:2
+-        //     ./v3issues.cue:14:4
+-        //     ./v3issues.cue:16:4
+-      }
++    out: (#struct){
++      extra: (string){ "foo" }
+     }
+   }
+ }
 -- diff/todo/p3 --
 Missing error positions.
 -- diff/explanation --
@@ -310,6 +356,11 @@ disallowed.vErr.d: field not allowed:
     ./in.cue:28:4
     ./in.cue:32:8
     ./in.cue:32:14
+issue3486.out.extra: field not allowed:
+    ./v3issues.cue:10:11
+    ./v3issues.cue:12:2
+    ./v3issues.cue:14:4
+    ./v3issues.cue:16:4
 noEraseDefinition.a.0.b: field not allowed:
     ./in.cue:54:17
     ./in.cue:55:7
@@ -433,6 +484,21 @@ Result:
       }
     }
   }
+  issue3486: (_|_){
+    // [eval]
+    #schema: (#struct){
+    }
+    out: (_|_){
+      // [eval]
+      extra: (_|_){
+        // [eval] issue3486.out.extra: field not allowed:
+        //     ./v3issues.cue:10:11
+        //     ./v3issues.cue:12:2
+        //     ./v3issues.cue:14:4
+        //     ./v3issues.cue:16:4
+      }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -552,6 +618,15 @@ Result:
           schemaField: 3
         }
       })
+    }
+  }
+  issue3486: {
+    #schema: {}
+    if true {
+      out: {
+        〈2;#schema〉
+        extra: "foo"
+      }
     }
   }
 }

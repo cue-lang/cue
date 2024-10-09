@@ -38,8 +38,8 @@ a: pkg.#A & {
 == Raw
 {
 	a: {
-		_val:  3
 		_#val: 6
+		_val:  3
 	}
 }
 == Final
@@ -49,8 +49,8 @@ a: pkg.#A & {
 == All
 {
 	a: {
-		_val:  3
 		_#val: 6
+		_val:  3
 	}
 }
 == Eval

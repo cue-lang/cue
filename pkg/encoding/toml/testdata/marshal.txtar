@@ -82,6 +82,17 @@ import "encoding/toml"
 
 marshal: {
 	output: {
+		complexKeys: """
+			[123-456]
+			' foo bar ' = 'value'
+
+			"""
+		defaults: """
+			key = 'default'
+
+			"""
+		failIncomplete: toml.Marshal(value)
+		failRequired:   toml.Marshal(value)
 		rootKey: """
 			r1 = 'foo'
 
@@ -115,21 +126,19 @@ marshal: {
 			sub1 = 'baz'
 
 			"""
-		complexKeys: """
-			[123-456]
-			' foo bar ' = 'value'
-
-			"""
-		defaults: """
-			key = 'default'
-
-			"""
-		failIncomplete: toml.Marshal(value)
-		failRequired:   toml.Marshal(value)
 	}
 }
 unmarshal: {
 	output: {
+		complexKeys: {
+			"123-456": {
+				" foo bar ": "value"
+			}
+		}
+		defaultEmpty: {}
+		failBadSyntax:  _|_ // unmarshal.output.failBadSyntax: error in call to encoding/toml.Unmarshal: invalid character at start of key: =
+		failDuplicate:  _|_ // unmarshal.output.failDuplicate: error in call to encoding/toml.Unmarshal: duplicate key: foo
+		failIncomplete: toml.Unmarshal(value)
 		rootKeysDots: {
 			a1: "A"
 			b1: {
@@ -152,14 +161,5 @@ unmarshal: {
 				}
 			}]
 		}
-		complexKeys: {
-			"123-456": {
-				" foo bar ": "value"
-			}
-		}
-		defaultEmpty: {}
-		failIncomplete: toml.Unmarshal(value)
-		failBadSyntax:  _|_ // unmarshal.output.failBadSyntax: error in call to encoding/toml.Unmarshal: invalid character at start of key: =
-		failDuplicate:  _|_ // unmarshal.output.failDuplicate: error in call to encoding/toml.Unmarshal: duplicate key: foo
 	}
 }

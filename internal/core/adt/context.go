@@ -85,10 +85,41 @@ func New(v *Vertex, cfg *Config) *OpContext {
 	return ctx
 }
 
-// An OpContext implements CUE's unification operation. It only
-// operates on values that are created with the Runtime with which an OpContext
-// is associated. An OpContext is not goroutine safe and only one goroutine may
-// use an OpContext at a time.
+func (c *OpContext) isDevVersion() bool {
+	return c.Version == internal.DevVersion
+}
+
+// An OpContext holds context associated with an on-going CUE
+// evaluation. It functions both as an optimized memory store,
+// amortizing allocations during an evaluation, and as a record of the
+// current state within an evaluation.
+//
+// It should only be used on values that are created with the Runtime
+// with which an OpContext is created.
+//
+// An OpContext is not goroutine safe and only one goroutine may use an
+// OpContext at a time.
+//
+// An OpContext is typically used for an entire operation involving CUE
+// values that are derived from the same [cue.Context], such as any call
+// to exported Go APIs like methods on [cue.Value].
+//
+// An OpContext stores:
+// - errors encountered during the evaluation
+// - the current vertex and its parents
+// - statistics on evaluation operations
+//
+// The recorded set of errors is added to by calls to [OpContext.AddErr],
+// [OpContext.AddErr], [OpContext.AddErrf], and in general
+// any other operation that encounters an error.
+//
+// The current vertex is modified by calling [OpContext.PushArc], which
+// must be balanced by a corresponding call to [OpContext.PopArc].
+//
+// The entire state, including recorded errors and the current vertex, can be
+// reset by calling [OpContext.PushState], which must be balanced by a
+// corresponding call to [OpContext.PopState], causing the original
+// errors and vertex to be restored.
 type OpContext struct {
 	Runtime
 	Format func(Runtime, Node) string
@@ -335,6 +366,12 @@ type frame struct {
 	ci  CloseInfo
 }
 
+// PushState resets c as if it was a newly created context
+// with the same configuration c was created with,
+// returning a value which should be used to restore the current
+// state by passing it to a matching call to [OpContext.PopState].
+//
+// If src is nil, c will still refer to the same source node.
 func (c *OpContext) PushState(env *Environment, src ast.Node) (saved frame) {
 	saved.env = c.e
 	saved.err = c.errs
@@ -368,6 +405,7 @@ func (c *OpContext) PushConjunct(x Conjunct) (saved frame) {
 	return saved
 }
 
+// PopState restores a state pushed by [OpContext.PushState].
 func (c *OpContext) PopState(s frame) *Bottom {
 	err := c.errs
 	c.e = s.env

@@ -62,6 +62,73 @@ func (nodes Nodes) Features() []adt.Feature {
 	return features
 }
 
+func VertexFeatures(indexer adt.StringIndexer, v *adt.Vertex) []adt.Feature {
+	builder := NewGraphBuilder()
+	// Find all fields which have been created as a result of
+	// successful evaluation of a dynamic field name.
+	dynamicFields := make(map[*adt.DynamicField]adt.Feature)
+	for _, arc := range v.Arcs {
+		builder.EnsureNode(arc.Label)
+		arc.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+			if dynField, ok := c.Field().(*adt.DynamicField); ok {
+				dynamicFields[dynField] = arc.Label
+			}
+			return true
+		})
+	}
+
+	structs := v.Structs
+	outgoing := make(map[adt.Decl][]*adt.StructInfo)
+	var roots []*adt.StructInfo
+	for _, s := range structs {
+		parentDecl := s.Decl
+		if parentDecl == nil || parentDecl == v {
+			roots = append(roots, s)
+		} else {
+			outgoing[parentDecl] = append(outgoing[parentDecl], s)
+		}
+	}
+
+	for _, s := range roots {
+		addEdges(builder, dynamicFields, outgoing, nil, s)
+	}
+
+	return builder.Build().Sort(indexer)
+}
+
+func addEdges(builder *GraphBuilder, dynamicFields map[*adt.DynamicField]adt.Feature, outgoing map[adt.Decl][]*adt.StructInfo, previous []adt.Feature, s *adt.StructInfo) []adt.Feature {
+	var next []adt.Feature
+
+	for _, decl := range s.Decls {
+		for _, s := range outgoing[decl] {
+			next = append(next, addEdges(builder, dynamicFields, outgoing, previous, s)...)
+		}
+		currentLabel := adt.InvalidLabel
+		switch decl := decl.(type) {
+		case *adt.Field:
+			currentLabel = decl.Label
+		case *adt.DynamicField:
+			// This struct contains a dynamic field. If that dynamic
+			// field was successfully evaluated into a field, then
+			// insert that field into this chain.
+			if label, found := dynamicFields[decl]; found {
+				currentLabel = label
+			}
+		}
+		if currentLabel != adt.InvalidLabel {
+			builder.EnsureNode(currentLabel)
+			next = append(next, currentLabel)
+			for _, prevLabel := range previous {
+				builder.AddEdge(prevLabel, currentLabel)
+			}
+		}
+		previous = next
+		next = nil
+	}
+
+	return previous
+}
+
 type edge struct {
 	from adt.Feature
 	to   adt.Feature

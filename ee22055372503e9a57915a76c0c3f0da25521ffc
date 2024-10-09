@@ -16,6 +16,24 @@
       "message": "this comma makes me think that you intended to add more sentences but forgot :)",
       "revId": "ee22055372503e9a57915a76c0c3f0da25521ffc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9458465b_8bc96596",
+        "filename": "encoding/jsonschema/decode_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-09T15:23:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6fe143ff_9f9e028d",
+      "revId": "ee22055372503e9a57915a76c0c3f0da25521ffc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b4812d9_e0b3f35a",
+        "filename": "encoding/jsonschema/external_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-09T07:29:05Z",
+      "side": 0,
+      "message": "isn\u0027t allowRegressions (and whatever env var it used) dead now? I would expect more deleted code",
+      "range": {
+        "startLine": 211,
+        "startChar": 27,
+        "endLine": 211,
+        "endChar": 43
+      },
+      "revId": "4a777544c903f46ab7d4b0e08a36150b3df478c7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

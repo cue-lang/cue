@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//	http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,6 +35,7 @@ type Node struct {
 	Feature      adt.Feature
 	Outgoing     Nodes
 	Incoming     Nodes
+	structMeta   *structMeta
 	sccNodeState *sccNodeState
 	ecNodeState  *ecNodeState
 	position     int
@@ -42,6 +43,10 @@ type Node struct {
 
 func (n *Node) IsSorted() bool {
 	return n.position >= 0
+}
+
+func (n *Node) Name(indexer adt.StringIndexer) string {
+	return n.Feature.RawString(indexer)
 }
 
 type Nodes []*Node
@@ -327,5 +332,5 @@ func appendNodes(indexerCmp *indexerComparison, nodesSorted, nodesReady, nodesEn
 }
 
 func debug(formatting string, args ...any) {
-	//	fmt.Printf(formatting, args...)
+	// fmt.Printf(formatting, args...)
 }

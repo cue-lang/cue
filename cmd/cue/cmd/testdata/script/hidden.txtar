@@ -36,11 +36,11 @@ a: _h0: int
 }
 
 -- expect-stdout --
+_h2:  string
 _top: 1
 a: {
     _h0: int
 }
-_h2: string
 #foo: {
     _h1: string
 }

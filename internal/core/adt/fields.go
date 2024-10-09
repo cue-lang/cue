@@ -16,6 +16,8 @@ package adt
 
 import (
 	"fmt"
+
+	"cuelang.org/go/cue/token"
 )
 
 // This file holds the logic for the insertion of fields and pattern
@@ -963,6 +965,10 @@ outer:
 		}
 		ca := a.cc
 		f := ca.Label()
+		if ca.arcType == ArcPending {
+			// This happens when a comprehension did not yield any results.
+			continue
+		}
 		switch ca.src.ArcType {
 		case ArcMember, ArcRequired:
 		case ArcOptional, ArcNotPresent:
@@ -970,7 +976,7 @@ outer:
 			// parent nodes that are otherwise allowed.
 			continue
 		case ArcPending:
-			// TODO: Need to evaluate?
+			ctx.Assertf(token.NoPos, false, "unexpected ArcPending")
 		default:
 			panic("unreachable")
 		}

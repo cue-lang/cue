@@ -33,7 +33,10 @@ type Node struct {
 	// temporary state for calculating the Strongly Connected
 	// Components of a graph.
 	sccNodeState *sccNodeState
-	position     int
+	// temporary state for calculating the Elementary Cycles of a
+	// graph.
+	ecNodeState *ecNodeState
+	position    int
 }
 
 func (n *Node) IsSorted() bool {

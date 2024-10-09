@@ -35,6 +35,7 @@ type Node struct {
 	Feature      adt.Feature
 	Outgoing     Nodes
 	Incoming     Nodes
+	structMeta   *structMeta
 	sccNodeState *sccNodeState
 	ecNodeState  *ecNodeState
 	position     int

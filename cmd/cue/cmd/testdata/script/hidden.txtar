@@ -40,7 +40,7 @@ _top: 1
 a: {
     _h0: int
 }
-_h2: string
 #foo: {
     _h1: string
 }
+_h2: string

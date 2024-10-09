@@ -82,8 +82,6 @@ files: child_7: 0
 files: root_3: 0
 -- sort/stdout-sort --
 files: {
-    root_1:       0
-    root_3:       0
     child_1:      0
     child_2:      0
     child_3:      0
@@ -92,5 +90,7 @@ files: {
     child_7:      0
     grandchild_1: 0
     grandchild_2: 0
+    root_1:       0
+    root_3:       0
 }
 flat: ["root_1", "root_3", "child_1", "child_2", "child_3", "child_5", "child_6", "child_7", "grandchild_1", "grandchild_2"]

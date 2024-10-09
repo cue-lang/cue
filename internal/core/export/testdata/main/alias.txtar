@@ -203,14 +203,14 @@ was known to compile and is known to be correct.
 == Simplified
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -267,15 +267,15 @@ was known to compile and is known to be correct.
 == Raw
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			bar?:  5
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -336,14 +336,14 @@ was known to compile and is known to be correct.
 == Final
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -387,15 +387,15 @@ was known to compile and is known to be correct.
 == All
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			bar?:  5
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -456,15 +456,15 @@ was known to compile and is known to be correct.
 == Eval
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			bar?:  5
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -527,14 +527,14 @@ Reorderings?
 == Simplified
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -591,15 +591,15 @@ Reorderings?
 == Raw
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			bar?:  5
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -660,14 +660,14 @@ Reorderings?
 == Final
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -711,15 +711,15 @@ Reorderings?
 == All
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			bar?:  5
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -780,15 +780,15 @@ Reorderings?
 == Eval
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			bar?:  5
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {

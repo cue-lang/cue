@@ -24,6 +24,8 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/export/topological"
+	"cuelang.org/go/internal/cueexperiment"
 )
 
 func (e *exporter) bareValue(v adt.Value) ast.Expr {
@@ -411,7 +413,13 @@ func (e *exporter) structComposite(v *adt.Vertex, attrs []*ast.Attribute) ast.Ex
 	}
 
 	p := e.cfg
-	for _, label := range VertexFeatures(e.ctx, v) {
+	var features []adt.Feature
+	if cueexperiment.Flags.TopoSort {
+		features = topological.VertexFeatures(e.ctx, v)
+	} else {
+		features = VertexFeatures(e.ctx, v)
+	}
+	for _, label := range features {
 		show := false
 		switch label.Typ() {
 		case adt.StringLabel:

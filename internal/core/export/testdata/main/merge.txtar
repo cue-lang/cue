@@ -75,6 +75,8 @@ Reordering.
 [#B #def]
 [#B #f]
 [#B #bar]
+-- diff/value/todo/p2 --
+Reordering.
 -- out/value-v3 --
 == Simplified
 {}
@@ -179,8 +181,6 @@ diff old new
 +		#a:   string
  	}
  }
--- diff/value/todo/p2 --
-Reordering.
 -- out/value --
 == Simplified
 {}

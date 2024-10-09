@@ -283,6 +283,10 @@ type closeContext struct {
 	// context has been completed, but it can be used for initial checking
 	// once isClosed is true.
 	Expr Value
+
+	// decl is the parent declaration which contains the conjuct which
+	// gave rise to this closeContext.
+	decl Decl
 }
 
 // Label is a convenience function to return the label of the associated Vertex.

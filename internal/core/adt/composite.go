@@ -316,6 +316,7 @@ func (v *Vertex) rootCloseContext(ctx *OpContext) *closeContext {
 			parent:          nil,
 			src:             v,
 			parentConjuncts: v,
+			decl:            v,
 		}
 		v._cc.incDependent(ctx, ROOT, nil) // matched in REF(decrement:nodeDone)
 	}
@@ -541,6 +542,9 @@ type StructInfo struct {
 	Disable bool
 
 	Embedding bool
+
+	// Decl contains this Struct
+	Decl Decl
 }
 
 // TODO(perf): this could be much more aggressive for eliminating structs that
@@ -1387,6 +1391,14 @@ func (v *Vertex) AddStruct(s *StructLit, env *Environment, ci CloseInfo) *Struct
 		StructLit: s,
 		Env:       env,
 		CloseInfo: ci,
+	}
+	if env.Vertex != nil {
+		// be careful to avoid promotion of nil env.Vertex to non-nil
+		// info.Decl
+		info.Decl = env.Vertex
+	}
+	if cc := ci.cc; cc != nil && cc.decl != nil {
+		info.Decl = cc.decl
 	}
 	for _, t := range v.Structs {
 		if *t == info { // TODO: check for different identity.

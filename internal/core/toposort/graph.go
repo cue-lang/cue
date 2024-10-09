@@ -32,9 +32,10 @@ type Graph struct {
 }
 
 type Node struct {
-	Feature  adt.Feature
-	Outgoing Nodes
-	Incoming Nodes
+	Feature    adt.Feature
+	Outgoing   Nodes
+	Incoming   Nodes
+	structMeta *structMeta
 	// temporary state for calculating the Strongly Connected
 	// Components of a graph.
 	sccNodeState *sccNodeState

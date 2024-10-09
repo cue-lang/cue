@@ -24,6 +24,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/export/topological"
 )
 
 func (e *exporter) bareValue(v adt.Value) ast.Expr {
@@ -408,7 +409,7 @@ func (e *exporter) structComposite(v *adt.Vertex, attrs []*ast.Attribute) ast.Ex
 	}
 
 	p := e.cfg
-	for _, label := range VertexFeatures(e.ctx, v) {
+	for _, label := range topological.VertexFeatures(e.ctx, v) {
 		show := false
 		switch label.Typ() {
 		case adt.StringLabel:

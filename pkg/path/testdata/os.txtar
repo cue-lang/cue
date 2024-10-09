@@ -272,68 +272,80 @@ Match: {
 Slash: {
 	unix: {
 		"": {
-			// should roundtrip
-			to:   ""
 			from: ""
+
+			// should roundtrip
+			to: ""
 		}
 		"/": {
-			// should roundtrip
-			to:   "/"
 			from: "/"
+
+			// should roundtrip
+			to: "/"
 		}
 		"/a/b": {
-			// should roundtrip
-			to:   "/a/b"
 			from: "/a/b"
+
+			// should roundtrip
+			to: "/a/b"
 		}
 		"/a//b": {
-			// should roundtrip
-			to:   "/a//b"
 			from: "/a//b"
+
+			// should roundtrip
+			to: "/a//b"
 		}
 	}
 	plan9: {
 		"": {
-			// should roundtrip
-			to:   ""
 			from: ""
+
+			// should roundtrip
+			to: ""
 		}
 		"/": {
-			// should roundtrip
-			to:   "/"
 			from: "/"
+
+			// should roundtrip
+			to: "/"
 		}
 		"/a/b": {
-			// should roundtrip
-			to:   "/a/b"
 			from: "/a/b"
+
+			// should roundtrip
+			to: "/a/b"
 		}
 		"/a//b": {
-			// should roundtrip
-			to:   "/a//b"
 			from: "/a//b"
+
+			// should roundtrip
+			to: "/a//b"
 		}
 	}
 	windows: {
 		"": {
-			// should roundtrip
-			to:   ""
 			from: ""
+
+			// should roundtrip
+			to: ""
 		}
 		"/": {
-			// should roundtrip
-			to:   "/"
 			from: "\\"
+
+			// should roundtrip
+			to: "/"
 		}
 		"/a/b": {
-			// should roundtrip
-			to:   "/a/b"
 			from: "\\a\\b"
+
+			// should roundtrip
+			to: "/a/b"
 		}
 		"/a//b": {
-			// should roundtrip
-			to:   "/a//b"
 			from: "\\a\\\\b"
+
+			// should roundtrip
+			to: "/a//b"
 		}
 	}
 }

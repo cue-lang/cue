@@ -17,6 +17,6 @@ y: 2
 package baz
 x: 1
 -- expect-stdout --
-z: 3
-y: 2
 x: 1
+y: 2
+z: 3

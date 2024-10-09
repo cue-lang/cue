@@ -233,8 +233,8 @@ dynamicSimple: {
 		c3: {}
 	}
 	dynamicComplex: {
-		foo: "foo"
 		a:   "foo"
+		foo: "foo"
 	}
 	dynamicSimple: {
 		a: "foo"
@@ -273,8 +273,8 @@ dynamicSimple: {
 		c3: {}
 	}
 	dynamicComplex: {
-		foo: "foo"
 		a:   "foo"
+		foo: "foo"
 		b?:  "foo"
 	}
 	dynamicSimple: {
@@ -311,8 +311,8 @@ dynamicSimple: {
 		c3: {}
 	}
 	dynamicComplex: {
-		foo: "foo"
 		a:   "foo"
+		foo: "foo"
 	}
 	dynamicSimple: {
 		a: "foo"
@@ -376,8 +376,8 @@ dynamicSimple: {
 		c3: {} @step(3)
 	}
 	dynamicComplex: {
-		foo: "foo" @step(1) @step(2)
 		a:   "foo" @step(3) @step(2)
+		foo: "foo" @step(1) @step(2)
 		b?:  "foo" @step(4) @step(2)
 	}
 	dynamicSimple: {
@@ -441,8 +441,8 @@ dynamicSimple: {
 		c3: {} @step(3)
 	}
 	dynamicComplex: {
-		foo: "foo" @step(1) @step(2)
 		a:   "foo" @step(3) @step(2)
+		foo: "foo" @step(1) @step(2)
 		b?:  "foo" @step(4) @step(2)
 	}
 	dynamicSimple: {
@@ -520,8 +520,8 @@ Reordering of attributes.
 		c3: {}
 	}
 	dynamicComplex: {
-		foo: "foo"
 		a:   "foo"
+		foo: "foo"
 	}
 	dynamicSimple: {
 		a: "foo"
@@ -560,8 +560,8 @@ Reordering of attributes.
 		c3: {}
 	}
 	dynamicComplex: {
-		foo: "foo"
 		a:   "foo"
+		foo: "foo"
 		b?:  "foo"
 	}
 	dynamicSimple: {
@@ -598,8 +598,8 @@ Reordering of attributes.
 		c3: {}
 	}
 	dynamicComplex: {
-		foo: "foo"
 		a:   "foo"
+		foo: "foo"
 	}
 	dynamicSimple: {
 		a: "foo"
@@ -663,8 +663,8 @@ Reordering of attributes.
 		c3: {} @step(3)
 	}
 	dynamicComplex: {
-		foo: "foo" @step(1) @step(2)
 		a:   "foo" @step(3) @step(2)
+		foo: "foo" @step(1) @step(2)
 		b?:  "foo" @step(4) @step(2)
 	}
 	dynamicSimple: {
@@ -728,8 +728,8 @@ Reordering of attributes.
 		c3: {} @step(3)
 	}
 	dynamicComplex: {
-		foo: "foo" @step(1) @step(2)
 		a:   "foo" @step(3) @step(2)
+		foo: "foo" @step(1) @step(2)
 		b?:  "foo" @step(4) @step(2)
 	}
 	dynamicSimple: {

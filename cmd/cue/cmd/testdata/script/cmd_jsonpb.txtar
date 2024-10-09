@@ -67,14 +67,14 @@ s: "SGVsbG8sIOS4lueVjA=="
 t: 'Hello, 世界'
 -- out/stream --
 A: {
-    kind: "A"
     a:    10
     b:    'Hello, 世界'
+    kind: "A"
 }
 B: {
-    kind: "B"
     a:    10
     s:    "SGVsbG8sIOS4lueVjA=="
+    kind: "B"
 }
 -- out/data-err --
 t: failed to decode base64: illegal base64 data at input byte 15:

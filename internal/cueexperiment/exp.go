@@ -32,6 +32,9 @@ var Flags struct {
 	// `int64` rather than `int` as the default type for CUE integer values
 	// to ensure consistency with 32-bit platforms.
 	DecodeInt64 bool
+
+	// Enable topological sorting of struct fields
+	TopoSort bool
 }
 
 // Init initializes Flags. Note: this isn't named "init" because we

@@ -104,6 +104,33 @@ Result:
 import "encoding/json"
 
 validate: {
+	disjunctionClosed: {
+		str: *"{\"a\":10}" | string
+		schema: {
+			a: int
+		} | {
+			b: int
+		}
+		result: true
+	}
+	disjunctionRequired: {
+		str: *"{\"a\":10}" | string
+		schema: {
+			a!: int
+		} | {
+			b!: int
+		}
+		result: true
+	}
+
+	// Issue #2395
+	enforceRequired: {
+		str: "{}"
+		schema: {
+			x!: int
+		}
+		result: json.Validate(str, schema)
+	}
 	t1: {
 		str: *"{\"a\":10}" | string
 		schema: {
@@ -117,33 +144,6 @@ validate: {
 			a: <3
 		}
 		result: _|_ // validate.t2.result: error in call to encoding/json.Validate: validate.t2.schema.a: invalid value 10 (out of bound <3)
-	}
-	disjunctionRequired: {
-		str: *"{\"a\":10}" | string
-		schema: {
-			a!: int
-		} | {
-			b!: int
-		}
-		result: true
-	}
-	disjunctionClosed: {
-		str: *"{\"a\":10}" | string
-		schema: {
-			a: int
-		} | {
-			b: int
-		}
-		result: true
-	}
-
-	// Issue #2395
-	enforceRequired: {
-		str: "{}"
-		schema: {
-			x!: int
-		}
-		result: json.Validate(str, schema)
 	}
 }
 valid: {
@@ -322,13 +322,13 @@ diff old new
  }
  marshal: {
  	t1: {
--		#x:      int
 -		#result: json.Marshal(X)
+-		#x:      int
 -		a:       int
 -	}
 -	t2: {
--		a:       "\\ \" & < >"
 -		#result: "{\"a\":\"\\\\ \\\" & < >\"}"
+-		a:       "\\ \" & < >"
 +		#x: int
 +		a:  #x
 +	} & {
@@ -385,6 +385,33 @@ Result:
 import "encoding/json"
 
 validate: {
+	disjunctionClosed: {
+		str: *"{\"a\":10}" | string
+		schema: {
+			a: int
+		} | {
+			b: int
+		}
+		result: true
+	}
+	disjunctionRequired: {
+		str: *"{\"a\":10}" | string
+		schema: {
+			a!: int
+		} | {
+			b!: int
+		}
+		result: true
+	}
+
+	// Issue #2395
+	enforceRequired: {
+		str: "{}"
+		schema: {
+			x!: int
+		}
+		result: json.Validate(str, schema)
+	}
 	t1: {
 		str: *"{\"a\":10}" | string
 		schema: {
@@ -398,33 +425,6 @@ validate: {
 			a: <3
 		}
 		result: _|_ // validate.t2.result: error in call to encoding/json.Validate: validate.t2.schema.a: invalid value 10 (out of bound <3)
-	}
-	disjunctionRequired: {
-		str: *"{\"a\":10}" | string
-		schema: {
-			a!: int
-		} | {
-			b!: int
-		}
-		result: true
-	}
-	disjunctionClosed: {
-		str: *"{\"a\":10}" | string
-		schema: {
-			a: int
-		} | {
-			b: int
-		}
-		result: true
-	}
-
-	// Issue #2395
-	enforceRequired: {
-		str: "{}"
-		schema: {
-			x!: int
-		}
-		result: json.Validate(str, schema)
 	}
 }
 valid: {
@@ -504,13 +504,13 @@ marshalStream: {
 }
 marshal: {
 	t1: {
-		#x:      int
 		#result: json.Marshal(X)
+		#x:      int
 		a:       int
 	}
 	t2: {
-		a:       "\\ \" & < >"
 		#result: "{\"a\":\"\\\\ \\\" & < >\"}"
+		a:       "\\ \" & < >"
 	}
 }
 htmlEscape: {

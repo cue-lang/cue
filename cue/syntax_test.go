@@ -210,10 +210,10 @@ if true {
 		options: o(cue.ResolveReferences(true)),
 		out: `
 {
-	s: string
 	out: {
 		"\(s)": 3
 	}
+	s: string
 }
 	`,
 	}, {

@@ -136,14 +136,14 @@ StrokesName: ZenStrokes1
 PlatformName: Linux
 CommandBindingsCount: 1
 CommandBindings:
-  - CmdName: CursorMoveToLineForward
-    CmdHumanName: Cursor Down
-    EditorCmdText: '"command": "move", "args": test'
-    BindingsCount: 1
-    BindingsMax: 0
-    Bindings:
+  - Bindings:
       - DefText: Down
         BindText: Down
+    BindingsCount: 1
+    BindingsMax: 0
+    CmdName: CursorMoveToLineForward
+    CmdHumanName: Cursor Down
+    EditorCmdText: '"command": "move", "args": test'
 
 -- stdout2.golden --
 foo

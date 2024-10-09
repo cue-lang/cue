@@ -31,6 +31,7 @@ type Node struct {
 	Outgoing     Nodes
 	Incoming     Nodes
 	sccNodeState *sccNodeState
+	ecNodeState  *ecNodeState
 	position     int
 }
 

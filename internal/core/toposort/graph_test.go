@@ -85,7 +85,7 @@ func TestSort(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			testAllPermutations(t, indexer, testCase.inputs, func(t *testing.T, permutation [][]adt.Feature, graph *topological.Graph) {
+			testAllPermutations(t, indexer, testCase.inputs, func(t *testing.T, permutation [][]adt.Feature, graph *toposort.Graph) {
 				sortedNames := featuresNames(indexer, graph.Sort(indexer))
 				if !slices.Equal(sortedNames, testCase.expected) {
 					t.Fatalf("\nFor permutation: %v\n       Expected: %v\n            Got: %v", permutationNames(indexer, permutation), testCase.expected, sortedNames)
@@ -123,7 +123,7 @@ func TestSortRandom(t *testing.T) {
 			t.Log("inputs:", inputs)
 
 			var expected []string
-			testAllPermutations(t, indexer, inputs, func(t *testing.T, permutation [][]adt.Feature, graph *topological.Graph) {
+			testAllPermutations(t, indexer, inputs, func(t *testing.T, permutation [][]adt.Feature, graph *toposort.Graph) {
 				sortedNames := featuresNames(indexer, graph.Sort(indexer))
 				if expected == nil {
 					expected = sortedNames

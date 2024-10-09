@@ -27,6 +27,9 @@ var Flags struct {
 
 	// Embed enabled file embedding.
 	Embed bool
+
+	// Enable topological sorting of struct fields
+	TopoSort bool
 }
 
 // Init initializes Flags. Note: this isn't named "init" because we

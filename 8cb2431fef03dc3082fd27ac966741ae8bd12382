@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ebac857_d27c4c34",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-09T19:09:04Z",
+      "side": 1,
+      "message": "allows",
+      "range": {
+        "startLine": 11,
+        "startChar": 7,
+        "endLine": 11,
+        "endChar": 12
+      },
+      "revId": "8cb2431fef03dc3082fd27ac966741ae8bd12382",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c5b1889_580ddcf0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-09T19:09:04Z",
+      "side": 1,
+      "message": "FWIW it would have been nice to add the test cases before the fixes, to be able to easily see the improvements in their behavior, but I trust that you checked that the added tests did something wrong without the fix.",
+      "revId": "8cb2431fef03dc3082fd27ac966741ae8bd12382",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

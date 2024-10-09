@@ -957,14 +957,11 @@ func isTotal(p Value) bool {
 // and patterns defined in closed. It reports an error in the nodeContext if
 // this is not the case.
 func injectClosed(ctx *OpContext, closed, dst *closeContext) {
-	// TODO: check that fields are not void arcs.
-outer:
 	for _, a := range dst.arcs {
 		if a.kind != ARC {
 			continue
 		}
 		ca := a.cc
-		f := ca.Label()
 		if ca.arcType == ArcPending {
 			// This happens when a comprehension did not yield any results.
 			continue
@@ -980,26 +977,12 @@ outer:
 		default:
 			panic("unreachable")
 		}
+		f := ca.Label()
 		// TODO: disallow new definitions in closed structs.
 		if f.IsHidden() || f.IsLet() || f.IsDef() {
 			continue
 		}
-		for _, b := range closed.arcs {
-			cb := b.cc
-			// TODO: we could potentially remove the check  for ArcPending if we
-			// explicitly set the arcType to ArcNonPresent when a comprehension
-			// yields no results.
-			if cb.arcType == ArcNotPresent || cb.arcType == ArcPending {
-				continue
-			}
-			if f == cb.Label() {
-				continue outer
-			}
-		}
-		if !matchPattern(ctx, closed.Expr, ca.Label()) {
-			ctx.notAllowedError(closed.src, ca.src)
-			continue
-		}
+		closed.allows(ctx, f, ca)
 	}
 
 	if !dst.isClosed {
@@ -1013,6 +996,26 @@ outer:
 
 		dst.isClosed = true
 	}
+}
+
+func (c *closeContext) allows(ctx *OpContext, f Feature, ca *closeContext) bool {
+	for _, b := range c.arcs {
+		cb := b.cc
+		// TODO: we could potentially remove the check  for ArcPending if we
+		// explicitly set the arcType to ArcNonPresent when a comprehension
+		// yields no results.
+		if cb.arcType == ArcNotPresent || cb.arcType == ArcPending {
+			continue
+		}
+		if f == cb.Label() {
+			return true
+		}
+	}
+	if !matchPattern(ctx, c.Expr, f) {
+		ctx.notAllowedError(c.src, ca.src)
+		return false
+	}
+	return true
 }
 
 func (ctx *OpContext) addPositions(c Conjunct) {

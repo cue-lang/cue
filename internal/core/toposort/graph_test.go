@@ -47,6 +47,22 @@ func compareStringses(a, b []string) int {
 	return cmp.Compare(len(a), len(b))
 }
 
+// Consider that names are nodes in a cycle, we want to rotate the
+// slice so that it starts at the given node name. This modifies the
+// names slice in-place.
+func rotateToStartAt(names []string, start string) {
+	if start != names[0] {
+		for idx, node := range names {
+			if start == node {
+				prefix := slices.Clone(names[:idx])
+				copy(names, names[idx:])
+				copy(names[len(names)-idx:], prefix)
+				break
+			}
+		}
+	}
+}
+
 func allPermutations(featureses [][]adt.Feature) [][][]adt.Feature {
 	nonNilIdx := -1
 	var results [][][]adt.Feature

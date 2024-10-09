@@ -17,13 +17,135 @@ package toposort_test
 import (
 	"cmp"
 	"fmt"
+	"math/rand"
+	"os"
 	"slices"
+	"strconv"
+	"strings"
 	"testing"
 
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/core/toposort"
 )
+
+func TestSort(t *testing.T) {
+	type MergeTestCase struct {
+		name     string
+		inputs   [][]string
+		expected []string
+	}
+
+	a, b, c, d, e, f, g, h := "a", "b", "c", "d", "e", "f", "g", "h"
+
+	testCases := []MergeTestCase{
+		{
+			name:     "simple two",
+			inputs:   [][]string{{c, b}, {d, a}},
+			expected: []string{c, b, d, a},
+		},
+		{
+			name:     "simple three",
+			inputs:   [][]string{{c, b}, {d, a}, {f, e}},
+			expected: []string{c, b, d, a, f, e},
+		},
+		{
+			name:     "linked linear two",
+			inputs:   [][]string{{b, c}, {c, a}},
+			expected: []string{b, c, a},
+		},
+		{
+			name:     "linked linear two multiple",
+			inputs:   [][]string{{b, c, f, d, g}, {c, a, e, d}},
+			expected: []string{b, c, a, e, f, d, g},
+		},
+		{
+			name:     "linked linear three",
+			inputs:   [][]string{{b, c}, {c, d, a, f}, {a, f, e}},
+			expected: []string{b, c, d, a, f, e},
+		},
+		{
+			name:     "simple cycle",
+			inputs:   [][]string{{h, b, a}, {a, b}, {h, c, d}, {d, c}},
+			expected: []string{h, b, a, c, d},
+		},
+		{
+			name:     "nested cycles",
+			inputs:   [][]string{{g, b, c}, {e, c, b, d}, {d, f, a, e}, {a, h, f}},
+			expected: []string{g, b, d, f, a, e, c, h},
+		},
+		{
+			name:     "fully connected 4",
+			inputs:   [][]string{{a, b, c, d}, {d, c, b, a}, {b, d, a, c}, {c, a, d, b}},
+			expected: []string{a, b, c, d},
+		},
+	}
+
+	indexer := runtime.New()
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			testAllPermutations(t, indexer, testCase.inputs, func(t *testing.T, permutation [][]adt.Feature, graph *topological.Graph) {
+				sortedNames := featuresNames(indexer, graph.Sort(indexer))
+				if !slices.Equal(sortedNames, testCase.expected) {
+					t.Fatalf("\nFor permutation: %v\n       Expected: %v\n            Got: %v", permutationNames(indexer, permutation), testCase.expected, sortedNames)
+				}
+			})
+		})
+	}
+}
+
+func TestSortRandom(t *testing.T) {
+	seed := rand.Int63()
+	if str := os.Getenv("SEED"); str != "" {
+		num, err := strconv.ParseInt(str, 10, 64)
+		if err != nil {
+			t.Fatalf("Could not parse SEED env var %q: %v", str, err)
+			return
+		}
+		seed = num
+	}
+	t.Log("Seed", seed)
+	rng := rand.New(rand.NewSource(seed))
+
+	names := strings.Split("abcdefghijklm", "")
+	indexer := runtime.New()
+
+	for n := 0; n < 100; n++ {
+		inputs := make([][]string, 2+rng.Intn(4))
+		for idx := range inputs {
+			names := slices.Clone(names)
+			rng.Shuffle(len(names), func(i, j int) { names[i], names[j] = names[j], names[i] })
+			inputs[idx] = names[:2+rng.Intn(4)]
+		}
+
+		t.Run(fmt.Sprint(n), func(t *testing.T) {
+			t.Log("inputs:", inputs)
+
+			var expected []string
+			testAllPermutations(t, indexer, inputs, func(t *testing.T, permutation [][]adt.Feature, graph *topological.Graph) {
+				sortedNames := featuresNames(indexer, graph.Sort(indexer))
+				if expected == nil {
+					expected = sortedNames
+					t.Log("First result:", expected)
+					usedNames := make(map[string]struct{}, len(expected))
+					for _, name := range expected {
+						usedNames[name] = struct{}{}
+					}
+					for _, input := range inputs {
+						for _, name := range input {
+							if _, found := usedNames[name]; !found {
+								t.Fatalf("\nInput %v contains name %q, but that does not appear in the output: %v", input, name, expected)
+							}
+						}
+					}
+				} else if !slices.Equal(sortedNames, expected) {
+					t.Fatalf("\nFor permutation: %v\n       Expected: %v\n            Got: %v", permutationNames(indexer, permutation), expected, sortedNames)
+				}
+			})
+		})
+	}
+}
 
 func makeFeatures(indexer adt.StringIndexer, inputs [][]string) [][]adt.Feature {
 	result := make([][]adt.Feature, len(inputs))

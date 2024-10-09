@@ -203,14 +203,14 @@ was known to compile and is known to be correct.
 == Simplified
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -234,6 +234,12 @@ was known to compile and is known to be correct.
 			}
 		}
 		selfRefValue: {
+			pattern: {
+				// this triggers the verbatim "adt" path. Note that there
+				// is no need to rename the variable here as the expression
+				// was known to compile and is known to be correct.
+				a: {}
+			}
 			struct: {
 				// Note: this resolves to a cycle error, which is considered
 				// to be equal to "incomplete". As a result, in case of
@@ -242,12 +248,6 @@ was known to compile and is known to be correct.
 				// range of what is acceptable for now.
 				// TODO: solve this issue.
 				a: or(X)
-			}
-			pattern: {
-				// this triggers the verbatim "adt" path. Note that there
-				// is no need to rename the variable here as the expression
-				// was known to compile and is known to be correct.
-				a: {}
 			}
 		}
 	}
@@ -267,15 +267,15 @@ was known to compile and is known to be correct.
 == Raw
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			bar?:  5
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -301,6 +301,12 @@ was known to compile and is known to be correct.
 			}
 		}
 		selfRefValue: {
+			pattern: {
+				// this triggers the verbatim "adt" path. Note that there
+				// is no need to rename the variable here as the expression
+				// was known to compile and is known to be correct.
+				a: {}
+			}
 			struct: {
 				// Note: this resolves to a cycle error, which is considered
 				// to be equal to "incomplete". As a result, in case of
@@ -309,12 +315,6 @@ was known to compile and is known to be correct.
 				// range of what is acceptable for now.
 				// TODO: solve this issue.
 				a: or(X)
-			}
-			pattern: {
-				// this triggers the verbatim "adt" path. Note that there
-				// is no need to rename the variable here as the expression
-				// was known to compile and is known to be correct.
-				a: {}
 			}
 		}
 	}
@@ -336,14 +336,14 @@ was known to compile and is known to be correct.
 == Final
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -365,11 +365,11 @@ was known to compile and is known to be correct.
 			}
 		}
 		selfRefValue: {
-			struct: {
-				a: _|_ // valueAlias.selfRefValue.struct.a: incomplete list: _ (and 1 more errors)
-			}
 			pattern: {
 				a: {}
+			}
+			struct: {
+				a: _|_ // valueAlias.selfRefValue.struct.a: incomplete list: _ (and 1 more errors)
 			}
 		}
 	}
@@ -387,15 +387,15 @@ was known to compile and is known to be correct.
 == All
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			bar?:  5
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -421,6 +421,12 @@ was known to compile and is known to be correct.
 			}
 		}
 		selfRefValue: {
+			pattern: {
+				// this triggers the verbatim "adt" path. Note that there
+				// is no need to rename the variable here as the expression
+				// was known to compile and is known to be correct.
+				a: {}
+			}
 			struct: {
 				// Note: this resolves to a cycle error, which is considered
 				// to be equal to "incomplete". As a result, in case of
@@ -429,12 +435,6 @@ was known to compile and is known to be correct.
 				// range of what is acceptable for now.
 				// TODO: solve this issue.
 				a: or(X)
-			}
-			pattern: {
-				// this triggers the verbatim "adt" path. Note that there
-				// is no need to rename the variable here as the expression
-				// was known to compile and is known to be correct.
-				a: {}
 			}
 		}
 	}
@@ -456,15 +456,15 @@ was known to compile and is known to be correct.
 == Eval
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			bar?:  5
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -488,11 +488,11 @@ was known to compile and is known to be correct.
 			}
 		}
 		selfRefValue: {
-			struct: {
-				a: or(X)
-			}
 			pattern: {
 				a: {}
+			}
+			struct: {
+				a: or(X)
 			}
 		}
 	}
@@ -511,15 +511,15 @@ was known to compile and is known to be correct.
 diff old new
 --- old
 +++ new
-@@ -164,7 +164,7 @@
- 		}
- 		selfRefValue: {
+@@ -167,7 +167,7 @@
+ 				a: {}
+ 			}
  			struct: {
 -				a: _|_ // cycle error
 +				a: _|_ // valueAlias.selfRefValue.struct.a: incomplete list: _ (and 1 more errors)
  			}
- 			pattern: {
- 				a: {}
+ 		}
+ 	}
 -- diff/value/explanation --
 Improved error message.
 Reorderings?
@@ -527,14 +527,14 @@ Reorderings?
 == Simplified
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -558,6 +558,12 @@ Reorderings?
 			}
 		}
 		selfRefValue: {
+			pattern: {
+				// this triggers the verbatim "adt" path. Note that there
+				// is no need to rename the variable here as the expression
+				// was known to compile and is known to be correct.
+				a: {}
+			}
 			struct: {
 				// Note: this resolves to a cycle error, which is considered
 				// to be equal to "incomplete". As a result, in case of
@@ -566,12 +572,6 @@ Reorderings?
 				// range of what is acceptable for now.
 				// TODO: solve this issue.
 				a: or(X)
-			}
-			pattern: {
-				// this triggers the verbatim "adt" path. Note that there
-				// is no need to rename the variable here as the expression
-				// was known to compile and is known to be correct.
-				a: {}
 			}
 		}
 	}
@@ -591,15 +591,15 @@ Reorderings?
 == Raw
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			bar?:  5
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -625,6 +625,12 @@ Reorderings?
 			}
 		}
 		selfRefValue: {
+			pattern: {
+				// this triggers the verbatim "adt" path. Note that there
+				// is no need to rename the variable here as the expression
+				// was known to compile and is known to be correct.
+				a: {}
+			}
 			struct: {
 				// Note: this resolves to a cycle error, which is considered
 				// to be equal to "incomplete". As a result, in case of
@@ -633,12 +639,6 @@ Reorderings?
 				// range of what is acceptable for now.
 				// TODO: solve this issue.
 				a: or(X)
-			}
-			pattern: {
-				// this triggers the verbatim "adt" path. Note that there
-				// is no need to rename the variable here as the expression
-				// was known to compile and is known to be correct.
-				a: {}
 			}
 		}
 	}
@@ -660,14 +660,14 @@ Reorderings?
 == Final
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -689,11 +689,11 @@ Reorderings?
 			}
 		}
 		selfRefValue: {
-			struct: {
-				a: _|_ // cycle error
-			}
 			pattern: {
 				a: {}
+			}
+			struct: {
+				a: _|_ // cycle error
 			}
 		}
 	}
@@ -711,15 +711,15 @@ Reorderings?
 == All
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			bar?:  5
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -745,6 +745,12 @@ Reorderings?
 			}
 		}
 		selfRefValue: {
+			pattern: {
+				// this triggers the verbatim "adt" path. Note that there
+				// is no need to rename the variable here as the expression
+				// was known to compile and is known to be correct.
+				a: {}
+			}
 			struct: {
 				// Note: this resolves to a cycle error, which is considered
 				// to be equal to "incomplete". As a result, in case of
@@ -753,12 +759,6 @@ Reorderings?
 				// range of what is acceptable for now.
 				// TODO: solve this issue.
 				a: or(X)
-			}
-			pattern: {
-				// this triggers the verbatim "adt" path. Note that there
-				// is no need to rename the variable here as the expression
-				// was known to compile and is known to be correct.
-				a: {}
 			}
 		}
 	}
@@ -780,15 +780,15 @@ Reorderings?
 == Eval
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			bar?:  5
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -812,11 +812,11 @@ Reorderings?
 			}
 		}
 		selfRefValue: {
-			struct: {
-				a: or(X)
-			}
 			pattern: {
 				a: {}
+			}
+			struct: {
+				a: or(X)
 			}
 		}
 	}

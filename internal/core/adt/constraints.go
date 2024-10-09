@@ -109,6 +109,8 @@ func (n *nodeContext) insertConstraint(pattern Value, c Conjunct) bool {
 
 // matchPattern reports whether f matches pattern. The result reflects
 // whether unification of pattern with f converted to a CUE value succeeds.
+// The caller should check separately whether f matches any other arcs
+// that are not covered by pattern.
 func matchPattern(ctx *OpContext, pattern Value, f Feature) bool {
 	if pattern == nil || !f.IsRegular() {
 		return false

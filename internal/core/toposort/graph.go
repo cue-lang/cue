@@ -35,6 +35,7 @@ type Node struct {
 	Feature      adt.Feature
 	Outgoing     Nodes
 	Incoming     Nodes
+	structMeta   *structMeta
 	sccNodeState *sccNodeState
 	ecNodeState  *ecNodeState
 	position     int
@@ -42,6 +43,10 @@ type Node struct {
 
 func (n *Node) IsSorted() bool {
 	return n.position >= 0
+}
+
+func (n *Node) Name(indexer adt.StringIndexer) string {
+	return n.Feature.RawString(indexer)
 }
 
 type Nodes []*Node

@@ -1524,6 +1524,12 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 	switch f := fun.(type) {
 	case *Builtin:
 		b = f
+		if f.RawFunc != nil {
+			if !b.checkArgs(c, pos(x), len(x.Args)) {
+				return nil
+			}
+			return f.RawFunc(c, x.Args)
+		}
 
 	case *BuiltinValidator:
 		// We allow a validator that takes no arguments except the validated
@@ -1605,6 +1611,14 @@ type Builtin struct {
 
 	Func func(c *OpContext, args []Value) Expr
 
+	// RawFunc gives low-level control to CUE's internals for builtins.
+	// It should be used when fine control over the evaluation process is
+	// needed. Note that RawFuncs are responsible for returning a Value. This
+	// gives them fine control over how exactly such value gets evaluated.
+	// A RawFunc may pass CycleInfo, errors and other information through
+	// the Context.
+	RawFunc func(c *OpContext, args []Expr) Value
+
 	Package Feature
 	Name    string
 }
@@ -1665,23 +1679,33 @@ func bottom(v Value) *Bottom {
 	return b
 }
 
-func (x *Builtin) call(c *OpContext, p token.Pos, validate bool, args []Value) Expr {
-	fun := x // right now always x.
-	if len(args) > len(x.Params) {
+func (x *Builtin) checkArgs(c *OpContext, p token.Pos, numArgs int) bool {
+	if numArgs > len(x.Params) {
 		c.addErrf(0, p,
 			"too many arguments in call to %v (have %d, want %d)",
-			fun, len(args), len(x.Params))
-		return nil
+			x, numArgs, len(x.Params))
+		return false
 	}
-	for i := len(args); i < len(x.Params); i++ {
-		v := x.Params[i].Default()
+	if numArgs < len(x.Params) {
+		// Assume that all subsequent params have a default as well.
+		v := x.Params[numArgs].Default()
 		if v == nil {
 			c.addErrf(0, p,
 				"not enough arguments in call to %v (have %d, want %d)",
-				fun, len(args), len(x.Params))
-			return nil
+				x, numArgs, len(x.Params))
+			return false
 		}
-		args = append(args, v)
+	}
+	return true
+}
+
+func (x *Builtin) call(c *OpContext, p token.Pos, validate bool, args []Value) Expr {
+	fun := x // right now always x.
+	if !x.checkArgs(c, p, len(args)) {
+		return nil
+	}
+	for i := len(args); i < len(x.Params); i++ {
+		args = append(args, x.Params[i].Default())
 	}
 	for i, a := range args {
 		if x.Params[i].Kind() == BottomKind {

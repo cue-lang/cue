@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e88c106d_3320f103",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-10T10:41:56Z",
+      "side": 1,
+      "message": "sorry - \"contraint\" isn\u0027t a word (yet)!",
+      "revId": "6eaa755e49d5cc1b0cd632d9160ba9e47a4fcbf3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "844d1618_ffa8a596",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-10T10:41:56Z",
+      "side": 1,
+      "message": "Ah this also seems to relate to https://gerrithub.io/c/cue-lang/cue/+/1198140 which suggests #3141 too.",
+      "revId": "6eaa755e49d5cc1b0cd632d9160ba9e47a4fcbf3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8c1ba5c_50697266",
+        "filename": "internal/pkg/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-10T10:41:56Z",
+      "side": 1,
+      "message": "worth documenting that this does *not* include patterns in the count?",
+      "revId": "6eaa755e49d5cc1b0cd632d9160ba9e47a4fcbf3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -16,6 +16,24 @@
       "message": "Maybe this gets improved later on in this CL chain, but:\nIt\u0027s really unclear to me when it\u0027s correct to use the `status` field and when to use the `Status()` method. There are no docs or guidance on either, and although the difference is very small, I can imagine it\u0027s easy to get tripped up and use the wrong one. I wonder whether renaming the method to `DerefStatus()` or something like that might help?",
       "revId": "332ef5c9e6a08ae749b028c59914d73fe9e5529c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5bd73893_658e2f25",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-10T11:34:20Z",
+      "side": 1,
+      "message": "One should always use Status(), at least for evalv3. Added a comment to the method, also explaining this:\n\nNote that I did not change the V2 version of evaluator. This would just cause more churn through rebase errors, and since we are deleting that code anyway, it is wasted cycles.",
+      "parentUuid": "84750514_bbf0be2f",
+      "revId": "332ef5c9e6a08ae749b028c59914d73fe9e5529c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

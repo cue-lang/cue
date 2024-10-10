@@ -16,6 +16,24 @@
       "message": "This might just be personal preference, but I really try to avoid field names (and variables, and command line flags) with negatives in them. I find it makes it much harder to read as part of any non-trivial condition. Maybe a different name would solve this (rather than inverting a bunch of logic) - possibly \"anonymous\" instead of \"notAddressable\", but I can\u0027t think of a suitable alternative for \"nonRooted\".",
       "revId": "4b899372f3abcdb950f2677960bdf814a2a256a0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75af18fa_acfabebe",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-10T11:46:41Z",
+      "side": 1,
+      "message": "I had rootless before. But that didn\u0027t quite work out. 😊\n\nThe conditions are the way they are to have the zero value be correct value initially. So inverting them would not be ideal.\n\nMaybe an alternative would be to have accessor methods that are used instead of the fields that invert the conditions. So Rooted() { return !nonRooted }. I do that in some cases already I believe.\n\nI like anonymous, though. Changed.",
+      "parentUuid": "2f4c0116_190c4d04",
+      "revId": "4b899372f3abcdb950f2677960bdf814a2a256a0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

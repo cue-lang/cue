@@ -15,8 +15,6 @@
 package cue
 
 import (
-	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
@@ -65,59 +63,6 @@ func (r *hiddenRuntime) Compile(filename string, source interface{}) (*Instance,
 	return r.complete(p, v)
 }
 
-// CompileFile compiles the given source file into an Instance. The source may
-// import builtin packages. Use Build to allow importing non-builtin packages.
-//
-// Deprecated: use [Context.BuildFile]. The use of [Instance] is being phased out.
-func (r *hiddenRuntime) CompileFile(file *ast.File) (*Instance, error) {
-	v, p := r.runtime().CompileFile(nil, file)
-	return r.complete(p, v)
-}
-
-// CompileExpr compiles the given source expression into an Instance. The source
-// may import builtin packages. Use Build to allow importing non-builtin
-// packages.
-//
-// Deprecated: use [Context.BuildExpr]. The use of [Instance] is being phased out.
-func (r *hiddenRuntime) CompileExpr(expr ast.Expr) (*Instance, error) {
-	f, err := astutil.ToFile(expr)
-	if err != nil {
-		return nil, err
-	}
-	runtime := r.runtime()
-	v := (*Context)(runtime).BuildExpr(expr)
-	err = v.Err()
-	inst := &Instance{
-		index: runtime,
-		root:  v.v,
-		inst: &build.Instance{
-			Files: []*ast.File{f},
-		},
-		Err:        errors.Promote(err, ""),
-		Incomplete: err != nil,
-	}
-	return inst, err
-}
-
-// Parse parses a CUE source value into a CUE Instance. The source code may be
-// provided as a string, byte slice, or io.Reader. The name is used as the file
-// name in position information. The source may import builtin packages.
-//
-// Deprecated: use [Context.CompileString] or [Context.CompileBytes].
-// The use of [Instance] is being phased out.
-func (r *hiddenRuntime) Parse(name string, source interface{}) (*Instance, error) {
-	return r.Compile(name, source)
-}
-
-// Build creates an Instance from the given build.Instance. A returned Instance
-// may be incomplete, in which case its Err field is set.
-//
-// Deprecated: use [Context.BuildInstance]. The use of [Instance] is being phased out.
-func (r *hiddenRuntime) Build(p *build.Instance) (*Instance, error) {
-	v, _ := r.runtime().Build(nil, p)
-	return r.complete(p, v)
-}
-
 // Deprecated: use [Context.BuildInstances]. The use of [Instance] is being phased out.
 func Build(instances []*build.Instance) []*Instance {
 	if len(instances) == 0 {
@@ -145,14 +90,4 @@ func (r *hiddenRuntime) BuildInstances(instances []*build.Instance) ([]*Instance
 
 	// TODO: insert imports
 	return loaded, errs
-}
-
-// FromExpr creates an instance from an expression.
-// Any references must be resolved beforehand.
-//
-// Deprecated: use [Context.BuildExpr]. The use of [Instance] is being phased out.
-func (r *hiddenRuntime) FromExpr(expr ast.Expr) (*Instance, error) {
-	return r.CompileFile(&ast.File{
-		Decls: []ast.Decl{&ast.EmbedDecl{Expr: expr}},
-	})
 }

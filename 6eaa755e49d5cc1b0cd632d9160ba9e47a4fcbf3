@@ -50,6 +50,24 @@
       "message": "worth documenting that this does *not* include patterns in the count?",
       "revId": "6eaa755e49d5cc1b0cd632d9160ba9e47a4fcbf3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fcbcb71c_3fa5ff4d",
+        "filename": "internal/pkg/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-10T11:57:24Z",
+      "side": 1,
+      "message": "Done\n\nAlso changed name to make this clearer.",
+      "parentUuid": "c8c1ba5c_50697266",
+      "revId": "6eaa755e49d5cc1b0cd632d9160ba9e47a4fcbf3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

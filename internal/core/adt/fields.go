@@ -706,6 +706,15 @@ func (c *closeContext) linkPatterns(child *closeContext) {
 	}
 }
 
+// allowedInClosed reports whether a field with label f is allowed in a closed
+// struct, even when it is not explicitly defined.
+//
+// TODO: see https://github.com/cue-lang/cue/issues/543
+// for whether to include f.IsDef.
+func allowedInClosed(f Feature) bool {
+	return f.IsHidden() || f.IsDef() || f.IsLet()
+}
+
 // checkArc validates that the node corresponding to cc allows a field with
 // label v.Label.
 func (n *nodeContext) checkArc(cc *closeContext, v *Vertex) *Vertex {
@@ -714,7 +723,7 @@ func (n *nodeContext) checkArc(cc *closeContext, v *Vertex) *Vertex {
 	f := v.Label
 	ctx := n.ctx
 
-	if f.IsHidden() || f.IsLet() {
+	if allowedInClosed(f) {
 		return v
 	}
 
@@ -979,8 +988,7 @@ func injectClosed(ctx *OpContext, closed, dst *closeContext) {
 			panic("unreachable")
 		}
 		f := ca.Label()
-		// TODO: disallow new definitions in closed structs.
-		if f.IsHidden() || f.IsLet() || f.IsDef() {
+		if allowedInClosed(f) {
 			continue
 		}
 		closed.allows(ctx, f, ca)

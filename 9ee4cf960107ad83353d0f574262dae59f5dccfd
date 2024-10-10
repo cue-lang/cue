@@ -3,6 +3,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "a3b15d83_d6da603a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-10T16:58:18Z",
+      "side": 1,
+      "message": "Sorry for the delay in review here. Thanks to much for your contribution.\n\nI really like the direction of this CL, but it doesn\u0027t _quite_ hit the spot.\n\nAs an example of where it doesn\u0027t quite work as it should/could:\n\n```\n{\n    \"$schema\": \"https://json-schema.org/draft/2019-09/schema\",\n    \"$defs\": {\n        \"foo\": {\n            \"anyOf\": [\n                {\n                \t\"type\": \"object\"\n                },\n                {\n                \t\"type\": \"string\"\n                }\n            ]\n        }\n    },\n    \"$ref\": \"#/$defs/foo\"\n}\n```\n\nThis results in the following JSON Schema:\n\n```\n@jsonschema(schema\u003d\"https://json-schema.org/draft/2019-09/schema\")\n#foo\n#foo: matchN(\u003e\u003d1, [{\n\t...\n}, string])\n```\n\nbut that\u0027s not quite right because arguments to functions are not closed even though the function argument appears within a closed schema, so the ellipsis is redundant.\n\nFor example, the following schema validates OK:\n\n```\n#x: matchN(1, [{}])\n#x \u0026 {a: 0}\n```\n\nbut... this is a whole can of worms, because playing with this made me realise that the existing logic gets closedness wrong in places. For example the current logic gets this schema wrong:\n\n```\n{\n    \"$schema\": \"https://json-schema.org/draft/2019-09/schema\",\n    \"$defs\": {\n        \"foo\": {\n            \"anyOf\": [\n                {\n                \t\"type\": \"object\",\n                \t\"additionalProperties\": false\n                },\n                {\n                \t\"type\": \"string\"\n                }\n            ]\n        }\n    },\n    \"$ref\": \"#/$defs/foo\"\n}\n```\n\nIt produces the same result as before, even though the struct _should_ be closed!\n\nSo to fix all of this, I think we should fix the existing logic so it works correctly in the above case, also addressing the \"TODO: may need to explicitly close\" comment in decode.go, and only then address the unnecessary ellipses issue, which is more of a appearance thing than anything else.\n\nIn general, I think the caller of `decoder.schema` or `decoder.schemaState` probably needs to make it known whether the resulting schema will be used in a definition context or not.\n\nAn alternative possibility might be to include ellipses anyway when generating but implement a second pass (via `astutil.Apply`) which processes the entire AST to remove unnecessary ellipses. That might be easier and result in simpler code and better results. It could also be done as a final step _outside_ of `encoding/jsonschema` and invoked by `cmd/cue`, which I _think_ could address your \"It is not trivial to determine whether the decoded schema is referenced as a definition\" caveat too. If we do that, then the \"right\" default approach would be to assume that we _are_ decoding into a definition, removing the need for the `DecodeAsDefinition` configuration option. Perhaps the redundant-ellipsis-removal function could go into the `astutil` package, although maybe it\u0027s not generally useful enough for that.\n\nWDYT?",
+      "revId": "9ee4cf960107ad83353d0f574262dae59f5dccfd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "32c4cd21_b2dde596",
         "filename": "cmd/cue/cmd/common.go",
         "patchSetId": 1
@@ -20,6 +37,47 @@
         "endLine": 521,
         "endChar": 2
       },
+      "revId": "9ee4cf960107ad83353d0f574262dae59f5dccfd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e73b78b3_2137c7d6",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 521,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-10T16:58:18Z",
+      "side": 1,
+      "message": "How about including your remark above as a comment in the source?",
+      "parentUuid": "32c4cd21_b2dde596",
+      "range": {
+        "startLine": 518,
+        "startChar": 0,
+        "endLine": 521,
+        "endChar": 2
+      },
+      "revId": "9ee4cf960107ad83353d0f574262dae59f5dccfd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "389978d6_3480ed2c",
+        "filename": "internal/encoding/encoding.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-10T16:58:18Z",
+      "side": 1,
+      "message": "```suggestion\n\t// DecodeAsDefinition specifies whether the decoded JSON Schema\n\t// will be placed into a definition (i.e. whether the result\n\t// will be recursively closed or not).\n\tDecodeAsDefinition bool\n```\n\n?",
       "revId": "9ee4cf960107ad83353d0f574262dae59f5dccfd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

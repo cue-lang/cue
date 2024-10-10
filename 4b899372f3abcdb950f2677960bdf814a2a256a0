@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f4c0116_190c4d04",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-10T08:43:47Z",
+      "side": 1,
+      "message": "This might just be personal preference, but I really try to avoid field names (and variables, and command line flags) with negatives in them. I find it makes it much harder to read as part of any non-trivial condition. Maybe a different name would solve this (rather than inverting a bunch of logic) - possibly \"anonymous\" instead of \"notAddressable\", but I can\u0027t think of a suitable alternative for \"nonRooted\".",
+      "revId": "4b899372f3abcdb950f2677960bdf814a2a256a0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

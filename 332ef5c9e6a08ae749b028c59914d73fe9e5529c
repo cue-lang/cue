@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84750514_bbf0be2f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-10T08:32:10Z",
+      "side": 1,
+      "message": "Maybe this gets improved later on in this CL chain, but:\nIt\u0027s really unclear to me when it\u0027s correct to use the `status` field and when to use the `Status()` method. There are no docs or guidance on either, and although the difference is very small, I can imagine it\u0027s easy to get tripped up and use the wrong one. I wonder whether renaming the method to `DerefStatus()` or something like that might help?",
+      "revId": "332ef5c9e6a08ae749b028c59914d73fe9e5529c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

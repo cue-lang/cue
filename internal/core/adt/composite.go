@@ -1342,7 +1342,10 @@ func (v *Vertex) AddStruct(s *StructLit, env *Environment, ci CloseInfo) *Struct
 		StructLit: s,
 		Env:       env,
 		CloseInfo: ci,
-		Decl:      env.Vertex,
+	}
+	if env.Vertex != nil {
+		// be care to avoid promotion of nil env.Vertex to non-nil info.Decl
+		info.Decl = env.Vertex
 	}
 	if cc := ci.cc; cc != nil && cc.decl != nil {
 		info.Decl = cc.decl

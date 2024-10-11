@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68baf66a_0083885b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-11T14:15:31Z",
+      "side": 1,
+      "message": "we usually prefix also internal/core. For consistency.\n\nAlso, I would put this directly under internal/core/, as this will also be used by the evaluator directly, eventually.",
+      "revId": "7131790b8be6263d8387f193471c94cabc66207e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5fac495_425ad5c1",
+        "filename": "internal/core/export/topological/graph.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-11T14:15:31Z",
+      "side": 1,
+      "message": "What is the purpose of this field? Note that Features have more info than just strings, so generally a string will not be sufficient. One way to retain names is to represent them as proper CUE, but that does not seem to be the case.",
+      "revId": "7131790b8be6263d8387f193471c94cabc66207e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "17a36136_6692c863",
+        "filename": "internal/core/export/topological/graph.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-11T14:15:31Z",
+      "side": 1,
+      "message": "Looking up a string is fast, so why storing it here?",
+      "revId": "7131790b8be6263d8387f193471c94cabc66207e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b419f006_abfb22cf",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 532,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-11T14:46:04Z",
+      "side": 1,
+      "message": "What parent? Could be one of several things.",
+      "revId": "562583a1238c63e14833e18986b5c43194e1afac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d77d60c_e771228b",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1351,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-11T14:46:04Z",
+      "side": 1,
+      "message": "This is very tied to V3. However, V2 has something similar, so it probably would not be too hard to support V2 as well.",
+      "revId": "562583a1238c63e14833e18986b5c43194e1afac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf71b54f_b1949478",
+        "filename": "internal/core/export/topological/graph.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-11T14:46:04Z",
+      "side": 1,
+      "message": "Since dynamic fields are rare, it may make sense to only conditionally create this map.",
+      "revId": "562583a1238c63e14833e18986b5c43194e1afac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

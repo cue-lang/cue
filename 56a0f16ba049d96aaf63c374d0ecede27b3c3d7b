@@ -1,0 +1,225 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d87c53fe_89d981cc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-11T15:46:21Z",
+      "side": 1,
+      "message": "Reviewed the first bunch. That probably gives enough of an idea.\n\nThe model we have, based on StructInfos only is maybe somewhat too weak, as the relative ordering of those within a file should matter too. One possibly simple solution is that we use the token.Pos of the StructLit\u0027s as a tie breaker between StructLits that come from the same file before using lexical sort.\n\nAnother way to look at this is that we should merge the StructInfos per file before passing it to the algorithm. I suspect that will fix many of the diffs.\n\nObviously the old evaluator did not do that. The reason why it still worked is because it used feature order as tie breaker, which roughly corresponds to the position of the files (but not quite).",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44954370_e7dc9a2a",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_issue2060.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-11T15:46:21Z",
+      "side": 1,
+      "message": "This ordering seems wrong.",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f454842_4c43bf4c",
+        "filename": "cmd/cue/cmd/testdata/script/embed.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-11T15:46:21Z",
+      "side": 1,
+      "message": "This is an interesting case. It seems the loader substitutes this, but I guess it is dynamic-ish.",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f774785f_ab400dfb",
+        "filename": "cmd/cue/cmd/testdata/script/hidden.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-11T15:46:21Z",
+      "side": 1,
+      "message": "This seems wrong.",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b4b076f_8650a9ea",
+        "filename": "cmd/cue/cmd/testdata/script/issue269.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-11T15:46:21Z",
+      "side": 1,
+      "message": "It seems this should become before i.",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad8e8a15_98052fc1",
+        "filename": "cmd/cue/cmd/testdata/script/issue398.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-11T15:46:21Z",
+      "side": 1,
+      "message": "Might be a good idea to change this to Y or so, so that we know that the ordering below (which is correct) is not just the result of lexicographical ordering.",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e848192_14932ce4",
+        "filename": "cue/context_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-11T15:46:21Z",
+      "side": 1,
+      "message": "This seems wrong.",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed7860ef_5bece5d7",
+        "filename": "internal/core/export/export_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-11T15:46:21Z",
+      "side": 1,
+      "message": "This seems wrong.",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5d24cb7_4f454de7",
+        "filename": "internal/core/export/testdata/main/adt.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-11T15:46:21Z",
+      "side": 1,
+      "message": "This seems wrong, as src is declared before any foo or bar and foo is defined before bar.",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e3f4aa5_13b5aa75",
+        "filename": "internal/core/export/testdata/main/attrs.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-11T15:46:21Z",
+      "side": 1,
+      "message": "a, foo, b? The dynamic field (foo) is declared before b.",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc14cdc3_c8737eec",
+        "filename": "internal/core/export/testdata/main/embedscalar.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-11T15:46:21Z",
+      "side": 1,
+      "message": "I would have guessed that #fn is defined first. \n\nIt is probably okay to place the scalar value first and not subject it to the ordering rules.",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d803657_93037eaa",
+        "filename": "internal/core/export/testdata/main/hidden.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-11T15:46:21Z",
+      "side": 1,
+      "message": "I would have expected _val, _#val, because in both #A and in the file itself it has that order.",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "641e1706_7e82195b",
+        "filename": "internal/core/export/testdata/main/shadow.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-11T15:46:21Z",
+      "side": 1,
+      "message": "Hmm, even though these are defined in different structs, e1 _is_ ordered before the t\u0027s within the same file. within the same file that should probably count, especially once adopt the path: constraint style.",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

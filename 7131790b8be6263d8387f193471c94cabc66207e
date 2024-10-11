@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9ea85c59_2520e740",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-11T14:24:26Z",
+      "side": 1,
+      "message": "Also, to make clear that this is used for sorting, maybe having sort in the name? like internal/core/toposort?\n\nAlso, if this might morph into other kind of algorithms, then basing it more on core functionality, like fieldsort, may be better.",
+      "parentUuid": "68baf66a_0083885b",
+      "revId": "7131790b8be6263d8387f193471c94cabc66207e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f5fac495_425ad5c1",
         "filename": "internal/core/export/topological/graph.go",
         "patchSetId": 1

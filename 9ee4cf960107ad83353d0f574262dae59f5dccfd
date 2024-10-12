@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "99eeb9e4_b4c2ee73",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-10-12T03:39:29Z",
+      "side": 1,
+      "message": "\u003e arguments to functions are not closed even though the function argument appears within a closed schema\n\nThank you for this information.\n\n\u003e playing with this made me realise that the existing logic gets closedness wrong in places\n\nWhile implementing this PR, I also realized that the current logic does not handle closeness properly. I originally planned to submit a follow-up PR to address this issue later.\n\n\u003e implement a second pass (via astutil.Apply) which processes the entire AST to remove unnecessary ellipses.\n\nI really like this idea, and I will take a closer look at it to see if it can solve the closeness issue as a whole, and then update the PR or submit new PRs later.",
+      "parentUuid": "a3b15d83_d6da603a",
+      "revId": "9ee4cf960107ad83353d0f574262dae59f5dccfd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "32c4cd21_b2dde596",
         "filename": "cmd/cue/cmd/common.go",
         "patchSetId": 1

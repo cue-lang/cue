@@ -49,7 +49,7 @@ func Extract(data cue.InstanceOrValue, cfg *Config) (f *ast.File, err error) {
 		cfg.MapURL = DefaultMapURL
 	}
 	if cfg.DefaultVersion == VersionUnknown {
-		cfg.DefaultVersion = VersionDraft7
+		cfg.DefaultVersion = DefaultVersion
 	}
 	if cfg.Strict {
 		cfg.StrictKeywords = true
@@ -69,7 +69,7 @@ func Extract(data cue.InstanceOrValue, cfg *Config) (f *ast.File, err error) {
 
 // DefaultVersion defines the default schema version used when
 // there is no $schema field and no explicit [Config.DefaultVersion].
-const DefaultVersion = VersionDraft7
+const DefaultVersion = VersionDraft2020_12
 
 // A Config configures a JSON Schema encoding or decoding.
 type Config struct {

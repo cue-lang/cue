@@ -16,6 +16,24 @@
       "message": "I\u0027m failing to understand this, and the comment.\nMy read is that you\u0027re testing that the last parameter has a non-nil default. But if so, I would have thought you meant \"preceding\" rather than \"subsequent\"?\nAlso I don\u0027t think I understand why it\u0027s safe to test only the last parameter, and none of the others.",
       "revId": "51005d4f7dccaec9350194cc834efc1dc21a7d20",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4dc29f74_b8b58eff",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1691,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-14T15:39:08Z",
+      "side": 1,
+      "message": "The number of arguments may be less then the number of parameters if the parameters have a default value. If the n-th parameter has a default, then all subsequent parameters have a default as well. So it is sufficient to test this.\n\nSo I meant subsequent. The first arguments are already given, all parameters from position numArgs and onwards must have a default as well for this to work.\n\nNote that the call method still appends all default values.",
+      "parentUuid": "c4e75436_d2d12615",
+      "revId": "51005d4f7dccaec9350194cc834efc1dc21a7d20",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

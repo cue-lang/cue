@@ -410,6 +410,11 @@ type state struct {
 	exclusiveMin bool // For OpenAPI and legacy support.
 	exclusiveMax bool // For OpenAPI and legacy support.
 
+	// Keep track of whether a $ref keyword is present,
+	// because pre-2019-09 schemas ignore sibling keywords
+	// to $ref.
+	hasRefKeyword bool
+
 	minContains *uint64
 	maxContains *uint64
 
@@ -694,35 +699,41 @@ func (s *state) schema(n cue.Value, idRef ...label) ast.Expr {
 // types holds the set of possible types that the value can hold.
 // idRef holds the path to the value.
 // isLogical specifies whether the caller is a logical operator like anyOf, allOf, oneOf, or not.
-func (s *state) schemaState(n cue.Value, types cue.Kind, idRef []label) (ast.Expr, *state) {
-	state := &state{
-		up:            s,
-		schemaVersion: s.schemaVersion,
-		isSchema:      s.isSchema,
-		decoder:       s.decoder,
+func (s0 *state) schemaState(n cue.Value, types cue.Kind, idRef []label) (ast.Expr, *state) {
+	s := &state{
+		up:            s0,
+		schemaVersion: s0.schemaVersion,
+		isSchema:      s0.isSchema,
+		decoder:       s0.decoder,
 		allowedTypes:  types,
 		knownTypes:    allTypes,
 		idRef:         idRef,
 		pos:           n,
 	}
 	if n.Kind() == cue.BoolKind {
-		if vfrom(VersionDraft6).contains(state.schemaVersion) {
+		if vfrom(VersionDraft6).contains(s.schemaVersion) {
 			// From draft6 onwards, boolean values signify a schema that always passes or fails.
-			if state.boolValue(n) {
-				return top(), state
+			if s.boolValue(n) {
+				return top(), s
 			}
-			return bottom(), state
+			return bottom(), s
 		}
-		return s.errf(n, "boolean schemas not supported in %v", state.schemaVersion), state
+		return s.errf(n, "boolean schemas not supported in %v", s.schemaVersion), s
 	}
-
 	if n.Kind() != cue.StructKind {
-		return s.errf(n, "schema expects mapping node, found %s", n.Kind()), state
+		return s.errf(n, "schema expects mapping node, found %s", n.Kind()), s
 	}
 
 	// do multiple passes over the constraints to ensure they are done in order.
 	for pass := 0; pass < numPhases; pass++ {
-		state.processMap(n, func(key string, value cue.Value) {
+		s.processMap(n, func(key string, value cue.Value) {
+			if pass == 0 && key == "$ref" {
+				// Before 2019-19, keywords alongside $ref are ignored so keep
+				// track of whether we've seen any non-$ref keywords so we can
+				// ignore those keywords. This could apply even when the schema
+				// is >=2019-19 because $schema could be used to change the version.
+				s.hasRefKeyword = true
+			}
 			if strings.HasPrefix(key, "x-") {
 				// A keyword starting with a leading x- is clearly
 				// not intended to be a valid keyword, and is explicitly
@@ -742,17 +753,31 @@ func (s *state) schemaState(n cue.Value, types cue.Kind, idRef []label) (ast.Exp
 			if c.phase != pass {
 				return
 			}
-			if !c.versions.contains(state.schemaVersion) {
+			if !c.versions.contains(s.schemaVersion) {
 				if s.cfg.StrictKeywords {
-					s.warnf(value.Pos(), "keyword %q is not supported in JSON schema version %v", key, state.schemaVersion)
+					s.warnf(value.Pos(), "keyword %q is not supported in JSON schema version %v", key, s.schemaVersion)
 				}
 				return
 			}
-			c.fn(key, value, state)
+			if pass > 0 && !vfrom(VersionDraft2019_09).contains(s.schemaVersion) && s.hasRefKeyword && key != "$ref" {
+				// We're using a schema version that ignores keywords alongside $ref.
+				//
+				// Note that we specifically exclude pass 0 (the pass in which $schema is checked)
+				// from this check, because hasRefKeyword is only set in pass 0 and we
+				// can get into a self-contradictory situation ($schema says we should
+				// ignore keywords alongside $ref, but $ref says we should ignore the $schema
+				// keyword itself). We could make that situation an explicit error, but other
+				// implementations don't, and it would require an entire extra pass just to do so.
+				if s.cfg.StrictKeywords {
+					s.warnf(value.Pos(), "ignoring keyword %q alongside $ref", key)
+				}
+				return
+			}
+			c.fn(key, value, s)
 		})
 	}
 
-	return state.finalize(), state
+	return s.finalize(), s
 }
 
 func (s *state) value(n cue.Value) ast.Expr {

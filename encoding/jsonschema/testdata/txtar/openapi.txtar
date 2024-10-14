@@ -12,7 +12,7 @@ components:
         name:
           type: string
         address:
-          $ref: "#/components/schemas/PhoneNumber"
+          allOf: [{$ref: "#/components/schemas/PhoneNumber"}]
           nullable: true
     PhoneNumber:
       description: "The number to dial."

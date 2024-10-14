@@ -4,12 +4,10 @@
   "$id": "https://test.example/foo",
   "oneOf": [
       {
-          "$schema": "http://json-schema.org/draft-07/schema#",
           "$id": "https://1.test.example/string",
           "type": "string"
       },
       {
-          "$schema": "http://json-schema.org/draft-07/schema#",
           "$id": "https://2.test.example/object",
           "type": "object"
       }

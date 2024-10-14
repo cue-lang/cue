@@ -50,6 +50,12 @@ func constraintID(key string, n cue.Value, s *state) {
 // constraintSchema implements $schema, which
 // identifies this as a JSON schema and specifies its version.
 func constraintSchema(key string, n cue.Value, s *state) {
+	if !s.isRoot && !vfrom(VersionDraft2019_09).contains(s.schemaVersion) {
+		// Before 2019-09, the $schema keyword was not allowed
+		// to appear anywhere but the root.
+		s.errf(n, "$schema can only appear at the root in JSON Schema version %v", s.schemaVersion)
+		return
+	}
 	str, ok := s.strValue(n)
 	if !ok {
 		// If there's no $schema value, use the default.

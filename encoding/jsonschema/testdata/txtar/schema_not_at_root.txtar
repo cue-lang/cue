@@ -1,0 +1,16 @@
+-- schema.json --
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://test.example/foo",
+  "oneOf": [
+      {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "string"
+      }
+  ]
+}
+
+-- out/decode/extract --
+ERROR:
+$schema can only appear at the root in JSON Schema version http://json-schema.org/draft-07/schema#:
+    schema.json:6:11

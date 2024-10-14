@@ -33,7 +33,7 @@ func constraintAllOf(key string, n cue.Value, s *state) {
 	}
 	a := make([]ast.Expr, 0, len(items))
 	for _, v := range items {
-		x, sub := s.schemaState(v, s.allowedTypes, nil, true)
+		x, sub := s.schemaState(v, s.allowedTypes, nil)
 		s.allowedTypes &= sub.allowedTypes
 		if sub.hasConstraints() {
 			// This might seem a little odd, since the actual
@@ -74,7 +74,7 @@ func constraintAnyOf(key string, n cue.Value, s *state) {
 	}
 	a := make([]ast.Expr, 0, len(items))
 	for _, v := range items {
-		x, sub := s.schemaState(v, s.allowedTypes, nil, true)
+		x, sub := s.schemaState(v, s.allowedTypes, nil)
 		if sub.allowedTypes == 0 {
 			// Nothing is allowed; omit.
 			continue
@@ -118,7 +118,7 @@ func constraintOneOf(key string, n cue.Value, s *state) {
 	}
 	a := make([]ast.Expr, 0, len(items))
 	for _, v := range items {
-		x, sub := s.schemaState(v, s.allowedTypes, nil, true)
+		x, sub := s.schemaState(v, s.allowedTypes, nil)
 		if sub.allowedTypes == 0 {
 			// Nothing is allowed; omit
 			continue

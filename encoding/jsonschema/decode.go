@@ -125,7 +125,7 @@ func (d *decoder) schema(ref []ast.Label, v cue.Value) (a []ast.Decl) {
 		root.isSchema = true
 	}
 
-	expr, state := root.schemaState(v, allTypes, nil, false)
+	expr, state := root.schemaState(v, allTypes, nil)
 	if state.allowedTypes == 0 {
 		d.addErr(errors.Newf(state.pos.Pos(), "constraints are not possible to satisfy"))
 	}
@@ -378,8 +378,7 @@ type state struct {
 
 	isSchema bool // for omitting ellipsis in an ast.File
 
-	up     *state
-	parent *state
+	up *state
 
 	path []string
 
@@ -685,7 +684,7 @@ func (s *state) doc(n ast.Node) {
 }
 
 func (s *state) schema(n cue.Value, idRef ...label) ast.Expr {
-	expr, _ := s.schemaState(n, allTypes, idRef, false)
+	expr, _ := s.schemaState(n, allTypes, idRef)
 	// TODO: report unused doc.
 	return expr
 }
@@ -695,7 +694,7 @@ func (s *state) schema(n cue.Value, idRef ...label) ast.Expr {
 // types holds the set of possible types that the value can hold.
 // idRef holds the path to the value.
 // isLogical specifies whether the caller is a logical operator like anyOf, allOf, oneOf, or not.
-func (s *state) schemaState(n cue.Value, types cue.Kind, idRef []label, isLogical bool) (ast.Expr, *state) {
+func (s *state) schemaState(n cue.Value, types cue.Kind, idRef []label) (ast.Expr, *state) {
 	state := &state{
 		up:            s,
 		schemaVersion: s.schemaVersion,
@@ -703,12 +702,8 @@ func (s *state) schemaState(n cue.Value, types cue.Kind, idRef []label, isLogica
 		decoder:       s.decoder,
 		allowedTypes:  types,
 		knownTypes:    allTypes,
-		path:          s.path,
 		idRef:         idRef,
 		pos:           n,
-	}
-	if isLogical {
-		state.parent = s
 	}
 	if n.Kind() == cue.BoolKind {
 		if vfrom(VersionDraft6).contains(state.schemaVersion) {
@@ -796,14 +791,10 @@ func (s *state) value(n cue.Value) ast.Expr {
 // This may also prevent exponential blow-up (as may happen when
 // converting YAML to JSON).
 func (s *state) processMap(n cue.Value, f func(key string, n cue.Value)) {
-	saved := s.path
-	defer func() { s.path = saved }()
 
 	// TODO: intercept references to allow for optimized performance.
 	for i, _ := n.Fields(); i.Next(); {
-		key := i.Label()
-		s.path = append(saved, key)
-		f(key, i.Value())
+		f(i.Label(), i.Value())
 	}
 }
 

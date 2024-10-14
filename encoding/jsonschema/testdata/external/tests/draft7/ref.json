@@ -290,11 +290,7 @@
 						3
 					]
 				},
-				"valid": true,
-				"skip": {
-					"v2": "5 errors in empty disjunction:\nconflicting values [...] and {foo:[1,2,3]} (mismatched types list and struct):\n    generated.cue:3:33\n    instance.json:1:1\nconflicting values bool and {foo:[1,2,3]} (mismatched types bool and struct):\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values null and {foo:[1,2,3]} (mismatched types null and struct):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values number and {foo:[1,2,3]} (mismatched types number and struct):\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values string and {foo:[1,2,3]} (mismatched types string and struct):\n    generated.cue:3:24\n    instance.json:1:1\n",
-					"v3": "cannot combine regular field \"foo\" with [[1,2,3],[]]:\n    generated.cue:1:1\n    instance.json:1:1\ncannot combine regular field \"foo\" with null:\n    generated.cue:3:1\ncannot combine regular field \"foo\" with {foo:[1,2,3],#reffed:[]}:\n    generated.cue:1:1\n    instance.json:1:1\nconflicting values [...] and {foo:[1,2,3]} (mismatched types list and struct):\n    generated.cue:3:33\n    instance.json:1:1\nconflicting values bool and {foo:[1,2,3]} (mismatched types bool and struct):\n    generated.cue:3:8\n    instance.json:1:1\nconflicting values null and {foo:[1,2,3]} (mismatched types null and struct):\n    generated.cue:3:1\n    instance.json:1:1\nconflicting values number and {foo:[1,2,3]} (mismatched types number and struct):\n    generated.cue:3:15\n    instance.json:1:1\nconflicting values string and {foo:[1,2,3]} (mismatched types string and struct):\n    generated.cue:3:24\n    instance.json:1:1\nfoo: conflicting values [1,2,3] and bool (mismatched types list and bool):\n    generated.cue:4:26\n    instance.json:1:8\nfoo: conflicting values [1,2,3] and null (mismatched types list and null):\n    generated.cue:4:19\n    instance.json:1:8\nfoo: conflicting values [1,2,3] and number (mismatched types list and number):\n    generated.cue:4:33\n    instance.json:1:8\nfoo: conflicting values [1,2,3] and string (mismatched types list and string):\n    generated.cue:4:42\n    instance.json:1:8\nfoo: conflicting values [1,2,3] and {...} (mismatched types list and struct):\n    generated.cue:4:70\n    instance.json:1:8\nfoo: invalid value [1,2,3] (does not satisfy list.MaxItems(2)): len(list) \u003e MaxItems(2) (3 \u003e 2):\n    generated.cue:4:51\n    generated.cue:4:65\n    instance.json:1:8\n"
-				}
+				"valid": true
 			},
 			{
 				"description": "ref invalid",
@@ -329,8 +325,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/sibling_id/foo.json:foo\":\n    generated.cue:1:8\n",
-			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/sibling_id/foo.json:foo\":\n    generated.cue:1:8\n"
+			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/sibling_id/base/foo.json:foo\":\n    generated.cue:1:8\n",
+			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/sibling_id/base/foo.json:foo\":\n    generated.cue:1:8\n"
 		},
 		"tests": [
 			{

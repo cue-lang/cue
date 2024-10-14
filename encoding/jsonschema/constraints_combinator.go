@@ -51,6 +51,11 @@ func constraintAllOf(key string, n cue.Value, s *state) {
 	// as that's a known-impossible assertion?
 	if len(a) > 0 {
 		s.knownTypes &= knownTypes
+		if len(a) == 1 {
+			// Only one possibility. Use that.
+			s.all.add(n, a[0])
+			return
+		}
 		s.all.add(n, ast.NewCall(
 			ast.NewIdent("matchN"),
 			// TODO it would be nice to be able to use a special sentinel "all" value
@@ -140,6 +145,11 @@ func constraintOneOf(key string, n cue.Value, s *state) {
 	s.allowedTypes &= types
 	if len(a) > 0 && hasSome {
 		s.knownTypes &= knownTypes
+		if len(a) == 1 {
+			// Only one possibility. Use that.
+			s.all.add(n, a[0])
+			return
+		}
 		s.all.add(n, ast.NewCall(
 			ast.NewIdent("matchN"),
 			&ast.BasicLit{

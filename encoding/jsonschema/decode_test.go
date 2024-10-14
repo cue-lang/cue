@@ -75,6 +75,10 @@ func TestDecode(t *testing.T) {
 		}
 
 		if versStr, ok := t.Value("version"); ok {
+			// TODO most schemas have neither an explicit $schema or a #version
+			// tag, so when we update the default version, they could break.
+			// We should probably change most of the tests to use an explicit $schema
+			// field apart from when we're explicitly testing the default version logic.
 			if versStr == "openapi" {
 				// OpenAPI doesn't have a JSON Schema URI so it gets a special case.
 				cfg.DefaultVersion = jsonschema.VersionOpenAPI

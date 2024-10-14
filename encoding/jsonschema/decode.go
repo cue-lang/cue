@@ -115,6 +115,7 @@ func (d *decoder) schema(ref []ast.Label, v cue.Value) (a []ast.Decl) {
 	root := state{
 		decoder:       d,
 		schemaVersion: d.cfg.DefaultVersion,
+		isRoot:        true,
 	}
 
 	var name ast.Label
@@ -415,6 +416,10 @@ type state struct {
 	// to $ref.
 	hasRefKeyword bool
 
+	// isRoot holds whether this state is at the root
+	// of the schema.
+	isRoot bool
+
 	minContains *uint64
 	maxContains *uint64
 
@@ -709,6 +714,7 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind, idRef []label) (ast.Ex
 		knownTypes:    allTypes,
 		idRef:         idRef,
 		pos:           n,
+		isRoot:        s0.isRoot && n == s0.pos,
 	}
 	if n.Kind() == cue.BoolKind {
 		if vfrom(VersionDraft6).contains(s.schemaVersion) {
@@ -818,9 +824,12 @@ func (s *state) value(n cue.Value) ast.Expr {
 func (s *state) processMap(n cue.Value, f func(key string, n cue.Value)) {
 
 	// TODO: intercept references to allow for optimized performance.
+	isRoot0 := s.isRoot
+	s.isRoot = false
 	for i, _ := n.Fields(); i.Next(); {
 		f(i.Label(), i.Value())
 	}
+	s.isRoot = isRoot0
 }
 
 func (s *state) listItems(name string, n cue.Value, allowEmpty bool) (a []cue.Value) {

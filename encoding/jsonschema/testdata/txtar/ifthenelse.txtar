@@ -1,0 +1,36 @@
+-- schema.json --
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "if": {
+        "properties": {
+            "a": {
+                "type": "number"
+            }
+        },
+        "required": [
+            "a"
+        ]
+    },
+    "then": {
+        "properties": {
+            "b": {
+                "type": "number"
+            }
+        },
+        "required": [
+            "b"
+        ]
+    },
+    "type": "object"
+}
+-- out/decode/extract --
+@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
+matchIf(null | bool | number | string | [...] | {
+	a!: number
+	...
+}, null | bool | number | string | [...] | {
+	b!: number
+	...
+}, _) & {
+	...
+}

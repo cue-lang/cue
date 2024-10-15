@@ -48,7 +48,7 @@ Note that this command is not yet stable and may be changed.
 		RunE: mkRunE(c, runModTidy),
 		Args: cobra.ExactArgs(0),
 	}
-	cmd.Flags().Bool(string(flagCheck), false, "check for tidiness only; do not update module.cue file")
+	cmd.Flags().Bool(string(flagCheck), false, "check for tidiness after fetching dependencies; fail if module.cue would be updated")
 
 	return cmd
 }

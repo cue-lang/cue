@@ -423,9 +423,9 @@ type state struct {
 	minContains *uint64
 	maxContains *uint64
 
-	ifConstraint   ast.Expr
-	thenConstraint ast.Expr
-	elseConstraint ast.Expr
+	ifConstraint   cue.Value
+	thenConstraint cue.Value
+	elseConstraint cue.Value
 
 	schemaVersion        Version
 	schemaVersionPresent bool
@@ -501,7 +501,6 @@ func (s *state) finalize() (e ast.Expr) {
 		// we might be inside an allOf or oneOf with other valid constraints.
 		return bottom()
 	}
-	s.addIfThenElse()
 
 	conjuncts := []ast.Expr{}
 	disjuncts := []ast.Expr{}
@@ -651,24 +650,6 @@ outer:
 	return e
 }
 
-func (s *state) addIfThenElse() {
-	if s.ifConstraint == nil || (s.thenConstraint == nil && s.elseConstraint == nil) {
-		return
-	}
-	if s.thenConstraint == nil {
-		s.thenConstraint = top()
-	}
-	if s.elseConstraint == nil {
-		s.elseConstraint = top()
-	}
-	s.all.add(s.pos, ast.NewCall(
-		ast.NewIdent("matchIf"),
-		s.ifConstraint,
-		s.thenConstraint,
-		s.elseConstraint,
-	))
-}
-
 func (s *state) comment() *ast.CommentGroup {
 	// Create documentation.
 	doc := strings.TrimSpace(s.title)
@@ -782,6 +763,7 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind, idRef []label) (ast.Ex
 			c.fn(key, value, s)
 		})
 	}
+	constraintIfThenElse(s)
 
 	return s.finalize(), s
 }

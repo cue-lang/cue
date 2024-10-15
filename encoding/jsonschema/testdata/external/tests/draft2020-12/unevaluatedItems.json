@@ -1422,8 +1422,8 @@
 			"unevaluatedItems": false
 		},
 		"skip": {
-			"v2": "extract error: keyword \"prefixItems\" not yet implemented (and 1 more errors)",
-			"v3": "extract error: keyword \"prefixItems\" not yet implemented (and 1 more errors)"
+			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
 		},
 		"tests": [
 			{

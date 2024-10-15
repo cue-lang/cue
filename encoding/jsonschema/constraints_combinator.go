@@ -177,13 +177,45 @@ func constraintNot(key string, n cue.Value, s *state) {
 }
 
 func constraintIf(key string, n cue.Value, s *state) {
-	s.ifConstraint = s.schema(n)
+	s.ifConstraint = n
 }
 
 func constraintThen(key string, n cue.Value, s *state) {
-	s.thenConstraint = s.schema(n)
+	s.thenConstraint = n
 }
 
 func constraintElse(key string, n cue.Value, s *state) {
-	s.elseConstraint = s.schema(n)
+	s.elseConstraint = n
+}
+
+// constraintIfThenElse is not implemented as a standard constraint
+// function because it needs to operate knowing about the presence
+// of all of "if", "then" and "else".
+func constraintIfThenElse(s *state) {
+	hasIf, hasThen, hasElse := s.ifConstraint.Exists(), s.thenConstraint.Exists(), s.elseConstraint.Exists()
+	if !hasIf || (!hasThen && !hasElse) {
+		return
+	}
+	var ifExpr, thenExpr, elseExpr ast.Expr
+	ifExpr, ifSub := s.schemaState(s.ifConstraint, s.allowedTypes, nil)
+	if hasThen {
+		// The allowed types of the "then" constraint are constrained both
+		// by the current constraints and the "if" constraint.
+		thenExpr, _ = s.schemaState(s.thenConstraint, s.allowedTypes&ifSub.allowedTypes, nil)
+	}
+	if hasElse {
+		elseExpr, _ = s.schemaState(s.elseConstraint, s.allowedTypes, nil)
+	}
+	if thenExpr == nil {
+		thenExpr = top()
+	}
+	if elseExpr == nil {
+		elseExpr = top()
+	}
+	s.all.add(s.pos, ast.NewCall(
+		ast.NewIdent("matchIf"),
+		ifExpr,
+		thenExpr,
+		elseExpr,
+	))
 }

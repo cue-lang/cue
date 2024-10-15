@@ -24,7 +24,6 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/load"
-	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/registrytest"
 )
 
@@ -90,8 +89,9 @@ func Example() {
 
 func Example_externalModules() {
 	// setUpModulesExample starts a temporary in-memory registry,
-	// populates it with an example module, and sets CUE_REGISTRY
-	// to refer to it
+	// populates it with an example module, and sets CUE_REGISTRY to refer to it.
+	// Users can leave [load.Config.Env] empty to use the default registry,
+	// or to set one globally via os.Setenv("CUE_REGISTRY", "registry.myorg.com").
 	env, cleanup := setUpModulesExample()
 	defer cleanup()
 
@@ -139,21 +139,12 @@ value: "world"
 	if err != nil {
 		panic(err)
 	}
-	cleanups := []func(){registry.Close}
 	env = append(env, "CUE_REGISTRY="+registry.Host()+"+insecure")
+	// We also set up a temporary cache directory to fetch and extract modules into.
 	dir, err := os.MkdirTemp("", "")
 	if err != nil {
 		panic(err)
 	}
 	env = append(env, "CUE_CACHE_DIR="+dir)
-	oldModulesExperiment := cueexperiment.Flags.Modules
-	cueexperiment.Flags.Modules = true
-	cleanups = append(cleanups, func() {
-		cueexperiment.Flags.Modules = oldModulesExperiment
-	})
-	return env, func() {
-		for i := len(cleanups) - 1; i >= 0; i-- {
-			cleanups[i]()
-		}
-	}
+	return env, registry.Close
 }

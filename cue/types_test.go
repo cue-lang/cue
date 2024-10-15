@@ -3324,10 +3324,12 @@ func TestPathCorrection(t *testing.T) {
 			if !i.Next() {
 				t.Fatal("no fields")
 			}
-			// Locate b
+			// Locate b, the second field
 			i, _ = i.Value().Fields(cue.Definitions(true), cue.Optional(true))
-			if !(i.Next() && i.Next()) {
-				t.Fatal("no fields")
+			for range 2 {
+				if !i.Next() {
+					t.Fatal("no fields")
+				}
 			}
 			v := i.Value()
 			return v

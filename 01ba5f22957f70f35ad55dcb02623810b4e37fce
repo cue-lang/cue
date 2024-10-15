@@ -16,6 +16,24 @@
       "message": "Thanks! This is what I meant last week with the simplification of matchN, btw.",
       "revId": "01ba5f22957f70f35ad55dcb02623810b4e37fce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7b4da44_ff5e818d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-15T12:03:22Z",
+      "side": 1,
+      "message": "Or rather, what I meant to say, but then confused myself.",
+      "parentUuid": "9b8420f0_ba725b33",
+      "revId": "01ba5f22957f70f35ad55dcb02623810b4e37fce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

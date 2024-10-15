@@ -16,6 +16,24 @@
       "message": "wasn\u0027t the old logic with the disjunctions broken? the \"if\" and \"then\" in your example were matching way too much, for example.",
       "revId": "7814edbdeae4c284f89da1154ca7ed0636991809",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f5a66cd_e1d87d0d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-15T16:14:34Z",
+      "side": 1,
+      "message": "No, the inner disjunctions were just redundant. The outer conjunctions made sure that the whole thing matched the correct instances. Note that in JSON Schema, a keyword like `properties` applies _only_ when the instance is an object, so a schema like:\n\n```\n{\"properties\": {\"a\": \"string\"}}\n```\nwill map to CUE\u0027s\n\n```\nnull | string | bool | number | [...] | {a?: string}\n```\n\nI found this... unexpected when I discovered it, and I suspect that many JSON Schema authors are making schemas that don\u0027t match what they\u0027re intended to match, but these are the semantics we have.",
+      "parentUuid": "fb32ba86_b37f3ea3",
+      "revId": "7814edbdeae4c284f89da1154ca7ed0636991809",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

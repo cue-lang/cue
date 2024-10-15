@@ -165,17 +165,6 @@ func (inst *Instance) setListOrError(err errors.Error) {
 	inst.Err = errors.Append(inst.Err, err)
 }
 
-func (inst *Instance) setError(err errors.Error) {
-	inst.Incomplete = true
-	inst.Err = errors.Append(inst.Err, err)
-}
-
-func (inst *Instance) eval(ctx *adt.OpContext) adt.Value {
-	// TODO: remove manifest here?
-	v := manifest(ctx, inst.root)
-	return v
-}
-
 // ID returns the package identifier that uniquely qualifies module and
 // package name.
 func (inst *Instance) ID() string {

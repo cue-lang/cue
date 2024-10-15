@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b7569149_fca5c113",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-15T14:43:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "94035c4d_f8ef66c6",
+      "revId": "83579f9b7cdbcdd082da8051e497caf92f3768bc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ccd01ffa_daa37fce",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-10-15T11:59:42Z",
       "side": 1,
       "message": "please document that this is meant to track the latest supported version. otherwise we might forget to keep this up to date as we add more versions in the future.",
+      "revId": "83579f9b7cdbcdd082da8051e497caf92f3768bc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "87c6fa7c_3c2d9e35",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-15T14:43:11Z",
+      "side": 1,
+      "message": "I can\u0027t quite decide if this really should track the latest supported version or not. In a sense, if it does and we change it, then we risk breaking users (as we are indeed risking in this CL), which might become more of an issue with more CUE users relying on encoding/jsonschema. Given there\u0027s no _need_ to track the latest version, I think I might leave the comment as-is.",
+      "parentUuid": "ccd01ffa_daa37fce",
       "revId": "83579f9b7cdbcdd082da8051e497caf92f3768bc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

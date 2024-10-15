@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb32ba86_b37f3ea3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-15T15:26:13Z",
+      "side": 1,
+      "message": "wasn\u0027t the old logic with the disjunctions broken? the \"if\" and \"then\" in your example were matching way too much, for example.",
+      "revId": "7814edbdeae4c284f89da1154ca7ed0636991809",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

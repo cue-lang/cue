@@ -14,17 +14,14 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
-	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/registrytest"
 	"cuelang.org/go/mod/modcache"
 )
 
 func TestModuleLoadWithInvalidRegistryConfig(t *testing.T) {
-	// When the modules experiment is enabled and there's an invalid
-	// registry configuration, we shouldn't get an error unless the
-	// module actually tries to use a registry.
-	qt.Patch(t, &cueexperiment.Flags.Modules, true)
+	// When there's an invalid registry configuration,
+	// we shouldn't get an error unless the module actually tries to use a registry.
 	t.Setenv("CUE_REGISTRY", "invalid}host:")
 	cacheDir := t.TempDir()
 	t.Setenv("CUE_CACHE_DIR", cacheDir)
@@ -94,7 +91,6 @@ func TestModuleFetch(t *testing.T) {
 		// The fetched files are read-only, so testing fails when trying
 		// to remove them.
 		defer modcache.RemoveAll(tmpDir)
-		qt.Patch(t, &cueexperiment.Flags.Modules, true)
 		ctx := cuecontext.New()
 		insts := t.RawInstances()
 		if len(insts) != 1 {

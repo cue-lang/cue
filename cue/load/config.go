@@ -285,10 +285,12 @@ type Config struct {
 	// Registry is used to fetch CUE module dependencies.
 	//
 	// When nil, [modconfig.NewRegistry] will be used to create a
-	// registry instance using the usual cmd/cue conventions for
-	// environment variables (but see the Env field below).
+	// registry instance using the variables set in [Config.Env]
+	// as documented in `[cue help registryconfig]`.
 	//
 	// THIS IS EXPERIMENTAL. API MIGHT CHANGE.
+	//
+	// [cue help registryconfig]: https://cuelang.org/docs/reference/command/cue-help-registryconfig/
 	Registry modconfig.Registry
 
 	// Env provides environment variables for use in the configuration.

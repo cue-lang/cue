@@ -36,9 +36,8 @@ import (
 )
 
 func init() {
-	// Ignore the value of CUE_EXPERIMENT for the purposes
-	// of these tests, which we want to test both with the experiment
-	// enabled and disabled.
+	// Ignore the value of CUE_EXPERIMENT for the purposes of these tests,
+	// as we want them to start off with the default experiment values.
 	os.Setenv("CUE_EXPERIMENT", "")
 
 	// Once we've called cueexperiment.Init, cueexperiment.Vars

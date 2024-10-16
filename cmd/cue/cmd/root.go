@@ -85,19 +85,15 @@ type Stats struct {
 	}
 }
 
-var hasRunCommand bool
-
 func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 	return func(cmd *cobra.Command, args []string) error {
-		// The init work below should only happen once per cmd/cue invocation;
-		// if it happens twice, we'll misbehave by writing stats twice
-		// or miscalculating pprof and stats numbers.
-		if hasRunCommand {
-			panic("cmd/cue/cmd.mkRunE init ran twice")
-		}
-		hasRunCommand = true
-
 		c.Command = cmd
+
+		// Note that the setup code below should only run once per cmd/cue invocation.
+		// This is because part of it modifies the global state like cueexperiment,
+		// but also because running this twice may result in broken CUE stats or Go profiles.
+		// However, users of the exposed Go API may be creating and running many commands,
+		// so we can't panic or fail if this setup work happens twice.
 
 		statsEnc, err := statsEncoder(c)
 		if err != nil {

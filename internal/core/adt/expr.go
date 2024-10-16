@@ -954,7 +954,7 @@ func (x *LetReference) resolve(ctx *OpContext, state combinedFlags) *Vertex {
 	// Not caching let expressions may lead to exponential behavior.
 	// The expr uses the expression of a Let field, which can never be used in
 	// any other context.
-	c := arc.Conjuncts[0]
+	c := arc.ConjunctAt(0)
 	expr := c.Expr()
 
 	// A let field always has a single expression and thus ConjunctGroups

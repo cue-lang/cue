@@ -39,12 +39,15 @@ func (w *compactPrinter) node(n adt.Node) {
 	switch x := n.(type) {
 	case *adt.Vertex:
 		if x.BaseValue == nil || (w.cfg.Raw && !x.IsData()) {
-			for i, c := range x.Conjuncts {
+			i := 0
+			x.VisitLeafConjuncts(func(c adt.Conjunct) bool {
 				if i > 0 {
 					w.string(" & ")
 				}
+				i++
 				w.node(c.Elem())
-			}
+				return true
+			})
 			return
 		}
 
@@ -62,7 +65,7 @@ func (w *compactPrinter) node(n adt.Node) {
 						w.string("m")
 					}
 					w.string("=")
-					if c := a.Conjuncts[0]; a.MultiLet {
+					if c := a.ConjunctAt(0); a.MultiLet {
 						w.node(c.Expr())
 						continue
 					}

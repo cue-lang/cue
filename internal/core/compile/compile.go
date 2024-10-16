@@ -305,7 +305,7 @@ func (c *compiler) compileFiles(a []*ast.File) *adt.Vertex { // Or value?
 		c.pushScope(nil, 0, file) // File scope
 		v := &adt.StructLit{Src: file}
 		c.addDecls(v, file.Decls)
-		res.Conjuncts = append(res.Conjuncts, adt.MakeRootConjunct(env, v))
+		res.InsertConjunct(adt.MakeRootConjunct(env, v))
 		c.popScope()
 	}
 

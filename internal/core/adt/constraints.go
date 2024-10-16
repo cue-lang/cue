@@ -163,9 +163,10 @@ func matchPatternValue(ctx *OpContext, pattern Value, f Feature, label Value) (r
 		// TODO: hoist and reuse with the identical code in optional.go.
 		if x == cycle {
 			err := ctx.NewPosf(pos(pattern), "cyclic pattern constraint")
-			for _, c := range ctx.vertex.Conjuncts {
+			ctx.vertex.VisitLeafConjuncts(func(c Conjunct) bool {
 				addPositions(err, c)
-			}
+				return true
+			})
 			ctx.AddBottom(&Bottom{
 				Err:  err,
 				Node: ctx.vertex,

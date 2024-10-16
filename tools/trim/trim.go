@@ -227,7 +227,7 @@ func (t *trimmer) addDominators(d, v *adt.Vertex, hasDisjunction bool) (doms *ad
 		Label:  v.Label,
 	}
 	if d != nil && hasDisjunction {
-		doms.Conjuncts = append(doms.Conjuncts, d.Conjuncts...)
+		doms.InsertConjunctsFrom(d)
 	}
 
 	hasDoms := false

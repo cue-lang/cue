@@ -313,7 +313,7 @@ func (w *printer) node(n adt.Node) {
 					w.string("multi")
 				}
 				w.string(" = ")
-				if c := a.Conjuncts[0]; a.MultiLet {
+				if c := a.ConjunctAt(0); a.MultiLet {
 					w.node(c.Expr())
 					continue
 				}

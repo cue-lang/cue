@@ -786,6 +786,8 @@ func (c *CloseInfo) setOptionalV3(n *nodeContext) {
 // the conjunct seems to be fully cyclic so far or if there is a valid reference
 // cycle.
 func (n *nodeContext) markCycle(arc *Vertex, env *Environment, x Resolver, ci CloseInfo) (_ CloseInfo, skip bool) {
+	unreachableForDev(n.ctx)
+
 	n.assertInitialized()
 
 	// TODO(perf): this optimization can work if we also check for any

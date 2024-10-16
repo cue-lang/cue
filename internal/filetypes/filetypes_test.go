@@ -132,7 +132,7 @@ func TestFromFile(t *testing.T) {
 				Form:           build.Schema,
 				BoolTags: map[string]bool{
 					"strict":         false,
-					"strictFeatures": true,
+					"strictFeatures": false,
 					"strictKeywords": false,
 				},
 			},
@@ -187,7 +187,7 @@ func TestFromFile(t *testing.T) {
 				Form:           build.Schema,
 				BoolTags: map[string]bool{
 					"strict":         false,
-					"strictFeatures": true,
+					"strictFeatures": false,
 					"strictKeywords": false,
 				},
 			},
@@ -218,7 +218,7 @@ func TestFromFile(t *testing.T) {
 				Form:           build.Schema,
 				BoolTags: map[string]bool{
 					"strict":         false,
-					"strictFeatures": true,
+					"strictFeatures": false,
 					"strictKeywords": false,
 				},
 			},
@@ -249,7 +249,7 @@ func TestFromFile(t *testing.T) {
 				Form:           build.Schema,
 				BoolTags: map[string]bool{
 					"strict":         false,
-					"strictFeatures": true,
+					"strictFeatures": false,
 					"strictKeywords": false,
 				},
 			},
@@ -349,7 +349,7 @@ func TestParseFile(t *testing.T) {
 			Form:           build.Schema,
 			BoolTags: map[string]bool{
 				"strict":         false,
-				"strictFeatures": true,
+				"strictFeatures": false,
 				"strictKeywords": false,
 			},
 		},
@@ -440,7 +440,7 @@ func TestParseArgs(t *testing.T) {
 				Interpretation: "jsonschema",
 				BoolTags: map[string]bool{
 					"strict":         false,
-					"strictFeatures": true,
+					"strictFeatures": false,
 					"strictKeywords": false,
 				},
 			},
@@ -461,7 +461,7 @@ func TestParseArgs(t *testing.T) {
 			},
 		},
 	}, {
-		in: "jsonschema+strictFeatures=0: bar.schema",
+		in: "jsonschema+strictFeatures=1: bar.schema",
 		out: []*build.File{
 			{
 				Filename:       "bar.schema",
@@ -470,7 +470,7 @@ func TestParseArgs(t *testing.T) {
 				Form:           build.Schema,
 				BoolTags: map[string]bool{
 					"strict":         false,
-					"strictFeatures": false,
+					"strictFeatures": true,
 					"strictKeywords": false,
 				},
 			},
@@ -503,7 +503,7 @@ func TestDefaultTagsForInterpretation(t *testing.T) {
 	tags := DefaultTagsForInterpretation(build.JSONSchema, Input)
 	qt.Assert(t, qt.DeepEquals(tags, map[string]bool{
 		"strict":         false,
-		"strictFeatures": true,
+		"strictFeatures": false,
 		"strictKeywords": false,
 	}))
 }

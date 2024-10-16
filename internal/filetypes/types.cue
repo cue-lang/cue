@@ -297,7 +297,8 @@ interpretations: jsonschema: {
 	boolTags: {
 		strict:         *false | bool
 		strictKeywords: *strict | bool
-		strictFeatures: *true | bool
+		// TODO(v0.12): enable strictFeatures by default
+		strictFeatures: *strict | bool
 	}
 }
 
@@ -307,7 +308,7 @@ interpretations: openapi: {
 	boolTags: {
 		strict:         *false | bool
 		strictKeywords: *strict | bool
-		strictFeatures: *true | bool
+		strictFeatures: *strict | bool
 	}
 }
 

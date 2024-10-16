@@ -55,9 +55,10 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 		e.popFrame(saved)
 	}()
 
-	for _, c := range n.Conjuncts {
+	n.VisitLeafConjuncts(func(c adt.Conjunct) bool {
 		e.markLets(c.Expr().Source(), s)
-	}
+		return true
+	})
 
 	switch x := n.BaseValue.(type) {
 	case nil:

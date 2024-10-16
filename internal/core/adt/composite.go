@@ -693,6 +693,13 @@ func (v *Vertex) SingleConjunct() (c Conjunct, count int) {
 	return c, count
 }
 
+// ConjunctAt assumes a Vertex represents a top-level Vertex, such as one
+// representing a file or a let expressions, where all conjuncts appear at the
+// top level. It may panic if this condition is not met.
+func (v *Vertex) ConjunctAt(i int) Conjunct {
+	return v.Conjuncts[i]
+}
+
 // Value returns the Value of v without definitions if it is a scalar
 // or itself otherwise.
 func (v *Vertex) Value() Value {
@@ -1233,6 +1240,14 @@ func (v *Vertex) Source() ast.Node {
 	return nil
 }
 
+// InsertConjunct is a low-level method to insert a conjunct into a Vertex.
+// It should only be used by the compiler. It does not consider any logic
+// that is necessary if a conjunct is added to a Vertex that is already being
+// evaluated.
+func (v *Vertex) InsertConjunct(c Conjunct) {
+	v.Conjuncts = append(v.Conjuncts, c)
+}
+
 // AddConjunct adds the given Conjuncts to v if it doesn't already exist.
 func (v *Vertex) AddConjunct(c Conjunct) *Bottom {
 	if v.BaseValue != nil && !isCyclePlaceholder(v.BaseValue) {
@@ -1427,7 +1442,7 @@ func (c *Conjunct) Field() Node {
 
 // Elem retrieves the Elem form of the contained conjunct.
 // If it is a Field, it will return the field value.
-func (c *Conjunct) Elem() Elem {
+func (c Conjunct) Elem() Elem {
 	switch x := c.x.(type) {
 	case interface{ expr() Expr }:
 		return x.expr()

@@ -39,9 +39,14 @@ func (c *Controller) runLoop() {
 	_, root := value.ToInternal(c.inst)
 
 	// Copy the initial conjuncts.
-	n := len(root.Conjuncts)
+	var rootConjuncts []adt.Conjunct
+	root.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+		rootConjuncts = append(rootConjuncts, c)
+		return true
+	})
+	n := len(rootConjuncts)
 	c.conjuncts = make([]adt.Conjunct, n, n+len(c.tasks))
-	copy(c.conjuncts, root.Conjuncts)
+	copy(c.conjuncts, rootConjuncts)
 
 	c.markReady(nil)
 

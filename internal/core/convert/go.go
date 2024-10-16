@@ -219,7 +219,7 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 		if err != nil {
 			return &adt.Bottom{Err: errors.Promote(err, "compile")}
 		}
-		if len(x.Conjuncts) != 1 {
+		if _, n := x.SingleConjunct(); n != 1 {
 			panic("unexpected length")
 		}
 		return x

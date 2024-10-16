@@ -1,15 +1,13 @@
-! exec cue def openapi: openapi.json
-cmp stderr expect-stderr-1
+exec cue def openapi: openapi.json
 
-! exec cue def openapi.json
-cmp stderr expect-stderr-1
+# Default is to best-effort mode.
+exec cue def openapi.json
+cmp stdout expect-out.cue
 
+# We can enable strictFeatures to give an error when
+# unimplemented features are used.
 ! exec cue def openapi+strictFeatures: openapi.json
 cmp stderr expect-stderr-1
-
-# We can disable strictFeatures to enable best effort mode.
-exec cue def openapi+strictFeatures=0: openapi.json
-cmp stdout expect-out.cue
 
 # Bad keywords are still always bad with OpenAPI 3.0.
 ! exec cue def openapi-badkeyword.json

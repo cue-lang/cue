@@ -56,10 +56,7 @@ func TestCommand(t *testing.T) {
 	qt.Assert(t, qt.Equals(buf.String(), "{\n    \"foo\": 123\n}\n"))
 
 	// Verify that we can use the API exposed by the embedded cobra command.
-	// TODO(mvdan): panics due to https://cuelang.org/issue/3458; fix it.
-	qt.Assert(t, qt.PanicMatches(func() {
-		c, err = cmd.New([]string{"fmt", "nosuchfile.cue"})
-		err = c.Execute()
-		qt.Assert(t, qt.IsNotNil(err))
-	}, "cmd/cue/cmd.mkRunE init ran twice"))
+	c, err = cmd.New([]string{"fmt", "nosuchfile.cue"})
+	err = c.Execute()
+	qt.Assert(t, qt.IsNotNil(err))
 }

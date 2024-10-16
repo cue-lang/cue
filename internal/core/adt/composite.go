@@ -668,6 +668,11 @@ func visitAllConjuncts(a []Conjunct, f func(c Conjunct, isLeaf bool)) {
 	}
 }
 
+// HasConjuncts reports whether v has any conjuncts.
+func (v *Vertex) HasConjuncts() bool {
+	return len(v.Conjuncts) > 0
+}
+
 // SingleConjunct reports whether there is a single leaf conjunct and returns 1
 // if so. It will return 0 if there are no conjuncts or 2 if there are more than
 // 1.
@@ -732,7 +737,7 @@ func (x *Vertex) IsConcrete() bool {
 // it tells whether optional field matching and non-regular fields, like
 // definitions and hidden fields, should be ignored.
 func (v *Vertex) IsData() bool {
-	return v.isData || len(v.Conjuncts) == 0
+	return v.isData || !v.HasConjuncts()
 }
 
 // ToDataSingle creates a new Vertex that represents just the regular fields

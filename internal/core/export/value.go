@@ -85,7 +85,7 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 				result = e.structComposite(n, attrs)
 			}
 
-		case !x.IsIncomplete() || len(n.Conjuncts) == 0 || e.cfg.Final:
+		case !x.IsIncomplete() || !n.HasConjuncts() || e.cfg.Final:
 			result = e.bottom(x)
 		}
 

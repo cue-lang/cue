@@ -74,7 +74,7 @@ func (e *exporter) expr(env *adt.Environment, v adt.Elem) (result ast.Expr) {
 		return nil
 
 	case *adt.Vertex:
-		if len(x.Conjuncts) == 0 || x.IsData() {
+		if x.IsData() {
 			// Treat as literal value.
 			return e.value(x)
 		} // Should this be the arcs label?
@@ -170,9 +170,9 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 	}
 
 	// Unify values only for one level.
-	if a := e.values.Conjuncts; len(a) > 0 {
+	if e.values.HasConjuncts() {
 		e.values.Finalize(e.ctx)
-		e.embed = append(e.embed, e.value(e.values, a...))
+		e.embed = append(e.embed, e.value(e.values, e.values.Conjuncts...))
 	}
 
 	// Collect and order set of fields.

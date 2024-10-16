@@ -690,12 +690,24 @@ z1.z.g.h: structural cycle
     ./in.cue:371:9
 e4.a.0.0: cannot combine regular field "c" with [1,{c:1} & (a|{}) & [{c:1}]]:
     ./in.cue:409:11
+    ./in.cue:408:6
+    ./in.cue:409:6
+    ./in.cue:409:7
 e4.a.0.0.0: cannot combine regular field "c" with [1,{c:1}]:
     ./in.cue:409:11
+    ./in.cue:408:6
+    ./in.cue:409:6
+    ./in.cue:409:7
 e4.b.0.0: cannot combine regular field "c" with [1,{c:1} & [{c:1}] & (b|{})]:
     ./in.cue:411:11
+    ./in.cue:411:6
+    ./in.cue:411:7
+    ./in.cue:412:6
 e4.b.0.0.0: cannot combine regular field "c" with [1,{c:1}]:
     ./in.cue:411:11
+    ./in.cue:411:6
+    ./in.cue:411:7
+    ./in.cue:412:6
 nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
     ./in.cue:426:6
 nestedList.v2e.y.0.0: incompatible list lengths (1 and 2):
@@ -1434,8 +1446,14 @@ Result:
         // e4.a.0.0.0: structural cycle
         // e4.a.0.0: cannot combine regular field "c" with [1,{c:1} & (a|{}) & [{c:1}]]:
         //     ./in.cue:409:11
+        //     ./in.cue:408:6
+        //     ./in.cue:409:6
+        //     ./in.cue:409:7
         // e4.a.0.0.0: cannot combine regular field "c" with [1,{c:1}]:
         //     ./in.cue:409:11
+        //     ./in.cue:408:6
+        //     ./in.cue:409:6
+        //     ./in.cue:409:7
       }
     }
     b: (_|_){
@@ -1459,8 +1477,14 @@ Result:
         // e4.b.0.0.0: structural cycle
         // e4.b.0.0: cannot combine regular field "c" with [1,{c:1} & [{c:1}] & (b|{})]:
         //     ./in.cue:411:11
+        //     ./in.cue:411:6
+        //     ./in.cue:411:7
+        //     ./in.cue:412:6
         // e4.b.0.0.0: cannot combine regular field "c" with [1,{c:1}]:
         //     ./in.cue:411:11
+        //     ./in.cue:411:6
+        //     ./in.cue:411:7
+        //     ./in.cue:412:6
       }
     }
   }
@@ -1785,7 +1809,7 @@ diff old new
  e1.a.c: structural cycle
  e1.b.c: structural cycle
  e2.a.c: structural cycle
-@@ -32,61 +36,72 @@
+@@ -32,61 +36,84 @@
      ./in.cue:403:5
      ./in.cue:404:5
  e3.b.c: structural cycle
@@ -1872,12 +1896,24 @@ diff old new
 +    ./in.cue:371:9
 +e4.a.0.0: cannot combine regular field "c" with [1,{c:1} & (a|{}) & [{c:1}]]:
 +    ./in.cue:409:11
++    ./in.cue:408:6
++    ./in.cue:409:6
++    ./in.cue:409:7
 +e4.a.0.0.0: cannot combine regular field "c" with [1,{c:1}]:
 +    ./in.cue:409:11
++    ./in.cue:408:6
++    ./in.cue:409:6
++    ./in.cue:409:7
 +e4.b.0.0: cannot combine regular field "c" with [1,{c:1} & [{c:1}] & (b|{})]:
 +    ./in.cue:411:11
++    ./in.cue:411:6
++    ./in.cue:411:7
++    ./in.cue:412:6
 +e4.b.0.0.0: cannot combine regular field "c" with [1,{c:1}]:
 +    ./in.cue:411:11
++    ./in.cue:411:6
++    ./in.cue:411:7
++    ./in.cue:412:6
 +nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
 +    ./in.cue:426:6
 +nestedList.v2e.y.0.0: incompatible list lengths (1 and 2):
@@ -1885,7 +1921,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -128,10 +143,7 @@
+@@ -128,10 +155,7 @@
    a7: (struct){
      a: (string){ "foo" }
      b: (struct){
@@ -1897,7 +1933,7 @@ diff old new
        y: (string){ "foo" }
      }
      c: (struct){
-@@ -168,11 +180,17 @@
+@@ -168,11 +192,17 @@
      }
    }
    b4: (_|_){
@@ -1920,7 +1956,7 @@ diff old new
        }
      }
      x: (_|_){
-@@ -240,10 +258,9 @@
+@@ -240,10 +270,9 @@
          // [eval]
          0: (_|_){
            // [eval] b6.b.a.0: conflicting values 1 and [1] (mismatched types int and list):
@@ -1932,7 +1968,7 @@ diff old new
            0: (_|_){
              // [structural cycle] b6.b.a.0.0: structural cycle
            }
-@@ -261,11 +278,20 @@
+@@ -261,11 +290,20 @@
      }
    }
    b7: (_|_){
@@ -1958,7 +1994,7 @@ diff old new
        }
      }
      a: (_|_){
-@@ -276,9 +302,7 @@
+@@ -276,9 +314,7 @@
      }
    }
    b8: (struct){
@@ -1969,7 +2005,7 @@ diff old new
      a: (struct){
        f: (string){ string }
      }
-@@ -304,7 +328,7 @@
+@@ -304,7 +340,7 @@
      #ref: (#struct){
        ref: (string){ string }
      }
@@ -1978,7 +2014,7 @@ diff old new
          c: (#list){
            0: ((string|struct)){ |((string){ string }, (#struct){
                ref: (string){ string }
-@@ -327,7 +351,13 @@
+@@ -327,7 +363,13 @@
          }) }
      }
      c: (#struct){
@@ -1993,7 +2029,7 @@ diff old new
      }
      d: (struct){
        d: (struct){
-@@ -337,9 +367,7 @@
+@@ -337,9 +379,7 @@
    }
    b11: (struct){
      #list: (#struct){
@@ -2004,7 +2040,7 @@ diff old new
      }
    }
    b12: (struct){
-@@ -356,7 +384,11 @@
+@@ -356,7 +396,11 @@
            value: (int){ 3 }
            tail: (#struct){
              value: (int){ 4 }
@@ -2017,7 +2053,7 @@ diff old new
              sum: (int){ 4 }
            }
            sum: (int){ 7 }
-@@ -428,10 +460,7 @@
+@@ -428,10 +472,7 @@
            link: (#struct){
              a: (#struct){
                two: (#struct){
@@ -2029,7 +2065,7 @@ diff old new
                }
              }
            }
-@@ -505,10 +534,7 @@
+@@ -505,10 +546,7 @@
            link: (#struct){
              a: (#list){
                0: (#struct){
@@ -2041,7 +2077,7 @@ diff old new
                }
              }
            }
-@@ -578,12 +604,7 @@
+@@ -578,12 +616,7 @@
        b: (struct){
        }
        c: (_|_){
@@ -2055,7 +2091,7 @@ diff old new
        }
      }
    }
-@@ -599,56 +620,26 @@
+@@ -599,56 +632,26 @@
              // [structural cycle]
              h: (int){ int }
              t: (_|_){
@@ -2132,7 +2168,7 @@ diff old new
          }
        }
      }
-@@ -666,28 +657,25 @@
+@@ -666,28 +669,25 @@
      }
      x: (_|_){
        // [structural cycle]
@@ -2166,7 +2202,7 @@ diff old new
        #List: (#struct){
          Next: (null){ null }
        }
-@@ -696,9 +684,7 @@
+@@ -696,9 +696,7 @@
        // [structural cycle]
        t1: (struct){
          #Foo: (#struct){
@@ -2177,7 +2213,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -706,10 +692,7 @@
+@@ -706,10 +704,7 @@
          Foo: (_|_){
            // [structural cycle]
            ref: (_|_){
@@ -2189,7 +2225,7 @@ diff old new
            }
          }
        }
-@@ -716,9 +699,7 @@
+@@ -716,9 +711,7 @@
      }
      comprehension: (struct){
        #list: (#struct){
@@ -2200,7 +2236,7 @@ diff old new
        }
      }
    }
-@@ -740,12 +721,11 @@
+@@ -740,12 +733,11 @@
      schema: (_|_){
        // [structural cycle]
        next: (_|_){
@@ -2215,7 +2251,7 @@ diff old new
      }
    }
    fieldsSumInfinite: (_|_){
-@@ -756,7 +736,8 @@
+@@ -756,7 +748,8 @@
        fries: (float){ 2.00 }
        sprite: (float){ 1.00 }
        total: (_|_){
@@ -2225,7 +2261,7 @@ diff old new
        }
      }
    }
-@@ -771,9 +752,7 @@
+@@ -771,9 +764,7 @@
        head: (int){ 3 }
        tail: (struct){
          head: (int){ 2 }
@@ -2236,7 +2272,7 @@ diff old new
        }
      }
    }
-@@ -813,11 +792,12 @@
+@@ -813,11 +804,12 @@
        // [eval] e3.a: conflicting values [a] and {c:a} (mismatched types list and struct):
        //     ./in.cue:400:5
        //     ./in.cue:401:5
@@ -2254,7 +2290,7 @@ diff old new
        }
      }
      b: (_|_){
-@@ -824,11 +804,12 @@
+@@ -824,11 +816,12 @@
        // [eval] e3.b: conflicting values [b] and {c:b} (mismatched types list and struct):
        //     ./in.cue:403:5
        //     ./in.cue:404:5
@@ -2272,7 +2308,7 @@ diff old new
        }
      }
    }
-@@ -837,41 +818,51 @@
+@@ -837,41 +830,63 @@
      a: (_|_){
        // [eval]
        0: (_|_){
@@ -2320,8 +2356,14 @@ diff old new
 +        // e4.a.0.0.0: structural cycle
 +        // e4.a.0.0: cannot combine regular field "c" with [1,{c:1} & (a|{}) & [{c:1}]]:
 +        //     ./in.cue:409:11
++        //     ./in.cue:408:6
++        //     ./in.cue:409:6
++        //     ./in.cue:409:7
 +        // e4.a.0.0.0: cannot combine regular field "c" with [1,{c:1}]:
 +        //     ./in.cue:409:11
++        //     ./in.cue:408:6
++        //     ./in.cue:409:6
++        //     ./in.cue:409:7
 +      }
 +    }
 +    b: (_|_){
@@ -2350,12 +2392,18 @@ diff old new
 +        // e4.b.0.0.0: structural cycle
 +        // e4.b.0.0: cannot combine regular field "c" with [1,{c:1} & [{c:1}] & (b|{})]:
 +        //     ./in.cue:411:11
++        //     ./in.cue:411:6
++        //     ./in.cue:411:7
++        //     ./in.cue:412:6
 +        // e4.b.0.0.0: cannot combine regular field "c" with [1,{c:1}]:
 +        //     ./in.cue:411:11
++        //     ./in.cue:411:6
++        //     ./in.cue:411:7
++        //     ./in.cue:412:6
        }
      }
    }
-@@ -894,19 +885,14 @@
+@@ -894,19 +909,14 @@
        y: (_|_){
          // [eval]
          0: (_|_){
@@ -2378,7 +2426,7 @@ diff old new
          }
          1: (int){ 1 }
        }
-@@ -916,19 +902,14 @@
+@@ -916,19 +926,14 @@
        y: (_|_){
          // [eval]
          0: (_|_){
@@ -2401,7 +2449,7 @@ diff old new
          }
          1: (int){ 1 }
        }
-@@ -981,7 +962,10 @@
+@@ -981,7 +986,10 @@
          head: (int){ 3 }
          tail: (struct){
            head: (int){ 4 }
@@ -2413,7 +2461,7 @@ diff old new
          }
        }
      }
-@@ -995,7 +979,10 @@
+@@ -995,7 +1003,10 @@
        head: (int){ 2 }
        tail: (struct){
          head: (int){ 3 }
@@ -2425,7 +2473,7 @@ diff old new
        }
      }
    }
-@@ -1009,8 +996,12 @@
+@@ -1009,8 +1020,12 @@
        head: (int){ 2 }
        tail: (struct){ |((struct){
            head: (int){ 3 }
@@ -2440,7 +2488,7 @@ diff old new
          }, (struct){
            head: (int){ 3 }
          }) }
-@@ -1032,9 +1023,7 @@
+@@ -1032,9 +1047,7 @@
        // [structural cycle]
        f: (_|_){
          // [structural cycle]
@@ -2451,7 +2499,7 @@ diff old new
        }
        g: (_|_){
          // [structural cycle]
-@@ -1055,10 +1044,7 @@
+@@ -1055,10 +1068,7 @@
            x: (_){ _ }
            y: (_){ _ }
          }
@@ -2463,7 +2511,7 @@ diff old new
        }
      }
      t2: (struct){
-@@ -1071,10 +1057,7 @@
+@@ -1071,10 +1081,7 @@
            x: (_){ _ }
            y: (_){ _ }
          }
@@ -2475,7 +2523,7 @@ diff old new
        }
      }
      t3: (struct){
-@@ -1089,16 +1072,8 @@
+@@ -1089,16 +1096,8 @@
            y: (_){ _ }
            z: (_){ _ }
          }
@@ -2494,7 +2542,7 @@ diff old new
        }
      }
      t4: (struct){
-@@ -1114,51 +1089,11 @@
+@@ -1114,51 +1113,11 @@
              y: (_){ _ }
              z: (_){ _ }
            }
@@ -2551,7 +2599,7 @@ diff old new
        }
      }
      t5: (struct){
-@@ -1169,6 +1104,7 @@
+@@ -1169,6 +1128,7 @@
          }
        }
        C: (struct){
@@ -2559,7 +2607,7 @@ diff old new
          y: (struct){
            y: (_|_){
              // [incomplete] crossRefNoCycle.t5.C.y.y: undefined field: x:
-@@ -1175,12 +1111,6 @@
+@@ -1175,12 +1135,6 @@
              //     ./in.cue:544:8
            }
          }
@@ -2572,7 +2620,7 @@ diff old new
        }
      }
    }
-@@ -1203,19 +1133,19 @@
+@@ -1203,19 +1157,19 @@
      }
    }
    n4: (struct){

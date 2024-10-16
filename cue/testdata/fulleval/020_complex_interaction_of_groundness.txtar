@@ -67,41 +67,6 @@ Retain: 5
 Unifications: 10
 Conjuncts:    33
 Disjuncts:    15
--- out/evalalpha --
-(struct){
-  res: (#list){
-    0: (struct){
-      d: (string){ "b" }
-      s: (string){ "ab" }
-    }
-  }
-  a: (struct){
-    b: (struct){
-      c: (struct){
-        d: (string){ string }
-        s: (_|_){
-          // [incomplete] a.b.c.s: non-concrete value string in operand to +:
-          //     ./in.cue:4:34
-          //     ./in.cue:5:13
-        }
-      }
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -12,7 +12,6 @@
-         s: (_|_){
-           // [incomplete] a.b.c.s: non-concrete value string in operand to +:
-           //     ./in.cue:4:34
--          //     ./in.cue:4:23
-           //     ./in.cue:5:13
-         }
-       }
--- diff/todo/p2 --
-Missing error position
 -- out/eval --
 (struct){
   res: (#list){

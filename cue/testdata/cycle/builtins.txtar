@@ -177,6 +177,8 @@ issue3443.matchIf.#S: cannot call non-function matchIf (type struct):
 issue3443.cycle1.cycle.s: invalid value {n:{n:_}} (does not satisfy matchN(1, [{n:matchN(1, [{n:#S}])}])): 0 matched, expected 1:
     ./matchn.cue:35:7
     ./matchn.cue:35:14
+    ./matchn.cue:47:7
+    ./matchn.cue:48:7
 issue3443.cycle2.fail.#S: invalid value {n:{n:{n:_}}} (does not satisfy matchN(1, [{n:~(issue3443.cycle2.fail.#S)}])): 0 matched, expected 1:
     ./matchn.cue:55:13
     ./matchn.cue:55:20
@@ -323,6 +325,8 @@ Result:
           // [eval] issue3443.cycle1.cycle.s: invalid value {n:{n:_}} (does not satisfy matchN(1, [{n:matchN(1, [{n:#S}])}])): 0 matched, expected 1:
           //     ./matchn.cue:35:7
           //     ./matchn.cue:35:14
+          //     ./matchn.cue:47:7
+          //     ./matchn.cue:48:7
           n: (struct){
             n: (_){ _ }
           }
@@ -351,7 +355,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,7 +1,10 @@
+@@ -1,7 +1,12 @@
  Errors:
  issue3443.matchIf.#S: cannot call non-function matchIf (type struct):
      ./matchn.cue:16:7
@@ -359,11 +363,13 @@ diff old new
 +issue3443.cycle1.cycle.s: invalid value {n:{n:_}} (does not satisfy matchN(1, [{n:matchN(1, [{n:#S}])}])): 0 matched, expected 1:
 +    ./matchn.cue:35:7
 +    ./matchn.cue:35:14
++    ./matchn.cue:47:7
++    ./matchn.cue:48:7
 +issue3443.cycle2.fail.#S: invalid value {n:{n:{n:_}}} (does not satisfy matchN(1, [{n:~(issue3443.cycle2.fail.#S)}])): 0 matched, expected 1:
      ./matchn.cue:55:13
      ./matchn.cue:55:20
  
-@@ -65,20 +68,20 @@
+@@ -65,20 +70,20 @@
    issue3410: (struct){
      _s: (struct){
        #x: (_){ matchN(1, (#list){
@@ -392,7 +398,7 @@ diff old new
          }
        }) }
    }
-@@ -85,9 +88,9 @@
+@@ -85,9 +90,9 @@
    issue3420: (struct){
      matches1: (struct){
        #S: (_){ matchN(1, (#list){
@@ -405,7 +411,7 @@ diff old new
            }
          }) }
        s: (int){ 2 }
-@@ -104,13 +107,13 @@
+@@ -104,13 +109,13 @@
      }
      noCycle: (struct){
        #S: (_){ matchN(1, (#list){
@@ -422,7 +428,7 @@ diff old new
            n: (struct){
              n: (_){ _ }
            }
-@@ -119,29 +122,34 @@
+@@ -119,29 +124,36 @@
      }
      noCycle2: (struct){
        #S: (_){ matchN(1, (#list){
@@ -467,10 +473,12 @@ diff old new
 +          // [eval] issue3443.cycle1.cycle.s: invalid value {n:{n:_}} (does not satisfy matchN(1, [{n:matchN(1, [{n:#S}])}])): 0 matched, expected 1:
 +          //     ./matchn.cue:35:7
 +          //     ./matchn.cue:35:14
++          //     ./matchn.cue:47:7
++          //     ./matchn.cue:48:7
            n: (struct){
              n: (_){ _ }
            }
-@@ -153,7 +161,7 @@
+@@ -153,7 +165,7 @@
        fail: (_|_){
          // [eval]
          #S: (_|_){

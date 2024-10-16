@@ -5,21 +5,20 @@ cmp stdout expect-stdout
 exec cue def schema.json -p schema -l '#Person:'
 cmp stdout expect-stdout
 
-! exec cue def jsonschema: bad.json
-cmp stderr expect-stderr-strict-features
+exec cue def jsonschema: bad.json
 
 # The default strictness modes should apply even when
 # we haven't explicitly specifed the jsonschema file type.
-! exec cue def bad.json
+! exec cue def jsonschema+strictFeatures: bad.json
 cmp stderr expect-stderr-strict-features
 
-exec cue def jsonschema+strictFeatures=0: bad.json
+exec cue def jsonschema: bad.json
 
 ! exec cue def jsonschema: bad.json --strict
-cmp stderr expect-stderr
+cmp stderr expect-stderr-strict
 
 ! exec cue def jsonschema+strict: bad.json
-cmp stderr expect-stderr
+cmp stderr expect-stderr-strict
 
 # With only strict features, it should error only for the
 # unimplemented feature and not for the unknown keyword.
@@ -83,7 +82,7 @@ import "strings"
   "$dynamicAnchor": "bar",
   "foo": true
 }
--- expect-stderr --
+-- expect-stderr-strict --
 keyword "$dynamicAnchor" not yet implemented:
     ./bad.json:4:3
 unknown keyword "foo":

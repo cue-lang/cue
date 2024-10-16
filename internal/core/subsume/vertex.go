@@ -221,7 +221,7 @@ outer:
 
 		a := &adt.Vertex{Label: f}
 		x.MatchAndInsert(ctx, a)
-		if len(a.Conjuncts) == 0 {
+		if !a.HasConjuncts() {
 			// It is accepted and has no further constraints, so all good.
 			continue
 		}
@@ -413,7 +413,7 @@ outer:
 
 		a := &adt.Vertex{Label: f}
 		x.MatchAndInsert(ctx, a)
-		if len(a.Conjuncts) == 0 {
+		if !a.HasConjuncts() {
 			// It is accepted and has no further constraints, so all good.
 			continue
 		}

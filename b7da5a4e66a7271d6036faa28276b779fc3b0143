@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e9a428f_c931f205",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-16T13:55:30Z",
+      "side": 1,
+      "message": "what about something like\n\n```\n// TODO(v0.12): enable strictFeatures by default\n```\n\nin types.cue?",
+      "revId": "b7da5a4e66a7271d6036faa28276b779fc3b0143",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

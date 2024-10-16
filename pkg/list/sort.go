@@ -69,12 +69,8 @@ func (s *valueSorter) Less(i, j int) bool {
 	saveX := *s.x
 	saveY := *s.y
 
-	for _, c := range x.V.Conjuncts {
-		s.x.AddConjunct(c)
-	}
-	for _, c := range y.V.Conjuncts {
-		s.y.AddConjunct(c)
-	}
+	s.x.InsertConjunctsFrom(x.V)
+	s.y.InsertConjunctsFrom(y.V)
 
 	// TODO(perf): if we can determine that the comparator values for
 	// x and y are idempotent (no arcs and a basevalue being top or
@@ -121,12 +117,8 @@ func (s *valueSorter) lessNew(i, j int) bool {
 	s.a[i].Core(&x)
 	s.a[j].Core(&y)
 
-	for _, c := range x.V.Conjuncts {
-		xa.AddConjunct(c)
-	}
-	for _, c := range y.V.Conjuncts {
-		ya.AddConjunct(c)
-	}
+	xa.InsertConjunctsFrom(x.V)
+	ya.InsertConjunctsFrom(y.V)
 
 	// TODO(perf): if we can determine that the comparator values for
 	// x and y are idempotent (no arcs and a basevalue being top or

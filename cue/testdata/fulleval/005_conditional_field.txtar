@@ -73,10 +73,12 @@ Disjuncts:    7
     // [incomplete] d: non-concrete value int in operand to >:
     //     ./in.cue:14:5
     //     ./in.cue:13:5
+    //     ./in.cue:14:2
     a: (_|_){
       // [incomplete] d: non-concrete value int in operand to >:
       //     ./in.cue:14:5
       //     ./in.cue:13:5
+      //     ./in.cue:14:2
     }
   }
 }
@@ -84,7 +86,7 @@ Disjuncts:    7
 diff old new
 --- old
 +++ new
-@@ -5,7 +5,13 @@
+@@ -5,7 +5,15 @@
      a: (int){ 3 }
    }
    d: (_|_){
@@ -92,10 +94,12 @@ diff old new
 +    // [incomplete] d: non-concrete value int in operand to >:
      //     ./in.cue:14:5
 +    //     ./in.cue:13:5
++    //     ./in.cue:14:2
 +    a: (_|_){
 +      // [incomplete] d: non-concrete value int in operand to >:
 +      //     ./in.cue:14:5
 +      //     ./in.cue:13:5
++      //     ./in.cue:14:2
 +    }
    }
  }

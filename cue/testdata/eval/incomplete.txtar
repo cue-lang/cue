@@ -159,21 +159,26 @@ Disjuncts:    29
     a: (_|_){
       // [incomplete] E.b: non-concrete value >=5 in operand to -:
       //     ./in.cue:13:5
+      //     ./in.cue:14:5
       //     ./in.cue:14:11
       // E.c: non-concrete value _ in operand to +:
       //     ./in.cue:14:5
+      //     ./in.cue:12:5
     }
     b: (_|_){
       // [incomplete] E.b: non-concrete value >=5 in operand to -:
       //     ./in.cue:13:5
+      //     ./in.cue:14:5
       //     ./in.cue:14:11
     }
     c: (_|_){
       // [incomplete] E.b: non-concrete value >=5 in operand to -:
       //     ./in.cue:13:5
+      //     ./in.cue:14:5
       //     ./in.cue:14:11
       // E.c: non-concrete value _ in operand to +:
       //     ./in.cue:14:5
+      //     ./in.cue:12:5
     }
   }
   a: (int){ int }
@@ -215,7 +220,7 @@ Disjuncts:    29
 diff old new
 --- old
 +++ new
-@@ -20,22 +20,28 @@
+@@ -20,22 +20,33 @@
      //     ./in.cue:1:4
    }
    e5: (_|_){
@@ -226,18 +231,20 @@ diff old new
    E: (struct){
      a: (_|_){
 -      // [cycle] cycle error:
--      //     ./in.cue:12:5
 +      // [incomplete] E.b: non-concrete value >=5 in operand to -:
 +      //     ./in.cue:13:5
++      //     ./in.cue:14:5
 +      //     ./in.cue:14:11
 +      // E.c: non-concrete value _ in operand to +:
 +      //     ./in.cue:14:5
+       //     ./in.cue:12:5
      }
      b: (_|_){
 -      // [cycle] cycle error:
 -      //     ./in.cue:13:5
 +      // [incomplete] E.b: non-concrete value >=5 in operand to -:
 +      //     ./in.cue:13:5
++      //     ./in.cue:14:5
 +      //     ./in.cue:14:11
      }
      c: (_|_){
@@ -247,9 +254,11 @@ diff old new
 -      //     ./in.cue:13:5
 +      // [incomplete] E.b: non-concrete value >=5 in operand to -:
 +      //     ./in.cue:13:5
++      //     ./in.cue:14:5
 +      //     ./in.cue:14:11
 +      // E.c: non-concrete value _ in operand to +:
 +      //     ./in.cue:14:5
++      //     ./in.cue:12:5
      }
    }
    a: (int){ int }

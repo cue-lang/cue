@@ -884,6 +884,7 @@ Result:
         // [incomplete] embed.incomplete7.p: non-concrete value int in operand to +:
         //     ./in.cue:93:6
         //     ./in.cue:94:6
+        //     ./in.cue:95:3
       }
       q: (int){ int }
     }
@@ -1479,15 +1480,7 @@ diff old new
          //     ./in.cue:74:4
          q: (int){ 1 }
        }
-@@ -130,7 +111,6 @@
-         // [incomplete] embed.incomplete7.p: non-concrete value int in operand to +:
-         //     ./in.cue:93:6
-         //     ./in.cue:94:6
--        //     ./in.cue:95:3
-       }
-       q: (int){ int }
-     }
-@@ -179,8 +159,7 @@
+@@ -179,8 +160,7 @@
        // [structural cycle] noStackOverflowStructCycle.list.tail: structural cycle
      }
    }
@@ -1497,7 +1490,7 @@ diff old new
      t1: (struct){
        #a: (_|_){
          // [incomplete] provideIncompleteSuccess.t1.#a: incomplete bool: bool:
-@@ -188,16 +167,12 @@
+@@ -188,16 +168,12 @@
          b: (bool){ bool }
        }
        x: (#struct){
@@ -1520,7 +1513,7 @@ diff old new
        #a: (#struct){
          c: (int){ 4 }
          b: (bool){ true }
-@@ -204,17 +179,8 @@
+@@ -204,17 +180,8 @@
        }
        #c: (#struct){
        }
@@ -1540,7 +1533,7 @@ diff old new
          }
          b: (bool){ true }
        }
-@@ -244,9 +210,22 @@
+@@ -244,9 +211,22 @@
    }
    cyclicError: (struct){
      a: (_|_){
@@ -1566,7 +1559,7 @@ diff old new
      }
    }
    midwayReferences: (struct){
-@@ -260,24 +239,9 @@
+@@ -260,24 +240,9 @@
          }
        }
      }
@@ -1594,7 +1587,7 @@ diff old new
    }
    closedCheck: (struct){
      success1: (struct){
-@@ -380,13 +344,7 @@
+@@ -380,13 +345,7 @@
            }
          }
        }
@@ -1609,7 +1602,7 @@ diff old new
        #F: (#struct){
          e: (bool){ bool }
          f: (_|_){
-@@ -403,17 +361,10 @@
+@@ -403,17 +362,10 @@
          }
        }
        E: (_|_){
@@ -1628,7 +1621,7 @@ diff old new
        }
      }
      derefDisj2: (struct){
-@@ -424,17 +375,10 @@
+@@ -424,17 +376,10 @@
          }
        }
        E: (_|_){
@@ -1647,7 +1640,7 @@ diff old new
        }
      }
      bulk1: (struct){
-@@ -557,9 +501,7 @@
+@@ -557,9 +502,7 @@
            // [eval]
            e: (_|_){
              // [eval] structShare.err1.x.d.e: field not allowed:
@@ -1658,7 +1651,7 @@ diff old new
              //     ./in.cue:578:9
            }
          }
-@@ -583,13 +525,13 @@
+@@ -583,13 +526,13 @@
        }
        envs: (struct){
          e1: (#struct){
@@ -1676,7 +1669,7 @@ diff old new
          }
        }
      }
-@@ -626,9 +568,8 @@
+@@ -626,9 +569,8 @@
      _c: (struct){
        y: (int){ 1 }
      }

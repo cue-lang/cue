@@ -242,15 +242,18 @@ Result:
     x: (_|_){
       // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
       //     ./in.cue:72:11
+      //     ./in.cue:73:11
     }
     y: (_){ _ }
     decimal: (_|_){
       // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
       //     ./in.cue:72:11
+      //     ./in.cue:73:11
     }
     str: (_|_){
       // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
       //     ./in.cue:72:11
+      //     ./in.cue:73:11
     }
   }
   badListType: (_|_){
@@ -320,6 +323,29 @@ diff old new
          //     ./in.cue:59:16
          //     ./in.cue:58:16
        }
+@@ -129,15 +129,18 @@
+     x: (_|_){
+       // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
+       //     ./in.cue:72:11
++      //     ./in.cue:73:11
+     }
+     y: (_){ _ }
+     decimal: (_|_){
+       // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
+       //     ./in.cue:72:11
+-    }
+-    str: (_|_){
+-      // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
+-      //     ./in.cue:72:11
++      //     ./in.cue:73:11
++    }
++    str: (_|_){
++      // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
++      //     ./in.cue:72:11
++      //     ./in.cue:73:11
+     }
+   }
+   badListType: (_|_){
 -- out/eval --
 Errors:
 badListType.decimal: cannot use 2 (type int) as list in argument 1 to list.Max:

@@ -97,9 +97,11 @@ o3.a: conflicting values "baz" and "foo":
     ./in.cue:20:24
 a3.a: invalid value "bar" (out of bound =~"oo"):
     ./in.cue:8:5
+    ./in.cue:7:5
     ./in.cue:12:14
 a3.a: invalid value "bar" (out of bound =~"fo"):
     ./in.cue:9:5
+    ./in.cue:7:5
     ./in.cue:12:14
 stringListErrors.b.result: invalid list element 0 in argument 0 to call: cannot use value int (int) as string:
     ./in.cue:31:11
@@ -128,9 +130,11 @@ Result:
     a: (_|_){
       // [eval] a3.a: invalid value "bar" (out of bound =~"oo"):
       //     ./in.cue:8:5
+      //     ./in.cue:7:5
       //     ./in.cue:12:14
       // a3.a: invalid value "bar" (out of bound =~"fo"):
       //     ./in.cue:9:5
+      //     ./in.cue:7:5
       //     ./in.cue:12:14
     }
     b: (string){ =~"oo" }
@@ -221,7 +225,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,22 +1,15 @@
+@@ -1,13 +1,8 @@
  Errors:
 -o3.a: 2 errors in empty disjunction:
  o3.a: conflicting values "bar" and "foo":
@@ -235,28 +239,7 @@ diff old new
      ./in.cue:20:14
      ./in.cue:20:24
  a3.a: invalid value "bar" (out of bound =~"oo"):
-     ./in.cue:8:5
--    ./in.cue:7:5
-     ./in.cue:12:14
- a3.a: invalid value "bar" (out of bound =~"fo"):
-     ./in.cue:9:5
--    ./in.cue:7:5
-     ./in.cue:12:14
- stringListErrors.b.result: invalid list element 0 in argument 0 to call: cannot use value int (int) as string:
-     ./in.cue:31:11
-@@ -45,11 +38,9 @@
-     a: (_|_){
-       // [eval] a3.a: invalid value "bar" (out of bound =~"oo"):
-       //     ./in.cue:8:5
--      //     ./in.cue:7:5
-       //     ./in.cue:12:14
-       // a3.a: invalid value "bar" (out of bound =~"fo"):
-       //     ./in.cue:9:5
--      //     ./in.cue:7:5
-       //     ./in.cue:12:14
-     }
-     b: (string){ =~"oo" }
-@@ -68,15 +59,10 @@
+@@ -68,15 +63,10 @@
    o3: (_|_){
      // [eval]
      a: (_|_){

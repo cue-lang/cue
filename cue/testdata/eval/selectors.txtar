@@ -26,50 +26,6 @@ Retain: 0
 Unifications: 18
 Conjuncts:    27
 Disjuncts:    18
--- out/evalalpha --
-(struct){
-  a: (int){ 1 }
-  b: (int){ 2 }
-  d: (struct){
-    x: (_){ _ }
-    y: (_|_){
-      // [incomplete] d.y: non-concrete value _ in operand to +:
-      //     ./in.cue:5:5
-    }
-  }
-  e: (struct){
-    x: (int){ 5 }
-    y: (int){ 7 }
-  }
-  f: (struct){
-    a: (struct){
-      "foo-bar": (int){ 3 }
-    }
-    b: (int){ 3 }
-  }
-  g: (struct){
-    a: (struct){
-      "foo-bar": (struct){
-        c: (int){ 3 }
-      }
-    }
-    b: (int){ 3 }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -6,7 +6,6 @@
-     y: (_|_){
-       // [incomplete] d.y: non-concrete value _ in operand to +:
-       //     ./in.cue:5:5
--      //     ./in.cue:4:5
-     }
-   }
-   e: (struct){
--- diff/todo/p2 --
-Missing error positions.
 -- out/eval --
 (struct){
   a: (int){ 1 }

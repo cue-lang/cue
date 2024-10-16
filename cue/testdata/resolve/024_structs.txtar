@@ -48,47 +48,6 @@ Retain: 2
 Unifications: 13
 Conjuncts:    33
 Disjuncts:    15
--- out/evalalpha --
-(struct){
-  a: (struct){
-    c: (int){ 5 }
-    d: (int){ 15 }
-  }
-  b: (struct){
-    c: (int){ 7 }
-    d: (int){ 21 }
-  }
-  t: (struct){
-    c: (number){ number }
-    d: (_|_){
-      // [incomplete] t.d: non-concrete value number in operand to *:
-      //     ./in.cue:3:19
-      //     ./in.cue:3:8
-    }
-  }
-  ti: (struct){
-    c: (int){ int }
-    d: (_|_){
-      // [incomplete] ti.d: non-concrete value int in operand to *:
-      //     ./in.cue:3:19
-      //     ./in.cue:4:13
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -20,7 +20,6 @@
-     d: (_|_){
-       // [incomplete] ti.d: non-concrete value int in operand to *:
-       //     ./in.cue:3:19
--      //     ./in.cue:3:8
-       //     ./in.cue:4:13
-     }
-   }
--- diff/todo/p2 --
-error positions
 -- out/eval --
 (struct){
   a: (struct){

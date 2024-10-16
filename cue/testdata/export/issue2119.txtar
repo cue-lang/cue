@@ -42,54 +42,6 @@ Retain: 4
 Unifications: 24
 Conjuncts:    42
 Disjuncts:    24
--- out/evalalpha --
-(struct){
-  simplified: (struct){
-    x: (struct){
-      d: (string){ ".*" }
-    }
-    out: (string){ "d: .*\n" }
-  }
-  original: (struct){
-    #testableRegexp: (string){
-      string
-      #test: (#struct){
-        in: (string){ string }
-        out: (_|_){
-          // [incomplete] original.#testableRegexp.#test.out: non-concrete value string in operand to +:
-          //     ./in.cue:20:29
-          //     ./in.cue:16:3
-        }
-      }
-    }
-    rule: (struct){
-      #patterns: (#struct){
-        bar: (string){
-          "(.*)"
-          #test: (#struct){
-            in: (string){ "testcontent" }
-            out: (string){ "testcontent" }
-          }
-        }
-      }
-    }
-    out: (string){ "{}\n" }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -13,7 +13,6 @@
-         out: (_|_){
-           // [incomplete] original.#testableRegexp.#test.out: non-concrete value string in operand to +:
-           //     ./in.cue:20:29
--          //     ./in.cue:15:21
-           //     ./in.cue:16:3
-         }
-       }
--- diff/todo/p2 --
-Missing error position.
 -- out/eval --
 (struct){
   simplified: (struct){

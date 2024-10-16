@@ -617,6 +617,7 @@ issue770: {
                     // [incomplete] nestedNonMonotonic.incomplete.a.n2.p1.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
                     //     ./in.cue:96:15
                     //     ./in.cue:96:32
+                    //     ./in.cue:97:12
                     c: (int){ 1 }
                   }
                 }
@@ -628,6 +629,7 @@ issue770: {
                   b: (_|_){
                     // [incomplete] nestedNonMonotonic.incomplete.a.n2.p2.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
                     //     ./in.cue:102:15
+                    //     ./in.cue:101:12
                     //     ./in.cue:102:32
                     c: (int){ 1 }
                   }
@@ -655,6 +657,14 @@ issue770: {
                   b: (_|_){
                     // [incomplete] nestedNonMonotonic.incomplete.b.n2.p1.x.a.b: invalid value {c:1,d:1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
                     //     ./in.cue:138:15
+                    //     ./in.cue:124:15
+                    //     ./in.cue:125:12
+                    //     ./in.cue:126:12
+                    //     ./in.cue:130:12
+                    //     ./in.cue:131:15
+                    //     ./in.cue:132:12
+                    //     ./in.cue:136:12
+                    //     ./in.cue:137:12
                     //     ./in.cue:138:32
                     c: (int){ 1 }
                     d: (int){ 1 }
@@ -1469,41 +1479,16 @@ diff old new
    disambiguateClosed: (struct){
      b: (#struct){ |((#struct){
          x: (bool){ true }
-@@ -143,7 +89,6 @@
-                     // [incomplete] nestedNonMonotonic.incomplete.a.n2.p1.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
-                     //     ./in.cue:96:15
-                     //     ./in.cue:96:32
--                    //     ./in.cue:97:12
-                     c: (int){ 1 }
-                   }
-                 }
-@@ -155,7 +100,6 @@
-                   b: (_|_){
-                     // [incomplete] nestedNonMonotonic.incomplete.a.n2.p2.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
-                     //     ./in.cue:102:15
--                    //     ./in.cue:101:12
-                     //     ./in.cue:102:32
-                     c: (int){ 1 }
-                   }
-@@ -181,16 +125,8 @@
+@@ -181,7 +127,7 @@
              x: ((null|struct)){ |((struct){
                  a: (struct){
                    b: (_|_){
 -                    // [incomplete] nestedNonMonotonic.incomplete.b.n2.p1.x.a.b: invalid value {c:1 & 1 & 1,d:1 & 1 & 1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
 +                    // [incomplete] nestedNonMonotonic.incomplete.b.n2.p1.x.a.b: invalid value {c:1,d:1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
                      //     ./in.cue:138:15
--                    //     ./in.cue:124:15
--                    //     ./in.cue:125:12
--                    //     ./in.cue:126:12
--                    //     ./in.cue:130:12
--                    //     ./in.cue:131:15
--                    //     ./in.cue:132:12
--                    //     ./in.cue:136:12
--                    //     ./in.cue:137:12
-                     //     ./in.cue:138:32
-                     c: (int){ 1 }
-                     d: (int){ 1 }
-@@ -205,24 +141,24 @@
+                     //     ./in.cue:124:15
+                     //     ./in.cue:125:12
+@@ -205,24 +151,24 @@
    preserveClosedness: (struct){
      small: (struct){
        p1: (struct){
@@ -1546,7 +1531,7 @@ diff old new
              a: (string){ string }
            }, (#struct){
              a: (string){ string }
-@@ -241,40 +177,40 @@
+@@ -241,40 +187,40 @@
      }
      medium: (struct){
        p1: (struct){
@@ -1621,7 +1606,7 @@ diff old new
              a: (string){ string }
            }, (#struct){
              a: (string){ string }
-@@ -307,7 +243,7 @@
+@@ -307,7 +253,7 @@
            }) }
        }
        p3: (struct){
@@ -1630,7 +1615,7 @@ diff old new
              a: (string){ string }
            }, (#struct){
              a: (string){ string }
-@@ -349,10 +285,6 @@
+@@ -349,10 +295,6 @@
        #type: (#struct){
          fieldName: ((string|struct)){ |((string){ string }, (#struct){
              foo: (string){ string }
@@ -1641,7 +1626,7 @@ diff old new
            }) }
        }
        #subtype: ((string|struct)){ |((string){ string }, (#struct){
-@@ -432,12 +364,8 @@
+@@ -432,12 +374,8 @@
      #T: (list){
        0: (string){ "d" }
      }
@@ -1656,7 +1641,7 @@ diff old new
    }
    issue1940: (struct){
      #T: (#list){
-@@ -446,53 +374,24 @@
+@@ -446,53 +384,24 @@
        }
      }
      #A: (#struct){
@@ -1722,7 +1707,7 @@ diff old new
        t1: (struct){
          #SpecFoo: (#struct){
            foo: (#struct){
-@@ -510,36 +409,20 @@
+@@ -510,36 +419,20 @@
            }
          }
          out: (struct){ |((struct){
@@ -1773,7 +1758,7 @@ diff old new
              nullBar: (null){ null }
            }) }
        }
-@@ -555,48 +438,45 @@
+@@ -555,48 +448,45 @@
              x: (int){ 1 }
            }
          }
@@ -1861,7 +1846,7 @@ diff old new
        Foo: (#struct){
          spec: (#struct){
            foo: (#struct){
-@@ -605,135 +485,52 @@
+@@ -605,135 +495,52 @@
            }
          }
          resource: (#struct){
@@ -2043,7 +2028,7 @@ diff old new
          }
        }
        #Abstract: (#struct){
-@@ -749,34 +546,34 @@
+@@ -749,34 +556,34 @@
              }
            }) }
          resource: (#struct){
@@ -2106,7 +2091,7 @@ diff old new
          }
        }
        _#Spec: (#struct){ |(*(#struct){
-@@ -803,36 +600,36 @@
+@@ -803,36 +610,36 @@
          }
        }
        _Thing: (#struct){
@@ -2172,7 +2157,7 @@ diff old new
        }
        #Constrained: (#struct){
          spec: (#struct){ |(*(#struct){
-@@ -916,19 +713,19 @@
+@@ -916,19 +723,19 @@
            common: (int){ 3 }
          }
          #FormFoo: (#struct){
@@ -2199,7 +2184,7 @@ diff old new
            }) }
        }
        #Input: (#struct){
-@@ -936,18 +733,12 @@
+@@ -936,18 +743,12 @@
          }
        }
        #summarizeReturn: (#struct){
@@ -2220,7 +2205,7 @@ diff old new
          out: (#list){
          }
        }
-@@ -977,10 +768,23 @@
+@@ -977,10 +778,23 @@
      }
      full: (struct){
        metrics: (#list){
@@ -2248,7 +2233,7 @@ diff old new
          1: (#struct){
            id: (string){ "bar" }
            value: (int){ 80 }
-@@ -1031,13 +835,11 @@
+@@ -1031,13 +845,11 @@
        }
      }
    }
@@ -2264,7 +2249,7 @@ diff old new
        0: (#struct){
          name: (string){ "FooBarFoo" }
        }
-@@ -1047,19 +849,8 @@
+@@ -1047,19 +859,8 @@
        2: (#struct){
          name: (string){ "FooQuuxFoo" }
        }
@@ -2286,7 +2271,7 @@ diff old new
        }
      }
    }
-@@ -1078,10 +869,10 @@
+@@ -1078,10 +879,10 @@
          v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
        }
        c: (#struct){

@@ -24,21 +24,21 @@ root: [
 -- out/run/errors --
 -- out/run/t0 --
 graph TD
-  t0("root[0] [Ready]")
+  t0("root[2] [Waiting]")
+  t0-->t2
+  t0-->t1
   t1("root[1] [Waiting]")
-  t1-->t0
-  t2("root[2] [Waiting]")
-  t2-->t0
-  t2-->t1
+  t1-->t2
+  t2("root[0] [Ready]")
 
 -- out/run/t1 --
 graph TD
-  t0("root[0] [Terminated]")
+  t0("root[2] [Waiting]")
+  t0-->t2
+  t0-->t1
   t1("root[1] [Ready]")
-  t1-->t0
-  t2("root[2] [Waiting]")
-  t2-->t0
-  t2-->t1
+  t1-->t2
+  t2("root[0] [Terminated]")
 
 -- out/run/t1/value --
 {
@@ -58,12 +58,12 @@ Conjuncts:    30
 Disjuncts:    17
 -- out/run/t2 --
 graph TD
-  t0("root[0] [Terminated]")
+  t0("root[2] [Ready]")
+  t0-->t2
+  t0-->t1
   t1("root[1] [Terminated]")
-  t1-->t0
-  t2("root[2] [Ready]")
-  t2-->t0
-  t2-->t1
+  t1-->t2
+  t2("root[0] [Terminated]")
 
 -- out/run/t2/value --
 {
@@ -88,12 +88,12 @@ Conjuncts:    33
 Disjuncts:    17
 -- out/run/t3 --
 graph TD
-  t0("root[0] [Terminated]")
+  t0("root[2] [Terminated]")
+  t0-->t2
+  t0-->t1
   t1("root[1] [Terminated]")
-  t1-->t0
-  t2("root[2] [Terminated]")
-  t2-->t0
-  t2-->t1
+  t1-->t2
+  t2("root[0] [Terminated]")
 
 -- out/run/t3/value --
 {

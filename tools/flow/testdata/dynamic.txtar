@@ -61,8 +61,8 @@ graph TD
 -- out/run/t2/value --
 {
 	$id: "sequenced"
-	seq: 2
 	out: "foo2"
+	seq: 2
 	val: "foo2"
 }
 -- out/run/t3 --
@@ -81,8 +81,8 @@ graph TD
 	$id: "list"
 	$after: [{
 		$id: "sequenced"
-		seq: 2
 		out: "foo2"
+		seq: 2
 		val: "foo2"
 	}]
 	out: [1, 2]

@@ -2153,6 +2153,7 @@ func (n *nodeContext) addStruct(
 			// TODO(perf): only do this if addExprConjunct below will result in
 			// a fieldSet. Otherwise the entry will just be removed next.
 			id := closeInfo.SpawnEmbed(x)
+			id.decl = x
 
 			c := MakeConjunct(childEnv, x, id)
 			n.addExprConjunct(c, partial)

@@ -178,7 +178,6 @@ func TestSyntax(t *testing.T) {
 		out: `
 {
 	spec: {
-		replicas: 3
 		containers: [{
 			image: *"myimage" | string
 			name:  "main"
@@ -187,6 +186,7 @@ func TestSyntax(t *testing.T) {
 		other: {
 			option: int
 		}
+		replicas: 3
 	}
 	incomplete: {
 		x: {}.x

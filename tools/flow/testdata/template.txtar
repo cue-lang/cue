@@ -38,12 +38,12 @@ graph TD
 
 -- out/run-v3/t2/value --
 {
-	$id:   "tool/exec.Run"
-	stdin: GET.response.body & (*null | string | bytes)
-	cmd:   "go run cuelang.org/go/cmd/cue import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue"
+	$id: "tool/exec.Run"
+	cmd: "go run cuelang.org/go/cmd/cue import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue"
 	env: {} | []
 	stdout:      "foo"
 	stderr:      null
+	stdin:       GET.response.body & (*null | string | bytes)
 	success:     bool
 	mustSucceed: true
 
@@ -67,55 +67,26 @@ graph TD
 diff old new
 --- old
 +++ new
-@@ -1,10 +1,10 @@
- {
--	$id: "tool/exec.Run"
--	cmd: "go run cuelang.org/go/cmd/cue import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue"
-+	$id:   "tool/exec.Run"
-+	stdin: GET.response.body & (*null | string | bytes)
-+	cmd:   "go run cuelang.org/go/cmd/cue import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue"
+@@ -4,7 +4,7 @@
  	env: {} | []
  	stdout:      "foo"
  	stderr:      null
 -	stdin:       (*null | string | bytes) & GET.response.body
++	stdin:       GET.response.body & (*null | string | bytes)
  	success:     bool
  	mustSucceed: true
  
 -- diff/value/p3 --
 Reordering.
--- out/run-v3/t1/value --
-{
-	$id:    "tool/http.Do"
-	method: "GET"
-	stdout: "foo"
-	request: {
-		body: ""
-	}
-	url: "https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
-}
--- diff/-out/run-v3/t1/value<==>+out/run/t1/value --
-diff old new
---- old
-+++ new
-@@ -2,8 +2,8 @@
- 	$id:    "tool/http.Do"
- 	method: "GET"
- 	stdout: "foo"
--	url:    "https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
- 	request: {
- 		body: ""
- 	}
-+	url: "https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
- }
 -- out/run/t1/value --
 {
 	$id:    "tool/http.Do"
 	method: "GET"
-	stdout: "foo"
 	url:    "https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
 	request: {
 		body: ""
 	}
+	stdout: "foo"
 }
 -- out/run/t1/stats --
 Leaks:  0

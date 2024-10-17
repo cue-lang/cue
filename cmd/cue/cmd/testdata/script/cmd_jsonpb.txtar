@@ -67,13 +67,13 @@ s: "SGVsbG8sIOS4lueVjA=="
 t: 'Hello, 世界'
 -- out/stream --
 A: {
-    kind: "A"
     a:    10
     b:    'Hello, 世界'
+    kind: "A"
 }
 B: {
-    kind: "B"
     a:    10
+    kind: "B"
     s:    "SGVsbG8sIOS4lueVjA=="
 }
 -- out/data-err --

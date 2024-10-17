@@ -151,11 +151,11 @@ c: """
 
     """
 d: {
-    "y/_test.json": {
-        z: 45
-    }
     "x/input.yaml": {
         a1: 2
+    }
+    "y/_test.json": {
+        z: 45
     }
     "y/test.json": {
         x: 34
@@ -237,8 +237,8 @@ c: """
 
 	"""
 d: {
-	"y/_test.json": z:  45
 	"x/input.yaml": a1: 2
+	"y/_test.json": z:  45
 	"y/test.json": x:   34
 }
 f: info: {

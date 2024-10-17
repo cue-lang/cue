@@ -367,6 +367,21 @@ y: Y & Y_1
 -- out/value-v3 --
 == Simplified
 {
+	cfgs: [{
+		metadata: {
+			name: "one"
+		}
+	}, {
+		metadata: {
+			name: "two"
+		}
+	}]
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
+		}
+	}
 	comprehension: {
 		for cfg in [{
 			a: "one"
@@ -377,24 +392,48 @@ y: Y & Y_1
 			}
 		}
 	}
-	complete: {
-		x: "a foo z"
-		run: {
-			a: "foo"
-		}
-	}
-	cfgs: [{
-		metadata: {
-			name: "one"
-		}
-	}, {
-		metadata: {
-			name: "two"
-		}
-	}]
 	files: {
 		"\("kind-\(cfg.name)")": {
 			patches: cfg
+		}
+	}
+	incomplete: {
+		a: {
+			x: "a \(run.a) z"
+			run: {
+				a: string
+			}
+		}
+		b: {
+			let A = run.a
+			x: "a \(A) z"
+			run: {
+				a: string
+			}
+		}
+		c: {
+			let A_1 = run.a
+			let A_2 = run2.a
+			x: "a \(A_1) z"
+			run: {
+				a: string
+			}
+			x2: "a \(A_2) z"
+			run2: {
+				a: string
+			}
+		}
+		d: {
+			let A_3 = run.a
+			let A_4 = run2.a
+			x: "a \(A_3) z"
+			run: {
+				a: string
+			}
+			x2: "a \(A_4) z"
+			run2: {
+				a: string
+			}
 		}
 	}
 	scoped: {
@@ -419,7 +458,43 @@ y: Y & Y_1
 			a: [1]
 		}
 	}
+	unresolvedDisjunction: {}
 	x: "foo"
+	y: "foo"
+}
+== Raw
+{
+	#Foo: 2
+	cfgs: [{
+		metadata: {
+			name: "one"
+		}
+	}, {
+		metadata: {
+			name: "two"
+		}
+	}]
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
+		}
+	}
+	comprehension: {
+		for cfg in [{
+			a: "one"
+		}] {
+			let filepath = "kind-\(cfg.name)"
+			"\(filepath)": {
+				patches: cfg
+			}
+		}
+	}
+	files: {
+		"\("kind-\(cfg.name)")": {
+			patches: cfg
+		}
+	}
 	incomplete: {
 		a: {
 			x: "a \(run.a) z"
@@ -437,11 +512,11 @@ y: Y & Y_1
 		c: {
 			let A_1 = run.a
 			let A_2 = run2.a
-			x:  "a \(A_1) z"
-			x2: "a \(A_2) z"
+			x: "a \(A_1) z"
 			run: {
 				a: string
 			}
+			x2: "a \(A_2) z"
 			run2: {
 				a: string
 			}
@@ -449,50 +524,14 @@ y: Y & Y_1
 		d: {
 			let A_3 = run.a
 			let A_4 = run2.a
-			x:  "a \(A_3) z"
-			x2: "a \(A_4) z"
+			x: "a \(A_3) z"
 			run: {
 				a: string
 			}
+			x2: "a \(A_4) z"
 			run2: {
 				a: string
 			}
-		}
-	}
-	unresolvedDisjunction: {}
-	y: "foo"
-}
-== Raw
-{
-	comprehension: {
-		for cfg in [{
-			a: "one"
-		}] {
-			let filepath = "kind-\(cfg.name)"
-			"\(filepath)": {
-				patches: cfg
-			}
-		}
-	}
-	#Foo: 2
-	complete: {
-		x: "a foo z"
-		run: {
-			a: "foo"
-		}
-	}
-	cfgs: [{
-		metadata: {
-			name: "one"
-		}
-	}, {
-		metadata: {
-			name: "two"
-		}
-	}]
-	files: {
-		"\("kind-\(cfg.name)")": {
-			patches: cfg
 		}
 	}
 	scoped: {
@@ -520,46 +559,6 @@ y: Y & Y_1
 			a: [1]
 		}
 	}
-	x: "foo"
-	incomplete: {
-		a: {
-			x: "a \(run.a) z"
-			run: {
-				a: string
-			}
-		}
-		b: {
-			let A = run.a
-			x: "a \(A) z"
-			run: {
-				a: string
-			}
-		}
-		c: {
-			let A_1 = run.a
-			let A_2 = run2.a
-			x:  "a \(A_1) z"
-			x2: "a \(A_2) z"
-			run: {
-				a: string
-			}
-			run2: {
-				a: string
-			}
-		}
-		d: {
-			let A_3 = run.a
-			let A_4 = run2.a
-			x:  "a \(A_3) z"
-			x2: "a \(A_4) z"
-			run: {
-				a: string
-			}
-			run2: {
-				a: string
-			}
-		}
-	}
 	unresolvedDisjunction: {
 		#TypePrimitive: {
 			_args: {
@@ -579,17 +578,11 @@ y: Y & Y_1
 			}
 		}
 	}
+	x: "foo"
 	y: "foo"
 }
 == Final
 {
-	comprehension: _|_ // comprehension: key value of dynamic field must be concrete, found _|_(invalid interpolation: invalid interpolation: comprehension.filepath: undefined field: name) (and 1 more errors)
-	complete: {
-		x: "a foo z"
-		run: {
-			a: "foo"
-		}
-	}
 	cfgs: [{
 		metadata: {
 			name: "one"
@@ -599,30 +592,14 @@ y: Y & Y_1
 			name: "two"
 		}
 	}]
-	files: _|_ // files: key value of dynamic field must be concrete, found _|_(invalid interpolation: invalid interpolation: filepath: undefined field: name) (and 3 more errors)
-	scoped: {
-		direct: {
-			a: 1
-		}
-		embed1: {
-			a: 1
-		}
-		embed2: {
-			a: 1
-		}
-		list: {
-			a: [1]
-		}
-		listStruct: {
-			a: [{
-				a: 1
-			}]
-		}
-		listEmbed: {
-			a: [1]
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
 		}
 	}
-	x: "foo"
+	comprehension: _|_ // comprehension: key value of dynamic field must be concrete, found _|_(invalid interpolation: invalid interpolation: comprehension.filepath: undefined field: name) (and 1 more errors)
+	files:         _|_ // files: key value of dynamic field must be concrete, found _|_(invalid interpolation: invalid interpolation: filepath: undefined field: name) (and 3 more errors)
 	incomplete: {
 		a: {
 			x: _|_ // invalid interpolation: incomplete.a.x: non-concrete value string (type string)
@@ -637,31 +614,70 @@ y: Y & Y_1
 			}
 		}
 		c: {
-			x:  _|_ // invalid interpolation: incomplete.c.x: non-concrete value string (type string)
-			x2: _|_ // invalid interpolation: incomplete.c.x2: non-concrete value string (type string)
+			x: _|_ // invalid interpolation: incomplete.c.x: non-concrete value string (type string)
 			run: {
 				a: string
 			}
+			x2: _|_ // invalid interpolation: incomplete.c.x2: non-concrete value string (type string)
 			run2: {
 				a: string
 			}
 		}
 		d: {
-			x:  _|_ // invalid interpolation: incomplete.d.x: non-concrete value string (type string)
-			x2: _|_ // invalid interpolation: incomplete.d.x2: non-concrete value string (type string)
+			x: _|_ // invalid interpolation: incomplete.d.x: non-concrete value string (type string)
 			run: {
 				a: string
 			}
+			x2: _|_ // invalid interpolation: incomplete.d.x2: non-concrete value string (type string)
 			run2: {
 				a: string
 			}
 		}
 	}
+	scoped: {
+		direct: {
+			a: 1
+		}
+		embed1: {
+			a: 1
+		}
+		embed2: {
+			a: 1
+		}
+		list: {
+			a: [1]
+		}
+		listStruct: {
+			a: [{
+				a: 1
+			}]
+		}
+		listEmbed: {
+			a: [1]
+		}
+	}
 	unresolvedDisjunction: {}
+	x: "foo"
 	y: "foo"
 }
 == All
 {
+	#Foo: 2
+	cfgs: [{
+		metadata: {
+			name: "one"
+		}
+	}, {
+		metadata: {
+			name: "two"
+		}
+	}]
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
+		}
+	}
 	comprehension: {
 		for cfg in [{
 			a: "one"
@@ -672,25 +688,48 @@ y: Y & Y_1
 			}
 		}
 	}
-	#Foo: 2
-	complete: {
-		x: "a foo z"
-		run: {
-			a: "foo"
-		}
-	}
-	cfgs: [{
-		metadata: {
-			name: "one"
-		}
-	}, {
-		metadata: {
-			name: "two"
-		}
-	}]
 	files: {
 		"\("kind-\(cfg.name)")": {
 			patches: cfg
+		}
+	}
+	incomplete: {
+		a: {
+			x: "a \(run.a) z"
+			run: {
+				a: string
+			}
+		}
+		b: {
+			let A = run.a
+			x: "a \(A) z"
+			run: {
+				a: string
+			}
+		}
+		c: {
+			let A_1 = run.a
+			let A_2 = run2.a
+			x: "a \(A_1) z"
+			run: {
+				a: string
+			}
+			x2: "a \(A_2) z"
+			run2: {
+				a: string
+			}
+		}
+		d: {
+			let A_3 = run.a
+			let A_4 = run2.a
+			x: "a \(A_3) z"
+			run: {
+				a: string
+			}
+			x2: "a \(A_4) z"
+			run2: {
+				a: string
+			}
 		}
 	}
 	scoped: {
@@ -718,46 +757,6 @@ y: Y & Y_1
 			a: [1]
 		}
 	}
-	x: "foo"
-	incomplete: {
-		a: {
-			x: "a \(run.a) z"
-			run: {
-				a: string
-			}
-		}
-		b: {
-			let A = run.a
-			x: "a \(A) z"
-			run: {
-				a: string
-			}
-		}
-		c: {
-			let A_1 = run.a
-			let A_2 = run2.a
-			x:  "a \(A_1) z"
-			x2: "a \(A_2) z"
-			run: {
-				a: string
-			}
-			run2: {
-				a: string
-			}
-		}
-		d: {
-			let A_3 = run.a
-			let A_4 = run2.a
-			x:  "a \(A_3) z"
-			x2: "a \(A_4) z"
-			run: {
-				a: string
-			}
-			run2: {
-				a: string
-			}
-		}
-	}
 	unresolvedDisjunction: {
 		#TypePrimitive: {
 			_args: {
@@ -777,10 +776,27 @@ y: Y & Y_1
 			}
 		}
 	}
+	x: "foo"
 	y: "foo"
 }
 == Eval
 {
+	#Foo: 2
+	cfgs: [{
+		metadata: {
+			name: "one"
+		}
+	}, {
+		metadata: {
+			name: "two"
+		}
+	}]
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
+		}
+	}
 	comprehension: {
 		for cfg in [{
 			a: "one"
@@ -791,25 +807,48 @@ y: Y & Y_1
 			}
 		}
 	}
-	#Foo: 2
-	complete: {
-		x: "a foo z"
-		run: {
-			a: "foo"
-		}
-	}
-	cfgs: [{
-		metadata: {
-			name: "one"
-		}
-	}, {
-		metadata: {
-			name: "two"
-		}
-	}]
 	files: {
 		"\("kind-\(cfg.name)")": {
 			patches: cfg
+		}
+	}
+	incomplete: {
+		a: {
+			x: "a \(run.a) z"
+			run: {
+				a: string
+			}
+		}
+		b: {
+			let A = run.a
+			x: "a \(A) z"
+			run: {
+				a: string
+			}
+		}
+		c: {
+			let A_1 = run.a
+			let A_2 = run2.a
+			x: "a \(A_1) z"
+			run: {
+				a: string
+			}
+			x2: "a \(A_2) z"
+			run2: {
+				a: string
+			}
+		}
+		d: {
+			let A_3 = run.a
+			let A_4 = run2.a
+			x: "a \(A_3) z"
+			run: {
+				a: string
+			}
+			x2: "a \(A_4) z"
+			run2: {
+				a: string
+			}
 		}
 	}
 	scoped: {
@@ -834,46 +873,6 @@ y: Y & Y_1
 			a: [1]
 		}
 	}
-	x: "foo"
-	incomplete: {
-		a: {
-			x: "a \(run.a) z"
-			run: {
-				a: string
-			}
-		}
-		b: {
-			let A = run.a
-			x: "a \(A) z"
-			run: {
-				a: string
-			}
-		}
-		c: {
-			let A_1 = run.a
-			let A_2 = run2.a
-			x:  "a \(A_1) z"
-			x2: "a \(A_2) z"
-			run: {
-				a: string
-			}
-			run2: {
-				a: string
-			}
-		}
-		d: {
-			let A_3 = run.a
-			let A_4 = run2.a
-			x:  "a \(A_3) z"
-			x2: "a \(A_4) z"
-			run: {
-				a: string
-			}
-			run2: {
-				a: string
-			}
-		}
-	}
 	unresolvedDisjunction: {
 		#TypePrimitive: {
 			"*": {}
@@ -889,58 +888,44 @@ y: Y & Y_1
 			}
 		}
 	}
+	x: "foo"
 	y: "foo"
 }
 -- diff/-out/value-v3<==>+out/value --
 diff old new
 --- old
 +++ new
-@@ -216,23 +216,23 @@
- }
- == Final
- {
+@@ -231,8 +231,8 @@
+ 			a: "foo"
+ 		}
+ 	}
 -	comprehension: _|_ // invalid interpolation: cycle error
--	complete: {
--		x: "a foo z"
--		run: {
--			a: "foo"
--		}
--	}
--	cfgs: [{
--		metadata: {
--			name: "one"
--		}
--	}, {
--		metadata: {
--			name: "two"
--		}
--	}]
--	files: _|_ // invalid interpolation: cycle error (and 3 more errors)
+-	files:         _|_ // invalid interpolation: cycle error (and 3 more errors)
 +	comprehension: _|_ // comprehension: key value of dynamic field must be concrete, found _|_(invalid interpolation: invalid interpolation: comprehension.filepath: undefined field: name) (and 1 more errors)
-+	complete: {
-+		x: "a foo z"
-+		run: {
-+			a: "foo"
-+		}
-+	}
-+	cfgs: [{
-+		metadata: {
-+			name: "one"
-+		}
-+	}, {
-+		metadata: {
-+			name: "two"
-+		}
-+	}]
-+	files: _|_ // files: key value of dynamic field must be concrete, found _|_(invalid interpolation: invalid interpolation: filepath: undefined field: name) (and 3 more errors)
- 	scoped: {
- 		direct: {
- 			a: 1
++	files:         _|_ // files: key value of dynamic field must be concrete, found _|_(invalid interpolation: invalid interpolation: filepath: undefined field: name) (and 3 more errors)
+ 	incomplete: {
+ 		a: {
+ 			x: _|_ // invalid interpolation: incomplete.a.x: non-concrete value string (type string)
 -- diff/value/explanation --
 Improved error messages.
 -- out/value --
 == Simplified
 {
+	cfgs: [{
+		metadata: {
+			name: "one"
+		}
+	}, {
+		metadata: {
+			name: "two"
+		}
+	}]
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
+		}
+	}
 	comprehension: {
 		for cfg in [{
 			a: "one"
@@ -951,24 +936,48 @@ Improved error messages.
 			}
 		}
 	}
-	complete: {
-		x: "a foo z"
-		run: {
-			a: "foo"
-		}
-	}
-	cfgs: [{
-		metadata: {
-			name: "one"
-		}
-	}, {
-		metadata: {
-			name: "two"
-		}
-	}]
 	files: {
 		"\("kind-\(cfg.name)")": {
 			patches: cfg
+		}
+	}
+	incomplete: {
+		a: {
+			x: "a \(run.a) z"
+			run: {
+				a: string
+			}
+		}
+		b: {
+			let A = run.a
+			x: "a \(A) z"
+			run: {
+				a: string
+			}
+		}
+		c: {
+			let A_1 = run.a
+			let A_2 = run2.a
+			x: "a \(A_1) z"
+			run: {
+				a: string
+			}
+			x2: "a \(A_2) z"
+			run2: {
+				a: string
+			}
+		}
+		d: {
+			let A_3 = run.a
+			let A_4 = run2.a
+			x: "a \(A_3) z"
+			run: {
+				a: string
+			}
+			x2: "a \(A_4) z"
+			run2: {
+				a: string
+			}
 		}
 	}
 	scoped: {
@@ -993,7 +1002,43 @@ Improved error messages.
 			a: [1]
 		}
 	}
+	unresolvedDisjunction: {}
 	x: "foo"
+	y: "foo"
+}
+== Raw
+{
+	#Foo: 2
+	cfgs: [{
+		metadata: {
+			name: "one"
+		}
+	}, {
+		metadata: {
+			name: "two"
+		}
+	}]
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
+		}
+	}
+	comprehension: {
+		for cfg in [{
+			a: "one"
+		}] {
+			let filepath = "kind-\(cfg.name)"
+			"\(filepath)": {
+				patches: cfg
+			}
+		}
+	}
+	files: {
+		"\("kind-\(cfg.name)")": {
+			patches: cfg
+		}
+	}
 	incomplete: {
 		a: {
 			x: "a \(run.a) z"
@@ -1011,11 +1056,11 @@ Improved error messages.
 		c: {
 			let A_1 = run.a
 			let A_2 = run2.a
-			x:  "a \(A_1) z"
-			x2: "a \(A_2) z"
+			x: "a \(A_1) z"
 			run: {
 				a: string
 			}
+			x2: "a \(A_2) z"
 			run2: {
 				a: string
 			}
@@ -1023,50 +1068,14 @@ Improved error messages.
 		d: {
 			let A_3 = run.a
 			let A_4 = run2.a
-			x:  "a \(A_3) z"
-			x2: "a \(A_4) z"
+			x: "a \(A_3) z"
 			run: {
 				a: string
 			}
+			x2: "a \(A_4) z"
 			run2: {
 				a: string
 			}
-		}
-	}
-	unresolvedDisjunction: {}
-	y: "foo"
-}
-== Raw
-{
-	comprehension: {
-		for cfg in [{
-			a: "one"
-		}] {
-			let filepath = "kind-\(cfg.name)"
-			"\(filepath)": {
-				patches: cfg
-			}
-		}
-	}
-	#Foo: 2
-	complete: {
-		x: "a foo z"
-		run: {
-			a: "foo"
-		}
-	}
-	cfgs: [{
-		metadata: {
-			name: "one"
-		}
-	}, {
-		metadata: {
-			name: "two"
-		}
-	}]
-	files: {
-		"\("kind-\(cfg.name)")": {
-			patches: cfg
 		}
 	}
 	scoped: {
@@ -1094,46 +1103,6 @@ Improved error messages.
 			a: [1]
 		}
 	}
-	x: "foo"
-	incomplete: {
-		a: {
-			x: "a \(run.a) z"
-			run: {
-				a: string
-			}
-		}
-		b: {
-			let A = run.a
-			x: "a \(A) z"
-			run: {
-				a: string
-			}
-		}
-		c: {
-			let A_1 = run.a
-			let A_2 = run2.a
-			x:  "a \(A_1) z"
-			x2: "a \(A_2) z"
-			run: {
-				a: string
-			}
-			run2: {
-				a: string
-			}
-		}
-		d: {
-			let A_3 = run.a
-			let A_4 = run2.a
-			x:  "a \(A_3) z"
-			x2: "a \(A_4) z"
-			run: {
-				a: string
-			}
-			run2: {
-				a: string
-			}
-		}
-	}
 	unresolvedDisjunction: {
 		#TypePrimitive: {
 			_args: {
@@ -1153,17 +1122,11 @@ Improved error messages.
 			}
 		}
 	}
+	x: "foo"
 	y: "foo"
 }
 == Final
 {
-	comprehension: _|_ // invalid interpolation: cycle error
-	complete: {
-		x: "a foo z"
-		run: {
-			a: "foo"
-		}
-	}
 	cfgs: [{
 		metadata: {
 			name: "one"
@@ -1173,30 +1136,14 @@ Improved error messages.
 			name: "two"
 		}
 	}]
-	files: _|_ // invalid interpolation: cycle error (and 3 more errors)
-	scoped: {
-		direct: {
-			a: 1
-		}
-		embed1: {
-			a: 1
-		}
-		embed2: {
-			a: 1
-		}
-		list: {
-			a: [1]
-		}
-		listStruct: {
-			a: [{
-				a: 1
-			}]
-		}
-		listEmbed: {
-			a: [1]
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
 		}
 	}
-	x: "foo"
+	comprehension: _|_ // invalid interpolation: cycle error
+	files:         _|_ // invalid interpolation: cycle error (and 3 more errors)
 	incomplete: {
 		a: {
 			x: _|_ // invalid interpolation: incomplete.a.x: non-concrete value string (type string)
@@ -1211,31 +1158,70 @@ Improved error messages.
 			}
 		}
 		c: {
-			x:  _|_ // invalid interpolation: incomplete.c.x: non-concrete value string (type string)
-			x2: _|_ // invalid interpolation: incomplete.c.x2: non-concrete value string (type string)
+			x: _|_ // invalid interpolation: incomplete.c.x: non-concrete value string (type string)
 			run: {
 				a: string
 			}
+			x2: _|_ // invalid interpolation: incomplete.c.x2: non-concrete value string (type string)
 			run2: {
 				a: string
 			}
 		}
 		d: {
-			x:  _|_ // invalid interpolation: incomplete.d.x: non-concrete value string (type string)
-			x2: _|_ // invalid interpolation: incomplete.d.x2: non-concrete value string (type string)
+			x: _|_ // invalid interpolation: incomplete.d.x: non-concrete value string (type string)
 			run: {
 				a: string
 			}
+			x2: _|_ // invalid interpolation: incomplete.d.x2: non-concrete value string (type string)
 			run2: {
 				a: string
 			}
 		}
 	}
+	scoped: {
+		direct: {
+			a: 1
+		}
+		embed1: {
+			a: 1
+		}
+		embed2: {
+			a: 1
+		}
+		list: {
+			a: [1]
+		}
+		listStruct: {
+			a: [{
+				a: 1
+			}]
+		}
+		listEmbed: {
+			a: [1]
+		}
+	}
 	unresolvedDisjunction: {}
+	x: "foo"
 	y: "foo"
 }
 == All
 {
+	#Foo: 2
+	cfgs: [{
+		metadata: {
+			name: "one"
+		}
+	}, {
+		metadata: {
+			name: "two"
+		}
+	}]
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
+		}
+	}
 	comprehension: {
 		for cfg in [{
 			a: "one"
@@ -1246,25 +1232,48 @@ Improved error messages.
 			}
 		}
 	}
-	#Foo: 2
-	complete: {
-		x: "a foo z"
-		run: {
-			a: "foo"
-		}
-	}
-	cfgs: [{
-		metadata: {
-			name: "one"
-		}
-	}, {
-		metadata: {
-			name: "two"
-		}
-	}]
 	files: {
 		"\("kind-\(cfg.name)")": {
 			patches: cfg
+		}
+	}
+	incomplete: {
+		a: {
+			x: "a \(run.a) z"
+			run: {
+				a: string
+			}
+		}
+		b: {
+			let A = run.a
+			x: "a \(A) z"
+			run: {
+				a: string
+			}
+		}
+		c: {
+			let A_1 = run.a
+			let A_2 = run2.a
+			x: "a \(A_1) z"
+			run: {
+				a: string
+			}
+			x2: "a \(A_2) z"
+			run2: {
+				a: string
+			}
+		}
+		d: {
+			let A_3 = run.a
+			let A_4 = run2.a
+			x: "a \(A_3) z"
+			run: {
+				a: string
+			}
+			x2: "a \(A_4) z"
+			run2: {
+				a: string
+			}
 		}
 	}
 	scoped: {
@@ -1292,46 +1301,6 @@ Improved error messages.
 			a: [1]
 		}
 	}
-	x: "foo"
-	incomplete: {
-		a: {
-			x: "a \(run.a) z"
-			run: {
-				a: string
-			}
-		}
-		b: {
-			let A = run.a
-			x: "a \(A) z"
-			run: {
-				a: string
-			}
-		}
-		c: {
-			let A_1 = run.a
-			let A_2 = run2.a
-			x:  "a \(A_1) z"
-			x2: "a \(A_2) z"
-			run: {
-				a: string
-			}
-			run2: {
-				a: string
-			}
-		}
-		d: {
-			let A_3 = run.a
-			let A_4 = run2.a
-			x:  "a \(A_3) z"
-			x2: "a \(A_4) z"
-			run: {
-				a: string
-			}
-			run2: {
-				a: string
-			}
-		}
-	}
 	unresolvedDisjunction: {
 		#TypePrimitive: {
 			_args: {
@@ -1351,10 +1320,27 @@ Improved error messages.
 			}
 		}
 	}
+	x: "foo"
 	y: "foo"
 }
 == Eval
 {
+	#Foo: 2
+	cfgs: [{
+		metadata: {
+			name: "one"
+		}
+	}, {
+		metadata: {
+			name: "two"
+		}
+	}]
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
+		}
+	}
 	comprehension: {
 		for cfg in [{
 			a: "one"
@@ -1365,25 +1351,48 @@ Improved error messages.
 			}
 		}
 	}
-	#Foo: 2
-	complete: {
-		x: "a foo z"
-		run: {
-			a: "foo"
-		}
-	}
-	cfgs: [{
-		metadata: {
-			name: "one"
-		}
-	}, {
-		metadata: {
-			name: "two"
-		}
-	}]
 	files: {
 		"\("kind-\(cfg.name)")": {
 			patches: cfg
+		}
+	}
+	incomplete: {
+		a: {
+			x: "a \(run.a) z"
+			run: {
+				a: string
+			}
+		}
+		b: {
+			let A = run.a
+			x: "a \(A) z"
+			run: {
+				a: string
+			}
+		}
+		c: {
+			let A_1 = run.a
+			let A_2 = run2.a
+			x: "a \(A_1) z"
+			run: {
+				a: string
+			}
+			x2: "a \(A_2) z"
+			run2: {
+				a: string
+			}
+		}
+		d: {
+			let A_3 = run.a
+			let A_4 = run2.a
+			x: "a \(A_3) z"
+			run: {
+				a: string
+			}
+			x2: "a \(A_4) z"
+			run2: {
+				a: string
+			}
 		}
 	}
 	scoped: {
@@ -1408,46 +1417,6 @@ Improved error messages.
 			a: [1]
 		}
 	}
-	x: "foo"
-	incomplete: {
-		a: {
-			x: "a \(run.a) z"
-			run: {
-				a: string
-			}
-		}
-		b: {
-			let A = run.a
-			x: "a \(A) z"
-			run: {
-				a: string
-			}
-		}
-		c: {
-			let A_1 = run.a
-			let A_2 = run2.a
-			x:  "a \(A_1) z"
-			x2: "a \(A_2) z"
-			run: {
-				a: string
-			}
-			run2: {
-				a: string
-			}
-		}
-		d: {
-			let A_3 = run.a
-			let A_4 = run2.a
-			x:  "a \(A_3) z"
-			x2: "a \(A_4) z"
-			run: {
-				a: string
-			}
-			run2: {
-				a: string
-			}
-		}
-	}
 	unresolvedDisjunction: {
 		#TypePrimitive: {
 			"*": {}
@@ -1463,5 +1432,6 @@ Improved error messages.
 			}
 		}
 	}
+	x: "foo"
 	y: "foo"
 }

@@ -177,17 +177,6 @@ func TestSyntax(t *testing.T) {
 		options: o(cue.ResolveReferences(true)),
 		out: `
 {
-	spec: {
-		replicas: 3
-		containers: [{
-			image: *"myimage" | string
-			name:  "main"
-			envs: [...string]
-		}]
-		other: {
-			option: int
-		}
-	}
 	incomplete: {
 		x: {}.x
 		y: 1 | 2
@@ -196,6 +185,17 @@ func TestSyntax(t *testing.T) {
 	recursive: {
 		Value: _
 		Next:  null
+	}
+	spec: {
+		containers: [{
+			image: *"myimage" | string
+			name:  "main"
+			envs: [...string]
+		}]
+		other: {
+			option: int
+		}
+		replicas: 3
 	}
 }
 		`,

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d25171a0_833e641e",
+        "filename": "cue/interpreter/wasm/exe_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-17T10:43:29Z",
+      "side": 1,
+      "message": "FWIW this could just be:\n\n```\nfunc must[T any](v T, err error) func(t *testing.T) T {\n\treturn func(t *testing.T) T {\n\t\tqt.Assert(t, qt.IsNil(err))\n\t\treturn v\n\t}\n}\n```",
+      "revId": "27eb161ff05a68552f2ff02ca0411b4b645509b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

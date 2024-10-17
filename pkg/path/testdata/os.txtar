@@ -155,14 +155,6 @@ Volume: [_]: {
 #OSes: ["unix", "windows", "plan9"]
 #AnyOS: "unix" | "windows" | "plan9"
 Split: {
-	default: {
-		"/foo/bar/baz": ["/foo/bar/", "baz"]
-		"a/b": ["a/", "b"]
-		"//host/share/foo": ["//host/share/", "foo"]
-		"\\\\host\\share\\foo": ["", "\\\\host\\share\\foo"]
-		"c:/foo/bar": ["c:/foo/", "bar"]
-		"c:\\foo\\bar": ["", "c:\\foo\\bar"]
-	}
 	unix: {
 		"/foo/bar/baz": ["/foo/bar/", "baz"]
 		"a/b": ["a/", "b"]
@@ -187,6 +179,14 @@ Split: {
 		"c:/foo/bar": ["c:/foo/", "bar"]
 		"c:\\foo\\bar": ["c:\\foo\\", "bar"]
 	}
+	default: {
+		"/foo/bar/baz": ["/foo/bar/", "baz"]
+		"a/b": ["a/", "b"]
+		"//host/share/foo": ["//host/share/", "foo"]
+		"\\\\host\\share\\foo": ["", "\\\\host\\share\\foo"]
+		"c:/foo/bar": ["c:/foo/", "bar"]
+		"c:\\foo\\bar": ["", "c:\\foo\\bar"]
+	}
 }
 SplitList: {
 	unix: {
@@ -206,10 +206,6 @@ SplitList: {
 	}
 }
 Clean: {
-	default: {
-		"abc//def//ghi":        "abc/def/ghi"
-		"c:\\abc\\def\\..\\..": "c:\\abc\\def\\..\\.."
-	}
 	unix: {
 		"abc//def//ghi":        "abc/def/ghi"
 		"c:\\abc\\def\\..\\..": "c:\\abc\\def\\..\\.."
@@ -222,19 +218,12 @@ Clean: {
 		"abc//def//ghi":        "abc\\def\\ghi"
 		"c:\\abc\\def\\..\\..": "c:\\"
 	}
+	default: {
+		"abc//def//ghi":        "abc/def/ghi"
+		"c:\\abc\\def\\..\\..": "c:\\abc\\def\\..\\.."
+	}
 }
 Match: {
-	default: {
-		"*c": {
-			abc: true
-		}
-		"*.txt": {
-			"a/b.txt": false
-		}
-		"*.zip": {
-			"c:\\a\\b\\file.zip": true
-		}
-	}
 	unix: {
 		"*c": {
 			abc: true
@@ -266,6 +255,17 @@ Match: {
 		}
 		"*.zip": {
 			"c:\\a\\b\\file.zip": false
+		}
+	}
+	default: {
+		"*c": {
+			abc: true
+		}
+		"*.txt": {
+			"a/b.txt": false
+		}
+		"*.zip": {
+			"c:\\a\\b\\file.zip": true
 		}
 	}
 }
@@ -338,17 +338,6 @@ Slash: {
 	}
 }
 Ext: {
-	default: {
-		// Same for all OS-es
-		"path.go":    ".go"
-		"path.pb.go": ".go"
-		"a.dir/b":    ""
-		"a.dir/b.go": ".go"
-		"a.dir/":     ""
-
-		// Differs on Windows.
-		"a.dir\\foo": ".dir\\foo"
-	}
 	unix: {
 		// Same for all OS-es
 		"path.go":    ".go"
@@ -382,23 +371,19 @@ Ext: {
 		// Differs on Windows.
 		"a.dir\\foo": ""
 	}
+	default: {
+		// Same for all OS-es
+		"path.go":    ".go"
+		"path.pb.go": ".go"
+		"a.dir/b":    ""
+		"a.dir/b.go": ".go"
+		"a.dir/":     ""
+
+		// Differs on Windows.
+		"a.dir\\foo": ".dir\\foo"
+	}
 }
 Resolve: {
-	default: {
-		"a/b/c": {
-			"d/e": "a/b/c/d/e"
-		}
-		"/a/b": {
-			"/c/d": "/c/d"
-		}
-		"c:/a": {
-			"d:\\": "c:/a/d:\\"
-		}
-		"//home/user/foo": {
-			bar:               "/home/user/foo/bar"
-			"//other/abs/foo": "/other/abs/foo"
-		}
-	}
 	unix: {
 		"a/b/c": {
 			"d/e": "a/b/c/d/e"
@@ -444,17 +429,23 @@ Resolve: {
 			"//other/abs/foo": "\\\\other\\abs\\foo"
 		}
 	}
+	default: {
+		"a/b/c": {
+			"d/e": "a/b/c/d/e"
+		}
+		"/a/b": {
+			"/c/d": "/c/d"
+		}
+		"c:/a": {
+			"d:\\": "c:/a/d:\\"
+		}
+		"//home/user/foo": {
+			bar:               "/home/user/foo/bar"
+			"//other/abs/foo": "/other/abs/foo"
+		}
+	}
 }
 IsAbs: {
-	default: {
-		"":                false
-		"/a":              true
-		a:                 false
-		"c:":              false
-		"c:/":             false
-		"c:\\":            false
-		"//home/user/foo": true
-	}
 	unix: {
 		"":                false
 		"/a":              true
@@ -480,6 +471,15 @@ IsAbs: {
 		"c:":              false
 		"c:/":             true
 		"c:\\":            true
+		"//home/user/foo": true
+	}
+	default: {
+		"":                false
+		"/a":              true
+		a:                 false
+		"c:":              false
+		"c:/":             false
+		"c:\\":            false
 		"//home/user/foo": true
 	}
 }

@@ -23,10 +23,10 @@ cmp stdout expect-stdout
 defaultRegistry: registry:     "${CUE_REGISTRY1}"
 moduleRegistries: "baz.org": registry:       "${CUE_REGISTRY2}"
 -- expect-stdout --
-main:                   "main"
 "foo.com/bar/hello@v0": "v0.2.3"
 "bar.com@v0":           "v0.5.0"
 "baz.org@v0":           "v0.10.1 in registry2"
+main:                   "main"
 "example.com@v0":       "v0.0.1"
 -- cue.mod/module.cue --
 module: "main.org@v0"

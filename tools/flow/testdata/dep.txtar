@@ -102,8 +102,8 @@ graph TD
 
 -- out/run/t1/value --
 {
-	b:   3
 	$id: "valToOut"
+	b:   3
 }
 -- out/run/t1/stats --
 Leaks:  0
@@ -137,10 +137,10 @@ graph TD
 
 -- out/run/t2/value --
 {
+	$id: "valToOut"
 	x: {
 		foo: 3
 	}
-	$id:   "valToOut"
 	index: int
 }
 -- out/run/t2/stats --
@@ -175,8 +175,8 @@ graph TD
 
 -- out/run/t3/value --
 {
-	x: [0, 1][INDEX]
 	$id: "valToOut"
+	x: [0, 1][INDEX]
 
 	//cue:path: root.concreteValueInGeneratedSubfield.index
 	let INDEX = int
@@ -211,14 +211,40 @@ graph TD
   t8("root.incompleteGeneratedStruct [Waiting]")
   t8-->t7
 
+-- out/run-v3/t4/value --
+{
+	$id: "valToOut"
+	$after: {
+		$id: "valToOut"
+		x: [0, 1][INDEX]
+	}
+	x: 3
+
+	//cue:path: root.concreteValueInGeneratedSubfield.index
+	let INDEX = int
+}
+-- diff/-out/run-v3/t4/value<==>+out/run/t4/value --
+diff old new
+--- old
++++ new
+@@ -1,8 +1,8 @@
+ {
+ 	$id: "valToOut"
+ 	$after: {
+-		x: [0, 1][INDEX]
+ 		$id: "valToOut"
++		x: [0, 1][INDEX]
+ 	}
+ 	x: 3
+ 
 -- out/run/t4/value --
 {
+	$id: "valToOut"
 	$after: {
 		x: [0, 1][INDEX]
 		$id: "valToOut"
 	}
-	$id: "valToOut"
-	x:   3
+	x: 3
 
 	//cue:path: root.concreteValueInGeneratedSubfield.index
 	let INDEX = int
@@ -255,8 +281,8 @@ graph TD
 
 -- out/run/t5/value --
 {
-	x:   3
 	$id: "valToOut"
+	x:   3
 }
 -- out/run/t5/stats --
 Leaks:  0
@@ -288,13 +314,36 @@ graph TD
   t8("root.incompleteGeneratedStruct [Waiting]")
   t8-->t7
 
+-- out/run-v3/t6/value --
+{
+	$id: "valToOut"
+	x: {
+		$id: "valToOut"
+		x:   3
+	}
+	incomplete: _
+}
+-- diff/-out/run-v3/t6/value<==>+out/run/t6/value --
+diff old new
+--- old
++++ new
+@@ -1,8 +1,8 @@
+ {
+ 	$id: "valToOut"
+ 	x: {
+-		x:   3
+ 		$id: "valToOut"
++		x:   3
+ 	}
+ 	incomplete: _
+ }
 -- out/run/t6/value --
 {
+	$id: "valToOut"
 	x: {
 		x:   3
 		$id: "valToOut"
 	}
-	$id:        "valToOut"
 	incomplete: _
 }
 -- out/run/t6/stats --
@@ -329,10 +378,10 @@ graph TD
 
 -- out/run/t7/value --
 {
+	$id: "valToOut"
 	x: {
 		for x in INCOMPLETE {}
 	}
-	$id: "valToOut"
 
 	//cue:path: root.indirectTaskRootReference.incomplete
 	let INCOMPLETE = _
@@ -369,8 +418,8 @@ graph TD
 
 -- out/run/t8/value --
 {
-	x: [X]
 	$id: "valToOut"
+	x: [X]
 
 	//cue:path: root.incompleteComprehensionSource.x
 	let X = {
@@ -412,10 +461,10 @@ graph TD
 
 -- out/run/t9/value --
 {
+	$id: "valToOut"
 	x: {
 		foo: [X_1]
 	}
-	$id: "valToOut"
 
 	//cue:path: root.incompleteComprehensionSource.x
 	let X_1 = {

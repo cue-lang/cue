@@ -1399,6 +1399,8 @@ func (v *Vertex) AddStruct(s *StructLit, env *Environment, ci CloseInfo) *Struct
 	}
 	if cc := ci.cc; cc != nil && cc.decl != nil {
 		info.Decl = cc.decl
+	} else if decl := ci.closeInfo.Decl(); decl != nil {
+		info.Decl = decl
 	}
 	for _, t := range v.Structs {
 		if *t == info { // TODO: check for different identity.

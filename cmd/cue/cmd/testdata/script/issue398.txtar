@@ -12,11 +12,11 @@ z: 3
 package bar
 import "mod.test/pkg:baz"
 baz
-y: 2
+x: 1
 -- pkg/baz.cue --
 package baz
-x: 1
+y: 2
 -- expect-stdout --
-z: 3
 y: 2
 x: 1
+z: 3

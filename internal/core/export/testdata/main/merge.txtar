@@ -75,110 +75,6 @@ Reordering.
 [#B #def]
 [#B #f]
 [#B #bar]
--- out/value-v3 --
-== Simplified
-{}
-== Raw
-{
-	#A: {
-		_
-		#a: string
-	}
-	#E: _
-	#F: _
-	#G: _
-	#B: {
-		2
-		#f:   int
-		#def: 3
-		#bar: int
-		#a:   string
-	}
-}
-== Final
-{}
-== All
-{
-	#A: {
-		_
-		#a: string
-	}
-	#E: _
-	#F: _
-	#G: _
-	#B: {
-		2
-		#f:   int
-		#def: 3
-		#bar: int
-		#a:   string
-	}
-}
-== Eval
-{
-	#A: {
-		_
-		#a: string
-	}
-	#E: _
-	#F: _
-	#G: _
-	#B: {
-		2
-		#f:   int
-		#def: 3
-		#bar: int
-		#a:   string
-	}
-}
--- diff/-out/value-v3<==>+out/value --
-diff old new
---- old
-+++ new
-@@ -11,10 +11,10 @@
- 	#G: _
- 	#B: {
- 		2
--		#a:   string
--		#f:   int
--		#def: 3
--		#bar: int
-+		#f:   int
-+		#def: 3
-+		#bar: int
-+		#a:   string
- 	}
- }
- == Final
-@@ -30,10 +30,10 @@
- 	#G: _
- 	#B: {
- 		2
--		#a:   string
--		#f:   int
--		#def: 3
--		#bar: int
-+		#f:   int
-+		#def: 3
-+		#bar: int
-+		#a:   string
- 	}
- }
- == Eval
-@@ -47,9 +47,9 @@
- 	#G: _
- 	#B: {
- 		2
--		#a:   string
--		#f:   int
--		#def: 3
--		#bar: int
-+		#f:   int
-+		#def: 3
-+		#bar: int
-+		#a:   string
- 	}
- }
 -- diff/value/todo/p2 --
 Reordering.
 -- out/value --
@@ -196,8 +92,8 @@ Reordering.
 	#B: {
 		2
 		#a:   string
-		#f:   int
 		#def: 3
+		#f:   int
 		#bar: int
 	}
 }
@@ -215,8 +111,8 @@ Reordering.
 	#B: {
 		2
 		#a:   string
-		#f:   int
 		#def: 3
+		#f:   int
 		#bar: int
 	}
 }
@@ -232,8 +128,8 @@ Reordering.
 	#B: {
 		2
 		#a:   string
-		#f:   int
 		#def: 3
+		#f:   int
 		#bar: int
 	}
 }

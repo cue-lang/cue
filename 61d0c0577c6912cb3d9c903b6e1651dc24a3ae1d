@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a353337_f7159fc0",
+        "filename": "cue/load/example_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-17T10:31:23Z",
+      "side": 1,
+      "message": "```suggestion\n\t// or set one globally with os.Setenv(\"CUE_REGISTRY\", \"registry.myorg.com\").\n```",
+      "revId": "61d0c0577c6912cb3d9c903b6e1651dc24a3ae1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -413,14 +413,15 @@ _|_ // e3: index out of range [2] with length 2
 		// baz is a required field.
 		baz!: 5
 	}
+	x: int
 	y1: {
 		src: [1, 2, 3]
 		foo0: 1
 		bar1: 2
 		bar2: 3
 		foo1: 2
-		x: [1, 2, 3]
 		foo2: 3
+		x: [1, 2, 3]
 	}
 	preserveKeyFieldInComprehension: 1
 	errorStructDef: {
@@ -429,7 +430,6 @@ _|_ // e3: index out of range [2] with length 2
 		#Def: 1
 	}
 	errorList: [1, _|_]
-	x: int
 	errorListDef: {
 		#Def: 1
 		[1, _|_]

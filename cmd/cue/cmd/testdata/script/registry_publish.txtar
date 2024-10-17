@@ -16,10 +16,10 @@ env CUE_CACHE_DIR=$WORK/.tmp/different-cache
 stderr 'cannot fetch example.com@v0.0.1: module example.com@v0.0.1: module not found'
 
 -- expect-eval-stdout --
-main:                   "main"
 "foo.com/bar/hello@v0": "v0.2.3"
 "bar.com@v0":           "v0.5.0"
 "baz.org@v0":           "v0.10.1"
+main:                   "main"
 "example.com@v0":       "v0.0.1"
 -- main/cue.mod/module.cue --
 module: "main.org@v0"

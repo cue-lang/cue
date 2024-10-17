@@ -26,8 +26,8 @@ List: [{name: "kube-api-server"}]
     "items": [
         [
             {
-                "name": "kube-api-server",
-                "namespace": "default"
+                "namespace": "default",
+                "name": "kube-api-server"
             }
         ]
     ]

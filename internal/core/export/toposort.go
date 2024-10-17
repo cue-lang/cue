@@ -30,7 +30,7 @@ import (
 // features than for which there are arcs and also includes features for
 // optional fields. It assumes the Structs fields are initialized and evaluated.
 func VertexFeatures(c *adt.OpContext, v *adt.Vertex) []adt.Feature {
-	if cueexperiment.Flags.TopoSort {
+	if cueexperiment.Flags.TopoSort || true {
 		return toposort.VertexFeatures(c, v)
 	} else {
 		return vertexFeatures(c, v)

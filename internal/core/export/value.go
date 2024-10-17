@@ -414,7 +414,7 @@ func (e *exporter) structComposite(v *adt.Vertex, attrs []*ast.Attribute) ast.Ex
 
 	p := e.cfg
 	var features []adt.Feature
-	if cueexperiment.Flags.TopoSort {
+	if cueexperiment.Flags.TopoSort || true {
 		features = toposort.VertexFeatures(e.ctx, v)
 	} else {
 		features = VertexFeatures(e.ctx, v)

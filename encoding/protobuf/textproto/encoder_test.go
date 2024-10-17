@@ -38,7 +38,7 @@ func TestEncode(t *testing.T) {
 		for _, f := range t.Archive.Files {
 			switch {
 			case strings.HasSuffix(f.Name, ".cue"):
-				val := t.CueContext().CompileBytes(f.Data)
+				val := t.CueContext().CompileBytes(f.Data, cue.Filename(f.Name))
 				if err := val.Err(); err != nil {
 					t.WriteErrors(errors.Promote(err, "test"))
 					return

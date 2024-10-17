@@ -234,7 +234,7 @@ if true {
 		t.Run(tc.name, func(t *testing.T) {
 			ctx := cuecontext.New()
 
-			v := ctx.CompileString(tc.in)
+			v := ctx.CompileString(tc.in, cue.Filename(tc.name))
 			v = v.LookupPath(cue.ParsePath(tc.path))
 
 			syntax := v.Syntax(tc.options...)

@@ -180,6 +180,7 @@ func (c CloseInfo) SpawnEmbed(x Node) CloseInfo {
 		mode:     closeEmbed,
 		root:     EmbeddingSpan,
 		span:     c.span() | EmbeddingSpan,
+		decl:     c.closeInfo.Decl(),
 	}
 	return c
 }
@@ -193,6 +194,7 @@ func (c CloseInfo) SpawnGroup(x Expr) CloseInfo {
 		parent:   c.closeInfo,
 		location: x,
 		span:     c.span(),
+		decl:     c.closeInfo.Decl(),
 	}
 	return c
 }
@@ -206,6 +208,7 @@ func (c CloseInfo) SpawnSpan(x Node, t SpanType) CloseInfo {
 		location: x,
 		root:     t,
 		span:     c.span() | t,
+		decl:     c.closeInfo.Decl(),
 	}
 	return c
 }
@@ -228,6 +231,7 @@ func (c CloseInfo) SpawnRef(arc *Vertex, isDef bool, x Expr) CloseInfo {
 			parent:   c.closeInfo,
 			location: x,
 			span:     span,
+			decl:     c.closeInfo.Decl(),
 		}
 	}
 	if isDef {
@@ -294,6 +298,21 @@ type closeInfo struct {
 
 	root SpanType
 	span SpanType
+
+	// decl is the parent declaration which contains the conjuct which
+	// gave rise to this closeInfo.
+	decl Decl
+}
+
+// Returns the first non-nil Decl from c, or c's parents, if possible.
+func (c *closeInfo) Decl() Decl {
+	for c != nil && c.decl == nil {
+		c = c.parent
+	}
+	if c == nil {
+		return nil
+	}
+	return c.decl
 }
 
 // closeStats holds the administrative fields for a closeInfo value. Each

@@ -167,34 +167,22 @@ _disjunction2: int
 // disjunction is like a sum type.
 disjunction: _disjunction1 | _disjunction2
 -- eval-cue.stdout --
-foo: "bar"
-struct: {
-    field1: "message1"
-    field2: "message2"
-}
+#Schema: {}
 Data: {
     name: "Foo"
 }
-#Schema: {}
-list: [1, 2, 3]
+foo:              "bar"
 implicitUnified:  "some value"
 explicitUnified1: "some default"
 explicitUnified2: "some value"
 explicitUnified:  "some value"
 disjunction:      "some default"
--- export-cue.stdout --
-// top-level comment before a simple field.
-foo: "bar"
-
-// top-level comment before a struct
 struct: {
-	// comment in a struct field
-	field1: "message1"
-	field2: "message2"
-
-	// comment at the end of a struct.
+    field1: "message1"
+    field2: "message2"
 }
-
+list: [1, 2, 3]
+-- export-cue.stdout --
 // Data fits the schema.
 Data: {
 	// name is the schema name.
@@ -203,8 +191,8 @@ Data: {
 	name: "Foo"
 }
 
-// top-level comment before a list.
-list: [1, 2, 3]
+// top-level comment before a simple field.
+foo: "bar"
 
 // implicitUnified is any non-empty string.
 
@@ -222,43 +210,55 @@ explicitUnified: "some value"
 
 // disjunction is like a sum type.
 disjunction: "some default"
+
+// top-level comment before a struct
+struct: {
+	// comment in a struct field
+	field1: "message1"
+	field2: "message2"
+
+	// comment at the end of a struct.
+}
+
+// top-level comment before a list.
+list: [1, 2, 3]
 -- export-json.stdout --
 {
+    "Data": {
+        "name": "Foo"
+    },
     "foo": "bar",
+    "implicitUnified": "some value",
+    "explicitUnified1": "some default",
+    "explicitUnified2": "some value",
+    "explicitUnified": "some value",
+    "disjunction": "some default",
     "struct": {
         "field1": "message1",
         "field2": "message2"
-    },
-    "Data": {
-        "name": "Foo"
     },
     "list": [
         1,
         2,
         3
-    ],
-    "implicitUnified": "some value",
-    "explicitUnified1": "some default",
-    "explicitUnified2": "some value",
-    "explicitUnified": "some value",
-    "disjunction": "some default"
+    ]
 }
 -- export-yaml.stdout --
-foo: bar
-struct:
-  field1: message1
-  field2: message2
 Data:
   name: Foo
-list:
-  - 1
-  - 2
-  - 3
+foo: bar
 implicitUnified: some value
 explicitUnified1: some default
 explicitUnified2: some value
 explicitUnified: some value
 disjunction: some default
+struct:
+  field1: message1
+  field2: message2
+list:
+  - 1
+  - 2
+  - 3
 -- export-toml.stdout --
 disjunction = 'some default'
 explicitUnified = 'some value'

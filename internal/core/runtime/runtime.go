@@ -18,6 +18,7 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cuedebug"
+	"cuelang.org/go/internal/cueexperiment"
 )
 
 // A Runtime maintains data structures for indexing and reuse for evaluation.
@@ -59,8 +60,9 @@ func New() *Runtime {
 // debug flags. The builtins registered with RegisterBuiltin are available for
 // evaluation.
 func NewWithSettings(v internal.EvaluatorVersion, flags cuedebug.Config) *Runtime {
-	r := &Runtime{version: v, flags: flags}
+	r := &Runtime{flags: flags}
 	r.Init()
+	r.version = v
 	return r
 }
 
@@ -93,4 +95,11 @@ func (r *Runtime) Init() {
 	r.index.builtinShort = sharedIndex.builtinShort
 
 	r.loaded = map[*build.Instance]interface{}{}
+
+	cueexperiment.Init()
+	if cueexperiment.Flags.EvalV3 {
+		r.version = internal.DevVersion
+	} else {
+		r.version = internal.DefaultVersion
+	}
 }

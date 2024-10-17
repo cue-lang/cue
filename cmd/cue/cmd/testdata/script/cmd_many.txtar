@@ -78,22 +78,22 @@ ls: a b
 
 -- stdout.export-post.golden --
 {
-    "itemsList": [],
-    "items": {}
+    "items": {},
+    "itemsList": []
 }
 {
-    "itemsList": [
-        "a"
-    ],
     "items": {
         "a": "a"
-    }
+    },
+    "itemsList": [
+        "a"
+    ]
 }
 {
-    "itemsList": [
-        "b"
-    ],
     "items": {
         "b": "b"
-    }
+    },
+    "itemsList": [
+        "b"
+    ]
 }

@@ -61,6 +61,12 @@ defEnum: baz: 3
 
 singleEnum: "single"
 -- out/encode --
+typeEnum: {
+  foo: FOO
+  bar: BAR
+  baz: 3
+}
+singleEnum: single
 enum: {
   asIs: "foo"
 }
@@ -69,9 +75,3 @@ defEnum: {
   foo: FOO
   bar: BAR
 }
-typeEnum: {
-  foo: FOO
-  bar: BAR
-  baz: 3
-}
-singleEnum: single

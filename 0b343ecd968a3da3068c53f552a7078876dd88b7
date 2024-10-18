@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ce1c3d0_41e539d4",
+        "filename": "internal/core/export/export_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-18T13:28:30Z",
+      "side": 1,
+      "message": "notes for myself: in go.go it looks like we have a syncmap already and it is caching the structlits so either they\u0027re not ending up in the vertices properly or something else weird is going on.",
+      "parentUuid": "34c67d36_d0ce533c",
+      "revId": "0b343ecd968a3da3068c53f552a7078876dd88b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "56376cd2_b6718ac5",

@@ -1343,6 +1343,14 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 			field.Value = cueast.NewBinExpr(cuetoken.AND, field.Value, expr)
 		}
 
+		if s := reflect.StructTag(tag).Get("cue_or"); s != "" {
+			expr, err := parser.ParseExpr("get go", s)
+			if err != nil {
+				e.logf("error parsing struct tag %q:", s, err)
+			}
+			field.Value = cueast.NewBinExpr(cuetoken.OR, field.Value, expr)
+		}
+
 		// Add field tag to convert back to Go.
 		typeName := f.Type().String()
 		// simplify type names:

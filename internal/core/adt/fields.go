@@ -440,7 +440,7 @@ func (cc *closeContext) linkNotify(ctx *OpContext, dst *Vertex, key *closeContex
 		}
 	}
 
-	cc.addDependency(ctx, NOTIFY, key, key, dst.cc)
+	cc.addDependency(ctx, NOTIFY, key, key, dst.cc())
 	return true
 }
 
@@ -528,7 +528,7 @@ func (c *closeContext) addDependency(ctx *OpContext, kind depKind, key, child, r
 	// if child.src.Parent != c.src {
 	// 	panic("addArc: inconsistent parent")
 	// }
-	if child.src.cc != root.src.cc {
+	if child.src.cc() != root.src.cc() {
 		panic("addArc: inconsistent root")
 	}
 	c.arcs = append(c.arcs, ccArc{
@@ -828,12 +828,13 @@ func (n *nodeContext) insertArcCC(f Feature, mode ArcType, c Conjunct, id CloseI
 	// 	return v, nil
 	// }
 
-	if v.cc == nil {
-		v.cc = v.rootCloseContext(n.ctx)
-		v.cc.generation = n.node.cc.generation
+	if v.cc() == nil {
+		v.rootCloseContext(n.ctx)
+		// TODO(evalv3): reevaluate need for generation
+		v._cc.generation = n.node._cc.generation
 	}
 
-	arc, added := cc.insertConjunct(n.ctx, v.cc, c, id, mode, check, true)
+	arc, added := cc.insertConjunct(n.ctx, v.cc(), c, id, mode, check, true)
 	if !added {
 		return v, arc
 	}

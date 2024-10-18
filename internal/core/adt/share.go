@@ -47,7 +47,7 @@ func (n *nodeContext) unshare() {
 
 	n.scheduleVertexConjuncts(n.shared, v, n.sharedID)
 
-	n.sharedID.cc.decDependent(n.ctx, SHARED, n.node.cc)
+	n.sharedID.cc.decDependent(n.ctx, SHARED, n.node.cc())
 	n.sharedID.cc = nil
 }
 
@@ -55,7 +55,7 @@ func (n *nodeContext) unshare() {
 // shared.
 func (n *nodeContext) finalizeSharing() {
 	if n.sharedID.cc != nil {
-		n.sharedID.cc.decDependent(n.ctx, SHARED, n.node.cc)
+		n.sharedID.cc.decDependent(n.ctx, SHARED, n.node.cc())
 		n.sharedID.cc = nil
 	}
 	if n.isShared {
@@ -98,7 +98,7 @@ func (n *nodeContext) share(c Conjunct, arc *Vertex, id CloseInfo) {
 	// have been processed and it is clear that sharing is possible. Delaying
 	// such a count should not hurt performance, as a shared node is completed
 	// anyway.
-	id.cc.incDependent(n.ctx, SHARED, n.node.cc)
+	id.cc.incDependent(n.ctx, SHARED, n.node.cc())
 }
 
 func (n *nodeContext) shareIfPossible(c Conjunct, arc *Vertex, id CloseInfo) bool {

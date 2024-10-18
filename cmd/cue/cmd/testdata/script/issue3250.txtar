@@ -10,9 +10,9 @@ exec cue mod init
 # passes - with module
 exec cue export -t foo .:foo
 
-# fails - with module
-# TODO fix this case
-! exec cue export -t foo foo.cue
+# passes - with module
+# (failed previously due to #3250).
+exec cue export -t foo foo.cue
 
 -- foo.cue --
 @if(foo)

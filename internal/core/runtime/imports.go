@@ -20,7 +20,9 @@ import (
 
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/cueexperiment"
 )
 
 type PackageFunc func(ctx adt.Runtime) (*adt.Vertex, errors.Error)
@@ -42,7 +44,29 @@ func (x *index) RegisterBuiltin(importPath string, f PackageFunc) {
 	x.builtinShort[base] = importPath
 }
 
-var SharedRuntime = &Runtime{index: sharedIndex}
+// We use a sync.OnceValue below so that cueexperiment.Init is only called
+// the first time that the API is used, letting the user set $CUE_EXPERIMENT globally
+// as part of their package init if they want to.
+var SharedRuntime = sync.OnceValue(func() *Runtime {
+	r := &Runtime{index: sharedIndex}
+	// The version logic below is copied from [Runtime.Init];
+	// consider refactoring to share the code if it gets any more complicated.
+	//
+	// TODO(mvdan,mpvl): Note that SharedRuntime follows the globally set evaluator version,
+	// which may be different than what was supplied via Go code for each context like
+	// via cuecontext.EvaluatorVersion(cuecontext.EvalV3).
+	// This does not cause issues between evalv2 and evalv3 as they use the same ADT,
+	// but future evaluator versions may not be compatible at that level.
+	// We should consider using one SharedRuntime per evaluator version,
+	// or getting rid of SharedRuntime altogether.
+	cueexperiment.Init()
+	if cueexperiment.Flags.EvalV3 {
+		r.version = internal.DevVersion
+	} else {
+		r.version = internal.DefaultVersion
+	}
+	return r
+})
 
 // BuiltinPackagePath converts a short-form builtin package identifier to its
 // full path or "" if this doesn't exist.

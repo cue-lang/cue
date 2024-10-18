@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "775170b5_9cdde25c",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1445,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-18T15:03:45Z",
+      "side": 1,
+      "message": "huh, this change surprises me slightly - why force the copy?",
+      "revId": "6fa5257e1e5ff87df73a8b7043a72d0752dbbfc9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

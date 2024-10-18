@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45bbaf6c_9b2b2a06",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_jsonpb.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-18T08:54:16Z",
+      "side": 1,
+      "message": "I\u0027m not sure I understand this ordering:\nThis unifies nested.cue with the values of stream.yaml. In the case of A, for instance, I see evidence of a-b and kind-a-b. I would expected the latter will be the ordering.",
+      "revId": "0b343ecd968a3da3068c53f552a7078876dd88b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1df55b27_ad9f4ec8",
+        "filename": "cmd/cue/cmd/testdata/script/issue398.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-18T08:54:16Z",
+      "side": 1,
+      "message": "It may make sense to reverse x and y to ensure it is really testing order correctly.",
+      "revId": "0b343ecd968a3da3068c53f552a7078876dd88b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34c67d36_d0ce533c",
+        "filename": "internal/core/export/export_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-18T08:54:16Z",
+      "side": 1,
+      "message": "Would be nice to preserve order of Go structs field definitions.",
+      "revId": "0b343ecd968a3da3068c53f552a7078876dd88b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56376cd2_b6718ac5",
+        "filename": "internal/core/export/testdata/main/shadow.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 480,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-18T08:54:16Z",
+      "side": 1,
+      "message": "Nice!",
+      "revId": "0b343ecd968a3da3068c53f552a7078876dd88b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "747592d2_3659c9a8",
+        "filename": "pkg/path/testdata/os.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-18T08:54:16Z",
+      "side": 1,
+      "message": "It seems the algorithm treats to-from-to-from as a cycle. However, if defined in the same struct, I would take the first position and remove duplicates, so to-from.\n\nThis would be consistent with treating\n\na: b: 1\na: c: 1\n\nas an equivalent of\n\na: { b: 1, c: 1 }\n\n\nIOW, I think the ordering here should be to: x, from: y.",
+      "revId": "0b343ecd968a3da3068c53f552a7078876dd88b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f5bab99_33e92e28",
+        "filename": "pkg/time/testdata/gen.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-18T08:54:16Z",
+      "side": 1,
+      "message": "This is interesting. time.Split returns a Go struct. We should preserve the order of Go struct fields.",
+      "revId": "0b343ecd968a3da3068c53f552a7078876dd88b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "088990c8_bed0b3c6",
+        "filename": "tools/flow/testdata/issue2416a.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-18T08:54:16Z",
+      "side": 1,
+      "message": "I\u0027m not sure I understand this: in the schema in pkg/tool/tool.cue, $id comes before $after.",
+      "revId": "0b343ecd968a3da3068c53f552a7078876dd88b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

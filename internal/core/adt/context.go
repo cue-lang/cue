@@ -195,8 +195,11 @@ func New(v *Vertex, cfg *Config) *OpContext {
 	return ctx
 }
 
-// See also: unreachableForDev
+// See also: [unreachableForDev]
 func (c *OpContext) isDevVersion() bool {
+	if c.Version == internal.EvalVersionUnset {
+		panic("OpContext was not provided with an evaluator version")
+	}
 	return c.Version == internal.DevVersion
 }
 

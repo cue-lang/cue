@@ -266,9 +266,11 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) {
 
 	if !fp.c.AllCUEFiles {
 		tagIsSet := fp.tagger.tagIsSet
-		if p.Module != fp.c.Module {
+		if p.Module != "" && p.Module != fp.c.Module {
 			// The file is outside the main module so treat all build tag keys as unset.
-			// TODO also consider packages explicitly specified on the command line.
+			// Note that if there's no module, we don't consider it to be outside
+			// the main module, because otherwise @if tags in non-package files
+			// explicitly specified on the command line will not work.
 			tagIsSet = func(string) bool {
 				return false
 			}

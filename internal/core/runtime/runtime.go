@@ -49,7 +49,8 @@ func (r *Runtime) BuildData(b *build.Instance) (x interface{}, ok bool) {
 	return x, ok
 }
 
-// New is a wrapper for NewVersioned(internal.DefaultVersion).
+// New is short for [NewWithSettings] while obeying `CUE_EXPERIMENT=evalv3`
+// for the evaluator version and using zero [cuedebug] flags.
 func New() *Runtime {
 	r := &Runtime{}
 	r.Init()

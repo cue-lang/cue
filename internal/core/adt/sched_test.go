@@ -19,6 +19,7 @@ import (
 	"strings"
 	"testing"
 
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cuetest"
 )
 
@@ -35,6 +36,7 @@ const (
 // TestScheduler tests the non-CUE specific scheduler functionality.
 func TestScheduler(t *testing.T) {
 	ctx := &OpContext{
+		Version: internal.DefaultVersion,
 		taskContext: taskContext{
 			counterMask: c1 | c2 | c3 | c4,
 			complete:    func(s *scheduler) condition { return 0 },

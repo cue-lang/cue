@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d920dea_801a0030",
+        "filename": "internal/core/export/topological/cycles.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-18T09:41:30Z",
+      "side": 1,
+      "message": "What is the time complexity of this algorithm? It seems that the number of returned cycles can be quite large at times.",
+      "revId": "94d8c332cd8c31940595189348a6f5ad28407c75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ab1a947_4cf3a2e2",
+        "filename": "internal/core/export/topological/graph_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-18T09:41:30Z",
+      "side": 1,
+      "message": "Maybe a short description?",
+      "revId": "94d8c332cd8c31940595189348a6f5ad28407c75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

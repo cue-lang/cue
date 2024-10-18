@@ -20,12 +20,23 @@ import (
 	"strings"
 	"sync"
 	"text/template"
+
+	"cuelang.org/go/internal"
 )
 
 // Counts holds counters for key events during a CUE evaluation.
 //
 // This is an experimental type and the contents may change without notice.
 type Counts struct {
+	// Note that we can't use the public [cuecontext.EvalVersion] type
+	// as that would lead to an import cycle. We could use "int" but that's a bit odd.
+	// There's no harm in referencing an internal type in practice, given that
+	// the public type is a type alias for the internal type already.
+
+	// EvalVersion is the evaluator version which was used for the CUE evaluation,
+	// corresponding to one of the values under [cuelang.org/go/cue/cuecontext.EvalVersion].
+	EvalVersion internal.EvaluatorVersion
+
 	// Operation counters
 	//
 	// These counters account for several key operations.
@@ -69,6 +80,22 @@ type Counts struct {
 // add checks on each of the operations.
 
 func (c *Counts) Add(other Counts) {
+	switch v, vo := c.EvalVersion, other.EvalVersion; {
+	case v == internal.EvalVersionUnset:
+		// The first time we add evaluator counts, we record the evaluator version being used.
+		if vo == internal.EvalVersionUnset {
+			panic("the first call to Counts.Add must provide an evaluator version")
+		}
+		c.EvalVersion = vo
+	case v != vo:
+		// Any further evaluator counts being added must match the same evaluator version.
+		//
+		// TODO(mvdan): this is currently not possible to enforce, as we collect stats globally
+		// via [adt.AddStats] which includes stats from contexts created with different versions.
+		// We likely need to refactor the collection of stats so that it is not global first.
+
+		// panic(fmt.Sprintf("cannot mix evaluator versions in Counts.Add: %v vs %v", v, vo))
+	}
 	c.Unifications += other.Unifications
 	c.Conjuncts += other.Conjuncts
 	c.Disjuncts += other.Disjuncts

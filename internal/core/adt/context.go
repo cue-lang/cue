@@ -186,6 +186,7 @@ func New(v *Vertex, cfg *Config) *OpContext {
 		Format:      cfg.Format,
 		vertex:      v,
 		Version:     version,
+		stats:       stats.Counts{EvalVersion: version},
 		Config:      flags,
 		taskContext: schedConfig,
 	}

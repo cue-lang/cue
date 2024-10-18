@@ -22,6 +22,15 @@ env CUE_STATS_FILE=-
 exec cue eval x.cue
 cmp stderr out/stderr
 
+# Check that EvalVersion reports the correct value.
+env CUE_STATS_FILE=-
+env CUE_EXPERIMENT=evalv3=0
+exec cue eval x.cue
+stderr -count=1 '"EvalVersion": 2,'
+env CUE_EXPERIMENT=evalv3=1
+exec cue eval x.cue
+stderr -count=1 '"EvalVersion": 3,'
+
 -- x.cue --
 a: 1
 b: 2
@@ -36,6 +45,7 @@ contents overwritten
 -- out/stats.json --
 {
     "CUE": {
+        "EvalVersion": 2,
         "Unifications": 4,
         "Disjuncts": 6,
         "Conjuncts": 8,
@@ -51,6 +61,7 @@ contents overwritten
 }
 -- out/stats.cue --
 CUE: {
+	EvalVersion:  2
 	Unifications: 4
 	Disjuncts:    6
 	Conjuncts:    8
@@ -65,6 +76,7 @@ Go: {
 }
 -- out/stats.yaml --
 CUE:
+  EvalVersion: 2
   Unifications: 4
   Disjuncts: 6
   Conjuncts: 8
@@ -78,6 +90,7 @@ Go:
 -- out/stderr --
 {
     "CUE": {
+        "EvalVersion": 2,
         "Unifications": 4,
         "Disjuncts": 6,
         "Conjuncts": 8,

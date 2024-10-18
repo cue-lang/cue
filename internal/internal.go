@@ -107,14 +107,27 @@ func Version(minor, patch int) int {
 	return -1000 + 100*minor + patch
 }
 
+// EvaluatorVersion is declared here so it can be used everywhere without import cycles,
+// but the canonical documentation lives at [cuelang.org/go/cue/cuecontext.EvalVersion].
+//
+// TODO(mvdan): rename to EvalVersion for consistency with cuecontext.
 type EvaluatorVersion int
 
 const (
-	DefaultVersion EvaluatorVersion = iota
+	// EvalVersionUnset is the zero value, which signals that no evaluator version is provided.
+	EvalVersionUnset EvaluatorVersion = 0
 
-	// The DevVersion is used for new implementations of the evaluator that
-	// do not cover all features of the CUE language yet.
-	DevVersion
+	// The values below are documented under [cuelang.org/go/cue/cuecontext.EvalVersion].
+	// We should never change or delete the values below, as they describe all known past versions
+	// which is useful for understanding old debug output.
+
+	EvalV2 EvaluatorVersion = 2
+	EvalV3 EvaluatorVersion = 3
+
+	// The current default and experimental versions.
+
+	DefaultVersion = EvalV2 // TODO(mvdan): rename to EvalDefault for consistency with cuecontext
+	DevVersion     = EvalV3 // TODO(mvdan): rename to EvalExperiment for consistency with cuecontext
 )
 
 // ListEllipsis reports the list type and remaining elements of a list. If we

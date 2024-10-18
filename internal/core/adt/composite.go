@@ -159,10 +159,10 @@ type Vertex struct {
 	//
 	state *nodeContext
 
-	// cc manages the closedness logic for this Vertex. It is created
+	// _cc manages the closedness logic for this Vertex. It is created
 	// by rootCloseContext.
 	// TODO: move back to nodeContext, but be sure not to clone it.
-	cc *closeContext
+	_cc *closeContext
 
 	// Label is the feature leading to this vertex.
 	Label Feature
@@ -299,25 +299,29 @@ func equalDeref(a, b *Vertex) bool {
 	return deref(a) == deref(b)
 }
 
+func (v *Vertex) cc() *closeContext {
+	return v._cc
+}
+
 // rootCloseContext creates a closeContext for this Vertex or returns the
 // existing one.
 func (v *Vertex) rootCloseContext(ctx *OpContext) *closeContext {
-	if v.cc == nil {
-		v.cc = &closeContext{
+	if v._cc == nil {
+		v._cc = &closeContext{
 			group:           (*ConjunctGroup)(&v.Conjuncts),
 			parent:          nil,
 			src:             v,
 			parentConjuncts: v,
 		}
-		v.cc.incDependent(ctx, ROOT, nil) // matched in REF(decrement:nodeDone)
+		v._cc.incDependent(ctx, ROOT, nil) // matched in REF(decrement:nodeDone)
 	}
-	v.cc.origin = v.cc
+	v._cc.origin = v._cc
 	if p := v.Parent; p != nil {
 		pcc := p.rootCloseContext(ctx)
-		v.cc.origin = pcc.origin
+		v._cc.origin = pcc.origin
 	}
 
-	return v.cc
+	return v._cc
 }
 
 // newInlineVertex creates a Vertex that is needed for computation, but for

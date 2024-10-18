@@ -315,7 +315,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 
 	// validationCompleted
 	if n.completed&(subFieldsProcessed) != 0 {
-		n.node.HasEllipsis = n.node.cc.hasEllipsis
+		n.node.HasEllipsis = n.node.cc().hasEllipsis
 
 		// The next piece of code used to address the following case
 		// (order matters)
@@ -415,7 +415,7 @@ func (n *nodeContext) completeNodeTasks(mode runMode) {
 	// - pending arcs (or incoming COMPS)
 	// TODO: replace with something more principled that does not piggyback on
 	// debug information.
-	for _, r := range v.cc.externalDeps {
+	for _, r := range v.cc().externalDeps {
 		src := r.src
 		a := &src.arcs[r.index]
 		if a.decremented || a.kind != NOTIFY {
@@ -493,7 +493,7 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 	// Investigate how to work around this.
 	n.completeNodeTasks(finalize)
 
-	for _, r := range n.node.cc.externalDeps {
+	for _, r := range n.node.cc().externalDeps {
 		src := r.src
 		a := &src.arcs[r.index]
 		if a.decremented {

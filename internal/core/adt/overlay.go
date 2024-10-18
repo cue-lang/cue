@@ -150,11 +150,11 @@ func (ctx *overlayContext) cloneVertex(x *Vertex) *Vertex {
 
 	ctx.vertices = append(ctx.vertices, v)
 
-	v.cc = ctx.allocCC(x.cc)
+	v._cc = ctx.allocCC(x.cc())
 
-	v.cc.src = v
-	v.cc.parentConjuncts = v
-	v.Conjuncts = *v.cc.group
+	v._cc.src = v
+	v._cc.parentConjuncts = v
+	v.Conjuncts = *v._cc.group
 
 	if a := x.Arcs; len(a) > 0 {
 		// TODO(perf): reuse buffer.

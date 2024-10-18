@@ -16,6 +16,24 @@
       "message": "FWIW this could just be:\n\n```\nfunc must[T any](v T, err error) func(t *testing.T) T {\n\treturn func(t *testing.T) T {\n\t\tqt.Assert(t, qt.IsNil(err))\n\t\treturn v\n\t}\n}\n```",
       "revId": "27eb161ff05a68552f2ff02ca0411b4b645509b8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "38e70a97_0bcc0b41",
+        "filename": "cue/interpreter/wasm/exe_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-18T14:32:50Z",
+      "side": 1,
+      "message": "I\u0027m only moving code here, and this is just test code, so I\u0027m going to leave it as-is for now for the sake of keeping the code move clean :) Feel free to send a follow-up.",
+      "parentUuid": "d25171a0_833e641e",
+      "revId": "27eb161ff05a68552f2ff02ca0411b4b645509b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

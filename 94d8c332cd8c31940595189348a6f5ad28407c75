@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fb45ad2a_4907d369",
+        "filename": "internal/core/export/topological/cycles.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-18T10:50:50Z",
+      "side": 1,
+      "message": "O((n+e)*c)\nwhere\nn: number of nodes in the SCC\ne: number of edges between the nodes in the SCC\nc: number of cycles discovered",
+      "parentUuid": "1d920dea_801a0030",
+      "revId": "94d8c332cd8c31940595189348a6f5ad28407c75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4ab1a947_4cf3a2e2",
         "filename": "internal/core/export/topological/graph_test.go",
         "patchSetId": 2

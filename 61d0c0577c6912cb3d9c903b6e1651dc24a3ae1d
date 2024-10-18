@@ -16,6 +16,24 @@
       "message": "```suggestion\n\t// or set one globally with os.Setenv(\"CUE_REGISTRY\", \"registry.myorg.com\").\n```",
       "revId": "61d0c0577c6912cb3d9c903b6e1651dc24a3ae1d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f83ad4ba_523a2621",
+        "filename": "cue/load/example_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-18T14:32:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a353337_f7159fc0",
+      "revId": "61d0c0577c6912cb3d9c903b6e1651dc24a3ae1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

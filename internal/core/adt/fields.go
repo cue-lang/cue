@@ -457,13 +457,10 @@ func (cc *closeContext) assignConjunct(ctx *OpContext, root *closeContext, c Con
 
 	c.CloseInfo.cc = nil
 
-	var group ConjunctGroup
-	if arc.group != nil {
-		group = *arc.group
-	}
-	pos = len(group)
+	group := arc.group
+	pos = len(*group)
 
-	added = !check || !hasConjunct(group, c)
+	added = !check || !hasConjunct(*group, c)
 	if added {
 		c.CloseInfo.cc = arc
 
@@ -471,12 +468,7 @@ func (cc *closeContext) assignConjunct(ctx *OpContext, root *closeContext, c Con
 			panic("Inconsistent src")
 		}
 
-		group = append(group, c)
-		if arc.group == nil {
-			arc.group = &group
-		} else {
-			*arc.group = group
-		}
+		*group = append(*group, c)
 	}
 
 	return arc, pos, added

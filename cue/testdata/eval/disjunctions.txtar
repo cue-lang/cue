@@ -161,16 +161,37 @@ issue3490: full: {
 		#D2: "d2"
 	}
 }
+-- issue3434.cue --
+issue3434: t1: {
+	({} | {})
+	{["x"]: 1}
+	{["y"]: 2}
+}
+issue3434: full: {
+	out: #Schema & {
+		steps: [{run: "example"}]
+	}
+	
+	#Schema: {
+		steps: [...{run: string}]
+		#matrixConfig: string | [...#matrixConfig]
+	
+		matrix?: ({...} | string) & {
+			{[=~"^foo"]: [...{[string]: #matrixConfig}]}
+			{[=~"^bar"]: [...#matrixConfig] | string}
+		}
+	}
+}
 -- out/eval/stats --
 Leaks:  0
-Freed:  426
-Reused: 410
+Freed:  449
+Reused: 433
 Allocs: 16
-Retain: 25
+Retain: 26
 
-Unifications: 197
-Conjuncts:    778
-Disjuncts:    427
+Unifications: 210
+Conjuncts:    817
+Disjuncts:    451
 -- out/evalalpha --
 Errors:
 f.name: conflicting values "int" and "str":
@@ -352,6 +373,31 @@ Result:
           0: (string){ "foo" }
         }
       }) }
+  }
+  issue3434: (struct){
+    t1: (struct){
+    }
+    full: (struct){
+      out: (#struct){
+        steps: (#list){
+          0: (#struct){
+            run: (string){ "example" }
+          }
+        }
+        #matrixConfig: ((string|list)){ |((string){ string }, (list){
+          }) }
+        matrix?: (#struct){
+        }
+      }
+      #Schema: (#struct){
+        steps: (list){
+        }
+        #matrixConfig: ((string|list)){ |((string){ string }, (list){
+          }) }
+        matrix?: (#struct){
+        }
+      }
+    }
   }
   issue3490: (struct){
     nested: (struct){
@@ -635,6 +681,31 @@ Result:
         }
       }) }
   }
+  issue3434: (struct){
+    t1: (struct){
+    }
+    full: (struct){
+      out: (#struct){
+        steps: (#list){
+          0: (#struct){
+            run: (string){ "example" }
+          }
+        }
+        #matrixConfig: ((string|list)){ |((string){ string }, (list){
+          }) }
+        matrix?: (#struct){
+        }
+      }
+      #Schema: (#struct){
+        steps: (list){
+        }
+        #matrixConfig: ((string|list)){ |((string){ string }, (list){
+          }) }
+        matrix?: (#struct){
+        }
+      }
+    }
+  }
   issue3490: (struct){
     nested: (struct){
       p1: (string){ |((string){ "a" }, (string){ "b" }) }
@@ -884,6 +955,57 @@ Result:
         "bar",
       ]
     })
+  }
+}
+--- issue3434.cue
+{
+  issue3434: {
+    t1: {
+      ({}|{})
+      {
+        ["x"]: 1
+      }
+      {
+        ["y"]: 2
+      }
+    }
+  }
+  issue3434: {
+    full: {
+      out: (〈0;#Schema〉 & {
+        steps: [
+          {
+            run: "example"
+          },
+        ]
+      })
+      #Schema: {
+        steps: [
+          ...{
+            run: string
+          },
+        ]
+        #matrixConfig: (string|[
+          ...〈1;#matrixConfig〉,
+        ])
+        matrix?: (({
+          ...
+        }|string) & {
+          {
+            [=~"^foo"]: [
+              ...{
+                [string]: 〈4;#matrixConfig〉
+              },
+            ]
+          }
+          {
+            [=~"^bar"]: ([
+              ...〈3;#matrixConfig〉,
+            ]|string)
+          }
+        })
+      }
+    }
   }
 }
 --- issue3490.cue

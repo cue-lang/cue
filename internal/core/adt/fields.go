@@ -786,7 +786,8 @@ func (cc *closeContext) insertConjunct(ctx *OpContext, key *closeContext, c Conj
 		// TODO: we should probably only notify a conjunct once the root of the
 		// conjunct group is completed. This will make it easier to "stitch" the
 		// conjunct trees together, as its correctness will be guaranteed.
-		cc.insertConjunct(ctx, rec.cc, c, id, mode, check, checkClosed)
+		c.CloseInfo.cc = rec.cc
+		rec.v.state.scheduleConjunct(c, id)
 	}
 
 	return

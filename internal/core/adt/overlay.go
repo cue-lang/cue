@@ -344,14 +344,18 @@ func (ctx *overlayContext) initCloneCC(x *closeContext) {
 	// necessary to use overlays.
 	o.child = x.child
 	if x.child != nil && x.child.overlay != nil {
-		// TODO: there seem to be situations where this is possible after all.
-		// See if this is really true, and we should remove this panic, or if
-		// this underlies a bug of sorts.
+		// TODO(evalv3): there seem to be situations where this is possible
+		// after all. See if this is really true, and we should remove this
+		// panic, or if this underlies a bug of sorts.
 		// panic("unexpected overlay in child")
 	}
 	o.next = x.next
 	if x.next != nil && x.next.overlay != nil {
-		panic("unexpected overlay in next")
+		// TODO(evalv3): there seem to be situations where this is possible
+		// after all. See if this is really true, and we should remove this
+		// panic, or if this underlies a bug of sorts.
+		// See Issue #3434.
+		// panic("unexpected overlay in next")
 	}
 
 	for _, d := range x.dependencies {

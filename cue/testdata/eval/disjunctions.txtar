@@ -143,16 +143,34 @@ issue3411: {
 	x: y?: [...string]
 	x: {y: ["foo"]} | *{y: ["bar"]}
 }
+-- issue3490.cue --
+issue3490: nested: p1: {
+	("a"|"b") | "b"
+	"a"|"b"
+}
+issue3490: nested: p2: {
+	"a"|"b"
+	("a"|"b") | "b"
+}
+issue3490: full: {
+	data: [...#Schema]
+	data: [#Schema & {}]
+	#Schema: {
+		runs?: "foo" | ([#D1] | [#D1, #D2])
+		#D1: "d1"
+		#D2: "d2"
+	}
+}
 -- out/eval/stats --
 Leaks:  0
-Freed:  355
-Reused: 343
-Allocs: 12
-Retain: 0
+Freed:  426
+Reused: 410
+Allocs: 16
+Retain: 25
 
-Unifications: 164
-Conjuncts:    647
-Disjuncts:    355
+Unifications: 197
+Conjuncts:    778
+Disjuncts:    427
 -- out/evalalpha --
 Errors:
 f.name: conflicting values "int" and "str":
@@ -334,6 +352,36 @@ Result:
           0: (string){ "foo" }
         }
       }) }
+  }
+  issue3490: (struct){
+    nested: (struct){
+      p1: (string){ |((string){ "a" }, (string){ "b" }) }
+      p2: (string){ |((string){ "a" }, (string){ "b" }) }
+    }
+    full: (struct){
+      data: (#list){
+        0: (#struct){
+          runs?: ((string|list)){ |((string){ "foo" }, (#list){
+              0: (string){ "d1" }
+            }, (#list){
+              0: (string){ "d1" }
+              1: (string){ "d2" }
+            }) }
+          #D1: (string){ "d1" }
+          #D2: (string){ "d2" }
+        }
+      }
+      #Schema: (#struct){
+        runs?: ((string|list)){ |((string){ "foo" }, (#list){
+            0: (string){ "d1" }
+          }, (#list){
+            0: (string){ "d1" }
+            1: (string){ "d2" }
+          }) }
+        #D1: (string){ "d1" }
+        #D2: (string){ "d2" }
+      }
+    }
   }
 }
 -- diff/-out/evalalpha<==>+out/eval --
@@ -587,6 +635,36 @@ Result:
         }
       }) }
   }
+  issue3490: (struct){
+    nested: (struct){
+      p1: (string){ |((string){ "a" }, (string){ "b" }) }
+      p2: (string){ |((string){ "a" }, (string){ "b" }) }
+    }
+    full: (struct){
+      data: (#list){
+        0: (#struct){
+          runs?: ((string|list)){ |((string){ "foo" }, (#list){
+              0: (string){ "d1" }
+            }, (#list){
+              0: (string){ "d1" }
+              1: (string){ "d2" }
+            }) }
+          #D1: (string){ "d1" }
+          #D2: (string){ "d2" }
+        }
+      }
+      #Schema: (#struct){
+        runs?: ((string|list)){ |((string){ "foo" }, (#list){
+            0: (string){ "d1" }
+          }, (#list){
+            0: (string){ "d1" }
+            1: (string){ "d2" }
+          }) }
+        #D1: (string){ "d1" }
+        #D2: (string){ "d2" }
+      }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -806,5 +884,44 @@ Result:
         "bar",
       ]
     })
+  }
+}
+--- issue3490.cue
+{
+  issue3490: {
+    nested: {
+      p1: {
+        (("a"|"b")|"b")
+        ("a"|"b")
+      }
+    }
+  }
+  issue3490: {
+    nested: {
+      p2: {
+        ("a"|"b")
+        (("a"|"b")|"b")
+      }
+    }
+  }
+  issue3490: {
+    full: {
+      data: [
+        ...〈1;#Schema〉,
+      ]
+      data: [
+        (〈1;#Schema〉 & {}),
+      ]
+      #Schema: {
+        runs?: ("foo"|([
+          〈1;#D1〉,
+        ]|[
+          〈1;#D1〉,
+          〈1;#D2〉,
+        ]))
+        #D1: "d1"
+        #D2: "d2"
+      }
+    }
   }
 }

@@ -208,20 +208,24 @@ issue2052: full: {
 	d: #Depth & {#in: tree}
 }
 -- out/evalalpha/stats --
-Leaks:  13628
-Freed:  1534
-Reused: 1533
-Allocs: 13629
+Leaks:  12701
+Freed:  1308
+Reused: 1307
+Allocs: 12702
 Retain: 0
 
-Unifications: 5379
-Conjuncts:    72236
-Disjuncts:    9483
+Unifications: 5010
+Conjuncts:    66031
+Disjuncts:    8699
 -- out/evalalpha --
 Errors:
 issue2052.t1.#Depth: adding field #basic not allowed as field set was already referenced:
     ./issue2052.cue:8:20
+issue2052.t1.d: adding field #basic not allowed as field set was already referenced:
+    ./issue2052.cue:8:20
 issue2052.t2.#Depth: adding field #basic not allowed as field set was already referenced:
+    ./issue2052.cue:41:20
+issue2052.t2.d: adding field #basic not allowed as field set was already referenced:
     ./issue2052.cue:41:20
 
 Result:
@@ -316,7 +320,9 @@ Result:
         }
       }
       tree: (string){ "bar" }
-      d: (#struct){
+      d: (_|_){
+        // [eval] issue2052.t1.d: adding field #basic not allowed as field set was already referenced:
+        //     ./issue2052.cue:8:20
         #in: (string){ "bar" }
         #maxiter: (int){ 4 }
         #funcs: (#struct){
@@ -342,8 +348,6 @@ Result:
             out: (int){ 1 }
           }
         }
-        #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-        out: (int){ 1 }
       }
     }
     t2: (_|_){
@@ -385,7 +389,9 @@ Result:
         }
       }
       tree: (string){ "bar" }
-      d: (#struct){
+      d: (_|_){
+        // [eval] issue2052.t2.d: adding field #basic not allowed as field set was already referenced:
+        //     ./issue2052.cue:41:20
         #in: (string){ "bar" }
         #maxiter: (int){ 4 }
         #funcs: (#struct){
@@ -411,8 +417,6 @@ Result:
             out: (int){ 1 }
           }
         }
-        #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-        out: (int){ 1 }
       }
     }
     full: (struct){
@@ -725,28 +729,32 @@ diff old new
 -Reused: 1816
 -Allocs: 70
 -Retain: 169
-+Leaks:  13628
-+Freed:  1534
-+Reused: 1533
-+Allocs: 13629
++Leaks:  12701
++Freed:  1308
++Reused: 1307
++Allocs: 12702
 +Retain: 0
  
 -Unifications: 801
 -Conjuncts:    3177
 -Disjuncts:    1979
-+Unifications: 5379
-+Conjuncts:    72236
-+Disjuncts:    9483
++Unifications: 5010
++Conjuncts:    66031
++Disjuncts:    8699
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,4 +1,12 @@
+@@ -1,4 +1,16 @@
 -(struct){
 +Errors:
 +issue2052.t1.#Depth: adding field #basic not allowed as field set was already referenced:
 +    ./issue2052.cue:8:20
++issue2052.t1.d: adding field #basic not allowed as field set was already referenced:
++    ./issue2052.cue:8:20
 +issue2052.t2.#Depth: adding field #basic not allowed as field set was already referenced:
++    ./issue2052.cue:41:20
++issue2052.t2.d: adding field #basic not allowed as field set was already referenced:
 +    ./issue2052.cue:41:20
 +
 +Result:
@@ -755,7 +763,7 @@ diff old new
    chain: (struct){
      t1: (struct){
        #maxiter: (int){ 2 }
-@@ -27,15 +35,11 @@
+@@ -27,15 +39,11 @@
            }
          }
        }
@@ -776,7 +784,7 @@ diff old new
            }
          }
          X: (int){ 1 }
-@@ -51,148 +55,148 @@
+@@ -51,148 +59,148 @@
        }
      }
    }
@@ -915,6 +923,8 @@ diff old new
 -          }
 -        }
 -        #in: (string){ "bar" }
+-        #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+-        out: (int){ 1 }
 +  issue2052: (_|_){
 +    // [eval]
 +    t1: (_|_){
@@ -956,7 +966,9 @@ diff old new
 +        }
 +      }
 +      tree: (string){ "bar" }
-+      d: (#struct){
++      d: (_|_){
++        // [eval] issue2052.t1.d: adding field #basic not allowed as field set was already referenced:
++        //     ./issue2052.cue:8:20
 +        #in: (string){ "bar" }
 +        #maxiter: (int){ 4 }
 +        #funcs: (#struct){
@@ -982,8 +994,6 @@ diff old new
 +            out: (int){ 1 }
 +          }
 +        }
-+        #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-+        out: (int){ 1 }
 +      }
 +    }
 +    t2: (_|_){
@@ -1025,7 +1035,9 @@ diff old new
 +        }
 +      }
 +      tree: (string){ "bar" }
-+      d: (#struct){
++      d: (_|_){
++        // [eval] issue2052.t2.d: adding field #basic not allowed as field set was already referenced:
++        //     ./issue2052.cue:41:20
 +        #in: (string){ "bar" }
 +        #maxiter: (int){ 4 }
 +        #funcs: (#struct){
@@ -1051,8 +1063,6 @@ diff old new
 +            out: (int){ 1 }
 +          }
 +        }
-         #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-         out: (int){ 1 }
        }
      }
      full: (struct){
@@ -1062,7 +1072,7 @@ diff old new
          #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
          #funcFactory: (#struct){
            #next: (_){ _ }
-@@ -339,49 +343,7 @@
+@@ -339,49 +347,7 @@
          }
          cow: (string){ "moo" }
        }
@@ -1113,7 +1123,7 @@ diff old new
          #in: (#struct){
            a: (#struct){
              foo: (string){ "bar" }
-@@ -393,6 +355,142 @@
+@@ -393,6 +359,142 @@
            }
            cow: (string){ "moo" }
          }

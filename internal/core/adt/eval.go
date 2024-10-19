@@ -1120,6 +1120,12 @@ type nodeContextState struct {
 	// progress.
 	isCompleting int
 
+	// runMode keeps track of what runMode a disjunct should run as. This is
+	// relevant for nested disjunctions, like the 2|3 in (1 | (2|3)) & (1 | 2),
+	// where the nested disjunction should _not_ be considered as final, as
+	// there is still a disjunction at a higher level to be processed.
+	runMode runMode
+
 	// evalDept is a number that is assigned when evaluating arcs and is set to
 	// detect structural cycles. This value may be temporarily altered when a
 	// node descends into evaluating a value that may be an error (pattern

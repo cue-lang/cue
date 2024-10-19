@@ -129,7 +129,7 @@ package adt
 //
 // ## Evaluating equality of partially evaluated nodes
 //
-// Because unevaluated expressions may depend on results that have yet been
+// Because unevaluated expressions may depend on results that have yet to be
 // computed, we cannot reliably compare the results of a Vertex to determine
 // equality. We need a different strategy.
 //
@@ -272,10 +272,17 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 	for i := 0; i < len(a); i++ {
 		d := &a[i]
 
+		// We need to only finalize the last series of disjunctions. However,
+		// disjunctions can be nested.
 		mode := attemptOnly
-		if i == len(a)-1 {
+		switch {
+		case n.runMode != 0:
+			mode = n.runMode
+		case i == len(a)-1:
 			mode = finalize
 		}
+
+		// Mark no final in nodeContext and observe later.
 		results = n.crossProduct(results, cross, d, mode)
 
 		// TODO: do we unwind only at the end or also intermittently?
@@ -414,6 +421,7 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode) (*node
 	n.scheduler.blocking = n.scheduler.blocking[:0]
 
 	d := oc.cloneRoot(n)
+	d.runMode = mode
 
 	d.defaultMode = combineDefault(m, n.defaultMode)
 
@@ -535,10 +543,18 @@ outer:
 			// it, trading correctness for performance.
 			// If enabled, we would simply "continue" here.
 
-			for i, h := range xn.disjunctCCs { // TODO(perf): only iterate over completed
-				x, y := findIntersections(h.cc, x.disjunctCCs[i].cc)
-				if !equalPartialNode(xn.ctx, x, y) {
-					continue outer
+			for i, h := range xn.disjunctCCs {
+				// TODO(perf): only iterate over completed
+				// TODO(evalv3): we now have a double loop to match the
+				// disjunction holes. It should be possible to keep them
+				// aligned and avoid the inner loop.
+				for _, g := range x.disjunctCCs {
+					if h.underlying == g.underlying {
+						x, y := findIntersections(h.cc, x.disjunctCCs[i].cc)
+						if !equalPartialNode(xn.ctx, x, y) {
+							continue outer
+						}
+					}
 				}
 			}
 			if len(xn.tasks) != len(x.tasks) {
@@ -579,7 +595,7 @@ outer:
 }
 
 // findIntersections reports the closeContext, relative to the two given
-// disjunction holds, that should be used in comparing the arc set.
+// disjunction holes, that should be used in comparing the arc set.
 // x and y MUST both be originating from the same disjunct hole. This ensures
 // that the depth of the parent chain is the same and that they have the
 // same underlying closeContext.

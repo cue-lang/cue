@@ -280,7 +280,7 @@ type Vertex struct {
 	// TODO: all access to Conjuncts should go through functions like
 	// VisitLeafConjuncts and VisitAllConjuncts. We should probably make this
 	// an unexported field.
-	Conjuncts []Conjunct
+	Conjuncts ConjunctGroup
 
 	// Structs is a slice of struct literals that contributed to this value.
 	// This information is used to compute the topological sort of arcs.
@@ -312,7 +312,7 @@ func (v *Vertex) cc() *closeContext {
 func (v *Vertex) rootCloseContext(ctx *OpContext) *closeContext {
 	if v._cc == nil {
 		v._cc = &closeContext{
-			group:           (*ConjunctGroup)(&v.Conjuncts),
+			group:           &v.Conjuncts,
 			parent:          nil,
 			src:             v,
 			parentConjuncts: v,

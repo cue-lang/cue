@@ -16,6 +16,24 @@
       "message": "huh, this change surprises me slightly - why force the copy?",
       "revId": "6fa5257e1e5ff87df73a8b7043a72d0752dbbfc9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e9a5155_5599da28",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1445,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-19T08:51:00Z",
+      "side": 1,
+      "message": "There are now some places in the code that use .Elem() on the result of ConjunctAt(x). The result of the latter is not addressable. So either that code has to be broken onto different lines, or we make Elem not a pointer receiver.\n\nI guess a viable, and perhaps better, alternative is to have ConjunctAt return a pointer. Although there are pros and cons to this.",
+      "parentUuid": "775170b5_9cdde25c",
+      "revId": "6fa5257e1e5ff87df73a8b7043a72d0752dbbfc9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

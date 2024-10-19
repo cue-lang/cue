@@ -1120,6 +1120,10 @@ type nodeContextState struct {
 	// progress.
 	isCompleting int
 
+	// isInterim indicates that this nodeContext should not be considered to be
+	// the last disjunction in a sequence.
+	runMode runMode
+
 	// evalDept is a number that is assigned when evaluating arcs and is set to
 	// detect structural cycles. This value may be temporarily altered when a
 	// node descends into evaluating a value that may be an error (pattern

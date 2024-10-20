@@ -110,7 +110,7 @@ func (x *StructLit) evaluate(c *OpContext, state combinedFlags) Value {
 	//
 	// v.completeArcs(c, state)
 
-	v.CompleteArcs(c)
+	v.CompleteArcsOnly(c)
 	return v
 }
 
@@ -2097,7 +2097,9 @@ func (x *ForClause) yield(s *compState) {
 
 		if c.isDevVersion() {
 			// TODO(evalv3): See comment in StructLit.evaluate.
-			c.require(a, arcTypeKnown)
+			if state := a.getState(c); state != nil {
+				state.process(arcTypeKnown, attemptOnly)
+			}
 		} else {
 			if !a.isDefined() {
 				a.Finalize(c)

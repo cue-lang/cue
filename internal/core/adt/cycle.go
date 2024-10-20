@@ -315,6 +315,16 @@ package adt
 // structural cycles to such nodes as "reference cycles". As pattern constraints
 // are optional, it is safe to ignore such errors.
 //
+// ### Lookups in inline cycles
+//
+// A lookup, especially in inline cycles, should be considered evidence of
+// non-cyclicity. Consider the following example:
+//
+// 		{ p: { x: p, y: 1 } }.p.x.y
+//
+// without considering a lookup as evidence of non-cyclicity, this would be
+// resulting in a structural cycle.
+//
 // ## CORRECTNESS
 //
 // ### The algorithm will terminate

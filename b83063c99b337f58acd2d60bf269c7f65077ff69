@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3f8ac07_f79a1e6d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-20T20:59:01Z",
+      "side": 1,
+      "message": "can you expand on this a bit? are you implying that the solution here is not complete or fully correct, or that the code could be simpler or more efficient? is the code in this CL going to give problems at any point in the near future?",
+      "revId": "b83063c99b337f58acd2d60bf269c7f65077ff69",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2cc1b85a_803ef04f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-20T20:59:01Z",
+      "side": 1,
+      "message": "should this not mean adding a diff/todo comment, like a P2 or P3?",
+      "range": {
+        "startLine": 26,
+        "startChar": 19,
+        "endLine": 27,
+        "endChar": 43
+      },
+      "revId": "b83063c99b337f58acd2d60bf269c7f65077ff69",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95b1edd5_9e782ee3",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 547,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-20T20:59:01Z",
+      "side": 1,
+      "message": "can you clarify whether this is a performance TODO? I assume it is, given the double loop.",
+      "revId": "b83063c99b337f58acd2d60bf269c7f65077ff69",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fce4926a_fa9e055b",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1123,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-20T20:59:01Z",
+      "side": 1,
+      "message": "did you rename this field? the field is runMode, not isInterim. the whole godoc seems to be out of date now.",
+      "range": {
+        "startLine": 1123,
+        "startChar": 4,
+        "endLine": 1123,
+        "endChar": 13
+      },
+      "revId": "b83063c99b337f58acd2d60bf269c7f65077ff69",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

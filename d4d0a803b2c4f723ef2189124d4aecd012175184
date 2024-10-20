@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8c9441b_4f1537a1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-20T21:00:03Z",
+      "side": 1,
+      "message": "As long as we don\u0027t think this leads to bad behavior or incorrect results, SGTM.",
+      "revId": "d4d0a803b2c4f723ef2189124d4aecd012175184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

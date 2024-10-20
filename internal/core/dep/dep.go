@@ -489,6 +489,10 @@ func (c *visitor) reportDependency(env *adt.Environment, ref adt.Resolver, v *ad
 
 	c.numRefs++
 
+	if c.ctxt.Version == internal.DevVersion {
+		v.Finalize(c.ctxt)
+	}
+
 	d := Dependency{
 		Node:      v,
 		Reference: altRef,

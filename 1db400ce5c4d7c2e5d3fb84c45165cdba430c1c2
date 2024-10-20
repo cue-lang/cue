@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "745d5a10_444f9c61",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 673,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-20T21:03:14Z",
+      "side": 1,
+      "message": "does the TODO apply to the new line as well?",
+      "revId": "1db400ce5c4d7c2e5d3fb84c45165cdba430c1c2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

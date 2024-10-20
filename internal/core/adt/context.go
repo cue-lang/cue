@@ -909,6 +909,8 @@ func (c *OpContext) unifyNode(v Expr, state combinedFlags) (result Value) {
 
 		if c.isDevVersion() {
 			if n := v.getState(c); n != nil {
+				// A lookup constitutes a new conjunct.
+				n.hasNonCycle = true
 				// Always yield to not get spurious errors.
 				n.process(arcTypeKnown, yield)
 			}

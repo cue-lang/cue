@@ -88,6 +88,7 @@ func (n *nodeContext) share(c Conjunct, arc *Vertex, id CloseInfo) {
 	if arc.IsDetached() && !arc.anonymous { // Second check necessary  ? XXX
 		// If the status is just "conjuncts", we could just take over the arcs.
 		arc.Parent = n.node.Parent
+		arc.Finalize(n.ctx)
 		for _, a := range arc.Arcs {
 			a.Parent = n.node
 		}

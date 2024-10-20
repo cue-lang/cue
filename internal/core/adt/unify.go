@@ -134,6 +134,15 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		return false
 	}
 
+	// Note that the state of a node can be removed before the node is.
+	// This happens with the close builtin, for instance.
+	// See TestFromAPI in pkg export.
+	// TODO(evalv3): find something more principled.
+	if v.state == nil && v.cc() != nil && v.cc().conjunctCount == 0 {
+		v.status = finalized
+		return true
+	}
+
 	n := v.getState(c)
 	if n == nil {
 		return true // already completed
@@ -662,6 +671,7 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 		// TODO: ideally this should not be run at this point. Consider under
 		// which circumstances this is still necessary, and at least ensure
 		// this will not be run if node v currently has a running task.
+		state.hasNonCycle = true
 		state.completeNodeTasks(attemptOnly)
 	}
 

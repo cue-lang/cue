@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "72d3ada3_30478e1b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-21T08:04:02Z",
+      "side": 1,
+      "message": "Correct. Most of the changes in this chain of CLs were related to panics.",
+      "parentUuid": "d029ae66_99c20bb4",
+      "revId": "32af21b638e69ed39f5ecc41c004ba5d10f9dbd5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d1fe2087_9f7c12ce",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0589067f_a545805c",
+        "filename": "internal/core/adt/eval_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-21T08:04:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d1fe2087_9f7c12ce",
+      "revId": "32af21b638e69ed39f5ecc41c004ba5d10f9dbd5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "99f1a131_cece5e42",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-10-20T20:54:44Z",
       "side": 1,
       "message": "does the TODO here still apply?",
+      "revId": "32af21b638e69ed39f5ecc41c004ba5d10f9dbd5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "53466abc_43fd9471",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 788,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-21T08:04:02Z",
+      "side": 1,
+      "message": "Yes, this does not materially change the situation of this comment.",
+      "parentUuid": "99f1a131_cece5e42",
       "revId": "32af21b638e69ed39f5ecc41c004ba5d10f9dbd5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

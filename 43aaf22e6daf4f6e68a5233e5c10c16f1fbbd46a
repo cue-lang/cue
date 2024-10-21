@@ -39,6 +39,24 @@
       "message": "I guess this is a testscript because of the need for multiple packages to reproduce this? Do the evaluator txtar tests not support this?",
       "revId": "43aaf22e6daf4f6e68a5233e5c10c16f1fbbd46a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3c3b794_b7a5bcda",
+        "filename": "cmd/cue/cmd/testdata/script/export_issue3511.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-21T14:37:12Z",
+      "side": 1,
+      "message": "They do support this, but there is something more subtle going on here.\n\nThe result needed not only to be evaluated, but also exported for the problem to become fully exposed. This is because the evaluator correctly shares the node, but then does not report the actual node, as it is outside of the package / there is no path to it from the root.\n\nThis would change if we export there as well, but right now we don\u0027t.",
+      "parentUuid": "8876160c_f26d01ce",
+      "revId": "43aaf22e6daf4f6e68a5233e5c10c16f1fbbd46a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

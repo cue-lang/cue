@@ -285,7 +285,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		}
 
 	case needs&fieldSetKnown != 0:
-		n.evalArcTypes()
+		n.evalArcTypes(mode)
 	}
 
 	if err := n.getErr(); err != nil {
@@ -650,12 +650,12 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 	return success
 }
 
-func (n *nodeContext) evalArcTypes() {
+func (n *nodeContext) evalArcTypes(mode runMode) {
 	for _, a := range n.node.Arcs {
 		if a.ArcType != ArcPending {
 			continue
 		}
-		a.unify(n.ctx, arcTypeKnown, yield)
+		a.unify(n.ctx, arcTypeKnown, mode)
 		// Ensure the arc is processed up to the desired level
 		if a.ArcType == ArcPending {
 			// TODO: cancel tasks?

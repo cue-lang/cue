@@ -224,9 +224,9 @@ issue2052.t1.#Depth: adding field #basic not allowed as field set was already re
 issue2052.t1.d: adding field #basic not allowed as field set was already referenced:
     ./issue2052.cue:8:20
 issue2052.t2.#Depth: adding field #basic not allowed as field set was already referenced:
-    ./issue2052.cue:41:20
+    ./issue2052.cue:46:14
 issue2052.t2.d: adding field #basic not allowed as field set was already referenced:
-    ./issue2052.cue:41:20
+    ./issue2052.cue:46:14
 
 Result:
 (_|_){
@@ -354,7 +354,7 @@ Result:
       // [eval]
       #Depth: (_|_){
         // [eval] issue2052.t2.#Depth: adding field #basic not allowed as field set was already referenced:
-        //     ./issue2052.cue:41:20
+        //     ./issue2052.cue:46:14
         #maxiter: (int){ 4 }
         #funcs: (#struct){
           "4": (null){ null }
@@ -391,7 +391,7 @@ Result:
       tree: (string){ "bar" }
       d: (_|_){
         // [eval] issue2052.t2.d: adding field #basic not allowed as field set was already referenced:
-        //     ./issue2052.cue:41:20
+        //     ./issue2052.cue:46:14
         #in: (string){ "bar" }
         #maxiter: (int){ 4 }
         #funcs: (#struct){
@@ -753,9 +753,9 @@ diff old new
 +issue2052.t1.d: adding field #basic not allowed as field set was already referenced:
 +    ./issue2052.cue:8:20
 +issue2052.t2.#Depth: adding field #basic not allowed as field set was already referenced:
-+    ./issue2052.cue:41:20
++    ./issue2052.cue:46:14
 +issue2052.t2.d: adding field #basic not allowed as field set was already referenced:
-+    ./issue2052.cue:41:20
++    ./issue2052.cue:46:14
 +
 +Result:
 +(_|_){
@@ -1000,7 +1000,7 @@ diff old new
 +      // [eval]
 +      #Depth: (_|_){
 +        // [eval] issue2052.t2.#Depth: adding field #basic not allowed as field set was already referenced:
-+        //     ./issue2052.cue:41:20
++        //     ./issue2052.cue:46:14
 +        #maxiter: (int){ 4 }
 +        #funcs: (#struct){
 +          "4": (null){ null }
@@ -1037,7 +1037,7 @@ diff old new
 +      tree: (string){ "bar" }
 +      d: (_|_){
 +        // [eval] issue2052.t2.d: adding field #basic not allowed as field set was already referenced:
-+        //     ./issue2052.cue:41:20
++        //     ./issue2052.cue:46:14
 +        #in: (string){ "bar" }
 +        #maxiter: (int){ 4 }
 +        #funcs: (#struct){

@@ -1336,7 +1336,7 @@ func (x *BinaryExpr) evaluate(c *OpContext, state combinedFlags) Value {
 		if env.Vertex.IsDynamic || c.inValidator > 0 {
 			v.Finalize(c)
 		} else {
-			v.CompleteArcs(c)
+			v.CompleteArcsOnly(c)
 		}
 
 		return v

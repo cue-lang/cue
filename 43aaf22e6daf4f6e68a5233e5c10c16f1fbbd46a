@@ -99,6 +99,24 @@
       "parentUuid": "e3c3b794_b7a5bcda",
       "revId": "43aaf22e6daf4f6e68a5233e5c10c16f1fbbd46a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1cc97bec_4ada85b5",
+        "filename": "cmd/cue/cmd/testdata/script/export_issue3511.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-21T20:28:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8823647d_25eea0fd",
+      "revId": "43aaf22e6daf4f6e68a5233e5c10c16f1fbbd46a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

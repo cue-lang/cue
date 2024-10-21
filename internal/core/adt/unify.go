@@ -130,6 +130,19 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		}()
 	}
 
+	if c.evalDepth == 0 {
+		defer func() {
+			// This loop processes nodes that need to be evaluated, but should be
+			// evaluated outside of the stack to avoid structural cycle detection.
+			// See comment at toFinalize.
+			a := c.toFinalize
+			c.toFinalize = c.toFinalize[:0]
+			for _, x := range a {
+				x.Finalize(c)
+			}
+		}()
+	}
+
 	if mode == ignore {
 		return false
 	}

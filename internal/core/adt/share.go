@@ -58,10 +58,20 @@ func (n *nodeContext) finalizeSharing() {
 		n.sharedID.cc.decDependent(n.ctx, SHARED, n.node.cc())
 		n.sharedID.cc = nil
 	}
-	if n.isShared {
-		v := n.node.BaseValue.(*Vertex)
+	if !n.isShared {
+		return
+	}
+	switch v := n.node.BaseValue.(type) {
+	case *Vertex:
+		if n.sharedID.CycleType == NoCycle {
+			v.Finalize(n.ctx)
+		} else if !v.isFinal() {
+			// TODO: ideally we just handle cycles in optional chains directly,
+			// rather than relying on this mechanism. This requires us to add
+			// a mechanism to detect that.
+			n.ctx.toFinalize = append(n.ctx.toFinalize, v)
+		}
 		if v.Parent == n.node.Parent {
-			v.unify(n.ctx, needTasksDone, finalize)
 			if !v.Rooted() && v.MayAttach() {
 				n.isShared = false
 				n.node.Arcs = v.Arcs
@@ -71,6 +81,10 @@ func (n *nodeContext) finalizeSharing() {
 				n.node.HasEllipsis = v.HasEllipsis
 			}
 		}
+	case *Bottom:
+		// An error trumps sharing. We can leave it as is.
+	default:
+		panic("unreachable")
 	}
 }
 

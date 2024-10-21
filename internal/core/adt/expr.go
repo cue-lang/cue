@@ -1423,9 +1423,15 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flag
 		// - walk over all fields and verify that fields are not contradicting
 		//   previously marked fields.
 		//
-		v.Finalize(c)
 
-		if v.status == evaluatingArcs {
+		if c.hasDepthCycle(v) {
+			// Eval V3 logic
+			c.verifyNonMonotonicResult(env, x, true)
+			match = op == EqualOp
+			break
+		} else if v.status == evaluatingArcs {
+			// Eval V3 logic
+
 			// We have a cycle, which may be an error. Cycle errors may occur
 			// in chains that are themselves not a cycle. It suffices to check
 			// for non-monotonic results at the end for this particular path.
@@ -1437,6 +1443,7 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flag
 			match = op == EqualOp
 			break
 		}
+		v.Finalize(c)
 
 		switch {
 		case !v.IsDefined(c):

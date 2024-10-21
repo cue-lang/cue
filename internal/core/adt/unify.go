@@ -233,6 +233,10 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	}
 
 	if v, ok := n.node.BaseValue.(*Vertex); ok && n.sharedID.CycleType == NoCycle {
+		if n.ctx.hasDepthCycle(v) {
+			n.reportCycleError()
+			return true
+		}
 		// We unify here to proactively detect cycles. We do not need to,
 		// nor should we, if have have already found one.
 		v.unify(n.ctx, needs, mode)
@@ -480,25 +484,6 @@ func (n *nodeContext) updateScalar() {
 }
 
 func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
-	// TODO: this can go when lookup vs evaluation distinction
-	// has been improved.
-	if n.node.status == evaluatingArcs {
-		// NOTE: this was an "incomplete" error pre v0.6. If this is a problem
-		// we could make this a CycleError. Technically, this may be correct,
-		// as it is possible to make the values exactly as the inserted
-		// values. It seems more user friendly to just disallow this, though.
-		// TODO: make uniform error messages
-		// see compbottom2.cue:
-		n.ctx.addErrf(CycleError, pos(n.node), "mutual dependency")
-		n.node.IsCyclic = true
-		// Consider using this, although not all
-		// mutual dependencies are irrecoverable.
-		// n.reportCycleError()
-	}
-
-	// TODO: remove the use of updateStatus as a cycle detection mechanism.
-	n.node.updateStatus(evaluatingArcs)
-
 	if n.underlying != nil {
 		// References within the disjunct may end up referencing the layer that
 		// this node overlays. Also for these nodes we want to be able to detect
@@ -540,10 +525,10 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 	// XXX(0.7): only set success if needs complete arcs.
 	success := true
 	// Visit arcs recursively to validate and compute error.
-	for n.arcPos < len(n.node.Arcs) {
-		a := n.node.Arcs[n.arcPos]
-		n.arcPos++
+	for arcPos := 0; arcPos < len(n.node.Arcs); arcPos++ {
+		a := n.node.Arcs[arcPos]
 
+		// XXX: check for cycle here? Might already have shared vertex assigned! ctx.evalDepth will be higher than node.
 		if !a.unify(n.ctx, needs, mode) {
 			success = false
 		}
@@ -603,6 +588,32 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 		}
 	}
 	n.node.Arcs = n.node.Arcs[:k]
+
+	// TODO: perhaps this code can go once we have builtins for comparing to
+	// bottom.
+	ctx := n.ctx
+	for _, c := range n.postChecks {
+		f := ctx.PushState(c.env, c.expr.Source())
+
+		v := ctx.evalState(c.expr, oldOnly(finalized))
+		v, _ = ctx.getDefault(v)
+		v = Unwrap(v)
+
+		switch _, isError := v.(*Bottom); {
+		case isError == c.expectError:
+		default:
+			n.node.AddErr(ctx, &Bottom{
+				Src:  c.expr.Source(),
+				Code: CycleError,
+				Node: n.node,
+				Err: ctx.NewPosf(pos(c.expr),
+					"circular dependency in evaluation of conditionals: %v changed after evaluation",
+					ctx.Str(c.expr)),
+			})
+		}
+
+		ctx.PopState(f)
+	}
 
 	// This should be called after all arcs have been processed, because
 	// whether sharing is possible or not may depend on how arcs with type

@@ -723,16 +723,8 @@ func (n *nodeContext) markCyclicPathV3(arc *Vertex, env *Environment, x Resolver
 // hasAncestorV3 checks whether a node is currently being processed. The code
 // still assumes that is includes any node that is currently being processed.
 func (n *nodeContext) hasAncestorV3(arc *Vertex) bool {
-	// TODO: consider removing this. For now we still need it, but we could
-	// possibly remove it after we strictly separate processing lookups versus
-	// full evaluation.
-	if arc.status == evaluatingArcs {
-		return true
-	}
 
-	// TODO(evalv3): replace the use of the old status mechanism.
-	// the depth counters is an alternative mechanism to the status used in
-	// the v2 evaluator. It is slightly more precise:
+	// Use depth counters to keep track of cycles:
 	//    - it allows detecting reference cycles as well (state evaluating is
 	//      no longer used in v3)
 	//    - it can capture cycles across inline structs, which do not have

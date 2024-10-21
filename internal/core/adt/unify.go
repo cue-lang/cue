@@ -343,6 +343,9 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		// For this reason we disable it now. It may be the case that we need
 		// to enable it for computing disjunctions.
 		//
+		n.incDepth()
+		defer n.decDepth()
+
 		if pc := n.node.PatternConstraints; pc != nil {
 			for _, c := range pc.Pairs {
 				c.Constraint.unify(n.ctx, allKnown, attemptOnly)
@@ -519,6 +522,7 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 	}
 
 	n.incDepth()
+	defer n.decDepth()
 
 	// XXX(0.7): only set success if needs complete arcs.
 	success := true
@@ -577,8 +581,6 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 			// 	}
 		}
 	}
-
-	n.decDepth()
 
 	k := 0
 	for _, a := range n.node.Arcs {

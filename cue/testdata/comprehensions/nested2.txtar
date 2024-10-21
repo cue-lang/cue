@@ -94,17 +94,29 @@ issue1974: {
 		}
 	}
 }
-
+-- pending.cue --
+// Trigger notification while an arc is still pending.
+T: int
+for C in Y {
+	let X = C.M
+	T:  X.V
+}
+Y: x: {
+	M: V: 1
+	for _ in M {
+		if true { M: {} }
+	}
+}
 -- out/eval/stats --
-Leaks:  0
-Freed:  43
-Reused: 38
-Allocs: 5
-Retain: 4
+Leaks:  2
+Freed:  50
+Reused: 45
+Allocs: 7
+Retain: 12
 
-Unifications: 43
-Conjuncts:    74
-Disjuncts:    43
+Unifications: 52
+Conjuncts:    91
+Disjuncts:    57
 -- out/eval --
 (struct){
   given: (struct){
@@ -164,6 +176,15 @@ Disjuncts:    43
       foo: (struct){
         bar: (string){ "" }
         baz: (string){ "" }
+      }
+    }
+  }
+  T: (int){ 1 }
+  let X#1multi = 〈1;C〉.M
+  Y: (struct){
+    x: (struct){
+      M: (struct){
+        V: (int){ 1 }
       }
     }
   }
@@ -266,6 +287,26 @@ Disjuncts:    43
       for k, v in 〈1;X〉 for vk, vv in 〈0;v〉 {
         "\(〈2;k〉)": {
           "\(〈2;vk〉)": 〈2;vv〉
+        }
+      }
+    }
+  }
+}
+--- pending.cue
+{
+  T: int
+  for _, C in 〈0;Y〉 {
+    let X#1multi = 〈1;C〉.M
+    T: 〈0;let X#1〉.V
+  }
+  Y: {
+    x: {
+      M: {
+        V: 1
+      }
+      for _, _ in 〈0;M〉 {
+        if true {
+          M: {}
         }
       }
     }

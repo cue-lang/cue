@@ -780,9 +780,11 @@ func (cc *closeContext) insertConjunct(ctx *OpContext, key *closeContext, c Conj
 	}
 
 	for _, rec := range n.notify {
-		if mode == ArcPending {
-			panic("unexpected pending arc")
-		}
+		// TODO(evalv3): currently we get pending arcs here for some tests.
+		// That seems fine. But consider this again when most of evalv3 work
+		// is done. See test "pending.cue" in comprehensions/notify2.txtar
+		// It seems that only let arcs can be pending, though.
+
 		// TODO: we should probably only notify a conjunct once the root of the
 		// conjunct group is completed. This will make it easier to "stitch" the
 		// conjunct trees together, as its correctness will be guaranteed.

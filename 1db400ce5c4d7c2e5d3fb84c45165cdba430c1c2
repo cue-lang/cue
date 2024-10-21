@@ -16,6 +16,24 @@
       "message": "does the TODO apply to the new line as well?",
       "revId": "1db400ce5c4d7c2e5d3fb84c45165cdba430c1c2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4937b885_4e06f8ef",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 673,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-21T08:58:38Z",
+      "side": 1,
+      "message": "Fixed.\n\nAlso added a bunch more comments to explain these two mystical lines.",
+      "parentUuid": "745d5a10_444f9c61",
+      "revId": "1db400ce5c4d7c2e5d3fb84c45165cdba430c1c2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2556b24_15f91460",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-21T13:37:48Z",
+      "side": 1,
+      "message": "duplicate word?",
+      "range": {
+        "startLine": 13,
+        "startChar": 41,
+        "endLine": 13,
+        "endChar": 43
+      },
+      "revId": "43aaf22e6daf4f6e68a5233e5c10c16f1fbbd46a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8876160c_f26d01ce",
+        "filename": "cmd/cue/cmd/testdata/script/export_issue3511.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-21T13:37:48Z",
+      "side": 1,
+      "message": "I guess this is a testscript because of the need for multiple packages to reproduce this? Do the evaluator txtar tests not support this?",
+      "revId": "43aaf22e6daf4f6e68a5233e5c10c16f1fbbd46a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

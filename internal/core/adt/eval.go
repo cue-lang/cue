@@ -1181,8 +1181,6 @@ type nodeContextState struct {
 	// conjunctsPartialPos is like conjunctsPos, but for the 'partial' phase
 	// of processing where conjuncts are only processed as concrete scalars.
 	conjunctsPartialPos int
-
-	arcPos int
 }
 
 // A receiver receives notifications.

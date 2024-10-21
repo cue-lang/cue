@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "89f9ee54_991616d3",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1432,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-21T20:45:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1bbcf101_0c1d622e",
+      "revId": "655b420c4b7e4a34ea4cfb54289072d01928fc83",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ab32027f_3a8543be",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-10-21T20:18:29Z",
       "side": 1,
       "message": "why is this not a regular `for arcPos, a :\u003d range n.node.Arcs`? or `for _, a :\u003d range n.node.Arcs` for that matter",
+      "revId": "655b420c4b7e4a34ea4cfb54289072d01928fc83",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5324a21_dd4bbb22",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 528,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-21T20:45:43Z",
+      "side": 1,
+      "message": "See commit message. In general, there are many cases where slices get added to during processing. range copies the slice at the start, so it will miss items that are added later. I think this is not the case here, but that may change. Using range first and then needing an index later can result in nasty bugs that have bitten me many times. So I tend to be a bit defensive and use indexes when I think there may be a change we will need it.",
+      "parentUuid": "ab32027f_3a8543be",
       "revId": "655b420c4b7e4a34ea4cfb54289072d01928fc83",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b2daf08_e17adc79",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 531,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-21T20:45:43Z",
+      "side": 1,
+      "message": "Yes, this should not go in here.",
+      "parentUuid": "e87d9646_d7b1bad8",
+      "revId": "655b420c4b7e4a34ea4cfb54289072d01928fc83",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b65e7b64_55eaf0fc",
@@ -65,6 +119,24 @@
       "writtenOn": "2024-10-21T20:18:29Z",
       "side": 1,
       "message": "nit: move ctx inside the block below, to keep the parent scope a bit smaller?",
+      "revId": "655b420c4b7e4a34ea4cfb54289072d01928fc83",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e335a24c_0756f2c3",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 594,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-21T20:45:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b65e7b64_55eaf0fc",
       "revId": "655b420c4b7e4a34ea4cfb54289072d01928fc83",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -34,6 +34,24 @@
       "parentUuid": "775170b5_9cdde25c",
       "revId": "6fa5257e1e5ff87df73a8b7043a72d0752dbbfc9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d91f9913_7a25faf9",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1445,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-21T08:10:53Z",
+      "side": 1,
+      "message": "I seems still slightly safer to remove the pointer receiver, so I\u0027ll do that for now. If this leads to performance issues we can change it back later.",
+      "parentUuid": "5e9a5155_5599da28",
+      "revId": "6fa5257e1e5ff87df73a8b7043a72d0752dbbfc9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

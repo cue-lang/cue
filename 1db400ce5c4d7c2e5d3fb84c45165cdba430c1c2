@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d203604b_1d9b9c6b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-21T09:02:33Z",
+      "side": 1,
+      "message": "As a note, even here the tests also panic without the fix.",
+      "revId": "1db400ce5c4d7c2e5d3fb84c45165cdba430c1c2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "745d5a10_444f9c61",

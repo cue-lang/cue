@@ -1205,8 +1205,6 @@ diff old new
        }
        T: (_|_){
          // [structural cycle]
--- diff/todo/p1 --
-selfTriggerCycle.issue1503: not showing a cycle, even though sharing is used.
 -- diff/todo/p2 --
 selfTriggerCycle.t1.a.b.b: cycle detected slightly too late
 -- out/eval --

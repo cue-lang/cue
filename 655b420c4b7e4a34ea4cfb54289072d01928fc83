@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1bbcf101_0c1d622e",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1432,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-21T20:18:29Z",
+      "side": 1,
+      "message": "nit: the \"else if\" can just be an \"if\" given the break above, no? that way the code is IMO a bit easier to follow",
+      "revId": "655b420c4b7e4a34ea4cfb54289072d01928fc83",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab32027f_3a8543be",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 528,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-21T20:18:29Z",
+      "side": 1,
+      "message": "why is this not a regular `for arcPos, a :\u003d range n.node.Arcs`? or `for _, a :\u003d range n.node.Arcs` for that matter",
+      "revId": "655b420c4b7e4a34ea4cfb54289072d01928fc83",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e87d9646_d7b1bad8",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 531,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-21T20:18:29Z",
+      "side": 1,
+      "message": "the point of XXX comments is to never let them hit master, is this meant to be a TODO or were you meant to fix this?",
+      "revId": "655b420c4b7e4a34ea4cfb54289072d01928fc83",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b65e7b64_55eaf0fc",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 594,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-21T20:18:29Z",
+      "side": 1,
+      "message": "nit: move ctx inside the block below, to keep the parent scope a bit smaller?",
+      "revId": "655b420c4b7e4a34ea4cfb54289072d01928fc83",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

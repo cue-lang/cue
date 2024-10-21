@@ -94,17 +94,19 @@ select: indirect: {
 	opt?: run?: string
 }
 -- out/evalalpha/stats --
-Leaks:  302
+Leaks:  250
 Freed:  0
 Reused: 0
-Allocs: 302
+Allocs: 250
 Retain: 0
 
-Unifications: 280
-Conjuncts:    1396
+Unifications: 202
+Conjuncts:    987
 Disjuncts:    0
 -- out/evalalpha --
 Errors:
+structural cycle:
+    ./in.cue:56:8
 issue3182.first.t2.x.b: structural cycle:
     ./issue3182.cue:6:6
 
@@ -151,7 +153,8 @@ Result:
     k20: (int){ 0 }
     k30: (int){ 0 }
   }
-  issue1708: (struct){
+  issue1708: (_|_){
+    // [structural cycle]
     #add10: (#struct){
       in: (number){ number }
       a10: (#struct){
@@ -170,8 +173,14 @@ Result:
     }
     k00: (int){ 0 }
     k10: (int){ 10 }
-    k20: (int){ 20 }
-    k30: (int){ 30 }
+    k20: (_|_){
+      // [structural cycle] structural cycle:
+      //     ./in.cue:56:8
+    }
+    k30: (_|_){
+      // [structural cycle] structural cycle:
+      //     ./in.cue:56:8
+    }
   }
   issue3182: (_|_){
     // [structural cycle]
@@ -208,12 +217,7 @@ Result:
   }
   select: (struct){
     direct: (struct){
-      #Step: (_|_){
-        // [incomplete] invalid value {opt:_} (does not satisfy matchN(1, [~(#NormalJob)])): 0 matched, expected 1:
-        //     ./select.cue:4:8
-        //     ./select.cue:3:10
-        //     ./select.cue:4:15
-      }
+      #Step: (_){ _ }
       #Job: (_){ matchN(1, (#list){
           0: (_|_){// &[〈3;#NormalJob〉]
           }
@@ -246,31 +250,43 @@ diff old new
 -Reused: 429
 -Allocs: 317
 -Retain: 1074
-+Leaks:  302
++Leaks:  250
 +Freed:  0
 +Reused: 0
-+Allocs: 302
++Allocs: 250
 +Retain: 0
  
 -Unifications: 746
 -Conjuncts:    2813
 -Disjuncts:    1485
-+Unifications: 280
-+Conjuncts:    1396
++Unifications: 202
++Conjuncts:    987
 +Disjuncts:    0
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,5 +1,6 @@
+@@ -1,5 +1,8 @@
  Errors:
 -issue3182.first.t2.x.b: structural cycle
++structural cycle:
++    ./in.cue:56:8
 +issue3182.first.t2.x.b: structural cycle:
 +    ./issue3182.cue:6:6
  
  Result:
  (_|_){
-@@ -53,14 +54,12 @@
+@@ -44,7 +47,8 @@
+     k20: (int){ 0 }
+     k30: (int){ 0 }
+   }
+-  issue1708: (struct){
++  issue1708: (_|_){
++    // [structural cycle]
+     #add10: (#struct){
+       in: (number){ number }
+       a10: (#struct){
+@@ -53,20 +57,24 @@
            // [incomplete] issue1708.#add10.a10.o: non-concrete value number in operand to +:
            //     ./in.cue:52:20
            //     ./in.cue:51:7
@@ -286,7 +302,21 @@ diff old new
        }
      }
      k00: (int){ 0 }
-@@ -80,7 +79,8 @@
+     k10: (int){ 10 }
+-    k20: (int){ 20 }
+-    k30: (int){ 30 }
++    k20: (_|_){
++      // [structural cycle] structural cycle:
++      //     ./in.cue:56:8
++    }
++    k30: (_|_){
++      // [structural cycle] structural cycle:
++      //     ./in.cue:56:8
++    }
+   }
+   issue3182: (_|_){
+     // [structural cycle]
+@@ -80,7 +88,8 @@
          x: (_|_){
            // [structural cycle]
            b: (_|_){
@@ -296,24 +326,16 @@ diff old new
            }
          }
        }
-@@ -102,9 +102,14 @@
-   }
-   select: (struct){
+@@ -104,7 +113,7 @@
      direct: (struct){
--      #Step: (_){ _ }
-+      #Step: (_|_){
-+        // [incomplete] invalid value {opt:_} (does not satisfy matchN(1, [~(#NormalJob)])): 0 matched, expected 1:
-+        //     ./select.cue:4:8
-+        //     ./select.cue:3:10
-+        //     ./select.cue:4:15
-+      }
+       #Step: (_){ _ }
        #Job: (_){ matchN(1, (#list){
 -          0: (_|_){// 〈3;#NormalJob〉
 +          0: (_|_){// &[〈3;#NormalJob〉]
            }
          }) }
      }
-@@ -111,7 +116,7 @@
+@@ -111,7 +120,7 @@
      indirect: (struct){
        #Step: (_){ _ }
        #Job: (_|_){
@@ -323,7 +345,7 @@ diff old new
          //     ./select.cue:8:15
          opt: (_){ _ }
 -- diff/todo/p1 --
-select: values of #Step differ
+issue1708: invalid structural cycle
 -- diff/todo/p3 --
 Error positions.
 Incorrect path due to structure sharing.

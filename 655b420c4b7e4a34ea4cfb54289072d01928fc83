@@ -71,6 +71,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3c3a83e_bbe94a55",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 528,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-21T20:47:37Z",
+      "side": 1,
+      "message": "Ah gotcha. I missed that detail from the commit message. personally I might document these with short comments because otherwise it\u0027s not very obvious.",
+      "parentUuid": "b5324a21_dd4bbb22",
+      "revId": "655b420c4b7e4a34ea4cfb54289072d01928fc83",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e87d9646_d7b1bad8",

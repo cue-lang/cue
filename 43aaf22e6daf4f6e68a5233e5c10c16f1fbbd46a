@@ -81,6 +81,24 @@
       "parentUuid": "8876160c_f26d01ce",
       "revId": "43aaf22e6daf4f6e68a5233e5c10c16f1fbbd46a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8823647d_25eea0fd",
+        "filename": "cmd/cue/cmd/testdata/script/export_issue3511.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-21T14:40:15Z",
+      "side": 1,
+      "message": "Maybe another clarification: it wasn\u0027t really a cycle error (obviously), but the node was simply not evaluated, beyond the point where a temporary cycle error sentinel value is used to catch reference errors.",
+      "parentUuid": "e3c3b794_b7a5bcda",
+      "revId": "43aaf22e6daf4f6e68a5233e5c10c16f1fbbd46a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

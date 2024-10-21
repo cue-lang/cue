@@ -469,37 +469,23 @@ Disjuncts:    204
         }
       }
       t2: (struct){
-        p1: (struct){
-          raises: (_|_){
-            // [cycle] sameStruct.cycleFail.t2.p1.raises: mutual dependency
-          }
-          ret: (struct){
-          }
+        p1: (_|_){
+          // [cycle] sameStruct.cycleFail.t2.p1: circular dependency in evaluation of conditionals: raises changed after evaluation:
+          //     ./mutualsamestruct.cue:54:6
         }
-        p2: (struct){
-          ret: (_|_){
-            // [cycle] sameStruct.cycleFail.t2.p2.ret: mutual dependency
-          }
-          raises: (struct){
-            a: (int){ 1 }
-          }
+        p2: (_|_){
+          // [cycle] sameStruct.cycleFail.t2.p2: circular dependency in evaluation of conditionals: ret changed after evaluation:
+          //     ./mutualsamestruct.cue:69:6
         }
       }
       t3: (struct){
-        p1: (struct){
-          raises: (_|_){
-            // [cycle] sameStruct.cycleFail.t3.p1.raises: mutual dependency
-          }
-          ret: (struct){
-          }
+        p1: (_|_){
+          // [cycle] sameStruct.cycleFail.t3.p1: circular dependency in evaluation of conditionals: raises changed after evaluation:
+          //     ./mutualsamestruct.cue:83:6
         }
-        p2: (struct){
-          ret: (_|_){
-            // [cycle] sameStruct.cycleFail.t3.p2.ret: mutual dependency
-          }
-          raises: (struct){
-            a: (int){ 1 }
-          }
+        p2: (_|_){
+          // [cycle] sameStruct.cycleFail.t3.p2: circular dependency in evaluation of conditionals: ret changed after evaluation:
+          //     ./mutualsamestruct.cue:94:6
         }
       }
     }
@@ -613,7 +599,7 @@ diff old new
        }
      }
      brokenCycleSuccess: (struct){
-@@ -151,33 +153,60 @@
+@@ -151,13 +153,26 @@
      }
      cycleFail: (struct){
        t1: (struct){
@@ -624,16 +610,6 @@ diff old new
 -        p2: (_|_){
 -          // [cycle] sameStruct.cycleFail.t1.p2: circular dependency in evaluation of conditionals: ret changed after evaluation:
 -          //     ./mutualsamestruct.cue:37:6
--        }
--      }
--      t2: (struct){
--        p1: (_|_){
--          // [cycle] sameStruct.cycleFail.t2.p1: circular dependency in evaluation of conditionals: raises changed after evaluation:
--          //     ./mutualsamestruct.cue:54:6
--        }
--        p2: (_|_){
--          // [cycle] sameStruct.cycleFail.t2.p2: circular dependency in evaluation of conditionals: ret changed after evaluation:
--          //     ./mutualsamestruct.cue:69:6
 +        p1: (struct){
 +          raises?: (struct){
 +            a: (_|_){
@@ -654,51 +630,10 @@ diff old new
 +          }
 +          raises?: (struct){
 +          }
-+        }
-+      }
-+      t2: (struct){
-+        p1: (struct){
-+          raises: (_|_){
-+            // [cycle] sameStruct.cycleFail.t2.p1.raises: mutual dependency
-+          }
-+          ret: (struct){
-+          }
-+        }
-+        p2: (struct){
-+          ret: (_|_){
-+            // [cycle] sameStruct.cycleFail.t2.p2.ret: mutual dependency
-+          }
-+          raises: (struct){
-+            a: (int){ 1 }
-+          }
          }
        }
-       t3: (struct){
--        p1: (_|_){
--          // [cycle] sameStruct.cycleFail.t3.p1: circular dependency in evaluation of conditionals: raises changed after evaluation:
--          //     ./mutualsamestruct.cue:83:6
--        }
--        p2: (_|_){
--          // [cycle] sameStruct.cycleFail.t3.p2: circular dependency in evaluation of conditionals: ret changed after evaluation:
--          //     ./mutualsamestruct.cue:94:6
-+        p1: (struct){
-+          raises: (_|_){
-+            // [cycle] sameStruct.cycleFail.t3.p1.raises: mutual dependency
-+          }
-+          ret: (struct){
-+          }
-+        }
-+        p2: (struct){
-+          ret: (_|_){
-+            // [cycle] sameStruct.cycleFail.t3.p2.ret: mutual dependency
-+          }
-+          raises: (struct){
-+            a: (int){ 1 }
-+          }
-         }
-       }
-     }
-@@ -189,17 +218,19 @@
+       t2: (struct){
+@@ -189,17 +204,19 @@
          ret?: (_){ _ }
        }
        expr: (#struct){
@@ -723,7 +658,7 @@ diff old new
      }
      brokenCycleSuccess: (struct){
        #E: (#struct){
-@@ -208,8 +239,12 @@
+@@ -208,8 +225,12 @@
        }
      }
      doubleAddfail: (_|_){
@@ -742,7 +677,6 @@ diff old new
 self.isConcreteFail: t1: int value is not an error.
 self.isNotConcrete: t1: int value is not an error.
 -- diff/todo/p3 --
-sameStruct.cycleFail: Harmonize and improve cycle errors
 cycleFail.t1.p1.raises?.a: error needs to be reported at parent node.
 -- out/eval --
 (struct){

@@ -80,7 +80,6 @@ var skipDebugDepErrors = map[string]int{
 	"builtins/default":         1,
 	"comprehensions/pushdown":  3,
 	"cycle/chain":              4,
-	"cycle/compbottom2":        4,
 	"cycle/comprehension":      2,
 	"cycle/disjunction":        4,
 	"cycle/issue990":           1,

@@ -1,0 +1,34 @@
+
+env CUE_EXPERIMENT=evalv3=1
+exec cue export
+cmp stdout out/stdout
+
+-- cue.mod/module.cue --
+module: "module.test/foo"
+language: version: "v0.9.0"
+
+-- main.cue --
+package p
+
+import "module.test/foo/imported@v0"
+
+items: [imported.List]
+-- imported/imported.cue --
+package imported
+
+Namespace: "default"
+
+List: [...{namespace: Namespace}]
+
+List: [{name: "kube-api-server"}]
+-- out/stdout --
+{
+    "items": [
+        [
+            {
+                "name": "kube-api-server",
+                "namespace": "default"
+            }
+        ]
+    ]
+}

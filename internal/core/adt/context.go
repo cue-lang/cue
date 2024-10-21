@@ -229,6 +229,12 @@ type OpContext struct {
 	// structural cycle errors.
 	vertex *Vertex
 
+	// list of vertices that need to be finalized.
+	// TODO: remove this again once we have a proper way of detecting references
+	// across optional boundaries in hasAncestorV3. We can probably do this
+	// with an optional depth counter.
+	toFinalize []*Vertex
+
 	// These fields are used associate scratch fields for computing closedness
 	// of a Vertex. These fields could have been included in StructInfo (like
 	// Tomabechi's unification algorithm), but we opted for an indirection to

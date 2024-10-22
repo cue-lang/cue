@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2028df7_6601e5ce",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-10-22T16:48:09Z",
+      "side": 1,
+      "message": "PTAL. I\u0027ve previewed the changes on GitHub, and have used only Markdown elements which I feel are likely to be supported by pkg.go.dev as I can\u0027t preview on that site.",
+      "revId": "fe354c7d8e9dc035ebd64f032e7680a20cd0cccd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

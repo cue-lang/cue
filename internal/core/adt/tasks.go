@@ -90,8 +90,8 @@ func processExpr(ctx *OpContext, t *task, mode runMode) {
 		// This is an optional cycle that we will ignore.
 		return
 	}
-	t.id.CycleInfo = ci.CycleInfo
-	t.node.insertValueConjunct(t.env, v, t.id)
+	ci = t.updateCI(ci)
+	t.node.insertValueConjunct(t.env, v, ci)
 }
 
 func processResolver(ctx *OpContext, t *task, mode runMode) {
@@ -113,9 +113,11 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 	// TODO: consider moving after markCycle or removing.
 	d := arc.DerefDisjunct()
 
+	ci := t.updateCI(ctx.ci)
+
 	// A reference that points to itself indicates equality. In that case
 	// we are done computing and we can return the arc as is.
-	ci, skip := t.node.detectCycleV3(d, t.env, r, t.id)
+	ci, skip := t.node.detectCycleV3(d, t.env, r, ci)
 	if skip {
 		return
 	}
@@ -162,9 +164,14 @@ func processDynamic(ctx *OpContext, t *task, mode runMode) {
 		return
 	}
 
-	c := MakeConjunct(t.env, field, t.id)
+	// Do not update the CloseInfo, as we are passing the field value
+	// unevaluated.
+	ci := t.id
+
+	c := MakeConjunct(t.env, field, ci)
+	// TODO(evalv3): this does not seem to be necessary and even treacherous.
 	c.CloseInfo.cc = nil
-	n.insertArc(f, field.ArcType, c, t.id, true)
+	n.insertArc(f, field.ArcType, c, ci, true)
 }
 
 func processPatternConstraint(ctx *OpContext, t *task, mode runMode) {
@@ -179,7 +186,11 @@ func processPatternConstraint(ctx *OpContext, t *task, mode runMode) {
 		return
 	}
 
-	n.insertPattern(v, MakeConjunct(t.env, t.x, t.id))
+	// Do not update the CloseInfo, as we are passing the constraint value
+	// unevaluated.
+	ci := t.id
+
+	n.insertPattern(v, MakeConjunct(t.env, t.x, ci))
 }
 
 func processComprehension(ctx *OpContext, t *task, mode runMode) {

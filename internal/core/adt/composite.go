@@ -187,6 +187,10 @@ type Vertex struct {
 	// of the conjuncts, or ancestor conjuncts, is a definition.
 	ClosedRecursive bool
 
+	// ClosedNonRecursive indicates that this Vertex has been closed for this
+	// level only. This supports the close builtin.
+	ClosedNonRecursive bool
+
 	// HasEllipsis indicates that this Vertex is open by means of an ellipsis.
 	// TODO: combine this field with Closed once we removed the old evaluator.
 	HasEllipsis bool
@@ -582,6 +586,15 @@ const (
 	// are save to use without further consideration.
 	finalized
 )
+
+// Wrap creates a Vertex that takes w as a shared value. This allows users
+// to set different flags for a wrapped Vertex.
+func (c *OpContext) Wrap(v *Vertex, id CloseInfo) *Vertex {
+	w := c.newInlineVertex(nil, nil, v.Conjuncts...)
+	n := w.getState(c)
+	n.share(makeAnonymousConjunct(nil, v, nil), v, CloseInfo{})
+	return w
+}
 
 // Status returns the status of the current node. When reading the status, one
 // should always use this method over directly reading status field.

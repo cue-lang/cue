@@ -80,14 +80,14 @@ issue3182: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  250
+Leaks:  272
 Freed:  0
 Reused: 0
-Allocs: 250
+Allocs: 272
 Retain: 0
 
-Unifications: 240
-Conjuncts:    1277
+Unifications: 251
+Conjuncts:    1299
 Disjuncts:    0
 -- out/evalalpha --
 Errors:
@@ -203,17 +203,17 @@ diff old new
 -Reused: 401
 -Allocs: 310
 -Retain: 1066
-+Leaks:  250
++Leaks:  272
 +Freed:  0
 +Reused: 0
-+Allocs: 250
++Allocs: 272
 +Retain: 0
  
 -Unifications: 711
 -Conjuncts:    2759
 -Disjuncts:    1446
-+Unifications: 240
-+Conjuncts:    1277
++Unifications: 251
++Conjuncts:    1299
 +Disjuncts:    0
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new

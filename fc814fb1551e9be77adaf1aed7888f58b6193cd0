@@ -16,6 +16,24 @@
       "message": "I believe this fixes https://github.com/cue-lang/cue/issues/3376 too :) \n\nAdd the panic test case from https://github.com/cue-lang/cue/issues/3376#issuecomment-2296704288 as well, which affected evalv2?",
       "revId": "fc814fb1551e9be77adaf1aed7888f58b6193cd0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f76ae93_516f3e29",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-22T13:45:44Z",
+      "side": 1,
+      "message": "Isn\u0027t this test case covered in the 3376 test?",
+      "parentUuid": "573dd21d_95c7a501",
+      "revId": "fc814fb1551e9be77adaf1aed7888f58b6193cd0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

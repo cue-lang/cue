@@ -19,6 +19,11 @@
 [![platforms](https://img.shields.io/badge/platforms-linux|windows|macos-inactive.svg)]()
 [![Docker Image](https://img.shields.io/docker/v/cuelang/cue?sort=semver&label=docker)](https://hub.docker.com/r/cuelang/cue)
 
+**CUE documentation: [cuelang.org/docs](https://cuelang.org/docs/)** |
+**Try CUE in your browser: [cuelang.org/play](https://cuelang.org/play/)**
+
+---
+
 # The CUE Data Constraint Language
 
 _Configure, Unify, Execute_

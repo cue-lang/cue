@@ -1710,9 +1710,9 @@ func allowed(ctx *adt.OpContext, parent, n *adt.Vertex) *adt.Bottom {
 
 func addConjuncts(dst, src *adt.Vertex) {
 	c := adt.MakeRootConjunct(nil, src)
-	if src.Closed {
+	if src.ClosedRecursive {
 		var root adt.CloseInfo
-		c.CloseInfo = root.SpawnRef(src, src.Closed, nil)
+		c.CloseInfo = root.SpawnRef(src, src.ClosedRecursive, nil)
 	}
 	dst.AddConjunct(c)
 }
@@ -1738,7 +1738,7 @@ func (v Value) Unify(w Value) Value {
 
 	n.Parent = v.v.Parent
 	n.Label = v.v.Label
-	n.Closed = v.v.Closed || w.v.Closed
+	n.ClosedRecursive = v.v.ClosedRecursive || w.v.ClosedRecursive
 
 	if err := n.Err(ctx); err != nil {
 		return makeValue(v.idx, n, v.parent_)

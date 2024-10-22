@@ -182,10 +182,10 @@ type Vertex struct {
 	// ignored.
 	isData bool
 
-	// Closed indicates whether this Vertex is recursively closed. This is the
-	// case, for instance, if it is a node in a definition or if one of the
-	// conjuncts, or ancestor conjuncts, is a definition.
-	Closed bool
+	// ClosedRecursive indicates whether this Vertex is recursively closed.
+	// This is the case, for instance, if it is a node in a definition or if one
+	// of the conjuncts, or ancestor conjuncts, is a definition.
+	ClosedRecursive bool
 
 	// HasEllipsis indicates that this Vertex is open by means of an ellipsis.
 	// TODO: combine this field with Closed once we removed the old evaluator.
@@ -1008,7 +1008,7 @@ func (v *Vertex) IsOptional(label Feature) bool {
 }
 
 func (v *Vertex) accepts(ok, required bool) bool {
-	return ok || (!required && !v.Closed)
+	return ok || (!required && !v.ClosedRecursive)
 }
 
 func (v *Vertex) IsClosedStruct() bool {
@@ -1026,7 +1026,7 @@ func (v *Vertex) IsClosedStruct() bool {
 		return false
 
 	case *Vertex:
-		return v.Closed && !v.HasEllipsis
+		return v.ClosedRecursive && !v.HasEllipsis
 
 	case *StructMarker:
 		if x.NeedClose {

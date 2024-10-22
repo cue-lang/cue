@@ -18,6 +18,7 @@
 [![Go 1.22+](https://img.shields.io/badge/go-1.22-9cf.svg)](https://golang.org/dl/)
 [![platforms](https://img.shields.io/badge/platforms-linux|windows|macos-inactive.svg)]()
 [![Docker Image](https://img.shields.io/docker/v/cuelang/cue?sort=semver&label=docker)](https://hub.docker.com/r/cuelang/cue)
+[![Gurubase](https://img.shields.io/badge/Gurubase-Ask%20CUE%20Guru-006BFF)](https://gurubase.io/g/cue)
 
 # The CUE Data Constraint Language
 

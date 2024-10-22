@@ -96,7 +96,6 @@ import (
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/runtime"
-	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/value"
@@ -149,11 +148,6 @@ type compiler struct {
 // (@embed(file=...)) or a glob of files (@embed(glob=...)).
 // and decodes the given files.
 func (c *compiler) Compile(funcName string, scope adt.Value, a *internal.Attr) (adt.Expr, errors.Error) {
-	// This is a really weird spot to disable embedding, but I could not get
-	// the wasm tests to pass without doing it like this.
-	if !cueexperiment.Flags.Embed {
-		return &adt.Top{}, nil
-	}
 
 	file, _, err := a.Lookup(0, "file")
 	if err != nil {

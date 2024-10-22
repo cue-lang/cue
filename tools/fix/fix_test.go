@@ -73,6 +73,10 @@ b: a + a
 c: a + [8]
 d: [9] + a
 e: [0] + [1]
+f: [0] + [1] + [2]
+g: list.Concat([[0], [1, 2]]) + list.Concat([[3, 4], [5]])
+h: list.Concat([[0], [1, 2]]) + [3] + [4] + list.Concat([[5, 6], [7]])
+i: list.Concat(list.Concat([[0], [1, 2]]), list.Concat([[3, 4], [5]]))
 `,
 			out: `import "list"
 
@@ -81,6 +85,10 @@ b: a + a
 c: list.Concat([a, [8]])
 d: list.Concat([[9], a])
 e: list.Concat([[0], [1]])
+f: list.Concat([[0], [1], [2]])
+g: list.Concat([[0], [1, 2], [3, 4], [5]])
+h: list.Concat([[0], [1, 2], [3], [4], [5, 6], [7]])
+i: list.Concat(list.Concat([[0], [1, 2]]), list.Concat([[3, 4], [5]]))
 `,
 		},
 
@@ -92,6 +100,7 @@ c: 4
 d: [7] * c
 e: c * [8]
 f: [9] * 5
+g: ([9] * 5) + (6 * [10])
 `,
 			out: `import "list"
 
@@ -101,6 +110,7 @@ c: 4
 d: list.Repeat([7], c)
 e: list.Repeat([8], c)
 f: list.Repeat([9], 5)
+g: (list.Repeat([9], 5)) + (list.Repeat([10], 6))
 `,
 		},
 	}

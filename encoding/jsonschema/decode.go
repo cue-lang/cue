@@ -165,7 +165,7 @@ func (d *decoder) schema(ref []ast.Label, v cue.Value) (a []ast.Decl) {
 		}
 
 		a = append(a, f)
-	} else if st, ok := expr.(*ast.StructLit); ok {
+	} else if st, ok := expr.(*ast.StructLit); ok && len(st.Elts) > 0 {
 		a = append(a, st.Elts...)
 	} else {
 		a = append(a, &ast.EmbedDecl{Expr: expr})
@@ -495,14 +495,21 @@ func (s *state) idTag() *ast.Attribute {
 		Text: fmt.Sprintf("@jsonschema(id=%q)", s.id)}
 }
 
+func (s *state) structCloseTag() *ast.Attribute {
+	return &ast.Attribute{
+		Text: astutil.TagCloseStruct,
+	}
+}
+
 func (s *state) object(n cue.Value) *ast.StructLit {
 	if s.obj == nil {
 		s.obj = &ast.StructLit{}
+		s.add(n, objectType, s.obj)
 
 		if s.id != nil {
 			s.obj.Elts = append(s.obj.Elts, s.idTag())
+			ast.SetPos(s.obj, s.idPos)
 		}
-		s.add(n, objectType, s.obj)
 	}
 	return s.obj
 }
@@ -608,9 +615,9 @@ func (s *state) finalize() (e ast.Expr) {
 		obj, _ = s.types[objectType].typ.(*ast.StructLit)
 	}
 	if obj != nil {
-		// TODO: may need to explicitly close.
-		if !s.closeStruct {
-			obj.Elts = append(obj.Elts, &ast.Ellipsis{})
+		obj.Elts = append(obj.Elts, &ast.Ellipsis{})
+		if s.closeStruct {
+			obj.Elts = append(obj.Elts, s.structCloseTag())
 		}
 	}
 
@@ -668,8 +675,14 @@ outer:
 	if s.id != nil && s.obj == nil {
 		if st, ok := e.(*ast.StructLit); ok {
 			st.Elts = append([]ast.Decl{s.idTag()}, st.Elts...)
+			if s.closeStruct {
+				st.Elts = append(st.Elts, s.structCloseTag())
+			}
 		} else {
 			st = &ast.StructLit{Elts: []ast.Decl{s.idTag()}}
+			if s.closeStruct {
+				st.Elts = append(st.Elts, s.structCloseTag())
+			}
 			st.Elts = append(st.Elts, &ast.EmbedDecl{Expr: e})
 			e = st
 		}
@@ -815,8 +828,6 @@ func (s *state) value(n cue.Value) ast.Expr {
 				Value: s.value(n),
 			})
 		})
-		// TODO: only open when s.isSchema?
-		a = append(a, &ast.Ellipsis{})
 		return setPos(&ast.StructLit{Elts: a}, n)
 
 	default:

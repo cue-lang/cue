@@ -70,42 +70,44 @@
 -- out/decode/extract --
 import "struct"
 
-// Main schema
-fields?: struct.MaxFields(10) & struct.MinFields(3) & {
-	[=~"^\\P{Lu}"]: _
-}
-additional?: {
-	foo?: number
-	bar?: number
-	{[!~"^(foo|bar)$"]: string}
-}
-map?: [string]: string
-patterns?: {
-	foo?: number
-	bar?: number
+close({
+	// Main schema
+	fields?: struct.MaxFields(10) & struct.MinFields(3) & {
+		[=~"^\\P{Lu}"]: _
+	}
+	additional?: {
+		foo?: number
+		bar?: number
+		{[!~"^(foo|bar)$"]: string}
+	}
+	map?: [string]: string
+	patterns?: {
+		foo?: number
+		bar?: number
 
-	{[=~"^\\P{Lu}" & !~"^(foo|bar)$"]: string}
+		{[=~"^\\P{Lu}" & !~"^(foo|bar)$"]: string}
 
-	{[=~"^\\P{Lo}" & !~"^(foo|bar)$"]: int}
-	...
-}
-patternsNoProps?: {
-	{[=~"^\\P{Lu}"]: string}
+		{[=~"^\\P{Lo}" & !~"^(foo|bar)$"]: int}
+		...
+	}
+	patternsNoProps?: {
+		{[=~"^\\P{Lu}"]: string}
 
-	{[=~"^\\P{Lo}"]: int}
-	...
-}
-complex?: {
-	foo?: number
-	bar?: number
+		{[=~"^\\P{Lo}"]: int}
+		...
+	}
+	complex?: {
+		foo?: number
+		bar?: number
 
-	{[=~"^\\P{Lu}" & !~"^(foo|bar)$"]: string}
+		{[=~"^\\P{Lu}" & !~"^(foo|bar)$"]: string}
 
-	{[=~"^\\P{Lo}" & !~"^(foo|bar)$"]: int}
-	{[!~"^\\P{Lu}" & !~"^\\P{Lo}" & !~"^(foo|bar)$"]: string}
-}
-multi?: >=7 | struct.MaxFields(5) & {
-	foo?: number
-	bar?: number
-	...
-}
+		{[=~"^\\P{Lo}" & !~"^(foo|bar)$"]: int}
+		{[!~"^\\P{Lu}" & !~"^\\P{Lo}" & !~"^(foo|bar)$"]: string}
+	}
+	multi?: >=7 | struct.MaxFields(5) & {
+		foo?: number
+		bar?: number
+		...
+	}
+})

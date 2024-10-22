@@ -69,19 +69,27 @@ func File(f *ast.File, o ...Option) *ast.File {
 				x, y := n.X, n.Y
 				_, xIsList := x.(*ast.ListLit)
 				_, yIsList := y.(*ast.ListLit)
-				if !(xIsList || yIsList) {
-					break
-				}
+				_, xIsConcat := concatCallArgs(x)
+				_, yIsConcat := concatCallArgs(y)
+
 				if n.Op == token.ADD {
+					if !(xIsList || xIsConcat || yIsList || yIsConcat) {
+						break
+					}
 					// Rewrite list addition to use list.Concat
+					exprs := expandConcats(x, y)
 					ast.SetRelPos(x, token.NoSpace)
 					c.Replace(ast.NewCall(
 						ast.NewSel(&ast.Ident{
 							Name: "list",
 							Node: ast.NewImport(nil, "list"),
-						}, "Concat"), ast.NewList(x, y)),
+						}, "Concat"), ast.NewList(exprs...)),
 					)
+
 				} else {
+					if !(xIsList || yIsList) {
+						break
+					}
 					// Rewrite list multiplication to use list.Repeat
 					if !xIsList {
 						x, y = y, x
@@ -114,4 +122,43 @@ func File(f *ast.File, o ...Option) *ast.File {
 		panic(err)
 	}
 	return f
+}
+
+func expandConcats(exprs ...ast.Expr) (result []ast.Expr) {
+	for _, expr := range exprs {
+		list, ok := concatCallArgs(expr)
+		if ok {
+			result = append(result, expandConcats(list.Elts...)...)
+		} else {
+			result = append(result, expr)
+		}
+	}
+	return result
+}
+
+func concatCallArgs(expr ast.Expr) (*ast.ListLit, bool) {
+	call, ok := expr.(*ast.CallExpr)
+	if !ok {
+		return nil, false
+	}
+	sel, ok := call.Fun.(*ast.SelectorExpr)
+	if !ok {
+		return nil, false
+	}
+	name, ok := sel.X.(*ast.Ident)
+	if !ok || name.Name != "list" {
+		return nil, false
+	}
+	name, ok = sel.Sel.(*ast.Ident)
+	if !ok || name.Name != "Concat" {
+		return nil, false
+	}
+	if len(call.Args) != 1 {
+		return nil, false
+	}
+	list, ok := call.Args[0].(*ast.ListLit)
+	if !ok {
+		return nil, false
+	}
+	return list, true
 }

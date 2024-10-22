@@ -27,6 +27,7 @@ func constraintAdditionalProperties(key string, n cue.Value, s *state) {
 	switch n.Kind() {
 	case cue.BoolKind:
 		s.closeStruct = !s.boolValue(n)
+		_ = s.object(n)
 
 	case cue.StructKind:
 		s.closeStruct = true

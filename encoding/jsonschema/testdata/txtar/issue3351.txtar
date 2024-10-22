@@ -66,7 +66,7 @@
 }
 -- out/decode-v3/extract --
 _schema
-_schema: {
+_schema: close({
 	// JSON-e templates
 	@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
 	@jsonschema(id="https://www.sourcemeta.com/schemas/vendor/json-e@1.json")
@@ -82,7 +82,7 @@ _schema: {
 	#: "jsone-array": [...#["jsone-value"]]
 
 	#: "jsone-object-array": [..._schema]
-}
+})
 -- diff/-out/decode-v3/extract<==>+out/decode/extract --
 diff old new
 --- old
@@ -102,7 +102,7 @@ diff old new
  
 -- out/decode-v3-noshare/extract --
 _schema
-_schema: {
+_schema: close({
 	// JSON-e templates
 	@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
 	@jsonschema(id="https://www.sourcemeta.com/schemas/vendor/json-e@1.json")
@@ -118,7 +118,7 @@ _schema: {
 	#: "jsone-array": [...#["jsone-value"]]
 
 	#: "jsone-object-array": [..._schema]
-}
+})
 -- diff/-out/decode-v3-noshare/extract<==>+out/decode/extract --
 diff old new
 --- old

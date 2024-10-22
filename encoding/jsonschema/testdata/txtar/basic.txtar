@@ -56,6 +56,4 @@ person?: {
 	// length. Let's keep on going and see what happens.
 	children?: [...string]
 	"home phone"?: string @deprecated()
-	...
 }
-...

@@ -36,10 +36,12 @@ additionalProperties: false
 -- out/decode/extract --
 import "list"
 
-@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
-p1?: list.MatchN(>=1, _)
-p2?: list.MatchN(>=0, _)
-p3?: list.MatchN(>=1 & <=6, _)
-p4?: list.MatchN(>=3 & <=6, _)
-p5?: [...]
-p6?: [...]
+close({
+	@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
+	p1?: list.MatchN(>=1, _)
+	p2?: list.MatchN(>=0, _)
+	p3?: list.MatchN(>=1 & <=6, _)
+	p4?: list.MatchN(>=3 & <=6, _)
+	p5?: [...]
+	p6?: [...]
+})

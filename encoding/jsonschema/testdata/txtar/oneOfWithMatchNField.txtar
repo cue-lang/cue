@@ -19,7 +19,6 @@ the matchN builtin.
 }
 -- out/decode/extract --
 "matchN"?: matchN(1, [1, 2])
-...
 -- test/ok1.json --
 {"matchN": 1}
 -- test/ok2.json --

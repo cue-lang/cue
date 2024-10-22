@@ -21,11 +21,13 @@
 -- out/decode/extract --
 // example jsonschema
 @jsonschema(schema="http://json-schema.org/draft-04/schema#")
-@jsonschema(id="https://example.test/example")
+close({
+	@jsonschema(id="https://example.test/example")
 
-// A required field
-x!: number
+	// A required field
+	x!: number
 
-// An optional field
-y?: number
-z!: _
+	// An optional field
+	y?: number
+	z!: _
+})

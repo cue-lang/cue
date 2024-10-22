@@ -34,6 +34,24 @@
       "parentUuid": "573dd21d_95c7a501",
       "revId": "fc814fb1551e9be77adaf1aed7888f58b6193cd0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15dfd1a7_e42354c3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-22T13:47:02Z",
+      "side": 1,
+      "message": "Oh yes it is, I completely missed that. Please just add a \"Fixes\" line to the commit message then!",
+      "parentUuid": "2f76ae93_516f3e29",
+      "revId": "fc814fb1551e9be77adaf1aed7888f58b6193cd0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

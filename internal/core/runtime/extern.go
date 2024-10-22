@@ -61,9 +61,6 @@ type Compiler interface {
 // injectImplementations modifies v to include implementations of functions
 // for fields associated with the @extern attributes.
 func (r *Runtime) injectImplementations(b *build.Instance, v *adt.Vertex) (errs errors.Error) {
-	if r.interpreters == nil {
-		return nil
-	}
 
 	d := &externDecorator{
 		runtime: r,

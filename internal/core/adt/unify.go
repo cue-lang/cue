@@ -77,12 +77,12 @@ func (n *nodeContext) initBare() {
 	n.blockOn(scalarKnown | listTypeKnown | arcTypeKnown)
 
 	if v.Label.IsDef() {
-		v.Closed = true
+		v.ClosedRecursive = true
 	}
 
 	if v.Parent != nil {
-		if v.Parent.Closed {
-			v.Closed = true
+		if v.Parent.ClosedRecursive {
+			v.ClosedRecursive = true
 		}
 	}
 }
@@ -187,7 +187,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	w := v.DerefDisjunct()
 	if w != v {
 		// Should resolve with dereference.
-		v.Closed = w.Closed
+		v.ClosedRecursive = w.ClosedRecursive
 		v.status = w.status
 		v.ChildErrors = CombineErrors(nil, v.ChildErrors, w.ChildErrors)
 		v.Arcs = nil
@@ -315,8 +315,8 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		v.Arcs = nil
 
 		// Set control fields that are referenced without dereferencing.
-		if w.Closed {
-			v.Closed = true
+		if w.ClosedRecursive {
+			v.ClosedRecursive = true
 		}
 		if w.HasEllipsis {
 			v.HasEllipsis = true

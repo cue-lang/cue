@@ -201,12 +201,12 @@ func (c *OpContext) unify(v *Vertex, flags combinedFlags) {
 
 	case 0:
 		if v.Label.IsDef() {
-			v.Closed = true
+			v.ClosedRecursive = true
 		}
 
 		if v.Parent != nil {
-			if v.Parent.Closed {
-				v.Closed = true
+			if v.Parent.ClosedRecursive {
+				v.ClosedRecursive = true
 			}
 		}
 
@@ -794,7 +794,7 @@ func (n *nodeContext) checkClosed(state vertexStatus) bool {
 	if !v.Label.IsInt() && v.Parent != nil && !ignore && v.ArcType <= ArcRequired {
 		ctx := n.ctx
 		// Visit arcs recursively to validate and compute error.
-		if _, err := verifyArc2(ctx, v.Label, v, v.Closed); err != nil {
+		if _, err := verifyArc2(ctx, v.Label, v, v.ClosedRecursive); err != nil {
 			// Record error in child node to allow recording multiple
 			// conflicts at the appropriate place, to allow valid fields to
 			// be represented normally and, most importantly, to avoid

@@ -119,7 +119,7 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 	env := c.Env
 
 	if id.cc.isDef {
-		n.node.Closed = true
+		n.node.ClosedRecursive = true
 	}
 
 	switch x := c.Elem().(type) {

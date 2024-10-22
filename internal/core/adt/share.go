@@ -77,7 +77,7 @@ func (n *nodeContext) finalizeSharing() {
 				n.node.Arcs = v.Arcs
 				n.node.BaseValue = v.BaseValue
 				n.node.status = v.status
-				n.node.Closed = v.Closed
+				n.node.ClosedRecursive = v.ClosedRecursive
 				n.node.HasEllipsis = v.HasEllipsis
 			}
 		}
@@ -146,7 +146,7 @@ func (n *nodeContext) shareIfPossible(c Conjunct, arc *Vertex, id CloseInfo) boo
 	// probably a good idea anyway.
 	//
 	// TODO: come up with a mechanism to allow this case.
-	if n.node.Closed && !arc.Closed {
+	if n.node.ClosedRecursive && !arc.ClosedRecursive {
 		return false
 	}
 

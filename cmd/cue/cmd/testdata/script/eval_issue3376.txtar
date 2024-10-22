@@ -24,9 +24,9 @@ exec cue eval ./scenario3.cue
 
 # evalv2 - scenario 4
 #
-# This should not fail but it does with a SIGSEV. Fixed in evalv3
+# This should not fail. Fixed in evalv3
 ! exec cue eval ./scenario4.cue
-stderr 'panic: runtime error: invalid memory address or nil pointer dereference'
+stderr 'items.a: cannot add to field '
 
 env CUE_EXPERIMENT=evalv3
 

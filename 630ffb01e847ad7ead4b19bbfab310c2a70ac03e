@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "214fe0da_ca7663c3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-22T09:29:42Z",
+      "side": 1,
+      "message": "nit: indent with four spaces so it renders as code in markdown too, e.g. on github",
+      "revId": "630ffb01e847ad7ead4b19bbfab310c2a70ac03e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d42ea816_a3a3c8de",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-22T09:29:42Z",
+      "side": 1,
+      "message": "nit: drop the `:` for consistency with our other commit messages",
+      "revId": "630ffb01e847ad7ead4b19bbfab310c2a70ac03e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b88bda1e_9c623cf1",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-22T09:29:42Z",
+      "side": 1,
+      "message": "nit: join with the previous if via `||`",
+      "revId": "630ffb01e847ad7ead4b19bbfab310c2a70ac03e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf054371_a7655833",
+        "filename": "tools/fix/fix.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-22T09:29:42Z",
+      "side": 1,
+      "message": "nit: join with the previous if via `||`",
+      "revId": "630ffb01e847ad7ead4b19bbfab310c2a70ac03e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

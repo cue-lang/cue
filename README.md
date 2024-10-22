@@ -14,10 +14,14 @@
  limitations under the License.
 -->
 [![Go Reference](https://pkg.go.dev/badge/cuelang.org/go.svg)](https://pkg.go.dev/cuelang.org/go)
+[![Documentation](https://img.shields.io/badge/Documentation-fdc52f)](https://cuelang.org/docs/)
 [![Github](https://github.com/cue-lang/cue/actions/workflows/trybot.yaml/badge.svg)](https://github.com/cue-lang/cue/actions/workflows/trybot.yaml?query=branch%3Amaster+event%3Apush)
-[![Go 1.22+](https://img.shields.io/badge/go-1.22-9cf.svg)](https://golang.org/dl/)
-[![platforms](https://img.shields.io/badge/platforms-linux|windows|macos-inactive.svg)]()
 [![Docker Image](https://img.shields.io/docker/v/cuelang/cue?sort=semver&label=docker)](https://hub.docker.com/r/cuelang/cue)
+
+**CUE documentation: [cuelang.org/docs](https://cuelang.org/docs/)** |
+**Try CUE in your browser: [cuelang.org/play](https://cuelang.org/play/)**
+
+---
 
 # The CUE Data Constraint Language
 

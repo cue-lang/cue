@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "573dd21d_95c7a501",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-22T13:19:53Z",
+      "side": 1,
+      "message": "I believe this fixes https://github.com/cue-lang/cue/issues/3376 too :) \n\nAdd the panic test case from https://github.com/cue-lang/cue/issues/3376#issuecomment-2296704288 as well, which affected evalv2?",
+      "revId": "fc814fb1551e9be77adaf1aed7888f58b6193cd0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

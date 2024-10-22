@@ -64,6 +64,7 @@ func Extract(data cue.InstanceOrValue, cfg *Config) (f *ast.File, err error) {
 	if d.errs != nil {
 		return nil, d.errs
 	}
+
 	return f, nil
 }
 

@@ -29,7 +29,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			},
@@ -86,7 +85,6 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
 					"v3": "unexpected success"
 				}
 			}
@@ -234,8 +232,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: reference \"strings\" in label expression refers to field against which it would be matched:\n    generated.cue:5:3\n",
-			"v3": "extract error: cannot compile resulting schema: reference \"strings\" in label expression refers to field against which it would be matched:\n    generated.cue:5:3\n"
+			"v2": "extract error: cannot compile resulting schema: reference \"strings\" in label expression refers to field against which it would be matched:\n    generated.cue:7:3\n",
+			"v3": "extract error: cannot compile resulting schema: reference \"strings\" in label expression refers to field against which it would be matched:\n    generated.cue:7:3\n"
 		},
 		"tests": [
 			{

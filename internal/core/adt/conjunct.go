@@ -552,20 +552,20 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 
 	switch x := v.(type) {
 	case *Vertex:
-		if m, ok := x.BaseValue.(*StructMarker); ok {
+		if x.ClosedNonRecursive {
+			n.node.ClosedNonRecursive = true
+			var cc *closeContext
+			id, cc = id.spawnCloseContext(n.ctx, 0)
+			cc.isClosedOnce = true
+
+			if v, ok := x.BaseValue.(*Vertex); ok {
+				n.insertValueConjunct(env, v, id)
+				return
+			}
+		}
+		if _, ok := x.BaseValue.(*StructMarker); ok {
 			n.aStruct = x
 			n.aStructID = id
-			if m.NeedClose {
-				// TODO: In the new evaluator this is used to mark a struct
-				// as closed in the debug output. Once the old evaluator is
-				// gone, we could simplify this.
-				id.IsClosed = true
-				if ctx.isDevVersion() {
-					var cc *closeContext
-					id, cc = id.spawnCloseContext(n.ctx, 0)
-					cc.isClosedOnce = true
-				}
-			}
 		}
 
 		if !x.IsData() {

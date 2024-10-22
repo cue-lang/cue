@@ -703,7 +703,10 @@ func runTask(t *task, mode runMode) {
 	defer ctx.popTask()
 	if t.env != nil {
 		id := t.id
-		id.cc = nil // this is done to avoid struct args from passing fields up.
+		// This is done to avoid struct args from passing fields up.
+		// Use task.updateCI() to get the current CloseInfo with this field
+		// restored.
+		id.cc = nil
 		s := ctx.PushConjunct(MakeConjunct(t.env, t.x, id))
 		defer ctx.PopState(s)
 	}
@@ -734,6 +737,13 @@ func runTask(t *task, mode runMode) {
 		t.node.decrementCounts(t.completes)
 		t.completes = 0 // safety
 	}
+}
+
+// updateCI stitches back the closeContext that more removed from the CloseInfo
+// before in the given CloseInfo.
+func (t *task) updateCI(ci CloseInfo) CloseInfo {
+	ci.cc = t.id.cc
+	return ci
 }
 
 // waitFor blocks task t until the needs for scheduler s are met.

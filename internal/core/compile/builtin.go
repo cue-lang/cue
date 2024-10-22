@@ -16,6 +16,7 @@ package compile
 
 import (
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 )
 
@@ -81,19 +82,26 @@ var closeBuiltin = &adt.Builtin{
 	Name:   "close",
 	Params: []adt.Param{structParam},
 	Result: adt.StructKind,
-	// NonConcrete: true, // TODO: should probably be noncrete
 	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
 		s, ok := args[0].(*adt.Vertex)
 		if !ok {
 			return c.NewErrf("struct argument must be concrete")
 		}
-		if m, ok := s.BaseValue.(*adt.StructMarker); ok && m.NeedClose {
-			return s
+		var v *adt.Vertex
+		if c.Version == internal.DevVersion {
+			// TODO(evalv3) this is a rather convoluted and inefficient way to
+			// accomplish signaling vertex should be closed. In most cases, it
+			// would suffice to set IsClosed in the CloseInfo. However, that
+			// does not cover all code paths. Consider simplifying this.
+			v = c.Wrap(s, c.CloseInfo())
+			v.ClosedNonRecursive = true
+		} else {
+			if m, ok := s.BaseValue.(*adt.StructMarker); ok && m.NeedClose {
+				return s
+			}
+			v = s.Clone()
+			v.BaseValue = &adt.StructMarker{NeedClose: true}
 		}
-		v := s.Clone()
-		// TODO(perf): do not copy the arc, but rather find a way to mark the
-		// calling nodeContext.
-		v.BaseValue = &adt.StructMarker{NeedClose: true}
 		return v
 	},
 }

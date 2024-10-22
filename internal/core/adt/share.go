@@ -113,7 +113,9 @@ func (n *nodeContext) share(c Conjunct, arc *Vertex, id CloseInfo) {
 	// have been processed and it is clear that sharing is possible. Delaying
 	// such a count should not hurt performance, as a shared node is completed
 	// anyway.
-	id.cc.incDependent(n.ctx, SHARED, n.node.cc())
+	if id.cc != nil {
+		id.cc.incDependent(n.ctx, SHARED, n.node.cc())
+	}
 }
 
 func (n *nodeContext) shareIfPossible(c Conjunct, arc *Vertex, id CloseInfo) bool {

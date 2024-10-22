@@ -318,6 +318,8 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		if w.ClosedRecursive {
 			v.ClosedRecursive = true
 		}
+		// NOTE: setting ClosedNonRecursive is not necessary, as it is
+		// handled by scheduleValue.
 		if w.HasEllipsis {
 			v.HasEllipsis = true
 		}

@@ -330,9 +330,10 @@ func isClosed(v *Vertex) bool {
 	// We could have used IsRecursivelyClosed here, but (effectively)
 	// implementing it again here allows us to only have to iterate over
 	// Structs once.
-	if v.ClosedRecursive {
+	if v.ClosedRecursive || v.ClosedNonRecursive {
 		return true
 	}
+	// TODO(evalv3): this can be removed once we delete the evalv2 code.
 	for _, s := range v.Structs {
 		if s.IsClosed || s.IsInOneOf(DefinitionSpan) {
 			return true

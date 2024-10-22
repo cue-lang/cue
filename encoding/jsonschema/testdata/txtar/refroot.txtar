@@ -20,6 +20,5 @@ _schema: {
 		@jsonschema(id="http://cuelang.org/go/encoding/openapi/testdata/order.json")
 		value?: _
 		next?:  _schema
-		...
 	}
 }

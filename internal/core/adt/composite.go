@@ -352,7 +352,8 @@ func (v *Vertex) updateArcType(t ArcType) {
 		return
 	}
 	s := v.state
-	if (s != nil || v.isFinal()) && s.ctx.isDevVersion() {
+	// NOTE: this condition does not occur in V2.
+	if s != nil && v.isFinal() {
 		c := s.ctx
 		if s.scheduler.frozen.meets(arcTypeKnown) {
 			p := token.NoPos

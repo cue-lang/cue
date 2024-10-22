@@ -606,40 +606,31 @@
 				"data": {
 					"l'ecole": "pas de vraie vie"
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3": "field not allowed: \"l'ecole\"\n"
+				}
 			},
 			{
 				"description": "literal unicode character in json string",
 				"data": {
 					"l'école": "pas de vraie vie"
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "unicode character in hex format in string",
 				"data": {
 					"l'école": "pas de vraie vie"
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "unicode matching is case-sensitive",
 				"data": {
 					"L'ÉCOLE": "PAS DE VRAIE VIE"
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -659,29 +650,24 @@
 				"data": {
 					"l'école": "pas de vraie vie"
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "unicode character in hex format in string",
 				"data": {
 					"l'école": "pas de vraie vie"
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "ascii characters match",
 				"data": {
 					"l'ecole": "pas de vraie vie"
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3": "field not allowed: \"l'ecole\"\n"
+				}
 			}
 		]
 	},
@@ -701,29 +687,24 @@
 				"data": {
 					"42": "life, the universe, and everything"
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v3": "field not allowed: \"42\"\n"
+				}
 			},
 			{
 				"description": "ascii non-digits",
 				"data": {
 					"-%#": "spending the year dead for tax reasons"
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "non-ascii digits (BENGALI DIGIT FOUR, BENGALI DIGIT TWO)",
 				"data": {
 					"৪২": "khajit has wares if you have coin"
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},

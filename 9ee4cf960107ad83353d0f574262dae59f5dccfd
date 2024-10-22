@@ -38,6 +38,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "c63f264f_a73da65f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-10-22T07:14:40Z",
+      "side": 1,
+      "message": "I have submitted another WIP CL(https://review.gerrithub.io/c/cue-lang/cue/+/1202854) using a second pass approach. It uses a sentinel attribute to mark closed struct in the first pass and updates the AST to close the structs and remove redundant ellipses in the second pass.\n\nWe still need to invoke the second pass inside `encoding/jsonschema`; otherwise, the output of `encoding/jsonschema` will contain the sentinel attributes and not handle closeness at all. If we want to delay the second pass until the `--path` is parsed, we also need a config option to control it.\n\n\u003e If we do that, then the \"right\" default approach would be to assume that we are decoding into a definition, removing the need for the `DecodeAsDefinition` configuration option.\n\nTo manage closeness accurately, the second pass must determine if the schema will be used in a definition context. If we assume decoding into a definition by default, using `cue import` without the `-l` flag cannot correctly close structs.\n\nAs an alternative approach, we can explicitly close the top-level value in the second pass. Doing so allows us to use the output in all contexts, ensuring it accurately handles closeness according to the input JSON schema. And we can avoid new configuration options. The disadvantage is that we may have a redundant close() at the top-level structure, for example, when decoding into a definition. What do you think about it?",
+      "parentUuid": "99eeb9e4_b4c2ee73",
+      "revId": "9ee4cf960107ad83353d0f574262dae59f5dccfd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "32c4cd21_b2dde596",
         "filename": "cmd/cue/cmd/common.go",
         "patchSetId": 1

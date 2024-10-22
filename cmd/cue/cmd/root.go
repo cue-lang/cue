@@ -55,6 +55,9 @@ import (
 
 type runFunction func(cmd *Command, args []string) error
 
+// wasmInterp is set when the cuewasm build tag is enbabled.
+var wasmInterp cuecontext.ExternInterpreter
+
 func statsEncoder(cmd *Command) (*encoding.Encoder, error) {
 	file := os.Getenv("CUE_STATS_FILE")
 	if file == "" {
@@ -105,6 +108,14 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		if err := cuedebug.Init(); err != nil {
 			return err
 		}
+		var opts []cuecontext.Option
+		if wasmInterp != nil {
+			opts = append(opts, cuecontext.Interpreter(wasmInterp))
+		}
+		if cueexperiment.Flags.Embed {
+			opts = append(opts, cuecontext.Interpreter(embed.New()))
+		}
+		c.ctx = cuecontext.New(opts...)
 		// Some init work, such as in internal/filetypes, evaluates CUE by design.
 		// We don't want that work to count towards $CUE_STATS.
 		adt.ResetStats()
@@ -198,13 +209,9 @@ func New(args []string) (*Command, error) {
 		DisableSuggestions: true,
 	}
 
-	embedding := cuecontext.Interpreter(embed.New())
-	rootContextOptions = append(rootContextOptions, embedding)
-
 	c := &Command{
 		Command: cmd,
 		root:    cmd,
-		ctx:     cuecontext.New(rootContextOptions...),
 	}
 	c.cmdCmd = newCmdCmd(c)
 
@@ -251,8 +258,6 @@ func New(args []string) (*Command, error) {
 	cmd.SetArgs(args)
 	return c, nil
 }
-
-var rootContextOptions []cuecontext.Option
 
 // rootWorkingDir avoids repeated calls to [os.Getwd] in cmd/cue.
 // If we can't figure out the current directory, something is very wrong,

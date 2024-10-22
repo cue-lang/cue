@@ -1,5 +1,5 @@
-exec cue eval
-cmp stdout out/noembed
+! exec cue eval
+cmp stderr out/noembed
 
 env CUE_EXPERIMENT=embed
 
@@ -108,19 +108,8 @@ language: version: "v0.9.0"
     }
 }
 -- out/noembed --
-a: _
-b: _
-c: _
-d: _
-f: _
-g: _
-special: {
-    underscoreFile: _
-    dotFile:        _
-    dotdotFile:     _
-    underscoreDir:  _
-    dotDir:         _
-}
+no interpreter defined for "embed":
+    ./test.cue:1:1
 -- out/eval --
 a: {
     x: 34

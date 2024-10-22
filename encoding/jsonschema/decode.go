@@ -165,7 +165,7 @@ func (d *decoder) schema(ref []ast.Label, v cue.Value) (a []ast.Decl) {
 		}
 
 		a = append(a, f)
-	} else if st, ok := expr.(*ast.StructLit); ok {
+	} else if st, ok := expr.(*ast.StructLit); ok && len(st.Elts) > 0 {
 		a = append(a, st.Elts...)
 	} else {
 		a = append(a, &ast.EmbedDecl{Expr: expr})
@@ -457,7 +457,11 @@ type state struct {
 	definitions []ast.Decl
 
 	// Used for inserting definitions, properties, etc.
-	obj *ast.StructLit
+	obj  *ast.StructLit
+	// objN records the node associated with the first
+	// caller of [state.object], used for adding obj
+	// to constraints.
+	objN cue.Value
 	// Complete at finalize.
 	fieldRefs map[label]refs
 
@@ -498,13 +502,32 @@ func (s *state) idTag() *ast.Attribute {
 func (s *state) object(n cue.Value) *ast.StructLit {
 	if s.obj == nil {
 		s.obj = &ast.StructLit{}
+		s.objN = n
 
 		if s.id != nil {
 			s.obj.Elts = append(s.obj.Elts, s.idTag())
 		}
-		s.add(n, objectType, s.obj)
 	}
 	return s.obj
+}
+
+func (s *state) finalizeObject() {
+	if s.obj == nil {
+		return
+	}
+
+	var e ast.Expr
+	if s.closeStruct {
+		e = ast.NewCall(ast.NewIdent("close"), s.obj)
+	} else {
+		s.obj.Elts = append(s.obj.Elts, &ast.Ellipsis{})
+		e = s.obj
+	}
+
+	s.add(s.objN, objectType, e)
+	if s.id != nil && s.idPos.Before(s.objN.Pos()) {
+		ast.SetPos(e, s.idPos)
+	}
 }
 
 func (s *state) hasConstraints() bool {
@@ -533,6 +556,8 @@ func (s *state) finalize() (e ast.Expr) {
 		// we might be inside an allOf or oneOf with other valid constraints.
 		return bottom()
 	}
+
+	s.finalizeObject()
 
 	conjuncts := []ast.Expr{}
 	disjuncts := []ast.Expr{}
@@ -603,16 +628,6 @@ func (s *state) finalize() (e ast.Expr) {
 		}
 	}
 	conjuncts = append(conjuncts, s.all.constraints...)
-	obj := s.obj
-	if obj == nil {
-		obj, _ = s.types[objectType].typ.(*ast.StructLit)
-	}
-	if obj != nil {
-		// TODO: may need to explicitly close.
-		if !s.closeStruct {
-			obj.Elts = append(obj.Elts, &ast.Ellipsis{})
-		}
-	}
 
 	if len(disjuncts) > 0 {
 		conjuncts = append(conjuncts, ast.NewBinExpr(token.OR, disjuncts...))
@@ -669,9 +684,7 @@ outer:
 		if st, ok := e.(*ast.StructLit); ok {
 			st.Elts = append([]ast.Decl{s.idTag()}, st.Elts...)
 		} else {
-			st = &ast.StructLit{Elts: []ast.Decl{s.idTag()}}
-			st.Elts = append(st.Elts, &ast.EmbedDecl{Expr: e})
-			e = st
+			e = &ast.StructLit{Elts: []ast.Decl{s.idTag(), &ast.EmbedDecl{Expr: e}}}
 		}
 	}
 
@@ -815,8 +828,6 @@ func (s *state) value(n cue.Value) ast.Expr {
 				Value: s.value(n),
 			})
 		})
-		// TODO: only open when s.isSchema?
-		a = append(a, &ast.Ellipsis{})
 		return setPos(&ast.StructLit{Elts: a}, n)
 
 	default:

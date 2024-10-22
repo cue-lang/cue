@@ -69,13 +69,17 @@ _schema
 _schema: {
 	// JSON-e templates
 	@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
-	@jsonschema(id="https://www.sourcemeta.com/schemas/vendor/json-e@1.json")
-	$else?: #["jsone-value"]
-	$let?: [string]: null | bool | number | string | [...] | {
-		[string]: _schema
-	}
-	$sort?: matchN(>=1, [_schema, [...number]])
-	{[!~"^(\\$else|\\$let|\\$sort)$"]: #["jsone-value"]}
+	close({
+		@jsonschema(id="https://www.sourcemeta.com/schemas/vendor/json-e@1.json")
+		$else?: #["jsone-value"]
+		$let?: close({
+			[string]: null | bool | number | string | [...] | close({
+				[string]: _schema
+			})
+		})
+		$sort?: matchN(>=1, [_schema, [...number]])
+		{[!~"^(\\$else|\\$let|\\$sort)$"]: #["jsone-value"]}
+	})
 
 	#: "jsone-value": matchN(1, [_schema, [..._schema]])
 
@@ -87,17 +91,17 @@ _schema: {
 diff old new
 --- old
 +++ new
-@@ -7,10 +7,10 @@
- 	$let?: [string]: null | bool | number | string | [...] | {
- 		[string]: _schema
- 	}
--	$sort?: _schema | [...number]
--	{[!~"^($else|$let|$sort)$"]: #["jsone-value"]}
--
+@@ -10,11 +10,11 @@
+ 				[string]: _schema
+ 			})
+ 		})
+-		$sort?: _schema | [...number]
+-		{[!~"^($else|$let|$sort)$"]: #["jsone-value"]}
++		$sort?: matchN(>=1, [_schema, [...number]])
++		{[!~"^(\\$else|\\$let|\\$sort)$"]: #["jsone-value"]}
+ 	})
+ 
 -	#: "jsone-value": _schema | [..._schema]
-+	$sort?: matchN(>=1, [_schema, [...number]])
-+	{[!~"^(\\$else|\\$let|\\$sort)$"]: #["jsone-value"]}
-+
 +	#: "jsone-value": matchN(1, [_schema, [..._schema]])
  
  	#: "jsone-array": [...#["jsone-value"]]
@@ -107,13 +111,17 @@ _schema
 _schema: {
 	// JSON-e templates
 	@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
-	@jsonschema(id="https://www.sourcemeta.com/schemas/vendor/json-e@1.json")
-	$else?: #["jsone-value"]
-	$let?: [string]: null | bool | number | string | [...] | {
-		[string]: _schema
-	}
-	$sort?: matchN(>=1, [_schema, [...number]])
-	{[!~"^(\\$else|\\$let|\\$sort)$"]: #["jsone-value"]}
+	close({
+		@jsonschema(id="https://www.sourcemeta.com/schemas/vendor/json-e@1.json")
+		$else?: #["jsone-value"]
+		$let?: close({
+			[string]: null | bool | number | string | [...] | close({
+				[string]: _schema
+			})
+		})
+		$sort?: matchN(>=1, [_schema, [...number]])
+		{[!~"^(\\$else|\\$let|\\$sort)$"]: #["jsone-value"]}
+	})
 
 	#: "jsone-value": matchN(1, [_schema, [..._schema]])
 
@@ -125,17 +133,17 @@ _schema: {
 diff old new
 --- old
 +++ new
-@@ -7,10 +7,10 @@
- 	$let?: [string]: null | bool | number | string | [...] | {
- 		[string]: _schema
- 	}
--	$sort?: _schema | [...number]
--	{[!~"^($else|$let|$sort)$"]: #["jsone-value"]}
--
+@@ -10,11 +10,11 @@
+ 				[string]: _schema
+ 			})
+ 		})
+-		$sort?: _schema | [...number]
+-		{[!~"^($else|$let|$sort)$"]: #["jsone-value"]}
++		$sort?: matchN(>=1, [_schema, [...number]])
++		{[!~"^(\\$else|\\$let|\\$sort)$"]: #["jsone-value"]}
+ 	})
+ 
 -	#: "jsone-value": _schema | [..._schema]
-+	$sort?: matchN(>=1, [_schema, [...number]])
-+	{[!~"^(\\$else|\\$let|\\$sort)$"]: #["jsone-value"]}
-+
 +	#: "jsone-value": matchN(1, [_schema, [..._schema]])
  
  	#: "jsone-array": [...#["jsone-value"]]
@@ -145,13 +153,17 @@ _schema
 _schema: {
 	// JSON-e templates
 	@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
-	@jsonschema(id="https://www.sourcemeta.com/schemas/vendor/json-e@1.json")
-	$else?: #["jsone-value"]
-	$let?: [string]: null | bool | number | string | [...] | {
-		[string]: _schema
-	}
-	$sort?: _schema | [...number]
-	{[!~"^($else|$let|$sort)$"]: #["jsone-value"]}
+	close({
+		@jsonschema(id="https://www.sourcemeta.com/schemas/vendor/json-e@1.json")
+		$else?: #["jsone-value"]
+		$let?: close({
+			[string]: null | bool | number | string | [...] | close({
+				[string]: _schema
+			})
+		})
+		$sort?: _schema | [...number]
+		{[!~"^($else|$let|$sort)$"]: #["jsone-value"]}
+	})
 
 	#: "jsone-value": _schema | [..._schema]
 

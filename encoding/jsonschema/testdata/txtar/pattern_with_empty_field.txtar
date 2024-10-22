@@ -13,13 +13,12 @@
 }
 -- out/decode/extract --
 @jsonschema(schema="https://json-schema.org/draft/2020-12/schema")
-
 {[=~".*"]: string}
 ...
 -- test/err-empty-field.json --
 {"": true}
 -- out/decode/testerr/err-empty-field --
 "": conflicting values true and string (mismatched types bool and string):
-    generated.cue:3:1
-    generated.cue:3:12
+    generated.cue:2:1
+    generated.cue:2:12
     test/err-empty-field.json:1:6

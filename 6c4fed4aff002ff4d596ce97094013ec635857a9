@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "97a6d4b1_51fb6da9",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-23T07:52:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f4ddf65b_7f68b595",
+      "revId": "6c4fed4aff002ff4d596ce97094013ec635857a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2f8e3a3b_93be7ff2",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-10-22T15:55:22Z",
       "side": 1,
       "message": "I would also note which part is v3 vs v2 here too.",
+      "revId": "6c4fed4aff002ff4d596ce97094013ec635857a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be6e1079_798f90ab",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 566,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-23T07:52:46Z",
+      "side": 1,
+      "message": "This is only V3 logic. All logic in this file is for V3. Note that the NeedClose test is gone.",
+      "parentUuid": "2f8e3a3b_93be7ff2",
       "revId": "6c4fed4aff002ff4d596ce97094013ec635857a9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -58,6 +94,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "09ef964e_b57649ca",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 707,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-23T07:52:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4b67fef6_e3af12d0",
+      "range": {
+        "startLine": 707,
+        "startChar": 9,
+        "endLine": 707,
+        "endChar": 24
+      },
+      "revId": "6c4fed4aff002ff4d596ce97094013ec635857a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6a93a3a1_a0ab9efc",
@@ -71,6 +131,24 @@
       "writtenOn": "2024-10-22T15:55:22Z",
       "side": 1,
       "message": "why do we have two ways to represent the close built-in now? assuming this is v3 vs v2, I would note that down with comments.",
+      "revId": "6c4fed4aff002ff4d596ce97094013ec635857a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a04a4bd8_a0d62d30",
+        "filename": "internal/core/export/expr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-23T07:52:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6a93a3a1_a0ab9efc",
       "revId": "6c4fed4aff002ff4d596ce97094013ec635857a9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

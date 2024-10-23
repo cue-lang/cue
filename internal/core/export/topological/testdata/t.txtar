@@ -1,0 +1,477 @@
+-- file.cue --
+b: {
+   z: 1
+   y: 2
+}
+a: {
+   x: 3
+   w: 4
+}
+
+c1: a&b
+c2: b&a
+
+c3: j: k: l: a&b
+c4: j: k: l: b&a
+
+d1: {
+    a
+    b
+}
+
+d2: {
+    b
+    a
+}
+
+d3: {
+    za: 11
+    a
+    b
+    t: 10
+}
+
+d4: {
+    za: 11
+    b
+    a
+    t: 10
+}
+
+d5: {
+    za: 11
+    a&b
+    t: 10
+}
+
+d6: {
+    za: 11
+    b&a
+    t: 10
+}
+
+e1: a
+e1: b
+
+e2: b
+e2: a
+
+e3: j: k: l: a
+e3: j: k: l: b
+
+e4: j: k: l: b
+e4: j: k: l: a
+
+f1: a1
+f1: b1
+
+f2: b1
+f2: a1
+
+f3: j: k: l: a1
+f3: j: k: l: b1
+
+f4: j: k: l: b1
+f4: j: k: l: a1
+
+g1: a&b
+g1: v: 5
+
+a1: a2
+a2: a
+b1: b2
+b2: b
+
+-- out/topological-v3 --
+{
+	b: {
+		z: 1
+		y: 2
+	}
+	a: {
+		x: 3
+		w: 4
+	}
+	c1: {
+		x: 3
+		w: 4
+		z: 1
+		y: 2
+	}
+	c2: {
+		x: 3
+		w: 4
+		z: 1
+		y: 2
+	}
+	c3: {
+		j: {
+			k: {
+				l: {
+					x: 3
+					w: 4
+					z: 1
+					y: 2
+				}
+			}
+		}
+	}
+	c4: {
+		j: {
+			k: {
+				l: {
+					x: 3
+					w: 4
+					z: 1
+					y: 2
+				}
+			}
+		}
+	}
+	d1: {
+		x: 3
+		w: 4
+		z: 1
+		y: 2
+	}
+	d2: {
+		z: 1
+		y: 2
+		x: 3
+		w: 4
+	}
+	d3: {
+		za: 11
+		x:  3
+		w:  4
+		z:  1
+		y:  2
+		t:  10
+	}
+	d4: {
+		za: 11
+		z:  1
+		y:  2
+		x:  3
+		w:  4
+		t:  10
+	}
+	d5: {
+		za: 11
+		x:  3
+		w:  4
+		z:  1
+		y:  2
+		t:  10
+	}
+	d6: {
+		za: 11
+		x:  3
+		w:  4
+		z:  1
+		y:  2
+		t:  10
+	}
+	e1: {
+		x: 3
+		w: 4
+		z: 1
+		y: 2
+	}
+	e2: {
+		z: 1
+		y: 2
+		x: 3
+		w: 4
+	}
+	e3: {
+		j: {
+			k: {
+				l: {
+					x: 3
+					w: 4
+					z: 1
+					y: 2
+				}
+			}
+		}
+	}
+	e4: {
+		j: {
+			k: {
+				l: {
+					z: 1
+					y: 2
+					x: 3
+					w: 4
+				}
+			}
+		}
+	}
+	f1: {
+		x: 3
+		w: 4
+		z: 1
+		y: 2
+	}
+	f2: {
+		z: 1
+		y: 2
+		x: 3
+		w: 4
+	}
+	f3: {
+		j: {
+			k: {
+				l: {
+					x: 3
+					w: 4
+					z: 1
+					y: 2
+				}
+			}
+		}
+	}
+	f4: {
+		j: {
+			k: {
+				l: {
+					z: 1
+					y: 2
+					x: 3
+					w: 4
+				}
+			}
+		}
+	}
+	g1: {
+		v: 5
+		x: 3
+		w: 4
+		z: 1
+		y: 2
+	}
+	a1: {
+		x: 3
+		w: 4
+	}
+	a2: {
+		x: 3
+		w: 4
+	}
+	b1: {
+		z: 1
+		y: 2
+	}
+	b2: {
+		z: 1
+		y: 2
+	}
+}
+-- diff/-out/topological-v3<==>+out/topological --
+diff old new
+--- old
++++ new
+@@ -182,4 +182,4 @@
+ 		z: 1
+ 		y: 2
+ 	}
+-}
++}
+\ No newline at end of file
+-- out/topological-v3-noshare --
+_|_ // d3.z: conflicting values 1 and 11
+-- diff/-out/topological-v3-noshare<==>+out/topological --
+diff old new
+--- old
++++ new
+@@ -1,1 +1,1 @@
+-_|_ // d3.z: conflicting values 1 and 11
++_|_ // d3.z: conflicting values 1 and 11
+\ No newline at end of file
+-- out/topological --
+{
+	b: {
+		z: 1
+		y: 2
+	}
+	a: {
+		x: 3
+		w: 4
+	}
+	c1: {
+		x: 3
+		w: 4
+		z: 1
+		y: 2
+	}
+	c2: {
+		x: 3
+		w: 4
+		z: 1
+		y: 2
+	}
+	c3: {
+		j: {
+			k: {
+				l: {
+					x: 3
+					w: 4
+					z: 1
+					y: 2
+				}
+			}
+		}
+	}
+	c4: {
+		j: {
+			k: {
+				l: {
+					x: 3
+					w: 4
+					z: 1
+					y: 2
+				}
+			}
+		}
+	}
+	d1: {
+		x: 3
+		w: 4
+		z: 1
+		y: 2
+	}
+	d2: {
+		z: 1
+		y: 2
+		x: 3
+		w: 4
+	}
+	d3: {
+		za: 11
+		x:  3
+		w:  4
+		z:  1
+		y:  2
+		t:  10
+	}
+	d4: {
+		za: 11
+		z:  1
+		y:  2
+		x:  3
+		w:  4
+		t:  10
+	}
+	d5: {
+		za: 11
+		x:  3
+		w:  4
+		z:  1
+		y:  2
+		t:  10
+	}
+	d6: {
+		za: 11
+		x:  3
+		w:  4
+		z:  1
+		y:  2
+		t:  10
+	}
+	e1: {
+		x: 3
+		w: 4
+		z: 1
+		y: 2
+	}
+	e2: {
+		z: 1
+		y: 2
+		x: 3
+		w: 4
+	}
+	e3: {
+		j: {
+			k: {
+				l: {
+					x: 3
+					w: 4
+					z: 1
+					y: 2
+				}
+			}
+		}
+	}
+	e4: {
+		j: {
+			k: {
+				l: {
+					z: 1
+					y: 2
+					x: 3
+					w: 4
+				}
+			}
+		}
+	}
+	f1: {
+		x: 3
+		w: 4
+		z: 1
+		y: 2
+	}
+	f2: {
+		z: 1
+		y: 2
+		x: 3
+		w: 4
+	}
+	f3: {
+		j: {
+			k: {
+				l: {
+					x: 3
+					w: 4
+					z: 1
+					y: 2
+				}
+			}
+		}
+	}
+	f4: {
+		j: {
+			k: {
+				l: {
+					z: 1
+					y: 2
+					x: 3
+					w: 4
+				}
+			}
+		}
+	}
+	g1: {
+		v: 5
+		x: 3
+		w: 4
+		z: 1
+		y: 2
+	}
+	a1: {
+		x: 3
+		w: 4
+	}
+	a2: {
+		x: 3
+		w: 4
+	}
+	b1: {
+		z: 1
+		y: 2
+	}
+	b2: {
+		z: 1
+		y: 2
+	}
+}

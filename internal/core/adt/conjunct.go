@@ -278,10 +278,14 @@ loop2:
 		case *Comprehension, Expr:
 			// No need to increment and decrement, as there will be at least
 			// one entry.
-			if _, ok := s.Src.(*ast.File); !ok {
+			if _, ok := s.Src.(*ast.File); !ok && s.Src != nil {
 				// If this is not a file, the struct indicates the scope/
 				// boundary at which closedness should apply. This is not true
 				// for files.
+				// We should also not spawn if this is a nested Comprehension,
+				// where the spawn is already done as it may lead to spurious
+				// field not allowed errors. We can detect this a nil s.Src.
+				// TODO(evalv3): use a more principled detection mechanism.
 				// TODO: set this as a flag in StructLit so as to not have to
 				// do the somewhat dangerous cast here.
 				ci, _ = ci.spawnCloseContext(n.ctx, 0)

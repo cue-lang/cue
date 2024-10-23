@@ -463,30 +463,20 @@ func (n *nodeContext) processComprehensionInner(d *envYield, state vertexStatus)
 	d.inserted = true
 
 	if len(d.envs) == 0 {
-		c := d.leaf
-		for p := c.arcCC; p != nil; p = p.parent {
-			// because the parent referrer will reach a zero count before this
-			// node will reach a zero count, we need to propagate the arcType.
-			p.updateArcType(ArcNotPresent)
-		}
+		c := d.leaf.arcCC
+		// because the parent referrer will reach a zero count before this
+		// node will reach a zero count, we need to propagate the arcType.
+		c.updateArcType(ctx, ArcNotPresent)
 		return nil
 	}
 
 	v := n.node
-	f := v.Label
 	for c := d.leaf; c.parent != nil; c = c.parent {
 		// because the parent referrer will reach a zero count before this
 		// node will reach a zero count, we need to propagate the arcType.
-		for arc, p := c.arcCC, c.cc; p != nil; arc, p = arc.parent, p.parent {
-
-			t := arc.arcType
-			if p.isClosed && t >= ArcPending && !p.allows(ctx, f, arc) {
-				ctx.notAllowedError(p.src, arc.src)
-			}
-			// TODO: remove this line once we use the arcType of the
-			// closeContext in notAllowedError.
-			arc.src.updateArcType(c.arcType)
-			arc.updateArcType(c.arcType)
+		if p := c.arcCC; p != nil {
+			p.src.updateArcType(c.arcType)
+			p.updateArcType(ctx, c.arcType)
 		}
 		v.updateArcType(c.arcType)
 		if v.ArcType == ArcNotPresent {

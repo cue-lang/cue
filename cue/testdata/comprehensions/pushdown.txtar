@@ -803,11 +803,6 @@ embed.fail1.p: field not allowed:
     ./in.cue:46:7
     ./in.cue:46:4
     ./in.cue:49:9
-embed.success4.x.y: field not allowed:
-    ./in.cue:76:9
-    ./in.cue:70:7
-    ./in.cue:71:6
-    ./in.cue:76:6
 embed.fail4.p: field not allowed:
     ./in.cue:87:10
     ./in.cue:87:4
@@ -817,11 +812,6 @@ fieldMismatch.a: cannot combine regular field "x" with 2:
 structShare.err1.x.d.e: field not allowed:
     ./in.cue:591:12
     ./in.cue:591:9
-issue3533.out.metadata.namespace: field not allowed:
-    ./issue3533.cue:7:26
-    ./issue3533.cue:2:15
-    ./issue3533.cue:7:15
-    ./issue3533.cue:11:17
 
 Result:
 (_|_){
@@ -890,20 +880,12 @@ Result:
     }
     #C3: (#struct){
     }
-    success4: (_|_){
-      // [eval]
+    success4: (struct){
       #X: (#struct){
         y: (string){ string }
       }
-      x: (_|_){
-        // [eval]
-        y: (_|_){
-          // [eval] embed.success4.x.y: field not allowed:
-          //     ./in.cue:76:9
-          //     ./in.cue:70:7
-          //     ./in.cue:71:6
-          //     ./in.cue:76:6
-        }
+      x: (#struct){
+        y: (string){ string }
       }
     }
     fail4: (_|_){
@@ -1432,22 +1414,13 @@ Result:
     root: (#struct){
     }
   }
-  issue3533: (_|_){
-    // [eval]
+  issue3533: (struct){
     #ObjectMeta: (#struct){
       namespace?: (string){ string }
     }
-    out: (_|_){
-      // [eval]
-      metadata: (_|_){
-        // [eval]
-        namespace: (_|_){
-          // [eval] issue3533.out.metadata.namespace: field not allowed:
-          //     ./issue3533.cue:7:26
-          //     ./issue3533.cue:2:15
-          //     ./issue3533.cue:7:15
-          //     ./issue3533.cue:11:17
-        }
+    out: (struct){
+      metadata: (#struct){
+        namespace: (string){ |(*(string){ "default" }, (string){ string }) }
       }
     }
   }
@@ -1475,7 +1448,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,32 +1,29 @@
+@@ -1,32 +1,19 @@
  Errors:
 +noStackOverflowStructCycle.#list.tail: structural cycle
 +noStackOverflowStructCycle.list.tail: structural cycle
@@ -1487,11 +1460,6 @@ diff old new
 +    ./in.cue:46:7
      ./in.cue:46:4
      ./in.cue:49:9
-+embed.success4.x.y: field not allowed:
-+    ./in.cue:76:9
-+    ./in.cue:70:7
-+    ./in.cue:71:6
-+    ./in.cue:76:6
  embed.fail4.p: field not allowed:
 -    ./in.cue:82:9
 -    ./in.cue:83:7
@@ -1517,15 +1485,10 @@ diff old new
 +structShare.err1.x.d.e: field not allowed:
 +    ./in.cue:591:12
 +    ./in.cue:591:9
-+issue3533.out.metadata.namespace: field not allowed:
-+    ./issue3533.cue:7:26
-+    ./issue3533.cue:2:15
-+    ./issue3533.cue:7:15
-+    ./issue3533.cue:11:17
  
  Result:
  (_|_){
-@@ -68,8 +65,8 @@
+@@ -68,8 +55,8 @@
    }
    fail: (struct){
      a: (_|_){
@@ -1536,7 +1499,7 @@ diff old new
      }
    }
    embed: (_|_){
-@@ -78,10 +75,7 @@
+@@ -78,10 +65,7 @@
        // [eval]
        p: (_|_){
          // [eval] embed.fail1.p: field not allowed:
@@ -1548,31 +1511,7 @@ diff old new
          //     ./in.cue:46:4
          //     ./in.cue:49:9
        }
-@@ -98,12 +92,20 @@
-     }
-     #C3: (#struct){
-     }
--    success4: (struct){
-+    success4: (_|_){
-+      // [eval]
-       #X: (#struct){
-         y: (string){ string }
-       }
--      x: (#struct){
--        y: (string){ string }
-+      x: (_|_){
-+        // [eval]
-+        y: (_|_){
-+          // [eval] embed.success4.x.y: field not allowed:
-+          //     ./in.cue:76:9
-+          //     ./in.cue:70:7
-+          //     ./in.cue:71:6
-+          //     ./in.cue:76:6
-+        }
-       }
-     }
-     fail4: (_|_){
-@@ -110,10 +112,7 @@
+@@ -110,10 +94,7 @@
        // [eval]
        p: (_|_){
          // [eval] embed.fail4.p: field not allowed:
@@ -1584,7 +1523,7 @@ diff old new
          //     ./in.cue:87:4
          q: (int){ 1 }
        }
-@@ -187,8 +186,7 @@
+@@ -187,8 +168,7 @@
        // [structural cycle] noStackOverflowStructCycle.list.tail: structural cycle
      }
    }
@@ -1594,7 +1533,7 @@ diff old new
      t1: (struct){
        #a: (_|_){
          // [incomplete] provideIncompleteSuccess.t1.#a: incomplete bool: bool:
-@@ -196,16 +194,12 @@
+@@ -196,16 +176,12 @@
          b: (bool){ bool }
        }
        x: (#struct){
@@ -1617,7 +1556,7 @@ diff old new
        #a: (#struct){
          c: (int){ 4 }
          b: (bool){ true }
-@@ -212,17 +206,8 @@
+@@ -212,17 +188,8 @@
        }
        #c: (#struct){
        }
@@ -1637,7 +1576,7 @@ diff old new
          }
          b: (bool){ true }
        }
-@@ -252,9 +237,22 @@
+@@ -252,9 +219,22 @@
    }
    cyclicError: (struct){
      a: (_|_){
@@ -1663,7 +1602,7 @@ diff old new
      }
    }
    midwayReferences: (struct){
-@@ -268,24 +266,9 @@
+@@ -268,24 +248,9 @@
          }
        }
      }
@@ -1691,7 +1630,7 @@ diff old new
    }
    closedCheck: (struct){
      success1: (struct){
-@@ -388,13 +371,7 @@
+@@ -388,13 +353,7 @@
            }
          }
        }
@@ -1706,7 +1645,7 @@ diff old new
        #F: (#struct){
          e: (bool){ bool }
          f: (_|_){
-@@ -411,17 +388,10 @@
+@@ -411,17 +370,10 @@
          }
        }
        E: (_|_){
@@ -1725,7 +1664,7 @@ diff old new
        }
      }
      derefDisj2: (struct){
-@@ -432,17 +402,10 @@
+@@ -432,17 +384,10 @@
          }
        }
        E: (_|_){
@@ -1744,7 +1683,7 @@ diff old new
        }
      }
      bulk1: (struct){
-@@ -565,9 +528,7 @@
+@@ -565,9 +510,7 @@
            // [eval]
            e: (_|_){
              // [eval] structShare.err1.x.d.e: field not allowed:
@@ -1755,7 +1694,7 @@ diff old new
              //     ./in.cue:591:9
            }
          }
-@@ -591,13 +552,13 @@
+@@ -591,13 +534,13 @@
        }
        envs: (struct){
          e1: (#struct){
@@ -1773,7 +1712,7 @@ diff old new
          }
        }
      }
-@@ -634,9 +595,8 @@
+@@ -634,9 +577,8 @@
      _c: (struct){
        y: (int){ 1 }
      }
@@ -1785,33 +1724,6 @@ diff old new
      }
    }
    errorPropagation: (_|_){
-@@ -674,13 +634,22 @@
-     root: (#struct){
-     }
-   }
--  issue3533: (struct){
-+  issue3533: (_|_){
-+    // [eval]
-     #ObjectMeta: (#struct){
-       namespace?: (string){ string }
-     }
--    out: (struct){
--      metadata: (#struct){
--        namespace: (string){ |(*(string){ "default" }, (string){ string }) }
-+    out: (_|_){
-+      // [eval]
-+      metadata: (_|_){
-+        // [eval]
-+        namespace: (_|_){
-+          // [eval] issue3533.out.metadata.namespace: field not allowed:
-+          //     ./issue3533.cue:7:26
-+          //     ./issue3533.cue:2:15
-+          //     ./issue3533.cue:7:15
-+          //     ./issue3533.cue:11:17
-+        }
-       }
-     }
-   }
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old

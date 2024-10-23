@@ -53,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a212cdb8_d202298b",
+        "filename": "cmd/cue/cmd/testdata/script/issue398.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-23T10:21:28Z",
+      "side": 1,
+      "message": "Yep, I\u0027ve done that in an upcoming patch, and yes, `y` comes out first so it matches the order implied by the embeddings.",
+      "parentUuid": "1df55b27_ad9f4ec8",
+      "revId": "0b343ecd968a3da3068c53f552a7078876dd88b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "34c67d36_d0ce533c",

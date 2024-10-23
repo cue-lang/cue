@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "940934da_6febe2d8",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_jsonpb.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-23T10:12:27Z",
+      "side": 1,
+      "message": "This has been fixed in an upcoming patch.",
+      "parentUuid": "45bbaf6c_9b2b2a06",
+      "revId": "0b343ecd968a3da3068c53f552a7078876dd88b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1df55b27_ad9f4ec8",
@@ -104,6 +122,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "33a50b93_2c91944d",
+        "filename": "pkg/path/testdata/os.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-23T10:12:27Z",
+      "side": 1,
+      "message": "Yes, the logic for determining when to skip adding edges was wrong. Fixed in an upcoming patch.",
+      "parentUuid": "747592d2_3659c9a8",
+      "revId": "0b343ecd968a3da3068c53f552a7078876dd88b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7f5bab99_33e92e28",
@@ -134,6 +170,24 @@
       "writtenOn": "2024-10-18T08:54:16Z",
       "side": 1,
       "message": "I\u0027m not sure I understand this: in the schema in pkg/tool/tool.cue, $id comes before $after.",
+      "revId": "0b343ecd968a3da3068c53f552a7078876dd88b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c193c8ff_ccf443f2",
+        "filename": "tools/flow/testdata/issue2416a.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-23T10:12:27Z",
+      "side": 1,
+      "message": "This is complex and there\u0027s a good chance I\u0027m missing something, but I think:\n$id comes in from `pkg/tool/file/pkg.go:v`. And it\u0027s an explicit unification up on line 46 of this txtar file, so my guess would be it ends up being lexicographical, hence $after before $id. I can\u0027t see any evidence to support $id before $after, though I know next to nothing about the flow stuff so I could be missing something.",
+      "parentUuid": "088990c8_bed0b3c6",
       "revId": "0b343ecd968a3da3068c53f552a7078876dd88b7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

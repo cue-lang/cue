@@ -291,14 +291,21 @@ func (c *closeContext) Label() Feature {
 }
 
 // See also Vertex.updateArcType in composite.go.
-func (c *closeContext) updateArcType(t ArcType) {
-	if t >= c.arcType {
+func (c *closeContext) updateArcType(ctx *OpContext, t ArcType) {
+	if t == ArcPending {
 		return
 	}
-	if c.arcType == ArcNotPresent {
-		return
+	for ; c != nil; c = c.parent {
+		switch {
+		case t >= c.arcType:
+			return
+		case c.arcType == ArcNotPresent:
+			ctx.notAllowedError(c.src)
+			return
+		default:
+			c.arcType = t
+		}
 	}
-	c.arcType = t
 }
 
 type ccArc struct {
@@ -374,7 +381,7 @@ func (v *Vertex) assignConjunct(ctx *OpContext, root *closeContext, c Conjunct, 
 func (cc *closeContext) getKeyedCC(ctx *OpContext, key *closeContext, c CycleInfo, mode ArcType, checkClosed bool) *closeContext {
 	for _, a := range cc.arcs {
 		if a.key == key {
-			a.cc.updateArcType(mode)
+			a.cc.updateArcType(ctx, mode)
 			return a.cc
 		}
 	}
@@ -728,7 +735,7 @@ func (n *nodeContext) checkArc(cc *closeContext, v *Vertex) *Vertex {
 	}
 
 	if cc.isClosed && !matchPattern(ctx, cc.Expr, f) {
-		ctx.notAllowedError(n.node, v)
+		ctx.notAllowedError(v)
 	}
 	if n.scheduler.frozen&fieldSetKnown != 0 {
 		for _, a := range n.node.Arcs {
@@ -976,26 +983,18 @@ func injectClosed(ctx *OpContext, closed, dst *closeContext) {
 			continue
 		}
 		ca := a.cc
-		if ca.arcType == ArcPending {
-			// This happens when a comprehension did not yield any results.
-			continue
-		}
-		switch ca.src.ArcType {
-		case ArcMember, ArcRequired:
-		case ArcOptional, ArcNotPresent:
+		switch f := ca.Label(); {
+		case ca.src.ArcType == ArcOptional,
 			// Without this continue, an evaluation error may be propagated to
 			// parent nodes that are otherwise allowed.
-			continue
-		case ArcPending:
-			ctx.Assertf(token.NoPos, false, "unexpected ArcPending")
+			// TODO(evalv3): consider using ca.arcType instead.
+			allowedInClosed(f),
+			closed.allows(ctx, f):
+		case ca.arcType == ArcPending:
+			ca.arcType = ArcNotPresent
 		default:
-			panic("unreachable")
+			ctx.notAllowedError(ca.src)
 		}
-		f := ca.Label()
-		if allowedInClosed(f) {
-			continue
-		}
-		closed.allows(ctx, f, ca)
 	}
 
 	if !dst.isClosed {
@@ -1011,24 +1010,23 @@ func injectClosed(ctx *OpContext, closed, dst *closeContext) {
 	}
 }
 
-func (c *closeContext) allows(ctx *OpContext, f Feature, ca *closeContext) bool {
+func (c *closeContext) allows(ctx *OpContext, f Feature) bool {
+	ctx.Assertf(token.NoPos, c.conjunctCount == 0, "unexpected 0 conjunctCount")
+
 	for _, b := range c.arcs {
 		cb := b.cc
+		if f != cb.Label() {
+			continue
+		}
 		// TODO: we could potentially remove the check  for ArcPending if we
 		// explicitly set the arcType to ArcNonPresent when a comprehension
 		// yields no results.
 		if cb.arcType == ArcNotPresent || cb.arcType == ArcPending {
 			continue
 		}
-		if f == cb.Label() {
-			return true
-		}
+		return true
 	}
-	if !matchPattern(ctx, c.Expr, f) {
-		ctx.notAllowedError(c.src, ca.src)
-		return false
-	}
-	return true
+	return matchPattern(ctx, c.Expr, f)
 }
 
 func (ctx *OpContext) addPositions(c Conjunct) {
@@ -1044,7 +1042,7 @@ func (ctx *OpContext) addPositions(c Conjunct) {
 
 // notAllowedError reports a field not allowed error in n and sets the value
 // for arc f to that error.
-func (ctx *OpContext) notAllowedError(v, arc *Vertex) {
+func (ctx *OpContext) notAllowedError(arc *Vertex) {
 	defer ctx.PopArc(ctx.PushArc(arc))
 
 	defer ctx.ReleasePositions(ctx.MarkPositions())

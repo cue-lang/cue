@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad5e85f8_74f5233c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-23T17:40:28Z",
+      "side": 1,
+      "message": "out of curiosity, why only \"mostly\"? do we need a TODO?",
+      "revId": "033e9893d8b638a50bb47aa471f71f9b069f2352",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2aa354e4_37ef53dd",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-23T17:40:28Z",
+      "side": 1,
+      "message": "**with** a nil s.Src?",
+      "revId": "033e9893d8b638a50bb47aa471f71f9b069f2352",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

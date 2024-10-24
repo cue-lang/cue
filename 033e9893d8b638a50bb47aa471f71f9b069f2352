@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "188ee349_c55506ba",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-24T07:01:57Z",
+      "side": 1,
+      "message": "`ca.src.ArcType \u003d\u003d ArcOptional,` in `injectClosed`.\n\nI\u0027ve thought about if we can do this differently, but this seems to be necessary.\n\nAdded a TODO to consider later.",
+      "parentUuid": "ad5e85f8_74f5233c",
+      "revId": "033e9893d8b638a50bb47aa471f71f9b069f2352",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2aa354e4_37ef53dd",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-10-23T17:40:28Z",
       "side": 1,
       "message": "**with** a nil s.Src?",
+      "revId": "033e9893d8b638a50bb47aa471f71f9b069f2352",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1cc7f83d_2eab0f1c",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-24T07:01:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2aa354e4_37ef53dd",
       "revId": "033e9893d8b638a50bb47aa471f71f9b069f2352",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

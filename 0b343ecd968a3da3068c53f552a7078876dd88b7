@@ -208,6 +208,24 @@
       "parentUuid": "088990c8_bed0b3c6",
       "revId": "0b343ecd968a3da3068c53f552a7078876dd88b7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3da1d92f_3af7ba3a",
+        "filename": "tools/flow/testdata/issue2416a.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-24T13:54:04Z",
+      "side": 1,
+      "message": "So I think that after the latest set of changes to the algorithm, it is now placing $id before $after. I can\u0027t say I know where it\u0027s finding that edge, but it must be finding it somewhere.",
+      "parentUuid": "c193c8ff_ccf443f2",
+      "revId": "0b343ecd968a3da3068c53f552a7078876dd88b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

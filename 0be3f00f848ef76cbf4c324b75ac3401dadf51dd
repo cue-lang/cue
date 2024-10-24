@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47b49d8e_b0490aa8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-24T16:00:21Z",
+      "side": 1,
+      "message": "Do you have a GitHub rendering of this README? I worry that the markdown links will take a bit too much vertical space, but I\u0027d like to see first.",
+      "revId": "0be3f00f848ef76cbf4c324b75ac3401dadf51dd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

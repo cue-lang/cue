@@ -1068,6 +1068,12 @@ func (ctx *OpContext) notAllowedError(arc *Vertex) {
 		// has been evaluated.
 		return
 	}
+	ctx.Assertf(ctx.pos(), !allowedInClosed(arc.Label), "unexpected disallowed definition, let, or hidden field")
+	if ctx.HasErr() {
+		// The next error will override this error when not run in Strict mode.
+		return
+	}
+
 	// TODO: setting arc instead of n.node eliminates subfields. This may be
 	// desirable or not, but it differs, at least from <=v0.6 behavior.
 	arc.SetValue(ctx, ctx.NewErrf("field not allowed"))

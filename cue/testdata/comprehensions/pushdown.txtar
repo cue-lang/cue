@@ -765,6 +765,46 @@ issue3533: {
 	}
 	out: metadata: namespace: *"default" | string
 }
+-- issue3535.cue --
+issue3535: hidden: {
+	#X: {
+		kind: string
+		output: {}
+	}
+	foo: #X & {
+		kind: string
+		if kind == "foo" {
+			_hidden: {}
+		}
+	}
+	foo: kind: "foo"
+}
+issue3535: regular: {
+	#X: {
+		kind: string
+		output: {}
+	}
+	foo: #X & {
+		kind: string
+		if kind == "foo" {
+			regular: {}
+		}
+	}
+	foo: kind: "foo"
+}
+issue3535: def: {
+	#X: {
+		kind: string
+		output: {}
+	}
+	foo: #X & {
+		kind: string
+		if kind == "foo" {
+			#def: {}
+		}
+	}
+	foo: kind: "foo"
+}
 -- reflect.cue --
 import "encoding/json"
 
@@ -812,6 +852,9 @@ fieldMismatch.a: cannot combine regular field "x" with 2:
 structShare.err1.x.d.e: field not allowed:
     ./in.cue:591:12
     ./in.cue:591:9
+issue3535.regular.foo.regular: field not allowed:
+    ./issue3535.cue:22:13
+    ./issue3535.cue:22:4
 
 Result:
 (_|_){
@@ -1424,6 +1467,56 @@ Result:
       }
     }
   }
+  issue3535: (_|_){
+    // [eval]
+    hidden: (struct){
+      #X: (#struct){
+        kind: (string){ string }
+        output: (#struct){
+        }
+      }
+      foo: (#struct){
+        kind: (string){ "foo" }
+        _hidden: (struct){
+        }
+        output: (#struct){
+        }
+      }
+    }
+    regular: (_|_){
+      // [eval]
+      #X: (#struct){
+        kind: (string){ string }
+        output: (#struct){
+        }
+      }
+      foo: (_|_){
+        // [eval]
+        kind: (string){ "foo" }
+        regular: (_|_){
+          // [eval] issue3535.regular.foo.regular: field not allowed:
+          //     ./issue3535.cue:22:13
+          //     ./issue3535.cue:22:4
+        }
+        output: (#struct){
+        }
+      }
+    }
+    def: (struct){
+      #X: (#struct){
+        kind: (string){ string }
+        output: (#struct){
+        }
+      }
+      foo: (#struct){
+        kind: (string){ "foo" }
+        #def: (#struct){
+        }
+        output: (#struct){
+        }
+      }
+    }
+  }
   unifyDynamicReflectSuccess: (struct){
     X: (struct){
       X: (struct){
@@ -1448,7 +1541,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,32 +1,19 @@
+@@ -1,39 +1,22 @@
  Errors:
 +noStackOverflowStructCycle.#list.tail: structural cycle
 +noStackOverflowStructCycle.list.tail: structural cycle
@@ -1467,6 +1560,13 @@ diff old new
 -    ./in.cue:85:3
 +    ./in.cue:87:10
      ./in.cue:87:4
+-issue3535.regular.foo.regular: field not allowed:
+-    ./issue3535.cue:15:6
+-    ./issue3535.cue:19:7
+-    ./issue3535.cue:19:12
+-    ./issue3535.cue:21:3
+-    ./issue3535.cue:22:4
+-    ./issue3535.cue:25:7
 -noStackOverflowStructCycle.#list.tail: structural cycle
 -noStackOverflowStructCycle.list.tail: structural cycle
 -provideIncompleteSuccess.t2.a.c.d: field not allowed:
@@ -1485,10 +1585,13 @@ diff old new
 +structShare.err1.x.d.e: field not allowed:
 +    ./in.cue:591:12
 +    ./in.cue:591:9
++issue3535.regular.foo.regular: field not allowed:
++    ./issue3535.cue:22:13
++    ./issue3535.cue:22:4
  
  Result:
  (_|_){
-@@ -68,8 +55,8 @@
+@@ -75,8 +58,8 @@
    }
    fail: (struct){
      a: (_|_){
@@ -1499,7 +1602,7 @@ diff old new
      }
    }
    embed: (_|_){
-@@ -78,10 +65,7 @@
+@@ -85,10 +68,7 @@
        // [eval]
        p: (_|_){
          // [eval] embed.fail1.p: field not allowed:
@@ -1511,7 +1614,7 @@ diff old new
          //     ./in.cue:46:4
          //     ./in.cue:49:9
        }
-@@ -110,10 +94,7 @@
+@@ -117,10 +97,7 @@
        // [eval]
        p: (_|_){
          // [eval] embed.fail4.p: field not allowed:
@@ -1523,7 +1626,7 @@ diff old new
          //     ./in.cue:87:4
          q: (int){ 1 }
        }
-@@ -187,8 +168,7 @@
+@@ -194,8 +171,7 @@
        // [structural cycle] noStackOverflowStructCycle.list.tail: structural cycle
      }
    }
@@ -1533,7 +1636,7 @@ diff old new
      t1: (struct){
        #a: (_|_){
          // [incomplete] provideIncompleteSuccess.t1.#a: incomplete bool: bool:
-@@ -196,16 +176,12 @@
+@@ -203,16 +179,12 @@
          b: (bool){ bool }
        }
        x: (#struct){
@@ -1556,7 +1659,7 @@ diff old new
        #a: (#struct){
          c: (int){ 4 }
          b: (bool){ true }
-@@ -212,17 +188,8 @@
+@@ -219,17 +191,8 @@
        }
        #c: (#struct){
        }
@@ -1576,7 +1679,7 @@ diff old new
          }
          b: (bool){ true }
        }
-@@ -252,9 +219,22 @@
+@@ -259,9 +222,22 @@
    }
    cyclicError: (struct){
      a: (_|_){
@@ -1602,7 +1705,7 @@ diff old new
      }
    }
    midwayReferences: (struct){
-@@ -268,24 +248,9 @@
+@@ -275,24 +251,9 @@
          }
        }
      }
@@ -1630,7 +1733,7 @@ diff old new
    }
    closedCheck: (struct){
      success1: (struct){
-@@ -388,13 +353,7 @@
+@@ -395,13 +356,7 @@
            }
          }
        }
@@ -1645,7 +1748,7 @@ diff old new
        #F: (#struct){
          e: (bool){ bool }
          f: (_|_){
-@@ -411,17 +370,10 @@
+@@ -418,17 +373,10 @@
          }
        }
        E: (_|_){
@@ -1664,7 +1767,7 @@ diff old new
        }
      }
      derefDisj2: (struct){
-@@ -432,17 +384,10 @@
+@@ -439,17 +387,10 @@
          }
        }
        E: (_|_){
@@ -1683,7 +1786,7 @@ diff old new
        }
      }
      bulk1: (struct){
-@@ -565,9 +510,7 @@
+@@ -572,9 +513,7 @@
            // [eval]
            e: (_|_){
              // [eval] structShare.err1.x.d.e: field not allowed:
@@ -1694,7 +1797,7 @@ diff old new
              //     ./in.cue:591:9
            }
          }
-@@ -591,13 +534,13 @@
+@@ -598,13 +537,13 @@
        }
        envs: (struct){
          e1: (#struct){
@@ -1712,7 +1815,7 @@ diff old new
          }
        }
      }
-@@ -634,9 +577,8 @@
+@@ -641,9 +580,8 @@
      _c: (struct){
        y: (int){ 1 }
      }
@@ -1724,6 +1827,52 @@ diff old new
      }
    }
    errorPropagation: (_|_){
+@@ -701,10 +639,10 @@
+       }
+       foo: (#struct){
+         kind: (string){ "foo" }
+-        output: (#struct){
+-        }
+         _hidden: (struct){
+         }
++        output: (#struct){
++        }
+       }
+     }
+     regular: (_|_){
+@@ -717,16 +655,12 @@
+       foo: (_|_){
+         // [eval]
+         kind: (string){ "foo" }
+-        output: (#struct){
+-        }
+         regular: (_|_){
+           // [eval] issue3535.regular.foo.regular: field not allowed:
+-          //     ./issue3535.cue:15:6
+-          //     ./issue3535.cue:19:7
+-          //     ./issue3535.cue:19:12
+-          //     ./issue3535.cue:21:3
++          //     ./issue3535.cue:22:13
+           //     ./issue3535.cue:22:4
+-          //     ./issue3535.cue:25:7
++        }
++        output: (#struct){
+         }
+       }
+     }
+@@ -738,10 +672,10 @@
+       }
+       foo: (#struct){
+         kind: (string){ "foo" }
+-        output: (#struct){
+-        }
+         #def: (#struct){
+         }
++        output: (#struct){
++        }
+       }
+     }
+   }
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -1748,14 +1897,14 @@ diff old new
 +Disjuncts:    22
 -- out/eval/stats --
 Leaks:  17
-Freed:  418
-Reused: 412
+Freed:  443
+Reused: 437
 Allocs: 23
 Retain: 104
 
-Unifications: 419
-Conjuncts:    678
-Disjuncts:    491
+Unifications: 444
+Conjuncts:    721
+Disjuncts:    516
 -- diff/todo/p2 --
 Missing empty disjunction message.
 provideIncompleteSuccess.t2.a.c.d: missing error: probably correct.
@@ -1778,6 +1927,13 @@ embed.fail4.p: field not allowed:
     ./in.cue:84:9
     ./in.cue:85:3
     ./in.cue:87:4
+issue3535.regular.foo.regular: field not allowed:
+    ./issue3535.cue:15:6
+    ./issue3535.cue:19:7
+    ./issue3535.cue:19:12
+    ./issue3535.cue:21:3
+    ./issue3535.cue:22:4
+    ./issue3535.cue:25:7
 noStackOverflowStructCycle.#list.tail: structural cycle
 noStackOverflowStructCycle.list.tail: structural cycle
 provideIncompleteSuccess.t2.a.c.d: field not allowed:
@@ -2447,6 +2603,60 @@ Result:
     out: (struct){
       metadata: (#struct){
         namespace: (string){ |(*(string){ "default" }, (string){ string }) }
+      }
+    }
+  }
+  issue3535: (_|_){
+    // [eval]
+    hidden: (struct){
+      #X: (#struct){
+        kind: (string){ string }
+        output: (#struct){
+        }
+      }
+      foo: (#struct){
+        kind: (string){ "foo" }
+        output: (#struct){
+        }
+        _hidden: (struct){
+        }
+      }
+    }
+    regular: (_|_){
+      // [eval]
+      #X: (#struct){
+        kind: (string){ string }
+        output: (#struct){
+        }
+      }
+      foo: (_|_){
+        // [eval]
+        kind: (string){ "foo" }
+        output: (#struct){
+        }
+        regular: (_|_){
+          // [eval] issue3535.regular.foo.regular: field not allowed:
+          //     ./issue3535.cue:15:6
+          //     ./issue3535.cue:19:7
+          //     ./issue3535.cue:19:12
+          //     ./issue3535.cue:21:3
+          //     ./issue3535.cue:22:4
+          //     ./issue3535.cue:25:7
+        }
+      }
+    }
+    def: (struct){
+      #X: (#struct){
+        kind: (string){ string }
+        output: (#struct){
+        }
+      }
+      foo: (#struct){
+        kind: (string){ "foo" }
+        output: (#struct){
+        }
+        #def: (#struct){
+        }
       }
     }
   }
@@ -3388,6 +3598,60 @@ Result:
     out: {
       metadata: {
         namespace: (*"default"|string)
+      }
+    }
+  }
+}
+--- issue3535.cue
+{
+  issue3535: {
+    hidden: {
+      #X: {
+        kind: string
+        output: {}
+      }
+      foo: (〈0;#X〉 & {
+        kind: string
+        if (〈0;kind〉 == "foo") {
+          _hidden: {}
+        }
+      })
+      foo: {
+        kind: "foo"
+      }
+    }
+  }
+  issue3535: {
+    regular: {
+      #X: {
+        kind: string
+        output: {}
+      }
+      foo: (〈0;#X〉 & {
+        kind: string
+        if (〈0;kind〉 == "foo") {
+          regular: {}
+        }
+      })
+      foo: {
+        kind: "foo"
+      }
+    }
+  }
+  issue3535: {
+    def: {
+      #X: {
+        kind: string
+        output: {}
+      }
+      foo: (〈0;#X〉 & {
+        kind: string
+        if (〈0;kind〉 == "foo") {
+          #def: {}
+        }
+      })
+      foo: {
+        kind: "foo"
       }
     }
   }

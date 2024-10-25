@@ -16,6 +16,24 @@
       "message": "Do you have a GitHub rendering of this README? I worry that the markdown links will take a bit too much vertical space, but I\u0027d like to see first.",
       "revId": "0be3f00f848ef76cbf4c324b75ac3401dadf51dd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac1c803b_570a128c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-10-25T09:55:28Z",
+      "side": 1,
+      "message": "https://github.com/cue-lang/cue/tree/0be3f00f848ef76cbf4c324b75ac3401dadf51dd",
+      "parentUuid": "47b49d8e_b0490aa8",
+      "revId": "0be3f00f848ef76cbf4c324b75ac3401dadf51dd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

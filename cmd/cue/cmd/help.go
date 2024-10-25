@@ -32,7 +32,7 @@ import (
 // The user can then scroll up to get a more in-depth explanation. But is
 // this how users use it?
 
-// newHelpCmd is largely borrowed from cobra,
+// newHelpCmd is similar to the built-in help command from cobra,
 // but knows how to load custom commands in `cue help cmd`.
 func newHelpCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
@@ -95,32 +95,15 @@ func newHelpCmd(c *Command) *cobra.Command {
 
 // We use a custom Cobra help text template for the sake of being a bit more
 // in control of its formatting, as well as the contents of the root `cue help`.
-//
-// TODO(mvdan): the text below should not jump straight into `cue cmd`,
-// and instead give a high level overview of CUE and its commands.
 var helpTemplate = `
 {{- if not .HasParent}}{{/* Special template for the root help. */ -}}
-cue evaluates CUE files, an extension of JSON, and sends them
-to user-defined commands for processing.
+CUE makes it easy to validate data, write schemas,
+and ensure configurations align with policies.
 
-Commands are defined in CUE as follows:
+CUE works with a wide range of tools and formats that you're already using
+such as Go, JSON, YAML, OpenAPI, and JSON Schema.
 
-	import "tool/exec"
-	command: deploy: {
-		exec.Run
-		cmd:   "kubectl"
-		args:  ["-f", "deploy"]
-		in:    json.Encode(userValue) // encode the emitted configuration.
-	}
-
-cue can also combine the results of http or grpc request with the input
-configuration for further processing. For more information on defining commands
-run 'cue help cmd' or go to cuelang.org/pkg/cmd.
-
-For more information on writing CUE configuration files see cuelang.org.
-
-Usage:
-  {{.CommandPath}} [command]
+For more information and documentation, see: https://cuelang.org
 
 Available Commands:{{range .Commands}}{{if .IsAvailableCommand}}
   {{rpad .Name .NamePadding }} {{.Short}}{{end}}{{end}}

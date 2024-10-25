@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22d865b9_3dadc722",
+        "filename": "internal/core/runtime/imports.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-10-25T09:03:54Z",
+      "side": 1,
+      "message": "They all map to the same ADT. But it could matter. If not now than in the future.\n\nThe safest is probably to have a separate shared runtime per version.\n\nOr maybe even to get rid of SharedRuntime altogether.",
+      "revId": "eeecaf5ae3bbd751b4f4ec10d9caa4cc396a8ea5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -14,80 +14,21 @@
  limitations under the License.
 -->
 [![Go Reference](https://pkg.go.dev/badge/cuelang.org/go.svg)](https://pkg.go.dev/cuelang.org/go)
+[![Documentation](https://img.shields.io/badge/CUE-Docs-0066ff)](https://cuelang.org/docs/)
 [![Github](https://github.com/cue-lang/cue/actions/workflows/trybot.yaml/badge.svg)](https://github.com/cue-lang/cue/actions/workflows/trybot.yaml?query=branch%3Amaster+event%3Apush)
 [![Go 1.22+](https://img.shields.io/badge/go-1.22-9cf.svg)](https://golang.org/dl/)
 [![platforms](https://img.shields.io/badge/platforms-linux|windows|macos-inactive.svg)]()
 [![Docker Image](https://img.shields.io/docker/v/cuelang/cue?sort=semver&label=docker)](https://hub.docker.com/r/cuelang/cue)
 
-# The CUE Data Constraint Language
+# CUE - _Configure, Unify, Execute_
 
-_Configure, Unify, Execute_
+CUE makes it easy to validate data, write schemas,
+and ensure configurations align with policies.
 
-CUE is an open source data constraint language which aims
-to simplify tasks involving defining and using data.
+CUE works with a wide range of tools and formats that you're already using
+such as Go, JSON, YAML, OpenAPI, and JSON Schema.
 
-It is a superset of JSON,
-allowing users familiar with JSON to get started quickly.
-
-
-### What is it for?
-
-You can use CUE to
-
-- define a detailed validation schema for your data (manually or automatically from data)
-- reduce boilerplate in your data (manually or automatically from schema)
-- extract a schema from code
-- generate type definitions and validation code
-- merge JSON in a principled way
-- define and run declarative scripts
-
-
-### How?
-
-CUE merges the notion of schema and data.
-The same CUE definition can simultaneously be used for validating data
-and act as a template to reduce boilerplate.
-Schema definition is enriched with fine-grained value definitions
-and default values.
-At the same time,
-data can be simplified by removing values implied by such detailed definitions.
-The merging of these two concepts enables
-many tasks to be handled in a principled way.
-
-Constraints provide a simple and well-defined, yet powerful, alternative
-to inheritance,
-a common source of complexity with configuration languages.
-
-
-### CUE Scripting
-
-The CUE scripting layer defines declarative scripting, expressed in CUE,
-on top of data.
-This solves three problems:
-working around the closedness of CUE definitions (we say CUE is hermetic),
-providing an easy way to share common scripts and workflows for using data,
-and giving CUE the knowledge of how data is used to optimize validation.
-
-There are many tools that interpret data or use a specialized language for
-a specific domain (Kustomize, Ksonnet).
-This solves dealing with data on one level, but the problem it solves may repeat
-itself at a higher level when integrating other systems in a workflow.
-CUE scripting is generic and allows users to define any workflow.
-
-
-### Tooling
-
-CUE is designed for automation.
-Some aspects of this are:
-
-- convert existing YAML and JSON
-- automatically simplify configurations
-- rich APIs designed for automated tooling
-- formatter
-- arbitrary-precision arithmetic
-- generate CUE templates from source code
-- generate source code from CUE definitions (TODO)
-
+For more information and documentation, including __tutorials and guides__, see [cuelang.org](https://cuelang.org).
 
 ### Download and Install
 

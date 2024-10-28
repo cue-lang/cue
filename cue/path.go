@@ -409,7 +409,7 @@ func basicLitSelector(b *ast.BasicLit) Selector {
 				errors.Newf(token.NoPos, "integer %s out of range", b.Value),
 			}}
 		}
-		return Index(int(i))
+		return Index(i)
 
 	case token.STRING:
 		info, _, _, _ := literal.ParseQuotes(b.Value, b.Value)
@@ -562,7 +562,8 @@ func (s stringSelector) feature(r adt.Runtime) adt.Feature {
 }
 
 // An Index selects a list element by index.
-func Index(x int) Selector {
+// It returns an invalid selector if the index is out of range.
+func Index[T interface{ int | int64 }](x T) Selector {
 	f, err := adt.MakeLabel(nil, int64(x), adt.IntLabel)
 	if err != nil {
 		return Selector{pathError{err}}
@@ -689,7 +690,7 @@ func valueToSel(v adt.Value) Selector {
 		if err != nil {
 			return Selector{&pathError{errors.Promote(err, "invalid number")}}
 		}
-		return Index(int(i))
+		return Index(i)
 	case *adt.String:
 		return Str(x.Str)
 	default:

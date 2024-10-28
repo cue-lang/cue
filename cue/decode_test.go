@@ -16,7 +16,10 @@ package cue_test
 
 import (
 	"fmt"
+	"math/big"
+	"math/bits"
 	"reflect"
+	"strconv"
 	"testing"
 	"time"
 
@@ -239,6 +242,27 @@ func TestDecode(t *testing.T) {
 		value: `[]`,
 		dst:   new(interface{}),
 		want:  []interface{}{},
+	}, {
+		// large integer which doesn't fit into an int32 or int on 32-bit platforms
+		value: `8000000000`,
+		dst:   new(interface{}),
+		want:  intOver32(),
+	}, {
+		// even larger integer which doesn't fit into an int64
+		value: `9500000000000000000`,
+		dst:   new(interface{}),
+		want:  bigInt("9500000000000000000"),
+	}, {
+		// large float which doesn't fit into a float32
+		value: `1.797693134e+308`,
+		dst:   new(interface{}),
+		want:  float64(1.797693134e+308),
+	}, {
+		// even larger float which doesn't fit into a float64
+		// TODO(mvdan): this should work via *big.Float, just like we do with *big.Int above.
+		value: `1.99769313499e+508`,
+		dst:   new(interface{}),
+		err:   "value was rounded up",
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
@@ -246,12 +270,29 @@ func TestDecode(t *testing.T) {
 			checkFatal(t, err, tc.err, "init")
 
 			got := reflect.ValueOf(tc.dst).Elem().Interface()
-			if diff := cmp.Diff(got, tc.want); diff != "" {
+			if diff := cmp.Diff(got, tc.want, cmp.Comparer(func(a, b *big.Int) bool {
+				return a.Cmp(b) == 0
+			})); diff != "" {
 				t.Error(diff)
 				t.Errorf("\n%#v\n%#v", got, tc.want)
 			}
 		})
 	}
+}
+
+func intOver32() any {
+	s := "8000000000"
+	if bits.UintSize == 32 {
+		return bigInt(s)
+	}
+	// Work around "constant overflows int" typechecking errors on 32 bits.
+	n, _ := strconv.Atoi(s)
+	return n
+}
+
+func bigInt(s string) *big.Int {
+	n, _ := big.NewInt(0).SetString(s, 10)
+	return n
 }
 
 func TestDecodeIntoCUEValue(t *testing.T) {

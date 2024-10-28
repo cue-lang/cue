@@ -25,8 +25,13 @@ var Flags struct {
 	// performance concerns.
 	EvalV3 bool
 
-	// Embed enabled file embedding.
+	// Embed enables file embedding.
 	Embed bool
+
+	// DecodeInt64 changes [cuelang.org/go/cue.Value.Decode] to choose
+	// `int64` rather than `int` as the default type for CUE integer values
+	// to ensure consistency with 32-bit platforms.
+	DecodeInt64 bool
 }
 
 // Init initializes Flags. Note: this isn't named "init" because we

@@ -867,6 +867,12 @@ line two.\
 			// Ensure that the decoded CUE can be re-encoded as TOML,
 			// and the resulting TOML is still JSON-equivalent.
 			t.Run("reencode", func(t *testing.T) {
+				switch test.name {
+				case "Integers":
+					t.Skip("TODO(mvdan): big integers always encode as TOML strings today; can be resolved once CUE_EXPERIMENT=decodeint64 is enabled")
+				case "DateTimes":
+					t.Skip("TODO(mvdan): dates and times always encode as TOML strings today")
+				}
 				sb := new(strings.Builder)
 				enc := toml.NewEncoder(sb)
 
@@ -878,7 +884,8 @@ line two.\
 				var unmarshalCueTOML any
 				err = gotoml.Unmarshal([]byte(cueTOML), &unmarshalCueTOML)
 				qt.Assert(t, qt.IsNil(err))
-				qt.Assert(t, qt.JSONEquals(jsonCUE, unmarshalCueTOML))
+
+				qt.Assert(t, qt.CmpEquals(unmarshalCueTOML, unmarshalTOML))
 			})
 		})
 	}

@@ -19,6 +19,7 @@ import (
 	"cmp"
 	"encoding"
 	"encoding/json"
+	"math"
 	"reflect"
 	"slices"
 	"strconv"
@@ -29,6 +30,7 @@ import (
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/cueexperiment"
 )
 
 // Decode initializes the value pointed to by x with Value v.
@@ -268,7 +270,17 @@ func (d *decoder) interfaceValue(v Value) (x interface{}) {
 
 	case IntKind:
 		if i, err := v.Int64(); err == nil {
-			return int(i)
+			cueexperiment.Init()
+			if cueexperiment.Flags.DecodeInt64 {
+				return i
+			}
+			// When the decodeint64 experiment is not enabled, we want to return the value
+			// as `int`, but that's not possible for large values on 32-bit architectures.
+			// To avoid overflows causing entirely wrong values to be returned to the user,
+			// let the logic continue below so that we return a *big.Int instead.
+			if i <= math.MaxInt {
+				return int(i)
+			}
 		}
 		x, err = v.Int(nil)
 

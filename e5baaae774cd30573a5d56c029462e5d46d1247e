@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "77e7f1db_f23b8da3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-28T12:07:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1f4060af_20b2afd8",
+      "revId": "e5baaae774cd30573a5d56c029462e5d46d1247e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "2725b798_b7b0d8ce",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -65,6 +83,24 @@
       "writtenOn": "2024-10-25T13:01:51Z",
       "side": 1,
       "message": "nit: I\u0027d vote to include the full range: + TOML and Protocol Buffers!",
+      "revId": "e5baaae774cd30573a5d56c029462e5d46d1247e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e1d7e2e_42e6e587",
+        "filename": "README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-28T12:07:49Z",
+      "side": 1,
+      "message": "I thought about it, but I decided against a full list because it will already get pretty long, and it will only get longer over time. We are adding INI very soon, for example, and perhaps libcue should also be in this list. So I only listed the most popular integrations.\n\nI think saying \"such as\" is clear enough that it\u0027s only a few examples, no?",
+      "parentUuid": "e2bf59b5_46649def",
       "revId": "e5baaae774cd30573a5d56c029462e5d46d1247e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -19,6 +19,7 @@ import (
 	"cmp"
 	"encoding"
 	"encoding/json"
+	"math"
 	"reflect"
 	"slices"
 	"strconv"
@@ -29,6 +30,7 @@ import (
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/cueexperiment"
 )
 
 // Decode initializes the value pointed to by x with Value v.
@@ -268,7 +270,13 @@ func (d *decoder) interfaceValue(v Value) (x interface{}) {
 
 	case IntKind:
 		if i, err := v.Int64(); err == nil {
-			return int(i)
+			cueexperiment.Init()
+			if cueexperiment.Flags.DecodeInt64 {
+				return i
+			}
+			if i <= math.MaxInt {
+				return int(i)
+			}
 		}
 		x, err = v.Int(nil)
 

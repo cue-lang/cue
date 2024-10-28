@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
+	"math/bits"
 	"path"
 	"reflect"
 	"strings"
@@ -867,6 +868,9 @@ line two.\
 			// Ensure that the decoded CUE can be re-encoded as TOML,
 			// and the resulting TOML is still JSON-equivalent.
 			t.Run("reencode", func(t *testing.T) {
+				if bits.UintSize == 32 {
+					t.Skip("TODO(mvdan): reenable once CUE_EXPERIMENT=decodeint64 is on by default")
+				}
 				sb := new(strings.Builder)
 				enc := toml.NewEncoder(sb)
 

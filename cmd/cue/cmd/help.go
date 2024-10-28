@@ -303,6 +303,9 @@ If an environment variable is unset or empty, sensible default setting is used.
 		embed
 			Enable support for embedded data files as described in
 			https://cuelang.org/discussion/3264.
+		decodeint64
+			Tweak cue.Value.Decode to choose "int64" rather than "int"
+			as the default Go type for CUE integer values.
 
 	CUE_DEBUG
 		Comma-separated list of debug flags to enable or disable, such as:

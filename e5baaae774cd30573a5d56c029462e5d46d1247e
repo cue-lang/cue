@@ -103,6 +103,24 @@
       "parentUuid": "e2bf59b5_46649def",
       "revId": "e5baaae774cd30573a5d56c029462e5d46d1247e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2442df7_48446b4c",
+        "filename": "README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-10-28T12:10:39Z",
+      "side": 1,
+      "message": "Sure :-) I think we\u0027ve the idea of a CUE-capability-vs-encoding table/grid for a while, and as the number of encodings increases, the need for that /compact/ representation will grow!",
+      "parentUuid": "0e1d7e2e_42e6e587",
+      "revId": "e5baaae774cd30573a5d56c029462e5d46d1247e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

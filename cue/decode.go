@@ -268,7 +268,7 @@ func (d *decoder) interfaceValue(v Value) (x interface{}) {
 
 	case IntKind:
 		if i, err := v.Int64(); err == nil {
-			return int(i)
+			return i
 		}
 		x, err = v.Int(nil)
 

@@ -127,7 +127,7 @@ func TestDecode(t *testing.T) {
 		value: `{a:1,m:{a: 3}}`,
 		dst:   &fields{},
 		want: fields{A: 1,
-			M: map[string]interface{}{"a": int(3)}},
+			M: map[string]interface{}{"a": int64(3)}},
 	}, {
 		// indirect int
 		value: `{p: 1}`,
@@ -190,23 +190,23 @@ func TestDecode(t *testing.T) {
 		value: `{a: 1, b: 2, c: true, d: e: 2}`,
 		dst:   &map[string]interface{}{},
 		want: map[string]interface{}{
-			"a": 1, "b": 2, "c": true,
-			"d": map[string]interface{}{"e": 2}},
+			"a": int64(1), "b": int64(2), "c": true,
+			"d": map[string]interface{}{"e": int64(2)}},
 	}, {
 		value: `{a: b: *2 | int}`,
 		dst:   &map[string]interface{}{},
-		want:  map[string]interface{}{"a": map[string]interface{}{"b": int(2)}},
+		want:  map[string]interface{}{"a": map[string]interface{}{"b": int64(2)}},
 	}, {
 		value: `{a: 1, b: 2, c: true}`,
-		dst:   &map[string]int{},
+		dst:   &map[string]int64{},
 		err:   "c: cannot use value true (type bool) as int",
 	}, {
 		value: `{"300": 3}`,
-		dst:   &map[int8]int{},
+		dst:   &map[int8]int64{},
 		err:   "key integer 300 overflows int8",
 	}, {
 		value: `{"300": 3}`,
-		dst:   &map[uint8]int{},
+		dst:   &map[uint8]int64{},
 		err:   "key integer 300 overflows uint8",
 	}, {
 		// Issue #1401
@@ -214,7 +214,7 @@ func TestDecode(t *testing.T) {
 		dst:   &map[string]interface{}{},
 		want: map[string]interface{}{
 			"a": map[string]interface{}{
-				"b": []interface{}{int(0)},
+				"b": []interface{}{int64(0)},
 			},
 		},
 	}, {
@@ -239,6 +239,16 @@ func TestDecode(t *testing.T) {
 		value: `[]`,
 		dst:   new(interface{}),
 		want:  []interface{}{},
+	}, {
+		// large integer which doesn't fit into an int32 or int on 32-bit platforms
+		value: `8000000000`,
+		dst:   new(interface{}),
+		want:  int64(8000000000),
+	}, {
+		// large float which doesn't fit into a float32
+		value: `1.797693134e+308`,
+		dst:   new(interface{}),
+		want:  float64(1.797693134e+308),
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {

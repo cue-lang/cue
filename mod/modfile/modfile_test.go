@@ -404,7 +404,7 @@ other: field: 123
 		Custom: map[string]map[string]any{
 			"legacy": {
 				"some":  true,
-				"other": map[string]any{"field": 123},
+				"other": map[string]any{"field": int64(123)},
 			},
 		},
 	},

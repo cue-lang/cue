@@ -115,11 +115,16 @@ jobs:
           ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || !(matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
         run: go test ./...
-      - name: Test with -race
+      - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
+        name: Test with -race
         env:
           GORACE: atexit_sleep_ms=10
-        if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
         run: go test -race ./...
+      - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
+        name: Test on 32 bits
+        env:
+          GOARCH: "386"
+        run: go test -short ./...
       - name: Test with -tags=cuewasm
         run: go test -tags cuewasm ./cmd/cue/cmd ./cue/interpreter/wasm
       - name: gcloud auth for end-to-end tests

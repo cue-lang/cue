@@ -70,9 +70,8 @@ workflows: trybot: _repo.bashWorkflow & {
 				_goTest & {
 					if: "\(_repo.isProtectedBranch) || !\(_isLatestLinux)"
 				},
-				_goTestRace & {
-					if: _isLatestLinux
-				},
+				_goTestRace,
+				_goTest32bit,
 				_goTestWasm,
 				for v in _e2eTestSteps {v},
 				_goCheck,
@@ -208,9 +207,27 @@ workflows: trybot: _repo.bashWorkflow & {
 	}
 
 	_goTestRace: githubactions.#Step & {
+		// Windows and Mac on CI are slower than Linux, and most data races are not specific
+		// to any OS or Go version in particular, so only run all tests with -race on Linux
+		// to not slow down CI unnecessarily.
+		if: _isLatestLinux
 		name: "Test with -race"
 		env: GORACE: "atexit_sleep_ms=10" // Otherwise every Go package being tested sleeps for 1s; see https://go.dev/issues/20364.
 		run: "go test -race ./..."
+	}
+
+	_goTest32bit: githubactions.#Step & {
+		// Ensure that the entire build and all tests succeed on a 32-bit platform as well.
+		// This should catch if any of the code or test cases rely on bit sizes,
+		// such as int being 64 bits, which could cause portability bugs for 32-bit platforms.
+		// While GOARCH=386 isn't particularly popular anymore, it can run on an amd64 machine,
+		// and the Linux runners on GitHub Actions use amd64.
+		//
+		// Running just the short tests is enough for now.
+		if: _isLatestLinux
+		name: "Test on 32 bits"
+		env: GOARCH: "386"
+		run: "go test -short ./..."
 	}
 
 	_goTestWasm: githubactions.#Step & {

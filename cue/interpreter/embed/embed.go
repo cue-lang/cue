@@ -125,6 +125,12 @@ func (i *interpreter) Kind() string {
 // NewCompiler returns a compiler that can decode and embed files that exist
 // within a CUE module.
 func (i *interpreter) NewCompiler(b *build.Instance, r *runtime.Runtime) (runtime.Compiler, errors.Error) {
+	if b.Module == "" {
+		return nil, errors.Newf(token.Pos{}, "cannot embed files when not in a module")
+	}
+	if b.Root == "" {
+		return nil, errors.Newf(token.Pos{}, "cannot embed files: no module root found")
+	}
 	return &compiler{
 		b:       b,
 		runtime: (*cue.Context)(r),

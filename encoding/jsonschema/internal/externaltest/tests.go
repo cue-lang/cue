@@ -93,15 +93,15 @@ func ReadTestDir(dir string) (tests map[string][]*Schema, err error) {
 		Dir: dir,
 		// Just like in the cue/load tests, prevent Go tests from walking up to the root
 		// directory of the git repository, as that almost always causes test cache misses.
-		ModuleRoot: dir,
+		ModuleRoot: ".",
 	})[0]
 	if err := inst.Err; err != nil {
-		return nil, err
+		return nil, fmt.Errorf("load.Instances: %v", err)
 	}
 	ctx := cuecontext.New(cuecontext.Interpreter(embed.New()))
 	instVal := ctx.BuildInstance(inst)
 	if err := instVal.Err(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("BuildInstance: %v", err)
 	}
 	val := instVal.LookupPath(cue.MakePath(cue.Str("allTests")))
 	if err := val.Err(); err != nil {

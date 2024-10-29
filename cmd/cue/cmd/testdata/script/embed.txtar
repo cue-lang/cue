@@ -12,6 +12,10 @@ cmp stdout out/export
 exec cue vet
 cmp stdout out/vet
 
+-- cue.mod/module.cue --
+module: "cue.example"
+language: version: "v0.11.0"
+
 -- test.cue --
 @extern(embed)
 

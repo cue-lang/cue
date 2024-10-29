@@ -41,6 +41,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a00b33a_80deb140",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-29T17:55:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "493498da_29a46232",
+      "range": {
+        "startLine": 18,
+        "startChar": 58,
+        "endLine": 19,
+        "endChar": 23
+      },
+      "revId": "e1acae47e0c0d41f46464b78469ad4b2391492bb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5be073bf_c71c63f9",
@@ -54,6 +78,24 @@
       "writtenOn": "2024-10-29T16:39:35Z",
       "side": 1,
       "message": "why are these two separate error cases? I\u0027m not sure I even understand when the second error case could happen, because I think we stopped supporting `module: \"\"`.",
+      "revId": "e1acae47e0c0d41f46464b78469ad4b2391492bb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b76aac92_93b0f1a9",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-29T17:55:59Z",
+      "side": 1,
+      "message": "I\u0027d possible for the second to happen in the user has hand-built their own `build.Instance`, although it shouldn\u0027t happen otherwise. I think it\u0027s worth checking for, therefore, as although we don\u0027t use the value of the Root field currently, we may well do in the future if we decide to support embedding of files that aren\u0027t strictly underneath a package\u0027s directory.",
+      "parentUuid": "5be073bf_c71c63f9",
       "revId": "e1acae47e0c0d41f46464b78469ad4b2391492bb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

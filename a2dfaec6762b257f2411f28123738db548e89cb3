@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e77cc16d_d85ef0ea",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-29T16:39:49Z",
+      "side": 1,
+      "message": "I\u0027m not sure that this is the right approach, but I\u0027m open to persuasion otherwise.",
+      "revId": "a2dfaec6762b257f2411f28123738db548e89cb3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9bb8a383_48fae92a",
+        "filename": "cue/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-29T16:39:49Z",
+      "side": 1,
+      "message": "This seems like too much of a breaking change to me. It seems entirely likely to me that people are using CUE to decode into an interface and then using a dynamic type conversion or type switch that only accepts either `int` or `*big.Int`.\n\nTo avoid that breakage, I think it would be better to continue to return `int` when the result is within int bounds and otherwise return `*big.Int`. Depending on how that\u0027s done, it might be a bit less efficient on a 32 bit platform when returning values that are between `int` and `int64`, but I think that\u0027s better than a breaking change where we get no help from the compiler.",
+      "revId": "a2dfaec6762b257f2411f28123738db548e89cb3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

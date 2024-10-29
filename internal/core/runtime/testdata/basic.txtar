@@ -9,6 +9,8 @@ Foo: _ @test(file1.xx, abi=c, sig="func(int)int")
 
 Rename: _ @test(file1.xx, name=Emaner, abi=c, sig="func(int)int")
 
+"Quoted-Field": _ @test(file1.xx, name=Emaner, abi=c, sig="func(int)int")
+
 -- file2.cue --
 @extern("test")
 
@@ -24,7 +26,8 @@ Bar: {
 -- extern/out --
 -- out/extern --
 {
-	Foo:    implFoo1
-	Bar:    implBar2
-	Rename: implEmaner1
+	Foo:            implFoo1
+	Rename:         implEmaner1
+	Bar:            implBar2
+	"Quoted-Field": implEmaner1
 }

@@ -16,6 +16,5 @@ func TestEmbedFailsWhenNotInModule(t *testing.T) {
 package foo
 x: _ 	@embed(file="testdata/readme.md",type=text)
 `)
-	qt.Assert(t, qt.IsNil(v.Err()))
-	// TODO qt.Assert(t, qt.ErrorMatches(v.Err(), `xxx`))
+	qt.Assert(t, qt.ErrorMatches(v.Err(), `cannot embed files when not in a module`))
 }

@@ -16,6 +16,10 @@ symlink symlink-dir -> y
 exec cue eval .
 cmp stdout out/std
 
+-- cue.mod/module.cue --
+module: "cue.example"
+language: version: "v0.11.0"
+
 -- test.cue --
 @extern(embed)
 

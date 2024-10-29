@@ -7,6 +7,10 @@ env CUE_EXPERIMENT=embed
 [windows] exec cue export --out cue
 [windows] cmp stdout out/export-windows
 
+-- cue.mod/module.cue --
+module: "cue.test"
+language: version: "v0.11.0"
+
 -- test.cue --
 @extern(embed)
 

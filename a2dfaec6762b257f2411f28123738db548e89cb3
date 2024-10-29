@@ -33,6 +33,24 @@
       "message": "This seems like too much of a breaking change to me. It seems entirely likely to me that people are using CUE to decode into an interface and then using a dynamic type conversion or type switch that only accepts either `int` or `*big.Int`.\n\nTo avoid that breakage, I think it would be better to continue to return `int` when the result is within int bounds and otherwise return `*big.Int`. Depending on how that\u0027s done, it might be a bit less efficient on a 32 bit platform when returning values that are between `int` and `int64`, but I think that\u0027s better than a breaking change where we get no help from the compiler.",
       "revId": "a2dfaec6762b257f2411f28123738db548e89cb3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0dd44af_13822bef",
+        "filename": "cue/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-29T16:51:13Z",
+      "side": 1,
+      "message": "I agree with the breakage being unfortunate, so this would be clearly marked as a breaking change in the changelog, but I disagree with your suggestion.\n\n\n\"use `int` when the result fits within its bounds\" will still cause different behavior between 32 bit and 64 bit platforms, and the entire point of this patch is to make behavior between them consistent. Put another way, the tests I added in this CL would be impossible to get passing on 386 and amd64, because they would disagree on the resulting type - int64 vs int.\n\nConsistent behavior between 32 bit and 64 bit platforms is simply not possible if we continue to use `int`. We are using `float64` for floating point numbers on both, after all, and not `float32` on 32-bit and `float64` on 64-bit. I think we just happened to avoid this bug for floats because Go has no `float` type.\n\nWe could continue using `int` when the value fits in `int32`, and use `int64` otherwise, but then that breaks any existing users of integers not fitting inside int32 on 64 bit platforms. So it will also break some users. Plus, it\u0027s awkward, because it optimizes for users on 32 bit platforms.\n\nIMHO the least bad option going forward is what I have in this patch. Yes, it will break some users, but we can surface the change, and fixing the code or tests should be straightforward. We can and should encourage users to decode into specific Go types to avoid further issues with the default type inference in the future.\n\nI also think my proposed behavior here aligns pretty well with the two existing Go API methods:\n* https://pkg.go.dev/cuelang.org/go/cue@master#Value.Int64\n* https://pkg.go.dev/cuelang.org/go/cue@master#Value.Int",
+      "parentUuid": "9bb8a383_48fae92a",
+      "revId": "a2dfaec6762b257f2411f28123738db548e89cb3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

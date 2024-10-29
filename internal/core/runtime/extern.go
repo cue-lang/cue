@@ -262,11 +262,10 @@ func (d *externDecorator) markExternFieldAttr(kind string, decls []ast.Decl) (er
 				return true
 			}
 
-			name, isIdent, err := ast.LabelName(f.Label)
-			if err != nil || !isIdent {
+			name, _, err := ast.LabelName(f.Label)
+			if err != nil {
 				b, _ := format.Node(f.Label)
-				errs = errors.Append(errs, errors.Newf(x.Pos(),
-					"can only define functions for fields with identifier names, found %v", string(b)))
+				errs = errors.Append(errs, errors.Newf(x.Pos(), "external attribute has non-concrete label %s", b))
 				return true
 			}
 

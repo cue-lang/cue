@@ -74,7 +74,7 @@ Fn7: {
 package foo
 
 
-"a-b": _ @test("file1.xx",sig=func(int)int)
+("something"): _ @test("file1.xx",sig=func(int)int)
 
 [string]: _ @test("file1.xx",sig=func(int)int)
 
@@ -101,9 +101,9 @@ no interpreter defined for "\"test\" foo":
     ./invalid_file_attr.cue:1:1
 extern attribute must appear before package clause:
     ./late_extern.cue:3:1
-can only define functions for fields with identifier names, found "a-b":
-    ./non_ident.cue:6:10
-can only define functions for fields with identifier names, found [string]:
+external attribute has non-concrete label ("something"):
+    ./non_ident.cue:6:18
+external attribute has non-concrete label [string]:
     ./non_ident.cue:8:13
 @test attribute not associated with field:
     ./package_attr.cue:5:1

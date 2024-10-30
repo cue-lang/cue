@@ -33,6 +33,24 @@
       "message": "please keep a test case which does `\"foo-bar\": _ @test(...)` because that\u0027s really the regression test here. otherwise AFAICT we have no regression test.\n\nIt\u0027s not just the fact that it\u0027s quoted, but also that the unquoted string would not be a valid identifier.",
       "revId": "84607c44de839606ed4e43a30b996001bb7f500f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "61f3ebf3_d267cb84",
+        "filename": "internal/core/runtime/testdata/errors.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-30T12:51:17Z",
+      "side": 1,
+      "message": "I\u0027ve added a test case.",
+      "parentUuid": "8e6e70d5_3fd506ad",
+      "revId": "84607c44de839606ed4e43a30b996001bb7f500f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

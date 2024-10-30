@@ -934,8 +934,7 @@ func (v Value) Source() ast.Node {
 // If v exactly represents a package, BuildInstance returns
 // the build instance corresponding to the value; otherwise it returns nil.
 //
-// The value returned by Value.ReferencePath will commonly represent
-// a package.
+// The value returned by [Value.ReferencePath] will commonly represent a package.
 func (v Value) BuildInstance() *build.Instance {
 	if v.idx == nil {
 		return nil
@@ -953,7 +952,7 @@ func (v Value) Err() error {
 
 // Pos returns position information.
 //
-// Use v.Expr to get positions for all conjuncts and disjuncts.
+// Use [Value.Expr] to get positions for all conjuncts and disjuncts.
 func (v Value) Pos() token.Pos {
 	if v.v == nil {
 		return token.NoPos
@@ -1143,7 +1142,7 @@ func (v Value) Len() Value {
 
 // Elem returns the value of undefined element types of lists and structs.
 //
-// Deprecated: use [Value.LookupPath] in combination with "AnyString" or "AnyIndex".
+// Deprecated: use [Value.LookupPath] in combination with [AnyString] or [AnyIndex].
 func (v hiddenValue) Elem() (Value, bool) {
 	sel := AnyString
 	if v.v.IsList() {
@@ -1550,7 +1549,7 @@ func (v hiddenValue) Fill(x interface{}, path ...string) Value {
 // FillPath creates a new value by unifying v with the value of x at the given
 // path.
 //
-// If x is an cue/ast.Expr, it will be evaluated within the context of the
+// If x is an [ast.Expr], it will be evaluated within the context of the
 // given path: identifiers that are not resolved within the expression are
 // resolved as if they were defined at the path position.
 //
@@ -1558,7 +1557,7 @@ func (v hiddenValue) Fill(x interface{}, path ...string) Value {
 // from the same Runtime as v.
 //
 // Otherwise, the given Go value will be converted to CUE using the same rules
-// as Context.Encode.
+// as [Context.Encode].
 //
 // Any reference in v referring to the value at the given path will resolve to x
 // in the newly created value. The resulting value is not validated.
@@ -1753,7 +1752,7 @@ func (v Value) Unify(w Value) Value {
 	return makeValue(v.idx, n, v.parent_)
 }
 
-// UnifyAccept is as v.Unify(w), but will disregard the closedness rules for
+// UnifyAccept is like [Value.Unify](w), but will disregard the closedness rules for
 // v and w, and will, instead, only allow fields that are present in accept.
 //
 // UnifyAccept is used to piecemeal unify individual conjuncts obtained from
@@ -1831,7 +1830,7 @@ func (v hiddenValue) Reference() (inst *Instance, path []string) {
 }
 
 // ReferencePath returns the value and path referred to by this value such that
-// value.LookupPath(path) resolves to the same value, or no path if this value
+// [Value.LookupPath](path) resolves to the same value, or no path if this value
 // is not a reference.
 func (v Value) ReferencePath() (root Value, p Path) {
 	// TODO: don't include references to hidden fields.

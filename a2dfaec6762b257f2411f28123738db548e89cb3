@@ -51,6 +51,24 @@
       "parentUuid": "9bb8a383_48fae92a",
       "revId": "a2dfaec6762b257f2411f28123738db548e89cb3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ea33bc5_03fae35c",
+        "filename": "cue/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-10-30T08:20:46Z",
+      "side": 1,
+      "message": "I would tend to agree with Daniel\u0027s points mentioned above. Ping @mpvl@gmail.com",
+      "parentUuid": "e0dd44af_13822bef",
+      "revId": "a2dfaec6762b257f2411f28123738db548e89cb3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

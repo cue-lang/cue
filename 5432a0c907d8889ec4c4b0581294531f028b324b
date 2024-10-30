@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "092d27bc_8dae69b4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-30T17:05:54Z",
+      "side": 1,
+      "message": "LGTM modulo one suggestion, thanks!",
+      "revId": "5432a0c907d8889ec4c4b0581294531f028b324b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8a8a5e7_b26411b3",
+        "filename": "cue/decode.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-30T17:05:54Z",
+      "side": 1,
+      "message": "We can be out of bounds in the negative direction too:\n\n```suggestion\n\t\t\tif i \u003c\u003d math.MaxInt \u0026\u0026 i \u003e\u003d math.MinInt {\n```",
+      "revId": "5432a0c907d8889ec4c4b0581294531f028b324b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0905985_38c51193",
+        "filename": "cue/decode_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-30T17:05:54Z",
+      "side": 1,
+      "message": "Let\u0027s have a test for -8000000000 too.",
+      "revId": "5432a0c907d8889ec4c4b0581294531f028b324b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

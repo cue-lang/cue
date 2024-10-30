@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8bedba7b_7f1e2189",
+        "filename": "cmd/cue/cmd/lsp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-10-30T11:08:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e9a97cc8_2b794748",
+      "revId": "b1c0141d15db26213e4721a1c5c6a17b3c17aeef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e1c7f36f_2b048a59",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-10-30T11:01:25Z",
       "side": 1,
       "message": "Hm, isn\u0027t `cue lsp` itself the command to start the LSP? If it will also include subcommands to interact with a started LSP, I would expect to read:\n\n\u003e start or interact with a CUE Language Server instance",
+      "revId": "b1c0141d15db26213e4721a1c5c6a17b3c17aeef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "53cdd7c6_033fa0b8",
+        "filename": "cmd/cue/cmd/lsp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-10-30T11:08:14Z",
+      "side": 1,
+      "message": "Good catch. Done.",
+      "parentUuid": "e1c7f36f_2b048a59",
       "revId": "b1c0141d15db26213e4721a1c5c6a17b3c17aeef",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

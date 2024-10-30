@@ -35,6 +35,10 @@ func getScopePrefix(v Value, p Path) Value {
 }
 
 // LookupPath reports the value for path p relative to v.
+//
+// Use [AnyString] and [AnyIndex] to find the value of undefined element types
+// for structs and lists respectively, for example for the patterns in
+// `{[string]: int}` and `[...string]`.
 func (v Value) LookupPath(p Path) Value {
 	if v.v == nil {
 		return Value{}

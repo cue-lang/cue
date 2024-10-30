@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ffd3f73d_4b07ef8c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-30T09:24:04Z",
+      "side": 1,
+      "message": "SGTM but I fail to see a regression test, see my comment below.\n\nAlso, I assume you ran this past Marcel and he gave his thumbs up? Because he wrote this code and he may have a good reason to have that check that we\u0027re not aware of. I\u0027ll happily +2 once you confirm that.",
+      "revId": "84607c44de839606ed4e43a30b996001bb7f500f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e6e70d5_3fd506ad",
+        "filename": "internal/core/runtime/testdata/errors.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-30T09:24:04Z",
+      "side": 1,
+      "message": "please keep a test case which does `\"foo-bar\": _ @test(...)` because that\u0027s really the regression test here. otherwise AFAICT we have no regression test.\n\nIt\u0027s not just the fact that it\u0027s quoted, but also that the unquoted string would not be a valid identifier.",
+      "revId": "84607c44de839606ed4e43a30b996001bb7f500f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

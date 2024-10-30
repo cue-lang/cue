@@ -69,6 +69,24 @@
       "parentUuid": "e0dd44af_13822bef",
       "revId": "a2dfaec6762b257f2411f28123738db548e89cb3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62ec8b3e_a87f23b6",
+        "filename": "cue/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-30T16:00:27Z",
+      "side": 1,
+      "message": "After a bit more discussion with Roger on Discord, we\u0027ve agreed that this would be a little to dangerous to do directly and without warning, so I\u0027ve added a CUE_EXPERIMENT which will be off by default in v0.11, on by default in v0.12, and sunset entirely in v0.13. This should give end users about six months to adapt to the change in semantics, which is particularly important if it affects dependencies or various components of a system.\n\nIt\u0027s worth noting that Roger and I are also in agreement that we would have liked to choose `int64` from the start, and that at this point today, none of the choices are great - we either break users somehow, or we leave things as they are, broken and inconsistent. My thinking is that doing this change with a CUE_EXPERIMENT is very reasonable, and we can communicate it clearly in changelogs.",
+      "parentUuid": "8ea33bc5_03fae35c",
+      "revId": "a2dfaec6762b257f2411f28123738db548e89cb3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -21,8 +21,10 @@ config: {
 		flags: *[
 			"-trimpath",
 		] | _
-		// Note that goreleaser says that id defaults to the binary name,
-		// but it then complains about "cue" being duplicate even though we use "cue" and "cuepls".
+		// Note that goreleaser says that id defaults to the binary name, but it
+		// then complains about, for example, "cue" being duplicate even though
+		// we use "cue" and "cuepls". Even though we no longer have a "cuepls"
+		// binary, we leave this comment for posterity's sake.
 		id:            binary
 		main:          string
 		binary:        string
@@ -40,7 +42,6 @@ config: {
 
 	builds: [
 		{main: "./cmd/cue", binary: "cue"},
-		{main: "./cmd/cuepls", binary: "cuepls"},
 	]
 
 	archives: [{

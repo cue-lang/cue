@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b00af9a8_4bac0e0f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-10-30T10:58:52Z",
+      "side": 1,
+      "message": "ci/test run to confirm GoRelease is happy: https://github.com/cue-lang/cue/actions/runs/11591767681/job/32272214615",
+      "revId": "769cae0fc8cbe80ea08ca0adf5695acffd93c13b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

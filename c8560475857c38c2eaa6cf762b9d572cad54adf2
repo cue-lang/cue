@@ -16,6 +16,24 @@
       "message": "what issue number is this for? if there is none, at least mention in the commit message how this was found or what it relates to.",
       "revId": "c8560475857c38c2eaa6cf762b9d572cad54adf2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "609dd022_614e8edc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-10-30T09:42:23Z",
+      "side": 1,
+      "message": "No issue: I just found this issue when debugging an issue relating to a test I was writing that used `cue mod get`. Exactly how the issue was found isn\u0027t that relevant here AFAICS, as it\u0027s clear (IMHO) from the test that the behaviour is incorrect. I could raise an issue only to close it immediately the fix lands, but it hardly seems worth it.",
+      "parentUuid": "7bd36d08_90ba2cce",
+      "revId": "c8560475857c38c2eaa6cf762b9d572cad54adf2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

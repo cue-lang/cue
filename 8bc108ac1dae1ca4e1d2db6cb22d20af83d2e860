@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f6b18d0c_3dca94e7",
+        "filename": "pkg/path/testdata/os.txtar",
+        "patchSetId": 15
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-31T17:48:33Z",
+      "side": 1,
+      "message": "This is annoying, but it\u0027s not possible to avoid currently - yes, it _should_ be clear that bar comes first, but we actually can\u0027t construct that; in this case, we end up with a graph with no edges and we fall back to lexicographical.",
+      "revId": "8bc108ac1dae1ca4e1d2db6cb22d20af83d2e860",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

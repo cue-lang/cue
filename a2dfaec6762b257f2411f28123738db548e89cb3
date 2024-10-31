@@ -87,6 +87,24 @@
       "parentUuid": "8ea33bc5_03fae35c",
       "revId": "a2dfaec6762b257f2411f28123738db548e89cb3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "59a75bd9_a76998c7",
+        "filename": "cue/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-31T11:53:16Z",
+      "side": 1,
+      "message": "We\u0027ve reached consensus with Rog and Marcel that this is OK to do with the CUE_EXPERIMENT slow transition. It\u0027s not ideal, as it\u0027s still some amount of breakage, but it\u0027s a compromise that lets us get to the desired end state without breaking too many users too abruptly. None of the other possible alternatives are better.",
+      "parentUuid": "62ec8b3e_a87f23b6",
+      "revId": "a2dfaec6762b257f2411f28123738db548e89cb3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

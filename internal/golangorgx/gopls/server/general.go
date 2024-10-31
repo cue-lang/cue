@@ -11,8 +11,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"go/build"
-	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -25,9 +23,6 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/file"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
-	"cuelang.org/go/internal/golangorgx/gopls/telemetry"
-	"cuelang.org/go/internal/golangorgx/gopls/util/bug"
-	"cuelang.org/go/internal/golangorgx/gopls/util/goversion"
 	"cuelang.org/go/internal/golangorgx/gopls/util/maps"
 	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/jsonrpc2"
@@ -37,12 +32,6 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 	ctx, done := event.Start(ctx, "lsp.Server.initialize")
 	defer done()
 
-	var clientName string
-	if params != nil && params.ClientInfo != nil {
-		clientName = params.ClientInfo.Name
-	}
-	telemetry.RecordClientInfo(clientName)
-
 	s.stateMu.Lock()
 	if s.state >= serverInitializing {
 		defer s.stateMu.Unlock()
@@ -51,11 +40,10 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 	s.state = serverInitializing
 	s.stateMu.Unlock()
 
-	// For uniqueness, use the gopls PID rather than params.ProcessID (the client
-	// pid). Some clients might start multiple gopls servers, though they
-	// probably shouldn't.
+	// Create a temp dir using the server PID. For uniqueness, use the server
+	// PID rather than params.ProcessID (the client pid).
 	pid := os.Getpid()
-	s.tempDir = filepath.Join(os.TempDir(), fmt.Sprintf("cuepls-%d.%s", pid, s.session.ID()))
+	s.tempDir = filepath.Join(os.TempDir(), fmt.Sprintf("cue-lsp-%d.%s", pid, s.session.ID()))
 	err := os.Mkdir(s.tempDir, 0700)
 	if err != nil {
 		// MkdirTemp could fail due to permissions issues. This is a problem with
@@ -65,42 +53,25 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 		event.Error(ctx, "creating temp dir", err)
 		s.tempDir = ""
 	}
+
+	// TODO(myitcv): need to better understand events, and the mechanisms that
+	// hang off that. At least for now we know that the integration expectation
+	// setup relies on the progress messaging titles to track things being done.
 	s.progress.SetSupportsWorkDoneProgress(params.Capabilities.Window.WorkDoneProgress)
 
+	// Clone the existing (default?) options, and update from the params. Defer setting
+	// the options for readability reasons (rather than having that call "lost" below any
+	// params-options related code below, it's easier to read locally here).
 	options := s.Options().Clone()
-	// TODO(rfindley): remove the error return from handleOptionResults, and
-	// eliminate this defer.
-	defer func() { s.SetOptions(options) }()
+	defer s.SetOptions(options)
 
+	// TODO(myitcv): review and slim down option handling code
 	if err := s.handleOptionResults(ctx, settings.SetOptions(options, params.InitializationOptions)); err != nil {
 		return nil, err
 	}
 	options.ForClientCapabilities(params.ClientInfo, params.Capabilities)
 
-	if options.ShowBugReports {
-		// Report the next bug that occurs on the server.
-		bug.Handle(func(b bug.Bug) {
-			msg := &protocol.ShowMessageParams{
-				Type:    protocol.Error,
-				Message: fmt.Sprintf("A bug occurred on the server: %s\nLocation:%s", b.Description, b.Key),
-			}
-			go func() {
-				if err := s.eventuallyShowMessage(context.Background(), msg); err != nil {
-					log.Printf("error showing bug: %v", err)
-				}
-			}()
-		})
-	}
-
 	folders := params.WorkspaceFolders
-	if len(folders) == 0 {
-		if params.RootURI != "" {
-			folders = []protocol.WorkspaceFolder{{
-				URI:  string(params.RootURI),
-				Name: path.Base(params.RootURI.Path()),
-			}}
-		}
-	}
 	for _, folder := range folders {
 		if folder.URI == "" {
 			return nil, fmt.Errorf("empty WorkspaceFolder.URI")
@@ -111,57 +82,17 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 		s.pendingFolders = append(s.pendingFolders, folder)
 	}
 
-	var codeActionProvider interface{} = true
-	var renameOpts interface{} = true
-	if r := params.Capabilities.TextDocument.Rename; r != nil && r.PrepareSupport {
-		renameOpts = protocol.RenameOptions{
-			PrepareProvider: r.PrepareSupport,
-		}
-	}
-
+	// TODO(myitcv): later we should leverage the existing mechanism for getting
+	// version information in cmd/cue. For now, let's just work around that.
 	versionInfo := debug.VersionInfo()
-
-	goplsVersion, err := json.Marshal(versionInfo)
+	cueLspVersion, err := json.Marshal(versionInfo)
 	if err != nil {
 		return nil, err
 	}
 
 	return &protocol.InitializeResult{
 		Capabilities: protocol.ServerCapabilities{
-			CallHierarchyProvider: &protocol.Or_ServerCapabilities_callHierarchyProvider{Value: true},
-			CodeActionProvider:    codeActionProvider,
-			CodeLensProvider:      &protocol.CodeLensOptions{}, // must be non-nil to enable the code lens capability
-			CompletionProvider: &protocol.CompletionOptions{
-				TriggerCharacters: []string{"."},
-			},
-			DefinitionProvider:         &protocol.Or_ServerCapabilities_definitionProvider{Value: true},
-			TypeDefinitionProvider:     &protocol.Or_ServerCapabilities_typeDefinitionProvider{Value: true},
-			ImplementationProvider:     &protocol.Or_ServerCapabilities_implementationProvider{Value: true},
 			DocumentFormattingProvider: &protocol.Or_ServerCapabilities_documentFormattingProvider{Value: true},
-			DocumentSymbolProvider:     &protocol.Or_ServerCapabilities_documentSymbolProvider{Value: true},
-			WorkspaceSymbolProvider:    &protocol.Or_ServerCapabilities_workspaceSymbolProvider{Value: true},
-			ExecuteCommandProvider: &protocol.ExecuteCommandOptions{
-				Commands: protocol.NonNilSlice(options.SupportedCommands),
-			},
-			FoldingRangeProvider:      &protocol.Or_ServerCapabilities_foldingRangeProvider{Value: true},
-			HoverProvider:             &protocol.Or_ServerCapabilities_hoverProvider{Value: true},
-			DocumentHighlightProvider: &protocol.Or_ServerCapabilities_documentHighlightProvider{Value: true},
-			DocumentLinkProvider:      &protocol.DocumentLinkOptions{},
-			InlayHintProvider:         protocol.InlayHintOptions{},
-			ReferencesProvider:        &protocol.Or_ServerCapabilities_referencesProvider{Value: true},
-			RenameProvider:            renameOpts,
-			SelectionRangeProvider:    &protocol.Or_ServerCapabilities_selectionRangeProvider{Value: true},
-			SemanticTokensProvider: protocol.SemanticTokensOptions{
-				Range: &protocol.Or_SemanticTokensOptions_range{Value: true},
-				Full:  &protocol.Or_SemanticTokensOptions_full{Value: true},
-				Legend: protocol.SemanticTokensLegend{
-					TokenTypes:     protocol.NonNilSlice(options.SemanticTypes),
-					TokenModifiers: protocol.NonNilSlice(options.SemanticMods),
-				},
-			},
-			SignatureHelpProvider: &protocol.SignatureHelpOptions{
-				TriggerCharacters: []string{"(", ","},
-			},
 			TextDocumentSync: &protocol.TextDocumentSyncOptions{
 				Change:    protocol.Incremental,
 				OpenClose: true,
@@ -177,8 +108,8 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 			},
 		},
 		ServerInfo: &protocol.ServerInfo{
-			Name:    "gopls",
-			Version: string(goplsVersion),
+			Name:    "cue lsp",
+			Version: string(cueLspVersion),
 		},
 	}, nil
 }
@@ -195,89 +126,45 @@ func (s *server) Initialized(ctx context.Context, params *protocol.InitializedPa
 	s.state = serverInitialized
 	s.stateMu.Unlock()
 
+	// TODO(myitcv): I _think_ that even in the case that we are using a daemon instance,
+	// then the pid that the client sees is that of the ultimate LSP server. Which is correct.
+	// Even though the client is connected through a forwarder, this is a dumb process that
+	// shouldn't affect behaviour in any way. This TODO captures ensuring that is the case.
+	// If so, this TODO can be removed.
+	pid := os.Getpid()
+	event.Log(ctx, fmt.Sprintf("cue lsp server pid: %d", pid))
+
 	for _, not := range s.notifications {
 		s.client.ShowMessage(ctx, not)
 	}
 	s.notifications = nil
 
+	// Now create views for the pending folders
 	s.addFolders(ctx, s.pendingFolders)
-
 	s.pendingFolders = nil
-	s.checkViewGoVersions()
-
-	var registrations []protocol.Registration
-	options := s.Options()
-	if options.ConfigurationSupported && options.DynamicConfigurationSupported {
-		registrations = append(registrations, protocol.Registration{
-			ID:     "workspace/didChangeConfiguration",
-			Method: "workspace/didChangeConfiguration",
-		})
-	}
-	if len(registrations) > 0 {
-		if err := s.client.RegisterCapability(ctx, &protocol.RegistrationParams{
-			Registrations: registrations,
-		}); err != nil {
-			return err
-		}
-	}
-
-	// Ask (maybe) about enabling telemetry. Do this asynchronously, as it's OK
-	// for users to ignore or dismiss the question.
-	go s.maybePromptForTelemetry(ctx, options.TelemetryPrompt)
 
 	return nil
 }
 
-// checkViewGoVersions checks whether any Go version used by a view is too old,
-// raising a showMessage notification if so.
+// addFolders gets called from Initialized to add the specified list of
+// WorkspaceFolders to the session. There is no sense in returning an error
+// here, because Initialized is a notification. As such, we report any errors
+// in the loading process as shown messages to the end user.
 //
-// It should be called after views change.
-func (s *server) checkViewGoVersions() {
-	oldestVersion, fromBuild := go1Point(), true
-	for _, view := range s.session.Views() {
-		viewVersion := view.GoVersion()
-		if oldestVersion == -1 || viewVersion < oldestVersion {
-			oldestVersion, fromBuild = viewVersion, false
-		}
-		telemetry.RecordViewGoVersion(viewVersion)
-	}
-
-	if msg, isError := goversion.Message(oldestVersion, fromBuild); msg != "" {
-		mType := protocol.Warning
-		if isError {
-			mType = protocol.Error
-		}
-		s.eventuallyShowMessage(context.Background(), &protocol.ShowMessageParams{
-			Type:    mType,
-			Message: msg,
-		})
-	}
-}
-
-// go1Point returns the x in Go 1.x. If an error occurs extracting the go
-// version, it returns -1.
+// If we start to call addFolders from elsewhere, i.e. at another point during
+// the lifetime of 'cue lsp', we will need to _very_ carefully consider the
+// assumptions that are otherwise made in the code below.
 //
-// Copied from the testenv package.
-func go1Point() int {
-	for i := len(build.Default.ReleaseTags) - 1; i >= 0; i-- {
-		var version int
-		if _, err := fmt.Sscanf(build.Default.ReleaseTags[i], "go1.%d", &version); err != nil {
-			continue
-		}
-		return version
-	}
-	return -1
-}
-
-// addFolders adds the specified list of "folders" (that's Windows for
-// directories) to the session. It does not return an error, though it
-// may report an error to the client over LSP if one or more folders
-// had problems.
+// Precondition: each folder in folders must have a valid URI.
 func (s *server) addFolders(ctx context.Context, folders []protocol.WorkspaceFolder) {
 	originalViews := len(s.session.Views())
 	viewErrors := make(map[protocol.URI]error)
 
 	var ndiagnose sync.WaitGroup // number of unfinished diagnose calls
+
+	// Do not remove this progress notification. It is a key part of integration
+	// tests knowing when 'cue lsp' is "ready" post the Initialized-initiated
+	// workspace load.
 	if s.Options().VerboseWorkDoneProgress {
 		work := s.progress.Start(ctx, DiagnosticWorkTitle(FromInitialWorkspaceLoad), "Calculating diagnostics for initial workspace load...", nil, nil)
 		defer func() {
@@ -287,20 +174,19 @@ func (s *server) addFolders(ctx context.Context, folders []protocol.WorkspaceFol
 			}()
 		}()
 	}
+
 	// Only one view gets to have a workspace.
 	var nsnapshots sync.WaitGroup // number of unfinished snapshot initializations
 	for _, folder := range folders {
 		uri, err := protocol.ParseDocumentURI(folder.URI)
 		if err != nil {
-			viewErrors[folder.URI] = fmt.Errorf("invalid folder URI: %v", err)
-			continue
+			// Precondition on folders having valid URI violated
+			panic(err)
 		}
+
 		work := s.progress.Start(ctx, "Setting up workspace", "Loading packages...", nil, nil)
 		snapshot, release, err := s.addView(ctx, folder.Name, uri)
 		if err != nil {
-			if err == cache.ErrViewExists {
-				continue
-			}
 			viewErrors[folder.URI] = err
 			work.End(ctx, fmt.Sprintf("Error loading packages: %s", err))
 			continue
@@ -455,7 +341,7 @@ func (s *server) newFolder(ctx context.Context, folder protocol.DocumentURI, nam
 		configs, err := s.client.Configuration(ctx, &protocol.ParamConfiguration{
 			Items: []protocol.ConfigurationItem{{
 				ScopeURI: &scope,
-				Section:  "gopls",
+				Section:  "cue lsp",
 			}},
 		},
 		)
@@ -471,15 +357,13 @@ func (s *server) newFolder(ctx context.Context, folder protocol.DocumentURI, nam
 		}
 	}
 
-	env, err := cache.FetchGoEnv(ctx, folder, opts)
-	if err != nil {
-		return nil, err
-	}
 	return &cache.Folder{
 		Dir:     folder,
 		Name:    name,
 		Options: opts,
-		Env:     env,
+
+		// TODO(myitcv): remove this
+		Env: new(cache.GoEnv),
 	}, nil
 }
 

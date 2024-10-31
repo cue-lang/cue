@@ -578,7 +578,7 @@ func (s *Snapshot) goCommandInvocation(ctx context.Context, flags InvocationFlag
 			// TODO(rfindley): this seems unnecessary and overly complicated. Remove
 			// this along with 'allowModFileModifications'.
 			if s.view.typ == GoModView {
-				modURI = s.view.gomod
+				modURI = s.view.cuemod
 			}
 		} else {
 			modURI = s.GoModForFile(protocol.URIFromPath(inv.WorkingDir))
@@ -1206,7 +1206,7 @@ func moduleForURI(modFiles map[protocol.DocumentURI]struct{}, uri protocol.Docum
 // The given uri must be a file, not a directory.
 func nearestModFile(ctx context.Context, uri protocol.DocumentURI, fs file.Source) (protocol.DocumentURI, error) {
 	dir := filepath.Dir(uri.Path())
-	return findRootPattern(ctx, protocol.URIFromPath(dir), "go.mod", fs)
+	return findRootPattern(ctx, protocol.URIFromPath(dir), "cue.mod/module.cue", fs)
 }
 
 // Metadata returns the metadata for the specified package,

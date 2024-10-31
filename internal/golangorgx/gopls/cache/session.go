@@ -538,7 +538,7 @@ func bestView[V viewDefiner](ctx context.Context, fs file.Source, fh file.Handle
 	}
 	uri := fh.URI()
 	dir := uri.Dir()
-	modURI, err := findRootPattern(ctx, dir, "go.mod", fs)
+	modURI, err := findRootPattern(ctx, dir, "cue.mod/module.cue", fs)
 	if err != nil {
 		return zero, err
 	}

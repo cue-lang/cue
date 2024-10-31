@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ea2dd3f_6d8425dc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-31T16:13:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ea85c59_2520e740",
+      "revId": "7131790b8be6263d8387f193471c94cabc66207e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f5fac495_425ad5c1",
@@ -53,6 +71,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fd2c1f1_570678e9",
+        "filename": "internal/core/export/topological/graph.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-31T16:13:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f5fac495_425ad5c1",
+      "revId": "7131790b8be6263d8387f193471c94cabc66207e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "17a36136_6692c863",
@@ -66,6 +102,24 @@
       "writtenOn": "2024-10-11T14:15:31Z",
       "side": 1,
       "message": "Looking up a string is fast, so why storing it here?",
+      "revId": "7131790b8be6263d8387f193471c94cabc66207e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0667dd34_5c910cc2",
+        "filename": "internal/core/export/topological/graph.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-31T16:13:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "17a36136_6692c863",
       "revId": "7131790b8be6263d8387f193471c94cabc66207e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

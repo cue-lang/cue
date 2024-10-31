@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb1b9afd_a0a7e794",
+        "filename": "internal/core/export/testdata/main/issue662.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-31T17:20:39Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "559efa10_d6e8b1ed",
+      "revId": "f1b01d0fb0362eec30e04dca5240c0ab1ec50d4d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "741f38f0_faa6ae5b",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-10-18T08:54:16Z",
       "side": 0,
       "message": "This can be removed. Apparently the automatic removal does not work for diff/value/todo, only diff/todo.",
+      "revId": "f1b01d0fb0362eec30e04dca5240c0ab1ec50d4d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b65a2a0_c32b45c5",
+        "filename": "internal/core/export/testdata/main/merge.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-31T17:20:39Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "741f38f0_faa6ae5b",
       "revId": "f1b01d0fb0362eec30e04dca5240c0ab1ec50d4d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

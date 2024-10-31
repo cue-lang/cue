@@ -9,7 +9,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"path/filepath"
 	"sync"
 
 	"cuelang.org/go/internal/golangorgx/gopls/cache"
@@ -95,21 +94,11 @@ func (s *server) DidOpen(ctx context.Context, params *protocol.DidOpenTextDocume
 	defer done()
 
 	uri := params.TextDocument.URI
-	// There may not be any matching view in the current session. If that's
-	// the case, try creating a new view based on the opened file path.
-	//
-	// TODO(golang/go#57979): revisit creating a folder here. We should separate
-	// the logic for managing folders from the logic for managing views. But it
-	// does make sense to ensure at least one workspace folder the first time a
-	// file is opened, and we can't do that inside didModifyFiles because we
-	// don't want to request configuration while holding a lock.
-	if len(s.session.Views()) == 0 {
-		dir := filepath.Dir(uri.Path())
-		s.addFolders(ctx, []protocol.WorkspaceFolder{{
-			URI:  string(protocol.URIFromPath(dir)),
-			Name: filepath.Base(dir),
-		}})
-	}
+
+	// TODO(myitcv): we need to report an error/problem/something in case the user opens a file
+	// that is not part of the CUE module. For now we will not support that, because it massively
+	// opens up a can of worms in terms of single-file support, ad hoc workspaces etc.
+
 	return s.didModifyFiles(ctx, []file.Modification{{
 		URI:        uri,
 		Action:     file.Open,

@@ -82,6 +82,10 @@ type server struct {
 	// folders is only valid between initialize and initialized, and holds the
 	// set of folders to build views for when we are ready.
 	// Each has a valid, non-empty 'file'-scheme URI.
+	//
+	// TODO(myitcv): it doesn't feel clean having this state at the "same level"
+	// as other server state. This field is only relevant for the time between
+	// the call to Initialize and notification of Initialized.
 	pendingFolders []protocol.WorkspaceFolder
 
 	// watchedGlobPatterns is the set of glob patterns that we have requested

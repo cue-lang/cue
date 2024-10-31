@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ec9ea44_fed5d403",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-31T16:17:03Z",
+      "side": 1,
+      "message": "(just clearing out these comments - they are moved to a different CL, and they are addressed too.)",
+      "revId": "eb4e2b8fc50f3312aeab3253fd5abaf1e82657e0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

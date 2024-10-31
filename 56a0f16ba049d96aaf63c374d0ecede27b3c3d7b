@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "293fa58e_308e48e1",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_issue2060.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-31T16:17:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "44954370_e7dc9a2a",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5f454842_4c43bf4c",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-10-11T15:46:21Z",
       "side": 1,
       "message": "This is an interesting case. It seems the loader substitutes this, but I guess it is dynamic-ish.",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "791abc33_5b83a87e",
+        "filename": "cmd/cue/cmd/testdata/script/embed.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-31T16:17:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f454842_4c43bf4c",
       "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f044784e_8e169fc0",
+        "filename": "cmd/cue/cmd/testdata/script/hidden.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-31T16:17:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f774785f_ab400dfb",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1b4b076f_8650a9ea",
@@ -82,6 +136,24 @@
       "writtenOn": "2024-10-11T15:46:21Z",
       "side": 1,
       "message": "It seems this should become before i.",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9559bb7_d8f0f811",
+        "filename": "cmd/cue/cmd/testdata/script/issue269.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-31T16:17:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1b4b076f_8650a9ea",
       "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +175,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eccbba02_020dcee6",
+        "filename": "cmd/cue/cmd/testdata/script/issue398.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-31T16:17:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ad8e8a15_98052fc1",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8e848192_14932ce4",
@@ -116,6 +206,24 @@
       "writtenOn": "2024-10-11T15:46:21Z",
       "side": 1,
       "message": "This seems wrong.",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a584a18_3099858d",
+        "filename": "cue/context_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-31T16:17:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8e848192_14932ce4",
       "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -137,6 +245,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b3118e4_b0bf2e41",
+        "filename": "internal/core/export/export_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-31T16:17:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ed7860ef_5bece5d7",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d5d24cb7_4f454de7",
@@ -150,6 +276,24 @@
       "writtenOn": "2024-10-11T15:46:21Z",
       "side": 1,
       "message": "This seems wrong, as src is declared before any foo or bar and foo is defined before bar.",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d264abdc_1a8f4e51",
+        "filename": "internal/core/export/testdata/main/adt.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-31T16:17:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d5d24cb7_4f454de7",
       "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -171,6 +315,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9b0efd2_32775e1d",
+        "filename": "internal/core/export/testdata/main/attrs.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-31T16:17:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1e3f4aa5_13b5aa75",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cc14cdc3_c8737eec",
@@ -184,6 +346,24 @@
       "writtenOn": "2024-10-11T15:46:21Z",
       "side": 1,
       "message": "I would have guessed that #fn is defined first. \n\nIt is probably okay to place the scalar value first and not subject it to the ordering rules.",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b99fab5_82f0f7f1",
+        "filename": "internal/core/export/testdata/main/embedscalar.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-31T16:17:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cc14cdc3_c8737eec",
       "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -205,6 +385,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f92ab187_5db4f8f8",
+        "filename": "internal/core/export/testdata/main/hidden.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-31T16:17:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5d803657_93037eaa",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "641e1706_7e82195b",
@@ -218,6 +416,24 @@
       "writtenOn": "2024-10-11T15:46:21Z",
       "side": 1,
       "message": "Hmm, even though these are defined in different structs, e1 _is_ ordered before the t\u0027s within the same file. within the same file that should probably count, especially once adopt the path: constraint style.",
+      "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7c47971_909bd2e5",
+        "filename": "internal/core/export/testdata/main/shadow.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-31T16:17:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "641e1706_7e82195b",
       "revId": "56a0f16ba049d96aaf63c374d0ecede27b3c3d7b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -145,9 +145,17 @@ func (v *View) definition() *viewDefinition { return v.viewDefinition }
 type viewDefinition struct {
 	folder *Folder // pointer comparison is OK, as any new Folder creates a new def
 
-	typ    ViewType
-	root   protocol.DocumentURI // root directory; where to run the Go command
-	gomod  protocol.DocumentURI // the nearest go.mod file, or ""
+	typ ViewType
+
+	// root represents the directory root of the CUE module that contains
+	// the WorkspaceFolder folder
+	root protocol.DocumentURI
+
+	// cuemod is the path of the the nearest ancestor cue.mod directory
+	//
+	// TODO(myitcv): why do we need this if we have root?
+	cuemod protocol.DocumentURI
+
 	gowork protocol.DocumentURI // the nearest go.work file, or ""
 
 	// workspaceModFiles holds the set of mod files active in this snapshot.
@@ -176,7 +184,7 @@ func (d *viewDefinition) Type() ViewType { return d.typ }
 func (d *viewDefinition) Root() protocol.DocumentURI { return d.root }
 
 // GoMod returns the nearest go.mod file for this view's root, or "".
-func (d *viewDefinition) GoMod() protocol.DocumentURI { return d.gomod }
+func (d *viewDefinition) GoMod() protocol.DocumentURI { return d.cuemod }
 
 // GoWork returns the nearest go.work file for this view's root, or "".
 func (d *viewDefinition) GoWork() protocol.DocumentURI { return d.gowork }
@@ -253,7 +261,7 @@ func viewDefinitionsEqual(x, y *viewDefinition) bool {
 	return x.folder == y.folder &&
 		x.typ == y.typ &&
 		x.root == y.root &&
-		x.gomod == y.gomod &&
+		x.cuemod == y.cuemod &&
 		x.gowork == y.gowork
 }
 
@@ -295,6 +303,8 @@ const (
 	//
 	// Load: . from the workspace folder.
 	AdHocView
+
+	CUEModView
 )
 
 func (t ViewType) String() string {
@@ -309,6 +319,8 @@ func (t ViewType) String() string {
 		return "GoWorkView"
 	case AdHocView:
 		return "AdHocView"
+	case CUEModView:
+		return "CUEModView"
 	default:
 		return "Unknown"
 	}
@@ -832,190 +844,56 @@ func (s *Session) invalidateViewLocked(ctx context.Context, v *View, changed Sta
 // defineView computes the view definition for the provided workspace folder
 // and URI.
 //
-// If forURI is non-empty, this view should be the best view including forURI.
-// Otherwise, it is the default view for the folder.
+// If forFile is non-empty, this view should be the best view including forFile.
+// Otherwise, it is the default view for the folder. Per below TODO(myitcv), we
+// need to better understand when this can happen, and what the preceding sentence
+// actually means.
 //
 // defineView only returns an error in the event of context cancellation.
 //
-// Note: keep this function in sync with bestView.
-//
-// TODO(rfindley): we should be able to remove the error return, as
-// findModules is going away, and all other I/O is memoized.
-//
-// TODO(rfindley): pass in a narrower interface for the file.Source
-// (e.g. fileExists func(DocumentURI) bool) to make clear that this
-// process depends only on directory information, not file contents.
+// gopls note: keep this function in sync with bestView.
 func defineView(ctx context.Context, fs file.Source, folder *Folder, forFile file.Handle) (*viewDefinition, error) {
 	if err := checkPathValid(folder.Dir.Path()); err != nil {
 		return nil, fmt.Errorf("invalid workspace folder path: %w; check that the spelling of the configured workspace folder path agrees with the spelling reported by the operating system", err)
 	}
 	dir := folder.Dir.Path()
+
 	if forFile != nil {
+		// TODO(myitcv): it's still not totally clear what codepath leads us to this point.
+		// Under what conditions do we have forFile? We want to limit (for now) that files
+		// opened within the workspace on which we do analysis are part of the CUE module
+		// that contains the WorkspaceFolder. If forFile != nil, do we already have that
+		// guarantee here? Hopefully... because this feels awfully late to be doing anything
+		// about it.
 		dir = filepath.Dir(forFile.URI().Path())
 	}
 
 	def := new(viewDefinition)
 	def.folder = folder
 
-	if forFile != nil && fileKind(forFile) == file.Go {
-		// If the file has GOOS/GOARCH build constraints that
-		// don't match the folder's environment (which comes from
-		// 'go env' in the folder, plus user options),
-		// add those constraints to the viewDefinition's environment.
-
-		// Content trimming is nontrivial, so do this outside of the loop below.
-		// Keep this in sync with bestView.
-		path := forFile.URI().Path()
-		if content, err := forFile.Content(); err == nil {
-			// Note the err == nil condition above: by convention a non-existent file
-			// does not have any constraints. See the related note in bestView: this
-			// choice of behavior shouldn't actually matter. In this case, we should
-			// only call defineView with Overlays, which always have content.
-			content = trimContentForPortMatch(content)
-			viewPort := port{def.folder.Env.GOOS, def.folder.Env.GOARCH}
-			if !viewPort.matches(path, content) {
-				for _, p := range preferredPorts {
-					if p.matches(path, content) {
-						if def.envOverlay == nil {
-							def.envOverlay = make(map[string]string)
-						}
-						def.envOverlay["GOOS"] = p.GOOS
-						def.envOverlay["GOARCH"] = p.GOARCH
-						break
-					}
-				}
-			}
-		}
-	}
-
 	var err error
 	dirURI := protocol.URIFromPath(dir)
-	goworkFromEnv := false
-	if folder.Env.GOWORK != "off" && folder.Env.GOWORK != "" {
-		goworkFromEnv = true
-		def.gowork = protocol.URIFromPath(folder.Env.GOWORK)
-	} else {
-		def.gowork, err = findRootPattern(ctx, dirURI, "go.work", fs)
-		if err != nil {
-			return nil, err
-		}
-	}
 
 	// When deriving the best view for a given file, we only want to search
-	// up the directory hierarchy for modfiles.
-	def.gomod, err = findRootPattern(ctx, dirURI, "go.mod", fs)
+	// up the directory hierarchy for cue.mod directories.
+	//
+	// TODO(myitcv): update this logic to support finding the cue.mod directory,
+	// which is the true marker of the CUE module.
+	moduleCUE, err := findRootPattern(ctx, dirURI, filepath.FromSlash("cue.mod/module.cue"), fs)
 	if err != nil {
 		return nil, err
 	}
+	def.cuemod = moduleCUE.Dir()
 
-	// Determine how we load and where to load package information for this view
-	//
-	// Specifically, set
-	//  - def.typ
-	//  - def.root
-	//  - def.workspaceModFiles, and
-	//  - def.envOverlay.
-
-	// If GOPACKAGESDRIVER is set it takes precedence.
-	{
-		// The value of GOPACKAGESDRIVER is not returned through the go command.
-		gopackagesdriver := os.Getenv("GOPACKAGESDRIVER")
-		// A user may also have a gopackagesdriver binary on their machine, which
-		// works the same way as setting GOPACKAGESDRIVER.
-		//
-		// TODO(rfindley): remove this call to LookPath. We should not support this
-		// undocumented method of setting GOPACKAGESDRIVER.
-		tool, err := exec.LookPath("gopackagesdriver")
-		if gopackagesdriver != "off" && (gopackagesdriver != "" || (err == nil && tool != "")) {
-			def.typ = GoPackagesDriverView
-			def.root = dirURI
-			return def, nil
-		}
-	}
-
-	// From go.dev/ref/mod, module mode is active if GO111MODULE=on, or
-	// GO111MODULE=auto or "" and we are inside a module or have a GOWORK value.
-	// But gopls is less strict, allowing GOPATH mode if GO111MODULE="", and
-	// AdHoc views if no module is found.
-
-	// gomodWorkspace is a helper to compute the correct set of workspace
-	// modfiles for a go.mod file, based on folder options.
-	gomodWorkspace := func() map[protocol.DocumentURI]unit {
-		modFiles := map[protocol.DocumentURI]struct{}{def.gomod: {}}
-		if folder.Options.IncludeReplaceInWorkspace {
-			includingReplace, err := goModModules(ctx, def.gomod, fs)
-			if err == nil {
-				modFiles = includingReplace
-			} else {
-				// If the go.mod file fails to parse, we don't know anything about
-				// replace directives, so fall back to a view of just the root module.
-			}
-		}
-		return modFiles
-	}
-
-	// Prefer a go.work file if it is available and contains the module relevant
-	// to forURI.
-	if def.adjustedGO111MODULE() != "off" && folder.Env.GOWORK != "off" && def.gowork != "" {
-		def.typ = GoWorkView
-		if goworkFromEnv {
-			// The go.work file could be anywhere, which can lead to confusing error
-			// messages.
-			def.root = dirURI
-		} else {
-			// The go.work file could be anywhere, which can lead to confusing error
-			def.root = def.gowork.Dir()
-		}
-		def.workspaceModFiles, def.workspaceModFilesErr = goWorkModules(ctx, def.gowork, fs)
-
-		// If forURI is in a module but that module is not
-		// included in the go.work file, use a go.mod view with GOWORK=off.
-		if forFile != nil && def.workspaceModFilesErr == nil && def.gomod != "" {
-			if _, ok := def.workspaceModFiles[def.gomod]; !ok {
-				def.typ = GoModView
-				def.root = def.gomod.Dir()
-				def.workspaceModFiles = gomodWorkspace()
-				if def.envOverlay == nil {
-					def.envOverlay = make(map[string]string)
-				}
-				def.envOverlay["GOWORK"] = "off"
-			}
-		}
+	// For now, we only support establishing a workspace folder when contained
+	// by a CUE module.
+	if def.cuemod != "" {
+		def.typ = CUEModView
+		def.root = def.cuemod.Dir()
 		return def, nil
 	}
 
-	// Otherwise, use the active module, if in module mode.
-	//
-	// Note, we could override GO111MODULE here via envOverlay if we wanted to
-	// support the case where someone opens a module with GO111MODULE=off. But
-	// that is probably not worth worrying about (at this point, folks probably
-	// shouldn't be setting GO111MODULE).
-	if def.adjustedGO111MODULE() != "off" && def.gomod != "" {
-		def.typ = GoModView
-		def.root = def.gomod.Dir()
-		def.workspaceModFiles = gomodWorkspace()
-		return def, nil
-	}
-
-	// Check if the workspace is within any GOPATH directory.
-	inGOPATH := false
-	for _, gp := range filepath.SplitList(folder.Env.GOPATH) {
-		if pathutil.InDir(filepath.Join(gp, "src"), dir) {
-			inGOPATH = true
-			break
-		}
-	}
-	if def.adjustedGO111MODULE() != "on" && inGOPATH {
-		def.typ = GOPATHView
-		def.root = dirURI
-		return def, nil
-	}
-
-	// We're not in a workspace, module, or GOPATH, so have no better choice than
-	// an ad-hoc view.
-	def.typ = AdHocView
-	def.root = dirURI
-	return def, nil
+	return nil, fmt.Errorf("WorkspaceFolder %s is not contained by a CUE module", dir)
 }
 
 // FetchGoEnv queries the environment and Go command to collect environment

@@ -91,7 +91,7 @@ func NewSandbox(config *SandboxConfig) (_ *Sandbox, err error) {
 
 	rootDir := config.RootDir
 	if rootDir == "" {
-		rootDir, err = os.MkdirTemp(config.RootDir, "cuepls-sandbox-")
+		rootDir, err = os.MkdirTemp(config.RootDir, "cue-lsp-sandbox-")
 		if err != nil {
 			return nil, fmt.Errorf("creating temporary workdir: %v", err)
 		}
@@ -149,7 +149,7 @@ func NewSandbox(config *SandboxConfig) (_ *Sandbox, err error) {
 // is the responsibility of the caller to call os.RemoveAll on the returned
 // file path when it is no longer needed.
 func Tempdir(files map[string][]byte) (string, error) {
-	dir, err := os.MkdirTemp("", "cuepls-tempdir-")
+	dir, err := os.MkdirTemp("", "cue-lsp-tempdir-")
 	if err != nil {
 		return "", err
 	}

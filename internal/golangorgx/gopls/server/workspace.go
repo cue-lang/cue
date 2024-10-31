@@ -97,8 +97,5 @@ func (s *server) DidChangeConfiguration(ctx context.Context, _ *protocol.DidChan
 		wg.Done()
 	}()
 
-	// An options change may have affected the detected Go version.
-	s.checkViewGoVersions()
-
 	return nil
 }

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "afbd825f_ea4586ab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-10-31T11:13:06Z",
+      "side": 1,
+      "message": "Marcel confirmed in a call that he\u0027s OK with this - indeed it may cause issues with wasm, but we don\u0027t use wasm right now, and it\u0027s a minor edge case that we can deal with later.",
+      "parentUuid": "ffd3f73d_4b07ef8c",
+      "revId": "84607c44de839606ed4e43a30b996001bb7f500f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8e6e70d5_3fd506ad",

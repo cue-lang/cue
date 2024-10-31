@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "170ab685_05e888c5",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 532,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-31T16:15:05Z",
+      "side": 1,
+      "message": "Sorry - I\u0027ve been meaning to discuss this with you for a while - not sure what term you\u0027d choose.",
+      "parentUuid": "b419f006_abfb22cf",
+      "revId": "562583a1238c63e14833e18986b5c43194e1afac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7d77d60c_e771228b",
         "filename": "internal/core/adt/composite.go",
         "patchSetId": 3
@@ -31,6 +49,24 @@
       "writtenOn": "2024-10-11T14:46:04Z",
       "side": 1,
       "message": "This is very tied to V3. However, V2 has something similar, so it probably would not be too hard to support V2 as well.",
+      "revId": "562583a1238c63e14833e18986b5c43194e1afac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8460738_dba4e710",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1351,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-31T16:15:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7d77d60c_e771228b",
       "revId": "562583a1238c63e14833e18986b5c43194e1afac",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -48,6 +84,24 @@
       "writtenOn": "2024-10-11T14:46:04Z",
       "side": 1,
       "message": "Since dynamic fields are rare, it may make sense to only conditionally create this map.",
+      "revId": "562583a1238c63e14833e18986b5c43194e1afac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "118e110f_4de0320d",
+        "filename": "internal/core/export/topological/graph.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-10-31T16:15:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf71b54f_b1949478",
       "revId": "562583a1238c63e14833e18986b5c43194e1afac",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,0 +1,191 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b99a1be1_0d65f49c",
+        "filename": "internal/core/toposort/graph.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T10:26:01Z",
+      "side": 1,
+      "message": "We tend to mostly use the style NodeUnsorted, although, admittedly, I sometimes use all caps as well if code is a clone or for emphasis reasons.\n\nI\u0027m fine leaving it, but just as a consideration.",
+      "revId": "bf2180cf7684867c1bc9829d717f9ee66c824b24",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1bbf0443_2df9ffbb",
+        "filename": "internal/core/toposort/graph.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T10:26:01Z",
+      "side": 1,
+      "message": "Note that this may not be entirely correct: two different field like \"#foo\" and #foo, can have the same raw string. So theoretically we should also take the field type into account. Perhaps add this as a TODO",
+      "revId": "bf2180cf7684867c1bc9829d717f9ee66c824b24",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e0af68b_6f3fb5ac",
+        "filename": "internal/core/toposort/graph.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T10:26:01Z",
+      "side": 1,
+      "message": "We usually use camelCase for labels.\n\nEither way, this is a lot of nesting. It may be worth hoisting one of the for loops out.",
+      "revId": "bf2180cf7684867c1bc9829d717f9ee66c824b24",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "17ca5ec7_82b1d954",
+        "filename": "internal/core/toposort/graph.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T10:26:01Z",
+      "side": 1,
+      "message": "We usually keep code below 80 characters. This seems to be over. Either way, it is quite hard to read here because of indentation.",
+      "revId": "bf2180cf7684867c1bc9829d717f9ee66c824b24",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2033d628_0f17e94f",
+        "filename": "internal/core/toposort/graph.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T10:26:01Z",
+      "side": 1,
+      "message": "Same here, labels in camelCase for consistency.",
+      "revId": "bf2180cf7684867c1bc9829d717f9ee66c824b24",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06e43bd9_cc8671b0",
+        "filename": "internal/core/toposort/graph.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T10:26:01Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "bf2180cf7684867c1bc9829d717f9ee66c824b24",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28c7bd33_171bb821",
+        "filename": "internal/core/toposort/graph.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T10:26:01Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "bf2180cf7684867c1bc9829d717f9ee66c824b24",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "737ff675_35e0fc28",
+        "filename": "internal/core/toposort/graph_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T10:26:01Z",
+      "side": 1,
+      "message": "Indentation",
+      "revId": "bf2180cf7684867c1bc9829d717f9ee66c824b24",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a70efb4_5861cfe1",
+        "filename": "internal/core/toposort/graph_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T10:26:01Z",
+      "side": 1,
+      "message": "indentation",
+      "revId": "bf2180cf7684867c1bc9829d717f9ee66c824b24",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d23c48e8_294e3896",
+        "filename": "internal/core/toposort/graph_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T10:26:01Z",
+      "side": 1,
+      "message": "indentation",
+      "revId": "bf2180cf7684867c1bc9829d717f9ee66c824b24",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e939fc56_ac94d898",
+        "filename": "internal/core/toposort/graph_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T10:26:01Z",
+      "side": 1,
+      "message": "Indentation",
+      "revId": "bf2180cf7684867c1bc9829d717f9ee66c824b24",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

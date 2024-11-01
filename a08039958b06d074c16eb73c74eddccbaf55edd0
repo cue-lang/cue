@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc91dd3d_2de07ea4",
+        "filename": "internal/core/toposort/graph.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T09:59:03Z",
+      "side": 1,
+      "message": "Maybe a short explanation here of what scc stands for.",
+      "revId": "a08039958b06d074c16eb73c74eddccbaf55edd0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0ca9a2a_674d0904",
+        "filename": "internal/core/toposort/graph.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T09:59:03Z",
+      "side": 1,
+      "message": "In the future we probably want to write features into a pre-allocated buffer (here and in other places) in OpContext. For now this is fine, but it may be good to keep in mind, as it would require passing OpContext around in various places.",
+      "revId": "a08039958b06d074c16eb73c74eddccbaf55edd0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

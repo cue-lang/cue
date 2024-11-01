@@ -84,7 +84,7 @@ type TxTarTest struct {
 
 // A Test represents a single test based on a .txtar file.
 //
-// A Test embeds *[testing.T] and should be used to report errors.
+// A Test embeds [*testing.T] and should be used to report errors.
 //
 // Entries within the txtar file define CUE files (available via the
 // Instances and RawInstances methods) and expected output

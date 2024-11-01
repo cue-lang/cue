@@ -115,7 +115,7 @@ func (o *hiddenStructValue) at(i int) *adt.Vertex {
 	return o.arcs[i]
 }
 
-// Lookup reports the field for the given key. The returned Value is invalid
+// Lookup reports the field for the given key. The returned [Value] is invalid
 // if it does not exist.
 func (o *hiddenStructValue) Lookup(key string) Value {
 	f := o.v.idx.StrLabel(key)
@@ -1326,6 +1326,8 @@ func (v hiddenValue) Struct() (*Struct, error) {
 }
 
 // Struct represents a CUE struct value.
+//
+// Deprecated: only used by deprecated functions.
 type Struct struct {
 	structValue
 }
@@ -1378,7 +1380,7 @@ func (s *hiddenStruct) FieldByName(name string, isIdent bool) (FieldInfo, error)
 	return FieldInfo{}, errNotFound
 }
 
-// Fields creates an iterator over the Struct's fields.
+// Fields creates an iterator over the struct's fields.
 func (s *hiddenStruct) Fields(opts ...Option) *Iterator {
 	iter, _ := s.v.Fields(opts...)
 	return iter
@@ -1554,7 +1556,7 @@ func (v hiddenValue) Fill(x interface{}, path ...string) Value {
 // resolved as if they were defined at the path position.
 //
 // If x is a Value, it will be used as is. It panics if x is not created
-// from the same Runtime as v.
+// from the same [Context] as v.
 //
 // Otherwise, the given Go value will be converted to CUE using the same rules
 // as [Context.Encode].

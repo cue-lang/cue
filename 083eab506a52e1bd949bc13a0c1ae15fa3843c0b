@@ -1,0 +1,293 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19eab56e_752adb9c",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T11:14:43Z",
+      "side": 1,
+      "message": "Why parent, could you not just remove \"parent\" in this sentence?",
+      "revId": "083eab506a52e1bd949bc13a0c1ae15fa3843c0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98ae9681_b6d8e200",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T11:14:43Z",
+      "side": 1,
+      "message": "This is a package comment. Conventially, these states with\n\"Package toposort ...\"\n\nAlthough my hunch is this is intended as a file-level comment. See comment below.",
+      "revId": "083eab506a52e1bd949bc13a0c1ae15fa3843c0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c67d4975_33d3b7e4",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T11:14:43Z",
+      "side": 1,
+      "message": "If I\u0027m not mistaken, a, b, and c will not have any StructInfos associated with them in this example.",
+      "revId": "083eab506a52e1bd949bc13a0c1ae15fa3843c0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f4b4373_402f3a8b",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T11:14:43Z",
+      "side": 1,
+      "message": "Ideally the package comment should be in a file with the same name as the package and the file that has the main entry points.\n\nIf this was not intended as a package comment, make it a file comment, typically by moving it below the package declaration.",
+      "revId": "083eab506a52e1bd949bc13a0c1ae15fa3843c0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c94e955_bee0c0cd",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T11:14:43Z",
+      "side": 1,
+      "message": "wrap comment.",
+      "revId": "083eab506a52e1bd949bc13a0c1ae15fa3843c0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7c6aec6_cda7ac2b",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T11:14:43Z",
+      "side": 1,
+      "message": "split across lines, possibly by putting arguments on new line.",
+      "revId": "083eab506a52e1bd949bc13a0c1ae15fa3843c0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1d45fc7_5985c933",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T11:14:43Z",
+      "side": 1,
+      "message": "Additional spaces. Indentation looks off.",
+      "revId": "083eab506a52e1bd949bc13a0c1ae15fa3843c0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54236260_2883292d",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T11:14:43Z",
+      "side": 1,
+      "message": "If your editor supports reflow around 80 chars, I would reflow this comment.",
+      "revId": "083eab506a52e1bd949bc13a0c1ae15fa3843c0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1445fd9_85738ac0",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T11:14:43Z",
+      "side": 1,
+      "message": "wrap line, possibly by putting 2nd and up args on new line. Also for other applicable debug statements.",
+      "revId": "083eab506a52e1bd949bc13a0c1ae15fa3843c0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2aa2ff6f_34c5f8f6",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T11:14:43Z",
+      "side": 1,
+      "message": "Line length exceeds 80 with ts 4.",
+      "revId": "083eab506a52e1bd949bc13a0c1ae15fa3843c0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0af6e592_c36b20f2",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T11:14:43Z",
+      "side": 1,
+      "message": "Line length.",
+      "revId": "083eab506a52e1bd949bc13a0c1ae15fa3843c0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3127feb_680bdf9c",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T11:14:43Z",
+      "side": 1,
+      "message": "Line length\n\nIn this case you could limit the overflows by renaming dynamicFields to something shorter, like \"m\" or \"result\". The name is either way incorrect, as you are not collecting dynamicFields, but rather a map from dynamic fields to features. So arguably the long name is not helping the readability. Personally, except for some cases where longer names do indeed provide more info, I prefer shorter names as it makes the code easier to scan. In my experience, most long variable names are not that useful and usually are indicative of an overly complicated function.",
+      "revId": "083eab506a52e1bd949bc13a0c1ae15fa3843c0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "39559625_8f00dac1",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T11:14:43Z",
+      "side": 1,
+      "message": "Line length",
+      "revId": "083eab506a52e1bd949bc13a0c1ae15fa3843c0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23380fb9_0e425782",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T11:14:43Z",
+      "side": 1,
+      "message": "self is an unusual name for a function receiver in Go code. If no letter makes sense, you can use x.",
+      "revId": "083eab506a52e1bd949bc13a0c1ae15fa3843c0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f41c3a2_c609ea8a",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T11:14:43Z",
+      "side": 1,
+      "message": "Line length.",
+      "revId": "083eab506a52e1bd949bc13a0c1ae15fa3843c0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85053f8a_2e4f5ad8",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T11:14:43Z",
+      "side": 1,
+      "message": "s/indexer/index/ would suffice. Usually extraneous suffixes, ones that do not convey extra information, are eliminated in typical Go style.\n\nThe \"er\" suffix in StringIndexer indicates it is an interface type, but that is not relevant for its usage within this function.\n\nAlternatively, use a common abbreviation, like idx or x.",
+      "revId": "083eab506a52e1bd949bc13a0c1ae15fa3843c0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47f6a3b3_432b20ca",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T11:14:43Z",
+      "side": 1,
+      "message": "line length here and in various other spots.",
+      "revId": "083eab506a52e1bd949bc13a0c1ae15fa3843c0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

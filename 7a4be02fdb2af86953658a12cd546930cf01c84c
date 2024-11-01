@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8bbc5538_57fb6789",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T13:54:47Z",
+      "side": 1,
+      "message": "Reviewed up to file 28",
+      "revId": "7a4be02fdb2af86953658a12cd546930cf01c84c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc748959_c6ed7701",
+        "filename": "cmd/cue/cmd/testdata/script/export_issue3511.txtar",
+        "patchSetId": 17
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T13:54:47Z",
+      "side": 1,
+      "message": "This is interesting. I guess it is an implicit unification, but I would not expect that to be the case for regular structs vs pattern constraints.",
+      "revId": "7a4be02fdb2af86953658a12cd546930cf01c84c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9cad68e7_60994921",
+        "filename": "cue/load/testdata/testfetch/simple.txtar",
+        "patchSetId": 17
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T13:54:47Z",
+      "side": 1,
+      "message": "I\u0027m not sure what is going on with all these registry cases, but I guess it doesn\u0027t matter too much.",
+      "revId": "7a4be02fdb2af86953658a12cd546930cf01c84c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f556a2af_16e54e73",
+        "filename": "cue/syntax_test.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T13:54:47Z",
+      "side": 1,
+      "message": "This seems to be incorrect: \"resource\" unifies the definition with a struct with a single entry with a field named \"spec\". In the Deployment definition, spec comes first.",
+      "revId": "7a4be02fdb2af86953658a12cd546930cf01c84c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0aa2a44_75a7959a",
+        "filename": "encoding/openapi/testdata/openapi-norefs.json",
+        "patchSetId": 17
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T13:54:47Z",
+      "side": 1,
+      "message": "What is the reasoning that b comes before a here?\n\nSee encoding/openapi/testdata/openapi.cue",
+      "revId": "7a4be02fdb2af86953658a12cd546930cf01c84c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6c4b3b9_c98f9ccc",
+        "filename": "encoding/protobuf/textproto/testdata/encoder/enum.txtar",
+        "patchSetId": 17
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T13:54:47Z",
+      "side": 1,
+      "message": "Is this as expected? It seems to me the original is correct.",
+      "revId": "7a4be02fdb2af86953658a12cd546930cf01c84c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

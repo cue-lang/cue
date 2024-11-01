@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1efe5ab_b1585c90",
+        "filename": "internal/core/toposort/cycles.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T10:06:10Z",
+      "side": 1,
+      "message": "Maybe write as\n\nif start \u003d\u003d nodes[0] {\n   return\n}\n\nThis keeps the indentation level a bit lower.",
+      "revId": "76adea3d3519b84e486175dc07add551b3910205",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c643341e_551005ee",
+        "filename": "internal/core/toposort/graph_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T10:06:10Z",
+      "side": 1,
+      "message": "This is almost the same as Cycle.RotateToStartAt. Just an observation. It is, imho, not worth it to refactor things.",
+      "revId": "76adea3d3519b84e486175dc07add551b3910205",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

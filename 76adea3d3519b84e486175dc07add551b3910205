@@ -18,6 +18,91 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "b7861e6e_21e67c43",
+        "filename": "internal/core/toposort/cycles_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T11:34:26Z",
+      "side": 1,
+      "message": "The code uses r for runtime throughout the code base.\n\nIf you want to stress this is used as a StringIndexer only, use either \"index\" or \"idx\".\n\nExtraneous suffixes that can be eliminated without loss of information are typically eliminated. The \"er\" suffix in StringIndexer indicates it is an interface type. But variable names in Go typically do not indicate whether the value is an interface.\n\nKeeping variable names shorter will also help with the requirement to keep line lengths below 80 chars.",
+      "revId": "76adea3d3519b84e486175dc07add551b3910205",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0eb6ff1_36d50c0e",
+        "filename": "internal/core/toposort/cycles_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T11:34:26Z",
+      "side": 1,
+      "message": "I conventionally use tc for test case.",
+      "revId": "76adea3d3519b84e486175dc07add551b3910205",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc874a39_fb3e7158",
+        "filename": "internal/core/toposort/cycles_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T11:34:26Z",
+      "side": 1,
+      "message": "Line length",
+      "revId": "76adea3d3519b84e486175dc07add551b3910205",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9fb802a1_8a204cea",
+        "filename": "internal/core/toposort/cycles_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T11:34:26Z",
+      "side": 1,
+      "message": "For small scope variable names like this we conventionally use single-character variable names. For features we typically use f. It makes code look cleaner and easier to scan without loss of the ability to comprehend the code.\n\nAlso, contrary to popular believe, it is less common in Go to use contractions of names. Except for some common ones, like ctx, idx, or some idiomatic ones that are frequently used within a code base, constructions are discouraged. For instance, I do not know what idy means. So you may as well use x or y in this case without loss of understanding the meaning.In fact, it took me a while to figure out, but it seems that this is just a map. So using `i` instead of `idy` would have been more informative in this case. \nDeviating from the convention makes it harder to read. I interpret `idy` as there must be some additional semantics I must be aware of. But it seems that it is just an index.\n\nIn other words, use full names when it helps convey semantics (e.g. when naming a variable of a generic type), but use small variable names or short names otherwise.",
+      "revId": "76adea3d3519b84e486175dc07add551b3910205",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53f7fe6c_9c41daae",
+        "filename": "internal/core/toposort/cycles_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T11:34:26Z",
+      "side": 1,
+      "message": "Line length",
+      "revId": "76adea3d3519b84e486175dc07add551b3910205",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "c643341e_551005ee",

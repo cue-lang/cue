@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "32f6226e_c486a600",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-01T10:49:19Z",
+      "side": 1,
+      "message": "Thanks very much for this CL, and apologies for the delay in review - I misread the \"Work in Progress\" status as being that it was not ready for me to look at.\n\nThis has been a really useful step forward for my understanding of the problem though, as it\u0027s forced me to think through exactly what semantics we do want here and how we might implement them in a nice way.\n\nThe crux of the issue for me, is that given a JSON Schema like this:\n\n```\n{\n    \"type\": \"object\",\n    \"properties\": {\n        \"a\": {\n            \"type\": \"boolean\"\n        }\n    }\n}\n```\n\nthe fact that it allows additional properties is fundamental to the schema.\nSo, let\u0027s say we end up defining the CUE in a package:\n\n```\npackage foo\na?: bool\n```\n\nAccording to this CL (and my prior thoughts on the matter!) we omit the ellipsis because packages are open, so the ellipsis is technically redundant.\n\n_However_, let\u0027s say someone imports the package and places it inside a definition:\n\n```\nimport \".../foo\"\n\n#fooSchema: foo\n```\n\nI think it\u0027s reasonable for a user to assume that `#fooSchema` will match exactly the same data as the original `foo` package, but that\u0027s not the case because without that \"redundant\" ellipsis, the schema is closed up and will now allow only a field named `a`.\n\nSo my current thinking is that we should retain ellipses anywhere where the schema _might_ be closed, and we\u0027ll also need `close` calls wherever the schema isn\u0027t known to be closed.\n\nSo, how about the following approach (which I think should allow you to retain substantial portions of your new astutil logic):\n\n- _always_ add an ellipsis when a struct is open\n- _always_ wrap with a `close` call when a struct is closed\n\nImplement an astutil pass that:\n- removes ellipses when there is no way that the struct can be referred to and it would otherwise be considered open\n- removes `close` calls when the struct is inside a definition (i.e. there\u0027s no way to defer to the struct without going through the definition and thereby closing it).\n- (optional) remove `close` calls where the struct is known to allow all possible members\n\nAn example of a place where an ellipsis can be removed is when it\u0027s part of an argument to `matchN`:\n\n```\nmatchN(1, [{a?: bool, ...}, {b?: string, ...}])\n```\n\ncould be simplified to:\n\n```\nmatchN(1, [{a?: bool}, {b?: string}])\n```\n\nAn example of when a `close` call could be removed is when it\u0027s part of a field inside a definition:\n\n```\n#foo: bar: close({a?: int})\n```\n\ncould be simplified to:\n\n```\n#foo: bar: a?: int\n```\n\nI _think_ this results in a more principled solution that retains correctness at each stage of the process, and makes the `astutil` function potentially useful for arbitrary generated CUE, not just the result of `encoding/jsonschema`.\n\nIdeally we might make `format.Simplify` implement this simplifying pass, so perhaps it\u0027s worth just keeping the functionality as an internal function for now (perhaps in `internal.SimplifyClosedness`) to avoid unnecessarily expanding the API.",
+      "revId": "2bc23f8e3ff63843a9752891b7ebb9df7a5dea30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3395a7f_21cce199",
+        "filename": "cue/ast/astutil/fix_closeness.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-01T10:49:19Z",
+      "side": 1,
+      "message": "I\u0027m not sure about this approach. It seems like we should be able to express the desired closedness properties using only language primitives like `...` and `close` and then this pass would remove redundant occurrences of each. So at every stage we\u0027d have valid CUE that correctly represented the schema that we\u0027re trying to define and this astutil pass would just be a simplification.",
+      "revId": "2bc23f8e3ff63843a9752891b7ebb9df7a5dea30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e497f9da_72432964",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 466,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-01T10:49:19Z",
+      "side": 1,
+      "message": "No need for this to be a state method AFAICS. I\u0027d put this as a helper function at the end of the code.",
+      "revId": "2bc23f8e3ff63843a9752891b7ebb9df7a5dea30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e330142d_4fbab465",
+        "filename": "encoding/jsonschema/testdata/txtar/contains.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-01T10:49:19Z",
+      "side": 1,
+      "message": "This is nice because it\u0027s technically more correct.",
+      "revId": "2bc23f8e3ff63843a9752891b7ebb9df7a5dea30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51b849e2_c4f40121",
+        "filename": "encoding/jsonschema/testdata/txtar/object.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-01T10:49:19Z",
+      "side": 1,
+      "message": "This is still technically incorrect, as `close` does not operate recursively, so although according to the semantics of JSON Schema, this object should only allow members with names that match the pattern, it actually allows any other field too.\n(https://cuelang.org/play/?id\u003dMVo3ZTEmtdl#w\u003dfunction\u0026i\u003dcue\u0026f\u003dexport\u0026o\u003dcue)",
+      "revId": "2bc23f8e3ff63843a9752891b7ebb9df7a5dea30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a94cddb_7c4be435",
+        "filename": "encoding/jsonschema/testdata/txtar/unsupported.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-01T10:49:19Z",
+      "side": 1,
+      "message": "This is still redundant.",
+      "revId": "2bc23f8e3ff63843a9752891b7ebb9df7a5dea30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

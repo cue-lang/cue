@@ -139,7 +139,7 @@ func (sel Selector) String() string {
 }
 
 // Unquoted returns the unquoted value of a string label.
-// It panics unless sel.LabelType is StringLabel and has a concrete name.
+// It panics unless [Selector.LabelType] is [StringLabel] and has a concrete name.
 func (sel Selector) Unquoted() string {
 	if sel.LabelType() != StringLabel ||
 		sel.ConstraintType() >= PatternConstraint {
@@ -197,8 +197,8 @@ func (sel Selector) PkgPath() string {
 	return s.pkg
 }
 
-// Index returns the index of the selector. It panics
-// unless sel.Type is IndexLabel.
+// Index returns the index of the selector.
+// It panics unless [Selector.Type] is [IndexLabel].
 func (sel Selector) Index() int {
 	// Note that lists will eventually have constraint types too,
 	// and in that case sel.sel would be of type constraintSelector,
@@ -211,7 +211,6 @@ func (sel Selector) Index() int {
 }
 
 var (
-
 	// AnyDefinition is a [Selector] which can be used to ask for any definition.
 	//
 	// In paths it is used to select constraints that apply to all elements.

@@ -23,7 +23,7 @@ import (
 	"cuelang.org/go/internal/core/runtime"
 )
 
-// An InstanceOrValue is implemented by [Value] and *[Instance].
+// An InstanceOrValue is implemented by [Value] and [*Instance].
 //
 // This is a placeholder type that is used to allow Instance-based APIs to
 // transition to Value-based APIs. The goals is to get rid of the Instance

@@ -115,10 +115,10 @@ func (c *Context) parseOptions(options []BuildOption) (cfg runtime.Config) {
 	return cfg
 }
 
-// BuildInstance creates a Value from the given build.Instance.
+// BuildInstance creates a value from the given instance.
 //
-// The returned Value will represent an error, accessible through Err, if any
-// error occurred.
+// The returned [Value] will represent an error, accessible through [Value.Err],
+// if any error occurred.
 func (c *Context) BuildInstance(i *build.Instance, options ...BuildOption) Value {
 	cfg := c.parseOptions(options)
 	v, err := c.runtime().Build(&cfg, i)
@@ -136,7 +136,7 @@ func (c *Context) makeError(err errors.Error) Value {
 	return c.make(node)
 }
 
-// BuildInstances creates a Value for each of the given instances and reports
+// BuildInstances creates a value for each of the given instances and reports
 // the combined errors or nil if there were no errors.
 func (c *Context) BuildInstances(instances []*build.Instance) ([]Value, error) {
 	var errs errors.Error
@@ -155,8 +155,8 @@ func (c *Context) BuildInstances(instances []*build.Instance) ([]Value, error) {
 
 // BuildFile creates a Value from f.
 //
-// The returned Value will represent an error, accessible through Err, if any
-// error occurred.
+// The returned [Value] will represent an error, accessible through [Value.Err],
+// if any error occurred.
 func (c *Context) BuildFile(f *ast.File, options ...BuildOption) Value {
 	cfg := c.parseOptions(options)
 	return c.compile(c.runtime().CompileFile(&cfg, f))
@@ -171,8 +171,8 @@ func (c *Context) compile(v *adt.Vertex, p *build.Instance) Value {
 
 // BuildExpr creates a Value from x.
 //
-// The returned Value will represent an error, accessible through Err, if any
-// error occurred.
+// The returned [Value] will represent an error, accessible through [Value.Err],
+// if any error occurred.
 func (c *Context) BuildExpr(x ast.Expr, options ...BuildOption) Value {
 	r := c.runtime()
 	cfg := c.parseOptions(options)
@@ -214,8 +214,8 @@ const anonymousPkg = "_"
 
 // CompileString parses and build a Value from the given source string.
 //
-// The returned Value will represent an error, accessible through Err, if any
-// error occurred.
+// The returned [Value] will represent an error, accessible through [Value.Err],
+// if any error occurred.
 func (c *Context) CompileString(src string, options ...BuildOption) Value {
 	cfg := c.parseOptions(options)
 	return c.compile(c.runtime().Compile(&cfg, src))
@@ -223,8 +223,8 @@ func (c *Context) CompileString(src string, options ...BuildOption) Value {
 
 // CompileBytes parses and build a Value from the given source bytes.
 //
-// The returned Value will represent an error, accessible through Err, if any
-// error occurred.
+// The returned [Value] will represent an error, accessible through [Value.Err],
+// if any error occurred.
 func (c *Context) CompileBytes(b []byte, options ...BuildOption) Value {
 	cfg := c.parseOptions(options)
 	return c.compile(c.runtime().Compile(&cfg, b))
@@ -255,7 +255,7 @@ func (c *Context) make(v *adt.Vertex) Value {
 }
 
 // An EncodeOption defines options for the various encoding-related methods of
-// Context.
+// [Context].
 type EncodeOption func(*encodeOptions)
 
 type encodeOptions struct {
@@ -277,8 +277,8 @@ func NilIsAny(isAny bool) EncodeOption {
 
 // Encode converts a Go value to a CUE value.
 //
-// The returned Value will represent an error, accessible through Err, if any
-// error occurred.
+// The returned [Value] will represent an error, accessible through [Value.Err],
+// if any error occurred.
 //
 // Encode traverses the value v recursively. If an encountered value implements
 // the json.Marshaler interface and is not a nil pointer, Encode calls its
@@ -377,8 +377,8 @@ func (c *Context) Encode(x interface{}, option ...EncodeOption) Value {
 
 // Encode converts a Go type to a CUE value.
 //
-// The returned Value will represent an error, accessible through Err, if any
-// error occurred.
+// The returned [Value] will represent an error, accessible through [Value.Err],
+// if any error occurred.
 func (c *Context) EncodeType(x interface{}, option ...EncodeOption) Value {
 	switch v := x.(type) {
 	case *adt.Vertex:

@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb32df47_45b48264",
+        "filename": "internal/core/export/toposort.go",
+        "patchSetId": 23
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-01T13:55:56Z",
+      "side": 1,
+      "message": "Ah, got it. As per discussion.",
+      "parentUuid": "f5465e2c_ec7f4eb0",
+      "revId": "ad7fdafa65f1e8e201c53e0e2f54c53b7ca5d7b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c766f81c_f6403a4f",

@@ -46,7 +46,7 @@ import "list"
 
 @jsonschema(schema="http://json-schema.org/draft-07/schema#")
 foo?: [...string]
-tuple?: [string, int, 2]
+tuple?: [string, int, 2, ...]
 has?: list.MatchN(>=1, 3)
 too?: list.MatchN(>=1, string)
 size?: list.UniqueItems() & list.MaxItems(9) & [_, _, _, ...]

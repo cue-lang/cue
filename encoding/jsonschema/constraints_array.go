@@ -25,19 +25,37 @@ import (
 // Array constraints
 
 func constraintAdditionalItems(key string, n cue.Value, s *state) {
+	var elem ast.Expr
 	switch n.Kind() {
 	case cue.BoolKind:
-		// TODO: support
-
+		// Boolean values are supported even in earlier
+		// versions that did not support boolean schemas otherwise.
+		elem = boolSchema(s.boolValue(n))
 	case cue.StructKind:
-		if s.list != nil {
-			elem := s.schema(n)
-			s.list.Elts = append(s.list.Elts, &ast.Ellipsis{Type: elem})
-		}
-
+		elem = s.schema(n)
 	default:
 		s.errf(n, `value of "additionalItems" must be an object or boolean`)
 	}
+	if s.list == nil || !s.listItemsIsArray {
+		// If there's no "items" keyword or its value is not an array "additionalItems" doesn't apply.
+		return
+	}
+	if len(s.list.Elts) == 0 {
+		// Should never happen because "items" always adds an ellipsis
+		panic("no elements in list")
+	}
+	last := s.list.Elts[len(s.list.Elts)-1].(*ast.Ellipsis)
+	if _, isBottom := elem.(*ast.BottomLit); isBottom {
+		// No additional elements allowed. Remove the ellipsis.
+		s.list.Elts = s.list.Elts[:len(s.list.Elts)-1]
+		return
+	}
+	if isAny(elem) {
+		// Nothing to do: there's already an ellipsis in place that
+		// allows anything.
+		return
+	}
+	last.Type = elem
 }
 
 func constraintMinContains(key string, n cue.Value, s *state) {
@@ -84,24 +102,35 @@ func constraintContains(key string, n cue.Value, s *state) {
 
 func constraintItems(key string, n cue.Value, s *state) {
 	switch n.Kind() {
-	case cue.StructKind:
+	case cue.StructKind, cue.BoolKind:
 		elem := s.schema(n)
 		ast.SetRelPos(elem, token.NoRelPos)
 		s.add(n, arrayType, ast.NewList(&ast.Ellipsis{Type: elem}))
 
 	case cue.ListKind:
-		var a []ast.Expr
-		for _, n := range s.listItems("items", n, true) {
-			v := s.schema(n) // TODO: label with number literal.
-			ast.SetRelPos(v, token.NoRelPos)
-			a = append(a, v)
+		if !vto(VersionDraft2019_09).contains(s.schemaVersion) {
+			// The list form is only supported up to 2019-09
+			s.errf(n, `from version %v onwards, the value of "items" must be an object or a boolean`, VersionDraft2020_12)
+			return
 		}
-		s.list = ast.NewList(a...)
-		s.add(n, arrayType, s.list)
-
-	default:
-		s.errf(n, `value of "items" must be an object or array`)
+		s.listItemsIsArray = true
+		constraintPrefixItems(key, n, s)
 	}
+}
+
+func constraintPrefixItems(key string, n cue.Value, s *state) {
+	if n.Kind() != cue.ListKind {
+		s.errf(n, `value of "prefixItems" must be an array`)
+	}
+	var a []ast.Expr
+	for _, n := range s.listItems(key, n, true) {
+		v := s.schema(n) // TODO: label with number literal.
+		ast.SetRelPos(v, token.NoRelPos)
+		a = append(a, v)
+	}
+	s.list = ast.NewList(a...)
+	s.list.Elts = append(s.list.Elts, &ast.Ellipsis{})
+	s.add(n, arrayType, s.list)
 }
 
 func constraintMaxItems(key string, n cue.Value, s *state) {

@@ -48,10 +48,6 @@
 			"$schema": "https://json-schema.org/draft/2020-12/schema",
 			"items": true
 		},
-		"skip": {
-			"v2": "extract error: value of \"items\" must be an object or array",
-			"v3": "extract error: value of \"items\" must be an object or array"
-		},
 		"tests": [
 			{
 				"description": "any array is valid",
@@ -60,20 +56,12 @@
 					"foo",
 					true
 				],
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "empty array is valid",
 				"data": [],
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -83,10 +71,6 @@
 			"$schema": "https://json-schema.org/draft/2020-12/schema",
 			"items": false
 		},
-		"skip": {
-			"v2": "extract error: value of \"items\" must be an object or array",
-			"v3": "extract error: value of \"items\" must be an object or array"
-		},
 		"tests": [
 			{
 				"description": "any non-empty array is invalid",
@@ -95,20 +79,12 @@
 					"foo",
 					true
 				],
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "empty array is valid",
 				"data": [],
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -151,8 +127,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: keyword \"prefixItems\" not yet implemented (and 3 more errors)",
-			"v3": "extract error: keyword \"prefixItems\" not yet implemented (and 3 more errors)"
+			"v2": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:4:12\n",
+			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:4:12\n"
 		},
 		"tests": [
 			{
@@ -479,18 +455,14 @@
 			],
 			"items": false
 		},
-		"skip": {
-			"v2": "extract error: keyword \"prefixItems\" not yet implemented (and 1 more errors)",
-			"v3": "extract error: keyword \"prefixItems\" not yet implemented (and 1 more errors)"
-		},
 		"tests": [
 			{
 				"description": "empty array",
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "5 errors in empty disjunction:\nconflicting values [] and {...} (mismatched types list and struct):\n    generated.cue:2:1\n    generated.cue:2:61\n    instance.json:1:1\nconflicting values bool and [] (mismatched types bool and list):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and [] (mismatched types null and list):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and [] (mismatched types number and list):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and [] (mismatched types string and list):\n    generated.cue:2:24\n    instance.json:1:1\n",
+					"v3": "conflicting values [] and {...} (mismatched types list and struct):\n    generated.cue:2:61\n    instance.json:1:1\nconflicting values bool and [] (mismatched types bool and list):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and [] (mismatched types null and list):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and [] (mismatched types number and list):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and [] (mismatched types string and list):\n    generated.cue:2:24\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:2:54\nincompatible list lengths (0 and 3):\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -500,8 +472,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "5 errors in empty disjunction:\nconflicting values [1] and {...} (mismatched types list and struct):\n    generated.cue:2:1\n    generated.cue:2:61\n    instance.json:1:1\nconflicting values bool and [1] (mismatched types bool and list):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and [1] (mismatched types null and list):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and [1] (mismatched types number and list):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and [1] (mismatched types string and list):\n    generated.cue:2:24\n    instance.json:1:1\n",
+					"v3": "conflicting values [1] and {...} (mismatched types list and struct):\n    generated.cue:2:61\n    instance.json:1:1\nconflicting values bool and [1] (mismatched types bool and list):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and [1] (mismatched types null and list):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and [1] (mismatched types number and list):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and [1] (mismatched types string and list):\n    generated.cue:2:24\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:2:54\nincompatible list lengths (1 and 3):\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -512,8 +484,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "5 errors in empty disjunction:\nconflicting values [1,2] and {...} (mismatched types list and struct):\n    generated.cue:2:1\n    generated.cue:2:61\n    instance.json:1:1\nconflicting values bool and [1,2] (mismatched types bool and list):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and [1,2] (mismatched types null and list):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and [1,2] (mismatched types number and list):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and [1,2] (mismatched types string and list):\n    generated.cue:2:24\n    instance.json:1:1\n",
+					"v3": "conflicting values [1,2] and {...} (mismatched types list and struct):\n    generated.cue:2:61\n    instance.json:1:1\nconflicting values bool and [1,2] (mismatched types bool and list):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and [1,2] (mismatched types null and list):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and [1,2] (mismatched types number and list):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and [1,2] (mismatched types string and list):\n    generated.cue:2:24\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:2:54\nincompatible list lengths (2 and 3):\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -525,8 +497,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "6 errors in empty disjunction:\nconflicting values [1,2,3] and {...} (mismatched types list and struct):\n    generated.cue:2:1\n    generated.cue:2:61\n    instance.json:1:1\nconflicting values bool and [1,2,3] (mismatched types bool and list):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and [1,2,3] (mismatched types null and list):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and [1,2,3] (mismatched types number and list):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and [1,2,3] (mismatched types string and list):\n    generated.cue:2:24\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:2:54\n",
+					"v3": "conflicting values [1,2,3] and {...} (mismatched types list and struct):\n    generated.cue:2:61\n    instance.json:1:1\nconflicting values bool and [1,2,3] (mismatched types bool and list):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and [1,2,3] (mismatched types null and list):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and [1,2,3] (mismatched types number and list):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and [1,2,3] (mismatched types string and list):\n    generated.cue:2:24\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:2:54\n"
 				}
 			},
 			{
@@ -537,11 +509,7 @@
 					3,
 					4
 				],
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -562,10 +530,6 @@
 				"minimum": 5
 			}
 		},
-		"skip": {
-			"v2": "extract error: keyword \"prefixItems\" not yet implemented",
-			"v3": "extract error: keyword \"prefixItems\" not yet implemented"
-		},
 		"tests": [
 			{
 				"description": "prefixItems in allOf does not constrain items, invalid case",
@@ -573,11 +537,7 @@
 					3,
 					5
 				],
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "prefixItems in allOf does not constrain items, valid case",
@@ -585,11 +545,7 @@
 					5,
 					5
 				],
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -606,10 +562,6 @@
 				"type": "integer"
 			}
 		},
-		"skip": {
-			"v2": "extract error: keyword \"prefixItems\" not yet implemented",
-			"v3": "extract error: keyword \"prefixItems\" not yet implemented"
-		},
 		"tests": [
 			{
 				"description": "valid items",
@@ -620,8 +572,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "6 errors in empty disjunction:\nconflicting values [\"x\",2,3] and {...} (mismatched types list and struct):\n    generated.cue:2:1\n    generated.cue:2:60\n    instance.json:1:1\nconflicting values bool and [\"x\",2,3] (mismatched types bool and list):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and [\"x\",2,3] (mismatched types null and list):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and [\"x\",2,3] (mismatched types number and list):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and [\"x\",2,3] (mismatched types string and list):\n    generated.cue:2:24\n    instance.json:1:1\n0: conflicting values \"x\" and int (mismatched types string and int):\n    generated.cue:2:1\n    generated.cue:2:50\n    generated.cue:2:53\n    instance.json:1:2\n",
+					"v3": "conflicting values [\"x\",2,3] and {...} (mismatched types list and struct):\n    generated.cue:2:60\n    instance.json:1:1\nconflicting values bool and [\"x\",2,3] (mismatched types bool and list):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and [\"x\",2,3] (mismatched types null and list):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and [\"x\",2,3] (mismatched types number and list):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and [\"x\",2,3] (mismatched types string and list):\n    generated.cue:2:24\n    instance.json:1:1\n0: conflicting values string and int (mismatched types string and int):\n    generated.cue:2:34\n    generated.cue:2:53\n"
 				}
 			},
 			{
@@ -630,11 +582,7 @@
 					"x",
 					"y"
 				],
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -647,10 +595,6 @@
 			],
 			"items": false
 		},
-		"skip": {
-			"v2": "extract error: keyword \"prefixItems\" not yet implemented (and 1 more errors)",
-			"v3": "extract error: keyword \"prefixItems\" not yet implemented (and 1 more errors)"
-		},
 		"tests": [
 			{
 				"description": "heterogeneous invalid instance",
@@ -659,11 +603,7 @@
 					"bar",
 					37
 				],
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "valid instance",
@@ -672,8 +612,8 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
+					"v2": "6 errors in empty disjunction:\nconflicting values [null] and {...} (mismatched types list and struct):\n    generated.cue:2:1\n    generated.cue:2:55\n    instance.json:1:1\nconflicting values bool and [null] (mismatched types bool and list):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and [null] (mismatched types null and list):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and [null] (mismatched types number and list):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and [null] (mismatched types string and list):\n    generated.cue:2:24\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:2:48\n",
+					"v3": "conflicting values [null] and {...} (mismatched types list and struct):\n    generated.cue:2:55\n    instance.json:1:1\nconflicting values bool and [null] (mismatched types bool and list):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and [null] (mismatched types null and list):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and [null] (mismatched types number and list):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and [null] (mismatched types string and list):\n    generated.cue:2:24\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:2:48\n"
 				}
 			}
 		]

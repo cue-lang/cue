@@ -109,8 +109,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: keyword \"prefixItems\" not yet implemented",
-			"v3": "extract error: keyword \"prefixItems\" not yet implemented"
+			"v2": "extract error: cannot compile resulting schema: reference \"prefixItems\" not found:\n    generated.cue:2:39\n",
+			"v3": "extract error: cannot compile resulting schema: reference \"prefixItems\" not found:\n    generated.cue:2:39\n"
 		},
 		"tests": [
 			{

@@ -13,6 +13,13 @@ type runConfig struct {
 	editor  fake.EditorConfig
 	sandbox fake.SandboxConfig
 	modes   Mode
+
+	// initializeError is set to a non-empty string if it is expected that
+	// creating a new fake editor will fail with an error during the Initialize
+	// sequence of the LSP protocol.
+	//
+	// TODO(myitcv): is there a better place for this?
+	initializeError string
 }
 
 func defaultConfig() runConfig {
@@ -107,6 +114,15 @@ func WorkspaceFolders(relFolders ...string) RunOption {
 
 	return optionSetter(func(opts *runConfig) {
 		opts.editor.WorkspaceFolders = relFolders
+	})
+}
+
+// The InitializeError RunOption establishes the expectation that creating a
+// new fake editor (happens as part of Run) will fail with the non-empty error
+// string err.
+func InitializeError(err string) RunOption {
+	return optionSetter(func(opts *runConfig) {
+		opts.initializeError = err
 	})
 }
 

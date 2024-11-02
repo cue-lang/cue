@@ -102,9 +102,6 @@ func (s *Session) Cache() *Cache {
 	return s.cache
 }
 
-// TODO(rfindley): is the logic surrounding this error actually necessary?
-var ErrViewExists = errors.New("view already exists for session")
-
 // NewView creates a new View, returning it and its first snapshot. If a
 // non-empty tempWorkspace directory is provided, the View will record a copy
 // of its gopls workspace module in that directory, so that client tooling
@@ -114,16 +111,9 @@ func (s *Session) NewView(ctx context.Context, folder *Folder) (*View, *Snapshot
 	s.viewMu.Lock()
 	defer s.viewMu.Unlock()
 
-	// Querying the file system to check whether
-	// two folders denote the same existing directory.
-	if inode1, err := os.Stat(filepath.FromSlash(folder.Dir.Path())); err == nil {
-		for _, view := range s.views {
-			inode2, err := os.Stat(filepath.FromSlash(view.folder.Dir.Path()))
-			if err == nil && os.SameFile(inode1, inode2) {
-				return nil, nil, nil, ErrViewExists
-			}
-		}
-	}
+	// TODO(myitcv): when we shift to support multiple WorkspaceFolders, we
+	// might need to introduce logic here that determines if we have an existing
+	// view for a WorkspaceFolder we are adding.
 
 	def, err := defineView(ctx, s, folder, nil)
 	if err != nil {

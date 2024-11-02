@@ -31,6 +31,7 @@ import (
 	"cuelang.org/go/internal/golangorgx/tools/memoize"
 	"cuelang.org/go/internal/golangorgx/tools/testenv"
 	"cuelang.org/go/internal/golangorgx/tools/xcontext"
+	"github.com/go-quicktest/qt"
 )
 
 // Mode is a bitmask that defines for which execution modes a test should run.
@@ -220,9 +221,17 @@ func (r *Runner) Run(t *testing.T, files string, test TestFunc, opts ...RunOptio
 			awaiter := NewAwaiter(sandbox.Workdir)
 			const skipApplyEdits = false
 			editor, err := fake.NewEditor(sandbox, config.editor).Connect(ctx, ts, awaiter.Hooks(), skipApplyEdits)
-			if err != nil {
-				t.Fatal(err)
+
+			// Were we expecting an error?
+			if config.initializeError != "" {
+				qt.Assert(t, qt.ErrorMatches(err, config.initializeError))
+				// at this point we are done
+				return
+
+			} else {
+				qt.Assert(t, qt.IsNil(err))
 			}
+
 			env := &Env{
 				T:       t,
 				Ctx:     ctx,

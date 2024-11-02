@@ -103,9 +103,9 @@ func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, filename string, s *ex
 		// to the generated schema.
 		b, err := format.Node(schemaAST, format.Simplify())
 		qt.Assert(t, qt.IsNil(err))
+		t.Logf("extracted schema: %q", b)
 		schemaValue = ctx.CompileBytes(b, cue.Filename("generated.cue"))
 		if err := schemaValue.Err(); err != nil {
-			t.Logf("extracted schema: %q", b)
 			extractErr = fmt.Errorf("cannot compile resulting schema: %v", errors.Details(err, nil))
 		}
 	}
@@ -208,7 +208,7 @@ func testName(s string) string {
 // skip field pointed to by skipField if necessary.
 func testFailed(t *testing.T, m *cuetdtest.M, skipField *externaltest.Skip, p positioner, errStr string) {
 	if cuetest.UpdateGoldenFiles {
-		if *skipField == nil && cuetest.ForceUpdateGoldenFiles {
+		if *skipField == nil && !cuetest.ForceUpdateGoldenFiles {
 			t.Fatalf("test regression; was succeeding, now failing: %v", errStr)
 		}
 		if *skipField == nil {

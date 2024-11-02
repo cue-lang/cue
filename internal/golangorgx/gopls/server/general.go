@@ -71,6 +71,21 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 	}
 	options.ForClientCapabilities(params.ClientInfo, params.Capabilities)
 
+	// An LSP WorkspaceFolder corresponds to a Session View. For now, we only
+	// want to support a single WorkspaceFolder, to avoid any complex logic of
+	// View handling. Therefore, error in case we get anything other than a
+	// single WorkspaceFolder during Initialize. Also error when handling
+	// didChangeWorkspaceFolders in case that state changes. We can then
+	// prioritise work to support different clients etc based on bug reports.
+	//
+	// Ensure this logic is consistent with [server.DidChangeWorkspaceFolders].
+	//
+	// Note that (for now) we do not support a fallback to params.RootURI. We
+	// might do this in the future.
+	if l := len(params.WorkspaceFolders); l != 1 {
+		return nil, fmt.Errorf("got %d WorkspaceFolders; expected 1", l)
+	}
+
 	folders := params.WorkspaceFolders
 	for _, folder := range folders {
 		if folder.URI == "" {
@@ -100,6 +115,12 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 					IncludeText: false,
 				},
 			},
+
+			// Even though we don't support this for now, it's worth having the
+			// feature enabled to that users run into the error of it not being
+			// supported. It's a more obvious signal that the feature isn't
+			// supported (yet), and a clear action to raise an issue if this is
+			// something that they need.
 			Workspace: &protocol.WorkspaceOptions{
 				WorkspaceFolders: &protocol.WorkspaceFolders5Gn{
 					Supported:           true,

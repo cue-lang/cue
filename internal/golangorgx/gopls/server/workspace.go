@@ -15,21 +15,26 @@ import (
 )
 
 func (s *server) DidChangeWorkspaceFolders(ctx context.Context, params *protocol.DidChangeWorkspaceFoldersParams) error {
-	for _, folder := range params.Event.Removed {
-		dir, err := protocol.ParseDocumentURI(folder.URI)
-		if err != nil {
-			return fmt.Errorf("invalid folder %q: %v", folder.URI, err)
-		}
-		if !s.session.RemoveView(dir) {
-			return fmt.Errorf("view %q for %v not found", folder.Name, folder.URI)
-		}
-	}
-	s.addFolders(ctx, params.Event.Added)
-	return nil
+	// Per the comment in [server.Initialize], we only support a single
+	// WorkspaceFolder for now. More precisely, the call to Initialize must have
+	// a single WorkspaceFolder. Therefore a notification via
+	// DidChangeWorkspaceFolders must not cause that folder to change (because
+	// that is the invariant we are maintaining for now).
+	//
+	// So for now we simply error in case there is any DidChangeWorkspaceFolders
+	// notification, rather than trying to be smart and work out "has the folder
+	// change?". If this proves to be too simplistic or restrictive, then we can
+	// revisit as part of removing this constraint.
+	//
+	// When we do add such support, we need to be how/if/where logic for
+	// deduping views comes in.
+	//
+	// Ensure this logic is consistent with [server.Initialize].
+	return fmt.Errorf("cue lsp only supports a single WorkspaceFolder for now")
 }
 
-// addView returns a Snapshot and a release function that must be
-// called when it is no longer needed.
+// addView returns a Snapshot and a release function that must be called when
+// the snapshot is no longer needed.
 func (s *server) addView(ctx context.Context, name string, dir protocol.DocumentURI) (*cache.Snapshot, func(), error) {
 	s.stateMu.Lock()
 	state := s.state

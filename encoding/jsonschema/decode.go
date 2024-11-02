@@ -444,6 +444,17 @@ type state struct {
 	patterns    []ast.Expr
 
 	list *ast.ListLit
+
+	// listItemsIsArray keeps track of whether the
+	// value of the "items" keyword is an array.
+	// Without this, we can't distinguish between
+	//
+	//	"items": true
+	//
+	// and
+	//
+	//	"items": []
+	listItemsIsArray bool
 }
 
 type label struct {
@@ -700,10 +711,7 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind, idRef []label) (ast.Ex
 	if n.Kind() == cue.BoolKind {
 		if vfrom(VersionDraft6).contains(s.schemaVersion) {
 			// From draft6 onwards, boolean values signify a schema that always passes or fails.
-			if s.boolValue(n) {
-				return top(), s
-			}
-			return bottom(), s
+			return boolSchema(s.boolValue(n)), s
 		}
 		return s.errf(n, "boolean schemas not supported in %v", s.schemaVersion), s
 	}
@@ -859,6 +867,13 @@ func bottom() ast.Expr {
 
 func top() ast.Expr {
 	return ast.NewIdent("_")
+}
+
+func boolSchema(ok bool) ast.Expr {
+	if ok {
+		return top()
+	}
+	return bottom()
 }
 
 func isAny(s ast.Expr) bool {

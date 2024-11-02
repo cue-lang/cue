@@ -17,10 +17,10 @@ func TestMain(m *testing.M) {
 
 func TestFormatFile(t *testing.T) {
 	const files = `
--- go.mod --
-module mod.com
+-- cue.mod/module.cue --
+module: "mod.example"
 
-go 1.12
+language: version: "v0.10.0"
 -- foo.cue --
 package foo
 

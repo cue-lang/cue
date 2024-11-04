@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "659316bc_56171522",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 23
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-11-04T15:07:37Z",
+      "side": 1,
+      "message": "Oh, do you mean with an Option? Could do, though it wouldn\u0027t necessarily need to be in this stack?",
+      "parentUuid": "ba8d2052_2bee843f",
+      "revId": "ad7fdafa65f1e8e201c53e0e2f54c53b7ca5d7b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f5465e2c_ec7f4eb0",
         "filename": "internal/core/export/toposort.go",
         "patchSetId": 23
@@ -66,6 +84,24 @@
       "writtenOn": "2024-11-01T12:59:01Z",
       "side": 1,
       "message": "I\u0027m fine leaving this as is, but just an example how single letters can be more informative than words: within this context it is quote obvious that label is a label.The scope is small enough to not lose that context. However, using an idiomatic `s` for string or `f` for Feature would have made it clear what type the label is, which can be useful information in certain contexts.",
+      "revId": "ad7fdafa65f1e8e201c53e0e2f54c53b7ca5d7b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c706743_7a50f3b5",
+        "filename": "internal/core/export/toposort.go",
+        "patchSetId": 23
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-11-04T15:07:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c766f81c_f6403a4f",
       "revId": "ad7fdafa65f1e8e201c53e0e2f54c53b7ca5d7b4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

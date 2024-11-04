@@ -107,6 +107,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b67c4290_97dcec62",
+        "filename": "cue/syntax_test.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-11-04T17:44:22Z",
+      "side": 1,
+      "message": "Ah found it. It\u0027s because of the use of CompileString without a filename option. It means there is no implicit ordering because there are no files. I would bet money the openapi issue is the same.",
+      "parentUuid": "6ee94582_c421b674",
+      "revId": "7a4be02fdb2af86953658a12cd546930cf01c84c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b0aa2a44_75a7959a",
         "filename": "encoding/openapi/testdata/openapi-norefs.json",
         "patchSetId": 17

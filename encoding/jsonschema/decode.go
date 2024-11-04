@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"math"
 	"net/url"
+	"regexp"
 	"regexp/syntax"
 	"sort"
 	"strconv"
@@ -832,21 +833,27 @@ func (s *state) listItems(name string, n cue.Value, allowEmpty bool) (a []cue.Va
 	return a
 }
 
-// excludeFields returns a CUE expression that can be used to exclude the
+// excludeFields returns either an empty slice (if decls is empty)
+// or a slice containing a CUE expression that can be used to exclude the
 // fields of the given declaration in a label expression. For instance, for
 //
 //	{ foo: 1, bar: int }
 //
-// it creates
+// it creates a slice holding the expression
 //
-//	"^(foo|bar)$"
+//	!~ "^(foo|bar)$"
 //
 // which can be used in a label expression to define types for all fields but
 // those existing:
 //
 //	[!~"^(foo|bar)$"]: string
-func excludeFields(decls []ast.Decl) ast.Expr {
-	var a []string
+func excludeFields(decls []ast.Decl) []ast.Expr {
+	if len(decls) == 0 {
+		return nil
+	}
+	var buf strings.Builder
+	first := true
+	buf.WriteString("^(")
 	for _, d := range decls {
 		f, ok := d.(*ast.Field)
 		if !ok {
@@ -854,11 +861,17 @@ func excludeFields(decls []ast.Decl) ast.Expr {
 		}
 		str, _, _ := ast.LabelName(f.Label)
 		if str != "" {
-			a = append(a, str)
+			if !first {
+				buf.WriteByte('|')
+			}
+			buf.WriteString(regexp.QuoteMeta(str))
+			first = false
 		}
 	}
-	re := fmt.Sprintf("^(%s)$", strings.Join(a, "|"))
-	return &ast.UnaryExpr{Op: token.NMAT, X: ast.NewString(re)}
+	buf.WriteString(")$")
+	return []ast.Expr{
+		&ast.UnaryExpr{Op: token.NMAT, X: ast.NewString(buf.String())},
+	}
 }
 
 func bottom() ast.Expr {

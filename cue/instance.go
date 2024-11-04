@@ -245,6 +245,9 @@ func (inst *hiddenInstance) Build(p *build.Instance) *Instance {
 	cfg := &compile.Config{Scope: valueScope(Value{idx: r, v: inst.root})}
 	v, err := compile.Files(cfg, r, p.ID(), p.Files...)
 
+	// Just like [runtime.Runtime.Build], ensure that the @embed compiler is run as needed.
+	err = errors.Append(err, r.InjectImplementations(p, v))
+
 	v.AddConjunct(adt.MakeRootConjunct(nil, inst.root))
 
 	i := newInstance(idx, p, v)

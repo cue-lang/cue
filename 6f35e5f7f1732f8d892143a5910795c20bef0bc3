@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31d2cc01_cbe676dc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-04T17:23:06Z",
+      "side": 1,
+      "message": "Your reasoning in general SGTM, and the majority of test changes look like improvements, although a few do lose a bit of useful context.\n\nDid you consider including the source when it\u0027s very short (say, under 10 or 20 characters), and otherwise omitting it or using an ellipsis to cut it short? That might be a nice enough tradeoff to avoid huge verbosity, which I have also seen with the huge matchN expressions in github-wofkrlows, and I agree is a big issue.\n\nI\u0027ll leave to @mpvl@gmail.com to approve given this is more of a UX decision that we should be on the same page on.",
+      "revId": "6f35e5f7f1732f8d892143a5910795c20bef0bc3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ae299d62_929b82dd",
+        "filename": "cmd/cue/cmd/testdata/script/export_issue3511.txtar",
+        "patchSetId": 17
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-11-04T15:57:55Z",
+      "side": 1,
+      "message": "Indeed it is - if you swap lines 21 and 23, then it switches back to the original.\n\nFor the inner struct, it\u0027s walking the resolution of each field backwards to find that `namespace` is from line 21, and `name` is from line 23 (in the same file), and it does treat them as an implicit unification. It\u0027s definitely not an explicit unification, so if you want it to not be implicit, then we\u0027d have to introduce some criteria to ignore this.\n\nEssentially, it doesn\u0027t know (or care) that `{namespace: Namespace}` is being used as a constraint on every element of the list.",
+      "parentUuid": "dc748959_c6ed7701",
+      "revId": "7a4be02fdb2af86953658a12cd546930cf01c84c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9cad68e7_60994921",
         "filename": "cue/load/testdata/testfetch/simple.txtar",
         "patchSetId": 17
@@ -71,6 +89,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6ee94582_c421b674",
+        "filename": "cue/syntax_test.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-11-04T15:57:55Z",
+      "side": 1,
+      "message": "Right, I spent quite some time figuring this one out. In this test, it seems we don\u0027t actually evaluate anything and so the Vertex\u0027s structs are empty (IIRC). If I take this test case, put it in a file, and `cue eval` it then the output matches the original (i.e. spec, then incomplete, then recursive).",
+      "parentUuid": "f556a2af_16e54e73",
+      "revId": "7a4be02fdb2af86953658a12cd546930cf01c84c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b0aa2a44_75a7959a",
         "filename": "encoding/openapi/testdata/openapi-norefs.json",
         "patchSetId": 17
@@ -88,6 +124,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "749a37cb_5d1a81de",
+        "filename": "encoding/openapi/testdata/openapi-norefs.json",
+        "patchSetId": 17
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-11-04T15:57:55Z",
+      "side": 1,
+      "message": "Here\u0027s the debug output for this properties struct:\n\n```\n*** V (properties 2097 0xc000474320) ***\nself arc conjunct field 0xc0001b7280 :: *adt.Field, expr 0xc000133560 :: *adt.StructLit (\u0026{- [] - {\u003cnil\u003e} {{}}})\nself arc conjunct field 0xc0001b72c0 :: *adt.Field, expr 0xc0001335f0 :: *adt.StructLit (\u0026{- [0xc000622f80] - {\u003cnil\u003e} {{}}})\nself conjunct field 0xc0001b7300 :: *adt.Field, expr 0xc0001334d0 :: *adt.StructLit\nroots: [{0xc0004734c0 sl:0xc0001334d0 - (explicit? false; root? true)}]\nbatches: [[{0xc0004734c0 sl:0xc0001334d0 - (explicit? false; root? true)}]]\nstarting root. Explicit unification? false\n--- S 0xc0004734c0 (0xc000474320 :: *adt.Vertex) (sl: 0xc0001334d0) (explicit? false) ---\n previous: []\n filename:  (-)\n 0xc0004734c0 / 0: d (0xc0001b7280 :: *adt.Field)\n value 0xc000133560 :: *adt.StructLit (\u0026{0xc00032d4f0 [] [] [] [] [] false false true 0})\n field value source: -\n  label 1905\n    \u0026{1905 [] [] \u003cnil\u003e \u003cnil\u003e \u003cnil\u003e -1} true\n 0xc0004734c0 / 1: d (0xc0001b72c0 :: *adt.Field)\n value 0xc0001335f0 :: *adt.StructLit (\u0026{0xc000330410 [0xc0001b72a0] [{2065}] [] [] [] false false true 0})\n field value source: -\n  label 1889\n    \u0026{1889 [] [] \u003cnil\u003e \u003cnil\u003e \u003cnil\u003e -1} true\nedges: map[{1905 1889}:{}]\nscc current: 0xc0004ea5a0 \u0026{[0xc0004e28a0] [0xc0004ea550] [] true}\nscc current: 0xc0004ea550 \u0026{[0xc0004e2900] [] [0xc0004ea5a0] true}\n```\n \nI realise this isn\u0027t massively readable, but we create exactly one edge (3 lines from the bottom), and that\u0027s due to two decls within a single structlit (the `0xc0004734c0 / 0: d` and `0xc0004734c0 / 1: d` lines are within a single `--- S` block). Ultimately, I do always trust the order of the decls within a structlit. Is it not safe to do so? Should I be resorting decls by file position (though here at first glance, there seems to be no file position available)? (I have confirmed that feature 1905 is b, and 1889 is a)",
+      "parentUuid": "b0aa2a44_75a7959a",
+      "revId": "7a4be02fdb2af86953658a12cd546930cf01c84c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a6c4b3b9_c98f9ccc",
         "filename": "encoding/protobuf/textproto/testdata/encoder/enum.txtar",
         "patchSetId": 17
@@ -99,6 +153,24 @@
       "writtenOn": "2024-11-01T13:54:47Z",
       "side": 1,
       "message": "Is this as expected? It seems to me the original is correct.",
+      "revId": "7a4be02fdb2af86953658a12cd546930cf01c84c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c592cf51_cab6b8ee",
+        "filename": "encoding/protobuf/textproto/testdata/encoder/enum.txtar",
+        "patchSetId": 17
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-11-04T15:57:55Z",
+      "side": 1,
+      "message": "Hmm, this is also seems to be something to do with the evaluation mode - if I `cue eval` the input files then it works as expected. Seems likely the same as the syntax_test situation?",
+      "parentUuid": "a6c4b3b9_c98f9ccc",
       "revId": "7a4be02fdb2af86953658a12cd546930cf01c84c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -22,9 +22,14 @@
 @jsonschema(schema="http://json-schema.org/draft-07/schema#")
 "c.e"?: bool
 
-{[=~".*" & !~"^(c.e)$"]: string}
+{[=~".*" & !~"^(c\\.e)$"]: string}
 ...
--- test/field.json --
+-- test/err-field.json --
 {
     "cue": 123
 }
+-- out/decode/testerr/err-field --
+cue: conflicting values 123 and string (mismatched types int and string):
+    generated.cue:4:1
+    generated.cue:4:28
+    test/err-field.json:2:12

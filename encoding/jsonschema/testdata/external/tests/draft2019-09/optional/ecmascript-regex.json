@@ -547,7 +547,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v3": "invalid regexp: error parsing regexp: invalid character class range: `\\p{Letter}`:\n    generated.cue:3:36\n"
+					"v2": "\"l'ecole\": invalid regexp: error parsing regexp: invalid character class range: `\\p{Letter}`\n",
+					"v3": "invalid regexp: error parsing regexp: invalid character class range: `\\p{Letter}`:\n    generated.cue:3:25\n"
 				}
 			},
 			{
@@ -732,7 +733,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v3": "invalid regexp: error parsing regexp: invalid character class range: `\\p{digit}`:\n    generated.cue:3:34\n"
+					"v2": "\"42\": invalid regexp: error parsing regexp: invalid character class range: `\\p{digit}`\n",
+					"v3": "invalid regexp: error parsing regexp: invalid character class range: `\\p{digit}`:\n    generated.cue:3:23\n"
 				}
 			},
 			{

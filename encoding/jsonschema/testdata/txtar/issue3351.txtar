@@ -75,7 +75,7 @@ _schema: {
 		[string]: _schema
 	}
 	$sort?: matchN(>=1, [_schema, [...number]])
-	{[!~"^($else|$let|$sort)$"]: #["jsone-value"]}
+	{[!~"^(\\$else|\\$let|\\$sort)$"]: #["jsone-value"]}
 
 	#: "jsone-value": matchN(1, [_schema, [..._schema]])
 
@@ -92,10 +92,12 @@ diff old new
  		[string]: _schema
  	}
 -	$sort?: _schema | [...number]
-+	$sort?: matchN(>=1, [_schema, [...number]])
- 	{[!~"^($else|$let|$sort)$"]: #["jsone-value"]}
- 
+-	{[!~"^($else|$let|$sort)$"]: #["jsone-value"]}
+-
 -	#: "jsone-value": _schema | [..._schema]
++	$sort?: matchN(>=1, [_schema, [...number]])
++	{[!~"^(\\$else|\\$let|\\$sort)$"]: #["jsone-value"]}
++
 +	#: "jsone-value": matchN(1, [_schema, [..._schema]])
  
  	#: "jsone-array": [...#["jsone-value"]]
@@ -111,7 +113,7 @@ _schema: {
 		[string]: _schema
 	}
 	$sort?: matchN(>=1, [_schema, [...number]])
-	{[!~"^($else|$let|$sort)$"]: #["jsone-value"]}
+	{[!~"^(\\$else|\\$let|\\$sort)$"]: #["jsone-value"]}
 
 	#: "jsone-value": matchN(1, [_schema, [..._schema]])
 
@@ -128,10 +130,12 @@ diff old new
  		[string]: _schema
  	}
 -	$sort?: _schema | [...number]
-+	$sort?: matchN(>=1, [_schema, [...number]])
- 	{[!~"^($else|$let|$sort)$"]: #["jsone-value"]}
- 
+-	{[!~"^($else|$let|$sort)$"]: #["jsone-value"]}
+-
 -	#: "jsone-value": _schema | [..._schema]
++	$sort?: matchN(>=1, [_schema, [...number]])
++	{[!~"^(\\$else|\\$let|\\$sort)$"]: #["jsone-value"]}
++
 +	#: "jsone-value": matchN(1, [_schema, [..._schema]])
  
  	#: "jsone-array": [...#["jsone-value"]]

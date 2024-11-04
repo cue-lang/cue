@@ -36,7 +36,7 @@ missing position
 Errors:
 #test.t1.ok1: cannot call non-function fn (type _):
     ./in.cue:8:11
-validate.t1.ok1: invalid value "a: 2" (does not satisfy encoding/yaml.Validate({a!:int} | {b!:int})): error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b!:int}:
+validate.t1.ok1: invalid value "a: 2" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b!:int}:
     ./in.cue:8:11
     ./in.cue:6:9
     ./in.cue:7:16
@@ -79,7 +79,7 @@ validate: {
 	// TODO: fix this test: the second disjunct should be eliminated, so there
 	// should not be a concreteness error.
 	t1: {
-		ok1: _|_ // validate.t1.ok1: invalid value "a: 2" (does not satisfy encoding/yaml.Validate({a!:int} | {b!:int})): validate.t1.ok1: error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b!:int}
+		ok1: _|_ // validate.t1.ok1: invalid value "a: 2" (does not satisfy encoding/yaml.Validate): validate.t1.ok1: error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b!:int}
 		ok2: "a: 2"
 		ok3: "a: 2"
 	}

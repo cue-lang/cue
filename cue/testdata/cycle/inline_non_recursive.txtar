@@ -226,7 +226,7 @@ Result:
     indirect: (struct){
       #Step: (_){ _ }
       #Job: (_|_){
-        // [incomplete] select.indirect.#Job: invalid value {opt:_} (does not satisfy matchN(1, [~(#NormalJob)])): 0 matched, expected 1:
+        // [incomplete] select.indirect.#Job: invalid value {opt:_} (does not satisfy matchN): 0 matched, expected 1:
         //     ./select.cue:8:8
         //     ./select.cue:8:15
         opt: (_){ _ }
@@ -335,15 +335,6 @@ diff old new
            }
          }) }
      }
-@@ -111,7 +120,7 @@
-     indirect: (struct){
-       #Step: (_){ _ }
-       #Job: (_|_){
--        // [incomplete] select.indirect.#Job: invalid value {opt:_} (does not satisfy matchN(1, [{req!:int,opt?:{run?:string}}])): 0 matched, expected 1:
-+        // [incomplete] select.indirect.#Job: invalid value {opt:_} (does not satisfy matchN(1, [~(#NormalJob)])): 0 matched, expected 1:
-         //     ./select.cue:8:8
-         //     ./select.cue:8:15
-         opt: (_){ _ }
 -- diff/todo/p1 --
 issue1708: invalid structural cycle
 -- diff/todo/p3 --
@@ -473,7 +464,7 @@ Result:
     indirect: (struct){
       #Step: (_){ _ }
       #Job: (_|_){
-        // [incomplete] select.indirect.#Job: invalid value {opt:_} (does not satisfy matchN(1, [{req!:int,opt?:{run?:string}}])): 0 matched, expected 1:
+        // [incomplete] select.indirect.#Job: invalid value {opt:_} (does not satisfy matchN): 0 matched, expected 1:
         //     ./select.cue:8:8
         //     ./select.cue:8:15
         opt: (_){ _ }

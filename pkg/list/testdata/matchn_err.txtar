@@ -15,42 +15,42 @@ t1: {
 #TOO: {too: int}
 -- out/list --
 Errors:
-t1.l1: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN(>0, [string])): number of matched elements is 0: does not satisfy >0:
+t1.l1: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN): number of matched elements is 0: does not satisfy >0:
     ./in.cue:6:6
     ./in.cue:4:12
     ./in.cue:6:18
-t1.l2: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN(1, number)): number of matched elements is 3: does not satisfy 1:
+t1.l2: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN): number of matched elements is 3: does not satisfy 1:
     ./in.cue:7:6
     ./in.cue:4:12
     ./in.cue:7:18
     ./in.cue:7:21
-t1.l3: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN(>1, string)): number of matched elements is 1: does not satisfy >1:
+t1.l3: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN): number of matched elements is 1: does not satisfy >1:
     ./in.cue:8:6
     ./in.cue:4:12
     ./in.cue:8:18
     ./in.cue:8:22
-t1.l4: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN(0, number)): number of matched elements is 3: does not satisfy 0:
+t1.l4: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN): number of matched elements is 3: does not satisfy 0:
     ./in.cue:9:6
     ./in.cue:4:12
     ./in.cue:9:18
     ./in.cue:9:21
-t1.l5: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN(string, [int])): number of matched elements is 1: does not satisfy string:
+t1.l5: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN): number of matched elements is 1: does not satisfy string:
     ./in.cue:10:6
     ./in.cue:4:12
     ./in.cue:10:18
-t1.l6: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN(>0, {too:int})): number of matched elements is 0: does not satisfy >0:
+t1.l6: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN): number of matched elements is 0: does not satisfy >0:
     ./in.cue:11:6
     ./in.cue:4:12
     ./in.cue:11:18
 
 Result:
 t1: {
-	l1: _|_ // t1.l1: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN(>0, [string])): number of matched elements is 0: does not satisfy >0
-	l2: _|_ // t1.l2: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN(1, number)): number of matched elements is 3: does not satisfy 1
-	l3: _|_ // t1.l3: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN(>1, string)): number of matched elements is 1: does not satisfy >1
-	l4: _|_ // t1.l4: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN(0, number)): number of matched elements is 3: does not satisfy 0
-	l5: _|_ // t1.l5: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN(string, [int])): number of matched elements is 1: does not satisfy string
-	l6: _|_ // t1.l6: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN(>0, {too:int})): number of matched elements is 0: does not satisfy >0
+	l1: _|_ // t1.l1: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN): number of matched elements is 0: does not satisfy >0
+	l2: _|_ // t1.l2: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN): number of matched elements is 3: does not satisfy 1
+	l3: _|_ // t1.l3: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN): number of matched elements is 1: does not satisfy >1
+	l4: _|_ // t1.l4: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN): number of matched elements is 3: does not satisfy 0
+	l5: _|_ // t1.l5: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN): number of matched elements is 1: does not satisfy string
+	l6: _|_ // t1.l6: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN): number of matched elements is 0: does not satisfy >0
 }
 #TOO: {
 	too: int

@@ -218,71 +218,71 @@ Conjuncts:    1167
 Disjuncts:    764
 -- out/eval --
 Errors:
-match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+match.singleErr: invalid value {a:"foo"} (does not satisfy matchN): 0 matched, expected 1:
     ./in.cue:8:17
     ./in.cue:8:24
     ./in.cue:10:13
-match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+match.incompleteErr: invalid value {a:string} (does not satisfy matchN): 0 matched, expected 1:
     ./in.cue:12:21
     ./in.cue:12:28
     ./in.cue:14:17
-match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:2}])): 0 matched, expected 1:
+match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN): 0 matched, expected 1:
     ./in.cue:36:23
     ./in.cue:36:30
     ./in.cue:39:19
-match.defaults.pickNested2Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:<=2}])): 0 matched, expected 1:
+match.defaults.pickNested2Err: invalid value {a:*3 | int} (does not satisfy matchN): 0 matched, expected 1:
     ./in.cue:41:23
     ./in.cue:41:30
     ./in.cue:44:19
-not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [{a:int}])): 1 matched, expected 0:
+not.singleErr: invalid value {a:2} (does not satisfy matchN): 1 matched, expected 0:
     ./in.cue:74:17
     ./in.cue:74:24
     ./in.cue:76:13
-not.doubleErr: invalid value {a:"foo"} (does not satisfy matchN(0, [matchN(0, [#Foo])])): 1 matched, expected 0:
+not.doubleErr: invalid value {a:"foo"} (does not satisfy matchN): 1 matched, expected 0:
     ./in.cue:78:17
     ./in.cue:78:24
     ./in.cue:80:13
-oneOf.multiple1Err1: invalid value 1 (does not satisfy matchN(1, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected 1:
+oneOf.multiple1Err1: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
     ./in.cue:84:20
     ./in.cue:84:27
     ./in.cue:86:17
-oneOf.multiple1Err2: invalid value 15 (does not satisfy matchN(1, [math.MultipleOf(3),math.MultipleOf(5)])): 2 matched, expected 1:
+oneOf.multiple1Err2: invalid value 15 (does not satisfy matchN): 2 matched, expected 1:
     ./in.cue:84:20
     ./in.cue:84:27
     ./in.cue:91:17
-anyOf.multiple1Err1: invalid value 1 (does not satisfy matchN(>0, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected >0:
+anyOf.multiple1Err1: invalid value 1 (does not satisfy matchN): 0 matched, expected >0:
     ./in.cue:95:20
     ./in.cue:95:27
     ./in.cue:97:17
-allOf.multiple1Err1: invalid value 1 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected 2:
+allOf.multiple1Err1: invalid value 1 (does not satisfy matchN): 0 matched, expected 2:
     ./in.cue:106:20
     ./in.cue:106:27
     ./in.cue:108:17
-allOf.multiple1Err2: invalid value 3 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 1 matched, expected 2:
+allOf.multiple1Err2: invalid value 3 (does not satisfy matchN): 1 matched, expected 2:
     ./in.cue:106:20
     ./in.cue:106:27
     ./in.cue:109:17
-allOf.multiple1Err3: invalid value 5 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 1 matched, expected 2:
+allOf.multiple1Err3: invalid value 5 (does not satisfy matchN): 1 matched, expected 2:
     ./in.cue:106:20
     ./in.cue:106:27
     ./in.cue:110:17
-incomplete.err1.x: invalid value {bar:2} (does not satisfy matchN(1, [{bar!:string}])): 0 matched, expected 1:
+incomplete.err1.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
     ./incomplete.cue:34:6
     ./incomplete.cue:34:13
     ./incomplete.cue:35:6
-incomplete.err2.x: invalid value {bar:2} (does not satisfy matchN(0, [{bar!:int},{foo!:int}])): 1 matched, expected 0:
+incomplete.err2.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected 0:
     ./incomplete.cue:40:6
     ./incomplete.cue:40:13
     ./incomplete.cue:41:6
-incomplete.err3.x: invalid value {bar:2} (does not satisfy matchN(2, [{bar!:string},{foo!:string}])): 0 matched, expected 2:
+incomplete.err3.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 2:
     ./incomplete.cue:46:6
     ./incomplete.cue:46:13
     ./incomplete.cue:47:6
-incomplete.err4.x: invalid value {bar:2} (does not satisfy matchN(>1, [{bar!:string},{foo!:string}])): 0 matched, expected >1:
+incomplete.err4.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected >1:
     ./incomplete.cue:51:6
     ./incomplete.cue:51:13
     ./incomplete.cue:52:6
-incomplete.err5.x: invalid value {bar:2} (does not satisfy matchN(<1, [{bar!:int},{foo!:int}])): 1 matched, expected <1:
+incomplete.err5.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected <1:
     ./incomplete.cue:55:6
     ./incomplete.cue:55:13
     ./incomplete.cue:56:6
@@ -299,7 +299,7 @@ Result:
       a: (int){ 2 }
     }
     singleErr: (_|_){
-      // [eval] match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+      // [eval] match.singleErr: invalid value {a:"foo"} (does not satisfy matchN): 0 matched, expected 1:
       //     ./in.cue:8:17
       //     ./in.cue:8:24
       //     ./in.cue:10:13
@@ -309,7 +309,7 @@ Result:
       a: (int){ int }
     }
     incompleteErr: (_|_){
-      // [eval] match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
+      // [eval] match.incompleteErr: invalid value {a:string} (does not satisfy matchN): 0 matched, expected 1:
       //     ./in.cue:12:21
       //     ./in.cue:12:28
       //     ./in.cue:14:17
@@ -338,7 +338,7 @@ Result:
         a: (int){ int }
       }
       pickNested1Err: (_|_){
-        // [eval] match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:2}])): 0 matched, expected 1:
+        // [eval] match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN): 0 matched, expected 1:
         //     ./in.cue:36:23
         //     ./in.cue:36:30
         //     ./in.cue:39:19
@@ -351,7 +351,7 @@ Result:
         a: (int){ int }
       }
       pickNested2Err: (_|_){
-        // [eval] match.defaults.pickNested2Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:<=2}])): 0 matched, expected 1:
+        // [eval] match.defaults.pickNested2Err: invalid value {a:*3 | int} (does not satisfy matchN): 0 matched, expected 1:
         //     ./in.cue:41:23
         //     ./in.cue:41:30
         //     ./in.cue:44:19
@@ -386,7 +386,7 @@ Result:
       a: (string){ "foo" }
     }
     singleErr: (_|_){
-      // [eval] not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [{a:int}])): 1 matched, expected 0:
+      // [eval] not.singleErr: invalid value {a:2} (does not satisfy matchN): 1 matched, expected 0:
       //     ./in.cue:74:17
       //     ./in.cue:74:24
       //     ./in.cue:76:13
@@ -396,7 +396,7 @@ Result:
       a: (int){ 2 }
     }
     doubleErr: (_|_){
-      // [eval] not.doubleErr: invalid value {a:"foo"} (does not satisfy matchN(0, [matchN(0, [#Foo])])): 1 matched, expected 0:
+      // [eval] not.doubleErr: invalid value {a:"foo"} (does not satisfy matchN): 1 matched, expected 0:
       //     ./in.cue:78:17
       //     ./in.cue:78:24
       //     ./in.cue:80:13
@@ -406,7 +406,7 @@ Result:
   oneOf: (_|_){
     // [eval]
     multiple1Err1: (_|_){
-      // [eval] oneOf.multiple1Err1: invalid value 1 (does not satisfy matchN(1, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected 1:
+      // [eval] oneOf.multiple1Err1: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
       //     ./in.cue:84:20
       //     ./in.cue:84:27
       //     ./in.cue:86:17
@@ -414,7 +414,7 @@ Result:
     multiple1OK1: (int){ 3 }
     multiple1OK2: (int){ 5 }
     multiple1Err2: (_|_){
-      // [eval] oneOf.multiple1Err2: invalid value 15 (does not satisfy matchN(1, [math.MultipleOf(3),math.MultipleOf(5)])): 2 matched, expected 1:
+      // [eval] oneOf.multiple1Err2: invalid value 15 (does not satisfy matchN): 2 matched, expected 1:
       //     ./in.cue:84:20
       //     ./in.cue:84:27
       //     ./in.cue:91:17
@@ -423,7 +423,7 @@ Result:
   anyOf: (_|_){
     // [eval]
     multiple1Err1: (_|_){
-      // [eval] anyOf.multiple1Err1: invalid value 1 (does not satisfy matchN(>0, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected >0:
+      // [eval] anyOf.multiple1Err1: invalid value 1 (does not satisfy matchN): 0 matched, expected >0:
       //     ./in.cue:95:20
       //     ./in.cue:95:27
       //     ./in.cue:97:17
@@ -435,19 +435,19 @@ Result:
   allOf: (_|_){
     // [eval]
     multiple1Err1: (_|_){
-      // [eval] allOf.multiple1Err1: invalid value 1 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected 2:
+      // [eval] allOf.multiple1Err1: invalid value 1 (does not satisfy matchN): 0 matched, expected 2:
       //     ./in.cue:106:20
       //     ./in.cue:106:27
       //     ./in.cue:108:17
     }
     multiple1Err2: (_|_){
-      // [eval] allOf.multiple1Err2: invalid value 3 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 1 matched, expected 2:
+      // [eval] allOf.multiple1Err2: invalid value 3 (does not satisfy matchN): 1 matched, expected 2:
       //     ./in.cue:106:20
       //     ./in.cue:106:27
       //     ./in.cue:109:17
     }
     multiple1Err3: (_|_){
-      // [eval] allOf.multiple1Err3: invalid value 5 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 1 matched, expected 2:
+      // [eval] allOf.multiple1Err3: invalid value 5 (does not satisfy matchN): 1 matched, expected 2:
       //     ./in.cue:106:20
       //     ./in.cue:106:27
       //     ./in.cue:110:17
@@ -524,7 +524,7 @@ Result:
     // [eval]
     incomplete1: (struct){
       x: (_|_){
-        // [incomplete] incomplete.incomplete1.x: invalid value {bar:2} (does not satisfy matchN(1, [{foo!:string}])): 0 matched, expected 1:
+        // [incomplete] incomplete.incomplete1.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
         //     ./incomplete.cue:7:6
         //     ./incomplete.cue:7:13
         //     ./incomplete.cue:8:6
@@ -541,7 +541,7 @@ Result:
     }
     incomplete3: (struct){
       x: (_|_){
-        // [incomplete] incomplete.incomplete3.x: invalid value {bar:2} (does not satisfy matchN(math.MultipleOf(2), [{bar!:int},{foo!:int}])): 1 matched, expected math.MultipleOf(2):
+        // [incomplete] incomplete.incomplete3.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected math.MultipleOf(2):
         //     ./incomplete.cue:16:6
         //     ./incomplete.cue:16:13
         //     ./incomplete.cue:17:6
@@ -550,7 +550,7 @@ Result:
     }
     incomplete4: (struct){
       x: (_|_){
-        // [incomplete] incomplete.incomplete4.x: invalid value {bar:2} (does not satisfy matchN(math.MultipleOf(2), [{bar!:int},{foo!:int},{baz!:int}])): 1 matched, expected math.MultipleOf(2):
+        // [incomplete] incomplete.incomplete4.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected math.MultipleOf(2):
         //     ./incomplete.cue:20:6
         //     ./incomplete.cue:20:13
         //     ./incomplete.cue:21:6
@@ -559,7 +559,7 @@ Result:
     }
     incomplete5: (struct){
       x: (_|_){
-        // [incomplete] incomplete.incomplete5.x: invalid value {bar:2} (does not satisfy matchN(>1 & <=3, [{bar!:int},{foo!:int},{baz!:int}])): 1 matched, expected >1 & <=3:
+        // [incomplete] incomplete.incomplete5.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected >1 & <=3:
         //     ./incomplete.cue:24:6
         //     ./incomplete.cue:24:13
         //     ./incomplete.cue:25:6
@@ -568,7 +568,7 @@ Result:
     }
     incomplete6: (struct){
       x: (_|_){
-        // [incomplete] incomplete.incomplete6.x: invalid value {bar:2} (does not satisfy matchN(2 | 3, [{bar!:int},{foo!:int},{baz!:int}])): 1 matched, expected 2 | 3:
+        // [incomplete] incomplete.incomplete6.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected 2 | 3:
         //     ./incomplete.cue:28:6
         //     ./incomplete.cue:28:13
         //     ./incomplete.cue:29:6
@@ -578,7 +578,7 @@ Result:
     err1: (_|_){
       // [eval]
       x: (_|_){
-        // [eval] incomplete.err1.x: invalid value {bar:2} (does not satisfy matchN(1, [{bar!:string}])): 0 matched, expected 1:
+        // [eval] incomplete.err1.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
         //     ./incomplete.cue:34:6
         //     ./incomplete.cue:34:13
         //     ./incomplete.cue:35:6
@@ -588,7 +588,7 @@ Result:
     err2: (_|_){
       // [eval]
       x: (_|_){
-        // [eval] incomplete.err2.x: invalid value {bar:2} (does not satisfy matchN(0, [{bar!:int},{foo!:int}])): 1 matched, expected 0:
+        // [eval] incomplete.err2.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected 0:
         //     ./incomplete.cue:40:6
         //     ./incomplete.cue:40:13
         //     ./incomplete.cue:41:6
@@ -598,7 +598,7 @@ Result:
     err3: (_|_){
       // [eval]
       x: (_|_){
-        // [eval] incomplete.err3.x: invalid value {bar:2} (does not satisfy matchN(2, [{bar!:string},{foo!:string}])): 0 matched, expected 2:
+        // [eval] incomplete.err3.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 2:
         //     ./incomplete.cue:46:6
         //     ./incomplete.cue:46:13
         //     ./incomplete.cue:47:6
@@ -608,7 +608,7 @@ Result:
     err4: (_|_){
       // [eval]
       x: (_|_){
-        // [eval] incomplete.err4.x: invalid value {bar:2} (does not satisfy matchN(>1, [{bar!:string},{foo!:string}])): 0 matched, expected >1:
+        // [eval] incomplete.err4.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected >1:
         //     ./incomplete.cue:51:6
         //     ./incomplete.cue:51:13
         //     ./incomplete.cue:52:6
@@ -618,7 +618,7 @@ Result:
     err5: (_|_){
       // [eval]
       x: (_|_){
-        // [eval] incomplete.err5.x: invalid value {bar:2} (does not satisfy matchN(<1, [{bar!:int},{foo!:int}])): 1 matched, expected <1:
+        // [eval] incomplete.err5.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected <1:
         //     ./incomplete.cue:55:6
         //     ./incomplete.cue:55:13
         //     ./incomplete.cue:56:6
@@ -629,71 +629,71 @@ Result:
 }
 -- out/evalalpha --
 Errors:
-match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [~(#Foo)])): 0 matched, expected 1:
+match.singleErr: invalid value {a:"foo"} (does not satisfy matchN): 0 matched, expected 1:
     ./in.cue:8:17
     ./in.cue:8:24
     ./in.cue:10:13
-match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [~(#Foo)])): 0 matched, expected 1:
+match.incompleteErr: invalid value {a:string} (does not satisfy matchN): 0 matched, expected 1:
     ./in.cue:12:21
     ./in.cue:12:28
     ./in.cue:14:17
-match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:2}])): 0 matched, expected 1:
+match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN): 0 matched, expected 1:
     ./in.cue:36:23
     ./in.cue:36:30
     ./in.cue:39:19
-match.defaults.pickNested2Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:<=2}])): 0 matched, expected 1:
+match.defaults.pickNested2Err: invalid value {a:*3 | int} (does not satisfy matchN): 0 matched, expected 1:
     ./in.cue:41:23
     ./in.cue:41:30
     ./in.cue:44:19
-not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [~(#Foo)])): 1 matched, expected 0:
+not.singleErr: invalid value {a:2} (does not satisfy matchN): 1 matched, expected 0:
     ./in.cue:74:17
     ./in.cue:74:24
     ./in.cue:76:13
-not.doubleErr: invalid value {a:"foo"} (does not satisfy matchN(0, [matchN(0, [#Foo])])): 1 matched, expected 0:
+not.doubleErr: invalid value {a:"foo"} (does not satisfy matchN): 1 matched, expected 0:
     ./in.cue:78:17
     ./in.cue:78:24
     ./in.cue:80:13
-oneOf.multiple1Err1: invalid value 1 (does not satisfy matchN(1, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected 1:
+oneOf.multiple1Err1: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
     ./in.cue:84:20
     ./in.cue:84:27
     ./in.cue:86:17
-oneOf.multiple1Err2: invalid value 15 (does not satisfy matchN(1, [math.MultipleOf(3),math.MultipleOf(5)])): 2 matched, expected 1:
+oneOf.multiple1Err2: invalid value 15 (does not satisfy matchN): 2 matched, expected 1:
     ./in.cue:84:20
     ./in.cue:84:27
     ./in.cue:91:17
-anyOf.multiple1Err1: invalid value 1 (does not satisfy matchN(>0, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected >0:
+anyOf.multiple1Err1: invalid value 1 (does not satisfy matchN): 0 matched, expected >0:
     ./in.cue:95:20
     ./in.cue:95:27
     ./in.cue:97:17
-allOf.multiple1Err1: invalid value 1 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected 2:
+allOf.multiple1Err1: invalid value 1 (does not satisfy matchN): 0 matched, expected 2:
     ./in.cue:106:20
     ./in.cue:106:27
     ./in.cue:108:17
-allOf.multiple1Err2: invalid value 3 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 1 matched, expected 2:
+allOf.multiple1Err2: invalid value 3 (does not satisfy matchN): 1 matched, expected 2:
     ./in.cue:106:20
     ./in.cue:106:27
     ./in.cue:109:17
-allOf.multiple1Err3: invalid value 5 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 1 matched, expected 2:
+allOf.multiple1Err3: invalid value 5 (does not satisfy matchN): 1 matched, expected 2:
     ./in.cue:106:20
     ./in.cue:106:27
     ./in.cue:110:17
-incomplete.err1.x: invalid value {bar:2} (does not satisfy matchN(1, [{bar!:string}])): 0 matched, expected 1:
+incomplete.err1.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
     ./incomplete.cue:34:6
     ./incomplete.cue:34:13
     ./incomplete.cue:35:6
-incomplete.err2.x: invalid value {bar:2} (does not satisfy matchN(0, [{bar!:int},{foo!:int}])): 1 matched, expected 0:
+incomplete.err2.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected 0:
     ./incomplete.cue:40:6
     ./incomplete.cue:40:13
     ./incomplete.cue:41:6
-incomplete.err3.x: invalid value {bar:2} (does not satisfy matchN(2, [{bar!:string},{foo!:string}])): 0 matched, expected 2:
+incomplete.err3.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 2:
     ./incomplete.cue:46:6
     ./incomplete.cue:46:13
     ./incomplete.cue:47:6
-incomplete.err4.x: invalid value {bar:2} (does not satisfy matchN(>1, [{bar!:string},{foo!:string}])): 0 matched, expected >1:
+incomplete.err4.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected >1:
     ./incomplete.cue:51:6
     ./incomplete.cue:51:13
     ./incomplete.cue:52:6
-incomplete.err5.x: invalid value {bar:2} (does not satisfy matchN(<1, [{bar!:int},{foo!:int}])): 1 matched, expected <1:
+incomplete.err5.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected <1:
     ./incomplete.cue:55:6
     ./incomplete.cue:55:13
     ./incomplete.cue:56:6
@@ -710,7 +710,7 @@ Result:
       a: (int){ 2 }
     }
     singleErr: (_|_){
-      // [eval] match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [~(#Foo)])): 0 matched, expected 1:
+      // [eval] match.singleErr: invalid value {a:"foo"} (does not satisfy matchN): 0 matched, expected 1:
       //     ./in.cue:8:17
       //     ./in.cue:8:24
       //     ./in.cue:10:13
@@ -720,7 +720,7 @@ Result:
       a: (int){ int }
     }
     incompleteErr: (_|_){
-      // [eval] match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [~(#Foo)])): 0 matched, expected 1:
+      // [eval] match.incompleteErr: invalid value {a:string} (does not satisfy matchN): 0 matched, expected 1:
       //     ./in.cue:12:21
       //     ./in.cue:12:28
       //     ./in.cue:14:17
@@ -749,7 +749,7 @@ Result:
         a: (int){ int }
       }
       pickNested1Err: (_|_){
-        // [eval] match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:2}])): 0 matched, expected 1:
+        // [eval] match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN): 0 matched, expected 1:
         //     ./in.cue:36:23
         //     ./in.cue:36:30
         //     ./in.cue:39:19
@@ -762,7 +762,7 @@ Result:
         a: (int){ int }
       }
       pickNested2Err: (_|_){
-        // [eval] match.defaults.pickNested2Err: invalid value {a:*3 | int} (does not satisfy matchN(1, [{a:<=2}])): 0 matched, expected 1:
+        // [eval] match.defaults.pickNested2Err: invalid value {a:*3 | int} (does not satisfy matchN): 0 matched, expected 1:
         //     ./in.cue:41:23
         //     ./in.cue:41:30
         //     ./in.cue:44:19
@@ -797,7 +797,7 @@ Result:
       a: (string){ "foo" }
     }
     singleErr: (_|_){
-      // [eval] not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [~(#Foo)])): 1 matched, expected 0:
+      // [eval] not.singleErr: invalid value {a:2} (does not satisfy matchN): 1 matched, expected 0:
       //     ./in.cue:74:17
       //     ./in.cue:74:24
       //     ./in.cue:76:13
@@ -807,7 +807,7 @@ Result:
       a: (int){ 2 }
     }
     doubleErr: (_|_){
-      // [eval] not.doubleErr: invalid value {a:"foo"} (does not satisfy matchN(0, [matchN(0, [#Foo])])): 1 matched, expected 0:
+      // [eval] not.doubleErr: invalid value {a:"foo"} (does not satisfy matchN): 1 matched, expected 0:
       //     ./in.cue:78:17
       //     ./in.cue:78:24
       //     ./in.cue:80:13
@@ -817,7 +817,7 @@ Result:
   oneOf: (_|_){
     // [eval]
     multiple1Err1: (_|_){
-      // [eval] oneOf.multiple1Err1: invalid value 1 (does not satisfy matchN(1, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected 1:
+      // [eval] oneOf.multiple1Err1: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
       //     ./in.cue:84:20
       //     ./in.cue:84:27
       //     ./in.cue:86:17
@@ -825,7 +825,7 @@ Result:
     multiple1OK1: (int){ 3 }
     multiple1OK2: (int){ 5 }
     multiple1Err2: (_|_){
-      // [eval] oneOf.multiple1Err2: invalid value 15 (does not satisfy matchN(1, [math.MultipleOf(3),math.MultipleOf(5)])): 2 matched, expected 1:
+      // [eval] oneOf.multiple1Err2: invalid value 15 (does not satisfy matchN): 2 matched, expected 1:
       //     ./in.cue:84:20
       //     ./in.cue:84:27
       //     ./in.cue:91:17
@@ -834,7 +834,7 @@ Result:
   anyOf: (_|_){
     // [eval]
     multiple1Err1: (_|_){
-      // [eval] anyOf.multiple1Err1: invalid value 1 (does not satisfy matchN(>0, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected >0:
+      // [eval] anyOf.multiple1Err1: invalid value 1 (does not satisfy matchN): 0 matched, expected >0:
       //     ./in.cue:95:20
       //     ./in.cue:95:27
       //     ./in.cue:97:17
@@ -846,19 +846,19 @@ Result:
   allOf: (_|_){
     // [eval]
     multiple1Err1: (_|_){
-      // [eval] allOf.multiple1Err1: invalid value 1 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 0 matched, expected 2:
+      // [eval] allOf.multiple1Err1: invalid value 1 (does not satisfy matchN): 0 matched, expected 2:
       //     ./in.cue:106:20
       //     ./in.cue:106:27
       //     ./in.cue:108:17
     }
     multiple1Err2: (_|_){
-      // [eval] allOf.multiple1Err2: invalid value 3 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 1 matched, expected 2:
+      // [eval] allOf.multiple1Err2: invalid value 3 (does not satisfy matchN): 1 matched, expected 2:
       //     ./in.cue:106:20
       //     ./in.cue:106:27
       //     ./in.cue:109:17
     }
     multiple1Err3: (_|_){
-      // [eval] allOf.multiple1Err3: invalid value 5 (does not satisfy matchN(2, [math.MultipleOf(3),math.MultipleOf(5)])): 1 matched, expected 2:
+      // [eval] allOf.multiple1Err3: invalid value 5 (does not satisfy matchN): 1 matched, expected 2:
       //     ./in.cue:106:20
       //     ./in.cue:106:27
       //     ./in.cue:110:17
@@ -935,7 +935,7 @@ Result:
     // [eval]
     incomplete1: (struct){
       x: (_|_){
-        // [incomplete] incomplete.incomplete1.x: invalid value {bar:2} (does not satisfy matchN(1, [{foo!:string}])): 0 matched, expected 1:
+        // [incomplete] incomplete.incomplete1.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
         //     ./incomplete.cue:7:6
         //     ./incomplete.cue:7:13
         //     ./incomplete.cue:8:6
@@ -952,7 +952,7 @@ Result:
     }
     incomplete3: (struct){
       x: (_|_){
-        // [incomplete] incomplete.incomplete3.x: invalid value {bar:2} (does not satisfy matchN(math.MultipleOf(2), [{bar!:int},{foo!:int}])): 1 matched, expected math.MultipleOf(2):
+        // [incomplete] incomplete.incomplete3.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected math.MultipleOf(2):
         //     ./incomplete.cue:16:6
         //     ./incomplete.cue:16:13
         //     ./incomplete.cue:17:6
@@ -961,7 +961,7 @@ Result:
     }
     incomplete4: (struct){
       x: (_|_){
-        // [incomplete] incomplete.incomplete4.x: invalid value {bar:2} (does not satisfy matchN(math.MultipleOf(2), [{bar!:int},{foo!:int},{baz!:int}])): 1 matched, expected math.MultipleOf(2):
+        // [incomplete] incomplete.incomplete4.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected math.MultipleOf(2):
         //     ./incomplete.cue:20:6
         //     ./incomplete.cue:20:13
         //     ./incomplete.cue:21:6
@@ -970,7 +970,7 @@ Result:
     }
     incomplete5: (struct){
       x: (_|_){
-        // [incomplete] incomplete.incomplete5.x: invalid value {bar:2} (does not satisfy matchN(>1 & <=3, [{bar!:int},{foo!:int},{baz!:int}])): 1 matched, expected >1 & <=3:
+        // [incomplete] incomplete.incomplete5.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected >1 & <=3:
         //     ./incomplete.cue:24:6
         //     ./incomplete.cue:24:13
         //     ./incomplete.cue:25:6
@@ -979,7 +979,7 @@ Result:
     }
     incomplete6: (struct){
       x: (_|_){
-        // [incomplete] incomplete.incomplete6.x: invalid value {bar:2} (does not satisfy matchN(2 | 3, [{bar!:int},{foo!:int},{baz!:int}])): 1 matched, expected 2 | 3:
+        // [incomplete] incomplete.incomplete6.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected 2 | 3:
         //     ./incomplete.cue:28:6
         //     ./incomplete.cue:28:13
         //     ./incomplete.cue:29:6
@@ -989,7 +989,7 @@ Result:
     err1: (_|_){
       // [eval]
       x: (_|_){
-        // [eval] incomplete.err1.x: invalid value {bar:2} (does not satisfy matchN(1, [{bar!:string}])): 0 matched, expected 1:
+        // [eval] incomplete.err1.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
         //     ./incomplete.cue:34:6
         //     ./incomplete.cue:34:13
         //     ./incomplete.cue:35:6
@@ -999,7 +999,7 @@ Result:
     err2: (_|_){
       // [eval]
       x: (_|_){
-        // [eval] incomplete.err2.x: invalid value {bar:2} (does not satisfy matchN(0, [{bar!:int},{foo!:int}])): 1 matched, expected 0:
+        // [eval] incomplete.err2.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected 0:
         //     ./incomplete.cue:40:6
         //     ./incomplete.cue:40:13
         //     ./incomplete.cue:41:6
@@ -1009,7 +1009,7 @@ Result:
     err3: (_|_){
       // [eval]
       x: (_|_){
-        // [eval] incomplete.err3.x: invalid value {bar:2} (does not satisfy matchN(2, [{bar!:string},{foo!:string}])): 0 matched, expected 2:
+        // [eval] incomplete.err3.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 2:
         //     ./incomplete.cue:46:6
         //     ./incomplete.cue:46:13
         //     ./incomplete.cue:47:6
@@ -1019,7 +1019,7 @@ Result:
     err4: (_|_){
       // [eval]
       x: (_|_){
-        // [eval] incomplete.err4.x: invalid value {bar:2} (does not satisfy matchN(>1, [{bar!:string},{foo!:string}])): 0 matched, expected >1:
+        // [eval] incomplete.err4.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected >1:
         //     ./incomplete.cue:51:6
         //     ./incomplete.cue:51:13
         //     ./incomplete.cue:52:6
@@ -1029,7 +1029,7 @@ Result:
     err5: (_|_){
       // [eval]
       x: (_|_){
-        // [eval] incomplete.err5.x: invalid value {bar:2} (does not satisfy matchN(<1, [{bar!:int},{foo!:int}])): 1 matched, expected <1:
+        // [eval] incomplete.err5.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected <1:
         //     ./incomplete.cue:55:6
         //     ./incomplete.cue:55:13
         //     ./incomplete.cue:56:6
@@ -1042,45 +1042,6 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,9 @@
- Errors:
--match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
-+match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [~(#Foo)])): 0 matched, expected 1:
-     ./in.cue:8:17
-     ./in.cue:8:24
-     ./in.cue:10:13
--match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
-+match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [~(#Foo)])): 0 matched, expected 1:
-     ./in.cue:12:21
-     ./in.cue:12:28
-     ./in.cue:14:17
-@@ -15,7 +15,7 @@
-     ./in.cue:41:23
-     ./in.cue:41:30
-     ./in.cue:44:19
--not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [{a:int}])): 1 matched, expected 0:
-+not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [~(#Foo)])): 1 matched, expected 0:
-     ./in.cue:74:17
-     ./in.cue:74:24
-     ./in.cue:76:13
-@@ -80,7 +80,7 @@
-       a: (int){ 2 }
-     }
-     singleErr: (_|_){
--      // [eval] match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
-+      // [eval] match.singleErr: invalid value {a:"foo"} (does not satisfy matchN(1, [~(#Foo)])): 0 matched, expected 1:
-       //     ./in.cue:8:17
-       //     ./in.cue:8:24
-       //     ./in.cue:10:13
-@@ -90,7 +90,7 @@
-       a: (int){ int }
-     }
-     incompleteErr: (_|_){
--      // [eval] match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [{a:int}])): 0 matched, expected 1:
-+      // [eval] match.incompleteErr: invalid value {a:string} (does not satisfy matchN(1, [~(#Foo)])): 0 matched, expected 1:
-       //     ./in.cue:12:21
-       //     ./in.cue:12:28
-       //     ./in.cue:14:17
 @@ -106,7 +106,7 @@
              0: (int){ 2 }
            }), int) }) }
@@ -1090,15 +1051,6 @@ diff old new
            }
          }), int) }
        pickTopErr: (int){ &(matchN(1, (#list){
-@@ -167,7 +167,7 @@
-       a: (string){ "foo" }
-     }
-     singleErr: (_|_){
--      // [eval] not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [{a:int}])): 1 matched, expected 0:
-+      // [eval] not.singleErr: invalid value {a:2} (does not satisfy matchN(0, [~(#Foo)])): 1 matched, expected 0:
-       //     ./in.cue:74:17
-       //     ./in.cue:74:24
-       //     ./in.cue:76:13
 @@ -239,21 +239,21 @@
      embed: (struct){
        t1: (struct){

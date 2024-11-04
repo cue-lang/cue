@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3b81079_18a49f0e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-04T17:16:58Z",
+      "side": 1,
+      "message": "I was wondering why these weren\u0027t linkifying; I sent https://review.gerrithub.io/c/cue-lang/cue/+/1203559.",
+      "revId": "c86ace90c4b9e1039ab625257f962f4988174f75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "937e0a88_e1e4275a",
+        "filename": "encoding/jsonschema/constraints_array.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-04T17:16:58Z",
+      "side": 1,
+      "message": "\"object or array\" yet the check is only for ListKind? what am I missing here? perhaps add a comment to clarify if the code is indeed correct.",
+      "revId": "c86ace90c4b9e1039ab625257f962f4988174f75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95efb69b_04e747b7",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 448,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-04T17:16:58Z",
+      "side": 1,
+      "message": "nit: duplicate \"the\"",
+      "range": {
+        "startLine": 448,
+        "startChar": 4,
+        "endLine": 448,
+        "endChar": 7
+      },
+      "revId": "c86ace90c4b9e1039ab625257f962f4988174f75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8738380_5f9ed4b8",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 450,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-04T17:16:58Z",
+      "side": 1,
+      "message": "nit: use backquotes for each of the snippets so it\u0027s clear where they start and end. that won\u0027t render like markdown, but at least it will be relatively obvious to the reader.\n\nyou could also do two one-line code blocks, which is more verbose, but will render nicely: https://go.dev/doc/comment#code",
+      "revId": "c86ace90c4b9e1039ab625257f962f4988174f75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

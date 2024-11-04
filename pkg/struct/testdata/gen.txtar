@@ -13,7 +13,7 @@ Errors:
 t1: conflicting values "" and struct.MinFields(0) (mismatched types string and struct):
     ./in.cue:3:5
     ./in.cue:3:27
-t4: invalid value {a:1} (does not satisfy struct.MaxFields(0)): len(fields) > MaxFields(0) (1 > 0):
+t4: invalid value {a:1} (does not satisfy struct.MaxFields): len(fields) > MaxFields(0) (1 > 0):
     ./in.cue:6:5
     ./in.cue:6:22
 
@@ -27,7 +27,7 @@ t2: {
 t3: struct.MinFields(2) & {
 	a: 1
 }
-t4: _|_ // t4: invalid value {a:1} (does not satisfy struct.MaxFields(0)): len(fields) > MaxFields(0) (1 > 0)
+t4: _|_ // t4: invalid value {a:1} (does not satisfy struct.MaxFields): len(fields) > MaxFields(0) (1 > 0)
 t5: {
 	a: 1
 }
@@ -41,7 +41,7 @@ diff old new
 +t1: conflicting values "" and struct.MinFields(0) (mismatched types string and struct):
      ./in.cue:3:5
      ./in.cue:3:27
- t4: invalid value {a:1} (does not satisfy struct.MaxFields(0)): len(fields) > MaxFields(0) (1 > 0):
+ t4: invalid value {a:1} (does not satisfy struct.MaxFields): len(fields) > MaxFields(0) (1 > 0):
 @@ -9,7 +9,7 @@
  Result:
  import "struct"
@@ -59,7 +59,7 @@ Errors:
 t1: conflicting values struct.MinFields(0) and "" (mismatched types struct and string):
     ./in.cue:3:5
     ./in.cue:3:27
-t4: invalid value {a:1} (does not satisfy struct.MaxFields(0)): len(fields) > MaxFields(0) (1 > 0):
+t4: invalid value {a:1} (does not satisfy struct.MaxFields): len(fields) > MaxFields(0) (1 > 0):
     ./in.cue:6:5
     ./in.cue:6:22
 
@@ -73,7 +73,7 @@ t2: {
 t3: struct.MinFields(2) & {
 	a: 1
 }
-t4: _|_ // t4: invalid value {a:1} (does not satisfy struct.MaxFields(0)): len(fields) > MaxFields(0) (1 > 0)
+t4: _|_ // t4: invalid value {a:1} (does not satisfy struct.MaxFields): len(fields) > MaxFields(0) (1 > 0)
 t5: {
 	a: 1
 }

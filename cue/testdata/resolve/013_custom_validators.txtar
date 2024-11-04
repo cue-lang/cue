@@ -29,7 +29,7 @@ Conjuncts:    8
 Disjuncts:    4
 -- out/eval --
 Errors:
-b: invalid value "dog" (does not satisfy strings.ContainsAny("c")):
+b: invalid value "dog" (does not satisfy strings.ContainsAny):
     ./in.cue:6:4
     ./in.cue:6:24
     ./in.cue:7:4
@@ -39,7 +39,7 @@ Result:
   // [eval]
   a: (string){ "after" }
   b: (_|_){
-    // [eval] b: invalid value "dog" (does not satisfy strings.ContainsAny("c")):
+    // [eval] b: invalid value "dog" (does not satisfy strings.ContainsAny):
     //     ./in.cue:6:4
     //     ./in.cue:6:24
     //     ./in.cue:7:4

@@ -79,11 +79,11 @@ concat.t8.v: error in call to list.Concat: cannot use value 1 (type int) as list
     ./in.cue:31:10
 concat.t7.v: cannot use 1 (type int) as list in argument 1 to list.Concat:
     ./in.cue:30:9
-minItems.fail1: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1):
+minItems.fail1: invalid value [] (does not satisfy list.MinItems): len(list) < MinItems(1) (0 < 1):
     ./in.cue:45:12
     ./in.cue:45:26
     ./in.cue:47:9
-maxItems.fail1: invalid value [0,1] (does not satisfy list.MaxItems(1)): len(list) > MaxItems(1) (2 > 1):
+maxItems.fail1: invalid value [0,1] (does not satisfy list.MaxItems): len(list) > MaxItems(1) (2 > 1):
     ./in.cue:53:12
     ./in.cue:53:26
     ./in.cue:58:9
@@ -183,7 +183,7 @@ unique: {
 // Issue #2099
 minItems: {
 	incomplete1: [...] & list.MinItems(1)
-	fail1: _|_ // minItems.fail1: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1)
+	fail1: _|_ // minItems.fail1: invalid value [] (does not satisfy list.MinItems): len(list) < MinItems(1) (0 < 1)
 	ok1: [0, ...]
 	ok2: [0]
 }
@@ -191,7 +191,7 @@ maxItems: {
 	ok1: [...]
 	ok2: [0, ...]
 	ok3: [0, ...]
-	fail1: _|_ // maxItems.fail1: invalid value [0,1] (does not satisfy list.MaxItems(1)): len(list) > MaxItems(1) (2 > 1)
+	fail1: _|_ // maxItems.fail1: invalid value [0,1] (does not satisfy list.MaxItems): len(list) > MaxItems(1) (2 > 1)
 }
 reverse: {
 	t1: {

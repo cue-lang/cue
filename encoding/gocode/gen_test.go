@@ -48,7 +48,7 @@ func TestPackages(t *testing.T) {
 2 errors in empty disjunction:
 conflicting values null and {A:strings.ContainsAny("X"),P:"cuelang.org/go/encoding/gocode/testdata/pkg2".PickMe} (mismatched types null and struct):
     pkg1/instance.cue:x:x
-A: invalid value "car" (does not satisfy strings.ContainsAny("X")):
+A: invalid value "car" (does not satisfy strings.ContainsAny):
     pkg1/instance.cue:x:x
     pkg1/instance.cue:x:x
 `,
@@ -73,7 +73,7 @@ O: 2 errors in empty disjunction:
 O: conflicting values null and {A:strings.ContainsAny("X"),P:"cuelang.org/go/encoding/gocode/testdata/pkg2".PickMe} (mismatched types null and struct):
     pkg1/instance.cue:x:x
     pkg1/instance.cue:x:x
-O.A: invalid value "car" (does not satisfy strings.ContainsAny("X")):
+O.A: invalid value "car" (does not satisfy strings.ContainsAny):
     pkg1/instance.cue:x:x
     pkg1/instance.cue:x:x
 `,

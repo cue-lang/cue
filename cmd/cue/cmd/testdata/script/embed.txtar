@@ -12,6 +12,9 @@ cmp stdout out/export
 exec cue vet
 cmp stdout out/vet
 
+exec cue cmd test
+cmp stdout out/cmd
+
 -- cue.mod/module.cue --
 module: "cue.example"
 language: version: "v0.11.0"
@@ -42,6 +45,28 @@ special: {
 	dotdotFile:        _ @embed(file="..dotdot.json")
 	underscoreDir:  _ @embed(file="_y/test.json")
 	dotDir:         _ @embed(file=".y/test.json")
+}
+
+-- foo_tool.cue --
+@extern(embed)
+
+package foo
+
+import (
+    "strings"
+    "tool/cli"
+)
+
+embedded_toolfile: _ @embed(file="input.yaml", type=text)
+
+command: test: {
+    regularFile: cli.Print & {
+        text: "from foo.cue: \(strings.TrimSpace(c))"
+    }
+    toolFile: cli.Print & {
+        $after: regularFile // for consistent output
+        text: "from foo_tool.cue: \(strings.TrimSpace(embedded_toolfile))"
+    }
 }
 
 -- test.json --
@@ -256,3 +281,6 @@ special: {
 	dotDir: z:          48
 }
 -- out/vet --
+-- out/cmd --
+from foo.cue: { "x": 34 }
+from foo_tool.cue: a1: 2

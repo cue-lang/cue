@@ -750,8 +750,14 @@ func buildInstances(cmd *Command, binst []*build.Instance, ignoreErrors bool) ([
 	return insts, nil
 }
 
-func buildToolInstances(binst []*build.Instance) ([]*cue.Instance, error) {
-	instances := cue.Build(binst)
+func buildToolInstances(ctx *cue.Context, binst []*build.Instance) ([]*cue.Instance, error) {
+	// Reuse the same context, if there is one, so that the @embed interpreter can be used.
+	// Note that ctx may be nil when we do `cue help cmd`.
+	r := new(cue.Runtime)
+	if ctx != nil {
+		r = (*cue.Runtime)(ctx)
+	}
+	instances, _ := r.BuildInstances(binst)
 	for _, inst := range instances {
 		if inst.Err != nil {
 			return nil, inst.Err
@@ -783,6 +789,10 @@ func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 	included := map[string]bool{}
 
 	ti := binst[0].Context().NewInstance(binst[0].Root, nil)
+	// For @embed to also work in _tool.cue files, we must pass the module info along.
+	ti.Module = binst[0].Module
+	ti.Root = binst[0].Root
+
 	for _, inst := range binst {
 		k := 0
 		for _, f := range inst.Files {
@@ -799,7 +809,7 @@ func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 		inst.Files = inst.Files[:k]
 	}
 
-	insts, err := buildToolInstances(binst)
+	insts, err := buildToolInstances(cmd.ctx, binst)
 	if err != nil {
 		return nil, err
 	}

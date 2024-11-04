@@ -58,9 +58,12 @@ type Compiler interface {
 	Compile(name string, scope adt.Value, a *internal.Attr) (adt.Expr, errors.Error)
 }
 
-// injectImplementations modifies v to include implementations of functions
+// InjectImplementations modifies v to include implementations of functions
 // for fields associated with the @extern attributes.
-func (r *Runtime) injectImplementations(b *build.Instance, v *adt.Vertex) (errs errors.Error) {
+//
+// TODO(mvdan): unexport again once cue.Instance.Build is no longer used by `cue cmd`
+// and can be removed entirely.
+func (r *Runtime) InjectImplementations(b *build.Instance, v *adt.Vertex) (errs errors.Error) {
 
 	d := &externDecorator{
 		runtime: r,

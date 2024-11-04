@@ -124,11 +124,12 @@ func Build(instances []*build.Instance) []*Instance {
 		panic("cue: list of instances must not be empty")
 	}
 	var r Runtime
-	a, _ := r.build(instances)
+	a, _ := r.BuildInstances(instances)
 	return a
 }
 
-func (r *hiddenRuntime) build(instances []*build.Instance) ([]*Instance, error) {
+// Deprecated: use [Context.BuildInstances]. The use of [Instance] is being phased out.
+func (r *hiddenRuntime) BuildInstances(instances []*build.Instance) ([]*Instance, error) {
 	index := r.runtime()
 
 	loaded := []*Instance{}

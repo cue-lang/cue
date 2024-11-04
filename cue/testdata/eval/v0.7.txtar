@@ -247,7 +247,7 @@ Result:
       ok: (struct){
         s3: (string){ strings.ContainsAny("dd") }
         s4: (_|_){
-          // [incomplete] mutualBuiltin.t1.ok.s4: invalid value "dd" (does not satisfy strings.ContainsAny(strings.ContainsAny("dd"))): error in call to strings.ContainsAny: non-concrete value string:
+          // [incomplete] mutualBuiltin.t1.ok.s4: invalid value "dd" (does not satisfy strings.ContainsAny): error in call to strings.ContainsAny: non-concrete value string:
           //     ./builtins.cue:6:6
           //     ./builtins.cue:5:6
           //     ./builtins.cue:7:6
@@ -1138,7 +1138,7 @@ diff old new
        ok: (struct){
          s3: (string){ strings.ContainsAny("dd") }
 -        s4: (_|_){
--          // [incomplete] mutualBuiltin.t1.ok.s4: invalid value "dd" (does not satisfy strings.ContainsAny(strings.ContainsAny("dd"))): error in call to strings.ContainsAny: non-concrete value string:
+-          // [incomplete] mutualBuiltin.t1.ok.s4: invalid value "dd" (does not satisfy strings.ContainsAny): error in call to strings.ContainsAny: non-concrete value string:
 -          //     ./builtins.cue:6:6
 -          //     ./builtins.cue:5:6
 -          //     ./builtins.cue:7:6

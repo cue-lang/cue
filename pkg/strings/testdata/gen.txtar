@@ -25,19 +25,19 @@ Errors:
 t2: invalid list element 0 in argument 0 to call: cannot use value 1 (int) as string:
     ./in.cue:4:6
     ./in.cue:4:20
-t10: invalid value "quux" (does not satisfy strings.MaxRunes(3)):
+t10: invalid value "quux" (does not satisfy strings.MaxRunes):
     ./in.cue:12:6
     ./in.cue:12:23
     ./in.cue:12:28
-t12: invalid value "e" (does not satisfy strings.MaxRunes(0)):
+t12: invalid value "e" (does not satisfy strings.MaxRunes):
     ./in.cue:14:6
     ./in.cue:14:23
     ./in.cue:14:28
-t16: invalid value "hello" (does not satisfy strings.MaxRunes(3)):
+t16: invalid value "hello" (does not satisfy strings.MaxRunes):
     ./in.cue:18:6
     ./in.cue:18:23
     ./in.cue:18:28
-t17: invalid value "hello" (does not satisfy strings.MinRunes(10)):
+t17: invalid value "hello" (does not satisfy strings.MinRunes):
     ./in.cue:19:6
     ./in.cue:19:23
     ./in.cue:19:29
@@ -52,11 +52,11 @@ t6: [67, 97, 102, 233]
 t7:  "alphaBeta"
 t8:  "Alpha"
 t9:  "foo"
-t10: _|_ // t10: invalid value "quux" (does not satisfy strings.MaxRunes(3))
+t10: _|_ // t10: invalid value "quux" (does not satisfy strings.MaxRunes)
 t11: "e"
-t12: _|_ // t12: invalid value "e" (does not satisfy strings.MaxRunes(0))
+t12: _|_ // t12: invalid value "e" (does not satisfy strings.MaxRunes)
 t13: ""
 t14: "hello"
 t15: "hello"
-t16: _|_ // t16: invalid value "hello" (does not satisfy strings.MaxRunes(3))
-t17: _|_ // t17: invalid value "hello" (does not satisfy strings.MinRunes(10))
+t16: _|_ // t16: invalid value "hello" (does not satisfy strings.MaxRunes)
+t17: _|_ // t17: invalid value "hello" (does not satisfy strings.MinRunes)

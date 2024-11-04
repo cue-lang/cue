@@ -27,7 +27,7 @@ the matchN builtin.
 -- test/err-nomatch.json --
 {"matchN": 3}
 -- out/decode/testerr/err-nomatch --
-matchN: invalid value 3 (does not satisfy matchN(1, [1,2])): 0 matched, expected 1:
+matchN: invalid value 3 (does not satisfy matchN): 0 matched, expected 1:
     generated.cue:1:12
     generated.cue:1:19
     test/err-nomatch.json:1:12

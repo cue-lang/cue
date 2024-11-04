@@ -614,7 +614,7 @@ issue770: {
             x: ((null|struct)){ |((struct){
                 a: (struct){
                   b: (_|_){
-                    // [incomplete] nestedNonMonotonic.incomplete.a.n2.p1.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
+                    // [incomplete] nestedNonMonotonic.incomplete.a.n2.p1.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields): len(fields) < MinFields(2) (1 < 2):
                     //     ./in.cue:96:15
                     //     ./in.cue:96:32
                     //     ./in.cue:97:12
@@ -627,7 +627,7 @@ issue770: {
             x: ((null|struct)){ |((struct){
                 a: (struct){
                   b: (_|_){
-                    // [incomplete] nestedNonMonotonic.incomplete.a.n2.p2.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
+                    // [incomplete] nestedNonMonotonic.incomplete.a.n2.p2.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields): len(fields) < MinFields(2) (1 < 2):
                     //     ./in.cue:102:15
                     //     ./in.cue:101:12
                     //     ./in.cue:102:32
@@ -655,7 +655,7 @@ issue770: {
             x: ((null|struct)){ |((struct){
                 a: (struct){
                   b: (_|_){
-                    // [incomplete] nestedNonMonotonic.incomplete.b.n2.p1.x.a.b: invalid value {c:1,d:1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
+                    // [incomplete] nestedNonMonotonic.incomplete.b.n2.p1.x.a.b: invalid value {c:1,d:1} (does not satisfy struct.MinFields): len(fields) < MinFields(3) (2 < 3):
                     //     ./in.cue:138:15
                     //     ./in.cue:124:15
                     //     ./in.cue:125:12
@@ -1483,8 +1483,8 @@ diff old new
              x: ((null|struct)){ |((struct){
                  a: (struct){
                    b: (_|_){
--                    // [incomplete] nestedNonMonotonic.incomplete.b.n2.p1.x.a.b: invalid value {c:1 & 1 & 1,d:1 & 1 & 1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
-+                    // [incomplete] nestedNonMonotonic.incomplete.b.n2.p1.x.a.b: invalid value {c:1,d:1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
+-                    // [incomplete] nestedNonMonotonic.incomplete.b.n2.p1.x.a.b: invalid value {c:1 & 1 & 1,d:1 & 1 & 1} (does not satisfy struct.MinFields): len(fields) < MinFields(3) (2 < 3):
++                    // [incomplete] nestedNonMonotonic.incomplete.b.n2.p1.x.a.b: invalid value {c:1,d:1} (does not satisfy struct.MinFields): len(fields) < MinFields(3) (2 < 3):
                      //     ./in.cue:138:15
                      //     ./in.cue:124:15
                      //     ./in.cue:125:12
@@ -2450,7 +2450,7 @@ Result:
             x: ((null|struct)){ |((struct){
                 a: (struct){
                   b: (_|_){
-                    // [incomplete] nestedNonMonotonic.incomplete.a.n2.p1.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
+                    // [incomplete] nestedNonMonotonic.incomplete.a.n2.p1.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields): len(fields) < MinFields(2) (1 < 2):
                     //     ./in.cue:96:15
                     //     ./in.cue:96:32
                     //     ./in.cue:97:12
@@ -2463,7 +2463,7 @@ Result:
             x: ((null|struct)){ |((struct){
                 a: (struct){
                   b: (_|_){
-                    // [incomplete] nestedNonMonotonic.incomplete.a.n2.p2.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
+                    // [incomplete] nestedNonMonotonic.incomplete.a.n2.p2.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields): len(fields) < MinFields(2) (1 < 2):
                     //     ./in.cue:102:15
                     //     ./in.cue:101:12
                     //     ./in.cue:102:32
@@ -2491,7 +2491,7 @@ Result:
             x: ((null|struct)){ |((struct){
                 a: (struct){
                   b: (_|_){
-                    // [incomplete] nestedNonMonotonic.incomplete.b.n2.p1.x.a.b: invalid value {c:1 & 1 & 1,d:1 & 1 & 1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
+                    // [incomplete] nestedNonMonotonic.incomplete.b.n2.p1.x.a.b: invalid value {c:1 & 1 & 1,d:1 & 1 & 1} (does not satisfy struct.MinFields): len(fields) < MinFields(3) (2 < 3):
                     //     ./in.cue:138:15
                     //     ./in.cue:124:15
                     //     ./in.cue:125:12

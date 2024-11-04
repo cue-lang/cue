@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a15a1d2b_84cbedc9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-04T04:23:43Z",
+      "side": 1,
+      "message": "Thank you for the meticulous and detailed review! I will update this CL soon.",
+      "parentUuid": "32f6226e_c486a600",
+      "revId": "2bc23f8e3ff63843a9752891b7ebb9df7a5dea30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d3395a7f_21cce199",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-11-01T10:49:19Z",
       "side": 1,
       "message": "I\u0027m not sure about this approach. It seems like we should be able to express the desired closedness properties using only language primitives like `...` and `close` and then this pass would remove redundant occurrences of each. So at every stage we\u0027d have valid CUE that correctly represented the schema that we\u0027re trying to define and this astutil pass would just be a simplification.",
+      "revId": "2bc23f8e3ff63843a9752891b7ebb9df7a5dea30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d0d7bca_857dd124",
+        "filename": "cue/ast/astutil/fix_closeness.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-04T04:23:43Z",
+      "side": 1,
+      "message": "I agree with you. I think using only language primitives is preferable.",
+      "parentUuid": "d3395a7f_21cce199",
       "revId": "2bc23f8e3ff63843a9752891b7ebb9df7a5dea30",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -82,6 +118,24 @@
       "writtenOn": "2024-11-01T10:49:19Z",
       "side": 1,
       "message": "This is still technically incorrect, as `close` does not operate recursively, so although according to the semantics of JSON Schema, this object should only allow members with names that match the pattern, it actually allows any other field too.\n(https://cuelang.org/play/?id\u003dMVo3ZTEmtdl#w\u003dfunction\u0026i\u003dcue\u0026f\u003dexport\u0026o\u003dcue)",
+      "revId": "2bc23f8e3ff63843a9752891b7ebb9df7a5dea30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94201f1a_08e828c3",
+        "filename": "encoding/jsonschema/testdata/txtar/object.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-04T04:23:43Z",
+      "side": 1,
+      "message": "\u003e as `close` does not operate recursively\n\nThank you for clarifying.",
+      "parentUuid": "51b849e2_c4f40121",
       "revId": "2bc23f8e3ff63843a9752891b7ebb9df7a5dea30",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

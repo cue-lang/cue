@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7e261a6_4cbac0d8",
+        "filename": "cue/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-11-04T10:31:45Z",
+      "side": 1,
+      "message": "You seem to have been a little inconsistent with when you do links to types, and when you don\u0027t. E.g. this one you\u0027ve not linked, the next sentence you have, but e.g. line 156 you\u0027ve not.\n\nIf it was me I would have linked everything. I think Value is always meant here as a real type. But maybe there\u0027s some idiom or logic I\u0027m missing?",
+      "revId": "460bf1ababa6fd91f5764c58bfe25fb9cae00921",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

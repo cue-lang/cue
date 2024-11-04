@@ -105,9 +105,9 @@ func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, filename string, s *ex
 		qt.Assert(t, qt.IsNil(err))
 		schemaValue = ctx.CompileBytes(b, cue.Filename("generated.cue"))
 		if err := schemaValue.Err(); err != nil {
-			t.Logf("extracted schema: %q", b)
 			extractErr = fmt.Errorf("cannot compile resulting schema: %v", errors.Details(err, nil))
 		}
+		t.Logf("extracted schema: %q", b)
 	}
 
 	if extractErr != nil {

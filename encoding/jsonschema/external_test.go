@@ -108,6 +108,7 @@ func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, filename string, s *ex
 		if err := schemaValue.Err(); err != nil {
 			extractErr = fmt.Errorf("cannot compile resulting schema: %v", errors.Details(err, nil))
 		}
+		t.Logf("extracted schema: %q", b)
 	}
 
 	if extractErr != nil {

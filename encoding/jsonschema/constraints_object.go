@@ -39,7 +39,7 @@ func constraintAdditionalProperties(key string, n cue.Value, s *state) {
 			return
 		}
 		// [!~(properties|patternProperties)]: schema
-		existing := append(s.patterns, excludeFields(obj.Elts))
+		existing := append(s.patterns, excludeFields(obj.Elts)...)
 		f := internal.EmbedStruct(ast.NewStruct(&ast.Field{
 			Label: ast.NewList(ast.NewBinExpr(token.AND, existing...)),
 			Value: s.schema(n),
@@ -87,9 +87,10 @@ func constraintPatternProperties(key string, n cue.Value, s *state) {
 		s.patterns = append(s.patterns,
 			&ast.UnaryExpr{Op: token.NMAT, X: ast.NewString(key)})
 		f := internal.EmbedStruct(ast.NewStruct(&ast.Field{
-			Label: ast.NewList(ast.NewBinExpr(token.AND,
-				&ast.UnaryExpr{Op: token.MAT, X: ast.NewString(key)},
-				existing)),
+			Label: ast.NewList(ast.NewBinExpr(
+				token.AND,
+				append([]ast.Expr{&ast.UnaryExpr{Op: token.MAT, X: ast.NewString(key)}}, existing...)...,
+			)),
 			Value: s.schema(n),
 		}))
 		ast.SetRelPos(f, token.NewSection)

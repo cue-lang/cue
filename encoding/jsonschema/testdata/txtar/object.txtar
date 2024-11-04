@@ -90,9 +90,9 @@ patterns?: {
 	...
 }
 patternsNoProps?: {
-	{[=~"^\\P{Lu}" & !~"^()$"]: string}
+	{[=~"^\\P{Lu}"]: string}
 
-	{[=~"^\\P{Lo}" & !~"^()$"]: int}
+	{[=~"^\\P{Lo}"]: int}
 	...
 }
 complex?: {

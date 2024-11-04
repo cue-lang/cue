@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "193f7c13_ff12de5f",
+        "filename": "internal/core/toposort/graph.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-11-04T11:15:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dc91dd3d_2de07ea4",
+      "revId": "a08039958b06d074c16eb73c74eddccbaf55edd0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "f0ca9a2a_674d0904",
         "filename": "internal/core/toposort/graph.go",
         "patchSetId": 7
@@ -48,6 +66,24 @@
       "writtenOn": "2024-11-01T11:16:45Z",
       "side": 1,
       "message": "Line length exceeds 80chars (assuming ts\u003d4) in various places here. It is the convention in Go, and we adopt this, to break lines at 80. \n\nThis makes reading diffs in Gerrit a whole lot easier.",
+      "revId": "a08039958b06d074c16eb73c74eddccbaf55edd0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "baf5f8aa_cc670f34",
+        "filename": "internal/core/toposort/scc_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-11-04T11:15:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f5897d47_b04559c2",
       "revId": "a08039958b06d074c16eb73c74eddccbaf55edd0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

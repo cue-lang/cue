@@ -122,6 +122,24 @@
       "parentUuid": "a9eb4103_8f03b891",
       "revId": "2253c13f621b65750cb6fac8859328404542d196",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5daeb5a_da53b4b9",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-05T15:14:05Z",
+      "side": 1,
+      "message": "I don\u0027t use any fixed-column tab, but I thought 8 spaces was the standard. I\u0027ll adjust my tools to use 4 space tabs.",
+      "parentUuid": "8fcdb5b2_e84ff5d4",
+      "revId": "2253c13f621b65750cb6fac8859328404542d196",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

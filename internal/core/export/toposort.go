@@ -20,7 +20,6 @@ import (
 
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/toposort"
-	"cuelang.org/go/internal/cueexperiment"
 )
 
 // TODO: topological sort should go arguably in a more fundamental place as it
@@ -30,7 +29,7 @@ import (
 // features than for which there are arcs and also includes features for
 // optional fields. It assumes the Structs fields are initialized and evaluated.
 func VertexFeatures(c *adt.OpContext, v *adt.Vertex) []adt.Feature {
-	if cueexperiment.Flags.TopoSort {
+	if c.TopoSort {
 		return toposort.VertexFeatures(c, v)
 	} else {
 		return vertexFeatures(c, v)

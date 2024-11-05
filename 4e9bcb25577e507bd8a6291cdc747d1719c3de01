@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f346f2f_c763684a",
+        "filename": "internal/core/toposort/sort_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-05T11:17:26Z",
+      "side": 1,
+      "message": "If we support this in the API, we should probably use that.",
+      "revId": "4e9bcb25577e507bd8a6291cdc747d1719c3de01",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

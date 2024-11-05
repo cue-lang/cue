@@ -1,0 +1,30 @@
+# This tests the case where there's a patternProperties keyword
+# and fields that contain regexp metacharacters.
+
+# TODO the field test should fail but currently does not.
+
+-- schema.json --
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "c.e": {
+            "type": "boolean"
+        }
+    },
+    "patternProperties": {
+        ".*": {
+            "type": "string"
+        }
+    }
+}
+-- out/decode/extract --
+@jsonschema(schema="http://json-schema.org/draft-07/schema#")
+"c.e"?: bool
+
+{[=~".*" & !~"^(c.e)$"]: string}
+...
+-- test/field.json --
+{
+    "cue": 123
+}

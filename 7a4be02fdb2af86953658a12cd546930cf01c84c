@@ -191,6 +191,24 @@
       "parentUuid": "a6c4b3b9_c98f9ccc",
       "revId": "7a4be02fdb2af86953658a12cd546930cf01c84c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57ce70bf_42d40ff5",
+        "filename": "encoding/protobuf/textproto/testdata/encoder/enum.txtar",
+        "patchSetId": 17
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-11-05T09:23:26Z",
+      "side": 1,
+      "message": "Adding a filename option to the test sorts this out - so this is the same as the syntax_test issue. I had assumed that if we have no position information then we shouldn\u0027t make any assumptions wrt implicit ordering. But maybe that\u0027s not right? Maybe I should always pay attention to filename and position apart from when it\u0027s really NoPos?",
+      "parentUuid": "c592cf51_cab6b8ee",
+      "revId": "7a4be02fdb2af86953658a12cd546930cf01c84c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

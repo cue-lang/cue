@@ -22,17 +22,17 @@ jobs:
           password ${{ secrets.CUECKOO_GERRITHUB_PASSWORD }}
           EOD
           chmod 600 ~/.netrc
-      - name: Write fake payload
-        id: payload
+      - id: payload
         if: github.repository == 'cue-lang/cue' && (github.ref == 'refs/heads/ci/test')
+        name: Write fake payload
         run: |-
           cat <<EOD >> $GITHUB_OUTPUT
           value<<DOE
           null
           DOE
           EOD
-      - name: Trigger TryBot (fake data)
-        if: github.event.client_payload.type != 'trybot'
+      - if: github.event.client_payload.type != 'trybot'
+        name: Trigger TryBot (fake data)
         run: |-
           mkdir tmpgit
           cd tmpgit
@@ -81,8 +81,8 @@ jobs:
           	echo "Giving up"
           	exit 1
           fi
-      - name: Trigger TryBot (repository_dispatch payload)
-        if: github.event.client_payload.type == 'trybot'
+      - if: github.event.client_payload.type == 'trybot'
+        name: Trigger TryBot (repository_dispatch payload)
         run: |-
           mkdir tmpgit
           cd tmpgit

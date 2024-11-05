@@ -208,7 +208,7 @@ func testName(s string) string {
 // skip field pointed to by skipField if necessary.
 func testFailed(t *testing.T, m *cuetdtest.M, skipField *externaltest.Skip, p positioner, errStr string) {
 	if cuetest.UpdateGoldenFiles {
-		if *skipField == nil && !cuetest.ForceUpdateGoldenFiles {
+		if (*skipField == nil || (*skipField)[m.Name()] == "") && !cuetest.ForceUpdateGoldenFiles {
 			t.Fatalf("test regression; was succeeding, now failing: %v", errStr)
 		}
 		if *skipField == nil {

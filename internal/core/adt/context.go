@@ -167,7 +167,7 @@ type Runtime interface {
 	// type if available.
 	LoadType(t reflect.Type) (src ast.Expr, expr Expr, ok bool)
 
-	Settings() (internal.EvaluatorVersion, cuedebug.Config)
+	ConfigureOpCtx(ctx *OpContext)
 }
 
 type Config struct {
@@ -180,16 +180,15 @@ func New(v *Vertex, cfg *Config) *OpContext {
 	if cfg.Runtime == nil {
 		panic("nil Runtime")
 	}
-	version, flags := cfg.Runtime.Settings()
+
 	ctx := &OpContext{
 		Runtime:     cfg.Runtime,
 		Format:      cfg.Format,
 		vertex:      v,
-		Version:     version,
-		stats:       stats.Counts{EvalVersion: version},
-		Config:      flags,
 		taskContext: schedConfig,
 	}
+	cfg.Runtime.ConfigureOpCtx(ctx)
+	ctx.stats.EvalVersion = ctx.Version
 	if v != nil {
 		ctx.e = &Environment{Up: nil, Vertex: v}
 	}
@@ -213,7 +212,8 @@ type OpContext struct {
 	Format func(Runtime, Node) string
 
 	cuedebug.Config
-	Version internal.EvaluatorVersion // Copied from Runtime
+	Version  internal.EvaluatorVersion // Copied from Runtime
+	TopoSort bool                      // Copied from Runtime
 
 	taskContext
 

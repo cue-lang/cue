@@ -21,18 +21,11 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/export"
-	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
 )
 
 func TestTopologicalSort(t *testing.T) {
-	cueexperiment.Init()
-	saved := cueexperiment.Flags.TopoSort
-	defer func() { cueexperiment.Flags.TopoSort = saved }()
-
-	cueexperiment.Flags.TopoSort = true
-
 	test := cuetxtar.TxTarTest{
 		Root:   "testdata",
 		Name:   "toposort",
@@ -41,6 +34,7 @@ func TestTopologicalSort(t *testing.T) {
 
 	test.Run(t, func(t *cuetxtar.Test) {
 		run := t.Runtime()
+		run.SetTopologicalSort(true)
 		inst := t.Instance()
 
 		v, err := run.Build(nil, inst)

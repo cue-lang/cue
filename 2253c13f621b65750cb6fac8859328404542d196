@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c8188c1_1a85ba99",
+        "filename": "encoding/jsonschema/constraints_object.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-05T14:25:33Z",
+      "side": 1,
+      "message": "odd formatting for this comment:\n\n* why an empty line?\n* the last two lines can be joined\n* the last line begins with a space",
+      "revId": "2253c13f621b65750cb6fac8859328404542d196",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2490bab_61dc6c80",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-05T14:25:33Z",
+      "side": 1,
+      "message": "nit: use https://go.dev/issue/14509 just like we do with CUE issues. not only is it shorter, it will also survive any VCS moves.",
+      "revId": "2253c13f621b65750cb6fac8859328404542d196",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7d8da93_abbcaed6",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-05T14:25:33Z",
+      "side": 1,
+      "message": "odd formatting again; the comment paragraph above in line 286 is wider and IMHO much more readable, this one is very narrow and inconsistent",
+      "revId": "2253c13f621b65750cb6fac8859328404542d196",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

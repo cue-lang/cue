@@ -21,6 +21,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cueexperiment"
 )
@@ -82,7 +83,8 @@ func TestEvalVersion(t *testing.T) {
 	defer func() { cueexperiment.Flags.EvalV3 = saved }()
 
 	test := func(c *cue.Context, want internal.EvaluatorVersion) {
-		got, _ := (*runtime.Runtime)(c).Settings()
+		opCtx := adt.NewContext((*runtime.Runtime)(c), nil)
+		got := opCtx.Version
 		if got != want {
 			t.Errorf("got %v; want %v", got, want)
 		}

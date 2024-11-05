@@ -16,6 +16,24 @@
       "message": "Your reasoning in general SGTM, and the majority of test changes look like improvements, although a few do lose a bit of useful context.\n\nDid you consider including the source when it\u0027s very short (say, under 10 or 20 characters), and otherwise omitting it or using an ellipsis to cut it short? That might be a nice enough tradeoff to avoid huge verbosity, which I have also seen with the huge matchN expressions in github-wofkrlows, and I agree is a big issue.\n\nI\u0027ll leave to @mpvl@gmail.com to approve given this is more of a UX decision that we should be on the same page on.",
       "revId": "6f35e5f7f1732f8d892143a5910795c20bef0bc3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7971c4c6_bdf4df0b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-05T12:32:19Z",
+      "side": 1,
+      "message": "In general, I\u0027m pretty sure that including source that\u0027s literally present in the source code is worth it (we don\u0027t for any other validation error - that\u0027s literally the reason we include source code locations in the error output).\n\nFWIW I\u0027m also seeing huge messages from the _value_ that\u0027s included, and I\u0027m as yet undecided as to the best approach there.",
+      "parentUuid": "31d2cc01_cbe676dc",
+      "revId": "6f35e5f7f1732f8d892143a5910795c20bef0bc3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

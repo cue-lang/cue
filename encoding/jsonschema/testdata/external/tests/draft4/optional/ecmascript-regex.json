@@ -359,8 +359,8 @@
 			"pattern": "\\p{Letter}cole"
 		},
 		"skip": {
-			"v2": "extract error: invalid regexp \"\\\\p{Letter}cole\": error parsing regexp: invalid character class range: `\\p{Letter}`",
-			"v3": "extract error: invalid regexp \"\\\\p{Letter}cole\": error parsing regexp: invalid character class range: `\\p{Letter}`"
+			"v2": "extract error: error parsing regexp: invalid character class range: `\\p{Letter}`",
+			"v3": "extract error: error parsing regexp: invalid character class range: `\\p{Letter}`"
 		},
 		"tests": [
 			{
@@ -481,8 +481,8 @@
 			"pattern": "^\\p{digit}+$"
 		},
 		"skip": {
-			"v2": "extract error: invalid regexp \"^\\\\p{digit}+$\": error parsing regexp: invalid character class range: `\\p{digit}`",
-			"v3": "extract error: invalid regexp \"^\\\\p{digit}+$\": error parsing regexp: invalid character class range: `\\p{digit}`"
+			"v2": "extract error: error parsing regexp: invalid character class range: `\\p{digit}`",
+			"v3": "extract error: error parsing regexp: invalid character class range: `\\p{digit}`"
 		},
 		"tests": [
 			{
@@ -523,6 +523,10 @@
 			},
 			"additionalProperties": false
 		},
+		"skip": {
+			"v2": "extract error: error parsing regexp: invalid character class range: `\\p{Letter}`",
+			"v3": "extract error: error parsing regexp: invalid character class range: `\\p{Letter}`"
+		},
 		"tests": [
 			{
 				"description": "ascii character in json string",
@@ -531,7 +535,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v3": "invalid regexp: error parsing regexp: invalid character class range: `\\p{Letter}`:\n    generated.cue:2:36\n"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -539,14 +544,22 @@
 				"data": {
 					"l'école": "pas de vraie vie"
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
+				}
 			},
 			{
 				"description": "unicode character in hex format in string",
 				"data": {
 					"l'école": "pas de vraie vie"
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
+				}
 			},
 			{
 				"description": "unicode matching is case-sensitive",
@@ -555,8 +568,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			}
 		]
@@ -704,6 +717,10 @@
 			},
 			"additionalProperties": false
 		},
+		"skip": {
+			"v2": "extract error: error parsing regexp: invalid character class range: `\\p{digit}`",
+			"v3": "extract error: error parsing regexp: invalid character class range: `\\p{digit}`"
+		},
 		"tests": [
 			{
 				"description": "ascii digits",
@@ -712,7 +729,8 @@
 				},
 				"valid": true,
 				"skip": {
-					"v3": "invalid regexp: error parsing regexp: invalid character class range: `\\p{digit}`:\n    generated.cue:2:34\n"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -722,8 +740,8 @@
 				},
 				"valid": false,
 				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
 				}
 			},
 			{
@@ -731,7 +749,11 @@
 				"data": {
 					"৪২": "khajit has wares if you have coin"
 				},
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v2": "could not compile schema",
+					"v3": "could not compile schema"
+				}
 			}
 		]
 	}

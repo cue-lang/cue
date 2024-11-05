@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2dedc9b_a4b9987c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-05T14:52:46Z",
+      "side": 1,
+      "message": "I actually did file that bug (#3555) to make it easier to refer to. I made the commit message refer to it.",
+      "parentUuid": "93946bd2_1131d0d1",
+      "revId": "32074c67d3b55d6822bc8269019ed816e750f9b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0e964db5_a151f1c8",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-11-05T14:22:04Z",
       "side": 1,
       "message": "this issue describes a test case that should fail but succeeded instead. is this captured by any of the tests below that isn\u0027t the \"empty property string\" one? because I skimmed but couldn\u0027t find it",
+      "revId": "32074c67d3b55d6822bc8269019ed816e750f9b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8baffde_af553749",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-05T14:52:46Z",
+      "side": 1,
+      "message": "I added another commit to add that test case.",
+      "parentUuid": "0e964db5_a151f1c8",
       "revId": "32074c67d3b55d6822bc8269019ed816e750f9b7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -66,6 +102,24 @@
       "side": 1,
       "message": "The square brackets here are meant to represent the returned slice, not\nthe actual CUE syntax, but I can see that\u0027s misleading, as the original comment.\nWill adjust.",
       "parentUuid": "90691fd7_0cc9aec8",
+      "revId": "32074c67d3b55d6822bc8269019ed816e750f9b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42438b6b_6bed64b2",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 844,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-05T14:52:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "94c6f20f_f05458bf",
       "revId": "32074c67d3b55d6822bc8269019ed816e750f9b7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

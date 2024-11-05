@@ -17,6 +17,7 @@ package runtime
 import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cueexperiment"
 )
@@ -31,13 +32,20 @@ type Runtime struct {
 	// the kind in a file-level @extern(kind) attribute.
 	interpreters map[string]Interpreter
 
-	version internal.EvaluatorVersion
+	version  internal.EvaluatorVersion
+	topoSort bool
 
 	flags cuedebug.Config
 }
 
 func (r *Runtime) Settings() (internal.EvaluatorVersion, cuedebug.Config) {
 	return r.version, r.flags
+}
+
+func (r *Runtime) ConfigureOpCtx(ctx *adt.OpContext) {
+	ctx.Version = r.version
+	ctx.TopoSort = r.topoSort
+	ctx.Config = r.flags
 }
 
 func (r *Runtime) SetBuildData(b *build.Instance, x interface{}) {
@@ -73,6 +81,12 @@ func (r *Runtime) SetVersion(v internal.EvaluatorVersion) {
 	r.version = v
 }
 
+// SetTopologicalSort sets whether or not to use topological sorting
+// for the Runtime.
+func (r *Runtime) SetTopologicalSort(b bool) {
+	r.topoSort = b
+}
+
 // SetDebugOptions sets the debug flags to use for the Runtime. This should only
 // be set before first use.
 func (r *Runtime) SetDebugOptions(flags *cuedebug.Config) {
@@ -103,4 +117,5 @@ func (r *Runtime) Init() {
 	} else {
 		r.version = internal.DefaultVersion
 	}
+	r.topoSort = cueexperiment.Flags.TopoSort
 }

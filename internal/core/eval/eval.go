@@ -30,8 +30,6 @@ func Evaluate(r adt.Runtime, v *adt.Vertex) {
 
 func New(r adt.Runtime) *Unifier {
 	ctx := NewContext(r, nil)
-	// TODO: we could access these directly if we can use runtime.Runtime directly.
-	ctx.Version, ctx.Config = r.Settings()
 	return &Unifier{r: r, e: ctx}
 }
 

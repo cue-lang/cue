@@ -369,5 +369,5 @@ func appendNodes(indexCmp *indexComparison, nodesSorted, nodesReady, nodesEnable
 }
 
 func debug(formatting string, args ...any) {
-	//	fmt.Printf(formatting, args...)
+	// fmt.Printf(formatting, args...)
 }

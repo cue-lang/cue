@@ -39,6 +39,7 @@ func constraintAdditionalProperties(key string, n cue.Value, s *state) {
 			return
 		}
 		// [!~(properties|patternProperties)]: schema
+
 		existing := append(s.patterns, excludeFields(obj.Elts)...)
 		f := internal.EmbedStruct(ast.NewStruct(&ast.Field{
 			Label: ast.NewList(ast.NewBinExpr(token.AND, existing...)),
@@ -83,7 +84,14 @@ func constraintPatternProperties(key string, n cue.Value, s *state) {
 	obj := s.object(n)
 	existing := excludeFields(s.obj.Elts)
 	s.processMap(n, func(key string, n cue.Value) {
+		if !s.checkRegexp(n, key) {
+			return
+		}
 		// [!~(properties) & pattern]: schema
+
+		// Record the pattern for potential use by additionalProperties
+		// because patternProperties are considered before
+		//  additionalProperties.
 		s.patterns = append(s.patterns,
 			&ast.UnaryExpr{Op: token.NMAT, X: ast.NewString(key)})
 		f := internal.EmbedStruct(ast.NewStruct(&ast.Field{

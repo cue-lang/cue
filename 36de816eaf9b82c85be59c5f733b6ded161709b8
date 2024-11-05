@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "304571e8_05c68537",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 23
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-05T11:15:23Z",
+      "side": 1,
+      "message": "I prefer sm over sMeta",
+      "revId": "36de816eaf9b82c85be59c5f733b6ded161709b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14a16da0_52821d98",
+        "filename": "internal/core/toposort/vertex.go",
+        "patchSetId": 23
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-05T11:15:23Z",
+      "side": 1,
+      "message": "This is still called indexer, even though the comments said it was resolved. Was the latest version maybe not pushed?",
+      "revId": "36de816eaf9b82c85be59c5f733b6ded161709b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

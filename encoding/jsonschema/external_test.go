@@ -93,6 +93,7 @@ func runExternalSchemaTests(t *testing.T, m *cuetdtest.M, filename string, s *ex
 	if vers == jsonschema.VersionUnknown {
 		t.Skipf("skipping test for unknown schema version %v", versStr)
 	}
+	t.Logf("extracting %v", jsonValue)
 	schemaAST, extractErr := jsonschema.Extract(jsonValue, &jsonschema.Config{
 		StrictFeatures: true,
 		DefaultVersion: vers,

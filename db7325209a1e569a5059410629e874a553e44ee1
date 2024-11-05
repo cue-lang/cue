@@ -16,6 +16,24 @@
       "message": "Please document this method.",
       "revId": "db7325209a1e569a5059410629e874a553e44ee1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca75fcb3_cc6ebe4d",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-11-05T16:18:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ed745690_8ad7bc9f",
+      "revId": "db7325209a1e569a5059410629e874a553e44ee1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

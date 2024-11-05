@@ -105,6 +105,24 @@
       "parentUuid": "a1a65cfb_d5119e87",
       "revId": "6f35e5f7f1732f8d892143a5910795c20bef0bc3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5fd0b340_686b73ab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-05T15:55:24Z",
+      "side": 1,
+      "message": "I agree with Dan that it is a pity to lose the concept in some cases. The source is not always immediately useful, for instance when the argument are references. Perhaps an alternative is to only show the arguments if the arguments are scalar values.",
+      "parentUuid": "eb468bc6_f499e705",
+      "revId": "6f35e5f7f1732f8d892143a5910795c20bef0bc3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

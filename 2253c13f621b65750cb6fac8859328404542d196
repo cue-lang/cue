@@ -140,6 +140,24 @@
       "parentUuid": "8fcdb5b2_e84ff5d4",
       "revId": "2253c13f621b65750cb6fac8859328404542d196",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f08c6ae0_b98585ec",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-05T15:17:30Z",
+      "side": 1,
+      "message": "I think 8 is followed by some Go people, and it\u0027s the default in go/printer, but I think in general 4 makes more sense and it works for me. Whatever works for you though, as long as the comments are reasonable and readable.\n\nFWIW you might have picked up a limit of 70 as a standard from git commit messages being capped to 76 (https://go.dev/wiki/CommitMessage). We do still follow that for commit messages, but for code, I think 90-100 is still very reasonable.",
+      "parentUuid": "a5daeb5a_da53b4b9",
+      "revId": "2253c13f621b65750cb6fac8859328404542d196",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

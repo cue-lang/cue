@@ -50,6 +50,24 @@
       "message": "nit: given that below it says \"can be used in a label expression\", I think it was correct without the pattern matching square brackets",
       "revId": "32074c67d3b55d6822bc8269019ed816e750f9b7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94c6f20f_f05458bf",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 844,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-05T14:47:49Z",
+      "side": 1,
+      "message": "The square brackets here are meant to represent the returned slice, not\nthe actual CUE syntax, but I can see that\u0027s misleading, as the original comment.\nWill adjust.",
+      "parentUuid": "90691fd7_0cc9aec8",
+      "revId": "32074c67d3b55d6822bc8269019ed816e750f9b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -72,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "becac351_1289cddd",
+        "filename": "cue/load/testdata/testfetch/simple.txtar",
+        "patchSetId": 17
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-11-05T10:51:52Z",
+      "side": 1,
+      "message": "I\u0027ve looked through simple.txtar, and actually this change makes total sense to me - it\u0027s constructing a simple chain from the imports + embeddings. I don\u0027t think there\u0027s anything surprising or wrong going on here from what I can see.",
+      "parentUuid": "9cad68e7_60994921",
+      "revId": "7a4be02fdb2af86953658a12cd546930cf01c84c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f556a2af_16e54e73",
         "filename": "cue/syntax_test.go",
         "patchSetId": 17

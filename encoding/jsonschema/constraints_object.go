@@ -83,9 +83,18 @@ func constraintPatternProperties(key string, n cue.Value, s *state) {
 	obj := s.object(n)
 	existing := excludeFields(s.obj.Elts)
 	s.processMap(n, func(key string, n cue.Value) {
-		// [!~(properties) & pattern]: schema
+		if !s.checkRegexp(n, key) {
+			return
+		}
+
+		// Record the pattern for potential use by
+		// additionalProperties because patternProperties are
+		// considered before additionalProperties.
 		s.patterns = append(s.patterns,
 			&ast.UnaryExpr{Op: token.NMAT, X: ast.NewString(key)})
+
+		// We'll make a pattern constraint of the form:
+		// 	[pattern & !~(properties)]: schema
 		f := internal.EmbedStruct(ast.NewStruct(&ast.Field{
 			Label: ast.NewList(ast.NewBinExpr(
 				token.AND,

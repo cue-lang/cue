@@ -171,8 +171,9 @@ func (d *decoder) schema(ref []ast.Label, v cue.Value) (a []ast.Decl) {
 		a = append(a, &ast.EmbedDecl{Expr: expr})
 	}
 
-	state.doc(a[0])
-
+	if len(a) > 0 {
+		state.doc(a[0])
+	}
 	for i := inner - 1; i >= 0; i-- {
 		a = []ast.Decl{&ast.Field{
 			Label: ref[i],
@@ -267,24 +268,43 @@ func (d *decoder) regexpValue(n cue.Value) (ast.Expr, bool) {
 	if !ok {
 		return nil, false
 	}
-	_, err := syntax.Parse(s, syntax.Perl)
-	if err == nil {
-		return d.string(n), true
-	}
-	var regErr *syntax.Error
-	if errors.As(err, &regErr) && regErr.Code == syntax.ErrInvalidPerlOp {
-		// It's Perl syntax that we'll never support because the CUE evaluation
-		// engine uses Go's regexp implementation and because the missing
-		// features are usually not there for good reason (e.g. exponential
-		// runtime). In other words, this is a missing feature but not an invalid
-		// regular expression as such.
-		if d.cfg.StrictFeatures {
-			d.errf(n, "unsupported Perl regexp syntax in %q: %v", s, err)
-		}
+	if !d.checkRegexp(n, s) {
 		return nil, false
 	}
+	return d.string(n), true
+}
+
+func (d *decoder) checkRegexp(n cue.Value, s string) bool {
+	_, err := syntax.Parse(s, syntax.Perl)
+	if err == nil {
+		return true
+	}
+	var regErr *syntax.Error
+	if errors.As(err, &regErr) {
+		switch regErr.Code {
+		case syntax.ErrInvalidPerlOp:
+			// It's Perl syntax that we'll never support because the CUE evaluation
+			// engine uses Go's regexp implementation and because the missing
+			// features are usually not there for good reason (e.g. exponential
+			// runtime). In other words, this is a missing feature but not an invalid
+			// regular expression as such.
+			if d.cfg.StrictFeatures {
+				d.errf(n, "unsupported Perl regexp syntax in %q: %v", s, err)
+			}
+			return false
+		case syntax.ErrInvalidCharRange:
+			// There are many more character class ranges than Go supports currently
+			// (see https://go.dev/issue/14509) so treat an unknown character class
+			// range as a feature error rather than a bad regexp.
+			// TODO translate names to Go-supported class names when possible.
+			if d.cfg.StrictFeatures {
+				d.errf(n, "unsupported regexp character class in %q: %v", s, err)
+			}
+			return false
+		}
+	}
 	d.errf(n, "invalid regexp %q: %v", s, err)
-	return nil, false
+	return false
 }
 
 // const draftCutoff = 5

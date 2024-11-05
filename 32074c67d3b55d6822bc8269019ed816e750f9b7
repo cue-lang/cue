@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93946bd2_1131d0d1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-05T14:22:04Z",
+      "side": 1,
+      "message": "perhaps clarify that we are not filing that bug with evalv2 because we are fully focused on evalv3 now.",
+      "revId": "32074c67d3b55d6822bc8269019ed816e750f9b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e964db5_a151f1c8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-05T14:22:04Z",
+      "side": 1,
+      "message": "this issue describes a test case that should fail but succeeded instead. is this captured by any of the tests below that isn\u0027t the \"empty property string\" one? because I skimmed but couldn\u0027t find it",
+      "revId": "32074c67d3b55d6822bc8269019ed816e750f9b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90691fd7_0cc9aec8",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 844,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-05T14:22:04Z",
+      "side": 1,
+      "message": "nit: given that below it says \"can be used in a label expression\", I think it was correct without the pattern matching square brackets",
+      "revId": "32074c67d3b55d6822bc8269019ed816e750f9b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

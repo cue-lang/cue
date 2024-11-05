@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09bfec8f_f20898f3",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-05T13:28:48Z",
+      "side": 1,
+      "message": "This is needed because in some cases there can be no elements generated\nas part of the struct literal. It\u0027s good to be defensive in any case.",
+      "revId": "03db04313a8c0f921f0dc47c7c126d662c611c2c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

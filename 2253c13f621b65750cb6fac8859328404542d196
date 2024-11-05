@@ -104,6 +104,24 @@
       "parentUuid": "d7d8da93_abbcaed6",
       "revId": "2253c13f621b65750cb6fac8859328404542d196",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8fcdb5b2_e84ff5d4",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-05T15:09:24Z",
+      "side": 1,
+      "message": "FWIW we don\u0027t have strict rules today in terms of line length limit or tab size, but if you do use tab size of 8, then at least set your line wrapping to 80 or 90 characters. 70 is way too small for a tab size of 8. I personally use a tab width of 4 and aim for 80-100 line length limits, but not as a hard rule, because it\u0027s not the 1980s.",
+      "parentUuid": "a9eb4103_8f03b891",
+      "revId": "2253c13f621b65750cb6fac8859328404542d196",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

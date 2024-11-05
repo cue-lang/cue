@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a233e312_ce9ccd3e",
+        "filename": "encoding/jsonschema/constraints_object.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-05T14:57:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2c8188c1_1a85ba99",
+      "revId": "2253c13f621b65750cb6fac8859328404542d196",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a2490bab_61dc6c80",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "885df055_d16cc378",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-05T14:57:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a2490bab_61dc6c80",
+      "revId": "2253c13f621b65750cb6fac8859328404542d196",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d7d8da93_abbcaed6",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-11-05T14:25:33Z",
       "side": 1,
       "message": "odd formatting again; the comment paragraph above in line 286 is wider and IMHO much more readable, this one is very narrow and inconsistent",
+      "revId": "2253c13f621b65750cb6fac8859328404542d196",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9eb4103_8f03b891",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-05T14:57:36Z",
+      "side": 1,
+      "message": "Technically, assuming 8-space tabs, this is maintaining the usual 70 column limit, but I tend to agree. Done.",
+      "parentUuid": "d7d8da93_abbcaed6",
       "revId": "2253c13f621b65750cb6fac8859328404542d196",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -141,6 +141,24 @@
       "parentUuid": "5fd0b340_686b73ab",
       "revId": "6f35e5f7f1732f8d892143a5910795c20bef0bc3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0412111b_b297c0a4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-06T15:46:13Z",
+      "side": 1,
+      "message": "I think this is a reasonable compromise for now. We can tweak it later if need be. I agree that avoiding huge, huge lines for matchN and friends with large schemas is a priority.",
+      "parentUuid": "681db0a2_1fb4d1c8",
+      "revId": "6f35e5f7f1732f8d892143a5910795c20bef0bc3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -123,6 +123,24 @@
       "parentUuid": "eb468bc6_f499e705",
       "revId": "6f35e5f7f1732f8d892143a5910795c20bef0bc3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "681db0a2_1fb4d1c8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-06T15:42:34Z",
+      "side": 1,
+      "message": "As discussed online, I\u0027ve made it omit the arguments only for builtins that accept non-concrete arguments.",
+      "parentUuid": "5fd0b340_686b73ab",
+      "revId": "6f35e5f7f1732f8d892143a5910795c20bef0bc3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

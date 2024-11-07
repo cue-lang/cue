@@ -273,7 +273,7 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "invalid value [\"foo\"] (does not satisfy matchN): 0 matched, expected 0:\n    generated.cue:2:1\n    generated.cue:2:8\n    instance.json:1:1\n"
+					"v2": "invalid value [\"foo\"] (does not satisfy matchN(0, _|_(explicit error (_|_ literal) in source))): 0 matched, expected 0:\n    generated.cue:2:1\n    generated.cue:2:8\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -281,7 +281,7 @@
 				"data": [],
 				"valid": true,
 				"skip": {
-					"v2": "invalid value [] (does not satisfy matchN): 0 matched, expected 0:\n    generated.cue:2:1\n    generated.cue:2:8\n    instance.json:1:1\n"
+					"v2": "invalid value [] (does not satisfy matchN(0, _|_(explicit error (_|_ literal) in source))): 0 matched, expected 0:\n    generated.cue:2:1\n    generated.cue:2:8\n    instance.json:1:1\n"
 				}
 			}
 		]

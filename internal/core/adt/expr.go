@@ -17,6 +17,7 @@ package adt
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"regexp"
 
 	"github.com/cockroachdb/apd/v3"
@@ -1654,11 +1655,12 @@ func (p Param) Default() Value {
 	return d.Values[0]
 }
 
-func (x *Builtin) qualifiedName(c *OpContext) string {
+func (x *Builtin) WriteName(w io.Writer, c *OpContext) {
 	if x.Package != InvalidLabel {
-		return x.Package.StringValue(c) + "." + x.Name
+		_, _ = fmt.Fprintf(w, "%s.%s", x.Package.StringValue(c), x.Name)
+	} else {
+		_, _ = fmt.Fprintf(w, "%s", x.Name) // stdlib
 	}
-	return x.Name
 }
 
 // Kind here represents the case where Builtin is used as a Validator.
@@ -1819,21 +1821,13 @@ func validateWithBuiltin(c *OpContext, src token.Pos, b *Builtin, args []Value) 
 		}
 
 	default:
-		return c.NewErrf("invalid validator %s", b.qualifiedName(c))
+		return c.NewErrf("invalid validator %s.%s", b.Package.StringValue(c), b.Name)
 	}
 
-	// If the validator returns an error and we already had an error, just
-	// return the original error.
-	if b, ok := Unwrap(args[0]).(*Bottom); ok {
-		return b
-	}
 	// failed:
 	var buf bytes.Buffer
-	buf.WriteString(b.qualifiedName(c))
-
-	// Note: when the builtin accepts non-concrete arguments, omit them because
-	// they can easily be very large.
-	if !b.NonConcrete && len(args) > 1 {
+	b.WriteName(&buf, c)
+	if len(args) > 1 {
 		buf.WriteString("(")
 		for i, a := range args[1:] {
 			if i > 0 {
@@ -1842,6 +1836,12 @@ func validateWithBuiltin(c *OpContext, src token.Pos, b *Builtin, args []Value) 
 			buf.WriteString(c.Str(a))
 		}
 		buf.WriteString(")")
+	}
+
+	// If the validator returns an error and we already had an error, just
+	// return the original error.
+	if b, ok := Unwrap(args[0]).(*Bottom); ok {
+		return b
 	}
 
 	vErr := c.NewPosf(src, "invalid value %s (does not satisfy %s)", args[0], buf.String())

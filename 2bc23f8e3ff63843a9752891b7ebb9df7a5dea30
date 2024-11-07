@@ -90,6 +90,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "b5251c0b_41393925",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 466,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-07T03:59:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e497f9da_72432964",
+      "revId": "2bc23f8e3ff63843a9752891b7ebb9df7a5dea30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "e330142d_4fbab465",
         "filename": "encoding/jsonschema/testdata/txtar/contains.txtar",
         "patchSetId": 1
@@ -140,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "841cc24c_3968bc36",
+        "filename": "encoding/jsonschema/testdata/txtar/object.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-07T03:59:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "94201f1a_08e828c3",
+      "revId": "2bc23f8e3ff63843a9752891b7ebb9df7a5dea30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6a94cddb_7c4be435",
@@ -153,6 +189,24 @@
       "writtenOn": "2024-11-01T10:49:19Z",
       "side": 1,
       "message": "This is still redundant.",
+      "revId": "2bc23f8e3ff63843a9752891b7ebb9df7a5dea30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e91c6023_659495ca",
+        "filename": "encoding/jsonschema/testdata/txtar/unsupported.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-07T03:59:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6a94cddb_7c4be435",
       "revId": "2bc23f8e3ff63843a9752891b7ebb9df7a5dea30",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

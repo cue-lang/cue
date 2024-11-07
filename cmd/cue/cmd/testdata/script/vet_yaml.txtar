@@ -2,7 +2,7 @@
 cmp stderr expect-stderr
 
 -- expect-stderr --
-phrases: invalid value "phrases:\n  # A quote from Mark Twain.\n  quote1:\n    lang: en\n    attribution: Mark Twain\n\n  # A Norwegian proverb.\n  proverb:\n    lang: no\n    text: Stemmen som sier at du ikke klarer det, lyver." (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: incomplete value !="":
+phrases: invalid value "phrases:\n  # A quote from Mark Twain.\n  quote1:\n    lang: en\n    attribution: Mark Twain\n\n  # A Norwegian proverb.\n  proverb:\n    lang: no\n    text: Stemmen som sier at du ikke klarer det, lyver." (does not satisfy encoding/yaml.Validate({phrases:{},#Phrase:{lang:=~"^[a-zA-Z0-9-_]{2,}$" | false,text:!="",attribution?:!=""},#LanguageTag:=~"^[a-zA-Z0-9-_]{2,}$" | false})): error in call to encoding/yaml.Validate: incomplete value !="":
     ./yaml.cue:19:10
     ./yaml.cue:11:17
     ./yaml.cue:21:10

@@ -317,15 +317,13 @@ foo: [
 [
 	if true {}, // inline comment
 ]
-
+// comments
 {
 
 	foo: {
 		// some
 		... // comment
-	}
-	// comments
-	... // surrounding
+	} // surrounding
 
 	// an ellipsis
 }

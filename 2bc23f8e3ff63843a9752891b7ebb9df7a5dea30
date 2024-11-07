@@ -71,6 +71,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f7e81d7_98e3ac61",
+        "filename": "cue/ast/astutil/fix_closeness.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-07T14:15:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1d0d7bca_857dd124",
+      "revId": "2bc23f8e3ff63843a9752891b7ebb9df7a5dea30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e497f9da_72432964",

@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "878e1485_a698fe5d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-07T14:15:20Z",
+      "side": 1,
+      "message": "LGTM modulo a few minor comments and suggestions. Thanks! This looks substantially more correct, and I\u0027m reasonably confident that the ast walk can make the result look decent again too.",
+      "revId": "293e785d3f5f804f0ed272cc6b6967ef2a074d0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a606f2da_11da178a",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 461,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-07T14:15:20Z",
+      "side": 1,
+      "message": "```suggestion\n\t// objN records the node associated with the first\n\t// caller of [state.object], used for adding obj\n\t// to constraints.\n\tobjN cue.Value\n```\n\n?",
+      "revId": "293e785d3f5f804f0ed272cc6b6967ef2a074d0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47f79109_9260cd76",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 525,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-07T14:15:20Z",
+      "side": 1,
+      "message": "Perhaps include a comment explaining what we\u0027re doing here and why?",
+      "revId": "293e785d3f5f804f0ed272cc6b6967ef2a074d0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5ebade9_e65e6830",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-07T14:15:20Z",
+      "side": 1,
+      "message": "no need to add this.",
+      "revId": "293e785d3f5f804f0ed272cc6b6967ef2a074d0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09625404_7118039c",
+        "filename": "encoding/jsonschema/testdata/external/tests/draft2019-09/additionalProperties.json",
+        "patchSetId": 6
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-07T14:15:20Z",
+      "side": 1,
+      "message": "Interesting. I wonder why v3 wasn\u0027t fixed by this too.",
+      "revId": "293e785d3f5f804f0ed272cc6b6967ef2a074d0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ea8d599_6a33fca9",
+        "filename": "encoding/jsonschema/testdata/external/tests/draft2019-09/optional/ecmascript-regex.json",
+        "patchSetId": 6
+      },
+      "lineNbr": 610,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-07T14:15:20Z",
+      "side": 1,
+      "message": "I wonder why we\u0027ve got a regression on v3 here. I filed https://github.com/cue-lang/cue/issues/3562 to track this one and the other one.",
+      "revId": "293e785d3f5f804f0ed272cc6b6967ef2a074d0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8e1f41f_7845b1e1",
+        "filename": "encoding/jsonschema/testdata/txtar/constobj.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-07T14:15:20Z",
+      "side": 1,
+      "message": "Aside: we really need to improve our support for const with structs.\nThis will validate against `{b: 1}` for example, which definitely isn\u0027t right.\nNothing to do now, but I\u0027ve just raised https://github.com/cue-lang/cue/issues/3561 to track this.",
+      "revId": "293e785d3f5f804f0ed272cc6b6967ef2a074d0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad97dc78_b5c2578e",
+        "filename": "encoding/jsonschema/testdata/txtar/issue3351.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-07T14:15:20Z",
+      "side": 1,
+      "message": "As a nod towards the next stage:\n\nSeeing that this is inside `_schema` makes me realise that the lexical `close` remover logic I\u0027ve been suggesting probably won\u0027t work on this, because it\u0027s not inside a definition, and checking that all references to `_schema` are inside definitions is more than we\u0027d like to do.\n\nWe\u0027d kinda like that to be possible, so perhaps one easy workaround is just to\nrename `_schema` to `_#schema`. Given that we have the explicit goal of saying that the generated schemas should be valid whether they\u0027re inside a definition or not, that shouldn\u0027t affect behaviour, but _should_ allow the logic to remove all the `close` calls like this.",
+      "revId": "293e785d3f5f804f0ed272cc6b6967ef2a074d0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d7439da_caef7311",
+        "filename": "encoding/jsonschema/testdata/txtar/list.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-07T14:15:20Z",
+      "side": 1,
+      "message": "For the record, there is another way of writing this that doesn\u0027t need an extra level of indentation for all fields.\n\n```\nclose({})\n```\nThat\u0027s because a struct that embeds a closed struct becomes closed itself.\n\nI\u0027m not sure whether it\u0027s worthwhile to do, but something to bear in mind for the future, perhaps.",
+      "revId": "293e785d3f5f804f0ed272cc6b6967ef2a074d0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7224c37_6c49dafd",
+        "filename": "encoding/jsonschema/testdata/txtar/type.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-07T14:15:20Z",
+      "side": 1,
+      "message": "This is interesting. The doc comment was lost before but this makes it appear again.",
+      "revId": "293e785d3f5f804f0ed272cc6b6967ef2a074d0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

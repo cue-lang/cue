@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "15b14317_9ee311d0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-07T16:49:04Z",
+      "side": 1,
+      "message": "I have split the simplification pass into a separate CL.\nhttps://review.gerrithub.io/c/cue-lang/cue/+/1203727",
+      "revId": "293e785d3f5f804f0ed272cc6b6967ef2a074d0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a606f2da_11da178a",
@@ -31,6 +48,24 @@
       "writtenOn": "2024-11-07T14:15:20Z",
       "side": 1,
       "message": "```suggestion\n\t// objN records the node associated with the first\n\t// caller of [state.object], used for adding obj\n\t// to constraints.\n\tobjN cue.Value\n```\n\n?",
+      "revId": "293e785d3f5f804f0ed272cc6b6967ef2a074d0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7bd647fb_4ba0a0e4",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 461,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-07T16:49:04Z",
+      "side": 1,
+      "message": "Fix applied.",
+      "parentUuid": "a606f2da_11da178a",
       "revId": "293e785d3f5f804f0ed272cc6b6967ef2a074d0f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

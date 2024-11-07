@@ -324,10 +324,6 @@ foo: [
 		// some
 		... // comment
 	}
-	// comments
-	... // surrounding
-
-	// an ellipsis
 }
 -- comment_alone.input --
 // Just one comment on its own.

@@ -34,9 +34,7 @@
 close({
 	// an integer or string.
 	intString?: null | bool | int | string | [...]
-	object?: {
-		...
-	} | *{
+	object?: {} | *{
 		foo: "bar"
 		baz: 1.3
 	}

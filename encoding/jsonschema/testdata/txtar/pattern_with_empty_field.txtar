@@ -14,7 +14,6 @@
 -- out/decode/extract --
 @jsonschema(schema="https://json-schema.org/draft/2020-12/schema")
 {[=~".*"]: string}
-...
 -- test/err-empty-field.json --
 {"": true}
 -- out/decode/testerr/err-empty-field --

@@ -35,16 +35,19 @@ func printNode(node interface{}, f *printer) error {
 	case *ast.File:
 		if f.cfg.simplify {
 			ls.markReferences(x)
+			x = internal.SimplifyCloseness(x, false).(*ast.File)
 		}
 		s.file(x)
 	case ast.Expr:
 		if f.cfg.simplify {
 			ls.markReferences(x)
+			x = internal.SimplifyCloseness(x, false).(ast.Expr)
 		}
 		s.expr(x)
 	case ast.Decl:
 		if f.cfg.simplify {
 			ls.markReferences(x)
+			x = internal.SimplifyCloseness(x, false).(ast.Decl)
 		}
 		s.decl(x)
 	// case ast.Node: // TODO: do we need this?
@@ -52,6 +55,9 @@ func printNode(node interface{}, f *printer) error {
 	case []ast.Decl:
 		if f.cfg.simplify {
 			ls.processDecls(x)
+			for i := range x {
+				x[i] = internal.SimplifyCloseness(x[i], false).(ast.Decl)
+			}
 		}
 		s.walkDeclList(x)
 	default:

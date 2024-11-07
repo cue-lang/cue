@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d05e1ab1_aaa677d4",
+        "filename": "cue/format/testdata/comments.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-07T18:43:14Z",
+      "side": 0,
+      "message": "Hmm, I wonder if it\u0027s OK that all these comments disappear.",
+      "revId": "293e785d3f5f804f0ed272cc6b6967ef2a074d0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "917858dc_c56a17e1",
+        "filename": "encoding/jsonschema/testdata/txtar/basic.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-07T18:43:14Z",
+      "side": 0,
+      "message": "According to the principles I outlined in my earlier suggestion, I don\u0027t think this quite right. Specifically, I suggested that the AST pass\n\n\u003e removes ellipses when there is no way that the struct can be referred to and it would otherwise be considered open\n\nbut a package value _can_ definitely be referred to (by importing it), and that value can be placed inside a definition, which would close up the places where the ellipses would have been, changing the semantics of the schema.",
+      "revId": "293e785d3f5f804f0ed272cc6b6967ef2a074d0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aef4ca57_e40ab6fc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-07T18:43:14Z",
+      "side": 1,
+      "message": "This is a great start, thanks! As ever, thanks very much for continuing to work on this 😊\nIt\u0027s not quite there yet, but not too far off I think.",
+      "revId": "89cadfbea9ec7f47be2adba6e37046bc727ce9f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9ace1b2_93b9294b",
+        "filename": "cue/format/node.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-07T18:43:14Z",
+      "side": 1,
+      "message": "Even though I know I did suggest it as a possibility (sorry 😊 ) I don\u0027t think this is appropriate to include as part of the default format simplifications, for reason I describe elsewhere in this review. Any simplifications that appear here have to be bombproof and not change semantics regardless of the CUE that\u0027s presented to them. I think that\u0027s quite hard (harder than I\u0027d originally thought actually), so let\u0027s not do it for now at any rate.",
+      "revId": "89cadfbea9ec7f47be2adba6e37046bc727ce9f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2fbf502_65eba706",
+        "filename": "internal/closeness.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-07T18:43:14Z",
+      "side": 1,
+      "message": "```suggestion\n// Copyright 2024 CUE Authors\n```",
+      "revId": "89cadfbea9ec7f47be2adba6e37046bc727ce9f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d070e94_1d580b37",
+        "filename": "internal/closeness.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-07T18:43:14Z",
+      "side": 1,
+      "message": "```suggestion\n// SimplifyClosedness updates the AST to remove redundant ellipses and `close` calls.\n```",
+      "revId": "89cadfbea9ec7f47be2adba6e37046bc727ce9f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "737ebd6a_fad522d7",
+        "filename": "internal/closeness.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-07T18:43:14Z",
+      "side": 1,
+      "message": "```suggestion\nfunc SimplifyClosedness(n ast.Node) ast.Node {\n```\n\nPart of the point of this operation is that, for the top level value at least, we don\u0027t _know_ if we\u0027re ever going to be part of a definition or not. The transformation should work regardless of that. So I think the argument isn\u0027t needed.\n\nAlso note the name change: \"closedness\" is a more valid English word.",
+      "revId": "89cadfbea9ec7f47be2adba6e37046bc727ce9f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bbdf742e_eba9ec94",
+        "filename": "internal/closeness.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-07T18:43:14Z",
+      "side": 1,
+      "message": "I think you\u0027ll also need to keep track of whether the current expression can be referred to (and hence closed). Perhaps another bool field named `canBeClosed` ?",
+      "revId": "89cadfbea9ec7f47be2adba6e37046bc727ce9f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ffe54dd5_a075367b",
+        "filename": "internal/closeness_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-07T18:43:14Z",
+      "side": 1,
+      "message": "I\u0027d like to see much more comprehensive tests here that explore a bunch of edge cases in a focused way.\n\nI made a start on this (and include the resulting test code below).\nAs you can see, there are a number of potentially problematic cases that make doing the \"right\" thing in all cases tricky. Luckily we can reduce the scope of the problem down to the set of possible outputs that encoding/jsonschema can produce, so I still think the approach should be viable.\n\n```\npackage internal_test\n\nimport (\n\t\"testing\"\n\n\t\"cuelang.org/go/cue/parser\"\n\t\"cuelang.org/go/internal\"\n\t\"cuelang.org/go/internal/astinternal\"\n\t\"cuelang.org/go/internal/cuetest\"\n\t\"github.com/go-quicktest/qt\"\n)\n\ntype closednessTest struct {\n\tname string\n\tsrc  string\n\twant string\n}\n\nvar closednessTests \u003d []closednessTest{{\n\tname: \"EllipsisAtTopLevel\",\n\tsrc:  `a: 5, ...`,\n\twant: `a: 5, ...`,\n}, {\n\tname: \"EllipsisInEmbeddedStructLiteral\",\n\tsrc:  `{a: 5, ...}`,\n\twant: `{a: 5, ...}`,\n}, {\n\tname: \"ReferenceIntoStructLiteral\",\n\tsrc:  `{x: {a: {b: 5, ...}}.a}`,\n\twant: `{x: {a: {b: 5, ...}}.a}`,\n}, {\n\tname: \"ReferenceIntoClosedFieldOfStructLiteralInDefinition\",\n\tsrc: `#x: {\n\t\t{a: close({b: 5, ...})}.a\n\t}`,\n\twant: `#x: {{a: {b: 5}}.a}`,\n}, {\n\tname: \"EllipsisInMatchNArg\",\n\tsrc:  `matchN(1, [{a: 5, ...}])`,\n\twant: `matchN(1, [{a: 5}])`,\n}, {\n\tname: \"CloseInDefinition\",\n\tsrc:  `#a: close({a: 5})`,\n\twant: `#a: {a: 5}`,\n}, {\n\tname: \"DoubleCloseInDefinition\",\n\tsrc:  `#a: close(close({a: 5}))`,\n\twant: `#a: {a: 5}`,\n}, {\n\tname: \"CloseInDefinitionWithEllipsis\",\n\tsrc:  `#a: close({a: 5, ...})`,\n\twant: `#a: {a: 5}`, // wrong: should retain ellipses\n}, {\n\tname: \"CloseInNestedFieldInDefinition\",\n\tsrc:  `a: #b: c: close({a: 5})`,\n\twant: `a: {#b: {c: {a: 5}}}`, // wrong: should not add extra braces\n}, {\n\tname: \"UnificationWithEllipsisInDefinition\",\n\tsrc:  `#a: {a: 5, ...} \u0026 {b: 5}`,\n\twant: `#a: {a: 5, ...}\u0026{b: 5}`,\n}, {\n\tname: \"UnificationWithCloseInDefinition\",\n\tsrc:  `#a: close({a: 5}) \u0026 {b: 5}`,\n\twant: `#a: {a: 5}\u0026{b: 5}`,\n}, {\n\tname: \"DisjunctionWithCloseInDefinition\",\n\tsrc:  `#a: null | close({a: 1})`,\n\twant: `#a: null|{a: 1}`,\n}, {\n\tname: \"CloseInNestedExpressionInDefinition\",\n\t// We can\u0027t elide the close call when the\n\t// literal is in a disjunction that features in some\n\t// other expression because that would change\n\t// semantics.\n\tsrc:  `#a: ({b: 1} | close({a: 1})) \u0026 {c: 1}`,\n\twant: `#a: ({b: 1}|{a: 1})\u0026{c: 1}`, // wrong: should be `#a: ({b: 1}|close({a: 1})\u0026{c: 1}`\n}, {\n\tname: \"ListTake\",\n\t// Usually, the struct literals passed into a function call\n\t// do not appear in the return from the function, so we\n\t// can elide redundant ellipses, but there are some counter-examples.\n\t// We should probably have a list of functions we know are OK\n\t// to apply this simplification to (e.g. matchN).\n\tsrc:  `#a: list.Take([{x: 5, ...}])[0]`,\n\twant: `#a: list.Take([{x: 5, ...}])[0]`,\n}, {\n\tname: \"FuncReturnsArgumentRenamedToMatchN\",\n\tsrc: `\nimport \"list\"\n\n_a: {\n\tmatchN: list.Take\n\tb: matchN([{x: 5, ...}])[0]\n}\n#a: _a.b\nx: #a\nx: y: 10\n`,\n\t// Wrong: eliding the ellipsis here changes semantics.\n\twant: `import \"list\", _a: {matchN: list.Take, b: matchN([{x: 5}])[0]}, #a: _a.b, x: #a, x: {y: 10}`,\n}, {\n\tname: \"MatchNWithMultipleArgs\",\n\tsrc:  `matchN(1, [{a?: bool, ...}, {b?: string, ...}, close({})])`,\n\twant: `matchN(1, [{a?: bool}, {b?: string}, close({})])`,\n}, {\n\tname: \"CloseInFieldInDefinition\",\n\tsrc:  `#foo: bar: close({a?: int})`,\n\twant: `#foo: {bar: {a?: int}}`, // wrong: extra braces.\n}, {\n\tname: \"CloseWithEllipsis\",\n\tsrc:  `close({a: {...}})`,\n\twant: `{a: {...}}`, // wrong: shouldn\u0027t remove close\n}, {\n\tname: \"CloseWithEllipsisInDefinition\",\n\tsrc:  `close({a: {#b: {...}}})`,\n\twant: `{a: {#b: {...}}}`, // wrong: shouldn\u0027t remove close\n}}\n\nfunc TestSimplifyClosedness(t *testing.T) {\n\tcuetest.Run(t, closednessTests, func(t *cuetest.T, test *closednessTest) {\n\t\tgotf, err :\u003d parser.ParseFile(\"src\", test.src, parser.ParseComments)\n\t\tqt.Assert(t, qt.IsNil(err))\n\n\t\tgotn :\u003d internal.SimplifyCloseness(gotf)\n\t\tt.Equal(astinternal.DebugStr(gotn), test.want)\n\t})\n}\n```",
+      "revId": "89cadfbea9ec7f47be2adba6e37046bc727ce9f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

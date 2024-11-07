@@ -17,6 +17,5 @@ _schema: {
 	null | bool | number | string | [...] | {
 		value?: _
 		next?:  _schema
-		...
 	}
 }

@@ -122,9 +122,6 @@ e5?: int & >=0
 e6?: [...=~"^[A-Za-z0-9 _.-]+$"]
 e7?: matchN(>=1, [true, {
 	disableFix?: bool
-	...
 } & {
 	ignoreMediaFeatureNames?: list.UniqueItems() & [_, ...] & [...string]
-	...
 }])
-...

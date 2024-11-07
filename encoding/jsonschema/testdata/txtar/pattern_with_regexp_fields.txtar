@@ -23,7 +23,6 @@
 "c.e"?: bool
 
 {[=~".*" & !~"^(c\\.e)$"]: string}
-...
 -- test/err-field.json --
 {
     "cue": 123

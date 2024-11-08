@@ -87,6 +87,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c951533c_3596f93a",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 525,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-08T06:51:49Z",
+      "side": 1,
+      "message": "I think we don\u0027t need this.",
+      "parentUuid": "47f79109_9260cd76",
+      "revId": "293e785d3f5f804f0ed272cc6b6967ef2a074d0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a5ebade9_e65e6830",
@@ -100,6 +118,24 @@
       "writtenOn": "2024-11-07T14:15:20Z",
       "side": 1,
       "message": "no need to add this.",
+      "revId": "293e785d3f5f804f0ed272cc6b6967ef2a074d0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "034dc0f5_668b73d6",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-08T06:51:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a5ebade9_e65e6830",
       "revId": "293e785d3f5f804f0ed272cc6b6967ef2a074d0f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

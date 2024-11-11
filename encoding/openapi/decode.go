@@ -75,7 +75,7 @@ func Extract(data cue.InstanceOrValue, c *Config) (*ast.File, error) {
 		p := &ast.Package{Name: ast.NewIdent(c.PkgName)}
 		p.AddComment(cg)
 		add(p)
-	} else {
+	} else if cg != nil {
 		add(cg)
 	}
 

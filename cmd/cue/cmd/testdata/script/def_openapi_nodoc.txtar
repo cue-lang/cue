@@ -1,7 +1,8 @@
-# TODO currently this panics, but it should not do.
+# Make sure that `cue def` works when the OpenAPI
+# schema does not have a top level doc field.
 
-! exec cue def openapi+yaml: schema.yaml
-stderr 'panic'
+exec cue def openapi+yaml: schema.yaml
+cmp stdout want.cue
 
 -- schema.yaml --
 openapi: "3.0.0"
@@ -9,3 +10,5 @@ components:
   schemas:
     Foo:
         type: string
+-- want.cue --
+#Foo: string

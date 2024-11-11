@@ -1,0 +1,11 @@
+# TODO currently this panics, but it should not do.
+
+! exec cue def openapi+yaml: schema.yaml
+stderr 'panic'
+
+-- schema.yaml --
+openapi: "3.0.0"
+components:
+  schemas:
+    Foo:
+        type: string

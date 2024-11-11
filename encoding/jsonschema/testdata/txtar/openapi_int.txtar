@@ -1,0 +1,15 @@
+#version: openapi
+
+-- schema.yaml --
+components:
+  schemas:
+    Int32:
+        type: number
+        format: int32
+    Int64:
+        type: number
+        format: int64
+
+-- out/decode/extract --
+#Int32: int32
+#Int64: int64

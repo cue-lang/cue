@@ -40,8 +40,8 @@ var formatFuncs = sync.OnceValue(func() map[string]formatFuncInfo {
 		"hostname":              {allVersions | openAPI, formatTODO},
 		"idn-email":             {vfrom(VersionDraft7), formatTODO},
 		"idn-hostname":          {vfrom(VersionDraft7), formatTODO},
-		"int32":                 {openAPI, formatTODO},
-		"int64":                 {openAPI, formatTODO},
+		"int32":                 {openAPI, formatInt32},
+		"int64":                 {openAPI, formatInt64},
 		"ipv4":                  {allVersions | openAPI, formatTODO},
 		"ipv6":                  {allVersions | openAPI, formatTODO},
 		"iri":                   {vfrom(VersionDraft7), formatURI},
@@ -110,6 +110,14 @@ func formatRegex(n cue.Value, s *state) {
 	// TODO this is a bit stricter than the spec, because the spec
 	// allows Perl idioms such as back-references.
 	s.add(n, stringType, ast.NewSel(s.addImport(n, "regexp"), "Valid"))
+}
+
+func formatInt32(n cue.Value, s *state) {
+	s.add(n, numType, ast.NewIdent("int32"))
+}
+
+func formatInt64(n cue.Value, s *state) {
+	s.add(n, numType, ast.NewIdent("int64"))
 }
 
 func formatTODO(n cue.Value, s *state) {}

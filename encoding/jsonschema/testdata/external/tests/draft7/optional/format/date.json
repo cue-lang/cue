@@ -48,11 +48,7 @@
 			{
 				"description": "a invalid date string with 32 days in January",
 				"data": "2020-01-32",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "a valid date string with 28 days in February (normal)",
@@ -62,11 +58,7 @@
 			{
 				"description": "a invalid date string with 29 days in February (normal)",
 				"data": "2021-02-29",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "a valid date string with 29 days in February (leap)",
@@ -76,11 +68,7 @@
 			{
 				"description": "a invalid date string with 30 days in February (leap)",
 				"data": "2020-02-30",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "a valid date string with 31 days in March",
@@ -90,11 +78,7 @@
 			{
 				"description": "a invalid date string with 32 days in March",
 				"data": "2020-03-32",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "a valid date string with 30 days in April",
@@ -104,11 +88,7 @@
 			{
 				"description": "a invalid date string with 31 days in April",
 				"data": "2020-04-31",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "a valid date string with 31 days in May",
@@ -118,11 +98,7 @@
 			{
 				"description": "a invalid date string with 32 days in May",
 				"data": "2020-05-32",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "a valid date string with 30 days in June",
@@ -132,11 +108,7 @@
 			{
 				"description": "a invalid date string with 31 days in June",
 				"data": "2020-06-31",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "a valid date string with 31 days in July",
@@ -146,11 +118,7 @@
 			{
 				"description": "a invalid date string with 32 days in July",
 				"data": "2020-07-32",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "a valid date string with 31 days in August",
@@ -160,11 +128,7 @@
 			{
 				"description": "a invalid date string with 32 days in August",
 				"data": "2020-08-32",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "a valid date string with 30 days in September",
@@ -174,11 +138,7 @@
 			{
 				"description": "a invalid date string with 31 days in September",
 				"data": "2020-09-31",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "a valid date string with 31 days in October",
@@ -188,11 +148,7 @@
 			{
 				"description": "a invalid date string with 32 days in October",
 				"data": "2020-10-32",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "a valid date string with 30 days in November",
@@ -202,11 +158,7 @@
 			{
 				"description": "a invalid date string with 31 days in November",
 				"data": "2020-11-31",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "a valid date string with 31 days in December",
@@ -216,83 +168,47 @@
 			{
 				"description": "a invalid date string with 32 days in December",
 				"data": "2020-12-32",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "a invalid date string with invalid month",
 				"data": "2020-13-01",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "an invalid date string",
 				"data": "06/19/1963",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "only RFC3339 not all of ISO 8601 are valid",
 				"data": "2013-350",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "non-padded month dates are not valid",
 				"data": "1998-1-20",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "non-padded day dates are not valid",
 				"data": "1998-01-1",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "invalid month",
 				"data": "1998-13-01",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "invalid month-day combination",
 				"data": "1998-04-31",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "2021 is not a leap year",
 				"data": "2021-02-29",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "2020 is a leap year",
@@ -302,47 +218,27 @@
 			{
 				"description": "invalid non-ASCII '৪' (a Bengali 4)",
 				"data": "1963-06-1৪",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "ISO8601 / non-RFC3339: YYYYMMDD without dashes (2023-03-28)",
 				"data": "20230328",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "ISO8601 / non-RFC3339: week number implicit day of week (2023-01-02)",
 				"data": "2023-W01",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "ISO8601 / non-RFC3339: week number with day of week (2023-03-28)",
 				"data": "2023-W13-2",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "ISO8601 / non-RFC3339: week number rollover to next year (2023-01-01)",
 				"data": "2022W527",
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	}

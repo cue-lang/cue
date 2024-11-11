@@ -31,7 +31,7 @@ var formatFuncs = sync.OnceValue(func() map[string]formatFuncInfo {
 		"binary":                {openAPI, formatTODO},
 		"byte":                  {openAPI, formatTODO},
 		"data":                  {openAPI, formatTODO},
-		"date":                  {vfrom(VersionDraft7), formatTODO},
+		"date":                  {vfrom(VersionDraft7) | openAPI, formatDate},
 		"date-time":             {allVersions | openAPI, formatDateTime},
 		"double":                {openAPI, formatTODO},
 		"duration":              {vfrom(VersionDraft2019_09), formatTODO},
@@ -98,6 +98,12 @@ func formatDateTime(n cue.Value, s *state) {
 	// allows lower-case "T" and "Z", and leap seconds, but
 	// it's not bad for now.
 	s.add(n, stringType, ast.NewSel(s.addImport(n, "time"), "Time"))
+}
+
+func formatDate(n cue.Value, s *state) {
+	// TODO it might be nice to have a dedicated `time.Date` validator rather
+	// than using `time.Format`.
+	s.add(n, stringType, ast.NewCall(ast.NewSel(s.addImport(n, "time"), "Format"), ast.NewString("2006-01-02")))
 }
 
 func formatRegex(n cue.Value, s *state) {

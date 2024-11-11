@@ -65,19 +65,25 @@ func constraintFormat(key string, n cue.Value, s *state) {
 	if !ok {
 		return
 	}
+	// Note: OpenAPI 3.0 says "the format property is an open
+	// string-valued property, and can have any value" so even when
+	// StrictKeywords is true, we do not generate an error if we're
+	// using OpenAPI. TODO it would still be nice to have a mode
+	// that allows the use to find likely spelling mistakes in
+	// format values in OpenAPI.
 	finfo, ok := formatFuncs()[formatStr]
 	if !ok {
 		// TODO StrictKeywords isn't exactly right here, but in general
 		// we want unknown formats to be ignored even when StrictFeatures
 		// is enabled, and StrictKeywords is closest to what we want.
 		// Perhaps we should have a "lint" mode?
-		if s.cfg.StrictKeywords {
+		if s.cfg.StrictKeywords && s.schemaVersion != VersionOpenAPI {
 			s.errf(n, "unknown format %q", formatStr)
 		}
 		return
 	}
 	if !finfo.versions.contains(s.schemaVersion) {
-		if s.cfg.StrictKeywords {
+		if s.cfg.StrictKeywords && s.schemaVersion != VersionOpenAPI {
 			s.errf(n, "format %q is not recognized in schema version %v", formatStr, s.schemaVersion)
 		}
 		return

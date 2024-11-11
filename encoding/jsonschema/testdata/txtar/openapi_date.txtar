@@ -1,0 +1,24 @@
+#version: openapi
+
+-- schema.yaml --
+components:
+  schemas:
+    Date:
+        type: string
+        format: date
+
+-- out/decode/extract --
+import "time"
+
+#Date: time.Format("2006-01-02")
+-- test/ok.json --
+#schema #Date
+"2023-05-12"
+-- test/err-out-of-range.json --
+#schema #Date
+"2023-02-30"
+-- out/decode/testerr/err-out-of-range --
+#Date: invalid value "2023-02-30" (does not satisfy time.Format("2006-01-02")): error in call to time.Format: invalid time "2023-02-30":
+    generated.cue:3:8
+    generated.cue:3:20
+    test/err-out-of-range.json:2:1

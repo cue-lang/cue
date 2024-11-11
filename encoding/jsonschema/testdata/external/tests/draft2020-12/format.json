@@ -351,7 +351,11 @@
 			{
 				"description": "invalid date string is only an annotation by default",
 				"data": "06/19/1963",
-				"valid": true
+				"valid": true,
+				"skip": {
+					"v2": "6 errors in empty disjunction:\nconflicting values \"06/19/1963\" and [...] (mismatched types string and list):\n    generated.cue:4:1\n    generated.cue:4:52\n    instance.json:1:1\nconflicting values \"06/19/1963\" and bool (mismatched types string and bool):\n    generated.cue:4:1\n    generated.cue:4:8\n    instance.json:1:1\nconflicting values \"06/19/1963\" and null (mismatched types string and null):\n    generated.cue:4:1\n    instance.json:1:1\nconflicting values \"06/19/1963\" and number (mismatched types string and number):\n    generated.cue:4:1\n    generated.cue:4:15\n    instance.json:1:1\nconflicting values \"06/19/1963\" and {...} (mismatched types string and struct):\n    generated.cue:4:1\n    generated.cue:4:60\n    instance.json:1:1\ninvalid value \"06/19/1963\" (does not satisfy time.Format(\"2006-01-02\")): error in call to time.Format: invalid time \"06/19/1963\":\n    generated.cue:4:24\n    generated.cue:1:1\n    generated.cue:4:36\n    instance.json:1:1\n",
+					"v3": "conflicting values \"06/19/1963\" and [...] (mismatched types string and list):\n    generated.cue:4:52\n    instance.json:1:1\nconflicting values \"06/19/1963\" and bool (mismatched types string and bool):\n    generated.cue:4:8\n    instance.json:1:1\nconflicting values \"06/19/1963\" and null (mismatched types string and null):\n    generated.cue:4:1\n    instance.json:1:1\nconflicting values \"06/19/1963\" and number (mismatched types string and number):\n    generated.cue:4:15\n    instance.json:1:1\nconflicting values \"06/19/1963\" and {...} (mismatched types string and struct):\n    generated.cue:4:60\n    instance.json:1:1\ninvalid value \"06/19/1963\" (does not satisfy time.Format(\"2006-01-02\")): error in call to time.Format: invalid time \"06/19/1963\":\n    generated.cue:4:24\n    generated.cue:1:1\n    generated.cue:4:36\n    instance.json:1:1\n"
+				}
 			}
 		]
 	},

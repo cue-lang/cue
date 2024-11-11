@@ -55,6 +55,10 @@ import (
 // name starts with "err-" it is expected to fail, otherwise it is
 // expected to succeed.
 //
+// If the first line of a test file starts with a "#" character,
+// it should start with `#schema` followed by a CUE path
+// of the schema to test within the extracted schema.
+//
 // The #noverify tag in the txtar header causes verification and
 // instance tests to be skipped.
 //
@@ -149,6 +153,24 @@ func TestDecode(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+			var schemaPath cue.Path
+			if bytes.HasPrefix(testData, []byte("#")) {
+				directiveBytes, rest, _ := bytes.Cut(testData, []byte("\n"))
+				// Replace the directive with a newline so the line numbers
+				// are correct in any error messages.
+				testData = append([]byte("\n"), rest...)
+				directive := string(directiveBytes)
+				verb, arg, ok := strings.Cut(directive, " ")
+				if verb != "#schema" {
+					t.Fatalf("unknown directive %q in test file %v", directiveBytes, file)
+				}
+				if !ok {
+					t.Fatalf("no schema path argument to #schema directive in %s", file)
+				}
+				schemaPath = cue.ParsePath(arg)
+				qt.Assert(t, qt.IsNil(schemaPath.Err()))
+			}
+
 			switch {
 			case strings.HasSuffix(file, ".json"):
 				expr, err := json.Extract(file, testData)
@@ -171,7 +193,11 @@ func TestDecode(t *testing.T) {
 			if err := v.Err(); err != nil {
 				t.Fatalf("error building expression for test %v: %v", file, err)
 			}
-			rv := schemav.Unify(v)
+			subSchema := schemav.LookupPath(schemaPath)
+			if !subSchema.Exists() {
+				t.Fatalf("path %q does not exist within schema", schemaPath)
+			}
+			rv := subSchema.Unify(v)
 			if strings.HasPrefix(e.Name(), "err-") {
 				err := rv.Err()
 				if err == nil {

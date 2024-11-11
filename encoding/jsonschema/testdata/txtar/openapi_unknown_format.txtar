@@ -1,0 +1,11 @@
+#version: openapi
+
+-- schema.yaml --
+components:
+  schemas:
+    Foo:
+        type: string
+        format: unknown
+
+-- out/decode/extract --
+#Foo: string

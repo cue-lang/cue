@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5afba947_b9ec76dd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-12T09:27:42Z",
+      "side": 1,
+      "message": "LGTM, but I\u0027ll wait until the other CL in the chain is ready to go before submitting, so we can land them both at the same time.",
+      "revId": "284e16a1b4086e144770ba155a319c8b613be3e8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

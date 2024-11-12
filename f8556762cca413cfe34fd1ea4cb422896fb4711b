@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92aef4b5_cfd57448",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-12T08:50:38Z",
+      "side": 1,
+      "message": "Assuming you\u0027re leaving the issue open for now on purpose, please comment there explaining why. Because on a first look, this looks like a \"fixes\" to me, even if the solution is not perfect.",
+      "revId": "f8556762cca413cfe34fd1ea4cb422896fb4711b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

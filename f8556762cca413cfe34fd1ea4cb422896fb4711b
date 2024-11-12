@@ -16,6 +16,24 @@
       "message": "Assuming you\u0027re leaving the issue open for now on purpose, please comment there explaining why. Because on a first look, this looks like a \"fixes\" to me, even if the solution is not perfect.",
       "revId": "f8556762cca413cfe34fd1ea4cb422896fb4711b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "24aeee22_c675a79f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-12T09:17:20Z",
+      "side": 1,
+      "message": "Ha, I thought that issue was fixed by an earlier CL in this chain, but actually I\u0027d \"fixed\" the PR not the issue. Done.",
+      "parentUuid": "92aef4b5_cfd57448",
+      "revId": "f8556762cca413cfe34fd1ea4cb422896fb4711b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

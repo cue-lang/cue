@@ -1,0 +1,28 @@
+env CUE_CONFIG_DIR=$WORK/cueconfig
+# When using the --token flag, we should not need to interact with a registry
+# to store the token into logins.json.
+oauthregistry device-code-expired
+
+# Unrecognized token formats fail for now.
+! exec cue login --token=unrecognized_token_format_1234
+stderr -count=1 'unknown token format, expected an appv1_ prefix'
+
+# Ensure that only one token is stored when starting from an empty logins.json file.
+exec cue login --token=appv1_validtoken1234
+grep -count=1 '"registries": {' cueconfig/logins.json
+grep -count=1 '"access_token"' cueconfig/logins.json
+
+# Ensure the contents of the token look correct.
+grep -count=1 '"access_token": "appv1_validtoken1234"' cueconfig/logins.json
+# appv1 tokens do not include any other field.
+! grep '"token_type"' cueconfig/logins.json
+! grep '"expiry"' cueconfig/logins.json
+! grep '"refresh_token"' cueconfig/logins.json
+
+# Ensure that we can store a token for a new registry on top of an existing logins.json file.
+# TODO(mvdan): we don't actually use the argument at all!
+exec cue login --token=appv1_validtoken5678 registry.mycorp.tld
+grep -count=1 '"registries": {' cueconfig/logins.json
+# grep -count=1 '"registry\.mycorp\.tld"' cueconfig/logins.json
+# grep -count=2 '"access_token"' cueconfig/logins.json
+! grep '"registry\.mycorp\.tld"' cueconfig/logins.json

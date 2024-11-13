@@ -1,0 +1,208 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f69a66e0_9c948553",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-13T17:29:34Z",
+      "side": 1,
+      "message": "Looking a lot better, thanks! Still a couple of things to fix though.",
+      "revId": "8d3feae26f57907a4b11d3b3b0fb5ca5aefd7c2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4af4bf53_2b99bf9e",
+        "filename": "encoding/jsonschema/internal/closedness.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-13T17:29:34Z",
+      "side": 1,
+      "message": "I don\u0027t think this should be in a jsonschema-internal package: I think we should be able to invoke this from the code inside `cmd/cue` that\u0027s actually responsible for the emitting the final code. That way the simplifier can make use of information about the field or definition that the schema might end up in.\n\nHow about exporting it as part of `encoding/jsonschema` itself? That way it\u0027ll be available to other users of the API. We could mark it as experimental for now.\n\nI wouldn\u0027t actually make cmd/cue call `SimplifyClosedness` in this CL though, as that looks like a somewhat more involved change given how `internal/encoding` hides whether encoding/jsonschema has been used.",
+      "revId": "8d3feae26f57907a4b11d3b3b0fb5ca5aefd7c2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa12f1dc_8676d1ab",
+        "filename": "encoding/jsonschema/internal/closedness.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-13T17:29:34Z",
+      "side": 1,
+      "message": "nit: I think it\u0027s nice if code reads from top to bottom, with more minor helper functions towards the end, so I\u0027d move this later in the code (same with `pushStack` and `popStack` FWIW).",
+      "revId": "8d3feae26f57907a4b11d3b3b0fb5ca5aefd7c2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eeffc189_4b4871a4",
+        "filename": "encoding/jsonschema/internal/closedness.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-13T17:29:34Z",
+      "side": 1,
+      "message": "This a no-op. No need for it AFAICS.",
+      "revId": "8d3feae26f57907a4b11d3b3b0fb5ca5aefd7c2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63c5a77a_36307a76",
+        "filename": "encoding/jsonschema/internal/closedness_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-13T17:29:34Z",
+      "side": 1,
+      "message": "```suggestion\n\tname: \"UnificationWithReferenceIntoClosedFieldOfStructLiteralInDefinition\",\n```",
+      "revId": "8d3feae26f57907a4b11d3b3b0fb5ca5aefd7c2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d692b06_12cbcc09",
+        "filename": "encoding/jsonschema/internal/closedness_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-13T17:29:34Z",
+      "side": 1,
+      "message": "This doesn\u0027t seem right to me: the `src` expression is OK, but the `want` expression fails.",
+      "revId": "8d3feae26f57907a4b11d3b3b0fb5ca5aefd7c2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1d63d36_a1ff1e6b",
+        "filename": "encoding/jsonschema/internal/closedness_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-13T17:29:34Z",
+      "side": 1,
+      "message": "This isn\u0027t right: `close({...})` does not result in a closed struct with no fields.",
+      "revId": "8d3feae26f57907a4b11d3b3b0fb5ca5aefd7c2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b9bbcea_1deef519",
+        "filename": "encoding/jsonschema/internal/closedness_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-13T17:29:34Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "8d3feae26f57907a4b11d3b3b0fb5ca5aefd7c2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f57da2c_193ceb77",
+        "filename": "encoding/jsonschema/internal/closedness_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-13T17:29:34Z",
+      "side": 1,
+      "message": "Again, the ellipsis shouldn\u0027t be lost here.",
+      "revId": "8d3feae26f57907a4b11d3b3b0fb5ca5aefd7c2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26907806_cf6a4d3b",
+        "filename": "encoding/jsonschema/internal/closedness_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-13T17:29:34Z",
+      "side": 1,
+      "message": "We shouldn\u0027t be adding braces here, although perhaps it doesn\u0027t matter for the code generated by `encoding/jsonschema`.",
+      "revId": "8d3feae26f57907a4b11d3b3b0fb5ca5aefd7c2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd658a53_b4f2d91c",
+        "filename": "encoding/jsonschema/internal/closedness_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-13T17:29:34Z",
+      "side": 1,
+      "message": "nit: these lines are quite long. A reasonably consistent line length for comments is worthwhile.",
+      "revId": "8d3feae26f57907a4b11d3b3b0fb5ca5aefd7c2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ba4b628_9043b9ba",
+        "filename": "encoding/jsonschema/internal/closedness_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-13T17:29:34Z",
+      "side": 1,
+      "message": "```suggestion\n\t// Keep this test case for the record.\n```",
+      "revId": "8d3feae26f57907a4b11d3b3b0fb5ca5aefd7c2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

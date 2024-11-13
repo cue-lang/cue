@@ -16,6 +16,23 @@
       "message": "PTAL.",
       "revId": "75d26297874a588a69d6a3e9cf17a8e769b7adfc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f568b13_711c5425",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-11-13T17:01:55Z",
+      "side": 1,
+      "message": "Please submit this at your convenience. I don\u0027t have submission rights in this repo.",
+      "revId": "75d26297874a588a69d6a3e9cf17a8e769b7adfc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

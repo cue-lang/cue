@@ -16,6 +16,24 @@
       "message": "There are some inconsistencies between `evalv2` and `evalv3` about the semantic of `close({...})`. I am confused about which one is correct.\n\n```\n# evalv2\n! exec cue eval input1.cue\nexec cue eval input2.cue\nexec cue eval input3.cue\nexec cue eval input4.cue\n\n# evalv3\nenv CUE_EXPERIMENT\u003devalv3\n\n! exec cue eval input1.cue\n! exec cue eval input2.cue\nexec cue eval input3.cue\n! exec cue eval input4.cue\n\n-- input1.cue --\nC: close({})\n\nC2: C \u0026 {\n\tfor k, v in {thisIsFine: string} {\n\t\t\"\\(k)\": v\n\t}\n}\n\n-- input2.cue --\nC: close({...})\n\nC2: C \u0026 {\n\tfor k, v in {thisIsFine: string} {\n\t\t\"\\(k)\": v\n\t}\n}\n\n-- input3.cue --\nC: close({\n    [_]: _\n})\n\nC2: C \u0026 {\n\tfor k, v in {thisIsFine: string} {\n\t\t\"\\(k)\": v\n\t}\n}\n\n-- input4.cue --\n#x: {\n\t{a: close({b: 5, ...})}.a \u0026 {a:1}\n}\n```",
       "revId": "47de17a83455e9ff5ca140af5d1f68f6dfb9874c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "72c9757e_bd7b0bf3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-14T21:35:27Z",
+      "side": 1,
+      "message": "Interesting! This is a bug in evalv3. I checked with Marcel that this isn\u0027t intended behaviour and I\u0027ve reported it as https://github.com/cue-lang/cue/issues/3572. In general, `close({...})` should not eliminate the `...`, and we can write this code assuming that.",
+      "parentUuid": "840854c7_c6a215da",
+      "revId": "47de17a83455e9ff5ca140af5d1f68f6dfb9874c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

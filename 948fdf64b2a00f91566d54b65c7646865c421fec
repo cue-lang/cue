@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "17994968_003072d3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-14T21:35:27Z",
+      "side": 1,
+      "message": "LGTM with the closedness transformation moved outside of encoding/jsonschema.\nThanks for bearing with me - this is a great improvement in correctness apart from anything else.",
+      "revId": "948fdf64b2a00f91566d54b65c7646865c421fec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

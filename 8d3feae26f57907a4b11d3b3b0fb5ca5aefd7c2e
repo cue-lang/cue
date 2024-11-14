@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd3dce75_590fec17",
+        "filename": "encoding/jsonschema/internal/closedness.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-14T06:24:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa12f1dc_8676d1ab",
+      "revId": "8d3feae26f57907a4b11d3b3b0fb5ca5aefd7c2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eeffc189_4b4871a4",
@@ -65,6 +83,24 @@
       "writtenOn": "2024-11-13T17:29:34Z",
       "side": 1,
       "message": "This a no-op. No need for it AFAICS.",
+      "revId": "8d3feae26f57907a4b11d3b3b0fb5ca5aefd7c2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84007099_3e09352e",
+        "filename": "encoding/jsonschema/internal/closedness.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-14T06:24:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eeffc189_4b4871a4",
       "revId": "8d3feae26f57907a4b11d3b3b0fb5ca5aefd7c2e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +122,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e1e3cd0_1649c670",
+        "filename": "encoding/jsonschema/internal/closedness_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-14T06:24:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "63c5a77a_36307a76",
+      "revId": "8d3feae26f57907a4b11d3b3b0fb5ca5aefd7c2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7d692b06_12cbcc09",
@@ -99,6 +153,24 @@
       "writtenOn": "2024-11-13T17:29:34Z",
       "side": 1,
       "message": "This doesn\u0027t seem right to me: the `src` expression is OK, but the `want` expression fails.",
+      "revId": "8d3feae26f57907a4b11d3b3b0fb5ca5aefd7c2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e64c6f34_ff2b51e3",
+        "filename": "encoding/jsonschema/internal/closedness_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-14T06:24:41Z",
+      "side": 1,
+      "message": "`src` is OK with evalv2, but fails with evalv3.",
+      "parentUuid": "7d692b06_12cbcc09",
       "revId": "8d3feae26f57907a4b11d3b3b0fb5ca5aefd7c2e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -171,6 +243,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d97b822_db20d4a7",
+        "filename": "encoding/jsonschema/internal/closedness_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-14T06:24:41Z",
+      "side": 1,
+      "message": "`astinternal.DebugStr()` will always print braces for a `structlit`. These braces are not added by the simplification pass.",
+      "parentUuid": "26907806_cf6a4d3b",
+      "revId": "8d3feae26f57907a4b11d3b3b0fb5ca5aefd7c2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cd658a53_b4f2d91c",
@@ -188,6 +278,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b1104b9_1e04bcca",
+        "filename": "encoding/jsonschema/internal/closedness_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-14T06:24:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cd658a53_b4f2d91c",
+      "revId": "8d3feae26f57907a4b11d3b3b0fb5ca5aefd7c2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2ba4b628_9043b9ba",
@@ -201,6 +309,24 @@
       "writtenOn": "2024-11-13T17:29:34Z",
       "side": 1,
       "message": "```suggestion\n\t// Keep this test case for the record.\n```",
+      "revId": "8d3feae26f57907a4b11d3b3b0fb5ca5aefd7c2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc1e4d72_fe54fc2a",
+        "filename": "encoding/jsonschema/internal/closedness_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-14T06:24:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2ba4b628_9043b9ba",
       "revId": "8d3feae26f57907a4b11d3b3b0fb5ca5aefd7c2e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -22,6 +22,9 @@ cmp stdout stdout1
   }
 }
 -- stdout1 --
+// This is a title
+//
+// top description
 null | bool | number | string | [...] | {
 	// a description
 	a?: {

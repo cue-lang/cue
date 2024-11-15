@@ -199,8 +199,10 @@ func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) *ast.File {
 			}
 
 			if e.cfg.ShowDocs {
-				if doc := internal.FileComment(f); doc != nil {
-					ast.AddComment(pkg, doc)
+				if docs := internal.FileComment(f); docs != nil {
+					for _, doc := range docs {
+						ast.AddComment(pkg, doc)
+					}
 				}
 			}
 			return true
@@ -209,6 +211,8 @@ func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) *ast.File {
 		if pkgName != "" {
 			pkg.Name = ast.NewIdent(pkgName)
 			f.Decls = append(f.Decls, pkg)
+		} else {
+			astutil.CopyComments(f, pkg)
 		}
 	}
 

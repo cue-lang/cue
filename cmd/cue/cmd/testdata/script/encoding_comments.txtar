@@ -115,6 +115,8 @@ disjunction: _disjunction1 | _disjunction2
 
 -- def-cue.stdout --
 // Package p is an example package.
+
+// comment at the start of a file.
 package p
 
 // top-level comment before a simple field.

@@ -228,6 +228,7 @@ info: {
 	...
 }
 -- expect-cue2 --
+// Some clever title.
 info: {
 	title:   *"Some clever title." | string
 	version: *"v1" | string

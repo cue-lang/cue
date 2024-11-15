@@ -1,0 +1,118 @@
+exec cue def -l '#top:' jsonschema: schema1.json
+cmp stdout stdout1-def
+
+exec cue def jsonschema: schema1.json
+cmp stdout stdout1
+
+exec cue def 1.cue
+cmp stdout stdout-1.cue
+
+exec cue def 2.cue
+cmp stdout stdout-2.cue
+
+exec cue def 1.cue 2.cue
+cmp stdout stdout-1_2.cue
+
+exec cue def 2.cue 1.cue
+cmp stdout stdout-2_1.cue
+
+-- schema1.json --
+{
+  "title": "This is a title",
+  "description": "top description",
+  "properties": {
+    "a": {
+      "type": "object",
+      "description": "a description",
+      "properties": {
+          "b": {
+              "description": "b description",
+              "type": "number"
+          }
+      }
+    }
+  }
+}
+-- stdout1 --
+null | bool | number | string | [...] | {
+	// a description
+	a?: {
+		// b description
+		b?: number
+		...
+	}
+	...
+}
+-- stdout1-def --
+#top: null | bool | number | string | [...] | {
+	// a description
+	a?: {
+		// b description
+		b?: number
+		...
+	}
+	...
+}
+-- 1.cue --
+// 1.cue: doc comment
+
+// 1.cue: pkg comment
+package t  // 1.cue: inline pkg comment
+
+// 1.cue: file comment
+
+// 1.cue: comment of d
+d:   1
+
+// 1.cue: file comment 2
+
+di:  1
+dii: 1
+
+-- 2.cue --
+// 2.cue: doc comment
+
+// 2.cue: file comment
+
+// 2.cue: comment of d
+d:   1
+di:  1
+dii: 1
+
+-- stdout-1.cue --
+// 1.cue: pkg comment
+package t
+
+// 1.cue: comment of d
+d:   1
+di:  1
+dii: 1
+-- stdout-2.cue --
+// 2.cue: comment of d
+d:   1
+di:  1
+dii: 1
+-- stdout-1_2.cue --
+// 1.cue: pkg comment
+
+// 2.cue: file comment
+package t
+
+// 1.cue: comment of d
+
+// 2.cue: comment of d
+d:   1
+di:  1
+dii: 1
+-- stdout-2_1.cue --
+// 1.cue: pkg comment
+
+// 2.cue: file comment
+package t
+
+// 1.cue: comment of d
+
+// 2.cue: comment of d
+d:   1
+di:  1
+dii: 1

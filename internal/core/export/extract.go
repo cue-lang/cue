@@ -56,9 +56,8 @@ func extractDocs(v *adt.Vertex) (docs []*ast.CommentGroup) {
 			}
 
 		case *ast.File:
-			if c := internal.FileComment(f); c != nil {
-				docs = append(docs, c)
-			}
+			fdocs, _ := internal.FileComments(f)
+			docs = append(docs, fdocs...)
 		}
 
 		return true

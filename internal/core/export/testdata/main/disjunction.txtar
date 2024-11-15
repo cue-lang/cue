@@ -10,8 +10,6 @@ b: *2 | int
 c: *(a & b) | 3
 -- out/doc --
 []
-- Issue #950
-
 [a]
 - Issue #950
 

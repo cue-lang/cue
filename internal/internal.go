@@ -23,6 +23,7 @@ import (
 	"bufio"
 	"fmt"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/cockroachdb/apd/v3"
@@ -229,34 +230,61 @@ func NewComment(isDoc bool, s string) *ast.CommentGroup {
 	return cg
 }
 
-func FileComment(f *ast.File) *ast.CommentGroup {
-	var cgs []*ast.CommentGroup
+func FileComments(f *ast.File) (docs, rest []*ast.CommentGroup) {
+	hasPkg := false
 	if pkg := Package(f); pkg != nil {
-		cgs = pkg.Comments()
-	} else if cgs = f.Comments(); len(cgs) > 0 {
-		// Use file comment.
-	} else {
-		// Use first comment before any declaration.
-		for _, d := range f.Decls {
-			if cg, ok := d.(*ast.CommentGroup); ok {
-				return cg
-			}
-			if cgs = ast.Comments(d); cgs != nil {
-				break
-			}
-			// TODO: what to do here?
-			if _, ok := d.(*ast.Attribute); !ok {
-				break
-			}
+		hasPkg = true
+		docs = pkg.Comments()
+	}
+
+	for _, c := range f.Comments() {
+		if c.Doc {
+			docs = append(docs, c)
+		} else {
+			rest = append(rest, c)
 		}
 	}
-	var cg *ast.CommentGroup
-	for _, c := range cgs {
-		if c.Position == 0 {
-			cg = c
+
+	if !hasPkg && len(docs) == 0 && len(rest) > 0 {
+		// use the first file comment group as as doc comment.
+		docs, rest = rest[:1], rest[1:]
+		docs[0].Doc = true
+	}
+
+	return
+}
+
+// MergeDocs merges multiple doc comments into one single doc comment.
+func MergeDocs(comments []*ast.CommentGroup) []*ast.CommentGroup {
+	if len(comments) > 1 {
+		slices.SortFunc(comments, func(a, b *ast.CommentGroup) int {
+			if a.Doc {
+				return -1
+			}
+			if b.Doc {
+				return 1
+			}
+			return 0
+		})
+		var i int
+		for _, c := range comments {
+			if !c.Doc {
+				break
+			}
+			i++
+		}
+		if i > 1 {
+			docs, inlines := comments[:i], comments[i:]
+			for _, c := range docs[1:] {
+				docs[0].List = append(docs[0].List, &ast.Comment{Text: "//"})
+				docs[0].List = append(docs[0].List, c.List...)
+			}
+			comments = make([]*ast.CommentGroup, 0, len(inlines)+1)
+			comments = append(comments, docs[0])
+			comments = append(comments, inlines...)
 		}
 	}
-	return cg
+	return comments
 }
 
 func NewAttr(name, str string) *ast.Attribute {

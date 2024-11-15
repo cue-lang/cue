@@ -114,6 +114,8 @@ _disjunction2: int
 disjunction: _disjunction1 | _disjunction2
 
 -- def-cue.stdout --
+// comment at the start of a file.
+
 // Package p is an example package.
 package p
 

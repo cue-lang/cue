@@ -295,6 +295,13 @@ func ToExpr(n ast.Node) ast.Expr {
 		decls := x.Decls[start:]
 		if len(decls) == 1 {
 			if e, ok := decls[0].(*ast.EmbedDecl); ok {
+				for _, c := range ast.Comments(e) {
+					ast.AddComment(x, c)
+				}
+				for _, c := range ast.Comments(e.Expr) {
+					ast.AddComment(x, c)
+				}
+				ast.SetComments(e.Expr, x.Comments())
 				return e.Expr
 			}
 		}

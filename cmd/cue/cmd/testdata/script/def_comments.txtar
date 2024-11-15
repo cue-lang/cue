@@ -35,6 +35,9 @@ null | bool | number | string | [...] | {
 	...
 }
 -- stdout1-def --
+// This is a title
+//
+// top description
 #top: null | bool | number | string | [...] | {
 	// a description
 	a?: {

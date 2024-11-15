@@ -1,0 +1,194 @@
+exec cue def 1.cue
+cmp stdout stdout-1.cue
+
+exec cue def 2.cue
+cmp stdout stdout-2.cue
+
+exec cue def 1.cue 2.cue
+cmp stdout stdout-1_2.cue
+
+exec cue def 2.cue 1.cue
+cmp stdout stdout-2_1.cue
+
+# title and top description are lost
+exec cue def -l '#top:' jsonschema: schema1.json
+cmp stdout stdout1-def
+
+exec cue def jsonschema: schema1.json
+cmp stdout stdout1
+
+# title and top description override a description
+exec cue def -l '#top:' jsonschema: schema2.json
+cmp stdout stdout2-def
+
+exec cue def jsonschema: schema2.json
+cmp stdout stdout2
+
+# description of definition is lost
+exec cue def -l '#top:' issue3522.json
+stdout 'description of a field'
+stdout 'overall description'
+! stdout 'description of foo'
+
+exec cue def issue3522.json
+stdout 'description of a field'
+stdout 'overall description'
+! stdout 'description of foo'
+
+-- issue3522.json --
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$defs": {
+        "foo": {
+            "description": "description of foo",
+            "properties": {
+                "a": {
+                    "description": "description of a field",
+                    "type": "number"
+                }
+            }
+        }
+    },
+    "description": "overall description",
+    "$ref": "#/$defs/foo"
+}
+-- schema1.json --
+{
+  "title": "This is a title",
+  "description": "top description",
+  "properties": {
+    "a": {
+      "type": "object",
+      "description": "a description",
+      "properties": {
+          "b": {
+              "description": "b description",
+              "type": "number"
+          }
+      }
+    }
+  }
+}
+-- stdout1 --
+null | bool | number | string | [...] | {
+	// a description
+	a?: {
+		// b description
+		b?: number
+		...
+	}
+	...
+}
+-- stdout1-def --
+#top: null | bool | number | string | [...] | {
+	// a description
+	a?: {
+		// b description
+		b?: number
+		...
+	}
+	...
+}
+-- schema2.json --
+{
+  "title": "This is a title",
+  "description": "top description",
+  "type": "object",
+  "properties": {
+    "a": {
+      "type": "object",
+      "description": "a description",
+      "properties": {
+          "b": {
+              "description": "b description",
+              "type": "number"
+          }
+      }
+    }
+  }
+}
+-- stdout2 --
+// This is a title
+//
+// top description
+a?: {
+	// b description
+	b?: number
+	...
+}
+...
+-- stdout2-def --
+#top: {
+	// This is a title
+	//
+	// top description
+	a?: {
+		// b description
+		b?: number
+		...
+	}
+	...
+}
+-- 1.cue --
+// 1.cue: doc comment
+
+// 1.cue: pkg comment
+package t  // 1.cue: inline pkg comment
+
+// 1.cue: decl comment
+
+// 1.cue: comment of d
+d:   1
+
+// 1.cue: decl comment 2
+
+di:  1
+dii: 1
+
+-- 2.cue --
+// 2.cue: doc comment
+
+// 2.cue: decl comment 2
+
+// 2.cue: comment of d
+d:   1
+di:  1
+dii: 1
+
+-- stdout-1.cue --
+// 1.cue: pkg comment
+package t
+
+// 1.cue: comment of d
+d:   1
+di:  1
+dii: 1
+-- stdout-2.cue --
+// 2.cue: comment of d
+d:   1
+di:  1
+dii: 1
+-- stdout-1_2.cue --
+// 1.cue: pkg comment
+
+// 2.cue: decl comment 2
+package t
+
+// 1.cue: comment of d
+
+// 2.cue: comment of d
+d:   1
+di:  1
+dii: 1
+-- stdout-2_1.cue --
+// 1.cue: pkg comment
+
+// 2.cue: decl comment 2
+package t
+
+// 1.cue: comment of d
+
+// 2.cue: comment of d
+d:   1
+di:  1
+dii: 1

@@ -23,6 +23,7 @@ import (
 	"bufio"
 	"fmt"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/cockroachdb/apd/v3"
@@ -229,34 +230,61 @@ func NewComment(isDoc bool, s string) *ast.CommentGroup {
 	return cg
 }
 
-func FileComment(f *ast.File) *ast.CommentGroup {
-	var cgs []*ast.CommentGroup
+func FileComments(f *ast.File) (docs, rest []*ast.CommentGroup) {
+	hasPkg := false
 	if pkg := Package(f); pkg != nil {
-		cgs = pkg.Comments()
-	} else if cgs = f.Comments(); len(cgs) > 0 {
-		// Use file comment.
-	} else {
-		// Use first comment before any declaration.
-		for _, d := range f.Decls {
-			if cg, ok := d.(*ast.CommentGroup); ok {
-				return cg
-			}
-			if cgs = ast.Comments(d); cgs != nil {
-				break
-			}
-			// TODO: what to do here?
-			if _, ok := d.(*ast.Attribute); !ok {
-				break
-			}
+		hasPkg = true
+		docs = pkg.Comments()
+	}
+
+	for _, c := range f.Comments() {
+		if c.Doc {
+			docs = append(docs, c)
+		} else {
+			rest = append(rest, c)
 		}
 	}
-	var cg *ast.CommentGroup
-	for _, c := range cgs {
-		if c.Position == 0 {
-			cg = c
+
+	if !hasPkg && len(docs) == 0 && len(rest) > 0 {
+		// use the first file comment group as as doc comment.
+		docs, rest = rest[:1], rest[1:]
+		docs[0].Doc = true
+	}
+
+	return
+}
+
+// MergeDocs merges multiple doc comments into one single doc comment.
+func MergeDocs(comments []*ast.CommentGroup) []*ast.CommentGroup {
+	if len(comments) <= 1 || !hasDocComment(comments) {
+		return comments
+	}
+
+	comments1 := make([]*ast.CommentGroup, 0, len(comments))
+	comments1 = append(comments1, nil)
+	var docComment *ast.CommentGroup
+	for _, c := range comments {
+		switch {
+		case !c.Doc:
+			comments1 = append(comments1, c)
+		case docComment == nil:
+			docComment = c
+		default:
+			docComment.List = append(slices.Clip(docComment.List), &ast.Comment{Text: "//"})
+			docComment.List = append(docComment.List, c.List...)
 		}
 	}
-	return cg
+	comments1[0] = docComment
+	return comments1
+}
+
+func hasDocComment(comments []*ast.CommentGroup) bool {
+	for _, c := range comments {
+		if c.Doc {
+			return true
+		}
+	}
+	return false
 }
 
 func NewAttr(name, str string) *ast.Attribute {

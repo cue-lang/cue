@@ -6,7 +6,7 @@
 # should be tested in each encoding package.
 
 # TODO(mvdan): test importing comments into CUE as well.
-# TODO(mvdan): comments at the start and end of a file are not exported.
+# TODO(mvdan): comments at the end of a file are not exported.
 # TODO(mvdan): comments at the start of a struct are not exported.
 # TODO(mvdan): comments attached to a list or its elements are not exported.
 # TODO(mvdan): comments between fields or list elements are not exported.
@@ -114,6 +114,8 @@ _disjunction2: int
 disjunction: _disjunction1 | _disjunction2
 
 -- def-cue.stdout --
+// comment at the start of a file.
+
 // Package p is an example package.
 package p
 

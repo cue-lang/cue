@@ -243,7 +243,7 @@ info: {
 }
 -- expect-cue3 --
 // My OpenAPI
-
+//
 // My OpenAPI2
 package foo
 

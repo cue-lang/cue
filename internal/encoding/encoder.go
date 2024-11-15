@@ -145,11 +145,14 @@ func NewEncoder(ctx *cue.Context, f *build.File, cfg *Config) (*Encoder, error) 
 			// with a newline.
 			f := internal.ToFile(n)
 			if e.cfg.PkgName != "" && f.PackageName() == "" {
-				f.Decls = append([]ast.Decl{
-					&ast.Package{
-						Name: ast.NewIdent(e.cfg.PkgName),
-					},
-				}, f.Decls...)
+				pkg := &ast.Package{
+					PackagePos: token.NoPos.WithRel(token.NewSection),
+					Name:       ast.NewIdent(e.cfg.PkgName),
+				}
+				doc, rest := internal.FileComments(f)
+				ast.SetComments(pkg, doc)
+				ast.SetComments(f, rest)
+				f.Decls = append([]ast.Decl{pkg}, f.Decls...)
 			}
 			b, err := format.Node(f, opts...)
 			if err != nil {

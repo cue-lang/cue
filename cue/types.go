@@ -893,6 +893,13 @@ outer:
 
 	if len(f.Decls) == 1 {
 		if e, ok := f.Decls[0].(*ast.EmbedDecl); ok {
+			for _, c := range ast.Comments(e) {
+				ast.AddComment(f, c)
+			}
+			for _, c := range ast.Comments(e.Expr) {
+				ast.AddComment(f, c)
+			}
+			ast.SetComments(e.Expr, f.Comments())
 			return e.Expr
 		}
 	}

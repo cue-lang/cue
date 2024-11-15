@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "067d29be_6a93c81a",
+        "filename": "internal/core/export/testdata/main/disjunction.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-15T10:11:46Z",
+      "side": 1,
+      "message": "this comment is now duplicated, which doesn\u0027t seem right",
+      "revId": "b9b20ab36db8c539767cf08010bd64b8970aacd4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

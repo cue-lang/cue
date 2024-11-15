@@ -1,0 +1,49 @@
+exec cue def -l '#top:' jsonschema: schema1.json
+cmp stdout stdout1-def
+
+exec cue def jsonschema: schema1.json
+cmp stdout stdout1
+
+-- schema1.json --
+{
+  "title": "This is a title",
+  "description": "top description",
+  "properties": {
+    "a": {
+      "type": "object",
+      "description": "a description",
+      "properties": {
+          "b": {
+              "description": "b description",
+              "type": "number"
+          }
+      }
+    }
+  }
+}
+-- stdout1 --
+// This is a title
+//
+// top description
+null | bool | number | string | [...] | {
+	// a description
+	a?: {
+		// b description
+		b?: number
+		...
+	}
+	...
+}
+-- stdout1-def --
+// This is a title
+//
+// top description
+#top: null | bool | number | string | [...] | {
+	// a description
+	a?: {
+		// b description
+		b?: number
+		...
+	}
+	...
+}

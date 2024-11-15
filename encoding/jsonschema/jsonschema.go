@@ -37,7 +37,6 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
 )
 
 // Extract converts JSON Schema data into an equivalent CUE representation.
@@ -65,7 +64,6 @@ func Extract(data cue.InstanceOrValue, cfg *Config) (f *ast.File, err error) {
 	if d.errs != nil {
 		return nil, d.errs
 	}
-	f = internal.SimplifyClosedness(f).(*ast.File)
 
 	return f, nil
 }

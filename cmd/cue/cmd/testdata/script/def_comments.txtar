@@ -81,13 +81,21 @@ dii: 1
 
 -- stdout-1.cue --
 // 1.cue: pkg comment
-package t
+
+// 1.cue: doc comment
+package t // 1.cue: inline pkg comment
+
+// 1.cue: file comment
 
 // 1.cue: comment of d
 d:   1
 di:  1
 dii: 1
 -- stdout-2.cue --
+// 2.cue: doc comment
+
+// 2.cue: file comment
+
 // 2.cue: comment of d
 d:   1
 di:  1
@@ -95,8 +103,14 @@ dii: 1
 -- stdout-1_2.cue --
 // 1.cue: pkg comment
 
+// 1.cue: doc comment
+
+// 2.cue: doc comment
+
 // 2.cue: file comment
-package t
+package t // 1.cue: inline pkg comment
+
+// 1.cue: file comment
 
 // 1.cue: comment of d
 
@@ -107,8 +121,14 @@ dii: 1
 -- stdout-2_1.cue --
 // 1.cue: pkg comment
 
+// 1.cue: doc comment
+
+// 2.cue: doc comment
+
 // 2.cue: file comment
-package t
+package t // 1.cue: inline pkg comment
+
+// 1.cue: file comment
 
 // 1.cue: comment of d
 

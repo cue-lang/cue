@@ -229,34 +229,21 @@ func NewComment(isDoc bool, s string) *ast.CommentGroup {
 	return cg
 }
 
-func FileComment(f *ast.File) *ast.CommentGroup {
+func FileComment(f *ast.File) []*ast.CommentGroup {
 	var cgs []*ast.CommentGroup
+
 	if pkg := Package(f); pkg != nil {
-		cgs = pkg.Comments()
-	} else if cgs = f.Comments(); len(cgs) > 0 {
-		// Use file comment.
-	} else {
-		// Use first comment before any declaration.
-		for _, d := range f.Decls {
-			if cg, ok := d.(*ast.CommentGroup); ok {
-				return cg
-			}
-			if cgs = ast.Comments(d); cgs != nil {
-				break
-			}
-			// TODO: what to do here?
-			if _, ok := d.(*ast.Attribute); !ok {
-				break
-			}
+		cgs = append(cgs, pkg.Comments()...)
+	}
+	cgs = append(cgs, f.Comments()...)
+
+	// unattached comments.
+	for _, d := range f.Decls {
+		if cg, ok := d.(*ast.CommentGroup); ok {
+			cgs = append(cgs, cg)
 		}
 	}
-	var cg *ast.CommentGroup
-	for _, c := range cgs {
-		if c.Position == 0 {
-			cg = c
-		}
-	}
-	return cg
+	return cgs
 }
 
 func NewAttr(name, str string) *ast.Attribute {

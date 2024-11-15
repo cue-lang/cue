@@ -82,6 +82,7 @@ cmp stderr expect-stderr-3
 keyword "xml" not yet implemented:
     ./openapi.json:13:17
 -- expect-out.cue --
+// My OpenAPI
 info: {
 	title:   *"My OpenAPI" | string
 	version: *"v1alpha1" | string

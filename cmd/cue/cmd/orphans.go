@@ -276,6 +276,8 @@ func placeOrphans(b *buildPlan, d *encoding.Decoder, pkg string, objs ...*ast.Fi
 			f.Decls = append(f.Decls, field)
 			if pkg := internal.Package(file); pkg != nil {
 				astutil.CopyComments(field, pkg)
+			} else {
+				astutil.CopyComments(field, file)
 			}
 			for _, e := range labels[1:] {
 				newField := &ast.Field{Label: e}

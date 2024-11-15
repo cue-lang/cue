@@ -195,19 +195,34 @@ di:  1
 dii: 1
 
 -- stdout-1.cue --
+// 1.cue: file comment
+
 // 1.cue: pkg doc comment
-package t
+package t // 1.cue: pkg comment 1
+
+// 1.cue: pkg comment 2
 
 // 1.cue: d comment
 d:   1
 di:  1
 dii: 1
 -- stdout-2.cue --
+// 2.cue: doc comment
+
+// 2.cue: file comment 1
+
+// 2.cue: file comment 2
+
 // 2.cue: d
 d:   1
 di:  1
 dii: 1
 -- stdout-2-pkg.cue --
+// 2.cue: file comment 1
+
+// 2.cue: file comment 2
+
+// 2.cue: doc comment
 package t
 
 // 2.cue: d
@@ -216,10 +231,18 @@ di:  1
 dii: 1
 -- stdout-3.cue --
 -- stdout-1_2.cue --
-// 1.cue: pkg doc comment
+// 1.cue: file comment
+
+// 2.cue: file comment 1
 
 // 2.cue: file comment 2
-package t
+
+// 1.cue: pkg doc comment
+//
+// 2.cue: doc comment
+package t // 1.cue: pkg comment 1
+
+// 1.cue: pkg comment 2
 
 // 1.cue: d comment
 
@@ -228,10 +251,18 @@ d:   1
 di:  1
 dii: 1
 -- stdout-2_1.cue --
-// 1.cue: pkg doc comment
+// 1.cue: file comment
+
+// 2.cue: file comment 1
 
 // 2.cue: file comment 2
-package t
+
+// 1.cue: pkg doc comment
+//
+// 2.cue: doc comment
+package t // 1.cue: pkg comment 1
+
+// 1.cue: pkg comment 2
 
 // 1.cue: d comment
 
@@ -240,10 +271,16 @@ d:   1
 di:  1
 dii: 1
 -- stdout-1_3.cue --
-// 1.cue: pkg doc comment
+// 1.cue: file comment
 
+// 1.cue: pkg doc comment
+//
 // 3.cue: pkg doc comment
-package t
+package t // 1.cue: pkg comment 1
+
+// 1.cue: pkg comment 2
+
+// 3.cue: pkg comment 1
 
 // 1.cue: d comment
 
@@ -252,10 +289,16 @@ d:   1
 di:  1
 dii: 1
 -- stdout-3_1.cue --
-// 1.cue: pkg doc comment
+// 1.cue: file comment
 
+// 1.cue: pkg doc comment
+//
 // 3.cue: pkg doc comment
-package t
+package t // 1.cue: pkg comment 1
+
+// 1.cue: pkg comment 2
+
+// 3.cue: pkg comment 1
 
 // 1.cue: d comment
 
@@ -264,6 +307,18 @@ d:   1
 di:  1
 dii: 1
 -- stdout-2_4.cue --
+// 2.cue: doc comment
+//
+// 4.cue: doc comment
+
+// 2.cue: file comment 1
+
+// 2.cue: file comment 2
+
+// 4.cue: file comment 1
+
+// 4.cue: file comment 2
+
 // 2.cue: d
 
 // 4.cue: d
@@ -271,6 +326,17 @@ d:   1
 di:  1
 dii: 1
 -- stdout-2_4-pkg.cue --
+// 2.cue: file comment 1
+
+// 2.cue: file comment 2
+
+// 4.cue: file comment 1
+
+// 4.cue: file comment 2
+
+// 2.cue: doc comment
+//
+// 4.cue: doc comment
 package t
 
 // 2.cue: d

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ca37f8c_2362a13e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-15T17:30:34Z",
+      "side": 1,
+      "message": "SGTM but we need a regression test, either as part of this commit or in a separate commit.",
+      "revId": "db624aa99206b794b70827f72f7ab886c26d4bc3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -35,7 +35,9 @@
 @jsonschema(schema="http://json-schema.org/draft-07/schema#")
 _
 
-#ref: matchN(1, [matchN(0, [string]) & {}, null]) & (null | {
+#ref: matchN(1, [matchN(0, [string]) & {
+	...
+}, null]) & (null | {
 	branches?: {
 		...
 	}

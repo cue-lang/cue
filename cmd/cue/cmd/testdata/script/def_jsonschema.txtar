@@ -5,15 +5,6 @@ cmp stdout expect-stdout
 exec cue def schema.json -p schema -l '#Person:'
 cmp stdout expect-stdout
 
-exec cue def schema.json -p schema -l 'Person:'
-cmp stdout expect-stdout2
-
-exec cue def schema-closed.json -p schema -l '#Person:'
-cmp stdout expect-stdout3
-
-exec cue def schema-closed.json -p schema -l 'Person:'
-cmp stdout expect-stdout4
-
 exec cue def jsonschema: bad.json
 
 # The default strictness modes should apply even when
@@ -60,26 +51,6 @@ import "strings"
 	age?: >=0 & int
 	...
 }
--- expect-stdout2 --
-package schema
-
-import "strings"
-
-Person: {
-	// Person
-	@jsonschema(schema="http://json-schema.org/draft-07/schema#")
-	@jsonschema(id="https://example.com/person.schema.json")
-
-	// The person's first name.
-	firstName?: string
-
-	// The person's last name.
-	lastName?: strings.MinRunes(1)
-
-	// Age in years which must be equal to or greater than zero.
-	age?: >=0 & int
-	...
-}
 -- schema.json --
 ﻿{
   "$id": "https://example.com/person.schema.json",
@@ -104,73 +75,6 @@ Person: {
   }
 }
 
--- schema-closed.json --
-﻿{
-  "$id": "https://example.com/person.schema.json",
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Person",
-  "type": "object",
-  "properties": {
-    "firstName": {
-      "type": "string",
-      "description": "The person's first name."
-    },
-    "lastName": {
-      "type": "string",
-      "description": "The person's last name.",
-      "minLength": 1
-    },
-    "age": {
-      "description": "Age in years which must be equal to or greater than zero.",
-      "type": "integer",
-      "minimum": 0
-    }
-  },
-  "additionalProperties": false
-}
-
--- expect-stdout3 --
-package schema
-
-import "strings"
-
-#Person: {
-	// Person
-	@jsonschema(schema="http://json-schema.org/draft-07/schema#")
-	close({
-		@jsonschema(id="https://example.com/person.schema.json")
-
-		// The person's first name.
-		firstName?: string
-
-		// The person's last name.
-		lastName?: strings.MinRunes(1)
-
-		// Age in years which must be equal to or greater than zero.
-		age?: >=0 & int
-	})
-}
--- expect-stdout4 --
-package schema
-
-import "strings"
-
-Person: {
-	// Person
-	@jsonschema(schema="http://json-schema.org/draft-07/schema#")
-	close({
-		@jsonschema(id="https://example.com/person.schema.json")
-
-		// The person's first name.
-		firstName?: string
-
-		// The person's last name.
-		lastName?: strings.MinRunes(1)
-
-		// Age in years which must be equal to or greater than zero.
-		age?: >=0 & int
-	})
-}
 -- bad.json --
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",

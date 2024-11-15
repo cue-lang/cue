@@ -16,6 +16,24 @@
       "message": "this comment is now duplicated, which doesn\u0027t seem right",
       "revId": "b9b20ab36db8c539767cf08010bd64b8970aacd4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cfe5df91_43b0cfb2",
+        "filename": "internal/core/export/testdata/main/disjunction.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-15T10:20:13Z",
+      "side": 1,
+      "message": "`internal.FileComment()` returns the first comment before any declaration if no package or file comments exist, leading to duplication. Interestingly, the `cue def` command doesn\u0027t show the same duplication. I need to investigate this issue further.",
+      "parentUuid": "067d29be_6a93c81a",
+      "revId": "b9b20ab36db8c539767cf08010bd64b8970aacd4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

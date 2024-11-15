@@ -71,6 +71,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a47c7fea_bbaf7058",
+        "filename": "encoding/jsonschema/internal/closedness.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-15T04:27:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ac1fcdab_fa4783af",
+      "revId": "8d3feae26f57907a4b11d3b3b0fb5ca5aefd7c2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fa12f1dc_8676d1ab",

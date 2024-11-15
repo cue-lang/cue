@@ -175,6 +175,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "10677aa0_23b1b418",
+        "filename": "internal/closeness.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-15T04:27:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bbdf742e_eba9ec94",
+      "revId": "89cadfbea9ec7f47be2adba6e37046bc727ce9f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ffe54dd5_a075367b",

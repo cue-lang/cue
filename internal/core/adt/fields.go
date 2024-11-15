@@ -776,6 +776,8 @@ func (cc *closeContext) insertConjunct(ctx *OpContext, key *closeContext, c Conj
 	switch id.CycleType {
 	case NoCycle, IsOptional:
 		n.hasNonCyclic = true
+	default:
+		ctx.Logf(ctx.vertex, "fff")
 	}
 
 	if key.src.isInProgress() {

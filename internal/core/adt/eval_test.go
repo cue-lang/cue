@@ -278,6 +278,35 @@ module: "mod.test"
 language: version: "v0.9.0"
 
 -- in.cue --
+#Def: a: 1
+x: (#Def & {b: 2}).b
+
+// #T
+// in: _
+// x: #T
+// x: x: #T
+
+// #T: {
+// 	in: x
+// 	x: _
+// }
+
+
+// x: close({
+// 	a: _
+// 	b: x.a
+// })
+
+// expr: t4: ok: {
+// 	// -> a0 -> X -> b1 -> b0 -> a1 -> a0
+// 	a0: X // Need all conjuncts known from X
+// 	b0: a1
+// 	a1: a0 + 2
+// 	b1: b0 - 2
+// 	a0: X
+// 	X:  b1
+// 	X:  5.0
+// }
 	`
 
 	if strings.HasSuffix(strings.TrimSpace(in), ".cue --") {

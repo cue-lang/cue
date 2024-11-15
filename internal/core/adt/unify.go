@@ -324,6 +324,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 			v.HasEllipsis = true
 		}
 		v.status = w.status
+		// w.unify(c, needs, mode)
 
 		return true
 	}

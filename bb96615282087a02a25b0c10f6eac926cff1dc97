@@ -16,6 +16,24 @@
       "message": "This doesn\u0027t _quite_ cover all the cases described by https://github.com/cue-lang/cue/issues/3522. Please add a definition with a description too. Or perhaps just use the test case from that issue, although maybe include a `\"type\": \"object\"` to make the result a little more idiomatic (assuming the same fixes are still appropriate - it might make sense to have both if not).",
       "revId": "bb96615282087a02a25b0c10f6eac926cff1dc97",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19540bec_4012c3af",
+        "filename": "cmd/cue/cmd/testdata/script/def_comments.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-18T17:26:23Z",
+      "side": 1,
+      "message": "This is a different case from the definition case in #3522. Including a `\"type\": \"object\"` in this case will restore the lost comments (top-level title and description). However, I think it would be good to add all the different cases here, including the #3522 case. I will update this CL later.",
+      "parentUuid": "f7967985_a908f066",
+      "revId": "bb96615282087a02a25b0c10f6eac926cff1dc97",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

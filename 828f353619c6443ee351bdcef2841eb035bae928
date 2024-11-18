@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9dab26c9_2e83ff43",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-11-18T16:34:52Z",
+      "side": 1,
+      "message": "That\u0027s very much intentional for now whilst it remains WIP. Effectively I wanted to land this early so I had _a_ place to dump notes. I will refine and reword etc later.",
+      "parentUuid": "e0031e93_a1c774d0",
+      "revId": "828f353619c6443ee351bdcef2841eb035bae928",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9ab4e8d3_529da3a6",
@@ -31,6 +49,30 @@
       "writtenOn": "2024-11-18T16:13:24Z",
       "side": 1,
       "message": "are you saying we are looking into this? I would phrase it that way, as otherwise it seems like you\u0027re telling the user to look into it.",
+      "range": {
+        "startLine": 30,
+        "startChar": 45,
+        "endLine": 30,
+        "endChar": 49
+      },
+      "revId": "828f353619c6443ee351bdcef2841eb035bae928",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d89202c_65fb1cae",
+        "filename": "cmd/cue/cmd/lsp.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-11-18T16:34:52Z",
+      "side": 1,
+      "message": "Per above comment, I\u0027m really not intending for this to be anything more than a collection of notes for now.",
+      "parentUuid": "9ab4e8d3_529da3a6",
       "range": {
         "startLine": 30,
         "startChar": 45,

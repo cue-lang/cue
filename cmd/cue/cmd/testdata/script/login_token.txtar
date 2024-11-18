@@ -21,9 +21,20 @@ grep -count=1 '"access_token": "appv1_validtoken1234"' cueconfig/logins.json
 ! grep '"refresh_token"' cueconfig/logins.json
 
 # Ensure that we can store a token for a new registry on top of an existing logins.json file.
-# TODO(mvdan): we don't actually use the argument at all!
 exec cue login --token=appv1_validtoken5678 registry.mycorp.tld
 grep -count=1 '"registries": {' cueconfig/logins.json
-# grep -count=1 '"registry\.mycorp\.tld"' cueconfig/logins.json
-# grep -count=2 '"access_token"' cueconfig/logins.json
-! grep '"registry\.mycorp\.tld"' cueconfig/logins.json
+grep -count=1 '"registry\.mycorp\.tld"' cueconfig/logins.json
+grep -count=2 '"access_token"' cueconfig/logins.json
+
+# Check that invalid registries are rejected.
+
+# A registry hostname has no path element.
+! exec cue login --token=appv1_validtokenn_everused registry.mycorp.tld/foobar
+stderr 'invalid host name'
+
+# When multiple registries are configured, none is selected by default.
+env CUE_REGISTRY=mycorp.tld=registry.mycorp.tld,registry.cue.works
+! exec cue login --token=appv1_validtoken_neverused
+stderr 'need a single CUE registry to log into'
+
+! grep 'validtoken_neverused' cueconfig/logins.json

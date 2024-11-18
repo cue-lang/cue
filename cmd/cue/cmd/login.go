@@ -22,11 +22,13 @@ import (
 	"strings"
 	"time"
 
+	"cuelabs.dev/go/oci/ociregistry/ociref"
 	"github.com/spf13/cobra"
 	"golang.org/x/oauth2"
 
 	"cuelang.org/go/internal/cueconfig"
 	"cuelang.org/go/internal/httplog"
+	"cuelang.org/go/mod/modconfig"
 )
 
 // TODO: We need a testscript to cover "cue login" with its oauth2 device flow.
@@ -68,11 +70,25 @@ inside $CUE_CONFIG_DIR; see 'cue help environment'.
 			if resolver == nil {
 				return fmt.Errorf("cannot log in when modules are not enabled")
 			}
-			registryHosts := resolver.AllHosts()
-			if len(registryHosts) > 1 {
-				return fmt.Errorf("need a single CUE registry to log into")
+			// TODO(mvdan): should we refuse to log into a CUE registry where host.Insecure==true?
+			var host modconfig.Host
+			if len(args) > 0 {
+				// Note that CUE_REGISTRY allows for +insecure suffixes, which we could use via
+				// [modresolve.ParseCUERegistry], but it also allows other syntax which doesn't
+				// make sense here. For example, specifying multiple registries, or a repository path prefix.
+				// For now, only accepting a host and not supporting +insecure seems fine.
+				hostname := args[0]
+				if !ociref.IsValidHost(hostname) {
+					return fmt.Errorf("invalid host name %q in registry", hostname)
+				}
+				host = modconfig.Host{Name: hostname}
+			} else {
+				registryHosts := resolver.AllHosts()
+				if len(registryHosts) > 1 {
+					return fmt.Errorf("need a single CUE registry to log into")
+				}
+				host = registryHosts[0]
 			}
-			host := registryHosts[0]
 			loginsPath, err := cueconfig.LoginConfigPath(os.Getenv)
 			if err != nil {
 				return fmt.Errorf("cannot find the path to store CUE registry logins: %v", err)

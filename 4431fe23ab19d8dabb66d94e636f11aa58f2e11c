@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ac20371_60c27852",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-18T17:19:18Z",
+      "side": 1,
+      "message": "LGTM with a couple of minor thoughts.",
+      "revId": "4431fe23ab19d8dabb66d94e636f11aa58f2e11c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "adb5b845_5abbe571",
+        "filename": "cmd/cue/cmd/testdata/script/login_token.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-18T17:19:18Z",
+      "side": 1,
+      "message": "FWIW an alternative to using `grep` here might be to validate the result with CUE, making it arguably easier to express the invariants we\u0027re interested in.",
+      "revId": "4431fe23ab19d8dabb66d94e636f11aa58f2e11c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b739948_e248cd12",
+        "filename": "cmd/cue/cmd/testdata/script/login_token.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-18T17:19:18Z",
+      "side": 1,
+      "message": "Is `cat` always available even under Windows? Do we need this?",
+      "revId": "4431fe23ab19d8dabb66d94e636f11aa58f2e11c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

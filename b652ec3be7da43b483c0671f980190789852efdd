@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "33f27e85_9100fdeb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-11-18T16:37:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "abb66a67_fc3a5b79",
+      "revId": "b652ec3be7da43b483c0671f980190789852efdd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e06aaa36_c1bf211b",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-11-18T16:20:19Z",
       "side": 1,
       "message": "I assume an editor should not be sending any such event that \"changes\" the workspace folder to exactly the same as before?",
+      "revId": "b652ec3be7da43b483c0671f980190789852efdd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a1379c2_2d9292eb",
+        "filename": "internal/golangorgx/gopls/server/workspace.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-11-18T16:37:04Z",
+      "side": 1,
+      "message": "Quite possibly/probably. But in any case relying too heavily on \"good\" LSP clients is not, at least from gopls experience, practical ground on which to stand!\n\nWe can and will revisit this shortly.",
+      "parentUuid": "e06aaa36_c1bf211b",
       "revId": "b652ec3be7da43b483c0671f980190789852efdd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

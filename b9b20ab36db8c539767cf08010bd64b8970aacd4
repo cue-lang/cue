@@ -34,6 +34,24 @@
       "parentUuid": "067d29be_6a93c81a",
       "revId": "b9b20ab36db8c539767cf08010bd64b8970aacd4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d814aa1_78ef8d92",
+        "filename": "internal/core/export/testdata/main/disjunction.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-18T09:49:20Z",
+      "side": 1,
+      "message": "\u003e the `cue def` command doesn\u0027t show the same duplication\n\nIt was lost again because `Value.Syntax()` would unwrap the `*ast.File` and return a new `*ast.StructLit`.",
+      "parentUuid": "cfe5df91_43b0cfb2",
+      "revId": "b9b20ab36db8c539767cf08010bd64b8970aacd4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

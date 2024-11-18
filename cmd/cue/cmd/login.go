@@ -27,6 +27,7 @@ import (
 
 	"cuelang.org/go/internal/cueconfig"
 	"cuelang.org/go/internal/httplog"
+	"cuelang.org/go/internal/mod/modresolve"
 )
 
 // TODO: We need a testscript to cover "cue login" with its oauth2 device flow.
@@ -61,17 +62,31 @@ inside $CUE_CONFIG_DIR; see 'cue help environment'.
 `,
 		Args: cobra.MaximumNArgs(1),
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {
-			resolver, err := getRegistryResolver()
-			if err != nil {
-				return err
+			var locResolver modresolve.LocationResolver
+			if len(args) > 0 {
+				var err error
+				locResolver, err = modresolve.ParseCUERegistry(args[0], "")
+				if err != nil {
+					return err
+				}
+			} else {
+				resolver, err := getRegistryResolver()
+				if err != nil {
+					return err
+				}
+				// We need to do this nil check before we assign to locResolver,
+				// otherwise the interface gets filled with a typed nil, which is not nil.
+				if resolver == nil {
+					return fmt.Errorf("cannot log in when modules are not enabled")
+				}
+				locResolver = resolver
 			}
-			if resolver == nil {
-				return fmt.Errorf("cannot log in when modules are not enabled")
-			}
-			registryHosts := resolver.AllHosts()
+			registryHosts := locResolver.AllHosts()
 			if len(registryHosts) > 1 {
 				return fmt.Errorf("need a single CUE registry to log into")
 			}
+			// TODO(mvdan): should we refuse to log into a CUE registry where host.Insecure==true?
+			// It is useful for local testing or debugging, but is otherwise pretty dangerous.
 			host := registryHosts[0]
 			loginsPath, err := cueconfig.LoginConfigPath(os.Getenv)
 			if err != nil {

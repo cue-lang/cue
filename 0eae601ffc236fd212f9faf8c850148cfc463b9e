@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d29c2878_e4a3be14",
+        "filename": "internal/golangorgx/gopls/test/integration/options.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-18T16:18:46Z",
+      "side": 1,
+      "message": "perhaps add a \"Matches\" or \"Regexp\" suffix to this to clarify that it\u0027s a regular expression - otherwise I might think this is used via string equality or substring search.",
+      "revId": "0eae601ffc236fd212f9faf8c850148cfc463b9e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

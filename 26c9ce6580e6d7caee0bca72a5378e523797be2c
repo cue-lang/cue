@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d467a9c0_375b09b7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-18T17:09:17Z",
+      "side": 1,
+      "message": "Either invoking `internal.SimplifyClosedness` before `astutil.Sanitize` in `decoder.decode()`, or invoking `astutil.Sanitize` again after `internal.SimplifyClosedness`, can fix this error. However, I need to investigate this error further to fully understand it before submitting another CL, and also want to completely avoid the alias in this case.",
+      "revId": "26c9ce6580e6d7caee0bca72a5378e523797be2c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

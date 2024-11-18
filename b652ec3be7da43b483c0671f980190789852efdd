@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abb66a67_fc3a5b79",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-18T16:20:19Z",
+      "side": 1,
+      "message": "nit: no punctuation in commit titles",
+      "revId": "b652ec3be7da43b483c0671f980190789852efdd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e06aaa36_c1bf211b",
+        "filename": "internal/golangorgx/gopls/server/workspace.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-18T16:20:19Z",
+      "side": 1,
+      "message": "I assume an editor should not be sending any such event that \"changes\" the workspace folder to exactly the same as before?",
+      "revId": "b652ec3be7da43b483c0671f980190789852efdd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

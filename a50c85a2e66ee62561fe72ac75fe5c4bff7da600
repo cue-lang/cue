@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a7276a9_21914461",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-18T16:16:53Z",
+      "side": 1,
+      "message": "Following your lead, I\u0027m not reviewing deleted/simplified code too closely, as it does look like stuff that we don\u0027t really need.",
+      "revId": "a50c85a2e66ee62561fe72ac75fe5c4bff7da600",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

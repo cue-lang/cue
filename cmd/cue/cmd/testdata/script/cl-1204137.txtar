@@ -1,0 +1,35 @@
+# reproduction for https://review.gerrithub.io/c/cue-lang/cue/+/1204137
+
+exec cue def -l '#Pipeline:' jsonschema: schema.json
+cmp stdout expect-stdout
+
+-- schema.json --
+{
+  "$id": "https://foo.com/this-id-is-required-to-reproduce-the-case",
+  "type": "object",
+  "properties": {
+    "a": {
+      "$ref": "#/definitions/User"
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
+-- expect-stdout --
+#Pipeline: {
+	@jsonschema(id="https://foo.com/this-id-is-required-to-reproduce-the-case")
+	a?: #User
+	#User: close({
+		name?: string
+	})
+	...
+}

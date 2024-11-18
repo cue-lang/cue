@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4e5e988_58baa128",
+        "filename": "cmd/cue/cmd/testdata/script/def_comments.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-18T22:29:39Z",
+      "side": 1,
+      "message": "Maybe worth including the output when using `-l` for the CUE cases too?",
+      "revId": "15b5c893cf728069aaef613c7ea819332d720576",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

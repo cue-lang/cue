@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0031e93_a1c774d0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-18T16:13:24Z",
+      "side": 1,
+      "message": "Note that markdown docs like this won\u0027t be easy to discover unless you link them from somewhere like README.md or cmd/cue/cmd/README.md.",
+      "revId": "828f353619c6443ee351bdcef2841eb035bae928",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ab4e8d3_529da3a6",
+        "filename": "cmd/cue/cmd/lsp.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-18T16:13:24Z",
+      "side": 1,
+      "message": "are you saying we are looking into this? I would phrase it that way, as otherwise it seems like you\u0027re telling the user to look into it.",
+      "range": {
+        "startLine": 30,
+        "startChar": 45,
+        "endLine": 30,
+        "endChar": 49
+      },
+      "revId": "828f353619c6443ee351bdcef2841eb035bae928",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

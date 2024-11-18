@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7967985_a908f066",
+        "filename": "cmd/cue/cmd/testdata/script/def_comments.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-18T14:34:30Z",
+      "side": 1,
+      "message": "This doesn\u0027t _quite_ cover all the cases described by https://github.com/cue-lang/cue/issues/3522. Please add a definition with a description too. Or perhaps just use the test case from that issue, although maybe include a `\"type\": \"object\"` to make the result a little more idiomatic (assuming the same fixes are still appropriate - it might make sense to have both if not).",
+      "revId": "bb96615282087a02a25b0c10f6eac926cff1dc97",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

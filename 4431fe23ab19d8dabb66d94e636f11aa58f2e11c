@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9baf47aa_dc1276ab",
+        "filename": "cmd/cue/cmd/testdata/script/login_token.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-19T11:52:25Z",
+      "side": 1,
+      "message": "maybe. I agree that grep with json is a bit of a hack, but I also prefer not to use cue itself (e.g. `cue vet`) as a sanity check in our own tests, because that causes issues with \"bootstrapping\" the tests or really ensuring that they do what we think they do. grep is much simpler so it\u0027s much harder to mess up.\n\nI\u0027ll leave as is for now because I lean against using cue to test cue, but I\u0027m happy to revisit in the future.",
+      "parentUuid": "adb5b845_5abbe571",
+      "revId": "4431fe23ab19d8dabb66d94e636f11aa58f2e11c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0b739948_e248cd12",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-11-18T17:19:18Z",
       "side": 1,
       "message": "Is `cat` always available even under Windows? Do we need this?",
+      "revId": "4431fe23ab19d8dabb66d94e636f11aa58f2e11c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2bc370c_bb3c2386",
+        "filename": "cmd/cue/cmd/testdata/script/login_token.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-19T11:52:25Z",
+      "side": 1,
+      "message": "oops, this was a debugging line. removed.",
+      "parentUuid": "0b739948_e248cd12",
       "revId": "4431fe23ab19d8dabb66d94e636f11aa58f2e11c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

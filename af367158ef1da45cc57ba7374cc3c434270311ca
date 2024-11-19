@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a79b20c6_471bcbd7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-19T13:33:30Z",
+      "side": 1,
+      "message": "structure-shared",
+      "revId": "af367158ef1da45cc57ba7374cc3c434270311ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "249060bd_60d91c29",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-19T13:33:30Z",
+      "side": 1,
+      "message": "TestFields",
+      "revId": "af367158ef1da45cc57ba7374cc3c434270311ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "914cc84c_3cb46daa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-19T13:33:30Z",
+      "side": 1,
+      "message": "LGTM with a few trivial suggestions, thanks!",
+      "revId": "af367158ef1da45cc57ba7374cc3c434270311ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f4960bf_106d5456",
+        "filename": "cue/path_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-19T13:33:30Z",
+      "side": 1,
+      "message": "Better on separate lines like the rest.",
+      "revId": "af367158ef1da45cc57ba7374cc3c434270311ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1f4e411_fd934a0d",
+        "filename": "cue/path_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-19T13:33:30Z",
+      "side": 1,
+      "message": "could use `t.Equal` for this and others?",
+      "revId": "af367158ef1da45cc57ba7374cc3c434270311ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

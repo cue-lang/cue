@@ -27,11 +27,17 @@ _registryReadOnlyAccessStep: githubactions.#Step & {
 		// Note: this token has read-only access to the registry
 		// and is used only because we need some credentials
 		// to pull dependencies from the Central Registry.
-		CUE_LOGINS: "${{ secrets.NOTCUECKOO_CUE_LOGINS }}"
+		// The token is owned by notcueckoo and described as "ci readonly".
+		// TODO(mvdan): delete the NOTCUECKOO_CUE_LOGINS org secret once all uses are gone;
+		// it will have expired by early December 2024 anyway.
+		CUE_TOKEN: "${{ secrets.NOTCUECKOO_CUE_TOKEN }}"
 	}
+	// For now we `go run` cue to not rely on a previous `go install ./cmd/cue`
+	// to have happened, which is very easy to forget or misconfigure.
+	// We use the full import path so that this works from any module subdirectory.
+	// TODO(mvdan): switch to `go tool cue` as soon as we are able to.
 	run: """
-		export CUE_CONFIG_DIR=$(mktemp -d)
-		echo "$CUE_LOGINS" > $CUE_CONFIG_DIR/logins.json
+		go run cuelang.org/go/cmd/cue login --token=${CUE_TOKEN}
 		\(_run)
 		"""
 }

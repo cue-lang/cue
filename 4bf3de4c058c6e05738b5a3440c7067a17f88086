@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "63201a35_704ee875",
+        "filename": "cmd/cue/cmd/login.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-19T11:52:25Z",
+      "side": 1,
+      "message": "yeah I\u0027m not sure. we currently allow it through CUE_REGISTRY so I guess it\u0027s consistent to also allow it. per your other comment, I\u0027ll make this follow the same CUE_REGISTRY parsing logic which supports +insecure, so I\u0027ll drop this TODO.",
+      "parentUuid": "48392ad2_72927fea",
+      "revId": "4bf3de4c058c6e05738b5a3440c7067a17f88086",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cc78502a_2559f2b6",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-11-18T17:31:46Z",
       "side": 1,
       "message": "One the other hand, maybe it\u0027s nice to have`CUE_REGISTRY\u003d$something cue login` considered the same as `cue login $something`. That\u0027s somewhat future-proof too, because it\u0027s possible that the subtree of the registry that we\u0027re intending to use might be part of the auth process.",
+      "revId": "4bf3de4c058c6e05738b5a3440c7067a17f88086",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2acbec1a_ee2a4795",
+        "filename": "cmd/cue/cmd/login.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-19T11:52:25Z",
+      "side": 1,
+      "message": "Maybe. For `cue login foo.bar+insecure` I agree it\u0027s a nice to have. For `cue login foo.bar,some.other.registry` or `cue login foo.bar/baz` it feels silly, but I guess at least it would be consistent. done",
+      "parentUuid": "cc78502a_2559f2b6",
       "revId": "4bf3de4c058c6e05738b5a3440c7067a17f88086",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

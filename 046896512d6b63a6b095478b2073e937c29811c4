@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff920efa_8cf6d094",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-19T14:44:10Z",
+      "side": 1,
+      "message": "LGTM with a couple of minor thoughts.",
+      "revId": "046896512d6b63a6b095478b2073e937c29811c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2bef54e7_e8c3d32b",
+        "filename": "internal/_e2e/script_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-19T14:44:10Z",
+      "side": 1,
+      "message": "debugging remnant?",
+      "revId": "046896512d6b63a6b095478b2073e937c29811c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ed5bc0c_192207f8",
+        "filename": "internal/_e2e/script_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-19T14:44:10Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t\t\t\treturn fmt.Errorf(\"%v: %s\", err, out)\n```",
+      "revId": "046896512d6b63a6b095478b2073e937c29811c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -42,7 +42,7 @@ matrixGo: ["1.22.x", latestGo]
 // Use a specific latest version for release builds.
 // Note that we don't want ".x" for the sake of reproducibility,
 // so we instead pin a specific Go release.
-pinnedReleaseGo: "1.23.2"
+pinnedReleaseGo: "1.23.3"
 
 goreleaserVersion: "v2.3.2"
 

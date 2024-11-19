@@ -145,7 +145,7 @@ jobs:
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
         name: End-to-end test
         env:
-          CUE_TEST_LOGINS: ${{ secrets.E2E_PORCUEPINE_CUE_LOGINS }}
+          CUE_TEST_TOKEN: ${{ secrets.E2E_PORCUEPINE_CUE_TOKEN }}
         run: |-
           cd internal/_e2e
           go test -race
@@ -174,11 +174,10 @@ jobs:
       - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
         name: Generate
         run: |-
-          export CUE_CONFIG_DIR=$(mktemp -d)
-          echo "$CUE_LOGINS" > $CUE_CONFIG_DIR/logins.json
+          cue login --token=${CUE_TOKEN}
           go generate ./...
         env:
-          CUE_LOGINS: ${{ secrets.NOTCUECKOO_CUE_LOGINS }}
+          CUE_TOKEN: ${{ secrets.NOTCUECKOO_CUE_TOKEN }}
       - if: always()
         name: Check that git is clean at the end of the job
         run: test -z "$(git status --porcelain)" || (git status; git diff; false)

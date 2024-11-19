@@ -143,11 +143,9 @@ workflows: trybot: _repo.bashWorkflow & {
 		{
 			name: "End-to-end test"
 			env: {
-				// E2E_PORCUEPINE_CUE_LOGINS is the logins.json resulting from doing a `cue login`
-				// with registry.cue.works as the GitHub porcuepine user.
-				// TODO(mvdan): remove the E2E_CUE_LOGINS secret once all uses are gone,
-				// i.e. once the release branch for v0.10 is deleted.
-				CUE_TEST_LOGINS: "${{ secrets.E2E_PORCUEPINE_CUE_LOGINS }}"
+				// E2E_PORCUEPINE_CUE_TOKEN is a token generated on registry.cue.works
+				// as the GitHub porcuepine user, with description "e2e cue repo".
+				CUE_TEST_TOKEN: "${{ secrets.E2E_PORCUEPINE_CUE_TOKEN }}"
 			}
 			// Our regular tests run with both `go test ./...` and `go test -race ./...`.
 			// The end-to-end tests should only be run once, given the slowness and API rate limits.

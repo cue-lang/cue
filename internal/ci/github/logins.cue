@@ -27,11 +27,13 @@ _registryReadOnlyAccessStep: githubactions.#Step & {
 		// Note: this token has read-only access to the registry
 		// and is used only because we need some credentials
 		// to pull dependencies from the Central Registry.
-		CUE_LOGINS: "${{ secrets.NOTCUECKOO_CUE_LOGINS }}"
+		// The token is owned by notcueckoo and described as "ci readonly".
+		// TODO(mvdan): delete the NOTCUECKOO_CUE_LOGINS org secret once all uses are gone;
+		// it will have expired by early December 2024 anyway.
+		CUE_TOKEN: "${{ secrets.NOTCUECKOO_CUE_TOKEN }}"
 	}
 	run: """
-		export CUE_CONFIG_DIR=$(mktemp -d)
-		echo "$CUE_LOGINS" > $CUE_CONFIG_DIR/logins.json
+		cue login --token=${CUE_TOKEN}
 		\(_run)
 		"""
 }

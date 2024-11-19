@@ -83,12 +83,11 @@ jobs:
           version: v2.3.2
       - name: Run GoReleaser with CUE
         run: |-
-          export CUE_CONFIG_DIR=$(mktemp -d)
-          echo "$CUE_LOGINS" > $CUE_CONFIG_DIR/logins.json
+          cue login --token=${CUE_TOKEN}
           cue cmd release
         working-directory: ./internal/ci/goreleaser
         env:
-          CUE_LOGINS: ${{ secrets.NOTCUECKOO_CUE_LOGINS }}
+          CUE_TOKEN: ${{ secrets.NOTCUECKOO_CUE_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.CUECKOO_GITHUB_PAT }}
       - if: startsWith(github.ref, 'refs/tags/v')
         name: Re-test cuelang.org

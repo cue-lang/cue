@@ -104,14 +104,14 @@ func TestScript(t *testing.T) {
 			configDir := filepath.Join(env.WorkDir, "tmp/configdir")
 			env.Setenv("CUE_CONFIG_DIR", configDir)
 
-			// CUE_TEST_LOGINS is a secret used by the scripts publishing to registry.cue.works.
+			// CUE_TEST_TOKEN is a secret used by the scripts publishing to registry.cue.works.
 			// When unset, those tests would fail with an auth error.
-			if logins := os.Getenv("CUE_TEST_LOGINS"); logins != "" {
-				if err := os.MkdirAll(configDir, 0o777); err != nil {
-					return err
-				}
-				if err := os.WriteFile(filepath.Join(configDir, "logins.json"), []byte(logins), 0o666); err != nil {
-					return err
+			if token := os.Getenv("CUE_TEST_TOKEN"); token != "" {
+				println(token)
+				cmd := exec.Command("cue", "login", "--token", token)
+				cmd.Env = env.Vars // store the token in the CUE_CONFIG_DIR we just set
+				if out, err := cmd.CombinedOutput(); err != nil {
+					env.T().Fatal(fmt.Sprintf("%v: %s", err, out))
 				}
 			}
 			return nil

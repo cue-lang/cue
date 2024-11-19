@@ -761,6 +761,7 @@ func TestFields(t *testing.T) {
 		res   string
 		err   string
 		opts  []cue.Option
+		path  string
 
 		todoV3 bool
 	}{{
@@ -786,7 +787,7 @@ func TestFields(t *testing.T) {
 		res:   "{}",
 	}, {
 		value: `{ for k, v in #y if v > 1 {"\(k)": v} }
-			#y: {a:1,b:2,c:3}`,
+				#y: {a:1,b:2,c:3}`,
 		res: "{b:2,c:3,}",
 	}, {
 		value: `{ #def: 1, _hidden: 2, opt?: 3, reg: 4 }`,
@@ -796,26 +797,26 @@ func TestFields(t *testing.T) {
 		err:   "cannot convert incomplete value",
 	}, {
 		value: `
-		step1: {}
-		step2: {prefix: 3}
-		if step2.value > 100 {
-		   step3: {prefix: step2.value}
-		}
-		_hidden: 3`,
+			step1: {}
+			step2: {prefix: 3}
+			if step2.value > 100 {
+			   step3: {prefix: step2.value}
+			}
+			_hidden: 3`,
 		res: `{step1:{},step2:{"prefix":3},}`,
 	}, {
 		opts: []cue.Option{cue.Final()},
 		value: `
-		step1: {}
-		if step1.value > 100 {
-		}`,
+			step1: {}
+			if step1.value > 100 {
+			}`,
 		err: "undefined field: value",
 	}, {
 		opts: []cue.Option{cue.Concrete(true)},
 		value: `
-		step1: {}
-		if step1.value > 100 {
-		}`,
+			step1: {}
+			if step1.value > 100 {
+			}`,
 		err: "undefined field: value",
 	}, {
 		value: `{a!: 1, b?: 2, c: 3}`,
@@ -832,10 +833,16 @@ func TestFields(t *testing.T) {
 		opts:  []cue.Option{cue.Optional(true)},
 		value: `1, a?: 2`,
 		err:   "cannot use value 1 (type int) as struct",
+	}, {
+		value: `a: x, x: y, y: b: 1`,
+		path:  "a",
+		res:   `{b:1,}`,
 	}}
 	for _, tc := range testCases {
-		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
-			obj := getValue(m, tc.value)
+		cuetdtest.DevOnlyMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
+			f := getValue(m, tc.value)
+
+			obj := f.LookupPath(cue.ParsePath(tc.path))
 
 			iter, err := obj.Fields(tc.opts...)
 			checkFatal(t, err, tc.err, "init")
@@ -973,7 +980,8 @@ v: #X
 a: {
 	b!: 1
 	c: 2
-}`)
+}
+pkg: x, x: y: "hello"`)
 		// expr, err := parser.ParseExpr("lookup.cue", `v`, parser.DeclarationErrors, parser.AllErrors)
 		// if err != nil {
 		// 	log.Fatalf("parseExpr: %v", err)
@@ -1005,6 +1013,11 @@ a: {
 			ref:    []string{"v", "x"},
 			result: "int64",
 			syntax: "int64",
+		}, {
+			// Issue 3577
+			ref:    []string{"pkg", "y"},
+			result: `"hello"`,
+			syntax: `"hello"`,
 		}}
 		for _, tc := range testCases {
 			t.Run("", func(t *testing.T) {

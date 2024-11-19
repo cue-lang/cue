@@ -50,7 +50,8 @@ func (v Value) LookupPath(p Path) Value {
 outer:
 	for _, sel := range p.path {
 		f := sel.sel.feature(v.idx)
-		for _, a := range n.Arcs {
+		deref := n.DerefValue()
+		for _, a := range deref.Arcs {
 			if a.Label == f {
 				if a.IsConstraint() && !sel.sel.isConstraint() {
 					break

@@ -19,30 +19,17 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/internal/cuetdtest"
 )
 
 func TestPaths(t *testing.T) {
-	val := cuecontext.New().CompileString(`
-		#Foo:   a: b: 1
-		"#Foo": c: d: 2
-		_foo: b: 5
-		a: 3
-		b: [4, 5, 6]
-		c: "#Foo": 7
-		map: [string]: int
-		list: [...int]
-
-		// Issue 2060
-		let X = {a: b: 0}
-		x: y: X.a
-	`)
-	testCases := []struct {
+	type testCase struct {
 		path cue.Path
 		out  string
 		str  string
 		err  bool
-	}{{
+	}
+	testCases := []testCase{{
 		path: cue.MakePath(cue.Str("list"), cue.AnyIndex),
 		out:  "int",
 		str:  "list.[_]",
@@ -138,33 +125,55 @@ func TestPaths(t *testing.T) {
 		path: cue.ParsePath("x.y.b"),
 		out:  "0",
 		str:  "x.y.b",
+	}, {
+		// Issue 3577
+		path: cue.ParsePath("pkg.y"),
+		out:  `"hello"`,
+		str:  "pkg.y", // show original path, not structure shared path.
 	}}
 
-	for _, tc := range testCases {
-		t.Run(tc.str, func(t *testing.T) {
-			if gotErr := tc.path.Err() != nil; gotErr != tc.err {
-				t.Errorf("error: got %v; want %v", gotErr, tc.err)
-			}
+	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {
+		ctx := t.M.CueContext()
+		val := mustCompile(t, ctx, `
+			#Foo:   a: b: 1
+			"#Foo": c: d: 2
+			_foo: b: 5
+			a: 3
+			b: [4, 5, 6]
+			c: "#Foo": 7
+			map: [string]: int
+			list: [...int]
 
-			w := val.LookupPath(tc.path)
+			// Issue 2060
+			let X = {a: b: 0}
+			x: y: X.a
 
-			if got := fmt.Sprint(w); got != tc.out {
-				t.Errorf("Value: got %v; want %v", got, tc.out)
-			}
+			// Issue 3577
+			pkg: z, z: y: "hello"
+		`)
 
-			if got := tc.path.String(); got != tc.str {
-				t.Errorf("String: got %v; want %v", got, tc.str)
-			}
+		if gotErr := tc.path.Err() != nil; gotErr != tc.err {
+			t.Errorf("error: got %v; want %v", gotErr, tc.err)
+		}
 
-			if w.Err() != nil {
-				return
-			}
+		w := val.LookupPath(tc.path)
 
-			if got := w.Path().String(); got != tc.str {
-				t.Errorf("Path: got %v; want %v", got, tc.str)
-			}
-		})
-	}
+		if got := fmt.Sprint(w); got != tc.out {
+			t.Errorf("Value: got %v; want %v", got, tc.out)
+		}
+
+		if got := tc.path.String(); got != tc.str {
+			t.Errorf("String: got %v; want %v", got, tc.str)
+		}
+
+		if w.Err() != nil {
+			return
+		}
+
+		if got := w.Path().String(); got != tc.str {
+			t.Errorf("Path: got %v; want %v", got, tc.str)
+		}
+	})
 }
 
 var selectorTests = []struct {

@@ -615,7 +615,7 @@ func (m *mermaidContext) pstr(cc *closeContext) string {
 	addFlag(cc.isEmbed, 'E')
 	addFlag(cc.isClosed, 'c')
 	addFlag(cc.isClosedOnce, 'C')
-	addFlag(cc.hasEllipsis, 'o')
+	addFlag(cc.isTotal, 'o')
 	flags.WriteByte(cc.arcType.String()[0])
 	io.Copy(w, flags)
 

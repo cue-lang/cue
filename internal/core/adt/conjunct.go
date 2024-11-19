@@ -361,7 +361,7 @@ loop2:
 		}
 	}
 	if hasEllipsis {
-		ci.cc.hasEllipsis = true
+		ci.cc.isTotal = true
 	}
 	if !hasEmbed {
 		n.aStruct = s

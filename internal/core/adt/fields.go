@@ -215,9 +215,6 @@ type closeContext struct {
 	// definition. This value propagates to itself and parents through isDef.
 	isDefOrig bool
 
-	// hasEllipsis indicates whether the node contains an ellipsis.
-	hasEllipsis bool
-
 	// hasTop indicates a node has at least one top conjunct.
 	hasTop bool
 
@@ -598,7 +595,7 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 
 	p := c.parent
 
-	if c.isDef && !c.hasEllipsis && (!c.hasTop || c.hasNonTop) {
+	if c.isDef && !c.isTotal && (!c.hasTop || c.hasNonTop) {
 		c.isClosed = true
 		if p != nil {
 			p.isDef = true
@@ -637,9 +634,6 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 		return
 	}
 
-	if c.hasEllipsis {
-		p.hasEllipsis = true
-	}
 	if c.hasTop {
 		p.hasTop = true
 	}

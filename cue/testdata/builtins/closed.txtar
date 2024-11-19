@@ -64,12 +64,6 @@ Errors:
 b.x: field not allowed:
     ./in.cue:1:4
     ./in.cue:5:9
-issue3572.t1.a: field not allowed:
-    ./in.cue:45:7
-    ./in.cue:45:23
-issue3572.t2.a: field not allowed:
-    ./in.cue:47:6
-    ./in.cue:49:12
 
 Result:
 (_|_){
@@ -205,25 +199,14 @@ Result:
       }
     }
   }
-  issue3572: (_|_){
-    // [eval]
-    t1: (_|_){
-      // [eval]
-      a: (_|_){
-        // [eval] issue3572.t1.a: field not allowed:
-        //     ./in.cue:45:7
-        //     ./in.cue:45:23
-      }
+  issue3572: (struct){
+    t1: (#struct){
+      a: (int){ 5 }
     }
     e: (#struct){
     }
-    t2: (_|_){
-      // [eval]
-      a: (_|_){
-        // [eval] issue3572.t2.a: field not allowed:
-        //     ./in.cue:47:6
-        //     ./in.cue:49:12
-      }
+    t2: (#struct){
+      a: (int){ 5 }
     }
   }
 }
@@ -231,23 +214,16 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,8 +1,13 @@
+@@ -1,7 +1,6 @@
  Errors:
  b.x: field not allowed:
 -    ./in.cue:1:10
 -    ./in.cue:5:4
 +    ./in.cue:1:4
      ./in.cue:5:9
-+issue3572.t1.a: field not allowed:
-+    ./in.cue:45:7
-+    ./in.cue:45:23
-+issue3572.t2.a: field not allowed:
-+    ./in.cue:47:6
-+    ./in.cue:49:12
  
  Result:
- (_|_){
-@@ -14,20 +19,19 @@
+@@ -14,20 +13,19 @@
    }
    b: (_|_){
      // [eval]
@@ -273,7 +249,7 @@ diff old new
      }
    }
    inDisjunctions: (struct){
-@@ -60,42 +64,50 @@
+@@ -60,42 +58,50 @@
            }) }
        }
        syslog: (#struct){
@@ -356,37 +332,6 @@ diff old new
              string: (#struct){
                a: (#struct){
                  b: (bool){ true }
-@@ -131,14 +143,25 @@
-       }
-     }
-   }
--  issue3572: (struct){
--    t1: (#struct){
--      a: (int){ 5 }
-+  issue3572: (_|_){
-+    // [eval]
-+    t1: (_|_){
-+      // [eval]
-+      a: (_|_){
-+        // [eval] issue3572.t1.a: field not allowed:
-+        //     ./in.cue:45:7
-+        //     ./in.cue:45:23
-+      }
-     }
-     e: (#struct){
-     }
--    t2: (#struct){
--      a: (int){ 5 }
-+    t2: (_|_){
-+      // [eval]
-+      a: (_|_){
-+        // [eval] issue3572.t2.a: field not allowed:
-+        //     ./in.cue:47:6
-+        //     ./in.cue:49:12
-+      }
-     }
-   }
- }
 -- diff/todo/p3 --
 Reordering
 Let differs.

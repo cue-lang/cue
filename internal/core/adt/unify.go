@@ -343,7 +343,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 
 	// validationCompleted
 	if n.completed&(subFieldsProcessed) != 0 {
-		n.node.HasEllipsis = n.node.cc().hasEllipsis
+		n.node.HasEllipsis = n.node.cc().isTotal
 
 		// The next piece of code used to address the following case
 		// (order matters)

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "57511b53_4dc0e006",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-19T14:12:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a79b20c6_471bcbd7",
+      "revId": "af367158ef1da45cc57ba7374cc3c434270311ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "249060bd_60d91c29",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-11-19T13:33:30Z",
       "side": 1,
       "message": "TestFields",
+      "revId": "af367158ef1da45cc57ba7374cc3c434270311ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fbd7ed2f_3c56f92e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-19T14:12:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "249060bd_60d91c29",
       "revId": "af367158ef1da45cc57ba7374cc3c434270311ca",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "94d3feb3_a1313534",
+        "filename": "cue/path_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-19T14:12:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6f4960bf_106d5456",
+      "revId": "af367158ef1da45cc57ba7374cc3c434270311ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a1f4e411_fd934a0d",
@@ -82,6 +136,24 @@
       "writtenOn": "2024-11-19T13:33:30Z",
       "side": 1,
       "message": "could use `t.Equal` for this and others?",
+      "revId": "af367158ef1da45cc57ba7374cc3c434270311ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f443f49_6822543b",
+        "filename": "cue/path_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-19T14:12:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a1f4e411_fd934a0d",
       "revId": "af367158ef1da45cc57ba7374cc3c434270311ca",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

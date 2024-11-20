@@ -33,6 +33,8 @@ import (
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
+	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/tdtest"
@@ -139,8 +141,6 @@ func TestAPI(t *testing.T) {
 			continue
 		}
 		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
-			m.TODO_V3(t) // P1: faulty closedness
-
 			ctx := m.CueContext()
 
 			valIn := mustCompile(t, ctx, tc.input)
@@ -2173,6 +2173,48 @@ func TestUnify(t *testing.T) {
 			t.Equal(string(b), tc.want)
 		})
 	})
+}
+
+// TestUnify2 is similar to TestUnify, but uses CompileString and Validate.
+func TestUnify2(t *testing.T) {
+	type testCase struct {
+		name   string
+		a      string
+		b      string
+		output string
+		err    bool
+	}
+	testCases := []testCase{{
+		a:   `null | close({})`,
+		b:   `quux: "boom"`,
+		err: true,
+	}, {
+		a: `close({[=~"a"]: _})`,
+		b: `a: 1`,
+	}, {
+		a: `close({{[=~"a"]: _}})`,
+		b: `a: 1`,
+	}}
+
+	adt.DebugDeps = true
+
+	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {
+		t.Select(2)
+		ctx := t.M.CueContext()
+
+		a := ctx.CompileString(tc.a)
+		b := ctx.CompileString(tc.b)
+
+		r := (*runtime.Runtime)(ctx)
+		r.SetDebugOptions(&cuedebug.Config{LogEval: 1})
+
+		c := a.Unify(b)
+
+		err := c.Validate()
+		t.Equal(err != nil, tc.err, "hasError")
+		t.Log("error:", err)
+	})
+
 }
 
 func TestUnifyAccept(t *testing.T) {

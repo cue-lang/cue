@@ -18,13 +18,13 @@ package list
 import (
 	"fmt"
 	"slices"
-	"sort"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/pkg"
+	"cuelang.org/go/internal/types"
 	"cuelang.org/go/internal/value"
 )
 
@@ -261,18 +261,51 @@ func MaxItems(list pkg.List, n int) (bool, error) {
 }
 
 // UniqueItems reports whether all elements in the list are unique.
-func UniqueItems(a []cue.Value) bool {
-	b := []string{}
-	for _, v := range a {
-		b = append(b, fmt.Sprintf("%+v", v))
+func UniqueItems(a []cue.Value) (bool, error) {
+	if len(a) <= 1 {
+		return true, nil
 	}
-	sort.Strings(b)
-	for i := 1; i < len(b); i++ {
-		if b[i-1] == b[i] {
-			return false
+
+	// TODO(perf): this is an O(n^2) algorithm. We should make it O(n log n).
+	// This could be done as follows:
+	// - Create a list with some has value for each element x in a as well
+	//   alongside the value of x itself.
+	// - Sort the elements based on the hash value.
+	// - Compare subsequent elements to see if they are equal.
+
+	var tv types.Value
+	a[0].Core(&tv)
+	ctx := adt.NewContext(tv.R, tv.V)
+
+	posX, posY := 0, 0
+	code := adt.IncompleteError
+
+outer:
+	for i, x := range a {
+		var tx types.Value
+		x.Core(&tx)
+
+		for j := i + 1; j < len(a); j++ {
+			var ty types.Value
+			a[j].Core(&ty)
+
+			if adt.Equal(ctx, tx.V, ty.V, adt.RegularOnly) {
+				posX, posY = i, j
+				if adt.IsFinal(ty.V) {
+					code = adt.EvalError
+					break outer
+				}
+			}
 		}
 	}
-	return true
+
+	if posX != posY {
+		return false, pkg.ValidationError{B: &adt.Bottom{
+			Code: code,
+			Err:  errors.Newf(token.NoPos, "equal values at position %d and %d", posX, posY),
+		}}
+	}
+	return true, nil
 }
 
 // Contains reports whether v is contained in a. The value must be a

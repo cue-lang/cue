@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2dfd85a1_3263581d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-20T10:49:50Z",
+      "side": 1,
+      "message": "CC Paul as this will eventually affect other repos too, once we sync them",
+      "revId": "0feaddfaaa2d69db06d8696b4a87ca5aa7b08c6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

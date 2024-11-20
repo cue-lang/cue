@@ -139,7 +139,7 @@ var p = &pkg.Package{
 		Func: func(c *pkg.CallCtxt) {
 			a := c.List(0)
 			if c.Do() {
-				c.Ret = UniqueItems(a)
+				c.Ret, c.Err = UniqueItems(a)
 			}
 		},
 	}, {

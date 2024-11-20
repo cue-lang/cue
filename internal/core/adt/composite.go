@@ -861,6 +861,54 @@ func toDataAll(ctx *OpContext, v BaseValue) BaseValue {
 	}
 }
 
+// IsFinal reports whether value v can still become more specific, when only
+// considering regular fields.
+//
+// TODO: move this functionality as a method on cue.Value.
+func IsFinal(v Value) bool {
+	return isFinal(v, false)
+}
+
+func isFinal(v Value, isClosed bool) bool {
+	switch x := v.(type) {
+	case *Vertex:
+		closed := isClosed || x.ClosedNonRecursive || x.ClosedRecursive
+
+		// TODO(evalv3): this is for V2 compatibility. Remove once V2 is gone.
+		closed = closed || x.IsClosedList() || x.IsClosedStruct()
+
+		// This also dereferences the value.
+		if v, ok := x.BaseValue.(Value); ok {
+			return isFinal(v, closed)
+		}
+
+		// If it is not closed, it can still become more specific.
+		if !closed {
+			return false
+		}
+
+		for _, a := range x.Arcs {
+			if !a.Label.IsRegular() {
+				continue
+			}
+			if a.ArcType > ArcMember && !a.IsErr() {
+				return false
+			}
+			if !isFinal(a, false) {
+				return false
+			}
+		}
+		return true
+
+	case *Bottom:
+		// Incomplete errors could be resolved by making a struct more specific.
+		return x.Code <= StructuralCycleError
+
+	default:
+		return v.Concreteness() <= Concrete
+	}
+}
+
 // func (v *Vertex) IsEvaluating() bool {
 // 	return v.Value == cycle
 // }

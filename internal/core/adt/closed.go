@@ -127,6 +127,11 @@ type CloseInfo struct {
 	// NOTE: only used when using closeContext.
 	FromDef bool
 
+	// GroupUnify indicates that this conjunct needs to spawn its own
+	// closeContext. This is necessary when programmatically combining
+	// top-level values, such as with Value.Unify.
+	GroupUnify bool
+
 	// FieldTypes indicates which kinds of fields (optional, dynamic, patterns,
 	// etc.) are contained in this conjunct.
 	FieldTypes OptionalType

@@ -589,10 +589,7 @@
 				"data": {
 					"l'ecole": "pas de vraie vie"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "field not allowed: \"l'ecole\"\n"
-				}
+				"valid": true
 			},
 			{
 				"description": "literal unicode character in json string",
@@ -646,10 +643,7 @@
 				"data": {
 					"l'ecole": "pas de vraie vie"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "field not allowed: \"l'ecole\"\n"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -668,10 +662,7 @@
 				"data": {
 					"42": "life, the universe, and everything"
 				},
-				"valid": true,
-				"skip": {
-					"v3": "field not allowed: \"42\"\n"
-				}
+				"valid": true
 			},
 			{
 				"description": "ascii non-digits",

@@ -37,11 +37,7 @@
 					1.00,
 					1
 				],
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "false is not equal to zero",
@@ -113,11 +109,7 @@
 						"foo": "bar"
 					}
 				],
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "unique array of nested objects is valid",
@@ -328,11 +320,7 @@
 						"a": 1
 					}
 				],
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "{\"a\": false} and {\"a\": 0} are unique",

@@ -16,7 +16,7 @@ Conjuncts:    5
 Disjuncts:    3
 -- out/eval --
 Errors:
-x: invalid value ["x","x"] (does not satisfy list.UniqueItems):
+x: invalid value ["x","x"] (does not satisfy list.UniqueItems): equal value ("x") at position 0 and 1:
     ./in.cue:3:4
     ./in.cue:4:4
     ./in.cue:5:4
@@ -25,7 +25,7 @@ Result:
 (_|_){
   // [eval]
   x: (_|_){
-    // [eval] x: invalid value ["x","x"] (does not satisfy list.UniqueItems):
+    // [eval] x: invalid value ["x","x"] (does not satisfy list.UniqueItems): equal value ("x") at position 0 and 1:
     //     ./in.cue:3:4
     //     ./in.cue:4:4
     //     ./in.cue:5:4

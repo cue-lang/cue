@@ -54,38 +54,22 @@ fail: {
 }
 -- out/list-v3 --
 Errors:
-fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems):
+fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1:
     ./in.cue:3:21
     ./in.cue:48:16
-fail.ignoreOptError: invalid value [~(#a),~(#abErr)] (does not satisfy list.UniqueItems):
+fail.ignoreOptError: invalid value [~(#a),~(#abErr)] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
     ./in.cue:3:21
     ./in.cue:52:18
-fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems):
+fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 2:
     ./in.cue:3:21
     ./in.cue:44:8
-fail.structs: invalid value [~(#a),~(#a)] (does not satisfy list.UniqueItems):
+fail.structs: invalid value [~(#a),~(#a)] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
     ./in.cue:3:21
     ./in.cue:45:11
-incomplete.openSpecific: invalid value [{a:1},{a:1}] (does not satisfy list.UniqueItems):
-    ./in.cue:3:21
-    ./in.cue:36:16
-incomplete.structs: invalid value [~(#c),~(#c)] (does not satisfy list.UniqueItems):
-    ./in.cue:3:21
-    ./in.cue:39:11
-incomplete.top: invalid value [_,_] (does not satisfy list.UniqueItems):
-    ./in.cue:3:21
-    ./in.cue:22:7
-incomplete.withOptional1: invalid value [{a:int},{a:int,b?:string}] (does not satisfy list.UniqueItems):
-    ./in.cue:3:21
-    ./in.cue:26:17
-incomplete.withOptional2: invalid value [{a:1},{a:1,b?:string}] (does not satisfy list.UniqueItems):
-    ./in.cue:3:21
-    ./in.cue:30:17
-incomplete.withOptional3: invalid value [~(#a),~(#ab)] (does not satisfy list.UniqueItems):
-    ./in.cue:3:21
-    ./in.cue:33:17
 
 Result:
+import "list"
+
 #a: {
 	a: 1
 }
@@ -117,73 +101,70 @@ ok: {
 
 // These have all equal elements, but
 incomplete: {
-	top: _|_ // incomplete.top: invalid value [_,_] (does not satisfy list.UniqueItems)
+	top: [_, _] & list.UniqueItems()
 
 	// These two elements are considered equal, but the error is an "incomplete"
 	// errors, as the items may still differ once they become more specific.
-	withOptional1: _|_ // incomplete.withOptional1: invalid value [{a:int},{a:int,b?:string}] (does not satisfy list.UniqueItems)
+	withOptional1: [{
+		a: int
+	}, {
+		a:  int
+		b?: string
+	}] & list.UniqueItems()
 
 	// Ditto. This is an incomplete error, even though the matching elements
 	// are "final": there is still an optional field.
-	withOptional2: _|_ // incomplete.withOptional2: invalid value [{a:1},{a:1,b?:string}] (does not satisfy list.UniqueItems)
+	withOptional2: [{
+		a: 1
+	}, {
+		a:  1
+		b?: string
+	}] & list.UniqueItems()
 
 	// Ditto. This time with actually closed fields.
-	withOptional3: _|_ // incomplete.withOptional3: invalid value [~(#a),~(#ab)] (does not satisfy list.UniqueItems)
+	withOptional3: [#a, #ab] & list.UniqueItems()
 
 	// Ditto. There are not optional fields, but the structs are open.
-	openSpecific: _|_ // incomplete.openSpecific: invalid value [{a:1},{a:1}] (does not satisfy list.UniqueItems)
+	openSpecific: [{
+		a: 1
+	}, {
+		a: 1
+	}] & list.UniqueItems()
 
 	// Fully identical closed structs, but with non-concrete values.
-	structs: _|_ // incomplete.structs: invalid value [~(#c),~(#c)] (does not satisfy list.UniqueItems)
+	structs: [#c, #c] & list.UniqueItems()
 }
 fail: {
-	ints:    _|_ // fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems)
-	structs: _|_ // fail.structs: invalid value [~(#a),~(#a)] (does not satisfy list.UniqueItems)
+	ints:    _|_ // fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 2
+	structs: _|_ // fail.structs: invalid value [~(#a),~(#a)] (does not satisfy list.UniqueItems): equal values at position 0 and 1
 
 	// Hidden values do not play a role in the comparisson.
-	ignoreHidden: _|_ // fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems)
+	ignoreHidden: _|_ // fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1
 
 	// This can be a permanent error, as the the optional field of the second
 	// element is erroneous an cannot match.
-	ignoreOptError: _|_ // fail.ignoreOptError: invalid value [~(#a),~(#abErr)] (does not satisfy list.UniqueItems)
+	ignoreOptError: _|_ // fail.ignoreOptError: invalid value [~(#a),~(#abErr)] (does not satisfy list.UniqueItems): equal values at position 0 and 1
 }
 -- diff/-out/list-v3<==>+out/list --
 diff old new
 --- old
 +++ new
-@@ -2,19 +2,19 @@
- fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems):
+@@ -2,10 +2,13 @@
+ fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1:
      ./in.cue:3:21
      ./in.cue:48:16
--fail.ignoreOptError: invalid value [{a:1},{a:1,b?:_|_(fail.ignoreOptError.1.b: conflicting values int and string (mismatched types int and string))}] (does not satisfy list.UniqueItems):
-+fail.ignoreOptError: invalid value [~(#a),~(#abErr)] (does not satisfy list.UniqueItems):
-     ./in.cue:3:21
-     ./in.cue:52:18
- fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems):
++fail.ignoreOptError: invalid value [~(#a),~(#abErr)] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
++    ./in.cue:3:21
++    ./in.cue:52:18
+ fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 2:
      ./in.cue:3:21
      ./in.cue:44:8
--fail.structs: invalid value [{a:1},{a:1}] (does not satisfy list.UniqueItems):
-+fail.structs: invalid value [~(#a),~(#a)] (does not satisfy list.UniqueItems):
+-fail.structs: invalid value [{a:1},{a:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
++fail.structs: invalid value [~(#a),~(#a)] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
      ./in.cue:3:21
      ./in.cue:45:11
- incomplete.openSpecific: invalid value [{a:1},{a:1}] (does not satisfy list.UniqueItems):
-     ./in.cue:3:21
-     ./in.cue:36:16
--incomplete.structs: invalid value [{c:int},{c:int}] (does not satisfy list.UniqueItems):
-+incomplete.structs: invalid value [~(#c),~(#c)] (does not satisfy list.UniqueItems):
-     ./in.cue:3:21
-     ./in.cue:39:11
- incomplete.top: invalid value [_,_] (does not satisfy list.UniqueItems):
-@@ -26,7 +26,7 @@
- incomplete.withOptional2: invalid value [{a:1},{a:1,b?:string}] (does not satisfy list.UniqueItems):
-     ./in.cue:3:21
-     ./in.cue:30:17
--incomplete.withOptional3: invalid value [{a:1},{a:1,b?:int}] (does not satisfy list.UniqueItems):
-+incomplete.withOptional3: invalid value [~(#a),~(#ab)] (does not satisfy list.UniqueItems):
-     ./in.cue:3:21
-     ./in.cue:33:17
  
-@@ -40,7 +40,7 @@
+@@ -21,7 +24,7 @@
  }
  #abErr: {
  	a:  1
@@ -192,68 +173,56 @@ diff old new
  }
  #b: {
  	b: 1
-@@ -73,17 +73,17 @@
- 	withOptional2: _|_ // incomplete.withOptional2: invalid value [{a:1},{a:1,b?:string}] (does not satisfy list.UniqueItems)
+@@ -64,12 +67,7 @@
+ 	}] & list.UniqueItems()
  
  	// Ditto. This time with actually closed fields.
--	withOptional3: _|_ // incomplete.withOptional3: invalid value [{a:1},{a:1,b?:int}] (does not satisfy list.UniqueItems)
-+	withOptional3: _|_ // incomplete.withOptional3: invalid value [~(#a),~(#ab)] (does not satisfy list.UniqueItems)
+-	withOptional3: [{
+-		a: 1
+-	}, {
+-		a:  1
+-		b?: int
+-	}]
++	withOptional3: [#a, #ab] & list.UniqueItems()
  
  	// Ditto. There are not optional fields, but the structs are open.
- 	openSpecific: _|_ // incomplete.openSpecific: invalid value [{a:1},{a:1}] (does not satisfy list.UniqueItems)
- 
- 	// Fully identical closed structs, but with non-concrete values.
--	structs: _|_ // incomplete.structs: invalid value [{c:int},{c:int}] (does not satisfy list.UniqueItems)
-+	structs: _|_ // incomplete.structs: invalid value [~(#c),~(#c)] (does not satisfy list.UniqueItems)
+ 	openSpecific: [{
+@@ -83,7 +81,7 @@
  }
  fail: {
- 	ints:    _|_ // fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems)
--	structs: _|_ // fail.structs: invalid value [{a:1},{a:1}] (does not satisfy list.UniqueItems)
-+	structs: _|_ // fail.structs: invalid value [~(#a),~(#a)] (does not satisfy list.UniqueItems)
+ 	ints:    _|_ // fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 2
+-	structs: _|_ // fail.structs: invalid value [{a:1},{a:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1
++	structs: _|_ // fail.structs: invalid value [~(#a),~(#a)] (does not satisfy list.UniqueItems): equal values at position 0 and 1
  
  	// Hidden values do not play a role in the comparisson.
- 	ignoreHidden: _|_ // fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems)
-@@ -90,5 +90,5 @@
+ 	ignoreHidden: _|_ // fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1
+@@ -90,10 +88,5 @@
  
  	// This can be a permanent error, as the the optional field of the second
  	// element is erroneous an cannot match.
--	ignoreOptError: _|_ // fail.ignoreOptError: invalid value [{a:1},{a:1,b?:_|_(fail.ignoreOptError.1.b: conflicting values int and string (mismatched types int and string))}] (does not satisfy list.UniqueItems)
-+	ignoreOptError: _|_ // fail.ignoreOptError: invalid value [~(#a),~(#abErr)] (does not satisfy list.UniqueItems)
+-	ignoreOptError: [{
+-		a: 1
+-	}, {
+-		a:  1
+-		b?: int & string
+-	}]
++	ignoreOptError: _|_ // fail.ignoreOptError: invalid value [~(#a),~(#abErr)] (does not satisfy list.UniqueItems): equal values at position 0 and 1
  }
 -- out/list --
 Errors:
-fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems):
+fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1:
     ./in.cue:3:21
     ./in.cue:48:16
-fail.ignoreOptError: invalid value [{a:1},{a:1,b?:_|_(fail.ignoreOptError.1.b: conflicting values int and string (mismatched types int and string))}] (does not satisfy list.UniqueItems):
-    ./in.cue:3:21
-    ./in.cue:52:18
-fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems):
+fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 2:
     ./in.cue:3:21
     ./in.cue:44:8
-fail.structs: invalid value [{a:1},{a:1}] (does not satisfy list.UniqueItems):
+fail.structs: invalid value [{a:1},{a:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
     ./in.cue:3:21
     ./in.cue:45:11
-incomplete.openSpecific: invalid value [{a:1},{a:1}] (does not satisfy list.UniqueItems):
-    ./in.cue:3:21
-    ./in.cue:36:16
-incomplete.structs: invalid value [{c:int},{c:int}] (does not satisfy list.UniqueItems):
-    ./in.cue:3:21
-    ./in.cue:39:11
-incomplete.top: invalid value [_,_] (does not satisfy list.UniqueItems):
-    ./in.cue:3:21
-    ./in.cue:22:7
-incomplete.withOptional1: invalid value [{a:int},{a:int,b?:string}] (does not satisfy list.UniqueItems):
-    ./in.cue:3:21
-    ./in.cue:26:17
-incomplete.withOptional2: invalid value [{a:1},{a:1,b?:string}] (does not satisfy list.UniqueItems):
-    ./in.cue:3:21
-    ./in.cue:30:17
-incomplete.withOptional3: invalid value [{a:1},{a:1,b?:int}] (does not satisfy list.UniqueItems):
-    ./in.cue:3:21
-    ./in.cue:33:17
 
 Result:
+import "list"
+
 #a: {
 	a: 1
 }
@@ -285,33 +254,57 @@ ok: {
 
 // These have all equal elements, but
 incomplete: {
-	top: _|_ // incomplete.top: invalid value [_,_] (does not satisfy list.UniqueItems)
+	top: [_, _] & list.UniqueItems()
 
 	// These two elements are considered equal, but the error is an "incomplete"
 	// errors, as the items may still differ once they become more specific.
-	withOptional1: _|_ // incomplete.withOptional1: invalid value [{a:int},{a:int,b?:string}] (does not satisfy list.UniqueItems)
+	withOptional1: [{
+		a: int
+	}, {
+		a:  int
+		b?: string
+	}] & list.UniqueItems()
 
 	// Ditto. This is an incomplete error, even though the matching elements
 	// are "final": there is still an optional field.
-	withOptional2: _|_ // incomplete.withOptional2: invalid value [{a:1},{a:1,b?:string}] (does not satisfy list.UniqueItems)
+	withOptional2: [{
+		a: 1
+	}, {
+		a:  1
+		b?: string
+	}] & list.UniqueItems()
 
 	// Ditto. This time with actually closed fields.
-	withOptional3: _|_ // incomplete.withOptional3: invalid value [{a:1},{a:1,b?:int}] (does not satisfy list.UniqueItems)
+	withOptional3: [{
+		a: 1
+	}, {
+		a:  1
+		b?: int
+	}]
 
 	// Ditto. There are not optional fields, but the structs are open.
-	openSpecific: _|_ // incomplete.openSpecific: invalid value [{a:1},{a:1}] (does not satisfy list.UniqueItems)
+	openSpecific: [{
+		a: 1
+	}, {
+		a: 1
+	}] & list.UniqueItems()
 
 	// Fully identical closed structs, but with non-concrete values.
-	structs: _|_ // incomplete.structs: invalid value [{c:int},{c:int}] (does not satisfy list.UniqueItems)
+	structs: [#c, #c] & list.UniqueItems()
 }
 fail: {
-	ints:    _|_ // fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems)
-	structs: _|_ // fail.structs: invalid value [{a:1},{a:1}] (does not satisfy list.UniqueItems)
+	ints:    _|_ // fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 2
+	structs: _|_ // fail.structs: invalid value [{a:1},{a:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1
 
 	// Hidden values do not play a role in the comparisson.
-	ignoreHidden: _|_ // fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems)
+	ignoreHidden: _|_ // fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1
 
 	// This can be a permanent error, as the the optional field of the second
 	// element is erroneous an cannot match.
-	ignoreOptError: _|_ // fail.ignoreOptError: invalid value [{a:1},{a:1,b?:_|_(fail.ignoreOptError.1.b: conflicting values int and string (mismatched types int and string))}] (does not satisfy list.UniqueItems)
+	ignoreOptError: [{
+		a: 1
+	}, {
+		a:  1
+		b?: int & string
+	}]
 }

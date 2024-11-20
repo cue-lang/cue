@@ -38,11 +38,7 @@
 					1.00,
 					1
 				],
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "false is not equal to zero",
@@ -114,11 +110,7 @@
 						"foo": "bar"
 					}
 				],
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "unique array of nested objects is valid",
@@ -329,11 +321,7 @@
 						"a": 1
 					}
 				],
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "{\"a\": false} and {\"a\": 0} are unique",
@@ -474,7 +462,7 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "7 errors in empty disjunction:\nconflicting values [false,true] and {...} (mismatched types list and struct):\n    generated.cue:4:1\n    generated.cue:4:85\n    instance.json:1:1\nconflicting values bool and [false,true] (mismatched types bool and list):\n    generated.cue:4:8\n    instance.json:1:1\nconflicting values null and [false,true] (mismatched types null and list):\n    generated.cue:4:1\n    instance.json:1:1\nconflicting values number and [false,true] (mismatched types number and list):\n    generated.cue:4:15\n    instance.json:1:1\nconflicting values string and [false,true] (mismatched types string and list):\n    generated.cue:4:24\n    instance.json:1:1\ninvalid value [_|_(explicit error (_|_ literal) in source),_|_(explicit error (_|_ literal) in source)] (does not satisfy list.UniqueItems):\n    generated.cue:4:33\n    generated.cue:1:1\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:4:78\n",
+					"v2": "7 errors in empty disjunction:\nconflicting values [false,true] and {...} (mismatched types list and struct):\n    generated.cue:4:1\n    generated.cue:4:85\n    instance.json:1:1\nconflicting values bool and [false,true] (mismatched types bool and list):\n    generated.cue:4:8\n    instance.json:1:1\nconflicting values null and [false,true] (mismatched types null and list):\n    generated.cue:4:1\n    instance.json:1:1\nconflicting values number and [false,true] (mismatched types number and list):\n    generated.cue:4:15\n    instance.json:1:1\nconflicting values string and [false,true] (mismatched types string and list):\n    generated.cue:4:24\n    instance.json:1:1\ninvalid value [_|_(explicit error (_|_ literal) in source),_|_(explicit error (_|_ literal) in source)] (does not satisfy list.UniqueItems): equal values at position 0 and 1:\n    generated.cue:4:33\n    generated.cue:1:1\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:4:78\n",
 					"v3": "conflicting values [false,true] and {...} (mismatched types list and struct):\n    generated.cue:4:85\n    instance.json:1:1\nconflicting values bool and [false,true] (mismatched types bool and list):\n    generated.cue:4:8\n    instance.json:1:1\nconflicting values null and [false,true] (mismatched types null and list):\n    generated.cue:4:1\n    instance.json:1:1\nconflicting values number and [false,true] (mismatched types number and list):\n    generated.cue:4:15\n    instance.json:1:1\nconflicting values string and [false,true] (mismatched types string and list):\n    generated.cue:4:24\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:4:78\n"
 				}
 			},
@@ -486,7 +474,7 @@
 				],
 				"valid": true,
 				"skip": {
-					"v2": "7 errors in empty disjunction:\nconflicting values [true,false] and {...} (mismatched types list and struct):\n    generated.cue:4:1\n    generated.cue:4:85\n    instance.json:1:1\nconflicting values bool and [true,false] (mismatched types bool and list):\n    generated.cue:4:8\n    instance.json:1:1\nconflicting values null and [true,false] (mismatched types null and list):\n    generated.cue:4:1\n    instance.json:1:1\nconflicting values number and [true,false] (mismatched types number and list):\n    generated.cue:4:15\n    instance.json:1:1\nconflicting values string and [true,false] (mismatched types string and list):\n    generated.cue:4:24\n    instance.json:1:1\ninvalid value [_|_(explicit error (_|_ literal) in source),_|_(explicit error (_|_ literal) in source)] (does not satisfy list.UniqueItems):\n    generated.cue:4:33\n    generated.cue:1:1\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:4:78\n",
+					"v2": "7 errors in empty disjunction:\nconflicting values [true,false] and {...} (mismatched types list and struct):\n    generated.cue:4:1\n    generated.cue:4:85\n    instance.json:1:1\nconflicting values bool and [true,false] (mismatched types bool and list):\n    generated.cue:4:8\n    instance.json:1:1\nconflicting values null and [true,false] (mismatched types null and list):\n    generated.cue:4:1\n    instance.json:1:1\nconflicting values number and [true,false] (mismatched types number and list):\n    generated.cue:4:15\n    instance.json:1:1\nconflicting values string and [true,false] (mismatched types string and list):\n    generated.cue:4:24\n    instance.json:1:1\ninvalid value [_|_(explicit error (_|_ literal) in source),_|_(explicit error (_|_ literal) in source)] (does not satisfy list.UniqueItems): equal values at position 0 and 1:\n    generated.cue:4:33\n    generated.cue:1:1\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:4:78\n",
 					"v3": "conflicting values [true,false] and {...} (mismatched types list and struct):\n    generated.cue:4:85\n    instance.json:1:1\nconflicting values bool and [true,false] (mismatched types bool and list):\n    generated.cue:4:8\n    instance.json:1:1\nconflicting values null and [true,false] (mismatched types null and list):\n    generated.cue:4:1\n    instance.json:1:1\nconflicting values number and [true,false] (mismatched types number and list):\n    generated.cue:4:15\n    instance.json:1:1\nconflicting values string and [true,false] (mismatched types string and list):\n    generated.cue:4:24\n    instance.json:1:1\nexplicit error (_|_ literal) in source:\n    generated.cue:4:78\n"
 				}
 			},

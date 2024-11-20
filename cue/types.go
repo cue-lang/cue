@@ -1693,6 +1693,8 @@ func (v Value) Subsume(w Value, opts ...Option) error {
 	return p.Value(ctx, v.v, w.v)
 }
 
+// TODO: this is likely not correct for V3. There are some cases where this is
+// still used for V3. Transition away from those.
 func allowed(ctx *adt.OpContext, parent, n *adt.Vertex) *adt.Bottom {
 	if !parent.IsClosedList() && !parent.IsClosedStruct() {
 		return nil
@@ -1709,11 +1711,17 @@ func allowed(ctx *adt.OpContext, parent, n *adt.Vertex) *adt.Bottom {
 	return nil
 }
 
-func addConjuncts(dst, src *adt.Vertex) {
+func addConjuncts(ctx *adt.OpContext, dst, src *adt.Vertex) {
 	c := adt.MakeRootConjunct(nil, src)
+	c.CloseInfo.GroupUnify = true
+
 	if src.ClosedRecursive {
-		var root adt.CloseInfo
-		c.CloseInfo = root.SpawnRef(src, src.ClosedRecursive, nil)
+		if ctx.Version == internal.EvalV2 {
+			var root adt.CloseInfo
+			c.CloseInfo = root.SpawnRef(src, src.ClosedRecursive, nil)
+		} else {
+			c.CloseInfo.FromDef = true
+		}
 	}
 	dst.AddConjunct(c)
 }
@@ -1730,11 +1738,11 @@ func (v Value) Unify(w Value) Value {
 		return v
 	}
 
-	n := &adt.Vertex{}
-	addConjuncts(n, v.v)
-	addConjuncts(n, w.v)
-
 	ctx := newContext(v.idx)
+	n := &adt.Vertex{}
+	addConjuncts(ctx, n, v.v)
+	addConjuncts(ctx, n, w.v)
+
 	n.Finalize(ctx)
 
 	n.Parent = v.v.Parent
@@ -1744,11 +1752,13 @@ func (v Value) Unify(w Value) Value {
 	if err := n.Err(ctx); err != nil {
 		return makeValue(v.idx, n, v.parent_)
 	}
-	if err := allowed(ctx, v.v, n); err != nil {
-		return newErrValue(w, err)
-	}
-	if err := allowed(ctx, w.v, n); err != nil {
-		return newErrValue(v, err)
+	if ctx.Version == internal.EvalV2 {
+		if err := allowed(ctx, v.v, n); err != nil {
+			return newErrValue(w, err)
+		}
+		if err := allowed(ctx, w.v, n); err != nil {
+			return newErrValue(v, err)
+		}
 	}
 
 	return makeValue(v.idx, n, v.parent_)

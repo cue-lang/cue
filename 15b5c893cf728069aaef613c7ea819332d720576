@@ -16,6 +16,24 @@
       "message": "Maybe worth including the output when using `-l` for the CUE cases too?",
       "revId": "15b5c893cf728069aaef613c7ea819332d720576",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b6260183_65ffee5f",
+        "filename": "cmd/cue/cmd/testdata/script/def_comments.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-20T10:28:57Z",
+      "side": 1,
+      "message": "The `-l` flag seems to apply only to non-CUE files.",
+      "parentUuid": "f4e5e988_58baa128",
+      "revId": "15b5c893cf728069aaef613c7ea819332d720576",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

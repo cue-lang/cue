@@ -7,7 +7,7 @@ name: Evict caches
 jobs:
   test:
     if: ${{github.repository == 'cue-lang/cue'}}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     defaults:
       run:
         shell: bash

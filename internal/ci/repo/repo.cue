@@ -26,7 +26,7 @@ protectedBranchPatterns: [defaultBranch, releaseBranchPattern]
 botGitHubUser:      "cueckoo"
 botGitHubUserEmail: "cueckoo@gmail.com"
 
-linuxMachine:   "ubuntu-22.04"
+linuxMachine:   "ubuntu-24.04"
 macosMachine:   "macos-14"
 windowsMachine: "windows-2022"
 

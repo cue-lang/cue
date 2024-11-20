@@ -20,7 +20,7 @@ jobs:
           - 1.22.x
           - 1.23.x
         runner:
-          - ubuntu-22.04
+          - ubuntu-24.04
           - macos-14
           - windows-2022
     runs-on: ${{ matrix.runner }}
@@ -107,20 +107,20 @@ jobs:
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || github.ref == 'refs/heads/ci/test')
         run: go clean -testcache
-      - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
+      - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
         name: Early git and code sanity checks
         run: go run ./internal/ci/checks
       - if: |-
           ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
-          Dispatch-Trailer: {"type":"')))) || !(matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
+          Dispatch-Trailer: {"type":"')))) || !(matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
         name: Test
         run: go test ./...
-      - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
+      - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
         name: Test with -race
         run: go test -race ./...
         env:
           GORACE: atexit_sleep_ms=10
-      - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
+      - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
         name: Test on 32 bits
         run: go test -short ./...
         env:
@@ -131,31 +131,31 @@ jobs:
         id: auth
         if: |-
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
-          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
+          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.E2E_GCLOUD_KEY }}
       - if: |-
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
-          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
+          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
         name: gcloud setup for end-to-end tests
         uses: google-github-actions/setup-gcloud@v2
       - if: |-
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
-          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
+          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
         name: End-to-end test
         env:
           CUE_TEST_TOKEN: ${{ secrets.E2E_PORCUEPINE_CUE_TOKEN }}
         run: |-
           cd internal/_e2e
           go test -race
-      - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
+      - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
         name: Go checks
         run: |-
           go vet ./...
           go mod tidy
           (cd internal/_e2e && go test -run=-)
-      - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
+      - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
         name: Check all git tags are available
         run: |-
           cd $(mktemp -d)
@@ -171,7 +171,7 @@ jobs:
           	echo "Did you forget about refs/attic branches? https://github.com/cue-lang/cue/wiki/Notes-for-project-maintainers"
           	exit 1
           fi
-      - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-22.04')
+      - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
         name: Generate
         run: |-
           go run cuelang.org/go/cmd/cue login --token=${CUE_TOKEN}

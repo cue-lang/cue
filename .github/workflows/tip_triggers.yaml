@@ -8,7 +8,7 @@ name: Triggers on push to tip
       - ci/test
 jobs:
   push:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: ${{github.repository == 'cue-lang/cue'}}
     defaults:
       run:

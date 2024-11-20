@@ -9,7 +9,7 @@ name: Push tip to trybot
 concurrency: push_tip_to_trybot
 jobs:
   push:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Write netrc file for cueckoo Gerrithub
         run: |-

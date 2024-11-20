@@ -451,8 +451,7 @@ type state struct {
 	schemaVersion        Version
 	schemaVersionPresent bool
 
-	id    *url.URL // base URI for $ref
-	idPos token.Pos
+	id *url.URL // base URI for $ref
 
 	definitions []ast.Decl
 
@@ -491,9 +490,7 @@ type refs struct {
 }
 
 func (s *state) idTag() *ast.Attribute {
-	return &ast.Attribute{
-		At:   s.idPos,
-		Text: fmt.Sprintf("@jsonschema(id=%q)", s.id)}
+	return &ast.Attribute{Text: fmt.Sprintf("@jsonschema(id=%q)", s.id)}
 }
 
 func (s *state) object(n cue.Value) *ast.StructLit {
@@ -522,9 +519,6 @@ func (s *state) finalizeObject() {
 	}
 
 	s.add(s.objN, objectType, e)
-	if s.id != nil && s.idPos.Before(s.objN.Pos()) {
-		ast.SetPos(e, s.idPos)
-	}
 }
 
 func (s *state) hasConstraints() bool {

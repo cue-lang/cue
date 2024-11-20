@@ -1,0 +1,9 @@
+! exec cue def jsonschema: schema.json
+stderr 'panic: illegal Pos value'
+
+-- schema.json --
+{
+  "$id": "https://2.test.example/object                                                                                                                                                                   ",
+  "type": "object",
+  "additionalProperties": false
+}

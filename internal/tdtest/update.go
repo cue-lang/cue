@@ -104,15 +104,19 @@ func (s *set[T]) getInfo(file string) *info {
 	// 	t.Fatalf("could not find test package")
 	// }
 
+	// In cuetdtest the function of the test may be a subtest, like TestFoo/v3.
+	// We need to strip the last part.
+	testName := strings.SplitN(t.Name(), "/", 2)[0]
+
 	// Find function declaration of this test.
 	var fn *ast.FuncDecl
 	for _, d := range f.Decls {
-		if fd, ok := d.(*ast.FuncDecl); ok && fd.Name.Name == t.Name() {
+		if fd, ok := d.(*ast.FuncDecl); ok && fd.Name.Name == testName {
 			fn = fd
 		}
 	}
 	if fn == nil {
-		t.Fatalf("could not find test %q in file %q", t.Name(), file)
+		t.Fatalf("could not find test %q in file %q", testName, file)
 	}
 
 	// Find CompositLit table used for the test:
@@ -199,7 +203,11 @@ func findFileAndPackage(path string, pkgs []*packages.Package) (*ast.File, *pack
 	return nil, nil
 }
 
-const typeT = "*cuelang.org/go/internal/tdtest.T"
+func isT(s string) bool {
+	// TODO: parametrize this so that tdtest does not have to know of cuetdtest.
+	return s == "*cuelang.org/go/internal/tdtest.T" ||
+		s == "*cuelang.org/go/internal/cuetdtest.T"
+}
 
 // findCalls finds all call expressions within a given block for functions
 // or methods defined within the tdtest package.
@@ -222,7 +230,7 @@ func (i *info) findCalls(block *ast.BlockStmt, names ...string) []*callInfo {
 		for _, name := range names {
 			if sel.Sel.Name == name {
 				receiver := info.TypeOf(sel.X).String()
-				if receiver == typeT {
+				if isT(receiver) {
 					// Method.
 				} else if len(c.Args) == 3 {
 					// Run function.
@@ -231,7 +239,7 @@ func (i *info) findCalls(block *ast.BlockStmt, names ...string) []*callInfo {
 						return true
 					}
 					argType := info.TypeOf(fn.Type.Params.List[0].Type).String()
-					if argType != typeT {
+					if !isT(argType) {
 						return true
 					}
 				} else {

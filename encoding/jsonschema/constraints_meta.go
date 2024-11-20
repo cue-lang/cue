@@ -44,7 +44,6 @@ func constraintID(key string, n cue.Value, s *state) {
 		return
 	}
 	s.id = u
-	s.idPos = n.Pos()
 }
 
 // constraintSchema implements $schema, which

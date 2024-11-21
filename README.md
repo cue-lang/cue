@@ -51,8 +51,8 @@ You can also clone the repository and build it directly via `go install ./cmd/cu
 Note that local builds [lack version information](https://go.dev/issue/50603),
 so you should inject the version string when building a release, such as:
 
-	git switch -d v0.9.0
-	go install -ldflags='-X cuelang.org/go/cmd/cue/cmd.version=v0.9.0' ./cmd/cue
+	git switch -d v0.11.0
+	go install -ldflags='-X cuelang.org/go/cmd/cue/cmd.version=v0.11.0' ./cmd/cue
 
 ### Learning CUE
 

@@ -28,8 +28,6 @@ _registryReadOnlyAccessStep: githubactions.#Step & {
 		// and is used only because we need some credentials
 		// to pull dependencies from the Central Registry.
 		// The token is owned by notcueckoo and described as "ci readonly".
-		// TODO(mvdan): delete the NOTCUECKOO_CUE_LOGINS org secret once all uses are gone;
-		// it will have expired by early December 2024 anyway.
 		CUE_TOKEN: "${{ secrets.NOTCUECKOO_CUE_TOKEN }}"
 	}
 	// For now we `go run` cue to not rely on a previous `go install ./cmd/cue`

@@ -10,8 +10,13 @@ t1: {
 	l4: list.MatchN(0, number)
 	l5: list.MatchN(string, [int])
 	l6: list.MatchN(>0, #TOO)
-
 }
+
+issue3519: {
+    a: [{}]
+    a: list.MatchN(1, {a!: _})
+}
+
 #TOO: {too: int}
 -- out/list --
 Errors:
@@ -51,6 +56,9 @@ t1: {
 	l4: _|_ // t1.l4: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN): number of matched elements is 3: does not satisfy 0
 	l5: _|_ // t1.l5: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN): number of matched elements is 1: does not satisfy string
 	l6: _|_ // t1.l6: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN): number of matched elements is 0: does not satisfy >0
+}
+issue3519: {
+	a: [{}]
 }
 #TOO: {
 	too: int

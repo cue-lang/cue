@@ -23,6 +23,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/validate"
 	"cuelang.org/go/internal/pkg"
 	"cuelang.org/go/internal/types"
 	"cuelang.org/go/internal/value"
@@ -326,7 +327,7 @@ func Contains(a []cue.Value, v cue.Value) bool {
 func MatchN(list []cue.Value, n pkg.Schema, matchValue pkg.Schema) (bool, error) {
 	var nmatch int64
 	for _, w := range list {
-		if matchValue.Unify(w).Validate() == nil {
+		if matchValue.Unify(w).Validate(cue.Final()) == nil {
 			nmatch++
 		}
 	}
@@ -334,7 +335,7 @@ func MatchN(list []cue.Value, n pkg.Schema, matchValue pkg.Schema) (bool, error)
 	r, _ := value.ToInternal(n)
 	ctx := (*cue.Context)(r)
 
-	if err := n.Unify(ctx.Encode(nmatch)).Validate(); err != nil {
+	if err := n.Unify(ctx.Encode(nmatch)).Err(); err != nil {
 		return false, pkg.ValidationError{B: &adt.Bottom{
 			Code: adt.EvalError,
 			Err: errors.Newf(
@@ -348,3 +349,5 @@ func MatchN(list []cue.Value, n pkg.Schema, matchValue pkg.Schema) (bool, error)
 
 	return true, nil
 }
+
+var finalCfg = &validate.Config{Final: true}

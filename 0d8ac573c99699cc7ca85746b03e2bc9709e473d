@@ -16,6 +16,91 @@
       "message": "I assume this meant to say n log n?",
       "revId": "0d8ac573c99699cc7ca85746b03e2bc9709e473d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b277fc60_caac61f7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-21T17:11:20Z",
+      "side": 1,
+      "message": "Presumably \"make it O(n log n) again\".",
+      "revId": "0d8ac573c99699cc7ca85746b03e2bc9709e473d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eefdb714_9461e48b",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 865,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-21T17:11:20Z",
+      "side": 1,
+      "message": "```suggestion\n// considering regular fields.\n```\n?",
+      "revId": "0d8ac573c99699cc7ca85746b03e2bc9709e473d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b711f35d_b2a56550",
+        "filename": "pkg/list/list.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-21T17:11:20Z",
+      "side": 1,
+      "message": "```suggestion\n\t// - Create a list with some hash value for each element x in a as well\n```",
+      "revId": "0d8ac573c99699cc7ca85746b03e2bc9709e473d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8567968e_d752166d",
+        "filename": "pkg/list/list.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-21T17:11:20Z",
+      "side": 1,
+      "message": "Is `Core` an expensive operation? It\u0027s gonna be called O(n^2) times here, so you could potentially consider making a slice of the core types so you only invoke it a maximum of once per item.",
+      "revId": "0d8ac573c99699cc7ca85746b03e2bc9709e473d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c3e1c50_9ffc7bce",
+        "filename": "pkg/list/list.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-21T17:11:20Z",
+      "side": 1,
+      "message": "Once again we\u0027re in a situation like `matchN` where _sometimes_ it might be nice to know the actual values in question, but I think this is the right way to go here, just as I do with `matchN`. Although... you could consider printing the duplicate value in question if it\u0027s a scalar?",
+      "revId": "0d8ac573c99699cc7ca85746b03e2bc9709e473d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

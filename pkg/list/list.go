@@ -333,7 +333,7 @@ func Contains(a []cue.Value, v cue.Value) bool {
 func MatchN(list []cue.Value, n pkg.Schema, matchValue pkg.Schema) (bool, error) {
 	var nmatch int64
 	for _, w := range list {
-		if matchValue.Unify(w).Validate() == nil {
+		if matchValue.Unify(w).Validate(cue.Final()) == nil {
 			nmatch++
 		}
 	}
@@ -341,7 +341,7 @@ func MatchN(list []cue.Value, n pkg.Schema, matchValue pkg.Schema) (bool, error)
 	r, _ := value.ToInternal(n)
 	ctx := (*cue.Context)(r)
 
-	if err := n.Unify(ctx.Encode(nmatch)).Validate(); err != nil {
+	if err := n.Unify(ctx.Encode(nmatch)).Err(); err != nil {
 		return false, pkg.ValidationError{B: &adt.Bottom{
 			Code: adt.EvalError,
 			Err: errors.Newf(

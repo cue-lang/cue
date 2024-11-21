@@ -47,6 +47,10 @@ t1.l6: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN): n
     ./in.cue:11:6
     ./in.cue:4:12
     ./in.cue:11:18
+issue3519.a: invalid value [{}] (does not satisfy list.MatchN): number of matched elements is 0: does not satisfy 1:
+    ./in.cue:16:8
+    ./in.cue:15:8
+    ./in.cue:16:20
 
 Result:
 t1: {
@@ -58,7 +62,7 @@ t1: {
 	l6: _|_ // t1.l6: invalid value [1,2,3,"str",[1],{foo:1}] (does not satisfy list.MatchN): number of matched elements is 0: does not satisfy >0
 }
 issue3519: {
-	a: [{}]
+	a: _|_ // issue3519.a: invalid value [{}] (does not satisfy list.MatchN): number of matched elements is 0: does not satisfy 1
 }
 #TOO: {
 	too: int

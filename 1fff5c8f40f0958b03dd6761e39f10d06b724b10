@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "075d89e5_b706703b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-21T18:06:05Z",
+      "side": 1,
+      "message": "nit: in Go, we usually don\u0027t use `()` as a suffix to indicate that we\u0027re referring to a method or function. Just `ast.StructLit.End` is sufficient.",
+      "revId": "1fff5c8f40f0958b03dd6761e39f10d06b724b10",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a01c433b_35fbb7be",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-21T18:06:05Z",
+      "side": 1,
+      "message": "LGTM. Thanks very much for finding and resolving this bug.",
+      "revId": "1fff5c8f40f0958b03dd6761e39f10d06b724b10",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

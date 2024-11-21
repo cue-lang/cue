@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "324d6b9d_d752ef5b",
+        "filename": "cmd/cue/cmd/testdata/script/def_openapi.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-21T18:00:23Z",
+      "side": 1,
+      "message": "I\u0027m not sure it\u0027s right to duplicate the title text here.\n\nGiven that it\u0027s in a field, I wonder if it deserves to be in a comment at all.",
+      "revId": "38830f65454ac8f56d59be2be416e4a4bc1b3093",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14ca1054_6269d7e1",
+        "filename": "cmd/cue/cmd/testdata/script/encoding_comments.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-21T18:00:23Z",
+      "side": 1,
+      "message": "This definitely doesn\u0027t seem right. A package comment is somewhat special for documentation purposes in CUE, as it is in Go, and should be attached directly to the package directive.\n\nIt looks like these comments are exactly reversed from how they should be.",
+      "revId": "38830f65454ac8f56d59be2be416e4a4bc1b3093",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0dc247a1_cafb62da",
+        "filename": "internal/internal.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-21T18:00:23Z",
+      "side": 1,
+      "message": "```suggestion\nfunc FileComments(f *ast.File) []*ast.CommentGroup {\n```",
+      "revId": "38830f65454ac8f56d59be2be416e4a4bc1b3093",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

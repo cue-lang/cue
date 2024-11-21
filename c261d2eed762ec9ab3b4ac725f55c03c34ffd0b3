@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "88c5d18c_d6389834",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-21T18:00:23Z",
+      "side": 1,
+      "message": "Thanks very much for working on this! Going in the right direction, but not quite there yet, I think.",
+      "revId": "c261d2eed762ec9ab3b4ac725f55c03c34ffd0b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

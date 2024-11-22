@@ -1,0 +1,14 @@
+Issue 3586, first test case.
+TODO fix this
+
+-- schema.json --
+{
+    "oneOf": [
+        true,
+        true
+    ]
+}
+-- out/decode/extract --
+_
+-- test/string.json --
+"something"

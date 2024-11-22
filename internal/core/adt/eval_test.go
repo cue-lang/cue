@@ -264,8 +264,9 @@ func TestX(t *testing.T) {
 	// adt.OpenGraphs = true
 
 	flags := cuedebug.Config{
-		Sharing: true, // Uncomment to turn sharing off.
-		LogEval: 1,    // Uncomment to turn logging off
+		Sharing:    true, // Uncomment to turn sharing off.
+		OpenInline: true,
+		LogEval:    1, // Uncomment to turn logging off
 	}
 
 	version := internal.DefaultVersion

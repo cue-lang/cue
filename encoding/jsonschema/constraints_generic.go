@@ -61,7 +61,7 @@ func constraintComment(key string, n cue.Value, s *state) {
 }
 
 func constraintConst(key string, n cue.Value, s *state) {
-	s.all.add(n, s.value(n))
+	s.all.add(n, s.constValue(n))
 	s.allowedTypes &= n.Kind()
 	s.knownTypes &= n.Kind()
 }
@@ -93,7 +93,7 @@ func constraintEnum(key string, n cue.Value, s *state) {
 			// not in the allowed type set.
 			continue
 		}
-		a = append(a, s.value(x))
+		a = append(a, s.constValue(x))
 		types |= x.Kind()
 	}
 	s.knownTypes &= types

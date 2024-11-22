@@ -1,8 +1,6 @@
 # Test that we can use a "number" type constraint with a numeric enum.
 # See issue #3173.
 
-# TODO fix this so it works.
-
 -- schema.json --
 {
     "type": "number",

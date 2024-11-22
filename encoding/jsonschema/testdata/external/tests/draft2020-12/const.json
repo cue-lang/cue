@@ -54,11 +54,7 @@
 				"data": {
 					"foo": "bar"
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "another type is invalid",

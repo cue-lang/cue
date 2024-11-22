@@ -6,4 +6,6 @@
 }
 
 -- out/decode/extract --
-a: 1
+close({
+	a!: 1
+})

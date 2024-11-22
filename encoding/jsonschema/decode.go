@@ -807,6 +807,34 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind, idRef []label) (ast.Ex
 	return s.finalize(), s
 }
 
+func (s *state) constValue(n cue.Value) ast.Expr {
+	k := n.Kind()
+	switch k {
+	case cue.ListKind:
+		a := []ast.Expr{}
+		for i, _ := n.List(); i.Next(); {
+			a = append(a, s.constValue(i.Value()))
+		}
+		return setPos(ast.NewList(a...), n)
+
+	case cue.StructKind:
+		a := []ast.Decl{}
+		s.processMap(n, func(key string, n cue.Value) {
+			a = append(a, &ast.Field{
+				Label:      ast.NewString(key),
+				Value:      s.constValue(n),
+				Constraint: token.NOT,
+			})
+		})
+		return setPos(ast.NewCall(ast.NewIdent("close"), &ast.StructLit{Elts: a}), n)
+	default:
+		if !n.IsConcrete() {
+			s.errf(n, "invalid non-concrete value")
+		}
+		return n.Syntax(cue.Final()).(ast.Expr)
+	}
+}
+
 func (s *state) value(n cue.Value) ast.Expr {
 	k := n.Kind()
 	switch k {

@@ -1043,6 +1043,12 @@ func (ctx *OpContext) addPositions(c Conjunct) {
 // notAllowedError reports a field not allowed error in n and sets the value
 // for arc f to that error.
 func (ctx *OpContext) notAllowedError(arc *Vertex) {
+	// TODO(compat): ultimately we should strive to remove this explicit
+	// reproduction of a bug to ensure compatibility with the old evaluator.
+	if ctx.inLiteralSelectee > 0 {
+		return
+	}
+
 	defer ctx.PopArc(ctx.PushArc(arc))
 
 	defer ctx.ReleasePositions(ctx.MarkPositions())

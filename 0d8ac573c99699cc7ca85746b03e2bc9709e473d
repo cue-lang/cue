@@ -35,6 +35,42 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "251315d0_881e97e7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-22T12:16:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b277fc60_caac61f7",
+      "revId": "0d8ac573c99699cc7ca85746b03e2bc9709e473d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aeea2843_79917b05",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-22T12:16:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "90ad4844_01c63287",
+      "revId": "0d8ac573c99699cc7ca85746b03e2bc9709e473d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eefdb714_9461e48b",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-11-21T17:11:20Z",
       "side": 1,
       "message": "```suggestion\n// considering regular fields.\n```\n?",
+      "revId": "0d8ac573c99699cc7ca85746b03e2bc9709e473d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1f398fc_6d7c0540",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 865,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-22T12:16:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eefdb714_9461e48b",
       "revId": "0d8ac573c99699cc7ca85746b03e2bc9709e473d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +123,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5cb836eb_6cacc8e3",
+        "filename": "pkg/list/list.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-22T12:16:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b711f35d_b2a56550",
+      "revId": "0d8ac573c99699cc7ca85746b03e2bc9709e473d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8567968e_d752166d",
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7a693bc_729a5d8c",
+        "filename": "pkg/list/list.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-22T12:16:12Z",
+      "side": 1,
+      "message": "It is really cheap. Replaced it with the shorter ToInternal.",
+      "parentUuid": "8567968e_d752166d",
+      "revId": "0d8ac573c99699cc7ca85746b03e2bc9709e473d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3c3e1c50_9ffc7bce",
@@ -99,6 +189,24 @@
       "writtenOn": "2024-11-21T17:11:20Z",
       "side": 1,
       "message": "Once again we\u0027re in a situation like `matchN` where _sometimes_ it might be nice to know the actual values in question, but I think this is the right way to go here, just as I do with `matchN`. Although... you could consider printing the duplicate value in question if it\u0027s a scalar?",
+      "revId": "0d8ac573c99699cc7ca85746b03e2bc9709e473d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b1db15d_4b079e6d",
+        "filename": "pkg/list/list.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-22T12:16:12Z",
+      "side": 1,
+      "message": "Now printing the value when scalar.",
+      "parentUuid": "3c3e1c50_9ffc7bce",
       "revId": "0d8ac573c99699cc7ca85746b03e2bc9709e473d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

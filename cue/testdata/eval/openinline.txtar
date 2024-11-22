@@ -1,0 +1,206 @@
+#openInline: true
+
+-- cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.9.0"
+-- in.cue --
+package exitcode
+
+import (
+	pkg "foo.com/example"
+)
+
+#D: {a: 1}
+
+// allow this in compatibility mode
+inlineErr: {
+	x: (#D & {b: 2}).b
+}
+
+// faulty struct referenced from package
+refFromPkg: (pkg.#E).b
+
+refFromLet: {
+	let X = {
+		#D: a: 2
+		#E: #D & {b: 1}
+	}
+	x: (X.#E).b
+}
+
+-- cue.mod/pkg/foo.com/example/example.cue --
+package example
+
+#D: a: 1
+#E: #D & {b: 1}
+
+-- out/eval/stats --
+Leaks:  8
+Freed:  18
+Reused: 14
+Allocs: 12
+Retain: 12
+
+Unifications: 26
+Conjuncts:    34
+Disjuncts:    27
+-- out/evalalpha --
+Errors:
+#E.b: field not allowed:
+    ./in.cue:15:14
+    ./cue.mod/pkg/foo.com/example/example.cue:4:11
+refFromLet.X.#E.b: field not allowed:
+    ./in.cue:20:7
+    ./in.cue:20:13
+
+Result:
+(_|_){
+  // [eval]
+  #D: (#struct){
+    a: (int){ 1 }
+  }
+  inlineErr: (struct){
+    x: (int){ 2 }
+  }
+  refFromPkg: (_|_){
+    // [eval] #E.b: field not allowed:
+    //     ./in.cue:15:14
+    //     ./cue.mod/pkg/foo.com/example/example.cue:4:11
+  }
+  refFromLet: (_|_){
+    // [eval]
+    let X#1 = (_|_){
+      // [eval]
+      #D: (#struct){
+        a: (int){ 2 }
+      }
+      #E: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval] refFromLet.X.#E.b: field not allowed:
+          //     ./in.cue:20:7
+          //     ./in.cue:20:13
+        }
+        a: (int){ 2 }
+      }
+    }
+    x: (_|_){
+      // [eval] refFromLet.X.#E.b: field not allowed:
+      //     ./in.cue:20:7
+      //     ./in.cue:20:13
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,4 +1,14 @@
+-(struct){
++Errors:
++#E.b: field not allowed:
++    ./in.cue:15:14
++    ./cue.mod/pkg/foo.com/example/example.cue:4:11
++refFromLet.X.#E.b: field not allowed:
++    ./in.cue:20:7
++    ./in.cue:20:13
++
++Result:
++(_|_){
++  // [eval]
+   #D: (#struct){
+     a: (int){ 1 }
+   }
+@@ -5,8 +15,13 @@
+   inlineErr: (struct){
+     x: (int){ 2 }
+   }
+-  refFromPkg: (int){ 1 }
+-  refFromLet: (struct){
++  refFromPkg: (_|_){
++    // [eval] #E.b: field not allowed:
++    //     ./in.cue:15:14
++    //     ./cue.mod/pkg/foo.com/example/example.cue:4:11
++  }
++  refFromLet: (_|_){
++    // [eval]
+     let X#1 = (_|_){
+       // [eval]
+       #D: (#struct){
+@@ -14,15 +29,18 @@
+       }
+       #E: (_|_){
+         // [eval]
+-        a: (int){ 2 }
+         b: (_|_){
+           // [eval] refFromLet.X.#E.b: field not allowed:
+-          //     ./in.cue:19:7
+           //     ./in.cue:20:7
+           //     ./in.cue:20:13
+         }
+-      }
+-    }
+-    x: (int){ 1 }
++        a: (int){ 2 }
++      }
++    }
++    x: (_|_){
++      // [eval] refFromLet.X.#E.b: field not allowed:
++      //     ./in.cue:20:7
++      //     ./in.cue:20:13
++    }
+   }
+ }
+-- out/eval --
+(struct){
+  #D: (#struct){
+    a: (int){ 1 }
+  }
+  inlineErr: (struct){
+    x: (int){ 2 }
+  }
+  refFromPkg: (int){ 1 }
+  refFromLet: (struct){
+    let X#1 = (_|_){
+      // [eval]
+      #D: (#struct){
+        a: (int){ 2 }
+      }
+      #E: (_|_){
+        // [eval]
+        a: (int){ 2 }
+        b: (_|_){
+          // [eval] refFromLet.X.#E.b: field not allowed:
+          //     ./in.cue:19:7
+          //     ./in.cue:20:7
+          //     ./in.cue:20:13
+        }
+      }
+    }
+    x: (int){ 1 }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #D: {
+    a: 1
+  }
+  inlineErr: {
+    x: (〈1;#D〉 & {
+      b: 2
+    }).b
+  }
+  refFromPkg: 〈import;"foo.com/example"〉.#E.b
+  refFromLet: {
+    let X#1 = {
+      #D: {
+        a: 2
+      }
+      #E: (〈0;#D〉 & {
+        b: 1
+      })
+    }
+    x: 〈0;let X#1〉.#E.b
+  }
+}

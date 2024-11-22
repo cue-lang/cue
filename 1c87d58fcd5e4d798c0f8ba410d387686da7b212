@@ -16,6 +16,24 @@
       "message": "Looks like this isn\u0027t used.",
       "revId": "1c87d58fcd5e4d798c0f8ba410d387686da7b212",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5bb50d60_f467ce65",
+        "filename": "pkg/list/list.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-22T12:57:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "43a53d96_3281d671",
+      "revId": "1c87d58fcd5e4d798c0f8ba410d387686da7b212",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

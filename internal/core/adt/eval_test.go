@@ -108,6 +108,8 @@ func TestEvalAlpha(t *testing.T) {
 
 	flags := cuedebug.Config{
 		Sharing: true,
+		// We test in "desired" mode.
+		// Compat:  true,
 	}
 
 	var todoAlpha = map[string]string{}
@@ -264,8 +266,9 @@ func TestX(t *testing.T) {
 	// adt.OpenGraphs = true
 
 	flags := cuedebug.Config{
-		Sharing: true, // Uncomment to turn sharing off.
-		LogEval: 1,    // Uncomment to turn logging off
+		Sharing:    true, // Uncomment to turn sharing off.
+		OpenInline: true,
+		LogEval:    1, // Uncomment to turn logging off
 	}
 
 	version := internal.DefaultVersion

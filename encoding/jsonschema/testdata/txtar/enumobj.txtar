@@ -1,0 +1,14 @@
+-- schema.json --
+{
+    "type": "object",
+    "enum": [{ "a": 1, "b": [1, 2, 3], "c": { "d": 1 } }]
+}
+
+-- out/decode/extract --
+close({
+	a!: 1
+	b!: [1, 2, 3]
+	c!: close({
+		d!: 1
+	})
+})

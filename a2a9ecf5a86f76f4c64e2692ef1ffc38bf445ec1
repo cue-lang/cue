@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a423edb7_7de9860f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-22T14:24:49Z",
+      "side": 1,
+      "message": "Not sure how that got there.",
+      "parentUuid": "0444f79f_1f12b86e",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 3
+      },
+      "revId": "a2a9ecf5a86f76f4c64e2692ef1ffc38bf445ec1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "df81f792_f2374d0e",
@@ -60,6 +84,24 @@
       "writtenOn": "2024-11-22T13:07:53Z",
       "side": 1,
       "message": "is this left over from debugging?",
+      "revId": "a2a9ecf5a86f76f4c64e2692ef1ffc38bf445ec1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5d3845a_5ae011a7",
+        "filename": "internal/core/adt/eval_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-22T14:24:49Z",
+      "side": 1,
+      "message": "I renamed Compat to OpenInline and this was left. Basically I tried to say that we test with the desired functionality and not compatibility mode. But maybe adding a comment is not clarifying anything.\n\nI removed the comment.",
+      "parentUuid": "5b690d82_8929c162",
       "revId": "a2a9ecf5a86f76f4c64e2692ef1ffc38bf445ec1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

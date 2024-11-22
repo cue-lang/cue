@@ -115,7 +115,7 @@ func constraintAnyOf(key string, n cue.Value, s *state) {
 func constraintOneOf(key string, n cue.Value, s *state) {
 	var types cue.Kind
 	var knownTypes cue.Kind
-	hasSome := false
+	needsConstraint := false
 	items := s.listItems("oneOf", n, false)
 	if len(items) == 0 {
 		s.errf(n, "oneOf requires at least one subschema")
@@ -128,22 +128,24 @@ func constraintOneOf(key string, n cue.Value, s *state) {
 			// Nothing is allowed; omit
 			continue
 		}
-		types |= sub.allowedTypes
 
 		// TODO: make more finegrained by making it two pass.
 		if sub.hasConstraints() {
-			hasSome = true
+			needsConstraint = true
+		} else if (types & sub.allowedTypes) != 0 {
+			// If there's overlap between the
+			// uncontrained elements, we'll definitely
+			// need to add a constraint.
+			needsConstraint = true
 		}
-
-		if !isAny(x) {
-			knownTypes |= sub.knownTypes
-			a = append(a, x)
-		}
+		types |= sub.allowedTypes
+		knownTypes |= sub.knownTypes
+		a = append(a, x)
 	}
 	// TODO if there are no elements in the oneOf, validation
 	// should fail.
 	s.allowedTypes &= types
-	if len(a) > 0 && hasSome {
+	if len(a) > 0 && needsConstraint {
 		s.knownTypes &= knownTypes
 		if len(a) == 1 {
 			// Only one possibility. Use that.

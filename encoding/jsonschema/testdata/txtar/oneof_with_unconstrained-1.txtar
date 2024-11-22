@@ -1,5 +1,4 @@
 Issue 3586, first test case.
-TODO fix this
 
 -- schema.json --
 {
@@ -9,6 +8,11 @@ TODO fix this
     ]
 }
 -- out/decode/extract --
-_
--- test/string.json --
+matchN(1, [_, _])
+-- test/err-string.json --
 "something"
+-- out/decode/testerr/err-string --
+invalid value "something" (does not satisfy matchN): 2 matched, expected 1:
+    generated.cue:1:1
+    generated.cue:1:8
+    test/err-string.json:1:1

@@ -1,0 +1,21 @@
+Issue 3586, second test case.
+TODO fix this
+
+-- schema.json --
+{
+    "oneOf": [
+        {
+            "type": "string"
+        },
+        {
+            "type": [
+                "string",
+                "number"
+            ]
+        }
+    ]
+}
+-- out/decode/extract --
+number | string
+-- test/string.json --
+"something"

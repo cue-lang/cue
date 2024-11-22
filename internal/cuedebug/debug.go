@@ -31,6 +31,17 @@ type Config struct {
 
 	// Sharing enables structure sharing.
 	Sharing bool `envflag:"default:true"`
+
+	// OpenInline permits disallowed fields to be selected into literal structs
+	// that would normally result in a close error. For instance,
+	//
+	//    #D: {a: 1}
+	//    x: (#D & {b: 2}).b // allow this
+	//
+	// This behavior was erroneously permitted in the v2 evaluator and was fixed
+	// in v3. This allows users that rely on this behavior to use v3.
+	// To aid the transition to v3, this is enabled by default for now.
+	OpenInline bool `envflag:"default:true"`
 }
 
 // Init initializes Flags. Note: this isn't named "init" because we

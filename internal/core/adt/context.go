@@ -275,6 +275,11 @@ type OpContext struct {
 	// enabled.
 	inConstraint int
 
+	// inLiteralSelectee indicates that we are evaluating a literal struct
+	// as the receiver of a selector. This is used to turn off closedness
+	// checking in compatibility mode.
+	inLiteralSelectee int
+
 	// inDetached indicates that inline structs evaluated in the current context
 	// should never be shared. This is the case, for instance, with the source
 	// for the for clause in a comprehension.
@@ -1133,7 +1138,15 @@ func pos(x Node) token.Pos {
 	return x.Source().Pos()
 }
 
+// node is called by SelectorExpr.resolve and IndexExpr.resolve.
 func (c *OpContext) node(orig Node, x Expr, scalar bool, state combinedFlags) *Vertex {
+	if c.OpenInline {
+		if _, ok := x.(Resolver); !ok {
+			c.inLiteralSelectee++
+			defer func() { c.inLiteralSelectee-- }()
+		}
+	}
+
 	// TODO: always get the vertex. This allows a whole bunch of trickery
 	// down the line.
 	v := c.unifyNode(x, state)

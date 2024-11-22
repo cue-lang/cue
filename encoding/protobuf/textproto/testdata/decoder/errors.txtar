@@ -8,4 +8,4 @@ a: int
 a: 1
 
 -- out/decode --
-textproto: parser encountered unexpected : character (should be whitespace, or a ,; separator)
+textproto: parser encountered unexpected character ':' (should be whitespace, ',', or ';')

@@ -71,19 +71,15 @@ func (s *state) resolveURI(n cue.Value) *url.URL {
 
 	u, err := url.Parse(str)
 	if err != nil {
-		s.addErr(errors.Newf(n.Pos(), "invalid JSON reference: %s", err))
+		s.addErr(errors.Newf(n.Pos(), "invalid JSON reference: %v", err))
 		return nil
 	}
 
-	for {
+	for ; s != nil; s = s.up {
 		if s.id != nil {
 			u = s.id.ResolveReference(u)
 			break
 		}
-		if s.up == nil {
-			break
-		}
-		s = s.up
 	}
 
 	return u
@@ -93,9 +89,8 @@ func (s *state) resolveURI(n cue.Value) *url.URL {
 // The returned identifier (or first expression in a selection chain), is
 // hardwired to point to the resolved value. This will allow [astutil.Sanitize]
 // to automatically unshadow any shadowed variables.
-func (s *state) makeCUERef(n cue.Value, u *url.URL, fragmentParts []string) (_e ast.Expr) {
-	switch fn := s.cfg.Map; {
-	case fn != nil:
+func (s *state) makeCUERef(n cue.Value, u *url.URL, fragmentParts []string) ast.Expr {
+	if fn := s.cfg.Map; fn != nil {
 		// TODO: This block is only used in case s.cfg.Map is set, which is
 		// currently only used for OpenAPI. Handling should be brought more in
 		// line with JSON schema.
@@ -126,98 +121,87 @@ func (s *state) makeCUERef(n cue.Value, u *url.URL, fragmentParts []string) (_e 
 		return sel
 	}
 
-	var refExpr ast.Expr
-
-	for ; ; s = s.up {
-		if s.up == nil {
-			switch {
-			case u.Host == "" && u.Path == "",
-				s.id != nil && s.id.Host == u.Host && s.id.Path == u.Path:
-				if len(fragmentParts) == 0 {
-					// Refers to the top of the file.
-					return s.rootRef()
-				}
-
-				refExpr, fragmentParts = s.getNextIdent(n.Pos(), fragmentParts)
-
-			case u.Host != "":
-				// Reference not found within scope. Create an import reference.
-
-				// TODO: currently only $ids that are in scope can be
-				// referenced. We could consider doing an extra pass to record
-				// all '$id's in a file to be able to link to them even if they
-				// are not in scope.
-				importPath, refPath, err := s.cfg.MapURL(u)
-				if err != nil {
-					ustr := u.String()
-					// Avoid producing many errors for the same URL.
-					if !s.mapURLErrors[ustr] {
-						s.mapURLErrors[ustr] = true
-						s.errf(n, "cannot determine import path from URL %q: %v", ustr, err)
-					}
-					return nil
-				}
-				ip := module.ParseImportPath(importPath)
-				if ip.Qualifier == "" {
-					s.errf(n, "cannot determine package name from import path %q", importPath)
-					return nil
-				}
-				ident := ast.NewIdent(ip.Qualifier)
-				ident.Node = &ast.ImportSpec{Path: ast.NewString(importPath)}
-				refExpr, err = pathRefSyntax(refPath, ident)
-				if err != nil {
-					s.errf(n, "invalid CUE path for URL %q: %v", u, err)
-					return nil
-				}
-
-			default:
-				// Just a path, not sure what that means.
-				s.errf(n, "unknown domain for reference %q", u)
-				return nil
-			}
-			break
-		}
-
-		if s.id == nil {
+	for ; s.up != nil; s = s.up {
+		if s.id == nil || s.id.Host != u.Host || s.id.Path != u.Path {
 			continue
 		}
-
-		if s.id.Host == u.Host && s.id.Path == u.Path {
-			if len(fragmentParts) == 0 {
-				if len(s.idRef) == 0 {
-					// This is a reference to either root or a schema for which
-					// we do not yet support references. See Issue #386.
-					if s.up.up != nil {
-						s.errf(n, "cannot refer to internal schema %q", u)
-						return nil
-					}
-
-					// This is referring to the root scope. There is a dummy
-					// state above the root state that we need to update.
-					s = s.up
-
-					// Refers to the top of the file.
-					return s.rootRef()
-				}
-
-				x := s.idRef[0]
-				if !x.isDef && !ast.IsValidIdent(x.name) {
-					s.errf(n, "referring to field %q not supported", x.name)
-					return nil
-				}
-				e := ast.NewIdent(x.name)
-				if len(s.idRef) == 1 {
-					return e
-				}
-				return newSel(e, s.idRef[1])
-			}
+		if len(fragmentParts) > 0 {
 			ident, fragmentParts0 := s.getNextIdent(n.Pos(), fragmentParts)
 			ident.Node = s.obj
-			refExpr, fragmentParts = ident, fragmentParts0
-			break
+			return s.newSel(n.Pos(), ident, fragmentParts0)
 		}
-	}
+		if len(s.idRef) == 0 {
+			// This is a reference to either root or a schema for which
+			// we do not yet support references. See Issue #386.
+			if s.up.up != nil {
+				s.errf(n, "cannot refer to internal schema %q", u)
+				return nil
+			}
 
+			// This is referring to the root scope. There is a dummy
+			// state above the root state that we need to update.
+			s = s.up
+
+			// Refers to the top of the file.
+			return s.rootRef()
+		}
+		x := s.idRef[0]
+		if !x.isDef && !ast.IsValidIdent(x.name) {
+			s.errf(n, "id %q not supported", x.name)
+			return nil
+		}
+		e := ast.NewIdent(x.name)
+		if len(s.idRef) == 1 {
+			return e
+		}
+		return newSel(e, s.idRef[1])
+	}
+	var refExpr ast.Expr
+	switch {
+	case u.Host == "" && u.Path == "",
+		s.id != nil && s.id.Host == u.Host && s.id.Path == u.Path:
+		if len(fragmentParts) == 0 {
+			// Refers to the top of the file.
+			return s.rootRef()
+		}
+
+		refExpr, fragmentParts = s.getNextIdent(n.Pos(), fragmentParts)
+
+	case u.Host != "":
+		// Reference not found within scope. Create an import reference.
+
+		// TODO: currently only $ids that are in scope can be
+		// referenced. We could consider doing an extra pass to record
+		// all '$id's in a file to be able to link to them even if they
+		// are not in scope.
+		importPath, refPath, err := s.cfg.MapURL(u)
+		if err != nil {
+			ustr := u.String()
+			// Avoid producing many errors for the same URL.
+			if !s.mapURLErrors[ustr] {
+				s.mapURLErrors[ustr] = true
+				s.errf(n, "cannot determine import path from URL %q: %v", ustr, err)
+			}
+			return nil
+		}
+		ip := module.ParseImportPath(importPath)
+		if ip.Qualifier == "" {
+			s.errf(n, "cannot determine package name from import path %q", importPath)
+			return nil
+		}
+		ident := ast.NewIdent(ip.Qualifier)
+		ident.Node = &ast.ImportSpec{Path: ast.NewString(importPath)}
+		refExpr, err = pathRefSyntax(refPath, ident)
+		if err != nil {
+			s.errf(n, "invalid CUE path for URL %q: %v", u, err)
+			return nil
+		}
+
+	default:
+		// Just a path, not sure what that means.
+		s.errf(n, "unknown domain for reference %q", u)
+		return nil
+	}
 	return s.newSel(n.Pos(), refExpr, fragmentParts)
 }
 

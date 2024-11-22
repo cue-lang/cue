@@ -1,0 +1,110 @@
+#openInline: true
+
+-- cue.mod/module.cue --
+module: "mod.test"
+language: version: "v0.9.0"
+-- in.cue --
+package exitcode
+
+import (
+	pkg "foo.com/example"
+)
+
+#D: {a: 1}
+
+// allow this in compatibility mode
+t1: {
+	x: (#D & {b: 2}).b
+}
+
+// a faulty struct should still be faulty
+t2: (pkg.#E).b
+
+-- cue.mod/pkg/foo.com/example/example.cue --
+package example
+
+#D: a: 1
+#E: #D & {b: 1}
+
+-- out/eval/stats --
+Leaks:  5
+Freed:  8
+Reused: 5
+Allocs: 8
+Retain: 7
+
+Unifications: 13
+Conjuncts:    17
+Disjuncts:    13
+-- out/evalalpha --
+Errors:
+#E.b: field not allowed:
+    ./in.cue:15:6
+    ./cue.mod/pkg/foo.com/example/example.cue:4:11
+
+Result:
+(_|_){
+  // [eval]
+  #D: (#struct){
+    a: (int){ 1 }
+  }
+  t1: (struct){
+    x: (int){ 2 }
+  }
+  t2: (_|_){
+    // [eval] #E.b: field not allowed:
+    //     ./in.cue:15:6
+    //     ./cue.mod/pkg/foo.com/example/example.cue:4:11
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,4 +1,11 @@
+-(struct){
++Errors:
++#E.b: field not allowed:
++    ./in.cue:15:6
++    ./cue.mod/pkg/foo.com/example/example.cue:4:11
++
++Result:
++(_|_){
++  // [eval]
+   #D: (#struct){
+     a: (int){ 1 }
+   }
+@@ -5,5 +12,9 @@
+   t1: (struct){
+     x: (int){ 2 }
+   }
+-  t2: (int){ 1 }
++  t2: (_|_){
++    // [eval] #E.b: field not allowed:
++    //     ./in.cue:15:6
++    //     ./cue.mod/pkg/foo.com/example/example.cue:4:11
++  }
+ }
+-- out/eval --
+(struct){
+  #D: (#struct){
+    a: (int){ 1 }
+  }
+  t1: (struct){
+    x: (int){ 2 }
+  }
+  t2: (int){ 1 }
+}
+-- out/compile --
+--- in.cue
+{
+  #D: {
+    a: 1
+  }
+  t1: {
+    x: (〈1;#D〉 & {
+      b: 2
+    }).b
+  }
+  t2: 〈import;"foo.com/example"〉.#E.b
+}

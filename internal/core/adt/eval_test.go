@@ -163,6 +163,8 @@ func skipFiles(a ...*ast.File) (reason string) {
 }
 
 func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, flags cuedebug.Config) (errorCount int) {
+	flags.OpenInline = t.Bool("openInline")
+
 	a := t.Instance()
 	r := runtime.NewWithSettings(version, flags)
 
@@ -264,8 +266,9 @@ func TestX(t *testing.T) {
 	// adt.OpenGraphs = true
 
 	flags := cuedebug.Config{
-		Sharing: true, // Uncomment to turn sharing off.
-		LogEval: 1,    // Uncomment to turn logging off
+		Sharing:    true, // Uncomment to turn sharing off.
+		OpenInline: true,
+		LogEval:    1, // Uncomment to turn logging off
 	}
 
 	version := internal.DefaultVersion

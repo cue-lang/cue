@@ -1,0 +1,230 @@
+// TODO: make special benchmark test that tests repeated lines more accurately
+// and and automatically.
+
+-- in.cue --
+// Should linearly increase with each repeated line.
+// automatically.
+pat: {[string]: 1} | {a: 2} // 9   conjuncts
+pat: {[string]: 1} | {a: 2} // 23  conjuncts (+14)
+pat: {[string]: 1} | {a: 2} // 34  conjuncts (+11)
+pat: {[string]: 1} | {a: 2} // 45  conjuncts (+11)
+pat: {[string]: 1} | {a: 2} // 56  conjuncts (+11)
+pat: {[string]: 1} | {a: 2} // 67  conjuncts (+11)
+pat: {[string]: 1} | {a: 2} // 78  conjuncts (+11)
+pat: {[string]: 1} | {a: 2} // 89  conjuncts (+11)
+pat: {[string]: 1} | {a: 2} // 100 conjuncts (+11)
+pat: {[string]: 1} | {a: 2} // 111 conjuncts (+11)
+
+// This also should grow linearly per repeated line.
+// Indicated
+list: [1] | [2] | [3] | [4] // 19  conjuncts; 4   disjuncts
+list: [1] | [2] | [3] | [4] // 52  conjuncts; 20  disjuncts (+33; +16)
+list: [1] | [2] | [3] | [4] // 85  conjuncts; 36  disjuncts (+33; +16)
+list: [1] | [2] | [3] | [4] // 118 conjuncts; 52  disjuncts (+33; +16)
+list: [1] | [2] | [3] | [4] // 151 conjuncts; 68  disjuncts (+33; +16)
+list: [1] | [2] | [3] | [4] // 184 conjuncts; 84  disjuncts (+33; +16)
+list: [1] | [2] | [3] | [4] // 217 conjuncts; 100 disjuncts (+33; +16)
+
+-- out/evalalpha/stats --
+Leaks:  26157
+Freed:  16399
+Reused: 16399
+Allocs: 26157
+Retain: 0
+
+Unifications: 4132
+Conjuncts:    71309
+Disjuncts:    21954
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  0
+-Freed:  269
+-Reused: 258
+-Allocs: 11
++Leaks:  26157
++Freed:  16399
++Reused: 16399
++Allocs: 26157
+ Retain: 0
+ 
+-Unifications: 131
+-Conjuncts:    755
+-Disjuncts:    269
++Unifications: 4132
++Conjuncts:    71309
++Disjuncts:    21954
+-- out/eval/stats --
+Leaks:  0
+Freed:  269
+Reused: 258
+Allocs: 11
+Retain: 0
+
+Unifications: 131
+Conjuncts:    755
+Disjuncts:    269
+-- out/evalalpha --
+(struct){
+  pat: (struct){
+  }
+  list: (list){ |((#list){
+      0: (int){ 1 }
+    }, (#list){
+      0: (int){ 2 }
+    }, (#list){
+      0: (int){ 3 }
+    }, (#list){
+      0: (int){ 4 }
+    }) }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,8 +1,6 @@
+ (struct){
+-  pat: (struct){ |((struct){
+-    }, (struct){
+-      a: (int){ 2 }
+-    }) }
++  pat: (struct){
++  }
+   list: (list){ |((#list){
+       0: (int){ 1 }
+     }, (#list){
+-- out/eval --
+(struct){
+  pat: (struct){ |((struct){
+    }, (struct){
+      a: (int){ 2 }
+    }) }
+  list: (list){ |((#list){
+      0: (int){ 1 }
+    }, (#list){
+      0: (int){ 2 }
+    }, (#list){
+      0: (int){ 3 }
+    }, (#list){
+      0: (int){ 4 }
+    }) }
+}
+-- out/compile --
+--- in.cue
+{
+  pat: ({
+    [string]: 1
+  }|{
+    a: 2
+  })
+  pat: ({
+    [string]: 1
+  }|{
+    a: 2
+  })
+  pat: ({
+    [string]: 1
+  }|{
+    a: 2
+  })
+  pat: ({
+    [string]: 1
+  }|{
+    a: 2
+  })
+  pat: ({
+    [string]: 1
+  }|{
+    a: 2
+  })
+  pat: ({
+    [string]: 1
+  }|{
+    a: 2
+  })
+  pat: ({
+    [string]: 1
+  }|{
+    a: 2
+  })
+  pat: ({
+    [string]: 1
+  }|{
+    a: 2
+  })
+  pat: ({
+    [string]: 1
+  }|{
+    a: 2
+  })
+  pat: ({
+    [string]: 1
+  }|{
+    a: 2
+  })
+  list: ([
+    1,
+  ]|[
+    2,
+  ]|[
+    3,
+  ]|[
+    4,
+  ])
+  list: ([
+    1,
+  ]|[
+    2,
+  ]|[
+    3,
+  ]|[
+    4,
+  ])
+  list: ([
+    1,
+  ]|[
+    2,
+  ]|[
+    3,
+  ]|[
+    4,
+  ])
+  list: ([
+    1,
+  ]|[
+    2,
+  ]|[
+    3,
+  ]|[
+    4,
+  ])
+  list: ([
+    1,
+  ]|[
+    2,
+  ]|[
+    3,
+  ]|[
+    4,
+  ])
+  list: ([
+    1,
+  ]|[
+    2,
+  ]|[
+    3,
+  ]|[
+    4,
+  ])
+  list: ([
+    1,
+  ]|[
+    2,
+  ]|[
+    3,
+  ]|[
+    4,
+  ])
+}

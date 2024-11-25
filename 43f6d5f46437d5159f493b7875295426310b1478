@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e3807c7_c45cb43d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-11-25T16:17:53Z",
+      "side": 1,
+      "message": "I think you meant \"intermediate values\" ?",
+      "revId": "43f6d5f46437d5159f493b7875295426310b1478",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d528683_006fac9f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-11-25T16:17:53Z",
+      "side": 1,
+      "message": "probably \"gains\", not \"gaints\".",
+      "revId": "43f6d5f46437d5159f493b7875295426310b1478",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

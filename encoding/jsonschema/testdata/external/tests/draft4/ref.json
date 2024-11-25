@@ -62,32 +62,20 @@
 				}
 			}
 		},
-		"skip": {
-			"v2": "extract error: cannot compile resulting schema: bar: reference \"foo\" not found:\n    generated.cue:4:10\n",
-			"v3": "extract error: cannot compile resulting schema: bar: reference \"foo\" not found:\n    generated.cue:4:10\n"
-		},
 		"tests": [
 			{
 				"description": "match",
 				"data": {
 					"bar": 3
 				},
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "mismatch",
 				"data": {
 					"bar": true
 				},
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -103,10 +91,6 @@
 				}
 			]
 		},
-		"skip": {
-			"v2": "extract error: referring to field \"items\" not yet supported",
-			"v3": "extract error: referring to field \"items\" not yet supported"
-		},
 		"tests": [
 			{
 				"description": "match array",
@@ -114,11 +98,7 @@
 					1,
 					2
 				],
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "mismatch array",
@@ -126,11 +106,7 @@
 					1,
 					"foo"
 				],
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -166,60 +142,42 @@
 				"data": {
 					"slash": "aoeu"
 				},
-				"valid": false,
-				"skip": {
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "tilde invalid",
 				"data": {
 					"tilde": "aoeu"
 				},
-				"valid": false,
-				"skip": {
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "percent invalid",
 				"data": {
 					"percent": "aoeu"
 				},
-				"valid": false,
-				"skip": {
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "slash valid",
 				"data": {
 					"slash": 123
 				},
-				"valid": true,
-				"skip": {
-					"v2": "6 errors in empty disjunction:\nconflicting values [...] and {slash:123} (mismatched types list and struct):\n    generated.cue:2:33\n    instance.json:1:1\nconflicting values bool and {slash:123} (mismatched types bool and struct):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and {slash:123} (mismatched types null and struct):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and {slash:123} (mismatched types number and struct):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and {slash:123} (mismatched types string and struct):\n    generated.cue:2:24\n    instance.json:1:1\nslash: undefined field: \"slash~1field\":\n    generated.cue:4:14\n"
-				}
+				"valid": true
 			},
 			{
 				"description": "tilde valid",
 				"data": {
 					"tilde": 123
 				},
-				"valid": true,
-				"skip": {
-					"v2": "6 errors in empty disjunction:\nconflicting values [...] and {tilde:123} (mismatched types list and struct):\n    generated.cue:2:33\n    instance.json:1:1\nconflicting values bool and {tilde:123} (mismatched types bool and struct):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and {tilde:123} (mismatched types null and struct):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and {tilde:123} (mismatched types number and struct):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and {tilde:123} (mismatched types string and struct):\n    generated.cue:2:24\n    instance.json:1:1\ntilde: undefined field: \"tilde~0field\":\n    generated.cue:3:14\n"
-				}
+				"valid": true
 			},
 			{
 				"description": "percent valid",
 				"data": {
 					"percent": 123
 				},
-				"valid": true,
-				"skip": {
-					"v2": "6 errors in empty disjunction:\nconflicting values [...] and {percent:123} (mismatched types list and struct):\n    generated.cue:2:33\n    instance.json:1:1\nconflicting values bool and {percent:123} (mismatched types bool and struct):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and {percent:123} (mismatched types null and struct):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and {percent:123} (mismatched types number and struct):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and {percent:123} (mismatched types string and struct):\n    generated.cue:2:24\n    instance.json:1:1\npercent: undefined field: \"percent%25field\":\n    generated.cue:5:14\n"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -322,28 +280,16 @@
 				}
 			]
 		},
-		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/sibling_id/base/foo.json:foo\":\n    generated.cue:1:8\n",
-			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/sibling_id/base/foo.json:foo\":\n    generated.cue:1:8\n"
-		},
 		"tests": [
 			{
 				"description": "$ref resolves to /definitions/base_foo, data does not validate",
 				"data": "a",
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "$ref resolves to /definitions/base_foo, data validates",
 				"data": 1,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			}
 		]
 	},
@@ -479,8 +425,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: builtin package \"localhost:1234/node\" undefined:\n    generated.cue:1:8\n_schema.nodes: reference \"node\" not found:\n    generated.cue:8:14\n",
-			"v3": "extract error: cannot compile resulting schema: builtin package \"localhost:1234/node\" undefined:\n    generated.cue:1:8\n_schema.nodes: reference \"node\" not found:\n    generated.cue:8:14\n"
+			"v2": "extract error: cannot compile resulting schema: builtin package \"localhost:1234/tree\" undefined:\n    generated.cue:3:8\n#node.subtree: reference \"tree\" not found:\n    generated.cue:13:12\n",
+			"v3": "extract error: cannot compile resulting schema: builtin package \"localhost:1234/tree\" undefined:\n    generated.cue:3:8\n#node.subtree: reference \"tree\" not found:\n    generated.cue:13:12\n"
 		},
 		"tests": [
 			{
@@ -587,20 +533,14 @@
 				"data": {
 					"foo\"bar": 1
 				},
-				"valid": true,
-				"skip": {
-					"v2": "6 errors in empty disjunction:\nconflicting values [...] and {\"foo\\\"bar\":1} (mismatched types list and struct):\n    generated.cue:2:33\n    instance.json:1:1\nconflicting values bool and {\"foo\\\"bar\":1} (mismatched types bool and struct):\n    generated.cue:2:8\n    instance.json:1:1\nconflicting values null and {\"foo\\\"bar\":1} (mismatched types null and struct):\n    generated.cue:2:1\n    instance.json:1:1\nconflicting values number and {\"foo\\\"bar\":1} (mismatched types number and struct):\n    generated.cue:2:15\n    instance.json:1:1\nconflicting values string and {\"foo\\\"bar\":1} (mismatched types string and struct):\n    generated.cue:2:24\n    instance.json:1:1\n\"foo\\\"bar\": undefined field: \"foo%22bar\":\n    generated.cue:3:17\n"
-				}
+				"valid": true
 			},
 			{
 				"description": "object with strings is invalid",
 				"data": {
 					"foo\"bar": "1"
 				},
-				"valid": false,
-				"skip": {
-					"v3": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -620,8 +560,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: $id URI may not contain a fragment (and 1 more errors)",
-			"v3": "extract error: $id URI may not contain a fragment (and 1 more errors)"
+			"v2": "extract error: $id URI may not contain a fragment (and 3 more errors)",
+			"v3": "extract error: $id URI may not contain a fragment (and 3 more errors)"
 		},
 		"tests": [
 			{
@@ -666,8 +606,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: $id URI may not contain a fragment (and 1 more errors)",
-			"v3": "extract error: $id URI may not contain a fragment (and 1 more errors)"
+			"v2": "extract error: $id URI may not contain a fragment (and 3 more errors)",
+			"v3": "extract error: $id URI may not contain a fragment (and 3 more errors)"
 		},
 		"tests": [
 			{
@@ -742,28 +682,16 @@
 				}
 			]
 		},
-		"skip": {
-			"v2": "extract error: cannot compile resulting schema: package \"example.com/b/d.json:d\" imported but not defined in :\n    generated.cue:1:8\n",
-			"v3": "extract error: cannot compile resulting schema: package \"example.com/b/d.json:d\" imported but not defined in :\n    generated.cue:1:8\n"
-		},
 		"tests": [
 			{
 				"description": "number is valid",
 				"data": 1,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "non-number is invalid",
 				"data": "a",
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	},
@@ -841,28 +769,16 @@
 				}
 			]
 		},
-		"skip": {
-			"v2": "extract error: cannot refer to definitions section: must refer to one of its elements",
-			"v3": "extract error: cannot refer to definitions section: must refer to one of its elements"
-		},
 		"tests": [
 			{
 				"description": "number is valid",
 				"data": 1,
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "non-number is invalid",
 				"data": "a",
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	}

@@ -32,10 +32,12 @@
 package jsonschema
 
 import (
+	"fmt"
 	"net/url"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/token"
 )
 
@@ -43,10 +45,18 @@ import (
 //
 // The generated CUE schema is guaranteed to deem valid any value that is
 // a valid instance of the source JSON schema.
-func Extract(data cue.InstanceOrValue, cfg *Config) (f *ast.File, err error) {
+func Extract(data cue.InstanceOrValue, cfg *Config) (*ast.File, error) {
 	cfg = ref(*cfg)
 	if cfg.MapURL == nil {
 		cfg.MapURL = DefaultMapURL
+	}
+	if cfg.Map == nil {
+		cfg.Map = defaultMap
+	}
+	if cfg.MapRef == nil {
+		cfg.MapRef = func(loc SchemaLoc) (string, cue.Path, error) {
+			return defaultMapRef(loc, cfg.Map, cfg.MapURL)
+		}
 	}
 	if cfg.DefaultVersion == VersionUnknown {
 		cfg.DefaultVersion = DefaultVersion
@@ -55,16 +65,41 @@ func Extract(data cue.InstanceOrValue, cfg *Config) (f *ast.File, err error) {
 		cfg.StrictKeywords = true
 		cfg.StrictFeatures = true
 	}
+	if cfg.ID == "" {
+		// Always choose a fully-qualified ID for the schema, even
+		// if it doesn't declare one.
+		//
+		// From https://json-schema.org/draft-07/draft-handrews-json-schema-01#rfc.section.8.1
+		// > Informatively, the initial base URI of a schema is the URI at which it was found, or a suitable substitute URI if none is known.
+		cfg.ID = DefaultRootID
+	}
+	rootIDURI, err := url.Parse(cfg.ID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid Config.ID value %q: %v", cfg.ID, err)
+	}
+	if !rootIDURI.IsAbs() {
+		return nil, fmt.Errorf("Config.ID %q is not absolute URI", cfg.ID)
+	}
 	d := &decoder{
 		cfg:          cfg,
 		mapURLErrors: make(map[string]bool),
+		root:         data.Value(),
+		rootID:       rootIDURI,
+		defs:         make(map[string]*definedSchema),
+		defForValue:  newValueMap[*definedSchema](),
 	}
 
-	f = d.decode(data.Value())
+	f := d.decode(d.root)
 	if d.errs != nil {
 		return nil, d.errs
 	}
-
+	//	log.Printf("before sanitize, syntax:\n%s", astinternal.AppendDebug(nil, f, astinternal.DebugConfig{
+	//		OmitEmpty:       true,
+	//		IncludePointers: true,
+	//	}))
+	if err := astutil.Sanitize(f); err != nil {
+		return nil, fmt.Errorf("cannot sanitize jsonschema resulting syntax: %v", err)
+	}
 	return f, nil
 }
 
@@ -79,12 +114,18 @@ type Config struct {
 	// ID sets the URL of the original source, corresponding to the $id field.
 	ID string
 
-	// JSON reference of location containing schema. The empty string indicates
-	// that there is a single schema at the root.
+	// JSON reference of location containing schemas. The empty string indicates
+	// that there is a single schema at the root. If this is non-empty,
+	// the referred-to location should be an object, and each member
+	// is taken to be a schema.
 	//
 	// Examples:
-	//  "#/"                     top-level fields are schemas.
+	//  "#/" or "#"                    top-level fields are schemas.
 	//  "#/components/schemas"   the canonical OpenAPI location.
+	//
+	// Note: #/ should technically _not_ refer to the root of the
+	// schema: this behavior is preserved for backwards compatibility
+	// only. Just `#` is preferred.
 	Root string
 
 	// Map maps the locations of schemas and definitions to a new location.
@@ -95,12 +136,88 @@ type Config struct {
 	//    {}                     {}
 	//    {"definitions", foo}   {#foo} or {#, foo}
 	//    {"$defs", foo}         {#foo} or {#, foo}
+	//
+	// Deprecated: use [Config.MapRef].
 	Map func(pos token.Pos, path []string) ([]ast.Label, error)
 
 	// MapURL maps a URL reference as found in $ref to
-	// an import path for a package and a path within that package.
+	// an import path for a CUE package and a path within that package.
 	// If this is nil, [DefaultMapURL] will be used.
+	//
+	// Deprecated: use [Config.MapRef].
 	MapURL func(u *url.URL) (importPath string, path cue.Path, err error)
+
+	// MapRef is used to determine how a JSON schema location maps to
+	// CUE. It is used for both explicit references and for named
+	// schemas inside $defs and definitions.
+	//
+	// For example, given this schema:
+	//
+	// 	{
+	// 	    "$schema": "https://json-schema.org/draft/2020-12/schema",
+	// 	    "$id": "https://my.schema.org/hello",
+	// 	    "$defs": {
+	// 	        "foo": {
+	// 	            "$id": "https://other.org",
+	// 	            "type": "object",
+	// 	            "properties": {
+	// 	                "a": {
+	// 	                    "type": "string"
+	// 	                },
+	// 	                "b": {
+	// 	                    "$ref": "#/properties/a"
+	// 	                }
+	// 	            }
+	// 	        }
+	// 	    },
+	// 	    "allOf": [{
+	// 	        "$ref": "#/$defs/foo"
+	// 	    }, {
+	// 	        "$ref": "https://my.schema.org/hello#/$defs/foo"
+	// 	    }, {
+	// 	        "$ref": "https://other.org"
+	// 	    }, {
+	// 	        "$ref": "https://external.ref"
+	//	    }]
+	// 	}
+	//
+	// ... MapRef will be called with the following locations for the
+	// $ref keywords in order of appearance (no guarantees are made
+	// about the actual order or number of calls to MapRef):
+	//
+	//	ID                                      RootRel
+	//	https://other.org/properties/a          https://my.schema.org/hello#/$defs/foo/properties/a
+	//	https://my.schema.org/hello#/$defs/foo  https://my.schema.org/hello#/$defs/foo
+	//	https://other.org                       https://my.schema.org/hello#/$defs/foo
+	//	https://external.ref                    <nil>
+	//
+	// It will also be called for the named schema in #/$defs/foo with these arguments:
+	//
+	//	https://other.org                       https://my.schema.org/hello#/$defs/foo
+	//
+	// MapRef should return the desired CUE location for the schema with
+	// the provided IDs, consisting of the import path of the package
+	// containing the schema, and a path within that package. If the
+	// returned import path is empty, the path will be interpreted
+	// relative to the root of the generated JSON schema.
+	//
+	// Note that MapRef is general enough to subsume use of Map and
+	// MapURL, which are both now deprecated. If all three fields are
+	// nil, [DefaultMapRef] will be used.
+	MapRef func(loc SchemaLoc) (importPath string, relPath cue.Path, err error)
+
+	// DefineSchema is called, if not nil, for any schema that is defined
+	// within the json schema being converted but is mapped somewhere
+	// external via [Config.MapRef]. The invoker of [Extract] is
+	// responsible for defining the schema e in the correct place as described
+	// by the import path and CUE path relative to that.
+	//
+	// The importPath and path are exactly as returned by [Config.MapRef].
+	// If this or [Config.MapRef] is nil this function will never be called.
+	// Note that importPath will never be empty, because if MapRef
+	// returns an empty importPath, it's specifying an internal schema
+	// which will be defined accordingly.
+	DefineSchema func(importPath string, path cue.Path, e ast.Expr) error
 
 	// TODO: configurability to make it compatible with OpenAPI, such as
 	// - locations of definitions: #/components/schemas, for instance.
@@ -126,6 +243,29 @@ type Config struct {
 	DefaultVersion Version
 
 	_ struct{} // prohibit casting from different type.
+}
+
+// SchemaLoc defines the location of schema, both in absolute
+// terms as its canonical ID and, optionally, relative to the
+// root of the value passed to [Extract].
+type SchemaLoc struct {
+	// ID holds the canonical URI of the schema, as declared
+	// by the schema or one of its parents.
+	ID *url.URL
+
+	// RootRel holds the URI of the schema relative to the
+	// root of the value passed to [Extract].
+	// This will be nil for schemas outside of that value.
+	// Its base URI will be either the value of [Config.ID]
+	// or [DefaultRootID] if [Config.ID] is empty..
+	RootRel *url.URL
+}
+
+func (loc SchemaLoc) String() string {
+	if loc.RootRel != nil {
+		return fmt.Sprintf("id=%v localID=%v", loc.ID, loc.RootRel)
+	}
+	return fmt.Sprintf("id=%v", loc.ID)
 }
 
 func ref[T any](x T) *T {

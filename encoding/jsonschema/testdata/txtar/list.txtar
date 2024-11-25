@@ -45,6 +45,7 @@ additionalProperties: false
 import "list"
 
 @jsonschema(schema="http://json-schema.org/draft-07/schema#")
+
 close({
 	foo?: [...string]
 	tuple?: [string, int, 2, ...]
@@ -55,9 +56,9 @@ close({
 })
 -- out/decode/testerr/err-foo-not-string --
 foo.0: conflicting values true and string (mismatched types bool and string):
-    generated.cue:4:1
-    generated.cue:5:9
-    generated.cue:5:12
+    generated.cue:5:1
+    generated.cue:6:9
+    generated.cue:6:12
     test/err-foo-not-string.json:2:10
 -- test/empty.json --
 {}

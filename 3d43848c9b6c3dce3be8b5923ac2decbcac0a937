@@ -69,6 +69,24 @@
       "parentUuid": "a9d5f2cf_110ca4fa",
       "revId": "3d43848c9b6c3dce3be8b5923ac2decbcac0a937",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b07385d_aa091cea",
+        "filename": "cue/cuecontext/cuecontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-25T14:16:03Z",
+      "side": 1,
+      "message": "EvaluatorVersion as an option is different though, because we *will* use that long term - after evalv3 will come evalv4, then evalv5, etc. TopologicalSort as its own separate option will be deprecated and dead within six to twelve months, hopefully.\n\nWhy not expose a `func CUE_EXPERIMENT(s string) Option` as I described above? I realise it involves more work, and perhaps Marcel can help with that refactor, but then we have a single entrypoint for all experiments, which is consistent with `func CUE_DEBUG(s string) Option`, and we don\u0027t have to worry about deprecating `TopologicalSort`.\n\nIf Marcel disagrees with me here perhaps he can review - perhaps there is some argument against a CUE_EXPERIMENT Go option that I\u0027m not seeing.",
+      "parentUuid": "e1a0be3d_da936856",
+      "revId": "3d43848c9b6c3dce3be8b5923ac2decbcac0a937",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

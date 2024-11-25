@@ -50,6 +50,24 @@
       "message": "Maybe add this test in an earlier CL so we can verify that this change actually fixes the issue?",
       "revId": "676d389235dd0358398deb1fc2e4c4bce747221b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4aa21e57_7c628254",
+        "filename": "cue/load/loader_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 640,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-25T16:52:16Z",
+      "side": 1,
+      "message": "Please see the commit message, which alrady answers this.",
+      "parentUuid": "34756efe_2f7a44eb",
+      "revId": "676d389235dd0358398deb1fc2e4c4bce747221b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

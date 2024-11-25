@@ -106,6 +106,10 @@ func PackageFiles(fsys fs.FS, dir string, pkgQualifier string) func(func(ModuleF
 				if e.Name() == "cue.mod" {
 					inModRoot = true
 				}
+				if e.IsDir() {
+					// Directories are never package files, even when their filename ends with ".cue".
+					continue
+				}
 				pkgName, cont := yieldPackageFile(fsys, path.Join(dir, e.Name()), selectPackage, yield)
 				if !cont {
 					return

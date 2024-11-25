@@ -87,6 +87,24 @@
       "parentUuid": "e1a0be3d_da936856",
       "revId": "3d43848c9b6c3dce3be8b5923ac2decbcac0a937",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ec42a11_abfba266",
+        "filename": "cue/cuecontext/cuecontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-11-25T14:23:51Z",
+      "side": 1,
+      "message": "I\u0027ll do the `CUE_EXPERIMENT` func then. But I think it\u0027s really ugly from the UX pov.",
+      "parentUuid": "2b07385d_aa091cea",
+      "revId": "3d43848c9b6c3dce3be8b5923ac2decbcac0a937",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

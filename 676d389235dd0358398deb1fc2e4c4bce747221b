@@ -16,6 +16,40 @@
       "message": "CI fail was a net flake, rerunning.",
       "revId": "676d389235dd0358398deb1fc2e4c4bce747221b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "927259d5_8cb974a3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-25T16:32:21Z",
+      "side": 1,
+      "message": "LGTM with one small suggestion.",
+      "revId": "676d389235dd0358398deb1fc2e4c4bce747221b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34756efe_2f7a44eb",
+        "filename": "cue/load/loader_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 640,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-25T16:32:21Z",
+      "side": 1,
+      "message": "Maybe add this test in an earlier CL so we can verify that this change actually fixes the issue?",
+      "revId": "676d389235dd0358398deb1fc2e4c4bce747221b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -105,6 +105,24 @@
       "parentUuid": "2b07385d_aa091cea",
       "revId": "3d43848c9b6c3dce3be8b5923ac2decbcac0a937",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5ee0cc1_d6ef34fa",
+        "filename": "cue/cuecontext/cuecontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-25T14:54:00Z",
+      "side": 1,
+      "message": "I agree with Dan that we should ideally not add options here that are likely to change or be removed. I do not think we know yet how the sorting will end up being.\n\nWe can make the toposort option a cue-internal thing only (in runtime) if that suffices, so that tests can set it at will. In cuecontext we could still observe the CUE_EXPERIMENT flag as we do now for the version as well.",
+      "parentUuid": "7ec42a11_abfba266",
+      "revId": "3d43848c9b6c3dce3be8b5923ac2decbcac0a937",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

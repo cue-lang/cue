@@ -26,15 +26,15 @@ list: [1] | [2] | [3] | [4] // 184 conjuncts; 84  disjuncts (+33; +16)
 list: [1] | [2] | [3] | [4] // 217 conjuncts; 100 disjuncts (+33; +16)
 
 -- out/evalalpha/stats --
-Leaks:  26157
-Freed:  16399
-Reused: 16399
-Allocs: 26157
+Leaks:  25997
+Freed:  16398
+Reused: 16398
+Allocs: 25997
 Retain: 0
 
-Unifications: 4132
-Conjuncts:    71309
-Disjuncts:    21954
+Unifications: 4115
+Conjuncts:    71139
+Disjuncts:    21882
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -44,18 +44,18 @@ diff old new
 -Freed:  269
 -Reused: 258
 -Allocs: 11
-+Leaks:  26157
-+Freed:  16399
-+Reused: 16399
-+Allocs: 26157
++Leaks:  25997
++Freed:  16398
++Reused: 16398
++Allocs: 25997
  Retain: 0
  
 -Unifications: 131
 -Conjuncts:    755
 -Disjuncts:    269
-+Unifications: 4132
-+Conjuncts:    71309
-+Disjuncts:    21954
++Unifications: 4115
++Conjuncts:    71139
++Disjuncts:    21882
 -- out/eval/stats --
 Leaks:  0
 Freed:  269
@@ -66,35 +66,6 @@ Retain: 0
 Unifications: 131
 Conjuncts:    755
 Disjuncts:    269
--- out/evalalpha --
-(struct){
-  pat: (struct){
-  }
-  list: (list){ |((#list){
-      0: (int){ 1 }
-    }, (#list){
-      0: (int){ 2 }
-    }, (#list){
-      0: (int){ 3 }
-    }, (#list){
-      0: (int){ 4 }
-    }) }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,8 +1,6 @@
- (struct){
--  pat: (struct){ |((struct){
--    }, (struct){
--      a: (int){ 2 }
--    }) }
-+  pat: (struct){
-+  }
-   list: (list){ |((#list){
-       0: (int){ 1 }
-     }, (#list){
 -- out/eval --
 (struct){
   pat: (struct){ |((struct){

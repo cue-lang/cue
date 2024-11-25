@@ -310,14 +310,14 @@ issue2367: {
 }
 
 -- out/evalalpha/stats --
-Leaks:  775
+Leaks:  778
 Freed:  63
 Reused: 63
-Allocs: 775
+Allocs: 778
 Retain: 0
 
-Unifications: 495
-Conjuncts:    3328
+Unifications: 498
+Conjuncts:    3349
 Disjuncts:    196
 -- out/evalalpha --
 Errors:
@@ -431,14 +431,15 @@ Result:
       }
     }
     list: (struct){
-      panels: (_|_){
-        // [incomplete] selfReferential.list.panels: cannot range over panels (incomplete type _):
-        //     ./in.cue:103:15
+      panels: (#list){
         0: (struct){
+          id: (int){ 0 }
         }
         1: (struct){
+          id: (int){ 1 }
         }
         2: (struct){
+          id: (int){ 2 }
         }
       }
     }
@@ -779,26 +780,7 @@ diff old new
          }
        }
      }
-@@ -112,15 +109,14 @@
-       }
-     }
-     list: (struct){
--      panels: (#list){
-+      panels: (_|_){
-+        // [incomplete] selfReferential.list.panels: cannot range over panels (incomplete type _):
-+        //     ./in.cue:103:15
-         0: (struct){
--          id: (int){ 0 }
-         }
-         1: (struct){
--          id: (int){ 1 }
-         }
-         2: (struct){
--          id: (int){ 2 }
-         }
-       }
-     }
-@@ -127,9 +123,9 @@
+@@ -127,9 +124,9 @@
      insertionError: (_|_){
        // [eval]
        A: (_|_){
@@ -810,7 +792,7 @@ diff old new
        }
      }
      acrossOr: (struct){
-@@ -268,13 +264,17 @@
+@@ -268,13 +265,17 @@
                reject: (string){ string }
              }, (#struct){
                resource: (string){ string }
@@ -835,7 +817,7 @@ diff old new
          }) }
      }
      p2: (struct){
-@@ -328,7 +328,8 @@
+@@ -328,7 +329,8 @@
        }
      }
    }
@@ -845,7 +827,7 @@ diff old new
      t1: (struct){
        p1: (struct){
          D: (struct){
-@@ -361,35 +362,28 @@
+@@ -361,35 +363,28 @@
          }
        }
      }
@@ -913,17 +895,17 @@ diff old new
 -Reused: 1260
 -Allocs: 60
 -Retain: 145
-+Leaks:  775
++Leaks:  778
 +Freed:  63
 +Reused: 63
-+Allocs: 775
++Allocs: 778
 +Retain: 0
  
 -Unifications: 832
 -Conjuncts:    2525
 -Disjuncts:    1404
-+Unifications: 495
-+Conjuncts:    3328
++Unifications: 498
++Conjuncts:    3349
 +Disjuncts:    196
 -- out/eval/stats --
 Leaks:  50
@@ -938,7 +920,6 @@ Disjuncts:    1404
 -- diff/explanation --
 B.a.children: now correctly marked as incomplete
 -- diff/todo/p0 --
-selfReferential.list.panels: invalid incomplete error: related to "or" builtin
 siblingInsertion.t2: errors
 -- diff/todo/p2 --
 issue1881.#AllOutputs.retry: additional entry.

@@ -24,9 +24,9 @@ func constraintID(key string, n cue.Value, s *state) {
 	// URL: https://domain.com/schemas/foo.json
 	// anchors: #identifier
 	//
-	// TODO: mark identifiers.
+	// TODO: mark anchors
 
-	// Resolution must be relative to parent $id
+	// Resolution is relative to parent $id
 	// https://tools.ietf.org/html/draft-handrews-json-schema-02#section-8.2.2
 	u := s.resolveURI(n)
 	if u == nil {

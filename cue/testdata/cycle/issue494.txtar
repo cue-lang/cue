@@ -35,10 +35,8 @@ Conjuncts:    83
 Disjuncts:    45
 -- out/evalalpha --
 Errors:
-f.ben: incompatible list lengths (1 and 2):
-    ./in.cue:20:17
-g.ben: incompatible list lengths (1 and 2):
-    ./in.cue:23:17
+f.ben: incompatible list lengths (1 and 2)
+g.ben: incompatible list lengths (1 and 2)
 
 Result:
 (_|_){
@@ -93,8 +91,7 @@ Result:
   f: (_|_){
     // [eval]
     ben: (_|_){
-      // [eval] f.ben: incompatible list lengths (1 and 2):
-      //     ./in.cue:20:17
+      // [eval] f.ben: incompatible list lengths (1 and 2)
       0: (struct){
       }
     }
@@ -102,8 +99,7 @@ Result:
   g: (_|_){
     // [eval]
     ben: (_|_){
-      // [eval] g.ben: incompatible list lengths (1 and 2):
-      //     ./in.cue:23:17
+      // [eval] g.ben: incompatible list lengths (1 and 2)
       0: (struct){
       }
       1: (struct){
@@ -115,18 +111,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,6 +1,8 @@
- Errors:
--f.ben: incompatible list lengths (1 and 2)
--g.ben: incompatible list lengths (1 and 2)
-+f.ben: incompatible list lengths (1 and 2):
-+    ./in.cue:20:17
-+g.ben: incompatible list lengths (1 and 2):
-+    ./in.cue:23:17
- 
- Result:
- (_|_){
-@@ -41,13 +43,7 @@
+@@ -41,13 +41,7 @@
        }
      }
    }
@@ -141,32 +126,22 @@ diff old new
    e: (struct){
      ben: (#list){
        0: (struct){
-@@ -61,12 +57,9 @@
-   f: (_|_){
-     // [eval]
+@@ -63,10 +57,6 @@
      ben: (_|_){
--      // [eval] f.ben: incompatible list lengths (1 and 2)
--      0: (struct){
+       // [eval] f.ben: incompatible list lengths (1 and 2)
+       0: (struct){
 -        pos: (int){ 0 }
 -      }
 -      1: (struct){
 -        pos: (int){ 1 }
-+      // [eval] f.ben: incompatible list lengths (1 and 2):
-+      //     ./in.cue:20:17
-+      0: (struct){
        }
      }
    }
-@@ -73,9 +66,9 @@
-   g: (_|_){
-     // [eval]
+@@ -75,7 +65,6 @@
      ben: (_|_){
--      // [eval] g.ben: incompatible list lengths (1 and 2)
--      0: (struct){
+       // [eval] g.ben: incompatible list lengths (1 and 2)
+       0: (struct){
 -        pos: (int){ 0 }
-+      // [eval] g.ben: incompatible list lengths (1 and 2):
-+      //     ./in.cue:23:17
-+      0: (struct){
        }
        1: (struct){
        }

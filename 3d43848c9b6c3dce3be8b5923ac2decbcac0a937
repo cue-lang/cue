@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "166d9168_02cc6899",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-11-25T13:53:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "91ad8988_2904b109",
+      "revId": "3d43848c9b6c3dce3be8b5923ac2decbcac0a937",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a9d5f2cf_110ca4fa",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-11-25T13:42:55Z",
       "side": 1,
       "message": "thinking outloud for a second, do we actually want this in the public API?\n\nmy impression is that we will soon get to a point where `CUE_EXPERIMENT\u003dtoposort` is on by default, and then sometime after we will remove the option to disable it via `CUE_EXPERIMENT\u003dtoposort\u003d0`, which will allow us to delete all the old sorting code. with the assumption that the old sorting was arbitrary, undocumented, and noone should need to stick to it.\n\nat that point... why would we want a TopologicalSort option? it would be deprecated or a no-op, both of which are best avoided.\n\nif what you are trying to solve is how to enable this from Go code, users could always do `os.Setenv(\"CUE_EXPERIMENT\", \"toposort\")` - not ideal, but it does work. Or, alternatively as a nicer API, next to the existing `func CUE_DEBUG(s string) Option` we could add `func CUE_EXPERIMENT(s string) Option`.",
+      "revId": "3d43848c9b6c3dce3be8b5923ac2decbcac0a937",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e1a0be3d_da936856",
+        "filename": "cue/cuecontext/cuecontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-11-25T13:53:02Z",
+      "side": 1,
+      "message": "I would expect that toposort as an experiment will only invert once we switch the default eval to v3. It is already part of the public API because CUE_EXPERIMENT is public API. All env vars are.\n\nI was using `os.Setenv` in some tests earlier, and Marcel (and I) didn\u0027t like it, so I added it to runtime, which was sufficient for toposort/sort_test.go. It was a mistake to add it to runtime and forget to add it as an option to cuecontext.\n\nFor any development work atm, I\u0027m doing\n\n```\n\tctx :\u003d cuecontext.New(cuecontext.EvaluatorVersion(cuecontext.EvalExperiment))\n```\n\nIt\u0027s quite bad to not also set the toposort the same way. Having to cope with a mixture of config via env vars and config via code is quite awful imo.",
+      "parentUuid": "a9d5f2cf_110ca4fa",
       "revId": "3d43848c9b6c3dce3be8b5923ac2decbcac0a937",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

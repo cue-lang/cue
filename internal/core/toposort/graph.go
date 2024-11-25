@@ -71,12 +71,20 @@ type edge struct {
 }
 
 type GraphBuilder struct {
+	allowEdges     bool
 	edgesSet       map[edge]struct{}
 	nodesByFeature map[adt.Feature]*Node
 }
 
-func NewGraphBuilder() *GraphBuilder {
+// NewGraphBuilder is the constructor for GraphBuilder.
+//
+// If you disallow edges, then nodes can still be added to the graph,
+// and the [AddEdge] method will not error, but edges will never be
+// added between nodes. This has the effect that topological ordering
+// is not possible.
+func NewGraphBuilder(allowEdges bool) *GraphBuilder {
 	return &GraphBuilder{
+		allowEdges:     allowEdges,
 		edgesSet:       make(map[edge]struct{}),
 		nodesByFeature: make(map[adt.Feature]*Node),
 	}
@@ -87,6 +95,12 @@ func NewGraphBuilder() *GraphBuilder {
 // multiple calls with the same arguments will not create multiple
 // edges, nor error.
 func (builder *GraphBuilder) AddEdge(from, to adt.Feature) {
+	if !builder.allowEdges {
+		builder.EnsureNode(from)
+		builder.EnsureNode(to)
+		return
+	}
+
 	edge := edge{from: from, to: to}
 	if _, found := builder.edgesSet[edge]; found {
 		return

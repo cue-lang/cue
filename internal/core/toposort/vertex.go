@@ -397,10 +397,10 @@ func comparePos(aPos, bPos token.Pos) int {
 	return cmp.Compare(aPos.Offset(), bPos.Offset())
 }
 
-func VertexFeatures(index adt.StringIndexer, v *adt.Vertex) []adt.Feature {
-	debug("\n*** V (%s %v %p) ***\n", v.Label.RawString(index), v.Label, v)
+func VertexFeatures(ctx *adt.OpContext, v *adt.Vertex) []adt.Feature {
+	debug("\n*** V (%s %v %p) ***\n", v.Label.RawString(ctx), v.Label, v)
 
-	builder := NewGraphBuilder()
+	builder := NewGraphBuilder(!ctx.Config.LexicoSort)
 	dynFieldsMap := dynamicFieldsFeatures(v)
 	roots, outgoing := analyseStructs(v, builder)
 
@@ -446,7 +446,7 @@ func VertexFeatures(index adt.StringIndexer, v *adt.Vertex) []adt.Feature {
 	}
 
 	debug("edges: %v\n", builder.edgesSet)
-	return builder.Build().Sort(index)
+	return builder.Build().Sort(ctx)
 }
 
 func (vf *vertexFeatures) addEdges(previous []adt.Feature, sMeta *structMeta) []adt.Feature {

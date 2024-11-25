@@ -238,7 +238,7 @@ func featuresNames(index adt.StringIndexer, features []adt.Feature) []string {
 }
 
 func buildGraphFromPermutation(permutation [][]adt.Feature) *toposort.Graph {
-	builder := toposort.NewGraphBuilder()
+	builder := toposort.NewGraphBuilder(true)
 
 	for _, chain := range permutation {
 		if len(chain) == 0 {

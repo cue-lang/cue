@@ -31,6 +31,9 @@ type Config struct {
 
 	// Sharing enables structure sharing.
 	Sharing bool `envflag:"default:true"`
+
+	// LexicoSort forces fields in a struct to be sorted lexicographically.
+	LexicoSort bool
 }
 
 // Init initializes Flags. Note: this isn't named "init" because we

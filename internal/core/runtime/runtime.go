@@ -91,6 +91,7 @@ func (r *Runtime) SetTopologicalSort(b bool) {
 // be set before first use.
 func (r *Runtime) SetDebugOptions(flags *cuedebug.Config) {
 	r.flags = *flags
+	r.topoSort = r.topoSort || r.flags.LexicoSort
 }
 
 // IsInitialized reports whether the runtime has been initialized.

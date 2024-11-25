@@ -32,37 +32,44 @@ func TestTopologicalSort(t *testing.T) {
 		Matrix: cuetdtest.SmallMatrix,
 	}
 
-	test.Run(t, func(t *cuetxtar.Test) {
-		run := t.Runtime()
-		run.SetTopologicalSort(true)
-		inst := t.Instance()
+	for _, lexico := range []bool{false, true} {
+		t.Run(fmt.Sprintf("lexicographical=%v", lexico), func(t *testing.T) {
+			test.Name = t.Name()
+			test.Run(t, func(t *cuetxtar.Test) {
+				t.Flags.LexicoSort = lexico
+				run := t.Runtime()
+				run.SetTopologicalSort(true)
 
-		v, err := run.Build(nil, inst)
-		if err != nil {
-			t.Fatal(err)
-		}
+				inst := t.Instance()
 
-		v.Finalize(eval.NewContext(run, v))
+				v, err := run.Build(nil, inst)
+				if err != nil {
+					t.Fatal(err)
+				}
 
-		evalWithOptions := export.Profile{
-			TakeDefaults:    true,
-			ShowOptional:    true,
-			ShowDefinitions: true,
-			ShowAttributes:  true,
-		}
+				v.Finalize(eval.NewContext(run, v))
 
-		expr, err := evalWithOptions.Value(run, inst.ID(), v)
-		if err != nil {
-			t.Fatal(err)
-		}
+				evalWithOptions := export.Profile{
+					TakeDefaults:    true,
+					ShowOptional:    true,
+					ShowDefinitions: true,
+					ShowAttributes:  true,
+				}
 
-		{
-			b, err := format.Node(expr)
-			if err != nil {
-				t.Fatal(err)
-			}
-			_, _ = t.Write(b)
-			fmt.Fprintln(t)
-		}
-	})
+				expr, err := evalWithOptions.Value(run, inst.ID(), v)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				{
+					b, err := format.Node(expr)
+					if err != nil {
+						t.Fatal(err)
+					}
+					_, _ = t.Write(b)
+					fmt.Fprintln(t)
+				}
+			})
+		})
+	}
 }

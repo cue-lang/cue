@@ -33,14 +33,14 @@ C: #steps: #Script & {mount: [B]}
 
 #ref: {a: 1} | {b: 2}
 -- out/evalalpha/stats --
-Leaks:  163
+Leaks:  158
 Freed:  10
 Reused: 10
-Allocs: 163
+Allocs: 158
 Retain: 0
 
-Unifications: 53
-Conjuncts:    407
+Unifications: 56
+Conjuncts:    461
 Disjuncts:    40
 -- out/evalalpha --
 (struct){
@@ -545,17 +545,17 @@ diff old new
 -Reused: 24051
 -Allocs: 45
 -Retain: 1
-+Leaks:  163
++Leaks:  158
 +Freed:  10
 +Reused: 10
-+Allocs: 163
++Allocs: 158
 +Retain: 0
  
 -Unifications: 18724
 -Conjuncts:    100730
 -Disjuncts:    24097
-+Unifications: 53
-+Conjuncts:    407
++Unifications: 56
++Conjuncts:    461
 +Disjuncts:    40
 -- out/eval/stats --
 Leaks:  0

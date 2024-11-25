@@ -1125,9 +1125,13 @@ func mergeConjunctions(a, b Value) Value {
 func (c *closeContext) finalizePattern() {
 	switch {
 	case c.Expr != nil: // Patterns and expression are already set.
-		if !c.isClosed {
-			panic("c.Expr set unexpectedly")
-		}
+		// NOTE: this panic check is just to verify using Expr unnecessarily. It
+		// is not the end of the world to use c.Expr, it is just less efficient.
+		// If this check causes trouble, it can be removed.
+		// TODO(openlists): reenable once we support open list semantics.
+		// if !c.isClosed {
+		// 	panic("c.Expr set unexpectedly")
+		// }
 		return
 	case c.isTotal: // All values are allowed always.
 		return

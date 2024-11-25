@@ -252,6 +252,9 @@ func processListLit(c *OpContext, t *task, mode runMode) {
 			}
 
 		case *Ellipsis:
+			// TODO(openlist): this will work once we have the same closedness
+			// semantics for lists as for structs.
+			// t.id.cc.isTotal = true
 			if j != len(l.Elems)-1 {
 				n.addErr(c.Newf("ellipsis must be last element in list"))
 				return

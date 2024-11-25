@@ -12,8 +12,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: anchors (foo) not supported (and 1 more errors)",
-			"v3": "extract error: anchors (foo) not supported (and 1 more errors)"
+			"v2": "extract error: cannot map reference: non-empty JSON pointer must start with / (and 1 more errors)",
+			"v3": "extract error: cannot map reference: non-empty JSON pointer must start with / (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -50,8 +50,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: anchors (foo) not supported (and 1 more errors)",
-			"v3": "extract error: anchors (foo) not supported (and 1 more errors)"
+			"v2": "extract error: cannot map reference: non-empty JSON pointer must start with / (and 1 more errors)",
+			"v3": "extract error: cannot map reference: non-empty JSON pointer must start with / (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -93,8 +93,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: anchors (foo) not supported (and 1 more errors)",
-			"v3": "extract error: anchors (foo) not supported (and 1 more errors)"
+			"v2": "extract error: cannot map reference: non-empty JSON pointer must start with / (and 1 more errors)",
+			"v3": "extract error: cannot map reference: non-empty JSON pointer must start with / (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -141,8 +141,8 @@
 			"$ref": "child1#my_anchor"
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$anchor\" not yet implemented (and 2 more errors)",
-			"v3": "extract error: keyword \"$anchor\" not yet implemented (and 2 more errors)"
+			"v2": "extract error: cannot map reference: non-empty JSON pointer must start with / (and 1 more errors)",
+			"v3": "extract error: cannot map reference: non-empty JSON pointer must start with / (and 1 more errors)"
 		},
 		"tests": [
 			{

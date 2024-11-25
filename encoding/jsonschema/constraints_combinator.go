@@ -33,7 +33,7 @@ func constraintAllOf(key string, n cue.Value, s *state) {
 	}
 	a := make([]ast.Expr, 0, len(items))
 	for _, v := range items {
-		x, sub := s.schemaState(v, s.allowedTypes, nil)
+		x, sub := s.schemaState(v, s.allowedTypes)
 		s.allowedTypes &= sub.allowedTypes
 		if sub.hasConstraints {
 			// This might seem a little odd, since the actual
@@ -79,7 +79,7 @@ func constraintAnyOf(key string, n cue.Value, s *state) {
 	}
 	a := make([]ast.Expr, 0, len(items))
 	for _, v := range items {
-		x, sub := s.schemaState(v, s.allowedTypes, nil)
+		x, sub := s.schemaState(v, s.allowedTypes)
 		if sub.allowedTypes == 0 {
 			// Nothing is allowed; omit.
 			continue
@@ -123,7 +123,7 @@ func constraintOneOf(key string, n cue.Value, s *state) {
 	}
 	a := make([]ast.Expr, 0, len(items))
 	for _, v := range items {
-		x, sub := s.schemaState(v, s.allowedTypes, nil)
+		x, sub := s.schemaState(v, s.allowedTypes)
 		if sub.allowedTypes == 0 {
 			// Nothing is allowed; omit
 			continue
@@ -133,8 +133,9 @@ func constraintOneOf(key string, n cue.Value, s *state) {
 		if sub.hasConstraints {
 			needsConstraint = true
 		} else if (types & sub.allowedTypes) != 0 {
-			// If there's overlap between the unconstrained elements,
-			// we'll definitely need to add a constraint.
+			// If there's overlap between the
+			// uncontrained elements, we'll definitely
+			// need to add a constraint.
 			needsConstraint = true
 		}
 		types |= sub.allowedTypes
@@ -198,14 +199,14 @@ func constraintIfThenElse(s *state) {
 		return
 	}
 	var ifExpr, thenExpr, elseExpr ast.Expr
-	ifExpr, ifSub := s.schemaState(s.ifConstraint, s.allowedTypes, nil)
+	ifExpr, ifSub := s.schemaState(s.ifConstraint, s.allowedTypes)
 	if hasThen {
 		// The allowed types of the "then" constraint are constrained both
 		// by the current constraints and the "if" constraint.
-		thenExpr, _ = s.schemaState(s.thenConstraint, s.allowedTypes&ifSub.allowedTypes, nil)
+		thenExpr, _ = s.schemaState(s.thenConstraint, s.allowedTypes&ifSub.allowedTypes)
 	}
 	if hasElse {
-		elseExpr, _ = s.schemaState(s.elseConstraint, s.allowedTypes, nil)
+		elseExpr, _ = s.schemaState(s.elseConstraint, s.allowedTypes)
 	}
 	if thenExpr == nil {
 		thenExpr = top()

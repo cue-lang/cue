@@ -34,8 +34,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$anchor\" not yet implemented (and 1 more errors)",
-			"v3": "extract error: keyword \"$anchor\" not yet implemented (and 1 more errors)"
+			"v2": "extract error: cannot map reference: non-empty JSON pointer must start with / (and 1 more errors)",
+			"v3": "extract error: cannot map reference: non-empty JSON pointer must start with / (and 1 more errors)"
 		},
 		"tests": [
 			{

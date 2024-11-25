@@ -68,8 +68,8 @@
 			"$ref": "http://localhost:1234/draft2019-09/locationIndependentIdentifier.json#foo"
 		},
 		"skip": {
-			"v2": "extract error: anchors (foo) not supported",
-			"v3": "extract error: anchors (foo) not supported"
+			"v2": "extract error: cannot map reference: non-empty JSON pointer must start with /",
+			"v3": "extract error: cannot map reference: non-empty JSON pointer must start with /"
 		},
 		"tests": [
 			{

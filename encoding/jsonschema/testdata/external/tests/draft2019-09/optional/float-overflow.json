@@ -12,8 +12,8 @@
 				"data": 1E+308,
 				"valid": true,
 				"skip": {
-					"v2": "conflicting values 1E+308 and int (mismatched types float and int):\n    generated.cue:4:1\n    instance.json:1:1\n",
-					"v3": "conflicting values 1E+308 and int (mismatched types float and int):\n    generated.cue:4:1\n    instance.json:1:1\n"
+					"v2": "conflicting values 1E+308 and int (mismatched types float and int):\n    generated.cue:3:1\n    instance.json:1:1\n",
+					"v3": "conflicting values 1E+308 and int (mismatched types float and int):\n    generated.cue:3:1\n    instance.json:1:1\n"
 				}
 			}
 		]

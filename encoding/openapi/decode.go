@@ -144,7 +144,7 @@ func Extract(data cue.InstanceOrValue, c *Config) (*ast.File, error) {
 	return f, nil
 }
 
-const oapiSchemas = "#/components/schemas/"
+const oapiSchemas = "#/components/schemas"
 
 // rootDefs is the fallback for schemas that are not valid identifiers.
 // TODO: find something more principled.

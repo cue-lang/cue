@@ -13,8 +13,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: bar: reference \"_X0\" not found:\n    generated.cue:3:8\n",
-			"v3": "extract error: cannot compile resulting schema: bar: reference \"_X0\" not found:\n    generated.cue:3:8\n"
+			"v2": "extract error: cannot compile resulting schema: bar: reference \"_#defs\" not found:\n    generated.cue:3:8\n",
+			"v3": "extract error: cannot compile resulting schema: bar: reference \"_#defs\" not found:\n    generated.cue:3:8\n"
 		},
 		"tests": [
 			{
@@ -57,8 +57,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: bar: reference \"foo\" not found:\n    generated.cue:4:10\n",
-			"v3": "extract error: cannot compile resulting schema: bar: reference \"foo\" not found:\n    generated.cue:4:10\n"
+			"v2": "extract error: cannot compile resulting schema: bar: reference \"_#defs\" not found:\n    generated.cue:4:8\n",
+			"v3": "extract error: cannot compile resulting schema: bar: reference \"_#defs\" not found:\n    generated.cue:4:8\n"
 		},
 		"tests": [
 			{
@@ -98,8 +98,8 @@
 			"$ref": "#/examples/0"
 		},
 		"skip": {
-			"v2": "extract error: reference to non-existing value \"examples\"",
-			"v3": "extract error: reference to non-existing value \"examples\""
+			"v2": "extract error: cannot compile resulting schema: reference \"_#defs\" not found:\n    generated.cue:4:2\n",
+			"v3": "extract error: cannot compile resulting schema: reference \"_#defs\" not found:\n    generated.cue:4:2\n"
 		},
 		"tests": [
 			{

@@ -56,6 +56,11 @@ type DebugConfig struct {
 	// IncludeNodeRefs causes a Node reference in an identifier
 	// to indicate which (if any) ast.Node it refers to.
 	IncludeNodeRefs bool
+
+	// IncludePointers causes all nodes to be printed with their
+	// pointer values; references will also be printed as pointers
+	// when IncludeNodeRefs is true.
+	IncludePointers bool
 }
 
 type debugPrinter struct {
@@ -82,6 +87,7 @@ func (d *debugPrinter) value0(v reflect.Value, impliedType reflect.Type) {
 	// Skip over interfaces and pointers, stopping early if nil.
 	concreteType := v.Type()
 	refName := ""
+	ptrVal := uintptr(0)
 	for {
 		k := v.Kind()
 		if k != reflect.Interface && k != reflect.Pointer {
@@ -97,6 +103,7 @@ func (d *debugPrinter) value0(v reflect.Value, impliedType reflect.Type) {
 			if n, ok := v.Interface().(ast.Node); ok {
 				if id, ok := d.nodeRefs[n]; ok {
 					refName = refIDToName(id)
+					ptrVal = v.Pointer()
 				}
 			}
 		}
@@ -143,7 +150,11 @@ func (d *debugPrinter) value0(v reflect.Value, impliedType reflect.Type) {
 		if concreteType != impliedType {
 			d.printf("%s", concreteType)
 		}
-		if refName != "" {
+		if d.cfg.IncludePointers {
+			if ptrVal != 0 {
+				d.printf("@%#x", ptrVal)
+			}
+		} else if refName != "" {
 			d.printf("@%s", refName)
 		}
 		d.printf("{")
@@ -192,11 +203,18 @@ func (d *debugPrinter) structFields(v reflect.Value) (anyElems bool) {
 		}
 		if f.Name == "Node" {
 			nodeVal := v.Field(i)
-			if !d.cfg.IncludeNodeRefs || nodeVal.IsNil() {
+			if (!d.cfg.IncludeNodeRefs && !d.cfg.IncludePointers) || nodeVal.IsNil() {
 				continue
 			}
 			d.newline()
-			d.printf("Node: @%s (%v)", refIDToName(d.nodeRefs[nodeVal.Interface().(ast.Node)]), nodeVal.Elem().Type())
+			if d.cfg.IncludePointers {
+				if nodeVal.Kind() == reflect.Interface {
+					nodeVal = nodeVal.Elem()
+				}
+				d.printf("Node: @%#v (%v)", nodeVal.Pointer(), nodeVal.Elem().Type())
+			} else {
+				d.printf("Node: @%s (%v)", refIDToName(d.nodeRefs[nodeVal.Interface().(ast.Node)]), nodeVal.Elem().Type())
+			}
 			continue
 		}
 		switch f.Name {

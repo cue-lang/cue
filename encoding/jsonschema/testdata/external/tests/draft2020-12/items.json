@@ -127,8 +127,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:4:12\n",
-			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:4:12\n"
+			"v2": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:10:13\n",
+			"v3": "extract error: cannot compile resulting schema: explicit error (_|_ literal) in source:\n    generated.cue:10:13\n"
 		},
 		"tests": [
 			{

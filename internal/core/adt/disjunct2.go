@@ -446,7 +446,7 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode) (*node
 
 	v.unify(n.ctx, allKnown, mode)
 
-	if err := d.getError(); err != nil && !isCyclePlaceholder(err) {
+	if err := d.getErrorAll(); err != nil && !isCyclePlaceholder(err) {
 		d.free()
 		return nil, err
 	}
@@ -499,6 +499,22 @@ func (n *nodeContext) finalizeDisjunctions() {
 	// information than incorrect information.
 	v.Arcs = nil
 	v.ChildErrors = nil
+}
+
+func (n *nodeContext) getErrorAll() *Bottom {
+	err := n.getError()
+	if err != nil {
+		return err
+	}
+	for _, a := range n.node.Arcs {
+		n := a.getState(n.ctx)
+		if n != nil {
+			if err := n.getErrorAll(); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func (n *nodeContext) getError() *Bottom {

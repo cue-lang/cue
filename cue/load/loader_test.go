@@ -636,7 +636,21 @@ display:.
 files:
     $CWD/testdata/testmod/test.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
+		// This tests that we can load a CUE package by pointing Dir to it
+		// even when the package's directory name ends with ".cue".
+		name: "DirWithCUEFileExtension",
+		cfg: &Config{
+			Dir: filepath.Join(testdataDir, "testdir.cue"),
+		},
+		args: []string{"."},
+		want: `path:   mod.test/test/testdir.cue@v0:testdir
+module: mod.test/test@v0
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/testdir.cue
+display:.
+files:
+    $CWD/testdata/testmod/testdir.cue/test.cue`,
 	}}
 	tdtest.Run(t, testCases, func(t *tdtest.T, tc *loadTest) {
 		pkgs := Instances(tc.args, tc.cfg)

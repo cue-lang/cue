@@ -21,6 +21,7 @@
 -- out/decode/extract --
 // example jsonschema
 @jsonschema(schema="http://json-schema.org/draft-04/schema#")
+
 close({
 	@jsonschema(id="https://example.test/example")
 

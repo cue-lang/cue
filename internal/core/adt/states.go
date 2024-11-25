@@ -138,7 +138,11 @@ const (
 	// This is a signal condition that is reached when:
 	//    - allFieldsKnown is reached (all expressions have )
 	//    - it is unified with an associative list type
-	listTypeKnown
+	//
+	// TODO(assoclist): this is set to 0 below: This mode is only needed for
+	// associative lists and is not yet used. We should use this again and fix
+	// any performance issues when we implement associative lists.
+	// listTypeKnown
 
 	// fieldConjunctsKnown means that all the conjuncts of all fields are
 	// known.
@@ -224,6 +228,9 @@ const (
 	// concreteKnown means that we know whether a value is concrete or not.
 	// At the moment this is equal to 'scalarKnown'.
 	concreteKnown = scalarKnown
+
+	// TODO(assoclist): see comment above.
+	listTypeKnown condition = 0
 )
 
 // schedConfig configures a taskContext with the states needed for the

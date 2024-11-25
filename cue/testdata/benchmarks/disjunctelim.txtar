@@ -26,15 +26,15 @@ list: [1] | [2] | [3] | [4] // 184 conjuncts; 84  disjuncts (+33; +16)
 list: [1] | [2] | [3] | [4] // 217 conjuncts; 100 disjuncts (+33; +16)
 
 -- out/evalalpha/stats --
-Leaks:  25997
-Freed:  16398
-Reused: 16398
-Allocs: 25997
+Leaks:  182
+Freed:  90
+Reused: 90
+Allocs: 182
 Retain: 0
 
-Unifications: 4115
-Conjuncts:    71139
-Disjuncts:    21882
+Unifications: 20
+Conjuncts:    327
+Disjuncts:    138
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -44,18 +44,18 @@ diff old new
 -Freed:  269
 -Reused: 258
 -Allocs: 11
-+Leaks:  25997
-+Freed:  16398
-+Reused: 16398
-+Allocs: 25997
++Leaks:  182
++Freed:  90
++Reused: 90
++Allocs: 182
  Retain: 0
  
 -Unifications: 131
 -Conjuncts:    755
 -Disjuncts:    269
-+Unifications: 4115
-+Conjuncts:    71139
-+Disjuncts:    21882
++Unifications: 20
++Conjuncts:    327
++Disjuncts:    138
 -- out/eval/stats --
 Leaks:  0
 Freed:  269

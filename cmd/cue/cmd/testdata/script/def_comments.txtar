@@ -85,6 +85,9 @@ stdout 'description of foo'
   }
 }
 -- stdout1 --
+// This is a title
+//
+// top description
 null | bool | number | string | [...] | {
 	// a description
 	a?: {
@@ -95,6 +98,9 @@ null | bool | number | string | [...] | {
 	...
 }
 -- stdout1-def --
+// This is a title
+//
+// top description
 #top: null | bool | number | string | [...] | {
 	// a description
 	a?: {
@@ -126,6 +132,7 @@ null | bool | number | string | [...] | {
 // This is a title
 //
 // top description
+// a description
 a?: {
 	// b description
 	b?: number
@@ -133,10 +140,11 @@ a?: {
 }
 ...
 -- stdout2-def --
+// This is a title
+//
+// top description
 #top: {
-	// This is a title
-	//
-	// top description
+	// a description
 	a?: {
 		// b description
 		b?: number

@@ -15,9 +15,13 @@
 package jsonschema
 
 import (
+	"errors"
+	"fmt"
+	"net/url"
+	"strings"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
 
@@ -25,42 +29,19 @@ import (
 
 func constraintAddDefinitions(key string, n cue.Value, s *state) {
 	if n.Kind() != cue.StructKind {
-		s.errf(n, `"definitions" expected an object, found %s`, n.Kind())
+		s.errf(n, `%q expected an object, found %s`, key, n.Kind())
 	}
 
 	s.processMap(n, func(key string, n cue.Value) {
-		name := key
-
-		var f *ast.Field
-
-		ident := "#" + name
-		if ast.IsValidIdent(ident) {
-			expr, sub := s.schemaState(n, allTypes, []label{{ident, true}})
-			f = &ast.Field{
-				Label: ast.NewIdent(ident),
-				Value: expr,
-			}
-			sub.doc(f)
-		} else {
-			expr, sub := s.schemaState(n, allTypes, []label{{"#", true}, {name: name}})
-			inner := ast.NewStruct(&ast.Field{
-				Label: ast.NewString(name),
-				Value: expr,
-			})
-			// Ensure that we get `#: foo: ...` not `#: {foo: ...}`
-			inner.Lbrace = token.NoPos
-			ident = "#"
-			f = &ast.Field{
-				Label: ast.NewIdent("#"),
-				Value: inner,
-			}
-			sub.doc(f)
-		}
-
-		ast.SetRelPos(f, token.NewSection)
-		s.definitions = append(s.definitions, f)
-		s.setField(label{name: ident, isDef: true}, f)
+		// Ensure that we are going to make a definition
+		// for this node.
+		s.ensureDefinition(n)
+		s.schema(n)
 	})
+}
+
+func constraintAnchor(key string, n cue.Value, s *state) {
+	s.anchorName, _ = s.strValue(n)
 }
 
 func constraintComment(key string, n cue.Value, s *state) {
@@ -122,7 +103,6 @@ func constraintExamples(key string, n cue.Value, s *state) {
 }
 
 func constraintNullable(key string, n cue.Value, s *state) {
-	// TODO: only allow for OpenAPI.
 	null := ast.NewNull()
 	setPos(null, n)
 	s.nullable = null
@@ -130,18 +110,73 @@ func constraintNullable(key string, n cue.Value, s *state) {
 
 func constraintRef(key string, n cue.Value, s *state) {
 	u := s.resolveURI(n)
-
-	fragmentParts, err := splitFragment(u)
-	if err != nil {
-		s.addErr(errors.Newf(n.Pos(), "%v", err))
+	if u == nil {
 		return
 	}
-	expr := s.makeCUERef(n, u, fragmentParts)
-	if expr == nil {
-		expr = &ast.BadExpr{From: n.Pos()}
+	schemaRoot := s.schemaRoot()
+	if u.Fragment == "" && schemaRoot.isRoot && sameSchemaRoot(u, schemaRoot.id) {
+		// It's a reference to the root of the schema being
+		// generated. This never maps to something different.
+		s.all.add(n, s.refExpr(n, "", cue.Path{}))
+		return
 	}
+	importPath, path, err := cueLocationForRef(s, n, u, schemaRoot)
+	if err != nil {
+		s.errf(n, "%v", err)
+		return
+	}
+	if e := s.refExpr(n, importPath, path); e != nil {
+		s.all.add(n, e)
+	}
+}
 
-	s.all.add(n, expr)
+func cueLocationForRef(s *state, n cue.Value, u *url.URL, schemaRoot *state) (importPath string, path cue.Path, err error) {
+	// If we already know about the schema, then use that reference.
+	if ds, ok := s.defs[u.String()]; ok {
+		// We already know about the schema, so use the information that's stored for it.
+		return ds.importPath, ds.path, nil
+	}
+	loc := SchemaLoc{
+		ID: u,
+	}
+	var base cue.Value
+	isAnchor := u.Fragment != "" && !strings.HasPrefix(u.Fragment, "/")
+	if !isAnchor {
+		// It's a JSON pointer reference.
+		if sameSchemaRoot(u, s.rootID) {
+			base = s.root
+		} else if sameSchemaRoot(u, schemaRoot.id) {
+			// it's within the current schema.
+			base = schemaRoot.pos
+		}
+		if base.Exists() {
+			target, err := lookupJSONPointer(schemaRoot.pos, u.Fragment)
+			if err != nil {
+				if errors.Is(err, errRefNotFound) {
+					return "", cue.Path{}, fmt.Errorf("reference to non-existent schema")
+				}
+				return "", cue.Path{}, fmt.Errorf("invalid JSON Pointer: %v", err)
+			}
+			if ds := s.defForValue.get(target); ds != nil {
+				// There's a definition in place for the value, which gives
+				// us our answer.
+				return ds.importPath, ds.path, nil
+			}
+			s.ensureDefinition(target)
+			loc.IsLocal = true
+			loc.Path = relPath(target, s.root)
+		}
+	}
+	importPath, path, err = s.cfg.MapRef(loc)
+	if err != nil {
+		return "", cue.Path{}, fmt.Errorf("cannot determine CUE location for JSON Schema location %v: %v", loc, err)
+	}
+	// TODO we'd quite like to avoid invoking MapRef many times
+	// for the same reference, but in general we don't necessily know
+	// the canonical URI of the schema until we've done at least one pass.
+	// There are potentially ways to do it, but leave it for now in favor
+	// of simplicity.
+	return importPath, path, nil
 }
 
 func constraintTitle(key string, n cue.Value, s *state) {

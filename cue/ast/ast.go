@@ -945,10 +945,6 @@ func (d *EmbedDecl) End() token.Pos { return d.Expr.End() }
 // Files and packages
 
 // A File node represents a CUE source file.
-//
-// The Comments list contains all comments in the source file in order of
-// appearance, including the comments that are pointed to from other nodes
-// via Doc and Comment fields.
 type File struct {
 	Filename string
 	Decls    []Decl // top-level declarations; or nil

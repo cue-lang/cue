@@ -216,8 +216,8 @@
 				"data": "\u000b",
 				"valid": true,
 				"skip": {
-					"v2": "invalid value \"\\v\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    generated.cue:1:1\n    instance.json:1:1\n",
-					"v3": "invalid value \"\\v\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+					"v2": "invalid value \"\\v\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n",
+					"v3": "invalid value \"\\v\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -230,8 +230,8 @@
 				"data": " ",
 				"valid": true,
 				"skip": {
-					"v2": "invalid value \"\\u00a0\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    generated.cue:1:1\n    instance.json:1:1\n",
-					"v3": "invalid value \"\\u00a0\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+					"v2": "invalid value \"\\u00a0\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n",
+					"v3": "invalid value \"\\u00a0\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -239,8 +239,8 @@
 				"data": "\ufeff",
 				"valid": true,
 				"skip": {
-					"v2": "invalid value \"\\ufeff\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    generated.cue:1:1\n    instance.json:1:1\n",
-					"v3": "invalid value \"\\ufeff\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+					"v2": "invalid value \"\\ufeff\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n",
+					"v3": "invalid value \"\\ufeff\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -253,8 +253,8 @@
 				"data": "\u2029",
 				"valid": true,
 				"skip": {
-					"v2": "invalid value \"\\u2029\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    generated.cue:1:1\n    instance.json:1:1\n",
-					"v3": "invalid value \"\\u2029\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+					"v2": "invalid value \"\\u2029\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n",
+					"v3": "invalid value \"\\u2029\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n"
 				}
 			},
 			{
@@ -262,8 +262,8 @@
 				"data": " ",
 				"valid": true,
 				"skip": {
-					"v2": "invalid value \"\\u2003\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    generated.cue:1:1\n    instance.json:1:1\n",
-					"v3": "invalid value \"\\u2003\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:2:1\n    generated.cue:1:1\n    instance.json:1:1\n"
+					"v2": "invalid value \"\\u2003\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n",
+					"v3": "invalid value \"\\u2003\" (out of bound =~\"^\\\\s$\"):\n    generated.cue:3:1\n    generated.cue:1:1\n    instance.json:1:1\n"
 				}
 			},
 			{

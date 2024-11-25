@@ -92,6 +92,13 @@ func EvaluatorVersion(v EvalVersion) Option {
 	}}
 }
 
+// TopologicalSort sets whether or not to use topological sorting.
+func TopologicalSort(b bool) Option {
+	return Option{func(r *runtime.Runtime) {
+		r.SetTopologicalSort(b)
+	}}
+}
+
 // CUE_DEBUG takes a string with the same contents as CUE_DEBUG and configures
 // the context with the relevant debug options. It panics for unknown or
 // malformed options.

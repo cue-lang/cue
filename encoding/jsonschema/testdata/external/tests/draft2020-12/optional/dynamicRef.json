@@ -42,8 +42,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$dynamicRef\" not yet implemented (and 2 more errors)",
-			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 2 more errors)"
+			"v2": "extract error: keyword \"$dynamicRef\" not yet implemented (and 5 more errors)",
+			"v3": "extract error: keyword \"$dynamicRef\" not yet implemented (and 5 more errors)"
 		},
 		"tests": [
 			{

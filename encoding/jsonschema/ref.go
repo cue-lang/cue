@@ -15,6 +15,7 @@
 package jsonschema
 
 import (
+	"encoding/base64"
 	"fmt"
 	"net/url"
 	"path"
@@ -26,38 +27,102 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
-	"cuelang.org/go/mod/module"
 )
 
-func (d *decoder) parseRef(p token.Pos, str string) []string {
+func parseRootRef(str string) (cue.Path, error) {
 	u, err := url.Parse(str)
 	if err != nil {
-		d.addErr(errors.Newf(p, "invalid JSON reference: %s", err))
-		return nil
+		return cue.Path{}, fmt.Errorf("invalid JSON reference: %s", err)
 	}
-
-	if u.Host != "" || u.Path != "" {
-		d.addErr(errors.Newf(p, "external references (%s) not supported in Root", str))
-		// TODO: handle
-		//    host:
-		//      If the host corresponds to a package known to cue,
-		//      load it from there. It would prefer schema converted to
-		//      CUE, although we could consider loading raw JSON schema
-		//      if present.
-		//      If not present, advise the user to run cue get.
-		//    path:
-		//      Look up on file system or relatively to authority location.
-		return nil
+	if u.Host != "" || u.Path != "" || u.Opaque != "" {
+		return cue.Path{}, fmt.Errorf("external references (%s) not supported in Root", str)
 	}
-	fragmentParts, err := splitFragment(u)
+	// As a special case for backward compatibility, treat
+	// trim a final slash because the docs specifically
+	// mention that #/ refers to the root document
+	// and the openapi code uses #/components/schemas/.
+	// (technically a trailing slash `/` means there's an empty
+	// final element).
+	u.Fragment = strings.TrimSuffix(u.Fragment, "/")
+	fragmentParts, err := splitJSONPointer(u.Fragment)
 	if err != nil {
-		d.addErr(errors.Newf(p, "%v", err))
-		return nil
+		return cue.Path{}, err
 	}
-	return fragmentParts
+	var selectors []cue.Selector
+	for _, r := range fragmentParts {
+		// Technically this is incorrect because a numeric
+		// element could also index into a list, but the
+		// resulting CUE path will not allow that.
+		selectors = append(selectors, cue.Str(r))
+	}
+	return cue.MakePath(selectors...), nil
 }
 
-// resolveURI parses a URI from n and resolves it in the current context.
+var errRefNotFound = errors.New("JSON Pointer reference not found")
+
+func lookupJSONPointer(v cue.Value, p string) (cue.Value, error) {
+	parts, err := splitJSONPointer(p)
+	if err != nil {
+		return cue.Value{}, err
+	}
+	for _, part := range parts {
+		// Note: a JSON Pointer doesn't distinguish between indexing
+		// and struct lookup. We have to use the value itself to decide
+		// which operation is appropriate.
+		v, _ = v.Default()
+		switch v.Kind() {
+		case cue.StructKind:
+			v = v.LookupPath(cue.MakePath(cue.Str(part)))
+		case cue.ListKind:
+			idx := int64(0)
+			if len(part) > 1 && part[0] == '0' {
+				// Leading zeros are not allowed
+				return cue.Value{}, errRefNotFound
+			}
+			idx, err := strconv.ParseInt(part, 10, 64)
+			if err != nil {
+				return cue.Value{}, errRefNotFound
+			}
+			v = v.LookupPath(cue.MakePath(cue.Index(idx)))
+		}
+		if !v.Exists() {
+			return cue.Value{}, errRefNotFound
+		}
+	}
+	return v, nil
+}
+
+func sameSchemaRoot(u1, u2 *url.URL) bool {
+	return u1.Host == u2.Host && u1.Path == u2.Path && u1.Opaque == u2.Opaque
+}
+
+var (
+	jsonPtrEsc   = strings.NewReplacer("~", "~0", "/", "~1")
+	jsonPtrUnesc = strings.NewReplacer("~0", "~", "~1", "/")
+)
+
+func splitJSONPointer(s string) ([]string, error) {
+	if s == "" {
+		return nil, nil
+	}
+	if s[0] != '/' {
+		return nil, fmt.Errorf("non-empty JSON pointer must start with /")
+	}
+	s = s[1:]
+	parts := strings.Split(s, "/")
+	if !strings.Contains(s, "~") {
+		return parts, nil
+	}
+	for i, part := range parts {
+		// TODO this leaves invalid escape sequences like
+		// ~2 unchanged where we should probably return an
+		// error.
+		parts[i] = jsonPtrUnesc.Replace(part)
+	}
+	return parts, nil
+}
+
+// resolveURI parses a URI from s and resolves it in the current context.
 // To resolve it in the current context, it looks for the closest URI from
 // an $id in the parent scopes and the uses the URI resolution to get the
 // new URI.
@@ -75,331 +140,109 @@ func (s *state) resolveURI(n cue.Value) *url.URL {
 		return nil
 	}
 
+	if u.IsAbs() {
+		// Absolute URI: no need to walk up the tree.
+		if u.Host == DefaultRootIDHost {
+			// No-one should be using the default root ID explicitly.
+			s.errf(n, "invalid use of default root ID host (%v) in URI", DefaultRootIDHost)
+			return nil
+		}
+		return u
+	}
+
+	return s.schemaRoot().id.ResolveReference(u)
+}
+
+// schemaRoot returns the state for the nearest enclosing
+// schema that has its own schema ID.
+func (s *state) schemaRoot() *state {
 	for ; s != nil; s = s.up {
 		if s.id != nil {
-			u = s.id.ResolveReference(u)
-			break
+			return s
 		}
 	}
-
-	return u
+	// Should never happen, as we ensure there's always an absolute
+	// URI at the root.
+	panic("unreachable")
 }
 
-// makeCUERef converts a URI into a CUE reference for the current location.
-// The returned identifier (or first expression in a selection chain), is
-// hardwired to point to the resolved value. This will allow [astutil.Sanitize]
-// to automatically unshadow any shadowed variables.
-func (s *state) makeCUERef(n cue.Value, u *url.URL, fragmentParts []string) ast.Expr {
-	if fn := s.cfg.Map; fn != nil {
-		// TODO: This block is only used in case s.cfg.Map is set, which is
-		// currently only used for OpenAPI. Handling should be brought more in
-		// line with JSON schema.
-		a, err := fn(n.Pos(), fragmentParts)
-		if err != nil {
-			s.addErr(errors.Newf(n.Pos(), "invalid reference %q: %v", u, err))
-			return nil
-		}
-		if len(a) == 0 {
-			// TODO: should we allow inserting at root level?
-			s.addErr(errors.Newf(n.Pos(),
-				"invalid empty reference returned by map for %q", u))
-			return nil
-		}
-		sel, ok := a[0].(ast.Expr)
-		if !ok {
-			sel = &ast.BadExpr{}
-		}
-		for _, l := range a[1:] {
-			switch x := l.(type) {
-			case *ast.Ident:
-				sel = &ast.SelectorExpr{X: sel, Sel: x}
-
-			case *ast.BasicLit:
-				sel = &ast.IndexExpr{X: sel, Index: x}
-			}
-		}
-		return sel
-	}
-
-	for ; s.up != nil; s = s.up {
-		if s.id == nil || s.id.Host != u.Host || s.id.Path != u.Path {
-			continue
-		}
-		if len(fragmentParts) > 0 {
-			ident, fragmentParts0 := s.getNextIdent(n.Pos(), fragmentParts)
-			ident.Node = s.obj
-			return s.newSel(n.Pos(), ident, fragmentParts0)
-		}
-		if len(s.idRef) == 0 {
-			// This is a reference to either root or a schema for which
-			// we do not yet support references. See Issue #386.
-			if s.up.up != nil {
-				s.errf(n, "cannot refer to internal schema %q", u)
-				return nil
-			}
-
-			// This is referring to the root scope. There is a dummy
-			// state above the root state that we need to update.
-			s = s.up
-
-			// Refers to the top of the file.
-			return s.rootRef()
-		}
-		x := s.idRef[0]
-		if !x.isDef && !ast.IsValidIdent(x.name) {
-			s.errf(n, "id %q not supported", x.name)
-			return nil
-		}
-		e := ast.NewIdent(x.name)
-		if len(s.idRef) == 1 {
-			return e
-		}
-		return newSel(e, s.idRef[1])
-	}
-	var refExpr ast.Expr
-	switch {
-	case u.Host == "" && u.Path == "",
-		s.id != nil && s.id.Host == u.Host && s.id.Path == u.Path:
-		if len(fragmentParts) == 0 {
-			// Refers to the top of the file.
-			return s.rootRef()
-		}
-
-		refExpr, fragmentParts = s.getNextIdent(n.Pos(), fragmentParts)
-
-	case u.Host != "":
-		// Reference not found within scope. Create an import reference.
-
-		// TODO: currently only $ids that are in scope can be
-		// referenced. We could consider doing an extra pass to record
-		// all '$id's in a file to be able to link to them even if they
-		// are not in scope.
-		importPath, refPath, err := s.cfg.MapURL(u)
-		if err != nil {
-			ustr := u.String()
-			// Avoid producing many errors for the same URL.
-			if !s.mapURLErrors[ustr] {
-				s.mapURLErrors[ustr] = true
-				s.errf(n, "cannot determine import path from URL %q: %v", ustr, err)
-			}
-			return nil
-		}
-		ip := module.ParseImportPath(importPath)
-		if ip.Qualifier == "" {
-			s.errf(n, "cannot determine package name from import path %q", importPath)
-			return nil
-		}
-		ident := ast.NewIdent(ip.Qualifier)
-		ident.Node = &ast.ImportSpec{Path: ast.NewString(importPath)}
-		refExpr, err = pathRefSyntax(refPath, ident)
-		if err != nil {
-			s.errf(n, "invalid CUE path for URL %q: %v", u, err)
-			return nil
-		}
-
-	default:
-		// Just a path, not sure what that means.
-		s.errf(n, "unknown domain for reference %q", u)
-		return nil
-	}
-	return s.newSel(n.Pos(), refExpr, fragmentParts)
-}
-
-// getNextSelector translates a JSON Reference path into a CUE path by consuming
-// the first path elements and returning the corresponding CUE label.
-func (s *state) getNextSelector(pos token.Pos, a []string) (l label, tail []string) {
-	switch elem := a[0]; elem {
-	case "$defs", "definitions":
-		if len(a) == 1 {
-			s.warnf(pos, "cannot refer to %s section: must refer to one of its elements", a[0])
-			return label{}, nil
-		}
-
-		if name := "#" + a[1]; ast.IsValidIdent(name) {
-			return label{name, true}, a[2:]
-		}
-
-		return label{"#", true}, a[1:]
-
-	case "properties":
-		if len(a) == 1 {
-			s.warnf(pos, "cannot refer to %s section: must refer to one of its elements", a[0])
-			return label{}, nil
-		}
-
-		return label{a[1], false}, a[2:]
-
-	case "additionalProperties",
-		"patternProperties",
-		"items",
-		"additionalItems":
-		// TODO: as a temporary workaround, include the schema verbatim.
-		// TODO: provide definitions for these in CUE.
-		s.warnf(pos, "referring to field %q not yet supported", elem)
-
-		// Other known fields cannot be supported.
-		return label{}, nil
-
-	default:
-		return label{elem, false}, a[1:]
-	}
-}
-
-// newSel converts an initial CUE identifier and a relative JSON Reference path
-// to a CUE selection path.
-func (s *state) newSel(pos token.Pos, e ast.Expr, a []string) ast.Expr {
-	for len(a) > 0 {
-		var label label
-		label, a = s.getNextSelector(pos, a)
-		e = newSel(e, label)
-	}
-	return e
-}
-
-// newSel converts label to a CUE index and creates an expression to index
-// into e.
-func newSel(e ast.Expr, label label) ast.Expr {
-	if label.isDef {
-		return ast.NewSel(e, label.name)
-
-	}
-	if ast.IsValidIdent(label.name) && !internal.IsDefOrHidden(label.name) {
-		return ast.NewSel(e, label.name)
-	}
-	return &ast.IndexExpr{X: e, Index: ast.NewString(label.name)}
-}
-
-func (s *state) setField(lab label, f *ast.Field) {
-	x := s.getRef(lab)
-	x.field = f
-	s.setRef(lab, x)
-	x = s.getRef(lab)
-}
-
-func (s *state) getRef(lab label) refs {
-	if s.fieldRefs == nil {
-		s.fieldRefs = make(map[label]refs)
-	}
-	x, ok := s.fieldRefs[lab]
-	if !ok {
-		if lab.isDef ||
-			(ast.IsValidIdent(lab.name) && !internal.IsDefOrHidden(lab.name)) {
-			x.ident = lab.name
-		} else {
-			x.ident = "_X" + strconv.Itoa(s.decoder.numID)
-			s.decoder.numID++
-		}
-		s.fieldRefs[lab] = x
-	}
-	return x
-}
-
-func (s *state) setRef(lab label, r refs) {
-	s.fieldRefs[lab] = r
-}
-
-// getNextIdent gets the first CUE reference from a JSON Reference path and
-// converts it to a CUE identifier.
-func (s *state) getNextIdent(pos token.Pos, a []string) (resolved *ast.Ident, tail []string) {
-	lab, a := s.getNextSelector(pos, a)
-
-	x := s.getRef(lab)
-	ident := ast.NewIdent(x.ident)
-	x.refs = append(x.refs, ident)
-	s.setRef(lab, x)
-
-	return ident, a
-}
-
-// linkReferences resolves identifiers to relevant nodes. This allows
-// [astutil.Sanitize] to unshadow nodes if necessary.
-func (s *state) linkReferences() {
-	for _, r := range s.fieldRefs {
-		if r.field == nil {
-			// TODO: improve error message.
-			s.errf(cue.Value{}, "reference to non-existing value %q", r.ident)
-			continue
-		}
-
-		// link resembles the link value. See astutil.Resolve.
-		var link ast.Node
-
-		ident, ok := r.field.Label.(*ast.Ident)
-		if ok && ident.Name == r.ident {
-			link = r.field.Value
-		} else if len(r.refs) > 0 {
-			r.field.Label = &ast.Alias{
-				Ident: ast.NewIdent(r.ident),
-				Expr:  r.field.Label.(ast.Expr),
-			}
-			link = r.field
-		}
-
-		for _, i := range r.refs {
-			i.Node = link
-		}
-	}
-}
-
-// splitFragment splits the fragment part of a URI into path components
-// and removes the fragment part from u.
-// The result may be an empty slice.
+// DefaultMapRef implements the default logic for mapping a schema location
+// to CUE.
+// It uses a heuristic to map the URL host and path to an import path,
+// and maps the fragment part according to the following:
 //
-// TODO: use u.RawFragment so that we can accept field names
-// that contain `/` characters.
-func splitFragment(u *url.URL) ([]string, error) {
-	frag := u.EscapedFragment()
-	if frag == "" {
+//	#                    <empty path>
+//	#/definitions/foo   #foo or #."foo"
+//	#/$defs/foo   #foo or #."foo"
+func DefaultMapRef(loc SchemaLoc) (importPath string, path cue.Path, err error) {
+	return defaultMapRef(loc, defaultMap, DefaultMapURL)
+}
+
+// defaultMapRef implements the default MapRef semantics
+// in terms of the default Map and MapURL functions provided
+// in the configuration.
+func defaultMapRef(
+	loc SchemaLoc,
+	mapFn func(pos token.Pos, path []string) ([]ast.Label, error),
+	mapURLFn func(u *url.URL) (importPath string, path cue.Path, err error),
+) (importPath string, path cue.Path, err error) {
+	// XXX
+	//defer func() {
+	//	log.Printf("mapref %v %v -> %v %v %v", loc.ID, loc.RootRel, importPath, path, err)
+	//}()
+	var fragment string
+	if loc.RootRel == nil {
+		// It's external: use mapURLFn.
+		u := ref(*loc.ID)
+		fragment = loc.ID.Fragment
+		u.Fragment = ""
+		var err error
+		importPath, path, err = mapURLFn(u)
+		if err != nil {
+			return "", cue.Path{}, err
+		}
+	} else {
+		fragment = loc.RootRel.Fragment
+	}
+	if len(fragment) > 0 && fragment[0] != '/' {
+		return "", cue.Path{}, fmt.Errorf("anchors (%s) not supported", fragment)
+	}
+	parts, err := splitJSONPointer(fragment)
+	if err != nil {
+		return "", cue.Path{}, err
+	}
+	labels, err := mapFn(token.Pos{}, parts)
+	if err != nil {
+		return "", cue.Path{}, err
+	}
+	relPath, err := labelsToCUEPath(labels)
+	if err != nil {
+		return "", cue.Path{}, err
+	}
+	return importPath, pathConcat(path, relPath), nil
+}
+
+func defaultMap(p token.Pos, a []string) ([]ast.Label, error) {
+	if len(a) == 0 {
 		return nil, nil
 	}
-	if !strings.HasPrefix(frag, "/") {
-		return nil, fmt.Errorf("anchors (%s) not supported", frag)
-	}
-	u.Fragment = ""
-	u.RawFragment = ""
-
-	if s := strings.TrimRight(frag[1:], "/"); s != "" {
-		return strings.Split(s, "/"), nil
-	}
-	return nil, nil
-}
-
-func (d *decoder) mapRef(p token.Pos, str string, ref []string) []ast.Label {
-	fn := d.cfg.Map
-	if fn == nil {
-		fn = jsonSchemaRef
-	}
-	a, err := fn(p, ref)
-	if err != nil {
-		if str == "" {
-			str = "#/" + strings.Join(ref, "/")
-		}
-		d.addErr(errors.Newf(p, "invalid reference %q: %v", str, err))
-		return nil
-	}
-	if len(a) == 0 {
-		// TODO: should we allow inserting at root level?
-		if str == "" {
-			str = "#/" + strings.Join(ref, "/")
-		}
-		d.addErr(errors.Newf(p,
-			"invalid empty reference returned by map for %q", str))
-		return nil
-	}
-	return a
-}
-
-func jsonSchemaRef(p token.Pos, a []string) ([]ast.Label, error) {
 	// TODO: technically, references could reference a
 	// non-definition. We disallow this case for the standard
 	// JSON Schema interpretation. We could detect cases that
 	// are not definitions and then resolve those as literal
 	// values.
 	if len(a) != 2 || (a[0] != "definitions" && a[0] != "$defs") {
-		return nil, errors.Newf(p,
-			// Don't mention the ability to use $defs, as this definition seems
-			// to already have been withdrawn from the JSON Schema spec.
-			"$ref must be of the form #/definitions/...")
+		// It's an internal reference (or a nested definition reference).
+		// Fall back to defining it in the internal namespace.
+		// TODO this is needlessly inefficient, as we're putting something
+		// back together that was already joined before defaultMap was
+		// invoked. This does avoid dual implementations though.
+		var buf strings.Builder
+		for _, elem := range a {
+			buf.WriteByte('/')
+			buf.WriteString(jsonPtrEsc.Replace(elem))
+		}
+		return []ast.Label{ast.NewIdent("_#defs"), ast.NewString(buf.String())}, nil
 	}
 	name := a[1]
 	if ast.IsValidIdent(name) &&
@@ -426,32 +269,9 @@ func DefaultMapURL(u *url.URL) (string, cue.Path, error) {
 		}
 		p += ":" + base
 	}
-	return u.Host + p, cue.Path{}, nil
-}
-
-// pathRefSyntax returns the syntax for an expression which
-// looks up the path inside the given root expression's value.
-// It returns an error if the path contains any elements with
-// type [cue.OptionalConstraint], [cue.RequiredConstraint], or [cue.PatternConstraint],
-// none of which are expressible as a CUE index expression.
-//
-// TODO implement this properly and move to a method on [cue.Path].
-func pathRefSyntax(cuePath cue.Path, root ast.Expr) (ast.Expr, error) {
-	expr := root
-	for _, sel := range cuePath.Selectors() {
-		switch sel.LabelType() {
-		case cue.StringLabel, cue.DefinitionLabel:
-			ident := sel.String()
-			if !ast.IsValidIdent(ident) {
-				return nil, fmt.Errorf("cannot form expression for path %q", cuePath)
-			}
-			expr = &ast.SelectorExpr{
-				X:   expr,
-				Sel: ast.NewIdent(sel.String()),
-			}
-		default:
-			return nil, fmt.Errorf("cannot form expression for path %q", cuePath)
-		}
+	if u.Opaque != "" {
+		// TODO don't use base64 unless we really have to.
+		return base64.RawURLEncoding.EncodeToString([]byte(u.Opaque)), cue.Path{}, nil
 	}
-	return expr, nil
+	return u.Host + p, cue.Path{}, nil
 }

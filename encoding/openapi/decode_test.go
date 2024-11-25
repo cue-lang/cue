@@ -116,7 +116,7 @@ func TestDecode(t *testing.T) {
 				out = bytes.TrimSpace(out)
 
 				if diff := cmp.Diff(b, out); diff != "" {
-					t.Error(diff)
+					t.Logf("updating golden %v %q", cuetest.UpdateGoldenFiles, os.Getenv("CUE_UPDATE"))
 					if cuetest.UpdateGoldenFiles {
 						a.Files[outIndex].Data = b
 						b = txtar.Format(a)

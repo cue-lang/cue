@@ -34,8 +34,8 @@
 			]
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$anchor\" not yet implemented (and 1 more errors)",
-			"v3": "extract error: keyword \"$anchor\" not yet implemented (and 1 more errors)"
+			"v2": "extract error: cannot determine CUE location for JSON Schema location id=https://cue.jsonschema.invalid#my_anchor: anchors (my_anchor) not supported (and 1 more errors)",
+			"v3": "extract error: cannot determine CUE location for JSON Schema location id=https://cue.jsonschema.invalid#my_anchor: anchors (my_anchor) not supported (and 1 more errors)"
 		},
 		"tests": [
 			{

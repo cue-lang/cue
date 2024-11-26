@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0373e0f_dc1e55fc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-11-26T10:46:32Z",
+      "side": 1,
+      "message": "Yeah, in truth I dislike all of this - needless duplication of a test txtar. I have no problem with wanting end to end tests - I\u0027m always a fan of integration tests. But the copying of txtars is very objectionable.",
+      "revId": "b13b45f2798523b00c987ff7313ac4b90a201d4a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

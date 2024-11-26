@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c8dd64c_5a907ef5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-26T16:16:33Z",
+      "side": 1,
+      "message": "As discussed, this does not appear to be a complete fix as it doesn\u0027t address https://github.com/cue-lang/cue/issues/3534, reduced from https://github.com/stakpak/devx-catalog.",
+      "revId": "46e522e803b9b7c53762f8245bbbf1836c883ca1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

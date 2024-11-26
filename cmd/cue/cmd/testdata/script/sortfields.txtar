@@ -5,7 +5,6 @@ exec cue export input.cue
 cmp stdout export-unsorted.stdout
 
 # Turn it on and ensure it works as expected for various commands and encodings.
-# TODO: sortfields does not seem to work at all for evalv2.
 env CUE_DEBUG=sortfields
 
 exec cue export input.cue
@@ -14,6 +13,7 @@ cmp stdout export.stdout
 exec cue export --out yaml input.cue
 cmp stdout export-yaml.stdout
 
+# TODO: sortfields does not seem to work with def.
 exec cue def input.cue
 cmp stdout def.stdout
 
@@ -45,13 +45,13 @@ b: y: true
 }
 -- export.stdout --
 {
-    "c": true,
+    "a": true,
     "b": {
         "x": true,
         "y": true,
         "z": true
     },
-    "a": true
+    "c": true
 }
 -- export-evalv3.stdout --
 {
@@ -64,12 +64,12 @@ b: y: true
     "c": true
 }
 -- export-yaml.stdout --
-c: true
+a: true
 b:
   x: true
   "y": true
   z: true
-a: true
+c: true
 -- def.stdout --
 c: true
 b: {
@@ -79,10 +79,10 @@ b: {
 }
 a: true
 -- eval.stdout --
-c: true
+a: true
 b: {
     x: true
     y: true
     z: true
 }
-a: true
+c: true

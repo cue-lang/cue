@@ -1,0 +1,88 @@
+# Test that CUE_DEBUG=sortfields is wired up correctly.
+
+# First, ensure that this debugging option is off by default.
+exec cue export input.cue
+cmp stdout export-unsorted.stdout
+
+# Turn it on and ensure it works as expected for various commands and encodings.
+# TODO: sortfields does not seem to work at all for evalv2.
+env CUE_DEBUG=sortfields
+
+exec cue export input.cue
+cmp stdout export.stdout
+
+exec cue export --out yaml input.cue
+cmp stdout export-yaml.stdout
+
+exec cue def input.cue
+cmp stdout def.stdout
+
+exec cue eval input.cue
+cmp stdout eval.stdout
+
+# Just to double check, ensure it also works for evalv3.
+env CUE_EXPERIMENT=evalv3
+exec cue export input.cue
+cmp stdout export-evalv3.stdout
+
+-- input.cue --
+c: true
+b: {
+	x: true
+	z: true
+}
+a: true
+b: y: true
+-- export-unsorted.stdout --
+{
+    "c": true,
+    "b": {
+        "x": true,
+        "y": true,
+        "z": true
+    },
+    "a": true
+}
+-- export.stdout --
+{
+    "c": true,
+    "b": {
+        "x": true,
+        "y": true,
+        "z": true
+    },
+    "a": true
+}
+-- export-evalv3.stdout --
+{
+    "a": true,
+    "b": {
+        "x": true,
+        "y": true,
+        "z": true
+    },
+    "c": true
+}
+-- export-yaml.stdout --
+c: true
+b:
+  x: true
+  "y": true
+  z: true
+a: true
+-- def.stdout --
+c: true
+b: {
+	x: true
+	y: true
+	z: true
+}
+a: true
+-- eval.stdout --
+c: true
+b: {
+    x: true
+    y: true
+    z: true
+}
+a: true

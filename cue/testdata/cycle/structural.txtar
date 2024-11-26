@@ -2723,6 +2723,7 @@ fieldsSumInfinite.issue3310.3: path missing in error
 b7.b.0.0.0: cycle too deep before detection.
 TODO(share): fix the following bug once we have structure sharing.
 p3.a.a: field not allowed incorrect?
+e4.a.0.0: "cycle error" in error message
 -- diff/todo/p3 --
 n4: Reordering.
 b12b: reported at correct level, but investigate if it is not processing

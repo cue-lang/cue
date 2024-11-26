@@ -1738,8 +1738,6 @@ indirect.embed.b1.d: should be an error, but is not an error in either version.
 -- diff/todo/p1 --
 Should be an error, but are not:
   indirect.closed.err1.Y.a.e
-  nested.err1.x.v.c.d
-  nested.err1.x.v.c.f
 -- diff/explanation --
 inline.err*.age*: fields are now correctly not allowed.
 -- out/compile --

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03a9fa7e_bbe88f44",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-11-26T10:42:18Z",
+      "side": 1,
+      "message": "fwiw, I think it\u0027s pretty gross that this can\u0027t be part of Options up on line 111.",
+      "revId": "5d820e744e4766f90e920a17759f6947f484e5f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

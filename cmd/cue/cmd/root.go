@@ -137,8 +137,10 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		if cueexperiment.Flags.EvalV3 {
 			const dev = internal.DevVersion
 			(*cueruntime.Runtime)(c.ctx).SetVersion(internal.EvaluatorVersion(dev))
-			(*cueruntime.Runtime)(c.ctx).SetDebugOptions(&cuedebug.Flags)
 		}
+		// Note that, while some debugging flags like "strict" or "sharing"
+		// are only used by evalv3, some others like "sortfields" are used by all versions.
+		(*cueruntime.Runtime)(c.ctx).SetDebugOptions(&cuedebug.Flags)
 
 		err = f(c, args)
 

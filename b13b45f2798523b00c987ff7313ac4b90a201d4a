@@ -16,6 +16,24 @@
       "message": "Yeah, in truth I dislike all of this - needless duplication of a test txtar. I have no problem with wanting end to end tests - I\u0027m always a fan of integration tests. But the copying of txtars is very objectionable.",
       "revId": "b13b45f2798523b00c987ff7313ac4b90a201d4a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7df3b45_27f4fbca",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-26T11:04:40Z",
+      "side": 1,
+      "message": "discussed this briefly on Discord, and while I agree to some extent, I also think it\u0027s impractical and not strictly necessary to reuse your larger existing toposort tests for an e2e test. duplicating seven lines of CUE doesn\u0027t seem like a problem when the concept of \"sortfields\" is easy to grasp.",
+      "parentUuid": "a0373e0f_dc1e55fc",
+      "revId": "b13b45f2798523b00c987ff7313ac4b90a201d4a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

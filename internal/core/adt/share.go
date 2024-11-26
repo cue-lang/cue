@@ -128,7 +128,7 @@ func (n *nodeContext) shareIfPossible(c Conjunct, arc *Vertex, id CloseInfo) boo
 	// We do not allowing sharing if the conjunct has a cycle. Sharing is only
 	// possible if there is a single conjunct. We want to further evaluate this
 	// conjunct to force recognition of a structural cycle.
-	if id.CycleType == IsCyclic {
+	if id.CycleType == IsCyclic && (n.node.nonRooted || n.node.IsDynamic) {
 		return false
 	}
 
@@ -157,7 +157,7 @@ func (n *nodeContext) shareIfPossible(c Conjunct, arc *Vertex, id CloseInfo) boo
 	// result will result in an infinite loop.
 	//
 	// TODO: allow this case.
-	if n.node.Label.IsLet() {
+	if arc.Label.IsLet() {
 		return false
 	}
 

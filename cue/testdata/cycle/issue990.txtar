@@ -83,15 +83,15 @@ This seems to be the result of incorrect handling of disjunctions.
 -- diff/todo/p3 --
 Reordering
 -- out/evalalpha/stats --
-Leaks:  653
-Freed:  52
-Reused: 52
-Allocs: 653
+Leaks:  633
+Freed:  49
+Reused: 49
+Allocs: 633
 Retain: 0
 
-Unifications: 183
-Conjuncts:    2641
-Disjuncts:    106
+Unifications: 175
+Conjuncts:    2541
+Disjuncts:    100
 -- out/evalalpha --
 Errors:
 out.subs: structural cycle:
@@ -258,18 +258,18 @@ diff old new
 -Reused: 3200
 -Allocs: 25
 -Retain: 26
-+Leaks:  653
-+Freed:  52
-+Reused: 52
-+Allocs: 653
++Leaks:  633
++Freed:  49
++Reused: 49
++Allocs: 633
 +Retain: 0
  
 -Unifications: 2577
 -Conjuncts:    12017
 -Disjuncts:    3244
-+Unifications: 183
-+Conjuncts:    2641
-+Disjuncts:    106
++Unifications: 175
++Conjuncts:    2541
++Disjuncts:    100
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old

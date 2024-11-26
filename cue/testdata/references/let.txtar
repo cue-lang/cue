@@ -299,25 +299,19 @@ Disjuncts:    121
   a1list: (#list){
     0: (int){ 1 }
   }
-  let A1#1 = (#list){
-    0: (int){ 1 }
-  }
+  let A1#1 = ~(a1list)
   a1: (int){ 101 }
   a2list: (#list){
     0: (int){ 2 }
   }
-  let A2#2 = (#list){
-    0: (int){ 2 }
-  }
+  let A2#2 = ~(a2list)
   a2: (struct){
     b: (int){ 202 }
   }
   a3list: (#list){
     0: (int){ 3 }
   }
-  let A3#3 = (#list){
-    0: (int){ 3 }
-  }
+  let A3#3 = ~(a3list)
   a3: (struct){
     b: (struct){
       c: (int){ 303 }
@@ -326,9 +320,7 @@ Disjuncts:    121
   a4list: (#list){
     0: (int){ 4 }
   }
-  let A4#4 = (#list){
-    0: (int){ 4 }
-  }
+  let A4#4 = ~(a4list)
   a4: (#list){
     0: (struct){
       v: (int){ 404 }
@@ -337,9 +329,7 @@ Disjuncts:    121
   a5list: (#list){
     0: (int){ 5 }
   }
-  let A5#5 = (#list){
-    0: (int){ 5 }
-  }
+  let A5#5 = ~(a5list)
   a5: (struct){
     b: (#list){
       0: (struct){
@@ -350,9 +340,7 @@ Disjuncts:    121
   a6list: (#list){
     0: (int){ 6 }
   }
-  let A6#6 = (#list){
-    0: (int){ 6 }
-  }
+  let A6#6 = ~(a6list)
   a6: (struct){
     b: (struct){
       c: (#list){
@@ -365,18 +353,14 @@ Disjuncts:    121
   a7list: (#list){
     0: (int){ 7 }
   }
-  let A7#7 = (#list){
-    0: (int){ 7 }
-  }
+  let A7#7 = ~(a7list)
   a7: (struct){
     v: (int){ 707 }
   }
   a8list: (#list){
     0: (int){ 8 }
   }
-  let A8#8 = (#list){
-    0: (int){ 8 }
-  }
+  let A8#8 = ~(a8list)
   a8: (struct){
     b: (struct){
       v: (int){ 808 }
@@ -385,9 +369,7 @@ Disjuncts:    121
   a9list: (#list){
     0: (int){ 9 }
   }
-  let A9#9 = (#list){
-    0: (int){ 9 }
-  }
+  let A9#9 = ~(a9list)
   a9: (struct){
     b: (struct){
       c: (struct){
@@ -415,7 +397,7 @@ Disjuncts:    121
       }
       min: (int){ 1 }
       max: (_|_){
-        // [incomplete] incompleteLet.bar.mx: undefined field: max:
+        // [incomplete] incompleteLet.bar.max: undefined field: max:
         //     ./in.cue:54:17
       }
     }
@@ -463,17 +445,11 @@ Disjuncts:    121
         0: (string){ "a" }
         1: (string){ "b" }
       }
-      let List#10 = (#list){
-        0: (string){ "a" }
-        1: (string){ "b" }
-      }
+      let List#10 = ~(issue1116.a.#a)
     }
     b: (string){
       "b"
-      let List#11 = (#list){
-        0: (string){ "a" }
-        1: (string){ "b" }
-      }
+      let List#11 = ~(issue1116.b.#a)
       #a: (#list){
         0: (string){ "a" }
         1: (string){ "b" }
@@ -485,17 +461,122 @@ Disjuncts:    121
 diff old new
 --- old
 +++ new
-@@ -118,7 +118,7 @@
+@@ -2,16 +2,12 @@
+   a1list: (#list){
+     0: (int){ 1 }
+   }
+-  let A1#1 = (#list){
+-    0: (int){ 1 }
+-  }
++  let A1#1 = ~(a1list)
+   a1: (int){ 101 }
+   a2list: (#list){
+     0: (int){ 2 }
+   }
+-  let A2#2 = (#list){
+-    0: (int){ 2 }
+-  }
++  let A2#2 = ~(a2list)
+   a2: (struct){
+     b: (int){ 202 }
+   }
+@@ -18,9 +14,7 @@
+   a3list: (#list){
+     0: (int){ 3 }
+   }
+-  let A3#3 = (#list){
+-    0: (int){ 3 }
+-  }
++  let A3#3 = ~(a3list)
+   a3: (struct){
+     b: (struct){
+       c: (int){ 303 }
+@@ -29,9 +23,7 @@
+   a4list: (#list){
+     0: (int){ 4 }
+   }
+-  let A4#4 = (#list){
+-    0: (int){ 4 }
+-  }
++  let A4#4 = ~(a4list)
+   a4: (#list){
+     0: (struct){
+       v: (int){ 404 }
+@@ -40,9 +32,7 @@
+   a5list: (#list){
+     0: (int){ 5 }
+   }
+-  let A5#5 = (#list){
+-    0: (int){ 5 }
+-  }
++  let A5#5 = ~(a5list)
+   a5: (struct){
+     b: (#list){
+       0: (struct){
+@@ -53,9 +43,7 @@
+   a6list: (#list){
+     0: (int){ 6 }
+   }
+-  let A6#6 = (#list){
+-    0: (int){ 6 }
+-  }
++  let A6#6 = ~(a6list)
+   a6: (struct){
+     b: (struct){
+       c: (#list){
+@@ -68,9 +56,7 @@
+   a7list: (#list){
+     0: (int){ 7 }
+   }
+-  let A7#7 = (#list){
+-    0: (int){ 7 }
+-  }
++  let A7#7 = ~(a7list)
+   a7: (struct){
+     v: (int){ 707 }
+   }
+@@ -77,9 +63,7 @@
+   a8list: (#list){
+     0: (int){ 8 }
+   }
+-  let A8#8 = (#list){
+-    0: (int){ 8 }
+-  }
++  let A8#8 = ~(a8list)
+   a8: (struct){
+     b: (struct){
+       v: (int){ 808 }
+@@ -88,9 +72,7 @@
+   a9list: (#list){
+     0: (int){ 9 }
+   }
+-  let A9#9 = (#list){
+-    0: (int){ 9 }
+-  }
++  let A9#9 = ~(a9list)
+   a9: (struct){
+     b: (struct){
+       c: (struct){
+@@ -166,17 +148,11 @@
+         0: (string){ "a" }
+         1: (string){ "b" }
        }
-       min: (int){ 1 }
-       max: (_|_){
--        // [incomplete] incompleteLet.bar.max: undefined field: max:
-+        // [incomplete] incompleteLet.bar.mx: undefined field: max:
-         //     ./in.cue:54:17
-       }
+-      let List#10 = (#list){
+-        0: (string){ "a" }
+-        1: (string){ "b" }
+-      }
++      let List#10 = ~(issue1116.a.#a)
      }
--- diff/todo/p3 --
-Investigate let divergence. Probably okay.
+     b: (string){
+       "b"
+-      let List#11 = (#list){
+-        0: (string){ "a" }
+-        1: (string){ "b" }
+-      }
++      let List#11 = ~(issue1116.b.#a)
+       #a: (#list){
+         0: (string){ "a" }
+         1: (string){ "b" }
 -- out/eval --
 (struct){
   a1list: (#list){

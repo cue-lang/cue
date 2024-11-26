@@ -89,7 +89,7 @@ Conjuncts:    102
 Disjuncts:    54
 -- out/evalalpha --
 Errors:
-_schema_1: structural cycle
+schema.next: structural cycle
 
 Result:
 (_|_){
@@ -119,7 +119,7 @@ Result:
   schema: (_|_){
     // [structural cycle]
     next: (_|_){
-      // [structural cycle] _schema_1: structural cycle
+      // [structural cycle] schema.next: structural cycle
     }
   }
   let _schema_1#2 = (_|_){
@@ -130,19 +130,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,5 +1,5 @@
- Errors:
--schema.next: structural cycle
-+_schema_1: structural cycle
- 
- Result:
- (_|_){
-@@ -29,11 +29,10 @@
-   schema: (_|_){
-     // [structural cycle]
-     next: (_|_){
--      // [structural cycle] schema.next: structural cycle
-+      // [structural cycle] _schema_1: structural cycle
+@@ -33,7 +33,6 @@
      }
    }
    let _schema_1#2 = (_|_){

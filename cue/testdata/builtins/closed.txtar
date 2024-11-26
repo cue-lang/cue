@@ -97,9 +97,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1 = (#struct){
-              b: (bool){ true }
-            }
+            let X#1 = ~(inDisjunctions.x.socket.string.a)
             uint: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -109,9 +107,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1 = (#struct){
-              b: (bool){ true }
-            }
+            let X#1 = ~(inDisjunctions.x.socket.string.a)
             string: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -124,9 +120,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1 = (#struct){
-              b: (bool){ true }
-            }
+            let X#1 = ~(inDisjunctions.x.syslog.xxx.a)
             uint: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -136,9 +130,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1 = (#struct){
-              b: (bool){ true }
-            }
+            let X#1 = ~(inDisjunctions.x.syslog.xxx.a)
             string: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -149,9 +141,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1 = (#struct){
-              b: (bool){ true }
-            }
+            let X#1 = ~(inDisjunctions.x.syslog.string.a)
             uint: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -161,9 +151,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1 = (#struct){
-              b: (bool){ true }
-            }
+            let X#1 = ~(inDisjunctions.x.syslog.string.a)
             string: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -249,7 +237,40 @@ diff old new
      }
    }
    inDisjunctions: (struct){
-@@ -60,42 +58,50 @@
+@@ -37,21 +35,17 @@
+             a: (#struct){
+               b: (bool){ true }
+             }
+-            let X#1 = (#struct){
+-              b: (bool){ true }
+-            }
+-            uint: (#struct){
+-              a: (#struct){
+-                b: (bool){ true }
+-              }
+-            }
+-          }, (#struct){
+-            a: (#struct){
+-              b: (bool){ true }
+-            }
+-            let X#1 = (#struct){
+-              b: (bool){ true }
+-            }
++            let X#1 = ~(inDisjunctions.x.socket.string.a)
++            uint: (#struct){
++              a: (#struct){
++                b: (bool){ true }
++              }
++            }
++          }, (#struct){
++            a: (#struct){
++              b: (bool){ true }
++            }
++            let X#1 = ~(inDisjunctions.x.socket.string.a)
+             string: (#struct){
+               a: (#struct){
+                 b: (bool){ true }
+@@ -60,42 +54,42 @@
            }) }
        }
        syslog: (#struct){
@@ -289,9 +310,7 @@ diff old new
 -              b: (bool){ true }
 -            }
 -            let X#1multi = 〈0;a〉
-+            let X#1 = (#struct){
-+              b: (bool){ true }
-+            }
++            let X#1 = ~(inDisjunctions.x.syslog.xxx.a)
 +            uint: (#struct){
 +              a: (#struct){
 +                b: (bool){ true }
@@ -301,9 +320,7 @@ diff old new
 +            a: (#struct){
 +              b: (bool){ true }
 +            }
-+            let X#1 = (#struct){
-+              b: (bool){ true }
-+            }
++            let X#1 = ~(inDisjunctions.x.syslog.xxx.a)
 +            string: (#struct){
 +              a: (#struct){
 +                b: (bool){ true }
@@ -314,9 +331,7 @@ diff old new
 +            a: (#struct){
 +              b: (bool){ true }
 +            }
-+            let X#1 = (#struct){
-+              b: (bool){ true }
-+            }
++            let X#1 = ~(inDisjunctions.x.syslog.string.a)
 +            uint: (#struct){
 +              a: (#struct){
 +                b: (bool){ true }
@@ -326,9 +341,7 @@ diff old new
 +            a: (#struct){
 +              b: (bool){ true }
 +            }
-+            let X#1 = (#struct){
-+              b: (bool){ true }
-+            }
++            let X#1 = ~(inDisjunctions.x.syslog.string.a)
              string: (#struct){
                a: (#struct){
                  b: (bool){ true }

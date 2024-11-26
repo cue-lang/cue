@@ -696,7 +696,7 @@ p5.#T.a.0.link: structural cycle
 p6.#U.#T.a.0.link: structural cycle
 patternFail.issue2374.a.b: structural cycle
 shortPathFail.elipsis.t2.Foo.ref: structural cycle
-withLetFail._schema_1: structural cycle
+withLetFail.schema.next: structural cycle
 z1.z.g.h: structural cycle
 d3.x.0: structural cycle:
     ./in.cue:317:13
@@ -1357,7 +1357,7 @@ Result:
     schema: (_|_){
       // [structural cycle]
       next: (_|_){
-        // [structural cycle] withLetFail._schema_1: structural cycle
+        // [structural cycle] withLetFail.schema.next: structural cycle
       }
     }
     let _schema_1#1 = (_|_){
@@ -1771,12 +1771,7 @@ Result:
       }
       C: (struct){
         x: ~(crossRefNoCycle.t5.T)
-        y: (struct){
-          y: (_|_){
-            // [incomplete] crossRefNoCycle.t5.C.y.y: undefined field: x:
-            //     ./in.cue:556:8
-          }
-        }
+        y: ~(crossRefNoCycle.t5.T)
       }
     }
   }
@@ -1931,10 +1926,9 @@ diff old new
  p6.#U.#T.a.0.link: structural cycle
  patternFail.issue2374.a.b: structural cycle
 -shortPathFail.elipsis.t2.Foo.ref.ref: structural cycle
--withLetFail.schema.next: structural cycle
--z1.z.f.h: structural cycle
 +shortPathFail.elipsis.t2.Foo.ref: structural cycle
-+withLetFail._schema_1: structural cycle
+ withLetFail.schema.next: structural cycle
+-z1.z.f.h: structural cycle
  z1.z.g.h: structural cycle
 -d1.r: structural cycle:
 -    ./in.cue:301:26
@@ -2276,12 +2270,7 @@ diff old new
        }
      }
    }
-@@ -741,12 +747,11 @@
-     schema: (_|_){
-       // [structural cycle]
-       next: (_|_){
--        // [structural cycle] withLetFail.schema.next: structural cycle
-+        // [structural cycle] withLetFail._schema_1: structural cycle
+@@ -745,8 +751,7 @@
        }
      }
      let _schema_1#1 = (_|_){
@@ -2667,28 +2656,28 @@ diff old new
        }
      }
      t5: (struct){
-@@ -1187,6 +1160,7 @@
+@@ -1187,18 +1160,8 @@
          }
        }
        C: (struct){
-+        x: ~(crossRefNoCycle.t5.T)
-         y: (struct){
-           y: (_|_){
-             // [incomplete] crossRefNoCycle.t5.C.y.y: undefined field: x:
-@@ -1193,12 +1167,6 @@
-             //     ./in.cue:556:8
-           }
-         }
+-        y: (struct){
+-          y: (_|_){
+-            // [incomplete] crossRefNoCycle.t5.C.y.y: undefined field: x:
+-            //     ./in.cue:556:8
+-          }
+-        }
 -        x: (struct){
 -          y: (_|_){
 -            // [incomplete] crossRefNoCycle.t5.C.x.y: undefined field: x:
 -            //     ./in.cue:556:8
 -          }
 -        }
++        x: ~(crossRefNoCycle.t5.T)
++        y: ~(crossRefNoCycle.t5.T)
        }
      }
    }
-@@ -1221,19 +1189,19 @@
+@@ -1221,19 +1184,19 @@
      }
    }
    n4: (struct){

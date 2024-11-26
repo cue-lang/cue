@@ -16,6 +16,24 @@
       "message": "fwiw, I think it\u0027s pretty gross that this can\u0027t be part of Options up on line 111.",
       "revId": "5d820e744e4766f90e920a17759f6947f484e5f8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c5e1dfa_f5d86ca1",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-26T10:43:56Z",
+      "side": 1,
+      "message": "It\u0027s likely that we can clean this up by folding all the logic into cuecontext.New; I will look at this in a separate CL. See the Discord thread with Roger I just started.",
+      "parentUuid": "03a9fa7e_bbe88f44",
+      "revId": "5d820e744e4766f90e920a17759f6947f484e5f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

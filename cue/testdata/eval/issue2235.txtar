@@ -212,16 +212,8 @@ Disjuncts:    160
     }
   }
   t2: (struct){
-    out: (struct){
-      z: (struct){
-      }
-    }
-    let X#2 = (struct){
-      y: (struct){
-        z: (struct){
-        }
-      }
-    }
+    out: ~(t2.m.x.y)
+    let X#2 = ~(t2.m.x)
     m: (struct){
       x: (struct){
         y: (struct){
@@ -335,6 +327,25 @@ diff old new
      x: (struct){
        y: (struct){
          a: (struct){
+@@ -146,16 +100,8 @@
+     }
+   }
+   t2: (struct){
+-    out: (struct){
+-      z: (struct){
+-      }
+-    }
+-    let X#2 = (struct){
+-      y: (struct){
+-        z: (struct){
+-        }
+-      }
+-    }
++    out: ~(t2.m.x.y)
++    let X#2 = ~(t2.m.x)
+     m: (struct){
+       x: (struct){
+         y: (struct){
 -- diff/todo/p2 --
 Different, but okay, error message, but missing some positions
 -- out/eval --

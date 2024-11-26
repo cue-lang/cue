@@ -120,13 +120,7 @@ Result:
       // [eval]
       description: (_|_){
         // [eval]
-        let dep#1 = (#struct){
-          service: ~(#ServiceManifest)
-          hsize: (_|_){
-            // [incomplete] #ServiceManifest.description: undefined field: service:
-            //     ./in.cue:5:28
-          }
-        }
+        let dep#1 = ~(#KumoriKinds.deployment)
         service: (_|_){
           // [eval]
           description: (_|_){
@@ -254,7 +248,7 @@ diff old new
        }
      }
    }
-@@ -58,24 +38,7 @@
+@@ -58,50 +38,20 @@
    #DoDeploy: (_|_){
      // [eval]
      _params: (#struct){
@@ -280,10 +274,9 @@ diff old new
      }
      deployment: (_|_){
        // [eval]
-@@ -82,16 +45,10 @@
        description: (_|_){
          // [eval]
-         let dep#1 = (#struct){
+-        let dep#1 = (#struct){
 -          service: (#struct){
 -            ref: (#struct){
 -              kind: (string){ "service" }
@@ -294,14 +287,10 @@ diff old new
 -            }
 -          }
 -          hsize: (#struct){
-+          service: ~(#ServiceManifest)
-+          hsize: (_|_){
-+            // [incomplete] #ServiceManifest.description: undefined field: service:
-+            //     ./in.cue:5:28
-           }
-         }
+-          }
+-        }
++        let dep#1 = ~(#KumoriKinds.deployment)
          service: (_|_){
-@@ -98,10 +55,9 @@
            // [eval]
            description: (_|_){
              // [eval]
@@ -314,7 +303,7 @@ diff old new
                  //     ./in.cue:51:14
                }
              }
-@@ -124,10 +80,9 @@
+@@ -124,10 +74,9 @@
        // [eval]
        description: (_|_){
          // [eval]
@@ -327,7 +316,7 @@ diff old new
              //     ./in.cue:51:14
            }
          }
-@@ -141,9 +96,7 @@
+@@ -141,9 +90,7 @@
    #RelabelService: (_|_){
      // [eval]
      _params: (#struct){
@@ -338,7 +327,7 @@ diff old new
      }
      out: (_|_){
        // [eval]
-@@ -157,16 +110,10 @@
+@@ -157,16 +104,10 @@
      $_instances: (number){ |(*(int){ 1 }, (number){ >=0 }) }
    }
    #Deployment: (#struct){

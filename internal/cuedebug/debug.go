@@ -43,8 +43,21 @@ type Config struct {
 	//    x: (#D & {b: 2}).b // allow this
 	//
 	// This behavior was erroneously permitted in the v2 evaluator and was fixed
-	// in v3. This allows users that rely on this behavior to use v3.
+	// in v3. This allows users that rely on this behavior to use v3. This
+	// option also discards closedness of the resulting expression. As was
+	// reported in Issue #3534, this was another erroneous behavior in v2 that
+	// is otherwise fixed in v3.
+	//
 	// To aid the transition to v3, this is enabled by default for now.
+	//
+	// A possible solution for both incompatibilities would be the introduction
+	// of an openAll builtin to recursive open up a cue value. For the first
+	// issue, the example above could be rewritten as:
+	//
+	//     x: (openAll(#D) & {b: 2}).b
+	//
+	// For the second issue, to open up the entire result of an inline struct,
+	// such an expression could be written as `openAll(expr).out`.
 	OpenInline bool `envflag:"default:true"`
 }
 

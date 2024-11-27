@@ -78,7 +78,10 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		if c.CloseInfo.FromDef {
 			t |= closeDef
 		}
-		if c.CloseInfo.FromEmbed {
+		// NOTE: the check for OpenInline is not strictly necessary, but it
+		// clarifies that using id.FromEmbed is not used when OpenInline is not
+		// used.
+		if c.CloseInfo.FromEmbed || (n.ctx.OpenInline && id.FromEmbed) {
 			t |= closeEmbed
 		}
 		if t != 0 || c.CloseInfo.GroupUnify {

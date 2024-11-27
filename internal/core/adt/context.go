@@ -1142,6 +1142,7 @@ func pos(x Node) token.Pos {
 func (c *OpContext) node(orig Node, x Expr, scalar bool, state combinedFlags) *Vertex {
 	if c.OpenInline {
 		if _, ok := x.(Resolver); !ok {
+			c.ci.FromEmbed = true
 			c.inLiteralSelectee++
 			defer func() { c.inLiteralSelectee-- }()
 		}

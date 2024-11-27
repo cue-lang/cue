@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf546fb7_4cca939f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-27T17:59:00Z",
+      "side": 1,
+      "message": "LGTM modulo one suggestion, thanks very much!",
+      "revId": "45841efa8b970a5fa32413bc54a9fb021835274a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4cb1565_a4acfe5f",
+        "filename": "cmd/cue/cmd/testdata/script/def_comments.txtar",
+        "patchSetId": 7
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-27T17:59:00Z",
+      "side": 1,
+      "message": "The ordering here is reversed from the above, which doesn\u0027t seem right. This seems to be fixed by my suggestion for an alternative implementation of `internal.MergeDoc`.",
+      "revId": "45841efa8b970a5fa32413bc54a9fb021835274a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea53de62_fcdc594e",
+        "filename": "cue/types.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 896,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-27T17:59:00Z",
+      "side": 1,
+      "message": "This is being done so much, it seems like it might be nice to have `ast.AddComments`. Then this would be:\n\n    ast.AddComments(f, ast.Comments(e))\n\nor alternatively (with a slight risk of breaking external API users), we could change the signature of `ast.AddComment` to accept a variadic argument.\n\nAnyway, no need for now, just sayin\u0027 😊",
+      "revId": "45841efa8b970a5fa32413bc54a9fb021835274a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "21f824db_54560726",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-27T17:59:00Z",
+      "side": 1,
+      "message": "Thanks for this useful comment.",
+      "revId": "45841efa8b970a5fa32413bc54a9fb021835274a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2eb3faeb_b97b7df9",
+        "filename": "internal/internal.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-27T17:59:00Z",
+      "side": 1,
+      "message": "Reduce the indentation throughout by doing this:\n```\nif len(comments) \u003c\u003d 1 {\n    return comments\n}\n```",
+      "revId": "45841efa8b970a5fa32413bc54a9fb021835274a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d718b574_fff3acd3",
+        "filename": "internal/internal.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-27T17:59:00Z",
+      "side": 1,
+      "message": "This doesn\u0027t look quite right, as if a.Doc and b.Doc are both true, then cmp(a, b) and cmp(b, a) will return -1, which is an inconsistent result for the sorting algorithm (in the past I\u0027ve seen this provoke a panic in sort.Sort).\n\nI was about to suggest changing it to this:\n\n```\n    if a.Doc !\u003d b.Doc {\n       if a.Doc {\n          return -1\n       }\n       return 1\n    }\n    return 0\n```\n\nbut then I realised that the whole sorting thing is a bit unnecessary. We\u0027d have to use sort.Stable to ensure that ordering is preserved, but I don\u0027t think we actually need to sort at all. How about something like this?\n\n```\n// MergeDocs merges multiple doc comments into one single doc comment.\nfunc MergeDocs(comments []*ast.CommentGroup) []*ast.CommentGroup {\n\tif len(comments) \u003c\u003d 1 || !hasDocComment(comments) {\n\t\treturn comments\n\t}\n\tcomments1 :\u003d make([]*ast.CommentGroup, 0, len(comments))\n\tcomments1 \u003d append(comments1, nil)\n\tvar docComment *ast.CommentGroup\n\tfor _, c :\u003d range comments {\n\t\tswitch {\n\t\tcase !c.Doc:\n\t\t\tcomments1 \u003d append(comments1, c)\n\t\tcase docComment \u003d\u003d nil:\n\t\t\tdocComment \u003d c\n\t\tdefault:\n\t\t\tdocComment.List \u003d append(slices.Clip(docComment.List), \u0026ast.Comment{Text: \"//\"})\n\t\t\tdocComment.List \u003d append(docComment.List, c.List...)\n\t\t}\n\t}\n\tcomments1[0] \u003d docComment\n\treturn comments1\n}\n\nfunc hasDocComment(comments []*ast.CommentGroup) bool {\n\tfor _, c :\u003d range comments {\n\t\tif c.Doc {\n\t\t\treturn true\n\t\t}\n\t}\n\treturn false\n}\n```\n\nThe slices.Clip is to be defensive with respect to possible slice aliasing.",
+      "revId": "45841efa8b970a5fa32413bc54a9fb021835274a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

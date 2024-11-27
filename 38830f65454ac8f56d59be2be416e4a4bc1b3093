@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5db4a079_c8a28e5a",
+        "filename": "cmd/cue/cmd/testdata/script/def_openapi.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-27T14:40:39Z",
+      "side": 1,
+      "message": "We should not duplicate the title here. Fixed.",
+      "parentUuid": "324d6b9d_d752ef5b",
+      "revId": "38830f65454ac8f56d59be2be416e4a4bc1b3093",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "14ca1054_6269d7e1",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ddea208_42fdab13",
+        "filename": "cmd/cue/cmd/testdata/script/encoding_comments.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-27T14:40:39Z",
+      "side": 1,
+      "message": "Indeed. I think we need to merge multiple doc comments into a single comment group and add necessary blank line between comments. Fixed.",
+      "parentUuid": "14ca1054_6269d7e1",
+      "revId": "38830f65454ac8f56d59be2be416e4a4bc1b3093",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0dc247a1_cafb62da",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-11-21T18:00:23Z",
       "side": 1,
       "message": "```suggestion\nfunc FileComments(f *ast.File) []*ast.CommentGroup {\n```",
+      "revId": "38830f65454ac8f56d59be2be416e4a4bc1b3093",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "030f0e1c_f346a1e0",
+        "filename": "internal/internal.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-11-27T14:40:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0dc247a1_cafb62da",
       "revId": "38830f65454ac8f56d59be2be416e4a4bc1b3093",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -4,18 +4,60 @@
 module: "mod.test"
 language: version: "v0.9.0"
 -- in.cue --
-package exitcode
-
 import (
 	pkg "foo.com/example"
 )
 
-#D: {a: 1}
-
-// allow this in compatibility mode
+// This test tests that closeness errors are eliminated that occur within an
+// inline struct.
 inlineErr: {
-	x: (#D & {b: 2}).b
+	#D: {a: 1}
+
+	// Allow a closedness error that occurs within an inline struct.
+	def: x: (#D & {b: 2}).b
 }
+
+// These tests test that selecting into an inlined struct recursively opens this
+// struct in OpenInline.
+outerErr: {
+	_inToOut: {
+		in: _
+		out: in.foo
+	}
+
+	// The closedness of #Inner should be opened in OpenInline mode.
+	issue3534: {
+		#Inner: foo: minor: 2
+		#Outer: version: { major: 1, ... }
+
+		t1: #Outer
+		t1: version: (_inToOut & {in: #Inner}).out
+	}
+
+	// Test that the same principle works with the close builtin.
+	usingClose: {
+		// Same as above, but with an additional level of nesting.
+		#Inner:  foo: close({minor: 2})
+		#Outer: version: { major: 1, ... }
+
+		t1: #Outer
+		t1: version: (_inToOut & {in: #Inner}).out
+	}
+
+	// Test that the mechanism still works with extra nesting: the closedness of
+	// #Inner should be opened recursively in OpenInline mode.
+	extraNesting: {
+		// Same as above, but with an additional level of nesting.
+		#Inner: foo: x: minor: 2
+		#Outer: version: x: { major: 1, ... }
+
+		t1: #Outer
+		t1: version: (_inToOut & {in: #Inner}).out
+	}
+}
+
+// Here OpenInline does _not_ erase the error, as the error is already present
+// in the referred definitions.
 
 // faulty struct referenced from package
 refFromPkg: (pkg.#E).b
@@ -35,36 +77,137 @@ package example
 #E: #D & {b: 1}
 
 -- out/eval/stats --
-Leaks:  8
-Freed:  18
-Reused: 14
-Allocs: 12
-Retain: 12
+Leaks:  18
+Freed:  73
+Reused: 69
+Allocs: 22
+Retain: 37
 
-Unifications: 26
-Conjuncts:    34
-Disjuncts:    27
+Unifications: 91
+Conjuncts:    141
+Disjuncts:    107
 -- out/evalalpha --
 Errors:
+outerErr.extraNesting.t1.version.x.major: field not allowed:
+    ./in.cue:46:25
+outerErr.issue3534.t1.version.major: field not allowed:
+    ./in.cue:19:8
+    ./in.cue:25:22
+outerErr.usingClose.t1.version.major: field not allowed:
+    ./in.cue:34:17
+    ./in.cue:35:22
 #E.b: field not allowed:
-    ./in.cue:15:14
+    ./in.cue:57:14
     ./cue.mod/pkg/foo.com/example/example.cue:4:11
 refFromLet.X.#E.b: field not allowed:
-    ./in.cue:20:7
-    ./in.cue:20:13
+    ./in.cue:62:7
+    ./in.cue:62:13
 
 Result:
 (_|_){
   // [eval]
-  #D: (#struct){
-    a: (int){ 1 }
-  }
   inlineErr: (struct){
-    x: (int){ 2 }
+    #D: (#struct){
+      a: (int){ 1 }
+    }
+    def: (struct){
+      x: (int){ 2 }
+    }
+  }
+  outerErr: (_|_){
+    // [eval]
+    _inToOut: (struct){
+      in: (_){ _ }
+      out: (_|_){
+        // [incomplete] outerErr._inToOut.out: in.foo undefined as in is incomplete (type _):
+        //     ./in.cue:19:8
+      }
+    }
+    issue3534: (_|_){
+      // [eval]
+      #Inner: (#struct){
+        foo: (#struct){
+          minor: (int){ 2 }
+        }
+      }
+      #Outer: (#struct){
+        version: (#struct){
+          major: (int){ 1 }
+        }
+      }
+      t1: (_|_){
+        // [eval]
+        version: (_|_){
+          // [eval]
+          major: (_|_){
+            // [eval] outerErr.issue3534.t1.version.major: field not allowed:
+            //     ./in.cue:19:8
+            //     ./in.cue:25:22
+          }
+          minor: (int){ 2 }
+        }
+      }
+    }
+    usingClose: (_|_){
+      // [eval]
+      #Inner: (#struct){
+        foo: (#struct){
+          minor: (int){ 2 }
+        }
+      }
+      #Outer: (#struct){
+        version: (#struct){
+          major: (int){ 1 }
+        }
+      }
+      t1: (_|_){
+        // [eval]
+        version: (_|_){
+          // [eval]
+          major: (_|_){
+            // [eval] outerErr.usingClose.t1.version.major: field not allowed:
+            //     ./in.cue:34:17
+            //     ./in.cue:35:22
+          }
+          minor: (int){ 2 }
+        }
+      }
+    }
+    extraNesting: (_|_){
+      // [eval]
+      #Inner: (#struct){
+        foo: (#struct){
+          x: (#struct){
+            minor: (int){ 2 }
+          }
+        }
+      }
+      #Outer: (#struct){
+        version: (#struct){
+          x: (#struct){
+            major: (int){ 1 }
+          }
+        }
+      }
+      t1: (_|_){
+        // [eval]
+        version: (_|_){
+          // [eval]
+          x: (_|_){
+            // [eval]
+            major: (_|_){
+              // [eval] outerErr.extraNesting.t1.version.x.major: field not allowed:
+              //     ./in.cue:46:25
+            }
+            minor: (int){ 2 }
+          }
+        }
+      }
+    }
   }
   refFromPkg: (_|_){
     // [eval] #E.b: field not allowed:
-    //     ./in.cue:15:14
+    //     ./in.cue:57:14
     //     ./cue.mod/pkg/foo.com/example/example.cue:4:11
   }
   refFromLet: (_|_){
@@ -78,16 +221,16 @@ Result:
         // [eval]
         b: (_|_){
           // [eval] refFromLet.X.#E.b: field not allowed:
-          //     ./in.cue:20:7
-          //     ./in.cue:20:13
+          //     ./in.cue:62:7
+          //     ./in.cue:62:13
         }
         a: (int){ 2 }
       }
     }
     x: (_|_){
       // [eval] refFromLet.X.#E.b: field not allowed:
-      //     ./in.cue:20:7
-      //     ./in.cue:20:13
+      //     ./in.cue:62:7
+      //     ./in.cue:62:13
     }
   }
 }
@@ -95,31 +238,153 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,4 +1,14 @@
--(struct){
-+Errors:
+@@ -1,10 +1,18 @@
+ Errors:
+-outerErr.usingClose.t1.version.major: field not allowed:
++outerErr.extraNesting.t1.version.x.major: field not allowed:
++    ./in.cue:46:25
++outerErr.issue3534.t1.version.major: field not allowed:
+     ./in.cue:19:8
+-    ./in.cue:34:23
++    ./in.cue:25:22
++outerErr.usingClose.t1.version.major: field not allowed:
++    ./in.cue:34:17
+     ./in.cue:35:22
+-    ./in.cue:37:7
+-    ./in.cue:38:16
 +#E.b: field not allowed:
-+    ./in.cue:15:14
++    ./in.cue:57:14
 +    ./cue.mod/pkg/foo.com/example/example.cue:4:11
 +refFromLet.X.#E.b: field not allowed:
-+    ./in.cue:20:7
-+    ./in.cue:20:13
-+
-+Result:
-+(_|_){
-+  // [eval]
-   #D: (#struct){
-     a: (int){ 1 }
-   }
-@@ -5,8 +15,13 @@
-   inlineErr: (struct){
-     x: (int){ 2 }
-   }
++    ./in.cue:62:7
++    ./in.cue:62:13
+ 
+ Result:
+ (_|_){
+@@ -26,20 +34,27 @@
+         //     ./in.cue:19:8
+       }
+     }
+-    issue3534: (struct){
+-      #Inner: (#struct){
+-        foo: (#struct){
+-          minor: (int){ 2 }
+-        }
+-      }
+-      #Outer: (#struct){
+-        version: (#struct){
+-          major: (int){ 1 }
+-        }
+-      }
+-      t1: (#struct){
+-        version: (#struct){
+-          major: (int){ 1 }
++    issue3534: (_|_){
++      // [eval]
++      #Inner: (#struct){
++        foo: (#struct){
++          minor: (int){ 2 }
++        }
++      }
++      #Outer: (#struct){
++        version: (#struct){
++          major: (int){ 1 }
++        }
++      }
++      t1: (_|_){
++        // [eval]
++        version: (_|_){
++          // [eval]
++          major: (_|_){
++            // [eval] outerErr.issue3534.t1.version.major: field not allowed:
++            //     ./in.cue:19:8
++            //     ./in.cue:25:22
++          }
+           minor: (int){ 2 }
+         }
+       }
+@@ -62,43 +77,52 @@
+           // [eval]
+           major: (_|_){
+             // [eval] outerErr.usingClose.t1.version.major: field not allowed:
+-            //     ./in.cue:19:8
+-            //     ./in.cue:34:23
++            //     ./in.cue:34:17
+             //     ./in.cue:35:22
+-            //     ./in.cue:37:7
+-            //     ./in.cue:38:16
+-          }
+-          minor: (int){ 2 }
+-        }
+-      }
+-    }
+-    extraNesting: (struct){
+-      #Inner: (#struct){
+-        foo: (#struct){
+-          x: (#struct){
+-            minor: (int){ 2 }
+-          }
+-        }
+-      }
+-      #Outer: (#struct){
+-        version: (#struct){
+-          x: (#struct){
+-            major: (int){ 1 }
+-          }
+-        }
+-      }
+-      t1: (#struct){
+-        version: (#struct){
+-          x: (#struct){
+-            major: (int){ 1 }
+-            minor: (int){ 2 }
+-          }
+-        }
+-      }
+-    }
+-  }
 -  refFromPkg: (int){ 1 }
 -  refFromLet: (struct){
++          }
++          minor: (int){ 2 }
++        }
++      }
++    }
++    extraNesting: (_|_){
++      // [eval]
++      #Inner: (#struct){
++        foo: (#struct){
++          x: (#struct){
++            minor: (int){ 2 }
++          }
++        }
++      }
++      #Outer: (#struct){
++        version: (#struct){
++          x: (#struct){
++            major: (int){ 1 }
++          }
++        }
++      }
++      t1: (_|_){
++        // [eval]
++        version: (_|_){
++          // [eval]
++          x: (_|_){
++            // [eval]
++            major: (_|_){
++              // [eval] outerErr.extraNesting.t1.version.x.major: field not allowed:
++              //     ./in.cue:46:25
++            }
++            minor: (int){ 2 }
++          }
++        }
++      }
++    }
++  }
 +  refFromPkg: (_|_){
 +    // [eval] #E.b: field not allowed:
-+    //     ./in.cue:15:14
++    //     ./in.cue:57:14
 +    //     ./cue.mod/pkg/foo.com/example/example.cue:4:11
 +  }
 +  refFromLet: (_|_){
@@ -127,16 +392,16 @@ diff old new
      let X#1 = (_|_){
        // [eval]
        #D: (#struct){
-@@ -14,15 +29,18 @@
+@@ -106,15 +130,18 @@
        }
        #E: (_|_){
          // [eval]
 -        a: (int){ 2 }
          b: (_|_){
            // [eval] refFromLet.X.#E.b: field not allowed:
--          //     ./in.cue:19:7
-           //     ./in.cue:20:7
-           //     ./in.cue:20:13
+-          //     ./in.cue:61:7
+           //     ./in.cue:62:7
+           //     ./in.cue:62:13
          }
 -      }
 -    }
@@ -146,18 +411,110 @@ diff old new
 +    }
 +    x: (_|_){
 +      // [eval] refFromLet.X.#E.b: field not allowed:
-+      //     ./in.cue:20:7
-+      //     ./in.cue:20:13
++      //     ./in.cue:62:7
++      //     ./in.cue:62:13
 +    }
    }
  }
 -- out/eval --
-(struct){
-  #D: (#struct){
-    a: (int){ 1 }
-  }
+Errors:
+outerErr.usingClose.t1.version.major: field not allowed:
+    ./in.cue:19:8
+    ./in.cue:34:23
+    ./in.cue:35:22
+    ./in.cue:37:7
+    ./in.cue:38:16
+
+Result:
+(_|_){
+  // [eval]
   inlineErr: (struct){
-    x: (int){ 2 }
+    #D: (#struct){
+      a: (int){ 1 }
+    }
+    def: (struct){
+      x: (int){ 2 }
+    }
+  }
+  outerErr: (_|_){
+    // [eval]
+    _inToOut: (struct){
+      in: (_){ _ }
+      out: (_|_){
+        // [incomplete] outerErr._inToOut.out: in.foo undefined as in is incomplete (type _):
+        //     ./in.cue:19:8
+      }
+    }
+    issue3534: (struct){
+      #Inner: (#struct){
+        foo: (#struct){
+          minor: (int){ 2 }
+        }
+      }
+      #Outer: (#struct){
+        version: (#struct){
+          major: (int){ 1 }
+        }
+      }
+      t1: (#struct){
+        version: (#struct){
+          major: (int){ 1 }
+          minor: (int){ 2 }
+        }
+      }
+    }
+    usingClose: (_|_){
+      // [eval]
+      #Inner: (#struct){
+        foo: (#struct){
+          minor: (int){ 2 }
+        }
+      }
+      #Outer: (#struct){
+        version: (#struct){
+          major: (int){ 1 }
+        }
+      }
+      t1: (_|_){
+        // [eval]
+        version: (_|_){
+          // [eval]
+          major: (_|_){
+            // [eval] outerErr.usingClose.t1.version.major: field not allowed:
+            //     ./in.cue:19:8
+            //     ./in.cue:34:23
+            //     ./in.cue:35:22
+            //     ./in.cue:37:7
+            //     ./in.cue:38:16
+          }
+          minor: (int){ 2 }
+        }
+      }
+    }
+    extraNesting: (struct){
+      #Inner: (#struct){
+        foo: (#struct){
+          x: (#struct){
+            minor: (int){ 2 }
+          }
+        }
+      }
+      #Outer: (#struct){
+        version: (#struct){
+          x: (#struct){
+            major: (int){ 1 }
+          }
+        }
+      }
+      t1: (#struct){
+        version: (#struct){
+          x: (#struct){
+            major: (int){ 1 }
+            minor: (int){ 2 }
+          }
+        }
+      }
+    }
   }
   refFromPkg: (int){ 1 }
   refFromLet: (struct){
@@ -171,9 +528,9 @@ diff old new
         a: (int){ 2 }
         b: (_|_){
           // [eval] refFromLet.X.#E.b: field not allowed:
-          //     ./in.cue:19:7
-          //     ./in.cue:20:7
-          //     ./in.cue:20:13
+          //     ./in.cue:61:7
+          //     ./in.cue:62:7
+          //     ./in.cue:62:13
         }
       }
     }
@@ -183,13 +540,82 @@ diff old new
 -- out/compile --
 --- in.cue
 {
-  #D: {
-    a: 1
-  }
   inlineErr: {
-    x: (〈1;#D〉 & {
-      b: 2
-    }).b
+    #D: {
+      a: 1
+    }
+    def: {
+      x: (〈1;#D〉 & {
+        b: 2
+      }).b
+    }
+  }
+  outerErr: {
+    _inToOut: {
+      in: _
+      out: 〈0;in〉.foo
+    }
+    issue3534: {
+      #Inner: {
+        foo: {
+          minor: 2
+        }
+      }
+      #Outer: {
+        version: {
+          major: 1
+          ...
+        }
+      }
+      t1: 〈0;#Outer〉
+      t1: {
+        version: (〈2;_inToOut〉 & {
+          in: 〈2;#Inner〉
+        }).out
+      }
+    }
+    usingClose: {
+      #Inner: {
+        foo: close({
+          minor: 2
+        })
+      }
+      #Outer: {
+        version: {
+          major: 1
+          ...
+        }
+      }
+      t1: 〈0;#Outer〉
+      t1: {
+        version: (〈2;_inToOut〉 & {
+          in: 〈2;#Inner〉
+        }).out
+      }
+    }
+    extraNesting: {
+      #Inner: {
+        foo: {
+          x: {
+            minor: 2
+          }
+        }
+      }
+      #Outer: {
+        version: {
+          x: {
+            major: 1
+            ...
+          }
+        }
+      }
+      t1: 〈0;#Outer〉
+      t1: {
+        version: (〈2;_inToOut〉 & {
+          in: 〈2;#Inner〉
+        }).out
+      }
+    }
   }
   refFromPkg: 〈import;"foo.com/example"〉.#E.b
   refFromLet: {

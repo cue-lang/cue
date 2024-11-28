@@ -16,3 +16,7 @@ unknown command "unknown" for "cue"
 unknown flag: --unknown
 -- typo_cmd.stdout --
 unknown command "evla" for "cue"
+
+Did you mean this?
+	eval
+

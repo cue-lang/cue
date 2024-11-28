@@ -204,11 +204,6 @@ func New(args []string) (*Command, error) {
 		// We can explicitly trigger help on certain errors via pflag.ErrHelp.
 		SilenceErrors: true,
 		SilenceUsage:  true,
-
-		// We currently support top-level custom commands like `cue mycmd` as an alias
-		// for `cue cmd mycmd`, so any sub-command suggestions might be confusing.
-		// TODO(mvdan): remove this and test it, as we no longer support `cue mycmd`.
-		DisableSuggestions: true,
 	}
 
 	c := &Command{

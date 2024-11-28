@@ -71,15 +71,13 @@ func (n *nodeContext) finalizeSharing() {
 			// a mechanism to detect that.
 			n.ctx.toFinalize = append(n.ctx.toFinalize, v)
 		}
-		if v.Parent == n.node.Parent {
-			if !v.Rooted() && v.MayAttach() {
-				n.isShared = false
-				n.node.Arcs = v.Arcs
-				n.node.BaseValue = v.BaseValue
-				n.node.status = v.status
-				n.node.ClosedRecursive = v.ClosedRecursive
-				n.node.HasEllipsis = v.HasEllipsis
-			}
+		if v.state != nil && v.state.parent != nil {
+			v.Parent = v.state.parent
+			v.Label = n.node.Label
+
+			// TODO: see if this can be removed and why some errors are not
+			// propagated when removed.
+			n.isShared = false
 		}
 	case *Bottom:
 		// An error trumps sharing. We can leave it as is.
@@ -99,12 +97,9 @@ func (n *nodeContext) share(c Conjunct, arc *Vertex, id CloseInfo) {
 	n.shared = c
 	n.sharedID = id
 
-	if arc.IsDetached() && !arc.anonymous { // Second check necessary  ? XXX
-		// If the status is just "conjuncts", we could just take over the arcs.
-		arc.Parent = n.node.Parent
-		arc.Finalize(n.ctx)
-		for _, a := range arc.Arcs {
-			a.Parent = n.node
+	if arc.IsDetached() && arc.MayAttach() { // TODO: Second check necessary?
+		if s := arc.getState(n.ctx); s != nil {
+			s.parent = n.node.Parent
 		}
 	}
 

@@ -94,21 +94,18 @@ select: indirect: {
 	opt?: run?: string
 }
 -- out/evalalpha/stats --
-Leaks:  250
+Leaks:  228
 Freed:  0
 Reused: 0
-Allocs: 250
+Allocs: 228
 Retain: 0
 
-Unifications: 202
-Conjuncts:    987
+Unifications: 183
+Conjuncts:    916
 Disjuncts:    0
 -- out/evalalpha --
 Errors:
-structural cycle:
-    ./in.cue:56:8
-issue3182.first.t2.x.b: structural cycle:
-    ./issue3182.cue:6:6
+issue3182.first.t2.x.b: structural cycle
 
 Result:
 (_|_){
@@ -153,8 +150,7 @@ Result:
     k20: (int){ 0 }
     k30: (int){ 0 }
   }
-  issue1708: (_|_){
-    // [structural cycle]
+  issue1708: (struct){
     #add10: (#struct){
       in: (number){ number }
       a10: (#struct){
@@ -173,14 +169,8 @@ Result:
     }
     k00: (int){ 0 }
     k10: (int){ 10 }
-    k20: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:56:8
-    }
-    k30: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:56:8
-    }
+    k20: (int){ 20 }
+    k30: (int){ 30 }
   }
   issue3182: (_|_){
     // [structural cycle]
@@ -194,8 +184,7 @@ Result:
         x: (_|_){
           // [structural cycle]
           b: (_|_){
-            // [structural cycle] issue3182.first.t2.x.b: structural cycle:
-            //     ./issue3182.cue:6:6
+            // [structural cycle] issue3182.first.t2.x.b: structural cycle
           }
         }
       }
@@ -250,43 +239,23 @@ diff old new
 -Reused: 429
 -Allocs: 317
 -Retain: 1074
-+Leaks:  250
++Leaks:  228
 +Freed:  0
 +Reused: 0
-+Allocs: 250
++Allocs: 228
 +Retain: 0
  
 -Unifications: 746
 -Conjuncts:    2813
 -Disjuncts:    1485
-+Unifications: 202
-+Conjuncts:    987
++Unifications: 183
++Conjuncts:    916
 +Disjuncts:    0
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,5 +1,8 @@
- Errors:
--issue3182.first.t2.x.b: structural cycle
-+structural cycle:
-+    ./in.cue:56:8
-+issue3182.first.t2.x.b: structural cycle:
-+    ./issue3182.cue:6:6
- 
- Result:
- (_|_){
-@@ -44,7 +47,8 @@
-     k20: (int){ 0 }
-     k30: (int){ 0 }
-   }
--  issue1708: (struct){
-+  issue1708: (_|_){
-+    // [structural cycle]
-     #add10: (#struct){
-       in: (number){ number }
-       a10: (#struct){
-@@ -53,20 +57,24 @@
+@@ -53,14 +53,12 @@
            // [incomplete] issue1708.#add10.a10.o: non-concrete value number in operand to +:
            //     ./in.cue:52:20
            //     ./in.cue:51:7
@@ -302,31 +271,7 @@ diff old new
        }
      }
      k00: (int){ 0 }
-     k10: (int){ 10 }
--    k20: (int){ 20 }
--    k30: (int){ 30 }
-+    k20: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:56:8
-+    }
-+    k30: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:56:8
-+    }
-   }
-   issue3182: (_|_){
-     // [structural cycle]
-@@ -80,7 +88,8 @@
-         x: (_|_){
-           // [structural cycle]
-           b: (_|_){
--            // [structural cycle] issue3182.first.t2.x.b: structural cycle
-+            // [structural cycle] issue3182.first.t2.x.b: structural cycle:
-+            //     ./issue3182.cue:6:6
-           }
-         }
-       }
-@@ -104,7 +113,7 @@
+@@ -104,7 +102,7 @@
      direct: (struct){
        #Step: (_){ _ }
        #Job: (_){ matchN(1, (#list){
@@ -335,8 +280,6 @@ diff old new
            }
          }) }
      }
--- diff/todo/p1 --
-issue1708: invalid structural cycle
 -- diff/todo/p3 --
 Error positions.
 Incorrect path due to structure sharing.

@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6991f9b5_7ecba8c5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-28T11:28:37Z",
+      "side": 1,
+      "message": "Apologies that we didn\u0027t review this sooner. While reviewing this I realised there are more edge cases to worry about. I replied in https://github.com/cue-lang/cue/issues/3464#issuecomment-2505894766; we should reach an agreement there first, and then we can come back here and update the patch.",
+      "revId": "2238478bc6bf24248645b89f70754b05dfb781dd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2098ef54_8bab24cc",
+        "filename": "cmd/cue/cmd/orphans.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-28T11:28:37Z",
+      "side": 1,
+      "message": "clarify that this is more about ignoring empty documents or missing keys.",
+      "revId": "2238478bc6bf24248645b89f70754b05dfb781dd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a4e9285_d503a81c",
+        "filename": "cmd/cue/cmd/testdata/script/import_list.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-28T11:28:37Z",
+      "side": 1,
+      "message": "replace import4 with issue3464 for clarity",
+      "revId": "2238478bc6bf24248645b89f70754b05dfb781dd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f48f234_b63e6a3d",
+        "filename": "cmd/cue/cmd/testdata/script/import_list.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-28T11:28:37Z",
+      "side": 1,
+      "message": "can you please add this test in one commit first, showing the previous behavior, and then do the fix in a second commit so we can see the diff?",
+      "revId": "2238478bc6bf24248645b89f70754b05dfb781dd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

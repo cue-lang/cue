@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7dece85_2776baa3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-28T17:04:43Z",
+      "side": 1,
+      "message": "LGTM with a request for a little more context.",
+      "revId": "1959d0bcee5aff1d23f1b864b7ca0345dbcaac19",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10ecb56c_ee680f43",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1194,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-28T17:04:43Z",
+      "side": 1,
+      "message": "It would be nice to say at least a tiny bit about _why_ it\u0027s needed for dep.",
+      "revId": "1959d0bcee5aff1d23f1b864b7ca0345dbcaac19",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bec5bb60_3f2f20ad",
+        "filename": "internal/core/adt/share.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-28T17:04:43Z",
+      "side": 1,
+      "message": "Maybe add a comment saying what\u0027s happening here?",
+      "revId": "1959d0bcee5aff1d23f1b864b7ca0345dbcaac19",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a377370_e1be82d4",
+        "filename": "internal/core/adt/share.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-28T17:04:43Z",
+      "side": 1,
+      "message": "again, a comment or two would be nice, otherwise what\u0027s going on is very opaque (and presumably it wasn\u0027t obvious otherwise the code would have been like this in the first place).",
+      "revId": "1959d0bcee5aff1d23f1b864b7ca0345dbcaac19",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

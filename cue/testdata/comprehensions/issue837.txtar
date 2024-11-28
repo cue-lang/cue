@@ -75,10 +75,10 @@ Conjuncts:    563
 Disjuncts:    30
 -- out/evalalpha --
 Errors:
-#Configure.service.description.role: undefined field: role:
-    ./in.cue:40:19
-#DoDeploy.deployment.description.service.description.role: undefined field: role:
-    ./in.cue:40:19
+#Configure.service.description.configed.labstr: undefined field: label:
+    ./in.cue:51:14
+#DoDeploy.deployment.description.service.description.configed.labstr: undefined field: label:
+    ./in.cue:51:14
 #RelabelService.out.labstr: undefined field: label:
     ./in.cue:51:14
 
@@ -125,15 +125,16 @@ Result:
           // [eval]
           description: (_|_){
             // [eval]
-            let configed#2 = (#struct){
+            let configed#2 = (_|_){
+              // [eval]
               labstr: (_|_){
-                // [incomplete] #DoDeploy.deployment.description.service.description.configed.labstr: undefined field: label:
+                // [eval] #DoDeploy.deployment.description.service.description.configed.labstr: undefined field: label:
                 //     ./in.cue:51:14
               }
             }
             role: (_|_){
-              // [eval] #DoDeploy.deployment.description.service.description.role: undefined field: role:
-              //     ./in.cue:40:19
+              // [eval] #DoDeploy.deployment.description.service.description.configed.labstr: undefined field: label:
+              //     ./in.cue:51:14
             }
           }
         }
@@ -150,15 +151,16 @@ Result:
       // [eval]
       description: (_|_){
         // [eval]
-        let configed#2 = (#struct){
+        let configed#2 = (_|_){
+          // [eval]
           labstr: (_|_){
-            // [incomplete] #Configure.service.description.configed.labstr: undefined field: label:
+            // [eval] #Configure.service.description.configed.labstr: undefined field: label:
             //     ./in.cue:51:14
           }
         }
         role: (_|_){
-          // [eval] #Configure.service.description.role: undefined field: role:
-          //     ./in.cue:40:19
+          // [eval] #Configure.service.description.configed.labstr: undefined field: label:
+          //     ./in.cue:51:14
         }
       }
     }
@@ -200,6 +202,19 @@ Result:
 diff old new
 --- old
 +++ new
+@@ -1,8 +1,8 @@
+ Errors:
+-#Configure.service.description.role: undefined field: role:
+-    ./in.cue:40:19
+-#DoDeploy.deployment.description.service.description.role: undefined field: role:
+-    ./in.cue:40:19
++#Configure.service.description.configed.labstr: undefined field: label:
++    ./in.cue:51:14
++#DoDeploy.deployment.description.service.description.configed.labstr: undefined field: label:
++    ./in.cue:51:14
+ #RelabelService.out.labstr: undefined field: label:
+     ./in.cue:51:14
+ 
 @@ -13,24 +13,10 @@
      ref: (#struct){
        kind: (string){ "deployment" }
@@ -248,7 +263,7 @@ diff old new
        }
      }
    }
-@@ -58,50 +38,20 @@
+@@ -58,42 +38,13 @@
    #DoDeploy: (_|_){
      // [eval]
      _params: (#struct){
@@ -293,30 +308,29 @@ diff old new
          service: (_|_){
            // [eval]
            description: (_|_){
-             // [eval]
--            let configed#2 = (_|_){
--              // [eval]
-+            let configed#2 = (#struct){
-               labstr: (_|_){
--                // [eval] #DoDeploy.deployment.description.service.description.configed.labstr: undefined field: label:
-+                // [incomplete] #DoDeploy.deployment.description.service.description.configed.labstr: undefined field: label:
-                 //     ./in.cue:51:14
+@@ -106,8 +57,8 @@
                }
              }
-@@ -124,10 +74,9 @@
-       // [eval]
-       description: (_|_){
-         // [eval]
--        let configed#2 = (_|_){
--          // [eval]
-+        let configed#2 = (#struct){
-           labstr: (_|_){
--            // [eval] #Configure.service.description.configed.labstr: undefined field: label:
-+            // [incomplete] #Configure.service.description.configed.labstr: undefined field: label:
-             //     ./in.cue:51:14
+             role: (_|_){
+-              // [eval] #DoDeploy.deployment.description.service.description.role: undefined field: role:
+-              //     ./in.cue:40:19
++              // [eval] #DoDeploy.deployment.description.service.description.configed.labstr: undefined field: label:
++              //     ./in.cue:51:14
+             }
            }
          }
-@@ -141,9 +90,7 @@
+@@ -132,8 +83,8 @@
+           }
+         }
+         role: (_|_){
+-          // [eval] #Configure.service.description.role: undefined field: role:
+-          //     ./in.cue:40:19
++          // [eval] #Configure.service.description.configed.labstr: undefined field: label:
++          //     ./in.cue:51:14
+         }
+       }
+     }
+@@ -141,9 +92,7 @@
    #RelabelService: (_|_){
      // [eval]
      _params: (#struct){
@@ -327,7 +341,7 @@ diff old new
      }
      out: (_|_){
        // [eval]
-@@ -157,16 +104,10 @@
+@@ -157,16 +106,10 @@
      $_instances: (number){ |(*(int){ 1 }, (number){ >=0 }) }
    }
    #Deployment: (#struct){
@@ -544,6 +558,8 @@ Result:
 Some incorrect error messages. The newly introduced error messages for hsize
 seem to be correct, though.
 Error paths seem wrong as a result of structure sharing.
+Error path now selects into let. This is probably okay, and
+to some extent is clearer.
 -- out/compile --
 --- in.cue
 {

@@ -1191,7 +1191,13 @@ func (c *OpContext) node(orig Node, x Expr, scalar bool, state combinedFlags) *V
 		if node == nil {
 			panic("unexpected markers with nil node")
 		}
-
+		// Needed for package dep: dep does partial evaluation of expressions
+		// while traversing values. Not evaluating the node here could lead
+		// to a lookup in an unevaluated node, resulting in erroneously failing
+		// lookups.
+		if c.isDevVersion() && nv.nonRooted {
+			nv.CompleteArcsOnly(c)
+		}
 	default:
 		if kind := v.Kind(); kind&StructKind != 0 {
 			c.addErrf(IncompleteError, pos(x),

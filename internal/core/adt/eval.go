@@ -1016,6 +1016,10 @@ type nodeContext struct {
 	// for source-level debuggers.
 	node *Vertex
 
+	// parent keeps track of the parent Vertex in which a Vertex is being
+	// evaluated. This is to keep track of the full path in error messages.
+	parent *Vertex
+
 	// underlying is the original Vertex that this node overlays. It should be
 	// set for all Vertex values that were cloned.
 	underlying *Vertex

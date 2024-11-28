@@ -325,12 +325,12 @@ func TestAttributeInt(t *testing.T) {
 		path: "a",
 		attr: "foo",
 		pos:  2,
-		err:  errors.New(`strconv.ParseInt: parsing "c=1": invalid syntax`),
+		err:  errors.New(`illegal number start "c=1"`),
 	}, {
 		path: "c",
 		attr: "nongo",
 		pos:  0,
-		err:  errors.New(`strconv.ParseInt: parsing "10Mi": invalid syntax`),
+		val:  10 << 20,
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%s.%s:%d", tc.path, tc.attr, tc.pos), func(t *testing.T, m *cuetdtest.M) {

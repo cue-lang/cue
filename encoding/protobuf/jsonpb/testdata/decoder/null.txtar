@@ -1,5 +1,3 @@
-# TODO(fmt): first line in data.cue indented when it should not be: cuelang.org/issue/722
-
 -- schema.cue --
 a0: int
 a1: 1 | *2
@@ -55,7 +53,7 @@ a9: null
 a10: null
 
 -- data.cue --
-	// comment a0
+// comment a0
 a0: null
 
 // comment a1

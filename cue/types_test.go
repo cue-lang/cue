@@ -33,8 +33,6 @@ import (
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
-	"cuelang.org/go/internal/core/runtime"
-	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/tdtest"
@@ -2204,8 +2202,8 @@ func TestUnify2(t *testing.T) {
 		a := ctx.CompileString(tc.a)
 		b := ctx.CompileString(tc.b)
 
-		r := (*runtime.Runtime)(ctx)
-		r.SetDebugOptions(&cuedebug.Config{LogEval: 1})
+		// r := (*runtime.Runtime)(ctx)
+		// r.SetDebugOptions(&cuedebug.Config{LogEval: 1})
 
 		c := a.Unify(b)
 

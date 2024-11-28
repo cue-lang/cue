@@ -35,6 +35,51 @@ r: {out: k: l: string}.out
 import "example.com/t"
 
 f: t.p
+-- out/self-v3/expand_imports --
+f: {
+	c: [int]
+	d: [c][0]
+	// TODO: simplify these:
+	e: {
+		out: c
+	}.out
+	f: Q
+	g: Q
+	h: {
+		out: {
+			r: {
+				s: string
+			}
+		}
+	}.out
+	i: h.r
+	j: h.r.s
+	k: K
+	l: K.l
+}
+
+//cue:path: "example.com/t".q
+let Q = {
+	x: [...int]
+}
+
+//cue:path: "example.com/t".out.k
+let K = {
+	l: string
+}
+-- diff/-out/self-v3/expand_imports<==>+out/self/expand_imports --
+diff old new
+--- old
++++ new
+@@ -25,7 +25,7 @@
+ 	x: [...int]
+ }
+ 
+-//cue:path: "example.com/t".r.k
++//cue:path: "example.com/t".out.k
+ let K = {
+ 	l: string
+ }
 -- out/self/expand_imports --
 f: {
 	c: [int]

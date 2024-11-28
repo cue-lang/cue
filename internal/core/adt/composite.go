@@ -411,9 +411,15 @@ func (v *Vertex) Rooted() bool {
 func (v *Vertex) IsDetached() bool {
 	// v might have resulted from an inline struct that was subsequently shared.
 	// In this case, it is still rooted.
-	for ; v != nil; v = v.Parent {
+	for v != nil {
 		if v.Rooted() {
 			return false
+		}
+		// Already take into account the provisionally assigned parent.
+		if v.state != nil && v.state.parent != nil {
+			v = v.state.parent
+		} else {
+			v = v.Parent
 		}
 	}
 

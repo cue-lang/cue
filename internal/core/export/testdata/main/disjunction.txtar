@@ -5,7 +5,6 @@ b: *2 | int
 c: *(a & b) | 3
 -- out/definition --
 // Issue #950
-// Issue #950
 a: *1 | int
 b: *2 | int
 c: *(a & b) | 3

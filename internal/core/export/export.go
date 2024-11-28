@@ -209,8 +209,6 @@ func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) *ast.File {
 		if pkgName != "" {
 			pkg.Name = ast.NewIdent(pkgName)
 			f.Decls = append(f.Decls, pkg)
-		} else {
-			astutil.CopyComments(f, pkg)
 		}
 	}
 

@@ -1,7 +1,7 @@
 #name: range unification
 #evalPartial
 -- in.cue --
-	// with concrete values
+// with concrete values
 a1: >=1 & <=5 & 3
 a2: >=1 & <=5 & 1
 a3: >=1 & <=5 & 5

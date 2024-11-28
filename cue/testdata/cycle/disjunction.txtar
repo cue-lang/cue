@@ -1,7 +1,5 @@
-# TODO(fmt): first line indented when it should not be: cuelang.org/issue/722
-
 -- in.cue --
-		// cycle is a structural cycle
+// cycle is a structural cycle
 cycle: a: cycle
 
 // reference to outside structural cycle

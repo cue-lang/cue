@@ -1,7 +1,7 @@
 #name: resolved self-reference cycles: Issue 19
 #evalPartial
 -- in.cue --
-	// CUE knows how to resolve the following:
+// CUE knows how to resolve the following:
 x: y + 100
 y: x - 100
 x: 200
@@ -13,14 +13,14 @@ z3: 8
 
 // TODO: extensive tests with disjunctions.
 -- out/def --
-	// CUE knows how to resolve the following:
+// CUE knows how to resolve the following:
 x:  200
 y:  100
 z1: 11
 z2: 10
 z3: 8
 -- out/export --
-	// CUE knows how to resolve the following:
+// CUE knows how to resolve the following:
 x:  200
 y:  100
 z1: 11

@@ -293,6 +293,7 @@ func TestAttributeInt(t *testing.T) {
 	a: {
 		a: 0 @foo(1,3,c=1)
 		b: 1 @bar(a,-4,c,d=1) @foo(a,,d=1)
+		c: 2 @nongo(10Mi)
 	}
 	`
 	testCases := []struct {
@@ -325,6 +326,11 @@ func TestAttributeInt(t *testing.T) {
 		attr: "foo",
 		pos:  2,
 		err:  errors.New(`strconv.ParseInt: parsing "c=1": invalid syntax`),
+	}, {
+		path: "c",
+		attr: "nongo",
+		pos:  0,
+		err:  errors.New(`strconv.ParseInt: parsing "10Mi": invalid syntax`),
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, fmt.Sprintf("%s.%s:%d", tc.path, tc.attr, tc.pos), func(t *testing.T, m *cuetdtest.M) {

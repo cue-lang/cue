@@ -6,7 +6,13 @@ cmp stderr unknown_cmd.out
 ! stdout .
 cmp stderr unknown_flag.out
 
+! exec cue evla
+! stdout .
+cmp stderr typo_cmd.stdout
+
 -- unknown_cmd.out --
 unknown command "unknown" for "cue"
 -- unknown_flag.out --
 unknown flag: --unknown
+-- typo_cmd.stdout --
+unknown command "evla" for "cue"

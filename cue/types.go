@@ -992,25 +992,6 @@ func (v Value) Pos() token.Pos {
 
 // TODO: IsFinal: this value can never be changed.
 
-// IsClosed reports whether a list or struct is closed. It reports false when
-// the value is not a list or struct.
-//
-// Deprecated: use Allows(AnyString) and Allows(AnyIndex) or Kind/IncompleteKind.
-func (v hiddenValue) IsClosed() bool {
-	if v.v == nil {
-		return false
-	}
-	switch v.Kind() {
-	case ListKind:
-		return v.v.IsClosedList()
-	case StructKind:
-		// TODO: remove this more expensive computation once the old evaluator
-		// is removed.
-		return !v.Allows(AnyString)
-	}
-	return false
-}
-
 // Allows reports whether a field with the given selector could be added to v.
 //
 // Allows does not take into account validators like list.MaxItems(4). This may

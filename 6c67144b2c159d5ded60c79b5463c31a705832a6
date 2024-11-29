@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a077686_f1614167",
+        "filename": "internal/core/adt/share.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-29T08:44:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ccf00ead_7ed0a661",
+      "revId": "6c67144b2c159d5ded60c79b5463c31a705832a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "53989e4a_ac1bf095",
@@ -65,6 +83,24 @@
       "writtenOn": "2024-11-29T08:39:06Z",
       "side": 1,
       "message": "```suggestion\n\t\t// directly, though, we record the prospective parent in the state: as the\n```\n?",
+      "revId": "6c67144b2c159d5ded60c79b5463c31a705832a6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5742f1be_2d0b8d2e",
+        "filename": "internal/core/adt/share.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-29T08:44:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "53989e4a_ac1bf095",
       "revId": "6c67144b2c159d5ded60c79b5463c31a705832a6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

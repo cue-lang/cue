@@ -32,6 +32,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 )
@@ -708,6 +709,14 @@ func (s *state) doc(n ast.Node) {
 	if doc != nil {
 		ast.SetComments(n, []*ast.CommentGroup{doc})
 	}
+}
+
+func nodeStr(n ast.Node) string {
+	data, err := format.Node(n)
+	if err != nil {
+		panic(err)
+	}
+	return string(data)
 }
 
 func (s *state) schema(n cue.Value, idRef ...label) ast.Expr {

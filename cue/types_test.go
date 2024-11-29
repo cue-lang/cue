@@ -266,13 +266,11 @@ func TestValueType(t *testing.T) {
 		kind:           cue.StructKind,
 		incompleteKind: cue.StructKind,
 		concrete:       true,
-		closed:         true,
 	}, {
 		value:          `v: []`,
 		kind:           cue.ListKind,
 		incompleteKind: cue.ListKind,
 		concrete:       true,
-		closed:         true,
 	}, {
 		value:          `v: [...int]`,
 		kind:           cue.ListKind,
@@ -329,16 +327,12 @@ func TestValueType(t *testing.T) {
 		kind:           cue.StructKind,
 		incompleteKind: cue.StructKind,
 		concrete:       true,
-		closed:         true,
 	}, {
 		value: `v: #Foo | int
 		#Foo: {
 			name: string,
 			}`,
 		incompleteKind: cue.StructKind | cue.IntKind,
-		// Hard to tell what is correct here, but For backwards compatibility,
-		// this is false.
-		closed: false,
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
@@ -353,9 +347,6 @@ func TestValueType(t *testing.T) {
 			}
 			if got := v.IsConcrete(); got != tc.concrete {
 				t.Errorf("IsConcrete: got %v; want %v", got, tc.concrete)
-			}
-			if got := v.IsClosed(); got != tc.closed {
-				t.Errorf("IsClosed: got %v; want %v", got, tc.closed)
 			}
 		})
 	}

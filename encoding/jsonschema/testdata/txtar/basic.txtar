@@ -1,42 +1,55 @@
 -- schema.json --
 {
-  "$schema": "https://json-schema.org/draft/2019-09/schema",
-
-  "type": "object",
-  "title": "Main schema",
-  "description": "Specify who you are and all.",
-
-  "properties": {
-    "person": {
-      "description": "A person is a human being.",
-      "type": "object",
-      "required": [ "name" ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "examples": [ "foo" ]
-        },
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "type": "object",
+    "title": "Main schema",
+    "description": "Specify who you are and all.",
+    "$defs": {
         "address": {
-            "description": "where does this person live?",
+            "description": "address stores a postal address",
             "type": "string",
-			"minLength": 4,
-			"maxLength": 20
+            "minLength": 4,
+            "maxLength": 20
         },
-        "children": {
-          "description": "A very large comment that will be wrapped after a certain line length. Let's keep on going and see what happens.",
-          "type": "array",
-          "items": { "type": "string" },
-          "default": []
-        },
-        "home phone": {
-            "type": "string",
-            "deprecated": true
+        "phone number": {
+            "description": "a telephone number",
+            "type": "string"
         }
-      }
+    },
+    "properties": {
+        "person": {
+            "description": "A person is a human being.",
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "examples": [
+                        "foo"
+                    ]
+                },
+                "address": {
+                    "description": "where does this person live?",
+                    "$ref": "#/$defs/address"
+                },
+                "children": {
+                    "description": "A very large comment that will be wrapped after a certain line length. Let's keep on going and see what happens.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": []
+                },
+                "home phone": {
+                    "$ref": "#/$defs/phone number",
+                    "deprecated": true
+                }
+            }
+        }
     }
-  }
 }
-
 -- out/decode/extract --
 import "strings"
 
@@ -50,12 +63,16 @@ person?: {
 	name!: string
 
 	// where does this person live?
-	address?: strings.MinRunes(4) & strings.MaxRunes(20)
+	address?: #address
 
 	// A very large comment that will be wrapped after a certain line
 	// length. Let's keep on going and see what happens.
 	children?: [...string]
-	"home phone"?: string @deprecated()
+	"home phone"?: #["phone%20number"] @deprecated()
 	...
 }
+
+#address: strings.MinRunes(4) & strings.MaxRunes(20)
+
+#: "phone number": string
 ...

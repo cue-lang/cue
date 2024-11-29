@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ea5eaa0_fde97133",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-29T09:18:11Z",
+      "side": 1,
+      "message": "Perhaps link to that CL so it\u0027s clear which actual change we\u0027re referring to?",
+      "revId": "c4f558a436369d0fe49c0d2393bb396cbf293348",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

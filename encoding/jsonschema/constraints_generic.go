@@ -39,19 +39,24 @@ func constraintAddDefinitions(key string, n cue.Value, s *state) {
 
 		ident := "#" + name
 		if ast.IsValidIdent(ident) {
-			f = &ast.Field{Value: s.schema(n, label{ident, true})}
+			expr, sub := s.schemaState(n, allTypes, []label{{ident, true}})
+			f = &ast.Field{Value: expr}
 			f.Label = ast.NewIdent(ident)
+			sub.doc(f)
 		} else {
-			f = &ast.Field{Value: s.schema(n, label{"#", true}, label{name: name})}
+			expr, sub := s.schemaState(n, allTypes, []label{{"#", true}, {name: name}})
+			f = &ast.Field{Value: expr}
 			f.Label = ast.NewString(name)
 			ident = "#"
 			f = &ast.Field{
 				Label: ast.NewIdent("#"),
 				Value: ast.NewStruct(f),
 			}
+			sub.doc(f)
 		}
 
 		ast.SetRelPos(f, token.NewSection)
+
 		s.definitions = append(s.definitions, f)
 		s.setField(label{name: ident, isDef: true}, f)
 	})

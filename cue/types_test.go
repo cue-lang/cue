@@ -1545,17 +1545,17 @@ func TestAllows(t *testing.T) {
 			x: 1
 			`,
 		sel: cue.AnyString,
-
-		// TODO(v0.6.0)
-		// }, {
-		// 	desc: "definition in closed scalar",
-		// 	in: `
-		// 	x: #Def
-		// 	x: 1
-		// 	#Def: int
-		// 	`,
-		// 	sel:   cue.AnyDefinition,
-		// 	allow: true,
+	}, {
+		// TODO: note that this may be affected by https://cuelang.org/issue/543
+		// if or when we decide to implement it in the future.
+		desc: "definition in closed scalar",
+		in: `
+			x: #Def
+			x: 1
+			#Def: int
+			`,
+		sel:   cue.AnyDefinition,
+		allow: true,
 	}, {
 		desc: "allow field in any",
 		in: `

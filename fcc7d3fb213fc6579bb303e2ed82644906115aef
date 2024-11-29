@@ -50,6 +50,24 @@
       "message": "LGTM. Doing #543 is/would be a huge and disruptive language change. This test records the current status quo and is very much worth having. Might be worth having a TODO with the test pointing to that issue though.",
       "revId": "fcc7d3fb213fc6579bb303e2ed82644906115aef",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6cb59a85_37e35612",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-11-29T11:02:46Z",
+      "side": 1,
+      "message": "Good point, added a TODO. I agree about the issue; with Marcel we already agreed that there\u0027s no way we are considering such intrusive language changes until evalv3 is enabled by default and stable.",
+      "parentUuid": "f6c03ab2_fc6c2d75",
+      "revId": "fcc7d3fb213fc6579bb303e2ed82644906115aef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

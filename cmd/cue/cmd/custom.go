@@ -72,7 +72,7 @@ func addCustomCommands(c *Command, cmd *cobra.Command, typ string, tools *cue.In
 		return
 	}
 	for fields.Next() {
-		sub, err := customCommand(c, commandSection, fields.Label(), tools)
+		sub, err := customCommand(c, commandSection, fields.Selector().Unquoted(), tools)
 		if err == nil {
 			cmd.AddCommand(sub)
 		}

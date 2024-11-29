@@ -150,7 +150,10 @@ func Generate(pkgPath string, inst cue.InstanceOrValue, c *Config) (b []byte, er
 	g.addErr(err)
 
 	for iter.Next() {
-		g.decl(iter.Label(), iter.Value())
+		// TODO(mvdan): using cue.Definitions above means that we iterate over definitions,
+		// whose selector will not be of string type. Revisit this, because using Unquoted
+		// for definitions is likely not right.
+		g.decl(iter.Selector().Unquoted(), iter.Value())
 	}
 
 	r := (*cue.Runtime)(val.Context())

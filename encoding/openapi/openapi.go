@@ -149,7 +149,7 @@ func (c *Config) compose(inst cue.InstanceOrValue, schemas *ast.StructLit) (x *a
 		if i.Selector().IsDefinition() {
 			continue
 		}
-		label := i.Label()
+		label := i.Selector().Unquoted()
 		attr := i.Value().Attribute("openapi")
 		if s, _ := attr.String(0); s != "" {
 			label = s

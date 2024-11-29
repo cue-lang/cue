@@ -159,7 +159,7 @@ func mkCommand(ctx *task.Context) (c *exec.Cmd, doc []string, err error) {
 
 	// Struct case.
 	for iter, _ := env.Fields(); iter.Next(); {
-		label := iter.Label()
+		label := iter.Selector().Unquoted()
 		v, _ := iter.Value().Default()
 		var str string
 		switch v.Kind() {

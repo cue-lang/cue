@@ -708,7 +708,7 @@ func (b *builder) object(v cue.Value) {
 
 	required := []ast.Expr{}
 	for i, _ := v.Fields(); i.Next(); {
-		required = append(required, ast.NewString(i.Label()))
+		required = append(required, ast.NewString(i.Selector().Unquoted()))
 	}
 	if len(required) > 0 {
 		b.setFilter("Schema", "required", ast.NewList(required...))

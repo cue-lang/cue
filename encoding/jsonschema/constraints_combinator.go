@@ -35,7 +35,7 @@ func constraintAllOf(key string, n cue.Value, s *state) {
 	for _, v := range items {
 		x, sub := s.schemaState(v, s.allowedTypes, nil)
 		s.allowedTypes &= sub.allowedTypes
-		if sub.hasConstraints() {
+		if sub.hasConstraints {
 			// This might seem a little odd, since the actual
 			// types are the intersection of the known types
 			// of the allOf members. However, knownTypes
@@ -130,12 +130,11 @@ func constraintOneOf(key string, n cue.Value, s *state) {
 		}
 
 		// TODO: make more finegrained by making it two pass.
-		if sub.hasConstraints() {
+		if sub.hasConstraints {
 			needsConstraint = true
 		} else if (types & sub.allowedTypes) != 0 {
-			// If there's overlap between the
-			// uncontrained elements, we'll definitely
-			// need to add a constraint.
+			// If there's overlap between the unconstrained elements,
+			// we'll definitely need to add a constraint.
 			needsConstraint = true
 		}
 		types |= sub.allowedTypes

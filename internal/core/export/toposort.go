@@ -114,7 +114,7 @@ func VertexFeaturesUnsorted(v *adt.Vertex) (features []adt.Feature) {
 	return features
 }
 
-// sortedArcs is like sortArcs, but returns a the features of optional and
+// sortedArcs is like sortArcs, but returns the features of optional and
 // required fields in an sorted slice. Ultimately, the implementation should
 // use merge sort everywhere, and this will be the preferred method. Also,
 // when querying optional fields as well, this helps identifying the optional

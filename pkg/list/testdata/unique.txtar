@@ -48,7 +48,7 @@ fail: {
 	// Hidden values do not play a role in the comparisson.
 	ignoreHidden: [1, {1, _foo: 3}]
 
-	// This can be a permanent error, as the the optional field of the second
+	// This can be a permanent error, as the optional field of the second
 	// element is erroneous an cannot match.
 	ignoreOptError: [#a, #abErr]
 }
@@ -141,7 +141,7 @@ fail: {
 	// Hidden values do not play a role in the comparisson.
 	ignoreHidden: _|_ // fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1
 
-	// This can be a permanent error, as the the optional field of the second
+	// This can be a permanent error, as the optional field of the second
 	// element is erroneous an cannot match.
 	ignoreOptError: _|_ // fail.ignoreOptError: invalid value [~(#a),~(#abErr)] (does not satisfy list.UniqueItems): equal values at position 0 and 1
 }
@@ -198,7 +198,7 @@ diff old new
  	ignoreHidden: _|_ // fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1
 @@ -90,10 +88,5 @@
  
- 	// This can be a permanent error, as the the optional field of the second
+ 	// This can be a permanent error, as the optional field of the second
  	// element is erroneous an cannot match.
 -	ignoreOptError: [{
 -		a: 1
@@ -299,7 +299,7 @@ fail: {
 	// Hidden values do not play a role in the comparisson.
 	ignoreHidden: _|_ // fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1
 
-	// This can be a permanent error, as the the optional field of the second
+	// This can be a permanent error, as the optional field of the second
 	// element is erroneous an cannot match.
 	ignoreOptError: [{
 		a: 1

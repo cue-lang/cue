@@ -74,7 +74,7 @@ type overlayContext struct {
 	vertices []*Vertex
 }
 
-// cloneRoot clones the a Vertex in which disjunctions are defined to allow
+// cloneRoot clones the Vertex in which disjunctions are defined to allow
 // inserting selected disjuncts into a new Vertex.
 func (ctx *overlayContext) cloneRoot(root *nodeContext) *nodeContext {
 	// Clone all vertices that need to be cloned to support the overlay.

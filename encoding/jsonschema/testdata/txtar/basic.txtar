@@ -72,7 +72,9 @@ person?: {
 	...
 }
 
+// address stores a postal address
 #address: strings.MinRunes(4) & strings.MaxRunes(20)
 
+// a telephone number
 #: "phone number": string
 ...

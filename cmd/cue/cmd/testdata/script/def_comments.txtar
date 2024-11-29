@@ -43,12 +43,12 @@ cmp stdout stdout2
 exec cue def -l '#top:' issue3522.json
 stdout 'description of a field'
 stdout 'overall description'
-! stdout 'description of foo'
+stdout 'description of foo'
 
 exec cue def issue3522.json
 stdout 'description of a field'
 stdout 'overall description'
-! stdout 'description of foo'
+stdout 'description of foo'
 
 -- issue3522.json --
 {

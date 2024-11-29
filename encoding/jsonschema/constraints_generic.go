@@ -39,16 +39,26 @@ func constraintAddDefinitions(key string, n cue.Value, s *state) {
 
 		ident := "#" + name
 		if ast.IsValidIdent(ident) {
-			f = &ast.Field{Value: s.schema(n, label{ident, true})}
-			f.Label = ast.NewIdent(ident)
+			expr, sub := s.schemaState(n, allTypes, []label{{ident, true}})
+			f = &ast.Field{
+				Label: ast.NewIdent(ident),
+				Value: expr,
+			}
+			sub.doc(f)
 		} else {
-			f = &ast.Field{Value: s.schema(n, label{"#", true}, label{name: name})}
-			f.Label = ast.NewString(name)
+			expr, sub := s.schemaState(n, allTypes, []label{{"#", true}, {name: name}})
+			inner := ast.NewStruct(&ast.Field{
+				Label: ast.NewString(name),
+				Value: expr,
+			})
+			// Ensure that we get `#: foo: ...` not `#: {foo: ...}`
+			inner.Lbrace = token.NoPos
 			ident = "#"
 			f = &ast.Field{
 				Label: ast.NewIdent("#"),
-				Value: ast.NewStruct(f),
+				Value: inner,
 			}
+			sub.doc(f)
 		}
 
 		ast.SetRelPos(f, token.NewSection)

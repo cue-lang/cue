@@ -33,6 +33,23 @@
       "message": "I think this makes sense; but in the light of https://github.com/cue-lang/cue/issues/543 I defer to Marcel/Roger.",
       "revId": "fcc7d3fb213fc6579bb303e2ed82644906115aef",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6c03ab2_fc6c2d75",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-11-29T10:59:28Z",
+      "side": 1,
+      "message": "LGTM. Doing #543 is/would be a huge and disruptive language change. This test records the current status quo and is very much worth having. Might be worth having a TODO with the test pointing to that issue though.",
+      "revId": "fcc7d3fb213fc6579bb303e2ed82644906115aef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

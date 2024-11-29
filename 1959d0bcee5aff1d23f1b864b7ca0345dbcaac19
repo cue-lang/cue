@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "32868823_7284cca4",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1194,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-29T08:18:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "10ecb56c_ee680f43",
+      "revId": "1959d0bcee5aff1d23f1b864b7ca0345dbcaac19",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bec5bb60_3f2f20ad",
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "51471c9c_7a80ba3d",
+        "filename": "internal/core/adt/share.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-29T08:18:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bec5bb60_3f2f20ad",
+      "revId": "1959d0bcee5aff1d23f1b864b7ca0345dbcaac19",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1a377370_e1be82d4",
@@ -65,6 +101,24 @@
       "writtenOn": "2024-11-28T17:04:43Z",
       "side": 1,
       "message": "again, a comment or two would be nice, otherwise what\u0027s going on is very opaque (and presumably it wasn\u0027t obvious otherwise the code would have been like this in the first place).",
+      "revId": "1959d0bcee5aff1d23f1b864b7ca0345dbcaac19",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b545441d_f8f033f1",
+        "filename": "internal/core/adt/share.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-11-29T08:18:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a377370_e1be82d4",
       "revId": "1959d0bcee5aff1d23f1b864b7ca0345dbcaac19",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

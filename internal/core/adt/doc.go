@@ -20,7 +20,7 @@
 //
 // # Abstract Types
 //
-// The following types describe the a place where a value may be used:
+// The following types describe the place where a value may be used:
 //
 //	Decl       a value than can be used as a StructLit element.
 //	Elem       a value than can be used as a ListLit element.

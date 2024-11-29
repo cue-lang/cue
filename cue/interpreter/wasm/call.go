@@ -77,7 +77,7 @@ func decBool(v uint64) bool {
 	return api.DecodeU32(v) == 1
 }
 
-// decNumber decodes the the Wasm/System V ABI encoding of the
+// decNumber decodes the Wasm/System V ABI encoding of the
 // val number of type typ into a Go value.
 func decNumber(typ cue.Value, val uint64) (r any) {
 	ctx := typ.Context()

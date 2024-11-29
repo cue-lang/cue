@@ -145,10 +145,7 @@ func (c *Config) compose(inst cue.InstanceOrValue, schemas *ast.StructLit) (x *a
 	var title, version string
 	var info *ast.StructLit
 
-	for i, _ := val.Fields(cue.Definitions(true)); i.Next(); {
-		if i.Selector().IsDefinition() {
-			continue
-		}
+	for i, _ := val.Fields(); i.Next(); {
 		label := i.Selector().Unquoted()
 		attr := i.Value().Attribute("openapi")
 		if s, _ := attr.String(0); s != "" {

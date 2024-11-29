@@ -114,9 +114,11 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 
 func (d *decoder) schema(ref []ast.Label, v cue.Value) (a []ast.Decl) {
 	root := state{
-		decoder:       d,
-		schemaVersion: d.cfg.DefaultVersion,
-		isRoot:        true,
+		decoder: d,
+		schemaInfo: schemaInfo{
+			schemaVersion: d.cfg.DefaultVersion,
+		},
+		isRoot: true,
 	}
 
 	var name ast.Label
@@ -129,7 +131,7 @@ func (d *decoder) schema(ref []ast.Label, v cue.Value) (a []ast.Decl) {
 
 	expr, state := root.schemaState(v, allTypes, nil)
 	if state.allowedTypes == 0 {
-		d.addErr(errors.Newf(state.pos.Pos(), "constraints are not possible to satisfy"))
+		d.addErr(errors.Newf(v.Pos(), "constraints are not possible to satisfy"))
 	}
 
 	tags := []string{}
@@ -397,6 +399,7 @@ func (s *state) setTypeUsed(n cue.Value, t coreType) {
 
 type state struct {
 	*decoder
+	schemaInfo
 
 	isSchema bool // for omitting ellipsis in an ast.File
 
@@ -414,21 +417,8 @@ type state struct {
 	all      constraintInfo // values and oneOf etc.
 	nullable *ast.BasicLit  // nullable
 
-	// allowedTypes holds the set of types that
-	// this node is allowed to be.
-	allowedTypes cue.Kind
-
-	// knownTypes holds the set of types that this node
-	// is known to be one of by virtue of the constraints inside
-	// all. This is used to avoid adding redundant elements
-	// to the disjunction created by [state.finalize].
-	knownTypes cue.Kind
-
 	default_     ast.Expr
 	examples     []ast.Expr
-	title        string
-	description  string
-	deprecated   bool
 	exclusiveMin bool // For OpenAPI and legacy support.
 	exclusiveMax bool // For OpenAPI and legacy support.
 
@@ -447,9 +437,6 @@ type state struct {
 	ifConstraint   cue.Value
 	thenConstraint cue.Value
 	elseConstraint cue.Value
-
-	schemaVersion        Version
-	schemaVersionPresent bool
 
 	id *url.URL // base URI for $ref
 
@@ -476,6 +463,29 @@ type state struct {
 	//
 	//	"items": []
 	listItemsIsArray bool
+}
+
+// schemaInfo holds information about a schema
+// after it has been created.
+type schemaInfo struct {
+	// allowedTypes holds the set of types that
+	// this node is allowed to be.
+	allowedTypes cue.Kind
+
+	// knownTypes holds the set of types that this node
+	// is known to be one of by virtue of the constraints inside
+	// all. This is used to avoid adding redundant elements
+	// to the disjunction created by [state.finalize].
+	knownTypes cue.Kind
+
+	title       string
+	description string
+	deprecated  bool
+
+	schemaVersion        Version
+	schemaVersionPresent bool
+
+	hasConstraints bool
 }
 
 type label struct {
@@ -686,7 +696,7 @@ outer:
 	return e
 }
 
-func (s *state) comment() *ast.CommentGroup {
+func (s schemaInfo) comment() *ast.CommentGroup {
 	// Create documentation.
 	doc := strings.TrimSpace(s.title)
 	if s.description != "" {
@@ -703,7 +713,7 @@ func (s *state) comment() *ast.CommentGroup {
 	return internal.NewComment(true, doc)
 }
 
-func (s *state) doc(n ast.Node) {
+func (s schemaInfo) doc(n ast.Node) {
 	doc := s.comment()
 	if doc != nil {
 		ast.SetComments(n, []*ast.CommentGroup{doc})
@@ -721,27 +731,29 @@ func (s *state) schema(n cue.Value, idRef ...label) ast.Expr {
 // types holds the set of possible types that the value can hold.
 // idRef holds the path to the value.
 // isLogical specifies whether the caller is a logical operator like anyOf, allOf, oneOf, or not.
-func (s0 *state) schemaState(n cue.Value, types cue.Kind, idRef []label) (ast.Expr, *state) {
+func (s0 *state) schemaState(n cue.Value, types cue.Kind, idRef []label) (ast.Expr, schemaInfo) {
 	s := &state{
-		up:            s0,
-		schemaVersion: s0.schemaVersion,
-		isSchema:      s0.isSchema,
-		decoder:       s0.decoder,
-		allowedTypes:  types,
-		knownTypes:    allTypes,
-		idRef:         idRef,
-		pos:           n,
-		isRoot:        s0.isRoot && n == s0.pos,
+		up: s0,
+		schemaInfo: schemaInfo{
+			schemaVersion: s0.schemaVersion,
+			allowedTypes:  types,
+			knownTypes:    allTypes,
+		},
+		isSchema: s0.isSchema,
+		decoder:  s0.decoder,
+		idRef:    idRef,
+		pos:      n,
+		isRoot:   s0.isRoot && n == s0.pos,
 	}
 	if n.Kind() == cue.BoolKind {
 		if vfrom(VersionDraft6).contains(s.schemaVersion) {
 			// From draft6 onwards, boolean values signify a schema that always passes or fails.
-			return boolSchema(s.boolValue(n)), s
+			return boolSchema(s.boolValue(n)), s.schemaInfo
 		}
-		return s.errf(n, "boolean schemas not supported in %v", s.schemaVersion), s
+		return s.errf(n, "boolean schemas not supported in %v", s.schemaVersion), s.schemaInfo
 	}
 	if n.Kind() != cue.StructKind {
-		return s.errf(n, "schema expects mapping node, found %s", n.Kind()), s
+		return s.errf(n, "schema expects mapping node, found %s", n.Kind()), s.schemaInfo
 	}
 
 	// do multiple passes over the constraints to ensure they are done in order.
@@ -798,7 +810,9 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind, idRef []label) (ast.Ex
 	}
 	constraintIfThenElse(s)
 
-	return s.finalize(), s
+	expr := s.finalize()
+	s.schemaInfo.hasConstraints = s.hasConstraints()
+	return expr, s.schemaInfo
 }
 
 func (s *state) constValue(n cue.Value) ast.Expr {

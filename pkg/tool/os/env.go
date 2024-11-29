@@ -54,7 +54,7 @@ func (c *getenvCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	update := map[string]interface{}{}
 
 	for iter.Next() {
-		name := iter.Label()
+		name := iter.Selector().Unquoted()
 		if strings.HasPrefix(name, "$") {
 			continue
 		}
@@ -110,7 +110,7 @@ func (c *environCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	}
 
 	for iter.Next() {
-		name := iter.Label()
+		name := iter.Selector().Unquoted()
 		if strings.HasPrefix(name, "$") {
 			continue
 		}

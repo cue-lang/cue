@@ -95,7 +95,7 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 			return nil
 		}
 		for i.Next() {
-			ref := append(ref, i.Label())
+			ref := append(ref, i.Selector().Unquoted())
 			lab := d.mapRef(i.Value().Pos(), "", ref)
 			if len(lab) == 0 {
 				return nil
@@ -877,10 +877,9 @@ func (s *state) value(n cue.Value) ast.Expr {
 // This may also prevent exponential blow-up (as may happen when
 // converting YAML to JSON).
 func (s *state) processMap(n cue.Value, f func(key string, n cue.Value)) {
-
 	// TODO: intercept references to allow for optimized performance.
 	for i, _ := n.Fields(); i.Next(); {
-		f(i.Label(), i.Value())
+		f(i.Selector().Unquoted(), i.Value())
 	}
 }
 

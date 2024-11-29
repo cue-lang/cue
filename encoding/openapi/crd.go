@@ -169,7 +169,7 @@ func (b *builder) buildCoreStruct(v cue.Value) {
 		}
 	}
 	for i, _ := v.Fields(cue.Optional(true), cue.Hidden(false)); i.Next(); {
-		label := i.Label()
+		label := i.Selector().Unquoted()
 		sub, ok := b.properties[label]
 		if !ok {
 			sub = newCoreBuilder(b.ctx)

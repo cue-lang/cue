@@ -259,7 +259,9 @@ func (i *Iterator) Selector() Selector {
 // Label reports the label of the value if i iterates over struct fields and ""
 // otherwise.
 //
-// Deprecated: use [Iterator.Selector] and [Selector.String].
+// Deprecated: use [Iterator.Selector] with methods like
+// [Selector.Unquoted] or [Selector.String] depending on whether or not
+// you are only dealing with regular fields, whose labels are always [StringLabel].
 // Note that this will give more accurate string representations.
 func (i *hiddenIterator) Label() string {
 	if i.f == 0 {

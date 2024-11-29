@@ -310,7 +310,7 @@ func (d *decoder) interfaceValue(v Value) (x interface{}) {
 		iter, err := v.Fields()
 		d.addErr(err)
 		for iter.Next() {
-			m[iter.Label()] = d.interfaceValue(iter.Value())
+			m[iter.Selector().Unquoted()] = d.interfaceValue(iter.Value())
 		}
 		x = m
 
@@ -352,7 +352,7 @@ func (d *decoder) convertMap(x reflect.Value, v Value) {
 	iter, err := v.Fields()
 	d.addErr(err)
 	for iter.Next() {
-		key := iter.Label()
+		key := iter.Selector().Unquoted()
 
 		var kv reflect.Value
 		kt := t.Key()
@@ -408,9 +408,8 @@ func (d *decoder) convertStruct(x reflect.Value, v Value) {
 	iter, err := v.Fields()
 	d.addErr(err)
 	for iter.Next() {
-
 		var f *goField
-		key := iter.Label()
+		key := iter.Selector().Unquoted()
 		if i, ok := fields.nameIndex[key]; ok {
 			// Found an exact name match.
 			f = &fields.list[i]

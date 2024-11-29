@@ -60,7 +60,7 @@ type Info struct {
 }
 
 func FromIter(i *cue.Iterator) (info Info, err error) {
-	return FromValue(i.Label(), i.Value())
+	return FromValue(i.Selector().Unquoted(), i.Value())
 }
 
 func FromValue(name string, v cue.Value) (info Info, err error) {

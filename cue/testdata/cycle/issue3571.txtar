@@ -1,0 +1,345 @@
+-- in.cue --
+// These tests should NOT have structural cycles.
+simplified: {
+	#T
+	in: _
+	x: #T
+	x: x: #T
+	
+	#T: {
+		in: x
+		x: _
+	}
+}
+
+issue3571: {
+	a: #T
+	a: in: f: true
+	a: #in: {
+		g: #T
+		g: #in: f: #T
+		g: #in: f: #in: x: true
+		f?: _
+	}
+
+	#T: {
+		in:  #in
+		#in: _
+	}
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  54
+Reused: 42
+Allocs: 12
+Retain: 19
+
+Unifications: 54
+Conjuncts:    125
+Disjuncts:    73
+-- out/evalalpha --
+(struct){
+  simplified: (#struct){
+    in: (#struct){
+      x: (#struct){
+        in: (_){ _ }
+        x: (_){ _ }
+      }
+      in: ~(simplified.in.x)
+    }
+    x: (#struct){
+      x: (#struct){
+        in: (_){ _ }
+        x: (_){ _ }
+      }
+      in: ~(simplified.x.x)
+    }
+    #T: (#struct){
+      in: (_){ _ }
+      x: (_){ _ }
+    }
+  }
+  issue3571: (struct){
+    a: (#struct){
+      in: (#struct){
+        f: (bool){ true }
+        g: (#struct){
+          #in: (#struct){
+            f: (#struct){
+              #in: (#struct){
+                x: (bool){ true }
+              }
+              in: ~(issue3571.a.in.g.#in.f.#in)
+            }
+          }
+          in: ~(issue3571.a.in.g.#in)
+        }
+      }
+      #in: (#struct){
+        g: (#struct){
+          #in: (#struct){
+            f: (#struct){
+              #in: (#struct){
+                x: (bool){ true }
+              }
+              in: ~(issue3571.a.#in.g.#in.f.#in)
+            }
+          }
+          in: ~(issue3571.a.#in.g.#in)
+        }
+        f?: (_){ _ }
+      }
+    }
+    #T: (#struct){
+      in: (_){ _ }
+      #in: (_){ _ }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,24 +1,18 @@
+ (struct){
+   simplified: (#struct){
+     in: (#struct){
+-      in: (#struct){
+-        in: (_){ _ }
+-        x: (_){ _ }
+-      }
+-      x: (#struct){
+-        in: (_){ _ }
+-        x: (_){ _ }
+-      }
++      x: (#struct){
++        in: (_){ _ }
++        x: (_){ _ }
++      }
++      in: ~(simplified.in.x)
+     }
+     x: (#struct){
+-      in: (#struct){
+-        in: (_){ _ }
+-        x: (_){ _ }
+-      }
+-      x: (#struct){
+-        in: (_){ _ }
+-        x: (_){ _ }
+-      }
++      x: (#struct){
++        in: (_){ _ }
++        x: (_){ _ }
++      }
++      in: ~(simplified.x.x)
+     }
+     #T: (#struct){
+       in: (_){ _ }
+@@ -28,52 +22,30 @@
+   issue3571: (struct){
+     a: (#struct){
+       in: (#struct){
+-        g: (#struct){
+-          in: (#struct){
+-            f: (#struct){
+-              in: (#struct){
+-                x: (bool){ true }
+-              }
+-              #in: (#struct){
+-                x: (bool){ true }
+-              }
+-            }
+-          }
+-          #in: (#struct){
+-            f: (#struct){
+-              in: (#struct){
+-                x: (bool){ true }
+-              }
+-              #in: (#struct){
+-                x: (bool){ true }
+-              }
+-            }
+-          }
+-        }
+         f: (bool){ true }
++        g: (#struct){
++          #in: (#struct){
++            f: (#struct){
++              #in: (#struct){
++                x: (bool){ true }
++              }
++              in: ~(issue3571.a.in.g.#in.f.#in)
++            }
++          }
++          in: ~(issue3571.a.in.g.#in)
++        }
+       }
+       #in: (#struct){
+         g: (#struct){
+-          in: (#struct){
+-            f: (#struct){
+-              in: (#struct){
+-                x: (bool){ true }
+-              }
+-              #in: (#struct){
+-                x: (bool){ true }
+-              }
+-            }
+-          }
+-          #in: (#struct){
+-            f: (#struct){
+-              in: (#struct){
+-                x: (bool){ true }
+-              }
+-              #in: (#struct){
+-                x: (bool){ true }
+-              }
+-            }
+-          }
++          #in: (#struct){
++            f: (#struct){
++              #in: (#struct){
++                x: (bool){ true }
++              }
++              in: ~(issue3571.a.#in.g.#in.f.#in)
++            }
++          }
++          in: ~(issue3571.a.#in.g.#in)
+         }
+         f?: (_){ _ }
+       }
+-- out/eval --
+(struct){
+  simplified: (#struct){
+    in: (#struct){
+      in: (#struct){
+        in: (_){ _ }
+        x: (_){ _ }
+      }
+      x: (#struct){
+        in: (_){ _ }
+        x: (_){ _ }
+      }
+    }
+    x: (#struct){
+      in: (#struct){
+        in: (_){ _ }
+        x: (_){ _ }
+      }
+      x: (#struct){
+        in: (_){ _ }
+        x: (_){ _ }
+      }
+    }
+    #T: (#struct){
+      in: (_){ _ }
+      x: (_){ _ }
+    }
+  }
+  issue3571: (struct){
+    a: (#struct){
+      in: (#struct){
+        g: (#struct){
+          in: (#struct){
+            f: (#struct){
+              in: (#struct){
+                x: (bool){ true }
+              }
+              #in: (#struct){
+                x: (bool){ true }
+              }
+            }
+          }
+          #in: (#struct){
+            f: (#struct){
+              in: (#struct){
+                x: (bool){ true }
+              }
+              #in: (#struct){
+                x: (bool){ true }
+              }
+            }
+          }
+        }
+        f: (bool){ true }
+      }
+      #in: (#struct){
+        g: (#struct){
+          in: (#struct){
+            f: (#struct){
+              in: (#struct){
+                x: (bool){ true }
+              }
+              #in: (#struct){
+                x: (bool){ true }
+              }
+            }
+          }
+          #in: (#struct){
+            f: (#struct){
+              in: (#struct){
+                x: (bool){ true }
+              }
+              #in: (#struct){
+                x: (bool){ true }
+              }
+            }
+          }
+        }
+        f?: (_){ _ }
+      }
+    }
+    #T: (#struct){
+      in: (_){ _ }
+      #in: (_){ _ }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  simplified: {
+    〈0;#T〉
+    in: _
+    x: 〈0;#T〉
+    x: {
+      x: 〈1;#T〉
+    }
+    #T: {
+      in: 〈0;x〉
+      x: _
+    }
+  }
+  issue3571: {
+    a: 〈0;#T〉
+    a: {
+      in: {
+        f: true
+      }
+    }
+    a: {
+      #in: {
+        g: 〈2;#T〉
+        g: {
+          #in: {
+            f: 〈4;#T〉
+          }
+        }
+        g: {
+          #in: {
+            f: {
+              #in: {
+                x: true
+              }
+            }
+          }
+        }
+        f?: _
+      }
+    }
+    #T: {
+      in: 〈0;#in〉
+      #in: _
+    }
+  }
+}

@@ -74,7 +74,7 @@ workflows: trybot: _repo.bashWorkflow & {
 				_goTest32bit,
 				_goTestWasm,
 				for v in _e2eTestSteps {v},
-				_goCheck,
+				for v in _goChecks {v},
 				_checkTags,
 				// Run code generation towards the very end, to ensure it succeeds and makes no changes.
 				// Note that doing this before any Go tests or checks may lead to test cache misses,
@@ -158,25 +158,37 @@ workflows: trybot: _repo.bashWorkflow & {
 		},
 	]
 
-	_goCheck: githubactions.#Step & {
+	_goChecks: [...githubactions.#Step & {
 		// These checks can vary between platforms, as different code can be built
 		// based on GOOS and GOARCH build tags.
 		// However, CUE does not have any such build tags yet, and we don't use
 		// dependencies that vary wildly between platforms.
 		// For now, to save CI resources, just run the checks on one matrix job.
-		//
-		// Also ensure that the end-to-end tests in ./internal/_e2e, which are only run
-		// on pushes to protected branches, still build correctly before merging.
-		//
-		// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
-		if:   "\(_isLatestLinux)"
-		name: "Go checks"
-		run: """
-			go vet ./...
-			go mod tidy
-			(cd internal/_e2e && go test -run=-)
-			"""
-	}
+		if: _isLatestLinux
+	}] & [
+		{
+			name: "Go checks"
+			// Also ensure that the end-to-end tests in ./internal/_e2e, which are only run
+			// on pushes to protected branches, still build correctly before merging.
+			//
+			// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
+			run: """
+				go vet ./...
+				go mod tidy
+				(cd internal/_e2e && go test -run=-)
+				"""
+		}, {
+			name: "staticcheck"
+			// TODO(mvdan): once we can do 'go tool staticcheck' with Go 1.24+,
+			// then using this action is probably no longer worthwhile.
+			// Note that we should then persist staticcheck's cache too.
+			uses: "dominikh/staticcheck-action@v1"
+			with: {
+				version: "2024.1.1" // Pin a version for determinism.
+				"install-go": false // We install Go ourselves.
+			}
+		},
+	]
 
 	_checkTags: githubactions.#Step & {
 		// Ensure that GitHub and Gerrit agree on the full list of available tags.
@@ -185,7 +197,7 @@ workflows: trybot: _repo.bashWorkflow & {
 		// We use `git ls-remote` to list all tags from each remote git repository
 		// because it does not depend on custom REST API endpoints and is very fast.
 		// Note that it sorts tag names as strings, which is not the best, but works OK.
-		if:   "\(_isLatestLinux)"
+		if:   _isLatestLinux
 		name: "Check all git tags are available"
 		run: """
 			cd $(mktemp -d)

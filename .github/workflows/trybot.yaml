@@ -156,6 +156,12 @@ jobs:
           go mod tidy
           (cd internal/_e2e && go test -run=-)
       - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
+        name: staticcheck
+        uses: dominikh/staticcheck-action@v1
+        with:
+          version: 2024.1.1
+          install-go: false
+      - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
         name: Check all git tags are available
         run: |-
           cd $(mktemp -d)

@@ -578,49 +578,42 @@ func printError(w io.Writer, err error, cfg *Config) {
 		fprintf = defaultFprintf
 	}
 
-	positions := []string{}
-	for _, p := range Positions(err) {
-		pos := p.Position()
-		s := pos.Filename
-		if cfg.Cwd != "" {
-			if p, err := filepath.Rel(cfg.Cwd, s); err == nil {
-				s = p
-				// Some IDEs (e.g. VSCode) only recognize a path if it start
-				// with a dot. This also helps to distinguish between local
-				// files and builtin packages.
-				if !strings.HasPrefix(s, ".") {
-					s = fmt.Sprintf(".%s%s", string(filepath.Separator), s)
-				}
-			}
-		}
-		if cfg.ToSlash {
-			s = filepath.ToSlash(s)
-		}
-		if pos.IsValid() {
-			if s != "" {
-				s += ":"
-			}
-			s += fmt.Sprintf("%d:%d", pos.Line, pos.Column)
-		}
-		if s == "" {
-			s = "-"
-		}
-		positions = append(positions, s)
-	}
-
 	if e, ok := err.(Error); ok {
 		writeErr(w, e)
 	} else {
 		fprintf(w, "%v", err)
 	}
 
+	positions := Positions(err)
 	if len(positions) == 0 {
 		fprintf(w, "\n")
 		return
 	}
-
 	fprintf(w, ":\n")
-	for _, pos := range positions {
-		fprintf(w, "    %s\n", pos)
+	for _, p := range positions {
+		pos := p.Position()
+		path := pos.Filename
+		if cfg.Cwd != "" {
+			if p, err := filepath.Rel(cfg.Cwd, path); err == nil {
+				path = p
+				// Some IDEs (e.g. VSCode) only recognize a path if it starts
+				// with a dot. This also helps to distinguish between local
+				// files and builtin packages.
+				if !strings.HasPrefix(path, ".") {
+					path = fmt.Sprintf(".%c%s", filepath.Separator, path)
+				}
+			}
+		}
+		if cfg.ToSlash {
+			path = filepath.ToSlash(path)
+		}
+		fprintf(w, "    %s", path)
+		if pos.IsValid() {
+			if path != "" {
+				fprintf(w, ":")
+			}
+			fprintf(w, "%d:%d", pos.Line, pos.Column)
+		}
+		fprintf(w, "\n")
 	}
 }

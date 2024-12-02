@@ -28,10 +28,6 @@ func constraintAddDefinitions(key string, n cue.Value, s *state) {
 		s.errf(n, `"definitions" expected an object, found %s`, n.Kind())
 	}
 
-	old := s.isSchema
-	s.isSchema = true
-	defer func() { s.isSchema = old }()
-
 	s.processMap(n, func(key string, n cue.Value) {
 		name := key
 

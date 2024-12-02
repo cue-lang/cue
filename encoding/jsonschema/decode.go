@@ -126,7 +126,6 @@ func (d *decoder) schema(ref []ast.Label, v cue.Value) (a []ast.Decl) {
 
 	if inner >= 0 {
 		name = ref[inner]
-		root.isSchema = true
 	}
 
 	expr, state := root.schemaState(v, allTypes, nil)
@@ -400,8 +399,6 @@ func (s *state) setTypeUsed(n cue.Value, t coreType) {
 type state struct {
 	*decoder
 	schemaInfo
-
-	isSchema bool // for omitting ellipsis in an ast.File
 
 	up *state
 
@@ -739,11 +736,10 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind, idRef []label) (ast.Ex
 			allowedTypes:  types,
 			knownTypes:    allTypes,
 		},
-		isSchema: s0.isSchema,
-		decoder:  s0.decoder,
-		idRef:    idRef,
-		pos:      n,
-		isRoot:   s0.isRoot && n == s0.pos,
+		decoder: s0.decoder,
+		idRef:   idRef,
+		pos:     n,
+		isRoot:  s0.isRoot && n == s0.pos,
 	}
 	if n.Kind() == cue.BoolKind {
 		if vfrom(VersionDraft6).contains(s.schemaVersion) {

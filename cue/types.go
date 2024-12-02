@@ -33,7 +33,6 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/convert"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/export"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/core/subsume"
@@ -759,8 +758,7 @@ func (v Value) IncompleteKind() Kind {
 
 // MarshalJSON marshalls this value into valid JSON.
 func (v Value) MarshalJSON() (b []byte, err error) {
-	ctx := newContext(v.idx)
-	b, err = v.appendJSON(ctx, nil)
+	b, err = v.appendJSON(v.ctx(), nil)
 	if err != nil {
 		return nil, unwrapJSONError(err)
 	}
@@ -1730,7 +1728,7 @@ func (v Value) Unify(w Value) Value {
 		return v
 	}
 
-	ctx := newContext(v.idx)
+	ctx := v.ctx()
 	n := &adt.Vertex{}
 	addConjuncts(ctx, n, v.v)
 	addConjuncts(ctx, n, w.v)
@@ -1776,7 +1774,7 @@ func (v Value) UnifyAccept(w Value, accept Value) Value {
 	n.AddConjunct(adt.MakeRootConjunct(nil, v.v))
 	n.AddConjunct(adt.MakeRootConjunct(nil, w.v))
 
-	ctx := newContext(v.idx)
+	ctx := v.ctx()
 	n.Finalize(ctx)
 
 	n.Parent = v.v.Parent
@@ -2270,7 +2268,7 @@ process:
 					a.AddConjunct(adt.MakeRootConjunct(env, n.Val))
 					b.AddConjunct(adt.MakeRootConjunct(env, disjunct.Val))
 
-					ctx := eval.NewContext(v.idx, nil)
+					ctx := v.ctx()
 					a.Finalize(ctx)
 					b.Finalize(ctx)
 					if allowed(ctx, v.v, &b) != nil {

@@ -33,30 +33,31 @@ func TestCommand(t *testing.T) {
 
 	// Create one command and run it, only checking that it succeeds.
 	c, err := cmd.New([]string{"help", "export"})
-	c.SetOutput(io.Discard)
 	qt.Assert(t, qt.IsNil(err))
+	c.SetOutput(io.Discard)
 	err = c.Run(ctx)
 	qt.Assert(t, qt.IsNil(err))
 
 	// Create another command and run it, expecting it to fail.
 	c, err = cmd.New([]string{"help", "nosuchcommand"})
-	c.SetOutput(io.Discard)
 	qt.Assert(t, qt.IsNil(err))
+	c.SetOutput(io.Discard)
 	err = c.Run(ctx)
 	qt.Assert(t, qt.IsNotNil(err))
 
 	// Verify that SetInput and SetOutput work.
 	c, err = cmd.New([]string{"export", "-"})
+	qt.Assert(t, qt.IsNil(err))
 	c.SetInput(strings.NewReader("foo: 123\n"))
 	var buf bytes.Buffer
 	c.SetOutput(&buf)
-	qt.Assert(t, qt.IsNil(err))
 	err = c.Run(ctx)
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.Equals(buf.String(), "{\n    \"foo\": 123\n}\n"))
 
 	// Verify that we can use the API exposed by the embedded cobra command.
 	c, err = cmd.New([]string{"fmt", "nosuchfile.cue"})
+	qt.Assert(t, qt.IsNil(err))
 	err = c.Execute()
 	qt.Assert(t, qt.IsNotNil(err))
 }

@@ -153,7 +153,7 @@ embed: {
 			Constraint: token.Token("ILLEGAL")
 			TokenPos: token.Pos("fields.cue:5:8", nospace)
 			Token: token.Token(":")
-			Value: *ast.StructLit{
+			Value: *ast.StructLit@ref001{
 				Lbrace: token.Pos("fields.cue:5:10", blank)
 				Elts: []ast.Decl{
 					*ast.Field{
@@ -196,6 +196,7 @@ embed: {
 						Expr: *ast.Ident{
 							NamePos: token.Pos("fields.cue:10:2", newline)
 							Name: "#Schema"
+							Node: @ref001 (*ast.StructLit)
 						}
 					}
 				}

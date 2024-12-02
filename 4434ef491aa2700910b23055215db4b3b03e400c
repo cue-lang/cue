@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "609b6817_58da8148",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-02T15:51:58Z",
+      "side": 1,
+      "message": "SGTM but please add tests; see for example how we currently test both omitempty and filtering for strings in debug_test.go. It\u0027s perhaps verbose to add one more output file to each txtar file, but I think it\u0027s OK; we won\u0027t have dozens of options here. Or you could just enable it for the default output file, given that it adds information but doesn\u0027t remove any.",
+      "revId": "4434ef491aa2700910b23055215db4b3b03e400c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

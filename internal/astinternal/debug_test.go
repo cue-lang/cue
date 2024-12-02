@@ -43,7 +43,13 @@ func TestDebugPrint(t *testing.T) {
 			qt.Assert(t, qt.IsNil(err))
 
 			// The full syntax tree, as printed by default.
-			full := astinternal.AppendDebug(nil, f, astinternal.DebugConfig{})
+			// We enable IncludeNodeRefs because it only adds information
+			// that would not otherwise be present.
+			// The syntax tree does not contain any maps, so
+			// the generated reference names should be deterministic.
+			full := astinternal.AppendDebug(nil, f, astinternal.DebugConfig{
+				IncludeNodeRefs: true,
+			})
 			t.Writer(file.Name).Write(full)
 
 			// A syntax tree which omits any empty values,

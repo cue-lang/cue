@@ -46,12 +46,12 @@ for k, v in input if v > 2 {
 			Clauses: []ast.Clause{
 				*ast.ForClause{
 					For: token.Pos("comprehensions.cue:4:1", newline)
-					Key: *ast.Ident{
+					Key: *ast.Ident@ref002{
 						NamePos: token.Pos("comprehensions.cue:4:5", blank)
 						Name: "k"
 					}
 					Colon: token.Pos("comprehensions.cue:4:6", nospace)
-					Value: *ast.Ident{
+					Value: *ast.Ident@ref001{
 						NamePos: token.Pos("comprehensions.cue:4:8", blank)
 						Name: "v"
 					}
@@ -67,6 +67,7 @@ for k, v in input if v > 2 {
 						X: *ast.Ident{
 							NamePos: token.Pos("comprehensions.cue:4:22", blank)
 							Name: "v"
+							Node: @ref001 (*ast.Ident)
 						}
 						OpPos: token.Pos("comprehensions.cue:4:24", blank)
 						Op: token.Token(">")
@@ -87,6 +88,7 @@ for k, v in input if v > 2 {
 							X: *ast.Ident{
 								NamePos: token.Pos("comprehensions.cue:5:3", nospace)
 								Name: "k"
+								Node: @ref002 (*ast.Ident)
 							}
 							Rparen: token.Pos("comprehensions.cue:5:4", nospace)
 						}
@@ -97,6 +99,7 @@ for k, v in input if v > 2 {
 						Value: *ast.Ident{
 							NamePos: token.Pos("comprehensions.cue:5:7", blank)
 							Name: "v"
+							Node: @ref001 (*ast.Ident)
 						}
 						Attrs: []*ast.Attribute{}
 					}

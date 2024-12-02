@@ -270,12 +270,12 @@ func chooseCycle(indexCmp *indexComparison, unusedCycles []*Cycle) *Cycle {
 //  1. minimising the number of incoming edges that are violated
 //  2. chosing a node which was reachable as early as possible
 //  3. chosing a node with a smaller feature name (lexicographical)
-func (self *Graph) Sort(index adt.StringIndexer) []adt.Feature {
+func (graph *Graph) Sort(index adt.StringIndexer) []adt.Feature {
 	indexCmp := &indexComparison{index}
 
-	nodesSorted := make(Nodes, 0, len(self.nodes))
+	nodesSorted := make(Nodes, 0, len(graph.nodes))
 
-	scc := self.StronglyConnectedComponents()
+	scc := graph.StronglyConnectedComponents()
 	var sccReady []*StronglyConnectedComponent
 	for _, component := range scc {
 		component.visited = false

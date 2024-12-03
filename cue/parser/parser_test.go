@@ -261,6 +261,11 @@ func TestParse(t *testing.T) {
 		`,
 		"a: {b: {c: d}}, c: a, d: a.b, e: a.b.c, \"f\": f, [X=_]: X",
 	}, {
+		"predeclared identifiers",
+		`a:    __string
+		__int: 2`,
+		"a: __string, __int: 2\nidentifiers starting with '__' are reserved",
+	}, {
 		"empty fields",
 		`
 		"": 3

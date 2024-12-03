@@ -16,6 +16,23 @@
       "message": "Proof that the tip triggers work: https://github.com/cue-lang/cue/actions/runs/12141411416",
       "revId": "d9c99881c9d102cac4e3ad314d4686492964b332",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "990d857c_8882b31b",
+        "filename": "internal/ci/github/tip_triggers.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-12-03T14:19:29Z",
+      "side": 1,
+      "message": "This sentence is no longer accurate.",
+      "revId": "d9c99881c9d102cac4e3ad314d4686492964b332",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

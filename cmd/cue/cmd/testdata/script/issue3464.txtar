@@ -1,0 +1,170 @@
+exec cue import --outfile=- --list                              input-noempty.yaml
+cmp stdout output-noempty-list.cue
+exec cue import --outfile=-        --path=strings.ToLower(kind) input-noempty.yaml
+cmp stdout output-noempty-exprpath.cue
+exec cue import --outfile=- --list --path=strings.ToLower(kind) input-noempty.yaml
+cmp stdout output-noempty-list-exprpath.cue
+exec cue import --outfile=- --list --path=fixedpath:            input-noempty.yaml
+cmp stdout output-noempty-list-fixedpath.cue
+
+exec cue import --outfile=- --list                              input-withempty.yaml
+cmp stdout output-withempty-list.cue
+! exec cue import --outfile=-        --path=strings.ToLower(kind) input-withempty.yaml
+cmp stdout output-withempty-exprpath.cue
+! exec cue import --outfile=- --list --path=strings.ToLower(kind) input-withempty.yaml
+cmp stdout output-withempty-list-exprpath.cue
+exec cue import --outfile=- --list --path=fixedpath:            input-withempty.yaml
+cmp stdout output-withempty-list-fixedpath.cue
+
+exec cue import --outfile=- --list                              input-withnull.yaml
+cmp stdout output-withnull-list.cue
+! exec cue import --outfile=-        --path=strings.ToLower(kind) input-withnull.yaml
+cmp stdout output-withnull-exprpath.cue
+! exec cue import --outfile=- --list --path=strings.ToLower(kind) input-withnull.yaml
+cmp stdout output-withnull-list-exprpath.cue
+exec cue import --outfile=- --list --path=fixedpath:            input-withnull.yaml
+cmp stdout output-withnull-list-fixedpath.cue
+
+exec cue import --outfile=- --list                              input-missing-key.yaml
+cmp stdout output-missing-key-list.cue
+! exec cue import --outfile=-        --path=strings.ToLower(kind) input-missing-key.yaml
+cmp stdout output-missing-key-exprpath.cue
+! exec cue import --outfile=- --list --path=strings.ToLower(kind) input-missing-key.yaml
+cmp stdout output-missing-key-list-exprpath.cue
+exec cue import --outfile=- --list --path=fixedpath:            input-missing-key.yaml
+cmp stdout output-missing-key-list-fixedpath.cue
+! exec cue import --outfile=-        --path=strings.ToLower(typo) input-missing-key.yaml
+cmp stdout output-missing-key-typopath.cue
+
+exec cue import --outfile=- --with-context --path='"number-\(index+1)"' input-withempty.yaml
+cmp stdout output-withempty-witcontext-index.cue
+! exec cue import --outfile=- --with-context --path='"number-\(index+1)"' --path=data.kind input-withempty.yaml
+cmp stdout output-withempty-witcontext-index-kind.cue
+
+-- input-noempty.yaml --
+kind: Deployment
+---
+kind: Deployment
+---
+kind: Other
+
+-- output-noempty-list.cue --
+[{
+	kind: "Deployment"
+}, {
+	kind: "Deployment"
+}, {
+	kind: "Other"
+}]
+-- output-noempty-exprpath.cue --
+deployment: kind: "Deployment"
+deployment: kind: "Deployment"
+other: kind:      "Other"
+-- output-noempty-list-exprpath.cue --
+deployment: [{
+	kind: "Deployment"
+}, {
+	kind: "Deployment"
+}]
+other: [{
+	kind: "Other"
+}]
+-- output-noempty-list-fixedpath.cue --
+fixedpath: [{
+	kind: "Deployment"
+}, {
+	kind: "Deployment"
+}, {
+	kind: "Other"
+}]
+-- input-withempty.yaml --
+---
+kind: Deployment
+---
+---
+kind: Deployment
+---
+kind: Other
+-- output-withempty-list.cue --
+[{
+	kind: "Deployment"
+}, null, {
+	kind: "Deployment"
+}, {
+	kind: "Other"
+}]
+-- output-withempty-exprpath.cue --
+-- output-withempty-list-exprpath.cue --
+-- output-withempty-list-fixedpath.cue --
+fixedpath: [{
+	kind: "Deployment"
+}, null, {
+	kind: "Deployment"
+}, {
+	kind: "Other"
+}]
+-- input-withnull.yaml --
+---
+kind: Deployment
+---
+null
+---
+kind: Deployment
+---
+kind: Other
+-- output-withnull-list.cue --
+[{
+	kind: "Deployment"
+}, null, {
+	kind: "Deployment"
+}, {
+	kind: "Other"
+}]
+-- output-withnull-exprpath.cue --
+-- output-withnull-list-exprpath.cue --
+-- output-withnull-list-fixedpath.cue --
+fixedpath: [{
+	kind: "Deployment"
+}, null, {
+	kind: "Deployment"
+}, {
+	kind: "Other"
+}]
+-- input-missing-key.yaml --
+---
+kind: Deployment
+---
+notkind: Other
+---
+kind: Deployment
+---
+kind: Other
+-- output-missing-key-list.cue --
+[{
+	kind: "Deployment"
+}, {
+	notkind: "Other"
+}, {
+	kind: "Deployment"
+}, {
+	kind: "Other"
+}]
+-- output-missing-key-exprpath.cue --
+-- output-missing-key-list-exprpath.cue --
+-- output-missing-key-list-fixedpath.cue --
+fixedpath: [{
+	kind: "Deployment"
+}, {
+	notkind: "Other"
+}, {
+	kind: "Deployment"
+}, {
+	kind: "Other"
+}]
+-- output-missing-key-typopath.cue --
+-- output-withempty-witcontext-index.cue --
+"number-1": kind: "Deployment"
+"number-2": null
+"number-3": kind: "Deployment"
+"number-4": kind: "Other"
+-- output-withempty-witcontext-index-kind.cue --

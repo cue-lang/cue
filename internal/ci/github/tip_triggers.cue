@@ -32,11 +32,9 @@ workflows: tip_triggers: _repo.bashWorkflow & {
 					event_type: "Check against ${GITHUB_SHA}"
 					client_payload: {
 						type: "unity"
-						payload: {
-							versions: """
+						payload: versions: """
 							"commit:${GITHUB_SHA}"
 							"""
-						}
 					}
 				}
 			},
@@ -47,10 +45,10 @@ workflows: tip_triggers: _repo.bashWorkflow & {
 			// tip of cue-lang/cue, therefore there's no dispatch payload/etc that
 			// communicates the commit ref.
 			_repo.workflowDispatch & {
-				name:                          "Trigger cuelang.org trybot"
+				name:                          "Trigger cuelang.org tipdeploy"
 				#githubRepositoryPath:         _repo.cuelangRepositoryPath
 				#botGitHubUserTokenSecretsKey: "CUECKOO_GITHUB_PAT"
-				#workflowID:                   "trybot.yaml"
+				#workflowID:                   "tipdeploy.yaml"
 			},
 		]
 	}

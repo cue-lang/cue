@@ -16,6 +16,24 @@
       "message": "nit: remember that the CL XXX linking only works on a single line. no need to fix this time.",
       "revId": "d0b7cef4d4ad1d44585b34ec7759a85e80c3313d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1039df6_61c64b2f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-12-03T16:45:47Z",
+      "side": 1,
+      "message": "Thanks, good spot. I didn\u0027t spot this because Vim automatically reflowed the text for me. Noted for next time (will also quickly see whether I can configure Vim not to break on that boundary)",
+      "parentUuid": "0bedf7a3_a9932a8f",
+      "revId": "d0b7cef4d4ad1d44585b34ec7759a85e80c3313d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -34,6 +34,24 @@
       "parentUuid": "0bedf7a3_a9932a8f",
       "revId": "d0b7cef4d4ad1d44585b34ec7759a85e80c3313d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b191fcd7_1484127b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-03T16:46:41Z",
+      "side": 1,
+      "message": "personally I avoid this via https://cuelang.org/cl/NNN - no whitespace means it won\u0027t be broken.",
+      "parentUuid": "b1039df6_61c64b2f",
+      "revId": "d0b7cef4d4ad1d44585b34ec7759a85e80c3313d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

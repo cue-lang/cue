@@ -1007,7 +1007,7 @@ func (p *parser) parseLabel(rhs bool) (label ast.Label, expr ast.Expr, decl ast.
 		}
 
 	case *ast.Ident:
-		if strings.HasPrefix(x.Name, "__") {
+		if strings.HasPrefix(x.Name, "__") && !rhs {
 			p.errf(x.NamePos, "identifiers starting with '__' are reserved")
 		}
 

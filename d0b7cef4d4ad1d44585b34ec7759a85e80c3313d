@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bedf7a3_a9932a8f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-03T14:32:10Z",
+      "side": 1,
+      "message": "nit: remember that the CL XXX linking only works on a single line. no need to fix this time.",
+      "revId": "d0b7cef4d4ad1d44585b34ec7759a85e80c3313d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -18,6 +18,8 @@ import (
 	"fmt"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
 )
 
 // This file contains functionality for processing conjuncts to insert the
@@ -554,6 +556,12 @@ func (n *nodeContext) addNotify2(v *Vertex, c CloseInfo) []receiver {
 
 // Literal conjuncts
 
+// NoSharingSentinel is a sentinel value that is used to disable sharing of
+// nodes. We make this an error to make it clear that we discard the value.
+var NoShareSentinel = &Bottom{
+	Err: errors.Newf(token.NoPos, "no sharing"),
+}
+
 func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInfo) {
 	n.updateCyclicStatusV3(id)
 
@@ -613,6 +621,10 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 		return
 
 	case *Bottom:
+		if x == NoShareSentinel {
+			n.unshare()
+			return
+		}
 		id.cc.hasNonTop = true
 		n.addBottom(x)
 		return

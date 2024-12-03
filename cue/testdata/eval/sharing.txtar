@@ -9,17 +9,39 @@ issue3062: ok1: {
 	X: x: A
 	A: "a"
 }
+
+// Test debug facilities to turn of sharing.
+debug: {
+	sharingOn: {
+		a: b
+		b: c: 1
+	}
+	sharingOff: t1: {
+		a: b & __no_sharing
+		b: c: 1
+	}
+	sharingOff: t2: {
+		a: b
+		a: __no_sharing
+		b: c: 1
+	}
+	sharingOff: t3: {
+		a: __no_sharing
+		a: b
+		b: c: 1
+	}
+}
 -- out/eval/stats --
 Leaks:  0
-Freed:  11
-Reused: 4
+Freed:  33
+Reused: 26
 Allocs: 7
-Retain: 3
+Retain: 7
 
-Unifications: 11
-Conjuncts:    18
-Disjuncts:    12
--- out/eval --
+Unifications: 33
+Conjuncts:    49
+Disjuncts:    38
+-- out/evalalpha --
 (struct){
   issue3062: (struct){
     ok1: (struct){
@@ -34,6 +56,186 @@ Disjuncts:    12
         x: (string){ "a" }
       }
       A: (string){ "a" }
+    }
+  }
+  debug: (struct){
+    sharingOn: (struct){
+      a: ~(debug.sharingOn.b)
+      b: (struct){
+        c: (int){ 1 }
+      }
+    }
+    sharingOff: (struct){
+      t1: (struct){
+        a: (struct){
+          c: (int){ 1 }
+        }
+        b: (struct){
+          c: (int){ 1 }
+        }
+      }
+      t2: (struct){
+        a: (struct){
+          c: (int){ 1 }
+        }
+        b: (struct){
+          c: (int){ 1 }
+        }
+      }
+      t3: (struct){
+        a: (struct){
+          c: (int){ 1 }
+        }
+        b: (struct){
+          c: (int){ 1 }
+        }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,4 @@
+-Errors:
+-no sharing
+-
+-Result:
+-(_|_){
+-  // [eval]
++(struct){
+   issue3062: (struct){
+     ok1: (struct){
+       #S: (string){ "a" }
+@@ -19,42 +14,32 @@
+       A: (string){ "a" }
+     }
+   }
+-  debug: (_|_){
+-    // [eval]
++  debug: (struct){
+     sharingOn: (struct){
+-      a: (struct){
+-        c: (int){ 1 }
+-      }
++      a: ~(debug.sharingOn.b)
+       b: (struct){
+         c: (int){ 1 }
+       }
+     }
+-    sharingOff: (_|_){
+-      // [eval]
+-      t1: (_|_){
+-        // [eval]
+-        a: (_|_){
+-          // [eval] no sharing
+-          c: (int){ 1 }
+-        }
+-        b: (struct){
+-          c: (int){ 1 }
+-        }
+-      }
+-      t2: (_|_){
+-        // [eval]
+-        a: (_|_){
+-          // [eval] no sharing
+-          c: (int){ 1 }
+-        }
+-        b: (struct){
+-          c: (int){ 1 }
+-        }
+-      }
+-      t3: (_|_){
+-        // [eval]
+-        a: (_|_){
+-          // [eval] no sharing
++    sharingOff: (struct){
++      t1: (struct){
++        a: (struct){
++          c: (int){ 1 }
++        }
++        b: (struct){
++          c: (int){ 1 }
++        }
++      }
++      t2: (struct){
++        a: (struct){
++          c: (int){ 1 }
++        }
++        b: (struct){
++          c: (int){ 1 }
++        }
++      }
++      t3: (struct){
++        a: (struct){
+           c: (int){ 1 }
+         }
+         b: (struct){
+-- out/eval --
+Errors:
+no sharing
+
+Result:
+(_|_){
+  // [eval]
+  issue3062: (struct){
+    ok1: (struct){
+      #S: (string){ "a" }
+      #o: (#struct){
+        x: (string){ "a" }
+      }
+      o: (#struct){
+        x: (string){ "a" }
+      }
+      X: (struct){
+        x: (string){ "a" }
+      }
+      A: (string){ "a" }
+    }
+  }
+  debug: (_|_){
+    // [eval]
+    sharingOn: (struct){
+      a: (struct){
+        c: (int){ 1 }
+      }
+      b: (struct){
+        c: (int){ 1 }
+      }
+    }
+    sharingOff: (_|_){
+      // [eval]
+      t1: (_|_){
+        // [eval]
+        a: (_|_){
+          // [eval] no sharing
+          c: (int){ 1 }
+        }
+        b: (struct){
+          c: (int){ 1 }
+        }
+      }
+      t2: (_|_){
+        // [eval]
+        a: (_|_){
+          // [eval] no sharing
+          c: (int){ 1 }
+        }
+        b: (struct){
+          c: (int){ 1 }
+        }
+      }
+      t3: (_|_){
+        // [eval]
+        a: (_|_){
+          // [eval] no sharing
+          c: (int){ 1 }
+        }
+        b: (struct){
+          c: (int){ 1 }
+        }
+      }
     }
   }
 }
@@ -52,6 +254,40 @@ Disjuncts:    12
         x: 〈1;A〉
       }
       A: "a"
+    }
+  }
+  debug: {
+    sharingOn: {
+      a: 〈0;b〉
+      b: {
+        c: 1
+      }
+    }
+    sharingOff: {
+      t1: {
+        a: (〈0;b〉 & _|_(no sharing))
+        b: {
+          c: 1
+        }
+      }
+    }
+    sharingOff: {
+      t2: {
+        a: 〈0;b〉
+        a: _|_(no sharing)
+        b: {
+          c: 1
+        }
+      }
+    }
+    sharingOff: {
+      t3: {
+        a: _|_(no sharing)
+        a: 〈0;b〉
+        b: {
+          c: 1
+        }
+      }
     }
   }
 }

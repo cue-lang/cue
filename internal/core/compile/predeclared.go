@@ -60,6 +60,9 @@ func predeclared(n *ast.Ident) adt.Expr {
 		return quoBuiltin
 	case "rem", "__rem":
 		return remBuiltin
+
+	case "__no_sharing":
+		return adt.NoShareSentinel
 	}
 
 	if r, ok := predefinedRanges[n.Name]; ok {

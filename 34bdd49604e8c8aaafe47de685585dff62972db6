@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27e49c2f_c25bbe0e",
+        "filename": "cue/errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 599,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-03T08:48:53Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t\t\t// Some IDEs (e.g. VSCode) only recognize a path if it starts\n```",
+      "revId": "34bdd49604e8c8aaafe47de685585dff62972db6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

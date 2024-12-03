@@ -32,25 +32,23 @@ workflows: tip_triggers: _repo.bashWorkflow & {
 					event_type: "Check against ${GITHUB_SHA}"
 					client_payload: {
 						type: "unity"
-						payload: {
-							versions: """
+						payload: versions: """
 							"commit:${GITHUB_SHA}"
 							"""
-						}
 					}
 				}
 			},
-			// This triggers the cuelang.org trybot, which finishes by testing that
-			// the site builds successfully against the tip of cue-lang/cue.
-			// The specific commit that triggered this workflow (inside tip_triggers)
-			// isn't used by the cuelang.org build unless it also happens to be the
-			// tip of cue-lang/cue, therefore there's no dispatch payload/etc that
-			// communicates the commit ref.
+
+			// This triggers the cuelang.org tipdeploy workflow, that ultimately
+			// deploys tip.cuelang.org. The specific commit that triggered this
+			// workflow (inside tip_triggers) isn't used by the cuelang.org build
+			// unless it also happens to be the tip of cue-lang/cue, therefore
+			// there's no dispatch payload/etc that communicates the commit ref.
 			_repo.workflowDispatch & {
-				name:                          "Trigger cuelang.org trybot"
+				name:                          "Trigger cuelang.org tipdeploy"
 				#githubRepositoryPath:         _repo.cuelangRepositoryPath
 				#botGitHubUserTokenSecretsKey: "CUECKOO_GITHUB_PAT"
-				#workflowID:                   "trybot.yaml"
+				#workflowID:                   "tipdeploy.yaml"
 			},
 		]
 	}

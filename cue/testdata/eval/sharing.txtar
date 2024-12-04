@@ -75,10 +75,7 @@ Disjuncts:    48
         }
       }
       out: (struct){
-        b: (_|_){
-          // [incomplete] issue3601.ok1.out.b: undefined field: a:
-          //     ./in.cue:12:11
-        }
+        b: (_){ _ }
       }
     }
   }
@@ -149,7 +146,7 @@ diff old new
        }
        X: (struct){
          a: (struct){
-@@ -31,47 +24,40 @@
+@@ -31,47 +24,37 @@
            b: (_){ _ }
          }
        }
@@ -161,10 +158,7 @@ diff old new
 -  debug: (_|_){
 -    // [eval]
 +      out: (struct){
-+        b: (_|_){
-+          // [incomplete] issue3601.ok1.out.b: undefined field: a:
-+          //     ./in.cue:12:11
-+        }
++        b: (_){ _ }
 +      }
 +    }
 +  }

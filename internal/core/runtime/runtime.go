@@ -57,8 +57,8 @@ func (r *Runtime) BuildData(b *build.Instance) (x interface{}, ok bool) {
 	return x, ok
 }
 
-// New is short for [NewWithSettings] while obeying `CUE_EXPERIMENT=evalv3`
-// for the evaluator version and using zero [cuedebug] flags.
+// New creates a new Runtime obeying the CUE_EXPERIMENT and CUE_DEBUG flags set
+// via environment variables.
 func New() *Runtime {
 	r := &Runtime{}
 	r.Init()
@@ -69,9 +69,11 @@ func New() *Runtime {
 // debug flags. The builtins registered with RegisterBuiltin are available for
 // evaluation.
 func NewWithSettings(v internal.EvaluatorVersion, flags cuedebug.Config) *Runtime {
-	r := &Runtime{flags: flags}
-	r.Init()
+	r := New()
+	// Override the evaluator version and debug flags derived from env vars
+	// with the explicit arguments given to us here.
 	r.version = v
+	r.SetDebugOptions(&flags)
 	return r
 }
 
@@ -119,4 +121,10 @@ func (r *Runtime) Init() {
 		r.version = internal.DefaultVersion
 	}
 	r.topoSort = cueexperiment.Flags.TopoSort
+
+	// By default we follow the environment's CUE_DEBUG settings,
+	// which can be overriden via [Runtime.SetDebugOptions],
+	// such as with the API option [cuelang.org/go/cue/cuecontext.CUE_DEBUG].
+	cuedebug.Init()
+	r.SetDebugOptions(&cuedebug.Flags)
 }

@@ -35,7 +35,6 @@ import (
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	cueruntime "cuelang.org/go/internal/core/runtime"
-	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
@@ -105,9 +104,6 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		if err := cueexperiment.Init(); err != nil {
 			return err
 		}
-		if err := cuedebug.Init(); err != nil {
-			return err
-		}
 		var opts []cuecontext.Option
 		if wasmInterp != nil {
 			opts = append(opts, cuecontext.Interpreter(wasmInterp))
@@ -138,10 +134,6 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 			const dev = internal.DevVersion
 			(*cueruntime.Runtime)(c.ctx).SetVersion(internal.EvaluatorVersion(dev))
 		}
-		// Note that, while some debugging flags like "strict" or "sharing"
-		// are only used by evalv3, some others like "sortfields" are used by all versions.
-		(*cueruntime.Runtime)(c.ctx).SetDebugOptions(&cuedebug.Flags)
-
 		err = f(c, args)
 
 		// TODO(mvdan): support -memprofilerate like `go help testflag`.

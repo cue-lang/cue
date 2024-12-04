@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6093e04c_a75598db",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-04T10:19:09Z",
+      "side": 1,
+      "message": "Marcel, did you mean to submit this and https://review.gerrithub.io/c/cue-lang/cue/+/1202772?",
+      "revId": "f67fb545438ff063c81b3120eb3a9ffbdc0edbc4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

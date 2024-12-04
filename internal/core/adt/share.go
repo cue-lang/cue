@@ -79,7 +79,6 @@ func (n *nodeContext) finalizeSharing() {
 		// its assigned location.
 		if v.state != nil && v.state.parent != nil {
 			v.Parent = v.state.parent
-			v.Label = n.node.Label
 
 			// TODO: see if this can be removed and why some errors are not
 			// propagated when removed.
@@ -112,7 +111,7 @@ func (n *nodeContext) share(c Conjunct, arc *Vertex, id CloseInfo) {
 		// Setting the parent in the state instead allows us to defer setting
 		// Parent until it is safe to do so..
 		if s := arc.getState(n.ctx); s != nil {
-			s.parent = n.node.Parent
+			s.parent = n.node
 		}
 	}
 

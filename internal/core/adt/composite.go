@@ -1479,7 +1479,10 @@ func appendPath(a []Feature, v *Vertex) []Feature {
 		return a
 	}
 	a = appendPath(a, v.Parent)
-	if v.Label != 0 {
+	// Skip if the node is a structure-shared node that has been assingned to
+	// the parent as it's new location: in this case the parent node will
+	// have the desired label.
+	if v.Label != 0 && v.Parent.BaseValue != v {
 		// A Label may be 0 for programmatically inserted nodes.
 		a = append(a, v.Label)
 	}

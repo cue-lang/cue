@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7847aca4_13f1aa8b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-04T10:15:58Z",
+      "side": 1,
+      "message": "Submitting before this gets forgotten about or gains conflicts. The change seems pretty uncontroversial to me too.",
+      "revId": "4b0d1b49d27f80f88a2cf2872ea798151587d51e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

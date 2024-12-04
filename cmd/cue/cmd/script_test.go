@@ -45,6 +45,8 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/tools/txtar"
 
+	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/cuetest"
@@ -388,6 +390,12 @@ func TestX(t *testing.T) {
 }
 
 func TestMain(m *testing.M) {
+	check := func(err error) {
+		if err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+	}
 	os.Exit(testscript.RunMain(m, map[string]func() int{
 		"cue": Main,
 		// Until https://github.com/rogpeppe/go-internal/issues/93 is fixed,
@@ -411,10 +419,26 @@ func TestMain(m *testing.M) {
 			return 0
 		},
 		"testcmd": func() int {
-			if err := testCmd(); err != nil {
-				fmt.Fprintln(os.Stderr, err)
-				return 1
-			}
+			err := testCmd()
+			check(err)
+			return 0
+		},
+		// Like `cue export`, but as a standalone Go program which doesn't
+		// go through cmd/cue's setup of cuecontext and the evaluator.
+		// Useful to check what the export behavior is for Go API users,
+		// for example in relation to env vars like CUE_EXPERIMENT or CUE_DEBUG.
+		// Only works with cue stdin and json stdout for simplicity.
+		"cuectx_export": func() int {
+			input, err := io.ReadAll(os.Stdin)
+			check(err)
+			ctx := cuecontext.New()
+			v := ctx.CompileBytes(input)
+			err = v.Validate(cue.Concrete(true))
+			check(err)
+			enc := json.NewEncoder(os.Stdout)
+			enc.SetIndent("", "    ")
+			err = enc.Encode(v)
+			check(err)
 			return 0
 		},
 	}))

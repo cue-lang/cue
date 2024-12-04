@@ -23,7 +23,13 @@ cmp stdout eval.stdout
 # Just to double check, ensure it also works for evalv3.
 env CUE_EXPERIMENT=evalv3
 exec cue export input.cue
-cmp stdout export-evalv3.stdout
+cmp stdout export.stdout
+
+# Also ensure that it's wired up for the Go API.
+# TODO: it is not, currently.
+stdin input.cue
+exec cuectx_export
+cmp stdout export-unsorted.stdout
 
 -- input.cue --
 c: true
@@ -44,16 +50,6 @@ b: y: true
     "a": true
 }
 -- export.stdout --
-{
-    "a": true,
-    "b": {
-        "x": true,
-        "y": true,
-        "z": true
-    },
-    "c": true
-}
--- export-evalv3.stdout --
 {
     "a": true,
     "b": {

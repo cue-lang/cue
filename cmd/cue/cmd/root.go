@@ -32,9 +32,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/interpreter/embed"
 	"cuelang.org/go/cue/stats"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
-	cueruntime "cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
@@ -108,6 +106,9 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		if wasmInterp != nil {
 			opts = append(opts, cuecontext.Interpreter(wasmInterp))
 		}
+		// CUE_EXPERIMENT=embed should probably be obeyed by [cuecontext.New] just like
+		// other flags such as evalv3 or toposort. Currently that causes an import cycle.
+		// See: https://cuelang.org/issue/3613
 		if cueexperiment.Flags.Embed {
 			opts = append(opts, cuecontext.Interpreter(embed.New()))
 		}
@@ -128,12 +129,6 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 			defer pprof.StopCPUProfile()
 		}
 
-		// TODO: do not rely on a global variable here, as this API is also used
-		// in a non-tooling context.
-		if cueexperiment.Flags.EvalV3 {
-			const dev = internal.DevVersion
-			(*cueruntime.Runtime)(c.ctx).SetVersion(internal.EvaluatorVersion(dev))
-		}
 		err = f(c, args)
 
 		// TODO(mvdan): support -memprofilerate like `go help testflag`.

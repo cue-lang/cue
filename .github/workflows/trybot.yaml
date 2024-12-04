@@ -10,7 +10,7 @@ name: TryBot
     tags-ignore:
       - v*
   workflow_dispatch: {}
-  pull_request: {}
+  pull_request_target: {}
 jobs:
   test:
     strategy:

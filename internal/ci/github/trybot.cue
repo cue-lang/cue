@@ -29,7 +29,11 @@ workflows: trybot: _repo.bashWorkflow & {
 			branches: list.Concat([[_repo.testDefaultBranch], _repo.protectedBranchPatterns]) // do not run PR branches
 			"tags-ignore": [_repo.releaseTagPattern]
 		}
-		pull_request: {}
+		// Note that pull_request_target gives PR CI jobs full access to our secrets,
+		// which is necessary to fetch dependencies from the registry via NOTCUECKOO_CUE_TOKEN.
+		// Giving access to secrets is OK given that we must approve PR jobs to run on CI,
+		// which mirrors the approval workflow for CI on Gerrit.
+		pull_request_target: {}
 	}
 
 	jobs: {

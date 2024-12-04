@@ -26,10 +26,9 @@ exec cue export input.cue
 cmp stdout export.stdout
 
 # Also ensure that it's wired up for the Go API.
-# TODO: it is not, currently.
 stdin input.cue
 exec cuectx_export
-cmp stdout export-unsorted.stdout
+cmp stdout export.stdout
 
 -- input.cue --
 c: true

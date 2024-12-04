@@ -31,20 +31,15 @@ type Option struct {
 	apply func(r *runtime.Runtime)
 }
 
-// defaultFlags defines the debug flags that are set by default.
-var defaultFlags cuedebug.Config
-
-func init() {
-	if err := envflag.Parse(&defaultFlags, ""); err != nil {
-		panic(err)
-	}
-}
-
-// New creates a new Context.
+// New creates a new [*cue.Context].
+//
+// The environment variables CUE_EXPERIMENT and CUE_DEBUG are followed to configure
+// the evaluator, just like the cue tool documents via [cue help environment].
+// You can override these settings via options like [EvaluatorVersion] and [CUE_DEBUG].
+//
+// [cue help environment]: https://cuelang.org/docs/reference/command/cue-help-environment/
 func New(options ...Option) *cue.Context {
 	r := runtime.New()
-	// Ensure default behavior if the flags are not set explicitly.
-	r.SetDebugOptions(&defaultFlags)
 	for _, o := range options {
 		o.apply(r)
 	}

@@ -10,6 +10,12 @@ issue3062: ok1: {
 	A: "a"
 }
 
+issue3601: ok1: {
+	Y: (X & __no_sharing).a
+	X: a: b: a.b
+	out: Y & __no_sharing
+}
+
 // Test debug facilities to turn of sharing.
 debug: {
 	sharingOn: {
@@ -32,15 +38,15 @@ debug: {
 	}
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  33
-Reused: 26
-Allocs: 7
-Retain: 7
+Leaks:  2
+Freed:  40
+Reused: 33
+Allocs: 9
+Retain: 10
 
-Unifications: 33
-Conjuncts:    49
-Disjuncts:    38
+Unifications: 42
+Conjuncts:    64
+Disjuncts:    48
 -- out/evalalpha --
 (struct){
   issue3062: (struct){
@@ -56,6 +62,24 @@ Disjuncts:    38
         x: (string){ "a" }
       }
       A: (string){ "a" }
+    }
+  }
+  issue3601: (struct){
+    ok1: (struct){
+      Y: (struct){
+        b: (_){ _ }
+      }
+      X: (struct){
+        a: (struct){
+          b: (_){ _ }
+        }
+      }
+      out: (struct){
+        b: (_|_){
+          // [incomplete] issue3601.ok1.out.b: undefined field: a:
+          //     ./in.cue:12:11
+        }
+      }
     }
   }
   debug: (struct){
@@ -108,12 +132,42 @@ diff old new
    issue3062: (struct){
      ok1: (struct){
        #S: (string){ "a" }
-@@ -19,42 +14,32 @@
+@@ -19,12 +14,10 @@
        A: (string){ "a" }
      }
    }
+-  issue3601: (_|_){
+-    // [eval]
+-    ok1: (_|_){
+-      // [eval]
+-      Y: (_|_){
+-        // [eval] no sharing
++  issue3601: (struct){
++    ok1: (struct){
++      Y: (struct){
++        b: (_){ _ }
+       }
+       X: (struct){
+         a: (struct){
+@@ -31,47 +24,40 @@
+           b: (_){ _ }
+         }
+       }
+-      out: (_|_){
+-        // [eval] no sharing
+-      }
+-    }
+-  }
 -  debug: (_|_){
 -    // [eval]
++      out: (struct){
++        b: (_|_){
++          // [incomplete] issue3601.ok1.out.b: undefined field: a:
++          //     ./in.cue:12:11
++        }
++      }
++    }
++  }
 +  debug: (struct){
      sharingOn: (struct){
 -      a: (struct){
@@ -194,6 +248,23 @@ Result:
       A: (string){ "a" }
     }
   }
+  issue3601: (_|_){
+    // [eval]
+    ok1: (_|_){
+      // [eval]
+      Y: (_|_){
+        // [eval] no sharing
+      }
+      X: (struct){
+        a: (struct){
+          b: (_){ _ }
+        }
+      }
+      out: (_|_){
+        // [eval] no sharing
+      }
+    }
+  }
   debug: (_|_){
     // [eval]
     sharingOn: (struct){
@@ -254,6 +325,17 @@ Result:
         x: 〈1;A〉
       }
       A: "a"
+    }
+  }
+  issue3601: {
+    ok1: {
+      Y: (〈0;X〉 & _|_(no sharing)).a
+      X: {
+        a: {
+          b: 〈1;a〉.b
+        }
+      }
+      out: (〈0;Y〉 & _|_(no sharing))
     }
   }
   debug: {

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8aa5107_07193d10",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-12-04T17:59:38Z",
+      "side": 1,
+      "message": "Just clarifying offline the security aspects of this change.",
+      "revId": "2e3261ec6a4153c87989c05b77192be6eca7f49d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

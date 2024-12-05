@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c465726c_38b3f478",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2024-12-05T08:38:58Z",
+      "side": 1,
+      "message": "This change skips over null when encounters it encounters an error. The output seems reasonable for now, but I am not sure if this is acceptable. And I am wondering how I can get the fields referenced in an expression.",
+      "revId": "cc89c9346ba61ebc39e2e68acdcb52b7cf5f5f0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

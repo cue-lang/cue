@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75876002_fa28b1ad",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1483,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-12-06T15:05:28Z",
+      "side": 1,
+      "message": "Maybe you changed tense mid-way through a word here? - either \"is\" or \"has\" became \"s\" I\u0027m guessing. Something needs fixing in this sentence!",
+      "revId": "232e1061ac2fcaadf3a7e255f53230a4347e4823",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

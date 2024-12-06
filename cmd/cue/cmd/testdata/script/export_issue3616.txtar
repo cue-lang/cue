@@ -1,0 +1,45 @@
+# https://cuelang.org/issue/3616
+#
+# The old evaluator (evalv2) does not correctly handle some combination of the
+# scenario below, which involves "copying" values and the use of -l for a
+# non-CUE file. The precise reason that evalv2 does not fail as expected is not
+# known. But given we are close to switching to evalv3 by default, and all
+# efforts and fixed are geared in that direction, adding this test to lock in
+# the behaviour of evalv3 (and evalv2 for that matter) is deemed sufficient.
+#
+# evalv3 correctly fails.
+
+# With evalv3, we get an error.
+env CUE_EXPERIMENT=evalv3
+! exec cue export --with-context -l '_input:' -l 'filename' x.cue data.json
+stderr 'notAllowed: field not allowed'
+
+# But with evalv2, it's incorrectly allowed. i.e. the following cue export
+# command should fail (with the error message in the commented stderr
+# expectation) but doesn't
+env CUE_EXPERIMENT=
+exec cue export --with-context -l '_input:' -l 'filename' x.cue data.json
+# stderr 'notAllowed: field not allowed'
+
+-- x.cue --
+#schema: aField!: bool
+
+_parameters & #schema
+_parameters: #template
+
+#template: {
+    #in: _input
+    for _name, _content in #in {
+        _content.parameters
+    }
+}
+
+_input: {}
+
+-- data.json --
+{
+    "parameters": {
+        "aField": true,
+        "notAllowed": true
+    }
+}

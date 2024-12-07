@@ -247,21 +247,23 @@ func (c CloseInfo) SpawnRef(arc *Vertex, isDef bool, x Expr) CloseInfo {
 //
 // TODO(performance): this should be merged with resolve(). But for now keeping
 // this code isolated makes it easier to see what it is for.
-func IsDef(x Expr) bool {
+func IsDef(x Expr) (isDef bool, depth int) {
 	switch r := x.(type) {
 	case *FieldReference:
-		return r.Label.IsDef()
+		isDef = r.Label.IsDef()
 
 	case *SelectorExpr:
+		isDef, depth = IsDef(r.X)
+		depth++
 		if r.Sel.IsDef() {
-			return true
+			isDef = true
 		}
-		return IsDef(r.X)
 
 	case *IndexExpr:
-		return IsDef(r.X)
+		isDef, depth = IsDef(r.X)
+		depth++
 	}
-	return false
+	return isDef, depth
 }
 
 // A SpanType is used to indicate whether a CUE value is within the scope of

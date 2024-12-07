@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0555954_5105f834",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-07T22:36:42Z",
+      "side": 1,
+      "message": "nit: the package that we care about here is cue/fmt, so that\u0027s the prefix we tend to use here. we tend to omit testdata subdirectories from prefixes.",
+      "revId": "a76eba99b3c672e749c3365effa3f80034141c51",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "297a31ce_e69e8bcb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-07T22:36:42Z",
+      "side": 1,
+      "message": "surely this means \"Fixes #3616\" then?",
+      "revId": "a76eba99b3c672e749c3365effa3f80034141c51",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2f5b514_aa6f56b3",
+        "filename": "cmd/cue/cmd/testdata/script/export_issue3616.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-07T22:36:42Z",
+      "side": 1,
+      "message": "Doesn\u0027t this duplicate some of the text below about evalv3 failing and evalv2 incorrectly allowing the input? IMHO I would join the texts because it\u0027s otherwise odd to repeat yourself. I would lean towards short paragraphs, max 2-3 lines, before each of the evalv2 and evalv3 test cases below.",
+      "revId": "a76eba99b3c672e749c3365effa3f80034141c51",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "459a921c_1c03a888",
+        "filename": "cmd/cue/cmd/testdata/script/export_issue3616.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-07T22:36:42Z",
+      "side": 1,
+      "message": "unfinished sentence?",
+      "revId": "a76eba99b3c672e749c3365effa3f80034141c51",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6153cb05_60de0aac",
+        "filename": "cmd/cue/cmd/testdata/script/export_issue3616.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-07T22:36:42Z",
+      "side": 1,
+      "message": "I suppose this commented out line is related to the unfinished sentence above? why not do a negation of stderr output?",
+      "revId": "a76eba99b3c672e749c3365effa3f80034141c51",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

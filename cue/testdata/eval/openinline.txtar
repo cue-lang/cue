@@ -88,6 +88,8 @@ Conjuncts:    141
 Disjuncts:    107
 -- out/evalalpha --
 Errors:
+outerErr.usingClose.t1.version.major: field not allowed:
+    ./in.cue:35:22
 #E.b: field not allowed:
     ./in.cue:57:14
     ./cue.mod/pkg/foo.com/example/example.cue:4:11
@@ -106,7 +108,8 @@ Result:
       x: (int){ 2 }
     }
   }
-  outerErr: (struct){
+  outerErr: (_|_){
+    // [eval]
     _inToOut: (struct){
       in: (_){ _ }
       out: (_|_){
@@ -132,7 +135,8 @@ Result:
         }
       }
     }
-    usingClose: (struct){
+    usingClose: (_|_){
+      // [eval]
       #Inner: (#struct){
         foo: (#struct){
           minor: (int){ 2 }
@@ -143,9 +147,14 @@ Result:
           major: (int){ 1 }
         }
       }
-      t1: (#struct){
-        version: (#struct){
-          major: (int){ 1 }
+      t1: (_|_){
+        // [eval]
+        version: (_|_){
+          // [eval]
+          major: (_|_){
+            // [eval] outerErr.usingClose.t1.version.major: field not allowed:
+            //     ./in.cue:35:22
+          }
           minor: (int){ 2 }
         }
       }
@@ -208,12 +217,12 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,10 +1,10 @@
+@@ -1,10 +1,12 @@
  Errors:
--outerErr.usingClose.t1.version.major: field not allowed:
+ outerErr.usingClose.t1.version.major: field not allowed:
 -    ./in.cue:19:8
 -    ./in.cue:34:23
--    ./in.cue:35:22
+     ./in.cue:35:22
 -    ./in.cue:37:7
 -    ./in.cue:38:16
 +#E.b: field not allowed:
@@ -225,62 +234,19 @@ diff old new
  
  Result:
  (_|_){
-@@ -17,8 +17,7 @@
-       x: (int){ 2 }
-     }
-   }
--  outerErr: (_|_){
--    // [eval]
-+  outerErr: (struct){
-     _inToOut: (struct){
-       in: (_){ _ }
-       out: (_|_){
-@@ -44,30 +43,20 @@
-         }
-       }
-     }
--    usingClose: (_|_){
--      // [eval]
--      #Inner: (#struct){
--        foo: (#struct){
--          minor: (int){ 2 }
--        }
--      }
--      #Outer: (#struct){
--        version: (#struct){
--          major: (int){ 1 }
--        }
--      }
--      t1: (_|_){
--        // [eval]
--        version: (_|_){
--          // [eval]
--          major: (_|_){
--            // [eval] outerErr.usingClose.t1.version.major: field not allowed:
+@@ -62,11 +64,7 @@
+           // [eval]
+           major: (_|_){
+             // [eval] outerErr.usingClose.t1.version.major: field not allowed:
 -            //     ./in.cue:19:8
 -            //     ./in.cue:34:23
--            //     ./in.cue:35:22
+             //     ./in.cue:35:22
 -            //     ./in.cue:37:7
 -            //     ./in.cue:38:16
--          }
-+    usingClose: (struct){
-+      #Inner: (#struct){
-+        foo: (#struct){
-+          minor: (int){ 2 }
-+        }
-+      }
-+      #Outer: (#struct){
-+        version: (#struct){
-+          major: (int){ 1 }
-+        }
-+      }
-+      t1: (#struct){
-+        version: (#struct){
-+          major: (int){ 1 }
+           }
            minor: (int){ 2 }
          }
-       }
-@@ -97,8 +86,13 @@
+@@ -97,8 +95,13 @@
        }
      }
    }
@@ -296,7 +262,7 @@ diff old new
      let X#1 = (_|_){
        // [eval]
        #D: (#struct){
-@@ -106,15 +100,18 @@
+@@ -106,15 +109,18 @@
        }
        #E: (_|_){
          // [eval]

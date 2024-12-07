@@ -136,7 +136,7 @@ Allocs: 193
 Retain: 0
 
 Unifications: 167
-Conjuncts:    644
+Conjuncts:    664
 Disjuncts:    28
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -158,7 +158,7 @@ diff old new
 -Conjuncts:    389
 -Disjuncts:    290
 +Unifications: 167
-+Conjuncts:    644
++Conjuncts:    664
 +Disjuncts:    28
 -- out/eval/stats --
 Leaks:  12

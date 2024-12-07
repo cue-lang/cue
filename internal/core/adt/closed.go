@@ -91,9 +91,6 @@ type closeNodeType uint8
 
 const (
 	// a closeRef node is created when there is a non-definition reference.
-	// These nodes are not necessary for computing results, but may be
-	// relevant down the line to group closures through embedded values and
-	// to track position information for failures.
 	closeRef closeNodeType = iota
 
 	// closeDef indicates this node was introduced as a result of referencing
@@ -102,8 +99,6 @@ const (
 
 	// closeEmbed indicates this node was added as a result of an embedding.
 	closeEmbed
-
-	_ = closeRef // silence the linter
 )
 
 // TODO: merge with closeInfo: this is a leftover of the refactoring.

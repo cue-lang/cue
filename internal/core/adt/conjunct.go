@@ -421,14 +421,29 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 	}
 	n.arcMap = append(n.arcMap, key)
 
-	if IsDef(c.Expr()) {
-		// TODO: or should we always insert the wrapper (for errors)?
-		ci, dc := closeInfo.spawnCloseContext(n.ctx, closeDef)
-		closeInfo = ci
-
-		dc.incDependent(n.ctx, DEFER, nil) // decrement deferred below
-		defer dc.decDependent(n.ctx, DEFER, nil)
+	mode := closeRef
+	isDef := IsDef(c.Expr())
+	// Also check arc.Label: definitions themselves do not have the FromDef
+	// and corresponding closeContexts to reflect their closedness. This means
+	// that if we are structure sharing, we may end up with a Vertex that is
+	// a definition without the reference reflecting that. We need to handle
+	// this case here and create a closeContext accordingly. Note that if an
+	// intermediate node refers to a definition, things are evaluated at least
+	// once and the closeContext is in place.
+	// See eval/closedness.txtar/test patterns.*.indirect.
+	// TODO: investigate whether we should add the corresponding closeContexts
+	// within definitions as well to avoid having to deal with these special
+	// cases.
+	if isDef || arc.Label.IsDef() {
+		mode = closeDef
 	}
+
+	// TODO: or should we always insert the wrapper (for errors)?
+	ci, dc := closeInfo.spawnCloseContext(n.ctx, mode)
+	closeInfo = ci
+
+	dc.incDependent(n.ctx, DEFER, nil) // decrement deferred below
+	defer dc.decDependent(n.ctx, DEFER, nil)
 
 	if !n.node.nonRooted || n.node.IsDynamic {
 		if state := arc.getBareState(n.ctx); state != nil {

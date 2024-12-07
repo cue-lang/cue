@@ -70,6 +70,359 @@ issue3325: ok: {
 		#Base
 	}
 }
+
+patterns: shallow: {
+	#a: [>="k"]: int
+	#b: [<="m"]: int
+	#c: [>="w"]: int
+	#d: [<="y"]: int
+
+	single: {
+		X: #a // "k" <= x
+		err: X
+		err: j: 3
+
+		ok: X
+		ok: k: 3
+	}
+
+	and: p1: {
+		X: #a & #b // "k" <= x && x <= "m"
+
+		err: X
+		err: j: 3
+
+		ok: X
+		ok: k: 3
+	}
+
+	and: p2: {
+		X: #b & #a // "k" <= x && x <= "m"
+		err: X
+		err: j: 3
+
+		ok: X
+		ok: k: 3
+	}
+
+	andEmbed: p1: {
+		X: { #a & #b } // "k" <= x && x <= "m"
+
+		err: X
+		err: j: 3
+
+		ok: X
+		ok: k: 3
+	}
+
+	andEmbed: p2: {
+		X: { #b & #a } // "k" <= x && x <= "m"
+		err: X
+		err: j: 3
+
+		ok: X
+		ok: k: 3
+	}
+
+	orEmbed: p1: {
+		X: { #a, #b } // "k" <= x && x <= "m"
+
+		ok1: X
+		ok1: j: 3
+
+		ok2: X
+		ok2: k: 3
+	}
+
+	orEmbed: p2: {
+		X: { #b, #a } // "k" <= x && x <= "m"
+		ok1: X
+		ok1: j: 3
+
+		ok2: X
+		ok2: k: 3
+	}
+
+	andOrEmbed: t1: p1: {
+		// ("k" <= x && x <= "m")  || ("w" <= x && x <= "y")
+		X: {
+			#a & #b
+			#c & #d
+		}
+		err1: X
+		err1: j: 3
+
+		ok1: X
+		ok1: k: 3
+	}
+
+	andOrEmbed: t1: p2: {
+		// ("k" <= x && x <= "m")  || ("w" <= x && x <= "y")
+		X: {
+			#c & #d
+			#a & #b
+		}
+		err1: X
+		err1: j: 3
+
+		ok1: X
+		ok1: k: 3
+	}
+
+	andOrEmbed: t2:{
+		// ("k" <= x && x <= "m")  || ("w" <= x && x <= "y") || x == "p"
+		X: {
+			#a & #b
+			#c & #d
+			["p"]: int
+		}
+		err1: X
+		err1: j: 3
+
+		ok1: X
+		ok1: k: 3
+
+		ok2: X
+		ok2: p: 3
+	}
+
+	// The last indirection is not a definition.
+	indirect: {
+		a: [>="k"]: int
+		#a: a
+
+		p1: { // XXX // link to code
+			X: #a
+			err1: X
+			err1: j: 3
+
+			err2: X & __no_sharing
+			err2: j: 3
+
+			ok: X
+			ok:k: 3
+		}
+
+		p2: {
+			#a: a & __no_sharing
+			X: #a
+
+			err1: X
+			err1: j: 3
+
+			err2: X & __no_sharing
+			err2: j: 3
+
+			ok: X
+			ok: k: 3
+		}
+
+		p3: {
+			X: #a & __no_sharing
+
+			err1: X
+			err1: j: 3
+
+			err2: X & __no_sharing
+			err2: j: 3
+
+			ok: X
+			ok: k: 3
+		}
+
+		p4: {
+			#a: a & __no_sharing
+			X: #a
+			X: #a & __no_sharing
+
+			err1: X
+			err1: j: 3
+
+			err2: X & __no_sharing
+			err2: j: 3
+
+			ok: X
+			ok: k: 3
+		}
+	}
+}
+
+patterns: nested: {
+	#a: x: y: [>="k"]: int
+	#b: x: y: [<="m"]: int
+	#c: x: y: [>="w"]: int
+	#d: x: y: [<="y"]: int
+
+	single: {
+		X: #a // "k" <= x
+		err: X
+		err: x: y: j: 3
+
+		ok: X
+		ok: x: y: k: 3
+	}
+
+	and: p1: {
+		X: #a & #b // "k" <= x && x <= "m"
+
+		err: X
+		err: x: y: j: 3
+
+		ok: X
+		ok: x: y: k: 3
+	}
+
+	and: p2: {
+		X: #b & #a // "k" <= x && x <= "m"
+		err: X
+		err: x: y: j: 3
+
+		ok: X
+		ok: x: y: k: 3
+	}
+
+	andEmbed: p1: {
+		X: { #a & #b } // "k" <= x && x <= "m"
+
+		err: X
+		err: x: y: j: 3
+
+		ok: X
+		ok: x: y: k: 3
+	}
+
+	andEmbed: p2: {
+		X: { #b & #a } // "k" <= x && x <= "m"
+		err: X
+		err: x: y: j: 3
+
+		ok: X
+		ok: x: y: k: 3
+	}
+
+	orEmbed: p1: {
+		X: { #a, #b } // "k" <= x && x <= "m"
+
+		ok1: X
+		ok1: x: y: j: 3
+
+		ok2: X
+		ok2: x: y: k: 3
+	}
+
+	orEmbed: p2: {
+		X: { #b, #a } // "k" <= x && x <= "m"
+		ok1: X
+		ok1: x: y: j: 3
+
+		ok2: X
+		ok2: x: y: k: 3
+	}
+
+	andOrEmbed: t1: p1: {
+		// ("k" <= x && x <= "m")  || ("w" <= x && x <= "y")
+		X: {
+			#a & #b
+			#c & #d
+		}
+		err1: X
+		err1: x: y: j: 3
+
+		ok1: X
+		ok1: x: y: k: 3
+	}
+
+	andOrEmbed: t1: p2: {
+		// ("k" <= x && x <= "m")  || ("w" <= x && x <= "y")
+		X: {
+			#c & #d
+			#a & #b
+		}
+		err1: X
+		err1: x: y: j: 3
+
+		ok1: X
+		ok1: x: y: k: 3
+	}
+
+	andOrEmbed: t2:{
+		// ("k" <= x && x <= "m")  || ("w" <= x && x <= "y") || x == "p"
+		X: {
+			#a & #b
+			#c & #d
+			["p"]: int
+		}
+		err1: X
+		err1: x: y: j: 3
+
+		ok1: X
+		ok1: x: y: k: 3
+
+		ok2: X
+		ok2: x: y: p: 3
+	}
+
+	// The last indirection is not a definition.
+	indirect: {
+		a: x: y: [>="k"]: int
+		#a: a
+
+		p1: {
+			X: #a
+			err1: X
+			err1: x: y: j: 3
+
+			err2: X & __no_sharing
+			err2: x: y: j: 3
+
+			ok: X
+			ok: x: y: k: 3
+		}
+
+		p2: {
+			#a: a & __no_sharing
+			X: #a
+
+			err1: X
+			err1: x: y: j: 3
+
+			err2: X & __no_sharing
+			err2: x: y: j: 3
+
+			ok: X
+			ok: x: y: k: 3
+		}
+
+		p3: {
+			X: #a & __no_sharing
+
+			err1: X
+			err1: x: y: j: 3
+
+			err2: X & __no_sharing
+			err2: x: y: j: 3
+
+			ok: X
+			ok: x: y: k: 3
+		}
+
+		p4: {
+			#a: a & __no_sharing
+			X: #a
+			X: #a & __no_sharing
+
+			err1: X
+			err1: x: y: j: 3
+
+			err2: X & __no_sharing
+			err2: x: y: j: 3
+
+			ok: X
+			ok: x: y: k: 3
+		}
+	}
+}
+
 -- reroot.cue --
 import "list"
 
@@ -222,6 +575,87 @@ inline: {
 		age2: 5 // not allowed
 	}
 }
+
+// minInDef defines examples where a definition is mixed into an open struct,
+// where then this struct refers to a field that is closed by the definition.
+mixInDef: {
+	refInside: {
+		#x: b: c: {d: {}, e: f: {} }
+		a: #x
+		a: b: c: d: {}
+		a: b: c: e: c.d
+	}
+	refEdge: {
+		#x: c: {d: {}, e: f: {} }
+		a: #x
+		a: c: d: {}
+		a: c: e: c.d
+	}
+	refOutside: {
+		#x: c: {d: {}, e: f: {} }
+		a: #x
+		a: c: d: {}
+		a: c: e: a.c.d // crosses definition
+	}
+}
+
+issue3601: original: {
+	out: {
+		#Transform.output
+	}
+	#Transform: output: (#Patch & {}).output
+	#Patch: {
+		target: {}
+		output: foo: {
+			final: target
+			final: version: "v1"
+		}
+	}
+}
+issue3601: originalNoShare: {
+	// Like the original, but with explicit no sharing.
+	out: {
+		#Transform.output
+	}
+	#Transform: output: (#Patch & __no_sharing).output
+	#Patch: {
+		target: {}
+		output: foo: {
+			final: target
+			final: version: "v1"
+		}
+	}
+}
+issue3601: reduced: {
+	#X: {
+		a: b: c: "v1"
+		a: b: empty
+		empty: {}
+	}
+
+	original: {
+		Y: (#X & __no_sharing).a
+		out: Y & __no_sharing
+	}
+	moreInlining: {
+		out: (#X & {}).a & {}
+	}
+	noInline: {
+		Y: #X & __no_sharing
+		Z: Y & __no_sharing
+		out: Z.a & __no_sharing
+	}
+	moreNesting: {
+		#X: {
+			a: b: c: d: "v1"
+			a: b: c: empty
+			empty: {}
+		}
+		Y: (#X.a & __no_sharing).b
+		Z: Y & __no_sharing
+	}
+}
+
 -- validation.cue --
 import "list"
 
@@ -233,15 +667,15 @@ issue3332: {
 }
 
 -- out/eval/stats --
-Leaks:  3
-Freed:  269
-Reused: 261
-Allocs: 11
-Retain: 29
+Leaks:  12
+Freed:  761
+Reused: 753
+Allocs: 20
+Retain: 78
 
-Unifications: 264
-Conjuncts:    482
-Disjuncts:    299
+Unifications: 765
+Conjuncts:    1946
+Disjuncts:    840
 -- out/eval --
 Errors:
 a.q.e: field not allowed:
@@ -306,6 +740,250 @@ nested.err2.x.b.g: field not allowed:
     ./reroot.cue:128:6
     ./reroot.cue:136:5
     ./reroot.cue:137:8
+patterns.nested.and.p1.err.x.y.j: field not allowed:
+    ./embed.cue:206:12
+    ./embed.cue:207:12
+    ./embed.cue:221:6
+    ./embed.cue:221:11
+    ./embed.cue:223:8
+    ./embed.cue:224:14
+patterns.nested.and.p2.err.x.y.j: field not allowed:
+    ./embed.cue:206:12
+    ./embed.cue:207:12
+    ./embed.cue:231:6
+    ./embed.cue:231:11
+    ./embed.cue:232:8
+    ./embed.cue:233:14
+patterns.nested.andEmbed.p1.err.x.y.j: field not allowed:
+    ./embed.cue:206:12
+    ./embed.cue:207:12
+    ./embed.cue:240:8
+    ./embed.cue:240:13
+    ./embed.cue:242:8
+    ./embed.cue:243:14
+patterns.nested.andEmbed.p2.err.x.y.j: field not allowed:
+    ./embed.cue:206:12
+    ./embed.cue:207:12
+    ./embed.cue:250:8
+    ./embed.cue:250:13
+    ./embed.cue:251:8
+    ./embed.cue:252:14
+patterns.nested.andOrEmbed.t1.p1.err1.x.y.j: field not allowed:
+    ./embed.cue:206:12
+    ./embed.cue:207:12
+    ./embed.cue:208:12
+    ./embed.cue:209:12
+    ./embed.cue:280:4
+    ./embed.cue:280:9
+    ./embed.cue:281:4
+    ./embed.cue:281:9
+    ./embed.cue:283:9
+    ./embed.cue:284:15
+patterns.nested.andOrEmbed.t1.p2.err1.x.y.j: field not allowed:
+    ./embed.cue:206:12
+    ./embed.cue:207:12
+    ./embed.cue:208:12
+    ./embed.cue:209:12
+    ./embed.cue:293:4
+    ./embed.cue:293:9
+    ./embed.cue:294:4
+    ./embed.cue:294:9
+    ./embed.cue:296:9
+    ./embed.cue:297:15
+patterns.nested.andOrEmbed.t2.err1.x.y.j: field not allowed:
+    ./embed.cue:206:12
+    ./embed.cue:207:12
+    ./embed.cue:208:12
+    ./embed.cue:209:12
+    ./embed.cue:306:4
+    ./embed.cue:306:9
+    ./embed.cue:307:4
+    ./embed.cue:307:9
+    ./embed.cue:310:9
+    ./embed.cue:311:15
+patterns.nested.andOrEmbed.t2.ok2.x.y.p: field not allowed:
+    ./embed.cue:206:12
+    ./embed.cue:207:12
+    ./embed.cue:208:12
+    ./embed.cue:209:12
+    ./embed.cue:306:4
+    ./embed.cue:306:9
+    ./embed.cue:307:4
+    ./embed.cue:307:9
+    ./embed.cue:316:8
+    ./embed.cue:317:14
+patterns.nested.indirect.p1.err1.x.y.j: field not allowed:
+    ./embed.cue:322:12
+    ./embed.cue:323:7
+    ./embed.cue:326:7
+    ./embed.cue:327:10
+    ./embed.cue:328:16
+patterns.nested.indirect.p1.err2.x.y.j: field not allowed:
+    ./embed.cue:322:12
+    ./embed.cue:323:7
+    ./embed.cue:326:7
+    ./embed.cue:330:10
+    ./embed.cue:331:16
+patterns.nested.indirect.p2.err1.x.y.j: field not allowed:
+    ./embed.cue:322:12
+    ./embed.cue:338:8
+    ./embed.cue:339:7
+    ./embed.cue:341:10
+    ./embed.cue:342:16
+patterns.nested.indirect.p2.err2.x.y.j: field not allowed:
+    ./embed.cue:322:12
+    ./embed.cue:338:8
+    ./embed.cue:339:7
+    ./embed.cue:344:10
+    ./embed.cue:345:16
+patterns.nested.indirect.p3.err1.x.y.j: field not allowed:
+    ./embed.cue:322:12
+    ./embed.cue:323:7
+    ./embed.cue:352:7
+    ./embed.cue:354:10
+    ./embed.cue:355:16
+patterns.nested.indirect.p3.err2.x.y.j: field not allowed:
+    ./embed.cue:322:12
+    ./embed.cue:323:7
+    ./embed.cue:352:7
+    ./embed.cue:357:10
+    ./embed.cue:358:16
+patterns.nested.indirect.p4.err1.x.y.j: field not allowed:
+    ./embed.cue:322:12
+    ./embed.cue:365:8
+    ./embed.cue:366:7
+    ./embed.cue:369:10
+    ./embed.cue:370:16
+patterns.nested.indirect.p4.err2.x.y.j: field not allowed:
+    ./embed.cue:322:12
+    ./embed.cue:365:8
+    ./embed.cue:366:7
+    ./embed.cue:372:10
+    ./embed.cue:373:16
+patterns.nested.single.err.x.y.j: field not allowed:
+    ./embed.cue:206:12
+    ./embed.cue:212:6
+    ./embed.cue:213:8
+    ./embed.cue:214:14
+patterns.shallow.and.p1.err.j: field not allowed:
+    ./embed.cue:30:6
+    ./embed.cue:31:6
+    ./embed.cue:45:6
+    ./embed.cue:45:11
+    ./embed.cue:47:8
+    ./embed.cue:48:8
+patterns.shallow.and.p2.err.j: field not allowed:
+    ./embed.cue:30:6
+    ./embed.cue:31:6
+    ./embed.cue:55:6
+    ./embed.cue:55:11
+    ./embed.cue:56:8
+    ./embed.cue:57:8
+patterns.shallow.andEmbed.p1.err.j: field not allowed:
+    ./embed.cue:30:6
+    ./embed.cue:31:6
+    ./embed.cue:64:6
+    ./embed.cue:64:8
+    ./embed.cue:64:13
+    ./embed.cue:66:8
+    ./embed.cue:67:8
+patterns.shallow.andEmbed.p2.err.j: field not allowed:
+    ./embed.cue:30:6
+    ./embed.cue:31:6
+    ./embed.cue:74:6
+    ./embed.cue:74:8
+    ./embed.cue:74:13
+    ./embed.cue:75:8
+    ./embed.cue:76:8
+patterns.shallow.andOrEmbed.t1.p1.err1.j: field not allowed:
+    ./embed.cue:30:6
+    ./embed.cue:31:6
+    ./embed.cue:32:6
+    ./embed.cue:33:6
+    ./embed.cue:103:6
+    ./embed.cue:104:4
+    ./embed.cue:104:9
+    ./embed.cue:105:4
+    ./embed.cue:105:9
+    ./embed.cue:107:9
+    ./embed.cue:108:9
+patterns.shallow.andOrEmbed.t1.p2.err1.j: field not allowed:
+    ./embed.cue:30:6
+    ./embed.cue:31:6
+    ./embed.cue:32:6
+    ./embed.cue:33:6
+    ./embed.cue:116:6
+    ./embed.cue:117:4
+    ./embed.cue:117:9
+    ./embed.cue:118:4
+    ./embed.cue:118:9
+    ./embed.cue:120:9
+    ./embed.cue:121:9
+patterns.shallow.andOrEmbed.t2.err1.j: field not allowed:
+    ./embed.cue:30:6
+    ./embed.cue:31:6
+    ./embed.cue:32:6
+    ./embed.cue:33:6
+    ./embed.cue:129:6
+    ./embed.cue:130:4
+    ./embed.cue:130:9
+    ./embed.cue:131:4
+    ./embed.cue:131:9
+    ./embed.cue:134:9
+    ./embed.cue:135:9
+patterns.shallow.indirect.p1.err1.j: field not allowed:
+    ./embed.cue:146:6
+    ./embed.cue:147:7
+    ./embed.cue:150:7
+    ./embed.cue:151:10
+    ./embed.cue:152:10
+patterns.shallow.indirect.p1.err2.j: field not allowed:
+    ./embed.cue:146:6
+    ./embed.cue:147:7
+    ./embed.cue:150:7
+    ./embed.cue:154:10
+    ./embed.cue:155:10
+patterns.shallow.indirect.p2.err1.j: field not allowed:
+    ./embed.cue:146:6
+    ./embed.cue:162:8
+    ./embed.cue:163:7
+    ./embed.cue:165:10
+    ./embed.cue:166:10
+patterns.shallow.indirect.p2.err2.j: field not allowed:
+    ./embed.cue:146:6
+    ./embed.cue:162:8
+    ./embed.cue:163:7
+    ./embed.cue:168:10
+    ./embed.cue:169:10
+patterns.shallow.indirect.p3.err1.j: field not allowed:
+    ./embed.cue:146:6
+    ./embed.cue:147:7
+    ./embed.cue:176:7
+    ./embed.cue:178:10
+    ./embed.cue:179:10
+patterns.shallow.indirect.p3.err2.j: field not allowed:
+    ./embed.cue:146:6
+    ./embed.cue:147:7
+    ./embed.cue:176:7
+    ./embed.cue:181:10
+    ./embed.cue:182:10
+patterns.shallow.indirect.p4.err1.j: field not allowed:
+    ./embed.cue:146:6
+    ./embed.cue:189:8
+    ./embed.cue:190:7
+    ./embed.cue:193:10
+    ./embed.cue:194:10
+patterns.shallow.indirect.p4.err2.j: field not allowed:
+    ./embed.cue:146:6
+    ./embed.cue:189:8
+    ./embed.cue:190:7
+    ./embed.cue:196:10
+    ./embed.cue:197:10
+patterns.shallow.single.err.j: field not allowed:
+    ./embed.cue:30:6
+    ./embed.cue:36:6
+    ./embed.cue:37:8
+    ./embed.cue:38:8
 
 Result:
 (_|_){
@@ -344,6 +1022,979 @@ Result:
         items: (#struct){
           "my-item": (#struct){
             name: (string){ "my-item" }
+          }
+        }
+      }
+    }
+  }
+  patterns: (_|_){
+    // [eval]
+    shallow: (_|_){
+      // [eval]
+      #a: (#struct){
+      }
+      #b: (#struct){
+      }
+      #c: (#struct){
+      }
+      #d: (#struct){
+      }
+      single: (_|_){
+        // [eval]
+        X: (#struct){
+        }
+        err: (_|_){
+          // [eval]
+          j: (_|_){
+            // [eval] patterns.shallow.single.err.j: field not allowed:
+            //     ./embed.cue:30:6
+            //     ./embed.cue:36:6
+            //     ./embed.cue:37:8
+            //     ./embed.cue:38:8
+          }
+        }
+        ok: (#struct){
+          k: (int){ 3 }
+        }
+      }
+      and: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval]
+          X: (#struct){
+          }
+          err: (_|_){
+            // [eval]
+            j: (_|_){
+              // [eval] patterns.shallow.and.p1.err.j: field not allowed:
+              //     ./embed.cue:30:6
+              //     ./embed.cue:31:6
+              //     ./embed.cue:45:6
+              //     ./embed.cue:45:11
+              //     ./embed.cue:47:8
+              //     ./embed.cue:48:8
+            }
+          }
+          ok: (#struct){
+            k: (int){ 3 }
+          }
+        }
+        p2: (_|_){
+          // [eval]
+          X: (#struct){
+          }
+          err: (_|_){
+            // [eval]
+            j: (_|_){
+              // [eval] patterns.shallow.and.p2.err.j: field not allowed:
+              //     ./embed.cue:30:6
+              //     ./embed.cue:31:6
+              //     ./embed.cue:55:6
+              //     ./embed.cue:55:11
+              //     ./embed.cue:56:8
+              //     ./embed.cue:57:8
+            }
+          }
+          ok: (#struct){
+            k: (int){ 3 }
+          }
+        }
+      }
+      andEmbed: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval]
+          X: (#struct){
+          }
+          err: (_|_){
+            // [eval]
+            j: (_|_){
+              // [eval] patterns.shallow.andEmbed.p1.err.j: field not allowed:
+              //     ./embed.cue:30:6
+              //     ./embed.cue:31:6
+              //     ./embed.cue:64:6
+              //     ./embed.cue:64:8
+              //     ./embed.cue:64:13
+              //     ./embed.cue:66:8
+              //     ./embed.cue:67:8
+            }
+          }
+          ok: (#struct){
+            k: (int){ 3 }
+          }
+        }
+        p2: (_|_){
+          // [eval]
+          X: (#struct){
+          }
+          err: (_|_){
+            // [eval]
+            j: (_|_){
+              // [eval] patterns.shallow.andEmbed.p2.err.j: field not allowed:
+              //     ./embed.cue:30:6
+              //     ./embed.cue:31:6
+              //     ./embed.cue:74:6
+              //     ./embed.cue:74:8
+              //     ./embed.cue:74:13
+              //     ./embed.cue:75:8
+              //     ./embed.cue:76:8
+            }
+          }
+          ok: (#struct){
+            k: (int){ 3 }
+          }
+        }
+      }
+      orEmbed: (struct){
+        p1: (struct){
+          X: (#struct){
+          }
+          ok1: (#struct){
+            j: (int){ 3 }
+          }
+          ok2: (#struct){
+            k: (int){ 3 }
+          }
+        }
+        p2: (struct){
+          X: (#struct){
+          }
+          ok1: (#struct){
+            j: (int){ 3 }
+          }
+          ok2: (#struct){
+            k: (int){ 3 }
+          }
+        }
+      }
+      andOrEmbed: (_|_){
+        // [eval]
+        t1: (_|_){
+          // [eval]
+          p1: (_|_){
+            // [eval]
+            X: (#struct){
+            }
+            err1: (_|_){
+              // [eval]
+              j: (_|_){
+                // [eval] patterns.shallow.andOrEmbed.t1.p1.err1.j: field not allowed:
+                //     ./embed.cue:30:6
+                //     ./embed.cue:31:6
+                //     ./embed.cue:32:6
+                //     ./embed.cue:33:6
+                //     ./embed.cue:103:6
+                //     ./embed.cue:104:4
+                //     ./embed.cue:104:9
+                //     ./embed.cue:105:4
+                //     ./embed.cue:105:9
+                //     ./embed.cue:107:9
+                //     ./embed.cue:108:9
+              }
+            }
+            ok1: (#struct){
+              k: (int){ 3 }
+            }
+          }
+          p2: (_|_){
+            // [eval]
+            X: (#struct){
+            }
+            err1: (_|_){
+              // [eval]
+              j: (_|_){
+                // [eval] patterns.shallow.andOrEmbed.t1.p2.err1.j: field not allowed:
+                //     ./embed.cue:30:6
+                //     ./embed.cue:31:6
+                //     ./embed.cue:32:6
+                //     ./embed.cue:33:6
+                //     ./embed.cue:116:6
+                //     ./embed.cue:117:4
+                //     ./embed.cue:117:9
+                //     ./embed.cue:118:4
+                //     ./embed.cue:118:9
+                //     ./embed.cue:120:9
+                //     ./embed.cue:121:9
+              }
+            }
+            ok1: (#struct){
+              k: (int){ 3 }
+            }
+          }
+        }
+        t2: (_|_){
+          // [eval]
+          X: (#struct){
+          }
+          err1: (_|_){
+            // [eval]
+            j: (_|_){
+              // [eval] patterns.shallow.andOrEmbed.t2.err1.j: field not allowed:
+              //     ./embed.cue:30:6
+              //     ./embed.cue:31:6
+              //     ./embed.cue:32:6
+              //     ./embed.cue:33:6
+              //     ./embed.cue:129:6
+              //     ./embed.cue:130:4
+              //     ./embed.cue:130:9
+              //     ./embed.cue:131:4
+              //     ./embed.cue:131:9
+              //     ./embed.cue:134:9
+              //     ./embed.cue:135:9
+            }
+          }
+          ok1: (#struct){
+            k: (int){ 3 }
+          }
+          ok2: (#struct){
+            p: (int){ 3 }
+          }
+        }
+      }
+      indirect: (_|_){
+        // [eval]
+        a: (struct){
+        }
+        #a: (#struct){
+        }
+        p1: (_|_){
+          // [eval]
+          X: (#struct){
+          }
+          err1: (_|_){
+            // [eval]
+            j: (_|_){
+              // [eval] patterns.shallow.indirect.p1.err1.j: field not allowed:
+              //     ./embed.cue:146:6
+              //     ./embed.cue:147:7
+              //     ./embed.cue:150:7
+              //     ./embed.cue:151:10
+              //     ./embed.cue:152:10
+            }
+          }
+          err2: (_|_){
+            // [eval]
+            j: (_|_){
+              // [eval] patterns.shallow.indirect.p1.err2.j: field not allowed:
+              //     ./embed.cue:146:6
+              //     ./embed.cue:147:7
+              //     ./embed.cue:150:7
+              //     ./embed.cue:154:10
+              //     ./embed.cue:155:10
+            }
+          }
+          ok: (#struct){
+            k: (int){ 3 }
+          }
+        }
+        p2: (_|_){
+          // [eval]
+          #a: (#struct){
+          }
+          X: (#struct){
+          }
+          err1: (_|_){
+            // [eval]
+            j: (_|_){
+              // [eval] patterns.shallow.indirect.p2.err1.j: field not allowed:
+              //     ./embed.cue:146:6
+              //     ./embed.cue:162:8
+              //     ./embed.cue:163:7
+              //     ./embed.cue:165:10
+              //     ./embed.cue:166:10
+            }
+          }
+          err2: (_|_){
+            // [eval]
+            j: (_|_){
+              // [eval] patterns.shallow.indirect.p2.err2.j: field not allowed:
+              //     ./embed.cue:146:6
+              //     ./embed.cue:162:8
+              //     ./embed.cue:163:7
+              //     ./embed.cue:168:10
+              //     ./embed.cue:169:10
+            }
+          }
+          ok: (#struct){
+            k: (int){ 3 }
+          }
+        }
+        p3: (_|_){
+          // [eval]
+          X: (#struct){
+          }
+          err1: (_|_){
+            // [eval]
+            j: (_|_){
+              // [eval] patterns.shallow.indirect.p3.err1.j: field not allowed:
+              //     ./embed.cue:146:6
+              //     ./embed.cue:147:7
+              //     ./embed.cue:176:7
+              //     ./embed.cue:178:10
+              //     ./embed.cue:179:10
+            }
+          }
+          err2: (_|_){
+            // [eval]
+            j: (_|_){
+              // [eval] patterns.shallow.indirect.p3.err2.j: field not allowed:
+              //     ./embed.cue:146:6
+              //     ./embed.cue:147:7
+              //     ./embed.cue:176:7
+              //     ./embed.cue:181:10
+              //     ./embed.cue:182:10
+            }
+          }
+          ok: (#struct){
+            k: (int){ 3 }
+          }
+        }
+        p4: (_|_){
+          // [eval]
+          #a: (#struct){
+          }
+          X: (#struct){
+          }
+          err1: (_|_){
+            // [eval]
+            j: (_|_){
+              // [eval] patterns.shallow.indirect.p4.err1.j: field not allowed:
+              //     ./embed.cue:146:6
+              //     ./embed.cue:189:8
+              //     ./embed.cue:190:7
+              //     ./embed.cue:193:10
+              //     ./embed.cue:194:10
+            }
+          }
+          err2: (_|_){
+            // [eval]
+            j: (_|_){
+              // [eval] patterns.shallow.indirect.p4.err2.j: field not allowed:
+              //     ./embed.cue:146:6
+              //     ./embed.cue:189:8
+              //     ./embed.cue:190:7
+              //     ./embed.cue:196:10
+              //     ./embed.cue:197:10
+            }
+          }
+          ok: (#struct){
+            k: (int){ 3 }
+          }
+        }
+      }
+    }
+    nested: (_|_){
+      // [eval]
+      #a: (#struct){
+        x: (#struct){
+          y: (#struct){
+          }
+        }
+      }
+      #b: (#struct){
+        x: (#struct){
+          y: (#struct){
+          }
+        }
+      }
+      #c: (#struct){
+        x: (#struct){
+          y: (#struct){
+          }
+        }
+      }
+      #d: (#struct){
+        x: (#struct){
+          y: (#struct){
+          }
+        }
+      }
+      single: (_|_){
+        // [eval]
+        X: (#struct){
+          x: (#struct){
+            y: (#struct){
+            }
+          }
+        }
+        err: (_|_){
+          // [eval]
+          x: (_|_){
+            // [eval]
+            y: (_|_){
+              // [eval]
+              j: (_|_){
+                // [eval] patterns.nested.single.err.x.y.j: field not allowed:
+                //     ./embed.cue:206:12
+                //     ./embed.cue:212:6
+                //     ./embed.cue:213:8
+                //     ./embed.cue:214:14
+              }
+            }
+          }
+        }
+        ok: (#struct){
+          x: (#struct){
+            y: (#struct){
+              k: (int){ 3 }
+            }
+          }
+        }
+      }
+      and: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval]
+          X: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          err: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                j: (_|_){
+                  // [eval] patterns.nested.and.p1.err.x.y.j: field not allowed:
+                  //     ./embed.cue:206:12
+                  //     ./embed.cue:207:12
+                  //     ./embed.cue:221:6
+                  //     ./embed.cue:221:11
+                  //     ./embed.cue:223:8
+                  //     ./embed.cue:224:14
+                }
+              }
+            }
+          }
+          ok: (#struct){
+            x: (#struct){
+              y: (#struct){
+                k: (int){ 3 }
+              }
+            }
+          }
+        }
+        p2: (_|_){
+          // [eval]
+          X: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          err: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                j: (_|_){
+                  // [eval] patterns.nested.and.p2.err.x.y.j: field not allowed:
+                  //     ./embed.cue:206:12
+                  //     ./embed.cue:207:12
+                  //     ./embed.cue:231:6
+                  //     ./embed.cue:231:11
+                  //     ./embed.cue:232:8
+                  //     ./embed.cue:233:14
+                }
+              }
+            }
+          }
+          ok: (#struct){
+            x: (#struct){
+              y: (#struct){
+                k: (int){ 3 }
+              }
+            }
+          }
+        }
+      }
+      andEmbed: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval]
+          X: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          err: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                j: (_|_){
+                  // [eval] patterns.nested.andEmbed.p1.err.x.y.j: field not allowed:
+                  //     ./embed.cue:206:12
+                  //     ./embed.cue:207:12
+                  //     ./embed.cue:240:8
+                  //     ./embed.cue:240:13
+                  //     ./embed.cue:242:8
+                  //     ./embed.cue:243:14
+                }
+              }
+            }
+          }
+          ok: (#struct){
+            x: (#struct){
+              y: (#struct){
+                k: (int){ 3 }
+              }
+            }
+          }
+        }
+        p2: (_|_){
+          // [eval]
+          X: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          err: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                j: (_|_){
+                  // [eval] patterns.nested.andEmbed.p2.err.x.y.j: field not allowed:
+                  //     ./embed.cue:206:12
+                  //     ./embed.cue:207:12
+                  //     ./embed.cue:250:8
+                  //     ./embed.cue:250:13
+                  //     ./embed.cue:251:8
+                  //     ./embed.cue:252:14
+                }
+              }
+            }
+          }
+          ok: (#struct){
+            x: (#struct){
+              y: (#struct){
+                k: (int){ 3 }
+              }
+            }
+          }
+        }
+      }
+      orEmbed: (struct){
+        p1: (struct){
+          X: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          ok1: (#struct){
+            x: (#struct){
+              y: (#struct){
+                j: (int){ 3 }
+              }
+            }
+          }
+          ok2: (#struct){
+            x: (#struct){
+              y: (#struct){
+                k: (int){ 3 }
+              }
+            }
+          }
+        }
+        p2: (struct){
+          X: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          ok1: (#struct){
+            x: (#struct){
+              y: (#struct){
+                j: (int){ 3 }
+              }
+            }
+          }
+          ok2: (#struct){
+            x: (#struct){
+              y: (#struct){
+                k: (int){ 3 }
+              }
+            }
+          }
+        }
+      }
+      andOrEmbed: (_|_){
+        // [eval]
+        t1: (_|_){
+          // [eval]
+          p1: (_|_){
+            // [eval]
+            X: (#struct){
+              x: (#struct){
+                y: (#struct){
+                }
+              }
+            }
+            err1: (_|_){
+              // [eval]
+              x: (_|_){
+                // [eval]
+                y: (_|_){
+                  // [eval]
+                  j: (_|_){
+                    // [eval] patterns.nested.andOrEmbed.t1.p1.err1.x.y.j: field not allowed:
+                    //     ./embed.cue:206:12
+                    //     ./embed.cue:207:12
+                    //     ./embed.cue:208:12
+                    //     ./embed.cue:209:12
+                    //     ./embed.cue:280:4
+                    //     ./embed.cue:280:9
+                    //     ./embed.cue:281:4
+                    //     ./embed.cue:281:9
+                    //     ./embed.cue:283:9
+                    //     ./embed.cue:284:15
+                  }
+                }
+              }
+            }
+            ok1: (#struct){
+              x: (#struct){
+                y: (#struct){
+                  k: (int){ 3 }
+                }
+              }
+            }
+          }
+          p2: (_|_){
+            // [eval]
+            X: (#struct){
+              x: (#struct){
+                y: (#struct){
+                }
+              }
+            }
+            err1: (_|_){
+              // [eval]
+              x: (_|_){
+                // [eval]
+                y: (_|_){
+                  // [eval]
+                  j: (_|_){
+                    // [eval] patterns.nested.andOrEmbed.t1.p2.err1.x.y.j: field not allowed:
+                    //     ./embed.cue:206:12
+                    //     ./embed.cue:207:12
+                    //     ./embed.cue:208:12
+                    //     ./embed.cue:209:12
+                    //     ./embed.cue:293:4
+                    //     ./embed.cue:293:9
+                    //     ./embed.cue:294:4
+                    //     ./embed.cue:294:9
+                    //     ./embed.cue:296:9
+                    //     ./embed.cue:297:15
+                  }
+                }
+              }
+            }
+            ok1: (#struct){
+              x: (#struct){
+                y: (#struct){
+                  k: (int){ 3 }
+                }
+              }
+            }
+          }
+        }
+        t2: (_|_){
+          // [eval]
+          X: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          err1: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                j: (_|_){
+                  // [eval] patterns.nested.andOrEmbed.t2.err1.x.y.j: field not allowed:
+                  //     ./embed.cue:206:12
+                  //     ./embed.cue:207:12
+                  //     ./embed.cue:208:12
+                  //     ./embed.cue:209:12
+                  //     ./embed.cue:306:4
+                  //     ./embed.cue:306:9
+                  //     ./embed.cue:307:4
+                  //     ./embed.cue:307:9
+                  //     ./embed.cue:310:9
+                  //     ./embed.cue:311:15
+                }
+              }
+            }
+          }
+          ok1: (#struct){
+            x: (#struct){
+              y: (#struct){
+                k: (int){ 3 }
+              }
+            }
+          }
+          ok2: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                p: (_|_){
+                  // [eval] patterns.nested.andOrEmbed.t2.ok2.x.y.p: field not allowed:
+                  //     ./embed.cue:206:12
+                  //     ./embed.cue:207:12
+                  //     ./embed.cue:208:12
+                  //     ./embed.cue:209:12
+                  //     ./embed.cue:306:4
+                  //     ./embed.cue:306:9
+                  //     ./embed.cue:307:4
+                  //     ./embed.cue:307:9
+                  //     ./embed.cue:316:8
+                  //     ./embed.cue:317:14
+                }
+              }
+            }
+          }
+        }
+      }
+      indirect: (_|_){
+        // [eval]
+        a: (struct){
+          x: (struct){
+            y: (struct){
+            }
+          }
+        }
+        #a: (#struct){
+          x: (#struct){
+            y: (#struct){
+            }
+          }
+        }
+        p1: (_|_){
+          // [eval]
+          X: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          err1: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                j: (_|_){
+                  // [eval] patterns.nested.indirect.p1.err1.x.y.j: field not allowed:
+                  //     ./embed.cue:322:12
+                  //     ./embed.cue:323:7
+                  //     ./embed.cue:326:7
+                  //     ./embed.cue:327:10
+                  //     ./embed.cue:328:16
+                }
+              }
+            }
+          }
+          err2: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                j: (_|_){
+                  // [eval] patterns.nested.indirect.p1.err2.x.y.j: field not allowed:
+                  //     ./embed.cue:322:12
+                  //     ./embed.cue:323:7
+                  //     ./embed.cue:326:7
+                  //     ./embed.cue:330:10
+                  //     ./embed.cue:331:16
+                }
+              }
+            }
+          }
+          ok: (#struct){
+            x: (#struct){
+              y: (#struct){
+                k: (int){ 3 }
+              }
+            }
+          }
+        }
+        p2: (_|_){
+          // [eval]
+          #a: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          X: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          err1: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                j: (_|_){
+                  // [eval] patterns.nested.indirect.p2.err1.x.y.j: field not allowed:
+                  //     ./embed.cue:322:12
+                  //     ./embed.cue:338:8
+                  //     ./embed.cue:339:7
+                  //     ./embed.cue:341:10
+                  //     ./embed.cue:342:16
+                }
+              }
+            }
+          }
+          err2: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                j: (_|_){
+                  // [eval] patterns.nested.indirect.p2.err2.x.y.j: field not allowed:
+                  //     ./embed.cue:322:12
+                  //     ./embed.cue:338:8
+                  //     ./embed.cue:339:7
+                  //     ./embed.cue:344:10
+                  //     ./embed.cue:345:16
+                }
+              }
+            }
+          }
+          ok: (#struct){
+            x: (#struct){
+              y: (#struct){
+                k: (int){ 3 }
+              }
+            }
+          }
+        }
+        p3: (_|_){
+          // [eval]
+          X: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          err1: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                j: (_|_){
+                  // [eval] patterns.nested.indirect.p3.err1.x.y.j: field not allowed:
+                  //     ./embed.cue:322:12
+                  //     ./embed.cue:323:7
+                  //     ./embed.cue:352:7
+                  //     ./embed.cue:354:10
+                  //     ./embed.cue:355:16
+                }
+              }
+            }
+          }
+          err2: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                j: (_|_){
+                  // [eval] patterns.nested.indirect.p3.err2.x.y.j: field not allowed:
+                  //     ./embed.cue:322:12
+                  //     ./embed.cue:323:7
+                  //     ./embed.cue:352:7
+                  //     ./embed.cue:357:10
+                  //     ./embed.cue:358:16
+                }
+              }
+            }
+          }
+          ok: (#struct){
+            x: (#struct){
+              y: (#struct){
+                k: (int){ 3 }
+              }
+            }
+          }
+        }
+        p4: (_|_){
+          // [eval]
+          #a: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          X: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          err1: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                j: (_|_){
+                  // [eval] patterns.nested.indirect.p4.err1.x.y.j: field not allowed:
+                  //     ./embed.cue:322:12
+                  //     ./embed.cue:365:8
+                  //     ./embed.cue:366:7
+                  //     ./embed.cue:369:10
+                  //     ./embed.cue:370:16
+                }
+              }
+            }
+          }
+          err2: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                j: (_|_){
+                  // [eval] patterns.nested.indirect.p4.err2.x.y.j: field not allowed:
+                  //     ./embed.cue:322:12
+                  //     ./embed.cue:365:8
+                  //     ./embed.cue:366:7
+                  //     ./embed.cue:372:10
+                  //     ./embed.cue:373:16
+                }
+              }
+            }
+          }
+          ok: (#struct){
+            x: (#struct){
+              y: (#struct){
+                k: (int){ 3 }
+              }
+            }
           }
         }
       }
@@ -773,6 +2424,216 @@ Result:
       age2: (int){ 5 }
     }
   }
+  mixInDef: (struct){
+    refInside: (struct){
+      #x: (#struct){
+        b: (#struct){
+          c: (#struct){
+            d: (#struct){
+            }
+            e: (#struct){
+              f: (#struct){
+              }
+            }
+          }
+        }
+      }
+      a: (#struct){
+        b: (#struct){
+          c: (#struct){
+            d: (#struct){
+            }
+            e: (#struct){
+              f: (#struct){
+              }
+            }
+          }
+        }
+      }
+    }
+    refEdge: (struct){
+      #x: (#struct){
+        c: (#struct){
+          d: (#struct){
+          }
+          e: (#struct){
+            f: (#struct){
+            }
+          }
+        }
+      }
+      a: (#struct){
+        c: (#struct){
+          d: (#struct){
+          }
+          e: (#struct){
+            f: (#struct){
+            }
+          }
+        }
+      }
+    }
+    refOutside: (struct){
+      #x: (#struct){
+        c: (#struct){
+          d: (#struct){
+          }
+          e: (#struct){
+            f: (#struct){
+            }
+          }
+        }
+      }
+      a: (#struct){
+        c: (#struct){
+          d: (#struct){
+          }
+          e: (#struct){
+            f: (#struct){
+            }
+          }
+        }
+      }
+    }
+  }
+  issue3601: (struct){
+    original: (struct){
+      out: (#struct){
+        foo: (#struct){
+          final: (#struct){
+            version: (string){ "v1" }
+          }
+        }
+      }
+      #Transform: (#struct){
+        output: (#struct){
+          foo: (#struct){
+            final: (#struct){
+              version: (string){ "v1" }
+            }
+          }
+        }
+      }
+      #Patch: (#struct){
+        target: (#struct){
+        }
+        output: (#struct){
+          foo: (#struct){
+            final: (#struct){
+              version: (string){ "v1" }
+            }
+          }
+        }
+      }
+    }
+    originalNoShare: (struct){
+      out: (#struct){
+        foo: (#struct){
+          final: (#struct){
+            version: (string){ "v1" }
+          }
+        }
+      }
+      #Transform: (#struct){
+        output: (#struct){
+          foo: (#struct){
+            final: (#struct){
+              version: (string){ "v1" }
+            }
+          }
+        }
+      }
+      #Patch: (#struct){
+        target: (#struct){
+        }
+        output: (#struct){
+          foo: (#struct){
+            final: (#struct){
+              version: (string){ "v1" }
+            }
+          }
+        }
+      }
+    }
+    reduced: (struct){
+      #X: (#struct){
+        a: (#struct){
+          b: (#struct){
+            c: (string){ "v1" }
+          }
+        }
+        empty: (#struct){
+        }
+      }
+      original: (struct){
+        Y: (struct){
+          b: (struct){
+            c: (string){ "v1" }
+          }
+        }
+        out: (struct){
+          b: (struct){
+            c: (string){ "v1" }
+          }
+        }
+      }
+      moreInlining: (struct){
+        out: (struct){
+          b: (struct){
+            c: (string){ "v1" }
+          }
+        }
+      }
+      noInline: (struct){
+        Y: (#struct){
+          a: (#struct){
+            b: (#struct){
+              c: (string){ "v1" }
+            }
+          }
+          empty: (#struct){
+          }
+        }
+        Z: (#struct){
+          a: (#struct){
+            b: (#struct){
+              c: (string){ "v1" }
+            }
+          }
+          empty: (#struct){
+          }
+        }
+        out: (struct){
+          b: (struct){
+            c: (string){ "v1" }
+          }
+        }
+      }
+      moreNesting: (struct){
+        #X: (#struct){
+          a: (#struct){
+            b: (#struct){
+              c: (#struct){
+                d: (string){ "v1" }
+              }
+            }
+          }
+          empty: (#struct){
+          }
+        }
+        Y: (struct){
+          c: (struct){
+            d: (string){ "v1" }
+          }
+        }
+        Z: (struct){
+          c: (struct){
+            d: (string){ "v1" }
+          }
+        }
+      }
+    }
+  }
   issue3332: (struct){
     #def: (#struct){
       field: (list){ list.MinItems(1) }
@@ -790,6 +2651,61 @@ nested.err1.x.b.f: field not allowed:
     ./reroot.cue:114:6
 nested.err2.x.b.g: field not allowed:
     ./reroot.cue:137:8
+patterns.shallow.and.p1.err.j: field not allowed:
+    ./embed.cue:30:15
+    ./embed.cue:48:8
+patterns.shallow.and.p2.err.j: field not allowed:
+    ./embed.cue:30:15
+    ./embed.cue:31:6
+    ./embed.cue:57:8
+patterns.shallow.andEmbed.p2.err.j: field not allowed:
+    ./embed.cue:30:15
+    ./embed.cue:31:6
+    ./embed.cue:76:8
+patterns.shallow.andOrEmbed.t2.ok2.p: field not allowed:
+    ./embed.cue:31:15
+    ./embed.cue:30:6
+    ./embed.cue:132:4
+    ./embed.cue:141:8
+patterns.shallow.indirect.p3.err1.j: field not allowed:
+    ./embed.cue:146:15
+    ./embed.cue:179:10
+patterns.shallow.indirect.p3.err2.j: field not allowed:
+    ./embed.cue:146:15
+    ./embed.cue:182:10
+patterns.shallow.indirect.p4.err1.j: field not allowed:
+    ./embed.cue:146:15
+    ./embed.cue:194:10
+patterns.shallow.indirect.p4.err2.j: field not allowed:
+    ./embed.cue:146:15
+    ./embed.cue:197:10
+patterns.nested.and.p1.err.x.y.j: field not allowed:
+    ./embed.cue:206:21
+    ./embed.cue:224:14
+patterns.nested.and.p2.err.x.y.j: field not allowed:
+    ./embed.cue:206:21
+    ./embed.cue:207:12
+    ./embed.cue:233:14
+patterns.nested.andEmbed.p2.err.x.y.j: field not allowed:
+    ./embed.cue:206:21
+    ./embed.cue:207:12
+    ./embed.cue:252:14
+patterns.nested.andOrEmbed.t2.ok2.x.y.p: field not allowed:
+    ./embed.cue:207:21
+    ./embed.cue:206:12
+    ./embed.cue:317:14
+patterns.nested.indirect.p3.err1.x.y.j: field not allowed:
+    ./embed.cue:322:21
+    ./embed.cue:355:16
+patterns.nested.indirect.p3.err2.x.y.j: field not allowed:
+    ./embed.cue:322:21
+    ./embed.cue:358:16
+patterns.nested.indirect.p4.err1.x.y.j: field not allowed:
+    ./embed.cue:322:21
+    ./embed.cue:370:16
+patterns.nested.indirect.p4.err2.x.y.j: field not allowed:
+    ./embed.cue:322:21
+    ./embed.cue:373:16
 a.q.e: field not allowed:
     ./in.cue:7:3
     ./in.cue:15:3
@@ -810,6 +2726,18 @@ inline.err1.age1: field not allowed:
 inline.err2.age2: field not allowed:
     ./reroot.cue:147:8
     ./reroot.cue:149:3
+issue3601.original.out.foo.final.version: field not allowed:
+    ./reroot.cue:184:11
+    ./reroot.cue:185:11
+issue3601.originalNoShare.out.foo.final.version: field not allowed:
+    ./reroot.cue:198:11
+    ./reroot.cue:199:11
+issue3601.reduced.moreInlining.out.b.c: field not allowed:
+    ./reroot.cue:206:9
+    ./reroot.cue:205:9
+issue3601.reduced.original.out.b.c: field not allowed:
+    ./reroot.cue:206:9
+    ./reroot.cue:205:9
 
 Result:
 (_|_){
@@ -850,6 +2778,709 @@ Result:
           }
         }
         name: (string){ "base" }
+      }
+    }
+  }
+  patterns: (_|_){
+    // [eval]
+    shallow: (_|_){
+      // [eval]
+      #a: (#struct){
+      }
+      #b: (#struct){
+      }
+      #c: (#struct){
+      }
+      #d: (#struct){
+      }
+      single: (struct){
+        X: (#struct){
+        }
+        err: (struct){
+          j: (int){ 3 }
+        }
+        ok: (struct){
+          k: (int){ 3 }
+        }
+      }
+      and: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval]
+          X: (#struct){
+          }
+          err: (_|_){
+            // [eval]
+            j: (_|_){
+              // [eval] patterns.shallow.and.p1.err.j: field not allowed:
+              //     ./embed.cue:30:15
+              //     ./embed.cue:48:8
+            }
+          }
+          ok: (#struct){
+            k: (int){ 3 }
+          }
+        }
+        p2: (_|_){
+          // [eval]
+          X: (#struct){
+          }
+          err: (_|_){
+            // [eval]
+            j: (_|_){
+              // [eval] patterns.shallow.and.p2.err.j: field not allowed:
+              //     ./embed.cue:30:15
+              //     ./embed.cue:31:6
+              //     ./embed.cue:57:8
+            }
+          }
+          ok: (#struct){
+            k: (int){ 3 }
+          }
+        }
+      }
+      andEmbed: (_|_){
+        // [eval]
+        p1: (struct){
+          X: (#struct){
+          }
+          err: (#struct){
+            j: (int){ 3 }
+          }
+          ok: (#struct){
+            k: (int){ 3 }
+          }
+        }
+        p2: (_|_){
+          // [eval]
+          X: (#struct){
+          }
+          err: (_|_){
+            // [eval]
+            j: (_|_){
+              // [eval] patterns.shallow.andEmbed.p2.err.j: field not allowed:
+              //     ./embed.cue:30:15
+              //     ./embed.cue:31:6
+              //     ./embed.cue:76:8
+            }
+          }
+          ok: (#struct){
+            k: (int){ 3 }
+          }
+        }
+      }
+      orEmbed: (struct){
+        p1: (struct){
+          X: (#struct){
+          }
+          ok1: (#struct){
+            j: (int){ 3 }
+          }
+          ok2: (#struct){
+            k: (int){ 3 }
+          }
+        }
+        p2: (struct){
+          X: (#struct){
+          }
+          ok1: (#struct){
+            j: (int){ 3 }
+          }
+          ok2: (#struct){
+            k: (int){ 3 }
+          }
+        }
+      }
+      andOrEmbed: (_|_){
+        // [eval]
+        t1: (struct){
+          p1: (struct){
+            X: (#struct){
+            }
+            err1: (#struct){
+              j: (int){ 3 }
+            }
+            ok1: (#struct){
+              k: (int){ 3 }
+            }
+          }
+          p2: (struct){
+            X: (#struct){
+            }
+            err1: (#struct){
+              j: (int){ 3 }
+            }
+            ok1: (#struct){
+              k: (int){ 3 }
+            }
+          }
+        }
+        t2: (_|_){
+          // [eval]
+          X: (#struct){
+          }
+          err1: (#struct){
+            j: (int){ 3 }
+          }
+          ok1: (#struct){
+            k: (int){ 3 }
+          }
+          ok2: (_|_){
+            // [eval]
+            p: (_|_){
+              // [eval] patterns.shallow.andOrEmbed.t2.ok2.p: field not allowed:
+              //     ./embed.cue:31:15
+              //     ./embed.cue:30:6
+              //     ./embed.cue:132:4
+              //     ./embed.cue:141:8
+            }
+          }
+        }
+      }
+      indirect: (_|_){
+        // [eval]
+        a: (struct){
+        }
+        #a: (#struct){
+        }
+        p1: (struct){
+          X: (#struct){
+          }
+          err1: (struct){
+            j: (int){ 3 }
+          }
+          err2: (struct){
+            j: (int){ 3 }
+          }
+          ok: (struct){
+            k: (int){ 3 }
+          }
+        }
+        p2: (struct){
+          #a: (#struct){
+          }
+          X: (#struct){
+          }
+          err1: (struct){
+            j: (int){ 3 }
+          }
+          err2: (struct){
+            j: (int){ 3 }
+          }
+          ok: (struct){
+            k: (int){ 3 }
+          }
+        }
+        p3: (_|_){
+          // [eval]
+          X: (#struct){
+          }
+          err1: (_|_){
+            // [eval]
+            j: (_|_){
+              // [eval] patterns.shallow.indirect.p3.err1.j: field not allowed:
+              //     ./embed.cue:146:15
+              //     ./embed.cue:179:10
+            }
+          }
+          err2: (_|_){
+            // [eval]
+            j: (_|_){
+              // [eval] patterns.shallow.indirect.p3.err2.j: field not allowed:
+              //     ./embed.cue:146:15
+              //     ./embed.cue:182:10
+            }
+          }
+          ok: (#struct){
+            k: (int){ 3 }
+          }
+        }
+        p4: (_|_){
+          // [eval]
+          #a: (#struct){
+          }
+          X: (#struct){
+          }
+          err1: (_|_){
+            // [eval]
+            j: (_|_){
+              // [eval] patterns.shallow.indirect.p4.err1.j: field not allowed:
+              //     ./embed.cue:146:15
+              //     ./embed.cue:194:10
+            }
+          }
+          err2: (_|_){
+            // [eval]
+            j: (_|_){
+              // [eval] patterns.shallow.indirect.p4.err2.j: field not allowed:
+              //     ./embed.cue:146:15
+              //     ./embed.cue:197:10
+            }
+          }
+          ok: (#struct){
+            k: (int){ 3 }
+          }
+        }
+      }
+    }
+    nested: (_|_){
+      // [eval]
+      #a: (#struct){
+        x: (#struct){
+          y: (#struct){
+          }
+        }
+      }
+      #b: (#struct){
+        x: (#struct){
+          y: (#struct){
+          }
+        }
+      }
+      #c: (#struct){
+        x: (#struct){
+          y: (#struct){
+          }
+        }
+      }
+      #d: (#struct){
+        x: (#struct){
+          y: (#struct){
+          }
+        }
+      }
+      single: (struct){
+        X: ~(patterns.nested.#a)
+        err: (struct){
+          x: (struct){
+            y: (struct){
+              j: (int){ 3 }
+            }
+          }
+        }
+        ok: (struct){
+          x: (struct){
+            y: (struct){
+              k: (int){ 3 }
+            }
+          }
+        }
+      }
+      and: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval]
+          X: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          err: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                j: (_|_){
+                  // [eval] patterns.nested.and.p1.err.x.y.j: field not allowed:
+                  //     ./embed.cue:206:21
+                  //     ./embed.cue:224:14
+                }
+              }
+            }
+          }
+          ok: (#struct){
+            x: (#struct){
+              y: (#struct){
+                k: (int){ 3 }
+              }
+            }
+          }
+        }
+        p2: (_|_){
+          // [eval]
+          X: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          err: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                j: (_|_){
+                  // [eval] patterns.nested.and.p2.err.x.y.j: field not allowed:
+                  //     ./embed.cue:206:21
+                  //     ./embed.cue:207:12
+                  //     ./embed.cue:233:14
+                }
+              }
+            }
+          }
+          ok: (#struct){
+            x: (#struct){
+              y: (#struct){
+                k: (int){ 3 }
+              }
+            }
+          }
+        }
+      }
+      andEmbed: (_|_){
+        // [eval]
+        p1: (struct){
+          X: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          err: (#struct){
+            x: (#struct){
+              y: (#struct){
+                j: (int){ 3 }
+              }
+            }
+          }
+          ok: (#struct){
+            x: (#struct){
+              y: (#struct){
+                k: (int){ 3 }
+              }
+            }
+          }
+        }
+        p2: (_|_){
+          // [eval]
+          X: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          err: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                j: (_|_){
+                  // [eval] patterns.nested.andEmbed.p2.err.x.y.j: field not allowed:
+                  //     ./embed.cue:206:21
+                  //     ./embed.cue:207:12
+                  //     ./embed.cue:252:14
+                }
+              }
+            }
+          }
+          ok: (#struct){
+            x: (#struct){
+              y: (#struct){
+                k: (int){ 3 }
+              }
+            }
+          }
+        }
+      }
+      orEmbed: (struct){
+        p1: (struct){
+          X: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          ok1: (#struct){
+            x: (#struct){
+              y: (#struct){
+                j: (int){ 3 }
+              }
+            }
+          }
+          ok2: (#struct){
+            x: (#struct){
+              y: (#struct){
+                k: (int){ 3 }
+              }
+            }
+          }
+        }
+        p2: (struct){
+          X: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          ok1: (#struct){
+            x: (#struct){
+              y: (#struct){
+                j: (int){ 3 }
+              }
+            }
+          }
+          ok2: (#struct){
+            x: (#struct){
+              y: (#struct){
+                k: (int){ 3 }
+              }
+            }
+          }
+        }
+      }
+      andOrEmbed: (_|_){
+        // [eval]
+        t1: (struct){
+          p1: (struct){
+            X: (#struct){
+              x: (#struct){
+                y: (#struct){
+                }
+              }
+            }
+            err1: (#struct){
+              x: (#struct){
+                y: (#struct){
+                  j: (int){ 3 }
+                }
+              }
+            }
+            ok1: (#struct){
+              x: (#struct){
+                y: (#struct){
+                  k: (int){ 3 }
+                }
+              }
+            }
+          }
+          p2: (struct){
+            X: (#struct){
+              x: (#struct){
+                y: (#struct){
+                }
+              }
+            }
+            err1: (#struct){
+              x: (#struct){
+                y: (#struct){
+                  j: (int){ 3 }
+                }
+              }
+            }
+            ok1: (#struct){
+              x: (#struct){
+                y: (#struct){
+                  k: (int){ 3 }
+                }
+              }
+            }
+          }
+        }
+        t2: (_|_){
+          // [eval]
+          X: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          err1: (#struct){
+            x: (#struct){
+              y: (#struct){
+                j: (int){ 3 }
+              }
+            }
+          }
+          ok1: (#struct){
+            x: (#struct){
+              y: (#struct){
+                k: (int){ 3 }
+              }
+            }
+          }
+          ok2: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                p: (_|_){
+                  // [eval] patterns.nested.andOrEmbed.t2.ok2.x.y.p: field not allowed:
+                  //     ./embed.cue:207:21
+                  //     ./embed.cue:206:12
+                  //     ./embed.cue:317:14
+                }
+              }
+            }
+          }
+        }
+      }
+      indirect: (_|_){
+        // [eval]
+        a: (struct){
+          x: (struct){
+            y: (struct){
+            }
+          }
+        }
+        #a: (#struct){
+          x: (#struct){
+            y: (#struct){
+            }
+          }
+        }
+        p1: (struct){
+          X: ~(patterns.nested.indirect.#a)
+          err1: (struct){
+            x: (struct){
+              y: (struct){
+                j: (int){ 3 }
+              }
+            }
+          }
+          err2: (struct){
+            x: (struct){
+              y: (struct){
+                j: (int){ 3 }
+              }
+            }
+          }
+          ok: (struct){
+            x: (struct){
+              y: (struct){
+                k: (int){ 3 }
+              }
+            }
+          }
+        }
+        p2: (struct){
+          #a: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          X: ~(patterns.nested.indirect.p2.#a)
+          err1: (struct){
+            x: (struct){
+              y: (struct){
+                j: (int){ 3 }
+              }
+            }
+          }
+          err2: (struct){
+            x: (struct){
+              y: (struct){
+                j: (int){ 3 }
+              }
+            }
+          }
+          ok: (struct){
+            x: (struct){
+              y: (struct){
+                k: (int){ 3 }
+              }
+            }
+          }
+        }
+        p3: (_|_){
+          // [eval]
+          X: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          err1: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                j: (_|_){
+                  // [eval] patterns.nested.indirect.p3.err1.x.y.j: field not allowed:
+                  //     ./embed.cue:322:21
+                  //     ./embed.cue:355:16
+                }
+              }
+            }
+          }
+          err2: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                j: (_|_){
+                  // [eval] patterns.nested.indirect.p3.err2.x.y.j: field not allowed:
+                  //     ./embed.cue:322:21
+                  //     ./embed.cue:358:16
+                }
+              }
+            }
+          }
+          ok: (#struct){
+            x: (#struct){
+              y: (#struct){
+                k: (int){ 3 }
+              }
+            }
+          }
+        }
+        p4: (_|_){
+          // [eval]
+          #a: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          X: (#struct){
+            x: (#struct){
+              y: (#struct){
+              }
+            }
+          }
+          err1: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                j: (_|_){
+                  // [eval] patterns.nested.indirect.p4.err1.x.y.j: field not allowed:
+                  //     ./embed.cue:322:21
+                  //     ./embed.cue:370:16
+                }
+              }
+            }
+          }
+          err2: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                j: (_|_){
+                  // [eval] patterns.nested.indirect.p4.err2.x.y.j: field not allowed:
+                  //     ./embed.cue:322:21
+                  //     ./embed.cue:373:16
+                }
+              }
+            }
+          }
+          ok: (#struct){
+            x: (#struct){
+              y: (#struct){
+                k: (int){ 3 }
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -1170,6 +3801,248 @@ Result:
       }
     }
   }
+  mixInDef: (struct){
+    refInside: (struct){
+      #x: (#struct){
+        b: (#struct){
+          c: (#struct){
+            d: (#struct){
+            }
+            e: (#struct){
+              f: (#struct){
+              }
+            }
+          }
+        }
+      }
+      a: (#struct){
+        b: (#struct){
+          c: (#struct){
+            d: (#struct){
+            }
+            e: (#struct){
+              f: (#struct){
+              }
+            }
+          }
+        }
+      }
+    }
+    refEdge: (struct){
+      #x: (#struct){
+        c: (#struct){
+          d: (#struct){
+          }
+          e: (#struct){
+            f: (#struct){
+            }
+          }
+        }
+      }
+      a: (#struct){
+        c: (#struct){
+          d: (#struct){
+          }
+          e: (#struct){
+            f: (#struct){
+            }
+          }
+        }
+      }
+    }
+    refOutside: (struct){
+      #x: (#struct){
+        c: (#struct){
+          d: (#struct){
+          }
+          e: (#struct){
+            f: (#struct){
+            }
+          }
+        }
+      }
+      a: (#struct){
+        c: (#struct){
+          d: (#struct){
+          }
+          e: (#struct){
+            f: (#struct){
+            }
+          }
+        }
+      }
+    }
+  }
+  issue3601: (_|_){
+    // [eval]
+    original: (_|_){
+      // [eval]
+      out: (_|_){
+        // [eval]
+        foo: (_|_){
+          // [eval]
+          final: (_|_){
+            // [eval]
+            version: (_|_){
+              // [eval] issue3601.original.out.foo.final.version: field not allowed:
+              //     ./reroot.cue:184:11
+              //     ./reroot.cue:185:11
+            }
+          }
+        }
+      }
+      #Transform: (#struct){
+        output: (#struct){
+          foo: (#struct){
+            final: (#struct){
+              version: (string){ "v1" }
+            }
+          }
+        }
+      }
+      #Patch: (#struct){
+        target: (#struct){
+        }
+        output: (#struct){
+          foo: (#struct){
+            final: (#struct){
+              version: (string){ "v1" }
+            }
+          }
+        }
+      }
+    }
+    originalNoShare: (_|_){
+      // [eval]
+      out: (_|_){
+        // [eval]
+        foo: (_|_){
+          // [eval]
+          final: (_|_){
+            // [eval]
+            version: (_|_){
+              // [eval] issue3601.originalNoShare.out.foo.final.version: field not allowed:
+              //     ./reroot.cue:198:11
+              //     ./reroot.cue:199:11
+            }
+          }
+        }
+      }
+      #Transform: (#struct){
+        output: (#struct){
+          foo: (#struct){
+            final: (#struct){
+              version: (string){ "v1" }
+            }
+          }
+        }
+      }
+      #Patch: (#struct){
+        target: (#struct){
+        }
+        output: (#struct){
+          foo: (#struct){
+            final: (#struct){
+              version: (string){ "v1" }
+            }
+          }
+        }
+      }
+    }
+    reduced: (_|_){
+      // [eval]
+      #X: (#struct){
+        a: (#struct){
+          b: (#struct){
+            c: (string){ "v1" }
+          }
+        }
+        empty: (#struct){
+        }
+      }
+      original: (_|_){
+        // [eval]
+        Y: (#struct){
+          b: (#struct){
+            c: (string){ "v1" }
+          }
+        }
+        out: (_|_){
+          // [eval]
+          b: (_|_){
+            // [eval]
+            c: (_|_){
+              // [eval] issue3601.reduced.original.out.b.c: field not allowed:
+              //     ./reroot.cue:206:9
+              //     ./reroot.cue:205:9
+            }
+          }
+        }
+      }
+      moreInlining: (_|_){
+        // [eval]
+        out: (_|_){
+          // [eval]
+          b: (_|_){
+            // [eval]
+            c: (_|_){
+              // [eval] issue3601.reduced.moreInlining.out.b.c: field not allowed:
+              //     ./reroot.cue:206:9
+              //     ./reroot.cue:205:9
+            }
+          }
+        }
+      }
+      noInline: (struct){
+        Y: (#struct){
+          a: (#struct){
+            b: (#struct){
+              c: (string){ "v1" }
+            }
+          }
+          empty: (#struct){
+          }
+        }
+        Z: (#struct){
+          a: (#struct){
+            b: (#struct){
+              c: (string){ "v1" }
+            }
+          }
+          empty: (#struct){
+          }
+        }
+        out: (struct){
+          b: (struct){
+            c: (string){ "v1" }
+          }
+        }
+      }
+      moreNesting: (struct){
+        #X: (#struct){
+          a: (#struct){
+            b: (#struct){
+              c: (#struct){
+                d: (string){ "v1" }
+              }
+            }
+          }
+          empty: (#struct){
+          }
+        }
+        Y: (#struct){
+          c: (#struct){
+            d: (string){ "v1" }
+          }
+        }
+        Z: (#struct){
+          c: (#struct){
+            d: (string){ "v1" }
+          }
+        }
+      }
+    }
+  }
   issue3332: (struct){
     #def: (#struct){
       field: (list){ list.MinItems(1) }
@@ -1185,18 +4058,14 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,66 +1,28 @@
+@@ -1,310 +1,95 @@
  Errors:
-+nested.err1.x.b.f: field not allowed:
-+    ./reroot.cue:114:6
-+nested.err2.x.b.g: field not allowed:
-+    ./reroot.cue:137:8
- a.q.e: field not allowed:
+-a.q.e: field not allowed:
 -    ./in.cue:1:5
 -    ./in.cue:6:5
-     ./in.cue:7:3
+-    ./in.cue:7:3
 -    ./in.cue:11:4
-     ./in.cue:15:3
+-    ./in.cue:15:3
 -indirect.closed.err1.Y.a.e: field not allowed:
 -    ./reroot.cue:73:7
 -    ./reroot.cue:74:7
@@ -1205,35 +4074,30 @@ diff old new
 -    ./reroot.cue:79:7
 -    ./reroot.cue:80:7
 -    ./reroot.cue:82:7
- issue852.a.Foo: field not allowed:
+-issue852.a.Foo: field not allowed:
 -    ./in.cue:22:6
 -    ./in.cue:26:5
-+    ./in.cue:23:16
-     ./in.cue:28:5
- nested.err1.x.#V.c.d: field not allowed:
+-    ./in.cue:28:5
+-nested.err1.x.#V.c.d: field not allowed:
 -    ./reroot.cue:112:5
 -    ./reroot.cue:114:6
 -    ./reroot.cue:117:7
 -    ./reroot.cue:118:5
 -    ./reroot.cue:122:8
 -    ./reroot.cue:123:6
-+    ./reroot.cue:122:8
-+    ./reroot.cue:118:5
- nested.err1.x.#V.c.f: field not allowed:
+-nested.err1.x.#V.c.f: field not allowed:
 -    ./reroot.cue:112:5
 -    ./reroot.cue:114:6
 -    ./reroot.cue:117:7
 -    ./reroot.cue:117:11
 -    ./reroot.cue:122:8
 -    ./reroot.cue:123:6
--nested.err1.x.b.f: field not allowed:
+ nested.err1.x.b.f: field not allowed:
 -    ./reroot.cue:112:5
 -    ./reroot.cue:114:6
 -    ./reroot.cue:122:8
 -    ./reroot.cue:123:6
-+    ./reroot.cue:122:8
-+    ./reroot.cue:114:6
- nested.err1.x.b.g: field not allowed:
+-nested.err1.x.b.g: field not allowed:
 -    ./reroot.cue:112:5
 -    ./reroot.cue:114:6
 -    ./reroot.cue:122:8
@@ -1254,10 +4118,307 @@ diff old new
 -    ./reroot.cue:117:11
 -    ./reroot.cue:122:8
 -    ./reroot.cue:123:6
--nested.err2.x.b.g: field not allowed:
++    ./reroot.cue:114:6
+ nested.err2.x.b.g: field not allowed:
 -    ./reroot.cue:128:6
 -    ./reroot.cue:136:5
--    ./reroot.cue:137:8
+     ./reroot.cue:137:8
++patterns.shallow.and.p1.err.j: field not allowed:
++    ./embed.cue:30:15
++    ./embed.cue:48:8
++patterns.shallow.and.p2.err.j: field not allowed:
++    ./embed.cue:30:15
++    ./embed.cue:31:6
++    ./embed.cue:57:8
++patterns.shallow.andEmbed.p2.err.j: field not allowed:
++    ./embed.cue:30:15
++    ./embed.cue:31:6
++    ./embed.cue:76:8
++patterns.shallow.andOrEmbed.t2.ok2.p: field not allowed:
++    ./embed.cue:31:15
++    ./embed.cue:30:6
++    ./embed.cue:132:4
++    ./embed.cue:141:8
++patterns.shallow.indirect.p3.err1.j: field not allowed:
++    ./embed.cue:146:15
++    ./embed.cue:179:10
++patterns.shallow.indirect.p3.err2.j: field not allowed:
++    ./embed.cue:146:15
++    ./embed.cue:182:10
++patterns.shallow.indirect.p4.err1.j: field not allowed:
++    ./embed.cue:146:15
++    ./embed.cue:194:10
++patterns.shallow.indirect.p4.err2.j: field not allowed:
++    ./embed.cue:146:15
++    ./embed.cue:197:10
+ patterns.nested.and.p1.err.x.y.j: field not allowed:
+-    ./embed.cue:206:12
+-    ./embed.cue:207:12
+-    ./embed.cue:221:6
+-    ./embed.cue:221:11
+-    ./embed.cue:223:8
++    ./embed.cue:206:21
+     ./embed.cue:224:14
+ patterns.nested.and.p2.err.x.y.j: field not allowed:
+-    ./embed.cue:206:12
+-    ./embed.cue:207:12
+-    ./embed.cue:231:6
+-    ./embed.cue:231:11
+-    ./embed.cue:232:8
++    ./embed.cue:206:21
++    ./embed.cue:207:12
+     ./embed.cue:233:14
+-patterns.nested.andEmbed.p1.err.x.y.j: field not allowed:
+-    ./embed.cue:206:12
+-    ./embed.cue:207:12
+-    ./embed.cue:240:8
+-    ./embed.cue:240:13
+-    ./embed.cue:242:8
+-    ./embed.cue:243:14
+ patterns.nested.andEmbed.p2.err.x.y.j: field not allowed:
+-    ./embed.cue:206:12
+-    ./embed.cue:207:12
+-    ./embed.cue:250:8
+-    ./embed.cue:250:13
+-    ./embed.cue:251:8
++    ./embed.cue:206:21
++    ./embed.cue:207:12
+     ./embed.cue:252:14
+-patterns.nested.andOrEmbed.t1.p1.err1.x.y.j: field not allowed:
+-    ./embed.cue:206:12
+-    ./embed.cue:207:12
+-    ./embed.cue:208:12
+-    ./embed.cue:209:12
+-    ./embed.cue:280:4
+-    ./embed.cue:280:9
+-    ./embed.cue:281:4
+-    ./embed.cue:281:9
+-    ./embed.cue:283:9
+-    ./embed.cue:284:15
+-patterns.nested.andOrEmbed.t1.p2.err1.x.y.j: field not allowed:
+-    ./embed.cue:206:12
+-    ./embed.cue:207:12
+-    ./embed.cue:208:12
+-    ./embed.cue:209:12
+-    ./embed.cue:293:4
+-    ./embed.cue:293:9
+-    ./embed.cue:294:4
+-    ./embed.cue:294:9
+-    ./embed.cue:296:9
+-    ./embed.cue:297:15
+-patterns.nested.andOrEmbed.t2.err1.x.y.j: field not allowed:
+-    ./embed.cue:206:12
+-    ./embed.cue:207:12
+-    ./embed.cue:208:12
+-    ./embed.cue:209:12
+-    ./embed.cue:306:4
+-    ./embed.cue:306:9
+-    ./embed.cue:307:4
+-    ./embed.cue:307:9
+-    ./embed.cue:310:9
+-    ./embed.cue:311:15
+ patterns.nested.andOrEmbed.t2.ok2.x.y.p: field not allowed:
+-    ./embed.cue:206:12
+-    ./embed.cue:207:12
+-    ./embed.cue:208:12
+-    ./embed.cue:209:12
+-    ./embed.cue:306:4
+-    ./embed.cue:306:9
+-    ./embed.cue:307:4
+-    ./embed.cue:307:9
+-    ./embed.cue:316:8
++    ./embed.cue:207:21
++    ./embed.cue:206:12
+     ./embed.cue:317:14
+-patterns.nested.indirect.p1.err1.x.y.j: field not allowed:
+-    ./embed.cue:322:12
+-    ./embed.cue:323:7
+-    ./embed.cue:326:7
+-    ./embed.cue:327:10
+-    ./embed.cue:328:16
+-patterns.nested.indirect.p1.err2.x.y.j: field not allowed:
+-    ./embed.cue:322:12
+-    ./embed.cue:323:7
+-    ./embed.cue:326:7
+-    ./embed.cue:330:10
+-    ./embed.cue:331:16
+-patterns.nested.indirect.p2.err1.x.y.j: field not allowed:
+-    ./embed.cue:322:12
+-    ./embed.cue:338:8
+-    ./embed.cue:339:7
+-    ./embed.cue:341:10
+-    ./embed.cue:342:16
+-patterns.nested.indirect.p2.err2.x.y.j: field not allowed:
+-    ./embed.cue:322:12
+-    ./embed.cue:338:8
+-    ./embed.cue:339:7
+-    ./embed.cue:344:10
+-    ./embed.cue:345:16
+ patterns.nested.indirect.p3.err1.x.y.j: field not allowed:
+-    ./embed.cue:322:12
+-    ./embed.cue:323:7
+-    ./embed.cue:352:7
+-    ./embed.cue:354:10
++    ./embed.cue:322:21
+     ./embed.cue:355:16
+ patterns.nested.indirect.p3.err2.x.y.j: field not allowed:
+-    ./embed.cue:322:12
+-    ./embed.cue:323:7
+-    ./embed.cue:352:7
+-    ./embed.cue:357:10
++    ./embed.cue:322:21
+     ./embed.cue:358:16
+ patterns.nested.indirect.p4.err1.x.y.j: field not allowed:
+-    ./embed.cue:322:12
+-    ./embed.cue:365:8
+-    ./embed.cue:366:7
+-    ./embed.cue:369:10
++    ./embed.cue:322:21
+     ./embed.cue:370:16
+ patterns.nested.indirect.p4.err2.x.y.j: field not allowed:
+-    ./embed.cue:322:12
+-    ./embed.cue:365:8
+-    ./embed.cue:366:7
+-    ./embed.cue:372:10
++    ./embed.cue:322:21
+     ./embed.cue:373:16
+-patterns.nested.single.err.x.y.j: field not allowed:
+-    ./embed.cue:206:12
+-    ./embed.cue:212:6
+-    ./embed.cue:213:8
+-    ./embed.cue:214:14
+-patterns.shallow.and.p1.err.j: field not allowed:
+-    ./embed.cue:30:6
+-    ./embed.cue:31:6
+-    ./embed.cue:45:6
+-    ./embed.cue:45:11
+-    ./embed.cue:47:8
+-    ./embed.cue:48:8
+-patterns.shallow.and.p2.err.j: field not allowed:
+-    ./embed.cue:30:6
+-    ./embed.cue:31:6
+-    ./embed.cue:55:6
+-    ./embed.cue:55:11
+-    ./embed.cue:56:8
+-    ./embed.cue:57:8
+-patterns.shallow.andEmbed.p1.err.j: field not allowed:
+-    ./embed.cue:30:6
+-    ./embed.cue:31:6
+-    ./embed.cue:64:6
+-    ./embed.cue:64:8
+-    ./embed.cue:64:13
+-    ./embed.cue:66:8
+-    ./embed.cue:67:8
+-patterns.shallow.andEmbed.p2.err.j: field not allowed:
+-    ./embed.cue:30:6
+-    ./embed.cue:31:6
+-    ./embed.cue:74:6
+-    ./embed.cue:74:8
+-    ./embed.cue:74:13
+-    ./embed.cue:75:8
+-    ./embed.cue:76:8
+-patterns.shallow.andOrEmbed.t1.p1.err1.j: field not allowed:
+-    ./embed.cue:30:6
+-    ./embed.cue:31:6
+-    ./embed.cue:32:6
+-    ./embed.cue:33:6
+-    ./embed.cue:103:6
+-    ./embed.cue:104:4
+-    ./embed.cue:104:9
+-    ./embed.cue:105:4
+-    ./embed.cue:105:9
+-    ./embed.cue:107:9
+-    ./embed.cue:108:9
+-patterns.shallow.andOrEmbed.t1.p2.err1.j: field not allowed:
+-    ./embed.cue:30:6
+-    ./embed.cue:31:6
+-    ./embed.cue:32:6
+-    ./embed.cue:33:6
+-    ./embed.cue:116:6
+-    ./embed.cue:117:4
+-    ./embed.cue:117:9
+-    ./embed.cue:118:4
+-    ./embed.cue:118:9
+-    ./embed.cue:120:9
+-    ./embed.cue:121:9
+-patterns.shallow.andOrEmbed.t2.err1.j: field not allowed:
+-    ./embed.cue:30:6
+-    ./embed.cue:31:6
+-    ./embed.cue:32:6
+-    ./embed.cue:33:6
+-    ./embed.cue:129:6
+-    ./embed.cue:130:4
+-    ./embed.cue:130:9
+-    ./embed.cue:131:4
+-    ./embed.cue:131:9
+-    ./embed.cue:134:9
+-    ./embed.cue:135:9
+-patterns.shallow.indirect.p1.err1.j: field not allowed:
+-    ./embed.cue:146:6
+-    ./embed.cue:147:7
+-    ./embed.cue:150:7
+-    ./embed.cue:151:10
+-    ./embed.cue:152:10
+-patterns.shallow.indirect.p1.err2.j: field not allowed:
+-    ./embed.cue:146:6
+-    ./embed.cue:147:7
+-    ./embed.cue:150:7
+-    ./embed.cue:154:10
+-    ./embed.cue:155:10
+-patterns.shallow.indirect.p2.err1.j: field not allowed:
+-    ./embed.cue:146:6
+-    ./embed.cue:162:8
+-    ./embed.cue:163:7
+-    ./embed.cue:165:10
+-    ./embed.cue:166:10
+-patterns.shallow.indirect.p2.err2.j: field not allowed:
+-    ./embed.cue:146:6
+-    ./embed.cue:162:8
+-    ./embed.cue:163:7
+-    ./embed.cue:168:10
+-    ./embed.cue:169:10
+-patterns.shallow.indirect.p3.err1.j: field not allowed:
+-    ./embed.cue:146:6
+-    ./embed.cue:147:7
+-    ./embed.cue:176:7
+-    ./embed.cue:178:10
+-    ./embed.cue:179:10
+-patterns.shallow.indirect.p3.err2.j: field not allowed:
+-    ./embed.cue:146:6
+-    ./embed.cue:147:7
+-    ./embed.cue:176:7
+-    ./embed.cue:181:10
+-    ./embed.cue:182:10
+-patterns.shallow.indirect.p4.err1.j: field not allowed:
+-    ./embed.cue:146:6
+-    ./embed.cue:189:8
+-    ./embed.cue:190:7
+-    ./embed.cue:193:10
+-    ./embed.cue:194:10
+-patterns.shallow.indirect.p4.err2.j: field not allowed:
+-    ./embed.cue:146:6
+-    ./embed.cue:189:8
+-    ./embed.cue:190:7
+-    ./embed.cue:196:10
+-    ./embed.cue:197:10
+-patterns.shallow.single.err.j: field not allowed:
+-    ./embed.cue:30:6
+-    ./embed.cue:36:6
+-    ./embed.cue:37:8
+-    ./embed.cue:38:8
++a.q.e: field not allowed:
++    ./in.cue:7:3
++    ./in.cue:15:3
++issue852.a.Foo: field not allowed:
++    ./in.cue:23:16
++    ./in.cue:28:5
++nested.err1.x.#V.c.d: field not allowed:
++    ./reroot.cue:122:8
++    ./reroot.cue:118:5
++nested.err1.x.#V.c.f: field not allowed:
++    ./reroot.cue:122:8
++    ./reroot.cue:114:6
++nested.err1.x.b.g: field not allowed:
 +    ./reroot.cue:122:8
 +inline.err1.age1: field not allowed:
 +    ./reroot.cue:143:8
@@ -1265,10 +4426,22 @@ diff old new
 +inline.err2.age2: field not allowed:
 +    ./reroot.cue:147:8
 +    ./reroot.cue:149:3
++issue3601.original.out.foo.final.version: field not allowed:
++    ./reroot.cue:184:11
++    ./reroot.cue:185:11
++issue3601.originalNoShare.out.foo.final.version: field not allowed:
++    ./reroot.cue:198:11
++    ./reroot.cue:199:11
++issue3601.reduced.moreInlining.out.b.c: field not allowed:
++    ./reroot.cue:206:9
++    ./reroot.cue:205:9
++issue3601.reduced.original.out.b.c: field not allowed:
++    ./reroot.cue:206:9
++    ./reroot.cue:205:9
  
  Result:
  (_|_){
-@@ -76,13 +38,13 @@
+@@ -320,13 +105,13 @@
          }
        }
        #Extended: (#struct){
@@ -1289,7 +4462,7 @@ diff old new
        }
        broken: (#struct){
          name: (string){ "base" }
-@@ -94,13 +56,13 @@
+@@ -338,13 +123,13 @@
          }
        }
        works: (#struct){
@@ -1310,7 +4483,905 @@ diff old new
        }
      }
    }
-@@ -110,8 +72,8 @@
+@@ -360,21 +145,13 @@
+       }
+       #d: (#struct){
+       }
+-      single: (_|_){
+-        // [eval]
+-        X: (#struct){
+-        }
+-        err: (_|_){
+-          // [eval]
+-          j: (_|_){
+-            // [eval] patterns.shallow.single.err.j: field not allowed:
+-            //     ./embed.cue:30:6
+-            //     ./embed.cue:36:6
+-            //     ./embed.cue:37:8
+-            //     ./embed.cue:38:8
+-          }
+-        }
+-        ok: (#struct){
++      single: (struct){
++        X: (#struct){
++        }
++        err: (struct){
++          j: (int){ 3 }
++        }
++        ok: (struct){
+           k: (int){ 3 }
+         }
+       }
+@@ -388,11 +165,7 @@
+             // [eval]
+             j: (_|_){
+               // [eval] patterns.shallow.and.p1.err.j: field not allowed:
+-              //     ./embed.cue:30:6
+-              //     ./embed.cue:31:6
+-              //     ./embed.cue:45:6
+-              //     ./embed.cue:45:11
+-              //     ./embed.cue:47:8
++              //     ./embed.cue:30:15
+               //     ./embed.cue:48:8
+             }
+           }
+@@ -408,11 +181,8 @@
+             // [eval]
+             j: (_|_){
+               // [eval] patterns.shallow.and.p2.err.j: field not allowed:
+-              //     ./embed.cue:30:6
+-              //     ./embed.cue:31:6
+-              //     ./embed.cue:55:6
+-              //     ./embed.cue:55:11
+-              //     ./embed.cue:56:8
++              //     ./embed.cue:30:15
++              //     ./embed.cue:31:6
+               //     ./embed.cue:57:8
+             }
+           }
+@@ -423,22 +193,11 @@
+       }
+       andEmbed: (_|_){
+         // [eval]
+-        p1: (_|_){
+-          // [eval]
+-          X: (#struct){
+-          }
+-          err: (_|_){
+-            // [eval]
+-            j: (_|_){
+-              // [eval] patterns.shallow.andEmbed.p1.err.j: field not allowed:
+-              //     ./embed.cue:30:6
+-              //     ./embed.cue:31:6
+-              //     ./embed.cue:64:6
+-              //     ./embed.cue:64:8
+-              //     ./embed.cue:64:13
+-              //     ./embed.cue:66:8
+-              //     ./embed.cue:67:8
+-            }
++        p1: (struct){
++          X: (#struct){
++          }
++          err: (#struct){
++            j: (int){ 3 }
+           }
+           ok: (#struct){
+             k: (int){ 3 }
+@@ -452,12 +211,8 @@
+             // [eval]
+             j: (_|_){
+               // [eval] patterns.shallow.andEmbed.p2.err.j: field not allowed:
+-              //     ./embed.cue:30:6
+-              //     ./embed.cue:31:6
+-              //     ./embed.cue:74:6
+-              //     ./embed.cue:74:8
+-              //     ./embed.cue:74:13
+-              //     ./embed.cue:75:8
++              //     ./embed.cue:30:15
++              //     ./embed.cue:31:6
+               //     ./embed.cue:76:8
+             }
+           }
+@@ -490,153 +245,81 @@
+       }
+       andOrEmbed: (_|_){
+         // [eval]
+-        t1: (_|_){
+-          // [eval]
+-          p1: (_|_){
+-            // [eval]
+-            X: (#struct){
+-            }
+-            err1: (_|_){
+-              // [eval]
+-              j: (_|_){
+-                // [eval] patterns.shallow.andOrEmbed.t1.p1.err1.j: field not allowed:
+-                //     ./embed.cue:30:6
+-                //     ./embed.cue:31:6
+-                //     ./embed.cue:32:6
+-                //     ./embed.cue:33:6
+-                //     ./embed.cue:103:6
+-                //     ./embed.cue:104:4
+-                //     ./embed.cue:104:9
+-                //     ./embed.cue:105:4
+-                //     ./embed.cue:105:9
+-                //     ./embed.cue:107:9
+-                //     ./embed.cue:108:9
+-              }
+-            }
+-            ok1: (#struct){
+-              k: (int){ 3 }
+-            }
+-          }
+-          p2: (_|_){
+-            // [eval]
+-            X: (#struct){
+-            }
+-            err1: (_|_){
+-              // [eval]
+-              j: (_|_){
+-                // [eval] patterns.shallow.andOrEmbed.t1.p2.err1.j: field not allowed:
+-                //     ./embed.cue:30:6
+-                //     ./embed.cue:31:6
+-                //     ./embed.cue:32:6
+-                //     ./embed.cue:33:6
+-                //     ./embed.cue:116:6
+-                //     ./embed.cue:117:4
+-                //     ./embed.cue:117:9
+-                //     ./embed.cue:118:4
+-                //     ./embed.cue:118:9
+-                //     ./embed.cue:120:9
+-                //     ./embed.cue:121:9
+-              }
+-            }
+-            ok1: (#struct){
+-              k: (int){ 3 }
+-            }
+-          }
+-        }
+-        t2: (_|_){
+-          // [eval]
+-          X: (#struct){
+-          }
+-          err1: (_|_){
+-            // [eval]
+-            j: (_|_){
+-              // [eval] patterns.shallow.andOrEmbed.t2.err1.j: field not allowed:
+-              //     ./embed.cue:30:6
+-              //     ./embed.cue:31:6
+-              //     ./embed.cue:32:6
+-              //     ./embed.cue:33:6
+-              //     ./embed.cue:129:6
+-              //     ./embed.cue:130:4
+-              //     ./embed.cue:130:9
+-              //     ./embed.cue:131:4
+-              //     ./embed.cue:131:9
+-              //     ./embed.cue:134:9
+-              //     ./embed.cue:135:9
+-            }
+-          }
+-          ok1: (#struct){
+-            k: (int){ 3 }
+-          }
+-          ok2: (#struct){
+-            p: (int){ 3 }
+-          }
+-        }
+-      }
+-      indirect: (_|_){
+-        // [eval]
+-        a: (struct){
+-        }
+-        #a: (#struct){
+-        }
+-        p1: (_|_){
+-          // [eval]
+-          X: (#struct){
+-          }
+-          err1: (_|_){
+-            // [eval]
+-            j: (_|_){
+-              // [eval] patterns.shallow.indirect.p1.err1.j: field not allowed:
+-              //     ./embed.cue:146:6
+-              //     ./embed.cue:147:7
+-              //     ./embed.cue:150:7
+-              //     ./embed.cue:151:10
+-              //     ./embed.cue:152:10
+-            }
+-          }
+-          err2: (_|_){
+-            // [eval]
+-            j: (_|_){
+-              // [eval] patterns.shallow.indirect.p1.err2.j: field not allowed:
+-              //     ./embed.cue:146:6
+-              //     ./embed.cue:147:7
+-              //     ./embed.cue:150:7
+-              //     ./embed.cue:154:10
+-              //     ./embed.cue:155:10
+-            }
+-          }
+-          ok: (#struct){
+-            k: (int){ 3 }
+-          }
+-        }
+-        p2: (_|_){
+-          // [eval]
+-          #a: (#struct){
+-          }
+-          X: (#struct){
+-          }
+-          err1: (_|_){
+-            // [eval]
+-            j: (_|_){
+-              // [eval] patterns.shallow.indirect.p2.err1.j: field not allowed:
+-              //     ./embed.cue:146:6
+-              //     ./embed.cue:162:8
+-              //     ./embed.cue:163:7
+-              //     ./embed.cue:165:10
+-              //     ./embed.cue:166:10
+-            }
+-          }
+-          err2: (_|_){
+-            // [eval]
+-            j: (_|_){
+-              // [eval] patterns.shallow.indirect.p2.err2.j: field not allowed:
+-              //     ./embed.cue:146:6
+-              //     ./embed.cue:162:8
+-              //     ./embed.cue:163:7
+-              //     ./embed.cue:168:10
+-              //     ./embed.cue:169:10
+-            }
+-          }
+-          ok: (#struct){
++        t1: (struct){
++          p1: (struct){
++            X: (#struct){
++            }
++            err1: (#struct){
++              j: (int){ 3 }
++            }
++            ok1: (#struct){
++              k: (int){ 3 }
++            }
++          }
++          p2: (struct){
++            X: (#struct){
++            }
++            err1: (#struct){
++              j: (int){ 3 }
++            }
++            ok1: (#struct){
++              k: (int){ 3 }
++            }
++          }
++        }
++        t2: (_|_){
++          // [eval]
++          X: (#struct){
++          }
++          err1: (#struct){
++            j: (int){ 3 }
++          }
++          ok1: (#struct){
++            k: (int){ 3 }
++          }
++          ok2: (_|_){
++            // [eval]
++            p: (_|_){
++              // [eval] patterns.shallow.andOrEmbed.t2.ok2.p: field not allowed:
++              //     ./embed.cue:31:15
++              //     ./embed.cue:30:6
++              //     ./embed.cue:132:4
++              //     ./embed.cue:141:8
++            }
++          }
++        }
++      }
++      indirect: (_|_){
++        // [eval]
++        a: (struct){
++        }
++        #a: (#struct){
++        }
++        p1: (struct){
++          X: (#struct){
++          }
++          err1: (struct){
++            j: (int){ 3 }
++          }
++          err2: (struct){
++            j: (int){ 3 }
++          }
++          ok: (struct){
++            k: (int){ 3 }
++          }
++        }
++        p2: (struct){
++          #a: (#struct){
++          }
++          X: (#struct){
++          }
++          err1: (struct){
++            j: (int){ 3 }
++          }
++          err2: (struct){
++            j: (int){ 3 }
++          }
++          ok: (struct){
+             k: (int){ 3 }
+           }
+         }
+@@ -648,10 +331,7 @@
+             // [eval]
+             j: (_|_){
+               // [eval] patterns.shallow.indirect.p3.err1.j: field not allowed:
+-              //     ./embed.cue:146:6
+-              //     ./embed.cue:147:7
+-              //     ./embed.cue:176:7
+-              //     ./embed.cue:178:10
++              //     ./embed.cue:146:15
+               //     ./embed.cue:179:10
+             }
+           }
+@@ -659,10 +339,7 @@
+             // [eval]
+             j: (_|_){
+               // [eval] patterns.shallow.indirect.p3.err2.j: field not allowed:
+-              //     ./embed.cue:146:6
+-              //     ./embed.cue:147:7
+-              //     ./embed.cue:176:7
+-              //     ./embed.cue:181:10
++              //     ./embed.cue:146:15
+               //     ./embed.cue:182:10
+             }
+           }
+@@ -680,10 +357,7 @@
+             // [eval]
+             j: (_|_){
+               // [eval] patterns.shallow.indirect.p4.err1.j: field not allowed:
+-              //     ./embed.cue:146:6
+-              //     ./embed.cue:189:8
+-              //     ./embed.cue:190:7
+-              //     ./embed.cue:193:10
++              //     ./embed.cue:146:15
+               //     ./embed.cue:194:10
+             }
+           }
+@@ -691,10 +365,7 @@
+             // [eval]
+             j: (_|_){
+               // [eval] patterns.shallow.indirect.p4.err2.j: field not allowed:
+-              //     ./embed.cue:146:6
+-              //     ./embed.cue:189:8
+-              //     ./embed.cue:190:7
+-              //     ./embed.cue:196:10
++              //     ./embed.cue:146:15
+               //     ./embed.cue:197:10
+             }
+           }
+@@ -730,33 +401,18 @@
+           }
+         }
+       }
+-      single: (_|_){
+-        // [eval]
+-        X: (#struct){
+-          x: (#struct){
+-            y: (#struct){
+-            }
+-          }
+-        }
+-        err: (_|_){
+-          // [eval]
+-          x: (_|_){
+-            // [eval]
+-            y: (_|_){
+-              // [eval]
+-              j: (_|_){
+-                // [eval] patterns.nested.single.err.x.y.j: field not allowed:
+-                //     ./embed.cue:206:12
+-                //     ./embed.cue:212:6
+-                //     ./embed.cue:213:8
+-                //     ./embed.cue:214:14
+-              }
+-            }
+-          }
+-        }
+-        ok: (#struct){
+-          x: (#struct){
+-            y: (#struct){
++      single: (struct){
++        X: ~(patterns.nested.#a)
++        err: (struct){
++          x: (struct){
++            y: (struct){
++              j: (int){ 3 }
++            }
++          }
++        }
++        ok: (struct){
++          x: (struct){
++            y: (struct){
+               k: (int){ 3 }
+             }
+           }
+@@ -780,11 +436,7 @@
+                 // [eval]
+                 j: (_|_){
+                   // [eval] patterns.nested.and.p1.err.x.y.j: field not allowed:
+-                  //     ./embed.cue:206:12
+-                  //     ./embed.cue:207:12
+-                  //     ./embed.cue:221:6
+-                  //     ./embed.cue:221:11
+-                  //     ./embed.cue:223:8
++                  //     ./embed.cue:206:21
+                   //     ./embed.cue:224:14
+                 }
+               }
+@@ -814,11 +466,8 @@
+                 // [eval]
+                 j: (_|_){
+                   // [eval] patterns.nested.and.p2.err.x.y.j: field not allowed:
+-                  //     ./embed.cue:206:12
+-                  //     ./embed.cue:207:12
+-                  //     ./embed.cue:231:6
+-                  //     ./embed.cue:231:11
+-                  //     ./embed.cue:232:8
++                  //     ./embed.cue:206:21
++                  //     ./embed.cue:207:12
+                   //     ./embed.cue:233:14
+                 }
+               }
+@@ -835,29 +484,17 @@
+       }
+       andEmbed: (_|_){
+         // [eval]
+-        p1: (_|_){
+-          // [eval]
+-          X: (#struct){
+-            x: (#struct){
+-              y: (#struct){
+-              }
+-            }
+-          }
+-          err: (_|_){
+-            // [eval]
+-            x: (_|_){
+-              // [eval]
+-              y: (_|_){
+-                // [eval]
+-                j: (_|_){
+-                  // [eval] patterns.nested.andEmbed.p1.err.x.y.j: field not allowed:
+-                  //     ./embed.cue:206:12
+-                  //     ./embed.cue:207:12
+-                  //     ./embed.cue:240:8
+-                  //     ./embed.cue:240:13
+-                  //     ./embed.cue:242:8
+-                  //     ./embed.cue:243:14
+-                }
++        p1: (struct){
++          X: (#struct){
++            x: (#struct){
++              y: (#struct){
++              }
++            }
++          }
++          err: (#struct){
++            x: (#struct){
++              y: (#struct){
++                j: (int){ 3 }
+               }
+             }
+           }
+@@ -885,11 +522,8 @@
+                 // [eval]
+                 j: (_|_){
+                   // [eval] patterns.nested.andEmbed.p2.err.x.y.j: field not allowed:
+-                  //     ./embed.cue:206:12
+-                  //     ./embed.cue:207:12
+-                  //     ./embed.cue:250:8
+-                  //     ./embed.cue:250:13
+-                  //     ./embed.cue:251:8
++                  //     ./embed.cue:206:21
++                  //     ./embed.cue:207:12
+                   //     ./embed.cue:252:14
+                 }
+               }
+@@ -952,112 +586,64 @@
+       }
+       andOrEmbed: (_|_){
+         // [eval]
+-        t1: (_|_){
+-          // [eval]
+-          p1: (_|_){
+-            // [eval]
+-            X: (#struct){
+-              x: (#struct){
+-                y: (#struct){
+-                }
+-              }
+-            }
+-            err1: (_|_){
+-              // [eval]
+-              x: (_|_){
+-                // [eval]
+-                y: (_|_){
+-                  // [eval]
+-                  j: (_|_){
+-                    // [eval] patterns.nested.andOrEmbed.t1.p1.err1.x.y.j: field not allowed:
+-                    //     ./embed.cue:206:12
+-                    //     ./embed.cue:207:12
+-                    //     ./embed.cue:208:12
+-                    //     ./embed.cue:209:12
+-                    //     ./embed.cue:280:4
+-                    //     ./embed.cue:280:9
+-                    //     ./embed.cue:281:4
+-                    //     ./embed.cue:281:9
+-                    //     ./embed.cue:283:9
+-                    //     ./embed.cue:284:15
+-                  }
+-                }
+-              }
+-            }
+-            ok1: (#struct){
+-              x: (#struct){
+-                y: (#struct){
+-                  k: (int){ 3 }
+-                }
+-              }
+-            }
+-          }
+-          p2: (_|_){
+-            // [eval]
+-            X: (#struct){
+-              x: (#struct){
+-                y: (#struct){
+-                }
+-              }
+-            }
+-            err1: (_|_){
+-              // [eval]
+-              x: (_|_){
+-                // [eval]
+-                y: (_|_){
+-                  // [eval]
+-                  j: (_|_){
+-                    // [eval] patterns.nested.andOrEmbed.t1.p2.err1.x.y.j: field not allowed:
+-                    //     ./embed.cue:206:12
+-                    //     ./embed.cue:207:12
+-                    //     ./embed.cue:208:12
+-                    //     ./embed.cue:209:12
+-                    //     ./embed.cue:293:4
+-                    //     ./embed.cue:293:9
+-                    //     ./embed.cue:294:4
+-                    //     ./embed.cue:294:9
+-                    //     ./embed.cue:296:9
+-                    //     ./embed.cue:297:15
+-                  }
+-                }
+-              }
+-            }
+-            ok1: (#struct){
+-              x: (#struct){
+-                y: (#struct){
+-                  k: (int){ 3 }
+-                }
+-              }
+-            }
+-          }
+-        }
+-        t2: (_|_){
+-          // [eval]
+-          X: (#struct){
+-            x: (#struct){
+-              y: (#struct){
+-              }
+-            }
+-          }
+-          err1: (_|_){
+-            // [eval]
+-            x: (_|_){
+-              // [eval]
+-              y: (_|_){
+-                // [eval]
+-                j: (_|_){
+-                  // [eval] patterns.nested.andOrEmbed.t2.err1.x.y.j: field not allowed:
+-                  //     ./embed.cue:206:12
+-                  //     ./embed.cue:207:12
+-                  //     ./embed.cue:208:12
+-                  //     ./embed.cue:209:12
+-                  //     ./embed.cue:306:4
+-                  //     ./embed.cue:306:9
+-                  //     ./embed.cue:307:4
+-                  //     ./embed.cue:307:9
+-                  //     ./embed.cue:310:9
+-                  //     ./embed.cue:311:15
+-                }
++        t1: (struct){
++          p1: (struct){
++            X: (#struct){
++              x: (#struct){
++                y: (#struct){
++                }
++              }
++            }
++            err1: (#struct){
++              x: (#struct){
++                y: (#struct){
++                  j: (int){ 3 }
++                }
++              }
++            }
++            ok1: (#struct){
++              x: (#struct){
++                y: (#struct){
++                  k: (int){ 3 }
++                }
++              }
++            }
++          }
++          p2: (struct){
++            X: (#struct){
++              x: (#struct){
++                y: (#struct){
++                }
++              }
++            }
++            err1: (#struct){
++              x: (#struct){
++                y: (#struct){
++                  j: (int){ 3 }
++                }
++              }
++            }
++            ok1: (#struct){
++              x: (#struct){
++                y: (#struct){
++                  k: (int){ 3 }
++                }
++              }
++            }
++          }
++        }
++        t2: (_|_){
++          // [eval]
++          X: (#struct){
++            x: (#struct){
++              y: (#struct){
++              }
++            }
++          }
++          err1: (#struct){
++            x: (#struct){
++              y: (#struct){
++                j: (int){ 3 }
+               }
+             }
+           }
+@@ -1076,15 +662,8 @@
+                 // [eval]
+                 p: (_|_){
+                   // [eval] patterns.nested.andOrEmbed.t2.ok2.x.y.p: field not allowed:
+-                  //     ./embed.cue:206:12
+-                  //     ./embed.cue:207:12
+-                  //     ./embed.cue:208:12
+-                  //     ./embed.cue:209:12
+-                  //     ./embed.cue:306:4
+-                  //     ./embed.cue:306:9
+-                  //     ./embed.cue:307:4
+-                  //     ./embed.cue:307:9
+-                  //     ./embed.cue:316:8
++                  //     ./embed.cue:207:21
++                  //     ./embed.cue:206:12
+                   //     ./embed.cue:317:14
+                 }
+               }
+@@ -1106,107 +685,55 @@
+             }
+           }
+         }
+-        p1: (_|_){
+-          // [eval]
+-          X: (#struct){
+-            x: (#struct){
+-              y: (#struct){
+-              }
+-            }
+-          }
+-          err1: (_|_){
+-            // [eval]
+-            x: (_|_){
+-              // [eval]
+-              y: (_|_){
+-                // [eval]
+-                j: (_|_){
+-                  // [eval] patterns.nested.indirect.p1.err1.x.y.j: field not allowed:
+-                  //     ./embed.cue:322:12
+-                  //     ./embed.cue:323:7
+-                  //     ./embed.cue:326:7
+-                  //     ./embed.cue:327:10
+-                  //     ./embed.cue:328:16
+-                }
+-              }
+-            }
+-          }
+-          err2: (_|_){
+-            // [eval]
+-            x: (_|_){
+-              // [eval]
+-              y: (_|_){
+-                // [eval]
+-                j: (_|_){
+-                  // [eval] patterns.nested.indirect.p1.err2.x.y.j: field not allowed:
+-                  //     ./embed.cue:322:12
+-                  //     ./embed.cue:323:7
+-                  //     ./embed.cue:326:7
+-                  //     ./embed.cue:330:10
+-                  //     ./embed.cue:331:16
+-                }
+-              }
+-            }
+-          }
+-          ok: (#struct){
+-            x: (#struct){
+-              y: (#struct){
+-                k: (int){ 3 }
+-              }
+-            }
+-          }
+-        }
+-        p2: (_|_){
+-          // [eval]
+-          #a: (#struct){
+-            x: (#struct){
+-              y: (#struct){
+-              }
+-            }
+-          }
+-          X: (#struct){
+-            x: (#struct){
+-              y: (#struct){
+-              }
+-            }
+-          }
+-          err1: (_|_){
+-            // [eval]
+-            x: (_|_){
+-              // [eval]
+-              y: (_|_){
+-                // [eval]
+-                j: (_|_){
+-                  // [eval] patterns.nested.indirect.p2.err1.x.y.j: field not allowed:
+-                  //     ./embed.cue:322:12
+-                  //     ./embed.cue:338:8
+-                  //     ./embed.cue:339:7
+-                  //     ./embed.cue:341:10
+-                  //     ./embed.cue:342:16
+-                }
+-              }
+-            }
+-          }
+-          err2: (_|_){
+-            // [eval]
+-            x: (_|_){
+-              // [eval]
+-              y: (_|_){
+-                // [eval]
+-                j: (_|_){
+-                  // [eval] patterns.nested.indirect.p2.err2.x.y.j: field not allowed:
+-                  //     ./embed.cue:322:12
+-                  //     ./embed.cue:338:8
+-                  //     ./embed.cue:339:7
+-                  //     ./embed.cue:344:10
+-                  //     ./embed.cue:345:16
+-                }
+-              }
+-            }
+-          }
+-          ok: (#struct){
+-            x: (#struct){
+-              y: (#struct){
++        p1: (struct){
++          X: ~(patterns.nested.indirect.#a)
++          err1: (struct){
++            x: (struct){
++              y: (struct){
++                j: (int){ 3 }
++              }
++            }
++          }
++          err2: (struct){
++            x: (struct){
++              y: (struct){
++                j: (int){ 3 }
++              }
++            }
++          }
++          ok: (struct){
++            x: (struct){
++              y: (struct){
++                k: (int){ 3 }
++              }
++            }
++          }
++        }
++        p2: (struct){
++          #a: (#struct){
++            x: (#struct){
++              y: (#struct){
++              }
++            }
++          }
++          X: ~(patterns.nested.indirect.p2.#a)
++          err1: (struct){
++            x: (struct){
++              y: (struct){
++                j: (int){ 3 }
++              }
++            }
++          }
++          err2: (struct){
++            x: (struct){
++              y: (struct){
++                j: (int){ 3 }
++              }
++            }
++          }
++          ok: (struct){
++            x: (struct){
++              y: (struct){
+                 k: (int){ 3 }
+               }
+             }
+@@ -1228,10 +755,7 @@
+                 // [eval]
+                 j: (_|_){
+                   // [eval] patterns.nested.indirect.p3.err1.x.y.j: field not allowed:
+-                  //     ./embed.cue:322:12
+-                  //     ./embed.cue:323:7
+-                  //     ./embed.cue:352:7
+-                  //     ./embed.cue:354:10
++                  //     ./embed.cue:322:21
+                   //     ./embed.cue:355:16
+                 }
+               }
+@@ -1245,10 +769,7 @@
+                 // [eval]
+                 j: (_|_){
+                   // [eval] patterns.nested.indirect.p3.err2.x.y.j: field not allowed:
+-                  //     ./embed.cue:322:12
+-                  //     ./embed.cue:323:7
+-                  //     ./embed.cue:352:7
+-                  //     ./embed.cue:357:10
++                  //     ./embed.cue:322:21
+                   //     ./embed.cue:358:16
+                 }
+               }
+@@ -1284,10 +805,7 @@
+                 // [eval]
+                 j: (_|_){
+                   // [eval] patterns.nested.indirect.p4.err1.x.y.j: field not allowed:
+-                  //     ./embed.cue:322:12
+-                  //     ./embed.cue:365:8
+-                  //     ./embed.cue:366:7
+-                  //     ./embed.cue:369:10
++                  //     ./embed.cue:322:21
+                   //     ./embed.cue:370:16
+                 }
+               }
+@@ -1301,10 +819,7 @@
+                 // [eval]
+                 j: (_|_){
+                   // [eval] patterns.nested.indirect.p4.err2.x.y.j: field not allowed:
+-                  //     ./embed.cue:322:12
+-                  //     ./embed.cue:365:8
+-                  //     ./embed.cue:366:7
+-                  //     ./embed.cue:372:10
++                  //     ./embed.cue:322:21
+                   //     ./embed.cue:373:16
+                 }
+               }
+@@ -1327,8 +842,8 @@
    #A: (#struct){
      b: (int){ int }
      q: (#struct){
@@ -1320,7 +5391,7 @@ diff old new
      }
    }
    a: (_|_){
-@@ -120,21 +82,17 @@
+@@ -1337,21 +852,17 @@
      q: (_|_){
        // [eval]
        c: (int){ 2 }
@@ -1344,7 +5415,7 @@ diff old new
      //     ./in.cue:28:5
      #A: (#struct){
      }
-@@ -142,8 +100,7 @@
+@@ -1359,8 +870,7 @@
        // [eval]
        Foo: (_|_){
          // [eval] issue852.a.Foo: field not allowed:
@@ -1354,7 +5425,7 @@ diff old new
          //     ./in.cue:28:5
        }
      }
-@@ -154,8 +111,8 @@
+@@ -1371,8 +881,8 @@
        foo: (int){ int }
      }
      d: (#struct){
@@ -1364,7 +5435,7 @@ diff old new
      }
    }
    issue3330: (struct){
-@@ -169,13 +126,7 @@
+@@ -1386,13 +896,7 @@
            }
          }
          out: (#list){
@@ -1379,7 +5450,7 @@ diff old new
          }
        }
      }
-@@ -204,18 +155,12 @@
+@@ -1421,18 +925,12 @@
            g: (#struct){
            }
          }
@@ -1404,7 +5475,7 @@ diff old new
            }
          }
        }
-@@ -231,13 +176,7 @@
+@@ -1448,13 +946,7 @@
              d: (int){ 1 }
            }
          }
@@ -1419,7 +5490,7 @@ diff old new
        }
      }
      variant1: (struct){
-@@ -250,32 +189,22 @@
+@@ -1467,32 +959,22 @@
            }
          }
          0: (#list){
@@ -1468,7 +5539,7 @@ diff old new
          }
          #x: (#struct){
            a: (#struct){
-@@ -287,29 +216,16 @@
+@@ -1504,29 +986,16 @@
              c: (int){ 2 }
            }
          }
@@ -1506,7 +5577,7 @@ diff old new
          X: (struct){
            a: (struct){
              e: (int){ 1 }
-@@ -317,24 +233,13 @@
+@@ -1534,24 +1003,13 @@
            b: (struct){
            }
          }
@@ -1538,7 +5609,7 @@ diff old new
            }
          }
          #X: (#struct){
-@@ -354,25 +259,11 @@
+@@ -1571,25 +1029,11 @@
            }
          }
        }
@@ -1569,7 +5640,7 @@ diff old new
          #A: (#struct){
            d: (#struct){
              e: (int){ int }
-@@ -397,69 +288,29 @@
+@@ -1614,69 +1058,29 @@
            // [eval]
            f: (_|_){
              // [eval] nested.err1.x.b.f: field not allowed:
@@ -1653,7 +5724,7 @@ diff old new
            }
          }
        }
-@@ -467,16 +318,11 @@
+@@ -1684,16 +1088,11 @@
          b: (#struct){
            f: (int){ 1 }
          }
@@ -1673,7 +5744,7 @@ diff old new
            }
          }
        }
-@@ -499,19 +345,18 @@
+@@ -1716,19 +1115,18 @@
            // [eval]
            g: (_|_){
              // [eval] nested.err2.x.b.g: field not allowed:
@@ -1700,7 +5771,7 @@ diff old new
      #x: (#struct){
        y: (#struct){
          z?: (#struct){
-@@ -519,13 +364,23 @@
+@@ -1736,13 +1134,23 @@
          }
        }
      }
@@ -1730,16 +5801,253 @@ diff old new
 +      }
      }
    }
-   issue3332: (struct){
+   mixInDef: (struct){
+@@ -1817,66 +1225,84 @@
+       }
+     }
+   }
+-  issue3601: (struct){
+-    original: (struct){
+-      out: (#struct){
+-        foo: (#struct){
+-          final: (#struct){
+-            version: (string){ "v1" }
+-          }
+-        }
+-      }
+-      #Transform: (#struct){
+-        output: (#struct){
+-          foo: (#struct){
+-            final: (#struct){
+-              version: (string){ "v1" }
+-            }
+-          }
+-        }
+-      }
+-      #Patch: (#struct){
+-        target: (#struct){
+-        }
+-        output: (#struct){
+-          foo: (#struct){
+-            final: (#struct){
+-              version: (string){ "v1" }
+-            }
+-          }
+-        }
+-      }
+-    }
+-    originalNoShare: (struct){
+-      out: (#struct){
+-        foo: (#struct){
+-          final: (#struct){
+-            version: (string){ "v1" }
+-          }
+-        }
+-      }
+-      #Transform: (#struct){
+-        output: (#struct){
+-          foo: (#struct){
+-            final: (#struct){
+-              version: (string){ "v1" }
+-            }
+-          }
+-        }
+-      }
+-      #Patch: (#struct){
+-        target: (#struct){
+-        }
+-        output: (#struct){
+-          foo: (#struct){
+-            final: (#struct){
+-              version: (string){ "v1" }
+-            }
+-          }
+-        }
+-      }
+-    }
+-    reduced: (struct){
++  issue3601: (_|_){
++    // [eval]
++    original: (_|_){
++      // [eval]
++      out: (_|_){
++        // [eval]
++        foo: (_|_){
++          // [eval]
++          final: (_|_){
++            // [eval]
++            version: (_|_){
++              // [eval] issue3601.original.out.foo.final.version: field not allowed:
++              //     ./reroot.cue:184:11
++              //     ./reroot.cue:185:11
++            }
++          }
++        }
++      }
++      #Transform: (#struct){
++        output: (#struct){
++          foo: (#struct){
++            final: (#struct){
++              version: (string){ "v1" }
++            }
++          }
++        }
++      }
++      #Patch: (#struct){
++        target: (#struct){
++        }
++        output: (#struct){
++          foo: (#struct){
++            final: (#struct){
++              version: (string){ "v1" }
++            }
++          }
++        }
++      }
++    }
++    originalNoShare: (_|_){
++      // [eval]
++      out: (_|_){
++        // [eval]
++        foo: (_|_){
++          // [eval]
++          final: (_|_){
++            // [eval]
++            version: (_|_){
++              // [eval] issue3601.originalNoShare.out.foo.final.version: field not allowed:
++              //     ./reroot.cue:198:11
++              //     ./reroot.cue:199:11
++            }
++          }
++        }
++      }
++      #Transform: (#struct){
++        output: (#struct){
++          foo: (#struct){
++            final: (#struct){
++              version: (string){ "v1" }
++            }
++          }
++        }
++      }
++      #Patch: (#struct){
++        target: (#struct){
++        }
++        output: (#struct){
++          foo: (#struct){
++            final: (#struct){
++              version: (string){ "v1" }
++            }
++          }
++        }
++      }
++    }
++    reduced: (_|_){
++      // [eval]
+       #X: (#struct){
+         a: (#struct){
+           b: (#struct){
+@@ -1886,22 +1312,36 @@
+         empty: (#struct){
+         }
+       }
+-      original: (struct){
+-        Y: (struct){
+-          b: (struct){
+-            c: (string){ "v1" }
+-          }
+-        }
+-        out: (struct){
+-          b: (struct){
+-            c: (string){ "v1" }
+-          }
+-        }
+-      }
+-      moreInlining: (struct){
+-        out: (struct){
+-          b: (struct){
+-            c: (string){ "v1" }
++      original: (_|_){
++        // [eval]
++        Y: (#struct){
++          b: (#struct){
++            c: (string){ "v1" }
++          }
++        }
++        out: (_|_){
++          // [eval]
++          b: (_|_){
++            // [eval]
++            c: (_|_){
++              // [eval] issue3601.reduced.original.out.b.c: field not allowed:
++              //     ./reroot.cue:206:9
++              //     ./reroot.cue:205:9
++            }
++          }
++        }
++      }
++      moreInlining: (_|_){
++        // [eval]
++        out: (_|_){
++          // [eval]
++          b: (_|_){
++            // [eval]
++            c: (_|_){
++              // [eval] issue3601.reduced.moreInlining.out.b.c: field not allowed:
++              //     ./reroot.cue:206:9
++              //     ./reroot.cue:205:9
++            }
+           }
+         }
+       }
+@@ -1942,13 +1382,13 @@
+           empty: (#struct){
+           }
+         }
+-        Y: (struct){
+-          c: (struct){
+-            d: (string){ "v1" }
+-          }
+-        }
+-        Z: (struct){
+-          c: (struct){
++        Y: (#struct){
++          c: (#struct){
++            d: (string){ "v1" }
++          }
++        }
++        Z: (#struct){
++          c: (#struct){
+             d: (string){ "v1" }
+           }
+         }
 -- diff/todo/p2 --
 Positions / reordering
-
-indirect.embed.b1.d: should be an error, but is not an error in either version.
+patterns.*.andOrEmbed.t2.ok2: erroneous in V2 as well.
+indirect.embed: fails for both versions.
 -- diff/todo/p1 --
-Should be an error, but are not:
+Should be an error, but are not or vice versa:
+  patterns.shallow.single.err
+  patterns.shallow.andEmbed.p1.err
+  patterns.shallow.andOrEmbed.t1.*.err1
+  patterns.shallow.andOrEmbed.t2.err1
+  patterns.shallow.indirect.p1.err*
+  patterns.shallow.indirect.p2.err*
+  patterns.nested.single.err
+  patterns.nested.andEmbed.p1.err
+  patterns.nested.andOrEmbed.t1.*.err1
+  patterns.nested.andOrEmbed.t2.err1
+  patterns.nested.indirect.p1.err*
+  patterns.nested.indirect.p2.err*
   indirect.closed.err1.Y.a.e
+  issue3601.original.out.foo.final.version
+  issue3601.originalNoShare.out.foo.final.version
+  issue3601.reduced.original.out.b.c
+  issue3601.reduced.moreInlining.out.b.c
 -- diff/explanation --
 inline.err*.age*: fields are now correctly not allowed.
+patterns.*.andOrEmbed.t2.ok2: erroneous in V2
+mixInDef: arguably should all be erroneous, but definitely refOutside.
 -- out/compile --
 --- embed.cue
 {
@@ -1768,6 +6076,640 @@ inline.err*.age*: fields are now correctly not allowed.
       works: {
         〈1;#Extended〉
         〈1;#Base〉
+      }
+    }
+  }
+  patterns: {
+    shallow: {
+      #a: {
+        [>="k"]: int
+      }
+      #b: {
+        [<="m"]: int
+      }
+      #c: {
+        [>="w"]: int
+      }
+      #d: {
+        [<="y"]: int
+      }
+      single: {
+        X: 〈1;#a〉
+        err: 〈0;X〉
+        err: {
+          j: 3
+        }
+        ok: 〈0;X〉
+        ok: {
+          k: 3
+        }
+      }
+      and: {
+        p1: {
+          X: (〈2;#a〉 & 〈2;#b〉)
+          err: 〈0;X〉
+          err: {
+            j: 3
+          }
+          ok: 〈0;X〉
+          ok: {
+            k: 3
+          }
+        }
+      }
+      and: {
+        p2: {
+          X: (〈2;#b〉 & 〈2;#a〉)
+          err: 〈0;X〉
+          err: {
+            j: 3
+          }
+          ok: 〈0;X〉
+          ok: {
+            k: 3
+          }
+        }
+      }
+      andEmbed: {
+        p1: {
+          X: {
+            (〈3;#a〉 & 〈3;#b〉)
+          }
+          err: 〈0;X〉
+          err: {
+            j: 3
+          }
+          ok: 〈0;X〉
+          ok: {
+            k: 3
+          }
+        }
+      }
+      andEmbed: {
+        p2: {
+          X: {
+            (〈3;#b〉 & 〈3;#a〉)
+          }
+          err: 〈0;X〉
+          err: {
+            j: 3
+          }
+          ok: 〈0;X〉
+          ok: {
+            k: 3
+          }
+        }
+      }
+      orEmbed: {
+        p1: {
+          X: {
+            〈3;#a〉
+            〈3;#b〉
+          }
+          ok1: 〈0;X〉
+          ok1: {
+            j: 3
+          }
+          ok2: 〈0;X〉
+          ok2: {
+            k: 3
+          }
+        }
+      }
+      orEmbed: {
+        p2: {
+          X: {
+            〈3;#b〉
+            〈3;#a〉
+          }
+          ok1: 〈0;X〉
+          ok1: {
+            j: 3
+          }
+          ok2: 〈0;X〉
+          ok2: {
+            k: 3
+          }
+        }
+      }
+      andOrEmbed: {
+        t1: {
+          p1: {
+            X: {
+              (〈4;#a〉 & 〈4;#b〉)
+              (〈4;#c〉 & 〈4;#d〉)
+            }
+            err1: 〈0;X〉
+            err1: {
+              j: 3
+            }
+            ok1: 〈0;X〉
+            ok1: {
+              k: 3
+            }
+          }
+        }
+      }
+      andOrEmbed: {
+        t1: {
+          p2: {
+            X: {
+              (〈4;#c〉 & 〈4;#d〉)
+              (〈4;#a〉 & 〈4;#b〉)
+            }
+            err1: 〈0;X〉
+            err1: {
+              j: 3
+            }
+            ok1: 〈0;X〉
+            ok1: {
+              k: 3
+            }
+          }
+        }
+      }
+      andOrEmbed: {
+        t2: {
+          X: {
+            (〈3;#a〉 & 〈3;#b〉)
+            (〈3;#c〉 & 〈3;#d〉)
+            ["p"]: int
+          }
+          err1: 〈0;X〉
+          err1: {
+            j: 3
+          }
+          ok1: 〈0;X〉
+          ok1: {
+            k: 3
+          }
+          ok2: 〈0;X〉
+          ok2: {
+            p: 3
+          }
+        }
+      }
+      indirect: {
+        a: {
+          [>="k"]: int
+        }
+        #a: 〈0;a〉
+        p1: {
+          X: 〈1;#a〉
+          err1: 〈0;X〉
+          err1: {
+            j: 3
+          }
+          err2: (〈0;X〉 & _|_(no sharing))
+          err2: {
+            j: 3
+          }
+          ok: 〈0;X〉
+          ok: {
+            k: 3
+          }
+        }
+        p2: {
+          #a: (〈1;a〉 & _|_(no sharing))
+          X: 〈0;#a〉
+          err1: 〈0;X〉
+          err1: {
+            j: 3
+          }
+          err2: (〈0;X〉 & _|_(no sharing))
+          err2: {
+            j: 3
+          }
+          ok: 〈0;X〉
+          ok: {
+            k: 3
+          }
+        }
+        p3: {
+          X: (〈1;#a〉 & _|_(no sharing))
+          err1: 〈0;X〉
+          err1: {
+            j: 3
+          }
+          err2: (〈0;X〉 & _|_(no sharing))
+          err2: {
+            j: 3
+          }
+          ok: 〈0;X〉
+          ok: {
+            k: 3
+          }
+        }
+        p4: {
+          #a: (〈1;a〉 & _|_(no sharing))
+          X: 〈0;#a〉
+          X: (〈0;#a〉 & _|_(no sharing))
+          err1: 〈0;X〉
+          err1: {
+            j: 3
+          }
+          err2: (〈0;X〉 & _|_(no sharing))
+          err2: {
+            j: 3
+          }
+          ok: 〈0;X〉
+          ok: {
+            k: 3
+          }
+        }
+      }
+    }
+  }
+  patterns: {
+    nested: {
+      #a: {
+        x: {
+          y: {
+            [>="k"]: int
+          }
+        }
+      }
+      #b: {
+        x: {
+          y: {
+            [<="m"]: int
+          }
+        }
+      }
+      #c: {
+        x: {
+          y: {
+            [>="w"]: int
+          }
+        }
+      }
+      #d: {
+        x: {
+          y: {
+            [<="y"]: int
+          }
+        }
+      }
+      single: {
+        X: 〈1;#a〉
+        err: 〈0;X〉
+        err: {
+          x: {
+            y: {
+              j: 3
+            }
+          }
+        }
+        ok: 〈0;X〉
+        ok: {
+          x: {
+            y: {
+              k: 3
+            }
+          }
+        }
+      }
+      and: {
+        p1: {
+          X: (〈2;#a〉 & 〈2;#b〉)
+          err: 〈0;X〉
+          err: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          ok: 〈0;X〉
+          ok: {
+            x: {
+              y: {
+                k: 3
+              }
+            }
+          }
+        }
+      }
+      and: {
+        p2: {
+          X: (〈2;#b〉 & 〈2;#a〉)
+          err: 〈0;X〉
+          err: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          ok: 〈0;X〉
+          ok: {
+            x: {
+              y: {
+                k: 3
+              }
+            }
+          }
+        }
+      }
+      andEmbed: {
+        p1: {
+          X: {
+            (〈3;#a〉 & 〈3;#b〉)
+          }
+          err: 〈0;X〉
+          err: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          ok: 〈0;X〉
+          ok: {
+            x: {
+              y: {
+                k: 3
+              }
+            }
+          }
+        }
+      }
+      andEmbed: {
+        p2: {
+          X: {
+            (〈3;#b〉 & 〈3;#a〉)
+          }
+          err: 〈0;X〉
+          err: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          ok: 〈0;X〉
+          ok: {
+            x: {
+              y: {
+                k: 3
+              }
+            }
+          }
+        }
+      }
+      orEmbed: {
+        p1: {
+          X: {
+            〈3;#a〉
+            〈3;#b〉
+          }
+          ok1: 〈0;X〉
+          ok1: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          ok2: 〈0;X〉
+          ok2: {
+            x: {
+              y: {
+                k: 3
+              }
+            }
+          }
+        }
+      }
+      orEmbed: {
+        p2: {
+          X: {
+            〈3;#b〉
+            〈3;#a〉
+          }
+          ok1: 〈0;X〉
+          ok1: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          ok2: 〈0;X〉
+          ok2: {
+            x: {
+              y: {
+                k: 3
+              }
+            }
+          }
+        }
+      }
+      andOrEmbed: {
+        t1: {
+          p1: {
+            X: {
+              (〈4;#a〉 & 〈4;#b〉)
+              (〈4;#c〉 & 〈4;#d〉)
+            }
+            err1: 〈0;X〉
+            err1: {
+              x: {
+                y: {
+                  j: 3
+                }
+              }
+            }
+            ok1: 〈0;X〉
+            ok1: {
+              x: {
+                y: {
+                  k: 3
+                }
+              }
+            }
+          }
+        }
+      }
+      andOrEmbed: {
+        t1: {
+          p2: {
+            X: {
+              (〈4;#c〉 & 〈4;#d〉)
+              (〈4;#a〉 & 〈4;#b〉)
+            }
+            err1: 〈0;X〉
+            err1: {
+              x: {
+                y: {
+                  j: 3
+                }
+              }
+            }
+            ok1: 〈0;X〉
+            ok1: {
+              x: {
+                y: {
+                  k: 3
+                }
+              }
+            }
+          }
+        }
+      }
+      andOrEmbed: {
+        t2: {
+          X: {
+            (〈3;#a〉 & 〈3;#b〉)
+            (〈3;#c〉 & 〈3;#d〉)
+            ["p"]: int
+          }
+          err1: 〈0;X〉
+          err1: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          ok1: 〈0;X〉
+          ok1: {
+            x: {
+              y: {
+                k: 3
+              }
+            }
+          }
+          ok2: 〈0;X〉
+          ok2: {
+            x: {
+              y: {
+                p: 3
+              }
+            }
+          }
+        }
+      }
+      indirect: {
+        a: {
+          x: {
+            y: {
+              [>="k"]: int
+            }
+          }
+        }
+        #a: 〈0;a〉
+        p1: {
+          X: 〈1;#a〉
+          err1: 〈0;X〉
+          err1: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          err2: (〈0;X〉 & _|_(no sharing))
+          err2: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          ok: 〈0;X〉
+          ok: {
+            x: {
+              y: {
+                k: 3
+              }
+            }
+          }
+        }
+        p2: {
+          #a: (〈1;a〉 & _|_(no sharing))
+          X: 〈0;#a〉
+          err1: 〈0;X〉
+          err1: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          err2: (〈0;X〉 & _|_(no sharing))
+          err2: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          ok: 〈0;X〉
+          ok: {
+            x: {
+              y: {
+                k: 3
+              }
+            }
+          }
+        }
+        p3: {
+          X: (〈1;#a〉 & _|_(no sharing))
+          err1: 〈0;X〉
+          err1: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          err2: (〈0;X〉 & _|_(no sharing))
+          err2: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          ok: 〈0;X〉
+          ok: {
+            x: {
+              y: {
+                k: 3
+              }
+            }
+          }
+        }
+        p4: {
+          #a: (〈1;a〉 & _|_(no sharing))
+          X: 〈0;#a〉
+          X: (〈0;#a〉 & _|_(no sharing))
+          err1: 〈0;X〉
+          err1: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          err2: (〈0;X〉 & _|_(no sharing))
+          err2: {
+            x: {
+              y: {
+                j: 3
+              }
+            }
+          }
+          ok: 〈0;X〉
+          ok: {
+            x: {
+              y: {
+                k: 3
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -2026,6 +6968,165 @@ inline.err*.age*: fields are now correctly not allowed.
       name: "a"
       age2: 5
     })
+  }
+  mixInDef: {
+    refInside: {
+      #x: {
+        b: {
+          c: {
+            d: {}
+            e: {
+              f: {}
+            }
+          }
+        }
+      }
+      a: 〈0;#x〉
+      a: {
+        b: {
+          c: {
+            d: {}
+          }
+        }
+      }
+      a: {
+        b: {
+          c: {
+            e: 〈1;c〉.d
+          }
+        }
+      }
+    }
+    refEdge: {
+      #x: {
+        c: {
+          d: {}
+          e: {
+            f: {}
+          }
+        }
+      }
+      a: 〈0;#x〉
+      a: {
+        c: {
+          d: {}
+        }
+      }
+      a: {
+        c: {
+          e: 〈1;c〉.d
+        }
+      }
+    }
+    refOutside: {
+      #x: {
+        c: {
+          d: {}
+          e: {
+            f: {}
+          }
+        }
+      }
+      a: 〈0;#x〉
+      a: {
+        c: {
+          d: {}
+        }
+      }
+      a: {
+        c: {
+          e: 〈2;a〉.c.d
+        }
+      }
+    }
+  }
+  issue3601: {
+    original: {
+      out: {
+        〈1;#Transform〉.output
+      }
+      #Transform: {
+        output: (〈1;#Patch〉 & {}).output
+      }
+      #Patch: {
+        target: {}
+        output: {
+          foo: {
+            final: 〈2;target〉
+            final: {
+              version: "v1"
+            }
+          }
+        }
+      }
+    }
+  }
+  issue3601: {
+    originalNoShare: {
+      out: {
+        〈1;#Transform〉.output
+      }
+      #Transform: {
+        output: (〈1;#Patch〉 & _|_(no sharing)).output
+      }
+      #Patch: {
+        target: {}
+        output: {
+          foo: {
+            final: 〈2;target〉
+            final: {
+              version: "v1"
+            }
+          }
+        }
+      }
+    }
+  }
+  issue3601: {
+    reduced: {
+      #X: {
+        a: {
+          b: {
+            c: "v1"
+          }
+        }
+        a: {
+          b: 〈1;empty〉
+        }
+        empty: {}
+      }
+      original: {
+        Y: (〈1;#X〉 & _|_(no sharing)).a
+        out: (〈0;Y〉 & _|_(no sharing))
+      }
+      moreInlining: {
+        out: ((〈1;#X〉 & {}).a & {})
+      }
+      noInline: {
+        Y: (〈1;#X〉 & _|_(no sharing))
+        Z: (〈0;Y〉 & _|_(no sharing))
+        out: (〈0;Z〉.a & _|_(no sharing))
+      }
+      moreNesting: {
+        #X: {
+          a: {
+            b: {
+              c: {
+                d: "v1"
+              }
+            }
+          }
+          a: {
+            b: {
+              c: 〈2;empty〉
+            }
+          }
+          empty: {}
+        }
+        Y: (〈0;#X〉.a & _|_(no sharing)).b
+        Z: (〈0;Y〉 & _|_(no sharing))
+      }
+    }
   }
 }
 --- validation.cue

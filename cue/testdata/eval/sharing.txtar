@@ -39,14 +39,14 @@ debug: {
 }
 -- out/eval/stats --
 Leaks:  2
-Freed:  40
-Reused: 33
+Freed:  46
+Reused: 39
 Allocs: 9
-Retain: 10
+Retain: 18
 
-Unifications: 42
-Conjuncts:    64
-Disjuncts:    48
+Unifications: 48
+Conjuncts:    74
+Disjuncts:    62
 -- out/evalalpha --
 (struct){
   issue3062: (struct){
@@ -118,51 +118,9 @@ Disjuncts:    48
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,4 @@
--Errors:
--no sharing
--
--Result:
--(_|_){
--  // [eval]
-+(struct){
-   issue3062: (struct){
-     ok1: (struct){
-       #S: (string){ "a" }
-@@ -19,12 +14,10 @@
-       A: (string){ "a" }
-     }
+@@ -31,9 +31,7 @@
    }
--  issue3601: (_|_){
--    // [eval]
--    ok1: (_|_){
--      // [eval]
--      Y: (_|_){
--        // [eval] no sharing
-+  issue3601: (struct){
-+    ok1: (struct){
-+      Y: (struct){
-+        b: (_){ _ }
-       }
-       X: (struct){
-         a: (struct){
-@@ -31,47 +24,37 @@
-           b: (_){ _ }
-         }
-       }
--      out: (_|_){
--        // [eval] no sharing
--      }
--    }
--  }
--  debug: (_|_){
--    // [eval]
-+      out: (struct){
-+        b: (_){ _ }
-+      }
-+    }
-+  }
-+  debug: (struct){
+   debug: (struct){
      sharingOn: (struct){
 -      a: (struct){
 -        c: (int){ 1 }
@@ -171,62 +129,8 @@ diff old new
        b: (struct){
          c: (int){ 1 }
        }
-     }
--    sharingOff: (_|_){
--      // [eval]
--      t1: (_|_){
--        // [eval]
--        a: (_|_){
--          // [eval] no sharing
--          c: (int){ 1 }
--        }
--        b: (struct){
--          c: (int){ 1 }
--        }
--      }
--      t2: (_|_){
--        // [eval]
--        a: (_|_){
--          // [eval] no sharing
--          c: (int){ 1 }
--        }
--        b: (struct){
--          c: (int){ 1 }
--        }
--      }
--      t3: (_|_){
--        // [eval]
--        a: (_|_){
--          // [eval] no sharing
-+    sharingOff: (struct){
-+      t1: (struct){
-+        a: (struct){
-+          c: (int){ 1 }
-+        }
-+        b: (struct){
-+          c: (int){ 1 }
-+        }
-+      }
-+      t2: (struct){
-+        a: (struct){
-+          c: (int){ 1 }
-+        }
-+        b: (struct){
-+          c: (int){ 1 }
-+        }
-+      }
-+      t3: (struct){
-+        a: (struct){
-           c: (int){ 1 }
-         }
-         b: (struct){
 -- out/eval --
-Errors:
-no sharing
-
-Result:
-(_|_){
-  // [eval]
+(struct){
   issue3062: (struct){
     ok1: (struct){
       #S: (string){ "a" }
@@ -242,25 +146,22 @@ Result:
       A: (string){ "a" }
     }
   }
-  issue3601: (_|_){
-    // [eval]
-    ok1: (_|_){
-      // [eval]
-      Y: (_|_){
-        // [eval] no sharing
+  issue3601: (struct){
+    ok1: (struct){
+      Y: (struct){
+        b: (_){ _ }
       }
       X: (struct){
         a: (struct){
           b: (_){ _ }
         }
       }
-      out: (_|_){
-        // [eval] no sharing
+      out: (struct){
+        b: (_){ _ }
       }
     }
   }
-  debug: (_|_){
-    // [eval]
+  debug: (struct){
     sharingOn: (struct){
       a: (struct){
         c: (int){ 1 }
@@ -269,32 +170,25 @@ Result:
         c: (int){ 1 }
       }
     }
-    sharingOff: (_|_){
-      // [eval]
-      t1: (_|_){
-        // [eval]
-        a: (_|_){
-          // [eval] no sharing
+    sharingOff: (struct){
+      t1: (struct){
+        a: (struct){
           c: (int){ 1 }
         }
         b: (struct){
           c: (int){ 1 }
         }
       }
-      t2: (_|_){
-        // [eval]
-        a: (_|_){
-          // [eval] no sharing
+      t2: (struct){
+        a: (struct){
           c: (int){ 1 }
         }
         b: (struct){
           c: (int){ 1 }
         }
       }
-      t3: (_|_){
-        // [eval]
-        a: (_|_){
-          // [eval] no sharing
+      t3: (struct){
+        a: (struct){
           c: (int){ 1 }
         }
         b: (struct){

@@ -386,6 +386,9 @@ func TestCloseContext(t *testing.T) {
 		patterns: `
 			>"b": {3}
 			<"h": {4}`,
+		// Allowed is defined here, because this embeds definitions with
+		// patterns.
+		allowed: `&(>"b", <"h")`,
 	}, {
 		name: "conjunctions in embedding 3",
 		run: func(x *adt.FieldTester) {

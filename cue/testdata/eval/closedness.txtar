@@ -2674,11 +2674,34 @@ patterns.shallow.andEmbed.p2.err.j: field not allowed:
 patterns.shallow.single.err.j: field not allowed:
     ./embed.cue:30:15
     ./embed.cue:38:8
+patterns.shallow.and.p1.err.j: field not allowed:
+    ./embed.cue:31:15
+    ./embed.cue:31:6
+    ./embed.cue:48:8
+patterns.shallow.andEmbed.p1.err.j: field not allowed:
+    ./embed.cue:31:15
+    ./embed.cue:31:6
+    ./embed.cue:67:8
+patterns.shallow.andOrEmbed.t1.p2.err1.j: field not allowed:
+    ./embed.cue:31:15
+    ./embed.cue:31:6
+    ./embed.cue:33:6
+    ./embed.cue:121:9
 patterns.shallow.andOrEmbed.t2.ok2.p: field not allowed:
     ./embed.cue:31:15
     ./embed.cue:30:6
     ./embed.cue:132:4
     ./embed.cue:141:8
+patterns.shallow.andOrEmbed.t1.p1.err1.j: field not allowed:
+    ./embed.cue:33:15
+    ./embed.cue:31:6
+    ./embed.cue:33:6
+    ./embed.cue:108:9
+patterns.shallow.andOrEmbed.t2.err1.j: field not allowed:
+    ./embed.cue:33:15
+    ./embed.cue:31:6
+    ./embed.cue:33:6
+    ./embed.cue:135:9
 patterns.shallow.indirect.p1.err1.j: field not allowed:
     ./embed.cue:146:15
     ./embed.cue:152:10
@@ -2714,9 +2737,33 @@ patterns.nested.andEmbed.p2.err.x.y.j: field not allowed:
 patterns.nested.single.err.x.y.j: field not allowed:
     ./embed.cue:206:21
     ./embed.cue:214:14
-patterns.nested.andOrEmbed.t2.ok2.x.y.p: field not allowed:
+patterns.nested.and.p1.err.x.y.j: field not allowed:
     ./embed.cue:207:21
+    ./embed.cue:207:12
+    ./embed.cue:224:14
+patterns.nested.andEmbed.p1.err.x.y.j: field not allowed:
+    ./embed.cue:207:21
+    ./embed.cue:207:12
+    ./embed.cue:243:14
+patterns.nested.andOrEmbed.t1.p2.err1.x.y.j: field not allowed:
+    ./embed.cue:207:21
+    ./embed.cue:207:12
+    ./embed.cue:209:12
+    ./embed.cue:297:15
+patterns.nested.andOrEmbed.t1.p1.err1.x.y.j: field not allowed:
+    ./embed.cue:209:21
+    ./embed.cue:207:12
+    ./embed.cue:209:12
+    ./embed.cue:284:15
+patterns.nested.andOrEmbed.t2.err1.x.y.j: field not allowed:
+    ./embed.cue:209:21
+    ./embed.cue:207:12
+    ./embed.cue:209:12
+    ./embed.cue:311:15
+patterns.nested.andOrEmbed.t2.ok2.x.y.p: field not allowed:
+    ./embed.cue:209:21
     ./embed.cue:206:12
+    ./embed.cue:209:12
     ./embed.cue:317:14
 patterns.nested.indirect.p1.err1.x.y.j: field not allowed:
     ./embed.cue:322:21
@@ -2838,11 +2885,18 @@ Result:
       }
       and: (_|_){
         // [eval]
-        p1: (struct){
+        p1: (_|_){
+          // [eval]
           X: (#struct){
           }
-          err: (#struct){
-            j: (int){ 3 }
+          err: (_|_){
+            // [eval]
+            j: (_|_){
+              // [eval] patterns.shallow.and.p1.err.j: field not allowed:
+              //     ./embed.cue:31:15
+              //     ./embed.cue:31:6
+              //     ./embed.cue:48:8
+            }
           }
           ok: (#struct){
             k: (int){ 3 }
@@ -2868,11 +2922,18 @@ Result:
       }
       andEmbed: (_|_){
         // [eval]
-        p1: (struct){
+        p1: (_|_){
+          // [eval]
           X: (#struct){
           }
-          err: (#struct){
-            j: (int){ 3 }
+          err: (_|_){
+            // [eval]
+            j: (_|_){
+              // [eval] patterns.shallow.andEmbed.p1.err.j: field not allowed:
+              //     ./embed.cue:31:15
+              //     ./embed.cue:31:6
+              //     ./embed.cue:67:8
+            }
           }
           ok: (#struct){
             k: (int){ 3 }
@@ -2920,22 +2981,39 @@ Result:
       }
       andOrEmbed: (_|_){
         // [eval]
-        t1: (struct){
-          p1: (struct){
+        t1: (_|_){
+          // [eval]
+          p1: (_|_){
+            // [eval]
             X: (#struct){
             }
-            err1: (#struct){
-              j: (int){ 3 }
+            err1: (_|_){
+              // [eval]
+              j: (_|_){
+                // [eval] patterns.shallow.andOrEmbed.t1.p1.err1.j: field not allowed:
+                //     ./embed.cue:33:15
+                //     ./embed.cue:31:6
+                //     ./embed.cue:33:6
+                //     ./embed.cue:108:9
+              }
             }
             ok1: (#struct){
               k: (int){ 3 }
             }
           }
-          p2: (struct){
+          p2: (_|_){
+            // [eval]
             X: (#struct){
             }
-            err1: (#struct){
-              j: (int){ 3 }
+            err1: (_|_){
+              // [eval]
+              j: (_|_){
+                // [eval] patterns.shallow.andOrEmbed.t1.p2.err1.j: field not allowed:
+                //     ./embed.cue:31:15
+                //     ./embed.cue:31:6
+                //     ./embed.cue:33:6
+                //     ./embed.cue:121:9
+              }
             }
             ok1: (#struct){
               k: (int){ 3 }
@@ -2946,8 +3024,15 @@ Result:
           // [eval]
           X: (#struct){
           }
-          err1: (#struct){
-            j: (int){ 3 }
+          err1: (_|_){
+            // [eval]
+            j: (_|_){
+              // [eval] patterns.shallow.andOrEmbed.t2.err1.j: field not allowed:
+              //     ./embed.cue:33:15
+              //     ./embed.cue:31:6
+              //     ./embed.cue:33:6
+              //     ./embed.cue:135:9
+            }
           }
           ok1: (#struct){
             k: (int){ 3 }
@@ -3125,17 +3210,26 @@ Result:
       }
       and: (_|_){
         // [eval]
-        p1: (struct){
+        p1: (_|_){
+          // [eval]
           X: (#struct){
             x: (#struct){
               y: (#struct){
               }
             }
           }
-          err: (#struct){
-            x: (#struct){
-              y: (#struct){
-                j: (int){ 3 }
+          err: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                j: (_|_){
+                  // [eval] patterns.nested.and.p1.err.x.y.j: field not allowed:
+                  //     ./embed.cue:207:21
+                  //     ./embed.cue:207:12
+                  //     ./embed.cue:224:14
+                }
               }
             }
           }
@@ -3181,17 +3275,26 @@ Result:
       }
       andEmbed: (_|_){
         // [eval]
-        p1: (struct){
+        p1: (_|_){
+          // [eval]
           X: (#struct){
             x: (#struct){
               y: (#struct){
               }
             }
           }
-          err: (#struct){
-            x: (#struct){
-              y: (#struct){
-                j: (int){ 3 }
+          err: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                j: (_|_){
+                  // [eval] patterns.nested.andEmbed.p1.err.x.y.j: field not allowed:
+                  //     ./embed.cue:207:21
+                  //     ./embed.cue:207:12
+                  //     ./embed.cue:243:14
+                }
               }
             }
           }
@@ -3283,18 +3386,29 @@ Result:
       }
       andOrEmbed: (_|_){
         // [eval]
-        t1: (struct){
-          p1: (struct){
+        t1: (_|_){
+          // [eval]
+          p1: (_|_){
+            // [eval]
             X: (#struct){
               x: (#struct){
                 y: (#struct){
                 }
               }
             }
-            err1: (#struct){
-              x: (#struct){
-                y: (#struct){
-                  j: (int){ 3 }
+            err1: (_|_){
+              // [eval]
+              x: (_|_){
+                // [eval]
+                y: (_|_){
+                  // [eval]
+                  j: (_|_){
+                    // [eval] patterns.nested.andOrEmbed.t1.p1.err1.x.y.j: field not allowed:
+                    //     ./embed.cue:209:21
+                    //     ./embed.cue:207:12
+                    //     ./embed.cue:209:12
+                    //     ./embed.cue:284:15
+                  }
                 }
               }
             }
@@ -3306,17 +3420,27 @@ Result:
               }
             }
           }
-          p2: (struct){
+          p2: (_|_){
+            // [eval]
             X: (#struct){
               x: (#struct){
                 y: (#struct){
                 }
               }
             }
-            err1: (#struct){
-              x: (#struct){
-                y: (#struct){
-                  j: (int){ 3 }
+            err1: (_|_){
+              // [eval]
+              x: (_|_){
+                // [eval]
+                y: (_|_){
+                  // [eval]
+                  j: (_|_){
+                    // [eval] patterns.nested.andOrEmbed.t1.p2.err1.x.y.j: field not allowed:
+                    //     ./embed.cue:207:21
+                    //     ./embed.cue:207:12
+                    //     ./embed.cue:209:12
+                    //     ./embed.cue:297:15
+                  }
                 }
               }
             }
@@ -3337,10 +3461,19 @@ Result:
               }
             }
           }
-          err1: (#struct){
-            x: (#struct){
-              y: (#struct){
-                j: (int){ 3 }
+          err1: (_|_){
+            // [eval]
+            x: (_|_){
+              // [eval]
+              y: (_|_){
+                // [eval]
+                j: (_|_){
+                  // [eval] patterns.nested.andOrEmbed.t2.err1.x.y.j: field not allowed:
+                  //     ./embed.cue:209:21
+                  //     ./embed.cue:207:12
+                  //     ./embed.cue:209:12
+                  //     ./embed.cue:311:15
+                }
               }
             }
           }
@@ -3359,8 +3492,9 @@ Result:
                 // [eval]
                 p: (_|_){
                   // [eval] patterns.nested.andOrEmbed.t2.ok2.x.y.p: field not allowed:
-                  //     ./embed.cue:207:21
+                  //     ./embed.cue:209:21
                   //     ./embed.cue:206:12
+                  //     ./embed.cue:209:12
                   //     ./embed.cue:317:14
                 }
               }
@@ -4154,7 +4288,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,310 +1,122 @@
+@@ -1,310 +1,169 @@
  Errors:
 -a.q.e: field not allowed:
 -    ./in.cue:1:5
@@ -4249,11 +4383,34 @@ diff old new
 +patterns.shallow.single.err.j: field not allowed:
 +    ./embed.cue:30:15
 +    ./embed.cue:38:8
++patterns.shallow.and.p1.err.j: field not allowed:
++    ./embed.cue:31:15
++    ./embed.cue:31:6
++    ./embed.cue:48:8
++patterns.shallow.andEmbed.p1.err.j: field not allowed:
++    ./embed.cue:31:15
++    ./embed.cue:31:6
++    ./embed.cue:67:8
++patterns.shallow.andOrEmbed.t1.p2.err1.j: field not allowed:
++    ./embed.cue:31:15
++    ./embed.cue:31:6
++    ./embed.cue:33:6
++    ./embed.cue:121:9
 +patterns.shallow.andOrEmbed.t2.ok2.p: field not allowed:
 +    ./embed.cue:31:15
 +    ./embed.cue:30:6
 +    ./embed.cue:132:4
 +    ./embed.cue:141:8
++patterns.shallow.andOrEmbed.t1.p1.err1.j: field not allowed:
++    ./embed.cue:33:15
++    ./embed.cue:31:6
++    ./embed.cue:33:6
++    ./embed.cue:108:9
++patterns.shallow.andOrEmbed.t2.err1.j: field not allowed:
++    ./embed.cue:33:15
++    ./embed.cue:31:6
++    ./embed.cue:33:6
++    ./embed.cue:135:9
 +patterns.shallow.indirect.p1.err1.j: field not allowed:
 +    ./embed.cue:146:15
 +    ./embed.cue:152:10
@@ -4314,7 +4471,18 @@ diff old new
 -    ./embed.cue:281:9
 -    ./embed.cue:283:9
 -    ./embed.cue:284:15
--patterns.nested.andOrEmbed.t1.p2.err1.x.y.j: field not allowed:
++patterns.nested.single.err.x.y.j: field not allowed:
++    ./embed.cue:206:21
++    ./embed.cue:214:14
++patterns.nested.and.p1.err.x.y.j: field not allowed:
++    ./embed.cue:207:21
++    ./embed.cue:207:12
++    ./embed.cue:224:14
++patterns.nested.andEmbed.p1.err.x.y.j: field not allowed:
++    ./embed.cue:207:21
++    ./embed.cue:207:12
++    ./embed.cue:243:14
+ patterns.nested.andOrEmbed.t1.p2.err1.x.y.j: field not allowed:
 -    ./embed.cue:206:12
 -    ./embed.cue:207:12
 -    ./embed.cue:208:12
@@ -4324,8 +4492,16 @@ diff old new
 -    ./embed.cue:294:4
 -    ./embed.cue:294:9
 -    ./embed.cue:296:9
--    ./embed.cue:297:15
--patterns.nested.andOrEmbed.t2.err1.x.y.j: field not allowed:
++    ./embed.cue:207:21
++    ./embed.cue:207:12
++    ./embed.cue:209:12
+     ./embed.cue:297:15
++patterns.nested.andOrEmbed.t1.p1.err1.x.y.j: field not allowed:
++    ./embed.cue:209:21
++    ./embed.cue:207:12
++    ./embed.cue:209:12
++    ./embed.cue:284:15
+ patterns.nested.andOrEmbed.t2.err1.x.y.j: field not allowed:
 -    ./embed.cue:206:12
 -    ./embed.cue:207:12
 -    ./embed.cue:208:12
@@ -4335,10 +4511,10 @@ diff old new
 -    ./embed.cue:307:4
 -    ./embed.cue:307:9
 -    ./embed.cue:310:9
--    ./embed.cue:311:15
-+patterns.nested.single.err.x.y.j: field not allowed:
-+    ./embed.cue:206:21
-+    ./embed.cue:214:14
++    ./embed.cue:209:21
++    ./embed.cue:207:12
++    ./embed.cue:209:12
+     ./embed.cue:311:15
  patterns.nested.andOrEmbed.t2.ok2.x.y.p: field not allowed:
 -    ./embed.cue:206:12
 -    ./embed.cue:207:12
@@ -4349,8 +4525,9 @@ diff old new
 -    ./embed.cue:307:4
 -    ./embed.cue:307:9
 -    ./embed.cue:316:8
-+    ./embed.cue:207:21
++    ./embed.cue:209:21
 +    ./embed.cue:206:12
++    ./embed.cue:209:12
      ./embed.cue:317:14
  patterns.nested.indirect.p1.err1.x.y.j: field not allowed:
 -    ./embed.cue:322:12
@@ -4558,7 +4735,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -320,13 +132,13 @@
+@@ -320,13 +179,13 @@
          }
        }
        #Extended: (#struct){
@@ -4579,7 +4756,7 @@ diff old new
        }
        broken: (#struct){
          name: (string){ "base" }
-@@ -338,13 +150,13 @@
+@@ -338,13 +197,13 @@
          }
        }
        works: (#struct){
@@ -4600,7 +4777,7 @@ diff old new
        }
      }
    }
-@@ -368,9 +180,7 @@
+@@ -368,9 +227,7 @@
            // [eval]
            j: (_|_){
              // [eval] patterns.shallow.single.err.j: field not allowed:
@@ -4611,34 +4788,21 @@ diff old new
              //     ./embed.cue:38:8
            }
          }
-@@ -380,21 +190,11 @@
-       }
-       and: (_|_){
-         // [eval]
--        p1: (_|_){
--          // [eval]
--          X: (#struct){
--          }
--          err: (_|_){
--            // [eval]
--            j: (_|_){
--              // [eval] patterns.shallow.and.p1.err.j: field not allowed:
+@@ -388,11 +245,8 @@
+             // [eval]
+             j: (_|_){
+               // [eval] patterns.shallow.and.p1.err.j: field not allowed:
 -              //     ./embed.cue:30:6
 -              //     ./embed.cue:31:6
 -              //     ./embed.cue:45:6
 -              //     ./embed.cue:45:11
 -              //     ./embed.cue:47:8
--              //     ./embed.cue:48:8
--            }
-+        p1: (struct){
-+          X: (#struct){
-+          }
-+          err: (#struct){
-+            j: (int){ 3 }
++              //     ./embed.cue:31:15
++              //     ./embed.cue:31:6
+               //     ./embed.cue:48:8
+             }
            }
-           ok: (#struct){
-             k: (int){ 3 }
-@@ -408,11 +208,8 @@
+@@ -408,11 +262,8 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.and.p2.err.j: field not allowed:
@@ -4652,35 +4816,22 @@ diff old new
                //     ./embed.cue:57:8
              }
            }
-@@ -423,22 +220,11 @@
-       }
-       andEmbed: (_|_){
-         // [eval]
--        p1: (_|_){
--          // [eval]
--          X: (#struct){
--          }
--          err: (_|_){
--            // [eval]
--            j: (_|_){
--              // [eval] patterns.shallow.andEmbed.p1.err.j: field not allowed:
+@@ -431,12 +282,8 @@
+             // [eval]
+             j: (_|_){
+               // [eval] patterns.shallow.andEmbed.p1.err.j: field not allowed:
 -              //     ./embed.cue:30:6
 -              //     ./embed.cue:31:6
 -              //     ./embed.cue:64:6
 -              //     ./embed.cue:64:8
 -              //     ./embed.cue:64:13
 -              //     ./embed.cue:66:8
--              //     ./embed.cue:67:8
--            }
-+        p1: (struct){
-+          X: (#struct){
-+          }
-+          err: (#struct){
-+            j: (int){ 3 }
++              //     ./embed.cue:31:15
++              //     ./embed.cue:31:6
+               //     ./embed.cue:67:8
+             }
            }
-           ok: (#struct){
-             k: (int){ 3 }
-@@ -452,12 +238,8 @@
+@@ -452,12 +299,8 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.andEmbed.p2.err.j: field not allowed:
@@ -4695,20 +4846,10 @@ diff old new
                //     ./embed.cue:76:8
              }
            }
-@@ -490,85 +272,47 @@
-       }
-       andOrEmbed: (_|_){
-         // [eval]
--        t1: (_|_){
--          // [eval]
--          p1: (_|_){
--            // [eval]
--            X: (#struct){
--            }
--            err1: (_|_){
--              // [eval]
--              j: (_|_){
--                // [eval] patterns.shallow.andOrEmbed.t1.p1.err1.j: field not allowed:
+@@ -500,16 +343,9 @@
+               // [eval]
+               j: (_|_){
+                 // [eval] patterns.shallow.andOrEmbed.t1.p1.err1.j: field not allowed:
 -                //     ./embed.cue:30:6
 -                //     ./embed.cue:31:6
 -                //     ./embed.cue:32:6
@@ -4719,21 +4860,16 @@ diff old new
 -                //     ./embed.cue:105:4
 -                //     ./embed.cue:105:9
 -                //     ./embed.cue:107:9
--                //     ./embed.cue:108:9
--              }
--            }
--            ok1: (#struct){
--              k: (int){ 3 }
--            }
--          }
--          p2: (_|_){
--            // [eval]
--            X: (#struct){
--            }
--            err1: (_|_){
--              // [eval]
--              j: (_|_){
--                // [eval] patterns.shallow.andOrEmbed.t1.p2.err1.j: field not allowed:
++                //     ./embed.cue:33:15
++                //     ./embed.cue:31:6
++                //     ./embed.cue:33:6
+                 //     ./embed.cue:108:9
+               }
+             }
+@@ -525,16 +361,9 @@
+               // [eval]
+               j: (_|_){
+                 // [eval] patterns.shallow.andOrEmbed.t1.p2.err1.j: field not allowed:
 -                //     ./embed.cue:30:6
 -                //     ./embed.cue:31:6
 -                //     ./embed.cue:32:6
@@ -4744,72 +4880,37 @@ diff old new
 -                //     ./embed.cue:118:4
 -                //     ./embed.cue:118:9
 -                //     ./embed.cue:120:9
--                //     ./embed.cue:121:9
--              }
--            }
--            ok1: (#struct){
--              k: (int){ 3 }
--            }
--          }
--        }
--        t2: (_|_){
--          // [eval]
--          X: (#struct){
--          }
--          err1: (_|_){
--            // [eval]
--            j: (_|_){
--              // [eval] patterns.shallow.andOrEmbed.t2.err1.j: field not allowed:
++                //     ./embed.cue:31:15
++                //     ./embed.cue:31:6
++                //     ./embed.cue:33:6
+                 //     ./embed.cue:121:9
+               }
+             }
+@@ -551,16 +380,9 @@
+             // [eval]
+             j: (_|_){
+               // [eval] patterns.shallow.andOrEmbed.t2.err1.j: field not allowed:
 -              //     ./embed.cue:30:6
 -              //     ./embed.cue:31:6
 -              //     ./embed.cue:32:6
--              //     ./embed.cue:33:6
++              //     ./embed.cue:33:15
++              //     ./embed.cue:31:6
+               //     ./embed.cue:33:6
 -              //     ./embed.cue:129:6
 -              //     ./embed.cue:130:4
 -              //     ./embed.cue:130:9
 -              //     ./embed.cue:131:4
 -              //     ./embed.cue:131:9
 -              //     ./embed.cue:134:9
--              //     ./embed.cue:135:9
--            }
--          }
--          ok1: (#struct){
--            k: (int){ 3 }
--          }
+               //     ./embed.cue:135:9
+             }
+           }
+@@ -567,8 +389,15 @@
+           ok1: (#struct){
+             k: (int){ 3 }
+           }
 -          ok2: (#struct){
 -            p: (int){ 3 }
-+        t1: (struct){
-+          p1: (struct){
-+            X: (#struct){
-+            }
-+            err1: (#struct){
-+              j: (int){ 3 }
-+            }
-+            ok1: (#struct){
-+              k: (int){ 3 }
-+            }
-+          }
-+          p2: (struct){
-+            X: (#struct){
-+            }
-+            err1: (#struct){
-+              j: (int){ 3 }
-+            }
-+            ok1: (#struct){
-+              k: (int){ 3 }
-+            }
-+          }
-+        }
-+        t2: (_|_){
-+          // [eval]
-+          X: (#struct){
-+          }
-+          err1: (#struct){
-+            j: (int){ 3 }
-+          }
-+          ok1: (#struct){
-+            k: (int){ 3 }
-+          }
 +          ok2: (_|_){
 +            // [eval]
 +            p: (_|_){
@@ -4822,7 +4923,7 @@ diff old new
            }
          }
        }
-@@ -586,10 +330,7 @@
+@@ -586,10 +415,7 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p1.err1.j: field not allowed:
@@ -4834,7 +4935,7 @@ diff old new
                //     ./embed.cue:152:10
              }
            }
-@@ -597,10 +338,7 @@
+@@ -597,10 +423,7 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p1.err2.j: field not allowed:
@@ -4846,7 +4947,7 @@ diff old new
                //     ./embed.cue:155:10
              }
            }
-@@ -618,10 +356,7 @@
+@@ -618,10 +441,7 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p2.err1.j: field not allowed:
@@ -4858,7 +4959,7 @@ diff old new
                //     ./embed.cue:166:10
              }
            }
-@@ -629,10 +364,7 @@
+@@ -629,10 +449,7 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p2.err2.j: field not allowed:
@@ -4870,7 +4971,7 @@ diff old new
                //     ./embed.cue:169:10
              }
            }
-@@ -648,10 +380,7 @@
+@@ -648,10 +465,7 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p3.err1.j: field not allowed:
@@ -4882,7 +4983,7 @@ diff old new
                //     ./embed.cue:179:10
              }
            }
-@@ -659,10 +388,7 @@
+@@ -659,10 +473,7 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p3.err2.j: field not allowed:
@@ -4894,7 +4995,7 @@ diff old new
                //     ./embed.cue:182:10
              }
            }
-@@ -680,10 +406,7 @@
+@@ -680,10 +491,7 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p4.err1.j: field not allowed:
@@ -4906,7 +5007,7 @@ diff old new
                //     ./embed.cue:194:10
              }
            }
-@@ -691,10 +414,7 @@
+@@ -691,10 +499,7 @@
              // [eval]
              j: (_|_){
                // [eval] patterns.shallow.indirect.p4.err2.j: field not allowed:
@@ -4918,7 +5019,7 @@ diff old new
                //     ./embed.cue:197:10
              }
            }
-@@ -732,12 +452,7 @@
+@@ -732,12 +537,7 @@
        }
        single: (_|_){
          // [eval]
@@ -4932,7 +5033,7 @@ diff old new
          err: (_|_){
            // [eval]
            x: (_|_){
-@@ -746,9 +461,7 @@
+@@ -746,9 +546,7 @@
                // [eval]
                j: (_|_){
                  // [eval] patterns.nested.single.err.x.y.j: field not allowed:
@@ -4943,48 +5044,21 @@ diff old new
                  //     ./embed.cue:214:14
                }
              }
-@@ -764,29 +477,17 @@
-       }
-       and: (_|_){
-         // [eval]
--        p1: (_|_){
--          // [eval]
--          X: (#struct){
--            x: (#struct){
--              y: (#struct){
--              }
--            }
--          }
--          err: (_|_){
--            // [eval]
--            x: (_|_){
--              // [eval]
--              y: (_|_){
--                // [eval]
--                j: (_|_){
--                  // [eval] patterns.nested.and.p1.err.x.y.j: field not allowed:
+@@ -780,11 +578,8 @@
+                 // [eval]
+                 j: (_|_){
+                   // [eval] patterns.nested.and.p1.err.x.y.j: field not allowed:
 -                  //     ./embed.cue:206:12
 -                  //     ./embed.cue:207:12
 -                  //     ./embed.cue:221:6
 -                  //     ./embed.cue:221:11
 -                  //     ./embed.cue:223:8
--                  //     ./embed.cue:224:14
--                }
-+        p1: (struct){
-+          X: (#struct){
-+            x: (#struct){
-+              y: (#struct){
-+              }
-+            }
-+          }
-+          err: (#struct){
-+            x: (#struct){
-+              y: (#struct){
-+                j: (int){ 3 }
++                  //     ./embed.cue:207:21
++                  //     ./embed.cue:207:12
+                   //     ./embed.cue:224:14
+                 }
                }
-             }
-           }
-@@ -814,11 +515,8 @@
+@@ -814,11 +609,8 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.and.p2.err.x.y.j: field not allowed:
@@ -4998,48 +5072,21 @@ diff old new
                    //     ./embed.cue:233:14
                  }
                }
-@@ -835,29 +533,17 @@
-       }
-       andEmbed: (_|_){
-         // [eval]
--        p1: (_|_){
--          // [eval]
--          X: (#struct){
--            x: (#struct){
--              y: (#struct){
--              }
--            }
--          }
--          err: (_|_){
--            // [eval]
--            x: (_|_){
--              // [eval]
--              y: (_|_){
--                // [eval]
--                j: (_|_){
--                  // [eval] patterns.nested.andEmbed.p1.err.x.y.j: field not allowed:
+@@ -851,11 +643,8 @@
+                 // [eval]
+                 j: (_|_){
+                   // [eval] patterns.nested.andEmbed.p1.err.x.y.j: field not allowed:
 -                  //     ./embed.cue:206:12
 -                  //     ./embed.cue:207:12
 -                  //     ./embed.cue:240:8
 -                  //     ./embed.cue:240:13
 -                  //     ./embed.cue:242:8
--                  //     ./embed.cue:243:14
--                }
-+        p1: (struct){
-+          X: (#struct){
-+            x: (#struct){
-+              y: (#struct){
-+              }
-+            }
-+          }
-+          err: (#struct){
-+            x: (#struct){
-+              y: (#struct){
-+                j: (int){ 3 }
++                  //     ./embed.cue:207:21
++                  //     ./embed.cue:207:12
+                   //     ./embed.cue:243:14
+                 }
                }
-             }
-           }
-@@ -885,11 +571,8 @@
+@@ -885,11 +674,8 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.andEmbed.p2.err.x.y.j: field not allowed:
@@ -5053,28 +5100,10 @@ diff old new
                    //     ./embed.cue:252:14
                  }
                }
-@@ -952,112 +635,64 @@
-       }
-       andOrEmbed: (_|_){
-         // [eval]
--        t1: (_|_){
--          // [eval]
--          p1: (_|_){
--            // [eval]
--            X: (#struct){
--              x: (#struct){
--                y: (#struct){
--                }
--              }
--            }
--            err1: (_|_){
--              // [eval]
--              x: (_|_){
--                // [eval]
--                y: (_|_){
--                  // [eval]
--                  j: (_|_){
--                    // [eval] patterns.nested.andOrEmbed.t1.p1.err1.x.y.j: field not allowed:
+@@ -970,15 +756,9 @@
+                   // [eval]
+                   j: (_|_){
+                     // [eval] patterns.nested.andOrEmbed.t1.p1.err1.x.y.j: field not allowed:
 -                    //     ./embed.cue:206:12
 -                    //     ./embed.cue:207:12
 -                    //     ./embed.cue:208:12
@@ -5084,35 +5113,16 @@ diff old new
 -                    //     ./embed.cue:281:4
 -                    //     ./embed.cue:281:9
 -                    //     ./embed.cue:283:9
--                    //     ./embed.cue:284:15
--                  }
--                }
--              }
--            }
--            ok1: (#struct){
--              x: (#struct){
--                y: (#struct){
--                  k: (int){ 3 }
--                }
--              }
--            }
--          }
--          p2: (_|_){
--            // [eval]
--            X: (#struct){
--              x: (#struct){
--                y: (#struct){
--                }
--              }
--            }
--            err1: (_|_){
--              // [eval]
--              x: (_|_){
--                // [eval]
--                y: (_|_){
--                  // [eval]
--                  j: (_|_){
--                    // [eval] patterns.nested.andOrEmbed.t1.p2.err1.x.y.j: field not allowed:
++                    //     ./embed.cue:209:21
++                    //     ./embed.cue:207:12
++                    //     ./embed.cue:209:12
+                     //     ./embed.cue:284:15
+                   }
+                 }
+@@ -1008,15 +788,9 @@
+                   // [eval]
+                   j: (_|_){
+                     // [eval] patterns.nested.andOrEmbed.t1.p2.err1.x.y.j: field not allowed:
 -                    //     ./embed.cue:206:12
 -                    //     ./embed.cue:207:12
 -                    //     ./embed.cue:208:12
@@ -5122,36 +5132,16 @@ diff old new
 -                    //     ./embed.cue:294:4
 -                    //     ./embed.cue:294:9
 -                    //     ./embed.cue:296:9
--                    //     ./embed.cue:297:15
--                  }
--                }
--              }
--            }
--            ok1: (#struct){
--              x: (#struct){
--                y: (#struct){
--                  k: (int){ 3 }
--                }
--              }
--            }
--          }
--        }
--        t2: (_|_){
--          // [eval]
--          X: (#struct){
--            x: (#struct){
--              y: (#struct){
--              }
--            }
--          }
--          err1: (_|_){
--            // [eval]
--            x: (_|_){
--              // [eval]
--              y: (_|_){
--                // [eval]
--                j: (_|_){
--                  // [eval] patterns.nested.andOrEmbed.t2.err1.x.y.j: field not allowed:
++                    //     ./embed.cue:207:21
++                    //     ./embed.cue:207:12
++                    //     ./embed.cue:209:12
+                     //     ./embed.cue:297:15
+                   }
+                 }
+@@ -1047,15 +821,9 @@
+                 // [eval]
+                 j: (_|_){
+                   // [eval] patterns.nested.andOrEmbed.t2.err1.x.y.j: field not allowed:
 -                  //     ./embed.cue:206:12
 -                  //     ./embed.cue:207:12
 -                  //     ./embed.cue:208:12
@@ -5161,70 +5151,13 @@ diff old new
 -                  //     ./embed.cue:307:4
 -                  //     ./embed.cue:307:9
 -                  //     ./embed.cue:310:9
--                  //     ./embed.cue:311:15
--                }
-+        t1: (struct){
-+          p1: (struct){
-+            X: (#struct){
-+              x: (#struct){
-+                y: (#struct){
-+                }
-+              }
-+            }
-+            err1: (#struct){
-+              x: (#struct){
-+                y: (#struct){
-+                  j: (int){ 3 }
-+                }
-+              }
-+            }
-+            ok1: (#struct){
-+              x: (#struct){
-+                y: (#struct){
-+                  k: (int){ 3 }
-+                }
-+              }
-+            }
-+          }
-+          p2: (struct){
-+            X: (#struct){
-+              x: (#struct){
-+                y: (#struct){
-+                }
-+              }
-+            }
-+            err1: (#struct){
-+              x: (#struct){
-+                y: (#struct){
-+                  j: (int){ 3 }
-+                }
-+              }
-+            }
-+            ok1: (#struct){
-+              x: (#struct){
-+                y: (#struct){
-+                  k: (int){ 3 }
-+                }
-+              }
-+            }
-+          }
-+        }
-+        t2: (_|_){
-+          // [eval]
-+          X: (#struct){
-+            x: (#struct){
-+              y: (#struct){
-+              }
-+            }
-+          }
-+          err1: (#struct){
-+            x: (#struct){
-+              y: (#struct){
-+                j: (int){ 3 }
++                  //     ./embed.cue:209:21
++                  //     ./embed.cue:207:12
++                  //     ./embed.cue:209:12
+                   //     ./embed.cue:311:15
+                 }
                }
-             }
-           }
-@@ -1076,15 +711,8 @@
+@@ -1076,15 +844,9 @@
                  // [eval]
                  p: (_|_){
                    // [eval] patterns.nested.andOrEmbed.t2.ok2.x.y.p: field not allowed:
@@ -5237,12 +5170,13 @@ diff old new
 -                  //     ./embed.cue:307:4
 -                  //     ./embed.cue:307:9
 -                  //     ./embed.cue:316:8
-+                  //     ./embed.cue:207:21
++                  //     ./embed.cue:209:21
 +                  //     ./embed.cue:206:12
++                  //     ./embed.cue:209:12
                    //     ./embed.cue:317:14
                  }
                }
-@@ -1108,12 +736,7 @@
+@@ -1108,12 +870,7 @@
          }
          p1: (_|_){
            // [eval]
@@ -5256,7 +5190,7 @@ diff old new
            err1: (_|_){
              // [eval]
              x: (_|_){
-@@ -1122,10 +745,7 @@
+@@ -1122,10 +879,7 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p1.err1.x.y.j: field not allowed:
@@ -5268,7 +5202,7 @@ diff old new
                    //     ./embed.cue:328:16
                  }
                }
-@@ -1139,10 +759,7 @@
+@@ -1139,10 +893,7 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p1.err2.x.y.j: field not allowed:
@@ -5280,7 +5214,7 @@ diff old new
                    //     ./embed.cue:331:16
                  }
                }
-@@ -1164,12 +781,7 @@
+@@ -1164,12 +915,7 @@
                }
              }
            }
@@ -5294,7 +5228,7 @@ diff old new
            err1: (_|_){
              // [eval]
              x: (_|_){
-@@ -1178,10 +790,7 @@
+@@ -1178,10 +924,7 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p2.err1.x.y.j: field not allowed:
@@ -5306,7 +5240,7 @@ diff old new
                    //     ./embed.cue:342:16
                  }
                }
-@@ -1195,10 +804,7 @@
+@@ -1195,10 +938,7 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p2.err2.x.y.j: field not allowed:
@@ -5318,7 +5252,7 @@ diff old new
                    //     ./embed.cue:345:16
                  }
                }
-@@ -1228,10 +834,7 @@
+@@ -1228,10 +968,7 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p3.err1.x.y.j: field not allowed:
@@ -5330,7 +5264,7 @@ diff old new
                    //     ./embed.cue:355:16
                  }
                }
-@@ -1245,10 +848,7 @@
+@@ -1245,10 +982,7 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p3.err2.x.y.j: field not allowed:
@@ -5342,7 +5276,7 @@ diff old new
                    //     ./embed.cue:358:16
                  }
                }
-@@ -1284,10 +884,7 @@
+@@ -1284,10 +1018,7 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p4.err1.x.y.j: field not allowed:
@@ -5354,7 +5288,7 @@ diff old new
                    //     ./embed.cue:370:16
                  }
                }
-@@ -1301,10 +898,7 @@
+@@ -1301,10 +1032,7 @@
                  // [eval]
                  j: (_|_){
                    // [eval] patterns.nested.indirect.p4.err2.x.y.j: field not allowed:
@@ -5366,7 +5300,7 @@ diff old new
                    //     ./embed.cue:373:16
                  }
                }
-@@ -1327,8 +921,8 @@
+@@ -1327,8 +1055,8 @@
    #A: (#struct){
      b: (int){ int }
      q: (#struct){
@@ -5376,7 +5310,7 @@ diff old new
      }
    }
    a: (_|_){
-@@ -1337,21 +931,17 @@
+@@ -1337,21 +1065,17 @@
      q: (_|_){
        // [eval]
        c: (int){ 2 }
@@ -5400,7 +5334,7 @@ diff old new
      //     ./in.cue:28:5
      #A: (#struct){
      }
-@@ -1359,8 +949,7 @@
+@@ -1359,8 +1083,7 @@
        // [eval]
        Foo: (_|_){
          // [eval] issue852.a.Foo: field not allowed:
@@ -5410,7 +5344,7 @@ diff old new
          //     ./in.cue:28:5
        }
      }
-@@ -1371,8 +960,8 @@
+@@ -1371,8 +1094,8 @@
        foo: (int){ int }
      }
      d: (#struct){
@@ -5420,7 +5354,7 @@ diff old new
      }
    }
    issue3330: (struct){
-@@ -1386,13 +975,7 @@
+@@ -1386,13 +1109,7 @@
            }
          }
          out: (#list){
@@ -5435,7 +5369,7 @@ diff old new
          }
        }
      }
-@@ -1421,13 +1004,7 @@
+@@ -1421,13 +1138,7 @@
            g: (#struct){
            }
          }
@@ -5450,7 +5384,7 @@ diff old new
          out2: (#struct){
            field: (#struct){
              n: (int){ 3 }
-@@ -1448,13 +1025,7 @@
+@@ -1448,13 +1159,7 @@
              d: (int){ 1 }
            }
          }
@@ -5465,7 +5399,7 @@ diff old new
        }
      }
      variant1: (struct){
-@@ -1467,13 +1038,7 @@
+@@ -1467,13 +1172,7 @@
            }
          }
          0: (#list){
@@ -5480,7 +5414,7 @@ diff old new
          }
        }
      }
-@@ -1480,19 +1045,18 @@
+@@ -1480,19 +1179,18 @@
    }
    indirect: (_|_){
      // [eval]
@@ -5512,7 +5446,7 @@ diff old new
          }
          #x: (#struct){
            a: (#struct){
-@@ -1504,22 +1068,16 @@
+@@ -1504,22 +1202,16 @@
              c: (int){ 2 }
            }
          }
@@ -5543,7 +5477,7 @@ diff old new
          }
        }
      }
-@@ -1536,22 +1094,17 @@
+@@ -1536,22 +1228,17 @@
          }
          Y: (_|_){
            // [eval]
@@ -5572,7 +5506,7 @@ diff old new
            }
          }
          #X: (#struct){
-@@ -1571,25 +1124,11 @@
+@@ -1571,25 +1258,11 @@
            }
          }
        }
@@ -5603,7 +5537,7 @@ diff old new
          #A: (#struct){
            d: (#struct){
              e: (int){ int }
-@@ -1614,69 +1153,29 @@
+@@ -1614,69 +1287,29 @@
            // [eval]
            f: (_|_){
              // [eval] nested.err1.x.b.f: field not allowed:
@@ -5687,7 +5621,7 @@ diff old new
            }
          }
        }
-@@ -1684,16 +1183,11 @@
+@@ -1684,16 +1317,11 @@
          b: (#struct){
            f: (int){ 1 }
          }
@@ -5707,7 +5641,7 @@ diff old new
            }
          }
        }
-@@ -1716,19 +1210,18 @@
+@@ -1716,19 +1344,18 @@
            // [eval]
            g: (_|_){
              // [eval] nested.err2.x.b.g: field not allowed:
@@ -5734,7 +5668,7 @@ diff old new
      #x: (#struct){
        y: (#struct){
          z?: (#struct){
-@@ -1736,13 +1229,21 @@
+@@ -1736,13 +1363,21 @@
          }
        }
      }
@@ -5763,7 +5697,7 @@ diff old new
      }
    }
    mixInDef: (struct){
-@@ -1817,66 +1318,82 @@
+@@ -1817,66 +1452,82 @@
        }
      }
    }
@@ -5906,7 +5840,7 @@ diff old new
        #X: (#struct){
          a: (#struct){
            b: (#struct){
-@@ -1886,47 +1403,66 @@
+@@ -1886,47 +1537,66 @@
          empty: (#struct){
          }
        }
@@ -6014,7 +5948,7 @@ diff old new
            }
          }
        }
-@@ -1942,13 +1478,13 @@
+@@ -1942,13 +1612,13 @@
            empty: (#struct){
            }
          }
@@ -6039,14 +5973,6 @@ diff old new
 Positions / reordering
 -- diff/todo/p1 --
 Should be an error, but are not or vice versa:
-  patterns.shallow.and.p1.err
-  patterns.shallow.andEmbed.p1.err
-  patterns.shallow.andOrEmbed.t1.*.err1
-  patterns.shallow.andOrEmbed.t2.err1
-  patterns.nested.and.err
-  patterns.nested.andEmbed.p1.err
-  patterns.nested.andOrEmbed.t1.*.err1
-  patterns.nested.andOrEmbed.t2.err1
   issue3601.original.out.foo.final.version
   issue3601.originalNoShare.out.foo.final.version
   issue3601.reduced.original.out.b.c

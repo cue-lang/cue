@@ -312,8 +312,11 @@ func (c *closeContext) updateArcType(ctx *OpContext, t ArcType) {
 type ccArc struct {
 	kind        depKind
 	decremented bool
-	key         *closeContext
-	cc          *closeContext
+	// matched indicates the arc is only added to track the destination of a
+	// matched pattern and that it is not explicitly defined as a field.
+	matched bool
+	key     *closeContext
+	cc      *closeContext
 }
 
 // A ccArcRef x refers to the x.src.arcs[x.index].
@@ -380,8 +383,11 @@ func (v *Vertex) assignConjunct(ctx *OpContext, root *closeContext, c Conjunct, 
 }
 
 func (cc *closeContext) getKeyedCC(ctx *OpContext, key *closeContext, c CycleInfo, mode ArcType, checkClosed bool) *closeContext {
-	for _, a := range cc.arcs {
+	for i, a := range cc.arcs {
 		if a.key == key {
+			if matched := !checkClosed; !matched {
+				cc.arcs[i].matched = false
+			}
 			a.cc.updateArcType(ctx, mode)
 			return a.cc
 		}
@@ -429,7 +435,8 @@ func (cc *closeContext) getKeyedCC(ctx *OpContext, key *closeContext, c CycleInf
 	if !arc.Label().IsLet() {
 		// prevent a dependency on self.
 		if key.src != cc.src {
-			cc.addDependency(ctx, ARC, key, arc, key)
+			matched := !checkClosed
+			cc.addDependency(ctx, ARC, matched, key, arc, key)
 		}
 	}
 
@@ -448,7 +455,7 @@ func (cc *closeContext) linkNotify(ctx *OpContext, dst *Vertex, key *closeContex
 		}
 	}
 
-	cc.addDependency(ctx, NOTIFY, key, key, dst.cc())
+	cc.addDependency(ctx, NOTIFY, false, key, key, dst.cc())
 	return true
 }
 
@@ -510,7 +517,7 @@ func (c CloseInfo) spawnCloseContext(ctx *OpContext, t closeNodeType) (CloseInfo
 }
 
 // addDependency adds a dependent arc to c. If child is an arc, child.src == key
-func (c *closeContext) addDependency(ctx *OpContext, kind depKind, key, child, root *closeContext) {
+func (c *closeContext) addDependency(ctx *OpContext, kind depKind, matched bool, key, child, root *closeContext) {
 	// NOTE: do not increment
 	// - either root closeContext or otherwise resulting from sub closeContext
 	//   all conjuncts will be added now, notified, or scheduled as task.
@@ -532,9 +539,10 @@ func (c *closeContext) addDependency(ctx *OpContext, kind depKind, key, child, r
 		panic("addArc: inconsistent root")
 	}
 	c.arcs = append(c.arcs, ccArc{
-		kind: kind,
-		key:  key,
-		cc:   child,
+		kind:    kind,
+		matched: matched,
+		key:     key,
+		cc:      child,
 	})
 	root.externalDeps = append(root.externalDeps, ccArcRef{
 		src:   c,
@@ -697,10 +705,11 @@ func (c *closeContext) decDisjunct(ctx *OpContext, kind depKind) {
 
 // linkPatterns merges the patterns of child into c, if needed.
 func (c *closeContext) linkPatterns(child *closeContext) {
-	if len(child.Patterns) > 0 {
-		child.next = c.child
-		c.child = child
-	}
+	// We need to always add the closeContext, as this closeContext may, for
+	// instance, be an embedding within a definition. In other words, we do
+	// not know yet if this information will be relevant for closedness.
+	child.next = c.child
+	c.child = child
 }
 
 // allowedInClosed reports whether a field with label f is allowed in a closed
@@ -899,9 +908,16 @@ func (n *nodeContext) addConstraint(arc *Vertex, mode ArcType, c Conjunct, check
 	// closedness check.
 	cc := c.CloseInfo.cc
 
+	// TODO: can go, but do in separate CL.
 	arc, _ = n.getArc(f, mode)
 
 	root := arc.rootCloseContext(n.ctx)
+
+	// Note: we are inserting the conjunct int the closeContext corresponding to
+	// the constraint. This will add an arc to the respective closeContext. In
+	// order to keep closedness information consistent, we need to ensure that,
+	// if the arc was otherwise not added in this context, the arc is marked as
+	// not really present.
 	cc.insertConjunct(n.ctx, root, c, c.CloseInfo, mode, check, false)
 }
 
@@ -1005,7 +1021,7 @@ func (c *closeContext) allows(ctx *OpContext, f Feature) bool {
 
 	for _, b := range c.arcs {
 		cb := b.cc
-		if f != cb.Label() {
+		if b.matched || f != cb.Label() {
 			continue
 		}
 		// TODO: we could potentially remove the check  for ArcPending if we

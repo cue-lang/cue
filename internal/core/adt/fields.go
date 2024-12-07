@@ -159,10 +159,9 @@ type closeContext struct {
 	// Used to recursively insert Vertices.
 	parent *closeContext
 
-	// points to the closeContext this closeContext originates when following
-	// the reverse or ARC/EVAL dependencies corresponding to parent vertices.
-	// This is used to compute the prefix path when resolving a reference.
-	origin *closeContext
+	// depth is the depth from the top following the parent tree. This may be
+	// relative to an anonymous struct for inline computed values.
+	depth int
 
 	// overlay is used to temporarily link a closeContext to its "overlay" copy,
 	// as it is used in a corresponding disjunction.
@@ -408,7 +407,8 @@ func (cc *closeContext) getKeyedCC(ctx *OpContext, key *closeContext, c CycleInf
 	}, mode, false, checkClosed)
 
 	arc := &closeContext{
-		origin:          cc.origin,
+		// origin:          cc.origin,
+		depth:           cc.depth,
 		generation:      cc.generation,
 		parent:          parent,
 		parentConjuncts: parent,
@@ -480,6 +480,15 @@ func (cc *closeContext) assignConjunct(ctx *OpContext, root *closeContext, c Con
 	return arc, pos, added
 }
 
+// TODO: cache depth.
+func VertexDepth(v *Vertex) int {
+	depth := 0
+	for p := v.Parent; p != nil; p = p.Parent {
+		depth++
+	}
+	return depth
+}
+
 // spawnCloseContext wraps the closeContext in c with a new one and returns
 // this new context along with an updated CloseInfo. The new values reflect
 // that the set of fields represented by c are now, for instance, enclosed in
@@ -492,15 +501,15 @@ func (c CloseInfo) spawnCloseContext(ctx *OpContext, t closeNodeType) (CloseInfo
 		panic("nil closeContext")
 	}
 
+	depth := VertexDepth(cc.src)
+
 	c.cc = &closeContext{
 		generation:      cc.generation,
 		parent:          cc,
+		depth:           depth,
 		src:             cc.src,
 		parentConjuncts: cc,
 	}
-
-	// By definition, a spawned closeContext is its own root.
-	c.cc.origin = c.cc
 
 	cc.incDependent(ctx, PARENT, c.cc) // REF(decrement: spawn)
 

@@ -264,8 +264,7 @@ func (ctx *overlayContext) allocCC(cc *closeContext) *closeContext {
 
 	o := &closeContext{generation: ctx.generation}
 	cc.overlay = o
-	// TODO(evalv3): is it okay to use the same origin in overlays?
-	o.origin = cc.origin
+	o.depth = cc.depth
 
 	if cc.parent != nil {
 		o.parent = ctx.allocCC(cc.parent)
@@ -321,7 +320,7 @@ func (ctx *overlayContext) initCloneCC(x *closeContext) {
 		o.src = o.parent.src
 	}
 
-	o.origin = x.origin
+	o.depth = x.depth
 	o.conjunctCount = x.conjunctCount
 	o.disjunctCount = x.disjunctCount
 	o.isDef = x.isDef

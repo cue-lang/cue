@@ -320,10 +320,10 @@ func (v *Vertex) rootCloseContext(ctx *OpContext) *closeContext {
 		}
 		v._cc.incDependent(ctx, ROOT, nil) // matched in REF(decrement:nodeDone)
 	}
-	v._cc.origin = v._cc
+
 	if p := v.Parent; p != nil {
 		pcc := p.rootCloseContext(ctx)
-		v._cc.origin = pcc.origin
+		v._cc.depth = pcc.depth + 1
 	}
 
 	return v._cc

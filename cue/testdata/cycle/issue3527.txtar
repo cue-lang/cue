@@ -33,6 +33,7 @@ Disjuncts:    39
 Errors:
 assert.res._computed.in.taxPayer.self: field not allowed:
     ./in.cue:5:22
+    ./in.cue:18:12
 
 Result:
 (_|_){
@@ -66,6 +67,7 @@ Result:
             self: (_|_){
               // [eval] assert.res._computed.in.taxPayer.self: field not allowed:
               //     ./in.cue:5:22
+              //     ./in.cue:18:12
             }
           }
         }
@@ -92,11 +94,12 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,32 +1,39 @@
+@@ -1,32 +1,41 @@
 -(struct){
 +Errors:
 +assert.res._computed.in.taxPayer.self: field not allowed:
 +    ./in.cue:5:22
++    ./in.cue:18:12
 +
 +Result:
 +(_|_){
@@ -150,10 +153,11 @@ diff old new
 +            self: (_|_){
 +              // [eval] assert.res._computed.in.taxPayer.self: field not allowed:
 +              //     ./in.cue:5:22
++              //     ./in.cue:18:12
              }
            }
          }
-@@ -34,30 +41,16 @@
+@@ -34,30 +43,16 @@
      }
    }
    subject: (struct){

@@ -137,9 +137,9 @@ Disjuncts:    69
         r: (int){ 2 }
       }
       y: (struct){
-        let X#2 = (struct){
-          b: ~(t2.xy.a)
-          c: (int){ 1 }
+        let X#2multi = {
+          b: 〈2;a〉
+          c: 1
         }
         v: (int){ 1 }
       }
@@ -150,7 +150,7 @@ Disjuncts:    69
 diff old new
 --- old
 +++ new
-@@ -57,37 +57,33 @@
+@@ -57,23 +57,19 @@
        }
        y: (struct){
          let X#2 = (struct){
@@ -171,20 +171,6 @@ diff old new
 -          b: (struct){
 -            r: (int){ 2 }
 -          }
--          c: (int){ 1 }
--        }
--        v: (int){ 1 }
--      }
--    }
--    xy: (struct){
--      a: (struct){
--        q: (int){ 1 }
--        r: (int){ 2 }
--      }
--      y: (struct){
--        let X#2multi = {
--          b: 〈2;a〉
--          c: 1
 +          b: ~(t2.x1.a)
 +          c: (int){ 1 }
 +        }
@@ -198,23 +184,9 @@ diff old new
 +      y: (struct){
 +        let X#2 = (struct){
 +          b: ~(t2.x2.a)
-+          c: (int){ 1 }
-+        }
-+        v: (int){ 1 }
-+      }
-+    }
-+    xy: (struct){
-+      a: (struct){
-+        q: (int){ 1 }
-+        r: (int){ 2 }
-+      }
-+      y: (struct){
-+        let X#2 = (struct){
-+          b: ~(t2.xy.a)
-+          c: (int){ 1 }
+           c: (int){ 1 }
          }
          v: (int){ 1 }
-       }
 -- diff/todo/p4 --
 Reduce conjunct group size. Semantically correct, though.
 -- out/eval --

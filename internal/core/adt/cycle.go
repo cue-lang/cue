@@ -664,6 +664,18 @@ func (n *nodeContext) detectCycleV3(arc *Vertex, env *Environment, x Resolver, c
 			// is optional, we allow this to continue one more cycle.
 			if ci.CycleType == IsOptional && n.hasNonCyclic {
 				ci.CycleType = MaybeCyclic
+				// There my still be a cycle if the optional field is a pattern
+				// that unifies with itself, as in:
+				//
+				//		[string]: c
+				//		a: b
+				//		b: _
+				//		c: a: int
+				//
+				// This is equivalent to a reference cycle.
+				if r.Depth == n.node.state.depth {
+					return ci, true
+				}
 				ci.Refs = nil
 				return ci, false
 			}

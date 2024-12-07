@@ -317,7 +317,7 @@ Allocs: 778
 Retain: 0
 
 Unifications: 498
-Conjuncts:    3349
+Conjuncts:    3595
 Disjuncts:    196
 -- out/evalalpha --
 Errors:
@@ -573,7 +573,7 @@ Result:
   issue1881: (struct){
     p1: (struct){
       o: (#struct){
-        retry: (#struct){
+        retry: (struct){
           output: (#struct){
             reject: (string){ "ok" }
           }
@@ -613,7 +613,7 @@ Result:
         }
       }
       o: (#struct){
-        retry: (#struct){
+        retry: (struct){
           output: (#struct){
             reject: (string){ "ok" }
           }
@@ -643,7 +643,7 @@ Result:
           resource: (string){ string }
         }) }
       o: (#struct){
-        retry: (#struct){
+        retry: (struct){
           output: (#struct){
             reject: (string){ "ok" }
           }
@@ -792,10 +792,24 @@ diff old new
        }
      }
      acrossOr: (struct){
-@@ -268,13 +265,17 @@
-               reject: (string){ string }
-             }, (#struct){
-               resource: (string){ string }
+@@ -254,27 +251,31 @@
+   issue1881: (struct){
+     p1: (struct){
+       o: (#struct){
+-        retry: (#struct){
+-          output: (#struct){
+-            reject: (string){ "ok" }
+-          }
+-        }
+-      }
+-      #AllOutputs: (#struct){
+-        reject: (string){ string }
+-        resource: (string){ string }
+-        retry: (#struct){
+-          output: (#struct){ |((#struct){
+-              reject: (string){ string }
+-            }, (#struct){
+-              resource: (string){ string }
 -            }) }
 -        }
 -      }
@@ -803,6 +817,20 @@ diff old new
 -          reject: (string){ string }
 -        }, (#struct){
 -          resource: (string){ string }
++        retry: (struct){
++          output: (#struct){
++            reject: (string){ "ok" }
++          }
++        }
++      }
++      #AllOutputs: (#struct){
++        reject: (string){ string }
++        resource: (string){ string }
++        retry: (#struct){
++          output: (#struct){ |((#struct){
++              reject: (string){ string }
++            }, (#struct){
++              resource: (string){ string }
 +            }, (#struct){
 +              retry: ~(issue1881.p1.#AllOutputs.retry)
 +            }) }
@@ -817,11 +845,36 @@ diff old new
          }) }
      }
      p2: (struct){
-@@ -328,7 +329,8 @@
+@@ -290,7 +291,7 @@
+         }
        }
-     }
-   }
+       o: (#struct){
+-        retry: (#struct){
++        retry: (struct){
+           output: (#struct){
+             reject: (string){ "ok" }
+           }
+@@ -320,15 +321,16 @@
+           resource: (string){ string }
+         }) }
+       o: (#struct){
+-        retry: (#struct){
+-          output: (#struct){
+-            reject: (string){ "ok" }
+-          }
+-        }
+-      }
+-    }
+-  }
 -  siblingInsertion: (struct){
++        retry: (struct){
++          output: (#struct){
++            reject: (string){ "ok" }
++          }
++        }
++      }
++    }
++  }
 +  siblingInsertion: (_|_){
 +    // [eval]
      t1: (struct){
@@ -905,7 +958,7 @@ diff old new
 -Conjuncts:    2525
 -Disjuncts:    1404
 +Unifications: 498
-+Conjuncts:    3349
++Conjuncts:    3595
 +Disjuncts:    196
 -- out/eval/stats --
 Leaks:  50

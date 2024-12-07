@@ -69,7 +69,7 @@ Allocs: 2135
 Retain: 0
 
 Unifications: 475
-Conjuncts:    4333
+Conjuncts:    4351
 Disjuncts:    790
 -- out/evalalpha --
 (struct){
@@ -153,7 +153,7 @@ diff old new
 -Conjuncts:    2480117
 -Disjuncts:    1064333
 +Unifications: 475
-+Conjuncts:    4333
++Conjuncts:    4351
 +Disjuncts:    790
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new

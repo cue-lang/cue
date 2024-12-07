@@ -140,9 +140,10 @@ func OpenNodeGraph(title, path, code, out, graph string) {
 // and all its dependencies that have not completed processing.
 // DO NOT DELETE: this is used to insert during debugging of the evaluator
 // to inspect a node.
-func openDebugGraph(ctx *OpContext, v *Vertex, name string) {
+func openDebugGraph(ctx *OpContext, cc *closeContext, name string) {
+	v := cc.src
 	graph, _ := CreateMermaidGraph(ctx, v, true)
-	path := filepath.Join(".debug", "TestX", name)
+	path := filepath.Join(".debug", "TestX", name, fmt.Sprintf("%p", cc))
 	OpenNodeGraph(name, path, "in", "out", graph)
 }
 

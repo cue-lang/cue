@@ -557,7 +557,7 @@ func (c *closeContext) incDependent(ctx *OpContext, kind depKind, dependant *clo
 	debug = c.addDependent(ctx, kind, dependant)
 
 	if c.done {
-		openDebugGraph(ctx, c.src, "incDependent: already checked")
+		openDebugGraph(ctx, c, "incDependent: already checked")
 
 		panic(fmt.Sprintf("incDependent: already closed: %p", c))
 	}

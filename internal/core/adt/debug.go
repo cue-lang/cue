@@ -622,12 +622,7 @@ func (m *mermaidContext) pstr(cc *closeContext) string {
 
 	// Show the origin of the closeContext.
 	indentOnNewline(w, 3)
-	ptr = fmt.Sprintf("%p", cc.origin)
-	if cc.origin != nil {
-		ptr = ptr[len(ptr)-sigPtrLen:]
-	}
-	w.WriteString("R:")
-	w.WriteString(ptr)
+	fmt.Fprintf(w, "+%d", cc.depth)
 
 	w.WriteString(close)
 

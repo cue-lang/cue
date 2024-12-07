@@ -1843,7 +1843,8 @@ func (n *nodeContext) addVertexConjuncts(c Conjunct, arc *Vertex, inline bool) {
 	// in case an API does many calls to Unify.
 	x := c.Expr()
 	if !inline || arc.IsClosedStruct() || arc.IsClosedList() {
-		closeInfo = closeInfo.SpawnRef(arc, IsDef(x), x)
+		isDef, _ := IsDef(x)
+		closeInfo = closeInfo.SpawnRef(arc, isDef, x)
 	}
 
 	if arc.status == unprocessed && !inline {

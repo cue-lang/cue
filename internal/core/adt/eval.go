@@ -1942,6 +1942,9 @@ func (n *nodeContext) addValueConjunct(env *Environment, v Value, id CloseInfo) 
 
 	switch b := v.(type) {
 	case *Bottom:
+		if b == NoShareSentinel {
+			return
+		}
 		n.addBottom(b)
 		return
 	case *Builtin:

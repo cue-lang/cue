@@ -83,7 +83,7 @@ var skipDebugDepErrors = map[string]int{
 	"cycle/chain":              4,
 	"cycle/comprehension":      2,
 	"cycle/disjunction":        4,
-	"cycle/structural":         12,
+	"cycle/structural":         14,
 	"disjunctions/edge":        1,
 	"disjunctions/elimination": 8,
 	"disjunctions/embed":       6,

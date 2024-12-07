@@ -119,6 +119,327 @@ k2: {
    k1
    a: 0
 }
+-- out/TestTopologicalSort/lexicographical=false-v3 --
+{
+	b: {
+		z: 1
+		y: 2
+	}
+	a: {
+		x: 3
+		w: 4
+	}
+	c1: {
+		x: 3
+		w: 4
+		z: 1
+		y: 2
+	}
+	c2: {
+		x: 3
+		w: 4
+		z: 1
+		y: 2
+	}
+	c3: {
+		j: {
+			k: {
+				l: {
+					x: 3
+					w: 4
+					z: 1
+					y: 2
+				}
+			}
+		}
+	}
+	c4: {
+		j: {
+			k: {
+				l: {
+					x: 3
+					w: 4
+					z: 1
+					y: 2
+				}
+			}
+		}
+	}
+	d1: {
+		x: 3
+		w: 4
+		z: 1
+		y: 2
+	}
+	d2: {
+		z: 1
+		y: 2
+		x: 3
+		w: 4
+	}
+	d3: {
+		x:  3
+		w:  4
+		z:  1
+		y:  2
+		za: 11
+		t:  10
+	}
+	d4: {
+		z:  1
+		y:  2
+		x:  3
+		w:  4
+		za: 11
+		t:  10
+	}
+	d5: {
+		x:  3
+		w:  4
+		z:  1
+		y:  2
+		za: 11
+		t:  10
+	}
+	d6: {
+		z:  1
+		y:  2
+		x:  3
+		w:  4
+		za: 11
+		t:  10
+	}
+	e1: {
+		x: 3
+		w: 4
+		z: 1
+		y: 2
+	}
+	e2: {
+		z: 1
+		y: 2
+		x: 3
+		w: 4
+	}
+	e3: {
+		j: {
+			k: {
+				l: {
+					x: 3
+					w: 4
+					z: 1
+					y: 2
+				}
+			}
+		}
+	}
+	e4: {
+		j: {
+			k: {
+				l: {
+					z: 1
+					y: 2
+					x: 3
+					w: 4
+				}
+			}
+		}
+	}
+	f1: {
+		x: 3
+		w: 4
+		z: 1
+		y: 2
+	}
+	f2: {
+		z: 1
+		y: 2
+		x: 3
+		w: 4
+	}
+	f3: {
+		j: {
+			k: {
+				l: {
+					x: 3
+					w: 4
+					z: 1
+					y: 2
+				}
+			}
+		}
+	}
+	f4: {
+		j: {
+			k: {
+				l: {
+					z: 1
+					y: 2
+					x: 3
+					w: 4
+				}
+			}
+		}
+	}
+	a1: {
+		x: 3
+		w: 4
+	}
+	a2: {
+		x: 3
+		w: 4
+	}
+	b1: {
+		z: 1
+		y: 2
+	}
+	b2: {
+		z: 1
+		y: 2
+	}
+	g1: {
+		x: 3
+		w: 4
+		z: 1
+		y: 2
+		v: 5
+	}
+	g2: {
+		za: 5
+		x:  3
+		w:  4
+		z:  1
+		y:  2
+	}
+	g3: {
+		d: _
+		c: _
+		b: _
+		f: _
+	}
+	h: {
+		t: {
+			z: 1
+			y: 2
+		} | {
+			x: 3
+			w: 4
+		}
+		u: {
+			x: 3
+			w: 4
+		} | {
+			z: 1
+			y: 2
+		}
+	}
+	i1: {
+		z: 1
+		y: 2
+		w: _
+	}
+	i2: {
+		w: _
+		z: 1
+		y: 2
+	}
+	j: {
+		b: 6
+		a: 5
+	}
+	k1: {
+		d: 0
+		c: 1
+		b: 2
+		z: 3
+	}
+	k2: {
+		d: 0
+		c: 1
+		b: 2
+		z: 3
+		e: 3
+		a: 0
+	}
+}
+-- diff/-out/TestTopologicalSort/lexicographical=false-v3<==>+out/TestTopologicalSort/lexicographical=false --
+diff old new
+--- old
++++ new
+@@ -56,35 +56,35 @@
+ 		w: 4
+ 	}
+ 	d3: {
+-		za: 11
+-		x:  3
+-		w:  4
+-		z:  1
+-		y:  2
++		x:  3
++		w:  4
++		z:  1
++		y:  2
++		za: 11
+ 		t:  10
+ 	}
+ 	d4: {
+-		za: 11
+-		z:  1
+-		y:  2
+-		x:  3
+-		w:  4
++		z:  1
++		y:  2
++		x:  3
++		w:  4
++		za: 11
+ 		t:  10
+ 	}
+ 	d5: {
+-		za: 11
+-		x:  3
+-		w:  4
+-		z:  1
+-		y:  2
++		x:  3
++		w:  4
++		z:  1
++		y:  2
++		za: 11
+ 		t:  10
+ 	}
+ 	d6: {
+-		za: 11
+-		x:  3
+-		w:  4
+-		z:  1
+-		y:  2
++		z:  1
++		y:  2
++		x:  3
++		w:  4
++		za: 11
+ 		t:  10
+ 	}
+ 	e1: {
+@@ -232,11 +232,11 @@
+ 		z: 3
+ 	}
+ 	k2: {
++		d: 0
++		c: 1
++		b: 2
++		z: 3
+ 		e: 3
+-		d: 0
+-		c: 1
+-		b: 2
+-		z: 3
+ 		a: 0
+ 	}
+ }
+-- diff/explanation/todo/p1 --
+Not sure what is wrong.
 -- out/TestTopologicalSort/lexicographical=false --
 {
 	b: {

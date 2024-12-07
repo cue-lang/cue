@@ -422,7 +422,7 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 	n.arcMap = append(n.arcMap, key)
 
 	var mode closeNodeType
-	isDef := IsDef(c.Expr())
+	isDef, relDepth := IsDef(c.Expr())
 	// Also check arc.Label: definitions themselves do not have the FromDef
 	// and corresponding closeContexts to reflect their closedness. This means
 	// that if we are structure sharing, we may end up with a Vertex that is
@@ -437,6 +437,7 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 	if isDef || arc.Label.IsDef() {
 		mode = closeDef
 	}
+	depth := VertexDepth(arc) - relDepth
 
 	// TODO: or should we always insert the wrapper (for errors)?
 	ci, dc := closeInfo.spawnCloseContext(n.ctx, mode)
@@ -451,14 +452,10 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 		}
 	}
 
-	// TODO(perf): buffer or use stack.
-	var a []*closeContext
-	a = appendPrefix(a, closeInfo.cc)
-
 	// Use explicit index in case Conjuncts grows during iteration.
 	for i := 0; i < len(arc.Conjuncts); i++ {
 		c := arc.Conjuncts[i]
-		n.insertAndSkipConjuncts(a, c, closeInfo)
+		n.insertAndSkipConjuncts(c, closeInfo, depth)
 	}
 
 	if state := arc.getBareState(n.ctx); state != nil {
@@ -466,64 +463,46 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 	}
 }
 
-// appendPrefix records the closeContext from the root of the current node to
-// cc by walking up the parent chain and storing the results ancestor first.
-// This is used to split conjunct trees into a forest of little trees.
-func appendPrefix(a []*closeContext, cc *closeContext) []*closeContext {
-	if cc.parent != nil {
-		a = appendPrefix(a, cc.parent)
-	}
-	a = append(a, cc)
-	return a
-}
-
-// insertAndSkipConjuncts analyzes the conjunct tree represented by c and splits
-// it into branches from the point where it deviates from the conjunct branch
-// represented by skip.
+// insertAndSkipConjuncts cuts the conjunct tree at the given relative depth.
+// The CUE spec defines references to be closed if they cross definition
+// boundaries. The conjunct tree tracks the origin of conjuncts, for instance,
+// whether they originate from a definition or embedding. This allows these
+// properties to hold even if a conjunct was referred indirectly.
+//
+// However, references within a referred Vertex, even though their conjunct
+// tree reflects the full history, should exclude any of the tops of this
+// tree that were not "crossed".
 //
 // TODO(evalv3): Consider this example:
 //
 //	#A: {
-//		b: {} // error only reported here.
+//		b: {}
 //		c: b & {
-//			// error (g not allowed) not reported here, as it would be okay if b
-//			// were valid. Instead, it is reported at b only. This is conform
-//			// the spec.
 //			d: 1
 //		}
 //	}
 //	x: #A
 //	x: b: g: 1
 //
-// We could also report an error at g by tracing if a conjunct crosses a isDef
-// boundary between the root of c and the cc of the conjunct.
-// Not doing so might have an effect on the outcome of disjunctions. This may be
-// okay (ideally closedness is not modal), but something to consider. For now,
-// we should probably copy whatever v2 was doing.
-func (n *nodeContext) insertAndSkipConjuncts(skip []*closeContext, c Conjunct, id CloseInfo) {
+// Here, x.b is set to contain g. This is allowed within #A. The references
+// within #A do not cross a definition boundary, so this is allowed.
+//
+// The algorithm to detect this keeps track of the relative depth of references.
+// Whenever a references is resolved, all conjuncts that correspond to a given
+// depth above the depth of the referred node are skipped.
+//
+// Note that the relative depth of references can be applied to any node,
+// even if this reference was defined in another struct.
+func (n *nodeContext) insertAndSkipConjuncts(c Conjunct, id CloseInfo, depth int) {
 	if c.CloseInfo.cc == nil {
 		n.scheduleConjunct(c, id)
 		return
 	}
 
-	root := c.CloseInfo.cc.origin
-
-	// TODO(perf): closeContexts should be exact prefixes. So instead of
-	// searching the list, we could test them incrementally. This seems more
-	// robust for now as the data structure might slightly change and cause
-	// disalignment.
-	for _, s := range skip {
-		if root == s.origin {
-			switch x := c.Elem().(type) {
-			case *ConjunctGroup:
-				for _, c := range *x {
-					n.insertAndSkipConjuncts(skip, c, id)
-				}
-
-			default:
-				// TODO: do leaf conjuncts that match need different treatment
-				// from those that don't? Right now, we treat them the same.
-				n.scheduleConjunct(c, id)
+	if c.CloseInfo.cc.depth <= depth {
+		if x, ok := c.Elem().(*ConjunctGroup); ok {
+			for _, c := range *x {
+				n.insertAndSkipConjuncts(c, id, depth)
 			}
 			return
 		}

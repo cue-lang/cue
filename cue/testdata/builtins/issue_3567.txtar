@@ -1,0 +1,66 @@
+-- in.cue --
+import "strings"
+a: strings.Join( [ strings.Join(["1"]), "2" ], "\n")
+
+-- out/compile --
+--- in.cue
+{
+  a: 〈import;strings〉.Join([
+    〈import;strings〉.Join([
+      "1",
+    ]),
+    "2",
+  ], "\n")
+}
+-- out/eval/stats --
+Leaks:  1
+Freed:  5
+Reused: 1
+Allocs: 5
+Retain: 2
+
+Unifications: 6
+Conjuncts:    6
+Disjuncts:    7
+-- out/evalalpha --
+Errors:
+0: not enough arguments in call to strings.Join (have 1, want 2):
+    ./in.cue:2:20
+
+Result:
+(_|_){
+  // [eval]
+  a: (_|_){
+    // [eval] 0: not enough arguments in call to strings.Join (have 1, want 2):
+    //     ./in.cue:2:20
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,6 +1,12 @@
++Errors:
++0: not enough arguments in call to strings.Join (have 1, want 2):
++    ./in.cue:2:20
++
++Result:
+ (_|_){
+   // [eval]
+   a: (_|_){
+-    // [eval]
++    // [eval] 0: not enough arguments in call to strings.Join (have 1, want 2):
++    //     ./in.cue:2:20
+   }
+ }
+-- diff/explanation --
+The old evaluator does not correctly handle the nested nature of calls
+to strings.Join, and buries the error of the missing argument in the
+nested call. The new evaluator handles this properly.
+-- out/eval --
+(_|_){
+  // [eval]
+  a: (_|_){
+    // [eval]
+  }
+}

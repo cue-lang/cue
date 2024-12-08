@@ -15,7 +15,7 @@ stderr 'notAllowed: field not allowed'
 # But with evalv2, it's incorrectly allowed. i.e. the following cue export
 # command should fail (with the error message in the inverted stderr
 # expectation) but doesn't.
-env CUE_EXPERIMENT=
+env CUE_EXPERIMENT=evalv3=0
 exec cue export --with-context -l '_input:' -l 'filename' x.cue data.json
 ! stderr 'notAllowed: field not allowed'
 

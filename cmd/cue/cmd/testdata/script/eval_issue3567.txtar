@@ -1,0 +1,18 @@
+# https://cuelang.org/issue/3567
+#
+# With evalv3, we correctly get an error about the nested call to strings.Join
+# missing a second argument. With evalv2, the error is swallowed and we
+# incorrectly get a success exit code and confusingly zero output.
+
+# eval3
+env CUE_EXPERIMENT=evalv3
+! exec cue eval f1.cue
+stderr 'not enough arguments in call to strings.Join \(have 1, want 2\)'
+
+# evalv2
+env CUE_EXPERIMENT=evalv3=0
+exec cue eval f1.cue
+
+-- f1.cue --
+import "strings"
+a: strings.Join( [ strings.Join(["1"]), "2" ], "\n")

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd527610_62094970",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-12-08T05:44:10Z",
+      "side": 1,
+      "message": "TBH it\u0027s not totally clear to me whether this is an evaluator or cmd/cue-related bug, given the reliance on `-l` to trigger this. But still, it\u0027s more `cmd/cue` at this point than the evaluator, given the local of this test.",
+      "parentUuid": "e0555954_5105f834",
+      "revId": "a76eba99b3c672e749c3365effa3f80034141c51",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "297a31ce_e69e8bcb",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-12-07T22:36:42Z",
       "side": 1,
       "message": "surely this means \"Fixes #3616\" then?",
+      "revId": "a76eba99b3c672e749c3365effa3f80034141c51",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca61adc9_d821be90",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-12-08T05:44:10Z",
+      "side": 1,
+      "message": "Thanks. I\u0027d reworded this block for consistency with the comment and then got rather distracted when it came to tidying up the commit message and txtar comments, hence the dregs you\u0027ve had to comment on. Apologies!",
+      "parentUuid": "297a31ce_e69e8bcb",
       "revId": "a76eba99b3c672e749c3365effa3f80034141c51",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "18a9881f_43604ed6",
+        "filename": "cmd/cue/cmd/testdata/script/export_issue3616.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-12-08T05:44:10Z",
+      "side": 1,
+      "message": "Per previous comment, this was a sloppy remnant of a local refactor of a comment.",
+      "parentUuid": "c2f5b514_aa6f56b3",
+      "revId": "a76eba99b3c672e749c3365effa3f80034141c51",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "459a921c_1c03a888",
@@ -69,6 +123,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a84bc254_a4fd512c",
+        "filename": "cmd/cue/cmd/testdata/script/export_issue3616.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-12-08T05:44:10Z",
+      "side": 1,
+      "message": "Just a missing full stop.",
+      "parentUuid": "459a921c_1c03a888",
+      "revId": "a76eba99b3c672e749c3365effa3f80034141c51",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6153cb05_60de0aac",
@@ -82,6 +154,24 @@
       "writtenOn": "2024-12-07T22:36:42Z",
       "side": 1,
       "message": "I suppose this commented out line is related to the unfinished sentence above? why not do a negation of stderr output?",
+      "revId": "a76eba99b3c672e749c3365effa3f80034141c51",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c65a8380_984501c4",
+        "filename": "cmd/cue/cmd/testdata/script/export_issue3616.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-12-08T05:44:10Z",
+      "side": 1,
+      "message": "Good point. Done.",
+      "parentUuid": "6153cb05_60de0aac",
       "revId": "a76eba99b3c672e749c3365effa3f80034141c51",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

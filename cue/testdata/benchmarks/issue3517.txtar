@@ -1,0 +1,767 @@
+-- main.cue --
+package p
+
+#TimeSpan: {
+	start:    float
+	duration: float
+	end:      float
+
+	start:    end - duration
+	duration: end - start
+	end:      start + duration
+
+	start: <=end
+}
+
+#Task: {
+	action:   string
+	timeSpan: #TimeSpan
+}
+
+#TaskSet: {
+	action: string
+	#tasks: [string]: #Task
+	tasks: [for _, v in #tasks {v}]
+	tasks: [...#Task]
+	timeSpan?: #TimeSpan
+}
+
+#T1: #Task & {
+	action: "Task 1"
+	timeSpan: #TimeSpan & {
+		duration: 4.2
+	}
+}
+
+#T2: #Task & {
+	action: "Task 2"
+	timeSpan: #TimeSpan & {
+		duration: 120.0
+	}
+}
+
+ts: #TaskSet
+ts: this={
+	action: "Task 1 and Task 2"
+	#tasks: {
+		t1: #T1 & {
+			timeSpan: end: this.#tasks.t2.timeSpan.start
+		}
+		t2: #T2 & {
+			timeSpan: end: 119 // this.timeSpan.end
+		}
+	}
+	timeSpan: start: this.#tasks.t1.timeSpan.start
+}
+-- out/eval/stats --
+Leaks:  2
+Freed:  49
+Reused: 39
+Allocs: 12
+Retain: 608
+
+Unifications: 51
+Conjuncts:    801
+Disjuncts:    73
+-- out/evalalpha --
+Errors:
+ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
+    ./main.cue:6:12
+    ./main.cue:50:19
+
+Result:
+(_|_){
+  // [eval]
+  #TimeSpan: (#struct){
+    start: (_|_){
+      // [incomplete] #TimeSpan.start: non-concrete value end for bound <=:
+      //     ./main.cue:12:11
+      // #TimeSpan.start: non-concrete value float in operand to -:
+      //     ./main.cue:8:12
+      //     ./main.cue:6:12
+      //     ./main.cue:10:12
+      // #TimeSpan.duration: non-concrete value float in operand to -:
+      //     ./main.cue:9:12
+      //     ./main.cue:6:12
+      //     ./main.cue:10:12
+    }
+    duration: (_|_){
+      // [incomplete] #TimeSpan.start: non-concrete value end for bound <=:
+      //     ./main.cue:12:11
+      // #TimeSpan.duration: non-concrete value float in operand to -:
+      //     ./main.cue:9:12
+      //     ./main.cue:6:12
+      //     ./main.cue:10:12
+    }
+    end: (_|_){
+      // [incomplete] #TimeSpan.start: non-concrete value end for bound <=:
+      //     ./main.cue:12:11
+      // #TimeSpan.start: non-concrete value float in operand to -:
+      //     ./main.cue:8:12
+      //     ./main.cue:6:12
+      //     ./main.cue:10:12
+      // #TimeSpan.duration: non-concrete value float in operand to -:
+      //     ./main.cue:9:12
+      //     ./main.cue:6:12
+      //     ./main.cue:10:12
+    }
+  }
+  #Task: (#struct){
+    action: (string){ string }
+    timeSpan: ~(#TimeSpan)
+  }
+  #TaskSet: (#struct){
+    action: (string){ string }
+    #tasks: (#struct){
+    }
+    tasks: (#list){
+    }
+    timeSpan?: ~(#TimeSpan)
+  }
+  #T1: (#struct){
+    action: (string){ "Task 1" }
+    timeSpan: (#struct){
+      duration: (_|_){
+        // [incomplete] #T1.timeSpan.start: non-concrete value end for bound <=:
+        //     ./main.cue:12:11
+        // #T1.timeSpan.start: non-concrete value float in operand to -:
+        //     ./main.cue:8:12
+        //     ./main.cue:6:12
+        //     ./main.cue:10:12
+      }
+      start: (_|_){
+        // [incomplete] #T1.timeSpan.start: non-concrete value end for bound <=:
+        //     ./main.cue:12:11
+        // #T1.timeSpan.start: non-concrete value float in operand to -:
+        //     ./main.cue:8:12
+        //     ./main.cue:6:12
+        //     ./main.cue:10:12
+      }
+      end: (_|_){
+        // [incomplete] #T1.timeSpan.start: non-concrete value end for bound <=:
+        //     ./main.cue:12:11
+        // #T1.timeSpan.start: non-concrete value float in operand to -:
+        //     ./main.cue:8:12
+        //     ./main.cue:6:12
+        //     ./main.cue:10:12
+      }
+    }
+  }
+  #T2: (#struct){
+    action: (string){ "Task 2" }
+    timeSpan: (#struct){
+      duration: (_|_){
+        // [incomplete] #T2.timeSpan.start: non-concrete value end for bound <=:
+        //     ./main.cue:12:11
+        // #T2.timeSpan.start: non-concrete value float in operand to -:
+        //     ./main.cue:8:12
+        //     ./main.cue:6:12
+        //     ./main.cue:10:12
+      }
+      start: (_|_){
+        // [incomplete] #T2.timeSpan.start: non-concrete value end for bound <=:
+        //     ./main.cue:12:11
+        // #T2.timeSpan.start: non-concrete value float in operand to -:
+        //     ./main.cue:8:12
+        //     ./main.cue:6:12
+        //     ./main.cue:10:12
+      }
+      end: (_|_){
+        // [incomplete] #T2.timeSpan.start: non-concrete value end for bound <=:
+        //     ./main.cue:12:11
+        // #T2.timeSpan.start: non-concrete value float in operand to -:
+        //     ./main.cue:8:12
+        //     ./main.cue:6:12
+        //     ./main.cue:10:12
+      }
+    }
+  }
+  ts: (_|_){
+    // [eval]
+    action: (string){ "Task 1 and Task 2" }
+    #tasks: (_|_){
+      // [eval]
+      t1: (_|_){
+        // [eval]
+        timeSpan: (_|_){
+          // [eval]
+          end: (_|_){
+            // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
+            //     ./main.cue:6:12
+            //     ./main.cue:50:19
+          }
+          duration: (_|_){
+            // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
+            //     ./main.cue:6:12
+            //     ./main.cue:50:19
+          }
+          start: (_|_){
+            // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
+            //     ./main.cue:6:12
+            //     ./main.cue:50:19
+          }
+        }
+        action: (string){ "Task 1" }
+      }
+      t2: (_|_){
+        // [eval]
+        timeSpan: (_|_){
+          // [eval]
+          end: (_|_){
+            // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
+            //     ./main.cue:6:12
+            //     ./main.cue:50:19
+          }
+          duration: (_|_){
+            // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
+            //     ./main.cue:6:12
+            //     ./main.cue:50:19
+          }
+          start: (_|_){
+            // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
+            //     ./main.cue:6:12
+            //     ./main.cue:50:19
+          }
+        }
+        action: (string){ "Task 2" }
+      }
+    }
+    timeSpan: (_|_){
+      // [eval]
+      start: (_|_){
+        // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
+        //     ./main.cue:6:12
+        //     ./main.cue:50:19
+      }
+      duration: (_|_){
+        // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
+        //     ./main.cue:6:12
+        //     ./main.cue:50:19
+      }
+      end: (_|_){
+        // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
+        //     ./main.cue:6:12
+        //     ./main.cue:50:19
+      }
+    }
+    tasks: (_|_){
+      // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
+      //     ./main.cue:6:12
+      //     ./main.cue:50:19
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,6 @@
+ Errors:
+ ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
+     ./main.cue:6:12
+-    ./main.cue:17:12
+-    ./main.cue:35:6
+-    ./main.cue:49:7
+     ./main.cue:50:19
+ 
+ Result:
+@@ -11,32 +8,41 @@
+   // [eval]
+   #TimeSpan: (#struct){
+     start: (_|_){
+-      // [cycle] cycle error
++      // [incomplete] #TimeSpan.start: non-concrete value end for bound <=:
++      //     ./main.cue:12:11
++      // #TimeSpan.start: non-concrete value float in operand to -:
++      //     ./main.cue:8:12
++      //     ./main.cue:6:12
++      //     ./main.cue:10:12
++      // #TimeSpan.duration: non-concrete value float in operand to -:
++      //     ./main.cue:9:12
++      //     ./main.cue:6:12
++      //     ./main.cue:10:12
+     }
+     duration: (_|_){
+-      // [cycle] cycle error:
+-      //     ./main.cue:9:12
++      // [incomplete] #TimeSpan.start: non-concrete value end for bound <=:
++      //     ./main.cue:12:11
++      // #TimeSpan.duration: non-concrete value float in operand to -:
++      //     ./main.cue:9:12
++      //     ./main.cue:6:12
++      //     ./main.cue:10:12
+     }
+     end: (_|_){
+-      // [cycle] cycle error:
++      // [incomplete] #TimeSpan.start: non-concrete value end for bound <=:
++      //     ./main.cue:12:11
++      // #TimeSpan.start: non-concrete value float in operand to -:
++      //     ./main.cue:8:12
++      //     ./main.cue:6:12
++      //     ./main.cue:10:12
++      // #TimeSpan.duration: non-concrete value float in operand to -:
++      //     ./main.cue:9:12
++      //     ./main.cue:6:12
+       //     ./main.cue:10:12
+     }
+   }
+   #Task: (#struct){
+     action: (string){ string }
+-    timeSpan: (#struct){
+-      start: (_|_){
+-        // [cycle] cycle error
+-      }
+-      duration: (_|_){
+-        // [cycle] cycle error:
+-        //     ./main.cue:9:12
+-      }
+-      end: (_|_){
+-        // [cycle] cycle error:
+-        //     ./main.cue:10:12
+-      }
+-    }
++    timeSpan: ~(#TimeSpan)
+   }
+   #TaskSet: (#struct){
+     action: (string){ string }
+@@ -44,32 +50,34 @@
+     }
+     tasks: (#list){
+     }
+-    timeSpan?: (#struct){
+-      start: (_|_){
+-        // [cycle] cycle error
+-      }
+-      duration: (_|_){
+-        // [cycle] cycle error:
+-        //     ./main.cue:9:12
+-      }
+-      end: (_|_){
+-        // [cycle] cycle error:
+-        //     ./main.cue:10:12
+-      }
+-    }
++    timeSpan?: ~(#TimeSpan)
+   }
+   #T1: (#struct){
+     action: (string){ "Task 1" }
+     timeSpan: (#struct){
+-      start: (_|_){
+-        // [cycle] cycle error
+-      }
+-      duration: (_|_){
+-        // [cycle] cycle error:
+-        //     ./main.cue:9:12
+-      }
+-      end: (_|_){
+-        // [cycle] cycle error
++      duration: (_|_){
++        // [incomplete] #T1.timeSpan.start: non-concrete value end for bound <=:
++        //     ./main.cue:12:11
++        // #T1.timeSpan.start: non-concrete value float in operand to -:
++        //     ./main.cue:8:12
++        //     ./main.cue:6:12
++        //     ./main.cue:10:12
++      }
++      start: (_|_){
++        // [incomplete] #T1.timeSpan.start: non-concrete value end for bound <=:
++        //     ./main.cue:12:11
++        // #T1.timeSpan.start: non-concrete value float in operand to -:
++        //     ./main.cue:8:12
++        //     ./main.cue:6:12
++        //     ./main.cue:10:12
++      }
++      end: (_|_){
++        // [incomplete] #T1.timeSpan.start: non-concrete value end for bound <=:
++        //     ./main.cue:12:11
++        // #T1.timeSpan.start: non-concrete value float in operand to -:
++        //     ./main.cue:8:12
++        //     ./main.cue:6:12
++        //     ./main.cue:10:12
+       }
+     }
+   }
+@@ -76,15 +84,29 @@
+   #T2: (#struct){
+     action: (string){ "Task 2" }
+     timeSpan: (#struct){
+-      start: (_|_){
+-        // [cycle] cycle error
+-      }
+-      duration: (_|_){
+-        // [cycle] cycle error:
+-        //     ./main.cue:9:12
+-      }
+-      end: (_|_){
+-        // [cycle] cycle error
++      duration: (_|_){
++        // [incomplete] #T2.timeSpan.start: non-concrete value end for bound <=:
++        //     ./main.cue:12:11
++        // #T2.timeSpan.start: non-concrete value float in operand to -:
++        //     ./main.cue:8:12
++        //     ./main.cue:6:12
++        //     ./main.cue:10:12
++      }
++      start: (_|_){
++        // [incomplete] #T2.timeSpan.start: non-concrete value end for bound <=:
++        //     ./main.cue:12:11
++        // #T2.timeSpan.start: non-concrete value float in operand to -:
++        //     ./main.cue:8:12
++        //     ./main.cue:6:12
++        //     ./main.cue:10:12
++      }
++      end: (_|_){
++        // [incomplete] #T2.timeSpan.start: non-concrete value end for bound <=:
++        //     ./main.cue:12:11
++        // #T2.timeSpan.start: non-concrete value float in operand to -:
++        //     ./main.cue:8:12
++        //     ./main.cue:6:12
++        //     ./main.cue:10:12
+       }
+     }
+   }
+@@ -93,66 +115,73 @@
+     action: (string){ "Task 1 and Task 2" }
+     #tasks: (_|_){
+       // [eval]
+-      t1: (#struct){
++      t1: (_|_){
++        // [eval]
++        timeSpan: (_|_){
++          // [eval]
++          end: (_|_){
++            // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
++            //     ./main.cue:6:12
++            //     ./main.cue:50:19
++          }
++          duration: (_|_){
++            // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
++            //     ./main.cue:6:12
++            //     ./main.cue:50:19
++          }
++          start: (_|_){
++            // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
++            //     ./main.cue:6:12
++            //     ./main.cue:50:19
++          }
++        }
+         action: (string){ "Task 1" }
+-        timeSpan: (#struct){
+-          start: (float){ -5.2 }
+-          duration: (float){ 4.2 }
+-          end: (float){ -1.0 }
+-        }
+       }
+       t2: (_|_){
+         // [eval]
++        timeSpan: (_|_){
++          // [eval]
++          end: (_|_){
++            // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
++            //     ./main.cue:6:12
++            //     ./main.cue:50:19
++          }
++          duration: (_|_){
++            // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
++            //     ./main.cue:6:12
++            //     ./main.cue:50:19
++          }
++          start: (_|_){
++            // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
++            //     ./main.cue:6:12
++            //     ./main.cue:50:19
++          }
++        }
+         action: (string){ "Task 2" }
+-        timeSpan: (_|_){
+-          // [eval]
+-          start: (float){ -1.0 }
+-          duration: (float){ 120.0 }
+-          end: (_|_){
+-            // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
+-            //     ./main.cue:6:12
+-            //     ./main.cue:17:12
+-            //     ./main.cue:35:6
+-            //     ./main.cue:49:7
+-            //     ./main.cue:50:19
+-          }
+-        }
++      }
++    }
++    timeSpan: (_|_){
++      // [eval]
++      start: (_|_){
++        // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
++        //     ./main.cue:6:12
++        //     ./main.cue:50:19
++      }
++      duration: (_|_){
++        // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
++        //     ./main.cue:6:12
++        //     ./main.cue:50:19
++      }
++      end: (_|_){
++        // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
++        //     ./main.cue:6:12
++        //     ./main.cue:50:19
+       }
+     }
+     tasks: (_|_){
+       // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
+       //     ./main.cue:6:12
+-      //     ./main.cue:17:12
+-      //     ./main.cue:35:6
+-      //     ./main.cue:49:7
+       //     ./main.cue:50:19
+     }
+-    timeSpan: (_|_){
+-      // [eval]
+-      start: (_|_){
+-        // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
+-        //     ./main.cue:6:12
+-        //     ./main.cue:17:12
+-        //     ./main.cue:35:6
+-        //     ./main.cue:49:7
+-        //     ./main.cue:50:19
+-      }
+-      duration: (_|_){
+-        // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
+-        //     ./main.cue:6:12
+-        //     ./main.cue:17:12
+-        //     ./main.cue:35:6
+-        //     ./main.cue:49:7
+-        //     ./main.cue:50:19
+-      }
+-      end: (_|_){
+-        // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
+-        //     ./main.cue:6:12
+-        //     ./main.cue:17:12
+-        //     ./main.cue:35:6
+-        //     ./main.cue:49:7
+-        //     ./main.cue:50:19
+-      }
+-    }
+   }
+ }
+-- out/eval --
+Errors:
+ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
+    ./main.cue:6:12
+    ./main.cue:17:12
+    ./main.cue:35:6
+    ./main.cue:49:7
+    ./main.cue:50:19
+
+Result:
+(_|_){
+  // [eval]
+  #TimeSpan: (#struct){
+    start: (_|_){
+      // [cycle] cycle error
+    }
+    duration: (_|_){
+      // [cycle] cycle error:
+      //     ./main.cue:9:12
+    }
+    end: (_|_){
+      // [cycle] cycle error:
+      //     ./main.cue:10:12
+    }
+  }
+  #Task: (#struct){
+    action: (string){ string }
+    timeSpan: (#struct){
+      start: (_|_){
+        // [cycle] cycle error
+      }
+      duration: (_|_){
+        // [cycle] cycle error:
+        //     ./main.cue:9:12
+      }
+      end: (_|_){
+        // [cycle] cycle error:
+        //     ./main.cue:10:12
+      }
+    }
+  }
+  #TaskSet: (#struct){
+    action: (string){ string }
+    #tasks: (#struct){
+    }
+    tasks: (#list){
+    }
+    timeSpan?: (#struct){
+      start: (_|_){
+        // [cycle] cycle error
+      }
+      duration: (_|_){
+        // [cycle] cycle error:
+        //     ./main.cue:9:12
+      }
+      end: (_|_){
+        // [cycle] cycle error:
+        //     ./main.cue:10:12
+      }
+    }
+  }
+  #T1: (#struct){
+    action: (string){ "Task 1" }
+    timeSpan: (#struct){
+      start: (_|_){
+        // [cycle] cycle error
+      }
+      duration: (_|_){
+        // [cycle] cycle error:
+        //     ./main.cue:9:12
+      }
+      end: (_|_){
+        // [cycle] cycle error
+      }
+    }
+  }
+  #T2: (#struct){
+    action: (string){ "Task 2" }
+    timeSpan: (#struct){
+      start: (_|_){
+        // [cycle] cycle error
+      }
+      duration: (_|_){
+        // [cycle] cycle error:
+        //     ./main.cue:9:12
+      }
+      end: (_|_){
+        // [cycle] cycle error
+      }
+    }
+  }
+  ts: (_|_){
+    // [eval]
+    action: (string){ "Task 1 and Task 2" }
+    #tasks: (_|_){
+      // [eval]
+      t1: (#struct){
+        action: (string){ "Task 1" }
+        timeSpan: (#struct){
+          start: (float){ -5.2 }
+          duration: (float){ 4.2 }
+          end: (float){ -1.0 }
+        }
+      }
+      t2: (_|_){
+        // [eval]
+        action: (string){ "Task 2" }
+        timeSpan: (_|_){
+          // [eval]
+          start: (float){ -1.0 }
+          duration: (float){ 120.0 }
+          end: (_|_){
+            // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
+            //     ./main.cue:6:12
+            //     ./main.cue:17:12
+            //     ./main.cue:35:6
+            //     ./main.cue:49:7
+            //     ./main.cue:50:19
+          }
+        }
+      }
+    }
+    tasks: (_|_){
+      // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
+      //     ./main.cue:6:12
+      //     ./main.cue:17:12
+      //     ./main.cue:35:6
+      //     ./main.cue:49:7
+      //     ./main.cue:50:19
+    }
+    timeSpan: (_|_){
+      // [eval]
+      start: (_|_){
+        // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
+        //     ./main.cue:6:12
+        //     ./main.cue:17:12
+        //     ./main.cue:35:6
+        //     ./main.cue:49:7
+        //     ./main.cue:50:19
+      }
+      duration: (_|_){
+        // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
+        //     ./main.cue:6:12
+        //     ./main.cue:17:12
+        //     ./main.cue:35:6
+        //     ./main.cue:49:7
+        //     ./main.cue:50:19
+      }
+      end: (_|_){
+        // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
+        //     ./main.cue:6:12
+        //     ./main.cue:17:12
+        //     ./main.cue:35:6
+        //     ./main.cue:49:7
+        //     ./main.cue:50:19
+      }
+    }
+  }
+}
+-- out/compile --
+--- main.cue
+{
+  #TimeSpan: {
+    start: float
+    duration: float
+    end: float
+    start: (〈0;end〉 - 〈0;duration〉)
+    duration: (〈0;end〉 - 〈0;start〉)
+    end: (〈0;start〉 + 〈0;duration〉)
+    start: <=〈0;end〉
+  }
+  #Task: {
+    action: string
+    timeSpan: 〈1;#TimeSpan〉
+  }
+  #TaskSet: {
+    action: string
+    #tasks: {
+      [string]: 〈2;#Task〉
+    }
+    tasks: [
+      for _, v in 〈1;#tasks〉 {
+        〈1;v〉
+      },
+    ]
+    tasks: [
+      ...〈2;#Task〉,
+    ]
+    timeSpan?: 〈1;#TimeSpan〉
+  }
+  #T1: (〈0;#Task〉 & {
+    action: "Task 1"
+    timeSpan: (〈1;#TimeSpan〉 & {
+      duration: 4.2
+    })
+  })
+  #T2: (〈0;#Task〉 & {
+    action: "Task 2"
+    timeSpan: (〈1;#TimeSpan〉 & {
+      duration: 120.0
+    })
+  })
+  ts: 〈0;#TaskSet〉
+  ts: {
+    action: "Task 1 and Task 2"
+    #tasks: {
+      t1: (〈2;#T1〉 & {
+        timeSpan: {
+          end: 〈4〉.#tasks.t2.timeSpan.start
+        }
+      })
+      t2: (〈2;#T2〉 & {
+        timeSpan: {
+          end: 119
+        }
+      })
+    }
+    timeSpan: {
+      start: 〈2〉.#tasks.t1.timeSpan.start
+    }
+  }
+}

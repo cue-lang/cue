@@ -729,8 +729,9 @@ func runTask(t *task, mode runMode) {
 		} else {
 			t.state = taskFAILED
 		}
-		t.node.addBottom(t.err) // TODO: replace with something more principled.
-
+		// TODO: do not add both context and task errors. Do something more
+		// principled.
+		t.node.addBottom(t.err)
 		if t.id.cc != nil {
 			t.id.cc.decDependent(ctx, TASK, nil)
 		}

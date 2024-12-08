@@ -305,6 +305,18 @@ func Errors(err error) []Error {
 }
 
 func appendToList(a list, err Error) list {
+	if b, _ := err.(list); b != nil {
+		for _, e := range b {
+			a = appendToList(a, e)
+
+		}
+		return a
+	}
+	for _, e := range a {
+		if e == err {
+			return a
+		}
+	}
 	switch x := err.(type) {
 	case nil:
 		return a

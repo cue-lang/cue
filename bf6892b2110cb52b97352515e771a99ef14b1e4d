@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35a2ab86_9ace9a73",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-12-08T14:43:44Z",
+      "side": 1,
+      "message": "@mpvl@gmail.com - should this kind of test live elsewhere? It feels a bit over the top to have a `cmd/cue` test to lock in the behaviour of evalv2 (broken) vs evalv3 (working)",
+      "revId": "bf6892b2110cb52b97352515e771a99ef14b1e4d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -309,11 +309,19 @@ func appendToList(a list, err Error) list {
 	case nil:
 		return a
 	case list:
-		if a == nil {
+		if len(a) == 0 {
 			return x
 		}
-		return append(a, x...)
+		for _, e := range x {
+			a = appendToList(a, e)
+		}
+		return a
 	default:
+		for _, e := range a {
+			if e == err {
+				return a
+			}
+		}
 		return append(a, err)
 	}
 }

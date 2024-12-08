@@ -1771,20 +1771,32 @@ func (v Value) UnifyAccept(w Value, accept Value) Value {
 	}
 
 	n := &adt.Vertex{}
-	n.AddConjunct(adt.MakeRootConjunct(nil, v.v))
-	n.AddConjunct(adt.MakeRootConjunct(nil, w.v))
-
 	ctx := v.ctx()
-	n.Finalize(ctx)
 
-	n.Parent = v.v.Parent
-	n.Label = v.v.Label
+	cv := adt.MakeRootConjunct(nil, v.v)
+	cv.CloseInfo.FromEmbed = true
+	n.AddConjunct(cv)
+	cw := adt.MakeRootConjunct(nil, w.v)
+	cw.CloseInfo.FromEmbed = true
+	n.AddConjunct(cw)
 
-	if err := n.Err(ctx); err != nil {
-		return makeValue(v.idx, n, v.parent_)
-	}
-	if err := allowed(ctx, accept.v, n); err != nil {
-		return newErrValue(accept, err)
+	switch ctx.Version {
+	case internal.EvalV2:
+		n.Finalize(ctx)
+
+		n.Parent = v.v.Parent
+		n.Label = v.v.Label
+
+		if err := n.Err(ctx); err != nil {
+			return makeValue(v.idx, n, v.parent_)
+		}
+		if err := allowed(ctx, accept.v, n); err != nil {
+			return newErrValue(accept, err)
+		}
+
+	case internal.EvalV3:
+		n.AddConjunct(adt.MakeRootConjunct(nil, accept.v))
+		n.Finalize(ctx)
 	}
 
 	return makeValue(v.idx, n, v.parent_)

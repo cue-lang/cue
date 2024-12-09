@@ -62,6 +62,57 @@ simplifyExpr: {
 	e1: <(=~"foo")
 	e2: >(null)
 }
+-- binarystring.cue --
+simplifyBinary: strings: {
+  err1: p1: <"a" & >"b"
+  err1: p2: >"b" & <"a"
+
+  err2: p1: >"b" & <="a"
+  err2: p2: <="a" & >"b"
+
+  err3: p1: >="b" & <"b"
+  err3: p2: <"b" & >="b"
+  err3: p3: >"b" & <="b"
+  err3: p4: <="b" & >"b"
+
+  ok1: p1: >"a" & <"b"
+  ok1: p2: <"b" & >"a"
+
+  ok2: p1: >"a" & <="b"
+  ok2: p2: <="b" & >"a"
+  ok2: p3: >="a" & <"b"
+  ok2: p4: <"b" & >="a"
+
+  ok3: p1: >="b" & <="c"
+  ok3: p2: <="c" & >="b"
+
+  ok4: p1: >="b" & <="b"
+}
+simplifyBinary: byte: {
+  err1: p1: <'a' & >'b'
+  err1: p2: >'b' & <'a'
+
+  err2: p1: >'b' & <='a'
+  err2: p2: <='a' & >'b'
+
+  err3: p1: >='b' & <'b'
+  err3: p2: <'b' & >='b'
+  err3: p3: >'b' & <='b'
+  err3: p4: <='b' & >'b'
+
+  ok1: p1: >'a' & <'b'
+  ok1: p2: <'b' & >'a'
+
+  ok2: p1: >'a' & <='b'
+  ok2: p2: <='b' & >'a'
+  ok2: p3: >='a' & <'b'
+  ok2: p4: <'b' & >='a'
+
+  ok3: p1: >='b' & <='c'
+  ok3: p2: <='c' & >='b'
+
+  ok4: p1: >='b' & <='b'
+}
 -- binary.cue --
 simplifyBinary: float: {
   err1: p1: <1 & >2
@@ -109,17 +160,16 @@ simplifyBinary: integer: {
   ok3: p3: <3 & >=2
   ok3: p4: <=3 & >2
 }
-
 -- out/eval/stats --
 Leaks:  0
-Freed:  98
-Reused: 93
+Freed:  148
+Reused: 143
 Allocs: 5
 Retain: 1
 
-Unifications: 98
-Conjuncts:    230
-Disjuncts:    99
+Unifications: 148
+Conjuncts:    337
+Disjuncts:    149
 -- out/evalalpha --
 Errors:
 simplifyBinary.float.err1.p1: incompatible number bounds <1 and >2:
@@ -176,6 +226,54 @@ simplifyBinary.integer.err4.p1: incompatible integer bounds >1 and <2:
 simplifyBinary.integer.err4.p2: incompatible integer bounds >1 and <2:
     ./binary.cue:34:18
     ./binary.cue:34:13
+simplifyBinary.strings.err1.p1: incompatible string bounds <"a" and >"b":
+    ./binarystring.cue:2:20
+    ./binarystring.cue:2:13
+simplifyBinary.strings.err1.p2: incompatible string bounds <"a" and >"b":
+    ./binarystring.cue:3:20
+    ./binarystring.cue:3:13
+simplifyBinary.strings.err2.p1: incompatible string bounds <="a" and >"b":
+    ./binarystring.cue:5:20
+    ./binarystring.cue:5:13
+simplifyBinary.strings.err2.p2: incompatible string bounds <="a" and >"b":
+    ./binarystring.cue:6:21
+    ./binarystring.cue:6:13
+simplifyBinary.strings.err3.p1: incompatible string bounds <"b" and >="b":
+    ./binarystring.cue:8:21
+    ./binarystring.cue:8:13
+simplifyBinary.strings.err3.p2: incompatible string bounds <"b" and >="b":
+    ./binarystring.cue:9:20
+    ./binarystring.cue:9:13
+simplifyBinary.strings.err3.p3: incompatible string bounds <="b" and >"b":
+    ./binarystring.cue:10:20
+    ./binarystring.cue:10:13
+simplifyBinary.strings.err3.p4: incompatible string bounds <="b" and >"b":
+    ./binarystring.cue:11:21
+    ./binarystring.cue:11:13
+simplifyBinary.byte.err1.p1: incompatible bytes bounds <'a' and >'b':
+    ./binarystring.cue:27:20
+    ./binarystring.cue:27:13
+simplifyBinary.byte.err1.p2: incompatible bytes bounds <'a' and >'b':
+    ./binarystring.cue:28:20
+    ./binarystring.cue:28:13
+simplifyBinary.byte.err2.p1: incompatible bytes bounds <='a' and >'b':
+    ./binarystring.cue:30:20
+    ./binarystring.cue:30:13
+simplifyBinary.byte.err2.p2: incompatible bytes bounds <='a' and >'b':
+    ./binarystring.cue:31:21
+    ./binarystring.cue:31:13
+simplifyBinary.byte.err3.p1: incompatible bytes bounds <'b' and >='b':
+    ./binarystring.cue:33:21
+    ./binarystring.cue:33:13
+simplifyBinary.byte.err3.p2: incompatible bytes bounds <'b' and >='b':
+    ./binarystring.cue:34:20
+    ./binarystring.cue:34:13
+simplifyBinary.byte.err3.p3: incompatible bytes bounds <='b' and >'b':
+    ./binarystring.cue:35:20
+    ./binarystring.cue:35:13
+simplifyBinary.byte.err3.p4: incompatible bytes bounds <='b' and >'b':
+    ./binarystring.cue:36:21
+    ./binarystring.cue:36:13
 simplifyExpr.e2: cannot use null for bound >:
     ./in.cue:62:8
 
@@ -323,6 +421,144 @@ Result:
         p4: (int){ 3 }
       }
     }
+    strings: (_|_){
+      // [eval]
+      err1: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.strings.err1.p1: incompatible string bounds <"a" and >"b":
+          //     ./binarystring.cue:2:20
+          //     ./binarystring.cue:2:13
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.strings.err1.p2: incompatible string bounds <"a" and >"b":
+          //     ./binarystring.cue:3:20
+          //     ./binarystring.cue:3:13
+        }
+      }
+      err2: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.strings.err2.p1: incompatible string bounds <="a" and >"b":
+          //     ./binarystring.cue:5:20
+          //     ./binarystring.cue:5:13
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.strings.err2.p2: incompatible string bounds <="a" and >"b":
+          //     ./binarystring.cue:6:21
+          //     ./binarystring.cue:6:13
+        }
+      }
+      err3: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.strings.err3.p1: incompatible string bounds <"b" and >="b":
+          //     ./binarystring.cue:8:21
+          //     ./binarystring.cue:8:13
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.strings.err3.p2: incompatible string bounds <"b" and >="b":
+          //     ./binarystring.cue:9:20
+          //     ./binarystring.cue:9:13
+        }
+        p3: (_|_){
+          // [eval] simplifyBinary.strings.err3.p3: incompatible string bounds <="b" and >"b":
+          //     ./binarystring.cue:10:20
+          //     ./binarystring.cue:10:13
+        }
+        p4: (_|_){
+          // [eval] simplifyBinary.strings.err3.p4: incompatible string bounds <="b" and >"b":
+          //     ./binarystring.cue:11:21
+          //     ./binarystring.cue:11:13
+        }
+      }
+      ok1: (struct){
+        p1: (string){ &(>"a", <"b") }
+        p2: (string){ &(>"a", <"b") }
+      }
+      ok2: (struct){
+        p1: (string){ &(>"a", <="b") }
+        p2: (string){ &(>"a", <="b") }
+        p3: (string){ &(>="a", <"b") }
+        p4: (string){ &(>="a", <"b") }
+      }
+      ok3: (struct){
+        p1: (string){ &(>="b", <="c") }
+        p2: (string){ &(>="b", <="c") }
+      }
+      ok4: (struct){
+        p1: (string){ "b" }
+      }
+    }
+    byte: (_|_){
+      // [eval]
+      err1: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.byte.err1.p1: incompatible bytes bounds <'a' and >'b':
+          //     ./binarystring.cue:27:20
+          //     ./binarystring.cue:27:13
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.byte.err1.p2: incompatible bytes bounds <'a' and >'b':
+          //     ./binarystring.cue:28:20
+          //     ./binarystring.cue:28:13
+        }
+      }
+      err2: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.byte.err2.p1: incompatible bytes bounds <='a' and >'b':
+          //     ./binarystring.cue:30:20
+          //     ./binarystring.cue:30:13
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.byte.err2.p2: incompatible bytes bounds <='a' and >'b':
+          //     ./binarystring.cue:31:21
+          //     ./binarystring.cue:31:13
+        }
+      }
+      err3: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.byte.err3.p1: incompatible bytes bounds <'b' and >='b':
+          //     ./binarystring.cue:33:21
+          //     ./binarystring.cue:33:13
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.byte.err3.p2: incompatible bytes bounds <'b' and >='b':
+          //     ./binarystring.cue:34:20
+          //     ./binarystring.cue:34:13
+        }
+        p3: (_|_){
+          // [eval] simplifyBinary.byte.err3.p3: incompatible bytes bounds <='b' and >'b':
+          //     ./binarystring.cue:35:20
+          //     ./binarystring.cue:35:13
+        }
+        p4: (_|_){
+          // [eval] simplifyBinary.byte.err3.p4: incompatible bytes bounds <='b' and >'b':
+          //     ./binarystring.cue:36:21
+          //     ./binarystring.cue:36:13
+        }
+      }
+      ok1: (struct){
+        p1: (bytes){ &(>'a', <'b') }
+        p2: (bytes){ &(>'a', <'b') }
+      }
+      ok2: (struct){
+        p1: (bytes){ &(>'a', <='b') }
+        p2: (bytes){ &(>'a', <='b') }
+        p3: (bytes){ &(>='a', <'b') }
+        p4: (bytes){ &(>='a', <'b') }
+      }
+      ok3: (struct){
+        p1: (bytes){ &(>='b', <='c') }
+        p2: (bytes){ &(>='b', <='c') }
+      }
+      ok4: (struct){
+        p1: (bytes){ 'b' }
+      }
+    }
   }
   x0: (int){ 5 }
   x1: (int){ 30 }
@@ -419,8 +655,32 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,62 +1,58 @@
+@@ -1,110 +1,106 @@
  Errors:
+-simplifyBinary.byte.err1.p1: incompatible bytes bounds <'a' and >'b':
+-    ./binarystring.cue:27:13
+-    ./binarystring.cue:27:20
+-simplifyBinary.byte.err1.p2: incompatible bytes bounds <'a' and >'b':
+-    ./binarystring.cue:28:13
+-    ./binarystring.cue:28:20
+-simplifyBinary.byte.err2.p1: incompatible bytes bounds <='a' and >'b':
+-    ./binarystring.cue:30:13
+-    ./binarystring.cue:30:20
+-simplifyBinary.byte.err2.p2: incompatible bytes bounds <='a' and >'b':
+-    ./binarystring.cue:31:13
+-    ./binarystring.cue:31:21
+-simplifyBinary.byte.err3.p1: incompatible bytes bounds <'b' and >='b':
+-    ./binarystring.cue:33:13
+-    ./binarystring.cue:33:21
+-simplifyBinary.byte.err3.p2: incompatible bytes bounds <'b' and >='b':
+-    ./binarystring.cue:34:13
+-    ./binarystring.cue:34:20
+-simplifyBinary.byte.err3.p3: incompatible bytes bounds <='b' and >'b':
+-    ./binarystring.cue:35:13
+-    ./binarystring.cue:35:20
+-simplifyBinary.byte.err3.p4: incompatible bytes bounds <='b' and >'b':
+-    ./binarystring.cue:36:13
+-    ./binarystring.cue:36:21
  simplifyBinary.float.err1.p1: incompatible number bounds <1 and >2:
 -    ./binary.cue:2:13
      ./binary.cue:2:18
@@ -505,10 +765,66 @@ diff old new
 -    ./binary.cue:34:13
      ./binary.cue:34:18
 +    ./binary.cue:34:13
+ simplifyBinary.strings.err1.p1: incompatible string bounds <"a" and >"b":
+-    ./binarystring.cue:2:13
+     ./binarystring.cue:2:20
++    ./binarystring.cue:2:13
+ simplifyBinary.strings.err1.p2: incompatible string bounds <"a" and >"b":
+-    ./binarystring.cue:3:13
+     ./binarystring.cue:3:20
++    ./binarystring.cue:3:13
+ simplifyBinary.strings.err2.p1: incompatible string bounds <="a" and >"b":
+-    ./binarystring.cue:5:13
+     ./binarystring.cue:5:20
++    ./binarystring.cue:5:13
+ simplifyBinary.strings.err2.p2: incompatible string bounds <="a" and >"b":
+-    ./binarystring.cue:6:13
+     ./binarystring.cue:6:21
++    ./binarystring.cue:6:13
+ simplifyBinary.strings.err3.p1: incompatible string bounds <"b" and >="b":
+-    ./binarystring.cue:8:13
+     ./binarystring.cue:8:21
++    ./binarystring.cue:8:13
+ simplifyBinary.strings.err3.p2: incompatible string bounds <"b" and >="b":
+-    ./binarystring.cue:9:13
+     ./binarystring.cue:9:20
++    ./binarystring.cue:9:13
+ simplifyBinary.strings.err3.p3: incompatible string bounds <="b" and >"b":
+-    ./binarystring.cue:10:13
+     ./binarystring.cue:10:20
++    ./binarystring.cue:10:13
+ simplifyBinary.strings.err3.p4: incompatible string bounds <="b" and >"b":
+-    ./binarystring.cue:11:13
+     ./binarystring.cue:11:21
++    ./binarystring.cue:11:13
++simplifyBinary.byte.err1.p1: incompatible bytes bounds <'a' and >'b':
++    ./binarystring.cue:27:20
++    ./binarystring.cue:27:13
++simplifyBinary.byte.err1.p2: incompatible bytes bounds <'a' and >'b':
++    ./binarystring.cue:28:20
++    ./binarystring.cue:28:13
++simplifyBinary.byte.err2.p1: incompatible bytes bounds <='a' and >'b':
++    ./binarystring.cue:30:20
++    ./binarystring.cue:30:13
++simplifyBinary.byte.err2.p2: incompatible bytes bounds <='a' and >'b':
++    ./binarystring.cue:31:21
++    ./binarystring.cue:31:13
++simplifyBinary.byte.err3.p1: incompatible bytes bounds <'b' and >='b':
++    ./binarystring.cue:33:21
++    ./binarystring.cue:33:13
++simplifyBinary.byte.err3.p2: incompatible bytes bounds <'b' and >='b':
++    ./binarystring.cue:34:20
++    ./binarystring.cue:34:13
++simplifyBinary.byte.err3.p3: incompatible bytes bounds <='b' and >'b':
++    ./binarystring.cue:35:20
++    ./binarystring.cue:35:13
++simplifyBinary.byte.err3.p4: incompatible bytes bounds <='b' and >'b':
++    ./binarystring.cue:36:21
++    ./binarystring.cue:36:13
  simplifyExpr.e2: cannot use null for bound >:
      ./in.cue:62:8
  
-@@ -71,13 +67,13 @@
+@@ -119,13 +115,13 @@
          // [eval]
          p1: (_|_){
            // [eval] simplifyBinary.float.err1.p1: incompatible number bounds <1 and >2:
@@ -524,7 +840,7 @@ diff old new
          }
        }
        err2: (_|_){
-@@ -84,13 +80,13 @@
+@@ -132,13 +128,13 @@
          // [eval]
          p1: (_|_){
            // [eval] simplifyBinary.float.err2.p1: incompatible number bounds <=1 and >2:
@@ -540,7 +856,7 @@ diff old new
          }
        }
        err3: (_|_){
-@@ -97,23 +93,23 @@
+@@ -145,23 +141,23 @@
          // [eval]
          p1: (_|_){
            // [eval] simplifyBinary.float.err3.p1: incompatible number bounds <2 and >=2:
@@ -568,7 +884,7 @@ diff old new
          }
        }
        ok1: (struct){
-@@ -130,50 +126,50 @@
+@@ -178,50 +174,50 @@
        err1: (_|_){
          // [eval]
          p1: (_|_){
@@ -655,7 +971,7 @@ diff old new
          }
        }
        err4: (_|_){
-@@ -180,17 +176,13 @@
+@@ -228,17 +224,13 @@
          // [eval]
          p1: (_|_){
            // [eval] simplifyBinary.integer.err4.p1: incompatible integer bounds >1 and <2:
@@ -675,7 +991,7 @@ diff old new
          }
        }
        ok1: (struct){
-@@ -198,8 +190,8 @@
+@@ -246,8 +238,8 @@
          p2: (int){ &(>=2, <=3, int) }
        }
        ok2: (struct){
@@ -686,10 +1002,154 @@ diff old new
        }
        ok3: (struct){
          p1: (int){ 2 }
+@@ -262,13 +254,13 @@
+         // [eval]
+         p1: (_|_){
+           // [eval] simplifyBinary.strings.err1.p1: incompatible string bounds <"a" and >"b":
+-          //     ./binarystring.cue:2:13
+           //     ./binarystring.cue:2:20
++          //     ./binarystring.cue:2:13
+         }
+         p2: (_|_){
+           // [eval] simplifyBinary.strings.err1.p2: incompatible string bounds <"a" and >"b":
+-          //     ./binarystring.cue:3:13
+           //     ./binarystring.cue:3:20
++          //     ./binarystring.cue:3:13
+         }
+       }
+       err2: (_|_){
+@@ -275,13 +267,13 @@
+         // [eval]
+         p1: (_|_){
+           // [eval] simplifyBinary.strings.err2.p1: incompatible string bounds <="a" and >"b":
+-          //     ./binarystring.cue:5:13
+           //     ./binarystring.cue:5:20
++          //     ./binarystring.cue:5:13
+         }
+         p2: (_|_){
+           // [eval] simplifyBinary.strings.err2.p2: incompatible string bounds <="a" and >"b":
+-          //     ./binarystring.cue:6:13
+           //     ./binarystring.cue:6:21
++          //     ./binarystring.cue:6:13
+         }
+       }
+       err3: (_|_){
+@@ -288,23 +280,23 @@
+         // [eval]
+         p1: (_|_){
+           // [eval] simplifyBinary.strings.err3.p1: incompatible string bounds <"b" and >="b":
+-          //     ./binarystring.cue:8:13
+           //     ./binarystring.cue:8:21
++          //     ./binarystring.cue:8:13
+         }
+         p2: (_|_){
+           // [eval] simplifyBinary.strings.err3.p2: incompatible string bounds <"b" and >="b":
+-          //     ./binarystring.cue:9:13
+           //     ./binarystring.cue:9:20
++          //     ./binarystring.cue:9:13
+         }
+         p3: (_|_){
+           // [eval] simplifyBinary.strings.err3.p3: incompatible string bounds <="b" and >"b":
+-          //     ./binarystring.cue:10:13
+           //     ./binarystring.cue:10:20
++          //     ./binarystring.cue:10:13
+         }
+         p4: (_|_){
+           // [eval] simplifyBinary.strings.err3.p4: incompatible string bounds <="b" and >"b":
+-          //     ./binarystring.cue:11:13
+           //     ./binarystring.cue:11:21
++          //     ./binarystring.cue:11:13
+         }
+       }
+       ok1: (struct){
+@@ -331,13 +323,13 @@
+         // [eval]
+         p1: (_|_){
+           // [eval] simplifyBinary.byte.err1.p1: incompatible bytes bounds <'a' and >'b':
+-          //     ./binarystring.cue:27:13
+           //     ./binarystring.cue:27:20
++          //     ./binarystring.cue:27:13
+         }
+         p2: (_|_){
+           // [eval] simplifyBinary.byte.err1.p2: incompatible bytes bounds <'a' and >'b':
+-          //     ./binarystring.cue:28:13
+           //     ./binarystring.cue:28:20
++          //     ./binarystring.cue:28:13
+         }
+       }
+       err2: (_|_){
+@@ -344,13 +336,13 @@
+         // [eval]
+         p1: (_|_){
+           // [eval] simplifyBinary.byte.err2.p1: incompatible bytes bounds <='a' and >'b':
+-          //     ./binarystring.cue:30:13
+           //     ./binarystring.cue:30:20
++          //     ./binarystring.cue:30:13
+         }
+         p2: (_|_){
+           // [eval] simplifyBinary.byte.err2.p2: incompatible bytes bounds <='a' and >'b':
+-          //     ./binarystring.cue:31:13
+           //     ./binarystring.cue:31:21
++          //     ./binarystring.cue:31:13
+         }
+       }
+       err3: (_|_){
+@@ -357,23 +349,23 @@
+         // [eval]
+         p1: (_|_){
+           // [eval] simplifyBinary.byte.err3.p1: incompatible bytes bounds <'b' and >='b':
+-          //     ./binarystring.cue:33:13
+           //     ./binarystring.cue:33:21
++          //     ./binarystring.cue:33:13
+         }
+         p2: (_|_){
+           // [eval] simplifyBinary.byte.err3.p2: incompatible bytes bounds <'b' and >='b':
+-          //     ./binarystring.cue:34:13
+           //     ./binarystring.cue:34:20
++          //     ./binarystring.cue:34:13
+         }
+         p3: (_|_){
+           // [eval] simplifyBinary.byte.err3.p3: incompatible bytes bounds <='b' and >'b':
+-          //     ./binarystring.cue:35:13
+           //     ./binarystring.cue:35:20
++          //     ./binarystring.cue:35:13
+         }
+         p4: (_|_){
+           // [eval] simplifyBinary.byte.err3.p4: incompatible bytes bounds <='b' and >'b':
+-          //     ./binarystring.cue:36:13
+           //     ./binarystring.cue:36:21
++          //     ./binarystring.cue:36:13
+         }
+       }
+       ok1: (struct){
 -- diff/explanation --
 simplifyBinary.integer.ok2.*: v3 indicates correct type.
 -- out/eval --
 Errors:
+simplifyBinary.byte.err1.p1: incompatible bytes bounds <'a' and >'b':
+    ./binarystring.cue:27:13
+    ./binarystring.cue:27:20
+simplifyBinary.byte.err1.p2: incompatible bytes bounds <'a' and >'b':
+    ./binarystring.cue:28:13
+    ./binarystring.cue:28:20
+simplifyBinary.byte.err2.p1: incompatible bytes bounds <='a' and >'b':
+    ./binarystring.cue:30:13
+    ./binarystring.cue:30:20
+simplifyBinary.byte.err2.p2: incompatible bytes bounds <='a' and >'b':
+    ./binarystring.cue:31:13
+    ./binarystring.cue:31:21
+simplifyBinary.byte.err3.p1: incompatible bytes bounds <'b' and >='b':
+    ./binarystring.cue:33:13
+    ./binarystring.cue:33:21
+simplifyBinary.byte.err3.p2: incompatible bytes bounds <'b' and >='b':
+    ./binarystring.cue:34:13
+    ./binarystring.cue:34:20
+simplifyBinary.byte.err3.p3: incompatible bytes bounds <='b' and >'b':
+    ./binarystring.cue:35:13
+    ./binarystring.cue:35:20
+simplifyBinary.byte.err3.p4: incompatible bytes bounds <='b' and >'b':
+    ./binarystring.cue:36:13
+    ./binarystring.cue:36:21
 simplifyBinary.float.err1.p1: incompatible number bounds <1 and >2:
     ./binary.cue:2:13
     ./binary.cue:2:18
@@ -748,6 +1208,30 @@ simplifyBinary.integer.err4.p2: incompatible integer bounds >1 and <2:
     ./binary.cue:21:13
     ./binary.cue:34:13
     ./binary.cue:34:18
+simplifyBinary.strings.err1.p1: incompatible string bounds <"a" and >"b":
+    ./binarystring.cue:2:13
+    ./binarystring.cue:2:20
+simplifyBinary.strings.err1.p2: incompatible string bounds <"a" and >"b":
+    ./binarystring.cue:3:13
+    ./binarystring.cue:3:20
+simplifyBinary.strings.err2.p1: incompatible string bounds <="a" and >"b":
+    ./binarystring.cue:5:13
+    ./binarystring.cue:5:20
+simplifyBinary.strings.err2.p2: incompatible string bounds <="a" and >"b":
+    ./binarystring.cue:6:13
+    ./binarystring.cue:6:21
+simplifyBinary.strings.err3.p1: incompatible string bounds <"b" and >="b":
+    ./binarystring.cue:8:13
+    ./binarystring.cue:8:21
+simplifyBinary.strings.err3.p2: incompatible string bounds <"b" and >="b":
+    ./binarystring.cue:9:13
+    ./binarystring.cue:9:20
+simplifyBinary.strings.err3.p3: incompatible string bounds <="b" and >"b":
+    ./binarystring.cue:10:13
+    ./binarystring.cue:10:20
+simplifyBinary.strings.err3.p4: incompatible string bounds <="b" and >"b":
+    ./binarystring.cue:11:13
+    ./binarystring.cue:11:21
 simplifyExpr.e2: cannot use null for bound >:
     ./in.cue:62:8
 
@@ -897,6 +1381,144 @@ Result:
         p2: (int){ 3 }
         p3: (int){ 2 }
         p4: (int){ 3 }
+      }
+    }
+    strings: (_|_){
+      // [eval]
+      err1: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.strings.err1.p1: incompatible string bounds <"a" and >"b":
+          //     ./binarystring.cue:2:13
+          //     ./binarystring.cue:2:20
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.strings.err1.p2: incompatible string bounds <"a" and >"b":
+          //     ./binarystring.cue:3:13
+          //     ./binarystring.cue:3:20
+        }
+      }
+      err2: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.strings.err2.p1: incompatible string bounds <="a" and >"b":
+          //     ./binarystring.cue:5:13
+          //     ./binarystring.cue:5:20
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.strings.err2.p2: incompatible string bounds <="a" and >"b":
+          //     ./binarystring.cue:6:13
+          //     ./binarystring.cue:6:21
+        }
+      }
+      err3: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.strings.err3.p1: incompatible string bounds <"b" and >="b":
+          //     ./binarystring.cue:8:13
+          //     ./binarystring.cue:8:21
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.strings.err3.p2: incompatible string bounds <"b" and >="b":
+          //     ./binarystring.cue:9:13
+          //     ./binarystring.cue:9:20
+        }
+        p3: (_|_){
+          // [eval] simplifyBinary.strings.err3.p3: incompatible string bounds <="b" and >"b":
+          //     ./binarystring.cue:10:13
+          //     ./binarystring.cue:10:20
+        }
+        p4: (_|_){
+          // [eval] simplifyBinary.strings.err3.p4: incompatible string bounds <="b" and >"b":
+          //     ./binarystring.cue:11:13
+          //     ./binarystring.cue:11:21
+        }
+      }
+      ok1: (struct){
+        p1: (string){ &(>"a", <"b") }
+        p2: (string){ &(>"a", <"b") }
+      }
+      ok2: (struct){
+        p1: (string){ &(>"a", <="b") }
+        p2: (string){ &(>"a", <="b") }
+        p3: (string){ &(>="a", <"b") }
+        p4: (string){ &(>="a", <"b") }
+      }
+      ok3: (struct){
+        p1: (string){ &(>="b", <="c") }
+        p2: (string){ &(>="b", <="c") }
+      }
+      ok4: (struct){
+        p1: (string){ "b" }
+      }
+    }
+    byte: (_|_){
+      // [eval]
+      err1: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.byte.err1.p1: incompatible bytes bounds <'a' and >'b':
+          //     ./binarystring.cue:27:13
+          //     ./binarystring.cue:27:20
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.byte.err1.p2: incompatible bytes bounds <'a' and >'b':
+          //     ./binarystring.cue:28:13
+          //     ./binarystring.cue:28:20
+        }
+      }
+      err2: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.byte.err2.p1: incompatible bytes bounds <='a' and >'b':
+          //     ./binarystring.cue:30:13
+          //     ./binarystring.cue:30:20
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.byte.err2.p2: incompatible bytes bounds <='a' and >'b':
+          //     ./binarystring.cue:31:13
+          //     ./binarystring.cue:31:21
+        }
+      }
+      err3: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.byte.err3.p1: incompatible bytes bounds <'b' and >='b':
+          //     ./binarystring.cue:33:13
+          //     ./binarystring.cue:33:21
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.byte.err3.p2: incompatible bytes bounds <'b' and >='b':
+          //     ./binarystring.cue:34:13
+          //     ./binarystring.cue:34:20
+        }
+        p3: (_|_){
+          // [eval] simplifyBinary.byte.err3.p3: incompatible bytes bounds <='b' and >'b':
+          //     ./binarystring.cue:35:13
+          //     ./binarystring.cue:35:20
+        }
+        p4: (_|_){
+          // [eval] simplifyBinary.byte.err3.p4: incompatible bytes bounds <='b' and >'b':
+          //     ./binarystring.cue:36:13
+          //     ./binarystring.cue:36:21
+        }
+      }
+      ok1: (struct){
+        p1: (bytes){ &(>'a', <'b') }
+        p2: (bytes){ &(>'a', <'b') }
+      }
+      ok2: (struct){
+        p1: (bytes){ &(>'a', <='b') }
+        p2: (bytes){ &(>'a', <='b') }
+        p3: (bytes){ &(>='a', <'b') }
+        p4: (bytes){ &(>='a', <'b') }
+      }
+      ok3: (struct){
+        p1: (bytes){ &(>='b', <='c') }
+        p2: (bytes){ &(>='b', <='c') }
+      }
+      ok4: (struct){
+        p1: (bytes){ 'b' }
       }
     }
   }
@@ -1092,6 +1714,119 @@ Result:
       }
       ok3: {
         p4: (<=3 & >2)
+      }
+    }
+  }
+}
+--- binarystring.cue
+{
+  simplifyBinary: {
+    strings: {
+      err1: {
+        p1: (<"a" & >"b")
+      }
+      err1: {
+        p2: (>"b" & <"a")
+      }
+      err2: {
+        p1: (>"b" & <="a")
+      }
+      err2: {
+        p2: (<="a" & >"b")
+      }
+      err3: {
+        p1: (>="b" & <"b")
+      }
+      err3: {
+        p2: (<"b" & >="b")
+      }
+      err3: {
+        p3: (>"b" & <="b")
+      }
+      err3: {
+        p4: (<="b" & >"b")
+      }
+      ok1: {
+        p1: (>"a" & <"b")
+      }
+      ok1: {
+        p2: (<"b" & >"a")
+      }
+      ok2: {
+        p1: (>"a" & <="b")
+      }
+      ok2: {
+        p2: (<="b" & >"a")
+      }
+      ok2: {
+        p3: (>="a" & <"b")
+      }
+      ok2: {
+        p4: (<"b" & >="a")
+      }
+      ok3: {
+        p1: (>="b" & <="c")
+      }
+      ok3: {
+        p2: (<="c" & >="b")
+      }
+      ok4: {
+        p1: (>="b" & <="b")
+      }
+    }
+  }
+  simplifyBinary: {
+    byte: {
+      err1: {
+        p1: (<'a' & >'b')
+      }
+      err1: {
+        p2: (>'b' & <'a')
+      }
+      err2: {
+        p1: (>'b' & <='a')
+      }
+      err2: {
+        p2: (<='a' & >'b')
+      }
+      err3: {
+        p1: (>='b' & <'b')
+      }
+      err3: {
+        p2: (<'b' & >='b')
+      }
+      err3: {
+        p3: (>'b' & <='b')
+      }
+      err3: {
+        p4: (<='b' & >'b')
+      }
+      ok1: {
+        p1: (>'a' & <'b')
+      }
+      ok1: {
+        p2: (<'b' & >'a')
+      }
+      ok2: {
+        p1: (>'a' & <='b')
+      }
+      ok2: {
+        p2: (<='b' & >'a')
+      }
+      ok2: {
+        p3: (>='a' & <'b')
+      }
+      ok2: {
+        p4: (<'b' & >='a')
+      }
+      ok3: {
+        p1: (>='b' & <='c')
+      }
+      ok3: {
+        p2: (<='c' & >='b')
+      }
+      ok4: {
+        p1: (>='b' & <='b')
       }
     }
   }

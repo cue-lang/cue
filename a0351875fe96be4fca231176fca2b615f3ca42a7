@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6bbe8a7d_ac756a47",
+        "filename": "cue/errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-12-09T10:58:39Z",
+      "side": 1,
+      "message": "Is this first block really needed? It\u0027s the same (and less efficient?) than line 323 I think. I can understand the deduping, but I think this first block is redundant.",
+      "revId": "a0351875fe96be4fca231176fca2b615f3ca42a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

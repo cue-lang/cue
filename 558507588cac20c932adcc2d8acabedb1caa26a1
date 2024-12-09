@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32f4783a_1e6cdcc6",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 424,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-12-09T09:32:44Z",
+      "side": 1,
+      "message": "Would it not be clearer to have `mode :\u003d closeRef` ?",
+      "revId": "558507588cac20c932adcc2d8acabedb1caa26a1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

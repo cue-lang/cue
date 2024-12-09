@@ -16,6 +16,24 @@
       "message": "This is slightly misleading. FromEmbed is (I believe) only used for v3, yet this code happens for both, which suggests that it has effect for both. Personally I think it would be clearer for these FromEmbed lines to be in the EvalV3 branch.",
       "revId": "ea89c5bf5b0e5efa6984a0cc1d559d6ee08828fe",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f323e48e_d76aaeee",
+        "filename": "cue/types.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1780,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-09T09:48:47Z",
+      "side": 1,
+      "message": "Funny, I had that initially. But I figured this makes it clearer what is common and what is separate. But I was very much on the fence about this. Changed it to be somewhere in the middle.",
+      "parentUuid": "98dadb97_2f186ccc",
+      "revId": "ea89c5bf5b0e5efa6984a0cc1d559d6ee08828fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

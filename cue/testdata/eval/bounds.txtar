@@ -62,24 +62,809 @@ simplifyExpr: {
 	e1: <(=~"foo")
 	e2: >(null)
 }
+-- binary.cue --
+simplifyBinary: float: {
+  err1: p1: <1 & >2
+  err1: p2: >2 & <1
+
+  err2: p1: >2 & <=1
+  err2: p2: <=1 & >2
+
+  err3: p1: >=2 & <2
+  err3: p2: <2 & >=2
+  err3: p3: >2 & <=2
+  err3: p4: <=2 & >2
+
+  ok1: p1: >1 & <2
+  ok1: p2: <2 & >1
+
+  ok2: p1: >=2 & <=2
+  ok2: p2: <=2 & >=2
+}
+
+simplifyBinary: integer: {
+  [_]: [_]: int
+  err1: p1: <1 & >2
+  err1: p2: >2 & <1
+
+  err2: p1: >2 & <=1
+  err2: p2: <=1 & >2
+
+  err3: p1: >=2 & <2
+  err3: p2: <2 & >=2
+  err3: p3: >2 & <=2
+  err3: p4: <=2 & >2
+
+  err4: p1: >1 & <2
+  err4: p2: <2 & >1
+
+  ok1: p1: >=2 & <=3
+  ok1: p2: <=3 & >=2
+
+  ok2: p1: >=2 & <=2
+  ok2: p2: <=2 & >=2
+
+  ok3: p1: >=2 & <3
+  ok3: p2: >2 & <=3
+  ok3: p3: <3 & >=2
+  ok3: p4: <=3 & >2
+}
+
 -- out/eval/stats --
 Leaks:  0
-Freed:  53
-Reused: 50
-Allocs: 3
+Freed:  98
+Reused: 93
+Allocs: 5
 Retain: 1
 
-Unifications: 53
-Conjuncts:    110
-Disjuncts:    54
--- out/eval --
+Unifications: 98
+Conjuncts:    230
+Disjuncts:    99
+-- out/evalalpha --
 Errors:
+simplifyBinary.float.err1.p1: incompatible bounds >2 and <1:
+    ./binary.cue:2:18
+    ./binary.cue:2:13
+simplifyBinary.float.err1.p2: incompatible bounds >2 and <1:
+    ./binary.cue:3:18
+    ./binary.cue:3:13
+simplifyBinary.float.err2.p1: incompatible bounds >2 and <=1:
+    ./binary.cue:5:18
+    ./binary.cue:5:13
+simplifyBinary.float.err2.p2: incompatible bounds >2 and <=1:
+    ./binary.cue:6:19
+    ./binary.cue:6:13
+simplifyBinary.float.err3.p1: incompatible bounds >=2 and <2:
+    ./binary.cue:8:19
+    ./binary.cue:8:13
+simplifyBinary.float.err3.p2: incompatible bounds >=2 and <2:
+    ./binary.cue:9:18
+    ./binary.cue:9:13
+simplifyBinary.float.err3.p3: incompatible bounds >2 and <=2:
+    ./binary.cue:10:18
+    ./binary.cue:10:13
+simplifyBinary.float.err3.p4: incompatible bounds >2 and <=2:
+    ./binary.cue:11:19
+    ./binary.cue:11:13
+simplifyBinary.integer.err1.p1: incompatible bounds >2 and <1:
+    ./binary.cue:22:18
+    ./binary.cue:22:13
+simplifyBinary.integer.err1.p2: incompatible bounds >2 and <1:
+    ./binary.cue:23:18
+    ./binary.cue:23:13
+simplifyBinary.integer.err2.p1: incompatible bounds >2 and <=1:
+    ./binary.cue:25:18
+    ./binary.cue:25:13
+simplifyBinary.integer.err2.p2: incompatible bounds >2 and <=1:
+    ./binary.cue:26:19
+    ./binary.cue:26:13
+simplifyBinary.integer.err3.p1: incompatible bounds >=2 and <2:
+    ./binary.cue:28:19
+    ./binary.cue:28:13
+simplifyBinary.integer.err3.p2: incompatible bounds >=2 and <2:
+    ./binary.cue:29:18
+    ./binary.cue:29:13
+simplifyBinary.integer.err3.p3: incompatible bounds >2 and <=2:
+    ./binary.cue:30:18
+    ./binary.cue:30:13
+simplifyBinary.integer.err3.p4: incompatible bounds >2 and <=2:
+    ./binary.cue:31:19
+    ./binary.cue:31:13
+simplifyBinary.integer.err4.p1: incompatible integer bounds >1 and <2:
+    ./binary.cue:33:18
+    ./binary.cue:33:13
+simplifyBinary.integer.err4.p2: incompatible integer bounds >1 and <2:
+    ./binary.cue:34:18
+    ./binary.cue:34:13
 simplifyExpr.e2: cannot use null for bound >:
     ./in.cue:62:8
 
 Result:
 (_|_){
   // [eval]
+  simplifyBinary: (_|_){
+    // [eval]
+    float: (_|_){
+      // [eval]
+      err1: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.float.err1.p1: incompatible bounds >2 and <1:
+          //     ./binary.cue:2:18
+          //     ./binary.cue:2:13
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.float.err1.p2: incompatible bounds >2 and <1:
+          //     ./binary.cue:3:18
+          //     ./binary.cue:3:13
+        }
+      }
+      err2: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.float.err2.p1: incompatible bounds >2 and <=1:
+          //     ./binary.cue:5:18
+          //     ./binary.cue:5:13
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.float.err2.p2: incompatible bounds >2 and <=1:
+          //     ./binary.cue:6:19
+          //     ./binary.cue:6:13
+        }
+      }
+      err3: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.float.err3.p1: incompatible bounds >=2 and <2:
+          //     ./binary.cue:8:19
+          //     ./binary.cue:8:13
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.float.err3.p2: incompatible bounds >=2 and <2:
+          //     ./binary.cue:9:18
+          //     ./binary.cue:9:13
+        }
+        p3: (_|_){
+          // [eval] simplifyBinary.float.err3.p3: incompatible bounds >2 and <=2:
+          //     ./binary.cue:10:18
+          //     ./binary.cue:10:13
+        }
+        p4: (_|_){
+          // [eval] simplifyBinary.float.err3.p4: incompatible bounds >2 and <=2:
+          //     ./binary.cue:11:19
+          //     ./binary.cue:11:13
+        }
+      }
+      ok1: (struct){
+        p1: (number){ &(>1, <2) }
+        p2: (number){ &(>1, <2) }
+      }
+      ok2: (struct){
+        p1: (number){ 2 }
+        p2: (number){ 2 }
+      }
+    }
+    integer: (_|_){
+      // [eval]
+      err1: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.integer.err1.p1: incompatible bounds >2 and <1:
+          //     ./binary.cue:22:18
+          //     ./binary.cue:22:13
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.integer.err1.p2: incompatible bounds >2 and <1:
+          //     ./binary.cue:23:18
+          //     ./binary.cue:23:13
+        }
+      }
+      err2: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.integer.err2.p1: incompatible bounds >2 and <=1:
+          //     ./binary.cue:25:18
+          //     ./binary.cue:25:13
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.integer.err2.p2: incompatible bounds >2 and <=1:
+          //     ./binary.cue:26:19
+          //     ./binary.cue:26:13
+        }
+      }
+      err3: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.integer.err3.p1: incompatible bounds >=2 and <2:
+          //     ./binary.cue:28:19
+          //     ./binary.cue:28:13
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.integer.err3.p2: incompatible bounds >=2 and <2:
+          //     ./binary.cue:29:18
+          //     ./binary.cue:29:13
+        }
+        p3: (_|_){
+          // [eval] simplifyBinary.integer.err3.p3: incompatible bounds >2 and <=2:
+          //     ./binary.cue:30:18
+          //     ./binary.cue:30:13
+        }
+        p4: (_|_){
+          // [eval] simplifyBinary.integer.err3.p4: incompatible bounds >2 and <=2:
+          //     ./binary.cue:31:19
+          //     ./binary.cue:31:13
+        }
+      }
+      err4: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.integer.err4.p1: incompatible integer bounds >1 and <2:
+          //     ./binary.cue:33:18
+          //     ./binary.cue:33:13
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.integer.err4.p2: incompatible integer bounds >1 and <2:
+          //     ./binary.cue:34:18
+          //     ./binary.cue:34:13
+        }
+      }
+      ok1: (struct){
+        p1: (int){ &(>=2, <=3, int) }
+        p2: (int){ &(>=2, <=3, int) }
+      }
+      ok2: (struct){
+        p1: (int){ 2 }
+        p2: (int){ 2 }
+      }
+      ok3: (struct){
+        p1: (int){ 2 }
+        p2: (int){ 3 }
+        p3: (int){ 2 }
+        p4: (int){ 3 }
+      }
+    }
+  }
+  x0: (int){ 5 }
+  x1: (int){ 30 }
+  b0: (number){ &(>0, <5) }
+  b1: (int){ &(>0, <5, int) }
+  b2: (int){ &(<5.5, int) }
+  b3: (number){ <=5 }
+  b4: (number){ >20 }
+  b5: (number){ >=21 }
+  b6: (int){ 6 }
+  simplifyExpr: (_|_){
+    // [eval]
+    less1: (number){ <3 }
+    less2: (number){ <3 }
+    less3: (number){ <3 }
+    less4: (number){ <=3 }
+    less5: (number){ number }
+    less6: (number){ number }
+    gtr1: (number){ >3 }
+    gtr2: (number){ >3 }
+    gtr3: (number){ >3 }
+    gtr4: (number){ >=3 }
+    gtr5: (number){ number }
+    gtr6: (number){ number }
+    lg1: (number){ number }
+    lg2: (number){ number }
+    lg3: (number){ number }
+    lg4: (number){ number }
+    gl1: (number){ number }
+    gl2: (number){ number }
+    gl3: (number){ number }
+    gl4: (number){ number }
+    ne1: (int){ 3 }
+    ne2: (number){ >=3 }
+    ne3: (number){ >3 }
+    ne4: (number){ <=3 }
+    ne5: (number){ <3 }
+    s: (string){ string }
+    n: (number){ number }
+    i: (int){ int }
+    f: (float){ float }
+    b: (bytes){ bytes }
+    basic1: (_|_){
+      // [incomplete] simplifyExpr.basic1: non-concrete value i for bound <:
+      //     ./in.cue:48:12
+    }
+    basic2: (_|_){
+      // [incomplete] simplifyExpr.basic2: non-concrete value n for bound >:
+      //     ./in.cue:49:12
+    }
+    basic3: (_|_){
+      // [incomplete] simplifyExpr.basic3: non-concrete value s for bound >=:
+      //     ./in.cue:50:13
+    }
+    basic4: (_|_){
+      // [incomplete] simplifyExpr.basic4: non-concrete value f for bound <=:
+      //     ./in.cue:51:13
+    }
+    basic5: (_|_){
+      // [incomplete] simplifyExpr.basic5: non-concrete value b for bound <=:
+      //     ./in.cue:52:13
+    }
+    bne1: (_|_){
+      // [incomplete] simplifyExpr.bne1: non-concrete value s for bound !=:
+      //     ./in.cue:55:11
+    }
+    bne2: (_|_){
+      // [incomplete] simplifyExpr.bne2: non-concrete value n for bound !=:
+      //     ./in.cue:56:11
+    }
+    bne3: (_|_){
+      // [incomplete] simplifyExpr.bne3: non-concrete value n for bound !=:
+      //     ./in.cue:57:11
+    }
+    bne4: (_|_){
+      // [incomplete] simplifyExpr.bne4: non-concrete value i for bound !=:
+      //     ./in.cue:58:11
+    }
+    bne5: (_|_){
+      // [incomplete] simplifyExpr.bne5: non-concrete value b for bound !=:
+      //     ./in.cue:59:11
+    }
+    e1: (_|_){
+      // [incomplete] simplifyExpr.e1: non-concrete value =~"foo" for bound <:
+      //     ./in.cue:61:8
+    }
+    e2: (_|_){
+      // [eval] simplifyExpr.e2: cannot use null for bound >:
+      //     ./in.cue:62:8
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,62 +1,58 @@
+ Errors:
+ simplifyBinary.float.err1.p1: incompatible bounds >2 and <1:
+-    ./binary.cue:2:13
+     ./binary.cue:2:18
++    ./binary.cue:2:13
+ simplifyBinary.float.err1.p2: incompatible bounds >2 and <1:
+-    ./binary.cue:3:13
+     ./binary.cue:3:18
++    ./binary.cue:3:13
+ simplifyBinary.float.err2.p1: incompatible bounds >2 and <=1:
+-    ./binary.cue:5:13
+     ./binary.cue:5:18
++    ./binary.cue:5:13
+ simplifyBinary.float.err2.p2: incompatible bounds >2 and <=1:
+-    ./binary.cue:6:13
+     ./binary.cue:6:19
++    ./binary.cue:6:13
+ simplifyBinary.float.err3.p1: incompatible bounds >=2 and <2:
+-    ./binary.cue:8:13
+     ./binary.cue:8:19
++    ./binary.cue:8:13
+ simplifyBinary.float.err3.p2: incompatible bounds >=2 and <2:
+-    ./binary.cue:9:13
+     ./binary.cue:9:18
++    ./binary.cue:9:13
+ simplifyBinary.float.err3.p3: incompatible bounds >2 and <=2:
+-    ./binary.cue:10:13
+     ./binary.cue:10:18
++    ./binary.cue:10:13
+ simplifyBinary.float.err3.p4: incompatible bounds >2 and <=2:
+-    ./binary.cue:11:13
+     ./binary.cue:11:19
++    ./binary.cue:11:13
+ simplifyBinary.integer.err1.p1: incompatible bounds >2 and <1:
+-    ./binary.cue:22:13
+     ./binary.cue:22:18
++    ./binary.cue:22:13
+ simplifyBinary.integer.err1.p2: incompatible bounds >2 and <1:
+-    ./binary.cue:23:13
+     ./binary.cue:23:18
++    ./binary.cue:23:13
+ simplifyBinary.integer.err2.p1: incompatible bounds >2 and <=1:
+-    ./binary.cue:25:13
+     ./binary.cue:25:18
++    ./binary.cue:25:13
+ simplifyBinary.integer.err2.p2: incompatible bounds >2 and <=1:
+-    ./binary.cue:26:13
+     ./binary.cue:26:19
++    ./binary.cue:26:13
+ simplifyBinary.integer.err3.p1: incompatible bounds >=2 and <2:
+-    ./binary.cue:28:13
+     ./binary.cue:28:19
++    ./binary.cue:28:13
+ simplifyBinary.integer.err3.p2: incompatible bounds >=2 and <2:
+-    ./binary.cue:29:13
+     ./binary.cue:29:18
++    ./binary.cue:29:13
+ simplifyBinary.integer.err3.p3: incompatible bounds >2 and <=2:
+-    ./binary.cue:30:13
+     ./binary.cue:30:18
++    ./binary.cue:30:13
+ simplifyBinary.integer.err3.p4: incompatible bounds >2 and <=2:
+-    ./binary.cue:31:13
+     ./binary.cue:31:19
++    ./binary.cue:31:13
+ simplifyBinary.integer.err4.p1: incompatible integer bounds >1 and <2:
+-    ./binary.cue:21:8
+-    ./binary.cue:21:13
+-    ./binary.cue:33:13
+     ./binary.cue:33:18
++    ./binary.cue:33:13
+ simplifyBinary.integer.err4.p2: incompatible integer bounds >1 and <2:
+-    ./binary.cue:21:8
+-    ./binary.cue:21:13
+-    ./binary.cue:34:13
+     ./binary.cue:34:18
++    ./binary.cue:34:13
+ simplifyExpr.e2: cannot use null for bound >:
+     ./in.cue:62:8
+ 
+@@ -71,13 +67,13 @@
+         // [eval]
+         p1: (_|_){
+           // [eval] simplifyBinary.float.err1.p1: incompatible bounds >2 and <1:
+-          //     ./binary.cue:2:13
+           //     ./binary.cue:2:18
++          //     ./binary.cue:2:13
+         }
+         p2: (_|_){
+           // [eval] simplifyBinary.float.err1.p2: incompatible bounds >2 and <1:
+-          //     ./binary.cue:3:13
+           //     ./binary.cue:3:18
++          //     ./binary.cue:3:13
+         }
+       }
+       err2: (_|_){
+@@ -84,13 +80,13 @@
+         // [eval]
+         p1: (_|_){
+           // [eval] simplifyBinary.float.err2.p1: incompatible bounds >2 and <=1:
+-          //     ./binary.cue:5:13
+           //     ./binary.cue:5:18
++          //     ./binary.cue:5:13
+         }
+         p2: (_|_){
+           // [eval] simplifyBinary.float.err2.p2: incompatible bounds >2 and <=1:
+-          //     ./binary.cue:6:13
+           //     ./binary.cue:6:19
++          //     ./binary.cue:6:13
+         }
+       }
+       err3: (_|_){
+@@ -97,23 +93,23 @@
+         // [eval]
+         p1: (_|_){
+           // [eval] simplifyBinary.float.err3.p1: incompatible bounds >=2 and <2:
+-          //     ./binary.cue:8:13
+           //     ./binary.cue:8:19
++          //     ./binary.cue:8:13
+         }
+         p2: (_|_){
+           // [eval] simplifyBinary.float.err3.p2: incompatible bounds >=2 and <2:
+-          //     ./binary.cue:9:13
+           //     ./binary.cue:9:18
++          //     ./binary.cue:9:13
+         }
+         p3: (_|_){
+           // [eval] simplifyBinary.float.err3.p3: incompatible bounds >2 and <=2:
+-          //     ./binary.cue:10:13
+           //     ./binary.cue:10:18
++          //     ./binary.cue:10:13
+         }
+         p4: (_|_){
+           // [eval] simplifyBinary.float.err3.p4: incompatible bounds >2 and <=2:
+-          //     ./binary.cue:11:13
+           //     ./binary.cue:11:19
++          //     ./binary.cue:11:13
+         }
+       }
+       ok1: (struct){
+@@ -131,13 +127,13 @@
+         // [eval]
+         p1: (_|_){
+           // [eval] simplifyBinary.integer.err1.p1: incompatible bounds >2 and <1:
+-          //     ./binary.cue:22:13
+           //     ./binary.cue:22:18
++          //     ./binary.cue:22:13
+         }
+         p2: (_|_){
+           // [eval] simplifyBinary.integer.err1.p2: incompatible bounds >2 and <1:
+-          //     ./binary.cue:23:13
+           //     ./binary.cue:23:18
++          //     ./binary.cue:23:13
+         }
+       }
+       err2: (_|_){
+@@ -144,13 +140,13 @@
+         // [eval]
+         p1: (_|_){
+           // [eval] simplifyBinary.integer.err2.p1: incompatible bounds >2 and <=1:
+-          //     ./binary.cue:25:13
+           //     ./binary.cue:25:18
++          //     ./binary.cue:25:13
+         }
+         p2: (_|_){
+           // [eval] simplifyBinary.integer.err2.p2: incompatible bounds >2 and <=1:
+-          //     ./binary.cue:26:13
+           //     ./binary.cue:26:19
++          //     ./binary.cue:26:13
+         }
+       }
+       err3: (_|_){
+@@ -157,23 +153,23 @@
+         // [eval]
+         p1: (_|_){
+           // [eval] simplifyBinary.integer.err3.p1: incompatible bounds >=2 and <2:
+-          //     ./binary.cue:28:13
+           //     ./binary.cue:28:19
++          //     ./binary.cue:28:13
+         }
+         p2: (_|_){
+           // [eval] simplifyBinary.integer.err3.p2: incompatible bounds >=2 and <2:
+-          //     ./binary.cue:29:13
+           //     ./binary.cue:29:18
++          //     ./binary.cue:29:13
+         }
+         p3: (_|_){
+           // [eval] simplifyBinary.integer.err3.p3: incompatible bounds >2 and <=2:
+-          //     ./binary.cue:30:13
+           //     ./binary.cue:30:18
++          //     ./binary.cue:30:13
+         }
+         p4: (_|_){
+           // [eval] simplifyBinary.integer.err3.p4: incompatible bounds >2 and <=2:
+-          //     ./binary.cue:31:13
+           //     ./binary.cue:31:19
++          //     ./binary.cue:31:13
+         }
+       }
+       err4: (_|_){
+@@ -180,17 +176,13 @@
+         // [eval]
+         p1: (_|_){
+           // [eval] simplifyBinary.integer.err4.p1: incompatible integer bounds >1 and <2:
+-          //     ./binary.cue:21:8
+-          //     ./binary.cue:21:13
+-          //     ./binary.cue:33:13
+           //     ./binary.cue:33:18
++          //     ./binary.cue:33:13
+         }
+         p2: (_|_){
+           // [eval] simplifyBinary.integer.err4.p2: incompatible integer bounds >1 and <2:
+-          //     ./binary.cue:21:8
+-          //     ./binary.cue:21:13
+-          //     ./binary.cue:34:13
+           //     ./binary.cue:34:18
++          //     ./binary.cue:34:13
+         }
+       }
+       ok1: (struct){
+@@ -198,8 +190,8 @@
+         p2: (int){ &(>=2, <=3, int) }
+       }
+       ok2: (struct){
+-        p1: (number){ 2 }
+-        p2: (number){ 2 }
++        p1: (int){ 2 }
++        p2: (int){ 2 }
+       }
+       ok3: (struct){
+         p1: (int){ 2 }
+-- diff/explanation --
+simplifyBinary.integer.ok2.*: v3 indicates correct type.
+-- out/eval --
+Errors:
+simplifyBinary.float.err1.p1: incompatible bounds >2 and <1:
+    ./binary.cue:2:13
+    ./binary.cue:2:18
+simplifyBinary.float.err1.p2: incompatible bounds >2 and <1:
+    ./binary.cue:3:13
+    ./binary.cue:3:18
+simplifyBinary.float.err2.p1: incompatible bounds >2 and <=1:
+    ./binary.cue:5:13
+    ./binary.cue:5:18
+simplifyBinary.float.err2.p2: incompatible bounds >2 and <=1:
+    ./binary.cue:6:13
+    ./binary.cue:6:19
+simplifyBinary.float.err3.p1: incompatible bounds >=2 and <2:
+    ./binary.cue:8:13
+    ./binary.cue:8:19
+simplifyBinary.float.err3.p2: incompatible bounds >=2 and <2:
+    ./binary.cue:9:13
+    ./binary.cue:9:18
+simplifyBinary.float.err3.p3: incompatible bounds >2 and <=2:
+    ./binary.cue:10:13
+    ./binary.cue:10:18
+simplifyBinary.float.err3.p4: incompatible bounds >2 and <=2:
+    ./binary.cue:11:13
+    ./binary.cue:11:19
+simplifyBinary.integer.err1.p1: incompatible bounds >2 and <1:
+    ./binary.cue:22:13
+    ./binary.cue:22:18
+simplifyBinary.integer.err1.p2: incompatible bounds >2 and <1:
+    ./binary.cue:23:13
+    ./binary.cue:23:18
+simplifyBinary.integer.err2.p1: incompatible bounds >2 and <=1:
+    ./binary.cue:25:13
+    ./binary.cue:25:18
+simplifyBinary.integer.err2.p2: incompatible bounds >2 and <=1:
+    ./binary.cue:26:13
+    ./binary.cue:26:19
+simplifyBinary.integer.err3.p1: incompatible bounds >=2 and <2:
+    ./binary.cue:28:13
+    ./binary.cue:28:19
+simplifyBinary.integer.err3.p2: incompatible bounds >=2 and <2:
+    ./binary.cue:29:13
+    ./binary.cue:29:18
+simplifyBinary.integer.err3.p3: incompatible bounds >2 and <=2:
+    ./binary.cue:30:13
+    ./binary.cue:30:18
+simplifyBinary.integer.err3.p4: incompatible bounds >2 and <=2:
+    ./binary.cue:31:13
+    ./binary.cue:31:19
+simplifyBinary.integer.err4.p1: incompatible integer bounds >1 and <2:
+    ./binary.cue:21:8
+    ./binary.cue:21:13
+    ./binary.cue:33:13
+    ./binary.cue:33:18
+simplifyBinary.integer.err4.p2: incompatible integer bounds >1 and <2:
+    ./binary.cue:21:8
+    ./binary.cue:21:13
+    ./binary.cue:34:13
+    ./binary.cue:34:18
+simplifyExpr.e2: cannot use null for bound >:
+    ./in.cue:62:8
+
+Result:
+(_|_){
+  // [eval]
+  simplifyBinary: (_|_){
+    // [eval]
+    float: (_|_){
+      // [eval]
+      err1: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.float.err1.p1: incompatible bounds >2 and <1:
+          //     ./binary.cue:2:13
+          //     ./binary.cue:2:18
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.float.err1.p2: incompatible bounds >2 and <1:
+          //     ./binary.cue:3:13
+          //     ./binary.cue:3:18
+        }
+      }
+      err2: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.float.err2.p1: incompatible bounds >2 and <=1:
+          //     ./binary.cue:5:13
+          //     ./binary.cue:5:18
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.float.err2.p2: incompatible bounds >2 and <=1:
+          //     ./binary.cue:6:13
+          //     ./binary.cue:6:19
+        }
+      }
+      err3: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.float.err3.p1: incompatible bounds >=2 and <2:
+          //     ./binary.cue:8:13
+          //     ./binary.cue:8:19
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.float.err3.p2: incompatible bounds >=2 and <2:
+          //     ./binary.cue:9:13
+          //     ./binary.cue:9:18
+        }
+        p3: (_|_){
+          // [eval] simplifyBinary.float.err3.p3: incompatible bounds >2 and <=2:
+          //     ./binary.cue:10:13
+          //     ./binary.cue:10:18
+        }
+        p4: (_|_){
+          // [eval] simplifyBinary.float.err3.p4: incompatible bounds >2 and <=2:
+          //     ./binary.cue:11:13
+          //     ./binary.cue:11:19
+        }
+      }
+      ok1: (struct){
+        p1: (number){ &(>1, <2) }
+        p2: (number){ &(>1, <2) }
+      }
+      ok2: (struct){
+        p1: (number){ 2 }
+        p2: (number){ 2 }
+      }
+    }
+    integer: (_|_){
+      // [eval]
+      err1: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.integer.err1.p1: incompatible bounds >2 and <1:
+          //     ./binary.cue:22:13
+          //     ./binary.cue:22:18
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.integer.err1.p2: incompatible bounds >2 and <1:
+          //     ./binary.cue:23:13
+          //     ./binary.cue:23:18
+        }
+      }
+      err2: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.integer.err2.p1: incompatible bounds >2 and <=1:
+          //     ./binary.cue:25:13
+          //     ./binary.cue:25:18
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.integer.err2.p2: incompatible bounds >2 and <=1:
+          //     ./binary.cue:26:13
+          //     ./binary.cue:26:19
+        }
+      }
+      err3: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.integer.err3.p1: incompatible bounds >=2 and <2:
+          //     ./binary.cue:28:13
+          //     ./binary.cue:28:19
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.integer.err3.p2: incompatible bounds >=2 and <2:
+          //     ./binary.cue:29:13
+          //     ./binary.cue:29:18
+        }
+        p3: (_|_){
+          // [eval] simplifyBinary.integer.err3.p3: incompatible bounds >2 and <=2:
+          //     ./binary.cue:30:13
+          //     ./binary.cue:30:18
+        }
+        p4: (_|_){
+          // [eval] simplifyBinary.integer.err3.p4: incompatible bounds >2 and <=2:
+          //     ./binary.cue:31:13
+          //     ./binary.cue:31:19
+        }
+      }
+      err4: (_|_){
+        // [eval]
+        p1: (_|_){
+          // [eval] simplifyBinary.integer.err4.p1: incompatible integer bounds >1 and <2:
+          //     ./binary.cue:21:8
+          //     ./binary.cue:21:13
+          //     ./binary.cue:33:13
+          //     ./binary.cue:33:18
+        }
+        p2: (_|_){
+          // [eval] simplifyBinary.integer.err4.p2: incompatible integer bounds >1 and <2:
+          //     ./binary.cue:21:8
+          //     ./binary.cue:21:13
+          //     ./binary.cue:34:13
+          //     ./binary.cue:34:18
+        }
+      }
+      ok1: (struct){
+        p1: (int){ &(>=2, <=3, int) }
+        p2: (int){ &(>=2, <=3, int) }
+      }
+      ok2: (struct){
+        p1: (number){ 2 }
+        p2: (number){ 2 }
+      }
+      ok3: (struct){
+        p1: (int){ 2 }
+        p2: (int){ 3 }
+        p3: (int){ 2 }
+        p4: (int){ 3 }
+      }
+    }
+  }
   x0: (int){ 5 }
   x1: (int){ 30 }
   b0: (number){ &(>0, <5) }
@@ -172,6 +957,110 @@ Result:
   }
 }
 -- out/compile --
+--- binary.cue
+{
+  simplifyBinary: {
+    float: {
+      err1: {
+        p1: (<1 & >2)
+      }
+      err1: {
+        p2: (>2 & <1)
+      }
+      err2: {
+        p1: (>2 & <=1)
+      }
+      err2: {
+        p2: (<=1 & >2)
+      }
+      err3: {
+        p1: (>=2 & <2)
+      }
+      err3: {
+        p2: (<2 & >=2)
+      }
+      err3: {
+        p3: (>2 & <=2)
+      }
+      err3: {
+        p4: (<=2 & >2)
+      }
+      ok1: {
+        p1: (>1 & <2)
+      }
+      ok1: {
+        p2: (<2 & >1)
+      }
+      ok2: {
+        p1: (>=2 & <=2)
+      }
+      ok2: {
+        p2: (<=2 & >=2)
+      }
+    }
+  }
+  simplifyBinary: {
+    integer: {
+      [_]: {
+        [_]: int
+      }
+      err1: {
+        p1: (<1 & >2)
+      }
+      err1: {
+        p2: (>2 & <1)
+      }
+      err2: {
+        p1: (>2 & <=1)
+      }
+      err2: {
+        p2: (<=1 & >2)
+      }
+      err3: {
+        p1: (>=2 & <2)
+      }
+      err3: {
+        p2: (<2 & >=2)
+      }
+      err3: {
+        p3: (>2 & <=2)
+      }
+      err3: {
+        p4: (<=2 & >2)
+      }
+      err4: {
+        p1: (>1 & <2)
+      }
+      err4: {
+        p2: (<2 & >1)
+      }
+      ok1: {
+        p1: (>=2 & <=3)
+      }
+      ok1: {
+        p2: (<=3 & >=2)
+      }
+      ok2: {
+        p1: (>=2 & <=2)
+      }
+      ok2: {
+        p2: (<=2 & >=2)
+      }
+      ok3: {
+        p1: (>=2 & <3)
+      }
+      ok3: {
+        p2: (>2 & <=3)
+      }
+      ok3: {
+        p3: (<3 & >=2)
+      }
+      ok3: {
+        p4: (<=3 & >2)
+      }
+    }
+  }
+}
 --- in.cue
 {
   x0: 5

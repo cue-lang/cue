@@ -1978,13 +1978,13 @@ func (n *nodeContext) addValueConjunct(env *Environment, v Value, id CloseInfo) 
 		switch x.Op {
 		case LessThanOp, LessEqualOp:
 			if y := n.upperBound; y != nil {
-				n.upperBound = nil
 				v := SimplifyBounds(ctx, n.kind, x, y)
 				if err := valueError(v); err != nil {
 					err.AddPosition(v)
 					err.AddPosition(n.upperBound)
 					err.AddClosedPositions(id)
 				}
+				n.upperBound = nil
 				n.addValueConjunct(env, v, id)
 				return
 			}
@@ -1992,13 +1992,13 @@ func (n *nodeContext) addValueConjunct(env *Environment, v Value, id CloseInfo) 
 
 		case GreaterThanOp, GreaterEqualOp:
 			if y := n.lowerBound; y != nil {
-				n.lowerBound = nil
 				v := SimplifyBounds(ctx, n.kind, x, y)
 				if err := valueError(v); err != nil {
 					err.AddPosition(v)
 					err.AddPosition(n.lowerBound)
 					err.AddClosedPositions(id)
 				}
+				n.lowerBound = nil
 				n.addValueConjunct(env, v, id)
 				return
 			}

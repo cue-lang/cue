@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e3b0710_b553f52d",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-12-09T09:58:08Z",
+      "side": 1,
+      "message": "This is troubling - delete or uncomment?",
+      "revId": "278e56fd4140503bb487635eb54d9531d6f5797d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c875759_977d1fa1",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-12-09T09:58:08Z",
+      "side": 1,
+      "message": "just curious: I\u0027m surprised you don\u0027t prefer `isDef \u003d isDef || r.Sel.IsDef()`",
+      "revId": "278e56fd4140503bb487635eb54d9531d6f5797d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ff4e786_52cf573a",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 488,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-12-09T09:58:08Z",
+      "side": 1,
+      "message": "I don\u0027t find this comment super clear. Line 485 would fail because the effect of line 484 is that `x.b` is `{}` and closed.\nIt\u0027s not clear to me what \"This is allowed within #A\" means given that the previous sentence suggests we\u0027re talking about `x`, not `#A`.\nAnd then the last sentence can be read to suggest that line 485 should not error.",
+      "revId": "278e56fd4140503bb487635eb54d9531d6f5797d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22d428e9_23f454e2",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-12-09T09:58:08Z",
+      "side": 1,
+      "message": "\"reference\" not \"references\"",
+      "revId": "278e56fd4140503bb487635eb54d9531d6f5797d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8feb5dd8_4fa4620a",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 492,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-12-09T09:58:08Z",
+      "side": 1,
+      "message": "very minor: I think \"less than\" might be clearer than \"above\"",
+      "revId": "278e56fd4140503bb487635eb54d9531d6f5797d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90253e23_cf1aa493",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 484,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2024-12-09T09:58:08Z",
+      "side": 1,
+      "message": "cache?",
+      "revId": "278e56fd4140503bb487635eb54d9531d6f5797d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

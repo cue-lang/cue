@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "371e9de1_1eb21e87",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-09T15:09:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5e3b0710_b553f52d",
+      "revId": "278e56fd4140503bb487635eb54d9531d6f5797d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5c875759_977d1fa1",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-12-09T09:58:08Z",
       "side": 1,
       "message": "just curious: I\u0027m surprised you don\u0027t prefer `isDef \u003d isDef || r.Sel.IsDef()`",
+      "revId": "278e56fd4140503bb487635eb54d9531d6f5797d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc64f3e9_c7a6cab7",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-09T15:09:57Z",
+      "side": 1,
+      "message": "I personally find it easier to read, even if it is larger.",
+      "parentUuid": "5c875759_977d1fa1",
       "revId": "278e56fd4140503bb487635eb54d9531d6f5797d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -54,6 +90,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5c6f7a1f_92664289",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 488,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-09T15:09:57Z",
+      "side": 1,
+      "message": "Indeed. Rewritten.",
+      "parentUuid": "5ff4e786_52cf573a",
+      "revId": "278e56fd4140503bb487635eb54d9531d6f5797d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "22d428e9_23f454e2",
         "filename": "internal/core/adt/conjunct.go",
         "patchSetId": 1
@@ -65,6 +119,24 @@
       "writtenOn": "2024-12-09T09:58:08Z",
       "side": 1,
       "message": "\"reference\" not \"references\"",
+      "revId": "278e56fd4140503bb487635eb54d9531d6f5797d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "da9342c7_a2707f60",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-09T15:09:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "22d428e9_23f454e2",
       "revId": "278e56fd4140503bb487635eb54d9531d6f5797d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "648e055b_d0be154f",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 492,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-09T15:09:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8feb5dd8_4fa4620a",
+      "revId": "278e56fd4140503bb487635eb54d9531d6f5797d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "90253e23_cf1aa493",
@@ -99,6 +189,24 @@
       "writtenOn": "2024-12-09T09:58:08Z",
       "side": 1,
       "message": "cache?",
+      "revId": "278e56fd4140503bb487635eb54d9531d6f5797d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6870b66_dee567d2",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 484,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-09T15:09:57Z",
+      "side": 1,
+      "message": "oops. :)",
+      "parentUuid": "90253e23_cf1aa493",
       "revId": "278e56fd4140503bb487635eb54d9531d6f5797d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

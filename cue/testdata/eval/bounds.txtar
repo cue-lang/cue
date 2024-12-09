@@ -122,52 +122,52 @@ Conjuncts:    230
 Disjuncts:    99
 -- out/evalalpha --
 Errors:
-simplifyBinary.float.err1.p1: incompatible bounds >2 and <1:
+simplifyBinary.float.err1.p1: incompatible number bounds <1 and >2:
     ./binary.cue:2:18
     ./binary.cue:2:13
-simplifyBinary.float.err1.p2: incompatible bounds >2 and <1:
+simplifyBinary.float.err1.p2: incompatible number bounds <1 and >2:
     ./binary.cue:3:18
     ./binary.cue:3:13
-simplifyBinary.float.err2.p1: incompatible bounds >2 and <=1:
+simplifyBinary.float.err2.p1: incompatible number bounds <=1 and >2:
     ./binary.cue:5:18
     ./binary.cue:5:13
-simplifyBinary.float.err2.p2: incompatible bounds >2 and <=1:
+simplifyBinary.float.err2.p2: incompatible number bounds <=1 and >2:
     ./binary.cue:6:19
     ./binary.cue:6:13
-simplifyBinary.float.err3.p1: incompatible bounds >=2 and <2:
+simplifyBinary.float.err3.p1: incompatible number bounds <2 and >=2:
     ./binary.cue:8:19
     ./binary.cue:8:13
-simplifyBinary.float.err3.p2: incompatible bounds >=2 and <2:
+simplifyBinary.float.err3.p2: incompatible number bounds <2 and >=2:
     ./binary.cue:9:18
     ./binary.cue:9:13
-simplifyBinary.float.err3.p3: incompatible bounds >2 and <=2:
+simplifyBinary.float.err3.p3: incompatible number bounds <=2 and >2:
     ./binary.cue:10:18
     ./binary.cue:10:13
-simplifyBinary.float.err3.p4: incompatible bounds >2 and <=2:
+simplifyBinary.float.err3.p4: incompatible number bounds <=2 and >2:
     ./binary.cue:11:19
     ./binary.cue:11:13
-simplifyBinary.integer.err1.p1: incompatible bounds >2 and <1:
+simplifyBinary.integer.err1.p1: incompatible integer bounds <1 and >2:
     ./binary.cue:22:18
     ./binary.cue:22:13
-simplifyBinary.integer.err1.p2: incompatible bounds >2 and <1:
+simplifyBinary.integer.err1.p2: incompatible integer bounds <1 and >2:
     ./binary.cue:23:18
     ./binary.cue:23:13
-simplifyBinary.integer.err2.p1: incompatible bounds >2 and <=1:
+simplifyBinary.integer.err2.p1: incompatible integer bounds <=1 and >2:
     ./binary.cue:25:18
     ./binary.cue:25:13
-simplifyBinary.integer.err2.p2: incompatible bounds >2 and <=1:
+simplifyBinary.integer.err2.p2: incompatible integer bounds <=1 and >2:
     ./binary.cue:26:19
     ./binary.cue:26:13
-simplifyBinary.integer.err3.p1: incompatible bounds >=2 and <2:
+simplifyBinary.integer.err3.p1: incompatible integer bounds <2 and >=2:
     ./binary.cue:28:19
     ./binary.cue:28:13
-simplifyBinary.integer.err3.p2: incompatible bounds >=2 and <2:
+simplifyBinary.integer.err3.p2: incompatible integer bounds <2 and >=2:
     ./binary.cue:29:18
     ./binary.cue:29:13
-simplifyBinary.integer.err3.p3: incompatible bounds >2 and <=2:
+simplifyBinary.integer.err3.p3: incompatible integer bounds <=2 and >2:
     ./binary.cue:30:18
     ./binary.cue:30:13
-simplifyBinary.integer.err3.p4: incompatible bounds >2 and <=2:
+simplifyBinary.integer.err3.p4: incompatible integer bounds <=2 and >2:
     ./binary.cue:31:19
     ./binary.cue:31:13
 simplifyBinary.integer.err4.p1: incompatible integer bounds >1 and <2:
@@ -189,12 +189,12 @@ Result:
       err1: (_|_){
         // [eval]
         p1: (_|_){
-          // [eval] simplifyBinary.float.err1.p1: incompatible bounds >2 and <1:
+          // [eval] simplifyBinary.float.err1.p1: incompatible number bounds <1 and >2:
           //     ./binary.cue:2:18
           //     ./binary.cue:2:13
         }
         p2: (_|_){
-          // [eval] simplifyBinary.float.err1.p2: incompatible bounds >2 and <1:
+          // [eval] simplifyBinary.float.err1.p2: incompatible number bounds <1 and >2:
           //     ./binary.cue:3:18
           //     ./binary.cue:3:13
         }
@@ -202,12 +202,12 @@ Result:
       err2: (_|_){
         // [eval]
         p1: (_|_){
-          // [eval] simplifyBinary.float.err2.p1: incompatible bounds >2 and <=1:
+          // [eval] simplifyBinary.float.err2.p1: incompatible number bounds <=1 and >2:
           //     ./binary.cue:5:18
           //     ./binary.cue:5:13
         }
         p2: (_|_){
-          // [eval] simplifyBinary.float.err2.p2: incompatible bounds >2 and <=1:
+          // [eval] simplifyBinary.float.err2.p2: incompatible number bounds <=1 and >2:
           //     ./binary.cue:6:19
           //     ./binary.cue:6:13
         }
@@ -215,22 +215,22 @@ Result:
       err3: (_|_){
         // [eval]
         p1: (_|_){
-          // [eval] simplifyBinary.float.err3.p1: incompatible bounds >=2 and <2:
+          // [eval] simplifyBinary.float.err3.p1: incompatible number bounds <2 and >=2:
           //     ./binary.cue:8:19
           //     ./binary.cue:8:13
         }
         p2: (_|_){
-          // [eval] simplifyBinary.float.err3.p2: incompatible bounds >=2 and <2:
+          // [eval] simplifyBinary.float.err3.p2: incompatible number bounds <2 and >=2:
           //     ./binary.cue:9:18
           //     ./binary.cue:9:13
         }
         p3: (_|_){
-          // [eval] simplifyBinary.float.err3.p3: incompatible bounds >2 and <=2:
+          // [eval] simplifyBinary.float.err3.p3: incompatible number bounds <=2 and >2:
           //     ./binary.cue:10:18
           //     ./binary.cue:10:13
         }
         p4: (_|_){
-          // [eval] simplifyBinary.float.err3.p4: incompatible bounds >2 and <=2:
+          // [eval] simplifyBinary.float.err3.p4: incompatible number bounds <=2 and >2:
           //     ./binary.cue:11:19
           //     ./binary.cue:11:13
         }
@@ -249,12 +249,12 @@ Result:
       err1: (_|_){
         // [eval]
         p1: (_|_){
-          // [eval] simplifyBinary.integer.err1.p1: incompatible bounds >2 and <1:
+          // [eval] simplifyBinary.integer.err1.p1: incompatible integer bounds <1 and >2:
           //     ./binary.cue:22:18
           //     ./binary.cue:22:13
         }
         p2: (_|_){
-          // [eval] simplifyBinary.integer.err1.p2: incompatible bounds >2 and <1:
+          // [eval] simplifyBinary.integer.err1.p2: incompatible integer bounds <1 and >2:
           //     ./binary.cue:23:18
           //     ./binary.cue:23:13
         }
@@ -262,12 +262,12 @@ Result:
       err2: (_|_){
         // [eval]
         p1: (_|_){
-          // [eval] simplifyBinary.integer.err2.p1: incompatible bounds >2 and <=1:
+          // [eval] simplifyBinary.integer.err2.p1: incompatible integer bounds <=1 and >2:
           //     ./binary.cue:25:18
           //     ./binary.cue:25:13
         }
         p2: (_|_){
-          // [eval] simplifyBinary.integer.err2.p2: incompatible bounds >2 and <=1:
+          // [eval] simplifyBinary.integer.err2.p2: incompatible integer bounds <=1 and >2:
           //     ./binary.cue:26:19
           //     ./binary.cue:26:13
         }
@@ -275,22 +275,22 @@ Result:
       err3: (_|_){
         // [eval]
         p1: (_|_){
-          // [eval] simplifyBinary.integer.err3.p1: incompatible bounds >=2 and <2:
+          // [eval] simplifyBinary.integer.err3.p1: incompatible integer bounds <2 and >=2:
           //     ./binary.cue:28:19
           //     ./binary.cue:28:13
         }
         p2: (_|_){
-          // [eval] simplifyBinary.integer.err3.p2: incompatible bounds >=2 and <2:
+          // [eval] simplifyBinary.integer.err3.p2: incompatible integer bounds <2 and >=2:
           //     ./binary.cue:29:18
           //     ./binary.cue:29:13
         }
         p3: (_|_){
-          // [eval] simplifyBinary.integer.err3.p3: incompatible bounds >2 and <=2:
+          // [eval] simplifyBinary.integer.err3.p3: incompatible integer bounds <=2 and >2:
           //     ./binary.cue:30:18
           //     ./binary.cue:30:13
         }
         p4: (_|_){
-          // [eval] simplifyBinary.integer.err3.p4: incompatible bounds >2 and <=2:
+          // [eval] simplifyBinary.integer.err3.p4: incompatible integer bounds <=2 and >2:
           //     ./binary.cue:31:19
           //     ./binary.cue:31:13
         }
@@ -421,68 +421,76 @@ diff old new
 +++ new
 @@ -1,62 +1,58 @@
  Errors:
- simplifyBinary.float.err1.p1: incompatible bounds >2 and <1:
+ simplifyBinary.float.err1.p1: incompatible number bounds <1 and >2:
 -    ./binary.cue:2:13
      ./binary.cue:2:18
 +    ./binary.cue:2:13
- simplifyBinary.float.err1.p2: incompatible bounds >2 and <1:
+ simplifyBinary.float.err1.p2: incompatible number bounds <1 and >2:
 -    ./binary.cue:3:13
      ./binary.cue:3:18
 +    ./binary.cue:3:13
- simplifyBinary.float.err2.p1: incompatible bounds >2 and <=1:
+ simplifyBinary.float.err2.p1: incompatible number bounds <=1 and >2:
 -    ./binary.cue:5:13
      ./binary.cue:5:18
 +    ./binary.cue:5:13
- simplifyBinary.float.err2.p2: incompatible bounds >2 and <=1:
+ simplifyBinary.float.err2.p2: incompatible number bounds <=1 and >2:
 -    ./binary.cue:6:13
      ./binary.cue:6:19
 +    ./binary.cue:6:13
- simplifyBinary.float.err3.p1: incompatible bounds >=2 and <2:
+ simplifyBinary.float.err3.p1: incompatible number bounds <2 and >=2:
 -    ./binary.cue:8:13
      ./binary.cue:8:19
 +    ./binary.cue:8:13
- simplifyBinary.float.err3.p2: incompatible bounds >=2 and <2:
+ simplifyBinary.float.err3.p2: incompatible number bounds <2 and >=2:
 -    ./binary.cue:9:13
      ./binary.cue:9:18
 +    ./binary.cue:9:13
- simplifyBinary.float.err3.p3: incompatible bounds >2 and <=2:
+ simplifyBinary.float.err3.p3: incompatible number bounds <=2 and >2:
 -    ./binary.cue:10:13
      ./binary.cue:10:18
 +    ./binary.cue:10:13
- simplifyBinary.float.err3.p4: incompatible bounds >2 and <=2:
+ simplifyBinary.float.err3.p4: incompatible number bounds <=2 and >2:
 -    ./binary.cue:11:13
      ./binary.cue:11:19
-+    ./binary.cue:11:13
- simplifyBinary.integer.err1.p1: incompatible bounds >2 and <1:
+-simplifyBinary.integer.err1.p1: incompatible number bounds <1 and >2:
 -    ./binary.cue:22:13
++    ./binary.cue:11:13
++simplifyBinary.integer.err1.p1: incompatible integer bounds <1 and >2:
      ./binary.cue:22:18
-+    ./binary.cue:22:13
- simplifyBinary.integer.err1.p2: incompatible bounds >2 and <1:
+-simplifyBinary.integer.err1.p2: incompatible number bounds <1 and >2:
 -    ./binary.cue:23:13
++    ./binary.cue:22:13
++simplifyBinary.integer.err1.p2: incompatible integer bounds <1 and >2:
      ./binary.cue:23:18
-+    ./binary.cue:23:13
- simplifyBinary.integer.err2.p1: incompatible bounds >2 and <=1:
+-simplifyBinary.integer.err2.p1: incompatible number bounds <=1 and >2:
 -    ./binary.cue:25:13
++    ./binary.cue:23:13
++simplifyBinary.integer.err2.p1: incompatible integer bounds <=1 and >2:
      ./binary.cue:25:18
-+    ./binary.cue:25:13
- simplifyBinary.integer.err2.p2: incompatible bounds >2 and <=1:
+-simplifyBinary.integer.err2.p2: incompatible number bounds <=1 and >2:
 -    ./binary.cue:26:13
++    ./binary.cue:25:13
++simplifyBinary.integer.err2.p2: incompatible integer bounds <=1 and >2:
      ./binary.cue:26:19
-+    ./binary.cue:26:13
- simplifyBinary.integer.err3.p1: incompatible bounds >=2 and <2:
+-simplifyBinary.integer.err3.p1: incompatible number bounds <2 and >=2:
 -    ./binary.cue:28:13
++    ./binary.cue:26:13
++simplifyBinary.integer.err3.p1: incompatible integer bounds <2 and >=2:
      ./binary.cue:28:19
-+    ./binary.cue:28:13
- simplifyBinary.integer.err3.p2: incompatible bounds >=2 and <2:
+-simplifyBinary.integer.err3.p2: incompatible number bounds <2 and >=2:
 -    ./binary.cue:29:13
++    ./binary.cue:28:13
++simplifyBinary.integer.err3.p2: incompatible integer bounds <2 and >=2:
      ./binary.cue:29:18
-+    ./binary.cue:29:13
- simplifyBinary.integer.err3.p3: incompatible bounds >2 and <=2:
+-simplifyBinary.integer.err3.p3: incompatible number bounds <=2 and >2:
 -    ./binary.cue:30:13
++    ./binary.cue:29:13
++simplifyBinary.integer.err3.p3: incompatible integer bounds <=2 and >2:
      ./binary.cue:30:18
-+    ./binary.cue:30:13
- simplifyBinary.integer.err3.p4: incompatible bounds >2 and <=2:
+-simplifyBinary.integer.err3.p4: incompatible number bounds <=2 and >2:
 -    ./binary.cue:31:13
++    ./binary.cue:30:13
++simplifyBinary.integer.err3.p4: incompatible integer bounds <=2 and >2:
      ./binary.cue:31:19
 +    ./binary.cue:31:13
  simplifyBinary.integer.err4.p1: incompatible integer bounds >1 and <2:
@@ -503,13 +511,13 @@ diff old new
 @@ -71,13 +67,13 @@
          // [eval]
          p1: (_|_){
-           // [eval] simplifyBinary.float.err1.p1: incompatible bounds >2 and <1:
+           // [eval] simplifyBinary.float.err1.p1: incompatible number bounds <1 and >2:
 -          //     ./binary.cue:2:13
            //     ./binary.cue:2:18
 +          //     ./binary.cue:2:13
          }
          p2: (_|_){
-           // [eval] simplifyBinary.float.err1.p2: incompatible bounds >2 and <1:
+           // [eval] simplifyBinary.float.err1.p2: incompatible number bounds <1 and >2:
 -          //     ./binary.cue:3:13
            //     ./binary.cue:3:18
 +          //     ./binary.cue:3:13
@@ -519,13 +527,13 @@ diff old new
 @@ -84,13 +80,13 @@
          // [eval]
          p1: (_|_){
-           // [eval] simplifyBinary.float.err2.p1: incompatible bounds >2 and <=1:
+           // [eval] simplifyBinary.float.err2.p1: incompatible number bounds <=1 and >2:
 -          //     ./binary.cue:5:13
            //     ./binary.cue:5:18
 +          //     ./binary.cue:5:13
          }
          p2: (_|_){
-           // [eval] simplifyBinary.float.err2.p2: incompatible bounds >2 and <=1:
+           // [eval] simplifyBinary.float.err2.p2: incompatible number bounds <=1 and >2:
 -          //     ./binary.cue:6:13
            //     ./binary.cue:6:19
 +          //     ./binary.cue:6:13
@@ -535,86 +543,113 @@ diff old new
 @@ -97,23 +93,23 @@
          // [eval]
          p1: (_|_){
-           // [eval] simplifyBinary.float.err3.p1: incompatible bounds >=2 and <2:
+           // [eval] simplifyBinary.float.err3.p1: incompatible number bounds <2 and >=2:
 -          //     ./binary.cue:8:13
            //     ./binary.cue:8:19
 +          //     ./binary.cue:8:13
          }
          p2: (_|_){
-           // [eval] simplifyBinary.float.err3.p2: incompatible bounds >=2 and <2:
+           // [eval] simplifyBinary.float.err3.p2: incompatible number bounds <2 and >=2:
 -          //     ./binary.cue:9:13
            //     ./binary.cue:9:18
 +          //     ./binary.cue:9:13
          }
          p3: (_|_){
-           // [eval] simplifyBinary.float.err3.p3: incompatible bounds >2 and <=2:
+           // [eval] simplifyBinary.float.err3.p3: incompatible number bounds <=2 and >2:
 -          //     ./binary.cue:10:13
            //     ./binary.cue:10:18
 +          //     ./binary.cue:10:13
          }
          p4: (_|_){
-           // [eval] simplifyBinary.float.err3.p4: incompatible bounds >2 and <=2:
+           // [eval] simplifyBinary.float.err3.p4: incompatible number bounds <=2 and >2:
 -          //     ./binary.cue:11:13
            //     ./binary.cue:11:19
 +          //     ./binary.cue:11:13
          }
        }
        ok1: (struct){
-@@ -131,13 +127,13 @@
+@@ -130,50 +126,50 @@
+       err1: (_|_){
          // [eval]
          p1: (_|_){
-           // [eval] simplifyBinary.integer.err1.p1: incompatible bounds >2 and <1:
+-          // [eval] simplifyBinary.integer.err1.p1: incompatible number bounds <1 and >2:
 -          //     ./binary.cue:22:13
++          // [eval] simplifyBinary.integer.err1.p1: incompatible integer bounds <1 and >2:
            //     ./binary.cue:22:18
-+          //     ./binary.cue:22:13
-         }
-         p2: (_|_){
-           // [eval] simplifyBinary.integer.err1.p2: incompatible bounds >2 and <1:
+-        }
+-        p2: (_|_){
+-          // [eval] simplifyBinary.integer.err1.p2: incompatible number bounds <1 and >2:
 -          //     ./binary.cue:23:13
++          //     ./binary.cue:22:13
++        }
++        p2: (_|_){
++          // [eval] simplifyBinary.integer.err1.p2: incompatible integer bounds <1 and >2:
            //     ./binary.cue:23:18
-+          //     ./binary.cue:23:13
-         }
-       }
-       err2: (_|_){
-@@ -144,13 +140,13 @@
-         // [eval]
-         p1: (_|_){
-           // [eval] simplifyBinary.integer.err2.p1: incompatible bounds >2 and <=1:
+-        }
+-      }
+-      err2: (_|_){
+-        // [eval]
+-        p1: (_|_){
+-          // [eval] simplifyBinary.integer.err2.p1: incompatible number bounds <=1 and >2:
 -          //     ./binary.cue:25:13
++          //     ./binary.cue:23:13
++        }
++      }
++      err2: (_|_){
++        // [eval]
++        p1: (_|_){
++          // [eval] simplifyBinary.integer.err2.p1: incompatible integer bounds <=1 and >2:
            //     ./binary.cue:25:18
-+          //     ./binary.cue:25:13
-         }
-         p2: (_|_){
-           // [eval] simplifyBinary.integer.err2.p2: incompatible bounds >2 and <=1:
+-        }
+-        p2: (_|_){
+-          // [eval] simplifyBinary.integer.err2.p2: incompatible number bounds <=1 and >2:
 -          //     ./binary.cue:26:13
++          //     ./binary.cue:25:13
++        }
++        p2: (_|_){
++          // [eval] simplifyBinary.integer.err2.p2: incompatible integer bounds <=1 and >2:
            //     ./binary.cue:26:19
-+          //     ./binary.cue:26:13
-         }
-       }
-       err3: (_|_){
-@@ -157,23 +153,23 @@
-         // [eval]
-         p1: (_|_){
-           // [eval] simplifyBinary.integer.err3.p1: incompatible bounds >=2 and <2:
+-        }
+-      }
+-      err3: (_|_){
+-        // [eval]
+-        p1: (_|_){
+-          // [eval] simplifyBinary.integer.err3.p1: incompatible number bounds <2 and >=2:
 -          //     ./binary.cue:28:13
++          //     ./binary.cue:26:13
++        }
++      }
++      err3: (_|_){
++        // [eval]
++        p1: (_|_){
++          // [eval] simplifyBinary.integer.err3.p1: incompatible integer bounds <2 and >=2:
            //     ./binary.cue:28:19
-+          //     ./binary.cue:28:13
-         }
-         p2: (_|_){
-           // [eval] simplifyBinary.integer.err3.p2: incompatible bounds >=2 and <2:
+-        }
+-        p2: (_|_){
+-          // [eval] simplifyBinary.integer.err3.p2: incompatible number bounds <2 and >=2:
 -          //     ./binary.cue:29:13
++          //     ./binary.cue:28:13
++        }
++        p2: (_|_){
++          // [eval] simplifyBinary.integer.err3.p2: incompatible integer bounds <2 and >=2:
            //     ./binary.cue:29:18
-+          //     ./binary.cue:29:13
-         }
-         p3: (_|_){
-           // [eval] simplifyBinary.integer.err3.p3: incompatible bounds >2 and <=2:
+-        }
+-        p3: (_|_){
+-          // [eval] simplifyBinary.integer.err3.p3: incompatible number bounds <=2 and >2:
 -          //     ./binary.cue:30:13
++          //     ./binary.cue:29:13
++        }
++        p3: (_|_){
++          // [eval] simplifyBinary.integer.err3.p3: incompatible integer bounds <=2 and >2:
            //     ./binary.cue:30:18
-+          //     ./binary.cue:30:13
-         }
-         p4: (_|_){
-           // [eval] simplifyBinary.integer.err3.p4: incompatible bounds >2 and <=2:
+-        }
+-        p4: (_|_){
+-          // [eval] simplifyBinary.integer.err3.p4: incompatible number bounds <=2 and >2:
 -          //     ./binary.cue:31:13
++          //     ./binary.cue:30:13
++        }
++        p4: (_|_){
++          // [eval] simplifyBinary.integer.err3.p4: incompatible integer bounds <=2 and >2:
            //     ./binary.cue:31:19
 +          //     ./binary.cue:31:13
          }
@@ -655,52 +690,52 @@ diff old new
 simplifyBinary.integer.ok2.*: v3 indicates correct type.
 -- out/eval --
 Errors:
-simplifyBinary.float.err1.p1: incompatible bounds >2 and <1:
+simplifyBinary.float.err1.p1: incompatible number bounds <1 and >2:
     ./binary.cue:2:13
     ./binary.cue:2:18
-simplifyBinary.float.err1.p2: incompatible bounds >2 and <1:
+simplifyBinary.float.err1.p2: incompatible number bounds <1 and >2:
     ./binary.cue:3:13
     ./binary.cue:3:18
-simplifyBinary.float.err2.p1: incompatible bounds >2 and <=1:
+simplifyBinary.float.err2.p1: incompatible number bounds <=1 and >2:
     ./binary.cue:5:13
     ./binary.cue:5:18
-simplifyBinary.float.err2.p2: incompatible bounds >2 and <=1:
+simplifyBinary.float.err2.p2: incompatible number bounds <=1 and >2:
     ./binary.cue:6:13
     ./binary.cue:6:19
-simplifyBinary.float.err3.p1: incompatible bounds >=2 and <2:
+simplifyBinary.float.err3.p1: incompatible number bounds <2 and >=2:
     ./binary.cue:8:13
     ./binary.cue:8:19
-simplifyBinary.float.err3.p2: incompatible bounds >=2 and <2:
+simplifyBinary.float.err3.p2: incompatible number bounds <2 and >=2:
     ./binary.cue:9:13
     ./binary.cue:9:18
-simplifyBinary.float.err3.p3: incompatible bounds >2 and <=2:
+simplifyBinary.float.err3.p3: incompatible number bounds <=2 and >2:
     ./binary.cue:10:13
     ./binary.cue:10:18
-simplifyBinary.float.err3.p4: incompatible bounds >2 and <=2:
+simplifyBinary.float.err3.p4: incompatible number bounds <=2 and >2:
     ./binary.cue:11:13
     ./binary.cue:11:19
-simplifyBinary.integer.err1.p1: incompatible bounds >2 and <1:
+simplifyBinary.integer.err1.p1: incompatible number bounds <1 and >2:
     ./binary.cue:22:13
     ./binary.cue:22:18
-simplifyBinary.integer.err1.p2: incompatible bounds >2 and <1:
+simplifyBinary.integer.err1.p2: incompatible number bounds <1 and >2:
     ./binary.cue:23:13
     ./binary.cue:23:18
-simplifyBinary.integer.err2.p1: incompatible bounds >2 and <=1:
+simplifyBinary.integer.err2.p1: incompatible number bounds <=1 and >2:
     ./binary.cue:25:13
     ./binary.cue:25:18
-simplifyBinary.integer.err2.p2: incompatible bounds >2 and <=1:
+simplifyBinary.integer.err2.p2: incompatible number bounds <=1 and >2:
     ./binary.cue:26:13
     ./binary.cue:26:19
-simplifyBinary.integer.err3.p1: incompatible bounds >=2 and <2:
+simplifyBinary.integer.err3.p1: incompatible number bounds <2 and >=2:
     ./binary.cue:28:13
     ./binary.cue:28:19
-simplifyBinary.integer.err3.p2: incompatible bounds >=2 and <2:
+simplifyBinary.integer.err3.p2: incompatible number bounds <2 and >=2:
     ./binary.cue:29:13
     ./binary.cue:29:18
-simplifyBinary.integer.err3.p3: incompatible bounds >2 and <=2:
+simplifyBinary.integer.err3.p3: incompatible number bounds <=2 and >2:
     ./binary.cue:30:13
     ./binary.cue:30:18
-simplifyBinary.integer.err3.p4: incompatible bounds >2 and <=2:
+simplifyBinary.integer.err3.p4: incompatible number bounds <=2 and >2:
     ./binary.cue:31:13
     ./binary.cue:31:19
 simplifyBinary.integer.err4.p1: incompatible integer bounds >1 and <2:
@@ -726,12 +761,12 @@ Result:
       err1: (_|_){
         // [eval]
         p1: (_|_){
-          // [eval] simplifyBinary.float.err1.p1: incompatible bounds >2 and <1:
+          // [eval] simplifyBinary.float.err1.p1: incompatible number bounds <1 and >2:
           //     ./binary.cue:2:13
           //     ./binary.cue:2:18
         }
         p2: (_|_){
-          // [eval] simplifyBinary.float.err1.p2: incompatible bounds >2 and <1:
+          // [eval] simplifyBinary.float.err1.p2: incompatible number bounds <1 and >2:
           //     ./binary.cue:3:13
           //     ./binary.cue:3:18
         }
@@ -739,12 +774,12 @@ Result:
       err2: (_|_){
         // [eval]
         p1: (_|_){
-          // [eval] simplifyBinary.float.err2.p1: incompatible bounds >2 and <=1:
+          // [eval] simplifyBinary.float.err2.p1: incompatible number bounds <=1 and >2:
           //     ./binary.cue:5:13
           //     ./binary.cue:5:18
         }
         p2: (_|_){
-          // [eval] simplifyBinary.float.err2.p2: incompatible bounds >2 and <=1:
+          // [eval] simplifyBinary.float.err2.p2: incompatible number bounds <=1 and >2:
           //     ./binary.cue:6:13
           //     ./binary.cue:6:19
         }
@@ -752,22 +787,22 @@ Result:
       err3: (_|_){
         // [eval]
         p1: (_|_){
-          // [eval] simplifyBinary.float.err3.p1: incompatible bounds >=2 and <2:
+          // [eval] simplifyBinary.float.err3.p1: incompatible number bounds <2 and >=2:
           //     ./binary.cue:8:13
           //     ./binary.cue:8:19
         }
         p2: (_|_){
-          // [eval] simplifyBinary.float.err3.p2: incompatible bounds >=2 and <2:
+          // [eval] simplifyBinary.float.err3.p2: incompatible number bounds <2 and >=2:
           //     ./binary.cue:9:13
           //     ./binary.cue:9:18
         }
         p3: (_|_){
-          // [eval] simplifyBinary.float.err3.p3: incompatible bounds >2 and <=2:
+          // [eval] simplifyBinary.float.err3.p3: incompatible number bounds <=2 and >2:
           //     ./binary.cue:10:13
           //     ./binary.cue:10:18
         }
         p4: (_|_){
-          // [eval] simplifyBinary.float.err3.p4: incompatible bounds >2 and <=2:
+          // [eval] simplifyBinary.float.err3.p4: incompatible number bounds <=2 and >2:
           //     ./binary.cue:11:13
           //     ./binary.cue:11:19
         }
@@ -786,12 +821,12 @@ Result:
       err1: (_|_){
         // [eval]
         p1: (_|_){
-          // [eval] simplifyBinary.integer.err1.p1: incompatible bounds >2 and <1:
+          // [eval] simplifyBinary.integer.err1.p1: incompatible number bounds <1 and >2:
           //     ./binary.cue:22:13
           //     ./binary.cue:22:18
         }
         p2: (_|_){
-          // [eval] simplifyBinary.integer.err1.p2: incompatible bounds >2 and <1:
+          // [eval] simplifyBinary.integer.err1.p2: incompatible number bounds <1 and >2:
           //     ./binary.cue:23:13
           //     ./binary.cue:23:18
         }
@@ -799,12 +834,12 @@ Result:
       err2: (_|_){
         // [eval]
         p1: (_|_){
-          // [eval] simplifyBinary.integer.err2.p1: incompatible bounds >2 and <=1:
+          // [eval] simplifyBinary.integer.err2.p1: incompatible number bounds <=1 and >2:
           //     ./binary.cue:25:13
           //     ./binary.cue:25:18
         }
         p2: (_|_){
-          // [eval] simplifyBinary.integer.err2.p2: incompatible bounds >2 and <=1:
+          // [eval] simplifyBinary.integer.err2.p2: incompatible number bounds <=1 and >2:
           //     ./binary.cue:26:13
           //     ./binary.cue:26:19
         }
@@ -812,22 +847,22 @@ Result:
       err3: (_|_){
         // [eval]
         p1: (_|_){
-          // [eval] simplifyBinary.integer.err3.p1: incompatible bounds >=2 and <2:
+          // [eval] simplifyBinary.integer.err3.p1: incompatible number bounds <2 and >=2:
           //     ./binary.cue:28:13
           //     ./binary.cue:28:19
         }
         p2: (_|_){
-          // [eval] simplifyBinary.integer.err3.p2: incompatible bounds >=2 and <2:
+          // [eval] simplifyBinary.integer.err3.p2: incompatible number bounds <2 and >=2:
           //     ./binary.cue:29:13
           //     ./binary.cue:29:18
         }
         p3: (_|_){
-          // [eval] simplifyBinary.integer.err3.p3: incompatible bounds >2 and <=2:
+          // [eval] simplifyBinary.integer.err3.p3: incompatible number bounds <=2 and >2:
           //     ./binary.cue:30:13
           //     ./binary.cue:30:18
         }
         p4: (_|_){
-          // [eval] simplifyBinary.integer.err3.p4: incompatible bounds >2 and <=2:
+          // [eval] simplifyBinary.integer.err3.p4: incompatible number bounds <=2 and >2:
           //     ./binary.cue:31:13
           //     ./binary.cue:31:19
         }

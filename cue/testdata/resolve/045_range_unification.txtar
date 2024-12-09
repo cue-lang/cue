@@ -160,13 +160,13 @@ a9: invalid value 6 (out of bound <=5):
 a10: invalid value 0 (out of bound >=1):
     ./in.cue:12:10
     ./in.cue:12:6
-b7: incompatible bounds >=6 and <=5:
+b7: incompatible bounds <=5 and >=6:
     ./in.cue:21:17
     ./in.cue:21:11
-b14: incompatible bounds >=6 and <=5:
+b14: incompatible bounds <=5 and >=6:
     ./in.cue:29:24
     ./in.cue:29:6
-n2: incompatible bounds >=1.1 and <=1.3:
+n2: incompatible bounds <=1.3 and >=1.1:
     ./in.cue:42:19
     ./in.cue:42:11
 
@@ -206,7 +206,7 @@ Result:
   b5: (number){ &(>=3, <=5) }
   b6: (number){ 5 }
   b7: (_|_){
-    // [eval] b7: incompatible bounds >=6 and <=5:
+    // [eval] b7: incompatible bounds <=5 and >=6:
     //     ./in.cue:21:17
     //     ./in.cue:21:11
   }
@@ -217,7 +217,7 @@ Result:
   b12: (number){ &(>=3, <=5) }
   b13: (number){ 5 }
   b14: (_|_){
-    // [eval] b14: incompatible bounds >=6 and <=5:
+    // [eval] b14: incompatible bounds <=5 and >=6:
     //     ./in.cue:29:24
     //     ./in.cue:29:6
   }
@@ -237,7 +237,7 @@ Result:
   s2: (string){ "ee" }
   n1: (number){ &(>=1, <=2) }
   n2: (_|_){
-    // [eval] n2: incompatible bounds >=1.1 and <=1.3:
+    // [eval] n2: incompatible bounds <=1.3 and >=1.1:
     //     ./in.cue:42:19
     //     ./in.cue:42:11
   }
@@ -251,10 +251,10 @@ diff old new
 +++ new
 @@ -1,19 +1,10 @@
  Errors:
--b14: incompatible bounds >=6 and <=5:
+-b14: incompatible bounds <=5 and >=6:
 -    ./in.cue:29:6
 -    ./in.cue:29:24
--b7: incompatible bounds >=6 and <=5:
+-b7: incompatible bounds <=5 and >=6:
 -    ./in.cue:21:11
 -    ./in.cue:21:17
  c3: conflicting values string and >=1 (mismatched types string and number):
@@ -264,7 +264,7 @@ diff old new
 +c4: conflicting values string and >=1 (mismatched types string and number):
      ./in.cue:35:5
      ./in.cue:35:17
--n2: incompatible bounds >=1.1 and <=1.3:
+-n2: incompatible bounds <=1.3 and >=1.1:
 -    ./in.cue:42:11
 -    ./in.cue:42:19
  a4: invalid value 6 (out of bound <=5):
@@ -274,13 +274,13 @@ diff old new
  a10: invalid value 0 (out of bound >=1):
      ./in.cue:12:10
      ./in.cue:12:6
-+b7: incompatible bounds >=6 and <=5:
++b7: incompatible bounds <=5 and >=6:
 +    ./in.cue:21:17
 +    ./in.cue:21:11
-+b14: incompatible bounds >=6 and <=5:
++b14: incompatible bounds <=5 and >=6:
 +    ./in.cue:29:24
 +    ./in.cue:29:6
-+n2: incompatible bounds >=1.1 and <=1.3:
++n2: incompatible bounds <=1.3 and >=1.1:
 +    ./in.cue:42:19
 +    ./in.cue:42:11
  
@@ -289,7 +289,7 @@ diff old new
 @@ -64,8 +64,8 @@
    b6: (number){ 5 }
    b7: (_|_){
-     // [eval] b7: incompatible bounds >=6 and <=5:
+     // [eval] b7: incompatible bounds <=5 and >=6:
 -    //     ./in.cue:21:11
      //     ./in.cue:21:17
 +    //     ./in.cue:21:11
@@ -299,7 +299,7 @@ diff old new
 @@ -75,8 +75,8 @@
    b13: (number){ 5 }
    b14: (_|_){
-     // [eval] b14: incompatible bounds >=6 and <=5:
+     // [eval] b14: incompatible bounds <=5 and >=6:
 -    //     ./in.cue:29:6
      //     ./in.cue:29:24
 +    //     ./in.cue:29:6
@@ -318,7 +318,7 @@ diff old new
 @@ -95,8 +95,8 @@
    n1: (number){ &(>=1, <=2) }
    n2: (_|_){
-     // [eval] n2: incompatible bounds >=1.1 and <=1.3:
+     // [eval] n2: incompatible bounds <=1.3 and >=1.1:
 -    //     ./in.cue:42:11
      //     ./in.cue:42:19
 +    //     ./in.cue:42:11
@@ -329,10 +329,10 @@ diff old new
 Reordering of error messages.
 -- out/eval --
 Errors:
-b14: incompatible bounds >=6 and <=5:
+b14: incompatible bounds <=5 and >=6:
     ./in.cue:29:6
     ./in.cue:29:24
-b7: incompatible bounds >=6 and <=5:
+b7: incompatible bounds <=5 and >=6:
     ./in.cue:21:11
     ./in.cue:21:17
 c3: conflicting values string and >=1 (mismatched types string and number):
@@ -341,7 +341,7 @@ c3: conflicting values string and >=1 (mismatched types string and number):
 c4: conflicting values >=1 and string (mismatched types number and string):
     ./in.cue:35:5
     ./in.cue:35:17
-n2: incompatible bounds >=1.1 and <=1.3:
+n2: incompatible bounds <=1.3 and >=1.1:
     ./in.cue:42:11
     ./in.cue:42:19
 a4: invalid value 6 (out of bound <=5):
@@ -393,7 +393,7 @@ Result:
   b5: (number){ &(>=3, <=5) }
   b6: (number){ 5 }
   b7: (_|_){
-    // [eval] b7: incompatible bounds >=6 and <=5:
+    // [eval] b7: incompatible bounds <=5 and >=6:
     //     ./in.cue:21:11
     //     ./in.cue:21:17
   }
@@ -404,7 +404,7 @@ Result:
   b12: (number){ &(>=3, <=5) }
   b13: (number){ 5 }
   b14: (_|_){
-    // [eval] b14: incompatible bounds >=6 and <=5:
+    // [eval] b14: incompatible bounds <=5 and >=6:
     //     ./in.cue:29:6
     //     ./in.cue:29:24
   }
@@ -424,7 +424,7 @@ Result:
   s2: (string){ "ee" }
   n1: (number){ &(>=1, <=2) }
   n2: (_|_){
-    // [eval] n2: incompatible bounds >=1.1 and <=1.3:
+    // [eval] n2: incompatible bounds <=1.3 and >=1.1:
     //     ./in.cue:42:11
     //     ./in.cue:42:19
   }

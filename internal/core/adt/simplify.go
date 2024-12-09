@@ -69,6 +69,7 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 	case xCat == -yCat:
 		if xCat == -1 {
 			x, y = y, x
+			xv, yv = yv, xv
 		}
 		a, aOK := xv.(*Num)
 		b, bOK := yv.(*Num)
@@ -138,13 +139,15 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 				if x.Op == GreaterThanOp && y.Op == LessEqualOp {
 					return ctx.newNum(&hi, k&NumberKind, x, y)
 				}
+				if x.Op == GreaterThanOp && y.Op == LessThanOp {
+					return ctx.NewErrf("incompatible integer bounds %v and %v", x, y)
+				}
 			}
 
 		case diff == 2:
 			if k&FloatKind == 0 && x.Op == GreaterThanOp && y.Op == LessThanOp {
 				_, _ = internal.BaseContext.Add(&d, d.SetInt64(1), &lo)
 				return ctx.newNum(&d, k&NumberKind, x, y)
-
 			}
 
 		case diff == 0 && err == nil:

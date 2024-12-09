@@ -16,6 +16,24 @@
       "message": "Is this first block really needed? It\u0027s the same (and less efficient?) than line 323 I think. I can understand the deduping, but I think this first block is redundant.",
       "revId": "a0351875fe96be4fca231176fca2b615f3ca42a7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0fd06a78_4f5978b5",
+        "filename": "cue/errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-09T15:08:20Z",
+      "side": 1,
+      "message": "Yes, it is necessary, as err can also be a list, so we need to compare the elements across both inputs. The way it is implemented here also allows it work recursively, in case err is a list of lists.\n\nI know this is maybe unnecessarily defensive, but at least it will cover all cases.\n\nI simplified and cleaned up the rest of the code a bit, though.",
+      "parentUuid": "6bbe8a7d_ac756a47",
+      "revId": "a0351875fe96be4fca231176fca2b615f3ca42a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -118,7 +118,7 @@ func constraintProperties(key string, n cue.Value, s *state) {
 	s.processMap(n, func(key string, n cue.Value) {
 		// property?: value
 		name := ast.NewString(key)
-		expr, state := s.schemaState(n, allTypes)
+		expr, state := s.schemaState(n, allTypes, false)
 		f := &ast.Field{Label: name, Value: expr}
 		state.doc(f)
 		f.Optional = token.Blank.Pos()
@@ -141,7 +141,7 @@ func constraintProperties(key string, n cue.Value, s *state) {
 
 func constraintPropertyNames(key string, n cue.Value, s *state) {
 	// [=~pattern]: _
-	if names, _ := s.schemaState(n, cue.StringKind); !isTop(names) {
+	if names, _ := s.schemaState(n, cue.StringKind, false); !isTop(names) {
 		x := ast.NewStruct(ast.NewList(names), top())
 		s.add(n, objectType, x)
 	}

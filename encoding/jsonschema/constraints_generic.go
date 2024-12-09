@@ -16,6 +16,7 @@ package jsonschema
 
 import (
 	"errors"
+	"log"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -31,11 +32,7 @@ func constraintAddDefinitions(key string, n cue.Value, s *state) {
 	}
 
 	s.processMap(n, func(key string, n cue.Value) {
-		expr := s.schema(n)
-		if expr == nil {
-			return
-		}
-		s.define(n, expr)
+		s.schemaState(n, allTypes, true)
 	})
 }
 
@@ -112,6 +109,13 @@ func constraintRef(key string, n cue.Value, s *state) {
 	if u == nil {
 		return
 	}
+	schemaRoot := s.schemaRoot()
+	if u.Fragment == "" && schemaRoot.isRoot && sameSchemaRoot(u, schemaRoot.id) {
+		// It's a reference to the root of the schema being
+		// generated. This never maps to something different.
+		s.all.add(n, s.refExpr(n, "", cue.Path{}))
+		return
+	}
 	var importPath string
 	var path cue.Path
 	// If we already know about the schema, then use that reference.
@@ -121,16 +125,15 @@ func constraintRef(key string, n cue.Value, s *state) {
 		loc := SchemaLoc{
 			ID: u,
 		}
-		isAnchor := u.Fragment == "" || !strings.HasPrefix(u.Fragment, "/")
-		schemaRoot := s.schemaRoot()
+		isAnchor := u.Fragment != "" && !strings.HasPrefix(u.Fragment, "/")
 		if !isAnchor {
 			// It's a JSON pointer reference.
 			var base cue.Value
-			if sameSchemaRoot(u, schemaRoot.id) {
+			if sameSchemaRoot(u, s.rootID) {
+				base = s.root
+			} else if sameSchemaRoot(u, schemaRoot.id) {
 				// it's within the current schema.
 				base = schemaRoot.pos
-			} else if sameSchemaRoot(u, s.rootID) {
-				base = s.root
 			}
 			if base.Exists() {
 				target, err := lookupJSONPointer(schemaRoot.pos, u.Fragment)
@@ -153,6 +156,17 @@ func constraintRef(key string, n cue.Value, s *state) {
 		if err != nil {
 			s.errf(n, "cannot map reference: %v", err)
 			return
+		}
+		// Record the result in s.defs. This serves two purposes:
+		// - it avoids calling MapRef many times for the same ID.
+		// - if we later encounter a local definition for the ID,
+		// we can tell that we need another generation pass
+		// because MapRef might return different results when
+		// we have a local definition.
+		log.Printf("recording definition for %v", loc.ID)
+		s.defs[loc.ID.String()] = &definedSchema{
+			importPath: importPath,
+			path:       path,
 		}
 	}
 	if e := s.refExpr(n, importPath, path); e != nil {

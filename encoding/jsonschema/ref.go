@@ -15,7 +15,9 @@
 package jsonschema
 
 import (
+	"encoding/base64"
 	"fmt"
+	"log"
 	"net/url"
 	"path"
 	"slices"
@@ -25,6 +27,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 )
@@ -70,7 +73,7 @@ func lookupJSONPointer(v cue.Value, p string) (cue.Value, error) {
 		// Note: a JSON Pointer doesn't distinguish between indexing
 		// and struct lookup. We have to use the value itself to decide
 		// which operation is appropriate.
-		v, _ := v.Default()
+		v, _ = v.Default()
 		switch v.Kind() {
 		case cue.StructKind:
 			v = v.LookupPath(cue.MakePath(cue.Str(part)))
@@ -94,7 +97,7 @@ func lookupJSONPointer(v cue.Value, p string) (cue.Value, error) {
 }
 
 func sameSchemaRoot(u1, u2 *url.URL) bool {
-	return u1.Host == u2.Host && u1.Path == u2.Path && u1.Fragment == u2.Fragment
+	return u1.Host == u2.Host && u1.Path == u2.Path && u1.Opaque == u2.Opaque
 }
 
 // splitFragment splits the fragment part of a URI into path components
@@ -204,6 +207,10 @@ func defaultMapRef(
 	mapFn func(pos token.Pos, path []string) ([]ast.Label, error),
 	mapURLFn func(u *url.URL) (importPath string, path cue.Path, err error),
 ) (importPath string, path cue.Path, err error) {
+	// XXX
+	defer func() {
+		log.Printf("mapref %v %v -> %v %v %v", loc.ID, loc.RootRel, importPath, path, err)
+	}()
 	var fragment string
 	if loc.RootRel == nil {
 		// It's external and mapURLFn is provided; use it.
@@ -247,15 +254,46 @@ func pathConcat(p1, p2 cue.Path) cue.Path {
 func labelsToCUEPath(labels []ast.Label) (cue.Path, error) {
 	sels := make([]cue.Selector, len(labels))
 	for i, label := range labels {
-		// TODO this doesn't allow defining hidden labels. We should
-		// probably use enhanced logic to allow that.
-		sels[i] = cue.Label(label)
+		var err error
+		// Note: we can't use cue.Label because that doesn't
+		// allow hidden fields.
+		sels[i], err = selectorForLabel(label)
+		if err != nil {
+			return cue.Path{}, err
+		}
 	}
-	p := cue.MakePath(sels...)
-	if err := p.Err(); err != nil {
-		return cue.Path{}, err
+	return cue.MakePath(sels...), nil
+}
+
+// selectorForLabel is like [cue.Label] except that it allows
+// hidden fields.
+func selectorForLabel(label ast.Label) (cue.Selector, error) {
+	switch label := label.(type) {
+	case *ast.Ident:
+		switch {
+		case strings.HasPrefix(label.Name, "_"):
+			return cue.Hid(label.Name, "_"), nil
+		case strings.HasPrefix(label.Name, "#"):
+			return cue.Def(label.Name), nil
+		default:
+			return cue.Str(label.Name), nil
+		}
+	case *ast.BasicLit:
+		if label.Kind != token.STRING {
+			return cue.Selector{}, fmt.Errorf("cannot make selector for %v", label.Kind)
+		}
+		info, _, _, _ := literal.ParseQuotes(label.Value, label.Value)
+		if !info.IsDouble() {
+			return cue.Selector{}, fmt.Errorf("invalid string label %s", label.Value)
+		}
+		s, err := literal.Unquote(label.Value)
+		if err != nil {
+			return cue.Selector{}, fmt.Errorf("invalid string label %s: %v", label.Value, err)
+		}
+		return cue.Str(s), nil
+	default:
+		return cue.Selector{}, fmt.Errorf("invalid label type %T", label)
 	}
-	return p, nil
 }
 
 func (d *decoder) mapRef(p token.Pos, str string, ref []string) []ast.Label {
@@ -280,6 +318,9 @@ func (d *decoder) mapRef(p token.Pos, str string, ref []string) []ast.Label {
 }
 
 func defaultMap(p token.Pos, a []string) ([]ast.Label, error) {
+	if len(a) == 0 {
+		return nil, nil
+	}
 	// TODO: technically, references could reference a
 	// non-definition. We disallow this case for the standard
 	// JSON Schema interpretation. We could detect cases that
@@ -322,6 +363,10 @@ func DefaultMapURL(u *url.URL) (string, cue.Path, error) {
 			base = "schema"
 		}
 		p += ":" + base
+	}
+	if u.Opaque != "" {
+		// TODO don't use base64 unless we really have to.
+		return base64.RawURLEncoding.EncodeToString([]byte(u.Opaque)), cue.Path{}, nil
 	}
 	return u.Host + p, cue.Path{}, nil
 }
@@ -382,11 +427,15 @@ func labelForSelector(sel cue.Selector) (ast.Label, error) {
 func cuePathToJSONPointer(p cue.Path) string {
 	var buf strings.Builder
 	for _, sel := range p.Selectors() {
-		if sel.Type() != cue.StringLabel {
+		buf.WriteByte('/')
+		switch sel.Type() {
+		case cue.StringLabel:
+			buf.WriteString(jsonPtrEsc.Replace(sel.Unquoted()))
+		case cue.IndexLabel:
+			buf.WriteString(strconv.Itoa(sel.Index()))
+		default:
 			panic(fmt.Errorf("cannot convert selector %v to JSON pointer", sel))
 		}
-		buf.WriteByte('/')
-		buf.WriteString(jsonPtrEsc.Replace(sel.Unquoted()))
 	}
 	return buf.String()
 }

@@ -31,6 +31,10 @@ func newSchemaSet() *schemaSet {
 	}
 }
 
+func (m *schemaSet) len() int {
+	return len(m.byPath)
+}
+
 func (m *schemaSet) set(key cue.Value) {
 	m.byPos[key.Pos()] = true
 	m.byPath[key.Path().String()] = true

@@ -20,6 +20,7 @@ package jsonschema
 
 import (
 	"fmt"
+	"log"
 	"math"
 	"net/url"
 	"regexp"
@@ -70,25 +71,33 @@ type decoder struct {
 	internalRefsDefined *schemaSet
 
 	// defs holds the set of named schemas, indexed by URI (both
-	// canonical, and root-relative if known)
+	// canonical, and root-relative if known), including external
+	// schemas that aren't known.
 	defs map[string]*definedSchema
 
 	// builder is used to build the final syntax tree as it becomes known.
 	builder structBuilder
+
+	// needAnotherPass is set to true when we know that
+	// we need another pass through the schema extraction
+	// process.
+	needAnotherPass bool
 }
 
 // definedSchema records information for a schema or subschema.
 type definedSchema struct {
-	// n holds the source schema value.
-	n cue.Value
-
 	// importPath is empty for internal schemas.
 	importPath string
 
 	// path holds the location of the schema relative to importPath.
 	path cue.Path
 
-	// schema holds the actual syntax for the schema.
+	// n holds the source schema value, or nil if the schema
+	// isn't local.
+	n cue.Value
+
+	// schema holds the actual syntax for the schema. This
+	// is nil if the entry was created by a reference only.
 	schema ast.Expr
 }
 
@@ -149,32 +158,42 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 }
 
 func (d *decoder) rootSchema(ref []ast.Label, v cue.Value) (a []ast.Decl) {
-	root := &state{
-		decoder: d,
-		schemaInfo: schemaInfo{
-			schemaVersion: d.cfg.DefaultVersion,
-			id:            d.rootID,
-		},
-		isRoot: true,
-	}
+	for {
+		log.Printf("--- new pass ---")
+		root := &state{
+			decoder: d,
+			schemaInfo: schemaInfo{
+				schemaVersion: d.cfg.DefaultVersion,
+				id:            d.rootID,
+			},
+			isRoot: true,
+			pos:    v,
+		}
 
-	expr, state := root.schemaState(v, allTypes)
-	if state.allowedTypes == 0 {
-		root.errf(v, "constraints are not possible to satisfy")
-		return nil
+		expr, state := root.schemaState(v, allTypes, false)
+		if state.allowedTypes == 0 {
+			root.errf(v, "constraints are not possible to satisfy")
+			return nil
+		}
+		log.Printf("after generation, needed %d; defined %d\n", d.internalRefsNeeded.len(), d.internalRefsDefined.len())
+		if d.needAnotherPass {
+			d.builder = structBuilder{}
+			d.needAnotherPass = false
+			continue
+		}
+		if !d.builder.put(cue.Path{}, expr) {
+			root.errf(v, "duplicate definition at root") // TODO better error message
+			return nil
+		}
+		syn, err := d.builder.syntax()
+		if err != nil {
+			root.errf(v, "cannot build final syntax: %v", err)
+			return nil
+		}
+		return []ast.Decl{&ast.EmbedDecl{
+			Expr: syn,
+		}}
 	}
-	if !d.builder.put(cue.Path{}, expr) {
-		root.errf(v, "duplicate definition at root") // TODO better error message
-		return nil
-	}
-	syn, err := d.builder.syntax()
-	if err != nil {
-		root.errf(v, "cannot build final syntax: %v", err)
-		return nil
-	}
-	return []ast.Decl{&ast.EmbedDecl{
-		Expr: syn,
-	}}
 }
 
 func (d *decoder) errf(n cue.Value, format string, args ...interface{}) ast.Expr {
@@ -671,7 +690,7 @@ func (s schemaInfo) doc(n ast.Node) {
 }
 
 func (s *state) schema(n cue.Value) ast.Expr {
-	expr, _ := s.schemaState(n, allTypes)
+	expr, _ := s.schemaState(n, allTypes, false)
 	// TODO: report unused doc.
 	return expr
 }
@@ -679,7 +698,7 @@ func (s *state) schema(n cue.Value) ast.Expr {
 // schemaState returns a new state value derived from s.
 // n holds the JSONSchema node to translate to a schema.
 // types holds the set of possible types that the value can hold.
-func (s0 *state) schemaState(n cue.Value, types cue.Kind) (ast.Expr, schemaInfo) {
+func (s0 *state) schemaState(n cue.Value, types cue.Kind, needsDefinition bool) (expr ast.Expr, ingo schemaInfo) {
 	s := &state{
 		up: s0,
 		schemaInfo: schemaInfo{
@@ -691,6 +710,11 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind) (ast.Expr, schemaInfo)
 		pos:     n,
 		isRoot:  s0.isRoot && n == s0.pos,
 	}
+	defer func() {
+		if needsDefinition {
+			s.define(n, expr)
+		}
+	}()
 	if n.Kind() == cue.BoolKind {
 		if vfrom(VersionDraft6).contains(s.schemaVersion) {
 			// From draft6 onwards, boolean values signify a schema that always passes or fails.
@@ -767,6 +791,7 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind) (ast.Expr, schemaInfo)
 		//		}
 		// s.internalRefsDefined.set(s.pos)
 	}
+	// XXX
 	//	if s.anchorName != "" {
 	//		rootURI := s.schemaRoot()
 	//		anchorURI := ref(*rootURI)
@@ -790,6 +815,20 @@ func (s *state) define(n cue.Value, expr ast.Expr) ast.Expr {
 	schemaRoot := s.schemaRoot()
 	loc.ID = ref(*schemaRoot.id)
 	loc.ID.Fragment = cuePathToJSONPointer(relPath(n, schemaRoot.pos))
+	log.Printf("define %v with id %v", n.Path(), loc.ID)
+	idStr := loc.ID.String()
+	if def, ok := s.defs[idStr]; ok {
+		if def.n.Exists() {
+			// s.errf(n, "redefinition of schema %s at %v", idStr, n.Path())
+			return nil
+		}
+		// We've encountered a local definition of
+		// a schema that we were previously considering
+		// to be external. That means we'll need another
+		// pass.
+		s.needAnotherPass = true
+		def.n = n
+	}
 	loc.RootRel = ref(*s.rootID)
 	loc.RootRel.Fragment = cuePathToJSONPointer(relPath(n, s.root))
 	importPath, path, err := s.cfg.MapRef(loc)
@@ -799,11 +838,14 @@ func (s *state) define(n cue.Value, expr ast.Expr) ast.Expr {
 	}
 	if importPath == "" {
 		if !s.builder.put(path, expr) {
-			s.errf(n, "#%v results in duplicate definition at %v", loc.RootRel.Fragment, path)
-			return nil
+			s.errf(n, "redefinition of schema %s at CUE path %v", idStr, path)
 		}
-	} else {
-		panic(fmt.Errorf("XXX store schema for calling Config.DefineSchema later; import path %q; path %v, loc.ID %v; loc.RootRel %v", importPath, path, loc.ID, loc.RootRel))
+	}
+	s.defs[idStr] = &definedSchema{
+		n:          n,
+		importPath: importPath,
+		path:       path,
+		schema:     expr,
 	}
 	return s.refExpr(n, importPath, path)
 }

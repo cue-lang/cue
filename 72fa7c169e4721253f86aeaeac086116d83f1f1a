@@ -16,6 +16,24 @@
       "message": "It\u0027s slightly unfortunate you now have a mixture of value and pointer semantics in here.\nI wonder if this might be clearer:\n\n```\nfor i :\u003d range cc.arcs {\n  a :\u003d \u0026cc.arcs[i]\n  if a.key \u003d\u003d key {\n    // I\u0027m not completely sure this is equiv:\n    a.matched \u003d a.matched \u0026\u0026 !checkClosed\n    a.cc.updateArcType(ctx, mode)\n    return a.cc\n  }\n}\n```",
       "revId": "72fa7c169e4721253f86aeaeac086116d83f1f1a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed53061e_9f15f4cc",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-09T09:57:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f9a56729_c0b901cc",
+      "revId": "72fa7c169e4721253f86aeaeac086116d83f1f1a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

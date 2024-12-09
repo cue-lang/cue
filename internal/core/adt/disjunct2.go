@@ -573,10 +573,12 @@ outer:
 					}
 				}
 			}
-			if len(xn.tasks) != len(x.tasks) {
-				continue
+			if len(xn.tasks) != xn.taskPos || len(x.tasks) != x.taskPos {
+				if len(xn.tasks) != len(x.tasks) {
+					continue
+				}
 			}
-			for i, t := range xn.tasks {
+			for i, t := range xn.tasks[xn.taskPos:] {
 				s := x.tasks[i]
 				if s.x != t.x || s.id.cc != t.id.cc {
 					continue outer
@@ -735,8 +737,10 @@ func isEqualNodeValue(x, y *nodeContext) bool {
 	if len(x.checks) != len(y.checks) {
 		return false
 	}
-	if len(x.tasks) != len(y.tasks) {
-		return false
+	if len(x.tasks) != x.taskPos || len(y.tasks) != y.taskPos {
+		if len(x.tasks) != len(y.tasks) {
+			return false
+		}
 	}
 
 	if !isEqualValue(x.ctx, x.lowerBound, y.lowerBound) {
@@ -754,7 +758,7 @@ func isEqualNodeValue(x, y *nodeContext) bool {
 		}
 	}
 
-	for i, t := range x.tasks {
+	for i, t := range x.tasks[x.taskPos:] {
 		s := y.tasks[i]
 		if s.x != t.x {
 			return false

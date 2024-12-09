@@ -25,47 +25,61 @@ list: [1] | [2] | [3] | [4] // 151 conjuncts; 68  disjuncts (+33; +16)
 list: [1] | [2] | [3] | [4] // 184 conjuncts; 84  disjuncts (+33; +16)
 list: [1] | [2] | [3] | [4] // 217 conjuncts; 100 disjuncts (+33; +16)
 
+issue3610: {
+	// Ensure disjuncts are disambiguated. The string field here is a reference
+	// and causes a task to be added. Ensure that, for instance, disjuncts
+	// >"b" and (>"b" & string) get equated when at least the task has
+	// completed.
+	#a
+	#a: <"a" | >"b" | string
+	#a: <"a" | >"b" | string // conjuncts 127  disjuncts 120
+	#a: <"a" | >"b" | string // conjuncts 219  disjuncts 210 (+92; +90)
+	#a: <"a" | >"b" | string // conjuncts 311  disjuncts 300 (+92; +90)
+	#a: <"a" | >"b" | string // conjuncts 403  disjuncts 390 (+92; +90)
+	#a: <"a" | >"b" | string // conjuncts 495  disjuncts 480 (+92; +90)
+}
+
 -- out/evalalpha/stats --
-Leaks:  182
-Freed:  90
-Reused: 90
-Allocs: 182
+Leaks:  572
+Freed:  230
+Reused: 230
+Allocs: 572
 Retain: 0
 
-Unifications: 20
-Conjuncts:    327
-Disjuncts:    138
+Unifications: 22
+Conjuncts:    825
+Disjuncts:    618
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
 @@ -1,9 +1,9 @@
 -Leaks:  0
--Freed:  269
--Reused: 258
+-Freed:  367
+-Reused: 356
 -Allocs: 11
-+Leaks:  182
-+Freed:  90
-+Reused: 90
-+Allocs: 182
++Leaks:  572
++Freed:  230
++Reused: 230
++Allocs: 572
  Retain: 0
  
--Unifications: 131
--Conjuncts:    755
--Disjuncts:    269
-+Unifications: 20
-+Conjuncts:    327
-+Disjuncts:    138
+-Unifications: 133
+-Conjuncts:    866
+-Disjuncts:    367
++Unifications: 22
++Conjuncts:    825
++Disjuncts:    618
 -- out/eval/stats --
 Leaks:  0
-Freed:  269
-Reused: 258
+Freed:  367
+Reused: 356
 Allocs: 11
 Retain: 0
 
-Unifications: 131
-Conjuncts:    755
-Disjuncts:    269
+Unifications: 133
+Conjuncts:    866
+Disjuncts:    367
 -- out/eval --
 (struct){
   pat: (struct){ |((struct){
@@ -80,6 +94,16 @@ Disjuncts:    269
       0: (int){ 3 }
     }, (#list){
       0: (int){ 4 }
+    }) }
+  issue3610: (string){ |((string){
+      <"a"
+      #a: (string){ |((string){ <"a" }, (string){ >"b" }, (string){ string }) }
+    }, (string){
+      >"b"
+      #a: (string){ |((string){ <"a" }, (string){ >"b" }, (string){ string }) }
+    }, (string){
+      string
+      #a: (string){ |((string){ <"a" }, (string){ >"b" }, (string){ string }) }
     }) }
 }
 -- out/compile --
@@ -198,4 +222,13 @@ Disjuncts:    269
   ]|[
     4,
   ])
+  issue3610: {
+    〈0;#a〉
+    #a: (<"a"|>"b"|string)
+    #a: (<"a"|>"b"|string)
+    #a: (<"a"|>"b"|string)
+    #a: (<"a"|>"b"|string)
+    #a: (<"a"|>"b"|string)
+    #a: (<"a"|>"b"|string)
+  }
 }

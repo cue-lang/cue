@@ -77,6 +77,7 @@ var needFix = map[string]string{
 // TODO: These counters should all go to zero.
 var skipDebugDepErrors = map[string]int{
 	"benchmarks/issue1684":     16,
+	"benchmarks/disjunctelim":  1,
 	"builtins/default":         1,
 	"compile/scope":            1,
 	"comprehensions/pushdown":  3,

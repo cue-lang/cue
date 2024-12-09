@@ -15,6 +15,9 @@
 package adt
 
 import (
+	"bytes"
+	"strings"
+
 	"github.com/cockroachdb/apd/v3"
 
 	"cuelang.org/go/internal"
@@ -65,6 +68,56 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 			return x
 		}
 		return y
+
+	case xCat == -yCat && k == StringKind:
+		if xCat == -1 {
+			x, y = y, x
+			xv, yv = yv, xv
+		}
+
+		a, aOK := xv.(*String)
+		b, bOK := yv.(*String)
+
+		if !aOK || !bOK {
+			break
+		}
+
+		switch diff := strings.Compare(a.Str, b.Str); diff {
+		case -1:
+		case 0:
+			if x.Op == GreaterEqualOp && y.Op == LessEqualOp {
+				return ctx.NewString(a.Str)
+			}
+			fallthrough
+
+		case 1:
+			return ctx.NewErrf("incompatible string bounds %v and %v", y, x)
+		}
+
+	case xCat == -yCat && k == BytesKind:
+		if xCat == -1 {
+			x, y = y, x
+			xv, yv = yv, xv
+		}
+
+		a, aOK := xv.(*Bytes)
+		b, bOK := yv.(*Bytes)
+
+		if !aOK || !bOK {
+			break
+		}
+
+		switch diff := bytes.Compare(a.B, b.B); diff {
+		case -1:
+		case 0:
+			if x.Op == GreaterEqualOp && y.Op == LessEqualOp {
+				return ctx.newBytes(a.B)
+			}
+			fallthrough
+
+		case 1:
+			return ctx.NewErrf("incompatible bytes bounds %v and %v", y, x)
+		}
 
 	case xCat == -yCat:
 		if xCat == -1 {

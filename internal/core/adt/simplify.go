@@ -157,7 +157,11 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 			fallthrough
 
 		case d.Negative:
-			return ctx.NewErrf("incompatible bounds %v and %v", x, y)
+			if k == IntKind {
+				return ctx.NewErrf("incompatible integer bounds %v and %v", y, x)
+			} else {
+				return ctx.NewErrf("incompatible number bounds %v and %v", y, x)
+			}
 		}
 
 	case x.Op == NotEqualOp:

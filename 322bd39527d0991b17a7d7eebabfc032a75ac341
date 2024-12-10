@@ -16,6 +16,24 @@
       "message": "perhaps clarify `... as it relies on the current default, which we want to change`?",
       "revId": "322bd39527d0991b17a7d7eebabfc032a75ac341",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1b685a7_2f0961fe",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-12-10T09:38:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c74f8282_6f249ad9",
+      "revId": "322bd39527d0991b17a7d7eebabfc032a75ac341",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

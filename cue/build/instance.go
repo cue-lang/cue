@@ -211,7 +211,7 @@ func (inst *Instance) addImport(imp *Instance) {
 // It does not process the file's imports. The package name of the file must
 // match the package name of the instance.
 //
-// Deprecated: use AddSyntax or wait for this to be renamed using a new
+// Deprecated: use [Instance.AddSyntax] or wait for this to be renamed using a new
 // signature.
 func (inst *Instance) AddFile(filename string, src interface{}) error {
 	file, err := inst.parse(filename, src)

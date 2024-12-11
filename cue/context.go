@@ -472,7 +472,7 @@ func str(c *adt.OpContext, v adt.Node) string {
 
 // eval returns the evaluated value. This may not be the vertex.
 //
-// Deprecated: use ctx.value
+// Deprecated: use [adt.OpContext.value].
 func (v Value) eval(ctx *adt.OpContext) adt.Value {
 	if v.v == nil {
 		panic("undefined value")

@@ -684,7 +684,7 @@ func remakeValue(base Value, env *adt.Environment, v adt.Expr) Value {
 	return makeChildValue(base.parent(), n)
 }
 
-func remakeFinal(base Value, env *adt.Environment, v adt.Value) Value {
+func remakeFinal(base Value, v adt.Value) Value {
 	n := &adt.Vertex{Parent: base.v.Parent, Label: base.v.Label, BaseValue: v}
 	n.ForceDone()
 	return makeChildValue(base.parent(), n)
@@ -1092,7 +1092,7 @@ func (v Value) checkKind(ctx *adt.OpContext, want adt.Kind) *adt.Bottom {
 func makeInt(v Value, x int64) Value {
 	n := &adt.Num{K: adt.IntKind}
 	n.X.SetInt64(int64(x))
-	return remakeFinal(v, nil, n)
+	return remakeFinal(v, n)
 }
 
 // Len returns the number of items of the underlying value.
@@ -1106,7 +1106,7 @@ func (v Value) Len() Value {
 				n := &adt.Num{K: adt.IntKind}
 				n.X.SetInt64(int64(len(x.Elems())))
 				if x.IsClosedList() {
-					return remakeFinal(v, nil, n)
+					return remakeFinal(v, n)
 				}
 				// Note: this HAS to be a Conjunction value and cannot be
 				// an adt.BinaryExpr, as the expressions would be considered
@@ -1116,7 +1116,7 @@ func (v Value) Len() Value {
 					&adt.BasicType{K: adt.IntKind},
 					&adt.BoundValue{Op: adt.GreaterEqualOp, Value: n},
 				}}
-				return remakeFinal(v, nil, c)
+				return remakeFinal(v, c)
 
 			}
 		case *adt.Bytes:
@@ -1329,7 +1329,7 @@ type hiddenStruct = Struct
 // Deprecated: only used by deprecated functions.
 type FieldInfo struct {
 	Selector string
-	Name     string // Deprecated: use Selector
+	Name     string // Deprecated: use [FieldInfo.Selector]
 	Pos      int
 	Value    Value
 
@@ -1968,7 +1968,7 @@ func Schema() Option {
 
 // Concrete ensures that all values are concrete.
 //
-// For Validate this means it returns an error if this is not the case.
+// For [Validate] this means it returns an error if this is not the case.
 // In other cases a non-concrete value will be replaced with an error.
 func Concrete(concrete bool) Option {
 	return func(p *options) {

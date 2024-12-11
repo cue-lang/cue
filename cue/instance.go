@@ -174,13 +174,6 @@ func (inst *Instance) ID() string {
 	return inst.inst.ID()
 }
 
-// Doc returns the package comments for this instance.
-//
-// Deprecated: use inst.Value().Doc()
-func (inst *hiddenInstance) Doc() []*ast.CommentGroup {
-	return inst.Value().Doc()
-}
-
 // Value returns the root value of the configuration. If the configuration
 // defines in emit value, it will be that value. Otherwise it will be all
 // top-level values.

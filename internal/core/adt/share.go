@@ -126,8 +126,6 @@ func (n *nodeContext) share(c Conjunct, arc *Vertex, id CloseInfo) {
 }
 
 func (n *nodeContext) shareIfPossible(c Conjunct, arc *Vertex, id CloseInfo) bool {
-	// TODO: have an experiment here to enable or disable structure sharing.
-	// return false
 	if !n.ctx.Sharing {
 		return false
 	}

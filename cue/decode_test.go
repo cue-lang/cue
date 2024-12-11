@@ -17,9 +17,7 @@ package cue_test
 import (
 	"fmt"
 	"math/big"
-	"math/bits"
 	"reflect"
-	"strconv"
 	"testing"
 	"time"
 
@@ -130,7 +128,7 @@ func TestDecode(t *testing.T) {
 		value: `{a:1,m:{a: 3}}`,
 		dst:   &fields{},
 		want: fields{A: 1,
-			M: map[string]interface{}{"a": int(3)}},
+			M: map[string]interface{}{"a": int64(3)}},
 	}, {
 		// indirect int
 		value: `{p: 1}`,
@@ -193,12 +191,12 @@ func TestDecode(t *testing.T) {
 		value: `{a: 1, b: 2, c: true, d: e: 2}`,
 		dst:   &map[string]interface{}{},
 		want: map[string]interface{}{
-			"a": 1, "b": 2, "c": true,
-			"d": map[string]interface{}{"e": 2}},
+			"a": int64(1), "b": int64(2), "c": true,
+			"d": map[string]interface{}{"e": int64(2)}},
 	}, {
 		value: `{a: b: *2 | int}`,
 		dst:   &map[string]interface{}{},
-		want:  map[string]interface{}{"a": map[string]interface{}{"b": int(2)}},
+		want:  map[string]interface{}{"a": map[string]interface{}{"b": int64(2)}},
 	}, {
 		value: `{a: 1, b: 2, c: true}`,
 		dst:   &map[string]int{},
@@ -217,7 +215,7 @@ func TestDecode(t *testing.T) {
 		dst:   &map[string]interface{}{},
 		want: map[string]interface{}{
 			"a": map[string]interface{}{
-				"b": []interface{}{int(0)},
+				"b": []interface{}{int64(0)},
 			},
 		},
 	}, {
@@ -246,12 +244,12 @@ func TestDecode(t *testing.T) {
 		// large integer which doesn't fit into an int32 or int on 32-bit platforms
 		value: `8000000000`,
 		dst:   new(interface{}),
-		want:  intOver32("8000000000"),
+		want:  int64(8000000000),
 	}, {
 		// same as the above, but negative
 		value: `-8000000000`,
 		dst:   new(interface{}),
-		want:  intOver32("-8000000000"),
+		want:  int64(-8000000000),
 	}, {
 		// even larger integer which doesn't fit into an int64
 		value: `9500000000000000000`,
@@ -294,15 +292,6 @@ func TestDecode(t *testing.T) {
 			}
 		})
 	}
-}
-
-func intOver32(s string) any {
-	if bits.UintSize == 32 {
-		return bigInt(s)
-	}
-	// Work around "constant overflows int" typechecking errors on 32 bits.
-	n, _ := strconv.Atoi(s)
-	return n
 }
 
 func bigInt(s string) *big.Int {

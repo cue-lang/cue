@@ -23,7 +23,7 @@ var Flags struct {
 	// DecodeInt64 changes [cuelang.org/go/cue.Value.Decode] to choose
 	// `int64` rather than `int` as the default type for CUE integer values
 	// to ensure consistency with 32-bit platforms.
-	DecodeInt64 bool
+	DecodeInt64 bool `envflag:"default:true"`
 
 	// Enable topological sorting of struct fields.
 	TopoSort bool

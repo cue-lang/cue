@@ -6,10 +6,16 @@ import (
 	"cuelang.org/go/internal/envflag"
 )
 
-// Flags holds the set of CUE_DEBUG flags. It is initialized by Init.
+// Flags holds the set of global CUE_DEBUG flags. It is initialized by Init.
 var Flags Config
 
+// Flags holds the set of known CUE_DEBUG flags.
+//
+// When adding, deleting, or modifying entries below,
+// update cmd/cue/cmd/help.go as well for `cue help environment`.
 type Config struct {
+	// HTTP enables JSON logging per HTTP request and response made
+	// when interacting with module registries.
 	HTTP bool
 
 	// TODO: consider moving these evaluator-related options into a separate

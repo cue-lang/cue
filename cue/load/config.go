@@ -237,10 +237,6 @@ type Config struct {
 	// Include all files, regardless of tags.
 	AllCUEFiles bool
 
-	// Deprecated: use Tags
-	BuildTags   []string
-	releaseTags []string
-
 	// If Tests is set, the loader includes not just the packages
 	// matching a particular pattern but also any related test packages.
 	Tests bool
@@ -338,13 +334,6 @@ func addImportQualifier(pkg importPath, name string) (importPath, error) {
 // It does not initialize c.Context, because that requires the
 // loader in order to use for build.Loader.
 func (c Config) complete() (cfg *Config, err error) {
-	// Each major CUE release should add a tag here.
-	// Old tags should not be removed. That is, the cue1.x tag is present
-	// in all releases >= CUE 1.x. Code that requires CUE 1.x or later should
-	// say "+build cue1.x", and code that should only be built before CUE 1.x
-	// (perhaps it is the stub to use in that case) should say "+build !cue1.x".
-	c.releaseTags = []string{"cue0.1"}
-
 	if c.Dir == "" {
 		c.Dir, err = os.Getwd()
 		if err != nil {

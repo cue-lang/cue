@@ -6,7 +6,7 @@ import (
 	"cuelang.org/go/internal/envflag"
 )
 
-// Flags holds the set of CUE_EXPERIMENT flags. It is initialized by Init.
+// Flags holds the set of global CUE_EXPERIMENT flags. It is initialized by Init.
 //
 // When adding, deleting, or modifying entries below,
 // update cmd/cue/cmd/help.go as well for `cue help environment`.
@@ -25,7 +25,7 @@ var Flags struct {
 	// to ensure consistency with 32-bit platforms.
 	DecodeInt64 bool
 
-	// Enable topological sorting of struct fields
+	// Enable topological sorting of struct fields.
 	TopoSort bool
 }
 

@@ -208,7 +208,6 @@ func TestScript(t *testing.T) {
 				if neg || len(args) != 1 {
 					ts.Fatalf("usage: oauthregistry <mode>")
 				}
-				ts.Setenv("CUE_EXPERIMENT", "modules")
 				srv := newMockRegistryOauth(args[0])
 				u, _ := url.Parse(srv.URL)
 				ts.Setenv("CUE_REGISTRY", u.Host+"+insecure")

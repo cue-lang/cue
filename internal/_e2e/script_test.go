@@ -94,8 +94,6 @@ func TestScript(t *testing.T) {
 		RequireExplicitExec: true,
 		RequireUniqueNames:  true,
 		Setup: func(env *testscript.Env) error {
-			env.Setenv("CUE_EXPERIMENT", "modules")
-			env.Setenv("CUE_REGISTRY", "registry.cue.works")
 			env.Setenv("CUE_CACHED_GOBIN", os.Getenv("CUE_CACHED_GOBIN"))
 			env.Setenv("CUE_REGISTRY_TOKEN", os.Getenv("CUE_REGISTRY_TOKEN"))
 

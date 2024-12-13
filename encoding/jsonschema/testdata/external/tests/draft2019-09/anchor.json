@@ -12,8 +12,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: anchors (foo) not supported (and 1 more errors)",
-			"v3": "extract error: anchors (foo) not supported (and 1 more errors)"
+			"v2": "extract error: cannot determine CUE location for JSON Schema location id=https://cue.jsonschema.invalid#foo: anchors (foo) not supported (and 1 more errors)",
+			"v3": "extract error: cannot determine CUE location for JSON Schema location id=https://cue.jsonschema.invalid#foo: anchors (foo) not supported (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -50,8 +50,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: anchors (foo) not supported (and 1 more errors)",
-			"v3": "extract error: anchors (foo) not supported (and 1 more errors)"
+			"v2": "extract error: cannot determine CUE location for JSON Schema location id=http://localhost:1234/draft2019-09/bar#foo: anchors (foo) not supported (and 1 more errors)",
+			"v3": "extract error: cannot determine CUE location for JSON Schema location id=http://localhost:1234/draft2019-09/bar#foo: anchors (foo) not supported (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -93,8 +93,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: anchors (foo) not supported (and 1 more errors)",
-			"v3": "extract error: anchors (foo) not supported (and 1 more errors)"
+			"v2": "extract error: cannot determine CUE location for JSON Schema location id=http://localhost:1234/draft2019-09/nested.json#foo: anchors (foo) not supported (and 1 more errors)",
+			"v3": "extract error: cannot determine CUE location for JSON Schema location id=http://localhost:1234/draft2019-09/nested.json#foo: anchors (foo) not supported (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -141,8 +141,8 @@
 			"$ref": "child1#my_anchor"
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$anchor\" not yet implemented (and 2 more errors)",
-			"v3": "extract error: keyword \"$anchor\" not yet implemented (and 2 more errors)"
+			"v2": "extract error: cannot determine CUE location for JSON Schema location id=http://localhost:1234/draft2019-09/child1#my_anchor: anchors (my_anchor) not supported (and 1 more errors)",
+			"v3": "extract error: cannot determine CUE location for JSON Schema location id=http://localhost:1234/draft2019-09/child1#my_anchor: anchors (my_anchor) not supported (and 1 more errors)"
 		},
 		"tests": [
 			{

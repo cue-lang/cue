@@ -451,6 +451,8 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode) (*node
 		return nil, err
 	}
 
+	d = d.node.DerefDisjunct().state
+
 	return d, nil
 }
 

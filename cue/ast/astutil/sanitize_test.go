@@ -431,6 +431,36 @@ c: {
 	}
 }
 `,
+	}, {
+		desc: "Avoid joining file doc comment to added import declaration",
+		// Resolve both identifiers to same clause.
+		file: func() *ast.File {
+			f := &ast.File{
+				Decls: []ast.Decl{
+					&ast.Field{
+						Label: ast.NewIdent("a"),
+						Value: ast.NewSel(
+							&ast.Ident{
+								Name: "list",
+								Node: ast.NewImport(nil, "list"),
+							},
+							"Min",
+						),
+					},
+				},
+			}
+			// Note: it's important it's not a doc comment, otherwise
+			// it gets joined anyway.
+			comment := internal.NewComment(true, "file-level comment")
+			comment.Doc = false
+			ast.SetComments(f, []*ast.CommentGroup{comment})
+			return f
+		}(),
+		want: `// file-level comment
+import "list"
+
+a: list.Min
+`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

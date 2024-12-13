@@ -19,6 +19,9 @@ components:
       type: string
 
 -- out/decode/extract --
+// The number to dial.
+#PhoneNumber: string
+
 // A User uses something.
 #User: {
 	id?:   int
@@ -27,6 +30,3 @@ components:
 		null | #PhoneNumber
 	...
 }
-
-// The number to dial.
-#PhoneNumber: string

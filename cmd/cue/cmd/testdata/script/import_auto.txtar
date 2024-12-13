@@ -21,13 +21,14 @@ info: {
 	version: *"v1beta1" | string
 }
 
+#Bar: {
+	foo!: #Foo
+	...
+}
+
 #Foo: {
 	a!: int
 	b!: int & <10 & >=0
-	...
-}
-#Bar: {
-	foo!: #Foo
 	...
 }
 -- openapi.yaml --

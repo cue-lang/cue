@@ -13,13 +13,13 @@
 }
 
 -- out/decode/extract --
+@jsonschema(schema="http://json-schema.org/draft-07/schema#")
 _schema
-_schema: {
-	@jsonschema(schema="http://json-schema.org/draft-07/schema#")
+_schema:
+
 	null | bool | number | string | [...] | {
 		@jsonschema(id="http://cuelang.org/go/encoding/openapi/testdata/order.json")
 		value?: _
 		next?:  _schema
 		...
 	}
-}

@@ -35,6 +35,9 @@ info: {
 		url:  "https://cuelang.org"
 	}
 }
+// The number to dial.
+#PhoneNumber: string
+
 // A User uses something.
 #User: {
 	id?:      int
@@ -42,6 +45,3 @@ info: {
 	address?: #PhoneNumber
 	...
 }
-
-// The number to dial.
-#PhoneNumber: string

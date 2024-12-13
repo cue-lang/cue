@@ -41,37 +41,21 @@
 				}
 			]
 		},
-		"skip": {
-			"v2": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/unknownKeyword/my_identifier.json:my_identifier\":\n    generated.cue:1:8\n",
-			"v3": "extract error: cannot compile resulting schema: invalid import path: \"localhost:1234/unknownKeyword/my_identifier.json:my_identifier\":\n    generated.cue:1:8\n"
-		},
 		"tests": [
 			{
 				"description": "type matches second anyOf, which has a real schema in it",
 				"data": "a string",
-				"valid": true,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": true
 			},
 			{
 				"description": "type matches non-schema in first anyOf",
 				"data": null,
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			},
 			{
 				"description": "type matches non-schema in third anyOf",
 				"data": 1,
-				"valid": false,
-				"skip": {
-					"v2": "could not compile schema",
-					"v3": "could not compile schema"
-				}
+				"valid": false
 			}
 		]
 	}

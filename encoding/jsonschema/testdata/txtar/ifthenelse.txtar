@@ -25,6 +25,7 @@
 }
 -- out/decode/extract --
 @jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
+
 matchIf({
 	a!: number
 	...

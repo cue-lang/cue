@@ -67,7 +67,7 @@
 import (
 	"acme.com/external.json:external"
 	"acme.com/external-foo.json:schema"
-	schema_5 "acme.com/external-bar.json:schema"
+	schema_1 "acme.com/external-bar.json:schema"
 )
 
 @jsonschema(schema="http://json-schema.org/draft-07/schema#")
@@ -76,36 +76,36 @@ person?:           #person
 billing_address?:  #address
 shipping_address?: #address
 
+#: "string-int": int | string
+
 #address: {
 	city?: string
 	...
 }
 
-#int_1=#int: int
-
-#: "string-int": int | string
+#int: int
 
 #person: {
 	@jsonschema(id="http://cuelang.org/person.json")
 	name?: string
 	children?: {
-		x?: external.foo
-		a?: #int
-		b?: #int
-		c?: #int_1
+		x?: external._#defs."/properties/foo"
+		a?: _#defs."/$defs/person/$defs/int"
+		b?: _#defs."/$defs/person/$defs/int"
+		c?: #int
 		d?: #address
-		e?: #["string-int"]
+		e?: #."string-int"
 		f?: #person
 		g?: external.#foo
-		h?: external.foo
+		h?: external._#defs."/properties/foo"
 		i?: external
 		j?: schema
-		k?: schema_5
+		k?: schema_1
 		z?: _
 		...
 	}
-
-	#int: int
 	...
 }
+
+_#defs: "/$defs/person/$defs/int": int
 ...

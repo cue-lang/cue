@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55f871d6_8bd4eb4c",
+        "filename": "internal/astinternal/debug_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-13T18:23:41Z",
+      "side": 1,
+      "message": "summarize in a short comment that you do this because pointers change between runs.",
+      "revId": "ce376780df2ed0bfbc466244a1d903bea7b530a8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

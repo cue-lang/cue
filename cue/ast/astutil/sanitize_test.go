@@ -457,6 +457,7 @@ c: {
 			return f
 		}(),
 		want: `// file-level comment
+
 import "list"
 
 a: list.Min

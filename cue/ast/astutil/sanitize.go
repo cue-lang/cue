@@ -181,6 +181,16 @@ func (z *sanitizer) cleanImports() {
 		decl.Specs = decl.Specs[:newLen]
 	})
 	z.file.Imports = fileImports
+	// Ensure that the first import always starts a new section
+	// so that if the file has a comment, it won't be associated with
+	// the import comment rather than the file.
+	first := true
+	z.file.VisitImports(func(decl *ast.ImportDecl) {
+		if first {
+			ast.SetRelPos(decl, token.NewSection)
+			first = false
+		}
+	})
 }
 
 func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {

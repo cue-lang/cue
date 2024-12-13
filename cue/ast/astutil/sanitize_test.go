@@ -20,6 +20,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 
 	"github.com/go-quicktest/qt"
@@ -430,6 +431,34 @@ c: {
 		e: X_1
 	}
 }
+`,
+	}, {
+		desc: "Avoid joining file doc comment to added import declaration",
+		// Resolve both identifiers to same clause.
+		file: func() *ast.File {
+			f := &ast.File{
+				Decls: []ast.Decl{
+					&ast.Field{
+						Label: ast.NewIdent("a"),
+						Value: ast.NewSel(
+							&ast.Ident{
+								Name: "list",
+								Node: ast.NewImport(nil, "list"),
+							},
+							"Min",
+						),
+					},
+				},
+			}
+			ast.SetRelPos(f.Decls[0], token.NewSection)
+			// Note: it's important it's not a doc comment, otherwise
+			// it gets joined anyway.
+			f.AddComment(internal.NewComment(false, "file-level comment"))
+			return f
+		}(),
+		want: `import "list"
+
+a: list.Min // file-level comment
 `,
 	}}
 	for _, tc := range testCases {

@@ -17,6 +17,7 @@ package astinternal_test
 import (
 	"path"
 	"reflect"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -28,6 +29,8 @@ import (
 	"github.com/go-quicktest/qt"
 )
 
+var ptrPat = regexp.MustCompile(`0x[0-9a-z]+`)
+
 func TestDebugPrint(t *testing.T) {
 	test := cuetxtar.TxTarTest{
 		Root: "testdata",
@@ -35,10 +38,12 @@ func TestDebugPrint(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
+		includePointers := t.HasTag("includePointers")
 		for _, file := range t.Archive.Files {
 			if strings.HasPrefix(file.Name, "out/") {
 				continue
 			}
+
 			f, err := parser.ParseFile(file.Name, file.Data, parser.ParseComments)
 			qt.Assert(t, qt.IsNil(err))
 
@@ -49,7 +54,11 @@ func TestDebugPrint(t *testing.T) {
 			// the generated reference names should be deterministic.
 			full := astinternal.AppendDebug(nil, f, astinternal.DebugConfig{
 				IncludeNodeRefs: true,
+				IncludePointers: includePointers,
 			})
+			if includePointers {
+				full = ptrPat.ReplaceAll(full, []byte("XXXX"))
+			}
 			t.Writer(file.Name).Write(full)
 
 			// A syntax tree which omits any empty values,

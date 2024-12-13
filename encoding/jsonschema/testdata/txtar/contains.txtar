@@ -37,6 +37,7 @@ additionalProperties: false
 import "list"
 
 @jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
+
 close({
 	p1?: list.MatchN(>=1, _)
 	p2?: list.MatchN(>=0, _)

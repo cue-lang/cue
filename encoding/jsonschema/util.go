@@ -16,6 +16,8 @@ package jsonschema
 
 import (
 	"fmt"
+	"slices"
+	"strconv"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -23,6 +25,31 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 )
+
+func pathConcat(p1, p2 cue.Path) cue.Path {
+	sels1, sels2 := p1.Selectors(), p2.Selectors()
+	if len(sels1) == 0 {
+		return p2
+	}
+	if len(sels2) == 0 {
+		return p1
+	}
+	return cue.MakePath(append(slices.Clip(sels1), sels2...)...)
+}
+
+func labelsToCUEPath(labels []ast.Label) (cue.Path, error) {
+	sels := make([]cue.Selector, len(labels))
+	for i, label := range labels {
+		var err error
+		// Note: we can't use cue.Label because that doesn't
+		// allow hidden fields.
+		sels[i], err = selectorForLabel(label)
+		if err != nil {
+			return cue.Path{}, err
+		}
+	}
+	return cue.MakePath(sels...), nil
+}
 
 // selectorForLabel is like [cue.Label] except that it allows
 // hidden fields.
@@ -144,4 +171,38 @@ func labelForSelector(sel cue.Selector) (ast.Label, error) {
 	default:
 		return nil, fmt.Errorf("cannot form label for selector %q with type %v", sel, sel.LabelType())
 	}
+}
+
+func cuePathToJSONPointer(p cue.Path) string {
+	var buf strings.Builder
+	for _, sel := range p.Selectors() {
+		buf.WriteByte('/')
+		switch sel.Type() {
+		case cue.StringLabel:
+			buf.WriteString(jsonPtrEsc.Replace(sel.Unquoted()))
+		case cue.IndexLabel:
+			buf.WriteString(strconv.Itoa(sel.Index()))
+		default:
+			panic(fmt.Errorf("cannot convert selector %v to JSON pointer", sel))
+		}
+	}
+	return buf.String()
+}
+
+// relPath returns the path to v relative to root,
+// which must be a direct ancestor of v.
+func relPath(v, root cue.Value) cue.Path {
+	rootPath := root.Path().Selectors()
+	vPath := v.Path().Selectors()
+	if !sliceHasPrefix(vPath, rootPath) {
+		panic("value is not inside root")
+	}
+	return cue.MakePath(vPath[len(rootPath):]...)
+}
+
+func sliceHasPrefix[E comparable](s1, s2 []E) bool {
+	if len(s2) > len(s1) {
+		return false
+	}
+	return slices.Equal(s1[:len(s2)], s2)
 }

@@ -31,6 +31,7 @@
 
 -- out/decode/extract --
 // Main schema
+
 close({
 	// an integer or string.
 	intString?: null | bool | int | string | [...]

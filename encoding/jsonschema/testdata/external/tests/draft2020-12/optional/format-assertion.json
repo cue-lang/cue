@@ -7,8 +7,8 @@
 			"format": "ipv4"
 		},
 		"skip": {
-			"v2": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/format-assertion-false.json\": $schema URI not recognized",
-			"v3": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/format-assertion-false.json\": $schema URI not recognized"
+			"v2": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/format-assertion-false.json\": $schema URI not recognized (and 1 more errors)",
+			"v3": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/format-assertion-false.json\": $schema URI not recognized (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -39,8 +39,8 @@
 			"format": "ipv4"
 		},
 		"skip": {
-			"v2": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/format-assertion-true.json\": $schema URI not recognized",
-			"v3": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/format-assertion-true.json\": $schema URI not recognized"
+			"v2": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/format-assertion-true.json\": $schema URI not recognized (and 1 more errors)",
+			"v3": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/format-assertion-true.json\": $schema URI not recognized (and 1 more errors)"
 		},
 		"tests": [
 			{

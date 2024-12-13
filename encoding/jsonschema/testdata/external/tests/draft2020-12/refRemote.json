@@ -68,8 +68,8 @@
 			"$ref": "http://localhost:1234/draft2020-12/locationIndependentIdentifier.json#foo"
 		},
 		"skip": {
-			"v2": "extract error: anchors (foo) not supported",
-			"v3": "extract error: anchors (foo) not supported"
+			"v2": "extract error: cannot determine CUE location for JSON Schema location id=http://localhost:1234/draft2020-12/locationIndependentIdentifier.json#foo: anchors (foo) not supported",
+			"v3": "extract error: cannot determine CUE location for JSON Schema location id=http://localhost:1234/draft2020-12/locationIndependentIdentifier.json#foo: anchors (foo) not supported"
 		},
 		"tests": [
 			{

@@ -20,9 +20,6 @@ import (
 	"cuelang.org/go/cue"
 )
 
-// TODO: skip invalid regexps containing ?! and foes.
-// alternatively, fall back to  https://github.com/dlclark/regexp2
-
 type constraint struct {
 	key string
 
@@ -62,17 +59,17 @@ const numPhases = 5
 // the linear progression of the rest of the JSON Schema versions.
 
 var constraints = []*constraint{
-	p1("$anchor", constraintTODO, vfrom(VersionDraft2019_09)),
+	px("$anchor", constraintTODO, vfrom(VersionDraft2019_09)),
 	p2("$comment", constraintComment, vfrom(VersionDraft7)),
 	p2("$defs", constraintAddDefinitions, allVersions),
-	p1("$dynamicAnchor", constraintTODO, vfrom(VersionDraft2020_12)),
-	p1("$dynamicRef", constraintTODO, vfrom(VersionDraft2020_12)),
+	px("$dynamicAnchor", constraintTODO, vfrom(VersionDraft2020_12)),
+	px("$dynamicRef", constraintTODO, vfrom(VersionDraft2020_12)),
 	p1("$id", constraintID, vfrom(VersionDraft6)),
-	p1("$recursiveAnchor", constraintTODO, vbetween(VersionDraft2019_09, VersionDraft2020_12)),
-	p1("$recursiveRef", constraintTODO, vbetween(VersionDraft2019_09, VersionDraft2020_12)),
+	px("$recursiveAnchor", constraintTODO, vbetween(VersionDraft2019_09, VersionDraft2020_12)),
+	px("$recursiveRef", constraintTODO, vbetween(VersionDraft2019_09, VersionDraft2020_12)),
 	p2("$ref", constraintRef, allVersions|openAPI),
 	p0("$schema", constraintSchema, allVersions),
-	p1("$vocabulary", constraintTODO, vfrom(VersionDraft2019_09)),
+	px("$vocabulary", constraintTODO, vfrom(VersionDraft2019_09)),
 	p4("additionalItems", constraintAdditionalItems, vto(VersionDraft2019_09)),
 	p4("additionalProperties", constraintAdditionalProperties, allVersions|openAPI),
 	p3("allOf", constraintAllOf, allVersions|openAPI),
@@ -81,22 +78,22 @@ var constraints = []*constraint{
 	p2("contains", constraintContains, vfrom(VersionDraft6)),
 	p2("contentEncoding", constraintContentEncoding, vfrom(VersionDraft7)),
 	p2("contentMediaType", constraintContentMediaType, vfrom(VersionDraft7)),
-	p1("contentSchema", constraintTODO, vfrom(VersionDraft2019_09)),
+	px("contentSchema", constraintTODO, vfrom(VersionDraft2019_09)),
 	p2("default", constraintDefault, allVersions|openAPI),
 	p2("definitions", constraintAddDefinitions, allVersions),
 	p2("dependencies", constraintDependencies, allVersions),
-	p1("dependentRequired", constraintTODO, vfrom(VersionDraft2019_09)),
-	p1("dependentSchemas", constraintTODO, vfrom(VersionDraft2019_09)),
+	px("dependentRequired", constraintTODO, vfrom(VersionDraft2019_09)),
+	px("dependentSchemas", constraintTODO, vfrom(VersionDraft2019_09)),
 	p2("deprecated", constraintDeprecated, vfrom(VersionDraft2019_09)|openAPI),
 	p2("description", constraintDescription, allVersions|openAPI),
-	p1("discriminator", constraintTODO, openAPI),
+	px("discriminator", constraintTODO, openAPI),
 	p1("else", constraintElse, vfrom(VersionDraft7)),
 	p2("enum", constraintEnum, allVersions|openAPI),
-	p1("example", constraintTODO, openAPI),
+	px("example", constraintTODO, openAPI),
 	p2("examples", constraintExamples, vfrom(VersionDraft6)),
 	p2("exclusiveMaximum", constraintExclusiveMaximum, allVersions|openAPI),
 	p2("exclusiveMinimum", constraintExclusiveMinimum, allVersions|openAPI),
-	p1("externalDocs", constraintTODO, openAPI),
+	px("externalDocs", constraintTODO, openAPI),
 	p1("format", constraintFormat, allVersions|openAPI),
 	p1("id", constraintID, vto(VersionDraft4)),
 	p1("if", constraintIf, vfrom(VersionDraft7)),
@@ -120,16 +117,21 @@ var constraints = []*constraint{
 	p2("prefixItems", constraintPrefixItems, vfrom(VersionDraft2020_12)),
 	p2("properties", constraintProperties, allVersions|openAPI),
 	p2("propertyNames", constraintPropertyNames, vfrom(VersionDraft6)),
-	p1("readOnly", constraintTODO, vfrom(VersionDraft7)|openAPI),
+	px("readOnly", constraintTODO, vfrom(VersionDraft7)|openAPI),
 	p3("required", constraintRequired, allVersions|openAPI),
 	p1("then", constraintThen, vfrom(VersionDraft7)),
 	p2("title", constraintTitle, allVersions|openAPI),
 	p2("type", constraintType, allVersions|openAPI),
-	p1("unevaluatedItems", constraintTODO, vfrom(VersionDraft2019_09)),
-	p1("unevaluatedProperties", constraintTODO, vfrom(VersionDraft2019_09)),
+	px("unevaluatedItems", constraintTODO, vfrom(VersionDraft2019_09)),
+	px("unevaluatedProperties", constraintTODO, vfrom(VersionDraft2019_09)),
 	p2("uniqueItems", constraintUniqueItems, allVersions|openAPI),
-	p1("writeOnly", constraintTODO, vfrom(VersionDraft7)|openAPI),
-	p1("xml", constraintTODO, openAPI),
+	px("writeOnly", constraintTODO, vfrom(VersionDraft7)|openAPI),
+	px("xml", constraintTODO, openAPI),
+}
+
+// px represents a TODO constraint that we haven't decided on a phase for yet.
+func px(name string, f constraintFunc, versions versionSet) *constraint {
+	return p1(name, f, versions)
 }
 
 func p0(name string, f constraintFunc, versions versionSet) *constraint {

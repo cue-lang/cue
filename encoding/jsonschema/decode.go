@@ -378,7 +378,7 @@ func (c *constraintInfo) setTypeUsed(n cue.Value, t coreType) {
 }
 
 func (c *constraintInfo) add(n cue.Value, x ast.Expr) {
-	if !isAny(x) {
+	if !isTop(x) {
 		setPos(x, n)
 		ast.SetRelPos(x, token.NoRelPos)
 		c.constraints = append(c.constraints, x)
@@ -948,9 +948,14 @@ func boolSchema(ok bool) ast.Expr {
 	return bottom()
 }
 
-func isAny(s ast.Expr) bool {
+func isTop(s ast.Expr) bool {
 	i, ok := s.(*ast.Ident)
 	return ok && i.Name == "_"
+}
+
+func isBottom(e ast.Expr) bool {
+	_, ok := e.(*ast.BottomLit)
+	return ok
 }
 
 func addTag(field ast.Label, tag, value string) *ast.Field {

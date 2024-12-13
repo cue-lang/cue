@@ -142,7 +142,7 @@ func constraintProperties(key string, n cue.Value, s *state) {
 
 func constraintPropertyNames(key string, n cue.Value, s *state) {
 	// [=~pattern]: _
-	if names, _ := s.schemaState(n, cue.StringKind, nil); !isAny(names) {
+	if names, _ := s.schemaState(n, cue.StringKind, nil); !isTop(names) {
 		x := ast.NewStruct(ast.NewList(names), top())
 		s.add(n, objectType, x)
 	}

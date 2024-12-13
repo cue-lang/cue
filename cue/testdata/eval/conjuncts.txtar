@@ -69,15 +69,15 @@ issue2355: {
 }
 
 -- out/evalalpha/stats --
-Leaks:  188
-Freed:  24
-Reused: 24
-Allocs: 188
+Leaks:  216
+Freed:  30
+Reused: 30
+Allocs: 216
 Retain: 0
 
 Unifications: 43
-Conjuncts:    350
-Disjuncts:    124
+Conjuncts:    378
+Disjuncts:    152
 -- out/evalalpha --
 Errors:
 param: conflicting values "foo" and [{}] (mismatched types string and list):
@@ -103,11 +103,6 @@ Result:
         #early: (string){ |(*(string){ "X" }, (string){ string }) }
       }) }
     t3: (string){ |(*(string){
-        "X"
-        #early: (_|_){
-          // [cycle] cycle error
-        }
-      }, (string){
         "X"
         #early: (string){ |(*(string){ "X" }, (string){ string }) }
       }, (string){
@@ -168,18 +163,18 @@ diff old new
 -Reused: 59
 -Allocs: 18
 -Retain: 22
-+Leaks:  188
-+Freed:  24
-+Reused: 24
-+Allocs: 188
++Leaks:  216
++Freed:  30
++Reused: 30
++Allocs: 216
 +Retain: 0
  
 -Unifications: 45
 -Conjuncts:    135
 -Disjuncts:    86
 +Unifications: 43
-+Conjuncts:    350
-+Disjuncts:    124
++Conjuncts:    378
++Disjuncts:    152
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
@@ -193,7 +188,7 @@ diff old new
      ./issue2351.cue:4:19
  
  Result:
-@@ -22,14 +21,18 @@
+@@ -22,14 +21,13 @@
          string
          #early: (string){ |(*(string){ "X" }, (string){ string }) }
        }) }
@@ -207,11 +202,6 @@ diff old new
 -    }
 +    t3: (string){ |(*(string){
 +        "X"
-+        #early: (_|_){
-+          // [cycle] cycle error
-+        }
-+      }, (string){
-+        "X"
 +        #early: (string){ |(*(string){ "X" }, (string){ string }) }
 +      }, (string){
 +        string
@@ -220,7 +210,7 @@ diff old new
    }
    handleComprehensions: (struct){
      #sub2: (int){ 2 }
-@@ -37,9 +40,8 @@
+@@ -37,9 +35,8 @@
    issue2351: (_|_){
      // [eval]
      let: (_|_){
@@ -231,7 +221,7 @@ diff old new
        //     ./issue2351.cue:4:19
        let _param#1 = (string){ "foo" }
      }
-@@ -67,7 +69,7 @@
+@@ -67,7 +64,7 @@
          }
        }
      }
@@ -250,10 +240,6 @@ Retain: 22
 Unifications: 45
 Conjuncts:    135
 Disjuncts:    86
--- diff/todo/p1 --
-conjunct.t3: there is a regression that causes the disjunct to not be fully
-resolved. This is likely related to a counter issue: this test still has
-reported misaligned counters.
 -- diff/todo/p3 --
 Missing error position.
 -- diff/explanation --

@@ -73,6 +73,7 @@ func UpdateVersions(ctx context.Context, fsys fs.FS, modRoot string, reg Registr
 	for _, v := range mversionsMap {
 		newVersions = append(newVersions, v)
 	}
+	module.Sort(newVersions)
 	rs = modrequirements.NewRequirements(mf.QualifiedModule(), reg, newVersions, mf.DefaultMajorVersions())
 	g, err = rs.Graph(ctx)
 	if err != nil {

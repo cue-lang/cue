@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8c7a0e2_a546d5db",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-13T17:04:05Z",
+      "side": 1,
+      "message": "I\u0027m confused. File embeds comments, which does expose a Comments method. So yes, it is there - just as a method.",
+      "revId": "9cf00b50cf4d8fa7ad75558ccd7b9a96bdaa462e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "578edf28_6952e0a5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-13T17:04:05Z",
+      "side": 1,
+      "message": "I\u0027m confused. File embeds comments, which does expose a Comments method. So yes, it is there - just as a method.",
+      "revId": "9cf00b50cf4d8fa7ad75558ccd7b9a96bdaa462e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

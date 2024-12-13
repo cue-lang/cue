@@ -1034,8 +1034,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -1088,8 +1088,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -1151,8 +1151,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$recursiveAnchor\" not yet implemented (and 3 more errors)",
-			"v3": "extract error: keyword \"$recursiveAnchor\" not yet implemented (and 3 more errors)"
+			"v2": "extract error: keyword \"$recursiveAnchor\" not yet implemented (and 7 more errors)",
+			"v3": "extract error: keyword \"$recursiveAnchor\" not yet implemented (and 7 more errors)"
 		},
 		"tests": [
 			{
@@ -1886,8 +1886,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented",
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented"
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -2060,8 +2060,8 @@
 			"unevaluatedProperties": false
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)",
-			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 1 more errors)"
+			"v2": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 3 more errors)",
+			"v3": "extract error: keyword \"unevaluatedProperties\" not yet implemented (and 3 more errors)"
 		},
 		"tests": [
 			{

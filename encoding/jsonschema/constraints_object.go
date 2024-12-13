@@ -118,9 +118,11 @@ func constraintProperties(key string, n cue.Value, s *state) {
 	s.processMap(n, func(key string, n cue.Value) {
 		// property?: value
 		name := ast.NewString(key)
-		expr, state := s.schemaState(n, allTypes, []label{{name: key}})
+		expr, state := s.schemaState(n, allTypes)
 		f := &ast.Field{Label: name, Value: expr}
-		state.doc(f)
+		if doc := state.comment(); doc != nil {
+			ast.SetComments(f, []*ast.CommentGroup{doc})
+		}
 		f.Optional = token.Blank.Pos()
 		if len(obj.Elts) > 0 && len(f.Comments()) > 0 {
 			// TODO: change formatter such that either a NewSection on the
@@ -136,13 +138,12 @@ func constraintProperties(key string, n cue.Value, s *state) {
 			}
 		}
 		obj.Elts = append(obj.Elts, f)
-		s.setField(label{name: key}, f)
 	})
 }
 
 func constraintPropertyNames(key string, n cue.Value, s *state) {
 	// [=~pattern]: _
-	if names, _ := s.schemaState(n, cue.StringKind, nil); !isTop(names) {
+	if names, _ := s.schemaState(n, cue.StringKind); !isTop(names) {
 		x := ast.NewStruct(ast.NewList(names), top())
 		s.add(n, objectType, x)
 	}
@@ -154,8 +155,6 @@ func constraintRequired(key string, n cue.Value, s *state) {
 		return
 	}
 
-	// TODO: detect that properties is defined somewhere.
-	// s.errf(n, `"required" without a "properties" field`)
 	obj := s.object(n)
 
 	// Create field map

@@ -525,6 +525,40 @@ issue770: {
 	h: c:   _
 	h: coo: _
 }
+-- issue3528.cue --
+issue3528: original: {
+	workflows: [...#Workflow]
+	workflows: [test]
+
+	test: #Workflow & {}
+
+	#Workflow: {
+		container: [string]: string | #container
+		#container: string | {volumes?: [...string]}
+	}
+}
+issue3528: reduced: {
+	a?: #A
+	a:  #A & {}
+	#A: {
+		A: [string]: 1 | #a
+		#a: 2 | {v: 1}
+	}
+}
+issue3528: counter: {
+}
+issue3528: nested: t1: {
+	{v: 1} | (2 | 3)
+	{v: 1} | (2 | 3)
+	{v: 1} | (2 | 3)
+	{v: 1} | (2 | 3)
+}
+issue3528: nested: t2: {
+	{v: 1} | 2
+	{v: 1} | (2 | 3)
+	{v: 1} | 2
+	{v: 1} | 2
+}
 -- out/evalalpha --
 (struct){
   disambiguateClosed: (struct){

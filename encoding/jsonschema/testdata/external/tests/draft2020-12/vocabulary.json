@@ -12,8 +12,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/metaschema-no-validation.json\": $schema URI not recognized",
-			"v3": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/metaschema-no-validation.json\": $schema URI not recognized"
+			"v2": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/metaschema-no-validation.json\": $schema URI not recognized (and 1 more errors)",
+			"v3": "extract error: invalid $schema URL \"http://localhost:1234/draft2020-12/metaschema-no-validation.json\": $schema URI not recognized (and 1 more errors)"
 		},
 		"tests": [
 			{

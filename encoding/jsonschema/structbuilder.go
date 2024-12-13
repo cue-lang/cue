@@ -250,6 +250,7 @@ func appendDeclsExpr(decls []ast.Decl, expr ast.Expr) []ast.Decl {
 	}
 	return decls
 }
+
 func appendField(decls []ast.Decl, path cue.Path, v ast.Expr, comment *ast.CommentGroup) ([]ast.Decl, error) {
 	if len(path.Selectors()) == 0 {
 		return appendDeclsExpr(decls, v), nil

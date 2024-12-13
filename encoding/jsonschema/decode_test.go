@@ -279,8 +279,10 @@ properties: {
 		},
 	})
 	qt.Assert(t, qt.Equals(errors.Details(err, nil), `
-cannot determine import path from URL "https://something.test/foo": some error:
+cannot determine CUE location for JSON Schema location id=https://something.test/foo#/definitions/x: some error:
     foo.cue:4:5
+cannot determine CUE location for JSON Schema location id=https://something.test/foo#/definitions/y: some error:
+    foo.cue:5:5
 `[1:]))
 }
 

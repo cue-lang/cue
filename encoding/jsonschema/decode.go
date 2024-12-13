@@ -34,24 +34,74 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/mod/module"
+)
+
+const (
+	// DefaultRootID is used as the absolute base URI for a schema
+	// when no value is provided in [Config.ID].
+	DefaultRootID     = "https://" + DefaultRootIDHost
+	DefaultRootIDHost = "cue.jsonschema.invalid"
 )
 
 // rootDefs defines the top-level name of the map of definitions that do not
 // have a valid identifier name.
 //
-// TODO: find something more principled, like allowing #."a-b" or `#a-b`.
+// TODO: find something more principled, like allowing #("a-b").
 const rootDefs = "#"
 
 // A decoder converts JSON schema to CUE.
 type decoder struct {
 	cfg          *Config
 	errs         errors.Error
-	numID        int // for creating unique numbers: increment on each use
 	mapURLErrors map[string]bool
-	// self holds the struct literal that will eventually be embedded
-	// in the top level file. It is only set when decoder.rootRef is
-	// called.
-	self *ast.StructLit
+
+	root   cue.Value
+	rootID *url.URL
+
+	// defForValue holds an entry for internal values
+	// that are known to map to a defined schema.
+	// A nil entry is stored for nodes that have been
+	// referred to but we haven't yet seen when walking
+	// the schemas.
+	defForValue *valueMap[*definedSchema]
+
+	// danglingRefs records the number of nil entries in defForValue,
+	// representing the number of references into the internal
+	// structure that have not yet been resolved.
+	danglingRefs int
+
+	// defs holds the set of named schemas, indexed by URI (both
+	// canonical, and root-relative if known), including external
+	// schemas that aren't known.
+	defs map[string]*definedSchema
+
+	// builder is used to build the final syntax tree as it becomes known.
+	builder structBuilder
+
+	// needAnotherPass is set to true when we know that
+	// we need another pass through the schema extraction
+	// process. This can happen because `MapRef` might choose
+	// a different location depending on whether a reference is local
+	// or external. We don't know that until we've traversed the
+	// entire schema and the `$ref` might be seen before the
+	// schema it's referring to. Still more passes might be required
+	// if a $ref is found to be referring to a node that would not normally
+	// be considered part of the schema data.
+	needAnotherPass bool
+}
+
+// definedSchema records information for a schema or subschema.
+type definedSchema struct {
+	// importPath is empty for internal schemas.
+	importPath string
+
+	// path holds the location of the schema relative to importPath.
+	path cue.Path
+
+	// schema holds the actual syntax for the schema. This
+	// is nil if the entry was created by a reference only.
+	schema ast.Expr
 }
 
 // addImport registers
@@ -76,142 +126,114 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 		f.Decls = append(f.Decls, pkg)
 	}
 
-	var a []ast.Decl
-
-	if d.cfg.Root == "" {
-		a = append(a, d.schema(nil, v)...)
-	} else {
-		ref := d.parseRef(token.NoPos, d.cfg.Root)
-		if ref == nil {
-			return f
-		}
-		var selectors []cue.Selector
-		for _, r := range ref {
-			selectors = append(selectors, cue.Str(r))
-		}
-		i, err := v.LookupPath(cue.MakePath(selectors...)).Fields()
+	var defsRoot cue.Value
+	if d.cfg.Root != "" {
+		defsPath, err := parseRootRef(d.cfg.Root)
 		if err != nil {
-			d.errs = errors.Append(d.errs, errors.Promote(err, ""))
+			d.errf(cue.Value{}, "invalid Config.Root value %q: %v", d.cfg.Root, err)
 			return nil
 		}
-		for i.Next() {
-			ref := append(ref, i.Selector().Unquoted())
-			lab := d.mapRef(i.Value().Pos(), "", ref)
-			if len(lab) == 0 {
+		defsRoot = v.LookupPath(defsPath)
+		if kind := defsRoot.Kind(); kind != cue.StructKind {
+			d.errf(defsRoot, "value at path %v must be struct containing definitions but is actually %v", d.cfg.Root, defsRoot)
+			return nil
+		}
+	}
+
+	var rootInfo schemaInfo
+	// extraSchemas records any nodes that are referred to
+	// but not part of the regular schema traversal.
+	var extraSchemas []cue.Value
+	// basePass records the last time that any new schemas were
+	// added for inspection. This can be set whenever new schemas
+	// not part of the regular traversal are found.
+	basePass := 0
+
+	for pass := 0; ; pass++ {
+		if pass > 10 {
+			// Should never happen: the most we should ever see in practice
+			// should be 2, but some pathological cases could end up with more.
+			d.errf(v, "internal error: too many passes without resolution")
+			return nil
+		}
+		root := &state{
+			decoder: d,
+			schemaInfo: schemaInfo{
+				schemaVersion: d.cfg.DefaultVersion,
+				id:            d.rootID,
+			},
+			isRoot: true,
+			pos:    v,
+		}
+
+		if defsRoot.Exists() {
+			// When d.cfg.Root is non-empty, it points to a struct
+			// containing a field for each definition.
+			constraintAddDefinitions("schemas", defsRoot, root)
+		} else {
+			expr, state := root.schemaState(v, allTypes)
+			if state.allowedTypes == 0 {
+				root.errf(v, "constraints are not possible to satisfy")
 				return nil
 			}
-			decls := d.schema(lab, i.Value())
-			a = append(a, decls...)
+			if !d.builder.put(cue.Path{}, expr, state.comment()) {
+				root.errf(v, "duplicate definition at root") // TODO better error message
+				return nil
+			}
+			rootInfo = state
 		}
+		if d.danglingRefs > 0 && pass == basePass+1 {
+			// There are still dangling references but we've been through the
+			// schema twice, so we know that there's a reference
+			// to a non-schema node. Technically this is not necessarily valid,
+			// but we do see this in the wild. This should be rare,
+			// so efficiency (re-parsing paths) shouldn't be a great issue.
+			for path, def := range d.defForValue.byPath {
+				if def != nil {
+					continue
+				}
+				n := d.root.LookupPath(cue.ParsePath(path))
+				if !n.Exists() {
+					panic("failed to find entry for dangling reference")
+				}
+				extraSchemas = append(extraSchemas, n)
+				basePass = pass
+			}
+		}
+		for _, n := range extraSchemas {
+			// As the ID namespace isn't well-defined we treat all such
+			// schemas as if they were directly under the root.
+			// See https://json-schema.org/draft/2020-12/json-schema-core#section-9.4.2
+			root.schema(n)
+		}
+		if !d.needAnotherPass && d.danglingRefs == 0 {
+			break
+		}
+
+		d.builder = structBuilder{}
+		d.needAnotherPass = false
 	}
-
-	f.Decls = append(f.Decls, a...)
-
-	_ = astutil.Sanitize(f)
-
-	return f
-}
-
-func (d *decoder) schema(ref []ast.Label, v cue.Value) (a []ast.Decl) {
-	root := state{
-		decoder: d,
-		schemaInfo: schemaInfo{
-			schemaVersion: d.cfg.DefaultVersion,
-		},
-		isRoot: true,
+	f, err := d.builder.syntax()
+	if err != nil {
+		d.errf(v, "cannot build final syntax: %v", err)
+		return nil
 	}
-
-	var name ast.Label
-	inner := len(ref) - 1
-
-	if inner >= 0 {
-		name = ref[inner]
-	}
-
-	expr, state := root.schemaState(v, allTypes, nil)
-	if state.allowedTypes == 0 {
-		d.addErr(errors.Newf(v.Pos(), "constraints are not possible to satisfy"))
-	}
-
-	tags := []string{}
-	if state.schemaVersionPresent {
+	var attrs []ast.Decl
+	if rootInfo.schemaVersionPresent {
 		// TODO use cue/literal.String
-		tags = append(tags, fmt.Sprintf("schema=%q", state.schemaVersion))
+		// TODO is this actually useful information: why is knowing the schema
+		// version of the input useful?
+		attrs = append(attrs, &ast.Attribute{
+			Text: fmt.Sprintf("@jsonschema(schema=%q)", rootInfo.schemaVersion),
+		})
 	}
-
-	if name == nil {
-		if len(tags) > 0 {
-			body := strings.Join(tags, ",")
-			a = append(a, &ast.Attribute{
-				Text: fmt.Sprintf("@jsonschema(%s)", body)})
-		}
-
-		if state.deprecated {
-			a = append(a, &ast.Attribute{Text: "@deprecated()"})
-		}
-	} else {
-		if len(tags) > 0 {
-			a = append(a, addTag(name, "jsonschema", strings.Join(tags, ",")))
-		}
-
-		if state.deprecated {
-			a = append(a, addTag(name, "deprecated", ""))
-		}
+	if rootInfo.deprecated {
+		attrs = append(attrs, &ast.Attribute{Text: "@deprecated()"})
 	}
-
-	if name != nil {
-		f := &ast.Field{
-			Label: name,
-			Value: expr,
-		}
-
-		a = append(a, f)
-	} else if st, ok := expr.(*ast.StructLit); ok && len(st.Elts) > 0 {
-		a = append(a, st.Elts...)
-	} else {
-		a = append(a, &ast.EmbedDecl{Expr: expr})
+	if len(attrs) > 0 {
+		f.Decls = append(attrs, f.Decls...)
 	}
-
-	if len(a) > 0 {
-		state.doc(a[0])
-	}
-	for i := inner - 1; i >= 0; i-- {
-		a = []ast.Decl{&ast.Field{
-			Label: ref[i],
-			Value: &ast.StructLit{Elts: a},
-		}}
-		expr = ast.NewStruct(ref[i], expr)
-	}
-
-	if root.self == nil {
-		return a
-	}
-	root.self.Elts = a
-	return []ast.Decl{
-		&ast.EmbedDecl{Expr: d.rootRef()},
-		&ast.Field{
-			Label: d.rootRef(),
-			Value: root.self,
-		},
-	}
-}
-
-// rootRef returns a reference to the top of the file. We do this by
-// creating a helper schema:
-//
-//	_schema: {...}
-//	_schema
-//
-// This is created at the finalization stage, signaled by d.self being
-// set, which rootRef does as a side-effect.
-func (d *decoder) rootRef() *ast.Ident {
-	ident := ast.NewIdent("_schema")
-	if d.self == nil {
-		d.self = &ast.StructLit{}
-	}
-	// Ensure that all self-references refer to the same node.
-	ident.Node = d.self
-	return ident
+	return f
 }
 
 func (d *decoder) errf(n cue.Value, format string, args ...interface{}) ast.Expr {
@@ -290,6 +312,7 @@ func (d *decoder) checkRegexp(n cue.Value, s string) bool {
 			// runtime). In other words, this is a missing feature but not an invalid
 			// regular expression as such.
 			if d.cfg.StrictFeatures {
+				// TODO: could fall back to  https://github.com/dlclark/regexp2 instead
 				d.errf(n, "unsupported Perl regexp syntax in %q: %v", s, err)
 			}
 			return false
@@ -306,6 +329,15 @@ func (d *decoder) checkRegexp(n cue.Value, s string) bool {
 	}
 	d.errf(n, "invalid regexp %q: %v", s, err)
 	return false
+}
+
+// ensureDefinition ensures that node n will
+// be a defined schema.
+func (d *decoder) ensureDefinition(n cue.Value) {
+	if _, ok := d.defForValue.lookup(n); !ok {
+		d.defForValue.set(n, nil)
+		d.danglingRefs++
+	}
 }
 
 // const draftCutoff = 5
@@ -402,11 +434,6 @@ type state struct {
 
 	up *state
 
-	path []string
-
-	// idRef is used to refer to this schema in case it defines an $id.
-	idRef []label
-
 	pos cue.Value
 
 	// The constraints in types represent disjunctions per type.
@@ -435,15 +462,11 @@ type state struct {
 	thenConstraint cue.Value
 	elseConstraint cue.Value
 
-	id *url.URL // base URI for $ref
-
 	definitions []ast.Decl
 
 	// Used for inserting definitions, properties, etc.
 	obj  *ast.StructLit
 	objN cue.Value // used for adding obj to constraints
-	// Complete at finalize.
-	fieldRefs map[label]refs
 
 	closeStruct bool
 	patterns    []ast.Expr
@@ -477,23 +500,16 @@ type schemaInfo struct {
 
 	title       string
 	description string
-	deprecated  bool
+
+	// id holds the absolute URI of the schema if has a $id field .
+	// It's the base URI for $ref or nested $id fields.
+	id         *url.URL
+	deprecated bool
 
 	schemaVersion        Version
 	schemaVersionPresent bool
 
 	hasConstraints bool
-}
-
-type label struct {
-	name  string
-	isDef bool
-}
-
-type refs struct {
-	field *ast.Field
-	ident string
-	refs  []*ast.Ident
 }
 
 func (s *state) idTag() *ast.Attribute {
@@ -544,10 +560,15 @@ func (s *state) hasConstraints() bool {
 		s.id != nil
 }
 
-const allTypes = cue.NullKind | cue.BoolKind | cue.NumberKind | cue.IntKind |
-	cue.StringKind | cue.ListKind | cue.StructKind
+const allTypes = cue.BoolKind |
+	cue.ListKind |
+	cue.NullKind |
+	cue.NumberKind |
+	cue.IntKind |
+	cue.StringKind |
+	cue.StructKind
 
-// finalize constructs a CUE type from the collected constraints.
+// finalize constructs CUE syntax from the collected constraints.
 func (s *state) finalize() (e ast.Expr) {
 	if s.allowedTypes == 0 {
 		// Nothing is possible. This isn't a necessarily a problem, as
@@ -675,8 +696,6 @@ outer:
 		}
 	}
 
-	s.linkReferences()
-
 	// If an "$id" exists and has not been included in any object constraints
 	if s.id != nil && s.obj == nil {
 		if st, ok := e.(*ast.StructLit); ok {
@@ -710,25 +729,15 @@ func (s schemaInfo) comment() *ast.CommentGroup {
 	return internal.NewComment(true, doc)
 }
 
-func (s schemaInfo) doc(n ast.Node) {
-	doc := s.comment()
-	if doc != nil {
-		ast.SetComments(n, []*ast.CommentGroup{doc})
-	}
-}
-
-func (s *state) schema(n cue.Value, idRef ...label) ast.Expr {
-	expr, _ := s.schemaState(n, allTypes, idRef)
-	// TODO: report unused doc.
+func (s *state) schema(n cue.Value) ast.Expr {
+	expr, _ := s.schemaState(n, allTypes)
 	return expr
 }
 
 // schemaState returns a new state value derived from s.
 // n holds the JSONSchema node to translate to a schema.
 // types holds the set of possible types that the value can hold.
-// idRef holds the path to the value.
-// isLogical specifies whether the caller is a logical operator like anyOf, allOf, oneOf, or not.
-func (s0 *state) schemaState(n cue.Value, types cue.Kind, idRef []label) (ast.Expr, schemaInfo) {
+func (s0 *state) schemaState(n cue.Value, types cue.Kind) (expr ast.Expr, ingo schemaInfo) {
 	s := &state{
 		up: s0,
 		schemaInfo: schemaInfo{
@@ -737,13 +746,17 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind, idRef []label) (ast.Ex
 			knownTypes:    allTypes,
 		},
 		decoder: s0.decoder,
-		idRef:   idRef,
 		pos:     n,
 		isRoot:  s0.isRoot && n == s0.pos,
 	}
+	defer func() {
+		// Perhaps replace the schema expression with a reference.
+		expr = s.maybeDefine(expr)
+	}()
 	if n.Kind() == cue.BoolKind {
 		if vfrom(VersionDraft6).contains(s.schemaVersion) {
 			// From draft6 onwards, boolean values signify a schema that always passes or fails.
+			// TODO if false, set s.allowedTypes and s.knownTypes to zero?
 			return boolSchema(s.boolValue(n)), s.schemaInfo
 		}
 		return s.errf(n, "boolean schemas not supported in %v", s.schemaVersion), s.schemaInfo
@@ -804,11 +817,124 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind, idRef []label) (ast.Ex
 			c.fn(key, value, s)
 		})
 	}
+	if s.id != nil {
+		// If there's an ID, it can be referred to.
+		s.ensureDefinition(s.pos)
+	}
 	constraintIfThenElse(s)
 
-	expr := s.finalize()
+	schemaExpr := s.finalize()
 	s.schemaInfo.hasConstraints = s.hasConstraints()
-	return expr, s.schemaInfo
+	return schemaExpr, s.schemaInfo
+}
+
+// maybeDefine checks whether we might need a definition
+// for n given its actual schema syntax expression. If
+// it does, it creates the definition as appropriate and returns
+// an expression that refers to that definition; if not,
+// it just returns expr itself.
+// TODO also report whether the schema has been defined at a place
+// where it can be unified with something else?
+func (s *state) maybeDefine(expr ast.Expr) ast.Expr {
+	def := s.definedSchemaForNode(s.pos)
+	if def == nil || len(def.path.Selectors()) == 0 {
+		return expr
+	}
+	def.schema = expr
+	if def.importPath == "" {
+		// It's a local definition that's not at the root.
+		if !s.builder.put(def.path, expr, s.comment()) {
+			s.errf(s.pos, "redefinition of schema CUE path %v", def.path)
+			return expr
+		}
+	}
+	return s.refExpr(s.pos, def.importPath, def.path)
+}
+
+// definedSchemaForNode returns the definedSchema value
+// for the given node in the JSON schema, or nil
+// if the node does not need a definition.
+func (s *state) definedSchemaForNode(n cue.Value) *definedSchema {
+	def, ok := s.defForValue.lookup(n)
+	if !ok {
+		return nil
+	}
+	if def != nil {
+		// We've either made a definition in a previous pass
+		// or it's a redefinition.
+		// TODO if it's a redefinition, error.
+		return def
+	}
+	// This node has been referred to but not actually defined. We'll
+	// need another pass to sort out the reference even though the
+	// reference is no longer dangling.
+	s.needAnotherPass = true
+
+	def = s.addDefinition(n)
+	if def == nil {
+		return nil
+	}
+	s.defForValue.set(n, def)
+	s.danglingRefs--
+	return def
+}
+
+func (s *state) addDefinition(n cue.Value) *definedSchema {
+	var loc SchemaLoc
+	schemaRoot := s.schemaRoot()
+	loc.ID = ref(*schemaRoot.id)
+	loc.ID.Fragment = cuePathToJSONPointer(relPath(n, schemaRoot.pos))
+	idStr := loc.ID.String()
+	def, ok := s.defs[idStr]
+	if ok {
+		// We've already got a definition for this ID.
+		// TODO if it's been defined in the same pass, then it's a redefinition
+		// s.errf(n, "redefinition of schema %s at %v", idStr, n.Path())
+		return def
+	}
+	loc.IsLocal = true
+	loc.Path = relPath(n, s.root)
+	importPath, path, err := s.cfg.MapRef(loc)
+	if err != nil {
+		s.errf(n, "cannot get reference for %v", loc)
+		return nil
+	}
+	def = &definedSchema{
+		importPath: importPath,
+		path:       path,
+	}
+	s.defs[idStr] = def
+	return def
+}
+
+// refExpr returns a CUE expression to refer to the given path within the given
+// imported CUE package. If importPath is empty, it returns a reference
+// relative to the root of the schema being generated.
+func (s *state) refExpr(n cue.Value, importPath string, path cue.Path) ast.Expr {
+	if importPath == "" {
+		// Internal reference
+		expr, err := s.builder.getRef(path)
+		if err != nil {
+			s.errf(n, "cannot generate reference: %v", err)
+			return nil
+		}
+		return expr
+	}
+	// External reference
+	ip := module.ParseImportPath(importPath)
+	if ip.Qualifier == "" {
+		// TODO choose an arbitrary name here.
+		s.errf(n, "cannot determine package name from import path %q", importPath)
+		return nil
+	}
+	ident := ast.NewIdent(ip.Qualifier)
+	ident.Node = &ast.ImportSpec{Path: ast.NewString(importPath)}
+	expr, err := pathRefSyntax(path, ident)
+	if err != nil {
+		s.errf(n, "cannot determine CUE path: %v", err)
+		return nil
+	}
+	return expr
 }
 
 func (s *state) constValue(n cue.Value) ast.Expr {

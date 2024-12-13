@@ -17,6 +17,7 @@ package jsonschema
 import (
 	"fmt"
 	"slices"
+	"strconv"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -160,6 +161,43 @@ func labelForSelector(sel cue.Selector) (ast.Label, error) {
 	}
 }
 
+func cuePathToJSONPointer(p cue.Path) string {
+	return jsonPointerFromTokens(func(yield func(s string) bool) {
+		for _, sel := range p.Selectors() {
+			var token string
+			switch sel.Type() {
+			case cue.StringLabel:
+				token = sel.Unquoted()
+			case cue.IndexLabel:
+				token = strconv.Itoa(sel.Index())
+			default:
+				panic(fmt.Errorf("cannot convert selector %v to JSON pointer", sel))
+			}
+			if !yield(token) {
+				return
+			}
+		}
+	})
+}
+
+// relPath returns the path to v relative to root,
+// which must be a direct ancestor of v.
+func relPath(v, root cue.Value) cue.Path {
+	rootPath := root.Path().Selectors()
+	vPath := v.Path().Selectors()
+	if !sliceHasPrefix(vPath, rootPath) {
+		panic("value is not inside root")
+	}
+	return cue.MakePath(vPath[len(rootPath):]...)
+}
+
+func sliceHasPrefix[E comparable](s1, s2 []E) bool {
+	if len(s2) > len(s1) {
+		return false
+	}
+	return slices.Equal(s1[:len(s2)], s2)
+}
+
 // TODO remove this when we can use [slices.SortedFunc] and [maps.Keys].
 func sortedKeys[K comparable, V any](m map[K]V, cmp func(K, K) int) []K {
 	ks := make([]K, 0, len(m))
@@ -168,4 +206,25 @@ func sortedKeys[K comparable, V any](m map[K]V, cmp func(K, K) int) []K {
 	}
 	slices.SortFunc(ks, cmp)
 	return ks
+}
+
+// TODO(go1.23) use slices.Collect
+func collectSlice[E any](seq func(func(E) bool)) []E {
+	var s []E
+	seq(func(v E) bool {
+		s = append(s, v)
+		return true
+	})
+	return s
+}
+
+// TODO(go1.23) use slices.Values
+func sliceValues[Slice ~[]E, E any](s Slice) func(func(E) bool) {
+	return func(yield func(E) bool) {
+		for _, v := range s {
+			if !yield(v) {
+				return
+			}
+		}
+	}
 }

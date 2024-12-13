@@ -525,6 +525,40 @@ issue770: {
 	h: c:   _
 	h: coo: _
 }
+-- issue3528.cue --
+issue3528: original: {
+	workflows: [...#Workflow]
+	workflows: [test]
+
+	test: #Workflow & {}
+
+	#Workflow: {
+		container: [string]: string | #container
+		#container: string | {volumes?: [...string]}
+	}
+}
+issue3528: reduced: {
+	a?: #A
+	a:  #A & {}
+	#A: {
+		A: [string]: 1 | #a
+		#a: 2 | {v: 1}
+	}
+}
+issue3528: counter: {
+}
+issue3528: nested: t1: {
+	{v: 1} | (2 | 3)
+	{v: 1} | (2 | 3)
+	{v: 1} | (2 | 3)
+	{v: 1} | (2 | 3)
+}
+issue3528: nested: t2: {
+	{v: 1} | 2
+	{v: 1} | (2 | 3)
+	{v: 1} | 2
+	{v: 1} | 2
+}
 -- out/evalalpha --
 (struct){
   disambiguateClosed: (struct){
@@ -1390,6 +1424,62 @@ issue770: {
       3: (#struct){
         name: (string){ "an exception" }
       }
+    }
+  }
+  issue3528: (struct){
+    original: (struct){
+      workflows: (#list){
+        0: (#struct){
+          container: (#struct){
+          }
+          #container: ((string|struct)){ |((string){ string }, (#struct){
+              volumes?: (list){
+              }
+            }) }
+        }
+      }
+      test: (#struct){
+        container: (#struct){
+        }
+        #container: ((string|struct)){ |((string){ string }, (#struct){
+            volumes?: (list){
+            }
+          }) }
+      }
+      #Workflow: (#struct){
+        container: (#struct){
+        }
+        #container: ((string|struct)){ |((string){ string }, (#struct){
+            volumes?: (list){
+            }
+          }) }
+      }
+    }
+    reduced: (struct){
+      a: (#struct){
+        A: (#struct){
+        }
+        #a: ((int|struct)){ |((int){ 2 }, (#struct){
+            v: (int){ 1 }
+          }) }
+      }
+      #A: (#struct){
+        A: (#struct){
+        }
+        #a: ((int|struct)){ |((int){ 2 }, (#struct){
+            v: (int){ 1 }
+          }) }
+      }
+    }
+    counter: (struct){
+    }
+    nested: (struct){
+      t1: ((int|struct)){ |((struct){
+          v: (int){ 1 }
+        }, (int){ 2 }, (int){ 3 }) }
+      t2: ((int|struct)){ |((struct){
+          v: (int){ 1 }
+        }, (int){ 2 }) }
     }
   }
   issue770: (struct){
@@ -2271,7 +2361,7 @@ diff old new
        }
      }
    }
-@@ -1078,10 +879,10 @@
+@@ -1134,10 +935,10 @@
          v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
        }
        c: (#struct){
@@ -2286,14 +2376,14 @@ diff old new
    }
 -- out/eval/stats --
 Leaks:  4
-Freed:  2554
-Reused: 2538
+Freed:  2684
+Reused: 2668
 Allocs: 20
-Retain: 115
+Retain: 118
 
-Unifications: 1292
-Conjuncts:    3726
-Disjuncts:    2669
+Unifications: 1350
+Conjuncts:    3905
+Disjuncts:    2802
 -- diff/todo/p1 --
 issue2263.full: missing elimination, may be lack of closeContext
 -- diff/todo/p2 --
@@ -3371,6 +3461,62 @@ Result:
           //     ./issue3149.cue:10:10
         }
       }
+    }
+  }
+  issue3528: (struct){
+    original: (struct){
+      workflows: (#list){
+        0: (#struct){
+          container: (#struct){
+          }
+          #container: ((string|struct)){ |((string){ string }, (#struct){
+              volumes?: (list){
+              }
+            }) }
+        }
+      }
+      test: (#struct){
+        container: (#struct){
+        }
+        #container: ((string|struct)){ |((string){ string }, (#struct){
+            volumes?: (list){
+            }
+          }) }
+      }
+      #Workflow: (#struct){
+        container: (#struct){
+        }
+        #container: ((string|struct)){ |((string){ string }, (#struct){
+            volumes?: (list){
+            }
+          }) }
+      }
+    }
+    reduced: (struct){
+      a: (#struct){
+        A: (#struct){
+        }
+        #a: ((int|struct)){ |((int){ 2 }, (#struct){
+            v: (int){ 1 }
+          }) }
+      }
+      #A: (#struct){
+        A: (#struct){
+        }
+        #a: ((int|struct)){ |((int){ 2 }, (#struct){
+            v: (int){ 1 }
+          }) }
+      }
+    }
+    counter: (struct){
+    }
+    nested: (struct){
+      t1: ((int|struct)){ |((struct){
+          v: (int){ 1 }
+        }, (int){ 2 }, (int){ 3 }) }
+      t2: ((int|struct)){ |((struct){
+          v: (int){ 1 }
+        }, (int){ 2 }) }
     }
   }
   issue770: (struct){
@@ -4457,6 +4603,83 @@ Result:
         name: "an exception"
       },
     ]
+  }
+}
+--- issue3528.cue
+{
+  issue3528: {
+    original: {
+      workflows: [
+        ...〈1;#Workflow〉,
+      ]
+      workflows: [
+        〈1;test〉,
+      ]
+      test: (〈0;#Workflow〉 & {})
+      #Workflow: {
+        container: {
+          [string]: (string|〈1;#container〉)
+        }
+        #container: (string|{
+          volumes?: [
+            ...string,
+          ]
+        })
+      }
+    }
+  }
+  issue3528: {
+    reduced: {
+      a?: 〈0;#A〉
+      a: (〈0;#A〉 & {})
+      #A: {
+        A: {
+          [string]: (1|〈1;#a〉)
+        }
+        #a: (2|{
+          v: 1
+        })
+      }
+    }
+  }
+  issue3528: {
+    counter: {}
+  }
+  issue3528: {
+    nested: {
+      t1: {
+        ({
+          v: 1
+        }|(2|3))
+        ({
+          v: 1
+        }|(2|3))
+        ({
+          v: 1
+        }|(2|3))
+        ({
+          v: 1
+        }|(2|3))
+      }
+    }
+  }
+  issue3528: {
+    nested: {
+      t2: {
+        ({
+          v: 1
+        }|2)
+        ({
+          v: 1
+        }|(2|3))
+        ({
+          v: 1
+        }|2)
+        ({
+          v: 1
+        }|2)
+      }
+    }
   }
 }
 --- issue770.cue

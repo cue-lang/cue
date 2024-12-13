@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3da432fd_a9886681",
+        "filename": "encoding/openapi/decode_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-13T18:21:18Z",
+      "side": 1,
+      "message": "why does this then re-compute the diff between out and b? the line that you\u0027re deleting seems to reuse the diff, so ISTM we should do that",
+      "revId": "252aae65c926edb084cfb698ec627203b48b13d2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

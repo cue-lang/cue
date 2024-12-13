@@ -1,0 +1,79 @@
+#includePointers
+-- file.cue --
+package p
+
+a: b
+b: 3
+-- out/debugprint/file.cue --
+*ast.File@XXXX{
+	Filename: "file.cue"
+	Decls: []ast.Decl{
+		*ast.Package@XXXX{
+			PackagePos: token.Pos("file.cue:1:1", nospace)
+			Name: *ast.Ident@XXXX{
+				NamePos: token.Pos("file.cue:1:9", blank)
+				Name: "p"
+			}
+		}
+		*ast.Field@XXXX{
+			Label: *ast.Ident@XXXX{
+				NamePos: token.Pos("file.cue:3:1", section)
+				Name: "a"
+			}
+			Optional: token.Pos("-")
+			Constraint: token.Token("ILLEGAL")
+			TokenPos: token.Pos("file.cue:3:2", nospace)
+			Token: token.Token(":")
+			Value: *ast.Ident@XXXX{
+				NamePos: token.Pos("file.cue:3:4", blank)
+				Name: "b"
+				Node: @XXXX (ast.BasicLit)
+			}
+			Attrs: []*ast.Attribute{}
+		}
+		*ast.Field@XXXX{
+			Label: *ast.Ident@XXXX{
+				NamePos: token.Pos("file.cue:4:1", newline)
+				Name: "b"
+			}
+			Optional: token.Pos("-")
+			Constraint: token.Token("ILLEGAL")
+			TokenPos: token.Pos("file.cue:4:2", nospace)
+			Token: token.Token(":")
+			Value: *ast.BasicLit@XXXX{
+				ValuePos: token.Pos("file.cue:4:4", blank)
+				Kind: token.Token("INT")
+				Value: "3"
+			}
+			Attrs: []*ast.Attribute{}
+		}
+	}
+	Imports: []*ast.ImportSpec{}
+}
+-- out/debugprint/file.cue/omitempty-strings --
+*ast.File{
+	Filename: "file.cue"
+	Decls: []ast.Decl{
+		*ast.Package{
+			Name: *ast.Ident{
+				Name: "p"
+			}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				Name: "a"
+			}
+			Value: *ast.Ident{
+				Name: "b"
+			}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				Name: "b"
+			}
+			Value: *ast.BasicLit{
+				Value: "3"
+			}
+		}
+	}
+}

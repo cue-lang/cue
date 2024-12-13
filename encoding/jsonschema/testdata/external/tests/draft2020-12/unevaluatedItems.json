@@ -815,8 +815,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
+			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented (and 1 more errors)",
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -869,8 +869,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented",
-			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented"
+			"v2": "extract error: keyword \"unevaluatedItems\" not yet implemented (and 1 more errors)",
+			"v3": "extract error: keyword \"unevaluatedItems\" not yet implemented (and 1 more errors)"
 		},
 		"tests": [
 			{
@@ -937,8 +937,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 3 more errors)",
-			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 3 more errors)"
+			"v2": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 7 more errors)",
+			"v3": "extract error: keyword \"$dynamicAnchor\" not yet implemented (and 7 more errors)"
 		},
 		"tests": [
 			{

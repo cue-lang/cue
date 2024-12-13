@@ -428,30 +428,3 @@ func DefaultMapURL(u *url.URL) (string, cue.Path, error) {
 	}
 	return u.Host + p, cue.Path{}, nil
 }
-
-// pathRefSyntax returns the syntax for an expression which
-// looks up the path inside the given root expression's value.
-// It returns an error if the path contains any elements with
-// type [cue.OptionalConstraint], [cue.RequiredConstraint], or [cue.PatternConstraint],
-// none of which are expressible as a CUE index expression.
-//
-// TODO implement this properly and move to a method on [cue.Path].
-func pathRefSyntax(cuePath cue.Path, root ast.Expr) (ast.Expr, error) {
-	expr := root
-	for _, sel := range cuePath.Selectors() {
-		switch sel.LabelType() {
-		case cue.StringLabel, cue.DefinitionLabel:
-			ident := sel.String()
-			if !ast.IsValidIdent(ident) {
-				return nil, fmt.Errorf("cannot form expression for path %q", cuePath)
-			}
-			expr = &ast.SelectorExpr{
-				X:   expr,
-				Sel: ast.NewIdent(sel.String()),
-			}
-		default:
-			return nil, fmt.Errorf("cannot form expression for path %q", cuePath)
-		}
-	}
-	return expr, nil
-}

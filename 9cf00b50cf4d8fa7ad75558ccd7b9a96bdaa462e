@@ -33,6 +33,24 @@
       "message": "I\u0027m confused. File embeds comments, which does expose a Comments method. So yes, it is there - just as a method.",
       "revId": "9cf00b50cf4d8fa7ad75558ccd7b9a96bdaa462e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "90cc96e8_030fb9eb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-13T17:28:02Z",
+      "side": 1,
+      "message": "That\u0027s not the Comments list referred to here, which is just the regular Comments method provided by any ast.Node. This is a holdover from go/ast.File, which _does_ have a Comments method that holds all comments in the file. The File.Comments method referred to here does no such thing.",
+      "parentUuid": "a8c7a0e2_a546d5db",
+      "revId": "9cf00b50cf4d8fa7ad75558ccd7b9a96bdaa462e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

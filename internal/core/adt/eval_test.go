@@ -88,7 +88,7 @@ var skipDebugDepErrors = map[string]int{
 	"disjunctions/edge":        1,
 	"disjunctions/elimination": 11,
 	"disjunctions/embed":       6,
-	"eval/conjuncts":           4,
+	"eval/conjuncts":           3,
 	"eval/notify":              17,
 	"fulleval/054_issue312":    1,
 	"scalars/embed":            1,

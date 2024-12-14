@@ -16,6 +16,24 @@
       "message": "summarize in a short comment that you do this because pointers change between runs.",
       "revId": "ce376780df2ed0bfbc466244a1d903bea7b530a8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "05c58346_17e9dc6b",
+        "filename": "internal/astinternal/debug_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-14T12:14:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "55f871d6_8bd4eb4c",
+      "revId": "ce376780df2ed0bfbc466244a1d903bea7b530a8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

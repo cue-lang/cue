@@ -16,6 +16,24 @@
       "message": "@mpvl@gmail.com - should this kind of test live elsewhere? It feels a bit over the top to have a `cmd/cue` test to lock in the behaviour of evalv2 (broken) vs evalv3 (working)",
       "revId": "bf6892b2110cb52b97352515e771a99ef14b1e4d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04b98c79_386ea1e8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-15T13:35:48Z",
+      "side": 1,
+      "message": "I think this is the right place. For example, see https://review.gerrithub.io/c/cue-lang/cue/+/1194556 or https://review.gerrithub.io/c/cue-lang/cue/+/1200808. The latter was a builtin too, but the cause was a cycle, so we ended up in testdata/cycle rather than testdata/builtins.",
+      "parentUuid": "35a2ab86_9ace9a73",
+      "revId": "bf6892b2110cb52b97352515e771a99ef14b1e4d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

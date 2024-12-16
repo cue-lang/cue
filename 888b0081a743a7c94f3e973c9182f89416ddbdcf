@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3e4a157_31ca6bde",
+        "filename": "encoding/jsonschema/structbuilder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T12:55:55Z",
+      "side": 1,
+      "message": "there\u0027s a difference between an entry at the top level of the struct, and a reference to the struct root itself. Maybe just adding \"itself\" might help enough htere.",
+      "parentUuid": "5f5b7511_745c6bc0",
+      "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d362dc86_25577e76",
@@ -31,6 +49,30 @@
       "writtenOn": "2024-12-16T11:27:49Z",
       "side": 1,
       "message": "nit: add \"and\" for readability\n```suggestion\n\t// value holds the value associated with the node, if any, and not including the\n```",
+      "range": {
+        "startLine": 42,
+        "startChar": 60,
+        "endLine": 42,
+        "endChar": 63
+      },
+      "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d9bd01d_a83d5eca",
+        "filename": "encoding/jsonschema/structbuilder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T12:55:55Z",
+      "side": 1,
+      "message": "Not keen on the \"and\" grammatically, but adjusted a bit differently.",
+      "parentUuid": "d362dc86_25577e76",
       "range": {
         "startLine": 42,
         "startChar": 60,
@@ -64,6 +106,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ab35775_86cea168",
+        "filename": "encoding/jsonschema/structbuilder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T12:55:55Z",
+      "side": 1,
+      "message": "It does hold nested fields by virtues of the recursive `structBuilderNode` type, but not as entries directly in this map. I\u0027ve adjusted the comment to try to make it clearer.",
+      "parentUuid": "542da440_dc682192",
+      "range": {
+        "startLine": 49,
+        "startChar": 30,
+        "endLine": 49,
+        "endChar": 37
+      },
+      "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e48b3cac_77e62336",
@@ -77,6 +143,30 @@
       "writtenOn": "2024-12-16T11:27:49Z",
       "side": 1,
       "message": "surely this is \"must be expressed as an identifier\", given the `!ok` logic?",
+      "range": {
+        "startLine": 91,
+        "startChar": 53,
+        "endLine": 91,
+        "endChar": 59
+      },
+      "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95626cae_3b27fe31",
+        "filename": "encoding/jsonschema/structbuilder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T12:55:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e48b3cac_77e62336",
       "range": {
         "startLine": 91,
         "startChar": 53,
@@ -110,6 +200,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7602d613_a7d636ae",
+        "filename": "encoding/jsonschema/structbuilder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T12:55:55Z",
+      "side": 1,
+      "message": "Good catch. In a previous iteration this was also invoked by `getRef`. All the `isPresent` logic is now redundant - I\u0027ve removed it.",
+      "parentUuid": "fa16b1db_aae90d25",
+      "range": {
+        "startLine": 102,
+        "startChar": 49,
+        "endLine": 102,
+        "endChar": 56
+      },
+      "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cb8dce93_c5ac7f5a",
@@ -123,6 +237,24 @@
       "writtenOn": "2024-12-16T11:27:49Z",
       "side": 1,
       "message": "replace with https://pkg.go.dev/slices#ContainsFunc ?",
+      "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8fda4c8c_8c6d9b39",
+        "filename": "encoding/jsonschema/structbuilder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T12:55:55Z",
+      "side": 1,
+      "message": "entries isn\u0027t a slice so that wouldn\u0027t have been appropriate, but as it happens this function is redundant now and I\u0027ve removed it 😊",
+      "parentUuid": "cb8dce93_c5ac7f5a",
       "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -144,6 +276,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "485a6d31_7ed4a3a3",
+        "filename": "encoding/jsonschema/structbuilder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T12:55:55Z",
+      "side": 1,
+      "message": "I\u0027d prefer to avoid the allocation that String allocation, and why not, given that it\u0027s trivial to do?",
+      "parentUuid": "1a717c97_7e20b84d",
+      "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "409e891c_73d36865",
@@ -161,6 +311,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "35abb0fc_e1e64a6f",
+        "filename": "encoding/jsonschema/structbuilder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T12:55:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "409e891c_73d36865",
+      "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4ac47174_9379c31f",
@@ -174,6 +342,24 @@
       "writtenOn": "2024-12-16T11:27:49Z",
       "side": 1,
       "message": "hm, do we know why the original code forbids that, when we find it useful here? perhaps leave a TODO behind because it\u0027s unfortunate to copy paste.\n\nor alternatively you could have a special case for ast.Ident with underscore prefix, and for all other cases fall back to `cue.Label` to reuse as much code as possible.",
+      "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b194534b_87bfe98b",
+        "filename": "encoding/jsonschema/util.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T12:55:55Z",
+      "side": 1,
+      "message": "Good idea. I\u0027ve done the latter and added a comment explaining why we need to do this here.",
+      "parentUuid": "4ac47174_9379c31f",
       "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -208,6 +394,24 @@
       "writtenOn": "2024-12-16T11:27:49Z",
       "side": 1,
       "message": "this strikes me as a bit of missing public API, like `func (Selector) Label() (Label, error)`.",
+      "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "20076322_6976831b",
+        "filename": "encoding/jsonschema/util.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T12:55:55Z",
+      "side": 1,
+      "message": "yeah, that would be nice. added a TODO.",
+      "parentUuid": "39d947d6_b55b8b9c",
       "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

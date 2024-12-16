@@ -16,6 +16,7 @@ package export
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -195,12 +196,15 @@ func (e *exporter) value(n adt.Value, a ...adt.Conjunct) (result ast.Expr) {
 			a = x.Values
 		}
 
+		slices.SortStableFunc(a, lessLeafNodes)
+
 		for _, x := range a {
 			result = wrapBin(result, e.bareValue(x), adt.AndOp)
 		}
 
 	case *adt.Disjunction:
 		a := []ast.Expr{}
+
 		for i, v := range x.Values {
 			var expr ast.Expr
 			if e.cfg.Simplify {

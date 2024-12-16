@@ -1,0 +1,215 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f5b7511_745c6bc0",
+        "filename": "encoding/jsonschema/structbuilder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T11:27:49Z",
+      "side": 1,
+      "message": "this godoc I find slightly confusing; refIdents is documented as \"refer to entries at the top level of the struct\", but then this is \"references to the struct root\". So they are both for pointing to the root struct? assuming I\u0027m misunderstanding, perhaps reword a bit to be clearer.",
+      "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d362dc86_25577e76",
+        "filename": "encoding/jsonschema/structbuilder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T11:27:49Z",
+      "side": 1,
+      "message": "nit: add \"and\" for readability\n```suggestion\n\t// value holds the value associated with the node, if any, and not including the\n```",
+      "range": {
+        "startLine": 42,
+        "startChar": 60,
+        "endLine": 42,
+        "endChar": 63
+      },
+      "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "542da440_dc682192",
+        "filename": "encoding/jsonschema/structbuilder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T11:27:49Z",
+      "side": 1,
+      "message": "clarify \"directly present\"? as in, just the fields for this struct, but no nested fields.",
+      "range": {
+        "startLine": 49,
+        "startChar": 30,
+        "endLine": 49,
+        "endChar": 37
+      },
+      "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e48b3cac_77e62336",
+        "filename": "encoding/jsonschema/structbuilder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T11:27:49Z",
+      "side": 1,
+      "message": "surely this is \"must be expressed as an identifier\", given the `!ok` logic?",
+      "range": {
+        "startLine": 91,
+        "startChar": 53,
+        "endLine": 91,
+        "endChar": 59
+      },
+      "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa16b1db_aae90d25",
+        "filename": "encoding/jsonschema/structbuilder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T11:27:49Z",
+      "side": 1,
+      "message": "this boolean is always true, no? I would simplify the code, or add a note explaining when we expect to use \"false\" here in the near future.",
+      "range": {
+        "startLine": 102,
+        "startChar": 49,
+        "endLine": 102,
+        "endChar": 56
+      },
+      "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb8dce93_c5ac7f5a",
+        "filename": "encoding/jsonschema/structbuilder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T11:27:49Z",
+      "side": 1,
+      "message": "replace with https://pkg.go.dev/slices#ContainsFunc ?",
+      "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a717c97_7e20b84d",
+        "filename": "encoding/jsonschema/structbuilder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T11:27:49Z",
+      "side": 1,
+      "message": "is this necessary? don\u0027t the two Compare calls below suffice? I don\u0027t imagine the performance of such a shortcut is measurable.",
+      "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "409e891c_73d36865",
+        "filename": "encoding/jsonschema/structbuilder.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T11:27:49Z",
+      "side": 1,
+      "message": "nit: I would always write this like\n\n\n```\nif c :\u003d cmp.Compare(s1.Type(), s2.Type()); c !\u003d 0 {\n    return c\n}\n```\n\nit\u0027s less repetitive, and you also compare just once rather than twice.",
+      "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ac47174_9379c31f",
+        "filename": "encoding/jsonschema/util.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T11:27:49Z",
+      "side": 1,
+      "message": "hm, do we know why the original code forbids that, when we find it useful here? perhaps leave a TODO behind because it\u0027s unfortunate to copy paste.\n\nor alternatively you could have a special case for ast.Ident with underscore prefix, and for all other cases fall back to `cue.Label` to reuse as much code as possible.",
+      "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1faec887_e5d72576",
+        "filename": "encoding/jsonschema/util.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T11:27:49Z",
+      "side": 1,
+      "message": "neat. I\u0027ve implemented almost exactly the same stuff in the YAML decoder, but with less code because I only deal with regular fields. We should consider unifying all this stuff in one place, even if it\u0027s not public API - perhaps leave a TODO?",
+      "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "39d947d6_b55b8b9c",
+        "filename": "encoding/jsonschema/util.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T11:27:49Z",
+      "side": 1,
+      "message": "this strikes me as a bit of missing public API, like `func (Selector) Label() (Label, error)`.",
+      "revId": "888b0081a743a7c94f3e973c9182f89416ddbdcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

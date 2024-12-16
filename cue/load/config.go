@@ -26,7 +26,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
-	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/mod/modconfig"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
@@ -371,22 +370,17 @@ func (c Config) complete() (cfg *Config, err error) {
 		// We should never use the registry in SkipImports mode
 		// but nil it out to be sure.
 		c.Registry = nil
-	} else {
-		// Note: if cueexperiment.Flags.Modules _isn't_ set but c.Registry
-		// is, we consider that a good enough hint that modules support
-		// should be enabled and hence don't return an error in that case.
-		if cueexperiment.Flags.Modules && c.Registry == nil {
-			registry, err := modconfig.NewRegistry(&modconfig.Config{
-				Env: c.Env,
-			})
-			if err != nil {
-				// If there's an error in the registry configuration,
-				// don't error immediately, but only when we actually
-				// need to resolve modules.
-				registry = errorRegistry{err}
-			}
-			c.Registry = registry
+	} else if c.Registry == nil {
+		registry, err := modconfig.NewRegistry(&modconfig.Config{
+			Env: c.Env,
+		})
+		if err != nil {
+			// If there's an error in the registry configuration,
+			// don't error immediately, but only when we actually
+			// need to resolve modules.
+			registry = errorRegistry{err}
 		}
+		c.Registry = registry
 	}
 	if err := c.loadModule(); err != nil {
 		return nil, err

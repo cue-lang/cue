@@ -57,9 +57,6 @@ func runModResolve(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	if resolver == nil {
-		return fmt.Errorf("modules experiment not enabled (enable with CUE_EXPERIMENT=modules)")
-	}
 	var mf *modfile.File
 	if len(args) == 0 {
 		// Use the current module if no arguments are provided.

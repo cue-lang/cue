@@ -1,16 +1,9 @@
 env-fill want-module.cue
 env-fill want-module-experiment.cue
 
-# No way of disabling the modules experiment.
-env CUE_EXPERIMENT=modules=0
-! exec cue mod init foo.com/bar
-stderr 'cannot change default value of deprecated flag "modules"'
-
-# With the experiment, although the major version will be implied
-# as v0, it's still omitted so that there's a possibility of compatibility
+# Although the major version will be implied as v0,
+# it's still omitted so that there's a possibility of compatibility
 # with earlier cue versions.
-env CUE_EXPERIMENT=modules
-rm cue.mod
 exec cue mod init foo.com/bar
 cmp cue.mod/module.cue want-module-experiment.cue
 exists cue.mod/usr

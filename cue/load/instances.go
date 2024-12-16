@@ -24,7 +24,6 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
-	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/mod/modimports"
 	"cuelang.org/go/internal/mod/modpkgload"
@@ -41,11 +40,6 @@ func Instances(args []string, c *Config) []*build.Instance {
 	ctx := context.TODO()
 	if c == nil {
 		c = &Config{}
-	}
-	// We want to consult the CUE_EXPERIMENT flag to see whether
-	// consult external registries by default.
-	if err := cueexperiment.Init(); err != nil {
-		return []*build.Instance{c.newErrInstance(err)}
 	}
 	newC, err := c.complete()
 	if err != nil {

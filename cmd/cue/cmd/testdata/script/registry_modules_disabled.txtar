@@ -1,5 +1,0 @@
-# When CUE_EXPERIMENT is disabled, we cannot use the cue command.
-
-env CUE_EXPERIMENT=modules=false
-! exec cue export .
-stderr 'cannot change default value of deprecated flag "modules"'

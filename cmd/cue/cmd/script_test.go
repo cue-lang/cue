@@ -267,7 +267,6 @@ func TestScript(t *testing.T) {
 			if err != nil {
 				return fmt.Errorf("cannot read workdir: %v", err)
 			}
-			// As modules are enabled by default, we always want a cache directory.
 			// Since os.UserCacheDir relies on OS-specific env vars that we don't set,
 			// explicitly set up the cache directory somewhere predictable.
 			e.Vars = append(e.Vars, "CUE_CACHE_DIR="+filepath.Join(e.WorkDir, ".tmp/cache"))

@@ -11,8 +11,6 @@ import (
 // When adding, deleting, or modifying entries below,
 // update cmd/cue/cmd/help.go as well for `cue help environment`.
 var Flags struct {
-	Modules bool `envflag:"deprecated,default:true"`
-
 	// EvalV3 enables the new evaluator. The new evaluator addresses various
 	// performance concerns.
 	EvalV3 bool

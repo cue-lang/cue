@@ -1,0 +1,258 @@
+-- in.cue --
+import "list"
+
+basicFirst: {
+	sort: Z & {a: _x} // string first
+	_x: y + ""
+	y:  string
+	Z: a: string
+}
+
+literalLast: {
+	p1: {
+		[string]: list.UniqueItems()
+		a: [_, _]
+	}
+	p2: {
+		a: [_, _]
+		[string]: list.UniqueItems()
+	}
+}
+
+posTieBreaker: {
+	p1: {
+		a: list.UniqueItems()
+		b: list.MinItems(3)
+		c: a & b
+	}
+	p2: {
+		b: list.MinItems(3)
+		a: list.UniqueItems()
+		c: a & b
+	}
+}
+-- out/definition --
+import "list"
+
+basicFirst: {
+	sort: Z & {
+		a: _x
+	}
+	_x: y + ""
+	y:  string
+	Z: {
+		a: string
+	}
+}
+literalLast: {
+	p1: {
+		[string]: list.UniqueItems()
+		a: [_, _]
+	}
+	p2: {
+		a: [_, _]
+		[string]: list.UniqueItems()
+	}
+}
+posTieBreaker: {
+	p1: {
+		a: list.UniqueItems()
+		b: list.MinItems(3)
+		c: a & b
+	}
+	p2: {
+		b: list.MinItems(3)
+		a: list.UniqueItems()
+		c: a & b
+	}
+}
+-- out/doc --
+[]
+[basicFirst]
+[basicFirst sort]
+[basicFirst sort a]
+[basicFirst _x]
+[basicFirst y]
+[basicFirst Z]
+[basicFirst Z a]
+[literalLast]
+[literalLast p1]
+[literalLast p1 a]
+[literalLast p1 a 0]
+[literalLast p1 a 1]
+[literalLast p2]
+[literalLast p2 a]
+[literalLast p2 a 0]
+[literalLast p2 a 1]
+[posTieBreaker]
+[posTieBreaker p1]
+[posTieBreaker p1 a]
+[posTieBreaker p1 b]
+[posTieBreaker p1 c]
+[posTieBreaker p2]
+[posTieBreaker p2 b]
+[posTieBreaker p2 a]
+[posTieBreaker p2 c]
+-- out/value --
+== Simplified
+{
+	basicFirst: {
+		sort: {
+			a: string & _x
+		}
+		y: string
+		Z: {
+			a: string
+		}
+	}
+	literalLast: {
+		p1: {
+			a: list.UniqueItems() & [_, _]
+		}
+		p2: {
+			a: list.UniqueItems() & [_, _]
+		}
+	}
+	posTieBreaker: {
+		p1: {
+			a: list.UniqueItems()
+			b: list.MinItems(3)
+			c: list.UniqueItems() & list.MinItems(3)
+		}
+		p2: {
+			b: list.MinItems(3)
+			a: list.UniqueItems()
+			c: list.MinItems(3) & list.UniqueItems()
+		}
+	}
+}
+== Raw
+{
+	basicFirst: {
+		sort: {
+			a: string & _x
+		}
+		_x: y + ""
+		y:  string
+		Z: {
+			a: string
+		}
+	}
+	literalLast: {
+		p1: {
+			a: list.UniqueItems() & [_, _]
+		}
+		p2: {
+			a: list.UniqueItems() & [_, _]
+		}
+	}
+	posTieBreaker: {
+		p1: {
+			a: list.UniqueItems()
+			b: list.MinItems(3)
+			c: list.UniqueItems() & list.MinItems(3)
+		}
+		p2: {
+			b: list.MinItems(3)
+			a: list.UniqueItems()
+			c: list.MinItems(3) & list.UniqueItems()
+		}
+	}
+}
+== Final
+{
+	basicFirst: {
+		sort: {
+			a: _|_ // basicFirst.sort.a: non-concrete value string in operand to +
+		}
+		y: string
+		Z: {
+			a: string
+		}
+	}
+	literalLast: {
+		p1: {
+			a: _|_ // literalLast.p1.a: invalid value [_,_] (does not satisfy list.UniqueItems): equal values at position 0 and 1
+		}
+		p2: {
+			a: _|_ // literalLast.p2.a: invalid value [_,_] (does not satisfy list.UniqueItems): equal values at position 0 and 1
+		}
+	}
+	posTieBreaker: {
+		p1: {
+			a: list.UniqueItems()
+			b: list.MinItems(3)
+			c: list.UniqueItems() & list.MinItems(3)
+		}
+		p2: {
+			b: list.MinItems(3)
+			a: list.UniqueItems()
+			c: list.MinItems(3) & list.UniqueItems()
+		}
+	}
+}
+== All
+{
+	basicFirst: {
+		sort: {
+			a: string & _x
+		}
+		_x: y + ""
+		y:  string
+		Z: {
+			a: string
+		}
+	}
+	literalLast: {
+		p1: {
+			a: list.UniqueItems() & [_, _]
+		}
+		p2: {
+			a: list.UniqueItems() & [_, _]
+		}
+	}
+	posTieBreaker: {
+		p1: {
+			a: list.UniqueItems()
+			b: list.MinItems(3)
+			c: list.UniqueItems() & list.MinItems(3)
+		}
+		p2: {
+			b: list.MinItems(3)
+			a: list.UniqueItems()
+			c: list.MinItems(3) & list.UniqueItems()
+		}
+	}
+}
+== Eval
+{
+	basicFirst: {
+		sort: {
+			a: string & _x
+		}
+		y: string
+		Z: {
+			a: string
+		}
+	}
+	literalLast: {
+		p1: {
+			a: list.UniqueItems() & [_, _]
+		}
+		p2: {
+			a: list.UniqueItems() & [_, _]
+		}
+	}
+	posTieBreaker: {
+		p1: {
+			a: list.UniqueItems()
+			b: list.MinItems(3)
+			c: list.UniqueItems() & list.MinItems(3)
+		}
+		p2: {
+			b: list.MinItems(3)
+			a: list.UniqueItems()
+			c: list.MinItems(3) & list.UniqueItems()
+		}
+	}
+}

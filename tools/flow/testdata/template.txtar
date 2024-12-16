@@ -101,7 +101,7 @@ diff old new
  	env: {} | []
  	stdout:      "foo"
  	stderr:      null
--	stdin:       (*null | string | bytes) & GET.response.body
+-	stdin:       GET.response.body & (*null | string | bytes)
  	success:     bool
  	mustSucceed: true
  
@@ -140,7 +140,7 @@ graph TD
 	env: {} | []
 	stdout:      "foo"
 	stderr:      null
-	stdin:       (*null | string | bytes) & GET.response.body
+	stdin:       GET.response.body & (*null | string | bytes)
 	success:     bool
 	mustSucceed: true
 

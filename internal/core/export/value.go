@@ -16,6 +16,7 @@ package export
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -102,14 +103,23 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 	}
 	if result == nil {
 		// fall back to expression mode
-		a := []ast.Expr{}
+		a := []adt.Conjunct{}
 		n.VisitLeafConjuncts(func(c adt.Conjunct) bool {
-			if x := e.expr(c.Env, c.Elem()); x != dummyTop {
-				a = append(a, x)
-			}
+			a = append(a, c)
 			return true
 		})
-		result = ast.NewBinExpr(token.AND, a...)
+		// Use stable sort to ensure that tie breaks (for instance if elements
+		// are not associated with a position) are deterministic.
+		slices.SortStableFunc(a, cmpConjuncts)
+
+		exprs := make([]ast.Expr, 0, len(a))
+		for _, c := range a {
+			if x := e.expr(c.Env, c.Elem()); x != dummyTop {
+				exprs = append(exprs, x)
+			}
+		}
+
+		result = ast.NewBinExpr(token.AND, exprs...)
 	}
 
 	if len(s.Elts) > 0 {
@@ -195,12 +205,15 @@ func (e *exporter) value(n adt.Value, a ...adt.Conjunct) (result ast.Expr) {
 			a = x.Values
 		}
 
+		slices.SortStableFunc(a, cmpLeafNodes)
+
 		for _, x := range a {
 			result = wrapBin(result, e.bareValue(x), adt.AndOp)
 		}
 
 	case *adt.Disjunction:
 		a := []ast.Expr{}
+
 		for i, v := range x.Values {
 			var expr ast.Expr
 			if e.cfg.Simplify {

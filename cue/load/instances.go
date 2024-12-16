@@ -173,7 +173,7 @@ func loadPackages(
 	otherFiles []*build.File,
 	tg *tagger,
 ) (*modpkgload.Packages, error) {
-	if cfg.Registry == nil || cfg.modFile == nil || cfg.modFile.Module == "" {
+	if cfg.modFile == nil || cfg.modFile.Module == "" {
 		return nil, nil
 	}
 	mainModPath := cfg.modFile.QualifiedModule()

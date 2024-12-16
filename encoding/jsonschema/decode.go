@@ -211,7 +211,19 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 		}
 
 		d.builder = structBuilder{}
+		for _, def := range d.defs {
+			def.schema = nil
+		}
 		d.needAnotherPass = false
+	}
+	if d.cfg.DefineSchema != nil {
+		// Let the caller know about any internal schemas that
+		// have been mapped to an external location.
+		for _, def := range d.defs {
+			if def.schema != nil && def.importPath != "" {
+				d.cfg.DefineSchema(def.importPath, def.path, def.schema)
+			}
+		}
 	}
 	f, err := d.builder.syntax()
 	if err != nil {

@@ -286,6 +286,103 @@ cannot determine CUE location for JSON Schema location id=https://something.test
 `[1:]))
 }
 
+func TestMapRef(t *testing.T) {
+	v := cuecontext.New().CompileString(`
+type: "object"
+$id: "https://this.test"
+$defs: foo: type: "string"
+properties: x: $ref: "https://something.test/foo#/$defs/blah"
+`)
+	var calls []string
+	expr, err := jsonschema.Extract(v, &jsonschema.Config{
+		MapRef: func(loc jsonschema.SchemaLoc) (string, cue.Path, error) {
+			calls = append(calls, loc.String())
+			switch loc.ID.String() {
+			case "https://this.test#/$defs/foo":
+				return "", cue.ParsePath("#x.#def.#foo"), nil
+			case "https://something.test/foo#/$defs/blah":
+				return "other.test/something:blah", cue.ParsePath("#Foo.bar"), nil
+			case "https://this.test":
+				return "", cue.Path{}, nil
+			}
+			t.Errorf("unexpected ID")
+			return "", cue.Path{}, fmt.Errorf("unexpected ID %q passed to MapRef", loc.ID)
+		},
+	})
+	qt.Assert(t, qt.IsNil(err))
+	b, err := format.Node(expr, format.Simplify())
+	if err != nil {
+		t.Fatal(errors.Details(err, nil))
+	}
+	qt.Assert(t, qt.DeepEquals(calls, []string{
+		"id=https://this.test#/$defs/foo localPath=$defs.foo",
+		"id=https://something.test/foo#/$defs/blah",
+		"id=https://this.test localPath=",
+		"id=https://something.test/foo#/$defs/blah",
+	}))
+	qt.Assert(t, qt.Equals(string(b), `
+import "other.test/something:blah"
+
+@jsonschema(id="https://this.test")
+x?: blah.#Foo.bar
+
+#x: #def: #foo: string
+...
+`[1:]))
+}
+
+func TestMapRefExternalRefForInternalSchema(t *testing.T) {
+	v := cuecontext.New().CompileString(`
+type: "object"
+$id: "https://this.test"
+$defs: foo: type: ["number", "string"]
+$ref: "#/$defs/foo"
+`)
+	var calls []string
+	defines := make(map[string]string)
+	expr, err := jsonschema.Extract(v, &jsonschema.Config{
+		MapRef: func(loc jsonschema.SchemaLoc) (string, cue.Path, error) {
+			calls = append(calls, loc.String())
+			switch loc.ID.String() {
+			case "https://this.test#/$defs/foo":
+				return "otherpkg.example/foo", cue.ParsePath("#foo"), nil
+			case "https://this.test":
+				return "", cue.Path{}, nil
+			}
+			t.Errorf("unexpected ID")
+			return "", cue.Path{}, fmt.Errorf("unexpected ID %q passed to MapRef", loc.ID)
+		},
+		DefineSchema: func(importPath string, path cue.Path, e ast.Expr) {
+			data, err := format.Node(e)
+			if err != nil {
+				t.Errorf("cannot format: %v", err)
+				return
+			}
+			defines[fmt.Sprintf("%s.%v", importPath, path)] = string(data)
+		},
+	})
+	qt.Assert(t, qt.IsNil(err))
+	b, err := format.Node(expr, format.Simplify())
+	if err != nil {
+		t.Fatal(errors.Details(err, nil))
+	}
+	qt.Assert(t, qt.DeepEquals(calls, []string{
+		"id=https://this.test#/$defs/foo localPath=$defs.foo",
+		"id=https://this.test localPath=",
+	}))
+	qt.Assert(t, qt.Equals(string(b), `
+import "otherpkg.example/foo"
+
+@jsonschema(id="https://this.test")
+foo.#foo & {
+	...
+}
+`[1:]))
+	qt.Assert(t, qt.DeepEquals(defines, map[string]string{
+		"otherpkg.example/foo.#foo": "number | string",
+	}))
+}
+
 func TestX(t *testing.T) {
 	t.Skip()
 	data := `

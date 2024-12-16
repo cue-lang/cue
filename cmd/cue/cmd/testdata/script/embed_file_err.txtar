@@ -1,7 +1,6 @@
 # Test what happens when there is an error an embedded file.
 # The error should mention the name of the file where the error is.
 
-env CUE_EXPERIMENT=embed
 ! exec cue vet
 cmp stderr want-stderr
 ! exec cue export

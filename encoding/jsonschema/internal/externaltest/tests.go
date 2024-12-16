@@ -88,7 +88,6 @@ func ReadTestDir(dir string) (tests map[string][]*Schema, err error) {
 		}
 		return nil, err
 	}
-	os.Setenv("CUE_EXPERIMENT", "embed")
 	inst := load.Instances([]string{"."}, &load.Config{
 		Dir: dir,
 		// Just like in the cue/load tests, prevent Go tests from walking up to the root

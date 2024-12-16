@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc09b3b5_1979d80c",
+        "filename": "encoding/jsonschema/constraints_generic.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T16:02:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "691b8f64_b45410c7",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "be267852_70126edf",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-12-16T12:28:23Z",
       "side": 1,
       "message": "document briefly when/why this extra pass may be necessary?",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b41b6a0b_eb7b71c0",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T16:02:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "be267852_70126edf",
       "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -75,6 +111,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c60c3473_e5bdc9fe",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T16:02:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "17d41b49_b7af1d41",
+      "range": {
+        "startLine": 328,
+        "startChar": 33,
+        "endLine": 328,
+        "endChar": 42
+      },
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "427ab316_0f8efd74",
@@ -88,6 +148,24 @@
       "writtenOn": "2024-12-16T12:28:23Z",
       "side": 1,
       "message": "inline this variable?",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d325a7f6_abdc669a",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 833,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T16:02:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "427ab316_0f8efd74",
       "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -109,6 +187,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "49c80642_fc51a3cd",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 873,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T16:02:34Z",
+      "side": 1,
+      "message": "danglingRefs is assigned exactly twice, once to increment, once to decrement. I don\u0027t think that\u0027s too bad. During several iterations when developing this, I\u0027ve used a `valueMap[bool]` to act as a set, and I may well do in the future, so I\u0027m not keen on specializing it to pointers (and putting a zero count in there seems like mixing concerns). We could have a separate type entirely, but I think it\u0027s probably OK as is. If maintaining danglingRefs in the future seems onerous, we can reconsider.",
+      "parentUuid": "7e258207_e4a0987a",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0277681a_6ec40df9",
@@ -126,6 +222,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4d7ffc0_35b4e335",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T16:02:34Z",
+      "side": 1,
+      "message": "This isn\u0027t user-visible. When we remove them, we can just set `MapRef` to `DefaultMapRef`, and refactor that so it\u0027s not defined in terms of the `MapURL` and `Map` primitives as it is now to avoid logic duplication.",
+      "parentUuid": "0277681a_6ec40df9",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8d01d258_80c2b365",
@@ -139,6 +253,24 @@
       "writtenOn": "2024-12-16T12:28:23Z",
       "side": 1,
       "message": "I suspect we should deprecate DefaultMapURL too, then.",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ef85ba9_31620769",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T16:02:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8d01d258_80c2b365",
       "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -166,6 +298,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "544b8bd2_f46ff6d4",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T16:02:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ca8e8d42_19b87695",
+      "range": {
+        "startLine": 204,
+        "startChar": 4,
+        "endLine": 204,
+        "endChar": 10
+      },
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d5b8b97d_75997c7b",
@@ -179,6 +335,24 @@
       "writtenOn": "2024-12-16T12:28:23Z",
       "side": 1,
       "message": "if this is not wired up yet, why add it already? I\u0027d leave it for a follow-up CL.",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "263bcb3d_29845b71",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T16:02:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d5b8b97d_75997c7b",
       "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -200,6 +374,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "53705a03_a3247371",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T16:02:34Z",
+      "side": 1,
+      "message": "I documented them as a pair above, which I think is probably reasonable, as\nthey should be considered together.",
+      "parentUuid": "c0733bbc_505aface",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5ab38cf7_09cdfbbb",
@@ -213,6 +405,24 @@
       "writtenOn": "2024-12-16T12:28:23Z",
       "side": 1,
       "message": "add a TODO about using https://pkg.go.dev/github.com/go-json-experiment/json/jsontext#Pointer ? or perhaps even borrow its code now, to ease the transition later.",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c4949c0d_bfcf0ed3",
+        "filename": "encoding/jsonschema/ref.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T16:02:34Z",
+      "side": 1,
+      "message": "I added a TODO. I started defining it as an iterator, but it\u0027s awkward when at least one use requires the slice form and we don\u0027t have the iterator utility methods until we can use go1.23.",
+      "parentUuid": "5ab38cf7_09cdfbbb",
       "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -234,6 +444,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "088c53a8_d7dbadf2",
+        "filename": "encoding/jsonschema/ref.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T16:02:34Z",
+      "side": 1,
+      "message": "That\u0027s actually not a great API because it allocates and copies the string for each element. The encoding is so simple I don\u0027t mind having another implementation here tbh.",
+      "parentUuid": "3ff42e5f_9ca7e36d",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "963ac18f_5fb81260",
@@ -247,6 +475,24 @@
       "writtenOn": "2024-12-16T12:28:23Z",
       "side": 1,
       "message": "like before: https://pkg.go.dev/github.com/go-json-experiment/json/jsontext#Pointer.AppendToken",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "92abfd3c_8d3c8159",
+        "filename": "encoding/jsonschema/util.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T16:02:34Z",
+      "side": 1,
+      "message": "I\u0027ve factored out the json pointer stuff into its own file with an iterator-oriented API that might end up more compatible with whatever ends up the stdlib.",
+      "parentUuid": "963ac18f_5fb81260",
       "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -268,6 +514,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "239b0547_38829513",
+        "filename": "encoding/jsonschema/valuemap.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T16:02:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "12db77dd_56b3de93",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "898a8395_776dc31e",
@@ -281,6 +545,24 @@
       "writtenOn": "2024-12-16T12:28:23Z",
       "side": 1,
       "message": "nit: I would use `valueMap[T]` rather than `*valueMap[T]` throughout. It just contains two maps, which are themselves pointers and initialised here in the constructor, so the struct value itself is never modified once initialized. And one pointer to a struct containing two other fixed pointers is a bit unnecessary :)",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f4b49d8_3a471c05",
+        "filename": "encoding/jsonschema/valuemap.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T16:02:34Z",
+      "side": 1,
+      "message": "tbh I prefer the pointer form. It gives the semantic hint that it\u0027s modifiable, and we may well want to add non-by-ref fields to it at some point. Seems a bit like premature optimisation to me.",
+      "parentUuid": "898a8395_776dc31e",
       "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

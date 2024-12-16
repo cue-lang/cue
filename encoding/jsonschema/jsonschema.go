@@ -205,6 +205,22 @@ type Config struct {
 	// nil, [DefaultMapRef] will be used.
 	MapRef func(loc SchemaLoc) (importPath string, relPath cue.Path, err error)
 
+	// NOTE: this method is currently experimental. Its usage and type
+	// signature may change.
+	//
+	// DefineSchema is called, if not nil, for any schema that is defined
+	// within the json schema being converted but is mapped somewhere
+	// external via [Config.MapRef]. The invoker of [Extract] is
+	// responsible for defining the schema e in the correct place as described
+	// by the import path and its relative CUE path.
+	//
+	// The importPath and path are exactly as returned by [Config.MapRef].
+	// If this or [Config.MapRef] is nil this function will never be called.
+	// Note that importPath will never be empty, because if MapRef
+	// returns an empty importPath, it's specifying an internal schema
+	// which will be defined accordingly.
+	DefineSchema func(importPath string, path cue.Path, e ast.Expr)
+
 	// TODO: configurability to make it compatible with OpenAPI, such as
 	// - locations of definitions: #/components/schemas, for instance.
 	// - selection and definition of formats

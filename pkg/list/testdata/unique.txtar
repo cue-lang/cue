@@ -79,7 +79,7 @@ import "list"
 }
 #abErr: {
 	a:  1
-	b?: string & int
+	b?: int & string
 }
 #b: {
 	b: 1
@@ -101,38 +101,38 @@ ok: {
 
 // These have all equal elements, but
 incomplete: {
-	top: [_, _] & list.UniqueItems()
+	top: list.UniqueItems() & [_, _]
 
 	// These two elements are considered equal, but the error is an "incomplete"
 	// errors, as the items may still differ once they become more specific.
-	withOptional1: [{
+	withOptional1: list.UniqueItems() & [{
 		a: int
 	}, {
 		a:  int
 		b?: string
-	}] & list.UniqueItems()
+	}]
 
 	// Ditto. This is an incomplete error, even though the matching elements
 	// are "final": there is still an optional field.
-	withOptional2: [{
+	withOptional2: list.UniqueItems() & [{
 		a: 1
 	}, {
 		a:  1
 		b?: string
-	}] & list.UniqueItems()
+	}]
 
 	// Ditto. This time with actually closed fields.
-	withOptional3: [#a, #ab] & list.UniqueItems()
+	withOptional3: list.UniqueItems() & [#a, #ab]
 
 	// Ditto. There are not optional fields, but the structs are open.
-	openSpecific: [{
+	openSpecific: list.UniqueItems() & [{
 		a: 1
 	}, {
 		a: 1
-	}] & list.UniqueItems()
+	}]
 
 	// Fully identical closed structs, but with non-concrete values.
-	structs: [#c, #c] & list.UniqueItems()
+	structs: list.UniqueItems() & [#c, #c]
 }
 fail: {
 	ints:    _|_ // fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 2
@@ -164,17 +164,8 @@ diff old new
      ./in.cue:3:21
      ./in.cue:45:11
  
-@@ -21,7 +24,7 @@
- }
- #abErr: {
- 	a:  1
--	b?: int & string
-+	b?: string & int
- }
- #b: {
- 	b: 1
 @@ -64,12 +67,7 @@
- 	}] & list.UniqueItems()
+ 	}]
  
  	// Ditto. This time with actually closed fields.
 -	withOptional3: [{
@@ -183,10 +174,10 @@ diff old new
 -		a:  1
 -		b?: int
 -	}]
-+	withOptional3: [#a, #ab] & list.UniqueItems()
++	withOptional3: list.UniqueItems() & [#a, #ab]
  
  	// Ditto. There are not optional fields, but the structs are open.
- 	openSpecific: [{
+ 	openSpecific: list.UniqueItems() & [{
 @@ -83,7 +81,7 @@
  }
  fail: {
@@ -254,25 +245,25 @@ ok: {
 
 // These have all equal elements, but
 incomplete: {
-	top: [_, _] & list.UniqueItems()
+	top: list.UniqueItems() & [_, _]
 
 	// These two elements are considered equal, but the error is an "incomplete"
 	// errors, as the items may still differ once they become more specific.
-	withOptional1: [{
+	withOptional1: list.UniqueItems() & [{
 		a: int
 	}, {
 		a:  int
 		b?: string
-	}] & list.UniqueItems()
+	}]
 
 	// Ditto. This is an incomplete error, even though the matching elements
 	// are "final": there is still an optional field.
-	withOptional2: [{
+	withOptional2: list.UniqueItems() & [{
 		a: 1
 	}, {
 		a:  1
 		b?: string
-	}] & list.UniqueItems()
+	}]
 
 	// Ditto. This time with actually closed fields.
 	withOptional3: [{
@@ -283,14 +274,14 @@ incomplete: {
 	}]
 
 	// Ditto. There are not optional fields, but the structs are open.
-	openSpecific: [{
+	openSpecific: list.UniqueItems() & [{
 		a: 1
 	}, {
 		a: 1
-	}] & list.UniqueItems()
+	}]
 
 	// Fully identical closed structs, but with non-concrete values.
-	structs: [#c, #c] & list.UniqueItems()
+	structs: list.UniqueItems() & [#c, #c]
 }
 fail: {
 	ints:    _|_ // fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 2

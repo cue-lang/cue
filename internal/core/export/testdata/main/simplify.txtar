@@ -58,7 +58,7 @@ Benign change in error message.
 == Raw
 {
 	x: {
-		y: >=-9223372036854775808 & <=9223372036854775807 & int
+		y: int & >=-9223372036854775808 & <=9223372036854775807
 	}
 	s: strings.MinRunes(4) & strings.MaxRunes(7)
 	additional: {
@@ -95,7 +95,7 @@ Benign change in error message.
 == Eval
 {
 	x: {
-		y: >=-9223372036854775808 & <=9223372036854775807 & int
+		y: int & >=-9223372036854775808 & <=9223372036854775807
 	}
 	s: strings.MinRunes(4) & strings.MaxRunes(7)
 	additional: {
@@ -135,7 +135,7 @@ diff old new
 == Raw
 {
 	x: {
-		y: >=-9223372036854775808 & <=9223372036854775807 & int
+		y: int & >=-9223372036854775808 & <=9223372036854775807
 	}
 	s: strings.MinRunes(4) & strings.MaxRunes(7)
 	additional: {
@@ -172,7 +172,7 @@ diff old new
 == Eval
 {
 	x: {
-		y: >=-9223372036854775808 & <=9223372036854775807 & int
+		y: int & >=-9223372036854775808 & <=9223372036854775807
 	}
 	s: strings.MinRunes(4) & strings.MaxRunes(7)
 	additional: {

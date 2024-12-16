@@ -1,7 +1,8 @@
+# Embedding is enabled by default, but it can still be disabled.
+env CUE_EXPERIMENT=embed=0
 ! exec cue eval
 cmp stderr out/noembed
-
-env CUE_EXPERIMENT=embed
+env CUE_EXPERIMENT=
 
 exec cue eval
 cmp stdout out/eval

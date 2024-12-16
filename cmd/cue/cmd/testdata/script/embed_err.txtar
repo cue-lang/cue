@@ -1,12 +1,9 @@
-env CUE_EXPERIMENT=embed
-
 ! exec cue eval
 ! stdout .
 cmp stderr out/err
 
-# On systems with symlink support, check that we don't allow embedding symlinks.
-# TODO(mvdan): we don't reject valid symlinks yet; see https://cuelang.org/issue/3299.
-# TODO: if we support symlinks in the future, add a test case for a symlink pointing to a file
+# On systems with symlink support, we follow symlinks when embedding files.
+# TODO: add a test case for a symlink pointing to a file
 # outside of the current module, as that should likely be forbidden.
 [!symlink] stop
 cd symlink

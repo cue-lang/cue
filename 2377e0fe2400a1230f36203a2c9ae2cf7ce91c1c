@@ -1,0 +1,288 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "51543d51_2dcf8d55",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T12:28:23Z",
+      "side": 1,
+      "message": "very nice stats!",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "691b8f64_b45410c7",
+        "filename": "encoding/jsonschema/constraints_generic.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T12:28:23Z",
+      "side": 1,
+      "message": "doesn\u0027t this comment repeat what is said two lines above?",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be267852_70126edf",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T12:28:23Z",
+      "side": 1,
+      "message": "document briefly when/why this extra pass may be necessary?",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "17d41b49_b7af1d41",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T12:28:23Z",
+      "side": 1,
+      "message": "```suggestion\n// ensureDefinition ensures that node n will\n```",
+      "range": {
+        "startLine": 328,
+        "startChar": 33,
+        "endLine": 328,
+        "endChar": 42
+      },
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "427ab316_0f8efd74",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 833,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T12:28:23Z",
+      "side": 1,
+      "message": "inline this variable?",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7e258207_e4a0987a",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 873,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T12:28:23Z",
+      "side": 1,
+      "message": "I wonder if it might be easier for the custom map type to keep track of nil entries, as then it\u0027s a bit easier to ensure we get it right. the map type would then be fixed to pointer values, but I think that\u0027s OK.",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0277681a_6ec40df9",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T12:28:23Z",
+      "side": 1,
+      "message": "should we still set Map and MapURL by default when they are deprecated?",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d01d258_80c2b365",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T12:28:23Z",
+      "side": 1,
+      "message": "I suspect we should deprecate DefaultMapURL too, then.",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca8e8d42_19b87695",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T12:28:23Z",
+      "side": 1,
+      "message": "link to these, e.g. `[Config.MapURL]`.",
+      "range": {
+        "startLine": 204,
+        "startChar": 4,
+        "endLine": 204,
+        "endChar": 10
+      },
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5b8b97d_75997c7b",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T12:28:23Z",
+      "side": 1,
+      "message": "if this is not wired up yet, why add it already? I\u0027d leave it for a follow-up CL.",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0733bbc_505aface",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T12:28:23Z",
+      "side": 1,
+      "message": "document this field too, for consistency?",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ab38cf7_09cdfbbb",
+        "filename": "encoding/jsonschema/ref.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T12:28:23Z",
+      "side": 1,
+      "message": "add a TODO about using https://pkg.go.dev/github.com/go-json-experiment/json/jsontext#Pointer ? or perhaps even borrow its code now, to ease the transition later.",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ff42e5f_9ca7e36d",
+        "filename": "encoding/jsonschema/ref.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T12:28:23Z",
+      "side": 1,
+      "message": "like before, here I would suggest: https://pkg.go.dev/github.com/go-json-experiment/json/jsontext#Pointer.AppendToken",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "963ac18f_5fb81260",
+        "filename": "encoding/jsonschema/util.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T12:28:23Z",
+      "side": 1,
+      "message": "like before: https://pkg.go.dev/github.com/go-json-experiment/json/jsontext#Pointer.AppendToken",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12db77dd_56b3de93",
+        "filename": "encoding/jsonschema/valuemap.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T12:28:23Z",
+      "side": 1,
+      "message": "```suggestion\n// (a.k.a. JSON Pointer).\n```",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "898a8395_776dc31e",
+        "filename": "encoding/jsonschema/valuemap.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-16T12:28:23Z",
+      "side": 1,
+      "message": "nit: I would use `valueMap[T]` rather than `*valueMap[T]` throughout. It just contains two maps, which are themselves pointers and initialised here in the constructor, so the struct value itself is never modified once initialized. And one pointer to a struct containing two other fixed pointers is a bit unnecessary :)",
+      "revId": "2377e0fe2400a1230f36203a2c9ae2cf7ce91c1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -91,9 +91,6 @@ func runModUpload(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	if resolver0 == nil {
-		return fmt.Errorf("modules experiment not enabled (enable with CUE_EXPERIMENT=modules)")
-	}
 	dryRun := flagDryRun.Bool(cmd)
 	outDir := flagOut.String(cmd)
 	useJSON := flagJSON.Bool(cmd)

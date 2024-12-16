@@ -68,9 +68,6 @@ func runModGet(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	if reg == nil {
-		return fmt.Errorf("modules experiment not enabled (enable with CUE_EXPERIMENT=modules)")
-	}
 	ctx := backgroundContext()
 	modRoot, err := findModuleRoot()
 	if err != nil {

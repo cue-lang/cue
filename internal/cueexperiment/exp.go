@@ -11,6 +11,8 @@ import (
 // When adding, deleting, or modifying entries below,
 // update cmd/cue/cmd/help.go as well for `cue help environment`.
 var Flags struct {
+	// TODO(mvdan): remove in December 2025; leaving it around for now
+	// so that we delay breaking any users enabling this experiment.
 	Modules bool `envflag:"deprecated,default:true"`
 
 	// EvalV3 enables the new evaluator. The new evaluator addresses various

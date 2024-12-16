@@ -63,23 +63,17 @@ inside $CUE_CONFIG_DIR; see 'cue help environment'.
 		Args: cobra.MaximumNArgs(1),
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {
 			var locResolver modresolve.LocationResolver
+			var err error
 			if len(args) > 0 {
-				var err error
 				locResolver, err = modresolve.ParseCUERegistry(args[0], "")
 				if err != nil {
 					return err
 				}
 			} else {
-				resolver, err := getRegistryResolver()
+				locResolver, err = getRegistryResolver()
 				if err != nil {
 					return err
 				}
-				// We need to do this nil check before we assign to locResolver,
-				// otherwise the interface gets filled with a typed nil, which is not nil.
-				if resolver == nil {
-					return fmt.Errorf("cannot log in when modules are not enabled")
-				}
-				locResolver = resolver
 			}
 			registryHosts := locResolver.AllHosts()
 			if len(registryHosts) > 1 {

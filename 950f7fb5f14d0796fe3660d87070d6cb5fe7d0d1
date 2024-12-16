@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93938412_e81add29",
+        "filename": "internal/cueexperiment/exp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-12-16T14:57:15Z",
+      "side": 0,
+      "message": "Hmm, I might just leave this in (marked as unused), as otherwise we can\u0027t have a single CUE_EXPERIMENT value that works for all the versions - something that\u0027s pretty useful for bisecting amongst other things.",
+      "revId": "950f7fb5f14d0796fe3660d87070d6cb5fe7d0d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

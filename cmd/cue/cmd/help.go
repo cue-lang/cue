@@ -254,8 +254,8 @@ and use APIs like yaml.Extract to decode as a list.
 
 Note that embedding cue files is not supported at this time.
 
-Note: support for embed is experimental, and is enabled via
-CUE_EXPERIMENT=embed.
+Note: support for embed is experimental, and can be disabled via
+CUE_EXPERIMENT=embed=0.
 
 For more details and discussion, see the proposal linked from
 https://cuelang.org/discussion/3264.

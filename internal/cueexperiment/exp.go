@@ -20,7 +20,7 @@ var Flags struct {
 	EvalV3 bool
 
 	// Embed enables file embedding.
-	Embed bool
+	Embed bool `envflag:"default:true"`
 
 	// DecodeInt64 changes [cuelang.org/go/cue.Value.Decode] to choose
 	// `int64` rather than `int` as the default type for CUE integer values

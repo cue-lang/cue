@@ -1,5 +1,3 @@
-env CUE_EXPERIMENT=embed
-
 exec cue mod tidy
 exec cue eval ./acme/foo
 cmp stdout out/eval

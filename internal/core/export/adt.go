@@ -17,6 +17,7 @@ package export
 import (
 	"bytes"
 	"fmt"
+	"sort"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -230,6 +231,9 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 		}
 
 	case *adt.BinaryExpr:
+		if x.Op == adt.AndOp || x.Op == adt.OrOp {
+			return e.sortBinaryTree(env, x)
+		}
 		return &ast.BinaryExpr{
 			Op: x.Op.Token(),
 			X:  e.innerExpr(env, x.X),
@@ -298,6 +302,87 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 
 	default:
 		panic(fmt.Sprintf("unknown field %T", x))
+	}
+}
+
+// sortBinaryTree converte x to a binary tree and sorts it's elements
+// using sortLeafAdt.
+func (e *exporter) sortBinaryTree(env *adt.Environment, x *adt.BinaryExpr) (b ast.Expr) {
+	var exprs []adt.Node
+
+	var flatten func(expr adt.Expr)
+	flatten = func(expr adt.Expr) {
+		if y, ok := expr.(*adt.BinaryExpr); ok && x.Op == y.Op {
+			flatten(y.X)
+			flatten(y.Y)
+		} else {
+			exprs = append(exprs, expr)
+		}
+	}
+	flatten(x)
+
+	// Sort the expressions
+	sort.Slice(exprs, func(i, j int) bool {
+		return lessLeafNodes(exprs[i], exprs[j])
+	})
+
+	nodes := make([]ast.Expr, 0, len(exprs))
+	for _, x := range exprs {
+		switch y := x.(type) {
+		case *adt.Top:
+		case *adt.BasicType:
+			if y.K != adt.TopKind {
+				nodes = append(nodes, e.expr(env, y))
+			}
+		default:
+			nodes = append(nodes, e.innerExpr(env, y.(adt.Expr)))
+		}
+	}
+
+	if len(nodes) == 0 {
+		return e.adt(env, &adt.Top{})
+	}
+
+	return ast.NewBinExpr(x.Op.Token(), nodes...)
+}
+
+// lessLeafNodes two adt.Expr values. The values may not be a binary expressions.
+// It returns true if a is less than b.
+func lessLeafNodes(a, b adt.Node) bool {
+	if x, y := typeOrder(a), typeOrder(b); x != y {
+		return x < y
+	}
+
+	srcA := a.Source()
+	srcB := b.Source()
+
+	if srcA == nil || srcB == nil {
+		// TODO: some tie breaker
+		return false
+	}
+
+	posA := srcA.Pos()
+	posB := srcB.Pos()
+
+	return posA.Filename() < posB.Filename() && posA.Offset() < posB.Offset()
+}
+
+func typeOrder(x adt.Node) int {
+	switch x.(type) {
+	case *adt.Top:
+		return 0
+	case *adt.BasicType:
+		return 1
+	case *adt.FieldReference:
+		return 2 // sometimes basic types are represented as field references.
+	case *adt.Bool, *adt.Null, *adt.Num, *adt.String, *adt.Bytes:
+		return 10
+	case *adt.BoundValue:
+		return 20
+	case *adt.BoundExpr:
+		return 25
+	default:
+		return 100
 	}
 }
 

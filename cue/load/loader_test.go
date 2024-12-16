@@ -31,19 +31,10 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
-	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/tdtest"
 )
 
 func init() {
-	// Ignore the value of CUE_EXPERIMENT for the purposes of these tests,
-	// as we want them to start off with the default experiment values.
-	os.Setenv("CUE_EXPERIMENT", "")
-
-	// Once we've called cueexperiment.Init, cueexperiment.Vars
-	// will not be touched again, so we can set fields in it for the tests.
-	cueexperiment.Init()
-
 	// The user running `go test` might have a broken environment,
 	// such as an invalid $CUE_REGISTRY like the one below,
 	// or a broken $DOCKER_CONFIG/config.json due to syntax errors.

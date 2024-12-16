@@ -80,8 +80,6 @@ func TestModuleFetch(t *testing.T) {
 		qt.Assert(t, qt.IsNil(err))
 		defer r.Close()
 
-		// We're testing that the default modconfig-based behavour works
-		// as expected when the modules experiment is enabled.
 		tmpDir := t.TempDir()
 		t.LoadConfig.Env = []string{
 			"CUE_CACHE_DIR=" + filepath.Join(tmpDir, "cache"),

@@ -49,7 +49,7 @@ import "strings"
 	lastName?: strings.MinRunes(1)
 
 	// Age in years which must be equal to or greater than zero.
-	age?: >=0 & int
+	age?: int & >=0
 	...
 }
 -- schema.json --

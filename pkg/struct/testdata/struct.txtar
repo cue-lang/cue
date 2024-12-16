@@ -65,14 +65,14 @@ Result:
 import "struct"
 
 minFields1: {
-	incomplete1: {} & struct.MinFields(1)
-	optIncomplete: {
+	incomplete1: struct.MinFields(1) & {}
+	optIncomplete: struct.MinFields(1) & {
 		a?: string
-	} & struct.MinFields(1)
+	}
 	fail1: _|_ // minFields1.fail1: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
-	optCloseIncomplete: close({
+	optCloseIncomplete: struct.MinFields(1) & close({
 		a?: 1
-	}) & struct.MinFields(1)
+	})
 	failHidden1: _|_ // minFields1.failHidden1: invalid value {_a:1} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
 	ok4: {
 		a: 1
@@ -92,24 +92,24 @@ minFields1: {
 	}
 }
 minFields2: {
-	incomplete1: close({
+	incomplete1: struct.MinFields(2) & close({
 		a?: string
 		b:  1
-	}) & struct.MinFields(2)
-	incomplete2: close({
+	})
+	incomplete2: struct.MinFields(2) & close({
 		a?: string
 		b?: int
-	}) & struct.MinFields(2)
-	incomplete3: close({
+	})
+	incomplete3: struct.MinFields(2) & close({
 		a?: string
 		b?: int
 		c:  1
-	}) & struct.MinFields(2)
-	incomplete4: close({
+	})
+	incomplete4: struct.MinFields(2) & close({
 		a?: string
 		b?: int
 		c?: int
-	}) & struct.MinFields(2)
+	})
 	fail: _|_ // minFields2.fail: invalid value {a?:string} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (0 < 2)
 }
 maxFields: {
@@ -151,10 +151,10 @@ diff old new
 @@ -61,9 +65,7 @@
  		b?: int
  		c?: int
- 	}) & struct.MinFields(2)
--	fail: close({
+ 	})
+-	fail: struct.MinFields(2) & close({
 -		a?: string
--	}) & struct.MinFields(2)
+-	})
 +	fail: _|_ // minFields2.fail: invalid value {a?:string} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (0 < 2)
  }
  maxFields: {
@@ -183,14 +183,14 @@ Result:
 import "struct"
 
 minFields1: {
-	incomplete1: {} & struct.MinFields(1)
-	optIncomplete: {
+	incomplete1: struct.MinFields(1) & {}
+	optIncomplete: struct.MinFields(1) & {
 		a?: string
-	} & struct.MinFields(1)
+	}
 	fail1: _|_ // minFields1.fail1: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
-	optCloseIncomplete: close({
+	optCloseIncomplete: struct.MinFields(1) & close({
 		a?: 1
-	}) & struct.MinFields(1)
+	})
 	failHidden1: _|_ // minFields1.failHidden1: invalid value {_a:1} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
 	ok4: {
 		a: 1
@@ -210,27 +210,27 @@ minFields1: {
 	}
 }
 minFields2: {
-	incomplete1: close({
+	incomplete1: struct.MinFields(2) & close({
 		a?: string
 		b:  1
-	}) & struct.MinFields(2)
-	incomplete2: close({
+	})
+	incomplete2: struct.MinFields(2) & close({
 		a?: string
 		b?: int
-	}) & struct.MinFields(2)
-	incomplete3: close({
+	})
+	incomplete3: struct.MinFields(2) & close({
 		a?: string
 		b?: int
 		c:  1
-	}) & struct.MinFields(2)
-	incomplete4: close({
+	})
+	incomplete4: struct.MinFields(2) & close({
 		a?: string
 		b?: int
 		c?: int
-	}) & struct.MinFields(2)
-	fail: close({
+	})
+	fail: struct.MinFields(2) & close({
 		a?: string
-	}) & struct.MinFields(2)
+	})
 }
 maxFields: {
 	ok1: {}

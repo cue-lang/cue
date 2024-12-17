@@ -818,8 +818,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: cannot determine CUE location for JSON Schema location id=https://example.com/draft2019-09/ref-and-id2/base.json#bigint: anchors (bigint) not supported (and 1 more errors)",
-			"v3": "extract error: cannot determine CUE location for JSON Schema location id=https://example.com/draft2019-09/ref-and-id2/base.json#bigint: anchors (bigint) not supported (and 1 more errors)"
+			"v2": "extract error: cannot determine CUE location for JSON Schema location id=https://example.com/draft2019-09/ref-and-id2/base.json#bigint: anchors (bigint) not supported (and 5 more errors)",
+			"v3": "extract error: cannot determine CUE location for JSON Schema location id=https://example.com/draft2019-09/ref-and-id2/base.json#bigint: anchors (bigint) not supported (and 5 more errors)"
 		},
 		"tests": [
 			{
@@ -1059,8 +1059,8 @@
 			}
 		},
 		"skip": {
-			"v2": "extract error: cannot determine CUE location for JSON Schema location id=urn:uuid:deadbeef-1234-ff00-00ff-4321feebdaed#something: anchors (something) not supported (and 1 more errors)",
-			"v3": "extract error: cannot determine CUE location for JSON Schema location id=urn:uuid:deadbeef-1234-ff00-00ff-4321feebdaed#something: anchors (something) not supported (and 1 more errors)"
+			"v2": "extract error: cannot determine CUE location for JSON Schema location id=urn:uuid:deadbeef-1234-ff00-00ff-4321feebdaed#something: anchors (something) not supported (and 3 more errors)",
+			"v3": "extract error: cannot determine CUE location for JSON Schema location id=urn:uuid:deadbeef-1234-ff00-00ff-4321feebdaed#something: anchors (something) not supported (and 3 more errors)"
 		},
 		"tests": [
 			{

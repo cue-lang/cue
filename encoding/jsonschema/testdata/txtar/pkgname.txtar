@@ -1,0 +1,34 @@
+#pkgName: somepkg
+-- schema.json --
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "type": "object",
+    "title": "Main schema",
+    "description": "Specify who you are and all.",
+    "$defs": {
+        "phone number": {
+            "description": "a telephone number",
+            "type": "string"
+        }
+    },
+    "properties": {
+        "person": {
+            "description": "A person is a human being.",
+            "type": "object"
+        }
+    }
+}
+-- out/decode/extract --
+// Main schema
+//
+// Specify who you are and all.
+@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
+
+// A person is a human being.
+person?: {
+	...
+}
+
+// a telephone number
+#: "phone number": string
+...

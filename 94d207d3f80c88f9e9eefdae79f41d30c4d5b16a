@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54c962cf_4acd2e90",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-17T14:48:29Z",
+      "side": 1,
+      "message": "```suggestion\n\t// by the import path and its relative CUE path.\n```\n\neasier to read IMHO; I first read \"that\" as \"schema e\" and was confused.",
+      "range": {
+        "startLine": 215,
+        "startChar": 27,
+        "endLine": 215,
+        "endChar": 52
+      },
+      "revId": "94d207d3f80c88f9e9eefdae79f41d30c4d5b16a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

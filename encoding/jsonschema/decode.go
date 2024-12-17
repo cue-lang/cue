@@ -119,13 +119,6 @@ func (d *decoder) addImport(n cue.Value, pkg string) *ast.Ident {
 }
 
 func (d *decoder) decode(v cue.Value) *ast.File {
-	f := &ast.File{}
-
-	if pkgName := d.cfg.PkgName; pkgName != "" {
-		pkg := &ast.Package{Name: ast.NewIdent(pkgName)}
-		f.Decls = append(f.Decls, pkg)
-	}
-
 	var defsRoot cue.Value
 	if d.cfg.Root != "" {
 		defsPath, err := parseRootRef(d.cfg.Root)
@@ -230,20 +223,23 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 		d.errf(v, "cannot build final syntax: %v", err)
 		return nil
 	}
-	var attrs []ast.Decl
+	var preamble []ast.Decl
+	if d.cfg.PkgName != "" {
+		preamble = append(preamble, &ast.Package{Name: ast.NewIdent(d.cfg.PkgName)})
+	}
 	if rootInfo.schemaVersionPresent {
 		// TODO use cue/literal.String
 		// TODO is this actually useful information: why is knowing the schema
 		// version of the input useful?
-		attrs = append(attrs, &ast.Attribute{
+		preamble = append(preamble, &ast.Attribute{
 			Text: fmt.Sprintf("@jsonschema(schema=%q)", rootInfo.schemaVersion),
 		})
 	}
 	if rootInfo.deprecated {
-		attrs = append(attrs, &ast.Attribute{Text: "@deprecated()"})
+		preamble = append(preamble, &ast.Attribute{Text: "@deprecated()"})
 	}
-	if len(attrs) > 0 {
-		f.Decls = append(attrs, f.Decls...)
+	if len(preamble) > 0 {
+		f.Decls = append(preamble, f.Decls...)
 	}
 	return f
 }

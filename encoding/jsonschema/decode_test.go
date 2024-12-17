@@ -101,6 +101,7 @@ func TestDecode(t *testing.T) {
 		cfg.Strict = t.HasTag("strict")
 		cfg.StrictKeywords = cfg.StrictKeywords || t.HasTag("strictKeywords")
 		cfg.StrictFeatures = t.HasTag("strictFeatures")
+		cfg.PkgName, _ = t.Value("pkgName")
 
 		ctx := t.CueContext()
 

@@ -10,10 +10,10 @@ cmp cue.mod/module.cue want-module-2
 -- want-module --
 module: "test.example"
 language: {
-	version: "v0.11.0"
+	version: "v0.11.1"
 }
 -- want-module-2 --
 module: "other.example"
 language: {
-	version: "v0.11.0"
+	version: "v0.11.1"
 }

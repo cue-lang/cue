@@ -152,33 +152,22 @@ Disjuncts:    29
     //     ./in.cue:1:4
   }
   e5: (_|_){
-    // [incomplete] e5: non-concrete value e5 for bound <:
-    //     ./in.cue:9:6
+    // [cycle] cycle error
   }
   E: (struct){
     a: (_|_){
-      // [incomplete] E.b: non-concrete value >=5 in operand to -:
+      // [cycle] cycle error:
       //     ./in.cue:13:5
+      // cycle error:
       //     ./in.cue:14:5
-      //     ./in.cue:14:11
-      // E.c: non-concrete value _ in operand to +:
-      //     ./in.cue:14:5
-      //     ./in.cue:12:5
     }
     b: (_|_){
-      // [incomplete] E.b: non-concrete value >=5 in operand to -:
+      // [cycle] cycle error:
       //     ./in.cue:13:5
-      //     ./in.cue:14:5
-      //     ./in.cue:14:11
     }
     c: (_|_){
-      // [incomplete] E.b: non-concrete value >=5 in operand to -:
-      //     ./in.cue:13:5
+      // [cycle] cycle error:
       //     ./in.cue:14:5
-      //     ./in.cue:14:11
-      // E.c: non-concrete value _ in operand to +:
-      //     ./in.cue:14:5
-      //     ./in.cue:12:5
     }
   }
   a: (int){ int }
@@ -220,50 +209,28 @@ Disjuncts:    29
 diff old new
 --- old
 +++ new
-@@ -20,22 +20,33 @@
-     //     ./in.cue:1:4
-   }
-   e5: (_|_){
--    // [cycle] cycle error
-+    // [incomplete] e5: non-concrete value e5 for bound <:
-+    //     ./in.cue:9:6
-   }
+@@ -25,7 +25,9 @@
    E: (struct){
      a: (_|_){
--      // [cycle] cycle error:
-+      // [incomplete] E.b: non-concrete value >=5 in operand to -:
+       // [cycle] cycle error:
+-      //     ./in.cue:12:5
 +      //     ./in.cue:13:5
++      // cycle error:
 +      //     ./in.cue:14:5
-+      //     ./in.cue:14:11
-+      // E.c: non-concrete value _ in operand to +:
-+      //     ./in.cue:14:5
-       //     ./in.cue:12:5
      }
      b: (_|_){
--      // [cycle] cycle error:
--      //     ./in.cue:13:5
-+      // [incomplete] E.b: non-concrete value >=5 in operand to -:
-+      //     ./in.cue:13:5
-+      //     ./in.cue:14:5
-+      //     ./in.cue:14:11
+       // [cycle] cycle error:
+@@ -33,9 +35,7 @@
      }
      c: (_|_){
--      // [cycle] cycle error:
+       // [cycle] cycle error:
 -      //     ./in.cue:12:5
 -      // cycle error:
 -      //     ./in.cue:13:5
-+      // [incomplete] E.b: non-concrete value >=5 in operand to -:
-+      //     ./in.cue:13:5
 +      //     ./in.cue:14:5
-+      //     ./in.cue:14:11
-+      // E.c: non-concrete value _ in operand to +:
-+      //     ./in.cue:14:5
-+      //     ./in.cue:12:5
      }
    }
    a: (int){ int }
--- diff/explanation --
-Improved error messages.
 -- out/compile --
 --- in.cue
 {

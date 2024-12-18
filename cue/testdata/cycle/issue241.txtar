@@ -36,9 +36,13 @@ Disjuncts:    47
 -- out/evalalpha --
 (struct){
   #Value: (int){ |((int){ 0 }, (int){ 1 }) }
-  foo: (int){ |((int){ 0 }, (int){ 1 }) }
-  bar: (int){ |((int){ 0 }, (int){ 1 }) }
-  Foo: (int){ |((int){ 0 }, (int){ 1 }) }
+  foo: (_|_){
+    // [cycle] cycle error
+  }
+  bar: (_|_){
+    // [cycle] cycle error
+  }
+  Foo: (int){ 1 }
   Bar: (int){ 0 }
   cell: (struct){
     a: (int){ 0 }
@@ -51,23 +55,24 @@ Disjuncts:    47
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,8 @@
+@@ -1,10 +1,11 @@
  (struct){
    #Value: (int){ |((int){ 0 }, (int){ 1 }) }
--  foo: (_|_){
+   foo: (_|_){
 -    // [incomplete] foo: unresolved disjunction 0 | 1 (type int):
 -    //     ./in.cue:4:6
 -  }
-+  foo: (int){ |((int){ 0 }, (int){ 1 }) }
-   bar: (int){ |((int){ 0 }, (int){ 1 }) }
--  Foo: (int){ 1 }
-+  Foo: (int){ |((int){ 0 }, (int){ 1 }) }
+-  bar: (int){ |((int){ 0 }, (int){ 1 }) }
++    // [cycle] cycle error
++  }
++  bar: (_|_){
++    // [cycle] cycle error
++  }
+   Foo: (int){ 1 }
    Bar: (int){ 0 }
    cell: (struct){
-     a: (int){ 0 }
--- diff/todo/p0 --
-many errors: resolve scalars correctly in combination with disjunctions
-foo: alternative: no error, but include constraints in output.
+-- diff/explanation --
+error is now symmetric
 -- out/eval --
 (struct){
   #Value: (int){ |((int){ 0 }, (int){ 1 }) }

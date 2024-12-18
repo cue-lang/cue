@@ -227,6 +227,10 @@ issue2052.t2.#Depth: adding field #basic not allowed as field set was already re
     ./issue2052.cue:46:14
 issue2052.t2.d: adding field #basic not allowed as field set was already referenced:
     ./issue2052.cue:46:14
+issue2052.full.#Depth: adding field #basic not allowed as field set was already referenced:
+    ./issue2052.cue:89:20
+issue2052.full.d: adding field #basic not allowed as field set was already referenced:
+    ./issue2052.cue:89:20
 
 Result:
 (_|_){
@@ -419,7 +423,8 @@ Result:
         }
       }
     }
-    full: (struct){
+    full: (_|_){
+      // [eval]
       #RecurseN: (#struct){
         #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
         #funcFactory: (#struct){
@@ -445,7 +450,9 @@ Result:
           }
         }
       }
-      #Depth: (#struct){
+      #Depth: (_|_){
+        // [eval] issue2052.full.#Depth: adding field #basic not allowed as field set was already referenced:
+        //     ./issue2052.cue:89:20
         #maxiter: (int){ 11 }
         #funcFactory: (#struct){
           #next: (_){ _ }
@@ -549,12 +556,6 @@ Result:
             }
           }
         }
-        #in: (_){ _ }
-        #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-        out: (int){
-          1
-          let depths#1 = (_){ _ }
-        }
       }
       tree: (struct){
         a: (struct){
@@ -567,7 +568,9 @@ Result:
         }
         cow: (string){ "moo" }
       }
-      d: (#struct){
+      d: (_|_){
+        // [eval] issue2052.full.d: adding field #basic not allowed as field set was already referenced:
+        //     ./issue2052.cue:89:20
         #in: (#struct){
           a: (#struct){
             foo: (string){ "bar" }
@@ -682,39 +685,6 @@ Result:
             }
           }
         }
-        #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-        out: (int){
-          5
-          let depths#1 = (#list){
-            0: (int){
-              4
-              let depths#1 = (#list){
-                0: (int){
-                  1
-                  let depths#1 = (_){ _ }
-                }
-                1: (int){
-                  3
-                  let depths#1 = (#list){
-                    0: (int){
-                      2
-                      let depths#1 = (#list){
-                        0: (int){
-                          1
-                          let depths#1 = (_){ _ }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            1: (int){
-              1
-              let depths#1 = (_){ _ }
-            }
-          }
-        }
       }
     }
   }
@@ -745,7 +715,7 @@ diff old new
 diff old new
 --- old
 +++ new
-@@ -1,4 +1,16 @@
+@@ -1,4 +1,20 @@
 -(struct){
 +Errors:
 +issue2052.t1.#Depth: adding field #basic not allowed as field set was already referenced:
@@ -756,6 +726,10 @@ diff old new
 +    ./issue2052.cue:46:14
 +issue2052.t2.d: adding field #basic not allowed as field set was already referenced:
 +    ./issue2052.cue:46:14
++issue2052.full.#Depth: adding field #basic not allowed as field set was already referenced:
++    ./issue2052.cue:89:20
++issue2052.full.d: adding field #basic not allowed as field set was already referenced:
++    ./issue2052.cue:89:20
 +
 +Result:
 +(_|_){
@@ -763,7 +737,7 @@ diff old new
    chain: (struct){
      t1: (struct){
        #maxiter: (int){ 2 }
-@@ -27,15 +39,11 @@
+@@ -27,15 +43,11 @@
            }
          }
        }
@@ -784,7 +758,7 @@ diff old new
            }
          }
          X: (int){ 1 }
-@@ -51,148 +59,148 @@
+@@ -51,148 +63,149 @@
        }
      }
    }
@@ -925,6 +899,11 @@ diff old new
 -        #in: (string){ "bar" }
 -        #basic: ((null|string)){ |((string){ string }, (null){ null }) }
 -        out: (int){ 1 }
+-      }
+-    }
+-    full: (struct){
+-      #RecurseN: (_){
+-        _
 +  issue2052: (_|_){
 +    // [eval]
 +    t1: (_|_){
@@ -1063,23 +1042,20 @@ diff old new
 +            out: (int){ 1 }
 +          }
 +        }
-       }
-     }
-     full: (struct){
--      #RecurseN: (_){
--        _
++      }
++    }
++    full: (_|_){
++      // [eval]
 +      #RecurseN: (#struct){
          #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
          #funcFactory: (#struct){
            #next: (_){ _ }
-@@ -339,49 +347,7 @@
+@@ -217,115 +230,111 @@
+           }
          }
-         cow: (string){ "moo" }
        }
--      d: (_|_){
--        // [incomplete] issue2052.full.d: cannot add field #maxiter: was already used:
--        //     ./issue2052.cue:119:23
--        #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
+-      #Depth: (#struct){
+-        #maxiter: (int){ 11 }
 -        #funcFactory: (#struct){
 -          #next: (_){ _ }
 -          #func: (#struct){
@@ -1092,8 +1068,15 @@ diff old new
 -          }
 -        }
 -        #funcs: (#struct){
--          "4": (null){ null }
--          "0": (_){ _ }
+-          "11": (null){ null }
+-          "0": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
 -          "1": (#struct){
 -            #in: (_){ _ }
 -            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
@@ -1118,15 +1101,71 @@ diff old new
 -              let depths#1 = (_){ _ }
 -            }
 -          }
+-          "4": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-          "5": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-          "6": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-          "7": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-          "8": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-          "9": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-          "10": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
 -        }
-+      d: (#struct){
-         #in: (#struct){
-           a: (#struct){
-             foo: (string){ "bar" }
-@@ -393,6 +359,142 @@
-           }
-           cow: (string){ "moo" }
-         }
+-        #in: (_){ _ }
+-        #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-        out: (int){
+-          1
+-          let depths#1 = (_){ _ }
++      #Depth: (_|_){
++        // [eval] issue2052.full.#Depth: adding field #basic not allowed as field set was already referenced:
++        //     ./issue2052.cue:89:20
 +        #maxiter: (int){ 11 }
 +        #funcFactory: (#struct){
 +          #next: (_){ _ }
@@ -1229,35 +1268,162 @@ diff old new
 +              let depths#1 = (_){ _ }
 +            }
 +          }
-+        }
-+        #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+        out: (int){
-+          5
-+          let depths#1 = (#list){
-+            0: (int){
-+              4
-+              let depths#1 = (#list){
-+                0: (int){
-+                  1
-+                  let depths#1 = (_){ _ }
-+                }
-+                1: (int){
-+                  3
-+                  let depths#1 = (#list){
-+                    0: (int){
-+                      2
-+                      let depths#1 = (#list){
-+                        0: (int){
-+                          1
-+                          let depths#1 = (_){ _ }
-+                        }
-+                      }
-+                    }
-+                  }
-+                }
-+              }
+         }
+       }
+       tree: (struct){
+@@ -340,48 +349,8 @@
+         cow: (string){ "moo" }
+       }
+       d: (_|_){
+-        // [incomplete] issue2052.full.d: cannot add field #maxiter: was already used:
+-        //     ./issue2052.cue:119:23
+-        #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
+-        #funcFactory: (#struct){
+-          #next: (_){ _ }
+-          #func: (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-        }
+-        #funcs: (#struct){
+-          "4": (null){ null }
+-          "0": (_){ _ }
+-          "1": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-          "2": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-          "3": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-        }
++        // [eval] issue2052.full.d: adding field #basic not allowed as field set was already referenced:
++        //     ./issue2052.cue:89:20
+         #in: (#struct){
+           a: (#struct){
+             foo: (string){ "bar" }
+@@ -393,6 +362,109 @@
+           }
+           cow: (string){ "moo" }
+         }
++        #maxiter: (int){ 11 }
++        #funcFactory: (#struct){
++          #next: (_){ _ }
++          #func: (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
 +            }
-+            1: (int){
++          }
++        }
++        #funcs: (#struct){
++          "11": (null){ null }
++          "0": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
++          }
++          "1": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
++          }
++          "2": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
++          }
++          "3": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
++          }
++          "4": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
++          }
++          "5": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
++          }
++          "6": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
++          }
++          "7": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
++          }
++          "8": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
++          }
++          "9": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
++          }
++          "10": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
 +              1
 +              let depths#1 = (_){ _ }
 +            }

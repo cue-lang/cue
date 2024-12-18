@@ -258,28 +258,21 @@ Disjuncts:    438
   issue3415: (struct){
     full: (struct){
       A: (#struct){
-        i: (number){ |(*(int){
-            0
-            _a: (int){ 1 }
-            _b: (int){ 10 }
-          }, (number){
-            number
-            _a: (int){ 1 }
-            _b: (int){ 10 }
-          }) }
+        i: (int){
+          11
+          _a: (int){ 1 }
+          _b: (int){ 10 }
+        }
       }
       #A: (#struct){
         i: (number){ |(*(int){ 0 }, (number){ number }) }
       }
     }
     reduced: (struct){
-      a: (number){ |(*(int){
-          0
-          #b: (int){ 10 }
-        }, (number){
-          number
-          #b: (int){ 10 }
-        }) }
+      a: (int){
+        11
+        #b: (int){ 10 }
+      }
     }
   }
 }
@@ -305,45 +298,6 @@ diff old new
            a: (string){ "foo" }
            e: (string){ "bar" }
          }, (#struct){
-@@ -163,11 +163,15 @@
-   issue3415: (struct){
-     full: (struct){
-       A: (#struct){
--        i: (int){
--          11
--          _a: (int){ 1 }
--          _b: (int){ 10 }
--        }
-+        i: (number){ |(*(int){
-+            0
-+            _a: (int){ 1 }
-+            _b: (int){ 10 }
-+          }, (number){
-+            number
-+            _a: (int){ 1 }
-+            _b: (int){ 10 }
-+          }) }
-       }
-       #A: (#struct){
-         i: (number){ |(*(int){ 0 }, (number){ number }) }
-@@ -174,10 +178,13 @@
-       }
-     }
-     reduced: (struct){
--      a: (int){
--        11
--        #b: (int){ 10 }
--      }
-+      a: (number){ |(*(int){
-+          0
-+          #b: (int){ 10 }
-+        }, (number){
-+          number
-+          #b: (int){ 10 }
-+        }) }
-     }
-   }
- }
 -- diff/explanation --
 The old algorithm was incorrect: the default value should not be carried:
 only {b: string} of the first disjunction can be part of the result. As it

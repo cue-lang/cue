@@ -63,8 +63,14 @@ Conjuncts:    80
 Disjuncts:    52
 -- out/evalalpha --
 (struct){
-  a1: (int){ |(*(int){ 0 }, (int){ 1 }) }
-  a2: (int){ |(*(int){ 0 }, (int){ 1 }) }
+  a1: (_|_){
+    // [cycle] cycle error:
+    //     ./in.cue:4:5
+  }
+  a2: (_|_){
+    // [cycle] cycle error:
+    //     ./in.cue:4:5
+  }
   a3: (int){ 1 }
   b1: (int){ |((int){ 0 }, (int){ 1 }) }
   b2: (int){ |((int){ 0 }, (int){ 1 }) }
@@ -87,20 +93,24 @@ Disjuncts:    52
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,6 @@
+@@ -1,9 +1,12 @@
  (struct){
--  a1: (_|_){
--    // [cycle] cycle error:
+   a1: (_|_){
+     // [cycle] cycle error:
 -    //     ./in.cue:2:5
 -  }
 -  a2: (int){ 1 }
-+  a1: (int){ |(*(int){ 0 }, (int){ 1 }) }
-+  a2: (int){ |(*(int){ 0 }, (int){ 1 }) }
++    //     ./in.cue:4:5
++  }
++  a2: (_|_){
++    // [cycle] cycle error:
++    //     ./in.cue:4:5
++  }
    a3: (int){ 1 }
    b1: (int){ |((int){ 0 }, (int){ 1 }) }
    b2: (int){ |((int){ 0 }, (int){ 1 }) }
--- diff/todo/p1 --
-a1: should be an error or include validators in result.
+-- diff/explanation --
+a2: cyclic error reporting is now reported at both nodes on cycle, which is good.
 -- out/eval --
 (struct){
   a1: (_|_){

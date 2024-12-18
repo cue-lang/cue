@@ -179,9 +179,9 @@ Conjuncts:    128
 Disjuncts:    60
 -- out/evalalpha --
 Errors:
-xe1: conflicting values 8 and 9:
-    ./in.cue:41:12
-    ./in.cue:46:6
+xe3: conflicting values 7 and 6:
+    ./in.cue:43:6
+    ./in.cue:43:10
 
 Result:
 (_|_){
@@ -196,7 +196,10 @@ Result:
   xb4: (int){ 13 }
   xc1: (int){ |((int){ 8 }, (int){ 9 }) }
   xc2: (int){ 8 }
-  xc3: (int){ 6 }
+  xc3: (_|_){
+    // [incomplete] xc3: unresolved disjunction 8 | 9 (type int):
+    //     ./in.cue:27:10
+  }
   xc4: (int){ 9 }
   xc5: (int){ 10 }
   xd1: (int){ 8 }
@@ -204,55 +207,31 @@ Result:
   xd3: (int){ 6 }
   xd4: (int){ 9 }
   xd5: (int){ 10 }
-  xe1: (_|_){
-    // [eval] xe1: conflicting values 8 and 9:
-    //     ./in.cue:41:12
-    //     ./in.cue:46:6
-  }
-  xe2: (_|_){
-    // [eval] xe1: conflicting values 8 and 9:
-    //     ./in.cue:41:12
-    //     ./in.cue:46:6
-  }
+  xe1: (int){ 9 }
+  xe2: (int){ 8 }
   xe3: (_|_){
-    // [eval] xe1: conflicting values 8 and 9:
-    //     ./in.cue:41:12
-    //     ./in.cue:46:6
+    // [eval] xe3: conflicting values 7 and 6:
+    //     ./in.cue:43:6
+    //     ./in.cue:43:10
   }
-  xe4: (_|_){
-    // [eval] xe1: conflicting values 8 and 9:
-    //     ./in.cue:41:12
-    //     ./in.cue:46:6
-  }
-  xe5: (_|_){
-    // [eval] xe1: conflicting values 8 and 9:
-    //     ./in.cue:41:12
-    //     ./in.cue:46:6
-  }
+  xe4: (int){ 9 }
+  xe5: (int){ 10 }
   xf1: (int){ 8 }
   xf2: (int){ 11 }
   xf3: (int){ 6 }
   xf4: (int){ 13 }
   z1: (int){ |((int){ 11 }, (int){ 13 }) }
   z2: (int){ 10 }
-  z3: (int){ 8 }
+  z3: (_|_){
+    // [incomplete] z3: unresolved disjunction 11 | 13 (type int):
+    //     ./in.cue:55:5
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,7 +1,7 @@
- Errors:
--xe3: conflicting values 7 and 6:
--    ./in.cue:43:6
--    ./in.cue:43:10
-+xe1: conflicting values 8 and 9:
-+    ./in.cue:41:12
-+    ./in.cue:46:6
- 
- Result:
- (_|_){
-@@ -10,28 +10,13 @@
+@@ -10,22 +10,10 @@
    xa2: (int){ 8 }
    xa3: (int){ 6 }
    xa4: (int){ 10 }
@@ -278,37 +257,11 @@ diff old new
 +  xb4: (int){ 13 }
    xc1: (int){ |((int){ 8 }, (int){ 9 }) }
    xc2: (int){ 8 }
--  xc3: (_|_){
--    // [incomplete] xc3: unresolved disjunction 8 | 9 (type int):
--    //     ./in.cue:27:10
--  }
-+  xc3: (int){ 6 }
-   xc4: (int){ 9 }
-   xc5: (int){ 10 }
-   xd1: (int){ 8 }
-@@ -39,35 +24,36 @@
-   xd3: (int){ 6 }
-   xd4: (int){ 9 }
-   xd5: (int){ 10 }
--  xe1: (int){ 9 }
--  xe2: (int){ 8 }
-+  xe1: (_|_){
-+    // [eval] xe1: conflicting values 8 and 9:
-+    //     ./in.cue:41:12
-+    //     ./in.cue:46:6
-+  }
-+  xe2: (_|_){
-+    // [eval] xe1: conflicting values 8 and 9:
-+    //     ./in.cue:41:12
-+    //     ./in.cue:46:6
-+  }
-   xe3: (_|_){
--    // [eval] xe3: conflicting values 7 and 6:
--    //     ./in.cue:43:6
--    //     ./in.cue:43:10
--  }
--  xe4: (int){ 9 }
--  xe5: (int){ 10 }
+   xc3: (_|_){
+@@ -48,22 +36,10 @@
+   }
+   xe4: (int){ 9 }
+   xe5: (int){ 10 }
 -  xf1: (_|_){
 -    // [incomplete] xf1: 2 errors in empty disjunction:
 -    // xf1: unresolved disjunction 6 | 9 (type int):
@@ -325,32 +278,13 @@ diff old new
 -    // [incomplete] xf2: unresolved disjunction 6 | 9 (type int):
 -    //     ./in.cue:49:6
 -  }
-+    // [eval] xe1: conflicting values 8 and 9:
-+    //     ./in.cue:41:12
-+    //     ./in.cue:46:6
-+  }
-+  xe4: (_|_){
-+    // [eval] xe1: conflicting values 8 and 9:
-+    //     ./in.cue:41:12
-+    //     ./in.cue:46:6
-+  }
-+  xe5: (_|_){
-+    // [eval] xe1: conflicting values 8 and 9:
-+    //     ./in.cue:41:12
-+    //     ./in.cue:46:6
-+  }
 +  xf1: (int){ 8 }
 +  xf2: (int){ 11 }
 +  xf3: (int){ 6 }
 +  xf4: (int){ 13 }
    z1: (int){ |((int){ 11 }, (int){ 13 }) }
    z2: (int){ 10 }
--  z3: (_|_){
--    // [incomplete] z3: unresolved disjunction 11 | 13 (type int):
--    //     ./in.cue:55:5
--  }
-+  z3: (int){ 8 }
- }
+   z3: (_|_){
 -- diff/todo/p1 --
 x(b|f)(2|4): resolve incorrectly. This is related to completeNodeTasks.
 -- diff/explanation --

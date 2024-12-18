@@ -83,16 +83,6 @@ out: list.Sort(list.FlattenN(_c, 4), {x: _, y: _, less: x.name < y.name})
     less: (〈0;x〉.name < 〈0;y〉.name)
   })
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  7529
-Reused: 7523
-Allocs: 6
-Retain: 1
-
-Unifications: 7529
-Conjuncts:    12154
-Disjuncts:    7530
 -- out/evalalpha --
 (struct){
   _a: (#list){

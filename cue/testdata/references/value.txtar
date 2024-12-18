@@ -20,45 +20,6 @@ Retain: 0
 Unifications: 13
 Conjuncts:    20
 Disjuncts:    13
--- out/evalalpha --
-(struct){
-  structShorthand: (struct){
-    b: (int){ 3 }
-    c: (int){ 3 }
-  }
-  fieldAndValue: (struct){
-    foo: (int){
-      3
-      #sum: (int){ 6 }
-    }
-  }
-  valueCycle: (struct){
-    b: (_|_){
-      // [incomplete] valueCycle.b: non-concrete value _ in operand to +:
-      //     ./in.cue:8:18
-    }
-  }
-  listValueAlias: (#list){
-    0: (int){ 1 }
-    1: (int){ 2 }
-    2: (int){ 1 }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -11,7 +11,7 @@
-   }
-   valueCycle: (struct){
-     b: (_|_){
--      // [cycle] cycle error:
-+      // [incomplete] valueCycle.b: non-concrete value _ in operand to +:
-       //     ./in.cue:8:18
-     }
-   }
--- diff/explanation --
-Improved error message.
 -- out/eval --
 (struct){
   structShorthand: (struct){

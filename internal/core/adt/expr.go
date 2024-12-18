@@ -1568,13 +1568,14 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 		// XXX: XXX: clear id.closeContext per argument and remove from runTask?
 
 		runMode := state.runMode()
-		cond := state.conditions() | allAncestorsProcessed | concreteKnown
-		state = combineMode(cond, runMode).withVertexStatus(state.vertexStatus())
-
+		cond := state.conditions()
 		var expr Value
 		if b.NonConcrete {
+			state = combineMode(cond, runMode).withVertexStatus(state.vertexStatus())
 			expr = c.evalState(a, state)
 		} else {
+			cond |= fieldSetKnown | allAncestorsProcessed | concreteKnown
+			state = combineMode(cond, runMode).withVertexStatus(state.vertexStatus())
 			expr = c.value(a, state)
 		}
 

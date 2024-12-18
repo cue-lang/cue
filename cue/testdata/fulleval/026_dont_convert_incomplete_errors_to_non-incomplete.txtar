@@ -52,65 +52,6 @@ Retain: 0
 Unifications: 17
 Conjuncts:    35
 Disjuncts:    0
--- out/evalalpha --
-(struct){
-  n1: (struct){
-    min: (_|_){
-      // [incomplete] n1.max: non-concrete value min for bound >:
-      //     ./in.cue:3:23
-    }
-    max: (_|_){
-      // [incomplete] n1.max: non-concrete value min for bound >:
-      //     ./in.cue:3:23
-    }
-  }
-  n2: (_|_){
-    // [incomplete] n2: operand num of '-' not concrete (was number):
-    //     ./in.cue:4:6
-  }
-  n3: (_|_){
-    // [incomplete] n3: operand num of '+' not concrete (was number):
-    //     ./in.cue:5:6
-  }
-  n4: (_|_){
-    // [incomplete] n4: non-concrete value <4 in operand to +:
-    //     ./in.cue:6:5
-    //     ./in.cue:18:6
-  }
-  n5: (_|_){
-    // [incomplete] n5: non-concrete value <4 in operand to -:
-    //     ./in.cue:7:5
-    //     ./in.cue:18:6
-  }
-  n6: (_|_){
-    // [incomplete] n6: non-concrete value <4 in operand to *:
-    //     ./in.cue:8:5
-    //     ./in.cue:18:6
-  }
-  n7: (_|_){
-    // [incomplete] n7: non-concrete value <4 in operand to /:
-    //     ./in.cue:9:5
-    //     ./in.cue:18:6
-  }
-  b1: (_|_){
-    // [incomplete] b1: operand is of '!' not concrete (was bool):
-    //     ./in.cue:11:6
-  }
-  s1: (_|_){
-    // [incomplete] s1: invalid interpolation: non-concrete value string (type string):
-    //     ./in.cue:13:5
-    //     ./in.cue:17:6
-  }
-  s2: (string){ strings.ContainsAny("dd") }
-  s3: (_|_){
-    // [incomplete] s3: error in call to strings.ContainsAny: non-concrete value string:
-    //     ./in.cue:15:5
-    //     ./in.cue:17:6
-  }
-  str: (string){ string }
-  num: (number){ <4 }
-  is: (bool){ bool }
-}
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -132,25 +73,6 @@ diff old new
 -Disjuncts:    82
 +Conjuncts:    35
 +Disjuncts:    0
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,10 +1,12 @@
- (struct){
-   n1: (struct){
-     min: (_|_){
--      // [cycle] cycle error
-+      // [incomplete] n1.max: non-concrete value min for bound >:
-+      //     ./in.cue:3:23
-     }
-     max: (_|_){
--      // [cycle] cycle error
-+      // [incomplete] n1.max: non-concrete value min for bound >:
-+      //     ./in.cue:3:23
-     }
-   }
-   n2: (_|_){
 -- out/eval/stats --
 Leaks:  0
 Freed:  17
@@ -161,8 +83,6 @@ Retain: 75
 Unifications: 17
 Conjuncts:    71
 Disjuncts:    82
--- diff/explanation --
-Improved error message.
 -- out/eval --
 (struct){
   n1: (struct){

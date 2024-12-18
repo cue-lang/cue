@@ -19,7 +19,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/spf13/pflag"
@@ -33,7 +32,6 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
-	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
 )
@@ -503,8 +501,6 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 	if err != nil {
 		return nil, err
 	}
-
-	adt.DebugSort, _ = strconv.Atoi(os.Getenv("CUE_DEBUG_SORT_ARCS"))
 
 	builds := loadFromArgs(args, cfg.loadCfg)
 	if builds == nil {

@@ -809,10 +809,6 @@ func (n *nodeContext) checkClosed(state vertexStatus) bool {
 func (n *nodeContext) completeArcs(state vertexStatus) {
 	unreachableForDev(n.ctx)
 
-	if DebugSort > 0 {
-		DebugSortArcs(n.ctx, n.node)
-	}
-
 	if n.node.hasAllConjuncts || n.node.Parent == nil {
 		n.node.setParentDone()
 	}

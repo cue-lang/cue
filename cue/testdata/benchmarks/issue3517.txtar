@@ -74,35 +74,17 @@ Result:
   // [eval]
   #TimeSpan: (#struct){
     start: (_|_){
-      // [incomplete] #TimeSpan.start: non-concrete value end for bound <=:
-      //     ./main.cue:12:11
-      // #TimeSpan.start: non-concrete value float in operand to -:
-      //     ./main.cue:8:12
-      //     ./main.cue:6:12
-      //     ./main.cue:10:12
-      // #TimeSpan.duration: non-concrete value float in operand to -:
+      // [cycle] cycle error:
       //     ./main.cue:9:12
-      //     ./main.cue:6:12
+      // cycle error:
       //     ./main.cue:10:12
     }
     duration: (_|_){
-      // [incomplete] #TimeSpan.start: non-concrete value end for bound <=:
-      //     ./main.cue:12:11
-      // #TimeSpan.duration: non-concrete value float in operand to -:
+      // [cycle] cycle error:
       //     ./main.cue:9:12
-      //     ./main.cue:6:12
-      //     ./main.cue:10:12
     }
     end: (_|_){
-      // [incomplete] #TimeSpan.start: non-concrete value end for bound <=:
-      //     ./main.cue:12:11
-      // #TimeSpan.start: non-concrete value float in operand to -:
-      //     ./main.cue:8:12
-      //     ./main.cue:6:12
-      //     ./main.cue:10:12
-      // #TimeSpan.duration: non-concrete value float in operand to -:
-      //     ./main.cue:9:12
-      //     ./main.cue:6:12
+      // [cycle] cycle error:
       //     ./main.cue:10:12
     }
   }
@@ -122,28 +104,13 @@ Result:
     action: (string){ "Task 1" }
     timeSpan: (#struct){
       duration: (_|_){
-        // [incomplete] #T1.timeSpan.start: non-concrete value end for bound <=:
-        //     ./main.cue:12:11
-        // #T1.timeSpan.start: non-concrete value float in operand to -:
-        //     ./main.cue:8:12
-        //     ./main.cue:6:12
-        //     ./main.cue:10:12
+        // [cycle] cycle error
       }
       start: (_|_){
-        // [incomplete] #T1.timeSpan.start: non-concrete value end for bound <=:
-        //     ./main.cue:12:11
-        // #T1.timeSpan.start: non-concrete value float in operand to -:
-        //     ./main.cue:8:12
-        //     ./main.cue:6:12
-        //     ./main.cue:10:12
+        // [cycle] cycle error
       }
       end: (_|_){
-        // [incomplete] #T1.timeSpan.start: non-concrete value end for bound <=:
-        //     ./main.cue:12:11
-        // #T1.timeSpan.start: non-concrete value float in operand to -:
-        //     ./main.cue:8:12
-        //     ./main.cue:6:12
-        //     ./main.cue:10:12
+        // [cycle] cycle error
       }
     }
   }
@@ -151,28 +118,13 @@ Result:
     action: (string){ "Task 2" }
     timeSpan: (#struct){
       duration: (_|_){
-        // [incomplete] #T2.timeSpan.start: non-concrete value end for bound <=:
-        //     ./main.cue:12:11
-        // #T2.timeSpan.start: non-concrete value float in operand to -:
-        //     ./main.cue:8:12
-        //     ./main.cue:6:12
-        //     ./main.cue:10:12
+        // [cycle] cycle error
       }
       start: (_|_){
-        // [incomplete] #T2.timeSpan.start: non-concrete value end for bound <=:
-        //     ./main.cue:12:11
-        // #T2.timeSpan.start: non-concrete value float in operand to -:
-        //     ./main.cue:8:12
-        //     ./main.cue:6:12
-        //     ./main.cue:10:12
+        // [cycle] cycle error
       }
       end: (_|_){
-        // [incomplete] #T2.timeSpan.start: non-concrete value end for bound <=:
-        //     ./main.cue:12:11
-        // #T2.timeSpan.start: non-concrete value float in operand to -:
-        //     ./main.cue:8:12
-        //     ./main.cue:6:12
-        //     ./main.cue:10:12
+        // [cycle] cycle error
       }
     }
   }
@@ -196,9 +148,7 @@ Result:
             //     ./main.cue:50:19
           }
           start: (_|_){
-            // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
-            //     ./main.cue:6:12
-            //     ./main.cue:50:19
+            // [cycle] cycle error
           }
         }
         action: (string){ "Task 1" }
@@ -265,45 +215,19 @@ diff old new
      ./main.cue:50:19
  
  Result:
-@@ -11,32 +8,41 @@
+@@ -11,7 +8,10 @@
    // [eval]
    #TimeSpan: (#struct){
      start: (_|_){
 -      // [cycle] cycle error
-+      // [incomplete] #TimeSpan.start: non-concrete value end for bound <=:
-+      //     ./main.cue:12:11
-+      // #TimeSpan.start: non-concrete value float in operand to -:
-+      //     ./main.cue:8:12
-+      //     ./main.cue:6:12
-+      //     ./main.cue:10:12
-+      // #TimeSpan.duration: non-concrete value float in operand to -:
++      // [cycle] cycle error:
 +      //     ./main.cue:9:12
-+      //     ./main.cue:6:12
++      // cycle error:
 +      //     ./main.cue:10:12
      }
      duration: (_|_){
--      // [cycle] cycle error:
--      //     ./main.cue:9:12
-+      // [incomplete] #TimeSpan.start: non-concrete value end for bound <=:
-+      //     ./main.cue:12:11
-+      // #TimeSpan.duration: non-concrete value float in operand to -:
-+      //     ./main.cue:9:12
-+      //     ./main.cue:6:12
-+      //     ./main.cue:10:12
-     }
-     end: (_|_){
--      // [cycle] cycle error:
-+      // [incomplete] #TimeSpan.start: non-concrete value end for bound <=:
-+      //     ./main.cue:12:11
-+      // #TimeSpan.start: non-concrete value float in operand to -:
-+      //     ./main.cue:8:12
-+      //     ./main.cue:6:12
-+      //     ./main.cue:10:12
-+      // #TimeSpan.duration: non-concrete value float in operand to -:
-+      //     ./main.cue:9:12
-+      //     ./main.cue:6:12
-       //     ./main.cue:10:12
-     }
+       // [cycle] cycle error:
+@@ -24,19 +24,7 @@
    }
    #Task: (#struct){
      action: (string){ string }
@@ -324,7 +248,7 @@ diff old new
    }
    #TaskSet: (#struct){
      action: (string){ string }
-@@ -44,32 +50,34 @@
+@@ -44,29 +32,16 @@
      }
      tasks: (#list){
      }
@@ -352,36 +276,15 @@ diff old new
 -      duration: (_|_){
 -        // [cycle] cycle error:
 -        //     ./main.cue:9:12
--      }
--      end: (_|_){
--        // [cycle] cycle error
 +      duration: (_|_){
-+        // [incomplete] #T1.timeSpan.start: non-concrete value end for bound <=:
-+        //     ./main.cue:12:11
-+        // #T1.timeSpan.start: non-concrete value float in operand to -:
-+        //     ./main.cue:8:12
-+        //     ./main.cue:6:12
-+        //     ./main.cue:10:12
++        // [cycle] cycle error
 +      }
 +      start: (_|_){
-+        // [incomplete] #T1.timeSpan.start: non-concrete value end for bound <=:
-+        //     ./main.cue:12:11
-+        // #T1.timeSpan.start: non-concrete value float in operand to -:
-+        //     ./main.cue:8:12
-+        //     ./main.cue:6:12
-+        //     ./main.cue:10:12
-+      }
-+      end: (_|_){
-+        // [incomplete] #T1.timeSpan.start: non-concrete value end for bound <=:
-+        //     ./main.cue:12:11
-+        // #T1.timeSpan.start: non-concrete value float in operand to -:
-+        //     ./main.cue:8:12
-+        //     ./main.cue:6:12
-+        //     ./main.cue:10:12
++        // [cycle] cycle error
        }
-     }
-   }
-@@ -76,15 +84,29 @@
+       end: (_|_){
+         // [cycle] cycle error
+@@ -76,12 +51,11 @@
    #T2: (#struct){
      action: (string){ "Task 2" }
      timeSpan: (#struct){
@@ -391,36 +294,15 @@ diff old new
 -      duration: (_|_){
 -        // [cycle] cycle error:
 -        //     ./main.cue:9:12
--      }
--      end: (_|_){
--        // [cycle] cycle error
 +      duration: (_|_){
-+        // [incomplete] #T2.timeSpan.start: non-concrete value end for bound <=:
-+        //     ./main.cue:12:11
-+        // #T2.timeSpan.start: non-concrete value float in operand to -:
-+        //     ./main.cue:8:12
-+        //     ./main.cue:6:12
-+        //     ./main.cue:10:12
++        // [cycle] cycle error
 +      }
 +      start: (_|_){
-+        // [incomplete] #T2.timeSpan.start: non-concrete value end for bound <=:
-+        //     ./main.cue:12:11
-+        // #T2.timeSpan.start: non-concrete value float in operand to -:
-+        //     ./main.cue:8:12
-+        //     ./main.cue:6:12
-+        //     ./main.cue:10:12
-+      }
-+      end: (_|_){
-+        // [incomplete] #T2.timeSpan.start: non-concrete value end for bound <=:
-+        //     ./main.cue:12:11
-+        // #T2.timeSpan.start: non-concrete value float in operand to -:
-+        //     ./main.cue:8:12
-+        //     ./main.cue:6:12
-+        //     ./main.cue:10:12
++        // [cycle] cycle error
        }
-     }
-   }
-@@ -93,66 +115,73 @@
+       end: (_|_){
+         // [cycle] cycle error
+@@ -93,66 +67,71 @@
      action: (string){ "Task 1 and Task 2" }
      #tasks: (_|_){
        // [eval]
@@ -440,9 +322,7 @@ diff old new
 +            //     ./main.cue:50:19
 +          }
 +          start: (_|_){
-+            // [eval] ts.#tasks.t2.timeSpan.end: conflicting values 119 and float (mismatched types int and float):
-+            //     ./main.cue:6:12
-+            //     ./main.cue:50:19
++            // [cycle] cycle error
 +          }
 +        }
          action: (string){ "Task 1" }

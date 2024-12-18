@@ -162,8 +162,6 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	}
 	defer n.free()
 
-	defer n.unmarkDepth(n.markDepth())
-
 	// Typically a node processes all conjuncts before processing its fields.
 	// So this condition is very likely to trigger. If for some reason the
 	// parent has not been processed yet, we could attempt to process more
@@ -180,6 +178,26 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	}
 
 	nodeOnlyNeeds := needs &^ (subFieldsProcessed)
+
+	if v.BaseValue == nil {
+		v.BaseValue = cycle
+	}
+	n.updateScalar()
+	if nodeOnlyNeeds == (scalarKnown|arcTypeKnown) && n.meets(nodeOnlyNeeds) {
+		return true
+	}
+
+	if v.status == evaluating &&
+		v.state.evalDepth == c.evalDepth &&
+		needs&fieldSetKnown == 0 &&
+		mode != finalize {
+		return false
+	}
+
+	v.status = evaluating
+
+	defer n.unmarkDepth(n.markDepth())
+
 	n.process(nodeOnlyNeeds, mode)
 
 	defer c.PopArc(c.PushArc(v))

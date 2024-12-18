@@ -494,8 +494,8 @@ Disjuncts:    215
         host: (string){ "mod.test" }
       }
       #Y: (_|_){
-        // [incomplete] large.p1.#Y: error in call to regexp.FindNamedSubmatch: non-concrete value _:
-        //     ./in.cue:231:7
+        // [incomplete] large.p1.X: undefined field: port:
+        //     ./in.cue:199:33
       }
     }
     p2: (struct){
@@ -852,8 +852,8 @@ diff old new
 +        host: (string){ "mod.test" }
 +      }
 +      #Y: (_|_){
-+        // [incomplete] large.p1.#Y: error in call to regexp.FindNamedSubmatch: non-concrete value _:
-+        //     ./in.cue:231:7
++        // [incomplete] large.p1.X: undefined field: port:
++        //     ./in.cue:199:33
 +      }
 +    }
 +    p2: (struct){

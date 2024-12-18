@@ -62,49 +62,6 @@ Retain: 1
 Unifications: 7
 Conjuncts:    7
 Disjuncts:    7
--- out/evalalpha --
-(struct){
-  a: (string){ "foo" }
-  b: (bool){ true }
-  c: (struct){
-    a: (int){ 3 }
-  }
-  d: (_|_){
-    // [incomplete] d: non-concrete value int in operand to >:
-    //     ./in.cue:14:5
-    //     ./in.cue:13:5
-    //     ./in.cue:14:2
-    a: (_|_){
-      // [incomplete] d: non-concrete value int in operand to >:
-      //     ./in.cue:14:5
-      //     ./in.cue:13:5
-      //     ./in.cue:14:2
-    }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -5,7 +5,15 @@
-     a: (int){ 3 }
-   }
-   d: (_|_){
--    // [cycle] cycle error:
-+    // [incomplete] d: non-concrete value int in operand to >:
-     //     ./in.cue:14:5
-+    //     ./in.cue:13:5
-+    //     ./in.cue:14:2
-+    a: (_|_){
-+      // [incomplete] d: non-concrete value int in operand to >:
-+      //     ./in.cue:14:5
-+      //     ./in.cue:13:5
-+      //     ./in.cue:14:2
-+    }
-   }
- }
--- diff/explanation --
-Improved error message.
 -- out/eval --
 (struct){
   a: (string){ "foo" }

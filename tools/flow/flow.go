@@ -90,6 +90,7 @@ var (
 	// TODO: ErrUpdate: update and run a dependency, but don't complete a
 	// dependency as more results may come. This is useful in server mode.
 
+	// TODO: move CUE_DEBUG_TOOLS_FLOW=1 to e.g. CUE_DEBUG=toolsflow
 	debug = os.Getenv("CUE_DEBUG_TOOLS_FLOW") != ""
 )
 

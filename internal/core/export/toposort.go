@@ -32,11 +32,11 @@ func VertexFeatures(c *adt.OpContext, v *adt.Vertex) []adt.Feature {
 	if c.TopoSort {
 		return toposort.VertexFeatures(c, v)
 	} else {
-		return vertexFeatures(c, v)
+		return vertexFeatures(v)
 	}
 }
 
-func vertexFeatures(c *adt.OpContext, v *adt.Vertex) []adt.Feature {
+func vertexFeatures(v *adt.Vertex) []adt.Feature {
 	sets := extractFeatures(v.Structs)
 	m := sortArcs(sets) // TODO: use for convenience.
 
@@ -54,11 +54,7 @@ func vertexFeatures(c *adt.OpContext, v *adt.Vertex) []adt.Feature {
 		sets = append(sets, a)
 	}
 
-	a = sortedArcs(sets)
-	if adt.DebugSort > 0 {
-		adt.DebugSortFields(c, a)
-	}
-	return a
+	return sortedArcs(sets)
 }
 
 func extractFeatures(in []*adt.StructInfo) (a [][]adt.Feature) {

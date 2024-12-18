@@ -250,10 +250,6 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		// done
 
 	case needs&subFieldsProcessed != 0:
-		if DebugSort > 0 {
-			DebugSortArcs(n.ctx, n.node)
-		}
-
 		switch {
 		case assertStructuralCycleV3(n):
 		// TODO: consider bailing on error if n.errs != nil.

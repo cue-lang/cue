@@ -189,20 +189,16 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 		return -cmp.Compare(f1, f2)
 	})
 
-	if adt.DebugSort == 0 {
-		m := sortArcs(extractFeatures(e.structs))
-		slices.SortStableFunc(fields, func(f1, f2 adt.Feature) int {
-			if m[f2] == 0 {
-				if m[f1] == 0 {
-					return +1
-				}
-				return -1
+	m := sortArcs(extractFeatures(e.structs))
+	slices.SortStableFunc(fields, func(f1, f2 adt.Feature) int {
+		if m[f2] == 0 {
+			if m[f1] == 0 {
+				return +1
 			}
-			return -cmp.Compare(m[f1], m[f2])
-		})
-	} else {
-		adt.DebugSortFields(e.ctx, fields)
-	}
+			return -1
+		}
+		return -cmp.Compare(m[f1], m[f2])
+	})
 
 	if len(e.fields) == 0 && !e.hasEllipsis {
 		switch len(e.embed) + len(e.conjuncts) {

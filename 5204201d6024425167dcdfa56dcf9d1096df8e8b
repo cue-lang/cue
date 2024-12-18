@@ -54,6 +54,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0849e5c5_defc5812",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-18T12:54:31Z",
+      "side": 1,
+      "message": "I just realised; why not place this near the bottom, to keep the switch cases in increasing order?",
+      "revId": "5204201d6024425167dcdfa56dcf9d1096df8e8b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a878af7d_822f2f47",
         "filename": "internal/core/export/value.go",
         "patchSetId": 3

@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3100c530_e5afc6a2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-18T12:53:32Z",
+      "side": 1,
+      "message": "I can confirm that this works well for Unity now! I couldn\u0027t spot any more conjunct reorderings.\n\nI suggest that we merge this, while coordinating so that I can send a PR to update the unity corpus accordingly. Then we can see how much smaller the diff with CUE_DEBUG\u003dsortedfields got.",
+      "revId": "5204201d6024425167dcdfa56dcf9d1096df8e8b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c468e5e_365d8bb5",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-18T12:53:32Z",
+      "side": 1,
+      "message": "nit: I would use consistent var names for the comparison integer, you are using `cmp` and `diff` here. I would suggest `c`, given that `cmp` is a standard library package now, and `diff` tends to mean plaintext or tree diffs.",
+      "revId": "5204201d6024425167dcdfa56dcf9d1096df8e8b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4718663_68082159",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-18T12:53:32Z",
+      "side": 1,
+      "message": "I really think you should use `cmp.Compare` here; you\u0027re adding ten extra lines for little reason. I might even use it over `strings.Compare` too for consistency, and rely on the compiler to do the right thing (which is not hard, given that these are basic types).",
+      "revId": "5204201d6024425167dcdfa56dcf9d1096df8e8b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a878af7d_822f2f47",
+        "filename": "internal/core/export/value.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-18T12:53:32Z",
+      "side": 1,
+      "message": "ditto stable sorting.",
+      "revId": "5204201d6024425167dcdfa56dcf9d1096df8e8b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "141417d1_209a72cc",
+        "filename": "internal/core/export/value.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-18T12:53:32Z",
+      "side": 1,
+      "message": "any particular reason why this should be a stable sort? before we weren\u0027t using a stable sort. if we must use it, I would document why, probably with a TODO as I imagine we shouldn\u0027t need to.",
+      "revId": "5204201d6024425167dcdfa56dcf9d1096df8e8b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -811,14 +811,11 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 				needs := state.conditions()
 				runMode := state.runMode()
 
-				arc.unify(c, needs|arcTypeKnown, attemptOnly) // to set scalar
-
 				if runMode == finalize {
-					// arc.unify(c, needs, attemptOnly) // to set scalar
-					// Freeze node.
+					arc.unify(c, needs|arcTypeKnown, attemptOnly) // to set scalar
 					arc.state.freeze(needs)
 				} else {
-					arc.unify(c, needs, runMode)
+					arc.unify(c, needs|arcTypeKnown, runMode) // to set scalar
 				}
 
 				v := arc

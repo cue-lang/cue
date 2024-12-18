@@ -766,17 +766,14 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 
 		if c.isDevVersion() {
 			if s := arc.getState(c); s != nil {
-				needs := state.conditions()
+				needs := state.conditions() | arcTypeKnown
 				runMode := state.runMode()
 
-				arc.unify(c, needs|arcTypeKnown, attemptOnly) // to set scalar
-
 				if runMode == finalize {
-					// arc.unify(c, needs, attemptOnly) // to set scalar
-					// Freeze node.
+					arc.unify(c, needs, attemptOnly) // to set scalar
 					arc.state.freeze(needs)
 				} else {
-					arc.unify(c, needs, runMode)
+					arc.unify(c, needs, runMode) // to set scalar
 				}
 
 				v := arc

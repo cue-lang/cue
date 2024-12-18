@@ -34,14 +34,12 @@ Disjuncts:    7
 -- out/evalalpha --
 (struct){
   a: (_|_){
-    // [incomplete] b: non-concrete value _ in operand to +:
+    // [cycle] cycle error:
     //     ./in.cue:2:4
-    //     ./in.cue:1:4
   }
   b: (_|_){
-    // [incomplete] b: non-concrete value _ in operand to +:
+    // [cycle] cycle error:
     //     ./in.cue:2:4
-    //     ./in.cue:1:4
   }
   c: (#list){
     0: (_){ _ }
@@ -52,23 +50,20 @@ Disjuncts:    7
 diff old new
 --- old
 +++ new
-@@ -1,10 +1,12 @@
+@@ -1,11 +1,11 @@
  (struct){
    a: (_|_){
--    // [cycle] cycle error:
-+    // [incomplete] b: non-concrete value _ in operand to +:
+     // [cycle] cycle error:
+-    //     ./in.cue:1:4
 +    //     ./in.cue:2:4
-     //     ./in.cue:1:4
    }
    b: (_|_){
--    // [cycle] cycle error:
-+    // [incomplete] b: non-concrete value _ in operand to +:
+     // [cycle] cycle error:
+-    //     ./in.cue:1:4
 +    //     ./in.cue:2:4
-     //     ./in.cue:1:4
    }
    c: (#list){
--- diff/explanation --
-More useful error messages.
+     0: (_){ _ }
 -- out/eval --
 (struct){
   a: (_|_){

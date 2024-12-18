@@ -134,9 +134,9 @@ Conjuncts:    82
 Disjuncts:    58
 -- out/evalalpha --
 Errors:
-xe1: conflicting values 8 and 9:
-    ./in.cue:33:14
-    ./in.cue:38:6
+xe3: conflicting values 7 and 6:
+    ./in.cue:35:6
+    ./in.cue:35:10
 
 Result:
 (_|_){
@@ -159,31 +159,15 @@ Result:
   xd3: (int){ 6 }
   xd4: (int){ 9 }
   xd5: (int){ 10 }
-  xe1: (_|_){
-    // [eval] xe1: conflicting values 8 and 9:
-    //     ./in.cue:33:14
-    //     ./in.cue:38:6
-  }
-  xe2: (_|_){
-    // [eval] xe1: conflicting values 8 and 9:
-    //     ./in.cue:33:14
-    //     ./in.cue:38:6
-  }
+  xe1: (int){ 9 }
+  xe2: (int){ 8 }
   xe3: (_|_){
-    // [eval] xe1: conflicting values 8 and 9:
-    //     ./in.cue:33:14
-    //     ./in.cue:38:6
+    // [eval] xe3: conflicting values 7 and 6:
+    //     ./in.cue:35:6
+    //     ./in.cue:35:10
   }
-  xe4: (_|_){
-    // [eval] xe1: conflicting values 8 and 9:
-    //     ./in.cue:33:14
-    //     ./in.cue:38:6
-  }
-  xe5: (_|_){
-    // [eval] xe1: conflicting values 8 and 9:
-    //     ./in.cue:33:14
-    //     ./in.cue:38:6
-  }
+  xe4: (int){ 9 }
+  xe5: (int){ 10 }
   z1: (int){ |(*(int){ 11 }, (int){ 13 }) }
   z2: (int){ 10 }
   z3: (int){ 8 }
@@ -192,17 +176,6 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,7 +1,7 @@
- Errors:
--xe3: conflicting values 7 and 6:
--    ./in.cue:35:6
--    ./in.cue:35:10
-+xe1: conflicting values 8 and 9:
-+    ./in.cue:33:14
-+    ./in.cue:38:6
- 
- Result:
- (_|_){
 @@ -11,9 +11,9 @@
    xa3: (int){ 6 }
    xa4: (int){ 10 }
@@ -216,46 +189,6 @@ diff old new
    xc1: (int){ |(*(int){ 8 }, (int){ 9 }) }
    xc2: (int){ 8 }
    xc3: (int){ 6 }
-@@ -24,15 +24,31 @@
-   xd3: (int){ 6 }
-   xd4: (int){ 9 }
-   xd5: (int){ 10 }
--  xe1: (int){ 9 }
--  xe2: (int){ 8 }
-+  xe1: (_|_){
-+    // [eval] xe1: conflicting values 8 and 9:
-+    //     ./in.cue:33:14
-+    //     ./in.cue:38:6
-+  }
-+  xe2: (_|_){
-+    // [eval] xe1: conflicting values 8 and 9:
-+    //     ./in.cue:33:14
-+    //     ./in.cue:38:6
-+  }
-   xe3: (_|_){
--    // [eval] xe3: conflicting values 7 and 6:
--    //     ./in.cue:35:6
--    //     ./in.cue:35:10
--  }
--  xe4: (int){ 9 }
--  xe5: (int){ 10 }
-+    // [eval] xe1: conflicting values 8 and 9:
-+    //     ./in.cue:33:14
-+    //     ./in.cue:38:6
-+  }
-+  xe4: (_|_){
-+    // [eval] xe1: conflicting values 8 and 9:
-+    //     ./in.cue:33:14
-+    //     ./in.cue:38:6
-+  }
-+  xe5: (_|_){
-+    // [eval] xe1: conflicting values 8 and 9:
-+    //     ./in.cue:33:14
-+    //     ./in.cue:38:6
-+  }
-   z1: (int){ |(*(int){ 11 }, (int){ 13 }) }
-   z2: (int){ 10 }
-   z3: (int){ 8 }
 -- diff/todo/p1 --
 Verify differences.
 xb2: Incorrect result.

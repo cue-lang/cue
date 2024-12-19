@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7849dd5_ec9e37ed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-19T22:09:42Z",
+      "side": 1,
+      "message": "I\u0027ll leave it to Matthew to +2, assuming he\u0027s around tomorrow.",
+      "revId": "adf98eb82346d130d182a9ed5282ac41e5efe4e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "559be8e6_e996e2a4",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 818,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-19T22:09:42Z",
+      "side": 1,
+      "message": "did you forget to call out these changes in the commit message? at least I don\u0027t immediately recognize which paragraph they belong to, unlike the others.",
+      "revId": "adf98eb82346d130d182a9ed5282ac41e5efe4e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f3d5b24_1a49b352",
+        "filename": "internal/core/adt/eval_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-19T22:09:42Z",
+      "side": 1,
+      "message": "are these increases expected? the commit message seems to imply there are no regressions with this commit, but these numbers should only go down in theory.",
+      "revId": "adf98eb82346d130d182a9ed5282ac41e5efe4e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c55e221_329d1dc6",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-19T22:09:42Z",
+      "side": 1,
+      "message": "can you summarize what this logic does for posterity?",
+      "revId": "adf98eb82346d130d182a9ed5282ac41e5efe4e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

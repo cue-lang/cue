@@ -60,16 +60,38 @@ nested: {
 	a: 1 | 2 | *(
 		(3 | 4 | *( 5 | 6 | *7)) & ( 3 | 4 | ( *7 | 8 )))
 }
--- out/eval/stats --
-Leaks:  1
-Freed:  416
-Reused: 381
-Allocs: 36
-Retain: 1
+-- issue3415.cue --
+issue3415: full: {
+	A: #A & {
+		i: {
+		  _a + _b
+		  _a: 1
+		  _b: 10
+		}
+	  }
+	  
+	  #A: {
+		i: *0 | number
+	  }
+}
+issue3415: reduced: {
+	a: {
+		1 + #b
+		#b: 10
+	}
+	a: *0 | number
+}
 
-Unifications: 257
-Conjuncts:    478
-Disjuncts:    417
+-- out/eval/stats --
+Leaks:  19
+Freed:  430
+Reused: 413
+Allocs: 36
+Retain: 5
+
+Unifications: 268
+Conjuncts:    502
+Disjuncts:    438
 -- out/evalalpha --
 (struct){
   default: (struct){
@@ -233,6 +255,33 @@ Disjuncts:    417
   nested: (struct){
     a: (int){ |(*(int){ 7 }, (int){ 2 }, (int){ 3 }, (int){ 4 }, (int){ 1 }) }
   }
+  issue3415: (struct){
+    full: (struct){
+      A: (#struct){
+        i: (number){ |(*(int){
+            0
+            _a: (int){ 1 }
+            _b: (int){ 10 }
+          }, (number){
+            number
+            _a: (int){ 1 }
+            _b: (int){ 10 }
+          }) }
+      }
+      #A: (#struct){
+        i: (number){ |(*(int){ 0 }, (number){ number }) }
+      }
+    }
+    reduced: (struct){
+      a: (number){ |(*(int){
+          0
+          #b: (int){ 10 }
+        }, (number){
+          number
+          #b: (int){ 10 }
+        }) }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -256,6 +305,45 @@ diff old new
            a: (string){ "foo" }
            e: (string){ "bar" }
          }, (#struct){
+@@ -163,11 +163,15 @@
+   issue3415: (struct){
+     full: (struct){
+       A: (#struct){
+-        i: (int){
+-          11
+-          _a: (int){ 1 }
+-          _b: (int){ 10 }
+-        }
++        i: (number){ |(*(int){
++            0
++            _a: (int){ 1 }
++            _b: (int){ 10 }
++          }, (number){
++            number
++            _a: (int){ 1 }
++            _b: (int){ 10 }
++          }) }
+       }
+       #A: (#struct){
+         i: (number){ |(*(int){ 0 }, (number){ number }) }
+@@ -174,10 +178,13 @@
+       }
+     }
+     reduced: (struct){
+-      a: (int){
+-        11
+-        #b: (int){ 10 }
+-      }
++      a: (number){ |(*(int){
++          0
++          #b: (int){ 10 }
++        }, (number){
++          number
++          #b: (int){ 10 }
++        }) }
+     }
+   }
+ }
 -- diff/explanation --
 The old algorithm was incorrect: the default value should not be carried:
 only {b: string} of the first disjunction can be part of the result. As it
@@ -424,6 +512,26 @@ default either.
   nested: (struct){
     a: (int){ |(*(int){ 7 }, (int){ 2 }, (int){ 3 }, (int){ 4 }, (int){ 1 }) }
   }
+  issue3415: (struct){
+    full: (struct){
+      A: (#struct){
+        i: (int){
+          11
+          _a: (int){ 1 }
+          _b: (int){ 10 }
+        }
+      }
+      #A: (#struct){
+        i: (number){ |(*(int){ 0 }, (number){ number }) }
+      }
+    }
+    reduced: (struct){
+      a: (int){
+        11
+        #b: (int){ 10 }
+      }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -513,5 +621,31 @@ default either.
   }
   nested: {
     a: (1|2|*((3|4|*(5|6|*7)) & (3|4|(*7|8))))
+  }
+}
+--- issue3415.cue
+{
+  issue3415: {
+    full: {
+      A: (〈0;#A〉 & {
+        i: {
+          (〈0;_a〉 + 〈0;_b〉)
+          _a: 1
+          _b: 10
+        }
+      })
+      #A: {
+        i: (*0|number)
+      }
+    }
+  }
+  issue3415: {
+    reduced: {
+      a: {
+        (1 + 〈0;#b〉)
+        #b: 10
+      }
+      a: (*0|number)
+    }
   }
 }

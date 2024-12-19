@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5fc93bdd_0299a6db",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-19T16:00:43Z",
+      "side": 1,
+      "message": "should we abandon this given that #3418 was later fixed by https://review.gerrithub.io/c/cue-lang/cue/+/1202211 ?",
+      "revId": "a17a3a6b3c527eee5d7d563d76783f828d1ded0e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d6152fc2_b7d25e4a",

@@ -69,6 +69,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "35fe3040_1bd75ae6",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 818,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-20T10:33:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "559be8e6_e996e2a4",
+      "revId": "adf98eb82346d130d182a9ed5282ac41e5efe4e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9f3d5b24_1a49b352",
@@ -88,6 +106,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9e1cf1ac_690460e1",
+        "filename": "internal/core/adt/eval_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-20T10:33:25Z",
+      "side": 1,
+      "message": "Yeah, small changes are possible without them indicating big issues. This is more to catch large changes.",
+      "parentUuid": "9f3d5b24_1a49b352",
+      "revId": "adf98eb82346d130d182a9ed5282ac41e5efe4e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5c55e221_329d1dc6",
         "filename": "internal/core/adt/unify.go",
         "patchSetId": 2
@@ -99,6 +135,24 @@
       "writtenOn": "2024-12-19T22:09:42Z",
       "side": 1,
       "message": "can you summarize what this logic does for posterity?",
+      "revId": "adf98eb82346d130d182a9ed5282ac41e5efe4e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6535c1a_e8fea631",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-20T10:33:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c55e221_329d1dc6",
       "revId": "adf98eb82346d130d182a9ed5282ac41e5efe4e1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

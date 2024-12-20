@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "25af135b_580615cc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-20T10:11:50Z",
+      "side": 1,
+      "message": "Upgrading to a +2 to keep Marcel unblocked. Any later reviews can always be addressed in follow-up changes.",
+      "revId": "adf98eb82346d130d182a9ed5282ac41e5efe4e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "559be8e6_e996e2a4",

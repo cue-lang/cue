@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ddf9707_5f632ddd",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-20T08:44:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c468e5e_365d8bb5",
+      "revId": "5204201d6024425167dcdfa56dcf9d1096df8e8b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a4718663_68082159",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-12-18T12:53:32Z",
       "side": 1,
       "message": "I really think you should use `cmp.Compare` here; you\u0027re adding ten extra lines for little reason. I might even use it over `strings.Compare` too for consistency, and rely on the compiler to do the right thing (which is not hard, given that these are basic types).",
+      "revId": "5204201d6024425167dcdfa56dcf9d1096df8e8b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "37966c7a_2d2d8450",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-20T08:44:41Z",
+      "side": 1,
+      "message": "Ad, I didn\u0027t realize it was a stdlib package. That changes the equation. Done.",
+      "parentUuid": "a4718663_68082159",
       "revId": "5204201d6024425167dcdfa56dcf9d1096df8e8b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -71,6 +107,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f9186168_b3722b64",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-20T08:44:41Z",
+      "side": 1,
+      "message": "Because StructLit and ListLit are an Expr.",
+      "parentUuid": "0849e5c5_defc5812",
+      "revId": "5204201d6024425167dcdfa56dcf9d1096df8e8b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a878af7d_822f2f47",
         "filename": "internal/core/export/value.go",
         "patchSetId": 3
@@ -88,6 +142,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c2cced49_20e00e11",
+        "filename": "internal/core/export/value.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-20T08:44:41Z",
+      "side": 1,
+      "message": "added comment.",
+      "parentUuid": "a878af7d_822f2f47",
+      "revId": "5204201d6024425167dcdfa56dcf9d1096df8e8b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "141417d1_209a72cc",
         "filename": "internal/core/export/value.go",
         "patchSetId": 3
@@ -99,6 +171,24 @@
       "writtenOn": "2024-12-18T12:53:32Z",
       "side": 1,
       "message": "any particular reason why this should be a stable sort? before we weren\u0027t using a stable sort. if we must use it, I would document why, probably with a TODO as I imagine we shouldn\u0027t need to.",
+      "revId": "5204201d6024425167dcdfa56dcf9d1096df8e8b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b685d6d_ac5d0085",
+        "filename": "internal/core/export/value.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-20T08:44:41Z",
+      "side": 1,
+      "message": "I haven\u0027t run into problems, but theoretically we could have two equal elements. So this is to prevent issues there.",
+      "parentUuid": "141417d1_209a72cc",
       "revId": "5204201d6024425167dcdfa56dcf9d1096df8e8b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "307a063b_5e6f81c7",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 816,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-20T10:37:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "488548c9_c4ffb1f3",
+      "revId": "adf98eb82346d130d182a9ed5282ac41e5efe4e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "559be8e6_e996e2a4",

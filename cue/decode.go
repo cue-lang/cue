@@ -270,8 +270,11 @@ func (d *decoder) interfaceValue(v Value) (x interface{}) {
 
 	case IntKind:
 		if i, err := v.Int64(); err == nil {
-			cueexperiment.Init()
-			if cueexperiment.Flags.DecodeInt64 {
+			experiment, err := cueexperiment.Flags()
+			if err != nil {
+				d.addErr(err)
+			}
+			if experiment.DecodeInt64 {
 				return i
 			}
 			// When the decodeint64 experiment is not enabled, we want to return the value

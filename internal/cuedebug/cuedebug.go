@@ -6,10 +6,18 @@ import (
 	"cuelang.org/go/internal/envflag"
 )
 
-// Flags holds the set of global CUE_DEBUG flags. It is initialized by Init.
-var Flags Config
+// Flags returns the set of global CUE_DEBUG flags.
+func Flags() (Config, error) {
+	return flagsOnce()
+}
 
-// Flags holds the set of known CUE_DEBUG flags.
+var flagsOnce = sync.OnceValues(func() (Config, error) {
+	var cfg Config
+	err := envflag.Init(&cfg, "CUE_DEBUG")
+	return cfg, err
+})
+
+// Config holds the set of known CUE_DEBUG flags.
 //
 // When adding, deleting, or modifying entries below,
 // update cmd/cue/cmd/help.go as well for `cue help environment`.
@@ -66,16 +74,3 @@ type Config struct {
 	// such an expression could be written as `openAll(expr).out`.
 	OpenInline bool `envflag:"default:true"`
 }
-
-// Init initializes Flags. Note: this isn't named "init" because we
-// don't always want it to be called (for example we don't want it to be
-// called when running "cue help"), and also because we want the failure
-// mode to be one of error not panic, which would be the only option if
-// it was a top level init function.
-func Init() error {
-	return initOnce()
-}
-
-var initOnce = sync.OnceValue(func() error {
-	return envflag.Init(&Flags, "CUE_DEBUG")
-})

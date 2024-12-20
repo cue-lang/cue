@@ -78,25 +78,25 @@ func TestConcurrency(t *testing.T) {
 }
 
 func TestEvalVersion(t *testing.T) {
-	cueexperiment.Init()
-	saved := cueexperiment.Flags.EvalV3
-	defer func() { cueexperiment.Flags.EvalV3 = saved }()
-
 	test := func(c *cue.Context, want internal.EvaluatorVersion) {
+		t.Helper()
 		opCtx := adt.NewContext((*runtime.Runtime)(c), nil)
 		got := opCtx.Version
 		if got != want {
-			t.Errorf("got %v; want %v", got, want)
+			t.Errorf("got version %v; want %v", got, want)
 		}
 	}
 
-	cueexperiment.Flags.EvalV3 = true
+	cueexperiment.InitAlways = true
+	t.Cleanup(func() { cueexperiment.InitAlways = false })
+
+	t.Setenv("CUE_EXPERIMENT", "evalv3=1")
 
 	test(New(), internal.DevVersion)
 	test(New(EvaluatorVersion(EvalV2)), internal.DefaultVersion)
 	test(New(EvaluatorVersion(EvalV3)), internal.DevVersion)
 
-	cueexperiment.Flags.EvalV3 = false
+	t.Setenv("CUE_EXPERIMENT", "evalv3=0")
 
 	test(New(), internal.DefaultVersion)
 }

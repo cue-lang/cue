@@ -6,10 +6,10 @@ import (
 	"github.com/go-quicktest/qt"
 )
 
-func TestInit(t *testing.T) {
+func TestFlags(t *testing.T) {
 	// This is just a smoke test to make sure it's all wired up OK.
 	t.Setenv("CUE_DEBUG", "http")
-	err := Init()
+	debug, err := Flags()
 	qt.Assert(t, qt.IsNil(err))
-	qt.Assert(t, qt.IsTrue(Flags.HTTP))
+	qt.Assert(t, qt.IsTrue(debug.HTTP))
 }

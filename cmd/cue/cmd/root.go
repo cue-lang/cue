@@ -99,9 +99,6 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		if err != nil {
 			return err
 		}
-		if err := cueexperiment.Init(); err != nil {
-			return err
-		}
 		var opts []cuecontext.Option
 		if wasmInterp != nil {
 			opts = append(opts, cuecontext.Interpreter(wasmInterp))
@@ -109,7 +106,11 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		// CUE_EXPERIMENT=embed should probably be obeyed by [cuecontext.New] just like
 		// other flags such as evalv3 or toposort. Currently that causes an import cycle.
 		// See: https://cuelang.org/issue/3613
-		if cueexperiment.Flags.Embed {
+		experiment, err := cueexperiment.Flags()
+		if err != nil {
+			return err
+		}
+		if experiment.Embed {
 			opts = append(opts, cuecontext.Interpreter(embed.New()))
 		}
 		c.ctx = cuecontext.New(opts...)

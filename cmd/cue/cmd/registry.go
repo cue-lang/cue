@@ -14,23 +14,39 @@ import (
 // getRegistryResolver returns an implementation of [modregistry.Resolver]
 // that resolves to registries as specified in the configuration.
 func getRegistryResolver() (*modconfig.Resolver, error) {
-	return modconfig.NewResolver(newModConfig())
+	cfg, err := newModConfig()
+	if err != nil {
+		return nil, err
+	}
+	return modconfig.NewResolver(cfg)
 }
 
 func getCachedRegistry() (modload.Registry, error) {
-	return modconfig.NewRegistry(newModConfig())
-}
-
-func newModConfig() *modconfig.Config {
-	return &modconfig.Config{
-		Transport:  httpTransport(),
-		ClientType: "cmd/cue",
+	cfg, err := newModConfig()
+	if err != nil {
+		return nil, err
 	}
+	return modconfig.NewRegistry(cfg)
 }
 
-func httpTransport() http.RoundTripper {
-	if !cuedebug.Flags.HTTP {
-		return http.DefaultTransport
+func newModConfig() (*modconfig.Config, error) {
+	transport, err := httpTransport()
+	if err != nil {
+		return nil, err
+	}
+	return &modconfig.Config{
+		Transport:  transport,
+		ClientType: "cmd/cue",
+	}, nil
+}
+
+func httpTransport() (http.RoundTripper, error) {
+	debug, err := cuedebug.Flags()
+	if err != nil {
+		return nil, err
+	}
+	if !debug.HTTP {
+		return http.DefaultTransport, nil
 	}
 	return httplog.Transport(&httplog.TransportConfig{
 		// It would be nice to use the default slog logger,
@@ -39,5 +55,5 @@ func httpTransport() http.RoundTripper {
 		Logger: httplog.SlogLogger{
 			Logger: slog.New(slog.NewJSONHandler(os.Stderr, nil)),
 		},
-	})
+	}), nil
 }

@@ -94,8 +94,12 @@ inside $CUE_CONFIG_DIR; see 'cue help environment'.
 
 				ctx := backgroundContext()
 				// Cause the oauth2 logic to log HTTP requests when logging is enabled.
+				transport, err := httpTransport()
+				if err != nil {
+					return err
+				}
 				ctx = context.WithValue(ctx, oauth2.HTTPClient, &http.Client{
-					Transport: httpTransport(),
+					Transport: transport,
 				})
 				// Elide request and response bodies because they're likely to include sensitive information.
 				ctx = httplog.RedactRequestBody(ctx, "request body can contain sensitive data when logging in")

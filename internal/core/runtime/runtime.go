@@ -114,17 +114,24 @@ func (r *Runtime) Init() {
 
 	r.loaded = map[*build.Instance]interface{}{}
 
-	cueexperiment.Init()
-	if cueexperiment.Flags.EvalV3 {
+	experiment, err := cueexperiment.Flags()
+	if err != nil {
+		panic(err) // TODO(mvdan): return this error up the chain.
+	}
+	if experiment.EvalV3 {
 		r.version = internal.DevVersion
 	} else {
 		r.version = internal.DefaultVersion
 	}
-	r.topoSort = cueexperiment.Flags.TopoSort
+	r.topoSort = experiment.TopoSort
 
 	// By default we follow the environment's CUE_DEBUG settings,
 	// which can be overriden via [Runtime.SetDebugOptions],
 	// such as with the API option [cuelang.org/go/cue/cuecontext.CUE_DEBUG].
-	cuedebug.Init()
-	r.SetDebugOptions(&cuedebug.Flags)
+	debug, err := cuedebug.Flags()
+	if err != nil {
+		panic(err) // TODO(mvdan): return this error up the chain.
+	}
+	// TODO(mvdan): the method below shouldn't need to take a pointer.
+	r.SetDebugOptions(&debug)
 }

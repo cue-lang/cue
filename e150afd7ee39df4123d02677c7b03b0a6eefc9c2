@@ -16,6 +16,24 @@
       "message": "remember to use the shorter links, which can survive even if we switch to a different gerrit: https://cuelang.org/cl/1199752\n\nIt\u0027s the same in the other CLs, please fix the others too; I won\u0027t repeat the comments to save time",
       "revId": "e150afd7ee39df4123d02677c7b03b0a6eefc9c2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a8c4064_0c1ef664",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-23T12:39:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ebf6e14f_a9dbf407",
+      "revId": "e150afd7ee39df4123d02677c7b03b0a6eefc9c2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

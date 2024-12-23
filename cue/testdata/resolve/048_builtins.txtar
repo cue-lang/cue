@@ -89,6 +89,7 @@ Conjuncts:    125
 Disjuncts:    75
 -- out/evalalpha --
 Errors:
+o3.a: 2 errors in empty disjunction:
 o3.a: conflicting values "bar" and "foo":
     ./in.cue:17:5
     ./in.cue:20:14
@@ -153,7 +154,8 @@ Result:
   o3: (_|_){
     // [eval]
     a: (_|_){
-      // [eval] o3.a: conflicting values "bar" and "foo":
+      // [eval] o3.a: 2 errors in empty disjunction:
+      // o3.a: conflicting values "bar" and "foo":
       //     ./in.cue:17:5
       //     ./in.cue:20:14
       // o3.a: conflicting values "baz" and "foo":
@@ -225,9 +227,9 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,13 +1,8 @@
+@@ -1,13 +1,9 @@
  Errors:
--o3.a: 2 errors in empty disjunction:
+ o3.a: 2 errors in empty disjunction:
  o3.a: conflicting values "bar" and "foo":
 -    ./in.cue:15:12
      ./in.cue:17:5
@@ -239,14 +241,11 @@ diff old new
      ./in.cue:20:14
      ./in.cue:20:24
  a3.a: invalid value "bar" (out of bound =~"oo"):
-@@ -68,15 +63,10 @@
-   o3: (_|_){
-     // [eval]
+@@ -70,13 +66,9 @@
      a: (_|_){
--      // [eval] o3.a: 2 errors in empty disjunction:
--      // o3.a: conflicting values "bar" and "foo":
+       // [eval] o3.a: 2 errors in empty disjunction:
+       // o3.a: conflicting values "bar" and "foo":
 -      //     ./in.cue:15:12
-+      // [eval] o3.a: conflicting values "bar" and "foo":
        //     ./in.cue:17:5
 -      //     ./in.cue:20:5
        //     ./in.cue:20:14
@@ -257,7 +256,6 @@ diff old new
        //     ./in.cue:20:24
      }
 -- diff/todo/p2 --
-Missing "empty disjunction" message.
 Missing error positions.
 -- out/eval --
 Errors:

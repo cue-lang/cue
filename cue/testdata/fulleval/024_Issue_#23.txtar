@@ -36,6 +36,7 @@ Conjuncts:    15
 Disjuncts:    11
 -- out/evalalpha --
 Errors:
+y: 2 errors in empty disjunction:
 y.a: conflicting values 1 and 3:
     ./in.cue:1:12
     ./in.cue:2:12
@@ -52,7 +53,8 @@ Result:
       a: (int){ 2 }
     }) }
   y: (_|_){
-    // [eval] y.a: conflicting values 1 and 3:
+    // [eval] y: 2 errors in empty disjunction:
+    // y.a: conflicting values 1 and 3:
     //     ./in.cue:1:12
     //     ./in.cue:2:12
     // y.a: conflicting values 2 and 3:
@@ -65,9 +67,8 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,12 +1,9 @@
- Errors:
--y: 2 errors in empty disjunction:
+@@ -2,11 +2,9 @@
+ y: 2 errors in empty disjunction:
  y.a: conflicting values 1 and 3:
      ./in.cue:1:12
 -    ./in.cue:2:4
@@ -78,13 +79,9 @@ diff old new
      ./in.cue:2:12
  
  Result:
-@@ -18,20 +15,12 @@
-       a: (int){ 2 }
-     }) }
-   y: (_|_){
--    // [eval] y: 2 errors in empty disjunction:
--    // y.a: conflicting values 1 and 3:
-+    // [eval] y.a: conflicting values 1 and 3:
+@@ -21,17 +19,10 @@
+     // [eval] y: 2 errors in empty disjunction:
+     // y.a: conflicting values 1 and 3:
      //     ./in.cue:1:12
 -    //     ./in.cue:2:4
      //     ./in.cue:2:12
@@ -103,7 +100,6 @@ diff old new
    }
  }
 -- diff/todo/p3 --
-Missing "empty disjunction" error message.
 Missing error positions.
 -- diff/explanation --
 It is okay to show field a as long as the error is clear and points to the

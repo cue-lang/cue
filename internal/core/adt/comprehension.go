@@ -217,7 +217,11 @@ func (n *nodeContext) insertComprehension(
 				conjunct := MakeConjunct(env, c, ci)
 				n.assertInitialized()
 				arc := n.insertFieldUnchecked(f.Label, ArcMember, conjunct)
-				arc.MultiLet = f.IsMulti
+				if n.ctx.isDevVersion() {
+					arc.MultiLet = true
+				} else {
+					arc.MultiLet = f.IsMulti
+				}
 
 				fields = append(fields, f)
 

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b06573e_e24c90c9",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 950,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-23T12:29:37Z",
+      "side": 1,
+      "message": "does this comment need updating now?",
+      "revId": "7aac4df31da32a2f517970866d32262f64fe74de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

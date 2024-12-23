@@ -61,13 +61,13 @@ output: {
 -- out/eval/stats --
 Leaks:  90
 Freed:  4079
-Reused: 4072
-Allocs: 97
-Retain: 1364
+Reused: 4074
+Allocs: 95
+Retain: 1359
 
 Unifications: 4161
 Conjuncts:    9489
-Disjuncts:    4809
+Disjuncts:    4804
 -- out/evalalpha --
 (struct){
   #Datastream: (#struct){

@@ -253,9 +253,9 @@ diff old new
 --- old
 +++ new
 @@ -1,9 +1,9 @@
--Leaks:  7
--Freed:  3218
--Reused: 3200
+-Leaks:  6
+-Freed:  3232
+-Reused: 3213
 -Allocs: 25
 -Retain: 26
 +Leaks:  605
@@ -264,9 +264,9 @@ diff old new
 +Allocs: 605
 +Retain: 0
  
--Unifications: 2577
--Conjuncts:    12017
--Disjuncts:    3244
+-Unifications: 2588
+-Conjuncts:    12056
+-Disjuncts:    3258
 +Unifications: 175
 +Conjuncts:    2668
 +Disjuncts:    92
@@ -617,15 +617,15 @@ diff old new
    }
  }
 -- out/eval/stats --
-Leaks:  7
-Freed:  3218
-Reused: 3200
+Leaks:  6
+Freed:  3232
+Reused: 3213
 Allocs: 25
 Retain: 26
 
-Unifications: 2577
-Conjuncts:    12017
-Disjuncts:    3244
+Unifications: 2588
+Conjuncts:    12056
+Disjuncts:    3258
 -- out/eval --
 (struct){
   #AC: (#struct){

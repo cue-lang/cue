@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba1f9c8f_bcf3e783",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 603,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-23T16:38:17Z",
+      "side": 1,
+      "message": "is it worth reusing the `range n.Node.Arcs` right above? I don\u0027t know the code intimately but at first glance it seems like we could reuse the loop.",
+      "revId": "84aa48425b7b05141325cb7282ad315a4273a77e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1208,7 +1208,8 @@ Result:
         }
       }
       E: (_|_){
-        // [incomplete] voidEliminationSuccess.derefDisj1.E.f: operand e of '!' not concrete (was bool):
+        // [incomplete] voidEliminationSuccess.derefDisj1.E: 2 errors in empty disjunction:
+        // voidEliminationSuccess.derefDisj1.E.f: operand e of '!' not concrete (was bool):
         //     ./in.cue:417:7
         // voidEliminationSuccess.derefDisj1.E.h: operand g of '!' not concrete (was bool):
         //     ./in.cue:420:7
@@ -1222,7 +1223,8 @@ Result:
         }
       }
       E: (_|_){
-        // [incomplete] voidEliminationSuccess.derefDisj2.E.f: operand e of '!' not concrete (was bool):
+        // [incomplete] voidEliminationSuccess.derefDisj2.E: 2 errors in empty disjunction:
+        // voidEliminationSuccess.derefDisj2.E.f: operand e of '!' not concrete (was bool):
         //     ./in.cue:435:7
         // voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
         //     ./in.cue:438:7
@@ -1742,14 +1744,14 @@ diff old new
        #F: (#struct){
          e: (bool){ bool }
          f: (_|_){
-@@ -418,17 +370,10 @@
+@@ -418,17 +370,11 @@
          }
        }
        E: (_|_){
 -        // [incomplete] voidEliminationSuccess.derefDisj1.E: 2 errors in empty disjunction::
 -        //     ./in.cue:407:28
--        // voidEliminationSuccess.derefDisj1.E.f: operand e of '!' not concrete (was bool):
-+        // [incomplete] voidEliminationSuccess.derefDisj1.E.f: operand e of '!' not concrete (was bool):
++        // [incomplete] voidEliminationSuccess.derefDisj1.E: 2 errors in empty disjunction:
+         // voidEliminationSuccess.derefDisj1.E.f: operand e of '!' not concrete (was bool):
          //     ./in.cue:417:7
          // voidEliminationSuccess.derefDisj1.E.h: operand g of '!' not concrete (was bool):
          //     ./in.cue:420:7
@@ -1761,14 +1763,14 @@ diff old new
        }
      }
      derefDisj2: (struct){
-@@ -439,17 +384,10 @@
+@@ -439,17 +385,11 @@
          }
        }
        E: (_|_){
 -        // [incomplete] voidEliminationSuccess.derefDisj2.E: 2 errors in empty disjunction::
 -        //     ./in.cue:425:28
--        // voidEliminationSuccess.derefDisj2.E.f: operand e of '!' not concrete (was bool):
-+        // [incomplete] voidEliminationSuccess.derefDisj2.E.f: operand e of '!' not concrete (was bool):
++        // [incomplete] voidEliminationSuccess.derefDisj2.E: 2 errors in empty disjunction:
+         // voidEliminationSuccess.derefDisj2.E.f: operand e of '!' not concrete (was bool):
          //     ./in.cue:435:7
          // voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
          //     ./in.cue:438:7
@@ -1780,7 +1782,7 @@ diff old new
        }
      }
      bulk1: (struct){
-@@ -572,9 +510,7 @@
+@@ -572,9 +512,7 @@
            // [eval]
            e: (_|_){
              // [eval] structShare.err1.x.d.e: field not allowed:
@@ -1791,7 +1793,7 @@ diff old new
              //     ./in.cue:591:9
            }
          }
-@@ -598,13 +534,13 @@
+@@ -598,13 +536,13 @@
        }
        envs: (struct){
          e1: (#struct){
@@ -1809,7 +1811,7 @@ diff old new
          }
        }
      }
-@@ -641,9 +577,8 @@
+@@ -641,9 +579,8 @@
      _c: (struct){
        y: (int){ 1 }
      }
@@ -1821,7 +1823,7 @@ diff old new
      }
    }
    errorPropagation: (_|_){
-@@ -701,10 +636,10 @@
+@@ -701,10 +638,10 @@
        }
        foo: (#struct){
          kind: (string){ "foo" }
@@ -1834,7 +1836,7 @@ diff old new
        }
      }
      regular: (_|_){
-@@ -717,16 +652,12 @@
+@@ -717,16 +654,12 @@
        foo: (_|_){
          // [eval]
          kind: (string){ "foo" }
@@ -1854,7 +1856,7 @@ diff old new
          }
        }
      }
-@@ -738,10 +669,10 @@
+@@ -738,10 +671,10 @@
        }
        foo: (#struct){
          kind: (string){ "foo" }
@@ -1900,7 +1902,6 @@ Unifications: 444
 Conjuncts:    721
 Disjuncts:    516
 -- diff/todo/p2 --
-Missing empty disjunction message.
 provideIncompleteSuccess.t2.a.c.d: missing error: probably correct.
    A bit esoteric, but should probably work.
 -- diff/explanation --

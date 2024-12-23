@@ -25,6 +25,7 @@ Conjuncts:    60
 Disjuncts:    46
 -- out/evalalpha --
 Errors:
+b: 2 errors in empty disjunction:
 b.c: field not allowed:
     ./in.cue:12:2
 b.d: field not allowed:
@@ -50,7 +51,8 @@ Result:
     c: (int){ 3 }
   }
   b: (_|_){
-    // [eval] b.c: field not allowed:
+    // [eval] b: 2 errors in empty disjunction:
+    // b.c: field not allowed:
     //     ./in.cue:12:2
     // b.d: field not allowed:
     //     ./in.cue:13:2
@@ -63,9 +65,9 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,16 +1,7 @@
+@@ -1,16 +1,8 @@
  Errors:
--b: 2 errors in empty disjunction:
+ b: 2 errors in empty disjunction:
  b.c: field not allowed:
 -    ./in.cue:1:5
 -    ./in.cue:3:2
@@ -80,17 +82,14 @@ diff old new
      ./in.cue:13:2
  
  Result:
-@@ -33,36 +24,12 @@
-     c: (int){ 3 }
-   }
+@@ -35,34 +27,11 @@
    b: (_|_){
--    // [eval] b: 2 errors in empty disjunction:
--    // b.c: field not allowed:
+     // [eval] b: 2 errors in empty disjunction:
+     // b.c: field not allowed:
 -    //     ./in.cue:1:5
 -    //     ./in.cue:3:2
 -    //     ./in.cue:3:3
 -    //     ./in.cue:11:4
-+    // [eval] b.c: field not allowed:
      //     ./in.cue:12:2
      // b.d: field not allowed:
 -    //     ./in.cue:1:5
@@ -121,7 +120,6 @@ diff old new
    }
  }
 -- diff/todo/p3 --
-Missing "empty disjunction" error.
 Missing error positions.
 -- diff/explanation --
 Dropping e? is correct.

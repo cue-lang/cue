@@ -60,9 +60,12 @@ Conjuncts:    150
 Disjuncts:    101
 -- out/evalalpha --
 Errors:
+er3.min: 2 errors in empty disjunction:
 er3.min: conflicting values 1 and 5:
     ./in.cue:28:8
     ./in.cue:44:7
+es3.max: 2 errors in empty disjunction:
+es3.max: 4 errors in empty disjunction:
 es3.max: conflicting values 1 and 5:
     ./in.cue:4:16
     ./in.cue:22:7
@@ -108,7 +111,9 @@ Result:
     // [eval]
     min: (int){ 10 }
     max: (_|_){
-      // [eval] es3.max: conflicting values 1 and 5:
+      // [eval] es3.max: 2 errors in empty disjunction:
+      // es3.max: 4 errors in empty disjunction:
+      // es3.max: conflicting values 1 and 5:
       //     ./in.cue:4:16
       //     ./in.cue:22:7
       // es3.max: conflicting values 10 and 5:
@@ -143,7 +148,8 @@ Result:
   er3: (_|_){
     // [eval]
     min: (_|_){
-      // [eval] er3.min: conflicting values 1 and 5:
+      // [eval] er3.min: 2 errors in empty disjunction:
+      // er3.min: conflicting values 1 and 5:
       //     ./in.cue:28:8
       //     ./in.cue:44:7
       // er3.min: invalid value 5 (out of bound <5):
@@ -151,7 +157,8 @@ Result:
       //     ./in.cue:44:7
     }
     max: (_|_){
-      // [eval] er3.min: conflicting values 1 and 5:
+      // [eval] er3.min: 2 errors in empty disjunction:
+      // er3.min: conflicting values 1 and 5:
       //     ./in.cue:28:8
       //     ./in.cue:44:7
       // er3.min: invalid value 5 (out of bound <5):
@@ -164,15 +171,16 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,18 +1,11 @@
- Errors:
--er3.min: 2 errors in empty disjunction:
+@@ -2,17 +2,13 @@
+ er3.min: 2 errors in empty disjunction:
  er3.min: conflicting values 1 and 5:
      ./in.cue:28:8
 -    ./in.cue:43:6
 -    ./in.cue:44:7
 -es3.max: 3 errors in empty disjunction:
 +    ./in.cue:44:7
++es3.max: 2 errors in empty disjunction:
++es3.max: 4 errors in empty disjunction:
  es3.max: conflicting values 1 and 5:
      ./in.cue:4:16
 -    ./in.cue:5:15
@@ -184,7 +192,7 @@ diff old new
      ./in.cue:21:7
      ./in.cue:22:7
  es3.max: invalid value 5 (out of bound >10):
-@@ -36,34 +29,28 @@
+@@ -36,34 +32,30 @@
      max: (number){ |(*(int){ 2 }, (number){ >1 }, (number){ >2 }) }
    }
    s1: (#struct){
@@ -215,8 +223,9 @@ diff old new
      min: (int){ 10 }
      max: (_|_){
 -      // [eval] es3.max: 3 errors in empty disjunction:
--      // es3.max: conflicting values 1 and 5:
-+      // [eval] es3.max: conflicting values 1 and 5:
++      // [eval] es3.max: 2 errors in empty disjunction:
++      // es3.max: 4 errors in empty disjunction:
+       // es3.max: conflicting values 1 and 5:
        //     ./in.cue:4:16
 -      //     ./in.cue:5:15
 -      //     ./in.cue:20:6
@@ -227,7 +236,7 @@ diff old new
        //     ./in.cue:21:7
        //     ./in.cue:22:7
        // es3.max: invalid value 5 (out of bound >10):
-@@ -70,12 +57,15 @@
+@@ -70,12 +62,15 @@
        //     ./in.cue:5:7
        //     ./in.cue:22:7
      }
@@ -244,7 +253,7 @@ diff old new
    }
    r1: (#struct){
      min: (int){ 3 }
-@@ -82,8 +72,8 @@
+@@ -82,8 +77,8 @@
      max: (number){ >3 }
    }
    r2: (#struct){
@@ -254,13 +263,10 @@ diff old new
    }
    r3: (#struct){
      min: (int){ 3 }
-@@ -92,20 +82,16 @@
-   er3: (_|_){
-     // [eval]
-     min: (_|_){
--      // [eval] er3.min: 2 errors in empty disjunction:
--      // er3.min: conflicting values 1 and 5:
--      //     ./in.cue:28:8
+@@ -95,17 +90,15 @@
+       // [eval] er3.min: 2 errors in empty disjunction:
+       // er3.min: conflicting values 1 and 5:
+       //     ./in.cue:28:8
 -      //     ./in.cue:43:6
 -      //     ./in.cue:44:7
 -      // er3.min: invalid value 5 (out of bound <5):
@@ -272,15 +278,14 @@ diff old new
 -      // er3.min: conflicting values 1 and 5:
 -      //     ./in.cue:28:8
 -      //     ./in.cue:43:6
-+      // [eval] er3.min: conflicting values 1 and 5:
-+      //     ./in.cue:28:8
 +      //     ./in.cue:44:7
 +      // er3.min: invalid value 5 (out of bound <5):
 +      //     ./in.cue:29:7
 +      //     ./in.cue:44:7
 +    }
 +    max: (_|_){
-+      // [eval] er3.min: conflicting values 1 and 5:
++      // [eval] er3.min: 2 errors in empty disjunction:
++      // er3.min: conflicting values 1 and 5:
 +      //     ./in.cue:28:8
        //     ./in.cue:44:7
        // er3.min: invalid value 5 (out of bound <5):

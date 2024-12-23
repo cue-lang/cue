@@ -73,13 +73,13 @@ full: {
 -- out/eval/stats --
 Leaks:  3
 Freed:  23
-Reused: 16
-Allocs: 10
-Retain: 61
+Reused: 17
+Allocs: 9
+Retain: 58
 
 Unifications: 26
 Conjuncts:    50
-Disjuncts:    59
+Disjuncts:    56
 -- out/eval --
 Errors:
 out: cannot combine regular field "val" with "b":

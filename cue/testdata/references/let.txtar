@@ -285,15 +285,15 @@ issue1116: {
   }
 }
 -- out/eval/stats --
-Leaks:  2
-Freed:  114
+Leaks:  3
+Freed:  112
 Reused: 107
-Allocs: 9
-Retain: 14
+Allocs: 8
+Retain: 10
 
-Unifications: 116
-Conjuncts:    166
-Disjuncts:    121
+Unifications: 115
+Conjuncts:    169
+Disjuncts:    117
 -- out/evalalpha --
 (struct){
   a1list: (#list){
@@ -494,8 +494,44 @@ diff old new
          //     ./in.cue:54:17
        }
      }
+@@ -173,9 +173,9 @@
+     }
+     b: (string){
+       "b"
+-      let List#11 = (_|_){
+-        // [incomplete] issue1116.b.List: cycle error referencing #a:
+-        //     ./in.cue:96:14
++      let List#11 = (#list){
++        0: (string){ "a" }
++        1: (string){ "b" }
+       }
+       #a: (#list){
+         0: (string){ "a" }
 -- diff/todo/p3 --
 Investigate let divergence. Probably okay.
+||||||| parent of 2702426b (internal/core/adt: fix let issue for eval v2)
+     b: (string){
+       "b"
+-      let List#11 = (#list){
+-        0: (string){ "a" }
+-        1: (string){ "b" }
+-      }
++      let List#11 = ~(issue1116.b.#a)
+       #a: (#list){
+         0: (string){ "a" }
+         1: (string){ "b" }
+=======
+     b: (string){
+       "b"
+-      let List#11 = (_|_){
+-        // [incomplete] issue1116.b.List: cycle error referencing #a:
+-        //     ./in.cue:96:14
+-      }
++      let List#11 = ~(issue1116.b.#a)
+       #a: (#list){
+         0: (string){ "a" }
+         1: (string){ "b" }
+>>>>>>> 2702426b (internal/core/adt: fix let issue for eval v2)
 -- out/eval --
 (struct){
   a1list: (#list){
@@ -672,9 +708,9 @@ Investigate let divergence. Probably okay.
     }
     b: (string){
       "b"
-      let List#11 = (#list){
-        0: (string){ "a" }
-        1: (string){ "b" }
+      let List#11 = (_|_){
+        // [incomplete] issue1116.b.List: cycle error referencing #a:
+        //     ./in.cue:96:14
       }
       #a: (#list){
         0: (string){ "a" }

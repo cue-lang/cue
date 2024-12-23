@@ -948,6 +948,9 @@ func (x *LetReference) resolve(ctx *OpContext, state combinedFlags) *Vertex {
 
 	// We should only partly finalize the result here as it is not safe to
 	// finalize any references made by the let.
+	if !ctx.isDevVersion() {
+		arc.Finalize(ctx)
+	}
 	b := arc.Bottom()
 	if !arc.MultiLet && b == nil {
 		return arc

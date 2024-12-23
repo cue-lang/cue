@@ -446,7 +446,13 @@ Result:
           #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
           out: (int){
             1
-            let depths#1 = (_){ _ }
+            let depths#1multi = [
+              for k, v in 〈3;#in〉 {
+                (〈6;#next〉 & {
+                  #in: 〈2;v〉
+                }).out
+              },
+            ]
           }
         }
       }
@@ -461,7 +467,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
         }
@@ -472,7 +484,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
           "1": (#struct){
@@ -480,7 +498,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
           "2": (#struct){
@@ -488,7 +512,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
           "3": (#struct){
@@ -496,7 +526,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
           "4": (#struct){
@@ -504,7 +540,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
           "5": (#struct){
@@ -512,7 +554,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
           "6": (#struct){
@@ -520,7 +568,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
           "7": (#struct){
@@ -528,7 +582,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
           "8": (#struct){
@@ -536,7 +596,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
           "9": (#struct){
@@ -544,7 +610,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
           "10": (#struct){
@@ -552,7 +624,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
         }
@@ -590,7 +668,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
         }
@@ -601,7 +685,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
           "1": (#struct){
@@ -609,7 +699,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
           "2": (#struct){
@@ -617,7 +713,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
           "3": (#struct){
@@ -625,7 +727,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
           "4": (#struct){
@@ -633,7 +741,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
           "5": (#struct){
@@ -641,7 +755,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
           "6": (#struct){
@@ -649,7 +769,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
           "7": (#struct){
@@ -657,7 +783,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
           "8": (#struct){
@@ -665,7 +797,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
           "9": (#struct){
@@ -673,7 +811,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
           "10": (#struct){
@@ -681,7 +825,13 @@ Result:
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){
               1
-              let depths#1 = (_){ _ }
+              let depths#1multi = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
             }
           }
         }
@@ -1050,10 +1200,14 @@ diff old new
          #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
          #funcFactory: (#struct){
            #next: (_){ _ }
-@@ -217,115 +230,111 @@
-           }
-         }
-       }
+@@ -213,119 +226,193 @@
+           #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+           out: (int){
+             1
+-            let depths#1 = (_){ _ }
+-          }
+-        }
+-      }
 -      #Depth: (#struct){
 -        #maxiter: (int){ 11 }
 -        #funcFactory: (#struct){
@@ -1163,6 +1317,16 @@ diff old new
 -        out: (int){
 -          1
 -          let depths#1 = (_){ _ }
++            let depths#1multi = [
++              for k, v in 〈3;#in〉 {
++                (〈6;#next〉 & {
++                  #in: 〈2;v〉
++                }).out
++              },
++            ]
++          }
++        }
++      }
 +      #Depth: (_|_){
 +        // [eval] issue2052.full.#Depth: adding field #basic not allowed as field set was already referenced:
 +        //     ./issue2052.cue:89:20
@@ -1174,7 +1338,13 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
 +        }
@@ -1185,7 +1355,13 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
 +          "1": (#struct){
@@ -1193,7 +1369,13 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
 +          "2": (#struct){
@@ -1201,7 +1383,13 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
 +          "3": (#struct){
@@ -1209,7 +1397,13 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
 +          "4": (#struct){
@@ -1217,7 +1411,13 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
 +          "5": (#struct){
@@ -1225,7 +1425,13 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
 +          "6": (#struct){
@@ -1233,7 +1439,13 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
 +          "7": (#struct){
@@ -1241,7 +1453,13 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
 +          "8": (#struct){
@@ -1249,7 +1467,13 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
 +          "9": (#struct){
@@ -1257,7 +1481,13 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
 +          "10": (#struct){
@@ -1265,13 +1495,19 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
          }
        }
        tree: (struct){
-@@ -340,48 +349,8 @@
+@@ -340,48 +427,8 @@
          cow: (string){ "moo" }
        }
        d: (_|_){
@@ -1322,7 +1558,7 @@ diff old new
          #in: (#struct){
            a: (#struct){
              foo: (string){ "bar" }
-@@ -393,6 +362,109 @@
+@@ -393,6 +440,181 @@
            }
            cow: (string){ "moo" }
          }
@@ -1334,7 +1570,13 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
 +        }
@@ -1345,7 +1587,13 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
 +          "1": (#struct){
@@ -1353,7 +1601,13 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
 +          "2": (#struct){
@@ -1361,7 +1615,13 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
 +          "3": (#struct){
@@ -1369,7 +1629,13 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
 +          "4": (#struct){
@@ -1377,7 +1643,13 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
 +          "5": (#struct){
@@ -1385,7 +1657,13 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
 +          "6": (#struct){
@@ -1393,7 +1671,13 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
 +          "7": (#struct){
@@ -1401,7 +1685,13 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
 +          "8": (#struct){
@@ -1409,7 +1699,13 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
 +          "9": (#struct){
@@ -1417,7 +1713,13 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
 +          "10": (#struct){
@@ -1425,7 +1727,13 @@ diff old new
 +            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
 +            out: (int){
 +              1
-+              let depths#1 = (_){ _ }
++              let depths#1multi = [
++                for k, v in 〈3;#in〉 {
++                  (〈6;#next〉 & {
++                    #in: 〈2;v〉
++                  }).out
++                },
++              ]
 +            }
 +          }
 +        }

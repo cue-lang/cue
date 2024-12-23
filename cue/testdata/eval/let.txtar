@@ -272,7 +272,7 @@ Result:
       1: (int){ 2 }
       2: (int){ 3 }
     }
-    let Y#1C = (int){ 2 }
+    let Y#1Cmulti = 〈1;X〉
     "0": (int){ 2 }
     "1": (int){ 2 }
     "2": (int){ 2 }
@@ -292,14 +292,7 @@ Result:
       //     ./incomprehension.cue:42:7
       //     ./incomprehension.cue:42:13
     }
-    let X#1D = (_|_){
-      // [eval] indirectReference.y: conflicting values 2 and 1:
-      //     ./incomprehension.cue:42:7
-      //     ./incomprehension.cue:42:10
-      // indirectReference.y: conflicting values 3 and 1:
-      //     ./incomprehension.cue:42:7
-      //     ./incomprehension.cue:42:13
-    }
+    let X#1Dmulti = (〈0;y〉 * 4)
     "0": (_|_){
       // [eval] indirectReference.y: conflicting values 2 and 1:
       //     ./incomprehension.cue:42:7
@@ -424,7 +417,16 @@ diff old new
  
  Result:
  (_|_){
-@@ -121,61 +117,41 @@
+@@ -105,7 +101,7 @@
+       1: (int){ 2 }
+       2: (int){ 3 }
+     }
+-    let Y#1C = (int){ 2 }
++    let Y#1Cmulti = 〈1;X〉
+     "0": (int){ 2 }
+     "1": (int){ 2 }
+     "2": (int){ 2 }
+@@ -121,61 +117,34 @@
        // [eval] indirectReference.y: conflicting values 2 and 1:
        //     ./incomprehension.cue:42:7
        //     ./incomprehension.cue:42:10
@@ -435,14 +437,11 @@ diff old new
 -      //     ./incomprehension.cue:42:13
 -      //     ./incomprehension.cue:43:2
 -      //     ./incomprehension.cue:44:6
-+      // indirectReference.y: conflicting values 3 and 1:
-+      //     ./incomprehension.cue:42:7
-+      //     ./incomprehension.cue:42:13
-     }
-     let X#1D = (_|_){
-       // [eval] indirectReference.y: conflicting values 2 and 1:
-       //     ./incomprehension.cue:42:7
-       //     ./incomprehension.cue:42:10
+-    }
+-    let X#1D = (_|_){
+-      // [eval] indirectReference.y: conflicting values 2 and 1:
+-      //     ./incomprehension.cue:42:7
+-      //     ./incomprehension.cue:42:10
 -      //     ./incomprehension.cue:43:2
 -      //     ./incomprehension.cue:44:6
 -      // indirectReference.y: conflicting values 3 and 1:
@@ -450,10 +449,12 @@ diff old new
 -      //     ./incomprehension.cue:42:13
 -      //     ./incomprehension.cue:43:2
 -      //     ./incomprehension.cue:44:6
+-    }
 +      // indirectReference.y: conflicting values 3 and 1:
 +      //     ./incomprehension.cue:42:7
 +      //     ./incomprehension.cue:42:13
-     }
++    }
++    let X#1Dmulti = (〈0;y〉 * 4)
      "0": (_|_){
        // [eval] indirectReference.y: conflicting values 2 and 1:
        //     ./incomprehension.cue:42:7
@@ -501,7 +502,7 @@ diff old new
      }
    }
    nestedFor: (struct){
-@@ -190,13 +166,13 @@
+@@ -190,13 +159,13 @@
      }
      "0": (struct){
        let X#1Fmulti = 〈1;x〉
@@ -519,7 +520,7 @@ diff old new
      }
    }
    keepDescending: (struct){
-@@ -234,8 +210,8 @@
+@@ -234,8 +203,8 @@
        b: (string){ "e" }
      }
      let T#23multi = 〈1;v〉

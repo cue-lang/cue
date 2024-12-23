@@ -106,21 +106,7 @@ Unifications: 131
 Conjuncts:    329
 Disjuncts:    216
 -- out/evalalpha --
-Errors:
-issue3590.full.result."conflicting-A".item: conflicting values "B" and "A":
-    ./issue3590.cue:33:6
-issue3590.full.result."conflicting-B".item: conflicting values "B" and "A":
-    ./issue3590.cue:33:6
-issue3590.reduced.result."conflicting-A".item: conflicting values "B" and "A":
-    ./issue3590.cue:5:9
-    ./issue3590.cue:6:9
-issue3590.reduced.result."conflicting-B".item: conflicting values "B" and "A":
-    ./issue3590.cue:5:9
-    ./issue3590.cue:6:9
-
-Result:
-(_|_){
-  // [eval]
+(struct){
   t1: (struct){
     x: (struct){
       a: (int){ int }
@@ -211,27 +197,14 @@ Result:
       }
     }
   }
-  issue3590: (_|_){
-    // [eval]
-    reduced: (_|_){
-      // [eval]
-      result: (_|_){
-        // [eval]
-        "conflicting-A": (_|_){
-          // [eval]
-          item: (_|_){
-            // [eval] issue3590.reduced.result."conflicting-A".item: conflicting values "B" and "A":
-            //     ./issue3590.cue:5:9
-            //     ./issue3590.cue:6:9
-          }
+  issue3590: (struct){
+    reduced: (struct){
+      result: (struct){
+        "conflicting-A": (struct){
+          item: (string){ "A" }
         }
-        "conflicting-B": (_|_){
-          // [eval]
-          item: (_|_){
-            // [eval] issue3590.reduced.result."conflicting-B".item: conflicting values "B" and "A":
-            //     ./issue3590.cue:5:9
-            //     ./issue3590.cue:6:9
-          }
+        "conflicting-B": (struct){
+          item: (string){ "B" }
         }
       }
       _input: (struct){
@@ -244,34 +217,19 @@ Result:
       }
       let Var1#3multi = 〈1;v〉.p
       let Var2#4multi = 〈0;let Var1#3〉
-      let Items#5 = (_|_){
-        // [eval]
-        item: (_|_){
-          // [eval] issue3590.reduced.Items.item: conflicting values "B" and "A":
-          //     ./issue3590.cue:5:9
-          //     ./issue3590.cue:6:9
-        }
+      let Items#5multi = {
+        item: 〈1;let Var2#4〉
       }
     }
-    full: (_|_){
-      // [eval]
+    full: (struct){
       #Result: (#struct){
       }
-      result: (_|_){
-        // [eval]
-        "conflicting-A": (_|_){
-          // [eval]
-          item: (_|_){
-            // [eval] issue3590.full.result."conflicting-A".item: conflicting values "B" and "A":
-            //     ./issue3590.cue:33:6
-          }
+      result: (#struct){
+        "conflicting-A": (#struct){
+          item: (string){ "A" }
         }
-        "conflicting-B": (_|_){
-          // [eval]
-          item: (_|_){
-            // [eval] issue3590.full.result."conflicting-B".item: conflicting values "B" and "A":
-            //     ./issue3590.cue:33:6
-          }
+        "conflicting-B": (#struct){
+          item: (string){ "B" }
         }
       }
       #Input: (#struct){
@@ -287,12 +245,8 @@ Result:
       }
       let Var1#6multi = 〈1;v〉.p
       let Var2#7multi = 〈0;let Var1#6〉
-      let Items#8 = (_|_){
-        // [eval]
-        item: (_|_){
-          // [eval] issue3590.full.Items.item: conflicting values "B" and "A":
-          //     ./issue3590.cue:33:6
-        }
+      let Items#8multi = {
+        item: 〈1;let Var2#7〉
       }
     }
   }
@@ -301,27 +255,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,4 +1,18 @@
--(struct){
-+Errors:
-+issue3590.full.result."conflicting-A".item: conflicting values "B" and "A":
-+    ./issue3590.cue:33:6
-+issue3590.full.result."conflicting-B".item: conflicting values "B" and "A":
-+    ./issue3590.cue:33:6
-+issue3590.reduced.result."conflicting-A".item: conflicting values "B" and "A":
-+    ./issue3590.cue:5:9
-+    ./issue3590.cue:6:9
-+issue3590.reduced.result."conflicting-B".item: conflicting values "B" and "A":
-+    ./issue3590.cue:5:9
-+    ./issue3590.cue:6:9
-+
-+Result:
-+(_|_){
-+  // [eval]
-   t1: (struct){
-     x: (struct){
-       a: (int){ int }
-@@ -57,23 +71,19 @@
+@@ -57,23 +57,19 @@
        }
        y: (struct){
          let X#2 = (struct){
@@ -358,98 +292,45 @@ diff old new
            c: (int){ 1 }
          }
          v: (int){ 1 }
-@@ -93,14 +103,27 @@
+@@ -113,17 +109,8 @@
        }
-     }
-   }
--  issue3590: (struct){
--    reduced: (struct){
--      result: (struct){
--        "conflicting-A": (struct){
--          item: (string){ "A" }
--        }
--        "conflicting-B": (struct){
--          item: (string){ "B" }
-+  issue3590: (_|_){
-+    // [eval]
-+    reduced: (_|_){
-+      // [eval]
-+      result: (_|_){
-+        // [eval]
-+        "conflicting-A": (_|_){
-+          // [eval]
-+          item: (_|_){
-+            // [eval] issue3590.reduced.result."conflicting-A".item: conflicting values "B" and "A":
-+            //     ./issue3590.cue:5:9
-+            //     ./issue3590.cue:6:9
-+          }
-+        }
-+        "conflicting-B": (_|_){
-+          // [eval]
-+          item: (_|_){
-+            // [eval] issue3590.reduced.result."conflicting-B".item: conflicting values "B" and "A":
-+            //     ./issue3590.cue:5:9
-+            //     ./issue3590.cue:6:9
-+          }
-         }
-       }
-       _input: (struct){
-@@ -119,22 +142,28 @@
-           // [eval] issue3590.reduced.Items.item: conflicting values "B" and "A":
-           //     ./issue3590.cue:5:9
-           //     ./issue3590.cue:6:9
+       let Var1#3multi = 〈1;v〉.p
+       let Var2#4multi = 〈0;let Var1#3〉
+-      let Items#5 = (_|_){
+-        // [eval]
+-        item: (_|_){
+-          // [eval] issue3590.reduced.Items.item: conflicting values "B" and "A":
+-          //     ./issue3590.cue:5:9
+-          //     ./issue3590.cue:6:9
 -          //     ./issue3590.cue:9:2
 -          //     ./issue3590.cue:10:14
 -          //     ./issue3590.cue:14:14
 -          //     ./issue3590.cue:17:10
 -        }
--      }
--    }
--    full: (struct){
-+        }
-+      }
-+    }
-+    full: (_|_){
-+      // [eval]
-       #Result: (#struct){
++      let Items#5multi = {
++        item: 〈1;let Var2#4〉
        }
--      result: (#struct){
--        "conflicting-A": (#struct){
--          item: (string){ "A" }
--        }
--        "conflicting-B": (#struct){
--          item: (string){ "B" }
-+      result: (_|_){
-+        // [eval]
-+        "conflicting-A": (_|_){
-+          // [eval]
-+          item: (_|_){
-+            // [eval] issue3590.full.result."conflicting-A".item: conflicting values "B" and "A":
-+            //     ./issue3590.cue:33:6
-+          }
-+        }
-+        "conflicting-B": (_|_){
-+          // [eval]
-+          item: (_|_){
-+            // [eval] issue3590.full.result."conflicting-B".item: conflicting values "B" and "A":
-+            //     ./issue3590.cue:33:6
-+          }
-         }
+     }
+     full: (struct){
+@@ -150,16 +137,8 @@
        }
-       #Input: (#struct){
-@@ -155,10 +184,6 @@
-         item: (_|_){
-           // [eval] issue3590.full.Items.item: conflicting values "B" and "A":
-           //     ./issue3590.cue:33:6
+       let Var1#6multi = 〈1;v〉.p
+       let Var2#7multi = 〈0;let Var1#6〉
+-      let Items#8 = (_|_){
+-        // [eval]
+-        item: (_|_){
+-          // [eval] issue3590.full.Items.item: conflicting values "B" and "A":
+-          //     ./issue3590.cue:33:6
 -          //     ./issue3590.cue:41:2
 -          //     ./issue3590.cue:42:14
 -          //     ./issue3590.cue:43:14
 -          //     ./issue3590.cue:46:12
-         }
+-        }
++      let Items#8multi = {
++        item: 〈1;let Var2#7〉
        }
      }
--- diff/todo/p1 --
-issue3590: spurious conflicts
+   }
 -- diff/todo/p4 --
 Reduce conjunct group size. Semantically correct, though.
 -- out/eval --

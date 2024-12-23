@@ -55,13 +55,13 @@ Result:
   }
   bar: (#struct){
   }
-  let _bar#1 = (_){ _ }
+  let _bar#1multi = 〈1;bar〉
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -6,7 +6,10 @@
+@@ -6,8 +6,11 @@
  (_|_){
    // [eval] undefined field: missing:
    //     ./in.cue:4:8
@@ -72,6 +72,8 @@ diff old new
 +  }
    bar: (#struct){
    }
-   let _bar#1 = (_){ _ }
+-  let _bar#1 = (_){ _ }
++  let _bar#1multi = 〈1;bar〉
+ }
 -- diff/todo/p2 --
 Let seems to have misplaced error, even though it does not affect outcome.

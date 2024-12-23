@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "17c02c53_9c54a7e6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-23T14:58:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "21b49ce4_4f0c2902",
+      "range": {
+        "startLine": 12,
+        "startChar": 26,
+        "endLine": 12,
+        "endChar": 46
+      },
+      "revId": "14dc96ed78d610f412ca9323e7004eb5e79bbf6d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "23e1797c_d5889750",
@@ -43,6 +67,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1c130ed1_c97775fa",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 1751,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-23T14:58:25Z",
+      "side": 1,
+      "message": "Oh, not sure it will be easy, but be my guest. :)",
+      "parentUuid": "23e1797c_d5889750",
+      "revId": "14dc96ed78d610f412ca9323e7004eb5e79bbf6d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "88863017_6e55e227",
         "filename": "internal/core/adt/disjunct2.go",
         "patchSetId": 1
@@ -54,6 +96,24 @@
       "writtenOn": "2024-12-23T14:41:22Z",
       "side": 1,
       "message": "I would document this special case about incomplete errors because it\u0027s rather subtle.",
+      "revId": "14dc96ed78d610f412ca9323e7004eb5e79bbf6d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5aeff9b_19ca5fb0",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 393,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-23T14:58:25Z",
+      "side": 1,
+      "message": "actually, this shouldn\u0027t be possible anymore, if it even was possible in v2.\n\nRemoved that block.",
+      "parentUuid": "88863017_6e55e227",
       "revId": "14dc96ed78d610f412ca9323e7004eb5e79bbf6d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -41,16 +41,22 @@ issue3157: {
 	foo: *42 | _
 	foo: *43 | bool
 }
+-- issue3581.cue --
+issue3581: reduced: {
+	list: [...] | *[]
+	list: ["\(c)" ]
+	c: _
+}
 -- out/eval/stats --
 Leaks:  0
-Freed:  57
-Reused: 48
+Freed:  65
+Reused: 56
 Allocs: 9
-Retain: 0
+Retain: 20
 
-Unifications: 33
-Conjuncts:    77
-Disjuncts:    57
+Unifications: 39
+Conjuncts:    96
+Disjuncts:    85
 -- out/evalalpha --
 Errors:
 issue516.x.match: field not allowed:
@@ -63,6 +69,8 @@ issue570.results.result: conflicting values "hello" and [...string] (mismatched 
 issue570.results.result: field not allowed:
     ./in.cue:3:11
     ./in.cue:12:3
+issue3581.reduced.list: incompatible list lengths (0 and 1):
+    ./issue3581.cue:2:17
 
 Result:
 (_|_){
@@ -130,12 +138,24 @@ Result:
   issue3157: (struct){
     foo: ((bool|int)){ |((int){ 43 }, (bool){ bool }) }
   }
+  issue3581: (_|_){
+    // [eval]
+    reduced: (_|_){
+      // [eval]
+      list: (_|_){
+        // [eval] issue3581.reduced.list: incompatible list lengths (0 and 1):
+        //     ./issue3581.cue:2:17
+        0: (_){ _ }
+      }
+      c: (_){ _ }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,17 +1,14 @@
+@@ -1,17 +1,16 @@
  Errors:
 -issue516.x: 2 errors in empty disjunction:
  issue516.x.match: field not allowed:
@@ -153,10 +173,12 @@ diff old new
 +issue570.results.result: field not allowed:
 +    ./in.cue:3:11
 +    ./in.cue:12:3
++issue3581.reduced.list: incompatible list lengths (0 and 1):
++    ./issue3581.cue:2:17
  
  Result:
  (_|_){
-@@ -20,16 +17,12 @@
+@@ -20,16 +19,12 @@
      // [eval]
      results: (_|_){
        // [eval] issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
@@ -177,7 +199,7 @@ diff old new
      }
      #Output: (#struct){ |((#struct){
          result: (_){ _ }
-@@ -57,20 +50,11 @@
+@@ -57,20 +52,11 @@
        }, (#struct){
        }) }
      x: (_|_){
@@ -200,7 +222,7 @@ diff old new
          metrics: (struct){
            foo: (struct){
            }
-@@ -86,10 +70,10 @@
+@@ -86,23 +72,20 @@
    }
    issue2916: (struct){
      b: (struct){
@@ -210,9 +232,30 @@ diff old new
    }
    issue3157: (struct){
 -    foo: ((bool|int)){ |(*(int){ 43 }, (bool){ bool }) }
+-  }
+-  issue3581: (struct){
+-    reduced: (struct){
 +    foo: ((bool|int)){ |((int){ 43 }, (bool){ bool }) }
-   }
- }
++  }
++  issue3581: (_|_){
++    // [eval]
++    reduced: (_|_){
++      // [eval]
+       list: (_|_){
+-        // [incomplete] issue3581.reduced.list: 2 errors in empty disjunction:
+-        // issue3581.reduced.list: incompatible list lengths (0 and 1)
+-        // issue3581.reduced.list.0: invalid interpolation: non-concrete value _ (type _):
+-        //     ./issue3581.cue:3:9
+-        0: (_|_){
+-          // [incomplete] issue3581.reduced.list.0: invalid interpolation: non-concrete value _ (type _):
+-          //     ./issue3581.cue:3:9
+-        }
++        // [eval] issue3581.reduced.list: incompatible list lengths (0 and 1):
++        //     ./issue3581.cue:2:17
++        0: (_){ _ }
+       }
+       c: (_){ _ }
+     }
 -- diff/todo/p1 --
 issue570.results.result: Spurious error: field not allowed
 This is probably due to the disjunction in the #Output field.
@@ -319,6 +362,21 @@ Result:
   issue3157: (struct){
     foo: ((bool|int)){ |(*(int){ 43 }, (bool){ bool }) }
   }
+  issue3581: (struct){
+    reduced: (struct){
+      list: (_|_){
+        // [incomplete] issue3581.reduced.list: 2 errors in empty disjunction:
+        // issue3581.reduced.list: incompatible list lengths (0 and 1)
+        // issue3581.reduced.list.0: invalid interpolation: non-concrete value _ (type _):
+        //     ./issue3581.cue:3:9
+        0: (_|_){
+          // [incomplete] issue3581.reduced.list.0: invalid interpolation: non-concrete value _ (type _):
+          //     ./issue3581.cue:3:9
+        }
+      }
+      c: (_){ _ }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -373,5 +431,19 @@ Result:
   issue3157: {
     foo: (*42|_)
     foo: (*43|bool)
+  }
+}
+--- issue3581.cue
+{
+  issue3581: {
+    reduced: {
+      list: ([
+        ...,
+      ]|*[])
+      list: [
+        "\(〈1;c〉)",
+      ]
+      c: _
+    }
   }
 }

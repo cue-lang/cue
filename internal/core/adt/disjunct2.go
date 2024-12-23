@@ -378,12 +378,22 @@ func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, m
 
 // collectErrors collects errors from a failed disjunctions.
 func (n *nodeContext) collectErrors(dn *envDisjunct) (errs *Bottom) {
+	code := EvalError
 	for _, d := range dn.disjuncts {
-		if d.err != nil {
-			errs = CombineErrors(dn.src.Source(), errs, d.err)
+		if b := d.err; b != nil {
+			n.disjunctErrs = append(n.disjunctErrs, b)
+			if b.Code > code {
+				code = b.Code
+			}
 		}
 	}
-	return errs
+
+	b := &Bottom{
+		Code: code,
+		Err:  n.disjunctError(),
+		Node: n.node,
+	}
+	return b
 }
 
 func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode) (*nodeContext, *Bottom) {

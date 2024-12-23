@@ -47,6 +47,7 @@ Conjuncts:    83
 Disjuncts:    54
 -- out/evalalpha --
 Errors:
+eliminated.x: 2 errors in empty disjunction:
 eliminated.x: conflicting values null and {} (mismatched types null and struct):
     ./in.cue:21:10
     ./in.cue:22:5
@@ -74,7 +75,8 @@ Result:
     #empty: (#struct){
     }
     x: (_|_){
-      // [eval] eliminated.x: conflicting values null and {} (mismatched types null and struct):
+      // [eval] eliminated.x: 2 errors in empty disjunction:
+      // eliminated.x: conflicting values null and {} (mismatched types null and struct):
       //     ./in.cue:21:10
       //     ./in.cue:22:5
       // eliminated.x.n: field not allowed:
@@ -87,7 +89,8 @@ Result:
       }
     }
     out: (_|_){
-      // [eval] eliminated.x: conflicting values null and {} (mismatched types null and struct):
+      // [eval] eliminated.x: 2 errors in empty disjunction:
+      // eliminated.x: conflicting values null and {} (mismatched types null and struct):
       //     ./in.cue:21:10
       //     ./in.cue:22:5
       // eliminated.x.n: field not allowed:
@@ -116,9 +119,9 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,8 @@
+@@ -1,11 +1,9 @@
  Errors:
--eliminated.x: 2 errors in empty disjunction:
+ eliminated.x: 2 errors in empty disjunction:
 -eliminated.x: conflicting values null and {n:3} (mismatched types null and struct):
 +eliminated.x: conflicting values null and {} (mismatched types null and struct):
 +    ./in.cue:21:10
@@ -130,7 +133,7 @@ diff old new
      ./in.cue:23:5
      ./in.cue:23:16
  
-@@ -21,13 +18,7 @@
+@@ -21,13 +19,7 @@
        }
      }
      out: (#list){
@@ -145,18 +148,17 @@ diff old new
      }
    }
    eliminated: (_|_){
-@@ -35,31 +26,23 @@
-     #empty: (#struct){
+@@ -36,18 +28,14 @@
      }
      x: (_|_){
--      // [eval] eliminated.x: 2 errors in empty disjunction:
+       // [eval] eliminated.x: 2 errors in empty disjunction:
 -      // eliminated.x: conflicting values null and {n:3} (mismatched types null and struct):
 -      //     ./in.cue:22:5
 -      //     ./in.cue:23:14
 -      // eliminated.x.n: field not allowed:
 -      //     ./in.cue:21:10
 -      //     ./in.cue:22:14
-+      // [eval] eliminated.x: conflicting values null and {} (mismatched types null and struct):
++      // eliminated.x: conflicting values null and {} (mismatched types null and struct):
 +      //     ./in.cue:21:10
 +      //     ./in.cue:22:5
 +      // eliminated.x.n: field not allowed:
@@ -169,16 +171,17 @@ diff old new
          //     ./in.cue:23:5
          //     ./in.cue:23:16
        }
+@@ -54,12 +42,10 @@
      }
      out: (_|_){
--      // [eval] eliminated.x: 2 errors in empty disjunction:
+       // [eval] eliminated.x: 2 errors in empty disjunction:
 -      // eliminated.x: conflicting values null and {n:3} (mismatched types null and struct):
 -      //     ./in.cue:22:5
 -      //     ./in.cue:23:14
 -      // eliminated.x.n: field not allowed:
 -      //     ./in.cue:21:10
 -      //     ./in.cue:22:14
-+      // [eval] eliminated.x: conflicting values null and {} (mismatched types null and struct):
++      // eliminated.x: conflicting values null and {} (mismatched types null and struct):
 +      //     ./in.cue:21:10
 +      //     ./in.cue:22:5
 +      // eliminated.x.n: field not allowed:
@@ -186,7 +189,7 @@ diff old new
        //     ./in.cue:23:16
      }
 -- diff/todo/p3 --
-Small differences in error output. Empty disjunction error.
+Small differences in error output.
 -- out/eval --
 Errors:
 eliminated.x: 2 errors in empty disjunction:

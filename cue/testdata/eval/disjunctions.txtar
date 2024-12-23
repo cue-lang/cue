@@ -192,6 +192,7 @@ Conjuncts:    817
 Disjuncts:    451
 -- out/evalalpha --
 Errors:
+f: 2 errors in empty disjunction:
 f.name: conflicting values "int" and "str":
     ./in.cue:5:8
     ./in.cue:15:15
@@ -224,7 +225,8 @@ Result:
     name: (string){ "str" }
   }
   f: (_|_){
-    // [eval] f.name: conflicting values "int" and "str":
+    // [eval] f: 2 errors in empty disjunction:
+    // f.name: conflicting values "int" and "str":
     //     ./in.cue:5:8
     //     ./in.cue:15:15
     // f.val: conflicting values 3 and string (mismatched types int and string):
@@ -432,9 +434,8 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,12 +1,9 @@
- Errors:
--f: 2 errors in empty disjunction:
+@@ -2,11 +2,9 @@
+ f: 2 errors in empty disjunction:
  f.name: conflicting values "int" and "str":
      ./in.cue:5:8
 -    ./in.cue:15:4
@@ -445,13 +446,9 @@ diff old new
      ./in.cue:15:27
  
  Result:
-@@ -34,22 +31,14 @@
-     name: (string){ "str" }
-   }
-   f: (_|_){
--    // [eval] f: 2 errors in empty disjunction:
--    // f.name: conflicting values "int" and "str":
-+    // [eval] f.name: conflicting values "int" and "str":
+@@ -37,19 +35,12 @@
+     // [eval] f: 2 errors in empty disjunction:
+     // f.name: conflicting values "int" and "str":
      //     ./in.cue:5:8
 -    //     ./in.cue:15:4
      //     ./in.cue:15:15
@@ -470,7 +467,7 @@ diff old new
    }
    e1: (struct){
      a: ((null|struct)){ |((null){ null }, (struct){
-@@ -161,8 +150,8 @@
+@@ -161,8 +152,8 @@
      e: (struct){
        foobar: (#struct){
          b: (#struct){
@@ -481,7 +478,6 @@ diff old new
        }
      }
 -- diff/todo/p3 --
-f: Missing "errors in empty disjunction:"
 Missing error positions.
   It is probably okay to show name and val fields with original values, as long
   as it is made clear that f does not unify with disjunctions and positions are

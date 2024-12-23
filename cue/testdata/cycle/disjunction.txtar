@@ -142,58 +142,15 @@ Result:
 -- out/evalalpha --
 Errors:
 cycle.a: structural cycle
+issue3042.data: 3 errors in empty disjunction:
 issue3042.data: conflicting values [...#nesting] and {secret:{infra:[{name:"bar1"}]}} (mismatched types list and struct):
     ./issue3042.cue:5:57
     ./issue3042.cue:7:19
 issue3042.data: conflicting values string and {secret:{infra:[{name:"bar1"}]}} (mismatched types string and struct):
     ./issue3042.cue:5:12
     ./issue3042.cue:7:19
-issue3042.data.secret: conflicting values [...#nesting] and {infra:[{name:"bar1"}]} (mismatched types list and struct):
-    ./issue3042.cue:5:57
-    ./issue3042.cue:8:11
-issue3042.data.secret: conflicting values string and {infra:[{name:"bar1"}]} (mismatched types string and struct):
-    ./issue3042.cue:5:12
-    ./issue3042.cue:8:11
 issue3042.data.secret: field not allowed:
     ./issue3042.cue:8:3
-issue3042.data.secret.infra: conflicting values [{name:"bar1"}] and string (mismatched types list and string):
-    ./issue3042.cue:5:12
-    ./issue3042.cue:9:11
-issue3042.data.secret.infra: conflicting values [{name:"bar1"}] and {name?:#foo,[string]:#nesting} (mismatched types list and struct):
-    ./issue3042.cue:5:21
-    ./issue3042.cue:9:11
-issue3042.data.secret.infra: field not allowed:
-    ./issue3042.cue:9:4
-issue3042.data.secret.infra.0: conflicting values [...#nesting] and {name:"bar1"} (mismatched types list and struct):
-    ./issue3042.cue:5:57
-    ./issue3042.cue:10:5
-issue3042.data.secret.infra.0: conflicting values string and {name:"bar1"} (mismatched types string and struct):
-    ./issue3042.cue:5:12
-    ./issue3042.cue:10:5
-issue3042.data.secret.infra.0: field not allowed:
-    ./issue3042.cue:10:5
-issue3042.data.secret.infra.0.name: conflicting values "bar1" and [...#nesting] (mismatched types string and list):
-    ./issue3042.cue:5:57
-    ./issue3042.cue:10:12
-issue3042.data.secret.infra.0.name: conflicting values "bar1" and {name?:#foo,[string]:#nesting} (mismatched types string and struct):
-    ./issue3042.cue:5:21
-    ./issue3042.cue:10:12
-issue3042.data.secret.infra.0.name: field not allowed:
-    ./issue3042.cue:10:6
-issue3042.data.secret.infra.0.name: invalid value "bar1" (out of bound =~"^foo"):
-    ./issue3042.cue:4:8
-    ./issue3042.cue:5:29
-    ./issue3042.cue:5:45
-    ./issue3042.cue:10:12
-issue3042.data.secret: field not allowed:
-    ./issue3042.cue:5:57
-    ./issue3042.cue:8:3
-issue3042.data.secret.infra: field not allowed:
-    ./issue3042.cue:5:57
-    ./issue3042.cue:9:4
-issue3042.data.secret.infra.0.name: field not allowed:
-    ./issue3042.cue:5:57
-    ./issue3042.cue:10:6
 
 Result:
 (_|_){
@@ -262,58 +219,15 @@ Result:
       }, (list){
       }) }
     data: (_|_){
-      // [eval] issue3042.data: conflicting values [...#nesting] and {secret:{infra:[{name:"bar1"}]}} (mismatched types list and struct):
+      // [eval] issue3042.data: 3 errors in empty disjunction:
+      // issue3042.data: conflicting values [...#nesting] and {secret:{infra:[{name:"bar1"}]}} (mismatched types list and struct):
       //     ./issue3042.cue:5:57
       //     ./issue3042.cue:7:19
       // issue3042.data: conflicting values string and {secret:{infra:[{name:"bar1"}]}} (mismatched types string and struct):
       //     ./issue3042.cue:5:12
       //     ./issue3042.cue:7:19
-      // issue3042.data.secret: conflicting values [...#nesting] and {infra:[{name:"bar1"}]} (mismatched types list and struct):
-      //     ./issue3042.cue:5:57
-      //     ./issue3042.cue:8:11
-      // issue3042.data.secret: conflicting values string and {infra:[{name:"bar1"}]} (mismatched types string and struct):
-      //     ./issue3042.cue:5:12
-      //     ./issue3042.cue:8:11
       // issue3042.data.secret: field not allowed:
       //     ./issue3042.cue:8:3
-      // issue3042.data.secret.infra: conflicting values [{name:"bar1"}] and string (mismatched types list and string):
-      //     ./issue3042.cue:5:12
-      //     ./issue3042.cue:9:11
-      // issue3042.data.secret.infra: conflicting values [{name:"bar1"}] and {name?:#foo,[string]:#nesting} (mismatched types list and struct):
-      //     ./issue3042.cue:5:21
-      //     ./issue3042.cue:9:11
-      // issue3042.data.secret.infra: field not allowed:
-      //     ./issue3042.cue:9:4
-      // issue3042.data.secret.infra.0: conflicting values [...#nesting] and {name:"bar1"} (mismatched types list and struct):
-      //     ./issue3042.cue:5:57
-      //     ./issue3042.cue:10:5
-      // issue3042.data.secret.infra.0: conflicting values string and {name:"bar1"} (mismatched types string and struct):
-      //     ./issue3042.cue:5:12
-      //     ./issue3042.cue:10:5
-      // issue3042.data.secret.infra.0: field not allowed:
-      //     ./issue3042.cue:10:5
-      // issue3042.data.secret.infra.0.name: conflicting values "bar1" and [...#nesting] (mismatched types string and list):
-      //     ./issue3042.cue:5:57
-      //     ./issue3042.cue:10:12
-      // issue3042.data.secret.infra.0.name: conflicting values "bar1" and {name?:#foo,[string]:#nesting} (mismatched types string and struct):
-      //     ./issue3042.cue:5:21
-      //     ./issue3042.cue:10:12
-      // issue3042.data.secret.infra.0.name: field not allowed:
-      //     ./issue3042.cue:10:6
-      // issue3042.data.secret.infra.0.name: invalid value "bar1" (out of bound =~"^foo"):
-      //     ./issue3042.cue:4:8
-      //     ./issue3042.cue:5:29
-      //     ./issue3042.cue:5:45
-      //     ./issue3042.cue:10:12
-      // issue3042.data.secret: field not allowed:
-      //     ./issue3042.cue:5:57
-      //     ./issue3042.cue:8:3
-      // issue3042.data.secret.infra: field not allowed:
-      //     ./issue3042.cue:5:57
-      //     ./issue3042.cue:9:4
-      // issue3042.data.secret.infra.0.name: field not allowed:
-      //     ./issue3042.cue:5:57
-      //     ./issue3042.cue:10:6
       secret: (struct){
         infra: (_){ _ }
       }
@@ -324,61 +238,18 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,61 @@
+@@ -1,9 +1,18 @@
  Errors:
  cycle.a: structural cycle
++issue3042.data: 3 errors in empty disjunction:
 +issue3042.data: conflicting values [...#nesting] and {secret:{infra:[{name:"bar1"}]}} (mismatched types list and struct):
 +    ./issue3042.cue:5:57
 +    ./issue3042.cue:7:19
 +issue3042.data: conflicting values string and {secret:{infra:[{name:"bar1"}]}} (mismatched types string and struct):
 +    ./issue3042.cue:5:12
 +    ./issue3042.cue:7:19
-+issue3042.data.secret: conflicting values [...#nesting] and {infra:[{name:"bar1"}]} (mismatched types list and struct):
-+    ./issue3042.cue:5:57
-+    ./issue3042.cue:8:11
-+issue3042.data.secret: conflicting values string and {infra:[{name:"bar1"}]} (mismatched types string and struct):
-+    ./issue3042.cue:5:12
-+    ./issue3042.cue:8:11
 +issue3042.data.secret: field not allowed:
 +    ./issue3042.cue:8:3
-+issue3042.data.secret.infra: conflicting values [{name:"bar1"}] and string (mismatched types list and string):
-+    ./issue3042.cue:5:12
-+    ./issue3042.cue:9:11
-+issue3042.data.secret.infra: conflicting values [{name:"bar1"}] and {name?:#foo,[string]:#nesting} (mismatched types list and struct):
-+    ./issue3042.cue:5:21
-+    ./issue3042.cue:9:11
-+issue3042.data.secret.infra: field not allowed:
-+    ./issue3042.cue:9:4
-+issue3042.data.secret.infra.0: conflicting values [...#nesting] and {name:"bar1"} (mismatched types list and struct):
-+    ./issue3042.cue:5:57
-+    ./issue3042.cue:10:5
-+issue3042.data.secret.infra.0: conflicting values string and {name:"bar1"} (mismatched types string and struct):
-+    ./issue3042.cue:5:12
-+    ./issue3042.cue:10:5
-+issue3042.data.secret.infra.0: field not allowed:
-+    ./issue3042.cue:10:5
-+issue3042.data.secret.infra.0.name: conflicting values "bar1" and [...#nesting] (mismatched types string and list):
-+    ./issue3042.cue:5:57
-+    ./issue3042.cue:10:12
-+issue3042.data.secret.infra.0.name: conflicting values "bar1" and {name?:#foo,[string]:#nesting} (mismatched types string and struct):
-+    ./issue3042.cue:5:21
-+    ./issue3042.cue:10:12
-+issue3042.data.secret.infra.0.name: field not allowed:
-+    ./issue3042.cue:10:6
-+issue3042.data.secret.infra.0.name: invalid value "bar1" (out of bound =~"^foo"):
-+    ./issue3042.cue:4:8
-+    ./issue3042.cue:5:29
-+    ./issue3042.cue:5:45
-+    ./issue3042.cue:10:12
-+issue3042.data.secret: field not allowed:
-+    ./issue3042.cue:5:57
-+    ./issue3042.cue:8:3
-+issue3042.data.secret.infra: field not allowed:
-+    ./issue3042.cue:5:57
-+    ./issue3042.cue:9:4
-+issue3042.data.secret.infra.0.name: field not allowed:
-+    ./issue3042.cue:5:57
-+    ./issue3042.cue:10:6
  
  Result:
  (_|_){
@@ -387,7 +258,7 @@ diff old new
    cycle: (_|_){
      // [structural cycle]
      a: (_|_){
-@@ -58,22 +110,71 @@
+@@ -58,22 +67,28 @@
      x: (#list){
      }
    }
@@ -411,58 +282,15 @@ diff old new
 -        }
 -        name?: (string){ =~"^foo" }
 +    data: (_|_){
-+      // [eval] issue3042.data: conflicting values [...#nesting] and {secret:{infra:[{name:"bar1"}]}} (mismatched types list and struct):
++      // [eval] issue3042.data: 3 errors in empty disjunction:
++      // issue3042.data: conflicting values [...#nesting] and {secret:{infra:[{name:"bar1"}]}} (mismatched types list and struct):
 +      //     ./issue3042.cue:5:57
 +      //     ./issue3042.cue:7:19
 +      // issue3042.data: conflicting values string and {secret:{infra:[{name:"bar1"}]}} (mismatched types string and struct):
 +      //     ./issue3042.cue:5:12
 +      //     ./issue3042.cue:7:19
-+      // issue3042.data.secret: conflicting values [...#nesting] and {infra:[{name:"bar1"}]} (mismatched types list and struct):
-+      //     ./issue3042.cue:5:57
-+      //     ./issue3042.cue:8:11
-+      // issue3042.data.secret: conflicting values string and {infra:[{name:"bar1"}]} (mismatched types string and struct):
-+      //     ./issue3042.cue:5:12
-+      //     ./issue3042.cue:8:11
 +      // issue3042.data.secret: field not allowed:
 +      //     ./issue3042.cue:8:3
-+      // issue3042.data.secret.infra: conflicting values [{name:"bar1"}] and string (mismatched types list and string):
-+      //     ./issue3042.cue:5:12
-+      //     ./issue3042.cue:9:11
-+      // issue3042.data.secret.infra: conflicting values [{name:"bar1"}] and {name?:#foo,[string]:#nesting} (mismatched types list and struct):
-+      //     ./issue3042.cue:5:21
-+      //     ./issue3042.cue:9:11
-+      // issue3042.data.secret.infra: field not allowed:
-+      //     ./issue3042.cue:9:4
-+      // issue3042.data.secret.infra.0: conflicting values [...#nesting] and {name:"bar1"} (mismatched types list and struct):
-+      //     ./issue3042.cue:5:57
-+      //     ./issue3042.cue:10:5
-+      // issue3042.data.secret.infra.0: conflicting values string and {name:"bar1"} (mismatched types string and struct):
-+      //     ./issue3042.cue:5:12
-+      //     ./issue3042.cue:10:5
-+      // issue3042.data.secret.infra.0: field not allowed:
-+      //     ./issue3042.cue:10:5
-+      // issue3042.data.secret.infra.0.name: conflicting values "bar1" and [...#nesting] (mismatched types string and list):
-+      //     ./issue3042.cue:5:57
-+      //     ./issue3042.cue:10:12
-+      // issue3042.data.secret.infra.0.name: conflicting values "bar1" and {name?:#foo,[string]:#nesting} (mismatched types string and struct):
-+      //     ./issue3042.cue:5:21
-+      //     ./issue3042.cue:10:12
-+      // issue3042.data.secret.infra.0.name: field not allowed:
-+      //     ./issue3042.cue:10:6
-+      // issue3042.data.secret.infra.0.name: invalid value "bar1" (out of bound =~"^foo"):
-+      //     ./issue3042.cue:4:8
-+      //     ./issue3042.cue:5:29
-+      //     ./issue3042.cue:5:45
-+      //     ./issue3042.cue:10:12
-+      // issue3042.data.secret: field not allowed:
-+      //     ./issue3042.cue:5:57
-+      //     ./issue3042.cue:8:3
-+      // issue3042.data.secret.infra: field not allowed:
-+      //     ./issue3042.cue:5:57
-+      //     ./issue3042.cue:9:4
-+      // issue3042.data.secret.infra.0.name: field not allowed:
-+      //     ./issue3042.cue:5:57
-+      //     ./issue3042.cue:10:6
 +      secret: (struct){
 +        infra: (_){ _ }
        }

@@ -34,12 +34,14 @@ issue3437: {
 }
 -- out/evalalpha --
 Errors:
+t1.p1: 7 errors in empty disjunction:
 t1.p1: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
     ./in.cue:3:5
     ./in.cue:3:10
 t1.p1: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
     ./in.cue:3:5
     ./in.cue:3:8
+t1.p1.a: 4 errors in empty disjunction:
 t1.p1.a: cannot combine regular field "a" with 1:
     ./in.cue:3:10
 t1.p1.a: cannot combine regular field "a" with 2:
@@ -50,12 +52,14 @@ t1.p1.a: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
 t1.p1.a: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
     ./in.cue:3:5
     ./in.cue:3:8
+t1.p2: 7 errors in empty disjunction:
 t1.p2: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
     ./in.cue:6:5
     ./in.cue:6:10
 t1.p2: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
     ./in.cue:6:5
     ./in.cue:6:8
+t1.p2.a: 4 errors in empty disjunction:
 t1.p2.a: cannot combine regular field "a" with 1:
     ./in.cue:6:10
 t1.p2.a: cannot combine regular field "a" with 2:
@@ -66,12 +70,14 @@ t1.p2.a: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
 t1.p2.a: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
     ./in.cue:6:5
     ./in.cue:6:8
+t2.p1.d: 7 errors in empty disjunction:
 t2.p1.d: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
     ./in.cue:11:8
     ./in.cue:11:13
 t2.p1.d: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
     ./in.cue:11:8
     ./in.cue:11:11
+t2.p1.d.a: 4 errors in empty disjunction:
 t2.p1.d.a: cannot combine regular field "a" with 1:
     ./in.cue:11:13
 t2.p1.d.a: cannot combine regular field "a" with 2:
@@ -82,12 +88,14 @@ t2.p1.d.a: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
 t2.p1.d.a: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
     ./in.cue:11:8
     ./in.cue:11:11
+t2.p2.d: 7 errors in empty disjunction:
 t2.p2.d: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
     ./in.cue:15:8
     ./in.cue:15:13
 t2.p2.d: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
     ./in.cue:15:8
     ./in.cue:15:11
+t2.p2.d.a: 4 errors in empty disjunction:
 t2.p2.d.a: cannot combine regular field "a" with 1:
     ./in.cue:15:13
 t2.p2.d.a: cannot combine regular field "a" with 2:
@@ -105,12 +113,14 @@ Result:
   t1: (_|_){
     // [eval]
     p1: (_|_){
-      // [eval] t1.p1: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+      // [eval] t1.p1: 7 errors in empty disjunction:
+      // t1.p1: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
       //     ./in.cue:3:5
       //     ./in.cue:3:10
       // t1.p1: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
       //     ./in.cue:3:5
       //     ./in.cue:3:8
+      // t1.p1.a: 4 errors in empty disjunction:
       // t1.p1.a: cannot combine regular field "a" with 1:
       //     ./in.cue:3:10
       // t1.p1.a: cannot combine regular field "a" with 2:
@@ -126,12 +136,14 @@ Result:
       }
     }
     p2: (_|_){
-      // [eval] t1.p2: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+      // [eval] t1.p2: 7 errors in empty disjunction:
+      // t1.p2: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
       //     ./in.cue:6:5
       //     ./in.cue:6:10
       // t1.p2: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
       //     ./in.cue:6:5
       //     ./in.cue:6:8
+      // t1.p2.a: 4 errors in empty disjunction:
       // t1.p2.a: cannot combine regular field "a" with 1:
       //     ./in.cue:6:10
       // t1.p2.a: cannot combine regular field "a" with 2:
@@ -152,12 +164,14 @@ Result:
     p1: (_|_){
       // [eval]
       d: (_|_){
-        // [eval] t2.p1.d: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+        // [eval] t2.p1.d: 7 errors in empty disjunction:
+        // t2.p1.d: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
         //     ./in.cue:11:8
         //     ./in.cue:11:13
         // t2.p1.d: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
         //     ./in.cue:11:8
         //     ./in.cue:11:11
+        // t2.p1.d.a: 4 errors in empty disjunction:
         // t2.p1.d.a: cannot combine regular field "a" with 1:
         //     ./in.cue:11:13
         // t2.p1.d.a: cannot combine regular field "a" with 2:
@@ -176,12 +190,14 @@ Result:
     p2: (_|_){
       // [eval]
       d: (_|_){
-        // [eval] t2.p2.d: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+        // [eval] t2.p2.d: 7 errors in empty disjunction:
+        // t2.p2.d: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
         //     ./in.cue:15:8
         //     ./in.cue:15:13
         // t2.p2.d: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
         //     ./in.cue:15:8
         //     ./in.cue:15:11
+        // t2.p2.d.a: 4 errors in empty disjunction:
         // t2.p2.d.a: cannot combine regular field "a" with 1:
         //     ./in.cue:15:13
         // t2.p2.d.a: cannot combine regular field "a" with 2:
@@ -1625,9 +1641,10 @@ Disjuncts:    111
 diff old new
 --- old
 +++ new
-@@ -1,38 +1,66 @@
+@@ -1,38 +1,74 @@
  Errors:
 -t1.p1: 2 errors in empty disjunction:
++t1.p1: 7 errors in empty disjunction:
  t1.p1: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
 -    ./in.cue:2:2
      ./in.cue:3:5
@@ -1639,6 +1656,7 @@ diff old new
 -t1.p2: 2 errors in empty disjunction:
 +    ./in.cue:3:5
 +    ./in.cue:3:8
++t1.p1.a: 4 errors in empty disjunction:
 +t1.p1.a: cannot combine regular field "a" with 1:
 +    ./in.cue:3:10
 +t1.p1.a: cannot combine regular field "a" with 2:
@@ -1649,6 +1667,7 @@ diff old new
 +t1.p1.a: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
 +    ./in.cue:3:5
 +    ./in.cue:3:8
++t1.p2: 7 errors in empty disjunction:
  t1.p2: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
      ./in.cue:6:5
      ./in.cue:6:10
@@ -1658,6 +1677,7 @@ diff old new
      ./in.cue:6:8
 -    ./in.cue:7:2
 -t2.p1.d: 2 errors in empty disjunction:
++t1.p2.a: 4 errors in empty disjunction:
 +t1.p2.a: cannot combine regular field "a" with 1:
 +    ./in.cue:6:10
 +t1.p2.a: cannot combine regular field "a" with 2:
@@ -1668,6 +1688,7 @@ diff old new
 +t1.p2.a: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
 +    ./in.cue:6:5
 +    ./in.cue:6:8
++t2.p1.d: 7 errors in empty disjunction:
  t2.p1.d: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
 -    ./in.cue:10:5
      ./in.cue:11:8
@@ -1679,6 +1700,7 @@ diff old new
 -t2.p2.d: 2 errors in empty disjunction:
 +    ./in.cue:11:8
 +    ./in.cue:11:11
++t2.p1.d.a: 4 errors in empty disjunction:
 +t2.p1.d.a: cannot combine regular field "a" with 1:
 +    ./in.cue:11:13
 +t2.p1.d.a: cannot combine regular field "a" with 2:
@@ -1689,6 +1711,7 @@ diff old new
 +t2.p1.d.a: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
 +    ./in.cue:11:8
 +    ./in.cue:11:11
++t2.p2.d: 7 errors in empty disjunction:
  t2.p2.d: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
 -    ./in.cue:14:5
      ./in.cue:15:8
@@ -1697,6 +1720,7 @@ diff old new
 -    ./in.cue:14:5
 +    ./in.cue:15:8
 +    ./in.cue:15:11
++t2.p2.d.a: 4 errors in empty disjunction:
 +t2.p2.d.a: cannot combine regular field "a" with 1:
 +    ./in.cue:15:13
 +t2.p2.d.a: cannot combine regular field "a" with 2:
@@ -1708,14 +1732,14 @@ diff old new
      ./in.cue:15:8
      ./in.cue:15:11
  
-@@ -42,31 +70,45 @@
+@@ -42,31 +78,49 @@
    t1: (_|_){
      // [eval]
      p1: (_|_){
 -      // [eval] t1.p1: 2 errors in empty disjunction:
--      // t1.p1: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
++      // [eval] t1.p1: 7 errors in empty disjunction:
+       // t1.p1: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
 -      //     ./in.cue:2:2
-+      // [eval] t1.p1: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
        //     ./in.cue:3:5
        //     ./in.cue:3:10
        // t1.p1: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
@@ -1728,12 +1752,9 @@ diff old new
 -    }
 -    p2: (_|_){
 -      // [eval] t1.p2: 2 errors in empty disjunction:
--      // t1.p2: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
--      //     ./in.cue:6:5
--      //     ./in.cue:6:10
--      //     ./in.cue:7:2
 +      //     ./in.cue:3:5
 +      //     ./in.cue:3:8
++      // t1.p1.a: 4 errors in empty disjunction:
 +      // t1.p1.a: cannot combine regular field "a" with 1:
 +      //     ./in.cue:3:10
 +      // t1.p1.a: cannot combine regular field "a" with 2:
@@ -1749,15 +1770,18 @@ diff old new
 +      }
 +    }
 +    p2: (_|_){
-+      // [eval] t1.p2: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
-+      //     ./in.cue:6:5
-+      //     ./in.cue:6:10
++      // [eval] t1.p2: 7 errors in empty disjunction:
+       // t1.p2: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+       //     ./in.cue:6:5
+       //     ./in.cue:6:10
+-      //     ./in.cue:7:2
        // t1.p2: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
        //     ./in.cue:6:5
        //     ./in.cue:6:8
 -      //     ./in.cue:7:2
 -      a: (struct){
 -        a: (int){ |((int){ 2 }, (int){ 1 }) }
++      // t1.p2.a: 4 errors in empty disjunction:
 +      // t1.p2.a: cannot combine regular field "a" with 1:
 +      //     ./in.cue:6:10
 +      // t1.p2.a: cannot combine regular field "a" with 2:
@@ -1773,14 +1797,14 @@ diff old new
        }
      }
    }
-@@ -75,34 +117,48 @@
+@@ -75,34 +129,52 @@
      p1: (_|_){
        // [eval]
        d: (_|_){
 -        // [eval] t2.p1.d: 2 errors in empty disjunction:
--        // t2.p1.d: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
++        // [eval] t2.p1.d: 7 errors in empty disjunction:
+         // t2.p1.d: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
 -        //     ./in.cue:10:5
-+        // [eval] t2.p1.d: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
          //     ./in.cue:11:8
          //     ./in.cue:11:13
          // t2.p1.d: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
@@ -1796,10 +1820,9 @@ diff old new
 -      // [eval]
 -      d: (_|_){
 -        // [eval] t2.p2.d: 2 errors in empty disjunction:
--        // t2.p2.d: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
--        //     ./in.cue:14:5
 +        //     ./in.cue:11:8
 +        //     ./in.cue:11:11
++        // t2.p1.d.a: 4 errors in empty disjunction:
 +        // t2.p1.d.a: cannot combine regular field "a" with 1:
 +        //     ./in.cue:11:13
 +        // t2.p1.d.a: cannot combine regular field "a" with 2:
@@ -1818,7 +1841,9 @@ diff old new
 +    p2: (_|_){
 +      // [eval]
 +      d: (_|_){
-+        // [eval] t2.p2.d: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
++        // [eval] t2.p2.d: 7 errors in empty disjunction:
+         // t2.p2.d: conflicting values 1 and {a:(2|1)} (mismatched types int and struct):
+-        //     ./in.cue:14:5
          //     ./in.cue:15:8
          //     ./in.cue:15:13
          // t2.p2.d: conflicting values 2 and {a:(2|1)} (mismatched types int and struct):
@@ -1829,6 +1854,7 @@ diff old new
 -          a: (int){ |((int){ 2 }, (int){ 1 }) }
 +        //     ./in.cue:15:8
 +        //     ./in.cue:15:11
++        // t2.p2.d.a: 4 errors in empty disjunction:
 +        // t2.p2.d.a: cannot combine regular field "a" with 1:
 +        //     ./in.cue:15:13
 +        // t2.p2.d.a: cannot combine regular field "a" with 2:
@@ -1844,7 +1870,7 @@ diff old new
          }
        }
      }
-@@ -118,10 +174,7 @@
+@@ -118,10 +190,7 @@
      }
    }
    issue3437: (struct){
@@ -1856,7 +1882,7 @@ diff old new
      d: (struct){
        a: (struct){
          a: (struct){
-@@ -131,33 +184,1293 @@
+@@ -131,33 +200,1293 @@
          }
        }
      }
@@ -3178,6 +3204,9 @@ diff old new
 +      }) }
    }
  }
+-- diff/todo/p2 --
+Investigate differing counts of errors in empty disjunctions. This may
+indicate a performance issue.
 -- out/eval --
 Errors:
 t1.p1: 2 errors in empty disjunction:

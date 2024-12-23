@@ -16,6 +16,24 @@
       "message": "does this comment need updating now?",
       "revId": "7aac4df31da32a2f517970866d32262f64fe74de",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a65600c_4eb35641",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 950,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-23T12:40:28Z",
+      "side": 1,
+      "message": "Not really, as it is still wrong to do (and thus the comment correct). It just does not seem to affect V2 that much, but it is still a bug.",
+      "parentUuid": "7b06573e_e24c90c9",
+      "revId": "7aac4df31da32a2f517970866d32262f64fe74de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

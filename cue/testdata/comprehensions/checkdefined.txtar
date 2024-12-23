@@ -82,14 +82,14 @@ structs: {
 
 -- out/eval/stats --
 Leaks:  11
-Freed:  87
-Reused: 83
+Freed:  89
+Reused: 85
 Allocs: 15
-Retain: 20
+Retain: 26
 
-Unifications: 98
-Conjuncts:    131
-Disjuncts:    102
+Unifications: 100
+Conjuncts:    134
+Disjuncts:    105
 -- out/eval --
 (struct){
   xc: (#struct){

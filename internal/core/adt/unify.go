@@ -565,21 +565,11 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 			continue
 		}
 
-		// Errors are allowed in let fields. Handle errors and failure to
-		// complete accordingly.
-		if !a.Label.IsLet() && a.ArcType <= ArcRequired {
-			a := a.DerefValue()
-			if err := a.Bottom(); err != nil {
-				n.AddChildError(err)
-			}
-			success = true // other arcs are irrelevant
-		}
-
 		// TODO: harmonize this error with "cannot combine"
 		switch {
 		case a.ArcType > ArcRequired, !a.Label.IsString():
 		case n.kind&StructKind == 0:
-			if !n.node.IsErr() {
+			if !n.node.IsErr() && !a.IsErr() {
 				n.reportFieldMismatch(pos(a.Value()), nil, a.Label, n.node.Value())
 			}
 			// case !wasVoid:
@@ -609,6 +599,18 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 		}
 	}
 	n.node.Arcs = n.node.Arcs[:k]
+
+	for _, a := range n.node.Arcs {
+		// Errors are allowed in let fields. Handle errors and failure to
+		// complete accordingly.
+		if !a.Label.IsLet() && a.ArcType <= ArcRequired {
+			a := a.DerefValue()
+			if err := a.Bottom(); err != nil {
+				n.AddChildError(err)
+			}
+			success = true // other arcs are irrelevant
+		}
+	}
 
 	// TODO: perhaps this code can go once we have builtins for comparing to
 	// bottom.

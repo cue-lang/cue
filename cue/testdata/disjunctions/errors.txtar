@@ -47,16 +47,49 @@ issue3581: reduced: {
 	list: ["\(c)" ]
 	c: _
 }
+-- issue3576.cue --
+issue3576: reduced: {
+	#A: a!: string
+	#B: {
+		if false {
+			dummy: {}
+		}
+	}
+	foo: #B | #A
+	foo: a: "1"
+}
+issue3576: full: {
+	#Run: {
+		run!: string
+		options?: #Option | [#Option, ...]
+		if options != _|_ {
+			optionsValue: options
+		}
+	}
+	
+	#Copy: {
+		copy!: string
+		options?: #Option | [#Option, ...]
+		if options != _|_ {
+			optionsValue: options
+		}
+	}
+	
+	#Option: {}
+	
+	foo: #Run | #Copy
+	foo: run: "make"	
+}
 -- out/eval/stats --
 Leaks:  0
-Freed:  65
-Reused: 56
-Allocs: 9
-Retain: 20
+Freed:  109
+Reused: 99
+Allocs: 10
+Retain: 21
 
-Unifications: 39
-Conjuncts:    96
-Disjuncts:    85
+Unifications: 71
+Conjuncts:    152
+Disjuncts:    130
 -- out/evalalpha --
 Errors:
 issue516.x: 2 errors in empty disjunction:
@@ -139,6 +172,64 @@ Result:
   }
   issue3157: (struct){
     foo: ((bool|int)){ |((int){ 43 }, (bool){ bool }) }
+  }
+  issue3576: (struct){
+    reduced: (struct){
+      #A: (#struct){
+        a!: (string){ string }
+      }
+      #B: (#struct){
+      }
+      foo: (struct){ |((#struct){
+          a: (_|_){
+            // [eval] issue3576.reduced.foo.a: field not allowed:
+            //     ./issue3576.cue:5:11
+            //     ./issue3576.cue:9:7
+          }
+        }, (#struct){
+          a: (string){ "1" }
+        }) }
+    }
+    full: (struct){
+      #Run: (#struct){
+        run!: (string){ string }
+        options?: ((list|struct)){ |((#struct){
+          }, (list){
+            0: (#struct){
+            }
+          }) }
+      }
+      #Copy: (#struct){
+        copy!: (string){ string }
+        options?: ((list|struct)){ |((#struct){
+          }, (list){
+            0: (#struct){
+            }
+          }) }
+      }
+      #Option: (#struct){
+      }
+      foo: (struct){ |((#struct){
+          run: (string){ "make" }
+          options?: ((list|struct)){ |((#struct){
+            }, (list){
+              0: (#struct){
+              }
+            }) }
+        }, (#struct){
+          run: (_|_){
+            // [eval] issue3576.full.foo.run: field not allowed:
+            //     ./issue3576.cue:24:18
+            //     ./issue3576.cue:31:7
+          }
+          copy!: (string){ string }
+          options?: ((list|struct)){ |((#struct){
+            }, (list){
+              0: (#struct){
+              }
+            }) }
+        }) }
+    }
   }
   issue3581: (struct){
     reduced: (struct){
@@ -224,7 +315,7 @@ diff old new
          metrics: (struct){
            foo: (struct){
            }
-@@ -86,23 +74,21 @@
+@@ -86,11 +74,11 @@
    }
    issue2916: (struct){
      b: (struct){
@@ -236,7 +327,63 @@ diff old new
 -    foo: ((bool|int)){ |(*(int){ 43 }, (bool){ bool }) }
 +    foo: ((bool|int)){ |((int){ 43 }, (bool){ bool }) }
    }
+   issue3576: (struct){
+     reduced: (struct){
+@@ -99,9 +87,15 @@
+       }
+       #B: (#struct){
+       }
+-      foo: (#struct){
+-        a: (string){ "1" }
+-      }
++      foo: (struct){ |((#struct){
++          a: (_|_){
++            // [eval] issue3576.reduced.foo.a: field not allowed:
++            //     ./issue3576.cue:5:11
++            //     ./issue3576.cue:9:7
++          }
++        }, (#struct){
++          a: (string){ "1" }
++        }) }
+     }
+     full: (struct){
+       #Run: (#struct){
+@@ -122,14 +116,26 @@
+       }
+       #Option: (#struct){
+       }
+-      foo: (#struct){
+-        run: (string){ "make" }
+-        options?: ((list|struct)){ |((#struct){
+-          }, (list){
+-            0: (#struct){
+-            }
+-          }) }
+-      }
++      foo: (struct){ |((#struct){
++          run: (string){ "make" }
++          options?: ((list|struct)){ |((#struct){
++            }, (list){
++              0: (#struct){
++              }
++            }) }
++        }, (#struct){
++          run: (_|_){
++            // [eval] issue3576.full.foo.run: field not allowed:
++            //     ./issue3576.cue:24:18
++            //     ./issue3576.cue:31:7
++          }
++          copy!: (string){ string }
++          options?: ((list|struct)){ |((#struct){
++            }, (list){
++              0: (#struct){
++              }
++            }) }
++        }) }
+     }
+   }
    issue3581: (struct){
+@@ -136,13 +142,11 @@
      reduced: (struct){
        list: (_|_){
          // [incomplete] issue3581.reduced.list: 2 errors in empty disjunction:
@@ -359,6 +506,46 @@ Result:
   issue3157: (struct){
     foo: ((bool|int)){ |(*(int){ 43 }, (bool){ bool }) }
   }
+  issue3576: (struct){
+    reduced: (struct){
+      #A: (#struct){
+        a!: (string){ string }
+      }
+      #B: (#struct){
+      }
+      foo: (#struct){
+        a: (string){ "1" }
+      }
+    }
+    full: (struct){
+      #Run: (#struct){
+        run!: (string){ string }
+        options?: ((list|struct)){ |((#struct){
+          }, (list){
+            0: (#struct){
+            }
+          }) }
+      }
+      #Copy: (#struct){
+        copy!: (string){ string }
+        options?: ((list|struct)){ |((#struct){
+          }, (list){
+            0: (#struct){
+            }
+          }) }
+      }
+      #Option: (#struct){
+      }
+      foo: (#struct){
+        run: (string){ "make" }
+        options?: ((list|struct)){ |((#struct){
+          }, (list){
+            0: (#struct){
+            }
+          }) }
+      }
+    }
+  }
   issue3581: (struct){
     reduced: (struct){
       list: (_|_){
@@ -428,6 +615,54 @@ Result:
   issue3157: {
     foo: (*42|_)
     foo: (*43|bool)
+  }
+}
+--- issue3576.cue
+{
+  issue3576: {
+    reduced: {
+      #A: {
+        a!: string
+      }
+      #B: {
+        if false {
+          dummy: {}
+        }
+      }
+      foo: (〈0;#B〉|〈0;#A〉)
+      foo: {
+        a: "1"
+      }
+    }
+  }
+  issue3576: {
+    full: {
+      #Run: {
+        run!: string
+        options?: (〈1;#Option〉|[
+          〈2;#Option〉,
+          ...,
+        ])
+        if (〈0;options〉 != _|_(explicit error (_|_ literal) in source)) {
+          optionsValue: 〈1;options〉
+        }
+      }
+      #Copy: {
+        copy!: string
+        options?: (〈1;#Option〉|[
+          〈2;#Option〉,
+          ...,
+        ])
+        if (〈0;options〉 != _|_(explicit error (_|_ literal) in source)) {
+          optionsValue: 〈1;options〉
+        }
+      }
+      #Option: {}
+      foo: (〈0;#Run〉|〈0;#Copy〉)
+      foo: {
+        run: "make"
+      }
+    }
   }
 }
 --- issue3581.cue

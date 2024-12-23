@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21b49ce4_4f0c2902",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-23T14:41:22Z",
+      "side": 1,
+      "message": "we actually _want_ the code? or need? seems like a word is missing",
+      "range": {
+        "startLine": 12,
+        "startChar": 26,
+        "endLine": 12,
+        "endChar": 46
+      },
+      "revId": "14dc96ed78d610f412ca9323e7004eb5e79bbf6d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23e1797c_d5889750",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 1751,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-23T14:41:22Z",
+      "side": 1,
+      "message": "interesting that evalv2 produced a line ending in `::`, which seems like a formatting bug. it\u0027s slightly inflating the diffs so I wonder if we should fix it, which should be easy to do and not break anyone.",
+      "revId": "14dc96ed78d610f412ca9323e7004eb5e79bbf6d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "88863017_6e55e227",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 393,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-23T14:41:22Z",
+      "side": 1,
+      "message": "I would document this special case about incomplete errors because it\u0027s rather subtle.",
+      "revId": "14dc96ed78d610f412ca9323e7004eb5e79bbf6d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

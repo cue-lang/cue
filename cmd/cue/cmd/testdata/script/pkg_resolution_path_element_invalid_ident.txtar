@@ -45,4 +45,3 @@ import failed: cannot determine package name for "mod.com/1x"; set it explicitly
     ./test2/root.cue:3:8
 -- test2-abs-stderr.golden --
 cannot determine package name for "mod.com/1x"; set it explicitly with ':'
-cannot find package "mod.com/1x": cannot determine package name from import path "mod.com/1x"

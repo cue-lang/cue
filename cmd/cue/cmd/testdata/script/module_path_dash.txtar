@@ -15,9 +15,7 @@ cd ..
 # mod tidy should work, because it is able to locate a module containing a package
 # at the given import path, but export should fail, as no explicit package is named.
 cd importer-noqualifier
-# TODO(mvdan): tidy should work here.
-! exec cue mod tidy
-cmp stderr tidy.stderr
+exec cue mod tidy
 cmp cue.mod/module.cue cue.mod/module.cue.want
 ! exec cue export .
 cmp stderr export.stderr
@@ -48,14 +46,17 @@ module: "main.org/importer-noqualifier@v1"
 language: {
 	version: "v0.9.0"
 }
+deps: {
+	"main.org/foo-bar@v1": {
+		v: "v1.0.0"
+	}
+}
 -- importer-noqualifier/main.cue --
 package importer
 
 import "main.org/foo-bar@v1"
 
 foobar.contents
--- importer-noqualifier/tidy.stderr --
-failed to resolve "main.org/foo-bar@v1": cannot determine package name from import path "main.org/foo-bar@v1"
 -- importer-noqualifier/export.stderr --
 main.org/importer-noqualifier@v1: import failed: cannot determine package name for "main.org/foo-bar@v1"; set it explicitly with ':':
     ./main.cue:3:8

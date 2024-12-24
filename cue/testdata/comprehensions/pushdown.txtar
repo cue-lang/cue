@@ -1549,42 +1549,39 @@ Result:
   }
   issue3621: (struct){
     reduced: (struct){
-      t1: (_|_){
-        // [incomplete] issue3621.reduced.t1.b1.b2.b3: cyclic reference to field b2:
-        //     ./issue3621.cue:5:2
-        a: (_|_){
-          // [incomplete] issue3621.reduced.t1.a: undefined field: b1:
-          //     ./issue3621.cue:6:6
+      t1: (struct){
+        a: (string){ "Foo" }
+        b1: (struct){
+          b2: (struct){
+            b3: (string){ "Foo" }
+          }
         }
       }
-      t2: (_|_){
-        // [incomplete] issue3621.reduced.t2.inner.inner2.name: cyclic reference to field inner2:
-        //     ./issue3621.cue:12:2
+      t2: (struct){
         outer: (struct){
-          b: (_|_){
-            // [incomplete] issue3621.reduced.t2.outer.b: undefined field: inner:
-            //     ./issue3621.cue:14:13
+          b: (string){ "Foo" }
+        }
+        inner: (struct){
+          inner2: (struct){
+            name: (string){ "Foo" }
           }
         }
       }
     }
-    full: (_|_){
-      // [incomplete] issue3621.full.inner.inner2.create_default: cyclic reference to field inner2:
-      //     ./issue3621.cue:20:2
-      // issue3621.full.inner.inner2.description: cyclic reference to field inner2:
-      //     ./issue3621.cue:20:2
-      // issue3621.full.inner.inner2.name: cyclic reference to field inner2:
-      //     ./issue3621.cue:20:2
-      // issue3621.full.inner.inner2.privacy: cyclic reference to field inner2:
-      //     ./issue3621.cue:20:2
+    full: (struct){
       hello: (string){ "world" }
       outer: (struct){
         outer2: (struct){
-          bar: (_|_){
-            // [incomplete] issue3621.full.outer.outer2.bar: undefined field: inner:
-            //     ./issue3621.cue:28:10
-          }
+          bar: (string){ "Employees" }
           name: (string){ "outer2" }
+        }
+      }
+      inner: (struct){
+        inner2: (struct){
+          name: (string){ "Employees" }
+          description: (string){ "All employees" }
+          privacy: (string){ "secret" }
+          create_default: (bool){ false }
         }
       }
     }
@@ -1929,7 +1926,7 @@ diff old new
          }
        }
      }
-@@ -738,50 +671,53 @@
+@@ -738,10 +671,10 @@
        }
        foo: (#struct){
          kind: (string){ "foo" }
@@ -1942,77 +1939,6 @@ diff old new
        }
      }
    }
-   issue3621: (struct){
-     reduced: (struct){
--      t1: (struct){
--        a: (string){ "Foo" }
--        b1: (struct){
--          b2: (struct){
--            b3: (string){ "Foo" }
--          }
--        }
--      }
--      t2: (struct){
-+      t1: (_|_){
-+        // [incomplete] issue3621.reduced.t1.b1.b2.b3: cyclic reference to field b2:
-+        //     ./issue3621.cue:5:2
-+        a: (_|_){
-+          // [incomplete] issue3621.reduced.t1.a: undefined field: b1:
-+          //     ./issue3621.cue:6:6
-+        }
-+      }
-+      t2: (_|_){
-+        // [incomplete] issue3621.reduced.t2.inner.inner2.name: cyclic reference to field inner2:
-+        //     ./issue3621.cue:12:2
-         outer: (struct){
--          b: (string){ "Foo" }
--        }
--        inner: (struct){
--          inner2: (struct){
--            name: (string){ "Foo" }
--          }
--        }
--      }
--    }
--    full: (struct){
-+          b: (_|_){
-+            // [incomplete] issue3621.reduced.t2.outer.b: undefined field: inner:
-+            //     ./issue3621.cue:14:13
-+          }
-+        }
-+      }
-+    }
-+    full: (_|_){
-+      // [incomplete] issue3621.full.inner.inner2.create_default: cyclic reference to field inner2:
-+      //     ./issue3621.cue:20:2
-+      // issue3621.full.inner.inner2.description: cyclic reference to field inner2:
-+      //     ./issue3621.cue:20:2
-+      // issue3621.full.inner.inner2.name: cyclic reference to field inner2:
-+      //     ./issue3621.cue:20:2
-+      // issue3621.full.inner.inner2.privacy: cyclic reference to field inner2:
-+      //     ./issue3621.cue:20:2
-       hello: (string){ "world" }
-       outer: (struct){
-         outer2: (struct){
--          bar: (string){ "Employees" }
-+          bar: (_|_){
-+            // [incomplete] issue3621.full.outer.outer2.bar: undefined field: inner:
-+            //     ./issue3621.cue:28:10
-+          }
-           name: (string){ "outer2" }
-         }
-       }
--      inner: (struct){
--        inner2: (struct){
--          name: (string){ "Employees" }
--          description: (string){ "All employees" }
--          privacy: (string){ "secret" }
--          create_default: (bool){ false }
--        }
--      }
-     }
-   }
-   unifyDynamicReflectSuccess: (struct){
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old

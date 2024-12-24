@@ -16,6 +16,24 @@
       "message": "is it worth reusing the `range n.Node.Arcs` right above? I don\u0027t know the code intimately but at first glance it seems like we could reuse the loop.",
       "revId": "84aa48425b7b05141325cb7282ad315a4273a77e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbb299ac_4b45d4c2",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 603,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-24T12:32:15Z",
+      "side": 1,
+      "message": "It may be a bit faster, but probably barely if at all. But it would be much less clean, imo.",
+      "parentUuid": "ba1f9c8f_bcf3e783",
+      "revId": "84aa48425b7b05141325cb7282ad315a4273a77e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

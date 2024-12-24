@@ -2026,7 +2026,13 @@ func (c *OpContext) forSource(x Expr) *Vertex {
 
 	node, ok := v.(*Vertex)
 	if ok && c.isDevVersion() {
-		node.unify(c, state.conditions(), yield)
+		// We do not request to "yield" here, but rather rely on the
+		// call-by-need behavior in combination with the freezing mechanism.
+		// TODO: this seems a bit fragile. At some point we need to make this
+		// more robust by moving to a pure call-by-need mechanism, for instance.
+		// TODO: using attemptOnly here will remove the cyclic reference error
+		// of comprehension.t1.ok (which also errors in V2),
+		node.unify(c, state.conditions(), finalize)
 	}
 
 	v, ok = c.getDefault(v)
@@ -2064,7 +2070,7 @@ func (c *OpContext) forSource(x Expr) *Vertex {
 		}
 
 	default:
-		if kind := v.Kind(); kind&StructKind != 0 {
+		if kind := v.Kind(); kind&(StructKind|ListKind) != 0 {
 			c.addErrf(IncompleteError, pos(x),
 				"cannot range over %s (incomplete type %s)", x, kind)
 			return emptyNode
@@ -2073,6 +2079,17 @@ func (c *OpContext) forSource(x Expr) *Vertex {
 			c.addErrf(0, pos(x), // TODO(error): better message.
 				"cannot range over %s (found %s, want list or struct)",
 				x.Source(), v.Kind())
+			return emptyNode
+		}
+	}
+	if c.isDevVersion() {
+		kind := v.Kind()
+		// At this point it is possible that the Vertex represents an incomplete
+		// struct or list, which is the case if it may be struct or list, but
+		// is also at least some other type, such as is the case with top.
+		if kind&(StructKind|ListKind) != 0 && kind != StructKind && kind != ListKind {
+			c.addErrf(IncompleteError, pos(x),
+				"cannot range over %s (incomplete type %s)", x, kind)
 			return emptyNode
 		}
 	}

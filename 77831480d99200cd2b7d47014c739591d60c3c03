@@ -16,6 +16,24 @@
       "message": "this line is a bit obtuse, can we document it a little bit? at first I thought it was buggy - but I guess what we want is \"the kind contains struct or list, but not only struct or list\".",
       "revId": "77831480d99200cd2b7d47014c739591d60c3c03",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "552d24e6_eb9e95f8",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 2085,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-24T11:33:14Z",
+      "side": 1,
+      "message": "added a comment.",
+      "parentUuid": "48883569_05761ab8",
+      "revId": "77831480d99200cd2b7d47014c739591d60c3c03",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

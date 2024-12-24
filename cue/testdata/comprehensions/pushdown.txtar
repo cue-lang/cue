@@ -743,9 +743,9 @@ import "path"
 
 issue2131: tests: {
 	windows: {
-		eg1: in: #"c:\"#
+		eg1: in: #"c:\d"#
 		eg2: in: #"c:\test"#
-		eg3: in: #"c:\test\"#
+		eg3: in: #"c:\test\d"#
 	}
 
 	for os, examples in tests for k, v in examples {
@@ -1436,7 +1436,7 @@ Result:
     tests: (struct){
       windows: (struct){
         eg1: (struct){
-          in: (string){ "c:\\" }
+          in: (string){ "c:\\d" }
           out: (string){ "test" }
         }
         eg2: (struct){
@@ -1444,7 +1444,7 @@ Result:
           out: (string){ "test" }
         }
         eg3: (struct){
-          in: (string){ "c:\\test\\" }
+          in: (string){ "c:\\test\\d" }
           out: (string){ "test" }
         }
       }
@@ -2571,7 +2571,7 @@ Result:
     tests: (struct){
       windows: (struct){
         eg1: (struct){
-          in: (string){ "c:\\" }
+          in: (string){ "c:\\d" }
           out: (string){ "test" }
         }
         eg2: (struct){
@@ -2579,7 +2579,7 @@ Result:
           out: (string){ "test" }
         }
         eg3: (struct){
-          in: (string){ "c:\\test\\" }
+          in: (string){ "c:\\test\\d" }
           out: (string){ "test" }
         }
       }
@@ -3534,13 +3534,13 @@ Result:
     tests: {
       windows: {
         eg1: {
-          in: "c:\\"
+          in: "c:\\d"
         }
         eg2: {
           in: "c:\\test"
         }
         eg3: {
-          in: "c:\\test\\"
+          in: "c:\\test\\d"
         }
       }
       for os, examples in 〈1;tests〉 for k, v in 〈0;examples〉 {

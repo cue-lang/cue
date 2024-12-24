@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b40bb46c_e49e4a06",
+        "filename": "internal/core/adt/sched_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-24T10:45:42Z",
+      "side": 1,
+      "message": "are used?",
+      "range": {
+        "startLine": 26,
+        "startChar": 16,
+        "endLine": 26,
+        "endChar": 20
+      },
+      "revId": "09f4187348fd0d683e0180267fccbff59febf885",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f45ab6d4_a300f215",
+        "filename": "internal/core/adt/sched_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-24T10:45:42Z",
+      "side": 1,
+      "message": "is a word missing before this?",
+      "range": {
+        "startLine": 28,
+        "startChar": 3,
+        "endLine": 28,
+        "endChar": 6
+      },
+      "revId": "09f4187348fd0d683e0180267fccbff59febf885",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "166167a8_4cb14160",
+        "filename": "internal/core/adt/sched_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-24T10:45:42Z",
+      "side": 1,
+      "message": "ensure",
+      "range": {
+        "startLine": 32,
+        "startChar": 25,
+        "endLine": 32,
+        "endChar": 32
+      },
+      "revId": "09f4187348fd0d683e0180267fccbff59febf885",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

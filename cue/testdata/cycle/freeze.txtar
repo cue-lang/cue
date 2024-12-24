@@ -158,8 +158,6 @@ comprehension.t3.err.a: adding field xq not allowed as field set was already ref
     ./comprehension.cue:82:13
 comprehension.moreSpecific.err.a.x: adding field z not allowed as field set was already referenced:
     ./comprehension.cue:114:9
-issue3178.output: adding field Value not allowed as field set was already referenced:
-    ./issue3178.cue:9:23
 
 Result:
 (_|_){
@@ -295,15 +293,12 @@ Result:
       }
     }
   }
-  issue3178: (_|_){
-    // [eval] issue3178.output: adding field Value not allowed as field set was already referenced:
-    //     ./issue3178.cue:9:23
+  issue3178: (struct){
     input: (#list){
       0: (string){ "Value" }
     }
-    output: (_|_){
-      // [eval] issue3178.output: adding field Value not allowed as field set was already referenced:
-      //     ./issue3178.cue:9:23
+    output: (struct){
+      Value: (bool){ true }
     }
   }
 }
@@ -311,7 +306,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,12 @@
+@@ -1,11 +1,10 @@
  Errors:
 -comprehension.moreSpecific.err.a: field z not allowed by earlier comprehension or reference cycle
 -comprehension.t1.ok.p0.x: field z not allowed by earlier comprehension or reference cycle
@@ -326,12 +321,10 @@ diff old new
 +    ./comprehension.cue:82:13
 +comprehension.moreSpecific.err.a.x: adding field z not allowed as field set was already referenced:
 +    ./comprehension.cue:114:9
-+issue3178.output: adding field Value not allowed as field set was already referenced:
-+    ./issue3178.cue:9:23
  
  Result:
  (_|_){
-@@ -12,73 +13,65 @@
+@@ -12,73 +11,65 @@
    // [eval]
    comprehension: (_|_){
      // [eval]
@@ -455,7 +448,7 @@ diff old new
              }
            }
          }
-@@ -89,9 +82,9 @@
+@@ -89,9 +80,9 @@
        err: (_|_){
          // [eval]
          a: (_|_){
@@ -468,7 +461,7 @@ diff old new
          }
        }
      }
-@@ -99,16 +92,14 @@
+@@ -99,16 +90,14 @@
        // [eval]
        err: (_|_){
          // [eval]
@@ -491,7 +484,7 @@ diff old new
          }
        }
      }
-@@ -132,10 +123,10 @@
+@@ -132,10 +121,10 @@
        err: (_|_){
          // [eval]
          a: (_|_){
@@ -504,27 +497,6 @@ diff old new
            }
          }
        }
-@@ -151,12 +142,15 @@
-       }
-     }
-   }
--  issue3178: (struct){
-+  issue3178: (_|_){
-+    // [eval] issue3178.output: adding field Value not allowed as field set was already referenced:
-+    //     ./issue3178.cue:9:23
-     input: (#list){
-       0: (string){ "Value" }
-     }
--    output: (struct){
--      Value: (bool){ true }
-+    output: (_|_){
-+      // [eval] issue3178.output: adding field Value not allowed as field set was already referenced:
-+      //     ./issue3178.cue:9:23
-     }
-   }
- }
--- diff/todo/p3 --
-Error path location could improve.
 -- diff/explanation --
 v0.7 fixes bugs in v0.6:
 - t1 should be incomplete error, as it is fixable.

@@ -2026,7 +2026,11 @@ func (c *OpContext) forSource(x Expr) *Vertex {
 
 	node, ok := v.(*Vertex)
 	if ok && c.isDevVersion() {
-		node.unify(c, state.conditions(), yield)
+		// We do not request to "yield" here, but rather rely on the
+		// call-by-need behavior in combination with the freezing mechanism.
+		// TODO: this seems a bit fragile. At some point we need to make this
+		// more robust by moving to a pure call-by-need mechanism, for instance.
+		node.unify(c, state.conditions(), finalize)
 	}
 
 	v, ok = c.getDefault(v)
@@ -2064,7 +2068,7 @@ func (c *OpContext) forSource(x Expr) *Vertex {
 		}
 
 	default:
-		if kind := v.Kind(); kind&StructKind != 0 {
+		if kind := v.Kind(); kind&(StructKind|ListKind) != 0 {
 			c.addErrf(IncompleteError, pos(x),
 				"cannot range over %s (incomplete type %s)", x, kind)
 			return emptyNode
@@ -2074,6 +2078,15 @@ func (c *OpContext) forSource(x Expr) *Vertex {
 				"cannot range over %s (found %s, want list or struct)",
 				x.Source(), v.Kind())
 			return emptyNode
+		}
+	}
+	if c.isDevVersion() {
+		kind := v.Kind()
+		if kind&(StructKind|ListKind) != 0 && kind != StructKind && kind != ListKind {
+			c.addErrf(IncompleteError, pos(x),
+				"cannot range over %s (incomplete type %s)", x, kind)
+			return emptyNode
+
 		}
 	}
 

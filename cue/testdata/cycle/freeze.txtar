@@ -126,16 +126,30 @@ comprehension: moreSpecific: err: {
 		}
 	}
 }
+-- issue3178.cue --
+issue3178: {
+	// This should pass. Reasoning:
+	// - second comprehension runs
+	// - in order to satisfy, first comprehension must run
+	// - first comprehension runs and completes
+	input: [ "Value" ]
+	output: {...}
+	for name in input {
+			output: "\(name)": true
+	}
+	for name, v in output {
+	}
+}
 -- out/eval/stats --
 Leaks:  0
-Freed:  67
-Reused: 59
+Freed:  72
+Reused: 64
 Allocs: 8
-Retain: 12
+Retain: 15
 
-Unifications: 67
-Conjuncts:    119
-Disjuncts:    76
+Unifications: 72
+Conjuncts:    127
+Disjuncts:    83
 -- out/evalalpha --
 Errors:
 comprehension.t2.err.a: adding field xq not allowed as field set was already referenced:
@@ -144,6 +158,8 @@ comprehension.t3.err.a: adding field xq not allowed as field set was already ref
     ./comprehension.cue:82:13
 comprehension.moreSpecific.err.a.x: adding field z not allowed as field set was already referenced:
     ./comprehension.cue:114:9
+issue3178.output: adding field Value not allowed as field set was already referenced:
+    ./issue3178.cue:9:23
 
 Result:
 (_|_){
@@ -279,12 +295,23 @@ Result:
       }
     }
   }
+  issue3178: (_|_){
+    // [eval] issue3178.output: adding field Value not allowed as field set was already referenced:
+    //     ./issue3178.cue:9:23
+    input: (#list){
+      0: (string){ "Value" }
+    }
+    output: (_|_){
+      // [eval] issue3178.output: adding field Value not allowed as field set was already referenced:
+      //     ./issue3178.cue:9:23
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,10 @@
+@@ -1,11 +1,12 @@
  Errors:
 -comprehension.moreSpecific.err.a: field z not allowed by earlier comprehension or reference cycle
 -comprehension.t1.ok.p0.x: field z not allowed by earlier comprehension or reference cycle
@@ -299,10 +326,12 @@ diff old new
 +    ./comprehension.cue:82:13
 +comprehension.moreSpecific.err.a.x: adding field z not allowed as field set was already referenced:
 +    ./comprehension.cue:114:9
++issue3178.output: adding field Value not allowed as field set was already referenced:
++    ./issue3178.cue:9:23
  
  Result:
  (_|_){
-@@ -12,73 +11,65 @@
+@@ -12,73 +13,65 @@
    // [eval]
    comprehension: (_|_){
      // [eval]
@@ -426,7 +455,7 @@ diff old new
              }
            }
          }
-@@ -89,9 +80,9 @@
+@@ -89,9 +82,9 @@
        err: (_|_){
          // [eval]
          a: (_|_){
@@ -439,7 +468,7 @@ diff old new
          }
        }
      }
-@@ -99,16 +90,14 @@
+@@ -99,16 +92,14 @@
        // [eval]
        err: (_|_){
          // [eval]
@@ -462,7 +491,7 @@ diff old new
          }
        }
      }
-@@ -132,10 +121,10 @@
+@@ -132,10 +123,10 @@
        err: (_|_){
          // [eval]
          a: (_|_){
@@ -475,6 +504,25 @@ diff old new
            }
          }
        }
+@@ -151,12 +142,15 @@
+       }
+     }
+   }
+-  issue3178: (struct){
++  issue3178: (_|_){
++    // [eval] issue3178.output: adding field Value not allowed as field set was already referenced:
++    //     ./issue3178.cue:9:23
+     input: (#list){
+       0: (string){ "Value" }
+     }
+-    output: (struct){
+-      Value: (bool){ true }
++    output: (_|_){
++      // [eval] issue3178.output: adding field Value not allowed as field set was already referenced:
++      //     ./issue3178.cue:9:23
+     }
+   }
+ }
 -- diff/todo/p3 --
 Error path location could improve.
 -- diff/explanation --
@@ -632,6 +680,14 @@ Result:
           x: (string){ "a" }
         }
       }
+    }
+  }
+  issue3178: (struct){
+    input: (#list){
+      0: (string){ "Value" }
+    }
+    output: (struct){
+      Value: (bool){ true }
     }
   }
 }
@@ -907,5 +963,22 @@ Result:
         len(〈0;#a〉)
       }
     }
+  }
+}
+--- issue3178.cue
+{
+  issue3178: {
+    input: [
+      "Value",
+    ]
+    output: {
+      ...
+    }
+    for _, name in 〈0;input〉 {
+      output: {
+        "\(〈2;name〉)": true
+      }
+    }
+    for name, v in 〈0;output〉 {}
   }
 }

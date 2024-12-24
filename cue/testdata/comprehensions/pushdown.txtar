@@ -824,7 +824,38 @@ unifyDynamicReflectSuccess: {
 		}
 	}
 }
-
+-- issue3621.cue --
+issue3621: reduced: t1: {
+	// This test ensures that when a reference is made within a comprehension,
+	// with vertices marked as "pending", that these are not completed the
+	// respective pushed-down comprehension is evaluated as well.
+	if true {
+		a: b1.b2.b3
+		b1: b2: b3: "Foo"
+	}
+}
+issue3621: reduced: t2: {
+	outer: {}
+	if true {
+		inner: inner2: name: "Foo"
+		outer: b: inner.inner2.name
+	}
+}
+issue3621: full: {
+	hello: "world"
+	outer: [Name=string]: name: Name
+	if true {
+		inner: inner2: {
+			name:           "Employees"
+			description:    "All employees"
+			privacy:        "secret"
+			create_default: false
+		}
+		outer: outer2: {
+			bar: (inner.inner2.name)
+		}
+	}
+}
 -- out/evalalpha/stats --
 Leaks:  513
 Freed:  2
@@ -1516,6 +1547,48 @@ Result:
       }
     }
   }
+  issue3621: (struct){
+    reduced: (struct){
+      t1: (_|_){
+        // [incomplete] issue3621.reduced.t1.b1.b2.b3: cyclic reference to field b2:
+        //     ./issue3621.cue:5:2
+        a: (_|_){
+          // [incomplete] issue3621.reduced.t1.a: undefined field: b1:
+          //     ./issue3621.cue:6:6
+        }
+      }
+      t2: (_|_){
+        // [incomplete] issue3621.reduced.t2.inner.inner2.name: cyclic reference to field inner2:
+        //     ./issue3621.cue:12:2
+        outer: (struct){
+          b: (_|_){
+            // [incomplete] issue3621.reduced.t2.outer.b: undefined field: inner:
+            //     ./issue3621.cue:14:13
+          }
+        }
+      }
+    }
+    full: (_|_){
+      // [incomplete] issue3621.full.inner.inner2.create_default: cyclic reference to field inner2:
+      //     ./issue3621.cue:20:2
+      // issue3621.full.inner.inner2.description: cyclic reference to field inner2:
+      //     ./issue3621.cue:20:2
+      // issue3621.full.inner.inner2.name: cyclic reference to field inner2:
+      //     ./issue3621.cue:20:2
+      // issue3621.full.inner.inner2.privacy: cyclic reference to field inner2:
+      //     ./issue3621.cue:20:2
+      hello: (string){ "world" }
+      outer: (struct){
+        outer2: (struct){
+          bar: (_|_){
+            // [incomplete] issue3621.full.outer.outer2.bar: undefined field: inner:
+            //     ./issue3621.cue:28:10
+          }
+          name: (string){ "outer2" }
+        }
+      }
+    }
+  }
   unifyDynamicReflectSuccess: (struct){
     X: (struct){
       X: (struct){
@@ -1856,7 +1929,7 @@ diff old new
          }
        }
      }
-@@ -738,10 +671,10 @@
+@@ -738,50 +671,53 @@
        }
        foo: (#struct){
          kind: (string){ "foo" }
@@ -1869,6 +1942,77 @@ diff old new
        }
      }
    }
+   issue3621: (struct){
+     reduced: (struct){
+-      t1: (struct){
+-        a: (string){ "Foo" }
+-        b1: (struct){
+-          b2: (struct){
+-            b3: (string){ "Foo" }
+-          }
+-        }
+-      }
+-      t2: (struct){
++      t1: (_|_){
++        // [incomplete] issue3621.reduced.t1.b1.b2.b3: cyclic reference to field b2:
++        //     ./issue3621.cue:5:2
++        a: (_|_){
++          // [incomplete] issue3621.reduced.t1.a: undefined field: b1:
++          //     ./issue3621.cue:6:6
++        }
++      }
++      t2: (_|_){
++        // [incomplete] issue3621.reduced.t2.inner.inner2.name: cyclic reference to field inner2:
++        //     ./issue3621.cue:12:2
+         outer: (struct){
+-          b: (string){ "Foo" }
+-        }
+-        inner: (struct){
+-          inner2: (struct){
+-            name: (string){ "Foo" }
+-          }
+-        }
+-      }
+-    }
+-    full: (struct){
++          b: (_|_){
++            // [incomplete] issue3621.reduced.t2.outer.b: undefined field: inner:
++            //     ./issue3621.cue:14:13
++          }
++        }
++      }
++    }
++    full: (_|_){
++      // [incomplete] issue3621.full.inner.inner2.create_default: cyclic reference to field inner2:
++      //     ./issue3621.cue:20:2
++      // issue3621.full.inner.inner2.description: cyclic reference to field inner2:
++      //     ./issue3621.cue:20:2
++      // issue3621.full.inner.inner2.name: cyclic reference to field inner2:
++      //     ./issue3621.cue:20:2
++      // issue3621.full.inner.inner2.privacy: cyclic reference to field inner2:
++      //     ./issue3621.cue:20:2
+       hello: (string){ "world" }
+       outer: (struct){
+         outer2: (struct){
+-          bar: (string){ "Employees" }
++          bar: (_|_){
++            // [incomplete] issue3621.full.outer.outer2.bar: undefined field: inner:
++            //     ./issue3621.cue:28:10
++          }
+           name: (string){ "outer2" }
+         }
+       }
+-      inner: (struct){
+-        inner2: (struct){
+-          name: (string){ "Employees" }
+-          description: (string){ "All employees" }
+-          privacy: (string){ "secret" }
+-          create_default: (bool){ false }
+-        }
+-      }
+     }
+   }
+   unifyDynamicReflectSuccess: (struct){
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -1893,14 +2037,14 @@ diff old new
 +Disjuncts:    22
 -- out/eval/stats --
 Leaks:  17
-Freed:  443
-Reused: 437
-Allocs: 23
+Freed:  468
+Reused: 461
+Allocs: 24
 Retain: 103
 
-Unifications: 444
-Conjuncts:    721
-Disjuncts:    516
+Unifications: 469
+Conjuncts:    747
+Disjuncts:    541
 -- diff/todo/p2 --
 provideIncompleteSuccess.t2.a.c.d: missing error: probably correct.
    A bit esoteric, but should probably work.
@@ -2651,6 +2795,45 @@ Result:
         output: (#struct){
         }
         #def: (#struct){
+        }
+      }
+    }
+  }
+  issue3621: (struct){
+    reduced: (struct){
+      t1: (struct){
+        a: (string){ "Foo" }
+        b1: (struct){
+          b2: (struct){
+            b3: (string){ "Foo" }
+          }
+        }
+      }
+      t2: (struct){
+        outer: (struct){
+          b: (string){ "Foo" }
+        }
+        inner: (struct){
+          inner2: (struct){
+            name: (string){ "Foo" }
+          }
+        }
+      }
+    }
+    full: (struct){
+      hello: (string){ "world" }
+      outer: (struct){
+        outer2: (struct){
+          bar: (string){ "Employees" }
+          name: (string){ "outer2" }
+        }
+      }
+      inner: (struct){
+        inner2: (struct){
+          name: (string){ "Employees" }
+          description: (string){ "All employees" }
+          privacy: (string){ "secret" }
+          create_default: (bool){ false }
         }
       }
     }
@@ -3647,6 +3830,65 @@ Result:
       })
       foo: {
         kind: "foo"
+      }
+    }
+  }
+}
+--- issue3621.cue
+{
+  issue3621: {
+    reduced: {
+      t1: {
+        if true {
+          a: 〈0;b1〉.b2.b3
+          b1: {
+            b2: {
+              b3: "Foo"
+            }
+          }
+        }
+      }
+    }
+  }
+  issue3621: {
+    reduced: {
+      t2: {
+        outer: {}
+        if true {
+          inner: {
+            inner2: {
+              name: "Foo"
+            }
+          }
+          outer: {
+            b: 〈1;inner〉.inner2.name
+          }
+        }
+      }
+    }
+  }
+  issue3621: {
+    full: {
+      hello: "world"
+      outer: {
+        [string]: {
+          name: 〈1;-〉
+        }
+      }
+      if true {
+        inner: {
+          inner2: {
+            name: "Employees"
+            description: "All employees"
+            privacy: "secret"
+            create_default: false
+          }
+        }
+        outer: {
+          outer2: {
+            bar: 〈2;inner〉.inner2.name
+          }
+        }
       }
     }
   }

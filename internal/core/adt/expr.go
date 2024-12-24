@@ -1578,6 +1578,14 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 			expr = c.evalState(a, state)
 		} else {
 			cond |= fieldSetKnown | allAncestorsProcessed | concreteKnown
+			// Be sure to process disjunctions at the very least when
+			// finalizing. Requiring disjunctions earlier may lead to too eager
+			// evaluation.
+			//
+			// TODO: Ideally we would always add this flag regardless of mode.
+			if runMode == finalize {
+				cond |= disjunctionTask
+			}
 			state = combineMode(cond, runMode).withVertexStatus(state.vertexStatus())
 			expr = c.value(a, state)
 		}

@@ -1,0 +1,111 @@
+# Test that it's possible to publish, depend on, and import a module
+# whose path ends with a name containing a dash like foo-bar.
+# Note that foo-bar is not a valid package name, but is allowed in a module path.
+# Note that this is similar to pkg_resolution_path_element_invalid_ident.txtar,
+# but this concerns module paths and publishing/retrieving them.
+
+memregistry MEMREGISTRY
+env CUE_REGISTRY=$MEMREGISTRY
+
+cd publisher
+exec cue mod publish v1.0.0
+cd ..
+
+# First, see what happens if the user forgot to qualify the CUE package import.
+# mod tidy should work, because it is able to locate a module containing a package
+# at the given import path, but export should fail, as no explicit package is named.
+cd importer-noqualifier
+# TODO(mvdan): tidy should work here.
+! exec cue mod tidy
+cmp stderr tidy.stderr
+cmp cue.mod/module.cue cue.mod/module.cue.want
+! exec cue export .
+cmp stderr export.stderr
+cd ..
+
+# Similarly, "getting" the entire module should work, even if no valid package name
+# can be derived from the module path.
+cd getter-noqualifier
+exec cue mod get main.org/foo-bar
+cmp cue.mod/module.cue cue.mod/module.cue.want
+cd ..
+
+# With an explicit qualifier, both mod tidy and export work just fine.
+cd importer-withqualifier
+exec cue mod tidy
+cmp cue.mod/module.cue cue.mod/module.cue.want
+exec cue export .
+cmp stdout export.stdout
+cd ..
+
+-- importer-noqualifier/cue.mod/module.cue --
+module: "main.org/importer-noqualifier@v1"
+language: {
+	version: "v0.9.0"
+}
+-- importer-noqualifier/cue.mod/module.cue.want --
+module: "main.org/importer-noqualifier@v1"
+language: {
+	version: "v0.9.0"
+}
+-- importer-noqualifier/main.cue --
+package importer
+
+import "main.org/foo-bar@v1"
+
+foobar.contents
+-- importer-noqualifier/tidy.stderr --
+failed to resolve "main.org/foo-bar@v1": cannot determine package name from import path "main.org/foo-bar@v1"
+-- importer-noqualifier/export.stderr --
+main.org/importer-noqualifier@v1: import failed: cannot determine package name for "main.org/foo-bar@v1"; set it explicitly with ':':
+    ./main.cue:3:8
+-- getter-noqualifier/cue.mod/module.cue --
+module: "main.org/getter-noqualifier@v1"
+language: {
+	version: "v0.9.0"
+}
+-- getter-noqualifier/cue.mod/module.cue.want --
+module: "main.org/getter-noqualifier@v1"
+language: {
+	version: "v0.9.0"
+}
+deps: {
+	"main.org/foo-bar@v1": {
+		v: "v1.0.0"
+	}
+}
+-- importer-withqualifier/cue.mod/module.cue --
+module: "main.org/importer-withqualifier@v1"
+language: {
+	version: "v0.9.0"
+}
+-- importer-withqualifier/cue.mod/module.cue.want --
+module: "main.org/importer-withqualifier@v1"
+language: {
+	version: "v0.9.0"
+}
+deps: {
+	"main.org/foo-bar@v1": {
+		v: "v1.0.0"
+	}
+}
+-- importer-withqualifier/main.cue --
+package importer
+
+import "main.org/foo-bar@v1:foobar"
+
+foobar.contents
+-- importer-withqualifier/export.stdout --
+"source for foo-bar"
+-- publisher/cue.mod/module.cue --
+module: "main.org/foo-bar@v1"
+language: {
+	version: "v0.9.0"
+}
+source: {
+	kind: "self"
+}
+-- publisher/main.cue --
+package foobar
+
+contents: "source for foo-bar"

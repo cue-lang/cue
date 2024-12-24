@@ -81,7 +81,6 @@ var skipDebugDepErrors = map[string]int{
 	"builtins/default":         1,
 	"compile/scope":            1,
 	"comprehensions/pushdown":  2,
-	"cycle/chain":              6,
 	"cycle/comprehension":      2,
 	"cycle/disjunction":        4,
 	"cycle/structural":         14,

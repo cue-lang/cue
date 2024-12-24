@@ -23,22 +23,47 @@ import (
 	"cuelang.org/go/internal/cuetest"
 )
 
+// These states are used for testing. Each has a suffix of their corresponding
+// name in states.go. Debuggers, when resolving constants, will often only
+// show the debug constants. Adding the suffix clarifies which states these
+// correspond to in the main program.
+//
+// We could also use the states in the main program directly, but states may
+// shift, so this way we ensure that we separate these concerns.
 const (
-	c1 condition = 1 << iota
-	c2
-	c3
-	c4
+	c1AllAncestorsProcessed condition = 1 << iota
+	c2ArcTypeKnown
+	c3ValueKnown
+	c4ScalarKnown
 
-	// auto is a condition that is automatically set by the simulator.
-	auto
+	// autoFieldConjunctsKnown is a condition that is automatically set by the simulator.
+	autoFieldConjunctsKnown
 )
+
+func TestStateNames(t *testing.T) {
+	if c1AllAncestorsProcessed != allAncestorsProcessed {
+		t.Error("inconsistent state name for allAncestorsProcessed")
+	}
+	if c2ArcTypeKnown != arcTypeKnown {
+		t.Error("inconsistent state name for arcTypeKnown")
+	}
+	if c3ValueKnown != valueKnown {
+		t.Error("inconsistent state name for valueKnown")
+	}
+	if c4ScalarKnown != scalarKnown {
+		t.Error("inconsistent state name for scalarKnown")
+	}
+	if autoFieldConjunctsKnown != fieldConjunctsKnown {
+		t.Error("inconsistent state name for fieldConjunctsKnown")
+	}
+}
 
 // TestScheduler tests the non-CUE specific scheduler functionality.
 func TestScheduler(t *testing.T) {
 	ctx := &OpContext{
 		Version: internal.DefaultVersion,
 		taskContext: taskContext{
-			counterMask: c1 | c2 | c3 | c4,
+			counterMask: c1AllAncestorsProcessed | c2ArcTypeKnown | c3ValueKnown | c4ScalarKnown,
 			complete:    func(s *scheduler) condition { return 0 },
 		},
 	}
@@ -198,7 +223,7 @@ func TestScheduler(t *testing.T) {
 		name: "node with one task",
 		init: func() {
 			v0 := node(nil)
-			success("t1", v0, c1, 0)
+			success("t1", v0, c1AllAncestorsProcessed, 0)
 		},
 		log: `
 		    running task t1`,
@@ -210,8 +235,8 @@ func TestScheduler(t *testing.T) {
 		name: "node with two tasks",
 		init: func() {
 			v0 := node(nil)
-			success("t1", v0, c1, 0)
-			success("t2", v0, c2, 0)
+			success("t1", v0, c1AllAncestorsProcessed, 0)
+			success("t2", v0, c2ArcTypeKnown, 0)
 		},
 		log: `
 		    running task t1
@@ -225,7 +250,7 @@ func TestScheduler(t *testing.T) {
 		name: "node failing task",
 		init: func() {
 			v0 := node(nil)
-			fail("t1", v0, c1, 0)
+			fail("t1", v0, c1AllAncestorsProcessed, 0)
 		},
 		log: `
 		    running task t1: FAIL`,
@@ -241,10 +266,10 @@ func TestScheduler(t *testing.T) {
 		name: "dependency chain on nodes within scheduler",
 		init: func() {
 			v0 := node(nil)
-			success("third", v0, c3, c2)
-			success("fourth", v0, c4, c3)
-			success("second", v0, c2, c1)
-			success("first", v0, c1, 0)
+			success("third", v0, c3ValueKnown, c2ArcTypeKnown)
+			success("fourth", v0, c4ScalarKnown, c3ValueKnown)
+			success("second", v0, c2ArcTypeKnown, c1AllAncestorsProcessed)
+			success("first", v0, c1AllAncestorsProcessed, 0)
 		},
 		log: `
 		    running task first
@@ -265,7 +290,7 @@ func TestScheduler(t *testing.T) {
 		name: "task depends on state for which there is no task",
 		init: func() {
 			v0 := node(nil)
-			success("t1", v0, c2, c1)
+			success("t1", v0, c2ArcTypeKnown, c1AllAncestorsProcessed)
 		},
 		log: `
 		    running task t1`,
@@ -279,7 +304,7 @@ func TestScheduler(t *testing.T) {
 			v0 := node(nil)
 			v1 := node(v0)
 			v2 := node(v0)
-			success("t1", v1, c1, 0, dep{node: v2, needs: c2})
+			success("t1", v1, c1AllAncestorsProcessed, 0, dep{node: v2, needs: c2ArcTypeKnown})
 		},
 		log: `
 		    running task t1`,
@@ -292,10 +317,10 @@ func TestScheduler(t *testing.T) {
 		name: "tasks depend on multiple other tasks within same scheduler",
 		init: func() {
 			v0 := node(nil)
-			success("before1", v0, c2, 0)
-			success("last", v0, c4, c1|c2|c3)
-			success("block", v0, c3, c1|c2)
-			success("before2", v0, c1, 0)
+			success("before1", v0, c2ArcTypeKnown, 0)
+			success("last", v0, c4ScalarKnown, c1AllAncestorsProcessed|c2ArcTypeKnown|c3ValueKnown)
+			success("block", v0, c3ValueKnown, c1AllAncestorsProcessed|c2ArcTypeKnown)
+			success("before2", v0, c1AllAncestorsProcessed, 0)
 		},
 		log: `
 		    running task before1
@@ -325,11 +350,11 @@ func TestScheduler(t *testing.T) {
 		init: func() {
 			v0 := node(nil)
 			baz := node(v0)
-			success("t0", baz, c1, 0)
+			success("t0", baz, c1AllAncestorsProcessed, 0)
 			foo := node(v0)
 
-			completes("t1:bar", v0, foo, c2, dep{node: baz, needs: c1})
-			success("t2:baz", v0, c1, 0, dep{node: foo, needs: c2})
+			completes("t1:bar", v0, foo, c2ArcTypeKnown, dep{node: baz, needs: c1AllAncestorsProcessed})
+			success("t2:baz", v0, c1AllAncestorsProcessed, 0, dep{node: foo, needs: c2ArcTypeKnown})
 		},
 		log: `
 		    running task t1:bar
@@ -355,11 +380,11 @@ func TestScheduler(t *testing.T) {
 		init: func() {
 			v0 := node(nil)
 			baz := node(v0)
-			success("foo", baz, c1, 0)
+			success("foo", baz, c1AllAncestorsProcessed, 0)
 			foo := node(v0)
 
-			success("t2:baz", v0, c1, 0, dep{node: foo, needs: c2})
-			completes("t1:bar", v0, foo, c2, dep{node: baz, needs: c1})
+			success("t2:baz", v0, c1AllAncestorsProcessed, 0, dep{node: foo, needs: c2ArcTypeKnown})
+			completes("t1:bar", v0, foo, c2ArcTypeKnown, dep{node: baz, needs: c1AllAncestorsProcessed})
 		},
 		log: `
 		    running task t2:baz
@@ -380,8 +405,8 @@ func TestScheduler(t *testing.T) {
 			v0 := node(nil)
 			v1 := node(v0)
 			v2 := node(v0)
-			success("a-10", v1, c1|c2, 0, dep{node: v2, needs: c1})
-			success("b+10", v2, c1|c2, 0, dep{node: v1, needs: c1})
+			success("a-10", v1, c1AllAncestorsProcessed|c2ArcTypeKnown, 0, dep{node: v2, needs: c1AllAncestorsProcessed})
+			success("b+10", v2, c1AllAncestorsProcessed|c2ArcTypeKnown, 0, dep{node: v1, needs: c1AllAncestorsProcessed})
 		},
 		log: `
 		    running task a-10
@@ -405,8 +430,8 @@ func TestScheduler(t *testing.T) {
 			v0 := node(nil)
 			v1 := node(v0)
 			v2 := node(v0)
-			success("a-10", v1, c1|c2, 0, dep{node: v2, needs: c1})
-			success("b+10", v2, c1|c2, 0, dep{node: v1, needs: c1})
+			success("a-10", v1, c1AllAncestorsProcessed|c2ArcTypeKnown, 0, dep{node: v2, needs: c1AllAncestorsProcessed})
+			success("b+10", v2, c1AllAncestorsProcessed|c2ArcTypeKnown, 0, dep{node: v1, needs: c1AllAncestorsProcessed})
 
 			// NOTE: using success("5", v2, c1, 0) here would cause the cyclic
 			// references to block, as they would both provide and depend on
@@ -414,7 +439,7 @@ func TestScheduler(t *testing.T) {
 			// it can safely be signaled as unification cannot make it more
 			// concrete. Further unification could result in an error, but that
 			// will be caught by completing the unification.
-			signal("5", v2, c1)
+			signal("5", v2, c1AllAncestorsProcessed)
 		},
 		log: `
 		    running task a-10
@@ -449,8 +474,8 @@ func TestScheduler(t *testing.T) {
 		init: func() {
 			x := node(nil)
 			foo := node(x)
-			success("5", foo, c1, 0)
-			success("comprehension", x, c1, 0, dep{node: x, needs: c1})
+			success("5", foo, c1AllAncestorsProcessed, 0)
+			success("comprehension", x, c1AllAncestorsProcessed, 0, dep{node: x, needs: c1AllAncestorsProcessed})
 		},
 		log: `
 		    running task comprehension
@@ -479,8 +504,8 @@ func TestScheduler(t *testing.T) {
 		init: func() {
 			x := node(nil)
 			foo := node(x)
-			success("5", foo, c1, 0)
-			success("comprehension", x, c1, 0, dep{node: x, needs: c1})
+			success("5", foo, c1AllAncestorsProcessed, 0)
+			success("comprehension", x, c1AllAncestorsProcessed, 0, dep{node: x, needs: c1AllAncestorsProcessed})
 		},
 		log: `
 		    running task comprehension
@@ -512,8 +537,8 @@ func TestScheduler(t *testing.T) {
 			x := node(v0)
 			y := node(v0)
 
-			success("comprehension", x, c1, 0, dep{node: y, needs: c1})
-			success("comprehension", y, c1, 0, dep{node: x, needs: c1})
+			success("comprehension", x, c1AllAncestorsProcessed, 0, dep{node: y, needs: c1AllAncestorsProcessed})
+			success("comprehension", y, c1AllAncestorsProcessed, 0, dep{node: x, needs: c1AllAncestorsProcessed})
 
 		},
 		log: `
@@ -552,10 +577,10 @@ func TestScheduler(t *testing.T) {
 			x := node(v0)
 			y := node(v0)
 			foo := node(y)
-			success("5", foo, c1, 0)
+			success("5", foo, c1AllAncestorsProcessed, 0)
 
-			success("comprehension", x, c1, 0, dep{node: y, needs: c1})
-			success("comprehension", y, c1, 0, dep{node: x, needs: c1})
+			success("comprehension", x, c1AllAncestorsProcessed, 0, dep{node: y, needs: c1AllAncestorsProcessed})
+			success("comprehension", y, c1AllAncestorsProcessed, 0, dep{node: x, needs: c1AllAncestorsProcessed})
 
 		},
 		log: `
@@ -587,11 +612,11 @@ func TestScheduler(t *testing.T) {
 		// Create and run root scheduler.
 		tc.init()
 		for _, n := range nodes {
-			n.provided |= auto
+			n.provided |= autoFieldConjunctsKnown
 			n.signalDoneAdding()
 		}
 		for _, n := range nodes {
-			n.finalize(auto)
+			n.finalize(autoFieldConjunctsKnown)
 		}
 
 		t.Equal(w.String(), tc.log)

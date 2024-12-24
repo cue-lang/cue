@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9874368_c7c219f7",
+        "filename": "internal/core/adt/sched_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-24T11:32:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b40bb46c_e49e4a06",
+      "range": {
+        "startLine": 26,
+        "startChar": 16,
+        "endLine": 26,
+        "endChar": 20
+      },
+      "revId": "09f4187348fd0d683e0180267fccbff59febf885",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f45ab6d4_a300f215",
@@ -47,6 +71,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b12f3b8a_eb0a842d",
+        "filename": "internal/core/adt/sched_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-24T11:32:48Z",
+      "side": 1,
+      "message": "how-\u003eshow",
+      "parentUuid": "f45ab6d4_a300f215",
+      "range": {
+        "startLine": 28,
+        "startChar": 3,
+        "endLine": 28,
+        "endChar": 6
+      },
+      "revId": "09f4187348fd0d683e0180267fccbff59febf885",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "166167a8_4cb14160",
@@ -60,6 +108,30 @@
       "writtenOn": "2024-12-24T10:45:42Z",
       "side": 1,
       "message": "ensure",
+      "range": {
+        "startLine": 32,
+        "startChar": 25,
+        "endLine": 32,
+        "endChar": 32
+      },
+      "revId": "09f4187348fd0d683e0180267fccbff59febf885",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42c6ce42_2f00fe92",
+        "filename": "internal/core/adt/sched_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-24T11:32:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "166167a8_4cb14160",
       "range": {
         "startLine": 32,
         "startChar": 25,

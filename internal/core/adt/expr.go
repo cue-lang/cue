@@ -1577,7 +1577,7 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 			state = combineMode(cond, runMode).withVertexStatus(state.vertexStatus())
 			expr = c.evalState(a, state)
 		} else {
-			cond |= fieldSetKnown | allAncestorsProcessed | concreteKnown
+			cond |= fieldSetKnown | concreteKnown
 			// Be sure to process disjunctions at the very least when
 			// finalizing. Requiring disjunctions earlier may lead to too eager
 			// evaluation.
@@ -2024,7 +2024,7 @@ func (x *ForClause) Source() ast.Node {
 }
 
 func (c *OpContext) forSource(x Expr) *Vertex {
-	state := require(conjuncts, needFieldSetKnown)
+	state := attempt(conjuncts, needFieldSetKnown)
 
 	// TODO: always get the vertex. This allows a whole bunch of trickery
 	// down the line.

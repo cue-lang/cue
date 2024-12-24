@@ -310,23 +310,19 @@ issue2367: {
 }
 
 -- out/evalalpha/stats --
-Leaks:  778
+Leaks:  782
 Freed:  63
 Reused: 63
-Allocs: 778
+Allocs: 782
 Retain: 0
 
-Unifications: 498
-Conjuncts:    2977
+Unifications: 502
+Conjuncts:    3031
 Disjuncts:    196
 -- out/evalalpha --
 Errors:
 selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
     ./in.cue:117:14
-siblingInsertion.t2.p1.deployment: adding field logging not allowed as field set was already referenced:
-    ./in.cue:277:21
-siblingInsertion.t2.p2.deployment: adding field logging not allowed as field set was already referenced:
-    ./in.cue:292:21
 
 Result:
 (_|_){
@@ -651,8 +647,7 @@ Result:
       }
     }
   }
-  siblingInsertion: (_|_){
-    // [eval]
+  siblingInsertion: (struct){
     t1: (struct){
       p1: (struct){
         D: (struct){
@@ -685,28 +680,35 @@ Result:
         }
       }
     }
-    t2: (_|_){
-      // [eval]
-      p1: (_|_){
-        // [eval] siblingInsertion.t2.p1.deployment: adding field logging not allowed as field set was already referenced:
-        //     ./in.cue:277:21
+    t2: (struct){
+      p1: (struct){
         D: (struct){
           logging: (_){ _ }
         }
-        deployment: (_|_){
-          // [eval] siblingInsertion.t2.p1.deployment: adding field logging not allowed as field set was already referenced:
-          //     ./in.cue:277:21
+        deployment: (struct){
+          logging: (struct){
+            env2: (struct){
+              ENV: (string){ "True" }
+            }
+            env: (struct){
+              ENV: (string){ "True" }
+            }
+          }
         }
       }
-      p2: (_|_){
-        // [eval] siblingInsertion.t2.p2.deployment: adding field logging not allowed as field set was already referenced:
-        //     ./in.cue:292:21
+      p2: (struct){
         D: (struct){
           logging: (_){ _ }
         }
-        deployment: (_|_){
-          // [eval] siblingInsertion.t2.p2.deployment: adding field logging not allowed as field set was already referenced:
-          //     ./in.cue:292:21
+        deployment: (struct){
+          logging: (struct){
+            env2: (struct){
+              ENV: (string){ "True" }
+            }
+            env: (struct){
+              ENV: (string){ "True" }
+            }
+          }
         }
       }
     }
@@ -719,19 +721,15 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,5 +1,10 @@
+@@ -1,5 +1,6 @@
  Errors:
 -selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle
 +selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
 +    ./in.cue:117:14
-+siblingInsertion.t2.p1.deployment: adding field logging not allowed as field set was already referenced:
-+    ./in.cue:277:21
-+siblingInsertion.t2.p2.deployment: adding field logging not allowed as field set was already referenced:
-+    ./in.cue:292:21
  
  Result:
  (_|_){
-@@ -19,7 +24,9 @@
+@@ -19,7 +20,9 @@
    B: (struct){
      a: (struct){
        parent: (string){ "" }
@@ -742,7 +740,7 @@ diff old new
        }
      }
    }
-@@ -52,17 +59,12 @@
+@@ -52,17 +55,12 @@
        }
      }
      _e: (#struct){
@@ -766,7 +764,7 @@ diff old new
        }
      }
      e: (#struct){
-@@ -76,12 +78,7 @@
+@@ -76,12 +74,7 @@
        }
        f2: (#struct){
          a: (#struct){
@@ -780,7 +778,7 @@ diff old new
          }
        }
      }
-@@ -127,9 +124,9 @@
+@@ -127,9 +120,9 @@
      insertionError: (_|_){
        // [eval]
        A: (_|_){
@@ -792,7 +790,7 @@ diff old new
        }
      }
      acrossOr: (struct){
-@@ -254,27 +251,31 @@
+@@ -254,27 +247,31 @@
    issue1881: (struct){
      p1: (struct){
        o: (#struct){
@@ -845,7 +843,7 @@ diff old new
          }) }
      }
      p2: (struct){
-@@ -290,7 +291,7 @@
+@@ -290,7 +287,7 @@
          }
        }
        o: (#struct){
@@ -854,90 +852,15 @@ diff old new
            output: (#struct){
              reject: (string){ "ok" }
            }
-@@ -320,15 +321,16 @@
+@@ -320,7 +317,7 @@
            resource: (string){ string }
          }) }
        o: (#struct){
 -        retry: (#struct){
--          output: (#struct){
--            reject: (string){ "ok" }
--          }
--        }
--      }
--    }
--  }
--  siblingInsertion: (struct){
 +        retry: (struct){
-+          output: (#struct){
-+            reject: (string){ "ok" }
-+          }
-+        }
-+      }
-+    }
-+  }
-+  siblingInsertion: (_|_){
-+    // [eval]
-     t1: (struct){
-       p1: (struct){
-         D: (struct){
-@@ -361,35 +363,28 @@
-         }
-       }
-     }
--    t2: (struct){
--      p1: (struct){
--        D: (struct){
--          logging: (_){ _ }
--        }
--        deployment: (struct){
--          logging: (struct){
--            env2: (struct){
--              ENV: (string){ "True" }
--            }
--            env: (struct){
--              ENV: (string){ "True" }
--            }
--          }
--        }
--      }
--      p2: (struct){
--        D: (struct){
--          logging: (_){ _ }
--        }
--        deployment: (struct){
--          logging: (struct){
--            env2: (struct){
--              ENV: (string){ "True" }
--            }
--            env: (struct){
--              ENV: (string){ "True" }
--            }
--          }
-+    t2: (_|_){
-+      // [eval]
-+      p1: (_|_){
-+        // [eval] siblingInsertion.t2.p1.deployment: adding field logging not allowed as field set was already referenced:
-+        //     ./in.cue:277:21
-+        D: (struct){
-+          logging: (_){ _ }
-+        }
-+        deployment: (_|_){
-+          // [eval] siblingInsertion.t2.p1.deployment: adding field logging not allowed as field set was already referenced:
-+          //     ./in.cue:277:21
-+        }
-+      }
-+      p2: (_|_){
-+        // [eval] siblingInsertion.t2.p2.deployment: adding field logging not allowed as field set was already referenced:
-+        //     ./in.cue:292:21
-+        D: (struct){
-+          logging: (_){ _ }
-+        }
-+        deployment: (_|_){
-+          // [eval] siblingInsertion.t2.p2.deployment: adding field logging not allowed as field set was already referenced:
-+          //     ./in.cue:292:21
-         }
-       }
-     }
+           output: (#struct){
+             reject: (string){ "ok" }
+           }
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -948,17 +871,17 @@ diff old new
 -Reused: 1260
 -Allocs: 60
 -Retain: 145
-+Leaks:  778
++Leaks:  782
 +Freed:  63
 +Reused: 63
-+Allocs: 778
++Allocs: 782
 +Retain: 0
  
 -Unifications: 832
 -Conjuncts:    2525
 -Disjuncts:    1404
-+Unifications: 498
-+Conjuncts:    2977
++Unifications: 502
++Conjuncts:    3031
 +Disjuncts:    196
 -- out/eval/stats --
 Leaks:  50
@@ -972,8 +895,6 @@ Conjuncts:    2525
 Disjuncts:    1404
 -- diff/explanation --
 B.a.children: now correctly marked as incomplete
--- diff/todo/p0 --
-siblingInsertion.t2: errors
 -- diff/todo/p2 --
 issue1881.#AllOutputs.retry: additional entry.
 Might be error in practice and okay.

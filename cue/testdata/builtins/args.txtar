@@ -1,0 +1,117 @@
+-- in.cue --
+import (
+	"math"
+	"strings"
+)
+
+issue3584: reduced: t1: {
+	ref: out
+	trigger: *1 | 2
+	out: strings.SliceRunes("ABC", 0, trigger)
+}
+
+issue3584: reduced: t2: {
+	x: math.Abs(y)
+	y: *6 | 5
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  14
+Reused: 5
+Allocs: 9
+Retain: 1
+
+Unifications: 10
+Conjuncts:    17
+Disjuncts:    15
+-- out/evalalpha --
+(struct){
+  issue3584: (struct){
+    reduced: (struct){
+      t1: (struct){
+        ref: (_|_){
+          // [incomplete] issue3584.reduced.t1.out: error in call to strings.SliceRunes: non-concrete value _:
+          //     ./in.cue:9:7
+        }
+        trigger: (int){ |(*(int){ 1 }, (int){ 2 }) }
+        out: (_|_){
+          // [incomplete] issue3584.reduced.t1.out: error in call to strings.SliceRunes: non-concrete value _:
+          //     ./in.cue:9:7
+        }
+      }
+      t2: (struct){
+        x: (_|_){
+          // [incomplete] issue3584.reduced.t2.x: error in call to math.Abs: non-concrete value _:
+          //     ./in.cue:13:5
+        }
+        y: (int){ |(*(int){ 6 }, (int){ 5 }) }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -2,12 +2,21 @@
+   issue3584: (struct){
+     reduced: (struct){
+       t1: (struct){
+-        ref: (string){ "A" }
++        ref: (_|_){
++          // [incomplete] issue3584.reduced.t1.out: error in call to strings.SliceRunes: non-concrete value _:
++          //     ./in.cue:9:7
++        }
+         trigger: (int){ |(*(int){ 1 }, (int){ 2 }) }
+-        out: (string){ "A" }
++        out: (_|_){
++          // [incomplete] issue3584.reduced.t1.out: error in call to strings.SliceRunes: non-concrete value _:
++          //     ./in.cue:9:7
++        }
+       }
+       t2: (struct){
+-        x: (int){ 6 }
++        x: (_|_){
++          // [incomplete] issue3584.reduced.t2.x: error in call to math.Abs: non-concrete value _:
++          //     ./in.cue:13:5
++        }
+         y: (int){ |(*(int){ 6 }, (int){ 5 }) }
+       }
+     }
+-- out/eval --
+(struct){
+  issue3584: (struct){
+    reduced: (struct){
+      t1: (struct){
+        ref: (string){ "A" }
+        trigger: (int){ |(*(int){ 1 }, (int){ 2 }) }
+        out: (string){ "A" }
+      }
+      t2: (struct){
+        x: (int){ 6 }
+        y: (int){ |(*(int){ 6 }, (int){ 5 }) }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  issue3584: {
+    reduced: {
+      t1: {
+        ref: 〈0;out〉
+        trigger: (*1|2)
+        out: 〈import;strings〉.SliceRunes("ABC", 0, 〈0;trigger〉)
+      }
+    }
+  }
+  issue3584: {
+    reduced: {
+      t2: {
+        x: 〈import;math〉.Abs(〈0;y〉)
+        y: (*6|5)
+      }
+    }
+  }
+}

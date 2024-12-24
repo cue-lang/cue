@@ -259,11 +259,16 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 	}
 	ip := module.ParseImportPath(pkg.path)
 	pkgQual := ip.Qualifier
-	if pkgQual == "" {
-		pkg.err = fmt.Errorf("cannot determine package name from import path %q", pkg.path)
+	switch pkgQual {
+	case "":
+		// If we are tidying a module which imports "foo.com/bar-baz@v0",
+		// a qualifier is needed as no valid package name can be derived from the path.
+		// Don't fail here, however, as tidy can simply ensure that bar-baz is a dependency,
+		// much like how `cue mod get foo.com/bar-baz` works just fine to add a module.
+		// Any command which later attempts to actually import bar-baz without a qualifier
+		// will result in a helpful error which the user can resolve at that point.
 		return
-	}
-	if pkgQual == "_" {
+	case "_":
 		pkg.err = fmt.Errorf("_ is not a valid import path qualifier in %q", pkg.path)
 		return
 	}

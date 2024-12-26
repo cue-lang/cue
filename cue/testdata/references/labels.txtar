@@ -92,16 +92,150 @@ underscore: e: {
 //  }
 // }
 // c2: c1 & { x: _ }
--- out/eval/stats --
-Leaks:  0
-Freed:  58
-Reused: 52
-Allocs: 6
-Retain: 3
 
-Unifications: 56
-Conjuncts:    103
-Disjuncts:    61
+invalidPattern: {
+	[=~"BAD)" & =~"x"]: string
+	y: 123
+}
+-- out/eval/stats --
+Leaks:  1
+Freed:  61
+Reused: 56
+Allocs: 6
+Retain: 4
+
+Unifications: 60
+Conjuncts:    109
+Disjuncts:    65
+-- out/evalalpha --
+Errors:
+invalidPattern: invalid regexp: error parsing regexp: unexpected ): `BAD)`:
+    ./in.cue:96:22
+
+Result:
+(_|_){
+  // [eval]
+  a: (struct){
+    bar: (string){ "bar" }
+  }
+  b: (struct){
+    bar: (string){ "bar" }
+  }
+  c: (struct){
+    bar: (string){ "bar" }
+  }
+  d: (struct){
+    bar: (struct){
+      name: (string){ "bar" }
+    }
+  }
+  e: (struct){
+    foo: (struct){
+      bar: (string){ "foobar" }
+    }
+  }
+  patternField: (struct){
+    t1: (struct){
+      a: (struct){
+        r: (int){ 0 }
+        b: (null){ null }
+      }
+    }
+    t2: (struct){
+      a: (struct){
+        r: (int){ 0 }
+        z: (int){ 1 }
+        b: (int){ 1 }
+      }
+    }
+  }
+  bar: (int){ 3 }
+  f1: (struct){
+    foo3: (struct){
+      name: (string){ "xx" }
+      foo: (string){ "xx" }
+      foo3baz: (struct){
+        name: (string){ "xx" }
+        a: (string){ "xx" }
+        b: (string){ "xx" }
+      }
+    }
+  }
+  c1: (struct){
+    foo3: (struct){
+      x: (struct){
+        name: (string){ "x" }
+        foo: (string){ "x" }
+      }
+    }
+  }
+  emptyLabel: (struct){
+    "": (int){ 1 }
+    a: (int){ 1 }
+  }
+  underscore: (struct){
+    a: (struct){
+      foo: (#struct){
+        "_": (string){ "bar" }
+      }
+      #Foo: (#struct){
+      }
+    }
+    c: (struct){
+      foo: (struct){
+        "_": (string){ "any" }
+      }
+    }
+    d: (struct){
+      bar: (#struct){
+        "_": (string){ "any" }
+      }
+      #bar: (#struct){
+      }
+    }
+    e: (struct){
+      baz: (#struct){
+        "_h": (string){ "any" }
+      }
+      #baz: (#struct){
+      }
+    }
+  }
+  invalidPattern: (_|_){
+    // [eval] invalidPattern: invalid regexp: error parsing regexp: unexpected ): `BAD)`:
+    //     ./in.cue:96:22
+    y: (int){ 123 }
+  }
+}
+-- diff/explanation --
+The new evaluator correctly points out that the pattern matching regular expression has invalid syntax.
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,4 +1,10 @@
+-(struct){
++Errors:
++invalidPattern: invalid regexp: error parsing regexp: unexpected ): `BAD)`:
++    ./in.cue:96:22
++
++Result:
++(_|_){
++  // [eval]
+   a: (struct){
+     bar: (string){ "bar" }
+   }
+@@ -85,7 +91,9 @@
+       }
+     }
+   }
+-  invalidPattern: (struct){
++  invalidPattern: (_|_){
++    // [eval] invalidPattern: invalid regexp: error parsing regexp: unexpected ): `BAD)`:
++    //     ./in.cue:96:22
+     y: (int){ 123 }
+   }
+ }
 -- out/eval --
 (struct){
   a: (struct){
@@ -189,6 +323,9 @@ Disjuncts:    61
       #baz: (#struct){
       }
     }
+  }
+  invalidPattern: (struct){
+    y: (int){ 123 }
   }
 }
 -- out/compile --
@@ -337,5 +474,9 @@ Disjuncts:    61
       }
       baz: 〈0;#baz〉
     }
+  }
+  invalidPattern: {
+    [(=~"BAD)" & =~"x")]: string
+    y: 123
   }
 }

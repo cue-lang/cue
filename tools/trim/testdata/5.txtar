@@ -1,0 +1,17 @@
+Compare and contrast with 3 and 30.
+
+The conjuncts in x and y are directly reachable (i.e. without going
+via z) from the evaluation result. So they can't be removed. Because x
+survives, we also keep all uses of x. So z: x cannot be removed.
+
+-- a.cue --
+x: string
+y: "hi"
+z: x
+z: y
+-- out/trim --
+== a.cue
+x: string
+y: "hi"
+z: x
+z: y

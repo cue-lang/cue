@@ -1,0 +1,6 @@
+Make sure we keep patterns for lists too.
+-- a.cue --
+x: [...string]
+-- out/trim --
+== a.cue
+x: [...string]

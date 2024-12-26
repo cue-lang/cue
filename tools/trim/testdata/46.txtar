@@ -1,0 +1,35 @@
+Related to 43. The changes from 43 are the switch from an embedded
+disjunction, and the fact that the disjunction is open. This means
+that the disjunction is not simplified to a single branch, unlike 43.
+
+See also 52.
+
+-- a.cue --
+DefA: A: "a"
+DefB: B: "b"
+
+First: {
+	B: "b"
+	C: "c"
+}
+
+First: {
+	B: "b"
+}
+
+First: DefA | DefB
+-- out/trim --
+== a.cue
+DefA: A: "a"
+DefB: B: "b"
+
+First: {
+	B: "b"
+	C: "c"
+}
+
+First: {
+	B: "b"
+}
+
+First: DefA | DefB

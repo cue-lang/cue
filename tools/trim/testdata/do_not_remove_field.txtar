@@ -1,6 +1,36 @@
+Because of the embedding, trimV3 does not simplify this. If line 1 was
+rewritten without the embedding, then the simplification can
+occur. See do_not_remove_field_2 for that.
+
 -- in.cue --
 {[_]: x: "hello"}
 a: x: "hello"
+-- out/trim-v3 --
+== in.cue
+{[_]: x: "hello"}
+a: x: "hello"
+-- diff/-out/trim-v3<==>+out/trim --
+diff old new
+--- old
++++ new
+@@ -1,3 +1,3 @@
+ == in.cue
+ {[_]: x: "hello"}
+-a: {}
++a: x: "hello"
+-- out/trim-v3-noshare --
+== in.cue
+{[_]: x: "hello"}
+a: x: "hello"
+-- diff/-out/trim-v3-noshare<==>+out/trim --
+diff old new
+--- old
++++ new
+@@ -1,3 +1,3 @@
+ == in.cue
+ {[_]: x: "hello"}
+-a: {}
++a: x: "hello"
 -- out/trim --
 == in.cue
 {[_]: x: "hello"}

@@ -1,0 +1,52 @@
+issue 1309
+
+NB: because of #NamespacedResource: #ClusterResource, it seems like it
+would be possible to remove line 4. But we can't because that would
+make line 5 an error - the use of the X_Platform field. So I think
+this is the best we can do.
+
+#skip-v2
+-- a.cue --
+#ClusterResource: X_Platform: string
+#NamespacedResource: {
+	#ClusterResource
+	X_Platform: string
+	metadata: namespace: X_Platform
+}
+
+Resources: [Platform=string]: {
+	#NamespacedResource
+	X_Platform: Platform
+}
+
+Resources: myplatform: {}
+-- out/trim-v3 --
+== a.cue
+#ClusterResource: X_Platform: string
+#NamespacedResource: {
+	#ClusterResource
+	X_Platform: string
+	metadata: namespace: X_Platform
+}
+
+Resources: [Platform=string]: {
+	#NamespacedResource
+	X_Platform: Platform
+}
+
+Resources: myplatform: {}
+-- out/trim-v3-noshare --
+== a.cue
+#ClusterResource: X_Platform: string
+#NamespacedResource: {
+	#ClusterResource
+	X_Platform: string
+	metadata: namespace: X_Platform
+}
+
+Resources: [Platform=string]: {
+	#NamespacedResource
+	X_Platform: Platform
+}
+
+Resources: myplatform: {}

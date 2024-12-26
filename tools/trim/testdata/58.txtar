@@ -1,0 +1,12 @@
+Make sure we don't remove fields due to patterns, even when the
+patterns are references.
+
+-- a.cue --
+x: [string]: y
+y: z: 6
+x: a: z: int
+-- out/trim --
+== a.cue
+x: [string]: y
+y: z:        6
+x: a: {}

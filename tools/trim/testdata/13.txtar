@@ -1,0 +1,30 @@
+A variant of 12, to ensure the ellipsis does not prevent
+simplification of the struct to top.
+
+-- a.cue --
+x: {a: bool, b: string, ...} & {a: true, b: "hi"}
+-- out/trim-v3 --
+== a.cue
+x: _ & {a: true, b: "hi"}
+-- diff/-out/trim-v3<==>+out/trim --
+diff old new
+--- old
++++ new
+@@ -1,2 +1,2 @@
+ == a.cue
+-x: {a: bool, b: string, ...} & {a: true, b: "hi"}
++x: _ & {a: true, b: "hi"}
+-- out/trim-v3-noshare --
+== a.cue
+x: _ & {a: true, b: "hi"}
+-- diff/-out/trim-v3-noshare<==>+out/trim --
+diff old new
+--- old
++++ new
+@@ -1,2 +1,2 @@
+ == a.cue
+-x: {a: bool, b: string, ...} & {a: true, b: "hi"}
++x: _ & {a: true, b: "hi"}
+-- out/trim --
+== a.cue
+x: {a: bool, b: string, ...} & {a: true, b: "hi"}

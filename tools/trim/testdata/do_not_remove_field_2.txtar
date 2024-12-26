@@ -1,0 +1,8 @@
+A variant of do_not_remove_field, but with line 1 not embedded.
+-- in.cue --
+[_]: x: "hello"
+a: x: "hello"
+-- out/trim --
+== in.cue
+[_]: x: "hello"
+a: {}

@@ -1,0 +1,21 @@
+Variant of 26, but the point here is to show that when there's a tie
+between a conjunct a pattern and one from outside a pattern, the
+pattern will always win.
+
+This is because we simplify patterns in isolation. So regardless of
+the order in which we do the processing, we know that the pattern is
+reachable from the result root, and it must not be made more general,
+so the z: 5 from line 3 must survive. When we eventually visit b's z:
+5, we find the z: 5 conjuncts from both line 1 and line 3, but we know
+(either already or later on) that line 3 must survive, so line 1's is
+redundant.
+
+-- a.cue --
+b: w: x: y: z: 5
+b: a
+a: [string]: x: y: z: 5
+-- out/trim --
+== a.cue
+b: w: {}
+b: a
+a: [string]: x: y: z: 5

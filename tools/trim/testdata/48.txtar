@@ -1,0 +1,40 @@
+Variant of 47 where the comprehension makes use of the value of the
+key-value pair.
+
+#skip-v2
+-- a.cue --
+d: port: 8080
+s: {
+	x: {
+		port: 8080
+	}
+	y: {
+		port: 8080
+	}
+}
+for k, v in s {
+	s: (k): d
+	s: (k): portCopy: v.port
+}
+-- out/trim-v3 --
+== a.cue
+d: port: 8080
+s: {
+	x: {}
+	y: {}
+}
+for k, v in s {
+	s: (k): d
+	s: (k): portCopy: v.port
+}
+-- out/trim-v3-noshare --
+== a.cue
+d: port: 8080
+s: {
+	x: {}
+	y: {}
+}
+for k, v in s {
+	s: (k): d
+	s: (k): portCopy: v.port
+}

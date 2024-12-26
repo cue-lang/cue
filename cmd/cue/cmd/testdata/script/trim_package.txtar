@@ -1,0 +1,63 @@
+exec cue mod init
+
+# -- evalv3 --
+env CUE_EXPERIMENT=evalv3=1
+exec cue trim -o - ./...
+cmp stdout expect-stdout-v3
+
+# -- evalv2 --
+env CUE_EXPERIMENT=evalv3=0
+exec cue trim -o - ./...
+cmp stdout expect-stdout-v2
+
+-- a.cue --
+package p
+
+x: y: int
+x: z: int
+-- b/b.cue --
+package p
+
+x: y: 7
+-- c/c.cue --
+package p
+
+x: z: 6
+-- expect-stdout-v3 --
+package p
+
+x: y: int
+x: z: int
+package p
+
+x: y: int
+x: z: int
+package p
+
+x: y: 7
+package p
+
+x: y: int
+x: z: int
+package p
+
+x: z: 6
+-- expect-stdout-v2 --
+package p
+
+x: y: int
+x: z: int
+package p
+
+x: y: int
+x: z: int
+package p
+
+x: y: 7
+package p
+
+x: y: int
+x: z: int
+package p
+
+x: z: 6

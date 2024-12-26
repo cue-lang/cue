@@ -12,16 +12,15 @@ keepPatternConstraintRoot: {
 	deployment: [string]: spec: []
 }
 
-// TODO(additional): add once implemented
-// keepAdditionalRoots: {
-//  if true {
-//   deployment: "name": {spec: [1]}
-//  }
-//
-// deployment: name: spec: [1]
-//
-// deployment: [string]: spec: [1]
-// }
+keepAdditionalRoots: {
+	if true {
+		deployment: "name": {spec: [1]}
+	}
+
+	deployment: name: spec: [1]
+
+	deployment: [string]: spec: [1]
+}
 
 keepPatternConstraintRootSolo: {
 	if true {
@@ -54,6 +53,236 @@ keepPatternConstraintRootDef: {
 
 	deployment: [string]: spec: []
 }
+-- out/trim-v3 --
+== in.cue
+keepPatternConstraintRoot: {
+	if true {
+		deployment: "name": {}
+	}
+
+	deployment: {}
+
+	deployment: [string]: spec: []
+}
+
+keepAdditionalRoots: {
+	if true {
+		deployment: "name": {}
+	}
+
+	deployment: {}
+
+	deployment: [string]: spec: [1]
+}
+
+keepPatternConstraintRootSolo: {
+	if true {
+		deployment: "name": {}
+	}
+
+	deployment: [string]: spec: [1]
+}
+
+keepPatternConstraintRootIndirect: {
+	if true {
+		deployment: "name": {spec: []}
+	}
+
+	deployment: name: spec: []
+
+	deployment: indirect
+
+	indirect: {{[string]: spec: []}}
+}
+
+keepPatternConstraintRootDef: {
+	if true {
+		deployment: "name": {}
+	}
+
+	#Deployment: spec: []
+
+	deployment: name: #Deployment
+
+	deployment: [string]: spec: []
+}
+-- diff/-out/trim-v3<==>+out/trim --
+diff old new
+--- old
++++ new
+@@ -1,8 +1,10 @@
+ == in.cue
+ keepPatternConstraintRoot: {
+ 	if true {
+-		deployment: "name": {spec: []}
+-	}
++		deployment: "name": {}
++	}
++
++	deployment: {}
+ 
+ 	deployment: [string]: spec: []
+ }
+@@ -9,8 +11,10 @@
+ 
+ keepAdditionalRoots: {
+ 	if true {
+-		deployment: "name": {spec: [1]}
+-	}
++		deployment: "name": {}
++	}
++
++	deployment: {}
+ 
+ 	deployment: [string]: spec: [1]
+ }
+@@ -17,7 +21,7 @@
+ 
+ keepPatternConstraintRootSolo: {
+ 	if true {
+-		deployment: "name": {spec: [1]}
++		deployment: "name": {}
+ 	}
+ 
+ 	deployment: [string]: spec: [1]
+@@ -28,6 +32,8 @@
+ 		deployment: "name": {spec: []}
+ 	}
+ 
++	deployment: name: spec: []
++
+ 	deployment: indirect
+ 
+ 	indirect: {{[string]: spec: []}}
+@@ -35,10 +41,12 @@
+ 
+ keepPatternConstraintRootDef: {
+ 	if true {
+-		deployment: "name": {spec: []}
++		deployment: "name": {}
+ 	}
+ 
+ 	#Deployment: spec: []
+ 
++	deployment: name: #Deployment
++
+ 	deployment: [string]: spec: []
+ }
+-- out/trim-v3-noshare --
+== in.cue
+keepPatternConstraintRoot: {
+	if true {
+		deployment: "name": {}
+	}
+
+	deployment: {}
+
+	deployment: [string]: spec: []
+}
+
+keepAdditionalRoots: {
+	if true {
+		deployment: "name": {}
+	}
+
+	deployment: {}
+
+	deployment: [string]: spec: [1]
+}
+
+keepPatternConstraintRootSolo: {
+	if true {
+		deployment: "name": {}
+	}
+
+	deployment: [string]: spec: [1]
+}
+
+keepPatternConstraintRootIndirect: {
+	if true {
+		deployment: "name": {spec: []}
+	}
+
+	deployment: name: spec: []
+
+	deployment: indirect
+
+	indirect: {{[string]: spec: []}}
+}
+
+keepPatternConstraintRootDef: {
+	if true {
+		deployment: "name": {}
+	}
+
+	#Deployment: spec: []
+
+	deployment: name: #Deployment
+
+	deployment: [string]: spec: []
+}
+-- diff/-out/trim-v3-noshare<==>+out/trim --
+diff old new
+--- old
++++ new
+@@ -1,8 +1,10 @@
+ == in.cue
+ keepPatternConstraintRoot: {
+ 	if true {
+-		deployment: "name": {spec: []}
+-	}
++		deployment: "name": {}
++	}
++
++	deployment: {}
+ 
+ 	deployment: [string]: spec: []
+ }
+@@ -9,8 +11,10 @@
+ 
+ keepAdditionalRoots: {
+ 	if true {
+-		deployment: "name": {spec: [1]}
+-	}
++		deployment: "name": {}
++	}
++
++	deployment: {}
+ 
+ 	deployment: [string]: spec: [1]
+ }
+@@ -17,7 +21,7 @@
+ 
+ keepPatternConstraintRootSolo: {
+ 	if true {
+-		deployment: "name": {spec: [1]}
++		deployment: "name": {}
+ 	}
+ 
+ 	deployment: [string]: spec: [1]
+@@ -28,6 +32,8 @@
+ 		deployment: "name": {spec: []}
+ 	}
+ 
++	deployment: name: spec: []
++
+ 	deployment: indirect
+ 
+ 	indirect: {{[string]: spec: []}}
+@@ -35,10 +41,12 @@
+ 
+ keepPatternConstraintRootDef: {
+ 	if true {
+-		deployment: "name": {spec: []}
++		deployment: "name": {}
+ 	}
+ 
+ 	#Deployment: spec: []
+ 
++	deployment: name: #Deployment
++
+ 	deployment: [string]: spec: []
+ }
 -- out/trim --
 == in.cue
 keepPatternConstraintRoot: {
@@ -64,16 +293,13 @@ keepPatternConstraintRoot: {
 	deployment: [string]: spec: []
 }
 
-// TODO(additional): add once implemented
-// keepAdditionalRoots: {
-//  if true {
-//   deployment: "name": {spec: [1]}
-//  }
-//
-// deployment: name: spec: [1]
-//
-// deployment: [string]: spec: [1]
-// }
+keepAdditionalRoots: {
+	if true {
+		deployment: "name": {spec: [1]}
+	}
+
+	deployment: [string]: spec: [1]
+}
 
 keepPatternConstraintRootSolo: {
 	if true {

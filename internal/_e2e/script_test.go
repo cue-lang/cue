@@ -50,8 +50,8 @@ func TestMain(m *testing.M) {
 		os.Setenv("CUE_CACHED_GOBIN", cachedGobin)
 	}
 
-	os.Exit(testscript.RunMain(m, map[string]func() int{
-		"cue": func() int {
+	testscript.Main(m, map[string]func(){
+		"cue": func() {
 			// Note that we could avoid this wrapper entirely by setting PATH,
 			// since TestMain sets up a single cue binary in a GOBIN directory,
 			// but that may change at any point, or we might just switch to "go tool cue".
@@ -61,14 +61,13 @@ func TestMain(m *testing.M) {
 			cmd.Stderr = os.Stderr
 			if err := cmd.Run(); err != nil {
 				if err, ok := err.(*exec.ExitError); ok {
-					return err.ExitCode()
+					os.Exit(err.ExitCode())
 				}
 				fmt.Fprintln(os.Stderr, err)
-				return 1
+				os.Exit(1)
 			}
-			return 0
 		},
-	}))
+	})
 }
 
 var (

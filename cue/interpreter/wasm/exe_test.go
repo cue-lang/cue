@@ -43,9 +43,9 @@ import (
 // We are using TestMain because we want to ensure Wasm is enabled and
 // works as expected with the command-line tool.
 func TestMain(m *testing.M) {
-	os.Exit(testscript.RunMain(m, map[string]func() int{
-		"cue": cmd.Main,
-	}))
+	testscript.Main(m, map[string]func(){
+		"cue": func() { os.Exit(cmd.Main()) },
+	})
 }
 
 // TestExe tests Wasm using the command-line tool.

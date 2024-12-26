@@ -26,6 +26,44 @@ service: a: {
 		extra: 3
 	}]
 }
+-- out/trim-v3 --
+== in.cue
+service: [ID=string]: {
+	ports: [...{
+		protocol: *"TCP" | "UDP"
+		extra:    3
+	}]
+}
+
+service: a: {
+	ports: [{
+		name: "a"
+		key:  "bar"
+	}]
+}
+
+service: a: {
+	ports: [{}]
+}
+
+service: a: {
+	ports: [{}]
+}
+-- diff/-out/trim-v3<==>+out/trim --
+diff old new
+--- old
++++ new
+@@ -14,9 +14,7 @@
+ }
+ 
+ service: a: {
+-	ports: [{
+-		key: "bar"
+-	}]
++	ports: [{}]
+ }
+ 
+ service: a: {
 -- out/trim --
 == in.cue
 service: [ID=string]: {

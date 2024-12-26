@@ -1,0 +1,10 @@
+TODO: This should get simplified in the same way as 3, but
+doesn't. Possible bug in evaluator.
+
+-- a.cue --
+string
+"hi"
+-- out/trim --
+== a.cue
+string
+"hi"

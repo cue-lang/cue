@@ -19,6 +19,8 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/core/runtime"
 )
 
 // Config configures trim options.
@@ -29,5 +31,10 @@ type Config struct {
 
 func Files(files []*ast.File, inst cue.InstanceOrValue, cfg *Config) error {
 	val := inst.Value()
-	return filesV2(files, val, cfg)
+	version, _ := (*runtime.Runtime)(val.Context()).Settings()
+	if version == internal.EvalV3 {
+		return filesV3(files, val, cfg)
+	} else {
+		return filesV2(files, val, cfg)
+	}
 }

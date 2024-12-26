@@ -1,0 +1,28 @@
+We can do simplifications due to comprehensions! The conjuncts from
+lines 3 and 6 tie with those from 9, but the conjuncts from line 9
+must win, because within line 9 there are no redundancies.
+
+#skip-v2
+-- a.cue --
+s: {
+	x: {
+		port: 8080
+	}
+	y: {
+		port: 8080
+	}
+}
+#d: port: 8080
+for k, v in s {
+	s: "\(k)": #d
+}
+-- out/trim-v3 --
+== a.cue
+s: {
+	x: _
+	y: _
+}
+#d: port: 8080
+for k, v in s {
+	s: "\(k)": #d
+}

@@ -12,39 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package trim removes fields that may be inferred from another mixed in value
-// that "dominates" it. For instance, a value that is merged in from a
-// definition is considered to dominate a value from a regular struct that
-// mixes in this definition. Values derived from constraints and comprehensions
-// can also dominate other fields.
-//
-// A value A is considered to be implied by a value B if A subsumes the default
-// value of B. For instance, if a definition defines a field `a: *1 | int` and
-// mixed in with a struct that defines a field `a: 1 | 2`, then the latter can
-// be removed because a definition field dominates a regular field and because
-// the latter subsumes the default value of the former.
-//
-// Examples:
-//
-//	light: [string]: {
-//		room:          string
-//		brightnessOff: *0.0 | >=0 & <=100.0
-//		brightnessOn:  *100.0 | >=0 & <=100.0
-//	}
-//
-//	light: ceiling50: {
-//		room:          "MasterBedroom"
-//		brightnessOff: 0.0    // this line
-//		brightnessOn:  100.0  // and this line will be removed
-//	}
-//
-// Results in:
-//
-//	// Unmodified: light: [string]: { ... }
-//
-//	light: ceiling50: {
-//		room: "MasterBedroom"
-//	}
 package trim
 
 import (

@@ -1,0 +1,6 @@
+Make sure we keep *all* of a pattern, not just its root.
+-- a.cue --
+x: [string]: a: b: c: d: _
+-- out/trim --
+== a.cue
+x: [string]: a: b: c: d: _

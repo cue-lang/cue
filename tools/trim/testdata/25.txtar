@@ -1,0 +1,32 @@
+Make sure we do not remove the outer `x: 5` (line 6), even though it
+is a tie with the inner `x: 5` (and the inner `x: 5` occurs earlier in
+the file (line 2) so it would win in a tie-break).
+
+What happens here is that we establish that line 1 requires (depends
+on) line 6. Even though within x we have a tie between line 2 and line
+6, we find that line 1 cannot be removed (because y only has 1 winner
+in line 4, and line 4 requires line 1), and so therefore line 6 is
+required, and so line 2 is redundant.
+
+Contrast with 57.
+
+#skip-v2
+-- a.cue --
+if x == 5 {
+	x: 5
+	x: int
+	y: "hi"
+}
+x: 5
+-- out/trim-v3 --
+== a.cue
+if x == 5 {
+	y: "hi"
+}
+x: 5
+-- out/trim-v3-noshare --
+== a.cue
+if x == 5 {
+	y: "hi"
+}
+x: 5

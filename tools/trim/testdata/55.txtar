@@ -1,0 +1,20 @@
+Variant of 54, where now the reference chain specialises b.c, instead
+of b.x.
+
+-- a.cue --
+d: c: 5
+a: d
+b: a
+b: {
+	x: int
+	c: x
+}
+-- out/trim --
+== a.cue
+d: c: 5
+a: d
+b: a
+b: {
+	x: int
+	c: x
+}

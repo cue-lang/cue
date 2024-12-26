@@ -1,0 +1,30 @@
+Explicit unification of structs can lead to simplification.
+Contrast with 4.
+
+-- a.cue --
+x: {a: bool, b: "hi"} & {a: true, b: string}
+-- out/trim-v3 --
+== a.cue
+x: {b: "hi"} & {a: true}
+-- diff/-out/trim-v3<==>+out/trim --
+diff old new
+--- old
++++ new
+@@ -1,2 +1,2 @@
+ == a.cue
+-x: {a: bool, b: "hi"} & {a: true, b: string}
++x: {b: "hi"} & {a: true}
+-- out/trim-v3-noshare --
+== a.cue
+x: {b: "hi"} & {a: true}
+-- diff/-out/trim-v3-noshare<==>+out/trim --
+diff old new
+--- old
++++ new
+@@ -1,2 +1,2 @@
+ == a.cue
+-x: {a: bool, b: "hi"} & {a: true, b: string}
++x: {b: "hi"} & {a: true}
+-- out/trim --
+== a.cue
+x: {a: bool, b: "hi"} & {a: true, b: string}

@@ -1,0 +1,56 @@
+Similar to 9, but with list instead of struct. Note the simplification
+of the pattern too.
+
+See also 60.
+
+-- a.cue --
+d: [
+	{name: "jack",    age: 5},
+	{name: "gill",    age: >4},
+	{name: "hilbert", age: int},
+]
+d: [...{name: string, age: 5, age: number}]
+-- out/trim-v3 --
+== a.cue
+d: [
+	{name: "jack"},
+	{name: "gill"},
+	{name: "hilbert"},
+]
+d: [...{name: string, age: 5}]
+-- diff/-out/trim-v3<==>+out/trim --
+diff old new
+--- old
++++ new
+@@ -4,4 +4,4 @@
+ 	{name: "gill"},
+ 	{name: "hilbert"},
+ ]
+-d: [...{name: string, age: 5, age: number}]
++d: [...{name: string, age: 5}]
+-- out/trim-v3-noshare --
+== a.cue
+d: [
+	{name: "jack"},
+	{name: "gill"},
+	{name: "hilbert"},
+]
+d: [...{name: string, age: 5}]
+-- diff/-out/trim-v3-noshare<==>+out/trim --
+diff old new
+--- old
++++ new
+@@ -4,4 +4,4 @@
+ 	{name: "gill"},
+ 	{name: "hilbert"},
+ ]
+-d: [...{name: string, age: 5, age: number}]
++d: [...{name: string, age: 5}]
+-- out/trim --
+== a.cue
+d: [
+	{name: "jack"},
+	{name: "gill"},
+	{name: "hilbert"},
+]
+d: [...{name: string, age: 5, age: number}]

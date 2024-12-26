@@ -1,0 +1,31 @@
+issue 1298
+
+See also 46, 52 and 56.
+
+-- a.cue --
+#DefA: A: "a"
+#DefB: B: "b"
+
+First: {
+	#DefA | #DefB
+	B: "b"
+	C: "c"
+}
+
+First: {
+	B: "b"
+}
+-- out/trim --
+== a.cue
+#DefA: A: "a"
+#DefB: B: "b"
+
+First: {
+	#DefA | #DefB
+	B: "b"
+	C: "c"
+}
+
+First: {
+	B: "b"
+}

@@ -20,6 +20,78 @@ group: {
 		comp: "\(k)": v
 	}
 }
+-- out/trim-v3 --
+== in.cue
+foo: [string]: {
+	t: [string]: {
+		x: >=0 & <=5
+	}
+}
+
+foo: multipath: {
+	t: [string]: {
+		// Combined with the other constraints, we know the value must be 5 and
+		// thus the entry below can be eliminated.
+		x: >=5 & <=8 & int
+	}
+
+	t: u: {x: 5}
+}
+
+group: {
+	for k, v in foo {
+		comp: "\(k)": v
+	}
+}
+-- diff/-out/trim-v3<==>+out/trim --
+diff old new
+--- old
++++ new
+@@ -12,7 +12,7 @@
+ 		x: >=5 & <=8 & int
+ 	}
+ 
+-	t: u: {}
++	t: u: {x: 5}
+ }
+ 
+ group: {
+-- out/trim-v3-noshare --
+== in.cue
+foo: [string]: {
+	t: [string]: {
+		x: >=0 & <=5
+	}
+}
+
+foo: multipath: {
+	t: [string]: {
+		// Combined with the other constraints, we know the value must be 5 and
+		// thus the entry below can be eliminated.
+		x: >=5 & <=8 & int
+	}
+
+	t: u: {x: 5}
+}
+
+group: {
+	for k, v in foo {
+		comp: "\(k)": v
+	}
+}
+-- diff/-out/trim-v3-noshare<==>+out/trim --
+diff old new
+--- old
++++ new
+@@ -12,7 +12,7 @@
+ 		x: >=5 & <=8 & int
+ 	}
+ 
+-	t: u: {}
++	t: u: {x: 5}
+ }
+ 
+ group: {
 -- out/trim --
 == in.cue
 foo: [string]: {

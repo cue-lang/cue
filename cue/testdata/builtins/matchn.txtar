@@ -147,6 +147,25 @@ required: {
 	}
 }
 
+// A struct with extra fields should match whether or not inside a list.
+// evalv2 would get this wrong but evalv3 got it right.
+issue3575: {
+	test1: {
+		#x: matchN(1, [
+			[{}],
+		])
+		x: #x
+		x: [{a: 1}]
+	}
+	test2: {
+		#x: matchN(1, [
+			{},
+		])
+		x: #x
+		x: {a: 1}
+	}
+}
+
 -- incomplete.cue --
 import "math"
 
@@ -207,15 +226,15 @@ incomplete: {
 	}
 }
 -- out/eval/stats --
-Leaks:  14
-Freed:  699
-Reused: 692
-Allocs: 21
-Retain: 65
+Leaks:  16
+Freed:  721
+Reused: 714
+Allocs: 23
+Retain: 69
 
-Unifications: 697
-Conjuncts:    1167
-Disjuncts:    764
+Unifications: 721
+Conjuncts:    1202
+Disjuncts:    791
 -- out/eval --
 Errors:
 match.singleErr: invalid value {a:"foo"} (does not satisfy matchN): 0 matched, expected 1:
@@ -266,6 +285,11 @@ allOf.multiple1Err3: invalid value 5 (does not satisfy matchN): 1 matched, expec
     ./in.cue:106:20
     ./in.cue:106:27
     ./in.cue:110:17
+issue3575.test1.x: invalid value [{a:1}] (does not satisfy matchN): 0 matched, expected 1:
+    ./in.cue:153:7
+    ./in.cue:153:14
+    ./in.cue:156:6
+    ./in.cue:157:6
 incomplete.err1.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
     ./incomplete.cue:34:6
     ./incomplete.cue:34:13
@@ -517,6 +541,37 @@ Result:
     ok3: (struct){
       x: (struct){
         bar: (int){ 2 }
+      }
+    }
+  }
+  issue3575: (_|_){
+    // [eval]
+    test1: (_|_){
+      // [eval]
+      #x: (_){ matchN(1, (#list){
+          0: (_|_){// [
+            //   {},
+            // ]
+          }
+        }) }
+      x: (_|_){
+        // [eval] issue3575.test1.x: invalid value [{a:1}] (does not satisfy matchN): 0 matched, expected 1:
+        //     ./in.cue:153:7
+        //     ./in.cue:153:14
+        //     ./in.cue:156:6
+        //     ./in.cue:157:6
+        0: (struct){
+          a: (int){ 1 }
+        }
+      }
+    }
+    test2: (struct){
+      #x: (_){ matchN(1, (#list){
+          0: (_|_){// {}
+          }
+        }) }
+      x: (struct){
+        a: (int){ 1 }
       }
     }
   }
@@ -931,6 +986,30 @@ Result:
       }
     }
   }
+  issue3575: (struct){
+    test1: (struct){
+      #x: (_){ matchN(1, (#list){
+          0: (_|_){// &[[
+            //   {},
+            // ]]
+          }
+        }) }
+      x: (#list){
+        0: (#struct){
+          a: (int){ 1 }
+        }
+      }
+    }
+    test2: (struct){
+      #x: (_){ matchN(1, (#list){
+          0: (_|_){// &[{}]
+          }
+        }) }
+      x: (#struct){
+        a: (int){ 1 }
+      }
+    }
+  }
   incomplete: (_|_){
     // [eval]
     incomplete1: (struct){
@@ -1042,7 +1121,19 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -106,7 +106,7 @@
+@@ -47,11 +47,6 @@
+     ./in.cue:106:20
+     ./in.cue:106:27
+     ./in.cue:110:17
+-issue3575.test1.x: invalid value [{a:1}] (does not satisfy matchN): 0 matched, expected 1:
+-    ./in.cue:153:7
+-    ./in.cue:153:14
+-    ./in.cue:156:6
+-    ./in.cue:157:6
+ incomplete.err1.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
+     ./incomplete.cue:34:6
+     ./incomplete.cue:34:13
+@@ -111,7 +106,7 @@
              0: (int){ 2 }
            }), int) }) }
        pickTopOK2: (int){ &(matchN(1, (#list){
@@ -1051,7 +1142,7 @@ diff old new
            }
          }), int) }
        pickTopErr: (int){ &(matchN(1, (#list){
-@@ -239,21 +239,21 @@
+@@ -244,21 +239,21 @@
      embed: (struct){
        t1: (struct){
          a: (_){ matchN(1, (#list){
@@ -1088,7 +1179,7 @@ diff old new
              }
            }) }
        }
-@@ -261,21 +261,21 @@
+@@ -266,21 +261,21 @@
      direct: (struct){
        t1: (struct){
          a: (_){ matchN(1, (#list){
@@ -1125,7 +1216,7 @@ diff old new
              }
            }) }
        }
-@@ -289,9 +289,9 @@
+@@ -294,9 +289,9 @@
      }
      ok2: (struct){
        x: (_){ matchN(0, (#list){
@@ -1138,7 +1229,55 @@ diff old new
            }
          }) }
      }
-@@ -314,9 +314,9 @@
+@@ -306,23 +301,16 @@
+       }
+     }
+   }
+-  issue3575: (_|_){
+-    // [eval]
+-    test1: (_|_){
+-      // [eval]
+-      #x: (_){ matchN(1, (#list){
+-          0: (_|_){// [
++  issue3575: (struct){
++    test1: (struct){
++      #x: (_){ matchN(1, (#list){
++          0: (_|_){// &[[
+             //   {},
+-            // ]
+-          }
+-        }) }
+-      x: (_|_){
+-        // [eval] issue3575.test1.x: invalid value [{a:1}] (does not satisfy matchN): 0 matched, expected 1:
+-        //     ./in.cue:153:7
+-        //     ./in.cue:153:14
+-        //     ./in.cue:156:6
+-        //     ./in.cue:157:6
+-        0: (struct){
++            // ]]
++          }
++        }) }
++      x: (#list){
++        0: (#struct){
+           a: (int){ 1 }
+         }
+       }
+@@ -329,10 +317,10 @@
+     }
+     test2: (struct){
+       #x: (_){ matchN(1, (#list){
+-          0: (_|_){// {}
+-          }
+-        }) }
+-      x: (struct){
++          0: (_|_){// &[{}]
++          }
++        }) }
++      x: (#struct){
+         a: (int){ 1 }
+       }
+     }
+@@ -350,9 +338,9 @@
      }
      incomplete2: (struct){
        x: (_){ matchN(1, (#list){
@@ -1154,6 +1293,7 @@ diff old new
 -- diff/explanation --
 The old evaluator does not correctly handle ToDataAll if a node is
 mid-evaluation. The new evaluator does.
+issue3575: the old evaluator was incorrect in behaving differently when using structs inside lists
 -- diff/todo/p3 --
 Missing error positions.
 -- out/compile --
@@ -1406,6 +1546,30 @@ Missing error positions.
       ])
       x: {
         bar: 2
+      }
+    }
+  }
+  issue3575: {
+    test1: {
+      #x: matchN(1, [
+        [
+          {},
+        ],
+      ])
+      x: 〈0;#x〉
+      x: [
+        {
+          a: 1
+        },
+      ]
+    }
+    test2: {
+      #x: matchN(1, [
+        {},
+      ])
+      x: 〈0;#x〉
+      x: {
+        a: 1
       }
     }
   }

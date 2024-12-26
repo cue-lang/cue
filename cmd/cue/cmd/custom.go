@@ -93,26 +93,20 @@ func customCommand(c *Command, typ, name string, tools *cue.Instance) (*cobra.Co
 
 	// Ensure there is at least one tool file.
 	// TODO: remove this block to allow commands to be defined in any file.
-	for _, v := range []cue.Value{tools.Lookup(typ), o} {
-		_, w := value.ToInternal(v)
-		hasToolFile := false
-		w.VisitLeafConjuncts(func(c adt.Conjunct) bool {
-			src := c.Source()
-			if src == nil {
-				return true
-			}
-			if strings.HasSuffix(src.Pos().Filename(), "_tool.cue") {
-				hasToolFile = true
-				return false
-			}
+	_, w := value.ToInternal(tools.Lookup(typ))
+	hasToolFile := false
+	w.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+		src := c.Source()
+		if src == nil {
 			return true
-		})
-		if hasToolFile {
-			break
 		}
-		if err := v.Err(); err != nil {
-			return nil, err
+		if strings.HasSuffix(src.Pos().Filename(), "_tool.cue") {
+			hasToolFile = true
+			return false
 		}
+		return true
+	})
+	if !hasToolFile {
 		return nil, errors.Newf(token.NoPos, "could not find command %q", name)
 	}
 

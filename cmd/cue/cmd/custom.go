@@ -86,33 +86,30 @@ func customCommand(c *Command, typ, name string, tools *cue.Instance) (*cobra.Co
 	}
 
 	// TODO: validate allowing incomplete.
-	o := tools.Lookup(typ, name)
+	cmds := tools.Lookup(typ)
+	o := cmds.Lookup(name)
 	if !o.Exists() {
 		return nil, o.Err()
 	}
 
 	// Ensure there is at least one tool file.
 	// TODO: remove this block to allow commands to be defined in any file.
-	for _, v := range []cue.Value{tools.Lookup(typ), o} {
-		_, w := value.ToInternal(v)
-		hasToolFile := false
-		w.VisitLeafConjuncts(func(c adt.Conjunct) bool {
-			src := c.Source()
-			if src == nil {
-				return true
-			}
-			if strings.HasSuffix(src.Pos().Filename(), "_tool.cue") {
-				hasToolFile = true
-				return false
-			}
+	_, w := value.ToInternal(cmds)
+	hasToolFile := false
+	w.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+		src := c.Source()
+		if src == nil {
 			return true
-		})
-		if hasToolFile {
-			break
 		}
-		if err := v.Err(); err != nil {
-			return nil, err
+		if strings.HasSuffix(src.Pos().Filename(), "_tool.cue") {
+			hasToolFile = true
+			return false
 		}
+		return true
+	})
+	if !hasToolFile {
+		// Note that earlier versions of this code checked cmds.Err in this scenario,
+		// but it isn't clear why that was done, and we had no tests covering it.
 		return nil, errors.Newf(token.NoPos, "could not find command %q", name)
 	}
 

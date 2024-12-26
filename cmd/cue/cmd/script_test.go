@@ -395,16 +395,16 @@ func TestMain(m *testing.M) {
 			os.Exit(1)
 		}
 	}
-	os.Exit(testscript.RunMain(m, map[string]func() int{
-		"cue": Main,
+	testscript.Main(m, map[string]func(){
+		"cue": func() { os.Exit(Main()) },
 		// Until https://github.com/rogpeppe/go-internal/issues/93 is fixed,
 		// or we have some other way to use "exec" without caring about success,
 		// this is an easy way for us to mimic `? exec cue`.
-		"cue_exitzero": func() int {
+		"cue_exitzero": func() {
 			Main()
-			return 0
+			os.Exit(0)
 		},
-		"cue_stdinpipe": func() int {
+		"cue_stdinpipe": func() {
 			cwd, _ := os.Getwd()
 			if err := mainStdinPipe(); err != nil {
 				if err != ErrPrintedError { // print errors like Main
@@ -413,21 +413,19 @@ func TestMain(m *testing.M) {
 						ToSlash: testing.Testing(),
 					})
 				}
-				return 1
+				os.Exit(1)
 			}
-			return 0
 		},
-		"testcmd": func() int {
+		"testcmd": func() {
 			err := testCmd()
 			check(err)
-			return 0
 		},
 		// Like `cue export`, but as a standalone Go program which doesn't
 		// go through cmd/cue's setup of cuecontext and the evaluator.
 		// Useful to check what the export behavior is for Go API users,
 		// for example in relation to env vars like CUE_EXPERIMENT or CUE_DEBUG.
 		// Only works with cue stdin and json stdout for simplicity.
-		"cuectx_export": func() int {
+		"cuectx_export": func() {
 			input, err := io.ReadAll(os.Stdin)
 			check(err)
 			ctx := cuecontext.New()
@@ -438,9 +436,8 @@ func TestMain(m *testing.M) {
 			enc.SetIndent("", "    ")
 			err = enc.Encode(v)
 			check(err)
-			return 0
 		},
-	}))
+	})
 }
 
 func tsExpand(ts *testscript.TestScript, s string) string {

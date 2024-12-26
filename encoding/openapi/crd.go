@@ -113,8 +113,8 @@ func (b *builder) buildCore(v cue.Value) {
 	defer b.popNode()
 
 	if !b.ctx.expandRefs {
-		_, r := v.Reference()
-		if len(r) > 0 {
+		_, r := v.ReferencePath()
+		if len(r.Selectors()) > 0 {
 			return
 		}
 	}
@@ -128,7 +128,7 @@ func (b *builder) buildCore(v cue.Value) {
 
 		switch b.kind {
 		case cue.StructKind:
-			if typ, ok := v.Elem(); ok {
+			if typ := v.LookupPath(cue.MakePath(cue.AnyString)); typ.Exists() {
 				if !b.checkCycle(typ) {
 					return
 				}
@@ -140,7 +140,7 @@ func (b *builder) buildCore(v cue.Value) {
 			b.buildCoreStruct(v)
 
 		case cue.ListKind:
-			if typ, ok := v.Elem(); ok {
+			if typ := v.LookupPath(cue.MakePath(cue.AnyIndex)); typ.Exists() {
 				if !b.checkCycle(typ) {
 					return
 				}

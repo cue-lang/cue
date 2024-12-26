@@ -1,0 +1,8 @@
+A variant of 12, to ensure the ellipsis does not prevent
+simplification of the struct to top.
+
+-- a.cue --
+x: {a: bool, b: string, ...} & {a: true, b: "hi"}
+-- out/trim-v3 --
+== a.cue
+x: _ & {a: true, b: "hi"}

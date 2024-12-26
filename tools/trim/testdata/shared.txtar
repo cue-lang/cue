@@ -13,19 +13,17 @@ a: {
 	shared: name: "a"
 }
 
-issue760: {
-
+b: {
 	service: [ID=_]: {
 		name: ID
 	}
 	service: foo: _shared
-	service: bar: _shared
 	_shared: {
 		name: "foo" // Do not remove!
 	}
 }
 
-issue760: {
+c: {
 	service: [ID=_]: {
 		_service_name: *strings.TrimSuffix(ID, "-suffix") | string
 	}
@@ -50,19 +48,17 @@ a: {
 	shared: name: "a"
 }
 
-issue760: {
-
+b: {
 	service: [ID=_]: {
 		name: ID
 	}
 	service: foo: _shared
-	service: bar: _shared
 	_shared: {
 		name: "foo" // Do not remove!
 	}
 }
 
-issue760: {
+c: {
 	service: [ID=_]: {
 		_service_name: *strings.TrimSuffix(ID, "-suffix") | string
 	}

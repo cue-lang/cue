@@ -1,0 +1,24 @@
+Demonstration of dependencies of references. Within b.c we find the
+reference to x; we resolve that to a vertex which contains conjuncts
+from line 1 and and line 4. We spot that line 4 is in the same (or
+ancestor) lexical scope as b.c, and so we ensure that if line 5
+survives, then line 4 must too, otherwise c: x will reference an
+unknown field.
+
+See also 53, 54, and 55.
+
+-- a.cue --
+a: x: 5
+b: {
+	a
+	x: int
+	c: x
+}
+-- out/trim-v3 --
+== a.cue
+a: x: 5
+b: {
+	a
+	x: int
+	c: x
+}

@@ -1,0 +1,17 @@
+Similar to 43 and 52, but with one level less depth.
+
+-- a.cue --
+#DefA: "a"
+#DefB: "b"
+
+First: "b"
+
+First: #DefA | #DefB
+-- out/trim-v3 --
+== a.cue
+#DefA: "a"
+#DefB: "b"
+
+First: "b"
+
+First: #DefA | #DefB

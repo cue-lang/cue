@@ -1,0 +1,12 @@
+Make sure we don't remove conjuncts that discriminate between
+disjunction branches.
+
+issue 2544
+
+-- a.cue --
+#A: value?: {x: number, y: number} | *{x: 0, y: 0} | 5
+a: #A & {value: {}}
+-- out/trim-v3 --
+== a.cue
+#A: value?: {x: number, y: number} | *{x: 0, y: 0} | 5
+a: #A & {value: {}}

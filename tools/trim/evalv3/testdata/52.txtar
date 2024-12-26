@@ -1,0 +1,22 @@
+Variant of 43 (and 46), where we bring the disjunction out so it's no
+longer embedded (but here it's still closed, unlike 46).
+
+See also 56.
+
+-- a.cue --
+#DefA: A: "a"
+#DefB: B: "b"
+
+First: B: "b"
+First: B: "b"
+
+First: #DefA | #DefB
+-- out/trim-v3 --
+== a.cue
+#DefA: A: "a"
+#DefB: B: "b"
+
+First: B: "b"
+First: _
+
+First: #DefA | #DefB

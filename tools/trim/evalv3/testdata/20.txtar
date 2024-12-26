@@ -1,0 +1,12 @@
+Simplifications can occur within definitions, but we must be sure to
+keep the ellipsis.
+
+-- a.cue --
+let #x = {a: int, b: {c: 5, c: >4, ...}}
+y: #x & {a: 4, b: {c: int}}
+z: #x & {a: 4, b: {c: int, d: "hi"}}
+-- out/trim-v3 --
+== a.cue
+let #x = {a: int, b: {c: 5, ...}}
+y: #x & {a: 4}
+z: #x & {a: 4, b: {d: "hi"}}

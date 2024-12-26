@@ -1,0 +1,8 @@
+A variant of 11, with fields slightly rearranged. We do not currently
+simplify explicit unification where one side is top.
+
+-- a.cue --
+x: {a: bool, b: string} & {a: true, b: "hi"}
+-- out/trim-v3 --
+== a.cue
+x: _ & {a: true, b: "hi"}

@@ -1,0 +1,22 @@
+Another variant of 51, moving the embedding out to an implicit
+unification.
+
+See also 55.
+
+-- a.cue --
+d: x: 5
+a: d
+b: a
+b: {
+	x: int
+	c: x
+}
+-- out/trim-v3 --
+== a.cue
+d: x: 5
+a: d
+b: a
+b: {
+	x: int
+	c: x
+}

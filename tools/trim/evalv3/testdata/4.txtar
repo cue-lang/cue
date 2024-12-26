@@ -1,0 +1,8 @@
+We do not simplify explicit unification.
+Compare and contrast with 3 and 11.
+
+-- a.cue --
+z: "hi" & string
+-- out/trim-v3 --
+== a.cue
+z: "hi" & string

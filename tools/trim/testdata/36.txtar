@@ -1,0 +1,87 @@
+issue 3009
+-- a.cue --
+X: {
+  a: 1
+  b: true
+}
+#X: X
+
+A: #X & {
+  a: 1
+  b: true
+}
+
+B: X & {
+  a: 1
+  b: true
+}
+-- out/trim-v3 --
+== a.cue
+X: {
+	a: 1
+	b: true
+}
+#X: X
+
+A: #X & _
+
+B: X & _
+-- diff/-out/trim-v3<==>+out/trim --
+diff old new
+--- old
++++ new
+@@ -5,9 +5,6 @@
+ }
+ #X: X
+ 
+-A: #X & {}
+-
+-B: X & {
+-	a: 1
+-	b: true
+-}
++A: #X & _
++
++B: X & _
+-- out/trim-v3-noshare --
+== a.cue
+X: {
+	a: 1
+	b: true
+}
+#X: X
+
+A: #X & _
+
+B: X & _
+-- diff/-out/trim-v3-noshare<==>+out/trim --
+diff old new
+--- old
++++ new
+@@ -5,9 +5,6 @@
+ }
+ #X: X
+ 
+-A: #X & {}
+-
+-B: X & {
+-	a: 1
+-	b: true
+-}
++A: #X & _
++
++B: X & _
+-- out/trim --
+== a.cue
+X: {
+	a: 1
+	b: true
+}
+#X: X
+
+A: #X & {}
+
+B: X & {
+	a: 1
+	b: true
+}

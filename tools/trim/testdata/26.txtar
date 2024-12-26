@@ -1,0 +1,58 @@
+This test demonstrates that it is only the "root" conjuncts within a
+pattern that need to be ignored for the purpose of identifying
+redundant conjuncts, and not any of their children.
+
+Thus `b` can be simplified, provided `b.w` survives, which is enough
+to ensure it matches the pattern.
+
+See also 61.
+
+-- a.cue --
+a: [string]: {
+	x: y: z: 5
+}
+b: w: x: y: {}
+b: a
+-- out/trim-v3 --
+== a.cue
+a: [string]: {
+	x: y: z: 5
+}
+b: w: _
+b: a
+-- diff/-out/trim-v3<==>+out/trim --
+diff old new
+--- old
++++ new
+@@ -2,5 +2,5 @@
+ a: [string]: {
+ 	x: y: z: 5
+ }
+-b: w: x: y: {}
++b: w: _
+ b: a
+-- out/trim-v3-noshare --
+== a.cue
+a: [string]: {
+	x: y: z: 5
+}
+b: w: _
+b: a
+-- diff/-out/trim-v3-noshare<==>+out/trim --
+diff old new
+--- old
++++ new
+@@ -2,5 +2,5 @@
+ a: [string]: {
+ 	x: y: z: 5
+ }
+-b: w: x: y: {}
++b: w: _
+ b: a
+-- out/trim --
+== a.cue
+a: [string]: {
+	x: y: z: 5
+}
+b: w: x: y: {}
+b: a

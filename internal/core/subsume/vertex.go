@@ -291,6 +291,9 @@ func (s *subsumer) verticesDev(x, y *adt.Vertex) bool {
 			return true
 		}
 
+	case nil:
+		return false
+
 	default:
 		panic(fmt.Sprintf("unexpected type %T", v))
 	}

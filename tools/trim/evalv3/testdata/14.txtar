@@ -1,0 +1,8 @@
+Further variation on 11: make sure patterns are kept, even if they're
+not used.
+
+-- a.cue --
+x: {a: bool, b: string, [>"b"]: int} & {a: true, b: "hi"}
+-- out/trim-v3 --
+== a.cue
+x: {[>"b"]: int} & {a: true, b: "hi"}

@@ -1,0 +1,8 @@
+issue 2329
+-- a.cue --
+#D: list: [...{value: number | *1}]
+d: #D & { list: [{value: 1}] }
+-- out/trim-v3 --
+== a.cue
+#D: list: [...{value: number | *1}]
+d: #D & {list: [{}]}

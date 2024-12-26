@@ -1,0 +1,28 @@
+issue 3009
+-- a.cue --
+X: {
+  a: 1
+  b: true
+}
+#X: X
+
+A: #X & {
+  a: 1
+  b: true
+}
+
+B: X & {
+  a: 1
+  b: true
+}
+-- out/trim-v3 --
+== a.cue
+X: {
+	a: 1
+	b: true
+}
+#X: X
+
+A: #X & _
+
+B: X & _

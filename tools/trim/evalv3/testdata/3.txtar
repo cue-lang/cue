@@ -1,0 +1,9 @@
+We do simplify implicit unification.
+2 should get simplified in the same way as this.
+
+-- a.cue --
+x: string
+x: "hi"
+-- out/trim-v3 --
+== a.cue
+x: "hi"

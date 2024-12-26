@@ -129,6 +129,10 @@ type CloseInfo struct {
 	CycleInfo
 }
 
+func (c CloseInfo) IsClosedAny() bool {
+	return c.cc != nil && (c.cc.isClosed || c.cc.isClosedOnce)
+}
+
 func (c CloseInfo) Location() Node {
 	if c.closeInfo == nil {
 		return nil

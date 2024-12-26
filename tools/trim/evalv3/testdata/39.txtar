@@ -1,0 +1,20 @@
+issue 2333
+-- a.cue --
+#D: inner: {
+	type: "A" | "B"
+	if type == "A" {
+		value: number | *0
+	}
+}
+
+a: {inner: {type: "A", value: 0}} & #D
+-- out/trim-v3 --
+== a.cue
+#D: inner: {
+	type: "A" | "B"
+	if type == "A" {
+		value: number | *0
+	}
+}
+
+a: {inner: {type: "A"}} & #D

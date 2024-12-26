@@ -1,0 +1,12 @@
+As with 21, make sure we don't do simplification of arguments to
+function calls - we've not just special-cased "close".
+
+-- a.cue --
+let x = close
+y: x({a: 5})
+z: y & {a: int}
+-- out/trim-v3 --
+== a.cue
+let x = close
+y: x({a: 5})
+z: y & _

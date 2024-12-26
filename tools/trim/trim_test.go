@@ -12,23 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package trim
+package trim_test
 
 import (
 	"testing"
 
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
+	"cuelang.org/go/tools/trim"
+	trimv3 "cuelang.org/go/tools/trim/evalv3"
 	"github.com/go-quicktest/qt"
 )
 
 var (
-	// TODO(evalv3): many broken tests in new evaluator, use FullMatrix to
-	// expose. This is probably due to the changed underlying representation.
-	// matrix = cuetdtest.FullMatrix
-	matrix = cuetdtest.DefaultOnlyMatrix
+	matrix = cuetdtest.SmallMatrix
 )
 
 const trace = false
@@ -51,7 +52,13 @@ func TestTrimFiles(t *testing.T) {
 
 		files := a.Files
 
-		err := Files(files, val, &Config{Trace: trace})
+		var err error
+		v, _ := (*runtime.Runtime)(ctx).Settings()
+		if v == internal.DevVersion {
+			err = trimv3.Files(files, a.Dir, val, &trimv3.Config{})
+		} else {
+			err = trim.Files(files, val, &trim.Config{Trace: trace})
+		}
 		if err != nil {
 			t.WriteErrors(errors.Promote(err, ""))
 		}

@@ -378,7 +378,7 @@ func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 			default:
 				a := appendSplit(nil, cue.OrOp, v)
 				for i, v := range a {
-					if _, r := v.Reference(); len(r) == 0 {
+					if _, r := v.ReferencePath(); len(r.Selectors()) == 0 {
 						a[i] = v.Eval()
 					}
 				}
@@ -750,7 +750,7 @@ func (b *builder) object(v cue.Value) {
 		b.setSingle("properties", (*ast.StructLit)(properties), false)
 	}
 
-	if t, ok := v.Elem(); ok &&
+	if t := v.LookupPath(cue.MakePath(cue.AnyString)); t.Exists() &&
 		(b.core == nil || b.core.items == nil) && b.checkCycle(t) {
 		schema := b.schema(nil, cue.AnyString, t)
 		if len(schema.Elts) > 0 {
@@ -852,7 +852,7 @@ func (b *builder) array(v cue.Value) {
 	}
 
 	if !hasMax || int64(len(items)) < maxLength {
-		if typ, ok := v.Elem(); ok && b.checkCycle(typ) {
+		if typ := v.LookupPath(cue.MakePath(cue.AnyIndex)); typ.Exists() && b.checkCycle(typ) {
 			var core *builder
 			if b.core != nil {
 				core = b.core.items

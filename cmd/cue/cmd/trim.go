@@ -23,8 +23,10 @@ import (
 
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
+	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/diff"
 	"cuelang.org/go/tools/trim"
+	trimv3 "cuelang.org/go/tools/trim/evalv3"
 )
 
 // TODO:
@@ -119,9 +121,18 @@ func runTrim(cmd *Command, args []string) error {
 
 	for i, inst := range binst {
 		root := instances[i]
-		err := trim.Files(inst.Files, root.Value(), &trim.Config{
-			Trace: flagTrace.Bool(cmd),
-		})
+		var err error
+		if cueexperiment.Flags.EvalV3 {
+			cfg := &trimv3.Config{}
+			if flagTrace.Bool(cmd) {
+				cfg.TraceWriter = os.Stderr
+			}
+			err = trimv3.Files(inst.Files, inst.Dir, root.Value(), cfg)
+		} else {
+			err = trim.Files(inst.Files, root.Value(), &trim.Config{
+				Trace: flagTrace.Bool(cmd),
+			})
+		}
 		if err != nil {
 			return err
 		}

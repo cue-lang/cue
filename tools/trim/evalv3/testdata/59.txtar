@@ -1,0 +1,15 @@
+Demonstration that embeddings need to be treated specially. The
+reference x does not appear in the vertex for z. Without special
+treatment of embeddings, we would attempt to simplify z to `z: _`.
+
+-- a.cue --
+x: y: 5
+z: {
+	x
+}
+-- out/trim-v3 --
+== a.cue
+x: y: 5
+z: {
+	x
+}

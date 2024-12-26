@@ -1,0 +1,40 @@
+issue 2357
+-- a.cue --
+things: [_]: {
+	resources: *{
+		requests: {
+			memory: "100M"
+			cpu:    "100m"
+		}
+		limits: requests
+	} | {...}
+}
+
+things: vagrant: {
+	resources: {
+		requests: {
+			cpu: "1m"
+		}
+		limits: close({})
+	}
+}
+-- out/trim-v3 --
+== a.cue
+things: [_]: {
+	resources: *{
+		requests: {
+			memory: "100M"
+			cpu:    "100m"
+		}
+		limits: requests
+	} | {...}
+}
+
+things: vagrant: {
+	resources: {
+		requests: {
+			cpu: "1m"
+		}
+		limits: close({})
+	}
+}

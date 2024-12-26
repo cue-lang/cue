@@ -1,0 +1,8 @@
+A real tie. The final tiebreaker is file position, so the first one we
+see wins.
+
+-- a.cue --
+x: {a: 5} & {a: 5}
+-- out/trim-v3 --
+== a.cue
+x: {a: 5} & _

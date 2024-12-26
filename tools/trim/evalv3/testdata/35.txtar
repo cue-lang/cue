@@ -1,0 +1,29 @@
+issue 3140
+-- a.cue --
+#Foo: {
+	id: string
+	...
+}
+
+foo: [ID=_]: #Foo & {
+	id: ID
+}
+
+foo: X1: {
+	id: "X1"
+	alist: []
+}
+-- out/trim-v3 --
+== a.cue
+#Foo: {
+	id: string
+	...
+}
+
+foo: [ID=_]: #Foo & {
+	id: ID
+}
+
+foo: X1: {
+	alist: []
+}

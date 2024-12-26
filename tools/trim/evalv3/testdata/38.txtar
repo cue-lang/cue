@@ -1,0 +1,32 @@
+issue 2356
+-- a.cue --
+#IPPool: {
+	cidr: string
+}
+
+#cluster: {
+	podCIDR: string
+	IPPool: #IPPool & {
+		cidr: podCIDR
+	}
+}
+
+clusters: [_]: #cluster
+
+clusters: vagrant: podCIDR: "abc"
+-- out/trim-v3 --
+== a.cue
+#IPPool: {
+	cidr: string
+}
+
+#cluster: {
+	podCIDR: string
+	IPPool: #IPPool & {
+		cidr: podCIDR
+	}
+}
+
+clusters: [_]: #cluster
+
+clusters: vagrant: podCIDR: "abc"

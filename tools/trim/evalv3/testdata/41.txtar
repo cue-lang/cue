@@ -1,0 +1,51 @@
+issue 1547
+
+Because of the embeddings, we can't remove the `base.helm.values`
+struct. Consequently, we can't simplify to `base: helm: values:
+cacert: _`
+
+-- a.cue --
+base: helm: values: cacert: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+base: #HelmRelease
+
+#HelmRelease: {
+	helm: {
+		#WithHelmUtils
+		values: {...}
+	}
+}
+
+#HelmUtils: {
+	cacert?: string | *"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+}
+
+#WithHelmUtils: {
+	values: {
+		utils
+		...
+	}
+	utils: #HelmUtils
+}
+-- out/trim-v3 --
+== a.cue
+base: helm: values: cacert: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+base: #HelmRelease
+
+#HelmRelease: {
+	helm: {
+		#WithHelmUtils
+		values: {...}
+	}
+}
+
+#HelmUtils: {
+	cacert?: string | *"/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+}
+
+#WithHelmUtils: {
+	values: {
+		utils
+		...
+	}
+	utils: #HelmUtils
+}

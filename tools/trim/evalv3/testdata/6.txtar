@@ -1,0 +1,8 @@
+1 should get simplified in the same way as this.
+
+-- a.cue --
+x: <10
+x: 7
+-- out/trim-v3 --
+== a.cue
+x: 7

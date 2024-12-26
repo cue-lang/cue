@@ -1,0 +1,8 @@
+Similar to 11, but with lists: explicit unification of lists can lead
+to simplification.
+
+-- a.cue --
+x: [int, int, int] & [9, 8, 7]
+-- out/trim-v3 --
+== a.cue
+x: [_, _, _] & [9, 8, 7]

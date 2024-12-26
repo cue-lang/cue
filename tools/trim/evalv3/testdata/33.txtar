@@ -1,0 +1,14 @@
+Do not remove conjuncts that are essential for selecting branches of a
+disjunction.
+
+-- a.cue --
+g: #x & {a: 5}
+#x: {a: 5, a: int} | {b: 5} | {c: >4}
+h: #x & {b: 5}
+i: #x & {c: 5}
+-- out/trim-v3 --
+== a.cue
+g: #x & {a: 5}
+#x: {a: 5, a: int} | {b: 5} | {c: >4}
+h: #x & {b: 5}
+i: #x & {c: 5}

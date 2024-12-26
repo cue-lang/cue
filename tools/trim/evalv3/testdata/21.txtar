@@ -1,0 +1,10 @@
+We do no simplification of arguments to function calls. This includes
+close, which appears in the AST as a normal CallExpr.
+
+-- a.cue --
+y: close({a: int, b: {c: string}}) & {a: 4, b: {c: "hi"}}
+z: close({a: int, b: {c: string}} & {a: 4, b: {c: "hi"}})
+-- out/trim-v3 --
+== a.cue
+y: close({a: int, b: {c: string}}) & {a: 4, b: {c: "hi"}}
+z: close({a: int, b: {c: string}} & {a: 4, b: {c: "hi"}})

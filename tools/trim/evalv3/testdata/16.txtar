@@ -1,0 +1,12 @@
+Like 11, but using a let comprehension. For trim, the let
+comprehension is treated the same as a field. I.e. in this case, it's
+no different to s: {a: bool, b: "hi"}, and so no simplification can
+occur.
+
+-- a.cue --
+let s = {a: bool, b: "hi"}
+x: s & {a: true, b: string}
+-- out/trim-v3 --
+== a.cue
+let s = {a: bool, b: "hi"}
+x: s & {a: true}

@@ -27,7 +27,7 @@ import (
 )
 
 var (
-	matrix = cuetdtest.DefaultOnlyMatrix
+	matrix = cuetdtest.SmallMatrix
 )
 
 const trace = false

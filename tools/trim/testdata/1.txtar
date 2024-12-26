@@ -1,0 +1,10 @@
+TODO. This should get simplified in the same way as 6, but
+doesn't. Possible bug in evaluator.
+
+-- a.cue --
+<10
+7
+-- out/trim --
+== a.cue
+<10
+7

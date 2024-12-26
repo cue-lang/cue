@@ -1,0 +1,42 @@
+Variant of 9, but with more complex field expressions. As before, we
+must ignore the conjuncts from the pattern when simplifying the
+fields, so that we don't accidentally remove the entire field.
+
+-- a.cue --
+d: {
+	jack:    {age: 5, age: 5}
+	gill:    {age: 5}
+	hilbert: {age: 5} & {age: 5}
+	[string]: {age: 5}
+}
+-- out/trim-v3 --
+== a.cue
+d: {
+	jack:    _
+	gill:    _
+	hilbert: _ & _
+	[string]: {age: 5}
+}
+-- diff/-out/trim-v3<==>+out/trim --
+diff old new
+--- old
++++ new
+@@ -1,7 +1,7 @@
+ == a.cue
+ d: {
+-	jack: {}
+-	gill: {}
+-	hilbert: {} & {}
++	jack:    _
++	gill:    _
++	hilbert: _ & _
+ 	[string]: {age: 5}
+ }
+-- out/trim --
+== a.cue
+d: {
+	jack: {}
+	gill: {}
+	hilbert: {} & {}
+	[string]: {age: 5}
+}

@@ -1,10 +1,40 @@
+cd simple
 exec cue export data.cue -e a+c -e d.e.f --out yaml
 cmp stdout expect-stdout
--- expect-stdout --
+cd ..
+
+# Issue 2542 was a regression introduced in CUE v0.6 which was resolved by evalv3.
+env CUE_EXPERIMENT=evalv3
+cd issue2542
+exec cue export -e 'obj2.name' input.cue
+cmp stdout stdout.golden
+cd ..
+
+-- simple/expect-stdout --
 4
 ---
 jam
--- data.cue --
+-- simple/data.cue --
 a: 1
 c: 3
 d: e: f: "jam"
+-- issue2542/input.cue --
+obj: this={
+	(#makeName & {enable: this._enable}).out
+}
+
+obj: _enable: true
+
+obj2: obj
+
+#makeName: {
+	enable: bool
+	if enable {
+		out: name: "enabled"
+	}
+	if !enable {
+		out: name: "disabled"
+	}
+}
+-- issue2542/stdout.golden --
+"enabled"

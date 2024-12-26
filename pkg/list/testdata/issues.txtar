@@ -30,6 +30,84 @@ issue1404: {
 	a:   *1 | 2
 	sum: list.Sum([a])
 }
+issue3541: {
+	_test: {
+		one: {
+			num: 2
+			test: num: 6
+		}
+		two: {
+			num: 3
+			test: num: 7
+		}
+		three: {
+			num: 4
+			test: num: 8
+		}
+		four: {
+			num: 5
+			test: num: 9
+		}
+	}
+
+	list.Sum([for key, val in _test {
+		val.num + val.test
+	}])
+}
+-- out/list-v3 --
+Errors:
+0: invalid operands 2 and {num:6} to '+' (type int and struct):
+    ./in.cue:53:3
+    ./in.cue:35:9
+    ./in.cue:36:10
+
+Result:
+issue563: {
+	#MyDef: {
+		name: string
+	}
+	output: [{
+		name: "a"
+	}, {
+		name: "b"
+	}, {
+		name: "c"
+	}, {
+		name: "1"
+	}, {
+		name: "2"
+	}, {
+		name: "3"
+	}]
+}
+issue1404: {
+	a:   *1 | 2
+	sum: 1
+}
+issue3541: _|_ // 0: invalid operands 2 and {num:6} to '+' (type int and struct)
+-- diff/-out/list-v3<==>+out/list --
+diff old new
+--- old
++++ new
+@@ -1,3 +1,10 @@
++Errors:
++0: invalid operands 2 and {num:6} to '+' (type int and struct):
++    ./in.cue:53:3
++    ./in.cue:35:9
++    ./in.cue:36:10
++
++Result:
+ issue563: {
+ 	#MyDef: {
+ 		name: string
+@@ -20,4 +27,4 @@
+ 	a:   *1 | 2
+ 	sum: 1
+ }
+-issue3541: {}
++issue3541: _|_ // 0: invalid operands 2 and {num:6} to '+' (type int and struct)
+-- diff/explanation --
+issue3541: evalv3 correctly spots an invalid operand error which evalv2 drops on the floor.
 -- out/list --
 issue563: {
 	#MyDef: {
@@ -53,3 +131,4 @@ issue1404: {
 	a:   *1 | 2
 	sum: 1
 }
+issue3541: {}

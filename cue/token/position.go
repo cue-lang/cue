@@ -15,6 +15,7 @@
 package token
 
 import (
+	"cmp"
 	"fmt"
 	"sort"
 	"sync"
@@ -74,6 +75,10 @@ func (p Pos) File() *File {
 	return p.file
 }
 
+// TODO(mvdan): The methods below don't need to build an entire Position
+// just to access some of the information. This could matter particularly for
+// Compare, as it is called many times when sorting by position.
+
 func (p Pos) Line() int {
 	if p.file == nil {
 		return 0
@@ -104,6 +109,24 @@ func (p Pos) Position() Position {
 
 func (p Pos) String() string {
 	return p.Position().String()
+}
+
+func (p Pos) Compare(p2 Pos) int {
+	if p == p2 {
+		return 0
+	} else if p == NoPos {
+		return 1
+	} else if p2 == NoPos {
+		return -1
+	}
+	pos, pos2 := p.Position(), p2.Position()
+	if c := cmp.Compare(pos.Filename, pos2.Filename); c != 0 {
+		return c
+	}
+	// Note that CUE doesn't currently use any directives which alter
+	// position information, like Go's //line, so comparing by offset is enough.
+	return cmp.Compare(pos.Offset, pos2.Offset)
+
 }
 
 // NoPos is the zero value for Pos; there is no file and line information

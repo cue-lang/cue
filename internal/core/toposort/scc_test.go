@@ -118,7 +118,7 @@ func TestStronglyConnectedComponents(t *testing.T) {
 						slices.Sort(names)
 						componentsNames[i] = names
 					}
-					slices.SortFunc(componentsNames, compareStringses)
+					slices.SortFunc(componentsNames, slices.Compare)
 
 					if !slices.EqualFunc(componentsNames, tc.expected, slices.Equal) {
 						t.Fatalf(`

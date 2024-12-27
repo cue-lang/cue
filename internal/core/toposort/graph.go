@@ -139,22 +139,12 @@ func (index *indexComparison) compareNodeByName(a, b *Node) int {
 	return cmp.Compare(a.Name(index), b.Name(index))
 }
 
-func (index *indexComparison) compareNodesByNames(a, b Nodes) int {
-	lim := min(len(a), len(b))
-	for i := 0; i < lim; i++ {
-		if comparison := index.compareNodeByName(a[i], b[i]); comparison != 0 {
-			return comparison
-		}
-	}
-	return cmp.Compare(len(a), len(b))
-}
-
 func (index *indexComparison) compareCyclesByNames(a, b *Cycle) int {
-	return index.compareNodesByNames(a.Nodes, b.Nodes)
+	return slices.CompareFunc(a.Nodes, b.Nodes, index.compareNodeByName)
 }
 
 func (index *indexComparison) compareComponentsByNodes(a, b *StronglyConnectedComponent) int {
-	return index.compareNodesByNames(a.Nodes, b.Nodes)
+	return slices.CompareFunc(a.Nodes, b.Nodes, index.compareNodeByName)
 }
 
 func chooseCycleEntryNode(cycle *Cycle) (entryNode *Node, enabledSince, brokenEdgeCount int) {

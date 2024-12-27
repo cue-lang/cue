@@ -15,7 +15,6 @@
 package toposort_test
 
 import (
-	"cmp"
 	"fmt"
 	"math/rand"
 	"os"
@@ -172,16 +171,6 @@ func makeFeatures(index adt.StringIndexer, inputs [][]string) [][]adt.Feature {
 		result[i] = features
 	}
 	return result
-}
-
-func compareStringses(a, b []string) int {
-	lim := min(len(a), len(b))
-	for i := 0; i < lim; i++ {
-		if comparison := cmp.Compare(a[i], b[i]); comparison != 0 {
-			return comparison
-		}
-	}
-	return cmp.Compare(len(a), len(b))
 }
 
 // Consider that names are nodes in a cycle, we want to rotate the

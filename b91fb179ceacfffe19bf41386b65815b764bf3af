@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7342fc1b_043b1a94",
+        "filename": "cue/token/position.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-27T10:55:48Z",
+      "side": 1,
+      "message": "wrap comment to 80 chars?",
+      "revId": "b91fb179ceacfffe19bf41386b65815b764bf3af",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

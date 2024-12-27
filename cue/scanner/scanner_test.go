@@ -691,9 +691,11 @@ func TestStdErrorHander(t *testing.T) {
 		errors.Print(os.Stderr, list, nil)
 	}
 
+	// Note that this is 9 errors when sanitized, and not 8,
+	// as we currently don't support //line comment directives.
 	n = len(errors.Errors(errors.Sanitize(list)))
-	if n != 8 {
-		t.Errorf("found %d one-per-line errors, expected 8", n)
+	if n != 9 {
+		t.Errorf("found %d one-per-line errors, expected 9", n)
 		errors.Print(os.Stderr, list, nil)
 	}
 }

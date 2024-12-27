@@ -145,7 +145,7 @@ func Positions(err error) []token.Pos {
 		}
 	}
 
-	slices.SortFunc(a[sortOffset:], comparePos)
+	slices.SortFunc(a[sortOffset:], token.Pos.Compare)
 	return slices.Compact(a)
 }
 
@@ -362,16 +362,6 @@ func (p *list) Add(err Error) {
 // Reset resets an List to no errors.
 func (p *list) Reset() { *p = (*p)[:0] }
 
-func comparePos(a, b token.Pos) int {
-	if c := cmp.Compare(a.Filename(), b.Filename()); c != 0 {
-		return c
-	}
-	if c := cmp.Compare(a.Line(), b.Line()); c != 0 {
-		return c
-	}
-	return cmp.Compare(a.Column(), b.Column())
-}
-
 func comparePath(a, b []string) int {
 	for i, x := range a {
 		if i >= len(b) {
@@ -414,12 +404,9 @@ func (p list) sanitize() list {
 // entry.
 func (p list) Sort() {
 	slices.SortFunc(p, func(a, b Error) int {
-		if c := comparePos(a.Position(), b.Position()); c != 0 {
+		if c := a.Position().Compare(b.Position()); c != 0 {
 			return c
 		}
-		// Note that it is not sufficient to simply compare file offsets because
-		// the offsets do not reflect modified line information (through //line
-		// comments).
 		if c := comparePath(a.Path(), b.Path()); c != 0 {
 			return c
 		}
@@ -449,10 +436,7 @@ func approximateEqual(a, b Error) bool {
 	if aPos == token.NoPos || bPos == token.NoPos {
 		return a.Error() == b.Error()
 	}
-	return aPos.Filename() == bPos.Filename() &&
-		aPos.Line() == bPos.Line() &&
-		aPos.Column() == bPos.Column() &&
-		comparePath(a.Path(), b.Path()) == 0
+	return aPos.Compare(bPos) == 0 && comparePath(a.Path(), b.Path()) == 0
 }
 
 // An List implements the error interface.

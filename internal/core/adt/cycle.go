@@ -650,8 +650,6 @@ func (n *nodeContext) detectCycleV3(arc *Vertex, env *Environment, x Resolver, c
 
 			if equalDeref(r.Node, n.node) {
 				// reference cycle
-				// TODO: in some cases we must continue to fully evaluate.
-				// Return false here to solve v0.7.txtar:mutual.t4.ok.p1 issue.
 				return ci, true
 			}
 

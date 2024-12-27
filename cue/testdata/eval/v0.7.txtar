@@ -1566,8 +1566,6 @@ diff old new
        }
 -- diff/explanation --
 Bug fixes
--- diff/todo/p0 --
-mutual.t4.p1: dropped fields. See comment in cycle.go that references this bug.
 -- diff/todo/p2 --
 Reordering / positions.
 -- out/compile --

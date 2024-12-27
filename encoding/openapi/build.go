@@ -19,6 +19,7 @@ import (
 	"math"
 	"path"
 	"regexp"
+	"slices"
 	"sort"
 	"strings"
 
@@ -152,7 +153,7 @@ func schemas(g *Generator, inst cue.InstanceOrValue) (schemas *ast.StructLit, er
 		for k := range c.externalRefs {
 			external = append(external, k)
 		}
-		sort.Strings(external)
+		slices.Sort(external)
 
 		for _, k := range external {
 			ext := c.externalRefs[k]

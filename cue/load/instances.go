@@ -18,7 +18,7 @@ import (
 	"context"
 	"fmt"
 	"io/fs"
-	"sort"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -218,7 +218,7 @@ func loadPackages(
 	for p := range pkgPaths {
 		pkgPathSlice = append(pkgPathSlice, p)
 	}
-	sort.Strings(pkgPathSlice)
+	slices.Sort(pkgPathSlice)
 	return modpkgload.LoadPackages(
 		ctx,
 		cfg.Module,

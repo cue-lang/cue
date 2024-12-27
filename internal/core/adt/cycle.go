@@ -721,7 +721,7 @@ func (n *nodeContext) markCyclicPathV3(arc *Vertex, env *Environment, x Resolver
 
 	n.hasAnyCyclicConjunct = true
 
-	if !n.hasNonCyclic && env != nil {
+	if !n.hasNonCyclic && !n.hasNonCycle && env != nil {
 		// TODO: investigate if we can get rid of cyclicConjuncts in the new
 		// evaluator.
 		v := Conjunct{env, x, ci}

@@ -999,7 +999,6 @@ func (x *LetReference) resolve(ctx *OpContext, state combinedFlags) *Vertex {
 			// nc.hasNonCycle = true
 			// Allow a first cycle to be skipped.
 			nc.free()
-			n.unify(ctx, allKnown, finalize)
 		} else {
 			nc := n.getNodeContext(ctx, 0)
 			nc.hasNonCycle = true // Allow a first cycle to be skipped.

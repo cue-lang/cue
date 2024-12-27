@@ -1596,14 +1596,14 @@ Result:
   }
 }
 -- out/evalalpha/stats --
-Leaks:  2156
+Leaks:  2249
 Freed:  266
 Reused: 265
-Allocs: 2157
+Allocs: 2250
 Retain: 0
 
-Unifications: 750
-Conjuncts:    12910
+Unifications: 760
+Conjuncts:    13284
 Disjuncts:    908
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -1615,17 +1615,17 @@ diff old new
 -Reused: 85
 -Allocs: 46
 -Retain: 5
-+Leaks:  2156
++Leaks:  2249
 +Freed:  266
 +Reused: 265
-+Allocs: 2157
++Allocs: 2250
 +Retain: 0
  
 -Unifications: 48
 -Conjuncts:    150
 -Disjuncts:    111
-+Unifications: 750
-+Conjuncts:    12910
++Unifications: 760
++Conjuncts:    13284
 +Disjuncts:    908
 -- out/eval/stats --
 Leaks:  34

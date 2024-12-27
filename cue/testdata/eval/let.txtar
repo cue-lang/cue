@@ -330,13 +330,13 @@ Result:
     }
     "0": (struct){
       let X#1Fmulti = 〈1;x〉
-      "2": (int){ 2 }
       "1": (int){ 1 }
+      "2": (int){ 2 }
     }
     "1": (struct){
       let X#1Fmulti = 〈1;x〉
-      "2": (int){ 2 }
       "1": (int){ 1 }
+      "2": (int){ 2 }
     }
   }
   keepDescending: (struct){
@@ -502,24 +502,6 @@ diff old new
      }
    }
    nestedFor: (struct){
-@@ -190,13 +159,13 @@
-     }
-     "0": (struct){
-       let X#1Fmulti = 〈1;x〉
--      "1": (int){ 1 }
--      "2": (int){ 2 }
-+      "2": (int){ 2 }
-+      "1": (int){ 1 }
-     }
-     "1": (struct){
-       let X#1Fmulti = 〈1;x〉
--      "1": (int){ 1 }
--      "2": (int){ 2 }
-+      "2": (int){ 2 }
-+      "1": (int){ 1 }
-     }
-   }
-   keepDescending: (struct){
 @@ -234,8 +203,8 @@
        b: (string){ "e" }
      }

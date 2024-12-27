@@ -77,29 +77,20 @@ _test: {
 //  Test
 
 out: #sub & {#p: _test.s1}
--- diff/todo/p0 --
-out.subs.subs.#p: invalid structural cycle
-This seems to be the result of incorrect handling of disjunctions.
 -- diff/todo/p3 --
 Reordering
 -- out/evalalpha/stats --
-Leaks:  605
-Freed:  45
-Reused: 45
-Allocs: 605
+Leaks:  1834
+Freed:  197
+Reused: 197
+Allocs: 1834
 Retain: 0
 
-Unifications: 175
-Conjuncts:    2668
-Disjuncts:    92
+Unifications: 243
+Conjuncts:    4474
+Disjuncts:    396
 -- out/evalalpha --
-Errors:
-out.subs: structural cycle:
-    ./in.cue:34:17
-
-Result:
-(_|_){
-  // [structural cycle]
+(struct){
   #AC: (#struct){
     k: (string){ "simple" }
     d: ~(#C)
@@ -243,9 +234,88 @@ Result:
       k: (string){ "complex" }
     }
   }
-  out: (_|_){
-    // [structural cycle] out.subs: structural cycle:
-    //     ./in.cue:34:17
+  out: (#struct){
+    #p: (#struct){
+      d: (#struct){
+        n: (string){ "s1" }
+        r: (#struct){
+          r1: (#struct){
+            a: (#struct){
+              d: (#struct){
+                n: (string){ "c1" }
+              }
+              k: (string){ "simple" }
+            }
+          }
+          r2: (#struct){
+            a: (#struct){
+              d: (#struct){
+                n: (string){ "s2" }
+                r: (#struct){
+                  r1: (#struct){
+                    a: (#struct){
+                      d: (#struct){
+                        n: (string){ "c1" }
+                      }
+                      k: (string){ "simple" }
+                    }
+                  }
+                  r2: (#struct){
+                    a: (#struct){
+                      d: (#struct){
+                        n: (string){ "s3" }
+                        r: (#struct){
+                          r1: (#struct){
+                            a: (#struct){
+                              d: (#struct){
+                                n: (string){ "c1" }
+                              }
+                              k: (string){ "simple" }
+                            }
+                          }
+                        }
+                      }
+                      k: (string){ "complex" }
+                    }
+                  }
+                }
+              }
+              k: (string){ "complex" }
+            }
+          }
+        }
+      }
+      k: (string){ "complex" }
+    }
+    dict: (#struct){
+      r1: (#struct){
+        a: (#struct){
+          d: (#struct){
+            n: (string){ "c1" }
+          }
+          k: (string){ "simple" }
+        }
+      }
+      r2_r1: (#struct){
+        a: (#struct){
+          d: (#struct){
+            n: (string){ "c1" }
+          }
+          k: (string){ "simple" }
+        }
+      }
+      r2_r2_r1: (#struct){
+        a: (#struct){
+          d: (#struct){
+            n: (string){ "c1" }
+          }
+          k: (string){ "simple" }
+        }
+      }
+    }
+    let subs#1multi = (〈3;#sub〉 & {
+      #p: 〈2;rd〉.a
+    })
   }
 }
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
@@ -258,31 +328,24 @@ diff old new
 -Reused: 3213
 -Allocs: 25
 -Retain: 26
-+Leaks:  605
-+Freed:  45
-+Reused: 45
-+Allocs: 605
++Leaks:  1834
++Freed:  197
++Reused: 197
++Allocs: 1834
 +Retain: 0
  
 -Unifications: 2588
 -Conjuncts:    12056
 -Disjuncts:    3258
-+Unifications: 175
-+Conjuncts:    2668
-+Disjuncts:    92
++Unifications: 243
++Conjuncts:    4474
++Disjuncts:    396
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,31 +1,25 @@
--(struct){
-+Errors:
-+out.subs: structural cycle:
-+    ./in.cue:34:17
-+
-+Result:
-+(_|_){
-+  // [structural cycle]
+@@ -1,31 +1,19 @@
+ (struct){
    #AC: (#struct){
      k: (string){ "simple" }
 -    d: (#struct){
@@ -317,7 +380,7 @@ diff old new
        }) }
    }
    #S: (#struct){
-@@ -37,14 +31,7 @@
+@@ -37,14 +25,7 @@
      n: (string){ string }
    }
    #sub: (#struct){
@@ -333,7 +396,7 @@ diff old new
      dict: (#struct){
      }
      let subs#1multi = (〈3;#sub〉 & {
-@@ -53,195 +40,116 @@
+@@ -53,190 +34,190 @@
    }
    _test: (struct){
      c1: (#struct){
@@ -475,90 +538,6 @@ diff old new
 -          }
 -        }
 -      }
--    }
--  }
--  out: (#struct){
--    #p: (#struct){
--      k: (string){ "complex" }
--      d: (#struct){
--        n: (string){ "s1" }
--        r: (#struct){
--          r1: (#struct){
--            a: (#struct){
--              k: (string){ "simple" }
--              d: (#struct){
--                n: (string){ "c1" }
--              }
--            }
--          }
--          r2: (#struct){
--            a: (#struct){
--              k: (string){ "complex" }
--              d: (#struct){
--                n: (string){ "s2" }
--                r: (#struct){
--                  r1: (#struct){
--                    a: (#struct){
--                      k: (string){ "simple" }
--                      d: (#struct){
--                        n: (string){ "c1" }
--                      }
--                    }
--                  }
--                  r2: (#struct){
--                    a: (#struct){
--                      k: (string){ "complex" }
--                      d: (#struct){
--                        n: (string){ "s3" }
--                        r: (#struct){
--                          r1: (#struct){
--                            a: (#struct){
--                              k: (string){ "simple" }
--                              d: (#struct){
--                                n: (string){ "c1" }
--                              }
--                            }
--                          }
--                        }
--                      }
--                    }
--                  }
--                }
--              }
--            }
--          }
--        }
--      }
--    }
--    dict: (#struct){
--      r1: (#struct){
--        a: (#struct){
--          k: (string){ "simple" }
--          d: (#struct){
--            n: (string){ "c1" }
--          }
--        }
--      }
--      r2_r1: (#struct){
--        a: (#struct){
--          k: (string){ "simple" }
--          d: (#struct){
--            n: (string){ "c1" }
--          }
--        }
--      }
--      r2_r2_r1: (#struct){
--        a: (#struct){
--          k: (string){ "simple" }
--          d: (#struct){
--            n: (string){ "c1" }
--          }
--        }
--      }
--    }
--    let subs#1multi = (〈3;#sub〉 & {
--      #p: 〈2;rd〉.a
--    })
 +      d: (#struct){
 +        n: (string){ "s1" }
 +        r: (#struct){
@@ -609,13 +588,149 @@ diff old new
 +        }
 +      }
 +      k: (string){ "complex" }
-+    }
-+  }
-+  out: (_|_){
-+    // [structural cycle] out.subs: structural cycle:
-+    //     ./in.cue:34:17
+     }
    }
- }
+   out: (#struct){
+     #p: (#struct){
+-      k: (string){ "complex" }
+-      d: (#struct){
+-        n: (string){ "s1" }
+-        r: (#struct){
+-          r1: (#struct){
+-            a: (#struct){
+-              k: (string){ "simple" }
+-              d: (#struct){
+-                n: (string){ "c1" }
+-              }
+-            }
+-          }
+-          r2: (#struct){
+-            a: (#struct){
+-              k: (string){ "complex" }
+-              d: (#struct){
+-                n: (string){ "s2" }
+-                r: (#struct){
+-                  r1: (#struct){
+-                    a: (#struct){
+-                      k: (string){ "simple" }
+-                      d: (#struct){
+-                        n: (string){ "c1" }
+-                      }
+-                    }
+-                  }
+-                  r2: (#struct){
+-                    a: (#struct){
+-                      k: (string){ "complex" }
+-                      d: (#struct){
+-                        n: (string){ "s3" }
+-                        r: (#struct){
+-                          r1: (#struct){
+-                            a: (#struct){
+-                              k: (string){ "simple" }
+-                              d: (#struct){
+-                                n: (string){ "c1" }
+-                              }
+-                            }
+-                          }
+-                        }
+-                      }
+-                    }
+-                  }
+-                }
+-              }
+-            }
+-          }
+-        }
+-      }
++      d: (#struct){
++        n: (string){ "s1" }
++        r: (#struct){
++          r1: (#struct){
++            a: (#struct){
++              d: (#struct){
++                n: (string){ "c1" }
++              }
++              k: (string){ "simple" }
++            }
++          }
++          r2: (#struct){
++            a: (#struct){
++              d: (#struct){
++                n: (string){ "s2" }
++                r: (#struct){
++                  r1: (#struct){
++                    a: (#struct){
++                      d: (#struct){
++                        n: (string){ "c1" }
++                      }
++                      k: (string){ "simple" }
++                    }
++                  }
++                  r2: (#struct){
++                    a: (#struct){
++                      d: (#struct){
++                        n: (string){ "s3" }
++                        r: (#struct){
++                          r1: (#struct){
++                            a: (#struct){
++                              d: (#struct){
++                                n: (string){ "c1" }
++                              }
++                              k: (string){ "simple" }
++                            }
++                          }
++                        }
++                      }
++                      k: (string){ "complex" }
++                    }
++                  }
++                }
++              }
++              k: (string){ "complex" }
++            }
++          }
++        }
++      }
++      k: (string){ "complex" }
+     }
+     dict: (#struct){
+       r1: (#struct){
+         a: (#struct){
+-          k: (string){ "simple" }
+-          d: (#struct){
+-            n: (string){ "c1" }
+-          }
++          d: (#struct){
++            n: (string){ "c1" }
++          }
++          k: (string){ "simple" }
+         }
+       }
+       r2_r1: (#struct){
+         a: (#struct){
+-          k: (string){ "simple" }
+-          d: (#struct){
+-            n: (string){ "c1" }
+-          }
++          d: (#struct){
++            n: (string){ "c1" }
++          }
++          k: (string){ "simple" }
+         }
+       }
+       r2_r2_r1: (#struct){
+         a: (#struct){
+-          k: (string){ "simple" }
+-          d: (#struct){
+-            n: (string){ "c1" }
+-          }
++          d: (#struct){
++            n: (string){ "c1" }
++          }
++          k: (string){ "simple" }
+         }
+       }
+     }
 -- out/eval/stats --
 Leaks:  6
 Freed:  3232

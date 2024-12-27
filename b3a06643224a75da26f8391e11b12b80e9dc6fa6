@@ -16,6 +16,24 @@
       "message": "nit:whereas",
       "revId": "b3a06643224a75da26f8391e11b12b80e9dc6fa6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "712d8b4a_3881382d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-27T10:37:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "65156aa7_5c328103",
+      "revId": "b3a06643224a75da26f8391e11b12b80e9dc6fa6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -43,7 +43,6 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
-	"sort"
 	"strings"
 	"text/template"
 
@@ -276,12 +275,11 @@ func (g *generator) processGo(pkg *packages.Package) error {
 		obj := scope.Lookup(name)
 		objs = append(objs, objWithPos{obj, pkg.Fset.Position(obj.Pos())})
 	}
-	sort.Slice(objs, func(i, j int) bool {
-		obj1, obj2 := objs[i], objs[j]
-		if obj1.pos.Filename == obj2.pos.Filename {
-			return obj1.pos.Line < obj2.pos.Line
+	slices.SortFunc(objs, func(a, b objWithPos) int {
+		if c := cmp.Compare(a.pos.Filename, b.pos.Filename); c != 0 {
+			return c
 		}
-		return obj1.pos.Filename < obj2.pos.Filename
+		return cmp.Compare(a.pos.Line, b.pos.Line)
 	})
 
 	for _, obj := range objs {

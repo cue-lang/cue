@@ -7,9 +7,9 @@
 package mvs
 
 import (
+	"cmp"
 	"fmt"
 	"slices"
-	"sort"
 	"sync"
 
 	"cuelang.org/go/internal/par"
@@ -268,8 +268,8 @@ func Req[V comparable](mainModule V, base []string, reqs Reqs[V]) ([]V, error) {
 			walk(m)
 		}
 	}
-	sort.Slice(min, func(i, j int) bool {
-		return reqs.Path(min[i]) < reqs.Path(min[j])
+	slices.SortFunc(min, func(a, b V) int {
+		return cmp.Compare(reqs.Path(a), reqs.Path(b))
 	})
 	return min, nil
 }

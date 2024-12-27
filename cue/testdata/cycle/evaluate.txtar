@@ -128,12 +128,11 @@ Disjuncts:    192
 -- out/evalalpha --
 Errors:
 closeCycle.c: structural cycle
+letCycleFail.t1.a.c: structural cycle
 printCycle.a.X: structural cycle
 structCycle.c: structural cycle
 letCycleOK.t2.a.X: structural cycle:
     ./in.cue:23:11
-letCycleFail.t1.a.X: structural cycle:
-    ./in.cue:33:11
 disjunctionCycle.b: cannot use 1 (type int) as type list:
     ./in.cue:56:5
     ./in.cue:56:9
@@ -186,8 +185,7 @@ Result:
           // [structural cycle] letCycleFail.t1.a.X: structural cycle
         }
         c: (_|_){
-          // [structural cycle] letCycleFail.t1.a.X: structural cycle:
-          //     ./in.cue:33:11
+          // [structural cycle] letCycleFail.t1.a.c: structural cycle
         }
       }
     }
@@ -350,7 +348,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,50 +1,49 @@
+@@ -1,50 +1,48 @@
  Errors:
 -closeCycle.a: structural cycle
 -closeCycle.b.d: structural cycle
@@ -359,19 +357,17 @@ diff old new
 -    ./in.cue:105:12
 -    ./in.cue:106:6
 -    ./in.cue:107:5
--letCycleFail.t1.a.c: structural cycle
++closeCycle.c: structural cycle
+ letCycleFail.t1.a.c: structural cycle
 -structCycle.a: structural cycle
 -structCycle.b.d: structural cycle
 -disjunctionCycle.a: cannot use 1 (type int) as type list:
 -    ./in.cue:56:5
 -    ./in.cue:56:9
-+closeCycle.c: structural cycle
 +printCycle.a.X: structural cycle
 +structCycle.c: structural cycle
 +letCycleOK.t2.a.X: structural cycle:
 +    ./in.cue:23:11
-+letCycleFail.t1.a.X: structural cycle:
-+    ./in.cue:33:11
  disjunctionCycle.b: cannot use 1 (type int) as type list:
      ./in.cue:56:5
      ./in.cue:56:9
@@ -428,16 +424,10 @@ diff old new
        }
      }
    }
-@@ -59,20 +58,16 @@
-           // [structural cycle] letCycleFail.t1.a.X: structural cycle
-         }
-         c: (_|_){
--          // [structural cycle] letCycleFail.t1.a.c: structural cycle
--        }
--      }
--    }
--    t2: (struct){
--      a: (struct){
+@@ -65,14 +63,9 @@
+     }
+     t2: (struct){
+       a: (struct){
 -        let X#4 = (struct){
 -          let X#4 = (_|_){
 -            // [structural cycle] letCycleFail.t2.a.X.X: structural cycle:
@@ -446,20 +436,13 @@ diff old new
 -          x: (struct){
 -            y: (string){ "" }
 -          }
-+          // [structural cycle] letCycleFail.t1.a.X: structural cycle:
-+          //     ./in.cue:33:11
-+        }
-+      }
-+    }
-+    t2: (struct){
-+      a: (struct){
 +        let X#4 = (_|_){
 +          // [structural cycle] letCycleFail.t2.a.X: structural cycle:
 +          //     ./in.cue:43:6
          }
          x: (struct){
            y: (string){ "" }
-@@ -88,17 +83,17 @@
+@@ -88,17 +81,17 @@
    disjunctionCycle: (_|_){
      // [eval]
      a: (_|_){
@@ -488,7 +471,7 @@ diff old new
        //     ./in.cue:56:5
        //     ./in.cue:56:9
      }
-@@ -124,80 +119,77 @@
+@@ -124,80 +117,77 @@
      }
      b: (struct){
      }
@@ -618,7 +601,7 @@ diff old new
      }
    }
    closeFail: (_|_){
-@@ -207,21 +199,22 @@
+@@ -207,21 +197,22 @@
      }
      x: (_|_){
        // [eval]

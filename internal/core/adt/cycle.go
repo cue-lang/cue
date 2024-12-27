@@ -632,11 +632,6 @@ func (n *nodeContext) detectCycleV3(arc *Vertex, env *Environment, x Resolver, c
 	// we also can terminate, as this is a structural cycle.
 	// TODO: use depth or check direct ancestry.
 	if n.hasAncestorV3(arc) {
-		if n.node.IsDynamic || ci.Inline {
-			n.reportCycleError()
-			return ci, true
-		}
-
 		return n.markCyclicV3(arc, env, x, ci)
 	}
 

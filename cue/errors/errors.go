@@ -362,18 +362,6 @@ func (p *list) Add(err Error) {
 // Reset resets an List to no errors.
 func (p *list) Reset() { *p = (*p)[:0] }
 
-func comparePath(a, b []string) int {
-	for i, x := range a {
-		if i >= len(b) {
-			break
-		}
-		if c := cmp.Compare(x, b[i]); c != 0 {
-			return c
-		}
-	}
-	return cmp.Compare(len(a), len(b))
-}
-
 // Sanitize sorts multiple errors and removes duplicates on a best effort basis.
 // If err represents a single or no error, it returns the error as is.
 func Sanitize(err Error) Error {
@@ -407,7 +395,7 @@ func (p list) Sort() {
 		if c := a.Position().Compare(b.Position()); c != 0 {
 			return c
 		}
-		if c := comparePath(a.Path(), b.Path()); c != 0 {
+		if c := slices.Compare(a.Path(), b.Path()); c != 0 {
 			return c
 		}
 		return cmp.Compare(a.Error(), b.Error())
@@ -436,7 +424,7 @@ func approximateEqual(a, b Error) bool {
 	if aPos == token.NoPos || bPos == token.NoPos {
 		return a.Error() == b.Error()
 	}
-	return aPos.Compare(bPos) == 0 && comparePath(a.Path(), b.Path()) == 0
+	return aPos.Compare(bPos) == 0 && slices.Compare(a.Path(), b.Path()) == 0
 }
 
 // An List implements the error interface.

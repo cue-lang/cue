@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "115899a4_9dfab42a",
+        "filename": "cue/token/position.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-12-27T10:53:51Z",
+      "side": 1,
+      "message": "Maybe a small comment as a reminder what -1 and 1 means in this case, especially as this is a public API.",
+      "revId": "cbf1083a8673f3a20e0f56d3ca766cb30074e6cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

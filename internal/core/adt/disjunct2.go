@@ -237,11 +237,17 @@ func (n *nodeContext) scheduleDisjunction(d envDisjunct) {
 	})
 }
 
-func initArcs(ctx *OpContext, v *Vertex) {
+func initArcs(ctx *OpContext, v *Vertex) bool {
 	for _, a := range v.Arcs {
-		a.getState(ctx)
-		initArcs(ctx, a)
+		s := a.getState(ctx)
+		if s != nil && s.errs != nil {
+			return false
+		}
+		if !initArcs(ctx, a) {
+			return false
+		}
 	}
+	return true
 }
 
 func (n *nodeContext) processDisjunctions() *Bottom {
@@ -257,7 +263,9 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 	a := n.disjunctions
 	n.disjunctions = n.disjunctions[:0]
 
-	initArcs(n.ctx, n.node)
+	if !initArcs(n.ctx, n.node) {
+		return n.getError()
+	}
 
 	// TODO(perf): single pass for quick filter on all disjunctions.
 	// n.node.unify(n.ctx, allKnown, attemptOnly)

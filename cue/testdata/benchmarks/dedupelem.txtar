@@ -53,9 +53,7 @@ Result:
   foo: (_|_){
     // [eval]
     0: (_|_){
-      // [eval] foo.0.type: conflicting values "string" and "float":
-      //     ./in.cue:5:14
-      //     ./in.cue:10:14
+      // [eval]
       type: (_|_){
         // [eval] foo.0.type: conflicting values "string" and "float":
         //     ./in.cue:5:14
@@ -79,7 +77,7 @@ diff old new
  foo.0.type: conflicting values "string" and "float":
      ./in.cue:5:14
      ./in.cue:10:14
-@@ -22,13 +16,7 @@
+@@ -22,15 +16,7 @@
    foo: (_|_){
      // [eval]
      0: (_|_){
@@ -90,10 +88,12 @@ diff old new
 -      //     ./in.cue:5:27
 -      //     ./in.cue:5:30
 -      // foo.0.type: conflicting values "string" and "float":
-+      // [eval] foo.0.type: conflicting values "string" and "float":
-       //     ./in.cue:5:14
-       //     ./in.cue:10:14
+-      //     ./in.cue:5:14
+-      //     ./in.cue:10:14
++      // [eval]
        type: (_|_){
+         // [eval] foo.0.type: conflicting values "string" and "float":
+         //     ./in.cue:5:14
 -- diff/explanation --
 Improved and simplified error message which can be detected before disjunction.
 -- out/eval --

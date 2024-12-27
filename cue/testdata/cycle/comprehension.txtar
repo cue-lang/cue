@@ -343,7 +343,7 @@ Result:
     a: (struct){
       parent: (string){ "" }
       children: (_|_){
-        // [incomplete] B.a.children: cannot range over v.children (incomplete type _):
+        // [incomplete] B.a.children: cannot range over v.children (incomplete type list):
         //     ./in.cue:19:40
       }
     }
@@ -735,7 +735,7 @@ diff old new
        parent: (string){ "" }
 -      children: (#list){
 +      children: (_|_){
-+        // [incomplete] B.a.children: cannot range over v.children (incomplete type _):
++        // [incomplete] B.a.children: cannot range over v.children (incomplete type list):
 +        //     ./in.cue:19:40
        }
      }

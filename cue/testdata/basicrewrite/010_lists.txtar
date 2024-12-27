@@ -84,7 +84,7 @@ Conjuncts:    46
 Disjuncts:    26
 -- out/evalalpha --
 Errors:
-e: conflicting values 4 and [] (mismatched types int and list):
+e: conflicting values [] and 4 (mismatched types list and int):
     ./in.cue:4:8
     ./in.cue:4:13
 e2: undefined field: d:
@@ -114,7 +114,7 @@ Result:
     2: (int){ 3 }
   }
   e: (_|_){
-    // [eval] e: conflicting values 4 and [] (mismatched types int and list):
+    // [eval] e: conflicting values [] and 4 (mismatched types list and int):
     //     ./in.cue:4:8
     //     ./in.cue:4:13
   }
@@ -154,8 +154,10 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -2,7 +2,7 @@
- e: conflicting values 4 and [] (mismatched types int and list):
+@@ -1,8 +1,8 @@
+ Errors:
+-e: conflicting values 4 and [] (mismatched types int and list):
++e: conflicting values [] and 4 (mismatched types list and int):
      ./in.cue:4:8
      ./in.cue:4:13
 -e2: invalid list index d (type string):
@@ -163,7 +165,13 @@ diff old new
      ./in.cue:5:12
  e3: invalid index -1 (index must be non-negative):
      ./in.cue:6:8
-@@ -34,7 +34,7 @@
+@@ -29,12 +29,12 @@
+     2: (int){ 3 }
+   }
+   e: (_|_){
+-    // [eval] e: conflicting values 4 and [] (mismatched types int and list):
++    // [eval] e: conflicting values [] and 4 (mismatched types list and int):
+     //     ./in.cue:4:8
      //     ./in.cue:4:13
    }
    e2: (_|_){

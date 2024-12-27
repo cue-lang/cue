@@ -192,6 +192,7 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 			Up:     env,
 			Vertex: n.node,
 		}
+		n.updateNodeType(ListKind, x, id)
 		n.scheduleTask(handleListLit, env, x, id)
 
 	case *DisjunctionExpr:

@@ -18,10 +18,8 @@
 package scanner
 
 import (
-	"bytes"
 	"fmt"
 	"path/filepath"
-	"strconv"
 	"unicode"
 	"unicode/utf8"
 
@@ -48,7 +46,6 @@ type Scanner struct {
 	ch              rune // current character
 	offset          int  // character offset
 	rdOffset        int  // reading offset (position after current character)
-	lineOffset      int  // current line offset
 	linesSinceLast  int
 	spacesSinceLast int
 	insertEOL       bool // insert a comma before next newline
@@ -73,7 +70,6 @@ func (s *Scanner) next() {
 	if s.rdOffset < len(s.src) {
 		s.offset = s.rdOffset
 		if s.ch == '\n' {
-			s.lineOffset = s.offset
 			s.file.AddLine(s.offset)
 		}
 		r, w := rune(s.src[s.rdOffset]), 1
@@ -94,7 +90,6 @@ func (s *Scanner) next() {
 	} else {
 		s.offset = len(s.src)
 		if s.ch == '\n' {
-			s.lineOffset = s.offset
 			s.file.AddLine(s.offset)
 		}
 		s.ch = -1 // eof
@@ -139,7 +134,6 @@ func (s *Scanner) Init(file *token.File, src []byte, eh ErrorHandler, mode Mode)
 	s.ch = ' '
 	s.offset = 0
 	s.rdOffset = 0
-	s.lineOffset = 0
 	s.insertEOL = false
 	s.ErrorCount = 0
 
@@ -156,29 +150,6 @@ func (s *Scanner) errf(offs int, msg string, args ...interface{}) {
 	s.ErrorCount++
 }
 
-var prefix = []byte("//line ")
-
-func (s *Scanner) interpretLineComment(text []byte) {
-	if bytes.HasPrefix(text, prefix) {
-		// get filename and line number, if any
-		if i := bytes.LastIndex(text, []byte{':'}); i > 0 {
-			if line, err := strconv.Atoi(string(text[i+1:])); err == nil && line > 0 {
-				// valid //line filename:line comment
-				filename := string(bytes.TrimSpace(text[len(prefix):i]))
-				if filename != "" {
-					filename = filepath.Clean(filename)
-					if !filepath.IsAbs(filename) {
-						// make filename relative to current directory
-						filename = filepath.Join(s.dir, filename)
-					}
-				}
-				// update scanner position
-				s.file.AddLineInfo(s.lineOffset+len(text)+1, filename, line) // +len(text)+1 since comment applies to next line
-			}
-		}
-	}
-}
-
 func (s *Scanner) scanComment() string {
 	// initial '/' already consumed; s.ch == '/'
 	offs := s.offset - 1 // position of initial '/'
@@ -192,10 +163,6 @@ func (s *Scanner) scanComment() string {
 				hasCR = true
 			}
 			s.next()
-		}
-		if offs == s.lineOffset {
-			// comment starts at the beginning of the current line
-			s.interpretLineComment(s.src[offs:s.offset])
 		}
 		goto exit
 	}

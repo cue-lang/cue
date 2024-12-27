@@ -17,8 +17,6 @@ package scanner
 import (
 	"fmt"
 	"os"
-	"path/filepath"
-	"runtime"
 	"strings"
 	"testing"
 
@@ -506,73 +504,6 @@ func TestRelative(t *testing.T) {
 	}
 	if diff := cmp.Diff(got, want); diff != "" {
 		t.Error(diff)
-	}
-}
-
-type segment struct {
-	srcline  string // a line of source text
-	filename string // filename for current token
-	line     int    // line number for current token
-}
-
-var segments = []segment{
-	// exactly one token per line since the test consumes one token per segment
-	{"  line1", filepath.Join("dir", "TestLineComments"), 1},
-	{"\nline2", filepath.Join("dir", "TestLineComments"), 2},
-	{"\nline3  //line File1.go:100", filepath.Join("dir", "TestLineComments"), 3}, // bad line comment, ignored
-	{"\nline4", filepath.Join("dir", "TestLineComments"), 4},
-	{"\n//line File1.go:100\n  line100", filepath.Join("dir", "File1.go"), 100},
-	{"\n//line  \t :42\n  line1", "", 42},
-	{"\n//line File2.go:200\n  line200", filepath.Join("dir", "File2.go"), 200},
-	{"\n//line foo\t:42\n  line42", filepath.Join("dir", "foo"), 42},
-	{"\n //line foo:42\n  line44", filepath.Join("dir", "foo"), 44},           // bad line comment, ignored
-	{"\n//line foo 42\n  line46", filepath.Join("dir", "foo"), 46},            // bad line comment, ignored
-	{"\n//line foo:42 extra text\n  line48", filepath.Join("dir", "foo"), 48}, // bad line comment, ignored
-	{"\n//line ./foo:42\n  line42", filepath.Join("dir", "foo"), 42},
-	{"\n//line a/b/c/File1.go:100\n  line100", filepath.Join("dir", "a", "b", "c", "File1.go"), 100},
-}
-
-var unixsegments = []segment{
-	{"\n//line /bar:42\n  line42", "/bar", 42},
-}
-
-var winsegments = []segment{
-	{"\n//line c:\\bar:42\n  line42", "c:\\bar", 42},
-	{"\n//line c:\\dir\\File1.go:100\n  line100", "c:\\dir\\File1.go", 100},
-}
-
-// Verify that comments of the form "//line filename:line" are interpreted correctly.
-func TestLineComments(t *testing.T) {
-	segs := segments
-	if runtime.GOOS == "windows" {
-		segs = append(segs, winsegments...)
-	} else {
-		segs = append(segs, unixsegments...)
-	}
-
-	// make source
-	var src string
-	for _, e := range segs {
-		src += e.srcline
-	}
-
-	// verify scan
-	var S Scanner
-	f := token.NewFile(filepath.Join("dir", "TestLineComments"), -1, len(src))
-	S.Init(f, []byte(src), nil, DontInsertCommas)
-	for _, s := range segs {
-		p, _, lit := S.Scan()
-		pos := f.Position(p)
-		checkPosScan(t, lit, p, token.Position{
-			Filename: s.filename,
-			Offset:   pos.Offset,
-			Line:     s.line,
-			Column:   pos.Column,
-		})
-	}
-
-	if S.ErrorCount != 0 {
-		t.Errorf("found %d errors", S.ErrorCount)
 	}
 }
 

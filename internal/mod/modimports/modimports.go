@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"path"
-	"sort"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -60,7 +60,7 @@ func AllImports(modFilesIter func(func(ModuleFile, error) bool)) (_ []string, re
 	for p := range pkgPaths {
 		pkgPathSlice = append(pkgPathSlice, p)
 	}
-	sort.Strings(pkgPathSlice)
+	slices.Sort(pkgPathSlice)
 	return pkgPathSlice, nil
 }
 

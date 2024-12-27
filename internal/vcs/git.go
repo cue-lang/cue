@@ -18,7 +18,7 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
-	"sort"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -72,7 +72,7 @@ func (v gitVCS) ListFiles(ctx context.Context, dir string, paths ...string) ([]s
 		return nil, nil
 	}
 	files := strings.Split(out, "\x00")
-	sort.Strings(files)
+	slices.Sort(files)
 	return files, nil
 }
 

@@ -18,7 +18,7 @@ import (
 	"flag"
 	"fmt"
 	"path/filepath"
-	"sort"
+	"slices"
 	"strings"
 	"testing"
 
@@ -199,7 +199,7 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, flags cued
 			keys[i] = k
 			i++
 		}
-		sort.Strings(keys)
+		slices.Sort(keys)
 		for _, s := range keys {
 			t.Errorf("  -- path: %s", s)
 		}

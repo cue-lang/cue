@@ -24,7 +24,7 @@ import (
 	"log"
 	"os"
 	"path"
-	"sort"
+	"slices"
 
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/jsonschema/internal/externaltest"
@@ -85,6 +85,6 @@ func sortedKeys[T any](m map[string]T) []string {
 	for k := range m {
 		ks = append(ks, k)
 	}
-	sort.Strings(ks)
+	slices.Sort(ks)
 	return ks
 }

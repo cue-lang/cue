@@ -16,6 +16,24 @@
       "message": "wrap comment to 80 chars?",
       "revId": "b91fb179ceacfffe19bf41386b65815b764bf3af",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c76f9f0_7fa0f632",
+        "filename": "cue/token/position.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-27T11:44:45Z",
+      "side": 1,
+      "message": "ended up moving this to the godoc following your previous request for one.",
+      "parentUuid": "7342fc1b_043b1a94",
+      "revId": "b91fb179ceacfffe19bf41386b65815b764bf3af",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

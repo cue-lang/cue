@@ -19,7 +19,6 @@ import (
 	pathpkg "path"
 	"path/filepath"
 	"slices"
-	"sort"
 	"strconv"
 	"strings"
 
@@ -350,7 +349,7 @@ func cleanImports(m map[string][]token.Pos) ([]string, map[string][]token.Pos) {
 	for path := range m {
 		all = append(all, path)
 	}
-	sort.Strings(all)
+	slices.Sort(all)
 	return all, m
 }
 

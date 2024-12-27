@@ -20,7 +20,7 @@ import (
 	"io"
 	"os"
 	"path"
-	"sort"
+	"slices"
 	"strings"
 	"testing"
 
@@ -259,7 +259,7 @@ func sortedKeys[T any](m map[string]T) []string {
 	for k := range m {
 		ks = append(ks, k)
 	}
-	sort.Strings(ks)
+	slices.Sort(ks)
 	return ks
 }
 

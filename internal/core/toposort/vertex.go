@@ -130,7 +130,6 @@ package toposort
 // Vertex's slice of StructInfos.
 
 import (
-	"cmp"
 	"fmt"
 	"slices"
 
@@ -368,7 +367,7 @@ type vertexFeatures struct {
 }
 
 func (vf *vertexFeatures) compareStructMeta(a, b *structMeta) int {
-	if c := comparePos(a.pos, b.pos); c != 0 {
+	if c := a.pos.Compare(b.pos); c != 0 {
 		return c
 	}
 	aHasDyn := a.hasDynamic(vf.dynFieldsMap)
@@ -381,20 +380,6 @@ func (vf *vertexFeatures) compareStructMeta(a, b *structMeta) int {
 	default:
 		return -1
 	}
-}
-
-func comparePos(aPos, bPos token.Pos) int {
-	if aPos == bPos {
-		return 0
-	} else if aPos == token.NoPos {
-		return 1
-	} else if bPos == token.NoPos {
-		return -1
-	}
-	if c := cmp.Compare(aPos.Filename(), bPos.Filename()); c != 0 {
-		return c
-	}
-	return cmp.Compare(aPos.Offset(), bPos.Offset())
 }
 
 func VertexFeatures(ctx *adt.OpContext, v *adt.Vertex) []adt.Feature {

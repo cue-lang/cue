@@ -365,18 +365,7 @@ func cmpLeafNodes[T adt.Node](a, b T) int {
 		return 0
 	}
 
-	posA := srcA.Pos()
-	posB := srcB.Pos()
-
-	if c := cmp.Compare(posA.Filename(), posB.Filename()); c != 0 {
-		return c
-	}
-
-	if c := cmp.Compare(posA.Offset(), posB.Offset()); c != 0 {
-		return c
-	}
-
-	return 0
+	return srcA.Pos().Compare(srcB.Pos())
 }
 
 func typeOrder(x adt.Node) int {

@@ -153,14 +153,14 @@ inline: acrossFields: ok1: {
   }
 }
 -- out/evalalpha/stats --
-Leaks:  137
+Leaks:  148
 Freed:  0
 Reused: 0
-Allocs: 137
+Allocs: 148
 Retain: 0
 
-Unifications: 101
-Conjuncts:    509
+Unifications: 108
+Conjuncts:    552
 Disjuncts:    0
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -172,17 +172,17 @@ diff old new
 -Reused: 136
 -Allocs: 252
 -Retain: 834
-+Leaks:  137
++Leaks:  148
 +Freed:  0
 +Reused: 0
-+Allocs: 137
++Allocs: 148
 +Retain: 0
  
 -Unifications: 388
 -Conjuncts:    1307
 -Disjuncts:    707
-+Unifications: 101
-+Conjuncts:    509
++Unifications: 108
++Conjuncts:    552
 +Disjuncts:    0
 -- out/eval/stats --
 Leaks:  247

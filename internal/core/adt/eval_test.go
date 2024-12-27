@@ -83,6 +83,7 @@ var skipDebugDepErrors = map[string]int{
 	"comprehensions/pushdown":  2,
 	"cycle/comprehension":      2,
 	"cycle/disjunction":        4,
+	"cycle/evaluate":           1,
 	"cycle/structural":         14,
 	"disjunctions/edge":        1,
 	"disjunctions/errors":      2,

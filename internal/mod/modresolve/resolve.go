@@ -15,13 +15,14 @@
 package modresolve
 
 import (
+	"cmp"
 	"crypto/sha256"
 	_ "embed"
 	"fmt"
 	"net"
 	"net/netip"
 	"path"
-	"sort"
+	"slices"
 	"strings"
 	"sync"
 
@@ -379,8 +380,8 @@ func (r *resolver) initHosts() error {
 			Insecure: insecure,
 		})
 	}
-	sort.Slice(allHosts, func(i, j int) bool {
-		return allHosts[i].Name < allHosts[j].Name
+	slices.SortFunc(allHosts, func(a, b Host) int {
+		return cmp.Compare(a.Name, b.Name)
 	})
 	r.allHosts = allHosts
 	return nil

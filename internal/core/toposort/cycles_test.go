@@ -99,7 +99,7 @@ func TestElementaryCycles(t *testing.T) {
 					for _, cycle := range cyclesNames {
 						rotateToStartAt(cycle, slices.Min(cycle))
 					}
-					slices.SortFunc(cyclesNames, compareStringses)
+					slices.SortFunc(cyclesNames, slices.Compare)
 
 					if !slices.EqualFunc(cyclesNames, tc.expected, slices.Equal) {
 						t.Fatalf(`

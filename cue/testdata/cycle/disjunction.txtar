@@ -229,7 +229,7 @@ Result:
       // issue3042.data.secret: field not allowed:
       //     ./issue3042.cue:8:3
       secret: (struct){
-        infra: (_){ _ }
+        infra: (list){ list }
       }
     }
   }
@@ -292,7 +292,7 @@ diff old new
 +      // issue3042.data.secret: field not allowed:
 +      //     ./issue3042.cue:8:3
 +      secret: (struct){
-+        infra: (_){ _ }
++        infra: (list){ list }
        }
 -      name?: (string){ =~"^foo" }
      }

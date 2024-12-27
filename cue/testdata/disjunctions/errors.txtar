@@ -97,13 +97,9 @@ issue516.x.match: field not allowed:
     ./in.cue:23:5
 issue516.x.match.metrics.foo: field not allowed:
     ./in.cue:23:21
-issue570.results: 2 errors in empty disjunction:
 issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
     ./in.cue:3:19
     ./in.cue:12:12
-issue570.results.result: field not allowed:
-    ./in.cue:3:11
-    ./in.cue:12:3
 
 Result:
 (_|_){
@@ -111,14 +107,12 @@ Result:
   issue570: (_|_){
     // [eval]
     results: (_|_){
-      // [eval] issue570.results: 2 errors in empty disjunction:
-      // issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
-      //     ./in.cue:3:19
-      //     ./in.cue:12:12
-      // issue570.results.result: field not allowed:
-      //     ./in.cue:3:11
-      //     ./in.cue:12:3
-      result: (string){ "hello" }
+      // [eval]
+      result: (_|_){
+        // [eval] issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
+        //     ./in.cue:3:19
+        //     ./in.cue:12:12
+      }
     }
     #Output: (#struct){ |((#struct){
         result: (_){ _ }
@@ -231,7 +225,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,17 +1,16 @@
+@@ -1,15 +1,10 @@
  Errors:
  issue516.x: 2 errors in empty disjunction:
  issue516.x.match: field not allowed:
@@ -242,42 +236,31 @@ diff old new
 -    ./in.cue:19:19
 -    ./in.cue:22:5
      ./in.cue:23:21
-+issue570.results: 2 errors in empty disjunction:
  issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
 -    ./in.cue:2:11
      ./in.cue:3:19
      ./in.cue:12:12
-+issue570.results.result: field not allowed:
-+    ./in.cue:3:11
-+    ./in.cue:12:3
  
- Result:
- (_|_){
-@@ -19,17 +18,14 @@
+@@ -19,17 +14,12 @@
    issue570: (_|_){
      // [eval]
      results: (_|_){
 -      // [eval] issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
 -      //     ./in.cue:2:11
-+      // [eval] issue570.results: 2 errors in empty disjunction:
-+      // issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
-       //     ./in.cue:3:19
-       //     ./in.cue:12:12
--      result: (_|_){
--        // [eval] issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
+-      //     ./in.cue:3:19
+-      //     ./in.cue:12:12
++      // [eval]
+       result: (_|_){
+         // [eval] issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
 -        //     ./in.cue:2:11
--        //     ./in.cue:3:19
--        //     ./in.cue:12:12
--      }
+         //     ./in.cue:3:19
+         //     ./in.cue:12:12
+       }
 -      error: (string){ string }
-+      // issue570.results.result: field not allowed:
-+      //     ./in.cue:3:11
-+      //     ./in.cue:12:3
-+      result: (string){ "hello" }
      }
      #Output: (#struct){ |((#struct){
          result: (_){ _ }
-@@ -59,18 +55,10 @@
+@@ -59,18 +49,10 @@
      x: (_|_){
        // [eval] issue516.x: 2 errors in empty disjunction:
        // issue516.x.match: field not allowed:
@@ -297,7 +280,7 @@ diff old new
          metrics: (struct){
            foo: (struct){
            }
-@@ -86,11 +74,11 @@
+@@ -86,11 +68,11 @@
    }
    issue2916: (struct){
      b: (struct){
@@ -311,7 +294,7 @@ diff old new
    }
    issue3576: (struct){
      reduced: (struct){
-@@ -136,13 +124,11 @@
+@@ -136,13 +118,11 @@
      reduced: (struct){
        list: (_|_){
          // [incomplete] issue3581.reduced.list: 2 errors in empty disjunction:
@@ -328,11 +311,7 @@ diff old new
        }
        c: (_){ _ }
      }
--- diff/todo/p1 --
-issue570.results.result: Spurious error: field not allowed
-This is probably due to the disjunction in the #Output field.
 -- diff/todo/p3 --
-Missing empty disjunction message.
 Missing error positions.
 -- diff/explanation --
 The additional "field not allowed" error is correct and a message corresponding

@@ -1570,7 +1570,7 @@ Result:
           //     ./in.cue:439:12
           // nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
           //     ./in.cue:438:6
-          0: (_){ _ }
+          0: (list){ list }
           1: (int){ 1 }
         }
         1: (int){ 1 }
@@ -1591,7 +1591,7 @@ Result:
           //     ./in.cue:444:11
           // nestedList.v2e.y.0.0: incompatible list lengths (1 and 2):
           //     ./in.cue:444:6
-          0: (_){ _ }
+          0: (list){ list }
           1: (int){ 1 }
         }
         1: (int){ 1 }
@@ -2497,7 +2497,7 @@ diff old new
 -          }
 +          // nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
 +          //     ./in.cue:438:6
-+          0: (_){ _ }
++          0: (list){ list }
            1: (int){ 1 }
          }
          1: (int){ 1 }
@@ -2520,7 +2520,7 @@ diff old new
 -          }
 +          // nestedList.v2e.y.0.0: incompatible list lengths (1 and 2):
 +          //     ./in.cue:444:6
-+          0: (_){ _ }
++          0: (list){ list }
            1: (int){ 1 }
          }
          1: (int){ 1 }

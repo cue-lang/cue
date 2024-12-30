@@ -16,6 +16,24 @@
       "message": "I might be a bit slow post holiday but haven\u0027t we lost this logic?",
       "revId": "c905888d93236a7398dd5ff07d436bb41762f2ed",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15cd6757_880455a7",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-30T13:18:05Z",
+      "side": 0,
+      "message": "we have indeed, but this is already covered by the `if !o.Exists() { return nil, o.Err() }` above. this added logic is only here to catch the \"command exists but nowhere near a tool file\"; if the commands field is an error, then we would not have reached this part of the code anyway.",
+      "parentUuid": "a1ebcddb_e21b68bd",
+      "revId": "c905888d93236a7398dd5ff07d436bb41762f2ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

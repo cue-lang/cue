@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1ebcddb_e21b68bd",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-12-30T13:16:08Z",
+      "side": 0,
+      "message": "I might be a bit slow post holiday but haven\u0027t we lost this logic?",
+      "revId": "c905888d93236a7398dd5ff07d436bb41762f2ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

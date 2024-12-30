@@ -19,6 +19,7 @@ import (
 	"encoding/yaml"
 	"tool/file"
 
+	"cuelang.org/go/internal/ci/base"
 	"cuelang.org/go/internal/ci/repo"
 	"cuelang.org/go/internal/ci/github"
 )
@@ -43,7 +44,7 @@ command: gen: {
 	workflows: {
 		remove: {
 			glob: file.Glob & {
-				glob: path.Join([_dir, "*.yml"], _goos)
+				glob: path.Join([_dir, "*" + base.workflowFileExtension], _goos)
 				files: [...string]
 			}
 			for _, _filename in glob.files {

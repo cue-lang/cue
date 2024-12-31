@@ -404,61 +404,22 @@ type viewDefiner interface{ definition() *viewDefinition }
 func bestView[V viewDefiner](ctx context.Context, fs file.Source, fh file.Handle, views []V) (V, error) {
 	var zero V
 
-	if len(views) == 0 {
-		return zero, nil // avoid the call to findRootPattern
-	}
-	uri := fh.URI()
-	dir := uri.Dir()
-	modURI, err := findRootPattern(ctx, dir, "cue.mod/module.cue", fs)
-	if err != nil {
-		return zero, err
+	// Given current limitations of cue lsp (exactly one workspace folder supported)
+	// we should assert here that we have a single view. Otherwise we have problems
+	if len(views) != 1 {
+		return zero, fmt.Errorf("expected exactly 1 view; saw %d", len(views))
 	}
 
-	// Prefer GoWork > GoMod > GOPATH > GoPackages > AdHoc.
-	var (
-		goPackagesViews []V // prefer longest
-		workViews       []V // prefer longest
-		modViews        []V // exact match
-		gopathViews     []V // prefer longest
-		adHocViews      []V // exact match
-	)
+	v := views[0]
 
-	for _, view := range views {
-		switch def := view.definition(); def.Type() {
-		case CUEModView:
-			if _, ok := def.workspaceModFiles[modURI]; ok {
-				modViews = append(modViews, view)
-			}
-		case AdHocView:
-			if def.root == dir {
-				adHocViews = append(adHocViews, view)
-			}
-		}
+	// Now we simply need to assert that the folder (directory) that defines the view
+	// (WorkspaceFolder) contains fh
+	if v.definition().folder.Dir.Encloses(fh.URI()) {
+		return v, nil
 	}
 
-	// Now that we've collected matching views, choose the best match,
-	// considering ports.
-	//
-	// We only consider one type of view, since the matching view created by
-	// defineView should be of the best type.
-	var bestViews []V
-	switch {
-	case len(workViews) > 0:
-		bestViews = workViews
-	case len(modViews) > 0:
-		bestViews = modViews
-	case len(gopathViews) > 0:
-		bestViews = gopathViews
-	case len(goPackagesViews) > 0:
-		bestViews = goPackagesViews
-	case len(adHocViews) > 0:
-		bestViews = adHocViews
-	default:
-		return zero, nil
-	}
-
-	// TODO: we need to fix this
-	return bestViews[0], nil
+	// Perhaps a random file opened by the user?
+	return zero, nil
 }
 
 // updateViewLocked recreates the view with the given options.

@@ -52,6 +52,24 @@
       "parentUuid": "15cd6757_880455a7",
       "revId": "c905888d93236a7398dd5ff07d436bb41762f2ed",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05921748_30eb460c",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-12-31T11:39:04Z",
+      "side": 0,
+      "message": "\u003e if the commands field is an error, then we would not have reached this part of the code anyway.\n\nI\u0027m not sure I follow how/where such an invariant is maintained.",
+      "parentUuid": "15cd6757_880455a7",
+      "revId": "c905888d93236a7398dd5ff07d436bb41762f2ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

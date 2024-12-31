@@ -9,7 +9,6 @@ import (
 
 	"cuelang.org/go/internal/golangorgx/gopls/cuelang"
 	"cuelang.org/go/internal/golangorgx/gopls/file"
-	"cuelang.org/go/internal/golangorgx/gopls/golang"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/event/tag"
@@ -26,8 +25,6 @@ func (s *server) Formatting(ctx context.Context, params *protocol.DocumentFormat
 	defer release()
 
 	switch snapshot.FileKind(fh) {
-	case file.Go:
-		return golang.Format(ctx, snapshot, fh)
 	case file.CUE:
 		return cuelang.FormatCUE(ctx, snapshot, fh)
 	default:

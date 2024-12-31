@@ -5,18 +5,13 @@
 package cache
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
 	"go/ast"
-	"go/build/constraint"
-	"go/parser"
 	"go/token"
 	"go/types"
-	"io"
 	"os"
-	"path"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -32,14 +27,12 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/file"
 	"cuelang.org/go/internal/golangorgx/gopls/filecache"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
-	"cuelang.org/go/internal/golangorgx/gopls/protocol/command"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/gopls/util/bug"
 	"cuelang.org/go/internal/golangorgx/gopls/util/constraints"
 	"cuelang.org/go/internal/golangorgx/gopls/util/immutable"
 	"cuelang.org/go/internal/golangorgx/gopls/util/pathutil"
 	"cuelang.org/go/internal/golangorgx/gopls/util/persistent"
-	"cuelang.org/go/internal/golangorgx/gopls/util/slices"
 	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/event/label"
 	"cuelang.org/go/internal/golangorgx/tools/event/tag"
@@ -112,12 +105,6 @@ type Snapshot struct {
 	// TODO(rfindley): can we unify the lifecycle of initialized and initialErr.
 	initialErr *InitializationError
 
-	// builtin is the location of builtin.go in GOROOT.
-	//
-	// TODO(rfindley): would it make more sense to eagerly parse builtin, and
-	// instead store a *ParsedGoFile here?
-	builtin protocol.DocumentURI
-
 	// meta holds loaded metadata.
 	//
 	// meta is guarded by mu, but the Graph itself is immutable.
@@ -163,23 +150,6 @@ type Snapshot struct {
 	// unloadableFiles keeps track of files that we've failed to load.
 	unloadableFiles *persistent.Set[protocol.DocumentURI]
 
-	// TODO(rfindley): rename the handles below to "promises". A promise is
-	// different from a handle (we mutate the package handle.)
-
-	// parseModHandles keeps track of any parseModHandles for the snapshot.
-	// The handles need not refer to only the view's go.mod file.
-	parseModHandles *persistent.Map[protocol.DocumentURI, *memoize.Promise] // *memoize.Promise[parseModResult]
-
-	// parseWorkHandles keeps track of any parseWorkHandles for the snapshot.
-	// The handles need not refer to only the view's go.work file.
-	parseWorkHandles *persistent.Map[protocol.DocumentURI, *memoize.Promise] // *memoize.Promise[parseWorkResult]
-
-	// Preserve go.mod-related handles to avoid garbage-collecting the results
-	// of various calls to the go command. The handles need not refer to only
-	// the view's go.mod file.
-	modTidyHandles *persistent.Map[protocol.DocumentURI, *memoize.Promise] // *memoize.Promise[modTidyResult]
-	modWhyHandles  *persistent.Map[protocol.DocumentURI, *memoize.Promise] // *memoize.Promise[modWhyResult]
-
 	// importGraph holds a shared import graph to use for type-checking. Adding
 	// more packages to this import graph can speed up type checking, at the
 	// expense of in-use memory.
@@ -190,14 +160,6 @@ type Snapshot struct {
 
 	// pkgIndex is an index of package IDs, for efficient storage of typerefs.
 	pkgIndex *typerefs.PackageIndex
-
-	// moduleUpgrades tracks known upgrades for module paths in each modfile.
-	// Each modfile has a map of module name to upgrade version.
-	moduleUpgrades *persistent.Map[protocol.DocumentURI, map[string]string]
-
-	// gcOptimizationDetails describes the packages for which we want
-	// optimization details to be included in the diagnostics.
-	gcOptimizationDetails map[metadata.PackageID]unit
 }
 
 var _ memoize.RefCounted = (*Snapshot)(nil) // snapshots are reference-counted
@@ -238,12 +200,7 @@ func (s *Snapshot) decref() {
 		s.activePackages.Destroy()
 		s.files.destroy()
 		s.symbolizeHandles.Destroy()
-		s.parseModHandles.Destroy()
-		s.parseWorkHandles.Destroy()
-		s.modTidyHandles.Destroy()
-		s.modWhyHandles.Destroy()
 		s.unloadableFiles.Destroy()
-		s.moduleUpgrades.Destroy()
 		s.done()
 	}
 }
@@ -424,190 +381,6 @@ func (m InvocationFlags) Mode() InvocationFlags {
 
 func (m InvocationFlags) AllowNetwork() bool {
 	return m&AllowNetwork != 0
-}
-
-// RunGoCommandDirect runs the given `go` command. Verb, Args, and
-// WorkingDir must be specified.
-func (s *Snapshot) RunGoCommandDirect(ctx context.Context, mode InvocationFlags, inv *gocommand.Invocation) (*bytes.Buffer, error) {
-	_, inv, cleanup, err := s.goCommandInvocation(ctx, mode, inv)
-	if err != nil {
-		return nil, err
-	}
-	defer cleanup()
-
-	return s.view.gocmdRunner.Run(ctx, *inv)
-}
-
-// RunGoCommandPiped runs the given `go` command, writing its output
-// to stdout and stderr. Verb, Args, and WorkingDir must be specified.
-//
-// RunGoCommandPiped runs the command serially using gocommand.RunPiped,
-// enforcing that this command executes exclusively to other commands on the
-// server.
-func (s *Snapshot) RunGoCommandPiped(ctx context.Context, mode InvocationFlags, inv *gocommand.Invocation, stdout, stderr io.Writer) error {
-	_, inv, cleanup, err := s.goCommandInvocation(ctx, mode, inv)
-	if err != nil {
-		return err
-	}
-	defer cleanup()
-	return s.view.gocmdRunner.RunPiped(ctx, *inv, stdout, stderr)
-}
-
-// RunGoModUpdateCommands runs a series of `go` commands that updates the go.mod
-// and go.sum file for wd, and returns their updated contents.
-//
-// TODO(rfindley): the signature of RunGoModUpdateCommands is very confusing.
-// Simplify it.
-func (s *Snapshot) RunGoModUpdateCommands(ctx context.Context, wd string, run func(invoke func(...string) (*bytes.Buffer, error)) error) ([]byte, []byte, error) {
-	flags := WriteTemporaryModFile | AllowNetwork
-	tmpURI, inv, cleanup, err := s.goCommandInvocation(ctx, flags, &gocommand.Invocation{WorkingDir: wd})
-	if err != nil {
-		return nil, nil, err
-	}
-	defer cleanup()
-	invoke := func(args ...string) (*bytes.Buffer, error) {
-		inv.Verb = args[0]
-		inv.Args = args[1:]
-		return s.view.gocmdRunner.Run(ctx, *inv)
-	}
-	if err := run(invoke); err != nil {
-		return nil, nil, err
-	}
-	if flags.Mode() != WriteTemporaryModFile {
-		return nil, nil, nil
-	}
-	var modBytes, sumBytes []byte
-	modBytes, err = os.ReadFile(tmpURI.Path())
-	if err != nil && !os.IsNotExist(err) {
-		return nil, nil, err
-	}
-	sumBytes, err = os.ReadFile(strings.TrimSuffix(tmpURI.Path(), ".mod") + ".sum")
-	if err != nil && !os.IsNotExist(err) {
-		return nil, nil, err
-	}
-	return modBytes, sumBytes, nil
-}
-
-// goCommandInvocation populates inv with configuration for running go commands on the snapshot.
-//
-// TODO(rfindley): refactor this function to compose the required configuration
-// explicitly, rather than implicitly deriving it from flags and inv.
-//
-// TODO(adonovan): simplify cleanup mechanism. It's hard to see, but
-// it used only after call to tempModFile.
-func (s *Snapshot) goCommandInvocation(ctx context.Context, flags InvocationFlags, inv *gocommand.Invocation) (tmpURI protocol.DocumentURI, updatedInv *gocommand.Invocation, cleanup func(), err error) {
-	allowModfileModificationOption := s.Options().AllowModfileModifications
-	allowNetworkOption := s.Options().AllowImplicitNetworkAccess
-
-	// TODO(rfindley): it's not clear that this is doing the right thing.
-	// Should inv.Env really overwrite view.options? Should s.view.envOverlay
-	// overwrite inv.Env? (Do we ever invoke this with a non-empty inv.Env?)
-	//
-	// We should survey existing uses and write down rules for how env is
-	// applied.
-	inv.Env = slices.Concat(
-		os.Environ(),
-		s.Options().EnvSlice(),
-		inv.Env,
-		[]string{"GO111MODULE=" + s.view.adjustedGO111MODULE()},
-		s.view.EnvOverlay(),
-	)
-	inv.BuildFlags = append([]string{}, s.Options().BuildFlags...)
-	cleanup = func() {} // fallback
-
-	// All logic below is for module mode.
-	if len(s.view.workspaceModFiles) == 0 {
-		return "", inv, cleanup, nil
-	}
-
-	mode, allowNetwork := flags.Mode(), flags.AllowNetwork()
-	if !allowNetwork && !allowNetworkOption {
-		inv.Env = append(inv.Env, "GOPROXY=off")
-	}
-
-	// What follows is rather complicated logic for how to actually run the go
-	// command. A word of warning: this is the result of various incremental
-	// features added to gopls, and varying behavior of the Go command across Go
-	// versions. It can surely be cleaned up significantly, but tread carefully.
-	//
-	// Roughly speaking we need to resolve four things:
-	//  - the working directory.
-	//  - the -mod flag
-	//  - the -modfile flag
-	//
-	// These are dependent on a number of factors: whether we need to run in a
-	// synthetic workspace, whether flags are supported at the current go
-	// version, and what we're actually trying to achieve (the
-	// InvocationFlags).
-	//
-	// TODO(rfindley): should we set -overlays here?
-
-	const mutableModFlag = "mod"
-
-	// If the mod flag isn't set, populate it based on the mode and workspace.
-	//
-	// (As noted in various TODOs throughout this function, this is very
-	// confusing and not obviously correct, but tests pass and we will eventually
-	// rewrite this entire function.)
-	if inv.ModFlag == "" {
-		switch mode {
-		case LoadWorkspace, Normal:
-			if allowModfileModificationOption {
-				inv.ModFlag = mutableModFlag
-			}
-		case WriteTemporaryModFile:
-			inv.ModFlag = mutableModFlag
-			// -mod must be readonly when using go.work files - see issue #48941
-			inv.Env = append(inv.Env, "GOWORK=off")
-		}
-	}
-
-	// TODO(rfindley): if inv.ModFlag was already set to "mod", we may not have
-	// set GOWORK=off here. But that doesn't happen. Clean up this entire API so
-	// that we don't have this mutation of the invocation, which is quite hard to
-	// follow.
-
-	// If the invocation needs to mutate the modfile, we must use a temp mod.
-	if inv.ModFlag == mutableModFlag {
-		var modURI protocol.DocumentURI
-		// Select the module context to use.
-		// If we're type checking, we need to use the workspace context, meaning
-		// the main (workspace) module. Otherwise, we should use the module for
-		// the passed-in working dir.
-		if mode == LoadWorkspace {
-			// TODO(rfindley): this seems unnecessary and overly complicated. Remove
-			// this along with 'allowModFileModifications'.
-			if s.view.typ == GoModView {
-				modURI = s.view.cuemod
-			}
-		} else {
-			modURI = s.GoModForFile(protocol.URIFromPath(inv.WorkingDir))
-		}
-
-		var modContent []byte
-		if modURI != "" {
-			modFH, err := s.ReadFile(ctx, modURI)
-			if err != nil {
-				return "", nil, cleanup, err
-			}
-			modContent, err = modFH.Content()
-			if err != nil {
-				return "", nil, cleanup, err
-			}
-		}
-		if modURI == "" {
-			return "", nil, cleanup, fmt.Errorf("no go.mod file found in %s", inv.WorkingDir)
-		}
-		// Use the go.sum if it happens to be available.
-		gosum := s.goSum(ctx, modURI)
-		tmpURI, cleanup, err = tempModFile(modURI, modContent, gosum)
-		if err != nil {
-			return "", nil, cleanup, err
-		}
-		inv.ModFile = tmpURI.Path()
-	}
-
-	return tmpURI, inv, cleanup, nil
 }
 
 func (s *Snapshot) buildOverlay() map[string][]byte {
@@ -931,13 +704,6 @@ func (s *Snapshot) fileWatchingGlobPatterns() map[protocol.RelativePattern]unit 
 	patterns := make(map[protocol.RelativePattern]unit)
 
 	// If GOWORK is outside the folder, ensure we are watching it.
-	if s.view.gowork != "" && !s.view.folder.Dir.Encloses(s.view.gowork) {
-		workPattern := protocol.RelativePattern{
-			BaseURI: s.view.gowork.Dir(),
-			Pattern: path.Base(string(s.view.gowork)),
-		}
-		patterns[workPattern] = unit{}
-	}
 
 	extensions := "go,mod,sum,work"
 	for _, ext := range s.Options().TemplateExtensions {
@@ -947,11 +713,6 @@ func (s *Snapshot) fileWatchingGlobPatterns() map[protocol.RelativePattern]unit 
 
 	var dirs []string
 	if s.view.moduleMode() {
-		if s.view.typ == GoWorkView {
-			workVendorDir := filepath.Join(s.view.gowork.Dir().Path(), "vendor")
-			workVendorURI := protocol.URIFromPath(workVendorDir)
-			patterns[protocol.RelativePattern{BaseURI: workVendorURI, Pattern: watchGoFiles}] = unit{}
-		}
 
 		// In module mode, watch directories containing active modules, and collect
 		// these dirs for later filtering the set of known directories.
@@ -1200,15 +961,6 @@ func moduleForURI(modFiles map[protocol.DocumentURI]struct{}, uri protocol.Docum
 	return match
 }
 
-// nearestModFile finds the nearest go.mod file contained in the directory
-// containing uri, or a parent of that directory.
-//
-// The given uri must be a file, not a directory.
-func nearestModFile(ctx context.Context, uri protocol.DocumentURI, fs file.Source) (protocol.DocumentURI, error) {
-	dir := filepath.Dir(uri.Path())
-	return findRootPattern(ctx, protocol.URIFromPath(dir), "cue.mod/module.cue", fs)
-}
-
 // Metadata returns the metadata for the specified package,
 // or nil if it was not found.
 func (s *Snapshot) Metadata(id PackageID) *metadata.Package {
@@ -1401,212 +1153,6 @@ func (s *Snapshot) reloadWorkspace(ctx context.Context) {
 	}
 }
 
-func (s *Snapshot) orphanedFileDiagnostics(ctx context.Context, overlays []*overlay) ([]*Diagnostic, error) {
-	if err := s.awaitLoaded(ctx); err != nil {
-		return nil, err
-	}
-
-	var diagnostics []*Diagnostic
-	var orphaned []*overlay
-searchOverlays:
-	for _, o := range overlays {
-		uri := o.URI()
-		if s.IsBuiltin(uri) || s.FileKind(o) != file.Go {
-			continue
-		}
-		mps, err := s.MetadataForFile(ctx, uri)
-		if err != nil {
-			return nil, err
-		}
-		for _, mp := range mps {
-			if !metadata.IsCommandLineArguments(mp.ID) || mp.Standalone {
-				continue searchOverlays
-			}
-		}
-		// With zero-config gopls (golang/go#57979), orphaned file diagnostics
-		// include diagnostics for orphaned files -- not just diagnostics relating
-		// to the reason the files are opened.
-		//
-		// This is because orphaned files are never considered part of a workspace
-		// package: if they are loaded by a view, that view is arbitrary, and they
-		// may be loaded by multiple views. If they were to be diagnosed by
-		// multiple views, their diagnostics may become inconsistent.
-		if len(mps) > 0 {
-			diags, err := s.PackageDiagnostics(ctx, mps[0].ID)
-			if err != nil {
-				return nil, err
-			}
-			diagnostics = append(diagnostics, diags[uri]...)
-		}
-		orphaned = append(orphaned, o)
-	}
-
-	if len(orphaned) == 0 {
-		return nil, nil
-	}
-
-	loadedModFiles := make(map[protocol.DocumentURI]struct{}) // all mod files, including dependencies
-	ignoredFiles := make(map[protocol.DocumentURI]bool)       // files reported in packages.Package.IgnoredFiles
-
-	g := s.MetadataGraph()
-	for _, meta := range g.Packages {
-		if meta.Module != nil && meta.Module.GoMod != "" {
-			gomod := protocol.URIFromPath(meta.Module.GoMod)
-			loadedModFiles[gomod] = struct{}{}
-		}
-		for _, ignored := range meta.IgnoredFiles {
-			ignoredFiles[ignored] = true
-		}
-	}
-
-	initialErr := s.InitializationError()
-
-	for _, fh := range orphaned {
-		pgf, rng, ok := orphanedFileDiagnosticRange(ctx, s.view.parseCache, fh)
-		if !ok {
-			continue // e.g. cancellation or parse error
-		}
-
-		var (
-			msg            string         // if non-empty, report a diagnostic with this message
-			suggestedFixes []SuggestedFix // associated fixes, if any
-		)
-		if initialErr != nil {
-			msg = fmt.Sprintf("initialization failed: %v", initialErr.MainError)
-		} else if goMod, err := nearestModFile(ctx, fh.URI(), s); err == nil && goMod != "" {
-			// If we have a relevant go.mod file, check whether the file is orphaned
-			// due to its go.mod file being inactive. We could also offer a
-			// prescriptive diagnostic in the case that there is no go.mod file, but it
-			// is harder to be precise in that case, and less important.
-			if _, ok := loadedModFiles[goMod]; !ok {
-				modDir := filepath.Dir(goMod.Path())
-				viewDir := s.view.folder.Dir.Path()
-
-				// When the module is underneath the view dir, we offer
-				// "use all modules" quick-fixes.
-				inDir := pathutil.InDir(viewDir, modDir)
-
-				if rel, err := filepath.Rel(viewDir, modDir); err == nil {
-					modDir = rel
-				}
-
-				var fix string
-				if s.view.folder.Env.GoVersion >= 18 {
-					if s.view.gowork != "" {
-						fix = fmt.Sprintf("To fix this problem, you can add this module to your go.work file (%s)", s.view.gowork)
-						if cmd, err := command.NewRunGoWorkCommandCommand("Run `go work use`", command.RunGoWorkArgs{
-							ViewID: s.view.ID(),
-							Args:   []string{"use", modDir},
-						}); err == nil {
-							suggestedFixes = append(suggestedFixes, SuggestedFix{
-								Title:      "Use this module in your go.work file",
-								Command:    &cmd,
-								ActionKind: protocol.QuickFix,
-							})
-						}
-
-						if inDir {
-							if cmd, err := command.NewRunGoWorkCommandCommand("Run `go work use -r`", command.RunGoWorkArgs{
-								ViewID: s.view.ID(),
-								Args:   []string{"use", "-r", "."},
-							}); err == nil {
-								suggestedFixes = append(suggestedFixes, SuggestedFix{
-									Title:      "Use all modules in your workspace",
-									Command:    &cmd,
-									ActionKind: protocol.QuickFix,
-								})
-							}
-						}
-					} else {
-						fix = "To fix this problem, you can add a go.work file that uses this directory."
-
-						if cmd, err := command.NewRunGoWorkCommandCommand("Run `go work init && go work use`", command.RunGoWorkArgs{
-							ViewID:    s.view.ID(),
-							InitFirst: true,
-							Args:      []string{"use", modDir},
-						}); err == nil {
-							suggestedFixes = []SuggestedFix{
-								{
-									Title:      "Add a go.work file using this module",
-									Command:    &cmd,
-									ActionKind: protocol.QuickFix,
-								},
-							}
-						}
-
-						if inDir {
-							if cmd, err := command.NewRunGoWorkCommandCommand("Run `go work init && go work use -r`", command.RunGoWorkArgs{
-								ViewID:    s.view.ID(),
-								InitFirst: true,
-								Args:      []string{"use", "-r", "."},
-							}); err == nil {
-								suggestedFixes = append(suggestedFixes, SuggestedFix{
-									Title:      "Add a go.work file using all modules in your workspace",
-									Command:    &cmd,
-									ActionKind: protocol.QuickFix,
-								})
-							}
-						}
-					}
-				} else {
-					fix = `To work with multiple modules simultaneously, please upgrade to Go 1.18 or
-later, reinstall gopls, and use a go.work file.`
-				}
-
-				msg = fmt.Sprintf(`This file is within module %q, which is not included in your workspace.
-%s
-See the documentation for more information on setting up your workspace:
-https://github.com/golang/tools/blob/master/gopls/doc/workspace.md.`, modDir, fix)
-			}
-		}
-
-		if msg == "" {
-			if ignoredFiles[fh.URI()] {
-				// TODO(rfindley): use the constraint package to check if the file
-				// _actually_ satisfies the current build context.
-				hasConstraint := false
-				walkConstraints(pgf.File, func(constraint.Expr) bool {
-					hasConstraint = true
-					return false
-				})
-				var fix string
-				if hasConstraint {
-					fix = `This file may be excluded due to its build tags; try adding "-tags=<build tag>" to your gopls "buildFlags" configuration
-See the documentation for more information on working with build tags:
-https://github.com/golang/tools/blob/master/gopls/doc/settings.md#buildflags-string.`
-				} else if strings.Contains(filepath.Base(fh.URI().Path()), "_") {
-					fix = `This file may be excluded due to its GOOS/GOARCH, or other build constraints.`
-				} else {
-					fix = `This file is ignored by your gopls build.` // we don't know why
-				}
-				msg = fmt.Sprintf("No packages found for open file %s.\n%s", fh.URI().Path(), fix)
-			} else {
-				// Fall back: we're not sure why the file is orphaned.
-				// TODO(rfindley): we could do better here, diagnosing the lack of a
-				// go.mod file and malformed file names (see the perc%ent marker test).
-				msg = fmt.Sprintf("No packages found for open file %s.", fh.URI().Path())
-			}
-		}
-
-		if msg != "" {
-			d := &Diagnostic{
-				URI:            fh.URI(),
-				Range:          rng,
-				Severity:       protocol.SeverityWarning,
-				Source:         ListError,
-				Message:        msg,
-				SuggestedFixes: suggestedFixes,
-			}
-			if ok := bundleQuickFixes(d); !ok {
-				bug.Reportf("failed to bundle quick fixes for %v", d)
-			}
-			// Only report diagnostics if we detect an actual exclusion.
-			diagnostics = append(diagnostics, d)
-		}
-	}
-	return diagnostics, nil
-}
-
 // orphanedFileDiagnosticRange returns the position to use for orphaned file diagnostics.
 // We only warn about an orphaned file if it is well-formed enough to actually
 // be part of a package. Otherwise, we need more information.
@@ -1668,10 +1214,6 @@ func (s *Snapshot) clone(ctx, bgCtx context.Context, changed StateChange, done f
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	// TODO(rfindley): reorganize this function to make the derivation of
-	// needsDiagnosis clearer.
-	needsDiagnosis := len(changed.GCDetails) > 0 || len(changed.ModuleUpgrades) > 0
-
 	bgCtx, cancel := context.WithCancel(bgCtx)
 	result := &Snapshot{
 		sequenceID:        s.sequenceID + 1,
@@ -1681,7 +1223,6 @@ func (s *Snapshot) clone(ctx, bgCtx context.Context, changed StateChange, done f
 		view:              s.view,
 		backgroundCtx:     bgCtx,
 		cancel:            cancel,
-		builtin:           s.builtin,
 		initialized:       s.initialized,
 		initialErr:        s.initialErr,
 		packages:          s.packages.Clone(),
@@ -1691,330 +1232,11 @@ func (s *Snapshot) clone(ctx, bgCtx context.Context, changed StateChange, done f
 		workspacePackages: s.workspacePackages,
 		shouldLoad:        s.shouldLoad.Clone(),      // not cloneWithout: shouldLoad is cleared on loads
 		unloadableFiles:   s.unloadableFiles.Clone(), // not cloneWithout: typing in a file doesn't necessarily make it loadable
-		parseModHandles:   cloneWithout(s.parseModHandles, changedFiles, &needsDiagnosis),
-		parseWorkHandles:  cloneWithout(s.parseWorkHandles, changedFiles, &needsDiagnosis),
-		modTidyHandles:    cloneWithout(s.modTidyHandles, changedFiles, &needsDiagnosis),
-		modWhyHandles:     cloneWithout(s.modWhyHandles, changedFiles, &needsDiagnosis),
 		importGraph:       s.importGraph,
 		pkgIndex:          s.pkgIndex,
-		moduleUpgrades:    cloneWith(s.moduleUpgrades, changed.ModuleUpgrades),
 	}
 
-	// Compute the new set of packages for which we want gc details, after
-	// applying changed.GCDetails.
-	if len(s.gcOptimizationDetails) > 0 || len(changed.GCDetails) > 0 {
-		newGCDetails := make(map[metadata.PackageID]unit)
-		for id := range s.gcOptimizationDetails {
-			if _, ok := changed.GCDetails[id]; !ok {
-				newGCDetails[id] = unit{} // no change
-			}
-		}
-		for id, want := range changed.GCDetails {
-			if want {
-				newGCDetails[id] = unit{}
-			}
-		}
-		if len(newGCDetails) > 0 {
-			result.gcOptimizationDetails = newGCDetails
-		}
-	}
-
-	reinit := false
-
-	// Changes to vendor tree may require reinitialization,
-	// either because of an initialization error
-	// (e.g. "inconsistent vendoring detected"), or because
-	// one or more modules may have moved into or out of the
-	// vendor tree after 'go mod vendor' or 'rm -fr vendor/'.
-	//
-	// In this case, we consider the actual modification to see if was a creation
-	// or deletion.
-	//
-	// TODO(rfindley): revisit the location of this check.
-	for _, mod := range changed.Modifications {
-		if inVendor(mod.URI) && (mod.Action == file.Create || mod.Action == file.Delete) ||
-			strings.HasSuffix(string(mod.URI), "/vendor/modules.txt") {
-
-			reinit = true
-			break
-		}
-	}
-
-	// Collect observed file handles for changed URIs from the old snapshot, if
-	// they exist. Importantly, we don't call ReadFile here: consider the case
-	// where a file is added on disk; we don't want to read the newly added file
-	// into the old snapshot, as that will break our change detection below.
-	//
-	// TODO(rfindley): it may be more accurate to rely on the modification type
-	// here, similarly to what we do for vendored files above. If we happened not
-	// to have read a file in the previous snapshot, that's not the same as it
-	// actually being created.
-	oldFiles := make(map[protocol.DocumentURI]file.Handle)
-	for uri := range changedFiles {
-		if fh, ok := s.files.get(uri); ok {
-			oldFiles[uri] = fh
-		}
-	}
-	// changedOnDisk determines if the new file handle may have changed on disk.
-	// It over-approximates, returning true if the new file is saved and either
-	// the old file wasn't saved, or the on-disk contents changed.
-	//
-	// oldFH may be nil.
-	changedOnDisk := func(oldFH, newFH file.Handle) bool {
-		if !newFH.SameContentsOnDisk() {
-			return false
-		}
-		if oe, ne := (oldFH != nil && fileExists(oldFH)), fileExists(newFH); !oe || !ne {
-			return oe != ne
-		}
-		return !oldFH.SameContentsOnDisk() || oldFH.Identity() != newFH.Identity()
-	}
-
-	// Reinitialize if any workspace mod file has changed on disk.
-	for uri, newFH := range changedFiles {
-		if _, ok := result.view.workspaceModFiles[uri]; ok && changedOnDisk(oldFiles[uri], newFH) {
-			reinit = true
-		}
-	}
-
-	// Finally, process sumfile changes that may affect loading.
-	for uri, newFH := range changedFiles {
-		if !changedOnDisk(oldFiles[uri], newFH) {
-			continue // like with go.mod files, we only reinit when things change on disk
-		}
-		dir, base := filepath.Split(uri.Path())
-		if base == "go.work.sum" && s.view.typ == GoWorkView && dir == filepath.Dir(s.view.gowork.Path()) {
-			reinit = true
-		}
-		if base == "go.sum" {
-			modURI := protocol.URIFromPath(filepath.Join(dir, "go.mod"))
-			if _, active := result.view.workspaceModFiles[modURI]; active {
-				reinit = true
-			}
-		}
-	}
-
-	// The snapshot should be initialized if either s was uninitialized, or we've
-	// detected a change that triggers reinitialization.
-	if reinit {
-		result.initialized = false
-		needsDiagnosis = true
-	}
-
-	// directIDs keeps track of package IDs that have directly changed.
-	// Note: this is not a set, it's a map from id to invalidateMetadata.
-	directIDs := map[PackageID]bool{}
-
-	// Invalidate all package metadata if the workspace module has changed.
-	if reinit {
-		for k := range s.meta.Packages {
-			// TODO(rfindley): this seems brittle; can we just start over?
-			directIDs[k] = true
-		}
-	}
-
-	// Compute invalidations based on file changes.
-	anyImportDeleted := false      // import deletions can resolve cycles
-	anyFileOpenedOrClosed := false // opened files affect workspace packages
-	anyFileAdded := false          // adding a file can resolve missing dependencies
-
-	for uri, newFH := range changedFiles {
-		// The original FileHandle for this URI is cached on the snapshot.
-		oldFH := oldFiles[uri] // may be nil
-		_, oldOpen := oldFH.(*overlay)
-		_, newOpen := newFH.(*overlay)
-
-		anyFileOpenedOrClosed = anyFileOpenedOrClosed || (oldOpen != newOpen)
-		anyFileAdded = anyFileAdded || (oldFH == nil || !fileExists(oldFH)) && fileExists(newFH)
-
-		// If uri is a Go file, check if it has changed in a way that would
-		// invalidate metadata. Note that we can't use s.view.FileKind here,
-		// because the file type that matters is not what the *client* tells us,
-		// but what the Go command sees.
-		var invalidateMetadata, pkgFileChanged, importDeleted bool
-		if strings.HasSuffix(uri.Path(), ".go") {
-			invalidateMetadata, pkgFileChanged, importDeleted = metadataChanges(ctx, s, oldFH, newFH)
-		}
-		if invalidateMetadata {
-			// If this is a metadata-affecting change, perhaps a reload will succeed.
-			result.unloadableFiles.Remove(uri)
-			needsDiagnosis = true
-		}
-
-		invalidateMetadata = invalidateMetadata || reinit
-		anyImportDeleted = anyImportDeleted || importDeleted
-
-		// Mark all of the package IDs containing the given file.
-		filePackageIDs := invalidatedPackageIDs(uri, s.meta.IDs, pkgFileChanged)
-		for id := range filePackageIDs {
-			directIDs[id] = directIDs[id] || invalidateMetadata // may insert 'false'
-		}
-
-		// Invalidate the previous modTidyHandle if any of the files have been
-		// saved or if any of the metadata has been invalidated.
-		//
-		// TODO(rfindley): this seems like too-aggressive invalidation of mod
-		// results. We should instead thread through overlays to the Go command
-		// invocation and only run this if invalidateMetadata (and perhaps then
-		// still do it less frequently).
-		if invalidateMetadata || fileWasSaved(oldFH, newFH) {
-			// Only invalidate mod tidy results for the most relevant modfile in the
-			// workspace. This is a potentially lossy optimization for workspaces
-			// with many modules (such as google-cloud-go, which has 145 modules as
-			// of writing).
-			//
-			// While it is theoretically possible that a change in workspace module A
-			// could affect the mod-tidiness of workspace module B (if B transitively
-			// requires A), such changes are probably unlikely and not worth the
-			// penalty of re-running go mod tidy for everything. Note that mod tidy
-			// ignores GOWORK, so the two modules would have to be related by a chain
-			// of replace directives.
-			//
-			// We could improve accuracy by inspecting replace directives, using
-			// overlays in go mod tidy, and/or checking for metadata changes from the
-			// on-disk content.
-			//
-			// Note that we iterate the modTidyHandles map here, rather than e.g.
-			// using nearestModFile, because we don't have access to an accurate
-			// FileSource at this point in the snapshot clone.
-			const onlyInvalidateMostRelevant = true
-			if onlyInvalidateMostRelevant {
-				deleteMostRelevantModFile(result.modTidyHandles, uri)
-			} else {
-				result.modTidyHandles.Clear()
-			}
-
-			// TODO(rfindley): should we apply the above heuristic to mod vuln or mod
-			// why handles as well?
-			//
-			// TODO(rfindley): no tests fail if I delete the line below.
-			result.modWhyHandles.Clear()
-		}
-	}
-
-	// Deleting an import can cause list errors due to import cycles to be
-	// resolved. The best we can do without parsing the list error message is to
-	// hope that list errors may have been resolved by a deleted import.
-	//
-	// We could do better by parsing the list error message. We already do this
-	// to assign a better range to the list error, but for such critical
-	// functionality as metadata, it's better to be conservative until it proves
-	// impractical.
-	//
-	// We could also do better by looking at which imports were deleted and
-	// trying to find cycles they are involved in. This fails when the file goes
-	// from an unparseable state to a parseable state, as we don't have a
-	// starting point to compare with.
-	if anyImportDeleted {
-		for id, mp := range s.meta.Packages {
-			if len(mp.Errors) > 0 {
-				directIDs[id] = true
-			}
-		}
-	}
-
-	// Adding a file can resolve missing dependencies from existing packages.
-	//
-	// We could be smart here and try to guess which packages may have been
-	// fixed, but until that proves necessary, just invalidate metadata for any
-	// package with missing dependencies.
-	if anyFileAdded {
-		for id, mp := range s.meta.Packages {
-			for _, impID := range mp.DepsByImpPath {
-				if impID == "" { // missing import
-					directIDs[id] = true
-					break
-				}
-			}
-		}
-	}
-
-	// Invalidate reverse dependencies too.
-	// idsToInvalidate keeps track of transitive reverse dependencies.
-	// If an ID is present in the map, invalidate its types.
-	// If an ID's value is true, invalidate its metadata too.
-	idsToInvalidate := map[PackageID]bool{}
-	var addRevDeps func(PackageID, bool)
-	addRevDeps = func(id PackageID, invalidateMetadata bool) {
-		current, seen := idsToInvalidate[id]
-		newInvalidateMetadata := current || invalidateMetadata
-
-		// If we've already seen this ID, and the value of invalidate
-		// metadata has not changed, we can return early.
-		if seen && current == newInvalidateMetadata {
-			return
-		}
-		idsToInvalidate[id] = newInvalidateMetadata
-		for _, rid := range s.meta.ImportedBy[id] {
-			addRevDeps(rid, invalidateMetadata)
-		}
-	}
-	for id, invalidateMetadata := range directIDs {
-		addRevDeps(id, invalidateMetadata)
-	}
-
-	// Invalidated package information.
-	for id, invalidateMetadata := range idsToInvalidate {
-		if _, ok := directIDs[id]; ok || invalidateMetadata {
-			if result.packages.Delete(id) {
-				needsDiagnosis = true
-			}
-		} else {
-			if entry, hit := result.packages.Get(id); hit {
-				needsDiagnosis = true
-				ph := entry.clone(false)
-				result.packages.Set(id, ph, nil)
-			}
-		}
-		if result.activePackages.Delete(id) {
-			needsDiagnosis = true
-		}
-	}
-
-	// Compute which metadata updates are required. We only need to invalidate
-	// packages directly containing the affected file, and only if it changed in
-	// a relevant way.
-	metadataUpdates := make(map[PackageID]*metadata.Package)
-	for id, mp := range s.meta.Packages {
-		invalidateMetadata := idsToInvalidate[id]
-
-		// For metadata that has been newly invalidated, capture package paths
-		// requiring reloading in the shouldLoad map.
-		if invalidateMetadata && !metadata.IsCommandLineArguments(mp.ID) {
-			needsReload := []PackagePath{mp.PkgPath}
-			if mp.ForTest != "" && mp.ForTest != mp.PkgPath {
-				// When reloading test variants, always reload their ForTest package as
-				// well. Otherwise, we may miss test variants in the resulting load.
-				//
-				// TODO(rfindley): is this actually sufficient? Is it possible that
-				// other test variants may be invalidated? Either way, we should
-				// determine exactly what needs to be reloaded here.
-				needsReload = append(needsReload, mp.ForTest)
-			}
-			result.shouldLoad.Set(id, needsReload, nil)
-		}
-
-		// Check whether the metadata should be deleted.
-		if invalidateMetadata {
-			needsDiagnosis = true
-			metadataUpdates[id] = nil
-			continue
-		}
-	}
-
-	// Update metadata, if necessary.
-	result.meta = s.meta.Update(metadataUpdates)
-
-	// Update workspace and active packages, if necessary.
-	if result.meta != s.meta || anyFileOpenedOrClosed {
-		needsDiagnosis = true
-		result.workspacePackages = computeWorkspacePackagesLocked(result, result.meta)
-		result.resetActivePackagesLocked()
-	} else {
-		result.workspacePackages = s.workspacePackages
-	}
-
-	return result, needsDiagnosis
+	return result, false
 }
 
 // cloneWithout clones m then deletes from it the keys of changes.
@@ -2281,53 +1503,4 @@ func extractMagicComments(f *ast.File) []string {
 		}
 	}
 	return results
-}
-
-// BuiltinFile returns information about the special builtin package.
-func (s *Snapshot) BuiltinFile(ctx context.Context) (*ParsedGoFile, error) {
-	s.AwaitInitialized(ctx)
-
-	s.mu.Lock()
-	builtin := s.builtin
-	s.mu.Unlock()
-
-	if builtin == "" {
-		return nil, fmt.Errorf("no builtin package for view %s", s.view.folder.Name)
-	}
-
-	fh, err := s.ReadFile(ctx, builtin)
-	if err != nil {
-		return nil, err
-	}
-	// For the builtin file only, we need syntactic object resolution
-	// (since we can't type check).
-	mode := ParseFull &^ parser.SkipObjectResolution
-	pgfs, err := s.view.parseCache.parseFiles(ctx, token.NewFileSet(), mode, false, fh)
-	if err != nil {
-		return nil, err
-	}
-	return pgfs[0], nil
-}
-
-// IsBuiltin reports whether uri is part of the builtin package.
-func (s *Snapshot) IsBuiltin(uri protocol.DocumentURI) bool {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	// We should always get the builtin URI in a canonical form, so use simple
-	// string comparison here. span.CompareURI is too expensive.
-	return uri == s.builtin
-}
-
-func (s *Snapshot) setBuiltin(path string) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	s.builtin = protocol.URIFromPath(path)
-}
-
-// WantGCDetails reports whether to compute GC optimization details for the
-// specified package.
-func (s *Snapshot) WantGCDetails(id metadata.PackageID) bool {
-	_, ok := s.gcOptimizationDetails[id]
-	return ok
 }

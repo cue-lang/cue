@@ -19,10 +19,8 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/cache"
 	"cuelang.org/go/internal/golangorgx/gopls/cache/metadata"
 	"cuelang.org/go/internal/golangorgx/gopls/file"
-	"cuelang.org/go/internal/golangorgx/gopls/golang"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
-	"cuelang.org/go/internal/golangorgx/gopls/template"
 	"cuelang.org/go/internal/golangorgx/gopls/util/maps"
 	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/event/tag"
@@ -248,29 +246,6 @@ func (s *server) diagnoseChangedFiles(ctx context.Context, snapshot *cache.Snaps
 		if snapshot.FindFile(uri) == nil {
 			continue
 		}
-
-		// Don't request type-checking for builtin.go: it's not a real package.
-		if snapshot.IsBuiltin(uri) {
-			continue
-		}
-
-		// Don't diagnose files that are ignored by `go list` (e.g. testdata).
-		if snapshot.IgnoredFile(uri) {
-			continue
-		}
-
-		// Find all packages that include this file and diagnose them in parallel.
-		meta, err := golang.NarrowestMetadataForFile(ctx, snapshot, uri)
-		if err != nil {
-			if ctx.Err() != nil {
-				return nil, ctx.Err()
-			}
-			// TODO(findleyr): we should probably do something with the error here,
-			// but as of now this can fail repeatedly if load fails, so can be too
-			// noisy to log (and we'll handle things later in the slow pass).
-			continue
-		}
-		toDiagnose[meta.ID] = meta
 	}
 	diags, err := snapshot.PackageDiagnostics(ctx, maps.Keys(toDiagnose)...)
 	if err != nil {
@@ -296,163 +271,9 @@ func (s *server) diagnose(ctx context.Context, snapshot *cache.Snapshot) (diagMa
 	ctx, done := event.Start(ctx, "Server.diagnose", snapshot.Labels()...)
 	defer done()
 
-	// Wait for a free diagnostics slot.
-	// TODO(adonovan): opt: shouldn't it be the analysis implementation's
-	// job to de-dup and limit resource consumption? In any case this
-	// function spends most its time waiting for awaitLoaded, at
-	// least initially.
-	select {
-	case <-ctx.Done():
-		return nil, ctx.Err()
-	case s.diagnosticsSema <- struct{}{}:
-	}
-	defer func() {
-		<-s.diagnosticsSema
-	}()
-
 	var (
-		diagnosticsMu sync.Mutex
-		diagnostics   = make(diagMap)
+		diagnostics = make(diagMap)
 	)
-	// common code for dispatching diagnostics
-	store := func(operation string, diagsByFile diagMap, err error) {
-		if err != nil {
-			if ctx.Err() == nil {
-				event.Error(ctx, "warning: while "+operation, err, snapshot.Labels()...)
-			}
-			return
-		}
-		diagnosticsMu.Lock()
-		defer diagnosticsMu.Unlock()
-		for uri, diags := range diagsByFile {
-			diagnostics[uri] = append(diagnostics[uri], diags...)
-		}
-	}
-
-	// Diagnostics below are organized by increasing specificity:
-	//  go.work > mod > mod upgrade > mod vuln > package, etc.
-
-	workspacePkgs, err := snapshot.WorkspaceMetadata(ctx)
-	if s.shouldIgnoreError(snapshot, err) {
-		return diagnostics, ctx.Err()
-	}
-
-	initialErr := snapshot.InitializationError()
-	if ctx.Err() != nil {
-		// Don't update initialization status if the context is cancelled.
-		return nil, ctx.Err()
-	}
-
-	if initialErr != nil {
-		store("critical error", initialErr.Diagnostics, nil)
-	}
-
-	// Show the error as a progress error report so that it appears in the
-	// status bar. If a client doesn't support progress reports, the error
-	// will still be shown as a ShowMessage. If there is no error, any running
-	// error progress reports will be closed.
-	statusErr := initialErr
-	if len(snapshot.Overlays()) == 0 {
-		// Don't report a hanging status message if there are no open files at this
-		// snapshot.
-		statusErr = nil
-	}
-	s.updateCriticalErrorStatus(ctx, snapshot, statusErr)
-
-	// Diagnose template (.tmpl) files.
-	tmplReports := template.Diagnostics(snapshot)
-	// NOTE(rfindley): typeCheckSource is not accurate here.
-	// (but this will be gone soon anyway).
-	store("diagnosing templates", tmplReports, nil)
-
-	// If there are no workspace packages, there is nothing to diagnose and
-	// there are no orphaned files.
-	if len(workspacePkgs) == 0 {
-		return diagnostics, nil
-	}
-
-	var wg sync.WaitGroup // for potentially slow operations below
-
-	// Run type checking and go/analysis diagnosis of packages in parallel.
-	//
-	// For analysis, we use the *widest* package for each open file,
-	// for two reasons:
-	//
-	// - Correctness: some analyzers (e.g. unusedparam) depend
-	//   on it. If applied to a non-test package for which a
-	//   corresponding test package exists, they make assumptions
-	//   that are falsified in the test package, for example that
-	//   all references to unexported symbols are visible to the
-	//   analysis.
-	//
-	// - Efficiency: it may yield a smaller covering set of
-	//   PackageIDs for a given set of files. For example, {x.go,
-	//   x_test.go} is covered by the single package x_test using
-	//   "widest". (Using "narrowest", it would be covered only by
-	//   the pair of packages {x, x_test}, Originally we used all
-	//   covering packages, so {x.go} alone would be analyzed
-	//   twice.)
-	var (
-		toDiagnose = make(map[metadata.PackageID]*metadata.Package)
-		toAnalyze  = make(map[metadata.PackageID]*metadata.Package)
-
-		// secondary index, used to eliminate narrower packages.
-		toAnalyzeWidest = make(map[golang.PackagePath]*metadata.Package)
-	)
-	for _, mp := range workspacePkgs {
-		var hasNonIgnored, hasOpenFile bool
-		for _, uri := range mp.CompiledGoFiles {
-			if !hasNonIgnored && !snapshot.IgnoredFile(uri) {
-				hasNonIgnored = true
-			}
-			if !hasOpenFile && snapshot.IsOpen(uri) {
-				hasOpenFile = true
-			}
-		}
-		if hasNonIgnored {
-			toDiagnose[mp.ID] = mp
-			if hasOpenFile {
-				if prev, ok := toAnalyzeWidest[mp.PkgPath]; ok {
-					if len(prev.CompiledGoFiles) >= len(mp.CompiledGoFiles) {
-						// Previous entry is not narrower; keep it.
-						continue
-					}
-					// Evict previous (narrower) entry.
-					delete(toAnalyze, prev.ID)
-				}
-				toAnalyze[mp.ID] = mp
-				toAnalyzeWidest[mp.PkgPath] = mp
-			}
-		}
-	}
-
-	// Package diagnostics and analysis diagnostics must both be computed and
-	// merged before they can be reported.
-	var pkgDiags, analysisDiags diagMap
-	// Collect package diagnostics.
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		var err error
-		pkgDiags, err = snapshot.PackageDiagnostics(ctx, maps.Keys(toDiagnose)...)
-		if err != nil {
-			event.Error(ctx, "warning: diagnostics failed", err, snapshot.Labels()...)
-		}
-	}()
-
-	wg.Wait()
-
-	// Merge analysis diagnostics with package diagnostics, and store the
-	// resulting analysis diagnostics.
-	for uri, adiags := range analysisDiags {
-		tdiags := pkgDiags[uri]
-		var tdiags2, adiags2 []*cache.Diagnostic
-		combineDiagnostics(tdiags, adiags, &tdiags2, &adiags2)
-		pkgDiags[uri] = tdiags2
-		analysisDiags[uri] = adiags2
-	}
-	store("type checking", pkgDiags, nil)           // error reported above
-	store("analyzing packages", analysisDiags, nil) // error reported above
 
 	return diagnostics, nil
 }

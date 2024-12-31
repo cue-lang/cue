@@ -29,11 +29,9 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/gopls/util/maps"
-	"cuelang.org/go/internal/golangorgx/gopls/util/pathutil"
 	"cuelang.org/go/internal/golangorgx/gopls/util/slices"
 	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/gocommand"
-	"cuelang.org/go/internal/golangorgx/tools/imports"
 	"cuelang.org/go/internal/golangorgx/tools/xcontext"
 )
 
@@ -49,7 +47,6 @@ type Folder struct {
 	Dir     protocol.DocumentURI
 	Name    string // decorative name for UI; not necessarily unique
 	Options *settings.Options
-	Env     *GoEnv
 }
 
 // GoEnv holds the environment variables and data from the Go command that is
@@ -84,8 +81,6 @@ type View struct {
 
 	*viewDefinition // build configuration
 
-	gocmdRunner *gocommand.Runner // limits go command concurrency
-
 	// baseCtx is the context handed to NewView. This is the parent of all
 	// background contexts created for this view.
 	baseCtx context.Context
@@ -97,9 +92,6 @@ type View struct {
 
 	// fs is the file source used to populate this view.
 	fs *overlayFS
-
-	// ignoreFilter is used for fast checking of ignored files.
-	ignoreFilter *ignoreFilter
 
 	// cancelInitialWorkspaceLoad can be used to terminate the view's first
 	// attempt at initialization.
@@ -156,8 +148,6 @@ type viewDefinition struct {
 	// TODO(myitcv): why do we need this if we have root?
 	cuemod protocol.DocumentURI
 
-	gowork protocol.DocumentURI // the nearest go.work file, or ""
-
 	// workspaceModFiles holds the set of mod files active in this snapshot.
 	//
 	// For a go.work workspace, this is the set of workspace modfiles. For a
@@ -186,9 +176,6 @@ func (d *viewDefinition) Root() protocol.DocumentURI { return d.root }
 // GoMod returns the nearest go.mod file for this view's root, or "".
 func (d *viewDefinition) GoMod() protocol.DocumentURI { return d.cuemod }
 
-// GoWork returns the nearest go.work file for this view's root, or "".
-func (d *viewDefinition) GoWork() protocol.DocumentURI { return d.gowork }
-
 // EnvOverlay returns a new sorted slice of environment variables (in the form
 // "k=v") for this view definition's env overlay.
 func (d *viewDefinition) EnvOverlay() []string {
@@ -198,34 +185,6 @@ func (d *viewDefinition) EnvOverlay() []string {
 	}
 	sort.Strings(env)
 	return env
-}
-
-// GOOS returns the effective GOOS value for this view definition, accounting
-// for its env overlay.
-func (d *viewDefinition) GOOS() string {
-	if goos, ok := d.envOverlay["GOOS"]; ok {
-		return goos
-	}
-	return d.folder.Env.GOOS
-}
-
-// GOOS returns the effective GOARCH value for this view definition, accounting
-// for its env overlay.
-func (d *viewDefinition) GOARCH() string {
-	if goarch, ok := d.envOverlay["GOARCH"]; ok {
-		return goarch
-	}
-	return d.folder.Env.GOARCH
-}
-
-// adjustedGO111MODULE is the value of GO111MODULE to use for loading packages.
-// It is adjusted to default to "auto" rather than "on", since if we are in
-// GOPATH and have no module, we may as well allow a GOPATH view to work.
-func (d viewDefinition) adjustedGO111MODULE() string {
-	if d.folder.Env.GO111MODULE != "" {
-		return d.folder.Env.GO111MODULE
-	}
-	return "auto"
 }
 
 // ModFiles are the go.mod files enclosed in the snapshot's view and known
@@ -261,8 +220,7 @@ func viewDefinitionsEqual(x, y *viewDefinition) bool {
 	return x.folder == y.folder &&
 		x.typ == y.typ &&
 		x.root == y.root &&
-		x.cuemod == y.cuemod &&
-		x.gowork == y.gowork
+		x.cuemod == y.cuemod
 }
 
 // A ViewType describes how we load package information for a view.
@@ -274,49 +232,17 @@ func viewDefinitionsEqual(x, y *viewDefinition) bool {
 type ViewType int
 
 const (
-	// GoPackagesDriverView is a view with a non-empty GOPACKAGESDRIVER
-	// environment variable.
-	//
-	// Load: ./... from the workspace folder.
-	GoPackagesDriverView ViewType = iota
-
-	// GOPATHView is a view in GOPATH mode.
-	//
-	// I.e. in GOPATH, with GO111MODULE=off, or GO111MODULE=auto with no
-	// go.mod file.
-	//
-	// Load: ./... from the workspace folder.
-	GOPATHView
-
-	// GoModView is a view in module mode with a single Go module.
-	//
-	// Load: <modulePath>/... from the module root.
-	GoModView
-
-	// GoWorkView is a view in module mode with a go.work file.
-	//
-	// Load: <modulePath>/... from the workspace folder, for each module.
-	GoWorkView
-
 	// An AdHocView is a collection of files in a given directory, not in GOPATH
 	// or a module.
 	//
 	// Load: . from the workspace folder.
-	AdHocView
+	AdHocView ViewType = iota
 
 	CUEModView
 )
 
 func (t ViewType) String() string {
 	switch t {
-	case GoPackagesDriverView:
-		return "GoPackagesDriverView"
-	case GOPATHView:
-		return "GOPATHView"
-	case GoModView:
-		return "GoModView"
-	case GoWorkView:
-		return "GoWorkView"
 	case AdHocView:
 		return "AdHocView"
 	case CUEModView:
@@ -329,7 +255,7 @@ func (t ViewType) String() string {
 // moduleMode reports whether the view uses Go modules.
 func (w viewDefinition) moduleMode() bool {
 	switch w.typ {
-	case GoModView, GoWorkView:
+	case CUEModView:
 		return true
 	default:
 		return false
@@ -337,50 +263,6 @@ func (w viewDefinition) moduleMode() bool {
 }
 
 func (v *View) ID() string { return v.id }
-
-// tempModFile creates a temporary go.mod file based on the contents
-// of the given go.mod file. On success, it is the caller's
-// responsibility to call the cleanup function when the file is no
-// longer needed.
-func tempModFile(modURI protocol.DocumentURI, gomod, gosum []byte) (tmpURI protocol.DocumentURI, cleanup func(), err error) {
-	filenameHash := file.HashOf([]byte(modURI.Path()))
-	tmpMod, err := os.CreateTemp("", fmt.Sprintf("go.%s.*.mod", filenameHash))
-	if err != nil {
-		return "", nil, err
-	}
-	defer tmpMod.Close()
-
-	tmpURI = protocol.URIFromPath(tmpMod.Name())
-	tmpSumName := sumFilename(tmpURI)
-
-	if _, err := tmpMod.Write(gomod); err != nil {
-		return "", nil, err
-	}
-
-	// We use a distinct name here to avoid subtlety around the fact
-	// that both 'return' and 'defer' update the "cleanup" variable.
-	doCleanup := func() {
-		_ = os.Remove(tmpSumName)
-		_ = os.Remove(tmpURI.Path())
-	}
-
-	// Be careful to clean up if we return an error from this function.
-	defer func() {
-		if err != nil {
-			doCleanup()
-			cleanup = nil
-		}
-	}()
-
-	// Create an analogous go.sum, if one exists.
-	if gosum != nil {
-		if err := os.WriteFile(tmpSumName, gosum, 0655); err != nil {
-			return "", nil, err
-		}
-	}
-
-	return tmpURI, doCleanup, nil
-}
 
 // Folder returns the folder at the base of this view.
 func (v *View) Folder() *Folder {
@@ -426,27 +308,17 @@ func viewEnv(v *View) string {
 	fmt.Fprintf(&buf, `go info for %v
 (view type %v)
 (root dir %s)
-(go version %s)
 (build flags: %v)
-(go env: %+v)
 (env overlay: %v)
 `,
 		v.folder.Dir.Path(),
 		v.typ,
 		v.root.Path(),
-		strings.TrimRight(v.folder.Env.GoVersionOutput, "\n"),
 		v.folder.Options.BuildFlags,
-		*v.folder.Env,
 		v.envOverlay,
 	)
 
 	return buf.String()
-}
-
-// RunProcessEnvFunc runs fn with the process env for this snapshot's view.
-// Note: the process env contains cached module and filesystem state.
-func (s *Snapshot) RunProcessEnvFunc(ctx context.Context, fn func(context.Context, *imports.Options) error) error {
-	return s.view.importsState.runProcessEnvFunc(ctx, s, fn)
 }
 
 // separated out from its sole use in locateTemplateFiles for testability
@@ -510,20 +382,7 @@ func (s *Snapshot) locateTemplateFiles(ctx context.Context) {
 // directoryFilters.
 func (v *View) filterFunc() func(protocol.DocumentURI) bool {
 	v.filterFuncOnce.Do(func() {
-		folderDir := v.folder.Dir.Path()
-		gomodcache := v.folder.Env.GOMODCACHE
-		var filters []string
-		filters = append(filters, v.folder.Options.DirectoryFilters...)
-		if pref := strings.TrimPrefix(gomodcache, folderDir); pref != gomodcache {
-			modcacheFilter := "-" + strings.TrimPrefix(filepath.ToSlash(pref), "/")
-			filters = append(filters, modcacheFilter)
-		}
-		filterer := NewFilterer(filters)
 		v._filterFunc = func(uri protocol.DocumentURI) bool {
-			// Only filter relative to the configured root directory.
-			if pathutil.InDir(folderDir, uri.Path()) {
-				return relPathExcludedByFilter(strings.TrimPrefix(uri.Path(), folderDir), filterer)
-			}
 			return false
 		}
 	})
@@ -542,69 +401,6 @@ func (v *View) shutdown() {
 		v.snapshot = nil
 	}
 	v.snapshotMu.Unlock()
-}
-
-// IgnoredFile reports if a file would be ignored by a `go list` of the whole
-// workspace.
-//
-// While go list ./... skips directories starting with '.', '_', or 'testdata',
-// gopls may still load them via file queries. Explicitly filter them out.
-func (s *Snapshot) IgnoredFile(uri protocol.DocumentURI) bool {
-	// Fast path: if uri doesn't contain '.', '_', or 'testdata', it is not
-	// possible that it is ignored.
-	{
-		uriStr := string(uri)
-		if !strings.Contains(uriStr, ".") && !strings.Contains(uriStr, "_") && !strings.Contains(uriStr, "testdata") {
-			return false
-		}
-	}
-
-	return s.view.ignoreFilter.ignored(uri.Path())
-}
-
-// An ignoreFilter implements go list's exclusion rules via its 'ignored' method.
-type ignoreFilter struct {
-	prefixes []string // root dirs, ending in filepath.Separator
-}
-
-// newIgnoreFilter returns a new ignoreFilter implementing exclusion rules
-// relative to the provided directories.
-func newIgnoreFilter(dirs []string) *ignoreFilter {
-	f := new(ignoreFilter)
-	for _, d := range dirs {
-		f.prefixes = append(f.prefixes, filepath.Clean(d)+string(filepath.Separator))
-	}
-	return f
-}
-
-func (f *ignoreFilter) ignored(filename string) bool {
-	for _, prefix := range f.prefixes {
-		if suffix := strings.TrimPrefix(filename, prefix); suffix != filename {
-			if checkIgnored(suffix) {
-				return true
-			}
-		}
-	}
-	return false
-}
-
-// checkIgnored implements go list's exclusion rules.
-// Quoting “go help list”:
-//
-//	Directory and file names that begin with "." or "_" are ignored
-//	by the go tool, as are directories named "testdata".
-func checkIgnored(suffix string) bool {
-	// Note: this could be further optimized by writing a HasSegment helper, a
-	// segment-boundary respecting variant of strings.Contains.
-	for _, component := range strings.Split(suffix, string(filepath.Separator)) {
-		if len(component) == 0 {
-			continue
-		}
-		if component[0] == '.' || component[0] == '_' || component == "testdata" {
-			return true
-		}
-	}
-	return false
 }
 
 // Snapshot returns the current snapshot for the view, and a
@@ -664,110 +460,13 @@ func (s *Snapshot) initialize(ctx context.Context, firstAttempt bool) {
 		}
 	}()
 
-	// TODO(rFindley): we should only locate template files on the first attempt,
-	// or guard it via a different mechanism.
-	s.locateTemplateFiles(ctx)
-
-	// Collect module paths to load by parsing go.mod files. If a module fails to
-	// parse, capture the parsing failure as a critical diagnostic.
-	var scopes []loadScope           // scopes to load
-	var modDiagnostics []*Diagnostic // diagnostics for broken go.mod files
-	addError := func(uri protocol.DocumentURI, err error) {
-		modDiagnostics = append(modDiagnostics, &Diagnostic{
-			URI:      uri,
-			Severity: protocol.SeverityError,
-			Source:   ListError,
-			Message:  err.Error(),
-		})
-	}
-
-	if len(s.view.workspaceModFiles) > 0 {
-		for modURI := range s.view.workspaceModFiles {
-			// Verify that the modfile is valid before trying to load it.
-			//
-			// TODO(rfindley): now that we no longer need to parse the modfile in
-			// order to load scope, we could move these diagnostics to a more general
-			// location where we diagnose problems with modfiles or the workspace.
-			//
-			// Be careful not to add context cancellation errors as critical module
-			// errors.
-			fh, err := s.ReadFile(ctx, modURI)
-			if err != nil {
-				if ctx.Err() != nil {
-					return
-				}
-				addError(modURI, err)
-				continue
-			}
-			parsed, err := s.ParseMod(ctx, fh)
-			if err != nil {
-				if ctx.Err() != nil {
-					return
-				}
-				addError(modURI, err)
-				continue
-			}
-			if parsed.File == nil || parsed.File.Module == nil {
-				addError(modURI, fmt.Errorf("no module path for %s", modURI))
-				continue
-			}
-			moduleDir := filepath.Dir(modURI.Path())
-			// Previously, we loaded <modulepath>/... for each module path, but that
-			// is actually incorrect when the pattern may match packages in more than
-			// one module. See golang/go#59458 for more details.
-			scopes = append(scopes, moduleLoadScope{dir: moduleDir, modulePath: parsed.File.Module.Mod.Path})
-		}
-	} else {
-		scopes = append(scopes, viewLoadScope{})
-	}
-
-	// If we're loading anything, ensure we also load builtin,
-	// since it provides fake definitions (and documentation)
-	// for types like int that are used everywhere.
-	if len(scopes) > 0 {
-		scopes = append(scopes, packageLoadScope("builtin"))
-	}
-	loadErr := s.load(ctx, true, scopes...)
-
-	// A failure is retryable if it may have been due to context cancellation,
-	// and this is not the initial workspace load (firstAttempt==true).
-	//
-	// The IWL runs on a detached context with a long (~10m) timeout, so
-	// if the context was canceled we consider loading to have failed
-	// permanently.
-	if loadErr != nil && ctx.Err() != nil && !firstAttempt {
-		return
-	}
-
-	var initialErr *InitializationError
-	switch {
-	case loadErr != nil && ctx.Err() != nil:
-		event.Error(ctx, fmt.Sprintf("initial workspace load: %v", loadErr), loadErr)
-		initialErr = &InitializationError{
-			MainError: loadErr,
-		}
-	case loadErr != nil:
-		event.Error(ctx, "initial workspace load failed", loadErr)
-		extractedDiags := s.extractGoCommandErrors(ctx, loadErr)
-		initialErr = &InitializationError{
-			MainError:   loadErr,
-			Diagnostics: maps.Group(extractedDiags, byURI),
-		}
-	case s.view.workspaceModFilesErr != nil:
-		initialErr = &InitializationError{
-			MainError: s.view.workspaceModFilesErr,
-		}
-	case len(modDiagnostics) > 0:
-		initialErr = &InitializationError{
-			MainError: fmt.Errorf("%s", modDiagnostics[0].Message),
-		}
-	}
-
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	s.initialized = true
-	s.initialErr = initialErr
+
+	// TODO(myitcv): fix this?
+	s.initialErr = nil
 }
 
 // A StateChange describes external state changes that may affect a snapshot.
@@ -1037,45 +736,6 @@ func CheckPathValid(dir string) error { return checkPathValid(dir) }
 
 func defaultCheckPathValid(path string) error {
 	return nil
-}
-
-// IsGoPrivatePath reports whether target is a private import path, as identified
-// by the GOPRIVATE environment variable.
-func (s *Snapshot) IsGoPrivatePath(target string) bool {
-	return globsMatchPath(s.view.folder.Env.GOPRIVATE, target)
-}
-
-// ModuleUpgrades returns known module upgrades for the dependencies of
-// modfile.
-func (s *Snapshot) ModuleUpgrades(modfile protocol.DocumentURI) map[string]string {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	upgrades := map[string]string{}
-	orig, _ := s.moduleUpgrades.Get(modfile)
-	for mod, ver := range orig {
-		upgrades[mod] = ver
-	}
-	return upgrades
-}
-
-// GoVersion returns the effective release Go version (the X in go1.X) for this
-// view.
-func (v *View) GoVersion() int {
-	return v.folder.Env.GoVersion
-}
-
-// GoVersionString returns the effective Go version string for this view.
-//
-// Unlike [GoVersion], this encodes the minor version and commit hash information.
-func (v *View) GoVersionString() string {
-	return gocommand.ParseGoVersionOutput(v.folder.Env.GoVersionOutput)
-}
-
-// GoVersionString is temporarily available from the snapshot.
-//
-// TODO(rfindley): refactor so that this method is not necessary.
-func (s *Snapshot) GoVersionString() string {
-	return s.view.GoVersionString()
 }
 
 // Copied from

@@ -9,18 +9,13 @@ package cache
 // golang.Diagnostic form, and suggesting quick fixes.
 
 import (
-	"context"
 	"fmt"
-	"go/parser"
 	"go/scanner"
-	"go/token"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 
-	"cuelang.org/go/internal/golangorgx/gopls/cache/metadata"
-	"cuelang.org/go/internal/golangorgx/gopls/file"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol/command"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
@@ -28,78 +23,6 @@ import (
 	"cuelang.org/go/internal/golangorgx/tools/typesinternal"
 	"golang.org/x/tools/go/packages"
 )
-
-// goPackagesErrorDiagnostics translates the given go/packages Error into a
-// diagnostic, using the provided metadata and filesource.
-//
-// The slice of diagnostics may be empty.
-func goPackagesErrorDiagnostics(ctx context.Context, e packages.Error, mp *metadata.Package, fs file.Source) ([]*Diagnostic, error) {
-	if diag, err := parseGoListImportCycleError(ctx, e, mp, fs); err != nil {
-		return nil, err
-	} else if diag != nil {
-		return []*Diagnostic{diag}, nil
-	}
-
-	// Parse error location and attempt to convert to protocol form.
-	loc, err := func() (protocol.Location, error) {
-		filename, line, col8 := parseGoListError(e, mp.LoadDir)
-		uri := protocol.URIFromPath(filename)
-
-		fh, err := fs.ReadFile(ctx, uri)
-		if err != nil {
-			return protocol.Location{}, err
-		}
-		content, err := fh.Content()
-		if err != nil {
-			return protocol.Location{}, err
-		}
-		mapper := protocol.NewMapper(uri, content)
-		posn, err := mapper.LineCol8Position(line, col8)
-		if err != nil {
-			return protocol.Location{}, err
-		}
-		return protocol.Location{
-			URI: uri,
-			Range: protocol.Range{
-				Start: posn,
-				End:   posn,
-			},
-		}, nil
-	}()
-
-	// TODO(rfindley): in some cases the go command outputs invalid spans, for
-	// example (from TestGoListErrors):
-	//
-	//   package a
-	//   import
-	//
-	// In this case, the go command will complain about a.go:2:8, which is after
-	// the trailing newline but still considered to be on the second line, most
-	// likely because *token.File lacks information about newline termination.
-	//
-	// We could do better here by handling that case.
-	if err != nil {
-		// Unable to parse a valid position.
-		// Apply the error to all files to be safe.
-		var diags []*Diagnostic
-		for _, uri := range mp.CompiledGoFiles {
-			diags = append(diags, &Diagnostic{
-				URI:      uri,
-				Severity: protocol.SeverityError,
-				Source:   ListError,
-				Message:  e.Msg,
-			})
-		}
-		return diags, nil
-	}
-	return []*Diagnostic{{
-		URI:      loc.URI,
-		Range:    loc.Range,
-		Severity: protocol.SeverityError,
-		Source:   ListError,
-		Message:  e.Msg,
-	}}, nil
-}
 
 func parseErrorDiagnostics(pkg *syntaxPackage, errList scanner.ErrorList) ([]*Diagnostic, error) {
 	// The first parser error is likely the root cause of the problem.
@@ -382,77 +305,4 @@ func splitFileLineCol(s string) (file string, line, col8 int) {
 	}
 
 	return s, n2, n1 // "filename:line:col"
-}
-
-// parseGoListImportCycleError attempts to parse the given go/packages error as
-// an import cycle, returning a diagnostic if successful.
-//
-// If the error is not detected as an import cycle error, it returns nil, nil.
-func parseGoListImportCycleError(ctx context.Context, e packages.Error, mp *metadata.Package, fs file.Source) (*Diagnostic, error) {
-	re := regexp.MustCompile(`(.*): import stack: \[(.+)\]`)
-	matches := re.FindStringSubmatch(strings.TrimSpace(e.Msg))
-	if len(matches) < 3 {
-		return nil, nil
-	}
-	msg := matches[1]
-	importList := strings.Split(matches[2], " ")
-	// Since the error is relative to the current package. The import that is causing
-	// the import cycle error is the second one in the list.
-	if len(importList) < 2 {
-		return nil, nil
-	}
-	// Imports have quotation marks around them.
-	circImp := strconv.Quote(importList[1])
-	for _, uri := range mp.CompiledGoFiles {
-		pgf, err := parseGoURI(ctx, fs, uri, ParseHeader)
-		if err != nil {
-			return nil, err
-		}
-		// Search file imports for the import that is causing the import cycle.
-		for _, imp := range pgf.File.Imports {
-			if imp.Path.Value == circImp {
-				rng, err := pgf.NodeMappedRange(imp)
-				if err != nil {
-					return nil, nil
-				}
-
-				return &Diagnostic{
-					URI:      pgf.URI,
-					Range:    rng.Range(),
-					Severity: protocol.SeverityError,
-					Source:   ListError,
-					Message:  msg,
-				}, nil
-			}
-		}
-	}
-	return nil, nil
-}
-
-// parseGoURI is a helper to parse the Go file at the given URI from the file
-// source fs. The resulting syntax and token.File belong to an ephemeral,
-// encapsulated FileSet, so this file stands only on its own: it's not suitable
-// to use in a list of file of a package, for example.
-//
-// It returns an error if the file could not be read.
-//
-// TODO(rfindley): eliminate this helper.
-func parseGoURI(ctx context.Context, fs file.Source, uri protocol.DocumentURI, mode parser.Mode) (*ParsedGoFile, error) {
-	fh, err := fs.ReadFile(ctx, uri)
-	if err != nil {
-		return nil, err
-	}
-	return parseGoImpl(ctx, token.NewFileSet(), fh, mode, false)
-}
-
-// parseModURI is a helper to parse the Mod file at the given URI from the file
-// source fs.
-//
-// It returns an error if the file could not be read.
-func parseModURI(ctx context.Context, fs file.Source, uri protocol.DocumentURI) (*ParsedModule, error) {
-	fh, err := fs.ReadFile(ctx, uri)
-	if err != nil {
-		return nil, err
-	}
-	return parseModImpl(ctx, fh)
 }

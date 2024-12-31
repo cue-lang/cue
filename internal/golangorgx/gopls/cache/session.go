@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"path"
 	"strconv"
 	"strings"
 	"sync"
@@ -404,61 +405,37 @@ type viewDefiner interface{ definition() *viewDefinition }
 func bestView[V viewDefiner](ctx context.Context, fs file.Source, fh file.Handle, views []V) (V, error) {
 	var zero V
 
-	if len(views) == 0 {
-		return zero, nil // avoid the call to findRootPattern
+	// Given current limitations of cue lsp (exactly one workspace folder
+	// supported), and that we create a single view per workspace folder, we
+	// should assert here that we have a single view. Otherwise we have problems
+	if len(views) != 1 {
+		return zero, fmt.Errorf("expected exactly 1 view; saw %d", len(views))
 	}
-	uri := fh.URI()
-	dir := uri.Dir()
-	modURI, err := findRootPattern(ctx, dir, "cue.mod/module.cue", fs)
+
+	v := views[0]
+
+	fileDir := fh.URI().Dir()
+	fileBase := path.Base(string(fh.URI()))
+	modRoot, err := findRootPattern(ctx, fileDir, fileBase, fs)
 	if err != nil {
 		return zero, err
 	}
 
-	// Prefer GoWork > GoMod > GOPATH > GoPackages > AdHoc.
-	var (
-		goPackagesViews []V // prefer longest
-		workViews       []V // prefer longest
-		modViews        []V // exact match
-		gopathViews     []V // prefer longest
-		adHocViews      []V // exact match
-	)
-
-	for _, view := range views {
-		switch def := view.definition(); def.Type() {
-		case CUEModView:
-			if _, ok := def.workspaceModFiles[modURI]; ok {
-				modViews = append(modViews, view)
-			}
-		case AdHocView:
-			if def.root == dir {
-				adHocViews = append(adHocViews, view)
-			}
-		}
+	// Only if the module root corresponds to that of the view (workspace folder)
+	// do we match.
+	if modRoot == v.definition().root {
+		return v, nil
 	}
 
-	// Now that we've collected matching views, choose the best match,
-	// considering ports.
-	//
-	// We only consider one type of view, since the matching view created by
-	// defineView should be of the best type.
-	var bestViews []V
-	switch {
-	case len(workViews) > 0:
-		bestViews = workViews
-	case len(modViews) > 0:
-		bestViews = modViews
-	case len(gopathViews) > 0:
-		bestViews = gopathViews
-	case len(goPackagesViews) > 0:
-		bestViews = goPackagesViews
-	case len(adHocViews) > 0:
-		bestViews = adHocViews
-	default:
+	// TODO(myitcv): in the case of a nested module, we could prompt the user to
+	// do something here when we add support for multiple workspace folders. For
+	// now we simply return the zero view.
+	if v.definition().folder.Dir.Encloses(fh.URI()) {
 		return zero, nil
 	}
 
-	// TODO: we need to fix this
-	return bestViews[0], nil
+	// Perhaps a random file opened by the user?
+	return zero, nil
 }
 
 // updateViewLocked recreates the view with the given options.

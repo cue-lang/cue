@@ -66,3 +66,26 @@ package a
 		InitializeError("initialize: got 2 WorkspaceFolders; expected 1"),
 	).Run(t, files, nil)
 }
+
+func TestNoContainingModule(t *testing.T) {
+	const files = `
+-- a.cue --
+package a
+`
+	WithOptions().Run(t, files, func(t *testing.T, env *Env) {
+		env.Await(ShownMessage("is not rooted at a CUE module"))
+	})
+}
+
+func TestWorkspaceFolderWithCUEModInParent(t *testing.T) {
+	const files = `
+-- cue.mod/module.cue --
+-- a/a.cue --
+package a
+`
+	WithOptions(
+		WorkspaceFolders("a"),
+	).Run(t, files, func(t *testing.T, env *Env) {
+		env.Await(ShownMessage("is not rooted at a CUE module"))
+	})
+}

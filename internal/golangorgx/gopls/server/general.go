@@ -382,9 +382,6 @@ func (s *server) newFolder(ctx context.Context, folder protocol.DocumentURI, nam
 		Dir:     folder,
 		Name:    name,
 		Options: opts,
-
-		// TODO(myitcv): remove this
-		Env: new(cache.GoEnv),
 	}, nil
 }
 

@@ -15,7 +15,6 @@ import (
 	"regexp"
 	"runtime"
 	"sort"
-	"strings"
 	"sync"
 	"sync/atomic"
 
@@ -30,13 +29,10 @@ import (
 	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/event/tag"
 	"cuelang.org/go/internal/golangorgx/tools/gcimporter"
-	"cuelang.org/go/internal/golangorgx/tools/packagesinternal"
 	"cuelang.org/go/internal/golangorgx/tools/tokeninternal"
 	"cuelang.org/go/internal/golangorgx/tools/typesinternal"
 	"cuelang.org/go/internal/golangorgx/tools/versions"
-	"golang.org/x/mod/module"
 	"golang.org/x/sync/errgroup"
-	"golang.org/x/tools/go/ast/astutil"
 )
 
 // Various optimizations that should not affect correctness.
@@ -1115,12 +1111,11 @@ func (b *packageHandleBuilder) buildPackageHandle(ctx context.Context, n *handle
 			return
 		}
 		n.ph = &packageHandle{
-			mp:              n.mp,
-			loadDiagnostics: computeLoadDiagnostics(ctx, b.s, n.mp),
-			localInputs:     inputs,
-			localKey:        localPackageKey(inputs),
-			refs:            refs,
-			validated:       true,
+			mp:          n.mp,
+			localInputs: inputs,
+			localKey:    localPackageKey(inputs),
+			refs:        refs,
+			validated:   true,
 		}
 	}
 
@@ -1632,140 +1627,6 @@ func (b *typeCheckBatch) typesConfig(ctx context.Context, inputs typeCheckInputs
 	// We passed typecheckCgo to go/packages when we Loaded.
 	typesinternal.SetUsesCgo(cfg)
 	return cfg
-}
-
-// depsErrors creates diagnostics for each metadata error (e.g. import cycle).
-// These may be attached to import declarations in the transitive source files
-// of pkg, or to 'requires' declarations in the package's go.mod file.
-//
-// TODO(rfindley): move this to load.go
-func depsErrors(ctx context.Context, snapshot *Snapshot, mp *metadata.Package) ([]*Diagnostic, error) {
-	// Select packages that can't be found, and were imported in non-workspace packages.
-	// Workspace packages already show their own errors.
-	var relevantErrors []*packagesinternal.PackageError
-	for _, depsError := range mp.DepsErrors {
-		// Up to Go 1.15, the missing package was included in the stack, which
-		// was presumably a bug. We want the next one up.
-		directImporterIdx := len(depsError.ImportStack) - 1
-		if directImporterIdx < 0 {
-			continue
-		}
-
-		directImporter := depsError.ImportStack[directImporterIdx]
-		if snapshot.isWorkspacePackage(PackageID(directImporter)) {
-			continue
-		}
-		relevantErrors = append(relevantErrors, depsError)
-	}
-
-	// Don't build the import index for nothing.
-	if len(relevantErrors) == 0 {
-		return nil, nil
-	}
-
-	// Subsequent checks require Go files.
-	if len(mp.CompiledGoFiles) == 0 {
-		return nil, nil
-	}
-
-	// Build an index of all imports in the package.
-	type fileImport struct {
-		cgf *ParsedGoFile
-		imp *ast.ImportSpec
-	}
-	allImports := map[string][]fileImport{}
-	for _, uri := range mp.CompiledGoFiles {
-		pgf, err := parseGoURI(ctx, snapshot, uri, ParseHeader)
-		if err != nil {
-			return nil, err
-		}
-		fset := tokeninternal.FileSetFor(pgf.Tok)
-		// TODO(adonovan): modify Imports() to accept a single token.File (cgf.Tok).
-		for _, group := range astutil.Imports(fset, pgf.File) {
-			for _, imp := range group {
-				if imp.Path == nil {
-					continue
-				}
-				path := strings.Trim(imp.Path.Value, `"`)
-				allImports[path] = append(allImports[path], fileImport{pgf, imp})
-			}
-		}
-	}
-
-	// Apply a diagnostic to any import involved in the error, stopping once
-	// we reach the workspace.
-	var errors []*Diagnostic
-	for _, depErr := range relevantErrors {
-		for i := len(depErr.ImportStack) - 1; i >= 0; i-- {
-			item := depErr.ImportStack[i]
-			if snapshot.isWorkspacePackage(PackageID(item)) {
-				break
-			}
-
-			for _, imp := range allImports[item] {
-				rng, err := imp.cgf.NodeRange(imp.imp)
-				if err != nil {
-					return nil, err
-				}
-				diag := &Diagnostic{
-					URI:            imp.cgf.URI,
-					Range:          rng,
-					Severity:       protocol.SeverityError,
-					Source:         TypeError,
-					Message:        fmt.Sprintf("error while importing %v: %v", item, depErr.Err),
-					SuggestedFixes: goGetQuickFixes(mp.Module != nil, imp.cgf.URI, item),
-				}
-				if !bundleQuickFixes(diag) {
-					bug.Reportf("failed to bundle fixes for diagnostic %q", diag.Message)
-				}
-				errors = append(errors, diag)
-			}
-		}
-	}
-
-	modFile, err := nearestModFile(ctx, mp.CompiledGoFiles[0], snapshot)
-	if err != nil {
-		return nil, err
-	}
-	pm, err := parseModURI(ctx, snapshot, modFile)
-	if err != nil {
-		return nil, err
-	}
-
-	// Add a diagnostic to the module that contained the lowest-level import of
-	// the missing package.
-	for _, depErr := range relevantErrors {
-		for i := len(depErr.ImportStack) - 1; i >= 0; i-- {
-			item := depErr.ImportStack[i]
-			mp := snapshot.Metadata(PackageID(item))
-			if mp == nil || mp.Module == nil {
-				continue
-			}
-			modVer := module.Version{Path: mp.Module.Path, Version: mp.Module.Version}
-			reference := findModuleReference(pm.File, modVer)
-			if reference == nil {
-				continue
-			}
-			rng, err := pm.Mapper.OffsetRange(reference.Start.Byte, reference.End.Byte)
-			if err != nil {
-				return nil, err
-			}
-			diag := &Diagnostic{
-				URI:            pm.URI,
-				Range:          rng,
-				Severity:       protocol.SeverityError,
-				Source:         TypeError,
-				Message:        fmt.Sprintf("error while importing %v: %v", item, depErr.Err),
-				SuggestedFixes: goGetQuickFixes(true, pm.URI, item),
-			}
-			if !bundleQuickFixes(diag) {
-				bug.Reportf("failed to bundle fixes for diagnostic %q", diag.Message)
-			}
-			errors = append(errors, diag)
-			break
-		}
-	}
-	return errors, nil
 }
 
 // missingPkgError returns an error message for a missing package that varies

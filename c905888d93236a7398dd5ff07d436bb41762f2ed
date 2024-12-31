@@ -34,6 +34,24 @@
       "parentUuid": "a1ebcddb_e21b68bd",
       "revId": "c905888d93236a7398dd5ff07d436bb41762f2ed",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6ddb3da_6518cfeb",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-31T11:22:37Z",
+      "side": 0,
+      "message": "Added a note comment as discussed.",
+      "parentUuid": "15cd6757_880455a7",
+      "revId": "c905888d93236a7398dd5ff07d436bb41762f2ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

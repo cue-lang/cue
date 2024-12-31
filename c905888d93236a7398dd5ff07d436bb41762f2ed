@@ -88,6 +88,24 @@
       "parentUuid": "05921748_30eb460c",
       "revId": "c905888d93236a7398dd5ff07d436bb41762f2ed",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d24a598_524ce1ef",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-12-31T12:09:51Z",
+      "side": 0,
+      "message": "To be clear, my earlier response was wrong, as I showed on a video call today.",
+      "parentUuid": "8d4ef3b7_d777f34a",
+      "revId": "c905888d93236a7398dd5ff07d436bb41762f2ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

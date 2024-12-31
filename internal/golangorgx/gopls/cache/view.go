@@ -143,11 +143,6 @@ type viewDefinition struct {
 	// the WorkspaceFolder folder
 	root protocol.DocumentURI
 
-	// cuemod is the path of the the nearest ancestor cue.mod directory
-	//
-	// TODO(myitcv): why do we need this if we have root?
-	cuemod protocol.DocumentURI
-
 	// workspaceModFiles holds the set of mod files active in this snapshot.
 	//
 	// For a go.work workspace, this is the set of workspace modfiles. For a
@@ -216,8 +211,7 @@ func viewDefinitionsEqual(x, y *viewDefinition) bool {
 	}
 	return x.folder == y.folder &&
 		x.typ == y.typ &&
-		x.root == y.root &&
-		x.cuemod == y.cuemod
+		x.root == y.root
 }
 
 // A ViewType describes how we load package information for a view.
@@ -552,44 +546,33 @@ func defineView(ctx context.Context, fs file.Source, folder *Folder, forFile fil
 	if err := checkPathValid(folder.Dir.Path()); err != nil {
 		return nil, fmt.Errorf("invalid workspace folder path: %w; check that the spelling of the configured workspace folder path agrees with the spelling reported by the operating system", err)
 	}
-	dir := folder.Dir.Path()
 
 	if forFile != nil {
-		// TODO(myitcv): it's still not totally clear what codepath leads us to this point.
-		// Under what conditions do we have forFile? We want to limit (for now) that files
-		// opened within the workspace on which we do analysis are part of the CUE module
-		// that contains the WorkspaceFolder. If forFile != nil, do we already have that
-		// guarantee here? Hopefully... because this feels awfully late to be doing anything
-		// about it.
-		dir = filepath.Dir(forFile.URI().Path())
+		// TODO(myitcv): fix the implementation here. forFile != nil when we are trying
+		// to compute the set of views given the set of open files/known folders. This is
+		// part of the zero config approach in gopls, and we don't have anything like that
+		// yet for 'cue lsp'.
+		return nil, fmt.Errorf("defineView with forFile != nil; not yet supported")
 	}
 
 	def := new(viewDefinition)
 	def.folder = folder
+	def.root = folder.Dir
 
-	var err error
-	dirURI := protocol.URIFromPath(dir)
-
-	// When deriving the best view for a given file, we only want to search
-	// up the directory hierarchy for cue.mod directories.
-	//
-	// TODO(myitcv): update this logic to support finding the cue.mod directory,
-	// which is the true marker of the CUE module.
-	moduleCUE, err := findRootPattern(ctx, dirURI, filepath.FromSlash("cue.mod/module.cue"), fs)
+	// Enforce that the workspace folder corresponds exactly to the root of a
+	// CUE module defined by the existence of a cue.mod/module.cue file.
+	targetFile := filepath.Join(folder.Dir.Path(), filepath.FromSlash("cue.mod/module.cue"))
+	targetURI := protocol.URIFromPath(targetFile)
+	modFile, err := fs.ReadFile(ctx, targetURI)
 	if err != nil {
-		return nil, err
+		return nil, err // cancelled
 	}
-	def.cuemod = moduleCUE.Dir()
-
-	// For now, we only support establishing a workspace folder when contained
-	// by a CUE module.
-	if def.cuemod != "" {
-		def.typ = CUEModView
-		def.root = def.cuemod.Dir()
-		return def, nil
+	if !fileExists(modFile) {
+		return nil, fmt.Errorf("WorkspaceFolder %s does not correspond to a CUE module", folder.Dir.Path())
 	}
 
-	return nil, fmt.Errorf("WorkspaceFolder %s is not contained by a CUE module", dir)
+	def.typ = CUEModView
+	return def, nil
 }
 
 // FetchGoEnv queries the environment and Go command to collect environment

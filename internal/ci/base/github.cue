@@ -11,8 +11,32 @@ import (
 	"github.com/cue-tmp/jsonschema-pub/exp1/githubactions"
 )
 
-bashWorkflow: githubactions.#Workflow & {
-	jobs: [string]: defaults: run: shell: "bash"
+bashWorkflow: {
+	// Relax closedness constraints so we can widen jobs.[string].steps.[].
+	// Strictly speaking we don't currently need to embed #Workflow, but in
+	// light of https://cuelang.org/issue/543 likely being the right thing to
+	// do, we embed as an example of best practice.
+	githubactions.#Workflow
+
+	jobs: [string]: {
+		defaults: run: shell: "bash"
+		steps: [...bashStep]
+	}
+}
+
+bashStep: {
+	githubactions.#Step
+
+	// Extend the API of a step such that we define steps in terms of #run. The
+	// run field used by GitHub Actions in the exported configuration is a data
+	// transformation of #run, that prepends the setting of a bash option.
+	#run?: string
+
+	if #run != _|_ {
+		run: """
+		  \(#run)
+		  """
+	}
 }
 
 installGo: {
@@ -51,7 +75,7 @@ installGo: {
 		{
 			githubactions.#Step & {
 				name: "Set common go env vars"
-				run: """
+				#run: """
 					go env -w GOTOOLCHAIN=local
 
 					# Dump env for good measure
@@ -92,7 +116,7 @@ checkoutCode: {
 		// TODO(mvdan): May be unnecessary once the Go bug above is fixed.
 		githubactions.#Step & {
 			name: "Reset git directory modification times"
-			run:  "touch -t 202211302355 $(find * -type d)"
+			#run: "touch -t 202211302355 $(find * -type d)"
 		},
 		githubactions.#Step & {
 			name: "Restore git file modification times"
@@ -103,7 +127,7 @@ checkoutCode: {
 			githubactions.#Step & {
 				name: "Try to extract \(dispatchTrailer)"
 				id:   dispatchTrailerStepID
-				run:  """
+				#run: """
 					x="$(git log -1 --pretty='%(trailers:key=\(dispatchTrailer),valueonly)')"
 					if [[ "$x" == "" ]]
 					then
@@ -127,7 +151,7 @@ checkoutCode: {
 		githubactions.#Step & {
 			name: "Check we don't have \(dispatchTrailer) on a protected branch"
 			if:   "\(isProtectedBranch) && \(containsDispatchTrailer)"
-			run:  """
+			#run: """
 				echo "\(_dispatchTrailerVariable) contains \(dispatchTrailer) but we are on a protected branch"
 				false
 				"""
@@ -137,7 +161,7 @@ checkoutCode: {
 
 earlyChecks: githubactions.#Step & {
 	name: "Early git and code sanity checks"
-	run:  *"go run cuelang.org/go/internal/ci/checks@v0.11.0-0.dev.0.20240903133435-46fb300df650" | string
+	#run: *"go run cuelang.org/go/internal/ci/checks@v0.11.0-0.dev.0.20240903133435-46fb300df650" | string
 }
 
 curlGitHubAPI: {
@@ -200,12 +224,12 @@ setupGoActionsCaches: {
 		githubactions.#Step & {
 			name: "Get go mod cache directory"
 			id:   goModCacheDirID
-			run:  #"echo "dir=$(go env GOMODCACHE)" >> ${GITHUB_OUTPUT}"#
+			#run: #"echo "dir=$(go env GOMODCACHE)" >> ${GITHUB_OUTPUT}"#
 		},
 		githubactions.#Step & {
 			name: "Get go build/test cache directory"
 			id:   goCacheDirID
-			run:  #"echo "dir=$(go env GOCACHE)" >> ${GITHUB_OUTPUT}"#
+			#run: #"echo "dir=$(go env GOCACHE)" >> ${GITHUB_OUTPUT}"#
 		},
 
 		// Only if we are not running in readonly mode do we want a step that
@@ -241,8 +265,8 @@ setupGoActionsCaches: {
 			// Critically we only want to do this in the main repo, not the trybot
 			// repo.
 			githubactions.#Step & {
-				if:  "github.repository == '\(githubRepositoryPath)' && (\(isProtectedBranch) || github.ref == 'refs/heads/\(testDefaultBranch)')"
-				run: "go clean -testcache"
+				if:   "github.repository == '\(githubRepositoryPath)' && (\(isProtectedBranch) || github.ref == 'refs/heads/\(testDefaultBranch)')"
+				#run: "go clean -testcache"
 			}
 		},
 	]
@@ -273,7 +297,7 @@ isReleaseTag: {
 checkGitClean: githubactions.#Step & {
 	name: "Check that git is clean at the end of the job"
 	if:   "always()"
-	run:  "test -z \"$(git status --porcelain)\" || (git status; git diff; false)"
+	#run: "test -z \"$(git status --porcelain)\" || (git status; git diff; false)"
 }
 
 repositoryDispatch: githubactions.#Step & {
@@ -284,7 +308,7 @@ repositoryDispatch: githubactions.#Step & {
 	_curlGitHubAPI: curlGitHubAPI & {#tokenSecretsKey: #botGitHubUserTokenSecretsKey, _}
 
 	name: string
-	run:  #"""
+	#run: #"""
 			\#(_curlGitHubAPI) --fail --request POST --data-binary \#(strconv.Quote(json.Marshal(#arg))) https://api.github.com/repos/\#(#githubRepositoryPath)/dispatches
 			"""#
 }
@@ -302,7 +326,7 @@ workflowDispatch: githubactions.#Step & {
 	_curlGitHubAPI: curlGitHubAPI & {#tokenSecretsKey: #botGitHubUserTokenSecretsKey, _}
 
 	name: string
-	run:  #"""
+	#run: #"""
 			\#(_curlGitHubAPI) --fail --request POST --data-binary \#(strconv.Quote(json.Marshal(#params))) https://api.github.com/repos/\#(#githubRepositoryPath)/actions/workflows/\#(#workflowID)/dispatches
 			"""#
 }

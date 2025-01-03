@@ -223,7 +223,8 @@ func TestScript(t *testing.T) {
 				out := ts.Stdout()
 				workdir := ts.Getenv("WORK")
 				for _, arg := range args {
-					err := filepath.WalkDir(arg, func(path string, d fs.DirEntry, err error) error {
+					path := ts.MkAbs(arg)
+					err := filepath.WalkDir(path, func(path string, d fs.DirEntry, err error) error {
 						if err != nil {
 							return err
 						}

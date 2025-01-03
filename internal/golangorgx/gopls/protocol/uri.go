@@ -88,6 +88,11 @@ func (uri DocumentURI) Path() string {
 
 // Dir returns the URI for the directory containing the receiver.
 func (uri DocumentURI) Dir() DocumentURI {
+	// filepath.Dir returns "." in case passed "". So we need to special
+	// case a check for uri == "" in case the caller has not done that.
+	if uri == "" {
+		return ""
+	}
 	// This function could be more efficiently implemented by avoiding any call
 	// to Path(), but at least consolidates URI manipulation.
 	return URIFromPath(filepath.Dir(uri.Path()))

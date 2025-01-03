@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aff4e96d_bce7d19c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-03T13:47:49Z",
+      "side": 1,
+      "message": "I assume multiple workspace support would come at a later point, and we can always look at gopls for ideas again.",
+      "revId": "a81a0441c6725bf729cfb279e218e0957ccdcfd3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

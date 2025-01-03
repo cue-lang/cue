@@ -22,6 +22,30 @@
       },
       "revId": "5845ce558ae27857ece93321a66fd587fa424f77",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4e9cf340_68806fd5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-01-03T13:57:00Z",
+      "side": 1,
+      "message": "Thanks fixed. This now aligns with https://github.com/cue-lang/cue/wiki/cue-lsp#requirements-restrictions-and-limitations.",
+      "parentUuid": "892c6934_5953d479",
+      "range": {
+        "startLine": 10,
+        "startChar": 12,
+        "endLine": 10,
+        "endChar": 18
+      },
+      "revId": "5845ce558ae27857ece93321a66fd587fa424f77",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

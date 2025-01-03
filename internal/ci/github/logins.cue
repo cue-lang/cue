@@ -14,14 +14,10 @@
 
 package github
 
-import (
-	"github.com/cue-tmp/jsonschema-pub/exp1/githubactions"
-)
-
 // _registryReadOnlyAccessStep defines a step that configures
 // a read-only Central Registry access credential. The actual
 // command should be placed in the _run field.
-_registryReadOnlyAccessStep: githubactions.#Step & {
+_registryReadOnlyAccessStep: _repo.bashStep & {
 	_run!: string
 	env: {
 		// Note: this token has read-only access to the registry
@@ -34,7 +30,7 @@ _registryReadOnlyAccessStep: githubactions.#Step & {
 	// to have happened, which is very easy to forget or misconfigure.
 	// We use the full import path so that this works from any module subdirectory.
 	// TODO(mvdan): switch to `go tool cue` as soon as we are able to.
-	run: """
+	#run: """
 		go run cuelang.org/go/cmd/cue login --token=${CUE_TOKEN}
 		\(_run)
 		"""

@@ -16,8 +16,6 @@ package github
 
 import (
 	"list"
-
-	"github.com/cue-tmp/jsonschema-pub/exp1/githubactions"
 )
 
 // _cueVersionRef is a workflow job-runtime expression that evaluates to the
@@ -50,15 +48,15 @@ workflows: release: _repo.bashWorkflow & {
 		steps: [
 			for v in _repo.checkoutCode {v},
 			for v in installGo {v},
-			githubactions.#Step & {
+			{
 				name: "Setup qemu"
 				uses: "docker/setup-qemu-action@v3"
 			},
-			githubactions.#Step & {
+			{
 				name: "Set up Docker Buildx"
 				uses: "docker/setup-buildx-action@v3"
 			},
-			githubactions.#Step & {
+			{
 				name: "Docker Login"
 				uses: "docker/login-action@v3"
 				with: {
@@ -67,11 +65,11 @@ workflows: release: _repo.bashWorkflow & {
 					password: "${{ secrets.CUECKOO_DOCKER_PAT }}"
 				}
 			},
-			githubactions.#Step & {
+			{
 				name: "Install CUE"
-				run:  "go install ./cmd/cue"
+				#run: "go install ./cmd/cue"
 			},
-			githubactions.#Step & {
+			{
 				name: "Install GoReleaser"
 				uses: "goreleaser/goreleaser-action@v5"
 				with: {

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44fd78e7_dbe21045",
+        "filename": "pkg/list/testdata/unique.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-03T11:25:08Z",
+      "side": 1,
+      "message": "nit: I would be clearer here, i.e. \"they might gain fields\"",
+      "range": {
+        "startLine": 60,
+        "startChar": 22,
+        "endLine": 60,
+        "endChar": 51
+      },
+      "revId": "ba42dc39b49309941cfad1dd13fbc3d073d3323c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

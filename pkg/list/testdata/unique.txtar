@@ -52,6 +52,31 @@ fail: {
 	// element is erroneous an cannot match.
 	ignoreOptError: [#a, #abErr]
 }
+
+// Value could still become more specific, and thus different.
+incomplete: ints: [int, int]
+
+// Struct field order is irrelevant, but these structs
+// are open and hence we might get more information later
+// which would make the values unique.
+incomplete: openStructs: [{
+	b: 1
+	a: 0
+}, {
+	a: 0
+	b: 1
+}]
+
+// Struct field order is irrelevant. We simulate finalising
+// these values here via close(), which gives the same behaviour
+// as 'cue vet -c' on otherwise open values.
+fail: structOrderIrrelevant: [close({
+	b: 1
+	a: 0
+}), close({
+	a: 0
+	b: 1
+})]
 -- out/list-v3 --
 Errors:
 fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1:
@@ -63,6 +88,9 @@ fail.ignoreOptError: invalid value [~(#a),~(#abErr)] (does not satisfy list.Uniq
 fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 2:
     ./in.cue:3:21
     ./in.cue:44:8
+fail.structOrderIrrelevant: invalid value [{b:1,a:0},{a:0,b:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
+    ./in.cue:3:21
+    ./in.cue:68:30
 fail.structs: invalid value [~(#a),~(#a)] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
     ./in.cue:3:21
     ./in.cue:45:11
@@ -131,6 +159,18 @@ incomplete: {
 		a: 1
 	}]
 
+	// Value could still become more specific, and thus different.
+	ints: list.UniqueItems() & [int, int]
+
+	// Struct field order is irrelevant
+	openStructs: list.UniqueItems() & [{
+		b: 1
+		a: 0
+	}, {
+		a: 0
+		b: 1
+	}]
+
 	// Fully identical closed structs, but with non-concrete values.
 	structs: list.UniqueItems() & [#c, #c]
 }
@@ -141,6 +181,9 @@ fail: {
 	// Hidden values do not play a role in the comparisson.
 	ignoreHidden: _|_ // fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1
 
+	// Struct field order is irrelevant
+	structOrderIrrelevant: _|_ // fail.structOrderIrrelevant: invalid value [{b:1,a:0},{a:0,b:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1
+
 	// This can be a permanent error, as the optional field of the second
 	// element is erroneous an cannot match.
 	ignoreOptError: _|_ // fail.ignoreOptError: invalid value [~(#a),~(#abErr)] (does not satisfy list.UniqueItems): equal values at position 0 and 1
@@ -149,7 +192,7 @@ fail: {
 diff old new
 --- old
 +++ new
-@@ -2,10 +2,13 @@
+@@ -2,6 +2,9 @@
  fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1:
      ./in.cue:3:21
      ./in.cue:48:16
@@ -159,14 +202,18 @@ diff old new
  fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 2:
      ./in.cue:3:21
      ./in.cue:44:8
+@@ -8,7 +11,7 @@
+ fail.structOrderIrrelevant: invalid value [{b:1,a:0},{a:0,b:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
+     ./in.cue:3:21
+     ./in.cue:68:30
 -fail.structs: invalid value [{a:1},{a:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
 +fail.structs: invalid value [~(#a),~(#a)] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
      ./in.cue:3:21
      ./in.cue:45:11
- 
-@@ -64,12 +67,7 @@
+
+@@ -67,12 +70,7 @@
  	}]
- 
+
  	// Ditto. This time with actually closed fields.
 -	withOptional3: [{
 -		a: 1
@@ -175,20 +222,20 @@ diff old new
 -		b?: int
 -	}]
 +	withOptional3: list.UniqueItems() & [#a, #ab]
- 
+
  	// Ditto. There are not optional fields, but the structs are open.
  	openSpecific: list.UniqueItems() & [{
-@@ -83,7 +81,7 @@
+@@ -98,7 +96,7 @@
  }
  fail: {
  	ints:    _|_ // fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 2
 -	structs: _|_ // fail.structs: invalid value [{a:1},{a:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1
 +	structs: _|_ // fail.structs: invalid value [~(#a),~(#a)] (does not satisfy list.UniqueItems): equal values at position 0 and 1
- 
+
  	// Hidden values do not play a role in the comparisson.
  	ignoreHidden: _|_ // fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1
-@@ -90,10 +88,5 @@
- 
+@@ -108,10 +106,5 @@
+
  	// This can be a permanent error, as the optional field of the second
  	// element is erroneous an cannot match.
 -	ignoreOptError: [{
@@ -207,6 +254,9 @@ fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equa
 fail.ints: invalid value [1,2,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 2:
     ./in.cue:3:21
     ./in.cue:44:8
+fail.structOrderIrrelevant: invalid value [{b:1,a:0},{a:0,b:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
+    ./in.cue:3:21
+    ./in.cue:68:30
 fail.structs: invalid value [{a:1},{a:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1:
     ./in.cue:3:21
     ./in.cue:45:11
@@ -280,6 +330,18 @@ incomplete: {
 		a: 1
 	}]
 
+	// Value could still become more specific, and thus different.
+	ints: list.UniqueItems() & [int, int]
+
+	// Struct field order is irrelevant
+	openStructs: list.UniqueItems() & [{
+		b: 1
+		a: 0
+	}, {
+		a: 0
+		b: 1
+	}]
+
 	// Fully identical closed structs, but with non-concrete values.
 	structs: list.UniqueItems() & [#c, #c]
 }
@@ -289,6 +351,9 @@ fail: {
 
 	// Hidden values do not play a role in the comparisson.
 	ignoreHidden: _|_ // fail.ignoreHidden: invalid value [1,1] (does not satisfy list.UniqueItems): equal value (1) at position 0 and 1
+
+	// Struct field order is irrelevant
+	structOrderIrrelevant: _|_ // fail.structOrderIrrelevant: invalid value [{b:1,a:0},{a:0,b:1}] (does not satisfy list.UniqueItems): equal values at position 0 and 1
 
 	// This can be a permanent error, as the optional field of the second
 	// element is erroneous an cannot match.

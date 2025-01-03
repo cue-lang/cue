@@ -9,7 +9,7 @@ import (
 
 base
 
-earlyChecks: run: "go run ./internal/ci/checks"
+earlyChecks: #run: "go run ./internal/ci/checks"
 
 githubRepositoryPath: "cue-lang/cue"
 

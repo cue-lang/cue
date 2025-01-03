@@ -1,15 +1,12 @@
 # Code generated internal/ci/ci_tool.cue; DO NOT EDIT.
 
-name: Push tip to trybot
-"on":
-  push:
-    branches:
-      - master
-      - release-branch.*
-concurrency: push_tip_to_trybot
 jobs:
   push:
     runs-on: ubuntu-24.04
+    defaults:
+      run:
+        shell: bash
+    if: ${{github.repository == 'cue-lang/cue'}}
     steps:
       - name: Write netrc file for cueckoo Gerrithub
         run: |-
@@ -45,7 +42,10 @@ jobs:
           	 echo "Giving up"
           	 exit 1
           fi
-    defaults:
-      run:
-        shell: bash
-    if: ${{github.repository == 'cue-lang/cue'}}
+name: Push tip to trybot
+"on":
+  push:
+    branches:
+      - master
+      - release-branch.*
+concurrency: push_tip_to_trybot

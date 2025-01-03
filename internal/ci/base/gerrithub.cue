@@ -77,7 +77,7 @@ trybotDispatchWorkflow: bashWorkflow & {
 					// not get interpreted as shell.  Both in the running of the
 					// command itself, which itself is the echo-ing of a command to
 					// $GITHUB_OUTPUT.
-					run: #"""
+					#run: #"""
 						cat <<EOD >> $GITHUB_OUTPUT
 						value<<DOE
 						\#(*json.Marshal(#dummyDispatch) | "null")
@@ -100,7 +100,7 @@ trybotDispatchWorkflow: bashWorkflow & {
 					githubactions.#Step & {
 						name: "Trigger \(trybot.name) (\(v.nameSuffix))"
 						if:   "github.event.client_payload.type \(v.condition) '\(trybot.key)'"
-						run:  """
+						#run: """
 						mkdir tmpgit
 						cd tmpgit
 						git init -b initialbranch
@@ -176,7 +176,7 @@ pushTipToTrybotWorkflow: bashWorkflow & {
 			writeNetrcFile,
 			githubactions.#Step & {
 				name: "Push tip to trybot"
-				run:  """
+				#run: """
 						mkdir tmpgit
 						cd tmpgit
 						git init -b initialbranch
@@ -250,7 +250,7 @@ evictCaches: bashWorkflow & {
 
 				githubactions.#Step & {
 					name: "Delete caches"
-					run:  """
+					#run: """
 						set -x
 
 						echo ${{ secrets.\(botGitHubUserTokenSecretsKey) }} | gh auth login --with-token
@@ -273,7 +273,7 @@ evictCaches: bashWorkflow & {
 					name: "Trigger workflow runs to repopulate caches"
 					let branchPatterns = strings.Join(protectedBranchPatterns, " ")
 
-					run: """
+					#run: """
 						# Prepare git for pushes to trybot repo. Note
 						# because we have already checked out code we don't
 						# need origin. Fetch origin default branch for later use
@@ -345,7 +345,7 @@ evictCaches: bashWorkflow & {
 
 writeNetrcFile: githubactions.#Step & {
 	name: "Write netrc file for \(botGerritHubUser) Gerrithub"
-	run:  """
+	#run: """
 			cat <<EOD > ~/.netrc
 			machine \(gerritHubHostname)
 			login \(botGerritHubUser)

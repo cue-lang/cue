@@ -16,8 +16,6 @@ package github
 
 import (
 	"list"
-
-	"github.com/cue-tmp/jsonschema-pub/exp1/githubactions"
 )
 
 // The trybot workflow.
@@ -119,12 +117,12 @@ workflows: trybot: _repo.bashWorkflow & {
 		if: _isLatestLinux
 	}
 
-	_goTest: githubactions.#Step & {
+	_goTest: _repo.step & {
 		name: "Test"
-		run:  "go test ./..."
+		#run: "go test ./..."
 	}
 
-	_e2eTestSteps: [... githubactions.#Step & {
+	_e2eTestSteps: [... _repo.step & {
 		// The end-to-end tests require a github token secret and are a bit slow,
 		// so we only run them on pushes to protected branches and on one
 		// environment in the source repo.
@@ -155,14 +153,14 @@ workflows: trybot: _repo.bashWorkflow & {
 			// The end-to-end tests should only be run once, given the slowness and API rate limits.
 			// We want to catch any data races they spot as soon as possible, and they aren't CPU-bound,
 			// so running them only with -race seems reasonable.
-			run: """
+			#run: """
 				cd internal/_e2e
 				go test -race
 				"""
 		},
 	]
 
-	_goChecks: [...githubactions.#Step & {
+	_goChecks: [..._repo.step & {
 		// These checks can vary between platforms, as different code can be built
 		// based on GOOS and GOARCH build tags.
 		// However, CUE does not have any such build tags yet, and we don't use
@@ -176,7 +174,7 @@ workflows: trybot: _repo.bashWorkflow & {
 			// on pushes to protected branches, still build correctly before merging.
 			//
 			// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
-			run: """
+			#run: """
 				go vet ./...
 				go mod tidy
 				(cd internal/_e2e && go test -run=-)
@@ -188,13 +186,13 @@ workflows: trybot: _repo.bashWorkflow & {
 			// Note that we should then persist staticcheck's cache too.
 			uses: "dominikh/staticcheck-action@v1"
 			with: {
-				version: "2024.1.1" // Pin a version for determinism.
-				"install-go": false // We install Go ourselves.
+				version:      "2024.1.1" // Pin a version for determinism.
+				"install-go": false      // We install Go ourselves.
 			}
 		},
 	]
 
-	_checkTags: githubactions.#Step & {
+	_checkTags: _repo.step & {
 		// Ensure that GitHub and Gerrit agree on the full list of available tags.
 		// This way, if there is any discrepancy, we will get a useful go-cmp diff.
 		//
@@ -203,7 +201,7 @@ workflows: trybot: _repo.bashWorkflow & {
 		// Note that it sorts tag names as strings, which is not the best, but works OK.
 		if:   _isLatestLinux
 		name: "Check all git tags are available"
-		run: """
+		#run: """
 			cd $(mktemp -d)
 
 			git ls-remote --tags https://github.com/cue-lang/cue >github.txt
@@ -220,17 +218,17 @@ workflows: trybot: _repo.bashWorkflow & {
 			"""
 	}
 
-	_goTestRace: githubactions.#Step & {
+	_goTestRace: _repo.step & {
 		// Windows and Mac on CI are slower than Linux, and most data races are not specific
 		// to any OS or Go version in particular, so only run all tests with -race on Linux
 		// to not slow down CI unnecessarily.
-		if: _isLatestLinux
+		if:   _isLatestLinux
 		name: "Test with -race"
 		env: GORACE: "atexit_sleep_ms=10" // Otherwise every Go package being tested sleeps for 1s; see https://go.dev/issues/20364.
-		run: "go test -race ./..."
+		#run: "go test -race ./..."
 	}
 
-	_goTest32bit: githubactions.#Step & {
+	_goTest32bit: _repo.step & {
 		// Ensure that the entire build and all tests succeed on a 32-bit platform as well.
 		// This should catch if any of the code or test cases rely on bit sizes,
 		// such as int being 64 bits, which could cause portability bugs for 32-bit platforms.
@@ -238,16 +236,16 @@ workflows: trybot: _repo.bashWorkflow & {
 		// and the Linux runners on GitHub Actions use amd64.
 		//
 		// Running just the short tests is enough for now.
-		if: _isLatestLinux
+		if:   _isLatestLinux
 		name: "Test on 32 bits"
 		env: GOARCH: "386"
-		run: "go test -short ./..."
+		#run: "go test -short ./..."
 	}
 
-	_goTestWasm: githubactions.#Step & {
+	_goTestWasm: _repo.step & {
 		name: "Test with -tags=cuewasm"
 		// The wasm interpreter is only bundled into cmd/cue with the cuewasm build tag.
 		// Test the related packages with the build tag enabled as well.
-		run: "go test -tags cuewasm ./cmd/cue/cmd ./cue/interpreter/wasm"
+		#run: "go test -tags cuewasm ./cmd/cue/cmd ./cue/interpreter/wasm"
 	}
 }

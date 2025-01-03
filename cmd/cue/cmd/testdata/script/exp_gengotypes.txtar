@@ -1,0 +1,422 @@
+exec cue exp gengotypes ./root
+# ! stderr .
+
+# Check how many files were generated, and see that it aligns with how many files we expect.
+find-files .
+stdout -count=3 'cue_gen.go$'
+stdout -count=3 'cue_gen.go.want$'
+# No Go file is generated for imported itself, as it's only loaded as part of subpackage instances.
+! stdout imported${/@R}gen_go.cue
+# No bad or unused packages should have been generated at all.
+! stdout 'bad_.*'${/@R}gen_go.cue
+! stdout 'unused.*'${/@R}gen_go.cue
+
+# Check the contents of the generated files.
+cmp root/cue_gen.go              root/cue_gen.go.want
+cmp imported/subinst/cue_gen.go  imported/subinst/cue_gen.go.want
+cmp imported/indirect/cue_gen.go imported/indirect/cue_gen.go.want
+
+# Check various properties about the generated code.
+
+# Names including "never generate" signal that they must not be generated.
+! grep '(?i)nevergenerate' root/cue_gen.go
+# Hidden definitions must never result in exported Go types.
+! grep '^type Hidden' root/cue_gen.go
+# We use '_' as a separator for nested definitions; check it's not misused.
+! grep '^type _' root/cue_gen.go
+! grep '__' root/cue_gen.go
+# TODO: ensure that no IncompleteKind TODOs are left in the output.
+
+# The resulting Go should work correctly.
+# TODO: for now we just check that it builds; check that all types work
+# with cue.Value.Decode and cue.Context.Encode.
+go build ./...
+
+-- go.mod --
+module "foo.test/bar"
+
+go 1.22
+-- cue.mod/module.cue --
+module: "foo.test/bar"
+language: version: "v0.11.0"
+-- root/root.cue --
+package root
+
+// These should be ignored as they are not exported definitions.
+regularNeverGenerate: string
+_hiddenNeverGenerate: string
+
+// This type is always overriden via @go() attributes, and it is hidden,
+// so it should never be generated.
+_#overridenNeverGenerate: string
+
+#emptyStruct: {}
+#root: {
+	// TODO: keep the embedding on the Go side to avoid repeating types
+	#embeddedStruct
+
+	regular:   int
+	required!: int
+
+	// Optional types are represented as *T in Go if they are not already nullable.
+	optional?:         int
+	optionalNullable?: [...int]
+
+	// Hidden fields are not generated.
+	_hiddenNeverGenerate: int
+
+	regularStruct!: field: int
+
+	withAttrName!: int @go(WithAttrChangedName)
+	withAttrType!: _#overridenNeverGenerate @go(,type=go/constant.Kind)
+	// For compatibility with `cue get go`, an unnamed second value is also a type.
+	withAttrTypeCompat!: _#overridenNeverGenerate @go(,go/token.Token)
+
+	// withDoc is a great field.
+	//
+	// It deserves multiple paragraphs of documentation
+	// as there is a lot to write about it.
+	withDoc!: int
+
+	withInlineDoc!: int // this is an inline comment
+
+	withInnerDoc!: {
+		// This is documentation inside a struct, but not attached to any of its fields.
+
+		innerDocField!: int
+	}
+
+	#innerStruct: innerStructField!: int
+	useInnerStruct!: #innerStruct
+
+	_#hiddenInnerStruct: innerStructField!: int
+	useHiddenInnerStruct!: _#hiddenInnerStruct
+
+	useRegular!:       regular
+	useRegularStruct!: regularStruct
+
+	deeplyNested!: one!: two!: three!: int
+
+	useHiddenStruct!: _#hiddenStruct
+
+	// Hidden definitions are only generated if referenced; this one is not.
+	_#unusedHiddenInnerStruct: neverGenerate!: int
+
+	// Nested definitions are generated even if not referenced, as they are still exported.
+	#unusedInnerStruct: field!: int
+}
+
+// Actually, this field needed even more documentation.
+#root: withDoc!: _
+
+// All definitions underneath here must not be exported.
+_#hiddenStruct: {
+	innerField!: int
+
+	#innerStruct: field!: int
+	innerStruct!: #innerStruct
+}
+
+#embeddedStruct: {
+	embedded1!: int
+	{
+		embedded2!: int
+	}
+}
+
+// Hidden definitions are only generated if referenced; this one is not.
+_#unusedHiddenStruct: neverGenerate!: int
+-- root/types.cue --
+package root
+
+import (
+	"list"
+	"time"
+)
+
+#types: {
+	// The field names below are capitalized to avoid name clashes.
+
+	Top!: _
+	// Do we care about bottom?
+
+	Null!:   null
+	Bool!:   bool
+	Int!:    int
+	Float!:  float
+	String!: string
+	Bytes!:  bytes
+
+	Number!: number
+	Uint!:   uint
+	Int8!:   int8
+	Rune!:   rune
+
+	IntList!:        [...int]
+	IntListClosed2!: [int, int]
+	IntMap!:         [string]: int
+
+	Time!:     time.Time
+	Duration!: time.Duration
+
+	StringOrInt!:        string | int
+	StringOrIntDefault!: string | *int
+	NullOrStruct!:       null | {foo!: int}
+	NullOrString!:       null | string
+	NumericBounds!:      >0 & <100
+	NonEmptyString!:     string & != ""
+	UniqueStrings!:      list.UniqueItems & [... string]
+	LinkedList!:         #linkedList
+}
+
+#linkedList: {
+	item!: _
+	next?: #linkedList
+}
+-- root/import.cue --
+package root
+
+import (
+	"foo.test/bar/imported/subinst:imported"
+	"foo.test/bar/imported/unused"
+)
+
+#remoteStructs: {
+	inst!: imported.#instanceStruct
+
+	lowerRegular!: imported.lowerRegular
+	UpperRegular!: imported.UpperRegular
+	lowerDef!:     imported.#lowerDef
+	UpperDef!:     imported.#UpperDef
+}
+
+_unusedImport: unused.#UnusedNeverGenerate
+-- root/cue_gen.go.want --
+// Code generated by "cue exp gengotypes"; DO NOT EDIT.
+
+package root
+
+import (
+	"foo.test/bar/imported/subinst"
+	"go/constant"
+	"go/token"
+	"time"
+)
+
+type RemoteStructs struct {
+	Inst imported.InstanceStruct `json:"inst"`
+
+	LowerRegular int64 `json:"lowerRegular"`
+
+	UpperRegular int64 `json:"UpperRegular"`
+
+	LowerDef imported.LowerDef `json:"lowerDef"`
+
+	UpperDef imported.UpperDef `json:"UpperDef"`
+}
+
+type EmptyStruct struct {
+}
+
+type Types struct {
+	Top any/* CUE top */ `json:"Top"`
+
+	Null *struct{}/* CUE null */ `json:"Null"`
+
+	Bool bool `json:"Bool"`
+
+	Int int64 `json:"Int"`
+
+	Float float64 `json:"Float"`
+
+	String string `json:"String"`
+
+	Bytes []byte `json:"Bytes"`
+
+	Number any/* CUE number; int64 or float64 */ `json:"Number"`
+
+	Uint int64 `json:"Uint"`
+
+	Int8 int64 `json:"Int8"`
+
+	Rune int64 `json:"Rune"`
+
+	IntList []int64 `json:"IntList"`
+
+	IntListClosed2 []any/* CUE closed list */ `json:"IntListClosed2"`
+
+	IntMap map[string]int64 `json:"IntMap"`
+
+	Time time.Time `json:"Time"`
+
+	Duration int64/* CUE time.Duration */ `json:"Duration"`
+
+	StringOrInt any/* TODO: IncompleteKind: (int|string) */ `json:"StringOrInt"`
+
+	StringOrIntDefault any/* TODO: IncompleteKind: (int|string) */ `json:"StringOrIntDefault"`
+
+	NullOrStruct any/* TODO: IncompleteKind: (null|struct) */ `json:"NullOrStruct"`
+
+	NullOrString any/* TODO: IncompleteKind: (null|string) */ `json:"NullOrString"`
+
+	NumericBounds any/* CUE number; int64 or float64 */ `json:"NumericBounds"`
+
+	NonEmptyString string `json:"NonEmptyString"`
+
+	UniqueStrings []string `json:"UniqueStrings"`
+
+	LinkedList LinkedList `json:"LinkedList"`
+}
+
+type Root struct {
+	Regular int64 `json:"regular"`
+
+	Required int64 `json:"required"`
+
+	// Optional types are represented as *T in Go if they are not already nullable.
+	Optional *int64 `json:"optional,omitempty"`
+
+	OptionalNullable *[]int64 `json:"optionalNullable,omitempty"`
+
+	RegularStruct struct {
+		Field int64 `json:"field"`
+	} `json:"regularStruct"`
+
+	WithAttrChangedName int64 `json:"withAttrName"`
+
+	WithAttrType constant.Kind `json:"withAttrType"`
+
+	// For compatibility with `cue get go`, an unnamed second value is also a type.
+	WithAttrTypeCompat token.Token `json:"withAttrTypeCompat"`
+
+	// withDoc is a great field.
+	//
+	// It deserves multiple paragraphs of documentation
+	// as there is a lot to write about it.
+	//
+	// Actually, this field needed even more documentation.
+	WithDoc int64 `json:"withDoc"`
+
+	WithInlineDoc int64 `json:"withInlineDoc"`
+
+	WithInnerDoc struct {
+		InnerDocField int64 `json:"innerDocField"`
+	} `json:"withInnerDoc"`
+
+	UseInnerStruct Root_innerStruct `json:"useInnerStruct"`
+
+	UseHiddenInnerStruct root_hiddenInnerStruct `json:"useHiddenInnerStruct"`
+
+	UseRegular int64 `json:"useRegular"`
+
+	UseRegularStruct struct {
+		Field int64 `json:"field"`
+	} `json:"useRegularStruct"`
+
+	DeeplyNested struct {
+		One struct {
+			Two struct {
+				Three int64 `json:"three"`
+			} `json:"two"`
+		} `json:"one"`
+	} `json:"deeplyNested"`
+
+	UseHiddenStruct hiddenStruct `json:"useHiddenStruct"`
+
+	Embedded1 int64 `json:"embedded1"`
+
+	Embedded2 int64 `json:"embedded2"`
+}
+
+type EmbeddedStruct struct {
+	Embedded1 int64 `json:"embedded1"`
+
+	Embedded2 int64 `json:"embedded2"`
+}
+
+type LinkedList struct {
+	Item any/* CUE top */ `json:"item"`
+
+	Next *LinkedList `json:"next,omitempty"`
+}
+
+type Root_innerStruct struct {
+	InnerStructField int64 `json:"innerStructField"`
+}
+
+type root_hiddenInnerStruct struct {
+	InnerStructField int64 `json:"innerStructField"`
+}
+
+// All definitions underneath here must not be exported.
+type hiddenStruct struct {
+	InnerField int64 `json:"innerField"`
+
+	InnerStruct hiddenStruct_innerStruct `json:"innerStruct"`
+}
+
+type Root_unusedInnerStruct struct {
+	// Nested definitions are generated even if not referenced, as they are still exported.
+	Field int64 `json:"field"`
+}
+
+type hiddenStruct_innerStruct struct {
+	Field int64 `json:"field"`
+}
+-- imported/imported.cue --
+package imported
+
+import "foo.test/bar/imported/indirect"
+
+#instanceStruct: {
+	instanceField: int
+
+	indirectField: indirect.#Indirect
+}
+-- imported/subinst/imported.cue --
+package imported
+
+#instanceStruct: _
+
+lowerRegular: int
+UpperRegular: int
+#lowerDef: int
+#UpperDef: int
+-- imported/subinst/cue_gen.go.want --
+// Code generated by "cue exp gengotypes"; DO NOT EDIT.
+
+package imported
+
+import (
+	"foo.test/bar/imported/indirect"
+)
+
+type InstanceStruct struct {
+	InstanceField int64 `json:"instanceField"`
+
+	IndirectField indirect.Indirect `json:"indirectField"`
+}
+
+type LowerDef int64
+
+type UpperDef int64
+-- imported/indirect/indirect.cue --
+package indirect
+
+#Indirect: int
+-- imported/indirect/cue_gen.go.want --
+// Code generated by "cue exp gengotypes"; DO NOT EDIT.
+
+package indirect
+
+type Indirect int64
+-- imported/unused/unused.cue --
+package unused
+
+// This API and package are not used as part of the generated schemas.
+#UnusedNeverGenerate: int
+-- bad_syntax/invalid.cue --
+package bad_syntax
+
+// This CUE package is not referenced nor used anywhere, so it should not be loaded.
+{ bad syntax

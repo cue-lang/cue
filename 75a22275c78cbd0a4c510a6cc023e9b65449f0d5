@@ -16,6 +16,278 @@
       "message": "Demo of this working for the two biggest service configs we have: https://review.gerrithub.io/c/cue-labs/services/+/1206630",
       "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07738ee4_52316925",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-03T18:37:16Z",
+      "side": 1,
+      "message": "How about saying something about the general principle of generation here?\nFor example:\n\n\u003e The generated Go types are guaranteed to accept any value accepted by the CUE definitions,\n\u003e but may be more general. For example `string | int` will translate into the Go\n\u003e type `any` because the Go type system is not powerful enough to express\n\u003e disjunctions.\n\nAlso, it\u0027s not clear to me what \"underneath\" means here. Is it \"nested directly within\", or \"referred to by\" ?",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8eaf2c1c_4271bd79",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-03T18:37:16Z",
+      "side": 1,
+      "message": "Shouldn\u0027t these attributes be compatible with the attributes created by `cue get go` ?\nThat would imply:\n\n```\n    retyped: string @go(,foo.com/bar.NamedString)\n```\n\narguably not ideal given the difference in convention from encoding/json, but I think keeping the two CUE attributes aligned is probably more important than that.",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ca50ff9_062b9ae6",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-03T18:37:16Z",
+      "side": 1,
+      "message": "I have to say I\u0027d prefer to see this in its own independent internal package rather than bundling more functionality directly into cmd/cue.",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b673e7f_46667f5e",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-03T18:37:16Z",
+      "side": 1,
+      "message": "debugging remnant?",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2dc1687_44ed58d1",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-03T18:37:16Z",
+      "side": 1,
+      "message": "Why are we iterating through hidden fields too?",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "239d6daf_707461da",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-03T18:37:16Z",
+      "side": 1,
+      "message": "or just do it:\n\n    sort.Strings(imported)\n    imported \u003d slices.Compact(imported)",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8bb33a76_175de7cf",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-03T18:37:16Z",
+      "side": 1,
+      "message": "Why include hidden fields?\n\nI\u0027m not actually sure it\u0027s a good idea to include nested definitions either, tbh, because of potential namespace clashes and a lack of clear motivation. One motivation could be considered to be encoding/jsonschema, but that all requires more thought (what about non-identifier names encoded inside `#.\"foo bar\"`, for example?).",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a46788a4_7febad83",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-03T18:37:16Z",
+      "side": 1,
+      "message": "debugging remnant?",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08010326_b8a74a71",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-03T18:37:16Z",
+      "side": 1,
+      "message": "FWIW I think I\u0027d find something like this a bit easier to read, as the crucial json tag can be read as a whole:\n\n    omitEmpty :\u003d \"\"\n    if optional {\n        omitEmpty \u003d \",omitempty\"\n    }\n    g.appendf(\" `json:\\\"%s%s\\\"`\\n\\n\", cueName, omitEmpty)",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "039564b0_de6aedb0",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-03T18:37:16Z",
+      "side": 1,
+      "message": "This will end up generating `TODO: IncompleteKind` messages for non-open lists. How about just passing in an explicit top value when elem.Exists returns false?",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae2c8c64_8ac1ee3b",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-03T18:37:16Z",
+      "side": 1,
+      "message": "It would be nice to say what `defsOnly` signifies here.",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8851cdd_036f6840",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-03T18:37:16Z",
+      "side": 1,
+      "message": "`time.Duration` means something quite different in Go vs CUE (in Go it\u0027s an int64; in CUE it\u0027s a string), so I\u0027m not sure it\u0027s correct that the CUE `time.Duration` should turn into the Go `time.Duration`, as they\u0027ll have incompatible marshaled representations.",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f822340_e1707621",
+        "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-03T18:37:16Z",
+      "side": 1,
+      "message": "It would be nice to do that earlier rather than later - maybe even in this CL. It shouldn\u0027t be hard to do, and would have caught the `time.Duration` error I think.",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57aaa34b_f1844449",
+        "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-03T18:37:16Z",
+      "side": 1,
+      "message": "Let\u0027s include some more awkward cases too, just so we can see how things improve over time (and to make sure the generator deals with them in a reasonably sensible way).\n\nSome possibilities:\n\n    string | int\n    null | #SomeStruct\n    null | string\n    \u003e0 \u0026 \u003c100\n    list.UniqueItems \u0026 [... string]\n\n\nA recursive type would be good to have too (e.g. a linked list)",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34471234_16126ea6",
+        "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-03T18:37:16Z",
+      "side": 1,
+      "message": "Let\u0027s make these optional or required fields, fitting the usual pattern for CUE pure definitions.",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d392b95_da04cd82",
+        "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-03T18:37:16Z",
+      "side": 1,
+      "message": "Having a JSON tag on a private field doesn\u0027t make sense. I don\u0027t think we should be generating hidden/private fields at all tbh.",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

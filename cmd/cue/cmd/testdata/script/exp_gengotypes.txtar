@@ -1,0 +1,803 @@
+exec cue exp gengotypes ./root
+# ! stderr .
+
+# Check how many files were generated, and see that it aligns with how many files we expect.
+find-files .
+stdout -count=3 'cue_gen.go$'
+stdout -count=3 'cue_gen.go.want$'
+# No Go file is generated for imported itself, as it's only loaded as part of subpackage instances.
+! stdout imported${/@R}gen_go.cue
+# No bad or unused packages should have been generated at all.
+! stdout 'bad_.*'${/@R}gen_go.cue
+! stdout 'unused.*'${/@R}gen_go.cue
+
+# Check the contents of the generated files.
+cmp root/cue_gen.go              root/cue_gen.go.want
+cmp imported/subinst/cue_gen.go  imported/subinst/cue_gen.go.want
+cmp imported/indirect/cue_gen.go imported/indirect/cue_gen.go.want
+
+# Check various properties about the generated code.
+
+# Names including "never generate" signal that they must not be generated.
+! grep '(?i)nevergenerate' root/cue_gen.go
+# Hidden definitions must never result in exported Go types.
+! grep '^type Hidden' root/cue_gen.go
+# We use '_' as a separator for nested definitions; check it's not misused.
+! grep '^type _' root/cue_gen.go
+! grep '__' root/cue_gen.go
+# TODO: ensure that no IncompleteKind TODOs are left in the output.
+
+# The resulting Go should all build without error.
+go build ./...
+
+# Sanity check that our valid data tests validate against the schema with cmd/cue.
+exec cue vet -c cuetest/pass_check.cue cuetest/all.cue
+! exec cue vet -c cuetest/fail_check.cue cuetest/all.cue
+cmp stderr cuetest/fail_check.stderr
+
+# The resulting Go should roundtrip with CUE correctly.
+# Extract the values from CUE in JSON for easy consumption.
+exec cue export cuetest/all.cue
+cp stdout gotest/all.json
+go run ./gotest
+
+# Check that the JSON values re-encoded from Go still validate with the CUE schema.
+exec cue vet -c -d '#root' ./root gotest/reencoded-pass.jsonl
+
+-- cue.mod/module.cue --
+module: "foo.test/bar"
+language: version: "v0.11.0"
+-- cuetest/pass_check.cue --
+package cuetest
+
+import "foo.test/bar/root"
+
+pass: [_]: root.#root
+
+-- cuetest/fail_check.cue --
+package cuetest
+
+import "foo.test/bar/root"
+
+// Note that it would be nice to sanity check that all tests result in an error,
+// for example by using matchN or list.MatchN somehow.
+fail: [_]: [_]: root.#root
+fail: both: notString: "not_a_struct"
+
+-- cuetest/all.cue --
+package cuetest
+
+pass: empty: {}
+fail: both: notString: "not_a_struct"
+fail: both: notList:   [1, 2, 3]
+
+pass: noOptional:           fields: {required: 3, regular: 4}
+pass: withOptional:         fields: {required: 3, regular: 4, optional: 5}
+fail: cue: missingRequired: fields: regular: 4
+
+fail: cue: isNotEqual: {mustEqual1: 8, mustEqual2: 99}
+pass: isEqual:         {mustEqual1: 8, mustEqual2: 8}
+
+fail: cue: discBoth: discriminatorField: {one: 5, two: 5}
+// TODO: discriminator field structs seem to generate empty Go structs.
+// pass: discOne: discriminatorField: one: 5
+// pass: discTwo: discriminatorField: two: 5
+
+// To avoid repetition, we template the type test cases.
+// Note that some types have multipe test cases.
+for i, test in _typeTests {
+	if test._fail == "none" {
+		pass: "\(i)_\(test.name)": types: (test.name): test.pass
+	}
+	if test._fail == "cue" {
+		fail: cue: "\(i)_\(test.name)": types: (test.name): test.fail.cue
+	}
+	if test._fail == "both" {
+		fail: both: "\(i)_\(test.name)": types: (test.name): test.fail.both
+	}
+}
+#typeTest: {
+	name:   string
+	isPass: bool
+}
+#typeTest: {
+	_fail: "none"
+	pass!: _
+} | {
+	_fail: "cue"
+	fail!: cue!: _
+} | {
+	_fail: "both"
+	fail!: both!: _
+}
+_typeTests: [...#typeTest] & [
+	// TODO: most failure tests below should also fail in Go.
+
+	{name: "Null",   pass: null},
+	{name: "Bool",   pass: false},
+	{name: "Bool",   pass: true},
+	{name: "Int",    pass: 123},
+	{name: "Float",  pass: 456.789},
+	{name: "String", pass: "foo bar"},
+	// {name: "Bytes",  pass: '\x01\x02\x03'},
+
+	{name: "Number", pass: 12333},
+	{name: "Number", pass: 123.33},
+	{name: "Uint",   pass: 123456789},
+	{name: "Uint",   fail: cue: -34},
+	{name: "Int8",   pass: 12},
+	{name: "Int8",   fail: cue: 99999},
+	{name: "Int8",   fail: cue: -99999},
+	{name: "Rune",   pass: 140},
+
+	{name: "IntList",        pass:       [1, 2, 3]},
+	{name: "IntList",        pass:       []},
+	{name: "IntList",        fail: both: ["foo", "bar"]},
+	{name: "IntListClosed2", pass: [1, 2]},
+	{name: "IntListClosed2", fail: cue: [1, 2, 3, 4]}, // too long
+	{name: "IntMap",         pass: {"one": 1, "two": 2}},
+	{name: "IntMap",         fail: both: {"one": "x", "two": "y"}},
+	{name: "Time",           pass: "1937-01-01T12:00:27.87+00:20"},
+	{name: "Duration",       pass: "1h2m3s4ms"},
+
+	{name: "StringOrInt",        pass:       "foo"},
+	{name: "StringOrInt",        pass:       345},
+	{name: "StringOrIntDefault", pass:       "foo"},
+	{name: "StringOrIntDefault", pass:       345},
+	{name: "NullOrStruct",       pass:       null},
+	{name: "NullOrStruct",       pass:       {foo: 3}},
+	{name: "NullOrStruct",       fail: cue:  "foo"},
+	{name: "NullOrString",       pass:       null},
+	{name: "NullOrString",       pass:       "foo"},
+	{name: "NullOrString",       fail: cue:  123},
+	{name: "NumericBounds",      pass:       50},
+	{name: "NumericBounds",      fail: cue:  5555},
+	{name: "NonEmptyString",     pass:       "foo"},
+	{name: "NonEmptyString",     fail: cue:  ""},
+	{name: "NonEmptyString",     fail: both: 123},
+	{name: "UniqueStrings",      pass:       ["foo", "bar"]},
+	{name: "UniqueStrings",      fail: cue:  ["foo", "foo"]},
+	{name: "NonEmptyString",     fail: both: [1, 2, 3]},
+	{name: "LinkedList",         pass:       {item: 12, next: {item: 34}}},
+	{name: "LinkedList",         fail: both: {next: "x"}},
+]
+-- cuetest/fail_check.stderr --
+fail.both."16_IntList".types.IntList.0: conflicting values "foo" and int (mismatched types string and int):
+    ./cuetest/all.cue:68:40
+    ./cuetest/fail_check.cue:7:12
+    ./cuetest/fail_check.cue:7:17
+    ./root/root.cue:12:10
+    ./root/types.cue:26:20
+    ./root/types.cue:26:23
+fail.both."16_IntList".types.IntList.1: conflicting values "bar" and int (mismatched types string and int):
+    ./cuetest/all.cue:68:47
+    ./cuetest/fail_check.cue:7:12
+    ./cuetest/fail_check.cue:7:17
+    ./root/root.cue:12:10
+    ./root/types.cue:26:20
+    ./root/types.cue:26:23
+fail.both."20_IntMap".types.IntMap.one: conflicting values "x" and int (mismatched types string and int):
+    ./cuetest/all.cue:72:47
+    ./cuetest/fail_check.cue:7:12
+    ./cuetest/fail_check.cue:7:17
+    ./root/root.cue:12:10
+    ./root/types.cue:28:29
+fail.both."20_IntMap".types.IntMap.two: conflicting values "y" and int (mismatched types string and int):
+    ./cuetest/all.cue:72:59
+    ./cuetest/fail_check.cue:7:12
+    ./cuetest/fail_check.cue:7:17
+    ./root/root.cue:12:10
+    ./root/types.cue:28:29
+fail.both."37_NonEmptyString".types.NonEmptyString: conflicting values string and 123 (mismatched types string and int):
+    ./cuetest/all.cue:21:1
+    ./cuetest/all.cue:28:2
+    ./cuetest/all.cue:29:56
+    ./cuetest/all.cue:90:43
+    ./root/types.cue:38:23
+fail.both."40_NonEmptyString".types.NonEmptyString: conflicting values string and [1,2,3] (mismatched types string and list):
+    ./cuetest/all.cue:21:1
+    ./cuetest/all.cue:28:2
+    ./cuetest/all.cue:29:56
+    ./cuetest/all.cue:93:43
+    ./root/types.cue:38:23
+fail.both."42_LinkedList".types.LinkedList.next: conflicting values "x" and {item?:_,next?:#linkedList} (mismatched types string and struct):
+    ./cuetest/all.cue:95:50
+    ./cuetest/fail_check.cue:7:12
+    ./cuetest/fail_check.cue:7:17
+    ./root/root.cue:12:10
+    ./root/types.cue:40:23
+    ./root/types.cue:43:14
+    ./root/types.cue:45:9
+fail.both.notList: conflicting values [1,2,3] and {doc?:_} (mismatched types list and struct):
+    ./cuetest/all.cue:5:24
+    ./cuetest/fail_check.cue:7:12
+    ./cuetest/fail_check.cue:7:17
+    ./root/root.cue:73:8
+fail.both.notString: conflicting values "not_a_struct" and {doc?:_} (mismatched types string and struct):
+    ./cuetest/all.cue:4:24
+    ./cuetest/fail_check.cue:7:12
+    ./cuetest/fail_check.cue:7:17
+    ./root/root.cue:73:8
+fail.cue."11_Int8".types.Int8: invalid value 99999 (out of bound <=127):
+    ./cuetest/all.cue:62:30
+fail.cue."12_Int8".types.Int8: invalid value -99999 (out of bound >=-128):
+    ./cuetest/all.cue:63:30
+fail.cue."18_IntListClosed2".types.IntListClosed2: incompatible list lengths (2 and 4)
+fail.cue."29_NullOrStruct".types.NullOrStruct: 2 errors in empty disjunction:
+fail.cue."29_NullOrStruct".types.NullOrStruct: conflicting values "foo" and null (mismatched types string and null):
+    ./cuetest/all.cue:82:43
+    ./cuetest/fail_check.cue:7:12
+    ./cuetest/fail_check.cue:7:17
+    ./root/root.cue:12:10
+    ./root/types.cue:35:23
+fail.cue."29_NullOrStruct".types.NullOrStruct: conflicting values "foo" and {foo?:int} (mismatched types string and struct):
+    ./cuetest/all.cue:82:43
+    ./cuetest/fail_check.cue:7:12
+    ./cuetest/fail_check.cue:7:17
+    ./root/root.cue:12:10
+    ./root/types.cue:35:30
+fail.cue."32_NullOrString".types.NullOrString: 2 errors in empty disjunction:
+fail.cue."32_NullOrString".types.NullOrString: conflicting values 123 and null (mismatched types int and null):
+    ./cuetest/all.cue:85:43
+    ./cuetest/fail_check.cue:7:12
+    ./cuetest/fail_check.cue:7:17
+    ./root/root.cue:12:10
+    ./root/types.cue:36:23
+fail.cue."32_NullOrString".types.NullOrString: conflicting values 123 and string (mismatched types int and string):
+    ./cuetest/all.cue:85:43
+    ./cuetest/fail_check.cue:7:12
+    ./cuetest/fail_check.cue:7:17
+    ./root/root.cue:12:10
+    ./root/types.cue:36:30
+fail.cue."39_UniqueStrings".types.UniqueStrings: invalid value ["foo","foo"] (does not satisfy list.UniqueItems): equal value ("foo") at position 0 and 1:
+    ./cuetest/all.cue:26:55
+    ./root/types.cue:39:23
+fail.cue."9_Uint".types.Uint: invalid value -34 (out of bound >=0):
+    ./cuetest/all.cue:60:30
+fail.cue.discBoth.discriminatorField: 2 errors in empty disjunction:
+fail.cue.discBoth.discriminatorField.one: field not allowed:
+    ./cuetest/all.cue:14:43
+    ./cuetest/fail_check.cue:7:12
+    ./cuetest/fail_check.cue:7:17
+    ./root/root.cue:66:50
+fail.cue.discBoth.discriminatorField.two: field not allowed:
+    ./cuetest/all.cue:14:51
+    ./cuetest/fail_check.cue:7:12
+    ./cuetest/fail_check.cue:7:17
+    ./root/root.cue:66:29
+fail.cue.isNotEqual.mustEqual2: conflicting values 8 and 99:
+    ./cuetest/all.cue:11:37
+    ./cuetest/all.cue:11:52
+    ./cuetest/fail_check.cue:7:12
+    ./cuetest/fail_check.cue:7:17
+    ./root/root.cue:69:15
+fail.cue."34_NumericBounds".types.NumericBounds: invalid value 5555 (out of bound <100):
+    ./root/types.cue:37:28
+    ./cuetest/all.cue:87:43
+fail.cue."36_NonEmptyString".types.NonEmptyString: invalid value "" (out of bound !=""):
+    ./root/types.cue:38:32
+    ./cuetest/all.cue:26:55
+    ./cuetest/all.cue:89:43
+    ./root/types.cue:38:23
+-- go.mod --
+module "foo.test/bar"
+
+go 1.22
+-- gotest/gotest.go --
+package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"go/constant"
+	"os"
+	"slices"
+
+	"foo.test/bar/root"
+)
+
+type Tests struct {
+	Pass map[string]json.RawMessage
+	Fail struct {
+		CUE map[string]json.RawMessage
+		Both map[string]json.RawMessage
+	}
+}
+
+func main() {
+	// Sanity check that some types and fields are what we expect them to be.
+	var zeroRoot root.Root
+	var _ = zeroRoot.Embedded1
+	var _ = zeroRoot.Embedded2
+	// TODO: embedded structs should remain
+	// var _ = root.Root.EmbeddedStruct
+	var _ = zeroRoot.AttrChangedName
+	zeroRoot.AttrType = constant.Kind(0)
+	var _ root.AttrChangedName
+	var _ = root.AttrType(constant.Kind(0))
+
+	// Sanity check that Go can JSON decode all the values we expect.
+	// We also re-encode the ones we expect CUE to be able to validate again.
+	data := try1(os.ReadFile("gotest/all.json"))
+	var tests Tests
+	try(json.Unmarshal(data, &tests))
+
+	failed := false
+	f := try1(os.Create("gotest/reencoded-pass.jsonl"))
+	enc := json.NewEncoder(f)
+	for _, name := range sortedKeys(tests.Pass) {
+		msg := compact(tests.Pass[name])
+		var v root.Root
+		if err := json.Unmarshal(msg, &v); err != nil {
+			fmt.Fprintf(os.Stderr, "pass.%s: unexpected error with %s: %v\n", name, msg, err)
+			failed = true
+		}
+		try(enc.Encode(&v))
+	}
+	for _, name := range sortedKeys(tests.Fail.CUE) {
+		msg := compact(tests.Fail.CUE[name])
+		var v root.Root
+		if err := json.Unmarshal(tests.Fail.CUE[name], &v); err != nil {
+			fmt.Fprintf(os.Stderr, "fail.cue.%s: unexpected error with %s: %v\n", name, msg, err)
+			failed = true
+		}
+	}
+	for _, name := range sortedKeys(tests.Fail.Both) {
+		msg := compact(tests.Fail.Both[name])
+		var v root.Root
+		if err := json.Unmarshal(msg, &v); err == nil {
+			fmt.Fprintf(os.Stderr, "fail.both.%s: expected error with %s\n", name, msg)
+			failed = true
+		}
+	}
+	try(f.Close())
+	if failed {
+		os.Exit(1)
+	}
+}
+
+// TODO: maps.Keys
+func sortedKeys(m map[string]json.RawMessage) []string {
+	var keys []string
+	for k := range m {
+		keys = append(keys, k)
+	}
+	slices.Sort(keys)
+	return keys
+}
+
+func compact(msg json.RawMessage) []byte {
+	var buf bytes.Buffer
+	try(json.Compact(&buf, []byte(msg)))
+	return buf.Bytes()
+}
+
+func try(err error) {
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}
+
+func try1[T any](t T, err error) T {
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	return t
+}
+-- rootval/root.cue --
+package rootval
+
+import "foo.test/bar/root"
+
+root.#root
+-- root/root.cue --
+package root
+
+// This type is always overriden via @go() attributes, and it is hidden,
+// so it should never be generated.
+_#overridenNeverGenerate: string
+
+#emptyStruct: {}
+#root: {
+	// TODO: keep the embedding on the Go side to avoid repeating types
+	#embeddedStruct
+
+	types?: #types
+
+	fields?: {
+		regular:   int
+		required?: int
+
+		// Optional types are represented as *T in Go if they are not already nullable.
+		optional?:         int
+		optionalNullable?: [...int]
+
+		regularStruct: field?: int
+
+		useRegular?:       regular
+		useRegularStruct?: regularStruct
+	}
+
+	// Hidden fields are not generated.
+	_hiddenNeverGenerate: int
+
+	attrName?:       int @go(AttrChangedName)
+	attrType?:       _#overridenNeverGenerate @go(,type=go/constant.Kind)
+	// For compatibility with `cue get go`, an unnamed second value is also a type.
+	attrTypeCompat?: _#overridenNeverGenerate @go(,go/token.Token)
+
+	// doc is a great field.
+	//
+	// It deserves multiple paragraphs of documentation
+	// as there is a lot to write about it.
+	doc?: int
+
+	inlineDoc?: int // this is an inline comment
+
+	innerDoc?: {
+		// This is documentation inside a struct, but not attached to any of its fields.
+
+		innerDocField?: int
+	}
+
+	#innerStruct: innerStructField?: int
+	useInnerStruct?: #innerStruct
+
+	_#hiddenInnerStruct: innerStructField?: int
+	useHiddenInnerStruct?: _#hiddenInnerStruct
+
+	deeplyNested?: one?: two?: three?: int
+
+	useHiddenStruct?: _#hiddenStruct
+
+	// Hidden definitions are only generated if referenced; this one is not.
+	_#unusedHiddenInnerStruct: neverGenerate?: int
+
+	// Nested definitions are generated even if not referenced, as they are still exported.
+	#unusedInnerStruct: field?: int
+
+	discriminatorField?: close({one!: int}) | close({two!: int})
+
+	mustEqual1?: int
+	mustEqual2?: mustEqual1
+}
+
+// Actually, this field needed even more documentation.
+#root: doc?: _
+
+// All definitions underneath here must not be exported.
+_#hiddenStruct: {
+	innerField?: int
+
+	#innerStruct: field?: int
+	innerStruct?: #innerStruct
+}
+
+#embeddedStruct: {
+	embedded1?: int
+	{
+		embedded2?: int
+	}
+}
+
+// Hidden definitions are only generated if referenced; this one is not.
+_#unusedHiddenStruct: neverGenerate?: int
+
+#attrName: int @go(AttrChangedName)
+#attrType: _#overridenNeverGenerate @go(,type=go/constant.Kind)
+-- root/types.cue --
+package root
+
+import (
+	"list"
+	"time"
+)
+
+#types: {
+	// The field names below are capitalized to avoid name clashes.
+
+	Top?: _
+	// Do we care about bottom?
+
+	Null?:   null
+	Bool?:   bool
+	Int?:    int
+	Float?:  float
+	String?: string
+	Bytes?:  bytes
+
+	Number?: number
+	Uint?:   uint
+	Int8?:   int8
+	Rune?:   rune
+
+	IntList?:        [...int]
+	IntListClosed2?: [int, int]
+	IntMap?:         [string]: int
+
+	Time?:     time.Time
+	Duration?: time.Duration
+
+	StringOrInt?:        string | int
+	StringOrIntDefault?: string | *int
+	NullOrStruct?:       null | {foo?: int}
+	NullOrString?:       null | string
+	NumericBounds?:      >0 & <100
+	NonEmptyString?:     string & != ""
+	UniqueStrings?:      list.UniqueItems & [... string]
+	LinkedList?:         #linkedList
+}
+
+#linkedList: {
+	item?: _
+	next?: #linkedList
+}
+-- root/import.cue --
+package root
+
+import (
+	"foo.test/bar/imported/subinst:imported"
+	"foo.test/bar/imported/unused"
+)
+
+#remoteStructs: {
+	inst?: imported.#instanceStruct
+
+	lowerRegular?: imported.lowerRegular
+	UpperRegular?: imported.UpperRegular
+	lowerDef?:     imported.#lowerDef
+	UpperDef?:     imported.#UpperDef
+}
+
+_unusedImport: unused.#UnusedNeverGenerate
+-- root/cue_gen.go.want --
+// Code generated by "cue exp gengotypes"; DO NOT EDIT.
+
+package root
+
+import (
+	"foo.test/bar/imported/subinst"
+	"go/constant"
+	"go/token"
+	"time"
+)
+
+type RemoteStructs struct {
+	Inst *imported.InstanceStruct `json:"inst,omitempty"`
+
+	LowerRegular int64 `json:"lowerRegular,omitempty"`
+
+	UpperRegular int64 `json:"UpperRegular,omitempty"`
+
+	LowerDef imported.LowerDef `json:"lowerDef,omitempty"`
+
+	UpperDef imported.UpperDef `json:"UpperDef,omitempty"`
+}
+
+type EmptyStruct struct {
+}
+
+type Types struct {
+	Top any/* CUE top */ `json:"Top,omitempty"`
+
+	Null *struct{}/* CUE null */ `json:"Null,omitempty"`
+
+	Bool bool `json:"Bool,omitempty"`
+
+	Int int64 `json:"Int,omitempty"`
+
+	Float float64 `json:"Float,omitempty"`
+
+	String string `json:"String,omitempty"`
+
+	Bytes []byte `json:"Bytes,omitempty"`
+
+	Number any/* CUE number; int64 or float64 */ `json:"Number,omitempty"`
+
+	Uint int64 `json:"Uint,omitempty"`
+
+	Int8 int64 `json:"Int8,omitempty"`
+
+	Rune int64 `json:"Rune,omitempty"`
+
+	IntList []int64 `json:"IntList,omitempty"`
+
+	IntListClosed2 []any/* CUE closed list */ `json:"IntListClosed2,omitempty"`
+
+	IntMap *map[string]int64 `json:"IntMap,omitempty"`
+
+	Time time.Time `json:"Time,omitempty"`
+
+	Duration string/* CUE time.Duration */ `json:"Duration,omitempty"`
+
+	StringOrInt any/* TODO: IncompleteKind: (int|string) */ `json:"StringOrInt,omitempty"`
+
+	StringOrIntDefault any/* TODO: IncompleteKind: (int|string) */ `json:"StringOrIntDefault,omitempty"`
+
+	NullOrStruct any/* TODO: IncompleteKind: (null|struct) */ `json:"NullOrStruct,omitempty"`
+
+	NullOrString any/* TODO: IncompleteKind: (null|string) */ `json:"NullOrString,omitempty"`
+
+	NumericBounds any/* CUE number; int64 or float64 */ `json:"NumericBounds,omitempty"`
+
+	NonEmptyString string `json:"NonEmptyString,omitempty"`
+
+	UniqueStrings []string `json:"UniqueStrings,omitempty"`
+
+	LinkedList *LinkedList `json:"LinkedList,omitempty"`
+}
+
+type Root struct {
+	Types *Types `json:"types,omitempty"`
+
+	Fields *struct {
+		Regular int64 `json:"regular"`
+
+		Required int64 `json:"required,omitempty"`
+
+		// Optional types are represented as *T in Go if they are not already nullable.
+		Optional int64 `json:"optional,omitempty"`
+
+		OptionalNullable []int64 `json:"optionalNullable,omitempty"`
+
+		RegularStruct struct {
+			Field int64 `json:"field,omitempty"`
+		} `json:"regularStruct"`
+
+		UseRegular int64 `json:"useRegular,omitempty"`
+
+		UseRegularStruct *struct {
+			Field int64 `json:"field,omitempty"`
+		} `json:"useRegularStruct,omitempty"`
+	} `json:"fields,omitempty"`
+
+	AttrChangedName int64 `json:"attrName,omitempty"`
+
+	AttrType constant.Kind `json:"attrType,omitempty"`
+
+	// For compatibility with `cue get go`, an unnamed second value is also a type.
+	AttrTypeCompat token.Token `json:"attrTypeCompat,omitempty"`
+
+	// doc is a great field.
+	//
+	// It deserves multiple paragraphs of documentation
+	// as there is a lot to write about it.
+	//
+	// Actually, this field needed even more documentation.
+	Doc int64 `json:"doc,omitempty"`
+
+	InlineDoc int64 `json:"inlineDoc,omitempty"`
+
+	InnerDoc *struct {
+		InnerDocField int64 `json:"innerDocField,omitempty"`
+	} `json:"innerDoc,omitempty"`
+
+	UseInnerStruct *Root_innerStruct `json:"useInnerStruct,omitempty"`
+
+	UseHiddenInnerStruct *root_hiddenInnerStruct `json:"useHiddenInnerStruct,omitempty"`
+
+	DeeplyNested *struct {
+		One *struct {
+			Two *struct {
+				Three int64 `json:"three,omitempty"`
+			} `json:"two,omitempty"`
+		} `json:"one,omitempty"`
+	} `json:"deeplyNested,omitempty"`
+
+	UseHiddenStruct *hiddenStruct `json:"useHiddenStruct,omitempty"`
+
+	DiscriminatorField *struct {
+	} `json:"discriminatorField,omitempty"`
+
+	MustEqual1 int64 `json:"mustEqual1,omitempty"`
+
+	Embedded1 int64 `json:"embedded1,omitempty"`
+
+	Embedded2 int64 `json:"embedded2,omitempty"`
+
+	MustEqual2 any/* TODO: IncompleteKind: _|_ */ `json:"mustEqual2,omitempty"`
+}
+
+type EmbeddedStruct struct {
+	Embedded1 int64 `json:"embedded1,omitempty"`
+
+	Embedded2 int64 `json:"embedded2,omitempty"`
+}
+
+type AttrChangedName int64
+
+type AttrType constant.Kind
+
+type LinkedList struct {
+	Item any/* CUE top */ `json:"item,omitempty"`
+
+	Next *LinkedList `json:"next,omitempty"`
+}
+
+type Root_innerStruct struct {
+	InnerStructField int64 `json:"innerStructField,omitempty"`
+}
+
+type root_hiddenInnerStruct struct {
+	InnerStructField int64 `json:"innerStructField,omitempty"`
+}
+
+// All definitions underneath here must not be exported.
+type hiddenStruct struct {
+	InnerField int64 `json:"innerField,omitempty"`
+
+	InnerStruct *hiddenStruct_innerStruct `json:"innerStruct,omitempty"`
+}
+
+type Root_unusedInnerStruct struct {
+	// Nested definitions are generated even if not referenced, as they are still exported.
+	Field int64 `json:"field,omitempty"`
+}
+
+type hiddenStruct_innerStruct struct {
+	Field int64 `json:"field,omitempty"`
+}
+-- imported/imported.cue --
+package imported
+
+import "foo.test/bar/imported/indirect"
+
+// These should be ignored as they are not exported definitions.
+regularNeverGenerate: string
+_hiddenNeverGenerate: string
+
+#instanceStruct: {
+	instanceField: int
+
+	indirectField: indirect.#Indirect
+}
+-- imported/subinst/imported.cue --
+package imported
+
+#instanceStruct: _
+
+lowerRegular: int
+UpperRegular: int
+#lowerDef: int
+#UpperDef: int
+-- imported/subinst/cue_gen.go.want --
+// Code generated by "cue exp gengotypes"; DO NOT EDIT.
+
+package imported
+
+import (
+	"foo.test/bar/imported/indirect"
+)
+
+type InstanceStruct struct {
+	InstanceField int64 `json:"instanceField"`
+
+	IndirectField indirect.Indirect `json:"indirectField"`
+}
+
+type LowerDef int64
+
+type UpperDef int64
+-- imported/indirect/indirect.cue --
+package indirect
+
+#Indirect: int
+-- imported/indirect/cue_gen.go.want --
+// Code generated by "cue exp gengotypes"; DO NOT EDIT.
+
+package indirect
+
+type Indirect int64
+-- imported/unused/unused.cue --
+package unused
+
+// This API and package are not used as part of the generated schemas.
+#UnusedNeverGenerate: int
+-- bad_syntax/invalid.cue --
+package bad_syntax
+
+// This CUE package is not referenced nor used anywhere, so it should not be loaded.
+{ bad syntax

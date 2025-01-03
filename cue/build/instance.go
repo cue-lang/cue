@@ -56,7 +56,7 @@ type Instance struct {
 
 	// ImportPath returns the unique path to identify an imported instance.
 	//
-	// Instances created with NewInstance do not have an import path.
+	// Instances created with [Context.NewInstance] do not have an import path.
 	ImportPath string
 
 	// Imports lists the instances of all direct imports of this instance.
@@ -84,7 +84,7 @@ type Instance struct {
 	// instance has no imports.
 	// If Module != "", this corresponds to the module root.
 	// Root/pkg is the directory that holds third-party packages.
-	Root string // root directory of hierarchy ("" if unknown)
+	Root string
 
 	// Dir is the package directory. A package may also include files from
 	// ancestor directories, up to the module file.
@@ -96,6 +96,7 @@ type Instance struct {
 	Incomplete bool `api:"alpha"`
 
 	// Dependencies
+
 	// ImportPaths gives the transitive dependencies of all imports.
 	ImportPaths []string               `api:"alpha"`
 	ImportPos   map[string][]token.Pos `api:"alpha"` // line information for Imports

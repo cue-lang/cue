@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "785e2d64_4b854726",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-03T16:41:54Z",
+      "side": 1,
+      "message": "Demo of this working for the two biggest service configs we have: https://review.gerrithub.io/c/cue-labs/services/+/1206630",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -234,6 +234,7 @@ func New(args []string) (*Command, error) {
 		newVetCmd(c),
 
 		// Hidden
+		newExpCmd(c),
 		newAddCmd(c),
 		newLSPCmd(c),
 	} {

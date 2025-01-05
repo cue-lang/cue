@@ -35,10 +35,22 @@ step: {
 	// data transformation of #run, that prepends the setting of a bash option.
 	#run?: string
 
+	// Constrain that run steps, when defined, should be prefixed with this bash
+	// option. This does not preclude the option later being unset, but it's a
+	// safe default position.
+	//
+	// GitHub does not allow us to call a custom shell, or to specify the
+	// options that are passed in a call to bash. In effect, the shell value of
+	// "bash" is mapped on the GitHub side to some internally defined command,
+	// and there appears to be no
+	// https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#defaultsrunshell
+	run?: =~"^set -o nounset\n"
 	if #run != _|_ {
 		run: """
-		  \(#run)
-		  """
+		set -o nounset
+
+		\(#run)
+		"""
 	}
 }
 

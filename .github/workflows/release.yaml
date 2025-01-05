@@ -15,12 +15,17 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
       - name: Reset git directory modification times
-        run: touch -t 202211302355 $(find * -type d)
+        run: |-
+          set -o nounset
+
+          touch -t 202211302355 $(find * -type d)
       - name: Restore git file modification times
         uses: chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe
       - id: DispatchTrailer
         name: Try to extract Dispatch-Trailer
         run: |-
+          set -o nounset
+
           x="$(git log -1 --pretty='%(trailers:key=Dispatch-Trailer,valueonly)')"
           if [[ "$x" == "" ]]
           then
@@ -41,6 +46,8 @@ jobs:
           Dispatch-Trailer: {"type":"'))
         name: Check we don't have Dispatch-Trailer on a protected branch
         run: |-
+          set -o nounset
+
           echo "github.event.head_commit.message contains Dispatch-Trailer but we are on a protected branch"
           false
       - name: Install Go
@@ -50,6 +57,8 @@ jobs:
           go-version: 1.23.4
       - name: Set common go env vars
         run: |-
+          set -o nounset
+
           go env -w GOTOOLCHAIN=local
 
           # Dump env for good measure
@@ -65,7 +74,10 @@ jobs:
           username: cueckoo
           password: ${{ secrets.CUECKOO_DOCKER_PAT }}
       - name: Install CUE
-        run: go install ./cmd/cue
+        run: |-
+          set -o nounset
+
+          go install ./cmd/cue
       - name: Install GoReleaser
         uses: goreleaser/goreleaser-action@v5
         with:
@@ -73,6 +85,8 @@ jobs:
           version: v2.5.0
       - name: Run GoReleaser with CUE
         run: |-
+          set -o nounset
+
           go run cuelang.org/go/cmd/cue login --token=${CUE_TOKEN}
           cue cmd release
         working-directory: ./internal/ci/goreleaser
@@ -81,10 +95,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.CUECKOO_GITHUB_PAT }}
       - if: startsWith(github.ref, 'refs/tags/v')
         name: Re-test cuelang.org
-        run: 'curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" --fail --request POST --data-binary "{\"event_type\":\"Re-test post release of ${GITHUB_REF##refs/tags/}\"}" https://api.github.com/repos/cue-lang/cuelang.org/dispatches'
+        run: |-
+          set -o nounset
+
+          curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" --fail --request POST --data-binary "{\"event_type\":\"Re-test post release of ${GITHUB_REF##refs/tags/}\"}" https://api.github.com/repos/cue-lang/cuelang.org/dispatches
       - if: startsWith(github.ref, 'refs/tags/v')
         name: Trigger unity build
-        run: 'curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.PORCUEPINE_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" --fail --request POST --data-binary "{\"event_type\":\"Check against CUE ${GITHUB_REF##refs/tags/}\",\"client_payload\":{\"type\":\"unity\",\"payload\":{\"versions\":\"\\\"${GITHUB_REF##refs/tags/}\\\"\"}}}" https://api.github.com/repos/cue-unity/unity-private/dispatches'
+        run: |-
+          set -o nounset
+
+          curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.PORCUEPINE_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" --fail --request POST --data-binary "{\"event_type\":\"Check against CUE ${GITHUB_REF##refs/tags/}\",\"client_payload\":{\"type\":\"unity\",\"payload\":{\"versions\":\"\\\"${GITHUB_REF##refs/tags/}\\\"\"}}}" https://api.github.com/repos/cue-unity/unity-private/dispatches
 "on":
   push:
     tags:

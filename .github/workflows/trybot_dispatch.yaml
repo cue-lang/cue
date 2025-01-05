@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Write netrc file for cueckoo Gerrithub
         run: |-
+          set -o nounset
+
           cat <<EOD > ~/.netrc
           machine review.gerrithub.io
           login cueckoo
@@ -26,6 +28,8 @@ jobs:
         if: github.repository == 'cue-lang/cue' && (github.ref == 'refs/heads/ci/test')
         name: Write fake payload
         run: |-
+          set -o nounset
+
           cat <<EOD >> $GITHUB_OUTPUT
           value<<DOE
           null
@@ -34,6 +38,8 @@ jobs:
       - if: github.event.client_payload.type != 'trybot'
         name: Trigger TryBot (fake data)
         run: |-
+          set -o nounset
+
           mkdir tmpgit
           cd tmpgit
           git init -b initialbranch
@@ -84,6 +90,8 @@ jobs:
       - if: github.event.client_payload.type == 'trybot'
         name: Trigger TryBot (repository_dispatch payload)
         run: |-
+          set -o nounset
+
           mkdir tmpgit
           cd tmpgit
           git init -b initialbranch

@@ -38,12 +38,17 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
       - name: Reset git directory modification times
-        run: touch -t 202211302355 $(find * -type d)
+        run: |-
+          set -o nounset
+
+          touch -t 202211302355 $(find * -type d)
       - name: Restore git file modification times
         uses: chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe
       - id: DispatchTrailer
         name: Try to extract Dispatch-Trailer
         run: |-
+          set -o nounset
+
           x="$(git log -1 --pretty='%(trailers:key=Dispatch-Trailer,valueonly)')"
           if [[ "$x" == "" ]]
           then
@@ -64,6 +69,8 @@ jobs:
           Dispatch-Trailer: {"type":"'))
         name: Check we don't have Dispatch-Trailer on a protected branch
         run: |-
+          set -o nounset
+
           echo "github.event.head_commit.message contains Dispatch-Trailer but we are on a protected branch"
           false
       - name: Install Go
@@ -73,16 +80,24 @@ jobs:
           go-version: ${{ matrix.go-version }}
       - name: Set common go env vars
         run: |-
+          set -o nounset
+
           go env -w GOTOOLCHAIN=local
 
           # Dump env for good measure
           go env
       - id: go-mod-cache-dir
         name: Get go mod cache directory
-        run: echo "dir=$(go env GOMODCACHE)" >> ${GITHUB_OUTPUT}
+        run: |-
+          set -o nounset
+
+          echo "dir=$(go env GOMODCACHE)" >> ${GITHUB_OUTPUT}
       - id: go-cache-dir
         name: Get go build/test cache directory
-        run: echo "dir=$(go env GOCACHE)" >> ${GITHUB_OUTPUT}
+        run: |-
+          set -o nounset
+
+          echo "dir=$(go env GOCACHE)" >> ${GITHUB_OUTPUT}
       - if: |-
           (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test'))
@@ -106,27 +121,45 @@ jobs:
       - if: |-
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || github.ref == 'refs/heads/ci/test')
-        run: go clean -testcache
+        run: |-
+          set -o nounset
+
+          go clean -testcache
       - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
         name: Early git and code sanity checks
-        run: go run ./internal/ci/checks
+        run: |-
+          set -o nounset
+
+          go run ./internal/ci/checks
       - if: |-
           ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || !(matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
         name: Test
-        run: go test ./...
+        run: |-
+          set -o nounset
+
+          go test ./...
       - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
         name: Test with -race
-        run: go test -race ./...
+        run: |-
+          set -o nounset
+
+          go test -race ./...
         env:
           GORACE: atexit_sleep_ms=10
       - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
         name: Test on 32 bits
-        run: go test -short ./...
+        run: |-
+          set -o nounset
+
+          go test -short ./...
         env:
           GOARCH: "386"
       - name: Test with -tags=cuewasm
-        run: go test -tags cuewasm ./cmd/cue/cmd ./cue/interpreter/wasm
+        run: |-
+          set -o nounset
+
+          go test -tags cuewasm ./cmd/cue/cmd ./cue/interpreter/wasm
       - name: gcloud auth for end-to-end tests
         id: auth
         if: |-
@@ -144,14 +177,18 @@ jobs:
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
         name: End-to-end test
-        run: |-
-          cd internal/_e2e
-          go test -race
         env:
           CUE_TEST_TOKEN: ${{ secrets.E2E_PORCUEPINE_CUE_TOKEN }}
+        run: |-
+          set -o nounset
+
+          cd internal/_e2e
+          go test -race
       - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
         name: Go checks
         run: |-
+          set -o nounset
+
           go vet ./...
           go mod tidy
           (cd internal/_e2e && go test -run=-)
@@ -164,6 +201,8 @@ jobs:
       - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
         name: Check all git tags are available
         run: |-
+          set -o nounset
+
           cd $(mktemp -d)
 
           git ls-remote --tags https://github.com/cue-lang/cue >github.txt
@@ -177,13 +216,18 @@ jobs:
           	echo "Did you forget about refs/attic branches? https://github.com/cue-lang/cue/wiki/Notes-for-project-maintainers"
           	exit 1
           fi
-      - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
-        name: Generate
-        run: |-
+      - run: |-
+          set -o nounset
+
           go run cuelang.org/go/cmd/cue login --token=${CUE_TOKEN}
           go generate ./...
+        if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
+        name: Generate
         env:
           CUE_TOKEN: ${{ secrets.NOTCUECKOO_CUE_TOKEN }}
       - if: always()
         name: Check that git is clean at the end of the job
-        run: test -z "$(git status --porcelain)" || (git status; git diff; false)
+        run: |-
+          set -o nounset
+
+          test -z "$(git status --porcelain)" || (git status; git diff; false)

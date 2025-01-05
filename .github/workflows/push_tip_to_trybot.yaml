@@ -10,6 +10,8 @@ jobs:
     steps:
       - name: Write netrc file for cueckoo Gerrithub
         run: |-
+          set -o nounset
+
           cat <<EOD > ~/.netrc
           machine review.gerrithub.io
           login cueckoo
@@ -18,6 +20,8 @@ jobs:
           chmod 600 ~/.netrc
       - name: Push tip to trybot
         run: |-
+          set -o nounset
+
           mkdir tmpgit
           cd tmpgit
           git init -b initialbranch

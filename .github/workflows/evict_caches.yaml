@@ -18,12 +18,17 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
       - name: Reset git directory modification times
-        run: touch -t 202211302355 $(find * -type d)
+        run: |-
+          set -o nounset
+
+          touch -t 202211302355 $(find * -type d)
       - name: Restore git file modification times
         uses: chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe
       - id: DispatchTrailer
         name: Try to extract Dispatch-Trailer
         run: |-
+          set -o nounset
+
           x="$(git log -1 --pretty='%(trailers:key=Dispatch-Trailer,valueonly)')"
           if [[ "$x" == "" ]]
           then
@@ -44,10 +49,14 @@ jobs:
           Dispatch-Trailer: {"type":"'))
         name: Check we don't have Dispatch-Trailer on a protected branch
         run: |-
+          set -o nounset
+
           echo "github.event.head_commit.message contains Dispatch-Trailer but we are on a protected branch"
           false
       - name: Delete caches
         run: |-
+          set -o nounset
+
           set -x
 
           echo ${{ secrets.CUECKOO_GITHUB_PAT }} | gh auth login --with-token
@@ -65,6 +74,8 @@ jobs:
           done
       - name: Trigger workflow runs to repopulate caches
         run: |-
+          set -o nounset
+
           # Prepare git for pushes to trybot repo. Note
           # because we have already checked out code we don't
           # need origin. Fetch origin default branch for later use

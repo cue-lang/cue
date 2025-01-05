@@ -32,10 +32,16 @@ bashStep: {
 	// transformation of #run, that prepends the setting of a bash option.
 	#run?: string
 
+	// Constrain that run steps, when defined, should be prefixed with this bash
+	// option. This does not preclude the option later being unset, but it's a
+	// safe default position.
+	run?: =~"^set -o nounset\n"
 	if #run != _|_ {
 		run: """
-		  \(#run)
-		  """
+		set -o nounset
+
+		\(#run)
+		"""
 	}
 }
 

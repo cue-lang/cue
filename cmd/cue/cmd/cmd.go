@@ -158,8 +158,6 @@ Run "cue help commands" for more details on tasks and workflow commands.
 		}),
 	}
 
-	cmd.Flags().SetInterspersed(false)
-
 	addInjectionFlags(cmd.Flags(), true, false)
 
 	return cmd

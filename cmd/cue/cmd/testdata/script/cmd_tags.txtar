@@ -1,6 +1,11 @@
 exec cue cmd -t prod -t name=bar tag tags.cue tags_tool.cue
 cmp stdout expect-stdout
 
+# Check that the flags can be used after any arguments;
+# such "interspersed" flags are supported by cobra by default.
+! exec cue cmd tag tags.cue tags_tool.cue -t prod -t name=bar
+stderr 'no encoding specified for file "-t"'
+
 # Verify that the new global -t flag added as a fix for issue 2510 above
 # works with the explicit or implicit "cmd" sub-command,
 # but not with other sub-commands like "fmt".

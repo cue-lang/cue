@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a581b23d_3841ef31",
+        "filename": "cue/testdata/eval/sharing.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-07T11:13:14Z",
+      "side": 1,
+      "message": "what about 3546 in \"full\" form? is it not necessary?",
+      "revId": "aab844f9cc1767eafbccedecee3bd11cbfae1cae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

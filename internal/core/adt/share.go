@@ -45,25 +45,23 @@ func (n *nodeContext) unshare() {
 	// Find another mechanism once we get rid of the old evaluator.
 	n.node.BaseValue = n.origBaseValue
 
-	n.scheduleVertexConjuncts(n.shared, v, n.sharedID)
+	for _, id := range n.sharedIDs {
+		n.scheduleVertexConjuncts(n.shared, v, id)
+	}
 
-	n.sharedID.cc.decDependent(n.ctx, SHARED, n.node.cc())
-	n.sharedID.cc = nil
+	n.decSharedIDs()
 }
 
 // finalizeSharing should be called when it is known for sure a node can be
 // shared.
 func (n *nodeContext) finalizeSharing() {
-	if n.sharedID.cc != nil {
-		n.sharedID.cc.decDependent(n.ctx, SHARED, n.node.cc())
-		n.sharedID.cc = nil
-	}
+	n.decSharedIDs()
 	if !n.isShared {
 		return
 	}
 	switch v := n.node.BaseValue.(type) {
 	case *Vertex:
-		if n.sharedID.CycleType == NoCycle {
+		if n.shareCycleType == NoCycle {
 			v.Finalize(n.ctx)
 		} else if !v.isFinal() {
 			// TODO: ideally we just handle cycles in optional chains directly,
@@ -91,6 +89,31 @@ func (n *nodeContext) finalizeSharing() {
 	}
 }
 
+func (n *nodeContext) addShared(id CloseInfo) {
+	if len(n.sharedIDs) == 0 || n.shareCycleType < id.CycleType {
+		n.shareCycleType = id.CycleType
+	}
+
+	// At this point, the node may still be unshared at a later point. For this
+	// purpose we need to keep the retain count above zero until all conjuncts
+	// have been processed and it is clear that sharing is possible. Delaying
+	// such a count should not hurt performance, as a shared node is completed
+	// anyway.
+	n.sharedIDs = append(n.sharedIDs, id)
+	if id.cc != nil {
+		id.cc.incDependent(n.ctx, SHARED, n.node.cc())
+	}
+}
+
+func (n *nodeContext) decSharedIDs() {
+	for _, id := range n.sharedIDs {
+		if cc := id.cc; cc != nil {
+			cc.decDependent(n.ctx, SHARED, n.node.cc())
+		}
+	}
+	n.sharedIDs = n.sharedIDs[:0]
+}
+
 func (n *nodeContext) share(c Conjunct, arc *Vertex, id CloseInfo) {
 	if n.isShared {
 		panic("already sharing")
@@ -100,7 +123,7 @@ func (n *nodeContext) share(c Conjunct, arc *Vertex, id CloseInfo) {
 	n.node.IsShared = true
 	n.isShared = true
 	n.shared = c
-	n.sharedID = id
+	n.addShared(id)
 
 	if arc.IsDetached() && arc.MayAttach() { // TODO: Second check necessary?
 		// This node can safely be shared. Since it is not rooted, though, it
@@ -113,15 +136,6 @@ func (n *nodeContext) share(c Conjunct, arc *Vertex, id CloseInfo) {
 		if s := arc.getState(n.ctx); s != nil {
 			s.parent = n.node
 		}
-	}
-
-	// At this point, the node may still be unshared at a later point. For this
-	// purpose we need to keep the retain count above zero until all conjuncts
-	// have been processed and it is clear that sharing is possible. Delaying
-	// such a count should not hurt performance, as a shared node is completed
-	// anyway.
-	if id.cc != nil {
-		id.cc.incDependent(n.ctx, SHARED, n.node.cc())
 	}
 }
 

@@ -30,14 +30,7 @@ Unifications: 35
 Conjuncts:    82
 Disjuncts:    39
 -- out/evalalpha --
-Errors:
-assert.res._computed.in.taxPayer.self: field not allowed:
-    ./in.cue:5:22
-    ./in.cue:18:12
-
-Result:
-(_|_){
-  // [eval]
+(struct){
   _taxPayer(:p): (struct){
     self: (struct){
     }
@@ -45,29 +38,21 @@ Result:
   let sam#1 = (struct){
     taxPayer: ~(_taxPayer(:p))
   }
-  assert: (_|_){
-    // [eval]
+  assert: (struct){
     invoke: (struct){
       taxPayer: ~(_taxPayer(:p))
     }
-    res: (_|_){
-      // [eval]
+    res: (struct){
       in: (#struct){
         taxPayer: (#struct){
           self: (#struct){
           }
         }
       }
-      _computed(:p): (_|_){
-        // [eval]
-        in: (_|_){
-          // [eval]
-          taxPayer: (_|_){
-            // [eval]
-            self: (_|_){
-              // [eval] assert.res._computed.in.taxPayer.self: field not allowed:
-              //     ./in.cue:5:22
-              //     ./in.cue:18:12
+      _computed(:p): (#struct){
+        in: (#struct){
+          taxPayer: (#struct){
+            self: (#struct){
             }
           }
         }
@@ -94,18 +79,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,32 +1,41 @@
--(struct){
-+Errors:
-+assert.res._computed.in.taxPayer.self: field not allowed:
-+    ./in.cue:5:22
-+    ./in.cue:18:12
-+
-+Result:
-+(_|_){
-+  // [eval]
-   _taxPayer(:p): (struct){
-     self: (struct){
+@@ -4,22 +4,16 @@
      }
    }
    let sam#1 = (struct){
@@ -113,51 +87,34 @@ diff old new
 -      self: (struct){
 -      }
 -    }
--  }
--  assert: (struct){
 +    taxPayer: ~(_taxPayer(:p))
-+  }
-+  assert: (_|_){
-+    // [eval]
+   }
+   assert: (struct){
      invoke: (struct){
 -      taxPayer: (struct){
 -        self: (struct){
 -        }
 -      }
--    }
--    res: (struct){
 +      taxPayer: ~(_taxPayer(:p))
-+    }
-+    res: (_|_){
-+      // [eval]
+     }
+     res: (struct){
        in: (#struct){
          taxPayer: (#struct){
 -          self: (struct){
--          }
--        }
--      }
--      _computed(:p): (#struct){
--        in: (#struct){
--          taxPayer: (#struct){
--            self: (struct){
 +          self: (#struct){
-+          }
-+        }
-+      }
-+      _computed(:p): (_|_){
-+        // [eval]
-+        in: (_|_){
-+          // [eval]
-+          taxPayer: (_|_){
-+            // [eval]
-+            self: (_|_){
-+              // [eval] assert.res._computed.in.taxPayer.self: field not allowed:
-+              //     ./in.cue:5:22
-+              //     ./in.cue:18:12
+           }
+         }
+       }
+@@ -26,7 +20,7 @@
+       _computed(:p): (#struct){
+         in: (#struct){
+           taxPayer: (#struct){
+-            self: (struct){
++            self: (#struct){
              }
            }
          }
-@@ -34,30 +43,16 @@
+@@ -34,30 +28,16 @@
      }
    }
    subject: (struct){

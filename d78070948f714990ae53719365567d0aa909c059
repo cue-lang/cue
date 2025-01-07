@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ecb5c6c_511a04b7",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1042,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-07T11:19:04Z",
+      "side": 1,
+      "message": "document this new field? particularly as it could be confusing with sharedID",
+      "revId": "d78070948f714990ae53719365567d0aa909c059",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

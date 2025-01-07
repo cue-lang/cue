@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd465cea_8ff61572",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-01-07T15:32:04Z",
+      "side": 1,
+      "message": "PTAL. This is the only incorrect use of `-p` that I can find on cuelang.org that comes directly from cmd/cue\u0027s help texts.\n\ncf. https://github.com/cue-lang/cue/issues/3516#issuecomment-2575575847 for the latest user who (I suspect) saw this text and imprinted on \"-p influences which CUE package to evaluate\". I know that I was tripped up by this, early in my CUE learning!",
+      "revId": "7fd3171e459c8520087a90c3bcc0330fe33f77c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

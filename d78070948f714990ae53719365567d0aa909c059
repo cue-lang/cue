@@ -16,6 +16,24 @@
       "message": "document this new field? particularly as it could be confusing with sharedID",
       "revId": "d78070948f714990ae53719365567d0aa909c059",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0703a09d_bc117cb1",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1042,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-07T11:52:10Z",
+      "side": 1,
+      "message": "Yes, good catch. Done. I actually removed sharedID in favor of for what it is now only used: shareCycleType.",
+      "parentUuid": "2ecb5c6c_511a04b7",
+      "revId": "d78070948f714990ae53719365567d0aa909c059",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

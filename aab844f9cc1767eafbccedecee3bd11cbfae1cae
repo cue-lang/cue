@@ -16,6 +16,24 @@
       "message": "what about 3546 in \"full\" form? is it not necessary?",
       "revId": "aab844f9cc1767eafbccedecee3bd11cbfae1cae",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b510248c_baa73c48",
+        "filename": "cue/testdata/eval/sharing.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-07T11:22:04Z",
+      "side": 1,
+      "message": "Not necessary and cumbersome, as it uses imports. I verified it is fixed as well.",
+      "parentUuid": "a581b23d_3841ef31",
+      "revId": "aab844f9cc1767eafbccedecee3bd11cbfae1cae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

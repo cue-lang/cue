@@ -132,31 +132,10 @@ Unifications: 150
 Conjuncts:    309
 Disjuncts:    165
 -- out/evalalpha --
-Errors:
-issue3641.simplified.t1.out.cfg.ctx: field not allowed:
-    ./dupshare.cue:13:16
-    ./dupshare.cue:6:13
-issue3641.simplified.t2.out.cfg.ctx: field not allowed:
-    ./dupshare.cue:29:16
-    ./dupshare.cue:22:13
-issue3641.simplified.t3.out.cfg.ctx: field not allowed:
-    ./dupshare.cue:46:16
-    ./dupshare.cue:39:13
-issue3641.full.out.sch.cfg.ctx: field not allowed:
-    ./dupshare.cue:60:17
-    ./dupshare.cue:56:13
-issue3546.reduced.out.list.0: field not allowed:
-    ./dupshare.cue:72:7
-
-Result:
-(_|_){
-  // [eval]
-  issue3641: (_|_){
-    // [eval]
-    simplified: (_|_){
-      // [eval]
-      t1: (_|_){
-        // [eval]
+(struct){
+  issue3641: (struct){
+    simplified: (struct){
+      t1: (struct){
         #Context1: (#struct){
           ctx: (#struct){
           }
@@ -180,20 +159,14 @@ Result:
             }
           }
         }
-        out: (_|_){
-          // [eval]
-          cfg: (_|_){
-            // [eval]
-            ctx: (_|_){
-              // [eval] issue3641.simplified.t1.out.cfg.ctx: field not allowed:
-              //     ./dupshare.cue:13:16
-              //     ./dupshare.cue:6:13
+        out: (#struct){
+          cfg: (#struct){
+            ctx: (#struct){
             }
           }
         }
       }
-      t2: (_|_){
-        // [eval]
+      t2: (struct){
         #Context1: (#struct){
           ctx: (#struct){
           }
@@ -217,20 +190,14 @@ Result:
             }
           }
         }
-        out: (_|_){
-          // [eval]
-          cfg: (_|_){
-            // [eval]
-            ctx: (_|_){
-              // [eval] issue3641.simplified.t2.out.cfg.ctx: field not allowed:
-              //     ./dupshare.cue:29:16
-              //     ./dupshare.cue:22:13
+        out: (#struct){
+          cfg: (#struct){
+            ctx: (#struct){
             }
           }
         }
       }
-      t3: (_|_){
-        // [eval]
+      t3: (struct){
         #Context1: (#struct){
           ctx: (#struct){
           }
@@ -254,21 +221,15 @@ Result:
             }
           }
         }
-        out: (_|_){
-          // [eval]
-          cfg: (_|_){
-            // [eval]
-            ctx: (_|_){
-              // [eval] issue3641.simplified.t3.out.cfg.ctx: field not allowed:
-              //     ./dupshare.cue:46:16
-              //     ./dupshare.cue:39:13
+        out: (#struct){
+          cfg: (#struct){
+            ctx: (#struct){
             }
           }
         }
       }
     }
-    full: (_|_){
-      // [eval]
+    full: (struct){
       #Context1: (#struct){
         ctx: (#struct){
         }
@@ -293,26 +254,18 @@ Result:
         }
       }
       let config#1 = ~(issue3641.full.#Config)
-      out: (_|_){
-        // [eval]
-        sch: (_|_){
-          // [eval]
-          cfg: (_|_){
-            // [eval]
-            ctx: (_|_){
-              // [eval] issue3641.full.out.sch.cfg.ctx: field not allowed:
-              //     ./dupshare.cue:60:17
-              //     ./dupshare.cue:56:13
+      out: (#struct){
+        sch: (#struct){
+          cfg: (#struct){
+            ctx: (#struct){
             }
           }
         }
       }
     }
   }
-  issue3546: (_|_){
-    // [eval]
-    reduced: (_|_){
-      // [eval]
+  issue3546: (struct){
+    reduced: (struct){
       all: (#list){
         0: (string){ "a" }
       }
@@ -330,14 +283,9 @@ Result:
           0: (string){ "a" }
         }
       }
-      out: (_|_){
-        // [eval]
-        list: (_|_){
-          // [eval]
-          0: (_|_){
-            // [eval] issue3546.reduced.out.list.0: field not allowed:
-            //     ./dupshare.cue:72:7
-          }
+      out: (#struct){
+        list: (#list){
+          0: (string){ "a" }
         }
       }
     }
@@ -411,20 +359,10 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,128 +1,140 @@
--(struct){
--  issue3641: (struct){
--    simplified: (struct){
--      t1: (struct){
--        #Context1: (#struct){
--          ctx: (#struct){
--          }
--        }
--        Context2: (struct){
--          ctx: (struct){
--          }
--        }
--        #Config1: (#struct){
+@@ -11,102 +11,75 @@
+           }
+         }
+         #Config1: (#struct){
 -          cfg: (#struct){
 -            ctx: (#struct){
 -            }
@@ -521,56 +459,6 @@ diff old new
 -            ctx: (struct){
 -            }
 -          }
--        }
--        Config: (#struct){
--          cfg: (#struct){
--            ctx: (#struct){
--            }
--          }
--        }
--        out: (#struct){
--          cfg: (#struct){
--            ctx: (#struct){
--            }
--          }
--        }
--      }
--    }
--    full: (struct){
-+Errors:
-+issue3641.simplified.t1.out.cfg.ctx: field not allowed:
-+    ./dupshare.cue:13:16
-+    ./dupshare.cue:6:13
-+issue3641.simplified.t2.out.cfg.ctx: field not allowed:
-+    ./dupshare.cue:29:16
-+    ./dupshare.cue:22:13
-+issue3641.simplified.t3.out.cfg.ctx: field not allowed:
-+    ./dupshare.cue:46:16
-+    ./dupshare.cue:39:13
-+issue3641.full.out.sch.cfg.ctx: field not allowed:
-+    ./dupshare.cue:60:17
-+    ./dupshare.cue:56:13
-+issue3546.reduced.out.list.0: field not allowed:
-+    ./dupshare.cue:72:7
-+
-+Result:
-+(_|_){
-+  // [eval]
-+  issue3641: (_|_){
-+    // [eval]
-+    simplified: (_|_){
-+      // [eval]
-+      t1: (_|_){
-+        // [eval]
-+        #Context1: (#struct){
-+          ctx: (#struct){
-+          }
-+        }
-+        Context2: (struct){
-+          ctx: (struct){
-+          }
-+        }
-+        #Config1: (#struct){
 +          cfg: ~(issue3641.simplified.t1.#Context1)
 +        }
 +        #Config3: (#struct){
@@ -585,20 +473,14 @@ diff old new
 +            }
 +          }
 +        }
-+        out: (_|_){
-+          // [eval]
-+          cfg: (_|_){
-+            // [eval]
-+            ctx: (_|_){
-+              // [eval] issue3641.simplified.t1.out.cfg.ctx: field not allowed:
-+              //     ./dupshare.cue:13:16
-+              //     ./dupshare.cue:6:13
++        out: (#struct){
++          cfg: (#struct){
++            ctx: (#struct){
 +            }
 +          }
 +        }
 +      }
-+      t2: (_|_){
-+        // [eval]
++      t2: (struct){
 +        #Context1: (#struct){
 +          ctx: (#struct){
 +          }
@@ -622,20 +504,14 @@ diff old new
 +            }
 +          }
 +        }
-+        out: (_|_){
-+          // [eval]
-+          cfg: (_|_){
-+            // [eval]
-+            ctx: (_|_){
-+              // [eval] issue3641.simplified.t2.out.cfg.ctx: field not allowed:
-+              //     ./dupshare.cue:29:16
-+              //     ./dupshare.cue:22:13
++        out: (#struct){
++          cfg: (#struct){
++            ctx: (#struct){
 +            }
 +          }
 +        }
 +      }
-+      t3: (_|_){
-+        // [eval]
++      t3: (struct){
 +        #Context1: (#struct){
 +          ctx: (#struct){
 +          }
@@ -652,32 +528,10 @@ diff old new
 +        }
 +        Config2: (struct){
 +          cfg: ~(issue3641.simplified.t3.Context2)
-+        }
-+        Config: (#struct){
-+          cfg: (#struct){
-+            ctx: (#struct){
-+            }
-+          }
-+        }
-+        out: (_|_){
-+          // [eval]
-+          cfg: (_|_){
-+            // [eval]
-+            ctx: (_|_){
-+              // [eval] issue3641.simplified.t3.out.cfg.ctx: field not allowed:
-+              //     ./dupshare.cue:46:16
-+              //     ./dupshare.cue:39:13
-+            }
-+          }
-+        }
-+      }
-+    }
-+    full: (_|_){
-+      // [eval]
-       #Context1: (#struct){
-         ctx: (#struct){
          }
-@@ -132,24 +144,13 @@
+         Config: (#struct){
+           cfg: (#struct){
+@@ -132,24 +105,13 @@
          }
        }
        #Config1: (#struct){
@@ -705,7 +559,7 @@ diff old new
        }
        #Config: (#struct){
          cfg: (#struct){
-@@ -157,24 +158,27 @@
+@@ -157,12 +119,7 @@
            }
          }
        }
@@ -715,61 +569,11 @@ diff old new
 -          }
 -        }
 -      }
--      out: (#struct){
--        sch: (#struct){
--          cfg: (#struct){
--            ctx: (#struct){
--            }
--          }
--        }
--      }
--    }
--  }
--  issue3546: (struct){
--    reduced: (struct){
 +      let config#1 = ~(issue3641.full.#Config)
-+      out: (_|_){
-+        // [eval]
-+        sch: (_|_){
-+          // [eval]
-+          cfg: (_|_){
-+            // [eval]
-+            ctx: (_|_){
-+              // [eval] issue3641.full.out.sch.cfg.ctx: field not allowed:
-+              //     ./dupshare.cue:60:17
-+              //     ./dupshare.cue:56:13
-+            }
-+          }
-+        }
-+      }
-+    }
-+  }
-+  issue3546: (_|_){
-+    // [eval]
-+    reduced: (_|_){
-+      // [eval]
-       all: (#list){
-         0: (string){ "a" }
-       }
-@@ -192,9 +196,14 @@
-           0: (string){ "a" }
-         }
-       }
--      out: (#struct){
--        list: (#list){
--          0: (string){ "a" }
-+      out: (_|_){
-+        // [eval]
-+        list: (_|_){
-+          // [eval]
-+          0: (_|_){
-+            // [eval] issue3546.reduced.out.list.0: field not allowed:
-+            //     ./dupshare.cue:72:7
-+          }
-         }
-       }
-     }
-@@ -231,9 +240,7 @@
+       out: (#struct){
+         sch: (#struct){
+           cfg: (#struct){
+@@ -231,9 +188,7 @@
    }
    debug: (struct){
      sharingOn: (struct){

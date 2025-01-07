@@ -1039,6 +1039,13 @@ type nodeContext struct {
 	// TODO: also use this to communicate increasingly more concrete values.
 	notify []receiver
 
+	// sharedIDs contains all the CloseInfos that are involved in a shared node.
+	// There can be more than one if the same Vertex is shared multiple times.
+	// It is important to keep track of each instance as we need to insert each
+	// of them separately in case a Vertex is "unshared" to ensure that
+	// closedness information is correctly computed in such cases.
+	sharedIDs []CloseInfo
+
 	// Conjuncts holds a reference to the Vertex Arcs that still need
 	// processing. It does NOT need to be copied.
 	conjuncts       []conjunct
@@ -1141,11 +1148,11 @@ type nodeContextState struct {
 	hasNonCycle          bool // has material conjuncts without structural cycle
 	hasNonCyclic         bool // has non-cyclic conjuncts at start of field processing
 
-	isShared      bool      // set if we are currently structure sharing.
-	noSharing     bool      // set if structure sharing is not allowed
-	shared        Conjunct  // the original conjunct that led to sharing
-	sharedID      CloseInfo // the original CloseInfo that led to sharing
-	origBaseValue BaseValue // the BaseValue that structure sharing replaces.
+	isShared       bool       // set if we are currently structure sharing.
+	noSharing      bool       // set if structure sharing is not allowed
+	shared         Conjunct   // the original conjunct that led to sharing
+	shareCycleType CyclicType // keeps track of the cycle type of shared nodes.
+	origBaseValue  BaseValue  // the BaseValue that structure sharing replaces.
 
 	depth       int32
 	defaultMode defaultMode
@@ -1227,6 +1234,7 @@ func (n *nodeContext) clone() *nodeContext {
 
 	d.arcMap = append(d.arcMap, n.arcMap...)
 	d.notify = append(d.notify, n.notify...)
+	d.sharedIDs = append(d.sharedIDs, n.sharedIDs...)
 
 	n.scheduler.cloneInto(&d.scheduler)
 
@@ -1264,6 +1272,7 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			conjuncts:          n.conjuncts[:0],
 			cyclicConjuncts:    n.cyclicConjuncts[:0],
 			notify:             n.notify[:0],
+			sharedIDs:          n.sharedIDs[:0],
 			checks:             n.checks[:0],
 			postChecks:         n.postChecks[:0],
 			dynamicFields:      n.dynamicFields[:0],

@@ -265,7 +265,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		}
 	}
 
-	if v, ok := n.node.BaseValue.(*Vertex); ok && n.sharedID.CycleType == NoCycle {
+	if v, ok := n.node.BaseValue.(*Vertex); ok && n.shareCycleType == NoCycle {
 		if n.ctx.hasDepthCycle(v) {
 			n.reportCycleError()
 			return true

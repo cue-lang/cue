@@ -1039,6 +1039,8 @@ type nodeContext struct {
 	// TODO: also use this to communicate increasingly more concrete values.
 	notify []receiver
 
+	sharedIDs []CloseInfo
+
 	// Conjuncts holds a reference to the Vertex Arcs that still need
 	// processing. It does NOT need to be copied.
 	conjuncts       []conjunct
@@ -1227,6 +1229,7 @@ func (n *nodeContext) clone() *nodeContext {
 
 	d.arcMap = append(d.arcMap, n.arcMap...)
 	d.notify = append(d.notify, n.notify...)
+	d.sharedIDs = append(d.sharedIDs, n.sharedIDs...)
 
 	n.scheduler.cloneInto(&d.scheduler)
 
@@ -1264,6 +1267,7 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			conjuncts:          n.conjuncts[:0],
 			cyclicConjuncts:    n.cyclicConjuncts[:0],
 			notify:             n.notify[:0],
+			sharedIDs:          n.sharedIDs[:0],
 			checks:             n.checks[:0],
 			postChecks:         n.postChecks[:0],
 			dynamicFields:      n.dynamicFields[:0],

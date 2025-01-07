@@ -38,13 +38,13 @@ Evaluated and emit
 	# multiple files: these are combined at the top-level. Order doesn't matter.
 	cue export file1.cue foo/file2.cue
 
-	# all files within the "mypkg" package: this includes all files in the
+	# all files within the "cloud" package, including all files in the
 	# current directory and its ancestor directories that are marked with the
-	# same package.
-	cue export -p cloud
+	# same package, up to the root of the containing module.
+	cue export .:cloud
 
-	# the -p flag can be omitted if the directory only contains files for
-	# the "mypkg" package.
+	# the package name can be omitted if the directory only contains files for
+	# the "cloud" package.
 	cue export
 
 Emit value:
@@ -71,9 +71,10 @@ yields the following JSON:
 
 In absence of arguments, the current directory is loaded as a package instance.
 A package instance for a directory contains all files in the directory and its
-ancestor directories, up to the module root, belonging to the same package.
-If the package is not explicitly defined by the '-p' flag, it must be uniquely
-defined by the files in the current directory.
+ancestor directories, up to the module root, belonging to the same package. If
+a single package is not uniquely defined by the files in the current directory
+then the package name must be specified as an explicit argument using
+".:<package-name>" syntax.
 
 
 Formats

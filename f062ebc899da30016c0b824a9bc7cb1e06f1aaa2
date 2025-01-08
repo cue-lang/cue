@@ -16,6 +16,24 @@
       "message": "This is a great start, thanks!\nI think it would be worth having slightly better testing in place before moving forward (at least check that the generated Go types are JSON-compatible with the original CUE).",
       "revId": "f062ebc899da30016c0b824a9bc7cb1e06f1aaa2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c4b27470_eb335db1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-08T15:08:50Z",
+      "side": 1,
+      "message": "I definitely agree, and I have a TODO about it in the testscript, but I\u0027d prefer to tackle this in a follow-up change - this change is large enough as it is, and I\u0027d like to have a base from which we can do smaller incremental changes and see how it affects the generation.",
+      "parentUuid": "97369eff_7d21914f",
+      "revId": "f062ebc899da30016c0b824a9bc7cb1e06f1aaa2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

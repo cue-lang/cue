@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ea63bb9_fd55ec5a",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-08T15:08:50Z",
+      "side": 1,
+      "message": "I meant nesting here, but in the end I swapped the logic to be transitive with references. I updated the text with that.",
+      "parentUuid": "07738ee4_52316925",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8eaf2c1c_4271bd79",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-01-03T18:37:16Z",
       "side": 1,
       "message": "Shouldn\u0027t these attributes be compatible with the attributes created by `cue get go` ?\nThat would imply:\n\n```\n    retyped: string @go(,foo.com/bar.NamedString)\n```\n\narguably not ideal given the difference in convention from encoding/json, but I think keeping the two CUE attributes aligned is probably more important than that.",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "226e3fb4_ca546267",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-08T15:08:50Z",
+      "side": 1,
+      "message": "as agreed, the named attribute value is better for readability and extensibility, but I\u0027ve added backwards compatible support for a second argument with a comment and test.",
+      "parentUuid": "8eaf2c1c_4271bd79",
       "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0932e86_cda2955f",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-08T15:08:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0ca50ff9_062b9ae6",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1b673e7f_46667f5e",
@@ -82,6 +136,24 @@
       "writtenOn": "2025-01-03T18:37:16Z",
       "side": 1,
       "message": "debugging remnant?",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "459a1d9d_2fc280f4",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-08T15:08:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1b673e7f_46667f5e",
       "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +175,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e58f58cd_8244a999",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-08T15:08:50Z",
+      "side": 1,
+      "message": "removed as agreed.",
+      "parentUuid": "c2dc1687_44ed58d1",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "239d6daf_707461da",
@@ -116,6 +206,24 @@
       "writtenOn": "2025-01-03T18:37:16Z",
       "side": 1,
       "message": "or just do it:\n\n    sort.Strings(imported)\n    imported \u003d slices.Compact(imported)",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba5bc7aa_d1ed3894",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-08T15:08:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "239d6daf_707461da",
       "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -137,6 +245,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "42ecdf61_02905dfd",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-08T15:08:50Z",
+      "side": 1,
+      "message": "Hidden fields, yes, those should not be done. That is fixed now.\n\nHidden definitions, now are only done if referenced by exported top-level definitions.\n\nNested definitions for now are done, because `pkg.#foo.#bar` is still exported and not hidden. But I don\u0027t feel strongly about this.",
+      "parentUuid": "8bb33a76_175de7cf",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a46788a4_7febad83",
@@ -150,6 +276,24 @@
       "writtenOn": "2025-01-03T18:37:16Z",
       "side": 1,
       "message": "debugging remnant?",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "82bf6ef5_3115f55f",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-08T15:08:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a46788a4_7febad83",
       "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -171,6 +315,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9db964bd_a7007df6",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-08T15:08:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "08010326_b8a74a71",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "039564b0_de6aedb0",
@@ -184,6 +346,24 @@
       "writtenOn": "2025-01-03T18:37:16Z",
       "side": 1,
       "message": "This will end up generating `TODO: IncompleteKind` messages for non-open lists. How about just passing in an explicit top value when elem.Exists returns false?",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d3e71d9_9defe00c",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-08T15:08:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "039564b0_de6aedb0",
       "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -205,6 +385,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c42b8409_51874238",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-08T15:08:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ae2c8c64_8ac1ee3b",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e8851cdd_036f6840",
@@ -218,6 +416,24 @@
       "writtenOn": "2025-01-03T18:37:16Z",
       "side": 1,
       "message": "`time.Duration` means something quite different in Go vs CUE (in Go it\u0027s an int64; in CUE it\u0027s a string), so I\u0027m not sure it\u0027s correct that the CUE `time.Duration` should turn into the Go `time.Duration`, as they\u0027ll have incompatible marshaled representations.",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "498ec5c6_d9d75475",
+        "filename": "cmd/cue/cmd/exp.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-08T15:08:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8851cdd_036f6840",
       "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -239,6 +455,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c00374ac_2d1060f4",
+        "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-08T15:08:50Z",
+      "side": 1,
+      "message": "yes, I plan to do that in the next CL. I would prefer not to do it here because this CL is already pretty large and can stand on its own - it allows the dogfooding in the services repo to begin.",
+      "parentUuid": "0f822340_e1707621",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "57aaa34b_f1844449",
@@ -252,6 +486,24 @@
       "writtenOn": "2025-01-03T18:37:16Z",
       "side": 1,
       "message": "Let\u0027s include some more awkward cases too, just so we can see how things improve over time (and to make sure the generator deals with them in a reasonably sensible way).\n\nSome possibilities:\n\n    string | int\n    null | #SomeStruct\n    null | string\n    \u003e0 \u0026 \u003c100\n    list.UniqueItems \u0026 [... string]\n\n\nA recursive type would be good to have too (e.g. a linked list)",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "277115f3_ae53e364",
+        "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-08T15:08:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "57aaa34b_f1844449",
       "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -273,6 +525,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "00f5ef0c_b751e9fa",
+        "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-08T15:08:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "34471234_16126ea6",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6d392b95_da04cd82",
@@ -286,6 +556,24 @@
       "writtenOn": "2025-01-03T18:37:16Z",
       "side": 1,
       "message": "Having a JSON tag on a private field doesn\u0027t make sense. I don\u0027t think we should be generating hidden/private fields at all tbh.",
+      "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3aa6870_78c05559",
+        "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-08T15:08:50Z",
+      "side": 1,
+      "message": "hidden fields are no longer generated.",
+      "parentUuid": "6d392b95_da04cd82",
       "revId": "75a22275c78cbd0a4c510a6cc023e9b65449f0d5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

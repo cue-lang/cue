@@ -370,3 +370,9 @@ containsUnityTrailer: containsDispatchTrailer & {
 }
 
 _dispatchTrailerVariable: "github.event.head_commit.message"
+
+loginCentralRegistry: githubactions.#Step & {
+	#cueCommand:       *"cue" | string
+	#tokenExpression!: string
+	run:               "\(#cueCommand) login --token=\(#tokenExpression)"
+}

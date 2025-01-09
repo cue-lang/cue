@@ -76,19 +76,16 @@ jobs:
           password: ${{ secrets.CUECKOO_DOCKER_PAT }}
       - name: Install CUE
         run: go install ./cmd/cue
+      - run: cue login --token=${{ secrets.NOTCUECKOO_CUE_TOKEN }}
       - name: Install GoReleaser
         uses: goreleaser/goreleaser-action@v5
         with:
           install-only: true
           version: v2.5.0
       - name: Run GoReleaser with CUE
-        run: |-
-          go run cuelang.org/go/cmd/cue login --token=${CUE_TOKEN}
-          cue cmd release
-        working-directory: ./internal/ci/goreleaser
         env:
-          CUE_TOKEN: ${{ secrets.NOTCUECKOO_CUE_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.CUECKOO_GITHUB_PAT }}
+        working-directory: ./internal/ci/goreleaser
       - if: startsWith(github.ref, 'refs/tags/v')
         name: Re-test cuelang.org
         run: 'curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" --fail --request POST --data-binary "{\"event_type\":\"Re-test post release of ${GITHUB_REF##refs/tags/}\"}" https://api.github.com/repos/cue-lang/cuelang.org/dispatches'

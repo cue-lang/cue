@@ -71,7 +71,7 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		// conjunct represents an embedding or definition, we need to create a
 		// new closeContext to represent this.
 		if id.cc == nil {
-			id.cc = n.node.rootCloseContext(n.ctx)
+			id.cc = n.node.rootCloseContext(n.ctx, ArcMember)
 		}
 		if id.cc == cc {
 			panic("inconsistent state: same closeContext")
@@ -561,7 +561,7 @@ func (n *nodeContext) addNotify2(v *Vertex, c CloseInfo) {
 
 	// TODO: dedup: only add if t does not already exist. First check if this
 	// is even possible by adding a panic.
-	root := n.node.rootCloseContext(n.ctx)
+	root := n.node.rootCloseContext(n.ctx, ArcPending)
 	if root.isDecremented {
 		return
 	}

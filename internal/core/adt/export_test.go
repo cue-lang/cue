@@ -42,7 +42,7 @@ func NewFieldTester(r Runtime) *FieldTester {
 	return &FieldTester{
 		OpContext: ctx,
 		n:         n,
-		cc:        v.rootCloseContext(ctx),
+		cc:        v.rootCloseContext(ctx, ArcMember),
 		Root:      v,
 	}
 }

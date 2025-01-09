@@ -767,7 +767,7 @@ func (n *nodeContext) insertArcCC(f Feature, mode ArcType, c Conjunct, id CloseI
 	// }
 
 	if v.cc() == nil {
-		v.rootCloseContext(n.ctx)
+		v.rootCloseContext(n.ctx, mode)
 		// TODO(evalv3): reevaluate need for generation
 		v._cc.generation = n.node._cc.generation
 	}
@@ -840,7 +840,7 @@ func (n *nodeContext) addConstraint(arc *Vertex, mode ArcType, c Conjunct, check
 	// TODO: can go, but do in separate CL.
 	arc, _ = n.getArc(f, mode)
 
-	root := arc.rootCloseContext(n.ctx)
+	root := arc.rootCloseContext(n.ctx, mode)
 
 	// Note: we are inserting the conjunct int the closeContext corresponding to
 	// the constraint. This will add an arc to the respective closeContext. In

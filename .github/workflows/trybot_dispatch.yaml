@@ -12,7 +12,7 @@ jobs:
     if: ${{ ((github.ref == 'refs/heads/ci/test') && false) || github.event.client_payload.type == 'trybot' }}
     defaults:
       run:
-        shell: bash
+        shell: bash --noprofile --norc -euo pipefail {0}
     steps:
       - name: Write netrc file for cueckoo Gerrithub
         run: |-

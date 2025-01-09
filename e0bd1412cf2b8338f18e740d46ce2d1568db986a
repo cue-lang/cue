@@ -33,6 +33,74 @@
       "message": "@Rog: please verify that the test changes in script/* are as intended.",
       "revId": "e0bd1412cf2b8338f18e740d46ce2d1568db986a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e99c484d_44b1505b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-09T16:24:35Z",
+      "side": 1,
+      "message": "LGTM in general, but a couple of the changes look a little dubious to me.",
+      "revId": "e0bd1412cf2b8338f18e740d46ce2d1568db986a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0a1f975_f6453935",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_non_local.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-09T16:24:35Z",
+      "side": 1,
+      "message": "I don\u0027t understand why this change has been made. It means that the file name is a bit misleading because the file does not use imports/root.",
+      "revId": "e0bd1412cf2b8338f18e740d46ce2d1568db986a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47dfcf6b_b9d7b8fa",
+        "filename": "cmd/cue/cmd/testdata/script/pkg_patterns.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-09T16:24:35Z",
+      "side": 1,
+      "message": "It looks like this change has somehow exposed a bug: this should really be referring to `foo.self` because `foo.bar` does not actually exist. As this test is definitely not oriented towards finding evaluator errors, I\u0027d suggest fixing this in an earlier CL to use `foo.self` (ideally it would be good to find out _why_ the `foo.bar` reference was not resulting in an error previously, but it\u0027s not _that_ important, given that it\u0027s fixed in evalv3).\n\nThe `TODO why does this succeed` comment should still be legitimate, as none of that behaviour has changed AFAIK.",
+      "revId": "e0bd1412cf2b8338f18e740d46ce2d1568db986a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c04da4c6_404c9f85",
+        "filename": "cue/testdata/cycle/builtins.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-09T16:24:35Z",
+      "side": 1,
+      "message": "In passing, it would be great if the `matchN` error actually said something about _why_ the match failed (in this case because the required field `a` is not provided).\nThis is https://github.com/cue-lang/cue/issues/3389.",
+      "revId": "e0bd1412cf2b8338f18e740d46ce2d1568db986a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -237,6 +237,21 @@ y: conflicting values 4 and 2:
 				x: string | {foo!: string}
 			`,
 		out: "incomplete\nx.foo: field is required but not present:\n    test:3:18",
+	}, {
+		name: "disallow incomplete error with final",
+		cfg:  &validate.Config{Final: true},
+		in: `
+			x: y + 1
+			y: int
+				`,
+		out: "incomplete\nx: non-concrete value int in operand to +:\n    test:2:7\n    test:3:7",
+	}, {
+		name: "allow incomplete error with final while in definition",
+		cfg:  &validate.Config{Final: true},
+		in: `
+			#D: x: #D.y + 1
+			#D: y: int
+				`,
 	}}
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {

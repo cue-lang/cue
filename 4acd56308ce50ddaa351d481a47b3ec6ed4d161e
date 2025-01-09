@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a44ad525_c5315548",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-09T16:00:50Z",
+      "side": 1,
+      "message": "A tiny bit more info here would help for future readers of the commit log. Maybe link to an earlier issue or CL where this issue surfaced?",
+      "revId": "4acd56308ce50ddaa351d481a47b3ec6ed4d161e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

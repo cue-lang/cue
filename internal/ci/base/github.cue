@@ -12,7 +12,7 @@ import (
 )
 
 bashWorkflow: githubactions.#Workflow & {
-	jobs: [string]: defaults: run: shell: "bash"
+	jobs: [string]: defaults: run: shell: "bash --noprofile --norc -euo pipefail {0}"
 }
 
 installGo: {

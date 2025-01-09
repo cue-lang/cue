@@ -30,8 +30,10 @@ jobs:
       Dispatch-Trailer: {"type":"'))
     defaults:
       run:
-        shell: bash
+        shell: bash --noprofile --norc -euo pipefail {0}
     steps:
+      - name: naughty step
+        run: echo $NO_VALUE_HERE
       - name: Checkout code
         uses: actions/checkout@v4
         with:

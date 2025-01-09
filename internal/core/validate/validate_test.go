@@ -119,7 +119,7 @@ y: conflicting values 4 and 2:
 		x: y
 		`,
 	}, {
-		// TODO: discarded cycle error
+		// TODO: different error position
 		todo_v3: true,
 
 		name: "disallow cycle",
@@ -130,7 +130,7 @@ y: conflicting values 4 and 2:
 		`,
 		out: "cycle\ncycle error:\n    test:2:6",
 	}, {
-		// TODO: discarded cycle error
+		// TODO: different error position
 		todo_v3: true,
 
 		name: "disallow cycle",
@@ -192,9 +192,6 @@ y: conflicting values 4 and 2:
 			`,
 		out: "incomplete\nx.a: incomplete value 1 | 2",
 	}, {
-		// TODO: missing error position
-		todo_v3: true,
-
 		name: "required field not present",
 		cfg:  &validate.Config{Final: true},
 		in: `
@@ -232,15 +229,14 @@ y: conflicting values 4 and 2:
 			x: matchN(0, [bool | {x!: _}])
 		`,
 		out: "",
-		// TODO: add this test once the new evaluator correctly reports the
-		// error position.
-		// }, {
-		// 	name: "indirect resolved disjunction",
-		// 	cfg:  &validate.Config{Final: true},
-		// 	in: `
-		// 		x: {bar: 2}
-		// 		x: string | {foo!: string}
-		// 	`,
+	}, {
+		name: "indirect resolved disjunction",
+		cfg:  &validate.Config{Final: true},
+		in: `
+				x: {bar: 2}
+				x: string | {foo!: string}
+			`,
+		out: "incomplete\nx.foo: field is required but not present:\n    test:3:18",
 	}}
 
 	cuetdtest.Run(t, testCases, func(t *cuetdtest.T, tc *testCase) {

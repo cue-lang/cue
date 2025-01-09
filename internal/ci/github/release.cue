@@ -67,10 +67,9 @@ workflows: release: _repo.bashWorkflow & {
 					password: "${{ secrets.CUECKOO_DOCKER_PAT }}"
 				}
 			},
-			githubactions.#Step & {
-				name: "Install CUE"
-				run:  "go install ./cmd/cue"
-			},
+
+			_repo.loginCentralRegistry,
+
 			githubactions.#Step & {
 				name: "Install GoReleaser"
 				uses: "goreleaser/goreleaser-action@v5"
@@ -79,12 +78,12 @@ workflows: release: _repo.bashWorkflow & {
 					version:        _repo.goreleaserVersion
 				}
 			},
-			_registryReadOnlyAccessStep & {
+			{
 				// Note that the logic for what gets run at release time
 				// is defined with the release command in CUE.
 				name: "Run GoReleaser with CUE"
 				env: GITHUB_TOKEN: "${{ secrets.CUECKOO_GITHUB_PAT }}"
-				_run:                "cue cmd release"
+				run:                 "\(_repo.cueCommand) cmd release"
 				"working-directory": "./internal/ci/goreleaser"
 			},
 			_repo.repositoryDispatch & {

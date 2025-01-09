@@ -80,18 +80,69 @@ issue3576: full: {
 	foo: #Run | #Copy
 	foo: run: "make"
 }
+-- issue3599.cue --
+// Ignore errors for irrelevant fields like let and optional fields.
+issue3599: full: {
+	#Action: {
+		action: {
+			read!:  string
+			write?: _|_
+		} | {
+			write!: string
+			read?:  _|_
+		}
+	}
+	
+	#Minio: {
+		container: #Action & {
+			action: {
+				read!:  string
+				write?: _|_
+			} | {
+				write!: string
+				read?:  _|_
+			}
+		}
+		doWrite: bool | *true
+		container: action: defaultAction
+		defaultAction: {
+			if doWrite { write: "somefile.txt" }
+			if !doWrite { read: "somefile.txt" }
+		}
+	}
+}
+issue3599: reduced: p1: {
+	{ a?:  1&2 } | { a:  string, b?: 1&2 }
+	{  } | {  }
+}
+issue3599: reduced: p2: {
+	{  } | {  }
+	{ a?:  1&2 } | { a:  string, b?: 1&2 }
+}
+issue3599: let: {
+	{ } | { a:  B | 1, let B = 1&2 }
+	{  } | {  }
+}
 -- out/eval/stats --
-Leaks:  0
-Freed:  109
-Reused: 99
-Allocs: 10
-Retain: 21
+Leaks:  6
+Freed:  181
+Reused: 171
+Allocs: 16
+Retain: 34
 
-Unifications: 71
-Conjuncts:    152
-Disjuncts:    130
+Unifications: 119
+Conjuncts:    268
+Disjuncts:    206
 -- out/evalalpha --
 Errors:
+issue3599.full.#Minio.container.action: 2 errors in empty disjunction:
+issue3599.reduced.p1: 2 errors in empty disjunction:
+issue3599.reduced.p1.a: conflicting values 2 and 1:
+    ./issue3599.cue:32:9
+    ./issue3599.cue:32:11
+issue3599.reduced.p1.b: conflicting values 2 and 1:
+    ./issue3599.cue:32:35
+    ./issue3599.cue:32:37
 issue516.x: 2 errors in empty disjunction:
 issue516.x.match: field not allowed:
     ./in.cue:23:5
@@ -100,6 +151,10 @@ issue516.x.match.metrics.foo: field not allowed:
 issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
     ./in.cue:3:19
     ./in.cue:12:12
+explicit error (_|_ literal) in source:
+    ./issue3599.cue:17:13
+explicit error (_|_ literal) in source:
+    ./issue3599.cue:20:13
 
 Result:
 (_|_){
@@ -220,13 +275,87 @@ Result:
       c: (_){ _ }
     }
   }
+  issue3599: (_|_){
+    // [eval]
+    full: (_|_){
+      // [user]
+      #Action: (#struct){
+        action: (#struct){ |((#struct){
+            read!: (string){ string }
+            write?: (_|_){
+              // [user] explicit error (_|_ literal) in source:
+              //     ./issue3599.cue:6:12
+            }
+          }, (#struct){
+            write!: (string){ string }
+            read?: (_|_){
+              // [user] explicit error (_|_ literal) in source:
+              //     ./issue3599.cue:9:12
+            }
+          }) }
+      }
+      #Minio: (_|_){
+        // [user]
+        container: (_|_){
+          // [user]
+          action: (_|_){
+            // [user] issue3599.full.#Minio.container.action: 2 errors in empty disjunction:
+            // explicit error (_|_ literal) in source:
+            //     ./issue3599.cue:17:13
+            // explicit error (_|_ literal) in source:
+            //     ./issue3599.cue:20:13
+          }
+        }
+        doWrite: (bool){ |(*(bool){ true }, (bool){ bool }) }
+        defaultAction: (#struct){
+          write: (string){ "somefile.txt" }
+        }
+      }
+    }
+    reduced: (_|_){
+      // [eval]
+      p1: (_|_){
+        // [eval] issue3599.reduced.p1: 2 errors in empty disjunction:
+        // issue3599.reduced.p1.a: conflicting values 2 and 1:
+        //     ./issue3599.cue:32:9
+        //     ./issue3599.cue:32:11
+        // issue3599.reduced.p1.b: conflicting values 2 and 1:
+        //     ./issue3599.cue:32:35
+        //     ./issue3599.cue:32:37
+      }
+      p2: (struct){ |((struct){
+          a?: (_|_){
+            // [eval] issue3599.reduced.p2.a: conflicting values 2 and 1:
+            //     ./issue3599.cue:37:9
+            //     ./issue3599.cue:37:11
+          }
+        }, (struct){
+          a: (string){ string }
+          b?: (_|_){
+            // [eval] issue3599.reduced.p2.b: conflicting values 2 and 1:
+            //     ./issue3599.cue:37:35
+            //     ./issue3599.cue:37:37
+          }
+        }) }
+    }
+    let: (struct){
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,15 +1,10 @@
+@@ -1,17 +1,24 @@
  Errors:
++issue3599.full.#Minio.container.action: 2 errors in empty disjunction:
++issue3599.reduced.p1: 2 errors in empty disjunction:
++issue3599.reduced.p1.a: conflicting values 2 and 1:
++    ./issue3599.cue:32:9
++    ./issue3599.cue:32:11
++issue3599.reduced.p1.b: conflicting values 2 and 1:
++    ./issue3599.cue:32:35
++    ./issue3599.cue:32:37
  issue516.x: 2 errors in empty disjunction:
  issue516.x.match: field not allowed:
 -    ./in.cue:20:6
@@ -240,8 +369,14 @@ diff old new
 -    ./in.cue:2:11
      ./in.cue:3:19
      ./in.cue:12:12
++explicit error (_|_ literal) in source:
++    ./issue3599.cue:17:13
++explicit error (_|_ literal) in source:
++    ./issue3599.cue:20:13
  
-@@ -19,17 +14,12 @@
+ Result:
+ (_|_){
+@@ -19,17 +26,12 @@
    issue570: (_|_){
      // [eval]
      results: (_|_){
@@ -260,7 +395,7 @@ diff old new
      }
      #Output: (#struct){ |((#struct){
          result: (_){ _ }
-@@ -59,18 +49,10 @@
+@@ -59,18 +61,10 @@
      x: (_|_){
        // [eval] issue516.x: 2 errors in empty disjunction:
        // issue516.x.match: field not allowed:
@@ -280,7 +415,7 @@ diff old new
          metrics: (struct){
            foo: (struct){
            }
-@@ -86,11 +68,11 @@
+@@ -86,11 +80,11 @@
    }
    issue2916: (struct){
      b: (struct){
@@ -294,7 +429,7 @@ diff old new
    }
    issue3576: (struct){
      reduced: (struct){
-@@ -136,13 +118,11 @@
+@@ -136,19 +130,19 @@
      reduced: (struct){
        list: (_|_){
          // [incomplete] issue3581.reduced.list: 2 errors in empty disjunction:
@@ -311,6 +446,106 @@ diff old new
        }
        c: (_){ _ }
      }
+   }
+-  issue3599: (struct){
+-    full: (struct){
++  issue3599: (_|_){
++    // [eval]
++    full: (_|_){
++      // [user]
+       #Action: (#struct){
+         action: (#struct){ |((#struct){
+             read!: (string){ string }
+@@ -164,16 +158,16 @@
+             }
+           }) }
+       }
+-      #Minio: (#struct){
+-        container: (#struct){
+-          action: (#struct){
+-            write: (string){ "somefile.txt" }
+-            read?: (_|_){
+-              // [user] explicit error (_|_ literal) in source:
+-              //     ./issue3599.cue:9:12
+-              // explicit error (_|_ literal) in source:
+-              //     ./issue3599.cue:20:13
+-            }
++      #Minio: (_|_){
++        // [user]
++        container: (_|_){
++          // [user]
++          action: (_|_){
++            // [user] issue3599.full.#Minio.container.action: 2 errors in empty disjunction:
++            // explicit error (_|_ literal) in source:
++            //     ./issue3599.cue:17:13
++            // explicit error (_|_ literal) in source:
++            //     ./issue3599.cue:20:13
+           }
+         }
+         doWrite: (bool){ |(*(bool){ true }, (bool){ bool }) }
+@@ -182,27 +176,20 @@
+         }
+       }
+     }
+-    reduced: (struct){
+-      p1: (struct){ |((struct){
+-          a?: (_|_){
+-            // [eval] issue3599.reduced.p1.a: conflicting values 2 and 1:
+-            //     ./issue3599.cue:32:2
+-            //     ./issue3599.cue:32:9
+-            //     ./issue3599.cue:32:11
+-          }
+-        }, (struct){
+-          a: (string){ string }
+-          b?: (_|_){
+-            // [eval] issue3599.reduced.p1.b: conflicting values 2 and 1:
+-            //     ./issue3599.cue:32:2
+-            //     ./issue3599.cue:32:35
+-            //     ./issue3599.cue:32:37
+-          }
+-        }) }
++    reduced: (_|_){
++      // [eval]
++      p1: (_|_){
++        // [eval] issue3599.reduced.p1: 2 errors in empty disjunction:
++        // issue3599.reduced.p1.a: conflicting values 2 and 1:
++        //     ./issue3599.cue:32:9
++        //     ./issue3599.cue:32:11
++        // issue3599.reduced.p1.b: conflicting values 2 and 1:
++        //     ./issue3599.cue:32:35
++        //     ./issue3599.cue:32:37
++      }
+       p2: (struct){ |((struct){
+           a?: (_|_){
+             // [eval] issue3599.reduced.p2.a: conflicting values 2 and 1:
+-            //     ./issue3599.cue:37:2
+             //     ./issue3599.cue:37:9
+             //     ./issue3599.cue:37:11
+           }
+@@ -210,21 +197,12 @@
+           a: (string){ string }
+           b?: (_|_){
+             // [eval] issue3599.reduced.p2.b: conflicting values 2 and 1:
+-            //     ./issue3599.cue:37:2
+             //     ./issue3599.cue:37:35
+             //     ./issue3599.cue:37:37
+           }
+         }) }
+     }
+-    let: (struct){ |((struct){
+-      }, (struct){
+-        a: (int){ 1 }
+-        let B#1 = (_|_){
+-          // [eval] issue3599.let.B: conflicting values 2 and 1:
+-          //     ./issue3599.cue:40:2
+-          //     ./issue3599.cue:40:29
+-          //     ./issue3599.cue:40:31
+-        }
+-      }) }
++    let: (struct){
++    }
+   }
+ }
 -- diff/todo/p3 --
 Missing error positions.
 -- diff/explanation --
@@ -468,6 +703,86 @@ Result:
       c: (_){ _ }
     }
   }
+  issue3599: (struct){
+    full: (struct){
+      #Action: (#struct){
+        action: (#struct){ |((#struct){
+            read!: (string){ string }
+            write?: (_|_){
+              // [user] explicit error (_|_ literal) in source:
+              //     ./issue3599.cue:6:12
+            }
+          }, (#struct){
+            write!: (string){ string }
+            read?: (_|_){
+              // [user] explicit error (_|_ literal) in source:
+              //     ./issue3599.cue:9:12
+            }
+          }) }
+      }
+      #Minio: (#struct){
+        container: (#struct){
+          action: (#struct){
+            write: (string){ "somefile.txt" }
+            read?: (_|_){
+              // [user] explicit error (_|_ literal) in source:
+              //     ./issue3599.cue:9:12
+              // explicit error (_|_ literal) in source:
+              //     ./issue3599.cue:20:13
+            }
+          }
+        }
+        doWrite: (bool){ |(*(bool){ true }, (bool){ bool }) }
+        defaultAction: (#struct){
+          write: (string){ "somefile.txt" }
+        }
+      }
+    }
+    reduced: (struct){
+      p1: (struct){ |((struct){
+          a?: (_|_){
+            // [eval] issue3599.reduced.p1.a: conflicting values 2 and 1:
+            //     ./issue3599.cue:32:2
+            //     ./issue3599.cue:32:9
+            //     ./issue3599.cue:32:11
+          }
+        }, (struct){
+          a: (string){ string }
+          b?: (_|_){
+            // [eval] issue3599.reduced.p1.b: conflicting values 2 and 1:
+            //     ./issue3599.cue:32:2
+            //     ./issue3599.cue:32:35
+            //     ./issue3599.cue:32:37
+          }
+        }) }
+      p2: (struct){ |((struct){
+          a?: (_|_){
+            // [eval] issue3599.reduced.p2.a: conflicting values 2 and 1:
+            //     ./issue3599.cue:37:2
+            //     ./issue3599.cue:37:9
+            //     ./issue3599.cue:37:11
+          }
+        }, (struct){
+          a: (string){ string }
+          b?: (_|_){
+            // [eval] issue3599.reduced.p2.b: conflicting values 2 and 1:
+            //     ./issue3599.cue:37:2
+            //     ./issue3599.cue:37:35
+            //     ./issue3599.cue:37:37
+          }
+        }) }
+    }
+    let: (struct){ |((struct){
+      }, (struct){
+        a: (int){ 1 }
+        let B#1 = (_|_){
+          // [eval] issue3599.let.B: conflicting values 2 and 1:
+          //     ./issue3599.cue:40:2
+          //     ./issue3599.cue:40:29
+          //     ./issue3599.cue:40:31
+        }
+      }) }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -583,6 +898,80 @@ Result:
         "\(〈1;c〉)",
       ]
       c: _
+    }
+  }
+}
+--- issue3599.cue
+{
+  issue3599: {
+    full: {
+      #Action: {
+        action: ({
+          read!: string
+          write?: _|_(explicit error (_|_ literal) in source)
+        }|{
+          write!: string
+          read?: _|_(explicit error (_|_ literal) in source)
+        })
+      }
+      #Minio: {
+        container: (〈1;#Action〉 & {
+          action: ({
+            read!: string
+            write?: _|_(explicit error (_|_ literal) in source)
+          }|{
+            write!: string
+            read?: _|_(explicit error (_|_ literal) in source)
+          })
+        })
+        doWrite: (bool|*true)
+        container: {
+          action: 〈1;defaultAction〉
+        }
+        defaultAction: {
+          if 〈1;doWrite〉 {
+            write: "somefile.txt"
+          }
+          if !〈1;doWrite〉 {
+            read: "somefile.txt"
+          }
+        }
+      }
+    }
+  }
+  issue3599: {
+    reduced: {
+      p1: {
+        ({
+          a?: (1 & 2)
+        }|{
+          a: string
+          b?: (1 & 2)
+        })
+        ({}|{})
+      }
+    }
+  }
+  issue3599: {
+    reduced: {
+      p2: {
+        ({}|{})
+        ({
+          a?: (1 & 2)
+        }|{
+          a: string
+          b?: (1 & 2)
+        })
+      }
+    }
+  }
+  issue3599: {
+    let: {
+      ({}|{
+        a: (〈0;let B#1〉|1)
+        let B#1 = (1 & 2)
+      })
+      ({}|{})
     }
   }
 }

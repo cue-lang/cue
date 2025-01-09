@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d57c3e6d_d7581420",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-09T14:57:56Z",
+      "side": 1,
+      "message": "Please add a comment explaining why we can\u0027t just have this as an option to the shell itself.",
+      "revId": "60b4267ebe08ac70132921ba8357bcc3e0fbbc92",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

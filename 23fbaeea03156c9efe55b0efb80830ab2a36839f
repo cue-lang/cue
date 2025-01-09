@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a47e1cce_48055240",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-09T14:33:21Z",
+      "side": 1,
+      "message": "LGTM modulo one naming consideration.",
+      "revId": "23fbaeea03156c9efe55b0efb80830ab2a36839f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4dfd5e41_e78f7dd8",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-09T14:33:21Z",
+      "side": 1,
+      "message": "This seems like a bit of an odd name to me, as though it is a step, it\u0027s not a step that is necessarily running bash. As this is intended to be a step that\u0027s unified in with all the steps we\u0027re creating in this configuration, I\u0027d be inclined to name it \"step\" or \"workflowStep\" or something that doesn\u0027t seem to imply that it\u0027s a bash-running step.",
+      "revId": "23fbaeea03156c9efe55b0efb80830ab2a36839f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

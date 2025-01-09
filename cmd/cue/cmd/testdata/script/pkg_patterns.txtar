@@ -32,9 +32,9 @@ stdout -count=1 '^self: "mod.com/alpha1/leaf"$'
 
 # A wildcard in the middle of a pattern, with the current module as a prefix
 # either as "dot" or as the full path.
-# TODO: Why does this succeed? What does the output mean? This seems broken.
-exec cue eval ./.../leaf
+! exec cue eval ./.../leaf
 cmp stderr dot-dots-middle.stderr
+
 # TODO: Unlike other cases, this still returns a "matched no packages" error.
 ! exec cue eval mod.com/.../leaf
 cmp stderr current-dots-middle.stderr
@@ -61,6 +61,8 @@ pattern not allowed in external package path "..."
 pattern not allowed in external package path ".../leaf"
 -- dot-dots-middle.stderr --
 // mod.com@v0:root
+undefined field: bar:
+    ./root.cue:5:5
 -- current-dots-middle.stderr --
 cue: "mod.com/.../leaf" matched no packages
 -- external-dots-middle.stderr --

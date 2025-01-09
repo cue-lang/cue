@@ -1,5 +1,6 @@
-exec cue eval
-cmp stdout outv2
+env CUE_EXPERIMENT=evalv3=0
+! exec cue eval
+cmp stderr outv2
 
 env CUE_EXPERIMENT=evalv3
 exec cue eval
@@ -15,3 +16,9 @@ y
 -- outv3 --
 y: 1
 -- outv2 --
+2 errors in empty disjunction:
+conflicting values 1 and {y:(1|{y:1}),y} (mismatched types int and struct):
+    ./test.cue:1:1
+    ./test.cue:4:4
+cannot add field y: was already used:
+    ./test.cue:4:9

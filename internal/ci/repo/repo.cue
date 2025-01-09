@@ -63,3 +63,5 @@ zeroReleaseTagSuffix: "-0.dev"
 zeroReleaseTagPattern: "*" + zeroReleaseTagSuffix
 
 codeReview: "cue-unity": unityRepositoryURL
+
+cueCommand: "go run cuelang.org/go/cmd/cue"

@@ -66,6 +66,8 @@ workflows: trybot: _repo.bashWorkflow & {
 				// are established by running each tool.
 				for v in _setupGoActionsCaches {v},
 
+				_repo.loginCentralRegistry,
+
 				_repo.earlyChecks & {
 					// These checks don't vary based on the Go version or OS,
 					// so we only need to run them on one of the matrix jobs.
@@ -111,9 +113,9 @@ workflows: trybot: _repo.bashWorkflow & {
 	// work.
 	_isLatestLinux: "(\(goVersion) == '\(_repo.latestGo)' && \(matrixRunner) == '\(_repo.linuxMachine)')"
 
-	_goGenerate: _registryReadOnlyAccessStep & {
+	_goGenerate: githubactions.#Step & {
 		name: "Generate"
-		_run: "go generate ./..."
+		run:  "go generate ./..."
 		// The Go version corresponds to the precise version specified in
 		// the matrix. Skip windows for now until we work out why re-gen is flaky
 		if: _isLatestLinux

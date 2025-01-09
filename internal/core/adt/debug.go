@@ -262,7 +262,7 @@ func CreateMermaidGraph(ctx *OpContext, v *Vertex, all bool) (graph string, hasE
 //
 //	 Each closeContext has the following info: ptr(cc); cc.count
 func (m *mermaidContext) vertex(v *Vertex) *mermaidVertex {
-	root := v.rootCloseContext(m.ctx)
+	root := v.getRootCloseContext(m.ctx)
 
 	vc := m.roots[root]
 	if vc != nil {

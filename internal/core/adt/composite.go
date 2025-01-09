@@ -308,22 +308,36 @@ func (v *Vertex) cc() *closeContext {
 	return v._cc
 }
 
+func (v *Vertex) getRootCloseContext(ctx *OpContext) *closeContext {
+	_ = ctx // suppress linter
+	if v._cc == nil {
+		panic("no closeContext")
+	}
+	return v._cc
+}
+
 // rootCloseContext creates a closeContext for this Vertex or returns the
 // existing one.
 func (v *Vertex) rootCloseContext(ctx *OpContext) *closeContext {
-	if v._cc == nil {
-		v._cc = &closeContext{
-			group:           &v.Conjuncts,
-			parent:          nil,
-			src:             v,
-			parentConjuncts: v,
-			decl:            v,
-		}
-		v._cc.incDependent(ctx, ROOT, nil) // matched in REF(decrement:nodeDone)
+	mode := v.ArcType
+	if v._cc != nil {
+		v._cc.updateArcType(ctx, mode)
+		return v._cc
 	}
+
+	v._cc = &closeContext{
+		group:           &v.Conjuncts,
+		parent:          nil,
+		src:             v,
+		parentConjuncts: v,
+		decl:            v,
+		arcType:         mode,
+	}
+	v._cc.incDependent(ctx, ROOT, nil) // matched in REF(decrement:nodeDone)
 
 	if p := v.Parent; p != nil {
 		pcc := p.rootCloseContext(ctx)
+		// pcc.addDependency(ctx, ARC, false, v._cc, v._cc, v._cc)
 		v._cc.depth = pcc.depth + 1
 	}
 

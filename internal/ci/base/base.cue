@@ -55,6 +55,11 @@ botGerritHubUser:                   *botGitHubUser | string
 botGerritHubUserPasswordSecretsKey: *(strings.ToUpper(botGitHubUser) + "_GERRITHUB_PASSWORD") | string
 botGerritHubUserEmail:              *botGitHubUserEmail | string
 
+unprivilegedBotGitHubUser:                               "not" + botGitHubUser
+unprivilegedBotGitHubUserCentralRegistryTokenSecretsKey: *(strings.ToUpper(unprivilegedBotGitHubUser) + "_CUE_TOKEN") | string
+
+cueCommand: *"cue" | string
+
 workflowFileExtension: ".yaml"
 
 linuxMachine: string

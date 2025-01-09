@@ -370,3 +370,9 @@ containsUnityTrailer: containsDispatchTrailer & {
 }
 
 _dispatchTrailerVariable: "github.event.head_commit.message"
+
+loginCentralRegistry: githubactions.#Step & {
+	#cueCommand:      *cueCommand | string
+	#tokenExpression: *"${{ secrets.\(unprivilegedBotGitHubUserCentralRegistryTokenSecretsKey) }}" | string
+	run:              "\(#cueCommand) login --token=\(#tokenExpression)"
+}

@@ -180,16 +180,40 @@ issue3434: full: {
 		}
 	}
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  449
-Reused: 433
-Allocs: 16
-Retain: 26
+-- issue3597.cue --
+issue3597: t1: {
+	#Schema: {
+		_ok: bool
+		{} | {
+			_ok: true
+			let Ok = _ok
+			{} | {x: Ok}
+		}
+	}
 
-Unifications: 210
-Conjuncts:    817
-Disjuncts:    451
+	[string]: #Schema
+
+	foo: bar
+	bar: {}
+}
+issue3597: t2: {
+	ok: true
+	X: _ | {
+		let Ok = ok
+		_ | {x: Ok}
+	}
+	foo: X & {X}
+}
+-- out/eval/stats --
+Leaks:  8
+Freed:  561
+Reused: 547
+Allocs: 22
+Retain: 34
+
+Unifications: 286
+Conjuncts:    1125
+Disjuncts:    571
 -- out/evalalpha --
 Errors:
 f: 2 errors in empty disjunction:
@@ -429,6 +453,60 @@ Result:
       }
     }
   }
+  issue3597: (struct){
+    t1: (struct){
+      #Schema: (#struct){ |((#struct){
+          _ok: (bool){ bool }
+        }, (#struct){
+          _ok: (bool){ true }
+          let Ok#1 = (bool){ true }
+        }, (#struct){
+          _ok: (bool){ true }
+          let Ok#1 = (bool){ true }
+          x: (bool){ true }
+        }) }
+      foo: (#struct){ |((#struct){
+          _ok: (bool){ bool }
+        }, (#struct){
+          _ok: (bool){ true }
+          let Ok#1 = (bool){ true }
+        }, (#struct){
+          _ok: (bool){ true }
+          let Ok#1 = (bool){ true }
+        }, (#struct){
+          _ok: (bool){ true }
+          let Ok#1multi = 〈0;_ok〉
+          x: (bool){ true }
+        }) }
+      bar: (#struct){ |((#struct){
+          _ok: (bool){ bool }
+        }, (#struct){
+          _ok: (bool){ true }
+          let Ok#1 = (bool){ true }
+        }, (#struct){
+          _ok: (bool){ true }
+          let Ok#1 = (bool){ true }
+          x: (bool){ true }
+        }) }
+    }
+    t2: (struct){
+      ok: (bool){ true }
+      X: (_){ |((_){ _ }, (_){
+          _
+          let Ok#2 = (bool){ true }
+        }, (struct){
+          let Ok#2 = (bool){ true }
+          x: (bool){ true }
+        }) }
+      foo: (_){ |((_){ _ }, (_){
+          _
+          let Ok#2 = (bool){ true }
+        }, (struct){
+          let Ok#2 = (bool){ true }
+          x: (bool){ true }
+        }) }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -477,6 +555,18 @@ diff old new
          }
        }
      }
+@@ -264,6 +255,9 @@
+           let Ok#1 = (bool){ true }
+         }, (#struct){
+           _ok: (bool){ true }
++          let Ok#1 = (bool){ true }
++        }, (#struct){
++          _ok: (bool){ true }
+           let Ok#1multi = 〈0;_ok〉
+           x: (bool){ true }
+         }) }
+-- diff/todo/p1 --
+issue3597.t1.foo: duplicate disjunct
 -- diff/todo/p3 --
 Missing error positions.
   It is probably okay to show name and val fields with original values, as long
@@ -728,6 +818,57 @@ Result:
         #D1: (string){ "d1" }
         #D2: (string){ "d2" }
       }
+    }
+  }
+  issue3597: (struct){
+    t1: (struct){
+      #Schema: (#struct){ |((#struct){
+          _ok: (bool){ bool }
+        }, (#struct){
+          _ok: (bool){ true }
+          let Ok#1 = (bool){ true }
+        }, (#struct){
+          _ok: (bool){ true }
+          let Ok#1 = (bool){ true }
+          x: (bool){ true }
+        }) }
+      foo: (#struct){ |((#struct){
+          _ok: (bool){ bool }
+        }, (#struct){
+          _ok: (bool){ true }
+          let Ok#1 = (bool){ true }
+        }, (#struct){
+          _ok: (bool){ true }
+          let Ok#1multi = 〈0;_ok〉
+          x: (bool){ true }
+        }) }
+      bar: (#struct){ |((#struct){
+          _ok: (bool){ bool }
+        }, (#struct){
+          _ok: (bool){ true }
+          let Ok#1 = (bool){ true }
+        }, (#struct){
+          _ok: (bool){ true }
+          let Ok#1 = (bool){ true }
+          x: (bool){ true }
+        }) }
+    }
+    t2: (struct){
+      ok: (bool){ true }
+      X: (_){ |((_){ _ }, (_){
+          _
+          let Ok#2 = (bool){ true }
+        }, (struct){
+          let Ok#2 = (bool){ true }
+          x: (bool){ true }
+        }) }
+      foo: (_){ |((_){ _ }, (_){
+          _
+          let Ok#2 = (bool){ true }
+        }, (struct){
+          let Ok#2 = (bool){ true }
+          x: (bool){ true }
+        }) }
     }
   }
 }
@@ -1038,6 +1179,40 @@ Result:
         #D1: "d1"
         #D2: "d2"
       }
+    }
+  }
+}
+--- issue3597.cue
+{
+  issue3597: {
+    t1: {
+      #Schema: {
+        _ok: bool
+        ({}|{
+          _ok: true
+          let Ok#1 = 〈0;_ok〉
+          ({}|{
+            x: 〈1;let Ok#1〉
+          })
+        })
+      }
+      [string]: 〈0;#Schema〉
+      foo: 〈0;bar〉
+      bar: {}
+    }
+  }
+  issue3597: {
+    t2: {
+      ok: true
+      X: (_|{
+        let Ok#2 = 〈1;ok〉
+        (_|{
+          x: 〈1;let Ok#2〉
+        })
+      })
+      foo: (〈0;X〉 & {
+        〈1;X〉
+      })
     }
   }
 }

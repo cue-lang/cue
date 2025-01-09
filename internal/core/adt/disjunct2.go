@@ -527,6 +527,9 @@ func (n *nodeContext) getErrorAll() *Bottom {
 		return err
 	}
 	for _, a := range n.node.Arcs {
+		if a.ArcType > ArcRequired || a.Label.IsLet() {
+			return nil
+		}
 		n := a.getState(n.ctx)
 		if n != nil {
 			if err := n.getErrorAll(); err != nil {

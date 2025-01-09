@@ -16,6 +16,24 @@
       "message": "Please add a comment explaining why we can\u0027t just have this as an option to the shell itself.",
       "revId": "60b4267ebe08ac70132921ba8357bcc3e0fbbc92",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "be05e904_26de7383",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-01-09T15:53:53Z",
+      "side": 1,
+      "message": "Per our discussions and indeed as a direct result of https://cuelang.org/cl/1206945 we don\u0027t actually need the approach in this stack of CLs. Correspondingly I don\u0027t have a link to docs/etc that motivates why it is necessary. I will resolve this comment, but then shortly afterwards abandon the CL (and follow up in https://github.com/cue-lang/cue/discussions/3653)",
+      "parentUuid": "d57c3e6d_d7581420",
+      "revId": "60b4267ebe08ac70132921ba8357bcc3e0fbbc92",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

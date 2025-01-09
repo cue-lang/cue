@@ -188,8 +188,8 @@ workflows: trybot: _repo.bashWorkflow & {
 			// Note that we should then persist staticcheck's cache too.
 			uses: "dominikh/staticcheck-action@v1"
 			with: {
-				version: "2024.1.1" // Pin a version for determinism.
-				"install-go": false // We install Go ourselves.
+				version:      "2024.1.1" // Pin a version for determinism.
+				"install-go": false      // We install Go ourselves.
 			}
 		},
 	]
@@ -224,7 +224,7 @@ workflows: trybot: _repo.bashWorkflow & {
 		// Windows and Mac on CI are slower than Linux, and most data races are not specific
 		// to any OS or Go version in particular, so only run all tests with -race on Linux
 		// to not slow down CI unnecessarily.
-		if: _isLatestLinux
+		if:   _isLatestLinux
 		name: "Test with -race"
 		env: GORACE: "atexit_sleep_ms=10" // Otherwise every Go package being tested sleeps for 1s; see https://go.dev/issues/20364.
 		run: "go test -race ./..."
@@ -238,7 +238,7 @@ workflows: trybot: _repo.bashWorkflow & {
 		// and the Linux runners on GitHub Actions use amd64.
 		//
 		// Running just the short tests is enough for now.
-		if: _isLatestLinux
+		if:   _isLatestLinux
 		name: "Test on 32 bits"
 		env: GOARCH: "386"
 		run: "go test -short ./..."

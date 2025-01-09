@@ -40,7 +40,6 @@ trybotDispatchWorkflow: bashWorkflow & {
 			branches: [testDefaultBranch]
 		}
 	}
-	jobs: [string]: defaults: run: shell: "bash"
 	jobs: {
 		(trybot.key): {
 			"runs-on": linuxMachine
@@ -157,8 +156,6 @@ trybotDispatchWorkflow: bashWorkflow & {
 }
 
 pushTipToTrybotWorkflow: bashWorkflow & {
-	jobs: [string]: defaults: run: shell: "bash"
-
 	on: {
 		push: branches: protectedBranchPatterns
 	}

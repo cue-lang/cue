@@ -12,7 +12,11 @@ import (
 )
 
 bashWorkflow: githubactions.#Workflow & {
-	jobs: [string]: defaults: run: shell: "bash"
+	// Use a custom default shell that extends the GitHub default to also fail
+	// on access to unset variables.
+	//
+	// https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions#defaultsrunshell
+	jobs: [string]: defaults: run: shell: "bash --noprofile --norc -euo pipefail {0}"
 }
 
 installGo: {

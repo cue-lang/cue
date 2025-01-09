@@ -359,7 +359,11 @@ Result:
   }
   issue3633: (struct){
     final: (struct){
-      data: (#struct){
+      data: (_|_){
+        // [incomplete] issue3633.final.data: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
+        //     ./matchn.cue:63:6
+        //     ./matchn.cue:62:8
+        //     ./matchn.cue:63:13
       }
       #s: (_){ matchN(1, (#list){
           0: (_|_){// &[matchN(1, [
@@ -497,12 +501,8 @@ diff old new
            n: (struct){
              n: (_){ _ }
            }
-@@ -167,14 +179,14 @@
-   }
-   issue3633: (struct){
-     final: (struct){
--      data: (struct){
-+      data: (#struct){
+@@ -174,11 +186,11 @@
+         //     ./matchn.cue:63:13
        }
        #s: (_){ matchN(1, (#list){
 -          0: (_|_){// matchN(1, [
@@ -687,7 +687,11 @@ Result:
   }
   issue3633: (struct){
     final: (struct){
-      data: (struct){
+      data: (_|_){
+        // [incomplete] issue3633.final.data: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
+        //     ./matchn.cue:63:6
+        //     ./matchn.cue:62:8
+        //     ./matchn.cue:63:13
       }
       #s: (_){ matchN(1, (#list){
           0: (_|_){// matchN(1, [

@@ -57,6 +57,10 @@ func (v *validator) checkConcrete() bool {
 	return v.Concrete && v.inDefinition == 0
 }
 
+func (v *validator) checkFinal() bool {
+	return (v.Concrete || v.Final) && v.inDefinition == 0
+}
+
 func (v *validator) add(b *adt.Bottom) {
 	if !v.AllErrors {
 		v.err = adt.CombineErrors(nil, v.err, b)
@@ -77,12 +81,12 @@ func (v *validator) validate(x *adt.Vertex) {
 	if b := x.Bottom(); b != nil {
 		switch b.Code {
 		case adt.CycleError:
-			if v.checkConcrete() || v.DisallowCycles {
+			if v.checkFinal() || v.DisallowCycles {
 				v.add(b)
 			}
 
 		case adt.IncompleteError:
-			if v.checkConcrete() {
+			if v.checkFinal() {
 				v.add(b)
 			}
 

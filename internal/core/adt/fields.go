@@ -329,6 +329,8 @@ type ccArcRef struct {
 }
 
 type conjunctGrouper interface {
+	// Assign conjunct adds the conjunct and returns an arc to represent it,
+	// along with the position within the group.
 	assignConjunct(ctx *OpContext, root *closeContext, c Conjunct, mode ArcType, check, checkClosed bool) (arc *closeContext, pos int, added bool)
 }
 
@@ -364,18 +366,26 @@ func (n *nodeContext) getArc(f Feature, mode ArcType) (arc *Vertex, isNew bool) 
 }
 
 func (v *Vertex) assignConjunct(ctx *OpContext, root *closeContext, c Conjunct, mode ArcType, check, checkClosed bool) (a *closeContext, pos int, added bool) {
+
 	// TODO: consider clearing CloseInfo.cc.
 	// c.CloseInfo.cc = nil
 
 	arc := root.src
 	arc.updateArcType(mode) // TODO: probably not necessary: consider removing.
 
-	pos = len(arc.Conjuncts)
+	if &arc.Conjuncts != root.group {
+		panic("misaligned conjuncts")
+	}
 
-	added = !check || !arc.hasConjunct(c)
-	if added {
+	pos = -1
+	if check {
+		pos = findConjunct(arc.Conjuncts, c)
+	}
+	if pos == -1 {
+		pos = len(arc.Conjuncts)
 		c.CloseInfo.cc = root
 		arc.addConjunctUnchecked(c)
+		added = true
 	}
 
 	return root, pos, added
@@ -467,10 +477,14 @@ func (cc *closeContext) assignConjunct(ctx *OpContext, root *closeContext, c Con
 	if arc.group != nil {
 		group = *arc.group
 	}
-	pos = len(group)
+	pos = -1
+	if check {
+		pos = findConjunct(group, c)
+	}
+	if pos == -1 {
+		pos = len(group)
+		added = true
 
-	added = !check || !hasConjunct(group, c)
-	if added {
 		c.CloseInfo.cc = arc
 
 		if c.CloseInfo.cc.src != arc.src {

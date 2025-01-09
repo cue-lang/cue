@@ -1362,19 +1362,20 @@ func (v *Vertex) hasConjunct(c Conjunct) (added bool) {
 	default:
 		v.ArcType = ArcMember
 	}
-	return hasConjunct(v.Conjuncts, c)
+	return findConjunct(v.Conjuncts, c) >= 0
 }
 
-func hasConjunct(cs []Conjunct, c Conjunct) bool {
-	for _, x := range cs {
+// findConjunct reports the position of c within cs or -1 if it is not found.
+func findConjunct(cs []Conjunct, c Conjunct) int {
+	for i, x := range cs {
 		// TODO: disregard certain fields from comparison (e.g. Refs)?
 		if x.CloseInfo.closeInfo == c.CloseInfo.closeInfo &&
 			x.x == c.x &&
 			x.Env.Up == c.Env.Up && x.Env.Vertex == c.Env.Vertex {
-			return true
+			return i
 		}
 	}
-	return false
+	return -1
 }
 
 func (n *nodeContext) addConjunction(c Conjunct, index int) {

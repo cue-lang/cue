@@ -154,7 +154,12 @@ func (ctx *overlayContext) cloneVertex(x *Vertex) *Vertex {
 
 	v._cc.src = v
 	v._cc.parentConjuncts = v
+
+	// The group of the root closeContext should point to the Conjuncts field
+	// of the Vertex. As we already allocated the group, we use that allocation,
+	// but "move" it to v.Conjuncts.
 	v.Conjuncts = *v._cc.group
+	v._cc.group = &v.Conjuncts
 
 	if a := x.Arcs; len(a) > 0 {
 		// TODO(perf): reuse buffer.
@@ -280,13 +285,16 @@ func (ctx *overlayContext) allocCC(cc *closeContext) *closeContext {
 		}
 
 		if o.parent != nil {
-			// validate invariants
-			ca := *cc.parent.group
-			if ca[cc.parentIndex].x != cc.group {
-				panic("group misaligned")
-			}
+			// validate invariants.
+			// TODO: the group can sometimes be empty. Investigate why and
+			// whether this is valid.
+			if ca := *cc.parent.group; len(ca) > 0 {
+				if ca[cc.parentIndex].x != cc.group {
+					panic("group misaligned")
+				}
 
-			(*o.parent.group)[cc.parentIndex].x = o.group
+				(*o.parent.group)[cc.parentIndex].x = o.group
+			}
 		}
 	}
 

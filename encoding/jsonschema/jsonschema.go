@@ -124,6 +124,12 @@ type Config struct {
 	// only. Just `#` is preferred.
 	Root string
 
+	// AllowNonExistentRoot holds whether it's an error when there
+	// is no value at the above Root path. For example, when extracting
+	// an OpenAPI schema, the #/components/schemas path might not
+	// exist, but that could be considered OK even so.
+	AllowNonExistentRoot bool
+
 	// Map maps the locations of schemas and definitions to a new location.
 	// References are updated accordingly. A returned label must be
 	// an identifier or string literal.

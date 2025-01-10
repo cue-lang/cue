@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c163631_fdd3e7cb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-10T08:53:37Z",
+      "side": 1,
+      "message": "Oops, the foo.bar vs foo.self mistake was mine.",
+      "revId": "aa087ee647b66e80698cd0978bf66510e5e330e7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

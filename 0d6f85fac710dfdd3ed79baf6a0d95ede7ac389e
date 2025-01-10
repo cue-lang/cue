@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6721a136_95531d42",
+        "filename": "cmd/cue/cmd/testdata/script/pkg_patterns.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-10T08:53:37Z",
+      "side": 0,
+      "message": "I messed this up when I originally wrote this testscript - this should be `stdout -count\u003d1 \u0027^self: \"example.com/foo\"$` much like line 31, because this is a success test case, not a failure where we compare an error on stderr.\n\nThen you can delete dot-dots-middle.stderr, which is now empty after your change.",
+      "revId": "0d6f85fac710dfdd3ed79baf6a0d95ede7ac389e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -71,6 +71,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "82983833_7d4899d9",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_non_local.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-10T08:27:30Z",
+      "side": 1,
+      "message": "Basically it gave an error as root.Type does not exist.\n\nSuggestions welcome.",
+      "parentUuid": "f0a1f975_f6453935",
+      "revId": "e0bd1412cf2b8338f18e740d46ce2d1568db986a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "47dfcf6b_b9d7b8fa",
         "filename": "cmd/cue/cmd/testdata/script/pkg_patterns.txtar",
         "patchSetId": 1
@@ -88,6 +106,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "83a5d830_a12c45c9",
+        "filename": "cmd/cue/cmd/testdata/script/pkg_patterns.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-10T08:27:30Z",
+      "side": 1,
+      "message": "\u003e The TODO why does this succeed\nI just didn\u0027t know what \"this\" meant, and thought it MAY be referring to foo.bar not failing.\n\nI do not think this is a V3 change, but rather a validator change that is causing it.\n\nMoved change to separate CL",
+      "parentUuid": "47dfcf6b_b9d7b8fa",
+      "revId": "e0bd1412cf2b8338f18e740d46ce2d1568db986a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c04da4c6_404c9f85",
         "filename": "cue/testdata/cycle/builtins.txtar",
         "patchSetId": 1
@@ -99,6 +135,24 @@
       "writtenOn": "2025-01-09T16:24:35Z",
       "side": 1,
       "message": "In passing, it would be great if the `matchN` error actually said something about _why_ the match failed (in this case because the required field `a` is not provided).\nThis is https://github.com/cue-lang/cue/issues/3389.",
+      "revId": "e0bd1412cf2b8338f18e740d46ce2d1568db986a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "654168fb_34039f38",
+        "filename": "cue/testdata/cycle/builtins.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-10T08:27:30Z",
+      "side": 1,
+      "message": "Separate CL, but good to mention indeed so it shows up in 3389.",
+      "parentUuid": "c04da4c6_404c9f85",
       "revId": "e0bd1412cf2b8338f18e740d46ce2d1568db986a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

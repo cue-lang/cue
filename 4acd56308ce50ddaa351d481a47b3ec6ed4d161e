@@ -16,6 +16,24 @@
       "message": "A tiny bit more info here would help for future readers of the commit log. Maybe link to an earlier issue or CL where this issue surfaced?",
       "revId": "4acd56308ce50ddaa351d481a47b3ec6ed4d161e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8477df72_35fe2016",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-10T08:30:24Z",
+      "side": 1,
+      "message": "These are just todos left over when we hooked in v3 tests to table-drive tests. There is no originating issue.",
+      "parentUuid": "a44ad525_c5315548",
+      "revId": "4acd56308ce50ddaa351d481a47b3ec6ed4d161e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

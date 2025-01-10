@@ -60,7 +60,6 @@ pattern not allowed in external package path "..."
 -- dots-prefix.stderr --
 pattern not allowed in external package path ".../leaf"
 -- dot-dots-middle.stderr --
-// mod.com@v0:root
 -- current-dots-middle.stderr --
 cue: "mod.com/.../leaf" matched no packages
 -- external-dots-middle.stderr --
@@ -78,7 +77,7 @@ package root
 
 import "example.com/foo"
 
-foo.bar
+foo.self
 -- alpha1/leaf/leaf.cue --
 package leaf
 self: "mod.com/alpha1/leaf"

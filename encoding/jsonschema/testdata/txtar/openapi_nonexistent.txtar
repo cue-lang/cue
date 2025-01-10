@@ -1,0 +1,9 @@
+Test what happens when there's an OpenAPI schema that has no
+/components/schemas entry but AllowNonExistentRoot is true
+
+#allowNonExistentRoot
+#version: openapi
+
+-- schema.yaml --
+-- out/decode/extract --
+

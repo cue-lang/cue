@@ -127,7 +127,9 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 			return nil
 		}
 		defsRoot = v.LookupPath(defsPath)
-		if kind := defsRoot.Kind(); kind != cue.StructKind {
+		if !defsRoot.Exists() && d.cfg.AllowNonExistentRoot {
+			defsRoot = v.Context().CompileString("{}")
+		} else if defsRoot.Kind() != cue.StructKind {
 			d.errf(defsRoot, "value at path %v must be struct containing definitions but is actually %v", d.cfg.Root, defsRoot)
 			return nil
 		}
@@ -904,7 +906,7 @@ func (s *state) addDefinition(n cue.Value) *definedSchema {
 	loc.Path = relPath(n, s.root)
 	importPath, path, err := s.cfg.MapRef(loc)
 	if err != nil {
-		s.errf(n, "cannot get reference for %v", loc)
+		s.errf(n, "cannot get reference for %v: %v", loc, err)
 		return nil
 	}
 	def = &definedSchema{

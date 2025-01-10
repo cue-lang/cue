@@ -100,6 +100,7 @@ func TestDecode(t *testing.T) {
 		}
 		cfg.Strict = t.HasTag("strict")
 		cfg.StrictKeywords = cfg.StrictKeywords || t.HasTag("strictKeywords")
+		cfg.AllowNonExistentRoot = t.HasTag("allowNonExistentRoot")
 		cfg.StrictFeatures = t.HasTag("strictFeatures")
 		cfg.PkgName, _ = t.Value("pkgName")
 

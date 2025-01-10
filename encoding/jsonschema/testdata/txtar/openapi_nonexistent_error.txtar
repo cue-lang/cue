@@ -1,0 +1,9 @@
+Test what happens when there's an OpenAPI schema that has no
+/components/schemas entry and AllowNonExistentRoot is false
+
+#version: openapi
+
+-- schema.yaml --
+-- out/decode/extract --
+ERROR:
+value at path #/components/schemas/ must be struct containing definitions but is actually _|_ // field not found: components

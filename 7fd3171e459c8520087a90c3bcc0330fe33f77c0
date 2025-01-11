@@ -16,6 +16,23 @@
       "message": "PTAL. This is the only incorrect use of `-p` that I can find on cuelang.org that comes directly from cmd/cue\u0027s help texts.\n\ncf. https://github.com/cue-lang/cue/issues/3516#issuecomment-2575575847 for the latest user who (I suspect) saw this text and imprinted on \"-p influences which CUE package to evaluate\". I know that I was tripped up by this, early in my CUE learning!",
       "revId": "7fd3171e459c8520087a90c3bcc0330fe33f77c0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a74b2bb_9e176a4b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-11T23:38:50Z",
+      "side": 1,
+      "message": "Your updated text and examples here match my understanding, but I\u0027d still like Paul to approve just to sanity check any history behind the -p flag.",
+      "revId": "7fd3171e459c8520087a90c3bcc0330fe33f77c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "39d92c6e_b37bdf7e",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-11T23:27:11Z",
+      "side": 1,
+      "message": "I would personally shorten the text, and summarize what you said in the commit message too:\n\n\u003e AllowNonExistentRoot prevents an error when there is no value at the\n\u003e above Root path. Such an error can be useful to signal that the data may\n\u003e not be a JSON Schema, but is not always a good idea.",
+      "revId": "c87315419d7f03165f07fb211d72ea50a42b6620",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

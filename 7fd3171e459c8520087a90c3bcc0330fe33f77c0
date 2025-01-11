@@ -33,6 +33,23 @@
       "message": "Your updated text and examples here match my understanding, but I\u0027d still like Paul to approve just to sanity check any history behind the -p flag.",
       "revId": "7fd3171e459c8520087a90c3bcc0330fe33f77c0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f91cd4e1_895cf248",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-11T23:40:27Z",
+      "side": 1,
+      "message": "Although, given that the help text says:\n\n      -p, --package string           package name for non-CUE files\n\nI think it\u0027s safe for me to +2 this - I can\u0027t imagine how the old examples and text could have been correct or up to date.",
+      "revId": "7fd3171e459c8520087a90c3bcc0330fe33f77c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -405,7 +405,18 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		defer n.unmarkOptional(n.markOptional())
 
 		if DebugDeps {
-			RecordDebugGraph(n.ctx, n.node, "Finalize")
+			switch n.node.BaseValue.(type) {
+			case *Disjunction:
+				// If we have a disjunction, its individual disjuncts will
+				// already have been checked. The node itself will likely have
+				// spurious results, as it will contain unclosed holes.
+
+			case *Vertex:
+				// No need to check dereferenced results.
+
+			default:
+				RecordDebugGraph(n.ctx, n.node, "Finalize")
+			}
 		}
 	}
 

@@ -124,10 +124,9 @@ type Config struct {
 	// only. Just `#` is preferred.
 	Root string
 
-	// AllowNonExistentRoot holds whether it's an error when there
-	// is no value at the above Root path. For example, when extracting
-	// an OpenAPI schema, the #/components/schemas path might not
-	// exist, but that could be considered OK even so.
+	// AllowNonExistentRoot prevents an error when there is no value at
+	// the above Root path. Such an error can be useful to signal that
+	// the data may not be a JSON Schema, but is not always a good idea.
 	AllowNonExistentRoot bool
 
 	// Map maps the locations of schemas and definitions to a new location.

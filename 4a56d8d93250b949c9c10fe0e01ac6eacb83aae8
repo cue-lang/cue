@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "973fa821_080ec278",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-13T09:47:55Z",
+      "side": 1,
+      "message": "LGTM modulo a bunch of mostly-minor comments and suggestions.",
+      "revId": "4a56d8d93250b949c9c10fe0e01ac6eacb83aae8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bfed81cd_4419e5e8",
+        "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 614,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-13T09:47:55Z",
+      "side": 1,
+      "message": "It would probably be nicer if the inline comment had a separating space and came after the field annotation.",
+      "revId": "4a56d8d93250b949c9c10fe0e01ac6eacb83aae8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26aa7c1b_0b6043c4",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-13T09:47:55Z",
+      "side": 1,
+      "message": "FWIW I quite like using the non-existent-as-yet cutLast function\nfor this kind of thing. I\u0027m sure that `strings.CutLast` will end\nup in the stdlib eventually and then we\u0027ll be able to avoid the\nextra function.\n\n```\nif pkgPath, attrType1, ok :\u003d cutLast(attrType, \".\"); ok {\n    g.importedAs[pkgPath] \u003d pkgPath\n    _, attrType, _ \u003d cutLast(attrType1, \"/\")\n}\n```\n\ngiven:\n\n```\nfunc cutLast(s, sep string) (before, after string, found bool) {\n\tif i :\u003d strings.LastIndex(s, sep); i \u003e\u003d 0 {\n\t\treturn s[:i], s[i+len(sep):], true\n\t}\n\treturn \"\", s, false\n}\n```\n\nYMMV",
+      "revId": "4a56d8d93250b949c9c10fe0e01ac6eacb83aae8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff04358a_109b4381",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-13T09:47:55Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t\t// TODO: should we ensure that optional fields are always nilable in Go?\n```",
+      "revId": "4a56d8d93250b949c9c10fe0e01ac6eacb83aae8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

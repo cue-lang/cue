@@ -1,0 +1,186 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae27f9a5_e7c8678b",
+        "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-13T09:47:55Z",
+      "side": 1,
+      "message": "```suggestion\n# Names including \"neverGenerate\" signal that they must not be generated.\n```",
+      "revId": "74bf89cf623490bd2cfe81d3b48ba4e9a565ed5f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4f831d4_cecd479d",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-13T09:47:55Z",
+      "side": 1,
+      "message": "doc comment?",
+      "revId": "74bf89cf623490bd2cfe81d3b48ba4e9a565ed5f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd256fa5_e355a28a",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-13T09:47:55Z",
+      "side": 1,
+      "message": "Perhaps be defensive and do `insts \u003d slices.Clip(insts)` to avoid mutating the slice that\u0027s passed in.",
+      "revId": "74bf89cf623490bd2cfe81d3b48ba4e9a565ed5f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "630ddced_63cb4d32",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-13T09:47:55Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t\tif sel :\u003d iter.Selector(); sel.IsDefinition() {\n\t\t\t\tg.addDef(cue.MakePath(sel))\n```",
+      "range": {
+        "startLine": 62,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 0
+      },
+      "revId": "74bf89cf623490bd2cfe81d3b48ba4e9a565ed5f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f085fd5_d9332f37",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-13T09:47:55Z",
+      "side": 1,
+      "message": "Maybe better to be more explicit about the actual TODO here?\n\n```suggestion\n\t\t// TODO: imported :\u003d slices.Sorted(maps.Values(g.importedAs))\n```\n?",
+      "revId": "74bf89cf623490bd2cfe81d3b48ba4e9a565ed5f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14ea0f52_0359f62b",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-13T09:47:55Z",
+      "side": 1,
+      "message": "This needs a blank line before the comment.",
+      "revId": "74bf89cf623490bd2cfe81d3b48ba4e9a565ed5f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0d87a0f_4b23e8e1",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-13T09:47:55Z",
+      "side": 1,
+      "message": "```suggestion\n\t// keyed by [cue.Path.String].\n```",
+      "revId": "74bf89cf623490bd2cfe81d3b48ba4e9a565ed5f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04b6e5d9_a0686091",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-13T09:47:55Z",
+      "side": 1,
+      "message": "I couldn\u0027t understand this very well\n\n```suggestion\n\t// importedAs records which CUE packages need to be imported as which Go packages in the generated Go package.\n```\n\n?",
+      "range": {
+        "startLine": 144,
+        "startChar": 49,
+        "endLine": 144,
+        "endChar": 59
+      },
+      "revId": "74bf89cf623490bd2cfe81d3b48ba4e9a565ed5f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9626135a_c9541292",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-13T09:47:55Z",
+      "side": 1,
+      "message": "```suggestion\n// addDef records that the definition at the given path\n// needs to be generated. \nfunc (g *generator) addDef(path cue.Path) {\n```\n\n?",
+      "revId": "74bf89cf623490bd2cfe81d3b48ba4e9a565ed5f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d39f4a26_1d34d997",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-13T09:47:55Z",
+      "side": 1,
+      "message": "tbh I\u0027m still not entirely convinced we should be generating any names that aren\u0027t at the top level. ISTM that nested schemas are quite likely to be template parameters rather than actual schemas suitable for export. Have we got some good motivating examples for this?",
+      "revId": "74bf89cf623490bd2cfe81d3b48ba4e9a565ed5f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

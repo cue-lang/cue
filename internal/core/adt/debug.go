@@ -623,6 +623,9 @@ func (m *mermaidContext) pstr(cc *closeContext) string {
 	// Show the origin of the closeContext.
 	indentOnNewline(w, 3)
 	fmt.Fprintf(w, "+%d", cc.depth)
+	if cc.holeID != 0 {
+		fmt.Fprintf(w, " H%d", cc.holeID)
+	}
 
 	w.WriteString(close)
 

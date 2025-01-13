@@ -367,7 +367,7 @@ type vertexFeatures struct {
 }
 
 func (vf *vertexFeatures) compareStructMeta(a, b *structMeta) int {
-	if c := a.pos.Compare(b.pos); c != 0 {
+	if c := a.pos.CompareNoPosLast(b.pos); c != 0 {
 		return c
 	}
 	aHasDyn := a.hasDynamic(vf.dynFieldsMap)

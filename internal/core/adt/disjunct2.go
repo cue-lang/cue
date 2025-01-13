@@ -634,7 +634,7 @@ outer:
 		if x.defaultMode == isDefault {
 			xn.defaultMode = isDefault
 		}
-		x.free()
+		// TODO: x.free()
 		return a
 	}
 

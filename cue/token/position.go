@@ -111,24 +111,49 @@ func (p Pos) String() string {
 	return p.Position().String()
 }
 
-// Compare returns an integer comparing two positions. The result will be 0 if p == p2,
-// -1 if p < p2, and +1 if p > p2. Note that [NoPos] is always smaller than any valid position.
-func (p Pos) Compare(p2 Pos) int {
-	if p == p2 {
-		return 0
-	} else if p == NoPos {
-		return -1
-	} else if p2 == NoPos {
-		return +1
+func (p1 Pos) compare(p2 Pos, noPosFirst bool) int {
+	noPosVal := 1
+	if noPosFirst {
+		noPosVal = -1
 	}
-	pos, pos2 := p.Position(), p2.Position()
-	if c := cmp.Compare(pos.Filename, pos2.Filename); c != 0 {
+	if p1 == p2 {
+		return 0
+	} else if p1 == NoPos {
+		return noPosVal
+	} else if p2 == NoPos {
+		return -noPosVal
+	}
+	pos1, pos2 := p1.Position(), p2.Position()
+	if c := cmp.Compare(pos1.Filename, pos2.Filename); c != 0 {
 		return c
 	}
 	// Note that CUE doesn't currently use any directives which alter
 	// position information, like Go's //line, so comparing by offset is enough.
-	return cmp.Compare(pos.Offset, pos2.Offset)
+	return cmp.Compare(pos1.Offset, pos2.Offset)
+}
 
+// Compare is an alias of CompareNoPosFirst, for satisfying interfaces
+// or reflection-base uses that need a plain Compare method.
+func (p1 Pos) Compare(p2 Pos) int {
+	return p1.CompareNoPosFirst(p2)
+}
+
+// CompareNoPosFirst returns an integer comparing two positions. If
+// the positions are from different files, the filenames are used and
+// the comparison is lexicographical. If the positions are from the
+// same file their offsets are compared, with the smaller offset
+// coming first. All [NoPos] values will come before other values.
+func (p1 Pos) CompareNoPosFirst(p2 Pos) int {
+	return p1.compare(p2, true)
+}
+
+// CompareNoPosLast returns an integer comparing two positions. If the
+// positions are from different files, the filenames are used and the
+// comparison is lexicographical. If the positions are from the same
+// file their offsets are compared, with the smaller offset coming
+// first. All [NoPos] values will come after other values.
+func (p1 Pos) CompareNoPosLast(p2 Pos) int {
+	return p1.compare(p2, false)
 }
 
 // NoPos is the zero value for [Pos]; there is no file and line information

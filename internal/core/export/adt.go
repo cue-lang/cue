@@ -365,7 +365,7 @@ func cmpLeafNodes[T adt.Node](a, b T) int {
 		return 0
 	}
 
-	return srcA.Pos().Compare(srcB.Pos())
+	return srcA.Pos().CompareNoPosFirst(srcB.Pos())
 }
 
 func typeOrder(x adt.Node) int {

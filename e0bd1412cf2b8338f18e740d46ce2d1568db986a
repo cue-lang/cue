@@ -89,6 +89,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "feacae91_c800c923",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_non_local.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-13T10:15:52Z",
+      "side": 1,
+      "message": "root.Type doesn\u0027t exist (and the bug you\u0027re fixing hid that fact) - that type is actually exported as `root.#Type`.\n\nI\u0027d suggest changing this code to:\n\n```\nroot.#Type \u0026 {\n\tSub1: Sub2: Leaf: 1\n}\n```\n\nand using `cue vet -c` instead of `cue eval` on line 22.",
+      "parentUuid": "82983833_7d4899d9",
+      "revId": "e0bd1412cf2b8338f18e740d46ce2d1568db986a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "47dfcf6b_b9d7b8fa",
         "filename": "cmd/cue/cmd/testdata/script/pkg_patterns.txtar",
         "patchSetId": 1
@@ -118,6 +136,24 @@
       "side": 1,
       "message": "\u003e The TODO why does this succeed\nI just didn\u0027t know what \"this\" meant, and thought it MAY be referring to foo.bar not failing.\n\nI do not think this is a V3 change, but rather a validator change that is causing it.\n\nMoved change to separate CL",
       "parentUuid": "47dfcf6b_b9d7b8fa",
+      "revId": "e0bd1412cf2b8338f18e740d46ce2d1568db986a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9d630cb_be79652e",
+        "filename": "cmd/cue/cmd/testdata/script/pkg_patterns.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-13T10:15:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "83a5d830_a12c45c9",
       "revId": "e0bd1412cf2b8338f18e740d46ce2d1568db986a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -153,6 +189,24 @@
       "side": 1,
       "message": "Separate CL, but good to mention indeed so it shows up in 3389.",
       "parentUuid": "c04da4c6_404c9f85",
+      "revId": "e0bd1412cf2b8338f18e740d46ce2d1568db986a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "78cf8ae1_af1aaa7f",
+        "filename": "cue/testdata/cycle/builtins.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-13T10:15:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "654168fb_34039f38",
       "revId": "e0bd1412cf2b8338f18e740d46ce2d1568db986a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

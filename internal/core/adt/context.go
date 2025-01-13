@@ -220,6 +220,10 @@ type OpContext struct {
 	// encountered. A value of 0 indicates we are not within such field.
 	optionalMark int
 
+	// holdID is a unique identifier for the current "hole", a choice of
+	// disjunct to be made when processing disjunctions.
+	holeID int
+
 	// inDisjunct indicates that non-monotonic checks should be skipped.
 	// This is used if we want to do some extra work to eliminate disjunctions
 	// early. The result of unification should be thrown away if this check is

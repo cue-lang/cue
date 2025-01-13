@@ -87,6 +87,7 @@ import (
 type envDisjunct struct {
 	env     *Environment
 	cloneID CloseInfo
+	holeID  int
 
 	// fields for new evaluator
 

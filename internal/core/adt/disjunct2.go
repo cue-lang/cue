@@ -209,6 +209,7 @@ type disjunct struct {
 // is relatively rare, we keep it separate to avoid bloating the closeContext.
 type disjunctHole struct {
 	cc         *closeContext
+	holeID     int
 	underlying *closeContext
 }
 
@@ -228,11 +229,13 @@ func (n *nodeContext) scheduleDisjunction(d envDisjunct) {
 	// case mergeVertex will override the original value, or multiple disjuncts,
 	// in which case the original is set to the disjunct itself.
 	ccHole.incDisjunct(n.ctx, DISJUNCT)
+	ccHole.holeID = d.holeID
 
 	n.disjunctions = append(n.disjunctions, d)
 
 	n.disjunctCCs = append(n.disjunctCCs, disjunctHole{
 		cc:         ccHole, // this value is cloned in doDisjunct.
+		holeID:     d.holeID,
 		underlying: ccHole,
 	})
 }
@@ -291,7 +294,7 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 		}
 
 		// Mark no final in nodeContext and observe later.
-		results = n.crossProduct(results, cross, d, mode)
+		results = n.crossProduct(results, cross, d, mode, d.holeID)
 
 		// TODO: do we unwind only at the end or also intermittently?
 		switch len(results) {
@@ -346,7 +349,7 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 
 // crossProduct computes the cross product of the disjuncts of a disjunction
 // with an existing set of results.
-func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, mode runMode) []*nodeContext {
+func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, mode runMode, hole int) []*nodeContext {
 	defer n.unmarkDepth(n.markDepth())
 	defer n.unmarkOptional(n.markOptional())
 
@@ -357,7 +360,7 @@ func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, m
 
 		for j, d := range dn.disjuncts {
 			c := MakeConjunct(dn.env, d.expr, dn.cloneID)
-			r, err := p.doDisjunct(c, d.mode, mode)
+			r, err := p.doDisjunct(c, d.mode, mode, hole)
 
 			if err != nil {
 				// TODO: store more error context
@@ -404,7 +407,7 @@ func (n *nodeContext) collectErrors(dn *envDisjunct) (errs *Bottom) {
 	return b
 }
 
-func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode) (*nodeContext, *Bottom) {
+func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, hole int) (*nodeContext, *Bottom) {
 	if c.CloseInfo.cc == nil {
 		panic("nil closeContext during init")
 	}
@@ -426,10 +429,13 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode) (*node
 		// a closeContext corresponding to a disjunction always has a parent.
 		// We therefore do not need to check whether x.parent is nil.
 		o := oc.allocCC(d.cc)
-		if c.CloseInfo.cc == d.underlying {
+		if hole == d.holeID {
 			ccHole = o
+			if d.cc.conjunctCount == 0 {
+				panic("unexpected zero conjunctCount")
+			}
 		}
-		holes = append(holes, disjunctHole{o, d.underlying})
+		holes = append(holes, disjunctHole{o, d.holeID, d.underlying})
 	}
 
 	if ccHole == nil {

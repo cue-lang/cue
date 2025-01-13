@@ -202,9 +202,11 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 
 		// TODO(perf): reuse envDisjunct values so that we can also reuse the
 		// disjunct slice.
+		n.ctx.holeID++
 		d := envDisjunct{
 			env:     env,
 			cloneID: id,
+			holeID:  n.ctx.holeID,
 			src:     x,
 			expr:    x,
 		}
@@ -649,9 +651,11 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 		id := id
 		id.setOptionalV3(n)
 
+		n.ctx.holeID++
 		d := envDisjunct{
 			env:     env,
 			cloneID: id,
+			holeID:  n.ctx.holeID,
 			src:     x,
 			value:   x,
 		}

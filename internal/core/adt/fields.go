@@ -170,6 +170,10 @@ type closeContext struct {
 	// in disjunction overlays. This is mostly for debugging.
 	generation int
 
+	// a non-zero value indicates that the closeContext is part of a disjunction
+	// and that it is associated with the given Hole Index.
+	holeID int
+
 	dependencies []*ccDep // For testing only. See debug.go
 
 	// externalDeps lists the closeContexts associated with a root node for

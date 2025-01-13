@@ -270,6 +270,7 @@ func (ctx *overlayContext) allocCC(cc *closeContext) *closeContext {
 	o := &closeContext{generation: ctx.generation}
 	cc.overlay = o
 	o.depth = cc.depth
+	o.holeID = cc.holeID
 
 	if cc.parent != nil {
 		o.parent = ctx.allocCC(cc.parent)

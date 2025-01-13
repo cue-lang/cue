@@ -1,0 +1,313 @@
+-- issue3635.cue --
+import "list"
+issue3635: case1: {
+	Run: {
+		env: *{[string]: string} | [...string]
+	}
+
+	command: Run & {
+		env: list.Concat([["foo"], ["bar"]])
+	}
+}
+
+issue3635: case2: {
+	out: [...#Schema]
+	out: [#Schema & {
+		name: "x"
+	}]
+
+	#Schema: {
+		name?: string
+		container?: [string]: string | #container
+
+		#container: string | {
+			env?: #env
+		}
+
+		#env: [string]: bool | string
+	}
+}
+
+issue3635: reduced: {
+	out: {X} & X
+	X: {
+		b: int | c
+		c: int | { e: d }
+	}
+	d: 1
+}
+
+issue3635: reduced_noshare: {
+	out: {X} & X
+	X: {
+		b: int | c
+		c: int | { e: d & __no_sharing }
+	}
+	d: 1
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  162
+Reused: 148
+Allocs: 14
+Retain: 62
+
+Unifications: 86
+Conjuncts:    315
+Disjuncts:    168
+-- out/evalalpha --
+(struct){
+  issue3635: (struct){
+    case1: (struct){
+      Run: (struct){
+        env: ((list|struct)){ |(*(struct){
+          }, (list){
+          }) }
+      }
+      command: (struct){
+        env: (#list){
+          0: (string){ string }
+          1: (string){ string }
+        }
+      }
+    }
+    case2: (struct){
+      out: (#list){
+        0: (#struct){
+          name: (string){ "x" }
+          container?: (#struct){
+          }
+          #container: ((string|struct)){ |((string){ string }, (#struct){
+              env?: (#struct){
+              }
+            }) }
+          #env: (#struct){
+          }
+        }
+      }
+      #Schema: (#struct){
+        name?: (string){ string }
+        container?: (#struct){
+        }
+        #container: ((string|struct)){ |((string){ string }, (#struct){
+            env?: (#struct){
+            }
+          }) }
+        #env: (#struct){
+        }
+      }
+    }
+    reduced: (struct){
+      out: (struct){
+        b: ((int|struct)){ |((int){ int }, (struct){
+            e: (int){ 1 }
+          }) }
+        c: ((int|struct)){ |((int){ int }, (struct){
+            e: (int){ 1 }
+          }) }
+      }
+      X: (struct){
+        b: ((int|struct)){ |((int){ int }, (struct){
+            e: (int){ 1 }
+          }) }
+        c: ((int|struct)){ |((int){ int }, (struct){
+            e: (int){ 1 }
+          }) }
+      }
+      d: (int){ 1 }
+    }
+    reduced_noshare: (struct){
+      out: (struct){
+        b: ((int|struct)){ |((int){ int }, (struct){
+            e: (int){ 1 }
+          }) }
+        c: ((int|struct)){ |((int){ int }, (struct){
+            e: (int){ 1 }
+          }) }
+      }
+      X: (struct){
+        b: ((int|struct)){ |((int){ int }, (struct){
+            e: (int){ 1 }
+          }) }
+        c: ((int|struct)){ |((int){ int }, (struct){
+            e: (int){ 1 }
+          }) }
+      }
+      d: (int){ 1 }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -8,8 +8,8 @@
+       }
+       command: (struct){
+         env: (#list){
+-          0: (string){ "foo" }
+-          1: (string){ "bar" }
++          0: (string){ string }
++          1: (string){ string }
+         }
+       }
+     }
+-- out/eval --
+(struct){
+  issue3635: (struct){
+    case1: (struct){
+      Run: (struct){
+        env: ((list|struct)){ |(*(struct){
+          }, (list){
+          }) }
+      }
+      command: (struct){
+        env: (#list){
+          0: (string){ "foo" }
+          1: (string){ "bar" }
+        }
+      }
+    }
+    case2: (struct){
+      out: (#list){
+        0: (#struct){
+          name: (string){ "x" }
+          container?: (#struct){
+          }
+          #container: ((string|struct)){ |((string){ string }, (#struct){
+              env?: (#struct){
+              }
+            }) }
+          #env: (#struct){
+          }
+        }
+      }
+      #Schema: (#struct){
+        name?: (string){ string }
+        container?: (#struct){
+        }
+        #container: ((string|struct)){ |((string){ string }, (#struct){
+            env?: (#struct){
+            }
+          }) }
+        #env: (#struct){
+        }
+      }
+    }
+    reduced: (struct){
+      out: (struct){
+        b: ((int|struct)){ |((int){ int }, (struct){
+            e: (int){ 1 }
+          }) }
+        c: ((int|struct)){ |((int){ int }, (struct){
+            e: (int){ 1 }
+          }) }
+      }
+      X: (struct){
+        b: ((int|struct)){ |((int){ int }, (struct){
+            e: (int){ 1 }
+          }) }
+        c: ((int|struct)){ |((int){ int }, (struct){
+            e: (int){ 1 }
+          }) }
+      }
+      d: (int){ 1 }
+    }
+    reduced_noshare: (struct){
+      out: (struct){
+        b: ((int|struct)){ |((int){ int }, (struct){
+            e: (int){ 1 }
+          }) }
+        c: ((int|struct)){ |((int){ int }, (struct){
+            e: (int){ 1 }
+          }) }
+      }
+      X: (struct){
+        b: ((int|struct)){ |((int){ int }, (struct){
+            e: (int){ 1 }
+          }) }
+        c: ((int|struct)){ |((int){ int }, (struct){
+            e: (int){ 1 }
+          }) }
+      }
+      d: (int){ 1 }
+    }
+  }
+}
+-- out/compile --
+--- issue3635.cue
+{
+  issue3635: {
+    case1: {
+      Run: {
+        env: (*{
+          [string]: string
+        }|[
+          ...string,
+        ])
+      }
+      command: (〈0;Run〉 & {
+        env: 〈import;list〉.Concat([
+          [
+            "foo",
+          ],
+          [
+            "bar",
+          ],
+        ])
+      })
+    }
+  }
+  issue3635: {
+    case2: {
+      out: [
+        ...〈1;#Schema〉,
+      ]
+      out: [
+        (〈1;#Schema〉 & {
+          name: "x"
+        }),
+      ]
+      #Schema: {
+        name?: string
+        container?: {
+          [string]: (string|〈1;#container〉)
+        }
+        #container: (string|{
+          env?: 〈1;#env〉
+        })
+        #env: {
+          [string]: (bool|string)
+        }
+      }
+    }
+  }
+  issue3635: {
+    reduced: {
+      out: ({
+        〈1;X〉
+      } & 〈0;X〉)
+      X: {
+        b: (int|〈0;c〉)
+        c: (int|{
+          e: 〈2;d〉
+        })
+      }
+      d: 1
+    }
+  }
+  issue3635: {
+    reduced_noshare: {
+      out: ({
+        〈1;X〉
+      } & 〈0;X〉)
+      X: {
+        b: (int|〈0;c〉)
+        c: (int|{
+          e: (〈2;d〉 & _|_(no sharing))
+        })
+      }
+      d: 1
+    }
+  }
+}

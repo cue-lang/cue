@@ -534,18 +534,23 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 	// Investigate how to work around this.
 	n.completeNodeTasks(finalize)
 
+	// TODO: remove this block in favor of finalizing notification nodes,
+	// or what have you. We have patched this to skip evaluating when using
+	// disjunctions, but this is overall a brittle approach.
 	for _, r := range n.node.cc().externalDeps {
 		src := r.src
+		// We should be careful to not evaluate parent nodes if we are inside a
+		// disjunction, or at least ensure that there are no disjunction values
+		// leaked into non-disjunction nodes through evaluating externalDeps.
+		if src.src.IsDisjunct {
+			continue
+		}
 		a := &src.arcs[r.index]
 		if a.decremented {
 			continue
 		}
 		a.decremented = true
 
-		// FIXME: we should be careful to not evaluate parent nodes if we
-		// are inside a disjunction, or at least ensure that there are no
-		// disjunction values leaked into non-disjunction nodes through
-		// evaluating externalDeps.
 		src.src.unify(n.ctx, needTasksDone, attemptOnly)
 		a.cc.decDependent(n.ctx, a.kind, src) // REF(arcs)
 	}

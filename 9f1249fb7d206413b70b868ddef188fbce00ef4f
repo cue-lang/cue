@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cda2d642_03d891c6",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 405,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-13T10:53:48Z",
+      "side": 1,
+      "message": "0 is the default exit code, so no need for this AFAICS.",
+      "revId": "9f1249fb7d206413b70b868ddef188fbce00ef4f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

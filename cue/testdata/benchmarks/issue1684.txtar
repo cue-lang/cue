@@ -62,10 +62,10 @@ nestedClosed: passing: {
 	D: {id: {}} | {[string]: D}
 }
 -- out/evalalpha/stats --
-Leaks:  2135
-Freed:  658
-Reused: 658
-Allocs: 2135
+Leaks:  2140
+Freed:  653
+Reused: 653
+Allocs: 2140
 Retain: 0
 
 Unifications: 475
@@ -143,10 +143,10 @@ diff old new
 -Freed:  1064333
 -Reused: 1064282
 -Allocs: 51
-+Leaks:  2135
-+Freed:  658
-+Reused: 658
-+Allocs: 2135
++Leaks:  2140
++Freed:  653
++Reused: 653
++Allocs: 2140
  Retain: 0
  
 -Unifications: 792123

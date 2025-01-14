@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab4d0d2d_d44721bb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-14T13:36:15Z",
+      "side": 1,
+      "message": "Do we need a github issue to track defaults/examples support? Particularly since I imagine that question will come up on discord/slack every now and then over the coming months.",
+      "revId": "defd9e50dde5bbaea1c8b9a01d7cb81b3f579b08",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

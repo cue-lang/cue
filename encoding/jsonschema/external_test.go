@@ -218,6 +218,7 @@ func testFailed(t *testing.T, m *cuetdtest.M, skipField *externaltest.Skip, p po
 		return
 	}
 	if reason := (*skipField)[m.Name()]; reason != "" {
+		qt.Assert(t, qt.Equals(reason, errStr), qt.Commentf("error message mismatch"))
 		t.Skipf("skipping due to known error: %v", reason)
 	}
 	t.Fatal(errStr)

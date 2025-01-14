@@ -1,0 +1,50 @@
+# Make sure that things work OK when cue mod rename renames
+# a module where the last component differs.
+
+# Make a copy of the original files.
+cp cue.mod/module.cue cue.mod/module.cue-0
+cp x.cue x.cue-0
+cp y/y.cue y/y.cue-0
+
+exec cue mod rename main.org/y
+cmp cue.mod/module.cue cue.mod/module.cue-1
+cmp x.cue x.cue-1
+cmp y/y.cue y/y.cue-1
+
+# Check that renaming back to the original name
+# gets us back to the original content.
+exec cue mod rename main.org/x
+cmp cue.mod/module.cue cue.mod/module.cue-0
+cmp x.cue x.cue-0
+cmp y/y.cue y/y.cue-0
+
+-- cue.mod/module.cue --
+module: "main.org/x"
+language: {
+	version: "v0.9.0"
+}
+-- x.cue --
+package x
+
+x: 1
+-- y/y.cue --
+package y
+
+import "main.org/x"
+
+y: x.x
+-- cue.mod/module.cue-1 --
+module: "main.org/y"
+language: {
+	version: "v0.9.0"
+}
+-- x.cue-1 --
+package x
+
+x: 1
+-- y/y.cue-1 --
+package y
+
+import "main.org/y:x"
+
+y: x.x

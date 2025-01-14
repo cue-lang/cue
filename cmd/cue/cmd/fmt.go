@@ -179,13 +179,9 @@ func formatFile(file *build.File, opts []format.Option, doDiff, check bool, cmd 
 	// We buffer the input and output bytes to compare them.
 	// This allows us to determine whether a file is already
 	// formatted, without modifying the file.
-	src, ok := file.Source.([]byte)
-	if !ok {
-		var err error
-		src, err = source.ReadAll(file.Filename, file.Source)
-		if err != nil {
-			return false, err
-		}
+	src, err := source.ReadAll(file.Filename, file.Source)
+	if err != nil {
+		return false, err
 	}
 
 	syntax, err := parser.ParseFile(file.Filename, src, parser.ParseComments)

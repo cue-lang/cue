@@ -5,6 +5,60 @@ a: b - 100
 b: a + 100
 
 c: [c[1], c[0]]
+
+d: e - 1
+e: 1 + d
+e: *2 | 0
+-- disjunction.cue --
+oneway: {
+    t1: {
+        a: *1 | int
+        a: b + 1
+        b: <a
+    }
+    t2: t1 & {
+        a: 3
+    }
+}
+// This should report a cycle error. TODO: this should also resolve.
+issue3669: {
+	#Schema: {
+		two: 1 + one
+		one: two - 1
+	}
+	
+	out: #Schema & {
+		two: 0 | *2
+	}
+}
+-- issue3737.cue --
+issue3737: reduced1: {
+    #A: {
+        a: b * 12
+        b: a / 12
+    }
+
+    x: #A
+    x: b: 1000.0
+
+    y: #A | *x
+    y: b: x.b * 0.7
+}
+issue3737: reduced2: {
+    x: #TimeSpan & {
+        start: y.start
+        end: 1000.0
+    }
+    y: #TimeSpan & {
+        duration: 100.0
+        end: x.end
+    }
+    #TimeSpan: {
+        start:    end - duration
+        duration: end - start
+        end:      start + duration
+    }
+}
 -- out/def --
 a: b - 100
 b: a + 100
@@ -12,6 +66,28 @@ c: [c[1], c[0]]
 -- out/legacy-debug --
 <0>{a: (<1>.b - 100), b: (<1>.a + 100), c: [<1>.c[1],<1>.c[0]]}
 -- out/compile --
+--- disjunction.cue
+{
+  oneway: {
+    t1: {
+      a: (*1|int)
+      a: (〈0;b〉 + 1)
+      b: <〈0;a〉
+    }
+    t2: (〈0;t1〉 & {
+      a: 3
+    })
+  }
+  issue3669: {
+    #Schema: {
+      two: (1 + 〈0;one〉)
+      one: (〈0;two〉 - 1)
+    }
+    out: (〈0;#Schema〉 & {
+      two: (0|*2)
+    })
+  }
+}
 --- in.cue
 {
   a: (〈0;b〉 - 100)
@@ -20,19 +96,103 @@ c: [c[1], c[0]]
     〈1;c〉[1],
     〈1;c〉[0],
   ]
+  d: (〈0;e〉 - 1)
+  e: (1 + 〈0;d〉)
+  e: (*2|0)
+}
+--- issue3737.cue
+{
+  issue3737: {
+    reduced1: {
+      #A: {
+        a: (〈0;b〉 * 12)
+        b: (〈0;a〉 / 12)
+      }
+      x: 〈0;#A〉
+      x: {
+        b: 1000.0
+      }
+      y: (〈0;#A〉|*〈0;x〉)
+      y: {
+        b: (〈1;x〉.b * 0.7)
+      }
+    }
+  }
+  issue3737: {
+    reduced2: {
+      x: (〈0;#TimeSpan〉 & {
+        start: 〈1;y〉.start
+        end: 1000.0
+      })
+      y: (〈0;#TimeSpan〉 & {
+        duration: 100.0
+        end: 〈1;x〉.end
+      })
+      #TimeSpan: {
+        start: (〈0;end〉 - 〈0;duration〉)
+        duration: (〈0;end〉 - 〈0;start〉)
+        end: (〈0;start〉 + 〈0;duration〉)
+      }
+    }
+  }
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  6
-Reused: 2
-Allocs: 4
-Retain: 11
+Leaks:  1
+Freed:  57
+Reused: 46
+Allocs: 12
+Retain: 166
 
-Unifications: 6
-Conjuncts:    26
-Disjuncts:    7
+Unifications: 48
+Conjuncts:    285
+Disjuncts:    88
 -- out/evalalpha --
 (struct){
+  oneway: (struct){
+    t1: (struct){
+      a: (_|_){
+        // [cycle] cycle error:
+        //     ./disjunction.cue:4:12
+      }
+      b: (_|_){
+        // [cycle] cycle error
+      }
+    }
+    t2: (struct){
+      a: (_|_){
+        // [incomplete] oneway.t2.a: 2 errors in empty disjunction:
+        // oneway.t2.a: conflicting values 1 and 3:
+        //     ./disjunction.cue:3:13
+        //     ./disjunction.cue:8:12
+        // oneway.t2.a: non-concrete value <3 in operand to +:
+        //     ./disjunction.cue:4:12
+        //     ./disjunction.cue:5:12
+      }
+      b: (number){ <3 }
+    }
+  }
+  issue3669: (struct){
+    #Schema: (#struct){
+      two: (_|_){
+        // [cycle] cycle error:
+        //     ./disjunction.cue:15:8
+      }
+      one: (_|_){
+        // [cycle] cycle error:
+        //     ./disjunction.cue:15:8
+      }
+    }
+    out: (#struct){
+      two: (_|_){
+        // [cycle] cycle error:
+        //     ./disjunction.cue:15:8
+      }
+      one: (_|_){
+        // [cycle] cycle error:
+        //     ./disjunction.cue:15:8
+      }
+    }
+  }
   a: (_|_){
     // [cycle] cycle error:
     //     ./in.cue:2:4
@@ -45,13 +205,144 @@ Disjuncts:    7
     0: (_){ _ }
     1: (_){ _ }
   }
+  d: (_|_){
+    // [cycle] cycle error:
+    //     ./in.cue:7:4
+  }
+  e: (_|_){
+    // [cycle] cycle error:
+    //     ./in.cue:7:4
+  }
+  issue3737: (struct){
+    reduced1: (struct){
+      #A: (#struct){
+        a: (_|_){
+          // [cycle] cycle error:
+          //     ./issue3737.cue:4:12
+        }
+        b: (_|_){
+          // [cycle] cycle error:
+          //     ./issue3737.cue:4:12
+        }
+      }
+      x: (#struct){
+        b: (float){ 1000.0 }
+        a: (float){ 12000.0 }
+      }
+      y: (#struct){
+        b: (float){ 700.00 }
+        a: (float){ 8400.00 }
+      }
+    }
+    reduced2: (struct){
+      x: (#struct){
+        start: (_|_){
+          // [cycle] cycle error:
+          //     ./issue3737.cue:24:19
+          // cycle error:
+          //     ./issue3737.cue:25:19
+        }
+        end: (_|_){
+          // [cycle] cycle error:
+          //     ./issue3737.cue:24:19
+          // cycle error:
+          //     ./issue3737.cue:25:19
+        }
+        duration: (_|_){
+          // [cycle] cycle error:
+          //     ./issue3737.cue:24:19
+        }
+      }
+      y: (#struct){
+        duration: (_|_){
+          // [cycle] cycle error:
+          //     ./issue3737.cue:25:19
+        }
+        end: (_|_){
+          // [cycle] cycle error:
+          //     ./issue3737.cue:25:19
+        }
+        start: (float){ 900.0 }
+      }
+      #TimeSpan: (#struct){
+        start: (_|_){
+          // [cycle] cycle error:
+          //     ./issue3737.cue:24:19
+          // cycle error:
+          //     ./issue3737.cue:25:19
+        }
+        duration: (_|_){
+          // [cycle] cycle error:
+          //     ./issue3737.cue:24:19
+        }
+        end: (_|_){
+          // [cycle] cycle error:
+          //     ./issue3737.cue:25:19
+        }
+      }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,11 @@
- (struct){
+@@ -2,11 +2,12 @@
+   oneway: (struct){
+     t1: (struct){
+       a: (_|_){
+-        // [incomplete] oneway.t1.a: non-concrete value <1 in operand to +:
+-        //     ./disjunction.cue:4:12
+-        //     ./disjunction.cue:5:12
+-      }
+-      b: (number){ <1 }
++        // [cycle] cycle error:
++        //     ./disjunction.cue:4:12
++      }
++      b: (_|_){
++        // [cycle] cycle error
++      }
+     }
+     t2: (struct){
+       a: (_|_){
+@@ -13,7 +14,6 @@
+         // [incomplete] oneway.t2.a: 2 errors in empty disjunction:
+         // oneway.t2.a: conflicting values 1 and 3:
+         //     ./disjunction.cue:3:13
+-        //     ./disjunction.cue:7:9
+         //     ./disjunction.cue:8:12
+         // oneway.t2.a: non-concrete value <3 in operand to +:
+         //     ./disjunction.cue:4:12
+@@ -26,28 +26,31 @@
+     #Schema: (#struct){
+       two: (_|_){
+         // [cycle] cycle error:
+-        //     ./disjunction.cue:14:8
+-      }
+-      one: (_|_){
+-        // [cycle] cycle error:
+-        //     ./disjunction.cue:14:8
++        //     ./disjunction.cue:15:8
++      }
++      one: (_|_){
++        // [cycle] cycle error:
++        //     ./disjunction.cue:15:8
+       }
+     }
+     out: (#struct){
+       two: (_|_){
+         // [cycle] cycle error:
+-        //     ./disjunction.cue:14:8
+-      }
+-      one: (int){ -1 }
++        //     ./disjunction.cue:15:8
++      }
++      one: (_|_){
++        // [cycle] cycle error:
++        //     ./disjunction.cue:15:8
++      }
+     }
+   }
    a: (_|_){
      // [cycle] cycle error:
 -    //     ./in.cue:1:4
@@ -64,8 +355,155 @@ diff old new
    }
    c: (#list){
      0: (_){ _ }
+@@ -55,11 +58,11 @@
+   }
+   d: (_|_){
+     // [cycle] cycle error:
+-    //     ./in.cue:6:4
++    //     ./in.cue:7:4
+   }
+   e: (_|_){
+     // [cycle] cycle error:
+-    //     ./in.cue:6:4
++    //     ./in.cue:7:4
+   }
+   issue3737: (struct){
+     reduced1: (struct){
+@@ -66,16 +69,16 @@
+       #A: (#struct){
+         a: (_|_){
+           // [cycle] cycle error:
+-          //     ./issue3737.cue:3:12
++          //     ./issue3737.cue:4:12
+         }
+         b: (_|_){
+           // [cycle] cycle error:
+-          //     ./issue3737.cue:3:12
+-        }
+-      }
+-      x: (#struct){
+-        a: (float){ 12000.0 }
++          //     ./issue3737.cue:4:12
++        }
++      }
++      x: (#struct){
+         b: (float){ 1000.0 }
++        a: (float){ 12000.0 }
+       }
+       y: (#struct){
+         b: (float){ 700.00 }
+@@ -84,29 +87,48 @@
+     }
+     reduced2: (struct){
+       x: (#struct){
+-        start: (float){ 900.0 }
+-        duration: (float){ 100.0 }
+-        end: (float){ 1000.0 }
+-      }
+-      y: (#struct){
+-        start: (float){ 900.0 }
+-        duration: (float){ 100.0 }
+-        end: (float){ 1000.0 }
++        start: (_|_){
++          // [cycle] cycle error:
++          //     ./issue3737.cue:24:19
++          // cycle error:
++          //     ./issue3737.cue:25:19
++        }
++        end: (_|_){
++          // [cycle] cycle error:
++          //     ./issue3737.cue:24:19
++          // cycle error:
++          //     ./issue3737.cue:25:19
++        }
++        duration: (_|_){
++          // [cycle] cycle error:
++          //     ./issue3737.cue:24:19
++        }
++      }
++      y: (#struct){
++        duration: (_|_){
++          // [cycle] cycle error:
++          //     ./issue3737.cue:25:19
++        }
++        end: (_|_){
++          // [cycle] cycle error:
++          //     ./issue3737.cue:25:19
++        }
++        start: (float){ 900.0 }
+       }
+       #TimeSpan: (#struct){
+         start: (_|_){
+           // [cycle] cycle error:
+-          //     ./issue3737.cue:23:19
+-        }
+-        duration: (_|_){
+-          // [cycle] cycle error:
+-          //     ./issue3737.cue:24:19
+-        }
+-        end: (_|_){
+-          // [cycle] cycle error:
+-          //     ./issue3737.cue:23:19
+-          // cycle error:
+-          //     ./issue3737.cue:24:19
++          //     ./issue3737.cue:24:19
++          // cycle error:
++          //     ./issue3737.cue:25:19
++        }
++        duration: (_|_){
++          // [cycle] cycle error:
++          //     ./issue3737.cue:24:19
++        }
++        end: (_|_){
++          // [cycle] cycle error:
++          //     ./issue3737.cue:25:19
+         }
+       }
+     }
 -- out/eval --
 (struct){
+  oneway: (struct){
+    t1: (struct){
+      a: (_|_){
+        // [incomplete] oneway.t1.a: non-concrete value <1 in operand to +:
+        //     ./disjunction.cue:4:12
+        //     ./disjunction.cue:5:12
+      }
+      b: (number){ <1 }
+    }
+    t2: (struct){
+      a: (_|_){
+        // [incomplete] oneway.t2.a: 2 errors in empty disjunction:
+        // oneway.t2.a: conflicting values 1 and 3:
+        //     ./disjunction.cue:3:13
+        //     ./disjunction.cue:7:9
+        //     ./disjunction.cue:8:12
+        // oneway.t2.a: non-concrete value <3 in operand to +:
+        //     ./disjunction.cue:4:12
+        //     ./disjunction.cue:5:12
+      }
+      b: (number){ <3 }
+    }
+  }
+  issue3669: (struct){
+    #Schema: (#struct){
+      two: (_|_){
+        // [cycle] cycle error:
+        //     ./disjunction.cue:14:8
+      }
+      one: (_|_){
+        // [cycle] cycle error:
+        //     ./disjunction.cue:14:8
+      }
+    }
+    out: (#struct){
+      two: (_|_){
+        // [cycle] cycle error:
+        //     ./disjunction.cue:14:8
+      }
+      one: (int){ -1 }
+    }
+  }
   a: (_|_){
     // [cycle] cycle error:
     //     ./in.cue:1:4
@@ -77,5 +515,63 @@ diff old new
   c: (#list){
     0: (_){ _ }
     1: (_){ _ }
+  }
+  d: (_|_){
+    // [cycle] cycle error:
+    //     ./in.cue:6:4
+  }
+  e: (_|_){
+    // [cycle] cycle error:
+    //     ./in.cue:6:4
+  }
+  issue3737: (struct){
+    reduced1: (struct){
+      #A: (#struct){
+        a: (_|_){
+          // [cycle] cycle error:
+          //     ./issue3737.cue:3:12
+        }
+        b: (_|_){
+          // [cycle] cycle error:
+          //     ./issue3737.cue:3:12
+        }
+      }
+      x: (#struct){
+        a: (float){ 12000.0 }
+        b: (float){ 1000.0 }
+      }
+      y: (#struct){
+        b: (float){ 700.00 }
+        a: (float){ 8400.00 }
+      }
+    }
+    reduced2: (struct){
+      x: (#struct){
+        start: (float){ 900.0 }
+        duration: (float){ 100.0 }
+        end: (float){ 1000.0 }
+      }
+      y: (#struct){
+        start: (float){ 900.0 }
+        duration: (float){ 100.0 }
+        end: (float){ 1000.0 }
+      }
+      #TimeSpan: (#struct){
+        start: (_|_){
+          // [cycle] cycle error:
+          //     ./issue3737.cue:23:19
+        }
+        duration: (_|_){
+          // [cycle] cycle error:
+          //     ./issue3737.cue:24:19
+        }
+        end: (_|_){
+          // [cycle] cycle error:
+          //     ./issue3737.cue:23:19
+          // cycle error:
+          //     ./issue3737.cue:24:19
+        }
+      }
+    }
   }
 }

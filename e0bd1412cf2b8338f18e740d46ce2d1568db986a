@@ -125,6 +125,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "990271be_fb40a136",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_non_local.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-14T08:38:34Z",
+      "side": 1,
+      "message": "I think you\u0027d tried to revert the change to the import, but not quite right: I just checked it and I you\u0027ve changed the import to `externalmod.test/root`, not `externalmod.test/imports/root`. When I fix that, the tests pass for me. Here\u0027s the patch from your latest version:\n\n```\ndiff --git a/cmd/cue/cmd/testdata/script/get_go_non_local.txtar b/cmd/cue/cmd/testdata/script/get_go_non_local.txtar\nindex 90c03e27..e6296888 100644\n--- a/cmd/cue/cmd/testdata/script/get_go_non_local.txtar\n+++ b/cmd/cue/cmd/testdata/script/get_go_non_local.txtar\n@@ -21,7 +21,7 @@ go get externalmod.test/imports/root@v1.0.0\n exec cue get go externalmod.test/imports/root\n \n # TODO: fix and renable this test\n-# exec cue eval uses_imports_root.cue\n+exec cue vet -c uses_imports_root.cue\n \n -- cue.mod/module.cue --\n module: \"mod.test/local\"\n@@ -29,9 +29,11 @@ language: version: \"v0.9.0\"\n -- uses_imports_root.cue --\n package p\n \n-import \"externalmod.test/root\"\n+import \"externalmod.test/imports/root\"\n \n-root.Type\n+root.#Type \u0026 {\n+    Sub1: Sub2: Leaf: 1\n+}\n \n -- go.mod --\n module mod.test/local\n```",
+      "parentUuid": "b629ced4_e6c35b1f",
+      "revId": "e0bd1412cf2b8338f18e740d46ce2d1568db986a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "47dfcf6b_b9d7b8fa",
         "filename": "cmd/cue/cmd/testdata/script/pkg_patterns.txtar",
         "patchSetId": 1

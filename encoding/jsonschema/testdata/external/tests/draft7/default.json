@@ -75,11 +75,7 @@
 				"data": {
 					"alpha": 5
 				},
-				"valid": false,
-				"skip": {
-					"v2": "unexpected success",
-					"v3": "unexpected success"
-				}
+				"valid": false
 			},
 			{
 				"description": "missing properties are not filled in with the default",

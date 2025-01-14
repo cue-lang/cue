@@ -145,8 +145,22 @@ func Positions(err error) []token.Pos {
 		}
 	}
 
-	slices.SortFunc(a[sortOffset:], token.Pos.Compare)
+	slices.SortFunc(a[sortOffset:], comparePosWithNoPosFirst)
 	return slices.Compact(a)
+}
+
+// comparePosWithNoPosFirst wraps [token.Pos.Compare] to place [token.NoPos] first,
+// which is currently required for errors to be sorted correctly.
+// TODO: give all errors valid positions so that we can use the standard sorting directly.
+func comparePosWithNoPosFirst(a, b token.Pos) int {
+	if a == b {
+		return 0
+	} else if a == token.NoPos {
+		return -1
+	} else if b == token.NoPos {
+		return +1
+	}
+	return token.Pos.Compare(a, b)
 }
 
 // Path returns the path of an Error if err is of that type.
@@ -392,7 +406,7 @@ func (p list) sanitize() list {
 // entry.
 func (p list) Sort() {
 	slices.SortFunc(p, func(a, b Error) int {
-		if c := a.Position().Compare(b.Position()); c != 0 {
+		if c := comparePosWithNoPosFirst(a.Position(), b.Position()); c != 0 {
 			return c
 		}
 		if c := slices.Compare(a.Path(), b.Path()); c != 0 {
@@ -424,7 +438,7 @@ func approximateEqual(a, b Error) bool {
 	if aPos == token.NoPos || bPos == token.NoPos {
 		return a.Error() == b.Error()
 	}
-	return aPos.Compare(bPos) == 0 && slices.Compare(a.Path(), b.Path()) == 0
+	return comparePosWithNoPosFirst(aPos, bPos) == 0 && slices.Compare(a.Path(), b.Path()) == 0
 }
 
 // An List implements the error interface.

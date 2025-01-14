@@ -16,6 +16,24 @@
       "message": "Do we need a github issue to track defaults/examples support? Particularly since I imagine that question will come up on discord/slack every now and then over the coming months.",
       "revId": "defd9e50dde5bbaea1c8b9a01d7cb81b3f579b08",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f253b01_4199f50b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-14T13:43:47Z",
+      "side": 1,
+      "message": "That\u0027s issue 3473, as mentioned in the CL description.",
+      "parentUuid": "ab4d0d2d_d44721bb",
+      "revId": "defd9e50dde5bbaea1c8b9a01d7cb81b3f579b08",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

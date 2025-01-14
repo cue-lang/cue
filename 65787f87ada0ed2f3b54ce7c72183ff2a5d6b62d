@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "82279803_f88c0c02",
+        "filename": "cmd/cue/cmd/modrename.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-14T15:29:02Z",
+      "side": 1,
+      "message": "Good call: I did indeed copy from `fmt` !",
+      "parentUuid": "f81d2e7a_d286b7d0",
+      "revId": "65787f87ada0ed2f3b54ce7c72183ff2a5d6b62d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c59e3659_9ae688b7",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-01-14T13:45:02Z",
       "side": 1,
       "message": "reuse `ast.File.Preamble` so that you only need to check for `ast.ImportDecl` types, and drop the `break outer` logic.",
+      "revId": "65787f87ada0ed2f3b54ce7c72183ff2a5d6b62d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d6589c1_eb99c0a4",
+        "filename": "cmd/cue/cmd/modrename.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-14T15:29:02Z",
+      "side": 1,
+      "message": "Good point: I\u0027d totally forgotten about that method.",
+      "parentUuid": "c59e3659_9ae688b7",
       "revId": "65787f87ada0ed2f3b54ce7c72183ff2a5d6b62d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -58,6 +94,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f0193cf_6f1dc1d3",
+        "filename": "cmd/cue/cmd/modrename.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-14T15:29:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ddaf984d_0303b310",
+      "range": {
+        "startLine": 186,
+        "startChar": 65,
+        "endLine": 186,
+        "endChar": 74
+      },
+      "revId": "65787f87ada0ed2f3b54ce7c72183ff2a5d6b62d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aa331c60_6d82c7b0",
@@ -71,6 +131,24 @@
       "writtenOn": "2025-01-14T13:45:02Z",
       "side": 1,
       "message": "this sounds like something we might want to expose/reuse in one of the mod packages, even if internal.",
+      "revId": "65787f87ada0ed2f3b54ce7c72183ff2a5d6b62d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4548cab9_20aa76c2",
+        "filename": "cmd/cue/cmd/modrename.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-14T15:29:02Z",
+      "side": 1,
+      "message": "Yeah, I\u0027ve been toying with the idea but I haven\u0027t thought of a good enough name and solid enough semantics to do that yet.",
+      "parentUuid": "aa331c60_6d82c7b0",
       "revId": "65787f87ada0ed2f3b54ce7c72183ff2a5d6b62d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

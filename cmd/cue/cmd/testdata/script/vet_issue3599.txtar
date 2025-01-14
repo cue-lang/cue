@@ -1,0 +1,39 @@
+
+# With the old evaluator.
+env CUE_EXPERIMENT=evalv3=0
+exec cue vet -c=false
+
+# With the new evaluator.
+env CUE_EXPERIMENT=evalv3=1
+exec cue vet -c=false
+
+-- input.cue --
+package p
+
+#Action: {
+	action: {
+		read!:  string
+		write?: _|_
+	} | {
+		write!: string
+		read?:  _|_
+	}
+}
+
+#Minio: {
+	container: #Action & {
+		action: {
+			read!:  string
+			write?: _|_
+		} | {
+			write!: string
+			read?:  _|_
+		}
+	}
+	doWrite: bool | *true
+	container: action: defaultAction
+	defaultAction: {
+		if doWrite { write: "somefile.txt" }
+		if !doWrite { read: "somefile.txt" }
+	}
+}

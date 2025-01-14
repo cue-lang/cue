@@ -1,0 +1,69 @@
+# Test that cue mod rename does not rewrite an import
+# of a package with a matching path but in a different major
+# version of the module.
+
+# First make sure everything is in canonical form.
+exec cue fmt ./...
+
+# Make a copy of the original files.
+cp cue.mod/module.cue cue.mod/module.cue-0
+cp foo.cue foo.cue-0
+cp bar/bar.cue bar/bar.cue-0
+
+exec cue mod rename other.org/bar
+cmp cue.mod/module.cue cue.mod/module.cue-1
+cmp foo.cue foo.cue-1
+cmp bar/bar.cue bar/bar.cue-1
+
+# Renaming back to the original name should
+# result in no changes from the original files.
+exec cue mod rename main.org/foo@v0
+cmp cue.mod/module.cue cue.mod/module.cue-0
+cmp foo.cue foo.cue-0
+cmp bar/bar.cue bar/bar.cue-0
+
+-- cue.mod/module.cue --
+module: "main.org/foo@v0"
+language: {
+	version: "v0.9.0"
+}
+deps: {
+	"main.org/foo@v1": {
+		v: "v1.2.3"
+	}
+}
+-- foo.cue --
+package foo
+
+import "main.org/foo@v1"
+
+x: foo.x
+-- bar/bar.cue --
+package bar
+
+import "main.org/foo@v0"
+
+foo.x
+
+-- cue.mod/module.cue-1 --
+module: "other.org/bar"
+language: {
+	version: "v0.9.0"
+}
+deps: {
+	"main.org/foo@v1": {
+		v: "v1.2.3"
+	}
+}
+-- foo.cue-1 --
+package foo
+
+import "main.org/foo@v1"
+
+x: foo.x
+-- bar/bar.cue-1 --
+package bar
+
+import "other.org/bar@v0:foo"
+
+foo.x

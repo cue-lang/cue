@@ -5,6 +5,22 @@ a: b - 100
 b: a + 100
 
 c: [c[1], c[0]]
+
+d: e - 1
+e: 1 + d
+e: *2 | 0
+-- issue3669.cue --
+// This should report a cycle error. TODO: this should also resolve.
+issue3669: {
+	#Schema: {
+		two: 1 + one
+		one: two - 1
+	}
+	
+	out: #Schema & {
+		two: 0 | *2
+	}
+}
 -- out/def --
 a: b - 100
 b: a + 100
@@ -20,17 +36,32 @@ c: [c[1], c[0]]
     〈1;c〉[1],
     〈1;c〉[0],
   ]
+  d: (〈0;e〉 - 1)
+  e: (1 + 〈0;d〉)
+  e: (*2|0)
+}
+--- issue3669.cue
+{
+  issue3669: {
+    #Schema: {
+      two: (1 + 〈0;one〉)
+      one: (〈0;two〉 - 1)
+    }
+    out: (〈0;#Schema〉 & {
+      two: (0|*2)
+    })
+  }
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  6
-Reused: 2
-Allocs: 4
-Retain: 11
+Freed:  19
+Reused: 12
+Allocs: 7
+Retain: 39
 
-Unifications: 6
-Conjuncts:    26
-Disjuncts:    7
+Unifications: 15
+Conjuncts:    95
+Disjuncts:    21
 -- out/evalalpha --
 (struct){
   a: (_|_){
@@ -44,6 +75,36 @@ Disjuncts:    7
   c: (#list){
     0: (_){ _ }
     1: (_){ _ }
+  }
+  d: (_|_){
+    // [cycle] cycle error:
+    //     ./in.cue:7:4
+  }
+  e: (_|_){
+    // [cycle] cycle error:
+    //     ./in.cue:7:4
+  }
+  issue3669: (struct){
+    #Schema: (#struct){
+      two: (_|_){
+        // [cycle] cycle error:
+        //     ./issue3669.cue:5:8
+      }
+      one: (_|_){
+        // [cycle] cycle error:
+        //     ./issue3669.cue:5:8
+      }
+    }
+    out: (#struct){
+      two: (_|_){
+        // [cycle] cycle error:
+        //     ./issue3669.cue:5:8
+      }
+      one: (_|_){
+        // [cycle] cycle error:
+        //     ./issue3669.cue:5:8
+      }
+    }
   }
 }
 -- diff/-out/evalalpha<==>+out/eval --
@@ -64,6 +125,49 @@ diff old new
    }
    c: (#list){
      0: (_){ _ }
+@@ -13,29 +13,32 @@
+   }
+   d: (_|_){
+     // [cycle] cycle error:
+-    //     ./in.cue:6:4
++    //     ./in.cue:7:4
+   }
+   e: (_|_){
+     // [cycle] cycle error:
+-    //     ./in.cue:6:4
++    //     ./in.cue:7:4
+   }
+   issue3669: (struct){
+     #Schema: (#struct){
+       two: (_|_){
+         // [cycle] cycle error:
+-        //     ./issue3669.cue:4:8
+-      }
+-      one: (_|_){
+-        // [cycle] cycle error:
+-        //     ./issue3669.cue:4:8
++        //     ./issue3669.cue:5:8
++      }
++      one: (_|_){
++        // [cycle] cycle error:
++        //     ./issue3669.cue:5:8
+       }
+     }
+     out: (#struct){
+       two: (_|_){
+         // [cycle] cycle error:
+-        //     ./issue3669.cue:4:8
+-      }
+-      one: (int){ -1 }
++        //     ./issue3669.cue:5:8
++      }
++      one: (_|_){
++        // [cycle] cycle error:
++        //     ./issue3669.cue:5:8
++      }
+     }
+   }
+ }
 -- out/eval --
 (struct){
   a: (_|_){
@@ -77,5 +181,32 @@ diff old new
   c: (#list){
     0: (_){ _ }
     1: (_){ _ }
+  }
+  d: (_|_){
+    // [cycle] cycle error:
+    //     ./in.cue:6:4
+  }
+  e: (_|_){
+    // [cycle] cycle error:
+    //     ./in.cue:6:4
+  }
+  issue3669: (struct){
+    #Schema: (#struct){
+      two: (_|_){
+        // [cycle] cycle error:
+        //     ./issue3669.cue:4:8
+      }
+      one: (_|_){
+        // [cycle] cycle error:
+        //     ./issue3669.cue:4:8
+      }
+    }
+    out: (#struct){
+      two: (_|_){
+        // [cycle] cycle error:
+        //     ./issue3669.cue:4:8
+      }
+      one: (int){ -1 }
+    }
   }
 }

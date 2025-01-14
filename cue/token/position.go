@@ -112,14 +112,14 @@ func (p Pos) String() string {
 }
 
 // Compare returns an integer comparing two positions. The result will be 0 if p == p2,
-// -1 if p < p2, and +1 if p > p2. Note that [NoPos] is always smaller than any valid position.
+// -1 if p < p2, and +1 if p > p2. Note that [NoPos] is always larger than any valid position.
 func (p Pos) Compare(p2 Pos) int {
 	if p == p2 {
 		return 0
 	} else if p == NoPos {
-		return -1
-	} else if p2 == NoPos {
 		return +1
+	} else if p2 == NoPos {
+		return -1
 	}
 	pos, pos2 := p.Position(), p2.Position()
 	if c := cmp.Compare(pos.Filename, pos2.Filename); c != 0 {
@@ -132,9 +132,11 @@ func (p Pos) Compare(p2 Pos) int {
 }
 
 // NoPos is the zero value for [Pos]; there is no file and line information
-// associated with it, and [Pos.IsValid] is false. NoPos is always
-// smaller than any valid [Pos] value. The corresponding [Position] value
-// for NoPos is the zero value.
+// associated with it, and [Pos.IsValid] is false.
+//
+// NoPos is always larger than any valid [Pos] value, as it tends to relate
+// to values produced from evaluating existing values with valid positions.
+// The corresponding [Position] value for NoPos is the zero value.
 var NoPos = Pos{}
 
 // RelPos indicates the relative position of token to the previous token.

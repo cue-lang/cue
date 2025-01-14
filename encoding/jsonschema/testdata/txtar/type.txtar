@@ -37,9 +37,6 @@ close({
 	intString?: null | bool | int | string | [...]
 	object?: {
 		...
-	} | *{
-		foo: "bar"
-		baz: 1.3
 	}
-	numOrList?: matchN(1, [number, [...number]]) | *[1, 2, 3]
+	numOrList?: matchN(1, [number, [...number]])
 })

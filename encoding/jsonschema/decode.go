@@ -451,8 +451,6 @@ type state struct {
 	all      constraintInfo // values and oneOf etc.
 	nullable *ast.BasicLit  // nullable
 
-	default_     ast.Expr
-	examples     []ast.Expr
 	exclusiveMin bool // For OpenAPI and legacy support.
 	exclusiveMax bool // For OpenAPI and legacy support.
 
@@ -678,19 +676,6 @@ func (s *state) finalize() (e ast.Expr) {
 	a := []ast.Expr{e}
 	if s.nullable != nil {
 		a = []ast.Expr{s.nullable, e}
-	}
-
-outer:
-	switch {
-	case s.default_ != nil:
-		// check conditions where default can be skipped.
-		switch x := s.default_.(type) {
-		case *ast.ListLit:
-			if s.allowedTypes == cue.ListKind && len(x.Elts) == 0 {
-				break outer
-			}
-		}
-		a = append(a, &ast.UnaryExpr{Op: token.MUL, X: s.default_})
 	}
 
 	e = ast.NewBinExpr(token.OR, a...)

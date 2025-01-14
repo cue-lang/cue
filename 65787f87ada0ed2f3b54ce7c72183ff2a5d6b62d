@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f81d2e7a_d286b7d0",
+        "filename": "cmd/cue/cmd/modrename.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-14T13:45:02Z",
+      "side": 1,
+      "message": "use `source.ReadAll` directly; it already handles `file.Source` being `[]byte`.\n\nEven more than that - `parser.ParseFile` arlready does this for you, so you should not be calling `source.ReadAll` yourself.\n\nI suspect you copied this from fmt.go, which had the first problem (fixed in https://review.gerrithub.io/c/cue-lang/cue/+/1207149). The second problem is not present there, as fmt.go does need to retain the original bytes for comparison.",
+      "revId": "65787f87ada0ed2f3b54ce7c72183ff2a5d6b62d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c59e3659_9ae688b7",
+        "filename": "cmd/cue/cmd/modrename.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-14T13:45:02Z",
+      "side": 1,
+      "message": "reuse `ast.File.Preamble` so that you only need to check for `ast.ImportDecl` types, and drop the `break outer` logic.",
+      "revId": "65787f87ada0ed2f3b54ce7c72183ff2a5d6b62d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ddaf984d_0303b310",
+        "filename": "cmd/cue/cmd/modrename.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-14T13:45:02Z",
+      "side": 1,
+      "message": "nit: nested module, to not be confusing with git submodules",
+      "range": {
+        "startLine": 186,
+        "startChar": 65,
+        "endLine": 186,
+        "endChar": 74
+      },
+      "revId": "65787f87ada0ed2f3b54ce7c72183ff2a5d6b62d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa331c60_6d82c7b0",
+        "filename": "cmd/cue/cmd/modrename.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-14T13:45:02Z",
+      "side": 1,
+      "message": "this sounds like something we might want to expose/reuse in one of the mod packages, even if internal.",
+      "revId": "65787f87ada0ed2f3b54ce7c72183ff2a5d6b62d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

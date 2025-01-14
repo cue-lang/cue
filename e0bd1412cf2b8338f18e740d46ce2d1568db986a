@@ -107,6 +107,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b629ced4_e6c35b1f",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_non_local.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-14T07:35:50Z",
+      "side": 1,
+      "message": "There is not package root in the file and indeed that change does not work. So I\u0027m not sure what you are suggesting.\n\nI\u0027m just don\u0027t quite understand this test.\n\nI\u0027ve disabled it, allowing you to fix an reenable it in a separate CL.",
+      "parentUuid": "feacae91_c800c923",
+      "revId": "e0bd1412cf2b8338f18e740d46ce2d1568db986a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "47dfcf6b_b9d7b8fa",
         "filename": "cmd/cue/cmd/testdata/script/pkg_patterns.txtar",
         "patchSetId": 1

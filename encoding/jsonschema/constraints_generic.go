@@ -50,11 +50,8 @@ func constraintConst(key string, n cue.Value, s *state) {
 }
 
 func constraintDefault(key string, n cue.Value, s *state) {
-	sc := *s
-	s.default_ = sc.value(n)
-	// TODO: must validate that the default is subsumed by the normal value,
-	// as CUE will otherwise broaden the accepted values with the default.
-	s.examples = append(s.examples, s.default_)
+	// TODO make the default value available in a separate
+	// template-like CUE value outside of the usual schema output.
 }
 
 func constraintDeprecated(key string, n cue.Value, s *state) {
@@ -90,12 +87,6 @@ func constraintExamples(key string, n cue.Value, s *state) {
 	if n.Kind() != cue.ListKind {
 		s.errf(n, `value of "examples" must be an array, found %v`, n.Kind())
 	}
-	// TODO: implement examples properly.
-	// for _, n := range s.listItems("examples", n, true) {
-	// 	if ex := s.value(n); !isAny(ex) {
-	// 		s.examples = append(s.examples, ex)
-	// 	}
-	// }
 }
 
 func constraintNullable(key string, n cue.Value, s *state) {

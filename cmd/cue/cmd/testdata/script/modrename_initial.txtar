@@ -1,0 +1,81 @@
+# Test the basic functionality of cue mod rename.
+
+cp cue.mod/module.cue module.cue-0
+exec cue mod rename main.org@v0
+cmp cue.mod/module.cue module.cue-0
+
+exec cue mod rename other.org@v0
+cmp cue.mod/module.cue module.cue-1
+cmp x.cue x.cue-1
+cmp foo/foo.cue foo/foo.cue-1
+
+exec cue mod rename another.blah/a
+cmp cue.mod/module.cue module.cue-2
+cmp x.cue x.cue-2
+cmp foo/foo.cue foo/foo.cue-2
+
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.9.0-alpha.0"
+-- a.cue --
+package a
+
+foo: "a"
+-- x.cue --
+package x
+
+import (
+	"main.org/foo"
+	"main.organization/blah"
+	"something.else"
+)
+
+foo.bar
+-- foo/foo.cue --
+package foo
+
+import "main.org:a"
+
+a.foo
+-- module.cue-1 --
+module: "other.org@v0"
+language: {
+	version: "v0.9.0-alpha.0"
+}
+-- x.cue-1 --
+package x
+
+import (
+	"other.org/foo"
+	"main.organization/blah"
+	"something.else"
+)
+
+foo.bar
+-- foo/foo.cue-1 --
+package foo
+
+import "other.org:a"
+
+a.foo
+-- module.cue-2 --
+module: "another.blah/a"
+language: {
+	version: "v0.9.0-alpha.0"
+}
+-- x.cue-2 --
+package x
+
+import (
+	"another.blah/a/foo"
+	"main.organization/blah"
+	"something.else"
+)
+
+foo.bar
+-- foo/foo.cue-2 --
+package foo
+
+import "another.blah/a"
+
+a.foo

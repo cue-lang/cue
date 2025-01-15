@@ -39,6 +39,24 @@
       "message": "I\u0027m a bit torn on this.\nOn the one hand, the code is more explicit and more obvious and that\u0027s all good; easier to detect errors etc etc.\nOn the other hand, it\u0027s another piece of state to manage and remember to pass around. I could imagine deciding a few months down the line \"hey the lifecycle of this bit of state is the same as closeContext, let\u0027s just use that - it\u0027ll simplify a bunch of function signatures\". Engineering is never straight-forward.",
       "revId": "499e69a42d855262fc1c9aa56adaaa7e81660d71",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d31d22f_e5b249a0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-15T10:19:05Z",
+      "side": 1,
+      "message": "Yeah, that is why I did that originally. It has been quite helpful in debugging, though. Also note that the closeContext are not unique per hole, whereas the holeIDs are. It shouldn\u0027t really matter, but that is not trivially the case, so it makes understanding why it works harder.",
+      "parentUuid": "1fed53db_936de0c3",
+      "revId": "499e69a42d855262fc1c9aa56adaaa7e81660d71",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -212,12 +212,12 @@ fail.both.notList: conflicting values [1,2,3] and {doc?:_} (mismatched types lis
     ./cuetest/all.cue:5:24
     ./cuetest/fail_check.cue:7:12
     ./cuetest/fail_check.cue:7:17
-    ./root/root.cue:76:8
+    ./root/root.cue:81:8
 fail.both.notString: conflicting values "not_a_struct" and {doc?:_} (mismatched types string and struct):
     ./cuetest/all.cue:4:24
     ./cuetest/fail_check.cue:7:12
     ./cuetest/fail_check.cue:7:17
-    ./root/root.cue:76:8
+    ./root/root.cue:81:8
 fail.cue."11_Int8".types.Int8: invalid value 99999 (out of bound <=127):
     ./cuetest/all.cue:62:30
 fail.cue."12_Int8".types.Int8: invalid value -99999 (out of bound >=-128):
@@ -259,18 +259,18 @@ fail.cue.discBoth.discriminatorField.one: field not allowed:
     ./cuetest/all.cue:14:43
     ./cuetest/fail_check.cue:7:12
     ./cuetest/fail_check.cue:7:17
-    ./root/root.cue:69:50
+    ./root/root.cue:74:50
 fail.cue.discBoth.discriminatorField.two: field not allowed:
     ./cuetest/all.cue:14:51
     ./cuetest/fail_check.cue:7:12
     ./cuetest/fail_check.cue:7:17
-    ./root/root.cue:69:29
+    ./root/root.cue:74:29
 fail.cue.isNotEqual.mustEqual2: conflicting values 8 and 99:
     ./cuetest/all.cue:11:37
     ./cuetest/all.cue:11:52
     ./cuetest/fail_check.cue:7:12
     ./cuetest/fail_check.cue:7:17
-    ./root/root.cue:72:15
+    ./root/root.cue:77:15
 fail.cue."34_NumericBounds".types.NumericBounds: invalid value 5555 (out of bound <100):
     ./root/types.cue:37:28
     ./cuetest/all.cue:87:43
@@ -291,7 +291,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"go/constant"
+	"go/token"
 	"os"
+	"reflect"
 	"slices"
 
 	"foo.test/bar/root"
@@ -307,15 +309,26 @@ type Tests struct {
 
 func main() {
 	// Sanity check that some types and fields are what we expect them to be.
+	var _ root.AttrChangedName
+	var _ = root.AttrType(constant.Kind(0))
+
+	// It's easier to test the fields with a root value.
+	// We use reflection to ensure that inline struct pointers are initialized.
 	var zeroRoot root.Root
+	fv := reflect.ValueOf(&zeroRoot).Elem().FieldByName("Fields")
+	fv.Set(reflect.New(fv.Type().Elem()))
+
 	var _ = zeroRoot.Embedded1
 	var _ = zeroRoot.Embedded2
 	// TODO: embedded structs should remain
 	// var _ = root.Root.EmbeddedStruct
 	var _ = zeroRoot.AttrChangedName
+	var _ = zeroRoot.AttrChangedNameNested
 	zeroRoot.AttrType = constant.Kind(0)
-	var _ root.AttrChangedName
-	var _ = root.AttrType(constant.Kind(0))
+	zeroRoot.AttrTypeCompat = token.Token(0)
+	// zeroRoot.AttrTypeNested = make(map[any]any)
+	zeroRoot.Fields.OptionalStruct = &root.EmptyStruct{}
+	// zeroRoot.Fields.OptionalStructAttrType = root.EmptyStruct{}
 
 	// Sanity check that Go can JSON decode all the values we expect.
 	// We also re-encode the ones we expect CUE to be able to validate again.
@@ -411,9 +424,12 @@ _#overridenNeverGenerate: string
 		regular:   int
 		required?: int
 
-		// Optional types are represented as *T in Go if they are not already nullable.
+		// Optional types are represented as *T in Go if they are structs.
 		optional?:         int
 		optionalNullable?: [...int]
+
+		optionalStruct?: #emptyStruct
+		optionalStructAttrType?: #emptyStruct @go(,type=EmptyStruct)
 
 		regularStruct: field?: int
 
@@ -425,9 +441,11 @@ _#overridenNeverGenerate: string
 	_hiddenNeverGenerate: int
 
 	attrName?:       int @go(AttrChangedName)
+	attrNameNested?: int @go(AttrChangedNameNested)
 	attrType?:       _#overridenNeverGenerate @go(,type=go/constant.Kind)
 	// For compatibility with `cue get go`, an unnamed second value is also a type.
 	attrTypeCompat?: _#overridenNeverGenerate @go(,go/token.Token)
+	attrTypeNested?: {one?: two?: three?: int} @go(,type=map[any]any)
 
 	// doc is a great field.
 	//
@@ -641,10 +659,14 @@ type Root struct {
 
 		Required int64 `json:"required,omitempty"`
 
-		// Optional types are represented as *T in Go if they are not already nullable.
+		// Optional types are represented as *T in Go if they are structs.
 		Optional int64 `json:"optional,omitempty"`
 
 		OptionalNullable []int64 `json:"optionalNullable,omitempty"`
+
+		OptionalStruct *EmptyStruct `json:"optionalStruct,omitempty"`
+
+		OptionalStructAttrType *EmptyStruct `json:"optionalStructAttrType,omitempty"`
 
 		RegularStruct struct {
 			Field int64 `json:"field,omitempty"`
@@ -659,10 +681,14 @@ type Root struct {
 
 	AttrChangedName int64 `json:"attrName,omitempty"`
 
+	AttrChangedNameNested int64 `json:"attrNameNested,omitempty"`
+
 	AttrType constant.Kind `json:"attrType,omitempty"`
 
 	// For compatibility with `cue get go`, an unnamed second value is also a type.
 	AttrTypeCompat token.Token `json:"attrTypeCompat,omitempty"`
+
+	AttrTypeNested *map[any]any `json:"attrTypeNested,omitempty"`
 
 	// doc is a great field.
 	//

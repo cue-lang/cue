@@ -638,13 +638,13 @@ type Types struct {
 
 	Duration string/* CUE time.Duration */ `json:"Duration,omitempty"`
 
-	StringOrInt any/* TODO: IncompleteKind: (int|string) */ `json:"StringOrInt,omitempty"`
+	StringOrInt any/* CUE disjunction: (int|string) */ `json:"StringOrInt,omitempty"`
 
-	StringOrIntDefault any/* TODO: IncompleteKind: (int|string) */ `json:"StringOrIntDefault,omitempty"`
+	StringOrIntDefault any/* CUE disjunction: (int|string) */ `json:"StringOrIntDefault,omitempty"`
 
-	NullOrStruct any/* TODO: IncompleteKind: (null|struct) */ `json:"NullOrStruct,omitempty"`
+	NullOrStruct any/* CUE disjunction: (null|struct) */ `json:"NullOrStruct,omitempty"`
 
-	NullOrString any/* TODO: IncompleteKind: (null|string) */ `json:"NullOrString,omitempty"`
+	NullOrString any/* CUE disjunction: (null|string) */ `json:"NullOrString,omitempty"`
 
 	NumericBounds any/* CUE number; int64 or float64 */ `json:"NumericBounds,omitempty"`
 

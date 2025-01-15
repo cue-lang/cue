@@ -316,6 +316,12 @@ func (g *generator) emitType(val cue.Value, optional bool) error {
 	// TODO: uint64 would be marginally better than int64 for unsigned integer types
 
 	default:
+		// A disjunction of various kinds cannot be represented in Go, as it does not have sum types.
+		// Also see the potential approaches in the TODO about disjunctions of structs.
+		if op, _ := val.Expr(); op == cue.OrOp {
+			g.appendf("any /* CUE disjunction: %s */", k)
+			break
+		}
 		g.appendf("any /* TODO: IncompleteKind: %s */", k)
 	}
 	return nil

@@ -69,16 +69,31 @@ patternCycle: t1: p3: {
 	countries: "US" | "GB" | "AU"
 }
 
+-- intpattern.cue --
+issue3670: {
+	#X: [int]: string
+	a: #X
+	a: "not_int": "c"
+}
+dual: {
+	_
+	// As long as it is undecided whether this is a struct or list, this should
+	// not be a conflict. Note that the spec does not allow int patterns, but
+	// both v2 and v3 allow it, and we soon will, so it seems gratuitous to
+	// break it now.
+	[string]: _
+	[int]: _
+}
 -- out/eval/stats --
 Leaks:  4
-Freed:  80
-Reused: 73
+Freed:  85
+Reused: 78
 Allocs: 11
 Retain: 12
 
-Unifications: 63
-Conjuncts:    126
-Disjuncts:    90
+Unifications: 68
+Conjuncts:    135
+Disjuncts:    95
 -- out/evalalpha --
 Errors:
 t1.c.z: field not allowed:
@@ -142,6 +157,14 @@ Result:
       }
     }
   }
+  issue3670: (struct){
+    #X: (#struct){
+    }
+    a: (#struct){
+      not_int: (string){ "c" }
+    }
+  }
+  dual: (_){ _ }
   patternCycle: (struct){
     issue2109: (struct){
       p1: (struct){
@@ -195,8 +218,12 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,30 +1,10 @@
+@@ -1,34 +1,10 @@
  Errors:
+-issue3670.a.not_int: field not allowed:
+-    ./intpattern.cue:2:6
+-    ./intpattern.cue:3:5
+-    ./intpattern.cue:4:5
  t1.c.z: field not allowed:
 -    ./in.cue:15:6
 -    ./in.cue:19:5
@@ -228,7 +255,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -37,16 +17,16 @@
+@@ -41,16 +17,16 @@
      }
    }
    d: (struct){
@@ -250,7 +277,7 @@ diff old new
    }
    t1: (_|_){
      // [eval]
-@@ -59,8 +39,7 @@
+@@ -63,8 +39,7 @@
        // [eval]
        z: (_|_){
          // [eval] t1.c.z: field not allowed:
@@ -260,7 +287,7 @@ diff old new
          //     ./in.cue:19:11
        }
      }
-@@ -76,93 +55,56 @@
+@@ -80,108 +55,64 @@
        // [eval]
        z: (_|_){
          // [eval] t2.c.z: field not allowed:
@@ -271,6 +298,24 @@ diff old new
        }
      }
    }
+-  issue3670: (_|_){
+-    // [eval]
++  issue3670: (struct){
+     #X: (#struct){
+     }
+-    a: (_|_){
+-      // [eval]
+-      not_int: (_|_){
+-        // [eval] issue3670.a.not_int: field not allowed:
+-        //     ./intpattern.cue:2:6
+-        //     ./intpattern.cue:3:5
+-        //     ./intpattern.cue:4:5
+-      }
++    a: (#struct){
++      not_int: (string){ "c" }
+     }
+   }
+   dual: (_){ _ }
 -  patternCycle: (_|_){
 -    // [eval]
 -    issue2109: (_|_){
@@ -407,6 +452,10 @@ Overall, the previous errors now passing is acceptable and consistent with
 the behavior of the new evaluator.
 -- out/eval --
 Errors:
+issue3670.a.not_int: field not allowed:
+    ./intpattern.cue:2:6
+    ./intpattern.cue:3:5
+    ./intpattern.cue:4:5
 t1.c.z: field not allowed:
     ./in.cue:15:6
     ./in.cue:19:5
@@ -490,6 +539,21 @@ Result:
       }
     }
   }
+  issue3670: (_|_){
+    // [eval]
+    #X: (#struct){
+    }
+    a: (_|_){
+      // [eval]
+      not_int: (_|_){
+        // [eval] issue3670.a.not_int: field not allowed:
+        //     ./intpattern.cue:2:6
+        //     ./intpattern.cue:3:5
+        //     ./intpattern.cue:4:5
+      }
+    }
+  }
+  dual: (_){ _ }
   patternCycle: (_|_){
     // [eval]
     issue2109: (_|_){
@@ -613,6 +677,23 @@ Result:
     c: (〈0;#a〉 & {
       z: 4
     })
+  }
+}
+--- intpattern.cue
+{
+  issue3670: {
+    #X: {
+      [int]: string
+    }
+    a: 〈0;#X〉
+    a: {
+      not_int: "c"
+    }
+  }
+  dual: {
+    _
+    [string]: _
+    [int]: _
   }
 }
 --- issue2109.cue

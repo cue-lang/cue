@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99c7882d_4e9361a5",
+        "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-15T12:08:33Z",
+      "side": 1,
+      "message": "why are these commented out?",
+      "revId": "1d8731847d9b869316f8b15788972a43696470c2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

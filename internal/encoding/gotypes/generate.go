@@ -201,23 +201,12 @@ func (g *generator) emitType(val cue.Value, optional bool) error {
 		g.appendf("%s", attrType)
 		return nil
 	}
-	// TODO: should we ensure that optional fields are always nilable in Go?
-	// On one hand this allows telling int64(0) apart from a missing field,
-	// but on the other, it's often unnecessary and leads to clumsy types.
-	// Perhaps add a @go() attribute parameter to require nullability.
-	//
-	// For now, only structs are always pointers when optional.
-	// This is necessary to allow recursive Go types such as linked lists.
-	// Pointers to structs are still OK in terms of UX, given that
-	// one can do X.PtrY.Z without needing to do (*X.PtrY).Z.
-	if optional && cue.Dereference(val).IncompleteKind() == cue.StructKind {
-		g.appendf("*")
-	}
 	// TODO: support nullable types, such as `null | #SomeReference` and
 	// `null | {foo: int}`.
-	if g.emitTypeReference(val) {
+	if g.emitTypeReference(val, optional) {
 		return nil
 	}
+
 	switch k := val.IncompleteKind(); k {
 	case cue.StructKind:
 		if elem := val.LookupPath(cue.MakePath(cue.AnyString)); elem.Err() == nil {
@@ -227,7 +216,22 @@ func (g *generator) emitType(val cue.Value, optional bool) error {
 			}
 			break
 		}
+		// A disjunction of structs cannot be represented in Go, as it does not have sum types.
+		// Fall back to a map of string to any, which is not ideal, but will work for any field.
+		//
+		// TODO: consider alternatives, such as:
+		// * For `#StructFoo | #StructBar`, generate named types for each disjunct,
+		//   and use `any` here as a sum type between them.
+		// * For a disjunction of closed structs, generate a flat struct with the superset
+		//   of all fields, akin to a C union.
+		if op, _ := val.Expr(); op == cue.OrOp {
+			g.appendf("map[string]any")
+			break
+		}
 		// TODO: treat a single embedding like `{[string]: int}` like we would `[string]: int`
+		if optional {
+			g.appendf("*")
+		}
 		g.appendf("struct {\n")
 		iter, err := val.Fields(cue.Definitions(true), cue.Optional(true))
 		if err != nil {
@@ -243,6 +247,15 @@ func (g *generator) emitType(val cue.Value, optional bool) error {
 			cueName := sel.String()
 			cueName = strings.TrimRight(cueName, "?!")
 			g.emitDocs(cueName, val.Doc())
+			// TODO: should we ensure that optional fields are always nilable in Go?
+			// On one hand this allows telling int64(0) apart from a missing field,
+			// but on the other, it's often unnecessary and leads to clumsy types.
+			// Perhaps add a @go() attribute parameter to require nullability.
+			//
+			// For now, only structs are always pointers when optional.
+			// This is necessary to allow recursive Go types such as linked lists.
+			// Pointers to structs are still OK in terms of UX, given that
+			// one can do X.PtrY.Z without needing to do (*X.PtrY).Z.
 			optional := sel.ConstraintType()&cue.OptionalConstraint != 0
 
 			// We want the Go name from just this selector, even when it's not a definition.
@@ -352,7 +365,7 @@ func goNameFromPath(path cue.Path, defsOnly bool) string {
 
 // emitTypeReference attempts to generate a CUE value as a Go type via a reference,
 // either to a type in the same Go package, or to a type in an imported package.
-func (g *generator) emitTypeReference(val cue.Value) bool {
+func (g *generator) emitTypeReference(val cue.Value, optional bool) bool {
 	// References to existing names, either from the same package or an imported package.
 	root, path := val.ReferencePath()
 	// TODO: surely there is a better way to check whether ReferencePath returned "no path",
@@ -367,6 +380,9 @@ func (g *generator) emitTypeReference(val cue.Value) bool {
 	unqualifiedPath := module.ParseImportPath(inst.ImportPath).Unqualified().String()
 
 	var sb strings.Builder
+	if optional && cue.Dereference(val).IncompleteKind() == cue.StructKind {
+		sb.WriteString("*")
+	}
 	if root != g.pkgRoot {
 		sb.WriteString(inst.PkgName)
 		sb.WriteString(".")

@@ -326,9 +326,9 @@ func main() {
 	var _ = zeroRoot.AttrChangedNameNested
 	zeroRoot.AttrType = constant.Kind(0)
 	zeroRoot.AttrTypeCompat = token.Token(0)
-	// zeroRoot.AttrTypeNested = make(map[any]any)
+	zeroRoot.AttrTypeNested = make(map[any]any)
 	zeroRoot.Fields.OptionalStruct = &root.EmptyStruct{}
-	// zeroRoot.Fields.OptionalStructAttrType = root.EmptyStruct{}
+	zeroRoot.Fields.OptionalStructAttrType = root.EmptyStruct{}
 
 	// Sanity check that Go can JSON decode all the values we expect.
 	// We also re-encode the ones we expect CUE to be able to validate again.
@@ -666,7 +666,7 @@ type Root struct {
 
 		OptionalStruct *EmptyStruct `json:"optionalStruct,omitempty"`
 
-		OptionalStructAttrType *EmptyStruct `json:"optionalStructAttrType,omitempty"`
+		OptionalStructAttrType EmptyStruct `json:"optionalStructAttrType,omitempty"`
 
 		RegularStruct struct {
 			Field int64 `json:"field,omitempty"`
@@ -688,7 +688,7 @@ type Root struct {
 	// For compatibility with `cue get go`, an unnamed second value is also a type.
 	AttrTypeCompat token.Token `json:"attrTypeCompat,omitempty"`
 
-	AttrTypeNested *map[any]any `json:"attrTypeNested,omitempty"`
+	AttrTypeNested map[any]any `json:"attrTypeNested,omitempty"`
 
 	// doc is a great field.
 	//

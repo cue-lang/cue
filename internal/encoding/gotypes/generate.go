@@ -83,7 +83,7 @@ func Generate(ctx *cue.Context, insts ...*build.Instance) error {
 
 			g.emitDocs(goName, val.Doc())
 			g.appendf("type %s ", goName)
-			if err := g.emitType(val); err != nil {
+			if err := g.emitType(val, false); err != nil {
 				return err
 			}
 			g.appendf("\n\n")
@@ -180,7 +180,7 @@ func (g *generator) addDef(path cue.Path) {
 // emitType generates a CUE value as a Go type.
 // When possible, the Go type is emitted in the form of a reference.
 // Otherwise, an inline Go type expression is used.
-func (g *generator) emitType(val cue.Value) error {
+func (g *generator) emitType(val cue.Value, optional bool) error {
 	goAttr := val.Attribute("go")
 	// We prefer the form @go(Name,type=pkg.Baz) as it is explicit and extensible,
 	// but we are also backwards compatible with @go(Name,pkg.Baz) as emitted by `cue get go`.
@@ -201,6 +201,18 @@ func (g *generator) emitType(val cue.Value) error {
 		g.appendf("%s", attrType)
 		return nil
 	}
+	// TODO: should we ensure that optional fields are always nilable in Go?
+	// On one hand this allows telling int64(0) apart from a missing field,
+	// but on the other, it's often unnecessary and leads to clumsy types.
+	// Perhaps add a @go() attribute parameter to require nullability.
+	//
+	// For now, only structs are always pointers when optional.
+	// This is necessary to allow recursive Go types such as linked lists.
+	// Pointers to structs are still OK in terms of UX, given that
+	// one can do X.PtrY.Z without needing to do (*X.PtrY).Z.
+	if optional && cue.Dereference(val).IncompleteKind() == cue.StructKind {
+		g.appendf("*")
+	}
 	// TODO: support nullable types, such as `null | #SomeReference` and
 	// `null | {foo: int}`.
 	if g.emitTypeReference(val) {
@@ -210,7 +222,7 @@ func (g *generator) emitType(val cue.Value) error {
 	case cue.StructKind:
 		if elem := val.LookupPath(cue.MakePath(cue.AnyString)); elem.Err() == nil {
 			g.appendf("map[string]")
-			if err := g.emitType(elem); err != nil {
+			if err := g.emitType(elem, false); err != nil {
 				return err
 			}
 			break
@@ -242,19 +254,7 @@ func (g *generator) emitType(val cue.Value) error {
 			}
 
 			g.appendf("%s ", goName)
-			// TODO: should we ensure that optional fields are always nilable in Go?
-			// On one hand this allows telling int64(0) apart from a missing field,
-			// but on the other, it's often unnecessary and leads to clumsy types.
-			// Perhaps add a @go() attribute parameter to require nullability.
-			//
-			// For now, only structs are always pointers when optional.
-			// This is necessary to allow recursive Go types such as linked lists.
-			// Pointers to structs are still OK in terms of UX, given that
-			// one can do X.PtrY.Z without needing to do (*X.PtrY).Z.
-			if optional && cue.Dereference(val).IncompleteKind() == cue.StructKind {
-				g.appendf("*")
-			}
-			if err := g.emitType(val); err != nil {
+			if err := g.emitType(val, optional); err != nil {
 				return err
 			}
 			// TODO: should we generate cuego tags like `cue:"expr"`?
@@ -275,7 +275,7 @@ func (g *generator) emitType(val cue.Value) error {
 		if !elem.Exists() {
 			// TODO: perhaps mention the original type.
 			g.appendf("any /* CUE closed list */")
-		} else if err := g.emitType(elem); err != nil {
+		} else if err := g.emitType(elem, false); err != nil {
 			return err
 		}
 

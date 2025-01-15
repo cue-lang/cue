@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7540ed5e_20e725c4",
+        "filename": "internal/core/adt/eval_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-15T10:20:01Z",
+      "side": 1,
+      "message": "the diff here is fractionally bigger than necessary because embed has jumped a line - maybe resort these key-value pairs.",
+      "revId": "c78b1a2c89d7253cdf11eeacc15b27439f1e6856",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

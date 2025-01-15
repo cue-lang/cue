@@ -227,6 +227,18 @@ func (g *generator) emitType(val cue.Value, optional bool) error {
 			}
 			break
 		}
+		// A disjunction of structs cannot be represented in Go, as it does not have sum types.
+		// Fall back to a map of string to any, which is not ideal, but will work for any field.
+		//
+		// TODO: consider alternatives, such as:
+		// * For `#StructFoo | #StructBar`, generate named types for each disjunct,
+		//   and use `any` here as a sum type between them.
+		// * For a disjunction of closed structs, generate a flat struct with the superset
+		//   of all fields, akin to a C union.
+		if op, _ := val.Expr(); op == cue.OrOp {
+			g.appendf("map[string]any")
+			break
+		}
 		// TODO: treat a single embedding like `{[string]: int}` like we would `[string]: int`
 		g.appendf("struct {\n")
 		iter, err := val.Fields(cue.Definitions(true), cue.Optional(true))

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a3f34af_a0c12493",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-01-15T13:55:55Z",
+      "side": 1,
+      "message": "This also appears to fix #3678 but I will let you confirm that for yourself to ensure that I\u0027m not attributing the wrong fix!",
+      "revId": "dbae3bbd7990d6115755afa907d8cc35fb29d289",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

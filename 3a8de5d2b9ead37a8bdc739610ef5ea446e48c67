@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "153fe998_62acf743",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-15T12:06:43Z",
+      "side": 1,
+      "message": "LGTM modulo one issue. Pointers for structs are necessary, but given we\u0027re not generating pointers for other types, I don\u0027t think we should generate one for this case either.",
+      "revId": "3a8de5d2b9ead37a8bdc739610ef5ea446e48c67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b16ee44_d8e90a32",
+        "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 720,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-15T12:06:43Z",
+      "side": 1,
+      "message": "I don\u0027t think this should be a pointer.",
+      "revId": "3a8de5d2b9ead37a8bdc739610ef5ea446e48c67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

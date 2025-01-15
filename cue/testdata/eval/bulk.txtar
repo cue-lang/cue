@@ -102,6 +102,9 @@ t1.c.z: field not allowed:
 t2.c.z: field not allowed:
     ./in.cue:24:16
     ./in.cue:27:11
+issue3670.a.not_int: field not allowed:
+    ./intpattern.cue:2:13
+    ./intpattern.cue:4:5
 
 Result:
 (_|_){
@@ -157,11 +160,17 @@ Result:
       }
     }
   }
-  issue3670: (struct){
+  issue3670: (_|_){
+    // [eval]
     #X: (#struct){
     }
-    a: (#struct){
-      not_int: (string){ "c" }
+    a: (_|_){
+      // [eval]
+      not_int: (_|_){
+        // [eval] issue3670.a.not_int: field not allowed:
+        //     ./intpattern.cue:2:13
+        //     ./intpattern.cue:4:5
+      }
     }
   }
   dual: (_){ _ }
@@ -218,7 +227,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,34 +1,10 @@
+@@ -1,34 +1,13 @@
  Errors:
 -issue3670.a.not_int: field not allowed:
 -    ./intpattern.cue:2:6
@@ -252,10 +261,13 @@ diff old new
 -patternCycle.t1.p3.countries: cyclic pattern constraint:
 -    ./issue2109.cue:37:15
 -    ./issue2109.cue:38:13
++issue3670.a.not_int: field not allowed:
++    ./intpattern.cue:2:13
++    ./intpattern.cue:4:5
  
  Result:
  (_|_){
-@@ -41,16 +17,16 @@
+@@ -41,16 +20,16 @@
      }
    }
    d: (struct){
@@ -277,7 +289,7 @@ diff old new
    }
    t1: (_|_){
      // [eval]
-@@ -63,8 +39,7 @@
+@@ -63,8 +42,7 @@
        // [eval]
        z: (_|_){
          // [eval] t1.c.z: field not allowed:
@@ -287,7 +299,7 @@ diff old new
          //     ./in.cue:19:11
        }
      }
-@@ -80,108 +55,64 @@
+@@ -80,8 +58,7 @@
        // [eval]
        z: (_|_){
          // [eval] t2.c.z: field not allowed:
@@ -297,22 +309,15 @@ diff old new
          //     ./in.cue:27:11
        }
      }
-   }
--  issue3670: (_|_){
--    // [eval]
-+  issue3670: (struct){
-     #X: (#struct){
-     }
--    a: (_|_){
--      // [eval]
--      not_int: (_|_){
--        // [eval] issue3670.a.not_int: field not allowed:
+@@ -94,94 +71,57 @@
+       // [eval]
+       not_int: (_|_){
+         // [eval] issue3670.a.not_int: field not allowed:
 -        //     ./intpattern.cue:2:6
 -        //     ./intpattern.cue:3:5
--        //     ./intpattern.cue:4:5
--      }
-+    a: (#struct){
-+      not_int: (string){ "c" }
++        //     ./intpattern.cue:2:13
+         //     ./intpattern.cue:4:5
+       }
      }
    }
    dual: (_){ _ }

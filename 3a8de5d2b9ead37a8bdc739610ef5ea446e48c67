@@ -33,6 +33,24 @@
       "message": "I don\u0027t think this should be a pointer.",
       "revId": "3a8de5d2b9ead37a8bdc739610ef5ea446e48c67",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce39b910_aba03b96",
+        "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 720,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-15T12:20:58Z",
+      "side": 1,
+      "message": "Oops, the logic was buggy so we were always generating pointers to maps. Fixed with tests, PTAL.",
+      "parentUuid": "2b16ee44_d8e90a32",
+      "revId": "3a8de5d2b9ead37a8bdc739610ef5ea446e48c67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

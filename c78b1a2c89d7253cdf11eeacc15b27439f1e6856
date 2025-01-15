@@ -16,6 +16,24 @@
       "message": "the diff here is fractionally bigger than necessary because embed has jumped a line - maybe resort these key-value pairs.",
       "revId": "c78b1a2c89d7253cdf11eeacc15b27439f1e6856",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4465c757_a283fe67",
+        "filename": "internal/core/adt/eval_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-15T13:43:34Z",
+      "side": 1,
+      "message": "It was an attempt to keep things sorted, but I\u0027ll move it back",
+      "parentUuid": "7540ed5e_20e725c4",
+      "revId": "c78b1a2c89d7253cdf11eeacc15b27439f1e6856",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -16,6 +16,24 @@
       "message": "I am confused; a test was already added in https://review.gerrithub.io/c/cue-lang/cue/+/1206941, which was followed by the fix. And the issue is now closed.",
       "revId": "e78f5eb7261303c518c70e631e306111ecb87d97",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b0ee3a2_f8e36708",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-15T08:35:47Z",
+      "side": 1,
+      "message": "Weird. Somehow I thought it was still open. Works for me. :) I\u0027ll abandon.",
+      "parentUuid": "1f75e014_f61aa389",
+      "revId": "e78f5eb7261303c518c70e631e306111ecb87d97",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

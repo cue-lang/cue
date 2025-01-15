@@ -1,0 +1,8 @@
+go mod edit -replace=cuelang.org/go=%s
+go mod tidy
+
+-- go.mod --
+module mod.example
+-- deps.go --
+package deps
+import _ "cuelang.org/go/cmd/cue"

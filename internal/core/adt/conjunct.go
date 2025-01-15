@@ -740,14 +740,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 	case Validator:
 		// This check serves as simplifier, but also to remove duplicates.
 		cx := MakeConjunct(env, x, id)
-		for i, y := range n.checks {
-			if b, ok := SimplifyValidator(ctx, cx, y); ok {
-				n.checks[i] = b
-				return
-			}
-		}
 		kind := x.Kind()
-		n.updateNodeType(kind, x, id)
 		// A validator that is inserted in a closeContext should behave like top
 		// in the sense that the closeContext should not be closed if no other
 		// value is present that would erase top (cc.hasNonTop): if a field is
@@ -756,6 +749,14 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 		if kind&(ListKind|StructKind) != 0 {
 			id.cc.hasTop = true
 		}
+
+		for i, y := range n.checks {
+			if b, ok := SimplifyValidator(ctx, cx, y); ok {
+				n.checks[i] = b
+				return
+			}
+		}
+
 		n.checks = append(n.checks, cx)
 
 		// We use set the type of the validator argument here to ensure that

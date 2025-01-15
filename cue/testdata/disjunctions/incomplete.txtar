@@ -49,16 +49,31 @@ issue782: {
 		interpolation: "override"
 	}
 }
+-- issue3680.cue --
+issue3680: t1: {
+	{} | {
+		a?: _|_
+		b?: _|_
+	}
+	{} | {}
+}
+issue3680: t2: {
+	x:	{} | {
+		a?: _|_
+		b?: _|_
+	}
+	x:	{} | {}
+}
 -- out/eval/stats --
 Leaks:  0
-Freed:  70
-Reused: 64
-Allocs: 6
+Freed:  98
+Reused: 88
+Allocs: 10
 Retain: 0
 
-Unifications: 40
-Conjuncts:    99
-Disjuncts:    70
+Unifications: 56
+Conjuncts:    132
+Disjuncts:    98
 -- out/eval --
 (struct){
   issue700: (struct){
@@ -134,6 +149,32 @@ Disjuncts:    70
       interpolation: (string){ "override" }
     }
   }
+  issue3680: (struct){
+    t1: (struct){ |((struct){
+      }, (struct){
+        a?: (_|_){
+          // [user] explicit error (_|_ literal) in source:
+          //     ./issue3680.cue:3:7
+        }
+        b?: (_|_){
+          // [user] explicit error (_|_ literal) in source:
+          //     ./issue3680.cue:4:7
+        }
+      }) }
+    t2: (struct){
+      x: (struct){ |((struct){
+        }, (struct){
+          a?: (_|_){
+            // [user] explicit error (_|_ literal) in source:
+            //     ./issue3680.cue:10:7
+          }
+          b?: (_|_){
+            // [user] explicit error (_|_ literal) in source:
+            //     ./issue3680.cue:11:7
+          }
+        }) }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -183,6 +224,27 @@ Disjuncts:    70
       inner: string
       interpolation: (string|"\(〈0;inner〉)")
       interpolation: "override"
+    }
+  }
+}
+--- issue3680.cue
+{
+  issue3680: {
+    t1: {
+      ({}|{
+        a?: _|_(explicit error (_|_ literal) in source)
+        b?: _|_(explicit error (_|_ literal) in source)
+      })
+      ({}|{})
+    }
+  }
+  issue3680: {
+    t2: {
+      x: ({}|{
+        a?: _|_(explicit error (_|_ literal) in source)
+        b?: _|_(explicit error (_|_ literal) in source)
+      })
+      x: ({}|{})
     }
   }
 }

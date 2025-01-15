@@ -16,6 +16,24 @@
       "message": "why are these commented out?",
       "revId": "1d8731847d9b869316f8b15788972a43696470c2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8afe10e4_b89468b5",
+        "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-15T12:09:22Z",
+      "side": 1,
+      "message": "because we generate pointers for them; the next commit fixes this and uncomments these test lines.",
+      "parentUuid": "99c7882d_4e9361a5",
+      "revId": "1d8731847d9b869316f8b15788972a43696470c2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

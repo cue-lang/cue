@@ -186,19 +186,32 @@ issue3474: topValidator: failType: {
 		if true {C: 1}
 	}
 }
-
+-- validator_is_top.cue --
+issue3639: {
+	a: {#X} & #X
+	a: b: 1
+	#X: matchN(1, [{b: int}])
+}
+issue3661: {
+	#X: matchN(1, [{ b!: int }])
+	a: b: 1
+	a: #X
+	["a"]: #X
+}
 -- out/eval/stats --
-Leaks:  1
-Freed:  117
-Reused: 110
-Allocs: 8
-Retain: 12
+Leaks:  3
+Freed:  144
+Reused: 137
+Allocs: 10
+Retain: 19
 
-Unifications: 118
-Conjuncts:    226
-Disjuncts:    131
+Unifications: 147
+Conjuncts:    274
+Disjuncts:    165
 -- out/evalalpha --
 Errors:
+issue3639.a.b: field not allowed:
+    ./validator_is_top.cue:3:5
 callOfCallToValidator.e: cannot call previously called validator b:
     ./in.cue:94:5
 issue3418.t1: invalid value "foo" (does not satisfy matchN): conflicting values 2 and 1:
@@ -244,6 +257,9 @@ issue3474.topValidator.failType.A: invalid value {C:1} (does not satisfy matchN)
     ./issue3474.cue:53:5
     ./issue3474.cue:53:12
     ./issue3474.cue:54:5
+issue3661.a.b: field not allowed:
+    ./validator_is_top.cue:7:6
+    ./validator_is_top.cue:8:5
 
 Result:
 (_|_){
@@ -457,12 +473,55 @@ Result:
       }
     }
   }
+  issue3639: (_|_){
+    // [eval]
+    a: (_|_){
+      // [eval] issue3639.a.b: field not allowed:
+      //     ./validator_is_top.cue:3:5
+      b: (_|_){
+        // [eval] issue3639.a.b: field not allowed:
+        //     ./validator_is_top.cue:3:5
+      }
+    }
+    #X: (_){ matchN(1, (#list){
+        0: (_|_){// &[{
+          //   b: int
+          // }]
+        }
+      }) }
+  }
+  issue3661: (_|_){
+    // [eval]
+    #X: (_){ matchN(1, (#list){
+        0: (_|_){// &[{
+          //   b!: int
+          // }]
+        }
+      }) }
+    a: (_|_){
+      // [eval] issue3661.a.b: field not allowed:
+      //     ./validator_is_top.cue:7:6
+      //     ./validator_is_top.cue:8:5
+      b: (_|_){
+        // [eval] issue3661.a.b: field not allowed:
+        //     ./validator_is_top.cue:7:6
+        //     ./validator_is_top.cue:8:5
+      }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -27,7 +27,7 @@
+@@ -1,4 +1,6 @@
+ Errors:
++issue3639.a.b: field not allowed:
++    ./validator_is_top.cue:3:5
+ callOfCallToValidator.e: cannot call previously called validator b:
+     ./in.cue:94:5
+ issue3418.t1: invalid value "foo" (does not satisfy matchN): conflicting values 2 and 1:
+@@ -27,7 +29,7 @@
      ./issue3418.cue:10:16
      ./issue3418.cue:10:18
      ./issue3418.cue:11:5
@@ -471,7 +530,17 @@ diff old new
      ./issue3474.cue:12:5
      ./issue3474.cue:12:22
      ./issue3474.cue:13:5
-@@ -134,11 +134,7 @@
+@@ -44,6 +46,9 @@
+     ./issue3474.cue:53:5
+     ./issue3474.cue:53:12
+     ./issue3474.cue:54:5
++issue3661.a.b: field not allowed:
++    ./validator_is_top.cue:7:6
++    ./validator_is_top.cue:8:5
+ 
+ Result:
+ (_|_){
+@@ -134,11 +139,7 @@
          0: (int){ 1 }
        }
      }
@@ -484,7 +553,7 @@ diff old new
        _a: (_|_){
          // [incomplete] issue2098.incomplete1._a: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1):
          //     ./in.cue:112:6
-@@ -202,7 +198,7 @@
+@@ -202,7 +203,7 @@
        failAfter: (_|_){
          // [eval]
          A: (_|_){
@@ -493,7 +562,7 @@ diff old new
            //     ./issue3474.cue:12:5
            //     ./issue3474.cue:12:22
            //     ./issue3474.cue:13:5
-@@ -245,7 +241,7 @@
+@@ -245,7 +246,7 @@
        }
        incomplete: (struct){
          A: (int){ &(matchN(1, (#list){
@@ -502,6 +571,65 @@ diff old new
              }
            }), int) }
        }
+@@ -261,26 +262,40 @@
+       }
+     }
+   }
+-  issue3639: (struct){
+-    a: (struct){
+-      b: (int){ 1 }
+-    }
+-    #X: (_){ matchN(1, (#list){
+-        0: (_|_){// {
++  issue3639: (_|_){
++    // [eval]
++    a: (_|_){
++      // [eval] issue3639.a.b: field not allowed:
++      //     ./validator_is_top.cue:3:5
++      b: (_|_){
++        // [eval] issue3639.a.b: field not allowed:
++        //     ./validator_is_top.cue:3:5
++      }
++    }
++    #X: (_){ matchN(1, (#list){
++        0: (_|_){// &[{
+           //   b: int
+-          // }
+-        }
+-      }) }
+-  }
+-  issue3661: (struct){
+-    #X: (_){ matchN(1, (#list){
+-        0: (_|_){// {
++          // }]
++        }
++      }) }
++  }
++  issue3661: (_|_){
++    // [eval]
++    #X: (_){ matchN(1, (#list){
++        0: (_|_){// &[{
+           //   b!: int
+-          // }
+-        }
+-      }) }
+-    a: (struct){
+-      b: (int){ 1 }
++          // }]
++        }
++      }) }
++    a: (_|_){
++      // [eval] issue3661.a.b: field not allowed:
++      //     ./validator_is_top.cue:7:6
++      //     ./validator_is_top.cue:8:5
++      b: (_|_){
++        // [eval] issue3661.a.b: field not allowed:
++        //     ./validator_is_top.cue:7:6
++        //     ./validator_is_top.cue:8:5
++      }
+     }
+   }
+ }
 -- out/eval --
 Errors:
 callOfCallToValidator.e: cannot call previously called validator b:
@@ -766,6 +894,28 @@ Result:
       }
     }
   }
+  issue3639: (struct){
+    a: (struct){
+      b: (int){ 1 }
+    }
+    #X: (_){ matchN(1, (#list){
+        0: (_|_){// {
+          //   b: int
+          // }
+        }
+      }) }
+  }
+  issue3661: (struct){
+    #X: (_){ matchN(1, (#list){
+        0: (_|_){// {
+          //   b!: int
+          // }
+        }
+      }) }
+    a: (struct){
+      b: (int){ 1 }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -1014,5 +1164,33 @@ Result:
         }
       }
     }
+  }
+}
+--- validator_is_top.cue
+{
+  issue3639: {
+    a: ({
+      〈1;#X〉
+    } & 〈0;#X〉)
+    a: {
+      b: 1
+    }
+    #X: matchN(1, [
+      {
+        b: int
+      },
+    ])
+  }
+  issue3661: {
+    #X: matchN(1, [
+      {
+        b!: int
+      },
+    ])
+    a: {
+      b: 1
+    }
+    a: 〈0;#X〉
+    ["a"]: 〈0;#X〉
   }
 }

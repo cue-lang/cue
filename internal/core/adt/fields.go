@@ -982,11 +982,6 @@ func (n *nodeContext) insertPattern(pattern Value, c Conjunct) {
 	if cc.isTotal {
 		return
 	}
-	if isTotal(pattern) {
-		cc.isTotal = true
-		cc.Patterns = cc.Patterns[:0]
-		return
-	}
 
 	// insert pattern in current set.
 	// TODO: normalize patterns

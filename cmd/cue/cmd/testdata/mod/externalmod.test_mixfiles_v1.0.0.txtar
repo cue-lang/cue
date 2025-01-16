@@ -1,0 +1,32 @@
+-- .mod --
+module externalmod.test/mixfiles
+
+-- .info --
+{"Version":"v1.0.0","Time":"2018-10-22T18:45:39Z"}
+
+-- go.mod --
+// A module which mixes CUE, Go, and other files, to be tested with `cue get go`.
+
+module externalmod.test/mixfiles
+
+-- aa_first_noextension --
+Mix an uninteresting file at the beginning of the directory list
+to verify that we don't stop looking at the rest of the files.
+-- code_one.go --
+package mixfiles
+
+// Some fruit
+const NameOne = "Orange"
+-- code_two.go --
+package mixfiles
+
+const NameTwo = "Apple"
+-- config_one.cue --
+package mixfiles
+
+Type: "Fruit"
+-- config_two.cue --
+package mixfiles
+
+Type: string
+-- zz_last_noextension --

@@ -460,7 +460,19 @@ Disjuncts:    8919
     }
     full: (struct){
       #RecurseN: (_|_){
-        // [cycle] cycle error
+        // [incomplete] issue2052.full.#RecurseN: error in call to list.Range: non-concrete value _:
+        //     ./issue2052.cue:111:15
+        #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
+        #funcFactory: (#struct){
+          #next: (_){ _ }
+          #func: (_){ _ }
+        }
+        #funcs: (_|_){
+          // [incomplete] issue2052.full.#RecurseN: error in call to list.Range: non-concrete value _:
+          //     ./issue2052.cue:111:15
+          // issue2052.full.#RecurseN.#funcs: invalid interpolation: non-concrete value _ (type _):
+          //     ./issue2052.cue:117:11
+        }
       }
       #DepthF: (#struct){
         #next: (_){ _ }
@@ -1145,30 +1157,35 @@ diff old new
            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
            out: (int){ 1 }
          }
-@@ -223,20 +215,8 @@
+@@ -223,19 +215,19 @@
        }
      }
      full: (struct){
 -      #RecurseN: (_){
 -        _
--        #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
--        #funcFactory: (#struct){
--          #next: (_){ _ }
--          #func: (_){ _ }
--        }
++      #RecurseN: (_|_){
++        // [incomplete] issue2052.full.#RecurseN: error in call to list.Range: non-concrete value _:
++        //     ./issue2052.cue:111:15
+         #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
+         #funcFactory: (#struct){
+           #next: (_){ _ }
+           #func: (_){ _ }
+         }
 -        #funcs: (#struct){
 -          "4": (null){ null }
 -          "0": (_){ _ }
 -          "1": (_){ _ }
 -          "2": (_){ _ }
 -          "3": (_){ _ }
--        }
-+      #RecurseN: (_|_){
-+        // [cycle] cycle error
++        #funcs: (_|_){
++          // [incomplete] issue2052.full.#RecurseN: error in call to list.Range: non-concrete value _:
++          //     ./issue2052.cue:111:15
++          // issue2052.full.#RecurseN.#funcs: invalid interpolation: non-concrete value _ (type _):
++          //     ./issue2052.cue:117:11
+         }
        }
        #DepthF: (#struct){
-         #next: (_){ _ }
-@@ -245,7 +225,13 @@
+@@ -245,7 +237,13 @@
            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
            out: (int){
              1
@@ -1183,7 +1200,7 @@ diff old new
            }
          }
        }
-@@ -258,98 +244,170 @@
+@@ -258,98 +256,170 @@
              #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
              out: (int){
                1
@@ -1446,7 +1463,7 @@ diff old new
              }
            }
          }
-@@ -357,7 +415,13 @@
+@@ -357,7 +427,13 @@
          #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
          out: (int){
            1
@@ -1461,7 +1478,7 @@ diff old new
          }
        }
        tree: (struct){
-@@ -371,49 +435,7 @@
+@@ -371,49 +447,7 @@
          }
          cow: (string){ "moo" }
        }
@@ -1512,7 +1529,7 @@ diff old new
          #in: (#struct){
            a: (#struct){
              foo: (string){ "bar" }
-@@ -425,6 +447,192 @@
+@@ -425,6 +459,192 @@
            }
            cow: (string){ "moo" }
          }

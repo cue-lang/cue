@@ -1,7 +1,7 @@
 # Basic test to ensure that the goproxytest instance used by various testscript
 # tests works as expected.
 
-go get externalmod.test/blah
+go get externalmod.test/mixfiles
 go mod tidy
 cmp go.mod go.mod.golden
 
@@ -15,15 +15,15 @@ package main
 import (
 	"fmt"
 
-	"externalmod.test/blah"
+	"externalmod.test/mixfiles"
 )
 
 func main() {
-	fmt.Println(blah.Orange)
+	fmt.Println(mixfiles.Orange)
 }
 -- go.mod.golden --
 module test
 
 go 1.14
 
-require externalmod.test/blah v1.0.0
+require externalmod.test/mixfiles v1.0.0

@@ -51,6 +51,24 @@
       "parentUuid": "8bab427c_c3b92248",
       "revId": "343763ed40401625164ec1ca0f1e760aee57ce62",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d01929c7_6037d692",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-01-16T17:40:07Z",
+      "side": 1,
+      "message": "Drive-by comment: more precisely either a `gen_` prefix or a basename (is the the correct phrase for the \"first bit before the `.`?) `_gen` suffix. Much easier to see in code review \"this is a file I shouldn\u0027t care about\"",
+      "parentUuid": "8bab427c_c3b92248",
+      "revId": "343763ed40401625164ec1ca0f1e760aee57ce62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -16,6 +16,24 @@
       "message": "can we document this like the others?",
       "revId": "730e71f8e4225f48886ca15f55c2001841eec3eb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "082764b7_c077cd3c",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1156,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-16T17:47:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d1ca6db5_d9cb181e",
+      "revId": "730e71f8e4225f48886ca15f55c2001841eec3eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

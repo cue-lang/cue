@@ -316,9 +316,7 @@ func (ctx *overlayContext) allocCC(cc *closeContext) *closeContext {
 	// We only explicitly tag dependencies of type ARC. Notifications that
 	// point within the disjunct overlay will be tagged elsewhere.
 	for _, a := range cc.arcs {
-		if a.kind == ARC {
-			ctx.allocCC(a.cc)
-		}
+		ctx.allocCC(a.cc)
 	}
 
 	return o
@@ -436,6 +434,8 @@ func (ctx *overlayContext) initCloneCC(x *closeContext) {
 	}
 
 	for _, a := range x.arcs {
+		// XXX Notify also?
+
 		// If an arc does not have an overlay, we should not decrement the
 		// dependency counter. We simply remove the dependency in that case.
 		if a.cc.overlay == nil {
@@ -446,6 +446,19 @@ func (ctx *overlayContext) initCloneCC(x *closeContext) {
 		}
 		a.cc = a.cc.overlay
 		o.arcs = append(o.arcs, a)
+	}
+
+	for _, a := range x.notify {
+		// If an arc does not have an overlay, we should not decrement the
+		// dependency counter. We simply remove the dependency in that case.
+		if a.cc.overlay == nil {
+			continue
+		}
+		if a.key.overlay != nil {
+			a.key = a.key.overlay // TODO: is this necessary?
+		}
+		a.cc = a.cc.overlay
+		o.notify = append(o.notify, a)
 	}
 
 	// NOTE: copying externalDeps is hard and seems unnecessary, as it needs to

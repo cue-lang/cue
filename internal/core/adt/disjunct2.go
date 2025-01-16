@@ -351,6 +351,21 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 		n.disjuncts = append(n.disjuncts, cross...)
 	}
 
+	var completed condition
+	numDefaults := 0
+	if len(n.disjuncts) == 1 {
+		completed = n.disjuncts[0].completed
+	}
+	for _, d := range n.disjuncts {
+		if d.defaultMode == isDefault {
+			numDefaults++
+			completed = d.completed
+		}
+	}
+	if numDefaults == 1 || len(n.disjuncts) == 1 {
+		n.signal(completed)
+	}
+
 	return nil
 }
 

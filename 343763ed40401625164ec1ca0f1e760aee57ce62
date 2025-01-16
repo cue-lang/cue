@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b98fcaf0_779f0f0d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-16T17:36:16Z",
+      "side": 1,
+      "message": "LGTM with one reservation regarding the naming of the generated files.",
+      "revId": "343763ed40401625164ec1ca0f1e760aee57ce62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8bab427c_c3b92248",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-16T17:36:16Z",
+      "side": 1,
+      "message": "I have to say I like the convention of having \"gen\" in the name of a generated file and I\u0027m a bit sorry to see that go.",
+      "revId": "343763ed40401625164ec1ca0f1e760aee57ce62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -218,10 +218,6 @@ type ccDep struct {
 }
 
 func (c *closeContext) addDependent(ctx *OpContext, kind depKind, dependant *closeContext) *ccDep {
-	if !DebugDeps {
-		return nil
-	}
-
 	if dependant == nil {
 		dependant = c
 	}
@@ -238,10 +234,6 @@ func (c *closeContext) addDependent(ctx *OpContext, kind depKind, dependant *clo
 
 // matchDecrement checks that this decrement matches a previous increment.
 func (c *closeContext) matchDecrement(ctx *OpContext, v *Vertex, kind depKind, dependant *closeContext) {
-	if !DebugDeps {
-		return
-	}
-
 	if dependant == nil {
 		dependant = c
 	}
@@ -267,7 +259,9 @@ func (c *closeContext) matchDecrement(ctx *OpContext, v *Vertex, kind depKind, d
 		return
 	}
 
-	panic(fmt.Sprintf("unmatched decrement: %s", kind))
+	if DebugDeps {
+		panic(fmt.Sprintf("unmatched decrement: %s", kind))
+	}
 }
 
 // mermaidContext is used to create a dependency analysis for a node.

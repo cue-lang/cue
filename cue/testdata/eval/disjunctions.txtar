@@ -317,10 +317,7 @@ Result:
   issue3681: (struct){
     out: (struct){
       one: (string){ |(*(string){ "fallback" }, (string){ string }) }
-      two: (_|_){
-        // [incomplete] issue3681.out.two: invalid interpolation: non-concrete value _ (type _):
-        //     ./dependencies.cue:26:12
-      }
+      two: (string){ "fallback" }
     }
     strDefault: (string){ |(*(string){ "fallback" }, (string){ string }) }
     #strDefaultDef: (string){ |(*(string){ "fallback" }, (string){ string }) }
@@ -647,19 +644,7 @@ diff old new
      }
      #S: ((string|struct)){ |((string){ string }, (#struct){
        }) }
-@@ -80,7 +69,10 @@
-   issue3681: (struct){
-     out: (struct){
-       one: (string){ |(*(string){ "fallback" }, (string){ string }) }
--      two: (string){ "fallback" }
-+      two: (_|_){
-+        // [incomplete] issue3681.out.two: invalid interpolation: non-concrete value _ (type _):
-+        //     ./dependencies.cue:26:12
-+      }
-     }
-     strDefault: (string){ |(*(string){ "fallback" }, (string){ string }) }
-     #strDefaultDef: (string){ |(*(string){ "fallback" }, (string){ string }) }
-@@ -110,19 +102,12 @@
+@@ -110,19 +99,12 @@
      // [eval] f: 2 errors in empty disjunction:
      // f.name: conflicting values "int" and "str":
      //     ./in.cue:5:8
@@ -680,7 +665,7 @@ diff old new
    }
    e1: (struct){
      a: ((null|struct)){ |((null){ null }, (struct){
-@@ -234,8 +219,8 @@
+@@ -234,8 +216,8 @@
      e: (struct){
        foobar: (#struct){
          b: (#struct){
@@ -690,7 +675,7 @@ diff old new
          }
        }
      }
-@@ -337,6 +322,9 @@
+@@ -337,6 +319,9 @@
            let Ok#1 = (bool){ true }
          }, (#struct){
            _ok: (bool){ true }

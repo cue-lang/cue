@@ -45,6 +45,46 @@
       },
       "revId": "4d5cb64a6273af788719f74ec056fba3dd5144da",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f47b074_cf7e2505",
+        "filename": "internal/core/adt/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-16T14:59:30Z",
+      "side": 1,
+      "message": "All of the `n.` in these doc strings should be `node.` ?",
+      "range": {
+        "startLine": 118,
+        "startChar": 36,
+        "endLine": 118,
+        "endChar": 37
+      },
+      "revId": "4d5cb64a6273af788719f74ec056fba3dd5144da",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0459028e_39a17ffc",
+        "filename": "internal/core/adt/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-16T14:59:30Z",
+      "side": 1,
+      "message": "To me, a method name with \"log\" in it probably doesn\u0027t mutate state. This looks to me to be a counterpart to n`.pop()`, If that\u0027s true, I wonder if a better name is possible?",
+      "revId": "4d5cb64a6273af788719f74ec056fba3dd5144da",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

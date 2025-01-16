@@ -242,12 +242,9 @@ func (ctx *overlayContext) cloneNodeContext(n *nodeContext) *nodeContext {
 	// d.cyclicConjuncts = append(d.cyclicConjuncts, n.cyclicConjuncts...)
 
 	if len(n.disjunctions) > 0 {
-		for _, de := range n.disjunctions {
-			// Do not clone cc, as it is identified by underlying. We only need
-			// to clone the cc in disjunctCCs.
-			// de.cloneID.cc = ctx.allocCC(de.cloneID.cc)
-			d.disjunctions = append(d.disjunctions, de)
-		}
+		// Do not clone cc in disjunctions, as it is identified by underlying.
+		// We only need to clone the cc in disjunctCCs.
+		d.disjunctions = append(d.disjunctions, n.disjunctions...)
 		for _, h := range n.disjunctCCs {
 			h.cc = ctx.allocCC(h.cc)
 			d.disjunctCCs = append(d.disjunctCCs, h)

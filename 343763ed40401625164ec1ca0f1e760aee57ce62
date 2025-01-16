@@ -69,6 +69,24 @@
       "parentUuid": "8bab427c_c3b92248",
       "revId": "343763ed40401625164ec1ca0f1e760aee57ce62",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5007a9c2_aec39bde",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-16T17:42:16Z",
+      "side": 1,
+      "message": "FWIW I sort of agree but I could not find a consistent consensus in Go; for example, the protobuf generator which is extremely popular will happily generate `foo.pb.go` from `foo.proto`, with no \"gen\" in sight.\n\nSo I\u0027m still happy to hear suggestions to replace the existing string in the code. I don\u0027t particularly like any of the ones I\u0027ve come up with.",
+      "parentUuid": "d01929c7_6037d692",
+      "revId": "343763ed40401625164ec1ca0f1e760aee57ce62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

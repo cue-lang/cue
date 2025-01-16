@@ -268,6 +268,15 @@ type closeContext struct {
 	// tree as this closeContext. In both cases the are keyed by Vertex.
 	arcs []ccArc
 
+	// notify represents closeContexts which to notify of updates.
+	//
+	// TODO: Note that this slice is very similar to nodeContext.notify and the
+	// use of these can likely be merged. It may be better to let the notify
+	// originate from a more specific closeContext, allowing it to stopped
+	// sooner and possibly even remove the need for breaking dependency
+	// cycles.
+	notify []ccArc
+
 	// parentIndex is the position in the parent's arcs slice that corresponds
 	// to this closeContext. This is currently unused. The intention is to use
 	// this to allow groups with single elements (which will be the majority)
@@ -315,7 +324,6 @@ func (c *closeContext) updateArcType(ctx *OpContext, t ArcType) {
 }
 
 type ccArc struct {
-	kind        depKind
 	decremented bool
 	// matched indicates the arc is only added to track the destination of a
 	// matched pattern and that it is not explicitly defined as a field.
@@ -331,6 +339,7 @@ type ccArc struct {
 // closeContext.
 type ccArcRef struct {
 	src   *closeContext
+	kind  depKind
 	index int
 }
 
@@ -464,7 +473,7 @@ func (cc *closeContext) getKeyedCC(ctx *OpContext, key *closeContext, c CycleInf
 }
 
 func (cc *closeContext) linkNotify(ctx *OpContext, key *closeContext) bool {
-	for _, a := range cc.arcs {
+	for _, a := range cc.notify {
 		if a.key == key {
 			return false
 		}
@@ -556,33 +565,67 @@ func (c *closeContext) addDependency(ctx *OpContext, kind depKind, matched bool,
 	// NOTE: do not increment
 	// - either root closeContext or otherwise resulting from sub closeContext
 	//   all conjuncts will be added now, notified, or scheduled as task.
-
-	child.incDependent(ctx, kind, c) // matched in decDependent REF(arcs)
-
-	for _, a := range c.arcs {
-		if a.key == key {
-			panic("addArc: Label already exists")
+	switch kind {
+	case ARC:
+		for _, a := range c.arcs {
+			if a.key == key {
+				panic("addArc: Label already exists")
+			}
 		}
+		child.incDependent(ctx, kind, c) // matched in decDependent REF(arcs)
+
+		c.arcs = append(c.arcs, ccArc{
+			matched: matched,
+			key:     key,
+			cc:      child,
+		})
+
+		// TODO: this tests seems sensible, but panics. Investigate what could
+		// trigger this.
+		// if child.src.Parent != c.src {
+		// 	panic("addArc: inconsistent parent")
+		// }
+		if child.src.cc() != root.src.cc() {
+			panic("addArc: inconsistent root")
+		}
+
+		root.externalDeps = append(root.externalDeps, ccArcRef{
+			src:   c,
+			kind:  kind,
+			index: len(c.arcs) - 1,
+		})
+	case NOTIFY:
+		for _, a := range c.notify {
+			if a.key == key {
+				panic("addArc: Label already exists")
+			}
+		}
+		child.incDependent(ctx, kind, c) // matched in decDependent REF(arcs)
+
+		c.notify = append(c.notify, ccArc{
+			matched: matched,
+			key:     key,
+			cc:      child,
+		})
+
+		// TODO: this tests seems sensible, but panics. Investigate what could
+		// trigger this.
+		// if child.src.Parent != c.src {
+		// 	panic("addArc: inconsistent parent")
+		// }
+		if child.src.cc() != root.src.cc() {
+			panic("addArc: inconsistent root")
+		}
+
+		root.externalDeps = append(root.externalDeps, ccArcRef{
+			src:   c,
+			kind:  kind,
+			index: len(c.notify) - 1,
+		})
+	default:
+		panic(kind)
 	}
 
-	// TODO: this tests seems sensible, but panics. Investigate what could
-	// trigger this.
-	// if child.src.Parent != c.src {
-	// 	panic("addArc: inconsistent parent")
-	// }
-	if child.src.cc() != root.src.cc() {
-		panic("addArc: inconsistent root")
-	}
-	c.arcs = append(c.arcs, ccArc{
-		kind:    kind,
-		matched: matched,
-		key:     key,
-		cc:      child,
-	})
-	root.externalDeps = append(root.externalDeps, ccArcRef{
-		src:   c,
-		index: len(c.arcs) - 1,
-	})
 }
 
 // incDependent needs to be called for any conjunct or child closeContext
@@ -650,7 +693,16 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 			continue
 		}
 		c.arcs[i].decremented = true
-		cc.decDependent(ctx, a.kind, c) // REF(arcs)
+		cc.decDependent(ctx, ARC, c)
+	}
+
+	for i, a := range c.notify {
+		cc := a.cc
+		if a.decremented {
+			continue
+		}
+		c.notify[i].decremented = true
+		cc.decDependent(ctx, NOTIFY, c)
 	}
 
 	c.finalizePattern()
@@ -1015,9 +1067,6 @@ func isTotal(p Value) bool {
 // this is not the case.
 func injectClosed(ctx *OpContext, closed, dst *closeContext) {
 	for _, a := range dst.arcs {
-		if a.kind != ARC {
-			continue
-		}
 		ca := a.cc
 		switch f := ca.Label(); {
 		case ca.src.ArcType == ArcOptional,

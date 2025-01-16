@@ -121,18 +121,33 @@ issue3546: reduced: {
 	out: #Network
 	out: val
 }
--- out/eval/stats --
-Leaks:  2
-Freed:  148
-Reused: 141
-Allocs: 9
-Retain: 19
+-- acrossdisjunction.cue --
+import "list"
 
-Unifications: 150
-Conjuncts:    309
-Disjuncts:    165
+issue3679: {
+	// The result of list.Repeat is structure shared in env. This needs to be
+	// "unshared" within the disjunction. Ensure that unsharing a shared Vertex
+	// works arcross disjunction boundaries.
+	b: null | [string]
+	b: list.Repeat([for k, v in [0] { "bar" }], 1)
+}
+-- out/eval/stats --
+Leaks:  3
+Freed:  158
+Reused: 151
+Allocs: 10
+Retain: 21
+
+Unifications: 159
+Conjuncts:    331
+Disjuncts:    177
 -- out/evalalpha --
 (struct){
+  issue3679: (struct){
+    b: (#list){
+      0: (string){ string }
+    }
+  }
   issue3641: (struct){
     simplified: (struct){
       t1: (struct){
@@ -359,7 +374,16 @@ Disjuncts:    165
 diff old new
 --- old
 +++ new
-@@ -11,102 +11,75 @@
+@@ -1,7 +1,7 @@
+ (struct){
+   issue3679: (struct){
+     b: (#list){
+-      0: (string){ "bar" }
++      0: (string){ string }
+     }
+   }
+   issue3641: (struct){
+@@ -16,102 +16,75 @@
            }
          }
          #Config1: (#struct){
@@ -531,7 +555,7 @@ diff old new
          }
          Config: (#struct){
            cfg: (#struct){
-@@ -132,24 +105,13 @@
+@@ -137,24 +110,13 @@
          }
        }
        #Config1: (#struct){
@@ -559,7 +583,7 @@ diff old new
        }
        #Config: (#struct){
          cfg: (#struct){
-@@ -157,12 +119,7 @@
+@@ -162,12 +124,7 @@
            }
          }
        }
@@ -573,7 +597,7 @@ diff old new
        out: (#struct){
          sch: (#struct){
            cfg: (#struct){
-@@ -231,9 +188,7 @@
+@@ -236,9 +193,7 @@
    }
    debug: (struct){
      sharingOn: (struct){
@@ -586,6 +610,11 @@ diff old new
        }
 -- out/eval --
 (struct){
+  issue3679: (struct){
+    b: (#list){
+      0: (string){ "bar" }
+    }
+  }
   issue3641: (struct){
     simplified: (struct){
       t1: (struct){
@@ -854,6 +883,21 @@ diff old new
   }
 }
 -- out/compile --
+--- acrossdisjunction.cue
+{
+  issue3679: {
+    b: (null|[
+      string,
+    ])
+    b: 〈import;list〉.Repeat([
+      for k, v in [
+        0,
+      ] {
+        "bar"
+      },
+    ], 1)
+  }
+}
 --- dupshare.cue
 {
   issue3641: {

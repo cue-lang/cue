@@ -595,7 +595,7 @@ func (e *extractor) importCUEFiles(p *packages.Package, dstDir, args string) err
 			path := filepath.Join(srcDir, name)
 			name, ok := strings.CutSuffix(name, ".cue")
 			if !ok {
-				return nil
+				continue
 			}
 			f, err := parser.ParseFile(path, nil, parser.PackageClauseOnly)
 			if err != nil {

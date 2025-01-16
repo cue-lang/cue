@@ -11,11 +11,8 @@ go mod tidy
 exec cue get go externalmod.test/mixfiles
 cmp cue.mod/gen/externalmod.test/mixfiles/code_one_go_gen.cue cue.mod/gen/externalmod.test/mixfiles/code_one_go_gen.cue.golden
 cmp cue.mod/gen/externalmod.test/mixfiles/code_two_go_gen.cue cue.mod/gen/externalmod.test/mixfiles/code_two_go_gen.cue.golden
-# TODO(mvdan): fix https://cuelang.org/issue/3644
-! exists cue.mod/gen/externalmod.test/mixfiles/config_one_gen.cue
-! exists cue.mod/gen/externalmod.test/mixfiles/config_two_gen.cue
-# cmp cue.mod/gen/externalmod.test/mixfiles/config_one_gen.cue cue.mod/gen/externalmod.test/mixfiles/config_one_gen.cue.golden
-# cmp cue.mod/gen/externalmod.test/mixfiles/config_two_gen.cue cue.mod/gen/externalmod.test/mixfiles/config_two_gen.cue.golden
+cmp cue.mod/gen/externalmod.test/mixfiles/config_one_gen.cue cue.mod/gen/externalmod.test/mixfiles/config_one_gen.cue.golden
+cmp cue.mod/gen/externalmod.test/mixfiles/config_two_gen.cue cue.mod/gen/externalmod.test/mixfiles/config_two_gen.cue.golden
 
 # Verify dependencies are as expected
 cmp go.mod go.mod.golden

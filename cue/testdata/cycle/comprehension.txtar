@@ -310,15 +310,15 @@ issue2367: {
 }
 
 -- out/evalalpha/stats --
-Leaks:  795
-Freed:  56
-Reused: 56
-Allocs: 795
+Leaks:  782
+Freed:  63
+Reused: 63
+Allocs: 782
 Retain: 0
 
-Unifications: 506
-Conjuncts:    3038
-Disjuncts:    198
+Unifications: 502
+Conjuncts:    3031
+Disjuncts:    196
 -- out/evalalpha --
 Errors:
 selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
@@ -450,31 +450,11 @@ Result:
     acrossOr: (struct){
       t1: (struct){
         p1: (struct){
-          o: (#struct){ |((#struct){
-              retry: (struct){
-                reject: (string){ "ok" }
-              }
-              reject: (string){ string }
-            }, (#struct){
-              retry: (struct){
-                reject: (string){ "ok" }
-              }
-              resource: (string){ string }
-            }, (#struct){
-              retry: (#struct){ |((#struct){
-                  reject: (string){ "ok" }
-                }, (#struct){
-                  reject: (string){ "ok" }
-                  resource: (string){ string }
-                }, (#struct){
-                  reject: (string){ "ok" }
-                  retry: (#struct){ |((#struct){
-                      reject: (string){ string }
-                    }, (#struct){
-                      resource: (string){ string }
-                    }) }
-                }) }
-            }) }
+          o: (#struct){
+            retry: (#struct){
+              reject: (string){ "ok" }
+            }
+          }
           #AllOutputs: (#struct){
             reject: (string){ string }
             resource: (string){ string }
@@ -588,33 +568,13 @@ Result:
   }
   issue1881: (struct){
     p1: (struct){
-      o: (#struct){ |((#struct){
-          retry: (struct){
-            output: (struct){
-              reject: (string){ "ok" }
-            }
+      o: (#struct){
+        retry: (struct){
+          output: (#struct){
+            reject: (string){ "ok" }
           }
-          reject: (string){ string }
-        }, (#struct){
-          retry: (struct){
-            output: (struct){
-              reject: (string){ "ok" }
-            }
-          }
-          resource: (string){ string }
-        }, (#struct){
-          retry: (struct){
-            output: (#struct){ |((#struct){
-                reject: (string){ "ok" }
-              }, (#struct){
-                reject: (string){ "ok" }
-                resource: (string){ string }
-              }, (#struct){
-                reject: (string){ "ok" }
-                retry: ~(issue1881.p1.#AllOutputs.retry)
-              }) }
-          }
-        }) }
+        }
+      }
       #AllOutputs: (#struct){
         reject: (string){ string }
         resource: (string){ string }
@@ -818,7 +778,7 @@ diff old new
          }
        }
      }
-@@ -127,19 +120,39 @@
+@@ -127,9 +120,9 @@
      insertionError: (_|_){
        // [eval]
        A: (_|_){
@@ -830,46 +790,10 @@ diff old new
        }
      }
      acrossOr: (struct){
-       t1: (struct){
-         p1: (struct){
--          o: (#struct){
--            retry: (#struct){
--              reject: (string){ "ok" }
--            }
--          }
-+          o: (#struct){ |((#struct){
-+              retry: (struct){
-+                reject: (string){ "ok" }
-+              }
-+              reject: (string){ string }
-+            }, (#struct){
-+              retry: (struct){
-+                reject: (string){ "ok" }
-+              }
-+              resource: (string){ string }
-+            }, (#struct){
-+              retry: (#struct){ |((#struct){
-+                  reject: (string){ "ok" }
-+                }, (#struct){
-+                  reject: (string){ "ok" }
-+                  resource: (string){ string }
-+                }, (#struct){
-+                  reject: (string){ "ok" }
-+                  retry: (#struct){ |((#struct){
-+                      reject: (string){ string }
-+                    }, (#struct){
-+                      resource: (string){ string }
-+                    }) }
-+                }) }
-+            }) }
-           #AllOutputs: (#struct){
-             reject: (string){ string }
-             resource: (string){ string }
-@@ -253,28 +266,52 @@
-   }
+@@ -254,27 +247,31 @@
    issue1881: (struct){
      p1: (struct){
--      o: (#struct){
+       o: (#struct){
 -        retry: (#struct){
 -          output: (#struct){
 -            reject: (string){ "ok" }
@@ -891,33 +815,12 @@ diff old new
 -          reject: (string){ string }
 -        }, (#struct){
 -          resource: (string){ string }
-+      o: (#struct){ |((#struct){
-+          retry: (struct){
-+            output: (struct){
-+              reject: (string){ "ok" }
-+            }
++        retry: (struct){
++          output: (#struct){
++            reject: (string){ "ok" }
 +          }
-+          reject: (string){ string }
-+        }, (#struct){
-+          retry: (struct){
-+            output: (struct){
-+              reject: (string){ "ok" }
-+            }
-+          }
-+          resource: (string){ string }
-+        }, (#struct){
-+          retry: (struct){
-+            output: (#struct){ |((#struct){
-+                reject: (string){ "ok" }
-+              }, (#struct){
-+                reject: (string){ "ok" }
-+                resource: (string){ string }
-+              }, (#struct){
-+                reject: (string){ "ok" }
-+                retry: ~(issue1881.p1.#AllOutputs.retry)
-+              }) }
-+          }
-+        }) }
++        }
++      }
 +      #AllOutputs: (#struct){
 +        reject: (string){ string }
 +        resource: (string){ string }
@@ -940,7 +843,7 @@ diff old new
          }) }
      }
      p2: (struct){
-@@ -290,7 +327,7 @@
+@@ -290,7 +287,7 @@
          }
        }
        o: (#struct){
@@ -949,7 +852,7 @@ diff old new
            output: (#struct){
              reject: (string){ "ok" }
            }
-@@ -320,7 +357,7 @@
+@@ -320,7 +317,7 @@
            resource: (string){ string }
          }) }
        o: (#struct){
@@ -968,18 +871,18 @@ diff old new
 -Reused: 1260
 -Allocs: 60
 -Retain: 145
-+Leaks:  795
-+Freed:  56
-+Reused: 56
-+Allocs: 795
++Leaks:  782
++Freed:  63
++Reused: 63
++Allocs: 782
 +Retain: 0
  
 -Unifications: 832
 -Conjuncts:    2525
 -Disjuncts:    1404
-+Unifications: 506
-+Conjuncts:    3038
-+Disjuncts:    198
++Unifications: 502
++Conjuncts:    3031
++Disjuncts:    196
 -- out/eval/stats --
 Leaks:  50
 Freed:  1270

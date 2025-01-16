@@ -174,7 +174,9 @@ type closeContext struct {
 	// and that it is associated with the given Hole Index.
 	holeID int
 
-	dependencies []*ccDep // For testing only. See debug.go
+	// dependencies is used to track dependencies that need to be copied in
+	// overlays. It is also use for testing.
+	dependencies []*ccDep
 
 	// externalDeps lists the closeContexts associated with a root node for
 	// which there are outstanding decrements (can only be NOTIFY or ARC). This

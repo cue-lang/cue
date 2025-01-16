@@ -246,12 +246,25 @@ f.name: conflicting values "int" and "str":
 f.val: conflicting values 3 and string (mismatched types int and string):
     ./in.cue:9:8
     ./in.cue:15:27
+issue3606.data: 2 errors in empty disjunction:
+issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
+    ./dependencies.cue:2:8
+    ./dependencies.cue:6:6
+issue3606.data.notAllowed: field not allowed:
+    ./dependencies.cue:3:3
 
 Result:
 (_|_){
   // [eval]
-  issue3606: (struct){
-    data: (#struct){
+  issue3606: (_|_){
+    // [eval]
+    data: (_|_){
+      // [eval] issue3606.data: 2 errors in empty disjunction:
+      // issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
+      //     ./dependencies.cue:2:8
+      //     ./dependencies.cue:6:6
+      // issue3606.data.notAllowed: field not allowed:
+      //     ./dependencies.cue:3:3
       notAllowed: (bool){ true }
     }
     #S: ((string|struct)){ |((string){ string }, (#struct){
@@ -287,15 +300,9 @@ Result:
     }
     v: (#struct){
       x: (#list){
-        0: (#struct){ |((#struct){
-            y: (bool){ true }
-          }, (#struct){
-            y: (bool){ true }
-            a: (string){ "append" }
-          }, (#struct){
-            y: (bool){ true }
-            b: (string){ "prepend" }
-          }) }
+        0: (#struct){
+          y: (bool){ true }
+        }
       }
     }
   }
@@ -547,7 +554,7 @@ Result:
           let Ok#1 = (bool){ true }
         }, (#struct){
           _ok: (bool){ true }
-          let Ok#1 = (bool){ true }
+          let Ok#1multi = 〈0;_ok〉
           x: (bool){ true }
         }) }
       bar: (#struct){ |((#struct){
@@ -584,7 +591,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -2,41 +2,17 @@
+@@ -2,11 +2,9 @@
  f: 2 errors in empty disjunction:
  f.name: conflicting values "int" and "str":
      ./in.cue:5:8
@@ -594,27 +601,21 @@ diff old new
      ./in.cue:9:8
 -    ./in.cue:15:4
      ./in.cue:15:27
--issue3606.data: 2 errors in empty disjunction:
--issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
--    ./dependencies.cue:2:8
--    ./dependencies.cue:6:6
--issue3606.data.notAllowed: field not allowed:
--    ./dependencies.cue:3:3
+ issue3606.data: 2 errors in empty disjunction:
+ issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
+@@ -14,8 +12,6 @@
+     ./dependencies.cue:6:6
+ issue3606.data.notAllowed: field not allowed:
+     ./dependencies.cue:3:3
 -    ./dependencies.cue:4:6
 -    ./dependencies.cue:6:15
  
  Result:
  (_|_){
-   // [eval]
--  issue3606: (_|_){
--    // [eval]
--    data: (_|_){
--      // [eval] issue3606.data: 2 errors in empty disjunction:
--      // issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
--      //     ./dependencies.cue:2:8
--      //     ./dependencies.cue:6:6
--      // issue3606.data.notAllowed: field not allowed:
--      //     ./dependencies.cue:3:3
+@@ -29,14 +25,7 @@
+       //     ./dependencies.cue:6:6
+       // issue3606.data.notAllowed: field not allowed:
+       //     ./dependencies.cue:3:3
 -      //     ./dependencies.cue:4:6
 -      //     ./dependencies.cue:6:15
 -      notAllowed: (_|_){
@@ -623,32 +624,11 @@ diff old new
 -        //     ./dependencies.cue:4:6
 -        //     ./dependencies.cue:6:15
 -      }
-+  issue3606: (struct){
-+    data: (#struct){
 +      notAllowed: (bool){ true }
      }
      #S: ((string|struct)){ |((string){ string }, (#struct){
        }) }
-@@ -71,9 +47,15 @@
-     }
-     v: (#struct){
-       x: (#list){
--        0: (#struct){
--          y: (bool){ true }
--        }
-+        0: (#struct){ |((#struct){
-+            y: (bool){ true }
-+          }, (#struct){
-+            y: (bool){ true }
-+            a: (string){ "append" }
-+          }, (#struct){
-+            y: (bool){ true }
-+            b: (string){ "prepend" }
-+          }) }
-       }
-     }
-   }
-@@ -102,19 +84,12 @@
+@@ -102,19 +91,12 @@
      // [eval] f: 2 errors in empty disjunction:
      // f.name: conflicting values "int" and "str":
      //     ./in.cue:5:8
@@ -669,7 +649,7 @@ diff old new
    }
    e1: (struct){
      a: ((null|struct)){ |((null){ null }, (struct){
-@@ -226,8 +201,8 @@
+@@ -226,8 +208,8 @@
      e: (struct){
        foobar: (#struct){
          b: (#struct){
@@ -679,18 +659,16 @@ diff old new
          }
        }
      }
-@@ -329,7 +304,10 @@
+@@ -329,6 +311,9 @@
            let Ok#1 = (bool){ true }
          }, (#struct){
            _ok: (bool){ true }
--          let Ok#1multi = 〈0;_ok〉
 +          let Ok#1 = (bool){ true }
 +        }, (#struct){
 +          _ok: (bool){ true }
-+          let Ok#1 = (bool){ true }
+           let Ok#1multi = 〈0;_ok〉
            x: (bool){ true }
          }) }
-       bar: (#struct){ |((#struct){
 -- diff/todo/p1 --
 issue3597.t1.foo: duplicate disjunct
 -- diff/todo/p3 --

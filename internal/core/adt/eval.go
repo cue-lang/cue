@@ -2293,13 +2293,9 @@ func (n *nodeContext) expandOne(state vertexStatus) (done bool) {
 
 		// collect and or
 	}
-	if len(n.exprs) < len(exprs) {
-		return true
-	}
-
-	// No progress, report error later if needed: unification with
+	// No progress if false, report error later if needed: unification with
 	// disjuncts may resolve this later on.
-	return false
+	return len(n.exprs) < len(exprs)
 }
 
 // injectDynamic evaluates and inserts dynamic declarations.

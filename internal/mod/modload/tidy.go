@@ -709,13 +709,9 @@ func (ld *loader) spotCheckRoots(ctx context.Context, rs *modrequirements.Requir
 	}
 	<-work.Idle()
 
-	if ctx.Err() != nil {
-		// Either we failed a spot-check, or the caller no longer cares about our
-		// answer anyway.
-		return false
-	}
-
-	return true
+	// If the context was canceled, either we failed a spot-check,
+	// or the caller no longer cares about our answer anyway.
+	return ctx.Err() == nil
 }
 
 func withoutIgnoredFiles(iter func(func(modimports.ModuleFile, error) bool)) func(func(modimports.ModuleFile, error) bool) {

@@ -593,7 +593,7 @@ type task struct {
 	// scheduler.
 	blockedOn      *scheduler
 	blockCondition condition
-	blockStack     []*task // TODO: use; for error reporting.
+	// blockStack     []*task // TODO: use; for error reporting.
 
 	err *Bottom
 

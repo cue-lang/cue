@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f4d83f0_3c572c7e",
+        "filename": "internal/core/adt/eval_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-16T14:46:18Z",
+      "side": 1,
+      "message": "just double checking that these changes are wanted in master? if so, perhaps call them out in the commit message, or document what\u0027s the deal with DebugDeps in this test with a comment.",
+      "revId": "3db8bba159e851621dc820bf83f59eb47998b1b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

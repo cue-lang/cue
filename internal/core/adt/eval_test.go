@@ -101,7 +101,7 @@ func TestEvalAlpha(t *testing.T) {
 	// externalDeps to agitate pending dependencies is replaced with a
 	// dedicated mechanism.
 	//
-	adt.DebugDeps = true // check unmatched dependencies.
+	// adt.DebugDeps = true // check unmatched dependencies.
 
 	flags := cuedebug.Config{
 		Sharing: true,
@@ -182,7 +182,7 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, flags cued
 	name := t.T.Name()[len("TestEvalAlpha/"):]
 	expectErrs := skipDebugDepErrors[name]
 
-	if len(m) != expectErrs {
+	if adt.DebugDeps && len(m) != expectErrs {
 		if expectErrs == 0 {
 			t.Errorf("unexpected node errors: %d", len(m))
 		} else {

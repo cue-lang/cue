@@ -204,16 +204,39 @@ issue3597: t2: {
 	}
 	foo: X & {X}
 }
--- out/eval/stats --
-Leaks:  8
-Freed:  561
-Reused: 547
-Allocs: 22
-Retain: 34
+-- dependencies.cue --
+issue3606: {
+	data: {
+		notAllowed: true
+	} & #S
+	
+	#S: string | {}
+}
+issue3672: {
+	#A: string | {y: true}
+	#B: #A | {a: "append"} | {b: "prepend"}
 
-Unifications: 286
-Conjuncts:    1125
-Disjuncts:    571
+	#fn: {
+		#C: #B
+		#out: x: [...#C]
+	}
+
+	// The unification inline appears to be critical
+	#def: (#fn & {}).#out
+	
+	v: #def
+	v: x: [{y: true}] // Should be one element
+}
+-- out/eval/stats --
+Leaks:  10
+Freed:  625
+Reused: 611
+Allocs: 24
+Retain: 39
+
+Unifications: 326
+Conjuncts:    1213
+Disjuncts:    640
 -- out/evalalpha --
 Errors:
 f: 2 errors in empty disjunction:
@@ -227,6 +250,55 @@ f.val: conflicting values 3 and string (mismatched types int and string):
 Result:
 (_|_){
   // [eval]
+  issue3606: (struct){
+    data: (#struct){
+      notAllowed: (bool){ true }
+    }
+    #S: ((string|struct)){ |((string){ string }, (#struct){
+      }) }
+  }
+  issue3672: (struct){
+    #A: ((string|struct)){ |((string){ string }, (#struct){
+        y: (bool){ true }
+      }) }
+    #B: ((string|struct)){ |((string){ string }, (#struct){
+        y: (bool){ true }
+      }, (#struct){
+        a: (string){ "append" }
+      }, (#struct){
+        b: (string){ "prepend" }
+      }) }
+    #fn: (#struct){
+      #C: ((string|struct)){ |((string){ string }, (#struct){
+          y: (bool){ true }
+        }, (#struct){
+          a: (string){ "append" }
+        }, (#struct){
+          b: (string){ "prepend" }
+        }) }
+      #out: (#struct){
+        x: (list){
+        }
+      }
+    }
+    #def: (#struct){
+      x: (list){
+      }
+    }
+    v: (#struct){
+      x: (#list){
+        0: (#struct){ |((#struct){
+            y: (bool){ true }
+          }, (#struct){
+            y: (bool){ true }
+            a: (string){ "append" }
+          }, (#struct){
+            y: (bool){ true }
+            b: (string){ "prepend" }
+          }) }
+      }
+    }
+  }
   a: (int){ |(*(int){ 1 }, (int){ int }) }
   aa: (int){ |(*(int){ 1 }, *(int){ 2 }, (int){ int }) }
   b: (struct){ |((struct){
@@ -475,7 +547,7 @@ Result:
           let Ok#1 = (bool){ true }
         }, (#struct){
           _ok: (bool){ true }
-          let Ok#1multi = 〈0;_ok〉
+          let Ok#1 = (bool){ true }
           x: (bool){ true }
         }) }
       bar: (#struct){ |((#struct){
@@ -512,7 +584,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -2,11 +2,9 @@
+@@ -2,41 +2,17 @@
  f: 2 errors in empty disjunction:
  f.name: conflicting values "int" and "str":
      ./in.cue:5:8
@@ -522,9 +594,61 @@ diff old new
      ./in.cue:9:8
 -    ./in.cue:15:4
      ./in.cue:15:27
+-issue3606.data: 2 errors in empty disjunction:
+-issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
+-    ./dependencies.cue:2:8
+-    ./dependencies.cue:6:6
+-issue3606.data.notAllowed: field not allowed:
+-    ./dependencies.cue:3:3
+-    ./dependencies.cue:4:6
+-    ./dependencies.cue:6:15
  
  Result:
-@@ -37,19 +35,12 @@
+ (_|_){
+   // [eval]
+-  issue3606: (_|_){
+-    // [eval]
+-    data: (_|_){
+-      // [eval] issue3606.data: 2 errors in empty disjunction:
+-      // issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
+-      //     ./dependencies.cue:2:8
+-      //     ./dependencies.cue:6:6
+-      // issue3606.data.notAllowed: field not allowed:
+-      //     ./dependencies.cue:3:3
+-      //     ./dependencies.cue:4:6
+-      //     ./dependencies.cue:6:15
+-      notAllowed: (_|_){
+-        // [eval] issue3606.data.notAllowed: field not allowed:
+-        //     ./dependencies.cue:3:3
+-        //     ./dependencies.cue:4:6
+-        //     ./dependencies.cue:6:15
+-      }
++  issue3606: (struct){
++    data: (#struct){
++      notAllowed: (bool){ true }
+     }
+     #S: ((string|struct)){ |((string){ string }, (#struct){
+       }) }
+@@ -71,9 +47,15 @@
+     }
+     v: (#struct){
+       x: (#list){
+-        0: (#struct){
+-          y: (bool){ true }
+-        }
++        0: (#struct){ |((#struct){
++            y: (bool){ true }
++          }, (#struct){
++            y: (bool){ true }
++            a: (string){ "append" }
++          }, (#struct){
++            y: (bool){ true }
++            b: (string){ "prepend" }
++          }) }
+       }
+     }
+   }
+@@ -102,19 +84,12 @@
      // [eval] f: 2 errors in empty disjunction:
      // f.name: conflicting values "int" and "str":
      //     ./in.cue:5:8
@@ -545,7 +669,7 @@ diff old new
    }
    e1: (struct){
      a: ((null|struct)){ |((null){ null }, (struct){
-@@ -161,8 +152,8 @@
+@@ -226,8 +201,8 @@
      e: (struct){
        foobar: (#struct){
          b: (#struct){
@@ -555,16 +679,18 @@ diff old new
          }
        }
      }
-@@ -264,6 +255,9 @@
+@@ -329,7 +304,10 @@
            let Ok#1 = (bool){ true }
          }, (#struct){
            _ok: (bool){ true }
+-          let Ok#1multi = 〈0;_ok〉
 +          let Ok#1 = (bool){ true }
 +        }, (#struct){
 +          _ok: (bool){ true }
-           let Ok#1multi = 〈0;_ok〉
++          let Ok#1 = (bool){ true }
            x: (bool){ true }
          }) }
+       bar: (#struct){ |((#struct){
 -- diff/todo/p1 --
 issue3597.t1.foo: duplicate disjunct
 -- diff/todo/p3 --
@@ -583,10 +709,75 @@ f.val: conflicting values 3 and string (mismatched types int and string):
     ./in.cue:9:8
     ./in.cue:15:4
     ./in.cue:15:27
+issue3606.data: 2 errors in empty disjunction:
+issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
+    ./dependencies.cue:2:8
+    ./dependencies.cue:6:6
+issue3606.data.notAllowed: field not allowed:
+    ./dependencies.cue:3:3
+    ./dependencies.cue:4:6
+    ./dependencies.cue:6:15
 
 Result:
 (_|_){
   // [eval]
+  issue3606: (_|_){
+    // [eval]
+    data: (_|_){
+      // [eval] issue3606.data: 2 errors in empty disjunction:
+      // issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
+      //     ./dependencies.cue:2:8
+      //     ./dependencies.cue:6:6
+      // issue3606.data.notAllowed: field not allowed:
+      //     ./dependencies.cue:3:3
+      //     ./dependencies.cue:4:6
+      //     ./dependencies.cue:6:15
+      notAllowed: (_|_){
+        // [eval] issue3606.data.notAllowed: field not allowed:
+        //     ./dependencies.cue:3:3
+        //     ./dependencies.cue:4:6
+        //     ./dependencies.cue:6:15
+      }
+    }
+    #S: ((string|struct)){ |((string){ string }, (#struct){
+      }) }
+  }
+  issue3672: (struct){
+    #A: ((string|struct)){ |((string){ string }, (#struct){
+        y: (bool){ true }
+      }) }
+    #B: ((string|struct)){ |((string){ string }, (#struct){
+        y: (bool){ true }
+      }, (#struct){
+        a: (string){ "append" }
+      }, (#struct){
+        b: (string){ "prepend" }
+      }) }
+    #fn: (#struct){
+      #C: ((string|struct)){ |((string){ string }, (#struct){
+          y: (bool){ true }
+        }, (#struct){
+          a: (string){ "append" }
+        }, (#struct){
+          b: (string){ "prepend" }
+        }) }
+      #out: (#struct){
+        x: (list){
+        }
+      }
+    }
+    #def: (#struct){
+      x: (list){
+      }
+    }
+    v: (#struct){
+      x: (#list){
+        0: (#struct){
+          y: (bool){ true }
+        }
+      }
+    }
+  }
   a: (int){ |(*(int){ 1 }, (int){ int }) }
   aa: (int){ |(*(int){ 1 }, *(int){ 2 }, (int){ int }) }
   b: (struct){ |((struct){
@@ -873,6 +1064,42 @@ Result:
   }
 }
 -- out/compile --
+--- dependencies.cue
+{
+  issue3606: {
+    data: ({
+      notAllowed: true
+    } & 〈0;#S〉)
+    #S: (string|{})
+  }
+  issue3672: {
+    #A: (string|{
+      y: true
+    })
+    #B: (〈0;#A〉|{
+      a: "append"
+    }|{
+      b: "prepend"
+    })
+    #fn: {
+      #C: 〈1;#B〉
+      #out: {
+        x: [
+          ...〈2;#C〉,
+        ]
+      }
+    }
+    #def: (〈0;#fn〉 & {}).#out
+    v: 〈0;#def〉
+    v: {
+      x: [
+        {
+          y: true
+        },
+      ]
+    }
+  }
+}
 --- in.cue
 {
   a: (*1|int)

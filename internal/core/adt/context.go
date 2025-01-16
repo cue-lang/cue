@@ -181,9 +181,15 @@ type OpContext struct {
 	// TODO: strictly separate validators and functions.
 	IsValidator bool
 
+	// ==== Debugging ====
+
 	// ErrorGraphs contains an analysis, represented as a Mermaid graph, for
 	// each node that has an error.
 	ErrorGraphs map[string]string
+
+	currentDisjunctionID int // sequence number for call to processDisjunctions
+
+	disjunctStack []disjunctInfo // stack of disjunct IDs
 }
 
 func (c *OpContext) CloseInfo() CloseInfo { return c.ci }

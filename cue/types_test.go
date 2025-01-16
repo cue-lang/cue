@@ -2167,11 +2167,9 @@ func TestUnify(t *testing.T) {
 // TestUnify2 is similar to TestUnify, but uses CompileString and Validate.
 func TestUnify2(t *testing.T) {
 	type testCase struct {
-		name   string
-		a      string
-		b      string
-		output string
-		err    bool
+		a   string
+		b   string
+		err bool
 	}
 	testCases := []testCase{{
 		a:   `null | close({})`,

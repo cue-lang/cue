@@ -257,6 +257,9 @@ func initArcs(ctx *OpContext, v *Vertex) bool {
 }
 
 func (n *nodeContext) processDisjunctions() *Bottom {
+	ID := n.logDisjunctionTask()
+	defer ID.pop()
+
 	defer func() {
 		// TODO:
 		// Clear the buffers.
@@ -285,6 +288,7 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 	// evaluation adds more disjunctions.
 	for i := 0; i < len(a); i++ {
 		d := &a[i]
+		n.nextDisjunction(i, len(a), d.holeID)
 
 		// We need to only finalize the last series of disjunctions. However,
 		// disjunctions can be nested.
@@ -356,12 +360,16 @@ func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, m
 	defer n.unmarkDepth(n.markDepth())
 	defer n.unmarkOptional(n.markOptional())
 
-	for _, p := range cross {
+	for i, p := range cross {
+		ID := n.nextCrossProduct(i, len(cross), p)
+
 		// TODO: use a partial unify instead
 		// p.completeNodeConjuncts()
 		initArcs(n.ctx, p.node)
 
 		for j, d := range dn.disjuncts {
+			ID.node.nextDisjunct(j, len(dn.disjuncts), d.expr)
+
 			c := MakeConjunct(dn.env, d.expr, dn.cloneID)
 			r, err := p.doDisjunct(c, d.mode, mode, hole)
 
@@ -414,7 +422,9 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, hole i
 	if c.CloseInfo.cc == nil {
 		panic("nil closeContext during init")
 	}
-	n.ctx.stats.Disjuncts++
+
+	ID := n.logDoDisjunct()
+	_ = ID // Do not remove, used for debugging.
 
 	oc := newOverlayContext(n.ctx)
 

@@ -1148,11 +1148,12 @@ type nodeContextState struct {
 	hasNonCycle          bool // has material conjuncts without structural cycle
 	hasNonCyclic         bool // has non-cyclic conjuncts at start of field processing
 
-	isShared       bool       // set if we are currently structure sharing.
-	noSharing      bool       // set if structure sharing is not allowed
-	shared         Conjunct   // the original conjunct that led to sharing
-	shareCycleType CyclicType // keeps track of the cycle type of shared nodes.
-	origBaseValue  BaseValue  // the BaseValue that structure sharing replaces.
+	isShared         bool       // set if we are currently structure sharing
+	noSharing        bool       // set if structure sharing is not allowed
+	shared           Conjunct   // the original conjunct that led to sharing
+	shareCycleType   CyclicType // keeps track of the cycle type of shared nodes
+	origBaseValue    BaseValue  // the BaseValue that structure sharing replaces
+	shareDecremented bool       // counters of sharedIDs have been decremented
 
 	depth       int32
 	defaultMode defaultMode

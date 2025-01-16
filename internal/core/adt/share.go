@@ -106,12 +106,15 @@ func (n *nodeContext) addShared(id CloseInfo) {
 }
 
 func (n *nodeContext) decSharedIDs() {
+	if n.shareDecremented {
+		return
+	}
+	n.shareDecremented = true
 	for _, id := range n.sharedIDs {
 		if cc := id.cc; cc != nil {
 			cc.decDependent(n.ctx, SHARED, n.node.cc())
 		}
 	}
-	n.sharedIDs = n.sharedIDs[:0]
 }
 
 func (n *nodeContext) share(c Conjunct, arc *Vertex, id CloseInfo) {

@@ -145,7 +145,7 @@ Disjuncts:    177
 (struct){
   issue3679: (struct){
     b: (#list){
-      0: (string){ string }
+      0: (string){ "bar" }
     }
   }
   issue3641: (struct){
@@ -374,15 +374,6 @@ Disjuncts:    177
 diff old new
 --- old
 +++ new
-@@ -1,7 +1,7 @@
- (struct){
-   issue3679: (struct){
-     b: (#list){
--      0: (string){ "bar" }
-+      0: (string){ string }
-     }
-   }
-   issue3641: (struct){
 @@ -16,102 +16,75 @@
            }
          }

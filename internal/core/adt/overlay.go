@@ -217,6 +217,11 @@ func (ctx *overlayContext) cloneNodeContext(n *nodeContext) *nodeContext {
 	d.arcMap = append(d.arcMap, n.arcMap...)
 	d.checks = append(d.checks, n.checks...)
 
+	for _, s := range n.sharedIDs {
+		s.cc = ctx.allocCC(s.cc)
+		d.sharedIDs = append(d.sharedIDs, s)
+	}
+
 	// TODO: do we need to add cyclicConjuncts? Typically, cyclicConjuncts
 	// gets cleared at the end of a unify call. There are cases, however, where
 	// this is possible. We should decide whether cyclicConjuncts should be

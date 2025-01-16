@@ -87,6 +87,24 @@
       "parentUuid": "d01929c7_6037d692",
       "revId": "343763ed40401625164ec1ca0f1e760aee57ce62",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1ea0292_f7cf8315",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-16T20:49:37Z",
+      "side": 1,
+      "message": "how about `cue_types_$pkgname_gen.go` ?\n\nAlso, how about only including the package name when the last component of the import path does not imply the package name? That is, include the package name whenever this code prints false.\n\n    ip :\u003d module.ParseImportPath(cuePackage)\n    ip1 :\u003d ip\n    ip1.Qualifier \u003d \"\"\n    ip1.ExplicitQualifier \u003d false\n    ip1 \u003d module.ParseImportPath(ip1.String())\n    println(ip1.Qualifier \u003d\u003d ip.Qualifier)\n\nThat would mean that most places would not include the package name in the filename, because most CUE package names match the last component of their import path.",
+      "parentUuid": "5007a9c2_aec39bde",
+      "revId": "343763ed40401625164ec1ca0f1e760aee57ce62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -227,16 +227,24 @@ issue3672: {
 	v: #def
 	v: x: [{y: true}] // Should be one element
 }
+issue3681: {
+	// Order dependent! These two fields need to go first.
+	out: one: #strDefaultDef
+	out: two: "\(strDefault)"
+
+	strDefault: *"fallback" | string
+	#strDefaultDef: strDefault
+}
 -- out/eval/stats --
 Leaks:  10
-Freed:  625
-Reused: 611
+Freed:  637
+Reused: 623
 Allocs: 24
 Retain: 39
 
-Unifications: 326
-Conjuncts:    1213
-Disjuncts:    640
+Unifications: 332
+Conjuncts:    1229
+Disjuncts:    652
 -- out/evalalpha --
 Errors:
 f: 2 errors in empty disjunction:
@@ -305,6 +313,17 @@ Result:
         }
       }
     }
+  }
+  issue3681: (struct){
+    out: (struct){
+      one: (string){ |(*(string){ "fallback" }, (string){ string }) }
+      two: (_|_){
+        // [incomplete] issue3681.out.two: invalid interpolation: non-concrete value _ (type _):
+        //     ./dependencies.cue:26:12
+      }
+    }
+    strDefault: (string){ |(*(string){ "fallback" }, (string){ string }) }
+    #strDefaultDef: (string){ |(*(string){ "fallback" }, (string){ string }) }
   }
   a: (int){ |(*(int){ 1 }, (int){ int }) }
   aa: (int){ |(*(int){ 1 }, *(int){ 2 }, (int){ int }) }
@@ -628,7 +647,19 @@ diff old new
      }
      #S: ((string|struct)){ |((string){ string }, (#struct){
        }) }
-@@ -102,19 +91,12 @@
+@@ -80,7 +69,10 @@
+   issue3681: (struct){
+     out: (struct){
+       one: (string){ |(*(string){ "fallback" }, (string){ string }) }
+-      two: (string){ "fallback" }
++      two: (_|_){
++        // [incomplete] issue3681.out.two: invalid interpolation: non-concrete value _ (type _):
++        //     ./dependencies.cue:26:12
++      }
+     }
+     strDefault: (string){ |(*(string){ "fallback" }, (string){ string }) }
+     #strDefaultDef: (string){ |(*(string){ "fallback" }, (string){ string }) }
+@@ -110,19 +102,12 @@
      // [eval] f: 2 errors in empty disjunction:
      // f.name: conflicting values "int" and "str":
      //     ./in.cue:5:8
@@ -649,7 +680,7 @@ diff old new
    }
    e1: (struct){
      a: ((null|struct)){ |((null){ null }, (struct){
-@@ -226,8 +208,8 @@
+@@ -234,8 +219,8 @@
      e: (struct){
        foobar: (#struct){
          b: (#struct){
@@ -659,7 +690,7 @@ diff old new
          }
        }
      }
-@@ -329,6 +311,9 @@
+@@ -337,6 +322,9 @@
            let Ok#1 = (bool){ true }
          }, (#struct){
            _ok: (bool){ true }
@@ -755,6 +786,14 @@ Result:
         }
       }
     }
+  }
+  issue3681: (struct){
+    out: (struct){
+      one: (string){ |(*(string){ "fallback" }, (string){ string }) }
+      two: (string){ "fallback" }
+    }
+    strDefault: (string){ |(*(string){ "fallback" }, (string){ string }) }
+    #strDefaultDef: (string){ |(*(string){ "fallback" }, (string){ string }) }
   }
   a: (int){ |(*(int){ 1 }, (int){ int }) }
   aa: (int){ |(*(int){ 1 }, *(int){ 2 }, (int){ int }) }
@@ -1076,6 +1115,16 @@ Result:
         },
       ]
     }
+  }
+  issue3681: {
+    out: {
+      one: 〈1;#strDefaultDef〉
+    }
+    out: {
+      two: "\(〈1;strDefault〉)"
+    }
+    strDefault: (*"fallback"|string)
+    #strDefaultDef: 〈0;strDefault〉
   }
 }
 --- in.cue

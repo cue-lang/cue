@@ -737,13 +737,7 @@ func equalPartialNode(ctx *OpContext, x, y *closeContext) bool {
 	// TODO(perf): use merge sort
 outer:
 	for _, a := range x.arcs {
-		if a.kind != ARC {
-			continue outer
-		}
 		for _, b := range y.arcs {
-			if b.kind != ARC {
-				continue
-			}
 			if a.key.src.Label != b.key.src.Label {
 				continue
 			}

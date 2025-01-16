@@ -487,9 +487,12 @@ func (n *nodeContext) completeNodeTasks(mode runMode) {
 	// TODO: replace with something more principled that does not piggyback on
 	// debug information.
 	for _, r := range v.cc().externalDeps {
+		if r.kind != NOTIFY {
+			continue
+		}
 		src := r.src
-		a := &src.arcs[r.index]
-		if a.decremented || a.kind != NOTIFY {
+		a := &src.notify[r.index]
+		if a.decremented {
 			continue
 		}
 		if n := src.src.getState(n.ctx); n != nil {
@@ -556,14 +559,20 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 		if src.src.IsDisjunct {
 			continue
 		}
-		a := &src.arcs[r.index]
+		var a *ccArc
+		switch r.kind {
+		case ARC:
+			a = &src.arcs[r.index]
+		case NOTIFY:
+			a = &src.notify[r.index]
+		}
 		if a.decremented {
 			continue
 		}
 		a.decremented = true
 
 		src.src.unify(n.ctx, needTasksDone, attemptOnly)
-		a.cc.decDependent(n.ctx, a.kind, src) // REF(arcs)
+		a.cc.decDependent(n.ctx, r.kind, src)
 	}
 
 	n.incDepth()

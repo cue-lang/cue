@@ -1,0 +1,30 @@
+# Issue #3646
+
+env CUE_EXPERIMENT=evalv3=0
+exec cue cmd two
+stdout 'msg.*hello'
+
+env CUE_EXPERIMENT=evalv3=1
+exec cue cmd two
+stdout 'msg.*hello'
+
+-- input_tool.cue --
+package p
+
+import (
+    "tool/exec"
+    "encoding/json"
+)
+
+command: {
+    one: exec.Run & {
+        stdin: "{\"msg\": \"hello\"}"
+        cmd: ["cat"]
+        stdout: string
+    }
+    two: exec.Run & {
+        let data = json.Unmarshal(one.stdout)
+        cmd: ["cat"] // "true" is printed for each json value read
+        stdin: json.Marshal(data) + "\n"
+    }
+}

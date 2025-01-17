@@ -265,6 +265,12 @@ type visitor struct {
 	pathStack []refEntry
 	numRefs   int // count of reported dependencies
 
+	// fromNonRoot indicates that the reference originates from a non-root. If
+	// the value of a non-rooted node is structure shared, we need to treat the
+	// first reference in the structure-shared node as if it is a non-rooted
+	// node.
+	fromNonRoot bool
+
 	// cfgDynamic is kept from the original config.
 	cfgDynamic bool
 
@@ -422,7 +428,13 @@ func (c *visitor) reportDependency(env *adt.Environment, ref adt.Resolver, v *ad
 		inspect = !v.Rooted()
 	}
 
-	if inspect {
+	if inspect || c.fromNonRoot {
+		saved := c.fromNonRoot
+		if c.ctxt.Sharing && v.Label.IsLet() {
+			c.fromNonRoot = inspect
+		}
+		defer func() { c.fromNonRoot = saved }()
+
 		// TODO: there is currently no way to inspect where a non-rooted node
 		// originated from. As of EvalV3, we allow non-rooted nodes to be
 		// structure shared. This makes them effectively rooted, with the
@@ -476,7 +488,7 @@ func (c *visitor) reportDependency(env *adt.Environment, ref adt.Resolver, v *ad
 		}
 		v = w
 	}
-	if len(c.pathStack) == 0 && c.topRef != nil {
+	if (inspect || c.fromNonRoot) && len(c.pathStack) == 0 && c.topRef != nil {
 		altRef = c.topRef
 	}
 
@@ -552,10 +564,6 @@ func (c *visitor) markConjuncts(v *adt.Vertex) {
 // proactive. For selectors and indices this means we need to evaluate their
 // objects to see exactly what the selector or index refers to.
 func (c *visitor) markInternalResolvers(env *adt.Environment, r adt.Resolver, v *adt.Vertex) {
-	if v.Rooted() {
-		panic("node must not be rooted")
-	}
-
 	saved := c.all // recursive traversal already done by this function.
 
 	// As lets have no path and we otherwise will not process them, we set

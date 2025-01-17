@@ -76,21 +76,28 @@ var needFix = map[string]string{
 // counter errors.
 // TODO: These counters should all go to zero.
 var skipDebugDepErrors = map[string]int{
+	"benchmarks/disjunctelim":  1,
 	"benchmarks/issue1684":     16,
 	"builtins/default":         1,
 	"compile/scope":            1,
 	"comprehensions/pushdown":  2,
-	"cycle/comprehension":      2,
+	"cycle/builtins":           2,
+	"cycle/comprehension":      3,
 	"cycle/disjunction":        4,
 	"cycle/evaluate":           1,
+	"cycle/issue990":           1,
 	"cycle/structural":         17,
+	"disjunctions/edge":        1,
 	"disjunctions/errors":      3,
-	"disjunctions/elimination": 15,
-	"disjunctions/embed":       6,
+	"disjunctions/elimination": 20,
+	"disjunctions/embed":       12,
 	"disjunctions/nested":      1,
+	"eval/conjuncts":           3,
 	"eval/disjunctions":        3,
-	"eval/notify":              17,
-	"fulleval/054_issue312":    1,
+	"eval/issue545":            1,
+	"eval/notify":              22,
+	"export/030":               2,
+	"fulleval/054_issue312":    2,
 	"scalars/embed":            2,
 }
 

@@ -476,7 +476,7 @@ func (c *visitor) reportDependency(env *adt.Environment, ref adt.Resolver, v *ad
 		}
 		v = w
 	}
-	if len(c.pathStack) == 0 && c.topRef != nil {
+	if inspect && len(c.pathStack) == 0 && c.topRef != nil {
 		altRef = c.topRef
 	}
 

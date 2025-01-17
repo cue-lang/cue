@@ -84,16 +84,71 @@ dual: {
 	[string]: _
 	[int]: _
 }
+-- multi.cue --
+// Ensure that if the same pattern is added multiple times in different
+// contexts, it is added to all contexts to preserve closedness information.
+issue3638: full: {
+	routes: default: {}
+	routes: [string]: spec: [{
+		refs: [{"default"}]
+	}]
+	#Fields: {
+		input: _
+		output: [for x in input { x }]
+		...
+	}
+	#Kubernetes: {
+		#Fields & {
+			Routes: route: [_]: spec!: HTTPROUTESPEC.#x
+		}
+		#Fields // Commenting out this line also fixes evalv3.
+		Routes: _
+		input: res1: Routes
+	}
+	let HTTPROUTESPEC = {
+		#x: [...{
+			refs: [...{string}]
+		}] | *[{
+			other: []
+		}]
+	}
+	
+	// Order dependent! Breaks if the lines below are moved to the top of the file.
+	entrypoint: used.output
+	used: #Kubernetes & {
+		Routes: route: routes
+	}
+}
+issue3638: reduced: {
+	input: k1: [string]: a: 1
+	input: k1: foo: #x
+	out: {
+		for x in input { x }
+		for x in input { x }
+	}
+	#x: { a: int } | *{ b: 2 }
+}
+// We expect that changing the pattern constraint into a field should give
+// not materially change the outcome.
+issue3638: compare: {
+	input: k1: foo: a: 1
+	input: k1: foo: #x
+	out: {
+		for x in input { x }
+		for x in input { x }
+	}
+	#x: { a: int } | *{ b: 2 }
+}
 -- out/eval/stats --
 Leaks:  4
-Freed:  85
-Reused: 78
-Allocs: 11
-Retain: 12
+Freed:  269
+Reused: 250
+Allocs: 23
+Retain: 30
 
-Unifications: 68
-Conjuncts:    135
-Disjuncts:    95
+Unifications: 214
+Conjuncts:    639
+Disjuncts:    297
 -- out/evalalpha --
 Errors:
 t1.c.z: field not allowed:
@@ -220,6 +275,147 @@ Result:
         }
         countries: (string){ |((string){ "US" }, (string){ "GB" }, (string){ "AU" }) }
       }
+    }
+  }
+  issue3638: (struct){
+    full: (struct){
+      routes: (struct){
+        default: (struct){
+          spec: (#list){
+            0: (struct){
+              refs: (#list){
+                0: (string){ "default" }
+              }
+            }
+          }
+        }
+      }
+      #Fields: (#struct){
+        input: (_){ _ }
+        output: (_|_){
+          // [incomplete] issue3638.full.#Fields.output: cannot range over input (incomplete type _):
+          //     ./multi.cue:10:21
+        }
+      }
+      #Kubernetes: (#struct){
+        Routes: (#struct){
+          route: (#struct){
+          }
+        }
+        input: (#struct){
+          res1: ~(issue3638.full.#Kubernetes.Routes)
+        }
+        output: (#list){
+          0: (#struct){
+            route: (#struct){
+            }
+          }
+        }
+      }
+      let HTTPROUTESPEC#1 = (struct){
+        #x: (#list){ |(*(#list){
+            0: (#struct){
+              other: (#list){
+              }
+            }
+          }, (list){
+          }) }
+      }
+      entrypoint: ~(issue3638.full.used.output)
+      used: (#struct){
+        Routes: (#struct){
+          route: (#struct){
+            default: (#struct){
+              spec: (#list){
+                0: (#struct){
+                  refs: (#list){
+                    0: (string){ "default" }
+                  }
+                }
+              }
+            }
+          }
+        }
+        input: (#struct){
+          res1: (#struct){
+            route: (#struct){
+              default: (#struct){
+                spec: (#list){
+                  0: (#struct){
+                    refs: (#list){
+                      0: (string){ "default" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        output: (#list){
+          0: (#struct){
+            route: (#struct){
+              default: (#struct){
+                spec: (#list){ |((#list){
+                    0: (#struct){
+                      refs: (#list){
+                        0: (string){ "default" }
+                      }
+                    }
+                  }, (#list){
+                    0: (#struct){
+                      refs: (#list){
+                        0: (string){ "default" }
+                      }
+                      other: (#list){
+                      }
+                    }
+                  }) }
+              }
+            }
+          }
+        }
+      }
+    }
+    reduced: (struct){
+      input: (struct){
+        k1: (struct){
+          foo: (#struct){
+            a: (int){ 1 }
+          }
+        }
+      }
+      out: (struct){
+        foo: (#struct){ |((#struct){
+            a: (int){ 1 }
+          }, (#struct){
+            a: (int){ 1 }
+            b: (int){ 2 }
+          }) }
+      }
+      #x: (#struct){ |(*(#struct){
+          b: (int){ 2 }
+        }, (#struct){
+          a: (int){ int }
+        }) }
+    }
+    compare: (struct){
+      input: (struct){
+        k1: (struct){
+          foo: (#struct){
+            a: (int){ 1 }
+          }
+        }
+      }
+      out: (struct){
+        foo: (#struct){
+          a: (int){ 1 }
+        }
+      }
+      #x: (#struct){ |(*(#struct){
+          b: (int){ 2 }
+        }, (#struct){
+          a: (int){ int }
+        }) }
     }
   }
 }
@@ -450,11 +646,162 @@ diff old new
        }
      }
    }
+@@ -206,20 +146,17 @@
+         }
+       }
+       #Kubernetes: (#struct){
+-        input: (#struct){
+-          res1: (#struct){
+-            route: (#struct){
+-            }
+-          }
+-        }
+-        output: (#list){
+-          0: (#struct){
+-            route: (#struct){
+-            }
+-          }
+-        }
+-        Routes: (#struct){
+-          route: (#struct){
++        Routes: (#struct){
++          route: (#struct){
++          }
++        }
++        input: (#struct){
++          res1: ~(issue3638.full.#Kubernetes.Routes)
++        }
++        output: (#list){
++          0: (#struct){
++            route: (#struct){
++            }
+           }
+         }
+       }
+@@ -232,22 +169,21 @@
+           }, (list){
+           }) }
+       }
+-      entrypoint: (#list){
+-        0: (struct){
+-          route: (struct){
+-            default: (struct){
+-              spec: (#list){
+-                0: (#struct){
+-                  refs: (#list){
+-                    0: (string){ "default" }
+-                  }
+-                }
+-              }
+-            }
+-          }
+-        }
+-      }
++      entrypoint: ~(issue3638.full.used.output)
+       used: (#struct){
++        Routes: (#struct){
++          route: (#struct){
++            default: (#struct){
++              spec: (#list){
++                0: (#struct){
++                  refs: (#list){
++                    0: (string){ "default" }
++                  }
++                }
++              }
++            }
++          }
++        }
+         input: (#struct){
+           res1: (#struct){
+             route: (#struct){
+@@ -267,12 +203,10 @@
+           0: (#struct){
+             route: (#struct){
+               default: (#struct){
+-                spec: (list){ |(*(#list){
+-                    0: (#struct){
+-                      refs: (#list){
+-                        0: (string){ "default" }
+-                      }
+-                      other: (#list){
++                spec: (#list){ |((#list){
++                    0: (#struct){
++                      refs: (#list){
++                        0: (string){ "default" }
+                       }
+                     }
+                   }, (#list){
+@@ -280,6 +214,8 @@
+                       refs: (#list){
+                         0: (string){ "default" }
+                       }
++                      other: (#list){
++                      }
+                     }
+                   }) }
+               }
+@@ -286,19 +222,6 @@
+             }
+           }
+         }
+-        Routes: (#struct){
+-          route: (#struct){
+-            default: (#struct){
+-              spec: (#list){
+-                0: (#struct){
+-                  refs: (#list){
+-                    0: (string){ "default" }
+-                  }
+-                }
+-              }
+-            }
+-          }
+-        }
+       }
+     }
+     reduced: (struct){
+@@ -310,11 +233,11 @@
+         }
+       }
+       out: (struct){
+-        foo: (#struct){ |(*(#struct){
+-            a: (int){ 1 }
+-            b: (int){ 2 }
+-          }, (#struct){
+-            a: (int){ 1 }
++        foo: (#struct){ |((#struct){
++            a: (int){ 1 }
++          }, (#struct){
++            a: (int){ 1 }
++            b: (int){ 2 }
+           }) }
+       }
+       #x: (#struct){ |(*(#struct){
+@@ -332,12 +255,9 @@
+         }
+       }
+       out: (struct){
+-        foo: (#struct){ |(*(#struct){
+-            a: (int){ 1 }
+-            b: (int){ 2 }
+-          }, (#struct){
+-            a: (int){ 1 }
+-          }) }
++        foo: (#struct){
++          a: (int){ 1 }
++        }
+       }
+       #x: (#struct){ |(*(#struct){
+           b: (int){ 2 }
 -- diff/todo/p3 --
 Reordering of error messages.
 -- diff/explanation --
 Overall, the previous errors now passing is acceptable and consistent with
 the behavior of the new evaluator.
+issue3638: in V2, there was a spurious default marker to disambiguate
+a disjunction that should have already been disambiguated.
+In V3, the disjunction is properly disambiguated.
 -- out/eval --
 Errors:
 issue3670.a.not_int: field not allowed:
@@ -643,6 +990,167 @@ Result:
       }
     }
   }
+  issue3638: (struct){
+    full: (struct){
+      routes: (struct){
+        default: (struct){
+          spec: (#list){
+            0: (struct){
+              refs: (#list){
+                0: (string){ "default" }
+              }
+            }
+          }
+        }
+      }
+      #Fields: (#struct){
+        input: (_){ _ }
+        output: (_|_){
+          // [incomplete] issue3638.full.#Fields.output: cannot range over input (incomplete type _):
+          //     ./multi.cue:10:21
+        }
+      }
+      #Kubernetes: (#struct){
+        input: (#struct){
+          res1: (#struct){
+            route: (#struct){
+            }
+          }
+        }
+        output: (#list){
+          0: (#struct){
+            route: (#struct){
+            }
+          }
+        }
+        Routes: (#struct){
+          route: (#struct){
+          }
+        }
+      }
+      let HTTPROUTESPEC#1 = (struct){
+        #x: (#list){ |(*(#list){
+            0: (#struct){
+              other: (#list){
+              }
+            }
+          }, (list){
+          }) }
+      }
+      entrypoint: (#list){
+        0: (struct){
+          route: (struct){
+            default: (struct){
+              spec: (#list){
+                0: (#struct){
+                  refs: (#list){
+                    0: (string){ "default" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      used: (#struct){
+        input: (#struct){
+          res1: (#struct){
+            route: (#struct){
+              default: (#struct){
+                spec: (#list){
+                  0: (#struct){
+                    refs: (#list){
+                      0: (string){ "default" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        output: (#list){
+          0: (#struct){
+            route: (#struct){
+              default: (#struct){
+                spec: (list){ |(*(#list){
+                    0: (#struct){
+                      refs: (#list){
+                        0: (string){ "default" }
+                      }
+                      other: (#list){
+                      }
+                    }
+                  }, (#list){
+                    0: (#struct){
+                      refs: (#list){
+                        0: (string){ "default" }
+                      }
+                    }
+                  }) }
+              }
+            }
+          }
+        }
+        Routes: (#struct){
+          route: (#struct){
+            default: (#struct){
+              spec: (#list){
+                0: (#struct){
+                  refs: (#list){
+                    0: (string){ "default" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    reduced: (struct){
+      input: (struct){
+        k1: (struct){
+          foo: (#struct){
+            a: (int){ 1 }
+          }
+        }
+      }
+      out: (struct){
+        foo: (#struct){ |(*(#struct){
+            a: (int){ 1 }
+            b: (int){ 2 }
+          }, (#struct){
+            a: (int){ 1 }
+          }) }
+      }
+      #x: (#struct){ |(*(#struct){
+          b: (int){ 2 }
+        }, (#struct){
+          a: (int){ int }
+        }) }
+    }
+    compare: (struct){
+      input: (struct){
+        k1: (struct){
+          foo: (#struct){
+            a: (int){ 1 }
+          }
+        }
+      }
+      out: (struct){
+        foo: (#struct){ |(*(#struct){
+            a: (int){ 1 }
+            b: (int){ 2 }
+          }, (#struct){
+            a: (int){ 1 }
+          }) }
+      }
+      #x: (#struct){ |(*(#struct){
+          b: (int){ 2 }
+        }, (#struct){
+          a: (int){ int }
+        }) }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -779,6 +1287,133 @@ Result:
         }
         countries: ("US"|"GB"|"AU")
       }
+    }
+  }
+}
+--- multi.cue
+{
+  issue3638: {
+    full: {
+      routes: {
+        default: {}
+      }
+      routes: {
+        [string]: {
+          spec: [
+            {
+              refs: [
+                {
+                  "default"
+                },
+              ]
+            },
+          ]
+        }
+      }
+      #Fields: {
+        input: _
+        output: [
+          for _, x in 〈1;input〉 {
+            〈1;x〉
+          },
+        ]
+        ...
+      }
+      #Kubernetes: {
+        (〈1;#Fields〉 & {
+          Routes: {
+            route: {
+              [_]: {
+                spec!: 〈5;let HTTPROUTESPEC#1〉.#x
+              }
+            }
+          }
+        })
+        〈1;#Fields〉
+        Routes: _
+        input: {
+          res1: 〈1;Routes〉
+        }
+      }
+      let HTTPROUTESPEC#1 = {
+        #x: ([
+          ...{
+            refs: [
+              ...{
+                string
+              },
+            ]
+          },
+        ]|*[
+          {
+            other: []
+          },
+        ])
+      }
+      entrypoint: 〈0;used〉.output
+      used: (〈0;#Kubernetes〉 & {
+        Routes: {
+          route: 〈2;routes〉
+        }
+      })
+    }
+  }
+  issue3638: {
+    reduced: {
+      input: {
+        k1: {
+          [string]: {
+            a: 1
+          }
+        }
+      }
+      input: {
+        k1: {
+          foo: 〈2;#x〉
+        }
+      }
+      out: {
+        for _, x in 〈1;input〉 {
+          〈1;x〉
+        }
+        for _, x in 〈1;input〉 {
+          〈1;x〉
+        }
+      }
+      #x: ({
+        a: int
+      }|*{
+        b: 2
+      })
+    }
+  }
+  issue3638: {
+    compare: {
+      input: {
+        k1: {
+          foo: {
+            a: 1
+          }
+        }
+      }
+      input: {
+        k1: {
+          foo: 〈2;#x〉
+        }
+      }
+      out: {
+        for _, x in 〈1;input〉 {
+          〈1;x〉
+        }
+        for _, x in 〈1;input〉 {
+          〈1;x〉
+        }
+      }
+      #x: ({
+        a: int
+      }|*{
+        b: 2
+      })
     }
   }
 }

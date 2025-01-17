@@ -355,21 +355,13 @@ Result:
           0: (#struct){
             route: (#struct){
               default: (#struct){
-                spec: (#list){ |((#list){
-                    0: (#struct){
-                      refs: (#list){
-                        0: (string){ "default" }
-                      }
+                spec: (#list){
+                  0: (#struct){
+                    refs: (#list){
+                      0: (string){ "default" }
                     }
-                  }, (#list){
-                    0: (#struct){
-                      refs: (#list){
-                        0: (string){ "default" }
-                      }
-                      other: (#list){
-                      }
-                    }
-                  }) }
+                  }
+                }
               }
             }
           }
@@ -385,12 +377,9 @@ Result:
         }
       }
       out: (struct){
-        foo: (#struct){ |((#struct){
-            a: (int){ 1 }
-          }, (#struct){
-            a: (int){ 1 }
-            b: (int){ 2 }
-          }) }
+        foo: (#struct){
+          a: (int){ 1 }
+        }
       }
       #x: (#struct){ |(*(#struct){
           b: (int){ 2 }
@@ -678,7 +667,7 @@ diff old new
            }
          }
        }
-@@ -232,22 +169,21 @@
+@@ -232,60 +169,8 @@
            }, (list){
            }) }
        }
@@ -699,69 +688,85 @@ diff old new
 -      }
 +      entrypoint: ~(issue3638.full.used.output)
        used: (#struct){
-+        Routes: (#struct){
-+          route: (#struct){
-+            default: (#struct){
-+              spec: (#list){
-+                0: (#struct){
-+                  refs: (#list){
-+                    0: (string){ "default" }
-+                  }
-+                }
-+              }
-+            }
-+          }
-+        }
-         input: (#struct){
-           res1: (#struct){
-             route: (#struct){
-@@ -267,12 +203,10 @@
-           0: (#struct){
-             route: (#struct){
-               default: (#struct){
--                spec: (list){ |(*(#list){
--                    0: (#struct){
--                      refs: (#list){
--                        0: (string){ "default" }
--                      }
--                      other: (#list){
-+                spec: (#list){ |((#list){
-+                    0: (#struct){
-+                      refs: (#list){
-+                        0: (string){ "default" }
-                       }
-                     }
-                   }, (#list){
-@@ -280,6 +214,8 @@
-                       refs: (#list){
-                         0: (string){ "default" }
-                       }
-+                      other: (#list){
-+                      }
-                     }
-                   }) }
-               }
-@@ -286,19 +222,6 @@
-             }
-           }
-         }
--        Routes: (#struct){
--          route: (#struct){
--            default: (#struct){
--              spec: (#list){
--                0: (#struct){
--                  refs: (#list){
--                    0: (string){ "default" }
+-        input: (#struct){
+-          res1: (#struct){
+-            route: (#struct){
+-              default: (#struct){
+-                spec: (#list){
+-                  0: (#struct){
+-                    refs: (#list){
+-                      0: (string){ "default" }
+-                    }
 -                  }
 -                }
 -              }
 -            }
 -          }
 -        }
+-        output: (#list){
+-          0: (#struct){
+-            route: (#struct){
+-              default: (#struct){
+-                spec: (list){ |(*(#list){
+-                    0: (#struct){
+-                      refs: (#list){
+-                        0: (string){ "default" }
+-                      }
+-                      other: (#list){
+-                      }
+-                    }
+-                  }, (#list){
+-                    0: (#struct){
+-                      refs: (#list){
+-                        0: (string){ "default" }
+-                      }
+-                    }
+-                  }) }
+-              }
+-            }
+-          }
+-        }
+         Routes: (#struct){
+           route: (#struct){
+             default: (#struct){
+@@ -299,6 +184,36 @@
+             }
+           }
+         }
++        input: (#struct){
++          res1: (#struct){
++            route: (#struct){
++              default: (#struct){
++                spec: (#list){
++                  0: (#struct){
++                    refs: (#list){
++                      0: (string){ "default" }
++                    }
++                  }
++                }
++              }
++            }
++          }
++        }
++        output: (#list){
++          0: (#struct){
++            route: (#struct){
++              default: (#struct){
++                spec: (#list){
++                  0: (#struct){
++                    refs: (#list){
++                      0: (string){ "default" }
++                    }
++                  }
++                }
++              }
++            }
++          }
++        }
        }
      }
      reduced: (struct){
-@@ -310,11 +233,11 @@
+@@ -310,12 +225,9 @@
          }
        }
        out: (struct){
@@ -770,15 +775,14 @@ diff old new
 -            b: (int){ 2 }
 -          }, (#struct){
 -            a: (int){ 1 }
-+        foo: (#struct){ |((#struct){
-+            a: (int){ 1 }
-+          }, (#struct){
-+            a: (int){ 1 }
-+            b: (int){ 2 }
-           }) }
+-          }) }
++        foo: (#struct){
++          a: (int){ 1 }
++        }
        }
        #x: (#struct){ |(*(#struct){
-@@ -332,12 +255,9 @@
+           b: (int){ 2 }
+@@ -332,12 +244,9 @@
          }
        }
        out: (struct){

@@ -1366,10 +1366,13 @@ func (v *Vertex) hasConjunct(c Conjunct) (added bool) {
 }
 
 // findConjunct reports the position of c within cs or -1 if it is not found.
+//
+// NOTE: we are not comparing closeContexts. The intended use of this function
+// is only to add to list of conjuncts within a closeContext.
 func findConjunct(cs []Conjunct, c Conjunct) int {
 	for i, x := range cs {
 		// TODO: disregard certain fields from comparison (e.g. Refs)?
-		if x.CloseInfo.closeInfo == c.CloseInfo.closeInfo &&
+		if x.CloseInfo.closeInfo == c.CloseInfo.closeInfo && // V2
 			x.x == c.x &&
 			x.Env.Up == c.Env.Up && x.Env.Vertex == c.Env.Vertex {
 			return i

@@ -1,8 +1,13 @@
+env CUE_EXPERIMENT=evalv3=1
 exec cue def --inline-imports ./p1
 stdin stdout
+exec cue eval --out=json -
+cmp stdout stdout.golden
 
-# TODO Fix this test
-! exec cue eval --out=json -
+env CUE_EXPERIMENT=evalv3=1
+exec cue def --inline-imports ./p1
+stdin stdout
+exec cue eval --out=json -
 cmp stdout stdout.golden
 
 -- go.mod --
@@ -38,3 +43,7 @@ package p2
 
 regionMap: #RegionMap
 -- stdout.golden --
+{
+    "r": "us-east-1",
+    "shortRegionName": "ue1"
+}

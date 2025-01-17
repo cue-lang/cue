@@ -1,0 +1,40 @@
+exec cue def --inline-imports ./p1
+stdin stdout
+
+# TODO Fix this test
+! exec cue eval --out=json -
+cmp stdout stdout.golden
+
+-- go.mod --
+module mod.example
+
+require cuelang.org/go v0.11.1
+-- deps.go --
+package deps
+
+import _ "cuelang.org/go/cmd/cue"
+-- cue.mod/module.cue --
+module: "example.com/def"
+language: {
+	version: "v0.9.2"
+}
+-- p1/caller.cue --
+package p1
+
+import (
+	"example.com/def/p2"
+)
+
+r: "us-east-1"
+shortRegionName: p2.regionMap[r]
+
+-- p2/callee.cue --
+package p2
+
+#RegionMap: {
+	"us-east-1": "ue1"
+	"us-west_1": "uw1"
+}
+
+regionMap: #RegionMap
+-- stdout.golden --

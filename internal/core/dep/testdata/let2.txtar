@@ -1,3 +1,6 @@
+# TODO:
+# out/dependencies/all: origin should ideally be Let reference not v
+
 -- in.cue --
 v: w: u: d: 0
 

@@ -324,6 +324,7 @@ func CreateMermaidGraph(ctx *OpContext, v *Vertex, all bool) (graph string, hasE
 
 	io.WriteString(m.w, "graph TD\n")
 	io.WriteString(m.w, "   classDef err fill:#e01010,stroke:#000000,stroke-width:3,font-size:medium\n")
+	fmt.Fprintf(m.w, "   title[<b>%v</b>]\n", ctx.disjunctInfo())
 
 	indent(m.w, 1)
 	fmt.Fprintf(m.w, "style %s stroke-width:5\n\n", m.vertexID(v))

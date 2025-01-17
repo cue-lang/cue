@@ -43,8 +43,12 @@ f: {
 	e: {
 		out: c
 	}.out
-	f: Q
-	g: Q
+	f: {
+		out: Q
+	}.out
+	g: {
+		out: Q
+	}.out
 	h: {
 		out: {
 			r: {

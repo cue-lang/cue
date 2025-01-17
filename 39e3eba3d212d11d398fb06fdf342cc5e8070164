@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6264b5c_e40c98e4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-17T16:54:22Z",
+      "side": 1,
+      "message": "Oof, this sounds like it was a nasty bug.",
+      "revId": "39e3eba3d212d11d398fb06fdf342cc5e8070164",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

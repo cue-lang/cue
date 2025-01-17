@@ -16,6 +16,24 @@
       "message": "Oof, this sounds like it was a nasty bug.",
       "revId": "39e3eba3d212d11d398fb06fdf342cc5e8070164",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "821cbe9a_599d0ace",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-17T17:11:16Z",
+      "side": 1,
+      "message": "It would have been very nasty to find, but I used our graphical debugger, and it visualized the problem pretty much immediately. Still took a few minutes, but far less than one might think. I\u0027ll post some graphs in the Github issue.",
+      "parentUuid": "d6264b5c_e40c98e4",
+      "revId": "39e3eba3d212d11d398fb06fdf342cc5e8070164",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

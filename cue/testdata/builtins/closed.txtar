@@ -56,6 +56,38 @@ issue3580: {
 		b: x.a
 	})
 }
+-- out/evalalpha/stats --
+Leaks:  372
+Freed:  6
+Reused: 6
+Allocs: 372
+Retain: 0
+
+Unifications: 179
+Conjuncts:    913
+Disjuncts:    24
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  43
+-Freed:  170
+-Reused: 164
+-Allocs: 49
+-Retain: 44
++Leaks:  372
++Freed:  6
++Reused: 6
++Allocs: 372
++Retain: 0
+ 
+-Unifications: 199
+-Conjuncts:    389
+-Disjuncts:    204
++Unifications: 179
++Conjuncts:    913
++Disjuncts:    24
 -- out/eval/stats --
 Leaks:  43
 Freed:  170
@@ -127,7 +159,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1 = ~(inDisjunctions.x.syslog.xxx.a)
+            let X#1multi = 〈0;a〉
             uint: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -137,7 +169,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1 = ~(inDisjunctions.x.syslog.xxx.a)
+            let X#1multi = 〈0;a〉
             string: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -148,7 +180,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1 = ~(inDisjunctions.x.syslog.string.a)
+            let X#1multi = 〈0;a〉
             uint: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -158,7 +190,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1 = ~(inDisjunctions.x.syslog.string.a)
+            let X#1multi = 〈0;a〉
             string: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -283,7 +315,7 @@ diff old new
              string: (#struct){
                a: (#struct){
                  b: (bool){ true }
-@@ -60,42 +54,42 @@
+@@ -60,27 +54,6 @@
            }) }
        }
        syslog: (#struct){
@@ -311,19 +343,15 @@ diff old new
          xxx: (#struct){ |((#struct){
              a: (#struct){
                b: (bool){ true }
+@@ -102,6 +75,27 @@
+               }
              }
--            let X#1multi = 〈0;a〉
--            uint: (#struct){
--              a: (#struct){
--                b: (bool){ true }
--              }
--            }
--          }, (#struct){
--            a: (#struct){
--              b: (bool){ true }
--            }
--            let X#1multi = 〈0;a〉
-+            let X#1 = ~(inDisjunctions.x.syslog.xxx.a)
+           }) }
++        string: (#struct){ |((#struct){
++            a: (#struct){
++              b: (bool){ true }
++            }
++            let X#1multi = 〈0;a〉
 +            uint: (#struct){
 +              a: (#struct){
 +                b: (bool){ true }
@@ -333,31 +361,16 @@ diff old new
 +            a: (#struct){
 +              b: (bool){ true }
 +            }
-+            let X#1 = ~(inDisjunctions.x.syslog.xxx.a)
++            let X#1multi = 〈0;a〉
 +            string: (#struct){
 +              a: (#struct){
 +                b: (bool){ true }
 +              }
 +            }
 +          }) }
-+        string: (#struct){ |((#struct){
-+            a: (#struct){
-+              b: (bool){ true }
-+            }
-+            let X#1 = ~(inDisjunctions.x.syslog.string.a)
-+            uint: (#struct){
-+              a: (#struct){
-+                b: (bool){ true }
-+              }
-+            }
-+          }, (#struct){
-+            a: (#struct){
-+              b: (bool){ true }
-+            }
-+            let X#1 = ~(inDisjunctions.x.syslog.string.a)
-             string: (#struct){
-               a: (#struct){
-                 b: (bool){ true }
+       }
+     }
+     #Def: (#struct){
 -- diff/todo/p3 --
 Reordering
 Let differs.

@@ -101,9 +101,19 @@ func (n *nodeContext) insertConstraint(pattern Value, c Conjunct) bool {
 			Pattern:    pattern,
 			Constraint: constraint,
 		})
-	} else if constraint.hasConjunct(c) {
+	} else {
+		found := false
+		constraint.VisitLeafConjuncts(func(x Conjunct) bool {
+			if c.CloseInfo.cc == x.CloseInfo.cc && c.x == x.x {
+				found = true
+				return false
+			}
+			return true
+		})
 		// The constraint already existed and the conjunct was already added.
-		return false
+		if found {
+			return false
+		}
 	}
 
 	constraint.addConjunctUnchecked(c)

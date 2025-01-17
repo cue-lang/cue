@@ -734,7 +734,7 @@ func (c *closeContext) decDisjunct(ctx *OpContext, kind depKind) {
 	// TODO: the counters are only used in debug mode and we could skip this
 	// if debug is disabled.
 	for ; c != nil; c = c.parent {
-		c.disjunctCount++
+		c.disjunctCount--
 	}
 }
 

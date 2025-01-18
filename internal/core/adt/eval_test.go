@@ -86,7 +86,7 @@ var skipDebugDepErrors = map[string]int{
 	"cycle/disjunction":        4,
 	"cycle/evaluate":           1,
 	"cycle/issue990":           1,
-	"cycle/structural":         17,
+	"cycle/structural":         13,
 	"disjunctions/edge":        1,
 	"disjunctions/errors":      3,
 	"disjunctions/elimination": 19,

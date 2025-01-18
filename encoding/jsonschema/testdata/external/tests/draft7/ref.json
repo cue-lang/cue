@@ -43,10 +43,7 @@
 						"bar": false
 					}
 				},
-				"valid": false,
-				"skip": {
-					"v3": "unexpected success"
-				}
+				"valid": false
 			}
 		]
 	},

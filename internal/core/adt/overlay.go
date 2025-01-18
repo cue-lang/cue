@@ -81,13 +81,17 @@ func (ctx *overlayContext) cloneRoot(root *nodeContext) *nodeContext {
 	v := ctx.cloneVertex(root.node)
 	v.IsDisjunct = true
 
+	// At this point we have copied all the mandatory closeContexts. There
+	// are still some replacement node contexts that we will
+
 	// TODO: patch notifications to any node that is within the disjunct to
 	// point to the new vertex instead.
 
 	// Initialize closeContexts: at this point, all closeContexts that need to
 	// be cloned have been allocated and stored in closeContexts and can now be
 	// initialized.
-	for _, cc := range ctx.closeContexts {
+	for i := 0; i < len(ctx.closeContexts); i++ {
+		cc := ctx.closeContexts[i]
 		ctx.initCloneCC(cc)
 	}
 
@@ -309,12 +313,6 @@ func (ctx *overlayContext) allocCC(cc *closeContext) *closeContext {
 	// src is set in the root closeContext when cloning a vertex.
 	ctx.closeContexts = append(ctx.closeContexts, cc)
 
-	// needsCloseInSchedule is used as a boolean. The pointer to the original
-	// closeContext is just used for reporting purposes.
-	if cc.needsCloseInSchedule != nil {
-		o.needsCloseInSchedule = ctx.allocCC(cc.needsCloseInSchedule)
-	}
-
 	// We only explicitly tag dependencies of type ARC. Notifications that
 	// point within the disjunct overlay will be tagged elsewhere.
 	for _, a := range cc.arcs {
@@ -350,6 +348,18 @@ func (ctx *overlayContext) initCloneCC(x *closeContext) {
 	o.parentIndex = x.parentIndex
 	o.Expr = x.Expr
 	o.Patterns = append(o.Patterns, x.Patterns...)
+
+	// needsCloseInSchedule is a separate mechanism to signal nodes that have
+	// completed. Do not signal such nodes if they are outside the current
+	// copied graph.
+	if cx := x.needsCloseInSchedule; cx != nil {
+		if cx.src._cc.overlay == nil {
+			o.needsCloseInSchedule = nil
+		} else {
+			// TODO: Debug assert: cx.overlay != nil
+			o.needsCloseInSchedule = ctx.allocCC(cx)
+		}
+	}
 
 	// child and next always point to completed closeContexts. Moreover, only
 	// fields that are immutable, such as Expr, are used. It is therefore not

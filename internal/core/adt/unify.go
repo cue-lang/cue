@@ -486,19 +486,7 @@ func (n *nodeContext) completeNodeTasks(mode runMode) {
 	// - pending arcs (or incoming COMPS)
 	// TODO: replace with something more principled that does not piggyback on
 	// debug information.
-	for _, r := range v.cc().externalDeps {
-		if r.kind != NOTIFY {
-			continue
-		}
-		src := r.src
-		a := &src.notify[r.index]
-		if a.decremented {
-			continue
-		}
-		if n := src.src.getState(n.ctx); n != nil {
-			n.completeNodeTasks(mode)
-		}
-	}
+	n.breakIncomingArcs(mode)
 
 	// As long as ancestors are not processed, it is still possible for
 	// conjuncts to be inserted. Until that time, it is not okay to decrement
@@ -548,32 +536,7 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 	// Investigate how to work around this.
 	n.completeNodeTasks(finalize)
 
-	// TODO: remove this block in favor of finalizing notification nodes,
-	// or what have you. We have patched this to skip evaluating when using
-	// disjunctions, but this is overall a brittle approach.
-	for _, r := range n.node.cc().externalDeps {
-		src := r.src
-		// We should be careful to not evaluate parent nodes if we are inside a
-		// disjunction, or at least ensure that there are no disjunction values
-		// leaked into non-disjunction nodes through evaluating externalDeps.
-		if src.src.IsDisjunct {
-			continue
-		}
-		var a *ccArc
-		switch r.kind {
-		case ARC:
-			a = &src.arcs[r.index]
-		case NOTIFY:
-			a = &src.notify[r.index]
-		}
-		if a.decremented {
-			continue
-		}
-		a.decremented = true
-
-		src.src.unify(n.ctx, needTasksDone, attemptOnly)
-		a.dst.decDependent(n.ctx, r.kind, src)
-	}
+	n.breakIncomingDeps()
 
 	n.incDepth()
 	defer n.decDepth()

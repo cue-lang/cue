@@ -133,6 +133,18 @@ func (c *closeContext) matchDecrement(ctx *OpContext, v *Vertex, kind depKind, d
 	}
 }
 
+// A ccArcRef x refers to the x.src.[arcs|notify][x.index]
+//
+// We use this instead of pointers, because the address may change when
+// growing a slice. We use this instead mechanism instead of a pointers so
+// that we do not need to maintain separate free buffers once we use pools of
+// closeContext.
+type ccArcRef struct {
+	src   *closeContext
+	kind  depKind
+	index int
+}
+
 // addArc adds a dependent arc to c. If child is an arc, child.src == key
 func (c *closeContext) addArcDependency(ctx *OpContext, matched bool, key, child, root *closeContext) {
 	const kind = ARC
@@ -320,5 +332,61 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 	if dep := p.needsCloseInSchedule; dep != nil {
 		p.needsCloseInSchedule = nil
 		p.decDependent(ctx, EVAL, dep)
+	}
+}
+
+// breakIncomingArcs walks over incoming arcs and forces any remaining work to
+// be done.
+func (n *nodeContext) breakIncomingArcs(mode runMode) {
+	v := n.node
+	// Check:
+	// - parents (done)
+	// - incoming notifications
+	// - pending arcs (or incoming COMPS)
+	// TODO: replace with something more principled that does not piggyback on
+	// debug information.
+	for _, r := range v.cc().externalDeps {
+		if r.kind != NOTIFY {
+			continue
+		}
+		src := r.src
+		a := &src.notify[r.index]
+		if a.decremented {
+			continue
+		}
+		if n := src.src.getState(n.ctx); n != nil {
+			n.completeNodeTasks(mode)
+		}
+	}
+}
+
+// breakIncomingDeps breaks all incoming dependencies, which includes arcs and
+// pending notifications and attempts all remaining work.
+func (n *nodeContext) breakIncomingDeps() {
+	// TODO: remove this block in favor of finalizing notification nodes,
+	// or what have you. We have patched this to skip evaluating when using
+	// disjunctions, but this is overall a brittle approach.
+	for _, r := range n.node.cc().externalDeps {
+		src := r.src
+		// We should be careful to not evaluate parent nodes if we are inside a
+		// disjunction, or at least ensure that there are no disjunction values
+		// leaked into non-disjunction nodes through evaluating externalDeps.
+		if src.src.IsDisjunct {
+			continue
+		}
+		var a *ccArc
+		switch r.kind {
+		case ARC:
+			a = &src.arcs[r.index]
+		case NOTIFY:
+			a = &src.notify[r.index]
+		}
+		if a.decremented {
+			continue
+		}
+		a.decremented = true
+
+		src.src.unify(n.ctx, needTasksDone, attemptOnly)
+		a.dst.decDependent(n.ctx, r.kind, src)
 	}
 }

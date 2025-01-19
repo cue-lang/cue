@@ -337,17 +337,6 @@ type ccArc struct {
 	dst *closeContext
 }
 
-// A ccArcRef x refers to the x.src.arcs[x.index].
-// We use this instead of pointers, because the address may change when
-// growing a slice. We use this instead mechanism instead of a pointers so
-// that we do not need to maintain separate free buffers once we use pools of
-// closeContext.
-type ccArcRef struct {
-	src   *closeContext
-	kind  depKind
-	index int
-}
-
 type conjunctGrouper interface {
 	// Assign conjunct adds the conjunct and returns an arc to represent it,
 	// along with the position within the group.

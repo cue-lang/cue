@@ -315,12 +315,19 @@ func (c *closeContext) updateArcType(ctx *OpContext, t ArcType) {
 }
 
 type ccArc struct {
+	// decremented indicates whether decDependant has been called for this
+	// dependency.
 	decremented bool
 	// matched indicates the arc is only added to track the destination of a
 	// matched pattern and that it is not explicitly defined as a field.
+	// This is only used for arcs and not for notify.
 	matched bool
-	key     *closeContext
-	cc      *closeContext
+	// key is the closeContext that is closeContext that is used to find the
+	// destination of the arc, which is the root context.
+	key *closeContext
+	// cc is the closeContext for which the counters are incremented and
+	// decremented and which is the actual destination of the dependency.
+	cc *closeContext
 }
 
 // A ccArcRef x refers to the x.src.arcs[x.index].
@@ -451,7 +458,7 @@ func (cc *closeContext) getKeyedCC(ctx *OpContext, key *closeContext, c CycleInf
 		// prevent a dependency on self.
 		if key.src != cc.src {
 			matched := !checkClosed
-			cc.addDependency(ctx, ARC, matched, key, arc, key)
+			cc.addArcDependency(ctx, matched, key, arc, key)
 		}
 	}
 

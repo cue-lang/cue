@@ -332,9 +332,9 @@ type ccArc struct {
 	// key is the closeContext is used to find the destination of the arc, which
 	// is the root context.
 	key *closeContext
-	// cc is the closeContext for which the counters are incremented and
+	// dst is the closeContext for which the counters are incremented and
 	// decremented and which is the actual destination of the dependency.
-	cc *closeContext
+	dst *closeContext
 }
 
 // A ccArcRef x refers to the x.src.arcs[x.index].
@@ -416,8 +416,8 @@ func (cc *closeContext) getKeyedCC(ctx *OpContext, key *closeContext, c CycleInf
 		a := &cc.arcs[i]
 		if a.key == key {
 			a.matched = a.matched && !checkClosed
-			a.cc.updateArcType(ctx, mode)
-			return a.cc
+			a.dst.updateArcType(ctx, mode)
+			return a.dst
 		}
 	}
 
@@ -892,7 +892,7 @@ func isTotal(p Value) bool {
 // this is not the case.
 func injectClosed(ctx *OpContext, closed, dst *closeContext) {
 	for _, a := range dst.arcs {
-		ca := a.cc
+		ca := a.dst
 		switch f := ca.Label(); {
 		case ca.src.ArcType == ArcOptional,
 			// Without this continue, an evaluation error may be propagated to
@@ -924,7 +924,7 @@ func (c *closeContext) allows(ctx *OpContext, f Feature) bool {
 	ctx.Assertf(token.NoPos, c.conjunctCount == 0, "unexpected 0 conjunctCount")
 
 	for _, b := range c.arcs {
-		cb := b.cc
+		cb := b.dst
 		if b.matched || f != cb.Label() {
 			continue
 		}

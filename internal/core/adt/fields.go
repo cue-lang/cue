@@ -15,8 +15,6 @@
 package adt
 
 import (
-	"fmt"
-
 	"cuelang.org/go/cue/token"
 )
 
@@ -465,17 +463,6 @@ func (cc *closeContext) getKeyedCC(ctx *OpContext, key *closeContext, c CycleInf
 	return arc
 }
 
-func (cc *closeContext) linkNotify(ctx *OpContext, key *closeContext) bool {
-	for _, a := range cc.notify {
-		if a.key == key {
-			return false
-		}
-	}
-
-	cc.addDependency(ctx, NOTIFY, false, key, key, key.src.cc())
-	return true
-}
-
 func (cc *closeContext) assignConjunct(ctx *OpContext, root *closeContext, c Conjunct, mode ArcType, check, checkClosed bool) (arc *closeContext, pos int, added bool) {
 	arc = cc.getKeyedCC(ctx, root, c.CloseInfo.CycleInfo, mode, checkClosed)
 
@@ -553,154 +540,6 @@ func (c CloseInfo) spawnCloseContext(ctx *OpContext, t closeNodeType) (CloseInfo
 	return c, c.cc
 }
 
-// addDependency adds a dependent arc to c. If child is an arc, child.src == key
-func (c *closeContext) addDependency(ctx *OpContext, kind depKind, matched bool, key, child, root *closeContext) {
-	// NOTE: do not increment
-	// - either root closeContext or otherwise resulting from sub closeContext
-	//   all conjuncts will be added now, notified, or scheduled as task.
-	switch kind {
-	case ARC:
-		for _, a := range c.arcs {
-			if a.key == key {
-				panic("addArc: Label already exists")
-			}
-		}
-		child.incDependent(ctx, kind, c) // matched in decDependent REF(arcs)
-
-		c.arcs = append(c.arcs, ccArc{
-			matched: matched,
-			key:     key,
-			cc:      child,
-		})
-
-		// TODO: this tests seems sensible, but panics. Investigate what could
-		// trigger this.
-		// if child.src.Parent != c.src {
-		// 	panic("addArc: inconsistent parent")
-		// }
-		if child.src.cc() != root.src.cc() {
-			panic("addArc: inconsistent root")
-		}
-
-		root.externalDeps = append(root.externalDeps, ccArcRef{
-			src:   c,
-			kind:  kind,
-			index: len(c.arcs) - 1,
-		})
-	case NOTIFY:
-		for _, a := range c.notify {
-			if a.key == key {
-				panic("addArc: Label already exists")
-			}
-		}
-		child.incDependent(ctx, kind, c) // matched in decDependent REF(arcs)
-
-		c.notify = append(c.notify, ccArc{
-			matched: matched,
-			key:     key,
-			cc:      child,
-		})
-
-		// TODO: this tests seems sensible, but panics. Investigate what could
-		// trigger this.
-		// if child.src.Parent != c.src {
-		// 	panic("addArc: inconsistent parent")
-		// }
-		if child.src.cc() != root.src.cc() {
-			panic("addArc: inconsistent root")
-		}
-
-		root.externalDeps = append(root.externalDeps, ccArcRef{
-			src:   c,
-			kind:  kind,
-			index: len(c.notify) - 1,
-		})
-	default:
-		panic(kind)
-	}
-
-}
-
-// incDependent needs to be called for any conjunct or child closeContext
-// scheduled for c that is queued for later processing and not scheduled
-// immediately.
-func (c *closeContext) incDependent(ctx *OpContext, kind depKind, dependant *closeContext) (debug *ccDep) {
-	if c.src == nil {
-		panic("incDependent: unexpected nil src")
-	}
-	if dependant != nil && c.generation != dependant.generation {
-		// TODO: enable this check.
-
-		// panic(fmt.Sprintf("incDependent: inconsistent generation: %d %d", c.generation, dependant.generation))
-	}
-	debug = c.addDependent(ctx, kind, dependant)
-
-	if c.done {
-		openDebugGraph(ctx, c, "incDependent: already checked")
-
-		panic(fmt.Sprintf("incDependent: already closed: %p", c))
-	}
-
-	c.conjunctCount++
-	return debug
-}
-
-// decDependent needs to be called for any conjunct or child closeContext for
-// which a corresponding incDependent was called after it has been successfully
-// processed.
-func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *closeContext) {
-	v := c.src
-
-	c.matchDecrement(ctx, v, kind, dependant)
-
-	if c.conjunctCount == 0 {
-		panic(fmt.Sprintf("negative reference counter %d %p", c.conjunctCount, c))
-	}
-
-	c.conjunctCount--
-	if c.conjunctCount > 0 {
-		return
-	}
-
-	c.done = true
-
-	for i, a := range c.arcs {
-		cc := a.cc
-		if a.decremented {
-			continue
-		}
-		c.arcs[i].decremented = true
-		cc.decDependent(ctx, ARC, c)
-	}
-
-	for i, a := range c.notify {
-		cc := a.cc
-		if a.decremented {
-			continue
-		}
-		c.notify[i].decremented = true
-		cc.decDependent(ctx, NOTIFY, c)
-	}
-
-	if !c.updateClosedInfo(ctx) {
-		return
-	}
-
-	p := c.parent
-
-	p.decDependent(ctx, PARENT, c) // REF(decrement: spawn)
-
-	// If we have started decrementing a child closeContext, the parent started
-	// as well. If it is still marked as needing an EVAL decrement, which can
-	// happen if processing started before the node was added, it is safe to
-	// decrement it now. In this case the NOTIFY and ARC dependencies will keep
-	// the nodes alive until they can be completed.
-	if dep := p.needsCloseInSchedule; dep != nil {
-		p.needsCloseInSchedule = nil
-		p.decDependent(ctx, EVAL, dep)
-	}
-}
-
 func (c *closeContext) updateClosedInfo(ctx *OpContext) bool {
 	p := c.parent
 
@@ -760,38 +599,6 @@ func (c *closeContext) updateClosedInfo(ctx *OpContext) bool {
 	}
 
 	return true
-}
-
-// incDisjunct increases disjunction-related counters. We require kind to be
-// passed explicitly so that we can easily find the points where certain kinds
-// are used.
-func (c *closeContext) incDisjunct(ctx *OpContext, kind depKind) {
-	if kind != DISJUNCT {
-		panic("unexpected kind")
-	}
-	c.incDependent(ctx, DISJUNCT, nil)
-
-	// TODO: the counters are only used in debug mode and we could skip this
-	// if debug is disabled.
-	for ; c != nil; c = c.parent {
-		c.disjunctCount++
-	}
-}
-
-// decDisjunct decreases disjunction-related counters. We require kind to be
-// passed explicitly so that we can easily find the points where certain kinds
-// are used.
-func (c *closeContext) decDisjunct(ctx *OpContext, kind depKind) {
-	if kind != DISJUNCT {
-		panic("unexpected kind")
-	}
-	c.decDependent(ctx, DISJUNCT, nil)
-
-	// TODO: the counters are only used in debug mode and we could skip this
-	// if debug is disabled.
-	for ; c != nil; c = c.parent {
-		c.disjunctCount--
-	}
 }
 
 // linkPatterns merges the patterns of child into c, if needed.

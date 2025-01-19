@@ -1192,6 +1192,8 @@ type nodeContextState struct {
 }
 
 // A receiver receives notifications.
+// cc is used for V3 and is nil in V2
+// v is equal to cc.src._cc in V3
 type receiver struct {
 	v  *Vertex
 	cc *closeContext

@@ -182,7 +182,7 @@ type closeContext struct {
 	//
 	// This is only used for root closedContext and only for debugging.
 	// TODO: move to nodeContext.
-	externalDeps []ccArcRef
+	externalDeps []ccDepRef
 
 	// child links to a sequence which additional patterns need to be verified
 	// against (&&). If there are more than one, these additional nodes are
@@ -266,7 +266,7 @@ type closeContext struct {
 	// tree as this closeContext. In both cases the are keyed by Vertex.
 	arcs []ccArc
 
-	notify []ccArc
+	notify []ccNotify
 
 	// parentIndex is the position in the parent's arcs slice that corresponds
 	// to this closeContext. This is currently unused. The intention is to use
@@ -322,9 +322,17 @@ type ccArc struct {
 	// matched pattern and that it is not explicitly defined as a field.
 	// This is only used for arcs and not for notify.
 	matched bool
-	// key is the closeContext that is closeContext that is used to find the
-	// destination of the arc, which is the root context.
-	key *closeContext
+	// root is dst.src.cc(). TODO: remove and use dst directly.
+	root *closeContext
+	// dst is the closeContext for which the counters are incremented and
+	// decremented and which is the actual destination of the dependency.
+	dst *closeContext
+}
+
+type ccNotify struct {
+	// decremented indicates whether decDependant has been called for this
+	// dependency.
+	decremented bool
 	// dst is the closeContext for which the counters are incremented and
 	// decremented and which is the actual destination of the dependency.
 	dst *closeContext
@@ -396,7 +404,7 @@ func (v *Vertex) assignConjunct(ctx *OpContext, root *closeContext, c Conjunct, 
 func (cc *closeContext) getKeyedCC(ctx *OpContext, key *closeContext, c CycleInfo, mode ArcType, checkClosed bool) *closeContext {
 	for i := range cc.arcs {
 		a := &cc.arcs[i]
-		if a.key == key {
+		if a.root == key {
 			a.matched = a.matched && !checkClosed
 			a.dst.updateArcType(ctx, mode)
 			return a.dst
@@ -447,7 +455,7 @@ func (cc *closeContext) getKeyedCC(ctx *OpContext, key *closeContext, c CycleInf
 		// prevent a dependency on self.
 		if key.src != cc.src {
 			matched := !checkClosed
-			cc.addArcDependency(ctx, matched, key, arc, key)
+			cc.addArcDependency(ctx, matched, arc)
 		}
 	}
 

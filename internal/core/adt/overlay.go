@@ -407,36 +407,58 @@ func (ctx *overlayContext) initCloneCC(x *closeContext) {
 	if o.parentConjuncts == nil {
 		panic("expected parentConjuncts")
 	}
-
-	for _, a := range x.arcs {
-		// If an arc does not have an overlay, we should not decrement the
-		// dependency counter. We simply remove the dependency in that case.
-		if a.dst.overlay == nil {
-			continue
-		}
-		if a.root.overlay != nil {
-			a.root = a.root.overlay // TODO: is this necessary?
-		}
-		a.dst = a.dst.overlay
-		o.arcs = append(o.arcs, a)
-	}
-
-	for _, a := range x.notify {
-		// If a notification does not have an overlay, we should not decrement the
-		// dependency counter. We simply remove the dependency in that case.
-		if a.dst.overlay == nil {
-			continue
-		}
-		a.dst = a.dst.overlay
-		o.notify = append(o.notify, a)
-	}
-
-	// NOTE: copying externalDeps is hard and seems unnecessary, as it needs to
-	// be resolved in the base anyway.
 }
 
 func (ctx *overlayContext) finishDependencies(x *closeContext) {
 	o := x.overlay
+
+	for _, a := range x.arcs {
+		// If an arc does not have an overlay, we should not decrement the
+		// dependency counter. We simply remove the dependency in that case.
+		if a.dst.overlay == nil || a.root.overlay == nil {
+			panic("arcs should always point inwards and thus included in the overlay")
+		}
+		if a.decremented {
+			continue
+		}
+		a.root = a.root.overlay // TODO: is this necessary?
+		a.dst = a.dst.overlay
+		o.arcs = append(o.arcs, a)
+
+		root := a.dst.src.cc()
+		root.externalDeps = append(root.externalDeps, ccDepRef{
+			src:   o,
+			kind:  ARC,
+			index: len(o.arcs) - 1,
+		})
+	}
+
+	for _, a := range x.notify {
+		// If a notification does not have an overlay, we should not decrement
+		// the dependency counter. We simply remove the dependency in that case.
+		// TODO: however, the original closeContext that it point to now will
+		// never be "filled". We should insert top in this gat or render it as
+		// "defunct", for instance, so that it will not leave an nondecremented
+		// counter.
+		if a.dst.overlay == nil {
+			for c := a.dst; c != nil; c = c.parent {
+				c.disjunctCount++
+			}
+			continue
+		}
+		if a.decremented {
+			continue
+		}
+		a.dst = a.dst.overlay
+		o.notify = append(o.notify, a)
+
+		root := a.dst.src.cc()
+		root.externalDeps = append(root.externalDeps, ccDepRef{
+			src:   o,
+			kind:  NOTIFY,
+			index: len(o.notify) - 1,
+		})
+	}
 
 	for _, d := range x.dependencies {
 		if d.decremented {
@@ -459,9 +481,7 @@ func (ctx *overlayContext) finishDependencies(x *closeContext) {
 		}
 
 		dep := d.dependency
-		if dep.overlay != nil {
-			dep = dep.overlay
-		}
+		dep = dep.overlay
 		o.dependencies = append(o.dependencies, &ccDep{
 			dependency:  dep,
 			kind:        d.kind,

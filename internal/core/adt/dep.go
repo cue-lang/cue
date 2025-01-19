@@ -133,72 +133,40 @@ func (c *closeContext) matchDecrement(ctx *OpContext, v *Vertex, kind depKind, d
 	}
 }
 
-// addDependency adds a dependent arc to c. If child is an arc, child.src == key
-func (c *closeContext) addDependency(ctx *OpContext, kind depKind, matched bool, key, child, root *closeContext) {
+// addArc adds a dependent arc to c. If child is an arc, child.src == key
+func (c *closeContext) addArcDependency(ctx *OpContext, matched bool, key, child, root *closeContext) {
+	const kind = ARC
+
 	// NOTE: do not increment
 	// - either root closeContext or otherwise resulting from sub closeContext
 	//   all conjuncts will be added now, notified, or scheduled as task.
-	switch kind {
-	case ARC:
-		for _, a := range c.arcs {
-			if a.key == key {
-				panic("addArc: Label already exists")
-			}
+	for _, a := range c.arcs {
+		if a.key == key {
+			panic("addArc: Label already exists")
 		}
-		child.incDependent(ctx, kind, c) // matched in decDependent REF(arcs)
+	}
+	child.incDependent(ctx, kind, c) // matched in decDependent REF(arcs)
 
-		c.arcs = append(c.arcs, ccArc{
-			matched: matched,
-			key:     key,
-			cc:      child,
-		})
+	c.arcs = append(c.arcs, ccArc{
+		matched: matched,
+		key:     key,
+		cc:      child,
+	})
 
-		// TODO: this tests seems sensible, but panics. Investigate what could
-		// trigger this.
-		// if child.src.Parent != c.src {
-		// 	panic("addArc: inconsistent parent")
-		// }
-		if child.src.cc() != root.src.cc() {
-			panic("addArc: inconsistent root")
-		}
-
-		root.externalDeps = append(root.externalDeps, ccArcRef{
-			src:   c,
-			kind:  kind,
-			index: len(c.arcs) - 1,
-		})
-	case NOTIFY:
-		for _, a := range c.notify {
-			if a.key == key {
-				panic("addArc: Label already exists")
-			}
-		}
-		child.incDependent(ctx, kind, c) // matched in decDependent REF(arcs)
-
-		c.notify = append(c.notify, ccArc{
-			matched: matched,
-			key:     key,
-			cc:      child,
-		})
-
-		// TODO: this tests seems sensible, but panics. Investigate what could
-		// trigger this.
-		// if child.src.Parent != c.src {
-		// 	panic("addArc: inconsistent parent")
-		// }
-		if child.src.cc() != root.src.cc() {
-			panic("addArc: inconsistent root")
-		}
-
-		root.externalDeps = append(root.externalDeps, ccArcRef{
-			src:   c,
-			kind:  kind,
-			index: len(c.notify) - 1,
-		})
-	default:
-		panic(kind)
+	// TODO: this tests seems sensible, but panics. Investigate what could
+	// trigger this.
+	// if child.src.Parent != c.src {
+	// 	panic("addArc: inconsistent parent")
+	// }
+	if child.src.cc() != root.src.cc() {
+		panic("addArc: inconsistent root")
 	}
 
+	root.externalDeps = append(root.externalDeps, ccArcRef{
+		src:   c,
+		kind:  kind,
+		index: len(c.arcs) - 1,
+	})
 }
 
 func (cc *closeContext) linkNotify(ctx *OpContext, key *closeContext) bool {
@@ -208,8 +176,39 @@ func (cc *closeContext) linkNotify(ctx *OpContext, key *closeContext) bool {
 		}
 	}
 
-	cc.addDependency(ctx, NOTIFY, false, key, key, key.src.cc())
+	cc.addNotificationDependency(ctx, false, key, key, key.src.cc())
 	return true
+}
+
+func (c *closeContext) addNotificationDependency(ctx *OpContext, matched bool, key, child, root *closeContext) {
+	const kind = NOTIFY
+	for _, a := range c.notify {
+		if a.key == key {
+			panic("addArc: Label already exists")
+		}
+	}
+	child.incDependent(ctx, kind, c) // matched in decDependent REF(arcs)
+
+	c.notify = append(c.notify, ccArc{
+		matched: matched,
+		key:     key,
+		cc:      child,
+	})
+
+	// TODO: this tests seems sensible, but panics. Investigate what could
+	// trigger this.
+	// if child.src.Parent != c.src {
+	// 	panic("addArc: inconsistent parent")
+	// }
+	if child.src.cc() != root.src.cc() {
+		panic("addArc: inconsistent root")
+	}
+
+	root.externalDeps = append(root.externalDeps, ccArcRef{
+		src:   c,
+		kind:  kind,
+		index: len(c.notify) - 1,
+	})
 }
 
 // incDisjunct increases disjunction-related counters. We require kind to be

@@ -689,6 +689,26 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 		cc.decDependent(ctx, NOTIFY, c)
 	}
 
+	if !c.updateClosedInfo(ctx) {
+		return
+	}
+
+	p := c.parent
+
+	p.decDependent(ctx, PARENT, c) // REF(decrement: spawn)
+
+	// If we have started decrementing a child closeContext, the parent started
+	// as well. If it is still marked as needing an EVAL decrement, which can
+	// happen if processing started before the node was added, it is safe to
+	// decrement it now. In this case the NOTIFY and ARC dependencies will keep
+	// the nodes alive until they can be completed.
+	if dep := p.needsCloseInSchedule; dep != nil {
+		p.needsCloseInSchedule = nil
+		p.decDependent(ctx, EVAL, dep)
+	}
+}
+
+func (c *closeContext) updateClosedInfo(ctx *OpContext) bool {
 	p := c.parent
 
 	if c.isDef && !c.isTotal && (!c.hasTop || c.hasNonTop) {
@@ -708,6 +728,7 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 	c.finalizePattern()
 
 	if p == nil {
+		v := c.src
 		// Root pattern, set allowed patterns.
 		if pcs := v.PatternConstraints; pcs != nil {
 			if pcs.Allowed != nil {
@@ -716,9 +737,9 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 				// panic("unexpected allowed set")
 			}
 			pcs.Allowed = c.Expr
-			return
+			return false
 		}
-		return
+		return false
 	}
 
 	if c.hasTop {
@@ -745,17 +766,7 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 		p.linkPatterns(c)
 	}
 
-	p.decDependent(ctx, PARENT, c) // REF(decrement: spawn)
-
-	// If we have started decrementing a child closeContext, the parent started
-	// as well. If it is still marked as needing an EVAL decrement, which can
-	// happen if processing started before the node was added, it is safe to
-	// decrement it now. In this case the NOTIFY and ARC dependencies will keep
-	// the nodes alive until they can be completed.
-	if dep := p.needsCloseInSchedule; dep != nil {
-		p.needsCloseInSchedule = nil
-		p.decDependent(ctx, EVAL, dep)
-	}
+	return true
 }
 
 // incDisjunct increases disjunction-related counters. We require kind to be

@@ -374,19 +374,25 @@ func (n *nodeContext) breakIncomingDeps() {
 		if src.src.IsDisjunct {
 			continue
 		}
-		var a *ccArc
 		switch r.kind {
 		case ARC:
-			a = &src.arcs[r.index]
-		case NOTIFY:
-			a = &src.notify[r.index]
-		}
-		if a.decremented {
-			continue
-		}
-		a.decremented = true
+			a := &src.arcs[r.index]
+			if a.decremented {
+				continue
+			}
+			a.decremented = true
 
-		src.src.unify(n.ctx, needTasksDone, attemptOnly)
-		a.dst.decDependent(n.ctx, r.kind, src)
+			src.src.unify(n.ctx, needTasksDone, attemptOnly)
+			a.dst.decDependent(n.ctx, ARC, src)
+		case NOTIFY:
+			a := &src.notify[r.index]
+			if a.decremented {
+				continue
+			}
+			a.decremented = true
+
+			src.src.unify(n.ctx, needTasksDone, attemptOnly)
+			a.dst.decDependent(n.ctx, NOTIFY, src)
+		}
 	}
 }

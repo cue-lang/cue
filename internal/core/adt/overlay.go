@@ -441,21 +441,18 @@ func (ctx *overlayContext) initCloneCC(x *closeContext) {
 		if a.dst.overlay == nil {
 			continue
 		}
-		if a.key.overlay != nil {
-			a.key = a.key.overlay // TODO: is this necessary?
+		if a.root.overlay != nil {
+			a.root = a.root.overlay // TODO: is this necessary?
 		}
 		a.dst = a.dst.overlay
 		o.arcs = append(o.arcs, a)
 	}
 
 	for _, a := range x.notify {
-		// If an arc does not have an overlay, we should not decrement the
+		// If a notification does not have an overlay, we should not decrement the
 		// dependency counter. We simply remove the dependency in that case.
 		if a.dst.overlay == nil {
 			continue
-		}
-		if a.key.overlay != nil {
-			a.key = a.key.overlay // TODO: is this necessary?
 		}
 		a.dst = a.dst.overlay
 		o.notify = append(o.notify, a)

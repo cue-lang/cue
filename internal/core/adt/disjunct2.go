@@ -738,7 +738,7 @@ func equalPartialNode(ctx *OpContext, x, y *closeContext) bool {
 outer:
 	for _, a := range x.arcs {
 		for _, b := range y.arcs {
-			if a.key.src.Label != b.key.src.Label {
+			if a.root.src.Label != b.root.src.Label {
 				continue
 			}
 			if !equalPartialNode(ctx, a.dst, b.dst) {

@@ -521,6 +521,9 @@ func (n *nodeContext) insertAndSkipConjuncts(c Conjunct, id CloseInfo, depth int
 }
 
 func (n *nodeContext) addNotify2(v *Vertex, c CloseInfo) []receiver {
+	if v != c.cc.src {
+		panic("unaligned src")
+	}
 	// No need to do the notification mechanism if we are already complete.
 	old := n.notify
 	switch {
@@ -543,15 +546,15 @@ func (n *nodeContext) addNotify2(v *Vertex, c CloseInfo) []receiver {
 	}
 
 	for _, r := range n.notify {
-		if r.v == v && r.cc == c.cc {
+		if r.cc == c.cc {
 			return old
 		}
 	}
 
 	cc := c.cc
 
-	if root.linkNotify(n.ctx, v, cc, c.CycleInfo) {
-		n.notify = append(n.notify, receiver{v, cc})
+	if root.linkNotify(n.ctx, cc) {
+		n.notify = append(n.notify, receiver{cc.src, cc})
 	}
 
 	return old

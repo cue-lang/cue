@@ -671,22 +671,6 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 
 	c.done = true
 
-	p := c.parent
-
-	if c.isDef && !c.isTotal && (!c.hasTop || c.hasNonTop) {
-		c.isClosed = true
-		if p != nil {
-			p.isDef = true
-		}
-	}
-
-	if c.isClosedOnce {
-		c.isClosed = true
-		if p != nil {
-			p.isClosedOnce = true
-		}
-	}
-
 	for i, a := range c.arcs {
 		cc := a.cc
 		if a.decremented {
@@ -703,6 +687,22 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 		}
 		c.notify[i].decremented = true
 		cc.decDependent(ctx, NOTIFY, c)
+	}
+
+	p := c.parent
+
+	if c.isDef && !c.isTotal && (!c.hasTop || c.hasNonTop) {
+		c.isClosed = true
+		if p != nil {
+			p.isDef = true
+		}
+	}
+
+	if c.isClosedOnce {
+		c.isClosed = true
+		if p != nil {
+			p.isClosedOnce = true
+		}
 	}
 
 	c.finalizePattern()

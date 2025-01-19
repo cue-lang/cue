@@ -520,18 +520,17 @@ func (n *nodeContext) insertAndSkipConjuncts(c Conjunct, id CloseInfo, depth int
 	n.scheduleConjunct(c, id)
 }
 
-func (n *nodeContext) addNotify2(v *Vertex, c CloseInfo) []receiver {
+func (n *nodeContext) addNotify2(v *Vertex, c CloseInfo) {
 	if v != c.cc.src {
 		panic("unaligned src")
 	}
 	// No need to do the notification mechanism if we are already complete.
-	old := n.notify
 	switch {
 	case n.node.isFinal():
-		return old
+		return
 	case !n.node.isInProgress():
 	case n.meets(allAncestorsProcessed):
-		return old
+		return
 	}
 
 	// Create a "root" closeContext to reflect the entry point of the
@@ -542,22 +541,24 @@ func (n *nodeContext) addNotify2(v *Vertex, c CloseInfo) []receiver {
 	// is even possible by adding a panic.
 	root := n.node.rootCloseContext(n.ctx)
 	if root.isDecremented {
-		return old
+		return
 	}
 
 	for _, r := range n.notify {
 		if r.cc == c.cc {
-			return old
+			return
 		}
 	}
 
 	cc := c.cc
 
-	if root.linkNotify(n.ctx, cc) {
+	if root.addNotifyDependency(n.ctx, cc) {
+		// TODO: this is mostly identical to the slice in the root closeContext.
+		// Use only one once V2 is removed.
 		n.notify = append(n.notify, receiver{cc.src, cc})
 	}
 
-	return old
+	return
 }
 
 // Literal conjuncts

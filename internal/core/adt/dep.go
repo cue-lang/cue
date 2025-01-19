@@ -150,7 +150,7 @@ func (c *closeContext) addArcDependency(ctx *OpContext, matched bool, key, child
 	c.arcs = append(c.arcs, ccArc{
 		matched: matched,
 		key:     key,
-		cc:      child,
+		dst:     child,
 	})
 
 	// TODO: this tests seems sensible, but panics. Investigate what could
@@ -192,7 +192,7 @@ func (c *closeContext) addNotificationDependency(ctx *OpContext, matched bool, k
 	c.notify = append(c.notify, ccArc{
 		matched: matched,
 		key:     key,
-		cc:      child,
+		dst:     child,
 	})
 
 	// TODO: this tests seems sensible, but panics. Investigate what could
@@ -287,7 +287,7 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 	c.done = true
 
 	for i, a := range c.arcs {
-		cc := a.cc
+		cc := a.dst
 		if a.decremented {
 			continue
 		}
@@ -296,7 +296,7 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 	}
 
 	for i, a := range c.notify {
-		cc := a.cc
+		cc := a.dst
 		if a.decremented {
 			continue
 		}

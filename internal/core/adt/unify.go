@@ -572,7 +572,7 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 		a.decremented = true
 
 		src.src.unify(n.ctx, needTasksDone, attemptOnly)
-		a.cc.decDependent(n.ctx, r.kind, src)
+		a.dst.decDependent(n.ctx, r.kind, src)
 	}
 
 	n.incDepth()

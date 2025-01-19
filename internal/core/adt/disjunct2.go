@@ -741,7 +741,7 @@ outer:
 			if a.key.src.Label != b.key.src.Label {
 				continue
 			}
-			if !equalPartialNode(ctx, a.cc, b.cc) {
+			if !equalPartialNode(ctx, a.dst, b.dst) {
 				return false
 			}
 			continue outer

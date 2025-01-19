@@ -95,6 +95,10 @@ func (ctx *overlayContext) cloneRoot(root *nodeContext) *nodeContext {
 		ctx.initCloneCC(cc)
 	}
 
+	for _, cc := range ctx.closeContexts {
+		ctx.finishDependencies(cc)
+	}
+
 	// TODO: walk overlay vertices and decrement counters of non-disjunction
 	// running tasks?
 	// TODO: find a faster way to do this. Walking over vertices would
@@ -378,37 +382,6 @@ func (ctx *overlayContext) initCloneCC(x *closeContext) {
 		// panic("unexpected overlay in next")
 	}
 
-	for _, d := range x.dependencies {
-		if d.decremented {
-			continue
-		}
-
-		if d.dependency.overlay == nil {
-			// This dependency is irrelevant for the current overlay. We can
-			// eliminate it as long as we decrement the accompanying counter.
-			if o.conjunctCount < 2 {
-				// This node can only be relevant if it has at least one other
-				// dependency. Check that we are not decrementing the counter
-				// to 0.
-				// TODO: this currently panics for some tests. Disabling does
-				// not seem to harm, though. Reconsider whether this is an issue.
-				// panic("unexpected conjunctCount: must be at least 2")
-			}
-			o.conjunctCount--
-			continue
-		}
-
-		dep := d.dependency
-		if dep.overlay != nil {
-			dep = dep.overlay
-		}
-		o.dependencies = append(o.dependencies, &ccDep{
-			dependency:  dep,
-			kind:        d.kind,
-			decremented: false,
-		})
-	}
-
 	switch p := x.parentConjuncts.(type) {
 	case *closeContext:
 		if p.overlay == nil {
@@ -460,6 +433,41 @@ func (ctx *overlayContext) initCloneCC(x *closeContext) {
 
 	// NOTE: copying externalDeps is hard and seems unnecessary, as it needs to
 	// be resolved in the base anyway.
+}
+
+func (ctx *overlayContext) finishDependencies(x *closeContext) {
+	o := x.overlay
+
+	for _, d := range x.dependencies {
+		if d.decremented {
+			continue
+		}
+
+		if d.dependency.overlay == nil {
+			// This dependency is irrelevant for the current overlay. We can
+			// eliminate it as long as we decrement the accompanying counter.
+			if o.conjunctCount < 2 {
+				// This node can only be relevant if it has at least one other
+				// dependency. Check that we are not decrementing the counter
+				// to 0.
+				// TODO: this currently panics for some tests. Disabling does
+				// not seem to harm, though. Reconsider whether this is an issue.
+				// panic("unexpected conjunctCount: must be at least 2")
+			}
+			o.conjunctCount--
+			continue
+		}
+
+		dep := d.dependency
+		if dep.overlay != nil {
+			dep = dep.overlay
+		}
+		o.dependencies = append(o.dependencies, &ccDep{
+			dependency:  dep,
+			kind:        d.kind,
+			decremented: false,
+		})
+	}
 }
 
 func (ctx *overlayContext) cloneScheduler(dst, src *nodeContext) {

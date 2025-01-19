@@ -463,14 +463,14 @@ func (cc *closeContext) getKeyedCC(ctx *OpContext, key *closeContext, c CycleInf
 	return arc
 }
 
-func (cc *closeContext) linkNotify(ctx *OpContext, dst *Vertex, key *closeContext, c CycleInfo) bool {
+func (cc *closeContext) linkNotify(ctx *OpContext, key *closeContext) bool {
 	for _, a := range cc.arcs {
 		if a.key == key {
 			return false
 		}
 	}
 
-	cc.addDependency(ctx, NOTIFY, false, key, key, dst.cc())
+	cc.addDependency(ctx, NOTIFY, false, key, key, key.src.cc())
 	return true
 }
 

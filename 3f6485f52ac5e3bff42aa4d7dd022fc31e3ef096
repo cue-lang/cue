@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f355c2dc_5ae8c978",
+        "filename": "cmd/cue/cmd/testdata/script/encoding_comments.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-20T14:26:46Z",
+      "side": 1,
+      "message": "`#Schema` is in its own file (`schema.cue`), on its own, and so has no relationship with any other node. The way in which it\u0027s used doesn\u0027t change that.\n\nfrom `data.cue` we know (read `a -\u003e b` as \"a comes before b\"):\nData -\u003e implicitUnified -\u003e explicitUnified -\u003e disjunction\n\nfrom `basic.cue`:\nfoo -\u003e struct -\u003e list\n\nAll of these relationships are honoured in the output.\n\nWe have 3 unrelated chains then:\n1. #Schema\n2. Data -\u003e implicitUnified -\u003e explicitUnified -\u003e disjunction\n3. foo -\u003e struct -\u003e list\n\nThe algorithm behaves as follows:\n1. #Schema wins because `#` \u003c `D` and `f`. Chain 1 is now complete\n2. Data wins because `D` \u003c `f`.\n3. foo wins because `f` \u003c `i`\n4. implicitUnified wins because `i` \u003c `s`\n5. explicitUnified wins because `e` \u003c `s`\n6. disjunction wins because `d` \u003c `s`. Chain 2 is now complete\n7. struct, then list finishes chain 3.",
+      "parentUuid": "3ae04abc_a04c5a25",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "40a07c05_7cb79b40",
         "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
         "patchSetId": 1

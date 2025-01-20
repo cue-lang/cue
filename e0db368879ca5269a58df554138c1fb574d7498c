@@ -1,0 +1,107 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b74a01d_56744f5e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-20T09:42:02Z",
+      "side": 1,
+      "message": "package",
+      "range": {
+        "startLine": 28,
+        "startChar": 15,
+        "endLine": 28,
+        "endChar": 22
+      },
+      "revId": "e0db368879ca5269a58df554138c1fb574d7498c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4c6f30e_37c77983",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-20T09:42:02Z",
+      "side": 1,
+      "message": "improves",
+      "range": {
+        "startLine": 31,
+        "startChar": 13,
+        "endLine": 31,
+        "endChar": 21
+      },
+      "revId": "e0db368879ca5269a58df554138c1fb574d7498c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "291ecd23_85ec28fc",
+        "filename": "encoding/jsonschema/external_teststats.txt",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-20T09:42:02Z",
+      "side": 1,
+      "message": "Roger will be happy with this!",
+      "revId": "e0db368879ca5269a58df554138c1fb574d7498c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1104016_6c607555",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 431,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-20T09:42:02Z",
+      "side": 1,
+      "message": "I assume we can\u0027t use `len(root.externalDeps)` here?",
+      "revId": "e0db368879ca5269a58df554138c1fb574d7498c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a178167b_4d4abdcf",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 441,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-20T09:42:02Z",
+      "side": 1,
+      "message": "Where or how does this happen? It\u0027s not obvious to me from the code below; perhaps expand a bit.",
+      "range": {
+        "startLine": 441,
+        "startChar": 5,
+        "endLine": 441,
+        "endChar": 39
+      },
+      "revId": "e0db368879ca5269a58df554138c1fb574d7498c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

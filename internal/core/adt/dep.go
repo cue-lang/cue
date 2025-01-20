@@ -254,7 +254,14 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 	v := c.src
 
 	c.matchDecrement(ctx, v, kind, dependant)
+	c.decDependentNoMatch(ctx, kind, dependant)
+}
 
+// decDependentNoMatch is like decDependent, but does not check for a matching
+// increment. This is useful when a decrement is triggered during creating
+// a disjunct overlay, as it obviates the need to create the matching debug
+// dependency.
+func (c *closeContext) decDependentNoMatch(ctx *OpContext, kind depKind, dependant *closeContext) {
 	if c.conjunctCount == 0 {
 		panic(fmt.Sprintf("negative reference counter %d %p", c.conjunctCount, c))
 	}

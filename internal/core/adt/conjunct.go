@@ -580,6 +580,8 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 			n.node.ClosedNonRecursive = true
 			var cc *closeContext
 			id, cc = id.spawnCloseContext(n.ctx, 0)
+			cc.incDependent(n.ctx, DEFER, nil)
+			defer cc.decDependent(n.ctx, DEFER, nil)
 			cc.isClosedOnce = true
 
 			if v, ok := x.BaseValue.(*Vertex); ok {

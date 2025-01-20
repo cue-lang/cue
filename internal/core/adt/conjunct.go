@@ -554,6 +554,10 @@ func (n *nodeContext) addNotify2(v *Vertex, c CloseInfo) {
 
 	cc := c.cc
 
+	// TODO: it should not be necessary to register for notifications for
+	// let expressions, so we could also filter for !n.node.Label.IsLet().
+	// However, somehow this appears to result in slightly better error
+	// messages.
 	if root.addNotifyDependency(n.ctx, cc) {
 		// TODO: this is mostly identical to the slice in the root closeContext.
 		// Use only one once V2 is removed.

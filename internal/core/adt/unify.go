@@ -285,6 +285,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	case needs&subFieldsProcessed != 0:
 		switch {
 		case assertStructuralCycleV3(n):
+			n.breakIncomingDeps()
 		// TODO: consider bailing on error if n.errs != nil.
 		case n.completeAllArcs(needs, mode):
 		}
@@ -462,13 +463,15 @@ func (n *nodeContext) completeNodeTasks(mode runMode) {
 		}()
 	}
 
-	if p := v.Parent; p != nil && p.state != nil {
-		if !v.IsDynamic && n.completed&allAncestorsProcessed == 0 {
-			p.state.completeNodeTasks(mode)
+	if !v.Label.IsLet() {
+		if p := v.Parent; p != nil && p.state != nil {
+			if !v.IsDynamic && n.completed&allAncestorsProcessed == 0 {
+				p.state.completeNodeTasks(mode)
+			}
 		}
 	}
 
-	if v.IsDynamic || v.Parent.allChildConjunctsKnown() {
+	if v.IsDynamic || v.Label.IsLet() || v.Parent.allChildConjunctsKnown() {
 		n.signal(allAncestorsProcessed)
 	}
 

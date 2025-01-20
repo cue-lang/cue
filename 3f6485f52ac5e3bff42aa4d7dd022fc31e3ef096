@@ -124,6 +124,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9e2635df_1c85f593",
+        "filename": "internal/core/export/export_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-20T17:19:28Z",
+      "side": 1,
+      "message": "This one,...",
+      "parentUuid": "6b6dd5b0_39b56f5c",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "60de6d1e_6b17d381",
         "filename": "internal/core/export/testdata/main/adt.txtar",
         "patchSetId": 1
@@ -346,6 +364,24 @@
       "writtenOn": "2025-01-20T14:00:07Z",
       "side": 1,
       "message": "This would ideally be fixed. Shouldn\u0027t be too hard.",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b804fe9_fabcb159",
+        "filename": "pkg/time/testdata/gen.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-20T17:19:28Z",
+      "side": 1,
+      "message": "...and this one, are both the same thing: I never did implement sorting in the conversion from Go structs. So it\u0027s defaulting back to name only. Happy to work on that and implement it, I\u0027m just not sure whether we should hold up this release for that feature?",
+      "parentUuid": "dd3dcae3_22cc1bc8",
       "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

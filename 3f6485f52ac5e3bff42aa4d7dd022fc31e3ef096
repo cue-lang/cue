@@ -350,6 +350,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bb8358e0_ba3930c1",
+        "filename": "tools/flow/testdata/issue2490.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-20T16:21:25Z",
+      "side": 1,
+      "message": "Indeed it does. There does appear to be something wrong here. We have explicit unification going on here, and from the docs:\n\n```\n// 2. Explicit unification\n//\n//\tx: {z: _, y: _} \u0026 {x: _, w: _}\n//\n// When considering x, we want no edges between the arguments of the\n// explicit unification operator \u0027\u0026\u0027.  There should only be edges (z\n// -\u003e y) and (x -\u003e w). \n```\n\nHowever, what\u0027s happening is the algorithm is seeing conjuncts in this order:\n```\ntext: \"foo\"\n$id:  *\"tool/cli.Print\" | \"print\"\ntext: string\n```\nIt\u0027s ignoring the edge from `$id -\u003e text` because it thinks `text` has already been provided in this struct. It has been. But it\u0027s failed to figure out they\u0027re from the explicit unification. I\u0027m still digging into this one.",
+      "parentUuid": "99daf4e7_d84cf3fa",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4e36b1da_729f398a",
         "filename": "tools/flow/testdata/slice.txtar",
         "patchSetId": 1

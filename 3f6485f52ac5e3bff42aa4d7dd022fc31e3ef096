@@ -368,6 +368,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5efb4093_2049810a",
+        "filename": "tools/flow/testdata/issue2490.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-20T16:47:26Z",
+      "side": 1,
+      "message": "Ah, figured it out. It\u0027s because it\u0027s an embedding, and the evaluator doesn\u0027t keep the explicit unification (BinaryExpr) around in the conjuncts of the vertex. If I change the test to:\n\n```\nroot: foo: cli.Print \u0026 {text: json.Marshal(input)}\n```\n\nthen it behaves as desired, because now the vertex has a BinaryExpr in its conjuncts. We treat everything as implicitly unified *unless* there\u0027s explicit evidence that it\u0027s explicitly unified.",
+      "parentUuid": "bb8358e0_ba3930c1",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4e36b1da_729f398a",
         "filename": "tools/flow/testdata/slice.txtar",
         "patchSetId": 1

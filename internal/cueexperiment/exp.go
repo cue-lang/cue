@@ -24,7 +24,7 @@ var Flags struct {
 	DecodeInt64 bool `envflag:"default:true"`
 
 	// Enable topological sorting of struct fields.
-	TopoSort bool
+	TopoSort bool `envflag:"default:true"`
 
 	// The flags below describe completed experiments; they can still be set
 	// as long as the value aligns with the final behavior once the experiment finished.

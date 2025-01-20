@@ -41,79 +41,6 @@ reordering
 [#GraphFieldConfig]
 [#GraphFieldConfig lineColor]
 [#GraphFieldConfig drawStyle]
--- out/value-v3 --
-== Simplified
-{}
-== Raw
-{
-	#LineConfig: {
-		lineColor?: string
-	}
-	#GraphFieldConfig: {
-		drawStyle?: int
-		lineColor?: string
-	}
-}
-== Final
-{}
-== All
-{
-	#LineConfig: {
-		lineColor?: string
-	}
-	#GraphFieldConfig: {
-		drawStyle?: int
-		lineColor?: string
-	}
-}
-== Eval
-{
-	#LineConfig: {
-		lineColor?: string
-	}
-	#GraphFieldConfig: {
-		drawStyle?: int
-		lineColor?: string
-	}
-}
--- diff/-out/value-v3<==>+out/value --
-diff old new
---- old
-+++ new
-@@ -6,8 +6,8 @@
- 		lineColor?: string
- 	}
- 	#GraphFieldConfig: {
--		lineColor?: string
--		drawStyle?: int
-+		drawStyle?: int
-+		lineColor?: string
- 	}
- }
- == Final
-@@ -18,8 +18,8 @@
- 		lineColor?: string
- 	}
- 	#GraphFieldConfig: {
--		lineColor?: string
--		drawStyle?: int
-+		drawStyle?: int
-+		lineColor?: string
- 	}
- }
- == Eval
-@@ -28,7 +28,7 @@
- 		lineColor?: string
- 	}
- 	#GraphFieldConfig: {
--		lineColor?: string
--		drawStyle?: int
-+		drawStyle?: int
-+		lineColor?: string
- 	}
- }
--- diff/value/explanation --
-reordering
 -- out/value --
 == Simplified
 {}
@@ -123,8 +50,8 @@ reordering
 		lineColor?: string
 	}
 	#GraphFieldConfig: {
-		lineColor?: string
 		drawStyle?: int
+		lineColor?: string
 	}
 }
 == Final
@@ -135,8 +62,8 @@ reordering
 		lineColor?: string
 	}
 	#GraphFieldConfig: {
-		lineColor?: string
 		drawStyle?: int
+		lineColor?: string
 	}
 }
 == Eval
@@ -145,7 +72,7 @@ reordering
 		lineColor?: string
 	}
 	#GraphFieldConfig: {
-		lineColor?: string
 		drawStyle?: int
+		lineColor?: string
 	}
 }

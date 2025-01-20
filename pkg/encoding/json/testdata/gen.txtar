@@ -223,13 +223,13 @@ marshalStream: {
 }
 marshal: {
 	t1: {
-		#x:      int
 		#result: json.Marshal(X)
+		#x:      int
 		a:       int
 	}
 	t2: {
-		a:       "\\ \" & < >"
 		#result: "{\"a\":\"\\\\ \\\" & < >\"}"
+		a:       "\\ \" & < >"
 	}
 }
 htmlEscape: {

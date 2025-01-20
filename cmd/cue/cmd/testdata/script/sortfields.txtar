@@ -43,8 +43,8 @@ b: y: true
     "c": true,
     "b": {
         "x": true,
-        "y": true,
-        "z": true
+        "z": true,
+        "y": true
     },
     "a": true
 }

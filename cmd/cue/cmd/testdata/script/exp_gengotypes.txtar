@@ -634,9 +634,6 @@ type RemoteStructs struct {
 	MultiTwo multipkg_two.Two `json:"multiTwo,omitempty"`
 }
 
-type EmptyStruct struct {
-}
-
 type Types struct {
 	Top any/* CUE top */ `json:"Top,omitempty"`
 
@@ -687,7 +684,20 @@ type Types struct {
 	LinkedList *LinkedList `json:"LinkedList,omitempty"`
 }
 
+type LinkedList struct {
+	Item any/* CUE top */ `json:"item,omitempty"`
+
+	Next *LinkedList `json:"next,omitempty"`
+}
+
+type EmptyStruct struct {
+}
+
 type Root struct {
+	Embedded1 int64 `json:"embedded1,omitempty"`
+
+	Embedded2 int64 `json:"embedded2,omitempty"`
+
 	Types *Types `json:"types,omitempty"`
 
 	Fields *struct {
@@ -758,10 +768,6 @@ type Root struct {
 
 	MustEqual1 int64 `json:"mustEqual1,omitempty"`
 
-	Embedded1 int64 `json:"embedded1,omitempty"`
-
-	Embedded2 int64 `json:"embedded2,omitempty"`
-
 	MustEqual2 any/* TODO: IncompleteKind: _|_ */ `json:"mustEqual2,omitempty"`
 }
 
@@ -774,12 +780,6 @@ type EmbeddedStruct struct {
 type AttrChangedName int64
 
 type AttrType constant.Kind
-
-type LinkedList struct {
-	Item any/* CUE top */ `json:"item,omitempty"`
-
-	Next *LinkedList `json:"next,omitempty"`
-}
 
 type Root_innerStruct struct {
 	InnerStructField int64 `json:"innerStructField,omitempty"`

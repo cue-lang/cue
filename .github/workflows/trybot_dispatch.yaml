@@ -8,11 +8,11 @@ name: Dispatch trybot
       - ci/test
 jobs:
   trybot:
-    runs-on: ubuntu-24.04
-    if: ${{ ((github.ref == 'refs/heads/ci/test') && false) || github.event.client_payload.type == 'trybot' }}
     defaults:
       run:
         shell: bash --noprofile --norc -euo pipefail {0}
+    runs-on: ubuntu-24.04
+    if: ${{ ((github.ref == 'refs/heads/ci/test') && false) || github.event.client_payload.type == 'trybot' }}
     steps:
       - name: Write netrc file for cueckoo Gerrithub
         run: |-

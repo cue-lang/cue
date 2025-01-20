@@ -105,6 +105,24 @@
       "parentUuid": "5007a9c2_aec39bde",
       "revId": "343763ed40401625164ec1ca0f1e760aee57ce62",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46b645a0_9f440397",
+        "filename": "internal/encoding/gotypes/generate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-20T14:19:29Z",
+      "side": 1,
+      "message": "good idea! this is now done.",
+      "parentUuid": "d1ea0292_f7cf8315",
+      "revId": "343763ed40401625164ec1ca0f1e760aee57ce62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

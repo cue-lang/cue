@@ -3,6 +3,74 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3ae04abc_a04c5a25",
+        "filename": "cmd/cue/cmd/testdata/script/encoding_comments.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-20T14:00:07Z",
+      "side": 1,
+      "message": "This one seems wrong. In the original, there is an explicit ordering:\nfoo, struct, Data, #Schema, list, and no evidence to the contrary.",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40a07c05_7cb79b40",
+        "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 654,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-20T14:00:07Z",
+      "side": 1,
+      "message": "Not sure I understand what is going on here, but it would be worth considering if we use top in these cases.",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1fd0502a_2c24336b",
+        "filename": "cmd/cue/cmd/testdata/script/export_issue3511.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-20T14:00:07Z",
+      "side": 1,
+      "message": "This is an interesting case. I would have thought there is no ordering, and thus that namespace comes later.\n\nBut I guess this is based on file position?\n\nI\u0027m not entirely sure if this should hold in this case. But as long as it is explainable from the set of rules we tell users, it is probably fine.",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b6dd5b0_39b56f5c",
+        "filename": "internal/core/export/export_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-20T14:00:07Z",
+      "side": 1,
+      "message": "Unwanted reordering.",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "60de6d1e_6b17d381",
         "filename": "internal/core/export/testdata/main/adt.txtar",
         "patchSetId": 1
@@ -14,6 +82,58 @@
       "writtenOn": "2025-01-20T11:52:17Z",
       "side": 1,
       "message": "I guess I should remove this (internal) file?",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ffccdd1_9415edfa",
+        "filename": "internal/core/export/testdata/main/adt.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 441,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-20T14:00:07Z",
+      "side": 1,
+      "message": "Yes. It does so automatically for the main test suite, but apparently not here.",
+      "parentUuid": "60de6d1e_6b17d381",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee0f1d0b_2ca8204d",
+        "filename": "internal/core/export/testdata/main/alias.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-20T14:00:07Z",
+      "side": 1,
+      "message": "This seems wrong. I only see evidence for simple -\u003e cross (so like the original).",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26b5434f_13d7b001",
+        "filename": "internal/core/export/testdata/main/alias.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 452,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-20T14:00:07Z",
+      "side": 1,
+      "message": "I would expect z-b and r to be unordered, so the result is r-z-b or such.",
       "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -54,6 +174,41 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4f55b6ef_54a25586",
+        "filename": "internal/core/export/testdata/main/merge.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-20T14:00:07Z",
+      "side": 1,
+      "message": "yes",
+      "parentUuid": "af828feb_44ba87ad",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd3dcae3_22cc1bc8",
+        "filename": "pkg/time/testdata/gen.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-20T14:00:07Z",
+      "side": 1,
+      "message": "This would ideally be fixed. Shouldn\u0027t be too hard.",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "723455fc_6e8318e1",
         "filename": "tools/flow/testdata/issue2416a.txtar",
         "patchSetId": 1
@@ -71,6 +226,58 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e7819ffc_1365b042",
+        "filename": "tools/flow/testdata/issue2416a.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-20T14:00:07Z",
+      "side": 1,
+      "message": "yes",
+      "parentUuid": "723455fc_6e8318e1",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99daf4e7_d84cf3fa",
+        "filename": "tools/flow/testdata/issue2490.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-20T14:00:07Z",
+      "side": 1,
+      "message": "It seems that this is wrong. $id comes before text in cli.Print.",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e36b1da_729f398a",
+        "filename": "tools/flow/testdata/slice.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-20T14:00:07Z",
+      "side": 1,
+      "message": "This seems a bit disturbing.",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0867a99e_ba652f21",
         "filename": "tools/flow/testdata/template.txtar",
         "patchSetId": 1
@@ -82,6 +289,24 @@
       "writtenOn": "2025-01-20T11:52:17Z",
       "side": 1,
       "message": "remove this.",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5f44e18_f7d9862e",
+        "filename": "tools/flow/testdata/template.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-20T14:00:07Z",
+      "side": 1,
+      "message": "yes",
+      "parentUuid": "0867a99e_ba652f21",
       "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

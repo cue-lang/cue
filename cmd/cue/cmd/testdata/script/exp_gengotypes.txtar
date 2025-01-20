@@ -1,5 +1,5 @@
 exec cue exp gengotypes ./root
-# ! stderr .
+! stderr .
 
 # Check how many files were generated, and see that it aligns with how many files we expect.
 find-files .
@@ -213,12 +213,12 @@ fail.both.notList: conflicting values [1,2,3] and {doc?:_} (mismatched types lis
     ./cuetest/all.cue:5:24
     ./cuetest/fail_check.cue:7:12
     ./cuetest/fail_check.cue:7:17
-    ./root/root.cue:81:8
+    ./root/root.cue:83:8
 fail.both.notString: conflicting values "not_a_struct" and {doc?:_} (mismatched types string and struct):
     ./cuetest/all.cue:4:24
     ./cuetest/fail_check.cue:7:12
     ./cuetest/fail_check.cue:7:17
-    ./root/root.cue:81:8
+    ./root/root.cue:83:8
 fail.cue."11_Int8".types.Int8: invalid value 99999 (out of bound <=127):
     ./cuetest/all.cue:61:30
 fail.cue."12_Int8".types.Int8: invalid value -99999 (out of bound >=-128):
@@ -260,18 +260,18 @@ fail.cue.discBoth.discriminatorField.one: field not allowed:
     ./cuetest/all.cue:14:43
     ./cuetest/fail_check.cue:7:12
     ./cuetest/fail_check.cue:7:17
-    ./root/root.cue:74:50
+    ./root/root.cue:76:50
 fail.cue.discBoth.discriminatorField.two: field not allowed:
     ./cuetest/all.cue:14:51
     ./cuetest/fail_check.cue:7:12
     ./cuetest/fail_check.cue:7:17
-    ./root/root.cue:74:29
+    ./root/root.cue:76:29
 fail.cue.isNotEqual.mustEqual2: conflicting values 8 and 99:
     ./cuetest/all.cue:11:37
     ./cuetest/all.cue:11:52
     ./cuetest/fail_check.cue:7:12
     ./cuetest/fail_check.cue:7:17
-    ./root/root.cue:77:15
+    ./root/root.cue:79:15
 fail.cue."34_NumericBounds".types.NumericBounds: invalid value 5555 (out of bound <100):
     ./root/types.cue:37:28
     ./cuetest/all.cue:86:43
@@ -311,6 +311,7 @@ type Tests struct {
 func main() {
 	// Sanity check that some types and fields are what we expect them to be.
 	var _ root.AttrChangedName
+	var _ root.AttrChangedNameEmbed
 	var _ = root.AttrType(constant.Kind(0))
 
 	// It's easier to test the fields with a root value.
@@ -453,6 +454,8 @@ _#overridenNeverGenerate: string
 	attrTypeCompat?: _#overridenNeverGenerate @go(,go/token.Token)
 	attrTypeNested?: {one?: two?: three?: int} @go(,type=map[any]any)
 
+	attrIgnoreNeverGenerate?: int @go(-)
+
 	// doc is a great field.
 	//
 	// It deserves multiple paragraphs of documentation
@@ -514,7 +517,24 @@ _#hiddenStruct: {
 _#unusedHiddenStruct: neverGenerate?: int
 
 #attrName: int @go(AttrChangedName)
+#attrNameEmbed: {
+	@go(AttrChangedNameEmbed)
+
+	field?: int
+}
 #attrType: _#overridenNeverGenerate @go(,type=go/constant.Kind)
+#attrTypeEmbed: {
+	@go(,type=go/constant.Kind) // obeyed even when the type has a different kind
+
+	neverGenerate?: int
+}
+
+#attrIgnoreNeverGenerate: int @go(-)
+#attrIgnoreEmbedNeverGenerate: {
+	@go(-)
+
+	neverGenerate?: int
+}
 -- root/types.cue --
 package root
 

@@ -203,14 +203,14 @@ was known to compile and is known to be correct.
 == Simplified
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -258,24 +258,24 @@ was known to compile and is known to be correct.
 	// TODO: these could be merged into a single struct.
 	issue2374: {
 		a: {
-			r: 0
 			z: 1
 			b: null
+			r: 0
 		}
 	}
 }
 == Raw
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			bar?:  5
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -327,23 +327,23 @@ was known to compile and is known to be correct.
 	// TODO: these could be merged into a single struct.
 	issue2374: {
 		a: {
-			r: 0
 			z: 1
 			b: null
+			r: 0
 		}
 	}
 }
 == Final
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -378,24 +378,24 @@ was known to compile and is known to be correct.
 	}
 	issue2374: {
 		a: {
-			r: 0
 			z: 1
 			b: null
+			r: 0
 		}
 	}
 }
 == All
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			bar?:  5
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -447,24 +447,24 @@ was known to compile and is known to be correct.
 	// TODO: these could be merged into a single struct.
 	issue2374: {
 		a: {
-			r: 0
 			z: 1
 			b: null
+			r: 0
 		}
 	}
 }
 == Eval
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			bar?:  5
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -501,9 +501,9 @@ was known to compile and is known to be correct.
 	}
 	issue2374: {
 		a: {
-			r: 0
 			z: 1
 			b: null
+			r: 0
 		}
 	}
 }
@@ -527,14 +527,14 @@ Reorderings?
 == Simplified
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -582,24 +582,24 @@ Reorderings?
 	// TODO: these could be merged into a single struct.
 	issue2374: {
 		a: {
-			r: 0
 			z: 1
 			b: null
+			r: 0
 		}
 	}
 }
 == Raw
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			bar?:  5
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -651,23 +651,23 @@ Reorderings?
 	// TODO: these could be merged into a single struct.
 	issue2374: {
 		a: {
-			r: 0
 			z: 1
 			b: null
+			r: 0
 		}
 	}
 }
 == Final
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -702,24 +702,24 @@ Reorderings?
 	}
 	issue2374: {
 		a: {
-			r: 0
 			z: 1
 			b: null
+			r: 0
 		}
 	}
 }
 == All
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			bar?:  5
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -771,24 +771,24 @@ Reorderings?
 	// TODO: these could be merged into a single struct.
 	issue2374: {
 		a: {
-			r: 0
 			z: 1
 			b: null
+			r: 0
 		}
 	}
 }
 == Eval
 {
 	fieldAlias: {
+		cross: {
+			baz: 3
+			"d-2": {}
+		}
 		simple: {
 			"a-b": 4
 			foo:   4
 			bar?:  5
 			"a-c": 5
-		}
-		cross: {
-			baz: 3
-			"d-2": {}
 		}
 	}
 	valueAlias: {
@@ -825,9 +825,9 @@ Reorderings?
 	}
 	issue2374: {
 		a: {
-			r: 0
 			z: 1
 			b: null
+			r: 0
 		}
 	}
 }

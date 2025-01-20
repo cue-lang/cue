@@ -55,11 +55,11 @@ graph TD
 
 -- out/run/t2/value --
 {
-	$id:    "run"
-	stdout: "foo"
+	$id: "run"
 	env: {
 		input: "foo"
 	}
+	stdout: "foo"
 }
 -- out/run/t2/stats --
 Leaks:  0

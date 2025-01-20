@@ -74,45 +74,9 @@ graph TD
 	$id:           "tool/file.Mkdir"
 	path:          "output"
 	createParents: true
-	stdout:        "foo"
 	permissions:   511
+	stdout:        "foo"
 }
--- out/run-v3/t2/value --
-{
-	$after: {
-		$id:           "tool/file.Mkdir"
-		path:          "output"
-		createParents: true
-		stdout:        "foo"
-		permissions:   511
-	}
-	$id:         "tool/file.Create"
-	filename:    "output/dns-records.zone"
-	permissions: 438
-	contents: """
-		kube-vagrant-monitoring-proxy A 127.0.0.1
-
-		"""
-	stdout: "foo"
-}
--- diff/-out/run-v3/t2/value<==>+out/run/t2/value --
-diff old new
---- old
-+++ new
-@@ -1,5 +1,4 @@
- {
--	$id: "tool/file.Create"
- 	$after: {
- 		$id:           "tool/file.Mkdir"
- 		path:          "output"
-@@ -7,6 +6,7 @@
- 		stdout:        "foo"
- 		permissions:   511
- 	}
-+	$id:         "tool/file.Create"
- 	filename:    "output/dns-records.zone"
- 	permissions: 438
- 	contents: """
 -- diff/value/todo/p3 --
 Reordering.
 -- out/run/t1/stats --
@@ -133,14 +97,14 @@ graph TD
 
 -- out/run/t2/value --
 {
-	$id: "tool/file.Create"
 	$after: {
 		$id:           "tool/file.Mkdir"
 		path:          "output"
 		createParents: true
-		stdout:        "foo"
 		permissions:   511
+		stdout:        "foo"
 	}
+	$id:         "tool/file.Create"
 	filename:    "output/dns-records.zone"
 	permissions: 438
 	contents: """

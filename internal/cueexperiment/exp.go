@@ -28,7 +28,7 @@ var Flags struct {
 	DecodeInt64 bool `envflag:"default:true"`
 
 	// Enable topological sorting of struct fields.
-	TopoSort bool
+	TopoSort bool `envflag:"default:true"`
 }
 
 // Init initializes Flags. Note: this isn't named "init" because we

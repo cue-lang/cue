@@ -10,8 +10,8 @@ exec cue export .
 cmp stdout want-stdout
 -- want-stdout --
 {
-    "main": "main",
-    "example.com@v0": "v0.0.1"
+    "example.com@v0": "v0.0.1",
+    "main": "main"
 }
 -- cue.mod/module.cue --
 module: "main.org@v0"

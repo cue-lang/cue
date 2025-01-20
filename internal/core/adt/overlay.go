@@ -465,6 +465,11 @@ func (ctx *overlayContext) finishDependencies(x *closeContext) {
 			continue
 		}
 
+		if d.kind == DEFER {
+			o.decDependentNoMatch(ctx.ctx, DEFER, nil)
+			continue
+		}
+
 		if d.dependency.overlay == nil {
 			// This dependency is irrelevant for the current overlay. We can
 			// eliminate it as long as we decrement the accompanying counter.

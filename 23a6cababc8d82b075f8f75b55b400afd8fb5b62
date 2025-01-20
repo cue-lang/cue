@@ -51,6 +51,24 @@
       "message": "end each of these lines with a period?",
       "revId": "23a6cababc8d82b075f8f75b55b400afd8fb5b62",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed8a5f77_8c724e23",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1196,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-20T13:19:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4f0b22bc_db4d30ad",
+      "revId": "23a6cababc8d82b075f8f75b55b400afd8fb5b62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

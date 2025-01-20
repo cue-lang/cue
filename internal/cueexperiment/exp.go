@@ -11,10 +11,6 @@ import (
 // When adding, deleting, or modifying entries below,
 // update cmd/cue/cmd/help.go as well for `cue help environment`.
 var Flags struct {
-	// TODO(mvdan): remove in December 2025; leaving it around for now
-	// so that we delay breaking any users enabling this experiment.
-	Modules bool `envflag:"deprecated,default:true"`
-
 	// EvalV3 enables the new evaluator. The new evaluator addresses various
 	// performance concerns.
 	EvalV3 bool
@@ -29,6 +25,17 @@ var Flags struct {
 
 	// Enable topological sorting of struct fields.
 	TopoSort bool
+
+	// The flags below describe completed experiments; they can still be set
+	// as long as the value aligns with the final behavior once the experiment finished.
+	// Breaking users who set such a flag seems unnecessary,
+	// and it simplifies using the same experiment flags across a range of CUE versions.
+
+	// Modules was an experiment which ran from early 2023 to late 2024.
+	Modules bool `envflag:"deprecated,default:true"`
+
+	// YAMLV3Decoder was an experiment which ran from early 2024 to late 2024.
+	YAMLV3Decoder bool `envflag:"deprecated,default:true"`
 }
 
 // Init initializes Flags. Note: this isn't named "init" because we

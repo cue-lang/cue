@@ -41,12 +41,12 @@ parse: {
 }
 split: {
 	t1: {
-		year:       2017
-		month:      7
 		day:        14
 		hour:       2
 		minute:     40
-		second:     0
+		month:      7
 		nanosecond: 123456
+		second:     0
+		year:       2017
 	}
 }

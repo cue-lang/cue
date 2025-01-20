@@ -6,11 +6,11 @@ name: Evict caches
     - cron: 0 2 * * *
 jobs:
   test:
-    if: ${{github.repository == 'cue-lang/cue'}}
-    runs-on: ubuntu-24.04
     defaults:
       run:
         shell: bash --noprofile --norc -euo pipefail {0}
+    if: ${{github.repository == 'cue-lang/cue'}}
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

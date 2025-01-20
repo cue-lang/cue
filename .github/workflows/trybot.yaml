@@ -9,10 +9,13 @@ name: TryBot
       - release-branch.*
     tags-ignore:
       - v*
-  workflow_dispatch: {}
   pull_request_target: {}
+  workflow_dispatch: {}
 jobs:
   test:
+    defaults:
+      run:
+        shell: bash --noprofile --norc -euo pipefail {0}
     strategy:
       fail-fast: false
       matrix:
@@ -28,9 +31,6 @@ jobs:
       (contains(github.event.head_commit.message, '
       Dispatch-Trailer: {"type":"trybot"')) || ! (contains(github.event.head_commit.message, '
       Dispatch-Trailer: {"type":"'))
-    defaults:
-      run:
-        shell: bash --noprofile --norc -euo pipefail {0}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -117,50 +117,50 @@ jobs:
         run: go test ./...
       - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
         name: Test with -race
-        run: go test -race ./...
         env:
           GORACE: atexit_sleep_ms=10
+        run: go test -race ./...
       - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
         name: Test on 32 bits
-        run: go test -short ./...
         env:
           GOARCH: "386"
+        run: go test -short ./...
       - name: Test with -tags=cuewasm
         run: go test -tags cuewasm ./cmd/cue/cmd ./cue/interpreter/wasm
       - name: gcloud auth for end-to-end tests
         id: auth
-        if: |-
-          github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
-          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.E2E_GCLOUD_KEY }}
-      - if: |-
+        if: |-
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
-        name: gcloud setup for end-to-end tests
+      - name: gcloud setup for end-to-end tests
         uses: google-github-actions/setup-gcloud@v2
-      - if: |-
+        if: |-
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
-        name: End-to-end test
+      - name: End-to-end test
         env:
           CUE_TEST_TOKEN: ${{ secrets.E2E_PORCUEPINE_CUE_TOKEN }}
         run: |-
           cd internal/_e2e
           go test -race
-      - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
-        name: Go checks
+        if: |-
+          github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
+          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
+      - name: Go checks
         run: |-
           go vet ./...
           go mod tidy
           (cd internal/_e2e && go test -run=-)
-      - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
-        name: staticcheck
+        if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
+      - name: staticcheck
         uses: dominikh/staticcheck-action@v1
         with:
           version: 2024.1.1
           install-go: false
+        if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
       - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
         name: Check all git tags are available
         run: |-
@@ -179,11 +179,11 @@ jobs:
           fi
       - if: (matrix.go-version == '1.23.x' && matrix.runner == 'ubuntu-24.04')
         name: Generate
+        env:
+          CUE_TOKEN: ${{ secrets.NOTCUECKOO_CUE_TOKEN }}
         run: |-
           go run cuelang.org/go/cmd/cue login --token=${CUE_TOKEN}
           go generate ./...
-        env:
-          CUE_TOKEN: ${{ secrets.NOTCUECKOO_CUE_TOKEN }}
       - if: always()
         name: Check that git is clean at the end of the job
         run: test -z "$(git status --porcelain)" || (git status; git diff; false)

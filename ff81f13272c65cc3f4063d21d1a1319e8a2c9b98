@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c963dba9_84333246",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-20T13:17:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "43313f4e_e313a127",
+      "revId": "ff81f13272c65cc3f4063d21d1a1319e8a2c9b98",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "78c5bdbd_35e3a0f6",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-01-20T09:22:35Z",
       "side": 1,
       "message": "personally, I would always comment why a manual iteration is done instead of a range. Presumably, here it\u0027s because initCloneCC may append more items to closeContexts - otherwise we could just range.",
+      "revId": "ff81f13272c65cc3f4063d21d1a1319e8a2c9b98",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3751a99f_ced80106",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-20T13:17:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "78c5bdbd_35e3a0f6",
       "revId": "ff81f13272c65cc3f4063d21d1a1319e8a2c9b98",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

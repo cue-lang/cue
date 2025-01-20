@@ -69,17 +69,22 @@ func Generate(ctx *cue.Context, insts ...*build.Instance) error {
 				g.addDef(cue.MakePath(sel))
 			}
 		}
+		// TODO: support ignoring an entire package via a @go(-) package attribute.
+		// TODO: support ignoring an entire file via a @go(-) file attribute above a package clause.
 		for len(g.defsList) > 0 {
 			path := g.defsList[0]
 			g.defsList = g.defsList[1:]
 
 			val := instVal.LookupPath(path)
-			goAttr := val.Attribute("go")
+			goAttr := goValueAttr(val)
 			goName := goNameFromPath(path, true)
 			if goName == "" {
 				return fmt.Errorf("unexpected path in defsList: %q", path.String())
 			}
 			if s, _ := goAttr.String(0); s != "" {
+				if s == "-" {
+					continue
+				}
 				goName = s
 			}
 
@@ -202,7 +207,7 @@ func (g *generator) addDef(path cue.Path) {
 // When possible, the Go type is emitted in the form of a reference.
 // Otherwise, an inline Go type expression is used.
 func (g *generator) emitType(val cue.Value, optional bool) error {
-	goAttr := val.Attribute("go")
+	goAttr := goValueAttr(val)
 	// We prefer the form @go(Name,type=pkg.Baz) as it is explicit and extensible,
 	// but we are also backwards compatible with @go(Name,pkg.Baz) as emitted by `cue get go`.
 	attrType, _, _ := goAttr.Lookup(1, "type")
@@ -284,6 +289,9 @@ func (g *generator) emitType(val cue.Value, optional bool) error {
 
 			goAttr := val.Attribute("go")
 			if s, _ := goAttr.String(0); s != "" {
+				if s == "-" {
+					continue
+				}
 				goName = s
 			}
 
@@ -390,17 +398,26 @@ func goNameFromPath(path cue.Path, defsOnly bool) string {
 	return name
 }
 
+// goValueAttr is like [cue.Value.Attribute] with the string parameter "go",
+// but it supports [cue.DeclAttr] attributes as well and not just [cue.FieldAttr].
+//
+// TODO: surely this is a shortcoming of the method above?
+func goValueAttr(val cue.Value) cue.Attribute {
+	attrs := val.Attributes(cue.ValueAttr)
+	for _, attr := range attrs {
+		if attr.Name() == "go" {
+			return attr
+		}
+	}
+	return cue.Attribute{}
+}
+
 // goPkgNameForInstance determines what to name a Go package generated from a CUE instance.
 // By default this is the CUE package name, but it can be overriden by a @go() package attribute.
 func goPkgNameForInstance(inst *build.Instance, instVal cue.Value) string {
-	attrs := instVal.Attributes(cue.DeclAttr)
-	for _, attr := range attrs {
-		if attr.Name() == "go" {
-			if s, _ := attr.String(0); s != "" {
-				return s
-			}
-			break
-		}
+	attr := goValueAttr(instVal)
+	if s, _ := attr.String(0); s != "" {
+		return s
 	}
 	return inst.PkgName
 }

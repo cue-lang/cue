@@ -76,11 +76,18 @@ given that Go does not allow declaring nested types.
 
 @go attributes can be used to override which name or type to be generated, for example:
 
-    renamed: int @go(BetterName)
-    retyped: string @go(,type=foo.com/bar.NamedString)
+	package foo
+	@go(betterpkgname)
 
-TODO: support @go(,generate=true) to force a type to be generated or skipped
+	renamed: int @go(BetterName)
+	retyped: string @go(,type=foo.com/bar.NamedString)
 
+The attribute "@go(-)" can be used to ignore a definition or field, for example:
+
+	#ignoredDefinition: {
+		@go(-)
+	}
+	ignoredField: int @go(-)
 `[1:],
 		// TODO: write a long help text once the feature set is reasonably stable.
 		RunE: mkRunE(c, runExpGenGoTypes),

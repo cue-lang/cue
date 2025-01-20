@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "360c506d_2d2f8648",
+        "filename": "internal/cueexperiment/exp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-20T17:06:41Z",
+      "side": 1,
+      "message": "Given that they\u0027re less important, how about moving these to the end of the struct?",
+      "revId": "528c5837e2427a54db428b96a3ccde9f4991d022",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

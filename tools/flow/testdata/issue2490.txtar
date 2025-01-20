@@ -23,6 +23,23 @@ graph TD
 graph TD
   t0("root.foo [Terminated]")
 
+-- out/run-v3/t1/value --
+{
+	$id:    "tool/cli.Print"
+	text:   "{}"
+	stdout: "foo"
+}
+-- diff/-out/run-v3/t1/value<==>+out/run/t1/value --
+diff old new
+--- old
++++ new
+@@ -1,5 +1,5 @@
+ {
+ 	$id:    "tool/cli.Print"
+-	stdout: "foo"
+ 	text:   "{}"
++	stdout: "foo"
+ }
 -- out/run/t1/value --
 {
 	$id:    "tool/cli.Print"

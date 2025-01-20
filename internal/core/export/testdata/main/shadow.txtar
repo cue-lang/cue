@@ -476,8 +476,8 @@ _|_ // shadowRef.e1.x.x: structural cycle
 				b: 0
 				d: {
 					b: 1
-					A: 1
 					c: 0
+					A: 1
 				}
 			}
 		}
@@ -487,8 +487,8 @@ _|_ // shadowRef.e1.x.x: structural cycle
 					b: 0
 					d: {
 						b: 1
-						A: 1
 						c: 0
+						A: 1
 					}
 				}
 			}
@@ -651,8 +651,8 @@ _|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)
 				b: 0
 				d: {
 					b: 1
-					A: 1
 					c: 0
+					A: 1
 				}
 			}
 		}
@@ -662,8 +662,8 @@ _|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)
 					b: 0
 					d: {
 						b: 1
-						A: 1
 						c: 0
+						A: 1
 					}
 				}
 			}

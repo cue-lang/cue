@@ -114,18 +114,18 @@
                   "maximum": 1000,
                   "exclusiveMaximum": true
                },
+               "bar": {
+                  "type": "array",
+                  "items": {
+                     "type": "string"
+                  }
+               },
                "a": {
                   "description": "Field a.",
                   "type": "integer",
                   "enum": [
                      1
                   ]
-               },
-               "bar": {
-                  "type": "array",
-                  "items": {
-                     "type": "string"
-                  }
                },
                "b": {
                   "type": "string"
@@ -165,10 +165,10 @@
          "YourMessage": {
             "type": "object",
             "properties": {
+               "b": {},
                "a": {
                   "type": "string"
-               },
-               "b": {}
+               }
             },
             "oneOf": [
                {

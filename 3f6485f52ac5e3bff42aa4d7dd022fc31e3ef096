@@ -89,6 +89,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7a484ec0_bcee1ecd",
+        "filename": "cmd/cue/cmd/testdata/script/export_issue3511.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-20T14:29:02Z",
+      "side": 1,
+      "message": "Implicit unification. As the docs in toposort say, this is important:\n\n```\n// 4. Implicit unification\n//\n//\tc: {z: _, y: _}\n//\tc: {x: _, w: _}\n//\n// Here, like with embeddings, we choose that the source order is\n// important, and so we must have a minimum of (z -\u003e y), (x -\u003e w) and\n// (y -\u003e x).\n```\n\nTherefore, here we have `namespace -\u003e name`.",
+      "parentUuid": "1fd0502a_2c24336b",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6b6dd5b0_39b56f5c",
         "filename": "internal/core/export/export_test.go",
         "patchSetId": 1

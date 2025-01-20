@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c43ec0ef_2c8ff1b6",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-20T12:57:58Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "6ccee235_42d6f138",
+      "revId": "fad0e0dd605568fe6523b9d198dab3f63569a909",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "20b8728d_ef1b194d",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5589f8d2_340b14fe",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 580,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-20T12:57:58Z",
+      "side": 1,
+      "message": "I wanted to keep the changes as dumb as possible. This TODO, and all assertions for that matter, will be removed in subsequent CLs.",
+      "parentUuid": "20b8728d_ef1b194d",
+      "revId": "fad0e0dd605568fe6523b9d198dab3f63569a909",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b56de163_2acb8353",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-01-20T09:28:31Z",
       "side": 1,
       "message": "reminder that XXX means \"must not merge\", so either fix or make a TODO",
+      "revId": "fad0e0dd605568fe6523b9d198dab3f63569a909",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a8faca2_51d169f4",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-20T12:57:58Z",
+      "side": 1,
+      "message": "Indeed, this can be removed.",
+      "parentUuid": "b56de163_2acb8353",
       "revId": "fad0e0dd605568fe6523b9d198dab3f63569a909",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

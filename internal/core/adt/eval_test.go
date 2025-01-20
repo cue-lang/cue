@@ -76,7 +76,6 @@ var needFix = map[string]string{
 // counter errors.
 // TODO: These counters should all go to zero.
 var skipDebugDepErrors = map[string]int{
-	"builtins/default":         1,
 	"compile/scope":            1,
 	"comprehensions/pushdown":  2,
 	"cycle/builtins":           2,

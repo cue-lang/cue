@@ -654,6 +654,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "76ec5623_809fc985",
+        "filename": "tools/flow/testdata/issue2490.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-21T17:27:08Z",
+      "side": 1,
+      "message": "I found the relevant section of comments which talks about why we use the location of the reference:\n\n```\n// The StructLit in a StructInfo may directly appear in the parent\u0027s\n// arc conjuncts. In this case, the StructLit\u0027s position is the\n// correct position to use. But the StructLit may have been reached\n// via a FieldReference, or SelectorExpr or something else. We want\n// the position of the reference, and not the StructLit itself. E.g.\n//\n//\ta: {x: 5}\n//\tb: {y: 7}\n//\tc: b\n//\tc: a\n//\n// If we\u0027re ordering the fields of c, we want the position of b and a\n// on lines 3 and 4, not the StructLits which declare a and b on lines\n// 1 and 2.\n```\n\nBut I also figured out how to find more BinExprs (explicit unification) and use them, which is now done in in the parent CL to this one.",
+      "parentUuid": "bc4497b9_234bdac8",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4e36b1da_729f398a",

@@ -90,6 +90,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0ed1ead2_dbccfd3d",
+        "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 654,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-21T11:10:56Z",
+      "side": 1,
+      "message": "\u003e LinkedList is declared in types.cue originally, which comes before root.cue.\n\nI got that filename ordering backwards actually (I tend to have issues with this), so perhaps this is backwards. But it\u0027s also not particularly important for a code generation tool.",
+      "parentUuid": "d0e70042_54fc4667",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1fd0502a_2c24336b",
         "filename": "cmd/cue/cmd/testdata/script/export_issue3511.txtar",
         "patchSetId": 1

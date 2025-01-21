@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8507126f_43e356ca",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-21T12:20:23Z",
+      "side": 1,
+      "message": "adjusting",
+      "revId": "11f351f9486a9ae6099dfd6094e04518af7d5586",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "61500bd7_132fe3f2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-21T12:20:23Z",
+      "side": 1,
+      "message": "I\u0027m not convinced about enabling S1008. In both cases I found the code easier to read before - this doesn\u0027t seem like a net improvement - and there are no other cases that it points out that _are_ an improvement.\n\nI\u0027ll +2 anyway, but consider me not sold on S1008.",
+      "revId": "11f351f9486a9ae6099dfd6094e04518af7d5586",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6aff2c04_8d2eb891",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 712,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-21T12:20:23Z",
+      "side": 1,
+      "message": "I honestly found the code quite a bit clearer before (maybe it\u0027s my brain when puzzling through conditional statements?). I think the staticcheck check should really only produce an error if there are no comments in either branch.",
+      "revId": "11f351f9486a9ae6099dfd6094e04518af7d5586",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -70,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0e70042_54fc4667",
+        "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 654,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-21T11:09:11Z",
+      "side": 1,
+      "message": "The changes here look overall correct.\n* EmptyStruct is declared before Root in the same original CUE file.\n* Embedded1 and Embedded2 are embedded at the top of the Root struct in the original CUE.\n* LinkedList is declared in types.cue originally, which comes before root.cue.\n\nSo all LGTM.\n\n\u003e but it would be worth considering if we use top in these cases.\n\nHonestly not sure what you mean by this.",
+      "parentUuid": "40a07c05_7cb79b40",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1fd0502a_2c24336b",

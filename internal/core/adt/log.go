@@ -48,7 +48,7 @@ func (c *OpContext) Assertf(pos token.Pos, b bool, format string, args ...interf
 }
 
 func init() {
-	log.SetFlags(log.Lshortfile)
+	log.SetFlags(0)
 }
 
 var pMap = map[*Vertex]int{}
@@ -57,41 +57,43 @@ func (c *OpContext) Logf(v *Vertex, format string, args ...interface{}) {
 	if c.LogEval == 0 {
 		return
 	}
-	var prefix string
+	w := &strings.Builder{}
+
+	c.logID++
+	fmt.Fprintf(w, "%3d ", c.logID)
+
 	if c.nest > 0 {
-		prefix = strings.Repeat("... ", c.nest)
-		prefix = prefix[:len(prefix)-1]
+		for i := 0; i < c.nest; i++ {
+			w.WriteString("... ")
+		}
 	}
 
 	if v == nil {
-		s := fmt.Sprintf(prefix+format, args...)
-		_ = log.Output(2, s)
+		fmt.Fprintf(w, format, args...)
+		_ = log.Output(2, w.String())
 		return
 	}
+
 	p := pMap[v]
 	if p == 0 {
 		p = len(pMap) + 1
 		pMap[v] = p
 	}
 	disjunctInfo := c.disjunctInfo()
+	fmt.Fprintf(w, "[n:%d/%v %s%s] ",
+		p, v.Path(), c.PathToString(v.Path()), disjunctInfo)
 
-	a := append([]interface{}{
-		prefix,
-		p,
-		v.Path(),
-		c.PathToString(v.Path()),
-		disjunctInfo,
-	}, args...)
-	for i := 2; i < len(a); i++ {
-		switch x := a[i].(type) {
+	for i, a := range args {
+		switch x := a.(type) {
 		case Node:
-			a[i] = c.Str(x)
+			args[i] = c.Str(x)
 		case Feature:
-			a[i] = x.SelectorString(c)
+			args[i] = x.SelectorString(c)
 		}
 	}
-	s := fmt.Sprintf("%s [n:%d %v%s%s] "+format, a...)
-	_ = log.Output(2, s)
+	fmt.Fprintf(w, format, args...)
+
+	_ = log.Output(2, w.String())
 }
 
 // PathToString creates a pretty-printed path of the given list of features.

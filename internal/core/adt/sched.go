@@ -369,11 +369,11 @@ func (s *scheduler) process(needs condition, mode runMode) bool {
 
 	if s.ctx.LogEval > 0 && len(s.tasks) > 0 {
 		if v := s.tasks[0].node.node; v != nil {
-			c.nest++
 			c.Logf(v, "START Process %v -- mode: %v", v.Label, mode)
+			c.nest++
 			defer func() {
-				c.Logf(v, "END Process")
 				c.nest--
+				c.Logf(v, "END Process")
 			}()
 		}
 	}

@@ -122,11 +122,11 @@ func (n *nodeContext) scheduleConjuncts() {
 // TODO(evalv3): consider not returning a result at all.
 func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	if c.LogEval > 0 {
-		c.nest++
 		c.Logf(v, "Unify %v", fmt.Sprintf("%p", v))
+		c.nest++
 		defer func() {
-			c.Logf(v, "END Unify")
 			c.nest--
+			c.Logf(v, "END Unify")
 		}()
 	}
 

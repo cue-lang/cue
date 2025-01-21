@@ -182,6 +182,7 @@ type OpContext struct {
 	IsValidator bool
 
 	// ==== Debugging ====
+	logID int // sequence number for log messages
 
 	// ErrorGraphs contains an analysis, represented as a Mermaid graph, for
 	// each node that has an error.

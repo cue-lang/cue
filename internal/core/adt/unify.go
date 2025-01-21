@@ -483,13 +483,7 @@ func (n *nodeContext) completeNodeTasks(mode runMode) {
 		n.updateScalar()
 	}
 
-	// Check:
-	// - parents (done)
-	// - incoming notifications
-	// - pending arcs (or incoming COMPS)
-	// TODO: replace with something more principled that does not piggyback on
-	// debug information.
-	n.breakIncomingArcs(mode)
+	n.breakIncomingNotifications(mode)
 
 	// As long as ancestors are not processed, it is still possible for
 	// conjuncts to be inserted. Until that time, it is not okay to decrement

@@ -337,7 +337,15 @@ func (n *nodeContext) breakIncomingArcs(mode runMode) {
 
 // breakIncomingDeps breaks all incoming dependencies, which includes arcs and
 // pending notifications and attempts all remaining work.
-func (n *nodeContext) breakIncomingDeps() {
+//
+// We should only break incoming dependencies if we are finalizing nodes, as
+// breaking them earlier can cause a "already closed" panic. To make sure of
+// this, we force the caller to pass mode.
+func (n *nodeContext) breakIncomingDeps(mode runMode) {
+	if mode != finalize {
+		return
+	}
+
 	// TODO: remove this block in favor of finalizing notification nodes,
 	// or what have you. We have patched this to skip evaluating when using
 	// disjunctions, but this is overall a brittle approach.

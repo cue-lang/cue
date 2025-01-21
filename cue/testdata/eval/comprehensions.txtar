@@ -96,19 +96,48 @@ matchOrder: {
     out: [string]: Val: 1
   }
 }
-
+-- issue3691.cue --
+// Ensure that parent nodes are properly processed, even when a pending arc
+// is evaluated early.
+issue3691: original: {
+	X: [string]: string
+	a: [string]: X
+	a: {
+		if true {
+			b: c: 1
+		}
+	}
+}
+// Structural cycles follow a different code path.
+issue3691: structuralCycle: {
+	X: [string]: string
+	a: [string]: X
+	a: {
+		if true {
+			b: c: a
+		}
+	}
+}
 -- out/eval/stats --
 Leaks:  4
-Freed:  64
-Reused: 57
-Allocs: 11
+Freed:  77
+Reused: 69
+Allocs: 12
 Retain: 19
 
-Unifications: 68
-Conjuncts:    96
-Disjuncts:    81
--- out/eval --
-(struct){
+Unifications: 81
+Conjuncts:    121
+Disjuncts:    94
+-- out/evalalpha --
+Errors:
+issue3691.original.a.b: conflicting values 1 and string (mismatched types int and string):
+    ./issue3691.cue:4:15
+    ./issue3691.cue:8:10
+issue3691.structuralCycle.a.b.c: structural cycle
+
+Result:
+(_|_){
+  // [eval]
   a: (struct){
     x: (int){ 10 }
     y: (int){ 100 }
@@ -206,6 +235,270 @@ Disjuncts:    81
       out: (struct){
         b: (struct){
           Val: (int){ 1 }
+        }
+      }
+    }
+  }
+  issue3691: (_|_){
+    // [eval]
+    original: (_|_){
+      // [eval]
+      X: (struct){
+      }
+      a: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval]
+          c: (_|_){
+            // [eval] issue3691.original.a.b: conflicting values 1 and string (mismatched types int and string):
+            //     ./issue3691.cue:4:15
+            //     ./issue3691.cue:8:10
+          }
+        }
+      }
+    }
+    structuralCycle: (_|_){
+      // [structural cycle]
+      X: (struct){
+      }
+      a: (_|_){
+        // [structural cycle]
+        b: (_|_){
+          // [structural cycle]
+          c: (_|_){
+            // [structural cycle] issue3691.structuralCycle.a.b.c: structural cycle
+          }
+        }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,14 +1,8 @@
+ Errors:
+-issue3691.original.a.b.c: conflicting values string and 1 (mismatched types string and int):
++issue3691.original.a.b: conflicting values 1 and string (mismatched types int and string):
+     ./issue3691.cue:4:15
+-    ./issue3691.cue:7:3
+     ./issue3691.cue:8:10
+-issue3691.structuralCycle.a.b.c: conflicting values string and {[string]:X} (mismatched types string and struct):
+-    ./issue3691.cue:14:15
+-    ./issue3691.cue:15:5
+-    ./issue3691.cue:17:3
+-    ./issue3691.cue:18:10
+-issue3691.structuralCycle.a.b.c.b.c: structural cycle
++issue3691.structuralCycle.a.b.c: structural cycle
+ 
+ Result:
+ (_|_){
+@@ -125,9 +119,8 @@
+         b: (_|_){
+           // [eval]
+           c: (_|_){
+-            // [eval] issue3691.original.a.b.c: conflicting values string and 1 (mismatched types string and int):
++            // [eval] issue3691.original.a.b: conflicting values 1 and string (mismatched types int and string):
+             //     ./issue3691.cue:4:15
+-            //     ./issue3691.cue:7:3
+             //     ./issue3691.cue:8:10
+           }
+         }
+@@ -134,25 +127,15 @@
+       }
+     }
+     structuralCycle: (_|_){
+-      // [eval]
+-      X: (struct){
+-      }
+-      a: (_|_){
+-        // [eval]
+-        b: (_|_){
+-          // [eval]
+-          c: (_|_){
+-            // [eval] issue3691.structuralCycle.a.b.c: conflicting values string and {[string]:X} (mismatched types string and struct):
+-            //     ./issue3691.cue:14:15
+-            //     ./issue3691.cue:15:5
+-            //     ./issue3691.cue:17:3
+-            //     ./issue3691.cue:18:10
+-            b: (_|_){
+-              // [structural cycle]
+-              c: (_|_){
+-                // [structural cycle] issue3691.structuralCycle.a.b.c.b.c: structural cycle
+-              }
+-            }
++      // [structural cycle]
++      X: (struct){
++      }
++      a: (_|_){
++        // [structural cycle]
++        b: (_|_){
++          // [structural cycle]
++          c: (_|_){
++            // [structural cycle] issue3691.structuralCycle.a.b.c: structural cycle
+           }
+         }
+       }
+-- diff/todo/p2 --
+Missing error positions.
+-- out/eval --
+Errors:
+issue3691.original.a.b.c: conflicting values string and 1 (mismatched types string and int):
+    ./issue3691.cue:4:15
+    ./issue3691.cue:7:3
+    ./issue3691.cue:8:10
+issue3691.structuralCycle.a.b.c: conflicting values string and {[string]:X} (mismatched types string and struct):
+    ./issue3691.cue:14:15
+    ./issue3691.cue:15:5
+    ./issue3691.cue:17:3
+    ./issue3691.cue:18:10
+issue3691.structuralCycle.a.b.c.b.c: structural cycle
+
+Result:
+(_|_){
+  // [eval]
+  a: (struct){
+    x: (int){ 10 }
+    y: (int){ 100 }
+    z: (int){ 50 }
+  }
+  b: (struct){
+    x: (int){ 10 }
+    k: (int){ 20 }
+    l: (int){ 40 }
+    z: (int){ 50 }
+  }
+  c: (struct){
+    y: (int){ 110 }
+    z: (int){ 60 }
+  }
+  A: (struct){
+    X: (struct){
+      run: (string){ "dfoo" }
+      files: (string){ "dfoo" }
+    }
+  }
+  matchOrder: (struct){
+    a1: (struct){
+      out: (struct){
+        b: (struct){
+          Val: (int){ 1 }
+        }
+      }
+      in: (struct){
+        a: (struct){
+          b: (struct){
+          }
+        }
+      }
+    }
+    a2: (struct){
+      out: (struct){
+        b: (struct){
+          Val: (int){ 1 }
+        }
+      }
+      in: (struct){
+        a: (struct){
+          b: (struct){
+          }
+        }
+      }
+    }
+    a3: (struct){
+      in: (struct){
+        a: (struct){
+          b: (struct){
+          }
+        }
+      }
+      out: (struct){
+        b: (struct){
+          Val: (int){ 1 }
+        }
+      }
+    }
+    a4: (struct){
+      out: (struct){
+        b: (struct){
+          Val: (int){ 1 }
+        }
+      }
+      in: (struct){
+        a: (struct){
+          b: (struct){
+          }
+        }
+      }
+    }
+    a5: (struct){
+      out: (struct){
+        b: (struct){
+          Val: (int){ 1 }
+        }
+      }
+      in: (struct){
+        a: (struct){
+          b: (struct){
+          }
+        }
+      }
+    }
+    a6: (struct){
+      in: (struct){
+        a: (struct){
+          b: (struct){
+          }
+        }
+      }
+      out: (struct){
+        b: (struct){
+          Val: (int){ 1 }
+        }
+      }
+    }
+  }
+  issue3691: (_|_){
+    // [eval]
+    original: (_|_){
+      // [eval]
+      X: (struct){
+      }
+      a: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval]
+          c: (_|_){
+            // [eval] issue3691.original.a.b.c: conflicting values string and 1 (mismatched types string and int):
+            //     ./issue3691.cue:4:15
+            //     ./issue3691.cue:7:3
+            //     ./issue3691.cue:8:10
+          }
+        }
+      }
+    }
+    structuralCycle: (_|_){
+      // [eval]
+      X: (struct){
+      }
+      a: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval]
+          c: (_|_){
+            // [eval] issue3691.structuralCycle.a.b.c: conflicting values string and {[string]:X} (mismatched types string and struct):
+            //     ./issue3691.cue:14:15
+            //     ./issue3691.cue:15:5
+            //     ./issue3691.cue:17:3
+            //     ./issue3691.cue:18:10
+            b: (_|_){
+              // [structural cycle]
+              c: (_|_){
+                // [structural cycle] issue3691.structuralCycle.a.b.c.b.c: structural cycle
+              }
+            }
+          }
         }
       }
     }
@@ -340,6 +633,43 @@ Disjuncts:    81
       out: {
         [string]: {
           Val: 1
+        }
+      }
+    }
+  }
+}
+--- issue3691.cue
+{
+  issue3691: {
+    original: {
+      X: {
+        [string]: string
+      }
+      a: {
+        [string]: 〈1;X〉
+      }
+      a: {
+        if true {
+          b: {
+            c: 1
+          }
+        }
+      }
+    }
+  }
+  issue3691: {
+    structuralCycle: {
+      X: {
+        [string]: string
+      }
+      a: {
+        [string]: 〈1;X〉
+      }
+      a: {
+        if true {
+          b: {
+            c: 〈3;a〉
+          }
         }
       }
     }

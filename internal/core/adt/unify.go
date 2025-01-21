@@ -285,7 +285,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	case needs&subFieldsProcessed != 0:
 		switch {
 		case assertStructuralCycleV3(n):
-			n.breakIncomingDeps()
+			n.breakIncomingDeps(mode)
 		// TODO: consider bailing on error if n.errs != nil.
 		case n.completeAllArcs(needs, mode):
 		}
@@ -539,7 +539,7 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 	// Investigate how to work around this.
 	n.completeNodeTasks(finalize)
 
-	n.breakIncomingDeps()
+	n.breakIncomingDeps(mode)
 
 	n.incDepth()
 	defer n.decDepth()

@@ -310,14 +310,10 @@ func (c *closeContext) decDependentNoMatch(ctx *OpContext, kind depKind, dependa
 	}
 }
 
-// breakIncomingArcs walks over incoming arcs and forces any remaining work to
-// be done.
-func (n *nodeContext) breakIncomingArcs(mode runMode) {
+// breakIncomingNotifications walks over incoming arcs and forces any remaining
+// work to be done.
+func (n *nodeContext) breakIncomingNotifications(mode runMode) {
 	v := n.node
-	// Check:
-	// - parents (done)
-	// - incoming notifications
-	// - pending arcs (or incoming COMPS)
 	// TODO: replace with something more principled that does not piggyback on
 	// debug information.
 	for _, r := range v.cc().externalDeps {

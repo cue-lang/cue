@@ -7,6 +7,10 @@ oauthregistry device-code-expired
 ! exec cue login --token=unrecognized_token_format_1234
 stderr -count=1 'unknown token format, expected an appv1_ prefix'
 
+# An empty token is rejected, to prevent issues like --token=${UNSET_VAR}.
+! exec cue login --token=
+stderr -count=1 'the --token flag needs a non-empty string'
+
 # Ensure that only one token is stored when starting from an empty logins.json file.
 exec cue login --token=appv1_validtoken1234
 grep -count=1 '"registries": {' cueconfig/logins.json

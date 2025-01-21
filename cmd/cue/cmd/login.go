@@ -91,6 +91,11 @@ inside $CUE_CONFIG_DIR; see 'cue help environment'.
 			switch tokenStr := flagToken.String(cmd); {
 			case tokenStr == "":
 				// By default, we perform the OAuth 2.0 device flow to obtain a new token.
+				// Note that we refuse to continue if the user set --token="",
+				// because that can be an easy mistake to make via --token=${UNSET_VAR}.
+				if flagToken.IsSet(cmd) {
+					return fmt.Errorf("the --token flag needs a non-empty string")
+				}
 
 				ctx := backgroundContext()
 				// Cause the oauth2 logic to log HTTP requests when logging is enabled.

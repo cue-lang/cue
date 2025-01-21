@@ -130,6 +130,19 @@ func (f flagName) ensureAdded(cmd *Command) {
 	}
 }
 
+// IsSet reports whether f was provided by the user, which is useful to tell
+// `cue` apart from `cue --flag=` when the flag's default value is the zero value.
+func (f flagName) IsSet(cmd *Command) bool {
+	f.ensureAdded(cmd)
+	found := false
+	cmd.Flags().Visit(func(pf *pflag.Flag) {
+		if pf.Name == string(f) {
+			found = true
+		}
+	})
+	return found
+}
+
 func (f flagName) Bool(cmd *Command) bool {
 	f.ensureAdded(cmd)
 	v, _ := cmd.Flags().GetBool(string(f))

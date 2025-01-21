@@ -291,29 +291,39 @@ func analyseStructs(v *adt.Vertex, builder *GraphBuilder) ([]*structMeta, map[ad
 		})
 	}
 
-	// Explore our own conjuncts to find explicit unifications and
-	// record as appropriate in the structMetas.
+	// Explore our own conjuncts, and the decls from our StructList, to
+	// find explicit unifications, and mark structMetas accordingly.
+	var worklist []adt.Expr
 	v.VisitLeafConjuncts(func(c adt.Conjunct) bool {
 		debug("self conjunct field %p :: %T, expr %p :: %T\n",
 			c.Field(), c.Field(), c.Expr(), c.Expr())
-		worklist := []adt.Expr{c.Expr()}
-		for len(worklist) != 0 {
-			expr := worklist[0]
-			worklist = worklist[1:]
-
-			binExpr, ok := expr.(*adt.BinaryExpr)
-			if !ok || binExpr.Op != adt.AndOp {
-				continue
-			}
-			for _, expr := range []adt.Expr{binExpr.X, binExpr.Y} {
-				for _, sMeta := range nodeToStructMeta[expr] {
-					sMeta.isExplicit = true
-				}
-			}
-			worklist = append(worklist, binExpr.X, binExpr.Y)
-		}
+		worklist = append(worklist, c.Expr())
 		return true
 	})
+	for _, si := range structInfos {
+		for _, decl := range si.StructLit.Decls {
+			if expr, ok := decl.(adt.Expr); ok {
+				worklist = append(worklist, expr)
+			}
+		}
+	}
+
+	for len(worklist) != 0 {
+		expr := worklist[0]
+		worklist = worklist[1:]
+
+		binExpr, ok := expr.(*adt.BinaryExpr)
+		if !ok || binExpr.Op != adt.AndOp {
+			continue
+		}
+		for _, expr := range []adt.Expr{binExpr.X, binExpr.Y} {
+			for _, sMeta := range nodeToStructMeta[expr] {
+				sMeta.isExplicit = true
+				debug(" now explicit: %v\n", sMeta)
+			}
+		}
+		worklist = append(worklist, binExpr.X, binExpr.Y)
+	}
 
 	return roots, outgoing
 }

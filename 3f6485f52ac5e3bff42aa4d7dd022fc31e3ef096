@@ -126,6 +126,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "98134b68_50b98865",
+        "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 654,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-21T15:28:48Z",
+      "side": 1,
+      "message": "Ok, I\u0027ve got to the bottom of this one. Note that as a general principle, we do not pay attention to filename, because we want the property that renaming a file does not alter output.\n\nWhat\u0027s tripping us up in this case is that `instVal.Fields(cue.Definitions(true))` does not sort definitions on their own. It sorts everything, and we then skip over things that are not definitions. So, we actually have three unrelated chains here:\n\n1. from import.cue, `#remoteStructs` -\u003e `_unusedImport`\n2. from root.cue, `_#overridenNeverGenerate` -\u003e `#emptyStruct` -\u003e `#root` -\u003e `_#hiddenStruct` -\u003e `#embeddedStruct` -\u003e `_#unusedHiddenStruct` -\u003e `#attrName` -\u003e `#attrType`\n3. from types.cue, `#types` -\u003e `#linkedList`\n\nIf you consider these chains, with their hidden fields too, it makes much more sense that the output order is:\n`#remoteStructs` -\u003e `#types` -\u003e `#linkedList` -\u003e `#emptyStruct` -\u003e `#root` -\u003e `#embeddedStruct` -\u003e `#attrName` -\u003e `#attrType`\n\nEssentially, once one chain gets to a `_`, we tend to switch to another chain because `#` \u003c `_`. So if you figure out the whole list, with hidden fields included, I think it all makes sense.",
+      "parentUuid": "0ed1ead2_dbccfd3d",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1fd0502a_2c24336b",
         "filename": "cmd/cue/cmd/testdata/script/export_issue3511.txtar",
         "patchSetId": 1

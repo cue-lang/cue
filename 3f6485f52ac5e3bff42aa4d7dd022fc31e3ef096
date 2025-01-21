@@ -142,6 +142,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "15acc8f6_76300d9e",
+        "filename": "cmd/cue/cmd/testdata/script/exp_gengotypes.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 654,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-21T15:35:46Z",
+      "side": 1,
+      "message": "As long as you\u0027re happy that the new order makes sense, I\u0027m happy. As I mentioned, the order for the code generator here is not terribly important, and in the other cases, toposort is clearly an improvement anyway.",
+      "parentUuid": "98134b68_50b98865",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1fd0502a_2c24336b",

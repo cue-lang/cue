@@ -53,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7924def_485a5258",
+        "filename": "cmd/cue/cmd/testdata/script/encoding_comments.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-21T14:18:15Z",
+      "side": 1,
+      "message": "doh. Please ignore me.",
+      "parentUuid": "f355c2dc_5ae8c978",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "40a07c05_7cb79b40",
@@ -137,6 +155,24 @@
       "side": 1,
       "message": "Implicit unification. As the docs in toposort say, this is important:\n\n```\n// 4. Implicit unification\n//\n//\tc: {z: _, y: _}\n//\tc: {x: _, w: _}\n//\n// Here, like with embeddings, we choose that the source order is\n// important, and so we must have a minimum of (z -\u003e y), (x -\u003e w) and\n// (y -\u003e x).\n```\n\nTherefore, here we have `namespace -\u003e name`.",
       "parentUuid": "1fd0502a_2c24336b",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c71ee508_29c10e0d",
+        "filename": "cmd/cue/cmd/testdata/script/export_issue3511.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-21T14:18:15Z",
+      "side": 1,
+      "message": "It is not a huge deal and if the user uses a fully-defined Schema, this will have a fixed ordering anyway.\n\nBut maybe add a TODO saying we need to consider this.",
+      "parentUuid": "7a484ec0_bcee1ecd",
       "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -264,6 +300,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "24c7b154_702a778c",
+        "filename": "internal/core/export/testdata/main/alias.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-21T14:18:15Z",
+      "side": 1,
+      "message": "never mind me again.",
+      "parentUuid": "6ee144a8_28d66efc",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "26b5434f_13d7b001",
@@ -295,6 +349,24 @@
       "side": 1,
       "message": "Within the vertex for `a`, we find conjuncts for `z`, `b`, and `r`.\nWe definitely have `z -\u003e b` because of `r\u003d[string]: {z: 1, b: r | null}`\nWe also find that the source positions of `z` and `b` are both before `r`. So the order is `z -\u003e b -\u003e r`",
       "parentUuid": "26b5434f_13d7b001",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d45d2818_d87792ed",
+        "filename": "internal/core/export/testdata/main/alias.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 452,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-21T14:18:15Z",
+      "side": 1,
+      "message": "TODO applies her as well.\n\nSo leave for now.",
+      "parentUuid": "6e45f376_733cf975",
       "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -524,6 +596,24 @@
       "side": 1,
       "message": "Ah, figured it out. It\u0027s because it\u0027s an embedding, and the evaluator doesn\u0027t keep the explicit unification (BinaryExpr) around in the conjuncts of the vertex. If I change the test to:\n\n```\nroot: foo: cli.Print \u0026 {text: json.Marshal(input)}\n```\n\nthen it behaves as desired, because now the vertex has a BinaryExpr in its conjuncts. We treat everything as implicitly unified *unless* there\u0027s explicit evidence that it\u0027s explicitly unified.",
       "parentUuid": "bb8358e0_ba3930c1",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc4497b9_234bdac8",
+        "filename": "tools/flow/testdata/issue2490.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-21T14:18:15Z",
+      "side": 1,
+      "message": "We should track this.\n\nEven so, text comes after the other two, so probably still good to investigate.",
+      "parentUuid": "5efb4093_2049810a",
       "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

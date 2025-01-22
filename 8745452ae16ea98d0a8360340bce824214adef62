@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9fc49262_386e8064",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-22T10:12:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6ae3ef31_ecce5a94",
+      "revId": "8745452ae16ea98d0a8360340bce824214adef62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "88a29f56_76ef7f94",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-10-10T09:05:46Z",
       "side": 1,
       "message": "I think something went wrong with this line though?",
+      "revId": "8745452ae16ea98d0a8360340bce824214adef62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f728b33a_1292afc6",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 433,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-22T10:12:15Z",
+      "side": 1,
+      "message": "Finished paragraph.",
+      "parentUuid": "88a29f56_76ef7f94",
       "revId": "8745452ae16ea98d0a8360340bce824214adef62",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

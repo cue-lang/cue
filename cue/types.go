@@ -787,11 +787,14 @@ func (v Value) appendJSON(ctx *adt.OpContext, b []byte) ([]byte, error) {
 		b2, err := json.Marshal(x.(*adt.Bool).B)
 		return append(b, b2...), err
 	case adt.IntKind, adt.FloatKind, adt.NumberKind:
-		// TODO(mvdan): MarshalText does not guarantee valid JSON,
-		// but apd.Decimal does not expose a MarshalJSON method either.
-		b2, err := x.(*adt.Num).X.MarshalText()
-		b2 = bytes.TrimLeft(b2, "+")
-		return append(b, b2...), err
+		// [apd.Decimal] offers no [json.Marshaler] method,
+		// however the "G" formatting appears to result in valid JSON
+		// for any valid CUE number that we've come across so far.
+		// Upstream also rejected adding JSON methods in favor of [encoding.TextMarshaler].
+		//
+		// As an optimization, use the append-like API directly which is equivalent to
+		// [apd.Decimal.MarshalText], allowing us to avoid extra copies.
+		return x.(*adt.Num).X.Append(b, 'G'), nil
 	case adt.StringKind:
 		// Do not use json.Marshal as it escapes HTML.
 		b2, err := internaljson.Marshal(x.(*adt.String).Str)

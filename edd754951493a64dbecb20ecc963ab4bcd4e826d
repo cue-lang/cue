@@ -50,6 +50,24 @@
       "message": "did you mean to test evalv2 here?",
       "revId": "edd754951493a64dbecb20ecc963ab4bcd4e826d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "120d61d4_d4611ed9",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_print.txtar",
+        "patchSetId": 9
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-22T09:32:59Z",
+      "side": 1,
+      "message": "Ah, debugging left over.",
+      "parentUuid": "c667b731_2fa4c6ce",
+      "revId": "edd754951493a64dbecb20ecc963ab4bcd4e826d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

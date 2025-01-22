@@ -213,6 +213,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd209765_b55b2214",
+        "filename": "cmd/cue/cmd/testdata/script/export_issue3511.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-22T11:06:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c71ee508_29c10e0d",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6b6dd5b0_39b56f5c",
@@ -244,6 +262,24 @@
       "side": 1,
       "message": "This one,...",
       "parentUuid": "6b6dd5b0_39b56f5c",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "62938176_56574dae",
+        "filename": "internal/core/export/export_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-22T11:06:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9e2635df_1c85f593",
       "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -530,6 +566,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3d389fc_0e00e2e8",
+        "filename": "pkg/time/testdata/gen.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-22T11:06:17Z",
+      "side": 1,
+      "message": "To be addressed via issues 3553 and 3554.",
+      "parentUuid": "4b804fe9_fabcb159",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "723455fc_6e8318e1",
@@ -703,6 +757,24 @@
       "side": 1,
       "message": "I went through this one before. It\u0027s the same graph, it\u0027s just the nodes have been renamed.",
       "parentUuid": "4e36b1da_729f398a",
+      "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ac60b88_970c18e7",
+        "filename": "tools/flow/testdata/slice.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-22T11:06:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a96ca600_00cdd944",
       "revId": "3f6485f52ac5e3bff42aa4d7dd022fc31e3ef096",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

@@ -16,6 +16,24 @@
       "message": "Just wondering out loud, but do we have a CI check that ensures these versions align with the tag? I\u0027ve done this for VSCode and it\u0027s saved me.",
       "revId": "bbb587421b6f8b5e45d4f93d374d076d95f987ee",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bfc78661_96bb48a3",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-22T12:40:50Z",
+      "side": 1,
+      "message": "We don\u0027t at the moment. It\u0027s not clear to me how to do this, given that we can\u0027t edit the string and do the tag at the same time. Pick this up over DMs? I\u0027m also not terribly concerned just yet, as we haven\u0027t made any mistake so far.",
+      "parentUuid": "e8840524_7609684c",
+      "revId": "bbb587421b6f8b5e45d4f93d374d076d95f987ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

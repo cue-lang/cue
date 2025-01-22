@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "310dc940_2857c512",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-22T09:20:48Z",
+      "side": 1,
+      "message": "nit: please don\u0027t mix tabs and spaces",
+      "revId": "edd754951493a64dbecb20ecc963ab4bcd4e826d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6ab565c_828c834c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-22T09:20:48Z",
+      "side": 1,
+      "message": "SGTM but the test seems wrong in that it tests evalv3 twice.",
+      "revId": "edd754951493a64dbecb20ecc963ab4bcd4e826d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c667b731_2fa4c6ce",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_print.txtar",
+        "patchSetId": 9
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-22T09:20:48Z",
+      "side": 1,
+      "message": "did you mean to test evalv2 here?",
+      "revId": "edd754951493a64dbecb20ecc963ab4bcd4e826d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

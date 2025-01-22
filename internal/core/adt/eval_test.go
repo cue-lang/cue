@@ -76,12 +76,12 @@ var needFix = map[string]string{
 // counter errors.
 // TODO: These counters should all go to zero.
 var skipDebugDepErrors = map[string]int{
-	"cycle/disjunction":        4,
-	"cycle/structural":         7,
+	"cycle/disjunction":        1,
+	"cycle/structural":         5,
 	"disjunctions/errors":      3,
-	"disjunctions/elimination": 19,
+	"disjunctions/elimination": 18,
 	"disjunctions/nested":      1,
-	"eval/disjunctions":        3,
+	"eval/disjunctions":        1,
 	"eval/issue545":            1,
 	"eval/notify":              3,
 	"scalars/embed":            2,

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8840524_7609684c",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-01-22T12:05:49Z",
+      "side": 1,
+      "message": "Just wondering out loud, but do we have a CI check that ensures these versions align with the tag? I\u0027ve done this for VSCode and it\u0027s saved me.",
+      "revId": "bbb587421b6f8b5e45d4f93d374d076d95f987ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

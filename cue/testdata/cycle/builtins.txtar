@@ -136,14 +136,14 @@ issue3633: final: {
 -- todo/p1 --
 issue3443.noCycle: fix hang
 -- out/evalalpha/stats --
-Leaks:  211
+Leaks:  227
 Freed:  17
 Reused: 17
-Allocs: 211
+Allocs: 227
 Retain: 0
 
-Unifications: 183
-Conjuncts:    696
+Unifications: 191
+Conjuncts:    726
 Disjuncts:    28
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -155,17 +155,17 @@ diff old new
 -Reused: 234
 -Allocs: 29
 -Retain: 70
-+Leaks:  211
++Leaks:  227
 +Freed:  17
 +Reused: 17
-+Allocs: 211
++Allocs: 227
 +Retain: 0
  
 -Unifications: 227
 -Conjuncts:    413
 -Disjuncts:    309
-+Unifications: 183
-+Conjuncts:    696
++Unifications: 191
++Conjuncts:    726
 +Disjuncts:    28
 -- out/eval/stats --
 Leaks:  14

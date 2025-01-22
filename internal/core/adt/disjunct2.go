@@ -272,6 +272,38 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 	a := n.disjunctions
 	n.disjunctions = n.disjunctions[:0]
 
+	holes := make([]disjunctHole, len(n.disjunctCCs))
+	copy(holes, n.disjunctCCs)
+
+	// Upon completion, decrement the DISJUNCT counters that were incremented
+	// in scheduleDisjunction. Note that this disjunction may be a copy of the
+	// original, in which case we need to decrement the copied disjunctCCs, not
+	// the original.
+	//
+	// This is not strictly necessary, but it helps for balancing counters.
+	// TODO: Consider disabling this when DebugDeps is not set.
+	defer func() {
+		// We add a "top" value to disable closedness checking for this
+		// disjunction to avoid a spurious "field not allowed" error.
+		// We return the errors below, which will, in turn, be reported as
+		// the error.
+		for i, d := range a {
+			// TODO(perf: prove that holeIDs are always stored in increasing
+			// order and allow for an incremental search to reduce cost.
+			for _, h := range holes {
+				if h.holeID != a[i].holeID {
+					continue
+				}
+				cc := h.cc
+				id := a[i].cloneID
+				id.cc = cc
+				c := MakeConjunct(d.env, top, id)
+				n.scheduleConjunct(c, d.cloneID)
+				cc.decDisjunct(n.ctx, DISJUNCT)
+			}
+		}
+	}()
+
 	if !initArcs(n.ctx, n.node) {
 		return n.getError()
 	}
@@ -307,16 +339,6 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 		switch len(results) {
 		case 0:
 			// TODO: now we have disjunct counters, do we plug holes at all?
-
-			// We add a "top" value to disable closedness checking for this
-			// disjunction to avoid a spurious "field not allowed" error.
-			// We return the errors below, which will, in turn, be reported as
-			// the error.
-			// TODO: probably no longer needed:
-			for i++; i < len(a); i++ {
-				c := MakeConjunct(d.env, top, a[i].cloneID)
-				n.scheduleConjunct(c, d.cloneID)
-			}
 
 			// Empty intermediate result. Further processing will not result in
 			// any new result, so we can terminate here.

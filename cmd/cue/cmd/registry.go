@@ -14,17 +14,18 @@ import (
 // getRegistryResolver returns an implementation of [modregistry.Resolver]
 // that resolves to registries as specified in the configuration.
 func getRegistryResolver() (*modconfig.Resolver, error) {
-	return modconfig.NewResolver(newModConfig())
+	return modconfig.NewResolver(newModConfig(""))
 }
 
 func getCachedRegistry() (modload.Registry, error) {
-	return modconfig.NewRegistry(newModConfig())
+	return modconfig.NewRegistry(newModConfig(""))
 }
 
-func newModConfig() *modconfig.Config {
+func newModConfig(registry string) *modconfig.Config {
 	return &modconfig.Config{
-		Transport:  httpTransport(),
-		ClientType: "cmd/cue",
+		Transport:   httpTransport(),
+		ClientType:  "cmd/cue",
+		CUERegistry: registry,
 	}
 }
 

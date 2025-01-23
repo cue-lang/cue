@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "410914e2_12958929",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-23T10:16:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8507126f_43e356ca",
+      "revId": "11f351f9486a9ae6099dfd6094e04518af7d5586",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "61500bd7_132fe3f2",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -48,6 +66,24 @@
       "writtenOn": "2025-01-21T12:20:23Z",
       "side": 1,
       "message": "I honestly found the code quite a bit clearer before (maybe it\u0027s my brain when puzzling through conditional statements?). I think the staticcheck check should really only produce an error if there are no comments in either branch.",
+      "revId": "11f351f9486a9ae6099dfd6094e04518af7d5586",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "71291d7d_caf81000",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 712,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-23T10:16:21Z",
+      "side": 1,
+      "message": "I had similar thoughts as I wrote this patch but pushed through for the sake of seeing how it would turn out. I don\u0027t hate the new form per se, but I agree that the old form is also perfectly fine. I\u0027ve left a comment on https://github.com/dominikh/go-tools/issues/704; in the meantime we can keep the rule disabled.",
+      "parentUuid": "6aff2c04_8d2eb891",
       "revId": "11f351f9486a9ae6099dfd6094e04518af7d5586",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

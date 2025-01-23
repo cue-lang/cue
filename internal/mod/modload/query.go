@@ -82,7 +82,7 @@ func (ld *loader) queryLatestModules(ctx context.Context, pkgPath string, rs *mo
 			return module.Version{}, err
 		}
 		logf("-> %q", versions)
-		if v := latestVersion(versions); v != "" {
+		if v := LatestVersion(versions); v != "" {
 			return module.NewVersion(prefix, v)
 		}
 		return module.Version{}, nil
@@ -114,9 +114,9 @@ func (ld *loader) queryLatestModules(ctx context.Context, pkgPath string, rs *mo
 	return candidates, parts.Version == "", queryErr
 }
 
-// latestVersion returns the latest of any of the given versions,
+// LatestVersion returns the latest of any of the given versions,
 // ignoring prerelease versions if there is any stable version.
-func latestVersion(versions []string) string {
+func LatestVersion(versions []string) string {
 	maxStable := ""
 	maxAny := ""
 	for _, v := range versions {

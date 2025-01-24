@@ -351,15 +351,16 @@ func (ctx *overlayContext) initCloneCC(x *closeContext) {
 	o.Patterns = append(o.Patterns, x.Patterns...)
 
 	// needsCloseInSchedule is a separate mechanism to signal nodes that have
-	// completed. Do not signal such nodes if they are outside the current
-	// copied graph.
-	if cx := x.needsCloseInSchedule; cx != nil {
-		if cx.src._cc.overlay == nil {
-			o.needsCloseInSchedule = nil
-		} else {
-			// TODO: Debug assert: cx.overlay != nil
-			o.needsCloseInSchedule = ctx.allocCC(cx)
-		}
+	// completed that corresponds to the EVAL mechanism. Since we have not
+	// processed the conjuncts yet, these are inherently initiated outside of
+	// this conjunct. By now, if a closeContext needs to remain open, other
+	// counters should have been added. As an example, the parent node of this
+	// disjunct is still processing. The disjunction will be fully added before
+	// processing, and thus their will be no direct EVAL dependency. However,
+	// this disjunct may depend on a NOTIFY that is kept open by an ancestor
+	// EVAL.
+	if x.needsCloseInSchedule != nil {
+		o.needsCloseInSchedule = nil
 	}
 
 	// child and next always point to completed closeContexts. Moreover, only
@@ -464,6 +465,13 @@ func (ctx *overlayContext) finishDependencies(x *closeContext) {
 
 		if d.kind == DEFER {
 			o.decDependentNoMatch(ctx.ctx, DEFER, nil)
+			continue
+		}
+
+		// Since have not started processing the disjunct yet, all EVAL
+		// dependencies will have been initiated outside of this disjunct.
+		if d.kind == EVAL {
+			o.decDependentNoMatch(ctx.ctx, EVAL, nil)
 			continue
 		}
 

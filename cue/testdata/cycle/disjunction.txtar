@@ -213,9 +213,7 @@ Result:
     // [eval]
     #foo: (string){ =~"^foo" }
     #nesting: ((string|list|struct)){ |((string){ string }, (#struct){
-        name?: (_|_){
-          // [structural cycle] issue3042.#nesting.name: structural cycle
-        }
+        name?: (string){ =~"^foo" }
       }, (list){
       }) }
     data: (_|_){
@@ -258,7 +256,7 @@ diff old new
    cycle: (_|_){
      // [structural cycle]
      a: (_|_){
-@@ -58,22 +67,28 @@
+@@ -58,22 +67,26 @@
      x: (#list){
      }
    }
@@ -267,10 +265,7 @@ diff old new
 +    // [eval]
      #foo: (string){ =~"^foo" }
      #nesting: ((string|list|struct)){ |((string){ string }, (#struct){
--        name?: (string){ =~"^foo" }
-+        name?: (_|_){
-+          // [structural cycle] issue3042.#nesting.name: structural cycle
-+        }
+         name?: (string){ =~"^foo" }
        }, (list){
        }) }
 -    data: (#struct){

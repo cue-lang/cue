@@ -77,14 +77,10 @@ var needFix = map[string]string{
 // TODO: These counters should all go to zero.
 var skipDebugDepErrors = map[string]int{
 	"cycle/disjunction":        1,
-	"cycle/structural":         5,
-	"disjunctions/errors":      3,
-	"disjunctions/elimination": 18,
-	"disjunctions/nested":      1,
-	"eval/disjunctions":        1,
+	"cycle/structural":         1,
+	"disjunctions/elimination": 6,
 	"eval/issue545":            1,
 	"eval/notify":              3,
-	"scalars/embed":            2,
 }
 
 func TestEvalAlpha(t *testing.T) {

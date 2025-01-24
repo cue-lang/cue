@@ -308,6 +308,21 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 		return n.getError()
 	}
 
+	// If the disjunct of an enclosing disjunction operation has an attemptOnly
+	// runMode, this disjunct should have this also and may not finalize.
+	// Finalization may cause incoming dependencies to be broken. If an outer
+	// disjunction still have open holes, this means that more conjuncts may be
+	// incoming and that finalization would prematurely prevent those from being
+	// added. In practice, this may result in the infamous "already closed"
+	// panic.
+	var outerRunMode runMode
+	for p := n.node; p != nil; p = p.Parent {
+		if p.IsDisjunct {
+			outerRunMode = p.state.runMode
+			break
+		}
+	}
+
 	// TODO(perf): single pass for quick filter on all disjunctions.
 	// n.node.unify(n.ctx, allKnown, attemptOnly)
 
@@ -326,8 +341,11 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 		// disjunctions can be nested.
 		mode := attemptOnly
 		switch {
-		case n.runMode != 0:
-			mode = n.runMode
+		case outerRunMode != 0:
+			mode = outerRunMode
+			if i < len(a)-1 {
+				mode = attemptOnly
+			}
 		case i == len(a)-1:
 			mode = finalize
 		}

@@ -18,11 +18,16 @@ import (
 	"fmt"
 	"testing"
 
+	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/export"
+	"cuelang.org/go/internal/core/toposort"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
+	"cuelang.org/go/internal/value"
 )
 
 func TestTopologicalSort(t *testing.T) {
@@ -72,4 +77,19 @@ func TestTopologicalSort(t *testing.T) {
 			})
 		})
 	}
+}
+
+func TestIssue3698(t *testing.T) {
+	str := `import "list"
+list.Repeat([{x: 5}], 1000)
+`
+	ctx := cuecontext.New()
+	val := ctx.CompileString(str, cue.Filename("issue3698"))
+	if err := val.Err(); err != nil {
+		t.Fatal(err)
+	}
+	run, v := value.ToInternal(val)
+	// If toposort does not correctly handle feature names,
+	// specifically IntLabels, then this will panic:
+	toposort.VertexFeatures(adt.NewContext(run, v), v)
 }

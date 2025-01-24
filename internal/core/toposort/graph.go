@@ -49,10 +49,13 @@ func (n *Node) IsSorted() bool {
 	return n.position >= 0
 }
 
-func (n *Node) Name(index adt.StringIndexer) string {
-	// TODO: two different fields like "#foo" and #foo, can have the same raw
-	// string
-	return n.Feature.RawString(index)
+// SafeName returns a string useful for debugging, regardless of the
+// type of the feature. So for IntLabels, you'll get back `1`, `10`
+// etc; for identifiers, you may get back a string with quotes in it,
+// eg `"runs-on"`. So this is not useful for comparisons, but it is
+// useful (and safe) for debugging.
+func (n *Node) SafeName(index adt.StringIndexer) string {
+	return n.Feature.SelectorString(index)
 }
 
 type Nodes []*Node
@@ -136,7 +139,19 @@ func (builder *GraphBuilder) Build() *Graph {
 type indexComparison struct{ adt.StringIndexer }
 
 func (index *indexComparison) compareNodeByName(a, b *Node) int {
-	return cmp.Compare(a.Name(index), b.Name(index))
+	aFeature, bFeature := a.Feature, b.Feature
+	aIsInt, bIsInt := aFeature.Typ() == adt.IntLabel, bFeature.Typ() == adt.IntLabel
+
+	switch {
+	case aIsInt && bIsInt:
+		return cmp.Compare(aFeature.Index(), bFeature.Index())
+	case aIsInt:
+		return -1
+	case bIsInt:
+		return 1
+	default:
+		return cmp.Compare(aFeature.RawString(index), bFeature.RawString(index))
+	}
 }
 
 func (index *indexComparison) compareCyclesByNames(a, b *Cycle) int {
@@ -202,7 +217,7 @@ func chooseCycle(indexCmp *indexComparison, unusedCycles []*Cycle) *Cycle {
 
 		debug("cycle %v; edgeCount %v; enabledSince %v; entryNode %v\n",
 			cycle, brokenEdgeCount, enabledSince,
-			entryNode.Name(indexCmp))
+			entryNode.SafeName(indexCmp))
 
 		cycleIsBetter := chosenCycleIdx == -1
 		// this is written out long-form for ease of readability
@@ -219,7 +234,7 @@ func chooseCycle(indexCmp *indexComparison, unusedCycles []*Cycle) *Cycle {
 		case enabledSince > chosenCycleEnabledSince:
 			// noop - only continue if ==
 
-		case entryNode.Name(indexCmp) < chosenCycleEntryNode.Name(indexCmp):
+		case indexCmp.compareNodeByName(entryNode, chosenCycleEntryNode) < 0:
 			cycleIsBetter = true
 		case entryNode == chosenCycleEntryNode:
 			cycleIsBetter =
@@ -239,7 +254,7 @@ func chooseCycle(indexCmp *indexComparison, unusedCycles []*Cycle) *Cycle {
 	}
 
 	debug("Chose cycle: %v; entering at node: %s\n",
-		unusedCycles[chosenCycleIdx], chosenCycleEntryNode.Name(indexCmp))
+		unusedCycles[chosenCycleIdx], chosenCycleEntryNode.SafeName(indexCmp))
 	cycle := unusedCycles[chosenCycleIdx]
 	unusedCycles[chosenCycleIdx] = nil
 	cycle.RotateToStartAt(chosenCycleEntryNode)
@@ -361,7 +376,7 @@ func appendNodes(indexCmp *indexComparison, nodesSorted, nodesReady, nodesEnable
 				}
 			}
 			debug("After %v, found new ready: %s\n",
-				nodesSorted, next.Name(indexCmp))
+				nodesSorted, next.SafeName(indexCmp))
 			nodesEnabled = append(nodesEnabled, next)
 			nodesReadyNeedsSorting = true
 		}

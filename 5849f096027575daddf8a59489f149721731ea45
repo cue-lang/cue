@@ -16,6 +16,24 @@
       "message": "Just a thought: lines 300 and 301 could be lifted to before this inner loop, and if so, it makes the relationship with what came before, more obvious (at least to me).\nBut, I also can see that if you do that, it makes it less obvious that you\u0027re expecting to find exactly one matching hole. Relatedly, if you are expecting to find exactly one hole, maybe have a `break` after line 302?",
       "revId": "5849f096027575daddf8a59489f149721731ea45",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09d338b1_bb689475",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-24T15:44:04Z",
+      "side": 1,
+      "message": "added break",
+      "parentUuid": "493e8775_f8f7cf00",
+      "revId": "5849f096027575daddf8a59489f149721731ea45",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

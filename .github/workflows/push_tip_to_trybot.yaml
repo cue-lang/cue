@@ -3,10 +3,10 @@
 concurrency: push_tip_to_trybot
 jobs:
   push:
+    runs-on: ubuntu-24.04
     defaults:
       run:
         shell: bash --noprofile --norc -euo pipefail {0}
-    runs-on: ubuntu-24.04
     if: ${{github.repository == 'cue-lang/cue'}}
     steps:
       - name: Write netrc file for cueckoo Gerrithub

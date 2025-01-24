@@ -812,6 +812,14 @@ func (v *Vertex) ToDataAll(ctx *OpContext) *Vertex {
 	w.Arcs = arcs
 	w.isData = true
 	w.Conjuncts = slices.Clone(v.Conjuncts)
+
+	// Converting to dat drops constraints and non-regular fields. This means
+	// that the domain on which they are defined is reduced, which will change
+	// closedness properties. We therefore remove closedness. Note that data,
+	// in general and JSON specifically, is not closed.
+	w.ClosedRecursive = false
+	w.ClosedNonRecursive = false
+
 	// TODO(perf): this is not strictly necessary for evaluation, but it can
 	// hurt performance greatly. Drawback is that it may disable ordering.
 	for _, s := range w.Structs {

@@ -16,6 +16,23 @@
       "message": "The changes here are because SelectorString quotes the identifier if necessary - i.e. we will end up with the string `\"runs-on\"`, including quotes. Consequently, there are some changes of position because the ordering now includes the quote.",
       "revId": "8ef7dc9fdd2113088d2c2aade7448dabfdd71b2f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80179a76_a7f2ddf6",
+        "filename": "internal/core/toposort/graph.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-24T09:09:48Z",
+      "side": 1,
+      "message": "I would still use RawString here if we can guarantee it is not called for list indexes.",
+      "revId": "8ef7dc9fdd2113088d2c2aade7448dabfdd71b2f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

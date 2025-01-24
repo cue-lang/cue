@@ -119,6 +119,9 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 	// we are done computing and we can return the arc as is.
 	ci, skip := t.node.detectCycleV3(d, t.env, r, ci)
 	if skip {
+		// Either we have a structure cycle or we are unifying with another
+		// conjunct. In either case, we are no longer structure sharing here.
+		t.node.unshare()
 		return
 	}
 

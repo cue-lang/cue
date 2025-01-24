@@ -52,7 +52,7 @@ func (n *Node) IsSorted() bool {
 func (n *Node) Name(index adt.StringIndexer) string {
 	// TODO: two different fields like "#foo" and #foo, can have the same raw
 	// string
-	return n.Feature.RawString(index)
+	return n.Feature.SelectorString(index)
 }
 
 type Nodes []*Node

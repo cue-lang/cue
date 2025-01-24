@@ -78,7 +78,7 @@ var needFix = map[string]string{
 var skipDebugDepErrors = map[string]int{
 	"cycle/disjunction":        1,
 	"cycle/structural":         1,
-	"disjunctions/elimination": 6,
+	"disjunctions/elimination": 4,
 	"eval/issue545":            1,
 	"eval/notify":              3,
 }

@@ -121,6 +121,25 @@ issue3546: reduced: {
 	out: #Network
 	out: val
 }
+-- sharecycle.cue --
+shareCycle: t1: {
+	#X: {}
+	Y: {
+		x: #X & Y
+	}
+}
+shareCycle: t2: {
+	#X: int
+	Y: {
+		x: #X & Y
+	}
+}
+shareCycle: t3: {
+	#X: {}
+	Y: {
+		x: Y & #X
+	}
+}
 -- acrossdisjunction.cue --
 import "list"
 
@@ -133,16 +152,32 @@ issue3679: {
 }
 -- out/eval/stats --
 Leaks:  3
-Freed:  158
-Reused: 151
+Freed:  174
+Reused: 167
 Allocs: 10
 Retain: 21
 
-Unifications: 159
-Conjuncts:    331
-Disjuncts:    177
+Unifications: 175
+Conjuncts:    365
+Disjuncts:    193
 -- out/evalalpha --
-(struct){
+Errors:
+shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
+    ./sharecycle.cue:8:6
+    ./sharecycle.cue:9:5
+shareCycle.t1.Y.x.x: field not allowed:
+    ./sharecycle.cue:4:11
+    ./sharecycle.cue:4:3
+shareCycle.t2.Y.x.x: field not allowed:
+    ./sharecycle.cue:10:11
+    ./sharecycle.cue:10:3
+shareCycle.t3.Y.x.x: field not allowed:
+    ./sharecycle.cue:16:10
+    ./sharecycle.cue:16:3
+
+Result:
+(_|_){
+  // [eval]
   issue3679: (struct){
     b: (#list){
       0: (string){ "bar" }
@@ -369,12 +404,87 @@ Disjuncts:    177
       }
     }
   }
+  shareCycle: (_|_){
+    // [eval]
+    t1: (_|_){
+      // [eval]
+      #X: (#struct){
+      }
+      Y: (_|_){
+        // [eval]
+        x: (_|_){
+          // [eval]
+          x: (_|_){
+            // [eval] shareCycle.t1.Y.x.x: field not allowed:
+            //     ./sharecycle.cue:4:11
+            //     ./sharecycle.cue:4:3
+          }
+        }
+      }
+    }
+    t2: (_|_){
+      // [eval]
+      #X: (int){ int }
+      Y: (_|_){
+        // [eval]
+        x: (_|_){
+          // [eval] shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
+          //     ./sharecycle.cue:8:6
+          //     ./sharecycle.cue:9:5
+          // shareCycle.t2.Y.x.x: field not allowed:
+          //     ./sharecycle.cue:10:11
+          //     ./sharecycle.cue:10:3
+          x: (_|_){
+            // [eval] shareCycle.t2.Y.x.x: field not allowed:
+            //     ./sharecycle.cue:10:11
+            //     ./sharecycle.cue:10:3
+          }
+        }
+      }
+    }
+    t3: (_|_){
+      // [eval]
+      #X: (#struct){
+      }
+      Y: (_|_){
+        // [eval]
+        x: (_|_){
+          // [eval]
+          x: (_|_){
+            // [eval] shareCycle.t3.Y.x.x: field not allowed:
+            //     ./sharecycle.cue:16:10
+            //     ./sharecycle.cue:16:3
+          }
+        }
+      }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -16,102 +16,75 @@
+@@ -1,11 +1,16 @@
+ Errors:
+-shareCycle.t1.Y.x.x: structural cycle
+ shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
+     ./sharecycle.cue:8:6
+     ./sharecycle.cue:9:5
++shareCycle.t1.Y.x.x: field not allowed:
++    ./sharecycle.cue:4:11
++    ./sharecycle.cue:4:3
++shareCycle.t2.Y.x.x: field not allowed:
+     ./sharecycle.cue:10:11
+-shareCycle.t2.Y.x.x: structural cycle
+-shareCycle.t3.Y.x.x: structural cycle
++    ./sharecycle.cue:10:3
++shareCycle.t3.Y.x.x: field not allowed:
++    ./sharecycle.cue:16:10
++    ./sharecycle.cue:16:3
+ 
+ Result:
+ (_|_){
+@@ -27,102 +32,75 @@
            }
          }
          #Config1: (#struct){
@@ -546,7 +656,7 @@ diff old new
          }
          Config: (#struct){
            cfg: (#struct){
-@@ -137,24 +110,13 @@
+@@ -148,24 +126,13 @@
          }
        }
        #Config1: (#struct){
@@ -574,7 +684,7 @@ diff old new
        }
        #Config: (#struct){
          cfg: (#struct){
-@@ -162,12 +124,7 @@
+@@ -173,12 +140,7 @@
            }
          }
        }
@@ -588,7 +698,7 @@ diff old new
        out: (#struct){
          sch: (#struct){
            cfg: (#struct){
-@@ -236,9 +193,7 @@
+@@ -247,9 +209,7 @@
    }
    debug: (struct){
      sharingOn: (struct){
@@ -599,8 +709,87 @@ diff old new
        b: (struct){
          c: (int){ 1 }
        }
+@@ -284,15 +244,17 @@
+   shareCycle: (_|_){
+     // [eval]
+     t1: (_|_){
+-      // [structural cycle]
+-      #X: (#struct){
+-      }
+-      Y: (_|_){
+-        // [structural cycle]
+-        x: (_|_){
+-          // [structural cycle]
+-          x: (_|_){
+-            // [structural cycle] shareCycle.t1.Y.x.x: structural cycle
++      // [eval]
++      #X: (#struct){
++      }
++      Y: (_|_){
++        // [eval]
++        x: (_|_){
++          // [eval]
++          x: (_|_){
++            // [eval] shareCycle.t1.Y.x.x: field not allowed:
++            //     ./sharecycle.cue:4:11
++            //     ./sharecycle.cue:4:3
+           }
+         }
+       }
+@@ -306,23 +268,29 @@
+           // [eval] shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
+           //     ./sharecycle.cue:8:6
+           //     ./sharecycle.cue:9:5
++          // shareCycle.t2.Y.x.x: field not allowed:
+           //     ./sharecycle.cue:10:11
+-          x: (_|_){
+-            // [structural cycle] shareCycle.t2.Y.x.x: structural cycle
++          //     ./sharecycle.cue:10:3
++          x: (_|_){
++            // [eval] shareCycle.t2.Y.x.x: field not allowed:
++            //     ./sharecycle.cue:10:11
++            //     ./sharecycle.cue:10:3
+           }
+         }
+       }
+     }
+     t3: (_|_){
+-      // [structural cycle]
+-      #X: (#struct){
+-      }
+-      Y: (_|_){
+-        // [structural cycle]
+-        x: (_|_){
+-          // [structural cycle]
+-          x: (_|_){
+-            // [structural cycle] shareCycle.t3.Y.x.x: structural cycle
++      // [eval]
++      #X: (#struct){
++      }
++      Y: (_|_){
++        // [eval]
++        x: (_|_){
++          // [eval]
++          x: (_|_){
++            // [eval] shareCycle.t3.Y.x.x: field not allowed:
++            //     ./sharecycle.cue:16:10
++            //     ./sharecycle.cue:16:3
+           }
+         }
+       }
 -- out/eval --
-(struct){
+Errors:
+shareCycle.t1.Y.x.x: structural cycle
+shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
+    ./sharecycle.cue:8:6
+    ./sharecycle.cue:9:5
+    ./sharecycle.cue:10:11
+shareCycle.t2.Y.x.x: structural cycle
+shareCycle.t3.Y.x.x: structural cycle
+
+Result:
+(_|_){
+  // [eval]
   issue3679: (struct){
     b: (#list){
       0: (string){ "bar" }
@@ -872,6 +1061,53 @@ diff old new
       }
     }
   }
+  shareCycle: (_|_){
+    // [eval]
+    t1: (_|_){
+      // [structural cycle]
+      #X: (#struct){
+      }
+      Y: (_|_){
+        // [structural cycle]
+        x: (_|_){
+          // [structural cycle]
+          x: (_|_){
+            // [structural cycle] shareCycle.t1.Y.x.x: structural cycle
+          }
+        }
+      }
+    }
+    t2: (_|_){
+      // [eval]
+      #X: (int){ int }
+      Y: (_|_){
+        // [eval]
+        x: (_|_){
+          // [eval] shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
+          //     ./sharecycle.cue:8:6
+          //     ./sharecycle.cue:9:5
+          //     ./sharecycle.cue:10:11
+          x: (_|_){
+            // [structural cycle] shareCycle.t2.Y.x.x: structural cycle
+          }
+        }
+      }
+    }
+    t3: (_|_){
+      // [structural cycle]
+      #X: (#struct){
+      }
+      Y: (_|_){
+        // [structural cycle]
+        x: (_|_){
+          // [structural cycle]
+          x: (_|_){
+            // [structural cycle] shareCycle.t3.Y.x.x: structural cycle
+          }
+        }
+      }
+    }
+  }
 }
 -- out/compile --
 --- acrossdisjunction.cue
@@ -1067,6 +1303,33 @@ diff old new
         b: {
           c: 1
         }
+      }
+    }
+  }
+}
+--- sharecycle.cue
+{
+  shareCycle: {
+    t1: {
+      #X: {}
+      Y: {
+        x: (〈1;#X〉 & 〈1;Y〉)
+      }
+    }
+  }
+  shareCycle: {
+    t2: {
+      #X: int
+      Y: {
+        x: (〈1;#X〉 & 〈1;Y〉)
+      }
+    }
+  }
+  shareCycle: {
+    t3: {
+      #X: {}
+      Y: {
+        x: (〈1;Y〉 & 〈1;#X〉)
       }
     }
   }

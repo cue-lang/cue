@@ -490,6 +490,14 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, hole i
 	// and then swapping it with disjunctCCs in the new nodeContext.
 	holes := make([]disjunctHole, 0, len(n.disjunctCCs))
 
+	// Complete as much of the pending work of this node and its parent before
+	// copying. Note that once a copy is made, the disjunct is no longer able
+	// to receive conjuncts from the original.
+	n.completeNodeTasks(mode)
+	// TODO: we may need to process incoming notifications for all arcs in
+	// the copied disjunct, but only those notifications not coming from
+	// within the arc itself.
+
 	// Clone the closeContexts of all open disjunctions and dependencies.
 	for _, d := range n.disjunctCCs {
 		// TODO: remove filled holes.

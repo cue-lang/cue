@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30f824e0_35f88bf1",
+        "filename": ".github/workflows/push_tip_to_trybot.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-24T08:52:43Z",
+      "side": 1,
+      "message": "The changes here are because SelectorString quotes the identifier if necessary - i.e. we will end up with the string `\"runs-on\"`, including quotes. Consequently, there are some changes of position because the ordering now includes the quote.",
+      "revId": "8ef7dc9fdd2113088d2c2aade7448dabfdd71b2f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e34addd4_98a00f9d",
+        "filename": "tools/flow/testdata/slice.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-24T08:39:40Z",
+      "side": 1,
+      "message": "The changes in this file put the content here back to the \"before\" from https://review.gerrithub.io/c/cue-lang/cue/+/1207475\nWhich is less worrying and perhaps even reassuring.",
+      "revId": "7f3557c973057dffc28d30fece6a1e984d02cdd1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

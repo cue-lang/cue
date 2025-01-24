@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "602a09fe_0c3c75bb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-24T15:41:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2074aafd_c6f101e2",
+      "revId": "c1ae7ebf38ca1fcf1129efd2ef2ed1fc6f211560",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f1988b98_9449bf29",
@@ -31,6 +49,30 @@
       "writtenOn": "2025-01-24T11:09:04Z",
       "side": 1,
       "message": "\"has\", I think.",
+      "range": {
+        "startLine": 314,
+        "startChar": 22,
+        "endLine": 314,
+        "endChar": 26
+      },
+      "revId": "c1ae7ebf38ca1fcf1129efd2ef2ed1fc6f211560",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1931abb_ae162c31",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-24T15:41:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f1988b98_9449bf29",
       "range": {
         "startLine": 314,
         "startChar": 22,

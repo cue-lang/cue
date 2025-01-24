@@ -347,12 +347,6 @@ func (n *nodeContext) breakIncomingDeps(mode runMode) {
 	// disjunctions, but this is overall a brittle approach.
 	for _, r := range n.node.cc().externalDeps {
 		src := r.src
-		// We should be careful to not evaluate parent nodes if we are inside a
-		// disjunction, or at least ensure that there are no disjunction values
-		// leaked into non-disjunction nodes through evaluating externalDeps.
-		if src.src.IsDisjunct {
-			continue
-		}
 		switch r.kind {
 		case ARC:
 			a := &src.arcs[r.index]

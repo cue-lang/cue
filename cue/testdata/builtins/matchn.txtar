@@ -225,16 +225,42 @@ incomplete: {
 		x: bar: 2
 	}
 }
--- out/eval/stats --
-Leaks:  16
-Freed:  721
-Reused: 714
-Allocs: 23
-Retain: 69
+-- issue3694.cue --
+issue3694: full: {
+	#step: matchN(1, [{
+		uses!: _
+		...
+	}, {
+		run!: _
+		...
+	}])
+	#step: close({
+		uses?: string
+		run?:  string
+	})
 
-Unifications: 721
-Conjuncts:    1202
-Disjuncts:    791
+	s: #step & {
+		run: "echo hello world"
+	}
+}
+issue3694: simple: {
+	#step: matchN(1, [{
+		uses!: _
+	}])
+	#step: close({
+		uses?: string
+	})
+}
+-- out/eval/stats --
+Leaks:  19
+Freed:  759
+Reused: 752
+Allocs: 26
+Retain: 75
+
+Unifications: 762
+Conjuncts:    1269
+Disjuncts:    835
 -- out/eval --
 Errors:
 match.singleErr: invalid value {a:"foo"} (does not satisfy matchN): 0 matched, expected 1:
@@ -681,6 +707,31 @@ Result:
       }
     }
   }
+  issue3694: (struct){
+    full: (struct){
+      #step: (_|_){
+        // [incomplete] issue3694.full.#step: invalid value {uses?:string,run?:string} (does not satisfy matchN): 0 matched, expected 1:
+        //     ./issue3694.cue:2:9
+        //     ./issue3694.cue:2:16
+        //     ./issue3694.cue:9:9
+        uses?: (string){ string }
+        run?: (string){ string }
+      }
+      s: (#struct){
+        uses?: (string){ string }
+        run: (string){ "echo hello world" }
+      }
+    }
+    simple: (struct){
+      #step: (_|_){
+        // [incomplete] issue3694.simple.#step: invalid value {uses?:string} (does not satisfy matchN): 0 matched, expected 1:
+        //     ./issue3694.cue:19:9
+        //     ./issue3694.cue:19:16
+        //     ./issue3694.cue:22:9
+        uses?: (string){ string }
+      }
+    }
+  }
 }
 -- out/evalalpha --
 Errors:
@@ -752,6 +803,14 @@ incomplete.err5.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, e
     ./incomplete.cue:55:6
     ./incomplete.cue:55:13
     ./incomplete.cue:56:6
+issue3694.full.#step: invalid value {uses?:string,run?:string} (does not satisfy matchN): 0 matched, expected 1:
+    ./issue3694.cue:2:9
+    ./issue3694.cue:2:16
+    ./issue3694.cue:9:9
+issue3694.simple.#step: invalid value {uses?:string} (does not satisfy matchN): 0 matched, expected 1:
+    ./issue3694.cue:19:9
+    ./issue3694.cue:19:16
+    ./issue3694.cue:22:9
 
 Result:
 (_|_){
@@ -1116,6 +1175,34 @@ Result:
       }
     }
   }
+  issue3694: (_|_){
+    // [eval]
+    full: (_|_){
+      // [eval]
+      #step: (_|_){
+        // [eval] issue3694.full.#step: invalid value {uses?:string,run?:string} (does not satisfy matchN): 0 matched, expected 1:
+        //     ./issue3694.cue:2:9
+        //     ./issue3694.cue:2:16
+        //     ./issue3694.cue:9:9
+        uses?: (string){ string }
+        run?: (string){ string }
+      }
+      s: (#struct){
+        run: (string){ "echo hello world" }
+        uses?: (string){ string }
+      }
+    }
+    simple: (_|_){
+      // [eval]
+      #step: (_|_){
+        // [eval] issue3694.simple.#step: invalid value {uses?:string} (does not satisfy matchN): 0 matched, expected 1:
+        //     ./issue3694.cue:19:9
+        //     ./issue3694.cue:19:16
+        //     ./issue3694.cue:22:9
+        uses?: (string){ string }
+      }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -1133,7 +1220,22 @@ diff old new
  incomplete.err1.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
      ./incomplete.cue:34:6
      ./incomplete.cue:34:13
-@@ -111,7 +106,7 @@
+@@ -72,6 +67,14 @@
+     ./incomplete.cue:55:6
+     ./incomplete.cue:55:13
+     ./incomplete.cue:56:6
++issue3694.full.#step: invalid value {uses?:string,run?:string} (does not satisfy matchN): 0 matched, expected 1:
++    ./issue3694.cue:2:9
++    ./issue3694.cue:2:16
++    ./issue3694.cue:9:9
++issue3694.simple.#step: invalid value {uses?:string} (does not satisfy matchN): 0 matched, expected 1:
++    ./issue3694.cue:19:9
++    ./issue3694.cue:19:16
++    ./issue3694.cue:22:9
+ 
+ Result:
+ (_|_){
+@@ -111,7 +114,7 @@
              0: (int){ 2 }
            }), int) }) }
        pickTopOK2: (int){ &(matchN(1, (#list){
@@ -1142,7 +1244,7 @@ diff old new
            }
          }), int) }
        pickTopErr: (int){ &(matchN(1, (#list){
-@@ -244,21 +239,21 @@
+@@ -244,21 +247,21 @@
      embed: (struct){
        t1: (struct){
          a: (_){ matchN(1, (#list){
@@ -1179,7 +1281,7 @@ diff old new
              }
            }) }
        }
-@@ -266,21 +261,21 @@
+@@ -266,21 +269,21 @@
      direct: (struct){
        t1: (struct){
          a: (_){ matchN(1, (#list){
@@ -1216,7 +1318,7 @@ diff old new
              }
            }) }
        }
-@@ -294,9 +289,9 @@
+@@ -294,9 +297,9 @@
      }
      ok2: (struct){
        x: (_){ matchN(0, (#list){
@@ -1229,7 +1331,7 @@ diff old new
            }
          }) }
      }
-@@ -306,23 +301,16 @@
+@@ -306,23 +309,16 @@
        }
      }
    }
@@ -1262,7 +1364,7 @@ diff old new
            a: (int){ 1 }
          }
        }
-@@ -329,10 +317,10 @@
+@@ -329,10 +325,10 @@
      }
      test2: (struct){
        #x: (_){ matchN(1, (#list){
@@ -1277,7 +1379,7 @@ diff old new
          a: (int){ 1 }
        }
      }
-@@ -350,9 +338,9 @@
+@@ -350,9 +346,9 @@
      }
      incomplete2: (struct){
        x: (_){ matchN(1, (#list){
@@ -1290,6 +1392,44 @@ diff old new
            }
          }) }
      }
+@@ -443,10 +439,12 @@
+       }
+     }
+   }
+-  issue3694: (struct){
+-    full: (struct){
+-      #step: (_|_){
+-        // [incomplete] issue3694.full.#step: invalid value {uses?:string,run?:string} (does not satisfy matchN): 0 matched, expected 1:
++  issue3694: (_|_){
++    // [eval]
++    full: (_|_){
++      // [eval]
++      #step: (_|_){
++        // [eval] issue3694.full.#step: invalid value {uses?:string,run?:string} (does not satisfy matchN): 0 matched, expected 1:
+         //     ./issue3694.cue:2:9
+         //     ./issue3694.cue:2:16
+         //     ./issue3694.cue:9:9
+@@ -454,13 +452,14 @@
+         run?: (string){ string }
+       }
+       s: (#struct){
+-        uses?: (string){ string }
+         run: (string){ "echo hello world" }
+-      }
+-    }
+-    simple: (struct){
+-      #step: (_|_){
+-        // [incomplete] issue3694.simple.#step: invalid value {uses?:string} (does not satisfy matchN): 0 matched, expected 1:
++        uses?: (string){ string }
++      }
++    }
++    simple: (_|_){
++      // [eval]
++      #step: (_|_){
++        // [eval] issue3694.simple.#step: invalid value {uses?:string} (does not satisfy matchN): 0 matched, expected 1:
+         //     ./issue3694.cue:19:9
+         //     ./issue3694.cue:19:16
+         //     ./issue3694.cue:22:9
 -- diff/explanation --
 The old evaluator does not correctly handle ToDataAll if a node is
 mid-evaluation. The new evaluator does.
@@ -1716,6 +1856,42 @@ Missing error positions.
       x: {
         bar: 2
       }
+    }
+  }
+}
+--- issue3694.cue
+{
+  issue3694: {
+    full: {
+      #step: matchN(1, [
+        {
+          uses!: _
+          ...
+        },
+        {
+          run!: _
+          ...
+        },
+      ])
+      #step: close({
+        uses?: string
+        run?: string
+      })
+      s: (〈0;#step〉 & {
+        run: "echo hello world"
+      })
+    }
+  }
+  issue3694: {
+    simple: {
+      #step: matchN(1, [
+        {
+          uses!: _
+        },
+      ])
+      #step: close({
+        uses?: string
+      })
     }
   }
 }

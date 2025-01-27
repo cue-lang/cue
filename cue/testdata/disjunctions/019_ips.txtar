@@ -56,14 +56,14 @@ MyIP: [10, 10, 10, 10]
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  61
-Reused: 55
+Freed:  56
+Reused: 50
 Allocs: 6
 Retain: 1
 
-Unifications: 52
-Conjuncts:    115
-Disjuncts:    62
+Unifications: 47
+Conjuncts:    106
+Disjuncts:    57
 -- out/eval --
 (struct){
   IP: (#list){

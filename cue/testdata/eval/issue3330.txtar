@@ -37,14 +37,14 @@ simplified: {
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  51
-Reused: 42
+Freed:  43
+Reused: 34
 Allocs: 9
 Retain: 3
 
-Unifications: 41
-Conjuncts:    83
-Disjuncts:    54
+Unifications: 35
+Conjuncts:    69
+Disjuncts:    46
 -- out/evalalpha --
 Errors:
 eliminated.x: 2 errors in empty disjunction:

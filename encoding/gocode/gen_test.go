@@ -50,6 +50,7 @@ conflicting values null and {A:strings.ContainsAny("X"),P:"cuelang.org/go/encodi
     pkg1/instance.cue:x:x
 A: invalid value "car" (does not satisfy strings.ContainsAny("X")):
     pkg1/instance.cue:x:x
+    _:1:4
     pkg1/instance.cue:x:x
 `,
 	}, {
@@ -75,6 +76,7 @@ O: conflicting values null and {A:strings.ContainsAny("X"),P:"cuelang.org/go/enc
     pkg1/instance.cue:x:x
 O.A: invalid value "car" (does not satisfy strings.ContainsAny("X")):
     pkg1/instance.cue:x:x
+    _:1:4
     pkg1/instance.cue:x:x
 `,
 	}, {

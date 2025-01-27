@@ -668,14 +668,14 @@ issue3332: {
 
 -- out/eval/stats --
 Leaks:  12
-Freed:  761
-Reused: 753
+Freed:  748
+Reused: 740
 Allocs: 20
-Retain: 78
+Retain: 77
 
-Unifications: 765
-Conjuncts:    1946
-Disjuncts:    840
+Unifications: 754
+Conjuncts:    1923
+Disjuncts:    826
 -- out/eval --
 Errors:
 a.q.e: field not allowed:

@@ -91,7 +91,7 @@ func TestGenerated(t *testing.T) {
 				}
 				return convert.GoValueToValue(ctx, in, false), nil
 			},
-			out: `Terminals: [{Description: "Desc", Name: "Name"}]`,
+			out: `Terminals: [{Name: "Name", Description: "Desc"}]`,
 		}, {
 			in: func(ctx *adt.OpContext) (adt.Expr, error) {
 				in := &C{

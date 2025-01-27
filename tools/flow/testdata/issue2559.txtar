@@ -60,24 +60,24 @@ graph TD
 }
 -- out/run/t1/stats --
 Leaks:  0
-Freed:  25792
-Reused: 25772
+Freed:  25574
+Reused: 25554
 Allocs: 20
-Retain: 352
+Retain: 337
 
-Unifications: 18522
-Conjuncts:    76898
-Disjuncts:    26056
+Unifications: 18344
+Conjuncts:    76391
+Disjuncts:    25823
 -- out/run/stats/totals --
 Leaks:  0
-Freed:  25792
-Reused: 25772
+Freed:  25574
+Reused: 25554
 Allocs: 20
-Retain: 352
+Retain: 337
 
-Unifications: 18522
-Conjuncts:    76898
-Disjuncts:    26056
+Unifications: 18344
+Conjuncts:    76391
+Disjuncts:    25823
 -- out/run/t2 --
 graph TD
   t0("root.prepare [Terminated]")

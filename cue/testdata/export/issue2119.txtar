@@ -34,14 +34,14 @@ original: {
 }
 -- out/eval/stats --
 Leaks:  4
-Freed:  20
-Reused: 11
-Allocs: 13
+Freed:  17
+Reused: 10
+Allocs: 11
 Retain: 4
 
-Unifications: 24
-Conjuncts:    42
-Disjuncts:    24
+Unifications: 21
+Conjuncts:    39
+Disjuncts:    21
 -- out/eval --
 (struct){
   simplified: (struct){

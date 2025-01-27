@@ -33,7 +33,7 @@ Allocs: 12
 Retain: 24
 
 Unifications: 26
-Conjuncts:    33
+Conjuncts:    34
 Disjuncts:    38
 -- out/run/stats/totals --
 Leaks:  8
@@ -43,7 +43,7 @@ Allocs: 12
 Retain: 24
 
 Unifications: 26
-Conjuncts:    33
+Conjuncts:    34
 Disjuncts:    38
 -- out/run/t2 --
 graph TD

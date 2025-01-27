@@ -47,14 +47,14 @@ issue3635: reduced_noshare: {
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  162
-Reused: 148
+Freed:  159
+Reused: 145
 Allocs: 14
 Retain: 62
 
-Unifications: 86
-Conjuncts:    315
-Disjuncts:    168
+Unifications: 83
+Conjuncts:    310
+Disjuncts:    165
 -- out/eval --
 (struct){
   issue3635: (struct){

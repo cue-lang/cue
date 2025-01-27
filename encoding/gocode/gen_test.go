@@ -40,7 +40,7 @@ func TestPackages(t *testing.T) {
 	}{{
 		name:  "failing int",
 		value: pkg2.PickMe(4),
-		want:  "invalid value 4 (out of bound >5):\n    pkg2/instance.cue:x:x",
+		want:  "invalid value 4 (out of bound >5):\n    pkg2/instance.cue:x:x\n    _:1:2",
 	}, {
 		name:  "failing field with validator",
 		value: &pkg1.OtherStruct{A: "car"},
@@ -50,6 +50,8 @@ conflicting values null and {A:strings.ContainsAny("X"),P:"cuelang.org/go/encodi
     pkg1/instance.cue:x:x
 A: invalid value "car" (does not satisfy strings.ContainsAny("X")):
     pkg1/instance.cue:x:x
+    _:1:3
+    _:1:4
     pkg1/instance.cue:x:x
 `,
 	}, {
@@ -61,6 +63,7 @@ conflicting values null and {A:<=10,B:(=~"cat"|*"dog"),O?:OtherStruct,I:"cuelang
     pkg1/instance.cue:x:x
 A: invalid value 11 (out of bound <=10):
     pkg1/instance.cue:x:x
+    _:1:3
 `,
 	}, {
 		name:  "failing nested struct ",
@@ -75,6 +78,8 @@ O: conflicting values null and {A:strings.ContainsAny("X"),P:"cuelang.org/go/enc
     pkg1/instance.cue:x:x
 O.A: invalid value "car" (does not satisfy strings.ContainsAny("X")):
     pkg1/instance.cue:x:x
+    _:1:4
+    _:1:9
     pkg1/instance.cue:x:x
 `,
 	}, {
@@ -90,6 +95,7 @@ O: conflicting values null and {A:strings.ContainsAny("X"),P:"cuelang.org/go/enc
     pkg1/instance.cue:x:x
 O.P: invalid value 4 (out of bound >5):
     pkg2/instance.cue:x:x
+    _:1:11
 `,
 	}, {
 		name: "all good",

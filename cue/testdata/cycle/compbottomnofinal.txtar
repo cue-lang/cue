@@ -364,7 +364,7 @@ Allocs: 20
 Retain: 302
 
 Unifications: 115
-Conjuncts:    223
+Conjuncts:    244
 Disjuncts:    215
 -- out/evalalpha --
 (struct){

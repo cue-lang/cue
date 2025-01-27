@@ -54,7 +54,7 @@ Allocs: 7
 Retain: 0
 
 Unifications: 26
-Conjuncts:    70
+Conjuncts:    71
 Disjuncts:    47
 -- out/run/t2 --
 graph TD
@@ -97,7 +97,7 @@ Allocs: 0
 Retain: 0
 
 Unifications: 26
-Conjuncts:    74
+Conjuncts:    76
 Disjuncts:    47
 -- out/run/stats/totals --
 Leaks:  0
@@ -107,7 +107,7 @@ Allocs: 7
 Retain: 0
 
 Unifications: 52
-Conjuncts:    144
+Conjuncts:    147
 Disjuncts:    94
 -- out/run/t3 --
 graph TD

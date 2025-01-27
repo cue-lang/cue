@@ -16,7 +16,7 @@ b: {
 Errors:
 b.y: conflicting values int and 3.479700443150099001242770375542286 (mismatched types int and float):
     ./in.cue:11:5
-    ./in.cue:12:5
+    _:1:2
 
 Result:
 a: {

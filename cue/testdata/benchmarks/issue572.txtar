@@ -11,14 +11,14 @@ unified: {
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  4501
-Reused: 4497
-Allocs: 4
+Freed:  3001
+Reused: 2998
+Allocs: 3
 Retain: 0
 
-Unifications: 4501
-Conjuncts:    8998
-Disjuncts:    4501
+Unifications: 3001
+Conjuncts:    7498
+Disjuncts:    3001
 -- out/eval --
 (struct){
   _entries(:p): (#list){

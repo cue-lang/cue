@@ -152,14 +152,14 @@ issue3679: {
 }
 -- out/eval/stats --
 Leaks:  3
-Freed:  174
-Reused: 167
+Freed:  172
+Reused: 165
 Allocs: 10
 Retain: 21
 
-Unifications: 175
-Conjuncts:    365
-Disjuncts:    193
+Unifications: 173
+Conjuncts:    361
+Disjuncts:    191
 -- out/evalalpha --
 Errors:
 shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):

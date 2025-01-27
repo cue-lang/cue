@@ -235,16 +235,40 @@ issue3681: {
 	strDefault: *"fallback" | string
 	#strDefaultDef: strDefault
 }
+issue3699: {
+	reduced: p1: {
+		y: { if x.z { 1 } }
+		x: *{z: true} | {}
+	}
+	reduced: p2: {
+		y: { if x.z { 1 } }
+		x: *{z: true} | {}
+	}
+	reduced: full: {
+		_res: {
+			_fooTrue: {} | *{foo: true}
+			_msgSwitch: [
+				if _fooTrue.foo { msg: "foo" },
+				{ msg: "bar" },
+			][0]
+			out: _msgSwitch.msg
+		}
+		let res = {
+			out: (_res & {}).out
+		}
+		out: res.out
+	}
+}
 -- out/eval/stats --
-Leaks:  10
-Freed:  637
-Reused: 623
-Allocs: 24
-Retain: 39
+Leaks:  22
+Freed:  673
+Reused: 659
+Allocs: 36
+Retain: 63
 
-Unifications: 332
-Conjuncts:    1229
-Disjuncts:    652
+Unifications: 370
+Conjuncts:    1296
+Disjuncts:    708
 -- out/evalalpha --
 Errors:
 f: 2 errors in empty disjunction:
@@ -260,6 +284,8 @@ issue3606.data: conflicting values string and {notAllowed:true} (mismatched type
     ./dependencies.cue:6:6
 issue3606.data.notAllowed: field not allowed:
     ./dependencies.cue:3:3
+issue3699.reduced.full.res.out: undefined field: msg:
+    ./dependencies.cue:47:20
 
 Result:
 (_|_){
@@ -321,6 +347,56 @@ Result:
     }
     strDefault: (string){ |(*(string){ "fallback" }, (string){ string }) }
     #strDefaultDef: (string){ |(*(string){ "fallback" }, (string){ string }) }
+  }
+  issue3699: (_|_){
+    // [eval]
+    reduced: (_|_){
+      // [eval]
+      p1: (struct){
+        y: (_|_){
+          // [incomplete] issue3699.reduced.p1.y: undefined field: z:
+          //     ./dependencies.cue:33:13
+        }
+        x: (struct){ |(*(struct){
+            z: (bool){ true }
+          }, (struct){
+          }) }
+      }
+      p2: (struct){
+        y: (_|_){
+          // [incomplete] issue3699.reduced.p2.y: undefined field: z:
+          //     ./dependencies.cue:37:13
+        }
+        x: (struct){ |(*(struct){
+            z: (bool){ true }
+          }, (struct){
+          }) }
+      }
+      full: (_|_){
+        // [eval]
+        _res: (struct){
+          _fooTrue: (struct){ |(*(struct){
+              foo: (bool){ true }
+            }, (struct){
+            }) }
+          _msgSwitch: (struct){
+            msg: (string){ "foo" }
+          }
+          out: (string){ "foo" }
+        }
+        let res#1 = (_|_){
+          // [eval]
+          out: (_|_){
+            // [eval] issue3699.reduced.full.res.out: undefined field: msg:
+            //     ./dependencies.cue:47:20
+          }
+        }
+        out: (_|_){
+          // [eval] issue3699.reduced.full.res.out: undefined field: msg:
+          //     ./dependencies.cue:47:20
+        }
+      }
+    }
   }
   a: (int){ |(*(int){ 1 }, (int){ int }) }
   aa: (int){ |(*(int){ 1 }, *(int){ 2 }, (int){ int }) }
@@ -554,33 +630,33 @@ Result:
           _ok: (bool){ bool }
         }, (#struct){
           _ok: (bool){ true }
-          let Ok#1 = (bool){ true }
+          let Ok#2 = (bool){ true }
         }, (#struct){
           _ok: (bool){ true }
-          let Ok#1 = (bool){ true }
+          let Ok#2 = (bool){ true }
           x: (bool){ true }
         }) }
       foo: (#struct){ |((#struct){
           _ok: (bool){ bool }
         }, (#struct){
           _ok: (bool){ true }
-          let Ok#1 = (bool){ true }
+          let Ok#2 = (bool){ true }
         }, (#struct){
           _ok: (bool){ true }
-          let Ok#1 = (bool){ true }
+          let Ok#2 = (bool){ true }
         }, (#struct){
           _ok: (bool){ true }
-          let Ok#1multi = 〈0;_ok〉
+          let Ok#2multi = 〈0;_ok〉
           x: (bool){ true }
         }) }
       bar: (#struct){ |((#struct){
           _ok: (bool){ bool }
         }, (#struct){
           _ok: (bool){ true }
-          let Ok#1 = (bool){ true }
+          let Ok#2 = (bool){ true }
         }, (#struct){
           _ok: (bool){ true }
-          let Ok#1 = (bool){ true }
+          let Ok#2 = (bool){ true }
           x: (bool){ true }
         }) }
     }
@@ -588,16 +664,16 @@ Result:
       ok: (bool){ true }
       X: (_){ |((_){ _ }, (_){
           _
-          let Ok#2 = (bool){ true }
+          let Ok#3 = (bool){ true }
         }, (struct){
-          let Ok#2 = (bool){ true }
+          let Ok#3 = (bool){ true }
           x: (bool){ true }
         }) }
       foo: (_){ |((_){ _ }, (_){
           _
-          let Ok#2 = (bool){ true }
+          let Ok#3 = (bool){ true }
         }, (struct){
-          let Ok#2 = (bool){ true }
+          let Ok#3 = (bool){ true }
           x: (bool){ true }
         }) }
     }
@@ -619,16 +695,18 @@ diff old new
      ./in.cue:15:27
  issue3606.data: 2 errors in empty disjunction:
  issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
-@@ -14,8 +12,6 @@
+@@ -14,8 +12,8 @@
      ./dependencies.cue:6:6
  issue3606.data.notAllowed: field not allowed:
      ./dependencies.cue:3:3
 -    ./dependencies.cue:4:6
 -    ./dependencies.cue:6:15
++issue3699.reduced.full.res.out: undefined field: msg:
++    ./dependencies.cue:47:20
  
  Result:
  (_|_){
-@@ -29,14 +25,7 @@
+@@ -29,14 +27,7 @@
        //     ./dependencies.cue:6:6
        // issue3606.data.notAllowed: field not allowed:
        //     ./dependencies.cue:3:3
@@ -644,7 +722,73 @@ diff old new
      }
      #S: ((string|struct)){ |((string){ string }, (#struct){
        }) }
-@@ -110,19 +99,12 @@
+@@ -85,10 +76,15 @@
+     strDefault: (string){ |(*(string){ "fallback" }, (string){ string }) }
+     #strDefaultDef: (string){ |(*(string){ "fallback" }, (string){ string }) }
+   }
+-  issue3699: (struct){
+-    reduced: (struct){
++  issue3699: (_|_){
++    // [eval]
++    reduced: (_|_){
++      // [eval]
+       p1: (struct){
+-        y: (int){ 1 }
++        y: (_|_){
++          // [incomplete] issue3699.reduced.p1.y: undefined field: z:
++          //     ./dependencies.cue:33:13
++        }
+         x: (struct){ |(*(struct){
+             z: (bool){ true }
+           }, (struct){
+@@ -95,13 +91,17 @@
+           }) }
+       }
+       p2: (struct){
+-        y: (int){ 1 }
+-        x: (struct){ |(*(struct){
+-            z: (bool){ true }
+-          }, (struct){
+-          }) }
+-      }
+-      full: (struct){
++        y: (_|_){
++          // [incomplete] issue3699.reduced.p2.y: undefined field: z:
++          //     ./dependencies.cue:37:13
++        }
++        x: (struct){ |(*(struct){
++            z: (bool){ true }
++          }, (struct){
++          }) }
++      }
++      full: (_|_){
++        // [eval]
+         _res: (struct){
+           _fooTrue: (struct){ |(*(struct){
+               foo: (bool){ true }
+@@ -112,10 +112,17 @@
+           }
+           out: (string){ "foo" }
+         }
+-        let res#1 = (struct){
+-          out: (string){ "foo" }
+-        }
+-        out: (string){ "foo" }
++        let res#1 = (_|_){
++          // [eval]
++          out: (_|_){
++            // [eval] issue3699.reduced.full.res.out: undefined field: msg:
++            //     ./dependencies.cue:47:20
++          }
++        }
++        out: (_|_){
++          // [eval] issue3699.reduced.full.res.out: undefined field: msg:
++          //     ./dependencies.cue:47:20
++        }
+       }
+     }
+   }
+@@ -144,19 +151,12 @@
      // [eval] f: 2 errors in empty disjunction:
      // f.name: conflicting values "int" and "str":
      //     ./in.cue:5:8
@@ -665,7 +809,7 @@ diff old new
    }
    e1: (struct){
      a: ((null|struct)){ |((null){ null }, (struct){
-@@ -234,8 +216,8 @@
+@@ -268,8 +268,8 @@
      e: (struct){
        foobar: (#struct){
          b: (#struct){
@@ -675,14 +819,14 @@ diff old new
          }
        }
      }
-@@ -337,6 +319,9 @@
-           let Ok#1 = (bool){ true }
+@@ -371,6 +371,9 @@
+           let Ok#2 = (bool){ true }
          }, (#struct){
            _ok: (bool){ true }
-+          let Ok#1 = (bool){ true }
++          let Ok#2 = (bool){ true }
 +        }, (#struct){
 +          _ok: (bool){ true }
-           let Ok#1multi = 〈0;_ok〉
+           let Ok#2multi = 〈0;_ok〉
            x: (bool){ true }
          }) }
 -- diff/todo/p1 --
@@ -779,6 +923,40 @@ Result:
     }
     strDefault: (string){ |(*(string){ "fallback" }, (string){ string }) }
     #strDefaultDef: (string){ |(*(string){ "fallback" }, (string){ string }) }
+  }
+  issue3699: (struct){
+    reduced: (struct){
+      p1: (struct){
+        y: (int){ 1 }
+        x: (struct){ |(*(struct){
+            z: (bool){ true }
+          }, (struct){
+          }) }
+      }
+      p2: (struct){
+        y: (int){ 1 }
+        x: (struct){ |(*(struct){
+            z: (bool){ true }
+          }, (struct){
+          }) }
+      }
+      full: (struct){
+        _res: (struct){
+          _fooTrue: (struct){ |(*(struct){
+              foo: (bool){ true }
+            }, (struct){
+            }) }
+          _msgSwitch: (struct){
+            msg: (string){ "foo" }
+          }
+          out: (string){ "foo" }
+        }
+        let res#1 = (struct){
+          out: (string){ "foo" }
+        }
+        out: (string){ "foo" }
+      }
+    }
   }
   a: (int){ |(*(int){ 1 }, (int){ int }) }
   aa: (int){ |(*(int){ 1 }, *(int){ 2 }, (int){ int }) }
@@ -1019,30 +1197,30 @@ Result:
           _ok: (bool){ bool }
         }, (#struct){
           _ok: (bool){ true }
-          let Ok#1 = (bool){ true }
+          let Ok#2 = (bool){ true }
         }, (#struct){
           _ok: (bool){ true }
-          let Ok#1 = (bool){ true }
+          let Ok#2 = (bool){ true }
           x: (bool){ true }
         }) }
       foo: (#struct){ |((#struct){
           _ok: (bool){ bool }
         }, (#struct){
           _ok: (bool){ true }
-          let Ok#1 = (bool){ true }
+          let Ok#2 = (bool){ true }
         }, (#struct){
           _ok: (bool){ true }
-          let Ok#1multi = 〈0;_ok〉
+          let Ok#2multi = 〈0;_ok〉
           x: (bool){ true }
         }) }
       bar: (#struct){ |((#struct){
           _ok: (bool){ bool }
         }, (#struct){
           _ok: (bool){ true }
-          let Ok#1 = (bool){ true }
+          let Ok#2 = (bool){ true }
         }, (#struct){
           _ok: (bool){ true }
-          let Ok#1 = (bool){ true }
+          let Ok#2 = (bool){ true }
           x: (bool){ true }
         }) }
     }
@@ -1050,16 +1228,16 @@ Result:
       ok: (bool){ true }
       X: (_){ |((_){ _ }, (_){
           _
-          let Ok#2 = (bool){ true }
+          let Ok#3 = (bool){ true }
         }, (struct){
-          let Ok#2 = (bool){ true }
+          let Ok#3 = (bool){ true }
           x: (bool){ true }
         }) }
       foo: (_){ |((_){ _ }, (_){
           _
-          let Ok#2 = (bool){ true }
+          let Ok#3 = (bool){ true }
         }, (struct){
-          let Ok#2 = (bool){ true }
+          let Ok#3 = (bool){ true }
           x: (bool){ true }
         }) }
     }
@@ -1110,6 +1288,54 @@ Result:
     }
     strDefault: (*"fallback"|string)
     #strDefaultDef: 〈0;strDefault〉
+  }
+  issue3699: {
+    reduced: {
+      p1: {
+        y: {
+          if 〈1;x〉.z {
+            1
+          }
+        }
+        x: (*{
+          z: true
+        }|{})
+      }
+    }
+    reduced: {
+      p2: {
+        y: {
+          if 〈1;x〉.z {
+            1
+          }
+        }
+        x: (*{
+          z: true
+        }|{})
+      }
+    }
+    reduced: {
+      full: {
+        _res: {
+          _fooTrue: ({}|*{
+            foo: true
+          })
+          _msgSwitch: [
+            if 〈1;_fooTrue〉.foo {
+              msg: "foo"
+            },
+            {
+              msg: "bar"
+            },
+          ][0]
+          out: 〈0;_msgSwitch〉.msg
+        }
+        let res#1 = {
+          out: (〈1;_res〉 & {}).out
+        }
+        out: 〈0;let res#1〉.out
+      }
+    }
   }
 }
 --- in.cue
@@ -1429,9 +1655,9 @@ Result:
         _ok: bool
         ({}|{
           _ok: true
-          let Ok#1 = 〈0;_ok〉
+          let Ok#2 = 〈0;_ok〉
           ({}|{
-            x: 〈1;let Ok#1〉
+            x: 〈1;let Ok#2〉
           })
         })
       }
@@ -1444,9 +1670,9 @@ Result:
     t2: {
       ok: true
       X: (_|{
-        let Ok#2 = 〈1;ok〉
+        let Ok#3 = 〈1;ok〉
         (_|{
-          x: 〈1;let Ok#2〉
+          x: 〈1;let Ok#3〉
         })
       })
       foo: (〈0;X〉 & {

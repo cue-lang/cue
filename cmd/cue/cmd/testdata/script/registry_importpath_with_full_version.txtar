@@ -1,0 +1,22 @@
+! exec cue eval .
+cmp stderr expect-stderr
+
+-- expect-stderr --
+test.org@v0: import failed: cannot find package "example.com/e@v0.0.2": malformed import path "example.com/e@v0.0.2": import paths can only contain a major version specifier:
+    ./main.cue:2:8
+-- main.cue --
+package main
+import "example.com/e@v0.0.2"
+
+e.foo
+
+-- cue.mod/module.cue --
+module: "test.org"
+language: version: "v0.8.0"
+deps: "example.com/e": v: "v0.0.2"
+-- _registry/example.com_e_v0.0.2/cue.mod/module.cue --
+module: "example.com/e@v0"
+language: version: "v0.8.0"
+
+-- _registry/example.com_e_v0.0.2/main.cue --
+package e

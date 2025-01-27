@@ -924,11 +924,11 @@ diff old new
          }
        }
 -      p2: (_|_){
--        // [incomplete] 1: invalid interpolation: cycle error referencing X:
+-        // [incomplete] chain.t2.p2.0.1: invalid interpolation: cycle error referencing X:
 -        //     ./in.cue:44:6
 -        //     ./in.cue:43:28
 -        x: (_|_){
--          // [incomplete] 1: invalid interpolation: cycle error referencing X:
+-          // [incomplete] chain.t2.p2.0.1: invalid interpolation: cycle error referencing X:
 -          //     ./in.cue:44:6
 -          //     ./in.cue:43:28
 -          x0: (struct){
@@ -1724,14 +1724,14 @@ diff old new
    }
 -- out/eval/stats --
 Leaks:  56
-Freed:  1852
-Reused: 1838
+Freed:  1788
+Reused: 1774
 Allocs: 70
-Retain: 175
+Retain: 174
 
-Unifications: 823
-Conjuncts:    3212
-Disjuncts:    2006
+Unifications: 759
+Conjuncts:    3139
+Disjuncts:    1942
 -- diff/todo/p2 --
 issue2052.full.#Recurse: cycle error. This is not the worst, as a self-reference
 cycle is an incomplete error and more or less equivalent to _, but the same
@@ -1772,11 +1772,11 @@ which is used in d.
         }
       }
       p2: (_|_){
-        // [incomplete] 1: invalid interpolation: cycle error referencing X:
+        // [incomplete] chain.t2.p2.0.1: invalid interpolation: cycle error referencing X:
         //     ./in.cue:44:6
         //     ./in.cue:43:28
         x: (_|_){
-          // [incomplete] 1: invalid interpolation: cycle error referencing X:
+          // [incomplete] chain.t2.p2.0.1: invalid interpolation: cycle error referencing X:
           //     ./in.cue:44:6
           //     ./in.cue:43:28
           x0: (struct){

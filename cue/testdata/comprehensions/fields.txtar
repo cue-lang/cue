@@ -60,14 +60,14 @@ issue560: {
 }
 -- out/eval/stats --
 Leaks:  1
-Freed:  32
-Reused: 26
-Allocs: 7
+Freed:  29
+Reused: 24
+Allocs: 6
 Retain: 1
 
-Unifications: 33
-Conjuncts:    41
-Disjuncts:    33
+Unifications: 30
+Conjuncts:    38
+Disjuncts:    30
 -- out/evalalpha --
 (struct){
   dynamic: (struct){

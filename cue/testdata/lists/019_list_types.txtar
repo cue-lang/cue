@@ -118,14 +118,84 @@ e1: [..._|_ // conflicting values int and float (mismatched types int and float)
 }
 -- out/eval/stats --
 Leaks:  3
-Freed:  54
-Reused: 50
+Freed:  33
+Reused: 29
 Allocs: 7
 Retain: 7
 
-Unifications: 57
-Conjuncts:    99
-Disjuncts:    60
+Unifications: 36
+Conjuncts:    59
+Disjuncts:    39
+-- out/evalalpha --
+Errors:
+e0: incompatible list lengths (1 and 2):
+    _:1:2
+
+Result:
+(_|_){
+  // [eval]
+  l0: (#list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+    2: (int){ 3 }
+  }
+  l2: (#list){
+    0: (struct){
+      a: (int){ 1 }
+    }
+    1: (struct){
+      a: (int){ 2 }
+      b: (int){ 3 }
+    }
+  }
+  s1: (#list){
+    0: (int){ int }
+  }
+  s2: (#list){
+    0: (int){ 2 }
+  }
+  i1: (int){ int }
+  i2: (int){ 3 }
+  t0: (#list){
+    0: (struct){
+      a: (int){ 8 }
+    }
+  }
+  t1: (list){
+  }
+  e0: (_|_){
+    // [eval] e0: incompatible list lengths (1 and 2):
+    //     _:1:2
+    0: (struct){
+    }
+    1: (struct){
+    }
+  }
+  e1: (list){
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,5 +1,6 @@
+ Errors:
+-e0: incompatible list lengths (1 and 2)
++e0: incompatible list lengths (1 and 2):
++    _:1:2
+ 
+ Result:
+ (_|_){
+@@ -34,7 +35,8 @@
+   t1: (list){
+   }
+   e0: (_|_){
+-    // [eval] e0: incompatible list lengths (1 and 2)
++    // [eval] e0: incompatible list lengths (1 and 2):
++    //     _:1:2
+     0: (struct){
+     }
+     1: (struct){
 -- out/eval --
 Errors:
 e0: incompatible list lengths (1 and 2)

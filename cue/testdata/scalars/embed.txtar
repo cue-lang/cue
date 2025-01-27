@@ -153,14 +153,14 @@ selfRefInEmbed: t1: {
 
 -- out/eval/stats --
 Leaks:  10
-Freed:  135
-Reused: 128
+Freed:  130
+Reused: 123
 Allocs: 17
 Retain: 57
 
-Unifications: 141
-Conjuncts:    313
-Disjuncts:    178
+Unifications: 136
+Conjuncts:    304
+Disjuncts:    173
 -- out/evalalpha --
 Errors:
 listEmbed.b6: index out of range [5] with length 2:

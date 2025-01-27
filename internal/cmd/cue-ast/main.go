@@ -20,6 +20,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"slices"
@@ -29,6 +30,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/astinternal"
 )
 
@@ -61,11 +63,35 @@ See 'cue help inputs' as well.
 	case "print":
 		var cfg astinternal.DebugConfig
 		flag.BoolVar(&cfg.OmitEmpty, "omitempty", false, "")
+		flag.BoolVar(&cfg.IncludeNodeRefs, "refs", false, "")
+		fileFlag := false
+		flag.BoolVar(&fileFlag, "files", false, "")
 		// Note that DebugConfig also has a Filter func, but that doesn't lend itself well
 		// to a command line flag. Perhaps we could provide some commonly used filters,
 		// such as "positions only" or "skip positions".
 		flag.CommandLine.Parse(args)
 
+		if fileFlag {
+			for _, f := range flag.Args() {
+				var data []byte
+				var err error
+				if f == "-" {
+					data, err = io.ReadAll(os.Stdin)
+				} else {
+					data, err = os.ReadFile(f)
+				}
+				if err != nil {
+					log.Fatal(err)
+				}
+				astf, err := parser.ParseFile(f, data, parser.ParseComments)
+				if err != nil {
+					log.Fatal(errors.Details(err, nil))
+				}
+				out := astinternal.AppendDebug(nil, astf, cfg)
+				os.Stdout.Write(out)
+			}
+			return
+		}
 		// TODO: should we produce output in txtar form for the sake of
 		// more clearly separating the AST for each file?
 		// [ast.File.Filename] already has the full filename,

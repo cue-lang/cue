@@ -4,14 +4,14 @@ import "list"
 a: list.Sort([2, 3, 1, 4], {x: _, y: _, less: x < y})
 -- out/eval/stats --
 Leaks:  0
-Freed:  20
-Reused: 15
+Freed:  15
+Reused: 10
 Allocs: 5
 Retain: 2
 
-Unifications: 20
-Conjuncts:    33
-Disjuncts:    22
+Unifications: 15
+Conjuncts:    24
+Disjuncts:    17
 -- out/eval --
 (struct){
   a: (#list){

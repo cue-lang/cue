@@ -225,6 +225,16 @@ func (w *printer) interpolation(x *adt.Interpolation) {
 	w.string(quote)
 }
 
+func (w *printer) arg(n adt.Node) {
+	if x, ok := n.(*adt.Vertex); ok {
+		if x.Label != adt.InvalidLabel {
+			w.path(x)
+			return
+		}
+	}
+	w.node(n)
+}
+
 func (w *printer) node(n adt.Node) {
 	switch x := n.(type) {
 	case *adt.Vertex:
@@ -558,7 +568,7 @@ func (w *printer) node(n adt.Node) {
 			if i > 0 {
 				w.string(", ")
 			}
-			w.node(a)
+			w.arg(a)
 		}
 		w.string(")")
 
@@ -576,7 +586,7 @@ func (w *printer) node(n adt.Node) {
 			if i > 0 {
 				w.string(", ")
 			}
-			w.node(a)
+			w.arg(a)
 		}
 		w.string(")")
 

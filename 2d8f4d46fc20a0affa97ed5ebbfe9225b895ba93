@@ -34,6 +34,57 @@
       "parentUuid": "44d8f5a9_4a021d4e",
       "revId": "2d8f4d46fc20a0affa97ed5ebbfe9225b895ba93",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "105f9787_3d1a5f63",
+        "filename": "internal/core/convert/go.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-28T11:43:43Z",
+      "side": 1,
+      "message": "we usually use f for features, not l. using f makes it clear we are dealing with a feature value, and not a string value. This is more useful. The fact that it is a label is already clear from the context. So this reduces the amount of information available to the reader.\n\nShort names often reflect the underlying type, not function.\n\nAside from deviating from the convention, this also makes the diff larger unnecessarily.",
+      "revId": "2d8f4d46fc20a0affa97ed5ebbfe9225b895ba93",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "521a7f34_36439a35",
+        "filename": "internal/core/convert/go.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 478,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-28T11:43:43Z",
+      "side": 1,
+      "message": "Is the Finalize necessary here? That is a big change.\n\nIf it is, we might want to move that to a separate CL with an explanation of itself.",
+      "revId": "2d8f4d46fc20a0affa97ed5ebbfe9225b895ba93",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "468927ea_865234a9",
+        "filename": "internal/core/convert/go.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 518,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-28T11:43:43Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "2d8f4d46fc20a0affa97ed5ebbfe9225b895ba93",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

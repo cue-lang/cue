@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "583da425_0de5ba40",
+        "filename": "internal/core/convert/go.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 449,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-28T11:43:43Z",
+      "side": 0,
+      "message": "Why is it safe to remove ForceDone? I didn\u0027t see anything about it in the CL commit message.",
+      "revId": "98692a5c1089c27258bc3f8bda13800a9fe69f57",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -588,6 +588,7 @@ Conjuncts:    399
 Disjuncts:    213
 -- out/evalalpha --
 Errors:
+brokenRing.t1.p1.T.b: structural cycle
 cyclicRing.t1.T.b: structural cycle
 mutuallyTriggeringCycle.t1.x.c.b.b.b.b.b: structural cycle
 noCancelSelfInvoke.t1.x.c.b.b: structural cycle
@@ -848,22 +849,34 @@ Result:
     }
     issue1503: (_|_){
       // [structural cycle]
-      a: (#struct){
-        a: (#struct){
-          one: (#struct){
-            link: (#struct){
-              a: (#struct){
-                two: (#struct){
+      a: (_|_){
+        // [structural cycle]
+        a: (_|_){
+          // [structural cycle]
+          one: (_|_){
+            // [structural cycle]
+            link: (_|_){
+              // [structural cycle]
+              a: (_|_){
+                // [structural cycle]
+                two: (_|_){
+                  // [structural cycle]
                   link: ~(selfTriggerCycle.issue1503.#T)
                 }
-                b: (#struct){
-                  link: ~(selfTriggerCycle.issue1503.#T)
+                b: (_|_){
+                  // [structural cycle]
+                  link: (_|_){
+                    // [structural cycle]
+                  }
                 }
               }
             }
           }
-          b: (#struct){
-            link: ~(selfTriggerCycle.issue1503.#T)
+          b: (_|_){
+            // [structural cycle]
+            link: (_|_){
+              // [structural cycle]
+            }
           }
         }
       }
@@ -935,14 +948,20 @@ Result:
       }
     }
   }
-  brokenRing: (struct){
-    t1: (struct){
-      p1: (struct){
+  brokenRing: (_|_){
+    // [structural cycle]
+    t1: (_|_){
+      // [structural cycle]
+      p1: (_|_){
+        // [structural cycle]
         D: (struct){
           a?: ~(brokenRing.t1.p1.T)
         }
-        T: (struct){
-          b: ~(brokenRing.t1.p1.D)
+        T: (_|_){
+          // [structural cycle]
+          b: (_|_){
+            // [structural cycle] brokenRing.t1.p1.T.b: structural cycle
+          }
         }
       }
       p2: (struct){
@@ -996,9 +1015,9 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,12 +1,10 @@
+@@ -1,12 +1,11 @@
  Errors:
--brokenRing.t1.p1.T.b: structural cycle
+ brokenRing.t1.p1.T.b: structural cycle
 -cyclicRing.t1.D.a.b: structural cycle
  cyclicRing.t1.T.b: structural cycle
 -mutuallyTriggeringCycle.t1.x.c.b.b.b.b: structural cycle
@@ -1012,7 +1031,7 @@ diff old new
  selfTriggerCycle.t1.#T.b.b: structural cycle
  selfTriggerCycle.t2.b.c.a: structural cycle
  
-@@ -152,18 +150,10 @@
+@@ -152,18 +151,10 @@
        #D: (#struct){
        }
        #E: (#struct){
@@ -1035,7 +1054,7 @@ diff old new
        }
        #S: (#struct){
          y: (#struct){
-@@ -201,18 +191,15 @@
+@@ -201,18 +192,15 @@
          // [structural cycle]
          c: (_|_){
            // [structural cycle]
@@ -1060,7 +1079,7 @@ diff old new
          }
        }
      }
-@@ -221,12 +208,7 @@
+@@ -221,12 +209,7 @@
      // [structural cycle]
      t1: (_|_){
        // [structural cycle]
@@ -1074,7 +1093,7 @@ diff old new
        #T: (_|_){
          // [structural cycle]
          b: (_|_){
-@@ -266,13 +248,7 @@
+@@ -266,13 +249,7 @@
                  c: (_|_){
                    // [structural cycle]
                    b: (_|_){
@@ -1089,49 +1108,47 @@ diff old new
                    }
                  }
                }
-@@ -283,25 +259,22 @@
-     }
-     issue1503: (_|_){
-       // [structural cycle]
--      a: (_|_){
--        // [structural cycle]
--        a: (_|_){
--          // [structural cycle]
+@@ -287,20 +264,29 @@
+         // [structural cycle]
+         a: (_|_){
+           // [structural cycle]
 -          b: (_|_){
 -            // [structural cycle]
 -            link: (_|_){
 -              // [structural cycle]
 -            }
 -          }
--          one: (_|_){
--            // [structural cycle]
--            link: (_|_){
--              // [structural cycle]
+           one: (_|_){
+             // [structural cycle]
+             link: (_|_){
+               // [structural cycle]
 -              a: (struct){
 -                two: (struct){
 -                }
 -              }
--            }
-+      a: (#struct){
-+        a: (#struct){
-+          one: (#struct){
-+            link: (#struct){
-+              a: (#struct){
-+                two: (#struct){
++              a: (_|_){
++                // [structural cycle]
++                two: (_|_){
++                  // [structural cycle]
 +                  link: ~(selfTriggerCycle.issue1503.#T)
 +                }
-+                b: (#struct){
-+                  link: ~(selfTriggerCycle.issue1503.#T)
++                b: (_|_){
++                  // [structural cycle]
++                  link: (_|_){
++                    // [structural cycle]
++                  }
 +                }
 +              }
 +            }
 +          }
-+          b: (#struct){
-+            link: ~(selfTriggerCycle.issue1503.#T)
++          b: (_|_){
++            // [structural cycle]
++            link: (_|_){
++              // [structural cycle]
+             }
            }
          }
-       }
-@@ -336,7 +309,10 @@
+@@ -336,7 +322,10 @@
                b: (_|_){
                  // [structural cycle]
                  b: (_|_){
@@ -1143,55 +1160,34 @@ diff old new
                  }
                }
              }
-@@ -370,34 +346,19 @@
-       }
-     }
-   }
--  brokenRing: (_|_){
--    // [structural cycle]
--    t1: (_|_){
--      // [structural cycle]
--      p1: (_|_){
--        // [structural cycle]
--        D: (struct){
+@@ -377,12 +366,7 @@
+       p1: (_|_){
+         // [structural cycle]
+         D: (struct){
 -          a?: (_|_){
 -            // [structural cycle]
 -            b: (_|_){
 -              // [structural cycle] brokenRing.t1.p1.D.a.b: structural cycle
 -            }
 -          }
--        }
--        T: (_|_){
--          // [structural cycle]
--          b: (_|_){
--            // [structural cycle] brokenRing.t1.p1.T.b: structural cycle
--          }
--        }
--      }
--      p2: (struct){
--        T: (struct){
++          a?: ~(brokenRing.t1.p1.T)
+         }
+         T: (_|_){
+           // [structural cycle]
+@@ -393,11 +377,7 @@
+       }
+       p2: (struct){
+         T: (struct){
 -          b: (struct){
 -            a?: (_|_){
 -              // [structural cycle] brokenRing.t1.p2.T.b.a: structural cycle
 -            }
 -          }
-+  brokenRing: (struct){
-+    t1: (struct){
-+      p1: (struct){
-+        D: (struct){
-+          a?: ~(brokenRing.t1.p1.T)
-+        }
-+        T: (struct){
-+          b: ~(brokenRing.t1.p1.D)
-+        }
-+      }
-+      p2: (struct){
-+        T: (struct){
 +          b: ~(brokenRing.t1.p2.D)
          }
          D: (struct){
            a?: (_|_){
-@@ -431,12 +392,7 @@
+@@ -431,12 +411,7 @@
        // [structural cycle]
        D: (_|_){
          // [structural cycle]

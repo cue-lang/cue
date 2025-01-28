@@ -355,6 +355,10 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		}
 		v.status = w.status
 
+		// Ensure that shared nodes comply to the same requirements as we
+		// need for the current node.
+		w.unify(c, needs, mode)
+
 		return true
 	}
 

@@ -625,9 +625,6 @@ Result:
           let Ok#2 = (bool){ true }
         }, (#struct){
           _ok: (bool){ true }
-          let Ok#2 = (bool){ true }
-        }, (#struct){
-          _ok: (bool){ true }
           let Ok#2multi = 〈0;_ok〉
           x: (bool){ true }
         }) }
@@ -733,16 +730,6 @@ diff old new
          }
        }
      }
-@@ -371,6 +353,9 @@
-           let Ok#2 = (bool){ true }
-         }, (#struct){
-           _ok: (bool){ true }
-+          let Ok#2 = (bool){ true }
-+        }, (#struct){
-+          _ok: (bool){ true }
-           let Ok#2multi = 〈0;_ok〉
-           x: (bool){ true }
-         }) }
 -- diff/todo/p1 --
 issue3597.t1.foo: duplicate disjunct
 -- diff/todo/p3 --

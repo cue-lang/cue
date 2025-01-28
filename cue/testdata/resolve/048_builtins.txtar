@@ -51,6 +51,28 @@ decimalListErrors: {
 		result: list.Avg(x)
 	}
 }
+-- issue3648.cue --
+// Fully finalize values before passing them to builtins.
+
+import "list"
+
+issue3648: reduced: {
+	[string]: {
+		a: list.Concat([b])
+		b: [{}]
+	}
+	foo: {}
+}
+issue3648: full: {
+	#Redirect: path?: string
+
+	[string]: {
+		// Note that this bug disappears if the order of the fields below is swapped.
+		allRedirects: list.Concat([redirects])
+		redirects:    [...#Redirect]
+	}
+	foo: {}
+}
 -- out/def --
 a1: {
 	a: =~"oo" & =~"fo"
@@ -79,14 +101,14 @@ o3: o1 & {
 <0>{a1: <1>{a: (=~"oo" & =~"fo"), b: =~"oo", c: =~"fo"}, a2: <2>{a: "foo", b: =~"oo", c: =~"fo"}, a3: <3>{a: _|_((=~"oo" & "bar"):invalid value "bar" (does not match =~"oo")), b: =~"oo", c: =~"fo"}, o1: <4>{a: string, b: string, c: "bar"}, o2: <5>{a: "foo", b: string, c: "bar"}, o3: <6>{a: _|_(("baz" & "foo"):empty disjunction: conflicting values "baz" and "foo";("bar" & "foo"):empty disjunction: conflicting values "bar" and "foo"), b: "baz", c: "bar"}}
 -- out/eval/stats --
 Leaks:  6
-Freed:  61
-Reused: 53
-Allocs: 14
-Retain: 22
+Freed:  82
+Reused: 73
+Allocs: 15
+Retain: 26
 
-Unifications: 55
-Conjuncts:    125
-Disjuncts:    75
+Unifications: 76
+Conjuncts:    156
+Disjuncts:    100
 -- out/evalalpha --
 Errors:
 o3.a: 2 errors in empty disjunction:
@@ -112,6 +134,10 @@ stringListErrors.c.result: cannot use int (type int) as string in argument 2 to 
 decimalListErrors.a.result: invalid list element 0 in argument 0 to call: cannot use value string (string) as number:
     ./in.cue:43:11
     ./in.cue:42:7
+issue3648.reduced.foo.a: error in call to list.Concat: not properly initialized (state: unprocessed, value: *adt.Vertex):
+    ./issue3648.cue:7:6
+issue3648.full.foo.allRedirects: error in call to list.Concat: not properly initialized (state: unprocessed, value: *adt.Vertex):
+    ./issue3648.cue:17:17
 
 Result:
 (_|_){
@@ -222,6 +248,38 @@ Result:
       }
     }
   }
+  issue3648: (_|_){
+    // [eval]
+    reduced: (_|_){
+      // [eval]
+      foo: (_|_){
+        // [eval]
+        a: (_|_){
+          // [eval] issue3648.reduced.foo.a: error in call to list.Concat: not properly initialized (state: unprocessed, value: *adt.Vertex):
+          //     ./issue3648.cue:7:6
+        }
+        b: (#list){
+          0: (struct){
+          }
+        }
+      }
+    }
+    full: (_|_){
+      // [eval]
+      #Redirect: (#struct){
+        path?: (string){ string }
+      }
+      foo: (_|_){
+        // [eval]
+        allRedirects: (_|_){
+          // [eval] issue3648.full.foo.allRedirects: error in call to list.Concat: not properly initialized (state: unprocessed, value: *adt.Vertex):
+          //     ./issue3648.cue:17:17
+        }
+        redirects: (list){
+        }
+      }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -241,7 +299,18 @@ diff old new
      ./in.cue:20:14
      ./in.cue:20:24
  a3.a: invalid value "bar" (out of bound =~"oo"):
-@@ -70,13 +66,9 @@
+@@ -26,6 +22,10 @@
+ decimalListErrors.a.result: invalid list element 0 in argument 0 to call: cannot use value string (string) as number:
+     ./in.cue:43:11
+     ./in.cue:42:7
++issue3648.reduced.foo.a: error in call to list.Concat: not properly initialized (state: unprocessed, value: *adt.Vertex):
++    ./issue3648.cue:7:6
++issue3648.full.foo.allRedirects: error in call to list.Concat: not properly initialized (state: unprocessed, value: *adt.Vertex):
++    ./issue3648.cue:17:17
+ 
+ Result:
+ (_|_){
+@@ -70,13 +70,9 @@
      a: (_|_){
        // [eval] o3.a: 2 errors in empty disjunction:
        // o3.a: conflicting values "bar" and "foo":
@@ -255,6 +324,48 @@ diff old new
        //     ./in.cue:20:14
        //     ./in.cue:20:24
      }
+@@ -140,12 +136,15 @@
+       }
+     }
+   }
+-  issue3648: (struct){
+-    reduced: (struct){
+-      foo: (struct){
+-        a: (#list){
+-          0: (struct){
+-          }
++  issue3648: (_|_){
++    // [eval]
++    reduced: (_|_){
++      // [eval]
++      foo: (_|_){
++        // [eval]
++        a: (_|_){
++          // [eval] issue3648.reduced.foo.a: error in call to list.Concat: not properly initialized (state: unprocessed, value: *adt.Vertex):
++          //     ./issue3648.cue:7:6
+         }
+         b: (#list){
+           0: (struct){
+@@ -153,12 +152,16 @@
+         }
+       }
+     }
+-    full: (struct){
++    full: (_|_){
++      // [eval]
+       #Redirect: (#struct){
+         path?: (string){ string }
+       }
+-      foo: (struct){
+-        allRedirects: (#list){
++      foo: (_|_){
++        // [eval]
++        allRedirects: (_|_){
++          // [eval] issue3648.full.foo.allRedirects: error in call to list.Concat: not properly initialized (state: unprocessed, value: *adt.Vertex):
++          //     ./issue3648.cue:17:17
+         }
+         redirects: (list){
+         }
 -- diff/todo/p2 --
 Missing error positions.
 -- out/eval --
@@ -400,6 +511,31 @@ Result:
       }
     }
   }
+  issue3648: (struct){
+    reduced: (struct){
+      foo: (struct){
+        a: (#list){
+          0: (struct){
+          }
+        }
+        b: (#list){
+          0: (struct){
+          }
+        }
+      }
+    }
+    full: (struct){
+      #Redirect: (#struct){
+        path?: (string){ string }
+      }
+      foo: (struct){
+        allRedirects: (#list){
+        }
+        redirects: (list){
+        }
+      }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -466,6 +602,38 @@ Result:
         ...string,
       ]
       result: 〈import;list〉.Avg(〈0;x〉)
+    }
+  }
+}
+--- issue3648.cue
+{
+  issue3648: {
+    reduced: {
+      [string]: {
+        a: 〈import;list〉.Concat([
+          〈1;b〉,
+        ])
+        b: [
+          {},
+        ]
+      }
+      foo: {}
+    }
+  }
+  issue3648: {
+    full: {
+      #Redirect: {
+        path?: string
+      }
+      [string]: {
+        allRedirects: 〈import;list〉.Concat([
+          〈1;redirects〉,
+        ])
+        redirects: [
+          ...〈2;#Redirect〉,
+        ]
+      }
+      foo: {}
     }
   }
 }

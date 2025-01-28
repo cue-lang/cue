@@ -225,6 +225,11 @@ incomplete: {
 		x: bar: 2
 	}
 }
+issue3389: {
+	// only report schema errors that are of a lesser severity.
+	x: bar: 2
+	x: matchN(1, [{bar: 3}, {bar: 2, foo!: int}])
+}
 -- issue3694.cue --
 issue3694: full: {
 	#step: matchN(1, [{
@@ -253,16 +258,33 @@ issue3694: simple: {
 }
 -- out/eval/stats --
 Leaks:  19
-Freed:  759
-Reused: 752
+Freed:  774
+Reused: 767
 Allocs: 26
-Retain: 75
+Retain: 76
 
-Unifications: 762
-Conjuncts:    1269
-Disjuncts:    835
+Unifications: 777
+Conjuncts:    1292
+Disjuncts:    851
 -- out/eval --
 Errors:
+a: conflicting values "foo" and int (mismatched types string and int):
+    ./in.cue:4:5
+    ./in.cue:8:17
+    ./in.cue:8:28
+    ./in.cue:10:16
+a: conflicting values 2 and 3:
+    ./in.cue:36:23
+    ./in.cue:36:38
+    ./in.cue:39:23
+a: conflicting values string and int (mismatched types string and int):
+    ./in.cue:4:5
+    ./in.cue:12:21
+    ./in.cue:12:32
+    ./in.cue:14:20
+bar: conflicting values 2 and string (mismatched types int and string):
+    ./incomplete.cue:34:24
+    ./incomplete.cue:35:11
 match.singleErr: invalid value {a:"foo"} (does not satisfy matchN): 0 matched, expected 1:
     ./in.cue:8:17
     ./in.cue:8:24
@@ -279,6 +301,9 @@ match.defaults.pickNested2Err: invalid value {a:*3 | int} (does not satisfy matc
     ./in.cue:41:23
     ./in.cue:41:30
     ./in.cue:44:19
+a: invalid value 3 (out of bound <=2):
+    ./in.cue:41:38
+    ./in.cue:44:23
 not.singleErr: invalid value {a:2} (does not satisfy matchN): 1 matched, expected 0:
     ./in.cue:74:17
     ./in.cue:74:24
@@ -295,9 +320,29 @@ oneOf.multiple1Err2: invalid value 15 (does not satisfy matchN): 2 matched, expe
     ./in.cue:84:20
     ./in.cue:84:27
     ./in.cue:91:17
+invalid value 1 (does not satisfy math.MultipleOf(3)):
+    ./in.cue:84:31
+    ./in.cue:84:20
+    ./in.cue:84:47
+    ./in.cue:86:17
+invalid value 1 (does not satisfy math.MultipleOf(5)):
+    ./in.cue:84:51
+    ./in.cue:84:20
+    ./in.cue:84:67
+    ./in.cue:86:17
 anyOf.multiple1Err1: invalid value 1 (does not satisfy matchN): 0 matched, expected >0:
     ./in.cue:95:20
     ./in.cue:95:27
+    ./in.cue:97:17
+invalid value 1 (does not satisfy math.MultipleOf(3)):
+    ./in.cue:95:32
+    ./in.cue:95:20
+    ./in.cue:95:48
+    ./in.cue:97:17
+invalid value 1 (does not satisfy math.MultipleOf(5)):
+    ./in.cue:95:52
+    ./in.cue:95:20
+    ./in.cue:95:68
     ./in.cue:97:17
 allOf.multiple1Err1: invalid value 1 (does not satisfy matchN): 0 matched, expected 2:
     ./in.cue:106:20
@@ -311,6 +356,22 @@ allOf.multiple1Err3: invalid value 5 (does not satisfy matchN): 1 matched, expec
     ./in.cue:106:20
     ./in.cue:106:27
     ./in.cue:110:17
+invalid value 1 (does not satisfy math.MultipleOf(3)):
+    ./in.cue:106:31
+    ./in.cue:106:20
+    ./in.cue:106:47
+    ./in.cue:108:17
+invalid value 1 (does not satisfy math.MultipleOf(5)):
+    ./in.cue:106:51
+    ./in.cue:106:20
+    ./in.cue:106:67
+    ./in.cue:108:17
+0.a: field not allowed:
+    ./in.cue:153:7
+    ./in.cue:154:4
+    ./in.cue:154:5
+    ./in.cue:156:6
+    ./in.cue:157:8
 issue3575.test1.x: invalid value [{a:1}] (does not satisfy matchN): 0 matched, expected 1:
     ./in.cue:153:7
     ./in.cue:153:14
@@ -349,7 +410,12 @@ Result:
       a: (int){ 2 }
     }
     singleErr: (_|_){
-      // [eval] match.singleErr: invalid value {a:"foo"} (does not satisfy matchN): 0 matched, expected 1:
+      // [eval] a: conflicting values "foo" and int (mismatched types string and int):
+      //     ./in.cue:4:5
+      //     ./in.cue:8:17
+      //     ./in.cue:8:28
+      //     ./in.cue:10:16
+      // match.singleErr: invalid value {a:"foo"} (does not satisfy matchN): 0 matched, expected 1:
       //     ./in.cue:8:17
       //     ./in.cue:8:24
       //     ./in.cue:10:13
@@ -359,7 +425,12 @@ Result:
       a: (int){ int }
     }
     incompleteErr: (_|_){
-      // [eval] match.incompleteErr: invalid value {a:string} (does not satisfy matchN): 0 matched, expected 1:
+      // [eval] a: conflicting values string and int (mismatched types string and int):
+      //     ./in.cue:4:5
+      //     ./in.cue:12:21
+      //     ./in.cue:12:32
+      //     ./in.cue:14:20
+      // match.incompleteErr: invalid value {a:string} (does not satisfy matchN): 0 matched, expected 1:
       //     ./in.cue:12:21
       //     ./in.cue:12:28
       //     ./in.cue:14:17
@@ -388,7 +459,11 @@ Result:
         a: (int){ int }
       }
       pickNested1Err: (_|_){
-        // [eval] match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN): 0 matched, expected 1:
+        // [eval] a: conflicting values 2 and 3:
+        //     ./in.cue:36:23
+        //     ./in.cue:36:38
+        //     ./in.cue:39:23
+        // match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN): 0 matched, expected 1:
         //     ./in.cue:36:23
         //     ./in.cue:36:30
         //     ./in.cue:39:19
@@ -405,6 +480,9 @@ Result:
         //     ./in.cue:41:23
         //     ./in.cue:41:30
         //     ./in.cue:44:19
+        // a: invalid value 3 (out of bound <=2):
+        //     ./in.cue:41:38
+        //     ./in.cue:44:23
         a: (int){ |(*(int){ 3 }, (int){ int }) }
       }
     }
@@ -460,6 +538,16 @@ Result:
       //     ./in.cue:84:20
       //     ./in.cue:84:27
       //     ./in.cue:86:17
+      // invalid value 1 (does not satisfy math.MultipleOf(3)):
+      //     ./in.cue:84:31
+      //     ./in.cue:84:20
+      //     ./in.cue:84:47
+      //     ./in.cue:86:17
+      // invalid value 1 (does not satisfy math.MultipleOf(5)):
+      //     ./in.cue:84:51
+      //     ./in.cue:84:20
+      //     ./in.cue:84:67
+      //     ./in.cue:86:17
     }
     multiple1OK1: (int){ 3 }
     multiple1OK2: (int){ 5 }
@@ -477,6 +565,16 @@ Result:
       //     ./in.cue:95:20
       //     ./in.cue:95:27
       //     ./in.cue:97:17
+      // invalid value 1 (does not satisfy math.MultipleOf(3)):
+      //     ./in.cue:95:32
+      //     ./in.cue:95:20
+      //     ./in.cue:95:48
+      //     ./in.cue:97:17
+      // invalid value 1 (does not satisfy math.MultipleOf(5)):
+      //     ./in.cue:95:52
+      //     ./in.cue:95:20
+      //     ./in.cue:95:68
+      //     ./in.cue:97:17
     }
     multiple1OK1: (int){ 3 }
     multiple1OK2: (int){ 5 }
@@ -489,17 +587,37 @@ Result:
       //     ./in.cue:106:20
       //     ./in.cue:106:27
       //     ./in.cue:108:17
+      // invalid value 1 (does not satisfy math.MultipleOf(3)):
+      //     ./in.cue:106:31
+      //     ./in.cue:106:20
+      //     ./in.cue:106:47
+      //     ./in.cue:108:17
+      // invalid value 1 (does not satisfy math.MultipleOf(5)):
+      //     ./in.cue:106:51
+      //     ./in.cue:106:20
+      //     ./in.cue:106:67
+      //     ./in.cue:108:17
     }
     multiple1Err2: (_|_){
       // [eval] allOf.multiple1Err2: invalid value 3 (does not satisfy matchN): 1 matched, expected 2:
       //     ./in.cue:106:20
       //     ./in.cue:106:27
       //     ./in.cue:109:17
+      // invalid value 3 (does not satisfy math.MultipleOf(5)):
+      //     ./in.cue:106:51
+      //     ./in.cue:106:20
+      //     ./in.cue:106:67
+      //     ./in.cue:109:17
     }
     multiple1Err3: (_|_){
       // [eval] allOf.multiple1Err3: invalid value 5 (does not satisfy matchN): 1 matched, expected 2:
       //     ./in.cue:106:20
       //     ./in.cue:106:27
+      //     ./in.cue:110:17
+      // invalid value 5 (does not satisfy math.MultipleOf(3)):
+      //     ./in.cue:106:31
+      //     ./in.cue:106:20
+      //     ./in.cue:106:47
       //     ./in.cue:110:17
     }
     multiple1OK1: (int){ 15 }
@@ -581,7 +699,13 @@ Result:
           }
         }) }
       x: (_|_){
-        // [eval] issue3575.test1.x: invalid value [{a:1}] (does not satisfy matchN): 0 matched, expected 1:
+        // [eval] 0.a: field not allowed:
+        //     ./in.cue:153:7
+        //     ./in.cue:154:4
+        //     ./in.cue:154:5
+        //     ./in.cue:156:6
+        //     ./in.cue:157:8
+        // issue3575.test1.x: invalid value [{a:1}] (does not satisfy matchN): 0 matched, expected 1:
         //     ./in.cue:153:7
         //     ./in.cue:153:14
         //     ./in.cue:156:6
@@ -605,7 +729,10 @@ Result:
     // [eval]
     incomplete1: (struct){
       x: (_|_){
-        // [incomplete] incomplete.incomplete1.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
+        // [incomplete] foo: field is required but not present:
+        //     ./incomplete.cue:7:6
+        //     ./incomplete.cue:7:18
+        // incomplete.incomplete1.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
         //     ./incomplete.cue:7:6
         //     ./incomplete.cue:7:13
         //     ./incomplete.cue:8:6
@@ -622,7 +749,10 @@ Result:
     }
     incomplete3: (struct){
       x: (_|_){
-        // [incomplete] incomplete.incomplete3.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected math.MultipleOf(2):
+        // [incomplete] foo: field is required but not present:
+        //     ./incomplete.cue:16:6
+        //     ./incomplete.cue:16:48
+        // incomplete.incomplete3.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected math.MultipleOf(2):
         //     ./incomplete.cue:16:6
         //     ./incomplete.cue:16:13
         //     ./incomplete.cue:17:6
@@ -631,7 +761,13 @@ Result:
     }
     incomplete4: (struct){
       x: (_|_){
-        // [incomplete] incomplete.incomplete4.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected math.MultipleOf(2):
+        // [incomplete] baz: field is required but not present:
+        //     ./incomplete.cue:20:6
+        //     ./incomplete.cue:20:61
+        // foo: field is required but not present:
+        //     ./incomplete.cue:20:6
+        //     ./incomplete.cue:20:48
+        // incomplete.incomplete4.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected math.MultipleOf(2):
         //     ./incomplete.cue:20:6
         //     ./incomplete.cue:20:13
         //     ./incomplete.cue:21:6
@@ -640,7 +776,13 @@ Result:
     }
     incomplete5: (struct){
       x: (_|_){
-        // [incomplete] incomplete.incomplete5.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected >1 & <=3:
+        // [incomplete] baz: field is required but not present:
+        //     ./incomplete.cue:24:6
+        //     ./incomplete.cue:24:51
+        // foo: field is required but not present:
+        //     ./incomplete.cue:24:6
+        //     ./incomplete.cue:24:38
+        // incomplete.incomplete5.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected >1 & <=3:
         //     ./incomplete.cue:24:6
         //     ./incomplete.cue:24:13
         //     ./incomplete.cue:25:6
@@ -649,7 +791,13 @@ Result:
     }
     incomplete6: (struct){
       x: (_|_){
-        // [incomplete] incomplete.incomplete6.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected 2 | 3:
+        // [incomplete] baz: field is required but not present:
+        //     ./incomplete.cue:28:6
+        //     ./incomplete.cue:28:46
+        // foo: field is required but not present:
+        //     ./incomplete.cue:28:6
+        //     ./incomplete.cue:28:33
+        // incomplete.incomplete6.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected 2 | 3:
         //     ./incomplete.cue:28:6
         //     ./incomplete.cue:28:13
         //     ./incomplete.cue:29:6
@@ -659,7 +807,10 @@ Result:
     err1: (_|_){
       // [eval]
       x: (_|_){
-        // [eval] incomplete.err1.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
+        // [eval] bar: conflicting values 2 and string (mismatched types int and string):
+        //     ./incomplete.cue:34:24
+        //     ./incomplete.cue:35:11
+        // incomplete.err1.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
         //     ./incomplete.cue:34:6
         //     ./incomplete.cue:34:13
         //     ./incomplete.cue:35:6
@@ -679,7 +830,10 @@ Result:
     err3: (_|_){
       // [eval]
       x: (_|_){
-        // [eval] incomplete.err3.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 2:
+        // [eval] bar: conflicting values 2 and string (mismatched types int and string):
+        //     ./incomplete.cue:46:24
+        //     ./incomplete.cue:47:11
+        // incomplete.err3.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 2:
         //     ./incomplete.cue:46:6
         //     ./incomplete.cue:46:13
         //     ./incomplete.cue:47:6
@@ -689,7 +843,10 @@ Result:
     err4: (_|_){
       // [eval]
       x: (_|_){
-        // [eval] incomplete.err4.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected >1:
+        // [eval] bar: conflicting values 2 and string (mismatched types int and string):
+        //     ./incomplete.cue:51:25
+        //     ./incomplete.cue:52:11
+        // incomplete.err4.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected >1:
         //     ./incomplete.cue:51:6
         //     ./incomplete.cue:51:13
         //     ./incomplete.cue:52:6
@@ -707,6 +864,18 @@ Result:
       }
     }
   }
+  issue3389: (struct){
+    x: (_|_){
+      // [incomplete] foo: field is required but not present:
+      //     ./incomplete.cue:62:5
+      //     ./incomplete.cue:62:35
+      // issue3389.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
+      //     ./incomplete.cue:62:5
+      //     ./incomplete.cue:61:5
+      //     ./incomplete.cue:62:12
+      bar: (int){ 2 }
+    }
+  }
   issue3694: (struct){
     full: (struct){
       #step: (_|_){
@@ -714,6 +883,12 @@ Result:
         //     ./issue3694.cue:2:9
         //     ./issue3694.cue:2:16
         //     ./issue3694.cue:9:9
+        // run: field is required but not present:
+        //     ./issue3694.cue:2:9
+        //     ./issue3694.cue:6:3
+        // uses: field is required but not present:
+        //     ./issue3694.cue:2:9
+        //     ./issue3694.cue:3:3
         uses?: (string){ string }
         run?: (string){ string }
       }
@@ -728,6 +903,9 @@ Result:
         //     ./issue3694.cue:19:9
         //     ./issue3694.cue:19:16
         //     ./issue3694.cue:22:9
+        // uses: field is required but not present:
+        //     ./issue3694.cue:19:9
+        //     ./issue3694.cue:20:3
         uses?: (string){ string }
       }
     }
@@ -735,6 +913,18 @@ Result:
 }
 -- out/evalalpha --
 Errors:
+a: conflicting values "foo" and int (mismatched types string and int):
+    ./in.cue:4:5
+    ./in.cue:10:16
+a: conflicting values 2 and 3:
+    ./in.cue:36:38
+    ./in.cue:39:23
+a: conflicting values string and int (mismatched types string and int):
+    ./in.cue:4:5
+    ./in.cue:14:20
+bar: conflicting values 2 and string (mismatched types int and string):
+    ./incomplete.cue:34:24
+    ./incomplete.cue:35:11
 match.singleErr: invalid value {a:"foo"} (does not satisfy matchN): 0 matched, expected 1:
     ./in.cue:8:17
     ./in.cue:8:24
@@ -751,6 +941,9 @@ match.defaults.pickNested2Err: invalid value {a:*3 | int} (does not satisfy matc
     ./in.cue:41:23
     ./in.cue:41:30
     ./in.cue:44:19
+a: invalid value 3 (out of bound <=2):
+    ./in.cue:41:38
+    ./in.cue:44:23
 not.singleErr: invalid value {a:2} (does not satisfy matchN): 1 matched, expected 0:
     ./in.cue:74:17
     ./in.cue:74:24
@@ -767,9 +960,29 @@ oneOf.multiple1Err2: invalid value 15 (does not satisfy matchN): 2 matched, expe
     ./in.cue:84:20
     ./in.cue:84:27
     ./in.cue:91:17
+invalid value 1 (does not satisfy math.MultipleOf(3)):
+    ./in.cue:84:31
+    ./in.cue:84:20
+    ./in.cue:84:47
+    ./in.cue:86:17
+invalid value 1 (does not satisfy math.MultipleOf(5)):
+    ./in.cue:84:51
+    ./in.cue:84:20
+    ./in.cue:84:67
+    ./in.cue:86:17
 anyOf.multiple1Err1: invalid value 1 (does not satisfy matchN): 0 matched, expected >0:
     ./in.cue:95:20
     ./in.cue:95:27
+    ./in.cue:97:17
+invalid value 1 (does not satisfy math.MultipleOf(3)):
+    ./in.cue:95:32
+    ./in.cue:95:20
+    ./in.cue:95:48
+    ./in.cue:97:17
+invalid value 1 (does not satisfy math.MultipleOf(5)):
+    ./in.cue:95:52
+    ./in.cue:95:20
+    ./in.cue:95:68
     ./in.cue:97:17
 allOf.multiple1Err1: invalid value 1 (does not satisfy matchN): 0 matched, expected 2:
     ./in.cue:106:20
@@ -783,6 +996,16 @@ allOf.multiple1Err3: invalid value 5 (does not satisfy matchN): 1 matched, expec
     ./in.cue:106:20
     ./in.cue:106:27
     ./in.cue:110:17
+invalid value 1 (does not satisfy math.MultipleOf(3)):
+    ./in.cue:106:31
+    ./in.cue:106:20
+    ./in.cue:106:47
+    ./in.cue:108:17
+invalid value 1 (does not satisfy math.MultipleOf(5)):
+    ./in.cue:106:51
+    ./in.cue:106:20
+    ./in.cue:106:67
+    ./in.cue:108:17
 incomplete.err1.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
     ./incomplete.cue:34:6
     ./incomplete.cue:34:13
@@ -816,7 +1039,10 @@ Result:
       a: (int){ 2 }
     }
     singleErr: (_|_){
-      // [eval] match.singleErr: invalid value {a:"foo"} (does not satisfy matchN): 0 matched, expected 1:
+      // [eval] a: conflicting values "foo" and int (mismatched types string and int):
+      //     ./in.cue:4:5
+      //     ./in.cue:10:16
+      // match.singleErr: invalid value {a:"foo"} (does not satisfy matchN): 0 matched, expected 1:
       //     ./in.cue:8:17
       //     ./in.cue:8:24
       //     ./in.cue:10:13
@@ -826,7 +1052,10 @@ Result:
       a: (int){ int }
     }
     incompleteErr: (_|_){
-      // [eval] match.incompleteErr: invalid value {a:string} (does not satisfy matchN): 0 matched, expected 1:
+      // [eval] a: conflicting values string and int (mismatched types string and int):
+      //     ./in.cue:4:5
+      //     ./in.cue:14:20
+      // match.incompleteErr: invalid value {a:string} (does not satisfy matchN): 0 matched, expected 1:
       //     ./in.cue:12:21
       //     ./in.cue:12:28
       //     ./in.cue:14:17
@@ -855,7 +1084,10 @@ Result:
         a: (int){ int }
       }
       pickNested1Err: (_|_){
-        // [eval] match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN): 0 matched, expected 1:
+        // [eval] a: conflicting values 2 and 3:
+        //     ./in.cue:36:38
+        //     ./in.cue:39:23
+        // match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN): 0 matched, expected 1:
         //     ./in.cue:36:23
         //     ./in.cue:36:30
         //     ./in.cue:39:19
@@ -872,6 +1104,9 @@ Result:
         //     ./in.cue:41:23
         //     ./in.cue:41:30
         //     ./in.cue:44:19
+        // a: invalid value 3 (out of bound <=2):
+        //     ./in.cue:41:38
+        //     ./in.cue:44:23
         a: (int){ |(*(int){ 3 }, (int){ int }) }
       }
     }
@@ -927,6 +1162,16 @@ Result:
       //     ./in.cue:84:20
       //     ./in.cue:84:27
       //     ./in.cue:86:17
+      // invalid value 1 (does not satisfy math.MultipleOf(3)):
+      //     ./in.cue:84:31
+      //     ./in.cue:84:20
+      //     ./in.cue:84:47
+      //     ./in.cue:86:17
+      // invalid value 1 (does not satisfy math.MultipleOf(5)):
+      //     ./in.cue:84:51
+      //     ./in.cue:84:20
+      //     ./in.cue:84:67
+      //     ./in.cue:86:17
     }
     multiple1OK1: (int){ 3 }
     multiple1OK2: (int){ 5 }
@@ -944,6 +1189,16 @@ Result:
       //     ./in.cue:95:20
       //     ./in.cue:95:27
       //     ./in.cue:97:17
+      // invalid value 1 (does not satisfy math.MultipleOf(3)):
+      //     ./in.cue:95:32
+      //     ./in.cue:95:20
+      //     ./in.cue:95:48
+      //     ./in.cue:97:17
+      // invalid value 1 (does not satisfy math.MultipleOf(5)):
+      //     ./in.cue:95:52
+      //     ./in.cue:95:20
+      //     ./in.cue:95:68
+      //     ./in.cue:97:17
     }
     multiple1OK1: (int){ 3 }
     multiple1OK2: (int){ 5 }
@@ -956,17 +1211,37 @@ Result:
       //     ./in.cue:106:20
       //     ./in.cue:106:27
       //     ./in.cue:108:17
+      // invalid value 1 (does not satisfy math.MultipleOf(3)):
+      //     ./in.cue:106:31
+      //     ./in.cue:106:20
+      //     ./in.cue:106:47
+      //     ./in.cue:108:17
+      // invalid value 1 (does not satisfy math.MultipleOf(5)):
+      //     ./in.cue:106:51
+      //     ./in.cue:106:20
+      //     ./in.cue:106:67
+      //     ./in.cue:108:17
     }
     multiple1Err2: (_|_){
       // [eval] allOf.multiple1Err2: invalid value 3 (does not satisfy matchN): 1 matched, expected 2:
       //     ./in.cue:106:20
       //     ./in.cue:106:27
       //     ./in.cue:109:17
+      // invalid value 3 (does not satisfy math.MultipleOf(5)):
+      //     ./in.cue:106:51
+      //     ./in.cue:106:20
+      //     ./in.cue:106:67
+      //     ./in.cue:109:17
     }
     multiple1Err3: (_|_){
       // [eval] allOf.multiple1Err3: invalid value 5 (does not satisfy matchN): 1 matched, expected 2:
       //     ./in.cue:106:20
       //     ./in.cue:106:27
+      //     ./in.cue:110:17
+      // invalid value 5 (does not satisfy math.MultipleOf(3)):
+      //     ./in.cue:106:31
+      //     ./in.cue:106:20
+      //     ./in.cue:106:47
       //     ./in.cue:110:17
     }
     multiple1OK1: (int){ 15 }
@@ -1065,7 +1340,10 @@ Result:
     // [eval]
     incomplete1: (struct){
       x: (_|_){
-        // [incomplete] incomplete.incomplete1.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
+        // [incomplete] foo: field is required but not present:
+        //     ./incomplete.cue:7:6
+        //     ./incomplete.cue:7:18
+        // incomplete.incomplete1.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
         //     ./incomplete.cue:7:6
         //     ./incomplete.cue:7:13
         //     ./incomplete.cue:8:6
@@ -1082,7 +1360,10 @@ Result:
     }
     incomplete3: (struct){
       x: (_|_){
-        // [incomplete] incomplete.incomplete3.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected math.MultipleOf(2):
+        // [incomplete] foo: field is required but not present:
+        //     ./incomplete.cue:16:6
+        //     ./incomplete.cue:16:48
+        // incomplete.incomplete3.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected math.MultipleOf(2):
         //     ./incomplete.cue:16:6
         //     ./incomplete.cue:16:13
         //     ./incomplete.cue:17:6
@@ -1091,7 +1372,13 @@ Result:
     }
     incomplete4: (struct){
       x: (_|_){
-        // [incomplete] incomplete.incomplete4.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected math.MultipleOf(2):
+        // [incomplete] baz: field is required but not present:
+        //     ./incomplete.cue:20:6
+        //     ./incomplete.cue:20:61
+        // foo: field is required but not present:
+        //     ./incomplete.cue:20:6
+        //     ./incomplete.cue:20:48
+        // incomplete.incomplete4.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected math.MultipleOf(2):
         //     ./incomplete.cue:20:6
         //     ./incomplete.cue:20:13
         //     ./incomplete.cue:21:6
@@ -1100,7 +1387,13 @@ Result:
     }
     incomplete5: (struct){
       x: (_|_){
-        // [incomplete] incomplete.incomplete5.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected >1 & <=3:
+        // [incomplete] baz: field is required but not present:
+        //     ./incomplete.cue:24:6
+        //     ./incomplete.cue:24:51
+        // foo: field is required but not present:
+        //     ./incomplete.cue:24:6
+        //     ./incomplete.cue:24:38
+        // incomplete.incomplete5.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected >1 & <=3:
         //     ./incomplete.cue:24:6
         //     ./incomplete.cue:24:13
         //     ./incomplete.cue:25:6
@@ -1109,7 +1402,13 @@ Result:
     }
     incomplete6: (struct){
       x: (_|_){
-        // [incomplete] incomplete.incomplete6.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected 2 | 3:
+        // [incomplete] baz: field is required but not present:
+        //     ./incomplete.cue:28:6
+        //     ./incomplete.cue:28:46
+        // foo: field is required but not present:
+        //     ./incomplete.cue:28:6
+        //     ./incomplete.cue:28:33
+        // incomplete.incomplete6.x: invalid value {bar:2} (does not satisfy matchN): 1 matched, expected 2 | 3:
         //     ./incomplete.cue:28:6
         //     ./incomplete.cue:28:13
         //     ./incomplete.cue:29:6
@@ -1119,7 +1418,10 @@ Result:
     err1: (_|_){
       // [eval]
       x: (_|_){
-        // [eval] incomplete.err1.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
+        // [eval] bar: conflicting values 2 and string (mismatched types int and string):
+        //     ./incomplete.cue:34:24
+        //     ./incomplete.cue:35:11
+        // incomplete.err1.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
         //     ./incomplete.cue:34:6
         //     ./incomplete.cue:34:13
         //     ./incomplete.cue:35:6
@@ -1139,7 +1441,10 @@ Result:
     err3: (_|_){
       // [eval]
       x: (_|_){
-        // [eval] incomplete.err3.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 2:
+        // [eval] bar: conflicting values 2 and string (mismatched types int and string):
+        //     ./incomplete.cue:46:24
+        //     ./incomplete.cue:47:11
+        // incomplete.err3.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 2:
         //     ./incomplete.cue:46:6
         //     ./incomplete.cue:46:13
         //     ./incomplete.cue:47:6
@@ -1149,7 +1454,10 @@ Result:
     err4: (_|_){
       // [eval]
       x: (_|_){
-        // [eval] incomplete.err4.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected >1:
+        // [eval] bar: conflicting values 2 and string (mismatched types int and string):
+        //     ./incomplete.cue:51:25
+        //     ./incomplete.cue:52:11
+        // incomplete.err4.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected >1:
         //     ./incomplete.cue:51:6
         //     ./incomplete.cue:51:13
         //     ./incomplete.cue:52:6
@@ -1167,6 +1475,18 @@ Result:
       }
     }
   }
+  issue3389: (struct){
+    x: (_|_){
+      // [incomplete] foo: field is required but not present:
+      //     ./incomplete.cue:62:5
+      //     ./incomplete.cue:62:35
+      // issue3389.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
+      //     ./incomplete.cue:62:5
+      //     ./incomplete.cue:61:5
+      //     ./incomplete.cue:62:12
+      bar: (int){ 2 }
+    }
+  }
   issue3694: (struct){
     full: (struct){
       #step: (_|_){
@@ -1174,6 +1494,12 @@ Result:
         //     ./issue3694.cue:2:9
         //     ./issue3694.cue:2:16
         //     ./issue3694.cue:9:9
+        // run: field is required but not present:
+        //     ./issue3694.cue:2:9
+        //     ./issue3694.cue:6:3
+        // uses: field is required but not present:
+        //     ./issue3694.cue:2:9
+        //     ./issue3694.cue:3:3
         uses?: (string){ string }
         run?: (string){ string }
       }
@@ -1188,6 +1514,9 @@ Result:
         //     ./issue3694.cue:19:9
         //     ./issue3694.cue:19:16
         //     ./issue3694.cue:22:9
+        // uses: field is required but not present:
+        //     ./issue3694.cue:19:9
+        //     ./issue3694.cue:20:3
         uses?: (string){ string }
       }
     }
@@ -1197,10 +1526,34 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -47,11 +47,6 @@
+@@ -1,17 +1,12 @@
+ Errors:
+ a: conflicting values "foo" and int (mismatched types string and int):
+     ./in.cue:4:5
+-    ./in.cue:8:17
+-    ./in.cue:8:28
+     ./in.cue:10:16
+ a: conflicting values 2 and 3:
+-    ./in.cue:36:23
+     ./in.cue:36:38
+     ./in.cue:39:23
+ a: conflicting values string and int (mismatched types string and int):
+     ./in.cue:4:5
+-    ./in.cue:12:21
+-    ./in.cue:12:32
+     ./in.cue:14:20
+ bar: conflicting values 2 and string (mismatched types int and string):
+     ./incomplete.cue:34:24
+@@ -97,17 +92,6 @@
      ./in.cue:106:20
-     ./in.cue:106:27
-     ./in.cue:110:17
+     ./in.cue:106:67
+     ./in.cue:108:17
+-0.a: field not allowed:
+-    ./in.cue:153:7
+-    ./in.cue:154:4
+-    ./in.cue:154:5
+-    ./in.cue:156:6
+-    ./in.cue:157:8
 -issue3575.test1.x: invalid value [{a:1}] (does not satisfy matchN): 0 matched, expected 1:
 -    ./in.cue:153:7
 -    ./in.cue:153:14
@@ -1209,7 +1562,25 @@ diff old new
  incomplete.err1.x: invalid value {bar:2} (does not satisfy matchN): 0 matched, expected 1:
      ./incomplete.cue:34:6
      ./incomplete.cue:34:13
-@@ -111,7 +106,7 @@
+@@ -143,8 +127,6 @@
+     singleErr: (_|_){
+       // [eval] a: conflicting values "foo" and int (mismatched types string and int):
+       //     ./in.cue:4:5
+-      //     ./in.cue:8:17
+-      //     ./in.cue:8:28
+       //     ./in.cue:10:16
+       // match.singleErr: invalid value {a:"foo"} (does not satisfy matchN): 0 matched, expected 1:
+       //     ./in.cue:8:17
+@@ -158,8 +140,6 @@
+     incompleteErr: (_|_){
+       // [eval] a: conflicting values string and int (mismatched types string and int):
+       //     ./in.cue:4:5
+-      //     ./in.cue:12:21
+-      //     ./in.cue:12:32
+       //     ./in.cue:14:20
+       // match.incompleteErr: invalid value {a:string} (does not satisfy matchN): 0 matched, expected 1:
+       //     ./in.cue:12:21
+@@ -177,7 +157,7 @@
              0: (int){ 2 }
            }), int) }) }
        pickTopOK2: (int){ &(matchN(1, (#list){
@@ -1218,7 +1589,15 @@ diff old new
            }
          }), int) }
        pickTopErr: (int){ &(matchN(1, (#list){
-@@ -244,21 +239,21 @@
+@@ -191,7 +171,6 @@
+       }
+       pickNested1Err: (_|_){
+         // [eval] a: conflicting values 2 and 3:
+-        //     ./in.cue:36:23
+         //     ./in.cue:36:38
+         //     ./in.cue:39:23
+         // match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN): 0 matched, expected 1:
+@@ -357,21 +336,21 @@
      embed: (struct){
        t1: (struct){
          a: (_){ matchN(1, (#list){
@@ -1255,7 +1634,7 @@ diff old new
              }
            }) }
        }
-@@ -266,21 +261,21 @@
+@@ -379,21 +358,21 @@
      direct: (struct){
        t1: (struct){
          a: (_){ matchN(1, (#list){
@@ -1292,7 +1671,7 @@ diff old new
              }
            }) }
        }
-@@ -294,9 +289,9 @@
+@@ -407,9 +386,9 @@
      }
      ok2: (struct){
        x: (_){ matchN(0, (#list){
@@ -1305,7 +1684,7 @@ diff old new
            }
          }) }
      }
-@@ -306,23 +301,16 @@
+@@ -419,29 +398,16 @@
        }
      }
    }
@@ -1324,7 +1703,13 @@ diff old new
 -          }
 -        }) }
 -      x: (_|_){
--        // [eval] issue3575.test1.x: invalid value [{a:1}] (does not satisfy matchN): 0 matched, expected 1:
+-        // [eval] 0.a: field not allowed:
+-        //     ./in.cue:153:7
+-        //     ./in.cue:154:4
+-        //     ./in.cue:154:5
+-        //     ./in.cue:156:6
+-        //     ./in.cue:157:8
+-        // issue3575.test1.x: invalid value [{a:1}] (does not satisfy matchN): 0 matched, expected 1:
 -        //     ./in.cue:153:7
 -        //     ./in.cue:153:14
 -        //     ./in.cue:156:6
@@ -1338,7 +1723,7 @@ diff old new
            a: (int){ 1 }
          }
        }
-@@ -329,10 +317,10 @@
+@@ -448,10 +414,10 @@
      }
      test2: (struct){
        #x: (_){ matchN(1, (#list){
@@ -1353,7 +1738,7 @@ diff old new
          a: (int){ 1 }
        }
      }
-@@ -350,9 +338,9 @@
+@@ -472,9 +438,9 @@
      }
      incomplete2: (struct){
        x: (_){ matchN(1, (#list){
@@ -1366,7 +1751,7 @@ diff old new
            }
          }) }
      }
-@@ -454,8 +442,8 @@
+@@ -624,8 +590,8 @@
          run?: (string){ string }
        }
        s: (#struct){
@@ -1803,6 +2188,20 @@ Missing error positions.
         bar: 2
       }
     }
+  }
+  issue3389: {
+    x: {
+      bar: 2
+    }
+    x: matchN(1, [
+      {
+        bar: 3
+      },
+      {
+        bar: 2
+        foo!: int
+      },
+    ])
   }
 }
 --- issue3694.cue

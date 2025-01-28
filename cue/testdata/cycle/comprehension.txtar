@@ -310,10 +310,10 @@ issue2367: {
 }
 
 -- out/evalalpha/stats --
-Leaks:  782
-Freed:  63
-Reused: 63
-Allocs: 782
+Leaks:  777
+Freed:  68
+Reused: 68
+Allocs: 777
 Retain: 0
 
 Unifications: 502
@@ -583,8 +583,6 @@ Result:
               reject: (string){ string }
             }, (#struct){
               resource: (string){ string }
-            }, (#struct){
-              retry: ~(issue1881.p1.#AllOutputs.retry)
             }) }
         }
       }
@@ -592,8 +590,6 @@ Result:
           reject: (string){ string }
         }, (#struct){
           resource: (string){ string }
-        }, (#struct){
-          retry: ~(issue1881.p1.#AllOutputs.retry)
         }) }
     }
     p2: (struct){
@@ -790,60 +786,16 @@ diff old new
        }
      }
      acrossOr: (struct){
-@@ -254,27 +247,31 @@
+@@ -254,7 +247,7 @@
    issue1881: (struct){
      p1: (struct){
        o: (#struct){
 -        retry: (#struct){
--          output: (#struct){
--            reject: (string){ "ok" }
--          }
--        }
--      }
--      #AllOutputs: (#struct){
--        reject: (string){ string }
--        resource: (string){ string }
--        retry: (#struct){
--          output: (#struct){ |((#struct){
--              reject: (string){ string }
--            }, (#struct){
--              resource: (string){ string }
--            }) }
--        }
--      }
--      #Output: (#struct){ |((#struct){
--          reject: (string){ string }
--        }, (#struct){
--          resource: (string){ string }
 +        retry: (struct){
-+          output: (#struct){
-+            reject: (string){ "ok" }
-+          }
-+        }
-+      }
-+      #AllOutputs: (#struct){
-+        reject: (string){ string }
-+        resource: (string){ string }
-+        retry: (#struct){
-+          output: (#struct){ |((#struct){
-+              reject: (string){ string }
-+            }, (#struct){
-+              resource: (string){ string }
-+            }, (#struct){
-+              retry: ~(issue1881.p1.#AllOutputs.retry)
-+            }) }
-+        }
-+      }
-+      #Output: (#struct){ |((#struct){
-+          reject: (string){ string }
-+        }, (#struct){
-+          resource: (string){ string }
-+        }, (#struct){
-+          retry: ~(issue1881.p1.#AllOutputs.retry)
-         }) }
-     }
-     p2: (struct){
-@@ -290,7 +287,7 @@
+           output: (#struct){
+             reject: (string){ "ok" }
+           }
+@@ -290,7 +283,7 @@
          }
        }
        o: (#struct){
@@ -852,7 +804,7 @@ diff old new
            output: (#struct){
              reject: (string){ "ok" }
            }
-@@ -320,7 +317,7 @@
+@@ -320,7 +313,7 @@
            resource: (string){ string }
          }) }
        o: (#struct){
@@ -871,10 +823,10 @@ diff old new
 -Reused: 1260
 -Allocs: 60
 -Retain: 145
-+Leaks:  782
-+Freed:  63
-+Reused: 63
-+Allocs: 782
++Leaks:  777
++Freed:  68
++Reused: 68
++Allocs: 777
 +Retain: 0
  
 -Unifications: 832
@@ -895,9 +847,6 @@ Conjuncts:    2525
 Disjuncts:    1404
 -- diff/explanation --
 B.a.children: now correctly marked as incomplete
--- diff/todo/p2 --
-issue1881.#AllOutputs.retry: additional entry.
-Might be error in practice and okay.
 -- out/eval --
 Errors:
 selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle

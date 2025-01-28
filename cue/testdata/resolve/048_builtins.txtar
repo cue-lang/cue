@@ -134,10 +134,6 @@ stringListErrors.c.result: cannot use int (type int) as string in argument 2 to 
 decimalListErrors.a.result: invalid list element 0 in argument 0 to call: cannot use value string (string) as number:
     ./in.cue:43:11
     ./in.cue:42:7
-issue3648.reduced.foo.a: error in call to list.Concat: not properly initialized (state: unprocessed, value: *adt.Vertex):
-    ./issue3648.cue:7:6
-issue3648.full.foo.allRedirects: error in call to list.Concat: not properly initialized (state: unprocessed, value: *adt.Vertex):
-    ./issue3648.cue:17:17
 
 Result:
 (_|_){
@@ -248,15 +244,12 @@ Result:
       }
     }
   }
-  issue3648: (_|_){
-    // [eval]
-    reduced: (_|_){
-      // [eval]
-      foo: (_|_){
-        // [eval]
-        a: (_|_){
-          // [eval] issue3648.reduced.foo.a: error in call to list.Concat: not properly initialized (state: unprocessed, value: *adt.Vertex):
-          //     ./issue3648.cue:7:6
+  issue3648: (struct){
+    reduced: (struct){
+      foo: (struct){
+        a: (#list){
+          0: (struct){
+          }
         }
         b: (#list){
           0: (struct){
@@ -264,16 +257,12 @@ Result:
         }
       }
     }
-    full: (_|_){
-      // [eval]
+    full: (struct){
       #Redirect: (#struct){
         path?: (string){ string }
       }
-      foo: (_|_){
-        // [eval]
-        allRedirects: (_|_){
-          // [eval] issue3648.full.foo.allRedirects: error in call to list.Concat: not properly initialized (state: unprocessed, value: *adt.Vertex):
-          //     ./issue3648.cue:17:17
+      foo: (struct){
+        allRedirects: (#list){
         }
         redirects: (list){
         }
@@ -299,18 +288,7 @@ diff old new
      ./in.cue:20:14
      ./in.cue:20:24
  a3.a: invalid value "bar" (out of bound =~"oo"):
-@@ -26,6 +22,10 @@
- decimalListErrors.a.result: invalid list element 0 in argument 0 to call: cannot use value string (string) as number:
-     ./in.cue:43:11
-     ./in.cue:42:7
-+issue3648.reduced.foo.a: error in call to list.Concat: not properly initialized (state: unprocessed, value: *adt.Vertex):
-+    ./issue3648.cue:7:6
-+issue3648.full.foo.allRedirects: error in call to list.Concat: not properly initialized (state: unprocessed, value: *adt.Vertex):
-+    ./issue3648.cue:17:17
- 
- Result:
- (_|_){
-@@ -70,13 +70,9 @@
+@@ -70,13 +66,9 @@
      a: (_|_){
        // [eval] o3.a: 2 errors in empty disjunction:
        // o3.a: conflicting values "bar" and "foo":
@@ -324,48 +302,6 @@ diff old new
        //     ./in.cue:20:14
        //     ./in.cue:20:24
      }
-@@ -140,12 +136,15 @@
-       }
-     }
-   }
--  issue3648: (struct){
--    reduced: (struct){
--      foo: (struct){
--        a: (#list){
--          0: (struct){
--          }
-+  issue3648: (_|_){
-+    // [eval]
-+    reduced: (_|_){
-+      // [eval]
-+      foo: (_|_){
-+        // [eval]
-+        a: (_|_){
-+          // [eval] issue3648.reduced.foo.a: error in call to list.Concat: not properly initialized (state: unprocessed, value: *adt.Vertex):
-+          //     ./issue3648.cue:7:6
-         }
-         b: (#list){
-           0: (struct){
-@@ -153,12 +152,16 @@
-         }
-       }
-     }
--    full: (struct){
-+    full: (_|_){
-+      // [eval]
-       #Redirect: (#struct){
-         path?: (string){ string }
-       }
--      foo: (struct){
--        allRedirects: (#list){
-+      foo: (_|_){
-+        // [eval]
-+        allRedirects: (_|_){
-+          // [eval] issue3648.full.foo.allRedirects: error in call to list.Concat: not properly initialized (state: unprocessed, value: *adt.Vertex):
-+          //     ./issue3648.cue:17:17
-         }
-         redirects: (list){
-         }
 -- diff/todo/p2 --
 Missing error positions.
 -- out/eval --

@@ -31,6 +31,8 @@ import (
 	"cuelang.org/go/internal/core/convert"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/runtime"
+
+	_ "cuelang.org/go/pkg"
 )
 
 func mkBigInt(a int64) (v apd.Decimal) { v.SetInt64(a); return }
@@ -265,10 +267,11 @@ func TestX(t *testing.T) {
 
 func TestConvertType(t *testing.T) {
 	testCases := []struct {
-		goTyp interface{}
-		want  string
+		goTyp       interface{}
+		want        string
+		expectError bool
 	}{{
-		struct {
+		goTyp: struct {
 			A int      `cue:">=0&<100"`
 			B *big.Int `cue:">=0"`
 			C *big.Int
@@ -276,7 +279,7 @@ func TestConvertType(t *testing.T) {
 			F *big.Float
 		}{},
 		// TODO: indicate that B is explicitly an int only.
-		`{
+		want: `{
   A: (((int & >=-9223372036854775808) & <=9223372036854775807) & (>=0 & <100))
   B: (int & >=0)
   C?: int
@@ -284,7 +287,7 @@ func TestConvertType(t *testing.T) {
   F?: number
 }`,
 	}, {
-		&struct {
+		goTyp: &struct {
 			A int16 `cue:">=0&<100"`
 			B error `json:"b,"`
 			C string
@@ -294,7 +297,7 @@ func TestConvertType(t *testing.T) {
 			T time.Time
 			G func()
 		}{},
-		`(*null|{
+		want: `(*null|{
   A: (((int & >=-32768) & <=32767) & (>=0 & <100))
   b: null
   C: string
@@ -304,12 +307,13 @@ func TestConvertType(t *testing.T) {
   T: _
 })`,
 	}, {
-		struct {
+		goTyp: struct {
 			A int `cue:"<"` // invalid
 		}{},
-		"_|_(invalid tag \"<\" for field \"A\": expected operand, found 'EOF' (and 1 more errors))",
+		want:        "_|_(invalid tag \"<\" for field \"A\": expected operand, found 'EOF' (and 1 more errors))",
+		expectError: true,
 	}, {
-		struct {
+		goTyp: struct {
 			A int `json:"-"` // skip
 			D *apd.Decimal
 			P ***apd.Decimal
@@ -317,40 +321,41 @@ func TestConvertType(t *testing.T) {
 			T string `cue:""` // allowed
 			h int
 		}{},
-		`{
+		want: `{
   D?: number
   P?: (*null|number)
   I?: _
   T: (string & _)
 }`,
 	}, {
-		struct {
+		goTyp: struct {
 			A int8 `cue:"C-B"`
 			B int8 `cue:"C-A,opt"`
 			C int8 `cue:"A+B"`
 		}{},
 		// TODO: should B be marked as optional?
-		`{
+		want: `{
   A: (((int & >=-128) & <=127) & (〈0;C〉 - 〈0;B〉))
   B?: (((int & >=-128) & <=127) & (〈0;C〉 - 〈0;A〉))
   C: (((int & >=-128) & <=127) & (〈0;A〉 + 〈0;B〉))
 }`,
 	}, {
-		[]string{},
-		`(*null|[
+		goTyp: []string{},
+		want: `(*null|[
   ...string,
 ])`,
 	}, {
-		[4]string{},
-		`(4 * [
+		goTyp: [4]string{},
+		want: `〈import;list〉.Repeat([
   string,
-])`,
+], 4)`,
 	}, {
-		[]func(){},
-		"_|_(unsupported Go type (func()))",
+		goTyp:       []func(){},
+		want:        "_|_(unsupported Go type (func()))",
+		expectError: true,
 	}, {
-		map[string]struct{ A map[string]uint }{},
-		`(*null|{
+		goTyp: map[string]struct{ A map[string]uint }{},
+		want: `(*null|{
   [string]: {
     A?: (*null|{
       [string]: ((int & >=0) & <=18446744073709551615)
@@ -358,29 +363,33 @@ func TestConvertType(t *testing.T) {
   }
 })`,
 	}, {
-		map[float32]int{},
-		`_|_(unsupported Go type for map key (float32))`,
+		goTyp:       map[float32]int{},
+		want:        `_|_(unsupported Go type for map key (float32))`,
+		expectError: true,
 	}, {
-		map[int]map[float32]int{},
-		`_|_(unsupported Go type for map key (float32))`,
+		goTyp:       map[int]map[float32]int{},
+		want:        `_|_(unsupported Go type for map key (float32))`,
+		expectError: true,
 	}, {
-		map[int]func(){},
-		`_|_(unsupported Go type (func()))`,
+		goTyp:       map[int]func(){},
+		want:        `_|_(unsupported Go type (func()))`,
+		expectError: true,
 	}, {
-		time.Now, // a function
-		"_|_(unsupported Go type (func() time.Time))",
+		goTyp:       time.Now, // a function
+		want:        "_|_(unsupported Go type (func() time.Time))",
+		expectError: true,
 	}, {
-		struct {
+		goTyp: struct {
 			Foobar string `cue:"\"foo,bar\",opt"`
 		}{},
-		`{
+		want: `{
   Foobar?: (string & "foo,bar")
 }`,
 	}, {
-		struct {
+		goTyp: struct {
 			Foobar string `cue:"\"foo,opt,bar\""`
 		}{},
-		`{
+		want: `{
   Foobar: (string & "foo,opt,bar")
 }`,
 	}}
@@ -390,10 +399,21 @@ func TestConvertType(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
 			ctx := adt.NewContext(r, &adt.Vertex{})
-			v, _ := convert.GoTypeToExpr(ctx, tc.goTyp)
+			v, err := convert.GoTypeToExpr(ctx, tc.goTyp)
 			got := debug.NodeString(ctx, v, nil)
 			if got != tc.want {
 				t.Errorf("\n got %q;\nwant %q", got, tc.want)
+			}
+			if tc.expectError && err == nil {
+				t.Errorf("\n expected an error but didn't get one")
+			} else if !tc.expectError && err != nil {
+				t.Errorf("\n got unexpected error: %v", err)
+			}
+			if err == nil && !tc.expectError {
+				val, _ := ctx.Evaluate(&adt.Environment{}, v)
+				if bot, ok := val.(*adt.Bottom); ok {
+					t.Errorf("\n unexpected error when evaluating result of conversion: %v", bot)
+				}
 			}
 		})
 	}

@@ -770,9 +770,13 @@ func (c *goConverter) goTypeToValueRec(allowNullDefault bool, t reflect.Type) (e
 			}
 
 			if t.Kind() == reflect.Array {
-				e = ast.NewBinExpr(token.MUL,
-					ast.NewLit(token.INT, strconv.Itoa(t.Len())),
-					ast.NewList(elem))
+				e = ast.NewCall(
+					ast.NewSel(&ast.Ident{
+						Name: "list",
+						Node: ast.NewImport(nil, "list")},
+						"Repeat"),
+					ast.NewList(elem),
+					ast.NewLit(token.INT, strconv.Itoa(t.Len())))
 			} else {
 				e = ast.NewList(&ast.Ellipsis{Type: elem})
 			}

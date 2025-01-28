@@ -342,9 +342,9 @@ func TestConvertType(t *testing.T) {
 ])`,
 	}, {
 		[4]string{},
-		`(4 * [
+		`〈import;list〉.Repeat([
   string,
-])`,
+], 4)`,
 	}, {
 		[]func(){},
 		"_|_(unsupported Go type (func()))",

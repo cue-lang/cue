@@ -401,7 +401,7 @@ Result:
   yamlNoCycle: (struct){
     #c: (#struct){
       b?: (string){ string }
-      a?: ((string|bytes)){ "encoding/yaml".Validate(<TODO: unmarked structural cycle>~(yamlNoCycle.#c)) }
+      a?: ((string|bytes)){ "encoding/yaml".Validate(yamlNoCycle.#c) }
     }
     data: (#struct){
       a: (string){ "{a: \"b: foo\"}" }
@@ -816,7 +816,7 @@ diff old new
              }) }
          }
 @@ -142,8 +163,8 @@
-       a?: ((string|bytes)){ "encoding/yaml".Validate(<TODO: unmarked structural cycle>~(yamlNoCycle.#c)) }
+       a?: ((string|bytes)){ "encoding/yaml".Validate(yamlNoCycle.#c) }
      }
      data: (#struct){
 -      b?: (string){ string }
@@ -1117,7 +1117,7 @@ Result:
   yamlNoCycle: (struct){
     #c: (#struct){
       b?: (string){ string }
-      a?: ((string|bytes)){ "encoding/yaml".Validate(<TODO: unmarked structural cycle>~(yamlNoCycle.#c)) }
+      a?: ((string|bytes)){ "encoding/yaml".Validate(yamlNoCycle.#c) }
     }
     data: (#struct){
       b?: (string){ string }

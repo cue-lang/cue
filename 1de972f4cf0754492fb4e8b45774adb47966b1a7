@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae56e3ef_b28afbd8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-28T10:43:16Z",
+      "side": 1,
+      "message": "Oof, nice find.\n\nWhy did this not fail with https://github.com/cue-lang/cue/commit/46fb300df650bbaefdbe70d646a1a5b45f968c1f? I guess we didn\u0027t have enough tests? If that\u0027s the case, I reckon we should add a test here. Or perhaps the go test you\u0027re editing here should also check that the resulting CUE validates without errors.",
+      "revId": "1de972f4cf0754492fb4e8b45774adb47966b1a7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

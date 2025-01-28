@@ -284,8 +284,6 @@ issue3606.data: conflicting values string and {notAllowed:true} (mismatched type
     ./dependencies.cue:6:6
 issue3606.data.notAllowed: field not allowed:
     ./dependencies.cue:3:3
-issue3699.reduced.full.res.out: undefined field: msg:
-    ./dependencies.cue:47:20
 
 Result:
 (_|_){
@@ -348,32 +346,23 @@ Result:
     strDefault: (string){ |(*(string){ "fallback" }, (string){ string }) }
     #strDefaultDef: (string){ |(*(string){ "fallback" }, (string){ string }) }
   }
-  issue3699: (_|_){
-    // [eval]
-    reduced: (_|_){
-      // [eval]
+  issue3699: (struct){
+    reduced: (struct){
       p1: (struct){
-        y: (_|_){
-          // [incomplete] issue3699.reduced.p1.y: undefined field: z:
-          //     ./dependencies.cue:33:13
-        }
+        y: (int){ 1 }
         x: (struct){ |(*(struct){
             z: (bool){ true }
           }, (struct){
           }) }
       }
       p2: (struct){
-        y: (_|_){
-          // [incomplete] issue3699.reduced.p2.y: undefined field: z:
-          //     ./dependencies.cue:37:13
-        }
+        y: (int){ 1 }
         x: (struct){ |(*(struct){
             z: (bool){ true }
           }, (struct){
           }) }
       }
-      full: (_|_){
-        // [eval]
+      full: (struct){
         _res: (struct){
           _fooTrue: (struct){ |(*(struct){
               foo: (bool){ true }
@@ -384,17 +373,10 @@ Result:
           }
           out: (string){ "foo" }
         }
-        let res#1 = (_|_){
-          // [eval]
-          out: (_|_){
-            // [eval] issue3699.reduced.full.res.out: undefined field: msg:
-            //     ./dependencies.cue:47:20
-          }
+        let res#1 = (struct){
+          out: (string){ "foo" }
         }
-        out: (_|_){
-          // [eval] issue3699.reduced.full.res.out: undefined field: msg:
-          //     ./dependencies.cue:47:20
-        }
+        out: (string){ "foo" }
       }
     }
   }
@@ -695,18 +677,16 @@ diff old new
      ./in.cue:15:27
  issue3606.data: 2 errors in empty disjunction:
  issue3606.data: conflicting values string and {notAllowed:true} (mismatched types string and struct):
-@@ -14,8 +12,8 @@
+@@ -14,8 +12,6 @@
      ./dependencies.cue:6:6
  issue3606.data.notAllowed: field not allowed:
      ./dependencies.cue:3:3
 -    ./dependencies.cue:4:6
 -    ./dependencies.cue:6:15
-+issue3699.reduced.full.res.out: undefined field: msg:
-+    ./dependencies.cue:47:20
  
  Result:
  (_|_){
-@@ -29,14 +27,7 @@
+@@ -29,14 +25,7 @@
        //     ./dependencies.cue:6:6
        // issue3606.data.notAllowed: field not allowed:
        //     ./dependencies.cue:3:3
@@ -722,73 +702,7 @@ diff old new
      }
      #S: ((string|struct)){ |((string){ string }, (#struct){
        }) }
-@@ -85,10 +76,15 @@
-     strDefault: (string){ |(*(string){ "fallback" }, (string){ string }) }
-     #strDefaultDef: (string){ |(*(string){ "fallback" }, (string){ string }) }
-   }
--  issue3699: (struct){
--    reduced: (struct){
-+  issue3699: (_|_){
-+    // [eval]
-+    reduced: (_|_){
-+      // [eval]
-       p1: (struct){
--        y: (int){ 1 }
-+        y: (_|_){
-+          // [incomplete] issue3699.reduced.p1.y: undefined field: z:
-+          //     ./dependencies.cue:33:13
-+        }
-         x: (struct){ |(*(struct){
-             z: (bool){ true }
-           }, (struct){
-@@ -95,13 +91,17 @@
-           }) }
-       }
-       p2: (struct){
--        y: (int){ 1 }
--        x: (struct){ |(*(struct){
--            z: (bool){ true }
--          }, (struct){
--          }) }
--      }
--      full: (struct){
-+        y: (_|_){
-+          // [incomplete] issue3699.reduced.p2.y: undefined field: z:
-+          //     ./dependencies.cue:37:13
-+        }
-+        x: (struct){ |(*(struct){
-+            z: (bool){ true }
-+          }, (struct){
-+          }) }
-+      }
-+      full: (_|_){
-+        // [eval]
-         _res: (struct){
-           _fooTrue: (struct){ |(*(struct){
-               foo: (bool){ true }
-@@ -112,10 +112,17 @@
-           }
-           out: (string){ "foo" }
-         }
--        let res#1 = (struct){
--          out: (string){ "foo" }
--        }
--        out: (string){ "foo" }
-+        let res#1 = (_|_){
-+          // [eval]
-+          out: (_|_){
-+            // [eval] issue3699.reduced.full.res.out: undefined field: msg:
-+            //     ./dependencies.cue:47:20
-+          }
-+        }
-+        out: (_|_){
-+          // [eval] issue3699.reduced.full.res.out: undefined field: msg:
-+          //     ./dependencies.cue:47:20
-+        }
-       }
-     }
-   }
-@@ -144,19 +151,12 @@
+@@ -144,19 +133,12 @@
      // [eval] f: 2 errors in empty disjunction:
      // f.name: conflicting values "int" and "str":
      //     ./in.cue:5:8
@@ -809,7 +723,7 @@ diff old new
    }
    e1: (struct){
      a: ((null|struct)){ |((null){ null }, (struct){
-@@ -268,8 +268,8 @@
+@@ -268,8 +250,8 @@
      e: (struct){
        foobar: (#struct){
          b: (#struct){
@@ -819,7 +733,7 @@ diff old new
          }
        }
      }
-@@ -371,6 +371,9 @@
+@@ -371,6 +353,9 @@
            let Ok#2 = (bool){ true }
          }, (#struct){
            _ok: (bool){ true }

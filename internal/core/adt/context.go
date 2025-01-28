@@ -821,6 +821,13 @@ func (c *OpContext) unifyNode(v Expr, state combinedFlags) (result Value) {
 
 				// Always yield to not get spurious errors.
 				n.process(arcTypeKnown, yield)
+				// It is possible that the node is only midway through
+				// evaluating a disjunction. In this case, we want to ensure
+				// that disjunctions are finalized, so that disjunction shows
+				// up in BaseValue.
+				if len(n.disjuncts) > 0 {
+					n.node.unify(c, arcTypeKnown, yield)
+				}
 			}
 		} else {
 			if v.isUndefined() || state.vertexStatus() > v.Status() {

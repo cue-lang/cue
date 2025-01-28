@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0267476_59fd8bc5",
+        "filename": "cue/interpreter/wasm/testdata/cue/struct.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-28T12:15:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9655e22c_83e3d883",
+      "revId": "2d8f4d46fc20a0affa97ed5ebbfe9225b895ba93",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "105f9787_3d1a5f63",
@@ -49,6 +67,24 @@
       "writtenOn": "2025-01-28T11:43:43Z",
       "side": 1,
       "message": "we usually use f for features, not l. using f makes it clear we are dealing with a feature value, and not a string value. This is more useful. The fact that it is a label is already clear from the context. So this reduces the amount of information available to the reader.\n\nShort names often reflect the underlying type, not function.\n\nAside from deviating from the convention, this also makes the diff larger unnecessarily.",
+      "revId": "2d8f4d46fc20a0affa97ed5ebbfe9225b895ba93",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6bb08f9_0ed141ed",
+        "filename": "internal/core/convert/go.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-28T12:15:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "105f9787_3d1a5f63",
       "revId": "2d8f4d46fc20a0affa97ed5ebbfe9225b895ba93",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -70,6 +106,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "64ffae77_9ed476c9",
+        "filename": "internal/core/convert/go.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 478,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-28T12:15:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "521a7f34_36439a35",
+      "revId": "2d8f4d46fc20a0affa97ed5ebbfe9225b895ba93",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "468927ea_865234a9",
@@ -83,6 +137,24 @@
       "writtenOn": "2025-01-28T11:43:43Z",
       "side": 1,
       "message": "ditto",
+      "revId": "2d8f4d46fc20a0affa97ed5ebbfe9225b895ba93",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f8ec5c6_f5fb1912",
+        "filename": "internal/core/convert/go.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 518,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-28T12:15:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "468927ea_865234a9",
       "revId": "2d8f4d46fc20a0affa97ed5ebbfe9225b895ba93",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

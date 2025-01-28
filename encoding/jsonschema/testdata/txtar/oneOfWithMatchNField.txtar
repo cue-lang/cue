@@ -27,10 +27,10 @@ the matchN builtin.
 -- test/err-nomatch.json --
 {"matchN": 3}
 -- out/decode/testerr/err-nomatch --
-conflicting values 1 and 3:
+matchN: conflicting values 1 and 3:
     generated.cue:1:23
     test/err-nomatch.json:1:12
-conflicting values 2 and 3:
+matchN: conflicting values 2 and 3:
     generated.cue:1:26
     test/err-nomatch.json:1:12
 matchN: invalid value 3 (does not satisfy matchN): 0 matched, expected 1:

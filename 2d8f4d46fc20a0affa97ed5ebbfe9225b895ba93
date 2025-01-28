@@ -16,6 +16,24 @@
       "message": "I\u0027m actively looking at this one - sorry - was on my todo list before requesting review and I forgot about it. Will fix.",
       "revId": "2d8f4d46fc20a0affa97ed5ebbfe9225b895ba93",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9655e22c_83e3d883",
+        "filename": "cue/interpreter/wasm/testdata/cue/struct.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-28T11:17:04Z",
+      "side": 1,
+      "message": "Ok, this is caused, in convert/go.go line 364:\n\n```\n\tcase float64:\n\t\tn :\u003d \u0026adt.Num{Src: c.setNextPos(ast.NewLit(token.FLOAT, fmt.Sprint(v))), K: adt.FloatKind}\n```\n\nIt\u0027s the fmt.Sprint - that is the string that\u0027s being output here. Not sure whether I should be doing something different?",
+      "parentUuid": "44d8f5a9_4a021d4e",
+      "revId": "2d8f4d46fc20a0affa97ed5ebbfe9225b895ba93",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

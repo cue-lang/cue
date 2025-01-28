@@ -46,7 +46,7 @@ var matchNBuiltin = &adt.Builtin{
 
 		var count, possibleCount int64
 		for _, check := range constraints {
-			v := unifyValidator(c, self, check)
+			v := adt.Unify(c, self, check)
 			if err := validate.Validate(c, v, finalCfg); err == nil {
 				// TODO: is it always true that the lack of an error signifies
 				// success?
@@ -99,14 +99,14 @@ var matchIfBuiltin = &adt.Builtin{
 			return &adt.Bool{B: false}
 		}
 		ifSchema, thenSchema, elseSchema := args[1], args[2], args[3]
-		v := unifyValidator(c, self, ifSchema)
+		v := adt.Unify(c, self, ifSchema)
 		var chosenSchema adt.Value
 		if err := validate.Validate(c, v, finalCfg); err == nil {
 			chosenSchema = thenSchema
 		} else {
 			chosenSchema = elseSchema
 		}
-		v = unifyValidator(c, self, chosenSchema)
+		v = adt.Unify(c, self, chosenSchema)
 		err := validate.Validate(c, v, finalCfg)
 		if err == nil {
 			return &adt.Bool{B: true}
@@ -128,7 +128,8 @@ func finalizeSelf(c *adt.OpContext, self adt.Value) adt.Value {
 	return self
 }
 
-func unifyValidator(c *adt.OpContext, self, check adt.Value) *adt.Vertex {
+// TODO: use adt.Unify instead.
+func unifyScalar(c *adt.OpContext, self, check adt.Value) *adt.Vertex {
 	v := &adt.Vertex{}
 	closeInfo := c.CloseInfo()
 	v.AddConjunct(adt.MakeConjunct(nil, self, closeInfo))
@@ -139,7 +140,7 @@ func unifyValidator(c *adt.OpContext, self, check adt.Value) *adt.Vertex {
 
 func checkNum(ctx *adt.OpContext, bound adt.Value, count, maxCount int64) *adt.Bottom {
 	cnt := ctx.NewInt64(count)
-	n := unifyValidator(ctx, bound, cnt)
+	n := unifyScalar(ctx, bound, cnt)
 	b, _ := n.BaseValue.(*adt.Bottom)
 	if b != nil {
 		b := ctx.NewErrf("%d matched, expected %v", count, bound)

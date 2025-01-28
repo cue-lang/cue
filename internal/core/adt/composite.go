@@ -955,6 +955,16 @@ func (v *Vertex) Bottom() *Bottom {
 
 // func (v *Vertex) Evaluate()
 
+// Unify unifies two values and returns the result.
+func Unify(c *OpContext, a, b Value) *Vertex {
+	v := &Vertex{}
+	closeInfo := c.CloseInfo()
+	v.AddConjunct(MakeConjunct(nil, a, closeInfo))
+	v.AddConjunct(MakeConjunct(nil, b, closeInfo))
+	v.Finalize(c)
+	return v
+}
+
 func (v *Vertex) Finalize(c *OpContext) {
 	// Saving and restoring the error context prevents v from panicking in
 	// case the caller did not handle existing errors in the context.

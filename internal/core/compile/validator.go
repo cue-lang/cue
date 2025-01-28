@@ -40,6 +40,8 @@ var matchNBuiltin = &adt.Builtin{
 			return &adt.Bool{B: false}
 		}
 
+		var errs []*adt.Bottom
+
 		constraints := c.Elems(args[2])
 
 		var count, possibleCount int64
@@ -50,6 +52,7 @@ var matchNBuiltin = &adt.Builtin{
 				// success?
 				count++
 			} else {
+				errs = append(errs, err)
 				if err.IsIncomplete() {
 					possibleCount++
 				}
@@ -62,6 +65,9 @@ var matchNBuiltin = &adt.Builtin{
 
 		b := checkNum(c, bound, count, count+possibleCount)
 		if b != nil {
+			for _, err := range errs {
+				c.AddBottom(err)
+			}
 			return b
 		}
 		return &adt.Bool{B: true}

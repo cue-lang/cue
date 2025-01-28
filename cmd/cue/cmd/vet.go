@@ -57,7 +57,7 @@ Examples:
   cue vet foo.cue foo.yaml
 
   # Check files against a particular expression
-  cue vet foo.cue translations/*.yaml -d '#Translation'
+  cue vet foo.cue translations/en.yaml translations/de.yaml -d '#Translation'
 
 More than one expression may be given using multiple -d flags. Each non-CUE
 file must match all expression values.

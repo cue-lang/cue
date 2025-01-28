@@ -957,7 +957,11 @@ func (v *Vertex) Bottom() *Bottom {
 
 // Unify unifies two values and returns the result.
 func Unify(c *OpContext, a, b Value) *Vertex {
-	v := &Vertex{}
+	// We set the parent of the context to be able to detect structural cycles
+	// early enough to error on schemas used for validation.
+	v := &Vertex{
+		Parent: c.vertex,
+	}
 	closeInfo := c.CloseInfo()
 	v.AddConjunct(MakeConjunct(nil, a, closeInfo))
 	v.AddConjunct(MakeConjunct(nil, b, closeInfo))

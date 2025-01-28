@@ -33,6 +33,24 @@
       "message": "may I suggest `langs/en.yaml langs/de.yaml` as that would be slightly shorter?",
       "revId": "4ac821825d04286d866bf506078d0bed06a4e1b8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "81a3759c_558ddfc8",
+        "filename": "cmd/cue/cmd/vet.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-01-28T17:31:26Z",
+      "side": 1,
+      "message": "I went 2 chars even shorter :-P",
+      "parentUuid": "a0fd8225_92eb78f6",
+      "revId": "4ac821825d04286d866bf506078d0bed06a4e1b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -186,9 +186,19 @@ issue3443.cycle1.cycle.s: invalid value {n:{n:_}} (does not satisfy matchN): 0 m
     ./matchn.cue:35:14
     ./matchn.cue:47:7
     ./matchn.cue:48:7
+n: invalid value {n:_} (does not satisfy matchN): 0 matched, expected 1:
+    ./matchn.cue:35:7
+    ./matchn.cue:35:14
+    ./matchn.cue:35:22
+    ./matchn.cue:48:10
 issue3443.cycle2.fail.#S: invalid value {n:{n:{n:_}}} (does not satisfy matchN): 0 matched, expected 1:
     ./matchn.cue:55:13
     ./matchn.cue:55:20
+n: invalid value {n:{n:{n:_}}} (does not satisfy matchN): 0 matched, expected 1:
+    ./matchn.cue:55:13
+    ./matchn.cue:55:20
+    ./matchn.cue:55:28
+    ./matchn.cue:55:40
 
 Result:
 (_|_){
@@ -334,6 +344,11 @@ Result:
           //     ./matchn.cue:35:14
           //     ./matchn.cue:47:7
           //     ./matchn.cue:48:7
+          // n: invalid value {n:_} (does not satisfy matchN): 0 matched, expected 1:
+          //     ./matchn.cue:35:7
+          //     ./matchn.cue:35:14
+          //     ./matchn.cue:35:22
+          //     ./matchn.cue:48:10
           n: (struct){
             n: (_){ _ }
           }
@@ -348,6 +363,11 @@ Result:
           // [eval] issue3443.cycle2.fail.#S: invalid value {n:{n:{n:_}}} (does not satisfy matchN): 0 matched, expected 1:
           //     ./matchn.cue:55:13
           //     ./matchn.cue:55:20
+          // n: invalid value {n:{n:{n:_}}} (does not satisfy matchN): 0 matched, expected 1:
+          //     ./matchn.cue:55:13
+          //     ./matchn.cue:55:20
+          //     ./matchn.cue:55:28
+          //     ./matchn.cue:55:40
           n: (#struct){
             n: (#struct){
               n: (_){ _ }
@@ -364,6 +384,13 @@ Result:
         //     ./matchn.cue:63:6
         //     ./matchn.cue:62:8
         //     ./matchn.cue:63:13
+        // invalid value {} (does not satisfy matchN): 0 matched, expected 1:
+        //     ./matchn.cue:63:17
+        //     ./matchn.cue:62:8
+        //     ./matchn.cue:63:24
+        // a: field is required but not present:
+        //     ./matchn.cue:63:17
+        //     ./matchn.cue:63:29
       }
       #s: (_){ matchN(1, (#list){
           0: (_|_){// &[matchN(1, [
@@ -380,7 +407,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,6 +1,11 @@
+@@ -1,6 +1,16 @@
  Errors:
  issue3443.matchIf.#S: cannot call non-function matchIf (type struct):
      ./matchn.cue:16:7
@@ -389,10 +416,15 @@ diff old new
 +    ./matchn.cue:35:14
 +    ./matchn.cue:47:7
 +    ./matchn.cue:48:7
++n: invalid value {n:_} (does not satisfy matchN): 0 matched, expected 1:
++    ./matchn.cue:35:7
++    ./matchn.cue:35:14
++    ./matchn.cue:35:22
++    ./matchn.cue:48:10
  issue3443.cycle2.fail.#S: invalid value {n:{n:{n:_}}} (does not satisfy matchN): 0 matched, expected 1:
      ./matchn.cue:55:13
      ./matchn.cue:55:20
-@@ -65,20 +70,20 @@
+@@ -70,20 +80,20 @@
    issue3410: (struct){
      _s: (struct){
        #x: (_){ matchN(1, (#list){
@@ -421,7 +453,7 @@ diff old new
          }
        }) }
    }
-@@ -85,9 +90,9 @@
+@@ -90,9 +100,9 @@
    issue3420: (struct){
      matches1: (struct){
        #S: (_){ matchN(1, (#list){
@@ -434,7 +466,7 @@ diff old new
            }
          }) }
        s: (int){ 2 }
-@@ -104,13 +109,13 @@
+@@ -109,13 +119,13 @@
      }
      noCycle: (struct){
        #S: (_){ matchN(1, (#list){
@@ -451,7 +483,7 @@ diff old new
            n: (struct){
              n: (_){ _ }
            }
-@@ -119,29 +124,36 @@
+@@ -124,29 +134,41 @@
      }
      noCycle2: (struct){
        #S: (_){ matchN(1, (#list){
@@ -498,11 +530,16 @@ diff old new
 +          //     ./matchn.cue:35:14
 +          //     ./matchn.cue:47:7
 +          //     ./matchn.cue:48:7
++          // n: invalid value {n:_} (does not satisfy matchN): 0 matched, expected 1:
++          //     ./matchn.cue:35:7
++          //     ./matchn.cue:35:14
++          //     ./matchn.cue:35:22
++          //     ./matchn.cue:48:10
            n: (struct){
              n: (_){ _ }
            }
-@@ -174,11 +186,11 @@
-         //     ./matchn.cue:63:13
+@@ -191,11 +213,11 @@
+         //     ./matchn.cue:63:29
        }
        #s: (_){ matchN(1, (#list){
 -          0: (_|_){// matchN(1, [
@@ -524,6 +561,11 @@ issue3443.matchIf.#S: cannot call non-function matchIf (type struct):
 issue3443.cycle2.fail.#S: invalid value {n:{n:{n:_}}} (does not satisfy matchN): 0 matched, expected 1:
     ./matchn.cue:55:13
     ./matchn.cue:55:20
+n: invalid value {n:{n:{n:_}}} (does not satisfy matchN): 0 matched, expected 1:
+    ./matchn.cue:55:13
+    ./matchn.cue:55:20
+    ./matchn.cue:55:28
+    ./matchn.cue:55:40
 
 Result:
 (_|_){
@@ -676,6 +718,11 @@ Result:
           // [eval] issue3443.cycle2.fail.#S: invalid value {n:{n:{n:_}}} (does not satisfy matchN): 0 matched, expected 1:
           //     ./matchn.cue:55:13
           //     ./matchn.cue:55:20
+          // n: invalid value {n:{n:{n:_}}} (does not satisfy matchN): 0 matched, expected 1:
+          //     ./matchn.cue:55:13
+          //     ./matchn.cue:55:20
+          //     ./matchn.cue:55:28
+          //     ./matchn.cue:55:40
           n: (#struct){
             n: (#struct){
               n: (_){ _ }
@@ -692,6 +739,13 @@ Result:
         //     ./matchn.cue:63:6
         //     ./matchn.cue:62:8
         //     ./matchn.cue:63:13
+        // invalid value {} (does not satisfy matchN): 0 matched, expected 1:
+        //     ./matchn.cue:63:17
+        //     ./matchn.cue:62:8
+        //     ./matchn.cue:63:24
+        // a: field is required but not present:
+        //     ./matchn.cue:63:17
+        //     ./matchn.cue:63:29
       }
       #s: (_){ matchN(1, (#list){
           0: (_|_){// matchN(1, [

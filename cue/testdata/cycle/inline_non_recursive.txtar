@@ -215,7 +215,10 @@ Result:
     indirect: (struct){
       #Step: (_){ _ }
       #Job: (_|_){
-        // [incomplete] select.indirect.#Job: invalid value {opt:_} (does not satisfy matchN): 0 matched, expected 1:
+        // [incomplete] req: field is required but not present:
+        //     ./select.cue:8:8
+        //     ./select.cue:11:2
+        // select.indirect.#Job: invalid value {opt:_} (does not satisfy matchN): 0 matched, expected 1:
         //     ./select.cue:8:8
         //     ./select.cue:8:15
         opt: (_){ _ }
@@ -280,6 +283,14 @@ diff old new
            }
          }) }
      }
+@@ -113,7 +111,6 @@
+       #Job: (_|_){
+         // [incomplete] req: field is required but not present:
+         //     ./select.cue:8:8
+-        //     ./select.cue:8:19
+         //     ./select.cue:11:2
+         // select.indirect.#Job: invalid value {opt:_} (does not satisfy matchN): 0 matched, expected 1:
+         //     ./select.cue:8:8
 -- diff/todo/p3 --
 Error positions.
 Incorrect path due to structure sharing.
@@ -407,7 +418,11 @@ Result:
     indirect: (struct){
       #Step: (_){ _ }
       #Job: (_|_){
-        // [incomplete] select.indirect.#Job: invalid value {opt:_} (does not satisfy matchN): 0 matched, expected 1:
+        // [incomplete] req: field is required but not present:
+        //     ./select.cue:8:8
+        //     ./select.cue:8:19
+        //     ./select.cue:11:2
+        // select.indirect.#Job: invalid value {opt:_} (does not satisfy matchN): 0 matched, expected 1:
         //     ./select.cue:8:8
         //     ./select.cue:8:15
         opt: (_){ _ }

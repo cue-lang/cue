@@ -223,6 +223,10 @@ Conjuncts:    327
 Disjuncts:    202
 -- out/evalalpha --
 Errors:
+conflicting values >10 and {C:1} (mismatched types number and struct):
+    ./issue3474.cue:53:5
+    ./issue3474.cue:53:16
+    ./issue3474.cue:54:5
 callOfCallToValidator.e: cannot call previously called validator b:
     ./in.cue:94:5
 issue3418.t1: invalid value "foo" (does not satisfy matchN): conflicting values 2 and 1:
@@ -264,9 +268,22 @@ issue3474.topValidator.fail.A: invalid value 1 (does not satisfy matchN): 0 matc
     ./issue3474.cue:41:12
     ./issue3474.cue:42:5
     ./issue3474.cue:43:12
+invalid value 1 (out of bound >10):
+    ./issue3474.cue:41:16
+    ./issue3474.cue:43:12
 issue3474.topValidator.failType.A: invalid value {C:1} (does not satisfy matchN): 0 matched, expected 1:
     ./issue3474.cue:53:5
     ./issue3474.cue:53:12
+    ./issue3474.cue:54:5
+invalid operands {C:1} and 10 to '>' (type _|_ and int):
+    ./issue3474.cue:53:16
+    ./issue3474.cue:53:5
+    ./issue3474.cue:53:17
+    ./issue3474.cue:54:5
+cannot combine regular field "C" with {C:1}:
+    ./issue3474.cue:55:15
+    ./issue3474.cue:53:5
+    ./issue3474.cue:53:16
     ./issue3474.cue:54:5
 
 Result:
@@ -461,6 +478,9 @@ Result:
           //     ./issue3474.cue:41:12
           //     ./issue3474.cue:42:5
           //     ./issue3474.cue:43:12
+          // invalid value 1 (out of bound >10):
+          //     ./issue3474.cue:41:16
+          //     ./issue3474.cue:43:12
         }
       }
       incomplete: (struct){
@@ -472,9 +492,23 @@ Result:
       failType: (_|_){
         // [eval]
         A: (_|_){
-          // [eval] issue3474.topValidator.failType.A: invalid value {C:1} (does not satisfy matchN): 0 matched, expected 1:
+          // [eval] conflicting values >10 and {C:1} (mismatched types number and struct):
+          //     ./issue3474.cue:53:5
+          //     ./issue3474.cue:53:16
+          //     ./issue3474.cue:54:5
+          // issue3474.topValidator.failType.A: invalid value {C:1} (does not satisfy matchN): 0 matched, expected 1:
           //     ./issue3474.cue:53:5
           //     ./issue3474.cue:53:12
+          //     ./issue3474.cue:54:5
+          // invalid operands {C:1} and 10 to '>' (type _|_ and int):
+          //     ./issue3474.cue:53:16
+          //     ./issue3474.cue:53:5
+          //     ./issue3474.cue:53:17
+          //     ./issue3474.cue:54:5
+          // cannot combine regular field "C" with {C:1}:
+          //     ./issue3474.cue:55:15
+          //     ./issue3474.cue:53:5
+          //     ./issue3474.cue:53:16
           //     ./issue3474.cue:54:5
           C: (int){ 1 }
         }
@@ -526,7 +560,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -27,7 +27,7 @@
+@@ -31,7 +31,7 @@
      ./issue3418.cue:10:16
      ./issue3418.cue:10:18
      ./issue3418.cue:11:5
@@ -535,7 +569,24 @@ diff old new
      ./issue3474.cue:12:5
      ./issue3474.cue:12:22
      ./issue3474.cue:13:5
-@@ -134,11 +134,7 @@
+@@ -51,6 +51,16 @@
+     ./issue3474.cue:53:5
+     ./issue3474.cue:53:12
+     ./issue3474.cue:54:5
++invalid operands {C:1} and 10 to '>' (type _|_ and int):
++    ./issue3474.cue:53:16
++    ./issue3474.cue:53:5
++    ./issue3474.cue:53:17
++    ./issue3474.cue:54:5
++cannot combine regular field "C" with {C:1}:
++    ./issue3474.cue:55:15
++    ./issue3474.cue:53:5
++    ./issue3474.cue:53:16
++    ./issue3474.cue:54:5
+ 
+ Result:
+ (_|_){
+@@ -141,11 +151,7 @@
          0: (int){ 1 }
        }
      }
@@ -548,7 +599,7 @@ diff old new
        _a: (_|_){
          // [incomplete] issue2098.incomplete1._a: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1):
          //     ./in.cue:112:6
-@@ -202,7 +198,7 @@
+@@ -209,7 +215,7 @@
        failAfter: (_|_){
          // [eval]
          A: (_|_){
@@ -557,7 +608,7 @@ diff old new
            //     ./issue3474.cue:12:5
            //     ./issue3474.cue:12:22
            //     ./issue3474.cue:13:5
-@@ -245,7 +241,7 @@
+@@ -255,7 +261,7 @@
        }
        incomplete: (struct){
          A: (int){ &(matchN(1, (#list){
@@ -566,7 +617,24 @@ diff old new
              }
            }), int) }
        }
-@@ -262,42 +258,42 @@
+@@ -270,6 +276,16 @@
+           //     ./issue3474.cue:53:5
+           //     ./issue3474.cue:53:12
+           //     ./issue3474.cue:54:5
++          // invalid operands {C:1} and 10 to '>' (type _|_ and int):
++          //     ./issue3474.cue:53:16
++          //     ./issue3474.cue:53:5
++          //     ./issue3474.cue:53:17
++          //     ./issue3474.cue:54:5
++          // cannot combine regular field "C" with {C:1}:
++          //     ./issue3474.cue:55:15
++          //     ./issue3474.cue:53:5
++          //     ./issue3474.cue:53:16
++          //     ./issue3474.cue:54:5
+           C: (int){ 1 }
+         }
+       }
+@@ -276,42 +292,42 @@
      }
    }
    issue3639: (struct){
@@ -633,6 +701,10 @@ diff old new
    }
 -- out/eval --
 Errors:
+conflicting values >10 and {C:1} (mismatched types number and struct):
+    ./issue3474.cue:53:5
+    ./issue3474.cue:53:16
+    ./issue3474.cue:54:5
 callOfCallToValidator.e: cannot call previously called validator b:
     ./in.cue:94:5
 issue3418.t1: invalid value "foo" (does not satisfy matchN): conflicting values 2 and 1:
@@ -673,6 +745,9 @@ issue3474.topValidator.fail.A: invalid value 1 (does not satisfy matchN): 0 matc
     ./issue3474.cue:41:5
     ./issue3474.cue:41:12
     ./issue3474.cue:42:5
+    ./issue3474.cue:43:12
+invalid value 1 (out of bound >10):
+    ./issue3474.cue:41:16
     ./issue3474.cue:43:12
 issue3474.topValidator.failType.A: invalid value {C:1} (does not satisfy matchN): 0 matched, expected 1:
     ./issue3474.cue:53:5
@@ -875,6 +950,9 @@ Result:
           //     ./issue3474.cue:41:12
           //     ./issue3474.cue:42:5
           //     ./issue3474.cue:43:12
+          // invalid value 1 (out of bound >10):
+          //     ./issue3474.cue:41:16
+          //     ./issue3474.cue:43:12
         }
       }
       incomplete: (struct){
@@ -886,7 +964,11 @@ Result:
       failType: (_|_){
         // [eval]
         A: (_|_){
-          // [eval] issue3474.topValidator.failType.A: invalid value {C:1} (does not satisfy matchN): 0 matched, expected 1:
+          // [eval] conflicting values >10 and {C:1} (mismatched types number and struct):
+          //     ./issue3474.cue:53:5
+          //     ./issue3474.cue:53:16
+          //     ./issue3474.cue:54:5
+          // issue3474.topValidator.failType.A: invalid value {C:1} (does not satisfy matchN): 0 matched, expected 1:
           //     ./issue3474.cue:53:5
           //     ./issue3474.cue:53:12
           //     ./issue3474.cue:54:5

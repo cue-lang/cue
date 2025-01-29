@@ -1,0 +1,110 @@
+# Check that the identifier remains the same by default
+# but can be updated with --ident and --update-ident.
+
+# Sanity check the initial output:
+exec cue export
+cmp stdout want-stdout-0
+
+exec cue refactor imports --exact example.com/inner example.com/newname
+cmp x.cue x.cue-1
+exec cue export
+cmp stdout want-stdout-1
+
+exec cue refactor imports --ident newname example.com/newname
+cmp x.cue x.cue-2
+! exec cue export
+stderr 'newname redeclared as imported package name'
+
+-- want-stdout-0 --
+{
+    "self": {
+        "inner": "example.com/inner@v0.0.01",
+        "further": "example.com/inner/further@v0.0.01"
+    },
+    "newname": true
+}
+-- want-stdout-1 --
+{
+    "self": {
+        "inner": "example.com/newname@v0.0.01",
+        "further": "example.com/inner/further@v0.0.01"
+    },
+    "newname": true
+}
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.9.0-alpha.0"
+deps: "example.com": {
+	default: true
+	v: "v0.0.1"
+}
+-- x.cue --
+package x
+
+import (
+	"example.com/inner"
+	"example.com/inner/further"
+)
+
+self: {
+	"inner": inner.self
+	"further": further.self
+}
+
+// Ensure that we're sanitizing correctly. If we don't, then the updated
+// identifier above will refer to the wrong thing.
+// TODO unfortunately astutil.Sanitize cannot currently cope with this
+// case.
+newname: true
+-- x.cue-1 --
+package x
+
+import (
+	inner "example.com/newname"
+	"example.com/inner/further"
+)
+
+self: {
+	"inner":   inner.self
+	"further": further.self
+}
+
+// Ensure that we're sanitizing correctly. If we don't, then the updated
+// identifier above will refer to the wrong thing.
+// TODO unfortunately astutil.Sanitize cannot currently cope with this
+// case.
+newname: true
+-- x.cue-2 --
+package x
+
+import (
+	"example.com/newname"
+	"example.com/inner/further"
+)
+
+self: {
+	"inner":   newname.self
+	"further": further.self
+}
+
+// Ensure that we're sanitizing correctly. If we don't, then the updated
+// identifier above will refer to the wrong thing.
+// TODO unfortunately astutil.Sanitize cannot currently cope with this
+// case.
+newname: true
+-- _registry/example.com_v0.0.1/cue.mod/module.cue --
+module: "example.com@v0"
+language: version: "v0.8.0"
+
+-- _registry/example.com_v0.0.1/inner/x.cue --
+package inner
+
+self: "example.com/inner@v0.0.01"
+-- _registry/example.com_v0.0.1/inner/further/x.cue --
+package further
+
+self: "example.com/inner/further@v0.0.01"
+-- _registry/example.com_v0.0.1/newname/x.cue --
+package newname
+
+self: "example.com/newname@v0.0.01"

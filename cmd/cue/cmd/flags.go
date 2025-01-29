@@ -24,15 +24,18 @@ import (
 const (
 	flagAll             flagName = "all"
 	flagAllErrors       flagName = "all-errors"
+	flagAllMajor        flagName = "all-major"
 	flagCheck           flagName = "check"
 	flagDiff            flagName = "diff"
 	flagDryRun          flagName = "dry-run"
 	flagEscape          flagName = "escape"
+	flagExact           flagName = "exact"
 	flagExpression      flagName = "expression"
 	flagExt             flagName = "ext"
 	flagFiles           flagName = "files"
 	flagForce           flagName = "force"
 	flagGlob            flagName = "name"
+	flagIdent           flagName = "ident"
 	flagIgnore          flagName = "ignore"
 	flagInject          flagName = "inject"
 	flagInjectVars      flagName = "inject-vars"
@@ -53,8 +56,10 @@ const (
 	flagSource          flagName = "source"
 	flagStrict          flagName = "strict"
 	flagTrace           flagName = "trace"
-	flagVerbose         flagName = "verbose"
-	flagWithContext     flagName = "with-context"
+	flagUpdateIdent     flagName = "update-ident"
+
+	flagVerbose     flagName = "verbose"
+	flagWithContext flagName = "with-context"
 
 	// Hidden flags.
 	flagCpuProfile flagName = "cpuprofile"

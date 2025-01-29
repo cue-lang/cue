@@ -301,6 +301,13 @@ _foo: "blah.example"
 	data:     `module: ""`,
 	want:     &File{},
 }, {
+	testName: "NonLegacyEmptyModule",
+	parse:    Parse,
+	data:     `module: "", language: version: "v0.8.0"`,
+	want: &File{
+		Language: &Language{Version: "v0.8.0"},
+	},
+}, {
 	testName: "ReferencesNotAllowed#1",
 	parse:    Parse,
 	data: `

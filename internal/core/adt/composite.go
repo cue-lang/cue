@@ -21,6 +21,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 )
 
 // TODO: unanswered questions about structural cycles:
@@ -956,16 +957,21 @@ func (v *Vertex) Bottom() *Bottom {
 // func (v *Vertex) Evaluate()
 
 // Unify unifies two values and returns the result.
+//
+// TODO: introduce: Open() wrapper that indicates closedness should be ignored.
+//
+// Change Value to Node to allow any kind of type to be passed.
 func Unify(c *OpContext, a, b Value) *Vertex {
+	v := &Vertex{}
+
 	// We set the parent of the context to be able to detect structural cycles
 	// early enough to error on schemas used for validation.
-	v := &Vertex{
-		Parent: c.vertex,
+	if n := c.vertex; n != nil {
+		v.Parent = n.Parent
 	}
 
-	closeInfo := c.CloseInfo()
-	v.AddConjunct(MakeConjunct(nil, a, closeInfo))
-	v.AddConjunct(MakeConjunct(nil, b, closeInfo))
+	addConjuncts(c, v, a)
+	addConjuncts(c, v, b)
 
 	if c.isDevVersion() {
 		s := v.getState(c)
@@ -975,7 +981,29 @@ func Unify(c *OpContext, a, b Value) *Vertex {
 	}
 
 	v.Finalize(c)
+
+	if c.vertex != nil {
+		v.Label = c.vertex.Label
+	}
+
 	return v
+}
+
+func addConjuncts(ctx *OpContext, dst *Vertex, src Value) {
+	closeInfo := ctx.CloseInfo()
+	c := MakeConjunct(nil, src, closeInfo)
+	c.CloseInfo.GroupUnify = true
+
+	if v, ok := src.(*Vertex); ok && v.ClosedRecursive {
+		if ctx.Version == internal.EvalV2 {
+			var root CloseInfo
+			c.CloseInfo = root.SpawnRef(v, v.ClosedRecursive, nil)
+		} else {
+			c.CloseInfo.FromDef = true
+		}
+	}
+
+	dst.AddConjunct(c)
 }
 
 func (v *Vertex) Finalize(c *OpContext) {

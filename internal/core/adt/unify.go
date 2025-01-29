@@ -130,18 +130,25 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		}()
 	}
 
-	if c.evalDepth == 0 {
-		defer func() {
-			// This loop processes nodes that need to be evaluated, but should be
-			// evaluated outside of the stack to avoid structural cycle detection.
-			// See comment at toFinalize.
-			a := c.toFinalize
-			c.toFinalize = c.toFinalize[:0]
-			for _, x := range a {
-				x.Finalize(c)
-			}
-		}()
-	}
+	// TODO: investigate whether we still need this mechanism.
+	//
+	// This has been disabled to fix Issue #3709. This was added in lieu of a
+	// proper depth detecting mechanism. This has been implemented now, but
+	// we keep this around to investigate certain edge cases, such as
+	// depth checking across inline vertices.
+	//
+	// if c.evalDepth == 0 {
+	// 	defer func() {
+	// 		// This loop processes nodes that need to be evaluated, but should be
+	// 		// evaluated outside of the stack to avoid structural cycle detection.
+	// 		// See comment at toFinalize.
+	// 		a := c.toFinalize
+	// 		c.toFinalize = c.toFinalize[:0]
+	// 		for _, x := range a {
+	// 			x.Finalize(c)
+	// 		}
+	// 	}()
+	// }
 
 	if mode == ignore {
 		return false

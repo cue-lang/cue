@@ -1,0 +1,39 @@
+# Issue #3709
+# Prevent hang.
+
+-- cue.mod/module.cue --
+module: "foo.test/bar"
+language: version: "v0.11.0"
+-- input.cue --
+package p
+
+import "foo.test/bar/imported"
+
+out: [string]: imported.#Foo
+-- imported/imported.cue --
+package imported
+
+#Foo: bar?: #Bar
+#Bar: foo?: #Foo
+-- out/compile --
+--- input.cue
+{
+  out: {
+    [string]: 〈import;"foo.test/bar/imported"〉.#Foo
+  }
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  2
+Reused: 0
+Allocs: 2
+Retain: 0
+
+Unifications: 2
+Conjuncts:    2
+Disjuncts:    2
+-- out/eval --
+(struct){
+  out: (struct){
+  }
+}

@@ -22,11 +22,21 @@ import (
 	"cuelang.org/go/cue/errors"
 )
 
-const vetDoc = `vet validates CUE and other data files
+const vetDoc = `The vet command validates CUE and other data files.
 
-By default it will only validate if there are no errors.
-The -c validates that all regular fields are concrete.
+The command is silent when it succeeds, emitting no output and an exit code of
+zero. Otherwise, errors are reported and the command returns a non-zero exit
+code.
 
+vet starts by ensuring that there are no validation errors. If errors are found
+then they are reported and the command exits.
+
+If there are no validation errors then, by default, vet checks that the result
+of the evaluation is concrete. It reports an error if the evaluation contains
+any regular fields that have non-concrete values.
+Specify -c=false to override this default and to permit regular fields to have
+non-concrete values. Specify -c/-c=true to report errors mentioning which
+regular fields have non-concrete values.
 
 Checking non-CUE files
 
@@ -39,12 +49,12 @@ currently supported:
 	TOML       .toml
 	TEXT       .txt  (validate a single string value)
 
-To activate this mode, the non-cue files must be explicitly mentioned on the
+To activate this mode, the non-CUE files must be explicitly mentioned on the
 command line. There must also be at least one CUE file to hold the constraints.
 
 In this mode, each file will be verified against a CUE constraint. If the files
-contain multiple objects (such as using --- in YAML), they will all be verified
-individually.
+contain multiple objects (such as using --- in YAML) then each object will be
+verified individually.
 
 By default, each file is checked against the root of the loaded CUE files.
 The -d can be used to only verify files against the result of an expression
@@ -75,7 +85,7 @@ func newVetCmd(c *Command) *cobra.Command {
 	addInjectionFlags(cmd.Flags(), false, false)
 
 	cmd.Flags().BoolP(string(flagConcrete), "c", false,
-		"require the evaluation to be concrete")
+		"require the evaluation to be concrete, or set -c=false to allow incomplete values")
 
 	return cmd
 }

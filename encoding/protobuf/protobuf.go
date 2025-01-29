@@ -189,12 +189,7 @@ func NewExtractor(c *Config) *Extractor {
 	// TODO(rogpeppe) the Go package path might itself include a major
 	// version, so we should probably consider that too.
 	if c.Module != "" {
-		var ok bool
-		modulePath, _, ok = module.SplitPathVersion(c.Module)
-		if !ok {
-			modulePath = c.Module
-
-		}
+		modulePath, _, _ = module.SplitPathVersion(c.Module)
 	}
 	cwd, _ := os.Getwd()
 	b := &Extractor{

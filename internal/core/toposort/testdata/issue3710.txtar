@@ -1,0 +1,52 @@
+-- input.cue --
+package p
+
+#Exporter: {
+	_objects: {...}
+	_imports: [...]
+
+	objects: [
+		for _, objs in _objects {
+			objs
+		}
+		for import in _imports for obj in import._export.objects {
+			obj
+		}
+	]
+}
+
+out: #Exporter & {
+	_imports: [_app1]
+}
+_app1: {
+	_export: #Exporter & {
+		_imports: [_app2]
+	}
+}
+_app2: {
+	_export: #Exporter & {
+		_objects: leaf: leafField: "leaf value"
+	}
+}
+-- out/TestTopologicalSort/lexicographical=false --
+{
+	#Exporter: {
+		objects: []
+	}
+	out: {
+		objects: [{
+			leafField: "leaf value"
+		}]
+	}
+}
+-- out/TestTopologicalSort/lexicographical=true --
+{
+	#Exporter: {
+		objects: []
+	}
+	out: {
+		objects: [{
+			leafField: "leaf value"
+		}]
+	}
+}

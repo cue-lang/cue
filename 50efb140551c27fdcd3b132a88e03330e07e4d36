@@ -16,6 +16,24 @@
       "message": "The CI failure appears real. If I cherry pick this commit to master, I can reproduce:\n\n```\n$ go generate ./internal/ci\n\"runs-on\": field not allowed:\n    ../../../../../.cache/cue/mod/extract/github.com/cue-tmp/jsonschema-pub/exp1/githubactions@v0.4.0/Workflow.cue:529:71\n    ./base/base.cue:60:15\n    ./base/gerrithub.cue:244:15\nexit status 1\n```",
       "revId": "50efb140551c27fdcd3b132a88e03330e07e4d36",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61e77481_a4a8a8e2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-01-29T18:15:15Z",
+      "side": 1,
+      "message": "I\u0027ve just mailed https://cuelang.org/cl/1208009 to update to the latest curated module, to rule out the fact that we\u0027re using an older version currently.\n\nHowever, I\u0027ve locally rebased this stack atop https://cuelang.org/cl/1208009 and still see the same error. So I agree it\u0027s a genuine error.",
+      "parentUuid": "de97b577_578d7f06",
+      "revId": "50efb140551c27fdcd3b132a88e03330e07e4d36",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

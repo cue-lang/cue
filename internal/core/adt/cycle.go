@@ -1103,7 +1103,11 @@ func (n *nodeContext) updateCyclicStatusV3(c CloseInfo) {
 		for _, c := range n.cyclicConjuncts {
 			ci := c.c.CloseInfo
 			ci.cc = n.node.rootCloseContext(n.ctx)
-			n.scheduleVertexConjuncts(c.c, c.arc, ci)
+			if c.arc != nil {
+				n.scheduleVertexConjuncts(c.c, c.arc, ci)
+			} else {
+				n.scheduleConjunct(c.c, ci)
+			}
 			n.node.cc().decDependent(n.ctx, DEFER, nil)
 		}
 		n.cyclicConjuncts = n.cyclicConjuncts[:0]

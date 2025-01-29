@@ -228,6 +228,18 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 
 	case Evaluator:
 		n.unshare()
+
+		// Expressions that contain a call may end up in an infinite recursion
+		// here if we do not ensure that there is non-cyclic data to propagate
+		// the evaluation. We therefore postpone expressions until we have
+		// evidence that such non-cyclic conjuncts exist.
+		if id.CycleType == IsCyclic && !n.hasNonCycle && !n.hasNonCyclic {
+			n.hasAncestorCycle = true
+			n.cyclicConjuncts = append(n.cyclicConjuncts, cyclicConjunct{c: c})
+			n.node.cc().incDependent(n.ctx, DEFER, nil)
+			return
+		}
+
 		// Interpolation, UnaryExpr, CallExpr
 		n.scheduleTask(handleExpr, env, x, id)
 

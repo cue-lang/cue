@@ -52,6 +52,24 @@
       "parentUuid": "61e77481_a4a8a8e2",
       "revId": "50efb140551c27fdcd3b132a88e03330e07e4d36",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21bb657f_e0aa30b1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-29T18:23:51Z",
+      "side": 1,
+      "message": "I can confirm that Paul is right - updating the curated module dependency still shows the same regression.\n\nI should also note that BOTH evalv2 and evalv3 break here, where they worked before:\n\n```\n$ CUE_EXPERIMENT\u003devalv3\u003d0 go generate ./internal/ci\n\"runs-on\": field not allowed:\n    ../../../../../.cache/cue/mod/extract/github.com/cue-tmp/jsonschema-pub/exp1/githubactions@v0.6.0/Workflow.cue:216:38\n    ../../../../../.cache/cue/mod/extract/github.com/cue-tmp/jsonschema-pub/exp1/githubactions@v0.6.0/Workflow.cue:11:2\n    ../../../../../.cache/cue/mod/extract/github.com/cue-tmp/jsonschema-pub/exp1/githubactions@v0.6.0/Workflow.cue:11:8\n    ../../../../../.cache/cue/mod/extract/github.com/cue-tmp/jsonschema-pub/exp1/githubactions@v0.6.0/Workflow.cue:215:18\n    ../../../../../.cache/cue/mod/extract/github.com/cue-tmp/jsonschema-pub/exp1/githubactions@v0.6.0/Workflow.cue:216:4\n    ../../../../../.cache/cue/mod/extract/github.com/cue-tmp/jsonschema-pub/exp1/githubactions@v0.6.0/Workflow.cue:216:61\n    ../../../../../.cache/cue/mod/extract/github.com/cue-tmp/jsonschema-pub/exp1/githubactions@v0.6.0/Workflow.cue:538:34\n    ./base/base.cue:60:15\n    ./base/gerrithub.cue:19:31\n    ./base/gerrithub.cue:231:14\n    ./base/gerrithub.cue:244:15\n    ./base/github.cue:14:15\n    ./base/github.cue:19:18\nexit status 1\ninternal/ci/gen.go:17: running \"go\": exit status 1\n$ CUE_EXPERIMENT\u003devalv3\u003d1 go generate ./internal/ci\n\"runs-on\": field not allowed:\n    ../../../../../.cache/cue/mod/extract/github.com/cue-tmp/jsonschema-pub/exp1/githubactions@v0.6.0/Workflow.cue:538:28\n    ./base/base.cue:60:15\n    ./base/gerrithub.cue:244:15\nexit status 1\ninternal/ci/gen.go:17: running \"go\": exit status 1\n```",
+      "parentUuid": "3fb142e6_5e002cad",
+      "revId": "50efb140551c27fdcd3b132a88e03330e07e4d36",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

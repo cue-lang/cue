@@ -27,13 +27,14 @@ import (
 )
 
 var parseTests = []struct {
-	testName     string
-	parse        func(modfile []byte, filename string) (*File, error)
-	data         string
-	wantError    string
-	want         *File
-	wantVersions []module.Version
-	wantDefaults map[string]string
+	testName            string
+	parse               func(modfile []byte, filename string) (*File, error)
+	data                string
+	wantError           string
+	want                *File
+	wantVersions        []module.Version
+	wantDefaults        map[string]string
+	wantPackageVersions map[string]string
 }{{
 	testName: "NoDeps",
 	parse:    Parse,
@@ -50,6 +51,15 @@ language: version: "v0.8.0-alpha.0"
 	wantDefaults: map[string]string{
 		"foo.com/bar": "v0",
 	},
+	wantPackageVersions: map[string]string{
+		"foo.com/bar":              "foo.com/bar@v0",
+		"foo.com/bar@v0":           "foo.com/bar@v0",
+		"foo.com/bar/baz@v0":       "foo.com/bar@v0",
+		"foo.com/bar@v1":           "",
+		"foo.com/bar:hello":        "foo.com/bar@v0",
+		"foo.com/bar/baz:hello":    "foo.com/bar@v0",
+		"foo.com/bar/baz@v0:hello": "foo.com/bar@v0",
+	},
 }, {
 	testName: "WithDeps",
 	parse:    Parse,
@@ -59,6 +69,11 @@ language: version: "v0.8.1"
 deps: "example.com@v1": {
 	default: true
 	v: "v1.2.3"
+}
+deps: "example.com/other@v1": v: "v1.9.10"
+deps: "example.com/other/more/nested@v2": {
+	v: "v2.9.20"
+	default: true
 }
 deps: "other.com/something@v0": v: "v0.2.3"
 `,
@@ -75,12 +90,36 @@ deps: "other.com/something@v0": v: "v0.2.3"
 			"other.com/something@v0": {
 				Version: "v0.2.3",
 			},
+			"example.com/other@v1": {
+				Version: "v1.9.10",
+			},
+			"example.com/other/more/nested@v2": {
+				Version: "v2.9.20",
+				Default: true,
+			},
 		},
 	},
-	wantVersions: parseVersions("example.com@v1.2.3", "other.com/something@v0.2.3"),
+	wantVersions: parseVersions(
+		"example.com/other/more/nested@v2.9.20",
+		"example.com/other@v1.9.10",
+		"example.com@v1.2.3",
+		"other.com/something@v0.2.3",
+	),
 	wantDefaults: map[string]string{
-		"foo.com/bar": "v0",
-		"example.com": "v1",
+		"example.com/other/more/nested": "v2",
+		"foo.com/bar":                   "v0",
+		"example.com":                   "v1",
+	},
+	wantPackageVersions: map[string]string{
+		"example.com":                       "example.com@v1.2.3",
+		"example.com/x/y@v1":                "example.com@v1.2.3",
+		"example.com/x/y@v1:x":              "example.com@v1.2.3",
+		"example.com/other@v1":              "example.com/other@v1.9.10",
+		"example.com/other/p@v1":            "example.com/other@v1.9.10",
+		"example.com/other/more":            "example.com@v1.2.3",
+		"example.com/other/more@v1":         "example.com/other@v1.9.10",
+		"example.com/other/more/nested":     "example.com/other/more/nested@v2.9.20",
+		"example.com/other/more/nested/x:p": "example.com/other/more/nested@v2.9.20",
 	},
 }, {
 	testName: "WithSource",
@@ -270,6 +309,12 @@ deps: "example.com": v: "v1.2.3"
 	wantDefaults: map[string]string{
 		"foo.com/bar": "v0",
 	},
+	wantPackageVersions: map[string]string{
+		"example.com":          "", // No default major version.
+		"example.com@v1":       "example.com@v1.2.3",
+		"example.com/x/y@v1":   "example.com@v1.2.3",
+		"example.com/x/y@v1:x": "example.com@v1.2.3",
+	},
 }, {
 	testName: "LegacyWithExtraFields",
 	parse:    ParseLegacy,
@@ -444,6 +489,17 @@ func TestParse(t *testing.T) {
 				qt.Assert(t, qt.Equals(f.QualifiedModule(), f.Module+"@v0"))
 				qt.Assert(t, qt.Equals(f.ModulePath(), f.Module))
 				qt.Assert(t, qt.Equals(f.MajorVersion(), "v0"))
+			}
+			for p, m := range test.wantPackageVersions {
+				t.Run("package-"+p, func(t *testing.T) {
+					mv, ok := f.ModuleForImportPath(p)
+					if m == "" {
+						qt.Assert(t, qt.IsFalse(ok), qt.Commentf("got version %v", mv))
+						return
+					}
+					qt.Check(t, qt.IsTrue(ok))
+					qt.Check(t, qt.Equals(mv.String(), m))
+				})
 			}
 		})
 	}

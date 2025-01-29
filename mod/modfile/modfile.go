@@ -22,6 +22,7 @@ package modfile
 import (
 	_ "embed"
 	"fmt"
+	"path"
 	"slices"
 	"strings"
 	"sync"
@@ -53,12 +54,13 @@ type File struct {
 	// Use the [File.QualifiedModule] method to obtain a module
 	// path that's always qualified. See also the
 	// [File.ModulePath] and [File.MajorVersion] methods.
-	Module   string                    `json:"module"`
-	Language *Language                 `json:"language,omitempty"`
-	Source   *Source                   `json:"source,omitempty"`
-	Deps     map[string]*Dep           `json:"deps,omitempty"`
-	Custom   map[string]map[string]any `json:"custom,omitempty"`
-	versions []module.Version
+	Module          string                    `json:"module"`
+	Language        *Language                 `json:"language,omitempty"`
+	Source          *Source                   `json:"source,omitempty"`
+	Deps            map[string]*Dep           `json:"deps,omitempty"`
+	Custom          map[string]map[string]any `json:"custom,omitempty"`
+	versions        []module.Version
+	versionByModule map[string]module.Version
 	// defaultMajorVersions maps from module base path to the
 	// major version default for that path.
 	defaultMajorVersions map[string]string
@@ -463,6 +465,7 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 			return nil, fmt.Errorf("language version %v in %s is not canonical", vers, filename)
 		}
 	}
+	mf.versionByModule = make(map[string]module.Version)
 	var versions []module.Version
 	defaultMajorVersions := make(map[string]string)
 	if mainPath != "" {
@@ -486,8 +489,17 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 			}
 			defaultMajorVersions[mp] = semver.Major(vers.Version())
 		}
+		mf.versionByModule[vers.Path()] = vers
 	}
-
+	if mainPath != "" {
+		// We don't necessarily have a full version for the main module.
+		mainWithMajor := mainPath + "@" + mainMajor
+		mainVersion, err := module.NewVersion(mainWithMajor, "")
+		if err != nil {
+			return nil, err
+		}
+		mf.versionByModule[mainWithMajor] = mainVersion
+	}
 	if len(defaultMajorVersions) > 0 {
 		mf.defaultMajorVersions = defaultMajorVersions
 	}
@@ -581,4 +593,28 @@ func (f *File) DepVersions() []module.Version {
 // The caller should not modify the returned map.
 func (f *File) DefaultMajorVersions() map[string]string {
 	return f.defaultMajorVersions
+}
+
+// ModuleForImportPath returns the module that should contain the given
+// import path and reports whether the module was found.
+// It does not check to see if the import path actually exists within the module.
+//
+// It works entirely from information in f, meaning that it does
+// not consult a registry to resolve a package whose module is not
+// mentioned in the file, which means it will not work in general unless
+// the module is tidy (as with `cue mod tidy`).
+func (f *File) ModuleForImportPath(importPath string) (module.Version, bool) {
+	ip := module.ParseImportPath(importPath)
+	for prefix := ip.Path; prefix != "."; prefix = path.Dir(prefix) {
+		pkgVersion := ip.Version
+		if pkgVersion == "" {
+			if pkgVersion = f.defaultMajorVersions[prefix]; pkgVersion == "" {
+				continue
+			}
+		}
+		if mv, ok := f.versionByModule[prefix+"@"+pkgVersion]; ok {
+			return mv, true
+		}
+	}
+	return module.Version{}, false
 }

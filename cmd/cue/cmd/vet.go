@@ -24,8 +24,9 @@ import (
 
 const vetDoc = `vet validates CUE and other data files
 
-By default it will only validate if there are no errors.
-The -c validates that all regular fields are concrete.
+By default it reports any validation failures, or a general error if any regular
+fields are incomplete. Enable more specific error messages for each non-concrete
+value with -c/-c=true, or allow valid-yet-incomplete values with -c=false.
 
 
 Checking non-CUE files
@@ -75,7 +76,7 @@ func newVetCmd(c *Command) *cobra.Command {
 	addInjectionFlags(cmd.Flags(), false, false)
 
 	cmd.Flags().BoolP(string(flagConcrete), "c", false,
-		"require the evaluation to be concrete")
+		"require the evaluation to be concrete (see note above)")
 
 	return cmd
 }

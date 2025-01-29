@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de97b577_578d7f06",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-29T17:54:33Z",
+      "side": 1,
+      "message": "The CI failure appears real. If I cherry pick this commit to master, I can reproduce:\n\n```\n$ go generate ./internal/ci\n\"runs-on\": field not allowed:\n    ../../../../../.cache/cue/mod/extract/github.com/cue-tmp/jsonschema-pub/exp1/githubactions@v0.4.0/Workflow.cue:529:71\n    ./base/base.cue:60:15\n    ./base/gerrithub.cue:244:15\nexit status 1\n```",
+      "revId": "50efb140551c27fdcd3b132a88e03330e07e4d36",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -34,6 +34,24 @@
       "parentUuid": "de97b577_578d7f06",
       "revId": "50efb140551c27fdcd3b132a88e03330e07e4d36",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fb142e6_5e002cad",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-01-29T18:21:09Z",
+      "side": 1,
+      "message": "Just to flag however, that CI is currently being generated with the default version of the evaluator, i.e. evalv2, _not_ evalv3.",
+      "parentUuid": "61e77481_a4a8a8e2",
+      "revId": "50efb140551c27fdcd3b132a88e03330e07e4d36",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

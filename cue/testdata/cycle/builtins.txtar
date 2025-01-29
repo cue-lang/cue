@@ -209,14 +209,14 @@ selfCycle: t2: {
 -- todo/p1 --
 issue3443.noCycle: fix hang
 -- out/evalalpha/stats --
-Leaks:  340
+Leaks:  352
 Freed:  17
 Reused: 17
-Allocs: 340
+Allocs: 352
 Retain: 0
 
-Unifications: 293
-Conjuncts:    1143
+Unifications: 309
+Conjuncts:    1189
 Disjuncts:    28
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -228,17 +228,17 @@ diff old new
 -Reused: 357
 -Allocs: 34
 -Retain: 95
-+Leaks:  340
++Leaks:  352
 +Freed:  17
 +Reused: 17
-+Allocs: 340
++Allocs: 352
 +Retain: 0
  
 -Unifications: 363
 -Conjuncts:    645
 -Disjuncts:    454
-+Unifications: 293
-+Conjuncts:    1143
++Unifications: 309
++Conjuncts:    1189
 +Disjuncts:    28
 -- out/eval/stats --
 Leaks:  22
@@ -256,18 +256,18 @@ noCycle.t1.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1
     ./cycle.cue:6:7
     ./cycle.cue:6:14
     ./cycle.cue:7:13
+noCycle.t1.#x.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
+    ./cycle.cue:6:7
+    ./cycle.cue:6:14
+    ./cycle.cue:7:13
 noCycle.t1._s.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
     ./cycle.cue:6:7
     ./cycle.cue:6:14
     ./cycle.cue:7:13
-issue3649.noCycle.t1.data.a: invalid value {b:"foo"} (does not satisfy matchN): 0 matched, expected 1:
-    ./cycle.cue:16:7
-    ./cycle.cue:12:11
-    ./cycle.cue:16:14
-issue3649.cycle.t1.data.a: invalid value {b:"foo"} (does not satisfy matchN): 0 matched, expected 1:
-    ./cycle.cue:33:6
-    ./cycle.cue:30:11
-    ./cycle.cue:33:13
+noCycle.t1._s.#x.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
+    ./cycle.cue:6:7
+    ./cycle.cue:6:14
+    ./cycle.cue:7:13
 selfCycle.t1.c: invalid value {d:{}} (does not satisfy matchN): 0 matched, expected 1:
     ./cycle.cue:47:5
     ./cycle.cue:47:12
@@ -324,6 +324,10 @@ Result:
           //     ./cycle.cue:6:7
           //     ./cycle.cue:6:14
           //     ./cycle.cue:7:13
+          // noCycle.t1._s.#x.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
+          //     ./cycle.cue:6:7
+          //     ./cycle.cue:6:14
+          //     ./cycle.cue:7:13
         }
       }
       #x: (_|_){
@@ -331,22 +335,18 @@ Result:
         //     ./cycle.cue:6:7
         //     ./cycle.cue:6:14
         //     ./cycle.cue:7:13
+        // noCycle.t1.#x.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
+        //     ./cycle.cue:6:7
+        //     ./cycle.cue:6:14
+        //     ./cycle.cue:7:13
       }
     }
   }
-  issue3649: (_|_){
-    // [eval]
-    noCycle: (_|_){
-      // [eval]
-      t1: (_|_){
-        // [eval]
-        data: (_|_){
-          // [eval]
-          a: (_|_){
-            // [eval] issue3649.noCycle.t1.data.a: invalid value {b:"foo"} (does not satisfy matchN): 0 matched, expected 1:
-            //     ./cycle.cue:16:7
-            //     ./cycle.cue:12:11
-            //     ./cycle.cue:16:14
+  issue3649: (struct){
+    noCycle: (struct){
+      t1: (struct){
+        data: (#struct){
+          a: (#struct){
             b: (string){ "foo" }
           }
           b?: (string){ string }
@@ -383,17 +383,10 @@ Result:
         }
       }
     }
-    cycle: (_|_){
-      // [eval]
-      t1: (_|_){
-        // [eval]
-        data: (_|_){
-          // [eval]
-          a: (_|_){
-            // [eval] issue3649.cycle.t1.data.a: invalid value {b:"foo"} (does not satisfy matchN): 0 matched, expected 1:
-            //     ./cycle.cue:33:6
-            //     ./cycle.cue:30:11
-            //     ./cycle.cue:33:13
+    cycle: (struct){
+      t1: (struct){
+        data: (#struct){
+          a: (#struct){
             b: (string){ "foo" }
           }
           b: (string){ string }
@@ -658,33 +651,6 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -3,18 +3,18 @@
-     ./cycle.cue:6:7
-     ./cycle.cue:6:14
-     ./cycle.cue:7:13
--noCycle.t1.#x.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
--    ./cycle.cue:6:7
--    ./cycle.cue:6:14
--    ./cycle.cue:7:13
- noCycle.t1._s.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
-     ./cycle.cue:6:7
-     ./cycle.cue:6:14
-     ./cycle.cue:7:13
--noCycle.t1._s.#x.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
--    ./cycle.cue:6:7
--    ./cycle.cue:6:14
--    ./cycle.cue:7:13
-+issue3649.noCycle.t1.data.a: invalid value {b:"foo"} (does not satisfy matchN): 0 matched, expected 1:
-+    ./cycle.cue:16:7
-+    ./cycle.cue:12:11
-+    ./cycle.cue:16:14
-+issue3649.cycle.t1.data.a: invalid value {b:"foo"} (does not satisfy matchN): 0 matched, expected 1:
-+    ./cycle.cue:33:6
-+    ./cycle.cue:30:11
-+    ./cycle.cue:33:13
- selfCycle.t1.c: invalid value {d:{}} (does not satisfy matchN): 0 matched, expected 1:
-     ./cycle.cue:47:5
-     ./cycle.cue:47:12
 @@ -24,29 +24,28 @@
      ./cycle.cue:47:12
      ./cycle.cue:47:20
@@ -744,52 +710,15 @@ diff old new
      ./matchn.cue:55:13
  
  Result:
-@@ -78,10 +71,6 @@
-           //     ./cycle.cue:6:7
-           //     ./cycle.cue:6:14
-           //     ./cycle.cue:7:13
--          // noCycle.t1._s.#x.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
--          //     ./cycle.cue:6:7
--          //     ./cycle.cue:6:14
--          //     ./cycle.cue:7:13
-         }
-       }
-       #x: (_|_){
-@@ -89,26 +78,30 @@
-         //     ./cycle.cue:6:7
-         //     ./cycle.cue:6:14
-         //     ./cycle.cue:7:13
--        // noCycle.t1.#x.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
--        //     ./cycle.cue:6:7
--        //     ./cycle.cue:6:14
--        //     ./cycle.cue:7:13
--      }
--    }
--  }
--  issue3649: (struct){
--    noCycle: (struct){
--      t1: (struct){
--        data: (#struct){
+@@ -100,15 +93,15 @@
+     noCycle: (struct){
+       t1: (struct){
+         data: (#struct){
 -          b?: (string){ string }
 -          a: (struct){
 -            b: (string){ "foo" }
 -          }
-+      }
-+    }
-+  }
-+  issue3649: (_|_){
-+    // [eval]
-+    noCycle: (_|_){
-+      // [eval]
-+      t1: (_|_){
-+        // [eval]
-+        data: (_|_){
-+          // [eval]
-+          a: (_|_){
-+            // [eval] issue3649.noCycle.t1.data.a: invalid value {b:"foo"} (does not satisfy matchN): 0 matched, expected 1:
-+            //     ./cycle.cue:16:7
-+            //     ./cycle.cue:12:11
-+            //     ./cycle.cue:16:14
++          a: (#struct){
 +            b: (string){ "foo" }
 +          }
 +          b?: (string){ string }
@@ -828,28 +757,15 @@ diff old new
                  }
                }) }
            }
-@@ -137,18 +130,25 @@
-         }
-       }
-     }
--    cycle: (struct){
--      t1: (struct){
--        data: (#struct){
+@@ -140,15 +133,15 @@
+     cycle: (struct){
+       t1: (struct){
+         data: (#struct){
 -          b: (string){ string }
 -          a: (struct){
 -            b: (string){ "foo" }
 -          }
-+    cycle: (_|_){
-+      // [eval]
-+      t1: (_|_){
-+        // [eval]
-+        data: (_|_){
-+          // [eval]
-+          a: (_|_){
-+            // [eval] issue3649.cycle.t1.data.a: invalid value {b:"foo"} (does not satisfy matchN): 0 matched, expected 1:
-+            //     ./cycle.cue:33:6
-+            //     ./cycle.cue:30:11
-+            //     ./cycle.cue:33:13
++          a: (#struct){
 +            b: (string){ "foo" }
 +          }
 +          b: (string){ string }
@@ -862,7 +778,7 @@ diff old new
                }
              }) }
          }
-@@ -161,8 +161,8 @@
+@@ -161,8 +154,8 @@
        a?: ((string|bytes)){ "encoding/yaml".Validate(yamlNoCycle.#c) }
      }
      data: (#struct){
@@ -872,7 +788,7 @@ diff old new
      }
    }
    selfCycle: (_|_){
-@@ -179,12 +179,7 @@
+@@ -179,12 +172,7 @@
          //     ./cycle.cue:47:12
          //     ./cycle.cue:47:20
          //     ./cycle.cue:48:8
@@ -886,7 +802,7 @@ diff old new
          //     ./cycle.cue:47:5
          d: (struct){
          }
-@@ -197,15 +192,7 @@
+@@ -197,15 +185,7 @@
          //     ./cycle.cue:53:5
          //     ./cycle.cue:53:12
          //     ./cycle.cue:54:5
@@ -903,7 +819,7 @@ diff old new
          //     ./cycle.cue:53:5
        }
      }
-@@ -267,20 +254,20 @@
+@@ -267,20 +247,20 @@
    issue3410: (struct){
      _s: (struct){
        #x: (_){ matchN(1, (#list){
@@ -932,7 +848,7 @@ diff old new
          }
        }) }
    }
-@@ -287,9 +274,9 @@
+@@ -287,9 +267,9 @@
    issue3420: (struct){
      matches1: (struct){
        #S: (_){ matchN(1, (#list){
@@ -945,7 +861,7 @@ diff old new
            }
          }) }
        s: (int){ 2 }
-@@ -306,13 +293,13 @@
+@@ -306,13 +286,13 @@
      }
      noCycle: (struct){
        #S: (_){ matchN(1, (#list){
@@ -962,7 +878,7 @@ diff old new
            n: (struct){
              n: (_){ _ }
            }
-@@ -321,29 +308,43 @@
+@@ -321,29 +301,43 @@
      }
      noCycle2: (struct){
        #S: (_){ matchN(1, (#list){
@@ -1019,7 +935,7 @@ diff old new
            n: (struct){
              n: (_){ _ }
            }
-@@ -363,13 +364,7 @@
+@@ -363,13 +357,7 @@
            //     ./matchn.cue:55:20
            //     ./matchn.cue:55:28
            //     ./matchn.cue:55:40
@@ -1034,7 +950,7 @@ diff old new
            //     ./matchn.cue:55:13
            n: (#struct){
              n: (#struct){
-@@ -396,11 +391,11 @@
+@@ -396,11 +384,11 @@
          //     ./matchn.cue:63:29
        }
        #s: (_){ matchN(1, (#list){

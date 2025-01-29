@@ -216,7 +216,6 @@ func splitModulePath(path string) (mpath string, mvers string, err error) {
 		}
 		return mpath, mvers, nil
 	}
-	mpath = path
 	if err := module.CheckPathWithoutVersion(mpath); err != nil {
 		return "", "", fmt.Errorf("invalid module path %q: %v", path, err)
 	}

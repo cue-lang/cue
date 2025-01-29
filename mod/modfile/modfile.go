@@ -447,7 +447,7 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 		if semver.Major(mainMajor) != mainMajor {
 			return nil, fmt.Errorf("module path %s in %q should contain the major version only", mf.Module, filename)
 		}
-	} else if mainPath = mf.Module; mainPath != "" {
+	} else if mainPath != "" {
 		if err := module.CheckPathWithoutVersion(mainPath); err != nil {
 			return nil, fmt.Errorf("module path %q in %q is not valid: %v", mainPath, filename, err)
 		}

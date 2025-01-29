@@ -176,9 +176,6 @@ func (c *Client) GetModuleWithManifest(m module.Version, contents []byte, mediaT
 // be returned.
 func (c *Client) ModuleVersions(ctx context.Context, m string) (_req []string, _err0 error) {
 	mpath, major, hasMajor := module.SplitPathVersion(m)
-	if !hasMajor {
-		mpath = m
-	}
 	loc, err := c.resolver.ResolveToRegistry(mpath, "")
 	if err != nil {
 		if errors.Is(err, ErrRegistryNotFound) {

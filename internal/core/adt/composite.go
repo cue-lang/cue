@@ -962,9 +962,18 @@ func Unify(c *OpContext, a, b Value) *Vertex {
 	v := &Vertex{
 		Parent: c.vertex,
 	}
+
 	closeInfo := c.CloseInfo()
 	v.AddConjunct(MakeConjunct(nil, a, closeInfo))
 	v.AddConjunct(MakeConjunct(nil, b, closeInfo))
+
+	if c.isDevVersion() {
+		s := v.getState(c)
+		if p := c.vertex; p != nil && p.state != nil && s != nil {
+			s.hasNonCyclic = p.state.hasNonCyclic
+		}
+	}
+
 	v.Finalize(c)
 	return v
 }

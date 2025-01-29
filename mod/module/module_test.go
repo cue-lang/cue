@@ -212,8 +212,8 @@ var checkPathTests = []checkPathTest{{
 	fileErr:   `malformed file path "x.y?/z": invalid char '?'`,
 }, {
 	path:      `x.y@/z`,
-	modErr:    `invalid char '@'`,
-	importErr: `malformed import path "x.y@/z": invalid char '@'`,
+	modErr:    `module path inappropriately contains version`,
+	importErr: `malformed import path "x.y@/z": import paths can only contain a major version specifier`,
 }, {
 	path:      `x.y[/z`,
 	modErr:    `invalid char '['`,
@@ -484,7 +484,7 @@ var checkPathTests = []checkPathTest{{
 	importErr: `malformed import path "rsc io/quote": invalid char ' '`,
 }, {
 	path:   `foo.com@v0`,
-	modErr: `module path inappropriately contains major version`,
+	modErr: `module path inappropriately contains version`,
 }, {
 	path: `foo.com/bar/baz`,
 }}

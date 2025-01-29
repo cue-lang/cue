@@ -36,6 +36,7 @@ import (
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/spf13/cobra"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/mod/modload"
 	"cuelang.org/go/internal/mod/semver"
 	"cuelang.org/go/internal/vcs"
@@ -139,7 +140,7 @@ func runModUpload(cmd *Command, args []string) error {
 	}
 
 	if major := mf.MajorVersion(); semver.Major(args[0]) != major {
-		if _, _, ok := module.SplitPathVersion(mf.Module); ok {
+		if _, _, ok := ast.SplitPackageVersion(mf.Module); ok {
 			return fmt.Errorf("publish version %q does not match the major version %q declared in %q; must be %s.N.N", args[0], major, modPath, major)
 		} else {
 			return fmt.Errorf("publish version %q does not match implied major version %q in %q; must be %s.N.N", args[0], major, modPath, major)

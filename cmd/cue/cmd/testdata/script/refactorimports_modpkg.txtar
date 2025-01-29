@@ -1,0 +1,62 @@
+# Check that we can use refactor imports to refactor imports
+# from packages in cue.mod.
+
+# Sanity check the initial output:
+exec cue export
+cmp stdout want-stdout-0
+
+exec cue refactor imports k8s.io curated.example/k8s.io
+cmp x.cue x.cue-1
+exec cue mod tidy
+
+exec cue export
+cmp stdout want-stdout-1
+
+-- want-stdout-0 --
+{
+    "self": {
+        "foo": "cue.mod/pkg/k8s.io/something/foo"
+    }
+}
+-- want-stdout-1 --
+{
+    "self": {
+        "foo": "curated.example/k8s.io/something/foo_v0.0.1"
+    }
+}
+-- x.cue --
+package x
+
+import (
+	"k8s.io/something/foo"
+)
+
+self: {
+	"foo": foo.self
+}
+-- x.cue-1 --
+package x
+
+import (
+	"curated.example/k8s.io/something/foo"
+)
+
+self: {
+	"foo": foo.self
+}
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.9.0-alpha.0"
+-- cue.mod/pkg/k8s.io/something/foo/foo.cue --
+package foo
+
+self: "cue.mod/pkg/k8s.io/something/foo"
+
+-- _registry/curated.example_k8s.io_something_v0.0.1/cue.mod/module.cue --
+module: "curated.example/k8s.io/something@v0"
+language: version: "v0.8.0"
+
+-- _registry/curated.example_k8s.io_something_v0.0.1/foo/foo.cue --
+package foo
+
+self: "curated.example/k8s.io/something/foo_v0.0.1"

@@ -1,0 +1,170 @@
+# Check that the identifier remains the same by default
+# but can be updated with --ident and --update-ident.
+
+# Sanity check the initial output:
+exec cue export
+cmp stdout want-export-x-0
+exec cue export ./y
+cmp stdout want-export-y-0
+
+exec cue refactor imports example.com/foo@v3
+cmp x.cue x.cue-1
+cmp y/y.cue y/y.cue-1
+
+# Providing the --all-major flag causes the remaining
+# imports to be changed too
+exec cue refactor imports --all-major example.com/foo@v3
+cmp x.cue x.cue-2
+cmp y/y.cue y/y.cue-2
+
+exec cue mod tidy
+exec cue export
+cmp stdout want-export-x-2
+exec cue export ./y
+cmp stdout want-export-y-2
+
+-- want-export-x-0 --
+{
+    "self": {
+        "foo": "example.com/foo@v0.0.1"
+    }
+}
+-- want-export-y-0 --
+{
+    "self": {
+        "foov2": "example.com/foo@v2.0.1",
+        "foo": "example.com/foo@v0.0.1"
+    }
+}
+-- want-export-x-1 --
+{
+    "self": {
+        "foo": "example.com/foo@v3.0.1"
+    }
+}
+-- want-export-y-1 --
+{
+    "self": {
+        "foov2": "example.com/foo@v2.0.1",
+        "foo": "example.com/foo@v3.0.1"
+    }
+}
+-- want-export-x-2 --
+{
+    "self": {
+        "foo": "example.com/foo@v3.0.1"
+    }
+}
+-- want-export-y-2 --
+{
+    "self": {
+        "foov2": "example.com/foo@v3.0.1",
+        "foo": "example.com/foo@v3.0.1"
+    }
+}
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.9.0-alpha.0"
+deps: "example.com@v0": {
+	default: true
+	v: "v0.0.1"
+}
+deps: "example.com@v2": {
+	v: "v2.0.1"
+}
+-- x.cue --
+package x
+
+import "example.com/foo"
+
+self: {
+	"foo": foo.self
+}
+-- x.cue-1 --
+package x
+
+import "example.com/foo@v3"
+
+self: {
+	"foo": foo.self
+}
+-- x.cue-2 --
+package x
+
+import "example.com/foo@v3"
+
+self: {
+	"foo": foo.self
+}
+-- y/y.cue --
+package y
+
+import (
+	// This should not be changed from v2 initially because
+	// only v0 (the default major version) should be updated.
+	foov2 "example.com/foo@v2"
+
+	// But this should
+	"example.com/foo@v0"
+)
+
+self: {
+	"foov2": foov2.self
+	"foo": foo.self
+}
+-- y/y.cue-1 --
+package y
+
+import (
+	// This should not be changed from v2 initially because
+	// only v0 (the default major version) should be updated.
+	foov2 "example.com/foo@v2"
+
+	// But this should
+	"example.com/foo@v3"
+)
+
+self: {
+	"foov2": foov2.self
+	"foo":   foo.self
+}
+-- y/y.cue-2 --
+package y
+
+import (
+	// This should not be changed from v2 initially because
+	// only v0 (the default major version) should be updated.
+	foov2 "example.com/foo@v3"
+
+	// But this should
+	"example.com/foo@v3"
+)
+
+self: {
+	"foov2": foov2.self
+	"foo":   foo.self
+}
+-- _registry/example.com_v0.0.1/cue.mod/module.cue --
+module: "example.com@v0"
+language: version: "v0.8.0"
+
+-- _registry/example.com_v0.0.1/foo/x.cue --
+package foo
+
+self: "example.com/foo@v0.0.1"
+-- _registry/example.com_v2.0.1/cue.mod/module.cue --
+module: "example.com@v2"
+language: version: "v0.8.0"
+
+-- _registry/example.com_v2.0.1/foo/x.cue --
+package foo
+
+self: "example.com/foo@v2.0.1"
+-- _registry/example.com_v3.0.1/cue.mod/module.cue --
+module: "example.com@v3"
+language: version: "v0.8.0"
+
+-- _registry/example.com_v3.0.1/foo/x.cue --
+package foo
+
+self: "example.com/foo@v3.0.1"

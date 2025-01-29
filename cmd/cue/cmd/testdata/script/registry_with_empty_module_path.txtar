@@ -1,9 +1,5 @@
-exec cue export x.cue
-cmp stdout want-stdout
--- want-stdout --
-{
-    "a": 1
-}
+! exec cue export x.cue
+stderr 'empty module path in .*module\.cue'
 -- cue.mod/module.cue --
 module: ""
 language: version: "v0.8.0"

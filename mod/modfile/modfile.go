@@ -462,9 +462,10 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 		}
 	}
 	var versions []module.Version
-	// The main module is always the default for its own major version.
-	defaultMajorVersions := map[string]string{
-		mainPath: mainMajor,
+	defaultMajorVersions := make(map[string]string)
+	if mainPath != "" {
+		// The main module is always the default for its own major version.
+		defaultMajorVersions[mainPath] = mainMajor
 	}
 	// Check that major versions match dependency versions.
 	for m, dep := range mf.Deps {

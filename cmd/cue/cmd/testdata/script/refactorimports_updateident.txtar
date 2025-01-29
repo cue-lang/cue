@@ -1,0 +1,82 @@
+# Check that the identifier remains the same by default
+# but can be updated with --ident and --update-ident.
+
+# Sanity check the initial output:
+exec cue export
+cmp stdout want-stdout-0
+
+exec cue refactor imports --update-ident example.com/foo example.com/bar
+cmp x.cue x.cue-1
+exec cue mod tidy
+exec cue export
+cmp stdout want-stdout-1
+
+-- want-stdout-0 --
+{
+    "self": {
+        "foo": "example.com/foo@v0.0.1",
+        "inner": "example.com/foo/inner@v0.0.1"
+    }
+}
+-- want-stdout-1 --
+{
+    "self": {
+        "foo": "example.com/bar@v0.0.1",
+        "inner": "example.com/bar/inner@v0.0.1"
+    }
+}
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.9.0-alpha.0"
+deps: "example.com/foo": {
+	default: true
+	v: "v0.0.1"
+}
+-- x.cue --
+package x
+
+import (
+	"example.com/foo"
+	"example.com/foo/inner"
+)
+
+self: {
+	"foo": foo.self
+	"inner": inner.self
+}
+
+-- x.cue-1 --
+package x
+
+import (
+	"example.com/bar"
+	"example.com/bar/inner"
+)
+
+self: {
+	"foo":   bar.self
+	"inner": inner.self
+}
+-- _registry/example.com_foo_v0.0.1/cue.mod/module.cue --
+module: "example.com/foo@v0"
+language: version: "v0.8.0"
+-- _registry/example.com_foo_v0.0.1/x.cue --
+package foo
+
+self: "example.com/foo@v0.0.1"
+-- _registry/example.com_foo_v0.0.1/inner/x.cue --
+package inner
+
+self: "example.com/foo/inner@v0.0.1"
+
+-- _registry/example.com_bar_v0.0.1/cue.mod/module.cue --
+module: "example.com/bar@v0"
+language: version: "v0.8.0"
+-- _registry/example.com_bar_v0.0.1/x.cue --
+package bar
+
+self: "example.com/bar@v0.0.1"
+-- _registry/example.com_bar_v0.0.1/inner/x.cue --
+package inner
+
+self: "example.com/bar/inner@v0.0.1"

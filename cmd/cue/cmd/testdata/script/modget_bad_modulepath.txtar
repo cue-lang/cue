@@ -2,9 +2,7 @@
 # path includes the path to the offending file (issue 3259)
 
 ! exec cue mod get example.com/foo
-cmp stderr want-stderr
--- want-stderr --
-cue.mod/module.cue: invalid module path: path "" has no major version
+stderr 'empty module path in.*module.cue'
 -- cue.mod/module.cue --
 module: ""
 language: version: "v0.9.2"

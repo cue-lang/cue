@@ -451,6 +451,8 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 		}
 		// There's no main module major version: default to v0.
 		mainMajor = "v0"
+	} else {
+		return nil, fmt.Errorf("empty module path in %q", filename)
 	}
 	if mf.Language != nil {
 		vers := mf.Language.Version
@@ -462,9 +464,10 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 		}
 	}
 	var versions []module.Version
-	// The main module is always the default for its own major version.
-	defaultMajorVersions := map[string]string{
-		mainPath: mainMajor,
+	defaultMajorVersions := make(map[string]string)
+	if mainPath != "" {
+		// The main module is always the default for its own major version.
+		defaultMajorVersions[mainPath] = mainMajor
 	}
 	// Check that major versions match dependency versions.
 	for m, dep := range mf.Deps {

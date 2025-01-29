@@ -229,6 +229,7 @@ func New(args []string) (*Command, error) {
 		newImportCmd(c),
 		newLoginCmd(c),
 		newModCmd(c),
+		newRefactorCmd(c),
 		newTrimCmd(c),
 		newVersionCmd(c),
 		newVetCmd(c),

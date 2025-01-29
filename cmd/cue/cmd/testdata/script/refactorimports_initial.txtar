@@ -1,0 +1,95 @@
+# Test the basic functionality of cue refactor imports
+
+# Sanity check the initial output:
+exec cue export
+cmp stdout want-stdout-0
+
+exec cue refactor imports example.com other.com
+cmp x.cue x.cue-1
+exec cue mod tidy
+exec cat cue.mod/module.cue
+
+exec cue export
+cmp stdout want-stdout-1
+
+-- want-stdout-0 --
+{
+    "self": {
+        "top": "example.com@v0.2.0:top",
+        "inner": "example.com/inner@v0.2.0"
+    }
+}
+-- want-stdout-1 --
+{
+    "self": {
+        "top": "other.com@v0.2.0:top",
+        "inner": "other.com/inner@v0.2.0"
+    }
+}
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.9.0-alpha.0"
+deps: "example.com": {
+	default: true
+	v: "v0.0.1"
+}
+-- x.cue --
+// foo
+package x
+
+// comment group
+
+import (
+	// another comment
+	"example.com:top"
+	"example.com/inner"
+)
+
+self: {
+	"top": top.self
+	"inner": inner.self
+}
+-- unchanged.cue --
+package x
+
+-- x.cue-1 --
+// foo
+package x
+
+// comment group
+
+import (
+	// another comment
+	"other.com:top"
+	"other.com/inner"
+)
+
+self: {
+	"top":   top.self
+	"inner": inner.self
+}
+-- _registry/example.com_v0.0.1/cue.mod/module.cue --
+module: "example.com@v0"
+language: version: "v0.8.0"
+
+-- _registry/example.com_v0.0.1/top.cue --
+package top
+
+self: "example.com@v0.2.0:top"
+-- _registry/example.com_v0.0.1/inner/inner.cue --
+package inner
+
+self: "example.com/inner@v0.2.0"
+
+-- _registry/other.com_v0.2.0/cue.mod/module.cue --
+module: "other.com@v0"
+language: version: "v0.8.0"
+
+-- _registry/other.com_v0.2.0/top.cue --
+package top
+
+self: "other.com@v0.2.0:top"
+-- _registry/other.com_v0.2.0/inner/inner.cue --
+package inner
+
+self: "other.com/inner@v0.2.0"

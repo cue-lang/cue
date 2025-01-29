@@ -574,8 +574,6 @@ var NoShareSentinel = &Bottom{
 }
 
 func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInfo) {
-	n.updateCyclicStatusV3(id)
-
 	ctx := n.ctx
 
 	switch x := v.(type) {
@@ -599,6 +597,8 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 		}
 
 		if !x.IsData() {
+			n.updateCyclicStatusV3(id)
+
 			c := MakeConjunct(env, x, id)
 			n.scheduleVertexConjuncts(c, x, id)
 			return
@@ -656,6 +656,8 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 
 	switch x := v.(type) {
 	case *Disjunction:
+		n.updateCyclicStatusV3(id)
+
 		// TODO(perf): reuse envDisjunct values so that we can also reuse the
 		// disjunct slice.
 		id := id
@@ -687,13 +689,19 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 		}
 
 	case *Top:
+		n.updateCyclicStatusV3(id)
+
 		n.hasTop = true
 		id.cc.hasTop = true
 
 	case *BasicType:
+		n.updateCyclicStatusV3(id)
+
 		id.cc.hasNonTop = true
 
 	case *BoundValue:
+		n.updateCyclicStatusV3(id)
+
 		id.cc.hasNonTop = true
 		switch x.Op {
 		case LessThanOp, LessEqualOp:
@@ -784,6 +792,8 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 	// handled above.
 
 	case Value: // *NullLit, *BoolLit, *NumLit, *StringLit, *BytesLit, *Builtin
+		n.updateCyclicStatusV3(id)
+
 		if y := n.scalar; y != nil {
 			if b, ok := BinOp(ctx, EqualOp, x, y).(*Bool); !ok || !b.B {
 				n.reportConflict(x, y, x.Kind(), y.Kind(), n.scalarID, id)

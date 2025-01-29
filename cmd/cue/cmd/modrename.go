@@ -206,7 +206,7 @@ func pkgIsUnderneath(pkg1, pkg2 string) bool {
 }
 
 func splitModulePath(path string) (mpath string, mvers string, err error) {
-	mpath, mvers, ok := module.SplitPathVersion(path)
+	mpath, mvers, ok := ast.SplitPackageVersion(path)
 	if ok {
 		if semver.Major(mvers) != mvers {
 			return "", "", fmt.Errorf("module path %q should contain the major version only", path)
@@ -216,7 +216,6 @@ func splitModulePath(path string) (mpath string, mvers string, err error) {
 		}
 		return mpath, mvers, nil
 	}
-	mpath = path
 	if err := module.CheckPathWithoutVersion(mpath); err != nil {
 		return "", "", fmt.Errorf("invalid module path %q: %v", path, err)
 	}

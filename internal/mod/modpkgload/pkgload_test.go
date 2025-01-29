@@ -14,6 +14,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"golang.org/x/tools/txtar"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/mod/modimports"
 	"cuelang.org/go/internal/mod/modrequirements"
 	"cuelang.org/go/mod/modfile"
@@ -126,7 +127,7 @@ func (r testRegistry) Requirements(ctx context.Context, m module.Version) ([]mod
 }
 
 func (r testRegistry) modpath(m module.Version) string {
-	mpath, _, _ := module.SplitPathVersion(m.Path())
+	mpath, _, _ := ast.SplitPackageVersion(m.Path())
 	return path.Join("_registry", strings.ReplaceAll(mpath, "/", "_")+"_"+m.Version())
 }
 

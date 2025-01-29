@@ -21,6 +21,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
@@ -590,10 +591,7 @@ func cutModulePrefix(p module.ImportPath, mod string) (module.ImportPath, bool) 
 	if mod == "" {
 		return p, true
 	}
-	modPath, modVers, ok := module.SplitPathVersion(mod)
-	if !ok {
-		modPath = mod
-	}
+	modPath, modVers, _ := ast.SplitPackageVersion(mod)
 	if !strings.HasPrefix(p.Path, modPath) {
 		return module.ImportPath{}, false
 	}

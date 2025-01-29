@@ -99,7 +99,6 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
-	"cuelang.org/go/mod/module"
 
 	// Generated protobuf CUE may use builtins. Ensure that these can always be
 	// found, even if the user does not use cue/load or another package that
@@ -189,12 +188,7 @@ func NewExtractor(c *Config) *Extractor {
 	// TODO(rogpeppe) the Go package path might itself include a major
 	// version, so we should probably consider that too.
 	if c.Module != "" {
-		var ok bool
-		modulePath, _, ok = module.SplitPathVersion(c.Module)
-		if !ok {
-			modulePath = c.Module
-
-		}
+		modulePath, _, _ = ast.SplitPackageVersion(c.Module)
 	}
 	cwd, _ := os.Getwd()
 	b := &Extractor{

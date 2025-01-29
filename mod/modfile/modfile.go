@@ -90,7 +90,7 @@ func (f *File) QualifiedModule() string {
 // ModulePath returns the path part of the module without
 // its major version suffix.
 func (f *File) ModulePath() string {
-	path, _, _ := module.SplitPathVersion(f.QualifiedModule())
+	path, _, _ := ast.SplitPackageVersion(f.QualifiedModule())
 	return path
 }
 
@@ -100,7 +100,7 @@ func (f *File) ModulePath() string {
 // is used or if Module is explicitly set to an empty string),
 // it returns the empty string.
 func (f *File) MajorVersion() string {
-	_, vers, _ := module.SplitPathVersion(f.QualifiedModule())
+	_, vers, _ := ast.SplitPackageVersion(f.QualifiedModule())
 	return vers
 }
 
@@ -442,12 +442,12 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 	if err != nil {
 		return nil, err
 	}
-	mainPath, mainMajor, ok := module.SplitPathVersion(mf.Module)
+	mainPath, mainMajor, ok := ast.SplitPackageVersion(mf.Module)
 	if ok {
 		if semver.Major(mainMajor) != mainMajor {
 			return nil, fmt.Errorf("module path %s in %q should contain the major version only", mf.Module, filename)
 		}
-	} else if mainPath = mf.Module; mainPath != "" {
+	} else if mainPath != "" {
 		if err := module.CheckPathWithoutVersion(mainPath); err != nil {
 			return nil, fmt.Errorf("module path %q in %q is not valid: %v", mainPath, filename, err)
 		}

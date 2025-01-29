@@ -2100,8 +2100,6 @@ func TestUnify(t *testing.T) {
 		pathB string
 		pathC string
 		want  string
-
-		skipv2 bool
 	}
 	testCases := []testCase{{
 		value: `4`,
@@ -2172,8 +2170,6 @@ func TestUnify(t *testing.T) {
 		pathB: b,
 		want:  `{"obj":{"initialField":"foo","extraField":"bar"}}`,
 	}, {
-		skipv2: true,
-
 		value: `
 			a: obj: initialField: "foo"
 			#x: obj?: _
@@ -2200,10 +2196,6 @@ func TestUnify(t *testing.T) {
 	// TODO(tdtest): use cuetest.Run when supported.
 	matrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
 		tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
-			if tc.skipv2 {
-				m.TODO_V2(t)
-			}
-
 			v := getValue(m, tc.value)
 			x := v.LookupPath(cue.ParsePath(tc.pathA))
 			y := v.LookupPath(cue.ParsePath(tc.pathB))

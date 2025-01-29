@@ -8,6 +8,7 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/mod/mvs"
 	"cuelang.org/go/internal/mod/semver"
 	"cuelang.org/go/internal/par"
@@ -128,7 +129,7 @@ func (rs *Requirements) initDefaultMajorVersions(defaultMajorVersions map[string
 	rs.origDefaultMajorVersions = defaultMajorVersions
 	rs.defaultMajorVersions = make(map[string]majorVersionDefault)
 	for mpath, v := range defaultMajorVersions {
-		if _, _, ok := module.SplitPathVersion(mpath); ok {
+		if _, _, ok := ast.SplitPackageVersion(mpath); ok {
 			panic(fmt.Sprintf("NewRequirements called with major version in defaultMajorVersions %q", mpath))
 		}
 		if semver.Major(v) != v {

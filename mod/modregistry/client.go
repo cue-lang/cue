@@ -37,6 +37,7 @@ import (
 	specs "github.com/opencontainers/image-spec/specs-go"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
 	"cuelang.org/go/mod/modzip"
@@ -175,10 +176,7 @@ func (c *Client) GetModuleWithManifest(m module.Version, contents []byte, mediaT
 // If m has a major version suffix, only versions with that major version will
 // be returned.
 func (c *Client) ModuleVersions(ctx context.Context, m string) (_req []string, _err0 error) {
-	mpath, major, hasMajor := module.SplitPathVersion(m)
-	if !hasMajor {
-		mpath = m
-	}
+	mpath, major, hasMajor := ast.SplitPackageVersion(m)
 	loc, err := c.resolver.ResolveToRegistry(mpath, "")
 	if err != nil {
 		if errors.Is(err, ErrRegistryNotFound) {

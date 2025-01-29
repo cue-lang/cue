@@ -131,9 +131,22 @@ func Unmarshal(b []byte) (ast.Expr, error) {
 // Validate validates JSON and confirms it matches the constraints
 // specified by v.
 func Validate(b []byte, v pkg.Schema) (bool, error) {
-	err := cuejson.Validate(b, v)
-	if err != nil {
+	if !json.Valid(b) {
+		return false, fmt.Errorf("json: invalid JSON")
+	}
+	v2 := v.Context().CompileBytes(b, cue.Filename("json.Validate"))
+	if err := v2.Err(); err != nil {
 		return false, err
 	}
+
+	v = v.Unify(v2)
+	if err := v.Err(); err != nil {
+		return false, err
+	}
+
+	if err := v.Validate(cue.Final()); err != nil {
+		return false, err
+	}
+
 	return true, nil
 }

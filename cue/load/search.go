@@ -590,10 +590,7 @@ func cutModulePrefix(p module.ImportPath, mod string) (module.ImportPath, bool) 
 	if mod == "" {
 		return p, true
 	}
-	modPath, modVers, ok := module.SplitPathVersion(mod)
-	if !ok {
-		modPath = mod
-	}
+	modPath, modVers, _ := module.SplitPathVersion(mod)
 	if !strings.HasPrefix(p.Path, modPath) {
 		return module.ImportPath{}, false
 	}

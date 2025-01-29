@@ -47,28 +47,21 @@ type ImportInfo struct {
 }
 
 // ParseImportSpec returns the name and full path of an ImportSpec.
-func ParseImportSpec(spec *ast.ImportSpec) (info ImportInfo, err error) {
+func ParseImportSpec(spec *ast.ImportSpec) (ImportInfo, error) {
 	str, err := strconv.Unquote(spec.Path.Value)
 	if err != nil {
-		return info, err
+		return ImportInfo{}, err
 	}
-
-	info.ID = str
-
-	if p := strings.LastIndexByte(str, ':'); p > 0 {
-		info.Dir = str[:p]
-		info.PkgName = str[p+1:]
-	} else {
-		info.Dir = str
-		info.PkgName = path.Base(str)
+	ip := ParseImportPath(str)
+	info := ImportInfo{
+		ID:      str,
+		Ident:   ip.Qualifier,
+		PkgName: ip.Qualifier,
+		Dir:     ip.Unqualified().String(),
 	}
-
 	if spec.Name != nil {
 		info.Ident = spec.Name.Name
-	} else {
-		info.Ident = info.PkgName
 	}
-
 	return info, nil
 }
 

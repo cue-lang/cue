@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ca928ef_44fab7fe",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_issue2060.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-29T15:08:46Z",
+      "side": 1,
+      "message": "This is what causes the change below - it\u0027s the embedding, and as the docs on toposort say, we\u0027re often not given enough information to correctly order fields that originate from embeddings. If we changed `{{BindingsMax: 0}}` to `{BindingsMax: 0}` (and similar change to line 117) then the change below goes away.",
+      "revId": "e461582927d79cf85f583d9872cfb5b163c2f7ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89b90661_6e516338",
+        "filename": "internal/core/toposort/testdata/issue3710.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-29T15:08:46Z",
+      "side": 1,
+      "message": "toposort tests run with the Matrix, so this *is* testing both evalv2 and evalv3.",
+      "revId": "e461582927d79cf85f583d9872cfb5b163c2f7ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a16af91c_cdba521c",
+        "filename": "internal/core/toposort/testdata/t.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 369,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-29T15:08:46Z",
+      "side": 1,
+      "message": "These changes are because behaviour of toposort under evalv2 has been brought closer to that under evalv3.",
+      "revId": "e461582927d79cf85f583d9872cfb5b163c2f7ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7eaefd0_34c6bb4b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-29T15:23:58Z",
+      "side": 1,
+      "message": "\u003e toposort code is the same for evalv2 and evalv3\nYes it is.\nThe Decl-in-StructInfo was something I added for toposort, and had to work out how to get it populated by both evalv2 and evalv3. I\u0027m not entirely sure what led me to believe that it needed to be the recursive search for evalv2 and not evalv3, but given the small size of the changes that are a consequence of removing the recursive search, whatever reasoning I had at the time seems very likely wrong.\nDoes this answer your question?",
+      "parentUuid": "ca4ea33b_fea55ed3",
+      "revId": "4d200be843ec2789a5abbc55730806191a8b0f60",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "20426112_5a397446",

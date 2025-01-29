@@ -32,7 +32,11 @@ func TestResolve(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		a := t.Instance()
+		// Use RawInstances because we want to allow imports
+		// without actually providing any dependencies. In general,
+		// Resolve is used just after parsing anyway, so lower level
+		// is more appropriate.
+		a := t.RawInstances()[0]
 
 		for _, f := range a.Files {
 			if filepath.Ext(f.Filename) != ".cue" {

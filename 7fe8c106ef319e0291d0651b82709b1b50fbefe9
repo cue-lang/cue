@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e28fef2_46cee7e3",
+        "filename": "internal/core/adt/call.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-30T11:09:54Z",
+      "side": 1,
+      "message": "Are these methods (Value and NumParams) really needed? Why not just make the args field public?",
+      "revId": "7fe8c106ef319e0291d0651b82709b1b50fbefe9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

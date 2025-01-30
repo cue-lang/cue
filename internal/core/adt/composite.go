@@ -452,6 +452,9 @@ const (
 	// its conjuncts need to be processed to find out. This happens when an arc
 	// is provisionally added as part of a comprehension, but when this
 	// comprehension has not yet yielded any results.
+	//
+	// TODO: make this a separate state so that we can track which arcs still
+	// have unresolved comprehensions.
 	ArcPending
 
 	// ArcNotPresent indicates that this arc is not present and, unlike

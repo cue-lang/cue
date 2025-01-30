@@ -246,7 +246,7 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, flags cued
 // TestX is for debugging. Do not delete.
 func TestX(t *testing.T) {
 	adt.DebugDeps = true
-	// adt.OpenGraphs = true
+	adt.OpenGraphs = true
 
 	flags := cuedebug.Config{
 		Sharing:    true, // Uncomment to turn sharing off.

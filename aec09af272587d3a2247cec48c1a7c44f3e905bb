@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "665f31d1_7943abf2",
+        "filename": "mod/modfile/modfile_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-30T10:55:54Z",
+      "side": 1,
+      "message": "even now I already forget why we decided it\u0027s OK for a non-legacy module to declare an empty module path. can you write a short comment about it here, for posterity?\n\na `cue mod init` now creates `module: \"cue.example\"`, and we also have https://github.com/cue-lang/cue/issues/3625, so I honestly forget why we decided it\u0027s still OK to allow empty paths in non-legacy modules. I would imagine that `cue mod fix` should replace/rename an empty module path.",
+      "revId": "aec09af272587d3a2247cec48c1a7c44f3e905bb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

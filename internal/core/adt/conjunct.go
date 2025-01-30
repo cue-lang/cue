@@ -638,6 +638,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 				c := MakeConjunct(nil, a, id)
 				n.insertArc(a.Label, a.ArcType, c, id, true)
 			}
+			n.node.Structs = append(n.node.Structs, x.Structs...)
 
 		case Value:
 			n.insertValueConjunct(env, v, id)

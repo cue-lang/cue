@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18700ebc_dc07e1bd",
+        "filename": "cue/ast/astutil/importpath.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-30T11:11:35Z",
+      "side": 1,
+      "message": "!!! I imagine this was meant to be internal/mod/semver, i.e. our version of the package. We might need to add a script or some sort of static analysis to forbid importing packages like this one.",
+      "revId": "75e1c2067fefa824837dcbd1e249dc011182cb41",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb149cfb_8a19004a",
+        "filename": "cue/ast/astutil/importpath.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-30T11:11:35Z",
+      "side": 1,
+      "message": "`astutil.ParseImportPath` and `astutil.ImportPath` don\u0027t seem right in terms of where these APIs should live. There is nothing \"util\" about them; they are pretty important building blocks for lots of other packages.\n\nI sort of agree that `cue/ast/astutil` should not import `mod/module` though. Perhaps we should introduce a tiny package like `mod/path`, `cue/imppath`, or `cue/pkgpath`. I\u0027d personally opt for `mod/path` given that we import `internal/mod/semver` here. But `cue/whatever` also seems OK; just like `cue/literal` can be used to work with `cue/ast.BasicLit`, `cue/whatever` can be used to work with `cue/ast.ImportSpec`.\n\nAn alternative is to promote these to `cue/ast` directly. Technically unnecessary, because they are not part of the syntax tree types, but perhaps OK if we can\u0027t figure out a good package name or path.",
+      "revId": "75e1c2067fefa824837dcbd1e249dc011182cb41",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

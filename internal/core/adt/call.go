@@ -29,6 +29,10 @@ type CallContext struct {
 	isValidator bool
 }
 
+func (c *CallContext) OpContext() *OpContext {
+	return c.ctx
+}
+
 func (c *CallContext) Pos() token.Pos {
 	var src ast.Node
 	switch {
@@ -56,4 +60,18 @@ func (c *CallContext) AddPositions(err *ValueError) {
 	for _, v := range c.args {
 		err.AddPosition(v)
 	}
+}
+
+// Args return the pre-evaluated arguments. This function is only used for
+// transitioning and will be removed at some point. Use [CallContext.Value]
+// instead.
+func (c *CallContext) Args() []Value {
+	return c.args
+}
+
+// Exprs return the unevaluated argument expressions. This function is only used
+// for transitioning and will be removed at some point. Use [CallContext.Expr]
+// instead. (TODO)
+func (c *CallContext) Exprs() []Expr {
+	return c.call.Args
 }

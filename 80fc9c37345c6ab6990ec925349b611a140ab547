@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be9d2f05_abf41559",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-30T10:53:10Z",
+      "side": 1,
+      "message": "but `import \"foo.com/bar@v0.2.3:xxx\"` in a CUE file should fail, yes? do we have a test for that?\n\nI assume this should only work in the CLI, like `cue export foo.com/bar@v0.2.3:xxx`?",
+      "revId": "80fc9c37345c6ab6990ec925349b611a140ab547",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

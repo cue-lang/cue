@@ -1531,13 +1531,17 @@ func (x *CallExpr) Source() ast.Node {
 }
 
 func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
+	call := &CallContext{
+		ctx:  c,
+		call: x,
+	}
+
 	fun := c.value(x.Fun, require(partial, concreteKnown))
-	var b *Builtin
 	switch f := fun.(type) {
 	case *Builtin:
-		b = f
+		call.builtin = f
 		if f.RawFunc != nil {
-			if !b.checkArgs(c, pos(x), len(x.Args)) {
+			if !call.builtin.checkArgs(c, pos(x), len(x.Args)) {
 				return nil
 			}
 			return f.RawFunc(c, x.Args)
@@ -1556,7 +1560,7 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 			return &v
 
 		default:
-			b = f.Builtin
+			call.builtin = f.Builtin
 		}
 
 	default:
@@ -1572,7 +1576,7 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 		runMode := state.runMode()
 		cond := state.conditions()
 		var expr Value
-		if b.NonConcrete {
+		if call.builtin.NonConcrete {
 			state = combineMode(cond, runMode).withVertexStatus(state.vertexStatus())
 			expr = c.evalState(a, state)
 		} else {
@@ -1610,10 +1614,11 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 	if c.HasErr() {
 		return nil
 	}
-	if b.IsValidator(len(args)) {
-		return &BuiltinValidator{x, b, args}
+	if call.builtin.IsValidator(len(args)) {
+		return &BuiltinValidator{x, call.builtin, args}
 	}
-	result := b.call(c, pos(x), false, args)
+	call.args = args
+	result := call.builtin.call(call)
 	if result == nil {
 		return nil
 	}
@@ -1721,15 +1726,18 @@ func (x *Builtin) checkArgs(c *OpContext, p token.Pos, numArgs int) bool {
 	return true
 }
 
-func (x *Builtin) call(c *OpContext, p token.Pos, validate bool, args []Value) Expr {
+func (x *Builtin) call(call *CallContext) Expr {
+	c := call.ctx
+	p := call.Pos()
+
 	fun := x // right now always x.
-	if !x.checkArgs(c, p, len(args)) {
+	if !x.checkArgs(c, p, len(call.args)) {
 		return nil
 	}
-	for i := len(args); i < len(x.Params); i++ {
-		args = append(args, x.Params[i].Default())
+	for i := len(call.args); i < len(x.Params); i++ {
+		call.args = append(call.args, x.Params[i].Default())
 	}
-	for i, a := range args {
+	for i, a := range call.args {
 		if x.Params[i].Kind() == BottomKind {
 			continue
 		}
@@ -1738,7 +1746,7 @@ func (x *Builtin) call(c *OpContext, p token.Pos, validate bool, args []Value) E
 		}
 		if k := kind(a); x.Params[i].Kind()&k == BottomKind {
 			code := EvalError
-			b, _ := args[i].(*Bottom)
+			b, _ := call.args[i].(*Bottom)
 			if b != nil {
 				code = b.Code
 			}
@@ -1759,12 +1767,13 @@ func (x *Builtin) call(c *OpContext, p token.Pos, validate bool, args []Value) E
 					a, v, i+1, fun)
 				return nil
 			}
-			args[i] = n
+			call.args[i] = n
 		}
 	}
+
 	saved := c.IsValidator
-	c.IsValidator = validate
-	ret := x.Func(c, args)
+	c.IsValidator = call.isValidator
+	ret := x.Func(c, call.args)
 	c.IsValidator = saved
 
 	return ret
@@ -1805,14 +1814,27 @@ func (x *BuiltinValidator) validate(c *OpContext, v Value) *Bottom {
 	args[0] = v
 	copy(args[1:], x.Args)
 
-	return validateWithBuiltin(c, x.Pos(), x.Builtin, args)
+	call := &CallContext{
+		ctx:         c,
+		call:        x.Src,
+		builtin:     x.Builtin,
+		args:        args,
+		isValidator: true,
+	}
+
+	return validateWithBuiltin(call)
 }
 
-func validateWithBuiltin(c *OpContext, src token.Pos, b *Builtin, args []Value) *Bottom {
+func validateWithBuiltin(call *CallContext) *Bottom {
 	var severeness ErrorCode
 	var err errors.Error
 
-	res := b.call(c, src, true, args)
+	c := call.ctx
+	b := call.builtin
+	src := call.Pos()
+	arg0 := call.Value(0)
+
+	res := call.builtin.call(call)
 	switch v := res.(type) {
 	case nil:
 		return nil
@@ -1835,7 +1857,7 @@ func validateWithBuiltin(c *OpContext, src token.Pos, b *Builtin, args []Value) 
 
 	// If the validator returns an error and we already had an error, just
 	// return the original error.
-	if b, ok := Unwrap(args[0]).(*Bottom); ok {
+	if b, ok := Unwrap(call.Value(0)).(*Bottom); ok {
 		return b
 	}
 	// failed:
@@ -1844,9 +1866,10 @@ func validateWithBuiltin(c *OpContext, src token.Pos, b *Builtin, args []Value) 
 
 	// Note: when the builtin accepts non-concrete arguments, omit them because
 	// they can easily be very large.
-	if !b.NonConcrete && len(args) > 1 {
+	if !b.NonConcrete && call.NumParams() > 1 { // use NumArgs instead
 		buf.WriteString("(")
-		for i, a := range args[1:] {
+		// TODO: use accessor instead of call.arg
+		for i, a := range call.args[1:] {
 			if i > 0 {
 				_, _ = buf.WriteString(", ")
 			}
@@ -1855,11 +1878,9 @@ func validateWithBuiltin(c *OpContext, src token.Pos, b *Builtin, args []Value) 
 		buf.WriteString(")")
 	}
 
-	vErr := c.NewPosf(src, "invalid value %s (does not satisfy %s)", args[0], buf.String())
+	vErr := c.NewPosf(src, "invalid value %s (does not satisfy %s)", arg0, buf.String())
 
-	for _, v := range args {
-		vErr.AddPosition(v)
-	}
+	call.AddPositions(vErr)
 
 	return &Bottom{
 		Code: severeness,

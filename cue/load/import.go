@@ -24,6 +24,7 @@ import (
 	"slices"
 	"strings"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
@@ -376,7 +377,7 @@ func importPathFromAbsDir(c *Config, absDir string, origPath string) (importPath
 	case c.Module == "":
 		return "", fmt.Errorf("cannot determine import path for %q (no module)", origPath)
 	default:
-		impPath := module.ParseImportPath(c.Module)
+		impPath := ast.ParseImportPath(c.Module)
 		impPath.Path += pkg
 		impPath.Qualifier = ""
 		pkg = impPath.String()
@@ -390,7 +391,7 @@ func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
 	i.Err = errors.Append(i.Err, err)
 	i.Dir = dir
 
-	parts := module.ParseImportPath(string(p))
+	parts := ast.ParseImportPath(string(p))
 	i.PkgName = parts.Qualifier
 	if i.PkgName == "" {
 		i.Err = errors.Append(i.Err, l.errPkgf([]token.Pos{pos}, "cannot determine package name for %q; set it explicitly with ':'", p))
@@ -433,7 +434,7 @@ func (l *loader) absDirFromImportPath1(pos token.Pos, p importPath) (absDir stri
 		return "", "", fmt.Errorf("imports are unavailable because there is no cue.mod/module.cue file")
 	}
 	// Extract the package name.
-	parts := module.ParseImportPath(string(p))
+	parts := ast.ParseImportPath(string(p))
 	unqualified := parts.Unqualified().String()
 	// TODO predicate registry-aware lookup on module.cue-declared CUE version?
 

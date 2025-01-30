@@ -27,7 +27,6 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
-	"cuelang.org/go/mod/module"
 )
 
 // Generate produces Go type definitions from exported CUE definitions.
@@ -135,11 +134,11 @@ func Generate(ctx *cue.Context, insts ...*build.Instance) error {
 		// To keep the filename short for common cases, if we are generating a CUE package
 		// whose package name is implied from its import path, omit the package name element.
 		basename := "cue_types_gen.go"
-		ip := module.ParseImportPath(inst.ImportPath)
+		ip := ast.ParseImportPath(inst.ImportPath)
 		ip1 := ip
 		ip1.Qualifier = ""
 		ip1.ExplicitQualifier = false
-		ip1 = module.ParseImportPath(ip1.String())
+		ip1 = ast.ParseImportPath(ip1.String())
 		if ip.Qualifier != ip1.Qualifier {
 			basename = fmt.Sprintf("cue_types_%s_gen.go", inst.PkgName)
 		}
@@ -436,7 +435,7 @@ func (g *generator) emitTypeReference(val cue.Value, optional bool) bool {
 	// Go has no notion of qualified import paths; if a CUE file imports
 	// "foo.com/bar:qualified", we import just "foo.com/bar" on the Go side.
 	// TODO: deal with multiple packages existing in the same directory.
-	unqualifiedPath := module.ParseImportPath(inst.ImportPath).Unqualified().String()
+	unqualifiedPath := ast.ParseImportPath(inst.ImportPath).Unqualified().String()
 
 	var sb strings.Builder
 	if optional && cue.Dereference(val).IncompleteKind() == cue.StructKind {

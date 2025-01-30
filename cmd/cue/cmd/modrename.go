@@ -70,13 +70,13 @@ func runModRename(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	mr.oldModuleQualifier = module.ParseImportPath(mr.oldModulePath).Qualifier
+	mr.oldModuleQualifier = ast.ParseImportPath(mr.oldModulePath).Qualifier
 	mf.Module = args[0]
 	mr.newModulePath, mr.newModuleMajor, err = splitModulePath(mf.Module)
 	if err != nil {
 		return err
 	}
-	mr.newModuleQualifier = module.ParseImportPath(mr.newModulePath).Qualifier
+	mr.newModuleQualifier = ast.ParseImportPath(mr.newModulePath).Qualifier
 
 	// TODO if we're renaming to a module that we currently depend on,
 	// perhaps we should detect that and give an error.
@@ -163,7 +163,7 @@ func (mr *modRenamer) rewriteImport(spec *ast.ImportSpec) (changed bool, err err
 	if err != nil {
 		return false, fmt.Errorf("malformed import path in AST: %v", err)
 	}
-	ip := module.ParseImportPath(importPath)
+	ip := ast.ParseImportPath(importPath)
 	if !pkgIsUnderneath(ip.Path, mr.oldModulePath) {
 		return false, nil
 	}

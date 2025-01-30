@@ -75,7 +75,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 		// of those, which don't.
 		pkgArgs1 := make([]string, 0, len(pkgArgs))
 		for _, p := range pkgArgs {
-			if ip := module.ParseImportPath(p); !ip.ExplicitQualifier {
+			if ip := ast.ParseImportPath(p); !ip.ExplicitQualifier {
 				ip.Qualifier = c.Package
 				p = ip.String()
 			}
@@ -209,7 +209,7 @@ func loadPackages(
 				return nil, fmt.Errorf("invalid import path %q in %s", imp.Path.Value, f.Filename)
 			}
 			// Canonicalize the path.
-			pkgPath = module.ParseImportPath(pkgPath).Canonical().String()
+			pkgPath = ast.ParseImportPath(pkgPath).Canonical().String()
 			pkgPaths[pkgPath] = true
 		}
 	}

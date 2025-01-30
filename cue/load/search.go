@@ -312,7 +312,7 @@ func appendExpandedPackageArg(c *Config, pkgPaths []resolvedPackageArg, p string
 	// in command-line arguments. Handles .\... and so on.
 	p = filepath.ToSlash(p)
 
-	ip := module.ParseImportPath(p)
+	ip := ast.ParseImportPath(p)
 	if ip.Qualifier == "_" {
 		return nil, fmt.Errorf("invalid import path qualifier _ in %q", origp)
 	}
@@ -339,7 +339,7 @@ func appendExpandedPackageArg(c *Config, pkgPaths []resolvedPackageArg, p string
 			if err != nil {
 				return nil, err
 			}
-			ip1 := module.ParseImportPath(string(pkgPath))
+			ip1 := ast.ParseImportPath(string(pkgPath))
 			// Leave ip.Qualifier and ip.ExplicitQualifier intact.
 			ip.Path = ip1.Path
 			ip.Version = ip1.Version
@@ -389,7 +389,7 @@ func appendExpandedPackageArg(c *Config, pkgPaths []resolvedPackageArg, p string
 //  5. if there's more than one package in the directory, it returns a MultiplePackageError.
 //  6. if there are no package files in the directory, it just appends the import path as is, leaving it
 //     to later logic to produce an error in this case.
-func appendExpandedUnqualifiedPackagePath(pkgPaths []resolvedPackageArg, origp string, ip module.ImportPath, pkgQual string, mainModRoot module.SourceLoc, mainModPath string, tg *tagger) (_ []resolvedPackageArg, _err error) {
+func appendExpandedUnqualifiedPackagePath(pkgPaths []resolvedPackageArg, origp string, ip ast.ImportPath, pkgQual string, mainModRoot module.SourceLoc, mainModPath string, tg *tagger) (_ []resolvedPackageArg, _err error) {
 	ipRel, ok := cutModulePrefix(ip, mainModPath)
 	if !ok {
 		// Should never happen.
@@ -493,8 +493,8 @@ func appendExpandedUnqualifiedPackagePath(pkgPaths []resolvedPackageArg, origp s
 // Note:
 // * We know that pattern contains "..."
 // * We know that pattern is relative to the module root
-func appendExpandedWildcardPackagePath(pkgPaths []resolvedPackageArg, pattern module.ImportPath, pkgQual string, mainModRoot module.SourceLoc, mainModPath string, tg *tagger) (_ []resolvedPackageArg, _err error) {
-	modIpath := module.ParseImportPath(mainModPath)
+func appendExpandedWildcardPackagePath(pkgPaths []resolvedPackageArg, pattern ast.ImportPath, pkgQual string, mainModRoot module.SourceLoc, mainModPath string, tg *tagger) (_ []resolvedPackageArg, _err error) {
+	modIpath := ast.ParseImportPath(mainModPath)
 	// Find directory to begin the scan.
 	// Could be smarter but this one optimization is enough for now,
 	// since ... is usually at the end of a path.
@@ -525,7 +525,7 @@ func appendExpandedWildcardPackagePath(pkgPaths []resolvedPackageArg, pattern mo
 	}
 
 	var prevFile modimports.ModuleFile
-	var prevImportPath module.ImportPath
+	var prevImportPath ast.ImportPath
 	iter := modimports.AllModuleFiles(mainModRoot.FS, dir)
 	iter(func(f modimports.ModuleFile, err error) bool {
 		if err != nil {
@@ -542,7 +542,7 @@ func appendExpandedWildcardPackagePath(pkgPaths []resolvedPackageArg, pattern mo
 		if pkgName == "" {
 			pkgName = "_"
 		}
-		ip := module.ImportPath{
+		ip := ast.ImportPath{
 			Path:      path.Join(modIpath.Path, path.Dir(f.FilePath)),
 			Qualifier: pkgName,
 			Version:   modIpath.Version,
@@ -587,23 +587,23 @@ func appendExpandedWildcardPackagePath(pkgPaths []resolvedPackageArg, pattern mo
 // It returns a relative package path within m.
 //
 // If p does not contain a major version suffix but otherwise matches mod, it counts as a match.
-func cutModulePrefix(p module.ImportPath, mod string) (module.ImportPath, bool) {
+func cutModulePrefix(p ast.ImportPath, mod string) (ast.ImportPath, bool) {
 	if mod == "" {
 		return p, true
 	}
 	modPath, modVers, _ := ast.SplitPackageVersion(mod)
 	if !strings.HasPrefix(p.Path, modPath) {
-		return module.ImportPath{}, false
+		return ast.ImportPath{}, false
 	}
 	if p.Path == modPath {
 		p.Path = "."
 		return p, true
 	}
 	if p.Path[len(modPath)] != '/' {
-		return module.ImportPath{}, false
+		return ast.ImportPath{}, false
 	}
 	if p.Version != "" && modVers != "" && p.Version != modVers {
-		return module.ImportPath{}, false
+		return ast.ImportPath{}, false
 	}
 	p.Path = "." + p.Path[len(modPath):]
 	p.Version = ""

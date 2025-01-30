@@ -33,6 +33,24 @@
       "message": "I thought errors.Details was only useful for evaluator errors?",
       "revId": "3e838d3c2968c3aa5df71344fe96ca54037c0c62",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f9aa8be_b7cfd3e2",
+        "filename": "internal/cmd/cue-ast/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-30T11:10:35Z",
+      "side": 1,
+      "message": "`cue/parser` also uses `errors.Append`.",
+      "parentUuid": "0b1108be_f1f7a1e1",
+      "revId": "3e838d3c2968c3aa5df71344fe96ca54037c0c62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

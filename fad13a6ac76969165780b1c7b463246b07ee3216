@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84cccb9c_82167326",
+        "filename": "cue/ast/astutil/resolve_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-30T11:01:45Z",
+      "side": 1,
+      "message": "why this change? I\u0027d add a short comment here because otherwise it feels odd why we\u0027re not using Instance like we used to. I imagine it\u0027s because we don\u0027t want to require the imported packages to actually exist as modules we can fetch.",
+      "revId": "fad13a6ac76969165780b1c7b463246b07ee3216",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

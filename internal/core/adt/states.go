@@ -170,6 +170,10 @@ const (
 	//
 	subFieldsProcessed
 
+	// pendingKnown means that this task is relevant for resolving whether an
+	// arc is present or not. This implies actTypeKnown.
+	pendingKnown
+
 	// disjunctionTask indicates that this task is a disjunction. This is
 	// used to trigger finalization of disjunctions.
 	disjunctionTask
@@ -183,7 +187,11 @@ const (
 	conditionsUsingCounters = arcTypeKnown |
 		valueKnown |
 		fieldConjunctsKnown |
-		allTasksCompleted
+		allTasksCompleted |
+		// TODO: not adding this improves error message for issue3691 in
+		// eval/comprehensions.txtar. But without this, TestVisit of dep
+		// panics. Investigate.
+		pendingKnown
 
 	// The xConjunct condition sets indicate a conjunct MAY contribute the to
 	// final result. For some conjuncts it may not be known what the

@@ -10,6 +10,7 @@ import (
 	"slices"
 	"strings"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/mod/modrequirements"
 	"cuelang.org/go/mod/module"
 )
@@ -39,7 +40,7 @@ func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m 
 	// Note: we don't care about the package qualifier at this point
 	// because any directory with CUE files in counts as a possible
 	// candidate, regardless of what packages are in it.
-	pathParts := module.ParseImportPath(pkgPath)
+	pathParts := ast.ParseImportPath(pkgPath)
 	pkgPathOnly := pathParts.Path
 
 	if filepath.IsAbs(pkgPathOnly) || path.IsAbs(pkgPathOnly) {

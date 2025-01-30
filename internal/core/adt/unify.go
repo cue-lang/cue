@@ -219,7 +219,9 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 				a.unify(c, needs, attemptOnly)
 			}
 		}
+		n.completePending(mode)
 	}
+
 	n.process(nodeOnlyNeeds, mode)
 
 	defer c.PopArc(c.PushArc(v))
@@ -677,6 +679,39 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 	return success
 }
 
+// completePending determines if n is pending. In order to do so, it must
+// recursively find any descendents with unresolved comprehensions. Note that
+// it is currently possible for arcs with unresolved comprehensions to not be
+// marked as pending. Consider this example (from issue 3708):
+//
+//	out: people.bob.kind
+//	people: [string]: {
+//		kind:  "person"
+//		name?: string
+//	}
+//	if true {
+//		people: bob: name: "Bob"
+//	}
+//
+// In this case, the pattern constraint inserts fields into 'bob', which then
+// marks 'name' as not pending. However, for 'people' to become non-pending,
+// the comprehension associated with field 'name' still needs to be evaluated.
+//
+// For this reason, this method does not check whether 'n' is pending.
+//
+// TODO(evalv4): consider making pending not an arc state, but rather a
+// separate mode. This will allow us to descend with more precision to only
+// visit arcs that still need to be resolved.
+func (n *nodeContext) completePending(mode runMode) {
+	for _, a := range n.node.Arcs {
+		state := a.getState(n.ctx)
+		if state != nil {
+			state.completePending(mode)
+		}
+	}
+	n.process(pendingKnown, mode)
+}
+
 func (n *nodeContext) evalArcTypes(mode runMode) {
 	for _, a := range n.node.Arcs {
 		if a.ArcType != ArcPending {
@@ -775,26 +810,11 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 	}
 
 	if arcState != nil && (!arcState.meets(needTasksDone) || !arcState.meets(arcTypeKnown)) {
-		needs |= arcTypeKnown
-		// If this arc is not ArcMember, which it is not at this point,
-		// any pending arcs could influence the field set.
-		for _, a := range arc.Arcs {
-			if a.ArcType == ArcPending {
-				needs |= fieldSetKnown
-				break
-			}
-		}
+		arcState.completePending(attemptOnly)
+
 		arcState.completeNodeTasks(yield)
 
-		// Child nodes, if pending and derived from a comprehension, may
-		// still cause this arc to become not pending.
-		if arc.ArcType != ArcMember {
-			for _, a := range arcState.node.Arcs {
-				if a.ArcType == ArcPending {
-					a.unify(c, arcTypeKnown, runMode)
-				}
-			}
-		}
+		needs |= arcTypeKnown
 
 		switch runMode {
 		case ignore, attemptOnly:

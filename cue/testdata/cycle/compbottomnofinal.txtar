@@ -514,8 +514,8 @@ Disjuncts:    215
         host: (string){ "mod.test" }
       }
       #Y: (_|_){
-        // [incomplete] large.p2.#Y: error in call to regexp.FindNamedSubmatch: non-concrete value _:
-        //     ./in.cue:272:7
+        // [incomplete] large.p2.X: undefined field: port:
+        //     ./in.cue:235:33
       }
     }
     p3: (struct){
@@ -534,8 +534,8 @@ Disjuncts:    215
         host: (string){ "mod.test" }
       }
       #Y: (_|_){
-        // [incomplete] large.p3.#Y: error in call to regexp.FindNamedSubmatch: non-concrete value _:
-        //     ./in.cue:313:7
+        // [incomplete] large.p3.X: undefined field: port:
+        //     ./in.cue:276:33
       }
     }
     p4: (struct){
@@ -550,8 +550,8 @@ Disjuncts:    215
         host: (string){ "mod.test" }
       }
       #Y: (_|_){
-        // [incomplete] large.p4.#Y: error in call to regexp.FindNamedSubmatch: non-concrete value _:
-        //     ./in.cue:337:7
+        // [incomplete] large.p4.X: undefined field: port:
+        //     ./in.cue:317:33
       }
       Y: (struct){
         userinfo: (string){ "user" }
@@ -872,8 +872,8 @@ diff old new
 +        host: (string){ "mod.test" }
 +      }
 +      #Y: (_|_){
-+        // [incomplete] large.p2.#Y: error in call to regexp.FindNamedSubmatch: non-concrete value _:
-+        //     ./in.cue:272:7
++        // [incomplete] large.p2.X: undefined field: port:
++        //     ./in.cue:235:33
 +      }
 +    }
 +    p3: (struct){
@@ -892,8 +892,8 @@ diff old new
 +        host: (string){ "mod.test" }
 +      }
 +      #Y: (_|_){
-+        // [incomplete] large.p3.#Y: error in call to regexp.FindNamedSubmatch: non-concrete value _:
-+        //     ./in.cue:313:7
++        // [incomplete] large.p3.X: undefined field: port:
++        //     ./in.cue:276:33
 +      }
 +    }
 +    p4: (struct){
@@ -908,8 +908,8 @@ diff old new
 +        host: (string){ "mod.test" }
 +      }
 +      #Y: (_|_){
-+        // [incomplete] large.p4.#Y: error in call to regexp.FindNamedSubmatch: non-concrete value _:
-+        //     ./in.cue:337:7
++        // [incomplete] large.p4.X: undefined field: port:
++        //     ./in.cue:317:33
 +      }
 +      Y: (struct){
 +        userinfo: (string){ "user" }

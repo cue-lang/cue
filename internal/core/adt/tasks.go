@@ -57,7 +57,7 @@ func init() {
 	handleComprehension = &runner{
 		name:      "Comprehension",
 		f:         processComprehension,
-		completes: valueKnown | allTasksCompleted | fieldConjunctsKnown,
+		completes: valueKnown | allTasksCompleted | fieldConjunctsKnown | pendingKnown,
 	}
 	handleListLit = &runner{
 		name:      "ListLit",

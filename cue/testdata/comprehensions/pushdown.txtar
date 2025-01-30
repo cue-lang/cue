@@ -1601,14 +1601,13 @@ Result:
       }
     }
   }
-  issue3708: (_|_){
-    // [incomplete] issue3708.people.bob.name: cyclic reference to field bob:
-    //     ./issue3708.cue:11:2
-    out: (_|_){
-      // [incomplete] issue3708.out: undefined field: bob:
-      //     ./issue3708.cue:2:14
-    }
+  issue3708: (struct){
+    out: (string){ "person" }
     people: (struct){
+      bob: (struct){
+        name: (string){ "Bob" }
+        kind: (string){ "person" }
+      }
     }
   }
   unifyDynamicReflectSuccess: (struct){
@@ -1964,27 +1963,6 @@ diff old new
        }
      }
    }
-@@ -784,13 +717,14 @@
-       }
-     }
-   }
--  issue3708: (struct){
--    out: (string){ "person" }
-+  issue3708: (_|_){
-+    // [incomplete] issue3708.people.bob.name: cyclic reference to field bob:
-+    //     ./issue3708.cue:11:2
-+    out: (_|_){
-+      // [incomplete] issue3708.out: undefined field: bob:
-+      //     ./issue3708.cue:2:14
-+    }
-     people: (struct){
--      bob: (struct){
--        name: (string){ "Bob" }
--        kind: (string){ "person" }
--      }
-     }
-   }
-   unifyDynamicReflectSuccess: (struct){
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old

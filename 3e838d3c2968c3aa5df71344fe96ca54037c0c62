@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a6a70cf_865c0f5f",
+        "filename": "internal/cmd/cue-ast/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-30T10:51:31Z",
+      "side": 1,
+      "message": "nice, this mirrors `cue fmt --files`, which exists for basically the same reason",
+      "revId": "3e838d3c2968c3aa5df71344fe96ca54037c0c62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b1108be_f1f7a1e1",
+        "filename": "internal/cmd/cue-ast/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-30T10:51:31Z",
+      "side": 1,
+      "message": "I thought errors.Details was only useful for evaluator errors?",
+      "revId": "3e838d3c2968c3aa5df71344fe96ca54037c0c62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

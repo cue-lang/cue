@@ -126,7 +126,10 @@ func ToBuiltin(b *Builtin) *adt.Builtin {
 		Package:     b.Pkg,
 		Name:        b.Name,
 	}
-	x.Func = func(ctx *adt.OpContext, args []adt.Value) (ret adt.Expr) {
+	x.Func = func(call *adt.CallContext) (ret adt.Expr) {
+		ctx := call.OpContext()
+		args := call.Args()
+
 		// call, _ := ctx.Source().(*ast.CallExpr)
 		c := &CallCtxt{
 			ctx:     ctx,

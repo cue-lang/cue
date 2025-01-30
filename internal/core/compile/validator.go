@@ -30,7 +30,10 @@ var matchNBuiltin = &adt.Builtin{
 	Params:      []adt.Param{topParam, intParam, listParam}, // varargs
 	Result:      adt.BoolKind,
 	NonConcrete: true,
-	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
+	Func: func(call *adt.CallContext) adt.Expr {
+		c := call.OpContext()
+		args := call.Args()
+
 		if !c.IsValidator {
 			return c.NewErrf("matchN is a validator and should not be used as a function")
 		}
@@ -89,7 +92,10 @@ var matchIfBuiltin = &adt.Builtin{
 	Params:      []adt.Param{topParam, topParam, topParam, topParam},
 	Result:      adt.BoolKind,
 	NonConcrete: true,
-	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
+	Func: func(call *adt.CallContext) adt.Expr {
+		c := call.OpContext()
+		args := call.Args()
+
 		if !c.IsValidator {
 			return c.NewErrf("matchIf is a validator and should not be used as a function")
 		}

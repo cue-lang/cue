@@ -1544,7 +1544,7 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 			if !call.builtin.checkArgs(c, pos(x), len(x.Args)) {
 				return nil
 			}
-			return f.RawFunc(c, x.Args)
+			return f.RawFunc(call)
 		}
 
 	case *BuiltinValidator:
@@ -1637,7 +1637,7 @@ type Builtin struct {
 	// arguments. By default, all arguments are checked to be concrete.
 	NonConcrete bool
 
-	Func func(c *OpContext, args []Value) Expr
+	Func func(call *CallContext) Expr
 
 	// RawFunc gives low-level control to CUE's internals for builtins.
 	// It should be used when fine control over the evaluation process is
@@ -1645,7 +1645,9 @@ type Builtin struct {
 	// gives them fine control over how exactly such value gets evaluated.
 	// A RawFunc may pass CycleInfo, errors and other information through
 	// the Context.
-	RawFunc func(c *OpContext, args []Expr) Value
+	//
+	// TODO: consider merging Func and RawFunc into a single field again.
+	RawFunc func(call *CallContext) Value
 
 	Package Feature
 	Name    string
@@ -1773,7 +1775,7 @@ func (x *Builtin) call(call *CallContext) Expr {
 
 	saved := c.IsValidator
 	c.IsValidator = call.isValidator
-	ret := x.Func(c, call.args)
+	ret := x.Func(call)
 	c.IsValidator = saved
 
 	return ret

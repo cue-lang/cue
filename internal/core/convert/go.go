@@ -416,6 +416,7 @@ func (c *goConverter) convertRec(nilIsTop bool, x interface{}) (result adt.Value
 
 		case reflect.Struct:
 			sl := &adt.StructLit{Src: c.setNextPos(ast.NewStruct())}
+			sl.Init(c.ctx)
 			v := &adt.Vertex{}
 
 			t := value.Type()
@@ -476,6 +477,7 @@ func (c *goConverter) convertRec(nilIsTop bool, x interface{}) (result adt.Value
 
 		case reflect.Map:
 			obj := &adt.StructLit{Src: c.setNextPos(ast.NewStruct())}
+			obj.Init(c.ctx)
 			v := &adt.Vertex{}
 
 			t := value.Type()

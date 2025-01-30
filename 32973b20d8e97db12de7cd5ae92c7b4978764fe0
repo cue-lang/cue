@@ -16,6 +16,24 @@
       "message": "FWIW, I think it would be nicer to avoid the code duplication between Unify and unifyScalar. I\u0027ve looked through the CLs that follow, and I think Unify could probably call unifyScalar.",
       "revId": "32973b20d8e97db12de7cd5ae92c7b4978764fe0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "426a563a_a0d297b3",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 960,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-30T10:38:36Z",
+      "side": 1,
+      "message": "Well, it cannot because it is in a different package. But unifyScalar could be removed, indeed.\n\nThat said, this function will still change a lot in coming CLs. So I prefer to leave it as is for now. I\u0027ve added a TODO to unifyScalar.",
+      "parentUuid": "b2205581_59186188",
+      "revId": "32973b20d8e97db12de7cd5ae92c7b4978764fe0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

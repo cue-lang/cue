@@ -16,6 +16,24 @@
       "message": "rewrite our own callers of this deprecated API, while this is fresh in your mind?",
       "revId": "c9d28fc2484b8ff1f5cd9c9c84364f5314c83d57",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "78df29ad_a01894f3",
+        "filename": "cmd/cue/cmd/modrename.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-30T16:25:15Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "4985a98d_517b178a",
+      "revId": "c9d28fc2484b8ff1f5cd9c9c84364f5314c83d57",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

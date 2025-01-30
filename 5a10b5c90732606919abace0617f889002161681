@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "28e9b2d8_2dbeafa6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-30T16:25:15Z",
+      "side": 1,
+      "message": "I\u0027ve got an OK on this from Marcel.",
+      "parentUuid": "97079ced_e81c684e",
+      "revId": "5a10b5c90732606919abace0617f889002161681",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "93730e53_8cab73a8",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-01-30T15:26:07Z",
       "side": 1,
       "message": "nit: move the TODO out of the godoc, because it\u0027s not for Go API users to read",
+      "revId": "5a10b5c90732606919abace0617f889002161681",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c6ea9c8_66b254a1",
+        "filename": "cue/ast/astutil/util.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-30T16:25:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "93730e53_8cab73a8",
       "revId": "5a10b5c90732606919abace0617f889002161681",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a2404c1_f5cd6489",
+        "filename": "cue/ast/importpath.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-30T16:25:15Z",
+      "side": 1,
+      "message": "I didn\u0027t mean to deprecate it in the end: it\u0027s sufficiently different from Cut to be _just_ worthwhile I think.",
+      "parentUuid": "41364c8f_8f0ed077",
+      "revId": "5a10b5c90732606919abace0617f889002161681",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bbec2217_4c0269d4",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-01-30T15:26:07Z",
       "side": 1,
       "message": "ditto replacing/inlining this",
+      "revId": "5a10b5c90732606919abace0617f889002161681",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "28cb5595_e0222873",
+        "filename": "cue/load/search.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 593,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-30T16:25:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bbec2217_4c0269d4",
       "revId": "5a10b5c90732606919abace0617f889002161681",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "420509f4_4cd819bd",
+        "filename": "encoding/protobuf/protobuf.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-30T16:25:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d9ae7f4f_90ace82d",
+      "revId": "5a10b5c90732606919abace0617f889002161681",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "504c5953_0514ea3c",
@@ -99,6 +189,24 @@
       "writtenOn": "2025-01-30T15:26:07Z",
       "side": 1,
       "message": "ditto",
+      "revId": "5a10b5c90732606919abace0617f889002161681",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e506059e_6eb94915",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 445,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-30T16:25:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "504c5953_0514ea3c",
       "revId": "5a10b5c90732606919abace0617f889002161681",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +228,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e71d92a_48392eb3",
+        "filename": "mod/modregistry/client.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-30T16:25:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fe592c87_420946b7",
+      "revId": "5a10b5c90732606919abace0617f889002161681",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "584f986d_ed15bcf2",
@@ -133,6 +259,24 @@
       "writtenOn": "2025-01-30T15:26:07Z",
       "side": 1,
       "message": "ditto",
+      "revId": "5a10b5c90732606919abace0617f889002161681",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "52be6fda_c0d6c992",
+        "filename": "mod/module/path.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-30T16:25:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "584f986d_ed15bcf2",
       "revId": "5a10b5c90732606919abace0617f889002161681",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -34,7 +34,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
-	"cuelang.org/go/mod/module"
 )
 
 const (
@@ -916,7 +915,7 @@ func (s *state) refExpr(n cue.Value, importPath string, path cue.Path) ast.Expr 
 		return expr
 	}
 	// External reference
-	ip := module.ParseImportPath(importPath)
+	ip := ast.ParseImportPath(importPath)
 	if ip.Qualifier == "" {
 		// TODO choose an arbitrary name here.
 		s.errf(n, "cannot determine package name from import path %q", importPath)

@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync/atomic"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/mod/modimports"
 	"cuelang.org/go/internal/mod/modrequirements"
 	"cuelang.org/go/internal/par"
@@ -256,7 +257,7 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 	if pkgs.mainModuleVersion.Path() == pkg.mod.Path() {
 		pkgs.applyPkgFlags(pkg, PkgInAll)
 	}
-	ip := module.ParseImportPath(pkg.path)
+	ip := ast.ParseImportPath(pkg.path)
 	pkgQual := ip.Qualifier
 	switch pkgQual {
 	case "":

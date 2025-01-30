@@ -52,6 +52,24 @@
       "parentUuid": "2e0b9378_b364c561",
       "revId": "7fe8c106ef319e0291d0651b82709b1b50fbefe9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15b47af2_1c6df69d",
+        "filename": "internal/core/adt/call.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-01-30T11:55:57Z",
+      "side": 1,
+      "message": "Ok.",
+      "parentUuid": "279b47de_14b87ebc",
+      "revId": "7fe8c106ef319e0291d0651b82709b1b50fbefe9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

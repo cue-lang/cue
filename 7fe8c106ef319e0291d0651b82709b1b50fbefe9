@@ -16,6 +16,24 @@
       "message": "Are these methods (Value and NumParams) really needed? Why not just make the args field public?",
       "revId": "7fe8c106ef319e0291d0651b82709b1b50fbefe9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e0b9378_b364c561",
+        "filename": "internal/core/adt/call.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-30T11:29:33Z",
+      "side": 1,
+      "message": "I want to be able to have the freedom to change the underlying implementation and/or to change what is evaluated. For instance, right now values are always evaluated upfront for non NonConcrete functions.\n\nOne obvious change of the underlying representation is to not have to construct a new array of arguments for validators, but rather keep the value + args separately and let an Args method figure out the indexing.\n\nIt can also help with debugging.",
+      "parentUuid": "9e28fef2_46cee7e3",
+      "revId": "7fe8c106ef319e0291d0651b82709b1b50fbefe9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

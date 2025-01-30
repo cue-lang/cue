@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "97079ced_e81c684e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-30T15:26:07Z",
+      "side": 1,
+      "message": "LGTM except adding cue/ast.SplitPackageVersion as a deprecated func.\n\nPlease make a note to run this API past Marcel before we tag a release, just in case he\u0027s opposed to these living in cue/ast once we stabilize.",
+      "revId": "5a10b5c90732606919abace0617f889002161681",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93730e53_8cab73a8",
+        "filename": "cue/ast/astutil/util.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-30T15:26:07Z",
+      "side": 1,
+      "message": "nit: move the TODO out of the godoc, because it\u0027s not for Go API users to read",
+      "revId": "5a10b5c90732606919abace0617f889002161681",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41364c8f_8f0ed077",
+        "filename": "cue/ast/importpath.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-30T15:26:07Z",
+      "side": 1,
+      "message": "why expose API in cue/ast that is immediately deprecated? ISTM like you can use strings.Cut above and remove this func entirely.",
+      "revId": "5a10b5c90732606919abace0617f889002161681",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bbec2217_4c0269d4",
+        "filename": "cue/load/search.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 593,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-30T15:26:07Z",
+      "side": 1,
+      "message": "ditto replacing/inlining this",
+      "revId": "5a10b5c90732606919abace0617f889002161681",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9ae7f4f_90ace82d",
+        "filename": "encoding/protobuf/protobuf.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-30T15:26:07Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "5a10b5c90732606919abace0617f889002161681",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "504c5953_0514ea3c",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 445,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-30T15:26:07Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "5a10b5c90732606919abace0617f889002161681",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe592c87_420946b7",
+        "filename": "mod/modregistry/client.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-30T15:26:07Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "5a10b5c90732606919abace0617f889002161681",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "584f986d_ed15bcf2",
+        "filename": "mod/module/path.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-01-30T15:26:07Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "5a10b5c90732606919abace0617f889002161681",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

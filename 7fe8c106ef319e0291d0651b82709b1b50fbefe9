@@ -34,6 +34,24 @@
       "parentUuid": "9e28fef2_46cee7e3",
       "revId": "7fe8c106ef319e0291d0651b82709b1b50fbefe9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "279b47de_14b87ebc",
+        "filename": "internal/core/adt/call.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-01-30T11:34:38Z",
+      "side": 1,
+      "message": "Also note that the indexes of exprs and args may not align, and that we may want to keep track that an argument was derived from a default, that we may not want to precompute optional fields, etc. etc.\n\nIOW, having a higher level API makes things a bit more flexible. Part of the messiness we have now, with having essentially three different function types, is exactly because of the lack of that flexibility. It seems that with this API we have a change of reducing it to 1 again.",
+      "parentUuid": "2e0b9378_b364c561",
+      "revId": "7fe8c106ef319e0291d0651b82709b1b50fbefe9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

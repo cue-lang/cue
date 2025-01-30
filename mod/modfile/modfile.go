@@ -604,7 +604,7 @@ func (f *File) DefaultMajorVersions() map[string]string {
 // mentioned in the file, which means it will not work in general unless
 // the module is tidy (as with `cue mod tidy`).
 func (f *File) ModuleForImportPath(importPath string) (module.Version, bool) {
-	ip := module.ParseImportPath(importPath)
+	ip := ast.ParseImportPath(importPath)
 	for prefix := ip.Path; prefix != "."; prefix = path.Dir(prefix) {
 		pkgVersion := ip.Version
 		if pkgVersion == "" {

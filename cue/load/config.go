@@ -310,7 +310,7 @@ func addImportQualifier(pkg importPath, name string) (importPath, error) {
 	if name == "" {
 		return pkg, nil
 	}
-	ip := module.ParseImportPath(string(pkg))
+	ip := ast.ParseImportPath(string(pkg))
 	if ip.Qualifier == "_" {
 		return "", fmt.Errorf("invalid import qualifier _ in %q", pkg)
 	}

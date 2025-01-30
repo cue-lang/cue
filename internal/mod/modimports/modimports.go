@@ -47,7 +47,7 @@ func AllImports(modFilesIter func(func(ModuleFile, error) bool)) (_ []string, re
 				return false
 			}
 			// Canonicalize the path.
-			pkgPath = module.ParseImportPath(pkgPath).Canonical().String()
+			pkgPath = ast.ParseImportPath(pkgPath).Canonical().String()
 			pkgPaths[pkgPath] = true
 		}
 		return true

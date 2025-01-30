@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"sync"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modrequirements"
 	"cuelang.org/go/internal/mod/semver"
@@ -55,7 +56,7 @@ func (ld *loader) queryImport(ctx context.Context, pkgPath string, rs *modrequir
 // It does not return modules that are already present in the given requirements.
 // It also reports whether a default major version will be required.
 func (ld *loader) queryLatestModules(ctx context.Context, pkgPath string, rs *modrequirements.Requirements) ([]module.Version, bool, error) {
-	parts := module.ParseImportPath(pkgPath)
+	parts := ast.ParseImportPath(pkgPath)
 	latestModuleForPrefix := func(prefix string) (module.Version, error) {
 		mv := parts.Version
 		if mv == "" {

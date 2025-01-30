@@ -55,7 +55,9 @@ func generateCallThatReturnsBuiltin(name string, scope adt.Value, args []string,
 	call := &adt.CallExpr{Fun: &adt.Builtin{
 		Result: adt.TopKind,
 		Name:   name,
-		Func: func(opctx *adt.OpContext, _ []adt.Value) adt.Expr {
+		Func: func(call *adt.CallContext) adt.Expr {
+			opctx := call.OpContext()
+
 			scope := value.Make(opctx, scope)
 			sig := compileStringsInScope(args, scope)
 			args, result := splitLast(sig)

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "511ed4f1_d536f41e",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 603,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-01-30T12:57:02Z",
+      "side": 1,
+      "message": "I don\u0027t think it\u0027s possible: there\u0027s no way to tell if the module is tidy except by actually walking all import paths in all CUE files recursively, as `cue mod tidy` does.",
+      "parentUuid": "6606237b_6fb45663",
+      "revId": "a9de164058f17fb7ce4d06684613da55ebc1d6e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f6be09d2_18b86842",

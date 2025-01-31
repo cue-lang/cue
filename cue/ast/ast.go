@@ -301,13 +301,15 @@ func (a *Attribute) Split() (key, body string) {
 
 // A Field represents a field declaration in a struct.
 type Field struct {
-	Label      Label       // must have at least one element.
-	Optional   token.Pos   // Deprecated
+	Label Label // must have at least one element.
+	// Deprecated: use [Field.Constraint]
+	Optional   token.Pos
 	Constraint token.Token // token.ILLEGAL, token.OPTION, or token.NOT
 
 	// No TokenPos: Value must be an StructLit with one field.
 	TokenPos token.Pos
-	Token    token.Token // Deprecated: always token.COLON
+	// Deprecated: the value is always [token.COLON]
+	Token token.Token
 
 	Value Expr // the value associated with this field.
 

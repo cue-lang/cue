@@ -548,7 +548,7 @@ $ cue eval --with-context -l 'path.Base(filename)' -l data.kind foo.yaml
 var filetypeHelp = &cobra.Command{
 	Use:   "filetypes",
 	Short: "supported file types and qualifiers",
-	Long: `The cue tools supports the following file types:
+	Long: `The cue tool supports the following file types:
 
     Tag         Extensions      Description
     cue         .cue            CUE source files.
@@ -573,7 +573,7 @@ interpreted as data. CUE and Go are interpreted as schema by
 default, but may be selected to operate in data mode.
 
 The cue tool will infer a file's type from its extension by
-default. The user my override this behavior by using qualifiers.
+default. The user may override this behavior by using qualifiers.
 A qualifier takes the form
 
     <tag>{'+'<tag>}':'

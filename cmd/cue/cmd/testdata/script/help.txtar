@@ -31,7 +31,7 @@ stdout -count=1 '^Publish the current module to an OCI registry\.'
 # Requesting additional help topics; the form without "help" is phased out.
 
 exec cue help filetypes
-stdout -count=1 '^The cue tools supports the following file types:$'
+stdout -count=1 '^The cue tool supports the following file types:$'
 
 ! exec cue filetypes
 ! stdout .

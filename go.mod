@@ -5,7 +5,7 @@ go 1.22.0
 require (
 	cuelabs.dev/go/oci/ociregistry v0.0.0-20241125120445-2c00c104c6e1
 	github.com/cockroachdb/apd/v3 v3.2.1
-	github.com/emicklei/proto v1.13.4
+	github.com/emicklei/proto v1.14.0
 	github.com/go-quicktest/qt v1.101.0
 	github.com/google/go-cmp v0.6.0
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
@@ -14,7 +14,7 @@ require (
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0
 	github.com/pelletier/go-toml/v2 v2.2.3
-	github.com/protocolbuffers/txtpbfmt v0.0.0-20241112170944-20d2c9ebc01d
+	github.com/protocolbuffers/txtpbfmt v0.0.0-20250129171521-feedd8250727
 	github.com/rogpeppe/go-internal v1.13.2-0.20241226121412-a5dc8ff20d0a
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5

@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f0a8740_5819a82a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-04T17:06:59Z",
+      "side": 1,
+      "message": "SGTM minus the modconfig API change.",
+      "revId": "a740dcce8cf42199aa9d37fc51a2cb69d4e25fe6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9fc50a7f_2c10fa9c",
+        "filename": "cmd/cue/cmd/modmirror.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-04T17:06:59Z",
+      "side": 1,
+      "message": "what are we doing with from and to being the same registry in the end? I remember there wasn\u0027t a clear consensus in the google doc draft.",
+      "revId": "a740dcce8cf42199aa9d37fc51a2cb69d4e25fe6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07506b43_8aa2f3e2",
+        "filename": "cmd/cue/cmd/modmirror.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-04T17:06:59Z",
+      "side": 1,
+      "message": "should this be clarified in the flag\u0027s help text?",
+      "revId": "a740dcce8cf42199aa9d37fc51a2cb69d4e25fe6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa637d9a_1e368711",
+        "filename": "cmd/cue/cmd/modmirror.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-04T17:06:59Z",
+      "side": 1,
+      "message": "shouldn\u0027t the filename be like `mv.String() + \"/cue.mod/module.cue` or somesuch?",
+      "revId": "a740dcce8cf42199aa9d37fc51a2cb69d4e25fe6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d1077f3_303f05d2",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-04T17:06:59Z",
+      "side": 1,
+      "message": "I honestly don\u0027t get this change at all; you can add `CUE_REGISTRY\u003dwhatever` to `Env` already. It seems odd to me to support both, especially given that this is just of type string. If there is some reason to directly support env vars as their own fields as well, then I\u0027m not sure why we have `Env` at all.",
+      "revId": "a740dcce8cf42199aa9d37fc51a2cb69d4e25fe6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

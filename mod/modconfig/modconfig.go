@@ -74,6 +74,11 @@ type Config struct {
 	// the current process's environment will be used.
 	Env []string
 
+	// CUERegistry specifies the registry or registries to use
+	// to resolve modules. If it is empty, $CUE_REGISTRY
+	// is used.
+	CUERegistry string
+
 	// ClientType is used as part of the User-Agent header
 	// that's added in each outgoing HTTP request.
 	// If it's empty, it defaults to "cuelang.org/go".
@@ -94,7 +99,10 @@ func NewResolver(cfg *Config) (*Resolver, error) {
 	getenv := getenvFunc(cfg.Env)
 	var configData []byte
 	var configPath string
-	cueRegistry := getenv("CUE_REGISTRY")
+	cueRegistry := cfg.CUERegistry
+	if cueRegistry == "" {
+		cueRegistry = getenv("CUE_REGISTRY")
+	}
 	kind, rest, _ := strings.Cut(cueRegistry, ":")
 	switch kind {
 	case "file":
@@ -104,7 +112,7 @@ func NewResolver(cfg *Config) (*Resolver, error) {
 		}
 		configData, configPath = data, rest
 	case "inline":
-		configData, configPath = []byte(rest), "$CUE_REGISTRY"
+		configData, configPath = []byte(rest), "inline"
 	case "simple":
 		cueRegistry = rest
 	}
@@ -116,7 +124,7 @@ func NewResolver(cfg *Config) (*Resolver, error) {
 		resolver, err = modresolve.ParseCUERegistry(cueRegistry, DefaultRegistry)
 	}
 	if err != nil {
-		return nil, fmt.Errorf("bad value for $CUE_REGISTRY: %v", err)
+		return nil, fmt.Errorf("bad value for registry: %v", err)
 	}
 	return &Resolver{
 		resolver: resolver,

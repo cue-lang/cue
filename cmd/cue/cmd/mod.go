@@ -48,6 +48,7 @@ See also:
 	cmd.AddCommand(newModFixCmd(c))
 	cmd.AddCommand(newModGetCmd(c))
 	cmd.AddCommand(newModInitCmd(c))
+	cmd.AddCommand(newModMirrorCmd(c))
 	cmd.AddCommand(newModRegistryCmd(c))
 	cmd.AddCommand(newModRenameCmd(c))
 	cmd.AddCommand(newModResolveCmd(c))

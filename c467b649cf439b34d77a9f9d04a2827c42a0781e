@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2beb17ec_b0ff4752",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-04T08:51:30Z",
+      "side": 1,
+      "message": "The Unity failure appears to be real. Here is a reproducer, reduced from the services repo:\n\n```\npackage main\n\nimport (\n\t\"os\"\n\n\t\"cuelang.org/go/cue\"\n\t\"cuelang.org/go/cue/cuecontext\"\n)\n\nfunc main() {\n\t// This env var is necessary for the reproducer!\n\tos.Setenv(\"CUE_EXPERIMENT\", \"embed\")\n\n\tctx :\u003d cuecontext.New()\n\n\troot :\u003d ctx.CompileString(`obj: initialField: \"foo\"`)\n\thandle(root.Err())\n\n\trootClosed :\u003d ctx.CompileString(`#x: obj?: _`).LookupPath(cue.MakePath(cue.Def(\"#x\")))\n\thandle(rootClosed.Err())\n\n\troot \u003d root.Unify(rootClosed)\n\thandle(root.Err())\n\n\tobj :\u003d root.LookupPath(cue.MakePath(cue.Str(\"obj\")))\n\tobj \u003d obj.Unify(ctx.CompileString(`extraField: \"bar\"`))\n\thandle(obj.Err())\n\n\tprintln(\"ALL OK\")\n}\n\nfunc handle(err error) {\n\tif err !\u003d nil {\n\t\tpanic(err)\n\t}\n}\n```\n\nWith cue@master this prints `ALL OK`, but with cue@master plus this patch, it prints `panic: obj.extraField: field not allowed`.\n\nMy intuition is that the new behavior is correct; `rootClosed` is recursively closed due to the reference `#x`, so when unified with the open `root` value, the result is a recursively closed struct. It seems like CUE did not fully track closedness in such an edge case before this patch.\n\nI failed to reproduce this issue on cue@master with just `cue export` or `cue vet`, so it seems to have been just a Go API issue. Which makes sense, given that `Value.Unify` used to have bespoke logic.\n\nI think the checklist here is:\n\n1) Please confirm that my thinking above is right, and that the change is desired.\n2) Assuming so, please add a regression test akin to the one I shared above.\n3) Please update the commit message accordingly.",
+      "revId": "c467b649cf439b34d77a9f9d04a2827c42a0781e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

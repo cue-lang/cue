@@ -131,6 +131,38 @@ x: a.foo + something.bar
 	qt.Assert(t, qt.DeepEquals(tags, []string{"v0.5.100"}))
 }
 
+func TestMirror(t *testing.T) {
+	const testMod = `
+-- cue.mod/module.cue --
+module: "example.com/module@v1"
+language: version: "v0.8.0"
+
+-- x.cue --
+x: 42
+`
+	ctx := context.Background()
+	mv := module.MustParseVersion("example.com/module@v1.2.3")
+	c := newTestClient(t)
+	zipData := putModule(t, c, mv, testMod)
+
+	c2 := newTestClient(t)
+	err := c.Mirror(ctx, c2, mv)
+	qt.Assert(t, qt.IsNil(err))
+
+	m, err := c2.GetModule(ctx, mv)
+	qt.Assert(t, qt.IsNil(err))
+
+	r, err := m.GetZip(ctx)
+	qt.Assert(t, qt.IsNil(err))
+	data, err := io.ReadAll(r)
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(data, zipData))
+
+	tags, err := c2.ModuleVersions(ctx, mv.Path())
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(tags, []string{"v1.2.3"}))
+}
+
 func TestNotFound(t *testing.T) {
 	// Check that we get appropriate not-found behavior when the
 	// HTTP response isn't entirely according to spec.

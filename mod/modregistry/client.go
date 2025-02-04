@@ -36,6 +36,7 @@ import (
 	digest "github.com/opencontainers/go-digest"
 	specs "github.com/opencontainers/image-spec/specs-go"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
+	"golang.org/x/sync/errgroup"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/mod/modfile"
@@ -107,6 +108,63 @@ func NewClientWithResolver(resolver Resolver) *Client {
 	}
 }
 
+// Mirror ensures that the given module and its component parts
+// are present and identical in both src and dst.
+func (src *Client) Mirror(ctx context.Context, dst *Client, mv module.Version) error {
+	m, err := src.GetModule(ctx, mv)
+	if err != nil {
+		return err
+	}
+	dstLoc, err := dst.resolve(mv)
+	if err != nil {
+		return fmt.Errorf("cannot resolve module in destination: %w", err)
+	}
+
+	// TODO ideally this parallelism would respect parallelism limits
+	// on whatever is calling the function too rather than just doing
+	// all uploads in parallel.
+	var g errgroup.Group
+	// TODO for desc := range manifestRefs(m.manifest)
+	manifestRefs(m.manifest)(func(desc ociregistry.Descriptor) bool {
+		g.Go(func() error {
+			return mirrorBlob(ctx, m.loc, dstLoc, desc)
+		})
+		return true
+	})
+	if err := g.Wait(); err != nil {
+		return err
+	}
+	// We've uploaded all the blobs referenced by the manifest; now
+	// we can upload the manifest itself.
+	if _, err := dstLoc.Registry.ResolveManifest(ctx, dstLoc.Repository, m.manifestDigest); err == nil {
+		return nil
+	}
+	if _, err := dstLoc.Registry.PushManifest(ctx, dstLoc.Repository, dstLoc.Tag, m.manifestContents, ocispec.MediaTypeImageManifest); err != nil {
+		return nil
+	}
+	return nil
+}
+
+func mirrorBlob(ctx context.Context, srcLoc, dstLoc RegistryLocation, desc ocispec.Descriptor) error {
+	desc1, err := dstLoc.Registry.ResolveBlob(ctx, dstLoc.Repository, desc.Digest)
+	if err == nil {
+		// Blob already exists in destination. Check that its size agrees.
+		if desc1.Size != desc.Size {
+			return fmt.Errorf("destination size (%d) does not agree with source size (%d) in blob %v", desc1.Size, desc.Size, desc.Digest)
+		}
+		return nil
+	}
+	r, err := srcLoc.Registry.GetBlob(ctx, srcLoc.Repository, desc.Digest)
+	if err != nil {
+		return err
+	}
+	defer r.Close()
+	if _, err := dstLoc.Registry.PushBlob(ctx, dstLoc.Repository, desc, r); err != nil {
+		return err
+	}
+	return nil
+}
+
 // GetModule returns the module instance for the given version.
 // It returns an error that satisfies [errors.Is]([ErrNotFound]) if the
 // module is not present in the store at this version.
@@ -163,11 +221,12 @@ func (c *Client) GetModuleWithManifest(m module.Version, contents []byte, mediaT
 	}
 	// TODO check that the other blobs are of the expected type (application/zip).
 	return &Module{
-		client:         c,
-		loc:            loc,
-		version:        m,
-		manifest:       *manifest,
-		manifestDigest: digest.FromBytes(contents),
+		client:           c,
+		loc:              loc,
+		version:          m,
+		manifest:         *manifest,
+		manifestContents: contents,
+		manifestDigest:   digest.FromBytes(contents),
 	}, nil
 }
 
@@ -369,11 +428,12 @@ func checkModFile(m module.Version, f *zip.File) ([]byte, *modfile.File, error) 
 
 // Module represents a CUE module instance.
 type Module struct {
-	client         *Client
-	loc            RegistryLocation
-	version        module.Version
-	manifest       ocispec.Manifest
-	manifestDigest ociregistry.Digest
+	client           *Client
+	loc              RegistryLocation
+	version          module.Version
+	manifest         ocispec.Manifest
+	manifestContents []byte
+	manifestDigest   ociregistry.Digest
 }
 
 func (m *Module) Version() module.Version {
@@ -506,4 +566,24 @@ func (r singleResolver) ResolveToRegistry(mpath, vers string) (RegistryLocation,
 		Repository: mpath,
 		Tag:        vers,
 	}, nil
+}
+
+// manifestRefs returns an iterator that produces all the references
+// contained in m.
+func manifestRefs(m ocispec.Manifest) func(func(ociregistry.Descriptor) bool) {
+	return func(yield func(ociregistry.Descriptor) bool) {
+		if !yield(m.Config) {
+			return
+		}
+		for _, desc := range m.Layers {
+			if !yield(desc) {
+				return
+			}
+		}
+		// For completeness, although we shouldn't actually use this
+		// logic.
+		if m.Subject != nil {
+			yield(*m.Subject)
+		}
+	}
 }

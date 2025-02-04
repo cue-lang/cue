@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "720a5837_503fc6e9",
+        "filename": "cmd/cue/cmd/modmirror.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-02-04T17:37:59Z",
+      "side": 1,
+      "message": "I chatted about this with Paul, and we decided it was OK to allow the same registry although we wouldn\u0027t call out that behaviour specifically. In general checking whether it\u0027s the same registry is non-trivial because the registry config is quite complex.",
+      "parentUuid": "9fc50a7f_2c10fa9c",
+      "revId": "a740dcce8cf42199aa9d37fc51a2cb69d4e25fe6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "07506b43_8aa2f3e2",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-02-04T17:06:59Z",
       "side": 1,
       "message": "should this be clarified in the flag\u0027s help text?",
+      "revId": "a740dcce8cf42199aa9d37fc51a2cb69d4e25fe6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "54cea136_440c8205",
+        "filename": "cmd/cue/cmd/modmirror.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-02-04T17:37:59Z",
+      "side": 1,
+      "message": "I just made it copy all major versions instead.",
+      "parentUuid": "07506b43_8aa2f3e2",
       "revId": "a740dcce8cf42199aa9d37fc51a2cb69d4e25fe6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed6c7769_2df409b5",
+        "filename": "cmd/cue/cmd/modmirror.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-02-04T17:37:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aa637d9a_1e368711",
+      "revId": "a740dcce8cf42199aa9d37fc51a2cb69d4e25fe6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0d1077f3_303f05d2",
@@ -82,6 +136,24 @@
       "writtenOn": "2025-02-04T17:06:59Z",
       "side": 1,
       "message": "I honestly don\u0027t get this change at all; you can add `CUE_REGISTRY\u003dwhatever` to `Env` already. It seems odd to me to support both, especially given that this is just of type string. If there is some reason to directly support env vars as their own fields as well, then I\u0027m not sure why we have `Env` at all.",
+      "revId": "a740dcce8cf42199aa9d37fc51a2cb69d4e25fe6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d192daff_e1959524",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-02-04T17:37:59Z",
+      "side": 1,
+      "message": "I didn\u0027t do that because it\u0027s then very confusing that the error message mentions `$CUE_REGISTRY` when the user has not actually got that environment variable specified (but it\u0027s reasonable for the code to be generating error messages like that). In general I think it\u0027s not a great idea to be passing parameters by setting Env internally other than in tests - Env is intended to be a proxy for actual user env vars and it\u0027s quite likely to be misleading if used otherwise.\n\nFor now I\u0027ll mark the field as experimental to give us some leeway.",
+      "parentUuid": "0d1077f3_303f05d2",
       "revId": "a740dcce8cf42199aa9d37fc51a2cb69d4e25fe6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -34,6 +34,24 @@
       "parentUuid": "2beb17ec_b0ff4752",
       "revId": "c467b649cf439b34d77a9f9d04a2827c42a0781e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7ecc45d_8e0c42e8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-04T09:01:19Z",
+      "side": 1,
+      "message": "Err, ignore my points about `os.Setenv`. I was forgetting I had `CUE_EXPERIMENT\u003devalv3` as a default. The bug is hidden in evalv2, but is correctly shown on evalv3. Roger\u0027s `os.Setenv(\"CUE_EXPERIMENT\", \"embed\")` was effectively force-disabling evalv3.\n\nSo ISTM that, before this change, only evalv3 showed the error correctly. Now, with this change, both evalv2 and evalv3 show the error correctly. This seems like a step forward to me, then.",
+      "parentUuid": "2c1e1325_309262d6",
+      "revId": "c467b649cf439b34d77a9f9d04a2827c42a0781e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

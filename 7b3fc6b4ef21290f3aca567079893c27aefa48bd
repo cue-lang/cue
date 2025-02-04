@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "93a5bc0c_1ec3076a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-02-04T07:29:53Z",
+      "side": 1,
+      "message": "tbh I don\u0027t think that adds much value: people can start relying on it either way, even when experimental, and I think it\u0027s worth experimenting with the final name too.",
+      "parentUuid": "368184dd_80fd56e5",
+      "revId": "7b3fc6b4ef21290f3aca567079893c27aefa48bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cd5e02f4_e3f52267",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-01-31T11:01:21Z",
       "side": 1,
       "message": "add an experimental note to the help text, just like we still do with `cue login`.",
+      "revId": "7b3fc6b4ef21290f3aca567079893c27aefa48bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b058d8a5_bfaaabfb",
+        "filename": "cmd/cue/cmd/refactor_imports.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-02-04T07:29:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cd5e02f4_e3f52267",
       "revId": "7b3fc6b4ef21290f3aca567079893c27aefa48bd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4e60e87_8db2c6ba",
+        "filename": "cmd/cue/cmd/refactor_imports.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-02-04T07:29:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "822a7487_4aff1e27",
+      "revId": "7b3fc6b4ef21290f3aca567079893c27aefa48bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a99e560a_d63323c1",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-01-31T11:01:21Z",
       "side": 1,
       "message": "extra period?",
+      "revId": "7b3fc6b4ef21290f3aca567079893c27aefa48bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f78ddc1_4a4ea1fb",
+        "filename": "cmd/cue/cmd/refactor_imports.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-02-04T07:29:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a99e560a_d63323c1",
       "revId": "7b3fc6b4ef21290f3aca567079893c27aefa48bd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "45d3f5dc_1356b8a5",
+        "filename": "cmd/cue/cmd/refactor_imports.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-02-04T07:29:53Z",
+      "side": 1,
+      "message": "Not quite: if the major version is omitted, the default is chosen, not all major versions. I changed the comment to clarify that a little.",
+      "parentUuid": "1e59ec50_c2e3dea7",
+      "revId": "7b3fc6b4ef21290f3aca567079893c27aefa48bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ecaea995_b1b81fbe",
@@ -99,6 +189,24 @@
       "writtenOn": "2025-01-31T11:01:21Z",
       "side": 1,
       "message": "these are posix shell examples, so I imagine we should be using `#` comments here.",
+      "revId": "7b3fc6b4ef21290f3aca567079893c27aefa48bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a69fc83f_f269ba77",
+        "filename": "cmd/cue/cmd/refactor_imports.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-02-04T07:29:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ecaea995_b1b81fbe",
       "revId": "7b3fc6b4ef21290f3aca567079893c27aefa48bd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +228,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e628f4af_d86979d4",
+        "filename": "cmd/cue/cmd/refactor_imports.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-02-04T07:29:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "61a15250_3fb8aad0",
+      "revId": "7b3fc6b4ef21290f3aca567079893c27aefa48bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c2f938fc_64d9864c",
@@ -133,6 +259,24 @@
       "writtenOn": "2025-01-31T11:01:21Z",
       "side": 1,
       "message": "perhaps comment briefly here that we\u0027re done fixing the import spec already, so we don\u0027t want to recurse into it.",
+      "revId": "7b3fc6b4ef21290f3aca567079893c27aefa48bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5f99f14_f6945666",
+        "filename": "cmd/cue/cmd/refactor_imports.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-02-04T07:29:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c2f938fc_64d9864c",
       "revId": "7b3fc6b4ef21290f3aca567079893c27aefa48bd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

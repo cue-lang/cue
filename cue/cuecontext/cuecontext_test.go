@@ -83,6 +83,7 @@ func TestEvalVersion(t *testing.T) {
 	defer func() { cueexperiment.Flags.EvalV3 = saved }()
 
 	test := func(c *cue.Context, want internal.EvaluatorVersion) {
+		t.Helper()
 		opCtx := adt.NewContext((*runtime.Runtime)(c), nil)
 		got := opCtx.Version
 		if got != want {
@@ -90,13 +91,27 @@ func TestEvalVersion(t *testing.T) {
 		}
 	}
 
-	cueexperiment.Flags.EvalV3 = true
-
-	test(New(), internal.DevVersion)
-	test(New(EvaluatorVersion(EvalV2)), internal.DefaultVersion)
-	test(New(EvaluatorVersion(EvalV3)), internal.DevVersion)
-
 	cueexperiment.Flags.EvalV3 = false
 
-	test(New(), internal.DefaultVersion)
+	test(New(), internal.EvalV2)
+	test(New(EvaluatorVersion(EvalDefault)), internal.EvalV2)
+	test(New(EvaluatorVersion(EvalExperiment)), internal.EvalV3)
+	test(New(EvaluatorVersion(EvalV2)), internal.EvalV2)
+	test(New(EvaluatorVersion(EvalV3)), internal.EvalV3)
+
+	cueexperiment.Flags.EvalV3 = true
+
+	test(New(), internal.EvalV3)
+	// TODO(mvdan): explicitly selecting the default should result in evalv3 here,
+	// just like implicitly selecting the default by not using the EvaluatorVersion flag.
+	// It currently does not, because internally, we treat "unset" vs "default"
+	// as different version selection scenarios.
+	//
+	// Or, if we want an evaluator version to describe "latest stable", opposing
+	// EvalExperiment to describe "latest experimental", we should rename it to EvalStable
+	// and keep its current behavior.
+	test(New(EvaluatorVersion(EvalDefault)), internal.EvalV2)
+	test(New(EvaluatorVersion(EvalExperiment)), internal.EvalV3)
+	test(New(EvaluatorVersion(EvalV2)), internal.EvalV2)
+	test(New(EvaluatorVersion(EvalV3)), internal.EvalV3)
 }

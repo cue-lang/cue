@@ -16,6 +16,24 @@
       "message": "Probably worth doing the same for CUE_DEBUG too?",
       "revId": "5c29bdb258d37ea7dc848b4788c63438dcdac31b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "290abacd_b152a8a7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-05T11:50:59Z",
+      "side": 1,
+      "message": "internal/envflag is used for both CUE_EXPERIMENT and CUE_DEBUG :) so yes, the change already applies to CUE_DEBUG too.",
+      "parentUuid": "24a88fd0_ba3d60a6",
+      "revId": "5c29bdb258d37ea7dc848b4788c63438dcdac31b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

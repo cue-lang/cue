@@ -57,13 +57,26 @@ var tests = []struct {
 		DefaultTrue: true,
 	}),
 }, {
+	testName: "JustCommas",
+	envVal:   ",,",
+	test: success(testFlags{
+		DefaultTrue: true,
+	}),
+}, {
 	testName: "Unknown",
 	envVal:   "ratchet",
 	test: failure(testFlags{DefaultTrue: true},
-		"cannot parse TEST_VAR: unknown ratchet"),
+		"cannot parse TEST_VAR: unknown flag \"ratchet\""),
 }, {
 	testName: "Set",
 	envVal:   "foo",
+	test: success(testFlags{
+		Foo:         true,
+		DefaultTrue: true,
+	}),
+}, {
+	testName: "SetExtraCommas",
+	envVal:   ",foo,",
 	test: success(testFlags{
 		Foo:         true,
 		DefaultTrue: true,
@@ -81,7 +94,7 @@ var tests = []struct {
 	test: failure(testFlags{
 		Foo:         true,
 		DefaultTrue: true,
-	}, "cannot parse TEST_VAR: unknown other"),
+	}, "cannot parse TEST_VAR: unknown flag \"other\""),
 }, {
 	testName: "TwoFlags",
 	envVal:   "barbaz,foo",
@@ -108,7 +121,7 @@ var tests = []struct {
 	test: failure(testFlags{
 		Foo:         true,
 		DefaultTrue: true,
-	}, "cannot parse TEST_VAR: unknown other1\nunknown other2"),
+	}, "cannot parse TEST_VAR: unknown flag \"other1\"\nunknown flag \"other2\""),
 }, {
 	testName: "Invalid",
 	envVal:   "foo=2,BarBaz=true",

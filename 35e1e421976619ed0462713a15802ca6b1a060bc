@@ -34,6 +34,24 @@
       "parentUuid": "b74c5869_2a74a584",
       "revId": "35e1e421976619ed0462713a15802ca6b1a060bc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "47316ece_6e672c12",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-05T16:15:50Z",
+      "side": 1,
+      "message": "For the sake of posterity, the patch:\n\n```\ndiff --git internal/envflag/flag.go internal/envflag/flag.go\nindex f7fddcd7..6c18b3d0 100644\n--- internal/envflag/flag.go\n+++ internal/envflag/flag.go\n@@ -5,7 +5,6 @@ import (\n \t\"fmt\"\n \t\"os\"\n \t\"reflect\"\n-\t\"strconv\"\n \t\"strings\"\n )\n \n@@ -49,11 +48,10 @@ func Parse[T any](flags *T, env string) error {\n \t\t\t\tkey, rest, hasRest :\u003d strings.Cut(f, \":\")\n \t\t\t\tswitch key {\n \t\t\t\tcase \"default\":\n-\t\t\t\t\tval, err :\u003d parseValue(name, field.Type.Kind(), rest)\n-\t\t\t\t\tif err !\u003d nil {\n+\t\t\t\t\tptr :\u003d fv.Field(i).Addr().Interface()\n+\t\t\t\t\tif err :\u003d parseValue(name, ptr, rest); err !\u003d nil {\n \t\t\t\t\t\treturn err\n \t\t\t\t\t}\n-\t\t\t\t\tfv.Field(i).Set(reflect.ValueOf(val))\n \t\t\t\tcase \"deprecated\":\n \t\t\t\t\tif hasRest {\n \t\t\t\t\t\treturn fmt.Errorf(\"cannot have a value for deprecated tag\")\n@@ -85,23 +83,20 @@ func Parse[T any](flags *T, env string) error {\n \n \t\tindex, knownFlag :\u003d indexByName[name]\n \t\tif !knownFlag {\n-\t\t\t// Unknown option, proceed processing options as long as the format is valid.\n-\t\t\terrs \u003d append(errs, fmt.Errorf(\"unknown flag %q\", elem))\n+\t\t\terrs \u003d append(errs, fmt.Errorf(\"unknown flag %q\", name))\n \t\t\tcontinue\n \t\t}\n \t\tfield :\u003d fv.Field(index)\n-\t\tvar val any\n+\t\tval :\u003d reflect.New(field.Type())\n \t\tif hasValue {\n-\t\t\tvar err error\n-\t\t\tval, err \u003d parseValue(name, field.Kind(), valueStr)\n-\t\t\tif err !\u003d nil {\n+\t\t\tif err :\u003d parseValue(name, val.Interface(), valueStr); err !\u003d nil {\n \t\t\t\terrs \u003d append(errs, err)\n \t\t\t\tcontinue\n \t\t\t}\n \t\t} else if field.Kind() \u003d\u003d reflect.Bool {\n \t\t\t// For bools, \"somename\" is short for \"somename\u003dtrue\" or \"somename\u003d1\".\n \t\t\t// This mimicks how Go flags work, e.g. -knob is short for -knob\u003dtrue.\n-\t\t\tval \u003d true\n+\t\t\tval.Elem().SetBool(true)\n \t\t} else {\n \t\t\t// For any other type, a value must be specified.\n \t\t\t// This mimicks how Go flags work, e.g. -output\u003dpath does not allow -output.\n@@ -112,34 +107,26 @@ func Parse[T any](flags *T, env string) error {\n \t\tif deprecated[name] {\n \t\t\t// We allow setting deprecated flags to their default value so that\n \t\t\t// bold explorers will not be penalised for their experimentation.\n-\t\t\tif field.Interface() !\u003d val {\n+\t\t\tif field.Interface() !\u003d val.Elem().Interface() {\n \t\t\t\terrs \u003d append(errs, fmt.Errorf(\"cannot change default value of deprecated flag %q\", name))\n \t\t\t}\n \t\t\tcontinue\n \t\t}\n \n-\t\tfield.Set(reflect.ValueOf(val))\n+\t\tfield.Set(val.Elem())\n \t}\n \treturn errors.Join(errs...)\n }\n \n-func parseValue(name string, kind reflect.Kind, str string) (any, error) {\n-\tvar val any\n-\tvar err error\n-\tswitch kind {\n-\tcase reflect.Bool:\n-\t\tval, err \u003d strconv.ParseBool(str)\n-\tcase reflect.Int:\n-\t\tval, err \u003d strconv.Atoi(str)\n-\tcase reflect.String:\n-\t\tval \u003d str\n-\tdefault:\n-\t\treturn nil, errInvalid{fmt.Errorf(\"unsupported kind %s\", kind)}\n+func parseValue(name string, ptr any, str string) error {\n+\tif _, ok :\u003d ptr.(*string); ok \u0026\u0026 str \u003d\u003d \"\" {\n+\t\treturn nil\n \t}\n+\t_, err :\u003d fmt.Sscanf(str, \"%v\", ptr)\n \tif err !\u003d nil {\n-\t\treturn nil, errInvalid{fmt.Errorf(\"invalid %s value for %s: %v\", kind, name, err)}\n+\t\treturn errInvalid{fmt.Errorf(\"invalid %T value for %s: %v\", ptr, name, err)}\n \t}\n-\treturn val, nil\n+\treturn nil\n }\n \n // An ErrInvalid indicates a malformed input string.\n```",
+      "parentUuid": "5641b1e4_bcfffbe3",
+      "revId": "35e1e421976619ed0462713a15802ca6b1a060bc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

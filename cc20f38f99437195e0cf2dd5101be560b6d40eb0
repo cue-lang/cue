@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbbb57d2_fcf264e3",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-05T13:12:55Z",
+      "side": 1,
+      "message": "I think this error message needs changing away from `bool`.",
+      "range": {
+        "startLine": 54,
+        "startChar": 41,
+        "endLine": 54,
+        "endChar": 45
+      },
+      "revId": "cc20f38f99437195e0cf2dd5101be560b6d40eb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59513417_7f7249b5",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-05T13:12:55Z",
+      "side": 1,
+      "message": "I think adding a `continue` here would make the control flow a little clearer?",
+      "revId": "cc20f38f99437195e0cf2dd5101be560b6d40eb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1be66063_fe5aae1a",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-05T13:12:55Z",
+      "side": 1,
+      "message": "I think if you add the `continue` as suggested above, it\u0027s straightforward to prove that `val` cannot be nil by this point, and so this `if` guard can be removed. _I think_.",
+      "revId": "cc20f38f99437195e0cf2dd5101be560b6d40eb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

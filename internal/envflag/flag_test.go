@@ -129,7 +129,7 @@ var tests = []struct {
 	}, "cannot parse TEST_VAR: unknown flag \"other1\"\nunknown flag \"other2\""),
 }, {
 	testName: "InvalidIntForBool",
-	envVal:   "foo=2,BarBaz=true",
+	envVal:   "foo=2",
 	test:     invalid(testFlags{DefaultTrue: true}),
 }, {
 	testName: "StringValue",

@@ -18,6 +18,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/go-quicktest/qt"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal"
@@ -83,20 +85,39 @@ func TestEvalVersion(t *testing.T) {
 	defer func() { cueexperiment.Flags.EvalV3 = saved }()
 
 	test := func(c *cue.Context, want internal.EvaluatorVersion) {
+		t.Helper()
 		opCtx := adt.NewContext((*runtime.Runtime)(c), nil)
-		got := opCtx.Version
-		if got != want {
-			t.Errorf("got %v; want %v", got, want)
-		}
+		qt.Check(t, qt.Equals(opCtx.Version, want))
 	}
 
-	cueexperiment.Flags.EvalV3 = true
+	// The experiment evaluator version setting does not affect the specific
+	// versions like Stable or V3, as they are fixed.
+	testFixedVersions := func() {
+		// We currently don't have an experimental version, so it's the current version.
+		test(New(EvaluatorVersion(EvalExperiment)), internal.EvalV3)
+		test(New(EvaluatorVersion(EvalV2)), internal.EvalV2)
+		test(New(EvaluatorVersion(EvalV3)), internal.EvalV3)
+	}
 
-	test(New(), internal.DevVersion)
-	test(New(EvaluatorVersion(EvalV2)), internal.DefaultVersion)
-	test(New(EvaluatorVersion(EvalV3)), internal.DevVersion)
+	// The current and default evaluator version is EvalV3.
+	qt.Assert(t, qt.Equals(cueexperiment.Flags.EvalV3, true))
+	test(New(), internal.EvalV3)
+	// TODO(mvdan): explicitly selecting the default should result in evalv3 here,
+	// just like implicitly selecting the default by not using the EvaluatorVersion flag.
+	// It currently does not, because internally, we treat "unset" vs "default"
+	// as different version selection scenarios.
+	//
+	// Or, if we want an evaluator version to describe "latest stable", opposing
+	// EvalExperiment to describe "latest experimental", we should rename it to EvalStable
+	// and keep its current behavior.
+	test(New(EvaluatorVersion(EvalDefault)), internal.EvalV2)
 
+	testFixedVersions()
+
+	// Turning off the evalv3 experiment switches the default back to EvalV2.
 	cueexperiment.Flags.EvalV3 = false
+	test(New(), internal.EvalV2)
+	test(New(EvaluatorVersion(EvalDefault)), internal.EvalV2)
 
-	test(New(), internal.DefaultVersion)
+	testFixedVersions()
 }

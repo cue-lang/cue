@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b74c5869_2a74a584",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-02-05T15:30:11Z",
+      "side": 1,
+      "message": "Another possibility to avoid the special-casing might be to use `fmt.Sscanf`.",
+      "revId": "35e1e421976619ed0462713a15802ca6b1a060bc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

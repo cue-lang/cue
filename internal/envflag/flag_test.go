@@ -14,6 +14,11 @@ type testFlags struct {
 	DefaultTrue  bool `envflag:"default:true"`
 }
 
+type testTypes struct {
+	StringDefaultFoo string `envflag:"default:foo"`
+	IntDefault5      int    `envflag:"default:5"`
+}
+
 type deprecatedFlags struct {
 	Foo bool `envflag:"deprecated"`
 	Bar bool `envflag:"deprecated,default:true"`
@@ -123,9 +128,44 @@ var tests = []struct {
 		DefaultTrue: true,
 	}, "cannot parse TEST_VAR: unknown flag \"other1\"\nunknown flag \"other2\""),
 }, {
-	testName: "Invalid",
+	testName: "InvalidIntForBool",
 	envVal:   "foo=2,BarBaz=true",
 	test:     invalid(testFlags{DefaultTrue: true}),
+}, {
+	testName: "StringValue",
+	envVal:   "stringdefaultfoo=bar",
+	test: success(testTypes{
+		StringDefaultFoo: "bar",
+		IntDefault5:      5,
+	}),
+}, {
+	testName: "StringEmpty",
+	envVal:   "stringdefaultfoo=",
+	test: success(testTypes{
+		StringDefaultFoo: "",
+		IntDefault5:      5,
+	}),
+}, {
+	testName: "FailureStringAlone",
+	envVal:   "stringdefaultfoo",
+	test: failure(testTypes{
+		StringDefaultFoo: "foo",
+		IntDefault5:      5,
+	}, "cannot parse TEST_VAR: value needed for string flag \"stringdefaultfoo\""),
+}, {
+	testName: "IntValue",
+	envVal:   "intdefault5=123",
+	test: success(testTypes{
+		StringDefaultFoo: "foo",
+		IntDefault5:      123,
+	}),
+}, {
+	testName: "IntEmpty",
+	envVal:   "intdefault5=",
+	test: invalid(testTypes{
+		StringDefaultFoo: "foo",
+		IntDefault5:      5,
+	}),
 }, {
 	testName: "DeprecatedWithFalseDefault",
 	envVal:   "foo=1",

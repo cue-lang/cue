@@ -26,6 +26,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2ec0719a_c030bfb6",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-05T13:15:33Z",
+      "side": 1,
+      "message": "I\u0027m not sure I understand why this is a direct return, and not appending to `errs`. It suggests there are different classes of error going on, but the function docs don\u0027t mention/explain this. I would be tempted to always use `errs` once in this loop.",
+      "revId": "cc20f38f99437195e0cf2dd5101be560b6d40eb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "59513417_7f7249b5",
         "filename": "internal/envflag/flag.go",
         "patchSetId": 1

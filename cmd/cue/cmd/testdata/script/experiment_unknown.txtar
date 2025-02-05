@@ -2,4 +2,4 @@ env CUE_EXPERIMENT=xxx
 ! exec cue eval something
 cmp stderr errout
 -- errout --
-cannot parse CUE_EXPERIMENT: unknown xxx
+cannot parse CUE_EXPERIMENT: unknown flag "xxx"

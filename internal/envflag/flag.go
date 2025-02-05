@@ -74,6 +74,15 @@ func Parse[T any](flags *T, env string) error {
 	}
 	var errs []error
 	for _, elem := range strings.Split(env, ",") {
+		if elem == "" {
+			// Allow empty elements such as `,somename=true` so that env vars
+			// can be joined together like
+			//
+			//     os.Setenv("CUE_EXPERIMENT", os.Getenv("CUE_EXPERIMENT")+",extra")
+			//
+			// even when the previous env var is empty.
+			continue
+		}
 		name, valueStr, ok := strings.Cut(elem, "=")
 		// "somename" is short for "somename=true" or "somename=1".
 		value := true
@@ -91,7 +100,7 @@ func Parse[T any](flags *T, env string) error {
 		if !ok {
 			// Unknown option, proceed processing options as long as the format
 			// is valid.
-			errs = append(errs, fmt.Errorf("unknown %s", elem))
+			errs = append(errs, fmt.Errorf("unknown flag %q", elem))
 			continue
 		}
 		if deprecated[name] {

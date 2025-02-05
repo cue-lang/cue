@@ -32,9 +32,8 @@ func Init[T any](flags *T, envVar string) error {
 // representing the boolean fields in the struct type T. If the value is omitted
 // entirely, the value is assumed to be name=true.
 //
-// Names are treated case insensitively. Value strings are parsed as Go booleans
-// via [strconv.ParseBool], meaning that they accept "true" and "false" but also
-// the shorter "1" and "0".
+// Names are treated case insensitively. Boolean values are parsed via [strconv.ParseBool],
+// integers via [strconv.Atoi], and strings are accepted as-is.
 func Parse[T any](flags *T, env string) error {
 	// Collect the field indices and set the default values.
 	indexByName := make(map[string]int)
@@ -67,9 +66,6 @@ func Parse[T any](flags *T, env string) error {
 		indexByName[name] = i
 	}
 
-	if env == "" {
-		return nil
-	}
 	var errs []error
 	for _, elem := range strings.Split(env, ",") {
 		if elem == "" {
@@ -85,7 +81,6 @@ func Parse[T any](flags *T, env string) error {
 
 		index, knownFlag := indexByName[name]
 		if !knownFlag {
-			// Unknown option, proceed processing options as long as the format is valid.
 			errs = append(errs, fmt.Errorf("unknown flag %q", elem))
 			continue
 		}
@@ -123,9 +118,7 @@ func Parse[T any](flags *T, env string) error {
 	return errors.Join(errs...)
 }
 
-func parseValue(name string, kind reflect.Kind, str string) (any, error) {
-	var val any
-	var err error
+func parseValue(name string, kind reflect.Kind, str string) (val any, err error) {
 	switch kind {
 	case reflect.Bool:
 		val, err = strconv.ParseBool(str)

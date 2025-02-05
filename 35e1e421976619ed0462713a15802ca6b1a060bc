@@ -16,6 +16,24 @@
       "message": "Another possibility to avoid the special-casing might be to use `fmt.Sscanf`.",
       "revId": "35e1e421976619ed0462713a15802ca6b1a060bc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5641b1e4_bcfffbe3",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-05T16:14:16Z",
+      "side": 1,
+      "message": "I tried this locally, and for the most part this worked nicely in that we avoided a switch to select the right strconv API. However:\n\n1) Sscanf is not required to consume the entire input, so we have to handle that ourselves, which may also result in odd error messages.\n\n2) Sscanf seems to do something very odd with %v on booleans: https://go.dev/play/p/pLizVQVkt64\n\nI will then stick to the very small switch for now. Honestly it doesn\u0027t feel like it\u0027s bad at all, especially because I don\u0027t think support for e.g. int8 or float will be needed.",
+      "parentUuid": "b74c5869_2a74a584",
+      "revId": "35e1e421976619ed0462713a15802ca6b1a060bc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

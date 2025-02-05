@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe4d9daf_25227c88",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-05T14:50:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fbbb57d2_fcf264e3",
+      "range": {
+        "startLine": 54,
+        "startChar": 41,
+        "endLine": 54,
+        "endChar": 45
+      },
+      "revId": "cc20f38f99437195e0cf2dd5101be560b6d40eb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2ec0719a_c030bfb6",
@@ -37,6 +61,24 @@
       "writtenOn": "2025-02-05T13:15:33Z",
       "side": 1,
       "message": "I\u0027m not sure I understand why this is a direct return, and not appending to `errs`. It suggests there are different classes of error going on, but the function docs don\u0027t mention/explain this. I would be tempted to always use `errs` once in this loop.",
+      "revId": "cc20f38f99437195e0cf2dd5101be560b6d40eb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6e0c1e6_a9eae6f6",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-05T14:50:52Z",
+      "side": 1,
+      "message": "The original code also returned immediately, with the comment\n\n\t// Invalid format, return an error immediately.\n\nbut I agree it\u0027s somewhat inconsistent and I can\u0027t see why. I will make all of them append to errs for now.",
+      "parentUuid": "2ec0719a_c030bfb6",
       "revId": "cc20f38f99437195e0cf2dd5101be560b6d40eb0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -58,6 +100,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd644cae_c3c79161",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-05T14:50:52Z",
+      "side": 1,
+      "message": "oof, nice catch.",
+      "parentUuid": "59513417_7f7249b5",
+      "revId": "cc20f38f99437195e0cf2dd5101be560b6d40eb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1be66063_fe5aae1a",
@@ -71,6 +131,24 @@
       "writtenOn": "2025-02-05T13:12:55Z",
       "side": 1,
       "message": "I think if you add the `continue` as suggested above, it\u0027s straightforward to prove that `val` cannot be nil by this point, and so this `if` guard can be removed. _I think_.",
+      "revId": "cc20f38f99437195e0cf2dd5101be560b6d40eb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a477b58e_0f222670",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-05T14:50:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1be66063_fe5aae1a",
       "revId": "cc20f38f99437195e0cf2dd5101be560b6d40eb0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

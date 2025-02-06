@@ -15,12 +15,12 @@
 package openapi
 
 import (
+	"cmp"
 	"fmt"
 	"math"
 	"path"
 	"regexp"
 	"slices"
-	"sort"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -166,11 +166,8 @@ func schemas(g *Generator, inst cue.InstanceOrValue) (schemas *ast.StructLit, er
 		}
 	}
 
-	a := c.schemas.Elts
-	sort.Slice(a, func(i, j int) bool {
-		x, _, _ := ast.LabelName(a[i].(*ast.Field).Label)
-		y, _, _ := ast.LabelName(a[j].(*ast.Field).Label)
-		return x < y
+	slices.SortFunc(c.schemas.Elts, func(a, b ast.Decl) int {
+		return cmp.Compare(label(a), label(b))
 	})
 
 	return (*ast.StructLit)(c.schemas), c.errs
@@ -286,15 +283,12 @@ func value(d ast.Decl) ast.Expr {
 }
 
 func sortSchema(s *ast.StructLit) {
-	sort.Slice(s.Elts, func(i, j int) bool {
-		iName := label(s.Elts[i])
-		jName := label(s.Elts[j])
-		pi := fieldOrder[iName]
-		pj := fieldOrder[jName]
-		if pi != pj {
-			return pi > pj
-		}
-		return iName < jName
+	slices.SortFunc(s.Elts, func(a, b ast.Decl) int {
+		aName := label(a)
+		bName := label(b)
+		aOrder := fieldOrder[aName]
+		bOrder := fieldOrder[bName]
+		return cmp.Or(-cmp.Compare(aOrder, bOrder), cmp.Compare(aName, bName))
 	})
 }
 

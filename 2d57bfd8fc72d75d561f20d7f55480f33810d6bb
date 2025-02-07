@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8a8311e_fc1a9515",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-07T15:09:00Z",
+      "side": 1,
+      "message": "is 3649 the right issue number here? it was closed over a week ago and seems to have related to cycle detection, not closedness nor \"top\".",
+      "revId": "2d57bfd8fc72d75d561f20d7f55480f33810d6bb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

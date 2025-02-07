@@ -16,6 +16,24 @@
       "message": "is 3649 the right issue number here? it was closed over a week ago and seems to have related to cycle detection, not closedness nor \"top\".",
       "revId": "2d57bfd8fc72d75d561f20d7f55480f33810d6bb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ceb4e26_b72c7043",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-07T15:12:52Z",
+      "side": 1,
+      "message": "I copied it from the Unify rework, maybe a bit aggressively. There are some issues related to the 3649 that are related to this.",
+      "parentUuid": "d8a8311e_fc1a9515",
+      "revId": "2d57bfd8fc72d75d561f20d7f55480f33810d6bb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

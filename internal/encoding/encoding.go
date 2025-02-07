@@ -174,10 +174,10 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 		return i
 	}
 
-	var srcr io.Reader
+	var r io.Reader
 	if f.Source == nil && f.Filename == "-" {
 		// TODO: should we allow this?
-		srcr = cfg.Stdin
+		r = cfg.Stdin
 	} else {
 		rc, err := source.Open(f.Filename, f.Source)
 		i.closer = rc
@@ -185,16 +185,8 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 		if i.err != nil {
 			return i
 		}
-		srcr = rc
+		r = rc
 	}
-
-	// For now we assume that all encodings require UTF-8. This will not be the
-	// case for some binary protocols. We need to exempt those explicitly here
-	// once we introduce them.
-	// TODO: this code also allows UTF16, which is too permissive for some
-	// encodings. Switch to unicode.UTF8Sig once available.
-	t := unicode.BOMOverride(unicode.UTF8.NewDecoder())
-	r := transform.NewReader(srcr, t)
 
 	switch f.Interpretation {
 	case "":
@@ -222,6 +214,19 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 		i.rewriteFunc = protobufJSONFunc(cfg, f)
 	default:
 		i.err = fmt.Errorf("unsupported interpretation %q", f.Interpretation)
+	}
+
+	// Binary encodings should not be treated as UTF-8, so read directly from the file.
+	// Other encodings are interepted as UTF-8 with an optional BOM prefix.
+	//
+	// TODO: perhaps each encoding could have a "binary" boolean attribute
+	// so that we can use that here rather than hard-coding which encodings are binary.
+	// In the near future, others like [build.BinaryProto] should also be treated as binary.
+	if f.Encoding != build.Binary {
+		// TODO: this code also allows UTF16, which is too permissive for some
+		// encodings. Switch to unicode.UTF8Sig once available.
+		t := unicode.BOMOverride(unicode.UTF8.NewDecoder())
+		r = transform.NewReader(r, t)
 	}
 
 	path := f.Filename

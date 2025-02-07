@@ -2098,7 +2098,11 @@ func TestUnify(t *testing.T) {
 		value string
 		pathA string
 		pathB string
+		pathC string
 		want  string
+
+		skipv2 bool
+		skipv3 bool
 	}
 	testCases := []testCase{{
 		value: `4`,
@@ -2148,14 +2152,74 @@ func TestUnify(t *testing.T) {
 		pathA: a,
 		pathB: "#B",
 		want:  `{}`,
+	}, {
+		skipv3: true,
+
+		value: `
+			a: obj: initialField: "foo"
+			a: #x
+			#x: obj?: _
+			b: obj: extraField: "bar"
+			`,
+		pathA: a,
+		pathB: b,
+		want:  `{"obj":{"initialField":"foo","extraField":"bar"}}`,
+	}, {
+		value: `
+			a: obj: initialField: "foo"
+			a: #x
+			#x: obj?: {...}
+			b: obj: extraField: "bar"
+				`,
+		pathA: a,
+		pathB: b,
+		want:  `{"obj":{"initialField":"foo","extraField":"bar"}}`,
+	}, {
+		skipv2: true,
+		skipv3: true,
+
+		value: `
+			a: obj: initialField: "foo"
+			#x: obj?: _
+			b: obj: extraField: "bar"
+			`,
+		pathA: a,
+		pathB: "#x",
+		pathC: b,
+		want:  `{"obj":{"initialField":"foo","extraField":"bar"}}`,
+	}, {
+		value: `
+			a: obj: initialField: "foo"
+			#x: obj?: {...}
+			a: #x
+			b: extraField: "bar"
+			`,
+		pathA: "a.obj",
+		pathB: b,
+		want:  `{"initialField":"foo","extraField":"bar"}`,
 	}}
+
+	matrix := cuetdtest.FullMatrix
+
 	// TODO(tdtest): use cuetest.Run when supported.
-	cuetdtest.FullMatrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
+	matrix.Do(t, func(t *testing.T, m *cuetdtest.M) {
 		tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
+			if tc.skipv2 {
+				m.TODO_V2(t)
+			}
+			if tc.skipv3 {
+				m.TODO_V3(t)
+			}
+
 			v := getValue(m, tc.value)
 			x := v.LookupPath(cue.ParsePath(tc.pathA))
 			y := v.LookupPath(cue.ParsePath(tc.pathB))
-			b, err := x.Unify(y).MarshalJSON()
+			x = x.Unify(y)
+			if tc.pathC != "" {
+				z := v.LookupPath(cue.ParsePath(tc.pathC))
+				x = x.Unify(z)
+			}
+			b, err := x.MarshalJSON()
 			if err != nil {
 				t.Fatal(err)
 			}

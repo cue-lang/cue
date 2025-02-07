@@ -6,11 +6,9 @@ env CUE_EXPERIMENT=
 
 # Create test files for type=binary. txtar can only hold valid UTF8 - we need to test arbitrary bytes as input so we use quoted strings for storage
 # Text file, encoded in UTF8-8 with leading BOM
-# BOM should be stripped by faulty binary handling
 strconv-unquote '"\xef\xbb\xbfHello, 世界"'
 cp stdout test-utf8.binary
 # A byte sequence - should be invalid UTF-8
-# Each byte should be replaced by a unicode replacement character due to faulty binary handling
 strconv-unquote "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7"
 cp stdout test-nonutf8.binary
 
@@ -230,7 +228,7 @@ g: {
     }
 }
 h: '''
-    Hello, 世界
+    \ufeffHello, 世界
 
     '''
 i: """
@@ -238,7 +236,7 @@ i: """
 
     """
 j: '''
-    ��������
+    \xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7
 
     '''
 special: {
@@ -302,7 +300,7 @@ g: {
 	}
 }
 h: '''
-	Hello, 世界
+	\ufeffHello, 世界
 
 	'''
 i: """
@@ -310,7 +308,7 @@ i: """
 
 	"""
 j: '''
-	��������
+	\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7
 
 	'''
 special: {

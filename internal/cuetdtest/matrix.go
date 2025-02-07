@@ -93,6 +93,12 @@ func (m Matrix) Do(t *testing.T, f func(t *testing.T, m *M)) {
 	}
 }
 
+func (m *M) TODO_V2(t testing.TB) {
+	if m.version == internal.DefaultVersion {
+		t.Skip("Skipping v2")
+	}
+}
+
 func (m *M) TODO_V3(t testing.TB) {
 	if m.version == internal.DevVersion {
 		t.Skip("Skipping v3")

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30c4befb_2f9e98fb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-07T15:21:03Z",
+      "side": 1,
+      "message": "Are the testdata changes/improvements due to the point 4 you mention in the commit message? If not, could you briefly explain the reason for the change in behavior?",
+      "revId": "09d9f92da81ca94e65ef4c0d299cfc61ea79ca88",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -2102,7 +2102,6 @@ func TestUnify(t *testing.T) {
 		want  string
 
 		skipv2 bool
-		skipv3 bool
 	}
 	testCases := []testCase{{
 		value: `4`,
@@ -2153,8 +2152,6 @@ func TestUnify(t *testing.T) {
 		pathB: "#B",
 		want:  `{}`,
 	}, {
-		skipv3: true,
-
 		value: `
 			a: obj: initialField: "foo"
 			a: #x
@@ -2176,7 +2173,6 @@ func TestUnify(t *testing.T) {
 		want:  `{"obj":{"initialField":"foo","extraField":"bar"}}`,
 	}, {
 		skipv2: true,
-		skipv3: true,
 
 		value: `
 			a: obj: initialField: "foo"
@@ -2206,9 +2202,6 @@ func TestUnify(t *testing.T) {
 		tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
 			if tc.skipv2 {
 				m.TODO_V2(t)
-			}
-			if tc.skipv3 {
-				m.TODO_V3(t)
 			}
 
 			v := getValue(m, tc.value)

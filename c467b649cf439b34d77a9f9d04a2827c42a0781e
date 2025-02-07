@@ -52,6 +52,24 @@
       "parentUuid": "2c1e1325_309262d6",
       "revId": "c467b649cf439b34d77a9f9d04a2827c42a0781e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44328a92_87a2d94c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-07T15:12:34Z",
+      "side": 1,
+      "message": "As Unity already reported, I confirm that the services repo passes with PS3 now :)",
+      "parentUuid": "a7ecc45d_8e0c42e8",
+      "revId": "c467b649cf439b34d77a9f9d04a2827c42a0781e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -386,7 +386,6 @@ loop2:
 	if !hasEmbed {
 		n.aStruct = s
 		n.aStructID = ci
-		ci.cc.hasNonTop = true
 	}
 
 	// TODO: probably no longer necessary.
@@ -651,12 +650,10 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 			n.unshare()
 			return
 		}
-		id.cc.hasNonTop = true
 		n.addBottom(x)
 		return
 
 	case *Builtin:
-		id.cc.hasNonTop = true
 		if v := x.BareValidator(); v != nil {
 			n.insertValueConjunct(env, v, id)
 			return
@@ -710,12 +707,9 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 	case *BasicType:
 		n.updateCyclicStatusV3(id)
 
-		id.cc.hasNonTop = true
-
 	case *BoundValue:
 		n.updateCyclicStatusV3(id)
 
-		id.cc.hasNonTop = true
 		switch x.Op {
 		case LessThanOp, LessEqualOp:
 			if y := n.upperBound; y != nil {

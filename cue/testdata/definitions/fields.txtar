@@ -127,6 +127,12 @@ ok: t14: {
 }
 
 
+// TODO: move this test to "ok": _ means any and implicitly defines all fields
+// to be present as optional fields with _, recursively (as long as the type
+// has not been picked to be non-struct).
+// This was not observed in V2, but is now observed in V3. We should probably
+// either allow for an error variant that only "allows" all fields but does not
+// define them as optional top, or rethink the closedness model altogether.
 err: t1: {
 	#D: _ & {a: 2}
 	a: #D
@@ -175,10 +181,16 @@ err: t6: {
 	b: b: c: d: e: h: 1 // only an error here
 }
 
+// TODO: move this test to "ok": _ means any and implicitly defines all fields
+// to be present as optional fields with _, recursively (as long as the type
+// has not been picked to be non-struct).
+// This was not observed in V2, but is now observed in V3. We should probably
+// either allow for an error variant that only "allows" all fields but does not
+// define them as optional top, or rethink the closedness model altogether.
 err: t7: {
 	#D: _ & {a: 2}
 	a: #D
-	a: b: 1 // FAIL
+	a: b: 1
 }
 
 err: t8: {
@@ -232,42 +244,29 @@ Disjuncts:    238
 -- out/evalalpha --
 Errors:
 err.t2.V.c.e: field not allowed:
-    ./in.cue:136:10
+    ./in.cue:142:10
 err.t3.p2.a.b.c: field not allowed:
-    ./in.cue:148:8
-err.t4.a.b.h: field not allowed:
     ./in.cue:154:8
+err.t4.a.b.h: field not allowed:
+    ./in.cue:160:8
 err.t5.b.b.h: field not allowed:
-    ./in.cue:163:8
+    ./in.cue:169:8
 err.t6.b.b.c.d.e.h: field not allowed:
-    ./in.cue:172:17
+    ./in.cue:178:17
 err.t8.V.c.e: field not allowed:
-    ./in.cue:185:10
+    ./in.cue:197:10
 issue1830.egs.x1.age1: field not allowed:
     ./issue1830.cue:13:4
 issue1830.egs.x2.age2: field not allowed:
     ./issue1830.cue:17:4
-ok.t5.x.c: field not allowed:
-    ./in.cue:36:3
-    ./in.cue:41:5
-ok.t13.x.c: field not allowed:
-    ./in.cue:107:3
-    ./in.cue:112:5
-err.t1.a.disallowed: field not allowed:
-    ./in.cue:129:5
-    ./in.cue:130:5
 err.t3.p1.a.c: field not allowed:
-    ./in.cue:141:5
-    ./in.cue:142:5
-err.t7.a.b: field not allowed:
-    ./in.cue:177:5
-    ./in.cue:178:5
+    ./in.cue:147:5
+    ./in.cue:148:5
 
 Result:
 (_|_){
   // [eval]
-  ok: (_|_){
-    // [eval]
+  ok: (struct){
     t1: (struct){
       c: (#list){
         0: (#struct){
@@ -317,19 +316,13 @@ Result:
         }
       }
     }
-    t5: (_|_){
-      // [eval]
+    t5: (struct){
       #A: (#struct){
       }
       Common: (struct){
       }
-      x: (_|_){
-        // [eval]
-        c: (_|_){
-          // [eval] ok.t5.x.c: field not allowed:
-          //     ./in.cue:36:3
-          //     ./in.cue:41:5
-        }
+      x: (#struct){
+        c: (int){ int }
       }
     }
     t6: (struct){
@@ -421,19 +414,13 @@ Result:
         }
       }
     }
-    t13: (_|_){
-      // [eval]
+    t13: (struct){
       #A: (#struct){
       }
       Common: (struct){
       }
-      x: (_|_){
-        // [eval]
-        c: (_|_){
-          // [eval] ok.t13.x.c: field not allowed:
-          //     ./in.cue:107:3
-          //     ./in.cue:112:5
-        }
+      x: (#struct){
+        c: (int){ int }
       }
     }
     t14: (struct){
@@ -448,18 +435,12 @@ Result:
   }
   err: (_|_){
     // [eval]
-    t1: (_|_){
-      // [eval]
+    t1: (struct){
       #D: (#struct){
         a: (int){ 2 }
       }
-      a: (_|_){
-        // [eval]
-        disallowed: (_|_){
-          // [eval] err.t1.a.disallowed: field not allowed:
-          //     ./in.cue:129:5
-          //     ./in.cue:130:5
-        }
+      a: (#struct){
+        disallowed: (int){ 1 }
         a: (int){ 2 }
       }
     }
@@ -476,7 +457,7 @@ Result:
           // [eval]
           e: (_|_){
             // [eval] err.t2.V.c.e: field not allowed:
-            //     ./in.cue:136:10
+            //     ./in.cue:142:10
           }
           d: (int){ 1 }
         }
@@ -492,8 +473,8 @@ Result:
           // [eval]
           c: (_|_){
             // [eval] err.t3.p1.a.c: field not allowed:
-            //     ./in.cue:141:5
-            //     ./in.cue:142:5
+            //     ./in.cue:147:5
+            //     ./in.cue:148:5
           }
         }
       }
@@ -509,7 +490,7 @@ Result:
             // [eval]
             c: (_|_){
               // [eval] err.t3.p2.a.b.c: field not allowed:
-              //     ./in.cue:148:8
+              //     ./in.cue:154:8
             }
           }
         }
@@ -523,7 +504,7 @@ Result:
           // [eval]
           h: (_|_){
             // [eval] err.t4.a.b.h: field not allowed:
-            //     ./in.cue:154:8
+            //     ./in.cue:160:8
           }
           f: (int){ 1 }
         }
@@ -558,7 +539,7 @@ Result:
           // [eval]
           h: (_|_){
             // [eval] err.t5.b.b.h: field not allowed:
-            //     ./in.cue:163:8
+            //     ./in.cue:169:8
           }
           f: (int){ 1 }
           g: (int){ 1 }
@@ -613,7 +594,7 @@ Result:
                 // [eval]
                 h: (_|_){
                   // [eval] err.t6.b.b.c.d.e.h: field not allowed:
-                  //     ./in.cue:172:17
+                  //     ./in.cue:178:17
                 }
                 f: (int){ 1 }
                 g: (int){ 1 }
@@ -623,18 +604,12 @@ Result:
         }
       }
     }
-    t7: (_|_){
-      // [eval]
+    t7: (struct){
       #D: (#struct){
         a: (int){ 2 }
       }
-      a: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval] err.t7.a.b: field not allowed:
-          //     ./in.cue:177:5
-          //     ./in.cue:178:5
-        }
+      a: (#struct){
+        b: (int){ 1 }
         a: (int){ 2 }
       }
     }
@@ -651,7 +626,7 @@ Result:
           // [eval]
           e: (_|_){
             // [eval] err.t8.V.c.e: field not allowed:
-            //     ./in.cue:185:10
+            //     ./in.cue:197:10
           }
           d: (int){ 1 }
         }
@@ -708,93 +683,88 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,60 +1,35 @@
+@@ -1,69 +1,31 @@
  Errors:
 -err.t1.a.disallowed: field not allowed:
--    ./in.cue:128:10
--    ./in.cue:129:5
--    ./in.cue:130:5
- err.t2.V.c.e: field not allowed:
--    ./in.cue:134:8
--    ./in.cue:134:13
+-    ./in.cue:134:10
 -    ./in.cue:135:5
-     ./in.cue:136:10
--err.t3.p1.a.c: field not allowed:
--    ./in.cue:140:6
+-    ./in.cue:136:5
+ err.t2.V.c.e: field not allowed:
+-    ./in.cue:140:8
+-    ./in.cue:140:13
 -    ./in.cue:141:5
--    ./in.cue:142:5
- err.t3.p2.a.b.c: field not allowed:
--    ./in.cue:146:9
+     ./in.cue:142:10
+-err.t3.p1.a.c: field not allowed:
+-    ./in.cue:146:6
 -    ./in.cue:147:5
-     ./in.cue:148:8
- err.t4.a.b.h: field not allowed:
--    ./in.cue:152:5
--    ./in.cue:153:9
+-    ./in.cue:148:5
+ err.t3.p2.a.b.c: field not allowed:
+-    ./in.cue:152:9
+-    ./in.cue:153:5
      ./in.cue:154:8
+ err.t4.a.b.h: field not allowed:
+-    ./in.cue:158:5
+-    ./in.cue:159:9
+     ./in.cue:160:8
  err.t5.b.b.h: field not allowed:
--    ./in.cue:159:6
--    ./in.cue:159:10
--    ./in.cue:160:9
--    ./in.cue:161:9
--    ./in.cue:162:5
-     ./in.cue:163:8
+-    ./in.cue:165:6
+-    ./in.cue:165:10
+-    ./in.cue:166:9
+-    ./in.cue:167:9
+-    ./in.cue:168:5
+     ./in.cue:169:8
  err.t6.b.b.c.d.e.h: field not allowed:
--    ./in.cue:168:6
--    ./in.cue:168:10
--    ./in.cue:169:18
--    ./in.cue:170:18
--    ./in.cue:171:5
-     ./in.cue:172:17
--err.t7.a.b: field not allowed:
--    ./in.cue:176:10
+-    ./in.cue:174:6
+-    ./in.cue:174:10
+-    ./in.cue:175:18
+-    ./in.cue:176:18
 -    ./in.cue:177:5
--    ./in.cue:178:5
+     ./in.cue:178:17
+-err.t7.a.b: field not allowed:
+-    ./in.cue:188:10
+-    ./in.cue:189:5
+-    ./in.cue:190:5
  err.t8.V.c.e: field not allowed:
--    ./in.cue:183:8
--    ./in.cue:183:13
--    ./in.cue:184:5
-     ./in.cue:185:10
+-    ./in.cue:195:8
+-    ./in.cue:195:13
+-    ./in.cue:196:5
+     ./in.cue:197:10
 -ok.t13.x.c: field not allowed:
 -    ./in.cue:106:6
 -    ./in.cue:107:3
 -    ./in.cue:110:10
 -    ./in.cue:111:5
 -    ./in.cue:112:5
+-ok.t5.x.c: field not allowed:
+-    ./in.cue:35:6
+-    ./in.cue:36:3
+-    ./in.cue:39:10
+-    ./in.cue:40:5
+-    ./in.cue:41:5
 +issue1830.egs.x1.age1: field not allowed:
 +    ./issue1830.cue:13:4
 +issue1830.egs.x2.age2: field not allowed:
 +    ./issue1830.cue:17:4
- ok.t5.x.c: field not allowed:
--    ./in.cue:35:6
-     ./in.cue:36:3
--    ./in.cue:39:10
--    ./in.cue:40:5
-     ./in.cue:41:5
-+ok.t13.x.c: field not allowed:
-+    ./in.cue:107:3
-+    ./in.cue:112:5
-+err.t1.a.disallowed: field not allowed:
-+    ./in.cue:129:5
-+    ./in.cue:130:5
 +err.t3.p1.a.c: field not allowed:
-+    ./in.cue:141:5
-+    ./in.cue:142:5
-+err.t7.a.b: field not allowed:
-+    ./in.cue:177:5
-+    ./in.cue:178:5
++    ./in.cue:147:5
++    ./in.cue:148:5
  
  Result:
  (_|_){
-@@ -63,7 +38,7 @@
-     // [eval]
-     t1: (struct){
-       c: (#list){
+   // [eval]
+-  ok: (_|_){
+-    // [eval]
+-    t1: (struct){
+-      c: (#list){
 -        0: (struct){
++  ok: (struct){
++    t1: (struct){
++      c: (#list){
 +        0: (#struct){
            b: (int){ int }
          }
        }
-@@ -72,7 +47,7 @@
+@@ -72,7 +34,7 @@
      }
      t2: (struct){
        #A: (_){ _ }
@@ -803,7 +773,7 @@ diff old new
          f: (string){ "hi" }
        }
      }
-@@ -102,11 +77,11 @@
+@@ -102,30 +64,21 @@
          }
        }
        W: (#struct){
@@ -812,26 +782,44 @@ diff old new
 -        }
 -        b: (struct){
 -          c: (int){ 2 }
+-        }
+-      }
+-    }
+-    t5: (_|_){
+-      // [eval]
+-      #A: (#struct){
+-      }
+-      Common: (struct){
+-      }
+-      x: (_|_){
+-        // [eval]
+-        c: (_|_){
+-          // [eval] ok.t5.x.c: field not allowed:
+-          //     ./in.cue:35:6
+-          //     ./in.cue:36:3
+-          //     ./in.cue:39:10
+-          //     ./in.cue:40:5
+-          //     ./in.cue:41:5
+-        }
 +        b: (struct){
 +          c: (int){ 2 }
 +        }
 +        a: (#struct){
 +          b: (int){ 1 }
-         }
++        }
++      }
++    }
++    t5: (struct){
++      #A: (#struct){
++      }
++      Common: (struct){
++      }
++      x: (#struct){
++        c: (int){ int }
        }
      }
-@@ -120,10 +95,7 @@
-         // [eval]
-         c: (_|_){
-           // [eval] ok.t5.x.c: field not allowed:
--          //     ./in.cue:35:6
-           //     ./in.cue:36:3
--          //     ./in.cue:39:10
--          //     ./in.cue:40:5
-           //     ./in.cue:41:5
-         }
-       }
-@@ -156,16 +128,7 @@
+     t6: (struct){
+@@ -156,16 +109,7 @@
        }
      }
      t8: (struct){
@@ -849,7 +837,7 @@ diff old new
        #X: (#struct){
          a: (#struct){
            b: (#struct){
-@@ -179,7 +142,7 @@
+@@ -179,7 +123,7 @@
      }
      t9: (struct){
        c: (#list){
@@ -858,7 +846,7 @@ diff old new
            b: (int){ int }
          }
        }
-@@ -188,7 +151,7 @@
+@@ -188,7 +132,7 @@
      }
      t10: (struct){
        #A: (_){ _ }
@@ -867,7 +855,7 @@ diff old new
          f: (string){ "hi" }
        }
      }
-@@ -218,11 +181,11 @@
+@@ -218,30 +162,21 @@
          }
        }
        W: (#struct){
@@ -876,83 +864,114 @@ diff old new
 -        }
 -        b: (struct){
 -          c: (int){ 2 }
+-        }
+-      }
+-    }
+-    t13: (_|_){
+-      // [eval]
+-      #A: (#struct){
+-      }
+-      Common: (struct){
+-      }
+-      x: (_|_){
+-        // [eval]
+-        c: (_|_){
+-          // [eval] ok.t13.x.c: field not allowed:
+-          //     ./in.cue:106:6
+-          //     ./in.cue:107:3
+-          //     ./in.cue:110:10
+-          //     ./in.cue:111:5
+-          //     ./in.cue:112:5
+-        }
 +        b: (struct){
 +          c: (int){ 2 }
 +        }
 +        a: (#struct){
 +          b: (int){ 1 }
-         }
++        }
++      }
++    }
++    t13: (struct){
++      #A: (#struct){
++      }
++      Common: (struct){
++      }
++      x: (#struct){
++        c: (int){ int }
        }
      }
-@@ -236,10 +199,7 @@
-         // [eval]
-         c: (_|_){
-           // [eval] ok.t13.x.c: field not allowed:
--          //     ./in.cue:106:6
-           //     ./in.cue:107:3
--          //     ./in.cue:110:10
--          //     ./in.cue:111:5
-           //     ./in.cue:112:5
-         }
-       }
-@@ -263,13 +223,12 @@
-       }
-       a: (_|_){
-         // [eval]
+     t14: (struct){
+@@ -256,20 +191,13 @@
+   }
+   err: (_|_){
+     // [eval]
+-    t1: (_|_){
+-      // [eval]
+-      #D: (#struct){
 -        a: (int){ 2 }
-         disallowed: (_|_){
-           // [eval] err.t1.a.disallowed: field not allowed:
--          //     ./in.cue:128:10
-           //     ./in.cue:129:5
-           //     ./in.cue:130:5
-         }
+-      }
+-      a: (_|_){
+-        // [eval]
+-        a: (int){ 2 }
+-        disallowed: (_|_){
+-          // [eval] err.t1.a.disallowed: field not allowed:
+-          //     ./in.cue:134:10
+-          //     ./in.cue:135:5
+-          //     ./in.cue:136:5
+-        }
++    t1: (struct){
++      #D: (#struct){
++        a: (int){ 2 }
++      }
++      a: (#struct){
++        disallowed: (int){ 1 }
 +        a: (int){ 2 }
        }
      }
      t2: (_|_){
-@@ -283,14 +242,11 @@
+@@ -283,14 +211,11 @@
          // [eval]
          c: (_|_){
            // [eval]
 -          d: (int){ 1 }
            e: (_|_){
              // [eval] err.t2.V.c.e: field not allowed:
--            //     ./in.cue:134:8
--            //     ./in.cue:134:13
--            //     ./in.cue:135:5
-             //     ./in.cue:136:10
+-            //     ./in.cue:140:8
+-            //     ./in.cue:140:13
+-            //     ./in.cue:141:5
+             //     ./in.cue:142:10
            }
 +          d: (int){ 1 }
          }
        }
      }
-@@ -304,7 +260,6 @@
+@@ -304,7 +229,6 @@
            // [eval]
            c: (_|_){
              // [eval] err.t3.p1.a.c: field not allowed:
--            //     ./in.cue:140:6
-             //     ./in.cue:141:5
-             //     ./in.cue:142:5
+-            //     ./in.cue:146:6
+             //     ./in.cue:147:5
+             //     ./in.cue:148:5
            }
-@@ -322,8 +277,6 @@
+@@ -322,8 +246,6 @@
              // [eval]
              c: (_|_){
                // [eval] err.t3.p2.a.b.c: field not allowed:
--              //     ./in.cue:146:9
--              //     ./in.cue:147:5
-               //     ./in.cue:148:8
+-              //     ./in.cue:152:9
+-              //     ./in.cue:153:5
+               //     ./in.cue:154:8
              }
            }
-@@ -336,54 +289,47 @@
+@@ -336,54 +258,47 @@
          // [eval]
          b: (_|_){
            // [eval]
 -          f: (int){ 1 }
            h: (_|_){
              // [eval] err.t4.a.b.h: field not allowed:
--            //     ./in.cue:152:5
--            //     ./in.cue:153:9
-             //     ./in.cue:154:8
+-            //     ./in.cue:158:5
+-            //     ./in.cue:159:9
+             //     ./in.cue:160:8
            }
 -        }
 -      }
@@ -1019,19 +1038,19 @@ diff old new
 +          // [eval]
            h: (_|_){
              // [eval] err.t5.b.b.h: field not allowed:
--            //     ./in.cue:159:6
--            //     ./in.cue:159:10
--            //     ./in.cue:160:9
--            //     ./in.cue:161:9
--            //     ./in.cue:162:5
-             //     ./in.cue:163:8
+-            //     ./in.cue:165:6
+-            //     ./in.cue:165:10
+-            //     ./in.cue:166:9
+-            //     ./in.cue:167:9
+-            //     ./in.cue:168:5
+             //     ./in.cue:169:8
            }
 +          f: (int){ 1 }
 +          g: (int){ 1 }
          }
        }
      }
-@@ -433,17 +379,12 @@
+@@ -433,37 +348,25 @@
                // [eval]
                e: (_|_){
                  // [eval]
@@ -1039,44 +1058,62 @@ diff old new
 -                g: (int){ 1 }
                  h: (_|_){
                    // [eval] err.t6.b.b.c.d.e.h: field not allowed:
--                  //     ./in.cue:168:6
--                  //     ./in.cue:168:10
--                  //     ./in.cue:169:18
--                  //     ./in.cue:170:18
--                  //     ./in.cue:171:5
-                   //     ./in.cue:172:17
+-                  //     ./in.cue:174:6
+-                  //     ./in.cue:174:10
+-                  //     ./in.cue:175:18
+-                  //     ./in.cue:176:18
+-                  //     ./in.cue:177:5
+                   //     ./in.cue:178:17
                  }
+-              }
+-            }
+-          }
+-        }
+-      }
+-    }
+-    t7: (_|_){
+-      // [eval]
+-      #D: (#struct){
+-        a: (int){ 2 }
+-      }
+-      a: (_|_){
+-        // [eval]
+-        a: (int){ 2 }
+-        b: (_|_){
+-          // [eval] err.t7.a.b: field not allowed:
+-          //     ./in.cue:188:10
+-          //     ./in.cue:189:5
+-          //     ./in.cue:190:5
+-        }
 +                f: (int){ 1 }
 +                g: (int){ 1 }
-               }
-             }
-           }
-@@ -457,13 +398,12 @@
-       }
-       a: (_|_){
-         // [eval]
--        a: (int){ 2 }
-         b: (_|_){
-           // [eval] err.t7.a.b: field not allowed:
--          //     ./in.cue:176:10
-           //     ./in.cue:177:5
-           //     ./in.cue:178:5
-         }
++              }
++            }
++          }
++        }
++      }
++    }
++    t7: (struct){
++      #D: (#struct){
++        a: (int){ 2 }
++      }
++      a: (#struct){
++        b: (int){ 1 }
 +        a: (int){ 2 }
        }
      }
      t8: (_|_){
-@@ -477,19 +417,17 @@
+@@ -477,19 +380,17 @@
          // [eval]
          c: (_|_){
            // [eval]
 -          d: (int){ 1 }
            e: (_|_){
              // [eval] err.t8.V.c.e: field not allowed:
--            //     ./in.cue:183:8
--            //     ./in.cue:183:13
--            //     ./in.cue:184:5
-             //     ./in.cue:185:10
+-            //     ./in.cue:195:8
+-            //     ./in.cue:195:13
+-            //     ./in.cue:196:5
+             //     ./in.cue:197:10
            }
 -        }
 -      }
@@ -1093,7 +1130,7 @@ diff old new
      #x: (#struct){
        y: (#struct){
          z?: (#struct){
-@@ -497,14 +435,23 @@
+@@ -497,14 +398,23 @@
          }
        }
      }
@@ -1126,63 +1163,56 @@ diff old new
      }
    }
 -- diff/todo/p2 --
-ok.t1.c.0: closedness probably incorrect: #R defines elements as type "top",
-which are not closed by definition. Probably does not matter for evaluation,
-as it will be determined to be "closed", but allowing all attributes.
-ok.t(9|10).c.0: same issue as ok.t1.c.0.
-ok.t2.l: same issue: top is marked as "closed", even though it will allow all
-values. Probably just a matter of difference in debugging output and not
-evaluation semantics.
 all: error positions and reordering.
 -- diff/explanation --
-ok.t5 and ok.t13 retain semantics of v0.6 for now.
 issue1830: the new evaluator correctly rejects inserting new fields in a closed struct
+err.t(1|2): bug fixes.
 -- out/eval --
 Errors:
 err.t1.a.disallowed: field not allowed:
-    ./in.cue:128:10
-    ./in.cue:129:5
-    ./in.cue:130:5
-err.t2.V.c.e: field not allowed:
-    ./in.cue:134:8
-    ./in.cue:134:13
+    ./in.cue:134:10
     ./in.cue:135:5
-    ./in.cue:136:10
-err.t3.p1.a.c: field not allowed:
-    ./in.cue:140:6
+    ./in.cue:136:5
+err.t2.V.c.e: field not allowed:
+    ./in.cue:140:8
+    ./in.cue:140:13
     ./in.cue:141:5
-    ./in.cue:142:5
-err.t3.p2.a.b.c: field not allowed:
-    ./in.cue:146:9
+    ./in.cue:142:10
+err.t3.p1.a.c: field not allowed:
+    ./in.cue:146:6
     ./in.cue:147:5
-    ./in.cue:148:8
-err.t4.a.b.h: field not allowed:
-    ./in.cue:152:5
-    ./in.cue:153:9
+    ./in.cue:148:5
+err.t3.p2.a.b.c: field not allowed:
+    ./in.cue:152:9
+    ./in.cue:153:5
     ./in.cue:154:8
+err.t4.a.b.h: field not allowed:
+    ./in.cue:158:5
+    ./in.cue:159:9
+    ./in.cue:160:8
 err.t5.b.b.h: field not allowed:
-    ./in.cue:159:6
-    ./in.cue:159:10
-    ./in.cue:160:9
-    ./in.cue:161:9
-    ./in.cue:162:5
-    ./in.cue:163:8
+    ./in.cue:165:6
+    ./in.cue:165:10
+    ./in.cue:166:9
+    ./in.cue:167:9
+    ./in.cue:168:5
+    ./in.cue:169:8
 err.t6.b.b.c.d.e.h: field not allowed:
-    ./in.cue:168:6
-    ./in.cue:168:10
-    ./in.cue:169:18
-    ./in.cue:170:18
-    ./in.cue:171:5
-    ./in.cue:172:17
-err.t7.a.b: field not allowed:
-    ./in.cue:176:10
+    ./in.cue:174:6
+    ./in.cue:174:10
+    ./in.cue:175:18
+    ./in.cue:176:18
     ./in.cue:177:5
-    ./in.cue:178:5
+    ./in.cue:178:17
+err.t7.a.b: field not allowed:
+    ./in.cue:188:10
+    ./in.cue:189:5
+    ./in.cue:190:5
 err.t8.V.c.e: field not allowed:
-    ./in.cue:183:8
-    ./in.cue:183:13
-    ./in.cue:184:5
-    ./in.cue:185:10
+    ./in.cue:195:8
+    ./in.cue:195:13
+    ./in.cue:196:5
+    ./in.cue:197:10
 ok.t13.x.c: field not allowed:
     ./in.cue:106:6
     ./in.cue:107:3
@@ -1406,9 +1436,9 @@ Result:
         a: (int){ 2 }
         disallowed: (_|_){
           // [eval] err.t1.a.disallowed: field not allowed:
-          //     ./in.cue:128:10
-          //     ./in.cue:129:5
-          //     ./in.cue:130:5
+          //     ./in.cue:134:10
+          //     ./in.cue:135:5
+          //     ./in.cue:136:5
         }
       }
     }
@@ -1426,10 +1456,10 @@ Result:
           d: (int){ 1 }
           e: (_|_){
             // [eval] err.t2.V.c.e: field not allowed:
-            //     ./in.cue:134:8
-            //     ./in.cue:134:13
-            //     ./in.cue:135:5
-            //     ./in.cue:136:10
+            //     ./in.cue:140:8
+            //     ./in.cue:140:13
+            //     ./in.cue:141:5
+            //     ./in.cue:142:10
           }
         }
       }
@@ -1444,9 +1474,9 @@ Result:
           // [eval]
           c: (_|_){
             // [eval] err.t3.p1.a.c: field not allowed:
-            //     ./in.cue:140:6
-            //     ./in.cue:141:5
-            //     ./in.cue:142:5
+            //     ./in.cue:146:6
+            //     ./in.cue:147:5
+            //     ./in.cue:148:5
           }
         }
       }
@@ -1462,9 +1492,9 @@ Result:
             // [eval]
             c: (_|_){
               // [eval] err.t3.p2.a.b.c: field not allowed:
-              //     ./in.cue:146:9
-              //     ./in.cue:147:5
-              //     ./in.cue:148:8
+              //     ./in.cue:152:9
+              //     ./in.cue:153:5
+              //     ./in.cue:154:8
             }
           }
         }
@@ -1479,9 +1509,9 @@ Result:
           f: (int){ 1 }
           h: (_|_){
             // [eval] err.t4.a.b.h: field not allowed:
-            //     ./in.cue:152:5
-            //     ./in.cue:153:9
-            //     ./in.cue:154:8
+            //     ./in.cue:158:5
+            //     ./in.cue:159:9
+            //     ./in.cue:160:8
           }
         }
       }
@@ -1517,12 +1547,12 @@ Result:
           g: (int){ 1 }
           h: (_|_){
             // [eval] err.t5.b.b.h: field not allowed:
-            //     ./in.cue:159:6
-            //     ./in.cue:159:10
-            //     ./in.cue:160:9
-            //     ./in.cue:161:9
-            //     ./in.cue:162:5
-            //     ./in.cue:163:8
+            //     ./in.cue:165:6
+            //     ./in.cue:165:10
+            //     ./in.cue:166:9
+            //     ./in.cue:167:9
+            //     ./in.cue:168:5
+            //     ./in.cue:169:8
           }
         }
       }
@@ -1577,12 +1607,12 @@ Result:
                 g: (int){ 1 }
                 h: (_|_){
                   // [eval] err.t6.b.b.c.d.e.h: field not allowed:
-                  //     ./in.cue:168:6
-                  //     ./in.cue:168:10
-                  //     ./in.cue:169:18
-                  //     ./in.cue:170:18
-                  //     ./in.cue:171:5
-                  //     ./in.cue:172:17
+                  //     ./in.cue:174:6
+                  //     ./in.cue:174:10
+                  //     ./in.cue:175:18
+                  //     ./in.cue:176:18
+                  //     ./in.cue:177:5
+                  //     ./in.cue:178:17
                 }
               }
             }
@@ -1600,9 +1630,9 @@ Result:
         a: (int){ 2 }
         b: (_|_){
           // [eval] err.t7.a.b: field not allowed:
-          //     ./in.cue:176:10
-          //     ./in.cue:177:5
-          //     ./in.cue:178:5
+          //     ./in.cue:188:10
+          //     ./in.cue:189:5
+          //     ./in.cue:190:5
         }
       }
     }
@@ -1620,10 +1650,10 @@ Result:
           d: (int){ 1 }
           e: (_|_){
             // [eval] err.t8.V.c.e: field not allowed:
-            //     ./in.cue:183:8
-            //     ./in.cue:183:13
-            //     ./in.cue:184:5
-            //     ./in.cue:185:10
+            //     ./in.cue:195:8
+            //     ./in.cue:195:13
+            //     ./in.cue:196:5
+            //     ./in.cue:197:10
           }
         }
       }

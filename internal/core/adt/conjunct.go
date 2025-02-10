@@ -79,6 +79,8 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		var t closeNodeType
 		if c.CloseInfo.FromDef {
 			t |= closeDef
+			c.CloseInfo.FromDef = false
+			id.FromDef = false
 		}
 		// NOTE: the check for OpenInline is not strictly necessary, but it
 		// clarifies that using id.FromEmbed is not used when OpenInline is not

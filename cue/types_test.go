@@ -2189,9 +2189,32 @@ func TestUnify(t *testing.T) {
 		pathA: "a.obj",
 		pathB: b,
 		want:  `{"initialField":"foo","extraField":"bar"}`,
+	}, {
+		// Issue 3706
+		value: `
+            #site: {
+                bar?: _kind & {
+                    kind!:       "bar1"
+                    bar1field?: string
+                }
+                _kind: kind!: string
+            }
+            b: {
+                "bar": {
+                    "kind": "bar1",
+                    "bar1field": "expr"
+                }
+            }
+        `,
+		pathA: "#site",
+		pathB: b,
+		want:  `{"bar":{"kind":"bar1","bar1field":"expr"}}`,
 	}}
 
 	matrix := cuetdtest.FullMatrix
+	// adt.DebugDeps = true
+	// adt.OpenGraphs = true
+	// matrix[0].Flags.LogEval = 1
 
 	// TODO(tdtest): use cuetest.Run when supported.
 	matrix.Do(t, func(t *testing.T, m *cuetdtest.M) {

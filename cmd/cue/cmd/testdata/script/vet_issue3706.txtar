@@ -1,0 +1,51 @@
+# evalv2
+env CUE_EXPERIMENT=evalv3=0
+exec cue vet -c -d '#site' schema.cue site.json
+
+# evalv3
+env CUE_EXPERIMENT=evalv3=1
+exec cue vet -c -d '#site' schema.cue site.json
+
+-- schema.cue --
+package preprocessor
+
+#site: {
+	_kind: {
+		kind!: string
+	}
+
+	#sanitiser:  _kind & (#patternSanitiser | #ellipsisSanitiser)
+	#comparator: _kind & (#patternComparator | #unstableLineOrderComparator)
+
+	#patternSanitiser: {
+		kind:     "patternSanitiser"
+		pattern?: string
+	}
+
+	#patternComparator: {
+		kind:     "patternComparator"
+		pattern?: string
+	}
+
+	#ellipsisSanitiser: {
+		kind: "ellipsisSanitiser"
+	}
+
+	#unstableLineOrderComparator: {
+		kind: "unstableLineOrderComparator"
+	}
+
+	sanitiser?:  #sanitiser
+	comparator?: #comparator
+}
+-- site.json --
+{
+  "comparator": {
+    "kind": "patternComparator",
+    "pattern": "expr"
+  },
+  "sanitiser": {
+    "kind": "patternSanitiser",
+    "pattern": "expr"
+  }
+}

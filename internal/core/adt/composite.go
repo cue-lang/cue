@@ -992,7 +992,6 @@ func Unify(c *OpContext, a, b Value) *Vertex {
 func addConjuncts(ctx *OpContext, dst *Vertex, src Value) {
 	closeInfo := ctx.CloseInfo()
 	c := MakeConjunct(nil, src, closeInfo)
-	c.CloseInfo.GroupUnify = true
 
 	if v, ok := src.(*Vertex); ok && v.ClosedRecursive {
 		if ctx.Version == internal.EvalV2 {

@@ -92,9 +92,10 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 				id.FromEmbed = false
 			}
 		}
-		if t != 0 || c.CloseInfo.GroupUnify {
+		if t != 0 {
 			id, _ = id.spawnCloseContext(n.ctx, t)
 		}
+
 		if !id.cc.done {
 			id.cc.incDependent(n.ctx, DEFER, nil)
 			defer id.cc.decDependent(n.ctx, DEFER, nil)

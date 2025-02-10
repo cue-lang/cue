@@ -87,6 +87,10 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		// used.
 		if c.CloseInfo.FromEmbed || (n.ctx.OpenInline && id.FromEmbed) {
 			t |= closeEmbed
+			if !n.ctx.OpenInline {
+				c.CloseInfo.FromEmbed = false
+				id.FromEmbed = false
+			}
 		}
 		if t != 0 || c.CloseInfo.GroupUnify {
 			id, _ = id.spawnCloseContext(n.ctx, t)

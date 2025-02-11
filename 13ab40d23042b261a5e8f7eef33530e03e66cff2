@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "995039ed_a7b06f67",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-11T13:24:39Z",
+      "side": 1,
+      "message": "@mvdan@mvdan.cc I think maybe you\u0027re inserting an extra \"that\" as you\u0027re reading? - maybe you\u0027re reading it as \"The code *that* accounted for this...\". As it is, it reads ok to me, though maybe changing the first , to a . would help too.",
+      "parentUuid": "31bd3b18_870eee80",
+      "range": {
+        "startLine": 22,
+        "startChar": 38,
+        "endLine": 22,
+        "endChar": 40
+      },
+      "revId": "13ab40d23042b261a5e8f7eef33530e03e66cff2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "88e76b3e_bffd1d60",
         "filename": "cue/testdata/cycle/compbottomnofinal.txtar",
         "patchSetId": 1

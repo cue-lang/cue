@@ -16,6 +16,24 @@
       "message": "should we see any test changes here, or perhaps a new test case?",
       "revId": "46aa90eb9bb14609e41e18a260a9919fabaf3e13",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fe14893_cd9b4ab4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-11T09:21:07Z",
+      "side": 1,
+      "message": "I can argue this is the right thing to do, but at this moment I cannot figure how this could lead to a bug. At most it could increase performance by creating slightly less allocations of closeContexts.",
+      "parentUuid": "1ba0fcc8_1a34c96a",
+      "revId": "46aa90eb9bb14609e41e18a260a9919fabaf3e13",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

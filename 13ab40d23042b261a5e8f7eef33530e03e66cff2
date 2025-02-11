@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31bd3b18_870eee80",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-11T11:29:12Z",
+      "side": 1,
+      "message": "remove \"it\"? otherwise this reads weirdly to me.",
+      "range": {
+        "startLine": 22,
+        "startChar": 38,
+        "endLine": 22,
+        "endChar": 40
+      },
+      "revId": "13ab40d23042b261a5e8f7eef33530e03e66cff2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "88e76b3e_bffd1d60",
+        "filename": "cue/testdata/cycle/compbottomnofinal.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 912,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-11T11:29:12Z",
+      "side": 1,
+      "message": "are these error message improvements? if so, perhaps call them out in the commit message.",
+      "revId": "13ab40d23042b261a5e8f7eef33530e03e66cff2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "050e34b3_88c4a479",
+        "filename": "internal/core/adt/eval_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-11T11:29:12Z",
+      "side": 1,
+      "message": "nit: I would avoid making debugging changes to TestX as that adds a bit of noise and could lead to silly conflicts, e.g. when backporting fixes to release branches.",
+      "revId": "13ab40d23042b261a5e8f7eef33530e03e66cff2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08be01d4_c1e82ab3",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 702,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-11T11:29:12Z",
+      "side": 1,
+      "message": "I like the `TODO(evalv4)` approach, as it makes recording these notes much more structured.",
+      "revId": "13ab40d23042b261a5e8f7eef33530e03e66cff2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

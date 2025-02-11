@@ -856,6 +856,21 @@ issue3621: full: {
 		}
 	}
 }
+-- issue3708.cue --
+issue3708: {
+	out: people.bob.kind
+
+	// pattern constraint marks 'name' as member, which should not preclude name
+	// from being futher evaluated to determine whether 'people' is pending.
+	people: [string]: {
+		kind:  "person"
+		name?: string
+	}
+
+	if true {
+		people: bob: name: "Bob"
+	}
+}
 -- out/evalalpha/stats --
 Leaks:  513
 Freed:  2
@@ -1586,6 +1601,16 @@ Result:
       }
     }
   }
+  issue3708: (_|_){
+    // [incomplete] issue3708.people.bob.name: cyclic reference to field bob:
+    //     ./issue3708.cue:11:2
+    out: (_|_){
+      // [incomplete] issue3708.out: undefined field: bob:
+      //     ./issue3708.cue:2:14
+    }
+    people: (struct){
+    }
+  }
   unifyDynamicReflectSuccess: (struct){
     X: (struct){
       X: (struct){
@@ -1939,6 +1964,27 @@ diff old new
        }
      }
    }
+@@ -784,13 +717,14 @@
+       }
+     }
+   }
+-  issue3708: (struct){
+-    out: (string){ "person" }
++  issue3708: (_|_){
++    // [incomplete] issue3708.people.bob.name: cyclic reference to field bob:
++    //     ./issue3708.cue:11:2
++    out: (_|_){
++      // [incomplete] issue3708.out: undefined field: bob:
++      //     ./issue3708.cue:2:14
++    }
+     people: (struct){
+-      bob: (struct){
+-        name: (string){ "Bob" }
+-        kind: (string){ "person" }
+-      }
+     }
+   }
+   unifyDynamicReflectSuccess: (struct){
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -1963,14 +2009,14 @@ diff old new
 +Disjuncts:    22
 -- out/eval/stats --
 Leaks:  17
-Freed:  468
-Reused: 461
+Freed:  474
+Reused: 467
 Allocs: 24
-Retain: 103
+Retain: 104
 
-Unifications: 469
-Conjuncts:    747
-Disjuncts:    541
+Unifications: 475
+Conjuncts:    756
+Disjuncts:    548
 -- diff/todo/p2 --
 provideIncompleteSuccess.t2.a.c.d: missing error: probably correct.
    A bit esoteric, but should probably work.
@@ -2761,6 +2807,15 @@ Result:
           privacy: (string){ "secret" }
           create_default: (bool){ false }
         }
+      }
+    }
+  }
+  issue3708: (struct){
+    out: (string){ "person" }
+    people: (struct){
+      bob: (struct){
+        name: (string){ "Bob" }
+        kind: (string){ "person" }
       }
     }
   }
@@ -3814,6 +3869,25 @@ Result:
           outer2: {
             bar: 〈2;inner〉.inner2.name
           }
+        }
+      }
+    }
+  }
+}
+--- issue3708.cue
+{
+  issue3708: {
+    out: 〈0;people〉.bob.kind
+    people: {
+      [string]: {
+        kind: "person"
+        name?: string
+      }
+    }
+    if true {
+      people: {
+        bob: {
+          name: "Bob"
         }
       }
     }

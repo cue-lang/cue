@@ -59,6 +59,8 @@ func newExpGenGoTypesCmd(c *Command) *cobra.Command {
 		Long: `
 gengotypes generates Go type definitions from exported CUE definitions.
 
+*This command is experimental and may be changed at any time - see "cue help exp"*
+
 The generated Go types are guaranteed to accept any value accepted by the CUE definitions,
 but may be more general. For example, "string | int" will translate into the Go
 type "any" because the Go type system is not able to express

@@ -221,17 +221,29 @@ jsonCycle: t1: {
 	x: y: json.Validate(x)
 	x: y: "{}"
 }
+-- listmatchncycle.cue --
+import "list"
+
+listMatchN: structCycle: {
+	x: y: list.MatchN(1, x)
+	x: y: [{}]
+}
+listMatchN: ok: {
+	x: y?: list.MatchN(1, x)
+    z: x
+	z: y: [{}]
+}
 -- todo/p1 --
 issue3443.noCycle: fix hang
 -- out/evalalpha/stats --
-Leaks:  394
+Leaks:  410
 Freed:  17
 Reused: 17
-Allocs: 394
+Allocs: 410
 Retain: 0
 
-Unifications: 353
-Conjuncts:    1427
+Unifications: 368
+Conjuncts:    1497
 Disjuncts:    28
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -239,32 +251,32 @@ diff old new
 +++ new
 @@ -1,9 +1,9 @@
 -Leaks:  23
--Freed:  398
--Reused: 386
+-Freed:  414
+-Reused: 402
 -Allocs: 35
 -Retain: 95
-+Leaks:  394
++Leaks:  410
 +Freed:  17
 +Reused: 17
-+Allocs: 394
++Allocs: 410
 +Retain: 0
  
--Unifications: 393
--Conjuncts:    730
--Disjuncts:    483
-+Unifications: 353
-+Conjuncts:    1427
+-Unifications: 409
+-Conjuncts:    764
+-Disjuncts:    501
++Unifications: 368
++Conjuncts:    1497
 +Disjuncts:    28
 -- out/eval/stats --
 Leaks:  23
-Freed:  398
-Reused: 386
+Freed:  414
+Reused: 402
 Allocs: 35
 Retain: 95
 
-Unifications: 393
-Conjuncts:    730
-Disjuncts:    483
+Unifications: 409
+Conjuncts:    764
+Disjuncts:    501
 -- out/evalalpha --
 Errors:
 noCycle.t1.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
@@ -286,6 +298,10 @@ issue3649.cycle.t1.data.a.a: structural cycle:
 jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): error in call to encoding/json.Validate: structural cycle:
     ./jsoncycle.cue:4:8
     ./jsoncycle.cue:5:8
+listMatchN.structCycle.x.y: invalid value [{}] (does not satisfy list.MatchN): number of matched elements is 0: does not satisfy 1:
+    ./listmatchncycle.cue:4:8
+    ./listmatchncycle.cue:4:20
+    ./listmatchncycle.cue:5:8
 issue3443.matchIf.#S: cannot call non-function matchIf (type struct):
     ./matchn.cue:16:7
 issue3443.cycle1.cycle.s: invalid value {n:{n:_}} (does not satisfy matchN): 0 matched, expected 1:
@@ -507,6 +523,34 @@ Result:
           // [structural cycle] jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): error in call to encoding/json.Validate: structural cycle:
           //     ./jsoncycle.cue:4:8
           //     ./jsoncycle.cue:5:8
+        }
+      }
+    }
+  }
+  listMatchN: (_|_){
+    // [eval]
+    structCycle: (_|_){
+      // [eval]
+      x: (_|_){
+        // [eval]
+        y: (_|_){
+          // [eval] listMatchN.structCycle.x.y: invalid value [{}] (does not satisfy list.MatchN): number of matched elements is 0: does not satisfy 1:
+          //     ./listmatchncycle.cue:4:8
+          //     ./listmatchncycle.cue:4:20
+          //     ./listmatchncycle.cue:5:8
+          0: (struct){
+          }
+        }
+      }
+    }
+    ok: (struct){
+      x: (struct){
+        y?: (list){ list.MatchN(1, listMatchN.ok.x) }
+      }
+      z: (struct){
+        y: (#list){
+          0: (struct){
+          }
         }
       }
     }
@@ -774,7 +818,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -3,22 +3,35 @@
+@@ -3,24 +3,39 @@
      ./cycle.cue:4:7
      ./cycle.cue:4:14
      ./cycle.cue:5:13
@@ -794,6 +838,8 @@ diff old new
 -    ./cycle.cue:5:13
 -jsonCycle.t1.x.y.y: structural cycle:
 -    ./jsoncycle.cue:4:22
+-listMatchN.structCycle.x.y.y: structural cycle:
+-    ./listmatchncycle.cue:4:23
 +issue3649.cycle.t1.data.a: invalid value {b:"foo"} (does not satisfy matchN): 0 matched, expected 1:
 +    ./cycle.cue:31:6
 +    ./cycle.cue:28:11
@@ -803,6 +849,10 @@ diff old new
 +jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): error in call to encoding/json.Validate: structural cycle:
 +    ./jsoncycle.cue:4:8
 +    ./jsoncycle.cue:5:8
++listMatchN.structCycle.x.y: invalid value [{}] (does not satisfy list.MatchN): number of matched elements is 0: does not satisfy 1:
++    ./listmatchncycle.cue:4:8
++    ./listmatchncycle.cue:4:20
++    ./listmatchncycle.cue:5:8
  issue3443.matchIf.#S: cannot call non-function matchIf (type struct):
      ./matchn.cue:16:7
 +issue3443.cycle1.cycle.s: invalid value {n:{n:_}} (does not satisfy matchN): 0 matched, expected 1:
@@ -820,7 +870,7 @@ diff old new
  issue3443.cycle2.fail.#S: invalid value {n:{n:{n:_}}} (does not satisfy matchN): 0 matched, expected 1:
      ./matchn.cue:55:13
      ./matchn.cue:55:20
-@@ -51,26 +64,21 @@
+@@ -53,26 +68,21 @@
      ./yamlcycle.cue:15:8
  selfCycle.t1.c.d.d.d: structural cycle:
      ./yamlcycle.cue:14:5
@@ -862,7 +912,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -86,10 +94,6 @@
+@@ -88,10 +98,6 @@
            //     ./cycle.cue:4:7
            //     ./cycle.cue:4:14
            //     ./cycle.cue:5:13
@@ -873,7 +923,7 @@ diff old new
          }
        }
        #x: (_|_){
-@@ -97,26 +101,25 @@
+@@ -99,26 +105,25 @@
          //     ./cycle.cue:4:7
          //     ./cycle.cue:4:14
          //     ./cycle.cue:5:13
@@ -915,7 +965,7 @@ diff old new
                }
              }) }
          }
-@@ -123,7 +126,6 @@
+@@ -125,7 +130,6 @@
        }
        t2: (struct){
          x: (struct){
@@ -923,7 +973,7 @@ diff old new
            y: (struct){
              a: (struct){
                d: (struct){
-@@ -131,14 +133,15 @@
+@@ -133,14 +137,15 @@
                }
              }
            }
@@ -941,7 +991,7 @@ diff old new
                  }
                }) }
            }
-@@ -145,18 +148,27 @@
+@@ -147,18 +152,27 @@
          }
        }
      }
@@ -977,7 +1027,7 @@ diff old new
                }
              }) }
          }
-@@ -222,8 +234,12 @@
+@@ -224,8 +238,12 @@
      t1: (_|_){
        // [structural cycle]
        x: (_|_){
@@ -992,7 +1042,25 @@ diff old new
        }
      }
    }
-@@ -230,20 +246,20 @@
+@@ -234,8 +252,15 @@
+     structCycle: (_|_){
+       // [eval]
+       x: (_|_){
+-        // [eval] listMatchN.structCycle.x.y.y: structural cycle:
+-        //     ./listmatchncycle.cue:4:23
++        // [eval]
++        y: (_|_){
++          // [eval] listMatchN.structCycle.x.y: invalid value [{}] (does not satisfy list.MatchN): number of matched elements is 0: does not satisfy 1:
++          //     ./listmatchncycle.cue:4:8
++          //     ./listmatchncycle.cue:4:20
++          //     ./listmatchncycle.cue:5:8
++          0: (struct){
++          }
++        }
+       }
+     }
+     ok: (struct){
+@@ -253,20 +278,20 @@
    issue3410: (struct){
      _s: (struct){
        #x: (_){ matchN(1, (#list){
@@ -1021,7 +1089,7 @@ diff old new
          }
        }) }
    }
-@@ -250,9 +266,9 @@
+@@ -273,9 +298,9 @@
    issue3420: (struct){
      matches1: (struct){
        #S: (_){ matchN(1, (#list){
@@ -1034,7 +1102,7 @@ diff old new
            }
          }) }
        s: (int){ 2 }
-@@ -269,13 +285,13 @@
+@@ -292,13 +317,13 @@
      }
      noCycle: (struct){
        #S: (_){ matchN(1, (#list){
@@ -1051,7 +1119,7 @@ diff old new
            n: (struct){
              n: (_){ _ }
            }
-@@ -284,29 +300,43 @@
+@@ -307,29 +332,43 @@
      }
      noCycle2: (struct){
        #S: (_){ matchN(1, (#list){
@@ -1108,7 +1176,7 @@ diff old new
            n: (struct){
              n: (_){ _ }
            }
-@@ -359,11 +389,11 @@
+@@ -382,11 +421,11 @@
          //     ./matchn.cue:63:24
        }
        #s: (_){ matchN(1, (#list){
@@ -1122,7 +1190,7 @@ diff old new
            }
          }) }
      }
-@@ -374,8 +404,8 @@
+@@ -397,8 +436,8 @@
        a?: ((string|bytes)){ "encoding/yaml".Validate(yamlNoCycle.#c) }
      }
      data: (#struct){
@@ -1132,7 +1200,7 @@ diff old new
      }
    }
    selfCycle: (_|_){
-@@ -403,19 +433,8 @@
+@@ -426,19 +465,8 @@
          }
        }
      }
@@ -1154,7 +1222,7 @@ diff old new
        }
      }
      yamlVal: (_|_){
-@@ -423,25 +442,33 @@
+@@ -446,25 +474,33 @@
        t1: (_|_){
          // [eval]
          x: (_|_){
@@ -1202,7 +1270,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -449,13 +476,16 @@
+@@ -472,13 +508,16 @@
          z: (_|_){
            // [eval]
            y: (_|_){
@@ -1226,7 +1294,7 @@ diff old new
          }
        }
      }
-@@ -462,8 +492,12 @@
+@@ -485,8 +524,12 @@
      yamlValidatePartial: (_|_){
        // [structural cycle]
        x: (_|_){
@@ -1263,6 +1331,8 @@ noCycle.t1._s.#x.#x: invalid value {} (does not satisfy matchN): 0 matched, expe
     ./cycle.cue:5:13
 jsonCycle.t1.x.y.y: structural cycle:
     ./jsoncycle.cue:4:22
+listMatchN.structCycle.x.y.y: structural cycle:
+    ./listmatchncycle.cue:4:23
 issue3443.matchIf.#S: cannot call non-function matchIf (type struct):
     ./matchn.cue:16:7
 issue3443.cycle2.fail.#S: invalid value {n:{n:{n:_}}} (does not satisfy matchN): 0 matched, expected 1:
@@ -1470,6 +1540,27 @@ Result:
       x: (_|_){
         // [structural cycle] jsonCycle.t1.x.y.y: structural cycle:
         //     ./jsoncycle.cue:4:22
+      }
+    }
+  }
+  listMatchN: (_|_){
+    // [eval]
+    structCycle: (_|_){
+      // [eval]
+      x: (_|_){
+        // [eval] listMatchN.structCycle.x.y.y: structural cycle:
+        //     ./listmatchncycle.cue:4:23
+      }
+    }
+    ok: (struct){
+      x: (struct){
+        y?: (list){ list.MatchN(1, listMatchN.ok.x) }
+      }
+      z: (struct){
+        y: (#list){
+          0: (struct){
+          }
+        }
       }
     }
   }
@@ -1851,6 +1942,34 @@ Result:
       }
       x: {
         y: "{}"
+      }
+    }
+  }
+}
+--- listmatchncycle.cue
+{
+  listMatchN: {
+    structCycle: {
+      x: {
+        y: 〈import;list〉.MatchN(1, 〈1;x〉)
+      }
+      x: {
+        y: [
+          {},
+        ]
+      }
+    }
+  }
+  listMatchN: {
+    ok: {
+      x: {
+        y?: 〈import;list〉.MatchN(1, 〈1;x〉)
+      }
+      z: 〈0;x〉
+      z: {
+        y: [
+          {},
+        ]
       }
     }
   }

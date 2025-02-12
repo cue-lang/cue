@@ -1,0 +1,8 @@
+TryBot-Result+1: CUEcueckoo <cueckoo@cuelang.org>
+Code-Review+2: Daniel Martí <mvdan@mvdan.cc>
+Unity-Result+1: CUE porcuepine <cue.porcuepine@gmail.com>
+Submitted-by: Marcel van Lohuizen <mpvl@gmail.com>
+Submitted-at: Wed, 12 Feb 2025 09:08:57 +0000
+Reviewed-on: https://cue.gerrithub.io/c/cue-lang/cue/+/1208633
+Project: cue-lang/cue
+Branch: refs/heads/master

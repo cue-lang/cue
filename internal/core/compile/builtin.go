@@ -120,9 +120,7 @@ var andBuiltin = &adt.Builtin{
 		c := call.OpContext()
 		arg := call.Expr(0)
 
-		// Pass through the cycle information from evaluating the first argument.
-		v := c.EvaluateKeepState(arg)
-		list := c.RawElems(v)
+		list := c.RawElems(arg)
 		if len(list) == 0 {
 			return &adt.Top{}
 		}

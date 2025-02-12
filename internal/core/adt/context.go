@@ -563,7 +563,7 @@ func (c *OpContext) Evaluate(env *Environment, x Expr) (result Value, complete b
 	return val, true
 }
 
-// EvaluateKeepState does an evaluate, but leaves any errors an cycle info
+// EvaluateKeepState does an evaluate, but leaves any errors and cycle info
 // within the context.
 func (c *OpContext) EvaluateKeepState(x Expr) (result Value) {
 	src := c.src

@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/types"
 )
 
@@ -152,7 +153,7 @@ func makeValueSorter(list []cue.Value, cmp cue.Value) (s valueSorter) {
 
 	var v types.Value
 	cmp.Core(&v)
-	ctx := adt.NewContext(v.R, v.V)
+	ctx := eval.NewContext(v.R, v.V)
 
 	n := &adt.Vertex{
 		Label:     v.V.Label,

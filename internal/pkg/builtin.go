@@ -132,9 +132,10 @@ func ToBuiltin(b *Builtin) *adt.Builtin {
 
 		// call, _ := ctx.Source().(*ast.CallExpr)
 		c := &CallCtxt{
-			ctx:     ctx,
-			args:    args,
-			builtin: b,
+			CallContext: call,
+			ctx:         ctx,
+			args:        args,
+			builtin:     b,
 		}
 		defer func() {
 			var errVal interface{} = c.Err

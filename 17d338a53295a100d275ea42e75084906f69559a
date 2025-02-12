@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "33bc1a69_514951f0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-02-12T16:59:48Z",
+      "side": 1,
+      "message": "PTAL. Change as per https://cuelang.org/issue/2120#issuecomment-2653182637.",
+      "revId": "17d338a53295a100d275ea42e75084906f69559a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -75,7 +75,7 @@ func (c *CallContext) Args() []Value {
 //
 // This method of getting an argument should be used when the argument is used
 // as a schema and may contain cycles.
-func (c *CallContext) Expr(i int) Expr {
+func (c *CallContext) Expr(i int) Value {
 	// If the call context represents a validator call, the argument will be
 	// offset by 1.
 	if c.isValidator {
@@ -85,7 +85,10 @@ func (c *CallContext) Expr(i int) Expr {
 		}
 		i--
 	}
-	return c.call.Args[i]
+	x := c.call.Args[i]
+
+	// Evaluated while keeping any cycle information in the context.
+	return c.ctx.EvaluateKeepState(x)
 }
 
 func (c *CallContext) Errf(format string, args ...interface{}) *Bottom {

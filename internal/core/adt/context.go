@@ -202,11 +202,6 @@ func (n *nodeContext) skipNonMonotonicChecks() bool {
 	return n.ctx.inDisjunct > 0
 }
 
-// Impl is for internal use only. This will go.
-func (c *OpContext) Impl() Runtime {
-	return c.Runtime
-}
-
 func (c *OpContext) Pos() token.Pos {
 	if c.src == nil {
 		return token.NoPos

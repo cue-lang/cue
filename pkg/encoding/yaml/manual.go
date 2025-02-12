@@ -20,8 +20,10 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/internal/core/eval"
 	cueyaml "cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/pkg"
+	"cuelang.org/go/internal/value"
 )
 
 // Marshal returns the YAML encoding of v.
@@ -86,7 +88,14 @@ func UnmarshalStream(data []byte) (ast.Expr, error) {
 // Validate validates YAML and confirms it is an instance of schema.
 // If the YAML source is a stream, every object must match v.
 func Validate(b []byte, v pkg.Schema) (bool, error) {
-	return cueyaml.Validate(b, v)
+	// This function is left for Go documentation. The package entry calls
+	// cueyaml.Validate directly, passing it the call context.
+
+	// TODO: remove this once we have proper documentation of builtins that does
+	// not piggyback on Go.
+	r, x := value.ToInternal(v)
+	ctx := eval.NewContext(r, x)
+	return cueyaml.Validate(ctx, b, x)
 }
 
 // ValidatePartial validates YAML and confirms it matches the constraints

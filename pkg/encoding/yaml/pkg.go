@@ -5,6 +5,8 @@ package yaml
 import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/pkg"
+
+	cueyaml "cuelang.org/go/internal/encoding/yaml"
 )
 
 func init() {
@@ -71,9 +73,10 @@ var p = &pkg.Package{
 		Result:      adt.BoolKind,
 		NonConcrete: true,
 		Func: func(c *pkg.CallCtxt) {
-			b, v := c.Bytes(0), c.Schema(1)
+			ctx := c.OpContext()
+			b, expr := c.Bytes(0), c.Expr(1)
 			if c.Do() {
-				c.Ret, c.Err = Validate(b, v)
+				c.Ret, c.Err = cueyaml.Validate(ctx, b, expr)
 			}
 		},
 	}, {

@@ -51,6 +51,12 @@ func ToInternal(v cue.Value) (*runtime.Runtime, *adt.Vertex) {
 	return t.R, t.V
 }
 
+func Vertex(v cue.Value) *adt.Vertex {
+	var t types.Value
+	v.Core(&t)
+	return t.V
+}
+
 // Make wraps cue.MakeValue.
 func Make(ctx *adt.OpContext, v adt.Value) cue.Value {
 	return Context(ctx).Encode(v)

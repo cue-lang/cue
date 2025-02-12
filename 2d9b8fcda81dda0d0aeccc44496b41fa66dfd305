@@ -170,6 +170,24 @@
       "message": "By virtue of what rule is key: \"bar\" removed here? Is there an option to turn it off? This seems a bit dangerous.",
       "revId": "2d9b8fcda81dda0d0aeccc44496b41fa66dfd305",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d790c351_24ad7740",
+        "filename": "tools/trim/testdata/kube1.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-12T17:00:14Z",
+      "side": 1,
+      "message": "For the `protocol` arc, the conjunct from the default branch of the disjunction wins.\nFor the `key` arc, the conjunct from line 13 (or 41) wins.\n\nI think it\u0027s actually a shame I don\u0027t remove the full section as it doesn\u0027t specialise anything over the `service` struct from line 9.",
+      "parentUuid": "1531d33d_30aca5d7",
+      "revId": "2d9b8fcda81dda0d0aeccc44496b41fa66dfd305",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -461,13 +461,16 @@ func (c *OpContext) Validate(check Conjunct, value Value) *Bottom {
 
 	src := c.src
 	ci := c.ci
+	env := c.e
 	c.src = check.Source()
 	c.ci = check.CloseInfo
+	c.e = check.Env
 
 	err := check.x.(Validator).validate(c, value)
 
 	c.src = src
 	c.ci = ci
+	c.e = env
 
 	return err
 }

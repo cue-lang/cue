@@ -69,9 +69,20 @@ func (c *CallContext) Args() []Value {
 	return c.args
 }
 
-// Exprs return the unevaluated argument expressions. This function is only used
-// for transitioning and will be removed at some point. Use [CallContext.Expr]
-// instead. (TODO)
-func (c *CallContext) Exprs() []Expr {
-	return c.call.Args
+// Expr return the nth argument expression. The value remains unevaluated.
+// If the call context represents a validator call, the argument will be offset
+// by 1.
+func (c *CallContext) Expr(i int) Expr {
+	if c.isValidator {
+		if i == 0 {
+			c.Errf("Expr may not be called for 0th argument of validator")
+			return nil
+		}
+		i--
+	}
+	return c.call.Args[i]
+}
+
+func (c *CallContext) Errf(format string, args ...interface{}) *Bottom {
+	return c.ctx.NewErrf(format, args...)
 }

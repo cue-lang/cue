@@ -165,9 +165,10 @@ var p = &pkg.Package{
 		Result:      adt.BoolKind,
 		NonConcrete: true,
 		Func: func(c *pkg.CallCtxt) {
+			ctx := c.OpContext()
 			list, n, matchValue := c.List(0), c.Schema(1), c.Schema(2)
 			if c.Do() {
-				c.Ret, c.Err = MatchN(list, n, matchValue)
+				c.Ret, c.Err = matchN(ctx, list, n, matchValue)
 			}
 		},
 	}, {

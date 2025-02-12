@@ -332,14 +332,21 @@ func Contains(a []cue.Value, v cue.Value) bool {
 // "n" may be a number constraint and does not have to be a concrete number.
 // Likewise, "matchValue" will usually be a non-concrete value.
 func MatchN(list []cue.Value, n pkg.Schema, matchValue pkg.Schema) (bool, error) {
+	ctx := value.OpContext(n)
+	return matchN(ctx, list, n, matchValue)
+}
+
+func matchN(c *adt.OpContext, list []cue.Value, n pkg.Schema, matchValue pkg.Schema) (bool, error) {
 	var nmatch int64
 	for _, w := range list {
-		if matchValue.Unify(w).Validate(cue.Final()) == nil {
+		vx := adt.Unify(c, value.Vertex(matchValue), value.Vertex(w))
+		x := value.Make(c, vx)
+		if x.Validate(cue.Final()) == nil {
 			nmatch++
 		}
 	}
 
-	ctx := value.Context(n)
+	ctx := value.Context(c)
 
 	if err := n.Unify(ctx.Encode(nmatch)).Err(); err != nil {
 		return false, pkg.ValidationError{B: &adt.Bottom{

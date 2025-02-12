@@ -132,7 +132,7 @@ func doVet(cmd *Command, args []string) error {
 				shown = true
 				p := message.NewPrinter(getLang())
 				_, _ = p.Fprintln(w,
-					"some instances are incomplete; use the -c flag to show errors or suppress this message")
+					"some instances are incomplete; use the -c flag to show errors or -c=false to allow incomplete instances")
 			}
 		}
 		printError(cmd, err)

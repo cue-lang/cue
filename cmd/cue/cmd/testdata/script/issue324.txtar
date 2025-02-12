@@ -10,4 +10,4 @@ a: b: c: *["\(x)"] | _
 d: yaml.Marshal(a.b)
 
 -- expect-stderr --
-some instances are incomplete; use the -c flag to show errors or suppress this message
+some instances are incomplete; use the -c flag to show errors or -c=false to allow incomplete instances

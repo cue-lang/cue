@@ -56,6 +56,7 @@ import (
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
+	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/subsume"
 	"cuelang.org/go/internal/core/walk"
 	"cuelang.org/go/internal/value"
@@ -75,7 +76,7 @@ func Files(files []*ast.File, inst cue.InstanceOrValue, cfg *Config) error {
 
 	t := &trimmer{
 		Config:  *cfg,
-		ctx:     adt.NewContext(r, v),
+		ctx:     eval.NewContext(r, v),
 		remove:  map[ast.Node]bool{},
 		exclude: map[ast.Node]bool{},
 		debug:   Debug,

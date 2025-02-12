@@ -23,6 +23,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/pkg"
 	"cuelang.org/go/internal/types"
 	"cuelang.org/go/internal/value"
@@ -275,7 +276,7 @@ func UniqueItems(a []cue.Value) (bool, error) {
 
 	var tv types.Value
 	a[0].Core(&tv)
-	ctx := adt.NewContext(tv.R, tv.V)
+	ctx := eval.NewContext(tv.R, tv.V)
 
 	posX, posY := 0, 0
 	code := adt.IncompleteError

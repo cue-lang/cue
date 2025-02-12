@@ -116,7 +116,7 @@ validate: {
 		schema: {
 			a: <3
 		}
-		result: _|_ // validate.t2.result: error in call to encoding/json.Validate: validate.t2.schema.a: invalid value 10 (out of bound <3)
+		result: _|_ // validate.t2.result: error in call to encoding/json.Validate: validate.t2.result.a: invalid value 10 (out of bound <3)
 	}
 	disjunctionRequired: {
 		str: *"{\"a\":10}" | string

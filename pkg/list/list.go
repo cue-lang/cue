@@ -339,8 +339,7 @@ func MatchN(list []cue.Value, n pkg.Schema, matchValue pkg.Schema) (bool, error)
 		}
 	}
 
-	r, _ := value.ToInternal(n)
-	ctx := (*cue.Context)(r)
+	ctx := value.Context(n)
 
 	if err := n.Unify(ctx.Encode(nmatch)).Err(); err != nil {
 		return false, pkg.ValidationError{B: &adt.Bottom{

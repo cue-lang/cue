@@ -47,7 +47,7 @@ type Codec struct {
 //
 // Note: calling this with a *cue.Runtime value is deprecated.
 func New[Ctx *cue.Runtime | *cue.Context](ctx Ctx, c *Config) *Codec {
-	return &Codec{runtime: value.ConvertToContext(ctx)}
+	return &Codec{runtime: value.Context(ctx)}
 }
 
 // ExtractType extracts a CUE value from a Go type.

@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "98716b88_3aea8f31",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-12T16:19:18Z",
+      "side": 1,
+      "message": "Partial review done.",
+      "revId": "2d9b8fcda81dda0d0aeccc44496b41fa66dfd305",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da64d3c4_c7430e39",
+        "filename": "tools/trim/evalv3/testdata/10.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-12T16:19:18Z",
+      "side": 1,
+      "message": "Would be interesting to add a test where \"age: int\". In that case it should not be removed.",
+      "revId": "2d9b8fcda81dda0d0aeccc44496b41fa66dfd305",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2418273_3d5f6ef7",
+        "filename": "tools/trim/evalv3/testdata/11.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-12T16:19:18Z",
+      "side": 1,
+      "message": "Can this be turned off? It seems this may not always be desirable, although it does not seem as bad as removing values on \"equal\" footing, like `{a: 2} \u0026 {a: 2}`",
+      "revId": "2d9b8fcda81dda0d0aeccc44496b41fa66dfd305",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87a00bb6_3a6eb3b1",
+        "filename": "tools/trim/evalv3/trim.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-12T16:19:18Z",
+      "side": 1,
+      "message": "Please merge with v2 package so there is only one API and users can transition to V3 without changing their code!\n\nI would be fine replacing the comments in the original trim package to reflect evalv3 and no longer give consideration to evalv2.\n\nThe API should switch code paths based on which version is being used/ passed. For instance, we could use the version set in Config and, if left unset, inspect the version of the Runtime associated with the passed cue.Value.",
+      "revId": "2d9b8fcda81dda0d0aeccc44496b41fa66dfd305",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "37af64ae_0f4b1a25",
+        "filename": "tools/trim/testdata/defaults.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-12T16:19:18Z",
+      "side": 1,
+      "message": "We have to be careful with this: using _ we implicitly define all fields to be top, recursively, whereas with {} we do not.\nIt may end up being correct, but generally, if the resulting type is known and fixed, I would not generalize beyond that type. So ideally this would remain {}",
+      "revId": "2d9b8fcda81dda0d0aeccc44496b41fa66dfd305",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8b389a9_a746b029",
+        "filename": "tools/trim/testdata/defaults_can_remove_non-defaults.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-12T16:19:18Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "2d9b8fcda81dda0d0aeccc44496b41fa66dfd305",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "faef0e0a_3b99ae12",
+        "filename": "tools/trim/testdata/do_not_overmark_comprehension.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-12T16:19:18Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "2d9b8fcda81dda0d0aeccc44496b41fa66dfd305",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7c4c26a_819694ad",
+        "filename": "tools/trim/testdata/do_not_remove_field.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-12T16:19:18Z",
+      "side": 1,
+      "message": "Could you add an explanation why this is not removed?",
+      "revId": "2d9b8fcda81dda0d0aeccc44496b41fa66dfd305",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1531d33d_30aca5d7",
+        "filename": "tools/trim/testdata/kube1.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-12T16:19:18Z",
+      "side": 1,
+      "message": "By virtue of what rule is key: \"bar\" removed here? Is there an option to turn it off? This seems a bit dangerous.",
+      "revId": "2d9b8fcda81dda0d0aeccc44496b41fa66dfd305",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

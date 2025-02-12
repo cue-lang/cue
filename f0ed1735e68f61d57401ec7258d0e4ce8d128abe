@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1938e0e8_5c9c1ba9",
+        "filename": "tools/trim/testdata/shared.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-12T16:19:18Z",
+      "side": 0,
+      "message": "Maybe keep this info as a comment?",
+      "revId": "f0ed1735e68f61d57401ec7258d0e4ce8d128abe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -71,6 +71,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a8ea86c4_57a97c05",
+        "filename": "tools/trim/evalv3/trim.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-12T16:49:44Z",
+      "side": 1,
+      "message": "The problem is we can\u0027t keep the same API. One of the issues with the v2 trim is that it doesn\u0027t seem to understand build instances and the implicit import of the same package from ancestor directories. This causes problems: if you have the files/directories and all the same package like this:\n\n```\np.cue\na/a.cue\nb/b.cue\n```\n\nmy understanding is that there are 3 instances here, and so trim gets invoked 3 times: once for p.cue on its own (instance 1), once for p.cue+a/a.cue (instance 2), and once for p.cue+b/b.cue (instance 3). It\u0027s entirely possible that in instance 2, trim finds simplifications for p.cue, but those simplifications are not valid for instance 3. Because of this, the API for trim has changed (func Files) so that it gets passed the leaf directory, and now trim makes sure it only trims the AST of files from the current leaf directory, and not any of its ancestors. This makes it safe.\n\nI\u0027m very happy to make this change to the v2 trim as well, but that\u0027s breaking backwards compatibility.",
+      "parentUuid": "87a00bb6_3a6eb3b1",
+      "revId": "2d9b8fcda81dda0d0aeccc44496b41fa66dfd305",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "37af64ae_0f4b1a25",
         "filename": "tools/trim/testdata/defaults.txtar",
         "patchSetId": 3

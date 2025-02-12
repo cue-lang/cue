@@ -103,5 +103,11 @@ func Validate(b []byte, v pkg.Schema) (bool, error) {
 // but does not have to be an instance of v. If the YAML source is a stream,
 // every object must match v.
 func ValidatePartial(b []byte, v pkg.Schema) (bool, error) {
-	return cueyaml.ValidatePartial(b, v)
+	// This function is left for Go documentation. The package entry calls
+	// cueyaml.ValidatePartial directly, passing it the call context.
+
+	// TODO: remove this once we have proper documentation of builtins that does
+	// not piggyback on Go.
+	ctx := value.OpContext(v)
+	return cueyaml.ValidatePartial(ctx, b, v)
 }

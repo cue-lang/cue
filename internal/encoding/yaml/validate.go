@@ -77,7 +77,7 @@ func Validate(c *adt.OpContext, b []byte, n adt.Value) (bool, error) {
 // specified by v using unification. This means that b must be consistent with,
 // but does not have to be an instance of v. If the YAML source is a stream,
 // every object must match v.
-func ValidatePartial(b []byte, v cue.Value) (bool, error) {
+func ValidatePartial(c *adt.OpContext, b []byte, v cue.Value) (bool, error) {
 	d := NewDecoder("yaml.ValidatePartial", b)
 	r := v.Context()
 	for {
@@ -94,8 +94,10 @@ func ValidatePartial(b []byte, v cue.Value) (bool, error) {
 			return false, err
 		}
 
-		if x := v.Unify(x); x.Err() != nil {
-			return false, x.Err()
+		vx := adt.Unify(c, value.Vertex(x), value.Vertex(v))
+		x = value.Make(c, vx)
+		if err := x.Err(); err != nil {
+			return false, err
 		}
 	}
 }

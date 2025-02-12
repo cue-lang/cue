@@ -88,9 +88,10 @@ var p = &pkg.Package{
 		Result:      adt.BoolKind,
 		NonConcrete: true,
 		Func: func(c *pkg.CallCtxt) {
+			ctx := c.OpContext()
 			b, v := c.Bytes(0), c.Schema(1)
 			if c.Do() {
-				c.Ret, c.Err = ValidatePartial(b, v)
+				c.Ret, c.Err = cueyaml.ValidatePartial(ctx, b, v)
 			}
 		},
 	}},

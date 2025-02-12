@@ -210,17 +210,21 @@ selfCycle: yamlFun: t2: {
 	z: y: "{}"
 	x: y: yaml.Validate("{}", x)
 }
+selfCycle: yamlValidatePartial: {
+	x: y: yaml.ValidatePartial(x)
+	x: y: "{}"
+}
 -- todo/p1 --
 issue3443.noCycle: fix hang
 -- out/evalalpha/stats --
-Leaks:  383
+Leaks:  388
 Freed:  17
 Reused: 17
-Allocs: 383
+Allocs: 388
 Retain: 0
 
-Unifications: 342
-Conjuncts:    1378
+Unifications: 347
+Conjuncts:    1401
 Disjuncts:    28
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -228,32 +232,32 @@ diff old new
 +++ new
 @@ -1,9 +1,9 @@
 -Leaks:  23
--Freed:  387
--Reused: 375
+-Freed:  392
+-Reused: 380
 -Allocs: 35
 -Retain: 95
-+Leaks:  383
++Leaks:  388
 +Freed:  17
 +Reused: 17
-+Allocs: 383
++Allocs: 388
 +Retain: 0
  
--Unifications: 382
--Conjuncts:    702
--Disjuncts:    472
-+Unifications: 342
-+Conjuncts:    1378
+-Unifications: 387
+-Conjuncts:    715
+-Disjuncts:    477
++Unifications: 347
++Conjuncts:    1401
 +Disjuncts:    28
 -- out/eval/stats --
 Leaks:  23
-Freed:  387
-Reused: 375
+Freed:  392
+Reused: 380
 Allocs: 35
 Retain: 95
 
-Unifications: 382
-Conjuncts:    702
-Disjuncts:    472
+Unifications: 387
+Conjuncts:    715
+Disjuncts:    477
 -- out/evalalpha --
 Errors:
 noCycle.t1.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
@@ -330,6 +334,9 @@ selfCycle.yamlFun.t2.x.y: error in call to encoding/yaml.Validate: structural cy
     ./yamlcycle.cue:41:8
 selfCycle.yamlFun.t2.z.y: error in call to encoding/yaml.Validate: structural cycle:
     ./yamlcycle.cue:41:8
+selfCycle.yamlValidatePartial.x.y: invalid value "{}" (does not satisfy encoding/yaml.ValidatePartial): error in call to encoding/yaml.ValidatePartial: structural cycle:
+    ./yamlcycle.cue:44:8
+    ./yamlcycle.cue:45:8
 
 Result:
 (_|_){
@@ -726,6 +733,17 @@ Result:
         }
       }
     }
+    yamlValidatePartial: (_|_){
+      // [structural cycle]
+      x: (_|_){
+        // [structural cycle]
+        y: (_|_){
+          // [structural cycle] selfCycle.yamlValidatePartial.x.y: invalid value "{}" (does not satisfy encoding/yaml.ValidatePartial): error in call to encoding/yaml.ValidatePartial: structural cycle:
+          //     ./yamlcycle.cue:44:8
+          //     ./yamlcycle.cue:45:8
+        }
+      }
+    }
   }
 }
 -- diff/-out/evalalpha<==>+out/eval --
@@ -773,7 +791,7 @@ diff old new
  issue3443.cycle2.fail.#S: invalid value {n:{n:{n:_}}} (does not satisfy matchN): 0 matched, expected 1:
      ./matchn.cue:55:13
      ./matchn.cue:55:20
-@@ -49,24 +61,18 @@
+@@ -49,26 +61,21 @@
      ./yamlcycle.cue:15:8
  selfCycle.t1.c.d.d.d: structural cycle:
      ./yamlcycle.cue:14:5
@@ -795,6 +813,8 @@ diff old new
 -    ./yamlcycle.cue:36:29
 -selfCycle.yamlFun.t2.x.y.y: structural cycle:
 -    ./yamlcycle.cue:41:28
+-selfCycle.yamlValidatePartial.x.y.y: structural cycle:
+-    ./yamlcycle.cue:44:29
 +selfCycle.yamlVal.t1.x.y: invalid value "{}" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: structural cycle:
 +    ./yamlcycle.cue:24:8
 +    ./yamlcycle.cue:25:8
@@ -807,10 +827,13 @@ diff old new
 +    ./yamlcycle.cue:41:8
 +selfCycle.yamlFun.t2.z.y: error in call to encoding/yaml.Validate: structural cycle:
 +    ./yamlcycle.cue:41:8
++selfCycle.yamlValidatePartial.x.y: invalid value "{}" (does not satisfy encoding/yaml.ValidatePartial): error in call to encoding/yaml.ValidatePartial: structural cycle:
++    ./yamlcycle.cue:44:8
++    ./yamlcycle.cue:45:8
  
  Result:
  (_|_){
-@@ -82,10 +88,6 @@
+@@ -84,10 +91,6 @@
            //     ./cycle.cue:4:7
            //     ./cycle.cue:4:14
            //     ./cycle.cue:5:13
@@ -821,7 +844,7 @@ diff old new
          }
        }
        #x: (_|_){
-@@ -93,26 +95,25 @@
+@@ -95,26 +98,25 @@
          //     ./cycle.cue:4:7
          //     ./cycle.cue:4:14
          //     ./cycle.cue:5:13
@@ -863,7 +886,7 @@ diff old new
                }
              }) }
          }
-@@ -119,7 +120,6 @@
+@@ -121,7 +123,6 @@
        }
        t2: (struct){
          x: (struct){
@@ -871,7 +894,7 @@ diff old new
            y: (struct){
              a: (struct){
                d: (struct){
-@@ -127,14 +127,15 @@
+@@ -129,14 +130,15 @@
                }
              }
            }
@@ -889,7 +912,7 @@ diff old new
                  }
                }) }
            }
-@@ -141,18 +142,27 @@
+@@ -143,18 +145,27 @@
          }
        }
      }
@@ -925,7 +948,7 @@ diff old new
                }
              }) }
          }
-@@ -216,20 +226,20 @@
+@@ -218,20 +229,20 @@
    issue3410: (struct){
      _s: (struct){
        #x: (_){ matchN(1, (#list){
@@ -954,7 +977,7 @@ diff old new
          }
        }) }
    }
-@@ -236,9 +246,9 @@
+@@ -238,9 +249,9 @@
    issue3420: (struct){
      matches1: (struct){
        #S: (_){ matchN(1, (#list){
@@ -967,7 +990,7 @@ diff old new
            }
          }) }
        s: (int){ 2 }
-@@ -255,13 +265,13 @@
+@@ -257,13 +268,13 @@
      }
      noCycle: (struct){
        #S: (_){ matchN(1, (#list){
@@ -984,7 +1007,7 @@ diff old new
            n: (struct){
              n: (_){ _ }
            }
-@@ -270,29 +280,43 @@
+@@ -272,29 +283,43 @@
      }
      noCycle2: (struct){
        #S: (_){ matchN(1, (#list){
@@ -1041,7 +1064,7 @@ diff old new
            n: (struct){
              n: (_){ _ }
            }
-@@ -345,11 +369,11 @@
+@@ -347,11 +372,11 @@
          //     ./matchn.cue:63:24
        }
        #s: (_){ matchN(1, (#list){
@@ -1055,7 +1078,7 @@ diff old new
            }
          }) }
      }
-@@ -360,8 +384,8 @@
+@@ -362,8 +387,8 @@
        a?: ((string|bytes)){ "encoding/yaml".Validate(yamlNoCycle.#c) }
      }
      data: (#struct){
@@ -1065,7 +1088,7 @@ diff old new
      }
    }
    selfCycle: (_|_){
-@@ -389,19 +413,8 @@
+@@ -391,19 +416,8 @@
          }
        }
      }
@@ -1087,7 +1110,7 @@ diff old new
        }
      }
      yamlVal: (_|_){
-@@ -409,25 +422,33 @@
+@@ -411,25 +425,33 @@
        t1: (_|_){
          // [eval]
          x: (_|_){
@@ -1135,7 +1158,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -435,13 +456,16 @@
+@@ -437,13 +459,16 @@
          z: (_|_){
            // [eval]
            y: (_|_){
@@ -1159,6 +1182,21 @@ diff old new
          }
        }
      }
+@@ -450,8 +475,12 @@
+     yamlValidatePartial: (_|_){
+       // [structural cycle]
+       x: (_|_){
+-        // [structural cycle] selfCycle.yamlValidatePartial.x.y.y: structural cycle:
+-        //     ./yamlcycle.cue:44:29
++        // [structural cycle]
++        y: (_|_){
++          // [structural cycle] selfCycle.yamlValidatePartial.x.y: invalid value "{}" (does not satisfy encoding/yaml.ValidatePartial): error in call to encoding/yaml.ValidatePartial: structural cycle:
++          //     ./yamlcycle.cue:44:8
++          //     ./yamlcycle.cue:45:8
++        }
+       }
+     }
+   }
 -- diff/todo/p2 --
 issue3443: Sort out differences in reporting of cycles.
 -- out/eval --
@@ -1231,6 +1269,8 @@ selfCycle.yamlFun.t1.x.y.y: structural cycle:
     ./yamlcycle.cue:36:29
 selfCycle.yamlFun.t2.x.y.y: structural cycle:
     ./yamlcycle.cue:41:28
+selfCycle.yamlValidatePartial.x.y.y: structural cycle:
+    ./yamlcycle.cue:44:29
 
 Result:
 (_|_){
@@ -1609,6 +1649,13 @@ Result:
         }
       }
     }
+    yamlValidatePartial: (_|_){
+      // [structural cycle]
+      x: (_|_){
+        // [structural cycle] selfCycle.yamlValidatePartial.x.y.y: structural cycle:
+        //     ./yamlcycle.cue:44:29
+      }
+    }
   }
 }
 -- out/compile --
@@ -1922,6 +1969,16 @@ Result:
         x: {
           y: 〈import;"encoding/yaml"〉.Validate("{}", 〈1;x〉)
         }
+      }
+    }
+  }
+  selfCycle: {
+    yamlValidatePartial: {
+      x: {
+        y: 〈import;"encoding/yaml"〉.ValidatePartial(〈1;x〉)
+      }
+      x: {
+        y: "{}"
       }
     }
   }

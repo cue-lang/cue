@@ -72,6 +72,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "92a25a76_b0c0a34b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-12T09:19:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a42a815_a940d45c",
+      "range": {
+        "startLine": 22,
+        "startChar": 38,
+        "endLine": 22,
+        "endChar": 40
+      },
+      "revId": "13ab40d23042b261a5e8f7eef33530e03e66cff2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "88e76b3e_bffd1d60",
@@ -89,6 +113,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc3c5c58_d9e5cdc0",
+        "filename": "cue/testdata/cycle/compbottomnofinal.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 912,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-12T09:19:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "88e76b3e_bffd1d60",
+      "revId": "13ab40d23042b261a5e8f7eef33530e03e66cff2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "050e34b3_88c4a479",
@@ -102,6 +144,24 @@
       "writtenOn": "2025-02-11T11:29:12Z",
       "side": 1,
       "message": "nit: I would avoid making debugging changes to TestX as that adds a bit of noise and could lead to silly conflicts, e.g. when backporting fixes to release branches.",
+      "revId": "13ab40d23042b261a5e8f7eef33530e03e66cff2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0129bea0_664bd756",
+        "filename": "internal/core/adt/eval_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-12T09:19:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "050e34b3_88c4a479",
       "revId": "13ab40d23042b261a5e8f7eef33530e03e66cff2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

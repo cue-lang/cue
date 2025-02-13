@@ -784,7 +784,12 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 
 		for i, y := range n.checks {
 			if b, ok := SimplifyValidator(ctx, cx, y); ok {
-				n.checks[i] = b
+				// It is possible that simplification process triggered further
+				// evaluation, finalizing this node, that the checks slice was
+				// cleared. In that case it is safe to ignore the result.
+				if len(n.checks) > 0 {
+					n.checks[i] = b
+				}
 				return
 			}
 		}

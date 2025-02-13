@@ -860,6 +860,12 @@ func (n *nodeContext) completeArcs(state vertexStatus) {
 				}
 			}
 
+			// If a structural cycle is detected, Arcs is cleared to avoid
+			// going into an infinite loop. If this is the case, we can bail
+			// from this loop.
+			if len(n.node.Arcs) == 0 {
+				goto postChecks
+			}
 			n.node.Arcs[k] = a
 			k++
 
@@ -889,6 +895,7 @@ func (n *nodeContext) completeArcs(state vertexStatus) {
 		}
 		n.node.Arcs = n.node.Arcs[:k]
 
+	postChecks:
 		for _, c := range n.postChecks {
 			f := ctx.PushState(c.env, c.expr.Source())
 

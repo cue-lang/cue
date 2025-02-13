@@ -114,7 +114,10 @@ func (r *Runtime) Init() {
 
 	r.loaded = map[*build.Instance]interface{}{}
 
-	cueexperiment.Init()
+	err := cueexperiment.Init()
+	if err != nil {
+		panic(err)
+	}
 	if cueexperiment.Flags.EvalV3 {
 		r.version = internal.DevVersion
 	} else {

@@ -59,7 +59,10 @@ var SharedRuntime = sync.OnceValue(func() *Runtime {
 	// but future evaluator versions may not be compatible at that level.
 	// We should consider using one SharedRuntime per evaluator version,
 	// or getting rid of SharedRuntime altogether.
-	cueexperiment.Init()
+	err := cueexperiment.Init()
+	if err != nil {
+		panic(err)
+	}
 	if cueexperiment.Flags.EvalV3 {
 		r.version = internal.DevVersion
 	} else {

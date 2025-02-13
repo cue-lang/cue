@@ -51,8 +51,13 @@ func (c *CallCtxt) Do() bool {
 }
 
 // Schema returns the ith argument as is, without converting it to a cue.Value.
+//
+// TODO: Schema should use CallContext.Expr to capture cycle information.
+// However, this only makes sense if functions also use the same OpContext for
+// further evaluation. We should enforce as we port the old calls.
 func (c *CallCtxt) Schema(i int) Schema {
-	return value.Make(c.ctx, c.args[i])
+	v := c.Expr(i)
+	return value.Make(c.ctx, v)
 }
 
 // Value returns a finalized cue.Value for the ith argument.

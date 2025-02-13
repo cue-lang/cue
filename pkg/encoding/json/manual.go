@@ -134,6 +134,11 @@ func Unmarshal(b []byte) (ast.Expr, error) {
 // specified by v.
 func Validate(b []byte, v pkg.Schema) (bool, error) {
 	c := value.OpContext(v)
+	return validate(c, b, v)
+}
+
+// validate is the actual implementation of Validate.
+func validate(c *adt.OpContext, b []byte, v pkg.Schema) (bool, error) {
 	if !json.Valid(b) {
 		return false, fmt.Errorf("json: invalid JSON")
 	}

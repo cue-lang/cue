@@ -20,6 +20,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/internal/core/adt"
 	cueyaml "cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/pkg"
 	"cuelang.org/go/internal/value"
@@ -87,8 +88,16 @@ func UnmarshalStream(data []byte) (ast.Expr, error) {
 // Validate validates YAML and confirms it is an instance of schema.
 // If the YAML source is a stream, every object must match v.
 func Validate(b []byte, v pkg.Schema) (bool, error) {
+	// This function is left for Go documentation. The package entry calls
+	// cueyaml.Validate directly, passing it the call context.
+
 	ctx := value.OpContext(v)
 	return cueyaml.Validate(ctx, b, v)
+}
+
+// validate is the actual implementation of Validate.
+func validate(c *adt.OpContext, b []byte, v pkg.Schema) (bool, error) {
+	return cueyaml.Validate(c, b, v)
 }
 
 // ValidatePartial validates YAML and confirms it matches the constraints
@@ -96,6 +105,14 @@ func Validate(b []byte, v pkg.Schema) (bool, error) {
 // but does not have to be an instance of v. If the YAML source is a stream,
 // every object must match v.
 func ValidatePartial(b []byte, v pkg.Schema) (bool, error) {
+	// This function is left for Go documentation. The package entry calls
+	// cueyaml.ValidatePartial directly, passing it the call context.
+
 	ctx := value.OpContext(v)
 	return cueyaml.ValidatePartial(ctx, b, v)
+}
+
+// validatePartial is the actual implementation of ValidatePartial.
+func validatePartial(c *adt.OpContext, b []byte, v pkg.Schema) (bool, error) {
+	return cueyaml.ValidatePartial(c, b, v)
 }

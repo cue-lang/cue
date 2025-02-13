@@ -122,12 +122,7 @@ func (n *nodeContext) scheduleConjuncts() {
 // TODO(evalv3): consider not returning a result at all.
 func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	if c.LogEval > 0 {
-		c.Logf(v, "Unify %v", fmt.Sprintf("%p", v))
-		c.nest++
-		defer func() {
-			c.nest--
-			c.Logf(v, "END Unify")
-		}()
+		defer c.Un(c.Indentf(v, "UNIFY(%x, %v)", needs, mode))
 	}
 
 	// TODO: investigate whether we still need this mechanism.
@@ -456,6 +451,8 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 // NOT:
 // - complete value. That is reserved for Unify.
 func (n *nodeContext) completeNodeTasks(mode runMode) {
+	defer n.ctx.Un(n.ctx.Indentf(n.node, "(%v)", mode))
+
 	n.assertInitialized()
 
 	if n.isCompleting > 0 {
@@ -467,14 +464,6 @@ func (n *nodeContext) completeNodeTasks(mode runMode) {
 	}()
 
 	v := n.node
-	c := n.ctx
-
-	if n.ctx.LogEval > 0 {
-		c.nest++
-		defer func() {
-			c.nest--
-		}()
-	}
 
 	if !v.Label.IsLet() {
 		if p := v.Parent; p != nil && p.state != nil {

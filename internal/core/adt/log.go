@@ -16,7 +16,10 @@ package adt
 
 import (
 	"fmt"
+	"io"
 	"log"
+	"path/filepath"
+	"runtime"
 	"strings"
 
 	"cuelang.org/go/cue/token"
@@ -53,6 +56,46 @@ func init() {
 
 var pMap = map[*Vertex]int{}
 
+type nestString string
+
+func (c *OpContext) Un(s nestString, id int) {
+	c.nest--
+	if id != c.logID {
+		c.Logf(nil, "END %s", string(s))
+	}
+}
+
+// Indentf logs a function call and increases the nesting level.
+// The first argument must be the function name.
+func (c *OpContext) Indentf(v *Vertex, format string, args ...any) (s nestString, id int) {
+	name := strings.Split(format, "(")[0]
+	if name == "" {
+		name, _ = getCallerFunctionName(1)
+		format = name + format
+	}
+
+	caller, line := getCallerFunctionName(2)
+	args = append(args, caller, line)
+
+	format += " %s:%d"
+
+	c.Logf(v, format, args...)
+	c.nest++
+
+	return nestString(name), c.logID
+}
+
+func (c *OpContext) RewriteArgs(args ...interface{}) {
+	for i, a := range args {
+		switch x := a.(type) {
+		case Node:
+			args[i] = c.Str(x)
+		case Feature:
+			args[i] = x.SelectorString(c)
+		}
+	}
+}
+
 func (c *OpContext) Logf(v *Vertex, format string, args ...interface{}) {
 	if c.LogEval == 0 {
 		return
@@ -74,24 +117,20 @@ func (c *OpContext) Logf(v *Vertex, format string, args ...interface{}) {
 		return
 	}
 
+	c.RewriteArgs(args...)
+	n, _ := fmt.Fprintf(w, format, args...)
+	if n < 60 {
+		w.WriteString(strings.Repeat(" ", 60-n))
+	}
+
 	p := pMap[v]
 	if p == 0 {
 		p = len(pMap) + 1
 		pMap[v] = p
 	}
 	disjunctInfo := c.disjunctInfo()
-	fmt.Fprintf(w, "[n:%d/%v %s%s] ",
-		p, v.Path(), c.PathToString(v.Path()), disjunctInfo)
-
-	for i, a := range args {
-		switch x := a.(type) {
-		case Node:
-			args[i] = c.Str(x)
-		case Feature:
-			args[i] = x.SelectorString(c)
-		}
-	}
-	fmt.Fprintf(w, format, args...)
+	fmt.Fprintf(w, "; n:%d %v %v%s ",
+		p, c.PathToString(v.Path()), v.Path(), disjunctInfo)
 
 	_ = log.Output(2, w.String())
 }
@@ -139,9 +178,6 @@ func (n *nodeContext) pushDisjunctionTask() *disjunctInfo {
 	}
 	c.disjunctStack = append(c.disjunctStack, id)
 
-	n.Logf("========= DISJUNCTION %d =========", c.currentDisjunctionID)
-	c.nest += 1
-
 	return c.currentDisjunct()
 }
 
@@ -186,8 +222,26 @@ func (n *nodeContext) logDoDisjunct() *disjunctInfo {
 
 func (d disjunctInfo) pop() {
 	c := d.node.ctx
-	c.nest -= 1
 	c.disjunctStack = c.disjunctStack[:len(c.disjunctStack)-1]
+}
+
+// Format implements the fmt.Formatter interface for disjunctInfo.
+func (d *disjunctInfo) Format(f fmt.State, c rune) {
+	d.Write(f)
+}
+
+func (d *disjunctInfo) Write(w io.Writer) {
+	// which disjunct
+	fmt.Fprintf(w, " D%d:H%d:%d/%d",
+		d.disjunctionID, d.holeID, d.disjunctionSeq, d.numDisjunctions)
+	if d.crossProductSeq != 0 {
+		fmt.Fprintf(w, " P%d/%d", d.crossProductSeq, d.numPrevious)
+	}
+	if d.disjunctID != 0 {
+		fmt.Fprintf(w, " d%d:%d/%d",
+			d.disjunctID, d.disjunctSeq, d.numDisjuncts,
+		)
+	}
 }
 
 // disjunctInfo prints a header for log to indicate the current disjunct.
@@ -203,17 +257,24 @@ func (c *OpContext) disjunctInfo() string {
 		if i != 0 {
 			b.WriteString(" =>")
 		}
-		// which disjunct
-		fmt.Fprintf(&b, " D%d:H%d:%d/%d",
-			d.disjunctionID, d.holeID, d.disjunctionSeq, d.numDisjunctions)
-		if d.crossProductSeq != 0 {
-			fmt.Fprintf(&b, " P%d/%d", d.crossProductSeq, d.numPrevious)
-		}
-		if d.disjunctID != 0 {
-			fmt.Fprintf(&b, " d%d:%d/%d",
-				d.disjunctID, d.disjunctSeq, d.numDisjuncts,
-			)
-		}
+		d.Write(&b)
 	}
 	return b.String()
+}
+
+func getCallerFunctionName(i int) (caller string, line int) {
+	pc, _, line, ok := runtime.Caller(1 + i)
+	if !ok {
+		return "unknown", 0
+	}
+	fn := runtime.FuncForPC(pc)
+	if fn == nil {
+		return "unknown", 0
+	}
+	fullName := fn.Name()
+	name := filepath.Base(fullName)
+	if idx := strings.LastIndex(name, "."); idx != -1 {
+		name = name[idx+1:]
+	}
+	return name, line
 }

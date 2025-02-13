@@ -342,6 +342,8 @@ func (n *nodeContext) breakIncomingDeps(mode runMode) {
 		return
 	}
 
+	defer n.ctx.Un(n.ctx.Indentf(n.node, "(%v)", mode))
+
 	// TODO: remove this block in favor of finalizing notification nodes,
 	// or what have you. We have patched this to skip evaluating when using
 	// disjunctions, but this is overall a brittle approach.

@@ -51,10 +51,10 @@ unmarshalTrailingInput.invalid: error in call to encoding/yaml.Unmarshal: expect
     ./in.cue:28:11
 
 Result:
-t1: _|_ // t1: error in call to encoding/yaml.Validate: a: invalid value 4 (out of bound <3)
+t1: _|_ // t1: error in call to encoding/yaml.Validate: t1.a: invalid value 4 (out of bound <3)
 t2: true
-t3: _|_ // t3: error in call to encoding/yaml.Validate: b: incomplete value int
-t4: _|_ // t4: error in call to encoding/yaml.ValidatePartial: a: invalid value 4 (out of bound <3)
+t3: _|_ // t3: error in call to encoding/yaml.Validate: t3.b: incomplete value int
+t4: _|_ // t4: error in call to encoding/yaml.ValidatePartial: t4.a: invalid value 4 (out of bound <3)
 t5: true
 t6: true
 t7: """

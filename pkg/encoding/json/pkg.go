@@ -123,7 +123,7 @@ var p = &pkg.Package{
 		Func: func(c *pkg.CallCtxt) {
 			b, v := c.Bytes(0), c.Schema(1)
 			if c.Do() {
-				c.Ret, c.Err = Validate(b, v)
+				c.Ret, c.Err = validate(c.OpContext(), b, v)
 			}
 		},
 	}},

@@ -333,6 +333,11 @@ func Contains(a []cue.Value, v cue.Value) bool {
 // Likewise, "matchValue" will usually be a non-concrete value.
 func MatchN(list []cue.Value, n pkg.Schema, matchValue pkg.Schema) (bool, error) {
 	c := value.OpContext(n)
+	return matchN(c, list, n, matchValue)
+}
+
+// matchN is the actual implementation of MatchN.
+func matchN(c *adt.OpContext, list []cue.Value, n pkg.Schema, matchValue pkg.Schema) (bool, error) {
 	var nmatch int64
 	for _, w := range list {
 		vx := adt.Unify(c, value.Vertex(matchValue), value.Vertex(w))
@@ -342,7 +347,7 @@ func MatchN(list []cue.Value, n pkg.Schema, matchValue pkg.Schema) (bool, error)
 		}
 	}
 
-	ctx := value.Context(n)
+	ctx := value.Context(c)
 
 	if err := n.Unify(ctx.Encode(nmatch)).Err(); err != nil {
 		return false, pkg.ValidationError{B: &adt.Bottom{

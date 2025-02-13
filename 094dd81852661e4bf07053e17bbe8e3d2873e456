@@ -22,6 +22,30 @@
       },
       "revId": "094dd81852661e4bf07053e17bbe8e3d2873e456",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a45cb8c_142f7c45",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-13T14:25:32Z",
+      "side": 1,
+      "message": "The eval package is the solution to breaking the import cycle and thus having better error messages. ;)\n\nBut with the API redesign we should indeed see if we can improve on this. It is a similar problem to why we need cuecontext next to cue. The latter isn\u0027t really fixable, as far as I can tell.",
+      "parentUuid": "e2af536e_9425c258",
+      "range": {
+        "startLine": 10,
+        "startChar": 36,
+        "endLine": 11,
+        "endChar": 48
+      },
+      "revId": "094dd81852661e4bf07053e17bbe8e3d2873e456",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

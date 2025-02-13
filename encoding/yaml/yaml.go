@@ -24,6 +24,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	cueyaml "cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/source"
+	"cuelang.org/go/internal/value"
 )
 
 // Extract parses the YAML specified by src to a CUE expression. If
@@ -96,6 +97,7 @@ func EncodeStream(iter cue.Iterator) ([]byte, error) {
 // Validate validates the YAML and confirms it matches the constraints
 // specified by v. For YAML streams, all values must match v.
 func Validate(b []byte, v cue.Value) error {
-	_, err := cueyaml.Validate(b, v)
+	ctx := value.OpContext(v)
+	_, err := cueyaml.Validate(ctx, b, v)
 	return err
 }

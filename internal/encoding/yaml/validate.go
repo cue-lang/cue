@@ -19,12 +19,18 @@ import (
 	"io"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/pkg"
+	"cuelang.org/go/internal/value"
 )
 
 // Validate validates YAML and confirms it is an instance of schema.
 // If the YAML source is a stream, every object must match v.
-func Validate(b []byte, v cue.Value) (bool, error) {
+//
+// If Validate is called in a broader context, like a validation or function
+// call, the cycle context of n should be accumulated in c before this call.
+// This can be done by using the Expr method on the CallContext.
+func Validate(c *adt.OpContext, b []byte, v cue.Value) (bool, error) {
 	d := NewDecoder("yaml.Validate", b)
 	r := v.Context()
 	for {
@@ -50,10 +56,12 @@ func Validate(b []byte, v cue.Value) (bool, error) {
 		// if err := v.Subsume(inst.Value(), cue.Final()); err != nil {
 		// 	return false, err
 		// }
-		x = v.Unify(x)
+		vx := adt.Unify(c, value.Vertex(x), value.Vertex(v))
 		if err := x.Err(); err != nil {
 			return false, err
 		}
+		x = value.Make(c, vx)
+
 		if err := x.Validate(cue.Concrete(true)); err != nil {
 			// Strip error codes: incomplete errors are terminal in this case.
 			var b pkg.Bottomer
@@ -69,7 +77,7 @@ func Validate(b []byte, v cue.Value) (bool, error) {
 // specified by v using unification. This means that b must be consistent with,
 // but does not have to be an instance of v. If the YAML source is a stream,
 // every object must match v.
-func ValidatePartial(b []byte, v cue.Value) (bool, error) {
+func ValidatePartial(c *adt.OpContext, b []byte, v cue.Value) (bool, error) {
 	d := NewDecoder("yaml.ValidatePartial", b)
 	r := v.Context()
 	for {
@@ -86,8 +94,10 @@ func ValidatePartial(b []byte, v cue.Value) (bool, error) {
 			return false, err
 		}
 
-		if x := v.Unify(x); x.Err() != nil {
-			return false, x.Err()
+		vx := adt.Unify(c, value.Vertex(x), value.Vertex(v))
+		x = value.Make(c, vx)
+		if err := x.Err(); err != nil {
+			return false, err
 		}
 	}
 }

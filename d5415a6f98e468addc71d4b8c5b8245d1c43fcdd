@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "94a1703d_273ab7ac",
+        "filename": "internal/value/value.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-13T09:51:43Z",
+      "side": 1,
+      "message": "wow. I\u0027m really surprised the Go compiler doesn\u0027t see that this switch is exhaustive and that this panic isn\u0027t needed.",
+      "revId": "d5415a6f98e468addc71d4b8c5b8245d1c43fcdd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

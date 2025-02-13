@@ -45,10 +45,34 @@ func Context[Ctx *cue.Runtime | *cue.Context | cue.Value | *adt.OpContext](ctx C
 	panic("unreachable")
 }
 
+// OpContext returns an OpContext with proper node formatting initialized.
+func OpContext[Ctx *cue.Runtime | *cue.Context | cue.Value](c Ctx) *adt.OpContext {
+	var r *runtime.Runtime
+	var v *adt.Vertex
+	switch x := any(c).(type) {
+	case *cue.Runtime:
+		r = (*runtime.Runtime)(x)
+		r.Init()
+	case *cue.Context:
+		r = (*runtime.Runtime)(x)
+	case cue.Value:
+		r, v = ToInternal(x)
+	default:
+		panic("unreachable")
+	}
+	return eval.NewContext(r, v)
+}
+
 func ToInternal(v cue.Value) (*runtime.Runtime, *adt.Vertex) {
 	var t types.Value
 	v.Core(&t)
 	return t.R, t.V
+}
+
+func Vertex(v cue.Value) *adt.Vertex {
+	var t types.Value
+	v.Core(&t)
+	return t.V
 }
 
 // Make wraps cue.MakeValue.

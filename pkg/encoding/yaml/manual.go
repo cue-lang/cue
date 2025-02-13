@@ -22,6 +22,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	cueyaml "cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/pkg"
+	"cuelang.org/go/internal/value"
 )
 
 // Marshal returns the YAML encoding of v.
@@ -86,7 +87,8 @@ func UnmarshalStream(data []byte) (ast.Expr, error) {
 // Validate validates YAML and confirms it is an instance of schema.
 // If the YAML source is a stream, every object must match v.
 func Validate(b []byte, v pkg.Schema) (bool, error) {
-	return cueyaml.Validate(b, v)
+	ctx := value.OpContext(v)
+	return cueyaml.Validate(ctx, b, v)
 }
 
 // ValidatePartial validates YAML and confirms it matches the constraints
@@ -94,5 +96,6 @@ func Validate(b []byte, v pkg.Schema) (bool, error) {
 // but does not have to be an instance of v. If the YAML source is a stream,
 // every object must match v.
 func ValidatePartial(b []byte, v pkg.Schema) (bool, error) {
-	return cueyaml.ValidatePartial(b, v)
+	ctx := value.OpContext(v)
+	return cueyaml.ValidatePartial(ctx, b, v)
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af13601b_d56e0f1a",
+        "filename": "internal/core/adt/call.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-13T09:54:14Z",
+      "side": 1,
+      "message": "Oh, this pretty much fixes up a comment I had on an earlier CL.",
+      "revId": "ea89159a473fc233c496b0f35c90ef229c23c41a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

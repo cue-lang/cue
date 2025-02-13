@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bef034e9_ff365bd4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-13T12:01:34Z",
+      "side": 1,
+      "message": "\"This\" may cause... I think.",
+      "range": {
+        "startLine": 10,
+        "startChar": 34,
+        "endLine": 10,
+        "endChar": 37
+      },
+      "revId": "6b1c827be35930c3cf1d7617850bae6f2551b0b1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57a2361d_76617fe8",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 788,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-13T12:01:34Z",
+      "side": 1,
+      "message": "I think something\u0027s not quite right in this sentence.",
+      "range": {
+        "startLine": 788,
+        "startChar": 41,
+        "endLine": 788,
+        "endChar": 45
+      },
+      "revId": "6b1c827be35930c3cf1d7617850bae6f2551b0b1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

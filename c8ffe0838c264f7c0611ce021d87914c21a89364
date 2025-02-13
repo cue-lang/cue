@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bdd29196_50c2fd73",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-13T09:46:34Z",
+      "side": 1,
+      "message": "Did something happen to the rest of this sentence?",
+      "range": {
+        "startLine": 16,
+        "startChar": 16,
+        "endLine": 16,
+        "endChar": 20
+      },
+      "revId": "c8ffe0838c264f7c0611ce021d87914c21a89364",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc579507_93200670",
+        "filename": "internal/core/adt/call.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-13T09:46:34Z",
+      "side": 1,
+      "message": "\"returns\" I think.",
+      "range": {
+        "startLine": 72,
+        "startChar": 8,
+        "endLine": 72,
+        "endChar": 14
+      },
+      "revId": "c8ffe0838c264f7c0611ce021d87914c21a89364",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91c8607e_575709c2",
+        "filename": "internal/core/adt/call.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-13T09:46:34Z",
+      "side": 1,
+      "message": "I\u0027m not entirely sure this last sentence is needed or helps - it surprised me to read the code and find `i--` and not `i++` - the comment doesn\u0027t say in which direction the offset is. Maybe the comment just needs to say something along the lines of \"this method does the right thing even if the callcontext is a validator\"?",
+      "revId": "c8ffe0838c264f7c0611ce021d87914c21a89364",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

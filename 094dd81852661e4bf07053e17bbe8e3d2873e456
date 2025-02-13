@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2af536e_9425c258",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-13T09:48:29Z",
+      "side": 1,
+      "message": "It seems really very unfortunate that we give worse error messages due to import cycles. It seems to me that solving these import cycle issues should be higher priority.",
+      "range": {
+        "startLine": 10,
+        "startChar": 36,
+        "endLine": 11,
+        "endChar": 48
+      },
+      "revId": "094dd81852661e4bf07053e17bbe8e3d2873e456",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

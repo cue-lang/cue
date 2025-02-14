@@ -68,7 +68,8 @@ disjunctions.
 
 To ensure that the resulting Go code works, any imported CUE packages or
 referenced CUE definitions are transitively generated as well.
-The generated code is placed in cue_gen.go files in the directory of each CUE package.
+The generated code is placed in cue_types*_gen.go files in the directory of
+each CUE package.
 
 Generated Go type and field names may differ from the original CUE names by default.
 For instance, an exported definition "#foo" becomes "Foo",
@@ -81,8 +82,11 @@ given that Go does not allow declaring nested types.
 	package foo
 	@go(betterpkgname)
 
-	renamed: int @go(BetterName)
-	retyped: string @go(,type=foo.com/bar.NamedString)
+	#Bar: {
+		@go(BetterBarTypeName)
+		renamed: int    @go(BetterFieldName)
+		retyped: string @go(,type=foo.com/bar.NamedString)
+	}
 
 The attribute "@go(-)" can be used to ignore a definition or field, for example:
 

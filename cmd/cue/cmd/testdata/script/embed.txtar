@@ -4,6 +4,12 @@ env CUE_EXPERIMENT=embed=0
 cmp stderr out/noembed
 env CUE_EXPERIMENT=
 
+# Create test files for type=binary using strconv-unquote as txtar can only hold UTF8.
+strconv-unquote '"\xef\xbb\xbfHello, 世界"'
+cp stdout test-utf8-bom.binary
+strconv-unquote "\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7"
+cp stdout test-nonutf8.binary
+
 exec cue eval
 cmp stdout out/eval
 
@@ -38,6 +44,12 @@ d: _ @embed(glob="x/*.yaml") // merge into the same map
 f: _ @embed(file="openapi.json", type=openapi)
 
 g: _ @embed(file="openapi.json") // test no auto mode!
+
+h: _ @embed(file="test-utf8-bom.binary", type=binary)
+
+i: _ @embed(file="test-utf8-bom.binary", type=text)
+
+j: _ @embed(file="test-nonutf8.binary", type=binary)
 
 special: {
 	// These are all valid.
@@ -213,6 +225,18 @@ g: {
         }
     }
 }
+h: '''
+    Hello, 世界
+
+    '''
+i: """
+    Hello, 世界
+
+    """
+j: '''
+    ��������
+
+    '''
 special: {
     underscoreFile: {
         z: 45
@@ -273,6 +297,18 @@ g: {
 		}
 	}
 }
+h: '''
+	Hello, 世界
+
+	'''
+i: """
+	Hello, 世界
+
+	"""
+j: '''
+	��������
+
+	'''
 special: {
 	// These are all valid.
 	underscoreFile: z:  45

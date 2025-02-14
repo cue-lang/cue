@@ -238,6 +238,18 @@ func TestScript(t *testing.T) {
 					ts.Check(err)
 				}
 			},
+			// strconv-unquote treats each argument as a go quoted string, unquotes it and prints
+			// them, separated by newlines, to stdout
+			"strconv-unquote": func(ts *testscript.TestScript, neg bool, args []string) {
+				if neg {
+					ts.Fatalf("usage: strconv-unquote args...")
+				}
+				for _, quoted := range args {
+					s, err := strconv.Unquote(quoted)
+					ts.Check(err)
+					fmt.Fprintln(ts.Stdout(), s)
+				}
+			},
 		},
 		Setup: func(e *testscript.Env) error {
 			// If a testscript loads CUE packages but forgot to set up a cue.mod,

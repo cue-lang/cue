@@ -12,22 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package trim
+package trim_test
 
 import (
+	"bytes"
 	"testing"
 
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
+	"cuelang.org/go/tools/trim"
 	"github.com/go-quicktest/qt"
 )
 
 var (
-	// TODO(evalv3): many broken tests in new evaluator, use FullMatrix to
-	// expose. This is probably due to the changed underlying representation.
-	// matrix = cuetdtest.FullMatrix
 	matrix = cuetdtest.DefaultOnlyMatrix
 )
 
@@ -41,7 +40,9 @@ func TestTrimFiles(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-
+		if t.HasTag("skip-" + t.Name()) {
+			t.Skip()
+		}
 		a := t.Instance()
 		ctx := t.CueContext()
 		val := ctx.BuildInstance(a)
@@ -51,7 +52,22 @@ func TestTrimFiles(t *testing.T) {
 
 		files := a.Files
 
-		err := Files(files, val, &Config{Trace: trace})
+		cfg := &trim.Config{
+			Trace: trace && testing.Verbose(),
+		}
+		var buf *bytes.Buffer
+		if cfg.Trace {
+			buf = new(bytes.Buffer)
+			cfg.TraceWriter = buf
+			// Uncomment if you find a test is panicking and still want
+			// tracing.
+			// cfg.TraceWriter = os.Stderr
+		}
+
+		err := trim.Files(files, val, cfg)
+		if buf != nil && buf.Len() != 0 {
+			t.Log("Trace:\n" + buf.String())
+		}
 		if err != nil {
 			t.WriteErrors(errors.Promote(err, ""))
 		}

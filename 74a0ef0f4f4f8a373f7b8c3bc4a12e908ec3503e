@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5859339a_055fd0b0",
+        "filename": "tools/trim/trim_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-14T14:00:13Z",
+      "side": 1,
+      "message": "Usually I use FullMatrix, unless that does not work. Would be useful to comment it if this does not work with structure sharing disabled.",
+      "revId": "74a0ef0f4f4f8a373f7b8c3bc4a12e908ec3503e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e74d0ce_2c268bbf",
+        "filename": "tools/trim/trimv3.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-14T14:00:13Z",
+      "side": 1,
+      "message": "Will this give preference to removing specific fields over fields from a pattern?",
+      "revId": "74a0ef0f4f4f8a373f7b8c3bc4a12e908ec3503e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2a261a3_a039766d",
+        "filename": "tools/trim/trimv3.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 450,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-14T14:00:13Z",
+      "side": 1,
+      "message": "How about:\n\n\ta: [string]: x: y: z: 5\n\tb: w: x: y: z: 5\n\tb: a\n\nWill that still guarantee the removal of the fields in b, and not the pattern?",
+      "revId": "32497eec6eab46eb65234cebcc7169a2886b4e9d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

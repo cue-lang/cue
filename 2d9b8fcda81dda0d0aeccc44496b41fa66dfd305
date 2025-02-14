@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "635d6a5a_e033fa2e",
+        "filename": "tools/trim/evalv3/testdata/10.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-14T13:47:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da64d3c4_c7430e39",
+      "revId": "2d9b8fcda81dda0d0aeccc44496b41fa66dfd305",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e2418273_3d5f6ef7",
@@ -169,6 +187,24 @@
       "writtenOn": "2025-02-12T16:19:18Z",
       "side": 1,
       "message": "Could you add an explanation why this is not removed?",
+      "revId": "2d9b8fcda81dda0d0aeccc44496b41fa66dfd305",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a28218ed_d4de27a6",
+        "filename": "tools/trim/testdata/do_not_remove_field.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-14T13:47:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d7c4c26a_819694ad",
       "revId": "2d9b8fcda81dda0d0aeccc44496b41fa66dfd305",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

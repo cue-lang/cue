@@ -21,7 +21,7 @@ import (
 	"cuelang.org/go/internal/core/adt"
 )
 
-func (t *trimmer) trace(v *adt.Vertex) (*trimmer, *adt.Vertex) {
+func (t *trimmerV2) trace(v *adt.Vertex) (*trimmerV2, *adt.Vertex) {
 	if t.debug {
 		t.indent++
 		fmt.Fprintf(t.w, "%s%s {\n",
@@ -31,7 +31,7 @@ func (t *trimmer) trace(v *adt.Vertex) (*trimmer, *adt.Vertex) {
 	return t, v
 }
 
-func un(t *trimmer, v *adt.Vertex) {
+func un(t *trimmerV2, v *adt.Vertex) {
 	if !t.debug {
 		return
 	}
@@ -40,7 +40,7 @@ func un(t *trimmer, v *adt.Vertex) {
 	t.indent--
 }
 
-func (t *trimmer) logf(format string, args ...interface{}) {
+func (t *trimmerV2) logf(format string, args ...interface{}) {
 	if !t.debug {
 		return
 	}

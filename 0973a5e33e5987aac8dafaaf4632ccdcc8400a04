@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ce0c7f3_90e9784f",
+        "filename": "internal/core/adt/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-14T08:58:19Z",
+      "side": 1,
+      "message": "I only mention this because I tend to prefer this form: `fmt.Fprintf(w, \"%*s\", 60-n, \"\")`. I think it\u0027s a touch more elegant than repeating a space. But :shrug:",
+      "revId": "0973a5e33e5987aac8dafaaf4632ccdcc8400a04",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

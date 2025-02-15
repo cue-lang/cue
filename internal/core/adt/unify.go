@@ -162,7 +162,9 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	if n == nil {
 		return true // already completed
 	}
-	defer n.free()
+	// TODO(perf): reintroduce freeing once we have the lifetime under control.
+	// Right now this is not managed anyway, so we prevent bugs by disabling it.
+	// defer n.free()
 
 	// Typically a node processes all conjuncts before processing its fields.
 	// So this condition is very likely to trigger. If for some reason the

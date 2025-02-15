@@ -566,10 +566,10 @@ n2: n1 & {a: n1}
 n3: n1 & {n1}
 n4: n1 & {x: n1 & {y: n1 & {z: int}}}
 -- out/evalalpha/stats --
-Leaks:  792
-Freed:  76
-Reused: 76
-Allocs: 792
+Leaks:  868
+Freed:  0
+Reused: 0
+Allocs: 868
 Retain: 0
 
 Unifications: 588
@@ -585,10 +585,10 @@ diff old new
 -Reused: 823
 -Allocs: 27
 -Retain: 66
-+Leaks:  792
-+Freed:  76
-+Reused: 76
-+Allocs: 792
++Leaks:  868
++Freed:  0
++Reused: 0
++Allocs: 868
 +Retain: 0
  
 -Unifications: 664

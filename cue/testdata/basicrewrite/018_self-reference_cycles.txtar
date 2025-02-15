@@ -16,7 +16,7 @@ issue3669: {
 		two: 1 + one
 		one: two - 1
 	}
-	
+
 	out: #Schema & {
 		two: 0 | *2
 	}
@@ -65,43 +65,53 @@ Disjuncts:    21
 -- out/evalalpha --
 (struct){
   a: (_|_){
-    // [cycle] cycle error:
+    // [cycle] a: cycle with field: b:
+    //     ./in.cue:1:4
+    // b: cycle with field: a:
     //     ./in.cue:2:4
   }
   b: (_|_){
-    // [cycle] cycle error:
+    // [cycle] a: cycle with field: b:
+    //     ./in.cue:1:4
+    // b: cycle with field: a:
     //     ./in.cue:2:4
   }
   c: (#list){
     0: (_){ _ }
     1: (_){ _ }
   }
-  d: (_|_){
-    // [cycle] cycle error:
-    //     ./in.cue:7:4
-  }
-  e: (_|_){
-    // [cycle] cycle error:
-    //     ./in.cue:7:4
-  }
+  d: (int){ 1 }
+  e: (int){ |(*(int){ 2 }, (int){ 0 }) }
   issue3669: (struct){
     #Schema: (#struct){
       two: (_|_){
-        // [cycle] cycle error:
+        // [cycle] issue3669.#Schema.two: cycle with field: one:
+        //     ./issue3669.cue:4:12
+        // issue3669.#Schema.one: cycle with field: two:
         //     ./issue3669.cue:5:8
       }
       one: (_|_){
-        // [cycle] cycle error:
+        // [cycle] issue3669.#Schema.two: cycle with field: one:
+        //     ./issue3669.cue:4:12
+        // issue3669.#Schema.one: cycle with field: two:
         //     ./issue3669.cue:5:8
       }
     }
     out: (#struct){
       two: (_|_){
-        // [cycle] cycle error:
+        // [cycle] issue3669.out.two: cycle with field: one:
+        //     ./issue3669.cue:4:12
+        // issue3669.out.one: cycle with field: two:
+        //     ./issue3669.cue:5:8
+        // issue3669.out.two: 2 errors in empty disjunction::
         //     ./issue3669.cue:5:8
       }
       one: (_|_){
-        // [cycle] cycle error:
+        // [cycle] issue3669.out.two: cycle with field: one:
+        //     ./issue3669.cue:4:12
+        // issue3669.out.one: cycle with field: two:
+        //     ./issue3669.cue:5:8
+        // issue3669.out.two: 2 errors in empty disjunction::
         //     ./issue3669.cue:5:8
       }
     }
@@ -111,58 +121,78 @@ Disjuncts:    21
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,11 @@
+@@ -1,41 +1,54 @@
  (struct){
    a: (_|_){
-     // [cycle] cycle error:
+-    // [cycle] cycle error:
 -    //     ./in.cue:1:4
++    // [cycle] a: cycle with field: b:
++    //     ./in.cue:1:4
++    // b: cycle with field: a:
 +    //     ./in.cue:2:4
    }
    b: (_|_){
-     // [cycle] cycle error:
+-    // [cycle] cycle error:
 -    //     ./in.cue:1:4
++    // [cycle] a: cycle with field: b:
++    //     ./in.cue:1:4
++    // b: cycle with field: a:
 +    //     ./in.cue:2:4
    }
    c: (#list){
      0: (_){ _ }
-@@ -13,29 +13,32 @@
+     1: (_){ _ }
    }
-   d: (_|_){
-     // [cycle] cycle error:
+-  d: (_|_){
+-    // [cycle] cycle error:
 -    //     ./in.cue:6:4
-+    //     ./in.cue:7:4
-   }
-   e: (_|_){
-     // [cycle] cycle error:
+-  }
+-  e: (_|_){
+-    // [cycle] cycle error:
 -    //     ./in.cue:6:4
-+    //     ./in.cue:7:4
-   }
+-  }
++  d: (int){ 1 }
++  e: (int){ |(*(int){ 2 }, (int){ 0 }) }
    issue3669: (struct){
      #Schema: (#struct){
        two: (_|_){
-         // [cycle] cycle error:
+-        // [cycle] cycle error:
 -        //     ./issue3669.cue:4:8
 -      }
 -      one: (_|_){
 -        // [cycle] cycle error:
 -        //     ./issue3669.cue:4:8
++        // [cycle] issue3669.#Schema.two: cycle with field: one:
++        //     ./issue3669.cue:4:12
++        // issue3669.#Schema.one: cycle with field: two:
 +        //     ./issue3669.cue:5:8
 +      }
 +      one: (_|_){
-+        // [cycle] cycle error:
++        // [cycle] issue3669.#Schema.two: cycle with field: one:
++        //     ./issue3669.cue:4:12
++        // issue3669.#Schema.one: cycle with field: two:
 +        //     ./issue3669.cue:5:8
        }
      }
      out: (#struct){
        two: (_|_){
-         // [cycle] cycle error:
+-        // [cycle] cycle error:
 -        //     ./issue3669.cue:4:8
 -      }
 -      one: (int){ -1 }
++        // [cycle] issue3669.out.two: cycle with field: one:
++        //     ./issue3669.cue:4:12
++        // issue3669.out.one: cycle with field: two:
++        //     ./issue3669.cue:5:8
++        // issue3669.out.two: 2 errors in empty disjunction::
 +        //     ./issue3669.cue:5:8
 +      }
 +      one: (_|_){
-+        // [cycle] cycle error:
++        // [cycle] issue3669.out.two: cycle with field: one:
++        //     ./issue3669.cue:4:12
++        // issue3669.out.one: cycle with field: two:
++        //     ./issue3669.cue:5:8
++        // issue3669.out.two: 2 errors in empty disjunction::
 +        //     ./issue3669.cue:5:8
 +      }
      }

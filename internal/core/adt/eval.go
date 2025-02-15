@@ -1165,6 +1165,9 @@ type nodeContextState struct {
 	depth       int32
 	defaultMode defaultMode
 
+	// has a value filled out before the node splits into a disjunction.
+	hasFieldValue bool
+
 	// Value info
 
 	kind     Kind

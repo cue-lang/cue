@@ -196,11 +196,18 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	// through an expression. As long as there is no request to process arcs or
 	// finalize the value, we can and should stop processing here to avoid
 	// spurious cycles.
-	if v.status == evaluating &&
-		v.state.evalDepth == c.evalDepth &&
-		needs&fieldSetKnown == 0 &&
-		mode != finalize {
-		return false
+
+	if v.status == evaluating && v.state.evalDepth == c.evalDepth {
+		switch mode {
+		case finalize:
+			// We will force completion below.
+		case yield:
+			// TODO: perhaps add to queue in some condition.
+		default:
+			if needs&fieldSetKnown == 0 {
+				return false
+			}
+		}
 	}
 
 	v.status = evaluating

@@ -698,34 +698,30 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 
 		if c.isDevVersion() {
 			if s := arc.getState(c); s != nil {
-				needs := state.conditions() | arcTypeKnown
+				needs := state.conditions()
+				needs = needs | arcTypeKnown
 				runMode := state.runMode()
 
-				if runMode == finalize {
+				switch runMode {
+				case finalize:
 					arc.unify(c, needs, attemptOnly) // to set scalar
 					arc.state.freeze(needs)
-				} else {
-					arc.unify(c, needs, runMode) // to set scalar
-				}
+				case attemptOnly:
+					arc.unify(c, needs, attemptOnly) // to set scalar
 
-				v := arc
-				if v.ArcType == ArcPending {
-					if v.status == evaluating {
-						for ; v.Parent != nil && v.ArcType == ArcPending; v = v.Parent {
-						}
-						err := c.Newf("cycle with field %v", x)
+				case yield:
+					hasCycleBreakingValue :=
+						!isCyclePlaceholder(arc.BaseValue) || s.hasFieldValue
+					evaluating := arc.status == evaluating
+
+					if evaluating && !hasCycleBreakingValue {
+						err := c.Newf("cycle with field: %v", x)
 						b := &Bottom{Code: CycleError, Err: err}
-						s.setBaseValue(b)
-						return b, c.ci
-						// TODO: use this instead, as is usual for incomplete errors,
-						// and also move this block one scope up to also apply to
-						// defined arcs. In both cases, though, doing so results in
-						// some errors to be misclassified as evaluation error.
-						// c.AddBottom(b)
-						// return nil
+						c.AddBottom(b)
+						break
 					}
-					c.undefinedFieldError(v, IncompleteError)
-					return nil, c.ci
+
+					arc.unify(c, needs, runMode) // to set scalar
 				}
 			}
 		}

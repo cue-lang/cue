@@ -236,10 +236,10 @@ listMatchN: ok: {
 -- todo/p1 --
 issue3443.noCycle: fix hang
 -- out/evalalpha/stats --
-Leaks:  410
-Freed:  17
-Reused: 17
-Allocs: 410
+Leaks:  427
+Freed:  0
+Reused: 0
+Allocs: 427
 Retain: 0
 
 Unifications: 368
@@ -255,10 +255,10 @@ diff old new
 -Reused: 402
 -Allocs: 35
 -Retain: 95
-+Leaks:  410
-+Freed:  17
-+Reused: 17
-+Allocs: 410
++Leaks:  427
++Freed:  0
++Reused: 0
++Allocs: 427
 +Retain: 0
  
 -Unifications: 409

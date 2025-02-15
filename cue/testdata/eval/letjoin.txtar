@@ -132,10 +132,10 @@ issue3591: missing: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  202
-Freed:  20
-Reused: 19
-Allocs: 203
+Leaks:  222
+Freed:  0
+Reused: 0
+Allocs: 222
 Retain: 0
 
 Unifications: 178
@@ -151,10 +151,10 @@ diff old new
 -Reused: 207
 -Allocs: 36
 -Retain: 160
-+Leaks:  202
-+Freed:  20
-+Reused: 19
-+Allocs: 203
++Leaks:  222
++Freed:  0
++Reused: 0
++Allocs: 222
 +Retain: 0
  
 -Unifications: 167

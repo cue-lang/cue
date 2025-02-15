@@ -57,10 +57,10 @@ issue3580: {
 	})
 }
 -- out/evalalpha/stats --
-Leaks:  372
-Freed:  6
-Reused: 6
-Allocs: 372
+Leaks:  378
+Freed:  0
+Reused: 0
+Allocs: 378
 Retain: 0
 
 Unifications: 179
@@ -76,10 +76,10 @@ diff old new
 -Reused: 164
 -Allocs: 49
 -Retain: 44
-+Leaks:  372
-+Freed:  6
-+Reused: 6
-+Allocs: 372
++Leaks:  378
++Freed:  0
++Reused: 0
++Allocs: 378
 +Retain: 0
  
 -Unifications: 199

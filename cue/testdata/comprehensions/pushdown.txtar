@@ -1107,18 +1107,21 @@ Result:
   cyclicError: (struct){
     a: (_|_){
       // [incomplete] cyclicError.a: incomplete bool: bool:
-      //     ./in.cue:246:6
+      //     ./in.cue:245:6
       x: (_|_){
         // [incomplete] cyclicError.a: incomplete bool: bool:
-        //     ./in.cue:246:6
+        //     ./in.cue:245:6
       }
-      y: (bool){ bool }
+      y: (_|_){
+        // [incomplete] cyclicError.a: incomplete bool: bool:
+        //     ./in.cue:245:6
+      }
       b: (struct){
       }
     }
     c: (_|_){
       // [incomplete] cyclicError.a: incomplete bool: bool:
-      //     ./in.cue:246:6
+      //     ./in.cue:245:6
     }
   }
   midwayReferences: (struct){
@@ -1772,7 +1775,7 @@ diff old new
          }
          b: (bool){ true }
        }
-@@ -259,9 +222,19 @@
+@@ -259,9 +222,22 @@
    }
    cyclicError: (struct){
      a: (_|_){
@@ -1780,22 +1783,25 @@ diff old new
 -    }
 -    c: (struct){
 +      // [incomplete] cyclicError.a: incomplete bool: bool:
-+      //     ./in.cue:246:6
++      //     ./in.cue:245:6
 +      x: (_|_){
 +        // [incomplete] cyclicError.a: incomplete bool: bool:
-+        //     ./in.cue:246:6
++        //     ./in.cue:245:6
 +      }
-+      y: (bool){ bool }
++      y: (_|_){
++        // [incomplete] cyclicError.a: incomplete bool: bool:
++        //     ./in.cue:245:6
++      }
 +      b: (struct){
 +      }
 +    }
 +    c: (_|_){
 +      // [incomplete] cyclicError.a: incomplete bool: bool:
-+      //     ./in.cue:246:6
++      //     ./in.cue:245:6
      }
    }
    midwayReferences: (struct){
-@@ -275,24 +248,9 @@
+@@ -275,24 +251,9 @@
          }
        }
      }
@@ -1823,7 +1829,7 @@ diff old new
    }
    closedCheck: (struct){
      success1: (struct){
-@@ -395,13 +353,7 @@
+@@ -395,13 +356,7 @@
            }
          }
        }
@@ -1838,7 +1844,7 @@ diff old new
        #F: (#struct){
          e: (bool){ bool }
          f: (_|_){
-@@ -418,17 +370,11 @@
+@@ -418,17 +373,11 @@
          }
        }
        E: (_|_){
@@ -1857,7 +1863,7 @@ diff old new
        }
      }
      derefDisj2: (struct){
-@@ -439,17 +385,11 @@
+@@ -439,17 +388,11 @@
          }
        }
        E: (_|_){
@@ -1876,7 +1882,7 @@ diff old new
        }
      }
      bulk1: (struct){
-@@ -572,9 +512,7 @@
+@@ -572,9 +515,7 @@
            // [eval]
            e: (_|_){
              // [eval] structShare.err1.x.d.e: field not allowed:
@@ -1887,7 +1893,7 @@ diff old new
              //     ./in.cue:591:9
            }
          }
-@@ -598,13 +536,13 @@
+@@ -598,13 +539,13 @@
        }
        envs: (struct){
          e1: (#struct){
@@ -1905,7 +1911,7 @@ diff old new
          }
        }
      }
-@@ -641,9 +579,8 @@
+@@ -641,9 +582,8 @@
      _c: (struct){
        y: (int){ 1 }
      }
@@ -1917,7 +1923,7 @@ diff old new
      }
    }
    errorPropagation: (_|_){
-@@ -701,10 +638,10 @@
+@@ -701,10 +641,10 @@
        }
        foo: (#struct){
          kind: (string){ "foo" }
@@ -1930,7 +1936,7 @@ diff old new
        }
      }
      regular: (_|_){
-@@ -717,16 +654,12 @@
+@@ -717,16 +657,12 @@
        foo: (_|_){
          // [eval]
          kind: (string){ "foo" }
@@ -1950,7 +1956,7 @@ diff old new
          }
        }
      }
-@@ -738,10 +671,10 @@
+@@ -738,10 +674,10 @@
        }
        foo: (#struct){
          kind: (string){ "foo" }

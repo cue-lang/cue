@@ -545,6 +545,12 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, hole i
 
 	oc.unlinkOverlay()
 
+	// TODO(perf): do not set to nil, but rather maintain an index to unwind
+	// to avoid allocting new arrays.
+	saved := n.ctx.blocking
+	n.ctx.blocking = nil
+	defer func() { n.ctx.blocking = saved }()
+
 	v.unify(n.ctx, allKnown, mode)
 
 	if err := d.getErrorAll(); err != nil && !isCyclePlaceholder(err) {

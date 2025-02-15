@@ -1596,10 +1596,10 @@ Result:
   }
 }
 -- out/evalalpha/stats --
-Leaks:  2262
-Freed:  253
-Reused: 252
-Allocs: 2263
+Leaks:  2515
+Freed:  0
+Reused: 0
+Allocs: 2515
 Retain: 0
 
 Unifications: 760
@@ -1615,10 +1615,10 @@ diff old new
 -Reused: 85
 -Allocs: 46
 -Retain: 5
-+Leaks:  2262
-+Freed:  253
-+Reused: 252
-+Allocs: 2263
++Leaks:  2515
++Freed:  0
++Reused: 0
++Allocs: 2515
 +Retain: 0
  
 -Unifications: 48

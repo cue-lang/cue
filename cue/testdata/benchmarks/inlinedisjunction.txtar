@@ -14,10 +14,10 @@
 x: #def
 x: c: "foo"
 -- out/evalalpha/stats --
-Leaks:  147
-Freed:  2
-Reused: 2
-Allocs: 147
+Leaks:  149
+Freed:  0
+Reused: 0
+Allocs: 149
 Retain: 0
 
 Unifications: 17
@@ -50,10 +50,10 @@ diff old new
 -Freed:  4674
 -Reused: 3903
 -Allocs: 771
-+Leaks:  147
-+Freed:  2
-+Reused: 2
-+Allocs: 147
++Leaks:  149
++Freed:  0
++Reused: 0
++Allocs: 149
  Retain: 0
  
 -Unifications: 2590

@@ -479,6 +479,9 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, hole i
 		panic("nil closeContext during init")
 	}
 
+	n.ctx.inDisjunct++
+	defer func() { n.ctx.inDisjunct-- }()
+
 	ID := n.logDoDisjunct()
 	_ = ID // Do not remove, used for debugging.
 

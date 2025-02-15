@@ -26,7 +26,7 @@ issue3669: {
 		two: 1 + one
 		one: two - 1
 	}
-	
+
 	out: #Schema & {
 		two: 0 | *2
 	}
@@ -151,11 +151,20 @@ Disjuncts:    88
   oneway: (struct){
     t1: (struct){
       a: (_|_){
-        // [cycle] cycle error:
+        // [cycle] oneway.t1.a: cycle with field: b:
         //     ./disjunction.cue:4:12
+        // oneway.t1.a: 2 errors in empty disjunction::
+        //     ./disjunction.cue:5:13
+        // oneway.t1.b: cycle with field: a:
+        //     ./disjunction.cue:5:13
       }
       b: (_|_){
-        // [cycle] cycle error
+        // [cycle] oneway.t1.a: cycle with field: b:
+        //     ./disjunction.cue:4:12
+        // oneway.t1.a: 2 errors in empty disjunction::
+        //     ./disjunction.cue:5:13
+        // oneway.t1.b: cycle with field: a:
+        //     ./disjunction.cue:5:13
       }
     }
     t2: (struct){
@@ -174,54 +183,68 @@ Disjuncts:    88
   issue3669: (struct){
     #Schema: (#struct){
       two: (_|_){
-        // [cycle] cycle error:
+        // [cycle] issue3669.#Schema.two: cycle with field: one:
+        //     ./disjunction.cue:14:12
+        // issue3669.#Schema.one: cycle with field: two:
         //     ./disjunction.cue:15:8
       }
       one: (_|_){
-        // [cycle] cycle error:
+        // [cycle] issue3669.#Schema.two: cycle with field: one:
+        //     ./disjunction.cue:14:12
+        // issue3669.#Schema.one: cycle with field: two:
         //     ./disjunction.cue:15:8
       }
     }
     out: (#struct){
       two: (_|_){
-        // [cycle] cycle error:
+        // [cycle] issue3669.out.two: cycle with field: one:
+        //     ./disjunction.cue:14:12
+        // issue3669.out.one: cycle with field: two:
+        //     ./disjunction.cue:15:8
+        // issue3669.out.two: 2 errors in empty disjunction::
         //     ./disjunction.cue:15:8
       }
       one: (_|_){
-        // [cycle] cycle error:
+        // [cycle] issue3669.out.two: cycle with field: one:
+        //     ./disjunction.cue:14:12
+        // issue3669.out.one: cycle with field: two:
+        //     ./disjunction.cue:15:8
+        // issue3669.out.two: 2 errors in empty disjunction::
         //     ./disjunction.cue:15:8
       }
     }
   }
   a: (_|_){
-    // [cycle] cycle error:
+    // [cycle] a: cycle with field: b:
+    //     ./in.cue:1:4
+    // b: cycle with field: a:
     //     ./in.cue:2:4
   }
   b: (_|_){
-    // [cycle] cycle error:
+    // [cycle] a: cycle with field: b:
+    //     ./in.cue:1:4
+    // b: cycle with field: a:
     //     ./in.cue:2:4
   }
   c: (#list){
     0: (_){ _ }
     1: (_){ _ }
   }
-  d: (_|_){
-    // [cycle] cycle error:
-    //     ./in.cue:7:4
-  }
-  e: (_|_){
-    // [cycle] cycle error:
-    //     ./in.cue:7:4
-  }
+  d: (int){ 1 }
+  e: (int){ |(*(int){ 2 }, (int){ 0 }) }
   issue3737: (struct){
     reduced1: (struct){
       #A: (#struct){
         a: (_|_){
-          // [cycle] cycle error:
+          // [cycle] issue3737.reduced1.#A.a: cycle with field: b:
+          //     ./issue3737.cue:3:12
+          // issue3737.reduced1.#A.b: cycle with field: a:
           //     ./issue3737.cue:4:12
         }
         b: (_|_){
-          // [cycle] cycle error:
+          // [cycle] issue3737.reduced1.#A.a: cycle with field: b:
+          //     ./issue3737.cue:3:12
+          // issue3737.reduced1.#A.b: cycle with field: a:
           //     ./issue3737.cue:4:12
         }
       }
@@ -229,55 +252,70 @@ Disjuncts:    88
         b: (float){ 1000.0 }
         a: (float){ 12000.0 }
       }
-      y: (#struct){
-        b: (float){ 700.00 }
-        a: (float){ 8400.00 }
+      y: (_|_){
+        // [cycle] issue3737.reduced1.y: 2 errors in empty disjunction:
+        // issue3737.reduced1.y.b: conflicting values 700.00 and 1000.0:
+        //     ./issue3737.cue:8:11
+        //     ./issue3737.cue:11:11
+        // issue3737.reduced1.y.a: cycle with field: b:
+        //     ./issue3737.cue:3:12
       }
     }
     reduced2: (struct){
       x: (#struct){
         start: (_|_){
-          // [cycle] cycle error:
-          //     ./issue3737.cue:24:19
-          // cycle error:
-          //     ./issue3737.cue:25:19
+          // [cycle] issue3737.reduced2.x.duration: cycle with field: start:
+          //     ./issue3737.cue:24:25
+          // issue3737.reduced2.y.end: cycle with field: duration:
+          //     ./issue3737.cue:25:27
         }
         end: (_|_){
-          // [cycle] cycle error:
-          //     ./issue3737.cue:24:19
-          // cycle error:
-          //     ./issue3737.cue:25:19
+          // [cycle] issue3737.reduced2.x.duration: cycle with field: start:
+          //     ./issue3737.cue:24:25
+          // issue3737.reduced2.y.end: cycle with field: duration:
+          //     ./issue3737.cue:25:27
         }
         duration: (_|_){
-          // [cycle] cycle error:
-          //     ./issue3737.cue:24:19
+          // [cycle] issue3737.reduced2.x.duration: cycle with field: start:
+          //     ./issue3737.cue:24:25
+          // issue3737.reduced2.y.end: cycle with field: duration:
+          //     ./issue3737.cue:25:27
         }
       }
       y: (#struct){
-        duration: (_|_){
-          // [cycle] cycle error:
-          //     ./issue3737.cue:25:19
-        }
+        duration: (float){ 100.0 }
         end: (_|_){
-          // [cycle] cycle error:
-          //     ./issue3737.cue:25:19
+          // [cycle] issue3737.reduced2.x.duration: cycle with field: start:
+          //     ./issue3737.cue:24:25
+          // issue3737.reduced2.y.end: cycle with field: duration:
+          //     ./issue3737.cue:25:27
         }
         start: (float){ 900.0 }
       }
       #TimeSpan: (#struct){
         start: (_|_){
-          // [cycle] cycle error:
-          //     ./issue3737.cue:24:19
-          // cycle error:
+          // [cycle] issue3737.reduced2.#TimeSpan.start: cycle with field: end:
+          //     ./issue3737.cue:23:19
+          // issue3737.reduced2.#TimeSpan.end: cycle with field: start:
           //     ./issue3737.cue:25:19
+          // issue3737.reduced2.#TimeSpan.end: cycle with field: duration:
+          //     ./issue3737.cue:25:27
         }
         duration: (_|_){
-          // [cycle] cycle error:
-          //     ./issue3737.cue:24:19
+          // [cycle] issue3737.reduced2.#TimeSpan.start: cycle with field: end:
+          //     ./issue3737.cue:23:19
+          // issue3737.reduced2.#TimeSpan.end: cycle with field: start:
+          //     ./issue3737.cue:25:19
+          // issue3737.reduced2.#TimeSpan.end: cycle with field: duration:
+          //     ./issue3737.cue:25:27
         }
         end: (_|_){
-          // [cycle] cycle error:
+          // [cycle] issue3737.reduced2.#TimeSpan.start: cycle with field: end:
+          //     ./issue3737.cue:23:19
+          // issue3737.reduced2.#TimeSpan.end: cycle with field: start:
           //     ./issue3737.cue:25:19
+          // issue3737.reduced2.#TimeSpan.end: cycle with field: duration:
+          //     ./issue3737.cue:25:27
         }
       }
     }
@@ -287,7 +325,7 @@ Disjuncts:    88
 diff old new
 --- old
 +++ new
-@@ -2,11 +2,12 @@
+@@ -2,11 +2,21 @@
    oneway: (struct){
      t1: (struct){
        a: (_|_){
@@ -296,16 +334,25 @@ diff old new
 -        //     ./disjunction.cue:5:12
 -      }
 -      b: (number){ <1 }
-+        // [cycle] cycle error:
++        // [cycle] oneway.t1.a: cycle with field: b:
 +        //     ./disjunction.cue:4:12
++        // oneway.t1.a: 2 errors in empty disjunction::
++        //     ./disjunction.cue:5:13
++        // oneway.t1.b: cycle with field: a:
++        //     ./disjunction.cue:5:13
 +      }
 +      b: (_|_){
-+        // [cycle] cycle error
++        // [cycle] oneway.t1.a: cycle with field: b:
++        //     ./disjunction.cue:4:12
++        // oneway.t1.a: 2 errors in empty disjunction::
++        //     ./disjunction.cue:5:13
++        // oneway.t1.b: cycle with field: a:
++        //     ./disjunction.cue:5:13
 +      }
      }
      t2: (struct){
        a: (_|_){
-@@ -13,7 +14,6 @@
+@@ -13,7 +23,6 @@
          // [incomplete] oneway.t2.a: 2 errors in empty disjunction:
          // oneway.t2.a: conflicting values 1 and 3:
          //     ./disjunction.cue:3:13
@@ -313,86 +360,121 @@ diff old new
          //     ./disjunction.cue:8:12
          // oneway.t2.a: non-concrete value <3 in operand to +:
          //     ./disjunction.cue:4:12
-@@ -26,28 +26,31 @@
+@@ -25,88 +34,139 @@
+   issue3669: (struct){
      #Schema: (#struct){
        two: (_|_){
-         // [cycle] cycle error:
+-        // [cycle] cycle error:
 -        //     ./disjunction.cue:14:8
 -      }
 -      one: (_|_){
 -        // [cycle] cycle error:
 -        //     ./disjunction.cue:14:8
++        // [cycle] issue3669.#Schema.two: cycle with field: one:
++        //     ./disjunction.cue:14:12
++        // issue3669.#Schema.one: cycle with field: two:
 +        //     ./disjunction.cue:15:8
 +      }
 +      one: (_|_){
-+        // [cycle] cycle error:
++        // [cycle] issue3669.#Schema.two: cycle with field: one:
++        //     ./disjunction.cue:14:12
++        // issue3669.#Schema.one: cycle with field: two:
 +        //     ./disjunction.cue:15:8
        }
      }
      out: (#struct){
        two: (_|_){
-         // [cycle] cycle error:
+-        // [cycle] cycle error:
 -        //     ./disjunction.cue:14:8
 -      }
 -      one: (int){ -1 }
++        // [cycle] issue3669.out.two: cycle with field: one:
++        //     ./disjunction.cue:14:12
++        // issue3669.out.one: cycle with field: two:
++        //     ./disjunction.cue:15:8
++        // issue3669.out.two: 2 errors in empty disjunction::
 +        //     ./disjunction.cue:15:8
 +      }
 +      one: (_|_){
-+        // [cycle] cycle error:
++        // [cycle] issue3669.out.two: cycle with field: one:
++        //     ./disjunction.cue:14:12
++        // issue3669.out.one: cycle with field: two:
++        //     ./disjunction.cue:15:8
++        // issue3669.out.two: 2 errors in empty disjunction::
 +        //     ./disjunction.cue:15:8
 +      }
      }
    }
    a: (_|_){
-     // [cycle] cycle error:
+-    // [cycle] cycle error:
 -    //     ./in.cue:1:4
++    // [cycle] a: cycle with field: b:
++    //     ./in.cue:1:4
++    // b: cycle with field: a:
 +    //     ./in.cue:2:4
    }
    b: (_|_){
-     // [cycle] cycle error:
+-    // [cycle] cycle error:
 -    //     ./in.cue:1:4
++    // [cycle] a: cycle with field: b:
++    //     ./in.cue:1:4
++    // b: cycle with field: a:
 +    //     ./in.cue:2:4
    }
    c: (#list){
      0: (_){ _ }
-@@ -55,11 +58,11 @@
+     1: (_){ _ }
    }
-   d: (_|_){
-     // [cycle] cycle error:
+-  d: (_|_){
+-    // [cycle] cycle error:
 -    //     ./in.cue:6:4
-+    //     ./in.cue:7:4
-   }
-   e: (_|_){
-     // [cycle] cycle error:
+-  }
+-  e: (_|_){
+-    // [cycle] cycle error:
 -    //     ./in.cue:6:4
-+    //     ./in.cue:7:4
-   }
+-  }
++  d: (int){ 1 }
++  e: (int){ |(*(int){ 2 }, (int){ 0 }) }
    issue3737: (struct){
      reduced1: (struct){
-@@ -66,16 +69,16 @@
        #A: (#struct){
          a: (_|_){
-           // [cycle] cycle error:
+-          // [cycle] cycle error:
 -          //     ./issue3737.cue:3:12
++          // [cycle] issue3737.reduced1.#A.a: cycle with field: b:
++          //     ./issue3737.cue:3:12
++          // issue3737.reduced1.#A.b: cycle with field: a:
 +          //     ./issue3737.cue:4:12
          }
          b: (_|_){
-           // [cycle] cycle error:
+-          // [cycle] cycle error:
 -          //     ./issue3737.cue:3:12
 -        }
 -      }
 -      x: (#struct){
 -        a: (float){ 12000.0 }
++          // [cycle] issue3737.reduced1.#A.a: cycle with field: b:
++          //     ./issue3737.cue:3:12
++          // issue3737.reduced1.#A.b: cycle with field: a:
 +          //     ./issue3737.cue:4:12
 +        }
 +      }
 +      x: (#struct){
          b: (float){ 1000.0 }
+-      }
+-      y: (#struct){
+-        b: (float){ 700.00 }
+-        a: (float){ 8400.00 }
 +        a: (float){ 12000.0 }
++      }
++      y: (_|_){
++        // [cycle] issue3737.reduced1.y: 2 errors in empty disjunction:
++        // issue3737.reduced1.y.b: conflicting values 700.00 and 1000.0:
++        //     ./issue3737.cue:8:11
++        //     ./issue3737.cue:11:11
++        // issue3737.reduced1.y.a: cycle with field: b:
++        //     ./issue3737.cue:3:12
        }
-       y: (#struct){
-         b: (float){ 700.00 }
-@@ -84,29 +87,48 @@
      }
      reduced2: (struct){
        x: (#struct){
@@ -405,36 +487,37 @@ diff old new
 -        duration: (float){ 100.0 }
 -        end: (float){ 1000.0 }
 +        start: (_|_){
-+          // [cycle] cycle error:
-+          //     ./issue3737.cue:24:19
-+          // cycle error:
-+          //     ./issue3737.cue:25:19
++          // [cycle] issue3737.reduced2.x.duration: cycle with field: start:
++          //     ./issue3737.cue:24:25
++          // issue3737.reduced2.y.end: cycle with field: duration:
++          //     ./issue3737.cue:25:27
 +        }
 +        end: (_|_){
-+          // [cycle] cycle error:
-+          //     ./issue3737.cue:24:19
-+          // cycle error:
-+          //     ./issue3737.cue:25:19
++          // [cycle] issue3737.reduced2.x.duration: cycle with field: start:
++          //     ./issue3737.cue:24:25
++          // issue3737.reduced2.y.end: cycle with field: duration:
++          //     ./issue3737.cue:25:27
 +        }
 +        duration: (_|_){
-+          // [cycle] cycle error:
-+          //     ./issue3737.cue:24:19
++          // [cycle] issue3737.reduced2.x.duration: cycle with field: start:
++          //     ./issue3737.cue:24:25
++          // issue3737.reduced2.y.end: cycle with field: duration:
++          //     ./issue3737.cue:25:27
 +        }
 +      }
 +      y: (#struct){
-+        duration: (_|_){
-+          // [cycle] cycle error:
-+          //     ./issue3737.cue:25:19
-+        }
++        duration: (float){ 100.0 }
 +        end: (_|_){
-+          // [cycle] cycle error:
-+          //     ./issue3737.cue:25:19
++          // [cycle] issue3737.reduced2.x.duration: cycle with field: start:
++          //     ./issue3737.cue:24:25
++          // issue3737.reduced2.y.end: cycle with field: duration:
++          //     ./issue3737.cue:25:27
 +        }
 +        start: (float){ 900.0 }
        }
        #TimeSpan: (#struct){
          start: (_|_){
-           // [cycle] cycle error:
+-          // [cycle] cycle error:
 -          //     ./issue3737.cue:23:19
 -        }
 -        duration: (_|_){
@@ -446,20 +529,34 @@ diff old new
 -          //     ./issue3737.cue:23:19
 -          // cycle error:
 -          //     ./issue3737.cue:24:19
-+          //     ./issue3737.cue:24:19
-+          // cycle error:
++          // [cycle] issue3737.reduced2.#TimeSpan.start: cycle with field: end:
++          //     ./issue3737.cue:23:19
++          // issue3737.reduced2.#TimeSpan.end: cycle with field: start:
 +          //     ./issue3737.cue:25:19
++          // issue3737.reduced2.#TimeSpan.end: cycle with field: duration:
++          //     ./issue3737.cue:25:27
 +        }
 +        duration: (_|_){
-+          // [cycle] cycle error:
-+          //     ./issue3737.cue:24:19
++          // [cycle] issue3737.reduced2.#TimeSpan.start: cycle with field: end:
++          //     ./issue3737.cue:23:19
++          // issue3737.reduced2.#TimeSpan.end: cycle with field: start:
++          //     ./issue3737.cue:25:19
++          // issue3737.reduced2.#TimeSpan.end: cycle with field: duration:
++          //     ./issue3737.cue:25:27
 +        }
 +        end: (_|_){
-+          // [cycle] cycle error:
++          // [cycle] issue3737.reduced2.#TimeSpan.start: cycle with field: end:
++          //     ./issue3737.cue:23:19
++          // issue3737.reduced2.#TimeSpan.end: cycle with field: start:
 +          //     ./issue3737.cue:25:19
++          // issue3737.reduced2.#TimeSpan.end: cycle with field: duration:
++          //     ./issue3737.cue:25:27
          }
        }
      }
+-- diff/explanations --
+issue3669: expressions are now allowed to refer to defaults within disjunctions,
+   even in a cycle, as long as the results are consistent.
 -- out/eval --
 (struct){
   oneway: (struct){

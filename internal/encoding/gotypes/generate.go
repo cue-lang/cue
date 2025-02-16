@@ -18,10 +18,10 @@ import (
 	"bytes"
 	"fmt"
 	goformat "go/format"
+	"maps"
 	"os"
 	"path/filepath"
 	"slices"
-	"sort"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -114,12 +114,7 @@ func Generate(ctx *cue.Context, insts ...*build.Instance) error {
 			goPkgNamesDoneByDir[inst.Dir] = goPkgName
 		}
 		g.appendf("package %s\n\n", goPkgName)
-		// TODO: imported := slices.Sorted(maps.Values(g.importedAs))
-		var imported []string
-		for _, path := range g.importedAs {
-			imported = append(imported, path)
-		}
-		sort.Strings(imported)
+		imported := slices.Sorted(maps.Values(g.importedAs))
 		imported = slices.Compact(imported)
 		if len(imported) > 0 {
 			g.appendf("import (\n")

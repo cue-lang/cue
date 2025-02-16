@@ -386,8 +386,10 @@ Disjuncts:    215
         //     ./in.cue:28:50
       }
       #X: (_|_){
-        // [incomplete] small.p1.#X.port: cyclic reference to field port:
-        //     ./in.cue:31:4
+        // [cycle] small.p1.#X: cycle error referencing port:
+        //     ./in.cue:31:10
+        // small.p1.#X: cycle error referencing port:
+        //     ./in.cue:34:10
       }
     }
     p2: (struct){
@@ -404,27 +406,27 @@ Disjuncts:    215
   medium: (struct){
     #userHostPort: (string){ "^(:(?P<port>\\d+))?$" }
     p1: (struct){
-      #Y: (_|_){
-        // [incomplete] medium.p1.#Y: undefined field: port:
-        //     ./in.cue:58:50
+      #Y: (#struct){
+        port: (string){ "" }
       }
-      Y: (struct){
+      Y: (_|_){
+        // [cycle] medium.p1.Y: cycle error referencing port:
+        //     ./in.cue:61:10
       }
-      #X: (_|_){
-        // [incomplete] medium.p1.#X.port: cyclic reference to field port:
-        //     ./in.cue:70:4
+      #X: (#struct){
+        port: (string){ "" }
       }
     }
     p2: (struct){
-      #Y: (_|_){
-        // [incomplete] medium.p2.#Y: undefined field: port:
-        //     ./in.cue:80:50
+      #Y: (#struct){
+        port: (string){ "" }
       }
-      #X: (_|_){
-        // [incomplete] medium.p2.#X.port: cyclic reference to field port:
-        //     ./in.cue:86:4
+      #X: (#struct){
+        port: (string){ "" }
       }
-      Y: (struct){
+      Y: (_|_){
+        // [cycle] medium.p2.Y: cycle error referencing port:
+        //     ./in.cue:95:10
       }
     }
     p3: (struct){
@@ -564,7 +566,7 @@ Disjuncts:    215
 diff old new
 --- old
 +++ new
-@@ -1,35 +1,34 @@
+@@ -1,35 +1,36 @@
  (struct){
    minimal: (struct){
      a: (_|_){
@@ -606,8 +608,10 @@ diff old new
 +        //     ./in.cue:28:50
 +      }
 +      #X: (_|_){
-+        // [incomplete] small.p1.#X.port: cyclic reference to field port:
-+        //     ./in.cue:31:4
++        // [cycle] small.p1.#X: cycle error referencing port:
++        //     ./in.cue:31:10
++        // small.p1.#X: cycle error referencing port:
++        //     ./in.cue:34:10
 +      }
 +    }
 +    p2: (struct){
@@ -621,14 +625,10 @@ diff old new
        }
      }
    }
-@@ -36,65 +35,61 @@
-   medium: (struct){
-     #userHostPort: (string){ "^(:(?P<port>\\d+))?$" }
-     p1: (struct){
--      #Y: (#struct){
--        port: (string){ "" }
--      }
--      Y: (_|_){
+@@ -40,61 +41,57 @@
+         port: (string){ "" }
+       }
+       Y: (_|_){
 -        // [cycle] medium.p1.Y: circular dependency in evaluation of conditionals: #Y.port changed after evaluation:
 -        //     ./in.cue:61:7
 -      }
@@ -652,27 +652,23 @@ diff old new
 -      Y: (_|_){
 -        // [cycle] medium.p3.#X: cycle with field Y.port:
 -        //     ./in.cue:114:7
-+      #Y: (_|_){
-+        // [incomplete] medium.p1.#Y: undefined field: port:
-+        //     ./in.cue:58:50
++        // [cycle] medium.p1.Y: cycle error referencing port:
++        //     ./in.cue:61:10
 +      }
-+      Y: (struct){
-+      }
-+      #X: (_|_){
-+        // [incomplete] medium.p1.#X.port: cyclic reference to field port:
-+        //     ./in.cue:70:4
++      #X: (#struct){
++        port: (string){ "" }
 +      }
 +    }
 +    p2: (struct){
-+      #Y: (_|_){
-+        // [incomplete] medium.p2.#Y: undefined field: port:
-+        //     ./in.cue:80:50
++      #Y: (#struct){
++        port: (string){ "" }
 +      }
-+      #X: (_|_){
-+        // [incomplete] medium.p2.#X.port: cyclic reference to field port:
-+        //     ./in.cue:86:4
++      #X: (#struct){
++        port: (string){ "" }
 +      }
-+      Y: (struct){
++      Y: (_|_){
++        // [cycle] medium.p2.Y: cycle error referencing port:
++        //     ./in.cue:95:10
 +      }
 +    }
 +    p3: (struct){
@@ -735,7 +731,7 @@ diff old new
        }
        Y: (struct){
        }
-@@ -101,14 +96,14 @@
+@@ -101,14 +98,14 @@
      }
      p6: (struct){
        #X: (_|_){
@@ -758,7 +754,7 @@ diff old new
        }
      }
    }
-@@ -115,81 +110,83 @@
+@@ -115,81 +112,83 @@
    large: (struct){
      #userHostPort: (string){ "^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)(:(?P<port>\\d+))?$" }
      p1: (struct){

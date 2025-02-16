@@ -1046,6 +1046,35 @@ issue3528: nested: t2: {
           }
           f1: (int){ int }
           b2: (int){ int }
+        }, (struct){
+          #A: (#struct){
+            v: (int){ 1 }
+          }
+          BAZ: (_){ _ }
+          S: (#struct){
+            x: (int){ 1 }
+            y: (int){ 1 }
+          }
+          #B: (#struct){
+            x: (int){ 1 }
+            y: (int){ 1 }
+          }
+          b2: (int){ int }
+          f2: (int){ int }
+        }, (struct){
+          #A: (#struct){
+            v: (int){ 1 }
+          }
+          BAZ: (_){ _ }
+          S: (#struct){
+            x: (int){ 1 }
+            y: (int){ 1 }
+          }
+          #B: (#struct){
+            x: (int){ 1 }
+            y: (int){ 1 }
+          }
+          b2: (int){ int }
         }) }
     }
     full: (struct){
@@ -1848,7 +1877,7 @@ diff old new
              nullBar: (null){ null }
            }) }
        }
-@@ -555,48 +448,45 @@
+@@ -555,48 +448,74 @@
              x: (int){ 1 }
            }
          }
@@ -1930,13 +1959,42 @@ diff old new
 +          }
 +          f1: (int){ int }
 +          b2: (int){ int }
++        }, (struct){
++          #A: (#struct){
++            v: (int){ 1 }
++          }
++          BAZ: (_){ _ }
++          S: (#struct){
++            x: (int){ 1 }
++            y: (int){ 1 }
++          }
++          #B: (#struct){
++            x: (int){ 1 }
++            y: (int){ 1 }
++          }
++          b2: (int){ int }
++          f2: (int){ int }
++        }, (struct){
++          #A: (#struct){
++            v: (int){ 1 }
++          }
++          BAZ: (_){ _ }
++          S: (#struct){
++            x: (int){ 1 }
++            y: (int){ 1 }
++          }
++          #B: (#struct){
++            x: (int){ 1 }
++            y: (int){ 1 }
++          }
++          b2: (int){ int }
 +        }) }
 +    }
 +    full: (struct){
        Foo: (#struct){
          spec: (#struct){
            foo: (#struct){
-@@ -605,135 +495,52 @@
+@@ -605,135 +524,52 @@
            }
          }
          resource: (#struct){
@@ -2118,7 +2176,7 @@ diff old new
          }
        }
        #Abstract: (#struct){
-@@ -749,34 +556,34 @@
+@@ -749,34 +585,34 @@
              }
            }) }
          resource: (#struct){
@@ -2181,7 +2239,7 @@ diff old new
          }
        }
        _#Spec: (#struct){ |(*(#struct){
-@@ -803,36 +610,36 @@
+@@ -803,36 +639,36 @@
          }
        }
        _Thing: (#struct){
@@ -2247,7 +2305,7 @@ diff old new
        }
        #Constrained: (#struct){
          spec: (#struct){ |(*(#struct){
-@@ -916,19 +723,19 @@
+@@ -916,19 +752,19 @@
            common: (int){ 3 }
          }
          #FormFoo: (#struct){
@@ -2274,7 +2332,7 @@ diff old new
            }) }
        }
        #Input: (#struct){
-@@ -936,18 +743,12 @@
+@@ -936,18 +772,12 @@
          }
        }
        #summarizeReturn: (#struct){
@@ -2295,7 +2353,7 @@ diff old new
          out: (#list){
          }
        }
-@@ -977,10 +778,23 @@
+@@ -977,10 +807,23 @@
      }
      full: (struct){
        metrics: (#list){
@@ -2323,7 +2381,7 @@ diff old new
          1: (#struct){
            id: (string){ "bar" }
            value: (int){ 80 }
-@@ -1031,13 +845,11 @@
+@@ -1031,13 +874,11 @@
        }
      }
    }
@@ -2339,7 +2397,7 @@ diff old new
        0: (#struct){
          name: (string){ "FooBarFoo" }
        }
-@@ -1047,19 +859,8 @@
+@@ -1047,19 +888,8 @@
        2: (#struct){
          name: (string){ "FooQuuxFoo" }
        }
@@ -2361,7 +2419,7 @@ diff old new
        }
      }
    }
-@@ -1134,10 +935,10 @@
+@@ -1134,10 +964,10 @@
          v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
        }
        c: (#struct){
@@ -2386,6 +2444,7 @@ Conjuncts:    3905
 Disjuncts:    2802
 -- diff/todo/p1 --
 issue2263.full: missing elimination, may be lack of closeContext
+issue2209.simplified.t3: ditto
 -- diff/todo/p2 --
 noChildError.issue1808.#type: one disjunction options eliminated due to earlier detected structural cycle. May be okay, but investigate.
 issue2209.simplified.full._X: ditto

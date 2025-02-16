@@ -225,7 +225,10 @@ Result:
     }
   }
   issue3437: (struct){
-    r: (_){ _ }
+    r: (_|_){
+      // [cycle] issue3437.r: cycle error referencing a:
+      //     ./issue3437.cue:2:9
+    }
     d: (struct){
       a: (struct){
         a: (struct){
@@ -1596,13 +1599,13 @@ Result:
   }
 }
 -- out/evalalpha/stats --
-Leaks:  2515
+Leaks:  2514
 Freed:  0
 Reused: 0
-Allocs: 2515
+Allocs: 2514
 Retain: 0
 
-Unifications: 760
+Unifications: 759
 Conjuncts:    13707
 Disjuncts:    908
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
@@ -1615,16 +1618,16 @@ diff old new
 -Reused: 85
 -Allocs: 46
 -Retain: 5
-+Leaks:  2515
++Leaks:  2514
 +Freed:  0
 +Reused: 0
-+Allocs: 2515
++Allocs: 2514
 +Retain: 0
  
 -Unifications: 48
 -Conjuncts:    150
 -Disjuncts:    111
-+Unifications: 760
++Unifications: 759
 +Conjuncts:    13707
 +Disjuncts:    908
 -- out/eval/stats --
@@ -1870,19 +1873,16 @@ diff old new
          }
        }
      }
-@@ -118,10 +190,7 @@
-     }
+@@ -119,7 +191,7 @@
    }
    issue3437: (struct){
--    r: (_|_){
+     r: (_|_){
 -      // [incomplete] issue3437.r: cycle error referencing a:
--      //     ./issue3437.cue:2:9
--    }
-+    r: (_){ _ }
++      // [cycle] issue3437.r: cycle error referencing a:
+       //     ./issue3437.cue:2:9
+     }
      d: (struct){
-       a: (struct){
-         a: (struct){
-@@ -131,33 +200,1293 @@
+@@ -131,33 +203,1293 @@
          }
        }
      }

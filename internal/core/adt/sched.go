@@ -427,6 +427,10 @@ unblockTasks:
 	// tasks do not happen in an order-dependent way, we want to ensure that we
 	// have unblocked all tasks from one phase, before commencing to the next.
 
+	if c.inDisjunct > 0 {
+		return true
+	}
+
 	// The types of the node can no longer be altered. We can unblock the
 	// relevant states first to finish up any tasks that were just waiting for
 	// types, such as lists.

@@ -1171,6 +1171,51 @@ type nodeContextState struct {
 	// improve the error messages.
 	hasFieldValue bool
 
+	// defaultAttemptInCycle indicates that a value relies on the default value
+	// and that it will be an error to remove the default value from the
+	// disjunction. It is set to the referring Vertex. Consider for instance:
+	//
+	//      a: 1 - b
+	//      b: 1 - a
+	//      a: *0 | 1
+	//      b: *0 | 1
+	//
+	// versus
+	//
+	//      a: 1 - b
+	//      b: 1 - a
+	//      a: *1 | 0
+	//      b: *0 | 1
+	//
+	// In both cases there are multiple solutions to the configuration. In the
+	// first case there is an ambiguity: if we start with evaluating 'a' and
+	// pick the default for 'b', we end up with a value of '1' for 'a'. If,
+	// conversely, we start evaluating 'b' and pick the default for 'a', we end
+	// up with {a: 0, b: 0}. In the seconds case, however, we do _will_ get the
+	// same answer regardless of order.
+	//
+	// In general, we will allow expressions on cyclic paths to be resolved if
+	// in all cases the default value is taken. In order to do that, we do not
+	// allow a default value to be removed from a disjunction if such value is
+	// depended on.
+	//
+	// For completeness, note that CUE will NOT solve a solution, even if there
+	// is only one solution. Consider for instance:
+	//
+	//      a: 0 | 1
+	//      a: b + 1
+	//      b: c - 1
+	//      c: a - 1
+	//      c: 1 | 2
+	//
+	// There the only consistent solution is {a: 1, b: 0, c: 1}. CUE, however,
+	// will not attempt this solve this as, in general, such solving would be NP
+	// complete.
+	//
+	// NOTE(evalv4): note that this would be easier if we got rid of default
+	// values and had pre-selected overridable values instead.
+	defaultAttemptInCycle *Vertex
+
 	// Value info
 
 	kind     Kind

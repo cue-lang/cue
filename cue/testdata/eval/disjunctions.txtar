@@ -544,13 +544,16 @@ Result:
   }
   indexElimination: (struct){
     inStruct: (struct){
-      x: (_){ |(*(_){ _ }, (int){ 0 }) }
+      x: (int){ 0 }
     }
     inList1: (struct){
-      x: (_){ _ }
+      x: (_|_){
+        // [cycle] indexElimination.inList1.x: cycle error referencing 0:
+        //     ./indexelim.cue:5:17
+      }
     }
     inList2: (struct){
-      x: (_){ |(*(_){ _ }, (int){ 0 }) }
+      x: (int){ 0 }
     }
     issue3124: (struct){
       full: (struct){
@@ -566,10 +569,7 @@ Result:
           2: (int){ 1 }
           3: (int){ 1 }
         }
-        z: (_|_){
-          // [incomplete] indexElimination.issue3124.full.z: error in call to math/bits.Set: non-concrete value _:
-          //     ./indexelim.cue:11:22
-        }
+        z: (int){ 1 }
       }
     }
   }
@@ -775,38 +775,15 @@ diff old new
          }
        }
      }
-@@ -276,16 +258,13 @@
-   }
-   indexElimination: (struct){
-     inStruct: (struct){
--      x: (int){ 0 }
-+      x: (_){ |(*(_){ _ }, (int){ 0 }) }
+@@ -280,7 +262,7 @@
      }
      inList1: (struct){
--      x: (_|_){
+       x: (_|_){
 -        // [incomplete] indexElimination.inList1.x: cycle error referencing 0:
--        //     ./indexelim.cue:5:17
--      }
-+      x: (_){ _ }
-     }
-     inList2: (struct){
--      x: (int){ 0 }
-+      x: (_){ |(*(_){ _ }, (int){ 0 }) }
-     }
-     issue3124: (struct){
-       full: (struct){
-@@ -301,7 +280,10 @@
-           2: (int){ 1 }
-           3: (int){ 1 }
-         }
--        z: (int){ 1 }
-+        z: (_|_){
-+          // [incomplete] indexElimination.issue3124.full.z: error in call to math/bits.Set: non-concrete value _:
-+          //     ./indexelim.cue:11:22
-+        }
++        // [cycle] indexElimination.inList1.x: cycle error referencing 0:
+         //     ./indexelim.cue:5:17
        }
      }
-   }
 -- diff/todo/p3 --
 Missing error positions.
   It is probably okay to show name and val fields with original values, as long

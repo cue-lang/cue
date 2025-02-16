@@ -14,13 +14,6 @@
 
 //go:build ignore
 
-// Since our go.mod still has 'go 1.22', but we want to use go/types.Alias
-// to differentiate cue.Value from pkg.Schema, we enable it explicitly.
-// TODO(mvdan): this can be removed once we bump go.mod to 'go 1.23';
-// at which point packages.NeedSyntax below can be removed as well
-// as we no longer need to force go/packages to typecheck with our GODEBUG setting.
-//go:debug gotypesalias=1
-
 // gen.go generates the pkg.go files inside the packages under the pkg directory.
 //
 // It takes the list of packages from the packages.txt.
@@ -92,7 +85,7 @@ func main() {
 	log.SetFlags(log.Lshortfile)
 	log.SetOutput(os.Stdout)
 
-	cfg := &packages.Config{Mode: packages.NeedName | packages.NeedFiles | packages.NeedTypes | packages.NeedSyntax}
+	cfg := &packages.Config{Mode: packages.NeedName | packages.NeedFiles | packages.NeedTypes}
 	pkgs, err := packages.Load(cfg, "./...")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "load: %v\n", err)

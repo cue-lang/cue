@@ -596,6 +596,11 @@ const (
 	// Value does not have to be nil
 	evaluatingArcs
 
+	// TODO: introduce a "frozen" state. Right now a node may marked and used
+	// as finalized, before all tasks have completed. We should introduce a
+	// frozen state that simply checks that all remaining tasks are idempotent
+	// and errors if they are not.
+
 	// finalized means that this node is fully evaluated and that the results
 	// are save to use without further consideration.
 	finalized

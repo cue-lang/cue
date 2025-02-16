@@ -190,10 +190,29 @@ Result:
   xa2: (int){ 8 }
   xa3: (int){ 6 }
   xa4: (int){ 10 }
-  xb1: (int){ 8 }
-  xb2: (int){ 11 }
-  xb3: (int){ 6 }
-  xb4: (int){ 13 }
+  xb1: (_|_){
+    // [cycle] xb1: 2 errors in empty disjunction:
+    // xb3: cycle across unresolved disjunction referenced by xb2:
+    //     ./in.cue:16:6
+    // xb3: cycle with field: xb2:
+    //     ./in.cue:18:6
+  }
+  xb2: (_|_){
+    // [cycle] xb3: cycle across unresolved disjunction referenced by xb2:
+    //     ./in.cue:16:6
+    // xb3: cycle with field: xb2:
+    //     ./in.cue:18:6
+  }
+  xb3: (_|_){
+    // [cycle] xb3: cycle across unresolved disjunction referenced by xb2:
+    //     ./in.cue:16:6
+  }
+  xb4: (_|_){
+    // [cycle] xb3: cycle across unresolved disjunction referenced by xb2:
+    //     ./in.cue:16:6
+    // xb3: cycle with field: xb2:
+    //     ./in.cue:18:6
+  }
   xc1: (int){ |((int){ 8 }, (int){ 9 }) }
   xc2: (int){ 8 }
   xc3: (_|_){
@@ -216,10 +235,29 @@ Result:
   }
   xe4: (int){ 9 }
   xe5: (int){ 10 }
-  xf1: (int){ 8 }
-  xf2: (int){ 11 }
-  xf3: (int){ 6 }
-  xf4: (int){ 13 }
+  xf1: (_|_){
+    // [cycle] xf1: 2 errors in empty disjunction:
+    // xf3: cycle across unresolved disjunction referenced by xf2:
+    //     ./in.cue:49:6
+    // xf3: cycle with field: xf2:
+    //     ./in.cue:51:6
+  }
+  xf2: (_|_){
+    // [cycle] xf3: cycle across unresolved disjunction referenced by xf2:
+    //     ./in.cue:49:6
+    // xf3: cycle with field: xf2:
+    //     ./in.cue:51:6
+  }
+  xf3: (_|_){
+    // [cycle] xf3: cycle across unresolved disjunction referenced by xf2:
+    //     ./in.cue:49:6
+  }
+  xf4: (_|_){
+    // [cycle] xf3: cycle across unresolved disjunction referenced by xf2:
+    //     ./in.cue:49:6
+    // xf3: cycle with field: xf2:
+    //     ./in.cue:51:6
+  }
   z1: (int){ |((int){ 11 }, (int){ 13 }) }
   z2: (int){ 10 }
   z3: (_|_){
@@ -231,66 +269,84 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -10,22 +10,10 @@
-   xa2: (int){ 8 }
+@@ -11,20 +11,27 @@
    xa3: (int){ 6 }
    xa4: (int){ 10 }
--  xb1: (_|_){
+   xb1: (_|_){
 -    // [incomplete] xb1: 2 errors in empty disjunction:
 -    // xb1: unresolved disjunction 6 | 9 (type int):
 -    //     ./in.cue:16:6
 -    // xb2: unresolved disjunction 6 | 9 (type int):
 -    //     ./in.cue:16:6
--  }
--  xb2: (_|_){
++    // [cycle] xb1: 2 errors in empty disjunction:
++    // xb3: cycle across unresolved disjunction referenced by xb2:
++    //     ./in.cue:16:6
++    // xb3: cycle with field: xb2:
++    //     ./in.cue:18:6
+   }
+   xb2: (_|_){
 -    // [incomplete] xb2: unresolved disjunction 6 | 9 (type int):
 -    //     ./in.cue:16:6
 -  }
 -  xb3: (int){ |((int){ 6 }, (int){ 9 }) }
--  xb4: (_|_){
++    // [cycle] xb3: cycle across unresolved disjunction referenced by xb2:
++    //     ./in.cue:16:6
++    // xb3: cycle with field: xb2:
++    //     ./in.cue:18:6
++  }
++  xb3: (_|_){
++    // [cycle] xb3: cycle across unresolved disjunction referenced by xb2:
++    //     ./in.cue:16:6
++  }
+   xb4: (_|_){
 -    // [incomplete] xb2: unresolved disjunction 6 | 9 (type int):
 -    //     ./in.cue:16:6
--  }
-+  xb1: (int){ 8 }
-+  xb2: (int){ 11 }
-+  xb3: (int){ 6 }
-+  xb4: (int){ 13 }
++    // [cycle] xb3: cycle across unresolved disjunction referenced by xb2:
++    //     ./in.cue:16:6
++    // xb3: cycle with field: xb2:
++    //     ./in.cue:18:6
+   }
    xc1: (int){ |((int){ 8 }, (int){ 9 }) }
    xc2: (int){ 8 }
-   xc3: (_|_){
-@@ -48,22 +36,10 @@
-   }
+@@ -49,20 +56,27 @@
    xe4: (int){ 9 }
    xe5: (int){ 10 }
--  xf1: (_|_){
+   xf1: (_|_){
 -    // [incomplete] xf1: 2 errors in empty disjunction:
 -    // xf1: unresolved disjunction 6 | 9 (type int):
 -    //     ./in.cue:49:6
 -    // xf2: unresolved disjunction 6 | 9 (type int):
 -    //     ./in.cue:49:6
--  }
--  xf2: (_|_){
++    // [cycle] xf1: 2 errors in empty disjunction:
++    // xf3: cycle across unresolved disjunction referenced by xf2:
++    //     ./in.cue:49:6
++    // xf3: cycle with field: xf2:
++    //     ./in.cue:51:6
+   }
+   xf2: (_|_){
 -    // [incomplete] xf2: unresolved disjunction 6 | 9 (type int):
 -    //     ./in.cue:49:6
 -  }
 -  xf3: (int){ |((int){ 6 }, (int){ 9 }) }
--  xf4: (_|_){
++    // [cycle] xf3: cycle across unresolved disjunction referenced by xf2:
++    //     ./in.cue:49:6
++    // xf3: cycle with field: xf2:
++    //     ./in.cue:51:6
++  }
++  xf3: (_|_){
++    // [cycle] xf3: cycle across unresolved disjunction referenced by xf2:
++    //     ./in.cue:49:6
++  }
+   xf4: (_|_){
 -    // [incomplete] xf2: unresolved disjunction 6 | 9 (type int):
 -    //     ./in.cue:49:6
--  }
-+  xf1: (int){ 8 }
-+  xf2: (int){ 11 }
-+  xf3: (int){ 6 }
-+  xf4: (int){ 13 }
++    // [cycle] xf3: cycle across unresolved disjunction referenced by xf2:
++    //     ./in.cue:49:6
++    // xf3: cycle with field: xf2:
++    //     ./in.cue:51:6
+   }
    z1: (int){ |((int){ 11 }, (int){ 13 }) }
    z2: (int){ 10 }
-   z3: (_|_){
--- diff/todo/p1 --
-x(b|f)(2|4): resolve incorrectly. This is related to completeNodeTasks.
--- diff/explanation --
-x(e|f)*: is better to have an error at each field.
-z3: include the "unchecked" validator.
-In general, new evaluator seems better.
 -- out/eval --
 Errors:
 xe3: conflicting values 7 and 6:

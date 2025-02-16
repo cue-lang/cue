@@ -188,7 +188,7 @@ workflows: trybot: _repo.bashWorkflow & {
 			// Note that we should then persist staticcheck's cache too.
 			uses: "dominikh/staticcheck-action@v1"
 			with: {
-				version:      "2024.1.1" // Pin a version for determinism.
+				version:      "2025.1" // Pin a version for determinism.
 				"install-go": false      // We install Go ourselves.
 			}
 		},

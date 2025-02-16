@@ -1,6 +1,6 @@
 module cuelang.org/go
 
-go 1.22.0
+go 1.23.0
 
 require (
 	cuelabs.dev/go/oci/ociregistry v0.0.0-20241125120445-2c00c104c6e1

@@ -290,6 +290,14 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		switch {
 		case assertStructuralCycleV3(n):
 			n.breakIncomingDeps(mode)
+
+		case n.node.status == finalized:
+			// There is no need to recursively process if the node is already
+			// finalized. This can happen if there was an error, for instance.
+			// This may drop a structural cycle error, but as long as the node
+			// already is erroneous, that is fine. It is probably possible to
+			// skip more processing if the node is already finalized.
+
 		// TODO: consider bailing on error if n.errs != nil.
 		case n.completeAllArcs(needs, mode):
 		}

@@ -411,8 +411,6 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 
 		n.node.updateStatus(finalized)
 
-		defer n.unmarkOptional(n.markOptional())
-
 		if DebugDeps {
 			switch n.node.BaseValue.(type) {
 			case *Disjunction:

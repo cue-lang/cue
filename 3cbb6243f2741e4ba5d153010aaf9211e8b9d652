@@ -16,6 +16,23 @@
       "message": "PTAL.",
       "revId": "3cbb6243f2741e4ba5d153010aaf9211e8b9d652",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dfd4c8d9_6d325ea3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-16T21:06:44Z",
+      "side": 1,
+      "message": "thanks - I added the package bits at the top later, not thinking I had now turned the example into a whole file.",
+      "revId": "3cbb6243f2741e4ba5d153010aaf9211e8b9d652",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

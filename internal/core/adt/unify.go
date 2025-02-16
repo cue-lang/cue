@@ -808,6 +808,15 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 		return nil
 
 	default:
+		if runMode == finalize && v.status == evaluating {
+			err := c.NewPosf(pos, "cycle error referencing %v", f)
+			c.AddBottom(&Bottom{
+				Code: CycleError,
+				Err:  err,
+				Node: arc,
+			})
+			return nil
+		}
 		arc = &Vertex{Parent: state.node, Label: f, ArcType: ArcPending}
 		v.Arcs = append(v.Arcs, arc)
 		arcState = arc.getState(c) // TODO: consider using getBareState.

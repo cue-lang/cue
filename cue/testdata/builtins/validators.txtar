@@ -375,7 +375,9 @@ Result:
         0: (int){ 1 }
       }
     }
-    incomplete1: (struct){
+    incomplete1: (_|_){
+      // [incomplete] issue2098.incomplete1: index out of range [0] with length 1:
+      //     ./in.cue:113:5
       _a: (_|_){
         // [incomplete] issue2098.incomplete1._a: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1):
         //     ./in.cue:112:6
@@ -586,20 +588,20 @@ diff old new
  
  Result:
  (_|_){
-@@ -141,11 +151,7 @@
-         0: (int){ 1 }
+@@ -142,10 +152,8 @@
        }
      }
--    incomplete1: (_|_){
+     incomplete1: (_|_){
 -      // [incomplete] issue2098.incomplete1._a: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1):
 -      //     ./in.cue:112:6
 -      //     ./in.cue:111:6
 -      //     ./in.cue:112:20
-+    incomplete1: (struct){
++      // [incomplete] issue2098.incomplete1: index out of range [0] with length 1:
++      //     ./in.cue:113:5
        _a: (_|_){
          // [incomplete] issue2098.incomplete1._a: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1):
          //     ./in.cue:112:6
-@@ -209,7 +215,7 @@
+@@ -209,7 +217,7 @@
        failAfter: (_|_){
          // [eval]
          A: (_|_){
@@ -608,7 +610,7 @@ diff old new
            //     ./issue3474.cue:12:5
            //     ./issue3474.cue:12:22
            //     ./issue3474.cue:13:5
-@@ -255,7 +261,7 @@
+@@ -255,7 +263,7 @@
        }
        incomplete: (struct){
          A: (int){ &(matchN(1, (#list){
@@ -617,7 +619,7 @@ diff old new
              }
            }), int) }
        }
-@@ -270,6 +276,16 @@
+@@ -270,6 +278,16 @@
            //     ./issue3474.cue:53:5
            //     ./issue3474.cue:53:12
            //     ./issue3474.cue:54:5
@@ -634,7 +636,7 @@ diff old new
            C: (int){ 1 }
          }
        }
-@@ -276,42 +292,42 @@
+@@ -276,42 +294,42 @@
      }
    }
    issue3639: (struct){

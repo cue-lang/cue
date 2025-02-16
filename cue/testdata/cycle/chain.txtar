@@ -462,6 +462,8 @@ Disjuncts:    8919
       #RecurseN: (_|_){
         // [incomplete] issue2052.full.#RecurseN: error in call to list.Range: non-concrete value _:
         //     ./issue2052.cue:111:15
+        // issue2052.full.#RecurseN: undefined field: "0":
+        //     ./issue2052.cue:121:10
         #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
         #funcFactory: (#struct){
           #next: (_){ _ }
@@ -1157,7 +1159,7 @@ diff old new
            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
            out: (int){ 1 }
          }
-@@ -223,19 +215,19 @@
+@@ -223,19 +215,21 @@
        }
      }
      full: (struct){
@@ -1166,6 +1168,8 @@ diff old new
 +      #RecurseN: (_|_){
 +        // [incomplete] issue2052.full.#RecurseN: error in call to list.Range: non-concrete value _:
 +        //     ./issue2052.cue:111:15
++        // issue2052.full.#RecurseN: undefined field: "0":
++        //     ./issue2052.cue:121:10
          #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
          #funcFactory: (#struct){
            #next: (_){ _ }
@@ -1185,7 +1189,7 @@ diff old new
          }
        }
        #DepthF: (#struct){
-@@ -245,7 +237,13 @@
+@@ -245,7 +239,13 @@
            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
            out: (int){
              1
@@ -1200,7 +1204,7 @@ diff old new
            }
          }
        }
-@@ -258,98 +256,170 @@
+@@ -258,98 +258,170 @@
              #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
              out: (int){
                1
@@ -1463,7 +1467,7 @@ diff old new
              }
            }
          }
-@@ -357,7 +427,13 @@
+@@ -357,7 +429,13 @@
          #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
          out: (int){
            1
@@ -1478,7 +1482,7 @@ diff old new
          }
        }
        tree: (struct){
-@@ -371,49 +447,7 @@
+@@ -371,49 +449,7 @@
          }
          cow: (string){ "moo" }
        }
@@ -1529,7 +1533,7 @@ diff old new
          #in: (#struct){
            a: (#struct){
              foo: (string){ "bar" }
-@@ -425,6 +459,192 @@
+@@ -425,6 +461,192 @@
            }
            cow: (string){ "moo" }
          }

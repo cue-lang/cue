@@ -8,10 +8,12 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"maps"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"regexp"
+	"slices"
 	"strings"
 
 	"cuelabs.dev/go/oci/ociregistry"
@@ -338,11 +340,9 @@ func writeError(w http.ResponseWriter, err error) {
 func pushContent(ctx context.Context, client *modregistry.Client, mods map[module.Version]*moduleContent) error {
 	pushed := make(map[module.Version]bool)
 	// Iterate over modules in deterministic order.
-	// TODO use maps.Keys when available.
-	vs := make([]module.Version, 0, len(mods))
-	for v := range mods {
-		vs = append(vs, v)
-	}
+	// TODO(mvdan): if Version.Compare is exposed, then here we could just do:
+	// for _, v := range slices.SortedFunc(maps.Keys(mods), module.Version.Compare) {
+	vs := slices.Collect(maps.Keys(mods))
 	module.Sort(vs)
 	for _, v := range vs {
 		err := visitDepthFirst(mods, v, func(v module.Version, m *moduleContent) error {

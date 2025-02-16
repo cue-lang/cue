@@ -240,12 +240,10 @@ func (ld *loader) resolveDependencies(ctx context.Context, rootPkgPaths []string
 			logf("dependencies are stable at %q", rs.RootModules())
 			return rs, pkgs, nil
 		}
-		toAdd := make([]module.Version, 0, len(modAddedBy))
-		// TODO use maps.Keys when we can.
 		for m, p := range modAddedBy {
-			logf("added: %v (by %v)", modAddedBy, p.ImportPath())
-			toAdd = append(toAdd, m)
+			logf("added: %v (by %v)", m, p.ImportPath())
 		}
+		toAdd := slices.Collect(maps.Keys(modAddedBy))
 		module.Sort(toAdd) // to make errors deterministic
 		oldRs := rs
 		var err error
@@ -565,10 +563,7 @@ func (ld *loader) resolveMissingImports(ctx context.Context, pkgs *modpkgload.Pa
 	<-work.Idle()
 
 	modAddedBy = map[module.Version]*modpkgload.Package{}
-	defaultMajorVersions = make(map[string]string)
-	for m, v := range rs.DefaultMajorVersions() {
-		defaultMajorVersions[m] = v
-	}
+	defaultMajorVersions = maps.Clone(rs.DefaultMajorVersions())
 	for _, pm := range pkgMods {
 		pkg, mods, needsDefault := pm.pkg, *pm.mods, *pm.needsDefault
 		for _, mod := range mods {

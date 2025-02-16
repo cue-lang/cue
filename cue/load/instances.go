@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"io/fs"
+	"maps"
 	"slices"
 	"strconv"
 	"strings"
@@ -213,19 +214,13 @@ func loadPackages(
 			pkgPaths[pkgPath] = true
 		}
 	}
-	// TODO use maps.Keys when we can.
-	pkgPathSlice := make([]string, 0, len(pkgPaths))
-	for p := range pkgPaths {
-		pkgPathSlice = append(pkgPathSlice, p)
-	}
-	slices.Sort(pkgPathSlice)
 	return modpkgload.LoadPackages(
 		ctx,
 		cfg.Module,
 		mainModLoc,
 		reqs,
 		cfg.Registry,
-		pkgPathSlice,
+		slices.Sorted(maps.Keys(pkgPaths)),
 		func(pkgPath string, mod module.Version, fsys fs.FS, mf modimports.ModuleFile) bool {
 			if !cfg.Tools && strings.HasSuffix(mf.FilePath, "_tool.cue") {
 				return false

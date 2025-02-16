@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"maps"
 	"path"
 	"slices"
 	"strconv"
@@ -55,13 +56,7 @@ func AllImports(modFilesIter func(func(ModuleFile, error) bool)) (_ []string, re
 	if retErr != nil {
 		return nil, retErr
 	}
-	// TODO use maps.Keys when we can.
-	pkgPathSlice := make([]string, 0, len(pkgPaths))
-	for p := range pkgPaths {
-		pkgPathSlice = append(pkgPathSlice, p)
-	}
-	slices.Sort(pkgPathSlice)
-	return pkgPathSlice, nil
+	return slices.Sorted(maps.Keys(pkgPaths)), nil
 }
 
 // PackageFiles returns an iterator that produces all the CUE files

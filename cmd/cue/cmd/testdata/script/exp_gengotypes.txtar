@@ -293,6 +293,7 @@ import (
 	"fmt"
 	"go/constant"
 	"go/token"
+	"maps"
 	"os"
 	"reflect"
 	"slices"
@@ -346,7 +347,7 @@ func main() {
 	failed := false
 	f := try1(os.Create("gotest/reencoded-pass.jsonl"))
 	enc := json.NewEncoder(f)
-	for _, name := range sortedKeys(tests.Pass) {
+	for _, name := range slices.Sorted(maps.Keys(tests.Pass)) {
 		msg := compact(tests.Pass[name])
 		var v root.Root
 		if err := json.Unmarshal(msg, &v); err != nil {
@@ -355,7 +356,7 @@ func main() {
 		}
 		try(enc.Encode(&v))
 	}
-	for _, name := range sortedKeys(tests.Fail.CUE) {
+	for _, name := range slices.Sorted(maps.Keys(tests.Fail.CUE)) {
 		msg := compact(tests.Fail.CUE[name])
 		var v root.Root
 		if err := json.Unmarshal(tests.Fail.CUE[name], &v); err != nil {
@@ -363,7 +364,7 @@ func main() {
 			failed = true
 		}
 	}
-	for _, name := range sortedKeys(tests.Fail.Both) {
+	for _, name := range slices.Sorted(maps.Keys(tests.Fail.Both)) {
 		msg := compact(tests.Fail.Both[name])
 		var v root.Root
 		if err := json.Unmarshal(msg, &v); err == nil {
@@ -375,16 +376,6 @@ func main() {
 	if failed {
 		os.Exit(1)
 	}
-}
-
-// TODO: maps.Keys
-func sortedKeys(m map[string]json.RawMessage) []string {
-	var keys []string
-	for k := range m {
-		keys = append(keys, k)
-	}
-	slices.Sort(keys)
-	return keys
 }
 
 func compact(msg json.RawMessage) []byte {

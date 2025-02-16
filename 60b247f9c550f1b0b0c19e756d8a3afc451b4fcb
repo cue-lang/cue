@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8fa176fe_e9f0ee94",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-16T11:35:51Z",
+      "side": 1,
+      "message": "fairly long lines in the generated txtar outputs, but I assume not to the point that it\u0027s a problem.",
+      "revId": "60b247f9c550f1b0b0c19e756d8a3afc451b4fcb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

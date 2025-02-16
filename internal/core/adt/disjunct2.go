@@ -385,6 +385,19 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 		d := cross[0].node
 		n.setBaseValue(d)
 		n.defaultMode = cross[0].defaultMode
+		if n.defaultAttemptInCycle != nil && n.defaultMode != isDefault {
+			c := n.ctx
+			path := c.PathToString(n.defaultAttemptInCycle.Path())
+
+			index := c.MarkPositions()
+			c.AddPosition(n.defaultAttemptInCycle)
+			err := c.Newf("ambiguous default elimination by referencing %v", path)
+			c.ReleasePositions(index)
+
+			b := &Bottom{Code: CycleError, Err: err}
+			n.setBaseValue(b)
+			return b
+		}
 
 	default:
 		// append, rather than assign, to allow reusing the memory of
@@ -575,8 +588,20 @@ func (n *nodeContext) finalizeDisjunctions() {
 	// This is especially relevant for the API. Ideally, though, we should
 	// update Conjuncts to reflect the actual conjunct that went into the
 	// disjuncts.
+	numErrs := 0
 	for _, x := range n.disjuncts {
 		x.node.Conjuncts = nil
+
+		if b := x.getErr(); b != nil {
+			n.disjunctErrs = append(n.disjunctErrs, b)
+			numErrs++
+			continue
+		}
+	}
+
+	if len(n.disjuncts) == numErrs {
+		n.makeError()
+		return
 	}
 
 	a := make([]Value, len(n.disjuncts))
@@ -605,7 +630,21 @@ func (n *nodeContext) finalizeDisjunctions() {
 	}
 
 	v := n.node
-	n.setBaseValue(d)
+
+	if n.defaultAttemptInCycle == nil || d.NumDefaults == 1 {
+		n.setBaseValue(d)
+	} else {
+		c := n.ctx
+		path := c.PathToString(n.defaultAttemptInCycle.Path())
+
+		index := c.MarkPositions()
+		c.AddPosition(n.defaultAttemptInCycle)
+		err := c.Newf("cycle across unresolved disjunction referenced by %v", path)
+		c.ReleasePositions(index)
+
+		b := &Bottom{Code: CycleError, Err: err}
+		n.setBaseValue(b)
+	}
 
 	// The conjuncts will have too much information. Better have no
 	// information than incorrect information.

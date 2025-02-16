@@ -674,6 +674,7 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 		if arc == nil {
 			return nil, c.ci
 		}
+		orig := arc
 		// TODO(deref): what is the right level of dereferencing here?
 		// DerefValue seems to work too.
 		arc = arc.DerefNonShared()
@@ -698,8 +699,8 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 
 		if c.isDevVersion() {
 			if s := arc.getState(c); s != nil {
-				needs := state.conditions()
-				needs = needs | arcTypeKnown
+				origNeeds := state.conditions()
+				needs := origNeeds | arcTypeKnown
 				runMode := state.runMode()
 
 				switch runMode {
@@ -710,10 +711,27 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 					arc.unify(c, needs, attemptOnly) // to set scalar
 
 				case yield:
-					hasCycleBreakingValue := s.hasFieldValue ||
-						!isCyclePlaceholder(arc.BaseValue)
+					arc.unify(c, needs, runMode) // to set scalar
 
 					evaluating := arc.status == evaluating
+
+					// We cannot resolve a value that represents an unresolved
+					// disjunction.
+					if evaluating && orig != arc && arc.IsDisjunct {
+						task := c.current()
+						if origNeeds == scalarKnown && !orig.state.meets(scalarKnown) {
+							orig.state.defaultAttemptInCycle = task.node.node
+							task.waitFor(&orig.state.scheduler, needs)
+							s.yield()
+							panic("unreachable")
+						}
+						err := c.Newf("unresolved disjunction: %v", x)
+						b := &Bottom{Code: CycleError, Err: err}
+						return b, c.ci
+					}
+
+					hasCycleBreakingValue := s.hasFieldValue ||
+						!isCyclePlaceholder(arc.BaseValue)
 
 					if evaluating && !hasCycleBreakingValue {
 						err := c.Newf("cycle with field: %v", x)
@@ -722,7 +740,9 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 						break
 					}
 
-					arc.unify(c, needs, runMode) // to set scalar
+					v := c.evaluate(arc, x, state)
+
+					return v, c.ci
 				}
 			}
 		}

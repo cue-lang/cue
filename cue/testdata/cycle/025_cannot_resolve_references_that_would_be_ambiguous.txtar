@@ -64,15 +64,11 @@ Disjuncts:    52
 -- out/evalalpha --
 (struct){
   a1: (_|_){
-    // [cycle] a1: conflicting values 0 and 1:
-    //     ./in.cue:1:10
-    //     ./in.cue:2:5
-    // a1: 2 errors in empty disjunction::
+    // [cycle] a1: ambiguous default elimination by referencing a2:
     //     ./in.cue:4:10
-    // a2: cycle with field: a1:
-    //     ./in.cue:4:10
+    //     ./in.cue:3:10
   }
-  a2: (int){ 1 }
+  a2: (int){ |(*(int){ 0 }, (int){ 1 }) }
   a3: (int){ 1 }
   b1: (int){ |((int){ 0 }, (int){ 1 }) }
   b2: (int){ |((int){ 0 }, (int){ 1 }) }
@@ -95,20 +91,20 @@ Disjuncts:    52
 diff old new
 --- old
 +++ new
-@@ -1,7 +1,12 @@
+@@ -1,9 +1,10 @@
  (struct){
    a1: (_|_){
 -    // [cycle] cycle error:
-+    // [cycle] a1: conflicting values 0 and 1:
-+    //     ./in.cue:1:10
-     //     ./in.cue:2:5
-+    // a1: 2 errors in empty disjunction::
+-    //     ./in.cue:2:5
++    // [cycle] a1: ambiguous default elimination by referencing a2:
 +    //     ./in.cue:4:10
-+    // a2: cycle with field: a1:
-+    //     ./in.cue:4:10
++    //     ./in.cue:3:10
    }
-   a2: (int){ 1 }
+-  a2: (int){ 1 }
++  a2: (int){ |(*(int){ 0 }, (int){ 1 }) }
    a3: (int){ 1 }
+   b1: (int){ |((int){ 0 }, (int){ 1 }) }
+   b2: (int){ |((int){ 0 }, (int){ 1 }) }
 -- diff/explanation --
 a2: cyclic error reporting is now reported at both nodes on cycle, which is good.
 -- out/eval --

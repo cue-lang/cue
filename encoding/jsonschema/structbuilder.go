@@ -3,6 +3,8 @@ package jsonschema
 import (
 	"cmp"
 	"fmt"
+	"maps"
+	"slices"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
@@ -201,8 +203,7 @@ func (b *structBuilder) appendDecls(n *structBuilderNode, db *declBuilder) (_err
 			return _err
 		}
 	}
-	// TODO slices.SortedFunc(maps.Keys(n.entries), cmpSelector)
-	for _, sel := range sortedKeys(n.entries, cmpSelector) {
+	for _, sel := range slices.SortedFunc(maps.Keys(n.entries), cmpSelector) {
 		entry := n.entries[sel]
 		db.pushPath(sel)
 		err := b.appendDecls(entry, db)

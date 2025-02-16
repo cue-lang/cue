@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"net/url"
 	"path"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -44,7 +45,7 @@ func parseRootRef(str string) (cue.Path, error) {
 	// (technically a trailing slash `/` means there's an empty
 	// final element).
 	u.Fragment = strings.TrimSuffix(u.Fragment, "/")
-	fragmentParts := collectSlice(jsonPointerTokens(u.Fragment))
+	fragmentParts := slices.Collect(jsonPointerTokens(u.Fragment))
 	var selectors []cue.Selector
 	for _, r := range fragmentParts {
 		// Technically this is incorrect because a numeric
@@ -176,7 +177,7 @@ func defaultMapRef(
 	if len(fragment) > 0 && fragment[0] != '/' {
 		return "", cue.Path{}, fmt.Errorf("anchors (%s) not supported", fragment)
 	}
-	parts := collectSlice(jsonPointerTokens(fragment))
+	parts := slices.Collect(jsonPointerTokens(fragment))
 	labels, err := mapFn(token.Pos{}, parts)
 	if err != nil {
 		return "", cue.Path{}, err
@@ -203,7 +204,7 @@ func defaultMap(p token.Pos, a []string) ([]ast.Label, error) {
 		// TODO this is needlessly inefficient, as we're putting something
 		// back together that was already joined before defaultMap was
 		// invoked. This does avoid dual implementations though.
-		p := jsonPointerFromTokens(sliceValues(a))
+		p := jsonPointerFromTokens(slices.Values(a))
 		return []ast.Label{ast.NewIdent("_#defs"), ast.NewString(p)}, nil
 	}
 	name := a[1]

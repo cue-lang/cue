@@ -6,11 +6,6 @@
 # that is left for other tests, so that this test can focus
 # on the various rules of get go.
 
-# Ensure we are ready for GODEBUG=gotypesalias=1 being the default
-# once we bump go.mod to go 1.23, or for any downstreams which
-# enable the GODEBUG flag themselves.
-env GODEBUG=gotypesalias=1
-
 # cue get go
 exec cue get go --local ./...
 cmp ./pkg3/pkg3_go_gen.cue ./pkg3/pkg3_go_gen.cue.golden

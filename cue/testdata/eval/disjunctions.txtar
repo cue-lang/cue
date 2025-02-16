@@ -730,8 +730,6 @@ diff old new
          }
        }
      }
--- diff/todo/p1 --
-issue3597.t1.foo: duplicate disjunct
 -- diff/todo/p3 --
 Missing error positions.
   It is probably okay to show name and val fields with original values, as long

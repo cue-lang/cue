@@ -51,7 +51,7 @@ tasks have completed.
 
 Available tasks can be found in the package documentation at
 
-	https://pkg.go.dev/cuelang.org/go/pkg/tool?tab=subdirectories
+	https://cuelang.org/go/pkg/tool#section-directories
 
 Examples:
 

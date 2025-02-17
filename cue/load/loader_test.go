@@ -722,7 +722,7 @@ func TestOverlays(t *testing.T) {
 	}
 	want := []string{
 		`{msg:"Hello"}`,
-		`{a:5}`,
+		`{a:>=5&<=5}`,
 	}
 	rmSpace := func(r rune) rune {
 		if unicode.IsSpace(r) {

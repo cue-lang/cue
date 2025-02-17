@@ -86,7 +86,10 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 		case -1:
 		case 0:
 			if x.Op == GreaterEqualOp && y.Op == LessEqualOp {
-				return ctx.NewString(a.Str)
+				if ctx.SimplifyValidators {
+					return ctx.NewString(a.Str)
+				}
+				return nil
 			}
 			fallthrough
 
@@ -111,7 +114,10 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 		case -1:
 		case 0:
 			if x.Op == GreaterEqualOp && y.Op == LessEqualOp {
-				return ctx.newBytes(a.B)
+				if ctx.SimplifyValidators {
+					return ctx.newBytes(a.B)
+				}
+				return nil
 			}
 			fallthrough
 
@@ -187,10 +193,10 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 		case diff == 1:
 			if k&FloatKind == 0 {
 				if x.Op == GreaterEqualOp && y.Op == LessThanOp {
-					return ctx.newNum(&lo, k&NumberKind, x, y)
+					return newNum(ctx, &lo, k&NumberKind, x, y)
 				}
 				if x.Op == GreaterThanOp && y.Op == LessEqualOp {
-					return ctx.newNum(&hi, k&NumberKind, x, y)
+					return newNum(ctx, &hi, k&NumberKind, x, y)
 				}
 				if x.Op == GreaterThanOp && y.Op == LessThanOp {
 					return ctx.NewErrf("incompatible integer bounds %v and %v", x, y)
@@ -200,12 +206,12 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 		case diff == 2:
 			if k&FloatKind == 0 && x.Op == GreaterThanOp && y.Op == LessThanOp {
 				_, _ = internal.BaseContext.Add(&d, d.SetInt64(1), &lo)
-				return ctx.newNum(&d, k&NumberKind, x, y)
+				return newNum(ctx, &d, k&NumberKind, x, y)
 			}
 
 		case diff == 0 && err == nil:
 			if x.Op == GreaterEqualOp && y.Op == LessEqualOp {
-				return ctx.newNum(&lo, k&NumberKind, x, y)
+				return newNum(ctx, &lo, k&NumberKind, x, y)
 			}
 			fallthrough
 
@@ -226,6 +232,13 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 		if !test(ctx, x.Op, yv, xv) {
 			return x
 		}
+	}
+	return nil
+}
+
+func newNum(ctx *OpContext, d *apd.Decimal, k Kind, sources ...Node) Value {
+	if ctx.SimplifyValidators {
+		return ctx.newNum(d, k, sources...)
 	}
 	return nil
 }

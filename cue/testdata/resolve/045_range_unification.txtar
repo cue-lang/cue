@@ -200,22 +200,22 @@ Result:
     //     ./in.cue:12:6
   }
   b1: (number){ &(>=1, <=5) }
-  b2: (number){ 1 }
-  b3: (number){ 5 }
+  b2: (number){ &(>=1, <=1) }
+  b3: (number){ &(>=5, <=5) }
   b4: (number){ &(>=2, <=3) }
   b5: (number){ &(>=3, <=5) }
-  b6: (number){ 5 }
+  b6: (number){ &(>=5, <=5) }
   b7: (_|_){
     // [eval] b7: incompatible number bounds <=5 and >=6:
     //     ./in.cue:21:17
     //     ./in.cue:21:11
   }
   b8: (number){ &(>=1, <=5) }
-  b9: (number){ 1 }
-  b10: (number){ 5 }
+  b9: (number){ &(>=1, <=1) }
+  b10: (number){ &(>=5, <=5) }
   b11: (number){ &(>=2, <=3) }
   b12: (number){ &(>=3, <=5) }
-  b13: (number){ 5 }
+  b13: (number){ &(>=5, <=5) }
   b14: (_|_){
     // [eval] b14: incompatible number bounds <=5 and >=6:
     //     ./in.cue:29:24
@@ -287,7 +287,7 @@ diff old new
  Result:
  (_|_){
 @@ -64,8 +64,8 @@
-   b6: (number){ 5 }
+   b6: (number){ &(>=5, <=5) }
    b7: (_|_){
      // [eval] b7: incompatible number bounds <=5 and >=6:
 -    //     ./in.cue:21:11
@@ -295,9 +295,9 @@ diff old new
 +    //     ./in.cue:21:11
    }
    b8: (number){ &(>=1, <=5) }
-   b9: (number){ 1 }
+   b9: (number){ &(>=1, <=1) }
 @@ -75,8 +75,8 @@
-   b13: (number){ 5 }
+   b13: (number){ &(>=5, <=5) }
    b14: (_|_){
      // [eval] b14: incompatible number bounds <=5 and >=6:
 -    //     ./in.cue:29:6
@@ -387,22 +387,22 @@ Result:
     //     ./in.cue:12:6
   }
   b1: (number){ &(>=1, <=5) }
-  b2: (number){ 1 }
-  b3: (number){ 5 }
+  b2: (number){ &(>=1, <=1) }
+  b3: (number){ &(>=5, <=5) }
   b4: (number){ &(>=2, <=3) }
   b5: (number){ &(>=3, <=5) }
-  b6: (number){ 5 }
+  b6: (number){ &(>=5, <=5) }
   b7: (_|_){
     // [eval] b7: incompatible number bounds <=5 and >=6:
     //     ./in.cue:21:11
     //     ./in.cue:21:17
   }
   b8: (number){ &(>=1, <=5) }
-  b9: (number){ 1 }
-  b10: (number){ 5 }
+  b9: (number){ &(>=1, <=1) }
+  b10: (number){ &(>=5, <=5) }
   b11: (number){ &(>=2, <=3) }
   b12: (number){ &(>=3, <=5) }
-  b13: (number){ 5 }
+  b13: (number){ &(>=5, <=5) }
   b14: (_|_){
     // [eval] b14: incompatible number bounds <=5 and >=6:
     //     ./in.cue:29:6

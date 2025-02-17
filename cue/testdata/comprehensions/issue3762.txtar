@@ -88,24 +88,8 @@ Unifications: 67
 Conjuncts:    88
 Disjuncts:    74
 -- out/evalalpha --
-Errors:
-f: conflicting values false and true:
-    ./in.cue:68:6
-    ./in.cue:72:6
-l.vms: conflicting values "again" and "hello":
-    ./in.cue:36:8
-    ./in.cue:39:14
-l.vms.0.name: conflicting values "again" and "hello":
-    ./in.cue:21:28
-    ./in.cue:22:28
-
-Result:
-(_|_){
-  // [eval]
-  full: (_|_){
-    // [eval] l.vms.0.name: conflicting values "again" and "hello":
-    //     ./in.cue:21:28
-    //     ./in.cue:22:28
+(struct){
+  full: (struct){
     kube: (struct){
       node: (struct){
         n1: (struct){
@@ -137,15 +121,12 @@ Result:
         }
       }
     }
+    x: (int){ 5 }
     _b: (struct){
     }
   }
-  reduced: (_|_){
-    // [eval]
-    p1: (_|_){
-      // [eval] l.vms: conflicting values "again" and "hello":
-      //     ./in.cue:36:8
-      //     ./in.cue:39:14
+  reduced: (struct){
+    p1: (struct){
       _cs: (struct){
         opts: (struct){
         }
@@ -165,11 +146,10 @@ Result:
           vms: (string){ "again" }
         }
       }
+      x: (int){ 5 }
     }
-    p2: (_|_){
-      // [eval] l.vms: conflicting values "again" and "hello":
-      //     ./in.cue:61:8
-      //     ./in.cue:64:14
+    p2: (struct){
+      x: (int){ 5 }
       _cs: (struct){
         opts: (struct){
         }
@@ -191,47 +171,21 @@ Result:
       }
     }
   }
-  reference: (_|_){
-    // [eval] f: conflicting values false and true:
-    //     ./in.cue:68:6
-    //     ./in.cue:72:6
+  reference: (struct){
     _x: (struct){
       f: (bool){ true }
     }
     _y: (struct){
       f: (bool){ false }
     }
+    ok: (bool){ true }
   }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,5 +1,21 @@
--(struct){
--  full: (struct){
-+Errors:
-+f: conflicting values false and true:
-+    ./in.cue:68:6
-+    ./in.cue:72:6
-+l.vms: conflicting values "again" and "hello":
-+    ./in.cue:36:8
-+    ./in.cue:39:14
-+l.vms.0.name: conflicting values "again" and "hello":
-+    ./in.cue:21:28
-+    ./in.cue:22:28
-+
-+Result:
-+(_|_){
-+  // [eval]
-+  full: (_|_){
-+    // [eval] l.vms.0.name: conflicting values "again" and "hello":
-+    //     ./in.cue:21:28
-+    //     ./in.cue:22:28
-     kube: (struct){
-       node: (struct){
-         n1: (struct){
-@@ -6,9 +22,9 @@
+@@ -6,9 +6,9 @@
            _CL: (string){ "l" }
            _cs: (struct){
              l: (struct){
@@ -242,126 +196,32 @@ diff old new
                vms: (#list){
                  0: (struct){
                    name: (string){ "hello" }
-@@ -31,57 +47,64 @@
-         }
+@@ -38,9 +38,9 @@
+   reduced: (struct){
+     p1: (struct){
+       _cs: (struct){
+-        _ba?: (string){ string }
+-        opts: (struct){
+-        }
++        opts: (struct){
++        }
++        _ba?: (string){ string }
+         vms: (string){ "hello" }
        }
-     }
--    x: (int){ 5 }
-     _b: (struct){
-     }
-   }
--  reduced: (struct){
--    p1: (struct){
--      _cs: (struct){
+       _a: (struct){
+@@ -61,9 +61,9 @@
+     p2: (struct){
+       x: (int){ 5 }
+       _cs: (struct){
 -        _ba?: (string){ string }
 -        opts: (struct){
 -        }
--        vms: (string){ "hello" }
--      }
--      _a: (struct){
--        l: (struct){
--          _ba?: (string){ string }
--          opts: (struct){
--          }
--          vms: (string){ "hello" }
--        }
--      }
--      _b: (struct){
--        l: (struct){
--          vms: (string){ "again" }
--        }
--      }
--      x: (int){ 5 }
--    }
--    p2: (struct){
--      x: (int){ 5 }
--      _cs: (struct){
--        _ba?: (string){ string }
--        opts: (struct){
--        }
--        vms: (string){ "hello" }
--      }
--      _a: (struct){
--        l: (struct){
--          _ba?: (string){ string }
--          opts: (struct){
--          }
--          vms: (string){ "hello" }
--        }
--      }
--      _b: (struct){
--        l: (struct){
--          vms: (string){ "again" }
--        }
--      }
--    }
--  }
--  reference: (struct){
-+  reduced: (_|_){
-+    // [eval]
-+    p1: (_|_){
-+      // [eval] l.vms: conflicting values "again" and "hello":
-+      //     ./in.cue:36:8
-+      //     ./in.cue:39:14
-+      _cs: (struct){
 +        opts: (struct){
 +        }
 +        _ba?: (string){ string }
-+        vms: (string){ "hello" }
-+      }
-+      _a: (struct){
-+        l: (struct){
-+          _ba?: (string){ string }
-+          opts: (struct){
-+          }
-+          vms: (string){ "hello" }
-+        }
-+      }
-+      _b: (struct){
-+        l: (struct){
-+          vms: (string){ "again" }
-+        }
-+      }
-+    }
-+    p2: (_|_){
-+      // [eval] l.vms: conflicting values "again" and "hello":
-+      //     ./in.cue:61:8
-+      //     ./in.cue:64:14
-+      _cs: (struct){
-+        opts: (struct){
-+        }
-+        _ba?: (string){ string }
-+        vms: (string){ "hello" }
-+      }
-+      _a: (struct){
-+        l: (struct){
-+          _ba?: (string){ string }
-+          opts: (struct){
-+          }
-+          vms: (string){ "hello" }
-+        }
-+      }
-+      _b: (struct){
-+        l: (struct){
-+          vms: (string){ "again" }
-+        }
-+      }
-+    }
-+  }
-+  reference: (_|_){
-+    // [eval] f: conflicting values false and true:
-+    //     ./in.cue:68:6
-+    //     ./in.cue:72:6
-     _x: (struct){
-       f: (bool){ true }
-     }
-@@ -88,6 +111,5 @@
-     _y: (struct){
-       f: (bool){ false }
-     }
--    ok: (bool){ true }
-   }
- }
+         vms: (string){ "hello" }
+       }
+       _a: (struct){
 -- out/eval --
 (struct){
   full: (struct){

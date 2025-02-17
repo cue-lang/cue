@@ -1381,12 +1381,13 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, flag
 
 	match := op != EqualOp // non-error case
 
-	// Like value(), but retain the original, unwrapped result.
 	c.inValidator++
+	// Note that evalState may call yield, so we need to balance the counter
+	// with a defer.
+	defer func() { c.inValidator-- }()
 	req := flags
 	req = final(state, needTasksDone)
 	v := c.evalState(x, req)
-	c.inValidator--
 	u, _ := c.getDefault(v)
 	u = Unwrap(u)
 

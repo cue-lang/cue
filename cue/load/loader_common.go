@@ -16,6 +16,7 @@ package load
 
 import (
 	"cmp"
+	"maps"
 	pathpkg "path"
 	"path/filepath"
 	"slices"
@@ -146,7 +147,7 @@ func (fp *fileProcessor) finalize(p *build.Instance) errors.Error {
 		return fp.err
 	}
 
-	p.ImportPaths, _ = cleanImports(fp.imported)
+	p.ImportPaths = slices.Sorted(maps.Keys(fp.imported))
 
 	return nil
 }
@@ -342,15 +343,6 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) {
 	default:
 		p.BuildFiles = append(p.BuildFiles, file)
 	}
-}
-
-func cleanImports(m map[string][]token.Pos) ([]string, map[string][]token.Pos) {
-	all := make([]string, 0, len(m))
-	for path := range m {
-		all = append(all, path)
-	}
-	slices.Sort(all)
-	return all, m
 }
 
 // isLocalImport reports whether the import path is

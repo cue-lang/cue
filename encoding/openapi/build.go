@@ -17,6 +17,7 @@ package openapi
 import (
 	"cmp"
 	"fmt"
+	"maps"
 	"math"
 	"path"
 	"regexp"
@@ -149,13 +150,7 @@ func schemas(g *Generator, inst cue.InstanceOrValue) (schemas *ast.StructLit, er
 		done = len(c.externalRefs)
 
 		// From now on, all references need to be expanded
-		external := []string{}
-		for k := range c.externalRefs {
-			external = append(external, k)
-		}
-		slices.Sort(external)
-
-		for _, k := range external {
+		for _, k := range slices.Sorted(maps.Keys(c.externalRefs)) {
 			ext := c.externalRefs[k]
 			c.instExt = ext.inst
 			sels := ext.path.Selectors()

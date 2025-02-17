@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b87b696_805ffc12",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-02-17T16:17:30Z",
+      "side": 1,
+      "message": "one drive-by comment",
+      "revId": "11e959c5ab13623af3e6f079d8f2f55409c85aaf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b48df77d_ca41e479",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1386,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-02-17T16:17:30Z",
+      "side": 1,
+      "message": "I\u0027d add a comment saying why we need to use defer here perhaps.\n\nThis is semantically quite different to the original, which decremented inValidator immediately after calling evalState. Does that matter at all?",
+      "revId": "11e959c5ab13623af3e6f079d8f2f55409c85aaf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

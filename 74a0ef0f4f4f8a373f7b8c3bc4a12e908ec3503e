@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "09633601_0e475bc9",
+        "filename": "tools/trim/trim_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-17T09:56:40Z",
+      "side": 1,
+      "message": "Done, and I\u0027ve verified the results for v3-noshare are exactly the same as for plain v3.",
+      "parentUuid": "5859339a_055fd0b0",
+      "revId": "74a0ef0f4f4f8a373f7b8c3bc4a12e908ec3503e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6e74d0ce_2c268bbf",

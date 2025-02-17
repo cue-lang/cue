@@ -1,3 +1,5 @@
+// This feature is deprecated.
+#simplifyValidators
 -- in.cue --
 x0: 5
 x1: b5 & 30

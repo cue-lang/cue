@@ -227,19 +227,19 @@ Result:
   s8: (number){ >5 }
   s10: (number){ &(>1, <=10) }
   s11: (number){ &(>0, <12) }
-  s20: (number){ 10 }
+  s20: (number){ &(>=10, <=10) }
   s22: (number){ &(>5, <=6) }
-  s22a: (int){ 6 }
-  s22b: (int){ 6 }
-  s22c: (int){ 5 }
-  s22d: (int){ 5 }
-  s22e: (int){ 5 }
-  s22f: (int){ 5 }
+  s22a: (int){ &(>5, <=6, int) }
+  s22b: (int){ &(>5, <=6, int) }
+  s22c: (int){ &(>=5, <6, int) }
+  s22d: (int){ &(>=5, <6, int) }
+  s22e: (int){ &(>=5, <6, int) }
+  s22f: (int){ &(>=5, <6, int) }
   s23: (number){ &(>0, <2) }
-  s23a: (int){ 1 }
-  s23b: (int){ 1 }
-  s23c: (int){ 1 }
-  s23d: (int){ 1 }
+  s23a: (int){ &(>0, <2, int) }
+  s23b: (int){ &(>0, <2, int) }
+  s23c: (int){ &(>0, <2, int) }
+  s23d: (int){ &(>0, <2, int) }
   s23e: (number){ &(>0.0, <2.0) }
   s30: (int){ &(>0, int) }
   floats: (_|_){
@@ -250,7 +250,7 @@ Result:
     f4: (float){ &(<=1.1, float) }
     f5: (float){ &(>1.1, float) }
     f6: (float){ &(>1.1, float) }
-    f7: (float){ 1.1 }
+    f7: (float){ &(>=1.1, <=1.1, float) }
     issue1310: (_|_){
       // [eval] floats.issue1310: incompatible number bounds <=1.0 and >=2.1:
       //     ./in.cue:50:21
@@ -368,12 +368,8 @@ diff old new
  
  Result:
  (_|_){
-@@ -74,16 +74,16 @@
-     f4: (float){ &(<=1.1, float) }
-     f5: (float){ &(>1.1, float) }
-     f6: (float){ &(>1.1, float) }
--    f7: (number){ 1.1 }
-+    f7: (float){ 1.1 }
+@@ -77,13 +77,13 @@
+     f7: (float){ &(>=1.1, <=1.1, float) }
      issue1310: (_|_){
        // [eval] floats.issue1310: incompatible number bounds <=1.0 and >=2.1:
 -      //     ./in.cue:50:13
@@ -483,19 +479,19 @@ Result:
   s8: (number){ >5 }
   s10: (number){ &(>1, <=10) }
   s11: (number){ &(>0, <12) }
-  s20: (number){ 10 }
+  s20: (number){ &(>=10, <=10) }
   s22: (number){ &(>5, <=6) }
-  s22a: (int){ 6 }
-  s22b: (int){ 6 }
-  s22c: (int){ 5 }
-  s22d: (int){ 5 }
-  s22e: (int){ 5 }
-  s22f: (int){ 5 }
+  s22a: (int){ &(>5, <=6, int) }
+  s22b: (int){ &(>5, <=6, int) }
+  s22c: (int){ &(>=5, <6, int) }
+  s22d: (int){ &(>=5, <6, int) }
+  s22e: (int){ &(>=5, <6, int) }
+  s22f: (int){ &(>=5, <6, int) }
   s23: (number){ &(>0, <2) }
-  s23a: (int){ 1 }
-  s23b: (int){ 1 }
-  s23c: (int){ 1 }
-  s23d: (int){ 1 }
+  s23a: (int){ &(>0, <2, int) }
+  s23b: (int){ &(>0, <2, int) }
+  s23c: (int){ &(>0, <2, int) }
+  s23d: (int){ &(>0, <2, int) }
   s23e: (number){ &(>0.0, <2.0) }
   s30: (int){ &(>0, int) }
   floats: (_|_){
@@ -506,7 +502,7 @@ Result:
     f4: (float){ &(<=1.1, float) }
     f5: (float){ &(>1.1, float) }
     f6: (float){ &(>1.1, float) }
-    f7: (number){ 1.1 }
+    f7: (float){ &(>=1.1, <=1.1, float) }
     issue1310: (_|_){
       // [eval] floats.issue1310: incompatible number bounds <=1.0 and >=2.1:
       //     ./in.cue:50:13

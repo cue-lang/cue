@@ -25,6 +25,11 @@ var Flags struct {
 	// and enabled by default in the upcoming v0.14 release.
 	CmdReferencePkg bool `envflag:"default:true"`
 
+	// Enable simplification of validators. We do not expect this experiment
+	// to be long lived and that support for simplifying validators will be
+	// dropped soon.
+	SimpleVal bool `envflag:"default:false"`
+
 	// The flags below describe completed experiments; they can still be set
 	// as long as the value aligns with the final behavior once the experiment finished.
 	// Breaking users who set such a flag seems unnecessary,

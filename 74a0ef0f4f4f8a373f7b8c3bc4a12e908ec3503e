@@ -51,6 +51,24 @@
       "message": "Will this give preference to removing specific fields over fields from a pattern?",
       "revId": "74a0ef0f4f4f8a373f7b8c3bc4a12e908ec3503e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "85e10660_d2bf0711",
+        "filename": "tools/trim/trimv3.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-17T11:13:40Z",
+      "side": 1,
+      "message": "Patterns are explored in isolation from other conjuncts/arcs (see roughly line 657 in this file). As such, they are simplified, but they are considered no different to any other field of a vertex. Therefore, if there\u0027s a tie between a conjunct from a pattern, and a conjunct from outside a pattern, the pattern will always win, because it is known that the pattern\u0027s conjunct must be kept, otherwise the pattern itself is being made less specific.",
+      "parentUuid": "6e74d0ce_2c268bbf",
+      "revId": "74a0ef0f4f4f8a373f7b8c3bc4a12e908ec3503e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -16,6 +16,24 @@
       "message": "How about:\n\n\ta: [string]: x: y: z: 5\n\tb: w: x: y: z: 5\n\tb: a\n\nWill that still guarantee the removal of the fields in b, and not the pattern?",
       "revId": "32497eec6eab46eb65234cebcc7169a2886b4e9d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9c0dfea_ac4b5ba7",
+        "filename": "tools/trim/trimv3.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 450,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-17T11:09:27Z",
+      "side": 1,
+      "message": "Yes. I consider a pattern as part of the API of a struct. So it must survive and not be made less specific.\nThis is achieved by fully exploring and simplifying patterns within a vertex in isolation. If the pattern on its own can be simplified, that\u0027s fine, but if the pattern is reachable from the root then it must survive and not be made more general.\nTest 61 added.",
+      "parentUuid": "e2a261a3_a039766d",
+      "revId": "32497eec6eab46eb65234cebcc7169a2886b4e9d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -16,6 +16,24 @@
       "message": "I only mention this because I tend to prefer this form: `fmt.Fprintf(w, \"%*s\", 60-n, \"\")`. I think it\u0027s a touch more elegant than repeating a space. But :shrug:",
       "revId": "0973a5e33e5987aac8dafaaf4632ccdcc8400a04",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54b50c61_27db67c5",
+        "filename": "internal/core/adt/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-17T16:18:26Z",
+      "side": 1,
+      "message": "Lame excuse to leave as it: It will require me to rerun the tests for a good chunk of the stack whereas otherwise this is not necessary. But happy to change later if you wish.",
+      "parentUuid": "0ce0c7f3_90e9784f",
+      "revId": "0973a5e33e5987aac8dafaaf4632ccdcc8400a04",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

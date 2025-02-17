@@ -89,7 +89,10 @@ Result:
   bar: (_|_){
     // [eval] bar.c: field not allowed:
     //     ./in.cue:12:7
-    c: (int){ 2 }
+    c: (_|_){
+      // [eval] bar.c: field not allowed:
+      //     ./in.cue:12:7
+    }
     field: (int){ int }
   }
   baz: (#struct){
@@ -110,7 +113,7 @@ diff old new
      ./in.cue:12:7
  
  Result:
-@@ -16,28 +13,17 @@
+@@ -16,28 +13,20 @@
        b: (int){ 2 }
      }) }
    foo: (#struct){
@@ -125,16 +128,15 @@ diff old new
 -    //     ./in.cue:11:6
      //     ./in.cue:12:7
 -    field: (int){ int }
--    c: (_|_){
--      // [eval] bar.c: field not allowed:
+     c: (_|_){
+       // [eval] bar.c: field not allowed:
 -      //     ./in.cue:1:7
 -      //     ./in.cue:4:2
 -      //     ./in.cue:5:2
 -      //     ./in.cue:11:6
--      //     ./in.cue:12:7
--    }
+       //     ./in.cue:12:7
+     }
 -    b: (int){ 2 }
-+    c: (int){ 2 }
 +    field: (int){ int }
    }
    baz: (#struct){

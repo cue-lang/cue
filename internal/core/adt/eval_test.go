@@ -137,6 +137,7 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, flags cued
 	ctx := e.NewContext(v)
 	ctx.Version = version
 	ctx.Config = flags
+	ctx.SimplifyValidators = t.HasTag("simplifyValidators")
 	v.Finalize(ctx)
 
 	switch counts := ctx.Stats(); {

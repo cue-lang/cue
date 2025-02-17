@@ -32,8 +32,9 @@ type Runtime struct {
 	// the kind in a file-level @extern(kind) attribute.
 	interpreters map[string]Interpreter
 
-	version  internal.EvaluatorVersion
-	topoSort bool
+	version            internal.EvaluatorVersion
+	topoSort           bool
+	simplifyValidators bool
 
 	flags cuedebug.Config
 }
@@ -45,6 +46,7 @@ func (r *Runtime) Settings() (internal.EvaluatorVersion, cuedebug.Config) {
 func (r *Runtime) ConfigureOpCtx(ctx *adt.OpContext) {
 	ctx.Version = r.version
 	ctx.TopoSort = r.topoSort
+	ctx.SimplifyValidators = r.simplifyValidators
 	ctx.Config = r.flags
 }
 

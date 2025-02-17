@@ -535,6 +535,10 @@ func (x *BoundExpr) evaluate(ctx *OpContext, state combinedFlags) Value {
 		return &BoundValue{x.Src, x.Op, v}
 	}
 
+	if !ctx.SimplifyValidators {
+		goto finalCheck
+	}
+
 	// This simplifies boundary expressions. It is an alternative to an
 	// evaluation strategy that makes nodes increasingly more specific.
 	//
@@ -608,6 +612,8 @@ func (x *BoundExpr) evaluate(ctx *OpContext, state combinedFlags) Value {
 			return nil
 		}
 	}
+
+finalCheck:
 	if v.Concreteness() > Concrete {
 		// TODO(errors): analyze dependencies of x.Expr to get positions.
 		ctx.addErrf(IncompleteError, token.NoPos, // TODO(errors): use ctx.pos()?

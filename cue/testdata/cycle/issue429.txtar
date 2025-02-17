@@ -53,11 +53,11 @@ Leaks:  0
 Freed:  98
 Reused: 91
 Allocs: 7
-Retain: 12
+Retain: 24
 
 Unifications: 40
-Conjuncts:    150
-Disjuncts:    101
+Conjuncts:    162
+Disjuncts:    113
 -- out/evalalpha --
 Errors:
 er3.min: 2 errors in empty disjunction:
@@ -126,11 +126,21 @@ Result:
     res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
   }
   #nonEmptyRange: (#struct){
-    min: (int){ |(*(int){ 1 }, (int){ int }) }
+    min: (_|_){
+      // [incomplete] #nonEmptyRange.min: non-concrete value max for bound <:
+      //     ./in.cue:29:8
+    }
     max: (number){ >1 }
   }
   r1: (#struct){
-    min: (int){ 3 }
+    min: (_|_){
+      // [incomplete] r1.min: 2 errors in empty disjunction:
+      // r1.min: conflicting values 1 and 3:
+      //     ./in.cue:28:8
+      //     ./in.cue:33:7
+      // r1.min: non-concrete value max for bound <:
+      //     ./in.cue:29:8
+    }
     max: (number){ >3 }
   }
   r2: (#struct){
@@ -232,21 +242,23 @@ diff old new
        //     ./in.cue:21:7
        //     ./in.cue:22:7
        // es3.max: invalid value 5 (out of bound >10):
-@@ -70,11 +62,10 @@
+@@ -70,6 +62,7 @@
        //     ./in.cue:5:7
        //     ./in.cue:22:7
      }
 +    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
    }
    #nonEmptyRange: (#struct){
--    min: (_|_){
--      // [cycle] cycle error
--    }
-+    min: (int){ |(*(int){ 1 }, (int){ int }) }
-     max: (number){ >1 }
-   }
-   r1: (#struct){
-@@ -82,8 +73,8 @@
+     min: (_|_){
+@@ -83,7 +76,6 @@
+       // [incomplete] r1.min: 2 errors in empty disjunction:
+       // r1.min: conflicting values 1 and 3:
+       //     ./in.cue:28:8
+-      //     ./in.cue:32:5
+       //     ./in.cue:33:7
+       // r1.min: non-concrete value max for bound <:
+       //     ./in.cue:29:8
+@@ -91,8 +83,8 @@
      max: (number){ >3 }
    }
    r2: (#struct){
@@ -256,7 +268,7 @@ diff old new
    }
    r3: (#struct){
      min: (int){ 3 }
-@@ -95,17 +86,15 @@
+@@ -104,17 +96,15 @@
        // [eval] er3.min: 2 errors in empty disjunction:
        // er3.min: conflicting values 1 and 5:
        //     ./in.cue:28:8
@@ -372,12 +384,21 @@ Result:
   }
   #nonEmptyRange: (#struct){
     min: (_|_){
-      // [cycle] cycle error
+      // [incomplete] #nonEmptyRange.min: non-concrete value max for bound <:
+      //     ./in.cue:29:8
     }
     max: (number){ >1 }
   }
   r1: (#struct){
-    min: (int){ 3 }
+    min: (_|_){
+      // [incomplete] r1.min: 2 errors in empty disjunction:
+      // r1.min: conflicting values 1 and 3:
+      //     ./in.cue:28:8
+      //     ./in.cue:32:5
+      //     ./in.cue:33:7
+      // r1.min: non-concrete value max for bound <:
+      //     ./in.cue:29:8
+    }
     max: (number){ >3 }
   }
   r2: (#struct){

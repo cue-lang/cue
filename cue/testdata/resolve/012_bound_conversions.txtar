@@ -54,62 +54,6 @@ Retain: 0
 Unifications: 12
 Conjuncts:    35
 Disjuncts:    12
--- out/evalalpha --
-Errors:
-c4: conflicting values 1.2 and int (mismatched types float and int):
-    ./in.cue:14:5
-    ./in.cue:14:23
-c1: invalid value 1.2 (out of bound >1.3):
-    ./in.cue:10:12
-    ./in.cue:10:6
-c2: invalid value 1.2 (out of bound >1.3):
-    ./in.cue:11:12
-    ./in.cue:11:5
-
-Result:
-(_|_){
-  // [eval]
-  r0: (int){ 1 }
-  r1: (int){ 1 }
-  r2: (int){ 1 }
-  r3: (int){ -1 }
-  r4: (int){ -1 }
-  r5: (number){ 1.1 }
-  r6: (float){ 1.1 }
-  c1: (_|_){
-    // [eval] c1: invalid value 1.2 (out of bound >1.3):
-    //     ./in.cue:10:12
-    //     ./in.cue:10:6
-  }
-  c2: (_|_){
-    // [eval] c2: invalid value 1.2 (out of bound >1.3):
-    //     ./in.cue:11:12
-    //     ./in.cue:11:5
-  }
-  c3: (float){ 1.2 }
-  c4: (_|_){
-    // [eval] c4: conflicting values 1.2 and int (mismatched types float and int):
-    //     ./in.cue:14:5
-    //     ./in.cue:14:23
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -18,7 +18,7 @@
-   r3: (int){ -1 }
-   r4: (int){ -1 }
-   r5: (number){ 1.1 }
--  r6: (number){ 1.1 }
-+  r6: (float){ 1.1 }
-   c1: (_|_){
-     // [eval] c1: invalid value 1.2 (out of bound >1.3):
-     //     ./in.cue:10:12
--- diff/todo/p3 --
-Seems like a correct fix, but investigate.
-This is independent from the fact that we probably
-want to relax the type of float literals to number.
 -- out/eval --
 Errors:
 c4: conflicting values 1.2 and int (mismatched types float and int):
@@ -125,13 +69,13 @@ c2: invalid value 1.2 (out of bound >1.3):
 Result:
 (_|_){
   // [eval]
-  r0: (int){ 1 }
-  r1: (int){ 1 }
-  r2: (int){ 1 }
-  r3: (int){ -1 }
-  r4: (int){ -1 }
-  r5: (number){ 1.1 }
-  r6: (number){ 1.1 }
+  r0: (int){ &(>0.1, <=1.9, int) }
+  r1: (int){ &(>0.1, <1.9, int) }
+  r2: (int){ &(>=0.1, <1.9, int) }
+  r3: (int){ &(>=-1.9, <=-0.1, int) }
+  r4: (int){ &(>-1.9, <=-0.1, int) }
+  r5: (number){ &(>=1.1, <=1.1) }
+  r6: (float){ 1.1 }
   c1: (_|_){
     // [eval] c1: invalid value 1.2 (out of bound >1.3):
     //     ./in.cue:10:12

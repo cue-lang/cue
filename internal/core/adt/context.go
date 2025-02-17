@@ -95,8 +95,9 @@ type OpContext struct {
 	Format func(Runtime, Node) string
 
 	cuedebug.Config
-	Version  internal.EvaluatorVersion // Copied from Runtime
-	TopoSort bool                      // Copied from Runtime
+	Version            internal.EvaluatorVersion // Copied from Runtime
+	TopoSort           bool                      // Copied from Runtime
+	SimplifyValidators bool                      // Copied from Runtime
 
 	taskContext
 

@@ -221,6 +221,9 @@ type closeContext struct {
 	// hasTop indicates a node has at least one top conjunct.
 	hasTop bool
 
+	// hasStruct indicates that a node has at least one struct conjunct.
+	hasStruct bool
+
 	// isClosedOnce is true if this closeContext is the result of calling the
 	// close builtin.
 	isClosedOnce bool
@@ -551,7 +554,7 @@ func (c CloseInfo) spawnCloseContext(ctx *OpContext, t closeNodeType) (CloseInfo
 func (c *closeContext) updateClosedInfo(ctx *OpContext) bool {
 	p := c.parent
 
-	if c.isDef && !c.isTotal && !c.hasTop {
+	if c.isDef && !c.isTotal && (!c.hasTop || c.hasStruct) {
 		c.isClosed = true
 		if p != nil {
 			p.isDef = true
@@ -585,6 +588,10 @@ func (c *closeContext) updateClosedInfo(ctx *OpContext) bool {
 	if c.hasTop {
 		p.hasTop = true
 	}
+	// NOTE: we should not pass up hasStruct: this flag is used to "close" a
+	// top that belongs to a single closeContext. This then sets isClosed, which
+	// itself is passed up the parent tree. Passing up hasStruct itself will
+	// have the effect of also closing tops that belong to other closeContexts.
 
 	switch {
 	case c.isTotal:

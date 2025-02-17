@@ -339,6 +339,7 @@ func (ctx *overlayContext) initCloneCC(x *closeContext) {
 	o.isDef = x.isDef
 	o.isDefOrig = x.isDefOrig
 	o.hasTop = x.hasTop
+	o.hasStruct = x.hasStruct
 	o.isClosedOnce = x.isClosedOnce
 	o.isEmbed = x.isEmbed
 	o.isClosed = x.isClosed

@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"maps"
 	"os"
 	"path"
 	"slices"
@@ -50,7 +51,7 @@ func main() {
 }
 
 func listFailures(outw io.Writer, version string, tests map[string][]*externaltest.Schema) {
-	for _, filename := range sortedKeys(tests) {
+	for _, filename := range slices.Sorted(maps.Keys(tests)) {
 		schemas := tests[filename]
 		for _, schema := range schemas {
 			if schema.Skip[version] != "" {
@@ -78,13 +79,4 @@ func testdataPos(p positioner) token.Position {
 	pp := p.Pos().Position()
 	pp.Filename = path.Join(testDir, pp.Filename)
 	return pp
-}
-
-func sortedKeys[T any](m map[string]T) []string {
-	ks := make([]string, 0, len(m))
-	for k := range m {
-		ks = append(ks, k)
-	}
-	slices.Sort(ks)
-	return ks
 }

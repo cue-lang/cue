@@ -6,6 +6,7 @@ package mvs
 
 import (
 	"fmt"
+	"maps"
 	"reflect"
 	"strings"
 	"testing"
@@ -527,10 +528,7 @@ func Test(t *testing.T) {
 				if err == nil {
 					// Copy the reqs map, but substitute the upgraded requirements in
 					// place of the target's original requirements.
-					upReqs := make(reqsMap, len(reqs))
-					for m, r := range reqs {
-						upReqs[m] = r
-					}
+					upReqs := maps.Clone(reqs)
 					upReqs[m(kf[1])] = list
 
 					list, err = Req(m(kf[1]), nil, upReqs)

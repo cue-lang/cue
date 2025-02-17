@@ -18,6 +18,7 @@ import (
 	stdjson "encoding/json"
 	"fmt"
 	"io"
+	"maps"
 	"os"
 	"path"
 	"slices"
@@ -55,7 +56,7 @@ func TestExternal(t *testing.T) {
 	// by the end.
 	cuetdtest.SmallMatrix.Run(t, "tests", func(t *testing.T, m *cuetdtest.M) {
 		// Run tests in deterministic order so we get some consistency between runs.
-		for _, filename := range sortedKeys(tests) {
+		for _, filename := range slices.Sorted(maps.Keys(tests)) {
 			schemas := tests[filename]
 			t.Run(testName(filename), func(t *testing.T) {
 				for _, s := range schemas {
@@ -253,15 +254,6 @@ var extVersionToVersion = map[string]jsonschema.Version{
 	"draft2019-09": jsonschema.VersionDraft2019_09,
 	"draft2020-12": jsonschema.VersionDraft2020_12,
 	"draft-next":   jsonschema.VersionUnknown,
-}
-
-func sortedKeys[T any](m map[string]T) []string {
-	ks := make([]string, 0, len(m))
-	for k := range m {
-		ks = append(ks, k)
-	}
-	slices.Sort(ks)
-	return ks
 }
 
 func writeExternalTestStats(testDir string, tests map[string][]*externaltest.Schema) error {

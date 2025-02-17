@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io/fs"
+	"maps"
 	"runtime"
 	"slices"
 	"strings"
@@ -311,11 +312,8 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 		}
 		return
 	}
-	imports := make([]string, 0, len(importsMap))
-	for imp := range importsMap {
-		imports = append(imports, imp)
-	}
-	slices.Sort(imports) // Make the algorithm deterministic for tests.
+	// Make the algorithm deterministic for tests.
+	imports := slices.Sorted(maps.Keys(importsMap))
 
 	pkg.imports = make([]*Package, 0, len(imports))
 	var importFlags Flags

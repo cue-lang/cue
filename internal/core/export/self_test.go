@@ -16,6 +16,7 @@ package export_test
 
 import (
 	"bytes"
+	"slices"
 	"strings"
 	"testing"
 
@@ -106,8 +107,7 @@ func buildFile(t *testing.T, r *cue.Context, b *build.Instance) cue.Value {
 // file.
 func patch(t *testing.T, r *cue.Context, orig *txtar.Archive, f *ast.File) cue.Value {
 	a := *orig
-	a.Files = make([]txtar.File, len(a.Files))
-	copy(a.Files, orig.Files)
+	a.Files = slices.Clone(orig.Files)
 
 	k := 0
 	for _, f := range a.Files {

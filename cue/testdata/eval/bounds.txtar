@@ -168,7 +168,7 @@ Allocs: 5
 Retain: 1
 
 Unifications: 148
-Conjuncts:    337
+Conjuncts:    437
 Disjuncts:    149
 -- out/evalalpha --
 Errors:
@@ -220,12 +220,6 @@ simplifyBinary.integer.err3.p3: incompatible integer bounds <=2 and >2:
 simplifyBinary.integer.err3.p4: incompatible integer bounds <=2 and >2:
     ./binary.cue:31:19
     ./binary.cue:31:13
-simplifyBinary.integer.err4.p1: incompatible integer bounds >1 and <2:
-    ./binary.cue:33:18
-    ./binary.cue:33:13
-simplifyBinary.integer.err4.p2: incompatible integer bounds >1 and <2:
-    ./binary.cue:34:18
-    ./binary.cue:34:13
 simplifyBinary.strings.err1.p1: incompatible string bounds <"a" and >"b":
     ./binarystring.cue:2:20
     ./binarystring.cue:2:13
@@ -338,8 +332,8 @@ Result:
         p2: (number){ &(>1, <2) }
       }
       ok2: (struct){
-        p1: (number){ 2 }
-        p2: (number){ 2 }
+        p1: (number){ &(>=2, <=2) }
+        p2: (number){ &(>=2, <=2) }
       }
     }
     integer: (_|_){
@@ -393,32 +387,23 @@ Result:
           //     ./binary.cue:31:13
         }
       }
-      err4: (_|_){
-        // [eval]
-        p1: (_|_){
-          // [eval] simplifyBinary.integer.err4.p1: incompatible integer bounds >1 and <2:
-          //     ./binary.cue:33:18
-          //     ./binary.cue:33:13
-        }
-        p2: (_|_){
-          // [eval] simplifyBinary.integer.err4.p2: incompatible integer bounds >1 and <2:
-          //     ./binary.cue:34:18
-          //     ./binary.cue:34:13
-        }
+      err4: (struct){
+        p1: (int){ &(>1, <2, int) }
+        p2: (int){ &(>1, <2, int) }
       }
       ok1: (struct){
         p1: (int){ &(>=2, <=3, int) }
         p2: (int){ &(>=2, <=3, int) }
       }
       ok2: (struct){
-        p1: (int){ 2 }
-        p2: (int){ 2 }
+        p1: (int){ &(>=2, <=2, int) }
+        p2: (int){ &(>=2, <=2, int) }
       }
       ok3: (struct){
-        p1: (int){ 2 }
-        p2: (int){ 3 }
-        p3: (int){ 2 }
-        p4: (int){ 3 }
+        p1: (int){ &(>=2, <3, int) }
+        p2: (int){ &(>2, <=3, int) }
+        p3: (int){ &(>=2, <3, int) }
+        p4: (int){ &(>2, <=3, int) }
       }
     }
     strings: (_|_){
@@ -487,7 +472,7 @@ Result:
         p2: (string){ &(>="b", <="c") }
       }
       ok4: (struct){
-        p1: (string){ "b" }
+        p1: (string){ &(>="b", <="b") }
       }
     }
     byte: (_|_){
@@ -568,34 +553,109 @@ Result:
   b3: (number){ <=5 }
   b4: (number){ >20 }
   b5: (number){ >=21 }
-  b6: (int){ 6 }
+  b6: (int){ &(>5, <=6, int) }
   simplifyExpr: (_|_){
     // [eval]
-    less1: (number){ <3 }
-    less2: (number){ <3 }
-    less3: (number){ <3 }
-    less4: (number){ <=3 }
-    less5: (number){ number }
-    less6: (number){ number }
-    gtr1: (number){ >3 }
-    gtr2: (number){ >3 }
-    gtr3: (number){ >3 }
-    gtr4: (number){ >=3 }
-    gtr5: (number){ number }
-    gtr6: (number){ number }
-    lg1: (number){ number }
-    lg2: (number){ number }
-    lg3: (number){ number }
-    lg4: (number){ number }
-    gl1: (number){ number }
-    gl2: (number){ number }
-    gl3: (number){ number }
-    gl4: (number){ number }
-    ne1: (int){ 3 }
-    ne2: (number){ >=3 }
-    ne3: (number){ >3 }
-    ne4: (number){ <=3 }
-    ne5: (number){ <3 }
+    less1: (_|_){
+      // [incomplete] simplifyExpr.less1: non-concrete value <3 for bound <:
+      //     ./in.cue:13:11
+    }
+    less2: (_|_){
+      // [incomplete] simplifyExpr.less2: non-concrete value <=3 for bound <:
+      //     ./in.cue:14:11
+    }
+    less3: (_|_){
+      // [incomplete] simplifyExpr.less3: non-concrete value <3 for bound <=:
+      //     ./in.cue:15:12
+    }
+    less4: (_|_){
+      // [incomplete] simplifyExpr.less4: non-concrete value <=3 for bound <=:
+      //     ./in.cue:16:12
+    }
+    less5: (_|_){
+      // [incomplete] simplifyExpr.less5: non-concrete value !=3 for bound <:
+      //     ./in.cue:17:11
+    }
+    less6: (_|_){
+      // [incomplete] simplifyExpr.less6: non-concrete value !=3 for bound <=:
+      //     ./in.cue:18:12
+    }
+    gtr1: (_|_){
+      // [incomplete] simplifyExpr.gtr1: non-concrete value >3 for bound >:
+      //     ./in.cue:20:10
+    }
+    gtr2: (_|_){
+      // [incomplete] simplifyExpr.gtr2: non-concrete value >=3 for bound >:
+      //     ./in.cue:21:10
+    }
+    gtr3: (_|_){
+      // [incomplete] simplifyExpr.gtr3: non-concrete value >3 for bound >=:
+      //     ./in.cue:22:11
+    }
+    gtr4: (_|_){
+      // [incomplete] simplifyExpr.gtr4: non-concrete value >=3 for bound >=:
+      //     ./in.cue:23:11
+    }
+    gtr5: (_|_){
+      // [incomplete] simplifyExpr.gtr5: non-concrete value !=3 for bound >:
+      //     ./in.cue:24:10
+    }
+    gtr6: (_|_){
+      // [incomplete] simplifyExpr.gtr6: non-concrete value !=3 for bound >=:
+      //     ./in.cue:25:11
+    }
+    lg1: (_|_){
+      // [incomplete] simplifyExpr.lg1: non-concrete value >3 for bound <:
+      //     ./in.cue:27:9
+    }
+    lg2: (_|_){
+      // [incomplete] simplifyExpr.lg2: non-concrete value >=3 for bound <:
+      //     ./in.cue:28:9
+    }
+    lg3: (_|_){
+      // [incomplete] simplifyExpr.lg3: non-concrete value >3 for bound <=:
+      //     ./in.cue:29:10
+    }
+    lg4: (_|_){
+      // [incomplete] simplifyExpr.lg4: non-concrete value >=3 for bound <=:
+      //     ./in.cue:30:10
+    }
+    gl1: (_|_){
+      // [incomplete] simplifyExpr.gl1: non-concrete value <3 for bound >:
+      //     ./in.cue:32:9
+    }
+    gl2: (_|_){
+      // [incomplete] simplifyExpr.gl2: non-concrete value <=3 for bound >:
+      //     ./in.cue:33:9
+    }
+    gl3: (_|_){
+      // [incomplete] simplifyExpr.gl3: non-concrete value <3 for bound >=:
+      //     ./in.cue:34:10
+    }
+    gl4: (_|_){
+      // [incomplete] simplifyExpr.gl4: non-concrete value <=3 for bound >=:
+      //     ./in.cue:35:10
+    }
+    ne1: (_|_){
+      // [incomplete] simplifyExpr.ne1: non-concrete value !=3 for bound !=:
+      //     ./in.cue:37:10
+    }
+    ne2: (_|_){
+      // [incomplete] simplifyExpr.ne2: non-concrete value <3 for bound !=:
+      //     ./in.cue:38:10
+    }
+    ne3: (_|_){
+      // [incomplete] simplifyExpr.ne3: non-concrete value <=3 for bound !=:
+      //     ./in.cue:39:10
+    }
+    ne4: (_|_){
+      // [incomplete] simplifyExpr.ne4: non-concrete value >3 for bound !=:
+      //     ./in.cue:40:10
+    }
+    ne5: (_|_){
+      // [incomplete] simplifyExpr.ne5: non-concrete value >=3 for bound !=:
+      //     ./in.cue:41:10
+    }
     s: (string){ string }
     n: (number){ number }
     i: (int){ int }
@@ -655,7 +715,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,110 +1,106 @@
+@@ -1,100 +1,100 @@
  Errors:
 -simplifyBinary.byte.err1.p1: incompatible bytes bounds <'a' and >'b':
 -    ./binarystring.cue:27:13
@@ -753,18 +813,6 @@ diff old new
 +simplifyBinary.integer.err3.p4: incompatible integer bounds <=2 and >2:
      ./binary.cue:31:19
 +    ./binary.cue:31:13
- simplifyBinary.integer.err4.p1: incompatible integer bounds >1 and <2:
--    ./binary.cue:21:8
--    ./binary.cue:21:13
--    ./binary.cue:33:13
-     ./binary.cue:33:18
-+    ./binary.cue:33:13
- simplifyBinary.integer.err4.p2: incompatible integer bounds >1 and <2:
--    ./binary.cue:21:8
--    ./binary.cue:21:13
--    ./binary.cue:34:13
-     ./binary.cue:34:18
-+    ./binary.cue:34:13
  simplifyBinary.strings.err1.p1: incompatible string bounds <"a" and >"b":
 -    ./binarystring.cue:2:13
      ./binarystring.cue:2:20
@@ -824,7 +872,7 @@ diff old new
  simplifyExpr.e2: cannot use null for bound >:
      ./in.cue:62:8
  
-@@ -119,13 +115,13 @@
+@@ -109,13 +109,13 @@
          // [eval]
          p1: (_|_){
            // [eval] simplifyBinary.float.err1.p1: incompatible number bounds <1 and >2:
@@ -840,7 +888,7 @@ diff old new
          }
        }
        err2: (_|_){
-@@ -132,13 +128,13 @@
+@@ -122,13 +122,13 @@
          // [eval]
          p1: (_|_){
            // [eval] simplifyBinary.float.err2.p1: incompatible number bounds <=1 and >2:
@@ -856,7 +904,7 @@ diff old new
          }
        }
        err3: (_|_){
-@@ -145,23 +141,23 @@
+@@ -135,23 +135,23 @@
          // [eval]
          p1: (_|_){
            // [eval] simplifyBinary.float.err3.p1: incompatible number bounds <2 and >=2:
@@ -884,7 +932,7 @@ diff old new
          }
        }
        ok1: (struct){
-@@ -178,50 +174,50 @@
+@@ -168,50 +168,50 @@
        err1: (_|_){
          // [eval]
          p1: (_|_){
@@ -970,39 +1018,8 @@ diff old new
 +          //     ./binary.cue:31:13
          }
        }
-       err4: (_|_){
-@@ -228,17 +224,13 @@
-         // [eval]
-         p1: (_|_){
-           // [eval] simplifyBinary.integer.err4.p1: incompatible integer bounds >1 and <2:
--          //     ./binary.cue:21:8
--          //     ./binary.cue:21:13
--          //     ./binary.cue:33:13
-           //     ./binary.cue:33:18
-+          //     ./binary.cue:33:13
-         }
-         p2: (_|_){
-           // [eval] simplifyBinary.integer.err4.p2: incompatible integer bounds >1 and <2:
--          //     ./binary.cue:21:8
--          //     ./binary.cue:21:13
--          //     ./binary.cue:34:13
-           //     ./binary.cue:34:18
-+          //     ./binary.cue:34:13
-         }
-       }
-       ok1: (struct){
-@@ -246,8 +238,8 @@
-         p2: (int){ &(>=2, <=3, int) }
-       }
-       ok2: (struct){
--        p1: (number){ 2 }
--        p2: (number){ 2 }
-+        p1: (int){ 2 }
-+        p2: (int){ 2 }
-       }
-       ok3: (struct){
-         p1: (int){ 2 }
-@@ -262,13 +254,13 @@
+       err4: (struct){
+@@ -239,13 +239,13 @@
          // [eval]
          p1: (_|_){
            // [eval] simplifyBinary.strings.err1.p1: incompatible string bounds <"a" and >"b":
@@ -1018,7 +1035,7 @@ diff old new
          }
        }
        err2: (_|_){
-@@ -275,13 +267,13 @@
+@@ -252,13 +252,13 @@
          // [eval]
          p1: (_|_){
            // [eval] simplifyBinary.strings.err2.p1: incompatible string bounds <="a" and >"b":
@@ -1034,7 +1051,7 @@ diff old new
          }
        }
        err3: (_|_){
-@@ -288,23 +280,23 @@
+@@ -265,23 +265,23 @@
          // [eval]
          p1: (_|_){
            // [eval] simplifyBinary.strings.err3.p1: incompatible string bounds <"b" and >="b":
@@ -1062,7 +1079,7 @@ diff old new
          }
        }
        ok1: (struct){
-@@ -331,13 +323,13 @@
+@@ -308,13 +308,13 @@
          // [eval]
          p1: (_|_){
            // [eval] simplifyBinary.byte.err1.p1: incompatible bytes bounds <'a' and >'b':
@@ -1078,7 +1095,7 @@ diff old new
          }
        }
        err2: (_|_){
-@@ -344,13 +336,13 @@
+@@ -321,13 +321,13 @@
          // [eval]
          p1: (_|_){
            // [eval] simplifyBinary.byte.err2.p1: incompatible bytes bounds <='a' and >'b':
@@ -1094,7 +1111,7 @@ diff old new
          }
        }
        err3: (_|_){
-@@ -357,23 +349,23 @@
+@@ -334,23 +334,23 @@
          // [eval]
          p1: (_|_){
            // [eval] simplifyBinary.byte.err3.p1: incompatible bytes bounds <'b' and >='b':
@@ -1198,16 +1215,6 @@ simplifyBinary.integer.err3.p3: incompatible number bounds <=2 and >2:
 simplifyBinary.integer.err3.p4: incompatible number bounds <=2 and >2:
     ./binary.cue:31:13
     ./binary.cue:31:19
-simplifyBinary.integer.err4.p1: incompatible integer bounds >1 and <2:
-    ./binary.cue:21:8
-    ./binary.cue:21:13
-    ./binary.cue:33:13
-    ./binary.cue:33:18
-simplifyBinary.integer.err4.p2: incompatible integer bounds >1 and <2:
-    ./binary.cue:21:8
-    ./binary.cue:21:13
-    ./binary.cue:34:13
-    ./binary.cue:34:18
 simplifyBinary.strings.err1.p1: incompatible string bounds <"a" and >"b":
     ./binarystring.cue:2:13
     ./binarystring.cue:2:20
@@ -1296,8 +1303,8 @@ Result:
         p2: (number){ &(>1, <2) }
       }
       ok2: (struct){
-        p1: (number){ 2 }
-        p2: (number){ 2 }
+        p1: (number){ &(>=2, <=2) }
+        p2: (number){ &(>=2, <=2) }
       }
     }
     integer: (_|_){
@@ -1351,36 +1358,23 @@ Result:
           //     ./binary.cue:31:19
         }
       }
-      err4: (_|_){
-        // [eval]
-        p1: (_|_){
-          // [eval] simplifyBinary.integer.err4.p1: incompatible integer bounds >1 and <2:
-          //     ./binary.cue:21:8
-          //     ./binary.cue:21:13
-          //     ./binary.cue:33:13
-          //     ./binary.cue:33:18
-        }
-        p2: (_|_){
-          // [eval] simplifyBinary.integer.err4.p2: incompatible integer bounds >1 and <2:
-          //     ./binary.cue:21:8
-          //     ./binary.cue:21:13
-          //     ./binary.cue:34:13
-          //     ./binary.cue:34:18
-        }
+      err4: (struct){
+        p1: (int){ &(>1, <2, int) }
+        p2: (int){ &(>1, <2, int) }
       }
       ok1: (struct){
         p1: (int){ &(>=2, <=3, int) }
         p2: (int){ &(>=2, <=3, int) }
       }
       ok2: (struct){
-        p1: (number){ 2 }
-        p2: (number){ 2 }
+        p1: (int){ &(>=2, <=2, int) }
+        p2: (int){ &(>=2, <=2, int) }
       }
       ok3: (struct){
-        p1: (int){ 2 }
-        p2: (int){ 3 }
-        p3: (int){ 2 }
-        p4: (int){ 3 }
+        p1: (int){ &(>=2, <3, int) }
+        p2: (int){ &(>2, <=3, int) }
+        p3: (int){ &(>=2, <3, int) }
+        p4: (int){ &(>2, <=3, int) }
       }
     }
     strings: (_|_){
@@ -1449,7 +1443,7 @@ Result:
         p2: (string){ &(>="b", <="c") }
       }
       ok4: (struct){
-        p1: (string){ "b" }
+        p1: (string){ &(>="b", <="b") }
       }
     }
     byte: (_|_){
@@ -1530,34 +1524,109 @@ Result:
   b3: (number){ <=5 }
   b4: (number){ >20 }
   b5: (number){ >=21 }
-  b6: (int){ 6 }
+  b6: (int){ &(>5, <=6, int) }
   simplifyExpr: (_|_){
     // [eval]
-    less1: (number){ <3 }
-    less2: (number){ <3 }
-    less3: (number){ <3 }
-    less4: (number){ <=3 }
-    less5: (number){ number }
-    less6: (number){ number }
-    gtr1: (number){ >3 }
-    gtr2: (number){ >3 }
-    gtr3: (number){ >3 }
-    gtr4: (number){ >=3 }
-    gtr5: (number){ number }
-    gtr6: (number){ number }
-    lg1: (number){ number }
-    lg2: (number){ number }
-    lg3: (number){ number }
-    lg4: (number){ number }
-    gl1: (number){ number }
-    gl2: (number){ number }
-    gl3: (number){ number }
-    gl4: (number){ number }
-    ne1: (int){ 3 }
-    ne2: (number){ >=3 }
-    ne3: (number){ >3 }
-    ne4: (number){ <=3 }
-    ne5: (number){ <3 }
+    less1: (_|_){
+      // [incomplete] simplifyExpr.less1: non-concrete value <3 for bound <:
+      //     ./in.cue:13:11
+    }
+    less2: (_|_){
+      // [incomplete] simplifyExpr.less2: non-concrete value <=3 for bound <:
+      //     ./in.cue:14:11
+    }
+    less3: (_|_){
+      // [incomplete] simplifyExpr.less3: non-concrete value <3 for bound <=:
+      //     ./in.cue:15:12
+    }
+    less4: (_|_){
+      // [incomplete] simplifyExpr.less4: non-concrete value <=3 for bound <=:
+      //     ./in.cue:16:12
+    }
+    less5: (_|_){
+      // [incomplete] simplifyExpr.less5: non-concrete value !=3 for bound <:
+      //     ./in.cue:17:11
+    }
+    less6: (_|_){
+      // [incomplete] simplifyExpr.less6: non-concrete value !=3 for bound <=:
+      //     ./in.cue:18:12
+    }
+    gtr1: (_|_){
+      // [incomplete] simplifyExpr.gtr1: non-concrete value >3 for bound >:
+      //     ./in.cue:20:10
+    }
+    gtr2: (_|_){
+      // [incomplete] simplifyExpr.gtr2: non-concrete value >=3 for bound >:
+      //     ./in.cue:21:10
+    }
+    gtr3: (_|_){
+      // [incomplete] simplifyExpr.gtr3: non-concrete value >3 for bound >=:
+      //     ./in.cue:22:11
+    }
+    gtr4: (_|_){
+      // [incomplete] simplifyExpr.gtr4: non-concrete value >=3 for bound >=:
+      //     ./in.cue:23:11
+    }
+    gtr5: (_|_){
+      // [incomplete] simplifyExpr.gtr5: non-concrete value !=3 for bound >:
+      //     ./in.cue:24:10
+    }
+    gtr6: (_|_){
+      // [incomplete] simplifyExpr.gtr6: non-concrete value !=3 for bound >=:
+      //     ./in.cue:25:11
+    }
+    lg1: (_|_){
+      // [incomplete] simplifyExpr.lg1: non-concrete value >3 for bound <:
+      //     ./in.cue:27:9
+    }
+    lg2: (_|_){
+      // [incomplete] simplifyExpr.lg2: non-concrete value >=3 for bound <:
+      //     ./in.cue:28:9
+    }
+    lg3: (_|_){
+      // [incomplete] simplifyExpr.lg3: non-concrete value >3 for bound <=:
+      //     ./in.cue:29:10
+    }
+    lg4: (_|_){
+      // [incomplete] simplifyExpr.lg4: non-concrete value >=3 for bound <=:
+      //     ./in.cue:30:10
+    }
+    gl1: (_|_){
+      // [incomplete] simplifyExpr.gl1: non-concrete value <3 for bound >:
+      //     ./in.cue:32:9
+    }
+    gl2: (_|_){
+      // [incomplete] simplifyExpr.gl2: non-concrete value <=3 for bound >:
+      //     ./in.cue:33:9
+    }
+    gl3: (_|_){
+      // [incomplete] simplifyExpr.gl3: non-concrete value <3 for bound >=:
+      //     ./in.cue:34:10
+    }
+    gl4: (_|_){
+      // [incomplete] simplifyExpr.gl4: non-concrete value <=3 for bound >=:
+      //     ./in.cue:35:10
+    }
+    ne1: (_|_){
+      // [incomplete] simplifyExpr.ne1: non-concrete value !=3 for bound !=:
+      //     ./in.cue:37:10
+    }
+    ne2: (_|_){
+      // [incomplete] simplifyExpr.ne2: non-concrete value <3 for bound !=:
+      //     ./in.cue:38:10
+    }
+    ne3: (_|_){
+      // [incomplete] simplifyExpr.ne3: non-concrete value <=3 for bound !=:
+      //     ./in.cue:39:10
+    }
+    ne4: (_|_){
+      // [incomplete] simplifyExpr.ne4: non-concrete value >3 for bound !=:
+      //     ./in.cue:40:10
+    }
+    ne5: (_|_){
+      // [incomplete] simplifyExpr.ne5: non-concrete value >=3 for bound !=:
+      //     ./in.cue:41:10
+    }
     s: (string){ string }
     n: (number){ number }
     i: (int){ int }

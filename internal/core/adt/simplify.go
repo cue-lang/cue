@@ -86,6 +86,7 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 		case -1:
 		case 0:
 			if x.Op == GreaterEqualOp && y.Op == LessEqualOp {
+				return nil
 				return ctx.NewString(a.Str)
 			}
 			fallthrough
@@ -187,12 +188,15 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 		case diff == 1:
 			if k&FloatKind == 0 {
 				if x.Op == GreaterEqualOp && y.Op == LessThanOp {
+					return nil
 					return ctx.newNum(&lo, k&NumberKind, x, y)
 				}
 				if x.Op == GreaterThanOp && y.Op == LessEqualOp {
+					return nil
 					return ctx.newNum(&hi, k&NumberKind, x, y)
 				}
 				if x.Op == GreaterThanOp && y.Op == LessThanOp {
+					return nil
 					return ctx.NewErrf("incompatible integer bounds %v and %v", x, y)
 				}
 			}
@@ -200,11 +204,13 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 		case diff == 2:
 			if k&FloatKind == 0 && x.Op == GreaterThanOp && y.Op == LessThanOp {
 				_, _ = internal.BaseContext.Add(&d, d.SetInt64(1), &lo)
+				return nil
 				return ctx.newNum(&d, k&NumberKind, x, y)
 			}
 
 		case diff == 0 && err == nil:
 			if x.Op == GreaterEqualOp && y.Op == LessEqualOp {
+				return nil
 				return ctx.newNum(&lo, k&NumberKind, x, y)
 			}
 			fallthrough

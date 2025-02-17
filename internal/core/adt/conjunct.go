@@ -278,6 +278,8 @@ func (n *nodeContext) scheduleStruct(env *Environment,
 	hasEmbed := false
 	hasEllipsis := false
 
+	ci.cc.hasStruct = true
+
 	// TODO: do we still need this?
 	// shouldClose := ci.cc.isDef || ci.cc.isClosedOnce
 
@@ -779,6 +781,9 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 		// only associated with a validator, we leave it to the validator to
 		// decide what fields are allowed.
 		if kind&(ListKind|StructKind) != 0 {
+			if b, ok := x.(*BuiltinValidator); ok && b.Builtin.NonConcrete {
+				id.cc.hasOpenValidator = true
+			}
 			id.cc.hasTop = true
 		}
 

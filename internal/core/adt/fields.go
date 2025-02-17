@@ -221,6 +221,15 @@ type closeContext struct {
 	// hasTop indicates a node has at least one top conjunct.
 	hasTop bool
 
+	// hasStruct indicates that a node has at least one struct conjunct.
+	hasStruct bool
+
+	// hasOpenValidator indicates that a node has at least one validator that
+	// takes a schema as an argument. In such cases we make an exception and
+	// disable closedness checking.
+	// TODO(closedness): remove this discrepancy as part of a closedness redesign.
+	hasOpenValidator bool
+
 	// isClosedOnce is true if this closeContext is the result of calling the
 	// close builtin.
 	isClosedOnce bool
@@ -551,7 +560,17 @@ func (c CloseInfo) spawnCloseContext(ctx *OpContext, t closeNodeType) (CloseInfo
 func (c *closeContext) updateClosedInfo(ctx *OpContext) bool {
 	p := c.parent
 
-	if c.isDef && !c.isTotal && !c.hasTop {
+	// A _ blocks close.
+	blockClose := c.hasTop
+	// Unless it is unified with a struct.
+	if c.hasStruct {
+		blockClose = false
+	}
+	// Unless, in turn, it is openend by a validator.
+	if c.hasOpenValidator {
+		blockClose = true
+	}
+	if c.isDef && !c.isTotal && !blockClose {
 		c.isClosed = true
 		if p != nil {
 			p.isDef = true
@@ -585,6 +604,13 @@ func (c *closeContext) updateClosedInfo(ctx *OpContext) bool {
 	if c.hasTop {
 		p.hasTop = true
 	}
+	if c.hasOpenValidator {
+		p.hasOpenValidator = true
+	}
+	// NOTE: we should not pass up hasStruct: this flag is used to "close" a
+	// top that belongs to a single closeContext. This then sets isClosed, which
+	// itself is passed up the parent tree. Passing up hasStruct itself will
+	// have the effect of also closing tops that belong to other closeContexts.
 
 	switch {
 	case c.isTotal:

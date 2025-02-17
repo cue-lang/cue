@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15c49640_ceb9c796",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 598,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-17T13:31:34Z",
+      "side": 1,
+      "message": "Don\u0027t need this `continue`? Or did you mean for it to be `break`?",
+      "revId": "07473ea0b8d9a99ec1faf9187f85d95c6280ce57",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

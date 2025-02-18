@@ -1,6 +1,7 @@
 -- schema.json --
 {
     "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "https://foo.example/schema",
     "if": {
         "properties": {
             "a": {
@@ -21,7 +22,12 @@
             "b"
         ]
     },
-    "type": "object"
+    "type": "object",
+    "properties": {
+        "c": {
+            "type": "string"
+        }
+    }
 }
 -- out/decode/extract --
 @jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
@@ -33,5 +39,7 @@ matchIf({
 	b!: number
 	...
 }, _) & {
+	@jsonschema(id="https://foo.example/schema")
+	c?: string
 	...
 }

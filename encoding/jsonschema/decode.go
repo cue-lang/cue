@@ -527,10 +527,6 @@ func (s *state) object(n cue.Value) *ast.StructLit {
 	if s.obj == nil {
 		s.obj = &ast.StructLit{}
 		s.objN = n
-
-		if s.id != nil {
-			s.obj.Elts = append(s.obj.Elts, s.idTag())
-		}
 	}
 	return s.obj
 }
@@ -694,8 +690,8 @@ func (s *state) finalize() (e ast.Expr) {
 		}
 	}
 
-	// If an "$id" exists and has not been included in any object constraints
-	if s.id != nil && s.obj == nil {
+	// If an "$id" exists, make sure it's present in the output.
+	if s.id != nil {
 		if st, ok := e.(*ast.StructLit); ok {
 			st.Elts = append([]ast.Decl{s.idTag()}, st.Elts...)
 		} else {

@@ -33,6 +33,24 @@
       "message": "I\u0027d add a comment saying why we need to use defer here perhaps.\n\nThis is semantically quite different to the original, which decremented inValidator immediately after calling evalState. Does that matter at all?",
       "revId": "11e959c5ab13623af3e6f079d8f2f55409c85aaf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75c5b8ff_4c563c34",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1386,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-18T11:58:52Z",
+      "side": 1,
+      "message": "Yes it matters, because evalState may \"suspend\" computation.\n\nI\u0027m not so sure if it is useful, as, to be consistent, I would have to repeat that comment all over the place. If people want more context they can simply rely on their IDE to show the commit message associated with the defer.",
+      "parentUuid": "b48df77d_ca41e479",
+      "revId": "11e959c5ab13623af3e6f079d8f2f55409c85aaf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

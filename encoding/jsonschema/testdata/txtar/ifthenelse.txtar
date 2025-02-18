@@ -39,5 +39,6 @@ matchIf({
 	b!: number
 	...
 }, _) & {
+	c?: string
 	...
 }

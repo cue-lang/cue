@@ -3,7 +3,7 @@
 -- schema.json --
 {
   "$schema": "https://json-schema.org/draft/2019-09/schema",
-  "$id": "https://www.sourcemeta.com/schemas/vendor/json-e@1.json",
+  "$id": "https://www.sourcemeta.com/schemas/vendor/json-eXXXX@1.json",
   "$comment": "https://json-e.js.org",
   "$defs": {
     "jsone-value": {
@@ -69,8 +69,8 @@
 @jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
 _schema
 _schema: {
+	@jsonschema(id="https://www.sourcemeta.com/schemas/vendor/json-eXXXX@1.json")
 	close({
-		@jsonschema(id="https://www.sourcemeta.com/schemas/vendor/json-e@1.json")
 		$else?: #."jsone-value"
 		$let?: close({
 			[string]: null | bool | number | string | [...] | close({
@@ -87,48 +87,13 @@ _schema: {
 
 	#: "jsone-value": matchN(1, [_schema, [..._schema]])
 }
--- diff/-out/decode-v3/extract<==>+out/decode/extract --
-diff old new
---- old
-+++ new
-@@ -1,22 +1,22 @@
-+// JSON-e templates
-+@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
- _schema
- _schema: {
--	// JSON-e templates
--	@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
- 	close({
- 		@jsonschema(id="https://www.sourcemeta.com/schemas/vendor/json-e@1.json")
--		$else?: #["jsone-value"]
-+		$else?: #."jsone-value"
- 		$let?: close({
- 			[string]: null | bool | number | string | [...] | close({
- 				[string]: _schema
- 			})
- 		})
--		$sort?: _schema | [...number]
--		{[!~"^($else|$let|$sort)$"]: #["jsone-value"]}
-+		$sort?: matchN(>=1, [_schema, [...number]])
-+		{[!~"^(\\$else|\\$let|\\$sort)$"]: #."jsone-value"}
- 	})
- 
--	#: "jsone-value": _schema | [..._schema]
--
--	#: "jsone-array": [...#["jsone-value"]]
-+	#: "jsone-array": [...#."jsone-value"]
- 
- 	#: "jsone-object-array": [..._schema]
-+
-+	#: "jsone-value": matchN(1, [_schema, [..._schema]])
- }
 -- out/decode-v3-noshare/extract --
 // JSON-e templates
 @jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
 _schema
 _schema: {
+	@jsonschema(id="https://www.sourcemeta.com/schemas/vendor/json-eXXXX@1.json")
 	close({
-		@jsonschema(id="https://www.sourcemeta.com/schemas/vendor/json-e@1.json")
 		$else?: #."jsone-value"
 		$let?: close({
 			[string]: null | bool | number | string | [...] | close({
@@ -144,62 +109,4 @@ _schema: {
 	#: "jsone-object-array": [..._schema]
 
 	#: "jsone-value": matchN(1, [_schema, [..._schema]])
-}
--- diff/-out/decode-v3-noshare/extract<==>+out/decode/extract --
-diff old new
---- old
-+++ new
-@@ -1,22 +1,22 @@
-+// JSON-e templates
-+@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
- _schema
- _schema: {
--	// JSON-e templates
--	@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
- 	close({
- 		@jsonschema(id="https://www.sourcemeta.com/schemas/vendor/json-e@1.json")
--		$else?: #["jsone-value"]
-+		$else?: #."jsone-value"
- 		$let?: close({
- 			[string]: null | bool | number | string | [...] | close({
- 				[string]: _schema
- 			})
- 		})
--		$sort?: _schema | [...number]
--		{[!~"^($else|$let|$sort)$"]: #["jsone-value"]}
-+		$sort?: matchN(>=1, [_schema, [...number]])
-+		{[!~"^(\\$else|\\$let|\\$sort)$"]: #."jsone-value"}
- 	})
- 
--	#: "jsone-value": _schema | [..._schema]
--
--	#: "jsone-array": [...#["jsone-value"]]
-+	#: "jsone-array": [...#."jsone-value"]
- 
- 	#: "jsone-object-array": [..._schema]
-+
-+	#: "jsone-value": matchN(1, [_schema, [..._schema]])
- }
--- out/decode/extract --
-_schema
-_schema: {
-	// JSON-e templates
-	@jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
-	close({
-		@jsonschema(id="https://www.sourcemeta.com/schemas/vendor/json-e@1.json")
-		$else?: #["jsone-value"]
-		$let?: close({
-			[string]: null | bool | number | string | [...] | close({
-				[string]: _schema
-			})
-		})
-		$sort?: _schema | [...number]
-		{[!~"^($else|$let|$sort)$"]: #["jsone-value"]}
-	})
-
-	#: "jsone-value": _schema | [..._schema]
-
-	#: "jsone-array": [...#["jsone-value"]]
-
-	#: "jsone-object-array": [..._schema]
 }

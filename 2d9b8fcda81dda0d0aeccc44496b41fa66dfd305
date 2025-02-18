@@ -72,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6f1e2c87_f965ab4f",
+        "filename": "tools/trim/evalv3/testdata/11.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-18T08:50:27Z",
+      "side": 1,
+      "message": "It\u0027s not clear what criteria we\u0027d use to disable this - e.g. in the vertex for x.a, you\u0027d find 2 conjuncts, and you\u0027d need to establish that they both come from the same expression somehow? Or we could walk the AST and find where we enter into an explicit unification and block all simplifications within?\nI have to say I don\u0027t understand why this isn\u0027t desirable. I think as a general policy, trim should be aggressive and safe, and the user needs to manually review the changes.",
+      "parentUuid": "e2418273_3d5f6ef7",
+      "revId": "2d9b8fcda81dda0d0aeccc44496b41fa66dfd305",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "87a00bb6_3a6eb3b1",
         "filename": "tools/trim/evalv3/trim.go",
         "patchSetId": 3
@@ -294,6 +312,24 @@
       "side": 1,
       "message": "For the `protocol` arc, the conjunct from the default branch of the disjunction wins.\nFor the `key` arc, the conjunct from line 13 (or 41) wins.\n\nI think it\u0027s actually a shame I don\u0027t remove the full section as it doesn\u0027t specialise anything over the `service` struct from line 9.",
       "parentUuid": "1531d33d_30aca5d7",
+      "revId": "2d9b8fcda81dda0d0aeccc44496b41fa66dfd305",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "39fb9169_50d782f8",
+        "filename": "tools/trim/testdata/kube1.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-18T08:50:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d790c351_24ad7740",
       "revId": "2d9b8fcda81dda0d0aeccc44496b41fa66dfd305",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

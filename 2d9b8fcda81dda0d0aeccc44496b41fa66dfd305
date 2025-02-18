@@ -176,6 +176,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5afd18f2_b82e8f20",
+        "filename": "tools/trim/testdata/defaults.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-18T10:20:04Z",
+      "side": 1,
+      "message": "Although I have done this, I don\u0027t believe it\u0027s necessary (and I would rather not have this change).\nIf you look at the difference between patchset 7 and 8, in every change to the test where a `_` has now been replaced by a `{}`, I believe it\u0027s unnecessary. For a conjunct (in this case any sort of struct) to be removed, there must a proof established that that conjunct is redundant - in this case, that means there must be some other struct that is part of this vertex that is more specific than the removed struct. As such, I don\u0027t see why it\u0027s unsafe to use `_`.\n\nThis is not about:\n```\na: {}\nb: a\nb: {f: `}\n```\nHere, the value of `a` can not be replaced with `_` - that empty struct is guaranteed to survive because in the vertex for `a` it is the only conjunct and it is not redundant.",
+      "parentUuid": "b76b14ea_b9ab23e2",
+      "revId": "2d9b8fcda81dda0d0aeccc44496b41fa66dfd305",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e8b389a9_a746b029",

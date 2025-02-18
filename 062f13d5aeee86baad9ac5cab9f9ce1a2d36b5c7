@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "695da73b_af4c9c35",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-18T11:20:18Z",
+      "side": 1,
+      "message": "Is this the right issue? 3706 was closed last week and doesn\u0027t _seem_ to be related to top.",
+      "range": {
+        "startLine": 35,
+        "startChar": 3,
+        "endLine": 35,
+        "endChar": 10
+      },
+      "revId": "062f13d5aeee86baad9ac5cab9f9ce1a2d36b5c7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

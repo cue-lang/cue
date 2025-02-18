@@ -401,11 +401,11 @@ Reused: 273
 Allocs: 43
 Retain: 0
 
-Unifications: 246
-Conjuncts:    624
+Unifications: 247
+Conjuncts:    623
 Disjuncts:    0
 
-NumCloseIDs: 204
+NumCloseIDs: 202
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -426,11 +426,11 @@ diff old new
 +Allocs: 43
 +Retain: 0
 +
-+Unifications: 246
-+Conjuncts:    624
++Unifications: 247
++Conjuncts:    623
 +Disjuncts:    0
 +
-+NumCloseIDs: 204
++NumCloseIDs: 202
 -- out/eval/stats --
 Leaks:  286
 Freed:  253
@@ -807,9 +807,7 @@ Result:
               input: (_|_){
                 // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle
               }
-              output: (_|_){
-                // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle
-              }
+              output: (_){ _ }
             }
           }
           output: (_){ _ }
@@ -1078,7 +1076,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -43,26 +41,18 @@
+@@ -43,26 +41,16 @@
            // [structural cycle]
            input: (_|_){
              // [structural cycle]
@@ -1105,16 +1103,14 @@ diff old new
 -          }
 +                // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle
 +              }
-+              output: (_|_){
-+                // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle
-+              }
++              output: (_){ _ }
 +            }
 +          }
 +          output: (_){ _ }
          }
        }
      }
-@@ -100,7 +90,7 @@
+@@ -100,7 +88,7 @@
            show: (bool){ true }
          }
          others: (#list){
@@ -1123,7 +1119,7 @@ diff old new
              show: (bool){ true }
            }
          }
-@@ -119,31 +109,22 @@
+@@ -119,31 +107,22 @@
          self: (struct){
            show: (bool){ true }
          }
@@ -1163,7 +1159,7 @@ diff old new
                }
              }
            }
-@@ -163,12 +144,7 @@
+@@ -163,12 +142,7 @@
          }
        }
        #AccountConfig: (#struct){
@@ -1177,7 +1173,7 @@ diff old new
          siblings?: (list){
          }
        }
-@@ -184,10 +160,10 @@
+@@ -184,10 +158,10 @@
        }
        #AccountConfigSub2: (#struct){
          workspaces: (#struct){
@@ -1190,7 +1186,7 @@ diff old new
          }
          siblings?: (list){
          }
-@@ -196,6 +172,9 @@
+@@ -196,6 +170,9 @@
          env1: (struct){
            region1: (struct){
              "env1-r1-account-sub1": (#struct){
@@ -1200,7 +1196,7 @@ diff old new
                workspaces: (#struct){
                  workspaceA: (#struct){
                  }
-@@ -202,19 +181,16 @@
+@@ -202,19 +179,16 @@
                  workspaceB?: (#struct){
                  }
                }
@@ -1226,7 +1222,7 @@ diff old new
                }
              }
            }
-@@ -245,7 +221,7 @@
+@@ -245,7 +219,7 @@
        // [structural cycle]
        f2: (_|_){
          // [structural cycle] structural cycle:
@@ -1235,7 +1231,7 @@ diff old new
        }
        fRec: (_|_){
          // [structural cycle]
-@@ -274,10 +250,8 @@
+@@ -274,10 +248,8 @@
          }
        }
      }
@@ -1248,7 +1244,7 @@ diff old new
          f: (struct){
            in: (number){ number }
            out: (_|_){
-@@ -288,16 +262,22 @@
+@@ -288,16 +260,22 @@
          }
          k00: (int){ 0 }
          k10: (_|_){

@@ -108,10 +108,10 @@ Allocs: 19
 Retain: 0
 
 Unifications: 75
-Conjuncts:    97
+Conjuncts:    95
 Disjuncts:    4
 
-NumCloseIDs: 9
+NumCloseIDs: 7
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -133,10 +133,10 @@ diff old new
 +Retain: 0
 +
 +Unifications: 75
-+Conjuncts:    97
++Conjuncts:    95
 +Disjuncts:    4
 +
-+NumCloseIDs: 9
++NumCloseIDs: 7
 -- out/eval/stats --
 Leaks:  8
 Freed:  115

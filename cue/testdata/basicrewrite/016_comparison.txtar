@@ -800,7 +800,7 @@ lists.eErrPassthrough: invalid right-hand value to '==' (type list): 1: conflict
     ./lists.cue:28:19
 incomplete.eErr4: invalid left-hand value to '==' (type _|_): a: failed arithmetic: division by zero:
     ./structs.cue:77:9
-incomplete.eErr5: invalid right-hand value to '==' (type struct): a: conflicting values int and string (mismatched types int and string):
+incomplete.eErr5: invalid right-hand value to '==' (type struct): a: conflicting values string and int (mismatched types string and int):
     ./structs.cue:79:9
 
 Result:
@@ -923,7 +923,7 @@ Result:
       //     ./structs.cue:77:9
     }
     eErr5: (_|_){
-      // [eval] incomplete.eErr5: invalid right-hand value to '==' (type struct): a: conflicting values int and string (mismatched types int and string):
+      // [eval] incomplete.eErr5: invalid right-hand value to '==' (type struct): a: conflicting values string and int (mismatched types string and int):
       //     ./structs.cue:79:9
     }
     iErr6: (_|_){
@@ -1000,7 +1000,7 @@ diff old new
 +incomplete.eErr4: invalid left-hand value to '==' (type _|_): a: failed arithmetic: division by zero:
      ./structs.cue:77:9
 -incomplete.eErr5: invalid right-hand value to '==' (type struct): incomplete.a: conflicting values int and string (mismatched types int and string):
-+incomplete.eErr5: invalid right-hand value to '==' (type struct): a: conflicting values int and string (mismatched types int and string):
++incomplete.eErr5: invalid right-hand value to '==' (type struct): a: conflicting values string and int (mismatched types string and int):
      ./structs.cue:79:9
  
  Result:
@@ -1046,7 +1046,7 @@ diff old new
      }
      eErr5: (_|_){
 -      // [eval] incomplete.eErr5: invalid right-hand value to '==' (type struct): incomplete.a: conflicting values int and string (mismatched types int and string):
-+      // [eval] incomplete.eErr5: invalid right-hand value to '==' (type struct): a: conflicting values int and string (mismatched types int and string):
++      // [eval] incomplete.eErr5: invalid right-hand value to '==' (type struct): a: conflicting values string and int (mismatched types string and int):
        //     ./structs.cue:79:9
      }
      iErr6: (_|_){

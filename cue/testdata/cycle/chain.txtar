@@ -1664,17 +1664,17 @@ diff old new
    }
 -- out/evalalpha/stats --
 Leaks:  152
-Freed:  2997
-Reused: 2937
-Allocs: 212
+Freed:  2975
+Reused: 2921
+Allocs: 206
 Retain: 0
 
-Unifications: 940
-Conjuncts:    5024
+Unifications: 924
+Conjuncts:    4994
 Disjuncts:    1615
 Notifications: 15
 
-NumCloseIDs: 1515
+NumCloseIDs: 1501
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -1694,17 +1694,17 @@ diff old new
 -
 -NumCloseIDs: 130
 +Leaks:  152
-+Freed:  2997
-+Reused: 2937
-+Allocs: 212
++Freed:  2975
++Reused: 2921
++Allocs: 206
 +Retain: 0
 +
-+Unifications: 940
-+Conjuncts:    5024
++Unifications: 924
++Conjuncts:    4994
 +Disjuncts:    1615
 +Notifications: 15
 +
-+NumCloseIDs: 1515
++NumCloseIDs: 1501
 -- out/eval/stats --
 Leaks:  56
 Freed:  1788

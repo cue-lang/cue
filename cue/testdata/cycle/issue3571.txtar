@@ -38,21 +38,24 @@ Unifications: 54
 Conjuncts:    125
 Disjuncts:    73
 -- out/evalalpha --
-(struct){
-  simplified: (#struct){
-    in: (#struct){
-      x: (#struct){
-        in: (_){ _ }
-        x: (_){ _ }
+Errors:
+simplified.in.in: structural cycle
+
+Result:
+(_|_){
+  // [structural cycle]
+  simplified: (_|_){
+    // [structural cycle]
+    in: (_|_){
+      // [structural cycle]
+      x: ~(simplified.#T)
+      in: (_|_){
+        // [structural cycle] simplified.in.in: structural cycle
       }
-      in: ~(simplified.in.x)
     }
     x: (#struct){
-      x: (#struct){
-        in: (_){ _ }
-        x: (_){ _ }
-      }
-      in: ~(simplified.x.x)
+      x: ~(simplified.#T)
+      in: ~(simplified.#T)
     }
     #T: (#struct){
       in: (_){ _ }
@@ -100,10 +103,10 @@ Disjuncts:    73
 diff old new
 --- old
 +++ new
-@@ -1,24 +1,18 @@
- (struct){
-   simplified: (#struct){
-     in: (#struct){
+@@ -1,24 +1,21 @@
+-(struct){
+-  simplified: (#struct){
+-    in: (#struct){
 -      in: (#struct){
 -        in: (_){ _ }
 -        x: (_){ _ }
@@ -111,12 +114,20 @@ diff old new
 -      x: (#struct){
 -        in: (_){ _ }
 -        x: (_){ _ }
--      }
-+      x: (#struct){
-+        in: (_){ _ }
-+        x: (_){ _ }
-+      }
-+      in: ~(simplified.in.x)
++Errors:
++simplified.in.in: structural cycle
++
++Result:
++(_|_){
++  // [structural cycle]
++  simplified: (_|_){
++    // [structural cycle]
++    in: (_|_){
++      // [structural cycle]
++      x: ~(simplified.#T)
++      in: (_|_){
++        // [structural cycle] simplified.in.in: structural cycle
+       }
      }
      x: (#struct){
 -      in: (#struct){
@@ -127,15 +138,12 @@ diff old new
 -        in: (_){ _ }
 -        x: (_){ _ }
 -      }
-+      x: (#struct){
-+        in: (_){ _ }
-+        x: (_){ _ }
-+      }
-+      in: ~(simplified.x.x)
++      x: ~(simplified.#T)
++      in: ~(simplified.#T)
      }
      #T: (#struct){
        in: (_){ _ }
-@@ -28,52 +22,30 @@
+@@ -28,52 +25,30 @@
    issue3571: (struct){
      a: (#struct){
        in: (#struct){

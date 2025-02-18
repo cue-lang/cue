@@ -577,14 +577,14 @@ resolveToAncestor: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  877
+Leaks:  866
 Freed:  0
 Reused: 0
-Allocs: 877
+Allocs: 866
 Retain: 0
 
-Unifications: 597
-Conjuncts:    1491
+Unifications: 586
+Conjuncts:    1462
 Disjuncts:    157
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -596,17 +596,17 @@ diff old new
 -Reused: 831
 -Allocs: 28
 -Retain: 68
-+Leaks:  877
++Leaks:  866
 +Freed:  0
 +Reused: 0
-+Allocs: 877
++Allocs: 866
 +Retain: 0
  
 -Unifications: 673
 -Conjuncts:    1299
 -Disjuncts:    896
-+Unifications: 597
-+Conjuncts:    1491
++Unifications: 586
++Conjuncts:    1462
 +Disjuncts:    157
 -- out/eval/stats --
 Leaks:  16
@@ -719,7 +719,7 @@ resolveToAncestor.t1.X.b: structural cycle
 resolveToAncestor.t2.X.b: structural cycle
 shortPathFail.elipsis.t2.Foo.ref: structural cycle
 withLetFail.schema.next: structural cycle
-z1.z.g.h: structural cycle
+z1.z.g: structural cycle
 3: structural cycle:
     ./in.cue:371:9
 e4.a.0.0: cannot combine regular field "c" with [1,_|_(cycle error)]:
@@ -1745,13 +1745,12 @@ Result:
       // [structural cycle]
       f: (_|_){
         // [structural cycle]
-        h: ~(z1.z.g)
+        h: (_|_){
+          // [structural cycle] z1.z.g: structural cycle
+        }
       }
       g: (_|_){
-        // [structural cycle]
-        h: (_|_){
-          // [structural cycle] z1.z.g.h: structural cycle
-        }
+        // [structural cycle] z1.z.g: structural cycle
       }
     }
   }
@@ -1762,11 +1761,8 @@ Result:
         y: (_){ _ }
       }
       C: (struct){
-        x: (struct){
-          x: (_){ _ }
-          y: (_){ _ }
-        }
-        y: ~(crossRefNoCycle.t1.C.x)
+        x: ~(crossRefNoCycle.t1.T)
+        y: ~(crossRefNoCycle.t1.T)
       }
     }
     t2: (struct){
@@ -1775,11 +1771,8 @@ Result:
         y: (_){ _ }
       }
       C: (struct){
-        x: (struct){
-          x: (_){ _ }
-          y: (_){ _ }
-        }
-        y: ~(crossRefNoCycle.t2.C.x)
+        x: ~(crossRefNoCycle.t2.T)
+        y: ~(crossRefNoCycle.t2.T)
       }
     }
     t3: (struct){
@@ -1789,13 +1782,9 @@ Result:
         z: (_){ _ }
       }
       C: (struct){
-        x: (struct){
-          x: (_){ _ }
-          y: (_){ _ }
-          z: (_){ _ }
-        }
-        y: ~(crossRefNoCycle.t3.C.x)
-        z: ~(crossRefNoCycle.t3.C.x)
+        x: ~(crossRefNoCycle.t3.T)
+        y: ~(crossRefNoCycle.t3.T)
+        z: ~(crossRefNoCycle.t3.T)
       }
     }
     t4: (struct){
@@ -1806,13 +1795,9 @@ Result:
       }
       C: (struct){
         x: (struct){
-          x: (struct){
-            x: (_){ _ }
-            y: (_){ _ }
-            z: (_){ _ }
-          }
-          y: ~(crossRefNoCycle.t4.C.x.x)
-          z: ~(crossRefNoCycle.t4.C.x.x)
+          x: ~(crossRefNoCycle.t4.T)
+          y: ~(crossRefNoCycle.t4.T)
+          z: ~(crossRefNoCycle.t4.T)
         }
         y: ~(crossRefNoCycle.t4.C.x)
         z: ~(crossRefNoCycle.t4.C.x)
@@ -1991,13 +1976,14 @@ diff old new
 +shortPathFail.elipsis.t2.Foo.ref: structural cycle
  withLetFail.schema.next: structural cycle
 -z1.z.f.h: structural cycle
- z1.z.g.h: structural cycle
+-z1.z.g.h: structural cycle
 -resolveToAncestor.t1.X.b: structural cycle:
 -    ./edge.cue:3:6
 -d1.r: structural cycle:
 -    ./in.cue:301:26
 -d3.x.indirect: structural cycle:
 -    ./in.cue:316:12
++z1.z.g: structural cycle
 +3: structural cycle:
 +    ./in.cue:371:9
 +e4.a.0.0: cannot combine regular field "c" with [1,_|_(cycle error)]:
@@ -2592,45 +2578,69 @@ diff old new
          }, (struct){
            head: (int){ 3 }
          }) }
-@@ -1082,9 +1124,7 @@
-       // [structural cycle]
+@@ -1083,14 +1125,11 @@
        f: (_|_){
          // [structural cycle]
--        h: (_|_){
+         h: (_|_){
 -          // [structural cycle] z1.z.f.h: structural cycle
 -        }
-+        h: ~(z1.z.g)
+-      }
+-      g: (_|_){
+-        // [structural cycle]
+-        h: (_|_){
+-          // [structural cycle] z1.z.g.h: structural cycle
+-        }
++          // [structural cycle] z1.z.g: structural cycle
++        }
++      }
++      g: (_|_){
++        // [structural cycle] z1.z.g: structural cycle
        }
-       g: (_|_){
-         // [structural cycle]
-@@ -1105,10 +1145,7 @@
-           x: (_){ _ }
-           y: (_){ _ }
-         }
+     }
+   }
+@@ -1101,14 +1140,8 @@
+         y: (_){ _ }
+       }
+       C: (struct){
+-        x: (struct){
+-          x: (_){ _ }
+-          y: (_){ _ }
+-        }
 -        y: (struct){
 -          x: (_){ _ }
 -          y: (_){ _ }
 -        }
-+        y: ~(crossRefNoCycle.t1.C.x)
++        x: ~(crossRefNoCycle.t1.T)
++        y: ~(crossRefNoCycle.t1.T)
        }
      }
      t2: (struct){
-@@ -1121,10 +1158,7 @@
-           x: (_){ _ }
-           y: (_){ _ }
-         }
+@@ -1117,14 +1150,8 @@
+         y: (_){ _ }
+       }
+       C: (struct){
+-        x: (struct){
+-          x: (_){ _ }
+-          y: (_){ _ }
+-        }
 -        y: (struct){
 -          x: (_){ _ }
 -          y: (_){ _ }
 -        }
-+        y: ~(crossRefNoCycle.t2.C.x)
++        x: ~(crossRefNoCycle.t2.T)
++        y: ~(crossRefNoCycle.t2.T)
        }
      }
      t3: (struct){
-@@ -1139,16 +1173,8 @@
-           y: (_){ _ }
-           z: (_){ _ }
-         }
+@@ -1134,21 +1161,9 @@
+         z: (_){ _ }
+       }
+       C: (struct){
+-        x: (struct){
+-          x: (_){ _ }
+-          y: (_){ _ }
+-          z: (_){ _ }
+-        }
 -        y: (struct){
 -          x: (_){ _ }
 -          y: (_){ _ }
@@ -2641,15 +2651,21 @@ diff old new
 -          y: (_){ _ }
 -          z: (_){ _ }
 -        }
-+        y: ~(crossRefNoCycle.t3.C.x)
-+        z: ~(crossRefNoCycle.t3.C.x)
++        x: ~(crossRefNoCycle.t3.T)
++        y: ~(crossRefNoCycle.t3.T)
++        z: ~(crossRefNoCycle.t3.T)
        }
      }
      t4: (struct){
-@@ -1164,51 +1190,11 @@
-             y: (_){ _ }
-             z: (_){ _ }
-           }
+@@ -1159,56 +1174,12 @@
+       }
+       C: (struct){
+         x: (struct){
+-          x: (struct){
+-            x: (_){ _ }
+-            y: (_){ _ }
+-            z: (_){ _ }
+-          }
 -          y: (struct){
 -            x: (_){ _ }
 -            y: (_){ _ }
@@ -2695,15 +2711,16 @@ diff old new
 -            z: (_){ _ }
 -          }
 -        }
-+          y: ~(crossRefNoCycle.t4.C.x.x)
-+          z: ~(crossRefNoCycle.t4.C.x.x)
++          x: ~(crossRefNoCycle.t4.T)
++          y: ~(crossRefNoCycle.t4.T)
++          z: ~(crossRefNoCycle.t4.T)
 +        }
 +        y: ~(crossRefNoCycle.t4.C.x)
 +        z: ~(crossRefNoCycle.t4.C.x)
        }
      }
      t5: (struct){
-@@ -1219,18 +1205,8 @@
+@@ -1219,18 +1190,8 @@
          }
        }
        C: (struct){
@@ -2724,7 +2741,7 @@ diff old new
        }
      }
    }
-@@ -1253,19 +1229,19 @@
+@@ -1253,19 +1214,19 @@
      }
    }
    n4: (struct){

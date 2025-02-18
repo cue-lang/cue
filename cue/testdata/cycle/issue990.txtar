@@ -80,15 +80,15 @@ out: #sub & {#p: _test.s1}
 -- diff/todo/p3 --
 Reordering
 -- out/evalalpha/stats --
-Leaks:  1265
+Leaks:  1251
 Freed:  0
 Reused: 0
-Allocs: 1265
+Allocs: 1251
 Retain: 0
 
-Unifications: 243
-Conjuncts:    2901
-Disjuncts:    204
+Unifications: 239
+Conjuncts:    2817
+Disjuncts:    202
 -- out/evalalpha --
 (struct){
   #AC: (#struct){
@@ -288,14 +288,7 @@ Disjuncts:    204
       k: (string){ "complex" }
     }
     dict: (#struct){
-      r1: (#struct){
-        a: (#struct){
-          d: (#struct){
-            n: (string){ "c1" }
-          }
-          k: (string){ "simple" }
-        }
-      }
+      r1: ~(out.#p.d.r.r1)
       r2_r1: (#struct){
         a: (#struct){
           d: (#struct){
@@ -328,18 +321,18 @@ diff old new
 -Reused: 3213
 -Allocs: 25
 -Retain: 26
-+Leaks:  1265
++Leaks:  1251
 +Freed:  0
 +Reused: 0
-+Allocs: 1265
++Allocs: 1251
 +Retain: 0
  
 -Unifications: 2588
 -Conjuncts:    12056
 -Disjuncts:    3258
-+Unifications: 243
-+Conjuncts:    2901
-+Disjuncts:    204
++Unifications: 239
++Conjuncts:    2817
++Disjuncts:    202
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
@@ -396,7 +389,7 @@ diff old new
      dict: (#struct){
      }
      let subs#1multi = (〈3;#sub〉 & {
-@@ -53,190 +34,190 @@
+@@ -53,190 +34,183 @@
    }
    _test: (struct){
      c1: (#struct){
@@ -642,6 +635,16 @@ diff old new
 -          }
 -        }
 -      }
+-    }
+-    dict: (#struct){
+-      r1: (#struct){
+-        a: (#struct){
+-          k: (string){ "simple" }
+-          d: (#struct){
+-            n: (string){ "c1" }
+-          }
+-        }
+-      }
 +      d: (#struct){
 +        n: (string){ "s1" }
 +        r: (#struct){
@@ -692,20 +695,9 @@ diff old new
 +        }
 +      }
 +      k: (string){ "complex" }
-     }
-     dict: (#struct){
-       r1: (#struct){
-         a: (#struct){
--          k: (string){ "simple" }
--          d: (#struct){
--            n: (string){ "c1" }
--          }
-+          d: (#struct){
-+            n: (string){ "c1" }
-+          }
-+          k: (string){ "simple" }
-         }
-       }
++    }
++    dict: (#struct){
++      r1: ~(out.#p.d.r.r1)
        r2_r1: (#struct){
          a: (#struct){
 -          k: (string){ "simple" }

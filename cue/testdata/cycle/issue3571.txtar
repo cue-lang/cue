@@ -41,18 +41,12 @@ Disjuncts:    73
 (struct){
   simplified: (#struct){
     in: (#struct){
-      x: (#struct){
-        in: (_){ _ }
-        x: (_){ _ }
-      }
-      in: ~(simplified.in.x)
+      x: ~(simplified.#T)
+      in: ~(simplified.#T)
     }
     x: (#struct){
-      x: (#struct){
-        in: (_){ _ }
-        x: (_){ _ }
-      }
-      in: ~(simplified.x.x)
+      x: ~(simplified.#T)
+      in: ~(simplified.#T)
     }
     #T: (#struct){
       in: (_){ _ }
@@ -100,7 +94,7 @@ Disjuncts:    73
 diff old new
 --- old
 +++ new
-@@ -1,24 +1,18 @@
+@@ -1,24 +1,12 @@
  (struct){
    simplified: (#struct){
      in: (#struct){
@@ -112,11 +106,8 @@ diff old new
 -        in: (_){ _ }
 -        x: (_){ _ }
 -      }
-+      x: (#struct){
-+        in: (_){ _ }
-+        x: (_){ _ }
-+      }
-+      in: ~(simplified.in.x)
++      x: ~(simplified.#T)
++      in: ~(simplified.#T)
      }
      x: (#struct){
 -      in: (#struct){
@@ -127,15 +118,12 @@ diff old new
 -        in: (_){ _ }
 -        x: (_){ _ }
 -      }
-+      x: (#struct){
-+        in: (_){ _ }
-+        x: (_){ _ }
-+      }
-+      in: ~(simplified.x.x)
++      x: ~(simplified.#T)
++      in: ~(simplified.#T)
      }
      #T: (#struct){
        in: (_){ _ }
-@@ -28,52 +22,30 @@
+@@ -28,52 +16,30 @@
    issue3571: (struct){
      a: (#struct){
        in: (#struct){

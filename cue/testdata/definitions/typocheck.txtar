@@ -626,20 +626,20 @@ issue4006: {
 	out: #C & #B
 }
 -- out/evalalpha/stats --
-Leaks:  47
-Freed:  876
-Reused: 819
-Allocs: 104
+Leaks:  46
+Freed:  875
+Reused: 818
+Allocs: 103
 Retain: 0
 
-Unifications: 756
-Conjuncts:    1520
+Unifications: 755
+Conjuncts:    1513
 Disjuncts:    84
 Notifications: 7
 
-NumCloseIDs: 445
+NumCloseIDs: 440
 
-ConjunctInfos:       1109
+ConjunctInfos:       1105
 MaxConjunctInfos:    5
 MaxReqSets:          9
 MaxRedirect:         2
@@ -648,7 +648,7 @@ diff old new
 --- old
 +++ new
 @@ -1,11 +1,17 @@
- Leaks:  47
+-Leaks:  47
 -Freed:  1002
 -Reused: 988
 -Allocs: 61
@@ -659,19 +659,20 @@ diff old new
 -Disjuncts:    1209
 -
 -NumCloseIDs: 3
-+Freed:  876
-+Reused: 819
-+Allocs: 104
++Leaks:  46
++Freed:  875
++Reused: 818
++Allocs: 103
 +Retain: 0
 +
-+Unifications: 756
-+Conjuncts:    1520
++Unifications: 755
++Conjuncts:    1513
 +Disjuncts:    84
 +Notifications: 7
 +
-+NumCloseIDs: 445
++NumCloseIDs: 440
 +
-+ConjunctInfos:       1109
++ConjunctInfos:       1105
 +MaxConjunctInfos:    5
 +MaxReqSets:          9
 +MaxRedirect:         2
@@ -1410,9 +1411,7 @@ Result:
         }
       }
       pass: (#struct){
-        let self#2 = (#struct){
-          firstName: (string){ "Sam" }
-        }
+        let self#2 = ~(issue3832._assert.invoke.self)
         outFirstName: (string){ "Sam" }
       }
     }
@@ -2442,7 +2441,7 @@ diff old new
            }
          }
        }
-@@ -818,35 +698,27 @@
+@@ -818,21 +698,32 @@
          }, (#struct){
            pass: (#struct){
              let self#2 = (_|_){
@@ -2466,32 +2465,36 @@ diff old new
          //     ./issue3832.cue:20:12
        }
      }
--    _subject: (#struct){
--      in: (_){ _ }
--      out: (#struct){
--        let self#2 = (_|_){
--          // [incomplete] issue3832._subject.out.self: in.self undefined as in is incomplete (type _):
--          //     ./issue3832.cue:8:16
--        }
--        outFirstName: (_|_){
--          // [incomplete] issue3832._subject.out.self: in.self undefined as in is incomplete (type _):
--          //     ./issue3832.cue:8:16
--        }
--      }
--    }
-     _assert: (#struct){
++    _assert: (#struct){
 +      invoke: (#struct){
 +        self: (#struct){
 +          firstName: (string){ "Sam" }
 +        }
 +      }
-       pass: (#struct){
-         let self#2 = (#struct){
-           firstName: (string){ "Sam" }
-@@ -853,20 +725,24 @@
++      pass: (#struct){
++        let self#2 = ~(issue3832._assert.invoke.self)
++        outFirstName: (string){ "Sam" }
++      }
++    }
+     _subject: (#struct){
+       in: (_){ _ }
+       out: (#struct){
+@@ -841,32 +732,15 @@
+           //     ./issue3832.cue:8:16
          }
-         outFirstName: (string){ "Sam" }
-       }
+         outFirstName: (_|_){
+-          // [incomplete] issue3832._subject.out.self: in.self undefined as in is incomplete (type _):
+-          //     ./issue3832.cue:8:16
+-        }
+-      }
+-    }
+-    _assert: (#struct){
+-      pass: (#struct){
+-        let self#2 = (#struct){
+-          firstName: (string){ "Sam" }
+-        }
+-        outFirstName: (string){ "Sam" }
+-      }
 -      invoke: (struct){
 -        self: (struct){
 -          firstName: (string){ "Sam" }
@@ -2506,15 +2509,6 @@ diff old new
 -    }
 -  }
 -  issue3833: (struct){
-+    }
-+    _subject: (#struct){
-+      in: (_){ _ }
-+      out: (#struct){
-+        let self#2 = (_|_){
-+          // [incomplete] issue3832._subject.out.self: in.self undefined as in is incomplete (type _):
-+          //     ./issue3832.cue:8:16
-+        }
-+        outFirstName: (_|_){
 +          // [incomplete] issue3832._subject.out.outFirstName: undefined field: firstName:
 +          //     ./issue3832.cue:9:24
 +        }
@@ -2527,7 +2521,7 @@ diff old new
      ok: (struct){
        out: (#struct){
          a: (#struct){
-@@ -887,11 +763,18 @@
+@@ -887,11 +761,18 @@
          b: (string){ "foo" }
        }
      }
@@ -2551,7 +2545,7 @@ diff old new
          }
        }
        #A: (#struct){
-@@ -962,12 +845,8 @@
+@@ -962,12 +843,8 @@
          globalField: (string){ string }
        }
        #Context: (#struct){
@@ -2566,7 +2560,7 @@ diff old new
        }
        out: (struct){
          ingress: (#struct){
-@@ -995,22 +874,22 @@
+@@ -995,22 +872,22 @@
            #Z: (#struct){
            }
            x: (#struct){
@@ -2605,7 +2599,7 @@ diff old new
              z: (int){ 1 }
            }
          }
-@@ -1020,22 +899,22 @@
+@@ -1020,22 +897,22 @@
            #Z: (#struct){
            }
            x: (#struct){
@@ -2644,7 +2638,7 @@ diff old new
              z: (int){ 1 }
            }
          }
-@@ -1050,11 +929,7 @@
+@@ -1050,11 +927,7 @@
          }
        }
        #JobConfig: (#struct){
@@ -2657,7 +2651,7 @@ diff old new
          job: (#struct){
            image: (string){ "foo:v1" }
            vcs: (string){ "git" }
-@@ -1118,7 +993,7 @@
+@@ -1118,7 +991,7 @@
          }
        }
        out: (#struct){
@@ -2666,7 +2660,7 @@ diff old new
            input: (#struct){
              image: (string){ "someimage" }
              env: (string){ "FOO" }
-@@ -1150,11 +1025,11 @@
+@@ -1150,11 +1023,11 @@
          _in: (_){ _ }
          out: (_){ _ }
        }
@@ -2683,7 +2677,7 @@ diff old new
            e: (string){ "foo" }
            f: (int){ 1 }
          }
-@@ -1187,24 +1062,16 @@
+@@ -1187,24 +1060,16 @@
          _in: (_){ _ }
          out: (_){ _ }
        }
@@ -2718,7 +2712,7 @@ diff old new
      }
    }
    issue3934: (struct){
-@@ -1291,7 +1158,7 @@
+@@ -1291,7 +1156,7 @@
            op: (string){ "add" }
            path: (string){ "/metadata" }
            value: (_|_){
@@ -2727,7 +2721,7 @@ diff old new
              //     ./large.cue:7:25
              //     ./large.cue:3:12
            }
-@@ -1320,38 +1187,11 @@
+@@ -1320,38 +1185,11 @@
      #Main: (#struct){
        namespace: (string){ string }
        output: (_|_){
@@ -2768,7 +2762,7 @@ diff old new
          let base#7 = (#struct){
            someMsg: (string){ string }
            obs: (#struct){ |(*(#struct){
-@@ -1370,7 +1210,7 @@
+@@ -1370,7 +1208,7 @@
                op: (string){ "add" }
                path: (string){ "/metadata" }
                value: (_|_){
@@ -2777,7 +2771,7 @@ diff old new
                  //     ./large.cue:7:25
                  //     ./large.cue:3:12
                }
-@@ -1394,6 +1234,19 @@
+@@ -1394,6 +1232,19 @@
              }
            }
          }
@@ -2797,7 +2791,7 @@ diff old new
        }
      }
      out: (#struct){
-@@ -1415,25 +1268,19 @@
+@@ -1415,25 +1266,19 @@
            b1: (_|_){
              // [incomplete] disjunction.withErr.t1.out.b1: 4 errors in empty disjunction:
              // disjunction.withErr.t1.out.b1: conflicting values null and {b2:{b3:params.mayExistLater}} (mismatched types null and struct):

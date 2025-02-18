@@ -418,19 +418,19 @@ issue2229: reduced_fail: X={
 }
 -- out/evalalpha/stats --
 Leaks:  53
-Freed:  915
-Reused: 880
+Freed:  913
+Reused: 878
 Allocs: 88
 Retain: 0
 
-Unifications: 583
-Conjuncts:    1712
+Unifications: 581
+Conjuncts:    1707
 Disjuncts:    210
 Notifications: 14
 
-NumCloseIDs: 730
+NumCloseIDs: 728
 
-ConjunctInfos:       1168
+ConjunctInfos:       1165
 MaxConjunctInfos:    10
 MaxReqSets:          12
 MaxRedirect:         1
@@ -1070,12 +1070,7 @@ Result:
     reduced: (struct){
       s1: (#struct){
         _deps: (#list){
-          0: (#struct){
-            _deps: (list){
-            }
-            objs: (#list){
-            }
-          }
+          0: ~(issue3903.reduced.#Schema)
         }
         objs: (#list){
         }
@@ -1224,7 +1219,7 @@ diff old new
          }
        }
      }
-@@ -599,6 +605,30 @@
+@@ -599,16 +605,35 @@
        }
      }
    }
@@ -1255,6 +1250,17 @@ diff old new
    issue3903: (struct){
      reduced: (struct){
        s1: (#struct){
+         _deps: (#list){
+-          0: (#struct){
+-            _deps: (list){
+-            }
+-            objs: (#list){
+-            }
+-          }
++          0: ~(issue3903.reduced.#Schema)
+         }
+         objs: (#list){
+         }
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -1274,19 +1280,19 @@ diff old new
 -
 -NumCloseIDs: 16
 +Leaks:  53
-+Freed:  915
-+Reused: 880
++Freed:  913
++Reused: 878
 +Allocs: 88
 +Retain: 0
 +
-+Unifications: 583
-+Conjuncts:    1712
++Unifications: 581
++Conjuncts:    1707
 +Disjuncts:    210
 +Notifications: 14
 +
-+NumCloseIDs: 730
++NumCloseIDs: 728
 +
-+ConjunctInfos:       1168
++ConjunctInfos:       1165
 +MaxConjunctInfos:    10
 +MaxReqSets:          12
 +MaxRedirect:         1

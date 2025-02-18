@@ -271,17 +271,17 @@ issue3743: {
 }
 -- out/evalalpha/stats --
 Leaks:  47
-Freed:  452
-Reused: 423
+Freed:  450
+Reused: 421
 Allocs: 76
 Retain: 0
 
-Unifications: 418
-Conjuncts:    743
+Unifications: 417
+Conjuncts:    741
 Disjuncts:    30
 Notifications: 2
 
-NumCloseIDs: 188
+NumCloseIDs: 187
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -297,17 +297,17 @@ diff old new
 -Conjuncts:    821
 -Disjuncts:    537
 +Leaks:  47
-+Freed:  452
-+Reused: 423
++Freed:  450
++Reused: 421
 +Allocs: 76
 +Retain: 0
 +
-+Unifications: 418
-+Conjuncts:    743
++Unifications: 417
++Conjuncts:    741
 +Disjuncts:    30
 +Notifications: 2
 +
-+NumCloseIDs: 188
++NumCloseIDs: 187
 -- out/eval/stats --
 Leaks:  25
 Freed:  446

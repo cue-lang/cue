@@ -31,7 +31,7 @@
 }
 -- out/decode/extract --
 @jsonschema(schema="https://json-schema.org/draft/2019-09/schema")
-
+@jsonschema(id="https://foo.example/schema")
 matchIf({
 	a!: number
 	...
@@ -39,7 +39,6 @@ matchIf({
 	b!: number
 	...
 }, _) & {
-	@jsonschema(id="https://foo.example/schema")
 	c?: string
 	...
 }

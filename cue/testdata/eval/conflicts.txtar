@@ -29,7 +29,7 @@ Conjuncts:    23
 Disjuncts:    15
 -- out/evalalpha --
 Errors:
-t0.v: conflicting values int and string (mismatched types int and string):
+t0.v: conflicting values string and int (mismatched types string and int):
     ./in.cue:1:4
     ./in.cue:2:4
     ./in.cue:5:5
@@ -48,7 +48,7 @@ Result:
   t0: (_|_){
     // [eval]
     v: (_|_){
-      // [eval] t0.v: conflicting values int and string (mismatched types int and string):
+      // [eval] t0.v: conflicting values string and int (mismatched types string and int):
       //     ./in.cue:1:4
       //     ./in.cue:2:4
       //     ./in.cue:5:5
@@ -86,16 +86,22 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -2,6 +2,7 @@
- t0.v: conflicting values int and string (mismatched types int and string):
+@@ -1,7 +1,8 @@
+ Errors:
+-t0.v: conflicting values int and string (mismatched types int and string):
++t0.v: conflicting values string and int (mismatched types string and int):
      ./in.cue:1:4
      ./in.cue:2:4
 +    ./in.cue:5:5
      ./in.cue:5:9
  t1.x.a.b: conflicting values 4 and 3:
      ./in.cue:10:9
-@@ -20,6 +21,7 @@
-       // [eval] t0.v: conflicting values int and string (mismatched types int and string):
+@@ -17,9 +18,10 @@
+   t0: (_|_){
+     // [eval]
+     v: (_|_){
+-      // [eval] t0.v: conflicting values int and string (mismatched types int and string):
++      // [eval] t0.v: conflicting values string and int (mismatched types string and int):
        //     ./in.cue:1:4
        //     ./in.cue:2:4
 +      //     ./in.cue:5:5

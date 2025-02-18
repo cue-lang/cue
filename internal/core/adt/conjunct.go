@@ -77,8 +77,6 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		}
 
 	case Value:
-		// TODO: perhaps some values could be shared.
-		n.unshare()
 		n.insertValueConjunct(env, x, id)
 
 	case *OpenExpr:
@@ -504,14 +502,15 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 		return
 
 	case *Bottom:
+		n.unshare()
 		if x == NoShareSentinel {
-			n.unshare()
 			return
 		}
 		n.addBottom(x)
 		return
 
 	case *Builtin:
+		n.unshare()
 		if v := x.BareValidator(); v != nil {
 			n.insertValueConjunct(env, v, id)
 			return
@@ -525,6 +524,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 	switch x := v.(type) {
 	case *Disjunction:
 		n.updateCyclicStatusV3(id)
+		n.unshare()
 
 		// TODO(perf): reuse envDisjunct values so that we can also reuse the
 		// disjunct slice.
@@ -561,12 +561,14 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 		n.updateConjunctInfo(TopKind, id, cHasTop)
 
 	case *BasicType:
+		n.unshare()
 		n.updateCyclicStatusV3(id)
 		if x.K != TopKind {
 			n.updateConjunctInfo(TopKind, id, cHasTop)
 		}
 
 	case *BoundValue:
+		n.unshare()
 		n.updateCyclicStatusV3(id)
 
 		switch x.Op {
@@ -614,6 +616,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 		}
 
 	case Validator:
+		n.unshare()
 		// This check serves as simplifier, but also to remove duplicates.
 		cx := MakeConjunct(env, x, id)
 		kind := x.Kind()
@@ -661,6 +664,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 	// handled above.
 
 	case Value: // *NullLit, *BoolLit, *NumLit, *StringLit, *BytesLit, *Builtin
+		n.unshare()
 		n.updateCyclicStatusV3(id)
 
 		if y := n.scalar; y != nil {

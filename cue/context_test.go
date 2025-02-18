@@ -58,7 +58,7 @@ func TestNewList(t *testing.T) {
 		out: `[1, 2, 3]`,
 	}, {
 		v:   intList.Unify(ctx.NewList(ctx.Encode("string"))),
-		out: `_|_ // 0: conflicting values "string" and int (mismatched types string and int)`,
+		out: `_|_ // 0: conflicting values int and "string" (mismatched types int and string)`,
 	}, {
 		v:   ctx.NewList().Unify(l123),
 		out: `_|_ // incompatible list lengths (0 and 3)`,

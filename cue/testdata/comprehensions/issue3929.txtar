@@ -94,12 +94,12 @@ Allocs: 36
 Retain: 0
 
 Unifications: 96
-Conjuncts:    265
+Conjuncts:    262
 Disjuncts:    53
 
-NumCloseIDs: 101
+NumCloseIDs: 99
 
-ConjunctInfos:       157
+ConjunctInfos:       156
 MaxConjunctInfos:    6
 MaxReqSets:          13
 MaxRedirect:         3
@@ -128,12 +128,12 @@ diff old new
 +Retain: 0
 +
 +Unifications: 96
-+Conjuncts:    265
++Conjuncts:    262
 +Disjuncts:    53
 +
-+NumCloseIDs: 101
++NumCloseIDs: 99
 +
-+ConjunctInfos:       157
++ConjunctInfos:       156
 +MaxConjunctInfos:    6
 +MaxReqSets:          13
 +MaxRedirect:         3

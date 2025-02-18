@@ -34,6 +34,24 @@
       "parentUuid": "15c49640_ceb9c796",
       "revId": "07473ea0b8d9a99ec1faf9187f85d95c6280ce57",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "021b51c3_ec693644",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 598,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-18T10:40:42Z",
+      "side": 1,
+      "message": "...but there\u0027s no code after this `if` block an within the loop. So the `continue` isn\u0027t needed. Am I missing something here?",
+      "parentUuid": "1b2a4316_1a5114d9",
+      "revId": "07473ea0b8d9a99ec1faf9187f85d95c6280ce57",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -38,7 +38,7 @@ func TestGit(t *testing.T) {
 -- baz/something --
 `)))
 	qt.Assert(t, qt.IsNil(err))
-	err = copyFS(dir, testFS)
+	err = os.CopyFS(dir, testFS)
 	qt.Assert(t, qt.IsNil(err))
 
 	// In the tests that follow, we are testing the scenario where a module is

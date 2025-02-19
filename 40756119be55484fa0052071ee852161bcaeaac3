@@ -33,6 +33,86 @@
       "message": "FYI I will take a look at this.",
       "revId": "40756119be55484fa0052071ee852161bcaeaac3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29d41244_c516159f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-02-19T11:27:58Z",
+      "side": 1,
+      "message": "I\u0027ve added some comments here but would suggest that @rogpeppe@gmail.com and @mvdan@mvdan.cc help to guide the change here more than me.",
+      "revId": "40756119be55484fa0052071ee852161bcaeaac3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46a2d8af_e99edc1f",
+        "filename": "cmd/cue/cmd/vet.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-02-19T11:27:58Z",
+      "side": 1,
+      "message": "I think we miss a crucial point here: that vet is silent on success, with a brief explanation of that perhaps.\n\nI also don\u0027t think we should use the phrase \"general error\" - there is no such classification of an error. \n\nHow about something like:\n\n```\nvet is silent when it succeeds, emitting no output with a 0 exit code.\nOtherwise, errors are reported with a non-zero exit code.\nvet first ensures there are no validation errors. If there are no validation\nerrors, by default vet ensures that the result\nof a validation is concrete, reporting an error if it is not. The detail\nof which field is not concrete can be seen by passing -c or -c\u003dtrue. Or if\nyou want to allow incomplete values, pass -c\u003dfalse.\n```",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 2
+      },
+      "revId": "40756119be55484fa0052071ee852161bcaeaac3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a60c1ed1_41772616",
+        "filename": "cmd/cue/cmd/vet.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-02-19T11:27:58Z",
+      "side": 1,
+      "message": "FWIW, I don\u0027t think these sorts of compound phrases translate well. We should be able to explain things in plainer language.",
+      "range": {
+        "startLine": 29,
+        "startChar": 32,
+        "endLine": 29,
+        "endChar": 52
+      },
+      "revId": "40756119be55484fa0052071ee852161bcaeaac3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b388e3a_cbab3400",
+        "filename": "cmd/cue/cmd/vet.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-02-19T11:27:58Z",
+      "side": 1,
+      "message": "Rather than refer the person to the text above, just tell them about `-c\u003dfalse` inline?\n\n```\nrequire the evaluation to be concrete, or set -c\u003dfalse to allow incomplete values\n```",
+      "revId": "40756119be55484fa0052071ee852161bcaeaac3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

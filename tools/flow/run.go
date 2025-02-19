@@ -28,6 +28,7 @@ package flow
 import (
 	"fmt"
 	"os"
+	"slices"
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
@@ -210,14 +211,13 @@ func (c *Controller) updateTaskResults(t *Task) bool {
 	}
 
 	expr := t.update
-	for i := len(t.labels) - 1; i >= 0; i-- {
-		label := t.labels[i]
+	for _, label := range slices.Backward(t.labels) {
 		switch label.Typ() {
 		case adt.StringLabel, adt.HiddenLabel:
 			expr = &adt.StructLit{
 				Decls: []adt.Decl{
 					&adt.Field{
-						Label: t.labels[i],
+						Label: label,
 						Value: expr,
 					},
 				},

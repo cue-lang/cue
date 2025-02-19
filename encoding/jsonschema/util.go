@@ -112,9 +112,7 @@ func pathRefSyntax(cuePath cue.Path, root ast.Expr) (ast.Expr, error) {
 // be exposed as a method on [cue.Path], say
 // `SyntaxForDefinition` or something.
 func exprAtPath(path cue.Path, expr ast.Expr) (ast.Expr, error) {
-	sels := path.Selectors()
-	for i := len(sels) - 1; i >= 0; i-- {
-		sel := sels[i]
+	for i, sel := range slices.Backward(path.Selectors()) {
 		label, err := labelForSelector(sel)
 		if err != nil {
 			return nil, err

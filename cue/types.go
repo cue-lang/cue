@@ -21,6 +21,7 @@ import (
 	"io"
 	"math"
 	"math/big"
+	"slices"
 	"strings"
 
 	"github.com/cockroachdb/apd/v3"
@@ -1579,8 +1580,8 @@ func (v Value) FillPath(p Path, x interface{}) Value {
 	default:
 		expr = convert.GoValueToValue(ctx, x, true)
 	}
-	for i := len(p.path) - 1; i >= 0; i-- {
-		switch sel := p.path[i]; sel.Type() {
+	for _, sel := range slices.Backward(p.path) {
+		switch sel.Type() {
 		case StringLabel | PatternConstraint:
 			expr = &adt.StructLit{Decls: []adt.Decl{
 				&adt.BulkOptionalField{

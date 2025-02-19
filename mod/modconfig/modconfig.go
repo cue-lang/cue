@@ -9,6 +9,7 @@ import (
 	"io/fs"
 	"net/http"
 	"os"
+	"slices"
 	"strings"
 	"sync"
 
@@ -359,8 +360,8 @@ func getenvFunc(env []string) func(string) string {
 		return os.Getenv
 	}
 	return func(key string) string {
-		for i := len(env) - 1; i >= 0; i-- {
-			if e := env[i]; len(e) >= len(key)+1 && e[len(key)] == '=' && e[:len(key)] == key {
+		for _, e := range slices.Backward(env) {
+			if len(e) >= len(key)+1 && e[len(key)] == '=' && e[:len(key)] == key {
 				return e[len(key)+1:]
 			}
 		}

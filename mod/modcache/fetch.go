@@ -10,6 +10,7 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -305,8 +306,8 @@ func makeDirsReadOnly(dir string) {
 	})
 
 	// Run over list backward to chmod children before parents.
-	for i := len(dirs) - 1; i >= 0; i-- {
-		os.Chmod(dirs[i].path, dirs[i].mode&^0222)
+	for _, dir := range slices.Backward(dirs) {
+		os.Chmod(dir.path, dir.mode&^0222)
 	}
 }
 

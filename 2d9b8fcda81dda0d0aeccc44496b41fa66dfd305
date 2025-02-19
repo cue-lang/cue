@@ -230,6 +230,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "70a722b5_68950332",
+        "filename": "tools/trim/testdata/defaults.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-19T15:48:21Z",
+      "side": 1,
+      "message": "Well I currently believe it to be the case. If I\u0027m wrong, I imagine we\u0027ll find out, make a change, and I\u0027ll learn why!",
+      "parentUuid": "675c0603_868c12ad",
+      "revId": "2d9b8fcda81dda0d0aeccc44496b41fa66dfd305",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e8b389a9_a746b029",

@@ -224,6 +224,8 @@ type closeContext struct {
 	// hasStruct indicates that a node has at least one struct conjunct.
 	hasStruct bool
 
+	hasOpenValidator bool
+
 	// isClosedOnce is true if this closeContext is the result of calling the
 	// close builtin.
 	isClosedOnce bool
@@ -554,7 +556,16 @@ func (c CloseInfo) spawnCloseContext(ctx *OpContext, t closeNodeType) (CloseInfo
 func (c *closeContext) updateClosedInfo(ctx *OpContext) bool {
 	p := c.parent
 
-	if c.isDef && !c.isTotal && (!c.hasTop || c.hasStruct) {
+	// A _ blocks close.
+	blockClose := c.hasTop
+	// Unless it is unified with a struct.
+	if c.hasStruct {
+		blockClose = false
+	}
+	if c.hasOpenValidator {
+		blockClose = true
+	}
+	if c.isDef && !c.isTotal && !blockClose {
 		c.isClosed = true
 		if p != nil {
 			p.isDef = true
@@ -587,6 +598,9 @@ func (c *closeContext) updateClosedInfo(ctx *OpContext) bool {
 
 	if c.hasTop {
 		p.hasTop = true
+	}
+	if c.hasOpenValidator {
+		p.hasOpenValidator = true
 	}
 	// NOTE: we should not pass up hasStruct: this flag is used to "close" a
 	// top that belongs to a single closeContext. This then sets isClosed, which

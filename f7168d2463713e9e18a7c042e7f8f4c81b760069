@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23d2f955_657a433d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-19T08:23:11Z",
+      "side": 1,
+      "message": "previously: https://review.gerrithub.io/c/cue-lang/cue/+/1206202aff\n\nNote that this issue affects cuedebug.Init as well, in this very package too, so this fix is not complete. Also see my mention of the broken CUE_DEBUG\u003dhttp in that earlier commit.\n\nMarcel opposed that API change, hence the abandoning, but it was my best attempt at making these human mistakes much less likely in the future. I\u0027m not sure how to prevent such issues in the future but with a harder-to-misuse internal API.\n\nHe also opposed making CUE_EXPERIMENT or CUE_DEBUG fail on unknown keys, as that can make bisecting or debugging across distant CUE versions harder. Hence I raised https://github.com/cue-lang/cue/issues/3689 to discuss what to do.\n\nRoger then filed https://github.com/cue-lang/cue/issues/3756 with his proposal for a new syntax which would allow for such a \"relaxed\" mode.\n\nI would reach consensus with Marcel that 3756 is indeed what we want to do, and then implement the default \"strict\" mode consistently, as well as the proposed \"relaxed\" mode. With the note that this change is not a complete fix for the strict mode.",
+      "revId": "f7168d2463713e9e18a7c042e7f8f4c81b760069",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

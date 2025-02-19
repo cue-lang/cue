@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eaecccde_0038d571",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-19T11:01:13Z",
+      "side": 1,
+      "message": "For either Patchset 7 or 8",
+      "revId": "7eb844ac59732d1f4ca9a1fac34e685621f5f96c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "318dc0df_0f994e62",
+        "filename": "tools/trim/trimv3.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 682,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-19T11:01:13Z",
+      "side": 1,
+      "message": "Might want to add a NOT with the two different versions explained and noting that we might want to make this an option. Whichever we pick, I can imagine that people might want to pick either (or for instance keep the top-level type, if known).",
+      "revId": "7eb844ac59732d1f4ca9a1fac34e685621f5f96c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

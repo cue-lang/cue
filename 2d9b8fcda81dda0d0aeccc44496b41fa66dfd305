@@ -194,6 +194,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "675c0603_868c12ad",
+        "filename": "tools/trim/testdata/defaults.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-19T11:01:13Z",
+      "side": 1,
+      "message": "If you believe this to be the case in all cases, that is fine.",
+      "parentUuid": "5afd18f2_b82e8f20",
+      "revId": "2d9b8fcda81dda0d0aeccc44496b41fa66dfd305",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e8b389a9_a746b029",

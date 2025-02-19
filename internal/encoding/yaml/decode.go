@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -420,8 +421,8 @@ func (d *decoder) merge(yn *yaml.Node, m *ast.StructLit, multiline bool) error {
 		return d.insertMap(yn.Alias, m, multiline, true)
 	case yaml.SequenceNode:
 		// Step backwards as earlier nodes take precedence.
-		for i := len(yn.Content) - 1; i >= 0; i-- {
-			if err := d.merge(yn.Content[i], m, multiline); err != nil {
+		for _, c := range slices.Backward(yn.Content) {
+			if err := d.merge(c, m, multiline); err != nil {
 				return err
 			}
 		}

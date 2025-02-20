@@ -96,7 +96,7 @@ For example:
 
 	# Refactor, for example github.com/foo/bar/something.v2/pkg to foo.example/something/v2/pkg
 	cue refactor imports 'github.com/foo/bar/(.*)\.(v[0-9]+)(.*)' 'foo.example/$1/$2$3'
-`[1:],
+`,
 		RunE: mkRunE(c, runRefactorImports),
 		Args: cobra.RangeArgs(1, 2),
 	}

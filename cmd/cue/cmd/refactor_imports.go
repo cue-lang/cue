@@ -37,7 +37,8 @@ func newRefactorImportsCmd(c *Command) *cobra.Command {
 
 		Use:   "imports [<oldImportPath] <newImportPath>",
 		Short: "rewrite import paths",
-		Long: `WARNING: THIS COMMAND IS EXPERIMENTAL.
+		Long: `
+WARNING: THIS COMMAND IS EXPERIMENTAL.
 
 This command alters import directives in the current module. By
 default it rewrites any imports in the current module that have a path

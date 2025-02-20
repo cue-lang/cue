@@ -1,0 +1,202 @@
+import "strings"
+
+import "encoding/json"
+
+#FinDefSetElemType: {
+	#Type!: _
+}
+#FinDefSetDefinition: {
+	#Elem!: #FinDefSetElemType
+	#Alternatives: {
+		allBut: {
+			AllBut: [...#Elem.#Type]
+		}
+		only: {
+			Only: [...#Elem.#Type]
+		}
+	}
+}
+
+#mkFinDefSet: {
+	#Definition!: #FinDefSetDefinition
+	#Type: or([for _, v in #Definition.#Alternatives {v}])
+}
+
+
+#FinDefSetElemType: {
+	#Type: _
+	toString!: {
+		_input:  #Type
+		_output: string
+	}
+}
+
+#FinDefSetDefinition: {
+	#Elem!: #FinDefSetElemType
+	#Alternatives: {
+		allBut: {
+			AllBut: [...#Elem.#Type]
+			let xs = [for x in AllBut {(#Elem.toString & {_input: x})._output}]
+			let str = strings.Join(xs, "\",\"")
+			orgSyntax: "AllBut [\(str)]"
+		}
+		only: {
+			Only: [...#Elem.#Type]
+			let xs = [for x in Only {(#Elem.toString & {_input: x})._output}]
+			let str = strings.Join(xs, "\",\"")
+			orgSyntax: "Only [\(str)]"
+		}
+	}
+}
+
+#ConfigText: string | {UseSectionName: true}
+
+#ConfigTextRule: #ConfigText | {Append: #ConfigText} | {Prepend: #ConfigText}
+
+#ConfigTextRules: #ConfigTextRule | [#ConfigTextRule, #ConfigTextRule, ...#ConfigTextRule]
+
+#FinDefSetConfigTextElem: #FinDefSetElemType
+#FinDefSetConfigTextElem: {
+	#Type: #ConfigTextRules
+}
+
+#FinDefSetOfConfigText: (
+	#mkFinDefSet & {
+		#Definition: {#Elem: #FinDefSetConfigTextElem}
+	}).#Type
+
+#PatSetCfg: {
+	wards?:                           *null | #FinDefSetOfConfigText
+	facilities?:                      *null | #FinDefSetOfConfigText
+	stayKind?:                        "OnlyInpatients" | "InAndOutpatients" | "OnlyOutpatients" | "OnlyConsultations"
+	id?:                              *null | #ConfigTextRules
+	servers?:                         *null | #FinDefSetOfConfigText
+	includeInpatientsBeforeStayDays?: int & >=0 & <30
+}
+
+#PatSetNode: string | {
+	name:    string
+	config?: #PatSetCfg
+	children?: [...#PatSetNode]
+}
+
+
+
+
+#FinDefSetConfigTextElem: {
+	toString: {
+		_input: #ConfigTextRules
+		_output: (#orgForConfigTextRules & {source: _input}).orgSyntax
+	}
+}
+
+#orgForConfigText: {
+	IN=source: #ConfigText
+	orgSyntax: [
+		if (IN & string) != _|_ {
+			json.Marshal(IN)
+		},
+		if IN.UseSectionName != _|_ {
+			"UseSectionName"
+		},
+		"Wrong input \(IN) in orgForConfigText",
+	][0]
+}
+
+#orgForConfigTextRule: {
+	IN=source: #ConfigTextRule
+	orgSyntax: [
+		if IN.Append != _|_ {
+			"Append " + (#orgForConfigText & {source: IN.Append}).orgSyntax
+		},
+		if IN.Prepend != _|_ {
+			"Prepend " + (#orgForConfigText & {source: IN.Prepend}).orgSyntax
+		},
+		(#orgForConfigText & {source: IN}).orgSyntax,
+	][0]
+}
+
+#orgForConfigTextRules: {
+	IN=source: #ConfigTextRules
+	orgSyntax: {
+		let INL = IN & [...]
+		[
+			if INL != _|_ {
+				let elems = [for x in IN {(#orgForConfigTextRule & {source: x}).orgSyntax}]
+				let result = strings.Join(elems, "\",\"")
+				"[\(result)]"
+			},
+			(#orgForConfigTextRule & {source: IN}).orgSyntax,
+		][0]
+	}
+}
+
+#PatSetCfg: {
+	wards?:                           _
+	facilities?:                      _
+	stayKind?:                        _
+	id?:                              _
+	includeInpatientsBeforeStayDays?: _
+	let parts = [
+		if wards != _|_ {
+			"- wards :: " + wards.orgSyntax
+		},
+		if facilities != _|_ {
+			"- facilities :: " + facilities.orgSyntax
+		},
+		if stayKind != _|_ {
+			"- stayKind :: " + stayKind
+		},
+		if id != _|_ {
+			"- id :: " + (#orgForConfigText & {source: id}).orgSyntax
+		},
+		if includeInpatientsBeforeStayDays != _|_ {
+			"- includeInpatientsBeforeStayDays :: \(includeInpatientsBeforeStayDays)"
+		},
+	]
+	orgSyntax: strings.Join(parts, "\n")
+}
+
+_nodes2: ["prod-live-demo-int-node-n-01", "prod-live-real-int-node-n-02", "staging-live-real-int-node-n-02", "dev-live-fake-int-node-n-02"]
+
+top: #PatSetNode
+top: {
+	name: "Top"
+	children: [abteilung]
+}
+
+abteilung: #PatSetNode
+abteilung: {
+	name: "Abteilung"
+	config: {
+		wards: AllBut: []
+		facilities: Only: [{UseSectionName: true}]
+		stayKind:                        "OnlyInpatients"
+		includeInpatientsBeforeStayDays: 3
+	}
+	children: [abteilungAbteilung]
+}
+
+abteilungAbteilung: #PatSetNode
+abteilungAbteilung: {
+	name: "Abteilung/Abteilung"
+	children: [node2]
+}
+
+node2: #PatSetNode
+node2: {
+	name: "Node2"
+	config: servers: Only: _nodes2
+	children: [
+		"KIM-ENDO",
+		kimGast,
+	]
+}
+
+kimGast: #PatSetNode
+kimGast: {
+	name: "KIM-GAST"
+	config: {
+		wards: AllBut: ["KIM6T"]
+	}
+}

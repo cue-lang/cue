@@ -101,7 +101,7 @@ Allocs: 228
 Retain: 0
 
 Unifications: 183
-Conjuncts:    827
+Conjuncts:    546
 Disjuncts:    0
 -- out/evalalpha --
 Errors:
@@ -208,7 +208,7 @@ Result:
     direct: (struct){
       #Step: (_){ _ }
       #Job: (_){ matchN(1, (#list){
-          0: (_|_){// &[〈3;#NormalJob〉]
+          0: (_|_){// 〈3;#NormalJob〉
           }
         }) }
     }
@@ -252,7 +252,7 @@ diff old new
 -Conjuncts:    2813
 -Disjuncts:    1485
 +Unifications: 183
-+Conjuncts:    827
++Conjuncts:    546
 +Disjuncts:    0
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -274,15 +274,6 @@ diff old new
        }
      }
      k00: (int){ 0 }
-@@ -104,7 +102,7 @@
-     direct: (struct){
-       #Step: (_){ _ }
-       #Job: (_){ matchN(1, (#list){
--          0: (_|_){// 〈3;#NormalJob〉
-+          0: (_|_){// &[〈3;#NormalJob〉]
-           }
-         }) }
-     }
 @@ -116,7 +114,6 @@
          //     ./select.cue:8:15
          // select.indirect.#Job.req: field is required but not present:

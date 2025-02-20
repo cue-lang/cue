@@ -1,0 +1,43 @@
+#ConfigText: string | {
+    UseSectionName: true
+}
+#ConfigTextRule: string | {
+    UseSectionName: true
+} | {
+    Append: string | {
+        UseSectionName: true
+    }
+}
+#FinDefSetOfConfigText: {
+    let str = (#orgForConfigText & {
+        source: Only
+    }).orgSyntax
+    Only: string | {
+        UseSectionName: true
+    } | {
+        Append: string | {
+            UseSectionName: true
+        }
+    }
+    orgSyntax: "Only \(str)"
+}
+#orgForConfigText: {
+    source: string | {
+        UseSectionName: true
+    } | {
+        Append: string | {
+            UseSectionName: true
+        }
+    }
+    orgSyntax: [
+        if IN.UseSectionName != _|_ // explicit error (_|_ literal) in source
+        {
+            "UseSectionName"
+        }, "Impossible: \(IN)"][0]
+}
+works1: {
+    Only: {
+        UseSectionName: true
+    }
+    orgSyntax: "Only UseSectionName"
+}

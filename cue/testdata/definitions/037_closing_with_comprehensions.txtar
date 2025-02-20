@@ -114,8 +114,6 @@ Disjuncts:    28
 Errors:
 a.f3: field not allowed:
     ./in.cue:4:19
-#E.f3: field not allowed:
-    ./in.cue:29:11
 
 Result:
 (_|_){
@@ -142,21 +140,17 @@ Result:
   #D: (#struct){
     f1: (int){ int }
   }
-  #E: (_|_){
-    // [eval]
+  #E: (#struct){
     f1: (int){ int }
     f2: (int){ int }
-    f3: (_|_){
-      // [eval] #E.f3: field not allowed:
-      //     ./in.cue:29:11
-    }
+    f3: (int){ int }
   }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,15 +1,8 @@
+@@ -1,15 +1,6 @@
  Errors:
 -#E.f3: field not allowed:
 -    ./in.cue:1:5
@@ -170,12 +164,10 @@ diff old new
 -    ./in.cue:4:5
 -    ./in.cue:4:11
 +    ./in.cue:4:19
-+#E.f3: field not allowed:
-+    ./in.cue:29:11
  
  Result:
  (_|_){
-@@ -24,10 +17,7 @@
+@@ -24,10 +15,7 @@
      f2: (int){ int }
      f3: (_|_){
        // [eval] a.f3: field not allowed:
@@ -187,17 +179,26 @@ diff old new
      }
    }
    #B: (#struct){
-@@ -45,11 +35,7 @@
-     f2: (int){ int }
-     f3: (_|_){
-       // [eval] #E.f3: field not allowed:
+@@ -39,17 +27,9 @@
+   #D: (#struct){
+     f1: (int){ int }
+   }
+-  #E: (_|_){
+-    // [eval]
+-    f1: (int){ int }
+-    f2: (int){ int }
+-    f3: (_|_){
+-      // [eval] #E.f3: field not allowed:
 -      //     ./in.cue:1:5
 -      //     ./in.cue:27:5
 -      //     ./in.cue:27:10
 -      //     ./in.cue:28:2
 -      //     ./in.cue:29:3
-+      //     ./in.cue:29:11
-     }
+-    }
++  #E: (#struct){
++    f1: (int){ int }
++    f2: (int){ int }
++    f3: (int){ int }
    }
  }
 -- diff/todo/p2 --

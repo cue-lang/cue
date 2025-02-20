@@ -116,15 +116,15 @@ printCycle: {
 	}
 }
 -- out/eval/stats --
-Leaks:  48
+Leaks:  47
 Freed:  127
 Reused: 120
-Allocs: 55
-Retain: 138
+Allocs: 54
+Retain: 137
 
-Unifications: 163
-Conjuncts:    299
-Disjuncts:    192
+Unifications: 162
+Conjuncts:    295
+Disjuncts:    191
 -- out/evalalpha --
 Errors:
 closeCycle.c: structural cycle

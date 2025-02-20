@@ -670,7 +670,7 @@ Result:
           let Ok#2 = (bool){ true }
         }, (#struct){
           _ok: (bool){ true }
-          let Ok#2multi = 〈0;_ok〉
+          let Ok#2 = (bool){ true }
           x: (bool){ true }
         }) }
       bar: (#struct){ |((#struct){
@@ -784,6 +784,15 @@ diff old new
          //     ./indexelim.cue:5:17
        }
      }
+@@ -402,7 +384,7 @@
+           let Ok#2 = (bool){ true }
+         }, (#struct){
+           _ok: (bool){ true }
+-          let Ok#2multi = 〈0;_ok〉
++          let Ok#2 = (bool){ true }
+           x: (bool){ true }
+         }) }
+       bar: (#struct){ |((#struct){
 -- diff/todo/p3 --
 Missing error positions.
   It is probably okay to show name and val fields with original values, as long

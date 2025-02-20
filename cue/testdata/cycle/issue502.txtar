@@ -39,6 +39,429 @@ Retain: 0
 Unifications: 93
 Conjuncts:    264
 Disjuncts:    93
+-- out/evalalpha --
+Errors:
+a.mas.one.link.mas.two.link: field not allowed
+#a.mas.one.link.mas.two.link.mas: field not allowed:
+    ./in.cue:6:10
+a.mas.one._link.mas.two.link.mas: field not allowed:
+    ./in.cue:6:10
+a.mas.one.link.mas.two._link.mas: field not allowed:
+    ./in.cue:6:10
+
+Result:
+(_|_){
+  // [eval]
+  #T: (#struct){
+    config: (_){ _ }
+    body: (_){ _ }
+    mas: (#struct){
+    }
+  }
+  #a: (_|_){
+    // [eval]
+    config: (#struct){
+      a: (int){ int }
+    }
+    body: (int){ int }
+    mas: (_|_){
+      // [eval]
+      one: (_|_){
+        // [eval]
+        cfg: (#struct){
+          b: (int){ int }
+        }
+        _link: (#struct){
+          config: (#struct){
+            b: (int){ int }
+          }
+          body: (int){ int }
+          mas: (#struct){
+            two: (#struct){
+              cfg: (#struct){
+                c: (int){ int }
+              }
+              _link: (#struct){
+                config: (#struct){
+                  c: (int){ int }
+                }
+                body: (int){ int }
+                mas: (#struct){
+                }
+              }
+              link: (#struct){
+                config: (#struct){
+                  c: (int){ int }
+                }
+                body: (int){ int }
+                mas: (#struct){
+                }
+              }
+            }
+          }
+        }
+        link: (_|_){
+          // [eval]
+          config: (#struct){
+            b: (int){ int }
+          }
+          body: (int){ int }
+          mas: (_|_){
+            // [eval]
+            two: (_|_){
+              // [eval]
+              cfg: (#struct){
+                c: (int){ int }
+              }
+              _link: (#struct){
+                config: (#struct){
+                  c: (int){ int }
+                }
+                body: (int){ int }
+                mas: (#struct){
+                }
+              }
+              link: (_|_){
+                // [eval]
+                config: (#struct){
+                  c: (int){ int }
+                }
+                body: (int){ int }
+                mas: (_|_){
+                  // [eval] #a.mas.one.link.mas.two.link.mas: field not allowed:
+                  //     ./in.cue:6:10
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  a: (_|_){
+    // [eval]
+    config: (#struct){
+      a: (int){ 34 }
+    }
+    body: (int){ 34 }
+    mas: (_|_){
+      // [eval]
+      one: (_|_){
+        // [eval]
+        cfg: (#struct){
+          b: (int){ 34 }
+        }
+        _link: (_|_){
+          // [eval]
+          config: (#struct){
+            b: (int){ int }
+          }
+          body: (int){ int }
+          mas: (_|_){
+            // [eval]
+            two: (_|_){
+              // [eval]
+              cfg: (#struct){
+                c: (int){ int }
+              }
+              _link: (#struct){
+                config: (#struct){
+                  c: (int){ int }
+                }
+                body: (int){ int }
+                mas: (#struct){
+                }
+              }
+              link: (_|_){
+                // [eval]
+                config: (#struct){
+                  c: (int){ int }
+                }
+                body: (int){ int }
+                mas: (_|_){
+                  // [eval] a.mas.one._link.mas.two.link.mas: field not allowed:
+                  //     ./in.cue:6:10
+                }
+              }
+            }
+          }
+        }
+        link: (_|_){
+          // [eval]
+          config: (#struct){
+            b: (int){ 34 }
+          }
+          body: (int){ 34 }
+          mas: (_|_){
+            // [eval]
+            two: (_|_){
+              // [eval]
+              cfg: (#struct){
+                c: (int){ 34 }
+              }
+              _link: (_|_){
+                // [eval]
+                config: (#struct){
+                  c: (int){ int }
+                }
+                body: (int){ int }
+                mas: (_|_){
+                  // [eval] a.mas.one.link.mas.two._link.mas: field not allowed:
+                  //     ./in.cue:6:10
+                }
+              }
+              link: (_|_){
+                // [eval] a.mas.one.link.mas.two.link: field not allowed
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,4 +1,15 @@
+-(struct){
++Errors:
++a.mas.one.link.mas.two.link: field not allowed
++#a.mas.one.link.mas.two.link.mas: field not allowed:
++    ./in.cue:6:10
++a.mas.one._link.mas.two.link.mas: field not allowed:
++    ./in.cue:6:10
++a.mas.one.link.mas.two._link.mas: field not allowed:
++    ./in.cue:6:10
++
++Result:
++(_|_){
++  // [eval]
+   #T: (#struct){
+     config: (_){ _ }
+     body: (_){ _ }
+@@ -5,13 +16,16 @@
+     mas: (#struct){
+     }
+   }
+-  #a: (#struct){
++  #a: (_|_){
++    // [eval]
+     config: (#struct){
+       a: (int){ int }
+     }
+     body: (int){ int }
+-    mas: (#struct){
+-      one: (#struct){
++    mas: (_|_){
++      // [eval]
++      one: (_|_){
++        // [eval]
+         cfg: (#struct){
+           b: (int){ int }
+         }
+@@ -44,102 +58,118 @@
+             }
+           }
+         }
+-        link: (#struct){
+-          config: (#struct){
+-            b: (int){ int }
+-          }
+-          body: (int){ int }
+-          mas: (#struct){
+-            two: (#struct){
+-              cfg: (#struct){
+-                c: (int){ int }
+-              }
+-              _link: (#struct){
+-                config: (#struct){
+-                  c: (int){ int }
+-                }
+-                body: (int){ int }
+-                mas: (#struct){
+-                }
+-              }
+-              link: (#struct){
+-                config: (#struct){
+-                  c: (int){ int }
+-                }
+-                body: (int){ int }
+-                mas: (#struct){
+-                }
+-              }
+-            }
+-          }
+-        }
+-      }
+-    }
+-  }
+-  a: (#struct){
++        link: (_|_){
++          // [eval]
++          config: (#struct){
++            b: (int){ int }
++          }
++          body: (int){ int }
++          mas: (_|_){
++            // [eval]
++            two: (_|_){
++              // [eval]
++              cfg: (#struct){
++                c: (int){ int }
++              }
++              _link: (#struct){
++                config: (#struct){
++                  c: (int){ int }
++                }
++                body: (int){ int }
++                mas: (#struct){
++                }
++              }
++              link: (_|_){
++                // [eval]
++                config: (#struct){
++                  c: (int){ int }
++                }
++                body: (int){ int }
++                mas: (_|_){
++                  // [eval] #a.mas.one.link.mas.two.link.mas: field not allowed:
++                  //     ./in.cue:6:10
++                }
++              }
++            }
++          }
++        }
++      }
++    }
++  }
++  a: (_|_){
++    // [eval]
+     config: (#struct){
+       a: (int){ 34 }
+     }
+     body: (int){ 34 }
+-    mas: (#struct){
+-      one: (#struct){
++    mas: (_|_){
++      // [eval]
++      one: (_|_){
++        // [eval]
+         cfg: (#struct){
+           b: (int){ 34 }
+         }
+-        _link: (#struct){
+-          config: (#struct){
+-            b: (int){ int }
+-          }
+-          body: (int){ int }
+-          mas: (#struct){
+-            two: (#struct){
+-              cfg: (#struct){
+-                c: (int){ int }
+-              }
+-              _link: (#struct){
+-                config: (#struct){
+-                  c: (int){ int }
+-                }
+-                body: (int){ int }
+-                mas: (#struct){
+-                }
+-              }
+-              link: (#struct){
+-                config: (#struct){
+-                  c: (int){ int }
+-                }
+-                body: (int){ int }
+-                mas: (#struct){
+-                }
+-              }
+-            }
+-          }
+-        }
+-        link: (#struct){
++        _link: (_|_){
++          // [eval]
++          config: (#struct){
++            b: (int){ int }
++          }
++          body: (int){ int }
++          mas: (_|_){
++            // [eval]
++            two: (_|_){
++              // [eval]
++              cfg: (#struct){
++                c: (int){ int }
++              }
++              _link: (#struct){
++                config: (#struct){
++                  c: (int){ int }
++                }
++                body: (int){ int }
++                mas: (#struct){
++                }
++              }
++              link: (_|_){
++                // [eval]
++                config: (#struct){
++                  c: (int){ int }
++                }
++                body: (int){ int }
++                mas: (_|_){
++                  // [eval] a.mas.one._link.mas.two.link.mas: field not allowed:
++                  //     ./in.cue:6:10
++                }
++              }
++            }
++          }
++        }
++        link: (_|_){
++          // [eval]
+           config: (#struct){
+             b: (int){ 34 }
+           }
+           body: (int){ 34 }
+-          mas: (#struct){
+-            two: (#struct){
++          mas: (_|_){
++            // [eval]
++            two: (_|_){
++              // [eval]
+               cfg: (#struct){
+                 c: (int){ 34 }
+               }
+-              _link: (#struct){
+-                config: (#struct){
+-                  c: (int){ int }
+-                }
+-                body: (int){ int }
+-                mas: (#struct){
+-                }
+-              }
+-              link: (#struct){
+-                config: (#struct){
+-                  c: (int){ 34 }
+-                }
+-                body: (int){ 34 }
+-                mas: (#struct){
+-                }
++              _link: (_|_){
++                // [eval]
++                config: (#struct){
++                  c: (int){ int }
++                }
++                body: (int){ int }
++                mas: (_|_){
++                  // [eval] a.mas.one.link.mas.two._link.mas: field not allowed:
++                  //     ./in.cue:6:10
++                }
++              }
++              link: (_|_){
++                // [eval] a.mas.one.link.mas.two.link: field not allowed
+               }
+             }
+           }
 -- out/eval --
 (struct){
   #T: (#struct){

@@ -2023,7 +2023,7 @@ Allocs: 1001
 Retain: 0
 
 Unifications: 1001
-Conjuncts:    2001
+Conjuncts:    1001
 Disjuncts:    0
 -- out/eval --
 (struct){
@@ -3046,7 +3046,7 @@ diff old new
  Unifications: 1001
 -Conjuncts:    500501
 -Disjuncts:    1001
-+Conjuncts:    2001
++Conjuncts:    1001
 +Disjuncts:    0
 -- out/eval/stats --
 Leaks:  0

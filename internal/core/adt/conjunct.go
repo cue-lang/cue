@@ -130,6 +130,12 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 
 	env := c.Env
 
+	// TODO: move to more logical position.
+	for p := id.cc; p != nil; p = p.parent {
+		if p.isDef {
+			n.node.ClosedRecursive = true
+		}
+	}
 	if id.cc.isDef {
 		n.node.ClosedRecursive = true
 	}

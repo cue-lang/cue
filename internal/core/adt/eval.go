@@ -1164,6 +1164,7 @@ type nodeContextState struct {
 
 	depth       int32
 	defaultMode defaultMode
+	disjunctID  disjunctInfo // for debugging
 
 	// has a value filled out before the node splits into a disjunction. Aside
 	// from detecting a self-reference cycle when there is otherwise just an

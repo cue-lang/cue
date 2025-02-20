@@ -1,0 +1,46 @@
+exec cue listcommands
+cmp stdout stdout.golden
+
+-- stdout.golden --
+cue add
+cue cmd
+cue completion
+cue def
+cue eval
+cue exp
+cue exp gengotypes
+cue export
+cue fix
+cue fmt
+cue get
+cue get go
+cue help
+cue help commands
+cue help embed
+cue help environment
+cue help filetypes
+cue help flags
+cue help injection
+cue help inputs
+cue help modules
+cue help registryconfig
+cue import
+cue listcommands
+cue login
+cue lsp
+cue mod
+cue mod edit
+cue mod fix
+cue mod get
+cue mod init
+cue mod mirror
+cue mod publish
+cue mod registry
+cue mod rename
+cue mod resolve
+cue mod tidy
+cue refactor
+cue refactor imports
+cue trim
+cue version
+cue vet

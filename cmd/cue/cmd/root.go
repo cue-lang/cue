@@ -238,6 +238,7 @@ func New(args []string) (*Command, error) {
 		newExpCmd(c),
 		newAddCmd(c),
 		newLSPCmd(c),
+		newListCommandsCmd(c),
 	} {
 		cmd.AddCommand(sub)
 	}

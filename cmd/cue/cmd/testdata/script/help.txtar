@@ -65,20 +65,20 @@ such as Go, JSON, YAML, OpenAPI, and JSON Schema.
 For more information and documentation, see: https://cuelang.org
 
 Available Commands:
-  cmd         run a user-defined workflow command
-  completion  Generate completion script
-  def         print consolidated definitions
-  eval        evaluate and print a configuration
-  export      output data in a standard format
-  fix         rewrite packages to latest standards
-  fmt         formats CUE configuration files
-  get         add non-CUE dependencies to the current module
-  import      convert other formats to CUE files
-  login       log into a CUE registry
-  mod         module maintenance
-  trim        remove superfluous fields
-  version     print CUE version
-  vet         validate data
+  cmd          run a user-defined workflow command
+  completion   Generate completion script
+  def          print consolidated definitions
+  eval         evaluate and print a configuration
+  export       output data in a standard format
+  fix          rewrite packages to latest standards
+  fmt          formats CUE configuration files
+  get          add non-CUE dependencies to the current module
+  import       convert other formats to CUE files
+  login        log into a CUE registry
+  mod          module maintenance
+  trim         remove superfluous fields
+  version      print CUE version
+  vet          validate data
 
 Use "cue help [command]" for more information about a command.
 

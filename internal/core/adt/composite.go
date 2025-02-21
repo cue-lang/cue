@@ -341,7 +341,14 @@ func (v *Vertex) rootCloseContext(ctx *OpContext) *closeContext {
 
 	if p := v.Parent; p != nil {
 		pcc := p.rootCloseContext(ctx)
-		// pcc.addDependency(ctx, ARC, false, v._cc, v._cc, v._cc)
+
+		if pcc.isClosed {
+			pcc.checkAllowsCC(ctx, v._cc)
+		}
+
+		// By un commenting is we significantly shorten the depth of the
+		// generated closeContext graph.
+		pcc.addArcDependency(ctx, false, v._cc)
 		v._cc.depth = pcc.depth + 1
 	}
 
@@ -1017,6 +1024,7 @@ func Unify(c *OpContext, a, b Value) *Vertex {
 
 func addConjuncts(ctx *OpContext, dst *Vertex, src Value) {
 	closeInfo := ctx.CloseInfo()
+	closeInfo.FromDef = false
 	c := MakeConjunct(nil, src, closeInfo)
 
 	if v, ok := src.(*Vertex); ok && v.ClosedRecursive {

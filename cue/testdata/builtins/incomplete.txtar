@@ -100,6 +100,38 @@ multipleErrors: {
 		out: template.Execute("{{.x}} {{.y}}", params)
 	}
 }
+-- out/evalalpha/stats --
+Leaks:  83
+Freed:  0
+Reused: 0
+Allocs: 83
+Retain: 0
+
+Unifications: 79
+Conjuncts:    114
+Disjuncts:    4
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  8
+-Freed:  115
+-Reused: 110
+-Allocs: 13
+-Retain: 58
++Leaks:  83
++Freed:  0
++Reused: 0
++Allocs: 83
++Retain: 0
+ 
+-Unifications: 103
+-Conjuncts:    255
+-Disjuncts:    150
++Unifications: 79
++Conjuncts:    114
++Disjuncts:    4
 -- out/eval/stats --
 Leaks:  8
 Freed:  115

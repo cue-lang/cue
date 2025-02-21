@@ -43,6 +43,38 @@ issue1837: {
 		x: context.b // incomplete error
 	}
 }
+-- out/evalalpha/stats --
+Leaks:  28
+Freed:  0
+Reused: 0
+Allocs: 28
+Retain: 0
+
+Unifications: 28
+Conjuncts:    52
+Disjuncts:    0
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  2
+-Freed:  30
+-Reused: 25
+-Allocs: 7
+-Retain: 80
++Leaks:  28
++Freed:  0
++Reused: 0
++Allocs: 28
++Retain: 0
+ 
+-Unifications: 32
+-Conjuncts:    156
+-Disjuncts:    29
++Unifications: 28
++Conjuncts:    52
++Disjuncts:    0
 -- out/eval/stats --
 Leaks:  2
 Freed:  30

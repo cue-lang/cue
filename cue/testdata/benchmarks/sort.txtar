@@ -13833,6 +13833,38 @@ diff old new
     }
   }
 }
+-- out/evalalpha/stats --
+Leaks:  947
+Freed:  0
+Reused: 0
+Allocs: 947
+Retain: 0
+
+Unifications: 947
+Conjuncts:    1848
+Disjuncts:    0
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  0
+-Freed:  3927
+-Reused: 3921
+-Allocs: 6
+-Retain: 1
++Leaks:  947
++Freed:  0
++Reused: 0
++Allocs: 947
++Retain: 0
+ 
+-Unifications: 3927
+-Conjuncts:    4952
+-Disjuncts:    3928
++Unifications: 947
++Conjuncts:    1848
++Disjuncts:    0
 -- out/eval/stats --
 Leaks:  0
 Freed:  3927

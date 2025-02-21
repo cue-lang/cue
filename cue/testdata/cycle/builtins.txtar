@@ -236,14 +236,14 @@ listMatchN: ok: {
 -- todo/p1 --
 issue3443.noCycle: fix hang
 -- out/evalalpha/stats --
-Leaks:  427
+Leaks:  426
 Freed:  0
 Reused: 0
-Allocs: 427
+Allocs: 426
 Retain: 0
 
-Unifications: 368
-Conjuncts:    1497
+Unifications: 367
+Conjuncts:    806
 Disjuncts:    28
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -255,17 +255,17 @@ diff old new
 -Reused: 402
 -Allocs: 35
 -Retain: 95
-+Leaks:  427
++Leaks:  426
 +Freed:  0
 +Reused: 0
-+Allocs: 427
++Allocs: 426
 +Retain: 0
  
 -Unifications: 409
 -Conjuncts:    764
 -Disjuncts:    501
-+Unifications: 368
-+Conjuncts:    1497
++Unifications: 367
++Conjuncts:    806
 +Disjuncts:    28
 -- out/eval/stats --
 Leaks:  23
@@ -293,8 +293,8 @@ issue3649.cycle.t1.data.a: invalid value {b:"foo"} (does not satisfy matchN): 0 
     ./cycle.cue:31:6
     ./cycle.cue:28:11
     ./cycle.cue:31:13
-issue3649.cycle.t1.data.a.a: structural cycle:
-    ./cycle.cue:31:6
+issue3649.cycle.t1.data.a.a: field not allowed:
+    ./cycle.cue:31:17
 jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): error in call to encoding/json.Validate: structural cycle:
     ./jsoncycle.cue:4:8
     ./jsoncycle.cue:5:8
@@ -403,7 +403,7 @@ Result:
         #c: (#struct){
           b?: (string){ string }
           a?: (_){ matchN(1, (#list){
-              0: (_|_){// &[〈2;#c〉]
+              0: (_|_){// 〈2;#c〉
               }
             }) }
         }
@@ -423,9 +423,9 @@ Result:
           b?: (string){ string }
           y: (struct){
             a?: (_){ matchN(1, (#list){
-                0: (_|_){// &[{
+                0: (_|_){// {
                   //   d: 〈4;c〉
-                  // }]
+                  // }
                 }
               }) }
           }
@@ -443,8 +443,8 @@ Result:
             //     ./cycle.cue:31:6
             //     ./cycle.cue:28:11
             //     ./cycle.cue:31:13
-            // issue3649.cycle.t1.data.a.a: structural cycle:
-            //     ./cycle.cue:31:6
+            // issue3649.cycle.t1.data.a.a: field not allowed:
+            //     ./cycle.cue:31:17
             b: (string){ "foo" }
           }
           b: (string){ string }
@@ -452,7 +452,7 @@ Result:
         #c: (#struct){
           b: (string){ string }
           a: (_){ matchN(1, (#list){
-              0: (_|_){// &[〈2;#c〉]
+              0: (_|_){// 〈2;#c〉
               }
             }) }
         }
@@ -558,29 +558,29 @@ Result:
   issue3410: (struct){
     _s: (struct){
       #x: (_){ matchN(1, (#list){
-          0: (_|_){// &[〈2;_s〉]
+          0: (_|_){// 〈2;_s〉
           }
-          1: (_|_){// &[[
+          1: (_|_){// [
             //   ...〈3;_s〉,
-            // ]]
+            // ]
           }
         }) }
     }
     #x: (_){ matchN(1, (#list){
-        0: (_|_){// &[〈2;_s〉]
+        0: (_|_){// 〈2;_s〉
         }
-        1: (_|_){// &[[
+        1: (_|_){// [
           //   ...〈3;_s〉,
-          // ]]
+          // ]
         }
       }) }
   }
   issue3420: (struct){
     matches1: (struct){
       #S: (_){ matchN(1, (#list){
-          0: (_|_){// &[_]
+          0: (_|_){// _
           }
-          1: (_|_){// &[_|_(explicit error (_|_ literal) in source)]
+          1: (_|_){// _|_(explicit error (_|_ literal) in source)
           }
         }) }
       s: (int){ 2 }
@@ -597,9 +597,9 @@ Result:
     }
     noCycle: (struct){
       #S: (_){ matchN(1, (#list){
-          0: (_|_){// &[{
+          0: (_|_){// {
             //   n?: (〈2;#S〉 & (int|{}))
-            // }]
+            // }
           }
         }) }
       noHang: (struct){
@@ -612,25 +612,25 @@ Result:
     }
     noCycle2: (struct){
       #S: (_){ matchN(1, (#list){
-          0: (_|_){// &[{
+          0: (_|_){// {
             //   n?: (int|〈2;#S〉)
-            // }]
+            // }
           }
         }) }
     }
     cycle1: (_|_){
       // [eval]
       #S: (_){ matchN(1, (#list){
-          0: (_|_){// &[{
+          0: (_|_){// {
             //   n: 〈2;#S〉
-            // }]
+            // }
           }
         }) }
       ok: (struct){
         s: (_){ matchN(1, (#list){
-            0: (_|_){// &[{
+            0: (_|_){// {
               //   n: 〈2;#S〉
-              // }]
+              // }
             }
           }) }
       }
@@ -701,11 +701,11 @@ Result:
         //     ./matchn.cue:63:24
       }
       #s: (_){ matchN(1, (#list){
-          0: (_|_){// &[matchN(1, [
+          0: (_|_){// matchN(1, [
             //   {
             //     a!: _
             //   },
-            // ])]
+            // ])
           }
         }) }
     }
@@ -844,8 +844,8 @@ diff old new
 +    ./cycle.cue:31:6
 +    ./cycle.cue:28:11
 +    ./cycle.cue:31:13
-+issue3649.cycle.t1.data.a.a: structural cycle:
-+    ./cycle.cue:31:6
++issue3649.cycle.t1.data.a.a: field not allowed:
++    ./cycle.cue:31:17
 +jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): error in call to encoding/json.Validate: structural cycle:
 +    ./jsoncycle.cue:4:8
 +    ./jsoncycle.cue:5:8
@@ -923,7 +923,7 @@ diff old new
          }
        }
        #x: (_|_){
-@@ -99,26 +105,25 @@
+@@ -99,21 +105,20 @@
          //     ./cycle.cue:4:7
          //     ./cycle.cue:4:14
          //     ./cycle.cue:5:13
@@ -959,12 +959,6 @@ diff old new
          }
          #c: (#struct){
            b?: (string){ string }
-           a?: (_){ matchN(1, (#list){
--              0: (_|_){// 〈2;#c〉
-+              0: (_|_){// &[〈2;#c〉]
-               }
-             }) }
-         }
 @@ -125,7 +130,6 @@
        }
        t2: (struct){
@@ -973,7 +967,7 @@ diff old new
            y: (struct){
              a: (struct){
                d: (struct){
-@@ -133,14 +137,15 @@
+@@ -133,6 +137,7 @@
                }
              }
            }
@@ -981,17 +975,7 @@ diff old new
          }
          c: (struct){
            b?: (string){ string }
-           y: (struct){
-             a?: (_){ matchN(1, (#list){
--                0: (_|_){// {
-+                0: (_|_){// &[{
-                   //   d: 〈4;c〉
--                  // }
-+                  // }]
-                 }
-               }) }
-           }
-@@ -147,18 +152,27 @@
+@@ -147,13 +152,22 @@
          }
        }
      }
@@ -1013,20 +997,14 @@ diff old new
 +            //     ./cycle.cue:31:6
 +            //     ./cycle.cue:28:11
 +            //     ./cycle.cue:31:13
-+            // issue3649.cycle.t1.data.a.a: structural cycle:
-+            //     ./cycle.cue:31:6
++            // issue3649.cycle.t1.data.a.a: field not allowed:
++            //     ./cycle.cue:31:17
 +            b: (string){ "foo" }
 +          }
 +          b: (string){ string }
          }
          #c: (#struct){
            b: (string){ string }
-           a: (_){ matchN(1, (#list){
--              0: (_|_){// 〈2;#c〉
-+              0: (_|_){// &[〈2;#c〉]
-               }
-             }) }
-         }
 @@ -224,8 +238,12 @@
      t1: (_|_){
        // [structural cycle]
@@ -1060,57 +1038,7 @@ diff old new
        }
      }
      ok: (struct){
-@@ -253,20 +278,20 @@
-   issue3410: (struct){
-     _s: (struct){
-       #x: (_){ matchN(1, (#list){
--          0: (_|_){// 〈2;_s〉
--          }
--          1: (_|_){// [
-+          0: (_|_){// &[〈2;_s〉]
-+          }
-+          1: (_|_){// &[[
-             //   ...〈3;_s〉,
--            // ]
-+            // ]]
-           }
-         }) }
-     }
-     #x: (_){ matchN(1, (#list){
--        0: (_|_){// 〈2;_s〉
--        }
--        1: (_|_){// [
-+        0: (_|_){// &[〈2;_s〉]
-+        }
-+        1: (_|_){// &[[
-           //   ...〈3;_s〉,
--          // ]
-+          // ]]
-         }
-       }) }
-   }
-@@ -273,9 +298,9 @@
-   issue3420: (struct){
-     matches1: (struct){
-       #S: (_){ matchN(1, (#list){
--          0: (_|_){// _
--          }
--          1: (_|_){// _|_(explicit error (_|_ literal) in source)
-+          0: (_|_){// &[_]
-+          }
-+          1: (_|_){// &[_|_(explicit error (_|_ literal) in source)]
-           }
-         }) }
-       s: (int){ 2 }
-@@ -292,13 +317,13 @@
-     }
-     noCycle: (struct){
-       #S: (_){ matchN(1, (#list){
--          0: (_|_){// {
-+          0: (_|_){// &[{
-             //   n?: (〈2;#S〉 & (int|{}))
--            // }
-+            // }]
+@@ -298,7 +323,7 @@
            }
          }) }
        noHang: (struct){
@@ -1119,40 +1047,17 @@ diff old new
            n: (struct){
              n: (_){ _ }
            }
-@@ -307,29 +332,43 @@
-     }
-     noCycle2: (struct){
-       #S: (_){ matchN(1, (#list){
--          0: (_|_){// {
-+          0: (_|_){// &[{
-             //   n?: (int|〈2;#S〉)
--            // }
--          }
--        }) }
--    }
--    cycle1: (struct){
--      #S: (_){ matchN(1, (#list){
--          0: (_|_){// {
-+            // }]
-+          }
-+        }) }
-+    }
-+    cycle1: (_|_){
-+      // [eval]
-+      #S: (_){ matchN(1, (#list){
-+          0: (_|_){// &[{
-             //   n: 〈2;#S〉
--            // }
-+            // }]
+@@ -313,7 +338,8 @@
            }
          }) }
-       ok: (struct){
-         s: (_){ matchN(1, (#list){
--            0: (_|_){// {
-+            0: (_|_){// &[{
-               //   n: 〈2;#S〉
--              // }
-+              // }]
+     }
+-    cycle1: (struct){
++    cycle1: (_|_){
++      // [eval]
+       #S: (_){ matchN(1, (#list){
+           0: (_|_){// {
+             //   n: 〈2;#S〉
+@@ -328,8 +354,21 @@
              }
            }) }
        }
@@ -1176,20 +1081,6 @@ diff old new
            n: (struct){
              n: (_){ _ }
            }
-@@ -382,11 +421,11 @@
-         //     ./matchn.cue:63:24
-       }
-       #s: (_){ matchN(1, (#list){
--          0: (_|_){// matchN(1, [
-+          0: (_|_){// &[matchN(1, [
-             //   {
-             //     a!: _
-             //   },
--            // ])
-+            // ])]
-           }
-         }) }
-     }
 @@ -397,8 +436,8 @@
        a?: ((string|bytes)){ "encoding/yaml".Validate(yamlNoCycle.#c) }
      }

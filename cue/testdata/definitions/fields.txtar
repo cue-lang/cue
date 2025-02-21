@@ -748,7 +748,7 @@ Result:
     open: (struct){
       #Schema: (_){
         matchN(1, (#list){
-          0: (_|_){// &[〈1;#x〉]
+          0: (_|_){// 〈1;#x〉
           }
         })
         #x: (#struct){
@@ -1219,7 +1219,7 @@ diff old new
        }
      }
    }
-@@ -540,11 +476,10 @@
+@@ -540,8 +476,7 @@
    }
    validator: (_|_){
      // [eval]
@@ -1228,11 +1228,7 @@ diff old new
 +    open: (struct){
        #Schema: (_){
          matchN(1, (#list){
--          0: (_|_){// 〈1;#x〉
-+          0: (_|_){// &[〈1;#x〉]
-           }
-         })
-         #x: (#struct){
+           0: (_|_){// 〈1;#x〉
 @@ -551,28 +486,10 @@
            trailingComma?: (string){ "all" }
          }

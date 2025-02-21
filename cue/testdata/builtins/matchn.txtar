@@ -1103,7 +1103,7 @@ Result:
             0: (int){ 2 }
           }), int) }) }
       pickTopOK2: (int){ &(matchN(1, (#list){
-          0: (_|_){// &[2]
+          0: (_|_){// 2
           }
         }), int) }
       pickTopErr: (int){ &(matchN(1, (#list){
@@ -1282,21 +1282,21 @@ Result:
     embed: (struct){
       t1: (struct){
         a: (_){ matchN(1, (#list){
-            0: (_|_){// &[>10]
+            0: (_|_){// >10
             }
           }) }
         b: (_){ matchN(1, (#list){
-            0: (_|_){// &[>10]
+            0: (_|_){// >10
             }
           }) }
       }
       t2: (struct){
         b: (_){ matchN(1, (#list){
-            0: (_|_){// &[>10]
+            0: (_|_){// >10
             }
           }) }
         a: (_){ matchN(1, (#list){
-            0: (_|_){// &[>10]
+            0: (_|_){// >10
             }
           }) }
       }
@@ -1304,21 +1304,21 @@ Result:
     direct: (struct){
       t1: (struct){
         a: (_){ matchN(1, (#list){
-            0: (_|_){// &[>10]
+            0: (_|_){// >10
             }
           }) }
         b: (_){ matchN(1, (#list){
-            0: (_|_){// &[>10]
+            0: (_|_){// >10
             }
           }) }
       }
       t2: (struct){
         b: (_){ matchN(1, (#list){
-            0: (_|_){// &[>10]
+            0: (_|_){// >10
             }
           }) }
         a: (_){ matchN(1, (#list){
-            0: (_|_){// &[>10]
+            0: (_|_){// >10
             }
           }) }
       }
@@ -1332,9 +1332,9 @@ Result:
     }
     ok2: (struct){
       x: (_){ matchN(0, (#list){
-          0: (_|_){// &[{
+          0: (_|_){// {
             //   foo!: string
-            // }]
+            // }
           }
         }) }
     }
@@ -1347,9 +1347,9 @@ Result:
   issue3575: (struct){
     test1: (struct){
       #x: (_){ matchN(1, (#list){
-          0: (_|_){// &[[
+          0: (_|_){// [
             //   {},
-            // ]]
+            // ]
           }
         }) }
       x: (#list){
@@ -1360,7 +1360,7 @@ Result:
     }
     test2: (struct){
       #x: (_){ matchN(1, (#list){
-          0: (_|_){// &[{}]
+          0: (_|_){// {}
           }
         }) }
       x: (#struct){
@@ -1384,9 +1384,9 @@ Result:
     }
     incomplete2: (struct){
       x: (_){ matchN(1, (#list){
-          0: (_|_){// &[{
+          0: (_|_){// {
             //   foo!: string
-            // }]
+            // }
           }
         }) }
     }
@@ -1613,15 +1613,6 @@ diff old new
        //     ./in.cue:14:20
        // match.incompleteErr: invalid value {a:string} (does not satisfy matchN): 0 matched, expected 1:
        //     ./in.cue:12:21
-@@ -193,7 +173,7 @@
-             0: (int){ 2 }
-           }), int) }) }
-       pickTopOK2: (int){ &(matchN(1, (#list){
--          0: (_|_){// 2
-+          0: (_|_){// &[2]
-           }
-         }), int) }
-       pickTopErr: (int){ &(matchN(1, (#list){
 @@ -207,7 +187,6 @@
        }
        pickNested1Err: (_|_){
@@ -1630,94 +1621,7 @@ diff old new
          //     ./in.cue:36:38
          //     ./in.cue:39:23
          // match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN): 0 matched, expected 1:
-@@ -373,21 +352,21 @@
-     embed: (struct){
-       t1: (struct){
-         a: (_){ matchN(1, (#list){
--            0: (_|_){// >10
--            }
--          }) }
--        b: (_){ matchN(1, (#list){
--            0: (_|_){// >10
--            }
--          }) }
--      }
--      t2: (struct){
--        b: (_){ matchN(1, (#list){
--            0: (_|_){// >10
--            }
--          }) }
--        a: (_){ matchN(1, (#list){
--            0: (_|_){// >10
-+            0: (_|_){// &[>10]
-+            }
-+          }) }
-+        b: (_){ matchN(1, (#list){
-+            0: (_|_){// &[>10]
-+            }
-+          }) }
-+      }
-+      t2: (struct){
-+        b: (_){ matchN(1, (#list){
-+            0: (_|_){// &[>10]
-+            }
-+          }) }
-+        a: (_){ matchN(1, (#list){
-+            0: (_|_){// &[>10]
-             }
-           }) }
-       }
-@@ -395,21 +374,21 @@
-     direct: (struct){
-       t1: (struct){
-         a: (_){ matchN(1, (#list){
--            0: (_|_){// >10
--            }
--          }) }
--        b: (_){ matchN(1, (#list){
--            0: (_|_){// >10
--            }
--          }) }
--      }
--      t2: (struct){
--        b: (_){ matchN(1, (#list){
--            0: (_|_){// >10
--            }
--          }) }
--        a: (_){ matchN(1, (#list){
--            0: (_|_){// >10
-+            0: (_|_){// &[>10]
-+            }
-+          }) }
-+        b: (_){ matchN(1, (#list){
-+            0: (_|_){// &[>10]
-+            }
-+          }) }
-+      }
-+      t2: (struct){
-+        b: (_){ matchN(1, (#list){
-+            0: (_|_){// &[>10]
-+            }
-+          }) }
-+        a: (_){ matchN(1, (#list){
-+            0: (_|_){// &[>10]
-             }
-           }) }
-       }
-@@ -423,9 +402,9 @@
-     }
-     ok2: (struct){
-       x: (_){ matchN(0, (#list){
--          0: (_|_){// {
--            //   foo!: string
--            // }
-+          0: (_|_){// &[{
-+            //   foo!: string
-+            // }]
-           }
-         }) }
-     }
-@@ -435,29 +414,16 @@
+@@ -435,10 +414,8 @@
        }
      }
    }
@@ -1725,16 +1629,15 @@ diff old new
 -    // [eval]
 -    test1: (_|_){
 -      // [eval]
--      #x: (_){ matchN(1, (#list){
--          0: (_|_){// [
 +  issue3575: (struct){
 +    test1: (struct){
-+      #x: (_){ matchN(1, (#list){
-+          0: (_|_){// &[[
+       #x: (_){ matchN(1, (#list){
+           0: (_|_){// [
              //   {},
--            // ]
--          }
--        }) }
+@@ -445,19 +422,8 @@
+             // ]
+           }
+         }) }
 -      x: (_|_){
 -        // [eval] issue3575.test1.x: invalid value [{a:1}] (does not satisfy matchN): 0 matched, expected 1:
 -        //     ./in.cue:153:7
@@ -1748,41 +1651,19 @@ diff old new
 -        //     ./in.cue:156:6
 -        //     ./in.cue:157:8
 -        0: (struct){
-+            // ]]
-+          }
-+        }) }
 +      x: (#list){
 +        0: (#struct){
            a: (int){ 1 }
          }
        }
-@@ -464,10 +430,10 @@
-     }
-     test2: (struct){
-       #x: (_){ matchN(1, (#list){
--          0: (_|_){// {}
--          }
--        }) }
+@@ -467,7 +433,7 @@
+           0: (_|_){// {}
+           }
+         }) }
 -      x: (struct){
-+          0: (_|_){// &[{}]
-+          }
-+        }) }
 +      x: (#struct){
          a: (int){ 1 }
        }
-     }
-@@ -488,9 +454,9 @@
-     }
-     incomplete2: (struct){
-       x: (_){ matchN(1, (#list){
--          0: (_|_){// {
--            //   foo!: string
--            // }
-+          0: (_|_){// &[{
-+            //   foo!: string
-+            // }]
-           }
-         }) }
      }
 @@ -640,8 +606,8 @@
          run?: (string){ string }

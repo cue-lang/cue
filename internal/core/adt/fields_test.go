@@ -666,13 +666,7 @@ func writeArcs(x adt.Runtime, v *adt.Vertex) string {
 		}
 		fmt.Fprintf(b, "%s: ", a.Label.RawString(x))
 
-		// TODO(perf): optimize this so that a single-element conjunct does
-		// not need a group.
-		if len(a.Conjuncts) != 1 {
-			panic("unexpected conjunct length")
-		}
-		g := a.Conjuncts[0].Elem().(*adt.ConjunctGroup)
-		vertexString(x, b, *g, initialIndent)
+		vertexString(x, b, a.Conjuncts, initialIndent)
 	}
 	return b.String()
 }

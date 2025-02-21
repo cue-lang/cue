@@ -176,6 +176,10 @@ func TestParseDefinitions(t *testing.T) {
 		in:     "omitvalue.cue",
 		out:    "omitvalue.json",
 		config: defaultConfig,
+	}, {
+		in:     "issue3718.cue",
+		out:    "issue3718.json",
+		config: defaultConfig,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.out+tc.variant, func(t *testing.T) {

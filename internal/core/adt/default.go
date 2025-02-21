@@ -14,6 +14,10 @@
 
 package adt
 
+import (
+	"slices"
+)
+
 // Default returns the default value or itself if there is no default.
 func Default(v Value) Value {
 	switch x := v.(type) {
@@ -131,9 +135,9 @@ func stripNonDefaults(elem Elem) (r Elem, stripped bool) {
 		// NOTE: this code requires allocations unconditional. This should be
 		// mitigated once we optimize conjunct groupings.
 		isNew := false
-		var a ConjunctGroup = make([]Conjunct, len(*x))
-		for i, c := range *x {
-			a[i].x, ok = stripNonDefaults(c.Expr())
+		a := slices.Clone(*x)
+		for i, c := range a {
+			a[i].x, ok = stripNonDefaults(c.Elem())
 			if ok {
 				isNew = true
 			}

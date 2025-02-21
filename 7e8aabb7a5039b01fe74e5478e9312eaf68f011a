@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2cabf9e3_e6c7fb5f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-21T11:40:12Z",
+      "side": 1,
+      "message": "Just FTR, if any issues bisect to this CL, we should use EnvExpr instead of Elem.",
+      "revId": "7e8aabb7a5039b01fe74e5478e9312eaf68f011a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

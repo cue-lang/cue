@@ -341,7 +341,14 @@ func (v *Vertex) rootCloseContext(ctx *OpContext) *closeContext {
 
 	if p := v.Parent; p != nil {
 		pcc := p.rootCloseContext(ctx)
-		// pcc.addDependency(ctx, ARC, false, v._cc, v._cc, v._cc)
+
+		if pcc.isClosed {
+			pcc.checkAllowsCC(ctx, v._cc)
+		}
+
+		// By un commenting is we significantly shorten the depth of the
+		// generated closeContext graph.
+		pcc.addArcDependency(ctx, false, v._cc)
 		v._cc.depth = pcc.depth + 1
 	}
 

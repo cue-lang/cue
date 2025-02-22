@@ -290,18 +290,8 @@ func (n *nodeContext) scheduleStruct(env *Environment,
 	parent.Disable = true // disable until processing is done.
 	ci.IsClosed = false
 
-	// TODO: precompile
-loop1:
-	for _, d := range s.Decls {
-		switch d.(type) {
-		case *Ellipsis:
-			hasEllipsis = true
-			break loop1
-		}
-	}
-
 	// TODO(perf): precompile whether struct has embedding.
-loop2:
+loop1:
 	for _, d := range s.Decls {
 		switch d.(type) {
 		case *Comprehension, Expr:
@@ -322,7 +312,7 @@ loop2:
 			// Note: adding a count is not needed here, as there will be an
 			// embed spawn below.
 			hasEmbed = true
-			break loop2
+			break loop1
 		}
 	}
 
@@ -357,9 +347,7 @@ loop2:
 
 		case *Ellipsis:
 			// Can be added unconditionally to patterns.
-			ci.cc.isDef = false
-			ci.cc.isClosed = false
-			ci.cc.isDefOrig = false
+			hasEllipsis = true
 
 		case *DynamicField:
 			if x.ArcType == ArcMember {

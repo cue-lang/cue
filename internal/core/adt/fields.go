@@ -934,6 +934,7 @@ func injectClosed(ctx *OpContext, closed, dst *closeContext) {
 		dst.Patterns = closed.Patterns
 
 		dst.isClosed = true
+		dst.isTotal = false
 	}
 }
 

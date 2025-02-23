@@ -172,8 +172,6 @@ func processDynamic(ctx *OpContext, t *task, mode runMode) {
 	ci := t.id
 
 	c := MakeConjunct(t.env, field, ci)
-	// TODO(evalv3): this does not seem to be necessary and even treacherous.
-	c.CloseInfo.cc = nil
 	n.insertArc(f, field.ArcType, c, ci, true)
 }
 

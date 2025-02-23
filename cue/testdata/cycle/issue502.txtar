@@ -29,16 +29,244 @@
 }
 
 a: #a & {config: a: 34}
+-- reduced.cue --
+reduced: t1: {
+	#T: x: y?: {
+		V: _
+		z: #T & V & {}
+	}
+	a: #T
+	a: x: y: V: x: y: V: {}
+}
 -- out/eval/stats --
 Leaks:  0
-Freed:  93
-Reused: 83
-Allocs: 10
+Freed:  120
+Reused: 107
+Allocs: 13
 Retain: 0
 
-Unifications: 93
-Conjuncts:    264
-Disjuncts:    93
+Unifications: 120
+Conjuncts:    320
+Disjuncts:    120
+-- out/evalalpha --
+(struct){
+  #T: (#struct){
+    config: (_){ _ }
+    body: (_){ _ }
+    mas: (#struct){
+    }
+  }
+  #a: (#struct){
+    config: (#struct){
+      a: (int){ int }
+    }
+    body: (int){ int }
+    mas: (#struct){
+      one: (#struct){
+        cfg: (#struct){
+          b: (int){ int }
+        }
+        _link: (#struct){
+          config: (#struct){
+            b: (int){ int }
+          }
+          body: (int){ int }
+          mas: (#struct){
+            two: (#struct){
+              cfg: (#struct){
+                c: (int){ int }
+              }
+              _link: (#struct){
+                config: (#struct){
+                  c: (int){ int }
+                }
+                body: (int){ int }
+                mas: (#struct){
+                }
+              }
+              link: (#struct){
+                config: (#struct){
+                  c: (int){ int }
+                }
+                body: (int){ int }
+                mas: (#struct){
+                }
+              }
+            }
+          }
+        }
+        link: (#struct){
+          config: (#struct){
+            b: (int){ int }
+          }
+          body: (int){ int }
+          mas: (#struct){
+            two: (#struct){
+              cfg: (#struct){
+                c: (int){ int }
+              }
+              _link: (#struct){
+                config: (#struct){
+                  c: (int){ int }
+                }
+                body: (int){ int }
+                mas: (#struct){
+                }
+              }
+              link: (#struct){
+                config: (#struct){
+                  c: (int){ int }
+                }
+                body: (int){ int }
+                mas: (#struct){
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  a: (#struct){
+    config: (#struct){
+      a: (int){ 34 }
+    }
+    body: (int){ 34 }
+    mas: (#struct){
+      one: (#struct){
+        cfg: (#struct){
+          b: (int){ 34 }
+        }
+        _link: (#struct){
+          config: (#struct){
+            b: (int){ int }
+          }
+          body: (int){ int }
+          mas: (#struct){
+            two: (#struct){
+              cfg: (#struct){
+                c: (int){ int }
+              }
+              _link: (#struct){
+                config: (#struct){
+                  c: (int){ int }
+                }
+                body: (int){ int }
+                mas: (#struct){
+                }
+              }
+              link: (#struct){
+                config: (#struct){
+                  c: (int){ int }
+                }
+                body: (int){ int }
+                mas: (#struct){
+                }
+              }
+            }
+          }
+        }
+        link: (#struct){
+          config: (#struct){
+            b: (int){ 34 }
+          }
+          body: (int){ 34 }
+          mas: (#struct){
+            two: (#struct){
+              cfg: (#struct){
+                c: (int){ 34 }
+              }
+              _link: (#struct){
+                config: (#struct){
+                  c: (int){ int }
+                }
+                body: (int){ int }
+                mas: (#struct){
+                }
+              }
+              link: (#struct){
+                config: (#struct){
+                  c: (int){ 34 }
+                }
+                body: (int){ 34 }
+                mas: (#struct){
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  reduced: (struct){
+    t1: (struct){
+      #T: (#struct){
+        x: (#struct){
+          y?: (#struct){
+            V: (_){ _ }
+            z: (#struct){
+              x: (#struct){
+                y?: (_|_){
+                  // [structural cycle]
+                  V: (_){ _ }
+                  z: (_|_){
+                    // [structural cycle] reduced.t1.#T.x.y.z.x.y.z: structural cycle
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      a: (#struct){
+        x: (#struct){
+          y: (#struct){
+            V: (#struct){
+              x: (struct){
+                y: (struct){
+                  V: (struct){
+                  }
+                }
+              }
+            }
+            z: (#struct){
+              x: (#struct){
+                y: (#struct){
+                  V: (#struct){
+                  }
+                  z: (#struct){
+                    x: (#struct){
+                      y?: (_|_){
+                        // [structural cycle]
+                        V: (_){ _ }
+                        z: (_|_){
+                          // [structural cycle] reduced.t1.a.x.y.z.x.y.z.x.y.z: structural cycle
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -170,7 +170,7 @@
+       a: (#struct){
+         x: (#struct){
+           y: (#struct){
+-            V: (struct){
++            V: (#struct){
+               x: (struct){
+                 y: (struct){
+                   V: (struct){
 -- out/eval --
 (struct){
   #T: (#struct){
@@ -189,6 +417,61 @@ Disjuncts:    93
       }
     }
   }
+  reduced: (struct){
+    t1: (struct){
+      #T: (#struct){
+        x: (#struct){
+          y?: (#struct){
+            V: (_){ _ }
+            z: (#struct){
+              x: (#struct){
+                y?: (_|_){
+                  // [structural cycle]
+                  V: (_){ _ }
+                  z: (_|_){
+                    // [structural cycle] reduced.t1.#T.x.y.z.x.y.z: structural cycle
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      a: (#struct){
+        x: (#struct){
+          y: (#struct){
+            V: (struct){
+              x: (struct){
+                y: (struct){
+                  V: (struct){
+                  }
+                }
+              }
+            }
+            z: (#struct){
+              x: (#struct){
+                y: (#struct){
+                  V: (#struct){
+                  }
+                  z: (#struct){
+                    x: (#struct){
+                      y?: (_|_){
+                        // [structural cycle]
+                        V: (_){ _ }
+                        z: (_|_){
+                          // [structural cycle] reduced.t1.a.x.y.z.x.y.z.x.y.z: structural cycle
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -243,4 +526,33 @@ Disjuncts:    93
       a: 34
     }
   })
+}
+--- reduced.cue
+{
+  reduced: {
+    t1: {
+      #T: {
+        x: {
+          y?: {
+            V: _
+            z: ((〈3;#T〉 & 〈0;V〉) & {})
+          }
+        }
+      }
+      a: 〈0;#T〉
+      a: {
+        x: {
+          y: {
+            V: {
+              x: {
+                y: {
+                  V: {}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }

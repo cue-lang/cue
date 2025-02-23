@@ -147,6 +147,10 @@ type ccDepRef struct {
 
 // addArc adds a dependent arc to c. If child is an arc, child.src == key
 func (c *closeContext) addArcDependency(ctx *OpContext, matched bool, child *closeContext) {
+	if f := child.src.Label; f.IsLet() || f == InvalidLabel {
+		return
+	}
+
 	root := child.src.cc()
 
 	// NOTE: do not increment

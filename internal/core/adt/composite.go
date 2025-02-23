@@ -335,6 +335,10 @@ func (v *Vertex) rootCloseContext(ctx *OpContext) *closeContext {
 	}
 	v._cc.incDependent(ctx, ROOT, nil) // matched in REF(decrement:nodeDone)
 
+	if f := v.Label; f.IsLet() || f == InvalidLabel {
+		return v._cc
+	}
+
 	if p := v.Parent; p != nil {
 		pcc := p.rootCloseContext(ctx)
 		// pcc.addDependency(ctx, ARC, false, v._cc, v._cc, v._cc)

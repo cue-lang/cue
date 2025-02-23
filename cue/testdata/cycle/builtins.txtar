@@ -236,14 +236,14 @@ listMatchN: ok: {
 -- todo/p1 --
 issue3443.noCycle: fix hang
 -- out/evalalpha/stats --
-Leaks:  426
+Leaks:  427
 Freed:  0
 Reused: 0
-Allocs: 426
+Allocs: 427
 Retain: 0
 
-Unifications: 367
-Conjuncts:    806
+Unifications: 368
+Conjuncts:    805
 Disjuncts:    28
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -255,17 +255,17 @@ diff old new
 -Reused: 402
 -Allocs: 35
 -Retain: 95
-+Leaks:  426
++Leaks:  427
 +Freed:  0
 +Reused: 0
-+Allocs: 426
++Allocs: 427
 +Retain: 0
  
 -Unifications: 409
 -Conjuncts:    764
 -Disjuncts:    501
-+Unifications: 367
-+Conjuncts:    806
++Unifications: 368
++Conjuncts:    805
 +Disjuncts:    28
 -- out/eval/stats --
 Leaks:  23
@@ -293,8 +293,8 @@ issue3649.cycle.t1.data.a: invalid value {b:"foo"} (does not satisfy matchN): 0 
     ./cycle.cue:31:6
     ./cycle.cue:28:11
     ./cycle.cue:31:13
-issue3649.cycle.t1.data.a.a: field not allowed:
-    ./cycle.cue:31:17
+issue3649.cycle.t1.data.a.a: structural cycle:
+    ./cycle.cue:31:6
 jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): error in call to encoding/json.Validate: structural cycle:
     ./jsoncycle.cue:4:8
     ./jsoncycle.cue:5:8
@@ -443,8 +443,8 @@ Result:
             //     ./cycle.cue:31:6
             //     ./cycle.cue:28:11
             //     ./cycle.cue:31:13
-            // issue3649.cycle.t1.data.a.a: field not allowed:
-            //     ./cycle.cue:31:17
+            // issue3649.cycle.t1.data.a.a: structural cycle:
+            //     ./cycle.cue:31:6
             b: (string){ "foo" }
           }
           b: (string){ string }
@@ -844,8 +844,8 @@ diff old new
 +    ./cycle.cue:31:6
 +    ./cycle.cue:28:11
 +    ./cycle.cue:31:13
-+issue3649.cycle.t1.data.a.a: field not allowed:
-+    ./cycle.cue:31:17
++issue3649.cycle.t1.data.a.a: structural cycle:
++    ./cycle.cue:31:6
 +jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): error in call to encoding/json.Validate: structural cycle:
 +    ./jsoncycle.cue:4:8
 +    ./jsoncycle.cue:5:8
@@ -997,8 +997,8 @@ diff old new
 +            //     ./cycle.cue:31:6
 +            //     ./cycle.cue:28:11
 +            //     ./cycle.cue:31:13
-+            // issue3649.cycle.t1.data.a.a: field not allowed:
-+            //     ./cycle.cue:31:17
++            // issue3649.cycle.t1.data.a.a: structural cycle:
++            //     ./cycle.cue:31:6
 +            b: (string){ "foo" }
 +          }
 +          b: (string){ string }

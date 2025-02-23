@@ -1024,6 +1024,7 @@ func Unify(c *OpContext, a, b Value) *Vertex {
 
 func addConjuncts(ctx *OpContext, dst *Vertex, src Value) {
 	closeInfo := ctx.CloseInfo()
+	closeInfo.FromDef = false
 	c := MakeConjunct(nil, src, closeInfo)
 
 	if v, ok := src.(*Vertex); ok && v.ClosedRecursive {

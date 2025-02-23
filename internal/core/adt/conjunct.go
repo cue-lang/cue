@@ -517,6 +517,9 @@ func (n *nodeContext) insertAndSkipConjuncts(c Conjunct, id CloseInfo, depth int
 	}
 
 	if c.CloseInfo.cc.depth <= depth {
+		// Now we do not clone the closeContext, set FromDef to false if
+		// the depth is smaller.
+		c.CloseInfo.FromDef = false
 		if x, ok := c.Elem().(*ConjunctGroup); ok {
 			for _, c := range *x {
 				n.insertAndSkipConjuncts(c, id, depth)

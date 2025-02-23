@@ -909,19 +909,7 @@ func isTotal(p Value) bool {
 // this is not the case.
 func injectClosed(ctx *OpContext, closed, dst *closeContext) {
 	for _, a := range dst.arcs {
-		ca := a.dst
-		switch f := ca.Label(); {
-		case ca.src.ArcType == ArcOptional,
-			// Without this continue, an evaluation error may be propagated to
-			// parent nodes that are otherwise allowed.
-			// TODO(evalv3): consider using ca.arcType instead.
-			allowedInClosed(f),
-			closed.allows(ctx, f):
-		case ca.arcType == ArcPending:
-			ca.arcType = ArcNotPresent
-		default:
-			ctx.notAllowedError(ca.src)
-		}
+		closed.checkAllowsCC(ctx, a.dst)
 	}
 
 	if !dst.isClosed {
@@ -938,8 +926,25 @@ func injectClosed(ctx *OpContext, closed, dst *closeContext) {
 	}
 }
 
+func (c *closeContext) checkAllowsCC(ctx *OpContext, arc *closeContext) {
+	switch f := arc.Label(); {
+	case arc.src.ArcType == ArcOptional,
+		// Without this continue, an evaluation error may be propagated to
+		// parent nodes that are otherwise allowed.
+		// TODO(evalv3): consider using ca.arcType instead.
+		allowedInClosed(f),
+		c.allows(ctx, f):
+	case arc.arcType == ArcPending:
+		arc.arcType = ArcNotPresent
+	default:
+		ctx.notAllowedError(arc.src)
+	}
+}
+
 func (c *closeContext) allows(ctx *OpContext, f Feature) bool {
-	ctx.Assertf(token.NoPos, c.conjunctCount == 0, "unexpected 0 conjunctCount")
+	// Either a closeConext was completed, or it was already determined that
+	// it is closed.
+	ctx.Assertf(token.NoPos, c.done || c.isClosed, "unexpected unfinished conjunct")
 
 	for _, b := range c.arcs {
 		cb := b.dst

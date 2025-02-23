@@ -5,7 +5,7 @@ exec cue vet -c schema.cue data.json
 # With the new evaluator.
 env CUE_EXPERIMENT=evalv3=1
 env CUE_DEBUG=openinline=0
-! exec cue vet -c schema.cue data.json #TODO Fix
+exec cue vet -c schema.cue data.json
 
 -- data.json --
 {

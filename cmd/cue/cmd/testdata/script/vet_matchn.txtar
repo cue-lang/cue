@@ -1,0 +1,32 @@
+# With the old evaluator.
+env CUE_EXPERIMENT=evalv3=0
+exec cue vet -c schema.cue data.json
+
+# With the new evaluator.
+env CUE_EXPERIMENT=evalv3=1
+env CUE_DEBUG=openinline=0
+! exec cue vet -c schema.cue data.json #TODO Fix
+
+-- data.json --
+{
+    "step": {
+        "run": "echo foo"
+    }
+}
+-- schema.cue --
+package githubactions
+
+#Workflow
+
+#Workflow: {
+    step!: matchN(1, [{
+        "uses"!: _
+        ...
+    }, {
+        "run"!: _
+        ...
+    }]) & close({
+        "uses"?: string
+        "run"?:  string
+    })
+}

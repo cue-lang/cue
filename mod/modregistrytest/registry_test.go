@@ -1,4 +1,4 @@
-package registrytest
+package modregistrytest
 
 import (
 	"context"

@@ -15,8 +15,8 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/internal/cuetxtar"
-	"cuelang.org/go/internal/registrytest"
 	"cuelang.org/go/mod/modcache"
+	"cuelang.org/go/mod/modregistrytest"
 )
 
 func TestModuleLoadWithInvalidRegistryConfig(t *testing.T) {
@@ -76,7 +76,7 @@ func TestModuleFetch(t *testing.T) {
 		qt.Assert(t, qt.IsNil(err))
 		rfs, err := fs.Sub(tfs, "_registry")
 		qt.Assert(t, qt.IsNil(err))
-		r, err := registrytest.New(rfs, "")
+		r, err := modregistrytest.New(rfs, "")
 		qt.Assert(t, qt.IsNil(err))
 		defer r.Close()
 

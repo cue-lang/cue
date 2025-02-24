@@ -26,8 +26,8 @@ import (
 
 	"cuelang.org/go/internal/cueconfig"
 	"cuelang.org/go/internal/cueversion"
-	"cuelang.org/go/internal/registrytest"
 	"cuelang.org/go/mod/modcache"
+	"cuelang.org/go/mod/modregistrytest"
 	"cuelang.org/go/mod/module"
 )
 
@@ -64,11 +64,11 @@ package x
 	qt.Assert(t, qt.IsNil(err))
 	r1fs, err := fs.Sub(fsys, "r1")
 	qt.Assert(t, qt.IsNil(err))
-	r1, err := registrytest.New(r1fs, "")
+	r1, err := modregistrytest.New(r1fs, "")
 	qt.Assert(t, qt.IsNil(err))
 	r2fs, err := fs.Sub(fsys, "r2")
 	qt.Assert(t, qt.IsNil(err))
-	r2, err := registrytest.New(r2fs, "")
+	r2, err := modregistrytest.New(r2fs, "")
 	qt.Assert(t, qt.IsNil(err))
 
 	dir := t.TempDir()
@@ -147,7 +147,7 @@ package x
 	qt.Assert(t, qt.IsNil(err))
 	ctx := context.Background()
 	rmem := ocimem.NewWithConfig(&ocimem.Config{ImmutableTags: true})
-	err = registrytest.Upload(ctx, rmem, regFS)
+	err = modregistrytest.Upload(ctx, rmem, regFS)
 	qt.Assert(t, qt.IsNil(err))
 	rh := ociserver.New(rmem, nil)
 	agent := cueversion.UserAgent("cuelang.org/go")
@@ -204,7 +204,7 @@ package bar
 		qt.Assert(t, qt.IsNil(err))
 		mux := http.NewServeMux()
 		r := ocimem.New()
-		err = registrytest.Upload(context.Background(), r, fsys)
+		err = modregistrytest.Upload(context.Background(), r, fsys)
 		qt.Assert(t, qt.IsNil(err))
 		rh := ociserver.New(r, nil)
 		mux.HandleFunc("/v2/", func(w http.ResponseWriter, r *http.Request) {

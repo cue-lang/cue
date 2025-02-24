@@ -16,9 +16,9 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"golang.org/x/tools/txtar"
 
-	"cuelang.org/go/internal/registrytest"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/modregistry"
+	"cuelang.org/go/mod/modregistrytest"
 	"cuelang.org/go/mod/module"
 )
 
@@ -85,7 +85,7 @@ func stringFromFile(fsys fs.FS, file string) string {
 func newRegistry(t *testing.T, fsys fs.FS) Registry {
 	fsys, err := fs.Sub(fsys, "_registry")
 	qt.Assert(t, qt.IsNil(err))
-	regSrv, err := registrytest.New(fsys, "")
+	regSrv, err := modregistrytest.New(fsys, "")
 	qt.Assert(t, qt.IsNil(err))
 	t.Cleanup(regSrv.Close)
 	regOCI, err := ociclient.New(regSrv.Host(), &ociclient.Options{

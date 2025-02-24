@@ -16,6 +16,24 @@
       "message": "Looks fine, but Unity unhappy.",
       "revId": "8682a20623533084d5e72b4a199c47b5204d2d75",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "50c0b7f3_d71578fc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-24T12:50:52Z",
+      "side": 1,
+      "message": "The Unity breakage was part of the previous CL and is actually fixed in this one. Added an interstitial test that exposes this.",
+      "parentUuid": "90b5d197_58448391",
+      "revId": "8682a20623533084d5e72b4a199c47b5204d2d75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

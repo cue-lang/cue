@@ -342,9 +342,9 @@ func (v *Vertex) rootCloseContext(ctx *OpContext) *closeContext {
 	if p := v.Parent; p != nil {
 		pcc := p.rootCloseContext(ctx)
 
-		if pcc.isClosed {
-			pcc.checkAllowsCC(ctx, v._cc)
-		}
+		// if pcc.isClosed {
+		// 	pcc.checkAllowsCC(ctx, v._cc)
+		// }
 
 		// By un commenting is we significantly shorten the depth of the
 		// generated closeContext graph.

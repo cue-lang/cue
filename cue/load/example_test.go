@@ -24,7 +24,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/load"
-	"cuelang.org/go/internal/registrytest"
+	"cuelang.org/go/mod/modregistrytest"
 )
 
 // Note that these examples may not be runnable on pkg.go.dev,
@@ -135,7 +135,7 @@ value: "world"
 	if err != nil {
 		panic(err)
 	}
-	registry, err := registrytest.New(registryFS, "")
+	registry, err := modregistrytest.New(registryFS, "")
 	if err != nil {
 		panic(err)
 	}

@@ -15,8 +15,8 @@ import (
 	"github.com/go-quicktest/qt"
 	"golang.org/x/tools/txtar"
 
-	"cuelang.org/go/internal/registrytest"
 	"cuelang.org/go/mod/modregistry"
+	"cuelang.org/go/mod/modregistrytest"
 	"cuelang.org/go/mod/module"
 )
 
@@ -180,7 +180,7 @@ func txtarContents(fsys fs.FS) ([]byte, error) {
 }
 
 func newRegistry(t *testing.T, fsys fs.FS) ociregistry.Interface {
-	regSrv, err := registrytest.New(fsys, "")
+	regSrv, err := modregistrytest.New(fsys, "")
 	qt.Assert(t, qt.IsNil(err))
 	t.Cleanup(regSrv.Close)
 	regOCI, err := ociclient.New(regSrv.Host(), &ociclient.Options{

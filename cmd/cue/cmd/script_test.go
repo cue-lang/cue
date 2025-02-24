@@ -52,7 +52,7 @@ import (
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/mod/semver"
-	"cuelang.org/go/internal/registrytest"
+	"cuelang.org/go/mod/modregistrytest"
 )
 
 // TestLatest checks that the examples match the latest language standard,
@@ -169,7 +169,7 @@ func TestScript(t *testing.T) {
 				if neg {
 					usage()
 				}
-				var auth *registrytest.AuthConfig
+				var auth *modregistrytest.AuthConfig
 				if len(args) > 0 && strings.HasPrefix(args[0], "-") {
 					userPass, ok := strings.CutPrefix(args[0], "-auth=")
 					if !ok {
@@ -179,7 +179,7 @@ func TestScript(t *testing.T) {
 					if !ok {
 						usage()
 					}
-					auth = &registrytest.AuthConfig{
+					auth = &modregistrytest.AuthConfig{
 						Username: user,
 						Password: pass,
 					}
@@ -189,7 +189,7 @@ func TestScript(t *testing.T) {
 					usage()
 				}
 
-				srv, err := registrytest.NewServer(ocimem.NewWithConfig(&ocimem.Config{ImmutableTags: true}), auth)
+				srv, err := modregistrytest.NewServer(ocimem.NewWithConfig(&ocimem.Config{ImmutableTags: true}), auth)
 				if err != nil {
 					ts.Fatalf("cannot start registrytest server: %v", err)
 				}
@@ -294,7 +294,7 @@ func TestScript(t *testing.T) {
 						return fmt.Errorf("invalid contents of proxy file %q: %v", proxyFile, err)
 					}
 				}
-				reg, err := registrytest.New(os.DirFS(registryDir), prefix)
+				reg, err := modregistrytest.New(os.DirFS(registryDir), prefix)
 				if err != nil {
 					return fmt.Errorf("cannot start test registry server: %v", err)
 				}

@@ -1,4 +1,9 @@
-package registrytest
+// Package modregistrytest provides helpers for testing packages
+// which interact with CUE registries.
+//
+// WARNING: THIS PACKAGE IS EXPERIMENTAL.
+// ITS API MAY CHANGE AT ANY TIME.
+package modregistrytest
 
 import (
 	"bytes"

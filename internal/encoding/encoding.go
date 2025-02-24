@@ -262,7 +262,9 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 		i.err = err
 		i.expr = ast.NewString(string(b))
 	case build.Binary:
-		b, err := io.ReadAll(r)
+		// Binary files should not generally be treated as UTF-8. Don't use the
+		// [transform.Reader] created above but read directly from the file instead.
+		b, err := io.ReadAll(srcr)
 		i.err = err
 		s := literal.Bytes.WithTabIndent(1).Quote(string(b))
 		i.expr = ast.NewLit(token.STRING, s)

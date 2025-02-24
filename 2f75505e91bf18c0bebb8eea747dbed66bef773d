@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6940b4c6_80653bf5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-24T10:08:35Z",
+      "side": 1,
+      "message": "The Unity evalv3 regression spotted by the curated modules reduces to the following:\n\n```\n# With the old evaluator.\nenv CUE_EXPERIMENT\u003devalv3\u003d0\nexec cue vet -c schema.cue data.json\n\n# With the new evaluator.\nenv CUE_EXPERIMENT\u003devalv3\u003d1\nenv CUE_DEBUG\u003dopeninline\u003d0\nexec cue vet -c schema.cue data.json\n\n-- data.json --\n{\n\t\"step\": {\n\t\t\"run\": \"echo foo\"\n\t}\n}\n-- schema.cue --\npackage githubactions\n\n#Workflow\n\n#Workflow: {\n\tstep!: matchN(1, [{\n\t\t\"uses\"!: _\n\t\t...\n\t}, {\n\t\t\"run\"!: _\n\t\t...\n\t}]) \u0026 close({\n\t\t\"uses\"?: string\n\t\t\"run\"?:  string\n\t})\n}\n```\n\nThe testscript above passes on cue@master, but it fails with this unmerged branch:\n\n```\n# With the old evaluator. (0.010s)\n\u003e env CUE_EXPERIMENT\u003devalv3\u003d0\n\u003e exec cue vet -c schema.cue data.json\n# With the new evaluator. (0.047s)\n\u003e env CUE_EXPERIMENT\u003devalv3\u003d1\n\u003e env CUE_DEBUG\u003dopeninline\u003d0\n\u003e exec cue vet -c schema.cue data.json\n[stderr]\n#Workflow.step: invalid value {uses?:string,run?:string} (does not satisfy matchN): 0 matched, expected 1:\n    ./schema.cue:6:9\n    ./schema.cue:6:16\n#Workflow.step.run: field not allowed:\n    ./schema.cue:6:9\n#Workflow.step.uses: field not allowed:\n    ./schema.cue:6:9\n[exit status 1]\n```",
+      "revId": "2f75505e91bf18c0bebb8eea747dbed66bef773d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

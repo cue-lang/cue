@@ -337,7 +337,11 @@ func TestMapRefExternalRefForInternalSchema(t *testing.T) {
 	v := cuecontext.New().CompileString(`
 type: "object"
 $id: "https://this.test"
-$defs: foo: type: ["number", "string"]
+$defs: foo: {
+	description: "foo can be a number or a string"
+	type: ["number", "string"]
+}
+$defs: bar: type: "boolean"
 $ref: "#/$defs/foo"
 `)
 	var calls []string
@@ -347,14 +351,19 @@ $ref: "#/$defs/foo"
 			calls = append(calls, loc.String())
 			switch loc.ID.String() {
 			case "https://this.test#/$defs/foo":
-				return "otherpkg.example/foo", cue.ParsePath("#foo"), nil
+				return "otherpkg.example/foo", cue.ParsePath("#x"), nil
+			case "https://this.test#/$defs/bar":
+				return "otherpkg.example/bar", cue.ParsePath("#x"), nil
 			case "https://this.test":
 				return "", cue.Path{}, nil
 			}
 			t.Errorf("unexpected ID")
 			return "", cue.Path{}, fmt.Errorf("unexpected ID %q passed to MapRef", loc.ID)
 		},
-		DefineSchema: func(importPath string, path cue.Path, e ast.Expr) {
+		DefineSchema: func(importPath string, path cue.Path, e ast.Expr, c *ast.CommentGroup) {
+			if c != nil {
+				ast.AddComment(e, c)
+			}
 			data, err := format.Node(e)
 			if err != nil {
 				t.Errorf("cannot format: %v", err)
@@ -368,20 +377,22 @@ $ref: "#/$defs/foo"
 	if err != nil {
 		t.Fatal(errors.Details(err, nil))
 	}
-	qt.Assert(t, qt.DeepEquals(calls, []string{
+	qt.Check(t, qt.DeepEquals(calls, []string{
 		"id=https://this.test#/$defs/foo localPath=$defs.foo",
+		"id=https://this.test#/$defs/bar localPath=$defs.bar",
 		"id=https://this.test localPath=",
 	}))
-	qt.Assert(t, qt.Equals(string(b), `
+	qt.Check(t, qt.Equals(string(b), `
 import "otherpkg.example/foo"
 
 @jsonschema(id="https://this.test")
-foo.#foo & {
+foo.#x & {
 	...
 }
 `[1:]))
-	qt.Assert(t, qt.DeepEquals(defines, map[string]string{
-		"otherpkg.example/foo.#foo": "number | string",
+	qt.Check(t, qt.DeepEquals(defines, map[string]string{
+		"otherpkg.example/bar.#x": "bool",
+		"otherpkg.example/foo.#x": "// foo can be a number or a string\nnumber | string",
 	}))
 }
 

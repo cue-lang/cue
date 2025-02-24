@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee64a894_6bc4e659",
+        "filename": "cmd/cue/cmd/testdata/script/help.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-02-24T15:18:49Z",
+      "side": 1,
+      "message": "I don\u0027t see the root cause of this harmless formatting change.",
+      "revId": "746a45586eaf587938a3831fb30c34d163403890",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fdc731db_a99ac451",
+        "filename": "cmd/cue/cmd/testdata/script/listcommands.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-02-24T15:18:49Z",
+      "side": 1,
+      "message": "The minimal output that I believe would be able to supplement the current cuelang.org page generation includes a list of the exact commands that generate help texts, omitting internal commands.\n\n`cue listcommands`, at least, is internal, and would need not to appear in this list.\n\n`cue help vet` would need to appear in this list instead of `cue vet` to prevent cuelang.org\u0027s generation having to distinguish (for example) between `cue help commands` and `cue vet`, in order to only inject the `help ` string at $1 inside the `cue vet` command string.\n\nWe can, of course, work round any of these issues by having more code on the cuelang.org side of the fence, or by changing what/how cuelang.org presents the commands. I mention these issues based on the headline aim of this change to remove code/data/complexity from cuelang.org.",
+      "revId": "746a45586eaf587938a3831fb30c34d163403890",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

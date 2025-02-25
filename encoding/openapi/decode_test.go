@@ -39,8 +39,13 @@ import (
 	"cuelang.org/go/internal/cuetest"
 )
 
-// TestDecode reads the testdata/*.txtar files, converts the contained
-// JSON schema to CUE and compares it against the output.
+// TestDecode reads the testdata/script/*.txtar files, converts the
+// contained JSON (or YAML) schema to CUE and compares it against the
+// output.
+//
+// The first .json or .yaml file in the txtar archive (with no / in
+// the name) is used as the input. The first .cue file in the archive
+// (with no / in the name) is used as the expected output.
 //
 // Set CUE_UPDATE=1 to update test files with the corresponding output.
 func TestDecode(t *testing.T) {
@@ -65,18 +70,29 @@ func TestDecode(t *testing.T) {
 			outIndex := -1
 
 			for i, f := range a.Files {
+				if strings.Contains(f.Name, "/") {
+					continue
+				}
 				switch path.Ext(f.Name) {
 				case ".json":
-					var inExpr ast.Expr
-					inExpr, err = json.Extract(f.Name, f.Data)
-					inFile = internal.ToFile(inExpr)
+					if inFile == nil {
+						var inExpr ast.Expr
+						inExpr, err = json.Extract(f.Name, f.Data)
+						inFile = internal.ToFile(inExpr)
+					}
 				case ".yaml":
-					inFile, err = yaml.Extract(f.Name, f.Data)
+					if inFile == nil {
+						inFile, err = yaml.Extract(f.Name, f.Data)
+					}
 				case ".cue":
-					out = f.Data
-					outIndex = i
+					if out == nil {
+						out = f.Data
+						outIndex = i
+					}
 				case ".err":
-					errout = f.Data
+					if errout == nil {
+						errout = f.Data
+					}
 				}
 			}
 			if err != nil {

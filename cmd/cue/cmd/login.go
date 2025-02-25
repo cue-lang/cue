@@ -49,8 +49,7 @@ func newLoginCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "login [registry]",
 		Short: "log into a CUE registry",
-		Long: `WARNING: THIS COMMAND IS EXPERIMENTAL.
-
+		Long: `
 Log into a CUE registry via the OAuth 2.0 Device Authorization Grant.
 Without an argument, CUE_REGISTRY is used if it points to a single registry.
 
@@ -59,7 +58,7 @@ removing the need for a human to interact with the OAuth device flow.
 
 Once the authorization is successful, a token is stored in a logins.json file
 inside $CUE_CONFIG_DIR; see 'cue help environment'.
-`,
+`[1:],
 		Args: cobra.MaximumNArgs(1),
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {
 			var locResolver modresolve.LocationResolver

@@ -1,0 +1,126 @@
+-- in.cue --
+passToSingleValue: p1: _ | *((_ | *"x") & "y")
+passToSingleValue: p2: _ | *((*"x" | _) & "y")
+passToSingleValue: p3: *((_ | *"x") & "y") | _
+passToSingleValue: p4: *((*"x" | _) & "y") | _
+
+issue3779: {
+	out: #Foo & {
+		fieldFoo: "foo"
+	}
+	#Foo: #Bar & {
+		fieldFoo: string | *"foo-default"
+	}
+	#Bar: {
+		fieldFoo: _
+		fieldBar: string | *fieldFoo
+	}
+}
+-- out/compile --
+--- in.cue
+{
+  passToSingleValue: {
+    p1: (_|*((_|*"x") & "y"))
+  }
+  passToSingleValue: {
+    p2: (_|*((*"x"|_) & "y"))
+  }
+  passToSingleValue: {
+    p3: (*((_|*"x") & "y")|_)
+  }
+  passToSingleValue: {
+    p4: (*((*"x"|_) & "y")|_)
+  }
+  issue3779: {
+    out: (〈0;#Foo〉 & {
+      fieldFoo: "foo"
+    })
+    #Foo: (〈0;#Bar〉 & {
+      fieldFoo: (string|*"foo-default")
+    })
+    #Bar: {
+      fieldFoo: _
+      fieldBar: (string|*〈0;fieldFoo〉)
+    }
+  }
+}
+-- out/evalalpha --
+(struct){
+  passToSingleValue: (struct){
+    p1: (_){ |((_){ _ }, (string){ "y" }) }
+    p2: (_){ |((_){ _ }, (string){ "y" }) }
+    p3: (_){ |((string){ "y" }, (_){ _ }) }
+    p4: (_){ |((string){ "y" }, (_){ _ }) }
+  }
+  issue3779: (struct){
+    out: (#struct){
+      fieldFoo: (string){ "foo" }
+      fieldBar: (string){ |((string){ string }, (string){ "foo" }) }
+    }
+    #Foo: (#struct){
+      fieldFoo: (string){ |(*(string){ "foo-default" }, (string){ string }) }
+      fieldBar: (string){ |(*(string){ "foo-default" }, (string){ string }) }
+    }
+    #Bar: (#struct){
+      fieldFoo: (_){ _ }
+      fieldBar: (_){ |(*(_){ _ }, (string){ string }) }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,14 +1,14 @@
+ (struct){
+   passToSingleValue: (struct){
+-    p1: (_){ |(*(string){ "y" }, (_){ _ }) }
+-    p2: (_){ |(*(string){ "y" }, (_){ _ }) }
+-    p3: (_){ |(*(string){ "y" }, (_){ _ }) }
+-    p4: (_){ |(*(string){ "y" }, (_){ _ }) }
++    p1: (_){ |((_){ _ }, (string){ "y" }) }
++    p2: (_){ |((_){ _ }, (string){ "y" }) }
++    p3: (_){ |((string){ "y" }, (_){ _ }) }
++    p4: (_){ |((string){ "y" }, (_){ _ }) }
+   }
+   issue3779: (struct){
+     out: (#struct){
+       fieldFoo: (string){ "foo" }
+-      fieldBar: (string){ |(*(string){ "foo" }, (string){ string }) }
++      fieldBar: (string){ |((string){ string }, (string){ "foo" }) }
+     }
+     #Foo: (#struct){
+       fieldFoo: (string){ |(*(string){ "foo-default" }, (string){ string }) }
+-- out/eval --
+(struct){
+  passToSingleValue: (struct){
+    p1: (_){ |(*(string){ "y" }, (_){ _ }) }
+    p2: (_){ |(*(string){ "y" }, (_){ _ }) }
+    p3: (_){ |(*(string){ "y" }, (_){ _ }) }
+    p4: (_){ |(*(string){ "y" }, (_){ _ }) }
+  }
+  issue3779: (struct){
+    out: (#struct){
+      fieldFoo: (string){ "foo" }
+      fieldBar: (string){ |(*(string){ "foo" }, (string){ string }) }
+    }
+    #Foo: (#struct){
+      fieldFoo: (string){ |(*(string){ "foo-default" }, (string){ string }) }
+      fieldBar: (string){ |(*(string){ "foo-default" }, (string){ string }) }
+    }
+    #Bar: (#struct){
+      fieldFoo: (_){ _ }
+      fieldBar: (_){ |(*(_){ _ }, (string){ string }) }
+    }
+  }
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  46
+Reused: 37
+Allocs: 9
+Retain: 2
+
+Unifications: 16
+Conjuncts:    68
+Disjuncts:    48

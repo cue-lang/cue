@@ -812,8 +812,25 @@ func (c *OpContext) unifyNode(expr Expr, state combinedFlags) (result Value) {
 		return x
 
 	case Evaluator:
-		v := x.evaluate(c, state)
-		return v
+		if !c.isDevVersion() {
+			return x.evaluate(c, state)
+		}
+
+		env := c.Env(0)
+		cv, ok := env.cache[cacheKey{expr, nil}]
+		if !ok {
+			if env.cache == nil {
+				env.cache = map[cacheKey]Value{}
+			}
+			x := x.evaluate(c, state)
+			env.cache[cacheKey{expr, nil}] = x
+			cv = x
+		}
+
+		v, ok = cv.(*Vertex)
+		if !ok {
+			return cv
+		}
 
 	case Resolver:
 		v = x.resolve(c, state)

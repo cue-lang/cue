@@ -16,6 +16,7 @@ var Flags struct {
 	EvalV3 bool
 
 	// Embed enables file embedding.
+	// TODO(v0.14): deprecate this flag to forbid disabling this feature.
 	Embed bool `envflag:"default:true"`
 
 	// DecodeInt64 changes [cuelang.org/go/cue.Value.Decode] to choose

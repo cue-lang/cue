@@ -384,7 +384,9 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 	case 1:
 		d := cross[0].node
 		n.setBaseValue(d)
-		n.defaultMode = cross[0].defaultMode
+		if n.defaultMode == maybeDefault {
+			n.defaultMode = cross[0].defaultMode
+		}
 		if n.defaultAttemptInCycle != nil && n.defaultMode != isDefault {
 			c := n.ctx
 			path := c.PathToString(n.defaultAttemptInCycle.Path())
@@ -574,7 +576,8 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, hole i
 		return nil, err
 	}
 
-	d = d.node.DerefDisjunct().state
+	d.node.DerefDisjunct().state.defaultMode = d.defaultMode
+	d = d.node.DerefDisjunct().state // TODO: maybe do not unroll at all.
 
 	return d, nil
 }

@@ -95,7 +95,7 @@ Result:
   s1: (#struct){
     min: (int){ 5 }
     res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
-    max: (number){ |((number){ >5 }, (int){ 5 }) }
+    max: (number){ |(*(int){ 5 }, (number){ >5 }) }
   }
   s2: (#struct){
     max: (int){ 5 }
@@ -194,10 +194,9 @@ diff old new
    s1: (#struct){
 -    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
 -    min: (int){ 5 }
--    max: (number){ |(*(int){ 5 }, (number){ >5 }) }
 +    min: (int){ 5 }
 +    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
-+    max: (number){ |((number){ >5 }, (int){ 5 }) }
+     max: (number){ |(*(int){ 5 }, (number){ >5 }) }
    }
    s2: (#struct){
 -    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }

@@ -1083,7 +1083,7 @@ func (p *parser) parseComprehensionClauses(first bool) (clauses []ast.Clause, c 
 			forPos := p.expect(token.FOR)
 			if first {
 				switch p.tok {
-				case token.COLON, token.BIND, token.OPTION,
+				case token.COLON, token.BIND, token.OPTION, token.NOT,
 					token.COMMA, token.EOF:
 					return nil, c
 				}

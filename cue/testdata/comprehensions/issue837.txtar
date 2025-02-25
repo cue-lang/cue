@@ -64,21 +64,21 @@
 
 #ServiceManifest: #Manifest & {ref: kind: "service"}
 -- out/evalalpha/stats --
-Leaks:  123
-Freed:  10
-Reused: 9
-Allocs: 124
+Leaks:  75
+Freed:  0
+Reused: 0
+Allocs: 75
 Retain: 0
 
-Unifications: 95
-Conjuncts:    563
-Disjuncts:    30
+Unifications: 62
+Conjuncts:    120
+Disjuncts:    8
 -- out/evalalpha --
 Errors:
-#Configure.service.description.role: undefined field: role:
-    ./in.cue:40:19
-#DoDeploy.deployment.description.service.description.role: undefined field: role:
-    ./in.cue:40:19
+#Configure.service.description.configed.labstr: undefined field: label:
+    ./in.cue:51:14
+#DoDeploy.deployment.description.service.description.configed.labstr: undefined field: label:
+    ./in.cue:51:14
 #RelabelService.out.labstr: undefined field: label:
     ./in.cue:51:14
 
@@ -133,8 +133,8 @@ Result:
               }
             }
             role: (_|_){
-              // [eval] #DoDeploy.deployment.description.service.description.role: undefined field: role:
-              //     ./in.cue:40:19
+              // [eval] #DoDeploy.deployment.description.service.description.configed.labstr: undefined field: label:
+              //     ./in.cue:51:14
             }
           }
         }
@@ -159,8 +159,8 @@ Result:
           }
         }
         role: (_|_){
-          // [eval] #Configure.service.description.role: undefined field: role:
-          //     ./in.cue:40:19
+          // [eval] #Configure.service.description.configed.labstr: undefined field: label:
+          //     ./in.cue:51:14
         }
       }
     }
@@ -202,6 +202,19 @@ Result:
 diff old new
 --- old
 +++ new
+@@ -1,8 +1,8 @@
+ Errors:
+-#Configure.service.description.role: undefined field: role:
+-    ./in.cue:40:19
+-#DoDeploy.deployment.description.service.description.role: undefined field: role:
+-    ./in.cue:40:19
++#Configure.service.description.configed.labstr: undefined field: label:
++    ./in.cue:51:14
++#DoDeploy.deployment.description.service.description.configed.labstr: undefined field: label:
++    ./in.cue:51:14
+ #RelabelService.out.labstr: undefined field: label:
+     ./in.cue:51:14
+ 
 @@ -13,24 +13,10 @@
      ref: (#struct){
        kind: (string){ "deployment" }
@@ -295,6 +308,28 @@ diff old new
          service: (_|_){
            // [eval]
            description: (_|_){
+@@ -106,8 +57,8 @@
+               }
+             }
+             role: (_|_){
+-              // [eval] #DoDeploy.deployment.description.service.description.role: undefined field: role:
+-              //     ./in.cue:40:19
++              // [eval] #DoDeploy.deployment.description.service.description.configed.labstr: undefined field: label:
++              //     ./in.cue:51:14
+             }
+           }
+         }
+@@ -132,8 +83,8 @@
+           }
+         }
+         role: (_|_){
+-          // [eval] #Configure.service.description.role: undefined field: role:
+-          //     ./in.cue:40:19
++          // [eval] #Configure.service.description.configed.labstr: undefined field: label:
++          //     ./in.cue:51:14
+         }
+       }
+     }
 @@ -141,9 +92,7 @@
    #RelabelService: (_|_){
      // [eval]
@@ -327,6 +362,28 @@ diff old new
      }
    }
    #ServiceManifest: (#struct){
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  16
+-Freed:  117
+-Reused: 108
+-Allocs: 25
+-Retain: 53
++Leaks:  75
++Freed:  0
++Reused: 0
++Allocs: 75
++Retain: 0
+ 
+-Unifications: 107
+-Conjuncts:    243
+-Disjuncts:    170
++Unifications: 62
++Conjuncts:    120
++Disjuncts:    8
 -- out/eval/stats --
 Leaks:  16
 Freed:  117

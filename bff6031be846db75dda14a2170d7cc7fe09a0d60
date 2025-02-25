@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e821ad97_9c5ef22f",
+        "filename": "cue/testdata/disjunctions/specdeviation.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-25T11:00:03Z",
+      "side": 1,
+      "message": "I think your sentence got truncated here.",
+      "revId": "bff6031be846db75dda14a2170d7cc7fe09a0d60",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

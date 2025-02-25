@@ -1,3 +1,17 @@
+-- in.cue --
+// File comment.
+
+#Struct: {
+	#T: int
+
+	a?: #T
+
+	{b?: #T}
+
+	c?: [...#T]
+}
+
+-- out/TestGenerateOpenAPI/out.json --
 {
    "openapi": "3.0.0",
    "info": {

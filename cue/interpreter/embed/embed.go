@@ -102,12 +102,7 @@ import (
 	pkgpath "cuelang.org/go/pkg/path"
 )
 
-// TODO: obtain a fs.FS from load or something similar
-// TODO: disallow files from submodules
 // TODO: record files in build.Instance
-// TODO: support stream values
-// TODO: support schema-based decoding
-// TODO: maybe: option to include hidden files?
 
 // interpreter is a [cuecontext.ExternInterpreter] for embedded files.
 type interpreter struct{}
@@ -351,9 +346,11 @@ func (c *compiler) decodeFile(file, scope string, schema adt.Value) (adt.Expr, e
 	n := d.File()
 
 	if d.Next(); !d.Done() {
+		// TODO: support streaming values
 		return nil, errors.Newf(c.pos, "streaming not implemented: found more than one value in file")
 	}
 
+	// TODO: each of these encodings should probably be supported in the future
 	switch f.Encoding {
 	case build.CUE:
 		return nil, errors.Newf(c.pos, "encoding %q not (yet) supported", f.Encoding)

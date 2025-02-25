@@ -233,52 +233,76 @@ listMatchN: ok: {
     z: x
 	z: y: [{}]
 }
--- todo/p1 --
-issue3443.noCycle: fix hang
+-- issue3634.cue --
+import "list"
+
+issue3634: full: {
+	#Schema: {
+		required?: [...string] 
+		properties?: [string]: null | #Schema
+	}
+	
+	out: len([...#Schema] & list.Repeat([{
+		#Schema // removing this fixes the bug!
+		properties: foo: required: ["bar", "baz"]
+	}], 3))
+}
+issue3634: reduced: {
+	#D: {
+		b?: int
+		a?: #D
+	}
+	out: len(#D & list.Repeat([#D & { a: b: 1 }], 1)[0])
+}
 -- out/evalalpha/stats --
-Leaks:  427
+Leaks:  465
 Freed:  0
 Reused: 0
-Allocs: 427
+Allocs: 465
 Retain: 0
 
-Unifications: 368
-Conjuncts:    805
-Disjuncts:    28
+Unifications: 397
+Conjuncts:    868
+Disjuncts:    34
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
 @@ -1,9 +1,9 @@
--Leaks:  23
--Freed:  414
--Reused: 402
--Allocs: 35
--Retain: 95
-+Leaks:  427
+-Leaks:  25
+-Freed:  446
+-Reused: 434
+-Allocs: 37
+-Retain: 99
++Leaks:  465
 +Freed:  0
 +Reused: 0
-+Allocs: 427
++Allocs: 465
 +Retain: 0
  
--Unifications: 409
--Conjuncts:    764
--Disjuncts:    501
-+Unifications: 368
-+Conjuncts:    805
-+Disjuncts:    28
+-Unifications: 441
+-Conjuncts:    821
+-Disjuncts:    537
++Unifications: 397
++Conjuncts:    868
++Disjuncts:    34
 -- out/eval/stats --
-Leaks:  23
-Freed:  414
-Reused: 402
-Allocs: 35
-Retain: 95
+Leaks:  25
+Freed:  446
+Reused: 434
+Allocs: 37
+Retain: 99
 
-Unifications: 409
-Conjuncts:    764
-Disjuncts:    501
+Unifications: 441
+Conjuncts:    821
+Disjuncts:    537
 -- out/evalalpha --
 Errors:
+0.properties.foo: cannot combine regular field "required" with null:
+    ./issue3634.cue:6:26
+0.properties.foo: conflicting values null and {required:["bar","baz"]} (mismatched types null and struct):
+    ./issue3634.cue:6:26
+    ./issue3634.cue:11:20
 noCycle.t1.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
     ./cycle.cue:4:7
     ./cycle.cue:4:14
@@ -295,6 +319,12 @@ issue3649.cycle.t1.data.a: invalid value {b:"foo"} (does not satisfy matchN): 0 
     ./cycle.cue:31:13
 issue3649.cycle.t1.data.a.a: structural cycle:
     ./cycle.cue:31:6
+0.properties.foo: structural cycle:
+    ./issue3634.cue:6:33
+0.properties.foo: 3 errors in empty disjunction::
+    ./issue3634.cue:9:26
+0.a: structural cycle:
+    ./issue3634.cue:17:7
 jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): error in call to encoding/json.Validate: structural cycle:
     ./jsoncycle.cue:4:8
     ./jsoncycle.cue:5:8
@@ -511,6 +541,42 @@ Result:
         host: (string){ "mod.test" }
       }
       host: (string){ "mod.test" }
+    }
+  }
+  issue3634: (_|_){
+    // [structural cycle]
+    full: (_|_){
+      // [structural cycle]
+      #Schema: (#struct){
+        required?: (list){
+        }
+        properties?: (#struct){
+        }
+      }
+      out: (_|_){
+        // [structural cycle] 0.properties.foo: cannot combine regular field "required" with null:
+        //     ./issue3634.cue:6:26
+        // 0.properties.foo: conflicting values null and {required:["bar","baz"]} (mismatched types null and struct):
+        //     ./issue3634.cue:6:26
+        //     ./issue3634.cue:11:20
+        // 0.properties.foo: structural cycle:
+        //     ./issue3634.cue:6:33
+        // 0.properties.foo: 3 errors in empty disjunction::
+        //     ./issue3634.cue:9:26
+      }
+    }
+    reduced: (_|_){
+      // [structural cycle]
+      #D: (#struct){
+        b?: (int){ int }
+        a?: (_|_){
+          // [structural cycle] issue3634.reduced.#D.a: structural cycle
+        }
+      }
+      out: (_|_){
+        // [structural cycle] 0.a: structural cycle:
+        //     ./issue3634.cue:17:7
+      }
     }
   }
   jsonCycle: (_|_){
@@ -818,7 +884,14 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -3,24 +3,39 @@
+@@ -1,26 +1,52 @@
+ Errors:
++0.properties.foo: cannot combine regular field "required" with null:
++    ./issue3634.cue:6:26
++0.properties.foo: conflicting values null and {required:["bar","baz"]} (mismatched types null and struct):
++    ./issue3634.cue:6:26
++    ./issue3634.cue:11:20
+ noCycle.t1.#x: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
      ./cycle.cue:4:7
      ./cycle.cue:4:14
      ./cycle.cue:5:13
@@ -846,6 +919,12 @@ diff old new
 +    ./cycle.cue:31:13
 +issue3649.cycle.t1.data.a.a: structural cycle:
 +    ./cycle.cue:31:6
++0.properties.foo: structural cycle:
++    ./issue3634.cue:6:33
++0.properties.foo: 3 errors in empty disjunction::
++    ./issue3634.cue:9:26
++0.a: structural cycle:
++    ./issue3634.cue:17:7
 +jsonCycle.t1.x.y: invalid value "{}" (does not satisfy encoding/json.Validate): error in call to encoding/json.Validate: structural cycle:
 +    ./jsoncycle.cue:4:8
 +    ./jsoncycle.cue:5:8
@@ -870,7 +949,7 @@ diff old new
  issue3443.cycle2.fail.#S: invalid value {n:{n:{n:_}}} (does not satisfy matchN): 0 matched, expected 1:
      ./matchn.cue:55:13
      ./matchn.cue:55:20
-@@ -53,26 +68,21 @@
+@@ -53,26 +79,21 @@
      ./yamlcycle.cue:15:8
  selfCycle.t1.c.d.d.d: structural cycle:
      ./yamlcycle.cue:14:5
@@ -912,7 +991,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -88,10 +98,6 @@
+@@ -88,10 +109,6 @@
            //     ./cycle.cue:4:7
            //     ./cycle.cue:4:14
            //     ./cycle.cue:5:13
@@ -923,7 +1002,7 @@ diff old new
          }
        }
        #x: (_|_){
-@@ -99,21 +105,20 @@
+@@ -99,21 +116,20 @@
          //     ./cycle.cue:4:7
          //     ./cycle.cue:4:14
          //     ./cycle.cue:5:13
@@ -959,7 +1038,7 @@ diff old new
          }
          #c: (#struct){
            b?: (string){ string }
-@@ -125,7 +130,6 @@
+@@ -125,7 +141,6 @@
        }
        t2: (struct){
          x: (struct){
@@ -967,7 +1046,7 @@ diff old new
            y: (struct){
              a: (struct){
                d: (struct){
-@@ -133,6 +137,7 @@
+@@ -133,6 +148,7 @@
                }
              }
            }
@@ -975,7 +1054,7 @@ diff old new
          }
          c: (struct){
            b?: (string){ string }
-@@ -147,13 +152,22 @@
+@@ -147,13 +163,22 @@
          }
        }
      }
@@ -1005,7 +1084,56 @@ diff old new
          }
          #c: (#struct){
            b: (string){ string }
-@@ -224,8 +238,12 @@
+@@ -219,8 +244,10 @@
+       host: (string){ "mod.test" }
+     }
+   }
+-  issue3634: (struct){
+-    full: (struct){
++  issue3634: (_|_){
++    // [structural cycle]
++    full: (_|_){
++      // [structural cycle]
+       #Schema: (#struct){
+         required?: (list){
+         }
+@@ -227,9 +254,20 @@
+         properties?: (#struct){
+         }
+       }
+-      out: (int){ 3 }
+-    }
+-    reduced: (struct){
++      out: (_|_){
++        // [structural cycle] 0.properties.foo: cannot combine regular field "required" with null:
++        //     ./issue3634.cue:6:26
++        // 0.properties.foo: conflicting values null and {required:["bar","baz"]} (mismatched types null and struct):
++        //     ./issue3634.cue:6:26
++        //     ./issue3634.cue:11:20
++        // 0.properties.foo: structural cycle:
++        //     ./issue3634.cue:6:33
++        // 0.properties.foo: 3 errors in empty disjunction::
++        //     ./issue3634.cue:9:26
++      }
++    }
++    reduced: (_|_){
++      // [structural cycle]
+       #D: (#struct){
+         b?: (int){ int }
+         a?: (_|_){
+@@ -236,7 +274,10 @@
+           // [structural cycle] issue3634.reduced.#D.a: structural cycle
+         }
+       }
+-      out: (int){ 1 }
++      out: (_|_){
++        // [structural cycle] 0.a: structural cycle:
++        //     ./issue3634.cue:17:7
++      }
+     }
+   }
+   jsonCycle: (_|_){
+@@ -244,8 +285,12 @@
      t1: (_|_){
        // [structural cycle]
        x: (_|_){
@@ -1020,7 +1148,7 @@ diff old new
        }
      }
    }
-@@ -234,8 +252,15 @@
+@@ -254,8 +299,15 @@
      structCycle: (_|_){
        // [eval]
        x: (_|_){
@@ -1038,7 +1166,7 @@ diff old new
        }
      }
      ok: (struct){
-@@ -298,7 +323,7 @@
+@@ -318,7 +370,7 @@
            }
          }) }
        noHang: (struct){
@@ -1047,7 +1175,7 @@ diff old new
            n: (struct){
              n: (_){ _ }
            }
-@@ -313,7 +338,8 @@
+@@ -333,7 +385,8 @@
            }
          }) }
      }
@@ -1057,7 +1185,7 @@ diff old new
        #S: (_){ matchN(1, (#list){
            0: (_|_){// {
              //   n: 〈2;#S〉
-@@ -328,8 +354,21 @@
+@@ -348,8 +401,21 @@
              }
            }) }
        }
@@ -1081,7 +1209,7 @@ diff old new
            n: (struct){
              n: (_){ _ }
            }
-@@ -397,8 +436,8 @@
+@@ -417,8 +483,8 @@
        a?: ((string|bytes)){ "encoding/yaml".Validate(yamlNoCycle.#c) }
      }
      data: (#struct){
@@ -1091,7 +1219,7 @@ diff old new
      }
    }
    selfCycle: (_|_){
-@@ -426,19 +465,8 @@
+@@ -446,19 +512,8 @@
          }
        }
      }
@@ -1113,7 +1241,7 @@ diff old new
        }
      }
      yamlVal: (_|_){
-@@ -446,25 +474,33 @@
+@@ -466,25 +521,33 @@
        t1: (_|_){
          // [eval]
          x: (_|_){
@@ -1161,7 +1289,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -472,13 +508,16 @@
+@@ -492,13 +555,16 @@
          z: (_|_){
            // [eval]
            y: (_|_){
@@ -1185,7 +1313,7 @@ diff old new
          }
        }
      }
-@@ -485,8 +524,12 @@
+@@ -505,8 +571,12 @@
      yamlValidatePartial: (_|_){
        // [structural cycle]
        x: (_|_){
@@ -1422,6 +1550,26 @@ Result:
         host: (string){ "mod.test" }
       }
       host: (string){ "mod.test" }
+    }
+  }
+  issue3634: (struct){
+    full: (struct){
+      #Schema: (#struct){
+        required?: (list){
+        }
+        properties?: (#struct){
+        }
+      }
+      out: (int){ 3 }
+    }
+    reduced: (struct){
+      #D: (#struct){
+        b?: (int){ int }
+        a?: (_|_){
+          // [structural cycle] issue3634.reduced.#D.a: structural cycle
+        }
+      }
+      out: (int){ 1 }
     }
   }
   jsonCycle: (_|_){
@@ -1821,6 +1969,51 @@ Result:
     Y: {
       #components: 〈import;regexp〉.FindNamedSubmatch("^(?P<host>[[:alnum:].]+)$", 〈1;X〉)
       host: 〈0;#components〉.host
+    }
+  }
+}
+--- issue3634.cue
+{
+  issue3634: {
+    full: {
+      #Schema: {
+        required?: [
+          ...string,
+        ]
+        properties?: {
+          [string]: (null|〈2;#Schema〉)
+        }
+      }
+      out: len(([
+        ...〈1;#Schema〉,
+      ] & 〈import;list〉.Repeat([
+        {
+          〈2;#Schema〉
+          properties: {
+            foo: {
+              required: [
+                "bar",
+                "baz",
+              ]
+            }
+          }
+        },
+      ], 3)))
+    }
+  }
+  issue3634: {
+    reduced: {
+      #D: {
+        b?: int
+        a?: 〈1;#D〉
+      }
+      out: len((〈0;#D〉 & 〈import;list〉.Repeat([
+        (〈1;#D〉 & {
+          a: {
+            b: 1
+          }
+        }),
+      ], 1)[0]))
     }
   }
 }

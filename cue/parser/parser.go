@@ -27,6 +27,12 @@ import (
 	"cuelang.org/go/internal"
 )
 
+type tokenInfo struct {
+	pos token.Pos
+	tok token.Token
+	lit string
+}
+
 // The parser structure holds the parser's internal state.
 type parser struct {
 	file    *token.File
@@ -47,6 +53,9 @@ type parser struct {
 	pos token.Pos   // token position
 	tok token.Token // one token look-ahead
 	lit string      // token literal
+
+	// token buffer for looking ahead more than one token
+	tokBuf *tokenInfo
 
 	// Error recovery
 	// (used to limit the number of calls to sync... functions
@@ -269,7 +278,23 @@ func (p *parser) next0() {
 		}
 	}
 
+	if p.tokBuf != nil {
+		p.pos, p.tok, p.lit = p.tokBuf.pos, p.tokBuf.tok, p.tokBuf.lit
+		p.tokBuf = nil
+		return
+	}
+
 	p.pos, p.tok, p.lit = p.scanner.Scan()
+}
+
+// peek looks ahead one more token and stores it into p.tokBuf.
+// It is not allowed to call peek without calling [next0] to drain p.tokBuf.
+func (p *parser) peek() {
+	if p.tokBuf != nil {
+		panic("should not happend")
+	}
+	p.tokBuf = &tokenInfo{}
+	p.tokBuf.pos, p.tokBuf.tok, p.tokBuf.lit = p.scanner.Scan()
 }
 
 // Consume a comment and return it and the line on which it ends.
@@ -1116,6 +1141,11 @@ func (p *parser) parseComprehensionClauses(first bool) (clauses []ast.Clause, c 
 				case token.COLON, token.BIND, token.OPTION,
 					token.COMMA, token.EOF:
 					return nil, c
+				case token.NOT:
+					p.peek()
+					if p.tokBuf.tok == token.COLON {
+						return nil, c
+					}
 				}
 			}
 

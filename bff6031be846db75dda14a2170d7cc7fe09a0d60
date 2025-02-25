@@ -16,6 +16,24 @@
       "message": "I think your sentence got truncated here.",
       "revId": "bff6031be846db75dda14a2170d7cc7fe09a0d60",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3abf69d_03bec597",
+        "filename": "cue/testdata/disjunctions/specdeviation.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-02-25T12:59:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e821ad97_9c5ef22f",
+      "revId": "bff6031be846db75dda14a2170d7cc7fe09a0d60",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "387c79c8_53dc61db",
+        "filename": "cue/interpreter/embed/embed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-02-25T08:46:05Z",
+      "side": 0,
+      "message": "\u003e All the other TODOs are already repeated elsewhere in the same package,\nnearer to where the related code lives.\n\nApart from the first item (fs.FS) and the hidden files TODO I can\u0027t see those TODOs anywhere.\n\nSpecifically, the stream values and schema-based decoding TODOs don\u0027t appear to be mentioned anywhere else.",
+      "revId": "d87558c803226dd67a7caae330d79ff0196a0fd1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

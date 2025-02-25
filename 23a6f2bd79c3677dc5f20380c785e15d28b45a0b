@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2f72ae1_1dae5c4e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-25T07:22:12Z",
+      "side": 1,
+      "message": "SGTM but this is breaking Unity because the API breakage affects the curate code.\n\nWe need to do these changes in sequence very quickly to minimise breakage:\n1) merge this change\n2) update the cue dependency in the services repo and fix the breakage\n3) update the version of the services repo in unity\n\nIf you can do 1 and 2, I can do 3. But we both need to be online and do it together so that we only keep Unity broken for a few minutes, not a few hours.",
+      "revId": "23a6f2bd79c3677dc5f20380c785e15d28b45a0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,3 +1,9 @@
+-- in.cue --
+#Def: {
+    "@type": string
+}
+
+-- out/TestGenerateOpenAPI/out.json --
 {
    "openapi": "3.0.0",
    "info": {
@@ -7,19 +13,14 @@
    "paths": {},
    "components": {
       "schemas": {
-         "MyMap": {
-            "type": "object",
-            "minProperties": 4,
-            "maxProperties": 9
-         },
-         "MyType": {
+         "Def": {
             "type": "object",
             "required": [
-               "map"
+               "@type"
             ],
             "properties": {
-               "map": {
-                  "$ref": "#/components/schemas/MyMap"
+               "@type": {
+                  "type": "string"
                }
             }
          }

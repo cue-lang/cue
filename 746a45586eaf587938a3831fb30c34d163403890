@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c06e6191_7c10fb8b",
+        "filename": "cmd/cue/cmd/testdata/script/help.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-25T07:44:41Z",
+      "side": 1,
+      "message": "this is cobra being cobra. hidden commands still count towards the alignment of names and descriptions for the commands table. not much we can do here other than patching cobra, but it feels very minor to block on it.",
+      "parentUuid": "ee64a894_6bc4e659",
+      "revId": "746a45586eaf587938a3831fb30c34d163403890",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fdc731db_a99ac451",

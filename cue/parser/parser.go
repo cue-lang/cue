@@ -43,10 +43,19 @@ type parser struct {
 	leadComment *ast.CommentGroup
 	comments    *commentState
 
-	// Next token
+	// Next token, filled by [parser.next0].
 	pos token.Pos   // token position
 	tok token.Token // one token look-ahead
 	lit string      // token literal
+
+	// Token after next, filled by [parser.peek].
+	peekToken struct {
+		scanned bool
+
+		pos token.Pos
+		tok token.Token
+		lit string
+	}
 
 	// Error recovery
 	// (used to limit the number of calls to sync... functions
@@ -269,7 +278,24 @@ func (p *parser) next0() {
 		}
 	}
 
+	// We had peeked one token, effectively scanning it early; use it now.
+	if p.peekToken.scanned {
+		p.pos, p.tok, p.lit = p.peekToken.pos, p.peekToken.tok, p.peekToken.lit
+		p.peekToken.scanned = false
+		return
+	}
+
 	p.pos, p.tok, p.lit = p.scanner.Scan()
+}
+
+// peek scans one more token as a look-ahead and stores it in [parser.peekToken].
+// Peeking multiple tokens ahead is not supported.
+func (p *parser) peek() {
+	if p.peekToken.scanned {
+		panic("can only peek one token at a time")
+	}
+	p.peekToken.pos, p.peekToken.tok, p.peekToken.lit = p.scanner.Scan()
+	p.peekToken.scanned = true
 }
 
 // Consume a comment and return it and the line on which it ends.
@@ -1116,6 +1142,11 @@ func (p *parser) parseComprehensionClauses(first bool) (clauses []ast.Clause, c 
 				case token.COLON, token.BIND, token.OPTION,
 					token.COMMA, token.EOF:
 					return nil, c
+				case token.NOT:
+					p.peek()
+					if p.peekToken.tok == token.COLON {
+						return nil, c
+					}
 				}
 			}
 

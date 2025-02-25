@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e252694c_b922ad9b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-25T07:24:43Z",
+      "side": 1,
+      "message": "From the spec, I think your fix is correct:\n\n\u003e All keywords may be used as labels (field names). Unless noted otherwise, they can also be used as identifiers to refer to the same name.\n\nThanks!",
+      "revId": "0fa5d24604ac85a7305667f93e86abfbefbefb24",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

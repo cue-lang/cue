@@ -1,0 +1,462 @@
+-- issue3750.cue --
+package p
+
+import "list"
+
+issue3750: original: {
+	out: #Foo & {
+		sub: #Foo
+	}
+
+	#Foo: {
+		sub: #Foo | #Bar
+		meta: {
+			strs: [...string]
+			for _, w in list.FlattenN([strs], 1) {}
+		}
+	}
+
+
+	#Bar: {
+		kind: "bar"
+		meta: strs: [...string]
+	}
+}
+
+issue3750: reduced: {
+	out: Foo & { sub: Foo }
+
+	Foo: {
+		sub: Foo | {a: b: _}
+		a: {
+			b: _
+			for _, w in list.FlattenN([b], 1) {}
+		}
+	}
+}
+-- issue3780.cue --
+package p
+
+import "strings"
+
+objs: #Objects & {}
+
+param?: bool
+if param != _|_ {
+	objs: obj1: {
+		one: 1
+		two: 2
+	}
+}
+
+#Objects: [strings.HasPrefix("obj")]: {
+	kind: "object"
+	...
+}
+-- out/compile --
+--- issue3750.cue
+{
+  issue3750: {
+    original: {
+      out: (〈0;#Foo〉 & {
+        sub: 〈1;#Foo〉
+      })
+      #Foo: {
+        sub: (〈1;#Foo〉|〈1;#Bar〉)
+        meta: {
+          strs: [
+            ...string,
+          ]
+          for _, w in 〈import;list〉.FlattenN([
+            〈1;strs〉,
+          ], 1) {}
+        }
+      }
+      #Bar: {
+        kind: "bar"
+        meta: {
+          strs: [
+            ...string,
+          ]
+        }
+      }
+    }
+  }
+  issue3750: {
+    reduced: {
+      out: (〈0;Foo〉 & {
+        sub: 〈1;Foo〉
+      })
+      Foo: {
+        sub: (〈1;Foo〉|{
+          a: {
+            b: _
+          }
+        })
+        a: {
+          b: _
+          for _, w in 〈import;list〉.FlattenN([
+            〈1;b〉,
+          ], 1) {}
+        }
+      }
+    }
+  }
+}
+--- issue3780.cue
+{
+  objs: (〈0;#Objects〉 & {})
+  param?: bool
+  if (〈0;param〉 != _|_(explicit error (_|_ literal) in source)) {
+    objs: {
+      obj1: {
+        one: 1
+        two: 2
+      }
+    }
+  }
+  #Objects: {
+    [〈import;strings〉.HasPrefix("obj")]: {
+      kind: "object"
+      ...
+    }
+  }
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  125
+Reused: 112
+Allocs: 13
+Retain: 29
+
+Unifications: 101
+Conjuncts:    193
+Disjuncts:    154
+-- out/evalalpha --
+(struct){
+  issue3750: (struct){
+    original: (struct){
+      out: (#struct){
+        sub: (#struct){
+          sub: (#struct){ |((#struct){
+              sub: (#struct){ |((#struct){
+                  sub: (#struct){
+                    kind: (string){ "bar" }
+                    meta: (#struct){
+                      strs: (list){
+                      }
+                    }
+                  }
+                  meta: (#struct){
+                    strs: (list){
+                    }
+                  }
+                }, (#struct){
+                  kind: (string){ "bar" }
+                  meta: (#struct){
+                    strs: (list){
+                    }
+                  }
+                }) }
+              meta: (#struct){
+                strs: (list){
+                }
+              }
+            }, (#struct){
+              kind: (string){ "bar" }
+              meta: (#struct){
+                strs: (list){
+                }
+              }
+            }) }
+          meta: (#struct){
+            strs: (list){
+            }
+          }
+        }
+        meta: (#struct){
+          strs: (list){
+          }
+        }
+      }
+      #Foo: (#struct){
+        sub: (#struct){
+          kind: (string){ "bar" }
+          meta: (#struct){
+            strs: (list){
+            }
+          }
+        }
+        meta: (#struct){
+          strs: (list){
+          }
+        }
+      }
+      #Bar: (#struct){
+        kind: (string){ "bar" }
+        meta: (#struct){
+          strs: (list){
+          }
+        }
+      }
+    }
+    reduced: (struct){
+      out: (struct){
+        sub: (struct){
+          sub: (struct){ |((struct){
+              sub: (struct){ |((struct){
+                  sub: (struct){
+                    a: (struct){
+                      b: (_){ _ }
+                    }
+                  }
+                  a: (struct){
+                    b: (_){ _ }
+                  }
+                }, (struct){
+                  a: (struct){
+                    b: (_){ _ }
+                  }
+                }) }
+              a: (struct){
+                b: (_){ _ }
+              }
+            }, (struct){
+              a: (struct){
+                b: (_){ _ }
+              }
+            }) }
+          a: (struct){
+            b: (_){ _ }
+          }
+        }
+        a: (struct){
+          b: (_){ _ }
+        }
+      }
+      Foo: (struct){
+        sub: (struct){
+          a: (struct){
+            b: (_){ _ }
+          }
+        }
+        a: (struct){
+          b: (_){ _ }
+        }
+      }
+    }
+  }
+  objs: (#struct){
+  }
+  param?: (bool){ bool }
+  #Objects: (#struct){
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -3,13 +3,37 @@
+     original: (struct){
+       out: (#struct){
+         sub: (#struct){
+-          sub: (#struct){
+-            kind: (string){ "bar" }
+-            meta: (#struct){
+-              strs: (list){
+-              }
+-            }
+-          }
++          sub: (#struct){ |((#struct){
++              sub: (#struct){ |((#struct){
++                  sub: (#struct){
++                    kind: (string){ "bar" }
++                    meta: (#struct){
++                      strs: (list){
++                      }
++                    }
++                  }
++                  meta: (#struct){
++                    strs: (list){
++                    }
++                  }
++                }, (#struct){
++                  kind: (string){ "bar" }
++                  meta: (#struct){
++                    strs: (list){
++                    }
++                  }
++                }) }
++              meta: (#struct){
++                strs: (list){
++                }
++              }
++            }, (#struct){
++              kind: (string){ "bar" }
++              meta: (#struct){
++                strs: (list){
++                }
++              }
++            }) }
+           meta: (#struct){
+             strs: (list){
+             }
+@@ -43,34 +67,34 @@
+     }
+     reduced: (struct){
+       out: (struct){
+-        sub: (struct){ |((struct){
+-            sub: (struct){ |((struct){
+-                a: (struct){
+-                  b: (_){ _ }
+-                }
+-                sub: (struct){
+-                  a: (struct){
+-                    b: (_){ _ }
+-                  }
+-                }
+-              }, (struct){
+-                a: (struct){
+-                  b: (_){ _ }
+-                }
+-              }) }
+-            a: (struct){
+-              b: (_){ _ }
+-            }
+-          }, (struct){
+-            sub: (struct){
+-              a: (struct){
+-                b: (_){ _ }
+-              }
+-            }
+-            a: (struct){
+-              b: (_){ _ }
+-            }
+-          }) }
++        sub: (struct){
++          sub: (struct){ |((struct){
++              sub: (struct){ |((struct){
++                  sub: (struct){
++                    a: (struct){
++                      b: (_){ _ }
++                    }
++                  }
++                  a: (struct){
++                    b: (_){ _ }
++                  }
++                }, (struct){
++                  a: (struct){
++                    b: (_){ _ }
++                  }
++                }) }
++              a: (struct){
++                b: (_){ _ }
++              }
++            }, (struct){
++              a: (struct){
++                b: (_){ _ }
++              }
++            }) }
++          a: (struct){
++            b: (_){ _ }
++          }
++        }
+         a: (struct){
+           b: (_){ _ }
+         }
+-- out/eval --
+(struct){
+  issue3750: (struct){
+    original: (struct){
+      out: (#struct){
+        sub: (#struct){
+          sub: (#struct){
+            kind: (string){ "bar" }
+            meta: (#struct){
+              strs: (list){
+              }
+            }
+          }
+          meta: (#struct){
+            strs: (list){
+            }
+          }
+        }
+        meta: (#struct){
+          strs: (list){
+          }
+        }
+      }
+      #Foo: (#struct){
+        sub: (#struct){
+          kind: (string){ "bar" }
+          meta: (#struct){
+            strs: (list){
+            }
+          }
+        }
+        meta: (#struct){
+          strs: (list){
+          }
+        }
+      }
+      #Bar: (#struct){
+        kind: (string){ "bar" }
+        meta: (#struct){
+          strs: (list){
+          }
+        }
+      }
+    }
+    reduced: (struct){
+      out: (struct){
+        sub: (struct){ |((struct){
+            sub: (struct){ |((struct){
+                a: (struct){
+                  b: (_){ _ }
+                }
+                sub: (struct){
+                  a: (struct){
+                    b: (_){ _ }
+                  }
+                }
+              }, (struct){
+                a: (struct){
+                  b: (_){ _ }
+                }
+              }) }
+            a: (struct){
+              b: (_){ _ }
+            }
+          }, (struct){
+            sub: (struct){
+              a: (struct){
+                b: (_){ _ }
+              }
+            }
+            a: (struct){
+              b: (_){ _ }
+            }
+          }) }
+        a: (struct){
+          b: (_){ _ }
+        }
+      }
+      Foo: (struct){
+        sub: (struct){
+          a: (struct){
+            b: (_){ _ }
+          }
+        }
+        a: (struct){
+          b: (_){ _ }
+        }
+      }
+    }
+  }
+  objs: (#struct){
+  }
+  param?: (bool){ bool }
+  #Objects: (#struct){
+  }
+}

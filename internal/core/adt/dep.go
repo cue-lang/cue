@@ -362,7 +362,16 @@ func (n *nodeContext) breakIncomingDeps(mode runMode) {
 			a.decremented = true
 
 			src.src.unify(n.ctx, needTasksDone, attemptOnly)
-			a.dst.decDependent(n.ctx, ARC, src)
+
+			// TODO(issue3750): when "forking" disjunctions, a node may be
+			// forked again if the parent node has not completed yet. In this
+			// case we cannot "break" incoming arc dependencies. We complete any
+			// outstanding work, but, for now, we disable decrementing the
+			// counter. Note that this _may_ result in closedness issues.
+			//
+			if n.ctx.inDisjunct == 0 {
+				a.dst.decDependent(n.ctx, ARC, src)
+			}
 		case NOTIFY:
 			a := &src.notify[r.index]
 			if a.decremented {

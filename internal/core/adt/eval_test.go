@@ -81,12 +81,55 @@ var skipDebugDepErrors = map[string]int{
 	"cycle/051_resolved_self-reference_cycles_with_disjunction":   2,
 
 	"cycle/052_resolved_self-reference_cycles_with_disjunction_with_defaults": 1,
-	"cycle/builtins":           3,
-	"cycle/issue241":           2,
-	"cycle/issue429":           1,
-	"disjunctions/elimination": 6,
-	"eval/issue2146":           1,
-	"eval/notify":              3,
+	"cycle/builtins": 3,
+	"cycle/issue241": 2,
+	"cycle/issue429": 1,
+
+	// Some of these counts are related to issue 3750
+	"disjunctions/elimination": 19,
+	"eval/issue2146":           4,
+	"eval/notify":              8,
+
+	// TODO(issue3750): commented out reflect counts that would be there if we
+	// disabled the counter also for non-disjunctions.
+	"builtins/closed": 6,
+	// "builtins/validators":      1,
+	// "comprehensions/closed":    4,
+	// "comprehensions/issue1732": 8,
+	// "comprehensions/issue287":  3,
+	// "comprehensions/issue3762": 38,
+	"comprehensions/issue843": 1, // 2,
+	// "comprehensions/nested2":  38,
+	// "comprehensions/pushdown": 46,
+	// "cycle/023_reentrance":    1,
+	// "cycle/chain":             2,
+	// "cycle/compbottom2":   44,
+	// "cycle/comprehension": 10,
+	// "cycle/freeze":     27,
+	// "cycle/issue990":   7,
+	"cycle/structural": 4, // 7,
+	// "definitions/037_closing_with_comprehensions": 3,
+	// "definitions/comprehensions": 3,
+	// "disjunctions/elimination":   23, // + 17
+	"disjunctions/errors": 3, // 6,
+	// "disjunctions/operands": 1,
+	// "eval/closedness":       5,
+	// "eval/comprehensions":   13,
+	"eval/disjunctions": 1,
+	// "eval/embed":            1,
+	// "eval/incomplete": 2,
+	// "eval/issue2146":        4, + 3
+	// "eval/issue2235": 43,
+	"eval/counters": 6, // 10,
+	// "eval/let":       4,
+	// "eval/letjoin":   8,
+	// "eval/merge":     14,
+	// "eval/notify":    13, // + 10
+	// "eval/sharing": 2,
+	// "eval/v0.7": 9,
+	// "fulleval/042_cross-dependent_comprehension": 1,
+	// "resolve/038_incomplete_comprehensions":      4,
+	"scalars/embed": 2,
 }
 
 func TestEvalAlpha(t *testing.T) {

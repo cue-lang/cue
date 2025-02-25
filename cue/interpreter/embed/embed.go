@@ -102,12 +102,7 @@ import (
 	pkgpath "cuelang.org/go/pkg/path"
 )
 
-// TODO: obtain a fs.FS from load or something similar
-// TODO: disallow files from submodules
 // TODO: record files in build.Instance
-// TODO: support stream values
-// TODO: support schema-based decoding
-// TODO: maybe: option to include hidden files?
 
 // interpreter is a [cuecontext.ExternInterpreter] for embedded files.
 type interpreter struct{}

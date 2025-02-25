@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "91bca1a4_d9455441",
+        "filename": "cmd/cue/cmd/testdata/script/help.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-02-25T07:54:51Z",
+      "side": 1,
+      "message": "Agreed. Very annoyingly I had already commented on this fact but it was left as a draft:\n\n\u003e My guess is that we have a whitespace change in this file because listcommands is used as part of the computation of \"how much width do we need for the first column\" even though it is not rendered because it is a hidden command.",
+      "parentUuid": "c06e6191_7c10fb8b",
+      "revId": "746a45586eaf587938a3831fb30c34d163403890",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fdc731db_a99ac451",

@@ -94,14 +94,14 @@ select: indirect: {
 	opt?: run?: string
 }
 -- out/evalalpha/stats --
-Leaks:  228
+Leaks:  203
 Freed:  0
 Reused: 0
-Allocs: 228
+Allocs: 203
 Retain: 0
 
-Unifications: 183
-Conjuncts:    546
+Unifications: 174
+Conjuncts:    521
 Disjuncts:    0
 -- out/evalalpha --
 Errors:
@@ -242,17 +242,17 @@ diff old new
 -Reused: 429
 -Allocs: 317
 -Retain: 1074
-+Leaks:  228
++Leaks:  203
 +Freed:  0
 +Reused: 0
-+Allocs: 228
++Allocs: 203
 +Retain: 0
  
 -Unifications: 746
 -Conjuncts:    2813
 -Disjuncts:    1485
-+Unifications: 183
-+Conjuncts:    546
++Unifications: 174
++Conjuncts:    521
 +Disjuncts:    0
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new

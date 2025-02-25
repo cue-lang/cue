@@ -1,0 +1,194 @@
+-- in.cue --
+import "strings"
+
+full: {
+	objs: #Objects & {}
+	param?: bool
+	if param != _|_ {
+		objs: obj1: {
+			one: 1
+			two: 2
+		}
+	}
+	#Objects: [strings.HasPrefix("obj")]: {
+		kind: "object"
+		...
+	}
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  10
+Reused: 4
+Allocs: 6
+Retain: 2
+
+Unifications: 10
+Conjuncts:    13
+Disjuncts:    12
+-- out/evalalpha --
+(struct){
+  full: (struct){
+    kube: (struct){
+      node: (struct){
+        n1: (struct){
+          _CL: (string){ "l" }
+          _cs: (struct){
+            l: (struct){
+              opts: (struct){
+              }
+              _ba?: (string){ string }
+              vms: (#list){
+                0: (struct){
+                  name: (string){ "hello" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    _a: (struct){
+      l: (struct){
+        _ba?: (string){ string }
+        opts: (struct){
+        }
+        vms: (#list){
+          0: (struct){
+            name: (string){ "hello" }
+          }
+        }
+      }
+    }
+    x: (int){ 5 }
+    _b: (struct){
+    }
+  }
+  reduced: (struct){
+    p1: (struct){
+      _cs: (struct){
+        opts: (struct){
+        }
+        _ba?: (string){ string }
+        vms: (string){ "hello" }
+      }
+      _a: (struct){
+        l: (struct){
+          _ba?: (string){ string }
+          opts: (struct){
+          }
+          vms: (string){ "hello" }
+        }
+      }
+      _b: (struct){
+        l: (struct){
+          vms: (string){ "again" }
+        }
+      }
+      x: (int){ 5 }
+    }
+    p2: (struct){
+      x: (int){ 5 }
+      _cs: (struct){
+        opts: (struct){
+        }
+        _ba?: (string){ string }
+        vms: (string){ "hello" }
+      }
+      _a: (struct){
+        l: (struct){
+          _ba?: (string){ string }
+          opts: (struct){
+          }
+          vms: (string){ "hello" }
+        }
+      }
+      _b: (struct){
+        l: (struct){
+          vms: (string){ "again" }
+        }
+      }
+    }
+  }
+  reference: (struct){
+    _x: (struct){
+      f: (bool){ true }
+    }
+    _y: (struct){
+      f: (bool){ false }
+    }
+    ok: (bool){ true }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -6,9 +6,9 @@
+           _CL: (string){ "l" }
+           _cs: (struct){
+             l: (struct){
+-              _ba?: (string){ string }
+               opts: (struct){
+               }
++              _ba?: (string){ string }
+               vms: (#list){
+                 0: (struct){
+                   name: (string){ "hello" }
+@@ -38,9 +38,9 @@
+   reduced: (struct){
+     p1: (struct){
+       _cs: (struct){
+-        _ba?: (string){ string }
+-        opts: (struct){
+-        }
++        opts: (struct){
++        }
++        _ba?: (string){ string }
+         vms: (string){ "hello" }
+       }
+       _a: (struct){
+@@ -61,9 +61,9 @@
+     p2: (struct){
+       x: (int){ 5 }
+       _cs: (struct){
+-        _ba?: (string){ string }
+-        opts: (struct){
+-        }
++        opts: (struct){
++        }
++        _ba?: (string){ string }
+         vms: (string){ "hello" }
+       }
+       _a: (struct){
+-- out/eval --
+(struct){
+  full: (struct){
+    objs: (#struct){
+    }
+    param?: (bool){ bool }
+    #Objects: (#struct){
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  full: {
+    objs: (〈0;#Objects〉 & {})
+    param?: bool
+    if (〈0;param〉 != _|_(explicit error (_|_ literal) in source)) {
+      objs: {
+        obj1: {
+          one: 1
+          two: 2
+        }
+      }
+    }
+    #Objects: {
+      [〈import;strings〉.HasPrefix("obj")]: {
+        kind: "object"
+        ...
+      }
+    }
+  }
+}

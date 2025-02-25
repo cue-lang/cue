@@ -1,3 +1,9 @@
+-- in.cue --
+#Def: {
+    "@type": string
+}
+
+-- out/openapi/out.json --
 {
    "openapi": "3.0.0",
    "info": {

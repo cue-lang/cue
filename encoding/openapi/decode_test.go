@@ -39,8 +39,8 @@ import (
 	"cuelang.org/go/internal/cuetest"
 )
 
-// TestDecode reads the testdata/*.txtar files, converts the contained
-// JSON schema to CUE and compares it against the output.
+// TestDecode reads the testdata/script/*.txtar files, converts the
+// contained JSON schema to CUE and compares it against the output.
 //
 // Set CUE_UPDATE=1 to update test files with the corresponding output.
 func TestDecode(t *testing.T) {

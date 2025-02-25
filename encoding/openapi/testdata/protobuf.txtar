@@ -1,8 +1,25 @@
+#ExpandReferences
+#skip-v3
+-- in.cue --
+// Note: This example originally derived from a CUE file converted from protobuf.
+
+#HTTPRoute: {
+	route: [...#HTTPRouteDestination]
+}
+#HTTPRouteDestination: {
+	headers:     #Headers
+}
+#Headers: {
+	request:  #HeaderOperations
+	#HeaderOperations:  {}
+}
+
+-- out/openapi/out.json --
 {
    "openapi": "3.0.0",
    "info": {
-      "title": "test",
-      "version": "v1"
+      "title": "Note: This example originally derived from a CUE file converted from protobuf.",
+      "version": "no version"
    },
    "paths": {},
    "components": {

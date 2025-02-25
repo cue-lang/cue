@@ -1,0 +1,6 @@
+#ExpandReferences
+#ExpectError: cycle in reference at #Foo
+-- in.cue --
+		// Issue #915
+#Foo: [string]: #Foo
+

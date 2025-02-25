@@ -73,6 +73,18 @@ func TestParse(t *testing.T) {
 		`,
 		`if: 0, for: 1, in: 2, where: 3, div: 4, quo: 5, func: 6, for: {if: {func: {let: 3}}}`,
 	}, {
+		"keywords as optional labels",
+		`if?: 0, for?: 1, in?: 2, where?: 3, div?: 4, quo?: 5, func?: 6
+		for?: if?: func?: let?: 3
+		`,
+		`if?: 0, for?: 1, in?: 2, where?: 3, div?: 4, quo?: 5, func?: 6, for?: {if?: {func?: {let?: 3}}}`,
+	}, {
+		"keywords as required labels",
+		`for!: 1, in!: 2, where!: 3, div!: 4, quo!: 5, func!: 6
+		for!: if!: func!: let!: 3
+		`,
+		`for!: 1, in!: 2, where!: 3, div!: 4, quo!: 5, func!: 6, for!: {if!: {func!: {let!: 3}}}`,
+	}, {
 		"keywords as alias",
 		`if=foo: 0
 		for=bar: 2

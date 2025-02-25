@@ -221,8 +221,31 @@ package adt
 // and evaluated before doing a lookup in such structs to be correct. For the
 // purpose of this algorithm, this especially pertains to structural cycles.
 //
-// TODO: implement: current handling of inline still loosly based on old
-// algorithm.
+// Note that the scope in which scope the "helper" field is defined may
+// determine whether or not there is a structural cycle. Consider, for instance,
+//
+//      X: {in: a, out: in}
+//      a: b: (X & {in: a}).out
+//
+// Two possible rewrites are:
+//
+//      X: {in: a, out: in}
+//      a: b: _a.out
+//      _a: X & {in: a}
+//
+// and
+//
+//      X: {in: a, out: in}
+//      a: {
+//          b: _b.out
+//          _b: X & {in: a}
+//      }
+//
+// The former prevents a structural cycle, the later results in a structural
+// cycle.
+//
+// The current implementation takes the former approach, which more closely
+// mimics the V2 implementation. Note that other approaches are possible.
 //
 // ### Examples
 //

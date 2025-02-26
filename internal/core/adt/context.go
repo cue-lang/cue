@@ -772,9 +772,9 @@ func (c *OpContext) wrapCycleError(src ast.Node, b *Bottom) *Bottom {
 // unifyNode returns a possibly partially evaluated node value.
 //
 // TODO: maybe return *Vertex, *Bottom
-func (c *OpContext) unifyNode(v Expr, state combinedFlags) (result Value) {
+func (c *OpContext) unifyNode(expr Expr, state combinedFlags) (result Value) {
 	savedSrc := c.src
-	c.src = v.Source()
+	c.src = expr.Source()
 	err := c.errs
 	c.errs = nil
 
@@ -805,7 +805,9 @@ func (c *OpContext) unifyNode(v Expr, state combinedFlags) (result Value) {
 		c.src = savedSrc
 	}()
 
-	switch x := v.(type) {
+	var v *Vertex
+
+	switch x := expr.(type) {
 	case Value:
 		return x
 
@@ -814,48 +816,49 @@ func (c *OpContext) unifyNode(v Expr, state combinedFlags) (result Value) {
 		return v
 
 	case Resolver:
-		v := x.resolve(c, state)
-		if c.HasErr() {
-			return nil
-		}
-		if v == nil {
-			return nil
-		}
-		v = v.DerefValue()
-
-		// TODO: consider moving this after markCycle, depending on how we
-		// implement markCycle, or whether we need it at all.
-		// TODO: is this indirect necessary?
-		// v = v.Indirect()
-
-		if c.isDevVersion() {
-			if n := v.getState(c); n != nil {
-				// A lookup counts as new structure. See the commend in Section
-				// "Lookups in inline cycles" in cycle.go.
-				n.hasNonCycle = true
-
-				// Always yield to not get spurious errors.
-				n.process(arcTypeKnown, yield)
-				// It is possible that the node is only midway through
-				// evaluating a disjunction. In this case, we want to ensure
-				// that disjunctions are finalized, so that disjunction shows
-				// up in BaseValue.
-				if len(n.disjuncts) > 0 {
-					n.node.unify(c, arcTypeKnown, yield)
-				}
-			}
-		} else {
-			if v.isUndefined() || state.vertexStatus() > v.Status() {
-				c.unify(v, state)
-			}
-		}
-
-		return v
+		v = x.resolve(c, state)
 
 	default:
 		// This can only happen, really, if v == nil, which is not allowed.
-		panic(fmt.Sprintf("unexpected Expr type %T", v))
+		panic(fmt.Sprintf("unexpected Expr type %T", expr))
 	}
+
+	if c.HasErr() {
+		return nil
+	}
+	if v == nil {
+		return nil
+	}
+	v = v.DerefValue()
+
+	// TODO: consider moving this after markCycle, depending on how we
+	// implement markCycle, or whether we need it at all.
+	// TODO: is this indirect necessary?
+	// v = v.Indirect()
+
+	if c.isDevVersion() {
+		if n := v.getState(c); n != nil {
+			// A lookup counts as new structure. See the commend in Section
+			// "Lookups in inline cycles" in cycle.go.
+			n.hasNonCycle = true
+
+			// Always yield to not get spurious errors.
+			n.process(arcTypeKnown, yield)
+			// It is possible that the node is only midway through
+			// evaluating a disjunction. In this case, we want to ensure
+			// that disjunctions are finalized, so that disjunction shows
+			// up in BaseValue.
+			if len(n.disjuncts) > 0 {
+				n.node.unify(c, arcTypeKnown, yield)
+			}
+		}
+	} else {
+		if v.isUndefined() || state.vertexStatus() > v.Status() {
+			c.unify(v, state)
+		}
+	}
+
+	return v
 }
 
 func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, flags combinedFlags) *Vertex {

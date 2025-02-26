@@ -54,7 +54,249 @@ inline: acrossFields: ok1: {
 	// This is borderline okay.
 	k10: (f & {in: k30}).out
 }
+-- inlineexpand.cue --
+inlined: {
+	X: {
+		input: a: _
+		output: input.a
+	}
+	root: a: (X & {input: root}).output
+}
+expanded1: hasCycle: {
+	X: {
+		input: a: _
+		output: input.a
+	}
+	root: {
+		a: _a.output
+		_a: X & {input: root}
+	}
+}
+expanded2: noCycle: {
+	X: {
+		input: a: _
+		output: input.a
+	}
+	root: a: _a.output
+	_a: X & {input: root}
+}
+issue3731: reduced: {
+	#lookup: {
+		input: {...}
+		output: [
+			for _, v in input if v.show != _|_ { v },
+		]
+	}
+
+	root: {
+		self: show: true
+		others: (#lookup & {input: root}).output
+	}
+}
+issue3731: expanded: {
+	#lookup: {
+		input: {...}
+		output: [
+			for _, v in input if v.show != _|_ { v },
+		]
+	}
+
+	root: {
+		self: show: true
+		others: _others.output
+		_others: #lookup & {input: root}
+	}
+}
+issue3731: full: {
+	#Workspace: {
+		workspaceA?: {}
+		workspaceB?: {}
+	}
+
+	#AccountConfig: {
+		workspaces: #Workspace
+		siblings?: [...string]
+	}
+
+	#AccountConfigSub1: {
+		#AccountConfig
+		workspaces: "workspaceA": {}
+	}
+	
+	#AccountConfigSub2: {
+		#AccountConfig
+		workspaces: "workspaceB": {}
+	}
+	
+	tree: env1: {
+		"region1": {
+			"env1-r1-account-sub1": #AccountConfigSub1
+			"env1-r1-account-sub2-1": #AccountConfigSub2
+		}
+	}
+	
+	#lookupSiblings: {
+		envtree: {...}
+		out: [
+			for region, v in envtree
+			for account, config in v
+			if config.workspaces."workspaceB" != _|_ { account },
+		]
+	}
+	
+	tree: ENVTREE=env1: [_]: [_]: #AccountConfig & {
+		siblings: (#lookupSiblings & {envtree: ENVTREE}).out
+	}
+}
 -- out/compile --
+--- inlineexpand.cue
+{
+  inlined: {
+    X: {
+      input: {
+        a: _
+      }
+      output: 〈0;input〉.a
+    }
+    root: {
+      a: (〈1;X〉 & {
+        input: 〈2;root〉
+      }).output
+    }
+  }
+  expanded1: {
+    hasCycle: {
+      X: {
+        input: {
+          a: _
+        }
+        output: 〈0;input〉.a
+      }
+      root: {
+        a: 〈0;_a〉.output
+        _a: (〈1;X〉 & {
+          input: 〈2;root〉
+        })
+      }
+    }
+  }
+  expanded2: {
+    noCycle: {
+      X: {
+        input: {
+          a: _
+        }
+        output: 〈0;input〉.a
+      }
+      root: {
+        a: 〈1;_a〉.output
+      }
+      _a: (〈0;X〉 & {
+        input: 〈1;root〉
+      })
+    }
+  }
+  issue3731: {
+    reduced: {
+      #lookup: {
+        input: {
+          ...
+        }
+        output: [
+          for _, v in 〈1;input〉 if (〈0;v〉.show != _|_(explicit error (_|_ literal) in source)) {
+            〈1;v〉
+          },
+        ]
+      }
+      root: {
+        self: {
+          show: true
+        }
+        others: (〈1;#lookup〉 & {
+          input: 〈2;root〉
+        }).output
+      }
+    }
+  }
+  issue3731: {
+    expanded: {
+      #lookup: {
+        input: {
+          ...
+        }
+        output: [
+          for _, v in 〈1;input〉 if (〈0;v〉.show != _|_(explicit error (_|_ literal) in source)) {
+            〈1;v〉
+          },
+        ]
+      }
+      root: {
+        self: {
+          show: true
+        }
+        others: 〈0;_others〉.output
+        _others: (〈1;#lookup〉 & {
+          input: 〈2;root〉
+        })
+      }
+    }
+  }
+  issue3731: {
+    full: {
+      #Workspace: {
+        workspaceA?: {}
+        workspaceB?: {}
+      }
+      #AccountConfig: {
+        workspaces: 〈1;#Workspace〉
+        siblings?: [
+          ...string,
+        ]
+      }
+      #AccountConfigSub1: {
+        〈1;#AccountConfig〉
+        workspaces: {
+          workspaceA: {}
+        }
+      }
+      #AccountConfigSub2: {
+        〈1;#AccountConfig〉
+        workspaces: {
+          workspaceB: {}
+        }
+      }
+      tree: {
+        env1: {
+          region1: {
+            "env1-r1-account-sub1": 〈3;#AccountConfigSub1〉
+            "env1-r1-account-sub2-1": 〈3;#AccountConfigSub2〉
+          }
+        }
+      }
+      #lookupSiblings: {
+        envtree: {
+          ...
+        }
+        out: [
+          for region, v in 〈1;envtree〉 for account, config in 〈0;v〉 if (〈0;config〉.workspaces.workspaceB != _|_(explicit error (_|_ literal) in source)) {
+            〈1;account〉
+          },
+        ]
+      }
+      tree: {
+        env1: {
+          [_]: {
+            [_]: (〈3;#AccountConfig〉 & {
+              siblings: (〈4;#lookupSiblings〉 & {
+                envtree: 〈4;env1〉
+              }).out
+            })
+          }
+        }
+      }
+    }
+  }
+}
 --- x.cue
 {
   inline: {
@@ -185,17 +427,21 @@ diff old new
 +Conjuncts:    257
 +Disjuncts:    0
 -- out/eval/stats --
-Leaks:  247
-Freed:  141
-Reused: 136
-Allocs: 252
-Retain: 834
+Leaks:  286
+Freed:  253
+Reused: 248
+Allocs: 291
+Retain: 994
 
-Unifications: 388
-Conjuncts:    1307
-Disjuncts:    707
+Unifications: 539
+Conjuncts:    1663
+Disjuncts:    943
 -- out/eval --
 Errors:
+expanded1.hasCycle.root._a.input._a.input: structural cycle:
+    ./inlineexpand.cue:11:11
+issue3731.expanded.root._others.input._others.input: structural cycle:
+    ./inlineexpand.cue:43:16
 structural cycle:
     ./x.cue:6:9
 structural cycle:
@@ -208,6 +454,219 @@ in: structural cycle:
 Result:
 (_|_){
   // [structural cycle]
+  inlined: (struct){
+    X: (struct){
+      input: (struct){
+        a: (_){ _ }
+      }
+      output: (_){ _ }
+    }
+    root: (struct){
+      a: (_){ _ }
+    }
+  }
+  expanded1: (_|_){
+    // [structural cycle]
+    hasCycle: (_|_){
+      // [structural cycle]
+      X: (struct){
+        input: (struct){
+          a: (_){ _ }
+        }
+        output: (_){ _ }
+      }
+      root: (_|_){
+        // [structural cycle]
+        a: (_){ _ }
+        _a: (_|_){
+          // [structural cycle]
+          input: (_|_){
+            // [structural cycle]
+            a: (_|_){
+              // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle:
+              //     ./inlineexpand.cue:11:11
+            }
+            _a: (_|_){
+              // [structural cycle]
+              input: (_|_){
+                // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle:
+                //     ./inlineexpand.cue:11:11
+              }
+              output: (_|_){
+                // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle:
+                //     ./inlineexpand.cue:11:11
+              }
+            }
+          }
+          output: (_|_){
+            // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle:
+            //     ./inlineexpand.cue:11:11
+          }
+        }
+      }
+    }
+  }
+  expanded2: (struct){
+    noCycle: (struct){
+      X: (struct){
+        input: (struct){
+          a: (_){ _ }
+        }
+        output: (_){ _ }
+      }
+      root: (struct){
+        a: (_){ _ }
+      }
+      _a: (struct){
+        input: (struct){
+          a: (_){ _ }
+        }
+        output: (_){ _ }
+      }
+    }
+  }
+  issue3731: (_|_){
+    // [structural cycle]
+    reduced: (struct){
+      #lookup: (#struct){
+        input: (#struct){
+        }
+        output: (#list){
+        }
+      }
+      root: (struct){
+        self: (struct){
+          show: (bool){ true }
+        }
+        others: (#list){
+          0: (struct){
+            show: (bool){ true }
+          }
+        }
+      }
+    }
+    expanded: (_|_){
+      // [structural cycle]
+      #lookup: (#struct){
+        input: (#struct){
+        }
+        output: (#list){
+        }
+      }
+      root: (_|_){
+        // [structural cycle]
+        self: (struct){
+          show: (bool){ true }
+        }
+        others: (#list){
+          0: (struct){
+            show: (bool){ true }
+          }
+        }
+        _others: (_|_){
+          // [structural cycle]
+          input: (_|_){
+            // [structural cycle]
+            self: (struct){
+              show: (bool){ true }
+            }
+            others: (_|_){
+              // [structural cycle] issue3731.expanded.root._others.input._others.input: structural cycle:
+              //     ./inlineexpand.cue:43:16
+            }
+            _others: (_|_){
+              // [structural cycle]
+              input: (_|_){
+                // [structural cycle] issue3731.expanded.root._others.input._others.input: structural cycle:
+                //     ./inlineexpand.cue:43:16
+              }
+              output: (_|_){
+                // [structural cycle] issue3731.expanded.root._others.input._others.input: structural cycle:
+                //     ./inlineexpand.cue:43:16
+              }
+            }
+          }
+          output: (#list){
+            0: (#struct){
+              show: (bool){ true }
+            }
+          }
+        }
+      }
+    }
+    full: (struct){
+      #Workspace: (#struct){
+        workspaceA?: (#struct){
+        }
+        workspaceB?: (#struct){
+        }
+      }
+      #AccountConfig: (#struct){
+        workspaces: (#struct){
+          workspaceA?: (#struct){
+          }
+          workspaceB?: (#struct){
+          }
+        }
+        siblings?: (list){
+        }
+      }
+      #AccountConfigSub1: (#struct){
+        workspaces: (#struct){
+          workspaceA: (#struct){
+          }
+          workspaceB?: (#struct){
+          }
+        }
+        siblings?: (list){
+        }
+      }
+      #AccountConfigSub2: (#struct){
+        workspaces: (#struct){
+          workspaceA?: (#struct){
+          }
+          workspaceB: (#struct){
+          }
+        }
+        siblings?: (list){
+        }
+      }
+      tree: (struct){
+        env1: (struct){
+          region1: (struct){
+            "env1-r1-account-sub1": (#struct){
+              workspaces: (#struct){
+                workspaceA: (#struct){
+                }
+                workspaceB?: (#struct){
+                }
+              }
+              siblings: (#list){
+                0: (string){ "env1-r1-account-sub2-1" }
+              }
+            }
+            "env1-r1-account-sub2-1": (#struct){
+              workspaces: (#struct){
+                workspaceA?: (#struct){
+                }
+                workspaceB: (#struct){
+                }
+              }
+              siblings: (#list){
+                0: (string){ "env1-r1-account-sub2-1" }
+              }
+            }
+          }
+        }
+      }
+      #lookupSiblings: (#struct){
+        envtree: (#struct){
+        }
+        out: (#list){
+        }
+      }
+    }
+  }
   inline: (_|_){
     // [structural cycle]
     small: (_|_){
@@ -295,10 +754,12 @@ Result:
 }
 -- out/evalalpha --
 Errors:
+expanded1.hasCycle.root._a.input._a.input: structural cycle
 in: conflicting values 4 and 1:
     ./x.cue:30:8
 inline.acrossFields.fail1.k10: conflicting values 4 and 1:
     ./x.cue:30:8
+issue3731.expanded.root._others.input._others.input: structural cycle
 structural cycle:
     ./x.cue:6:9
 structural cycle:
@@ -311,6 +772,195 @@ structural cycle:
 Result:
 (_|_){
   // [eval]
+  inlined: (struct){
+    X: (struct){
+      input: (struct){
+        a: (_){ _ }
+      }
+      output: (_){ _ }
+    }
+    root: (struct){
+      a: (_){ _ }
+    }
+  }
+  expanded1: (_|_){
+    // [structural cycle]
+    hasCycle: (_|_){
+      // [structural cycle]
+      X: (struct){
+        input: (struct){
+          a: (_){ _ }
+        }
+        output: (_){ _ }
+      }
+      root: (_|_){
+        // [structural cycle]
+        a: (_){ _ }
+        _a: (_|_){
+          // [structural cycle]
+          input: (_|_){
+            // [structural cycle]
+            a: (_){ _ }
+            _a: (_|_){
+              // [structural cycle]
+              input: (_|_){
+                // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle
+              }
+              output: (_){ _ }
+            }
+          }
+          output: (_){ _ }
+        }
+      }
+    }
+  }
+  expanded2: (struct){
+    noCycle: (struct){
+      X: (struct){
+        input: (struct){
+          a: (_){ _ }
+        }
+        output: (_){ _ }
+      }
+      root: (struct){
+        a: (_){ _ }
+      }
+      _a: (struct){
+        input: (struct){
+          a: (_){ _ }
+        }
+        output: (_){ _ }
+      }
+    }
+  }
+  issue3731: (_|_){
+    // [structural cycle]
+    reduced: (struct){
+      #lookup: (#struct){
+        input: (#struct){
+        }
+        output: (#list){
+        }
+      }
+      root: (struct){
+        self: (struct){
+          show: (bool){ true }
+        }
+        others: (#list){
+          0: (#struct){
+            show: (bool){ true }
+          }
+        }
+      }
+    }
+    expanded: (_|_){
+      // [structural cycle]
+      #lookup: (#struct){
+        input: (#struct){
+        }
+        output: (#list){
+        }
+      }
+      root: (_|_){
+        // [structural cycle]
+        self: (struct){
+          show: (bool){ true }
+        }
+        others: ~(issue3731.expanded.root._others.output)
+        _others: (_|_){
+          // [structural cycle]
+          input: (_|_){
+            // [structural cycle]
+            self: (#struct){
+              show: (bool){ true }
+            }
+            others: (#list){
+            }
+            _others: (_|_){
+              // [structural cycle]
+              input: (_|_){
+                // [structural cycle] issue3731.expanded.root._others.input._others.input: structural cycle
+              }
+              output: (#list){
+              }
+            }
+          }
+          output: (#list){
+            0: (#struct){
+              show: (bool){ true }
+            }
+          }
+        }
+      }
+    }
+    full: (struct){
+      #Workspace: (#struct){
+        workspaceA?: (#struct){
+        }
+        workspaceB?: (#struct){
+        }
+      }
+      #AccountConfig: (#struct){
+        workspaces: ~(issue3731.full.#Workspace)
+        siblings?: (list){
+        }
+      }
+      #AccountConfigSub1: (#struct){
+        workspaces: (#struct){
+          workspaceA: (#struct){
+          }
+          workspaceB?: (#struct){
+          }
+        }
+        siblings?: (list){
+        }
+      }
+      #AccountConfigSub2: (#struct){
+        workspaces: (#struct){
+          workspaceB: (#struct){
+          }
+          workspaceA?: (#struct){
+          }
+        }
+        siblings?: (list){
+        }
+      }
+      tree: (struct){
+        env1: (struct){
+          region1: (struct){
+            "env1-r1-account-sub1": (#struct){
+              siblings: (#list){
+                0: (string){ "env1-r1-account-sub2-1" }
+              }
+              workspaces: (#struct){
+                workspaceA: (#struct){
+                }
+                workspaceB?: (#struct){
+                }
+              }
+            }
+            "env1-r1-account-sub2-1": (#struct){
+              siblings: (#list){
+                0: (string){ "env1-r1-account-sub2-1" }
+              }
+              workspaces: (#struct){
+                workspaceB: (#struct){
+                }
+                workspaceA?: (#struct){
+                }
+              }
+            }
+          }
+        }
+      }
+      #lookupSiblings: (#struct){
+        envtree: (#struct){
+        }
+        out: (#list){
+        }
+      }
+    }
+  }
   inline: (_|_){
     // [eval]
     small: (_|_){
@@ -397,12 +1047,18 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,18 +1,22 @@
+@@ -1,20 +1,22 @@
  Errors:
+-expanded1.hasCycle.root._a.input._a.input: structural cycle:
+-    ./inlineexpand.cue:11:11
+-issue3731.expanded.root._others.input._others.input: structural cycle:
+-    ./inlineexpand.cue:43:16
++expanded1.hasCycle.root._a.input._a.input: structural cycle
 +in: conflicting values 4 and 1:
 +    ./x.cue:30:8
 +inline.acrossFields.fail1.k10: conflicting values 4 and 1:
 +    ./x.cue:30:8
++issue3731.expanded.root._others.input._others.input: structural cycle
  structural cycle:
      ./x.cue:6:9
  structural cycle:
@@ -418,13 +1074,165 @@ diff old new
  (_|_){
 -  // [structural cycle]
 +  // [eval]
+   inlined: (struct){
+     X: (struct){
+       input: (struct){
+@@ -43,26 +45,16 @@
+           // [structural cycle]
+           input: (_|_){
+             // [structural cycle]
+-            a: (_|_){
+-              // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle:
+-              //     ./inlineexpand.cue:11:11
+-            }
++            a: (_){ _ }
+             _a: (_|_){
+               // [structural cycle]
+               input: (_|_){
+-                // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle:
+-                //     ./inlineexpand.cue:11:11
+-              }
+-              output: (_|_){
+-                // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle:
+-                //     ./inlineexpand.cue:11:11
+-              }
+-            }
+-          }
+-          output: (_|_){
+-            // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle:
+-            //     ./inlineexpand.cue:11:11
+-          }
++                // [structural cycle] expanded1.hasCycle.root._a.input._a.input: structural cycle
++              }
++              output: (_){ _ }
++            }
++          }
++          output: (_){ _ }
+         }
+       }
+     }
+@@ -100,7 +92,7 @@
+           show: (bool){ true }
+         }
+         others: (#list){
+-          0: (struct){
++          0: (#struct){
+             show: (bool){ true }
+           }
+         }
+@@ -119,31 +111,22 @@
+         self: (struct){
+           show: (bool){ true }
+         }
+-        others: (#list){
+-          0: (struct){
+-            show: (bool){ true }
+-          }
+-        }
++        others: ~(issue3731.expanded.root._others.output)
+         _others: (_|_){
+           // [structural cycle]
+           input: (_|_){
+             // [structural cycle]
+-            self: (struct){
+-              show: (bool){ true }
+-            }
+-            others: (_|_){
+-              // [structural cycle] issue3731.expanded.root._others.input._others.input: structural cycle:
+-              //     ./inlineexpand.cue:43:16
++            self: (#struct){
++              show: (bool){ true }
++            }
++            others: (#list){
+             }
+             _others: (_|_){
+               // [structural cycle]
+               input: (_|_){
+-                // [structural cycle] issue3731.expanded.root._others.input._others.input: structural cycle:
+-                //     ./inlineexpand.cue:43:16
+-              }
+-              output: (_|_){
+-                // [structural cycle] issue3731.expanded.root._others.input._others.input: structural cycle:
+-                //     ./inlineexpand.cue:43:16
++                // [structural cycle] issue3731.expanded.root._others.input._others.input: structural cycle
++              }
++              output: (#list){
+               }
+             }
+           }
+@@ -163,12 +146,7 @@
+         }
+       }
+       #AccountConfig: (#struct){
+-        workspaces: (#struct){
+-          workspaceA?: (#struct){
+-          }
+-          workspaceB?: (#struct){
+-          }
+-        }
++        workspaces: ~(issue3731.full.#Workspace)
+         siblings?: (list){
+         }
+       }
+@@ -184,10 +162,10 @@
+       }
+       #AccountConfigSub2: (#struct){
+         workspaces: (#struct){
+-          workspaceA?: (#struct){
+-          }
+           workspaceB: (#struct){
+           }
++          workspaceA?: (#struct){
++          }
+         }
+         siblings?: (list){
+         }
+@@ -196,6 +174,9 @@
+         env1: (struct){
+           region1: (struct){
+             "env1-r1-account-sub1": (#struct){
++              siblings: (#list){
++                0: (string){ "env1-r1-account-sub2-1" }
++              }
+               workspaces: (#struct){
+                 workspaceA: (#struct){
+                 }
+@@ -202,19 +183,16 @@
+                 workspaceB?: (#struct){
+                 }
+               }
+-              siblings: (#list){
+-                0: (string){ "env1-r1-account-sub2-1" }
+-              }
+             }
+             "env1-r1-account-sub2-1": (#struct){
+-              workspaces: (#struct){
+-                workspaceA?: (#struct){
+-                }
++              siblings: (#list){
++                0: (string){ "env1-r1-account-sub2-1" }
++              }
++              workspaces: (#struct){
+                 workspaceB: (#struct){
+                 }
+-              }
+-              siblings: (#list){
+-                0: (string){ "env1-r1-account-sub2-1" }
++                workspaceA?: (#struct){
++                }
+               }
+             }
+           }
+@@ -229,7 +207,7 @@
+     }
+   }
    inline: (_|_){
 -    // [structural cycle]
 +    // [eval]
      small: (_|_){
        // [structural cycle]
        f: (_|_){
-@@ -28,7 +32,7 @@
+@@ -245,7 +223,7 @@
        // [structural cycle]
        f2: (_|_){
          // [structural cycle] structural cycle:
@@ -433,7 +1241,7 @@ diff old new
        }
        fRec: (_|_){
          // [structural cycle]
-@@ -58,9 +62,9 @@
+@@ -275,9 +253,9 @@
        }
      }
      acrossFields: (_|_){
@@ -445,7 +1253,7 @@ diff old new
          f: (struct){
            in: (number){ number }
            out: (_|_){
-@@ -71,17 +75,14 @@
+@@ -288,17 +266,14 @@
          }
          k00: (int){ 0 }
          k10: (_|_){

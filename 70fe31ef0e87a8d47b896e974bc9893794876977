@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "885019bd_e306a261",
+        "filename": "internal/encoding/encoding.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-26T13:46:56Z",
+      "side": 1,
+      "message": "This is probably a slightly academic concern, but still:\n\nThere is no guarantee that the transform does no internal buffering. Consequently, the act of creating the transform reader (line 197) could have read something from the underlying buffer `srcr`. We are therefore not guaranteed that this `io.Readall(srcr)` actually does read everything.\n\nThe `t` and `r` are created a block too early - they could be moved down to ~line 226. Which also then means you could a test for this `build.Binary` case early, before `r` (and `t`) is created, and then we\u0027d have the guarantee.\n\nThis is probably nothing to worry about, but if it were me, I think I would make this change, to make the code a touch more defensive.",
+      "revId": "70fe31ef0e87a8d47b896e974bc9893794876977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

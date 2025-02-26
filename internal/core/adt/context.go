@@ -817,6 +817,25 @@ func (c *OpContext) unifyNode(expr Expr, state combinedFlags) (result Value) {
 		}
 
 		env := c.Env(0)
+		// Pick the first Environment that is not within a dynamic scope to
+		// record the ephemeral Vertex so that it can be found.
+		// Consider the following two cases:
+		//
+		//		X: {in: a, out: in}
+		//		a: (X & {in: a}).out
+		//
+		// versus
+		//
+		//		X: {in: a, out: in}
+		//		a: b: (X & {in: a}).out
+		//
+		// In the first case, the passed Environment, which reflects the outer
+		// scope. In the second case, however, we also want the outer scope to
+		// avoid a structural cycle. See the section INLINE CYCLES in cycle.go
+		// for more information.
+		for env.Vertex.nonRooted {
+			env = env.Up
+		}
 		cv, ok := env.cache[cacheKey{expr, nil}]
 		if !ok {
 			if env.cache == nil {

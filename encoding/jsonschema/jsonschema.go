@@ -216,7 +216,7 @@ type Config struct {
 	// DefineSchema is called, if not nil, for any schema that is defined
 	// within the json schema being converted but is mapped somewhere
 	// external via [Config.MapRef]. The invoker of [Extract] is
-	// responsible for defining the schema in the correct place as described
+	// responsible for defining the schema e in the correct place as described
 	// by the import path and its relative CUE path.
 	//
 	// The importPath and path are exactly as returned by [Config.MapRef].
@@ -224,7 +224,7 @@ type Config struct {
 	// Note that importPath will never be empty, because if MapRef
 	// returns an empty importPath, it's specifying an internal schema
 	// which will be defined accordingly.
-	DefineSchema func(importPath string, path cue.Path, e ast.Expr, docComment *ast.CommentGroup)
+	DefineSchema func(importPath string, path cue.Path, e ast.Expr)
 
 	// TODO: configurability to make it compatible with OpenAPI, such as
 	// - locations of definitions: #/components/schemas, for instance.

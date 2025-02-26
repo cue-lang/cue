@@ -1765,6 +1765,11 @@ func TestDefaults(t *testing.T) {
 		def:   `"x" | string`,
 		val:   `"x"|string`,
 		ok:    false,
+	}, {
+		value: `{#x: {y: #y}, #y: {a: int}}.#y`,
+		def:   `{a:int}`,
+		val:   `{a: int}`,
+		ok:    false,
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {

@@ -110,6 +110,13 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 			//		}
 			// panic("inconsistent state: nodes differ")
 		}
+		// TODO: consider setting this as a safety measure.
+		// if c.CloseInfo.CycleType > id.CycleType {
+		// 	id.CycleType = c.CloseInfo.CycleType
+		// }
+		// if c.CloseInfo.IsCyclic {
+		// 	id.IsCyclic = true
+		// }
 	default:
 
 		// In this case, the conjunct is inserted as the result of an expansion

@@ -434,9 +434,24 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 	ciKey := closeInfo
 	ciKey.Refs = nil
 	ciKey.Inline = false
-	key := arcKey{arc, ciKey}
+	key := arcKey{
+		arc: arc,
+		id:  ciKey,
+	}
 	for _, k := range n.arcMap {
-		if key == k {
+		if key.arc == k.arc {
+			// openDebugGraph(n.ctx, key.id.cc, "duplicate arc A")
+			// openDebugGraph(n.ctx, k.id.cc, "duplicate arc B")
+			isTotal := k.id.cc.isTotal && !k.id.cc.isClosed
+			for _, a := range k.id.cc.arcs {
+				a.decremented = true
+				for cc := key.id.cc; cc != nil; cc = cc.parent {
+					cc.arcs = append(cc.arcs, a)
+					if isTotal && !cc.isClosed {
+						cc.isTotal = true
+					}
+				}
+			}
 			return
 		}
 	}

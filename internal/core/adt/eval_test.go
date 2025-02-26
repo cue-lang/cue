@@ -84,8 +84,8 @@ var skipDebugDepErrors = map[string]int{
 	"cycle/builtins":           3,
 	"cycle/issue241":           2,
 	"cycle/issue429":           1,
+	"cycle/issue990":           2,
 	"disjunctions/elimination": 6,
-	"eval/issue2146":           1,
 	"eval/notify":              3,
 }
 
@@ -255,7 +255,7 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, flags cued
 // TestX is for debugging. Do not delete.
 func TestX(t *testing.T) {
 	adt.DebugDeps = true
-	// adt.OpenGraphs = true
+	adt.OpenGraphs = true
 
 	flags := cuedebug.Config{
 		Sharing:    true, // Uncomment to turn sharing off.

@@ -224,7 +224,7 @@ func (ctx *overlayContext) cloneNodeContext(n *nodeContext) *nodeContext {
 
 	d.nodeContextState = n.nodeContextState
 
-	d.arcMap = append(d.arcMap, n.arcMap...)
+	// d.arcMap = append(d.arcMap, n.arcMap...)
 	d.checks = append(d.checks, n.checks...)
 
 	for _, s := range n.sharedIDs {

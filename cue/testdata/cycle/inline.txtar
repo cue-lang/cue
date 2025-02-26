@@ -395,36 +395,36 @@ issue3731: full: {
   }
 }
 -- out/evalalpha/stats --
-Leaks:  88
+Leaks:  259
 Freed:  0
 Reused: 0
-Allocs: 88
+Allocs: 259
 Retain: 0
 
-Unifications: 79
-Conjuncts:    257
+Unifications: 233
+Conjuncts:    745
 Disjuncts:    0
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
 @@ -1,9 +1,9 @@
--Leaks:  247
--Freed:  141
--Reused: 136
--Allocs: 252
--Retain: 834
-+Leaks:  88
+-Leaks:  286
+-Freed:  253
+-Reused: 248
+-Allocs: 291
+-Retain: 994
++Leaks:  259
 +Freed:  0
 +Reused: 0
-+Allocs: 88
++Allocs: 259
 +Retain: 0
  
--Unifications: 388
--Conjuncts:    1307
--Disjuncts:    707
-+Unifications: 79
-+Conjuncts:    257
+-Unifications: 539
+-Conjuncts:    1663
+-Disjuncts:    943
++Unifications: 233
++Conjuncts:    745
 +Disjuncts:    0
 -- out/eval/stats --
 Leaks:  286

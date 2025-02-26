@@ -33,24 +33,20 @@ C: #steps: #Script & {mount: [B]}
 
 #ref: {a: 1} | {b: 2}
 -- out/evalalpha/stats --
-Leaks:  168
+Leaks:  96
 Freed:  0
 Reused: 0
-Allocs: 168
+Allocs: 96
 Retain: 0
 
-Unifications: 56
-Conjuncts:    329
-Disjuncts:    40
+Unifications: 40
+Conjuncts:    161
+Disjuncts:    24
 -- out/evalalpha --
 (struct){
   A: (#struct){ |((#struct){
       #steps: ~(#Script)
       a: (int){ 1 }
-    }, (#struct){
-      #steps: ~(#Script)
-      a: (int){ 1 }
-      b: (int){ 2 }
     }, (#struct){
       #steps: ~(#Script)
       b: (int){ 2 }
@@ -61,10 +57,6 @@ Disjuncts:    40
         0: (#struct){ |((#struct){
             #steps: ~(#Script)
             a: (int){ 1 }
-          }, (#struct){
-            #steps: ~(#Script)
-            a: (int){ 1 }
-            b: (int){ 2 }
           }, (#struct){
             #steps: ~(#Script)
             b: (int){ 2 }
@@ -83,10 +75,6 @@ Disjuncts:    40
                     a: (int){ 1 }
                   }, (#struct){
                     #steps: ~(#Script)
-                    a: (int){ 1 }
-                    b: (int){ 2 }
-                  }, (#struct){
-                    #steps: ~(#Script)
                     b: (int){ 2 }
                   }) }
               }
@@ -98,28 +86,6 @@ Disjuncts:    40
                 0: (#struct){ |((#struct){
                     #steps: ~(#Script)
                     a: (int){ 1 }
-                  }, (#struct){
-                    #steps: ~(#Script)
-                    a: (int){ 1 }
-                    b: (int){ 2 }
-                  }, (#struct){
-                    #steps: ~(#Script)
-                    b: (int){ 2 }
-                  }) }
-              }
-            }
-            a: (int){ 1 }
-            b: (int){ 2 }
-          }, (#struct){
-            #steps: (#struct){
-              mount: (#list){
-                0: (#struct){ |((#struct){
-                    #steps: ~(#Script)
-                    a: (int){ 1 }
-                  }, (#struct){
-                    #steps: ~(#Script)
-                    a: (int){ 1 }
-                    b: (int){ 2 }
                   }, (#struct){
                     #steps: ~(#Script)
                     b: (int){ 2 }
@@ -140,10 +106,6 @@ Disjuncts:    40
       a: (int){ 1 }
     }, (#struct){
       #steps: ~(#Script)
-      a: (int){ 1 }
-      b: (int){ 2 }
-    }, (#struct){
-      #steps: ~(#Script)
       b: (int){ 2 }
     }) }
   #ref: (#struct){ |((#struct){
@@ -156,7 +118,7 @@ Disjuncts:    40
 diff old new
 --- old
 +++ new
-@@ -1,22 +1,13 @@
+@@ -1,22 +1,9 @@
  (struct){
    A: (#struct){ |((#struct){
 -      #steps: (#struct){
@@ -180,14 +142,10 @@ diff old new
 +      a: (int){ 1 }
 +    }, (#struct){
 +      #steps: ~(#Script)
-+      a: (int){ 1 }
-+      b: (int){ 2 }
-+    }, (#struct){
-+      #steps: ~(#Script)
        b: (int){ 2 }
      }) }
    B: (struct){
-@@ -23,23 +14,14 @@
+@@ -23,23 +10,10 @@
      #steps: (#struct){
        mount: (#list){
          0: (#struct){ |((#struct){
@@ -212,14 +170,10 @@ diff old new
 +            a: (int){ 1 }
 +          }, (#struct){
 +            #steps: ~(#Script)
-+            a: (int){ 1 }
-+            b: (int){ 2 }
-+          }, (#struct){
-+            #steps: ~(#Script)
              b: (int){ 2 }
            }) }
        }
-@@ -52,76 +34,49 @@
+@@ -52,76 +26,23 @@
              #steps: (#struct){
                mount: (#list){
                  0: (#struct){ |((#struct){
@@ -297,10 +251,6 @@ diff old new
 +                    a: (int){ 1 }
 +                  }, (#struct){
 +                    #steps: ~(#Script)
-+                    a: (int){ 1 }
-+                    b: (int){ 2 }
-+                  }, (#struct){
-+                    #steps: ~(#Script)
 +                    b: (int){ 2 }
 +                  }) }
 +              }
@@ -312,34 +262,12 @@ diff old new
 +                0: (#struct){ |((#struct){
 +                    #steps: ~(#Script)
 +                    a: (int){ 1 }
-+                  }, (#struct){
-+                    #steps: ~(#Script)
-+                    a: (int){ 1 }
-+                    b: (int){ 2 }
-+                  }, (#struct){
-+                    #steps: ~(#Script)
-+                    b: (int){ 2 }
-+                  }) }
-+              }
-+            }
-+            a: (int){ 1 }
-+            b: (int){ 2 }
-+          }, (#struct){
-+            #steps: (#struct){
-+              mount: (#list){
-+                0: (#struct){ |((#struct){
-+                    #steps: ~(#Script)
-+                    a: (int){ 1 }
-+                  }, (#struct){
-+                    #steps: ~(#Script)
-+                    a: (int){ 1 }
-+                    b: (int){ 2 }
 +                  }, (#struct){
 +                    #steps: ~(#Script)
                      b: (int){ 2 }
                    }) }
                }
-@@ -136,23 +91,14 @@
+@@ -136,23 +57,10 @@
      }
    }
    #Task: (#struct){ |((#struct){
@@ -362,10 +290,6 @@ diff old new
 -      }
 +      #steps: ~(#Script)
 +      a: (int){ 1 }
-+    }, (#struct){
-+      #steps: ~(#Script)
-+      a: (int){ 1 }
-+      b: (int){ 2 }
 +    }, (#struct){
 +      #steps: ~(#Script)
        b: (int){ 2 }
@@ -545,18 +469,18 @@ diff old new
 -Reused: 24051
 -Allocs: 45
 -Retain: 1
-+Leaks:  168
++Leaks:  96
 +Freed:  0
 +Reused: 0
-+Allocs: 168
++Allocs: 96
 +Retain: 0
  
 -Unifications: 18724
 -Conjuncts:    100730
 -Disjuncts:    24097
-+Unifications: 56
-+Conjuncts:    329
-+Disjuncts:    40
++Unifications: 40
++Conjuncts:    161
++Disjuncts:    24
 -- out/eval/stats --
 Leaks:  0
 Freed:  24096

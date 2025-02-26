@@ -666,7 +666,7 @@ func (n *nodeContext) detectCycleV3(arc *Vertex, env *Environment, x Resolver, c
 
 	for r := ci.Refs; r != nil; r = r.Next {
 		if equalDeref(r.Arc, arc) {
-			if n.node.IsDynamic || ci.Inline {
+			if n.node.IsDynamic {
 				n.reportCycleError()
 				return ci, true
 			}

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7115afe4_4bac7e71",
+        "filename": "internal/encoding/encoding.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-26T17:14:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a241aed_8e58b24a",
+      "revId": "70fe31ef0e87a8d47b896e974bc9893794876977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "885019bd_e306a261",
@@ -49,6 +67,24 @@
       "side": 1,
       "message": "Agreed. Although it\u0027s trivial to manually verify that transform.NewReader does nothing other than allocate, it\u0027s logically nicer (and a tiny bit cheaper) to do the binary check first before creating the transformer.",
       "parentUuid": "885019bd_e306a261",
+      "revId": "70fe31ef0e87a8d47b896e974bc9893794876977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9f40409_5f68f11f",
+        "filename": "internal/encoding/encoding.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-26T17:14:01Z",
+      "side": 1,
+      "message": "agreed, done. I had similar thoughts when I first saw the PR, but wasn\u0027t sure whether it was too nitpicky. easy enough to fix in any case.",
+      "parentUuid": "dc1c9060_ee8bf1a7",
       "revId": "70fe31ef0e87a8d47b896e974bc9893794876977",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "86350256_39a3ed0f",
+        "filename": "encoding/openapi/decode_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-26T10:30:37Z",
+      "side": 1,
+      "message": "Yup, done. And modified the code to increase robustness.",
+      "parentUuid": "32e8bb10_db51ffbd",
+      "revId": "6bf3e5dd54a5180bcfb2f3444cb47bb639373e88",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "49d62b7e_4e0d4185",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-02-25T18:08:33Z",
       "side": 1,
       "message": "I think the TrimSpace is unneccesary here (and we probably want to know if the generator _is_ generating spurious whitespace. So I\u0027d suggest just:\n```\n    out.WriteByte(\u0027\\n\u0027)\n    w.Write(out.Bytes())\n```\n\n(Note that the writer returned by `t.Writer` is a `bytes.Buffer` itself and hence can\u0027t fail).",
+      "revId": "6bf3e5dd54a5180bcfb2f3444cb47bb639373e88",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d2f95cc_25c96321",
+        "filename": "encoding/openapi/openapi_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-26T10:30:37Z",
+      "side": 1,
+      "message": "Need to discuss trailing newlines elsewhere - there seems to be a General Problem!\n\n(`t.Writer`\u0027s signature returns an `io.Writer`. I think it\u0027s fragile to assume anything more specific - makes refactoring more dangerous. I would also be surprised if Go\u0027s compatibility guarantee ensures `bytes.Buffer`\u0027s `Write` method can *never* return a non-nil error.)",
+      "parentUuid": "49d62b7e_4e0d4185",
       "revId": "6bf3e5dd54a5180bcfb2f3444cb47bb639373e88",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -82,6 +118,24 @@
       "writtenOn": "2025-02-25T18:08:33Z",
       "side": 1,
       "message": "spurious tabs?",
+      "revId": "6bf3e5dd54a5180bcfb2f3444cb47bb639373e88",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "764ca47b_74d69a10",
+        "filename": "encoding/openapi/testdata/cycle.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-26T10:30:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "32bd0a21_c2d7287b",
       "revId": "6bf3e5dd54a5180bcfb2f3444cb47bb639373e88",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

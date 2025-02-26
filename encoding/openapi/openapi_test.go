@@ -17,20 +17,14 @@ package openapi_test
 import (
 	"bytes"
 	"encoding/json"
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
-
-	"github.com/google/go-cmp/cmp"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/load"
 	"cuelang.org/go/encoding/openapi"
 	"cuelang.org/go/internal/cuetdtest"
-	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 )
 
@@ -43,6 +37,34 @@ func TestGenerateOpenAPI(t *testing.T) {
 		Root:   "./testdata",
 		Name:   t.Name(),
 		Matrix: matrix,
+	}
+
+	nameFuncs := map[string]func(v cue.Value, path cue.Path) string{
+		"oneof": func(v cue.Value, path cue.Path) string {
+			var buf strings.Builder
+			for i, sel := range path.Selectors() {
+				if i > 0 {
+					buf.WriteByte('_')
+				}
+				s := sel.String()
+				s = strings.TrimPrefix(s, "#")
+				buf.WriteString(strings.ToUpper(s))
+			}
+			return buf.String()
+		},
+		"refs": func(v cue.Value, path cue.Path) string {
+			switch {
+			case strings.HasPrefix(path.Selectors()[0].String(), "#Excluded"):
+				return ""
+			}
+			return strings.TrimPrefix(path.String(), "#")
+		},
+	}
+
+	descFuncs := map[string]func(v cue.Value) string{
+		"oneof": func(v cue.Value) string {
+			return "Randomly picked description from a set of size one."
+		},
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
@@ -67,6 +89,20 @@ func TestGenerateOpenAPI(t *testing.T) {
 		}
 		if version, ok := t.Value("Version"); ok {
 			config.Version = version
+		}
+		if name, ok := t.Value("NameFunc"); ok {
+			if fun, found := nameFuncs[name]; found {
+				config.NameFunc = fun
+			} else {
+				t.Fatal("Unknown NameFunc", name)
+			}
+		}
+		if desc, ok := t.Value("DescriptionFunc"); ok {
+			if fun, found := descFuncs[desc]; found {
+				config.DescriptionFunc = fun
+			} else {
+				t.Fatal("Unknown DescFunc", desc)
+			}
 		}
 
 		expectedErr, shouldErr := t.Value("ExpectError")
@@ -102,92 +138,6 @@ func TestGenerateOpenAPI(t *testing.T) {
 			t.Fatal(err)
 		}
 	})
-}
-
-func TestParseDefinitions(t *testing.T) {
-	info := struct {
-		Title   string `json:"title"`
-		Version string `json:"version"`
-	}{"test", "v1"}
-	testCases := []struct {
-		in, out string
-		config  *openapi.Config
-	}{{
-		in:  "oneof.cue",
-		out: "oneof-funcs.json",
-		config: &openapi.Config{
-			Info: info,
-			NameFunc: func(v cue.Value, path cue.Path) string {
-				var buf strings.Builder
-				for i, sel := range path.Selectors() {
-					if i > 0 {
-						buf.WriteByte('_')
-					}
-					s := sel.String()
-					s = strings.TrimPrefix(s, "#")
-					buf.WriteString(strings.ToUpper(s))
-				}
-				return buf.String()
-			},
-			DescriptionFunc: func(v cue.Value) string {
-				return "Randomly picked description from a set of size one."
-			},
-		},
-	}, {
-		in:  "refs.cue",
-		out: "refs.json",
-		config: &openapi.Config{
-			Info: info,
-			NameFunc: func(v cue.Value, path cue.Path) string {
-				switch {
-				case strings.HasPrefix(path.Selectors()[0].String(), "#Excluded"):
-					return ""
-				}
-				return strings.TrimPrefix(path.String(), "#")
-			},
-		},
-	}}
-	for _, tc := range testCases {
-		t.Run(tc.out, func(t *testing.T) {
-			filename := filepath.FromSlash(tc.in)
-			inst := load.Instances([]string{filename}, &load.Config{
-				Dir: "./testdata",
-			})[0]
-			ctx := cuecontext.New()
-			v := ctx.BuildInstance(inst)
-			if err := v.Err(); err != nil {
-				t.Fatal(errors.Details(err, nil))
-			}
-
-			b, err := openapi.Gen(v, tc.config)
-			if err != nil {
-				t.Fatal("unexpected error:", errors.Details(err, nil))
-			}
-
-			_, err = openapi.Generate(v, tc.config)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			var out = &bytes.Buffer{}
-			_ = json.Indent(out, b, "", "   ")
-
-			wantFile := filepath.Join("testdata", tc.out)
-			if cuetest.UpdateGoldenFiles {
-				_ = os.WriteFile(wantFile, out.Bytes(), 0666)
-				return
-			}
-
-			b, err = os.ReadFile(wantFile)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			if d := cmp.Diff(string(b), out.String()); d != "" {
-				t.Errorf("files differ:\n%v", d)
-			}
-		})
-	}
 }
 
 // TODO: move OpenAPI testing to txtar and allow errors.

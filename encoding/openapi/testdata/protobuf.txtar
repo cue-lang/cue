@@ -1,5 +1,4 @@
 #ExpandReferences
-#skip-v3
 -- in.cue --
 // Note: This example originally derived from a CUE file converted from protobuf.
 

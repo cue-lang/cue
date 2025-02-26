@@ -716,11 +716,13 @@ func (v Value) Default() (Value, bool) {
 		return v, false
 	}
 
-	d := v.v.Default()
+	x := v.v.DerefValue()
+	d := x.Default()
+	isDefault := d != x
 	if d == v.v {
 		return v, false
 	}
-	return makeValue(v.idx, d, v.parent_), true
+	return makeValue(v.idx, d, v.parent_), isDefault
 }
 
 // Label reports he label used to obtain this value from the enclosing struct.

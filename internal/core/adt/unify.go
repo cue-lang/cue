@@ -764,7 +764,9 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 
 		// A lookup counts as new structure. See the commend in Section
 		// "Lookups in inline cycles" in cycle.go.
-		state.hasNonCycle = true
+		// TODO: this seems no longer necessary and setting this will cause some
+		// hangs. Investigate.
+		// state.hasNonCycle = true
 
 		// TODO: ideally this should not be run at this point. Consider under
 		// which circumstances this is still necessary, and at least ensure

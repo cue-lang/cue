@@ -376,6 +376,13 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		}
 		v.status = w.status
 
+		// TODO: find a more principled way to catch this cycle and avoid this
+		// check.
+		if n.hasAncestorV3(w) {
+			n.reportCycleError()
+			return true
+		}
+
 		// Ensure that shared nodes comply to the same requirements as we
 		// need for the current node.
 		w.unify(c, needs, mode)

@@ -720,7 +720,8 @@ func (v Value) Default() (Value, bool) {
 	if d == v.v {
 		return v, false
 	}
-	return makeValue(v.idx, d, v.parent_), true
+	_, isDisjunction := v.v.BaseValue.(*adt.Disjunction)
+	return makeValue(v.idx, d, v.parent_), isDisjunction || v.v.IsConstraint()
 }
 
 // Label reports he label used to obtain this value from the enclosing struct.

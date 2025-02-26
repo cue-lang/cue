@@ -1736,10 +1736,11 @@ func TestValue_LookupDef(t *testing.T) {
 // TODO: trim down to individual defaults?
 func TestDefaults(t *testing.T) {
 	testCases := []struct {
-		value string
-		def   string
-		val   string
-		ok    bool
+		value      string
+		def        string
+		val        string
+		ok         bool
+		firstField bool
 	}{{
 		value: `number | *1`,
 		def:   "1",
@@ -1765,12 +1766,36 @@ func TestDefaults(t *testing.T) {
 		def:   `"x" | string`,
 		val:   `"x"|string`,
 		ok:    false,
+	}, {
+		value: `{#x: {y: #y}, #y: {a: int}}.#y`,
+		def:   `{a:int}`,
+		val:   `{a: int}`,
+		ok:    false,
+	}, {
+		value:      `{x?: []}`,
+		def:        `[]`,
+		val:        `[]`,
+		ok:         true,
+		firstField: true,
 	}}
 	for _, tc := range testCases {
 		cuetdtest.FullMatrix.Run(t, tc.value, func(t *testing.T, m *cuetdtest.M) {
 			v := getValue(m, "a: "+tc.value).Lookup("a")
 
 			v = v.Eval()
+
+			if tc.firstField {
+				iter, err := v.Fields(cue.All())
+				if err != nil {
+					t.Fatal(err)
+				}
+				if iter.Next() {
+					v = iter.Value()
+				} else {
+					t.Fatal("No fields found")
+				}
+			}
+
 			d, ok := v.Default()
 			if ok != tc.ok {
 				t.Errorf("hasDefault: got %v; want %v", ok, tc.ok)

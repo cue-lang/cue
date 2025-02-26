@@ -1,5 +1,4 @@
 #NameFunc: excludeExcluded
-#skip-v3
 -- in.cue --
 #Keep: {
 	// This comment is included

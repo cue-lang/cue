@@ -28,6 +28,82 @@ t3: {
 	l2: l
 	l3: ls
 }
+-- out/list-v3 --
+Errors:
+t1.ils: error in call to list.IsSorted: runtime error: invalid memory address or nil pointer dereference:
+    ./in.cue:7:7
+t2.ils: error in call to list.IsSorted: runtime error: invalid memory address or nil pointer dereference:
+    ./in.cue:15:7
+t3.il: error in call to list.IsSorted: runtime error: invalid memory address or nil pointer dereference:
+    ./in.cue:21:6
+t3.ls: error in call to list.Sort: runtime error: invalid memory address or nil pointer dereference:
+    ./in.cue:23:7
+
+Result:
+t1: {
+	l: ["c", "b", "a"]
+	ls: ["a", "b", "c"]
+	il:  false
+	ils: _|_ // t1.ils: error in call to list.IsSorted: runtime error: invalid memory address or nil pointer dereference
+}
+t2: {
+	l: ["c", "b", "a"]
+	il: false
+	ls: ["a", "b", "c"]
+	ils: _|_ // t2.ils: error in call to list.IsSorted: runtime error: invalid memory address or nil pointer dereference
+}
+t3: {
+	L: ["c", "b", "a", "e", "d"]
+	l: ["c", "b", "a", "e"]
+	il:  _|_ // t3.il: error in call to list.IsSorted: runtime error: invalid memory address or nil pointer dereference
+	ls:  _|_ // t3.ls: error in call to list.Sort: runtime error: invalid memory address or nil pointer dereference
+	ils: _|_ // t3.ls: error in call to list.Sort: runtime error: invalid memory address or nil pointer dereference
+	l2: ["c", "b", "a", "e"]
+	l3: _|_ // t3.ls: error in call to list.Sort: runtime error: invalid memory address or nil pointer dereference
+}
+-- diff/-out/list-v3<==>+out/list --
+diff old new
+--- old
++++ new
+@@ -1,21 +1,32 @@
++Errors:
++t1.ils: error in call to list.IsSorted: runtime error: invalid memory address or nil pointer dereference:
++    ./in.cue:7:7
++t2.ils: error in call to list.IsSorted: runtime error: invalid memory address or nil pointer dereference:
++    ./in.cue:15:7
++t3.il: error in call to list.IsSorted: runtime error: invalid memory address or nil pointer dereference:
++    ./in.cue:21:6
++t3.ls: error in call to list.Sort: runtime error: invalid memory address or nil pointer dereference:
++    ./in.cue:23:7
++
++Result:
+ t1: {
+ 	l: ["c", "b", "a"]
+ 	ls: ["a", "b", "c"]
+ 	il:  false
+-	ils: true
++	ils: _|_ // t1.ils: error in call to list.IsSorted: runtime error: invalid memory address or nil pointer dereference
+ }
+ t2: {
+ 	l: ["c", "b", "a"]
+ 	il: false
+ 	ls: ["a", "b", "c"]
+-	ils: true
++	ils: _|_ // t2.ils: error in call to list.IsSorted: runtime error: invalid memory address or nil pointer dereference
+ }
+ t3: {
+ 	L: ["c", "b", "a", "e", "d"]
+ 	l: ["c", "b", "a", "e"]
+-	il: false
+-	ls: ["a", "b", "c", "e"]
+-	ils: true
++	il:  _|_ // t3.il: error in call to list.IsSorted: runtime error: invalid memory address or nil pointer dereference
++	ls:  _|_ // t3.ls: error in call to list.Sort: runtime error: invalid memory address or nil pointer dereference
++	ils: _|_ // t3.ls: error in call to list.Sort: runtime error: invalid memory address or nil pointer dereference
+ 	l2: ["c", "b", "a", "e"]
+-	l3: ["a", "b", "c", "e"]
++	l3: _|_ // t3.ls: error in call to list.Sort: runtime error: invalid memory address or nil pointer dereference
+ }
 -- out/list --
 t1: {
 	l: ["c", "b", "a"]

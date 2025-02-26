@@ -830,14 +830,14 @@ func equalPartialNode(ctx *OpContext, x, y *closeContext) bool {
 		return false
 	}
 
-	if len(x.arcs) != len(y.arcs) {
+	if len(x.arcs()) != len(y.arcs()) {
 		return false
 	}
 
 	// TODO(perf): use merge sort
 outer:
-	for _, a := range x.arcs {
-		for _, b := range y.arcs {
+	for _, a := range x.arcs() {
+		for _, b := range y.arcs() {
 			if a.root.src.Label != b.root.src.Label {
 				continue
 			}

@@ -270,7 +270,10 @@ type closeContext struct {
 	// arcs represents closeContexts for sub fields and notification targets
 	// associated with this node that reflect the same point in the expression
 	// tree as this closeContext. In both cases the are keyed by Vertex.
-	arcs []ccArc
+	_arcs []ccArc
+
+	// any arcs added to _arcs should also be added to forward.
+	forward []*closeContext
 
 	// notify represents closeContexts which to notify of updates.
 	//
@@ -302,6 +305,30 @@ type closeContext struct {
 	// decl is the declaration which contains the conjuct which gave
 	// rise to this closeContext.
 	decl Decl
+}
+
+func (c *closeContext) arcs() []ccArc {
+	return c._arcs
+}
+
+func (c *closeContext) appendArc(a ccArc) {
+	c._arcs = append(c.arcs(), a)
+	a.decremented = true
+	isTotal := c.isTotal && !c.isClosed
+outer:
+	for _, cc := range c.forward {
+		for ; cc != nil; cc = cc.parent {
+			for _, b := range cc.arcs() {
+				if b.dst == a.dst {
+					continue outer
+				}
+			}
+			cc.appendArc(a)
+			if isTotal && !cc.isClosed {
+				cc.isTotal = true
+			}
+		}
+	}
 }
 
 // Label is a convenience function to return the label of the associated Vertex.
@@ -415,8 +442,8 @@ func (v *Vertex) assignConjunct(ctx *OpContext, root *closeContext, c Conjunct, 
 }
 
 func (cc *closeContext) getKeyedCC(ctx *OpContext, key *closeContext, c CycleInfo, mode ArcType, checkClosed bool) *closeContext {
-	for i := range cc.arcs {
-		a := &cc.arcs[i]
+	for i := range cc.arcs() {
+		a := &cc.arcs()[i]
 		if a.root == key {
 			a.matched = a.matched && !checkClosed
 			a.dst.updateArcType(ctx, mode)
@@ -908,7 +935,7 @@ func isTotal(p Value) bool {
 // and patterns defined in closed. It reports an error in the nodeContext if
 // this is not the case.
 func injectClosed(ctx *OpContext, closed, dst *closeContext) {
-	for _, a := range dst.arcs {
+	for _, a := range dst.arcs() {
 		closed.checkAllowsCC(ctx, a.dst)
 	}
 
@@ -937,6 +964,7 @@ func (c *closeContext) checkAllowsCC(ctx *OpContext, arc *closeContext) {
 	case arc.arcType == ArcPending:
 		arc.arcType = ArcNotPresent
 	default:
+		openDebugGraph(ctx, c, "DISALLOWED")
 		ctx.notAllowedError(arc.src)
 	}
 }
@@ -946,7 +974,7 @@ func (c *closeContext) allows(ctx *OpContext, f Feature) bool {
 	// it is closed.
 	ctx.Assertf(token.NoPos, c.done || c.isClosed, "unexpected unfinished conjunct")
 
-	for _, b := range c.arcs {
+	for _, b := range c.arcs() {
 		cb := b.dst
 		if b.matched || f != cb.Label() {
 			continue

@@ -683,15 +683,15 @@ Result:
   }
 }
 -- out/evalalpha/stats --
-Leaks:  278
-Freed:  16
-Reused: 16
-Allocs: 278
+Leaks:  260
+Freed:  0
+Reused: 0
+Allocs: 260
 Retain: 0
 
-Unifications: 248
-Conjuncts:    1900
-Disjuncts:    44
+Unifications: 247
+Conjuncts:    752
+Disjuncts:    6
 -- out/evalalpha --
 Errors:
 definition.t0.err.d1.env.c: field not allowed:
@@ -1100,18 +1100,18 @@ diff old new
 -Reused: 273
 -Allocs: 16
 -Retain: 170
-+Leaks:  278
-+Freed:  16
-+Reused: 16
-+Allocs: 278
++Leaks:  260
++Freed:  0
++Reused: 0
++Allocs: 260
 +Retain: 0
  
 -Unifications: 269
 -Conjuncts:    1619
 -Disjuncts:    436
-+Unifications: 248
-+Conjuncts:    1900
-+Disjuncts:    44
++Unifications: 247
++Conjuncts:    752
++Disjuncts:    6
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old

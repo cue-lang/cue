@@ -68,6 +68,9 @@ const (
 	// change until all other conjuncts have been processed.
 	SHARED
 
+	// FORWARD is used to track forwarded dedup arcs.
+	FORWARD
+
 	// TEST is used for testing notifications.
 	TEST // Always refers to self.
 )
@@ -156,14 +159,14 @@ func (c *closeContext) addArcDependency(ctx *OpContext, matched bool, child *clo
 	// NOTE: do not increment
 	// - either root closeContext or otherwise resulting from sub closeContext
 	//   all conjuncts will be added now, notified, or scheduled as task.
-	for _, a := range c.arcs {
+	for _, a := range c.arcs() {
 		if a.root == root {
 			panic("addArc: Label already exists")
 		}
 	}
 	child.incDependent(ctx, ARC, c) // matched in decDependent REF(arcs)
 
-	c.arcs = append(c.arcs, ccArc{
+	c.appendArc(ccArc{
 		matched: matched,
 		root:    root,
 		dst:     child,
@@ -172,7 +175,7 @@ func (c *closeContext) addArcDependency(ctx *OpContext, matched bool, child *clo
 	root.externalDeps = append(root.externalDeps, ccDepRef{
 		src:   c,
 		kind:  ARC,
-		index: len(c.arcs) - 1,
+		index: len(c.arcs()) - 1,
 	})
 }
 
@@ -277,12 +280,12 @@ func (c *closeContext) decDependentNoMatch(ctx *OpContext, kind depKind, dependa
 
 	c.done = true
 
-	for i, a := range c.arcs {
+	for i, a := range c.arcs() {
 		cc := a.dst
 		if a.decremented {
 			continue
 		}
-		c.arcs[i].decremented = true
+		c.arcs()[i].decremented = true
 		cc.decDependent(ctx, ARC, c)
 	}
 
@@ -293,6 +296,13 @@ func (c *closeContext) decDependentNoMatch(ctx *OpContext, kind depKind, dependa
 		}
 		c.notify[i].decremented = true
 		cc.decDependent(ctx, NOTIFY, c)
+	}
+
+	if c.forward != nil {
+		for _, cc := range c.forward {
+			cc.decDependent(ctx, FORWARD, c)
+		}
+		c.forward = c.forward[:0]
 	}
 
 	if !c.updateClosedInfo(ctx) {
@@ -355,7 +365,7 @@ func (n *nodeContext) breakIncomingDeps(mode runMode) {
 		src := r.src
 		switch r.kind {
 		case ARC:
-			a := &src.arcs[r.index]
+			a := &src.arcs()[r.index]
 			if a.decremented {
 				continue
 			}

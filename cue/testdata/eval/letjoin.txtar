@@ -132,14 +132,14 @@ issue3591: missing: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  222
+Leaks:  216
 Freed:  0
 Reused: 0
-Allocs: 222
+Allocs: 216
 Retain: 0
 
-Unifications: 178
-Conjuncts:    675
+Unifications: 174
+Conjuncts:    648
 Disjuncts:    36
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -151,17 +151,17 @@ diff old new
 -Reused: 207
 -Allocs: 36
 -Retain: 160
-+Leaks:  222
++Leaks:  216
 +Freed:  0
 +Reused: 0
-+Allocs: 222
++Allocs: 216
 +Retain: 0
  
 -Unifications: 167
 -Conjuncts:    486
 -Disjuncts:    325
-+Unifications: 178
-+Conjuncts:    675
++Unifications: 174
++Conjuncts:    648
 +Disjuncts:    36
 -- out/eval/stats --
 Leaks:  24
@@ -257,9 +257,9 @@ Disjuncts:    325
         r: (int){ 2 }
       }
       y: (struct){
-        let X#2multi = {
-          b: 〈2;a〉
-          c: 1
+        let X#2 = (struct){
+          b: ~(t2.xy.a)
+          c: (int){ 1 }
         }
         v: (int){ 1 }
       }
@@ -355,7 +355,7 @@ Disjuncts:    325
 diff old new
 --- old
 +++ new
-@@ -57,23 +57,19 @@
+@@ -57,37 +57,33 @@
        }
        y: (struct){
          let X#2 = (struct){
@@ -376,6 +376,20 @@ diff old new
 -          b: (struct){
 -            r: (int){ 2 }
 -          }
+-          c: (int){ 1 }
+-        }
+-        v: (int){ 1 }
+-      }
+-    }
+-    xy: (struct){
+-      a: (struct){
+-        q: (int){ 1 }
+-        r: (int){ 2 }
+-      }
+-      y: (struct){
+-        let X#2multi = {
+-          b: 〈2;a〉
+-          c: 1
 +          b: ~(t2.x1.a)
 +          c: (int){ 1 }
 +        }
@@ -389,9 +403,23 @@ diff old new
 +      y: (struct){
 +        let X#2 = (struct){
 +          b: ~(t2.x2.a)
-           c: (int){ 1 }
++          c: (int){ 1 }
++        }
++        v: (int){ 1 }
++      }
++    }
++    xy: (struct){
++      a: (struct){
++        q: (int){ 1 }
++        r: (int){ 2 }
++      }
++      y: (struct){
++        let X#2 = (struct){
++          b: ~(t2.xy.a)
++          c: (int){ 1 }
          }
          v: (int){ 1 }
+       }
 @@ -113,17 +109,8 @@
        }
        let Var1#3multi = 〈1;v〉.p

@@ -19,12 +19,13 @@ func _() {
 	_ = x[INIT-9]
 	_ = x[DEFER-10]
 	_ = x[SHARED-11]
-	_ = x[TEST-12]
+	_ = x[FORWARD-12]
+	_ = x[TEST-13]
 }
 
-const _depKind_name = "PARENTARCNOTIFYTASKDISJUNCTEVALCOMPROOTINITDEFERSHAREDTEST"
+const _depKind_name = "PARENTARCNOTIFYTASKDISJUNCTEVALCOMPROOTINITDEFERSHAREDFORWARDTEST"
 
-var _depKind_index = [...]uint8{0, 6, 9, 15, 19, 27, 31, 35, 39, 43, 48, 54, 58}
+var _depKind_index = [...]uint8{0, 6, 9, 15, 19, 27, 31, 35, 39, 43, 48, 54, 61, 65}
 
 func (i depKind) String() string {
 	i -= 1

@@ -224,7 +224,7 @@ func (ctx *overlayContext) cloneNodeContext(n *nodeContext) *nodeContext {
 
 	d.nodeContextState = n.nodeContextState
 
-	d.arcMap = append(d.arcMap, n.arcMap...)
+	// d.arcMap = append(d.arcMap, n.arcMap...)
 	d.checks = append(d.checks, n.checks...)
 
 	for _, s := range n.sharedIDs {
@@ -288,6 +288,10 @@ func (ctx *overlayContext) allocCC(cc *closeContext) *closeContext {
 		o.parent = ctx.allocCC(cc.parent)
 	}
 
+	for _, f := range cc.forward {
+		o.forward = append(o.forward, ctx.allocCC(f))
+	}
+
 	// Copy the conjunct group if it exists.
 	if cc.group != nil {
 		// Copy the group of conjuncts.
@@ -318,7 +322,7 @@ func (ctx *overlayContext) allocCC(cc *closeContext) *closeContext {
 
 	// We only explicitly tag dependencies of type ARC. Notifications that
 	// point within the disjunct overlay will be tagged elsewhere.
-	for _, a := range cc.arcs {
+	for _, a := range cc.arcs() {
 		ctx.allocCC(a.dst)
 	}
 
@@ -411,7 +415,7 @@ func (ctx *overlayContext) initCloneCC(x *closeContext) {
 func (ctx *overlayContext) finishDependencies(x *closeContext) {
 	o := x.overlay
 
-	for _, a := range x.arcs {
+	for _, a := range x.arcs() {
 		// If an arc does not have an overlay, we should not decrement the
 		// dependency counter. We simply remove the dependency in that case.
 		if a.dst.overlay == nil || a.root.overlay == nil {
@@ -422,13 +426,13 @@ func (ctx *overlayContext) finishDependencies(x *closeContext) {
 		}
 		a.root = a.root.overlay // TODO: is this necessary?
 		a.dst = a.dst.overlay
-		o.arcs = append(o.arcs, a)
+		o.appendArc(a)
 
 		root := a.dst.src.cc()
 		root.externalDeps = append(root.externalDeps, ccDepRef{
 			src:   o,
 			kind:  ARC,
-			index: len(o.arcs) - 1,
+			index: len(o.arcs()) - 1,
 		})
 	}
 

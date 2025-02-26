@@ -101,9 +101,6 @@ type definedSchema struct {
 	// schema holds the actual syntax for the schema. This
 	// is nil if the entry was created by a reference only.
 	schema ast.Expr
-
-	// comment holds any doc comment associated with the above schema.
-	comment *ast.CommentGroup
 }
 
 // addImport registers
@@ -218,7 +215,7 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 		// have been mapped to an external location.
 		for _, def := range d.defs {
 			if def.schema != nil && def.importPath != "" {
-				d.cfg.DefineSchema(def.importPath, def.path, def.schema, def.comment)
+				d.cfg.DefineSchema(def.importPath, def.path, def.schema)
 			}
 		}
 	}
@@ -752,7 +749,7 @@ func (s *state) schema(n cue.Value) ast.Expr {
 // schemaState returns a new state value derived from s.
 // n holds the JSONSchema node to translate to a schema.
 // types holds the set of possible types that the value can hold.
-func (s0 *state) schemaState(n cue.Value, types cue.Kind) (expr ast.Expr, info schemaInfo) {
+func (s0 *state) schemaState(n cue.Value, types cue.Kind) (expr ast.Expr, ingo schemaInfo) {
 	s := &state{
 		up: s0,
 		schemaInfo: schemaInfo{
@@ -766,7 +763,7 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind) (expr ast.Expr, info s
 	}
 	defer func() {
 		// Perhaps replace the schema expression with a reference.
-		expr = s.maybeDefine(expr, info)
+		expr = s.maybeDefine(expr)
 	}()
 	if n.Kind() == cue.BoolKind {
 		if vfrom(VersionDraft6).contains(s.schemaVersion) {
@@ -850,13 +847,12 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind) (expr ast.Expr, info s
 // it just returns expr itself.
 // TODO also report whether the schema has been defined at a place
 // where it can be unified with something else?
-func (s *state) maybeDefine(expr ast.Expr, info schemaInfo) ast.Expr {
+func (s *state) maybeDefine(expr ast.Expr) ast.Expr {
 	def := s.definedSchemaForNode(s.pos)
 	if def == nil || len(def.path.Selectors()) == 0 {
 		return expr
 	}
 	def.schema = expr
-	def.comment = info.comment()
 	if def.importPath == "" {
 		// It's a local definition that's not at the root.
 		if !s.builder.put(def.path, expr, s.comment()) {

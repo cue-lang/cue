@@ -876,7 +876,13 @@ func (c *OpContext) unifyNode(expr Expr, state combinedFlags) (result Value) {
 		if n := v.getState(c); n != nil {
 			// A lookup counts as new structure. See the commend in Section
 			// "Lookups in inline cycles" in cycle.go.
-			n.hasNonCycle = true
+			if !c.ci.IsCyclic || v.Label.IsLet() {
+				// TODO: fix! Setting this when we are not structure sharing can
+				// cause some hangs. We are conservative and not set this in
+				// this case, with the potential that some configurations will
+				// break. It is probably related to let.
+				n.hasNonCycle = true
+			}
 
 			// Always yield to not get spurious errors.
 			n.process(arcTypeKnown, yield)

@@ -1467,14 +1467,7 @@ issue3528: nested: t2: {
             }) }
         }
       }
-      test: (#struct){
-        container: (#struct){
-        }
-        #container: ((string|struct)){ |((string){ string }, (#struct){
-            volumes?: (list){
-            }
-          }) }
-      }
+      test: ~(issue3528.original.#Workflow)
       #Workflow: (#struct){
         container: (#struct){
         }
@@ -1485,13 +1478,7 @@ issue3528: nested: t2: {
       }
     }
     reduced: (struct){
-      a: (#struct){
-        A: (#struct){
-        }
-        #a: ((int|struct)){ |((int){ 2 }, (#struct){
-            v: (int){ 1 }
-          }) }
-      }
+      a: ~(issue3528.reduced.#A)
       #A: (#struct){
         A: (#struct){
         }
@@ -2419,7 +2406,38 @@ diff old new
        }
      }
    }
-@@ -1134,10 +964,10 @@
+@@ -1075,14 +905,7 @@
+             }) }
+         }
+       }
+-      test: (#struct){
+-        container: (#struct){
+-        }
+-        #container: ((string|struct)){ |((string){ string }, (#struct){
+-            volumes?: (list){
+-            }
+-          }) }
+-      }
++      test: ~(issue3528.original.#Workflow)
+       #Workflow: (#struct){
+         container: (#struct){
+         }
+@@ -1093,13 +916,7 @@
+       }
+     }
+     reduced: (struct){
+-      a: (#struct){
+-        A: (#struct){
+-        }
+-        #a: ((int|struct)){ |((int){ 2 }, (#struct){
+-            v: (int){ 1 }
+-          }) }
+-      }
++      a: ~(issue3528.reduced.#A)
+       #A: (#struct){
+         A: (#struct){
+         }
+@@ -1134,10 +951,10 @@
          v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
        }
        c: (#struct){

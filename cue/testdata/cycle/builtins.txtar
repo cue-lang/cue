@@ -255,14 +255,14 @@ issue3634: reduced: {
 	out: len(#D & list.Repeat([#D & { a: b: 1 }], 1)[0])
 }
 -- out/evalalpha/stats --
-Leaks:  482
+Leaks:  467
 Freed:  0
 Reused: 0
-Allocs: 482
+Allocs: 467
 Retain: 0
 
-Unifications: 408
-Conjuncts:    918
+Unifications: 395
+Conjuncts:    892
 Disjuncts:    38
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -274,17 +274,17 @@ diff old new
 -Reused: 434
 -Allocs: 37
 -Retain: 99
-+Leaks:  482
++Leaks:  467
 +Freed:  0
 +Reused: 0
-+Allocs: 482
++Allocs: 467
 +Retain: 0
  
 -Unifications: 441
 -Conjuncts:    821
 -Disjuncts:    537
-+Unifications: 408
-+Conjuncts:    918
++Unifications: 395
++Conjuncts:    892
 +Disjuncts:    38
 -- out/eval/stats --
 Leaks:  25
@@ -726,19 +726,14 @@ Result:
   }
   issue3633: (struct){
     final: (struct){
-      data: (_|_){
-        // [incomplete] issue3633.final.data: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
-        //     ./matchn.cue:63:6
-        //     ./matchn.cue:62:8
-        //     ./matchn.cue:63:13
-        // issue3633.final.a: field is required but not present:
-        //     ./matchn.cue:63:17
-        //     ./matchn.cue:63:29
-        // issue3633.final.data: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
-        //     ./matchn.cue:63:17
-        //     ./matchn.cue:62:8
-        //     ./matchn.cue:63:24
-      }
+      data: (_){ matchN(1, (#list){
+          0: (_|_){// matchN(1, [
+            //   {
+            //     a!: _
+            //   },
+            // ])
+          }
+        }) }
       #s: (_){ matchN(1, (#list){
           0: (_|_){// matchN(1, [
             //   {
@@ -1120,7 +1115,35 @@ diff old new
            n: (struct){
              n: (_){ _ }
            }
-@@ -417,8 +456,8 @@
+@@ -388,19 +427,14 @@
+   }
+   issue3633: (struct){
+     final: (struct){
+-      data: (_|_){
+-        // [incomplete] issue3633.final.data: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
+-        //     ./matchn.cue:63:6
+-        //     ./matchn.cue:62:8
+-        //     ./matchn.cue:63:13
+-        // issue3633.final.a: field is required but not present:
+-        //     ./matchn.cue:63:17
+-        //     ./matchn.cue:63:29
+-        // issue3633.final.data: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
+-        //     ./matchn.cue:63:17
+-        //     ./matchn.cue:62:8
+-        //     ./matchn.cue:63:24
+-      }
++      data: (_){ matchN(1, (#list){
++          0: (_|_){// matchN(1, [
++            //   {
++            //     a!: _
++            //   },
++            // ])
++          }
++        }) }
+       #s: (_){ matchN(1, (#list){
+           0: (_|_){// matchN(1, [
+             //   {
+@@ -417,8 +451,8 @@
        a?: ((string|bytes)){ "encoding/yaml".Validate(yamlNoCycle.#c) }
      }
      data: (#struct){
@@ -1130,7 +1153,7 @@ diff old new
      }
    }
    selfCycle: (_|_){
-@@ -446,19 +485,8 @@
+@@ -446,19 +480,8 @@
          }
        }
      }
@@ -1152,7 +1175,7 @@ diff old new
        }
      }
      yamlVal: (_|_){
-@@ -466,25 +494,33 @@
+@@ -466,25 +489,33 @@
        t1: (_|_){
          // [eval]
          x: (_|_){
@@ -1200,7 +1223,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -492,13 +528,16 @@
+@@ -492,13 +523,16 @@
          z: (_|_){
            // [eval]
            y: (_|_){
@@ -1224,7 +1247,7 @@ diff old new
          }
        }
      }
-@@ -505,8 +544,12 @@
+@@ -505,8 +539,12 @@
      yamlValidatePartial: (_|_){
        // [structural cycle]
        x: (_|_){

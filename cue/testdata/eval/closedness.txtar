@@ -2852,7 +2852,7 @@ indirect.embed.err1.b1.d: field not allowed:
     ./reroot.cue:67:7
     ./reroot.cue:68:7
 indirect.closed.err1.Y.a.e: field not allowed:
-    ./reroot.cue:79:7
+    ./reroot.cue:73:7
     ./reroot.cue:75:7
 nested.err1.x.#V.c.d: field not allowed:
     ./reroot.cue:122:8
@@ -3862,13 +3862,7 @@ Result:
           g: (#struct){
           }
         }
-        out: (#struct){
-          field: (#struct){
-            n: (int){ 3 }
-          }
-          g: (#struct){
-          }
-        }
+        out: ~(issue3330.matthew.ok1.#struct)
       }
       ok2: (struct){
         #struct: (#struct){
@@ -3879,13 +3873,7 @@ Result:
           }
         }
         out: ~(issue3330.matthew.ok2.#struct)
-        out2: (#struct){
-          field: (#struct){
-            n: (int){ 3 }
-          }
-          g: (#struct){
-          }
-        }
+        out2: ~(issue3330.matthew.ok2.#struct)
       }
     }
   }
@@ -3976,7 +3964,7 @@ Result:
             // [eval]
             e: (_|_){
               // [eval] indirect.closed.err1.Y.a.e: field not allowed:
-              //     ./reroot.cue:79:7
+              //     ./reroot.cue:73:7
               //     ./reroot.cue:75:7
             }
           }
@@ -4225,13 +4213,7 @@ Result:
         }
       }
       #Transform: (#struct){
-        output: (#struct){
-          foo: (#struct){
-            final: (#struct){
-              version: (string){ "v1" }
-            }
-          }
-        }
+        output: ~(issue3601.original.#Patch.output)
       }
       #Patch: (#struct){
         target: (#struct){
@@ -4297,11 +4279,7 @@ Result:
         }
       }
       moreInlining: (struct){
-        out: (#struct){
-          b: (#struct){
-            c: (string){ "v1" }
-          }
-        }
+        out: ~(issue3601.reduced.#X.a)
       }
       noInline: (struct){
         Y: (#struct){
@@ -4800,7 +4778,7 @@ diff old new
 +    ./reroot.cue:67:7
 +    ./reroot.cue:68:7
 +indirect.closed.err1.Y.a.e: field not allowed:
-+    ./reroot.cue:79:7
++    ./reroot.cue:73:7
 +    ./reroot.cue:75:7
 +nested.err1.x.#V.c.d: field not allowed:
 +    ./reroot.cue:122:8
@@ -5467,7 +5445,7 @@ diff old new
          }
        }
      }
-@@ -1463,13 +1172,7 @@
+@@ -1447,13 +1156,7 @@
            g: (#struct){
            }
          }
@@ -5478,11 +5456,34 @@ diff old new
 -          g: (#struct){
 -          }
 -        }
++        out: ~(issue3330.matthew.ok1.#struct)
+       }
+       ok2: (struct){
+         #struct: (#struct){
+@@ -1463,20 +1166,8 @@
+           g: (#struct){
+           }
+         }
+-        out: (#struct){
+-          field: (#struct){
+-            n: (int){ 3 }
+-          }
+-          g: (#struct){
+-          }
+-        }
+-        out2: (#struct){
+-          field: (#struct){
+-            n: (int){ 3 }
+-          }
+-          g: (#struct){
+-          }
+-        }
 +        out: ~(issue3330.matthew.ok2.#struct)
-         out2: (#struct){
-           field: (#struct){
-             n: (int){ 3 }
-@@ -1490,13 +1193,7 @@
++        out2: ~(issue3330.matthew.ok2.#struct)
+       }
+     }
+   }
+@@ -1490,13 +1181,7 @@
              d: (int){ 1 }
            }
          }
@@ -5497,7 +5498,7 @@ diff old new
        }
      }
      variant1: (struct){
-@@ -1509,13 +1206,7 @@
+@@ -1509,13 +1194,7 @@
            }
          }
          0: (#list){
@@ -5512,7 +5513,7 @@ diff old new
          }
        }
      }
-@@ -1522,19 +1213,18 @@
+@@ -1522,19 +1201,18 @@
    }
    indirect: (_|_){
      // [eval]
@@ -5544,7 +5545,7 @@ diff old new
          }
          #x: (#struct){
            a: (#struct){
-@@ -1546,22 +1236,16 @@
+@@ -1546,22 +1224,16 @@
              c: (int){ 2 }
            }
          }
@@ -5575,7 +5576,7 @@ diff old new
          }
        }
      }
-@@ -1578,22 +1262,17 @@
+@@ -1578,22 +1250,17 @@
          }
          Y: (_|_){
            // [eval]
@@ -5587,11 +5588,11 @@ diff old new
              // [eval]
              e: (_|_){
                // [eval] indirect.closed.err1.Y.a.e: field not allowed:
--              //     ./reroot.cue:73:7
+               //     ./reroot.cue:73:7
 -              //     ./reroot.cue:74:7
--              //     ./reroot.cue:75:7
+               //     ./reroot.cue:75:7
 -              //     ./reroot.cue:77:6
-               //     ./reroot.cue:79:7
+-              //     ./reroot.cue:79:7
 -              //     ./reroot.cue:80:7
 -              //     ./reroot.cue:82:7
 -            }
@@ -5599,12 +5600,11 @@ diff old new
 -          b: (#struct){
 -          }
 -          c: (#struct){
-+              //     ./reroot.cue:75:7
 +            }
            }
          }
          #X: (#struct){
-@@ -1613,25 +1292,11 @@
+@@ -1613,25 +1280,11 @@
            }
          }
        }
@@ -5635,7 +5635,7 @@ diff old new
          #A: (#struct){
            d: (#struct){
              e: (int){ int }
-@@ -1656,69 +1321,29 @@
+@@ -1656,69 +1309,29 @@
            // [eval]
            f: (_|_){
              // [eval] nested.err1.x.b.f: field not allowed:
@@ -5719,7 +5719,7 @@ diff old new
            }
          }
        }
-@@ -1726,16 +1351,11 @@
+@@ -1726,16 +1339,11 @@
          b: (#struct){
            f: (int){ 1 }
          }
@@ -5739,7 +5739,7 @@ diff old new
            }
          }
        }
-@@ -1758,19 +1378,18 @@
+@@ -1758,19 +1366,18 @@
            // [eval]
            g: (_|_){
              // [eval] nested.err2.x.b.g: field not allowed:
@@ -5766,7 +5766,7 @@ diff old new
      #x: (#struct){
        y: (#struct){
          z?: (#struct){
-@@ -1778,81 +1397,112 @@
+@@ -1778,81 +1385,112 @@
          }
        }
      }
@@ -5954,7 +5954,22 @@ diff old new
              }
            }
          }
-@@ -1929,8 +1579,8 @@
+@@ -1869,13 +1507,7 @@
+         }
+       }
+       #Transform: (#struct){
+-        output: (#struct){
+-          foo: (#struct){
+-            final: (#struct){
+-              version: (string){ "v1" }
+-            }
+-          }
+-        }
++        output: ~(issue3601.original.#Patch.output)
+       }
+       #Patch: (#struct){
+         target: (#struct){
+@@ -1929,8 +1561,8 @@
          }
        }
        original: (struct){
@@ -5965,18 +5980,20 @@ diff old new
              c: (string){ "v1" }
            }
          }
-@@ -1941,8 +1591,8 @@
+@@ -1941,11 +1573,7 @@
          }
        }
        moreInlining: (struct){
 -        out: (struct){
 -          b: (struct){
-+        out: (#struct){
-+          b: (#struct){
-             c: (string){ "v1" }
-           }
-         }
-@@ -1966,8 +1616,8 @@
+-            c: (string){ "v1" }
+-          }
+-        }
++        out: ~(issue3601.reduced.#X.a)
+       }
+       noInline: (struct){
+         Y: (#struct){
+@@ -1966,8 +1594,8 @@
            empty: (#struct){
            }
          }
@@ -5987,7 +6004,7 @@ diff old new
              c: (string){ "v1" }
            }
          }
-@@ -1984,8 +1634,8 @@
+@@ -1984,8 +1612,8 @@
            empty: (#struct){
            }
          }

@@ -76,6 +76,32 @@ Retain: 0
 Unifications: 10
 Conjuncts:    15
 Disjuncts:    10
+-- out/evalalpha --
+(struct){
+  test: (struct){
+    A: (struct){
+      field1: (string){ "1" }
+      field2: (string){ "2" }
+      name: (string){ "A" }
+    }
+  }
+  B: ~(test.A)
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -6,9 +6,5 @@
+       name: (string){ "A" }
+     }
+   }
+-  B: (struct){
+-    field1: (string){ "1" }
+-    field2: (string){ "2" }
+-    name: (string){ "A" }
+-  }
++  B: ~(test.A)
+ }
 -- out/eval --
 (struct){
   test: (struct){

@@ -62,15 +62,15 @@ nestedClosed: passing: {
 	D: {id: {}} | {[string]: D}
 }
 -- out/evalalpha/stats --
-Leaks:  2543
+Leaks:  2351
 Freed:  0
 Reused: 0
-Allocs: 2543
+Allocs: 2351
 Retain: 0
 
-Unifications: 445
-Conjuncts:    4086
-Disjuncts:    818
+Unifications: 385
+Conjuncts:    3792
+Disjuncts:    734
 -- out/evalalpha --
 (struct){
   #Secret: (#struct){
@@ -124,12 +124,6 @@ Disjuncts:    818
           id: (struct){
           }
         }, (struct){
-          id: (struct){ |((struct){
-              id: (struct){
-              }
-            }, (struct){
-            }) }
-        }, (struct){
         }) }
     }
   }
@@ -143,26 +137,32 @@ diff old new
 -Freed:  1064333
 -Reused: 1064282
 -Allocs: 51
-+Leaks:  2543
++Leaks:  2351
 +Freed:  0
 +Reused: 0
-+Allocs: 2543
++Allocs: 2351
  Retain: 0
  
 -Unifications: 792123
 -Conjuncts:    2480117
 -Disjuncts:    1064333
-+Unifications: 445
-+Conjuncts:    4086
-+Disjuncts:    818
++Unifications: 385
++Conjuncts:    3792
++Disjuncts:    734
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -56,36 +56,6 @@
-             }, (struct){
-             }) }
+@@ -50,42 +50,6 @@
+           id: (struct){
+           }
          }, (struct){
+-          id: (struct){ |((struct){
+-              id: (struct){
+-              }
+-            }, (struct){
+-            }) }
+-        }, (struct){
 -          id: (struct){ |((struct){
 -              id: (struct){
 -              }

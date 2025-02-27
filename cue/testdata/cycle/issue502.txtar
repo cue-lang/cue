@@ -202,18 +202,11 @@ Disjuncts:    120
     t1: (struct){
       #T: (#struct){
         x: (#struct){
-          y?: (#struct){
+          y?: (_|_){
+            // [structural cycle]
             V: (_){ _ }
-            z: (#struct){
-              x: (#struct){
-                y?: (_|_){
-                  // [structural cycle]
-                  V: (_){ _ }
-                  z: (_|_){
-                    // [structural cycle] reduced.t1.#T.x.y.z.x.y.z: structural cycle
-                  }
-                }
-              }
+            z: (_|_){
+              // [structural cycle] reduced.t1.#T.x.y.z: structural cycle
             }
           }
         }
@@ -234,17 +227,7 @@ Disjuncts:    120
                 y: (#struct){
                   V: (#struct){
                   }
-                  z: (#struct){
-                    x: (#struct){
-                      y?: (_|_){
-                        // [structural cycle]
-                        V: (_){ _ }
-                        z: (_|_){
-                          // [structural cycle] reduced.t1.a.x.y.z.x.y.z.x.y.z: structural cycle
-                        }
-                      }
-                    }
-                  }
+                  z: ~(reduced.t1.#T)
                 }
               }
             }
@@ -258,7 +241,30 @@ Disjuncts:    120
 diff old new
 --- old
 +++ new
-@@ -170,7 +170,7 @@
+@@ -151,18 +151,11 @@
+     t1: (struct){
+       #T: (#struct){
+         x: (#struct){
+-          y?: (#struct){
++          y?: (_|_){
++            // [structural cycle]
+             V: (_){ _ }
+-            z: (#struct){
+-              x: (#struct){
+-                y?: (_|_){
+-                  // [structural cycle]
+-                  V: (_){ _ }
+-                  z: (_|_){
+-                    // [structural cycle] reduced.t1.#T.x.y.z.x.y.z: structural cycle
+-                  }
+-                }
+-              }
++            z: (_|_){
++              // [structural cycle] reduced.t1.#T.x.y.z: structural cycle
+             }
+           }
+         }
+@@ -170,7 +163,7 @@
        a: (#struct){
          x: (#struct){
            y: (#struct){
@@ -267,6 +273,25 @@ diff old new
                x: (struct){
                  y: (struct){
                    V: (struct){
+@@ -183,17 +176,7 @@
+                 y: (#struct){
+                   V: (#struct){
+                   }
+-                  z: (#struct){
+-                    x: (#struct){
+-                      y?: (_|_){
+-                        // [structural cycle]
+-                        V: (_){ _ }
+-                        z: (_|_){
+-                          // [structural cycle] reduced.t1.a.x.y.z.x.y.z.x.y.z: structural cycle
+-                        }
+-                      }
+-                    }
+-                  }
++                  z: ~(reduced.t1.#T)
+                 }
+               }
+             }
 -- out/eval --
 (struct){
   #T: (#struct){

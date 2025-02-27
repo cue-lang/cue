@@ -340,10 +340,7 @@ Result:
         }
       }
     }
-    #def: (#struct){
-      x: (list){
-      }
-    }
+    #def: ~(issue3672.#fn.#out)
     v: (#struct){
       x: (#list){
         0: (#struct){
@@ -430,7 +427,10 @@ Result:
     a: ((null|struct)){ |((null){ null }, (struct){
         bar: (int){ 2 }
       }) }
-    b: (int){ 2 }
+    b: (_|_){
+      // [incomplete] e1.b: unresolved disjunction null | {bar:2} (type (null|struct)):
+      //     ./in.cue:20:5
+    }
   }
   d1: (struct){
     a: (struct){
@@ -628,16 +628,7 @@ Result:
     }
     full: (struct){
       data: (#list){
-        0: (#struct){
-          runs?: ((string|list)){ |((string){ "foo" }, (#list){
-              0: (string){ "d1" }
-            }, (#list){
-              0: (string){ "d1" }
-              1: (string){ "d2" }
-            }) }
-          #D1: (string){ "d1" }
-          #D2: (string){ "d2" }
-        }
+        0: ~(issue3490.full.#Schema)
       }
       #Schema: (#struct){
         runs?: ((string|list)){ |((string){ "foo" }, (#list){
@@ -744,7 +735,19 @@ diff old new
      }
      #S: ((string|struct)){ |((string){ string }, (#struct){
        }) }
-@@ -144,19 +133,12 @@
+@@ -65,10 +54,7 @@
+         }
+       }
+     }
+-    #def: (#struct){
+-      x: (list){
+-      }
+-    }
++    #def: ~(issue3672.#fn.#out)
+     v: (#struct){
+       x: (#list){
+         0: (#struct){
+@@ -144,25 +130,21 @@
      // [eval] f: 2 errors in empty disjunction:
      // f.name: conflicting values "int" and "str":
      //     ./in.cue:5:8
@@ -765,6 +768,16 @@ diff old new
    }
    e1: (struct){
      a: ((null|struct)){ |((null){ null }, (struct){
+         bar: (int){ 2 }
+       }) }
+-    b: (int){ 2 }
++    b: (_|_){
++      // [incomplete] e1.b: unresolved disjunction null | {bar:2} (type (null|struct)):
++      //     ./in.cue:20:5
++    }
+   }
+   d1: (struct){
+     a: (struct){
 @@ -268,8 +250,8 @@
      e: (struct){
        foobar: (#struct){
@@ -784,6 +797,24 @@ diff old new
          //     ./indexelim.cue:5:17
        }
      }
+@@ -360,16 +342,7 @@
+     }
+     full: (struct){
+       data: (#list){
+-        0: (#struct){
+-          runs?: ((string|list)){ |((string){ "foo" }, (#list){
+-              0: (string){ "d1" }
+-            }, (#list){
+-              0: (string){ "d1" }
+-              1: (string){ "d2" }
+-            }) }
+-          #D1: (string){ "d1" }
+-          #D2: (string){ "d2" }
+-        }
++        0: ~(issue3490.full.#Schema)
+       }
+       #Schema: (#struct){
+         runs?: ((string|list)){ |((string){ "foo" }, (#list){
 -- diff/todo/p3 --
 Missing error positions.
   It is probably okay to show name and val fields with original values, as long

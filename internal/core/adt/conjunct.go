@@ -191,7 +191,9 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		n.scheduleTask(handleExpr, env, x, id)
 
 	case *StructLit:
-		n.unshare()
+		if len(x.Decls) > 0 {
+			n.unshare()
+		}
 		n.scheduleStruct(env, x, id)
 
 	case *ListLit:

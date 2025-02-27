@@ -19,6 +19,38 @@ object: #Leaf & {}
 		}
 	}
 }
+-- out/evalalpha --
+(struct){
+  object: ~(#Leaf)
+  #Base: (#struct){
+    extra?: (#struct){
+    }
+  }
+  #Mid: (#struct){
+    extra?: (#struct){
+    }
+  }
+  #Leaf: (#struct){
+    extra?: (#struct){
+    }
+    more?: (int){ int }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,5 @@
+ (struct){
+-  object: (#struct){
+-    extra?: (#struct){
+-    }
+-    more?: (int){ int }
+-  }
++  object: ~(#Leaf)
+   #Base: (#struct){
+     extra?: (#struct){
+     }
 -- out/eval --
 (struct){
   object: (#struct){

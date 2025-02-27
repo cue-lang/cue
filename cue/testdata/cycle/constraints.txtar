@@ -595,7 +595,7 @@ noCancelSelfInvoke.t1.x.c.b.b: structural cycle
 noCancelSelfInvoke.t1.x.c.c: structural cycle
 selfTriggerCycle.issue1503.#T.a.b.link: structural cycle
 selfTriggerCycle.long1.a.c.b.c.b.c.b: structural cycle
-selfTriggerCycle.t1.#T.b.b: structural cycle
+selfTriggerCycle.t1.#T.b: structural cycle
 selfTriggerCycle.t2.b.c.a: structural cycle
 
 Result:
@@ -690,10 +690,7 @@ Result:
       a: (struct){
         b: (struct){
           x: (struct){
-            c: (struct){
-              x: (struct){
-              }
-            }
+            c: ~(noCyclePattern.t3._T)
           }
         }
       }
@@ -707,10 +704,7 @@ Result:
       }
       a: (struct){
         b: (struct){
-          x: (struct){
-            y: (struct){
-            }
-          }
+          x: ~(noCyclePattern.t4._T)
         }
       }
     }
@@ -726,10 +720,7 @@ Result:
           x: (struct){
             y: (struct){
               c: (struct){
-                x: (struct){
-                  y: (struct){
-                  }
-                }
+                x: ~(noCyclePattern.t5._T)
               }
             }
           }
@@ -757,10 +748,7 @@ Result:
                 y: (#struct){
                   foo: (#struct){
                     t: (#struct){
-                      object: (#struct){
-                        y: (#struct){
-                        }
-                      }
+                      object: ~(noCyclePattern.t6.#S)
                     }
                   }
                 }
@@ -802,10 +790,7 @@ Result:
       #T: (_|_){
         // [structural cycle]
         b: (_|_){
-          // [structural cycle]
-          b: (_|_){
-            // [structural cycle] selfTriggerCycle.t1.#T.b.b: structural cycle
-          }
+          // [structural cycle] selfTriggerCycle.t1.#T.b: structural cycle
         }
       }
     }
@@ -1015,7 +1000,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,12 +1,11 @@
+@@ -1,13 +1,12 @@
  Errors:
  brokenRing.t1.p1.T.b: structural cycle
 -cyclicRing.t1.D.a.b: structural cycle
@@ -1027,11 +1012,49 @@ diff old new
  noCancelSelfInvoke.t1.x.c.c: structural cycle
  selfTriggerCycle.issue1503.#T.a.b.link: structural cycle
 -selfTriggerCycle.long1.a.c.b.c.b.c.b.c.b: structural cycle
+-selfTriggerCycle.t1.#T.b.b: structural cycle
 +selfTriggerCycle.long1.a.c.b.c.b.c.b: structural cycle
- selfTriggerCycle.t1.#T.b.b: structural cycle
++selfTriggerCycle.t1.#T.b: structural cycle
  selfTriggerCycle.t2.b.c.a: structural cycle
  
-@@ -152,18 +151,10 @@
+ Result:
+@@ -102,10 +101,7 @@
+       a: (struct){
+         b: (struct){
+           x: (struct){
+-            c: (struct){
+-              x: (struct){
+-              }
+-            }
++            c: ~(noCyclePattern.t3._T)
+           }
+         }
+       }
+@@ -119,10 +115,7 @@
+       }
+       a: (struct){
+         b: (struct){
+-          x: (struct){
+-            y: (struct){
+-            }
+-          }
++          x: ~(noCyclePattern.t4._T)
+         }
+       }
+     }
+@@ -138,10 +131,7 @@
+           x: (struct){
+             y: (struct){
+               c: (struct){
+-                x: (struct){
+-                  y: (struct){
+-                  }
+-                }
++                x: ~(noCyclePattern.t5._T)
+               }
+             }
+           }
+@@ -152,18 +142,10 @@
        #D: (#struct){
        }
        #E: (#struct){
@@ -1054,7 +1077,19 @@ diff old new
        }
        #S: (#struct){
          y: (#struct){
-@@ -201,18 +192,15 @@
+@@ -177,10 +159,7 @@
+                 y: (#struct){
+                   foo: (#struct){
+                     t: (#struct){
+-                      object: (#struct){
+-                        y: (#struct){
+-                        }
+-                      }
++                      object: ~(noCyclePattern.t6.#S)
+                     }
+                   }
+                 }
+@@ -201,18 +180,15 @@
          // [structural cycle]
          c: (_|_){
            // [structural cycle]
@@ -1079,7 +1114,7 @@ diff old new
          }
        }
      }
-@@ -221,12 +209,7 @@
+@@ -221,19 +197,11 @@
      // [structural cycle]
      t1: (_|_){
        // [structural cycle]
@@ -1089,11 +1124,22 @@ diff old new
 -          // [structural cycle]
 -        }
 -      }
+-      #T: (_|_){
+-        // [structural cycle]
+-        b: (_|_){
+-          // [structural cycle]
+-          b: (_|_){
+-            // [structural cycle] selfTriggerCycle.t1.#T.b.b: structural cycle
+-          }
 +      a: ~(selfTriggerCycle.t1.#T)
-       #T: (_|_){
-         // [structural cycle]
-         b: (_|_){
-@@ -266,13 +249,7 @@
++      #T: (_|_){
++        // [structural cycle]
++        b: (_|_){
++          // [structural cycle] selfTriggerCycle.t1.#T.b: structural cycle
+         }
+       }
+     }
+@@ -266,13 +234,7 @@
                  c: (_|_){
                    // [structural cycle]
                    b: (_|_){
@@ -1108,7 +1154,7 @@ diff old new
                    }
                  }
                }
-@@ -287,20 +264,29 @@
+@@ -287,20 +249,29 @@
          // [structural cycle]
          a: (_|_){
            // [structural cycle]
@@ -1148,7 +1194,7 @@ diff old new
              }
            }
          }
-@@ -336,7 +322,10 @@
+@@ -336,7 +307,10 @@
                b: (_|_){
                  // [structural cycle]
                  b: (_|_){
@@ -1160,7 +1206,7 @@ diff old new
                  }
                }
              }
-@@ -377,12 +366,7 @@
+@@ -377,12 +351,7 @@
        p1: (_|_){
          // [structural cycle]
          D: (struct){
@@ -1174,7 +1220,7 @@ diff old new
          }
          T: (_|_){
            // [structural cycle]
-@@ -393,11 +377,7 @@
+@@ -393,11 +362,7 @@
        }
        p2: (struct){
          T: (struct){
@@ -1187,7 +1233,7 @@ diff old new
          }
          D: (struct){
            a?: (_|_){
-@@ -431,12 +411,7 @@
+@@ -431,12 +396,7 @@
        // [structural cycle]
        D: (_|_){
          // [structural cycle]

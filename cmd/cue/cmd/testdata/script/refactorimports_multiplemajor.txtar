@@ -1,0 +1,263 @@
+exec cue export .
+cmp stdout want-export-0
+
+# First save the original files so we can try several variants.
+cp main1.cue main1.cue-orig
+cp main2.cue main2.cue-orig
+cp cue.mod/module.cue cue.mod/module.cue-orig
+
+# First try specifying an explicit major version.
+# It should not rename imports in the nested module.
+exec cue refactor imports foo.example/c@v2 new.example/f
+cmp main1.cue main1.cue-1
+cmp main2.cue main2.cue-1
+exec cue mod tidy
+exec cue export
+cmp stdout want-export-1
+
+# Restore original files
+cp main1.cue-orig main1.cue
+cp main2.cue-orig main2.cue
+cp cue.mod/module.cue-orig cue.mod/module.cue
+
+# Try again _without_ specifying an explicit major version.
+# Because the first argument resolves to a module,
+# it should not rename imports in the nested module,
+# as before.
+exec cue refactor imports foo.example/c new.example/f
+cmp main1.cue main1.cue-1
+cmp main2.cue main2.cue-1
+exec cue mod tidy
+exec cue export
+cmp stdout want-export-1
+
+# Now try renaming across multiple modules
+exec cue refactor imports foo.example new.example
+cmp main1.cue main1.cue-2
+cmp main2.cue main2.cue-2
+exec cue mod tidy
+exec cue export
+cmp stdout want-export-2
+
+# Specifying a major version on a path that does
+# not map to a module is an error.
+! exec cue refactor imports new.example@v0 newer.example@v1
+cmp stderr want-stderr-3
+
+-- want-export-0 --
+{
+    "self": {
+        "a": "foo.example/a@v0.0.0",
+        "b": "foo.example/b@v1.0.0",
+        "c": "foo.example/c@v2.0.0",
+        "d": "foo.example/c/d@v2.0.0"
+    }
+}
+-- want-export-1 --
+{
+    "self": {
+        "a": "foo.example/a@v0.0.0",
+        "b": "foo.example/b@v1.0.0",
+        "c": "new.example/f@v5.0.0",
+        "d": "foo.example/c/d@v2.0.0"
+    }
+}
+-- want-export-2 --
+{
+    "self": {
+        "a": "new.example/a@v0.0.0",
+        "b": "new.example/b@v1.0.0",
+        "c": "new.example/f@v5.0.0",
+        "d": "new.example/c/d@v2.0.0"
+    }
+}
+-- want-stderr-3 --
+path "new.example@v0" has a major version but does not resolve to a module in the dependencies
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.8.0"
+deps: {
+	"foo.example/a@v0": {
+		default: true
+		v: "v0.0.0"
+	}
+	"foo.example/b@v1": {
+		default: true
+		v: "v1.0.0"
+	}
+	"foo.example/c@v2": {
+		default: true
+		v: "v2.0.0"
+	}
+	"foo.example/c/d@v2": {
+		default: true
+		v: "v2.0.0"
+	}
+}
+-- main1.cue --
+package main
+
+import (
+	"foo.example/a"
+	"foo.example/b"
+	"foo.example/c"
+	"foo.example/c/d"
+)
+
+self: {
+	"a": a.self
+	"b": b.self
+	"c": c.self
+	"d": d.self
+}
+-- main1.cue-1 --
+package main
+
+import (
+	"foo.example/a"
+	"foo.example/b"
+	c "new.example/f"
+	"foo.example/c/d"
+)
+
+self: {
+	"a": a.self
+	"b": b.self
+	"c": c.self
+	"d": d.self
+}
+-- main1.cue-2 --
+package main
+
+import (
+	"new.example/a"
+	"new.example/b"
+	c "new.example/f"
+	"new.example/c/d"
+)
+
+self: {
+	"a": a.self
+	"b": b.self
+	"c": c.self
+	"d": d.self
+}
+-- main2.cue --
+package main
+
+import (
+	"foo.example/a@v0"
+	"foo.example/b@v1"
+	"foo.example/c@v2"
+	"foo.example/c/d@v2"
+)
+
+self: {
+	"a": a.self
+	"b": b.self
+	"c": c.self
+	"d": d.self
+}
+-- main2.cue-1 --
+package main
+
+import (
+	"foo.example/a@v0"
+	"foo.example/b@v1"
+	c "new.example/f"
+	"foo.example/c/d@v2"
+)
+
+self: {
+	"a": a.self
+	"b": b.self
+	"c": c.self
+	"d": d.self
+}
+-- main2.cue-2 --
+package main
+
+import (
+	"new.example/a@v0"
+	"new.example/b@v1"
+	c "new.example/f"
+	"new.example/c/d@v2"
+)
+
+self: {
+	"a": a.self
+	"b": b.self
+	"c": c.self
+	"d": d.self
+}
+-- _registry/foo.example_a_v0.0.0/cue.mod/module.cue --
+module: "foo.example/a@v0"
+language: version: "v0.8.0"
+
+-- _registry/foo.example_a_v0.0.0/top.cue --
+package a
+
+self: "foo.example/a@v0.0.0"
+
+-- _registry/foo.example_b_v1.0.0/cue.mod/module.cue --
+module: "foo.example/b@v1"
+language: version: "v0.8.0"
+
+-- _registry/foo.example_b_v1.0.0/top.cue --
+package b
+
+self: "foo.example/b@v1.0.0"
+
+-- _registry/foo.example_c_v2.0.0/cue.mod/module.cue --
+module: "foo.example/c@v2"
+language: version: "v0.8.0"
+
+-- _registry/foo.example_c_v2.0.0/top.cue --
+package c
+
+self: "foo.example/c@v2.0.0"
+
+-- _registry/foo.example_c_d_v2.0.0/cue.mod/module.cue --
+module: "foo.example/c/d@v2"
+language: version: "v0.8.0"
+
+-- _registry/foo.example_c_d_v2.0.0/top.cue --
+package d
+
+self: "foo.example/c/d@v2.0.0"
+
+-- _registry/new.example_a_v0.0.0/cue.mod/module.cue --
+module: "new.example/a@v0"
+language: version: "v0.8.0"
+
+-- _registry/new.example_a_v0.0.0/top.cue --
+package a
+
+self: "new.example/a@v0.0.0"
+
+-- _registry/new.example_b_v1.0.0/cue.mod/module.cue --
+module: "new.example/b@v1"
+language: version: "v0.8.0"
+
+-- _registry/new.example_b_v1.0.0/top.cue --
+package b
+
+self: "new.example/b@v1.0.0"
+
+-- _registry/new.example_c_d_v2.0.0/cue.mod/module.cue --
+module: "new.example/c/d@v2"
+language: version: "v0.8.0"
+
+-- _registry/new.example_c_d_v2.0.0/top.cue --
+package d
+
+self: "new.example/c/d@v2.0.0"
+
+-- _registry/new.example_f_v5.0.0/cue.mod/module.cue --
+module: "new.example/f@v5"
+language: version: "v0.8.0"
+
+-- _registry/new.example_f_v5.0.0/top.cue --
+package f
+
+self: "new.example/f@v5.0.0"

@@ -17,7 +17,7 @@ package github
 import (
 	"list"
 
-	"github.com/cue-tmp/jsonschema-pub/exp1/githubactions"
+	"github.com/cue-tmp/jsonschema-pub/exp3/githubactions"
 )
 
 // _cueVersionRef is a workflow job-runtime expression that evaluates to the

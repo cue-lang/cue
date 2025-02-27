@@ -15,7 +15,7 @@
 package github
 
 import (
-	"github.com/cue-tmp/jsonschema-pub/exp1/githubactions"
+	"github.com/cue-tmp/jsonschema-pub/exp3/githubactions"
 )
 
 // _registryReadOnlyAccessStep defines a step that configures

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f07ad2b1_5c3036ba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-27T12:38:29Z",
+      "side": 1,
+      "message": "SGTM; approving to unblock Marcel while Matthew is AFK. I assume we are OK with the added entries in skipDebugDepErrors for now.",
+      "revId": "bd07cffa78a72b664b04d6d88c85a05fee460b1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -33,6 +33,24 @@
       "message": "I\u0027m not that keen on the naming here. You\u0027ve named these after the name of the test that uses them, but they can potentially be used by any test, and just saying `#DescriptionFunc: oneof` in the txtar file doesn\u0027t say much about what that actual description func is supposed to be doing.\n\nHow about naming these functions according to what they actually do intead.\n\nFor example, this one could be `toUpper` and the other can be `noExcluded` or something.",
       "revId": "95cb64057309461b2da0f1c843cc6c03f33df6dd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "abc54d11_f5e39496",
+        "filename": "encoding/openapi/openapi_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-27T09:56:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f5e7df54_c37794d7",
+      "revId": "95cb64057309461b2da0f1c843cc6c03f33df6dd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

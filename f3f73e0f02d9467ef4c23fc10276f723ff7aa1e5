@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b98ed34_0571ddc8",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 832,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-27T09:15:06Z",
+      "side": 1,
+      "message": "Something\u0027s wrong with this sentence. It\u0027s possible you don\u0027t want the \"which\"?",
+      "range": {
+        "startLine": 832,
+        "startChar": 48,
+        "endLine": 832,
+        "endChar": 53
+      },
+      "revId": "f3f73e0f02d9467ef4c23fc10276f723ff7aa1e5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

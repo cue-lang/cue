@@ -88,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "75fb0726_6dd9c442",
+        "filename": "encoding/openapi/openapi_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-27T09:51:23Z",
+      "side": 1,
+      "message": "(discussed elsewhere. Will fix more generally in a subsequent CL)",
+      "parentUuid": "7d2f95cc_25c96321",
+      "revId": "6bf3e5dd54a5180bcfb2f3444cb47bb639373e88",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7e89491d_621e97fd",
@@ -101,6 +119,24 @@
       "writtenOn": "2025-02-25T18:08:33Z",
       "side": 1,
       "message": "Seeing as we\u0027re adding a newline in the other test, perhaps we should do so here too.",
+      "revId": "6bf3e5dd54a5180bcfb2f3444cb47bb639373e88",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c4a2bd0_67f684e9",
+        "filename": "encoding/openapi/openapi_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-27T09:51:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e89491d_621e97fd",
       "revId": "6bf3e5dd54a5180bcfb2f3444cb47bb639373e88",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

@@ -262,18 +262,18 @@ issue3990: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  16
-Freed:  414
-Reused: 354
-Allocs: 76
+Leaks:  8
+Freed:  381
+Reused: 321
+Allocs: 68
 Retain: 0
 
-Unifications: 373
-Conjuncts:    712
+Unifications: 344
+Conjuncts:    644
 Disjuncts:    0
 Notifications: 5
 
-NumCloseIDs: 217
+NumCloseIDs: 188
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -292,18 +292,18 @@ diff old new
 -MisalignedConjunct: 48
 -
 -NumCloseIDs: 61
-+Leaks:  16
-+Freed:  414
-+Reused: 354
-+Allocs: 76
++Leaks:  8
++Freed:  381
++Reused: 321
++Allocs: 68
 +Retain: 0
 +
-+Unifications: 373
-+Conjuncts:    712
++Unifications: 344
++Conjuncts:    644
 +Disjuncts:    0
 +Notifications: 5
 +
-+NumCloseIDs: 217
++NumCloseIDs: 188
 -- out/eval/stats --
 Leaks:  112
 Freed:  510
@@ -402,7 +402,7 @@ NumCloseIDs: 61
         }
       }
       objects: (_|_){
-        // [incomplete] objects: undefined field: objects:
+        // [incomplete] issue3940.reduced1.a.b.objects: undefined field: objects:
         //     ./issue3940.cue:12:22
       }
     }
@@ -427,7 +427,7 @@ NumCloseIDs: 61
         }
       }
       objects: (_|_){
-        // [incomplete] objects: undefined field: objects:
+        // [incomplete] issue3940.reduced2.a.b.objects: undefined field: objects:
         //     ./issue3940.cue:29:22
       }
     }
@@ -505,7 +505,7 @@ NumCloseIDs: 61
         }
       }
       objects: (_|_){
-        // [incomplete] objects: undefined field: objects:
+        // [incomplete] issue3940.let.a.b.objects: undefined field: objects:
         //     ./issue3940.cue:73:15
       }
     }
@@ -910,6 +910,15 @@ diff old new
              }
            }
            objects: (_|_){
+@@ -86,7 +81,7 @@
+         }
+       }
+       objects: (_|_){
+-        // [incomplete] objects: undefined field: objects:
++        // [incomplete] issue3940.reduced1.a.b.objects: undefined field: objects:
+         //     ./issue3940.cue:12:22
+       }
+     }
 @@ -95,12 +90,7 @@
          b: (struct){
            a: (struct){
@@ -924,6 +933,15 @@ diff old new
              }
            }
            objects: (_|_){
+@@ -116,7 +106,7 @@
+         }
+       }
+       objects: (_|_){
+-        // [incomplete] objects: undefined field: objects:
++        // [incomplete] issue3940.reduced2.a.b.objects: undefined field: objects:
+         //     ./issue3940.cue:29:22
+       }
+     }
 @@ -125,12 +115,7 @@
          i: (struct){
            x: (struct){
@@ -952,7 +970,14 @@ diff old new
              }
            }
            objects: (_|_){
-@@ -210,17 +190,10 @@
+@@ -204,23 +184,16 @@
+         }
+       }
+       objects: (_|_){
+-        // [incomplete] objects: undefined field: objects:
++        // [incomplete] issue3940.let.a.b.objects: undefined field: objects:
+         //     ./issue3940.cue:73:15
+       }
      }
      full: (struct){
        out: (#struct){

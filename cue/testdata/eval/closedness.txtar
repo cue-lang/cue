@@ -764,16 +764,16 @@ issue3332: {
 
 -- out/evalalpha/stats --
 Leaks:  5
-Freed:  801
-Reused: 758
+Freed:  784
+Reused: 741
 Allocs: 48
 Retain: 0
 
-Unifications: 775
-Conjuncts:    1911
+Unifications: 764
+Conjuncts:    1880
 Disjuncts:    2
 
-NumCloseIDs: 578
+NumCloseIDs: 564
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -791,16 +791,16 @@ diff old new
 -
 -NumCloseIDs: 1
 +Leaks:  5
-+Freed:  801
-+Reused: 758
++Freed:  784
++Reused: 741
 +Allocs: 48
 +Retain: 0
 +
-+Unifications: 775
-+Conjuncts:    1911
++Unifications: 764
++Conjuncts:    1880
 +Disjuncts:    2
 +
-+NumCloseIDs: 578
++NumCloseIDs: 564
 -- out/eval/stats --
 Leaks:  19
 Freed:  864
@@ -4291,13 +4291,7 @@ Result:
           g: (#struct){
           }
         }
-        out: (#struct){
-          field: (#struct){
-            n: (int){ 3 }
-          }
-          g: (#struct){
-          }
-        }
+        out: ~(issue3330.matthew.ok1.#struct)
       }
       ok2: (struct){
         #struct: (#struct){
@@ -4308,13 +4302,7 @@ Result:
           }
         }
         out: ~(issue3330.matthew.ok2.#struct)
-        out2: (#struct){
-          field: (#struct){
-            n: (int){ 3 }
-          }
-          g: (#struct){
-          }
-        }
+        out2: ~(issue3330.matthew.ok2.#struct)
       }
     }
   }
@@ -4612,13 +4600,7 @@ Result:
         }
       }
       #Transform: (#struct){
-        output: (#struct){
-          foo: (#struct){
-            final: (#struct){
-              version: (string){ "v1" }
-            }
-          }
-        }
+        output: ~(issue3601.original.#Patch.output)
       }
       #Patch: (#struct){
         target: (#struct){
@@ -4684,11 +4666,7 @@ Result:
         }
       }
       moreInlining: (struct){
-        out: (#struct){
-          b: (#struct){
-            c: (string){ "v1" }
-          }
-        }
+        out: ~(issue3601.reduced.#X.a)
       }
       noInline: (struct){
         Y: (#struct){
@@ -6168,7 +6146,7 @@ diff old new
          }
        }
      }
-@@ -1752,13 +1191,7 @@
+@@ -1736,13 +1175,7 @@
            g: (#struct){
            }
          }
@@ -6179,11 +6157,34 @@ diff old new
 -          g: (#struct){
 -          }
 -        }
++        out: ~(issue3330.matthew.ok1.#struct)
+       }
+       ok2: (struct){
+         #struct: (#struct){
+@@ -1752,20 +1185,8 @@
+           g: (#struct){
+           }
+         }
+-        out: (#struct){
+-          field: (#struct){
+-            n: (int){ 3 }
+-          }
+-          g: (#struct){
+-          }
+-        }
+-        out2: (#struct){
+-          field: (#struct){
+-            n: (int){ 3 }
+-          }
+-          g: (#struct){
+-          }
+-        }
 +        out: ~(issue3330.matthew.ok2.#struct)
-         out2: (#struct){
-           field: (#struct){
-             n: (int){ 3 }
-@@ -1779,13 +1212,7 @@
++        out2: ~(issue3330.matthew.ok2.#struct)
+       }
+     }
+   }
+@@ -1779,13 +1200,7 @@
              d: (int){ 1 }
            }
          }
@@ -6198,7 +6199,7 @@ diff old new
        }
      }
      variant1: (struct){
-@@ -1798,13 +1225,7 @@
+@@ -1798,13 +1213,7 @@
            }
          }
          0: (#list){
@@ -6213,7 +6214,7 @@ diff old new
          }
        }
      }
-@@ -1820,10 +1241,7 @@
+@@ -1820,10 +1229,7 @@
                c: (int){ 2 }
              }
            }
@@ -6225,7 +6226,7 @@ diff old new
          }
          #x: (#struct){
            a: (#struct){
-@@ -1835,22 +1253,11 @@
+@@ -1835,22 +1241,11 @@
              c: (int){ 2 }
            }
          }
@@ -6251,7 +6252,7 @@ diff old new
          }
        }
      }
-@@ -1867,22 +1274,16 @@
+@@ -1867,22 +1262,16 @@
          }
          Y: (_|_){
            // [eval]
@@ -6279,7 +6280,7 @@ diff old new
            }
          }
          #X: (#struct){
-@@ -1902,25 +1303,11 @@
+@@ -1902,25 +1291,11 @@
            }
          }
        }
@@ -6310,7 +6311,7 @@ diff old new
          #A: (#struct){
            d: (#struct){
              e: (int){ int }
-@@ -1945,69 +1332,27 @@
+@@ -1945,69 +1320,27 @@
            // [eval]
            f: (_|_){
              // [eval] nested.err1.x.b.f: field not allowed:
@@ -6392,7 +6393,7 @@ diff old new
            }
          }
        }
-@@ -2015,16 +1360,11 @@
+@@ -2015,16 +1348,11 @@
          b: (#struct){
            f: (int){ 1 }
          }
@@ -6412,7 +6413,7 @@ diff old new
            }
          }
        }
-@@ -2047,14 +1387,12 @@
+@@ -2047,14 +1375,12 @@
            // [eval]
            g: (_|_){
              // [eval] nested.err2.x.b.g: field not allowed:
@@ -6428,7 +6429,7 @@ diff old new
          }
        }
      }
-@@ -2067,11 +1405,11 @@
+@@ -2067,11 +1393,11 @@
          }
        }
      }
@@ -6442,7 +6443,22 @@ diff old new
        name: (string){ "a" }
        age2: (int){ 5 }
      }
-@@ -2218,20 +1556,20 @@
+@@ -2158,13 +1484,7 @@
+         }
+       }
+       #Transform: (#struct){
+-        output: (#struct){
+-          foo: (#struct){
+-            final: (#struct){
+-              version: (string){ "v1" }
+-            }
+-          }
+-        }
++        output: ~(issue3601.original.#Patch.output)
+       }
+       #Patch: (#struct){
+         target: (#struct){
+@@ -2218,23 +1538,19 @@
          }
        }
        original: (struct){
@@ -6467,12 +6483,14 @@ diff old new
        moreInlining: (struct){
 -        out: (struct){
 -          b: (struct){
-+        out: (#struct){
-+          b: (#struct){
-             c: (string){ "v1" }
-           }
-         }
-@@ -2255,8 +1593,8 @@
+-            c: (string){ "v1" }
+-          }
+-        }
++        out: ~(issue3601.reduced.#X.a)
+       }
+       noInline: (struct){
+         Y: (#struct){
+@@ -2255,8 +1571,8 @@
            empty: (#struct){
            }
          }
@@ -6483,7 +6501,7 @@ diff old new
              c: (string){ "v1" }
            }
          }
-@@ -2273,13 +1611,13 @@
+@@ -2273,13 +1589,13 @@
            empty: (#struct){
            }
          }

@@ -111,16 +111,16 @@ weaveExtraField: {
 }
 -- out/evalalpha/stats --
 Leaks:  0
-Freed:  452
-Reused: 407
+Freed:  382
+Reused: 337
 Allocs: 45
 Retain: 0
 
-Unifications: 452
-Conjuncts:    845
+Unifications: 382
+Conjuncts:    663
 Disjuncts:    0
 
-NumCloseIDs: 238
+NumCloseIDs: 189
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -131,19 +131,21 @@ diff old new
 -Reused: 308
 -Allocs: 144
 -Retain: 428
-+Leaks:  0
-+Freed:  452
-+Reused: 407
-+Allocs: 45
-+Retain: 0
- 
- Unifications: 452
+-
+-Unifications: 452
 -Conjuncts:    853
 -Disjuncts:    720
-+Conjuncts:    845
++Leaks:  0
++Freed:  382
++Reused: 337
++Allocs: 45
++Retain: 0
++
++Unifications: 382
++Conjuncts:    663
 +Disjuncts:    0
 +
-+NumCloseIDs: 238
++NumCloseIDs: 189
 -- out/eval/stats --
 Leaks:  112
 Freed:  340
@@ -338,135 +340,37 @@ Disjuncts:    720
       }
     }
     f8: (struct){
-      ref: (struct){
-        ref: (struct){
-          ref: (struct){
-            ref: (struct){
-              ref: (struct){
-                ref: (struct){
-                  ref: (struct){
-                    out: (int){ 2 }
-                  }
-                  out: (int){ 4 }
-                  in: (int){ 3 }
-                }
-                out: (int){ 6 }
-                in: (int){ 5 }
-              }
-              out: (int){ 8 }
-              in: (int){ 7 }
-            }
-            out: (int){ 10 }
-            in: (int){ 9 }
-          }
-          out: (int){ 12 }
-          in: (int){ 11 }
-        }
-        out: (int){ 14 }
-        in: (int){ 13 }
-      }
+      ref: ~(weave.f7)
       out: (int){ 16 }
       in: (int){ 15 }
     }
     f7: (struct){
-      ref: (struct){
-        ref: (struct){
-          ref: (struct){
-            ref: (struct){
-              ref: (struct){
-                ref: (struct){
-                  out: (int){ 2 }
-                }
-                out: (int){ 4 }
-                in: (int){ 3 }
-              }
-              out: (int){ 6 }
-              in: (int){ 5 }
-            }
-            out: (int){ 8 }
-            in: (int){ 7 }
-          }
-          out: (int){ 10 }
-          in: (int){ 9 }
-        }
-        out: (int){ 12 }
-        in: (int){ 11 }
-      }
+      ref: ~(weave.f6)
       out: (int){ 14 }
       in: (int){ 13 }
     }
     f6: (struct){
-      ref: (struct){
-        ref: (struct){
-          ref: (struct){
-            ref: (struct){
-              ref: (struct){
-                out: (int){ 2 }
-              }
-              out: (int){ 4 }
-              in: (int){ 3 }
-            }
-            out: (int){ 6 }
-            in: (int){ 5 }
-          }
-          out: (int){ 8 }
-          in: (int){ 7 }
-        }
-        out: (int){ 10 }
-        in: (int){ 9 }
-      }
+      ref: ~(weave.f5)
       out: (int){ 12 }
       in: (int){ 11 }
     }
     f5: (struct){
-      ref: (struct){
-        ref: (struct){
-          ref: (struct){
-            ref: (struct){
-              out: (int){ 2 }
-            }
-            out: (int){ 4 }
-            in: (int){ 3 }
-          }
-          out: (int){ 6 }
-          in: (int){ 5 }
-        }
-        out: (int){ 8 }
-        in: (int){ 7 }
-      }
+      ref: ~(weave.f4)
       out: (int){ 10 }
       in: (int){ 9 }
     }
     f4: (struct){
-      ref: (struct){
-        ref: (struct){
-          ref: (struct){
-            out: (int){ 2 }
-          }
-          out: (int){ 4 }
-          in: (int){ 3 }
-        }
-        out: (int){ 6 }
-        in: (int){ 5 }
-      }
+      ref: ~(weave.f3)
       out: (int){ 8 }
       in: (int){ 7 }
     }
     f3: (struct){
-      ref: (struct){
-        ref: (struct){
-          out: (int){ 2 }
-        }
-        out: (int){ 4 }
-        in: (int){ 3 }
-      }
+      ref: ~(weave.f2)
       out: (int){ 6 }
       in: (int){ 5 }
     }
     f2: (struct){
-      ref: (struct){
-        out: (int){ 2 }
-      }
+      ref: ~(weave.f1)
       out: (int){ 4 }
       in: (int){ 3 }
     }
@@ -658,7 +562,7 @@ Disjuncts:    720
 diff old new
 --- old
 +++ new
-@@ -170,148 +170,148 @@
+@@ -170,148 +170,50 @@
    weave: (struct){
      f: (struct){
        out: (_|_){
@@ -815,141 +719,43 @@ diff old new
 +      }
 +    }
 +    f8: (struct){
-+      ref: (struct){
-+        ref: (struct){
-+          ref: (struct){
-+            ref: (struct){
-+              ref: (struct){
-+                ref: (struct){
-+                  ref: (struct){
-+                    out: (int){ 2 }
-+                  }
-+                  out: (int){ 4 }
-+                  in: (int){ 3 }
-+                }
-+                out: (int){ 6 }
-+                in: (int){ 5 }
-+              }
-+              out: (int){ 8 }
-+              in: (int){ 7 }
-+            }
-+            out: (int){ 10 }
-+            in: (int){ 9 }
-+          }
-+          out: (int){ 12 }
-+          in: (int){ 11 }
-+        }
-+        out: (int){ 14 }
-+        in: (int){ 13 }
-+      }
++      ref: ~(weave.f7)
 +      out: (int){ 16 }
 +      in: (int){ 15 }
 +    }
 +    f7: (struct){
-+      ref: (struct){
-+        ref: (struct){
-+          ref: (struct){
-+            ref: (struct){
-+              ref: (struct){
-+                ref: (struct){
-+                  out: (int){ 2 }
-+                }
-+                out: (int){ 4 }
-+                in: (int){ 3 }
-+              }
-+              out: (int){ 6 }
-+              in: (int){ 5 }
-+            }
-+            out: (int){ 8 }
-+            in: (int){ 7 }
-+          }
-+          out: (int){ 10 }
-+          in: (int){ 9 }
-+        }
-+        out: (int){ 12 }
-+        in: (int){ 11 }
-+      }
++      ref: ~(weave.f6)
 +      out: (int){ 14 }
 +      in: (int){ 13 }
 +    }
 +    f6: (struct){
-+      ref: (struct){
-+        ref: (struct){
-+          ref: (struct){
-+            ref: (struct){
-+              ref: (struct){
-+                out: (int){ 2 }
-+              }
-+              out: (int){ 4 }
-+              in: (int){ 3 }
-+            }
-+            out: (int){ 6 }
-+            in: (int){ 5 }
-+          }
-+          out: (int){ 8 }
-+          in: (int){ 7 }
-+        }
-+        out: (int){ 10 }
-+        in: (int){ 9 }
-+      }
++      ref: ~(weave.f5)
 +      out: (int){ 12 }
 +      in: (int){ 11 }
 +    }
 +    f5: (struct){
-+      ref: (struct){
-+        ref: (struct){
-+          ref: (struct){
-+            ref: (struct){
-+              out: (int){ 2 }
-+            }
-+            out: (int){ 4 }
-+            in: (int){ 3 }
-+          }
-+          out: (int){ 6 }
-+          in: (int){ 5 }
-+        }
-+        out: (int){ 8 }
-+        in: (int){ 7 }
-+      }
++      ref: ~(weave.f4)
 +      out: (int){ 10 }
 +      in: (int){ 9 }
 +    }
 +    f4: (struct){
-+      ref: (struct){
-+        ref: (struct){
-+          ref: (struct){
-+            out: (int){ 2 }
-+          }
-+          out: (int){ 4 }
-+          in: (int){ 3 }
-+        }
-+        out: (int){ 6 }
-+        in: (int){ 5 }
-+      }
++      ref: ~(weave.f3)
 +      out: (int){ 8 }
 +      in: (int){ 7 }
 +    }
 +    f3: (struct){
-+      ref: (struct){
-+        ref: (struct){
-+          out: (int){ 2 }
-+        }
-+        out: (int){ 4 }
-+        in: (int){ 3 }
-+      }
++      ref: ~(weave.f2)
 +      out: (int){ 6 }
 +      in: (int){ 5 }
 +    }
 +    f2: (struct){
-+      ref: (struct){
-+        out: (int){ 2 }
-+      }
++      ref: ~(weave.f1)
 +      out: (int){ 4 }
 +      in: (int){ 3 }
      }
      f1: (struct){
        out: (int){ 2 }
-@@ -320,177 +320,177 @@
+@@ -320,177 +222,177 @@
    weaveExtraField: (struct){
      f: (struct){
        out: (_|_){

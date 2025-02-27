@@ -418,19 +418,19 @@ issue2229: reduced_fail: X={
 }
 -- out/evalalpha/stats --
 Leaks:  53
-Freed:  913
-Reused: 878
+Freed:  906
+Reused: 871
 Allocs: 88
 Retain: 0
 
-Unifications: 581
-Conjuncts:    1707
+Unifications: 574
+Conjuncts:    1689
 Disjuncts:    210
 Notifications: 14
 
-NumCloseIDs: 728
+NumCloseIDs: 721
 
-ConjunctInfos:       1165
+ConjunctInfos:       1151
 MaxConjunctInfos:    10
 MaxReqSets:          12
 MaxRedirect:         1
@@ -1280,19 +1280,19 @@ diff old new
 -
 -NumCloseIDs: 16
 +Leaks:  53
-+Freed:  913
-+Reused: 878
++Freed:  906
++Reused: 871
 +Allocs: 88
 +Retain: 0
 +
-+Unifications: 581
-+Conjuncts:    1707
++Unifications: 574
++Conjuncts:    1689
 +Disjuncts:    210
 +Notifications: 14
 +
-+NumCloseIDs: 728
++NumCloseIDs: 721
 +
-+ConjunctInfos:       1165
++ConjunctInfos:       1151
 +MaxConjunctInfos:    10
 +MaxReqSets:          12
 +MaxRedirect:         1

@@ -360,7 +360,7 @@ dynamicSimple: {
 			x: 1
 		}
 		c: {
-			@decl2(), @decl1()
+			@decl1()
 		}
 		d: {
 			@decl2(), @decl1()
@@ -425,7 +425,7 @@ dynamicSimple: {
 			x: 1
 		}
 		c: {
-			@decl2(), @decl1()
+			@decl1()
 		}
 		d: {
 			@decl2(), @decl1()
@@ -467,7 +467,7 @@ diff old new
 +			x: 1
 +		}
 +		c: {
-+			@decl2(), @decl1()
++			@decl1()
  		}
  		d: {
  			@decl2(), @decl1()
@@ -484,7 +484,7 @@ diff old new
 +			x: 1
 +		}
 +		c: {
-+			@decl2(), @decl1()
++			@decl1()
  		}
  		d: {
  			@decl2(), @decl1()

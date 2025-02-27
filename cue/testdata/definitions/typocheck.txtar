@@ -627,21 +627,21 @@ issue4006: {
 }
 -- out/evalalpha/stats --
 Leaks:  46
-Freed:  875
-Reused: 818
+Freed:  825
+Reused: 768
 Allocs: 103
 Retain: 0
 
-Unifications: 755
-Conjuncts:    1513
-Disjuncts:    84
+Unifications: 715
+Conjuncts:    1413
+Disjuncts:    82
 Notifications: 7
 
-NumCloseIDs: 440
+NumCloseIDs: 395
 
-ConjunctInfos:       1105
+ConjunctInfos:       1034
 MaxConjunctInfos:    5
-MaxReqSets:          9
+MaxReqSets:          8
 MaxRedirect:         2
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -660,21 +660,21 @@ diff old new
 -
 -NumCloseIDs: 3
 +Leaks:  46
-+Freed:  875
-+Reused: 818
++Freed:  825
++Reused: 768
 +Allocs: 103
 +Retain: 0
 +
-+Unifications: 755
-+Conjuncts:    1513
-+Disjuncts:    84
++Unifications: 715
++Conjuncts:    1413
++Disjuncts:    82
 +Notifications: 7
 +
-+NumCloseIDs: 440
++NumCloseIDs: 395
 +
-+ConjunctInfos:       1105
++ConjunctInfos:       1034
 +MaxConjunctInfos:    5
-+MaxReqSets:          9
++MaxReqSets:          8
 +MaxRedirect:         2
 -- out/eval/stats --
 Leaks:  47
@@ -776,9 +776,7 @@ Result:
     #B: (#struct){
       fieldA: (string){ string }
     }
-    #C: (#struct){
-      fieldA: (string){ string }
-    }
+    #C: ~(issue4006.#A)
     out: (#struct){
       fieldA: (string){ string }
     }
@@ -1638,25 +1636,10 @@ Result:
       }
       #Output: (#struct){
         _in: (_){ _ }
-        out: (#struct){
-        }
+        out: (_){ _ }
       }
-      _in: (#struct){
-        image: (string){ "foo:v1" }
-        vcs: (string){ "git" }
-        args: (list){
-        }
-        env: (#struct){
-        }
-      }
-      out: (#struct){
-        image: (string){ "foo:v1" }
-        vcs: (string){ "git" }
-        args: (list){
-        }
-        env: (#struct){
-        }
-      }
+      _in: ~(orig.t1.#JobConfig.job)
+      out: ~(orig.t1.#JobConfig.job)
     }
     t2: (struct){
       #JobConfig: (#struct){
@@ -1677,21 +1660,16 @@ Result:
       #Output: (#struct){
         in: (_){ _ }
         out: (_|_){
-          // [incomplete] orig.t2.#Output.out: undefined field: input:
-          //     ./issue3858.cue:55:18
+          // [incomplete] orig.t2.#Output.out: (in & {}).input undefined as (in & {}) is incomplete (type _):
+          //     ./issue3858.cue:55:9
+          //     ./issue3858.cue:55:8
         }
       }
       out: (#struct){
         in: (#struct){
-          input: (#struct){
-            image: (string){ "someimage" }
-            env: (string){ "FOO" }
-          }
+          input: ~(orig.t2.#JobConfig.job)
         }
-        out: (#struct){
-          image: (string){ "someimage" }
-          env: (string){ "FOO" }
-        }
+        out: ~(orig.t2.#JobConfig.job)
       }
     }
   }
@@ -1881,31 +1859,7 @@ Result:
         //     ./large.cue:19:15
       }
       let jsonPatch#4 = (#struct){
-        let base#7 = (#struct){
-          someMsg: (string){ string }
-          obs: (#struct){ |(*(#struct){
-              missing: (bool){ true }
-            }, (#struct){
-            }) }
-          let pickMsg#3 = (#struct){
-            msg: (_|_){
-              // [incomplete] full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
-              //     ./large.cue:7:25
-              //     ./large.cue:3:12
-            }
-          }
-          patches: (#list){
-            0: (#struct){
-              op: (string){ "add" }
-              path: (string){ "/metadata" }
-              value: (_|_){
-                // [incomplete] full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
-                //     ./large.cue:7:25
-                //     ./large.cue:3:12
-              }
-            }
-          }
-        }
+        let base#7 = ~(full.#Resource)
         let withMsg#8 = (#struct){
           someMsg: (string){ "foo" }
           obs: (#struct){ |(*(#struct){
@@ -2115,7 +2069,18 @@ diff old new
      }
      #B: (#struct){
        c?: (string){ string }
-@@ -163,10 +107,7 @@
+@@ -141,9 +85,7 @@
+     #B: (#struct){
+       fieldA: (string){ string }
+     }
+-    #C: (#struct){
+-      fieldA: (string){ string }
+-    }
++    #C: ~(issue4006.#A)
+     out: (#struct){
+       fieldA: (string){ string }
+     }
+@@ -163,10 +105,7 @@
          allowed?: (string){ string }
          disallowed: (_|_){
            // [eval] issue3947.full.out.disallowed: field not allowed:
@@ -2126,7 +2091,7 @@ diff old new
          }
        }
      }
-@@ -178,15 +119,9 @@
+@@ -178,15 +117,9 @@
        c: (_|_){
          // [eval]
          a: (_|_){
@@ -2143,7 +2108,7 @@ diff old new
          }
          b?: (string){ string }
        }
-@@ -259,9 +194,6 @@
+@@ -259,9 +192,6 @@
      }
      nestedWithPatterns: (struct){
        out: (#struct){
@@ -2153,7 +2118,7 @@ diff old new
          objs: (#struct){
            obj1: (#struct){
              extra: (string){ "foo" }
-@@ -268,6 +200,9 @@
+@@ -268,6 +198,9 @@
              name?: (int){ int }
            }
          }
@@ -2163,7 +2128,7 @@ diff old new
        }
        #Schema: (#struct){
          #meta: (#struct){
-@@ -413,14 +348,11 @@
+@@ -413,14 +346,11 @@
        }
        a: (_|_){
          // [eval]
@@ -2179,7 +2144,7 @@ diff old new
        }
      }
      andInStruct: (_|_){
-@@ -430,14 +362,11 @@
+@@ -430,14 +360,11 @@
        }
        a: (_|_){
          // [eval]
@@ -2195,7 +2160,7 @@ diff old new
        }
      }
      embedDefWithEmbedding: (_|_){
-@@ -447,15 +376,11 @@
+@@ -447,15 +374,11 @@
        }
        a: (_|_){
          // [eval]
@@ -2212,7 +2177,7 @@ diff old new
        }
      }
      embedComprehension: (_|_){
-@@ -465,16 +390,11 @@
+@@ -465,16 +388,11 @@
        }
        a: (_|_){
          // [eval]
@@ -2230,7 +2195,7 @@ diff old new
        }
      }
      fieldWithAnd: (_|_){
-@@ -485,9 +405,6 @@
+@@ -485,9 +403,6 @@
          // [eval]
          err: (_|_){
            // [eval] embed.fieldWithAnd.a.err: field not allowed:
@@ -2240,7 +2205,7 @@ diff old new
            //     ./in.cue:20:13
          }
        }
-@@ -498,20 +415,15 @@
+@@ -498,20 +413,15 @@
          a: (int){ int }
        }
        B: (struct){
@@ -2266,7 +2231,7 @@ diff old new
        }
      }
      andEmbed: (_|_){
-@@ -527,17 +439,11 @@
+@@ -527,17 +437,11 @@
        }
        d: (_|_){
          // [eval]
@@ -2285,7 +2250,7 @@ diff old new
        }
      }
      nonDef: (struct){
-@@ -546,12 +452,12 @@
+@@ -546,12 +450,12 @@
            a: (string){ string }
          }
          #Y: (#struct){
@@ -2302,7 +2267,7 @@ diff old new
          }
        }
      }
-@@ -561,12 +467,12 @@
+@@ -561,12 +465,12 @@
            Name: (string){ string }
          }
          #Step: (#struct){
@@ -2319,7 +2284,7 @@ diff old new
          }
          out: (#struct){
            Name: (string){ "foo" }
-@@ -576,21 +482,15 @@
+@@ -576,21 +480,15 @@
      }
      withIndirect: (_|_){
        // [eval]
@@ -2346,7 +2311,7 @@ diff old new
      }
      normalValidator: (_|_){
        // [eval]
-@@ -600,20 +500,18 @@
+@@ -600,20 +498,18 @@
        }
        x: (_|_){
          // [eval]
@@ -2371,7 +2336,7 @@ diff old new
          #X: (_){
            matchN(0, (#list){
            })
-@@ -620,17 +518,10 @@
+@@ -620,17 +516,10 @@
            a?: (int){ int }
            b?: (int){ int }
          }
@@ -2393,7 +2358,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -709,16 +600,11 @@
+@@ -709,16 +598,11 @@
          }
          out: (_|_){
            // [eval]
@@ -2411,7 +2376,7 @@ diff old new
          }
        }
      }
-@@ -751,17 +637,11 @@
+@@ -751,17 +635,11 @@
          }
          out: (_|_){
            // [eval]
@@ -2430,7 +2395,7 @@ diff old new
          }
        }
      }
-@@ -807,8 +687,8 @@
+@@ -807,8 +685,8 @@
              //     ./issue3832.cue:8:16
            }
            outFirstName: (_|_){
@@ -2441,7 +2406,7 @@ diff old new
            }
          }
        }
-@@ -818,21 +698,32 @@
+@@ -818,21 +696,32 @@
          }, (#struct){
            pass: (#struct){
              let self#2 = (_|_){
@@ -2479,7 +2444,7 @@ diff old new
      _subject: (#struct){
        in: (_){ _ }
        out: (#struct){
-@@ -841,32 +732,15 @@
+@@ -841,32 +730,15 @@
            //     ./issue3832.cue:8:16
          }
          outFirstName: (_|_){
@@ -2521,7 +2486,7 @@ diff old new
      ok: (struct){
        out: (#struct){
          a: (#struct){
-@@ -887,11 +761,18 @@
+@@ -887,11 +759,18 @@
          b: (string){ "foo" }
        }
      }
@@ -2545,7 +2510,7 @@ diff old new
          }
        }
        #A: (#struct){
-@@ -962,12 +843,8 @@
+@@ -962,12 +841,8 @@
          globalField: (string){ string }
        }
        #Context: (#struct){
@@ -2560,7 +2525,7 @@ diff old new
        }
        out: (struct){
          ingress: (#struct){
-@@ -995,22 +872,22 @@
+@@ -995,22 +870,22 @@
            #Z: (#struct){
            }
            x: (#struct){
@@ -2599,7 +2564,7 @@ diff old new
              z: (int){ 1 }
            }
          }
-@@ -1020,22 +897,22 @@
+@@ -1020,22 +895,22 @@
            #Z: (#struct){
            }
            x: (#struct){
@@ -2638,7 +2603,7 @@ diff old new
              z: (int){ 1 }
            }
          }
-@@ -1050,11 +927,7 @@
+@@ -1050,11 +925,7 @@
          }
        }
        #JobConfig: (#struct){
@@ -2651,16 +2616,69 @@ diff old new
          job: (#struct){
            image: (string){ "foo:v1" }
            vcs: (string){ "git" }
-@@ -1118,7 +991,7 @@
-         }
+@@ -1074,25 +945,10 @@
        }
-       out: (#struct){
+       #Output: (#struct){
+         _in: (_){ _ }
+-        out: (#struct){
+-        }
+-      }
+-      _in: (#struct){
+-        image: (string){ "foo:v1" }
+-        vcs: (string){ "git" }
+-        args: (list){
+-        }
+-        env: (#struct){
+-        }
+-      }
+-      out: (#struct){
+-        image: (string){ "foo:v1" }
+-        vcs: (string){ "git" }
+-        args: (list){
+-        }
+-        env: (#struct){
+-        }
+-      }
++        out: (_){ _ }
++      }
++      _in: ~(orig.t1.#JobConfig.job)
++      out: ~(orig.t1.#JobConfig.job)
+     }
+     t2: (struct){
+       #JobConfig: (#struct){
+@@ -1113,21 +969,16 @@
+       #Output: (#struct){
+         in: (_){ _ }
+         out: (_|_){
+-          // [incomplete] orig.t2.#Output.out: undefined field: input:
+-          //     ./issue3858.cue:55:18
+-        }
+-      }
+-      out: (#struct){
 -        in: (struct){
+-          input: (#struct){
+-            image: (string){ "someimage" }
+-            env: (string){ "FOO" }
+-          }
+-        }
+-        out: (#struct){
+-          image: (string){ "someimage" }
+-          env: (string){ "FOO" }
+-        }
++          // [incomplete] orig.t2.#Output.out: (in & {}).input undefined as (in & {}) is incomplete (type _):
++          //     ./issue3858.cue:55:9
++          //     ./issue3858.cue:55:8
++        }
++      }
++      out: (#struct){
 +        in: (#struct){
-           input: (#struct){
-             image: (string){ "someimage" }
-             env: (string){ "FOO" }
-@@ -1150,11 +1023,11 @@
++          input: ~(orig.t2.#JobConfig.job)
++        }
++        out: ~(orig.t2.#JobConfig.job)
+       }
+     }
+   }
+@@ -1150,11 +1001,11 @@
          _in: (_){ _ }
          out: (_){ _ }
        }
@@ -2677,7 +2695,7 @@ diff old new
            e: (string){ "foo" }
            f: (int){ 1 }
          }
-@@ -1187,24 +1060,16 @@
+@@ -1187,24 +1038,16 @@
          _in: (_){ _ }
          out: (_){ _ }
        }
@@ -2712,7 +2730,7 @@ diff old new
      }
    }
    issue3934: (struct){
-@@ -1291,7 +1156,7 @@
+@@ -1291,7 +1134,7 @@
            op: (string){ "add" }
            path: (string){ "/metadata" }
            value: (_|_){
@@ -2721,7 +2739,7 @@ diff old new
              //     ./large.cue:7:25
              //     ./large.cue:3:12
            }
-@@ -1320,38 +1185,11 @@
+@@ -1320,18 +1163,29 @@
      #Main: (#struct){
        namespace: (string){ string }
        output: (_|_){
@@ -2739,17 +2757,35 @@ diff old new
 -        }
        }
        let jsonPatch#4 = (#struct){
--        namespace: (string){ string }
--        patch: (#list){
--          0: (#struct){
--            op: (string){ "add" }
--            path: (string){ "/metadata" }
--            value: (string){ "foo" }
--          }
--        }
--        output: (_|_){
++        let base#7 = ~(full.#Resource)
++        let withMsg#8 = (#struct){
++          someMsg: (string){ "foo" }
++          obs: (#struct){ |(*(#struct){
++              missing: (bool){ true }
++            }, (#struct){
++            }) }
++          let pickMsg#3 = (#struct){
++            msg: (string){ "foo" }
++          }
++          patches: (#list){
++            0: (#struct){
++              op: (string){ "add" }
++              path: (string){ "/metadata" }
++              value: (string){ "foo" }
++            }
++          }
++        }
+         namespace: (string){ string }
+         patch: (#list){
+           0: (#struct){
+@@ -1341,58 +1195,9 @@
+           }
+         }
+         output: (_|_){
 -          // [incomplete] full.#Main.jsonPatch.output: invalid non-ground value string (must be concrete string):
--          //     ./large.cue:19:15
++          // [incomplete] full.#Main.jsonPatch.output: key value of dynamic field must be concrete, found string:
++          //     ./large.cue:21:24
+           //     ./large.cue:19:15
 -          //     ./large.cue:41:15
 -          _: (#list){
 -            0: (#struct){
@@ -2759,39 +2795,51 @@ diff old new
 -            }
 -          }
 -        }
-         let base#7 = (#struct){
-           someMsg: (string){ string }
-           obs: (#struct){ |(*(#struct){
-@@ -1370,7 +1208,7 @@
-               op: (string){ "add" }
-               path: (string){ "/metadata" }
-               value: (_|_){
+-        let base#7 = (#struct){
+-          someMsg: (string){ string }
+-          obs: (#struct){ |(*(#struct){
+-              missing: (bool){ true }
+-            }, (#struct){
+-            }) }
+-          let pickMsg#3 = (#struct){
+-            msg: (_|_){
+-              // [incomplete] full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
+-              //     ./large.cue:7:25
+-              //     ./large.cue:3:12
+-            }
+-          }
+-          patches: (#list){
+-            0: (#struct){
+-              op: (string){ "add" }
+-              path: (string){ "/metadata" }
+-              value: (_|_){
 -                // [incomplete] full.#Main.jsonPatch.base.patches.0.value: invalid interpolation: non-concrete value string (type string):
-+                // [incomplete] full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
-                 //     ./large.cue:7:25
-                 //     ./large.cue:3:12
-               }
-@@ -1394,6 +1232,19 @@
-             }
-           }
+-                //     ./large.cue:7:25
+-                //     ./large.cue:3:12
+-              }
+-            }
+-          }
+-        }
+-        let withMsg#8 = (#struct){
+-          someMsg: (string){ "foo" }
+-          obs: (#struct){ |(*(#struct){
+-              missing: (bool){ true }
+-            }, (#struct){
+-            }) }
+-          let pickMsg#3 = (#struct){
+-            msg: (string){ "foo" }
+-          }
+-          patches: (#list){
+-            0: (#struct){
+-              op: (string){ "add" }
+-              path: (string){ "/metadata" }
+-              value: (string){ "foo" }
+-            }
+-          }
          }
-+        namespace: (string){ string }
-+        patch: (#list){
-+          0: (#struct){
-+            op: (string){ "add" }
-+            path: (string){ "/metadata" }
-+            value: (string){ "foo" }
-+          }
-+        }
-+        output: (_|_){
-+          // [incomplete] full.#Main.jsonPatch.output: key value of dynamic field must be concrete, found string:
-+          //     ./large.cue:21:24
-+          //     ./large.cue:19:15
-+        }
        }
      }
-     out: (#struct){
-@@ -1415,25 +1266,19 @@
+@@ -1415,25 +1220,19 @@
            b1: (_|_){
              // [incomplete] disjunction.withErr.t1.out.b1: 4 errors in empty disjunction:
              // disjunction.withErr.t1.out.b1: conflicting values null and {b2:{b3:params.mayExistLater}} (mismatched types null and struct):

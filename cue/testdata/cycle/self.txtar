@@ -265,17 +265,17 @@ issue1729: t2: {
 }
 
 -- out/evalalpha/stats --
-Leaks:  34
-Freed:  290
-Reused: 267
-Allocs: 57
+Leaks:  32
+Freed:  288
+Reused: 265
+Allocs: 55
 Retain: 0
 
 Unifications: 206
-Conjuncts:    412
-Disjuncts:    100
+Conjuncts:    404
+Disjuncts:    96
 
-NumCloseIDs: 80
+NumCloseIDs: 74
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -290,17 +290,17 @@ diff old new
 -Unifications: 240
 -Conjuncts:    663
 -Disjuncts:    447
-+Leaks:  34
-+Freed:  290
-+Reused: 267
-+Allocs: 57
++Leaks:  32
++Freed:  288
++Reused: 265
++Allocs: 55
 +Retain: 0
 +
 +Unifications: 206
-+Conjuncts:    412
-+Disjuncts:    100
++Conjuncts:    404
++Disjuncts:    96
 +
-+NumCloseIDs: 80
++NumCloseIDs: 74
 -- out/eval/stats --
 Leaks:  0
 Freed:  432

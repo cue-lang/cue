@@ -105,13 +105,7 @@ Result:
       g: (#struct){
       }
     }
-    out: (#struct){
-      field: (#struct){
-        n: (int){ 3 }
-      }
-      g: (#struct){
-      }
-    }
+    out: ~(simplified.#struct)
   }
 }
 -- diff/-out/evalalpha<==>+out/eval --
@@ -195,6 +189,20 @@ diff old new
        //     ./in.cue:23:16
      }
    }
+@@ -72,12 +57,6 @@
+       g: (#struct){
+       }
+     }
+-    out: (#struct){
+-      field: (#struct){
+-        n: (int){ 3 }
+-      }
+-      g: (#struct){
+-      }
+-    }
++    out: ~(simplified.#struct)
+   }
+ }
 -- diff/todo/p3 --
 Small differences in error output.
 -- out/eval --

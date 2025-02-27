@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -46,10 +47,10 @@ prefix matching oldImportPath to replace that prefix by newImportPath.
 It does not attempt to adjust the contents of the cue.mod/module.cue file:
 use "cue mod get" or "cue mod tidy" for that.
 
-If the major version suffix is omitted from oldImportPath, then the
-major version will match the default major version specified in the
-module.cue file for that import path unless --all-major is specified,
-in which case all major versions will match.
+If oldImportPath is underneath one of the dependency modules,
+only imports in that module will be altered, unless --all-major
+is specified, in which case all modules with that as a prefix will be
+refactored.
 
 If the --exact flag is specified, then oldImportPath is only
 considered to match when the entire path matches, rather than matching
@@ -57,12 +58,16 @@ any path prefix. The --exact flag is implied if either oldImportPath
 or newImportPath contain an explicit package qualifier or when the
 --ident flag is specified.
 
-If oldImportPath is omitted and --exact is not specified,
-oldImportPath is taken to be the same as newImportPath but with the
-major version suffix omitted (see above for details). If oldImportPath
-is omitted and --exact *is* specified, oldImportPath is taken to be
-the same as newImportPath (this is useful in conjunction with
---ident).
+With only one argument, the command will first resolve the current
+default major version for the argument (ignoring any major version)
+and then take oldImportPath to be path of the argument with that major
+version. This means that the single argument form can be used to
+upgrade the major version of a module, assuming the packages in that
+module remain stable.
+
+If oldImportPath is omitted and --exact *is* specified, oldImportPath
+is taken to be the same as newImportPath. This is useful in
+conjunction with --ident.
 
 By default the identifier that the package is imported as will be kept
 the same (this is to minimize code churn). However, if --update-ident
@@ -94,9 +99,6 @@ For example:
 
 	# Update only foo.com/bar, not (say) foo.com/baz/somethingelse
 	cue refactor imports --exact foo.com/bar foo.com/baz
-
-	# Refactor, for example github.com/foo/bar/something.v2/pkg to foo.example/something/v2/pkg
-	cue refactor imports 'github.com/foo/bar/(.*)\.(v[0-9]+)(.*)' 'foo.example/$1/$2$3'
 `[1:],
 		RunE: mkRunE(c, runRefactorImports),
 		Args: cobra.RangeArgs(1, 2),
@@ -131,15 +133,6 @@ func runRefactorImports(cmd *Command, args []string) error {
 	// When matching, ignore whether the qualifier is explicit or not.
 	oldImportPath.ExplicitQualifier = false
 
-	// "If oldImportPath is omitted and `--exact` is not specified,
-	// oldImportPath is taken to be the same as newImportPath but with
-	// the major version suffix omitted"
-	if len(args) == 1 && !exactMatch {
-		oldImportPath.Version = ""
-	}
-	if allMajor {
-		oldImportPath.Version = ""
-	}
 	modRoot, err := findModuleRoot()
 	if err != nil {
 		return err
@@ -148,15 +141,27 @@ func runRefactorImports(cmd *Command, args []string) error {
 	if err != nil {
 		return nil
 	}
-	omittedMajor := oldImportPath.Version == ""
-	if omittedMajor && !allMajor {
-		// Find the default major version from the module.cue file if
-		// there is one. If there isn't, it might be a dependency not
-		// yet present or in cue.mod/pkg; in that case we leave it
-		// empty and match only imports with a missing major version.
-		if mv, ok := mf.ModuleForImportPath(oldImportPath.Path); ok {
-			oldImportPath.Version = semver.Major(mv.Version())
+
+	// "If oldImportPath is omitted and `--exact` is not specified,
+	// oldImportPath is taken to be the same as newImportPath but with
+	// the major version suffix omitted"
+	if len(args) == 1 && !exactMatch {
+		oldImportPath.Version = ""
+		mv, ok := mf.ModuleForImportPath(oldImportPath.String())
+		if !ok {
+			return fmt.Errorf("cannot resolve module version for %v", oldImportPath)
 		}
+		oldImportPath.Version = semver.Major(mv.Version())
+	}
+
+	exactModule := ""
+	if allMajor {
+		oldImportPath.Version = ""
+	} else if mv, ok := mf.ModuleForImportPath(oldImportPath.String()); ok {
+		// The path matches an existing module. Change
+		// only paths in that module.
+		exactModule = mv.Path()
+		oldImportPath.Version = semver.Major(mv.Version())
 	}
 	matchPkg := func(ip ast.ImportPath) (_m bool) {
 		// Quick check: if the import path doesn't at least start with
@@ -167,16 +172,29 @@ func runRefactorImports(cmd *Command, args []string) error {
 		}
 		// Ignore whether the qualifier is explicit or not.
 		ip.ExplicitQualifier = false
-		if allMajor {
+		switch {
+		case allMajor:
+			// --all-major really does mean "all major versions", regardless.
 			ip.Version = ""
-		} else if ip.Version == "" {
+		case ip.Version == "" && oldImportPath.Version != "":
+			// The specified import path has an explicit version
+			// so we need to make sure that the actual import
+			// path major version matches that.
 			mv, ok := mf.ModuleForImportPath(ip.String())
-			if !ok && !omittedMajor {
+			if !ok {
 				// Can't find the major version for the package
 				// and it was specified in the pattern.
 				return false
 			}
+			if exactModule != "" && mv.Path() != exactModule {
+				return false
+			}
 			ip.Version = semver.Major(mv.Version())
+		case exactModule != "":
+			mv, ok := mf.ModuleForImportPath(ip.String())
+			if !ok || mv.Path() != exactModule {
+				return false
+			}
 		}
 		if exactMatch {
 			return ip == oldImportPath
@@ -184,7 +202,7 @@ func runRefactorImports(cmd *Command, args []string) error {
 		// We've already checked the path prefix, and we know
 		// that if the qualifier is explicit, exactMatch will be true,
 		// so the only thing left to check is the major version.
-		return allMajor || ip.Version == oldImportPath.Version
+		return oldImportPath.Version == "" || ip.Version == oldImportPath.Version
 	}
 	binst := load.Instances([]string{"./..."}, &load.Config{
 		Dir:         modRoot,
@@ -225,6 +243,12 @@ func runRefactorImports(cmd *Command, args []string) error {
 						newIP.Qualifier = ""
 						newIP.ExplicitQualifier = false
 					}
+				}
+				if exactModule == "" && newIP.Version == "" {
+					// We're matching any one of a number of possible modules:
+					// preserve the major versions from the imports if one
+					// hasn't been provided explicitly.
+					newIP.Version = oldIP.Version
 				}
 				if newIdent != "" {
 					return newIP.String(), newIdent

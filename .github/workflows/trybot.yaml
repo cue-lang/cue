@@ -128,27 +128,27 @@ jobs:
       - name: Test with -tags=cuewasm
         run: go test -tags cuewasm ./cmd/cue/cmd ./cue/interpreter/wasm
       - id: auth
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.E2E_GCLOUD_KEY }}
         if: |-
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.24.x' && matrix.runner == 'ubuntu-24.04')
         name: gcloud auth for end-to-end tests
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.E2E_GCLOUD_KEY }}
       - if: |-
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.24.x' && matrix.runner == 'ubuntu-24.04')
         name: gcloud setup for end-to-end tests
         uses: google-github-actions/setup-gcloud@v2
-      - if: |-
+      - env:
+          CUE_TEST_TOKEN: ${{ secrets.E2E_PORCUEPINE_CUE_TOKEN }}
+        if: |-
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.24.x' && matrix.runner == 'ubuntu-24.04')
         name: End-to-end test
         run: |-
           cd internal/_e2e
           go test -race
-        env:
-          CUE_TEST_TOKEN: ${{ secrets.E2E_PORCUEPINE_CUE_TOKEN }}
       - if: (matrix.go-version == '1.24.x' && matrix.runner == 'ubuntu-24.04')
         name: Go checks
         run: |-

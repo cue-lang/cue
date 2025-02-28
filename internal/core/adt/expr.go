@@ -989,7 +989,7 @@ func (x *LetReference) resolve(ctx *OpContext, state combinedFlags) *Vertex {
 		v = n
 		e.cache[key] = n
 		if ctx.isDevVersion() {
-			nc := n.getState(ctx)
+			// nc := n.getState(ctx)
 			// TODO: unlike with the old evaluator, we do not allow the first
 			// cycle to be skipped. Doing so can lead to hanging evaluation.
 			// As the cycle detection works slightly differently in the new
@@ -998,7 +998,7 @@ func (x *LetReference) resolve(ctx *OpContext, state combinedFlags) *Vertex {
 			// detection.
 			// nc.hasNonCycle = true
 			// Allow a first cycle to be skipped.
-			nc.free()
+			// nc.free()
 		} else {
 			nc := n.getNodeContext(ctx, 0)
 			nc.hasNonCycle = true // Allow a first cycle to be skipped.

@@ -22,6 +22,36 @@ Retain: 0
 Unifications: 10
 Conjuncts:    18
 Disjuncts:    14
+-- out/evalalpha --
+(struct){
+  #Schema: (#struct){
+  }
+  Component: (struct){
+    hostname: (string){ |(*(string){ "localhost" }, (string){ string }) }
+    _#foo: (#struct){
+      hello: (string){ "world" }
+    }
+  }
+  hello: (struct){
+    hostname: (string){ |(*(string){ "localhost" }, (string){ string }) }
+    _#foo: (#struct){
+      hello: (string){ "world" }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -7,7 +7,7 @@
+       hello: (string){ "world" }
+     }
+   }
+-  hello: (#struct){
++  hello: (struct){
+     hostname: (string){ |(*(string){ "localhost" }, (string){ string }) }
+     _#foo: (#struct){
+       hello: (string){ "world" }
 -- out/eval --
 (struct){
   #Schema: (#struct){

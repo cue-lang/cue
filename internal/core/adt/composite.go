@@ -165,6 +165,12 @@ type Vertex struct {
 	// TODO: move back to nodeContext, but be sure not to clone it.
 	_cc *closeContext
 
+	reqDefIDs    []refInfo
+	dropDefIDs   []defID
+	conjunctInfo []conjunctInfo
+
+	overlay *Vertex
+
 	// Label is the feature leading to this vertex.
 	Label Feature
 
@@ -308,50 +314,50 @@ func (v *Vertex) cc() *closeContext {
 	return v._cc
 }
 
-func (v *Vertex) getRootCloseContext(ctx *OpContext) *closeContext {
-	_ = ctx // suppress linter
-	if v._cc == nil {
-		panic("no closeContext")
-	}
-	return v._cc
-}
+// func (v *Vertex) getRootCloseContext(ctx *OpContext) *closeContext {
+// 	_ = ctx // suppress linter
+// 	if v._cc == nil {
+// 		panic("no closeContext")
+// 	}
+// 	return v._cc
+// }
 
 // rootCloseContext creates a closeContext for this Vertex or returns the
 // existing one.
-func (v *Vertex) rootCloseContext(ctx *OpContext) *closeContext {
-	mode := v.ArcType
-	if v._cc != nil {
-		v._cc.updateArcType(ctx, mode)
-		return v._cc
-	}
+// func (v *Vertex) rootCloseContext(ctx *OpContext) *closeContext {
+// 	mode := v.ArcType
+// 	if v._cc != nil {
+// 		v._cc.updateArcType(ctx, mode)
+// 		return v._cc
+// 	}
 
-	v._cc = &closeContext{
-		group:           &v.Conjuncts,
-		parent:          nil,
-		src:             v,
-		parentConjuncts: v,
-		decl:            v,
-		arcType:         mode,
-	}
-	v._cc.incDependent(ctx, ROOT, nil) // matched in REF(decrement:nodeDone)
+// 	v._cc = &closeContext{
+// 		group:           &v.Conjuncts,
+// 		parent:          nil,
+// 		src:             v,
+// 		parentConjuncts: v,
+// 		decl:            v,
+// 		arcType:         mode,
+// 	}
+// 	v._cc.incDependent(ctx, ROOT, nil) // matched in REF(decrement:nodeDone)
 
-	if f := v.Label; f.IsLet() || f == InvalidLabel {
-		return v._cc
-	}
+// 	if f := v.Label; f.IsLet() || f == InvalidLabel {
+// 		return v._cc
+// 	}
 
-	if p := v.Parent; p != nil {
-		pcc := p.rootCloseContext(ctx)
+// 	if p := v.Parent; p != nil {
+// 		pcc := p.rootCloseContext(ctx)
 
-		if pcc.isClosed {
-			pcc.checkAllowsCC(ctx, v._cc)
-		}
+// 		if pcc.isClosed {
+// 			pcc.checkAllowsCC(ctx, v._cc)
+// 		}
 
-		pcc.addArcDependency(ctx, false, v._cc)
-		v._cc.depth = pcc.depth + 1
-	}
+// 		pcc.addArcDependency(ctx, false, v._cc)
+// 		v._cc.depth = pcc.depth + 1
+// 	}
 
-	return v._cc
-}
+// 	return v._cc
+// }
 
 // newInlineVertex creates a Vertex that is needed for computation, but for
 // which there is no CUE path defined from the root Vertex.
@@ -1302,8 +1308,7 @@ func (v *Vertex) MatchAndInsert(ctx *OpContext, arc *Vertex) {
 					}
 					c.Env = &env
 
-					root := arc.rootCloseContext(ctx)
-					root.insertConjunct(ctx, root, c, c.CloseInfo, ArcMember, true, false)
+					arc.insertConjunct(ctx, c, c.CloseInfo, ArcMember, true, false)
 				}
 			}
 		}
@@ -1471,6 +1476,16 @@ func findConjunct(cs []Conjunct, c Conjunct) int {
 	return -1
 }
 
+// func findConjunctV3(cs []Conjunct, c Conjunct) int {
+// 	for i, x := range cs {
+// 		// TODO: disregard certain fields from comparison (e.g. Refs)?
+// 		if x.x == c.x && x.Env.Vertex == c.Env.Vertex {
+// 			return i
+// 		}
+// 	}
+// 	return -1
+// }
+
 func (n *nodeContext) addConjunction(c Conjunct, index int) {
 	unreachableForDev(n.ctx)
 
@@ -1545,11 +1560,11 @@ func (v *Vertex) AddStruct(s *StructLit, env *Environment, ci CloseInfo) *Struct
 		// info.Decl
 		info.Decl = env.Vertex
 	}
-	if cc := ci.cc; cc != nil && cc.decl != nil {
-		info.Decl = cc.decl
-	} else if ci := ci.closeInfo; ci != nil && ci.decl != nil {
-		info.Decl = ci.decl
-	}
+	// if cc := ci.cc; cc != nil && cc.decl != nil {
+	// 	info.Decl = cc.decl
+	// } else if ci := ci.closeInfo; ci != nil && ci.decl != nil {
+	// 	info.Decl = ci.decl
+	// }
 	for _, t := range v.Structs {
 		if *t == info { // TODO: check for different identity.
 			return t

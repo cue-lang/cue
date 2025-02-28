@@ -1,0 +1,16 @@
+{
+    "CUE": {
+        "EvalVersion": 3,
+        "Unifications": 11851,
+        "Disjuncts": 32,
+        "Conjuncts": 91367,
+        "Freed": 4,
+        "Reused": 4,
+        "Allocs": 11880,
+        "Retained": 0
+    },
+    "Go": {
+        "AllocBytes": 134784864,
+        "AllocObjects": 1729857
+    }
+}

@@ -107,16 +107,16 @@ func (n *nodeContext) scheduleConjuncts() {
 
 	defer ctx.PopArc(ctx.PushArc(v))
 
-	root := n.node.rootCloseContext(n.ctx)
-	root.incDependent(n.ctx, INIT, nil) // decremented below
+	// root := n.node.rootCloseContext(n.ctx)
+	// root.incDependent(n.ctx, INIT, nil) // decremented below
 
 	for _, c := range v.Conjuncts {
 		ci := c.CloseInfo
-		ci.cc = root
+		// ci.cc = root
 		n.scheduleConjunct(c, ci)
 	}
 
-	root.decDependent(ctx, INIT, nil)
+	// root.decDependent(ctx, INIT, nil)
 }
 
 // TODO(evalv3): consider not returning a result at all.
@@ -153,15 +153,12 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	// This happens with the close builtin, for instance.
 	// See TestFromAPI in pkg export.
 	// TODO(evalv3): find something more principled.
-	if v.state == nil && v.cc() != nil && v.cc().conjunctCount == 0 {
-		v.status = finalized
-		return true
-	}
-
 	n := v.getState(c)
 	if n == nil {
+		v.status = finalized
 		return true // already completed
 	}
+
 	// TODO(perf): reintroduce freeing once we have the lifetime under control.
 	// Right now this is not managed anyway, so we prevent bugs by disabling it.
 	// defer n.free()
@@ -271,12 +268,12 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		n.validateValue(state)
 	}
 
-	if n.node.Label.IsLet() || n.meets(allAncestorsProcessed) {
-		if cc := v.getRootCloseContext(n.ctx); !cc.isDecremented {
-			cc.decDependent(c, ROOT, nil) // REF(decrement:nodeDone)
-			cc.isDecremented = true
-		}
-	}
+	// if n.node.Label.IsLet() || n.meets(allAncestorsProcessed) {
+	// 	// if cc := v.getRootCloseContext(n.ctx); !cc.isDecremented {
+	// 	// 	cc.decDependent(c, ROOT, nil) // REF(decrement:nodeDone)
+	// 	// 	cc.isDecremented = true
+	// 	// }
+	// }
 
 	if v, ok := n.node.BaseValue.(*Vertex); ok && n.shareCycleType == NoCycle {
 		if n.ctx.hasDepthCycle(v) {
@@ -298,7 +295,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	case needs&subFieldsProcessed != 0:
 		switch {
 		case assertStructuralCycleV3(n):
-			n.breakIncomingDeps(mode)
+			// n.breakIncomingDeps(mode)
 
 		case n.node.status == finalized:
 			// There is no need to recursively process if the node is already
@@ -405,8 +402,6 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 
 	// validationCompleted
 	if n.completed&(subFieldsProcessed) != 0 {
-		n.node.HasEllipsis = n.node.cc().isTotal
-
 		// The next piece of code used to address the following case
 		// (order matters)
 		//
@@ -433,7 +428,23 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 			}
 		}
 
+		blockClose := n.hasTop
+		if n.hasStruct {
+			blockClose = false
+		}
+		if n.hasOpenValidator {
+			blockClose = true
+		}
+		if n.isDef && !n.isTotal && !blockClose {
+			n.node.ClosedRecursive = true
+		}
+
 		n.node.updateStatus(finalized)
+
+		n.checkTypos()
+		if c.logID > 45 && c.logID < 47 {
+			// openDebugGraph(n.ctx, n.node.Parent.Parent, "Finalize")
+		}
 
 		if DebugDeps {
 			switch n.node.BaseValue.(type) {
@@ -446,7 +457,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 				// No need to check dereferenced results.
 
 			default:
-				RecordDebugGraph(n.ctx, n.node, "Finalize")
+				// RecordDebugGraph(n.ctx, n.node, "Finalize")
 			}
 		}
 	}
@@ -507,7 +518,8 @@ func (n *nodeContext) completeNodeTasks(mode runMode) {
 		n.updateScalar()
 	}
 
-	n.breakIncomingNotifications(mode)
+	// XXX(REPLACE)
+	// n.breakIncomingNotifications(mode)
 
 	// As long as ancestors are not processed, it is still possible for
 	// conjuncts to be inserted. Until that time, it is not okay to decrement
@@ -521,18 +533,20 @@ func (n *nodeContext) completeNodeTasks(mode runMode) {
 	// At this point, no more conjuncts will be added, so we could decrement
 	// the notification counters.
 
-	if cc := v.getRootCloseContext(n.ctx); !cc.isDecremented {
-		cc.isDecremented = true
+	// if cc := v.getRootCloseContext(n.ctx); !cc.isDecremented {
+	// 	cc.isDecremented = true
 
-		cc.decDependent(n.ctx, ROOT, nil) // REF(decrement:nodeDone)
-	}
+	// 	cc.decDependent(n.ctx, ROOT, nil) // REF(decrement:nodeDone)
+	// }
 }
 
 func (n *nodeContext) updateScalar() {
 	// Set BaseValue to scalar, but only if it was not set before. Most notably,
 	// errors should not be discarded.
 	if n.scalar != nil && (!n.node.IsErr() || isCyclePlaceholder(n.node.BaseValue)) {
-		n.setBaseValue(n.scalar)
+		if v, ok := n.node.BaseValue.(*Vertex); !ok || !v.IsDisjunct {
+			n.setBaseValue(n.scalar)
+		}
 		n.signal(scalarKnown)
 	}
 }
@@ -557,7 +571,7 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 	// Investigate how to work around this.
 	n.completeNodeTasks(finalize)
 
-	n.breakIncomingDeps(mode)
+	// n.breakIncomingDeps(mode)
 
 	n.incDepth()
 	defer n.decDepth()

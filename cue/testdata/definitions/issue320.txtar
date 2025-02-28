@@ -23,7 +23,6 @@ Disjuncts:    8
 -- out/evalalpha --
 Errors:
 foo.y: field not allowed:
-    ./in.cue:6:19
     ./in.cue:10:2
 
 Result:
@@ -39,7 +38,6 @@ Result:
     x: (string){ "hello" }
     y: (_|_){
       // [eval] foo.y: field not allowed:
-      //     ./in.cue:6:19
       //     ./in.cue:10:2
     }
   }
@@ -48,18 +46,17 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,6 @@
+@@ -1,9 +1,5 @@
  Errors:
  foo.y: field not allowed:
 -    ./in.cue:1:7
 -    ./in.cue:3:2
 -    ./in.cue:6:8
 -    ./in.cue:8:6
-+    ./in.cue:6:19
      ./in.cue:10:2
  
  Result:
-@@ -19,10 +16,7 @@
+@@ -19,10 +15,6 @@
      x: (string){ "hello" }
      y: (_|_){
        // [eval] foo.y: field not allowed:
@@ -67,7 +64,6 @@ diff old new
 -      //     ./in.cue:3:2
 -      //     ./in.cue:6:8
 -      //     ./in.cue:8:6
-+      //     ./in.cue:6:19
        //     ./in.cue:10:2
      }
    }

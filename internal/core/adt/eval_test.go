@@ -22,6 +22,8 @@ import (
 	"strings"
 	"testing"
 
+	goruntime "runtime"
+
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue"
@@ -76,60 +78,60 @@ var needFix = map[string]string{
 // counter errors.
 // TODO: These counters should all go to zero.
 var skipDebugDepErrors = map[string]int{
-	"basicrewrite/018_self-reference_cycles":                      3,
-	"cycle/025_cannot_resolve_references_that_would_be_ambiguous": 1,
-	"cycle/051_resolved_self-reference_cycles_with_disjunction":   2,
+	// "basicrewrite/018_self-reference_cycles":                      3,
+	// "cycle/025_cannot_resolve_references_that_would_be_ambiguous": 1,
+	// "cycle/051_resolved_self-reference_cycles_with_disjunction":   2,
 
-	"cycle/052_resolved_self-reference_cycles_with_disjunction_with_defaults": 1,
-	"cycle/builtins": 3,
-	"cycle/issue241": 2,
-	"cycle/issue429": 1,
+	// "cycle/052_resolved_self-reference_cycles_with_disjunction_with_defaults": 1,
+	// "cycle/builtins": 3,
+	// "cycle/issue241": 2,
+	// "cycle/issue429": 1,
 
-	// Some of these counts are related to issue 3750
-	"disjunctions/elimination": 19,
-	"eval/issue2146":           4,
-	"eval/notify":              8,
+	// // Some of these counts are related to issue 3750
+	// "disjunctions/elimination": 19,
+	// "eval/issue2146":           4,
+	// "eval/notify":              8,
 
-	// TODO(issue3750): commented out reflect counts that would be there if we
-	// disabled the counter also for non-disjunctions.
-	"builtins/closed": 6,
-	// "builtins/validators":      1,
-	// "comprehensions/closed":    4,
-	// "comprehensions/issue1732": 8,
-	// "comprehensions/issue287":  3,
-	// "comprehensions/issue3762": 38,
-	"comprehensions/issue843": 1, // 2,
-	// "comprehensions/nested2":  38,
-	// "comprehensions/pushdown": 46,
-	// "cycle/023_reentrance":    1,
-	// "cycle/chain":             2,
-	// "cycle/compbottom2":   44,
-	// "cycle/comprehension": 10,
-	// "cycle/freeze":     27,
-	// "cycle/issue990":   7,
-	"cycle/structural": 4, // 7,
-	// "definitions/037_closing_with_comprehensions": 3,
-	// "definitions/comprehensions": 3,
-	// "disjunctions/elimination":   23, // + 17
-	"disjunctions/errors": 3, // 6,
-	// "disjunctions/operands": 1,
-	// "eval/closedness":       5,
-	// "eval/comprehensions":   13,
-	"eval/disjunctions": 1,
-	// "eval/embed":            1,
-	// "eval/incomplete": 2,
-	// "eval/issue2146":        4, + 3
-	// "eval/issue2235": 43,
-	"eval/counters": 6, // 10,
-	// "eval/let":       4,
-	// "eval/letjoin":   8,
-	// "eval/merge":     14,
-	// "eval/notify":    13, // + 10
-	// "eval/sharing": 2,
-	// "eval/v0.7": 9,
-	// "fulleval/042_cross-dependent_comprehension": 1,
-	// "resolve/038_incomplete_comprehensions":      4,
-	"scalars/embed": 2,
+	// // TODO(issue3750): commented out reflect counts that would be there if we
+	// // disabled the counter also for non-disjunctions.
+	// "builtins/closed": 6,
+	// // "builtins/validators":      1,
+	// // "comprehensions/closed":    4,
+	// // "comprehensions/issue1732": 8,
+	// // "comprehensions/issue287":  3,
+	// // "comprehensions/issue3762": 38,
+	// "comprehensions/issue843": 1, // 2,
+	// // "comprehensions/nested2":  38,
+	// // "comprehensions/pushdown": 46,
+	// // "cycle/023_reentrance":    1,
+	// // "cycle/chain":             2,
+	// // "cycle/compbottom2":   44,
+	// // "cycle/comprehension": 10,
+	// // "cycle/freeze":     27,
+	// // "cycle/issue990":   7,
+	// "cycle/structural": 4, // 7,
+	// // "definitions/037_closing_with_comprehensions": 3,
+	// // "definitions/comprehensions": 3,
+	// // "disjunctions/elimination":   23, // + 17
+	// "disjunctions/errors": 3, // 6,
+	// // "disjunctions/operands": 1,
+	// // "eval/closedness":       5,
+	// // "eval/comprehensions":   13,
+	// "eval/disjunctions": 1,
+	// // "eval/embed":            1,
+	// // "eval/incomplete": 2,
+	// // "eval/issue2146":        4, + 3
+	// // "eval/issue2235": 43,
+	// "eval/counters": 6, // 10,
+	// // "eval/let":       4,
+	// // "eval/letjoin":   8,
+	// // "eval/merge":     14,
+	// // "eval/notify":    13, // + 10
+	// // "eval/sharing": 2,
+	// // "eval/v0.7": 9,
+	// // "fulleval/042_cross-dependent_comprehension": 1,
+	// // "resolve/038_incomplete_comprehensions":      4,
+	// "scalars/embed": 2,
 }
 
 func TestEvalAlpha(t *testing.T) {
@@ -145,7 +147,26 @@ func TestEvalAlpha(t *testing.T) {
 		Sharing: true,
 	}
 
-	var todoAlpha = map[string]string{}
+	var todoAlpha = map[string]string{
+		// "benchmarks/issue1684": "issue 1684",
+		// "cycle/builtins":      "hang",
+		// "cycle/comprehension": "hang",
+		// "cycle/constraints":   "hang",
+		// "cycle/disjunction":   "hang",
+		// "cycle/evaluate":      "hang",
+		// "cycle/inline":        "hang",
+		// "cycle/issue502":      "hang",
+		// "cycle/structural":    "hang",
+		// "eval/counters":       "hang",
+		// "eval/issue545":       "hang",
+		// "eval/notify":         "hang",
+		// "eval/sharing":        "hang",
+		// "export/029":          "hang",
+		// "export/030":          "hang",
+		// "": "hang",
+		// "": "hang",
+		// "": "hang",
+	}
 
 	test := cuetxtar.TxTarTest{
 		Root:     "../../../cue/testdata",
@@ -298,12 +319,12 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, flags cued
 // TestX is for debugging. Do not delete.
 func TestX(t *testing.T) {
 	adt.DebugDeps = true
-	// adt.OpenGraphs = true
+	adt.OpenGraphs = true
 
 	flags := cuedebug.Config{
-		Sharing:    true, // Uncomment to turn sharing off.
-		OpenInline: true,
-		LogEval:    1, // Uncomment to turn logging off
+		Sharing: true, // Uncomment to turn sharing off.
+		// OpenInline: true,
+		LogEval: 1, // Uncomment to turn logging off
 	}
 
 	version := internal.DefaultVersion
@@ -312,10 +333,138 @@ func TestX(t *testing.T) {
 	in := `
 -- cue.mod/module.cue --
 module: "mod.test"
-
 language: version: "v0.9.0"
-
 -- in.cue --
+// import "strings"
+
+
+// definitions/embed
+reclose3: {
+    #Common: Name: string
+	#A: {#Common}
+	#Step: {#Common}
+	x: #A & #Step
+	x: Name: "a"
+}
+
+// // cycle/inline
+// issue3731: full: {
+// 	#Workspace: {
+// 		workspaceA?: {}
+// 		workspaceB?: {}
+// 	}
+// 	#AccountConfig: {
+// 		workspaces: #Workspace
+// 		siblings?: [...string]
+// 	}
+// 	#AccountConfigSub1: {
+// 		#AccountConfig
+// 		workspaces: "workspaceA": {}
+// 	}
+// 	#AccountConfigSub2: {
+// 		#AccountConfig
+// 		workspaces: "workspaceB": {}
+// 	}
+// 	tree: env1: {
+// 		"region1": {
+// 			"env1-r1-account-sub1": #AccountConfigSub1
+// 			"env1-r1-account-sub2-1": #AccountConfigSub2
+// 		}
+// 	}
+// 	#lookupSiblings: {
+// 		envtree: {...}
+// 		out: [
+// 			for region, v in envtree
+// 			for account, config in v
+// 			if config.workspaces."workspaceB" != _|_ { account },
+// 		]
+// 	}
+// 	tree: ENVTREE=env1: [_]: [_]: #AccountConfig & {
+// 		siblings: (#lookupSiblings & {envtree: ENVTREE}).out
+// 	}
+// }
+
+
+// eval/sharing
+// issue3641: simplified: t1: {
+// 	#Context1: ctx: {}
+// 	Context2: ctx: {}
+// 	// Must both refer to #Context1
+// 	#Config1: cfg: #Context1
+// 	#Config3: cfg: #Context1
+// 	Config2: cfg: Context2
+// 	Config: #Config1 & Config2
+// 	// order matters
+// 	out: Config // Indirection necessary.
+// 	out: #Config3
+// }
+// issue3641: simplified: t2: {
+// 	#Context1: ctx: {}
+// 	Context2: ctx: {}
+// 	// Must both refer to #Context1
+// 	#Config1: cfg: #Context1
+// 	#Config3: cfg: #Context1
+// 	Config2: cfg: Context2
+// 	Config: #Config1 & Config2
+// 	// order matters
+// 	out: Config // Indirection necessary.
+// 	out: #Config3
+// }
+// // Variant where sharing is explicitly disabled.
+// issue3641: simplified: t3: {
+// 	#Context1: ctx: {}
+// 	Context2: ctx: {}
+// 	// Must both refer to #Context1
+// 	#Config1: cfg: #Context1
+// 	#Config3: cfg: #Context1
+// 	Config2: cfg: Context2
+// 	Config: #Config1 & Config2
+// 	// order matters
+// 	out: __no_sharing
+// 	out: Config // Indirection necessary.
+// 	out: #Config3
+// }
+
+// #T: [_]: _
+// #T: close({"a": string})
+// x:  #T
+// x: b: "foo"
+
+// a: { #A }
+// a: c: 1
+// #A: b: 1
+
+
+// // Should fail: embed should count
+// #A: {f1: int, f2: int}
+// for k, v in {f3: int} {
+// 	a: #A & {"\(k)": v}
+// }
+
+
+// recloseSimple: {
+// 	#foo: {}
+// 	a: {#foo} & {b: int}
+// }
+
+// #k1: {a: int, b?: int} & #A// & close({a: int})
+// #A: {a: int}
+
+
+// items: #JSONSchemaProps
+// #JSONSchemaProps: {
+//     props?: [string]: #JSONSchemaProps
+
+//     repeat0?: [...#JSONSchemaProps]
+//     repeat1?: [...#JSONSchemaProps]
+//     repeat2?: [...#JSONSchemaProps]
+// }
+// items: {
+//     props: a1: props: a2: props: a3: props: a4: props: a5: {}
+//     props: b1: props: b2: props: b3: props: b4: props: b5: {}
+//     props: c1: props: c2: props: c3: props: c4: props: c5: {}
+// }
+
 	`
 
 	if strings.HasSuffix(strings.TrimSpace(in), ".cue --") {
@@ -330,6 +479,7 @@ language: version: "v0.9.0"
 
 	r := runtime.NewWithSettings(version, flags)
 
+	adt.Main = true
 	v, err := r.Build(nil, instance)
 	if err != nil {
 		t.Fatal(err)
@@ -338,7 +488,17 @@ language: version: "v0.9.0"
 	e := eval.New(r)
 	ctx := e.NewContext(v)
 	ctx.Config = flags
+
+	var memStats goruntime.MemStats
+	goruntime.ReadMemStats(&memStats)
+	allocBytes := memStats.Alloc
+	allocObjects := memStats.Mallocs
+
 	v.Finalize(ctx)
+
+	goruntime.ReadMemStats(&memStats)
+	allocBytes = memStats.Alloc - allocBytes
+	allocObjects = memStats.Mallocs - allocObjects
 
 	out := debug.NodeString(r, v, nil)
 	if adt.OpenGraphs {
@@ -356,7 +516,21 @@ language: version: "v0.9.0"
 
 	t.Error(out)
 
-	t.Log(ctx.Stats())
+	var stats struct {
+		// CUE groups stats obtained from the CUE evaluator.
+		CUE stats.Counts
+
+		// Go groups stats obtained from the Go runtime.
+		Go struct {
+			AllocBytes   uint64
+			AllocObjects uint64
+		}
+	}
+
+	stats.CUE = *ctx.Stats()
+	stats.Go.AllocBytes = allocBytes
+	stats.Go.AllocObjects = allocObjects
+	t.Log(stats)
 }
 
 func BenchmarkUnifyAPI(b *testing.B) {

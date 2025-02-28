@@ -135,7 +135,6 @@ Conjuncts:    268
 Disjuncts:    206
 -- out/evalalpha --
 Errors:
-issue516.x: 2 errors in empty disjunction:
 issue516.x.match: field not allowed:
     ./in.cue:23:5
 issue516.x.match.metrics.foo: field not allowed:
@@ -166,7 +165,9 @@ Result:
         result: (list){
         }
       }, (#struct){
-        result?: (list){
+        result?: (_|_){
+          // [eval] issue570.#DecodeOutput.result: field not allowed:
+          //     ./in.cue:12:3
         }
         error: (string){ string }
       }) }
@@ -183,14 +184,17 @@ Result:
       }, (#struct){
       }) }
     x: (_|_){
-      // [eval] issue516.x: 2 errors in empty disjunction:
-      // issue516.x.match: field not allowed:
-      //     ./in.cue:23:5
-      // issue516.x.match.metrics.foo: field not allowed:
+      // [eval] issue516.x.match.metrics.foo: field not allowed:
       //     ./in.cue:23:21
-      match: (struct){
-        metrics: (struct){
-          foo: (struct){
+      match: (_|_){
+        // [eval] issue516.x.match: field not allowed:
+        //     ./in.cue:23:5
+        metrics: (_|_){
+          // [eval] issue516.x.match.metrics: field not allowed:
+          //     ./in.cue:23:12
+          foo: (_|_){
+            // [eval] issue516.x.match.metrics.foo: field not allowed:
+            //     ./in.cue:23:21
           }
         }
       }
@@ -343,9 +347,9 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,15 +1,10 @@
+@@ -1,15 +1,9 @@
  Errors:
- issue516.x: 2 errors in empty disjunction:
+-issue516.x: 2 errors in empty disjunction:
  issue516.x.match: field not allowed:
 -    ./in.cue:20:6
 -    ./in.cue:22:5
@@ -359,7 +363,7 @@ diff old new
      ./in.cue:3:19
      ./in.cue:12:12
  
-@@ -19,17 +14,12 @@
+@@ -19,17 +13,12 @@
    issue570: (_|_){
      // [eval]
      results: (_|_){
@@ -378,27 +382,48 @@ diff old new
      }
      #Output: (#struct){ |((#struct){
          result: (_){ _ }
-@@ -59,18 +49,10 @@
+@@ -40,7 +29,9 @@
+         result: (list){
+         }
+       }, (#struct){
+-        result?: (list){
++        result?: (_|_){
++          // [eval] issue570.#DecodeOutput.result: field not allowed:
++          //     ./in.cue:12:3
+         }
+         error: (string){ string }
+       }) }
+@@ -57,22 +48,17 @@
+       }, (#struct){
+       }) }
      x: (_|_){
-       // [eval] issue516.x: 2 errors in empty disjunction:
-       // issue516.x.match: field not allowed:
+-      // [eval] issue516.x: 2 errors in empty disjunction:
+-      // issue516.x.match: field not allowed:
 -      //     ./in.cue:20:6
 -      //     ./in.cue:22:5
-       //     ./in.cue:23:5
-       // issue516.x.match.metrics.foo: field not allowed:
+-      //     ./in.cue:23:5
+-      // issue516.x.match.metrics.foo: field not allowed:
 -      //     ./in.cue:19:19
 -      //     ./in.cue:22:5
++      // [eval] issue516.x.match.metrics.foo: field not allowed:
        //     ./in.cue:23:21
--      match: (_|_){
--        // [eval] issue516.x.match: field not allowed:
+       match: (_|_){
+         // [eval] issue516.x.match: field not allowed:
 -        //     ./in.cue:20:6
 -        //     ./in.cue:22:5
--        //     ./in.cue:23:5
-+      match: (struct){
-         metrics: (struct){
-           foo: (struct){
+         //     ./in.cue:23:5
+-        metrics: (struct){
+-          foo: (struct){
++        metrics: (_|_){
++          // [eval] issue516.x.match.metrics: field not allowed:
++          //     ./in.cue:23:12
++          foo: (_|_){
++            // [eval] issue516.x.match.metrics.foo: field not allowed:
++            //     ./in.cue:23:21
            }
-@@ -86,11 +68,11 @@
+         }
+       }
+@@ -86,11 +72,11 @@
    }
    issue2916: (struct){
      b: (struct){
@@ -412,7 +437,7 @@ diff old new
    }
    issue3576: (struct){
      reduced: (struct){
-@@ -136,13 +118,11 @@
+@@ -136,13 +122,11 @@
      reduced: (struct){
        list: (_|_){
          // [incomplete] issue3581.reduced.list: 2 errors in empty disjunction:
@@ -429,7 +454,7 @@ diff old new
        }
        c: (_){ _ }
      }
-@@ -186,7 +166,6 @@
+@@ -186,7 +170,6 @@
        p1: (struct){ |((struct){
            a?: (_|_){
              // [eval] issue3599.reduced.p1.a: conflicting values 2 and 1:
@@ -437,7 +462,7 @@ diff old new
              //     ./issue3599.cue:32:9
              //     ./issue3599.cue:32:11
            }
-@@ -194,7 +173,6 @@
+@@ -194,7 +177,6 @@
            a: (string){ string }
            b?: (_|_){
              // [eval] issue3599.reduced.p1.b: conflicting values 2 and 1:
@@ -445,7 +470,7 @@ diff old new
              //     ./issue3599.cue:32:35
              //     ./issue3599.cue:32:37
            }
-@@ -202,7 +180,6 @@
+@@ -202,7 +184,6 @@
        p2: (struct){ |((struct){
            a?: (_|_){
              // [eval] issue3599.reduced.p2.a: conflicting values 2 and 1:
@@ -453,7 +478,7 @@ diff old new
              //     ./issue3599.cue:37:9
              //     ./issue3599.cue:37:11
            }
-@@ -210,7 +187,6 @@
+@@ -210,7 +191,6 @@
            a: (string){ string }
            b?: (_|_){
              // [eval] issue3599.reduced.p2.b: conflicting values 2 and 1:
@@ -461,7 +486,7 @@ diff old new
              //     ./issue3599.cue:37:35
              //     ./issue3599.cue:37:37
            }
-@@ -221,7 +197,6 @@
+@@ -221,7 +201,6 @@
          a: (int){ 1 }
          let B#1 = (_|_){
            // [eval] issue3599.let.B: conflicting values 2 and 1:

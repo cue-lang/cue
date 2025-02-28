@@ -1282,21 +1282,21 @@ Result:
     embed: (struct){
       t1: (struct){
         a: (_){ matchN(1, (#list){
-            0: (_|_){// >10
+            0: (_|_){// [e]>10
             }
           }) }
         b: (_){ matchN(1, (#list){
-            0: (_|_){// >10
+            0: (_|_){// [e]>10
             }
           }) }
       }
       t2: (struct){
         b: (_){ matchN(1, (#list){
-            0: (_|_){// >10
+            0: (_|_){// [e]>10
             }
           }) }
         a: (_){ matchN(1, (#list){
-            0: (_|_){// >10
+            0: (_|_){// [e]>10
             }
           }) }
       }
@@ -1353,7 +1353,7 @@ Result:
           }
         }) }
       x: (#list){
-        0: (#struct){
+        0: (struct){
           a: (int){ 1 }
         }
       }
@@ -1363,7 +1363,7 @@ Result:
           0: (_|_){// {}
           }
         }) }
-      x: (#struct){
+      x: (struct){
         a: (int){ 1 }
       }
     }
@@ -1621,6 +1621,43 @@ diff old new
          //     ./in.cue:36:38
          //     ./in.cue:39:23
          // match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN): 0 matched, expected 1:
+@@ -373,21 +352,21 @@
+     embed: (struct){
+       t1: (struct){
+         a: (_){ matchN(1, (#list){
+-            0: (_|_){// >10
+-            }
+-          }) }
+-        b: (_){ matchN(1, (#list){
+-            0: (_|_){// >10
+-            }
+-          }) }
+-      }
+-      t2: (struct){
+-        b: (_){ matchN(1, (#list){
+-            0: (_|_){// >10
+-            }
+-          }) }
+-        a: (_){ matchN(1, (#list){
+-            0: (_|_){// >10
++            0: (_|_){// [e]>10
++            }
++          }) }
++        b: (_){ matchN(1, (#list){
++            0: (_|_){// [e]>10
++            }
++          }) }
++      }
++      t2: (struct){
++        b: (_){ matchN(1, (#list){
++            0: (_|_){// [e]>10
++            }
++          }) }
++        a: (_){ matchN(1, (#list){
++            0: (_|_){// [e]>10
+             }
+           }) }
+       }
 @@ -435,10 +414,8 @@
        }
      }
@@ -1634,7 +1671,7 @@ diff old new
        #x: (_){ matchN(1, (#list){
            0: (_|_){// [
              //   {},
-@@ -445,19 +422,8 @@
+@@ -445,18 +422,7 @@
              // ]
            }
          }) }
@@ -1650,21 +1687,10 @@ diff old new
 -        //     ./in.cue:154:5
 -        //     ./in.cue:156:6
 -        //     ./in.cue:157:8
--        0: (struct){
 +      x: (#list){
-+        0: (#struct){
+         0: (struct){
            a: (int){ 1 }
          }
-       }
-@@ -467,7 +433,7 @@
-           0: (_|_){// {}
-           }
-         }) }
--      x: (struct){
-+      x: (#struct){
-         a: (int){ 1 }
-       }
-     }
 @@ -640,8 +606,8 @@
          run?: (string){ string }
        }

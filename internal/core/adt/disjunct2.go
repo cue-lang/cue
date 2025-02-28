@@ -219,25 +219,25 @@ func (n *nodeContext) scheduleDisjunction(d envDisjunct) {
 		n.scheduleTask(handleDisjunctions, nil, nil, CloseInfo{})
 	}
 
-	// ccHole is the closeContext in which the individual disjuncts are
-	// scheduled.
-	ccHole := d.cloneID.cc
+	// // ccHole is the closeContext in which the individual disjuncts are
+	// // scheduled.
+	// ccHole := d.cloneID.cc
 
-	// This counter can be decremented after either a disjunct has been
-	// scheduled in the clone. Note that it will not be closed in the original
-	// as the result will either be an error, a single disjunct, in which
-	// case mergeVertex will override the original value, or multiple disjuncts,
-	// in which case the original is set to the disjunct itself.
-	ccHole.incDisjunct(n.ctx, DISJUNCT)
-	ccHole.holeID = d.holeID
+	// // This counter can be decremented after either a disjunct has been
+	// // scheduled in the clone. Note that it will not be closed in the original
+	// // as the result will either be an error, a single disjunct, in which
+	// // case mergeVertex will override the original value, or multiple disjuncts,
+	// // in which case the original is set to the disjunct itself.
+	// ccHole.incDisjunct(n.ctx, DISJUNCT)
+	// ccHole.holeID = d.holeID
 
 	n.disjunctions = append(n.disjunctions, d)
 
-	n.disjunctCCs = append(n.disjunctCCs, disjunctHole{
-		cc:         ccHole, // this value is cloned in doDisjunct.
-		holeID:     d.holeID,
-		underlying: ccHole,
-	})
+	// n.disjunctCCs = append(n.disjunctCCs, disjunctHole{
+	// 	cc:         ccHole, // this value is cloned in doDisjunct.
+	// 	holeID:     d.holeID,
+	// 	underlying: ccHole,
+	// })
 }
 
 func initArcs(ctx *OpContext, v *Vertex) bool {
@@ -269,6 +269,8 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 		// disjunction list length.
 	}()
 
+	// TODO(perf): check scalar errors so far to avoid unnecessary work.
+
 	a := n.disjunctions
 	n.disjunctions = n.disjunctions[:0]
 
@@ -294,12 +296,12 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 				if h.holeID != a[i].holeID {
 					continue
 				}
-				cc := h.cc
+				// cc := h.cc
 				id := a[i].cloneID
-				id.cc = cc
+				// id.cc = cc
 				c := MakeConjunct(d.env, top, id)
 				n.scheduleConjunct(c, d.cloneID)
-				cc.decDisjunct(n.ctx, DISJUNCT)
+				// cc.decDisjunct(n.ctx, DISJUNCT)
 				break
 			}
 		}
@@ -490,9 +492,6 @@ func (n *nodeContext) collectErrors(dn *envDisjunct) (errs *Bottom) {
 }
 
 func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, hole int) (*nodeContext, *Bottom) {
-	if c.CloseInfo.cc == nil {
-		panic("nil closeContext during init")
-	}
 
 	n.ctx.inDisjunct++
 	defer func() { n.ctx.inDisjunct-- }()
@@ -502,11 +501,7 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, hole i
 
 	oc := newOverlayContext(n.ctx)
 
-	var ccHole *closeContext
-
-	// TODO(perf): resuse buffer, for instance by keeping a buffer handy in oc
-	// and then swapping it with disjunctCCs in the new nodeContext.
-	holes := make([]disjunctHole, 0, len(n.disjunctCCs))
+	// var ccHole *closeContext
 
 	// Complete as much of the pending work of this node and its parent before
 	// copying. Note that once a copy is made, the disjunct is no longer able
@@ -516,31 +511,15 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, hole i
 	// the copied disjunct, but only those notifications not coming from
 	// within the arc itself.
 
-	// Clone the closeContexts of all open disjunctions and dependencies.
-	for _, d := range n.disjunctCCs {
-		// TODO: remove filled holes.
-
-		// Note that the root is already cloned as part of cloneVertex and that
-		// a closeContext corresponding to a disjunction always has a parent.
-		// We therefore do not need to check whether x.parent is nil.
-		o := oc.allocCC(d.cc)
-		if hole == d.holeID {
-			ccHole = o
-			if d.cc.conjunctCount == 0 {
-				panic("unexpected zero conjunctCount")
-			}
-		}
-		holes = append(holes, disjunctHole{o, d.holeID, d.underlying})
-	}
-
-	if ccHole == nil {
-		panic("expected non-nil overlay closeContext")
-	}
-
 	n.scheduler.blocking = n.scheduler.blocking[:0]
 
 	d := oc.cloneRoot(n)
 	d.runMode = mode
+	// d.node.reqDefIDs = append(d.node.reqDefIDs, n.node.reqDefIDs...)
+
+	// if c.CloseInfo.FromDef {
+	// 	d.addType(d.node, c.CloseInfo)
+	// }
 
 	d.defaultMode = combineDefault(m, n.defaultMode)
 
@@ -555,11 +534,11 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, hole i
 	v.status = unprocessed
 
 	d.overlays = n
-	d.disjunctCCs = append(d.disjunctCCs, holes...)
+	// d.disjunctCCs = append(d.disjunctCCs, holes...)
 	d.disjunct = c
-	c.CloseInfo.cc = ccHole
+	// c.CloseInfo.cc = ccHole
 	d.scheduleConjunct(c, c.CloseInfo)
-	ccHole.decDisjunct(n.ctx, DISJUNCT)
+	// ccHole.decDisjunct(n.ctx, DISJUNCT)
 
 	oc.unlinkOverlay()
 
@@ -572,8 +551,13 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, hole i
 	v.unify(n.ctx, allKnown, mode)
 
 	if err := d.getErrorAll(); err != nil && !isCyclePlaceholder(err) {
-		d.free()
+		// d.free()
+		// openDebugGraph(n.ctx, v, fmt.Sprintf("%p lskdfldsjf", v))
+		n.Logf("DISJUNCT FAILED")
 		return nil, err
+	}
+	if mode == finalize {
+		n.Logf("DISJUNCT SUCCEEDED")
 	}
 
 	d.node.DerefDisjunct().state.defaultMode = d.defaultMode
@@ -716,19 +700,22 @@ outer:
 			// it, trading correctness for performance.
 			// If enabled, we would simply "continue" here.
 
-			for i, h := range xn.disjunctCCs {
-				// TODO(perf): only iterate over completed
-				// TODO(evalv3): we now have a double loop to match the
-				// disjunction holes. It should be possible to keep them
-				// aligned and avoid the inner loop.
-				for _, g := range x.disjunctCCs {
-					if h.underlying == g.underlying {
-						x, y := findIntersections(h.cc, x.disjunctCCs[i].cc)
-						if !equalPartialNode(xn.ctx, x, y) {
-							continue outer
-						}
-					}
-				}
+			// for i, h := range xn.disjunctCCs {
+			// 	// TODO(perf): only iterate over completed
+			// 	// TODO(evalv3): we now have a double loop to match the
+			// 	// disjunction holes. It should be possible to keep them
+			// 	// aligned and avoid the inner loop.
+			// 	for _, g := range x.disjunctCCs {
+			// 		if h.underlying == g.underlying {
+			// 			x, y := findIntersections(h.cc, x.disjunctCCs[i].cc)
+			// 			if !equalPartialNode(xn.ctx, x, y) {
+			// 				continue outer
+			// 			}
+			// 		}
+			// 	}
+			// }
+			if !equalPartialNode(xn.ctx, x.node, xn.node) {
+				continue outer
 			}
 			if len(xn.tasks) != xn.taskPos || len(x.tasks) != x.taskPos {
 				if len(xn.tasks) != len(x.tasks) {
@@ -737,7 +724,7 @@ outer:
 			}
 			for i, t := range xn.tasks[xn.taskPos:] {
 				s := x.tasks[i]
-				if s.x != t.x || s.id.cc != t.id.cc {
+				if s.x != t.x {
 					continue outer
 				}
 			}
@@ -763,6 +750,7 @@ outer:
 			xn.defaultMode = isDefault
 		}
 		// TODO: x.free()
+		mergeCloseInfo(xn.node, x.node)
 		return a
 	}
 
@@ -797,13 +785,13 @@ func findIntersections(x, y *closeContext) (cx, cy *closeContext) {
 	return cx, cy
 }
 
-func equalPartialNode(ctx *OpContext, x, y *closeContext) bool {
-	nx := x.src.getState(ctx)
-	ny := y.src.getState(ctx)
+func equalPartialNode(ctx *OpContext, x, y *Vertex) bool {
+	nx := x.state
+	ny := y.state
 
 	if nx == nil && ny == nil {
 		// Both nodes were finalized. We can compare them directly.
-		return Equal(ctx, x.src, y.src, CheckStructural)
+		return Equal(ctx, x, y, CheckStructural)
 	}
 
 	// TODO: process the nodes with allKnown, attemptOnly.
@@ -816,32 +804,36 @@ func equalPartialNode(ctx *OpContext, x, y *closeContext) bool {
 		return false
 	}
 
-	if len(x.Patterns) != len(y.Patterns) {
+	switch cx, cy := x.PatternConstraints, y.PatternConstraints; {
+	case cx == nil && cy == nil:
+	case cx == nil || cy == nil:
 		return false
-	}
-	// Assume patterns are in the same order.
-	for i, p := range x.Patterns {
-		if !Equal(ctx, p, y.Patterns[i], 0) {
+	case len(cx.Pairs) != len(cy.Pairs):
+		return false
+	default:
+		if len(x.PatternConstraints.Pairs) != len(y.PatternConstraints.Pairs) {
 			return false
+		}
+		// Assume patterns are in the same order.
+		for i, p := range x.PatternConstraints.Pairs {
+			if !Equal(ctx, p.Constraint, y.PatternConstraints.Pairs[i].Constraint, 0) {
+				return false
+			}
 		}
 	}
 
-	if !Equal(ctx, x.Expr, y.Expr, 0) {
-		return false
-	}
-
-	if len(x.arcs) != len(y.arcs) {
+	if len(x.Arcs) != len(y.Arcs) {
 		return false
 	}
 
 	// TODO(perf): use merge sort
 outer:
-	for _, a := range x.arcs {
-		for _, b := range y.arcs {
-			if a.root.src.Label != b.root.src.Label {
+	for _, a := range x.Arcs {
+		for _, b := range y.Arcs {
+			if a.Label != b.Label {
 				continue
 			}
-			if !equalPartialNode(ctx, a.dst, b.dst) {
+			if !equalPartialNode(ctx, a, b) {
 				return false
 			}
 			continue outer
@@ -914,12 +906,12 @@ func isEqualNodeValue(x, y *nodeContext) bool {
 		if s.x != t.x {
 			return false
 		}
-		if s.id.cc != t.id.cc {
-			// FIXME: we should compare this too. For this to work we need to
-			// have access to the underlying closeContext, which we do not
-			// have at the moment.
-			// return false
-		}
+		// if s.id.cc != t.id.cc {
+		// 	// FIXME: we should compare this too. For this to work we need to
+		// 	// have access to the underlying closeContext, which we do not
+		// 	// have at the moment.
+		// 	// return false
+		// }
 	}
 
 	return true
@@ -941,4 +933,23 @@ func isEqualValue[P ComparableValue](ctx *OpContext, x, y P) bool {
 	}
 
 	return Equal(ctx, x, y, CheckStructural)
+}
+
+// TODO: export this instead of IsDisjunct
+func (v *Vertex) isDisjunct() bool {
+	for {
+		if v.IsDisjunct {
+			return true
+		}
+		arc, ok := v.BaseValue.(*Vertex)
+		if !ok {
+			return false
+		}
+		v = arc
+	}
+}
+
+func (v *Vertex) IsFromDisjunction() bool {
+	_, ok := v.BaseValue.(*Disjunction)
+	return ok || v.isDisjunct()
 }

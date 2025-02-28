@@ -139,7 +139,7 @@ func cueLocationForRef(s *state, n cue.Value, u *url.URL, schemaRoot *state) (im
 			target, err := lookupJSONPointer(schemaRoot.pos, u.Fragment)
 			if err != nil {
 				if errors.Is(err, errRefNotFound) {
-					return "", cue.Path{}, fmt.Errorf("reference to non-existent schema")
+					return "", cue.Path{}, fmt.Errorf("reference to non-existent schema %q in %#v", u.Fragment, schemaRoot.pos)
 				}
 				return "", cue.Path{}, fmt.Errorf("invalid JSON Pointer: %v", err)
 			}

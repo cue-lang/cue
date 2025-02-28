@@ -122,18 +122,32 @@ func (d *decoder) addImport(n cue.Value, pkg string) *ast.Ident {
 
 func (d *decoder) decode(v cue.Value) *ast.File {
 	var defsRoot cue.Value
+	// docRoot represents the root of the actual data, by contrast
+	// with the "root" value as specified in [Config.Root] which
+	// represents the root of the schemas to be decoded.
+	docRoot := v
 	if d.cfg.Root != "" {
-		defsPath, err := parseRootRef(d.cfg.Root)
+		rootPath, err := parseRootRef(d.cfg.Root)
 		if err != nil {
 			d.errf(cue.Value{}, "invalid Config.Root value %q: %v", d.cfg.Root, err)
 			return nil
 		}
-		defsRoot = v.LookupPath(defsPath)
-		if !defsRoot.Exists() && d.cfg.AllowNonExistentRoot {
-			defsRoot = v.Context().CompileString("{}")
-		} else if defsRoot.Kind() != cue.StructKind {
-			d.errf(defsRoot, "value at path %v must be struct containing definitions but is actually %v", d.cfg.Root, defsRoot)
+		root := v.LookupPath(rootPath)
+		if !root.Exists() && !d.cfg.AllowNonExistentRoot {
+			d.errf(v, "root value at path %v does not exist", rootPath)
 			return nil
+		}
+		if d.cfg.SingleRoot {
+			v = root
+		} else {
+			if !root.Exists() {
+				root = v.Context().CompileString("{}")
+			}
+			if root.Kind() != cue.StructKind {
+				d.errf(root, "value at path %v must be struct containing definitions but is actually %v", d.cfg.Root, root)
+				return nil
+			}
+			defsRoot = root
 		}
 	}
 
@@ -160,7 +174,7 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 				id:            d.rootID,
 			},
 			isRoot: true,
-			pos:    v,
+			pos:    docRoot,
 		}
 
 		if defsRoot.Exists() {

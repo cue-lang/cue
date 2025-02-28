@@ -6,4 +6,4 @@ Test what happens when there's an OpenAPI schema that has no
 -- schema.yaml --
 -- out/decode/extract --
 ERROR:
-value at path #/components/schemas/ must be struct containing definitions but is actually _|_ // field not found: components
+root value at path components.schemas does not exist

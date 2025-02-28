@@ -48,10 +48,14 @@ func parseRootRef(str string) (cue.Path, error) {
 	fragmentParts := slices.Collect(jsonPointerTokens(u.Fragment))
 	var selectors []cue.Selector
 	for _, r := range fragmentParts {
-		// Technically this is incorrect because a numeric
-		// element could also index into a list, but the
-		// resulting CUE path will not allow that.
-		selectors = append(selectors, cue.Str(r))
+		if i, err := strconv.ParseUint(r, 10, 64); err == nil && strconv.FormatUint(i, 10) == r {
+			// Technically this is incorrect because a numeric element
+			// could also be a string selector and the resulting path
+			// will not allow that.
+			selectors = append(selectors, cue.Index(int64(i)))
+		} else {
+			selectors = append(selectors, cue.Str(r))
+		}
 	}
 	return cue.MakePath(selectors...), nil
 }

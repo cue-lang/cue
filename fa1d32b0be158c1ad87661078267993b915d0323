@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "be8c7989_6d0460e3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-02-28T18:12:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9d0721e1_afff529b",
+      "range": {
+        "startLine": 14,
+        "startChar": 31,
+        "endLine": 14,
+        "endChar": 47
+      },
+      "revId": "fa1d32b0be158c1ad87661078267993b915d0323",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8cd986b2_d0c3e88c",
@@ -37,6 +61,24 @@
       "writtenOn": "2025-02-28T15:08:10Z",
       "side": 1,
       "message": "One CRD YAML file can presumably contain multiple jsonschema schema \"roots\", presumably? is that possibly a problem, or would we only ever extract one of them at a time?",
+      "revId": "fa1d32b0be158c1ad87661078267993b915d0323",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c4d8be6_d26592af",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-02-28T18:12:13Z",
+      "side": 1,
+      "message": "We\u0027ll have to deal with that when we come to do CRDs in more detail. For now, this should be sufficient underlying functionality (we can pass each top level value in at a time).",
+      "parentUuid": "8cd986b2_d0c3e88c",
       "revId": "fa1d32b0be158c1ad87661078267993b915d0323",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -64,6 +106,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "680a479f_5a2ac63d",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-02-28T18:12:13Z",
+      "side": 1,
+      "message": "I _think_ it\u0027s OK just to use the absolute statement here, given that we have suitable qualifications in the SingleRoot doc comment.",
+      "parentUuid": "253555a1_33b12ec1",
+      "range": {
+        "startLine": 114,
+        "startChar": 20,
+        "endLine": 114,
+        "endChar": 45
+      },
+      "revId": "fa1d32b0be158c1ad87661078267993b915d0323",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "84e5e73e_1ea815ff",
@@ -77,6 +143,24 @@
       "writtenOn": "2025-02-28T15:08:10Z",
       "side": 1,
       "message": "mention in the commit message how this is related?",
+      "revId": "fa1d32b0be158c1ad87661078267993b915d0323",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4dc200e4_e7ac8e12",
+        "filename": "encoding/jsonschema/ref.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-02-28T18:12:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "84e5e73e_1ea815ff",
       "revId": "fa1d32b0be158c1ad87661078267993b915d0323",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

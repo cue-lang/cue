@@ -31,6 +31,6 @@ cmp stdout expect-stdout
 
 -- expect-stdout --
 a: aaa
-b: bbb
 ab: aaabbb
+b: bbb
 cd: cccddd

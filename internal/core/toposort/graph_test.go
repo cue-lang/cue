@@ -64,14 +64,16 @@ func TestSort(t *testing.T) {
 			expected: []string{b, c, d, a, f, e},
 		},
 		{
-			name:     "simple cycle",
-			inputs:   [][]string{{h, b, a}, {a, b}, {h, c, d}, {d, c}},
-			expected: []string{h, b, a, c, d},
+			name:   "simple cycle",
+			inputs: [][]string{{h, b, a}, {a, b}, {h, c, d}, {d, c}},
+			// 3 SCCs: {h}, {a, b}, and {c,d}.
+			expected: []string{h, a, b, c, d},
 		},
 		{
-			name:     "nested cycles",
-			inputs:   [][]string{{g, b, c}, {e, c, b, d}, {d, f, a, e}, {a, h, f}},
-			expected: []string{g, b, d, f, a, e, c, h},
+			name:   "nested cycles",
+			inputs: [][]string{{g, b, c}, {e, c, b, d}, {d, f, a, e}, {a, h, f}},
+			// 2 SCCs: {g}, and {a,b,c,d,e,f,h}.
+			expected: []string{g, a, b, c, d, e, f, h},
 		},
 		{
 			name: "fully connected 4",
@@ -98,6 +100,34 @@ For permutation: %v
 					}
 				})
 		})
+	}
+}
+
+func TestSortFullyConnected(t *testing.T) {
+	// In a fully connected graph of 12 nodes, there are 119,481,284
+	// cycles. The number of cycles grows with the factorial of the
+	// number of nodes. Any attempt to calculate and analyse the cycles
+	// here takes ~100 seconds at the time of writing.
+	names := strings.Split("abcdefghijkl", "")
+	var inputs [][]string
+	for _, left := range names {
+		for _, right := range names {
+			if left == right {
+				continue
+			}
+			inputs = append(inputs, []string{left, right})
+		}
+	}
+
+	index := runtime.New()
+	features := makeFeatures(index, inputs)
+	graph := buildGraphFromPermutation(features)
+	sortedNames := featuresNames(index, graph.Sort(index))
+	if !slices.Equal(sortedNames, names) {
+		t.Fatalf(`
+       Expected: %v
+            Got: %v`,
+			names, sortedNames)
 	}
 }
 

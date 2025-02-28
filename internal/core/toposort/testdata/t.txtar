@@ -340,8 +340,8 @@ k2: {
 	}
 	i2: {
 		w: _
-		z: 1
 		y: 2
+		z: 1
 	}
 	j: {
 		b: 6
@@ -619,8 +619,8 @@ Not sure what is wrong.
 	}
 	i2: {
 		w: _
-		z: 1
 		y: 2
+		z: 1
 	}
 	j: {
 		b: 6

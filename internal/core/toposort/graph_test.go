@@ -64,14 +64,16 @@ func TestSort(t *testing.T) {
 			expected: []string{b, c, d, a, f, e},
 		},
 		{
-			name:     "simple cycle",
-			inputs:   [][]string{{h, b, a}, {a, b}, {h, c, d}, {d, c}},
-			expected: []string{h, b, a, c, d},
+			name:   "simple cycle",
+			inputs: [][]string{{h, b, a}, {a, b}, {h, c, d}, {d, c}},
+			// 3 SCCs: {h}, {a, b}, and {c,d}.
+			expected: []string{h, a, b, c, d},
 		},
 		{
-			name:     "nested cycles",
-			inputs:   [][]string{{g, b, c}, {e, c, b, d}, {d, f, a, e}, {a, h, f}},
-			expected: []string{g, b, d, f, a, e, c, h},
+			name:   "nested cycles",
+			inputs: [][]string{{g, b, c}, {e, c, b, d}, {d, f, a, e}, {a, h, f}},
+			// 2 SCCs: {g}, and {a,b,c,d,e,f,h}.
+			expected: []string{g, a, b, c, d, e, f, h},
 		},
 		{
 			name: "fully connected 4",

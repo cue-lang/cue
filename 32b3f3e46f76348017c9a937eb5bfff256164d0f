@@ -33,6 +33,24 @@
       "message": "should we clarify how expensive? e.g. the fact that it\u0027s factorial means it can blow up with just a dozen nodes, as your test shows.",
       "revId": "32b3f3e46f76348017c9a937eb5bfff256164d0f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7feac9c9_6a39d02b",
+        "filename": "internal/core/toposort/graph.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-02-28T14:18:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f35c9071_13010c2e",
+      "revId": "32b3f3e46f76348017c9a937eb5bfff256164d0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

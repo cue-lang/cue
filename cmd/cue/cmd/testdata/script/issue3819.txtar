@@ -5,7 +5,6 @@ cmp stdout stdout.golden
 
 # -- evalv3 --
 env CUE_EXPERIMENT=evalv3=1
-env CUE_DEBUG=openinline=0
 exec cue eval -e output main.cue
 cmp stdout stdout.golden
 

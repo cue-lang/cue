@@ -128,6 +128,12 @@ package toposort
 // (including no position) will be treated as explicity unified, and
 // so no weight will be given to their relative position within the
 // Vertex's slice of StructInfos.
+//
+// TODO: Switch if possible to finding if a struct has been unified
+// with a definition and as much as possible taking order from the
+// definition. In order words, if a cycle is only created by edges
+// that come from non-definitions, then we ignore those edges, and
+// thus don't end dealing with a cycle.
 
 import (
 	"fmt"

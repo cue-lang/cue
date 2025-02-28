@@ -40,10 +40,10 @@ graph TD
 {
 	$id:    "tool/http.Do"
 	method: "GET"
-	url:    "https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
 	request: {
 		body: ""
 	}
+	url:    "https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
 	stdout: "foo"
 }
 -- out/run/t1/stats --
@@ -67,9 +67,9 @@ graph TD
 	$id: "tool/exec.Run"
 	cmd: "go run cuelang.org/go/cmd/cue import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue"
 	env: {} | []
-	stdout:      "foo"
 	stderr:      null
 	stdin:       GET.response.body & (*null | string | bytes)
+	stdout:      "foo"
 	success:     bool
 	mustSucceed: true
 

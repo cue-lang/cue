@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a630fafc_a560e3f9",
+        "filename": "cmd/cue/cmd/refactor_imports.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-28T10:32:33Z",
+      "side": 0,
+      "message": "did you mean to remove this example?",
+      "revId": "a0c6dfeb45535f87f9dae70d8b9cec9e8f10e67e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

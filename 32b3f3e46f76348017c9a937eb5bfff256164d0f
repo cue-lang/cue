@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbdb0c90_00db3630",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-28T14:01:35Z",
+      "side": 1,
+      "message": "can you briefly mention in the commit message whether the ordering changes in our tests and generated configs are expected and acceptable?\n\nI\u0027d also make a brief mention about whether we expect most third party projects to see any ordering changes from this change, or if we think they might be large/noisy.",
+      "revId": "32b3f3e46f76348017c9a937eb5bfff256164d0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f35c9071_13010c2e",
+        "filename": "internal/core/toposort/graph.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-28T14:01:35Z",
+      "side": 1,
+      "message": "should we clarify how expensive? e.g. the fact that it\u0027s factorial means it can blow up with just a dozen nodes, as your test shows.",
+      "revId": "32b3f3e46f76348017c9a937eb5bfff256164d0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

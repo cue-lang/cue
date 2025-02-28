@@ -113,7 +113,7 @@ type Config struct {
 	// JSON reference of location containing schemas. The empty string indicates
 	// that there is a single schema at the root. If this is non-empty,
 	// the referred-to location should be an object, and each member
-	// is taken to be a schema.
+	// is taken to be a schema (by default: see [Config.SingleRoot])
 	//
 	// Examples:
 	//  "#/" or "#"                    top-level fields are schemas.
@@ -123,6 +123,11 @@ type Config struct {
 	// schema: this behavior is preserved for backwards compatibility
 	// only. Just `#` is preferred.
 	Root string
+
+	// SingleRoot is consulted only when Root is non-empty.
+	// If Root is non-empty and SingleRoot is true, then
+	// Root should specify the location of a single schema to extract.
+	SingleRoot bool
 
 	// AllowNonExistentRoot prevents an error when there is no value at
 	// the above Root path. Such an error can be useful to signal that

@@ -1,0 +1,35 @@
+#root: #/spec/versions/0/schema/openAPIV3Schema
+#singleRoot
+
+-- schema.yaml --
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+spec:
+  group: example.io
+  scope: Namespaced
+  versions:
+    - name: v2
+      schema:
+        openAPIV3Schema:
+          description: Something about a CRD.
+          type: object
+          properties:
+            foo:
+              description: description of foo
+              type: string
+            bar:
+              description: description of bar
+              allOf:
+                - $ref: '#/spec/versions/0/schema/openAPIV3Schema/properties/foo'
+-- out/decode/extract --
+// Something about a CRD.
+// description of foo
+foo?: _#defs."/spec/versions/0/schema/openAPIV3Schema/properties/foo"
+
+// description of bar
+bar?: _#defs."/spec/versions/0/schema/openAPIV3Schema/properties/foo"
+
+// description of foo
+_#defs: "/spec/versions/0/schema/openAPIV3Schema/properties/foo": string
+...

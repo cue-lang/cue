@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a528ac73_236bbf72",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-28T13:00:42Z",
+      "side": 1,
+      "message": "Can we add a regression test that shows the worst case scenario here, e.g. a test that would take 5s before the fix, and milliseconds after the fix? With the added bonus that you can explain the perf benefit in terms of the test in the commit message.\n\nI know that a slow/fast test is not perfect, as it won\u0027t directly fail if we become slow again, but it\u0027s definitely better than nothing - and a very slow test is likely to be spotted sooner than later.",
+      "revId": "2c7b623e3c210d7c2a7fd875ba4a767cbe2f29e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

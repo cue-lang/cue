@@ -42,8 +42,8 @@ func NewFieldTester(r Runtime) *FieldTester {
 	return &FieldTester{
 		OpContext: ctx,
 		n:         n,
-		cc:        v.rootCloseContext(ctx),
-		Root:      v,
+		// cc:        v.rootCloseContext(ctx),
+		Root: v,
 	}
 }
 

@@ -53,7 +53,7 @@ Disjuncts:    17
   #B: (#struct){
     a: (int){ int }
   }
-  y: (#struct){
+  y: (struct){
     c: (int){ int }
     a: (int){ int }
   }
@@ -76,9 +76,10 @@ diff old new
    #B: (#struct){
      a: (int){ int }
    }
-   y: (#struct){
+-  y: (#struct){
 -    a: (int){ int }
 -    c: (int){ int }
++  y: (struct){
 +    c: (int){ int }
 +    a: (int){ int }
    }

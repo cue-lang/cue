@@ -47,13 +47,16 @@ Conjuncts:    69
 Disjuncts:    46
 -- out/evalalpha --
 Errors:
-eliminated.x: 2 errors in empty disjunction:
+eliminated.x: 3 errors in empty disjunction:
 eliminated.x: conflicting values null and {} (mismatched types null and struct):
     ./in.cue:21:10
     ./in.cue:22:5
 eliminated.x.n: field not allowed:
-    ./in.cue:23:5
+    ./in.cue:22:14
     ./in.cue:23:16
+eliminated.x: cannot combine regular field "n" with null:
+    ./in.cue:23:19
+    ./in.cue:22:5
 
 Result:
 (_|_){
@@ -75,27 +78,32 @@ Result:
     #empty: (#struct){
     }
     x: (_|_){
-      // [eval] eliminated.x: 2 errors in empty disjunction:
+      // [eval] eliminated.x: 3 errors in empty disjunction:
       // eliminated.x: conflicting values null and {} (mismatched types null and struct):
       //     ./in.cue:21:10
       //     ./in.cue:22:5
       // eliminated.x.n: field not allowed:
-      //     ./in.cue:23:5
+      //     ./in.cue:22:14
       //     ./in.cue:23:16
+      // eliminated.x: cannot combine regular field "n" with null:
+      //     ./in.cue:23:19
+      //     ./in.cue:22:5
       n: (_|_){
         // [eval] eliminated.x.n: field not allowed:
-        //     ./in.cue:23:5
         //     ./in.cue:23:16
       }
     }
     out: (_|_){
-      // [eval] eliminated.x: 2 errors in empty disjunction:
+      // [eval] eliminated.x: 3 errors in empty disjunction:
       // eliminated.x: conflicting values null and {} (mismatched types null and struct):
       //     ./in.cue:21:10
       //     ./in.cue:22:5
       // eliminated.x.n: field not allowed:
-      //     ./in.cue:23:5
+      //     ./in.cue:22:14
       //     ./in.cue:23:16
+      // eliminated.x: cannot combine regular field "n" with null:
+      //     ./in.cue:23:19
+      //     ./in.cue:22:5
     }
   }
   simplified: (struct){
@@ -119,21 +127,28 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,9 @@
+@@ -1,13 +1,14 @@
  Errors:
- eliminated.x: 2 errors in empty disjunction:
+-eliminated.x: 2 errors in empty disjunction:
 -eliminated.x: conflicting values null and {n:3} (mismatched types null and struct):
-+eliminated.x: conflicting values null and {} (mismatched types null and struct):
-+    ./in.cue:21:10
-     ./in.cue:22:5
+-    ./in.cue:22:5
 -    ./in.cue:23:14
- eliminated.x.n: field not allowed:
--    ./in.cue:21:10
--    ./in.cue:22:14
-     ./in.cue:23:5
+-eliminated.x.n: field not allowed:
++eliminated.x: 3 errors in empty disjunction:
++eliminated.x: conflicting values null and {} (mismatched types null and struct):
+     ./in.cue:21:10
++    ./in.cue:22:5
++eliminated.x.n: field not allowed:
+     ./in.cue:22:14
+-    ./in.cue:23:5
      ./in.cue:23:16
++eliminated.x: cannot combine regular field "n" with null:
++    ./in.cue:23:19
++    ./in.cue:22:5
  
-@@ -21,13 +19,7 @@
+ Result:
+ (_|_){
+@@ -21,13 +22,7 @@
        }
      }
      out: (#list){
@@ -148,46 +163,60 @@ diff old new
      }
    }
    eliminated: (_|_){
-@@ -36,18 +28,14 @@
+@@ -35,33 +30,32 @@
+     #empty: (#struct){
      }
      x: (_|_){
-       // [eval] eliminated.x: 2 errors in empty disjunction:
+-      // [eval] eliminated.x: 2 errors in empty disjunction:
 -      // eliminated.x: conflicting values null and {n:3} (mismatched types null and struct):
 -      //     ./in.cue:22:5
 -      //     ./in.cue:23:14
 -      // eliminated.x.n: field not allowed:
 -      //     ./in.cue:21:10
 -      //     ./in.cue:22:14
+-      //     ./in.cue:23:5
+-      //     ./in.cue:23:16
++      // [eval] eliminated.x: 3 errors in empty disjunction:
 +      // eliminated.x: conflicting values null and {} (mismatched types null and struct):
 +      //     ./in.cue:21:10
 +      //     ./in.cue:22:5
 +      // eliminated.x.n: field not allowed:
-       //     ./in.cue:23:5
-       //     ./in.cue:23:16
++      //     ./in.cue:22:14
++      //     ./in.cue:23:16
++      // eliminated.x: cannot combine regular field "n" with null:
++      //     ./in.cue:23:19
++      //     ./in.cue:22:5
        n: (_|_){
          // [eval] eliminated.x.n: field not allowed:
 -        //     ./in.cue:21:10
 -        //     ./in.cue:22:14
-         //     ./in.cue:23:5
+-        //     ./in.cue:23:5
          //     ./in.cue:23:16
        }
-@@ -54,12 +42,10 @@
      }
      out: (_|_){
-       // [eval] eliminated.x: 2 errors in empty disjunction:
+-      // [eval] eliminated.x: 2 errors in empty disjunction:
 -      // eliminated.x: conflicting values null and {n:3} (mismatched types null and struct):
 -      //     ./in.cue:22:5
 -      //     ./in.cue:23:14
 -      // eliminated.x.n: field not allowed:
 -      //     ./in.cue:21:10
 -      //     ./in.cue:22:14
+-      //     ./in.cue:23:5
+-      //     ./in.cue:23:16
++      // [eval] eliminated.x: 3 errors in empty disjunction:
 +      // eliminated.x: conflicting values null and {} (mismatched types null and struct):
 +      //     ./in.cue:21:10
 +      //     ./in.cue:22:5
 +      // eliminated.x.n: field not allowed:
-       //     ./in.cue:23:5
-       //     ./in.cue:23:16
++      //     ./in.cue:22:14
++      //     ./in.cue:23:16
++      // eliminated.x: cannot combine regular field "n" with null:
++      //     ./in.cue:23:19
++      //     ./in.cue:22:5
      }
+   }
+   simplified: (struct){
 -- diff/todo/p3 --
 Small differences in error output.
 -- out/eval --

@@ -25,6 +25,8 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
+var Main bool
+
 // Assert panics if the condition is false. Assert can be used to check for
 // conditions that are considers to break an internal variant or unexpected
 // condition, but that nonetheless probably will be handled correctly down the

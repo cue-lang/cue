@@ -150,10 +150,10 @@ func (n *nodeContext) insertComprehension(
 		}
 	}
 
-	if ec.done && len(ec.envs) == 0 {
-		n.decComprehension(c)
-		return
-	}
+	// if ec.done && len(ec.envs) == 0 {
+	// 	// n.decComprehension(c)
+	// 	return
+	// }
 
 	x := c.Value
 
@@ -179,7 +179,7 @@ func (n *nodeContext) insertComprehension(
 					Clauses: c.Clauses,
 					Value:   f,
 					arcType: f.ArcType, // TODO: can be derived, remove this field.
-					cc:      ci.cc,
+					// cc:      ci.cc,
 
 					comp:   ec,
 					parent: c,
@@ -189,9 +189,9 @@ func (n *nodeContext) insertComprehension(
 				conjunct := MakeConjunct(env, c, ci)
 				if n.ctx.isDevVersion() {
 					n.assertInitialized()
-					_, c.arcCC = n.insertArcCC(f.Label, ArcPending, conjunct, conjunct.CloseInfo, false)
-					c.cc = ci.cc
-					ci.cc.incDependent(n.ctx, COMP, c.arcCC)
+					n.insertArcCC(f.Label, ArcPending, conjunct, conjunct.CloseInfo, false)
+					// c.cc = ci.cc
+					// ci.cc.incDependent(n.ctx, COMP, c.arcCC)
 				} else {
 					n.insertFieldUnchecked(f.Label, ArcPending, conjunct)
 				}
@@ -414,20 +414,20 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 	// NOTE: we cannot move this to defer in processComprehensionInner, as we
 	// use panics to implement "yielding" (and possibly coroutines in the
 	// future).
-	n.decComprehension(d.leaf)
+	// n.decComprehension(d.leaf)
 
 	return err
 }
 
-func (n *nodeContext) decComprehension(p *Comprehension) {
-	for ; p != nil; p = p.parent {
-		cc := p.cc
-		if cc != nil {
-			cc.decDependent(n.ctx, COMP, p.arcCC)
-		}
-		p.cc = nil
-	}
-}
+// func (n *nodeContext) decComprehension(p *Comprehension) {
+// 	for ; p != nil; p = p.parent {
+// 		cc := p.cc
+// 		if cc != nil {
+// 			cc.decDependent(n.ctx, COMP, p.arcCC)
+// 		}
+// 		p.cc = nil
+// 	}
+// }
 
 func (n *nodeContext) processComprehensionInner(d *envYield, state vertexStatus) *Bottom {
 	ctx := n.ctx

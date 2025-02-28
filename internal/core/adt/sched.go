@@ -630,14 +630,14 @@ func (s *scheduler) insertTask(t *task) {
 	}
 
 	s.incrementCounts(completes)
-	if cc := t.id.cc; cc != nil {
-		// may be nil for "group" tasks, such as processLists.
-		dep := cc.incDependent(t.node.ctx, TASK, nil)
-		if dep != nil {
-			dep.taskID = len(s.tasks)
-			dep.task = t
-		}
-	}
+	// if cc := t.id.cc; cc != nil {
+	// 	// may be nil for "group" tasks, such as processLists.
+	// 	dep := cc.incDependent(t.node.ctx, TASK, nil)
+	// 	if dep != nil {
+	// 		dep.taskID = len(s.tasks)
+	// 		dep.task = t
+	// 	}
+	// }
 	s.tasks = append(s.tasks, t)
 
 	// Sort by priority. This code is optimized for the case that there are
@@ -659,9 +659,9 @@ func runTask(t *task, mode runMode) {
 	if t.defunct {
 		if t.state != taskCANCELLED {
 			t.state = taskCANCELLED
-			if t.id.cc != nil {
-				t.id.cc.decDependent(t.node.ctx, TASK, nil)
-			}
+			// if t.id.cc != nil {
+			// 	t.id.cc.decDependent(t.node.ctx, TASK, nil)
+			// }
 		}
 		return
 	}
@@ -706,7 +706,7 @@ func runTask(t *task, mode runMode) {
 		// This is done to avoid struct args from passing fields up.
 		// Use [task.updateCI] to get the current CloseInfo with this field
 		// restored.
-		id.cc = nil
+		// id.cc = nil
 		s := ctx.PushConjunct(MakeConjunct(t.env, t.x, id))
 		defer ctx.PopState(s)
 	}
@@ -732,9 +732,9 @@ func runTask(t *task, mode runMode) {
 		// TODO: do not add both context and task errors. Do something more
 		// principled.
 		t.node.addBottom(t.err)
-		if t.id.cc != nil {
-			t.id.cc.decDependent(ctx, TASK, nil)
-		}
+		// if t.id.cc != nil {
+		// 	t.id.cc.decDependent(ctx, TASK, nil)
+		// }
 		t.node.decrementCounts(t.completes)
 		t.completes = 0 // safety
 	}
@@ -743,7 +743,7 @@ func runTask(t *task, mode runMode) {
 // updateCI stitches back the closeContext that more removed from the CloseInfo
 // before in the given CloseInfo.
 func (t *task) updateCI(ci CloseInfo) CloseInfo {
-	ci.cc = t.id.cc
+	// ci.cc = t.id.cc
 	return ci
 }
 

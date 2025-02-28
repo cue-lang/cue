@@ -142,7 +142,10 @@ Result:
     w: (_|_){
       // [eval] b.w.c: field not allowed:
       //     ./in.cue:11:6
-      c: (int){ int }
+      c: (_|_){
+        // [eval] b.w.c: field not allowed:
+        //     ./in.cue:11:6
+      }
     }
   }
   #R: (#struct){
@@ -195,26 +198,25 @@ diff old new
          //     ./in.cue:5:6
        }
        a: (int){ int }
-@@ -37,17 +28,8 @@
+@@ -37,17 +28,11 @@
      // [eval]
      w: (_|_){
        // [eval] b.w.c: field not allowed:
 -      //     ./in.cue:8:12
 -      //     ./in.cue:10:4
        //     ./in.cue:11:6
--      c: (_|_){
--        // [eval] b.w.c: field not allowed:
+       c: (_|_){
+         // [eval] b.w.c: field not allowed:
 -        //     ./in.cue:8:12
 -        //     ./in.cue:8:23
 -        //     ./in.cue:10:4
--        //     ./in.cue:11:6
--      }
+         //     ./in.cue:11:6
+       }
 -      b: (int){ int }
-+      c: (int){ int }
      }
    }
    #R: (#struct){
-@@ -60,9 +42,6 @@
+@@ -60,9 +45,6 @@
          // [eval]
          d: (_|_){
            // [eval] c.w.0.d: field not allowed:

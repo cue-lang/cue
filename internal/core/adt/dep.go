@@ -242,7 +242,7 @@ func (c *closeContext) incDependent(ctx *OpContext, kind depKind, dependant *clo
 	debug = c.addDependent(ctx, kind, dependant)
 
 	if c.done {
-		openDebugGraph(ctx, c, "incDependent: already checked")
+		// openDebugGraph(ctx, c, "incDependent: already checked")
 
 		panic(fmt.Sprintf("incDependent: already closed: %p", c))
 	}
@@ -316,24 +316,24 @@ func (c *closeContext) decDependentNoMatch(ctx *OpContext, kind depKind, dependa
 
 // breakIncomingNotifications walks over incoming arcs and forces any remaining
 // work to be done.
-func (n *nodeContext) breakIncomingNotifications(mode runMode) {
-	v := n.node
-	// TODO: replace with something more principled that does not piggyback on
-	// debug information.
-	for _, r := range v.cc().externalDeps {
-		if r.kind != NOTIFY {
-			continue
-		}
-		src := r.src
-		a := &src.notify[r.index]
-		if a.decremented {
-			continue
-		}
-		if n := src.src.getState(n.ctx); n != nil {
-			n.completeNodeTasks(mode)
-		}
-	}
-}
+// func (n *nodeContext) breakIncomingNotifications(mode runMode) {
+// 	v := n.node
+// 	// TODO: replace with something more principled that does not piggyback on
+// 	// debug information.
+// 	for _, r := range v.cc().externalDeps {
+// 		if r.kind != NOTIFY {
+// 			continue
+// 		}
+// 		src := r.src
+// 		a := &src.notify[r.index]
+// 		if a.decremented {
+// 			continue
+// 		}
+// 		if n := src.src.getState(n.ctx); n != nil {
+// 			n.completeNodeTasks(mode)
+// 		}
+// 	}
+// }
 
 // breakIncomingDeps breaks all incoming dependencies, which includes arcs and
 // pending notifications and attempts all remaining work.
@@ -341,46 +341,46 @@ func (n *nodeContext) breakIncomingNotifications(mode runMode) {
 // We should only break incoming dependencies if we are finalizing nodes, as
 // breaking them earlier can cause a "already closed" panic. To make sure of
 // this, we force the caller to pass mode.
-func (n *nodeContext) breakIncomingDeps(mode runMode) {
-	if mode != finalize {
-		return
-	}
+// func (n *nodeContext) breakIncomingDeps(mode runMode) {
+// 	if mode != finalize {
+// 		return
+// 	}
 
-	defer n.ctx.Un(n.ctx.Indentf(n.node, "(%v)", mode))
+// 	defer n.ctx.Un(n.ctx.Indentf(n.node, "(%v)", mode))
 
-	// TODO: remove this block in favor of finalizing notification nodes,
-	// or what have you. We have patched this to skip evaluating when using
-	// disjunctions, but this is overall a brittle approach.
-	for _, r := range n.node.cc().externalDeps {
-		src := r.src
-		switch r.kind {
-		case ARC:
-			a := &src.arcs[r.index]
-			if a.decremented {
-				continue
-			}
-			a.decremented = true
+// 	// TODO: remove this block in favor of finalizing notification nodes,
+// 	// or what have you. We have patched this to skip evaluating when using
+// 	// disjunctions, but this is overall a brittle approach.
+// 	for _, r := range n.node.cc().externalDeps {
+// 		src := r.src
+// 		switch r.kind {
+// 		case ARC:
+// 			a := &src.arcs[r.index]
+// 			if a.decremented {
+// 				continue
+// 			}
+// 			a.decremented = true
 
-			src.src.unify(n.ctx, needTasksDone, attemptOnly)
+// 			src.src.unify(n.ctx, needTasksDone, attemptOnly)
 
-			// TODO(issue3750): when "forking" disjunctions, a node may be
-			// forked again if the parent node has not completed yet. In this
-			// case we cannot "break" incoming arc dependencies. We complete any
-			// outstanding work, but, for now, we disable decrementing the
-			// counter. Note that this _may_ result in closedness issues.
-			//
-			if n.ctx.inDisjunct == 0 {
-				a.dst.decDependent(n.ctx, ARC, src)
-			}
-		case NOTIFY:
-			a := &src.notify[r.index]
-			if a.decremented {
-				continue
-			}
-			a.decremented = true
+// 			// TODO(issue3750): when "forking" disjunctions, a node may be
+// 			// forked again if the parent node has not completed yet. In this
+// 			// case we cannot "break" incoming arc dependencies. We complete any
+// 			// outstanding work, but, for now, we disable decrementing the
+// 			// counter. Note that this _may_ result in closedness issues.
+// 			//
+// 			if n.ctx.inDisjunct == 0 {
+// 				a.dst.decDependent(n.ctx, ARC, src)
+// 			}
+// 		case NOTIFY:
+// 			a := &src.notify[r.index]
+// 			if a.decremented {
+// 				continue
+// 			}
+// 			a.decremented = true
 
-			src.src.unify(n.ctx, needTasksDone, attemptOnly)
-			a.dst.decDependent(n.ctx, NOTIFY, src)
-		}
-	}
-}
+// 			src.src.unify(n.ctx, needTasksDone, attemptOnly)
+// 			a.dst.decDependent(n.ctx, NOTIFY, src)
+// 		}
+// 	}
+// }

@@ -348,7 +348,7 @@ func processListVertex(c *OpContext, t *task, mode runMode) {
 			continue
 		}
 		for _, c := range a.Conjuncts {
-			c.CloseInfo.cc = t.id.cc
+			// c.CloseInfo.cc = t.id.cc
 			n.insertArc(a.Label, ArcMember, c, t.id, true)
 		}
 	}

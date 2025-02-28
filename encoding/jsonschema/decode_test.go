@@ -98,10 +98,14 @@ func TestDecode(t *testing.T) {
 				cfg.DefaultVersion = vers
 			}
 		}
+		if root, ok := t.Value("root"); ok {
+			cfg.Root = root
+		}
 		cfg.Strict = t.HasTag("strict")
 		cfg.StrictKeywords = cfg.StrictKeywords || t.HasTag("strictKeywords")
 		cfg.AllowNonExistentRoot = t.HasTag("allowNonExistentRoot")
 		cfg.StrictFeatures = t.HasTag("strictFeatures")
+		cfg.SingleRoot = t.HasTag("singleRoot")
 		cfg.PkgName, _ = t.Value("pkgName")
 
 		ctx := t.CueContext()

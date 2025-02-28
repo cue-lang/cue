@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7633e124_866d09b2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-02-28T11:53:30Z",
+      "side": 1,
+      "message": "I\u0027ve clarified the semantics a bit more in the updated commit message, as discussed.",
+      "parentUuid": "1cc0b7d2_957a54fe",
+      "revId": "03e824941ec6893a20c56090c5dea85b24179256",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1f77e343_60f171ac",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "74d3f299_4e27bbe1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-02-28T11:53:30Z",
+      "side": 1,
+      "message": "as above.",
+      "parentUuid": "1f77e343_60f171ac",
+      "revId": "03e824941ec6893a20c56090c5dea85b24179256",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a81ec673_ba5d2019",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-02-28T11:21:51Z",
       "side": 1,
       "message": "Do we need/want a test with the equivalent of `foo.example/b` as the old import path? i.e. without the major version specified?",
+      "revId": "03e824941ec6893a20c56090c5dea85b24179256",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "26213609_9859fd8c",
+        "filename": "cmd/cue/cmd/testdata/script/refactorimports_multiplemajor.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-02-28T11:53:30Z",
+      "side": 1,
+      "message": "Yeah, good idea. Done.",
+      "parentUuid": "a81ec673_ba5d2019",
       "revId": "03e824941ec6893a20c56090c5dea85b24179256",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

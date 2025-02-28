@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d0721e1_afff529b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-28T15:08:10Z",
+      "side": 1,
+      "message": "\"might reference\", or \"might have references\"?",
+      "range": {
+        "startLine": 14,
+        "startChar": 31,
+        "endLine": 14,
+        "endChar": 47
+      },
+      "revId": "fa1d32b0be158c1ad87661078267993b915d0323",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8cd986b2_d0c3e88c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-28T15:08:10Z",
+      "side": 1,
+      "message": "One CRD YAML file can presumably contain multiple jsonschema schema \"roots\", presumably? is that possibly a problem, or would we only ever extract one of them at a time?",
+      "revId": "fa1d32b0be158c1ad87661078267993b915d0323",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "253555a1_33b12ec1",
+        "filename": "encoding/jsonschema/jsonschema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-28T15:08:10Z",
+      "side": 1,
+      "message": "should we say something like \"and SingleRoot is ignored, assumed to be true\"?",
+      "range": {
+        "startLine": 114,
+        "startChar": 20,
+        "endLine": 114,
+        "endChar": 45
+      },
+      "revId": "fa1d32b0be158c1ad87661078267993b915d0323",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84e5e73e_1ea815ff",
+        "filename": "encoding/jsonschema/ref.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-02-28T15:08:10Z",
+      "side": 1,
+      "message": "mention in the commit message how this is related?",
+      "revId": "fa1d32b0be158c1ad87661078267993b915d0323",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

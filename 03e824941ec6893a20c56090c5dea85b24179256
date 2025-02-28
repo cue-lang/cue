@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1cc0b7d2_957a54fe",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-02-28T11:21:51Z",
+      "side": 1,
+      "message": "Per my comment last night, I don\u0027t know how this can be the case. Because `cue refactor imports` works with naked `k8s.io`. Because in that situation, there is no module at all. So I think this comment needs to explain the caveat for k8s.io assuming there is one. Especially given that\u0027s a key part of what we\u0027re doing in the examples etc.",
+      "revId": "03e824941ec6893a20c56090c5dea85b24179256",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f77e343_60f171ac",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-02-28T11:21:51Z",
+      "side": 1,
+      "message": "I\u0027m not quite sure I follow this comment either. At least it doesn\u0027t appear to cover the case that triggered this change in the first place: namely where the old import path is a prefix of a (number of) module(s).",
+      "revId": "03e824941ec6893a20c56090c5dea85b24179256",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a81ec673_ba5d2019",
+        "filename": "cmd/cue/cmd/testdata/script/refactorimports_multiplemajor.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-02-28T11:21:51Z",
+      "side": 1,
+      "message": "Do we need/want a test with the equivalent of `foo.example/b` as the old import path? i.e. without the major version specified?",
+      "revId": "03e824941ec6893a20c56090c5dea85b24179256",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

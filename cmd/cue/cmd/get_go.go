@@ -433,13 +433,12 @@ func (e *extractor) addPackage(p *packages.Package) {
 
 func (e *extractor) recordTypeInfo(p *packages.Package) {
 	for _, f := range p.Syntax {
-		ast.Inspect(f, func(n ast.Node) bool {
+		for n := range ast.Preorder(f) {
 			switch n := n.(type) {
 			case *ast.StructType:
 				e.orig[p.TypesInfo.TypeOf(n)] = n
 			}
-			return true
-		})
+		}
 	}
 }
 

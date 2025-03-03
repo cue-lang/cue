@@ -141,11 +141,7 @@ func Repeat(x []cue.Value, count int) ([]cue.Value, error) {
 	if count < 0 {
 		return nil, fmt.Errorf("negative count")
 	}
-	var a []cue.Value
-	for range count {
-		a = append(a, x...)
-	}
-	return a, nil
+	return slices.Repeat(x, count), nil
 }
 
 // Concat takes a list of lists and concatenates them.
@@ -319,12 +315,7 @@ outer:
 // Contains reports whether v is contained in a. The value must be a
 // comparable value.
 func Contains(a []cue.Value, v cue.Value) bool {
-	for _, w := range a {
-		if v.Equals(w) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(a, v.Equals)
 }
 
 // MatchN is a validator that checks that the number of elements in the given

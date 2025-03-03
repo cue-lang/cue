@@ -297,7 +297,7 @@ func Upgrade[V comparable](target V, reqs UpgradeReqs[V], upgrade ...V) ([]V, er
 	for _, m := range list {
 		pathInList[reqs.Path(m)] = true
 	}
-	list = append([]V(nil), list...)
+	list = slices.Clone(list)
 
 	upgradeTo := make(map[string]string, len(upgrade))
 	for _, u := range upgrade {

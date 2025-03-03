@@ -16,6 +16,24 @@
       "message": "Thank you so much for this patch! Indeed the bug seems valid and I think your fix is correct.\n\nI had some thoughts in terms of how to make the code a bit cleaner, and to write a commit message which was a bit more detailed. Rather than leave a review on Gerrit with twelve comments, I thought that doing a second patchset with my attempt at the fix would be easier.\n\nWhat do you think? Please feel free to do one more patchset if you would like to do more tweaks, or don\u0027t like something I did here.",
       "revId": "4841a0cb40bd7d30795bcacd0f32fbcb99e79cc4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bee516b8_32f9b16c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037721
+      },
+      "writtenOn": "2025-03-03T04:22:28Z",
+      "side": 1,
+      "message": "Looks much better! Thank you for the review.",
+      "parentUuid": "33d27bae_eeee323f",
+      "revId": "4841a0cb40bd7d30795bcacd0f32fbcb99e79cc4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

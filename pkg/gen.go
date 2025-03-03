@@ -314,7 +314,7 @@ var (
 
 func (g *generator) genFunc(fn *types.Func) {
 	g.nonConcrete = false
-	sign := fn.Type().(*types.Signature)
+	sign := fn.Signature()
 	if sign.Recv() != nil {
 		return
 	}

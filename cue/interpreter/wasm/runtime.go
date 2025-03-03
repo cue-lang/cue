@@ -15,6 +15,7 @@
 package wasm
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"os"
@@ -183,11 +184,11 @@ func (m *memory) Bytes() []byte {
 	m.i.mu.Lock()
 	defer m.i.mu.Unlock()
 
-	bytes, ok := m.i.instance.Memory().Read(m.ptr, m.len)
+	p, ok := m.i.instance.Memory().Read(m.ptr, m.len)
 	if !ok {
 		panic(fmt.Sprintf("can't read %d bytes from Wasm address %#x", m.len, m.ptr))
 	}
-	return append([]byte{}, bytes...)
+	return bytes.Clone(p)
 }
 
 // WriteAt writes p at the given relative offset within m.

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d69932f8_0b94122e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-03T11:51:01Z",
+      "side": 1,
+      "message": "Please add a TODO somewhere that we still should fall back to schema order.\nBasically, when a definition is unified with non-definitions, these non-definitions should not influence the order of the definition. It is probably fine to say we have lexicographical fallback if we unify two schema (so not with embedding). Although even there, if one fully defines the fields of the other, and not vice versa, it should win.",
+      "revId": "aead9f9a2545c740e7f34adbdb88a2ba33594955",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

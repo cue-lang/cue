@@ -414,7 +414,7 @@ func (f *File) Pos(offset int, rel RelPos) Pos {
 // f.Offset(f.Pos(offset)) == offset.
 func (f *File) Offset(p Pos) int {
 	x := p.index()
-	if x < 1 || x > 1+index(f.size) {
+	if x < 1 || x > 1+f.size {
 		panic("illegal Pos value")
 	}
 	return int(x - 1)
@@ -436,7 +436,7 @@ func searchLineInfos(a []lineInfo, x int) int {
 func (f *File) unpack(offset index, adjusted bool) (filename string, line, column int) {
 	filename = f.name
 	if i := searchInts(f.lines, offset); i >= 0 {
-		line, column = int(i+1), int(offset-f.lines[i]+1)
+		line, column = i+1, int(offset-f.lines[i]+1)
 	}
 	if adjusted && len(f.infos) > 0 {
 		// almost no files have extra line infos

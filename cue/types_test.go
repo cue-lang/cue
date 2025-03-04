@@ -421,7 +421,7 @@ func TestInt(t *testing.T) {
 
 			vu, err := n.Uint64()
 			checkErr(t, err, tc.errU, "Uint64")
-			if vu != uint64(tc.uint) {
+			if vu != tc.uint {
 				t.Errorf("Uint64: got %v; want %v", vu, tc.uint)
 			}
 		})

@@ -83,7 +83,7 @@ func expectedErrors(t *testing.T, file *token.File, src []byte) map[token.Pos]st
 				if s[1] == "HERE" {
 					pos = here
 				}
-				errors[pos] = string(s[2])
+				errors[pos] = s[2]
 			}
 		default:
 			prev = pos

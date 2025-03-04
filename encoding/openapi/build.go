@@ -257,7 +257,7 @@ func (b *builder) fillSchema(v cue.Value) *ast.StructLit {
 	}
 
 	schema := b.finish()
-	s := (*ast.StructLit)(schema)
+	s := schema
 
 	simplify(b, s)
 
@@ -529,7 +529,7 @@ func (b *builder) disjunction(a []cue.Value, f typeFunc) {
 		c := newOASBuilder(b)
 		c.value(v, f)
 		t := c.finish()
-		schemas[i] = (*ast.StructLit)(t)
+		schemas[i] = t
 		if len(t.Elts) == 0 {
 			if c.typ == "" {
 				return
@@ -1207,7 +1207,7 @@ func (b *builder) add(t *ast.StructLit) {
 func (b *builder) addConjunct(f func(*builder)) {
 	c := newOASBuilder(b)
 	f(c)
-	b.add((*ast.StructLit)(c.finish()))
+	b.add(c.finish())
 }
 
 func (b *builder) addRef(v cue.Value, inst cue.Value, ref cue.Path) {

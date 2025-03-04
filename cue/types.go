@@ -1095,7 +1095,7 @@ func (v Value) checkKind(ctx *adt.OpContext, want adt.Kind) *adt.Bottom {
 
 func makeInt(v Value, x int64) Value {
 	n := &adt.Num{K: adt.IntKind}
-	n.X.SetInt64(int64(x))
+	n.X.SetInt64(x)
 	return remakeFinal(v, n)
 }
 

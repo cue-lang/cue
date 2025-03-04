@@ -127,8 +127,7 @@ func (s *state) resolveURI(n cue.Value) *url.URL {
 		return u
 	}
 
-	// TODO(go1.23) use ResolveReference directly.
-	return resolveReference(s.schemaRoot().id, u)
+	return s.schemaRoot().id.ResolveReference(u)
 }
 
 // schemaRoot returns the state for the nearest enclosing

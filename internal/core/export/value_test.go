@@ -110,8 +110,8 @@ func TestValueX(t *testing.T) {
 	a := cuetxtar.Load(archive, t.TempDir())
 
 	r := runtime.New()
-	(*runtime.Runtime)(r).SetVersion(internal.DevVersion)
-	(*runtime.Runtime)(r).SetDebugOptions(&cuedebug.Config{Sharing: true})
+	r.SetVersion(internal.DevVersion)
+	r.SetDebugOptions(&cuedebug.Config{Sharing: true})
 
 	v, errs := compile.Files(nil, r, "", a[0].Files...)
 	if errs != nil {

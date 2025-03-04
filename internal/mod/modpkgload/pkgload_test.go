@@ -88,7 +88,7 @@ func TestLoadPackages(t *testing.T) {
 						}
 					}
 				}
-				if diff := cmp.Diff(string(want), out.String()); diff != "" {
+				if diff := cmp.Diff(want, out.String()); diff != "" {
 					t.Logf("actual result:\n%s", out.String())
 					t.Fatalf("unexpected results (-want +got):\n%s", diff)
 				}

@@ -31,7 +31,7 @@ func (e *exporter) stringLabel(f adt.Feature) ast.Label {
 	x := f.Index()
 	switch f.Typ() {
 	case adt.IntLabel:
-		return ast.NewLit(token.INT, strconv.Itoa(int(x)))
+		return ast.NewLit(token.INT, strconv.Itoa(x))
 
 	case adt.DefinitionLabel, adt.HiddenLabel, adt.HiddenDefinitionLabel:
 		s := e.identString(f)

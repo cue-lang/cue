@@ -44,7 +44,7 @@ func (c *compiler) label(n ast.Node) adt.Feature {
 				return adt.InvalidLabel
 			}
 
-			i := int64(index.StringToIndex(norm.NFC.String(s)))
+			i := index.StringToIndex(norm.NFC.String(s))
 			f, err := adt.MakeLabel(n, i, adt.StringLabel)
 			if err != nil {
 				c.errf(n, msg, err)

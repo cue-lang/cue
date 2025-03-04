@@ -94,7 +94,6 @@ func TestScript(t *testing.T) {
 		RequireUniqueNames:  true,
 		Setup: func(env *testscript.Env) error {
 			env.Setenv("CUE_CACHED_GOBIN", os.Getenv("CUE_CACHED_GOBIN"))
-			env.Setenv("CUE_REGISTRY_TOKEN", os.Getenv("CUE_REGISTRY_TOKEN"))
 
 			// Just like cmd/cue/cmd.TestScript, set up separate cache and config dirs per test.
 			env.Setenv("CUE_CACHE_DIR", filepath.Join(env.WorkDir, "tmp/cachedir"))

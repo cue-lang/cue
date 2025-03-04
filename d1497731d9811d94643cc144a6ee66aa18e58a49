@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "998c4280_327b475e",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 436,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-04T12:41:34Z",
+      "side": 1,
+      "message": "Nice. TIL about this new API.",
+      "revId": "d1497731d9811d94643cc144a6ee66aa18e58a49",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

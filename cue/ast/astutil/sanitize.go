@@ -347,7 +347,7 @@ func (z *sanitizer) uniqueName(base string, hidden bool) string {
 
 	const mask = 0xff_ffff_ffff_ffff // max bits; stay clear of int64 overflow
 	const shift = 4                  // rate of growth
-	for n := int64(0x10); ; n = int64(mask&((n<<shift)-1)) + 1 {
+	for n := int64(0x10); ; n = mask&((n<<shift)-1) + 1 {
 		num := z.rand.Intn(int(n))
 		name := fmt.Sprintf("%s_%01X", base, num)
 		if !z.names[name] {

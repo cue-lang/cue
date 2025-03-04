@@ -35,19 +35,19 @@ func Valid(s string) error {
 // encoding: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.
 func Parse(s string) (string, error) {
 	x, err := uuid.Parse(s)
-	return string(x.String()), err
+	return x.String(), err
 }
 
 // TODO(mvdan): what is ToString meant to do? it appears like a no-op?
 
 // String represents a 128-bit UUID value as a string.
 func ToString(x string) string {
-	return string(x)
+	return x
 }
 
 // URN reports the canonical URN of a UUID.
 func URN(x string) (string, error) {
-	u, err := uuid.Parse(string(x))
+	u, err := uuid.Parse(x)
 	if err != nil {
 		return "", err
 	}
@@ -66,7 +66,7 @@ func FromInt(i *big.Int) (string, error) {
 		b = buf[:]
 	}
 	u, err := uuid.FromBytes(b)
-	return string(u.String()), err
+	return u.String(), err
 }
 
 // ToInt represents a UUID string as a 128-bit value.
@@ -78,7 +78,7 @@ func ToInt(x string) *big.Int {
 
 // Variant reports the UUID variant.
 func Variant(x string) (int, error) {
-	u, err := uuid.Parse(string(x))
+	u, err := uuid.Parse(x)
 	if err != nil {
 		return 0, err
 	}
@@ -87,7 +87,7 @@ func Variant(x string) (int, error) {
 
 // Version reports the UUID version.
 func Version(x string) (int, error) {
-	u, err := uuid.Parse(string(x))
+	u, err := uuid.Parse(x)
 	if err != nil {
 		return 0, err
 	}
@@ -96,19 +96,19 @@ func Version(x string) (int, error) {
 
 // SHA1 generates a version 5 UUID based on the supplied name space and data.
 func SHA1(space string, data []byte) (string, error) {
-	u, err := uuid.Parse(string(space))
+	u, err := uuid.Parse(space)
 	if err != nil {
 		return "", err
 	}
-	return string(uuid.NewSHA1(u, data).String()), nil
+	return uuid.NewSHA1(u, data).String(), nil
 }
 
 // MD5 generates a version 3 UUID based on the supplied name space and data.
 // Use SHA1 instead if you can.
 func MD5(space string, data []byte) (string, error) {
-	u, err := uuid.Parse(string(space))
+	u, err := uuid.Parse(space)
 	if err != nil {
 		return "", err
 	}
-	return string(uuid.NewMD5(u, data).String()), nil
+	return uuid.NewMD5(u, data).String(), nil
 }

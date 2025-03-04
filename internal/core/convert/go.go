@@ -344,7 +344,7 @@ func (c *goConverter) convertRec(nilIsTop bool, x interface{}) (result adt.Value
 	case int32:
 		return c.toInt(int64(v))
 	case int64:
-		return c.toInt(int64(v))
+		return c.toInt(v)
 	case uint:
 		return c.toUint(uint64(v))
 	case uint8:
@@ -354,7 +354,7 @@ func (c *goConverter) convertRec(nilIsTop bool, x interface{}) (result adt.Value
 	case uint32:
 		return c.toUint(uint64(v))
 	case uint64:
-		return c.toUint(uint64(v))
+		return c.toUint(v)
 	case uintptr:
 		return c.toUint(uint64(v))
 	case float64:

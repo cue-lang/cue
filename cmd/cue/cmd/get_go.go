@@ -249,13 +249,13 @@ type extractor struct {
 	done    map[string]bool
 
 	// per package
+	pkg      *packages.Package
 	orig     map[types.Type]*ast.StructType
 	usedPkgs map[string]bool
+	consts   map[string][]string
 
 	// per file
 	cmap     ast.CommentMap
-	pkg      *packages.Package
-	consts   map[string][]string
 	pkgNames map[string]pkgInfo
 
 	exclusions []*regexp.Regexp
@@ -1040,13 +1040,14 @@ func (e *extractor) makeType(typ types.Type) (result cueast.Expr) {
 	switch typ := types.Unalias(typ).(type) {
 	case *types.Named:
 		obj := typ.Obj()
-		if obj.Pkg() == nil {
+		pkg := obj.Pkg()
+		if pkg == nil {
 			return e.ident("_", false)
 		}
 		// Check for builtin packages.
 		switch {
-		case obj.Pkg().Path() == "time" && obj.Name() == "Time":
-			ref := e.ident(e.pkgNames[obj.Pkg().Path()].name, false)
+		case pkg.Path() == "time" && obj.Name() == "Time":
+			ref := e.ident(e.pkgNames[pkg.Path()].name, false)
 			var name *cueast.Ident
 			if ref.Name != "time" {
 				name = e.ident(ref.Name, false)
@@ -1054,7 +1055,7 @@ func (e *extractor) makeType(typ types.Type) (result cueast.Expr) {
 			ref.Node = cueast.NewImport(name, "time")
 			return cueast.NewSel(ref, obj.Name())
 
-		case obj.Pkg().Path() == "time" && obj.Name() == "Duration":
+		case pkg.Path() == "time" && obj.Name() == "Duration":
 			// Go's time.Duration is an int64 to represent nanoseconds,
 			// and even though most Go users would find the string representation
 			// like "3s" or "40m" most reasonable and readable for constant values,
@@ -1072,22 +1073,27 @@ func (e *extractor) makeType(typ types.Type) (result cueast.Expr) {
 			// and constants like '300 | *"300ns"' to support both at the same time?
 			return e.ident("int", false)
 
-		case obj.Pkg().Path() == "math/big" && obj.Name() == "Int":
+		case pkg.Path() == "math/big" && obj.Name() == "Int":
 			return e.ident("int", false)
 
 		default:
-			if !strings.ContainsAny(obj.Pkg().Path(), ".") {
-				// Drop any standard library type if they haven't been handled
-				// above.
-				// TODO: Doc?
+			// Any Go standard library type that hasn't been handled above is not supported;
+			// fall back to whatever alternative type we can, or just "top".
+			// Otherwise we would end up generating "std" packages which clash with our
+			// own standard library, for example cue.mod/gen/time.
+			// TODO: for cases where the Go std type could be supported, we could still generate
+			// and import it under a non-std CUE package, such as cue.mod/gen/pkg.go.dev/time.
+			// TODO: Doc?
+			if !strings.ContainsAny(pkg.Path(), ".") {
 				if s := e.altType(obj.Type()); s != nil {
 					return s
 				}
+				return e.ident("_", false)
 			}
 		}
 
 		result = e.ident(obj.Name(), true)
-		if pkg := obj.Pkg(); pkg != nil && pkg != e.pkg.Types {
+		if pkg != e.pkg.Types {
 			info := e.pkgNames[pkg.Path()]
 			if info.name == "" {
 				info.name = pkg.Name()

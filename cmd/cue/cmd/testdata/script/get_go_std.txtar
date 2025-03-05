@@ -5,14 +5,13 @@ exec cue get go --local
 cmp src_go_gen.cue src_go_gen.cue.golden
 
 # Check which files were generated under cue.mod/gen and other directories.
-# TODO: we should be generating zero "std" packages under cue.mod/gen.
 find-files cue.mod
 cmp stdout cue-mod-files
+# We cannot generate any std packages under cue.mod/gen either.
+! stdout '^cue.mod/gen/[^.]+/'
 
 # Verify that the result can be loaded correctly.
-# TODO: this should succeed, not fail.
-! exec cue vet -c=false
-cmp stderr vet.stderr
+exec cue vet -c=false
 
 -- go.mod --
 module mod.test
@@ -37,8 +36,9 @@ type Root struct {
 	ReflectValue reflect.Value
 
 	// reflect.ValueError is an example of a struct made up of simple types,
-	// in this case a Method string and a Kind uint. We could generate that structure,
-	// as long as we don't place it in cue.mod/pkg/reflect, conflicting with CUE's own std.
+	// in this case a Method string and a Kind uint.
+	// TODO: generate that structure as long as we don't place it in cue.mod/pkg/reflect,
+	// which conflicts with CUE's own std.
 	ReflectValueError reflect.ValueError
 
 	// io.Writer is an interface, so there is no structure to be generated.
@@ -47,6 +47,8 @@ type Root struct {
 
 	// time.Month is just an int type, but this edge case is particularly interesting
 	// given that CUE already has a "time" package with e.g. Duration and Time, but no Month.
+	// TODO: generate that structure as long as we don't place it in cue.mod/pkg/reflect,
+	// which conflicts with CUE's own std, or generate "int" directly.
 	TimeMonth time.Month
 }
 -- src_go_gen.cue.golden --
@@ -56,55 +58,25 @@ type Root struct {
 
 package x
 
-import (
-	"reflect"
-	"io"
-	"time"
-)
-
 #Root: {
 	// reflect types and values in Go are opaque and do not encode as useful JSON.
-	ReflectType: reflect.#Type
+	ReflectType: _ @go(,reflect.Type)
 
 	// reflect.ValueError is an example of a struct made up of simple types,
-	// in this case a Method string and a Kind uint. We could generate that structure,
-	// as long as we don't place it in cue.mod/pkg/reflect, conflicting with CUE's own std.
-	ReflectValueError: reflect.#ValueError
+	// in this case a Method string and a Kind uint.
+	// TODO: generate that structure as long as we don't place it in cue.mod/pkg/reflect,
+	// which conflicts with CUE's own std.
+	ReflectValueError: _ @go(,reflect.ValueError)
 
 	// io.Writer is an interface, so there is no structure to be generated.
 	// Moreover, even though "io" is a very common Go package, CUE has no such package.
-	IoWriter: io.#Writer
+	IoWriter: _ @go(,io.Writer)
 
 	// time.Month is just an int type, but this edge case is particularly interesting
 	// given that CUE already has a "time" package with e.g. Duration and Time, but no Month.
-	TimeMonth: time.#Month
+	// TODO: generate that structure as long as we don't place it in cue.mod/pkg/reflect,
+	// which conflicts with CUE's own std, or generate "int" directly.
+	TimeMonth: _ @go(,time.Month)
 }
 -- cue-mod-files --
-cue.mod/gen/internal/abi/abi_amd64_go_gen.cue
-cue.mod/gen/internal/abi/abi_go_gen.cue
-cue.mod/gen/internal/abi/iface_go_gen.cue
-cue.mod/gen/internal/abi/map_noswiss_go_gen.cue
-cue.mod/gen/internal/abi/map_select_swiss_go_gen.cue
-cue.mod/gen/internal/abi/map_swiss_go_gen.cue
-cue.mod/gen/internal/abi/rangefuncconsts_go_gen.cue
-cue.mod/gen/internal/abi/runtime_go_gen.cue
-cue.mod/gen/internal/abi/stack_go_gen.cue
-cue.mod/gen/internal/abi/switch_go_gen.cue
-cue.mod/gen/internal/abi/symtab_go_gen.cue
-cue.mod/gen/internal/abi/type_go_gen.cue
-cue.mod/gen/io/io_go_gen.cue
-cue.mod/gen/io/multi_go_gen.cue
-cue.mod/gen/reflect/abi_go_gen.cue
-cue.mod/gen/reflect/map_swiss_go_gen.cue
-cue.mod/gen/reflect/type_go_gen.cue
-cue.mod/gen/reflect/value_go_gen.cue
-cue.mod/gen/time/format_go_gen.cue
-cue.mod/gen/time/time_go_gen.cue
-cue.mod/gen/time/zoneinfo_go_gen.cue
-cue.mod/gen/time/zoneinfo_read_go_gen.cue
 cue.mod/module.cue
--- vet.stderr --
-builtin package "reflect" undefined:
-    ./src_go_gen.cue:8:2
-builtin package "io" undefined:
-    ./src_go_gen.cue:9:2

@@ -1081,10 +1081,19 @@ func (e *extractor) makeType(typ types.Type) (result cueast.Expr) {
 			// fall back to whatever alternative type we can, or just "top".
 			// Otherwise we would end up generating "std" packages which clash with our
 			// own standard library, for example cue.mod/gen/time.
+			//
+			// Go defines standard library as "no dot in the first path element",
+			// such that "foo/bar.baz" is still technically part of the standard library.
+			// Note that "example" and "test" are reserved for users in Go, such that "test/foo"
+			// is not part of Go's standard library, but such exceptions do not exist in CUE.
+			// TODO: never place such packages under e.g. cue.mod/gen/example, as that clashes
+			// with CUE's own standard library namespace at the moment.
+			//
 			// TODO: for cases where the Go std type could be supported, we could still generate
 			// and import it under a non-std CUE package, such as cue.mod/gen/pkg.go.dev/time.
 			// TODO: Doc?
-			if !strings.ContainsAny(pkg.Path(), ".") {
+			firstElem, _, _ := strings.Cut(pkg.Path(), "/")
+			if !strings.ContainsAny(firstElem, ".") {
 				if s := e.altType(obj.Type()); s != nil {
 					return s
 				}

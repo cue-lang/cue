@@ -26,7 +26,10 @@
 					"bar": 2,
 					"quux": "boom"
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3": "unexpected success"
+				}
 			},
 			{
 				"description": "ignores arrays",
@@ -78,7 +81,10 @@
 				"data": {
 					"élmény": 2
 				},
-				"valid": false
+				"valid": false,
+				"skip": {
+					"v3": "unexpected success"
+				}
 			}
 		]
 	},

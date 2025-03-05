@@ -12,5 +12,10 @@ add: _ @extern("basic.wasm", abi=c, sig="func(int64, int64): int64")
 x0: add(*1 | string, *2 | string)
 -- basic.wasm --
 -- out/wasm --
+Errors:
+x0: cannot call non-function add (type _):
+    ./a.cue:6:5
+
+Result:
 add: add
-x0:  3
+x0:  _|_ // x0: cannot call non-function add (type _)

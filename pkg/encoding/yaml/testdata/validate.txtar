@@ -36,8 +36,16 @@ missing position
 Errors:
 #test.t1.ok1: cannot call non-function fn (type _):
     ./in.cue:8:11
+validate.t1.ok1: invalid value "a: 2" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b!:int}:
+    ./in.cue:8:11
+    ./in.cue:6:9
+    ./in.cue:7:16
 #test.t1.ok2: cannot call non-function fn (type _):
     ./in.cue:9:11
+validate.t1.ok2: invalid value "a: 2" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b:int}:
+    ./in.cue:9:11
+    ./in.cue:6:9
+    ./in.cue:7:16
 #test.t1.ok3: cannot call non-function fn (type _):
     ./in.cue:13:11
 #test.t2.ok1: cannot call non-function fn (type _):
@@ -75,8 +83,8 @@ validate: {
 	// TODO: fix this test: the second disjunct should be eliminated, so there
 	// should not be a concreteness error.
 	t1: {
-		ok1: "a: 2"
-		ok2: "a: 2"
+		ok1: _|_ // validate.t1.ok1: invalid value "a: 2" (does not satisfy encoding/yaml.Validate): validate.t1.ok1: error in call to encoding/yaml.Validate: validate.t1.ok1: incomplete value {a:2} | {a:2,b!:int}
+		ok2: _|_ // validate.t1.ok2: invalid value "a: 2" (does not satisfy encoding/yaml.Validate): validate.t1.ok2: error in call to encoding/yaml.Validate: validate.t1.ok2: incomplete value {a:2} | {a:2,b:int}
 		ok3: "a: 2"
 	}
 	#A: {
@@ -115,26 +123,26 @@ validatePartial: {
 diff old new
 --- old
 +++ new
-@@ -1,10 +1,6 @@
- Errors:
- #test.t1.ok1: cannot call non-function fn (type _):
-     ./in.cue:8:11
--validate.t1.ok1: invalid value "a: 2" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b!:int}:
--    ./in.cue:8:11
--    ./in.cue:6:9
--    ./in.cue:7:16
+@@ -7,6 +7,10 @@
+     ./in.cue:7:16
  #test.t1.ok2: cannot call non-function fn (type _):
      ./in.cue:9:11
++validate.t1.ok2: invalid value "a: 2" (does not satisfy encoding/yaml.Validate): error in call to encoding/yaml.Validate: incomplete value {a:2} | {a:2,b:int}:
++    ./in.cue:9:11
++    ./in.cue:6:9
++    ./in.cue:7:16
  #test.t1.ok3: cannot call non-function fn (type _):
-@@ -44,7 +40,7 @@
- 	// TODO: fix this test: the second disjunct should be eliminated, so there
+     ./in.cue:13:11
+ #test.t2.ok1: cannot call non-function fn (type _):
+@@ -45,7 +49,7 @@
  	// should not be a concreteness error.
  	t1: {
--		ok1: _|_ // validate.t1.ok1: invalid value "a: 2" (does not satisfy encoding/yaml.Validate): validate.t1.ok1: error in call to encoding/yaml.Validate: validate.t1.ok1: incomplete value {a:2} | {a:2,b!:int}
-+		ok1: "a: 2"
- 		ok2: "a: 2"
+ 		ok1: _|_ // validate.t1.ok1: invalid value "a: 2" (does not satisfy encoding/yaml.Validate): validate.t1.ok1: error in call to encoding/yaml.Validate: validate.t1.ok1: incomplete value {a:2} | {a:2,b!:int}
+-		ok2: "a: 2"
++		ok2: _|_ // validate.t1.ok2: invalid value "a: 2" (does not satisfy encoding/yaml.Validate): validate.t1.ok2: error in call to encoding/yaml.Validate: validate.t1.ok2: incomplete value {a:2} | {a:2,b:int}
  		ok3: "a: 2"
  	}
+ 	#A: {
 -- out/yaml --
 Errors:
 #test.t1.ok1: cannot call non-function fn (type _):

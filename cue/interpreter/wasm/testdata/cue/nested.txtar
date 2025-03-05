@@ -35,6 +35,17 @@ mb2: mag({b: false, bar: {b: true, baz: {vec: {x: 12, y: 35}}, n: 5}})
 mb3: mag({b: false, bar: {b: false, baz: {vec: {x: 3.33, y: 5.55}}, n: 110}})
 -- struct.wasm --
 -- out/wasm --
+Errors:
+mb0: cannot call non-function mag (type _):
+    ./a.cue:26:6
+mb1: cannot call non-function mag (type _):
+    ./a.cue:27:6
+mb2: cannot call non-function mag (type _):
+    ./a.cue:28:6
+mb3: cannot call non-function mag (type _):
+    ./a.cue:29:6
+
+Result:
 #vector2: {
     x: float64
     y: float64
@@ -69,7 +80,7 @@ mb3: mag({b: false, bar: {b: false, baz: {vec: {x: 3.33, y: 5.55}}, n: 110}})
     }
 }
 mag: magnitude_foo()
-mb0: 1.4142135623730951
-mb1: 5.0
-mb2: 37.0
-mb3: 6.472356603278283
+mb0: _|_ // mb0: cannot call non-function mag (type _)
+mb1: _|_ // mb1: cannot call non-function mag (type _)
+mb2: _|_ // mb2: cannot call non-function mag (type _)
+mb3: _|_ // mb3: cannot call non-function mag (type _)

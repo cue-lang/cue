@@ -1,8 +1,8 @@
 -- out/modfetch --
 {
-	"foo.com/bar/hello@v0": "v0.2.3"
 	"bar.com@v0":           "v0.5.0"
 	"baz.org@v0":           "v0.10.1"
+	"foo.com/bar/hello@v0": "v0.2.3"
 	main:                   "main"
 	"example.com@v0":       "v0.0.1"
 }

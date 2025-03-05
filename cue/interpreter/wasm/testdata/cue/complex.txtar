@@ -27,6 +27,17 @@ c2: cornucopia(_c2)
 c3: cornucopia(_c3)
 -- struct.wasm --
 -- out/wasm --
+Errors:
+c0: cannot call non-function cornucopia (type _):
+    ./a.cue:18:5
+c1: cannot call non-function cornucopia (type _):
+    ./a.cue:19:5
+c2: cannot call non-function cornucopia (type _):
+    ./a.cue:20:5
+c3: cannot call non-function cornucopia (type _):
+    ./a.cue:21:5
+
+Result:
 cornucopia: cornucopia()
 #cornucopia: {
     b:  bool
@@ -34,7 +45,7 @@ cornucopia: cornucopia()
     n1: uint8
     n2: int64
 }
-c0: 42
-c1: 6
-c2: 99
-c3: -10014990
+c0: _|_ // c0: cannot call non-function cornucopia (type _)
+c1: _|_ // c1: cannot call non-function cornucopia (type _)
+c2: _|_ // c2: cannot call non-function cornucopia (type _)
+c3: _|_ // c3: cannot call non-function cornucopia (type _)

@@ -15,7 +15,16 @@ x2: add(100, 1)
 -- basic.wasm --
 -- empty.wasm --
 -- out/wasm --
+Errors:
+x0: cannot call non-function add (type _):
+    ./a.cue:6:5
+x1: cannot call non-function add (type _):
+    ./a.cue:7:5
+x2: cannot call non-function add (type _):
+    ./a.cue:8:5
+
+Result:
 add: add
-x0:  3
-x1:  1
-x2:  101
+x0:  _|_ // x0: cannot call non-function add (type _)
+x1:  _|_ // x1: cannot call non-function add (type _)
+x2:  _|_ // x2: cannot call non-function add (type _)

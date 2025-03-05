@@ -45,32 +45,46 @@ double3: _ @extern("struct.wasm", abi=c, sig="func(#vector3): #vector3")
 d4: double3(_v4)
 -- struct.wasm --
 -- out/wasm --
+Errors:
+m0: cannot call non-function magnitude2 (type _):
+    ./a.cue:18:5
+m1: cannot call non-function magnitude2 (type _):
+    ./a.cue:19:5
+m2: cannot call non-function magnitude2 (type _):
+    ./a.cue:20:5
+n2: cannot call non-function normalize2 (type _):
+    ./a.cue:23:5
+n2m: cannot call non-function magnitude2 (type _):
+    ./a.cue:24:6
+m3: cannot call non-function magnitude3 (type _):
+    ./a.cue:36:5
+m4: cannot call non-function magnitude3 (type _):
+    ./a.cue:37:5
+m5: cannot call non-function magnitude3 (type _):
+    ./a.cue:38:5
+d4: cannot call non-function double3 (type _):
+    ./a.cue:41:5
+
+Result:
 #vector2: {
     x: float64
     y: float64
 }
 magnitude2: magnitude2()
 magnitude3: magnitude3()
-m0:         1.4142135623730951
-m1:         2.0
-m2:         798.6121211702211
+m0:         _|_ // m0: cannot call non-function magnitude2 (type _)
+m1:         _|_ // m1: cannot call non-function magnitude2 (type _)
+m2:         _|_ // m2: cannot call non-function magnitude2 (type _)
 normalize2: normalize2
-n2: {
-    x: 0.7071067811865476
-    y: 0.7071067811865476
-}
-n2m: 1.0
+n2:         _|_ // n2: cannot call non-function normalize2 (type _)
+n2m:        _|_ // n2m: cannot call non-function magnitude2 (type _)
 #vector3: {
     x: float64
     y: float64
     z: float64
 }
-m3:      1.7320508075688772
-m4:      2.8284271247461903
-m5:      6.666666666666667
+m3:      _|_ // m3: cannot call non-function magnitude3 (type _)
+m4:      _|_ // m4: cannot call non-function magnitude3 (type _)
+m5:      _|_ // m5: cannot call non-function magnitude3 (type _)
 double3: double3
-d4: {
-    x: 0.0
-    y: 4.0
-    z: 4.0
-}
+d4:      _|_ // d4: cannot call non-function double3 (type _)

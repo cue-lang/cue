@@ -1976,14 +1976,14 @@ diff old new
 +Disjuncts:    22
 -- out/eval/stats --
 Leaks:  17
-Freed:  474
-Reused: 467
+Freed:  476
+Reused: 469
 Allocs: 24
 Retain: 104
 
-Unifications: 475
+Unifications: 477
 Conjuncts:    756
-Disjuncts:    548
+Disjuncts:    550
 -- diff/todo/p2 --
 provideIncompleteSuccess.t2.a.c.d: missing error: probably correct.
    A bit esoteric, but should probably work.

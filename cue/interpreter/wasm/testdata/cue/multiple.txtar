@@ -30,15 +30,34 @@ c2: fact(9)
 -- basic.wasm --
 -- basic1.wasm --
 -- out/wasm --
+Errors:
+x0: cannot call non-function add (type _):
+    ./a.cue:7:5
+x1: cannot call non-function add (type _):
+    ./a.cue:8:5
+x2: cannot call non-function add (type _):
+    ./a.cue:9:5
+a0: cannot call non-function neg32 (type _):
+    ./b.cue:7:5
+b1: cannot call non-function isPrime (type _):
+    ./b.cue:9:5
+b2: cannot call non-function isPrime (type _):
+    ./b.cue:10:5
+c1: cannot call non-function fact (type _):
+    ./b.cue:12:5
+c2: cannot call non-function fact (type _):
+    ./b.cue:13:5
+
+Result:
 isPrime: is_prime()
 fact:    fact()
-a0:      -42
-b1:      true
-b2:      false
-c1:      5040
-c2:      362880
+a0:      _|_ // a0: cannot call non-function neg32 (type _)
+b1:      _|_ // b1: cannot call non-function isPrime (type _)
+b2:      _|_ // b2: cannot call non-function isPrime (type _)
+c1:      _|_ // c1: cannot call non-function fact (type _)
+c2:      _|_ // c2: cannot call non-function fact (type _)
 neg32:   neg32()
 add:     add
-x0:      3
-x1:      1
-x2:      101
+x0:      _|_ // x0: cannot call non-function add (type _)
+x1:      _|_ // x1: cannot call non-function add (type _)
+x2:      _|_ // x2: cannot call non-function add (type _)

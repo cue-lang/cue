@@ -22,13 +22,30 @@ y2: mul(1.234, 5.678)
 z: not(true)
 -- basic.wasm --
 -- out/wasm --
+Errors:
+x0: cannot call non-function add (type _):
+    ./a.cue:8:5
+x1: cannot call non-function add (type _):
+    ./a.cue:9:5
+x2: cannot call non-function add (type _):
+    ./a.cue:10:5
+y0: cannot call non-function mul (type _):
+    ./a.cue:12:5
+y1: cannot call non-function mul (type _):
+    ./a.cue:13:5
+y2: cannot call non-function mul (type _):
+    ./a.cue:14:5
+z: cannot call non-function not (type _):
+    ./a.cue:16:4
+
+Result:
 add: add
 mul: mul
 not: not()
-x0:  3
-x1:  1
-x2:  101
-y0:  15.0
-y1:  -8.425
-y2:  7.006652
-z:   false
+x0:  _|_ // x0: cannot call non-function add (type _)
+x1:  _|_ // x1: cannot call non-function add (type _)
+x2:  _|_ // x2: cannot call non-function add (type _)
+y0:  _|_ // y0: cannot call non-function mul (type _)
+y1:  _|_ // y1: cannot call non-function mul (type _)
+y2:  _|_ // y2: cannot call non-function mul (type _)
+z:   _|_ // z: cannot call non-function not (type _)

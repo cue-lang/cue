@@ -464,6 +464,19 @@ func TestParse(t *testing.T) {
 		"<[d0// doc] [l5// line] a: 5>, " +
 			"<[l5// lineb] [5// next] b: 6>",
 	}, {
+		"yaml hash comment",
+		`
+		# standalone comment
+		a: 5
+		`,
+		"<*ast.BadDecl>, <*ast.BadDecl>, comment, a: 5\nexpected label or ':', found 'IDENT' standalone (and 1 more errors)",
+	}, {
+		"yaml hash inline comment",
+		`
+		a: 5 # inline comment
+		`,
+		"a: 5, <*ast.BadDecl>, comment\nmissing ',' in struct literal (and 1 more errors)",
+	}, {
 		"alt comments",
 		`// a ...
 		a: 5 // line a

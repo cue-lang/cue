@@ -243,8 +243,7 @@ func (ld *loader) resolveDependencies(ctx context.Context, rootPkgPaths []string
 		for m, p := range modAddedBy {
 			logf("added: %v (by %v)", m, p.ImportPath())
 		}
-		toAdd := slices.Collect(maps.Keys(modAddedBy))
-		module.Sort(toAdd) // to make errors deterministic
+		toAdd := slices.SortedFunc(maps.Keys(modAddedBy), module.Version.Compare)
 		oldRs := rs
 		var err error
 		rs, err = ld.updateRoots(ctx, rs, pkgs, toAdd)
@@ -406,7 +405,7 @@ func (ld *loader) updateRoots(ctx context.Context, rs *modrequirements.Requireme
 		}
 	}
 	if needSort {
-		module.Sort(roots)
+		slices.SortFunc(roots, module.Version.Compare)
 	}
 
 	// "Each root appears only once, at the selected version of its path ….”
@@ -627,7 +626,7 @@ func (ld *loader) tidyRoots(ctx context.Context, old *modrequirements.Requiremen
 		queue = append(queue, pkg)
 		queued[pkg] = true
 	}
-	module.Sort(roots)
+	slices.SortFunc(roots, module.Version.Compare)
 	tidy := modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots, old.DefaultMajorVersions())
 
 	for len(queue) > 0 {
@@ -659,7 +658,7 @@ func (ld *loader) tidyRoots(ctx context.Context, old *modrequirements.Requiremen
 		}
 
 		if tidyRoots := tidy.RootModules(); len(roots) > len(tidyRoots) {
-			module.Sort(roots)
+			slices.SortFunc(roots, module.Version.Compare)
 			tidy = modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots, tidy.DefaultMajorVersions())
 		}
 	}

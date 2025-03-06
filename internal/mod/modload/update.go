@@ -4,9 +4,12 @@ import (
 	"context"
 	"fmt"
 	"io/fs"
+	"maps"
 	"runtime"
 	"strings"
 	"sync/atomic"
+
+	"slices"
 
 	"cuelang.org/go/internal/mod/modrequirements"
 	"cuelang.org/go/internal/mod/semver"
@@ -70,10 +73,8 @@ func UpdateVersions(ctx context.Context, fsys fs.FS, modRoot string, reg Registr
 			newVersions = append(newVersions, v)
 		}
 	}
-	for _, v := range mversionsMap {
-		newVersions = append(newVersions, v)
-	}
-	module.Sort(newVersions)
+	newVersions = slices.AppendSeq(newVersions, maps.Values(mversionsMap))
+	slices.SortFunc(newVersions, module.Version.Compare)
 	rs = modrequirements.NewRequirements(mf.QualifiedModule(), reg, newVersions, mf.DefaultMajorVersions())
 	g, err = rs.Graph(ctx)
 	if err != nil {

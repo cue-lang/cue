@@ -105,6 +105,7 @@ const (
 type CloseInfo struct {
 	*closeInfo               // old implementation (TODO: remove)
 	cc         *closeContext // new implementation (TODO: rename field to closeCtx)
+	defID      defID         // Unique ID to track anything that gets inserted from this Conjunct.
 
 	// IsClosed is true if this conjunct represents a single level of closing
 	// as indicated by the closed builtin.

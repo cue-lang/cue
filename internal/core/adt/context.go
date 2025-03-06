@@ -102,6 +102,8 @@ type OpContext struct {
 
 	nest int
 
+	nextDefID defID
+
 	stats        stats.Counts
 	freeListNode *nodeContext
 

@@ -150,11 +150,6 @@ func (n *nodeContext) insertComprehension(
 		}
 	}
 
-	if ec.done && len(ec.envs) == 0 {
-		n.decComprehension(c)
-		return
-	}
-
 	x := c.Value
 
 	if !n.ctx.isDevVersion() {
@@ -179,7 +174,6 @@ func (n *nodeContext) insertComprehension(
 					Clauses: c.Clauses,
 					Value:   f,
 					arcType: f.ArcType, // TODO: can be derived, remove this field.
-					cc:      ci.cc,
 
 					comp:   ec,
 					parent: c,
@@ -189,9 +183,8 @@ func (n *nodeContext) insertComprehension(
 				conjunct := MakeConjunct(env, c, ci)
 				if n.ctx.isDevVersion() {
 					n.assertInitialized()
-					_, c.arcCC = n.insertArcCC(f.Label, ArcPending, conjunct, conjunct.CloseInfo, false)
-					c.cc = ci.cc
-					ci.cc.incDependent(n.ctx, COMP, c.arcCC)
+					v := n.insertArcCC(f.Label, ArcPending, conjunct, conjunct.CloseInfo, false)
+					c.arcCC = v
 				} else {
 					n.insertFieldUnchecked(f.Label, ArcPending, conjunct)
 				}
@@ -409,27 +402,6 @@ func (n *nodeContext) injectSelfComprehensions(state vertexStatus) {
 // It returns an incomplete error if there was one. Fatal errors are
 // processed as a "successfully" completed computation.
 func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bottom {
-	err := n.processComprehensionInner(d, state)
-
-	// NOTE: we cannot move this to defer in processComprehensionInner, as we
-	// use panics to implement "yielding" (and possibly coroutines in the
-	// future).
-	n.decComprehension(d.leaf)
-
-	return err
-}
-
-func (n *nodeContext) decComprehension(p *Comprehension) {
-	for ; p != nil; p = p.parent {
-		cc := p.cc
-		if cc != nil {
-			cc.decDependent(n.ctx, COMP, p.arcCC)
-		}
-		p.cc = nil
-	}
-}
-
-func (n *nodeContext) processComprehensionInner(d *envYield, state vertexStatus) *Bottom {
 	ctx := n.ctx
 
 	// Compute environments, if needed.
@@ -468,10 +440,9 @@ func (n *nodeContext) processComprehensionInner(d *envYield, state vertexStatus)
 	d.inserted = true
 
 	if len(d.envs) == 0 {
-		c := d.leaf.arcCC
-		// because the parent referrer will reach a zero count before this
-		// node will reach a zero count, we need to propagate the arcType.
-		c.updateArcType(ctx, ArcNotPresent)
+		if arc := d.leaf.arcCC; arc != nil {
+			arc.updateArcType(ArcNotPresent)
+		}
 		return nil
 	}
 
@@ -480,8 +451,7 @@ func (n *nodeContext) processComprehensionInner(d *envYield, state vertexStatus)
 		// because the parent referrer will reach a zero count before this
 		// node will reach a zero count, we need to propagate the arcType.
 		if p := c.arcCC; p != nil {
-			p.src.updateArcType(c.arcType)
-			p.updateArcType(ctx, c.arcType)
+			p.updateArcType(c.arcType) // TODO: Still necessary?
 		}
 		v.updateArcType(c.arcType)
 		if v.ArcType == ArcNotPresent {

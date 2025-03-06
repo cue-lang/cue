@@ -85,11 +85,7 @@ Conjuncts:    124
 Disjuncts:    69
 -- out/evalalpha --
 Errors:
-recloseSimple.a.b: field not allowed:
-    ./in.cue:17:6
-    ./in.cue:17:15
 reclose1.z.d: field not allowed:
-    ./in.cue:33:5
     ./in.cue:34:5
 
 Result:
@@ -110,17 +106,11 @@ Result:
   }
   #TypeMeta: (#struct){
   }
-  recloseSimple: (_|_){
-    // [eval]
+  recloseSimple: (struct){
     #foo: (#struct){
     }
-    a: (_|_){
-      // [eval]
-      b: (_|_){
-        // [eval] recloseSimple.a.b: field not allowed:
-        //     ./in.cue:17:6
-        //     ./in.cue:17:15
-      }
+    a: (#struct){
+      b: (int){ int }
     }
   }
   reclose1: (_|_){
@@ -140,7 +130,6 @@ Result:
       // [eval]
       d: (_|_){
         // [eval] reclose1.z.d: field not allowed:
-        //     ./in.cue:33:5
         //     ./in.cue:34:5
       }
       c: (int){ int }
@@ -192,24 +181,21 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,13 +1,10 @@
+@@ -1,13 +1,6 @@
  Errors:
--reclose1.z.d: field not allowed:
+ reclose1.z.d: field not allowed:
 -    ./in.cue:28:6
 -    ./in.cue:33:5
--    ./in.cue:34:5
- recloseSimple.a.b: field not allowed:
+     ./in.cue:34:5
+-recloseSimple.a.b: field not allowed:
 -    ./in.cue:16:8
 -    ./in.cue:17:5
-     ./in.cue:17:6
-     ./in.cue:17:15
-+reclose1.z.d: field not allowed:
-+    ./in.cue:33:5
-+    ./in.cue:34:5
+-    ./in.cue:17:6
+-    ./in.cue:17:15
  
  Result:
  (_|_){
-@@ -20,9 +17,7 @@
+@@ -20,9 +13,7 @@
      }
    }
    #Deployment: (#struct){
@@ -220,16 +206,30 @@ diff old new
    }
    #Spec: (#struct){
      replicas: (int){ int }
-@@ -37,8 +32,6 @@
-       // [eval]
-       b: (_|_){
-         // [eval] recloseSimple.a.b: field not allowed:
+@@ -29,19 +20,11 @@
+   }
+   #TypeMeta: (#struct){
+   }
+-  recloseSimple: (_|_){
+-    // [eval]
++  recloseSimple: (struct){
+     #foo: (#struct){
+     }
+-    a: (_|_){
+-      // [eval]
+-      b: (_|_){
+-        // [eval] recloseSimple.a.b: field not allowed:
 -        //     ./in.cue:16:8
 -        //     ./in.cue:17:5
-         //     ./in.cue:17:6
-         //     ./in.cue:17:15
-       }
-@@ -51,21 +44,20 @@
+-        //     ./in.cue:17:6
+-        //     ./in.cue:17:15
+-      }
++    a: (#struct){
++      b: (int){ int }
+     }
+   }
+   reclose1: (_|_){
+@@ -51,21 +34,19 @@
        y: (int){ int }
      }
      #a: (#struct){
@@ -247,14 +247,14 @@ diff old new
        d: (_|_){
          // [eval] reclose1.z.d: field not allowed:
 -        //     ./in.cue:28:6
-         //     ./in.cue:33:5
+-        //     ./in.cue:33:5
          //     ./in.cue:34:5
        }
 +      c: (int){ int }
      }
    }
    reclose2: (struct){
-@@ -74,15 +66,15 @@
+@@ -74,15 +55,15 @@
        y: (int){ int }
      }
      a: (#struct){
@@ -273,7 +273,7 @@ diff old new
      }
    }
    reclose3: (struct){
-@@ -97,12 +89,12 @@
+@@ -97,12 +78,12 @@
        Name: (string){ string }
      }
      #A: (#struct){

@@ -115,6 +115,38 @@ printCycle: {
 		}
 	}
 }
+-- out/evalalpha/stats --
+Leaks:  119
+Freed:  0
+Reused: 0
+Allocs: 119
+Retain: 0
+
+Unifications: 100
+Conjuncts:    133
+Disjuncts:    5
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  48
+-Freed:  127
+-Reused: 120
+-Allocs: 55
+-Retain: 138
++Leaks:  119
++Freed:  0
++Reused: 0
++Allocs: 119
++Retain: 0
+ 
+-Unifications: 163
+-Conjuncts:    299
+-Disjuncts:    192
++Unifications: 100
++Conjuncts:    133
++Disjuncts:    5
 -- out/eval/stats --
 Leaks:  48
 Freed:  127
@@ -142,10 +174,6 @@ listAddCycle.c: structural cycle:
     ./in.cue:91:5
 listMulCycle.c: structural cycle:
     ./in.cue:97:5
-closeFail.x.b: field not allowed:
-    ./in.cue:105:6
-    ./in.cue:104:6
-    ./in.cue:107:5
 
 Result:
 (_|_){
@@ -310,19 +338,12 @@ Result:
       //     ./in.cue:97:5
     }
   }
-  closeFail: (_|_){
-    // [eval]
+  closeFail: (struct){
     #T: (#struct){
       a: (string){ string }
     }
-    x: (_|_){
-      // [eval]
-      b: (_|_){
-        // [eval] closeFail.x.b: field not allowed:
-        //     ./in.cue:105:6
-        //     ./in.cue:104:6
-        //     ./in.cue:107:5
-      }
+    x: (#struct){
+      b: (string){ "foo" }
       a: (string){ string }
     }
   }
@@ -340,7 +361,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,33 +1,23 @@
+@@ -1,33 +1,19 @@
  Errors:
 -closeCycle.a: structural cycle
 -closeCycle.b.d: structural cycle
@@ -380,14 +401,10 @@ diff old new
 +    ./in.cue:91:5
 +listMulCycle.c: structural cycle:
 +    ./in.cue:97:5
-+closeFail.x.b: field not allowed:
-+    ./in.cue:105:6
-+    ./in.cue:104:6
-+    ./in.cue:107:5
  
  Result:
  (_|_){
-@@ -65,14 +55,9 @@
+@@ -65,14 +51,9 @@
      }
      t2: (struct){
        a: (struct){
@@ -405,7 +422,7 @@ diff old new
          }
          x: (struct){
            y: (string){ "" }
-@@ -88,17 +73,17 @@
+@@ -88,17 +69,17 @@
    disjunctionCycle: (_|_){
      // [eval]
      a: (_|_){
@@ -434,7 +451,7 @@ diff old new
        //     ./in.cue:56:5
        //     ./in.cue:56:9
      }
-@@ -124,80 +109,77 @@
+@@ -124,104 +105,95 @@
      }
      b: (struct){
      }
@@ -551,6 +568,10 @@ diff old new
 -    }
 -    c: (_|_){
 -      // [structural cycle]
+-    }
+-  }
+-  closeFail: (_|_){
+-    // [eval]
 +      // [structural cycle] listMulCycle.c: structural cycle:
 +      //     ./in.cue:97:5
 +    }
@@ -561,22 +582,24 @@ diff old new
 +    c: (_|_){
 +      // [structural cycle] listMulCycle.c: structural cycle:
 +      //     ./in.cue:97:5
++    }
++  }
++  closeFail: (struct){
+     #T: (#struct){
+       a: (string){ string }
      }
-   }
-   closeFail: (_|_){
-@@ -207,21 +189,22 @@
-     }
-     x: (_|_){
-       // [eval]
+-    x: (_|_){
+-      // [eval]
 -      a: (string){ string }
-       b: (_|_){
-         // [eval] closeFail.x.b: field not allowed:
-+        //     ./in.cue:105:6
-         //     ./in.cue:104:6
+-      b: (_|_){
+-        // [eval] closeFail.x.b: field not allowed:
+-        //     ./in.cue:104:6
 -        //     ./in.cue:105:12
 -        //     ./in.cue:106:6
-         //     ./in.cue:107:5
-       }
+-        //     ./in.cue:107:5
+-      }
++    x: (#struct){
++      b: (string){ "foo" }
 +      a: (string){ string }
      }
    }

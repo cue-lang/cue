@@ -119,14 +119,14 @@ issue3780: panic2: {
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  117
-Reused: 104
+Freed:  137
+Reused: 124
 Allocs: 13
-Retain: 27
+Retain: 34
 
-Unifications: 93
-Conjuncts:    181
-Disjuncts:    144
+Unifications: 113
+Conjuncts:    209
+Disjuncts:    171
 -- out/evalalpha --
 (struct){
   issue3750: (struct){
@@ -237,6 +237,26 @@ Disjuncts:    144
         }
         a: (struct){
           b: (_){ _ }
+        }
+      }
+    }
+  }
+  issue3780: (struct){
+    panic1: (_|_){
+      // [incomplete] issue3780.panic1: incomplete bool: bool:
+      //     ./issue3780.cue:5:10
+      objs: (#struct){
+      }
+      param!: (bool){ bool }
+      #Objects: (#struct){
+      }
+    }
+    panic2: (struct){
+      parent: (struct){
+        objs: (#struct){
+        }
+        param?: (bool){ bool }
+        #Objects: (#struct){
         }
       }
     }
@@ -440,6 +460,26 @@ diff old new
         }
         a: (struct){
           b: (_){ _ }
+        }
+      }
+    }
+  }
+  issue3780: (struct){
+    panic1: (_|_){
+      // [incomplete] issue3780.panic1: incomplete bool: bool:
+      //     ./issue3780.cue:5:10
+      objs: (#struct){
+      }
+      param!: (bool){ bool }
+      #Objects: (#struct){
+      }
+    }
+    panic2: (struct){
+      parent: (struct){
+        objs: (#struct){
+        }
+        param?: (bool){ bool }
+        #Objects: (#struct){
         }
       }
     }

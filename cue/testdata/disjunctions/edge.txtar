@@ -250,6 +250,37 @@ Disjuncts:    74
       y: (int){ 1 }
     }
   }
+  panic1: (struct){
+    #TypeFoo: (#struct){
+      name: (string){ "foo" }
+      foo_field: (string){ string }
+    }
+    #TypeBar: (#struct){
+      bar_field?: (string){ string }
+      name: (string){ "bar" }
+    }
+    #TypeBar2: (#struct){
+      name: (string){ "bar" }
+    }
+    objs: (struct){
+      obj1: (struct){
+        type: (struct){ |((#struct){
+            name: (string){ "foo" }
+            foo_field: (string){ string }
+          }, (#struct){
+            bar_field?: (string){ string }
+            name: (string){ "bar" }
+          }) }
+      }
+    }
+    out: (struct){ |((#struct){
+        name: (string){ "foo" }
+        foo_field: (string){ string }
+      }, (#struct){
+        bar_field?: (string){ string }
+        name: (string){ "bar" }
+      }) }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -264,7 +295,7 @@ diff old new
            a: (int){ 1 }
          }, (#struct){
            a: (int){ 1 }
-@@ -59,16 +59,8 @@
+@@ -59,16 +59,39 @@
      }
    }
    cyclicSelfElimination: (struct){
@@ -278,9 +309,41 @@ diff old new
 -      y: ((int|struct)){ |((int){ 1 }, (struct){
 -          y: (int){ 1 }
 -        }) }
+-    }
 +    ok: (struct){
 +      y: (int){ 1 }
-     }
++    }
++  }
++  panic1: (struct){
++    #TypeFoo: (#struct){
++      name: (string){ "foo" }
++      foo_field: (string){ string }
++    }
++    #TypeBar: (#struct){
++      bar_field?: (string){ string }
++      name: (string){ "bar" }
++    }
++    #TypeBar2: (#struct){
++      name: (string){ "bar" }
++    }
++    objs: (struct){
++      obj1: (struct){
++        type: (struct){ |((#struct){
++            name: (string){ "foo" }
++            foo_field: (string){ string }
++          }, (#struct){
++            bar_field?: (string){ string }
++            name: (string){ "bar" }
++          }) }
++      }
++    }
++    out: (struct){ |((#struct){
++        name: (string){ "foo" }
++        foo_field: (string){ string }
++      }, (#struct){
++        bar_field?: (string){ string }
++        name: (string){ "bar" }
++      }) }
    }
  }
 -- diff/todo/p2 --

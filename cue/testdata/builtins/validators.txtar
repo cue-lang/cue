@@ -518,7 +518,7 @@ Result:
     }
   }
   issue3639: (struct){
-    a: (#struct){
+    a: (struct){
       b: (int){ 1 }
     }
     #X: (_){ matchN(1, (#list){
@@ -535,7 +535,7 @@ Result:
           // }
         }
       }) }
-    a: (#struct){
+    a: (struct){
       b: (int){ 1 }
     }
   }
@@ -550,10 +550,10 @@ Result:
           // }
         }
       }) }
-    x: (#struct){
+    x: (struct){
       c: (string){ "c" }
     }
-    y: (#struct){
+    y: (struct){
       c: (string){ "c" }
     }
   }
@@ -627,39 +627,6 @@ diff old new
            C: (int){ 1 }
          }
        }
-@@ -276,7 +294,7 @@
-     }
-   }
-   issue3639: (struct){
--    a: (struct){
-+    a: (#struct){
-       b: (int){ 1 }
-     }
-     #X: (_){ matchN(1, (#list){
-@@ -293,7 +311,7 @@
-           // }
-         }
-       }) }
--    a: (struct){
-+    a: (#struct){
-       b: (int){ 1 }
-     }
-   }
-@@ -308,10 +326,10 @@
-           // }
-         }
-       }) }
--    x: (struct){
--      c: (string){ "c" }
--    }
--    y: (struct){
-+    x: (#struct){
-+      c: (string){ "c" }
-+    }
-+    y: (#struct){
-       c: (string){ "c" }
-     }
-   }
 -- out/eval --
 Errors:
 issue3474.topValidator.failType.A: conflicting values >10 and {C:1} (mismatched types number and struct):

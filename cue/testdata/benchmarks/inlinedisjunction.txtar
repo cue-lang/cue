@@ -14,15 +14,15 @@
 x: #def
 x: c: "foo"
 -- out/evalalpha/stats --
-Leaks:  149
+Leaks:  112
 Freed:  0
 Reused: 0
-Allocs: 149
+Allocs: 112
 Retain: 0
 
-Unifications: 17
-Conjuncts:    188
-Disjuncts:    76
+Unifications: 16
+Conjuncts:    113
+Disjuncts:    58
 -- out/eval --
 (struct){
   #def: (#struct){ |((#struct){
@@ -50,18 +50,18 @@ diff old new
 -Freed:  4674
 -Reused: 3903
 -Allocs: 771
-+Leaks:  149
++Leaks:  112
 +Freed:  0
 +Reused: 0
-+Allocs: 149
++Allocs: 112
  Retain: 0
  
 -Unifications: 2590
 -Conjuncts:    13409
 -Disjuncts:    4674
-+Unifications: 17
-+Conjuncts:    188
-+Disjuncts:    76
++Unifications: 16
++Conjuncts:    113
++Disjuncts:    58
 -- out/eval/stats --
 Leaks:  0
 Freed:  4674

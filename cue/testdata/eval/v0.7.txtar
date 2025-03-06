@@ -683,15 +683,15 @@ Result:
   }
 }
 -- out/evalalpha/stats --
-Leaks:  278
-Freed:  16
-Reused: 16
-Allocs: 278
+Leaks:  265
+Freed:  0
+Reused: 0
+Allocs: 265
 Retain: 0
 
-Unifications: 248
-Conjuncts:    1900
-Disjuncts:    44
+Unifications: 256
+Conjuncts:    576
+Disjuncts:    6
 -- out/evalalpha --
 Errors:
 definition.t0.err.d1.env.c: field not allowed:
@@ -970,6 +970,8 @@ Result:
               d: (struct){
                 b: (int){ 2 }
               }
+              a: (int){ 1 }
+              b: (int){ 2 }
             }
           }
           z: (struct){
@@ -990,6 +992,8 @@ Result:
               d: (struct){
                 b: (int){ 2 }
               }
+              a: (int){ 1 }
+              b: (int){ 2 }
             }
           }
           y: (struct){
@@ -1010,6 +1014,8 @@ Result:
               d: (struct){
                 b: (int){ 2 }
               }
+              a: (int){ 1 }
+              b: (int){ 2 }
             }
           }
           y: (struct){
@@ -1052,6 +1058,8 @@ Result:
               d: (struct){
                 b: (int){ 2 }
               }
+              a: (int){ 1 }
+              b: (int){ 2 }
             }
           }
           y: (struct){
@@ -1072,6 +1080,8 @@ Result:
               d: (struct){
                 b: (int){ 2 }
               }
+              a: (int){ 1 }
+              b: (int){ 2 }
             }
           }
           z: (struct){
@@ -1100,18 +1110,18 @@ diff old new
 -Reused: 273
 -Allocs: 16
 -Retain: 170
-+Leaks:  278
-+Freed:  16
-+Reused: 16
-+Allocs: 278
++Leaks:  265
++Freed:  0
++Reused: 0
++Allocs: 265
 +Retain: 0
  
 -Unifications: 269
 -Conjuncts:    1619
 -Disjuncts:    436
-+Unifications: 248
-+Conjuncts:    1900
-+Disjuncts:    44
++Unifications: 256
++Conjuncts:    576
++Disjuncts:    6
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
@@ -1252,7 +1262,7 @@ diff old new
      t0: (struct){
        ok: (struct){
          c: (struct){
-@@ -270,135 +245,110 @@
+@@ -270,135 +245,116 @@
          }
        }
      }
@@ -1415,6 +1425,8 @@ diff old new
 +              d: (struct){
 +                b: (int){ 2 }
 +              }
++              a: (int){ 1 }
++              b: (int){ 2 }
 +            }
 +          }
 +          z: (struct){
@@ -1435,6 +1447,8 @@ diff old new
 +              d: (struct){
 +                b: (int){ 2 }
 +              }
++              a: (int){ 1 }
++              b: (int){ 2 }
 +            }
 +          }
 +          y: (struct){
@@ -1455,6 +1469,8 @@ diff old new
 +              d: (struct){
 +                b: (int){ 2 }
 +              }
++              a: (int){ 1 }
++              b: (int){ 2 }
 +            }
 +          }
 +          y: (struct){
@@ -1492,7 +1508,7 @@ diff old new
            }
          }
          p5: (struct){
-@@ -407,23 +357,18 @@
+@@ -407,23 +363,20 @@
                d: (struct){
                  b: (int){ 2 }
                }
@@ -1513,6 +1529,8 @@ diff old new
 -            }
 -            b: (int){ 2 }
 -            a: (int){ 1 }
++              a: (int){ 1 }
++              b: (int){ 2 }
 +            }
 +          }
 +          y: (struct){
@@ -1528,38 +1546,14 @@ diff old new
            }
          }
          check: (struct){
-@@ -432,23 +377,18 @@
-               d: (struct){
-                 b: (int){ 2 }
-               }
--              a: (int){ 1 }
--              b: (int){ 2 }
--            }
--          }
--          z: (struct){
--            d: (struct){
--              a: (int){ 1 }
--              b: (int){ 2 }
--            }
--            a: (int){ 1 }
--            b: (int){ 2 }
--          }
--          y: (struct){
+@@ -445,10 +398,7 @@
+             b: (int){ 2 }
+           }
+           y: (struct){
 -            c: (struct){
 -              a: (int){ 1 }
 -              b: (int){ 2 }
 -            }
-+            }
-+          }
-+          z: (struct){
-+            d: (struct){
-+              a: (int){ 1 }
-+              b: (int){ 2 }
-+            }
-+            a: (int){ 1 }
-+            b: (int){ 2 }
-+          }
-+          y: (struct){
 +            c: ~(mutual.t4.ok.check.z.d)
            }
          }

@@ -76,6 +76,29 @@ cyclicSelfElimination: ok: {
 	y: 1 | {y: 1}
 	y
 }
+-- panic.cue --
+// This used to cause a panic with evalv3.
+panic1: {
+	#TypeFoo: {
+		name:      "foo"
+		// Make foo_field here optional and master panics too!
+		foo_field: string
+	}
+	#TypeBar: {
+		#TypeBar2
+		bar_field?: string
+	}
+
+	#TypeBar2: name: "bar"
+
+	objs: obj1: {
+		type: #TypeFoo | #TypeBar
+		type: *objs["missing"] | #TypeFoo | #TypeBar
+	}
+
+	out: #TypeFoo | #TypeBar
+	out: objs["obj1"].type
+}
 -- out/eval/stats --
 Leaks:  0
 Freed:  73

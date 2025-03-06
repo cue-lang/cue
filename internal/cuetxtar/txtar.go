@@ -148,6 +148,20 @@ type file struct {
 	diff     bool // true if this contains a diff between fallback and main
 }
 
+// bytes returns the bytes in the file's buffer, and ensures that the
+// slice finishes with a newline (\n). txtar archives cannot contain
+// files without a final newline. Consequently, when comparing
+// proposed/generated file content with content from an archive's
+// file, we must ensure that the proposed content also finishes with a
+// newline.
+func (f *file) bytes() []byte {
+	bs := f.buf.Bytes()
+	if l := len(bs); l > 0 && bs[l-1] != '\n' {
+		bs = append(bs, '\n')
+	}
+	return bs
+}
+
 // HasTag reports whether the tag with the given key is defined
 // for the current test. A tag x is defined by a line in the comment
 // section of the txtar file like:
@@ -505,7 +519,7 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 					}
 					fallback := a.Files[j].Data
 
-					result := sub.buf.Bytes()
+					result := sub.bytes()
 					if len(result) == 0 || len(fallback) == 0 {
 						continue
 					}
@@ -555,7 +569,7 @@ func (x *TxTarTest) run(t *testing.T, m *cuetdtest.M, f func(tc *Test)) {
 			files := make([]txtar.File, 0, len(a.Files))
 
 			for _, sub := range tc.outFiles {
-				result := sub.buf.Bytes()
+				result := sub.bytes()
 
 				files = append(files, txtar.File{Name: sub.name})
 				gold := &files[len(files)-1]

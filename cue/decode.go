@@ -559,7 +559,7 @@ func typeFields(t reflect.Type) structFields {
 				if tag == "-" {
 					continue
 				}
-				name, opts := parseTag(tag)
+				name, opts, _ := strings.Cut(tag, ",")
 				if !isValidTag(name) {
 					name = ""
 				}
@@ -584,7 +584,7 @@ func typeFields(t reflect.Type) structFields {
 						tag:       tagged,
 						index:     index,
 						typ:       ft,
-						omitEmpty: opts.Contains("omitempty"),
+						omitEmpty: tagOptions(opts).Contains("omitempty"),
 					}
 					field.nameBytes = []byte(field.name)
 					field.equalFold = foldFunc(field.nameBytes)
@@ -698,15 +698,6 @@ func cachedTypeFields(t reflect.Type) structFields {
 // tag, or the empty string. It does not include the leading comma.
 type tagOptions string
 
-// parseTag splits a struct field's json tag into its name and
-// comma-separated options.
-func parseTag(tag string) (string, tagOptions) {
-	if idx := strings.Index(tag, ","); idx != -1 {
-		return tag[:idx], tagOptions(tag[idx+1:])
-	}
-	return tag, tagOptions("")
-}
-
 // Contains reports whether a comma-separated list of options
 // contains a particular substr flag. substr must be surrounded by a
 // string boundary or commas.
@@ -717,10 +708,7 @@ func (o tagOptions) Contains(optionName string) bool {
 	s := string(o)
 	for s != "" {
 		var next string
-		i := strings.Index(s, ",")
-		if i >= 0 {
-			s, next = s[:i], s[i+1:]
-		}
+		s, next, _ = strings.Cut(s, ",")
 		if s == optionName {
 			return true
 		}

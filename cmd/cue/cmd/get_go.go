@@ -1477,9 +1477,7 @@ func getName(name string, tag string) string {
 	tags := reflect.StructTag(tag)
 	for _, s := range []string{"json", "yaml"} {
 		if tag, ok := tags.Lookup(s); ok {
-			if p := strings.Index(tag, ","); p >= 0 {
-				tag = tag[:p]
-			}
+			tag, _, _ = strings.Cut(tag, ",")
 			if tag != "" {
 				return tag
 			}

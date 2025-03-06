@@ -114,20 +114,17 @@ func CheckPathWithoutVersion(basePath string) (err error) {
 	if err := checkPath(basePath, modulePath); err != nil {
 		return err
 	}
-	i := strings.Index(basePath, "/")
-	if i < 0 {
-		i = len(basePath)
-	}
-	if i == 0 {
+	firstPath, _, _ := strings.Cut(basePath, "/")
+	if firstPath == "" {
 		return fmt.Errorf("leading slash")
 	}
-	if !strings.Contains(basePath[:i], ".") {
+	if !strings.Contains(firstPath, ".") {
 		return fmt.Errorf("missing dot in first path element")
 	}
 	if basePath[0] == '-' {
 		return fmt.Errorf("leading dash in first path element")
 	}
-	for _, r := range basePath[:i] {
+	for _, r := range firstPath {
 		if !firstPathOK(r) {
 			return fmt.Errorf("invalid char %q in first path element", r)
 		}
@@ -297,10 +294,7 @@ func checkElem(elem string, kind pathKind) error {
 	}
 	// Windows disallows a bunch of path elements, sadly.
 	// See https://docs.microsoft.com/en-us/windows/desktop/fileio/naming-a-file
-	short := elem
-	if i := strings.Index(short, "."); i >= 0 {
-		short = short[:i]
-	}
+	short, _, _ := strings.Cut(elem, ".")
 	for _, bad := range badWindowsNames {
 		if strings.EqualFold(bad, short) {
 			return fmt.Errorf("%q disallowed as path element component on Windows", short)

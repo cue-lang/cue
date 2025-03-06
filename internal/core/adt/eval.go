@@ -1067,6 +1067,14 @@ type nodeContext struct {
 	vLists []*Vertex
 	exprs  []envExpr
 
+	// TODO: remove
+	typeCandidates []*Vertex
+
+	// TODO: Move here from Vertex.
+	// reqDefIDs    []defID
+	// dropDefIDs   []defID
+	// conjunctInfo []conjunctInfo
+
 	// Checks is a list of conjuncts, as we need to preserve the context in
 	// which it was evaluated. The conjunct is always a validator (and thus
 	// a Value). We need to keep track of the CloseInfo, however, to be able
@@ -1154,6 +1162,10 @@ type nodeContextState struct {
 	hasAncestorCycle     bool // has conjunct with structural cycle to an ancestor
 	hasNonCycle          bool // has material conjuncts without structural cycle
 	hasNonCyclic         bool // has non-cyclic conjuncts at start of field processing
+	hasStruct            bool
+	hasOpenValidator     bool
+	isTotal              bool
+	isDef                bool
 
 	isShared         bool       // set if we are currently structure sharing
 	noSharing        bool       // set if structure sharing is not allowed
@@ -1495,6 +1507,8 @@ func (n *nodeContext) reportFieldMismatch(
 }
 
 func (n *nodeContext) updateNodeType(k Kind, v Expr, id CloseInfo) bool {
+	n.updateConjunctInfo(k, id, 0)
+
 	ctx := n.ctx
 	kind := n.kind & k
 

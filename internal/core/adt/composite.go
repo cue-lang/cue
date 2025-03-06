@@ -163,7 +163,13 @@ type Vertex struct {
 	// _cc manages the closedness logic for this Vertex. It is created
 	// by rootCloseContext.
 	// TODO: move back to nodeContext, but be sure not to clone it.
-	_cc *closeContext
+
+	// TODO: move to nodeContext.
+	reqDefIDs    []refInfo
+	dropDefIDs   []defID
+	conjunctInfo []conjunctInfo
+
+	overlay *Vertex
 
 	// Label is the feature leading to this vertex.
 	Label Feature
@@ -302,55 +308,6 @@ func deref(v *Vertex) *Vertex {
 
 func equalDeref(a, b *Vertex) bool {
 	return deref(a) == deref(b)
-}
-
-func (v *Vertex) cc() *closeContext {
-	return v._cc
-}
-
-func (v *Vertex) getRootCloseContext(ctx *OpContext) *closeContext {
-	_ = ctx // suppress linter
-	if v._cc == nil {
-		panic("no closeContext")
-	}
-	return v._cc
-}
-
-// rootCloseContext creates a closeContext for this Vertex or returns the
-// existing one.
-func (v *Vertex) rootCloseContext(ctx *OpContext) *closeContext {
-	mode := v.ArcType
-	if v._cc != nil {
-		v._cc.updateArcType(ctx, mode)
-		return v._cc
-	}
-
-	v._cc = &closeContext{
-		group:           &v.Conjuncts,
-		parent:          nil,
-		src:             v,
-		parentConjuncts: v,
-		decl:            v,
-		arcType:         mode,
-	}
-	v._cc.incDependent(ctx, ROOT, nil) // matched in REF(decrement:nodeDone)
-
-	if f := v.Label; f.IsLet() || f == InvalidLabel {
-		return v._cc
-	}
-
-	if p := v.Parent; p != nil {
-		pcc := p.rootCloseContext(ctx)
-
-		if pcc.isClosed {
-			pcc.checkAllowsCC(ctx, v._cc)
-		}
-
-		pcc.addArcDependency(ctx, false, v._cc)
-		v._cc.depth = pcc.depth + 1
-	}
-
-	return v._cc
 }
 
 // newInlineVertex creates a Vertex that is needed for computation, but for
@@ -1302,8 +1259,7 @@ func (v *Vertex) MatchAndInsert(ctx *OpContext, arc *Vertex) {
 					}
 					c.Env = &env
 
-					root := arc.rootCloseContext(ctx)
-					root.insertConjunct(ctx, root, c, c.CloseInfo, ArcMember, true, false)
+					arc.insertConjunct(ctx, c, c.CloseInfo, ArcMember, true, false)
 				}
 			}
 		}
@@ -1544,11 +1500,6 @@ func (v *Vertex) AddStruct(s *StructLit, env *Environment, ci CloseInfo) *Struct
 		// be careful to avoid promotion of nil env.Vertex to non-nil
 		// info.Decl
 		info.Decl = env.Vertex
-	}
-	if cc := ci.cc; cc != nil && cc.decl != nil {
-		info.Decl = cc.decl
-	} else if ci := ci.closeInfo; ci != nil && ci.decl != nil {
-		info.Decl = ci.decl
 	}
 	for _, t := range v.Structs {
 		if *t == info { // TODO: check for different identity.

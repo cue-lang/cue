@@ -532,7 +532,9 @@ func (n *nodeContext) updateScalar() {
 	// Set BaseValue to scalar, but only if it was not set before. Most notably,
 	// errors should not be discarded.
 	if n.scalar != nil && (!n.node.IsErr() || isCyclePlaceholder(n.node.BaseValue)) {
-		n.setBaseValue(n.scalar)
+		if v, ok := n.node.BaseValue.(*Vertex); !ok || !v.IsDisjunct {
+			n.setBaseValue(n.scalar)
+		}
 		n.signal(scalarKnown)
 	}
 }

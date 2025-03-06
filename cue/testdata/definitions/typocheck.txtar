@@ -1,0 +1,1897 @@
+-- in.cue --
+embed: simple: {
+	#A: b: 1
+	a: { #A }
+	a: err: 1
+}
+embed: andInStruct: {
+	#Foo: a: int
+	a: { #Foo & { err: 2 } }
+}
+embed: embedDefWithEmbedding: {
+	#Foo: {{a: int}}
+	a: { #Foo & { err: 2 } } // not allowed
+}
+embed: embedComprehension: {
+	#Foo: {if true {a: int}}
+	a: { #Foo & { err: 2 } } // not allowed
+}
+embed: fieldWithAnd: {
+	#A: {}
+	{ a: #A & {err: 3} }
+}
+embed: embedAndRecursive: {
+	#A: a: int
+	B: x: #A
+	B & { x: err: 2 }
+}
+embed: andEmbed: {
+	#A: b: int
+	#B: b: int
+	#D: {#A & #B}
+	d: #D & {err: 3}
+}
+and: transitive: {
+	Z: a: string
+	#Y: Z
+	#X: #Y & Z
+	out: #X & {
+		ok: "foo"
+	}
+}
+and: transitiveWithEmbed: {
+	Z: a: string
+	#X: #Y & Z
+	#Y: {Z}
+	out: #X & {
+		ok: "foo"
+	}
+}
+embed: nonDef: t1: {
+	X: a: string
+	#Y: #Z & X
+	#Z: {
+		X
+		b?:    string
+	}
+}
+embed: defAndHidden: full: {
+	_stepCommon: Name: string
+	#Step: #Command & _stepCommon
+	#Command: {
+		_stepCommon
+		Path?:    string
+	}
+	out: #Step & {
+		Name: "foo"
+	}
+}
+-- validators.cue --
+import "struct"
+embed: normalValidator: {
+	#X: {
+		struct.MaxFields(1)
+		a?: int
+		b?: int
+	}
+	x: #X
+	x: err: 1
+}
+embed: openValidator: t1: {
+	#X: {
+		matchN(0, [])
+		a?: int
+		b?: int
+	}
+	x: #X
+	x: err: 1
+}
+embed: openValidator: t2: {
+	Y: matchN(1, [X])
+	X: b?: Y
+	a: X
+	a: b: 1
+}
+
+-- large.cue --
+full: {
+	#Resource: {
+		someMsg: string
+		obs: {} | *{missing: true}
+
+		let pickMsg = [
+			if obs.missing {msg: "\(someMsg)"},
+			{msg: "bar"},
+		][0]
+		patches: [{
+			op:    "add"
+			path:  "/metadata"
+			value: pickMsg.msg
+		}]
+	}
+
+	#Patches: [string]: _
+	#JSONPatch: {
+		namespace?: string
+		patch: [...#JSONOp]
+		output: #Patches & {(namespace): patch}
+	}
+	#JSONOp: {
+		op:    "add"
+		path:  string
+		value: _
+	} | {
+		op:   "remove"
+		path: string
+	}
+
+	#Main: {
+		NS=namespace: string
+
+		output: jsonPatch.output
+
+		let jsonPatch = #JSONPatch & {
+			let base = #Resource & {}
+			let withMsg = base & {someMsg: "foo"}
+
+			namespace: NS
+
+			patch: withMsg.patches
+		}
+	}
+	out: (#Main & {namespace: "ns1"}).output
+}
+-- out/evalalpha/stats --
+Leaks:  111
+Freed:  0
+Reused: 0
+Allocs: 111
+Retain: 0
+
+Unifications: 78
+Conjuncts:    141
+Disjuncts:    12
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  12
+-Freed:  160
+-Reused: 150
+-Allocs: 22
+-Retain: 20
++Leaks:  111
++Freed:  0
++Reused: 0
++Allocs: 111
++Retain: 0
+ 
+-Unifications: 146
+-Conjuncts:    331
+-Disjuncts:    179
++Unifications: 78
++Conjuncts:    141
++Disjuncts:    12
+-- out/eval/stats --
+Leaks:  15
+Freed:  284
+Reused: 273
+Allocs: 26
+Retain: 29
+
+Unifications: 273
+Conjuncts:    581
+Disjuncts:    312
+-- out/evalalpha --
+Errors:
+embed.openValidator.t2.a.b: conflicting values 1 and {b?:Y} (mismatched types int and struct):
+    ./validators.cue:22:5
+    ./validators.cue:24:8
+embed.simple.a.err: field not allowed:
+    ./in.cue:3:7
+    ./in.cue:4:5
+embed.andInStruct.a.err: field not allowed:
+    ./in.cue:8:7
+    ./in.cue:8:16
+embed.embedDefWithEmbedding.a.err: field not allowed:
+    ./in.cue:12:7
+    ./in.cue:12:16
+embed.embedComprehension.a.err: field not allowed:
+    ./in.cue:15:21
+    ./in.cue:16:16
+embed.fieldWithAnd.a.err: field not allowed:
+    ./in.cue:20:7
+    ./in.cue:20:13
+embed.embedAndRecursive.x.err: field not allowed:
+    ./in.cue:24:8
+    ./in.cue:25:11
+embed.andEmbed.d.err: field not allowed:
+    ./in.cue:30:12
+    ./in.cue:31:11
+and.transitive.out.ok: field not allowed:
+    ./in.cue:35:6
+    ./in.cue:38:3
+and.transitiveWithEmbed.out.ok: field not allowed:
+    ./in.cue:44:7
+    ./in.cue:46:3
+embed.normalValidator.x.err: field not allowed:
+    ./validators.cue:4:3
+    ./validators.cue:9:5
+embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
+    ./validators.cue:21:5
+    ./validators.cue:21:12
+    ./validators.cue:22:9
+    ./validators.cue:24:8
+
+Result:
+(_|_){
+  // [eval]
+  embed: (_|_){
+    // [eval]
+    simple: (_|_){
+      // [eval]
+      #A: (#struct){
+        b: (int){ 1 }
+      }
+      a: (_|_){
+        // [eval]
+        err: (_|_){
+          // [eval] embed.simple.a.err: field not allowed:
+          //     ./in.cue:3:7
+          //     ./in.cue:4:5
+        }
+        b: (int){ 1 }
+      }
+    }
+    andInStruct: (_|_){
+      // [eval]
+      #Foo: (#struct){
+        a: (int){ int }
+      }
+      a: (_|_){
+        // [eval]
+        err: (_|_){
+          // [eval] embed.andInStruct.a.err: field not allowed:
+          //     ./in.cue:8:7
+          //     ./in.cue:8:16
+        }
+        a: (int){ int }
+      }
+    }
+    embedDefWithEmbedding: (_|_){
+      // [eval]
+      #Foo: (#struct){
+        a: (int){ int }
+      }
+      a: (_|_){
+        // [eval]
+        err: (_|_){
+          // [eval] embed.embedDefWithEmbedding.a.err: field not allowed:
+          //     ./in.cue:12:7
+          //     ./in.cue:12:16
+        }
+        a: (int){ int }
+      }
+    }
+    embedComprehension: (_|_){
+      // [eval]
+      #Foo: (#struct){
+        a: (int){ int }
+      }
+      a: (_|_){
+        // [eval]
+        err: (_|_){
+          // [eval] embed.embedComprehension.a.err: field not allowed:
+          //     ./in.cue:15:21
+          //     ./in.cue:16:16
+        }
+        a: (int){ int }
+      }
+    }
+    fieldWithAnd: (_|_){
+      // [eval]
+      #A: (#struct){
+      }
+      a: (_|_){
+        // [eval]
+        err: (_|_){
+          // [eval] embed.fieldWithAnd.a.err: field not allowed:
+          //     ./in.cue:20:7
+          //     ./in.cue:20:13
+        }
+      }
+    }
+    embedAndRecursive: (_|_){
+      // [eval]
+      #A: (#struct){
+        a: (int){ int }
+      }
+      B: (struct){
+        x: ~(embed.embedAndRecursive.#A)
+      }
+      x: (_|_){
+        // [eval]
+        err: (_|_){
+          // [eval] embed.embedAndRecursive.x.err: field not allowed:
+          //     ./in.cue:24:8
+          //     ./in.cue:25:11
+        }
+        a: (int){ int }
+      }
+    }
+    andEmbed: (_|_){
+      // [eval]
+      #A: (#struct){
+        b: (int){ int }
+      }
+      #B: (#struct){
+        b: (int){ int }
+      }
+      #D: (#struct){
+        b: (int){ int }
+      }
+      d: (_|_){
+        // [eval]
+        err: (_|_){
+          // [eval] embed.andEmbed.d.err: field not allowed:
+          //     ./in.cue:30:12
+          //     ./in.cue:31:11
+        }
+        b: (int){ int }
+      }
+    }
+    nonDef: (struct){
+      t1: (struct){
+        X: (struct){
+          a: (string){ string }
+        }
+        #Y: (#struct){
+          b?: (string){ string }
+          a: (string){ string }
+        }
+        #Z: (#struct){
+          b?: (string){ string }
+          a: (string){ string }
+        }
+      }
+    }
+    defAndHidden: (struct){
+      full: (struct){
+        _stepCommon: (struct){
+          Name: (string){ string }
+        }
+        #Step: (#struct){
+          Path?: (string){ string }
+          Name: (string){ string }
+        }
+        #Command: (#struct){
+          Path?: (string){ string }
+          Name: (string){ string }
+        }
+        out: (#struct){
+          Name: (string){ "foo" }
+          Path?: (string){ string }
+        }
+      }
+    }
+    normalValidator: (_|_){
+      // [eval]
+      #X: (#struct){
+        a?: (int){ int }
+        b?: (int){ int }
+      }
+      x: (_|_){
+        // [eval] embed.normalValidator.x.err: field not allowed:
+        //     ./validators.cue:4:3
+        //     ./validators.cue:9:5
+        err: (_|_){
+          // [eval] embed.normalValidator.x.err: field not allowed:
+          //     ./validators.cue:4:3
+          //     ./validators.cue:9:5
+        }
+        a?: (int){ int }
+        b?: (int){ int }
+      }
+    }
+    openValidator: (_|_){
+      // [eval]
+      t1: (struct){
+        #X: (_){
+          matchN(0, (#list){
+          })
+          a?: (int){ int }
+          b?: (int){ int }
+        }
+        x: (#struct){
+          err: (int){ 1 }
+          a?: (int){ int }
+          b?: (int){ int }
+        }
+      }
+      t2: (_|_){
+        // [eval]
+        Y: (_){ matchN(1, (#list){
+            0: (_|_){// 〈1;X〉
+            }
+          }) }
+        X: (struct){
+          b?: (_){ matchN(1, (#list){
+              0: (_|_){// 〈1;X〉
+              }
+            }) }
+        }
+        a: (_|_){
+          // [eval]
+          b: (_|_){
+            // [eval] embed.openValidator.t2.a.b: conflicting values 1 and {b?:Y} (mismatched types int and struct):
+            //     ./validators.cue:22:5
+            //     ./validators.cue:24:8
+            // embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
+            //     ./validators.cue:21:5
+            //     ./validators.cue:21:12
+            //     ./validators.cue:22:9
+            //     ./validators.cue:24:8
+          }
+        }
+      }
+    }
+  }
+  and: (_|_){
+    // [eval]
+    transitive: (_|_){
+      // [eval]
+      Z: (struct){
+        a: (string){ string }
+      }
+      #Y: (#struct){
+        a: (string){ string }
+      }
+      #X: (#struct){
+        a: (string){ string }
+      }
+      out: (_|_){
+        // [eval]
+        ok: (_|_){
+          // [eval] and.transitive.out.ok: field not allowed:
+          //     ./in.cue:35:6
+          //     ./in.cue:38:3
+        }
+        a: (string){ string }
+      }
+    }
+    transitiveWithEmbed: (_|_){
+      // [eval]
+      Z: (struct){
+        a: (string){ string }
+      }
+      #X: (#struct){
+        a: (string){ string }
+      }
+      #Y: (#struct){
+        a: (string){ string }
+      }
+      out: (_|_){
+        // [eval]
+        ok: (_|_){
+          // [eval] and.transitiveWithEmbed.out.ok: field not allowed:
+          //     ./in.cue:44:7
+          //     ./in.cue:46:3
+        }
+        a: (string){ string }
+      }
+    }
+  }
+  full: (struct){
+    #Resource: (#struct){
+      someMsg: (string){ string }
+      obs: (#struct){ |(*(#struct){
+          missing: (bool){ true }
+        }, (#struct){
+        }) }
+      let pickMsg#1 = (#struct){
+        msg: (_|_){
+          // [incomplete] full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
+          //     ./large.cue:7:25
+          //     ./large.cue:3:12
+        }
+      }
+      patches: (#list){
+        0: (#struct){
+          op: (string){ "add" }
+          path: (string){ "/metadata" }
+          value: (_|_){
+            // [incomplete] full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
+            //     ./large.cue:7:25
+            //     ./large.cue:3:12
+          }
+        }
+      }
+    }
+    #Patches: (#struct){
+    }
+    #JSONPatch: (#struct){
+      namespace?: (string){ string }
+      patch: (list){
+      }
+      output: (_|_){
+        // [incomplete] full.#JSONPatch.output: cannot reference optional field: namespace:
+        //     ./large.cue:21:24
+      }
+    }
+    #JSONOp: (#struct){ |((#struct){
+        op: (string){ "add" }
+        path: (string){ string }
+        value: (_){ _ }
+      }, (#struct){
+        op: (string){ "remove" }
+        path: (string){ string }
+      }) }
+    #Main: (#struct){
+      namespace: (string){ string }
+      output: (_|_){
+        // [incomplete] full.#Main.jsonPatch.output: key value of dynamic field must be concrete, found string:
+        //     ./large.cue:21:24
+        //     ./large.cue:19:15
+      }
+      let jsonPatch#2 = (#struct){
+        let base#5 = (#struct){
+          someMsg: (string){ string }
+          obs: (#struct){ |(*(#struct){
+              missing: (bool){ true }
+            }, (#struct){
+            }) }
+          let pickMsg#1 = (#struct){
+            msg: (_|_){
+              // [incomplete] full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
+              //     ./large.cue:7:25
+              //     ./large.cue:3:12
+            }
+          }
+          patches: (#list){
+            0: (#struct){
+              op: (string){ "add" }
+              path: (string){ "/metadata" }
+              value: (_|_){
+                // [incomplete] full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
+                //     ./large.cue:7:25
+                //     ./large.cue:3:12
+              }
+            }
+          }
+        }
+        let withMsg#6 = (#struct){
+          someMsg: (string){ "foo" }
+          obs: (#struct){ |(*(#struct){
+              missing: (bool){ true }
+            }, (#struct){
+            }) }
+          let pickMsg#1 = (#struct){
+            msg: (_|_){
+              // [incomplete] full.#Main.jsonPatch.withMsg.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
+              //     ./large.cue:7:25
+              //     ./large.cue:3:12
+            }
+          }
+          patches: (#list){
+            0: (#struct){
+              op: (string){ "add" }
+              path: (string){ "/metadata" }
+              value: (_|_){
+                // [incomplete] full.#Main.jsonPatch.withMsg.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
+                //     ./large.cue:7:25
+                //     ./large.cue:3:12
+              }
+            }
+          }
+        }
+        namespace: (string){ string }
+        patch: (#list){
+          0: (_|_){
+            // [incomplete] full.#Main.jsonPatch.patch.0: 2 errors in empty disjunction:
+            // full.#Main.jsonPatch.patch.0.op: conflicting values "remove" and "add":
+            //     ./large.cue:11:11
+            //     ./large.cue:28:9
+            // full.#Main.jsonPatch.patch.0.value: invalid interpolation: non-concrete value string (type string):
+            //     ./large.cue:7:25
+            //     ./large.cue:3:12
+            op: (string){ "add" }
+            path: (string){ "/metadata" }
+            value: (_){ _ }
+          }
+        }
+        output: (_|_){
+          // [incomplete] full.#Main.jsonPatch.output: key value of dynamic field must be concrete, found string:
+          //     ./large.cue:21:24
+          //     ./large.cue:19:15
+        }
+      }
+    }
+    out: (#struct){
+      ns1: (#list){
+        0: (_|_){
+          // [incomplete] jsonPatch.output.ns1.0: 2 errors in empty disjunction:
+          // jsonPatch.output.ns1.0.op: conflicting values "remove" and "add":
+          //     ./large.cue:11:11
+          //     ./large.cue:28:9
+          // jsonPatch.output.ns1.0.value: invalid interpolation: non-concrete value string (type string):
+          //     ./large.cue:7:25
+          //     ./large.cue:3:12
+          op: (string){ "add" }
+          path: (string){ "/metadata" }
+          value: (_){ _ }
+        }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,75 +1,37 @@
+ Errors:
+-and.transitive.out.ok: field not allowed:
+-    ./in.cue:34:5
+-    ./in.cue:35:6
+-    ./in.cue:36:6
+-    ./in.cue:36:11
+-    ./in.cue:37:7
+-    ./in.cue:38:3
+-and.transitiveWithEmbed.out.ok: field not allowed:
+-    ./in.cue:42:5
+-    ./in.cue:43:6
+-    ./in.cue:43:11
+-    ./in.cue:44:6
+-    ./in.cue:44:7
+-    ./in.cue:45:7
+-    ./in.cue:46:3
+-embed.andEmbed.d.err: field not allowed:
+-    ./in.cue:28:6
+-    ./in.cue:29:6
+-    ./in.cue:30:6
+-    ./in.cue:30:7
+-    ./in.cue:30:12
+-    ./in.cue:31:5
+-    ./in.cue:31:11
++embed.openValidator.t2.a.b: conflicting values 1 and {b?:Y} (mismatched types int and struct):
++    ./validators.cue:22:5
++    ./validators.cue:24:8
++embed.simple.a.err: field not allowed:
++    ./in.cue:3:7
++    ./in.cue:4:5
+ embed.andInStruct.a.err: field not allowed:
+-    ./in.cue:7:8
+-    ./in.cue:8:5
+     ./in.cue:8:7
+     ./in.cue:8:16
+-embed.embedAndRecursive.x.err: field not allowed:
+-    ./in.cue:23:6
+-    ./in.cue:24:8
+-    ./in.cue:25:2
+-    ./in.cue:25:11
+-embed.embedComprehension.a.err: field not allowed:
+-    ./in.cue:15:8
+-    ./in.cue:15:9
+-    ./in.cue:15:17
+-    ./in.cue:16:5
+-    ./in.cue:16:7
+-    ./in.cue:16:16
+ embed.embedDefWithEmbedding.a.err: field not allowed:
+-    ./in.cue:11:8
+-    ./in.cue:11:9
+-    ./in.cue:12:5
+     ./in.cue:12:7
+     ./in.cue:12:16
++embed.embedComprehension.a.err: field not allowed:
++    ./in.cue:15:21
++    ./in.cue:16:16
+ embed.fieldWithAnd.a.err: field not allowed:
+-    ./in.cue:19:6
+-    ./in.cue:20:2
+     ./in.cue:20:7
+     ./in.cue:20:13
++embed.embedAndRecursive.x.err: field not allowed:
++    ./in.cue:24:8
++    ./in.cue:25:11
++embed.andEmbed.d.err: field not allowed:
++    ./in.cue:30:12
++    ./in.cue:31:11
++and.transitive.out.ok: field not allowed:
++    ./in.cue:35:6
++    ./in.cue:38:3
++and.transitiveWithEmbed.out.ok: field not allowed:
++    ./in.cue:44:7
++    ./in.cue:46:3
+ embed.normalValidator.x.err: field not allowed:
+-    ./validators.cue:3:6
+-    ./validators.cue:8:5
++    ./validators.cue:4:3
+     ./validators.cue:9:5
+-embed.openValidator.t2.a.b: conflicting values 1 and {b?:Y} (mismatched types int and struct):
+-    ./validators.cue:21:16
+-    ./validators.cue:22:5
+-    ./validators.cue:22:9
+-    ./validators.cue:23:5
+-    ./validators.cue:24:8
+-embed.simple.a.err: field not allowed:
+-    ./in.cue:2:6
+-    ./in.cue:3:5
+-    ./in.cue:3:7
+-    ./in.cue:4:5
+-embed.openValidator.t1.x.err: field not allowed:
+-    ./validators.cue:13:3
+-    ./validators.cue:12:6
+-    ./validators.cue:17:5
+-    ./validators.cue:18:5
+ embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
+     ./validators.cue:21:5
+     ./validators.cue:21:12
+@@ -88,14 +50,12 @@
+       }
+       a: (_|_){
+         // [eval]
+-        b: (int){ 1 }
+         err: (_|_){
+           // [eval] embed.simple.a.err: field not allowed:
+-          //     ./in.cue:2:6
+-          //     ./in.cue:3:5
+           //     ./in.cue:3:7
+           //     ./in.cue:4:5
+         }
++        b: (int){ 1 }
+       }
+     }
+     andInStruct: (_|_){
+@@ -105,14 +65,12 @@
+       }
+       a: (_|_){
+         // [eval]
+-        a: (int){ int }
+         err: (_|_){
+           // [eval] embed.andInStruct.a.err: field not allowed:
+-          //     ./in.cue:7:8
+-          //     ./in.cue:8:5
+           //     ./in.cue:8:7
+           //     ./in.cue:8:16
+         }
++        a: (int){ int }
+       }
+     }
+     embedDefWithEmbedding: (_|_){
+@@ -122,15 +80,12 @@
+       }
+       a: (_|_){
+         // [eval]
+-        a: (int){ int }
+         err: (_|_){
+           // [eval] embed.embedDefWithEmbedding.a.err: field not allowed:
+-          //     ./in.cue:11:8
+-          //     ./in.cue:11:9
+-          //     ./in.cue:12:5
+           //     ./in.cue:12:7
+           //     ./in.cue:12:16
+         }
++        a: (int){ int }
+       }
+     }
+     embedComprehension: (_|_){
+@@ -140,16 +95,12 @@
+       }
+       a: (_|_){
+         // [eval]
+-        a: (int){ int }
+         err: (_|_){
+           // [eval] embed.embedComprehension.a.err: field not allowed:
+-          //     ./in.cue:15:8
+-          //     ./in.cue:15:9
+-          //     ./in.cue:15:17
+-          //     ./in.cue:16:5
+-          //     ./in.cue:16:7
++          //     ./in.cue:15:21
+           //     ./in.cue:16:16
+         }
++        a: (int){ int }
+       }
+     }
+     fieldWithAnd: (_|_){
+@@ -160,8 +111,6 @@
+         // [eval]
+         err: (_|_){
+           // [eval] embed.fieldWithAnd.a.err: field not allowed:
+-          //     ./in.cue:19:6
+-          //     ./in.cue:20:2
+           //     ./in.cue:20:7
+           //     ./in.cue:20:13
+         }
+@@ -173,20 +122,16 @@
+         a: (int){ int }
+       }
+       B: (struct){
+-        x: (#struct){
+-          a: (int){ int }
+-        }
+-      }
+-      x: (_|_){
+-        // [eval]
+-        a: (int){ int }
++        x: ~(embed.embedAndRecursive.#A)
++      }
++      x: (_|_){
++        // [eval]
+         err: (_|_){
+           // [eval] embed.embedAndRecursive.x.err: field not allowed:
+-          //     ./in.cue:23:6
+           //     ./in.cue:24:8
+-          //     ./in.cue:25:2
+           //     ./in.cue:25:11
+         }
++        a: (int){ int }
+       }
+     }
+     andEmbed: (_|_){
+@@ -202,17 +147,12 @@
+       }
+       d: (_|_){
+         // [eval]
+-        b: (int){ int }
+         err: (_|_){
+           // [eval] embed.andEmbed.d.err: field not allowed:
+-          //     ./in.cue:28:6
+-          //     ./in.cue:29:6
+-          //     ./in.cue:30:6
+-          //     ./in.cue:30:7
+           //     ./in.cue:30:12
+-          //     ./in.cue:31:5
+           //     ./in.cue:31:11
+         }
++        b: (int){ int }
+       }
+     }
+     nonDef: (struct){
+@@ -221,12 +161,12 @@
+           a: (string){ string }
+         }
+         #Y: (#struct){
+-          a: (string){ string }
+-          b?: (string){ string }
++          b?: (string){ string }
++          a: (string){ string }
+         }
+         #Z: (#struct){
+-          a: (string){ string }
+-          b?: (string){ string }
++          b?: (string){ string }
++          a: (string){ string }
+         }
+       }
+     }
+@@ -236,12 +176,12 @@
+           Name: (string){ string }
+         }
+         #Step: (#struct){
+-          Name: (string){ string }
+-          Path?: (string){ string }
++          Path?: (string){ string }
++          Name: (string){ string }
+         }
+         #Command: (#struct){
+-          Name: (string){ string }
+-          Path?: (string){ string }
++          Path?: (string){ string }
++          Name: (string){ string }
+         }
+         out: (#struct){
+           Name: (string){ "foo" }
+@@ -256,21 +196,21 @@
+         b?: (int){ int }
+       }
+       x: (_|_){
+-        // [eval]
+-        a?: (int){ int }
+-        b?: (int){ int }
++        // [eval] embed.normalValidator.x.err: field not allowed:
++        //     ./validators.cue:4:3
++        //     ./validators.cue:9:5
+         err: (_|_){
+           // [eval] embed.normalValidator.x.err: field not allowed:
+-          //     ./validators.cue:3:6
+-          //     ./validators.cue:8:5
++          //     ./validators.cue:4:3
+           //     ./validators.cue:9:5
+         }
++        a?: (int){ int }
++        b?: (int){ int }
+       }
+     }
+     openValidator: (_|_){
+       // [eval]
+-      t1: (_|_){
+-        // [eval]
++      t1: (struct){
+         #X: (_){
+           matchN(0, (#list){
+           })
+@@ -277,17 +217,10 @@
+           a?: (int){ int }
+           b?: (int){ int }
+         }
+-        x: (_|_){
+-          // [eval]
+-          a?: (int){ int }
+-          b?: (int){ int }
+-          err: (_|_){
+-            // [eval] embed.openValidator.t1.x.err: field not allowed:
+-            //     ./validators.cue:13:3
+-            //     ./validators.cue:12:6
+-            //     ./validators.cue:17:5
+-            //     ./validators.cue:18:5
+-          }
++        x: (#struct){
++          err: (int){ 1 }
++          a?: (int){ int }
++          b?: (int){ int }
+         }
+       }
+       t2: (_|_){
+@@ -306,10 +239,7 @@
+           // [eval]
+           b: (_|_){
+             // [eval] embed.openValidator.t2.a.b: conflicting values 1 and {b?:Y} (mismatched types int and struct):
+-            //     ./validators.cue:21:16
+             //     ./validators.cue:22:5
+-            //     ./validators.cue:22:9
+-            //     ./validators.cue:23:5
+             //     ./validators.cue:24:8
+             // embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
+             //     ./validators.cue:21:5
+@@ -336,16 +266,12 @@
+       }
+       out: (_|_){
+         // [eval]
+-        a: (string){ string }
+         ok: (_|_){
+           // [eval] and.transitive.out.ok: field not allowed:
+-          //     ./in.cue:34:5
+           //     ./in.cue:35:6
+-          //     ./in.cue:36:6
+-          //     ./in.cue:36:11
+-          //     ./in.cue:37:7
+           //     ./in.cue:38:3
+         }
++        a: (string){ string }
+       }
+     }
+     transitiveWithEmbed: (_|_){
+@@ -361,17 +287,12 @@
+       }
+       out: (_|_){
+         // [eval]
+-        a: (string){ string }
+         ok: (_|_){
+           // [eval] and.transitiveWithEmbed.out.ok: field not allowed:
+-          //     ./in.cue:42:5
+-          //     ./in.cue:43:6
+-          //     ./in.cue:43:11
+-          //     ./in.cue:44:6
+           //     ./in.cue:44:7
+-          //     ./in.cue:45:7
+           //     ./in.cue:46:3
+         }
++        a: (string){ string }
+       }
+     }
+   }
+@@ -394,7 +315,7 @@
+           op: (string){ "add" }
+           path: (string){ "/metadata" }
+           value: (_|_){
+-            // [incomplete] full.#Resource.patches.0.value: invalid interpolation: non-concrete value string (type string):
++            // [incomplete] full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
+             //     ./large.cue:7:25
+             //     ./large.cue:3:12
+           }
+@@ -423,38 +344,11 @@
+     #Main: (#struct){
+       namespace: (string){ string }
+       output: (_|_){
+-        // [incomplete] full.#Main.output: invalid non-ground value string (must be concrete string):
++        // [incomplete] full.#Main.jsonPatch.output: key value of dynamic field must be concrete, found string:
++        //     ./large.cue:21:24
+         //     ./large.cue:19:15
+-        //     ./large.cue:41:15
+-        _: (#list){
+-          0: (#struct){
+-            op: (string){ "add" }
+-            path: (string){ "/metadata" }
+-            value: (string){ "foo" }
+-          }
+-        }
+       }
+       let jsonPatch#2 = (#struct){
+-        namespace: (string){ string }
+-        patch: (#list){
+-          0: (#struct){
+-            op: (string){ "add" }
+-            path: (string){ "/metadata" }
+-            value: (string){ "foo" }
+-          }
+-        }
+-        output: (_|_){
+-          // [incomplete] full.#Main.jsonPatch.output: invalid non-ground value string (must be concrete string):
+-          //     ./large.cue:19:15
+-          //     ./large.cue:41:15
+-          _: (#list){
+-            0: (#struct){
+-              op: (string){ "add" }
+-              path: (string){ "/metadata" }
+-              value: (string){ "foo" }
+-            }
+-          }
+-        }
+         let base#5 = (#struct){
+           someMsg: (string){ string }
+           obs: (#struct){ |(*(#struct){
+@@ -473,7 +367,7 @@
+               op: (string){ "add" }
+               path: (string){ "/metadata" }
+               value: (_|_){
+-                // [incomplete] full.#Main.jsonPatch.base.patches.0.value: invalid interpolation: non-concrete value string (type string):
++                // [incomplete] full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
+                 //     ./large.cue:7:25
+                 //     ./large.cue:3:12
+               }
+@@ -487,24 +381,59 @@
+             }, (#struct){
+             }) }
+           let pickMsg#1 = (#struct){
+-            msg: (string){ "foo" }
+-          }
+-          patches: (#list){
+-            0: (#struct){
+-              op: (string){ "add" }
+-              path: (string){ "/metadata" }
+-              value: (string){ "foo" }
+-            }
+-          }
++            msg: (_|_){
++              // [incomplete] full.#Main.jsonPatch.withMsg.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
++              //     ./large.cue:7:25
++              //     ./large.cue:3:12
++            }
++          }
++          patches: (#list){
++            0: (#struct){
++              op: (string){ "add" }
++              path: (string){ "/metadata" }
++              value: (_|_){
++                // [incomplete] full.#Main.jsonPatch.withMsg.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
++                //     ./large.cue:7:25
++                //     ./large.cue:3:12
++              }
++            }
++          }
++        }
++        namespace: (string){ string }
++        patch: (#list){
++          0: (_|_){
++            // [incomplete] full.#Main.jsonPatch.patch.0: 2 errors in empty disjunction:
++            // full.#Main.jsonPatch.patch.0.op: conflicting values "remove" and "add":
++            //     ./large.cue:11:11
++            //     ./large.cue:28:9
++            // full.#Main.jsonPatch.patch.0.value: invalid interpolation: non-concrete value string (type string):
++            //     ./large.cue:7:25
++            //     ./large.cue:3:12
++            op: (string){ "add" }
++            path: (string){ "/metadata" }
++            value: (_){ _ }
++          }
++        }
++        output: (_|_){
++          // [incomplete] full.#Main.jsonPatch.output: key value of dynamic field must be concrete, found string:
++          //     ./large.cue:21:24
++          //     ./large.cue:19:15
+         }
+       }
+     }
+     out: (#struct){
+       ns1: (#list){
+-        0: (#struct){
+-          op: (string){ "add" }
+-          path: (string){ "/metadata" }
+-          value: (string){ "foo" }
++        0: (_|_){
++          // [incomplete] jsonPatch.output.ns1.0: 2 errors in empty disjunction:
++          // jsonPatch.output.ns1.0.op: conflicting values "remove" and "add":
++          //     ./large.cue:11:11
++          //     ./large.cue:28:9
++          // jsonPatch.output.ns1.0.value: invalid interpolation: non-concrete value string (type string):
++          //     ./large.cue:7:25
++          //     ./large.cue:3:12
++          op: (string){ "add" }
++          path: (string){ "/metadata" }
++          value: (_){ _ }
+         }
+       }
+     }
+-- diff/todo/p1 --
+embed.openValidator.err: unexpected pass.
+and.full.out: failure in evalv3
+-- diff/todo/p2 --
+and.transitive(WithEmbed)?.out.ok: unexpected error
+-- out/eval --
+Errors:
+and.transitive.out.ok: field not allowed:
+    ./in.cue:34:5
+    ./in.cue:35:6
+    ./in.cue:36:6
+    ./in.cue:36:11
+    ./in.cue:37:7
+    ./in.cue:38:3
+and.transitiveWithEmbed.out.ok: field not allowed:
+    ./in.cue:42:5
+    ./in.cue:43:6
+    ./in.cue:43:11
+    ./in.cue:44:6
+    ./in.cue:44:7
+    ./in.cue:45:7
+    ./in.cue:46:3
+embed.andEmbed.d.err: field not allowed:
+    ./in.cue:28:6
+    ./in.cue:29:6
+    ./in.cue:30:6
+    ./in.cue:30:7
+    ./in.cue:30:12
+    ./in.cue:31:5
+    ./in.cue:31:11
+embed.andInStruct.a.err: field not allowed:
+    ./in.cue:7:8
+    ./in.cue:8:5
+    ./in.cue:8:7
+    ./in.cue:8:16
+embed.embedAndRecursive.x.err: field not allowed:
+    ./in.cue:23:6
+    ./in.cue:24:8
+    ./in.cue:25:2
+    ./in.cue:25:11
+embed.embedComprehension.a.err: field not allowed:
+    ./in.cue:15:8
+    ./in.cue:15:9
+    ./in.cue:15:17
+    ./in.cue:16:5
+    ./in.cue:16:7
+    ./in.cue:16:16
+embed.embedDefWithEmbedding.a.err: field not allowed:
+    ./in.cue:11:8
+    ./in.cue:11:9
+    ./in.cue:12:5
+    ./in.cue:12:7
+    ./in.cue:12:16
+embed.fieldWithAnd.a.err: field not allowed:
+    ./in.cue:19:6
+    ./in.cue:20:2
+    ./in.cue:20:7
+    ./in.cue:20:13
+embed.normalValidator.x.err: field not allowed:
+    ./validators.cue:3:6
+    ./validators.cue:8:5
+    ./validators.cue:9:5
+embed.openValidator.t2.a.b: conflicting values 1 and {b?:Y} (mismatched types int and struct):
+    ./validators.cue:21:16
+    ./validators.cue:22:5
+    ./validators.cue:22:9
+    ./validators.cue:23:5
+    ./validators.cue:24:8
+embed.simple.a.err: field not allowed:
+    ./in.cue:2:6
+    ./in.cue:3:5
+    ./in.cue:3:7
+    ./in.cue:4:5
+embed.openValidator.t1.x.err: field not allowed:
+    ./validators.cue:13:3
+    ./validators.cue:12:6
+    ./validators.cue:17:5
+    ./validators.cue:18:5
+embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
+    ./validators.cue:21:5
+    ./validators.cue:21:12
+    ./validators.cue:22:9
+    ./validators.cue:24:8
+
+Result:
+(_|_){
+  // [eval]
+  embed: (_|_){
+    // [eval]
+    simple: (_|_){
+      // [eval]
+      #A: (#struct){
+        b: (int){ 1 }
+      }
+      a: (_|_){
+        // [eval]
+        b: (int){ 1 }
+        err: (_|_){
+          // [eval] embed.simple.a.err: field not allowed:
+          //     ./in.cue:2:6
+          //     ./in.cue:3:5
+          //     ./in.cue:3:7
+          //     ./in.cue:4:5
+        }
+      }
+    }
+    andInStruct: (_|_){
+      // [eval]
+      #Foo: (#struct){
+        a: (int){ int }
+      }
+      a: (_|_){
+        // [eval]
+        a: (int){ int }
+        err: (_|_){
+          // [eval] embed.andInStruct.a.err: field not allowed:
+          //     ./in.cue:7:8
+          //     ./in.cue:8:5
+          //     ./in.cue:8:7
+          //     ./in.cue:8:16
+        }
+      }
+    }
+    embedDefWithEmbedding: (_|_){
+      // [eval]
+      #Foo: (#struct){
+        a: (int){ int }
+      }
+      a: (_|_){
+        // [eval]
+        a: (int){ int }
+        err: (_|_){
+          // [eval] embed.embedDefWithEmbedding.a.err: field not allowed:
+          //     ./in.cue:11:8
+          //     ./in.cue:11:9
+          //     ./in.cue:12:5
+          //     ./in.cue:12:7
+          //     ./in.cue:12:16
+        }
+      }
+    }
+    embedComprehension: (_|_){
+      // [eval]
+      #Foo: (#struct){
+        a: (int){ int }
+      }
+      a: (_|_){
+        // [eval]
+        a: (int){ int }
+        err: (_|_){
+          // [eval] embed.embedComprehension.a.err: field not allowed:
+          //     ./in.cue:15:8
+          //     ./in.cue:15:9
+          //     ./in.cue:15:17
+          //     ./in.cue:16:5
+          //     ./in.cue:16:7
+          //     ./in.cue:16:16
+        }
+      }
+    }
+    fieldWithAnd: (_|_){
+      // [eval]
+      #A: (#struct){
+      }
+      a: (_|_){
+        // [eval]
+        err: (_|_){
+          // [eval] embed.fieldWithAnd.a.err: field not allowed:
+          //     ./in.cue:19:6
+          //     ./in.cue:20:2
+          //     ./in.cue:20:7
+          //     ./in.cue:20:13
+        }
+      }
+    }
+    embedAndRecursive: (_|_){
+      // [eval]
+      #A: (#struct){
+        a: (int){ int }
+      }
+      B: (struct){
+        x: (#struct){
+          a: (int){ int }
+        }
+      }
+      x: (_|_){
+        // [eval]
+        a: (int){ int }
+        err: (_|_){
+          // [eval] embed.embedAndRecursive.x.err: field not allowed:
+          //     ./in.cue:23:6
+          //     ./in.cue:24:8
+          //     ./in.cue:25:2
+          //     ./in.cue:25:11
+        }
+      }
+    }
+    andEmbed: (_|_){
+      // [eval]
+      #A: (#struct){
+        b: (int){ int }
+      }
+      #B: (#struct){
+        b: (int){ int }
+      }
+      #D: (#struct){
+        b: (int){ int }
+      }
+      d: (_|_){
+        // [eval]
+        b: (int){ int }
+        err: (_|_){
+          // [eval] embed.andEmbed.d.err: field not allowed:
+          //     ./in.cue:28:6
+          //     ./in.cue:29:6
+          //     ./in.cue:30:6
+          //     ./in.cue:30:7
+          //     ./in.cue:30:12
+          //     ./in.cue:31:5
+          //     ./in.cue:31:11
+        }
+      }
+    }
+    nonDef: (struct){
+      t1: (struct){
+        X: (struct){
+          a: (string){ string }
+        }
+        #Y: (#struct){
+          a: (string){ string }
+          b?: (string){ string }
+        }
+        #Z: (#struct){
+          a: (string){ string }
+          b?: (string){ string }
+        }
+      }
+    }
+    defAndHidden: (struct){
+      full: (struct){
+        _stepCommon: (struct){
+          Name: (string){ string }
+        }
+        #Step: (#struct){
+          Name: (string){ string }
+          Path?: (string){ string }
+        }
+        #Command: (#struct){
+          Name: (string){ string }
+          Path?: (string){ string }
+        }
+        out: (#struct){
+          Name: (string){ "foo" }
+          Path?: (string){ string }
+        }
+      }
+    }
+    normalValidator: (_|_){
+      // [eval]
+      #X: (#struct){
+        a?: (int){ int }
+        b?: (int){ int }
+      }
+      x: (_|_){
+        // [eval]
+        a?: (int){ int }
+        b?: (int){ int }
+        err: (_|_){
+          // [eval] embed.normalValidator.x.err: field not allowed:
+          //     ./validators.cue:3:6
+          //     ./validators.cue:8:5
+          //     ./validators.cue:9:5
+        }
+      }
+    }
+    openValidator: (_|_){
+      // [eval]
+      t1: (_|_){
+        // [eval]
+        #X: (_){
+          matchN(0, (#list){
+          })
+          a?: (int){ int }
+          b?: (int){ int }
+        }
+        x: (_|_){
+          // [eval]
+          a?: (int){ int }
+          b?: (int){ int }
+          err: (_|_){
+            // [eval] embed.openValidator.t1.x.err: field not allowed:
+            //     ./validators.cue:13:3
+            //     ./validators.cue:12:6
+            //     ./validators.cue:17:5
+            //     ./validators.cue:18:5
+          }
+        }
+      }
+      t2: (_|_){
+        // [eval]
+        Y: (_){ matchN(1, (#list){
+            0: (_|_){// 〈1;X〉
+            }
+          }) }
+        X: (struct){
+          b?: (_){ matchN(1, (#list){
+              0: (_|_){// 〈1;X〉
+              }
+            }) }
+        }
+        a: (_|_){
+          // [eval]
+          b: (_|_){
+            // [eval] embed.openValidator.t2.a.b: conflicting values 1 and {b?:Y} (mismatched types int and struct):
+            //     ./validators.cue:21:16
+            //     ./validators.cue:22:5
+            //     ./validators.cue:22:9
+            //     ./validators.cue:23:5
+            //     ./validators.cue:24:8
+            // embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
+            //     ./validators.cue:21:5
+            //     ./validators.cue:21:12
+            //     ./validators.cue:22:9
+            //     ./validators.cue:24:8
+          }
+        }
+      }
+    }
+  }
+  and: (_|_){
+    // [eval]
+    transitive: (_|_){
+      // [eval]
+      Z: (struct){
+        a: (string){ string }
+      }
+      #Y: (#struct){
+        a: (string){ string }
+      }
+      #X: (#struct){
+        a: (string){ string }
+      }
+      out: (_|_){
+        // [eval]
+        a: (string){ string }
+        ok: (_|_){
+          // [eval] and.transitive.out.ok: field not allowed:
+          //     ./in.cue:34:5
+          //     ./in.cue:35:6
+          //     ./in.cue:36:6
+          //     ./in.cue:36:11
+          //     ./in.cue:37:7
+          //     ./in.cue:38:3
+        }
+      }
+    }
+    transitiveWithEmbed: (_|_){
+      // [eval]
+      Z: (struct){
+        a: (string){ string }
+      }
+      #X: (#struct){
+        a: (string){ string }
+      }
+      #Y: (#struct){
+        a: (string){ string }
+      }
+      out: (_|_){
+        // [eval]
+        a: (string){ string }
+        ok: (_|_){
+          // [eval] and.transitiveWithEmbed.out.ok: field not allowed:
+          //     ./in.cue:42:5
+          //     ./in.cue:43:6
+          //     ./in.cue:43:11
+          //     ./in.cue:44:6
+          //     ./in.cue:44:7
+          //     ./in.cue:45:7
+          //     ./in.cue:46:3
+        }
+      }
+    }
+  }
+  full: (struct){
+    #Resource: (#struct){
+      someMsg: (string){ string }
+      obs: (#struct){ |(*(#struct){
+          missing: (bool){ true }
+        }, (#struct){
+        }) }
+      let pickMsg#1 = (#struct){
+        msg: (_|_){
+          // [incomplete] full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
+          //     ./large.cue:7:25
+          //     ./large.cue:3:12
+        }
+      }
+      patches: (#list){
+        0: (#struct){
+          op: (string){ "add" }
+          path: (string){ "/metadata" }
+          value: (_|_){
+            // [incomplete] full.#Resource.patches.0.value: invalid interpolation: non-concrete value string (type string):
+            //     ./large.cue:7:25
+            //     ./large.cue:3:12
+          }
+        }
+      }
+    }
+    #Patches: (#struct){
+    }
+    #JSONPatch: (#struct){
+      namespace?: (string){ string }
+      patch: (list){
+      }
+      output: (_|_){
+        // [incomplete] full.#JSONPatch.output: cannot reference optional field: namespace:
+        //     ./large.cue:21:24
+      }
+    }
+    #JSONOp: (#struct){ |((#struct){
+        op: (string){ "add" }
+        path: (string){ string }
+        value: (_){ _ }
+      }, (#struct){
+        op: (string){ "remove" }
+        path: (string){ string }
+      }) }
+    #Main: (#struct){
+      namespace: (string){ string }
+      output: (_|_){
+        // [incomplete] full.#Main.output: invalid non-ground value string (must be concrete string):
+        //     ./large.cue:19:15
+        //     ./large.cue:41:15
+        _: (#list){
+          0: (#struct){
+            op: (string){ "add" }
+            path: (string){ "/metadata" }
+            value: (string){ "foo" }
+          }
+        }
+      }
+      let jsonPatch#2 = (#struct){
+        namespace: (string){ string }
+        patch: (#list){
+          0: (#struct){
+            op: (string){ "add" }
+            path: (string){ "/metadata" }
+            value: (string){ "foo" }
+          }
+        }
+        output: (_|_){
+          // [incomplete] full.#Main.jsonPatch.output: invalid non-ground value string (must be concrete string):
+          //     ./large.cue:19:15
+          //     ./large.cue:41:15
+          _: (#list){
+            0: (#struct){
+              op: (string){ "add" }
+              path: (string){ "/metadata" }
+              value: (string){ "foo" }
+            }
+          }
+        }
+        let base#5 = (#struct){
+          someMsg: (string){ string }
+          obs: (#struct){ |(*(#struct){
+              missing: (bool){ true }
+            }, (#struct){
+            }) }
+          let pickMsg#1 = (#struct){
+            msg: (_|_){
+              // [incomplete] full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
+              //     ./large.cue:7:25
+              //     ./large.cue:3:12
+            }
+          }
+          patches: (#list){
+            0: (#struct){
+              op: (string){ "add" }
+              path: (string){ "/metadata" }
+              value: (_|_){
+                // [incomplete] full.#Main.jsonPatch.base.patches.0.value: invalid interpolation: non-concrete value string (type string):
+                //     ./large.cue:7:25
+                //     ./large.cue:3:12
+              }
+            }
+          }
+        }
+        let withMsg#6 = (#struct){
+          someMsg: (string){ "foo" }
+          obs: (#struct){ |(*(#struct){
+              missing: (bool){ true }
+            }, (#struct){
+            }) }
+          let pickMsg#1 = (#struct){
+            msg: (string){ "foo" }
+          }
+          patches: (#list){
+            0: (#struct){
+              op: (string){ "add" }
+              path: (string){ "/metadata" }
+              value: (string){ "foo" }
+            }
+          }
+        }
+      }
+    }
+    out: (#struct){
+      ns1: (#list){
+        0: (#struct){
+          op: (string){ "add" }
+          path: (string){ "/metadata" }
+          value: (string){ "foo" }
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  embed: {
+    simple: {
+      #A: {
+        b: 1
+      }
+      a: {
+        〈1;#A〉
+      }
+      a: {
+        err: 1
+      }
+    }
+  }
+  embed: {
+    andInStruct: {
+      #Foo: {
+        a: int
+      }
+      a: {
+        (〈1;#Foo〉 & {
+          err: 2
+        })
+      }
+    }
+  }
+  embed: {
+    embedDefWithEmbedding: {
+      #Foo: {
+        {
+          a: int
+        }
+      }
+      a: {
+        (〈1;#Foo〉 & {
+          err: 2
+        })
+      }
+    }
+  }
+  embed: {
+    embedComprehension: {
+      #Foo: {
+        if true {
+          a: int
+        }
+      }
+      a: {
+        (〈1;#Foo〉 & {
+          err: 2
+        })
+      }
+    }
+  }
+  embed: {
+    fieldWithAnd: {
+      #A: {}
+      {
+        a: (〈1;#A〉 & {
+          err: 3
+        })
+      }
+    }
+  }
+  embed: {
+    embedAndRecursive: {
+      #A: {
+        a: int
+      }
+      B: {
+        x: 〈1;#A〉
+      }
+      (〈0;B〉 & {
+        x: {
+          err: 2
+        }
+      })
+    }
+  }
+  embed: {
+    andEmbed: {
+      #A: {
+        b: int
+      }
+      #B: {
+        b: int
+      }
+      #D: {
+        (〈1;#A〉 & 〈1;#B〉)
+      }
+      d: (〈0;#D〉 & {
+        err: 3
+      })
+    }
+  }
+  and: {
+    transitive: {
+      Z: {
+        a: string
+      }
+      #Y: 〈0;Z〉
+      #X: (〈0;#Y〉 & 〈0;Z〉)
+      out: (〈0;#X〉 & {
+        ok: "foo"
+      })
+    }
+  }
+  and: {
+    transitiveWithEmbed: {
+      Z: {
+        a: string
+      }
+      #X: (〈0;#Y〉 & 〈0;Z〉)
+      #Y: {
+        〈1;Z〉
+      }
+      out: (〈0;#X〉 & {
+        ok: "foo"
+      })
+    }
+  }
+  embed: {
+    nonDef: {
+      t1: {
+        X: {
+          a: string
+        }
+        #Y: (〈0;#Z〉 & 〈0;X〉)
+        #Z: {
+          〈1;X〉
+          b?: string
+        }
+      }
+    }
+  }
+  embed: {
+    defAndHidden: {
+      full: {
+        _stepCommon: {
+          Name: string
+        }
+        #Step: (〈0;#Command〉 & 〈0;_stepCommon〉)
+        #Command: {
+          〈1;_stepCommon〉
+          Path?: string
+        }
+        out: (〈0;#Step〉 & {
+          Name: "foo"
+        })
+      }
+    }
+  }
+}
+--- large.cue
+{
+  full: {
+    #Resource: {
+      someMsg: string
+      obs: ({}|*{
+        missing: true
+      })
+      let pickMsg#1 = [
+        if 〈1;obs〉.missing {
+          msg: "\(〈2;someMsg〉)"
+        },
+        {
+          msg: "bar"
+        },
+      ][0]
+      patches: [
+        {
+          op: "add"
+          path: "/metadata"
+          value: 〈2;let pickMsg#1〉.msg
+        },
+      ]
+    }
+    #Patches: {
+      [string]: _
+    }
+    #JSONPatch: {
+      namespace?: string
+      patch: [
+        ...〈2;#JSONOp〉,
+      ]
+      output: (〈1;#Patches〉 & {
+        〈1;namespace〉: 〈1;patch〉
+      })
+    }
+    #JSONOp: ({
+      op: "add"
+      path: string
+      value: _
+    }|{
+      op: "remove"
+      path: string
+    })
+    #Main: {
+      namespace: string
+      output: 〈0;let jsonPatch#2〉.output
+      let jsonPatch#2 = (〈1;#JSONPatch〉 & {
+        let base#5 = (〈2;#Resource〉 & {})
+        let withMsg#6 = (〈0;let base#5〉 & {
+          someMsg: "foo"
+        })
+        namespace: 〈1;namespace〉
+        patch: 〈0;let withMsg#6〉.patches
+      })
+    }
+    out: (〈0;#Main〉 & {
+      namespace: "ns1"
+    }).output
+  }
+}
+--- validators.cue
+{
+  embed: {
+    normalValidator: {
+      #X: {
+        〈import;struct〉.MaxFields(1)
+        a?: int
+        b?: int
+      }
+      x: 〈0;#X〉
+      x: {
+        err: 1
+      }
+    }
+  }
+  embed: {
+    openValidator: {
+      t1: {
+        #X: {
+          matchN(0, [])
+          a?: int
+          b?: int
+        }
+        x: 〈0;#X〉
+        x: {
+          err: 1
+        }
+      }
+    }
+  }
+  embed: {
+    openValidator: {
+      t2: {
+        Y: matchN(1, [
+          〈1;X〉,
+        ])
+        X: {
+          b?: 〈1;Y〉
+        }
+        a: 〈0;X〉
+        a: {
+          b: 1
+        }
+      }
+    }
+  }
+}

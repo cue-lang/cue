@@ -254,15 +254,8 @@ func Sort(list []Version) {
 		// To help go.sum formatting, allow version/file.
 		// Compare semver prefix by semver rules,
 		// file by string order.
-		va := a.version
-		vb := b.version
-		var fa, fb string
-		if k := strings.Index(va, "/"); k >= 0 {
-			va, fa = va[:k], va[k:]
-		}
-		if k := strings.Index(vb, "/"); k >= 0 {
-			vb, fb = vb[:k], vb[k:]
-		}
+		va, fa, _ := strings.Cut(a.version, "/")
+		vb, fb, _ := strings.Cut(b.version, "/")
 		if c := semver.Compare(va, vb); c != 0 {
 			return c
 		}

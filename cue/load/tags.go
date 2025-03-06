@@ -291,19 +291,19 @@ func findTags(b *build.Instance) (tags []*tag, errs errors.Error) {
 func (tg *tagger) injectTags(tags []string) errors.Error {
 	// Parses command line args
 	for _, s := range tags {
-		p := strings.Index(s, "=")
+		name, val, ok := strings.Cut(s, "=")
 		found := tg.usedTags[s]
-		if p > 0 { // key-value
+		if ok { // key-value
 			for _, t := range tg.tags {
-				if t.key == s[:p] {
+				if t.key == name {
 					found = true
-					if err := t.inject(s[p+1:], tg); err != nil {
+					if err := t.inject(val, tg); err != nil {
 						return err
 					}
 				}
 			}
 			if !found {
-				return errors.Newf(token.NoPos, "no tag for %q", s[:p])
+				return errors.Newf(token.NoPos, "no tag for %q", name)
 			}
 		} else { // shorthand
 			for _, t := range tg.tags {

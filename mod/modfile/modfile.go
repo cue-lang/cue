@@ -504,7 +504,7 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 		mf.defaultMajorVersions = defaultMajorVersions
 	}
 	mf.versions = versions[:len(versions):len(versions)]
-	module.Sort(mf.versions)
+	slices.SortFunc(mf.versions, module.Version.Compare)
 	return mf, nil
 }
 

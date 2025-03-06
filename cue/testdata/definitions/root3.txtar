@@ -1,0 +1,33 @@
+-- in.cue --
+x: _
+#D: b: x
+#D & { b: _ }
+-- out/eval/stats --
+Leaks:  0
+Freed:  5
+Reused: 2
+Allocs: 3
+Retain: 1
+
+Unifications: 5
+Conjuncts:    11
+Disjuncts:    6
+-- out/eval --
+(#struct){
+  x: (_){ _ }
+  #D: (#struct){
+    b: (_){ _ }
+  }
+  b: (_){ _ }
+}
+-- out/compile --
+--- in.cue
+{
+  x: _
+  #D: {
+    b: 〈1;x〉
+  }
+  (〈0;#D〉 & {
+    b: _
+  })
+}

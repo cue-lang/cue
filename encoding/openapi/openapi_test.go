@@ -124,16 +124,14 @@ func TestGenerateOpenAPI(t *testing.T) {
 			}
 		}
 
-		var out = &bytes.Buffer{}
-		err = json.Indent(out, b, "", "   ")
+		var out bytes.Buffer
+		err = json.Indent(&out, b, "", "   ")
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		w := t.Writer("out.json")
-		jsonStr := out.String()
-		jsonStr = strings.TrimSpace(jsonStr) + "\n"
-		_, err = w.Write([]byte(jsonStr))
+		_, err = w.Write(out.Bytes())
 		if err != nil {
 			t.Fatal(err)
 		}

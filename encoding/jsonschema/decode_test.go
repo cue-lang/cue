@@ -126,7 +126,7 @@ func TestDecode(t *testing.T) {
 		expr, err := jsonschema.Extract(v, cfg)
 		if err != nil {
 			got := "ERROR:\n" + errors.Details(err, nil)
-			w.Write([]byte(strings.TrimSpace(got) + "\n"))
+			w.Write([]byte(got))
 			return
 		}
 		if expr == nil {

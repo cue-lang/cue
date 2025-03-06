@@ -1,0 +1,415 @@
+-- in.cue --
+package p
+
+excludeLet: {
+	// Two lets with the same name should not unify and checked by definition.
+	#D: { let X = {}, #foo: X, f: _ }
+	a: #D
+	a: { let X = { a: 1 }, f: X }
+}
+
+definition: {
+	// Check a definition only if it s contained withing a definition.
+	err1: {
+		#D: { #foo: a: int }
+		a: #D
+		a: { #foo: b: int }
+	}
+	ok1: {
+		#D: {}
+		a: #D
+		a: { #foo: b: int }
+	}
+}
+
+hidden: {
+	// Check a hidden field only if it s contained withing a definition.
+	err1: {
+		#D: { _foo: a: int }
+		a: #D
+		a: { _foo: b: int }
+	}
+	ok1: {
+		#D: {}
+		a: #D
+		a: { _foo: b: int }
+	}
+}
+-- regress.cue --
+package p
+
+import "encoding/json"
+
+definition: ok1: {
+	org: #Org & {
+		#Employee: username: string
+	}
+	#Org: employees?: [string]: username!: string
+}
+
+definition: ok2: {
+	#Tree: {
+		#Leaf: leaf: string
+		#Branch: branch?: #Leaf
+		root: #Branch
+	}
+	out: json.Marshal(#Tree & {root: {}})
+}
+
+hidden: ok1: {
+	out: #Workflow & {
+		_hidden: #step & {
+			run: "foo bar"
+		}
+	}
+	#Workflow: {
+	}
+	#step: matchN(1, [{
+		"run"!: _
+	}])
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  53
+Reused: 45
+Allocs: 8
+Retain: 3
+
+Unifications: 53
+Conjuncts:    79
+Disjuncts:    56
+-- out/evalalpha --
+Errors:
+definition.ok1.a.#foo.b: field not allowed:
+    ./in.cue:15:14
+
+Result:
+(_|_){
+  // [eval]
+  excludeLet: (struct){
+    #D: (#struct){
+      let X#1 = (#struct){
+      }
+      #foo: (#struct){
+      }
+      f: (_){ _ }
+    }
+    a: (#struct){
+      let X#2 = (struct){
+        a: (int){ 1 }
+      }
+      f: (#struct){
+        a: (int){ 1 }
+      }
+      let X#1 = (#struct){
+      }
+      #foo: (#struct){
+      }
+    }
+  }
+  definition: (_|_){
+    // [eval]
+    ok1: (_|_){
+      // [eval]
+      #D: (#struct){
+        #foo: (#struct){
+          a: (int){ int }
+        }
+      }
+      a: (_|_){
+        // [eval]
+        #foo: (_|_){
+          // [eval]
+          b: (_|_){
+            // [eval] definition.ok1.a.#foo.b: field not allowed:
+            //     ./in.cue:15:14
+          }
+          a: (int){ int }
+        }
+      }
+      org: (#struct){
+        #Employee: (#struct){
+          username: (string){ string }
+        }
+        employees?: (#struct){
+        }
+      }
+      #Org: (#struct){
+        employees?: (#struct){
+        }
+      }
+    }
+    err1: (struct){
+      #D: (#struct){
+      }
+      a: (#struct){
+        #foo: (#struct){
+          b: (int){ int }
+        }
+      }
+    }
+    ok2: (struct){
+      #Tree: (#struct){
+        #Leaf: (#struct){
+          leaf: (string){ string }
+        }
+        #Branch: (#struct){
+          branch?: ~(definition.ok2.#Tree.#Leaf)
+        }
+        root: ~(definition.ok2.#Tree.#Branch)
+      }
+      out: (string){ "{\"root\":{}}" }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,7 +1,5 @@
+ Errors:
+ definition.ok1.a.#foo.b: field not allowed:
+-    ./in.cue:13:15
+-    ./in.cue:14:6
+     ./in.cue:15:14
+ 
+ Result:
+@@ -16,16 +14,16 @@
+       f: (_){ _ }
+     }
+     a: (#struct){
+-      let X#1 = (#struct){
+-      }
+-      #foo: (#struct){
+-      }
+-      f: (struct){
+-        a: (int){ 1 }
+-      }
+       let X#2 = (struct){
+         a: (int){ 1 }
+       }
++      f: (#struct){
++        a: (int){ 1 }
++      }
++      let X#1 = (#struct){
++      }
++      #foo: (#struct){
++      }
+     }
+   }
+   definition: (_|_){
+@@ -41,21 +39,19 @@
+         // [eval]
+         #foo: (_|_){
+           // [eval]
+-          a: (int){ int }
+           b: (_|_){
+             // [eval] definition.ok1.a.#foo.b: field not allowed:
+-            //     ./in.cue:13:15
+-            //     ./in.cue:14:6
+             //     ./in.cue:15:14
+           }
++          a: (int){ int }
+         }
+       }
+       org: (#struct){
+-        employees?: (#struct){
+-        }
+         #Employee: (#struct){
+           username: (string){ string }
+         }
++        employees?: (#struct){
++        }
+       }
+       #Org: (#struct){
+         employees?: (#struct){
+@@ -77,15 +73,9 @@
+           leaf: (string){ string }
+         }
+         #Branch: (#struct){
+-          branch?: (#struct){
+-            leaf: (string){ string }
+-          }
+-        }
+-        root: (#struct){
+-          branch?: (#struct){
+-            leaf: (string){ string }
+-          }
+-        }
++          branch?: ~(definition.ok2.#Tree.#Leaf)
++        }
++        root: ~(definition.ok2.#Tree.#Branch)
+       }
+       out: (string){ "{\"root\":{}}" }
+     }
+-- out/eval --
+Errors:
+definition.ok1.a.#foo.b: field not allowed:
+    ./in.cue:13:15
+    ./in.cue:14:6
+    ./in.cue:15:14
+
+Result:
+(_|_){
+  // [eval]
+  excludeLet: (struct){
+    #D: (#struct){
+      let X#1 = (#struct){
+      }
+      #foo: (#struct){
+      }
+      f: (_){ _ }
+    }
+    a: (#struct){
+      let X#1 = (#struct){
+      }
+      #foo: (#struct){
+      }
+      f: (struct){
+        a: (int){ 1 }
+      }
+      let X#2 = (struct){
+        a: (int){ 1 }
+      }
+    }
+  }
+  definition: (_|_){
+    // [eval]
+    ok1: (_|_){
+      // [eval]
+      #D: (#struct){
+        #foo: (#struct){
+          a: (int){ int }
+        }
+      }
+      a: (_|_){
+        // [eval]
+        #foo: (_|_){
+          // [eval]
+          a: (int){ int }
+          b: (_|_){
+            // [eval] definition.ok1.a.#foo.b: field not allowed:
+            //     ./in.cue:13:15
+            //     ./in.cue:14:6
+            //     ./in.cue:15:14
+          }
+        }
+      }
+      org: (#struct){
+        employees?: (#struct){
+        }
+        #Employee: (#struct){
+          username: (string){ string }
+        }
+      }
+      #Org: (#struct){
+        employees?: (#struct){
+        }
+      }
+    }
+    err1: (struct){
+      #D: (#struct){
+      }
+      a: (#struct){
+        #foo: (#struct){
+          b: (int){ int }
+        }
+      }
+    }
+    ok2: (struct){
+      #Tree: (#struct){
+        #Leaf: (#struct){
+          leaf: (string){ string }
+        }
+        #Branch: (#struct){
+          branch?: (#struct){
+            leaf: (string){ string }
+          }
+        }
+        root: (#struct){
+          branch?: (#struct){
+            leaf: (string){ string }
+          }
+        }
+      }
+      out: (string){ "{\"root\":{}}" }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  excludeLet: {
+    #D: {
+      let X#1 = {}
+      #foo: 〈0;let X#1〉
+      f: _
+    }
+    a: 〈0;#D〉
+    a: {
+      let X#2 = {
+        a: 1
+      }
+      f: 〈0;let X#2〉
+    }
+  }
+  definition: {
+    ok1: {
+      #D: {
+        #foo: {
+          a: int
+        }
+      }
+      a: 〈0;#D〉
+      a: {
+        #foo: {
+          b: int
+        }
+      }
+    }
+    err: {
+      #D: {}
+      a: 〈0;#D〉
+      a: {
+        #foo: {
+          b: int
+        }
+      }
+    }
+  }
+}
+--- regress.cue
+{
+  definition: {
+    ok1: {
+      org: (〈0;#Org〉 & {
+        #Employee: {
+          username: string
+        }
+      })
+      #Org: {
+        employees?: {
+          [string]: {
+            username!: string
+          }
+        }
+      }
+    }
+  }
+  definition: {
+    ok2: {
+      #Tree: {
+        #Leaf: {
+          leaf: string
+        }
+        #Branch: {
+          branch?: 〈1;#Leaf〉
+        }
+        root: 〈0;#Branch〉
+      }
+      out: 〈import;"encoding/json"〉.Marshal((〈0;#Tree〉 & {
+        root: {}
+      }))
+    }
+  }
+}

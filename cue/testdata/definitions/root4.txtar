@@ -1,0 +1,117 @@
+-- in.cue --
+#schema: a!: bool
+_hidden & #schema // must fail here, but not elsewhere
+_hidden: {
+	"a": true,
+	notAllowed: true
+}
+allowed: true
+-- out/eval/stats --
+Leaks:  0
+Freed:  9
+Reused: 5
+Allocs: 4
+Retain: 2
+
+Unifications: 9
+Conjuncts:    15
+Disjuncts:    11
+-- out/evalalpha --
+Errors:
+notAllowed: field not allowed:
+    ./in.cue:5:2
+
+Result:
+(_|_){
+  // [eval]
+  #schema: (#struct){
+    a!: (bool){ bool }
+  }
+  _hidden: (struct){
+    a: (bool){ true }
+    notAllowed: (bool){ true }
+  }
+  allowed: (bool){ true }
+  a: (bool){ true }
+  notAllowed: (_|_){
+    // [eval] notAllowed: field not allowed:
+    //     ./in.cue:5:2
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,5 @@
+ Errors:
+ notAllowed: field not allowed:
+-    ./in.cue:1:1
+-    ./in.cue:1:10
+-    ./in.cue:2:1
+-    ./in.cue:2:11
+     ./in.cue:5:2
+ 
+ Result:
+@@ -12,18 +8,14 @@
+   #schema: (#struct){
+     a!: (bool){ bool }
+   }
+-  a: (bool){ true }
+   _hidden: (struct){
+     a: (bool){ true }
+     notAllowed: (bool){ true }
+   }
+   allowed: (bool){ true }
++  a: (bool){ true }
+   notAllowed: (_|_){
+     // [eval] notAllowed: field not allowed:
+-    //     ./in.cue:1:1
+-    //     ./in.cue:1:10
+-    //     ./in.cue:2:1
+-    //     ./in.cue:2:11
+     //     ./in.cue:5:2
+   }
+ }
+-- out/eval --
+Errors:
+notAllowed: field not allowed:
+    ./in.cue:1:1
+    ./in.cue:1:10
+    ./in.cue:2:1
+    ./in.cue:2:11
+    ./in.cue:5:2
+
+Result:
+(_|_){
+  // [eval]
+  #schema: (#struct){
+    a!: (bool){ bool }
+  }
+  a: (bool){ true }
+  _hidden: (struct){
+    a: (bool){ true }
+    notAllowed: (bool){ true }
+  }
+  allowed: (bool){ true }
+  notAllowed: (_|_){
+    // [eval] notAllowed: field not allowed:
+    //     ./in.cue:1:1
+    //     ./in.cue:1:10
+    //     ./in.cue:2:1
+    //     ./in.cue:2:11
+    //     ./in.cue:5:2
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #schema: {
+    a!: bool
+  }
+  (〈0;_hidden〉 & 〈0;#schema〉)
+  _hidden: {
+    a: true
+    notAllowed: true
+  }
+  allowed: true
+}

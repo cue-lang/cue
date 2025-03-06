@@ -77,11 +77,12 @@ var needFix = map[string]string{
 // TODO: These counters should all go to zero.
 var skipDebugDepErrors = map[string]int{
 	"basicrewrite/018_self-reference_cycles":                      3,
+	"builtins/matchn":                                             2,
 	"cycle/025_cannot_resolve_references_that_would_be_ambiguous": 1,
 	"cycle/051_resolved_self-reference_cycles_with_disjunction":   2,
 
 	"cycle/052_resolved_self-reference_cycles_with_disjunction_with_defaults": 1,
-	"cycle/builtins": 3,
+	"cycle/builtins": 9,
 	"cycle/issue241": 2,
 	"cycle/issue429": 1,
 

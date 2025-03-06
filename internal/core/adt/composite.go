@@ -995,6 +995,9 @@ func Unify(c *OpContext, a, b Value) *Vertex {
 	// early enough to error on schemas used for validation.
 	if n := c.vertex; n != nil {
 		v.Parent = n.Parent
+		if c.isDevVersion() {
+			v.Label = n.Label // this doesn't work in V2
+		}
 	}
 
 	addConjuncts(c, v, a)

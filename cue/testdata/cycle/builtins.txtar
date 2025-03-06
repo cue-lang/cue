@@ -731,13 +731,13 @@ Result:
         //     ./matchn.cue:63:6
         //     ./matchn.cue:62:8
         //     ./matchn.cue:63:13
-        // issue3633.final.a: field is required but not present:
-        //     ./matchn.cue:63:17
-        //     ./matchn.cue:63:29
         // issue3633.final.data: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
         //     ./matchn.cue:63:17
         //     ./matchn.cue:62:8
         //     ./matchn.cue:63:24
+        // issue3633.final.data.a: field is required but not present:
+        //     ./matchn.cue:63:17
+        //     ./matchn.cue:63:29
       }
       #s: (_){ matchN(1, (#list){
           0: (_|_){// matchN(1, [
@@ -1120,6 +1120,23 @@ diff old new
            n: (struct){
              n: (_){ _ }
            }
+@@ -393,13 +432,13 @@
+         //     ./matchn.cue:63:6
+         //     ./matchn.cue:62:8
+         //     ./matchn.cue:63:13
+-        // issue3633.final.a: field is required but not present:
+-        //     ./matchn.cue:63:17
+-        //     ./matchn.cue:63:29
+         // issue3633.final.data: invalid value {} (does not satisfy matchN): 0 matched, expected 1:
+         //     ./matchn.cue:63:17
+         //     ./matchn.cue:62:8
+         //     ./matchn.cue:63:24
++        // issue3633.final.data.a: field is required but not present:
++        //     ./matchn.cue:63:17
++        //     ./matchn.cue:63:29
+       }
+       #s: (_){ matchN(1, (#list){
+           0: (_|_){// matchN(1, [
 @@ -417,8 +456,8 @@
        a?: ((string|bytes)){ "encoding/yaml".Validate(yamlNoCycle.#c) }
      }

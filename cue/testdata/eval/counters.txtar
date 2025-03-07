@@ -34,6 +34,39 @@ issue3750: reduced: {
 		}
 	}
 }
+-- issue3780.cue --
+import "strings"
+
+issue3780: panic1: {
+	objs: #Objects & {}
+	param!: bool
+	if param {
+		objs: obj1: {
+			one: 1
+			two: 2
+		}
+	}
+	#Objects: [strings.HasPrefix("obj")]: {
+		kind: "object"
+		...
+	}
+}
+issue3780: panic2: {
+	parent: {
+		objs: #Objects & {}
+		param?: bool
+		if param != _|_ {
+			objs: obj1: {
+				one: 1
+				two: 2
+			}
+		}
+		#Objects: [strings.HasPrefix("obj")]: {
+			kind: "object"
+			...
+		}
+	}
+}
 -- out/compile --
 --- issue3750.cue
 {
@@ -84,16 +117,93 @@ issue3750: reduced: {
     }
   }
 }
+--- issue3780.cue
+{
+  issue3780: {
+    panic1: {
+      objs: (〈0;#Objects〉 & {})
+      param!: bool
+      if 〈0;param〉 {
+        objs: {
+          obj1: {
+            one: 1
+            two: 2
+          }
+        }
+      }
+      #Objects: {
+        [〈import;strings〉.HasPrefix("obj")]: {
+          kind: "object"
+          ...
+        }
+      }
+    }
+  }
+  issue3780: {
+    panic2: {
+      parent: {
+        objs: (〈0;#Objects〉 & {})
+        param?: bool
+        if (〈0;param〉 != _|_(explicit error (_|_ literal) in source)) {
+          objs: {
+            obj1: {
+              one: 1
+              two: 2
+            }
+          }
+        }
+        #Objects: {
+          [〈import;strings〉.HasPrefix("obj")]: {
+            kind: "object"
+            ...
+          }
+        }
+      }
+    }
+  }
+}
+-- out/evalalpha/stats --
+Leaks:  205
+Freed:  0
+Reused: 0
+Allocs: 205
+Retain: 0
+
+Unifications: 161
+Conjuncts:    240
+Disjuncts:    32
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  0
+-Freed:  137
+-Reused: 124
+-Allocs: 13
+-Retain: 34
++Leaks:  205
++Freed:  0
++Reused: 0
++Allocs: 205
++Retain: 0
+ 
+-Unifications: 113
+-Conjuncts:    209
+-Disjuncts:    171
++Unifications: 161
++Conjuncts:    240
++Disjuncts:    32
 -- out/eval/stats --
 Leaks:  0
-Freed:  117
-Reused: 104
+Freed:  137
+Reused: 124
 Allocs: 13
-Retain: 27
+Retain: 34
 
-Unifications: 93
-Conjuncts:    181
-Disjuncts:    144
+Unifications: 113
+Conjuncts:    209
+Disjuncts:    171
 -- out/evalalpha --
 (struct){
   issue3750: (struct){
@@ -204,6 +314,26 @@ Disjuncts:    144
         }
         a: (struct){
           b: (_){ _ }
+        }
+      }
+    }
+  }
+  issue3780: (struct){
+    panic1: (_|_){
+      // [incomplete] issue3780.panic1: incomplete bool: bool:
+      //     ./issue3780.cue:5:10
+      objs: (#struct){
+      }
+      param!: (bool){ bool }
+      #Objects: (#struct){
+      }
+    }
+    panic2: (struct){
+      parent: (struct){
+        objs: (#struct){
+        }
+        param?: (bool){ bool }
+        #Objects: (#struct){
         }
       }
     }
@@ -407,6 +537,26 @@ diff old new
         }
         a: (struct){
           b: (_){ _ }
+        }
+      }
+    }
+  }
+  issue3780: (struct){
+    panic1: (_|_){
+      // [incomplete] issue3780.panic1: incomplete bool: bool:
+      //     ./issue3780.cue:5:10
+      objs: (#struct){
+      }
+      param!: (bool){ bool }
+      #Objects: (#struct){
+      }
+    }
+    panic2: (struct){
+      parent: (struct){
+        objs: (#struct){
+        }
+        param?: (bool){ bool }
+        #Objects: (#struct){
         }
       }
     }

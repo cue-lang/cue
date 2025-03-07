@@ -38,15 +38,15 @@ This commmand ensures that a set of modules and their dependencies
 are available ("mirrored") in a registry.
 
 For each module specified on the command line, it ensures that the
-module and all the modules in depends on
+module and all the modules it depends on
 are present in both the "from" registry and the "to" registry and that the
 contents are the same in each. If the --no-deps is specified, only
 the module itself but not its dependencies will be mirrored.
 
 A module may be specified as <module>@<version>, in which case the
 specified version will be mirrored. If the version is canonical (for example v1.2.3), then
-exactly that version will be mirrored, otherwise the latest corresponding
-version will be mirrored (or all corresponding versions if --all-versions
+exactly that version will be mirrored, otherwise (for example v1) the latest
+corresponding version will be mirrored (or all corresponding versions if --all-versions
 is specified).
 
 For example:

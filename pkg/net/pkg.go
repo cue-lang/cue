@@ -238,6 +238,32 @@ var p = &pkg.Package{
 			}
 		},
 	}, {
+		Name: "AddIP",
+		Params: []pkg.Param{
+			{Kind: adt.TopKind},
+			{Kind: adt.IntKind},
+		},
+		Result: adt.StringKind,
+		Func: func(c *pkg.CallCtxt) {
+			ip, offset := c.Value(0), c.BigInt(1)
+			if c.Do() {
+				c.Ret, c.Err = AddIP(ip, offset)
+			}
+		},
+	}, {
+		Name: "AddIPCIDR",
+		Params: []pkg.Param{
+			{Kind: adt.TopKind},
+			{Kind: adt.IntKind},
+		},
+		Result: adt.StringKind,
+		Func: func(c *pkg.CallCtxt) {
+			ip, offset := c.Value(0), c.BigInt(1)
+			if c.Do() {
+				c.Ret, c.Err = AddIPCIDR(ip, offset)
+			}
+		},
+	}, {
 		Name: "PathEscape",
 		Params: []pkg.Param{
 			{Kind: adt.StringKind},

@@ -37,6 +37,19 @@ t31: net.URL & "https://foo.com/bar"
 t32: net.AbsURL & "/foo/bar"
 t33: net.AbsURL & "https://foo.com/bar"
 t34: net.AbsURL & "%"
+t35: net.AddIP("127.0.0.1", 1)
+t36: net.AddIP("127.0.0.1/8", 2)
+t37: net.AddIP("2001:db8::", 1)
+t38: net.AddIP("2001:db8::/64", 2)
+t39: net.AddIP("invalid ip", 1)
+t40: net.AddIP("0.0.0.0", -1)
+t41: net.AddIP("255.255.255.255", 1)
+t42: net.AddIP("::ffff:127.0.0.1", 1)
+t43: net.AddIPCIDR("192.168.0.0/23", 1)
+t44: net.AddIPCIDR("2001:db8:1111:2222::/64", 1)
+t45: net.AddIPCIDR("192.168.0.0", 1)
+t46: net.AddIPCIDR("10.0.0.0/8", -11)
+t47: net.AddIPCIDR("255.0.0.0/8", 1)
 -- out/net --
 Errors:
 t25: invalid value "2001:db8::1234567" (does not satisfy net.IPv6):
@@ -64,6 +77,18 @@ t20: error in call to net.IPCIDR: netip.ParsePrefix("172.16.12.3"): no '/':
 t27: invalid value "23.23.23.23" (does not satisfy net.IPv6):
     ./in.cue:29:6
     ./in.cue:29:19
+t39: error in call to net.AddIP: invalid IP "invalid ip":
+    ./in.cue:41:6
+t40: error in call to net.AddIP: IP address arithmetic resulted in out-of-range address (underflow):
+    ./in.cue:42:6
+t41: error in call to net.AddIP: IP address arithmetic resulted in out-of-range address (overflow):
+    ./in.cue:43:6
+t45: error in call to net.AddIPCIDR: netip.ParsePrefix("192.168.0.0"): no '/':
+    ./in.cue:47:6
+t46: error in call to net.AddIPCIDR: IP address arithmetic resulted in out-of-range address (underflow):
+    ./in.cue:48:6
+t47: error in call to net.AddIPCIDR: IP address arithmetic resulted in out-of-range address (overflow):
+    ./in.cue:49:6
 
 Result:
 t1: "foo.bar."
@@ -100,3 +125,16 @@ t31: "https://foo.com/bar"
 t32: _|_ // t32: invalid value "/foo/bar" (does not satisfy net.AbsURL): t32: error in call to net.AbsURL: URL is not absolute
 t33: "https://foo.com/bar"
 t34: _|_ // t34: invalid value "%" (does not satisfy net.AbsURL): t34: error in call to net.AbsURL: parse "%": invalid URL escape "%"
+t35: "127.0.0.2"
+t36: "127.0.0.3/8"
+t37: "2001:db8::1"
+t38: "2001:db8::2/64"
+t39: _|_ // t39: error in call to net.AddIP: invalid IP "invalid ip"
+t40: _|_ // t40: error in call to net.AddIP: IP address arithmetic resulted in out-of-range address (underflow)
+t41: _|_ // t41: error in call to net.AddIP: IP address arithmetic resulted in out-of-range address (overflow)
+t42: "::ffff:127.0.0.2"
+t43: "192.168.2.0/23"
+t44: "2001:db8:1111:2223::/64"
+t45: _|_ // t45: error in call to net.AddIPCIDR: netip.ParsePrefix("192.168.0.0"): no '/'
+t46: _|_ // t46: error in call to net.AddIPCIDR: IP address arithmetic resulted in out-of-range address (underflow)
+t47: _|_ // t47: error in call to net.AddIPCIDR: IP address arithmetic resulted in out-of-range address (overflow)

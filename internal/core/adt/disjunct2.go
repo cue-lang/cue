@@ -707,7 +707,7 @@ outer:
 			xn.defaultMode = isDefault
 		}
 		// TODO: x.free()
-		mergeCloseInfo(xn.node, x.node)
+		mergeCloseInfo(xn, x)
 		return a
 	}
 

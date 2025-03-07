@@ -165,9 +165,7 @@ type Vertex struct {
 	// TODO: move back to nodeContext, but be sure not to clone it.
 
 	// TODO: move to nodeContext.
-	reqDefIDs    []refInfo
-	dropDefIDs   []defID
-	conjunctInfo []conjunctInfo
+	// conjunctInfo []conjunctInfo
 
 	overlay *Vertex
 

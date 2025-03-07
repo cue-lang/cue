@@ -106,8 +106,6 @@ func (ctx *overlayContext) cloneVertex(x *Vertex) *Vertex {
 
 	ctx.vertices = append(ctx.vertices, x)
 
-	v.conjunctInfo = slices.Clone(x.conjunctInfo) // theoretically necessary.
-
 	// The group of the root closeContext should point to the Conjuncts field
 	// of the Vertex. As we already allocated the group, we use that allocation,
 	// but "move" it to v.Conjuncts.
@@ -169,8 +167,9 @@ func (ctx *overlayContext) cloneNodeContext(n *nodeContext) *nodeContext {
 	d.checks = append(d.checks, n.checks...)
 	d.sharedIDs = append(d.sharedIDs, n.sharedIDs...)
 
-	// XXX: add these?
-	// d.reqDefIDs = append(d.reqDefIDs, n.reqDefIDs...)
+	d.reqDefIDs = append(d.reqDefIDs, n.reqDefIDs...)
+	d.dropDefIDs = append(d.dropDefIDs, n.dropDefIDs...)
+	d.conjunctInfo = append(d.conjunctInfo, n.conjunctInfo...)
 
 	// TODO: do we need to add cyclicConjuncts? Typically, cyclicConjuncts
 	// gets cleared at the end of a unify call. There are cases, however, where

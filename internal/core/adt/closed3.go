@@ -74,50 +74,53 @@ func filterNonRecursive(a []refInfo) []refInfo {
 	return a
 }
 
-func mergeCloseInfo(v, w *Vertex) {
+func mergeCloseInfo(nv, nw *nodeContext) {
+	v := nv.node
+	w := nw.node
 	if w == nil {
 		return
 	}
 	// Merge missing closeInfos
 outer:
-	for _, wci := range w.conjunctInfo {
-		for _, vci := range v.conjunctInfo {
+	for _, wci := range nw.conjunctInfo {
+		for _, vci := range nv.conjunctInfo {
 			if wci.id == vci.id {
 				continue outer
 			}
 		}
-		v.conjunctInfo = append(v.conjunctInfo, wci)
+		nv.conjunctInfo = append(nv.conjunctInfo, wci)
 	}
 
 outer2:
-	for _, d := range w.dropDefIDs {
-		for _, vd := range v.dropDefIDs {
+	for _, d := range nw.dropDefIDs {
+		for _, vd := range nv.dropDefIDs {
 			if d == vd {
 				continue outer2
 			}
 		}
-		v.dropDefIDs = append(v.dropDefIDs, d)
+		nv.dropDefIDs = append(nv.dropDefIDs, d)
 	}
 
 	// Recurse for arcs
 	for _, wa := range w.Arcs {
 		for _, va := range v.Arcs {
 			if va.Label == wa.Label {
-				mergeCloseInfo(va, wa)
+				mergeCloseInfo(va.state, wa.state)
 				break
 			}
 		}
 	}
 }
 
-func appendRequired(a []refInfo, v *Vertex) []refInfo {
+func appendRequired(a []refInfo, n *nodeContext) []refInfo {
+	v := n.node
 	if p := v.Parent; p != nil {
-		a = appendRequired(a, p)
+		a = appendRequired(a, p.state)
 	}
 	a = filterNonRecursive(a)
 
 outer:
-	for _, y := range v.reqDefIDs {
+	for _, y := range n.reqDefIDs {
 		for _, x := range a {
 			if x.id == y.id {
 				continue outer
@@ -132,7 +135,7 @@ outer:
 		filtered := a[:0]
 	outer2:
 		for _, e := range a {
-			for _, c := range v.conjunctInfo {
+			for _, c := range n.conjunctInfo {
 				if c.id == e.id {
 					filtered = append(filtered, e)
 					continue outer2
@@ -142,21 +145,20 @@ outer:
 		a = filtered
 	}
 
-	for _, c := range v.conjunctInfo {
+	for _, c := range n.conjunctInfo {
 		if c.isAny() || c.hasEllipsis() {
 			a = rmDropped(a, c.id)
 		}
 	}
-	a = rmDropped(a, v.dropDefIDs...)
+	a = rmDropped(a, n.dropDefIDs...)
 	return a
 }
 
 func (n *nodeContext) removeRequired(id defID) {
-	x := n.node
 	// if i := slices.Index(n.reqDefIDs, id); i >= 0 {
 	// 	n.reqDefIDs = slices.Delete(n.reqDefIDs, i, i+1)
 	// }
-	x.dropDefIDs = append(x.dropDefIDs, id)
+	n.dropDefIDs = append(n.dropDefIDs, id)
 }
 
 func (n *nodeContext) updateConjunctInfo(k Kind, id CloseInfo, flags conjunctFlags) {
@@ -164,14 +166,14 @@ func (n *nodeContext) updateConjunctInfo(k Kind, id CloseInfo, flags conjunctFla
 		return
 	}
 
-	for i, c := range n.node.conjunctInfo {
+	for i, c := range n.conjunctInfo {
 		if c.id == id.defID {
-			n.node.conjunctInfo[i].kind &= k
-			n.node.conjunctInfo[i].flags |= flags
+			n.conjunctInfo[i].kind &= k
+			n.conjunctInfo[i].flags |= flags
 			return
 		}
 	}
-	n.node.conjunctInfo = append(n.node.conjunctInfo, conjunctInfo{
+	n.conjunctInfo = append(n.conjunctInfo, conjunctInfo{
 		id: id.defID, kind: k,
 	})
 }
@@ -205,7 +207,7 @@ func (n *nodeContext) addType(v *Vertex, id CloseInfo) CloseInfo {
 			}
 			n.ctx.nextDefID++
 			id.defID = n.ctx.nextDefID
-			n.node.reqDefIDs = append(n.node.reqDefIDs, refInfo{v: v, id: id.defID})
+			n.reqDefIDs = append(n.reqDefIDs, refInfo{v: v, id: id.defID})
 		}
 	}
 	return id
@@ -213,25 +215,25 @@ func (n *nodeContext) addType(v *Vertex, id CloseInfo) CloseInfo {
 
 func (n *nodeContext) checkTypos() {
 	c := n.ctx
-	v := n.node
 
-	if err := v.checkFields2(c, true, v.reqDefIDs...); err != nil {
+	if err := n.checkFields2(c, true, n.reqDefIDs...); err != nil {
 		n.AddChildError(err)
 	}
 }
 
-func (v *Vertex) checkFields2(ctx *OpContext, recursive bool, required ...refInfo) (err *Bottom) {
+func (n *nodeContext) checkFields2(ctx *OpContext, recursive bool, required ...refInfo) (err *Bottom) {
 	if ctx.OpenDef {
 		return nil
 
 	}
+	v := n.node
 	z := v
 	_ = z
 	v = v.DerefValue()
 
-	required = appendRequired(nil, v)
+	required = appendRequired(nil, n)
 
-	for _, c := range v.conjunctInfo {
+	for _, c := range n.conjunctInfo {
 		if c.isAny() {
 			required = rmDropped(required, c.id)
 		}
@@ -255,8 +257,11 @@ outer:
 			continue // Avoid exponential runtime. Assume this is checked already.
 		}
 
+		// TODO(mem): child states of uncompleted nodes must have a state.
+		na := a.state
+
 		// do the right thing in appendRequired either way.
-		filtered := rmDropped(required, a.dropDefIDs...)
+		filtered := rmDropped(required, na.dropDefIDs...)
 		a = a.DerefValue()
 		// TODO(perf): somehow prevent error generation of recursive structures,
 		// or at least make it cheap. Right now if this field is a typo, likely
@@ -271,7 +276,7 @@ outer:
 		found := true
 	outer2:
 		for _, ri := range filtered {
-			for _, c := range a.conjunctInfo {
+			for _, c := range na.conjunctInfo {
 				if c.id == ri.id {
 					continue outer2
 				}
@@ -279,8 +284,6 @@ outer:
 			found = false
 			break
 		}
-
-		required = rmDropped(required, a.dropDefIDs...) // XXX: remove
 
 		switch {
 		case !recursive:

@@ -206,7 +206,11 @@ func CreateMermaidGraph(ctx *OpContext, v *Vertex, all bool) (graph string, hasE
 	// get parent context, if there is relevant closedness information.
 	root := v.Parent
 	for p := root; p != nil; p = p.Parent {
-		if len(p.reqDefIDs) > 0 {
+		n := p.state
+		if n == nil {
+			continue
+		}
+		if len(n.reqDefIDs) > 0 {
 			root = p.Parent
 		}
 	}
@@ -378,56 +382,57 @@ func (m *mermaidContext) vertexInfo(vc *mermaidVertex, recursive bool) {
 	}
 
 	indentOnNewline(node, 2)
-	for i, d := range v.reqDefIDs {
-		indentOnNewline(node, 2)
-		var id any = d.id
-		if d.v.ClosedNonRecursive && d.id == 0 {
-			id = "once"
-		}
-		reqID := fmt.Sprintf("%s_req_%d", m.vertexID(v), i)
-		fmt.Fprintf(node, "%s((%d))\n", reqID, id)
-		m.vertex(d.v, false)
-		fmt.Fprintf(global, "%s == R ==> %s\n", reqID, m.vertexID(d.v))
-	}
-	indentOnNewline(node, 2)
-
-	if recursive {
-		// fmt.Fprintf(node, "subgraph %s_conjuncts[conjunctInfo]\n", m.vertexID(v))
-		fmt.Fprintf(node, "subgraph %s_conjuncts[conjuncts]\n", m.vertexID(v))
-		for i, conj := range v.conjunctInfo {
-			indentOnNewline(node, 3)
-			kind := ""
-			switch {
-			case conj.isAny():
-				kind = "any"
-			case conj.hasEllipsis():
-				kind = "..."
-			default:
-				kind = conj.kind.String()
+	if n := v.state; n != nil {
+		for i, d := range n.reqDefIDs {
+			indentOnNewline(node, 2)
+			var id any = d.id
+			if d.v.ClosedNonRecursive && d.id == 0 {
+				id = "once"
 			}
-			fmt.Fprintf(node, "%s_conj_%d((%v\n%d))", m.vertexID(v), i, kind, conj.id)
+			reqID := fmt.Sprintf("%s_req_%d", m.vertexID(v), i)
+			fmt.Fprintf(node, "%s((%d))\n", reqID, id)
+			m.vertex(d.v, false)
+			fmt.Fprintf(global, "%s == R ==> %s\n", reqID, m.vertexID(d.v))
 		}
 		indentOnNewline(node, 2)
 
-		if len(v.dropDefIDs) > 0 {
-			fmt.Fprintf(node, "subgraph %s_drop[dropped]\n", m.vertexID(v))
-			for i, id := range v.dropDefIDs {
+		if recursive {
+			// fmt.Fprintf(node, "subgraph %s_conjuncts[conjunctInfo]\n", m.vertexID(v))
+			fmt.Fprintf(node, "subgraph %s_conjuncts[conjuncts]\n", m.vertexID(v))
+			for i, conj := range n.conjunctInfo {
 				indentOnNewline(node, 3)
-				dropID := fmt.Sprintf("%s_drop_%d", m.vertexID(v), i)
-				fmt.Fprintf(node, "%s((%d))\n", dropID, id)
+				kind := ""
+				switch {
+				case conj.isAny():
+					kind = "any"
+				case conj.hasEllipsis():
+					kind = "..."
+				default:
+					kind = conj.kind.String()
+				}
+				fmt.Fprintf(node, "%s_conj_%d((%v\n%d))", m.vertexID(v), i, kind, conj.id)
 			}
 			indentOnNewline(node, 2)
-		}
 
-		// fmt.Fprintf(node, "end\n")
-		fmt.Fprintln(node, "end")
-
-		src := m.vertexID(v)
-		for _, arc := range v.Arcs {
-			m.vertex(arc, true) // ensure the arc is also processed
-			indentOnNewline(node, 2)
-			fmt.Fprintf(global, "%s --> %s\n", src, m.vertexID(arc))
+			if len(n.dropDefIDs) > 0 {
+				fmt.Fprintf(node, "subgraph %s_drop[dropped]\n", m.vertexID(v))
+				for i, id := range n.dropDefIDs {
+					indentOnNewline(node, 3)
+					dropID := fmt.Sprintf("%s_drop_%d", m.vertexID(v), i)
+					fmt.Fprintf(node, "%s((%d))\n", dropID, id)
+				}
+				indentOnNewline(node, 2)
+			}
+			// fmt.Fprintf(node, "end\n")
+			fmt.Fprintln(node, "end")
 		}
+	}
+
+	src := m.vertexID(v)
+	for _, arc := range v.Arcs {
+		m.vertex(arc, true) // ensure the arc is also processed
+		indentOnNewline(node, 2)
+		fmt.Fprintf(global, "%s --> %s\n", src, m.vertexID(arc))
 	}
 }
 

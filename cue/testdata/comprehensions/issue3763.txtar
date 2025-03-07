@@ -1,0 +1,284 @@
+-- reduced.cue --
+reduced: {
+	A: x1: y?: int // needs to be optional
+	A: x2: y?: int
+	A: x3: y?: int
+
+	if true {
+		let Z = [for _, x in A {x}]
+		B: [for z in Z if z.y != _|_ { b: 1 }]
+	}
+}
+-- full.cue --
+full: {
+	_core_v1: {
+		#cp: {
+			hostPort?: int32
+			cp:        int32
+		}
+	}
+
+	k: n: n1: {
+		_CL: "l"
+	}
+
+	let nc = {
+		_ports: [ID=_]: _core_v1.#cp
+	}
+
+	_cl: [ID=_]: nc & {
+		_ports: {
+			"1": {}
+			"2": {}
+			"3": {}
+		}
+	}
+
+	k: n: [ID=_]: {
+		_CL: string
+		_cs: (_CL): _cl[(_CL)]
+	}
+
+	for _, n in k.n {
+		let cps = [for _, c in n._cs for _, cps in c._ports {cps}]
+		ports: [for cp in cps if cp.hostPort != _|_ {
+			port: "\(cp.hostPort)"
+		}]
+	}
+
+	_cl: l: {}
+}
+-- out/eval/stats --
+Leaks:  4
+Freed:  66
+Reused: 58
+Allocs: 12
+Retain: 10
+
+Unifications: 70
+Conjuncts:    129
+Disjuncts:    76
+-- out/evalalpha --
+(struct){
+  full: (struct){
+    _core_v1: (struct){
+      #cp: (#struct){
+        hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
+        cp: (int){ &(>=-2147483648, <=2147483647, int) }
+      }
+    }
+    k: (struct){
+      n: (struct){
+        n1: (struct){
+          _CL: (string){ "l" }
+          _cs: (struct){
+            l: ~(full._cl.l)
+          }
+        }
+      }
+    }
+    let nc#1 = (struct){
+      _ports: (struct){
+      }
+    }
+    _cl: (struct){
+      l: (struct){
+        _ports: (struct){
+          "1": (#struct){
+            hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
+            cp: (int){ &(>=-2147483648, <=2147483647, int) }
+          }
+          "2": (#struct){
+            hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
+            cp: (int){ &(>=-2147483648, <=2147483647, int) }
+          }
+          "3": (#struct){
+            hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
+            cp: (int){ &(>=-2147483648, <=2147483647, int) }
+          }
+        }
+      }
+    }
+    let cps#2multi = [
+      for _, c in 〈2;n〉._cs for _, cps in 〈0;c〉._ports {
+        〈1;cps〉
+      },
+    ]
+    ports: (list){ list }
+  }
+  reduced: (struct){
+    A: (struct){
+      x1: (struct){
+        y?: (int){ int }
+      }
+      x2: (struct){
+        y?: (int){ int }
+      }
+      x3: (struct){
+        y?: (int){ int }
+      }
+    }
+    let Z#3multi = [
+      for _, x in 〈2;A〉 {
+        〈1;x〉
+      },
+    ]
+    B: (list){ list }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -11,22 +11,7 @@
+         n1: (struct){
+           _CL: (string){ "l" }
+           _cs: (struct){
+-            l: (struct){
+-              _ports: (struct){
+-                "1": (#struct){
+-                  hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
+-                  cp: (int){ &(>=-2147483648, <=2147483647, int) }
+-                }
+-                "2": (#struct){
+-                  hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
+-                  cp: (int){ &(>=-2147483648, <=2147483647, int) }
+-                }
+-                "3": (#struct){
+-                  hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
+-                  cp: (int){ &(>=-2147483648, <=2147483647, int) }
+-                }
+-              }
+-            }
++            l: ~(full._cl.l)
+           }
+         }
+       }
+@@ -58,8 +43,7 @@
+         〈1;cps〉
+       },
+     ]
+-    ports: (#list){
+-    }
++    ports: (list){ list }
+   }
+   reduced: (struct){
+     A: (struct){
+@@ -73,18 +57,11 @@
+         y?: (int){ int }
+       }
+     }
+-    let Z#3 = (#list){
+-      0: (struct){
+-        y?: (int){ int }
+-      }
+-      1: (struct){
+-        y?: (int){ int }
+-      }
+-      2: (struct){
+-        y?: (int){ int }
+-      }
+-    }
+-    B: (#list){
+-    }
++    let Z#3multi = [
++      for _, x in 〈2;A〉 {
++        〈1;x〉
++      },
++    ]
++    B: (list){ list }
+   }
+ }
+-- diff/todo/p1 --
+full.ports|reduced.B: incomplete value (list)
+-- out/eval --
+(struct){
+  full: (struct){
+    _core_v1: (struct){
+      #cp: (#struct){
+        hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
+        cp: (int){ &(>=-2147483648, <=2147483647, int) }
+      }
+    }
+    k: (struct){
+      n: (struct){
+        n1: (struct){
+          _CL: (string){ "l" }
+          _cs: (struct){
+            l: (struct){
+              _ports: (struct){
+                "1": (#struct){
+                  hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
+                  cp: (int){ &(>=-2147483648, <=2147483647, int) }
+                }
+                "2": (#struct){
+                  hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
+                  cp: (int){ &(>=-2147483648, <=2147483647, int) }
+                }
+                "3": (#struct){
+                  hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
+                  cp: (int){ &(>=-2147483648, <=2147483647, int) }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    let nc#1 = (struct){
+      _ports: (struct){
+      }
+    }
+    _cl: (struct){
+      l: (struct){
+        _ports: (struct){
+          "1": (#struct){
+            hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
+            cp: (int){ &(>=-2147483648, <=2147483647, int) }
+          }
+          "2": (#struct){
+            hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
+            cp: (int){ &(>=-2147483648, <=2147483647, int) }
+          }
+          "3": (#struct){
+            hostPort?: (int){ &(>=-2147483648, <=2147483647, int) }
+            cp: (int){ &(>=-2147483648, <=2147483647, int) }
+          }
+        }
+      }
+    }
+    let cps#2multi = [
+      for _, c in 〈2;n〉._cs for _, cps in 〈0;c〉._ports {
+        〈1;cps〉
+      },
+    ]
+    ports: (#list){
+    }
+  }
+  reduced: (struct){
+    A: (struct){
+      x1: (struct){
+        y?: (int){ int }
+      }
+      x2: (struct){
+        y?: (int){ int }
+      }
+      x3: (struct){
+        y?: (int){ int }
+      }
+    }
+    let Z#3 = (#list){
+      0: (struct){
+        y?: (int){ int }
+      }
+      1: (struct){
+        y?: (int){ int }
+      }
+      2: (struct){
+        y?: (int){ int }
+      }
+    }
+    B: (#list){
+    }
+  }
+}

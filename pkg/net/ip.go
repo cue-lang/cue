@@ -16,7 +16,9 @@
 package net
 
 import (
+	"errors"
 	"fmt"
+	"math/big"
 	"net/netip"
 
 	"cuelang.org/go/cue"
@@ -241,4 +243,64 @@ func IPString(ip cue.Value) (string, error) {
 		return "", fmt.Errorf("invalid IP %q", ip)
 	}
 	return ipdata.String(), nil
+}
+
+func netIPAdd(addr netip.Addr, offset *big.Int) (netip.Addr, error) {
+	i := big.NewInt(0).SetBytes(addr.AsSlice())
+	i = i.Add(i, offset)
+
+	if i.Sign() < 0 {
+		return netip.Addr{}, errors.New("IP address arithmetic resulted in out-of-range address (underflow)")
+	}
+
+	b := i.Bytes()
+	size := addr.BitLen() / 8
+
+	if len(b) > size {
+		return netip.Addr{}, errors.New("IP address arithmetic resulted in out-of-range address (overflow)")
+	}
+
+	if len(b) < size {
+		b = append(make([]byte, size-len(b), size), b...)
+	}
+	addr, _ = netip.AddrFromSlice(b)
+	return addr, nil
+}
+
+// AddIP adds a numerical offset to a given IP address.
+// The address can be provided as a string, byte array, or CIDR subnet notation.
+// It returns the resulting IP address or CIDR subnet notation as a string.
+func AddIP(ip cue.Value, offset *big.Int) (string, error) {
+	prefix, err := netGetIPCIDR(ip)
+	if err == nil {
+		addr, err := netIPAdd(prefix.Addr(), offset)
+		if err != nil {
+			return "", err
+		}
+		return netip.PrefixFrom(addr, prefix.Bits()).String(), nil
+	}
+	ipdata := netGetIP(ip)
+	if !ipdata.IsValid() {
+		return "", fmt.Errorf("invalid IP %q", ip)
+	}
+	addr, err := netIPAdd(ipdata, offset)
+	if err != nil {
+		return "", err
+	}
+	return addr.String(), nil
+}
+
+// AddIPCIDR adds a numerical offset to a given CIDR subnet
+// string, returning a CIDR string.
+func AddIPCIDR(ip cue.Value, offset *big.Int) (string, error) {
+	prefix, err := netGetIPCIDR(ip)
+	if err != nil {
+		return "", err
+	}
+	shifted := big.NewInt(0).Lsh(offset, (uint)(prefix.Addr().BitLen()-prefix.Bits()))
+	addr, err := netIPAdd(prefix.Addr(), shifted)
+	if err != nil {
+		return "", err
+	}
+	return netip.PrefixFrom(addr, prefix.Bits()).String(), nil
 }

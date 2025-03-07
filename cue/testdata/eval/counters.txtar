@@ -34,6 +34,39 @@ issue3750: reduced: {
 		}
 	}
 }
+-- issue3780.cue --
+import "strings"
+
+issue3780: panic1: {
+	objs: #Objects & {}
+	param!: bool
+	if param {
+		objs: obj1: {
+			one: 1
+			two: 2
+		}
+	}
+	#Objects: [strings.HasPrefix("obj")]: {
+		kind: "object"
+		...
+	}
+}
+issue3780: panic2: {
+	parent: {
+		objs: #Objects & {}
+		param?: bool
+		if param != _|_ {
+			objs: obj1: {
+				one: 1
+				two: 2
+			}
+		}
+		#Objects: [strings.HasPrefix("obj")]: {
+			kind: "object"
+			...
+		}
+	}
+}
 -- out/compile --
 --- issue3750.cue
 {

@@ -559,8 +559,114 @@ issue3528: nested: t2: {
 	{v: 1} | 2
 	{v: 1} | 2
 }
+-- issue3784.cue --
+issue3784: reduced: {
+	#Schema: a: {
+		kind: "A"
+		b: c?: string
+		b: {}
+	} | {
+		kind: "B"
+	}
+	
+	out: #Schema
+	out: a: {
+		kind: "A"
+		b: c: "x"
+	}
+}
+issue3784: full: {
+	#Schema: {
+		pages?: {
+			build_type?: "legacy" | "workflow"
+			source?: {
+				branch?: string
+				path?:   string
+			}
+			cname?: string
+		}
+		pages?: {
+			build_type!: "legacy"
+			source!: {
+				branch!: _
+			}
+		} | close({
+			build_type!: "workflow"
+			cname?:      _
+		})
+	}
+	out: #Schema & {
+		pages: {
+			cname:      "foo.com"
+			build_type: "legacy"
+			source: {
+				branch: "main"
+				path:   "/"
+			}
+		}
+	}
+}
+issue3784: variant1: {
+	#Schema: {
+		pages: {
+			build_type?: "legacy" | "workflow"
+			source: {
+				branch?: string
+				path?:   string
+			}
+			cname?: string
+		}
+		pages?: {
+			build_type!: "legacy"
+			source!: {
+				branch!: _
+			}
+		} | close({
+			build_type!: "workflow"
+			cname?:      _
+		})
+	}
+}
+issue3784: variant2: {
+	#Schema: {
+		build_type!: "legacy"
+		source!: {
+			branch!: _
+		}
+	} | close({
+		build_type!: "workflow"
+		cname?:      _
+	})
+	a: #Schema
+	a: {
+		build_type?: "legacy" | "workflow"
+		source: {
+			branch?: string
+			path?:   string
+		}
+		cname?: string
+	}
+}
 -- out/evalalpha --
-(struct){
+Errors:
+issue3784.full.out.pages: 2 errors in empty disjunction:
+issue3784.full.out.pages.build_type: conflicting values "workflow" and "legacy":
+    ./issue3784.cue:32:17
+    ./issue3784.cue:39:16
+issue3784.full.out.pages.source.path: field not allowed:
+    ./issue3784.cue:22:5
+    ./issue3784.cue:42:5
+issue3784.reduced.out.a: 2 errors in empty disjunction:
+issue3784.reduced.out.a.b.c: field not allowed:
+    ./issue3784.cue:4:6
+    ./issue3784.cue:13:6
+issue3784.reduced.out.a.kind: conflicting values "B" and "A":
+    ./issue3784.cue:7:9
+    ./issue3784.cue:12:9
+
+Result:
+(_|_){
+  // [eval]
   disambiguateClosed: (struct){
     b: (#struct){ |((#struct){
         x: (bool){ true }
@@ -1511,6 +1617,107 @@ issue3528: nested: t2: {
         }, (int){ 2 }) }
     }
   }
+  issue3784: (_|_){
+    // [eval]
+    reduced: (_|_){
+      // [eval]
+      #Schema: (#struct){
+        a: (#struct){ |((#struct){
+            kind: (string){ "A" }
+            b: (#struct){
+              c?: (string){ string }
+            }
+          }, (#struct){
+            kind: (string){ "B" }
+          }) }
+      }
+      out: (_|_){
+        // [eval]
+        a: (_|_){
+          // [eval] issue3784.reduced.out.a: 2 errors in empty disjunction:
+          // issue3784.reduced.out.a.b.c: field not allowed:
+          //     ./issue3784.cue:4:6
+          //     ./issue3784.cue:13:6
+          // issue3784.reduced.out.a.kind: conflicting values "B" and "A":
+          //     ./issue3784.cue:7:9
+          //     ./issue3784.cue:12:9
+          kind: (string){ "A" }
+          b: (struct){
+            c: (string){ "x" }
+          }
+        }
+      }
+    }
+    full: (_|_){
+      // [eval]
+      #Schema: (#struct){
+        pages?: (#struct){ |((#struct){
+            build_type!: (string){ "legacy" }
+            source!: (#struct){
+              branch!: (string){ string }
+              path?: (string){ string }
+            }
+            cname?: (string){ string }
+          }, (#struct){
+            build_type!: (string){ "workflow" }
+            source?: (#struct){
+              branch?: (string){ string }
+              path?: (string){ string }
+            }
+            cname?: (string){ string }
+          }) }
+      }
+      out: (_|_){
+        // [eval]
+        pages: (_|_){
+          // [eval] issue3784.full.out.pages: 2 errors in empty disjunction:
+          // issue3784.full.out.pages.build_type: conflicting values "workflow" and "legacy":
+          //     ./issue3784.cue:32:17
+          //     ./issue3784.cue:39:16
+          // issue3784.full.out.pages.source.path: field not allowed:
+          //     ./issue3784.cue:22:5
+          //     ./issue3784.cue:42:5
+          cname: (string){ "foo.com" }
+          build_type: (string){ "legacy" }
+          source: (#struct){
+            branch: (string){ "main" }
+            path: (string){ "/" }
+          }
+        }
+      }
+    }
+    variant1: (struct){
+      #Schema: (#struct){
+        pages: (#struct){
+          build_type!: (string){ "legacy" }
+          source: (#struct){
+            branch!: (string){ string }
+            path?: (string){ string }
+          }
+          cname?: (string){ string }
+        }
+      }
+    }
+    variant2: (struct){
+      #Schema: (#struct){ |((#struct){
+          build_type!: (string){ "legacy" }
+          source!: (#struct){
+            branch!: (_){ _ }
+          }
+        }, (#struct){
+          build_type!: (string){ "workflow" }
+          cname?: (_){ _ }
+        }) }
+      a: (#struct){
+        build_type!: (string){ "legacy" }
+        source: (#struct){
+          branch!: (string){ string }
+          path?: (string){ string }
+        }
+        cname?: (string){ string }
+      }
+    }
+  }
   issue770: (struct){
     #A: (#struct){
       v: (string){ |((string){ "a" }, (string){ "b" }, (string){ "c" }) }
@@ -1538,8 +1745,8 @@ issue3528: nested: t2: {
 diff old new
 --- old
 +++ new
-@@ -1,58 +1,4 @@
--Errors:
+@@ -1,54 +1,18 @@
+ Errors:
 -issue1417.ids.2: 2 errors in empty disjunction:
 -issue2209.full.Bar.resource.spec: 6 errors in empty disjunction:
 -issue2209.full.Bar.resource.spec.minBar: 2 errors in empty disjunction:
@@ -1590,15 +1797,24 @@ diff old new
 -    ./issue3149.cue:3:46
 -    ./issue3149.cue:3:10
 -    ./issue3149.cue:10:10
--
--Result:
--(_|_){
--  // [eval]
-+(struct){
-   disambiguateClosed: (struct){
-     b: (#struct){ |((#struct){
-         x: (bool){ true }
-@@ -181,7 +127,7 @@
++issue3784.full.out.pages: 2 errors in empty disjunction:
++issue3784.full.out.pages.build_type: conflicting values "workflow" and "legacy":
++    ./issue3784.cue:32:17
++    ./issue3784.cue:39:16
++issue3784.full.out.pages.source.path: field not allowed:
++    ./issue3784.cue:22:5
++    ./issue3784.cue:42:5
++issue3784.reduced.out.a: 2 errors in empty disjunction:
++issue3784.reduced.out.a.b.c: field not allowed:
++    ./issue3784.cue:4:6
++    ./issue3784.cue:13:6
++issue3784.reduced.out.a.kind: conflicting values "B" and "A":
++    ./issue3784.cue:7:9
++    ./issue3784.cue:12:9
+ 
+ Result:
+ (_|_){
+@@ -181,7 +145,7 @@
              x: ((null|struct)){ |((struct){
                  a: (struct){
                    b: (_|_){
@@ -1607,7 +1823,7 @@ diff old new
                      //     ./in.cue:138:15
                      //     ./in.cue:124:15
                      //     ./in.cue:125:12
-@@ -205,24 +151,24 @@
+@@ -205,24 +169,24 @@
    preserveClosedness: (struct){
      small: (struct){
        p1: (struct){
@@ -1650,7 +1866,7 @@ diff old new
              a: (string){ string }
            }, (#struct){
              a: (string){ string }
-@@ -241,40 +187,40 @@
+@@ -241,40 +205,40 @@
      }
      medium: (struct){
        p1: (struct){
@@ -1725,7 +1941,7 @@ diff old new
              a: (string){ string }
            }, (#struct){
              a: (string){ string }
-@@ -307,7 +253,7 @@
+@@ -307,7 +271,7 @@
            }) }
        }
        p3: (struct){
@@ -1734,7 +1950,7 @@ diff old new
              a: (string){ string }
            }, (#struct){
              a: (string){ string }
-@@ -349,10 +295,6 @@
+@@ -349,10 +313,6 @@
        #type: (#struct){
          fieldName: ((string|struct)){ |((string){ string }, (#struct){
              foo: (string){ string }
@@ -1745,7 +1961,7 @@ diff old new
            }) }
        }
        #subtype: ((string|struct)){ |((string){ string }, (#struct){
-@@ -432,12 +374,8 @@
+@@ -432,12 +392,8 @@
      #T: (list){
        0: (string){ "d" }
      }
@@ -1760,7 +1976,7 @@ diff old new
    }
    issue1940: (struct){
      #T: (#list){
-@@ -446,53 +384,24 @@
+@@ -446,53 +402,24 @@
        }
      }
      #A: (#struct){
@@ -1826,7 +2042,7 @@ diff old new
        t1: (struct){
          #SpecFoo: (#struct){
            foo: (#struct){
-@@ -510,36 +419,20 @@
+@@ -510,36 +437,20 @@
            }
          }
          out: (struct){ |((struct){
@@ -1877,7 +2093,7 @@ diff old new
              nullBar: (null){ null }
            }) }
        }
-@@ -555,48 +448,74 @@
+@@ -555,48 +466,74 @@
              x: (int){ 1 }
            }
          }
@@ -1994,7 +2210,7 @@ diff old new
        Foo: (#struct){
          spec: (#struct){
            foo: (#struct){
-@@ -605,135 +524,52 @@
+@@ -605,135 +542,52 @@
            }
          }
          resource: (#struct){
@@ -2176,7 +2392,7 @@ diff old new
          }
        }
        #Abstract: (#struct){
-@@ -749,34 +585,34 @@
+@@ -749,34 +603,34 @@
              }
            }) }
          resource: (#struct){
@@ -2239,7 +2455,7 @@ diff old new
          }
        }
        _#Spec: (#struct){ |(*(#struct){
-@@ -803,36 +639,36 @@
+@@ -803,36 +657,36 @@
          }
        }
        _Thing: (#struct){
@@ -2305,7 +2521,7 @@ diff old new
        }
        #Constrained: (#struct){
          spec: (#struct){ |(*(#struct){
-@@ -916,19 +752,19 @@
+@@ -916,19 +770,19 @@
            common: (int){ 3 }
          }
          #FormFoo: (#struct){
@@ -2332,7 +2548,7 @@ diff old new
            }) }
        }
        #Input: (#struct){
-@@ -936,18 +772,12 @@
+@@ -936,18 +790,12 @@
          }
        }
        #summarizeReturn: (#struct){
@@ -2353,7 +2569,7 @@ diff old new
          out: (#list){
          }
        }
-@@ -977,10 +807,23 @@
+@@ -977,10 +825,23 @@
      }
      full: (struct){
        metrics: (#list){
@@ -2381,7 +2597,7 @@ diff old new
          1: (#struct){
            id: (string){ "bar" }
            value: (int){ 80 }
-@@ -1031,13 +874,11 @@
+@@ -1031,13 +892,11 @@
        }
      }
    }
@@ -2397,7 +2613,7 @@ diff old new
        0: (#struct){
          name: (string){ "FooBarFoo" }
        }
-@@ -1047,19 +888,8 @@
+@@ -1047,19 +906,8 @@
        2: (#struct){
          name: (string){ "FooQuuxFoo" }
        }
@@ -2419,7 +2635,76 @@ diff old new
        }
      }
    }
-@@ -1134,10 +964,10 @@
+@@ -1119,8 +967,10 @@
+         }, (int){ 2 }) }
+     }
+   }
+-  issue3784: (struct){
+-    reduced: (struct){
++  issue3784: (_|_){
++    // [eval]
++    reduced: (_|_){
++      // [eval]
+       #Schema: (#struct){
+         a: (#struct){ |((#struct){
+             kind: (string){ "A" }
+@@ -1131,16 +981,25 @@
+             kind: (string){ "B" }
+           }) }
+       }
+-      out: (#struct){
+-        a: (#struct){
++      out: (_|_){
++        // [eval]
++        a: (_|_){
++          // [eval] issue3784.reduced.out.a: 2 errors in empty disjunction:
++          // issue3784.reduced.out.a.b.c: field not allowed:
++          //     ./issue3784.cue:4:6
++          //     ./issue3784.cue:13:6
++          // issue3784.reduced.out.a.kind: conflicting values "B" and "A":
++          //     ./issue3784.cue:7:9
++          //     ./issue3784.cue:12:9
+           kind: (string){ "A" }
+-          b: (#struct){
++          b: (struct){
+             c: (string){ "x" }
+           }
+         }
+       }
+     }
+-    full: (struct){
++    full: (_|_){
++      // [eval]
+       #Schema: (#struct){
+         pages?: (#struct){ |((#struct){
+             build_type!: (string){ "legacy" }
+@@ -1158,14 +1017,22 @@
+             cname?: (string){ string }
+           }) }
+       }
+-      out: (#struct){
+-        pages: (#struct){
++      out: (_|_){
++        // [eval]
++        pages: (_|_){
++          // [eval] issue3784.full.out.pages: 2 errors in empty disjunction:
++          // issue3784.full.out.pages.build_type: conflicting values "workflow" and "legacy":
++          //     ./issue3784.cue:32:17
++          //     ./issue3784.cue:39:16
++          // issue3784.full.out.pages.source.path: field not allowed:
++          //     ./issue3784.cue:22:5
++          //     ./issue3784.cue:42:5
++          cname: (string){ "foo.com" }
+           build_type: (string){ "legacy" }
+           source: (#struct){
+             branch: (string){ "main" }
+             path: (string){ "/" }
+           }
+-          cname: (string){ "foo.com" }
+         }
+       }
+     }
+@@ -1216,10 +1083,10 @@
          v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
        }
        c: (#struct){
@@ -2433,15 +2718,15 @@ diff old new
      }
    }
 -- out/eval/stats --
-Leaks:  4
-Freed:  2684
-Reused: 2668
-Allocs: 20
-Retain: 118
+Leaks:  9
+Freed:  2786
+Reused: 2771
+Allocs: 24
+Retain: 123
 
-Unifications: 1350
-Conjuncts:    3905
-Disjuncts:    2802
+Unifications: 1427
+Conjuncts:    4068
+Disjuncts:    2909
 -- diff/todo/p1 --
 issue2263.full: missing elimination, may be lack of closeContext
 issue2209.simplified.t3: ditto
@@ -3576,6 +3861,88 @@ Result:
       t2: ((int|struct)){ |((struct){
           v: (int){ 1 }
         }, (int){ 2 }) }
+    }
+  }
+  issue3784: (struct){
+    reduced: (struct){
+      #Schema: (#struct){
+        a: (#struct){ |((#struct){
+            kind: (string){ "A" }
+            b: (#struct){
+              c?: (string){ string }
+            }
+          }, (#struct){
+            kind: (string){ "B" }
+          }) }
+      }
+      out: (#struct){
+        a: (#struct){
+          kind: (string){ "A" }
+          b: (#struct){
+            c: (string){ "x" }
+          }
+        }
+      }
+    }
+    full: (struct){
+      #Schema: (#struct){
+        pages?: (#struct){ |((#struct){
+            build_type!: (string){ "legacy" }
+            source!: (#struct){
+              branch!: (string){ string }
+              path?: (string){ string }
+            }
+            cname?: (string){ string }
+          }, (#struct){
+            build_type!: (string){ "workflow" }
+            source?: (#struct){
+              branch?: (string){ string }
+              path?: (string){ string }
+            }
+            cname?: (string){ string }
+          }) }
+      }
+      out: (#struct){
+        pages: (#struct){
+          build_type: (string){ "legacy" }
+          source: (#struct){
+            branch: (string){ "main" }
+            path: (string){ "/" }
+          }
+          cname: (string){ "foo.com" }
+        }
+      }
+    }
+    variant1: (struct){
+      #Schema: (#struct){
+        pages: (#struct){
+          build_type!: (string){ "legacy" }
+          source: (#struct){
+            branch!: (string){ string }
+            path?: (string){ string }
+          }
+          cname?: (string){ string }
+        }
+      }
+    }
+    variant2: (struct){
+      #Schema: (#struct){ |((#struct){
+          build_type!: (string){ "legacy" }
+          source!: (#struct){
+            branch!: (_){ _ }
+          }
+        }, (#struct){
+          build_type!: (string){ "workflow" }
+          cname?: (_){ _ }
+        }) }
+      a: (#struct){
+        build_type!: (string){ "legacy" }
+        source: (#struct){
+          branch!: (string){ string }
+          path?: (string){ string }
+        }
+        cname?: (string){ string }
+      }
     }
   }
   issue770: (struct){

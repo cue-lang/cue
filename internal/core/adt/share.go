@@ -103,6 +103,10 @@ func (n *nodeContext) addShared(id CloseInfo) {
 }
 
 func (n *nodeContext) decSharedIDs() {
+	for _, id := range n.sharedIDs {
+		n.updateConjunctInfo(n.node.Kind(), id, 0)
+	}
+
 	if n.shareDecremented {
 		return
 	}

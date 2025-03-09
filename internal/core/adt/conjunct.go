@@ -328,30 +328,14 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 	ciKey.Refs = nil
 	ciKey.Inline = false
 	if n.ctx.isDevVersion() {
-		// ciKey = CloseInfo{}
+		ciKey = CloseInfo{}
 	}
 	// TODO(perf): do not use a key: the Conjuncts of a Vertex have its own
 	// Environment, so it is safe to unique a Vertex in its entirety.
 	// Recode the key mapping separately.
 	// ciKey.defID = 0
-	key := arcKey{arc, ciKey}
-	for _, k := range n.arcMap {
-		if key == k {
-			return
-		}
-	}
-	n.arcMap = append(n.arcMap, key)
-
 	isDef, _ := IsDef(c.Expr())
-	// Also check arc.Label: definitions themselves do not have the FromDef to
-	// reflect their closedness. This means that if we are structure sharing, we
-	// may end up with a Vertex that is a definition without the reference
-	// reflecting that. We need to handle this case here. Note that if an
-	// intermediate node refers to a definition, things are evaluated at least
-	// once.
 
-	// TODO: ClosedNonRecursive might not be computed yet. We may need to add
-	// all references to the list and process later.
 	switch {
 	case isDef || arc.Label.IsDef(): // || arc.ClosedRecursive:
 		n.isDef = true
@@ -363,6 +347,36 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 		closeInfo = n.addType(arc, closeInfo)
 		c.CloseInfo.defID = closeInfo.defID
 	}
+	// ciKey.defID = 0
+
+	key := arcKey{arc, ciKey}
+	for _, k := range n.arcMap {
+		if key == k {
+			return
+		}
+	}
+	n.arcMap = append(n.arcMap, key)
+
+	// Also check arc.Label: definitions themselves do not have the FromDef to
+	// reflect their closedness. This means that if we are structure sharing, we
+	// may end up with a Vertex that is a definition without the reference
+	// reflecting that. We need to handle this case here. Note that if an
+	// intermediate node refers to a definition, things are evaluated at least
+	// once.
+
+	// TODO: ClosedNonRecursive might not be computed yet. We may need to add
+	// all references to the list and process later.
+	// switch {
+	// case isDef || arc.Label.IsDef(): // || arc.ClosedRecursive:
+	// 	n.isDef = true
+	// 	// n.node.ClosedRecursive = true // TODO: should we set this here?
+	// 	closeInfo.FromDef = true
+
+	// 	// arc = arc.DerefValue()
+	// 	// mode = closeDef
+	// 	closeInfo = n.addType(arc, closeInfo)
+	// 	c.CloseInfo.defID = closeInfo.defID
+	// }
 
 	// if arc.ClosedNonRecursive || arc.ClosedRecursive || closeInfo.defID != 0 {
 	// 	closeInfo = n.addType(arc, closeInfo)

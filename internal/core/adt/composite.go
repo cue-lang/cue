@@ -589,7 +589,7 @@ const (
 func (c *OpContext) Wrap(v *Vertex, id CloseInfo) *Vertex {
 	w := c.newInlineVertex(nil, nil, v.Conjuncts...)
 	n := w.getState(c)
-	n.share(makeAnonymousConjunct(nil, v, nil), v, CloseInfo{})
+	n.share(makeAnonymousConjunct(nil, v, nil), v, id)
 	return w
 }
 
@@ -1412,23 +1412,24 @@ func (v *Vertex) hasConjunct(c Conjunct) (added bool) {
 	default:
 		v.ArcType = ArcMember
 	}
-	return findConjunct(v.Conjuncts, c) >= 0
+	p, _ := findConjunct(v.Conjuncts, c)
+	return p >= 0
 }
 
 // findConjunct reports the position of c within cs or -1 if it is not found.
 //
 // NOTE: we are not comparing closeContexts. The intended use of this function
 // is only to add to list of conjuncts within a closeContext.
-func findConjunct(cs []Conjunct, c Conjunct) int {
+func findConjunct(cs []Conjunct, c Conjunct) (int, Conjunct) {
 	for i, x := range cs {
 		// TODO: disregard certain fields from comparison (e.g. Refs)?
 		if x.CloseInfo.closeInfo == c.CloseInfo.closeInfo && // V2
 			x.x == c.x &&
 			x.Env.Up == c.Env.Up && x.Env.Vertex == c.Env.Vertex {
-			return i
+			return i, x
 		}
 	}
-	return -1
+	return -1, Conjunct{}
 }
 
 func (n *nodeContext) addConjunction(c Conjunct, index int) {

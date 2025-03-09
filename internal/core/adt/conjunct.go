@@ -327,6 +327,9 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 	ciKey := closeInfo
 	ciKey.Refs = nil
 	ciKey.Inline = false
+	if n.ctx.isDevVersion() {
+		// ciKey = CloseInfo{}
+	}
 	// TODO(perf): do not use a key: the Conjuncts of a Vertex have its own
 	// Environment, so it is safe to unique a Vertex in its entirety.
 	// Recode the key mapping separately.
@@ -354,16 +357,18 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 		n.isDef = true
 		// n.node.ClosedRecursive = true // TODO: should we set this here?
 		closeInfo.FromDef = true
-		fallthrough
 
-	case arc.ClosedNonRecursive:
 		// arc = arc.DerefValue()
 		// mode = closeDef
 		closeInfo = n.addType(arc, closeInfo)
 		c.CloseInfo.defID = closeInfo.defID
-		arc = arc.DerefValue()
 	}
 
+	// if arc.ClosedNonRecursive || arc.ClosedRecursive || closeInfo.defID != 0 {
+	// 	closeInfo = n.addType(arc, closeInfo)
+	// 	c.CloseInfo.defID = closeInfo.defID
+	// 	arc = arc.DerefValue()
+	// }
 	if !n.node.nonRooted || n.node.IsDynamic {
 		if state := arc.getBareState(n.ctx); state != nil {
 			state.addNotify2(n.node, closeInfo)
@@ -418,7 +423,8 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 
 	switch x := v.(type) {
 	case *Vertex:
-		if x.ClosedNonRecursive {
+		if id.IsClosed {
+			n.ctx.ci.IsClosed = false
 			n.node.ClosedNonRecursive = true
 
 			// If this is a definition, it will be repeated in the evaluation.
@@ -432,6 +438,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 				n.aStruct = x
 				n.aStructID = id
 			}
+			id.IsClosed = false
 		}
 		if _, ok := x.BaseValue.(*StructMarker); ok {
 			n.aStruct = x

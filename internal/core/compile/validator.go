@@ -49,7 +49,11 @@ var matchNBuiltin = &adt.Builtin{
 
 		var count, possibleCount int64
 		for _, check := range constraints {
-			v := adt.Unify(c, self, check)
+			v := func() *adt.Vertex {
+				defer c.PopArc(c.PushArc(check))
+				return adt.Unify(c, self, check)
+			}()
+
 			if err := validate.Validate(c, v, finalCfg); err == nil {
 				// TODO: is it always true that the lack of an error signifies
 				// success?

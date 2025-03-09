@@ -1069,9 +1069,11 @@ type nodeContext struct {
 
 	// TODO: remove
 	typeCandidates []*Vertex
+	closeParent    *nodeContext
 	reqDefIDs      []refInfo
-	dropDefIDs     []defID
-	conjunctInfo   []conjunctInfo
+	replaceIDs     []replaceID
+	// equivalences   []reqSet // see comment on [reqSet]
+	conjunctInfo []conjunctInfo
 
 	// Checks is a list of conjuncts, as we need to preserve the context in
 	// which it was evaluated. The conjunct is always a validator (and thus
@@ -1320,7 +1322,7 @@ func (n *nodeContext) clone() *nodeContext {
 
 	d.typeCandidates = append(d.typeCandidates, n.typeCandidates...)
 	d.reqDefIDs = append(d.reqDefIDs, n.reqDefIDs...)
-	d.dropDefIDs = append(d.dropDefIDs, n.dropDefIDs...)
+	d.replaceIDs = append(d.replaceIDs, n.replaceIDs...)
 	d.conjunctInfo = append(d.conjunctInfo, n.conjunctInfo...)
 
 	d.checks = append(d.checks, n.checks...)
@@ -1360,7 +1362,7 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			exprs:              n.exprs[:0],
 			typeCandidates:     n.typeCandidates[:0],
 			reqDefIDs:          n.reqDefIDs[:0],
-			dropDefIDs:         n.dropDefIDs[:0],
+			replaceIDs:         n.replaceIDs[:0],
 			conjunctInfo:       n.conjunctInfo[:0],
 			disjunctions:       n.disjunctions[:0],
 			disjunctCCs:        n.disjunctCCs[:0],

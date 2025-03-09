@@ -141,8 +141,13 @@ func OpenNodeGraph(title, path, code, out, graph string) {
 // DO NOT DELETE: this is used to insert during debugging of the evaluator
 // to inspect a node.
 func openDebugGraph(ctx *OpContext, v *Vertex, name string) {
+	if !OpenGraphs {
+		return
+	}
 	graph, _ := CreateMermaidGraph(ctx, v, true)
 	path := filepath.Join(".debug", "TestX", name, fmt.Sprintf("%v", v.Path()))
+	// println(graph)
+	// panic("")
 	OpenNodeGraph(name, path, "in", "out", graph)
 }
 
@@ -390,49 +395,65 @@ func (m *mermaidContext) vertexInfo(vc *mermaidVertex, recursive bool) {
 				id = "once"
 			}
 			reqID := fmt.Sprintf("%s_req_%d", m.vertexID(v), i)
-			fmt.Fprintf(node, "%s((%d))\n", reqID, id)
+			arrow := "%s == R ==> %s\n"
+			format := "%s((%d))\n"
+			if d.ignore {
+				arrow = "%s -. R .-> %s\n"
+				format = "%s((<s><i>%di</i></s>))\n"
+			}
+			fmt.Fprintf(node, format, reqID, id)
 			m.vertex(d.v, false)
-			fmt.Fprintf(global, "%s == R ==> %s\n", reqID, m.vertexID(d.v))
+			fmt.Fprintf(global, arrow, reqID, m.vertexID(d.v))
 		}
 		indentOnNewline(node, 2)
 
-		if recursive {
-			// fmt.Fprintf(node, "subgraph %s_conjuncts[conjunctInfo]\n", m.vertexID(v))
-			fmt.Fprintf(node, "subgraph %s_conjuncts[conjuncts]\n", m.vertexID(v))
-			for i, conj := range n.conjunctInfo {
-				indentOnNewline(node, 3)
-				kind := ""
-				switch {
-				case conj.isAny():
-					kind = "any"
-				case conj.hasEllipsis():
-					kind = "..."
-				default:
-					kind = conj.kind.String()
+		// fmt.Fprintf(node, "subgraph %s_conjuncts[conjunctInfo]\n", m.vertexID(v))
+		fmt.Fprintf(node, "subgraph %s_conjuncts[conjuncts]\n", m.vertexID(v))
+		for i, conj := range n.conjunctInfo {
+			indentOnNewline(node, 3)
+			kind := ""
+			switch {
+			case conj.isAny():
+				kind = "_"
+			case conj.hasEllipsis():
+				kind = "..."
+			default:
+				kind = conj.kind.String()
+				if kind == "_|_" {
+					kind = "error"
 				}
-				fmt.Fprintf(node, "%s_conj_%d((%v\n%d))", m.vertexID(v), i, kind, conj.id)
+			}
+			fmt.Fprintf(node, "%s_conj_%d((%v\n%d))", m.vertexID(v), i, kind, conj.id)
+		}
+		indentOnNewline(node, 2)
+		fmt.Fprintln(node, "end")
+
+		if len(n.replaceIDs) > 0 {
+			fmt.Fprintf(node, "subgraph %s_drop[replace]\n", m.vertexID(v))
+			for i, r := range n.replaceIDs {
+				indentOnNewline(node, 3)
+				dropID := fmt.Sprintf("%s_drop_%d", m.vertexID(v), i)
+				add := ""
+				if r.add {
+					add = "+"
+				}
+				fmt.Fprintf(node, "%s((%d->%d%s))\n", dropID, r.from, r.to, add)
 			}
 			indentOnNewline(node, 2)
-
-			if len(n.dropDefIDs) > 0 {
-				fmt.Fprintf(node, "subgraph %s_drop[dropped]\n", m.vertexID(v))
-				for i, id := range n.dropDefIDs {
-					indentOnNewline(node, 3)
-					dropID := fmt.Sprintf("%s_drop_%d", m.vertexID(v), i)
-					fmt.Fprintf(node, "%s((%d))\n", dropID, id)
-				}
-				indentOnNewline(node, 2)
-			}
 			// fmt.Fprintf(node, "end\n")
 			fmt.Fprintln(node, "end")
 		}
 	}
 
-	src := m.vertexID(v)
-	for _, arc := range v.Arcs {
-		m.vertex(arc, true) // ensure the arc is also processed
+	if v.Parent != nil {
+		m.vertex(v.Parent, false) // ensure the arc is also processed
 		indentOnNewline(node, 2)
-		fmt.Fprintf(global, "%s --> %s\n", src, m.vertexID(arc))
+		fmt.Fprintf(global, "%s --> %s\n", m.vertexID(v.Parent), m.vertexID(v))
+	}
+	if recursive {
+		for _, arc := range v.Arcs {
+			m.vertex(arc, true) // ensure the arc is also processed
+		}
 	}
 }
 

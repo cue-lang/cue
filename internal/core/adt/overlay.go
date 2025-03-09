@@ -69,6 +69,22 @@ func (ctx *overlayContext) cloneRoot(root *nodeContext) *nodeContext {
 	v := ctx.cloneVertex(root.node)
 	v.IsDisjunct = true
 
+	for _, v := range ctx.vertices {
+		n := v.state
+		if n == nil || n.closeParent == nil {
+			continue
+		}
+
+		if p := n.closeParent.node; p.overlay != nil {
+			// Use the new nodeContext if the node was cloned. Otherwise it
+			// is fine to use the old one.
+			n.closeParent = p.state
+			if p.state == nil {
+				panic("unexpected nil nodeContext")
+			}
+		}
+	}
+
 	return v.state
 }
 
@@ -168,7 +184,7 @@ func (ctx *overlayContext) cloneNodeContext(n *nodeContext) *nodeContext {
 	d.sharedIDs = append(d.sharedIDs, n.sharedIDs...)
 
 	d.reqDefIDs = append(d.reqDefIDs, n.reqDefIDs...)
-	d.dropDefIDs = append(d.dropDefIDs, n.dropDefIDs...)
+	d.replaceIDs = append(d.replaceIDs, n.replaceIDs...)
 	d.conjunctInfo = append(d.conjunctInfo, n.conjunctInfo...)
 
 	// TODO: do we need to add cyclicConjuncts? Typically, cyclicConjuncts

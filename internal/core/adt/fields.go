@@ -364,30 +364,30 @@ func (n *nodeContext) getArc(f Feature, mode ArcType) (arc *Vertex, isNew bool) 
 	return arc, true
 }
 
-func (v *Vertex) assignConjunct(ctx *OpContext, root *closeContext, c Conjunct, mode ArcType, check, checkClosed bool) (a *closeContext, pos int, added bool) {
+// func (v *Vertex) assignConjunct(ctx *OpContext, root *closeContext, c Conjunct, mode ArcType, check, checkClosed bool) (a *closeContext, pos int, added bool) {
 
-	// TODO: consider clearing CloseInfo.cc.
-	// c.CloseInfo.cc = nil
+// 	// TODO: consider clearing CloseInfo.cc.
+// 	// c.CloseInfo.cc = nil
 
-	arc := root.src
-	arc.updateArcType(mode) // TODO: probably not necessary: consider removing.
+// 	arc := root.src
+// 	arc.updateArcType(mode) // TODO: probably not necessary: consider removing.
 
-	if &arc.Conjuncts != root.group {
-		panic("misaligned conjuncts")
-	}
+// 	if &arc.Conjuncts != root.group {
+// 		panic("misaligned conjuncts")
+// 	}
 
-	pos = -1
-	if check {
-		pos = findConjunct(arc.Conjuncts, c)
-	}
-	if pos == -1 {
-		pos = len(arc.Conjuncts)
-		arc.addConjunctUnchecked(c)
-		added = true
-	}
+// 	pos = -1
+// 	if check {
+// 		pos, _ = findConjunct(arc.Conjuncts, c)
+// 	}
+// 	if pos == -1 {
+// 		pos = len(arc.Conjuncts)
+// 		arc.addConjunctUnchecked(c)
+// 		added = true
+// 	}
 
-	return root, pos, added
-}
+// 	return root, pos, added
+// }
 
 // allowedInClosed reports whether a field with label f is allowed in a closed
 // struct, even when it is not explicitly defined.
@@ -412,16 +412,23 @@ func (v *Vertex) insertConjunct(ctx *OpContext, c Conjunct, id CloseInfo, mode A
 
 	v.updateArcType(mode)
 
+	var c2 Conjunct
 	pos = -1
 	if check {
-		pos = findConjunct(v.Conjuncts, c)
+		pos, c2 = findConjunct(v.Conjuncts, c)
+
 	}
 	if pos == -1 {
 		pos = len(v.Conjuncts)
 		v.addConjunctUnchecked(c)
 		added = true
-	} else {
-		n.removeRequired(id.defID)
+	} else if srcRef := c2.CloseInfo.defID; id.defID != 0 && srcRef != 0 {
+		// TODO: done to avoid embedding conflicts.
+		// Instead, let each embedded def and ref have its own number
+		// and then add to equivalency set.
+		// n.replaceRequired(id.defID, 0)
+		n.addRequired(srcRef, id.defID)
+		// n.addRequired(id.defID, srcRef)
 	}
 
 	if v.isInProgress() {

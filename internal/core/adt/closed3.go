@@ -114,118 +114,16 @@ import (
 	"slices"
 )
 
+const deleteID defID = 0
+
+type defID uint32
+
 type refInfo struct {
 	v      *Vertex
 	id     defID
 	ignore bool
 	once   bool
 }
-
-// reqSets defines a set of sets of defIDs that can each satisfy a required id.
-//
-// A reqSet holds a sequence of a defID "representative", or "head" for a
-// requirement, followed by all defIDs that satisfy this requirement. For head
-// elements, next points to the next head element. All elements up to the next
-// head element represent defIDs that satisfy the requirement of the head and
-// have next set to 0.
-type reqSets []reqSet
-
-// A single reqID might be satisfied by multiple defIDs, if the definition
-// associated with the reqID embeds other definitions, for instance. In this
-// case we keep a linked list of defIDs that may also be satisfied.
-//
-// This type is used in [nodeContext.equivalences] as follows:
-//   - if an embedding is used by a definition, it is inserted in the list
-//     pointed to by its refInfo. Similarly,
-//     refInfo is added to the list
-type reqSet struct {
-	id defID
-	// size is the number of elements in the set. This is only set for the head.
-	// Entries with equivalence IDs have size set to 0.
-	size uint32
-	once bool
-}
-
-// assert checks the invariants of a reqSets. It can be used for debugging.
-func (a reqSets) assert() {
-	for i := 0; i < len(a); {
-		e := a[i]
-		if e.size == 0 {
-			panic("head element with 0 size")
-		}
-		if i+int(e.size) > len(a) {
-			panic("set extends beyond end of slice")
-		}
-		for j := 1; j < int(e.size); j++ {
-			if a[i+j].size != 0 {
-				panic("non-head element with non-zero size")
-			}
-		}
-
-		i += int(e.size)
-	}
-}
-
-var _ = reqSets.assert // silence linter
-
-// filter keeps all elements e in a for which f(e) and removes the rest.
-// If f(e) is false for a group head, the entire group is removed.
-func (a *reqSets) filter(f func(e reqSet) bool) {
-	temp := (*a)[:0]
-	lastHead := -1
-	for i := 0; i < len(*a); {
-		e := (*a)[i]
-		switch {
-		case f(e):
-			if e.size != 0 {
-				lastHead = len(temp)
-			}
-			temp = append(temp, e)
-			i++
-
-		case e.size != 0:
-			// force crash if an equivalence is removed before a new head is
-			// found.
-			lastHead = -1
-			i += int(e.size)
-
-		default:
-			temp[lastHead].size--
-			i++
-		}
-	}
-	*a = temp
-}
-
-// filter keeps all reqSets e in a for which f(e) and removes the rest.
-func (a *reqSets) filterSets(f func(e []reqSet) bool) {
-	temp := (*a)[:0]
-	for i := 0; i < len(*a); {
-		e := (*a)[i]
-		set := (*a)[i : i+int(e.size)]
-
-		if f(set) {
-			temp = append(temp, set...)
-		}
-
-		i += int(e.size)
-	}
-	*a = temp
-}
-
-type replaceID struct {
-	from  defID
-	to    defID
-	add   bool
-	isDef bool // was originally a definition. For tracking and V2 compatibility.
-}
-
-const (
-	// addID    defID = 0xffff
-	deleteID defID = 0
-)
-
-type defID uint32
 
 type conjunctFlags uint8
 
@@ -248,204 +146,11 @@ func (c conjunctInfo) isAny() bool {
 	return c.kind&TopKind == TopKind || c.flags&cHasOpenValidator != 0
 }
 
-// replaceIDs replaces defIDs mappings in the receiving reqSets in place.
-//
-// The following rules apply:
-//
-//   - Mapping a typo-checked definition to a new typo-checked definition replaces
-//     the set from the "from" definition in its entirety. It is assumed that the
-//     set is already added to the requirements.
-//
-//   - A mapping from a typo-checked definition to 0 removes the set from the
-//     requirements. This typically comes from _ or ....
-//
-//   - A mapping from an equivalence (non-head) value to 0 removes the
-//     equivalence. This does not change the outcome of typo checking, but
-//     reduces the size of the equivalence list, which helps performance.
-//
-//   - A mapping from an equivalence (non-head) value to a new value widens the
-//     allowed values for the respective set by adding the new value to the
-//     equivalence list.
-//
-// In words;
-// - Definition: if not in embed, create new group
-// - If in active definition, replace old definition
-// - If in embed, replace embed in respective sets. definition starts new group
-// - child definition replaces parent definition
-func (a *reqSets) replaceIDs(b ...replaceID) {
-	temp := *a
-	temp = temp[:0]
-	headPos := -1
-	var buf reqSets
-outer:
-	for i := 0; i < len(*a); {
-		e := (*a)[i]
-		if e.size != 0 {
-			// If the head is dropped, the entire group is deleted.
-			for _, x := range b {
-				if e.id == x.from && !x.add {
-					i += int(e.size)
-					headPos = -1 // force crash
-					continue outer
-				}
-			}
-			_ = headPos
-			if len(buf) > 0 {
-				buf[0].size = uint32(len(buf))
-				if len(temp)+len(buf) > i {
-					*a = slices.Replace(*a, len(temp), i, buf...)
-					i = len(temp) + len(buf)
-					temp = (*a)[:i]
-				} else {
-					temp = append(temp, buf...)
-				}
-				buf = buf[:0] // TODO: perf use opcontext buffer.
-			}
-			headPos = len(temp)
-		}
-
-		buf = transitiveMapping(buf, e, b)
-
-		i++
-	}
-	if len(buf) > 0 {
-		buf[0].size = uint32(len(buf))
-		temp = append(temp, buf...)
-	}
-	*a = temp
-}
-
-func transitiveMapping(buf reqSets, x reqSet, b []replaceID) reqSets {
-	// do not add duplicates
-	for _, y := range buf {
-		if x.id == y.id {
-			return buf
-		}
-	}
-
-	// yield first element
-	buf = append(buf, x)
-
-	for _, y := range b {
-		if x.id == y.from && y.from != 0 {
-			if y.to == deleteID {
-				buf = buf[:len(buf)-1]
-				return buf
-			}
-			buf = transitiveMapping(buf, reqSet{id: y.to, once: x.once}, b)
-		}
-	}
-	return buf
-}
-
-func (a *reqSets) filterNonRecursive() {
-	a.filterSets(func(e []reqSet) bool {
-		x := e[0]
-		if x.once || x.id == 0 {
-			return false // discard the entry
-		}
-		return true // keep the entry
-	})
-}
-
-// mergeCloseInfo merges the conjunctInfo of nw that is missing from nv into nv.
-//
-// This is used to merge conjunctions from a disjunct to the Vertex that
-// originated the disjunct.
-// TODO: consider whether we can do without. We usually aim to not check
-// such nodes, but sometimes we do.
-func mergeCloseInfo(nv, nw *nodeContext) {
-	v := nv.node
-	w := nw.node
-	if w == nil {
-		return
-	}
-	// Merge missing closeInfos
-outer:
-	for _, wci := range nw.conjunctInfo {
-		for _, vci := range nv.conjunctInfo {
-			if wci.id == vci.id {
-				continue outer
-			}
-		}
-		nv.conjunctInfo = append(nv.conjunctInfo, wci)
-	}
-
-outer2:
-	for _, d := range nw.replaceIDs {
-		for _, vd := range nv.replaceIDs {
-			if d == vd {
-				continue outer2
-			}
-		}
-		nv.replaceIDs = append(nv.replaceIDs, d)
-	}
-
-	// Recurse for arcs
-	for _, wa := range w.Arcs {
-		for _, va := range v.Arcs {
-			if va.Label == wa.Label {
-				mergeCloseInfo(va.state, wa.state)
-				break
-			}
-		}
-	}
-}
-
-func appendRequired(a reqSets, n *nodeContext) reqSets {
-	v := n.node
-	if p := v.Parent; p != nil {
-		a = appendRequired(a, p.state)
-	}
-	a.filterNonRecursive()
-
-outer:
-	for _, y := range n.reqDefIDs {
-		if y.ignore {
-			continue
-		}
-		for _, x := range a {
-			if x.id == y.id {
-				continue outer
-			}
-		}
-		a = append(a, reqSet{
-			id:   y.id,
-			once: !y.v.ClosedRecursive,
-			size: 1,
-		})
-	}
-
-	a.replaceIDs(n.replaceIDs...)
-
-	// If 'v' is a hidden field, then all reqSets in 'a' for which there is no
-	// corresponding entry in conjunctInfo should be removed from 'a'.
-	if allowedInClosed(v.Label) {
-		a.filterSets(func(a []reqSet) bool {
-			for _, e := range a {
-				for _, c := range n.conjunctInfo {
-					if c.id == e.id {
-						return true // keep the set
-					}
-				}
-			}
-			return false // discard the set
-		})
-	}
-
-	for _, c := range n.conjunctInfo {
-		if c.isAny() || c.hasEllipsis() {
-			a.filterSets(func(a []reqSet) bool {
-				for _, e := range a {
-					if e.id == c.id {
-						return false // discard the set
-					}
-				}
-				return true // keep the set
-			})
-		}
-	}
-	return a
+type replaceID struct {
+	from  defID
+	to    defID
+	add   bool
+	isDef bool // was originally a definition. For tracking and V2 compatibility.
 }
 
 func (n *nodeContext) addRequired(from, to defID) { // XXX remove from == delete
@@ -528,44 +233,6 @@ func (n *nodeContext) addType(v *Vertex, id CloseInfo) CloseInfo {
 		}
 	}
 
-	// If this conjunct is a "close" builtin, we cannot replace the original
-	// definition. In that case we should force add.
-
-	// // Replace when both are definition.
-	// switch {
-	// case id.FromEmbed:
-	// 	// n.embeddings = append(n.embeddings, v)
-	// case v.ClosedNonRecursive:
-	// 	// id.IsClosed = true
-	// 	if id.defID != 0 {
-	// 		break
-	// 	}
-
-	// 	if id.defID != 0 {
-	// 		n.addRequired(id.defID, dstID)
-	// 	}
-	// 	id.defID = dstID
-
-	// default:
-	// 	dstID := defID(0)
-	// 	for _, x := range n.reqDefIDs {
-	// 		if x.v == v {
-	// 			dstID = x.id
-	// 			break
-	// 		}
-	// 	}
-
-	// 	if dstID == 0 {
-	// 		n.ctx.nextDefID++
-	// 		dstID = n.ctx.nextDefID
-	// 		n.reqDefIDs = append(n.reqDefIDs, refInfo{v: v, id: dstID})
-	// 	}
-
-	// 	if id.defID != 0 {
-	// 		n.replaceRequired(id.defID, dstID)
-	// 	}
-	// 	id.defID = dstID
-	// }
 	return id
 }
 
@@ -691,4 +358,294 @@ func hasEvidenceForOne(a reqSets, conjuncts []conjunctInfo) bool {
 		}
 	}
 	return false
+}
+
+// reqSets defines a set of sets of defIDs that can each satisfy a required id.
+//
+// A reqSet holds a sequence of a defID "representative", or "head" for a
+// requirement, followed by all defIDs that satisfy this requirement. For head
+// elements, next points to the next head element. All elements up to the next
+// head element represent defIDs that satisfy the requirement of the head and
+// have next set to 0.
+type reqSets []reqSet
+
+// A single reqID might be satisfied by multiple defIDs, if the definition
+// associated with the reqID embeds other definitions, for instance. In this
+// case we keep a linked list of defIDs that may also be satisfied.
+//
+// This type is used in [nodeContext.equivalences] as follows:
+//   - if an embedding is used by a definition, it is inserted in the list
+//     pointed to by its refInfo. Similarly,
+//     refInfo is added to the list
+type reqSet struct {
+	id defID
+	// size is the number of elements in the set. This is only set for the head.
+	// Entries with equivalence IDs have size set to 0.
+	size uint32
+	once bool
+}
+
+// assert checks the invariants of a reqSets. It can be used for debugging.
+func (a reqSets) assert() {
+	for i := 0; i < len(a); {
+		e := a[i]
+		if e.size == 0 {
+			panic("head element with 0 size")
+		}
+		if i+int(e.size) > len(a) {
+			panic("set extends beyond end of slice")
+		}
+		for j := 1; j < int(e.size); j++ {
+			if a[i+j].size != 0 {
+				panic("non-head element with non-zero size")
+			}
+		}
+
+		i += int(e.size)
+	}
+}
+
+// replaceIDs replaces defIDs mappings in the receiving reqSets in place.
+//
+// The following rules apply:
+//
+//   - Mapping a typo-checked definition to a new typo-checked definition replaces
+//     the set from the "from" definition in its entirety. It is assumed that the
+//     set is already added to the requirements.
+//
+//   - A mapping from a typo-checked definition to 0 removes the set from the
+//     requirements. This typically comes from _ or ....
+//
+//   - A mapping from an equivalence (non-head) value to 0 removes the
+//     equivalence. This does not change the outcome of typo checking, but
+//     reduces the size of the equivalence list, which helps performance.
+//
+//   - A mapping from an equivalence (non-head) value to a new value widens the
+//     allowed values for the respective set by adding the new value to the
+//     equivalence list.
+//
+// In words;
+// - Definition: if not in embed, create new group
+// - If in active definition, replace old definition
+// - If in embed, replace embed in respective sets. definition starts new group
+// - child definition replaces parent definition
+func (a *reqSets) replaceIDs(b ...replaceID) {
+	temp := *a
+	temp = temp[:0]
+	headPos := -1
+	var buf reqSets
+outer:
+	for i := 0; i < len(*a); {
+		e := (*a)[i]
+		if e.size != 0 {
+			// If the head is dropped, the entire group is deleted.
+			for _, x := range b {
+				if e.id == x.from && !x.add {
+					i += int(e.size)
+					headPos = -1 // force crash
+					continue outer
+				}
+			}
+			_ = headPos
+			if len(buf) > 0 {
+				buf[0].size = uint32(len(buf))
+				if len(temp)+len(buf) > i {
+					*a = slices.Replace(*a, len(temp), i, buf...)
+					i = len(temp) + len(buf)
+					temp = (*a)[:i]
+				} else {
+					temp = append(temp, buf...)
+				}
+				buf = buf[:0] // TODO: perf use opcontext buffer.
+			}
+			headPos = len(temp)
+		}
+
+		buf = transitiveMapping(buf, e, b)
+
+		i++
+	}
+	if len(buf) > 0 {
+		buf[0].size = uint32(len(buf))
+		temp = append(temp, buf...)
+	}
+	*a = temp
+}
+
+func transitiveMapping(buf reqSets, x reqSet, b []replaceID) reqSets {
+	// do not add duplicates
+	for _, y := range buf {
+		if x.id == y.id {
+			return buf
+		}
+	}
+
+	// yield first element
+	buf = append(buf, x)
+
+	for _, y := range b {
+		if x.id == y.from && y.from != 0 {
+			if y.to == deleteID {
+				buf = buf[:len(buf)-1]
+				return buf
+			}
+			buf = transitiveMapping(buf, reqSet{id: y.to, once: x.once}, b)
+		}
+	}
+	return buf
+}
+
+// mergeCloseInfo merges the conjunctInfo of nw that is missing from nv into nv.
+//
+// This is used to merge conjunctions from a disjunct to the Vertex that
+// originated the disjunct.
+// TODO: consider whether we can do without. We usually aim to not check
+// such nodes, but sometimes we do.
+func mergeCloseInfo(nv, nw *nodeContext) {
+	v := nv.node
+	w := nw.node
+	if w == nil {
+		return
+	}
+	// Merge missing closeInfos
+outer:
+	for _, wci := range nw.conjunctInfo {
+		for _, vci := range nv.conjunctInfo {
+			if wci.id == vci.id {
+				continue outer
+			}
+		}
+		nv.conjunctInfo = append(nv.conjunctInfo, wci)
+	}
+
+outer2:
+	for _, d := range nw.replaceIDs {
+		for _, vd := range nv.replaceIDs {
+			if d == vd {
+				continue outer2
+			}
+		}
+		nv.replaceIDs = append(nv.replaceIDs, d)
+	}
+
+	// Recurse for arcs
+	for _, wa := range w.Arcs {
+		for _, va := range v.Arcs {
+			if va.Label == wa.Label {
+				mergeCloseInfo(va.state, wa.state)
+				break
+			}
+		}
+	}
+}
+
+func appendRequired(a reqSets, n *nodeContext) reqSets {
+	v := n.node
+	if p := v.Parent; p != nil {
+		a = appendRequired(a, p.state)
+	}
+	a.filterNonRecursive()
+
+outer:
+	for _, y := range n.reqDefIDs {
+		if y.ignore {
+			continue
+		}
+		for _, x := range a {
+			if x.id == y.id {
+				continue outer
+			}
+		}
+		a = append(a, reqSet{
+			id:   y.id,
+			once: !y.v.ClosedRecursive,
+			size: 1,
+		})
+	}
+
+	a.replaceIDs(n.replaceIDs...)
+
+	// If 'v' is a hidden field, then all reqSets in 'a' for which there is no
+	// corresponding entry in conjunctInfo should be removed from 'a'.
+	if allowedInClosed(v.Label) {
+		a.filterSets(func(a []reqSet) bool {
+			for _, e := range a {
+				for _, c := range n.conjunctInfo {
+					if c.id == e.id {
+						return true // keep the set
+					}
+				}
+			}
+			return false // discard the set
+		})
+	}
+
+	for _, c := range n.conjunctInfo {
+		if c.isAny() || c.hasEllipsis() {
+			a.filterSets(func(a []reqSet) bool {
+				for _, e := range a {
+					if e.id == c.id {
+						return false // discard the set
+					}
+				}
+				return true // keep the set
+			})
+		}
+	}
+	return a
+}
+
+func (a *reqSets) filterNonRecursive() {
+	a.filterSets(func(e []reqSet) bool {
+		x := e[0]
+		if x.once || x.id == 0 {
+			return false // discard the entry
+		}
+		return true // keep the entry
+	})
+}
+
+// filter keeps all reqSets e in a for which f(e) and removes the rest.
+func (a *reqSets) filterSets(f func(e []reqSet) bool) {
+	temp := (*a)[:0]
+	for i := 0; i < len(*a); {
+		e := (*a)[i]
+		set := (*a)[i : i+int(e.size)]
+
+		if f(set) {
+			temp = append(temp, set...)
+		}
+
+		i += int(e.size)
+	}
+	*a = temp
+}
+
+// filter keeps all elements e in a for which f(e) and removes the rest.
+// If f(e) is false for a group head, the entire group is removed.
+func (a *reqSets) filter(f func(e reqSet) bool) {
+	temp := (*a)[:0]
+	lastHead := -1
+	for i := 0; i < len(*a); {
+		e := (*a)[i]
+		switch {
+		case f(e):
+			if e.size != 0 {
+				lastHead = len(temp)
+			}
+			temp = append(temp, e)
+			i++
+
+		case e.size != 0:
+			// force crash if an equivalence is removed before a new head is
+			// found.
+			lastHead = -1
+			i += int(e.size)
+
+		default:
+			temp[lastHead].size--
+			i++
+		}
+	}
+	*a = temp
 }

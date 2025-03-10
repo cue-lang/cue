@@ -1776,10 +1776,14 @@ func (x *Builtin) call(call *CallContext) Expr {
 
 	saved := c.IsValidator
 	c.IsValidator = call.isValidator
-	ret := x.Func(call)
-	c.IsValidator = saved
+	isEmbed := c.ci.FromEmbed
+	c.ci.FromEmbed = false
+	defer func() {
+		c.ci.FromEmbed = isEmbed
+		c.IsValidator = saved
+	}()
 
-	return ret
+	return x.Func(call)
 }
 
 func (x *Builtin) Source() ast.Node { return nil }

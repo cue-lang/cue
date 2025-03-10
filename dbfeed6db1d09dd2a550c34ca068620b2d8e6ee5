@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "37fd5c09_91f49646",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-10T19:57:58Z",
+      "side": 1,
+      "message": "oops, done",
+      "parentUuid": "2657fb29_610ca849",
+      "revId": "dbfeed6db1d09dd2a550c34ca068620b2d8e6ee5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e4345ba7_3683920e",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-03-10T17:46:46Z",
       "side": 1,
       "message": "remove blank line",
+      "revId": "dbfeed6db1d09dd2a550c34ca068620b2d8e6ee5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5f7d05a_8acd230a",
+        "filename": "internal/mod/modload/update.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-10T19:57:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e4345ba7_3683920e",
       "revId": "dbfeed6db1d09dd2a550c34ca068620b2d8e6ee5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

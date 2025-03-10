@@ -427,8 +427,7 @@ func (v *Vertex) insertConjunct(ctx *OpContext, c Conjunct, id CloseInfo, mode A
 		// Instead, let each embedded def and ref have its own number
 		// and then add to equivalency set.
 		// n.replaceRequired(id.defID, 0)
-		n.addRequired(srcRef, id.defID)
-		// n.addRequired(id.defID, srcRef)
+		n.addMapping(replaceID{from: srcRef, to: id.defID, add: true})
 	}
 
 	if v.isInProgress() {

@@ -83,7 +83,7 @@ func TestReplaceIDs(t *testing.T) {
 			{id: 1, size: 1},
 		},
 		replace: []replaceID{
-			{from: 1, to: 0},
+			{from: 1, to: deleteID},
 		},
 		expected: reqSets{},
 	}, {
@@ -119,8 +119,8 @@ func TestReplaceIDs(t *testing.T) {
 			{id: 5, size: 1},
 		},
 		replace: []replaceID{
-			{from: 4, to: 0},
-			{from: 2, to: 0},
+			{from: 4, to: deleteID},
+			{from: 2, to: deleteID},
 		},
 		expected: reqSets{
 			{id: 1, size: 2},
@@ -302,6 +302,71 @@ func TestReplaceIDs(t *testing.T) {
 			{id: 1},
 			{id: 3},
 		},
+	}, {
+		name: "cycle",
+		reqSets: []reqSet{
+			{id: 1, size: 1},
+			{id: 2, size: 1},
+			{id: 3, size: 1, del: 2},
+			{id: 4, size: 1, del: 2},
+		},
+		replace: []replaceID{
+			{from: 1, to: 2, add: true}, // , headOnly: true},
+			{from: 2, to: 3, add: true},
+			{from: 2, to: 4, add: true},
+			{from: 3, to: 1, add: true},
+			{from: 4, to: 1, add: true},
+		},
+		expected: reqSets{
+			{id: 1, size: 4},
+			{id: 2},
+			{id: 3},
+			{id: 4},
+			{id: 2, size: 4},
+			{id: 3},
+			{id: 1},
+			{id: 4},
+			{id: 3, size: 3, del: 2},
+			{id: 1},
+			{id: 2},
+			{id: 4, size: 3, del: 2},
+			{id: 1},
+			{id: 2},
+		},
+	}, {
+		// name: "cycle",
+		// reqSets: []reqSet{
+		// 	{id: 5, size: 1},
+		// 	{id: 6, size: 1, del: 5},
+		// 	{id: 7, size: 1, del: 6},
+		// 	{id: 8, size: 1, del: 7},
+		// },
+		// replace: []replaceID{
+		// 	// {5 4 0 false} {6 0 0 false} {7 0 0 false} {8 0 0 false}
+
+		// 	{from: 5, to: 6, add: true}, // , headOnly: true},
+		// 	{from: 6, to: 5, add: true},
+		// 	{from: 6, to: 7, add: false},
+		// 	{from: 7, to: 5, add: false},
+		// 	{from: 6, to: 8, add: false},
+		// 	{from: 8, to: 5, add: false},
+		// },
+		// expected: reqSets{
+		// 	{id: 1, size: 4},
+		// 	{id: 2},
+		// 	{id: 3},
+		// 	{id: 4},
+		// 	{id: 2, size: 4},
+		// 	{id: 3},
+		// 	{id: 1},
+		// 	{id: 4},
+		// 	{id: 3, size: 3, del: 2},
+		// 	{id: 1},
+		// 	{id: 2},
+		// 	{id: 4, size: 3, del: 2},
+		// 	{id: 1},
+		// 	{id: 2},
+		// },
 		// }, { // good to have
 		// 	name: "transitive delete",
 		// 	reqSets: reqSets{
@@ -309,7 +374,7 @@ func TestReplaceIDs(t *testing.T) {
 		// 		{id: 2},
 		// 	},
 		// 	replace: []replaceID{
-		// 		{from: 4, to: 0},
+		// 		{from: 4, to: deleteID},
 		// 		{from: 2, to: 3},
 		// 		{from: 3, to: 4},
 		// 	},
@@ -327,7 +392,7 @@ func TestReplaceIDs(t *testing.T) {
 
 			tt.reqSets.replaceIDs(tt.replace...)
 			if !slices.Equal(tt.reqSets, tt.expected) {
-				t.Errorf("got %v, want %v", tt.reqSets, tt.expected)
+				t.Errorf("got: \n%v, want:\n%v", tt.reqSets, tt.expected)
 			}
 		})
 	}

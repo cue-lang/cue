@@ -391,17 +391,21 @@ func (m *mermaidContext) vertexInfo(vc *mermaidVertex, recursive bool) {
 		for i, d := range n.reqDefIDs {
 			indentOnNewline(node, 2)
 			var id any = d.id
-			if d.v.ClosedNonRecursive && d.id == 0 {
+			if d.v != nil && d.v.ClosedNonRecursive && d.id == 0 {
 				id = "once"
 			}
 			reqID := fmt.Sprintf("%s_req_%d", m.vertexID(v), i)
 			arrow := "%s == R ==> %s\n"
-			format := "%s((%d))\n"
+			format := "%s((%d%s))\n"
 			if d.ignore {
 				arrow = "%s -. R .-> %s\n"
-				format = "%s((<s><i>%di</i></s>))\n"
+				format = "%s((<s><i>%d%si</i></s>))\n"
 			}
-			fmt.Fprintf(node, format, reqID, id)
+			flags := ""
+			if d.placeholder {
+				flags += "S"
+			}
+			fmt.Fprintf(node, format, reqID, id, flags)
 			m.vertex(d.v, false)
 			fmt.Fprintf(global, arrow, reqID, m.vertexID(d.v))
 		}
@@ -433,11 +437,14 @@ func (m *mermaidContext) vertexInfo(vc *mermaidVertex, recursive bool) {
 			for i, r := range n.replaceIDs {
 				indentOnNewline(node, 3)
 				dropID := fmt.Sprintf("%s_drop_%d", m.vertexID(v), i)
-				add := ""
+				flags := ""
 				if r.add {
-					add = "+"
+					flags = "+"
 				}
-				fmt.Fprintf(node, "%s((%d->%d%s))\n", dropID, r.from, r.to, add)
+				if r.headOnly {
+					flags += "H"
+				}
+				fmt.Fprintf(node, "%s((%d->%d%s))\n", dropID, r.from, r.to, flags)
 			}
 			indentOnNewline(node, 2)
 			// fmt.Fprintf(node, "end\n")

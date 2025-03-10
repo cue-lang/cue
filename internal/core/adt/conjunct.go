@@ -94,8 +94,13 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		// NOTE: do not unshare: a conjunction could still allow structure
 		// sharing, such as in the case of `ref & ref`.
 		if x.Op == AndOp {
-			n.scheduleConjunct(MakeConjunct(env, x.X, id), id)
-			n.scheduleConjunct(MakeConjunct(env, x.Y, id), id)
+			idA, idB := id, id
+			// if id.EmbedOnce {
+			// 	idA = n.splitDefID(nil, id)
+			// 	idB = n.splitDefID(nil, id)
+			// }
+			n.scheduleConjunct(MakeConjunct(env, x.X, idA), idA)
+			n.scheduleConjunct(MakeConjunct(env, x.Y, idB), idB)
 			return
 		}
 
@@ -222,6 +227,12 @@ loop1:
 		}
 	}
 
+	// TODO: if embed, add an "ignore" field.
+	// When inserting a replace that is a definition, flip the ignore.
+	if hasEmbed && !ci.FromDef && !ci.FromEmbed {
+		ci = n.splitDefID(s, ci)
+	}
+
 	// First add fixed fields and schedule expressions.
 	for _, d := range s.Decls {
 		switch x := d.(type) {
@@ -268,9 +279,21 @@ loop1:
 
 		case Expr:
 			ci := ci
+			ci.ParentEmbed = ci.FromEmbed
 			ci.FromEmbed = true
+			switch x.(type) {
+			case Resolver:
+			case *StructLit:
+			case *ListLit:
+			case *BinaryExpr:
+				ci.EmbedOnce = true
+				// ci.FromEmbed = true
+				ci = n.injectEmbedNode(ci)
+			default:
+			}
 
 			ec := MakeConjunct(childEnv, x, ci)
+
 			n.scheduleConjunct(ec, ci)
 			hasEmbed = true
 		}

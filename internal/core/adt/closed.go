@@ -117,6 +117,9 @@ type CloseInfo struct {
 	// NOTE: only used when using closeContext.
 	FromEmbed bool
 
+	EmbedOnce   bool
+	ParentEmbed bool
+
 	// FromDef indicates whether this conjunct was inserted because of a
 	// definition. This flag is sticky: it will be set for conjuncts created
 	// from fields defined by this conjunct.

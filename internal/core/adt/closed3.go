@@ -112,17 +112,22 @@ package adt
 import (
 	"fmt"
 	"slices"
+
+	"cuelang.org/go/cue/ast"
 )
 
-const deleteID defID = 0
+// const deleteID defID = 0 // 0xffff
+const deleteID defID = 0xffff
 
 type defID uint32
 
 type refInfo struct {
-	v      *Vertex
-	id     defID
-	ignore bool
-	once   bool
+	v           *Vertex
+	id          defID
+	ignore      bool
+	placeholder bool
+	once        bool
+	parentDef   defID // TODO(flatclose): can be removed later.
 }
 
 type conjunctFlags uint8
@@ -147,25 +152,29 @@ func (c conjunctInfo) isAny() bool {
 }
 
 type replaceID struct {
-	from  defID
-	to    defID
-	add   bool
-	isDef bool // was originally a definition. For tracking and V2 compatibility.
+	from defID
+	to   defID
+	add  bool
+	// isDef    bool // was originally a definition. For tracking and V2 compatibility.
+	headOnly bool
 }
 
-func (n *nodeContext) addRequired(from, to defID) { // XXX remove from == delete
-	// if i := slices.Index(n.reqDefIDs, id); i >= 0 {
-	// 	n.reqDefIDs = slices.Delete(n.reqDefIDs, i, i+1)
-	// }
-	n.replaceIDs = append(n.replaceIDs, replaceID{from: from, to: to, add: true})
+func (n *nodeContext) addMapping(x replaceID) {
+	n.replaceIDs = append(n.replaceIDs, x)
 }
 
-func (n *nodeContext) replaceRequired(from, to defID) {
-	// if i := slices.Index(n.reqDefIDs, id); i >= 0 {
-	// 	n.reqDefIDs = slices.Delete(n.reqDefIDs, i, i+1)
-	// }
-	n.replaceIDs = append(n.replaceIDs, replaceID{from: from, to: to})
-}
+// func (n *nodeContext) addRequired(from, to defID) { // XXX remove from == delete
+// 	// if i := slices.Index(n.reqDefIDs, id); i >= 0 {
+// 	// 	n.reqDefIDs = slices.Delete(n.reqDefIDs, i, i+1)
+// 	// }
+// 	n.replaceIDs = append(n.replaceIDs, replaceID{from: from, to: to, add: true})
+// }
+// func (n *nodeContext) replaceRequired(from, to defID) {
+// 	// if i := slices.Index(n.reqDefIDs, id); i >= 0 {
+// 	// 	n.reqDefIDs = slices.Delete(n.reqDefIDs, i, i+1)
+// 	// }
+// 	n.replaceIDs = append(n.replaceIDs, replaceID{from: from, to: to})
+// }
 
 func (n *nodeContext) updateConjunctInfo(k Kind, id CloseInfo, flags conjunctFlags) {
 	if n.ctx.OpenDef {
@@ -195,6 +204,9 @@ func (n *nodeContext) addType(v *Vertex, id CloseInfo) CloseInfo {
 	// TODO: this is more accurate, but is more restrictive than V2 in some
 	// cases.
 	// ignore := (id.FromEmbed || !id.FromDef) && !id.IsClosed
+	if id.EmbedOnce {
+		ignore = !id.FromDef && !id.IsClosed
+	}
 
 	srcID := id.defID
 	dstID := defID(0)
@@ -211,9 +223,10 @@ func (n *nodeContext) addType(v *Vertex, id CloseInfo) CloseInfo {
 		n.ctx.nextDefID++
 		dstID = n.ctx.nextDefID
 		n.reqDefIDs = append(n.reqDefIDs, refInfo{
-			v:      v,
-			id:     dstID,
-			ignore: ignore,
+			v:         v,
+			id:        dstID,
+			ignore:    ignore,
+			parentDef: srcID,
 		})
 	}
 	id.defID = dstID
@@ -224,13 +237,159 @@ func (n *nodeContext) addType(v *Vertex, id CloseInfo) CloseInfo {
 		return id
 	}
 
-	// TODO: should replace any existing requirement.
-	if srcID != 0 {
-		if ignore {
-			n.addRequired(srcID, dstID)
-		} else {
-			n.replaceRequired(srcID, dstID)
+	if id.FromDef || id.IsClosed {
+		for i, x := range n.reqDefIDs {
+			if x.id == srcID && x.placeholder {
+				n.reqDefIDs[i].ignore = false
+				break
+			}
 		}
+	}
+
+	// TODO: should replace any existing requirement.
+	switch {
+	case id.EmbedOnce:
+		parentID := defID(0)
+		for _, x := range n.reqDefIDs {
+			if srcID == x.id {
+				parentID = x.parentDef
+				break
+			}
+		}
+		n.addMapping(replaceID{from: srcID, to: dstID, add: true})
+		n.addMapping(replaceID{from: dstID, to: parentID, add: true})
+		id.EmbedOnce = false
+	case srcID == 0:
+	case ignore:
+		n.addMapping(replaceID{from: srcID, to: dstID, add: true})
+	default:
+		n.addMapping(replaceID{from: srcID, to: dstID})
+	}
+
+	return id
+}
+
+// func (n *nodeContext) splitEmbedding(id CloseInfo) CloseInfo {
+// 	if n.ctx.OpenDef {
+// 		return id
+// 	}
+
+// 	if !id.EmbedOnce {
+// 		return id
+// 	}
+
+// 	srcID := id.defID
+
+// 	// Create new required ID.
+// 	n.ctx.nextDefID++
+// 	dstID := n.ctx.nextDefID
+// 	n.reqDefIDs = append(n.reqDefIDs, refInfo{
+// 		v:        emptyNode,
+// 		id:       dstID,
+// 		headOnly: true,
+// 	})
+// 	id.defID = dstID
+
+// 	// allow
+
+// 	if id.FromDef || id.IsClosed {
+// 		for i, x := range n.reqDefIDs {
+// 			if x.id == srcID && x.placeholder {
+// 				n.reqDefIDs[i].ignore = false
+// 				break
+// 			}
+// 		}
+// 	}
+
+// 	// TODO: should replace any existing requirement.
+// 	if srcID != 0 {
+// 		if ignore {
+// 			n.addRequired(srcID, dstID)
+// 		} else {
+// 			n.replaceRequired(srcID, dstID)
+// 		}
+// 	}
+
+//		return id
+//	}
+func (n *nodeContext) injectEmbedNode(id CloseInfo) CloseInfo {
+	srcID := id.defID
+
+	ignore := !id.FromDef && !id.IsClosed
+
+	n.ctx.nextDefID++
+	dstID := n.ctx.nextDefID
+	n.reqDefIDs = append(n.reqDefIDs, refInfo{
+		v:      emptyNode,
+		id:     dstID,
+		ignore: ignore,
+		// placeholder: true,
+		parentDef: srcID,
+	})
+	id.defID = dstID
+
+	// id.EmbedOnce = false
+	// id.FromEmbed = true
+
+	// allow any field in the new struct within the original
+	// n.addMapping(replaceID{from: srcID, to: dstID, headOnly: true, add: true})
+	n.addMapping(replaceID{from: srcID, to: dstID, add: true})
+	// allow any other structs spawning off the original struct in here.
+	// n.addMapping(replaceID{from: dstID, to: srcID, add: true})
+
+	return id
+}
+
+func (n *nodeContext) splitDefID(s *StructLit, id CloseInfo) CloseInfo {
+	if n.ctx.OpenDef {
+		return id
+	}
+
+	if s != nil { // TODO: move to caller
+		if _, ok := s.Src.(*ast.File); ok {
+			return id
+		}
+	}
+
+	// If this comes from an embedding we are ignoring it as a requirement.
+	// We may still add an idea to track it as an equivalence, though.
+	ignore := id.FromEmbed || (!id.FromDef && !id.IsClosed)
+	// TODO: this is more accurate, but is more restrictive than V2 in some
+	// cases.
+	// ignore := (id.FromEmbed || !id.FromDef) && !id.IsClosed
+
+	srcID := id.defID
+
+	n.ctx.nextDefID++
+	dstID := n.ctx.nextDefID
+	n.reqDefIDs = append(n.reqDefIDs, refInfo{
+		v:           emptyNode,
+		id:          dstID,
+		ignore:      true,
+		placeholder: true,
+		parentDef:   srcID,
+	})
+	id.defID = dstID
+
+	if ignore && id.defID == 0 {
+		// We have reserved the number. We know there is no requirement that
+		// needs an addition ore replacement, though.
+		return id
+	}
+
+	switch {
+	// case id.EmbedOnce:
+	// id.EmbedOnce = false
+	// // allow any field in the new struct within the original
+	// n.addMapping(replaceID{from: srcID, to: dstID, headOnly: true, add: true})
+	// // allow any other structs spawning off the original struct in here.
+	// n.addMapping(replaceID{from: dstID, to: srcID, add: true})
+
+	case srcID == 0:
+	case ignore:
+		n.addMapping(replaceID{from: srcID, to: dstID, add: true})
+	default:
+		n.addMapping(replaceID{from: srcID, to: dstID})
 	}
 
 	return id
@@ -247,8 +406,11 @@ func (n *nodeContext) checkTypos() {
 	_ = z
 	v = v.DerefValue()
 
-	if ctx.logID > 49 {
+	if ctx.logID > 84 {
 		// openDebugGraph(ctx, z, fmt.Sprintf("CHECK TYPOS"))
+	}
+	if n.node.Label == 1697 {
+		openDebugGraph(ctx, z, fmt.Sprintf("CHECK TYPOS"))
 	}
 
 	required := appendRequired(nil, n)
@@ -287,7 +449,8 @@ func (n *nodeContext) checkTypos() {
 			continue // Already checked in disjuncts.
 		}
 		if a.IsShared {
-			continue // Avoid exponential runtime. Assume this is checked already.
+			// continue // Avoid exponential runtime. Assume this is checked already.
+			_ = a
 		}
 
 		// TODO(mem): child states of uncompleted nodes must have a state.
@@ -298,7 +461,7 @@ func (n *nodeContext) checkTypos() {
 		// do the right thing in appendRequired either way.
 		required.replaceIDs(na.replaceIDs...)
 
-		a = a.DerefValue()
+		a = a.DerefDisjunct()
 		// TODO(perf): somehow prevent error generation of recursive structures,
 		// or at least make it cheap. Right now if this field is a typo, likely
 		// all descendents will be regarded as typos.
@@ -382,6 +545,7 @@ type reqSet struct {
 	// size is the number of elements in the set. This is only set for the head.
 	// Entries with equivalence IDs have size set to 0.
 	size uint32
+	del  defID // TODO(flatclose): can be removed later.
 	once bool
 }
 
@@ -432,7 +596,7 @@ func (a reqSets) assert() {
 func (a *reqSets) replaceIDs(b ...replaceID) {
 	temp := *a
 	temp = temp[:0]
-	headPos := -1
+	headPos := -1 // XXX: remove
 	var buf reqSets
 outer:
 	for i := 0; i < len(*a); {
@@ -456,7 +620,7 @@ outer:
 				} else {
 					temp = append(temp, buf...)
 				}
-				buf = buf[:0] // TODO: perf use opcontext buffer.
+				buf = buf[:0] // TODO: perf use OpContext buffer.
 			}
 			headPos = len(temp)
 		}
@@ -484,7 +648,13 @@ func transitiveMapping(buf reqSets, x reqSet, b []replaceID) reqSets {
 	buf = append(buf, x)
 
 	for _, y := range b {
-		if x.id == y.from && y.from != 0 {
+		if x.id == y.from { // && y.from != 0
+			if y.headOnly && buf[0].id != y.from {
+				continue
+			}
+			if buf[0].del == y.from {
+				continue
+			}
 			if y.to == deleteID {
 				buf = buf[:len(buf)-1]
 				return buf
@@ -556,9 +726,15 @@ outer:
 				continue outer
 			}
 		}
+		once := false
+		if y.v != nil {
+			once = !y.v.ClosedRecursive
+		}
+
 		a = append(a, reqSet{
 			id:   y.id,
-			once: !y.v.ClosedRecursive,
+			once: once,
+			del:  y.parentDef,
 			size: 1,
 		})
 	}
@@ -598,7 +774,7 @@ outer:
 func (a *reqSets) filterNonRecursive() {
 	a.filterSets(func(e []reqSet) bool {
 		x := e[0]
-		if x.once || x.id == 0 {
+		if x.once { //  || x.id == 0
 			return false // discard the entry
 		}
 		return true // keep the entry

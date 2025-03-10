@@ -91,6 +91,9 @@ func processExpr(ctx *OpContext, t *task, mode runMode) {
 		return
 	}
 	ci = t.updateCI(ci)
+	// if v, ok := v.(*Vertex); ok {
+	// 	openDebugGraph(ctx, v, "processExpr")
+	// }
 	t.node.insertValueConjunct(t.env, v, ci)
 }
 

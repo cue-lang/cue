@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d599aaaa_0b39b95f",
+        "filename": "cue/load/tags.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-10T20:50:41Z",
+      "side": 1,
+      "message": "Note: this is slightly different from the old semantics, which would have treated `\u003dfoo` as a shorthand tag. I think that this new behaviour is more correct, but worth pointing out.",
+      "revId": "5d0252ed8f7ad1f100ff9e11c639eb89dc264a2d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

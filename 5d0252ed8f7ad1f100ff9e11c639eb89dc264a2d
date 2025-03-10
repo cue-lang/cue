@@ -16,6 +16,24 @@
       "message": "Note: this is slightly different from the old semantics, which would have treated `\u003dfoo` as a shorthand tag. I think that this new behaviour is more correct, but worth pointing out.",
       "revId": "5d0252ed8f7ad1f100ff9e11c639eb89dc264a2d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46d5ab88_4a84e141",
+        "filename": "cue/load/tags.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-10T21:25:48Z",
+      "side": 1,
+      "message": "ah indeed. I thought about this as I rewrote the code as well; I thought it was okay either way, as I don\u0027t suspect anyone is actually relying on such an edge case, nor should it have done anything useful before.",
+      "parentUuid": "d599aaaa_0b39b95f",
+      "revId": "5d0252ed8f7ad1f100ff9e11c639eb89dc264a2d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

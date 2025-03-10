@@ -448,6 +448,7 @@ _|_ // e3: index out of range [2] with length 2
 == All
 {
 	@foo(bar)
+	x: int
 	p1: {}
 	d1: {
 		foobar: int
@@ -512,14 +513,13 @@ _|_ // e3: index out of range [2] with length 2
 		// baz is a required field.
 		baz!: 5
 	}
-	x: int
 	y1: {
-		src: [1, 2, 3]
 		foo0: 1
 		bar1: 2
 		bar2: 3
 		foo1: 2
 		foo2: 3
+		src: [1, 2, 3]
 		x: [1, 2, 3]
 	}
 	preserveKeyFieldInComprehension: 1

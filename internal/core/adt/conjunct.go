@@ -346,7 +346,6 @@ loop1:
 
 		case *Comprehension:
 			ci, cc := ci.spawnCloseContext(n.ctx, closeEmbed)
-			cc.decl = x
 			cc.incDependent(n.ctx, DEFER, nil)
 			defer cc.decDependent(n.ctx, DEFER, nil)
 			n.insertComprehension(childEnv, x, ci)
@@ -373,7 +372,6 @@ loop1:
 		case Expr:
 			// TODO: perhaps special case scalar Values to avoid creating embedding.
 			ci, cc := ci.spawnCloseContext(n.ctx, closeEmbed)
-			cc.decl = x
 
 			// TODO: do we need to increment here?
 			cc.incDependent(n.ctx, DEFER, nil) // decrement deferred below

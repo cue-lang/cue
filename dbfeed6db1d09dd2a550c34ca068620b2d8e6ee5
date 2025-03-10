@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2657fb29_610ca849",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-10T17:46:46Z",
+      "side": 1,
+      "message": "We could still keep the \"to make errors deterministic\" comment in some form, as it\u0027s still relevant to why we\u0027re sorting here.",
+      "revId": "dbfeed6db1d09dd2a550c34ca068620b2d8e6ee5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4345ba7_3683920e",
+        "filename": "internal/mod/modload/update.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-10T17:46:46Z",
+      "side": 1,
+      "message": "remove blank line",
+      "revId": "dbfeed6db1d09dd2a550c34ca068620b2d8e6ee5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b7a2d6b_7e6ef96b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-10T17:49:46Z",
+      "side": 1,
+      "message": "Maybe link to some info on \"unconvert\" for those readers that have no idea what it is? It would be useful to have a full Go path or install link for it, if nothing else.",
+      "revId": "f5b9a0dbbbc73bd75deb0d40d9896dfc6af995b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

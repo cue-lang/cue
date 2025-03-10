@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "278b3a49_609927e4",
+        "filename": "cmd/cue/cmd/testdata/script/issue269.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-10T14:54:34Z",
+      "side": 1,
+      "message": "Ideally, i and j would be put at the end.",
+      "revId": "b97dec6e383a0b073d2b3914bed0ff3dc412359f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -140,12 +140,12 @@ jobs:
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.24.x' && matrix.runner == 'ubuntu-24.04')
         name: gcloud setup for end-to-end tests
         uses: google-github-actions/setup-gcloud@v2
-      - env:
-          CUE_TEST_TOKEN: ${{ secrets.E2E_PORCUEPINE_CUE_TOKEN }}
-        if: |-
+      - if: |-
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.24.x' && matrix.runner == 'ubuntu-24.04')
         name: End-to-end test
+        env:
+          CUE_TEST_TOKEN: ${{ secrets.E2E_PORCUEPINE_CUE_TOKEN }}
         run: |-
           cd internal/_e2e
           go test -race

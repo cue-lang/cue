@@ -228,8 +228,8 @@ dynamicSimple: {
 		d: {}
 	}
 	comprehensions: {
-		c1: {}
 		c2: {}
+		c1: {}
 		c3: {}
 	}
 	dynamicComplex: {
@@ -268,8 +268,8 @@ dynamicSimple: {
 		d: {}
 	}
 	comprehensions: {
-		c1: {}
 		c2: {}
+		c1: {}
 		c3: {}
 	}
 	dynamicComplex: {
@@ -306,8 +306,8 @@ dynamicSimple: {
 		d: {}
 	}
 	comprehensions: {
-		c1: {}
 		c2: {}
+		c1: {}
 		c3: {}
 	}
 	dynamicComplex: {
@@ -369,10 +369,10 @@ dynamicSimple: {
 	comprehensions: {
 		@step(0)
 		@step(2c)
-		c1: {} @step(1)
 		c2: {
 			@step(2a)
 		} @step(2b)
+		c1: {} @step(1)
 		c3: {} @step(3)
 	}
 	dynamicComplex: {
@@ -434,10 +434,10 @@ dynamicSimple: {
 	comprehensions: {
 		@step(0)
 		@step(2c)
-		c1: {} @step(1)
 		c2: {
 			@step(2a)
 		} @step(2b)
+		c1: {} @step(1)
 		c3: {} @step(3)
 	}
 	dynamicComplex: {
@@ -515,8 +515,8 @@ Reordering of attributes.
 		d: {}
 	}
 	comprehensions: {
-		c1: {}
 		c2: {}
+		c1: {}
 		c3: {}
 	}
 	dynamicComplex: {
@@ -555,8 +555,8 @@ Reordering of attributes.
 		d: {}
 	}
 	comprehensions: {
-		c1: {}
 		c2: {}
+		c1: {}
 		c3: {}
 	}
 	dynamicComplex: {
@@ -593,8 +593,8 @@ Reordering of attributes.
 		d: {}
 	}
 	comprehensions: {
-		c1: {}
 		c2: {}
+		c1: {}
 		c3: {}
 	}
 	dynamicComplex: {
@@ -656,10 +656,10 @@ Reordering of attributes.
 	comprehensions: {
 		@step(0)
 		@step(2c)
-		c1: {} @step(1)
 		c2: {
 			@step(2a)
 		} @step(2b)
+		c1: {} @step(1)
 		c3: {} @step(3)
 	}
 	dynamicComplex: {
@@ -721,10 +721,10 @@ Reordering of attributes.
 	comprehensions: {
 		@step(0)
 		@step(2c)
-		c1: {} @step(1)
 		c2: {
 			@step(2a)
 		} @step(2b)
+		c1: {} @step(1)
 		c3: {} @step(3)
 	}
 	dynamicComplex: {

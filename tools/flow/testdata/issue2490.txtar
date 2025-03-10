@@ -26,8 +26,8 @@ graph TD
 -- out/run/t1/value --
 {
 	$id:    "tool/cli.Print"
-	text:   "{}"
 	stdout: "foo"
+	text:   "{}"
 }
 -- out/run/t1/stats --
 Leaks:  0

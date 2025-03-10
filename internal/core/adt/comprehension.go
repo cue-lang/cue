@@ -160,7 +160,6 @@ func (n *nodeContext) insertComprehension(
 	if !n.ctx.isDevVersion() {
 		ci = ci.SpawnEmbed(c)
 		ci.closeInfo.span |= ComprehensionSpan
-		ci.decl = c
 	}
 
 	var decls []Decl

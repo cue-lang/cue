@@ -291,10 +291,6 @@ type closeInfo struct {
 
 	root SpanType
 	span SpanType
-
-	// decl is the parent declaration which contains the conjuct which
-	// gave rise to this closeInfo.
-	decl Decl
 }
 
 // closeStats holds the administrative fields for a closeInfo value. Each

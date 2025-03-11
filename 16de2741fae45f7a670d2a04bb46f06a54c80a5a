@@ -16,6 +16,40 @@
       "message": "PTAL.",
       "revId": "16de2741fae45f7a670d2a04bb46f06a54c80a5a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd6a13e1_eba68774",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-11T16:08:46Z",
+      "side": 1,
+      "message": "LGTM module one minor point.",
+      "revId": "16de2741fae45f7a670d2a04bb46f06a54c80a5a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d368ca43_413ef54b",
+        "filename": "cmd/cue/cmd/modmirror.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-11T16:08:46Z",
+      "side": 1,
+      "message": "I think that currently we only support major version only (`@v1`) and `@v1.2.3` not major and minor but no patch (`@v1.2`). We probably should support this at some point, but not a huge priority.",
+      "revId": "16de2741fae45f7a670d2a04bb46f06a54c80a5a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ebeb4b1_2eef148d",
+        "filename": "cue/query_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-11T13:32:05Z",
+      "side": 1,
+      "message": "This test fails in v3 without the fix to StructLit.Init.",
+      "revId": "97c4341db5279526c1568d4f88498d6d3aacfc8e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

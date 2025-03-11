@@ -50,6 +50,24 @@
       "message": "I think that currently we only support major version only (`@v1`) and `@v1.2.3` not major and minor but no patch (`@v1.2`). We probably should support this at some point, but not a huge priority.",
       "revId": "16de2741fae45f7a670d2a04bb46f06a54c80a5a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81b6d638_ea98689f",
+        "filename": "cmd/cue/cmd/modmirror.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2025-03-11T16:43:53Z",
+      "side": 1,
+      "message": "@rogpeppe@gmail.com So, in the language of the help text, the only kind of version that can be specified that\u0027s *not* \"canonical\" is a major version by itself, e.g. `@v1` - do I have that right?",
+      "parentUuid": "d368ca43_413ef54b",
+      "revId": "16de2741fae45f7a670d2a04bb46f06a54c80a5a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

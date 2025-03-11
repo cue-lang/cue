@@ -83,7 +83,8 @@ func TestDecode(t *testing.T) {
 			// tag, so when we update the default version, they could break.
 			// We should probably change most of the tests to use an explicit $schema
 			// field apart from when we're explicitly testing the default version logic.
-			if versStr == "openapi" {
+			switch versStr {
+			case "openapi":
 				// OpenAPI doesn't have a JSON Schema URI so it gets a special case.
 				cfg.DefaultVersion = jsonschema.VersionOpenAPI
 				cfg.Root = "#/components/schemas/"
@@ -92,7 +93,14 @@ func TestDecode(t *testing.T) {
 					// Just for testing: does not validate the path.
 					return []ast.Label{ast.NewIdent("#" + a[len(a)-1])}, nil
 				}
-			} else {
+			case "crd":
+				// Similar for CRDs as OpenAPI.
+				cfg.DefaultVersion = jsonschema.VersionKubernetesCRD
+				// Default to the first version; can be overridden with #root.
+				cfg.Root = "#/spec/versions/0/schema/openAPIV3Schema"
+				cfg.StrictKeywords = true // CRDs always use strict keywords
+				cfg.SingleRoot = true
+			default:
 				vers, err := jsonschema.ParseVersion(versStr)
 				qt.Assert(t, qt.IsNil(err))
 				cfg.DefaultVersion = vers
@@ -105,7 +113,9 @@ func TestDecode(t *testing.T) {
 		cfg.StrictKeywords = cfg.StrictKeywords || t.HasTag("strictKeywords")
 		cfg.AllowNonExistentRoot = t.HasTag("allowNonExistentRoot")
 		cfg.StrictFeatures = t.HasTag("strictFeatures")
-		cfg.SingleRoot = t.HasTag("singleRoot")
+		if t.HasTag("singleRoot") {
+			cfg.SingleRoot = true
+		}
 		cfg.PkgName, _ = t.Value("pkgName")
 
 		ctx := t.CueContext()

@@ -1,0 +1,99 @@
+#version: crd
+
+-- schema.json --
+{
+    "apiVersion": "apiextensions.k8s.io/v1",
+    "kind": "CustomResourceDefinition",
+    "metadata": {
+        "name": "myapps.example.com"
+    },
+    "spec": {
+        "group": "example.com",
+        "scope": "Namespaced",
+        "names": {
+            "kind": "MyApp",
+            "singular": "myapp",
+            "plural": "myapps"
+        },
+        "versions": [
+            {
+                "name": "v1",
+                "served": true,
+                "storage": true,
+                "schema": {
+                    "openAPIV3Schema": {
+                        "type": "object",
+                        "properties": {
+                            "alpha": {
+                                "type": "string"
+                            },
+                            "beta": {
+                                "type": "number"
+                            },
+                            "preserving": {
+                                "type": "object",
+                                "x-kubernetes-preserve-unknown-fields": true,
+                                "properties": {
+                                    "preserving": {
+                                        "type": "object",
+                                        "x-kubernetes-preserve-unknown-fields": true
+                                    },
+                                    "pruning": {
+                                        "type": "object"
+                                    },
+                                    "pruning2": {
+                                        "type": "object",
+                                        "additionalProperties": {
+                                            "type": "object",
+                                            "properties": {
+                                                "preserved": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "pruning": {
+                                "type": "object",
+                                "properties": {
+                                    "preserving": {
+                                        "type": "object",
+                                        "x-kubernetes-preserve-unknown-fields": true
+                                    },
+                                    "pruning": {
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        },
+                        "x-kubernetes-preserve-unknown-fields": true
+                    }
+                }
+            }
+        ]
+    }
+}
+
+-- out/decode/extract --
+alpha?: string
+beta?:  number
+preserving?: {
+	preserving?: {
+		...
+	}
+	pruning?: close({})
+	pruning2?: close({
+		[string]: close({
+			preserved?: string
+		})
+	})
+	...
+}
+pruning?: close({
+	preserving?: {
+		...
+	}
+	pruning?: close({})
+})
+...

@@ -3,6 +3,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "9d82154e_e3d4014b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-11T13:58:26Z",
+      "side": 1,
+      "message": "I strongly prefer to fix the actual bug in PatternConstraints, rather than papering over it by using a V2-only data structure in V3.",
+      "revId": "97c4341db5279526c1568d4f88498d6d3aacfc8e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "8ebeb4b1_2eef148d",
         "filename": "cue/query_test.go",
         "patchSetId": 2
@@ -14,6 +31,41 @@
       "writtenOn": "2025-03-11T13:32:05Z",
       "side": 1,
       "message": "This test fails in v3 without the fix to StructLit.Init.",
+      "revId": "97c4341db5279526c1568d4f88498d6d3aacfc8e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29d6340a_bd08d68d",
+        "filename": "cue/query_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-11T13:58:26Z",
+      "side": 1,
+      "message": "This should really be fixed in the V3 PatternConstraint. This avoids the extra allocations, which could be large, and there is also code that accesses PatternConstraint directly. So this may be indicative of an underlying bug.",
+      "parentUuid": "8ebeb4b1_2eef148d",
+      "revId": "97c4341db5279526c1568d4f88498d6d3aacfc8e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abcb0f5c_3ebff05f",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-11T13:58:26Z",
+      "side": 1,
+      "message": "Please do not do this. V3 should not use StructInfo.",
       "revId": "97c4341db5279526c1568d4f88498d6d3aacfc8e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

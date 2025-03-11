@@ -1568,6 +1568,17 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 		c.AddErrf("cannot call non-function %s (type %s)", x.Fun, kind(fun))
 		return nil
 	}
+
+	// Arguments to functions are open. This mostly matters for NonConcrete
+	// builtins.
+	saved := c.ci
+	c.ci.FromDef = false
+	c.ci.FromEmbed = false
+	defer func() {
+		c.ci.FromDef = saved.FromDef
+		c.ci.FromEmbed = saved.FromEmbed
+	}()
+
 	args := []Value{}
 	for i, a := range x.Args {
 		saved := c.errs
@@ -1774,12 +1785,20 @@ func (x *Builtin) call(call *CallContext) Expr {
 		}
 	}
 
+	// Arguments to functions are open. This mostly matters for NonConcrete
+	// builtins.
 	saved := c.IsValidator
 	c.IsValidator = call.isValidator
-	ret := x.Func(call)
-	c.IsValidator = saved
+	ci := c.ci
+	c.ci.FromEmbed = false
+	c.ci.FromDef = false
+	defer func() {
+		c.ci.FromDef = ci.FromDef
+		c.ci.FromEmbed = ci.FromEmbed
+		c.IsValidator = saved
+	}()
 
-	return ret
+	return x.Func(call)
 }
 
 func (x *Builtin) Source() ast.Node { return nil }

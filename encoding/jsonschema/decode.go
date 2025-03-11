@@ -182,7 +182,7 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 			// containing a field for each definition.
 			constraintAddDefinitions("schemas", defsRoot, root)
 		} else {
-			expr, state := root.schemaState(v, allTypes)
+			expr, state := root.schemaState(v, allTypes, nil)
 			if state.allowedTypes == 0 {
 				root.errf(v, "constraints are not possible to satisfy")
 				return nil
@@ -470,11 +470,6 @@ type state struct {
 	exclusiveMin bool // For OpenAPI and legacy support.
 	exclusiveMax bool // For OpenAPI and legacy support.
 
-	// Keep track of whether a $ref keyword is present,
-	// because pre-2019-09 schemas ignore sibling keywords
-	// to $ref.
-	hasRefKeyword bool
-
 	// isRoot holds whether this state is at the root
 	// of the schema.
 	isRoot bool
@@ -507,6 +502,27 @@ type state struct {
 	//
 	//	"items": []
 	listItemsIsArray bool
+
+	// The following fields are used by the CRD version to
+	// check that "properties" and "additionalProperties" may
+	// not be specified together.
+	hasProperties           bool
+	hasAdditionalProperties bool
+
+	// Keep track of whether "items" and "type": "array" have been specified, because
+	// in OpenAPI it's mandatory when "type" is "array".
+	hasItems bool
+	isArray  bool
+
+	// Keep track of whether a $ref keyword is present,
+	// because pre-2019-09 schemas ignore sibling keywords
+	// to $ref.
+	hasRefKeyword bool
+
+	// Keep track of whether we're preserving existing fields,
+	// which is preserved recursively by default, and is
+	// reset within properties or additionalProperties.
+	preserveUnknownFields bool
 }
 
 // schemaInfo holds information about a schema
@@ -549,12 +565,24 @@ func (s *state) object(n cue.Value) *ast.StructLit {
 }
 
 func (s *state) finalizeObject() {
+	if s.obj == nil && s.schemaVersion == VersionKubernetesCRD && (s.allowedTypes&cue.StructKind) != 0 && !s.preserveUnknownFields {
+		// With regular JSON Schema, we'll never get a closed struct
+		// unless additionalProperties is specified, which invokes
+		// s.object. However, that's not true of CRDs which are closed
+		// (or at least non-preserving) by default, so make sure there's
+		// an object.
+		_ = s.object(s.pos)
+	}
 	if s.obj == nil {
 		return
 	}
-
 	var e ast.Expr
-	if s.closeStruct {
+	if s.closeStruct || (s.schemaVersion == VersionKubernetesCRD && !s.preserveUnknownFields) {
+		// TODO in CRDs, this isn't quite right, as the
+		// structs aren't _really_ closed: it's just that
+		// unknown fields are discarded when persisting
+		// data. But we don't really have a way of representing
+		// that in CUE yet, so close will have to do.
 		e = ast.NewCall(ast.NewIdent("close"), s.obj)
 	} else {
 		s.obj.Elts = append(s.obj.Elts, &ast.Ellipsis{})
@@ -759,14 +787,17 @@ func (s schemaInfo) comment() *ast.CommentGroup {
 }
 
 func (s *state) schema(n cue.Value) ast.Expr {
-	expr, _ := s.schemaState(n, allTypes)
+	expr, _ := s.schemaState(n, allTypes, nil)
 	return expr
 }
 
 // schemaState returns a new state value derived from s.
 // n holds the JSONSchema node to translate to a schema.
 // types holds the set of possible types that the value can hold.
-func (s0 *state) schemaState(n cue.Value, types cue.Kind) (expr ast.Expr, info schemaInfo) {
+//
+// If init is not nil, it is called on the newly created state value
+// before doing anything else.
+func (s0 *state) schemaState(n cue.Value, types cue.Kind, init func(*state)) (expr ast.Expr, info schemaInfo) {
 	s := &state{
 		up: s0,
 		schemaInfo: schemaInfo{
@@ -774,9 +805,13 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind) (expr ast.Expr, info s
 			allowedTypes:  types,
 			knownTypes:    allTypes,
 		},
-		decoder: s0.decoder,
-		pos:     n,
-		isRoot:  s0.isRoot && n == s0.pos,
+		decoder:               s0.decoder,
+		pos:                   n,
+		isRoot:                s0.isRoot && n == s0.pos,
+		preserveUnknownFields: s0.preserveUnknownFields,
+	}
+	if init != nil {
+		init(s)
 	}
 	defer func() {
 		// Perhaps replace the schema expression with a reference.
@@ -804,16 +839,16 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind) (expr ast.Expr, info s
 				// is >=2019-19 because $schema could be used to change the version.
 				s.hasRefKeyword = true
 			}
-			if strings.HasPrefix(key, "x-") {
-				// A keyword starting with a leading x- is clearly
-				// not intended to be a valid keyword, and is explicitly
-				// allowed by OpenAPI. It seems reasonable that
-				// this is not an error even with StrictKeywords enabled.
-				return
-			}
 			// Convert each constraint into a either a value or a functor.
 			c := constraintMap[key]
 			if c == nil {
+				if strings.HasPrefix(key, "x-") {
+					// A keyword starting with a leading x- is clearly
+					// not intended to be a valid keyword, and is explicitly
+					// allowed by OpenAPI. It seems reasonable that
+					// this is not an error even with StrictKeywords enabled.
+					return
+				}
 				if pass == 0 && s.cfg.StrictKeywords {
 					// TODO: value is not the correct position, albeit close. Fix this.
 					s.warnf(value.Pos(), "unknown keyword %q", key)
@@ -851,6 +886,18 @@ func (s0 *state) schemaState(n cue.Value, types cue.Kind) (expr ast.Expr, info s
 		s.ensureDefinition(s.pos)
 	}
 	constraintIfThenElse(s)
+	if s.schemaVersion == VersionKubernetesCRD {
+		if s.hasProperties && s.hasAdditionalProperties {
+			s.errf(n, "additionalProperties may not be combined with properties in %v", s.schemaVersion)
+		}
+	}
+	if openAPILike.contains(s.schemaVersion) {
+		if s.isArray && !s.hasItems {
+			// From https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/versions/3.0.0.md#schema-object
+			// "`items` MUST be present if the `type` is `array`."
+			s.errf(n, `"items" must be present when the "type" is "array" in %v`, s.schemaVersion)
+		}
+	}
 
 	schemaExpr := s.finalize()
 	s.schemaInfo.hasConstraints = s.hasConstraints()

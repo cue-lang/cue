@@ -127,7 +127,7 @@ var constraints = []*constraint{
 	p2("uniqueItems", constraintUniqueItems, allVersions|openAPI|k8sCRD),
 	px("writeOnly", constraintTODO, vfrom(VersionDraft7)|openAPI),
 	px("xml", constraintTODO, openAPI),
-	px("x-kubernetes-embedded-resource", constraintTODO, k8sCRD),
+	p1("x-kubernetes-embedded-resource", constraintEmbeddedResource, k8sCRD),
 	p2("x-kubernetes-int-or-string", constraintIntOrString, k8sCRD),
 	px("x-kubernetes-list-map-keys", constraintTODO, k8sCRD),
 	px("x-kubernetes-list-type", constraintTODO, k8sCRD),

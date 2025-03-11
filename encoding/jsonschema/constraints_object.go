@@ -139,13 +139,43 @@ func constraintPatternProperties(key string, n cue.Value, s *state) {
 	})
 }
 
+func constraintEmbeddedResource(key string, n cue.Value, s *state) {
+	// TODO:
+	// - should fail if type has not been specified as "object"
+	// - should fail if neither x-kubernetes-preserve-unknown-fields or properties have been specified
+
+	// Note: this runs in a phase before the properties keyword so
+	// that the embedded expression always comes first in the struct
+	// literal.
+	resourceDefinitionPath := cue.MakePath(cue.Hid("_embeddedResource", "_"))
+	obj := s.object(n)
+
+	// Generate a reference to a shared schema that all embedded resources
+	// can share. If it already exists, that's fine.
+	// TODO add an attribute to make it clear what's going on here
+	// when encoding a CRD from CUE?
+	s.builder.put(resourceDefinitionPath, ast.NewStruct(
+		"apiVersion", token.NOT, ast.NewIdent("string"),
+		"kind", token.NOT, ast.NewIdent("string"),
+		"metadata", token.NOT, ast.NewStruct(&ast.Ellipsis{}),
+	), nil)
+	refExpr, err := s.builder.getRef(resourceDefinitionPath)
+	if err != nil {
+		s.errf(n, `cannot get reference to embedded resource definition: %v`, err)
+	} else {
+		obj.Elts = append(obj.Elts, &ast.EmbedDecl{
+			Expr: refExpr,
+		})
+	}
+	s.allowedTypes &= cue.StructKind
+}
+
 func constraintProperties(key string, n cue.Value, s *state) {
 	obj := s.object(n)
 
 	if n.Kind() != cue.StructKind {
 		s.errf(n, `"properties" expected an object, found %v`, n.Kind())
 	}
-
 	s.processMap(n, func(key string, n cue.Value) {
 		// property?: value
 		name := ast.NewString(key)

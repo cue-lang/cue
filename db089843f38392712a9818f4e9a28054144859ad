@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "3df1d12b_2b6c9d7d",
+        "filename": "cue/types.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 723,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-11T14:42:34Z",
+      "side": 1,
+      "message": "Changing line 719 to `d :\u003d v.v.DerefValue().Default()` doesn\u0027t seem to alter anything. Explicitly testing for `isDisjunction || v.v.IsConstraint()` is still required for the tests to pass.",
+      "parentUuid": "985c5aee_cb913224",
+      "revId": "db089843f38392712a9818f4e9a28054144859ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "63b0351f_9fe633ae",

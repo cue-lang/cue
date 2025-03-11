@@ -26,37 +26,55 @@ type formatFuncInfo struct {
 	f        func(n cue.Value, s *state)
 }
 
+// For reference, the Kubernetes-related format strings
+// are defined here:
+// https://github.com/kubernetes/apiextensions-apiserver/blob/aca9073a80bee92a0b77741b9c7ad444c49fe6be/pkg/apis/apiextensions/v1beta1/types_jsonschema.go#L73
+
 var formatFuncs = sync.OnceValue(func() map[string]formatFuncInfo {
 	return map[string]formatFuncInfo{
 		"binary":                {openAPI, formatTODO},
-		"byte":                  {openAPI, formatTODO},
+		"bsonobjectid":          {k8sCRD, formatTODO},
+		"byte|k8sCRD":           {openAPI, formatTODO},
+		"cidr":                  {k8sCRD, formatTODO},
+		"creditcard":            {k8sCRD, formatTODO},
 		"data":                  {openAPI, formatTODO},
-		"date":                  {vfrom(VersionDraft7) | openAPI, formatDate},
+		"date":                  {vfrom(VersionDraft7) | openAPI | k8sCRD, formatDate},
 		"date-time":             {allVersions | openAPI, formatDateTime},
+		"datetime":              {k8sCRD, formatDateTime},
 		"double":                {openAPI, formatTODO},
-		"duration":              {vfrom(VersionDraft2019_09), formatTODO},
-		"email":                 {allVersions | openAPI, formatTODO},
+		"duration":              {vfrom(VersionDraft2019_09) | k8sCRD, formatTODO},
+		"email":                 {allVersions | openAPI | k8sCRD, formatTODO},
 		"float":                 {openAPI, formatTODO},
-		"hostname":              {allVersions | openAPI, formatTODO},
+		"hexcolor":              {k8sCRD, formatTODO},
+		"hostname":              {allVersions | openAPI | k8sCRD, formatTODO},
 		"idn-email":             {vfrom(VersionDraft7), formatTODO},
 		"idn-hostname":          {vfrom(VersionDraft7), formatTODO},
 		"int32":                 {openAPI, formatInt32},
 		"int64":                 {openAPI, formatInt64},
-		"ipv4":                  {allVersions | openAPI, formatTODO},
-		"ipv6":                  {allVersions | openAPI, formatTODO},
+		"ipv4":                  {allVersions | openAPI | k8sCRD, formatTODO},
+		"ipv6":                  {allVersions | openAPI | k8sCRD, formatTODO},
 		"iri":                   {vfrom(VersionDraft7), formatURI},
 		"iri-reference":         {vfrom(VersionDraft7), formatURIReference},
+		"isbn":                  {k8sCRD, formatTODO},
+		"isbn10":                {k8sCRD, formatTODO},
+		"isbn13":                {k8sCRD, formatTODO},
 		"json-pointer":          {vfrom(VersionDraft6), formatTODO},
-		"password":              {openAPI, formatTODO},
+		"mac":                   {k8sCRD, formatTODO},
+		"password":              {openAPI | k8sCRD, formatTODO},
 		"regex":                 {vfrom(VersionDraft7), formatRegex},
 		"relative-json-pointer": {vfrom(VersionDraft7), formatTODO},
+		"rgbcolor":              {k8sCRD, formatTODO},
+		"ssn":                   {k8sCRD, formatTODO},
 		"time":                  {vfrom(VersionDraft7), formatTODO},
 		// TODO we should probably disallow non-ASCII URIs (IRIs) but
 		// this is good enough for now.
-		"uri":           {allVersions | openAPI, formatURI},
+		"uri":           {allVersions | openAPI | k8sCRD, formatURI},
 		"uri-reference": {vfrom(VersionDraft6), formatURIReference},
 		"uri-template":  {vfrom(VersionDraft6), formatTODO},
-		"uuid":          {vfrom(VersionDraft2019_09), formatTODO},
+		"uuid":          {vfrom(VersionDraft2019_09) | k8sCRD, formatTODO},
+		"uuid3":         {k8sCRD, formatTODO},
+		"uuid4":         {k8sCRD, formatTODO},
+		"uuid5":         {k8sCRD, formatTODO},
 	}
 })
 
@@ -77,13 +95,13 @@ func constraintFormat(key string, n cue.Value, s *state) {
 		// we want unknown formats to be ignored even when StrictFeatures
 		// is enabled, and StrictKeywords is closest to what we want.
 		// Perhaps we should have a "lint" mode?
-		if s.cfg.StrictKeywords && s.schemaVersion != VersionOpenAPI {
+		if s.cfg.StrictKeywords && !openAPILike.contains(s.schemaVersion) {
 			s.errf(n, "unknown format %q", formatStr)
 		}
 		return
 	}
 	if !finfo.versions.contains(s.schemaVersion) {
-		if s.cfg.StrictKeywords && s.schemaVersion != VersionOpenAPI {
+		if s.cfg.StrictKeywords && !openAPILike.contains(s.schemaVersion) {
 			s.errf(n, "format %q is not recognized in schema version %v", formatStr, s.schemaVersion)
 		}
 		return

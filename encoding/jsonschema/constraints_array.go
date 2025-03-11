@@ -106,6 +106,7 @@ func constraintItems(key string, n cue.Value, s *state) {
 		elem := s.schema(n)
 		ast.SetRelPos(elem, token.NoRelPos)
 		s.add(n, arrayType, ast.NewList(&ast.Ellipsis{Type: elem}))
+		s.hasItems = true
 
 	case cue.ListKind:
 		if !vto(VersionDraft2019_09).contains(s.schemaVersion) {
@@ -157,6 +158,10 @@ func constraintMinItems(key string, n cue.Value, s *state) {
 
 func constraintUniqueItems(key string, n cue.Value, s *state) {
 	if s.boolValue(n) {
+		if s.schemaVersion == VersionKubernetesCRD {
+			s.errf(n, "cannot set uniqueItems to true in a CRD schema")
+			return
+		}
 		list := s.addImport(n, "list")
 		s.add(n, arrayType, ast.NewCall(ast.NewSel(list, "UniqueItems")))
 	}

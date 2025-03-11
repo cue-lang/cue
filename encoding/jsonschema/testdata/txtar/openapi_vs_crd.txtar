@@ -1,0 +1,18 @@
+Make sure that OpenAPI still works when there are unimplemented
+CRD keywords present.
+
+#version: openapi
+
+-- schema.yaml --
+components:
+  schemas:
+    User:
+      description: "A User uses something."
+      type: array
+      items:
+        type: string
+      x-kubernetes-list-type: set
+
+-- out/decode/extract --
+// A User uses something.
+#User: [...string]

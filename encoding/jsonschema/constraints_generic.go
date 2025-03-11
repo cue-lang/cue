@@ -169,6 +169,15 @@ func constraintTitle(key string, n cue.Value, s *state) {
 	s.title, _ = s.strValue(n)
 }
 
+func constraintIntOrString(key string, n cue.Value, s *state) {
+	// See x-kubernetes-int-or-string in
+	// https://kubernetes.io/docs/reference/kubernetes-api/extend-resources/custom-resource-definition-v1/#JSONSchemaProps.
+	s.setTypeUsed(n, stringType)
+	s.setTypeUsed(n, numType)
+	s.add(n, numType, ast.NewIdent("int"))
+	s.allowedTypes &= cue.StringKind | cue.IntKind
+}
+
 func constraintType(key string, n cue.Value, s *state) {
 	var types cue.Kind
 	set := func(n cue.Value) {
@@ -197,6 +206,9 @@ func constraintType(key string, n cue.Value, s *state) {
 		case "array":
 			types |= cue.ListKind
 			s.setTypeUsed(n, arrayType)
+			// For OpenAPI, specifically keep track of whether type is array
+			// so we can mandate the "items" keyword.
+			s.isArray = true
 		case "object":
 			types |= cue.StructKind
 			s.setTypeUsed(n, objectType)
@@ -210,6 +222,12 @@ func constraintType(key string, n cue.Value, s *state) {
 	case cue.StringKind:
 		set(n)
 	case cue.ListKind:
+		if openAPILike.contains(s.schemaVersion) {
+			// From https://spec.openapis.org/oas/v3.0.3.html#properties:
+			// "Value MUST be a string. Multiple types via an array are not supported."
+			s.errf(n, `value of "type" must be a string in %v`, s.schemaVersion)
+			return
+		}
 		for i, _ := n.List(); i.Next(); {
 			set(i.Value())
 		}

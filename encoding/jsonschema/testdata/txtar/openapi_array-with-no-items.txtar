@@ -1,0 +1,13 @@
+#version: openapi
+
+-- schema.yaml --
+components:
+  schemas:
+    BadArray:
+      description: "A User uses something."
+      type: array
+
+-- out/decode/extract --
+ERROR:
+"items" must be present when the "type" is "array" in OpenAPI 3.0:
+    schema.yaml:3:5

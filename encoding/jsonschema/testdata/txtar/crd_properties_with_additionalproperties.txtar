@@ -1,0 +1,45 @@
+#version: crd
+
+-- schema.json --
+{
+    "apiVersion": "apiextensions.k8s.io/v1",
+    "kind": "CustomResourceDefinition",
+    "metadata": {
+        "name": "myapps.example.com"
+    },
+    "spec": {
+        "group": "example.com",
+        "scope": "Namespaced",
+        "names": {
+            "kind": "MyApp",
+            "singular": "myapp",
+            "plural": "myapps"
+        },
+        "versions": [
+            {
+                "name": "v1",
+                "served": true,
+                "storage": true,
+                "schema": {
+                    "openAPIV3Schema": {
+                        "type": "object",
+                        "properties": {
+                            "spec": {
+                                "type": "object",
+                                "x-kubernetes-preserve-unknown-fields": true
+                            }
+                        },
+                        "additionalProperties": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        ]
+    }
+}
+
+-- out/decode/extract --
+ERROR:
+additionalProperties may not be combined with properties in Kubernetes CRD:
+    schema.json:21:21

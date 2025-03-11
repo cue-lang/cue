@@ -174,7 +174,7 @@ Disjuncts:    179
           }) }
         let pickMsg#1 = (#struct){
           msg: (_|_){
-            // [incomplete] #Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
+            // [incomplete] #Main.jsonPatch.withMsg.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
             //     ./in.cue:6:30
             //     ./in.cue:2:14
           }
@@ -184,7 +184,7 @@ Disjuncts:    179
             op: (string){ "add" }
             path: (string){ "/metadata" }
             value: (_|_){
-              // [incomplete] #Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
+              // [incomplete] #Main.jsonPatch.withMsg.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
               //     ./in.cue:6:30
               //     ./in.cue:2:14
             }
@@ -307,7 +307,7 @@ diff old new
 -          }
 -        }
 +          msg: (_|_){
-+            // [incomplete] #Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
++            // [incomplete] #Main.jsonPatch.withMsg.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
 +            //     ./in.cue:6:30
 +            //     ./in.cue:2:14
 +          }
@@ -317,7 +317,7 @@ diff old new
 +            op: (string){ "add" }
 +            path: (string){ "/metadata" }
 +            value: (_|_){
-+              // [incomplete] #Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
++              // [incomplete] #Main.jsonPatch.withMsg.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
 +              //     ./in.cue:6:30
 +              //     ./in.cue:2:14
 +            }
@@ -500,4 +500,64 @@ diff old new
       }
     }
   }
+}
+-- out/compile --
+--- in.cue
+{
+  #Resource: {
+    someMsg: string
+    obs: ({}|*{
+      missing: true
+    })
+    let pickMsg#1 = [
+      if 〈1;obs〉.missing {
+        msg: "\(〈2;someMsg〉)"
+      },
+      {
+        msg: "bar"
+      },
+    ][0]
+    patches: [
+      {
+        op: "add"
+        path: "/metadata"
+        value: 〈2;let pickMsg#1〉.msg
+      },
+    ]
+  }
+  #Patches: {
+    [string]: _
+  }
+  #JSONPatch: {
+    namespace?: string
+    patch: [
+      ...〈2;#JSONOp〉,
+    ]
+    output: (〈1;#Patches〉 & {
+      〈1;namespace〉: 〈1;patch〉
+    })
+  }
+  #JSONOp: ({
+    op: "add"
+    path: string
+    value: _
+  }|{
+    op: "remove"
+    path: string
+  })
+  #Main: {
+    namespace: string
+    output: 〈0;let jsonPatch#2〉.output
+    let jsonPatch#2 = (〈1;#JSONPatch〉 & {
+      let base#5 = (〈2;#Resource〉 & {})
+      let withMsg#6 = (〈0;let base#5〉 & {
+        someMsg: "foo"
+      })
+      namespace: 〈1;namespace〉
+      patch: 〈0;let withMsg#6〉.patches
+    })
+  }
+  out: (〈0;#Main〉 & {
+    namespace: "ns1"
+  }).output
 }

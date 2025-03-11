@@ -5108,6 +5108,111 @@ Result:
     }
   }
 }
+--- issue3784.cue
+{
+  issue3784: {
+    reduced: {
+      #Schema: {
+        a: ({
+          kind: "A"
+          b: {
+            c?: string
+          }
+          b: {}
+        }|{
+          kind: "B"
+        })
+      }
+      out: 〈0;#Schema〉
+      out: {
+        a: {
+          kind: "A"
+          b: {
+            c: "x"
+          }
+        }
+      }
+    }
+  }
+  issue3784: {
+    full: {
+      #Schema: {
+        pages?: {
+          build_type?: ("legacy"|"workflow")
+          source?: {
+            branch?: string
+            path?: string
+          }
+          cname?: string
+        }
+        pages?: ({
+          build_type!: "legacy"
+          source!: {
+            branch!: _
+          }
+        }|close({
+          build_type!: "workflow"
+          cname?: _
+        }))
+      }
+      out: (〈0;#Schema〉 & {
+        pages: {
+          cname: "foo.com"
+          build_type: "legacy"
+          source: {
+            branch: "main"
+            path: "/"
+          }
+        }
+      })
+    }
+  }
+  issue3784: {
+    variant1: {
+      #Schema: {
+        pages: {
+          build_type?: ("legacy"|"workflow")
+          source: {
+            branch?: string
+            path?: string
+          }
+          cname?: string
+        }
+        pages?: ({
+          build_type!: "legacy"
+          source!: {
+            branch!: _
+          }
+        }|close({
+          build_type!: "workflow"
+          cname?: _
+        }))
+      }
+    }
+  }
+  issue3784: {
+    variant2: {
+      #Schema: ({
+        build_type!: "legacy"
+        source!: {
+          branch!: _
+        }
+      }|close({
+        build_type!: "workflow"
+        cname?: _
+      }))
+      a: 〈0;#Schema〉
+      a: {
+        build_type?: ("legacy"|"workflow")
+        source: {
+          branch?: string
+          path?: string
+        }
+        cname?: string
+      }
+    }
+  }
+}
 --- issue770.cue
 {
   issue770: {

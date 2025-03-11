@@ -69,19 +69,21 @@ hidden: ok1: {
 	}])
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  53
-Reused: 45
-Allocs: 8
-Retain: 3
+Leaks:  1
+Freed:  78
+Reused: 70
+Allocs: 9
+Retain: 7
 
-Unifications: 53
-Conjuncts:    79
-Disjuncts:    56
+Unifications: 79
+Conjuncts:    120
+Disjuncts:    85
 -- out/evalalpha --
 Errors:
-definition.ok1.a.#foo.b: field not allowed:
+definition.err1.a.#foo.b: field not allowed:
     ./in.cue:15:14
+hidden.err1.a._foo.b: field not allowed:
+    ./in.cue:29:14
 
 Result:
 (_|_){
@@ -109,7 +111,7 @@ Result:
   }
   definition: (_|_){
     // [eval]
-    ok1: (_|_){
+    err1: (_|_){
       // [eval]
       #D: (#struct){
         #foo: (#struct){
@@ -121,10 +123,19 @@ Result:
         #foo: (_|_){
           // [eval]
           b: (_|_){
-            // [eval] definition.ok1.a.#foo.b: field not allowed:
+            // [eval] definition.err1.a.#foo.b: field not allowed:
             //     ./in.cue:15:14
           }
           a: (int){ int }
+        }
+      }
+    }
+    ok1: (struct){
+      #D: (#struct){
+      }
+      a: (#struct){
+        #foo: (#struct){
+          b: (int){ int }
         }
       }
       org: (#struct){
@@ -136,15 +147,6 @@ Result:
       }
       #Org: (#struct){
         employees?: (#struct){
-        }
-      }
-    }
-    err1: (struct){
-      #D: (#struct){
-      }
-      a: (#struct){
-        #foo: (#struct){
-          b: (int){ int }
         }
       }
     }
@@ -161,20 +163,68 @@ Result:
       out: (string){ "{\"root\":{}}" }
     }
   }
+  hidden: (_|_){
+    // [eval]
+    err1: (_|_){
+      // [eval]
+      #D: (#struct){
+        _foo(:p): (#struct){
+          a: (int){ int }
+        }
+      }
+      a: (_|_){
+        // [eval]
+        _foo(:p): (_|_){
+          // [eval]
+          b: (_|_){
+            // [eval] hidden.err1.a._foo.b: field not allowed:
+            //     ./in.cue:29:14
+          }
+          a: (int){ int }
+        }
+      }
+    }
+    ok1: (struct){
+      #D: (#struct){
+      }
+      a: (#struct){
+        _foo(:p): (struct){
+          b: (int){ int }
+        }
+      }
+      out: (#struct){
+        _hidden(:p): (#struct){
+          run: (string){ "foo bar" }
+        }
+      }
+      #Workflow: (#struct){
+      }
+      #step: (_){ matchN(1, (#list){
+          0: (_|_){// {
+            //   run!: _
+            // }
+          }
+        }) }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,7 +1,5 @@
+@@ -1,11 +1,7 @@
  Errors:
- definition.ok1.a.#foo.b: field not allowed:
+ definition.err1.a.#foo.b: field not allowed:
 -    ./in.cue:13:15
 -    ./in.cue:14:6
      ./in.cue:15:14
+ hidden.err1.a._foo.b: field not allowed:
+-    ./in.cue:27:15
+-    ./in.cue:28:6
+     ./in.cue:29:14
  
  Result:
-@@ -16,16 +14,16 @@
+@@ -20,16 +16,16 @@
        f: (_){ _ }
      }
      a: (#struct){
@@ -198,18 +248,22 @@ diff old new
      }
    }
    definition: (_|_){
-@@ -41,21 +39,19 @@
+@@ -45,13 +41,11 @@
          // [eval]
          #foo: (_|_){
            // [eval]
 -          a: (int){ int }
            b: (_|_){
-             // [eval] definition.ok1.a.#foo.b: field not allowed:
+             // [eval] definition.err1.a.#foo.b: field not allowed:
 -            //     ./in.cue:13:15
 -            //     ./in.cue:14:6
              //     ./in.cue:15:14
            }
 +          a: (int){ int }
+         }
+       }
+     }
+@@ -64,11 +58,11 @@
          }
        }
        org: (#struct){
@@ -223,7 +277,7 @@ diff old new
        }
        #Org: (#struct){
          employees?: (#struct){
-@@ -77,15 +73,9 @@
+@@ -81,15 +75,9 @@
            leaf: (string){ string }
          }
          #Branch: (#struct){
@@ -242,12 +296,40 @@ diff old new
        }
        out: (string){ "{\"root\":{}}" }
      }
+@@ -107,13 +95,11 @@
+         // [eval]
+         _foo(:p): (_|_){
+           // [eval]
+-          a: (int){ int }
+           b: (_|_){
+             // [eval] hidden.err1.a._foo.b: field not allowed:
+-            //     ./in.cue:27:15
+-            //     ./in.cue:28:6
+             //     ./in.cue:29:14
+           }
++          a: (int){ int }
+         }
+       }
+     }
+@@ -126,7 +112,7 @@
+         }
+       }
+       out: (#struct){
+-        _hidden(:p): (struct){
++        _hidden(:p): (#struct){
+           run: (string){ "foo bar" }
+         }
+       }
 -- out/eval --
 Errors:
-definition.ok1.a.#foo.b: field not allowed:
+definition.err1.a.#foo.b: field not allowed:
     ./in.cue:13:15
     ./in.cue:14:6
     ./in.cue:15:14
+hidden.err1.a._foo.b: field not allowed:
+    ./in.cue:27:15
+    ./in.cue:28:6
+    ./in.cue:29:14
 
 Result:
 (_|_){
@@ -275,7 +357,7 @@ Result:
   }
   definition: (_|_){
     // [eval]
-    ok1: (_|_){
+    err1: (_|_){
       // [eval]
       #D: (#struct){
         #foo: (#struct){
@@ -288,11 +370,20 @@ Result:
           // [eval]
           a: (int){ int }
           b: (_|_){
-            // [eval] definition.ok1.a.#foo.b: field not allowed:
+            // [eval] definition.err1.a.#foo.b: field not allowed:
             //     ./in.cue:13:15
             //     ./in.cue:14:6
             //     ./in.cue:15:14
           }
+        }
+      }
+    }
+    ok1: (struct){
+      #D: (#struct){
+      }
+      a: (#struct){
+        #foo: (#struct){
+          b: (int){ int }
         }
       }
       org: (#struct){
@@ -304,15 +395,6 @@ Result:
       }
       #Org: (#struct){
         employees?: (#struct){
-        }
-      }
-    }
-    err1: (struct){
-      #D: (#struct){
-      }
-      a: (#struct){
-        #foo: (#struct){
-          b: (int){ int }
         }
       }
     }
@@ -335,6 +417,52 @@ Result:
       out: (string){ "{\"root\":{}}" }
     }
   }
+  hidden: (_|_){
+    // [eval]
+    err1: (_|_){
+      // [eval]
+      #D: (#struct){
+        _foo(:p): (#struct){
+          a: (int){ int }
+        }
+      }
+      a: (_|_){
+        // [eval]
+        _foo(:p): (_|_){
+          // [eval]
+          a: (int){ int }
+          b: (_|_){
+            // [eval] hidden.err1.a._foo.b: field not allowed:
+            //     ./in.cue:27:15
+            //     ./in.cue:28:6
+            //     ./in.cue:29:14
+          }
+        }
+      }
+    }
+    ok1: (struct){
+      #D: (#struct){
+      }
+      a: (#struct){
+        _foo(:p): (struct){
+          b: (int){ int }
+        }
+      }
+      out: (#struct){
+        _hidden(:p): (struct){
+          run: (string){ "foo bar" }
+        }
+      }
+      #Workflow: (#struct){
+      }
+      #step: (_){ matchN(1, (#list){
+          0: (_|_){// {
+            //   run!: _
+            // }
+          }
+        }) }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -354,7 +482,7 @@ Result:
     }
   }
   definition: {
-    ok1: {
+    err1: {
       #D: {
         #foo: {
           a: int
@@ -367,11 +495,35 @@ Result:
         }
       }
     }
-    err: {
+    ok1: {
       #D: {}
       a: 〈0;#D〉
       a: {
         #foo: {
+          b: int
+        }
+      }
+    }
+  }
+  hidden: {
+    err1: {
+      #D: {
+        _foo: {
+          a: int
+        }
+      }
+      a: 〈0;#D〉
+      a: {
+        _foo: {
+          b: int
+        }
+      }
+    }
+    ok1: {
+      #D: {}
+      a: 〈0;#D〉
+      a: {
+        _foo: {
           b: int
         }
       }
@@ -410,6 +562,21 @@ Result:
       out: 〈import;"encoding/json"〉.Marshal((〈0;#Tree〉 & {
         root: {}
       }))
+    }
+  }
+  hidden: {
+    ok1: {
+      out: (〈0;#Workflow〉 & {
+        _hidden: (〈1;#step〉 & {
+          run: "foo bar"
+        })
+      })
+      #Workflow: {}
+      #step: matchN(1, [
+        {
+          run!: _
+        },
+      ])
     }
   }
 }

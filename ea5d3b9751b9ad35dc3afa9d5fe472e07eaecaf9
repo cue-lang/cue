@@ -16,6 +16,24 @@
       "message": "Maybe add some test cases to TestDefault to expose this and clarify the differences between V2 and V3?",
       "revId": "ea5d3b9751b9ad35dc3afa9d5fe472e07eaecaf9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc8a8d40_bf834af1",
+        "filename": "cue/types.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 724,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-11T11:26:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c765625_2d9fea0e",
+      "revId": "ea5d3b9751b9ad35dc3afa9d5fe472e07eaecaf9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

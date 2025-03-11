@@ -23,9 +23,35 @@ import (
 
 // Object constraints
 
+func constraintPreserveUnknownFields(key string, n cue.Value, s *state) {
+	// x-kubernetes-preserve-unknown-fields stops the API server decoding
+	// step from pruning fields which are not specified in the validation
+	// schema. This affects fields recursively, but switches back to normal
+	// pruning behaviour if nested properties or additionalProperties are
+	// specified in the schema. This can either be true or undefined. False
+	// is forbidden.
+	// Note: by experimentation, "nested properties" means "within a schema
+	// within a nested property" not "within a schema that has the properties keyword".
+	if !s.boolValue(n) {
+		s.errf(n, "x-kubernetes-preserve-unknown-fields value may not be false")
+		return
+	}
+	// TODO check that it's specified on an object type. This requires
+	// either setting a bool (hasPreserveUnknownFields?) and checking
+	// later or making a new phase and placing this after "type" but
+	// before "allOf", because it's important that this value be
+	// passed down recursively to allOf and friends.
+	s.preserveUnknownFields = true
+}
+
 func constraintAdditionalProperties(key string, n cue.Value, s *state) {
 	switch n.Kind() {
 	case cue.BoolKind:
+		closeStruct := !s.boolValue(n)
+		if s.schemaVersion == VersionKubernetesCRD && closeStruct {
+			s.errf(n, "additionalProperties may not be set to false in a CRD schema")
+			return
+		}
 		s.closeStruct = !s.boolValue(n)
 		_ = s.object(n)
 
@@ -41,15 +67,20 @@ func constraintAdditionalProperties(key string, n cue.Value, s *state) {
 		}
 		// [!~(properties|patternProperties)]: schema
 		existing := append(s.patterns, excludeFields(obj.Elts)...)
+		expr, _ := s.schemaState(n, allTypes, func(s *state) {
+			s.preserveUnknownFields = false
+		})
 		f := internal.EmbedStruct(ast.NewStruct(&ast.Field{
 			Label: ast.NewList(ast.NewBinExpr(token.AND, existing...)),
-			Value: s.schema(n),
+			Value: expr,
 		}))
 		obj.Elts = append(obj.Elts, f)
 
 	default:
 		s.errf(n, `value of "additionalProperties" must be an object or boolean`)
+		return
 	}
+	s.hasAdditionalProperties = true
 }
 
 func constraintDependencies(key string, n cue.Value, s *state) {
@@ -118,7 +149,9 @@ func constraintProperties(key string, n cue.Value, s *state) {
 	s.processMap(n, func(key string, n cue.Value) {
 		// property?: value
 		name := ast.NewString(key)
-		expr, state := s.schemaState(n, allTypes)
+		expr, state := s.schemaState(n, allTypes, func(s *state) {
+			s.preserveUnknownFields = false
+		})
 		f := &ast.Field{Label: name, Value: expr}
 		if doc := state.comment(); doc != nil {
 			ast.SetComments(f, []*ast.CommentGroup{doc})
@@ -139,11 +172,12 @@ func constraintProperties(key string, n cue.Value, s *state) {
 		}
 		obj.Elts = append(obj.Elts, f)
 	})
+	s.hasProperties = true
 }
 
 func constraintPropertyNames(key string, n cue.Value, s *state) {
 	// [=~pattern]: _
-	if names, _ := s.schemaState(n, cue.StringKind); !isTop(names) {
+	if names, _ := s.schemaState(n, cue.StringKind, nil); !isTop(names) {
 		x := ast.NewStruct(ast.NewList(names), top())
 		s.add(n, objectType, x)
 	}

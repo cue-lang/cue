@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "985c5aee_cb913224",
+        "filename": "cue/types.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 723,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-11T13:46:58Z",
+      "side": 1,
+      "message": "I wonder if this is not a function of not dereferencing. It seems that calling v \u003d v.DerefValue() before calling default is probably safer. This will then do the right thing for d \u003d\u003d v.v.  This way it will also work for structure shared nodes.\n\nNote that V2 did not have structure sharing and did not forward disjunction nodes.\n\nI\u0027m still a bit fuzzy about the IsConstraint. Is that not an artifact of structure sharing? I wonder if you do the above the need to add check will go.",
+      "revId": "db089843f38392712a9818f4e9a28054144859ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "63b0351f_9fe633ae",

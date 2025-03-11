@@ -34,11 +34,16 @@ const (
 
 	numJSONSchemaVersions // unknown
 
-	// Note: OpenAPI stands alone: it's not in the regular JSON Schema lineage.
-	VersionOpenAPI // OpenAPI 3.0
+	// Note: The following versions stand alone: they're not in the regular JSON Schema lineage.
+	VersionOpenAPI       // OpenAPI 3.0
+	VersionKubernetesCRD // Kubernetes CRD
 )
 
-const openAPI = versionSet(1 << VersionOpenAPI)
+const (
+	openAPI     = versionSet(1 << VersionOpenAPI)
+	k8sCRD      = versionSet(1 << VersionKubernetesCRD)
+	openAPILike = openAPI | k8sCRD
+)
 
 type versionSet int
 

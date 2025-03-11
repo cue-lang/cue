@@ -1579,7 +1579,18 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 		var expr Value
 		if call.builtin.NonConcrete {
 			state = combineMode(cond, runMode).withVertexStatus(state.vertexStatus())
-			expr = c.evalState(a, state)
+			func() {
+				// Arguments to functions are open. This only matters for
+				// NonConcrete builtins.
+				ci := c.ci
+				c.ci.FromDef = false
+				c.ci.FromEmbed = false
+				defer func() {
+					c.ci.FromDef = ci.FromDef
+					c.ci.FromDef = ci.FromEmbed
+				}()
+				expr = c.evalState(a, state)
+			}()
 		} else {
 			cond |= fieldSetKnown | concreteKnown
 			// Be sure to process disjunctions at the very least when

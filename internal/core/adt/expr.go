@@ -124,6 +124,22 @@ func (o *StructLit) Init(ctx *OpContext) {
 	}
 	o.initialized = true
 
+	for _, d := range o.Decls {
+		switch x := d.(type) {
+		case *Ellipsis:
+			switch x.Value.(type) {
+			case nil, *Top:
+				o.IsOpen = true
+				o.types |= IsOpen
+
+			default:
+				// TODO: consider only adding for non-top.
+				o.types |= HasAdditional
+			}
+			o.Additional = append(o.Additional, x)
+		}
+	}
+
 	if ctx.isDevVersion() {
 		return
 	}
@@ -167,16 +183,6 @@ func (o *StructLit) Init(ctx *OpContext) {
 			}
 
 		case *Ellipsis:
-			switch x.Value.(type) {
-			case nil, *Top:
-				o.IsOpen = true
-				o.types |= IsOpen
-
-			default:
-				// TODO: consider only adding for non-top.
-				o.types |= HasAdditional
-			}
-			o.Additional = append(o.Additional, x)
 
 		default:
 			panic("unreachable")

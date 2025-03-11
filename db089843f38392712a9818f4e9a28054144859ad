@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "63b0351f_9fe633ae",
+        "filename": "cue/types_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1773,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-11T11:28:11Z",
+      "side": 1,
+      "message": "Before this fix, this test would not find a default in v2, but it would in v3. The change to Default() ensures this does not find a default for v3 either.",
+      "revId": "db089843f38392712a9818f4e9a28054144859ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "88adb4e6_c30e098d",
+        "filename": "cue/types_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1779,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-11T11:28:11Z",
+      "side": 1,
+      "message": "In v2, Default() would return true here. Thus the change to Default() to explicitly allow Constraints, so the behaviour is maintained into v3.",
+      "revId": "db089843f38392712a9818f4e9a28054144859ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

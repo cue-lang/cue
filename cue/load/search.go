@@ -436,6 +436,10 @@ func appendExpandedUnqualifiedPackagePath(pkgPaths []resolvedPackageArg, origp s
 		if err != nil {
 			return nil, err
 		}
+		if err := shouldBuildFile(f.Syntax, tg.tagIsSet); err != nil {
+			// Later build logic should pick up and report the same error.
+			continue
+		}
 		pkgName := f.Syntax.PackageName()
 		// 2. if pkgQual is "_", it looks for a package file with no package name.
 		// 3. if there's a package named after ip.Qualifier it chooses that

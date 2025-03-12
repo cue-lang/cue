@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9feccd59_5df14ef6",
+        "filename": "encoding/jsonschema/constraints_generic.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-12T10:37:27Z",
+      "side": 1,
+      "message": "Done, except the link to the format specification, because github there seems to be the primary source, and the only place where we can see the doc comment correctly formatted.",
+      "parentUuid": "2dec784b_dfc0ede4",
+      "revId": "e412fa13d4785cfd5a012097716229566cd8c2d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "52d3db05_b00625d0",
@@ -41,6 +59,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e0967f3_dece80d7",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 506,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-12T10:37:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "52d3db05_b00625d0",
+      "range": {
+        "startLine": 506,
+        "startChar": 37,
+        "endLine": 506,
+        "endChar": 52
+      },
+      "revId": "e412fa13d4785cfd5a012097716229566cd8c2d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c2bf4802_0c7c04aa",
@@ -54,6 +96,24 @@
       "writtenOn": "2025-03-12T09:25:57Z",
       "side": 1,
       "message": "I would clarify that this is v1, i.e. https://kubernetes.io/docs/reference/kubernetes-api/extend-resources/custom-resource-definition-v1/\n\nSpeaking of, should these names not include \"3\" and \"1\", or \"v3\" and \"v1\" in their names? otherwise if e.g. we add support for openapi v4 or CRD v2 in the future, that\u0027s going to be very confusing.",
+      "revId": "e412fa13d4785cfd5a012097716229566cd8c2d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cae9571_c8f27e76",
+        "filename": "encoding/jsonschema/version.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-12T10:37:27Z",
+      "side": 1,
+      "message": "OpenAPI 3.1 schemas are just JSON Schema (2020-12). 3.0 was a fork, so we shouldn\u0027t _need_ to have any more OpenAPI versions in the future. If/when there\u0027s a new version of CRDs, I think it\u0027s not too unreasonable to name it VersionKubernetesCRD_V2 or similar, just as Go packages don\u0027t need to have `/v1` on the name for v1.",
+      "parentUuid": "c2bf4802_0c7c04aa",
       "revId": "e412fa13d4785cfd5a012097716229566cd8c2d5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

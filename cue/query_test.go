@@ -20,14 +20,13 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/internal/cuetdtest"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/diff"
 	"golang.org/x/tools/txtar"
 )
 
 func TestLookupPath(t *testing.T) {
-	ctx := cuecontext.New()
-
 	testCases := []struct {
 		in   string
 		path cue.Path
@@ -104,9 +103,28 @@ func TestLookupPath(t *testing.T) {
 		`,
 		path: cue.MakePath(cue.Str("a")),
 		err:  `field not found: a`,
+	}, {
+		in: `
+		x: {
+			[string]: int
+		}
+		y: x
+		`,
+		path: cue.MakePath(cue.Str("y"), cue.AnyString),
+		out:  `int`,
+	}, {
+		in: `
+		x: {
+			[_]: int
+		}
+		y: x
+		`,
+		path: cue.MakePath(cue.Str("y"), cue.AnyString),
+		out:  `int`,
 	}}
 	for _, tc := range testCases {
-		t.Run(tc.path.String(), func(t *testing.T) {
+		cuetdtest.FullMatrix.Run(t, tc.path.String(), func(t *testing.T, m *cuetdtest.M) {
+			ctx := m.CueContext()
 			v := mustCompile(t, ctx, tc.in)
 
 			v = v.LookupPath(tc.path)

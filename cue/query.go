@@ -66,7 +66,7 @@ outer:
 				Parent: n,
 				Label:  sel.sel.feature(ctx),
 			}
-			n.MatchAndInsert(ctx, x)
+			deref.MatchAndInsert(ctx, x)
 			if x.HasConjuncts() {
 				x.Finalize(ctx)
 				parent = linkParent(parent, n, x)

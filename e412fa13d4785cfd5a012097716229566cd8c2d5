@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2dec784b_dfc0ede4",
+        "filename": "encoding/jsonschema/constraints_generic.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-12T09:25:57Z",
+      "side": 1,
+      "message": "personally I would prefer linking to the canonical reference document for CRDs v1, e.g. see int-or-string under https://kubernetes.io/docs/reference/kubernetes-api/extend-resources/custom-resource-definition-v1/#JSONSchemaProps.\n\nI would suggest the same throughout the rest of the comments; I suspect this page will be more reliable longer term, and more consistent than a mix of github and various doc page links.",
+      "revId": "e412fa13d4785cfd5a012097716229566cd8c2d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52d3db05_b00625d0",
+        "filename": "encoding/jsonschema/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 506,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-12T09:25:57Z",
+      "side": 1,
+      "message": "use a link, i.e. `[VersionCRD]`?",
+      "range": {
+        "startLine": 506,
+        "startChar": 37,
+        "endLine": 506,
+        "endChar": 52
+      },
+      "revId": "e412fa13d4785cfd5a012097716229566cd8c2d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2bf4802_0c7c04aa",
+        "filename": "encoding/jsonschema/version.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-12T09:25:57Z",
+      "side": 1,
+      "message": "I would clarify that this is v1, i.e. https://kubernetes.io/docs/reference/kubernetes-api/extend-resources/custom-resource-definition-v1/\n\nSpeaking of, should these names not include \"3\" and \"1\", or \"v3\" and \"v1\" in their names? otherwise if e.g. we add support for openapi v4 or CRD v2 in the future, that\u0027s going to be very confusing.",
+      "revId": "e412fa13d4785cfd5a012097716229566cd8c2d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

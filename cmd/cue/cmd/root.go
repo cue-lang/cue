@@ -89,7 +89,7 @@ type Stats struct {
 // such as `cue mod` or `cue refactor`. Note that the user can't actually run these commands to
 // do anything useful, but we need RunE for good error messages, as Cobra itself is lacking:
 // https://github.com/spf13/cobra/issues/706
-func commandGroup(c *Command, cmd *cobra.Command) *cobra.Command {
+func commandGroup(cmd *cobra.Command) *cobra.Command {
 	// If the user ran `cue mod nosuchcommand --nosuchflag`, we run the `cue mod` command
 	// because `nosuchcommand` was not a known subcommand.
 	// In such a case, do not fail with "unknown flag"; what matters to the user is that
@@ -98,8 +98,8 @@ func commandGroup(c *Command, cmd *cobra.Command) *cobra.Command {
 	cmd.FParseErrWhitelist.UnknownFlags = true
 
 	name := cmd.Name()
-	cmd.RunE = mkRunE(c, func(cmd *Command, args []string) error {
-		stderr := cmd.Stderr()
+	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		stderr := cmd.OutOrStderr()
 		if len(args) == 0 {
 			fmt.Fprintf(stderr, "%s must be run as one of its subcommands\n", name)
 		} else {
@@ -107,7 +107,7 @@ func commandGroup(c *Command, cmd *cobra.Command) *cobra.Command {
 		}
 		fmt.Fprintf(stderr, "Run 'cue help %s' for known subcommands.\n", name)
 		return ErrPrintedError
-	})
+	}
 	return cmd
 }
 

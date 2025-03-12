@@ -19,7 +19,7 @@ import (
 )
 
 func newGetCmd(c *Command) *cobra.Command {
-	cmd := commandGroup(c, &cobra.Command{
+	cmd := commandGroup(&cobra.Command{
 		Use:   "get <language> [packages]",
 		Short: "add non-CUE dependencies to the current module",
 		Long: `Get downloads packages or modules for non-CUE languages

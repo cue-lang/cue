@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ef33ca0_5d7c8367",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 735,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-12T09:33:05Z",
+      "side": 1,
+      "message": "nit: move \"flag\" up a line to not break the sentence?",
+      "revId": "8dcaab2f06ec360dd063ef98fe73a257e09180cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

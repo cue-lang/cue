@@ -64,15 +64,15 @@
 
 #ServiceManifest: #Manifest & {ref: kind: "service"}
 -- out/evalalpha/stats --
-Leaks:  77
+Leaks:  83
 Freed:  0
 Reused: 0
-Allocs: 77
+Allocs: 83
 Retain: 0
 
-Unifications: 59
-Conjuncts:    95
-Disjuncts:    8
+Unifications: 63
+Conjuncts:    110
+Disjuncts:    10
 -- out/evalalpha --
 Errors:
 #RelabelService.out.labstr: undefined field: label:
@@ -100,9 +100,17 @@ Result:
   #KindsNames: (string){ |((string){ "service" }, (string){ "deployment" }) }
   #KumoriKinds: (#struct){
     deployment: (#struct){
-      service: ~(#ServiceManifest)
+      service: (#struct){
+        ref: (#struct){
+          kind: (string){ "service" }
+        }
+        description: (_|_){
+          // [incomplete] #KumoriKinds.deployment.service.description: undefined field: service:
+          //     ./in.cue:5:28
+        }
+      }
       hsize: (_|_){
-        // [incomplete] #ServiceManifest.description: undefined field: service:
+        // [incomplete] #KumoriKinds.deployment.service.description: undefined field: service:
         //     ./in.cue:5:28
       }
     }
@@ -226,19 +234,10 @@ diff old new
      description: (_|_){
        // [incomplete] #Manifest.description: unresolved disjunction "service" | "deployment" (type string):
        //     ./in.cue:5:15
-@@ -42,62 +24,22 @@
-   #KindsNames: (string){ |((string){ "service" }, (string){ "deployment" }) }
-   #KumoriKinds: (#struct){
-     deployment: (#struct){
--      service: (#struct){
--        ref: (#struct){
--          kind: (string){ "service" }
--        }
--        description: (_|_){
--          // [incomplete] #KumoriKinds.deployment.service.description: undefined field: service:
--          //     ./in.cue:5:28
--        }
--      }
+@@ -51,53 +33,21 @@
+           //     ./in.cue:5:28
+         }
+       }
 -      hsize: (#struct){
 -      }
 -    }
@@ -286,9 +285,8 @@ diff old new
 -          // [eval]
 -          description: (_|_){
 -            // [eval]
-+      service: ~(#ServiceManifest)
 +      hsize: (_|_){
-+        // [incomplete] #ServiceManifest.description: undefined field: service:
++        // [incomplete] #KumoriKinds.deployment.service.description: undefined field: service:
 +        //     ./in.cue:5:28
 +      }
 +    }
@@ -305,7 +303,7 @@ diff old new
              let configed#2 = (_|_){
                // [eval]
                labstr: (_|_){
-@@ -106,7 +48,7 @@
+@@ -106,7 +56,7 @@
                }
              }
              role: (_|_){
@@ -314,7 +312,7 @@ diff old new
                //     ./in.cue:40:19
              }
            }
-@@ -114,16 +56,13 @@
+@@ -114,16 +64,13 @@
        }
      }
    }
@@ -338,7 +336,7 @@ diff old new
          let configed#2 = (_|_){
            // [eval]
            labstr: (_|_){
-@@ -132,7 +71,7 @@
+@@ -132,7 +79,7 @@
            }
          }
          role: (_|_){
@@ -347,7 +345,7 @@ diff old new
            //     ./in.cue:40:19
          }
        }
-@@ -141,9 +80,7 @@
+@@ -141,9 +88,7 @@
    #RelabelService: (_|_){
      // [eval]
      _params: (#struct){
@@ -358,7 +356,7 @@ diff old new
      }
      out: (_|_){
        // [eval]
-@@ -157,16 +94,10 @@
+@@ -157,16 +102,10 @@
      $_instances: (number){ |(*(int){ 1 }, (number){ >=0 }) }
    }
    #Deployment: (#struct){
@@ -389,18 +387,18 @@ diff old new
 -Reused: 108
 -Allocs: 25
 -Retain: 53
-+Leaks:  77
++Leaks:  83
 +Freed:  0
 +Reused: 0
-+Allocs: 77
++Allocs: 83
 +Retain: 0
  
 -Unifications: 107
 -Conjuncts:    243
 -Disjuncts:    170
-+Unifications: 59
-+Conjuncts:    95
-+Disjuncts:    8
++Unifications: 63
++Conjuncts:    110
++Disjuncts:    10
 -- out/eval/stats --
 Leaks:  16
 Freed:  117

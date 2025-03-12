@@ -90,6 +90,13 @@ type Stats struct {
 // do anything useful, but we need RunE for good error messages, as Cobra itself is lacking:
 // https://github.com/spf13/cobra/issues/706
 func commandGroup(c *Command, cmd *cobra.Command) *cobra.Command {
+	// If the user ran `cue mod nosuchcommand --nosuchflag`, we run the `cue mod` command
+	// because `nosuchcommand` was not a known subcommand.
+	// In such a case, do not fail with "unknown flag"; what matters to the user is that
+	// `nosuchcommand`, which might have such a flag if it existed, was not found at all.
+	// The logic below does not need to parse flags in any case.
+	cmd.FParseErrWhitelist.UnknownFlags = true
+
 	name := cmd.Name()
 	cmd.RunE = mkRunE(c, func(cmd *Command, args []string) error {
 		stderr := cmd.Stderr()

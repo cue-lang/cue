@@ -16,19 +16,22 @@ cmp stderr unknown_mod_cmd.out
 
 ! exec cue mod --unknown
 ! stdout .
-cmp stderr unknown_flag.out
+cmp stderr missing_mod_cmd.out
 
-# TODO: this should result in an "unknown subcommand" error.
 ! exec cue mod unknown --unknown
 ! stdout .
-cmp stderr unknown_flag.out
+cmp stderr unknown_mod_cmd.out
+
+! exec cue -v mod -E unknown --unknown
+! stdout .
+cmp stderr unknown_mod_cmd.out
 
 # A rather convoluted edge case, but Cobra allows mixing flags with args,
 # even when the args are subcommand names. -v and -E are global flags.
 # TODO: this should result in an "unknown subcommand" error.
 ! exec cue -v mod -E unknown --unknown
 ! stdout .
-cmp stderr unknown_flag.out
+cmp stderr unknown_mod_cmd.out
 
 ! exec cue evla
 ! stdout .
@@ -36,6 +39,9 @@ cmp stderr typo_cmd.stdout
 
 -- unknown_cmd.out --
 unknown command "unknown" for "cue"
+-- missing_mod_cmd.out --
+mod must be run as one of its subcommands
+Run 'cue help mod' for known subcommands.
 -- unknown_mod_cmd.out --
 mod must be run as one of its subcommands: unknown subcommand "unknown"
 Run 'cue help mod' for known subcommands.

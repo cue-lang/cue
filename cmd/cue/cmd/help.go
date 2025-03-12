@@ -731,7 +731,8 @@ ensures the user may only specify "prod" or "staging".
 Tag variables
 
 The injection mechanism allows for the injection of system variables:
-when variable injection is enabled, tags of the form
+when variable injection is enabled by passing the --inject-vars/-T
+flag, tags of the form
 
     @tag(dir,var=cwd)
 

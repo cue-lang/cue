@@ -85,6 +85,25 @@ type Stats struct {
 	}
 }
 
+// commandGroup makes cmd runnable in a way that implements commands grouping more subcommands,
+// such as `cue mod` or `cue refactor`. Note that the user can't actually run these commands to
+// do anything useful, but we need RunE for good error messages, as Cobra itself is lacking:
+// https://github.com/spf13/cobra/issues/706
+func commandGroup(c *Command, cmd *cobra.Command) *cobra.Command {
+	name := cmd.Name()
+	cmd.RunE = mkRunE(c, func(cmd *Command, args []string) error {
+		stderr := cmd.Stderr()
+		if len(args) == 0 {
+			fmt.Fprintf(stderr, "%s must be run as one of its subcommands\n", name)
+		} else {
+			fmt.Fprintf(stderr, "%s must be run as one of its subcommands: unknown subcommand %q\n", name, args[0])
+		}
+		fmt.Fprintf(stderr, "Run 'cue help %s' for known subcommands.\n", name)
+		return ErrPrintedError
+	})
+	return cmd
+}
+
 func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		c.Command = cmd

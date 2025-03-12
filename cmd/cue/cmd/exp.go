@@ -15,8 +15,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/internal/encoding/gotypes"
 
@@ -24,7 +22,7 @@ import (
 )
 
 func newExpCmd(c *Command) *cobra.Command {
-	cmd := &cobra.Command{
+	cmd := commandGroup(c, &cobra.Command{
 		// Experimental commands are hidden by design.
 		Hidden: true,
 
@@ -36,17 +34,7 @@ exp groups commands which are still in an experimental stage.
 Experimental commands may be changed or removed at any time,
 as the objective is to gain experience and then move the feature elsewhere.
 `[1:],
-		RunE: mkRunE(c, func(cmd *Command, args []string) error {
-			stderr := cmd.Stderr()
-			if len(args) == 0 {
-				fmt.Fprintln(stderr, "exp must be run as one of its subcommands")
-			} else {
-				fmt.Fprintf(stderr, "exp must be run as one of its subcommands: unknown subcommand %q\n", args[0])
-			}
-			fmt.Fprintln(stderr, "Run 'cue help exp' for known subcommands.")
-			return ErrPrintedError
-		}),
-	}
+	})
 
 	cmd.AddCommand(newExpGenGoTypesCmd(c))
 	return cmd

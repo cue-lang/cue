@@ -15,13 +15,11 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
 func newGetCmd(c *Command) *cobra.Command {
-	cmd := &cobra.Command{
+	cmd := commandGroup(c, &cobra.Command{
 		Use:   "get <language> [packages]",
 		Short: "add non-CUE dependencies to the current module",
 		Long: `Get downloads packages or modules for non-CUE languages
@@ -37,17 +35,7 @@ For information on native CUE modules:
 
     cue help modules
 `,
-		RunE: mkRunE(c, func(cmd *Command, args []string) error {
-			stderr := cmd.Stderr()
-			if len(args) == 0 {
-				fmt.Fprintln(stderr, "get must be run as one of its subcommands")
-			} else {
-				fmt.Fprintf(stderr, "get must be run as one of its subcommands: unknown subcommand %q\n", args[0])
-			}
-			fmt.Fprintln(stderr, "Run 'cue help get' for known subcommands.")
-			return ErrPrintedError
-		}),
-	}
+	})
 	cmd.AddCommand(newGoCmd(c))
 	return cmd
 }

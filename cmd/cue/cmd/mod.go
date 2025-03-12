@@ -15,13 +15,11 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
 func newModCmd(c *Command) *cobra.Command {
-	cmd := &cobra.Command{
+	cmd := commandGroup(c, &cobra.Command{
 		Use:   "mod <cmd> [arguments]",
 		Short: "module maintenance",
 		Long: `Mod groups commands which operate on CUE modules.
@@ -32,17 +30,7 @@ just 'cue mod'.
 See also:
 	cue help modules
 `,
-		RunE: mkRunE(c, func(cmd *Command, args []string) error {
-			stderr := cmd.Stderr()
-			if len(args) == 0 {
-				fmt.Fprintln(stderr, "mod must be run as one of its subcommands")
-			} else {
-				fmt.Fprintf(stderr, "mod must be run as one of its subcommands: unknown subcommand %q\n", args[0])
-			}
-			fmt.Fprintln(stderr, "Run 'cue help mod' for known subcommands.")
-			return ErrPrintedError
-		}),
-	}
+	})
 
 	cmd.AddCommand(newModEditCmd(c))
 	cmd.AddCommand(newModFixCmd(c))

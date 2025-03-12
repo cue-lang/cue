@@ -265,7 +265,16 @@ loop1:
 			hasEmbed = true
 
 		case *Ellipsis:
-			// Can be added unconditionally to patterns.
+			elem := x.Value
+			if elem == nil {
+				elem = &Top{}
+			}
+
+			ci := ci
+			ci.setOptionalV3(n)
+			c := MakeConjunct(childEnv, elem, ci)
+			pat := &BasicType{K: StringKind}
+			n.insertPattern(pat, c)
 			hasEllipsis = true
 
 		case *DynamicField:

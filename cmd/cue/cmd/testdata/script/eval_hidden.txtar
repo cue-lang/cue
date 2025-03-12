@@ -7,8 +7,10 @@ exec cue eval _foo.cue
 cmp stdout expect-stdout-underscore
 
 # Ensure package eval excludes both for completeness
-exec cue eval .
-cmp stdout expect-stdout-pkg
+# TODO fix this
+! exec cue eval .
+cmp stderr expect-stderr-pkg
+# cmp stdout expect-stdout-pkg
 
 -- .foo.cue --
 package foo
@@ -18,6 +20,8 @@ a: 42
 package foo
 
 b: 42
+-- .bar.cue --
+package bar
 -- foo.cue --
 package foo
 
@@ -28,3 +32,5 @@ a: 42
 b: 42
 -- expect-stdout-pkg --
 c: 42
+-- expect-stderr-pkg --
+found packages "bar" (.bar.cue) and "foo" (.foo.cue) in "."

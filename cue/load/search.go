@@ -389,7 +389,7 @@ func appendExpandedPackageArg(c *Config, pkgPaths []resolvedPackageArg, p string
 //  5. if there's more than one package in the directory, it returns a MultiplePackageError.
 //  6. if there are no package files in the directory, it just appends the import path as is, leaving it
 //     to later logic to produce an error in this case.
-func appendExpandedUnqualifiedPackagePath(pkgPaths []resolvedPackageArg, origp string, ip ast.ImportPath, pkgQual string, mainModRoot module.SourceLoc, mainModPath string, tg *tagger) (_ []resolvedPackageArg, _err error) {
+func appendExpandedUnqualifiedPackagePath(pkgPaths []resolvedPackageArg, origp string, ip ast.ImportPath, pkgQual string, mainModRoot module.SourceLoc, mainModPath string, tg *tagger) ([]resolvedPackageArg, error) {
 	ipRel, ok := cutModulePrefix(ip, mainModPath)
 	if !ok {
 		// Should never happen.
@@ -410,53 +410,42 @@ func appendExpandedUnqualifiedPackagePath(pkgPaths []resolvedPackageArg, origp s
 	// 1. if pkgQual is "*", it appends all the packages present in the package directory.
 	if pkgQual == "*" {
 		wasAdded := make(map[string]bool)
-		iter(func(f modimports.ModuleFile, err error) bool {
+		for f, err := range iter {
 			if err != nil {
-				_err = err
-				return false
+				return nil, err
 			}
 			if err := shouldBuildFile(f.Syntax, tg.tagIsSet); err != nil {
 				// Later build logic should pick up and report the same error.
-				return true
+				continue
 			}
 			pkgName := f.Syntax.PackageName()
 			if wasAdded[pkgName] {
-				return true
+				continue
 			}
 			wasAdded[pkgName] = true
 			ip := ip
 			ip.Qualifier = pkgName
 			p := ip.String()
 			pkgPaths = append(pkgPaths, resolvedPackageArg{p, p})
-			return true
-		})
-		if _err != nil {
-			return nil, _err
 		}
 		return pkgPaths, nil
 	}
 	var files []modimports.ModuleFile
 	foundQualifier := false
-	// TODO(rog): for f, err := range iter {
-	iter(func(f modimports.ModuleFile, err error) bool {
+	for f, err := range iter {
 		if err != nil {
-			_err = err
-			return false
+			return nil, err
 		}
 		pkgName := f.Syntax.PackageName()
 		// 2. if pkgQual is "_", it looks for a package file with no package name.
 		// 3. if there's a package named after ip.Qualifier it chooses that
 		if (pkgName != "" && pkgName == ip.Qualifier) || (pkgQual == "_" && pkgName == "") {
 			foundQualifier = true
-			return false
+			break
 		}
 		if pkgName != "" {
 			files = append(files, f)
 		}
-		return true
-	})
-	if _err != nil {
-		return nil, _err
 	}
 	if foundQualifier {
 		// We found the actual package that was implied by the import path (or pkgQual == "_").

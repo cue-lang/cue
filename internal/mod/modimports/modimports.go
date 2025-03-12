@@ -105,6 +105,9 @@ func PackageFiles(fsys fs.FS, dir string, pkgQualifier string) func(func(ModuleF
 					// Directories are never package files, even when their filename ends with ".cue".
 					continue
 				}
+				if isHidden(e.Name()) {
+					continue
+				}
 				pkgName, cont := yieldPackageFile(fsys, path.Join(dir, e.Name()), selectPackage, yield)
 				if !cont {
 					return
@@ -179,6 +182,9 @@ func yieldAllModFiles(fsys fs.FS, fpath string, topDir bool, yield func(ModuleFi
 		if entry.IsDir() {
 			continue
 		}
+		if isHidden(entry.Name()) {
+			continue
+		}
 		fpath := path.Join(fpath, entry.Name())
 		if _, ok := yieldPackageFile(fsys, fpath, func(string) bool { return true }, yield); !ok {
 			return false
@@ -190,7 +196,7 @@ func yieldAllModFiles(fsys fs.FS, fpath string, topDir bool, yield func(ModuleFi
 		if !entry.IsDir() {
 			continue
 		}
-		if name == "cue.mod" || strings.HasPrefix(name, ".") || strings.HasPrefix(name, "_") {
+		if name == "cue.mod" || isHidden(name) {
 			continue
 		}
 		fpath := path.Join(fpath, name)
@@ -259,4 +265,8 @@ func yieldPackageFile(fsys fs.FS, fpath string, selectPackage func(pkgName strin
 	}
 	pf.Syntax = syntax
 	return syntax.PackageName(), yield(pf, nil)
+}
+
+func isHidden(name string) bool {
+	return name == "" || name[0] == '.' || name[0] == '_'
 }

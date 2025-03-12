@@ -163,14 +163,14 @@ issue3780: panic2: {
   }
 }
 -- out/evalalpha/stats --
-Leaks:  205
+Leaks:  207
 Freed:  0
 Reused: 0
-Allocs: 205
+Allocs: 207
 Retain: 0
 
-Unifications: 161
-Conjuncts:    240
+Unifications: 163
+Conjuncts:    252
 Disjuncts:    32
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -182,17 +182,17 @@ diff old new
 -Reused: 124
 -Allocs: 13
 -Retain: 34
-+Leaks:  205
++Leaks:  207
 +Freed:  0
 +Reused: 0
-+Allocs: 205
++Allocs: 207
 +Retain: 0
  
 -Unifications: 113
 -Conjuncts:    209
 -Disjuncts:    171
-+Unifications: 161
-+Conjuncts:    240
++Unifications: 163
++Conjuncts:    252
 +Disjuncts:    32
 -- out/eval/stats --
 Leaks:  0

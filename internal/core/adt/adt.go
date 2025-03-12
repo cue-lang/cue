@@ -256,6 +256,7 @@ func (*ConjunctGroup) elemNode() {}
 func (*ConjunctGroup) expr()     {}
 
 var top = &Top{}
+var EllipsisTop = &Top{}
 
 // Decl and Yielder
 

@@ -50,9 +50,10 @@ Benign change in error message.
 	s: strings.MinRunes(4) & strings.MaxRunes(7)
 	additional: {
 		env: _
-		confs: {
-			if env {}
-		}
+		confs: _ &
+			{
+				if env {}
+			}
 	}
 }
 == Raw
@@ -63,9 +64,10 @@ Benign change in error message.
 	s: strings.MinRunes(4) & strings.MaxRunes(7)
 	additional: {
 		env: _
-		confs: {
-			if env {}
-		}
+		confs: _ &
+			{
+				if env {}
+			}
 	}
 }
 == Final
@@ -87,9 +89,10 @@ Benign change in error message.
 	s: strings.MinRunes(4) & strings.MaxRunes(7)
 	additional: {
 		env: _
-		confs: {
-			if env {}
-		}
+		confs: _ &
+			{
+				if env {}
+			}
 	}
 }
 == Eval
@@ -100,16 +103,45 @@ Benign change in error message.
 	s: strings.MinRunes(4) & strings.MaxRunes(7)
 	additional: {
 		env: _
-		confs: {
-			if env {}
-		}
+		confs: _ &
+			{
+				if env {}
+			}
 	}
 }
 -- diff/-out/value-v3<==>+out/value --
 diff old new
 --- old
 +++ new
-@@ -32,7 +32,7 @@
+@@ -6,9 +6,10 @@
+ 	s: strings.MinRunes(4) & strings.MaxRunes(7)
+ 	additional: {
+ 		env: _
+-		confs: {
+-			if env {}
+-		}
++		confs: _ &
++			{
++				if env {}
++			}
+ 	}
+ }
+ == Raw
+@@ -19,9 +20,10 @@
+ 	s: strings.MinRunes(4) & strings.MaxRunes(7)
+ 	additional: {
+ 		env: _
+-		confs: {
+-			if env {}
+-		}
++		confs: _ &
++			{
++				if env {}
++			}
+ 	}
+ }
+ == Final
+@@ -32,7 +34,7 @@
  	s: strings.MinRunes(4) & strings.MaxRunes(7)
  	additional: {
  		env:   _
@@ -118,6 +150,33 @@ diff old new
  	}
  }
  == All
+@@ -43,9 +45,10 @@
+ 	s: strings.MinRunes(4) & strings.MaxRunes(7)
+ 	additional: {
+ 		env: _
+-		confs: {
+-			if env {}
+-		}
++		confs: _ &
++			{
++				if env {}
++			}
+ 	}
+ }
+ == Eval
+@@ -56,8 +59,9 @@
+ 	s: strings.MinRunes(4) & strings.MaxRunes(7)
+ 	additional: {
+ 		env: _
+-		confs: {
+-			if env {}
+-		}
++		confs: _ &
++			{
++				if env {}
++			}
+ 	}
+ }
 -- out/value --
 == Simplified
 {

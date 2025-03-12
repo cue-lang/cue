@@ -37,11 +37,10 @@ func newModMirrorCmd(c *Command) *cobra.Command {
 This commmand ensures that a set of modules and their dependencies
 are available ("mirrored") in a registry.
 
-For each module specified on the command line, it ensures that the
-module and all the modules it depends on
-are present in both the "from" registry and the "to" registry and that the
-contents are the same in each. If the --no-deps is specified, only
-the module itself but not its dependencies will be mirrored.
+For each module specified on the command line, it ensures that the module and
+all the modules it depends on are present in both the "from" registry and the
+"to" registry, and that the contents are the same in each. If --no-deps is
+specified then the module will be mirrored without its dependencies.
 
 A module may be specified as <module>@<version>, in which case the
 specified version will be mirrored. If the version is canonical (for example v1.2.3), then

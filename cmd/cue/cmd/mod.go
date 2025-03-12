@@ -19,7 +19,7 @@ import (
 )
 
 func newModCmd(c *Command) *cobra.Command {
-	cmd := commandGroup(c, &cobra.Command{
+	cmd := commandGroup(&cobra.Command{
 		Use:   "mod <cmd> [arguments]",
 		Short: "module maintenance",
 		Long: `Mod groups commands which operate on CUE modules.

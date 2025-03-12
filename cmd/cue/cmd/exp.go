@@ -22,7 +22,7 @@ import (
 )
 
 func newExpCmd(c *Command) *cobra.Command {
-	cmd := commandGroup(c, &cobra.Command{
+	cmd := commandGroup(&cobra.Command{
 		// Experimental commands are hidden by design.
 		Hidden: true,
 

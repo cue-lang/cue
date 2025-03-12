@@ -19,7 +19,7 @@ import (
 )
 
 func newRefactorCmd(c *Command) *cobra.Command {
-	cmd := commandGroup(c, &cobra.Command{
+	cmd := commandGroup(&cobra.Command{
 		// Experimental so far.
 		Hidden: true,
 

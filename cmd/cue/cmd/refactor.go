@@ -15,13 +15,11 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
 func newRefactorCmd(c *Command) *cobra.Command {
-	cmd := &cobra.Command{
+	cmd := commandGroup(c, &cobra.Command{
 		// Experimental so far.
 		Hidden: true,
 
@@ -31,17 +29,7 @@ func newRefactorCmd(c *Command) *cobra.Command {
 This command groups together commands relating
 to altering code within the current CUE module.
 `[1:],
-		RunE: mkRunE(c, func(cmd *Command, args []string) error {
-			stderr := cmd.Stderr()
-			if len(args) == 0 {
-				fmt.Fprintln(stderr, "refactor must be run as one of its subcommands")
-			} else {
-				fmt.Fprintf(stderr, "refactor must be run as one of its subcommands: unknown subcommand %q\n", args[0])
-			}
-			fmt.Fprintln(stderr, "Run 'cue help refactor' for known subcommands.")
-			return ErrPrintedError
-		}),
-	}
+	})
 
 	cmd.AddCommand(newRefactorImportsCmd(c))
 	return cmd

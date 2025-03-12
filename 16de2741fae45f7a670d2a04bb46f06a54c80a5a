@@ -68,6 +68,24 @@
       "parentUuid": "d368ca43_413ef54b",
       "revId": "16de2741fae45f7a670d2a04bb46f06a54c80a5a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0beeb7d5_96a83404",
+        "filename": "cmd/cue/cmd/modmirror.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-12T09:11:13Z",
+      "side": 1,
+      "message": "That\u0027s correct.",
+      "parentUuid": "81b6d638_ea98689f",
+      "revId": "16de2741fae45f7a670d2a04bb46f06a54c80a5a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

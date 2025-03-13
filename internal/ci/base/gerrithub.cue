@@ -260,7 +260,9 @@ evictCaches: bashWorkflow & {
 							git remote add origin $i
 							for j in $(gh actions-cache list -L 100 | grep refs/ | awk '{print $1}')
 							do
-							   gh actions-cache delete --confirm $j
+								# Clearing out the caches is best-effort, as they might get evicted automatically
+								# by GitHub once we start using too much space in total, causing races.
+								gh actions-cache delete --confirm $j || true
 							done
 						done
 						"""

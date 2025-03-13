@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6daec6ec_d7d79734",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-13T12:36:36Z",
+      "side": 1,
+      "message": "Nice improvement, thanks.",
+      "revId": "f71261a7dc5b26cff00b3af06d2757d3d37e065c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0cfbf01_6e3f0a82",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-13T12:36:36Z",
+      "side": 1,
+      "message": "This isn\u0027t _quite_ right; for example:\n\n```\ncue mod --dfvsd edit\n```\n\nnow prints:\n\n```\nmod must be run as one of its subcommands\nRun \u0027cue help mod\u0027 for known subcommands.\n```\n\nbut given that command group commands don\u0027t tend to have\nmuch in the way of flags themselves, this is probably\nfine.",
+      "revId": "f71261a7dc5b26cff00b3af06d2757d3d37e065c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

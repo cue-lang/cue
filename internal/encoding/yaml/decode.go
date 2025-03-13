@@ -107,9 +107,17 @@ func (d *decoder) Decode() (ast.Expr, error) {
 			// Note that when the input contains "---", we get an empty document
 			// with a null scalar value inside instead.
 			if !d.yamlNonEmpty {
-				return &ast.BasicLit{
-					Kind:  token.NULL,
-					Value: "null",
+				// Expression below: *null | _
+				return &ast.BinaryExpr{
+					Op: token.OR,
+					X: &ast.UnaryExpr{
+						Op: token.MUL,
+						X: &ast.BasicLit{
+							Kind:  token.NULL,
+							Value: "null",
+						},
+					},
+					Y: &ast.Ident{Name: "_"},
 				}, nil
 			}
 			// If the input wasn't empty, we already decoded some CUE syntax nodes,

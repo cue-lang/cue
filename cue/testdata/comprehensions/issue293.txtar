@@ -42,12 +42,10 @@ Conjuncts:    33
 Disjuncts:    20
 -- out/evalalpha --
 Errors:
-z.x.f2: field not allowed:
-    ./in.cue:5:6
-    ./in.cue:14:3
 #V1.x.f2: field not allowed:
-    ./variant1.cue:2:5
     ./variant1.cue:3:5
+z.x.f2: field not allowed:
+    ./in.cue:14:3
 
 Result:
 (_|_){
@@ -64,7 +62,6 @@ Result:
       f1: (int){ 99 }
       f2: (_|_){
         // [eval] z.x.f2: field not allowed:
-        //     ./in.cue:5:6
         //     ./in.cue:14:3
       }
     }
@@ -81,7 +78,6 @@ Result:
       // [eval]
       f2: (_|_){
         // [eval] #V1.x.f2: field not allowed:
-        //     ./variant1.cue:2:5
         //     ./variant1.cue:3:5
       }
       f1: (int){ int }
@@ -92,35 +88,29 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,12 +1,10 @@
+@@ -1,11 +1,7 @@
  Errors:
--#V1.x.f2: field not allowed:
+ #V1.x.f2: field not allowed:
 -    ./variant1.cue:2:11
--    ./variant1.cue:3:5
+     ./variant1.cue:3:5
  z.x.f2: field not allowed:
 -    ./in.cue:2:2
 -    ./in.cue:5:12
 -    ./in.cue:11:4
-+    ./in.cue:5:6
      ./in.cue:14:3
-+#V1.x.f2: field not allowed:
-+    ./variant1.cue:2:5
-+    ./variant1.cue:3:5
  
  Result:
- (_|_){
-@@ -23,9 +21,7 @@
+@@ -23,9 +19,6 @@
        f1: (int){ 99 }
        f2: (_|_){
          // [eval] z.x.f2: field not allowed:
 -        //     ./in.cue:2:2
 -        //     ./in.cue:5:12
 -        //     ./in.cue:11:4
-+        //     ./in.cue:5:6
          //     ./in.cue:14:3
        }
      }
-@@ -40,12 +36,12 @@
+@@ -40,12 +33,11 @@
      // [eval]
      x: (_|_){
        // [eval]
@@ -128,7 +118,6 @@ diff old new
        f2: (_|_){
          // [eval] #V1.x.f2: field not allowed:
 -        //     ./variant1.cue:2:11
-+        //     ./variant1.cue:2:5
          //     ./variant1.cue:3:5
        }
 +      f1: (int){ int }

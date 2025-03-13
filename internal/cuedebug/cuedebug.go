@@ -65,6 +65,9 @@ type Config struct {
 	// For the second issue, to open up the entire result of an inline struct,
 	// such an expression could be written as `openAll(expr).out`.
 	OpenInline bool `envflag:"default:true"`
+
+	// OpenDef disables the check for closedness of definitions.
+	OpenDef bool
 }
 
 // Init initializes Flags. Note: this isn't named "init" because we

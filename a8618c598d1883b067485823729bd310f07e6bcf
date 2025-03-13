@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "48c6cb80_5bdbb281",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-13T12:09:24Z",
+      "side": 1,
+      "message": "LGTM with one minor question: maybe this a little bug or something?",
+      "revId": "a8618c598d1883b067485823729bd310f07e6bcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8bac723_8478cda8",
+        "filename": "cmd/cue/cmd/testdata/script/empty_yaml.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-13T12:09:24Z",
+      "side": 1,
+      "message": "What\u0027s this non-empty blank line doing?",
+      "revId": "a8618c598d1883b067485823729bd310f07e6bcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

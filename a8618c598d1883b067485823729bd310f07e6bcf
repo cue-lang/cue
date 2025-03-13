@@ -33,6 +33,24 @@
       "message": "What\u0027s this non-empty blank line doing?",
       "revId": "a8618c598d1883b067485823729bd310f07e6bcf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f03ec0d_439cb283",
+        "filename": "cmd/cue/cmd/testdata/script/empty_yaml.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-13T22:49:46Z",
+      "side": 1,
+      "message": "I noticed this too but thought it wasn\u0027t a big deal as this error goes away in the next CL. I dug into it a bit and the reason was that the empty yaml `null` was lacking a position, hence the empty (blank) filename here. fixed now in a new second CL in this stack.",
+      "parentUuid": "a8bac723_8478cda8",
+      "revId": "a8618c598d1883b067485823729bd310f07e6bcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

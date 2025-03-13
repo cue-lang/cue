@@ -108,8 +108,9 @@ func (d *decoder) Decode() (ast.Expr, error) {
 			// with a null scalar value inside instead.
 			if !d.yamlNonEmpty {
 				return &ast.BasicLit{
-					Kind:  token.NULL,
-					Value: "null",
+					Kind:     token.NULL,
+					ValuePos: d.tokFile.Pos(0, token.NoRelPos),
+					Value:    "null",
 				}, nil
 			}
 			// If the input wasn't empty, we already decoded some CUE syntax nodes,

@@ -13,7 +13,7 @@ cmp stderr export-all.stderr
 null
 -- export-all.stderr --
 conflicting values null and {two:"two text"} (mismatched types null and struct):
-    
+    ./empty.yaml
     ./two.yaml:1:1
 -- one.yaml --
 one: "one text"

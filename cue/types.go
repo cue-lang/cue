@@ -1758,11 +1758,11 @@ func (v Value) UnifyAccept(w Value, accept Value) Value {
 	n := &adt.Vertex{}
 	ctx := v.ctx()
 
-	cv := adt.MakeRootConjunct(nil, v.v)
-	cw := adt.MakeRootConjunct(nil, w.v)
-
 	switch ctx.Version {
 	case internal.EvalV2:
+		cv := adt.MakeRootConjunct(nil, v.v)
+		cw := adt.MakeRootConjunct(nil, w.v)
+
 		n.AddConjunct(cv)
 		n.AddConjunct(cw)
 
@@ -1779,10 +1779,8 @@ func (v Value) UnifyAccept(w Value, accept Value) Value {
 		}
 
 	case internal.EvalV3:
-		cv.CloseInfo.FromEmbed = true
-		cw.CloseInfo.FromEmbed = true
-		n.AddConjunct(cv)
-		n.AddConjunct(cw)
+		n.AddOpenConjunct(ctx, v.v)
+		n.AddOpenConjunct(ctx, w.v)
 		ca := adt.MakeRootConjunct(nil, accept.v)
 		n.AddConjunct(ca)
 		n.Finalize(ctx)

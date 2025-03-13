@@ -101,7 +101,6 @@ Disjuncts:    204
 -- out/evalalpha --
 Errors:
 b.x: field not allowed:
-    ./in.cue:1:4
     ./in.cue:5:9
 
 Result:
@@ -116,7 +115,6 @@ Result:
     // [eval]
     x: (_|_){
       // [eval] b.x: field not allowed:
-      //     ./in.cue:1:4
       //     ./in.cue:5:9
     }
     a: (struct){
@@ -159,7 +157,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1multi = 〈0;a〉
+            let X#1 = ~(inDisjunctions.x.syslog.xxx.a)
             uint: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -169,7 +167,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1multi = 〈0;a〉
+            let X#1 = ~(inDisjunctions.x.syslog.xxx.a)
             string: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -180,7 +178,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1multi = 〈0;a〉
+            let X#1 = ~(inDisjunctions.x.syslog.string.a)
             uint: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -190,7 +188,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1multi = 〈0;a〉
+            let X#1 = ~(inDisjunctions.x.syslog.string.a)
             string: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -247,16 +245,15 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,7 +1,6 @@
+@@ -1,7 +1,5 @@
  Errors:
  b.x: field not allowed:
 -    ./in.cue:1:10
 -    ./in.cue:5:4
-+    ./in.cue:1:4
      ./in.cue:5:9
  
  Result:
-@@ -14,20 +13,19 @@
+@@ -14,20 +12,18 @@
    }
    b: (_|_){
      // [eval]
@@ -267,7 +264,6 @@ diff old new
        // [eval] b.x: field not allowed:
 -      //     ./in.cue:1:10
 -      //     ./in.cue:5:4
-+      //     ./in.cue:1:4
        //     ./in.cue:5:9
      }
 +    a: (struct){
@@ -282,7 +278,7 @@ diff old new
      }
    }
    inDisjunctions: (struct){
-@@ -37,21 +35,17 @@
+@@ -37,21 +33,17 @@
              a: (#struct){
                b: (bool){ true }
              }
@@ -315,7 +311,7 @@ diff old new
              string: (#struct){
                a: (#struct){
                  b: (bool){ true }
-@@ -60,27 +54,6 @@
+@@ -60,42 +52,42 @@
            }) }
        }
        syslog: (#struct){
@@ -343,15 +339,19 @@ diff old new
          xxx: (#struct){ |((#struct){
              a: (#struct){
                b: (bool){ true }
-@@ -102,6 +75,27 @@
-               }
              }
-           }) }
-+        string: (#struct){ |((#struct){
-+            a: (#struct){
-+              b: (bool){ true }
-+            }
-+            let X#1multi = 〈0;a〉
+-            let X#1multi = 〈0;a〉
+-            uint: (#struct){
+-              a: (#struct){
+-                b: (bool){ true }
+-              }
+-            }
+-          }, (#struct){
+-            a: (#struct){
+-              b: (bool){ true }
+-            }
+-            let X#1multi = 〈0;a〉
++            let X#1 = ~(inDisjunctions.x.syslog.xxx.a)
 +            uint: (#struct){
 +              a: (#struct){
 +                b: (bool){ true }
@@ -361,16 +361,31 @@ diff old new
 +            a: (#struct){
 +              b: (bool){ true }
 +            }
-+            let X#1multi = 〈0;a〉
++            let X#1 = ~(inDisjunctions.x.syslog.xxx.a)
 +            string: (#struct){
 +              a: (#struct){
 +                b: (bool){ true }
 +              }
 +            }
 +          }) }
-       }
-     }
-     #Def: (#struct){
++        string: (#struct){ |((#struct){
++            a: (#struct){
++              b: (bool){ true }
++            }
++            let X#1 = ~(inDisjunctions.x.syslog.string.a)
++            uint: (#struct){
++              a: (#struct){
++                b: (bool){ true }
++              }
++            }
++          }, (#struct){
++            a: (#struct){
++              b: (bool){ true }
++            }
++            let X#1 = ~(inDisjunctions.x.syslog.string.a)
+             string: (#struct){
+               a: (#struct){
+                 b: (bool){ true }
 -- diff/todo/p3 --
 Reordering
 Let differs.

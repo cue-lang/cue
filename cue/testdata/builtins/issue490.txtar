@@ -20,7 +20,6 @@ Disjuncts:    10
 -- out/evalalpha --
 Errors:
 B.c: field not allowed:
-    ./test.cue:1:4
     ./test.cue:7:2
 
 Result:
@@ -34,7 +33,6 @@ Result:
     // [eval]
     c: (_|_){
       // [eval] B.c: field not allowed:
-      //     ./test.cue:1:4
       //     ./test.cue:7:2
     }
     a: (int){ 1 }
@@ -45,16 +43,15 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,7 +1,6 @@
+@@ -1,7 +1,5 @@
  Errors:
  B.c: field not allowed:
 -    ./test.cue:1:10
 -    ./test.cue:6:4
-+    ./test.cue:1:4
      ./test.cue:7:2
  
  Result:
-@@ -13,13 +12,12 @@
+@@ -13,13 +11,11 @@
    }
    B: (_|_){
      // [eval]
@@ -64,7 +61,6 @@ diff old new
        // [eval] B.c: field not allowed:
 -      //     ./test.cue:1:10
 -      //     ./test.cue:6:4
-+      //     ./test.cue:1:4
        //     ./test.cue:7:2
      }
 +    a: (int){ 1 }

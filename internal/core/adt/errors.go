@@ -83,6 +83,7 @@ type Bottom struct {
 	HasRecursive bool
 	ChildError   bool // Err is the error of the child
 	NotExists    bool // This error originated from a failed lookup.
+	CloseCheck   bool // This error resulted from a close check.
 	ForCycle     bool // this is a for cycle
 	// Value holds the computed value so far in case
 	Value Value
@@ -144,12 +145,13 @@ func (n *nodeContext) AddChildError(recursive *Bottom) {
 	}
 	x := v.BaseValue
 	err, _ := x.(*Bottom)
-	if err == nil {
+	if err == nil || err.CloseCheck {
 		n.setBaseValue(&Bottom{
 			Code:         recursive.Code,
 			Value:        v,
 			HasRecursive: true,
 			ChildError:   true,
+			CloseCheck:   recursive.CloseCheck,
 			Err:          recursive.Err,
 			Node:         n.node,
 		})
@@ -198,9 +200,10 @@ func CombineErrors(src ast.Node, x, y Value) *Bottom {
 	}
 
 	return &Bottom{
-		Src:  src,
-		Err:  errors.Append(a.Err, b.Err),
-		Code: a.Code,
+		Src:        src,
+		Err:        errors.Append(a.Err, b.Err),
+		Code:       a.Code,
+		CloseCheck: a.CloseCheck || b.CloseCheck,
 	}
 }
 

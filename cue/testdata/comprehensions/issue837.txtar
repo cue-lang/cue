@@ -64,21 +64,17 @@
 
 #ServiceManifest: #Manifest & {ref: kind: "service"}
 -- out/evalalpha/stats --
-Leaks:  75
+Leaks:  77
 Freed:  0
 Reused: 0
-Allocs: 75
+Allocs: 77
 Retain: 0
 
-Unifications: 62
-Conjuncts:    120
+Unifications: 59
+Conjuncts:    95
 Disjuncts:    8
 -- out/evalalpha --
 Errors:
-#Configure.service.description.configed.labstr: undefined field: label:
-    ./in.cue:51:14
-#DoDeploy.deployment.description.service.description.configed.labstr: undefined field: label:
-    ./in.cue:51:14
 #RelabelService.out.labstr: undefined field: label:
     ./in.cue:51:14
 
@@ -111,20 +107,15 @@ Result:
       }
     }
   }
-  #DoDeploy: (_|_){
-    // [eval]
+  #DoDeploy: (#struct){
     _params: (#struct){
       manifest: ~(#DeploymentManifest)
     }
-    deployment: (_|_){
-      // [eval]
-      description: (_|_){
-        // [eval]
+    deployment: (#struct){
+      description: (#struct){
         let dep#1 = ~(#KumoriKinds.deployment)
-        service: (_|_){
-          // [eval]
-          description: (_|_){
-            // [eval]
+        service: (#struct){
+          description: (#struct){
             let configed#2 = (_|_){
               // [eval]
               labstr: (_|_){
@@ -133,24 +124,21 @@ Result:
               }
             }
             role: (_|_){
-              // [eval] #DoDeploy.deployment.description.service.description.configed.labstr: undefined field: label:
-              //     ./in.cue:51:14
+              // [incomplete] #DoDeploy.deployment.description.service.description.role: undefined field: role:
+              //     ./in.cue:40:19
             }
           }
         }
       }
     }
   }
-  #Configure: (_|_){
-    // [eval]
+  #Configure: (#struct){
     _params: (#struct){
       hsize: (#struct){
       }
     }
-    service: (_|_){
-      // [eval]
-      description: (_|_){
-        // [eval]
+    service: (#struct){
+      description: (#struct){
         let configed#2 = (_|_){
           // [eval]
           labstr: (_|_){
@@ -159,8 +147,8 @@ Result:
           }
         }
         role: (_|_){
-          // [eval] #Configure.service.description.configed.labstr: undefined field: label:
-          //     ./in.cue:51:14
+          // [incomplete] #Configure.service.description.role: undefined field: role:
+          //     ./in.cue:40:19
         }
       }
     }
@@ -202,20 +190,16 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,8 +1,8 @@
+@@ -1,8 +1,4 @@
  Errors:
 -#Configure.service.description.role: undefined field: role:
 -    ./in.cue:40:19
 -#DoDeploy.deployment.description.service.description.role: undefined field: role:
 -    ./in.cue:40:19
-+#Configure.service.description.configed.labstr: undefined field: label:
-+    ./in.cue:51:14
-+#DoDeploy.deployment.description.service.description.configed.labstr: undefined field: label:
-+    ./in.cue:51:14
  #RelabelService.out.labstr: undefined field: label:
      ./in.cue:51:14
  
-@@ -13,24 +13,10 @@
+@@ -13,24 +9,10 @@
      ref: (#struct){
        kind: (string){ "deployment" }
      }
@@ -242,7 +226,7 @@ diff old new
      description: (_|_){
        // [incomplete] #Manifest.description: unresolved disjunction "service" | "deployment" (type string):
        //     ./in.cue:5:15
-@@ -42,16 +28,10 @@
+@@ -42,62 +24,22 @@
    #KindsNames: (string){ |((string){ "service" }, (string){ "deployment" }) }
    #KumoriKinds: (#struct){
      deployment: (#struct){
@@ -256,17 +240,12 @@ diff old new
 -        }
 -      }
 -      hsize: (#struct){
-+      service: ~(#ServiceManifest)
-+      hsize: (_|_){
-+        // [incomplete] #ServiceManifest.description: undefined field: service:
-+        //     ./in.cue:5:28
-       }
-     }
-   }
-@@ -58,42 +38,13 @@
-   #DoDeploy: (_|_){
-     // [eval]
-     _params: (#struct){
+-      }
+-    }
+-  }
+-  #DoDeploy: (_|_){
+-    // [eval]
+-    _params: (#struct){
 -      manifest: (#struct){
 -        ref: (#struct){
 -          kind: (string){ "deployment" }
@@ -285,12 +264,11 @@ diff old new
 -          }
 -        }
 -      }
-+      manifest: ~(#DeploymentManifest)
-     }
-     deployment: (_|_){
-       // [eval]
-       description: (_|_){
-         // [eval]
+-    }
+-    deployment: (_|_){
+-      // [eval]
+-      description: (_|_){
+-        // [eval]
 -        let dep#1 = (#struct){
 -          service: (#struct){
 -            ref: (#struct){
@@ -304,33 +282,72 @@ diff old new
 -          hsize: (#struct){
 -          }
 -        }
+-        service: (_|_){
+-          // [eval]
+-          description: (_|_){
+-            // [eval]
++      service: ~(#ServiceManifest)
++      hsize: (_|_){
++        // [incomplete] #ServiceManifest.description: undefined field: service:
++        //     ./in.cue:5:28
++      }
++    }
++  }
++  #DoDeploy: (#struct){
++    _params: (#struct){
++      manifest: ~(#DeploymentManifest)
++    }
++    deployment: (#struct){
++      description: (#struct){
 +        let dep#1 = ~(#KumoriKinds.deployment)
-         service: (_|_){
-           // [eval]
-           description: (_|_){
-@@ -106,8 +57,8 @@
++        service: (#struct){
++          description: (#struct){
+             let configed#2 = (_|_){
+               // [eval]
+               labstr: (_|_){
+@@ -106,7 +48,7 @@
                }
              }
              role: (_|_){
 -              // [eval] #DoDeploy.deployment.description.service.description.role: undefined field: role:
--              //     ./in.cue:40:19
-+              // [eval] #DoDeploy.deployment.description.service.description.configed.labstr: undefined field: label:
-+              //     ./in.cue:51:14
++              // [incomplete] #DoDeploy.deployment.description.service.description.role: undefined field: role:
+               //     ./in.cue:40:19
              }
            }
-         }
-@@ -132,8 +83,8 @@
+@@ -114,16 +56,13 @@
+       }
+     }
+   }
+-  #Configure: (_|_){
+-    // [eval]
+-    _params: (#struct){
+-      hsize: (#struct){
+-      }
+-    }
+-    service: (_|_){
+-      // [eval]
+-      description: (_|_){
+-        // [eval]
++  #Configure: (#struct){
++    _params: (#struct){
++      hsize: (#struct){
++      }
++    }
++    service: (#struct){
++      description: (#struct){
+         let configed#2 = (_|_){
+           // [eval]
+           labstr: (_|_){
+@@ -132,7 +71,7 @@
            }
          }
          role: (_|_){
 -          // [eval] #Configure.service.description.role: undefined field: role:
--          //     ./in.cue:40:19
-+          // [eval] #Configure.service.description.configed.labstr: undefined field: label:
-+          //     ./in.cue:51:14
++          // [incomplete] #Configure.service.description.role: undefined field: role:
+           //     ./in.cue:40:19
          }
        }
-     }
-@@ -141,9 +92,7 @@
+@@ -141,9 +80,7 @@
    #RelabelService: (_|_){
      // [eval]
      _params: (#struct){
@@ -341,7 +358,7 @@ diff old new
      }
      out: (_|_){
        // [eval]
-@@ -157,16 +106,10 @@
+@@ -157,16 +94,10 @@
      $_instances: (number){ |(*(int){ 1 }, (number){ >=0 }) }
    }
    #Deployment: (#struct){
@@ -372,17 +389,17 @@ diff old new
 -Reused: 108
 -Allocs: 25
 -Retain: 53
-+Leaks:  75
++Leaks:  77
 +Freed:  0
 +Reused: 0
-+Allocs: 75
++Allocs: 77
 +Retain: 0
  
 -Unifications: 107
 -Conjuncts:    243
 -Disjuncts:    170
-+Unifications: 62
-+Conjuncts:    120
++Unifications: 59
++Conjuncts:    95
 +Disjuncts:    8
 -- out/eval/stats --
 Leaks:  16

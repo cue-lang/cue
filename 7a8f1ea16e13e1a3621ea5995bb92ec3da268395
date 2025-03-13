@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "69956f78_fcdd040b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-13T12:18:27Z",
+      "side": 1,
+      "message": "I don\u0027t think that changing the grammar in a backwardly incompatible way for the sake of a better error message is worthwhile.",
+      "revId": "7a8f1ea16e13e1a3621ea5995bb92ec3da268395",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6fca47c_05fbc943",
+        "filename": "cue/scanner/scanner.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 677,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-13T12:18:27Z",
+      "side": 1,
+      "message": "I don\u0027t think this is OK. It makes currently valid CUE source such as `# : 1` into an error.\n\nI\u0027m not sure there\u0027s an easy win here tbh.",
+      "revId": "7a8f1ea16e13e1a3621ea5995bb92ec3da268395",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8d9832b_8226e043",
+        "filename": "cue/scanner/scanner_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-13T12:18:27Z",
+      "side": 1,
+      "message": "Why remove this test case? It seems rather important, given that `#` is in common use as a standalone identifier.",
+      "revId": "7a8f1ea16e13e1a3621ea5995bb92ec3da268395",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fb4fc11_b7383a50",
+        "filename": "internal/attrs_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-13T12:18:27Z",
+      "side": 1,
+      "message": "Again this seems like a backwards incompatible change that we shouldn\u0027t be doing.",
+      "revId": "7a8f1ea16e13e1a3621ea5995bb92ec3da268395",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

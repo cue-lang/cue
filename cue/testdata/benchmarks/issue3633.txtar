@@ -1,35 +1,4 @@
 #Issue: 3633
--- out/evalalpha/stats --
-Leaks:  41492
-Freed:  0
-Reused: 0
-Allocs: 41492
-Retain: 0
-
-Unifications: 4487
-Conjuncts:    54446
-Disjuncts:    29860
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,9 @@
--Leaks:  0
--Freed:  3595
--Reused: 3575
--Allocs: 20
-+Leaks:  41492
-+Freed:  0
-+Reused: 0
-+Allocs: 41492
- Retain: 0
- 
--Unifications: 885
--Conjuncts:    3846
--Disjuncts:    3595
-+Unifications: 4487
-+Conjuncts:    54446
-+Disjuncts:    29860
 -- out/eval/stats --
 Leaks:  0
 Freed:  3595

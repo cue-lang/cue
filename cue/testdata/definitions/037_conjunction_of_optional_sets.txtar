@@ -61,11 +61,9 @@ Disjuncts:    9
 -- out/evalalpha --
 Errors:
 c.aaa: field not allowed:
-    ./in.cue:5:18
     ./in.cue:2:2
     ./in.cue:9:11
 d.aaa: field not allowed:
-    ./in.cue:5:18
     ./in.cue:2:2
     ./in.cue:12:10
 
@@ -82,7 +80,6 @@ Result:
     // [eval]
     aaa: (_|_){
       // [eval] c.aaa: field not allowed:
-      //     ./in.cue:5:18
       //     ./in.cue:2:2
       //     ./in.cue:9:11
     }
@@ -93,7 +90,6 @@ Result:
     // [eval]
     aaa: (_|_){
       // [eval] d.aaa: field not allowed:
-      //     ./in.cue:5:18
       //     ./in.cue:2:2
       //     ./in.cue:12:10
     }
@@ -103,55 +99,45 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,18 +1,11 @@
+@@ -1,18 +1,9 @@
  Errors:
  c.aaa: field not allowed:
--    ./in.cue:2:2
+     ./in.cue:2:2
 -    ./in.cue:4:5
 -    ./in.cue:8:5
 -    ./in.cue:8:10
 -    ./in.cue:9:5
-+    ./in.cue:5:18
-+    ./in.cue:2:2
      ./in.cue:9:11
  d.aaa: field not allowed:
--    ./in.cue:2:2
+     ./in.cue:2:2
 -    ./in.cue:4:5
 -    ./in.cue:11:5
 -    ./in.cue:11:6
 -    ./in.cue:11:11
 -    ./in.cue:12:4
-+    ./in.cue:5:18
-+    ./in.cue:2:2
      ./in.cue:12:10
  
  Result:
-@@ -28,11 +21,8 @@
-     // [eval]
+@@ -29,10 +20,6 @@
      aaa: (_|_){
        // [eval] c.aaa: field not allowed:
--      //     ./in.cue:2:2
+       //     ./in.cue:2:2
 -      //     ./in.cue:4:5
 -      //     ./in.cue:8:5
 -      //     ./in.cue:8:10
 -      //     ./in.cue:9:5
-+      //     ./in.cue:5:18
-+      //     ./in.cue:2:2
        //     ./in.cue:9:11
      }
    }
-@@ -42,12 +32,8 @@
-     // [eval]
+@@ -43,11 +30,6 @@
      aaa: (_|_){
        // [eval] d.aaa: field not allowed:
--      //     ./in.cue:2:2
+       //     ./in.cue:2:2
 -      //     ./in.cue:4:5
 -      //     ./in.cue:11:5
 -      //     ./in.cue:11:6
 -      //     ./in.cue:11:11
 -      //     ./in.cue:12:4
-+      //     ./in.cue:5:18
-+      //     ./in.cue:2:2
        //     ./in.cue:12:10
      }
    }

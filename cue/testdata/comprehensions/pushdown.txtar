@@ -871,36 +871,22 @@ issue3708: {
 		people: bob: name: "Bob"
 	}
 }
--- out/evalalpha/stats --
-Leaks:  513
-Freed:  2
-Reused: 2
-Allocs: 513
-Retain: 0
-
-Unifications: 489
-Conjuncts:    2982
-Disjuncts:    22
 -- out/evalalpha --
 Errors:
-noStackOverflowStructCycle.#list.tail: structural cycle
-noStackOverflowStructCycle.list.tail: structural cycle
 embed.fail1.p: field not allowed:
-    ./in.cue:46:7
     ./in.cue:46:4
     ./in.cue:49:9
 embed.fail4.p: field not allowed:
-    ./in.cue:87:10
     ./in.cue:87:4
+issue3535.regular.foo.regular: field not allowed:
+    ./issue3535.cue:22:4
+noStackOverflowStructCycle.#list.tail: structural cycle
+noStackOverflowStructCycle.list.tail: structural cycle
+structShare.err1.x.d.e: field not allowed:
+    ./in.cue:591:9
 fieldMismatch.a: cannot combine regular field "x" with 2:
     ./in.cue:152:7
     ./in.cue:150:3
-structShare.err1.x.d.e: field not allowed:
-    ./in.cue:591:12
-    ./in.cue:591:9
-issue3535.regular.foo.regular: field not allowed:
-    ./issue3535.cue:22:13
-    ./issue3535.cue:22:4
 
 Result:
 (_|_){
@@ -952,7 +938,6 @@ Result:
       // [eval]
       p: (_|_){
         // [eval] embed.fail1.p: field not allowed:
-        //     ./in.cue:46:7
         //     ./in.cue:46:4
         //     ./in.cue:49:9
       }
@@ -981,9 +966,11 @@ Result:
       // [eval]
       p: (_|_){
         // [eval] embed.fail4.p: field not allowed:
-        //     ./in.cue:87:10
         //     ./in.cue:87:4
-        q: (int){ 1 }
+        q: (_|_){
+          // [eval] embed.fail4.p.q: field not allowed:
+          //     ./in.cue:87:7
+        }
       }
     }
     #C4: (#struct){
@@ -1399,7 +1386,6 @@ Result:
           // [eval]
           e: (_|_){
             // [eval] structShare.err1.x.d.e: field not allowed:
-            //     ./in.cue:591:12
             //     ./in.cue:591:9
           }
         }
@@ -1543,7 +1529,6 @@ Result:
         kind: (string){ "foo" }
         regular: (_|_){
           // [eval] issue3535.regular.foo.regular: field not allowed:
-          //     ./issue3535.cue:22:13
           //     ./issue3535.cue:22:4
         }
         output: (#struct){
@@ -1637,16 +1622,13 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,39 +1,22 @@
+@@ -1,35 +1,14 @@
  Errors:
-+noStackOverflowStructCycle.#list.tail: structural cycle
-+noStackOverflowStructCycle.list.tail: structural cycle
  embed.fail1.p: field not allowed:
 -    ./in.cue:37:9
 -    ./in.cue:38:7
 -    ./in.cue:45:3
 -    ./in.cue:45:12
-+    ./in.cue:46:7
      ./in.cue:46:4
      ./in.cue:49:9
  embed.fail4.p: field not allowed:
@@ -1654,40 +1636,29 @@ diff old new
 -    ./in.cue:83:7
 -    ./in.cue:84:9
 -    ./in.cue:85:3
-+    ./in.cue:87:10
      ./in.cue:87:4
--issue3535.regular.foo.regular: field not allowed:
+ issue3535.regular.foo.regular: field not allowed:
 -    ./issue3535.cue:15:6
 -    ./issue3535.cue:19:7
 -    ./issue3535.cue:19:12
 -    ./issue3535.cue:21:3
--    ./issue3535.cue:22:4
+     ./issue3535.cue:22:4
 -    ./issue3535.cue:25:7
--noStackOverflowStructCycle.#list.tail: structural cycle
--noStackOverflowStructCycle.list.tail: structural cycle
+ noStackOverflowStructCycle.#list.tail: structural cycle
+ noStackOverflowStructCycle.list.tail: structural cycle
 -provideIncompleteSuccess.t2.a.c.d: field not allowed:
 -    ./in.cue:200:7
 -    ./in.cue:202:4
 -    ./in.cue:203:8
 -    ./in.cue:208:7
--structShare.err1.x.d.e: field not allowed:
+ structShare.err1.x.d.e: field not allowed:
 -    ./in.cue:588:15
 -    ./in.cue:589:9
 -    ./in.cue:590:2
--    ./in.cue:591:9
+     ./in.cue:591:9
  fieldMismatch.a: cannot combine regular field "x" with 2:
      ./in.cue:152:7
-     ./in.cue:150:3
-+structShare.err1.x.d.e: field not allowed:
-+    ./in.cue:591:12
-+    ./in.cue:591:9
-+issue3535.regular.foo.regular: field not allowed:
-+    ./issue3535.cue:22:13
-+    ./issue3535.cue:22:4
- 
- Result:
- (_|_){
-@@ -75,8 +58,8 @@
+@@ -75,8 +54,8 @@
    }
    fail: (struct){
      a: (_|_){
@@ -1698,7 +1669,7 @@ diff old new
      }
    }
    embed: (_|_){
-@@ -85,10 +68,7 @@
+@@ -85,10 +64,6 @@
        // [eval]
        p: (_|_){
          // [eval] embed.fail1.p: field not allowed:
@@ -1706,11 +1677,10 @@ diff old new
 -        //     ./in.cue:38:7
 -        //     ./in.cue:45:3
 -        //     ./in.cue:45:12
-+        //     ./in.cue:46:7
          //     ./in.cue:46:4
          //     ./in.cue:49:9
        }
-@@ -117,10 +97,7 @@
+@@ -117,12 +92,11 @@
        // [eval]
        p: (_|_){
          // [eval] embed.fail4.p: field not allowed:
@@ -1718,11 +1688,16 @@ diff old new
 -        //     ./in.cue:83:7
 -        //     ./in.cue:84:9
 -        //     ./in.cue:85:3
-+        //     ./in.cue:87:10
          //     ./in.cue:87:4
-         q: (int){ 1 }
+-        q: (int){ 1 }
++        q: (_|_){
++          // [eval] embed.fail4.p.q: field not allowed:
++          //     ./in.cue:87:7
++        }
        }
-@@ -194,8 +171,7 @@
+     }
+     #C4: (#struct){
+@@ -194,8 +168,7 @@
        // [structural cycle] noStackOverflowStructCycle.list.tail: structural cycle
      }
    }
@@ -1732,7 +1707,7 @@ diff old new
      t1: (struct){
        #a: (_|_){
          // [incomplete] provideIncompleteSuccess.t1.#a: incomplete bool: bool:
-@@ -203,16 +179,12 @@
+@@ -203,16 +176,12 @@
          b: (bool){ bool }
        }
        x: (#struct){
@@ -1755,7 +1730,7 @@ diff old new
        #a: (#struct){
          c: (int){ 4 }
          b: (bool){ true }
-@@ -219,17 +191,8 @@
+@@ -219,17 +188,8 @@
        }
        #c: (#struct){
        }
@@ -1775,7 +1750,7 @@ diff old new
          }
          b: (bool){ true }
        }
-@@ -259,9 +222,22 @@
+@@ -259,9 +219,22 @@
    }
    cyclicError: (struct){
      a: (_|_){
@@ -1801,7 +1776,7 @@ diff old new
      }
    }
    midwayReferences: (struct){
-@@ -275,24 +251,9 @@
+@@ -275,24 +248,9 @@
          }
        }
      }
@@ -1829,7 +1804,7 @@ diff old new
    }
    closedCheck: (struct){
      success1: (struct){
-@@ -395,13 +356,7 @@
+@@ -395,13 +353,7 @@
            }
          }
        }
@@ -1844,7 +1819,7 @@ diff old new
        #F: (#struct){
          e: (bool){ bool }
          f: (_|_){
-@@ -418,17 +373,11 @@
+@@ -418,17 +370,11 @@
          }
        }
        E: (_|_){
@@ -1863,7 +1838,7 @@ diff old new
        }
      }
      derefDisj2: (struct){
-@@ -439,17 +388,11 @@
+@@ -439,17 +385,11 @@
          }
        }
        E: (_|_){
@@ -1882,18 +1857,17 @@ diff old new
        }
      }
      bulk1: (struct){
-@@ -572,9 +515,7 @@
+@@ -572,9 +512,6 @@
            // [eval]
            e: (_|_){
              // [eval] structShare.err1.x.d.e: field not allowed:
 -            //     ./in.cue:588:15
 -            //     ./in.cue:589:9
 -            //     ./in.cue:590:2
-+            //     ./in.cue:591:12
              //     ./in.cue:591:9
            }
          }
-@@ -598,13 +539,13 @@
+@@ -598,13 +535,13 @@
        }
        envs: (struct){
          e1: (#struct){
@@ -1911,7 +1885,7 @@ diff old new
          }
        }
      }
-@@ -641,9 +582,8 @@
+@@ -641,9 +578,8 @@
      _c: (struct){
        y: (int){ 1 }
      }
@@ -1923,7 +1897,7 @@ diff old new
      }
    }
    errorPropagation: (_|_){
-@@ -701,10 +641,10 @@
+@@ -701,10 +637,10 @@
        }
        foo: (#struct){
          kind: (string){ "foo" }
@@ -1936,7 +1910,7 @@ diff old new
        }
      }
      regular: (_|_){
-@@ -717,16 +657,12 @@
+@@ -717,16 +653,11 @@
        foo: (_|_){
          // [eval]
          kind: (string){ "foo" }
@@ -1948,7 +1922,6 @@ diff old new
 -          //     ./issue3535.cue:19:7
 -          //     ./issue3535.cue:19:12
 -          //     ./issue3535.cue:21:3
-+          //     ./issue3535.cue:22:13
            //     ./issue3535.cue:22:4
 -          //     ./issue3535.cue:25:7
 +        }
@@ -1956,7 +1929,7 @@ diff old new
          }
        }
      }
-@@ -738,10 +674,10 @@
+@@ -738,10 +669,10 @@
        }
        foo: (#struct){
          kind: (string){ "foo" }
@@ -1969,38 +1942,16 @@ diff old new
        }
      }
    }
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,9 @@
--Leaks:  15
--Freed:  394
--Reused: 388
--Allocs: 21
--Retain: 100
-+Leaks:  513
-+Freed:  2
-+Reused: 2
-+Allocs: 513
-+Retain: 0
- 
--Unifications: 395
--Conjuncts:    636
--Disjuncts:    464
-+Unifications: 489
-+Conjuncts:    2982
-+Disjuncts:    22
 -- out/eval/stats --
 Leaks:  17
-Freed:  474
-Reused: 467
+Freed:  476
+Reused: 469
 Allocs: 24
 Retain: 104
 
-Unifications: 475
+Unifications: 477
 Conjuncts:    756
-Disjuncts:    548
+Disjuncts:    550
 -- diff/todo/p2 --
 provideIncompleteSuccess.t2.a.c.d: missing error: probably correct.
    A bit esoteric, but should probably work.

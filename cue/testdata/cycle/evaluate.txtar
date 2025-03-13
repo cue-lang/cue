@@ -115,6 +115,38 @@ printCycle: {
 		}
 	}
 }
+-- out/evalalpha/stats --
+Leaks:  113
+Freed:  0
+Reused: 0
+Allocs: 113
+Retain: 0
+
+Unifications: 97
+Conjuncts:    130
+Disjuncts:    5
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  48
+-Freed:  127
+-Reused: 120
+-Allocs: 55
+-Retain: 138
++Leaks:  113
++Freed:  0
++Reused: 0
++Allocs: 113
++Retain: 0
+ 
+-Unifications: 163
+-Conjuncts:    299
+-Disjuncts:    192
++Unifications: 97
++Conjuncts:    130
++Disjuncts:    5
 -- out/eval/stats --
 Leaks:  48
 Freed:  127
@@ -128,6 +160,9 @@ Disjuncts:    192
 -- out/evalalpha --
 Errors:
 closeCycle.c: structural cycle
+closeFail.x.b: field not allowed:
+    ./in.cue:104:6
+    ./in.cue:107:5
 letCycleFail.t1.a.c: structural cycle
 printCycle.a.X: structural cycle
 structCycle.c: structural cycle
@@ -142,10 +177,6 @@ listAddCycle.c: structural cycle:
     ./in.cue:91:5
 listMulCycle.c: structural cycle:
     ./in.cue:97:5
-closeFail.x.b: field not allowed:
-    ./in.cue:105:6
-    ./in.cue:104:6
-    ./in.cue:107:5
 
 Result:
 (_|_){
@@ -319,7 +350,6 @@ Result:
       // [eval]
       b: (_|_){
         // [eval] closeFail.x.b: field not allowed:
-        //     ./in.cue:105:6
         //     ./in.cue:104:6
         //     ./in.cue:107:5
       }
@@ -340,16 +370,16 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,33 +1,23 @@
+@@ -1,33 +1,22 @@
  Errors:
 -closeCycle.a: structural cycle
 -closeCycle.b.d: structural cycle
--closeFail.x.b: field not allowed:
--    ./in.cue:104:6
++closeCycle.c: structural cycle
+ closeFail.x.b: field not allowed:
+     ./in.cue:104:6
 -    ./in.cue:105:12
 -    ./in.cue:106:6
--    ./in.cue:107:5
-+closeCycle.c: structural cycle
+     ./in.cue:107:5
  letCycleFail.t1.a.c: structural cycle
 -structCycle.a: structural cycle
 -structCycle.b.d: structural cycle
@@ -380,14 +410,10 @@ diff old new
 +    ./in.cue:91:5
 +listMulCycle.c: structural cycle:
 +    ./in.cue:97:5
-+closeFail.x.b: field not allowed:
-+    ./in.cue:105:6
-+    ./in.cue:104:6
-+    ./in.cue:107:5
  
  Result:
  (_|_){
-@@ -65,14 +55,9 @@
+@@ -65,14 +54,9 @@
      }
      t2: (struct){
        a: (struct){
@@ -405,7 +431,7 @@ diff old new
          }
          x: (struct){
            y: (string){ "" }
-@@ -88,17 +73,17 @@
+@@ -88,17 +72,17 @@
    disjunctionCycle: (_|_){
      // [eval]
      a: (_|_){
@@ -434,7 +460,7 @@ diff old new
        //     ./in.cue:56:5
        //     ./in.cue:56:9
      }
-@@ -124,80 +109,77 @@
+@@ -124,80 +108,77 @@
      }
      b: (struct){
      }
@@ -564,14 +590,13 @@ diff old new
      }
    }
    closeFail: (_|_){
-@@ -207,21 +189,22 @@
+@@ -207,21 +188,21 @@
      }
      x: (_|_){
        // [eval]
 -      a: (string){ string }
        b: (_|_){
          // [eval] closeFail.x.b: field not allowed:
-+        //     ./in.cue:105:6
          //     ./in.cue:104:6
 -        //     ./in.cue:105:12
 -        //     ./in.cue:106:6

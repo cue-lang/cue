@@ -61,6 +61,21 @@ func TestAPI(t *testing.T) {
 	}{{
 		// Issue #567
 		input: `
+		#runSpec: {action: int}
+
+		v: {ction: 1}
+				`,
+		fun: func(i cue.Value) cue.Value {
+			runSpec := i.LookupDef("#runSpec")
+			v := i.Lookup("v")
+
+			res := runSpec.Unify(v)
+			return res
+		},
+		want: "_|_ // #runSpec.ction: field not allowed",
+	}, {
+		// Issue #567
+		input: `
 		#runSpec: {action: foo: int}
 
 		v: {ction: foo: 1}
@@ -72,8 +87,6 @@ func TestAPI(t *testing.T) {
 			return res
 		},
 		want: "_|_ // #runSpec.ction: field not allowed",
-
-		skip: true,
 	}, {
 		// Issue #567
 		input: `
@@ -138,7 +151,8 @@ func TestAPI(t *testing.T) {
 		if tc.skip {
 			continue
 		}
-		cuetdtest.FullMatrix.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
+		m := cuetdtest.FullMatrix
+		m.Run(t, "", func(t *testing.T, m *cuetdtest.M) {
 			ctx := m.CueContext()
 
 			valIn := mustCompile(t, ctx, tc.input)

@@ -58,6 +58,38 @@ output: {
 	"1": (datastream & {marker: length: 4}).marker.position
 	"2": (datastream & {marker: length: 14}).marker.position
 }
+-- out/evalalpha/stats --
+Leaks:  449
+Freed:  0
+Reused: 0
+Allocs: 449
+Retain: 0
+
+Unifications: 377
+Conjuncts:    1333
+Disjuncts:    8
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  90
+-Freed:  684
+-Reused: 680
+-Allocs: 94
+-Retain: 1359
++Leaks:  449
++Freed:  0
++Reused: 0
++Allocs: 449
++Retain: 0
+ 
+-Unifications: 766
+-Conjuncts:    3242
+-Disjuncts:    1409
++Unifications: 377
++Conjuncts:    1333
++Disjuncts:    8
 -- out/eval/stats --
 Leaks:  90
 Freed:  684

@@ -100,9 +100,6 @@ func (n *nodeContext) addShared(id CloseInfo) {
 	// such a count should not hurt performance, as a shared node is completed
 	// anyway.
 	n.sharedIDs = append(n.sharedIDs, id)
-	if id.cc != nil {
-		id.cc.incDependent(n.ctx, SHARED, n.node.cc())
-	}
 }
 
 func (n *nodeContext) decSharedIDs() {
@@ -111,9 +108,7 @@ func (n *nodeContext) decSharedIDs() {
 	}
 	n.shareDecremented = true
 	for _, id := range n.sharedIDs {
-		if cc := id.cc; cc != nil {
-			cc.decDependent(n.ctx, SHARED, n.node.cc())
-		}
+		n.updateConjunctInfo(n.node.Kind(), id, 0)
 	}
 }
 

@@ -140,10 +140,14 @@ func OpenNodeGraph(title, path, code, out, graph string) {
 // and all its dependencies that have not completed processing.
 // DO NOT DELETE: this is used to insert during debugging of the evaluator
 // to inspect a node.
-func openDebugGraph(ctx *OpContext, cc *closeContext, name string) {
-	v := cc.src
+func openDebugGraph(ctx *OpContext, v *Vertex, name string) {
+	if !OpenGraphs {
+		return
+	}
 	graph, _ := CreateMermaidGraph(ctx, v, true)
-	path := filepath.Join(".debug", "TestX", name, fmt.Sprintf("%p", cc))
+	path := filepath.Join(".debug", "TestX", name, fmt.Sprintf("%v", v.Path()))
+	// println(graph)
+	// panic("")
 	OpenNodeGraph(name, path, "in", "out", graph)
 }
 
@@ -156,20 +160,10 @@ type mermaidContext struct {
 
 	hasError bool
 
-	// roots maps the root closeContext of any Vertex to the analysis data
-	// for that Vertex.
-	roots map[*closeContext]*mermaidVertex
+	refRoot map[defID]*mermaidVertex
 
-	// processed indicates whether the node in question has been processed
-	// by the dependency analysis.
-	processed map[*closeContext]bool
-
-	// inConjuncts indicates whether a node is explicitly referenced by
-	// a Conjunct. These nodes are visualized with an additional circle.
-	inConjuncts map[*closeContext]bool
-
-	// ccID maps a closeContext to a unique ID.
-	ccID map[*closeContext]string
+	// roots maps a Vertex to the analysis data for that Vertex.
+	roots map[*Vertex]*mermaidVertex
 
 	w io.Writer
 
@@ -179,10 +173,12 @@ type mermaidContext struct {
 }
 
 type mermaidVertex struct {
-	f     Feature
-	w     *bytes.Buffer
-	tasks *bytes.Buffer
-	intra *bytes.Buffer
+	vertex    *Vertex
+	f         Feature
+	w         *bytes.Buffer
+	tasks     *bytes.Buffer
+	intra     *bytes.Buffer
+	processed bool
 }
 
 // CreateMermaidGraph creates an analysis of relations and values involved in
@@ -195,14 +191,11 @@ func CreateMermaidGraph(ctx *OpContext, v *Vertex, all bool) (graph string, hasE
 	buf := &strings.Builder{}
 
 	m := &mermaidContext{
-		ctx:         ctx,
-		v:           v,
-		roots:       map[*closeContext]*mermaidVertex{},
-		processed:   map[*closeContext]bool{},
-		inConjuncts: map[*closeContext]bool{},
-		ccID:        map[*closeContext]string{},
-		w:           buf,
-		all:         all,
+		ctx:   ctx,
+		v:     v,
+		roots: map[*Vertex]*mermaidVertex{},
+		w:     buf,
+		all:   all,
 	}
 
 	io.WriteString(m.w, "graph TD\n")
@@ -213,17 +206,32 @@ func CreateMermaidGraph(ctx *OpContext, v *Vertex, all bool) (graph string, hasE
 	fmt.Fprintf(m.w, "style %s stroke-width:5\n\n", m.vertexID(v))
 	// Trigger descent on first vertex. This may include other vertices when
 	// traversing closeContexts if they have dependencies on such vertices.
-	m.vertex(v)
+	m.vertex(v, true)
 
-	// Close and flush all collected vertices.
-	for i, v := range m.vertices {
-		v.closeVertex()
-		if i == 0 || len(m.ccID) > 0 {
-			m.w.Write(v.w.Bytes())
+	// get parent context, if there is relevant closedness information.
+	root := v.Parent
+	for p := root; p != nil; p = p.Parent {
+		n := p.state
+		if n == nil {
+			continue
+		}
+		if len(n.reqDefIDs) > 0 {
+			root = p.Parent
 		}
 	}
+	for p := v.Parent; p != root; p = p.Parent {
+		m.vertex(p, true) // only render relevant child
+	}
 
-	return buf.String(), m.hasError
+	// Close and flush all collected vertices.
+	for _, v := range m.vertices {
+		v.closeVertex()
+		m.w.Write(v.w.Bytes())
+	}
+
+	s := buf.String()
+
+	return s, m.hasError
 }
 
 // vertex creates a blob of Mermaid graph representing one vertex. It has
@@ -261,24 +269,21 @@ func CreateMermaidGraph(ctx *OpContext, v *Vertex, all bool) (graph string, hasE
 //	 A vertex has the following name: path(v); done
 //
 //	 Each closeContext has the following info: ptr(cc); cc.count
-func (m *mermaidContext) vertex(v *Vertex) *mermaidVertex {
-	root := v.getRootCloseContext(m.ctx)
-
-	vc := m.roots[root]
+func (m *mermaidContext) vertex(v *Vertex, recursive bool) *mermaidVertex {
+	vc := m.roots[v]
 	if vc != nil {
 		return vc
 	}
 
 	vc = &mermaidVertex{
-		f:     v.Label,
-		w:     &bytes.Buffer{},
-		intra: &bytes.Buffer{},
+		vertex: v,
+		f:      v.Label,
+		w:      &bytes.Buffer{},
+		intra:  &bytes.Buffer{},
 	}
 	m.vertices = append(m.vertices, vc)
 
-	m.tagReferencedConjuncts(v.Conjuncts)
-
-	m.roots[root] = vc
+	m.roots[v] = vc
 	w := vc.w
 
 	var status string
@@ -298,19 +303,9 @@ func (m *mermaidContext) vertex(v *Vertex) *mermaidVertex {
 	indentOnNewline(w, 1)
 	fmt.Fprintf(w, "subgraph %s[%s: %s]\n", m.vertexID(v), path, status)
 
-	m.cc(root)
+	m.vertexInfo(vc, recursive)
 
 	return vc
-}
-
-func (m *mermaidContext) tagReferencedConjuncts(a []Conjunct) {
-	for _, c := range a {
-		m.inConjuncts[c.CloseInfo.cc] = true
-
-		if g, ok := c.x.(*ConjunctGroup); ok {
-			m.tagReferencedConjuncts([]Conjunct(*g))
-		}
-	}
 }
 
 func (v *mermaidVertex) closeVertex() {
@@ -325,14 +320,11 @@ func (v *mermaidVertex) closeVertex() {
 	// TODO: write all notification sources (or is this just the node?)
 
 	indent(w, 1)
-	fmt.Fprintf(w, "end\n")
+	fmt.Fprintf(w, "\nend\n")
 }
 
-func (m *mermaidContext) task(d *ccDep) string {
-	v := d.dependency.src
-
-	// This must already exist.
-	vc := m.vertex(v)
+func (m *mermaidContext) task(vc *mermaidVertex, t *task, id int) string {
+	v := vc.vertex
 
 	if vc.tasks == nil {
 		vc.tasks = &bytes.Buffer{}
@@ -340,20 +332,20 @@ func (m *mermaidContext) task(d *ccDep) string {
 		fmt.Fprintf(vc.tasks, "subgraph %s_tasks[tasks]\n", m.vertexID(v))
 	}
 
-	if d.task != nil && v != d.task.node.node {
+	if t != nil && v != t.node.node {
 		panic("inconsistent task")
 	}
-	taskID := fmt.Sprintf("%s_%d", m.vertexID(v), d.taskID)
+	taskID := fmt.Sprintf("%s_%d", m.vertexID(v), id)
 	var state string
 	var completes condition
 	var kind string
-	if d.task != nil {
-		state = d.task.state.String()[:2]
-		completes = d.task.completes
-		kind = d.task.run.name
+	if t != nil {
+		state = t.state.String()[:2]
+		completes = t.completes
+		kind = t.run.name
 	}
 	indentOnNewline(vc.tasks, 3)
-	fmt.Fprintf(vc.tasks, "%s(%d", taskID, d.taskID)
+	fmt.Fprintf(vc.tasks, "%s(%d", taskID, id)
 	indentOnNewline(vc.tasks, 4)
 	io.WriteString(vc.tasks, state)
 	indentOnNewline(vc.tasks, 4)
@@ -361,80 +353,126 @@ func (m *mermaidContext) task(d *ccDep) string {
 	indentOnNewline(vc.tasks, 4)
 	fmt.Fprintf(vc.tasks, "%x)\n", completes)
 
-	if s := d.task.blockedOn; s != nil {
-		m.vertex(s.node.node)
+	if s := t.blockedOn; s != nil {
+		m.vertex(s.node.node, false)
 		fmt.Fprintf(m.w, "%s_tasks == BLOCKED ==> %s\n", m.vertexID(s.node.node), taskID)
 	}
 
 	return taskID
 }
 
-func (m *mermaidContext) cc(cc *closeContext) {
-	if m.processed[cc] {
+func (m *mermaidContext) vertexInfo(vc *mermaidVertex, recursive bool) {
+	if vc.processed {
 		return
 	}
-	m.processed[cc] = true
+	vc.processed = true
+
+	v := vc.vertex
 
 	// This must already exist.
-	v := m.vertex(cc.src)
 
 	// Dependencies at different scope levels.
 	global := m.w
-	node := v.w
+	node := vc.w
 
-	for _, d := range cc.dependencies {
-		indentLevel := 2
-		var w io.Writer
-		var name, link string
-
-		switch {
-		case !d.decremented:
-			link = fmt.Sprintf(`--%s-->`, d.kind.String())
-		case m.all:
-			link = fmt.Sprintf("-. %s .->", d.kind.String()[0:1])
-		default:
-			continue
+	if s := v.state; s != nil {
+		for i, t := range s.tasks {
+			taskID := m.task(vc, t, i)
+			name := fmt.Sprintf("%s((%d))", taskID, 1)
+			_ = name
+			// 		dst := m.pstr(cc)
+			// 		indent(w, indentLevel)
+			// 		fmt.Fprintf(w, "%s %s %s\n", name, link, dst)
 		}
+	}
 
-		// Only include still outstanding nodes.
-		switch d.kind {
-		case PARENT:
-			w = node
-			name = m.pstr(d.dependency)
-		case EVAL, ARC, NOTIFY, DISJUNCT, COMP:
-			w = global
-			indentLevel = 1
-			name = m.pstr(d.dependency)
-
-		case TASK:
-			w = node
-			taskID := "disjunct"
-			if d.task != nil {
-				taskID = m.task(d)
+	indentOnNewline(node, 2)
+	if n := v.state; n != nil {
+		for i, d := range n.reqDefIDs {
+			indentOnNewline(node, 2)
+			var id any = d.id
+			if d.v != nil && d.v.ClosedNonRecursive && d.id == 0 {
+				id = "once"
 			}
-			name = fmt.Sprintf("%s((%d))", taskID, d.taskID)
-		case ROOT, INIT, SHARED:
-			w = node
-			src := cc.src
-			if v.f != src.Label {
-				panic("incompatible labels")
+			reqID := fmt.Sprintf("%s_req_%d", m.vertexID(v), i)
+			arrow := "%s == R ==> %s\n"
+			format := "%s((%d%s))\n"
+			if d.ignore {
+				arrow = "%s -. R .-> %s\n"
+				format = "%s((<s><i>%d%si</i></s>))\n"
 			}
-			name = fmt.Sprintf("root_%s", m.vertexID(src))
+			flags := ""
+			if d.placeholder {
+				flags += "S"
+			}
+			if d.exclude != 0 {
+				flags += fmt.Sprintf("-%d", d.exclude)
+			}
+
+			fmt.Fprintf(node, format, reqID, id, flags)
+			m.vertex(d.v, false)
+			fmt.Fprintf(global, arrow, reqID, m.vertexID(d.v))
 		}
+		indentOnNewline(node, 2)
 
-		if w != nil {
-			dst := m.pstr(cc)
-			indent(w, indentLevel)
-			fmt.Fprintf(w, "%s %s %s\n", name, link, dst)
+		// fmt.Fprintf(node, "subgraph %s_conjuncts[conjunctInfo]\n", m.vertexID(v))
+		fmt.Fprintf(node, "subgraph %s_conjuncts[conjuncts]\n", m.vertexID(v))
+		for i, conj := range n.conjunctInfo {
+			indentOnNewline(node, 3)
+			kind := conj.kind.String()
+			if kind == "_|_" {
+				kind = "error"
+			}
+			x := conj.flags
+			flags := ""
+			if x != 0 {
+				flags = " "
+			}
+			if x&cHasTop != 0 {
+				flags += "_"
+			}
+			if x&cHasStruct != 0 {
+				flags += "s"
+			}
+			if x&cHasEllipsis != 0 {
+				flags += "."
+			}
+			if x&cHasOpenValidator != 0 {
+				flags += "o"
+			}
+			fmt.Fprintf(node, "%s_conj_%d((%v\n%d%s))", m.vertexID(v), i, kind, conj.id, flags)
 		}
+		indentOnNewline(node, 2)
+		fmt.Fprintln(node, "end")
 
-		// If the references count is 0, all direct dependencies must have
-		// completed as well. In this case, descending into each of them should
-		// not end up printing anything. In case of any bugs, these nodes will
-		// show up as unattached nodes.
+		if len(n.replaceIDs) > 0 {
+			fmt.Fprintf(node, "subgraph %s_drop[replace]\n", m.vertexID(v))
+			for i, r := range n.replaceIDs {
+				indentOnNewline(node, 3)
+				dropID := fmt.Sprintf("%s_drop_%d", m.vertexID(v), i)
+				flags := ""
+				if r.add {
+					flags = "+"
+				}
+				if r.headOnly {
+					flags += "H"
+				}
+				fmt.Fprintf(node, "%s((%d->%d%s))\n", dropID, r.from, r.to, flags)
+			}
+			indentOnNewline(node, 2)
+			// fmt.Fprintf(node, "end\n")
+			fmt.Fprintln(node, "end")
+		}
+	}
 
-		if dep := d.dependency; dep != nil && dep != cc {
-			m.cc(dep)
+	if v.Parent != nil {
+		m.vertex(v.Parent, false) // ensure the arc is also processed
+		indentOnNewline(node, 2)
+		fmt.Fprintf(global, "%s --> %s\n", m.vertexID(v.Parent), m.vertexID(v))
+	}
+	if recursive {
+		for _, arc := range v.Arcs {
+			m.vertex(arc, true) // ensure the arc is also processed
 		}
 	}
 }
@@ -452,78 +490,6 @@ const sigPtrLen = 6
 func (m *mermaidContext) vertexID(v *Vertex) string {
 	s := fmt.Sprintf("%p", v)
 	return "v" + s[len(s)-sigPtrLen:]
-}
-
-func (m *mermaidContext) pstr(cc *closeContext) string {
-	if id, ok := m.ccID[cc]; ok {
-		return id
-	}
-
-	ptr := fmt.Sprintf("%p", cc)
-	ptr = ptr[len(ptr)-sigPtrLen:]
-	id := fmt.Sprintf("cc%s", ptr)
-	m.ccID[cc] = id
-
-	v := m.vertex(cc.src)
-
-	w := v.w
-
-	indent(w, 2)
-	w.WriteString(id)
-
-	var open, close = "((", "))"
-	if m.inConjuncts[cc] {
-		open, close = "(((", ")))"
-	}
-
-	w.WriteString(open)
-	w.WriteString("cc")
-	if cc.conjunctCount > 0 {
-		fmt.Fprintf(w, " c:%d: d:%d", cc.conjunctCount, cc.disjunctCount)
-	}
-	indentOnNewline(w, 3)
-	w.WriteString(ptr)
-
-	flags := &bytes.Buffer{}
-	addFlag := func(test bool, flag byte) {
-		if test {
-			flags.WriteByte(flag)
-		}
-	}
-	addFlag(cc.isDefOrig, '#')
-	addFlag(cc.isEmbed, 'E')
-	addFlag(cc.isClosed, 'c')
-	addFlag(cc.isClosedOnce, 'C')
-	addFlag(cc.isTotal, 'o')
-	flags.WriteByte(cc.arcType.String()[0])
-	io.Copy(w, flags)
-
-	// Show the origin of the closeContext.
-	indentOnNewline(w, 3)
-	fmt.Fprintf(w, "+%d", cc.depth)
-	if cc.holeID != 0 {
-		fmt.Fprintf(w, " H%d", cc.holeID)
-	}
-
-	w.WriteString(close)
-
-	switch {
-	case cc.conjunctCount == 0:
-	case cc.conjunctCount <= cc.disjunctCount:
-		// TODO: Extra checks for disjunctions?
-		// E.g.: cc.src is not a disjunction
-	default:
-		// If cc.conjunctCount > cc.disjunctCount.
-		// TODO: count the number of non-decremented DISJUNCT dependencies.
-		fmt.Fprintf(w, ":::err")
-		if cc.src == m.v {
-			m.hasError = true
-		}
-	}
-
-	w.WriteString("\n")
-
-	return id
 }
 
 func indentOnNewline(w io.Writer, level int) {

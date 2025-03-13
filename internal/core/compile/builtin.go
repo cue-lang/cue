@@ -99,8 +99,12 @@ var closeBuiltin = &adt.Builtin{
 			// accomplish signaling vertex should be closed. In most cases, it
 			// would suffice to set IsClosed in the CloseInfo. However, that
 			// does not cover all code paths. Consider simplifying this.
-			v = c.Wrap(s, c.CloseInfo())
-			v.ClosedNonRecursive = true
+			ci := c.CloseInfo()
+			ci.IsClosed = true
+			// v = c.Wrap(s, ci)
+			c.UpdateCloseInfo(ci)
+			// v.ClosedNonRecursive = true
+			return s
 		} else {
 			if m, ok := s.BaseValue.(*adt.StructMarker); ok && m.NeedClose {
 				return s

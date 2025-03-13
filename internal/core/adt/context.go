@@ -102,6 +102,8 @@ type OpContext struct {
 
 	nest int
 
+	nextDefID defID
+
 	stats        stats.Counts
 	freeListNode *nodeContext
 
@@ -193,7 +195,8 @@ type OpContext struct {
 	disjunctStack []disjunctInfo // stack of disjunct IDs
 }
 
-func (c *OpContext) CloseInfo() CloseInfo { return c.ci }
+func (c *OpContext) CloseInfo() CloseInfo         { return c.ci }
+func (c *OpContext) UpdateCloseInfo(ci CloseInfo) { c.ci = ci }
 
 func (n *nodeContext) skipNonMonotonicChecks() bool {
 	if n.ctx.inConstraint > 0 {

@@ -71,10 +71,6 @@ func (n *nodeContext) insertListEllipsis(offset int, ellipsis Conjunct) {
 // closeContext will be collated properly in fields to which these constraints
 // are applied.
 func (n *nodeContext) insertConstraint(pattern Value, c Conjunct) bool {
-	if c.CloseInfo.cc == nil {
-		panic("constraint conjunct must have closeContext associated with it")
-	}
-
 	ctx := n.ctx
 	v := n.node
 
@@ -104,8 +100,9 @@ func (n *nodeContext) insertConstraint(pattern Value, c Conjunct) bool {
 	} else {
 		found := false
 		constraint.VisitLeafConjuncts(func(x Conjunct) bool {
-			if c.CloseInfo.cc == x.CloseInfo.cc && c.x == x.x {
+			if c.x == x.x {
 				found = true
+				// XXX: need to reroute conjunct here?
 				return false
 			}
 			return true

@@ -1431,7 +1431,7 @@ explicitClose.err1.out.a: invalid value {baz:"notAllowed"} (does not satisfy mat
     ./closedness.cue:33:13
     ./closedness.cue:36:6
 explicitClose.err1.out.a.baz: field not allowed:
-    ./closedness.cue:33:24
+    ./closedness.cue:33:6
     ./closedness.cue:36:11
 explicitClose.err1.out.a: cannot combine regular field "baz" with "all":
     ./closedness.cue:36:11
@@ -1674,7 +1674,7 @@ Result:
           //     ./closedness.cue:33:13
           //     ./closedness.cue:36:6
           // explicitClose.err1.out.a.baz: field not allowed:
-          //     ./closedness.cue:33:24
+          //     ./closedness.cue:33:6
           //     ./closedness.cue:36:11
           // explicitClose.err1.out.a: cannot combine regular field "baz" with "all":
           //     ./closedness.cue:36:11
@@ -2158,7 +2158,7 @@ Result:
           }
         }) }
       x: (#list){
-        0: (#struct){
+        0: (struct){
           a: (int){ 1 }
         }
       }
@@ -2392,7 +2392,7 @@ diff old new
      ./closedness.cue:36:6
  incomplete.err1.x.bar: conflicting values 2 and string (mismatched types int and string):
      ./incomplete.cue:34:24
-@@ -33,40 +23,35 @@
+@@ -33,29 +23,25 @@
      ./incomplete.cue:51:25
      ./incomplete.cue:52:11
  match.defaults.pickNested1Err.a: conflicting values 2 and 3:
@@ -2427,11 +2427,12 @@ diff old new
  explicitClose.err1.out.a: invalid value {baz:"notAllowed"} (does not satisfy matchN): 0 matched, expected 1:
      ./closedness.cue:33:6
      ./closedness.cue:33:13
+@@ -62,11 +48,10 @@
      ./closedness.cue:36:6
  explicitClose.err1.out.a.baz: field not allowed:
--    ./closedness.cue:33:6
+     ./closedness.cue:33:6
 -    ./closedness.cue:32:12
-     ./closedness.cue:33:24
+-    ./closedness.cue:33:24
 -    ./closedness.cue:33:30
 -    ./closedness.cue:35:7
 -    ./closedness.cue:36:11
@@ -2522,13 +2523,12 @@ diff old new
            //     ./closedness.cue:36:6
            // explicitClose.err1.out.a: invalid value {baz:"notAllowed"} (does not satisfy matchN): 0 matched, expected 1:
            //     ./closedness.cue:33:6
-@@ -314,12 +290,11 @@
-           //     ./closedness.cue:33:13
+@@ -315,11 +291,10 @@
            //     ./closedness.cue:36:6
            // explicitClose.err1.out.a.baz: field not allowed:
--          //     ./closedness.cue:33:6
+           //     ./closedness.cue:33:6
 -          //     ./closedness.cue:32:12
-           //     ./closedness.cue:33:24
+-          //     ./closedness.cue:33:24
 -          //     ./closedness.cue:33:30
 -          //     ./closedness.cue:35:7
 -          //     ./closedness.cue:36:11
@@ -2636,7 +2636,7 @@ diff old new
        #x: (_){ matchN(1, (#list){
            0: (_|_){// [
              //   {},
-@@ -810,19 +773,8 @@
+@@ -810,18 +773,7 @@
              // ]
            }
          }) }
@@ -2652,12 +2652,10 @@ diff old new
 -        //     ./in.cue:154:5
 -        //     ./in.cue:156:6
 -        //     ./in.cue:157:8
--        0: (struct){
 +      x: (#list){
-+        0: (#struct){
+         0: (struct){
            a: (int){ 1 }
          }
-       }
 @@ -832,7 +784,7 @@
            0: (_|_){// {}
            }

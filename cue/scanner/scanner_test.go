@@ -76,7 +76,7 @@ var testTokens = [...]elt{
 	{token.IDENT, "$foobar", literal},
 	{token.IDENT, "#foobar", literal},
 	// {token.IDENT, "#0", literal},
-	{token.IDENT, "#", literal},
+	// {token.IDENT, "#", literal},
 	{token.IDENT, "_foobar", literal},
 	{token.IDENT, "__foobar", literal},
 	{token.IDENT, "#_foobar", literal},
@@ -734,6 +734,7 @@ var errorTests = []struct {
 	{`#""#`, token.STRING, 0, `#""#`, ""},
 	// {"$", IDENT, 0, "$", ""}, // TODO: for root of file?
 	{"#'", token.STRING, 0, "#'", "string literal not terminated"},
+	{"# ", token.IDENT, 0, "#", "CUE comments use // rather than #"},
 	{"''", token.STRING, 0, "''", ""},
 	{"'", token.STRING, 0, "'", "string literal not terminated"},
 	{`"\("`, token.INTERPOLATION, 0, `"\(`, ""},

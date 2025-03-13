@@ -98,7 +98,7 @@ func TestAttributeBody(t *testing.T) {
 		err: "error scanning attribute text",
 	}, {
 		in:  `# `,
-		out: keyVals{{"", "#", "# "}},
+		err: "error scanning attribute text",
 	}}
 	for i, tc := range testdata {
 		t.Run(fmt.Sprintf("%d-%s", i, tc.in), func(t *testing.T) {

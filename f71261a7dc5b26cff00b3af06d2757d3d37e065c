@@ -33,6 +33,24 @@
       "message": "This isn\u0027t _quite_ right; for example:\n\n```\ncue mod --dfvsd edit\n```\n\nnow prints:\n\n```\nmod must be run as one of its subcommands\nRun \u0027cue help mod\u0027 for known subcommands.\n```\n\nbut given that command group commands don\u0027t tend to have\nmuch in the way of flags themselves, this is probably\nfine.",
       "revId": "f71261a7dc5b26cff00b3af06d2757d3d37e065c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2afcaba5_b3ce9831",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-13T12:46:06Z",
+      "side": 1,
+      "message": "Yeah, this is always going to be somewhat lossy given how Cobra allows you to put flags before subcommand names. Given unknown flags, it has to guess that they take an argument. But I think this new mechanism is slightly better overall.\n\nIf/when cobra implements https://github.com/spf13/cobra/issues/706, then perhaps we can do away with some of this hackery.",
+      "parentUuid": "b0cfbf01_6e3f0a82",
+      "revId": "f71261a7dc5b26cff00b3af06d2757d3d37e065c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

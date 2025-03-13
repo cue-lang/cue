@@ -22,6 +22,8 @@ import (
 	"strings"
 	"testing"
 
+	goruntime "runtime"
+
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue"
@@ -75,62 +77,7 @@ var needFix = map[string]string{
 // skipDebugDepErrors is a temporary hack to skip tests that are known to have
 // counter errors.
 // TODO: These counters should all go to zero.
-var skipDebugDepErrors = map[string]int{
-	"basicrewrite/018_self-reference_cycles":                      3,
-	"cycle/025_cannot_resolve_references_that_would_be_ambiguous": 1,
-	"cycle/051_resolved_self-reference_cycles_with_disjunction":   2,
-
-	"cycle/052_resolved_self-reference_cycles_with_disjunction_with_defaults": 1,
-	"cycle/builtins": 3,
-	"cycle/issue241": 2,
-	"cycle/issue429": 1,
-
-	// Some of these counts are related to issue 3750
-	"disjunctions/elimination": 19,
-	"eval/issue2146":           4,
-	"eval/notify":              8,
-
-	// TODO(issue3750): commented out reflect counts that would be there if we
-	// disabled the counter also for non-disjunctions.
-	"builtins/closed": 6,
-	// "builtins/validators":      1,
-	// "comprehensions/closed":    4,
-	// "comprehensions/issue1732": 8,
-	// "comprehensions/issue287":  3,
-	// "comprehensions/issue3762": 38,
-	"comprehensions/issue843": 1, // 2,
-	// "comprehensions/nested2":  38,
-	// "comprehensions/pushdown": 46,
-	// "cycle/023_reentrance":    1,
-	// "cycle/chain":             2,
-	// "cycle/compbottom2":   44,
-	// "cycle/comprehension": 10,
-	// "cycle/freeze":     27,
-	// "cycle/issue990":   7,
-	"cycle/structural": 4, // 7,
-	// "definitions/037_closing_with_comprehensions": 3,
-	// "definitions/comprehensions": 3,
-	// "disjunctions/elimination":   23, // + 17
-	"disjunctions/errors": 3, // 6,
-	// "disjunctions/operands": 1,
-	// "eval/closedness":       5,
-	// "eval/comprehensions":   13,
-	"eval/disjunctions": 1,
-	// "eval/embed":            1,
-	// "eval/incomplete": 2,
-	// "eval/issue2146":        4, + 3
-	// "eval/issue2235": 43,
-	"eval/counters": 6, // 10,
-	// "eval/let":       4,
-	// "eval/letjoin":   8,
-	// "eval/merge":     14,
-	// "eval/notify":    13, // + 10
-	// "eval/sharing": 2,
-	// "eval/v0.7": 9,
-	// "fulleval/042_cross-dependent_comprehension": 1,
-	// "resolve/038_incomplete_comprehensions":      4,
-	"scalars/embed": 2,
-}
+var skipDebugDepErrors = map[string]int{}
 
 func TestEvalAlpha(t *testing.T) {
 	// TODO: remove use of externalDeps for processing. Currently, enabling
@@ -298,12 +245,12 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, flags cued
 // TestX is for debugging. Do not delete.
 func TestX(t *testing.T) {
 	adt.DebugDeps = true
-	// adt.OpenGraphs = true
+	adt.OpenGraphs = true
 
 	flags := cuedebug.Config{
-		Sharing:    true, // Uncomment to turn sharing off.
-		OpenInline: true,
-		LogEval:    1, // Uncomment to turn logging off
+		Sharing: true, // Uncomment to turn sharing off.
+		// OpenInline: true,
+		LogEval: 1, // Uncomment to turn logging off
 	}
 
 	version := internal.DefaultVersion
@@ -312,10 +259,534 @@ func TestX(t *testing.T) {
 	in := `
 -- cue.mod/module.cue --
 module: "mod.test"
-
 language: version: "v0.9.0"
-
 -- in.cue --
+Y: matchN(1, [X])
+X: b?: Y
+a: X
+a: b: 1
+
+// // foo: {
+// y: 1
+// #X: {}
+// #X
+// // }
+
+
+// mixed: ok3: {
+// 	#Schema: {
+// 		exports?: matchN(1, [
+// 			close({ never?: _ }), // fail
+// 			#exportsObject,       // pass
+// 		])
+
+// 		#exports: matchN(1, [string, #exportsObject])
+// 		#exportsObject: exp1?: #exports
+// 	}
+// 	out: #Schema & {
+// 		exports: exp1: "str"
+// 	}
+// }
+
+
+// #D1: {
+// 	env: a: "A"
+// 	env: b: "B"
+// 	#def: {a: "A"}
+// 	#def: {b: "B"}
+// }
+
+// d1: #D1 & {env: c: "C"}
+
+// #A: {
+// 	...
+// 	{a: int}
+// }
+// x: #A & { c: int }
+
+// import "list"
+// issue2052: full: {
+// 	#RecurseN: {
+// 		#maxiter: uint | *2
+// 		#funcFactory: {
+// 			#next: _
+// 			#func: _
+// 		}
+// 		for k, v in list.Range(0, #maxiter, 1) {
+// 			#funcs: "a\(k)": (#funcFactory & {#next: #funcs["a\(k+1)"]}).#func
+// 		}
+
+// 		#funcs: "\(#maxiter)": null
+// 		#funcs["a0"]
+// 	}
+
+// 	#DepthF: {
+// 		#next: _
+// 		#func: {
+// 			#in:    _
+// 			#basic: int | null
+// 			out: {
+// 				if (#in & #basic) != _|_ {1}
+// 			}
+// 		}
+// 	}
+// 	#Depth: #RecurseN & {#maxiter: 1, #funcFactory: #DepthF}
+// }
+
+// a: {
+// 	#A: depends_on: [...#AnyA]
+// 	#AnyA: {
+// 		depends_on: [...#AnyA]
+// 		...
+// 	}
+// 	#A1: {
+// 		#A
+// 		x: int
+// 	}
+// 	#A2: { #A }
+// 	s: [Name=string]: #AnyA & {}
+// 	s: foo: #A1
+// 	s: bar: #A2 & {
+// 		depends_on: [s.foo]
+// 	}
+// }
+
+// ellipsis: ok: {
+// 	out: #Schema & {
+// 		field: shouldBeAllowed: 123
+// 	}
+// 	#Schema: {
+// 		field?: #anything
+// 		#anything: matchN(1, [{ ... }])
+// 	}
+// }
+// #x2: {a: int}
+// y2: #x2
+// y2: {}
+// y3: y2 & {a: 3}
+
+
+// b: c: int
+// #D: a: b
+
+// a: #D
+// a: a: d: 3
+
+// test1: {
+//     #x: matchN(1, [
+//         [{}],
+//     ])
+
+//     x: #x
+//     x: [{a: 1}]
+// }
+
+// test2: {
+//     #x: matchN(1, [
+//         {},
+//     ])
+//     x: #x
+//     x: {a: 1}
+// }
+
+// #Workflow: {{
+//     perms: matchN(1, ["all", close({"foo": "bar"})])
+// }}
+// out: #Workflow & {
+//     perms: files: "read"
+// }
+
+// should pass
+// #Schema: {
+//     exports?: matchN(1, [close({
+//         never?: _
+//     }), #exportsObject])
+
+//     #exports: matchN(1, [string, #exportsObject])
+//     #exportsObject: {
+//         exp1?: #exports
+//     }
+// }
+
+// out: #Schema & {
+//     exports: {
+//         exp1: "./main-module.js"
+//     }
+// }
+
+
+// #Schema: {
+//     exports?: matchN(1, [null, #exportsObject])
+//     #exports: matchN(1, [null, #exportsObject])
+//     #exportsObject: {
+//         exp1?: #exports
+//     }
+// }
+// out: #Schema & {
+//     exports: {
+//         exp1: "./main-module.js"
+//     }
+// }
+
+
+// disableEmbed: err1: {
+// 	#Schema: {{
+// 		a: matchN(1, ["all", {foo: "bar"}])
+// 	}}
+// 	out: #Schema & {
+// 		a: baz: "notAllowed"
+// 	}
+// }
+// disableEmbed: errWithClose: {
+// 	#Schema: {{
+// 		a: matchN(1, ["all", close({foo: "bar"})])
+// 	}}
+// 	out: #Schema & {
+// 		a: baz: "notAllowed"
+// 	}
+// }
+// disableEmbed: ok1: {
+// 	#Schema: {{
+//         a?: matchN(1, [
+// 				null, // fail
+// 				{ [string]: string }, // pass
+// 				{b: {...}}, // fail
+// 			])
+// 	}}
+// 	out: #Schema & {
+// 		a: allowed: "once"
+// 	}
+// }
+// disableEmbed: okWithClose: {
+// 	#Schema: {{
+//         a?: matchN(1, [
+// 				null, // fail
+// 				close({ [string]: string }), // pass
+// 				close({b: {...}}), // fail
+// 			])
+// 	}}
+// 	out: #Schema & {
+// 		a: allowed: "once"
+// 	}
+// }
+
+	// #a: [>="k"]: p: int
+	// #b: [<="m"]: p: int
+	// #c: [>="w"]: p: int
+	// #d: [<="y"]: p: int
+	// andOrEmbed: t2:{
+	// 	#X: {
+	// 		#c & #d
+	// 		#a & #b
+	// 	}
+	// 	ok1: #X
+	// 	ok1: k: {}
+	// }
+
+// patterns: shallow: {
+// 	#a: [>="k"]: int
+// 	#b: [<="m"]: int
+// 	#c: [>="w"]: int
+// 	#d: [<="y"]: int
+
+// 	andEmbed: p1: {
+// 		#X: { #a & #b } // "k" <= x && x <= "m"
+// 		err: #X
+// 		err: j: 3
+// 	}
+// }
+
+// // issue370
+// #C1: name: string
+// #C2: {
+// 	#C1
+// 	age: int
+// }
+// c1: #C1 & { name: "cueckoo" }
+// c2: #C2 & {
+// 	c1
+// 	age: 5
+// }
+
+// // 039_augment
+// #A: { [=~"^[a-s]*$"]: int }
+// #B: { [=~"^[m-z]*$"]: int }
+// #C: {
+// 	#A & #B
+// 	[=~"^Q*$"]: int
+// }
+// c: #C & {EQQ: 3}
+// c: #C & {QQ: 3}
+
+
+// issue3580: {
+// 	x: close({
+// 		a: _
+// 		b: x.a
+// 	})
+// }
+
+	// #Context1: {}
+	// Context2: {}
+	// #Config1: cfg: #Context1
+	// #Config3: cfg: #Context1
+	// Config2: cfg: Context2
+	// #CConfig: #Config1 & Config2
+	// out: #Config3
+	// out: #CConfig
+
+// #A: {f1: int, f2: int}
+// for k, v in {f3: int} {
+// 	a: #A & {"\(k)": v}
+// }
+	// a: #X
+	// a: id:  "foo"
+	// #X: { #Y }
+	// #Y: #Z | {}
+	// #Z: id: string
+
+// #T: {
+// 	if true {
+// 		// We'd like to restrict the possible members of x in this case,
+// 		// but this doesn't work.
+// 		x: close({
+// 			f1: int
+// 		})
+// 	}
+// 	x: _
+// }
+// z: #T & {
+// 	x: {
+// 		f1: 99
+// 		f2: "i want to disallow this"
+// 	}
+// }
+
+// outerErr: {
+// 	_inToOut: {
+// 		in: _
+// 		out: in.foo
+// 	}
+// 	// Test that the same principle works with the close builtin.
+// 	usingClose: {
+// 		// Same as above, but with an additional level of nesting.
+// 		#Inner:  foo: close({minor: 2})
+// 		#Outer: version: { major: 1, ... }
+
+// 		t1: #Outer
+// 		t1: version: (_inToOut & {in: #Inner}).out
+// 	}
+// }
+
+	// #Context1: ctx: {}
+	// Context2: ctx: {}
+
+	// // Must both refer to #Context1
+	// #Config1: cfg: #Context1
+	// #Config3: cfg: #Context1
+
+	// Config2: cfg: Context2
+
+	// Config: #Config1 & Config2
+
+	// // order matters
+	// out: Config // Indirection necessary.
+	// out: #Config3
+
+// let F = { // must be a let.
+//     // moving this one level up fixes it.
+//     base: {
+//         in: string
+//         let X = [ {msg: "\(in)"} ][0]
+//         out: X.msg
+//     }
+//     XXX: base & {in: "foo"}
+// }
+// output: F.XXX.out // confirm that it does not work outside let.
+
+
+
+// out: #Schema & {
+//     field: shouldBeAllowed: 123
+// }
+// #Schema: {
+//     field?: #anything
+//     #anything: matchN(1, [{ ... }])
+// }
+
+
+	// #Common: Name: string
+	// #A: {
+	// 	#Common
+	// 	Something: int
+	// }
+	// #B: {
+	// 	#Common
+	// 	Else: int
+	// }
+	// x: #B
+	// x: #A & {
+	// 	Name:      "a"
+	// 	Something: 4
+	// }
+
+// #ImageTag: {
+//     version?: string
+//     output: version
+// }
+// #ImageTags: {
+//     versions: [string]: string
+//     cfg: (#ImageTag & {
+//         version: versions["may-exist-later"]
+//     }).output
+// }
+
+	// ok2: {
+	// 	out: #Workflow & {
+	// 		_b: #step & {
+	// 			run: "foo bar"
+	// 		}
+	// 	}
+	// 	#Workflow: {}
+	// 	#step: matchN(1, [{ run!: _ }])
+	// }
+// issue3694: simple: {
+// 	#step: matchN(1, [{
+// 		uses!: _
+// 	}])
+// 	#step: close({
+// 		uses?: string
+// 	})
+// }
+
+
+// definitions/embed
+// reclose3: {
+//     #Common: Name: string
+// 	#A: {#Common}
+// 	#Step: {#Common}
+// 	x: #A & #Step
+// 	x: Name: "a"
+// }
+
+// // cycle/inline
+// issue3731: full: {
+// 	#Workspace: {
+// 		workspaceA?: {}
+// 		workspaceB?: {}
+// 	}
+// 	#AccountConfig: {
+// 		workspaces: #Workspace
+// 		siblings?: [...string]
+// 	}
+// 	#AccountConfigSub1: {
+// 		#AccountConfig
+// 		workspaces: "workspaceA": {}
+// 	}
+// 	#AccountConfigSub2: {
+// 		#AccountConfig
+// 		workspaces: "workspaceB": {}
+// 	}
+// 	tree: env1: {
+// 		"region1": {
+// 			"env1-r1-account-sub1": #AccountConfigSub1
+// 			"env1-r1-account-sub2-1": #AccountConfigSub2
+// 		}
+// 	}
+// 	#lookupSiblings: {
+// 		envtree: {...}
+// 		out: [
+// 			for region, v in envtree
+// 			for account, config in v
+// 			if config.workspaces."workspaceB" != _|_ { account },
+// 		]
+// 	}
+// 	tree: ENVTREE=env1: [_]: [_]: #AccountConfig & {
+// 		siblings: (#lookupSiblings & {envtree: ENVTREE}).out
+// 	}
+// }
+
+
+// eval/sharing
+// issue3641: simplified: t1: {
+// 	#Context1: ctx: {}
+// 	Context2: ctx: {}
+// 	// Must both refer to #Context1
+// 	#Config1: cfg: #Context1
+// 	#Config3: cfg: #Context1
+// 	Config2: cfg: Context2
+// 	Config: #Config1 & Config2
+// 	// order matters
+// 	out: Config // Indirection necessary.
+// 	out: #Config3
+// }
+// issue3641: simplified: t2: {
+// 	#Context1: ctx: {}
+// 	Context2: ctx: {}
+// 	// Must both refer to #Context1
+// 	#Config1: cfg: #Context1
+// 	#Config3: cfg: #Context1
+// 	Config2: cfg: Context2
+// 	Config: #Config1 & Config2
+// 	// order matters
+// 	out: Config // Indirection necessary.
+// 	out: #Config3
+// }
+// // Variant where sharing is explicitly disabled.
+// issue3641: simplified: t3: {
+// 	#Context1: ctx: {}
+// 	Context2: ctx: {}
+// 	// Must both refer to #Context1
+// 	#Config1: cfg: #Context1
+// 	#Config3: cfg: #Context1
+// 	Config2: cfg: Context2
+// 	Config: #Config1 & Config2
+// 	// order matters
+// 	out: __no_sharing
+// 	out: Config // Indirection necessary.
+// 	out: #Config3
+// }
+
+// #T: [_]: _
+// #T: close({"a": string})
+// x:  #T
+// x: b: "foo"
+
+// a: { #A }
+// a: c: 1
+// #A: b: 1
+
+
+// // Should fail: embed should count
+// #A: {f1: int, f2: int}
+// for k, v in {f3: int} {
+// 	a: #A & {"\(k)": v}
+// }
+
+
+// recloseSimple: {
+// 	#foo: {}
+// 	a: {#foo} & {b: int}
+// }
+
+// #k1: {a: int, b?: int} & #A// & close({a: int})
+// #A: {a: int}
+
+
+// items: #JSONSchemaProps
+// #JSONSchemaProps: {
+//     props?: [string]: #JSONSchemaProps
+
+//     repeat0?: [...#JSONSchemaProps]
+//     repeat1?: [...#JSONSchemaProps]
+//     repeat2?: [...#JSONSchemaProps]
+// }
+// items: {
+//     props: a1: props: a2: props: a3: props: a4: props: a5: {}
+//     props: b1: props: b2: props: b3: props: b4: props: b5: {}
+//     props: c1: props: c2: props: c3: props: c4: props: c5: {}
+// }
+
 	`
 
 	if strings.HasSuffix(strings.TrimSpace(in), ".cue --") {
@@ -330,6 +801,7 @@ language: version: "v0.9.0"
 
 	r := runtime.NewWithSettings(version, flags)
 
+	adt.TestInFinalize = true
 	v, err := r.Build(nil, instance)
 	if err != nil {
 		t.Fatal(err)
@@ -338,7 +810,17 @@ language: version: "v0.9.0"
 	e := eval.New(r)
 	ctx := e.NewContext(v)
 	ctx.Config = flags
+
+	var memStats goruntime.MemStats
+	goruntime.ReadMemStats(&memStats)
+	allocBytes := memStats.Alloc
+	allocObjects := memStats.Mallocs
+
 	v.Finalize(ctx)
+
+	goruntime.ReadMemStats(&memStats)
+	allocBytes = memStats.Alloc - allocBytes
+	allocObjects = memStats.Mallocs - allocObjects
 
 	out := debug.NodeString(r, v, nil)
 	if adt.OpenGraphs {
@@ -356,7 +838,21 @@ language: version: "v0.9.0"
 
 	t.Error(out)
 
-	t.Log(ctx.Stats())
+	var stats struct {
+		// CUE groups stats obtained from the CUE evaluator.
+		CUE stats.Counts
+
+		// Go groups stats obtained from the Go runtime.
+		Go struct {
+			AllocBytes   uint64
+			AllocObjects uint64
+		}
+	}
+
+	stats.CUE = *ctx.Stats()
+	stats.Go.AllocBytes = allocBytes
+	stats.Go.AllocObjects = allocObjects
+	t.Log(stats)
 }
 
 func BenchmarkUnifyAPI(b *testing.B) {

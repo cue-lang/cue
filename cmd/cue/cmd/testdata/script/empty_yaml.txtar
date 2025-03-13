@@ -1,0 +1,22 @@
+# Empty YAML files by themselves decode as null, following the YAML spec.
+# However, for the sake of the user experience when joining with other YAML files,
+# we allow unifying with them as well. This is done by decoding empty YAML as `*null | _`.
+# TODO: implement the above and make the second test case below work.
+
+exec cue export empty.yaml
+cmp stdout export-empty.stdout
+
+! exec cue export one.yaml empty.yaml two.yaml
+cmp stderr export-all.stderr
+
+-- export-empty.stdout --
+null
+-- export-all.stderr --
+conflicting values null and {two:"two text"} (mismatched types null and struct):
+    
+    ./two.yaml:1:1
+-- one.yaml --
+one: "one text"
+-- empty.yaml --
+-- two.yaml --
+two: "two text"

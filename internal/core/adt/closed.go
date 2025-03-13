@@ -103,8 +103,11 @@ const (
 
 // TODO: merge with closeInfo: this is a leftover of the refactoring.
 type CloseInfo struct {
-	*closeInfo               // old implementation (TODO: remove)
-	cc         *closeContext // new implementation (TODO: rename field to closeCtx)
+	*closeInfo           // old implementation (TODO: remove)
+	defID          defID // Unique ID to track anything that gets inserted from this Conjunct.
+	enclosingEmbed defID // Tracks an embedding within a struct.
+	outerID        defID // Tracks the {} that should be closed after unifying.
+	hasOuter       bool
 
 	// IsClosed is true if this conjunct represents a single level of closing
 	// as indicated by the closed builtin.
@@ -121,6 +124,7 @@ type CloseInfo struct {
 	// from fields defined by this conjunct.
 	// NOTE: only used when using closeContext.
 	FromDef bool
+	TopDef  bool
 
 	// FieldTypes indicates which kinds of fields (optional, dynamic, patterns,
 	// etc.) are contained in this conjunct.

@@ -127,11 +127,10 @@ Conjuncts:    43
 Disjuncts:    28
 -- out/evalalpha --
 Errors:
+foo.feild: field not allowed:
+    ./in.cue:13:7
 foo1.recursive.feild: field not allowed:
     ./in.cue:19:3
-foo.feild: field not allowed:
-    ./in.cue:12:6
-    ./in.cue:13:7
 
 Result:
 (_|_){
@@ -150,7 +149,6 @@ Result:
     // [eval]
     feild: (_|_){
       // [eval] foo.feild: field not allowed:
-      //     ./in.cue:12:6
       //     ./in.cue:13:7
     }
     field: (int){ int }
@@ -188,22 +186,19 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,12 +1,9 @@
+@@ -1,11 +1,7 @@
  Errors:
-+foo1.recursive.feild: field not allowed:
-+    ./in.cue:19:3
  foo.feild: field not allowed:
 -    ./in.cue:1:7
-     ./in.cue:12:6
+-    ./in.cue:12:6
      ./in.cue:13:7
--foo1.recursive.feild: field not allowed:
+ foo1.recursive.feild: field not allowed:
 -    ./in.cue:3:13
 -    ./in.cue:15:7
--    ./in.cue:19:3
+     ./in.cue:19:3
  
  Result:
- (_|_){
-@@ -23,16 +20,15 @@
+@@ -23,16 +19,14 @@
    }
    foo: (_|_){
      // [eval]
@@ -214,7 +209,7 @@ diff old new
      feild: (_|_){
        // [eval] foo.feild: field not allowed:
 -      //     ./in.cue:1:7
-       //     ./in.cue:12:6
+-      //     ./in.cue:12:6
        //     ./in.cue:13:7
      }
 +    field: (int){ int }
@@ -224,7 +219,7 @@ diff old new
    }
    foo1: (_|_){
      // [eval]
-@@ -39,13 +35,11 @@
+@@ -39,13 +33,11 @@
      field: (int){ 2 }
      recursive: (_|_){
        // [eval]
@@ -239,7 +234,7 @@ diff old new
      }
    }
    #Bar: (#struct){
-@@ -52,8 +46,8 @@
+@@ -52,8 +44,8 @@
      field: (int){ int }
    }
    bar: (#struct){

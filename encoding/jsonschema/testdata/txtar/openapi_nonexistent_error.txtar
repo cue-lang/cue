@@ -6,4 +6,5 @@ Test what happens when there's an OpenAPI schema that has no
 -- schema.yaml --
 -- out/decode/extract --
 ERROR:
-root value at path #/components/schemas/ does not exist
+root value at path #/components/schemas/ does not exist:
+    schema.yaml

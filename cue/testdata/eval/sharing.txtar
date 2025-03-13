@@ -162,18 +162,12 @@ Conjuncts:    361
 Disjuncts:    191
 -- out/evalalpha --
 Errors:
+shareCycle.t1.Y.x.x: structural cycle
 shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
     ./sharecycle.cue:8:6
     ./sharecycle.cue:9:5
-shareCycle.t1.Y.x.x: field not allowed:
-    ./sharecycle.cue:4:11
-    ./sharecycle.cue:4:3
-shareCycle.t2.Y.x.x: field not allowed:
-    ./sharecycle.cue:10:11
-    ./sharecycle.cue:10:3
-shareCycle.t3.Y.x.x: field not allowed:
-    ./sharecycle.cue:16:10
-    ./sharecycle.cue:16:3
+shareCycle.t2.Y.x.x: structural cycle
+shareCycle.t3.Y.x.x: structural cycle
 
 Result:
 (_|_){
@@ -407,17 +401,15 @@ Result:
   shareCycle: (_|_){
     // [eval]
     t1: (_|_){
-      // [eval]
+      // [structural cycle]
       #X: (#struct){
       }
       Y: (_|_){
-        // [eval]
+        // [structural cycle]
         x: (_|_){
-          // [eval]
+          // [structural cycle]
           x: (_|_){
-            // [eval] shareCycle.t1.Y.x.x: field not allowed:
-            //     ./sharecycle.cue:4:11
-            //     ./sharecycle.cue:4:3
+            // [structural cycle] shareCycle.t1.Y.x.x: structural cycle
           }
         }
       }
@@ -431,29 +423,23 @@ Result:
           // [eval] shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
           //     ./sharecycle.cue:8:6
           //     ./sharecycle.cue:9:5
-          // shareCycle.t2.Y.x.x: field not allowed:
-          //     ./sharecycle.cue:10:11
-          //     ./sharecycle.cue:10:3
+          // shareCycle.t2.Y.x.x: structural cycle
           x: (_|_){
-            // [eval] shareCycle.t2.Y.x.x: field not allowed:
-            //     ./sharecycle.cue:10:11
-            //     ./sharecycle.cue:10:3
+            // [structural cycle] shareCycle.t2.Y.x.x: structural cycle
           }
         }
       }
     }
     t3: (_|_){
-      // [eval]
+      // [structural cycle]
       #X: (#struct){
       }
       Y: (_|_){
-        // [eval]
+        // [structural cycle]
         x: (_|_){
-          // [eval]
+          // [structural cycle]
           x: (_|_){
-            // [eval] shareCycle.t3.Y.x.x: field not allowed:
-            //     ./sharecycle.cue:16:10
-            //     ./sharecycle.cue:16:3
+            // [structural cycle] shareCycle.t3.Y.x.x: structural cycle
           }
         }
       }
@@ -464,27 +450,15 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,16 @@
- Errors:
--shareCycle.t1.Y.x.x: structural cycle
+@@ -3,7 +3,6 @@
  shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
      ./sharecycle.cue:8:6
      ./sharecycle.cue:9:5
-+shareCycle.t1.Y.x.x: field not allowed:
-+    ./sharecycle.cue:4:11
-+    ./sharecycle.cue:4:3
-+shareCycle.t2.Y.x.x: field not allowed:
-     ./sharecycle.cue:10:11
--shareCycle.t2.Y.x.x: structural cycle
--shareCycle.t3.Y.x.x: structural cycle
-+    ./sharecycle.cue:10:3
-+shareCycle.t3.Y.x.x: field not allowed:
-+    ./sharecycle.cue:16:10
-+    ./sharecycle.cue:16:3
+-    ./sharecycle.cue:10:11
+ shareCycle.t2.Y.x.x: structural cycle
+ shareCycle.t3.Y.x.x: structural cycle
  
- Result:
- (_|_){
-@@ -27,102 +32,75 @@
+@@ -27,102 +26,75 @@
            }
          }
          #Config1: (#struct){
@@ -656,7 +630,7 @@ diff old new
          }
          Config: (#struct){
            cfg: (#struct){
-@@ -148,24 +126,13 @@
+@@ -148,24 +120,13 @@
          }
        }
        #Config1: (#struct){
@@ -684,7 +658,7 @@ diff old new
        }
        #Config: (#struct){
          cfg: (#struct){
-@@ -173,12 +140,7 @@
+@@ -173,12 +134,7 @@
            }
          }
        }
@@ -698,7 +672,7 @@ diff old new
        out: (#struct){
          sch: (#struct){
            cfg: (#struct){
-@@ -247,9 +209,7 @@
+@@ -247,9 +203,7 @@
    }
    debug: (struct){
      sharingOn: (struct){
@@ -709,74 +683,15 @@ diff old new
        b: (struct){
          c: (int){ 1 }
        }
-@@ -284,15 +244,17 @@
-   shareCycle: (_|_){
-     // [eval]
-     t1: (_|_){
--      // [structural cycle]
--      #X: (#struct){
--      }
--      Y: (_|_){
--        // [structural cycle]
--        x: (_|_){
--          // [structural cycle]
--          x: (_|_){
--            // [structural cycle] shareCycle.t1.Y.x.x: structural cycle
-+      // [eval]
-+      #X: (#struct){
-+      }
-+      Y: (_|_){
-+        // [eval]
-+        x: (_|_){
-+          // [eval]
-+          x: (_|_){
-+            // [eval] shareCycle.t1.Y.x.x: field not allowed:
-+            //     ./sharecycle.cue:4:11
-+            //     ./sharecycle.cue:4:3
-           }
-         }
-       }
-@@ -306,23 +268,29 @@
+@@ -306,7 +260,7 @@
            // [eval] shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
            //     ./sharecycle.cue:8:6
            //     ./sharecycle.cue:9:5
-+          // shareCycle.t2.Y.x.x: field not allowed:
-           //     ./sharecycle.cue:10:11
--          x: (_|_){
--            // [structural cycle] shareCycle.t2.Y.x.x: structural cycle
-+          //     ./sharecycle.cue:10:3
-+          x: (_|_){
-+            // [eval] shareCycle.t2.Y.x.x: field not allowed:
-+            //     ./sharecycle.cue:10:11
-+            //     ./sharecycle.cue:10:3
+-          //     ./sharecycle.cue:10:11
++          // shareCycle.t2.Y.x.x: structural cycle
+           x: (_|_){
+             // [structural cycle] shareCycle.t2.Y.x.x: structural cycle
            }
-         }
-       }
-     }
-     t3: (_|_){
--      // [structural cycle]
--      #X: (#struct){
--      }
--      Y: (_|_){
--        // [structural cycle]
--        x: (_|_){
--          // [structural cycle]
--          x: (_|_){
--            // [structural cycle] shareCycle.t3.Y.x.x: structural cycle
-+      // [eval]
-+      #X: (#struct){
-+      }
-+      Y: (_|_){
-+        // [eval]
-+        x: (_|_){
-+          // [eval]
-+          x: (_|_){
-+            // [eval] shareCycle.t3.Y.x.x: field not allowed:
-+            //     ./sharecycle.cue:16:10
-+            //     ./sharecycle.cue:16:3
-           }
-         }
-       }
 -- out/eval --
 Errors:
 shareCycle.t1.Y.x.x: structural cycle

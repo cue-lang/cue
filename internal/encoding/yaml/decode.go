@@ -107,10 +107,25 @@ func (d *decoder) Decode() (ast.Expr, error) {
 			// Note that when the input contains "---", we get an empty document
 			// with a null scalar value inside instead.
 			if !d.yamlNonEmpty {
-				return &ast.BasicLit{
-					Kind:     token.NULL,
-					ValuePos: d.tokFile.Pos(0, token.NoRelPos),
-					Value:    "null",
+				// Expression below: *null | _
+				// Attach positions which at least point to the filename.
+				pos := d.tokFile.Pos(0, token.NoRelPos)
+				return &ast.BinaryExpr{
+					Op:    token.OR,
+					OpPos: pos,
+					X: &ast.UnaryExpr{
+						Op:    token.MUL,
+						OpPos: pos,
+						X: &ast.BasicLit{
+							Kind:     token.NULL,
+							ValuePos: d.tokFile.Pos(0, token.NoRelPos),
+							Value:    "null",
+						},
+					},
+					Y: &ast.Ident{
+						Name:    "_",
+						NamePos: pos,
+					},
 				}, nil
 			}
 			// If the input wasn't empty, we already decoded some CUE syntax nodes,

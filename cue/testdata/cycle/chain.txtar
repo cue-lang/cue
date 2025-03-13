@@ -231,16 +231,6 @@ issue2052: full: {
 
 	d: #Depth & {#in: tree}
 }
--- out/evalalpha/stats --
-Leaks:  12801
-Freed:  1484
-Reused: 1483
-Allocs: 12802
-Retain: 0
-
-Unifications: 5066
-Conjuncts:    67167
-Disjuncts:    8919
 -- out/evalalpha --
 (struct){
   chain: (struct){
@@ -895,28 +885,6 @@ Disjuncts:    8919
     }
   }
 }
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,9 @@
--Leaks:  56
--Freed:  1830
--Reused: 1816
--Allocs: 70
--Retain: 169
-+Leaks:  12801
-+Freed:  1484
-+Reused: 1483
-+Allocs: 12802
-+Retain: 0
- 
--Unifications: 801
--Conjuncts:    3177
--Disjuncts:    1979
-+Unifications: 5066
-+Conjuncts:    67167
-+Disjuncts:    8919
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old

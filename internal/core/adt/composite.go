@@ -159,11 +159,8 @@ type Vertex struct {
 	//   eval: *,   BaseValue: *   -- finalized
 	//
 	state *nodeContext
-
-	// _cc manages the closedness logic for this Vertex. It is created
-	// by rootCloseContext.
-	// TODO: move back to nodeContext, but be sure not to clone it.
-	_cc *closeContext
+	// TODO: move to nodeContext.
+	overlay *Vertex
 
 	// Label is the feature leading to this vertex.
 	Label Feature
@@ -302,54 +299,6 @@ func deref(v *Vertex) *Vertex {
 
 func equalDeref(a, b *Vertex) bool {
 	return deref(a) == deref(b)
-}
-
-func (v *Vertex) cc() *closeContext {
-	return v._cc
-}
-
-func (v *Vertex) getRootCloseContext(ctx *OpContext) *closeContext {
-	_ = ctx // suppress linter
-	if v._cc == nil {
-		panic("no closeContext")
-	}
-	return v._cc
-}
-
-// rootCloseContext creates a closeContext for this Vertex or returns the
-// existing one.
-func (v *Vertex) rootCloseContext(ctx *OpContext) *closeContext {
-	mode := v.ArcType
-	if v._cc != nil {
-		v._cc.updateArcType(ctx, mode)
-		return v._cc
-	}
-
-	v._cc = &closeContext{
-		group:           &v.Conjuncts,
-		parent:          nil,
-		src:             v,
-		parentConjuncts: v,
-		arcType:         mode,
-	}
-	v._cc.incDependent(ctx, ROOT, nil) // matched in REF(decrement:nodeDone)
-
-	if f := v.Label; f.IsLet() || f == InvalidLabel {
-		return v._cc
-	}
-
-	if p := v.Parent; p != nil {
-		pcc := p.rootCloseContext(ctx)
-
-		if pcc.isClosed {
-			pcc.checkAllowsCC(ctx, v._cc)
-		}
-
-		pcc.addArcDependency(ctx, false, v._cc)
-		v._cc.depth = pcc.depth + 1
-	}
-
-	return v._cc
 }
 
 // newInlineVertex creates a Vertex that is needed for computation, but for
@@ -630,7 +579,7 @@ const (
 func (c *OpContext) Wrap(v *Vertex, id CloseInfo) *Vertex {
 	w := c.newInlineVertex(nil, nil, v.Conjuncts...)
 	n := w.getState(c)
-	n.share(makeAnonymousConjunct(nil, v, nil), v, CloseInfo{})
+	n.share(makeAnonymousConjunct(nil, v, nil), v, id)
 	return w
 }
 
@@ -1005,6 +954,10 @@ func Unify(c *OpContext, a, b Value) *Vertex {
 
 	if c.isDevVersion() {
 		s := v.getState(c)
+		// As this is a new node, we should drop all the requirements from
+		// parent nodes, as these will not be aligned with the reinsertion
+		// of the conjuncts.
+		s.dropParentRequirements = true
 		if p := c.vertex; p != nil && p.state != nil && s != nil {
 			s.hasNonCyclic = p.state.hasNonCyclic
 		}
@@ -1029,7 +982,19 @@ func addConjuncts(ctx *OpContext, dst *Vertex, src Value) {
 			var root CloseInfo
 			c.CloseInfo = root.SpawnRef(v, v.ClosedRecursive, nil)
 		} else {
-			c.CloseInfo.FromDef = true
+			// Even if a node is marked as ClosedRecursive, it may be that this
+			// is the first node that references a definition.
+			// We approximate this to see if the path leading up to this
+			// value is a defintion. This is not fully accurate. We could
+			// investigate the closedness information contained in the parent.
+			isDef := false
+			for p := v; p != nil; p = p.Parent {
+				if p.Label.IsDef() {
+					isDef = true
+					break
+				}
+			}
+			c.CloseInfo.TopDef = isDef
 		}
 	}
 
@@ -1301,8 +1266,7 @@ func (v *Vertex) MatchAndInsert(ctx *OpContext, arc *Vertex) {
 					}
 					c.Env = &env
 
-					root := arc.rootCloseContext(ctx)
-					root.insertConjunct(ctx, root, c, c.CloseInfo, ArcMember, true, false)
+					arc.insertConjunct(ctx, c, c.CloseInfo, ArcMember, true, false)
 				}
 			}
 		}
@@ -1451,23 +1415,24 @@ func (v *Vertex) hasConjunct(c Conjunct) (added bool) {
 	default:
 		v.ArcType = ArcMember
 	}
-	return findConjunct(v.Conjuncts, c) >= 0
+	p, _ := findConjunct(v.Conjuncts, c)
+	return p >= 0
 }
 
 // findConjunct reports the position of c within cs or -1 if it is not found.
 //
 // NOTE: we are not comparing closeContexts. The intended use of this function
 // is only to add to list of conjuncts within a closeContext.
-func findConjunct(cs []Conjunct, c Conjunct) int {
+func findConjunct(cs []Conjunct, c Conjunct) (int, Conjunct) {
 	for i, x := range cs {
 		// TODO: disregard certain fields from comparison (e.g. Refs)?
 		if x.CloseInfo.closeInfo == c.CloseInfo.closeInfo && // V2
 			x.x == c.x &&
 			x.Env.Up == c.Env.Up && x.Env.Vertex == c.Env.Vertex {
-			return i
+			return i, x
 		}
 	}
-	return -1
+	return -1, Conjunct{}
 }
 
 func (n *nodeContext) addConjunction(c Conjunct, index int) {

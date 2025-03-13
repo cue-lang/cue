@@ -19,7 +19,6 @@ Disjuncts:    8
 -- out/evalalpha --
 Errors:
 x.b: field not allowed:
-    ./in.cue:2:5
     ./in.cue:1:5
     ./in.cue:6:2
 
@@ -34,7 +33,6 @@ Result:
     a: (string){ "hello" }
     b: (_|_){
       // [eval] x.b: field not allowed:
-      //     ./in.cue:2:5
       //     ./in.cue:1:5
       //     ./in.cue:6:2
     }
@@ -44,21 +42,18 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,8 +1,7 @@
+@@ -1,8 +1,6 @@
  Errors:
  x.b: field not allowed:
-+    ./in.cue:2:5
      ./in.cue:1:5
 -    ./in.cue:2:11
 -    ./in.cue:3:5
      ./in.cue:6:2
  
  Result:
-@@ -16,9 +15,8 @@
-     a: (string){ "hello" }
+@@ -17,8 +15,6 @@
      b: (_|_){
        // [eval] x.b: field not allowed:
-+      //     ./in.cue:2:5
        //     ./in.cue:1:5
 -      //     ./in.cue:2:11
 -      //     ./in.cue:3:5

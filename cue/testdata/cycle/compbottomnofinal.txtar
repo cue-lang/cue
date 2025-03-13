@@ -483,7 +483,10 @@ Disjuncts:    215
     p1: (struct){
       Y: (struct){
         userinfo: (string){ "user" }
-        host: (string){ "mod.test" }
+        host: (_|_){
+          // [incomplete] large.p1.Y.host: undefined field: host:
+          //     ./in.cue:224:13
+        }
       }
       X: (_|_){
         // [incomplete] large.p1.X: undefined field: port:
@@ -507,7 +510,10 @@ Disjuncts:    215
       }
       Y: (struct){
         userinfo: (string){ "user" }
-        host: (string){ "mod.test" }
+        host: (_|_){
+          // [incomplete] large.p2.Y.host: undefined field: host:
+          //     ./in.cue:265:13
+        }
       }
       #X: (_|_){
         // [incomplete] large.p2.#X.port: cyclic reference to field port:
@@ -533,7 +539,10 @@ Disjuncts:    215
       }
       Y: (struct){
         userinfo: (string){ "user" }
-        host: (string){ "mod.test" }
+        host: (_|_){
+          // [incomplete] large.p3.Y.host: undefined field: host:
+          //     ./in.cue:306:13
+        }
       }
       #Y: (_|_){
         // [incomplete] large.p3.X: undefined field: port:
@@ -557,7 +566,10 @@ Disjuncts:    215
       }
       Y: (struct){
         userinfo: (string){ "user" }
-        host: (string){ "mod.test" }
+        host: (_|_){
+          // [incomplete] large.p4.X: undefined field: port:
+          //     ./in.cue:317:33
+        }
       }
     }
   }
@@ -754,7 +766,7 @@ diff old new
        }
      }
    }
-@@ -115,81 +112,83 @@
+@@ -115,81 +112,95 @@
    large: (struct){
      #userHostPort: (string){ "^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)(:(?P<port>\\d+))?$" }
      p1: (struct){
@@ -835,7 +847,10 @@ diff old new
 -        //     ./in.cue:351:10
 +      Y: (struct){
 +        userinfo: (string){ "user" }
-+        host: (string){ "mod.test" }
++        host: (_|_){
++          // [incomplete] large.p1.Y.host: undefined field: host:
++          //     ./in.cue:224:13
++        }
 +      }
 +      X: (_|_){
 +        // [incomplete] large.p1.X: undefined field: port:
@@ -859,7 +874,10 @@ diff old new
 +      }
 +      Y: (struct){
 +        userinfo: (string){ "user" }
-+        host: (string){ "mod.test" }
++        host: (_|_){
++          // [incomplete] large.p2.Y.host: undefined field: host:
++          //     ./in.cue:265:13
++        }
 +      }
 +      #X: (_|_){
 +        // [incomplete] large.p2.#X.port: cyclic reference to field port:
@@ -885,7 +903,10 @@ diff old new
 +      }
 +      Y: (struct){
 +        userinfo: (string){ "user" }
-+        host: (string){ "mod.test" }
++        host: (_|_){
++          // [incomplete] large.p3.Y.host: undefined field: host:
++          //     ./in.cue:306:13
++        }
 +      }
 +      #Y: (_|_){
 +        // [incomplete] large.p3.X: undefined field: port:
@@ -909,7 +930,10 @@ diff old new
 +      }
 +      Y: (struct){
 +        userinfo: (string){ "user" }
-+        host: (string){ "mod.test" }
++        host: (_|_){
++          // [incomplete] large.p4.X: undefined field: port:
++          //     ./in.cue:317:33
++        }
        }
      }
    }

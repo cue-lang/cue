@@ -142,7 +142,7 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state combinedFlags) Value {
 		// relax this again once we have proper tests to prevent regressions of
 		// that issue.
 		if !v.state.done() || v.state.errs != nil {
-			v.state.addNotify(c.vertex, nil)
+			v.state.addNotify(c.vertex)
 		}
 	}
 
@@ -1067,6 +1067,14 @@ type nodeContext struct {
 	vLists []*Vertex
 	exprs  []envExpr
 
+	// TODO: remove
+	closeParent *nodeContext
+
+	// These fields are used to track type checking.
+	reqDefIDs    []refInfo
+	replaceIDs   []replaceID
+	conjunctInfo []conjunctInfo
+
 	// Checks is a list of conjuncts, as we need to preserve the context in
 	// which it was evaluated. The conjunct is always a validator (and thus
 	// a Value). We need to keep track of the CloseInfo, however, to be able
@@ -1154,6 +1162,13 @@ type nodeContextState struct {
 	hasAncestorCycle     bool // has conjunct with structural cycle to an ancestor
 	hasNonCycle          bool // has material conjuncts without structural cycle
 	hasNonCyclic         bool // has non-cyclic conjuncts at start of field processing
+
+	// These simulate the old closeContext logic. TODO: perhaps remove.
+	hasStruct        bool // this node has a struct conjunct
+	hasOpenValidator bool // this node has an open validator
+	isDef            bool // this node is a definition
+
+	dropParentRequirements bool // used for typo checking
 
 	isShared         bool       // set if we are currently structure sharing
 	noSharing        bool       // set if structure sharing is not allowed
@@ -1253,8 +1268,7 @@ type nodeContextState struct {
 // cc is used for V3 and is nil in V2.
 // v is equal to cc.src._cc in V3.
 type receiver struct {
-	v  *Vertex
-	cc *closeContext
+	v *Vertex
 }
 
 // Logf substitutes args in format. Arguments of type Feature, Value, and Expr
@@ -1275,11 +1289,11 @@ type defaultInfo struct {
 	origMode defaultMode
 }
 
-func (n *nodeContext) addNotify(v *Vertex, cc *closeContext) {
+func (n *nodeContext) addNotify(v *Vertex) {
 	unreachableForDev(n.ctx)
 
 	if v != nil && !n.node.hasAllConjuncts {
-		n.notify = append(n.notify, receiver{v, cc})
+		n.notify = append(n.notify, receiver{v})
 	}
 }
 
@@ -1307,6 +1321,11 @@ func (n *nodeContext) clone() *nodeContext {
 	d.lists = append(d.lists, n.lists...)
 	d.vLists = append(d.vLists, n.vLists...)
 	d.exprs = append(d.exprs, n.exprs...)
+
+	d.reqDefIDs = append(d.reqDefIDs, n.reqDefIDs...)
+	d.replaceIDs = append(d.replaceIDs, n.replaceIDs...)
+	d.conjunctInfo = append(d.conjunctInfo, n.conjunctInfo...)
+
 	d.checks = append(d.checks, n.checks...)
 	d.postChecks = append(d.postChecks, n.postChecks...)
 
@@ -1342,6 +1361,9 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			lists:              n.lists[:0],
 			vLists:             n.vLists[:0],
 			exprs:              n.exprs[:0],
+			reqDefIDs:          n.reqDefIDs[:0],
+			replaceIDs:         n.replaceIDs[:0],
+			conjunctInfo:       n.conjunctInfo[:0],
 			disjunctions:       n.disjunctions[:0],
 			disjunctCCs:        n.disjunctCCs[:0],
 			usedDefault:        n.usedDefault[:0],
@@ -1495,6 +1517,8 @@ func (n *nodeContext) reportFieldMismatch(
 }
 
 func (n *nodeContext) updateNodeType(k Kind, v Expr, id CloseInfo) bool {
+	n.updateConjunctInfo(k, id, 0)
+
 	ctx := n.ctx
 	kind := n.kind & k
 
@@ -1929,7 +1953,7 @@ func (n *nodeContext) addVertexConjuncts(c Conjunct, arc *Vertex, inline bool) {
 	}
 
 	if arc.state != nil {
-		arc.state.addNotify(n.node, nil)
+		arc.state.addNotify(n.node)
 	}
 
 	for _, c := range arc.Conjuncts {

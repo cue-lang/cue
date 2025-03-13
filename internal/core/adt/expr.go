@@ -989,7 +989,7 @@ func (x *LetReference) resolve(ctx *OpContext, state combinedFlags) *Vertex {
 		v = n
 		e.cache[key] = n
 		if ctx.isDevVersion() {
-			nc := n.getState(ctx)
+			// nc := n.getState(ctx)
 			// TODO: unlike with the old evaluator, we do not allow the first
 			// cycle to be skipped. Doing so can lead to hanging evaluation.
 			// As the cycle detection works slightly differently in the new
@@ -998,7 +998,7 @@ func (x *LetReference) resolve(ctx *OpContext, state combinedFlags) *Vertex {
 			// detection.
 			// nc.hasNonCycle = true
 			// Allow a first cycle to be skipped.
-			nc.free()
+			// nc.free()
 		} else {
 			nc := n.getNodeContext(ctx, 0)
 			nc.hasNonCycle = true // Allow a first cycle to be skipped.
@@ -1787,10 +1787,14 @@ func (x *Builtin) call(call *CallContext) Expr {
 
 	saved := c.IsValidator
 	c.IsValidator = call.isValidator
-	ret := x.Func(call)
-	c.IsValidator = saved
+	isEmbed := c.ci.FromEmbed
+	c.ci.FromEmbed = false
+	defer func() {
+		c.ci.FromEmbed = isEmbed
+		c.IsValidator = saved
+	}()
 
-	return ret
+	return x.Func(call)
 }
 
 func (x *Builtin) Source() ast.Node { return nil }
@@ -1991,15 +1995,11 @@ type Comprehension struct {
 	// The type of field as which the comprehension is added.
 	arcType ArcType
 
-	// The closeContext into which the comprehension is added. Upon a successful
+	// The node into which the comprehension is added. Upon a successful
 	// completion of the comprehension, the arcType should be updated in this
-	// closeContext. After this is done, the corresponding parent closeContext
-	// must be closed.
-	arcCC *closeContext
-
-	// This is incremented by the Comprehension upon creation, and decremented
-	// once it is known whether the comprehension succeeded.
-	cc *closeContext
+	// node.
+	// TODO: rename to arc and rename arc to something else.
+	arcCC *Vertex
 
 	// Only used for partial comprehensions.
 	comp   *envComprehension

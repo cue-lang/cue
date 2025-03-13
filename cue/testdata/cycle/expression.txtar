@@ -95,6 +95,37 @@ t2: d: {
 t2total: {
 	for _, v in t2 {v}
 }
+-- out/evalalpha/stats --
+Leaks:  58
+Freed:  0
+Reused: 0
+Allocs: 58
+Retain: 0
+
+Unifications: 58
+Conjuncts:    168
+Disjuncts:    0
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  0
+-Freed:  58
+-Reused: 49
+-Allocs: 9
+-Retain: 71
++Leaks:  58
++Freed:  0
++Reused: 0
++Allocs: 58
++Retain: 0
+ 
+ Unifications: 58
+-Conjuncts:    410
+-Disjuncts:    75
++Conjuncts:    168
++Disjuncts:    0
 -- out/eval/stats --
 Leaks:  0
 Freed:  58

@@ -577,14 +577,14 @@ resolveToAncestor: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  877
+Leaks:  865
 Freed:  0
 Reused: 0
-Allocs: 877
+Allocs: 865
 Retain: 0
 
-Unifications: 597
-Conjuncts:    1491
+Unifications: 591
+Conjuncts:    1060
 Disjuncts:    157
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -596,17 +596,17 @@ diff old new
 -Reused: 831
 -Allocs: 28
 -Retain: 68
-+Leaks:  877
++Leaks:  865
 +Freed:  0
 +Reused: 0
-+Allocs: 877
++Allocs: 865
 +Retain: 0
  
 -Unifications: 673
 -Conjuncts:    1299
 -Disjuncts:    896
-+Unifications: 597
-+Conjuncts:    1491
++Unifications: 591
++Conjuncts:    1060
 +Disjuncts:    157
 -- out/eval/stats --
 Leaks:  16
@@ -856,7 +856,7 @@ Result:
         // [eval] b4.b.0: conflicting values 1 and [y] (mismatched types int and list):
         //     ./in.cue:55:12
         //     ./in.cue:56:8
-        0: (_|_){// &[〈1;y〉]
+        0: (_|_){// 〈1;y〉
         }
       }
     }
@@ -927,7 +927,7 @@ Result:
           // [eval] b6.b.a.0: conflicting values 1 and [1] (mismatched types int and list):
           //     ./in.cue:94:13
           //     ./in.cue:94:14
-          0: (_|_){// &[&[1, 〈1;a〉]]
+          0: (_|_){// 1 & 〈1;a〉
           }
         }
       }
@@ -952,7 +952,7 @@ Result:
           // [eval] b7.b.0.0: conflicting values 1 and [a] (mismatched types int and list):
           //     ./in.cue:99:11
           //     ./in.cue:100:5
-          0: (_|_){// &[〈1;a〉]
+          0: (_|_){// 〈1;a〉
           }
         }
       }
@@ -1403,7 +1403,7 @@ Result:
       }
     }
     let _schema_1#1 = (_|_){
-      // [structural cycle] withLetFail._schema_1: structural cycle
+      // [structural cycle]
     }
   }
   fieldsSumInfinite: (_|_){
@@ -2072,7 +2072,7 @@ diff old new
 +        // [eval] b4.b.0: conflicting values 1 and [y] (mismatched types int and list):
 +        //     ./in.cue:55:12
 +        //     ./in.cue:56:8
-+        0: (_|_){// &[〈1;y〉]
++        0: (_|_){// 〈1;y〉
 +        }
        }
      }
@@ -2087,7 +2087,7 @@ diff old new
 -          //     ./in.cue:95:9
 -          0: (_|_){
 -            // [structural cycle] b6.b.a.0.0: structural cycle
-+          0: (_|_){// &[&[1, 〈1;a〉]]
++          0: (_|_){// 1 & 〈1;a〉
            }
          }
        }
@@ -2109,7 +2109,7 @@ diff old new
 +          // [eval] b7.b.0.0: conflicting values 1 and [a] (mismatched types int and list):
 +          //     ./in.cue:99:11
 +          //     ./in.cue:100:5
-+          0: (_|_){// &[〈1;a〉]
++          0: (_|_){// 〈1;a〉
 +          }
 +        }
        }
@@ -2337,7 +2337,7 @@ diff old new
      let _schema_1#1 = (_|_){
 -      // [structural cycle] withLetFail._schema_1: structural cycle:
 -      //     ./in.cue:362:17
-+      // [structural cycle] withLetFail._schema_1: structural cycle
++      // [structural cycle]
      }
    }
    fieldsSumInfinite: (_|_){

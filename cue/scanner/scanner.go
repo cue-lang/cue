@@ -674,6 +674,11 @@ scanAgain:
 		tok, lit = s.scanNumber(false)
 	case isLetter(ch), ch == '$', ch == '#':
 		lit = s.scanFieldIdentifier()
+		if lit == "#" && s.ch == ' ' {
+			// If we see a line like `# some comment`, it may be a confused YAML user;
+			// give them a helpful error rather than a puzzling "unexpected token" error.
+			s.errf(offset, "CUE comments use // rather than #")
+		}
 		if len(lit) > 1 {
 			// keywords are longer than one letter - avoid lookup otherwise
 			tok = token.Lookup(lit)

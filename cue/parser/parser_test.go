@@ -469,13 +469,13 @@ func TestParse(t *testing.T) {
 		# standalone comment
 		a: 5
 		`,
-		"<*ast.BadDecl>, <*ast.BadDecl>, comment, a: 5\nexpected label or ':', found 'IDENT' standalone (and 1 more errors)",
+		"\nCUE comments use // rather than #",
 	}, {
 		"yaml hash inline comment",
 		`
 		a: 5 # inline comment
 		`,
-		"a: 5, <*ast.BadDecl>, comment\nmissing ',' in struct literal (and 1 more errors)",
+		"a: 5, <*ast.BadDecl>, comment\nCUE comments use // rather than # (and 1 more errors)",
 	}, {
 		"alt comments",
 		`// a ...

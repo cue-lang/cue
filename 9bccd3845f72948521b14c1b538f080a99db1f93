@@ -16,6 +16,23 @@
       "message": "Please re-review - there are additional changes beyond the PS you previously saw.",
       "revId": "9bccd3845f72948521b14c1b538f080a99db1f93",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b96f9ce9_53432dd7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-13T12:28:54Z",
+      "side": 1,
+      "message": "LGTM",
+      "revId": "9bccd3845f72948521b14c1b538f080a99db1f93",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

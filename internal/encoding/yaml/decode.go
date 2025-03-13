@@ -103,14 +103,28 @@ func (d *decoder) Decode() (ast.Expr, error) {
 			// Any further Decode calls must return EOF to avoid an endless loop.
 			d.decodeErr = io.EOF
 
-			// If the input is empty, we produce a single null literal with EOF.
+			// If the input is empty, we produce `*null | _` followed by EOF.
 			// Note that when the input contains "---", we get an empty document
 			// with a null scalar value inside instead.
 			if !d.yamlNonEmpty {
-				return &ast.BasicLit{
-					Kind:     token.NULL,
-					ValuePos: d.tokFile.Pos(0, token.NoRelPos),
-					Value:    "null",
+				// Attach positions which at least point to the filename.
+				pos := d.tokFile.Pos(0, token.NoRelPos)
+				return &ast.BinaryExpr{
+					Op:    token.OR,
+					OpPos: pos,
+					X: &ast.UnaryExpr{
+						Op:    token.MUL,
+						OpPos: pos,
+						X: &ast.BasicLit{
+							Kind:     token.NULL,
+							ValuePos: pos,
+							Value:    "null",
+						},
+					},
+					Y: &ast.Ident{
+						Name:    "_",
+						NamePos: pos,
+					},
 				}, nil
 			}
 			// If the input wasn't empty, we already decoded some CUE syntax nodes,

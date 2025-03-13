@@ -33,10 +33,10 @@ func TestYAML(t *testing.T) {
 		name:    "empty",
 		yaml:    "",
 		yamlOut: "null",
-		want:    "null",
+		want:    "*null | _",
 	}, {
 		name:     "empty stream",
-		want:     "null",
+		want:     "*null | _",
 		isStream: true,
 	}, {
 		name: "string literal",

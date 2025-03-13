@@ -162,6 +162,38 @@ issue3780: panic2: {
     }
   }
 }
+-- out/evalalpha/stats --
+Leaks:  205
+Freed:  0
+Reused: 0
+Allocs: 205
+Retain: 0
+
+Unifications: 161
+Conjuncts:    240
+Disjuncts:    32
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  0
+-Freed:  137
+-Reused: 124
+-Allocs: 13
+-Retain: 34
++Leaks:  205
++Freed:  0
++Reused: 0
++Allocs: 205
++Retain: 0
+ 
+-Unifications: 113
+-Conjuncts:    209
+-Disjuncts:    171
++Unifications: 161
++Conjuncts:    240
++Disjuncts:    32
 -- out/eval/stats --
 Leaks:  0
 Freed:  137
@@ -282,6 +314,26 @@ Disjuncts:    171
         }
         a: (struct){
           b: (_){ _ }
+        }
+      }
+    }
+  }
+  issue3780: (struct){
+    panic1: (_|_){
+      // [incomplete] issue3780.panic1: incomplete bool: bool:
+      //     ./issue3780.cue:5:10
+      objs: (#struct){
+      }
+      param!: (bool){ bool }
+      #Objects: (#struct){
+      }
+    }
+    panic2: (struct){
+      parent: (struct){
+        objs: (#struct){
+        }
+        param?: (bool){ bool }
+        #Objects: (#struct){
         }
       }
     }

@@ -122,12 +122,11 @@ Conjuncts:    118
 Disjuncts:    81
 -- out/evalalpha --
 Errors:
-noEraseDefinition.a.0.b: field not allowed:
-    ./in.cue:55:17
 disallowed.vErr.d: field not allowed:
-    ./in.cue:28:7
     ./in.cue:28:4
     ./in.cue:32:14
+noEraseDefinition.a.0.b: field not allowed:
+    ./in.cue:55:17
 
 Result:
 (_|_){
@@ -163,7 +162,6 @@ Result:
       // [eval]
       d: (_|_){
         // [eval] disallowed.vErr.d: field not allowed:
-        //     ./in.cue:28:7
         //     ./in.cue:28:4
         //     ./in.cue:32:14
       }
@@ -252,15 +250,12 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,20 +1,10 @@
+@@ -1,19 +1,8 @@
  Errors:
-+noEraseDefinition.a.0.b: field not allowed:
-+    ./in.cue:55:17
  disallowed.vErr.d: field not allowed:
 -    ./in.cue:26:6
 -    ./in.cue:27:3
 -    ./in.cue:27:12
-+    ./in.cue:28:7
      ./in.cue:28:4
 -    ./in.cue:32:8
      ./in.cue:32:14
@@ -269,27 +264,25 @@ diff old new
 -    ./v3issues.cue:12:2
 -    ./v3issues.cue:14:4
 -    ./v3issues.cue:16:4
--noEraseDefinition.a.0.b: field not allowed:
+ noEraseDefinition.a.0.b: field not allowed:
 -    ./in.cue:54:17
 -    ./in.cue:55:7
--    ./in.cue:55:17
+     ./in.cue:55:17
  
  Result:
- (_|_){
-@@ -50,11 +40,8 @@
+@@ -50,11 +39,7 @@
        // [eval]
        d: (_|_){
          // [eval] disallowed.vErr.d: field not allowed:
 -        //     ./in.cue:26:6
 -        //     ./in.cue:27:3
 -        //     ./in.cue:27:12
-+        //     ./in.cue:28:7
          //     ./in.cue:28:4
 -        //     ./in.cue:32:8
          //     ./in.cue:32:14
        }
      }
-@@ -83,13 +70,11 @@
+@@ -83,13 +68,11 @@
        // [eval]
        0: (_|_){
          // [eval]
@@ -304,7 +297,7 @@ diff old new
        }
      }
    }
-@@ -114,13 +99,11 @@
+@@ -114,13 +97,11 @@
        c: (_){ _ }
      }
      out: (#struct){
@@ -320,7 +313,7 @@ diff old new
        }
      }
    }
-@@ -134,19 +117,11 @@
+@@ -134,19 +115,11 @@
        }
      }
    }

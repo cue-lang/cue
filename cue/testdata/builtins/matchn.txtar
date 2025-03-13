@@ -1431,7 +1431,7 @@ explicitClose.err1.out.a: invalid value {baz:"notAllowed"} (does not satisfy mat
     ./closedness.cue:33:13
     ./closedness.cue:36:6
 explicitClose.err1.out.a.baz: field not allowed:
-    ./closedness.cue:33:24
+    ./closedness.cue:33:6
     ./closedness.cue:36:11
 explicitClose.err1.out.a: cannot combine regular field "baz" with "all":
     ./closedness.cue:36:11
@@ -1597,9 +1597,9 @@ Result:
     ok1: (struct){
       #Schema: (#struct){
         a: (_){ matchN(1, (#list){
-            0: (_|_){// "all"
+            0: (_|_){// [e]"all"
             }
-            1: (_|_){// {
+            1: (_|_){// [e]{
               //   foo: "bar"
               // }
             }
@@ -1615,13 +1615,13 @@ Result:
       // [eval]
       #Schema: (#struct){
         a?: (_){ matchN(1, (#list){
-            0: (_|_){// null
+            0: (_|_){// [e]null
             }
-            1: (_|_){// {
+            1: (_|_){// [e]{
               //   [string]: string
               // }
             }
-            2: (_|_){// {
+            2: (_|_){// [e]{
               //   b: {
               //     ...
               //   }
@@ -1654,9 +1654,9 @@ Result:
       // [eval]
       #Schema: (#struct){
         a: (_){ matchN(1, (#list){
-            0: (_|_){// "all"
+            0: (_|_){// [e]"all"
             }
-            1: (_|_){// close({
+            1: (_|_){// [e]close({
               //   foo: "bar"
               // })
             }
@@ -1674,7 +1674,7 @@ Result:
           //     ./closedness.cue:33:13
           //     ./closedness.cue:36:6
           // explicitClose.err1.out.a.baz: field not allowed:
-          //     ./closedness.cue:33:24
+          //     ./closedness.cue:33:6
           //     ./closedness.cue:36:11
           // explicitClose.err1.out.a: cannot combine regular field "baz" with "all":
           //     ./closedness.cue:36:11
@@ -1686,13 +1686,13 @@ Result:
     ok2: (struct){
       #Schema: (#struct){
         a?: (_){ matchN(1, (#list){
-            0: (_|_){// null
+            0: (_|_){// [e]null
             }
-            1: (_|_){// close({
+            1: (_|_){// [e]close({
               //   [string]: string
               // })
             }
-            2: (_|_){// close({
+            2: (_|_){// [e]close({
               //   b: {
               //     ...
               //   }
@@ -2087,21 +2087,21 @@ Result:
     embed: (struct){
       t1: (struct){
         a: (_){ matchN(1, (#list){
-            0: (_|_){// >10
+            0: (_|_){// [e]>10
             }
           }) }
         b: (_){ matchN(1, (#list){
-            0: (_|_){// >10
+            0: (_|_){// [e]>10
             }
           }) }
       }
       t2: (struct){
         b: (_){ matchN(1, (#list){
-            0: (_|_){// >10
+            0: (_|_){// [e]>10
             }
           }) }
         a: (_){ matchN(1, (#list){
-            0: (_|_){// >10
+            0: (_|_){// [e]>10
             }
           }) }
       }
@@ -2158,7 +2158,7 @@ Result:
           }
         }) }
       x: (#list){
-        0: (#struct){
+        0: (struct){
           a: (int){ 1 }
         }
       }
@@ -2392,7 +2392,7 @@ diff old new
      ./closedness.cue:36:6
  incomplete.err1.x.bar: conflicting values 2 and string (mismatched types int and string):
      ./incomplete.cue:34:24
-@@ -33,40 +23,35 @@
+@@ -33,29 +23,25 @@
      ./incomplete.cue:51:25
      ./incomplete.cue:52:11
  match.defaults.pickNested1Err.a: conflicting values 2 and 3:
@@ -2427,11 +2427,12 @@ diff old new
  explicitClose.err1.out.a: invalid value {baz:"notAllowed"} (does not satisfy matchN): 0 matched, expected 1:
      ./closedness.cue:33:6
      ./closedness.cue:33:13
+@@ -62,11 +48,10 @@
      ./closedness.cue:36:6
  explicitClose.err1.out.a.baz: field not allowed:
--    ./closedness.cue:33:6
+     ./closedness.cue:33:6
 -    ./closedness.cue:32:12
-     ./closedness.cue:33:24
+-    ./closedness.cue:33:24
 -    ./closedness.cue:33:30
 -    ./closedness.cue:35:7
 -    ./closedness.cue:36:11
@@ -2479,15 +2480,54 @@ diff old new
            shouldBeAllowed: (int){ 123 }
          }
          #anything: (_){ matchN(1, (#list){
-@@ -245,7 +222,7 @@
-           }) }
-       }
-       out: (#struct){
+@@ -236,16 +213,16 @@
+     ok1: (struct){
+       #Schema: (#struct){
+         a: (_){ matchN(1, (#list){
+-            0: (_|_){// "all"
+-            }
+-            1: (_|_){// {
+-              //   foo: "bar"
+-              // }
+-            }
+-          }) }
+-      }
+-      out: (#struct){
 -        a: (struct){
++            0: (_|_){// [e]"all"
++            }
++            1: (_|_){// [e]{
++              //   foo: "bar"
++              // }
++            }
++          }) }
++      }
++      out: (#struct){
 +        a: (#struct){
            baz: (string){ "allowed" }
          }
        }
+@@ -254,13 +231,13 @@
+       // [eval]
+       #Schema: (#struct){
+         a?: (_){ matchN(1, (#list){
+-            0: (_|_){// null
+-            }
+-            1: (_|_){// {
+-              //   [string]: string
+-              // }
+-            }
+-            2: (_|_){// {
++            0: (_|_){// [e]null
++            }
++            1: (_|_){// [e]{
++              //   [string]: string
++              // }
++            }
++            2: (_|_){// [e]{
+               //   b: {
+               //     ...
+               //   }
 @@ -272,15 +249,16 @@
          // [eval]
          a: (_|_){
@@ -2509,6 +2549,19 @@ diff old new
            allowed: (string){ "once" }
          }
        }
+@@ -292,9 +270,9 @@
+       // [eval]
+       #Schema: (#struct){
+         a: (_){ matchN(1, (#list){
+-            0: (_|_){// "all"
+-            }
+-            1: (_|_){// close({
++            0: (_|_){// [e]"all"
++            }
++            1: (_|_){// [e]close({
+               //   foo: "bar"
+               // })
+             }
 @@ -304,10 +282,8 @@
          // [eval]
          a: (_|_){
@@ -2522,13 +2575,12 @@ diff old new
            //     ./closedness.cue:36:6
            // explicitClose.err1.out.a: invalid value {baz:"notAllowed"} (does not satisfy matchN): 0 matched, expected 1:
            //     ./closedness.cue:33:6
-@@ -314,12 +290,11 @@
-           //     ./closedness.cue:33:13
+@@ -315,11 +291,10 @@
            //     ./closedness.cue:36:6
            // explicitClose.err1.out.a.baz: field not allowed:
--          //     ./closedness.cue:33:6
+           //     ./closedness.cue:33:6
 -          //     ./closedness.cue:32:12
-           //     ./closedness.cue:33:24
+-          //     ./closedness.cue:33:24
 -          //     ./closedness.cue:33:30
 -          //     ./closedness.cue:35:7
 -          //     ./closedness.cue:36:11
@@ -2539,11 +2591,41 @@ diff old new
            baz: (string){ "notAllowed" }
          }
        }
-@@ -342,7 +317,7 @@
-           }) }
-       }
-       out: (#struct){
+@@ -327,22 +302,22 @@
+     ok2: (struct){
+       #Schema: (#struct){
+         a?: (_){ matchN(1, (#list){
+-            0: (_|_){// null
+-            }
+-            1: (_|_){// close({
+-              //   [string]: string
+-              // })
+-            }
+-            2: (_|_){// close({
+-              //   b: {
+-              //     ...
+-              //   }
+-              // })
+-            }
+-          }) }
+-      }
+-      out: (#struct){
 -        a: (struct){
++            0: (_|_){// [e]null
++            }
++            1: (_|_){// [e]close({
++              //   [string]: string
++              // })
++            }
++            2: (_|_){// [e]close({
++              //   b: {
++              //     ...
++              //   }
++              // })
++            }
++          }) }
++      }
++      out: (#struct){
 +        a: (#struct){
            allowed: (string){ "once" }
          }
@@ -2623,6 +2705,43 @@ diff old new
          //     ./in.cue:36:38
          //     ./in.cue:39:23
          // match.defaults.pickNested1Err: invalid value {a:*3 | int} (does not satisfy matchN): 0 matched, expected 1:
+@@ -738,21 +703,21 @@
+     embed: (struct){
+       t1: (struct){
+         a: (_){ matchN(1, (#list){
+-            0: (_|_){// >10
+-            }
+-          }) }
+-        b: (_){ matchN(1, (#list){
+-            0: (_|_){// >10
+-            }
+-          }) }
+-      }
+-      t2: (struct){
+-        b: (_){ matchN(1, (#list){
+-            0: (_|_){// >10
+-            }
+-          }) }
+-        a: (_){ matchN(1, (#list){
+-            0: (_|_){// >10
++            0: (_|_){// [e]>10
++            }
++          }) }
++        b: (_){ matchN(1, (#list){
++            0: (_|_){// [e]>10
++            }
++          }) }
++      }
++      t2: (struct){
++        b: (_){ matchN(1, (#list){
++            0: (_|_){// [e]>10
++            }
++          }) }
++        a: (_){ matchN(1, (#list){
++            0: (_|_){// [e]>10
+             }
+           }) }
+       }
 @@ -800,10 +765,8 @@
        }
      }
@@ -2636,7 +2755,7 @@ diff old new
        #x: (_){ matchN(1, (#list){
            0: (_|_){// [
              //   {},
-@@ -810,19 +773,8 @@
+@@ -810,18 +773,7 @@
              // ]
            }
          }) }
@@ -2652,12 +2771,10 @@ diff old new
 -        //     ./in.cue:154:5
 -        //     ./in.cue:156:6
 -        //     ./in.cue:157:8
--        0: (struct){
 +      x: (#list){
-+        0: (#struct){
+         0: (struct){
            a: (int){ 1 }
          }
-       }
 @@ -832,7 +784,7 @@
            0: (_|_){// {}
            }

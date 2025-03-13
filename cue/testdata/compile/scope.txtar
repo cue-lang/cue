@@ -77,6 +77,38 @@ let _schema_1 = schema
   }
   let _schema_1#2 = 〈0;schema〉
 }
+-- out/evalalpha/stats --
+Leaks:  24
+Freed:  0
+Reused: 0
+Allocs: 24
+Retain: 0
+
+Unifications: 22
+Conjuncts:    39
+Disjuncts:    2
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  2
+-Freed:  48
+-Reused: 45
+-Allocs: 5
+-Retain: 8
++Leaks:  24
++Freed:  0
++Reused: 0
++Allocs: 24
++Retain: 0
+ 
+-Unifications: 50
+-Conjuncts:    102
+-Disjuncts:    54
++Unifications: 22
++Conjuncts:    39
++Disjuncts:    2
 -- out/eval/stats --
 Leaks:  2
 Freed:  48
@@ -123,7 +155,7 @@ Result:
     }
   }
   let _schema_1#2 = (_|_){
-    // [structural cycle] _schema_1: structural cycle
+    // [structural cycle]
   }
 }
 -- diff/-out/evalalpha<==>+out/eval --
@@ -136,7 +168,7 @@ diff old new
    let _schema_1#2 = (_|_){
 -    // [structural cycle] _schema_1: structural cycle:
 -    //     ./in.cue:32:8
-+    // [structural cycle] _schema_1: structural cycle
++    // [structural cycle]
    }
  }
 -- diff/todo/p3 --

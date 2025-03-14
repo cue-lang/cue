@@ -86,6 +86,10 @@ func runModMirror(cmd *Command, args []string) error {
 	allVersions := flagAllVersions.Bool(cmd)
 	useMod := flagMod.Bool(cmd)
 
+	if len(args) == 0 && !useMod {
+		return fmt.Errorf("nothing to do; provide arguments or --mod")
+	}
+
 	// TODO configure concurrency limit?
 
 	srcResolver, err := modconfig.NewResolver(newModConfig(srcRegStr))

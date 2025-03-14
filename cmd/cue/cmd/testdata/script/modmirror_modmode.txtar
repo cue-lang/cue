@@ -16,6 +16,15 @@ memregistry MEMREGISTRY2
 exec cue mod mirror --to $MEMREGISTRY2 --mod
 cmp stdout $WORK/want-mirror2-stdout
 
+# No arguments without --mod should fail as a no-op.
+# TODO: currently these do nothing at all.
+exec cue mod mirror --to $MEMREGISTRY2
+! stdout .
+! stderr .
+exec cue mod mirror
+! stdout .
+! stderr .
+
 -- want-mirror1-stdout --
 mirroring baz.org@v0.5.0
 mirroring bar.com@v0.5.0

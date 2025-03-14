@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c7c835c3_9ef41fc6",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1590,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-14T09:17:08Z",
+      "side": 1,
+      "message": "This is surely wrong - don\u0027t you mean `c.ci.FromEmbed`?",
+      "revId": "89da8294bd4cda5ae4c7938ad7d35f1d088021b9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

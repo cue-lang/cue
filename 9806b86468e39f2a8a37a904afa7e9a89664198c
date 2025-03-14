@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7e1a3db_2fb36031",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-14T14:06:40Z",
+      "side": 1,
+      "message": "I thought openinline was entirely removed or made unnecessary by new closedness?",
+      "revId": "9806b86468e39f2a8a37a904afa7e9a89664198c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f2e0498_4a5ce6ad",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-14T14:06:40Z",
+      "side": 1,
+      "message": "these two lines are shared with the previous case - move them outside the switch?",
+      "revId": "9806b86468e39f2a8a37a904afa7e9a89664198c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74219c6f_c1a59285",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 729,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-14T14:06:40Z",
+      "side": 1,
+      "message": "this if check is redundant with `case len(cx.Pairs) !\u003d len(cy.Pairs)` above.",
+      "revId": "9806b86468e39f2a8a37a904afa7e9a89664198c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91cf1bb8_ef952bfc",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 735,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-14T14:06:40Z",
+      "side": 1,
+      "message": "reuse cx and cy in this switch case?",
+      "revId": "9806b86468e39f2a8a37a904afa7e9a89664198c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0462efa_9d135fdd",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-14T14:06:40Z",
+      "side": 1,
+      "message": "I assume this needs to be resolved",
+      "revId": "9806b86468e39f2a8a37a904afa7e9a89664198c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8fb38e3_5d7ce1ea",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-14T14:06:40Z",
+      "side": 1,
+      "message": "I also assume this one needs to be resolved",
+      "revId": "9806b86468e39f2a8a37a904afa7e9a89664198c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "293e92cc_327aa719",
+        "filename": "internal/cuedebug/cuedebug.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-14T14:06:40Z",
+      "side": 1,
+      "message": "opendef _disables_ closedness typo checking, no?",
+      "revId": "9806b86468e39f2a8a37a904afa7e9a89664198c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

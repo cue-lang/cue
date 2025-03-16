@@ -54,6 +54,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ae479ff_d0c160c5",
+        "filename": "cue/types.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 723,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-16T12:55:35Z",
+      "side": 1,
+      "message": "FTR, the correct implementation here is considered to be\n\n```\nfunc (v Value) Default() (Value, bool) {\n    if v.v \u003d\u003d nil {\n        return v, false\n    }\n\n    x :\u003d v.v.DerefValue()\n    d :\u003d x.Default()\n    if d \u003d\u003d x {\n        return v, false\n    }\n    return makeValue(v.idx, d, v.parent_), true\n}\n```\n\nHowever, doing this breaks Decode tests. I\u0027ve been unable to figure out why.",
+      "parentUuid": "9afd8df3_8667266b",
+      "revId": "db089843f38392712a9818f4e9a28054144859ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "63b0351f_9fe633ae",

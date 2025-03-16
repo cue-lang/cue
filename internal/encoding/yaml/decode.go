@@ -375,9 +375,6 @@ outer:
 			}
 			continue
 		}
-		if yk.Kind != yaml.ScalarNode {
-			return d.posErrorf(yn, "invalid map key: %v", yk.ShortTag())
-		}
 
 		field := &ast.Field{}
 		label, err := d.label(yk)
@@ -435,17 +432,34 @@ func (d *decoder) merge(yn *yaml.Node, m *ast.StructLit, multiline bool) error {
 func (d *decoder) label(yn *yaml.Node) (ast.Label, error) {
 	pos := d.pos(yn)
 
-	expr, err := d.scalar(yn)
+	var expr ast.Expr
+	var err error
+	var value string
+	switch yn.Kind {
+	case yaml.ScalarNode:
+		expr, err = d.scalar(yn)
+		value = yn.Value
+	case yaml.AliasNode:
+		if yn.Alias.Kind == yaml.ScalarNode {
+			expr, err = d.alias(yn)
+			value = yn.Alias.Value
+		} else {
+			return nil, d.posErrorf(yn, "invalid map key: %v", yn.Alias.ShortTag())
+		}
+	default:
+		return nil, d.posErrorf(yn, "invalid map key: %v", yn.ShortTag())
+	}
 	if err != nil {
 		return nil, err
 	}
+
 	switch expr := expr.(type) {
 	case *ast.BasicLit:
 		if expr.Kind == token.STRING {
-			if ast.IsValidIdent(yn.Value) && !internal.IsDefOrHidden(yn.Value) {
+			if ast.IsValidIdent(value) && !internal.IsDefOrHidden(value) {
 				return &ast.Ident{
 					NamePos: pos,
-					Name:    yn.Value,
+					Name:    value,
 				}, nil
 			}
 			ast.SetPos(expr, pos)
@@ -459,7 +473,7 @@ func (d *decoder) label(yn *yaml.Node) (ast.Label, error) {
 		}, nil
 
 	default:
-		return nil, d.posErrorf(yn, "invalid label "+yn.Value)
+		return nil, d.posErrorf(yn, "invalid label " + value)
 	}
 }
 

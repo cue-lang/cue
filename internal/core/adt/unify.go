@@ -343,6 +343,10 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 
 	n.finalizeDisjunctions()
 
+	if n.completed&(subFieldsProcessed) == 0 {
+		return false
+	}
+
 	w = v.DerefValue() // Dereference anything, including shared nodes.
 	if w != v {
 		// Clear value fields that are now referred to in the dereferenced
@@ -360,6 +364,8 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 			v.HasEllipsis = true
 		}
 		v.status = w.status
+
+		n.finalizeSharing()
 
 		// TODO: find a more principled way to catch this cycle and avoid this
 		// check.
@@ -389,50 +395,48 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	// }
 
 	// validationCompleted
-	if n.completed&(subFieldsProcessed) != 0 {
-		// The next piece of code used to address the following case
-		// (order matters)
-		//
-		// 		c1: c: [string]: f2
-		// 		f2: c1
-		// 		Also: cycle/issue990
-		//
-		// However, with recent changes, it no longer matters. Simultaneously,
-		// this causes a hang in the following case:
-		//
-		// 		_self: x: [...and(x)]
-		// 		_self
-		// 		x: [1]
-		//
-		// For this reason we disable it now. It may be the case that we need
-		// to enable it for computing disjunctions.
-		//
-		n.incDepth()
-		defer n.decDepth()
+	// The next piece of code used to address the following case
+	// (order matters)
+	//
+	// 		c1: c: [string]: f2
+	// 		f2: c1
+	// 		Also: cycle/issue990
+	//
+	// However, with recent changes, it no longer matters. Simultaneously,
+	// this causes a hang in the following case:
+	//
+	// 		_self: x: [...and(x)]
+	// 		_self
+	// 		x: [1]
+	//
+	// For this reason we disable it now. It may be the case that we need
+	// to enable it for computing disjunctions.
+	//
+	n.incDepth()
+	defer n.decDepth()
 
-		if pc := n.node.PatternConstraints; pc != nil {
-			for _, c := range pc.Pairs {
-				c.Constraint.unify(n.ctx, allKnown, attemptOnly)
-			}
+	if pc := n.node.PatternConstraints; pc != nil {
+		for _, c := range pc.Pairs {
+			c.Constraint.unify(n.ctx, allKnown, attemptOnly)
 		}
-
-		// XXX: find more strategic place to set ClosedRecursive and get rid
-		// of helper fields.
-		blockClose := n.hasTop
-		if n.hasStruct {
-			blockClose = false
-		}
-		if n.hasOpenValidator {
-			blockClose = true
-		}
-		if n.isDef && !n.isTotal && !blockClose {
-			n.node.ClosedRecursive = true
-		}
-
-		n.node.updateStatus(finalized)
-
-		n.checkTypos()
 	}
+
+	// XXX: find more strategic place to set ClosedRecursive and get rid
+	// of helper fields.
+	blockClose := n.hasTop
+	if n.hasStruct {
+		blockClose = false
+	}
+	if n.hasOpenValidator {
+		blockClose = true
+	}
+	if n.isDef && !n.isTotal && !blockClose {
+		n.node.ClosedRecursive = true
+	}
+
+	n.node.updateStatus(finalized)
+
+	n.checkTypos()
 
 	return n.meets(needs)
 }

@@ -6,15 +6,13 @@ cmp decls/p_go_gen.cue decls/p_go_gen.cue.golden
 
 # Marshal via Go's encoding/json and validate with the generated CUE schema.
 exec go run ./marshal
-cp stdout go_marshal.json
-cmp go_marshal.json go_marshal.json.golden
-exec cue vet go_marshal.json schema.cue
+cmp stdout go_marshal.json
+exec cue vet -c schema.cue go_marshal.json
 
-# Export from CUE and Unmarshal via Go's encoding/json.
+# Export from CUE to verify that it results in the same JSON as Go did.
+# This helps catch if any of the keys have been dropped or their values changed.
 exec cue export ./decls
-cmp stdout cue_export.json.golden
-stdin stdout
-exec go run ./unmarshal
+cmp stdout go_marshal.json
 
 -- schema.cue --
 package schema
@@ -40,16 +38,6 @@ package decls
 		#ErrorPrefix,
 		#ResetColor,
 	]
-}
--- go_marshal.json.golden --
-{"Duration":3000000000,"Strings":["\u001b[31mError:\u001b[0m","\u001b[0m"]}
--- cue_export.json.golden --
-{
-    "Duration": 3000000000,
-    "Strings": [
-        "\u001b[31mError:\u001b[0m",
-        "\u001b[0m"
-    ]
 }
 -- decls/p.go --
 package decls
@@ -102,33 +90,18 @@ func main() {
 			decls.ResetColor,
 		},
 	}
-	data, err := json.Marshal(r)
+	// Mimic the formatting of `cue export` to be able to compare bytes.
+	data, err := json.MarshalIndent(r, "", "    ")
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Printf("%s\n", data)
 }
--- unmarshal/main.go --
-package main
-
-import (
-	"encoding/json"
-	"io"
-	"os"
-	"fmt"
-	"log"
-
-	"mod.test/decls"
-)
-
-func main() {
-	data, err := io.ReadAll(os.Stdin)
-	if err != nil {
-		log.Fatal(err)
-	}
-	var r decls.Root
-	if err := json.Unmarshal(data, &r); err != nil {
-		log.Fatal(err)
-	}
-	fmt.Printf("%s\n", data)
+-- go_marshal.json --
+{
+    "Duration": 3000000000,
+    "Strings": [
+        "\u001b[31mError:\u001b[0m",
+        "\u001b[0m"
+    ]
 }

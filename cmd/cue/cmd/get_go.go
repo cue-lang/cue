@@ -30,6 +30,7 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 
 	"github.com/spf13/cobra"
 	"golang.org/x/tools/go/packages"
@@ -792,10 +793,17 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 				var cv cueast.Expr
 				switch v.Kind() {
 				case constant.String:
-					cv = &cueast.BasicLit{
-						Kind:  cuetoken.STRING,
-						Value: literal.String.Quote(constant.StringVal(v)),
+					s := constant.StringVal(v)
+					bl := &cueast.BasicLit{Kind: cuetoken.STRING}
+					// Go strings may contain any bytes, even invalid UTF-8.
+					// CUE strings may only contain valid UTF-8, because it has
+					// bytes values for anything that may not be valid UTF-8.
+					if utf8.ValidString(s) {
+						bl.Value = literal.String.Quote(s)
+					} else {
+						bl.Value = literal.Bytes.Quote(s)
 					}
+					cv = bl
 
 				default:
 					// TODO(mvdan): replace this with switch cases for Bool/Int/Float

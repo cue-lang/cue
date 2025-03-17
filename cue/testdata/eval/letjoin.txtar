@@ -146,10 +146,10 @@ diff old new
 --- old
 +++ new
 @@ -1,9 +1,9 @@
--Leaks:  24
--Freed:  219
--Reused: 207
--Allocs: 36
+-Leaks:  28
+-Freed:  215
+-Reused: 203
+-Allocs: 40
 -Retain: 160
 +Leaks:  212
 +Freed:  0
@@ -164,10 +164,10 @@ diff old new
 +Conjuncts:    353
 +Disjuncts:    36
 -- out/eval/stats --
-Leaks:  24
-Freed:  219
-Reused: 207
-Allocs: 36
+Leaks:  28
+Freed:  215
+Reused: 203
+Allocs: 40
 Retain: 160
 
 Unifications: 167

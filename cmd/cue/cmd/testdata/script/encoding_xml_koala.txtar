@@ -1,0 +1,89 @@
+# Test that the XML Koala encoding is fully supported in cmd/cue.
+# Note that we allow both "xml+koala" and just "koala",
+# even though the latter by itself is a made up word.
+# This is consistent with other encoding interpretations,
+# and should not cause conflicts as "koala" is rather unusual.
+
+# An XML interpretation like Koala must be specified.
+! exec cue export --out xml .
+cmp stderr encode-xml.stderr
+
+# We don't support encoding into XML yet.
+! exec cue export --out xml+koala .
+cmp stderr encode-xml-koala.stderr
+
+# An XML interpretation like Koala must be specified.
+! exec cue export export.xml
+cmp stderr decode-xml.stderr
+
+# Koala by itself is not a top-level encoding, unlike jsonschema.
+! exec cue export koala: export.xml
+cmp stderr decode-koala.stderr
+
+# Specifying xml+koala works, no matter the file input filename.
+exec cue export xml+koala: export.xml
+cmp stdout export.json
+stdin export.xml
+exec cue export xml+koala: export.xml
+cmp stdout export.json
+
+exec cue import -o - xml+koala: export.xml
+cmp stdout import.cue
+
+-- encode-xml.stderr --
+unsupported encoding "xml"
+-- encode-xml-koala.stderr --
+unsupported encoding "xml"
+-- decode-xml.stderr --
+xml requires a variant, such as: xml+koala
+-- decode-koala.stderr --
+unknown filetype koala
+-- export.xml --
+<root>
+    <message>Hello World!</message>
+    <nested>
+        <a1>one level</a1>
+        <a2>
+            <b>two levels</b>
+        </a2>
+    </nested>
+</root>
+-- export.json --
+{
+    "root": {
+        "message": {
+            "$$": "Hello World!"
+        },
+        "nested": {
+            "a1": {
+                "$$": "one level"
+            },
+            "a2": {
+                "b": {
+                    "$$": "two levels"
+                }
+            }
+        }
+    }
+}
+-- import.cue --
+root: {
+	message: $$: "Hello World!"
+	nested: {
+		a1: $$: "one level"
+		a2: b: $$: "two levels"
+	}
+}
+-- data.cue --
+package hello
+
+_who: "World"
+-- hello.cue --
+package hello
+
+root: {
+    message: "Hello \(_who)!" // who declared in data.cue
+
+    nested: a1: "one level"
+    nested: a2: b: "two levels"
+}

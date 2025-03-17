@@ -235,6 +235,36 @@ func TestFromFile(t *testing.T) {
 			Attributes:   true,
 		},
 	}, {
+		name: "KoalaXML",
+		in: build.File{
+			Filename: "foo.xml",
+			BoolTags: map[string]bool{
+				"koala": true,
+			},
+		},
+		mode: Def,
+		out: &FileInfo{
+			File: &build.File{
+				Filename: "foo.xml",
+				Encoding: "xml",
+				Form:     "data",
+				BoolTags: map[string]bool{
+					"koala": true,
+				},
+			},
+			Definitions:  false,
+			Data:         true,
+			Optional:     false,
+			Constraints:  false,
+			References:   false,
+			Cycles:       false,
+			KeepDefaults: false,
+			Incomplete:   false,
+			Imports:      false,
+			Docs:         true,
+			Attributes:   true,
+		},
+	}, {
 		name: "OpenAPIDefaults",
 		in: build.File{
 			Filename:       "-",
@@ -445,6 +475,9 @@ func TestParseArgs(t *testing.T) {
 				},
 			},
 		},
+	}, {
+		in:  "koala: bar.xml",
+		out: "unknown filetype koala",
 	}, {
 		in: "jsonschema+strict: bar.schema",
 		out: []*build.File{

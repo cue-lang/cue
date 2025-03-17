@@ -97,8 +97,9 @@ modes: input: {
 	}
 	extensions: ".json": interpretation: *"auto" | _
 	extensions: ".yaml": interpretation: *"auto" | _
-	extensions: ".yml": interpretation:  *"auto" | _
+	extensions: ".yml":  interpretation: *"auto" | _
 	extensions: ".toml": interpretation: *"auto" | _
+	extensions: ".xml":  interpretation: *"auto" | _
 }
 
 modes: export: {
@@ -160,6 +161,7 @@ modes: [string]: {
 		".yaml":      tagInfo.yaml
 		".yml":       tagInfo.yaml
 		".toml":      tagInfo.toml
+		".xml":       tagInfo.xml
 		".txt":       tagInfo.text
 		".go":        tagInfo.go
 		".wasm":      tagInfo.binary
@@ -205,6 +207,11 @@ modes: [string]: {
 	}
 
 	encodings: toml: {
+		forms.data
+		stream: false
+	}
+
+	encodings: xml: {
 		forms.data
 		stream: false
 	}
@@ -329,6 +336,16 @@ tagInfo: {
 	jsonl: encoding:     "jsonl"
 	yaml: encoding:      "yaml"
 	toml: encoding:      "toml"
+	xml: {
+		encoding: "xml"
+		boolTags: {
+			// We implement XML variants as boolean tags, such that "koala" is not accessible
+			// as a top-level filetype, and can only be used via "xml+koala".
+			// Note: once we add other XML variants, we need a "one of" here to ensure
+			// that only one of them can be picked at a time, ensuring we have good error messages.
+			koala: *false | bool
+		}
+	}
 	proto: encoding:     "proto"
 	textproto: encoding: "textproto"
 	// "binpb":  encodings.binproto

@@ -47,6 +47,7 @@ const (
 	JSON        Encoding = "json"
 	YAML        Encoding = "yaml"
 	TOML        Encoding = "toml"
+	XML         Encoding = "xml"
 	JSONL       Encoding = "jsonl"
 	Text        Encoding = "text"
 	Binary      Encoding = "binary"

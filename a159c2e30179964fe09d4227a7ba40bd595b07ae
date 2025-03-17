@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99d7a87e_809caccb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-17T12:12:57Z",
+      "side": 1,
+      "message": "\"a\" flat dynamic closedness?",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6cc78a76_091f4fd4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-17T12:12:57Z",
+      "side": 1,
+      "message": "So far, I\u0027ve looked through everything *apart* from typocheck.",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60f1dd86_e9b9fd96",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-17T12:12:57Z",
+      "side": 1,
+      "message": "I think you don\u0027t need both this line and line 270.",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06e83c2d_8848e224",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 859,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-17T12:12:57Z",
+      "side": 1,
+      "message": "I do find these two functions confusing in their implementation. It\u0027s not clear to me (a) when would I use one of these functions but not the other? (this really stems from the fact it\u0027s never been clear to me what difference you imply when you talk of a disjunct vs a disjunction). (b) why testing BaseValue for a *Disjunction is right in one, but *Vertex is right in the other.",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b76e793_276ea3d8",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 1169,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-17T12:12:57Z",
+      "side": 1,
+      "message": "I think you\u0027ve used the field name hasEllipsis before, which I find much more descriptive. Why is it more useful to name it isTotal here?",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5808781_f1bb0ee9",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 1001,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-17T12:12:57Z",
+      "side": 1,
+      "message": "was it deliberate to keep these newly-commented-out lines?",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

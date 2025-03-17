@@ -97,8 +97,9 @@ modes: input: {
 	}
 	extensions: ".json": interpretation: *"auto" | _
 	extensions: ".yaml": interpretation: *"auto" | _
-	extensions: ".yml": interpretation:  *"auto" | _
+	extensions: ".yml":  interpretation: *"auto" | _
 	extensions: ".toml": interpretation: *"auto" | _
+	extensions: ".xml":  interpretation: *"auto" | _
 }
 
 modes: export: {
@@ -160,6 +161,7 @@ modes: [string]: {
 		".yaml":      tagInfo.yaml
 		".yml":       tagInfo.yaml
 		".toml":      tagInfo.toml
+		".xml":       tagInfo.xml
 		".txt":       tagInfo.text
 		".go":        tagInfo.go
 		".wasm":      tagInfo.binary
@@ -205,6 +207,11 @@ modes: [string]: {
 	}
 
 	encodings: toml: {
+		forms.data
+		stream: false
+	}
+
+	encodings: xml: {
 		forms.data
 		stream: false
 	}
@@ -317,6 +324,11 @@ interpretations: pb: {
 	stream: true
 }
 
+interpretations: koala: {
+	forms.data
+	encoding: *"xml" | _
+}
+
 // tagInfo maps command line tags to file properties.
 tagInfo: {
 	schema: form: "schema"
@@ -329,6 +341,7 @@ tagInfo: {
 	jsonl: encoding:     "jsonl"
 	yaml: encoding:      "yaml"
 	toml: encoding:      "toml"
+	xml: encoding:       "xml"
 	proto: encoding:     "proto"
 	textproto: encoding: "textproto"
 	// "binpb":  encodings.binproto
@@ -365,4 +378,5 @@ tagInfo: {
 	}
 	jsonschema: interpretations.jsonschema
 	openapi:    interpretations.openapi
+	koala:      interpretations.koala
 }

@@ -37,6 +37,7 @@ import (
 	"cuelang.org/go/encoding/protobuf/jsonpb"
 	"cuelang.org/go/encoding/protobuf/textproto"
 	"cuelang.org/go/encoding/toml"
+	"cuelang.org/go/encoding/xml/koala"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/filetypes"
@@ -212,6 +213,7 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 	case build.ProtobufJSON:
 		i.interpretation = build.ProtobufJSON
 		i.rewriteFunc = protobufJSONFunc(cfg, f)
+	case build.Koala:
 	default:
 		i.err = fmt.Errorf("unsupported interpretation %q", f.Interpretation)
 	}
@@ -262,6 +264,14 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 	case build.TOML:
 		i.next = toml.NewDecoder(path, r).Decode
 		i.Next()
+	case build.XML:
+		switch f.Interpretation {
+		case build.Koala:
+			i.next = koala.NewDecoder(path, r).Decode
+			i.Next()
+		default:
+			i.err = fmt.Errorf("xml requires an interpretation, such as: xml+koala")
+		}
 	case build.Text:
 		b, err := io.ReadAll(r)
 		i.err = err

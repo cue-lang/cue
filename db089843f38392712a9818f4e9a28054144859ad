@@ -72,6 +72,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b410f8d_596c6bf2",
+        "filename": "cue/types.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 723,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-17T11:52:13Z",
+      "side": 1,
+      "message": "Ah, the pointer comparison should only be used to determine whether the value is a default. To see whether we can return the original value, we should still check against this original value:\n\n\tx :\u003d v.v.DerefValue()\n\td :\u003d x.Default()\n\tisDefault :\u003d d !\u003d x\n\tif d \u003d\u003d v.v {\n\t\treturn v, false\n\t}\n\treturn makeValue(v.idx, d, v.parent_), isDefault\n\nA better approach, perhaps, would be to have the getNum method dereference. But for now this seems more robust (to do as well) as functions generally rely on Default to get a fully cleaned scalar value.",
+      "parentUuid": "4ae479ff_d0c160c5",
+      "revId": "db089843f38392712a9818f4e9a28054144859ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "63b0351f_9fe633ae",

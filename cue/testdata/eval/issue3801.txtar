@@ -97,15 +97,15 @@ issue3801: nonRooted: full: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  197
+Leaks:  209
 Freed:  0
 Reused: 0
-Allocs: 197
+Allocs: 209
 Retain: 0
 
-Unifications: 156
-Conjuncts:    260
-Disjuncts:    12
+Unifications: 167
+Conjuncts:    273
+Disjuncts:    14
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -116,18 +116,18 @@ diff old new
 -Reused: 254
 -Allocs: 104
 -Retain: 121
-+Leaks:  197
++Leaks:  209
 +Freed:  0
 +Reused: 0
-+Allocs: 197
++Allocs: 209
 +Retain: 0
  
 -Unifications: 332
 -Conjuncts:    783
 -Disjuncts:    373
-+Unifications: 156
-+Conjuncts:    260
-+Disjuncts:    12
++Unifications: 167
++Conjuncts:    273
++Disjuncts:    14
 -- out/eval/stats --
 Leaks:  98
 Freed:  260
@@ -159,23 +159,11 @@ Disjuncts:    373
           }
           XXX: (struct){
             in: (string){ "foo" }
-            let X#2 = (_|_){
-              // [incomplete] issue3801.let.reduced.F.base.X: invalid interpolation: non-concrete value string (type string):
-              //     ./nested.cue:5:16
-              //     ./nested.cue:4:8
-            }
-            out: (_|_){
-              // [incomplete] issue3801.let.reduced.F.base.X: invalid interpolation: non-concrete value string (type string):
-              //     ./nested.cue:5:16
-              //     ./nested.cue:4:8
-            }
+            let X#2 = (string){ "foo" }
+            out: (string){ "foo" }
           }
         }
-        z: (_|_){
-          // [incomplete] issue3801.let.reduced.F.base.X: invalid interpolation: non-concrete value string (type string):
-          //     ./nested.cue:5:16
-          //     ./nested.cue:4:8
-        }
+        z: (string){ "foo" }
       }
       full: (struct){
         #Resource: (#struct){
@@ -262,37 +250,22 @@ Disjuncts:    373
                 }, (#struct){
                 }) }
               let pickMsg#4 = (#struct){
-                msg: (_|_){
-                  // [incomplete] issue3801.let.full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
-                  //     ./nested.cue:29:25
-                  //     ./nested.cue:25:12
-                }
+                msg: (string){ "foo" }
               }
               patches: (#list){
                 0: (#struct){
                   op: (string){ "add" }
                   path: (string){ "/metadata" }
-                  value: (_|_){
-                    // [incomplete] issue3801.let.full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
-                    //     ./nested.cue:29:25
-                    //     ./nested.cue:25:12
-                  }
+                  value: (string){ "foo" }
                 }
               }
             }
             namespace: (string){ string }
             patch: (#list){
-              0: (_|_){
-                // [incomplete] issue3801.let.full.#Main.jsonPatch.patch.0: 2 errors in empty disjunction:
-                // issue3801.let.full.#Main.jsonPatch.patch.0.op: conflicting values "remove" and "add":
-                //     ./nested.cue:33:11
-                //     ./nested.cue:50:9
-                // issue3801.let.full.#Main.jsonPatch.patch.0.value: invalid interpolation: non-concrete value string (type string):
-                //     ./nested.cue:29:25
-                //     ./nested.cue:25:12
+              0: (#struct){
                 op: (string){ "add" }
                 path: (string){ "/metadata" }
-                value: (_){ _ }
+                value: (string){ "foo" }
               }
             }
             output: (_|_){
@@ -304,17 +277,10 @@ Disjuncts:    373
         }
         out: (#struct){
           ns1: (#list){
-            0: (_|_){
-              // [incomplete] jsonPatch.output.ns1.0: 2 errors in empty disjunction:
-              // jsonPatch.output.ns1.0.op: conflicting values "remove" and "add":
-              //     ./nested.cue:33:11
-              //     ./nested.cue:50:9
-              // jsonPatch.output.ns1.0.value: invalid interpolation: non-concrete value string (type string):
-              //     ./nested.cue:29:25
-              //     ./nested.cue:25:12
+            0: (#struct){
               op: (string){ "add" }
               path: (string){ "/metadata" }
-              value: (_){ _ }
+              value: (string){ "foo" }
             }
           }
         }
@@ -391,36 +357,7 @@ diff old new
                //     ./nested.cue:5:16
                //     ./nested.cue:4:8
              }
-@@ -18,11 +18,23 @@
-           }
-           XXX: (struct){
-             in: (string){ "foo" }
--            let X#2 = (string){ "foo" }
--            out: (string){ "foo" }
--          }
--        }
--        z: (string){ "foo" }
-+            let X#2 = (_|_){
-+              // [incomplete] issue3801.let.reduced.F.base.X: invalid interpolation: non-concrete value string (type string):
-+              //     ./nested.cue:5:16
-+              //     ./nested.cue:4:8
-+            }
-+            out: (_|_){
-+              // [incomplete] issue3801.let.reduced.F.base.X: invalid interpolation: non-concrete value string (type string):
-+              //     ./nested.cue:5:16
-+              //     ./nested.cue:4:8
-+            }
-+          }
-+        }
-+        z: (_|_){
-+          // [incomplete] issue3801.let.reduced.F.base.X: invalid interpolation: non-concrete value string (type string):
-+          //     ./nested.cue:5:16
-+          //     ./nested.cue:4:8
-+        }
-       }
-       full: (struct){
-         #Resource: (#struct){
-@@ -43,7 +55,7 @@
+@@ -43,7 +43,7 @@
                op: (string){ "add" }
                path: (string){ "/metadata" }
                value: (_|_){
@@ -429,7 +366,7 @@ diff old new
                  //     ./nested.cue:29:25
                  //     ./nested.cue:25:12
                }
-@@ -72,38 +84,11 @@
+@@ -72,38 +72,11 @@
          #Main: (#struct){
            namespace: (string){ string }
            output: (_|_){
@@ -470,7 +407,7 @@ diff old new
              let base#8 = (#struct){
                someMsg: (string){ string }
                obs: (#struct){ |(*(#struct){
-@@ -122,7 +107,7 @@
+@@ -122,7 +95,7 @@
                    op: (string){ "add" }
                    path: (string){ "/metadata" }
                    value: (_|_){
@@ -479,80 +416,27 @@ diff old new
                      //     ./nested.cue:29:25
                      //     ./nested.cue:25:12
                    }
-@@ -136,24 +121,59 @@
-                 }, (#struct){
-                 }) }
-               let pickMsg#4 = (#struct){
--                msg: (string){ "foo" }
--              }
--              patches: (#list){
--                0: (#struct){
--                  op: (string){ "add" }
--                  path: (string){ "/metadata" }
--                  value: (string){ "foo" }
--                }
--              }
-+                msg: (_|_){
-+                  // [incomplete] issue3801.let.full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
-+                  //     ./nested.cue:29:25
-+                  //     ./nested.cue:25:12
-+                }
-+              }
-+              patches: (#list){
-+                0: (#struct){
-+                  op: (string){ "add" }
-+                  path: (string){ "/metadata" }
-+                  value: (_|_){
-+                    // [incomplete] issue3801.let.full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
-+                    //     ./nested.cue:29:25
-+                    //     ./nested.cue:25:12
-+                  }
-+                }
-+              }
-+            }
+@@ -146,6 +119,19 @@
+                 }
+               }
+             }
 +            namespace: (string){ string }
 +            patch: (#list){
-+              0: (_|_){
-+                // [incomplete] issue3801.let.full.#Main.jsonPatch.patch.0: 2 errors in empty disjunction:
-+                // issue3801.let.full.#Main.jsonPatch.patch.0.op: conflicting values "remove" and "add":
-+                //     ./nested.cue:33:11
-+                //     ./nested.cue:50:9
-+                // issue3801.let.full.#Main.jsonPatch.patch.0.value: invalid interpolation: non-concrete value string (type string):
-+                //     ./nested.cue:29:25
-+                //     ./nested.cue:25:12
++              0: (#struct){
 +                op: (string){ "add" }
 +                path: (string){ "/metadata" }
-+                value: (_){ _ }
++                value: (string){ "foo" }
 +              }
 +            }
 +            output: (_|_){
 +              // [incomplete] issue3801.let.full.#Main.jsonPatch.output: key value of dynamic field must be concrete, found string:
 +              //     ./nested.cue:43:24
 +              //     ./nested.cue:41:15
-             }
++            }
            }
          }
          out: (#struct){
-           ns1: (#list){
--            0: (#struct){
--              op: (string){ "add" }
--              path: (string){ "/metadata" }
--              value: (string){ "foo" }
-+            0: (_|_){
-+              // [incomplete] jsonPatch.output.ns1.0: 2 errors in empty disjunction:
-+              // jsonPatch.output.ns1.0.op: conflicting values "remove" and "add":
-+              //     ./nested.cue:33:11
-+              //     ./nested.cue:50:9
-+              // jsonPatch.output.ns1.0.value: invalid interpolation: non-concrete value string (type string):
-+              //     ./nested.cue:29:25
-+              //     ./nested.cue:25:12
-+              op: (string){ "add" }
-+              path: (string){ "/metadata" }
-+              value: (_){ _ }
-             }
-           }
-         }
-@@ -175,7 +195,7 @@
+@@ -175,7 +161,7 @@
              }
            }
          }
@@ -561,7 +445,7 @@ diff old new
            #base: (#struct){
              val0: (string){ string }
              msgObj: (string){ string }
-@@ -183,23 +203,22 @@
+@@ -183,23 +169,22 @@
            }
            out: (#struct){
              val0: (string){ "foo" }

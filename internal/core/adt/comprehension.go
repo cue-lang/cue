@@ -187,8 +187,7 @@ func (n *nodeContext) insertComprehension(
 				conjunct := MakeConjunct(env, c, ci)
 				if n.ctx.isDevVersion() {
 					n.assertInitialized()
-					v := n.insertArcCC(f.Label, ArcPending, conjunct, conjunct.CloseInfo, false)
-					c.arcCC = v
+					n.insertArcCC(f.Label, ArcPending, conjunct, conjunct.CloseInfo, false)
 				} else {
 					n.insertFieldUnchecked(f.Label, ArcPending, conjunct)
 				}
@@ -454,19 +453,12 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 	d.inserted = true
 
 	if len(d.envs) == 0 {
-		if arc := d.leaf.arcCC; arc != nil {
-			arc.updateArcType(ArcNotPresent)
-		}
+		n.node.updateArcType(ArcNotPresent)
 		return nil
 	}
 
 	v := n.node
 	for c := d.leaf; c.parent != nil; c = c.parent {
-		// because the parent referrer will reach a zero count before this
-		// node will reach a zero count, we need to propagate the arcType.
-		if p := c.arcCC; p != nil {
-			p.updateArcType(c.arcType) // TODO: Still necessary?
-		}
 		v.updateArcType(c.arcType)
 		if v.ArcType == ArcNotPresent {
 			parent := v.Parent

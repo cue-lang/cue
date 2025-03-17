@@ -1,0 +1,55 @@
+# Test that the XML Koala encoding is fully supported in cmd/cue.
+
+# We don't support encoding into XML yet.
+! exec cue export --out xml .
+! exec cue export --out xml+koala .
+
+# An XML interpretation like Koala must be specified.
+! exec cue export --out json export.xml
+# exec cue export --out json xml+koala: export.xml
+# cmp stdout export.json
+exec cue export --out json koala: export.xml
+cmp stdout export.json
+
+exec cue import -o - export.xml
+cmp stdout import.cue
+exec cue import -o - xml .
+cmp stdout import.cue
+
+-- encode.stderr --
+unsupported encoding "xml"
+-- encode-koala.stderr --
+unsupported encoding "xml"
+-- export.xml --
+message = 'Hello World!'
+
+[nested]
+a1 = 'one level'
+
+[nested.a2]
+b = 'two levels'
+-- export.json --
+{
+    "message": "Hello World!",
+    "nested": {
+        "a1": "one level",
+        "a2": {
+            "b": "two levels"
+        }
+    }
+}
+-- import.cue --
+message: "Hello World!"
+nested: a1: "one level"
+nested: a2: b: "two levels"
+-- data.cue --
+package hello
+
+_who: "World"
+-- hello.cue --
+package hello
+
+message: "Hello \(_who)!" // who declared in data.cue
+
+nested: a1: "one level"
+nested: a2: b: "two levels"

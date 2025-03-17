@@ -552,10 +552,6 @@ func (c *visitor) markConjuncts(v *adt.Vertex) {
 // proactive. For selectors and indices this means we need to evaluate their
 // objects to see exactly what the selector or index refers to.
 func (c *visitor) markInternalResolvers(env *adt.Environment, r adt.Resolver, v *adt.Vertex) {
-	if v.Rooted() {
-		panic("node must not be rooted")
-	}
-
 	saved := c.all // recursive traversal already done by this function.
 
 	// As lets have no path and we otherwise will not process them, we set

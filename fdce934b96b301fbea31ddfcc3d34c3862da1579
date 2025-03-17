@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef99fd6d_6bbedbe9",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-17T13:05:40Z",
+      "side": 1,
+      "message": "Good point. It should be 0xffff_ffff. Fixed.\n\nWith that, the machines memory limit is a natural protection.",
+      "parentUuid": "3c316110_03a494f1",
+      "revId": "fdce934b96b301fbea31ddfcc3d34c3862da1579",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c4dd08bb_ec1b5981",

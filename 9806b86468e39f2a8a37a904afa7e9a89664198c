@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0de78f5b_7887494c",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-17T13:05:40Z",
+      "side": 1,
+      "message": "Updated the comment. It is probably good to have some check again for this in the future. But for the sake of transition, we leave it. Note also there are some cases where the new closedness _does_ check inline structs.",
+      "parentUuid": "9cac349f_c4eed3d2",
+      "revId": "9806b86468e39f2a8a37a904afa7e9a89664198c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7f2e0498_4a5ce6ad",
         "filename": "internal/core/adt/conjunct.go",
         "patchSetId": 6
@@ -49,6 +67,24 @@
       "writtenOn": "2025-03-14T14:06:40Z",
       "side": 1,
       "message": "these two lines are shared with the previous case - move them outside the switch?",
+      "revId": "9806b86468e39f2a8a37a904afa7e9a89664198c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c438ee50_9ad8962d",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-17T13:05:40Z",
+      "side": 1,
+      "message": "They have different arguments. The last line I can share, though.",
+      "parentUuid": "7f2e0498_4a5ce6ad",
       "revId": "9806b86468e39f2a8a37a904afa7e9a89664198c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -70,6 +106,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c4855b6f_abf24f0b",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 729,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-17T13:05:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "74219c6f_c1a59285",
+      "revId": "9806b86468e39f2a8a37a904afa7e9a89664198c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "91cf1bb8_ef952bfc",
@@ -83,6 +137,24 @@
       "writtenOn": "2025-03-14T14:06:40Z",
       "side": 1,
       "message": "reuse cx and cy in this switch case?",
+      "revId": "9806b86468e39f2a8a37a904afa7e9a89664198c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ee072f1_97b90efc",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 735,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-17T13:05:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "91cf1bb8_ef952bfc",
       "revId": "9806b86468e39f2a8a37a904afa7e9a89664198c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -104,6 +176,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "74302f51_24e9f4c5",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-17T13:05:40Z",
+      "side": 1,
+      "message": "I do not remember what this is for. Removed.",
+      "parentUuid": "a0462efa_9d135fdd",
+      "revId": "9806b86468e39f2a8a37a904afa7e9a89664198c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c8fb38e3_5d7ce1ea",
@@ -121,6 +211,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf1e8694_d4a06426",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-17T13:05:40Z",
+      "side": 1,
+      "message": "I looked at it a bit, and it is not straightforward. This is closest to how it used to work, so I\u0027ll leave this code in and changed it to a TODO.",
+      "parentUuid": "c8fb38e3_5d7ce1ea",
+      "revId": "9806b86468e39f2a8a37a904afa7e9a89664198c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "293e92cc_327aa719",
@@ -134,6 +242,24 @@
       "writtenOn": "2025-03-14T14:06:40Z",
       "side": 1,
       "message": "opendef _disables_ closedness typo checking, no?",
+      "revId": "9806b86468e39f2a8a37a904afa7e9a89664198c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44755eeb_fde20789",
+        "filename": "internal/cuedebug/cuedebug.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-17T13:05:40Z",
+      "side": 1,
+      "message": "Ah yes, original name was for an opposite flag, but forgot to update comment when flipping it.",
+      "parentUuid": "293e92cc_327aa719",
       "revId": "9806b86468e39f2a8a37a904afa7e9a89664198c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

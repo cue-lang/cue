@@ -97,7 +97,14 @@ embed: openValidator: t2: {
 	a: X
 	a: b: 1
 }
-
+disjunction: withErr: t1: {
+	params: {}
+	out: #Schema1 & {
+		b1: b2: b3: params.mayExistLater
+	}
+	#Schema1: b1?: null | #Schema2
+	#Schema2: b2?: null | {b3?: string}
+}
 -- large.cue --
 full: {
 	#Resource: {
@@ -147,53 +154,56 @@ full: {
 	out: (#Main & {namespace: "ns1"}).output
 }
 -- out/evalalpha/stats --
-Leaks:  111
+Leaks:  273
 Freed:  0
 Reused: 0
-Allocs: 111
+Allocs: 273
 Retain: 0
 
-Unifications: 78
-Conjuncts:    141
-Disjuncts:    12
+Unifications: 223
+Conjuncts:    416
+Disjuncts:    22
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
 @@ -1,9 +1,9 @@
--Leaks:  12
--Freed:  160
--Reused: 150
--Allocs: 22
--Retain: 20
-+Leaks:  111
+-Leaks:  15
+-Freed:  319
+-Reused: 305
+-Allocs: 29
+-Retain: 34
++Leaks:  273
 +Freed:  0
 +Reused: 0
-+Allocs: 111
++Allocs: 273
 +Retain: 0
  
--Unifications: 146
--Conjuncts:    331
--Disjuncts:    179
-+Unifications: 78
-+Conjuncts:    141
-+Disjuncts:    12
+-Unifications: 298
+-Conjuncts:    629
+-Disjuncts:    352
++Unifications: 223
++Conjuncts:    416
++Disjuncts:    22
 -- out/eval/stats --
 Leaks:  15
-Freed:  291
-Reused: 280
-Allocs: 26
-Retain: 32
+Freed:  319
+Reused: 305
+Allocs: 29
+Retain: 34
 
-Unifications: 280
-Conjuncts:    594
-Disjuncts:    322
+Unifications: 298
+Conjuncts:    629
+Disjuncts:    352
 -- out/evalalpha --
 Errors:
 and.transitive.out.ok: field not allowed:
     ./in.cue:38:3
 and.transitiveWithEmbed.out.ok: field not allowed:
     ./in.cue:46:3
+disjunction.withErr.t1.out.b1: field not allowed:
+    ./validators.cue:29:3
+    ./validators.cue:31:12
 embed.andEmbed.d.err: field not allowed:
     ./in.cue:31:11
 embed.andInStruct.a.err: field not allowed:
@@ -621,12 +631,51 @@ Result:
       }
     }
   }
+  disjunction: (_|_){
+    // [eval]
+    withErr: (_|_){
+      // [eval]
+      t1: (_|_){
+        // [eval]
+        params: (struct){
+        }
+        out: (_|_){
+          // [eval]
+          b1: (_|_){
+            // [eval] disjunction.withErr.t1.out.b1: field not allowed:
+            //     ./validators.cue:29:3
+            //     ./validators.cue:31:12
+            b2: (_|_){
+              // [eval] disjunction.withErr.t1.out.b1.b2: field not allowed:
+              //     ./validators.cue:29:7
+              b3: (_|_){
+                // [eval] disjunction.withErr.t1.out.b1.b2.b3: field not allowed:
+                //     ./validators.cue:29:11
+              }
+            }
+          }
+        }
+        #Schema1: (#struct){
+          b1?: ((null|struct)){ |((null){ null }, (#struct){
+              b2?: ((null|struct)){ |((null){ null }, (#struct){
+                  b3?: (string){ string }
+                }) }
+            }) }
+        }
+        #Schema2: (#struct){
+          b2?: ((null|struct)){ |((null){ null }, (#struct){
+              b3?: (string){ string }
+            }) }
+        }
+      }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,81 +1,29 @@
+@@ -1,81 +1,32 @@
  Errors:
  and.transitive.out.ok: field not allowed:
 -    ./in.cue:34:5
@@ -643,6 +692,9 @@ diff old new
 -    ./in.cue:44:7
 -    ./in.cue:45:7
      ./in.cue:46:3
++disjunction.withErr.t1.out.b1: field not allowed:
++    ./validators.cue:29:3
++    ./validators.cue:31:12
  embed.andEmbed.d.err: field not allowed:
 -    ./in.cue:28:6
 -    ./in.cue:29:6
@@ -708,7 +760,7 @@ diff old new
  embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
      ./validators.cue:21:5
      ./validators.cue:21:12
-@@ -94,14 +42,11 @@
+@@ -94,14 +45,11 @@
        }
        a: (_|_){
          // [eval]
@@ -724,7 +776,7 @@ diff old new
        }
      }
      andInStruct: (_|_){
-@@ -111,14 +56,11 @@
+@@ -111,14 +59,11 @@
        }
        a: (_|_){
          // [eval]
@@ -740,7 +792,7 @@ diff old new
        }
      }
      embedDefWithEmbedding: (_|_){
-@@ -128,15 +70,11 @@
+@@ -128,15 +73,11 @@
        }
        a: (_|_){
          // [eval]
@@ -757,7 +809,7 @@ diff old new
        }
      }
      embedComprehension: (_|_){
-@@ -146,16 +84,11 @@
+@@ -146,16 +87,11 @@
        }
        a: (_|_){
          // [eval]
@@ -775,7 +827,7 @@ diff old new
        }
      }
      fieldWithAnd: (_|_){
-@@ -166,9 +99,6 @@
+@@ -166,9 +102,6 @@
          // [eval]
          err: (_|_){
            // [eval] embed.fieldWithAnd.a.err: field not allowed:
@@ -785,7 +837,7 @@ diff old new
            //     ./in.cue:20:13
          }
        }
-@@ -179,20 +109,15 @@
+@@ -179,20 +112,15 @@
          a: (int){ int }
        }
        B: (struct){
@@ -811,7 +863,7 @@ diff old new
        }
      }
      andEmbed: (_|_){
-@@ -208,17 +133,11 @@
+@@ -208,17 +136,11 @@
        }
        d: (_|_){
          // [eval]
@@ -830,7 +882,7 @@ diff old new
        }
      }
      nonDef: (struct){
-@@ -227,12 +146,12 @@
+@@ -227,12 +149,12 @@
            a: (string){ string }
          }
          #Y: (#struct){
@@ -847,7 +899,7 @@ diff old new
          }
        }
      }
-@@ -242,12 +161,12 @@
+@@ -242,12 +164,12 @@
            Name: (string){ string }
          }
          #Step: (#struct){
@@ -864,7 +916,7 @@ diff old new
          }
          out: (#struct){
            Name: (string){ "foo" }
-@@ -257,21 +176,15 @@
+@@ -257,21 +179,15 @@
      }
      withIndirect: (_|_){
        // [eval]
@@ -891,7 +943,7 @@ diff old new
      }
      normalValidator: (_|_){
        // [eval]
-@@ -281,20 +194,17 @@
+@@ -281,20 +197,17 @@
        }
        x: (_|_){
          // [eval]
@@ -915,7 +967,7 @@ diff old new
          #X: (_){
            matchN(0, (#list){
            })
-@@ -301,17 +211,10 @@
+@@ -301,17 +214,10 @@
            a?: (int){ int }
            b?: (int){ int }
          }
@@ -937,7 +989,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -330,10 +233,7 @@
+@@ -330,10 +236,7 @@
            // [eval]
            b: (_|_){
              // [eval] embed.openValidator.t2.a.b: conflicting values 1 and {b?:Y} (mismatched types int and struct):
@@ -948,7 +1000,7 @@ diff old new
              //     ./validators.cue:24:8
              // embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
              //     ./validators.cue:21:5
-@@ -360,16 +260,11 @@
+@@ -360,16 +263,11 @@
        }
        out: (_|_){
          // [eval]
@@ -966,7 +1018,7 @@ diff old new
        }
      }
      transitiveWithEmbed: (_|_){
-@@ -385,17 +280,11 @@
+@@ -385,17 +283,11 @@
        }
        out: (_|_){
          // [eval]
@@ -985,7 +1037,7 @@ diff old new
        }
      }
    }
-@@ -418,7 +307,7 @@
+@@ -418,7 +310,7 @@
            op: (string){ "add" }
            path: (string){ "/metadata" }
            value: (_|_){
@@ -994,7 +1046,7 @@ diff old new
              //     ./large.cue:7:25
              //     ./large.cue:3:12
            }
-@@ -447,38 +336,11 @@
+@@ -447,38 +339,11 @@
      #Main: (#struct){
        namespace: (string){ string }
        output: (_|_){
@@ -1035,7 +1087,7 @@ diff old new
          let base#5 = (#struct){
            someMsg: (string){ string }
            obs: (#struct){ |(*(#struct){
-@@ -497,7 +359,7 @@
+@@ -497,7 +362,7 @@
                op: (string){ "add" }
                path: (string){ "/metadata" }
                value: (_|_){
@@ -1044,7 +1096,7 @@ diff old new
                  //     ./large.cue:7:25
                  //     ./large.cue:3:12
                }
-@@ -511,24 +373,59 @@
+@@ -511,55 +376,83 @@
              }, (#struct){
              }) }
            let pickMsg#1 = (#struct){
@@ -1103,6 +1155,13 @@ diff old new
 -          op: (string){ "add" }
 -          path: (string){ "/metadata" }
 -          value: (string){ "foo" }
+-        }
+-      }
+-    }
+-  }
+-  disjunction: (struct){
+-    withErr: (struct){
+-      t1: (struct){
 +        0: (_|_){
 +          // [incomplete] jsonPatch.output.ns1.0: 2 errors in empty disjunction:
 +          // jsonPatch.output.ns1.0.op: conflicting values "remove" and "add":
@@ -1114,9 +1173,52 @@ diff old new
 +          op: (string){ "add" }
 +          path: (string){ "/metadata" }
 +          value: (_){ _ }
++        }
++      }
++    }
++  }
++  disjunction: (_|_){
++    // [eval]
++    withErr: (_|_){
++      // [eval]
++      t1: (_|_){
++        // [eval]
+         params: (struct){
          }
-       }
-     }
+-        out: (#struct){
++        out: (_|_){
++          // [eval]
+           b1: (_|_){
+-            // [incomplete] disjunction.withErr.t1.out.b1: 4 errors in empty disjunction:
+-            // disjunction.withErr.t1.out.b1: conflicting values null and {b2:{b3:params.mayExistLater}} (mismatched types null and struct):
+-            //     ./validators.cue:29:7
+-            //     ./validators.cue:31:17
+-            // disjunction.withErr.t1.out.b1.b2: 2 errors in empty disjunction:
+-            // disjunction.withErr.t1.out.b1.b2: conflicting values null and {b3:params.mayExistLater} (mismatched types null and struct):
+-            //     ./validators.cue:29:11
+-            //     ./validators.cue:32:17
+-            // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
+-            //     ./validators.cue:29:22
++            // [eval] disjunction.withErr.t1.out.b1: field not allowed:
++            //     ./validators.cue:29:3
++            //     ./validators.cue:31:12
+             b2: (_|_){
+-              // [incomplete] disjunction.withErr.t1.out.b1.b2: 2 errors in empty disjunction:
+-              // disjunction.withErr.t1.out.b1.b2: conflicting values null and {b3:params.mayExistLater} (mismatched types null and struct):
+-              //     ./validators.cue:29:11
+-              //     ./validators.cue:32:17
+-              // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
+-              //     ./validators.cue:29:22
++              // [eval] disjunction.withErr.t1.out.b1.b2: field not allowed:
++              //     ./validators.cue:29:7
+               b3: (_|_){
+-                // [incomplete] disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
+-                //     ./validators.cue:29:22
++                // [eval] disjunction.withErr.t1.out.b1.b2.b3: field not allowed:
++                //     ./validators.cue:29:11
+               }
+             }
+           }
 -- diff/todo/p1 --
 embed.openValidator.err: unexpected pass.
 and.full.out: failure in evalv3
@@ -1658,6 +1760,52 @@ Result:
       }
     }
   }
+  disjunction: (struct){
+    withErr: (struct){
+      t1: (struct){
+        params: (struct){
+        }
+        out: (#struct){
+          b1: (_|_){
+            // [incomplete] disjunction.withErr.t1.out.b1: 4 errors in empty disjunction:
+            // disjunction.withErr.t1.out.b1: conflicting values null and {b2:{b3:params.mayExistLater}} (mismatched types null and struct):
+            //     ./validators.cue:29:7
+            //     ./validators.cue:31:17
+            // disjunction.withErr.t1.out.b1.b2: 2 errors in empty disjunction:
+            // disjunction.withErr.t1.out.b1.b2: conflicting values null and {b3:params.mayExistLater} (mismatched types null and struct):
+            //     ./validators.cue:29:11
+            //     ./validators.cue:32:17
+            // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
+            //     ./validators.cue:29:22
+            b2: (_|_){
+              // [incomplete] disjunction.withErr.t1.out.b1.b2: 2 errors in empty disjunction:
+              // disjunction.withErr.t1.out.b1.b2: conflicting values null and {b3:params.mayExistLater} (mismatched types null and struct):
+              //     ./validators.cue:29:11
+              //     ./validators.cue:32:17
+              // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
+              //     ./validators.cue:29:22
+              b3: (_|_){
+                // [incomplete] disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
+                //     ./validators.cue:29:22
+              }
+            }
+          }
+        }
+        #Schema1: (#struct){
+          b1?: ((null|struct)){ |((null){ null }, (#struct){
+              b2?: ((null|struct)){ |((null){ null }, (#struct){
+                  b3?: (string){ string }
+                }) }
+            }) }
+        }
+        #Schema2: (#struct){
+          b2?: ((null|struct)){ |((null){ null }, (#struct){
+              b3?: (string){ string }
+            }) }
+        }
+      }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -1928,6 +2076,28 @@ Result:
         a: 〈0;X〉
         a: {
           b: 1
+        }
+      }
+    }
+  }
+  disjunction: {
+    withErr: {
+      t1: {
+        params: {}
+        out: (〈0;#Schema1〉 & {
+          b1: {
+            b2: {
+              b3: 〈3;params〉.mayExistLater
+            }
+          }
+        })
+        #Schema1: {
+          b1?: (null|〈1;#Schema2〉)
+        }
+        #Schema2: {
+          b2?: (null|{
+            b3?: string
+          })
         }
       }
     }

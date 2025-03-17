@@ -2003,12 +2003,6 @@ type Comprehension struct {
 	// Kind indicates the possible kind of Value.
 	kind Kind
 
-	// The node into which the comprehension is added. Upon a successful
-	// completion of the comprehension, the arcType should be updated in this
-	// node.
-	// TODO: rename to arc and rename arc to something else.
-	arcCC *Vertex
-
 	// Only used for partial comprehensions.
 	comp   *envComprehension
 	parent *Comprehension // comprehension from which this one was derived, if any

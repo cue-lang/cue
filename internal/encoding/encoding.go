@@ -37,6 +37,7 @@ import (
 	"cuelang.org/go/encoding/protobuf/jsonpb"
 	"cuelang.org/go/encoding/protobuf/textproto"
 	"cuelang.org/go/encoding/toml"
+	"cuelang.org/go/encoding/xml/koala"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/filetypes"
@@ -262,6 +263,14 @@ func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 	case build.TOML:
 		i.next = toml.NewDecoder(path, r).Decode
 		i.Next()
+	case build.XML:
+		switch {
+		case f.BoolTags["koala"]:
+			i.next = koala.NewDecoder(path, r).Decode
+			i.Next()
+		default:
+			i.err = fmt.Errorf("xml requires a variant, such as: xml+koala")
+		}
 	case build.Text:
 		b, err := io.ReadAll(r)
 		i.err = err

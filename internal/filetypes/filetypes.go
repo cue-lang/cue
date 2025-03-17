@@ -315,7 +315,9 @@ func toFile(modeVal, fileVal cue.Value, filename string) (*build.File, error) {
 			extFile := modeVal.LookupPath(cue.MakePath(cue.Str("extensions"), cue.Str(ext)))
 			fileVal = fileVal.Unify(extFile)
 			if err := fileVal.Err(); err != nil {
-				return nil, errors.Newf(token.NoPos, "unknown file extension %s", ext)
+				if strings.Contains(err.Error(), "conflicting values") {
+					return nil, errors.Newf(token.NoPos, "incompatible file extension %s", ext)
+				}
 			}
 		} else {
 			return nil, errors.Newf(token.NoPos, "no encoding specified for file %q", filename)

@@ -167,7 +167,7 @@ func (n *nodeContext) getArc(f Feature, mode ArcType) (arc *Vertex, isNew bool) 
 		Parent:    v,
 		Label:     f,
 		ArcType:   mode,
-		nonRooted: v.IsDynamic || v.Label.IsLet() || v.nonRooted,
+		nonRooted: v.IsDynamic || v.nonRooted,
 		anonymous: v.anonymous || v.Label.IsLet(),
 	}
 	if n.scheduler.frozen&fieldSetKnown != 0 {

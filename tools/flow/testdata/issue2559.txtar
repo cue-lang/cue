@@ -59,20 +59,20 @@ graph TD
 	text:   "5"
 }
 -- out/run/t1/stats --
-Leaks:  0
-Freed:  25574
-Reused: 25554
-Allocs: 20
+Leaks:  35
+Freed:  25539
+Reused: 25523
+Allocs: 51
 Retain: 337
 
 Unifications: 18344
 Conjuncts:    76391
 Disjuncts:    25823
 -- out/run/stats/totals --
-Leaks:  0
-Freed:  25574
-Reused: 25554
-Allocs: 20
+Leaks:  35
+Freed:  25539
+Reused: 25523
+Allocs: 51
 Retain: 337
 
 Unifications: 18344

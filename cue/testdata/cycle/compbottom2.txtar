@@ -281,10 +281,10 @@ nestedChain: {
 	}
 }
 -- out/eval/stats --
-Leaks:  1
-Freed:  158
-Reused: 149
-Allocs: 10
+Leaks:  15
+Freed:  144
+Reused: 138
+Allocs: 21
 Retain: 67
 
 Unifications: 159

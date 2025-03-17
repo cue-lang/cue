@@ -934,6 +934,9 @@ embed.fail4.p: field not allowed:
     ./in.cue:87:4
 issue3535.regular.foo.regular: field not allowed:
     ./issue3535.cue:22:4
+issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
+    ./issue3729.cue:9:9
+    ./issue3729.cue:11:9
 noStackOverflowStructCycle.#list.tail: structural cycle
 noStackOverflowStructCycle.list.tail: structural cycle
 structShare.err1.x.d.e: field not allowed:
@@ -1652,22 +1655,26 @@ Result:
       }
     }
   }
-  issue3729: (struct){
+  issue3729: (_|_){
+    // [eval]
     withDisjunction: (struct){
       #Root: (#struct){
         sub1?: (#struct){
           #sub2?: (bool){ bool }
         }
       }
-      root: ((null|struct)){ |((null){ null }, (#struct){
-          sub1?: (#struct){
-            #sub2: (bool){ true }
-          }
-        }) }
+      root: (#struct){
+        sub1?: (#struct){
+          #sub2: (bool){ true }
+        }
+      }
     }
-    withoutDisjunction: (struct){
-      root: (null){
-        null
+    withoutDisjunction: (_|_){
+      // [eval]
+      root: (_|_){
+        // [eval] issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
+        //     ./issue3729.cue:9:9
+        //     ./issue3729.cue:11:9
         #sub1?: (#struct){
           #sub2: (bool){ true }
         }
@@ -1687,11 +1694,11 @@ Result:
           #sub2?: (bool){ bool }
         }
       }
-      root: ((null|struct)){ |((null){ null }, (#struct){
-          #sub1?: (#struct){
-            #sub2: (bool){ true }
-          }
-        }) }
+      root: (#struct){
+        #sub1?: (#struct){
+          #sub2: (bool){ true }
+        }
+      }
     }
     withEmbed: (struct){
       incomplete: (struct){
@@ -1731,12 +1738,12 @@ Result:
       }
       argoApp: (#struct){
         spec: (#struct){
-          syncPolicy: ((null|struct)){ |((null){ null }, (#struct){
-              automated: (#struct){
-                prune: (bool){ true }
-                selfHeal: (bool){ true }
-              }
-            }) }
+          syncPolicy: (#struct){
+            automated: (#struct){
+              prune: (bool){ true }
+              selfHeal: (bool){ true }
+            }
+          }
           _syncpolicy: (string){ "selfhealprune" }
         }
       }
@@ -1766,7 +1773,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,35 +1,14 @@
+@@ -1,39 +1,17 @@
  Errors:
  embed.fail1.p: field not allowed:
 -    ./in.cue:37:9
@@ -1788,6 +1795,10 @@ diff old new
 -    ./issue3535.cue:21:3
      ./issue3535.cue:22:4
 -    ./issue3535.cue:25:7
+ issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
+     ./issue3729.cue:9:9
+-    ./issue3729.cue:10:2
+     ./issue3729.cue:11:9
  noStackOverflowStructCycle.#list.tail: structural cycle
  noStackOverflowStructCycle.list.tail: structural cycle
 -provideIncompleteSuccess.t2.a.c.d: field not allowed:
@@ -1802,7 +1813,7 @@ diff old new
      ./in.cue:591:9
  fieldMismatch.a: cannot combine regular field "x" with 2:
      ./in.cue:152:7
-@@ -75,8 +54,8 @@
+@@ -79,8 +57,8 @@
    }
    fail: (struct){
      a: (_|_){
@@ -1813,7 +1824,7 @@ diff old new
      }
    }
    embed: (_|_){
-@@ -85,10 +64,6 @@
+@@ -89,10 +67,6 @@
        // [eval]
        p: (_|_){
          // [eval] embed.fail1.p: field not allowed:
@@ -1824,7 +1835,7 @@ diff old new
          //     ./in.cue:46:4
          //     ./in.cue:49:9
        }
-@@ -117,12 +92,11 @@
+@@ -121,12 +95,11 @@
        // [eval]
        p: (_|_){
          // [eval] embed.fail4.p: field not allowed:
@@ -1841,7 +1852,7 @@ diff old new
        }
      }
      #C4: (#struct){
-@@ -194,8 +168,7 @@
+@@ -198,8 +171,7 @@
        // [structural cycle] noStackOverflowStructCycle.list.tail: structural cycle
      }
    }
@@ -1851,7 +1862,7 @@ diff old new
      t1: (struct){
        #a: (_|_){
          // [incomplete] provideIncompleteSuccess.t1.#a: incomplete bool: bool:
-@@ -203,16 +176,12 @@
+@@ -207,16 +179,12 @@
          b: (bool){ bool }
        }
        x: (#struct){
@@ -1874,7 +1885,7 @@ diff old new
        #a: (#struct){
          c: (int){ 4 }
          b: (bool){ true }
-@@ -219,17 +188,8 @@
+@@ -223,17 +191,8 @@
        }
        #c: (#struct){
        }
@@ -1894,7 +1905,7 @@ diff old new
          }
          b: (bool){ true }
        }
-@@ -259,9 +219,22 @@
+@@ -263,9 +222,22 @@
    }
    cyclicError: (struct){
      a: (_|_){
@@ -1920,7 +1931,7 @@ diff old new
      }
    }
    midwayReferences: (struct){
-@@ -275,24 +248,9 @@
+@@ -279,24 +251,9 @@
          }
        }
      }
@@ -1948,7 +1959,7 @@ diff old new
    }
    closedCheck: (struct){
      success1: (struct){
-@@ -395,13 +353,7 @@
+@@ -399,13 +356,7 @@
            }
          }
        }
@@ -1963,7 +1974,7 @@ diff old new
        #F: (#struct){
          e: (bool){ bool }
          f: (_|_){
-@@ -418,17 +370,11 @@
+@@ -422,17 +373,11 @@
          }
        }
        E: (_|_){
@@ -1982,7 +1993,7 @@ diff old new
        }
      }
      derefDisj2: (struct){
-@@ -439,17 +385,11 @@
+@@ -443,17 +388,11 @@
          }
        }
        E: (_|_){
@@ -2001,7 +2012,7 @@ diff old new
        }
      }
      bulk1: (struct){
-@@ -572,9 +512,6 @@
+@@ -576,9 +515,6 @@
            // [eval]
            e: (_|_){
              // [eval] structShare.err1.x.d.e: field not allowed:
@@ -2011,7 +2022,7 @@ diff old new
              //     ./in.cue:591:9
            }
          }
-@@ -598,13 +535,13 @@
+@@ -602,13 +538,13 @@
        }
        envs: (struct){
          e1: (#struct){
@@ -2029,7 +2040,7 @@ diff old new
          }
        }
      }
-@@ -641,9 +578,8 @@
+@@ -645,9 +581,8 @@
      _c: (struct){
        y: (int){ 1 }
      }
@@ -2041,7 +2052,7 @@ diff old new
      }
    }
    errorPropagation: (_|_){
-@@ -701,10 +637,10 @@
+@@ -705,10 +640,10 @@
        }
        foo: (#struct){
          kind: (string){ "foo" }
@@ -2054,7 +2065,7 @@ diff old new
        }
      }
      regular: (_|_){
-@@ -717,16 +653,11 @@
+@@ -721,16 +656,11 @@
        foo: (_|_){
          // [eval]
          kind: (string){ "foo" }
@@ -2073,7 +2084,7 @@ diff old new
          }
        }
      }
-@@ -738,10 +669,10 @@
+@@ -742,10 +672,10 @@
        }
        foo: (#struct){
          kind: (string){ "foo" }
@@ -2086,35 +2097,15 @@ diff old new
        }
      }
    }
-@@ -800,12 +731,7 @@
-           #sub2?: (bool){ bool }
-         }
-       }
--      root: ((null|struct)){ |((null){
--          null
--          sub1?: (struct){
--            #sub2: (bool){ true }
--          }
--        }, (#struct){
-+      root: ((null|struct)){ |((null){ null }, (#struct){
-           sub1?: (#struct){
-             #sub2: (bool){ true }
-           }
-@@ -833,12 +759,7 @@
-           #sub2?: (bool){ bool }
-         }
-       }
--      root: ((null|struct)){ |((null){
--          null
--          #sub1?: (#struct){
--            #sub2: (bool){ true }
--          }
--        }, (#struct){
-+      root: ((null|struct)){ |((null){ null }, (#struct){
-           #sub1?: (#struct){
-             #sub2: (bool){ true }
-           }
-@@ -851,12 +772,7 @@
+@@ -816,7 +746,6 @@
+       root: (_|_){
+         // [eval] issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
+         //     ./issue3729.cue:9:9
+-        //     ./issue3729.cue:10:2
+         //     ./issue3729.cue:11:9
+         #sub1?: (#struct){
+           #sub2: (bool){ true }
+@@ -850,12 +779,7 @@
              #sub2?: (bool){ bool }
            }
          }
@@ -2128,7 +2119,7 @@ diff old new
              #sub1?: (#struct){
                #sub2: (bool){ true }
              }
-@@ -865,14 +781,7 @@
+@@ -864,14 +788,7 @@
      }
      full: (struct){
        #Application: (#struct){
@@ -2144,25 +2135,6 @@ diff old new
        }
        #ApplicationSpec: (#struct){
          syncPolicy?: ((null|struct)){ |((null){ null }, (#struct){
-@@ -894,12 +803,12 @@
-       }
-       argoApp: (#struct){
-         spec: (#struct){
--          syncPolicy: (#struct){
--            automated: (#struct){
--              prune: (bool){ true }
--              selfHeal: (bool){ true }
--            }
--          }
-+          syncPolicy: ((null|struct)){ |((null){ null }, (#struct){
-+              automated: (#struct){
-+                prune: (bool){ true }
-+                selfHeal: (bool){ true }
-+              }
-+            }) }
-           _syncpolicy: (string){ "selfhealprune" }
-         }
-       }
 -- out/evalalpha/stats --
 Leaks:  620
 Freed:  0
@@ -2178,10 +2150,10 @@ diff old new
 --- old
 +++ new
 @@ -1,9 +1,9 @@
--Leaks:  17
--Freed:  564
--Reused: 551
--Allocs: 30
+-Leaks:  63
+-Freed:  518
+-Reused: 510
+-Allocs: 71
 -Retain: 107
 +Leaks:  620
 +Freed:  0
@@ -2196,10 +2168,10 @@ diff old new
 +Conjuncts:    943
 +Disjuncts:    28
 -- out/eval/stats --
-Leaks:  17
-Freed:  564
-Reused: 551
-Allocs: 30
+Leaks:  63
+Freed:  518
+Reused: 510
+Allocs: 71
 Retain: 107
 
 Unifications: 545
@@ -2233,6 +2205,10 @@ issue3535.regular.foo.regular: field not allowed:
     ./issue3535.cue:21:3
     ./issue3535.cue:22:4
     ./issue3535.cue:25:7
+issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
+    ./issue3729.cue:9:9
+    ./issue3729.cue:10:2
+    ./issue3729.cue:11:9
 noStackOverflowStructCycle.#list.tail: structural cycle
 noStackOverflowStructCycle.list.tail: structural cycle
 provideIncompleteSuccess.t2.a.c.d: field not allowed:
@@ -3007,27 +2983,27 @@ Result:
       }
     }
   }
-  issue3729: (struct){
+  issue3729: (_|_){
+    // [eval]
     withDisjunction: (struct){
       #Root: (#struct){
         sub1?: (#struct){
           #sub2?: (bool){ bool }
         }
       }
-      root: ((null|struct)){ |((null){
-          null
-          sub1?: (struct){
-            #sub2: (bool){ true }
-          }
-        }, (#struct){
-          sub1?: (#struct){
-            #sub2: (bool){ true }
-          }
-        }) }
+      root: (#struct){
+        sub1?: (#struct){
+          #sub2: (bool){ true }
+        }
+      }
     }
-    withoutDisjunction: (struct){
-      root: (null){
-        null
+    withoutDisjunction: (_|_){
+      // [eval]
+      root: (_|_){
+        // [eval] issue3729.withoutDisjunction.root.#sub1.#sub2: conflicting values null and {#sub1?:{#sub2:true}} (mismatched types null and struct):
+        //     ./issue3729.cue:9:9
+        //     ./issue3729.cue:10:2
+        //     ./issue3729.cue:11:9
         #sub1?: (#struct){
           #sub2: (bool){ true }
         }
@@ -3047,16 +3023,11 @@ Result:
           #sub2?: (bool){ bool }
         }
       }
-      root: ((null|struct)){ |((null){
-          null
-          #sub1?: (#struct){
-            #sub2: (bool){ true }
-          }
-        }, (#struct){
-          #sub1?: (#struct){
-            #sub2: (bool){ true }
-          }
-        }) }
+      root: (#struct){
+        #sub1?: (#struct){
+          #sub2: (bool){ true }
+        }
+      }
     }
     withEmbed: (struct){
       incomplete: (struct){

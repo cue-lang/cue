@@ -100,11 +100,11 @@ for clusterName, cluster in clusters {
 
 clusters: foo: {}
 -- out/eval/stats --
-Leaks:  3
-Freed:  101
-Reused: 84
-Allocs: 20
-Retain: 72
+Leaks:  20
+Freed:  84
+Reused: 79
+Allocs: 25
+Retain: 68
 
 Unifications: 104
 Conjuncts:    271

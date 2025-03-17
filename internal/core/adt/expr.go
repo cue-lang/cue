@@ -1999,6 +1999,9 @@ type Comprehension struct {
 	// The type of field as which the comprehension is added.
 	arcType ArcType
 
+	// Kind indicates the possible kind of Value.
+	kind Kind
+
 	// The node into which the comprehension is added. Upon a successful
 	// completion of the comprehension, the arcType should be updated in this
 	// node.

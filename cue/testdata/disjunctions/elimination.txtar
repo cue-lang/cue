@@ -1102,7 +1102,6 @@ issue3784: variant2: {
           bar: (struct){
           }
         }
-        BAZ: (_){ _ }
       }
       t3: (struct){ |((struct){
           #A: (#struct){
@@ -1915,7 +1914,7 @@ diff old new
              nullBar: (null){ null }
            }) }
        }
-@@ -555,48 +448,74 @@
+@@ -555,48 +448,73 @@
              x: (int){ 1 }
            }
          }
@@ -1965,7 +1964,6 @@ diff old new
 +          bar: (struct){
 +          }
 +        }
-+        BAZ: (_){ _ }
 +      }
 +      t3: (struct){ |((struct){
 +          #A: (#struct){
@@ -2032,7 +2030,7 @@ diff old new
        Foo: (#struct){
          spec: (#struct){
            foo: (#struct){
-@@ -605,135 +524,52 @@
+@@ -605,135 +523,52 @@
            }
          }
          resource: (#struct){
@@ -2214,7 +2212,7 @@ diff old new
          }
        }
        #Abstract: (#struct){
-@@ -749,34 +585,34 @@
+@@ -749,34 +584,34 @@
              }
            }) }
          resource: (#struct){
@@ -2277,7 +2275,7 @@ diff old new
          }
        }
        _#Spec: (#struct){ |(*(#struct){
-@@ -803,36 +639,36 @@
+@@ -803,36 +638,36 @@
          }
        }
        _Thing: (#struct){
@@ -2343,7 +2341,7 @@ diff old new
        }
        #Constrained: (#struct){
          spec: (#struct){ |(*(#struct){
-@@ -916,19 +752,19 @@
+@@ -916,19 +751,19 @@
            common: (int){ 3 }
          }
          #FormFoo: (#struct){
@@ -2370,7 +2368,7 @@ diff old new
            }) }
        }
        #Input: (#struct){
-@@ -936,18 +772,12 @@
+@@ -936,18 +771,12 @@
          }
        }
        #summarizeReturn: (#struct){
@@ -2391,7 +2389,7 @@ diff old new
          out: (#list){
          }
        }
-@@ -1031,13 +861,11 @@
+@@ -1031,13 +860,11 @@
        }
      }
    }
@@ -2407,7 +2405,7 @@ diff old new
        0: (#struct){
          name: (string){ "FooBarFoo" }
        }
-@@ -1047,19 +875,8 @@
+@@ -1047,19 +874,8 @@
        2: (#struct){
          name: (string){ "FooQuuxFoo" }
        }
@@ -2429,7 +2427,7 @@ diff old new
        }
      }
    }
-@@ -1151,7 +968,9 @@
+@@ -1151,7 +967,9 @@
              cname?: (string){ string }
            }, (#struct){
              build_type!: (string){ "workflow" }
@@ -2440,7 +2438,7 @@ diff old new
                branch?: (string){ string }
                path?: (string){ string }
              }
-@@ -1160,12 +979,12 @@
+@@ -1160,12 +978,12 @@
        }
        out: (#struct){
          pages: (#struct){
@@ -2454,7 +2452,7 @@ diff old new
          }
        }
      }
-@@ -1195,9 +1014,15 @@
+@@ -1195,9 +1013,15 @@
          build_type!: (string){ "legacy" }
          source: (#struct){
            branch!: (string){ string }
@@ -2473,7 +2471,7 @@ diff old new
        }
      }
    }
-@@ -1216,10 +1041,10 @@
+@@ -1216,10 +1040,10 @@
          v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
        }
        c: (#struct){
@@ -2503,7 +2501,9 @@ issue2209.simplified.t3: ditto
 noChildError.issue1808.#type: one disjunction options eliminated due to earlier detected structural cycle. May be okay, but investigate.
 issue2209.simplified.full._X: ditto
 -- diff/todo/p3 --
-issue2209.simplified.t2.BAZ: error reported in wrong location.
+issue2209.simplified.t2.BAZ: error reported in wrong location. Missing field
+like in V2.
+issue2209.simplified.t3.BAZ: missing error.
 -- diff/explanation --
 issue2209.simplified.t3: new evaluator fixes known bug.
 preserveClosedness.medium.p*: discarding of default is correct.

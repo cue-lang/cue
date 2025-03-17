@@ -101,6 +101,216 @@
       "message": "was it deliberate to keep these newly-commented-out lines?",
       "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "402da2f3_9a0d7a2d",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-17T15:12:52Z",
+      "side": 1,
+      "message": "I think in general, this documentation would benefit from worked examples. I find it quite hard to follow and I think worked examples would help.\n\nE.g.\n\n\u003e When a node is unified with a definition all (sub)nodes...\n\n_which_ subnodes? Subnodes of the struct, or the definition, or the result of the unification?\n\n\u003e Once a node finished processing, it is checked that all (sub)nodes adhere to this schema by checking that is sufficient tagged evidence.\n\nI think either some words are missing there, or maybe it could be reworded?",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4499af8b_0337e9b9",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-17T15:12:52Z",
+      "side": 1,
+      "message": "Given this is talking about replacements, I wonder if this method would be better named as `addReplacement`?",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f868f7eb_d99efc5d",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-17T15:12:52Z",
+      "side": 1,
+      "message": "I think I\u0027m surprised this isn\u0027t idempotent. Do we have a proof that this will never be called multiple times with the same arguments? By testing against the contents of `n.conjunctInfo`, you could make it idempotent if needed.",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11737522_91fae0fb",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-17T15:12:52Z",
+      "side": 1,
+      "message": "it surprises me that if this is an embedding that _isn\u0027t_ closed then we _don\u0027t_ ignore it. I would have expected this to be `ignore \u003d true` here. What am I missing?",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35c5bfb8_93e3eada",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-17T15:12:52Z",
+      "side": 1,
+      "message": "(typo) s$",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1db6038b_ec269f1a",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-17T15:12:52Z",
+      "side": 1,
+      "message": "reference?",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac289b04_4c581129",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-17T15:12:52Z",
+      "side": 1,
+      "message": "I\u0027ve seen this pair of lines at least 3 times now. I would definitely introduce a `*nodeContext.getNextDefId` method.",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35847bd0_b0409ae0",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 438,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-17T15:12:52Z",
+      "side": 1,
+      "message": "I don\u0027t understand this block?",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fdb421ce_e85f9ed1",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-17T15:12:52Z",
+      "side": 1,
+      "message": "I don\u0027t understand this \"next\" - I\u0027m not seeing any field called `next`.",
+      "range": {
+        "startLine": 463,
+        "startChar": 13,
+        "endLine": 463,
+        "endChar": 17
+      },
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee7e0308_e5875ed9",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 466,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-17T15:12:52Z",
+      "side": 1,
+      "message": "You could add methods `reqSets.current() (head reqSet, nonHead []reqSet)` and `reqSets.next() reqSets` which might usefully abstract out the logic which appears in a few places for navigating over this flattened structure.",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10426c15_0b512aa4",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 568,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-17T15:12:52Z",
+      "side": 1,
+      "message": "Hmm, I\u0027m failing to follow this. I\u0027d have thought you\u0027d want to calculate the transitive closure of your replacementIds. It\u0027s highly likely I\u0027m misread this, but I think there\u0027s a risk here you recalculate the same transitive paths several times. E.g, imagine you have the replacements {[1-\u003e3], [2-\u003e3], [3-\u003e4], [4-\u003e5]}. If you call this twice, the first time x.id is 1, the second time x.id is 2, wouldn\u0027t you need to find and follow the 3-\u003e4 and 4-\u003e5 replacements both times?\n\nIt\u0027s certainly not clear to me that calculating the complete transitive closure is better (O(n^2) IIRC), I think I just want to better understand the likely scenarios here.",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41637da0_5e69f985",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 640,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-17T15:12:52Z",
+      "side": 1,
+      "message": "I don\u0027t understand this line.",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

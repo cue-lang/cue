@@ -538,37 +538,22 @@ Result:
             }, (#struct){
             }) }
           let pickMsg#1 = (#struct){
-            msg: (_|_){
-              // [incomplete] full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
-              //     ./large.cue:7:25
-              //     ./large.cue:3:12
-            }
+            msg: (string){ "foo" }
           }
           patches: (#list){
             0: (#struct){
               op: (string){ "add" }
               path: (string){ "/metadata" }
-              value: (_|_){
-                // [incomplete] full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
-                //     ./large.cue:7:25
-                //     ./large.cue:3:12
-              }
+              value: (string){ "foo" }
             }
           }
         }
         namespace: (string){ string }
         patch: (#list){
-          0: (_|_){
-            // [incomplete] full.#Main.jsonPatch.patch.0: 2 errors in empty disjunction:
-            // full.#Main.jsonPatch.patch.0.op: conflicting values "remove" and "add":
-            //     ./large.cue:11:11
-            //     ./large.cue:28:9
-            // full.#Main.jsonPatch.patch.0.value: invalid interpolation: non-concrete value string (type string):
-            //     ./large.cue:7:25
-            //     ./large.cue:3:12
+          0: (#struct){
             op: (string){ "add" }
             path: (string){ "/metadata" }
-            value: (_){ _ }
+            value: (string){ "foo" }
           }
         }
         output: (_|_){
@@ -580,17 +565,10 @@ Result:
     }
     out: (#struct){
       ns1: (#list){
-        0: (_|_){
-          // [incomplete] jsonPatch.output.ns1.0: 2 errors in empty disjunction:
-          // jsonPatch.output.ns1.0.op: conflicting values "remove" and "add":
-          //     ./large.cue:11:11
-          //     ./large.cue:28:9
-          // jsonPatch.output.ns1.0.value: invalid interpolation: non-concrete value string (type string):
-          //     ./large.cue:7:25
-          //     ./large.cue:3:12
+        0: (#struct){
           op: (string){ "add" }
           path: (string){ "/metadata" }
-          value: (_){ _ }
+          value: (string){ "foo" }
         }
       }
     }
@@ -989,79 +967,26 @@ diff old new
                  //     ./large.cue:7:25
                  //     ./large.cue:3:12
                }
-@@ -487,24 +352,59 @@
-             }, (#struct){
-             }) }
-           let pickMsg#1 = (#struct){
--            msg: (string){ "foo" }
--          }
--          patches: (#list){
--            0: (#struct){
--              op: (string){ "add" }
--              path: (string){ "/metadata" }
--              value: (string){ "foo" }
--            }
--          }
-+            msg: (_|_){
-+              // [incomplete] full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
-+              //     ./large.cue:7:25
-+              //     ./large.cue:3:12
-+            }
-+          }
-+          patches: (#list){
-+            0: (#struct){
-+              op: (string){ "add" }
-+              path: (string){ "/metadata" }
-+              value: (_|_){
-+                // [incomplete] full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
-+                //     ./large.cue:7:25
-+                //     ./large.cue:3:12
-+              }
-+            }
-+          }
-+        }
+@@ -497,6 +362,19 @@
+             }
+           }
+         }
 +        namespace: (string){ string }
 +        patch: (#list){
-+          0: (_|_){
-+            // [incomplete] full.#Main.jsonPatch.patch.0: 2 errors in empty disjunction:
-+            // full.#Main.jsonPatch.patch.0.op: conflicting values "remove" and "add":
-+            //     ./large.cue:11:11
-+            //     ./large.cue:28:9
-+            // full.#Main.jsonPatch.patch.0.value: invalid interpolation: non-concrete value string (type string):
-+            //     ./large.cue:7:25
-+            //     ./large.cue:3:12
++          0: (#struct){
 +            op: (string){ "add" }
 +            path: (string){ "/metadata" }
-+            value: (_){ _ }
++            value: (string){ "foo" }
 +          }
 +        }
 +        output: (_|_){
 +          // [incomplete] full.#Main.jsonPatch.output: key value of dynamic field must be concrete, found string:
 +          //     ./large.cue:21:24
 +          //     ./large.cue:19:15
-         }
++        }
        }
      }
      out: (#struct){
-       ns1: (#list){
--        0: (#struct){
--          op: (string){ "add" }
--          path: (string){ "/metadata" }
--          value: (string){ "foo" }
-+        0: (_|_){
-+          // [incomplete] jsonPatch.output.ns1.0: 2 errors in empty disjunction:
-+          // jsonPatch.output.ns1.0.op: conflicting values "remove" and "add":
-+          //     ./large.cue:11:11
-+          //     ./large.cue:28:9
-+          // jsonPatch.output.ns1.0.value: invalid interpolation: non-concrete value string (type string):
-+          //     ./large.cue:7:25
-+          //     ./large.cue:3:12
-+          op: (string){ "add" }
-+          path: (string){ "/metadata" }
-+          value: (_){ _ }
-         }
-       }
-     }
 -- diff/todo/p1 --
 embed.openValidator.err: unexpected pass.
 and.full.out: failure in evalv3

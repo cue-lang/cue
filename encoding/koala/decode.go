@@ -305,7 +305,7 @@ func (dec *Decoder) attributeOffsets(attribute xml.Attr, startElement xml.StartE
 func (dec *Decoder) contentOffset(endElementOffset int) int {
 	//find the start of the content of the element
 	contentStartIdx := endElementOffset
-	for i := endElementOffset; i > 0; i-- {
+	for i := endElementOffset - 1; i > 0; i-- {
 		if dec.xmlText[i] == '>' {
 			return i + 1
 		}

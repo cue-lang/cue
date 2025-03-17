@@ -2,12 +2,15 @@
 
 # We don't support encoding into XML yet.
 ! exec cue export --out xml .
+cmp stderr encode-xml.stderr
 ! exec cue export --out xml+koala .
+cmp stderr encode-xml-koala.stderr
 
 # An XML interpretation like Koala must be specified.
 ! exec cue export --out json export.xml
-# exec cue export --out json xml+koala: export.xml
-# cmp stdout export.json
+cmp stderr decode-xml.stderr
+exec cue export --out json xml+koala: export.xml
+cmp stdout export.json
 exec cue export --out json koala: export.xml
 cmp stdout export.json
 
@@ -16,25 +19,31 @@ cmp stdout import.cue
 exec cue import -o - xml .
 cmp stdout import.cue
 
--- encode.stderr --
+-- encode-xml.stderr --
 unsupported encoding "xml"
--- encode-koala.stderr --
-unsupported encoding "xml"
+-- encode-xml-koala.stderr --
+unsupported interpretation "koala"
+-- decode-xml.stderr --
+xml requires an interpretation, such as: xml+koala
 -- export.xml --
-message = 'Hello World!'
-
-[nested]
-a1 = 'one level'
-
-[nested.a2]
-b = 'two levels'
+<root>
+    <message>Hello World!</message>
+    <nested>
+        <a1>one level</a1>
+        <a2>
+            <b>two levels</b>
+        </a2>
+    </nested>
+</root>
 -- export.json --
 {
-    "message": "Hello World!",
-    "nested": {
-        "a1": "one level",
-        "a2": {
-            "b": "two levels"
+    "root": {
+        "message": "Hello World!",
+        "nested": {
+            "a1": "one level",
+            "a2": {
+                "b": "two levels"
+            }
         }
     }
 }
@@ -49,7 +58,9 @@ _who: "World"
 -- hello.cue --
 package hello
 
-message: "Hello \(_who)!" // who declared in data.cue
+root: {
+    message: "Hello \(_who)!" // who declared in data.cue
 
-nested: a1: "one level"
-nested: a2: b: "two levels"
+    nested: a1: "one level"
+    nested: a2: b: "two levels"
+}

@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61bb85fa_e7a06547",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-17T23:53:48Z",
+      "side": 1,
+      "message": "XMLElement, ContentAttribute, and AttributeSymbol don\u0027t need to be exported, as far as I can tell.",
+      "revId": "8f7a1da1a1193f57f430fab42307026df239488e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f001ca7_7f41644c",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-17T23:53:48Z",
+      "side": 1,
+      "message": "personally I\u0027d inline this. it\u0027s just a few simple lines, and only called once.",
+      "revId": "8f7a1da1a1193f57f430fab42307026df239488e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91d1ced0_491ff672",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-17T23:53:48Z",
+      "side": 1,
+      "message": "please keep one space after `//` in comments for consistency",
+      "revId": "8f7a1da1a1193f57f430fab42307026df239488e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "909b10c0_b065369d",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-17T23:53:48Z",
+      "side": 1,
+      "message": "this is pretty inefficient - you are compiling a regular expression every time.\n\nyou don\u0027t really need a regular expression for this; just do a pretty simple loop like:\n\n```\nfor _, r :\u003d range s {\n    if !unicode.IsSpace(r) {\n        return false\n    }\n}\nreturn true\n```",
+      "revId": "8f7a1da1a1193f57f430fab42307026df239488e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b5bcf17_2bbcc3bf",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-17T23:53:48Z",
+      "side": 1,
+      "message": "compiling a regular expression here is also going to be a problem performance-wise, I\u0027m afraid.\n\nI see that encoding/xml\u0027s Token and Attr types have no positions, which is why I assume you\u0027re trying to figure out the offsets here. I honestly think we could use the offset of the entire StartElement for now; it won\u0027t be perfect but it will be good enough as a start, and we can worry about reconstructing attribute positions later on without harming performance too much, by e.g. doing a second light parse of the element text.",
+      "revId": "8f7a1da1a1193f57f430fab42307026df239488e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab15faca_19b8dd5d",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-17T23:53:48Z",
+      "side": 1,
+      "message": "refrain from creating errors in the happy path, as they cause allocations and overhead like string formatting. only create them when you actually fail. also in other funcs.",
+      "revId": "8f7a1da1a1193f57f430fab42307026df239488e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

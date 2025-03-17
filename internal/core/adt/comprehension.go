@@ -157,15 +157,24 @@ func (n *nodeContext) insertComprehension(
 		ci.closeInfo.span |= ComprehensionSpan
 	}
 
+	node := n.node.DerefDisjunct()
+
 	var decls []Decl
 	switch v := ToExpr(x).(type) {
 	case *StructLit:
+		kind := TopKind
 		numFixed := 0
 		var fields []Decl
 		for _, d := range v.Decls {
 			switch f := d.(type) {
 			case *Field:
 				numFixed++
+
+				if f.Label.IsInt() {
+					kind &= ListKind
+				} else if f.Label.IsString() {
+					kind &= StructKind
+				}
 
 				// Create partial comprehension
 				c := &Comprehension{
@@ -176,7 +185,7 @@ func (n *nodeContext) insertComprehension(
 
 					comp:   ec,
 					parent: c,
-					arc:    n.node,
+					arc:    node,
 				}
 
 				conjunct := MakeConjunct(env, c, ci)
@@ -203,7 +212,7 @@ func (n *nodeContext) insertComprehension(
 
 					comp:   ec,
 					parent: c,
-					arc:    n.node,
+					arc:    node,
 				}
 
 				conjunct := MakeConjunct(env, c, ci)
@@ -236,14 +245,19 @@ func (n *nodeContext) insertComprehension(
 					Decls: fields,
 				}
 			}
-			n.node.AddStruct(st, env, ci)
+			node.AddStruct(st, env, ci)
 			switch {
 			case !ec.done:
 				ec.structs = append(ec.structs, st)
 			case len(ec.envs) > 0:
 				st.Init(n.ctx)
+				if kind == StructKind || kind == ListKind {
+					n.updateNodeType(kind, st, ci)
+				}
 			}
 		}
+
+		c.kind = kind
 
 		switch numFixed {
 		case 0:
@@ -251,6 +265,11 @@ func (n *nodeContext) insertComprehension(
 
 		case len(v.Decls):
 			// No comprehension to add at this level.
+			// The should be considered a struct if it has only non-regular
+			// fields (like definitions), and no embeddings.
+			if kind == TopKind {
+				c.kind = StructKind
+			}
 			return
 
 		default:
@@ -460,6 +479,12 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 			ctx.current().err = b
 			ctx.current().state = taskFAILED
 			return nil
+		}
+		if k := c.kind; k == StructKind || k == ListKind {
+			v := v.DerefDisjunct()
+			if s := v.getBareState(n.ctx); s != nil {
+				s.updateNodeType(k, ToExpr(c.Value), d.id)
+			}
 		}
 		v = c.arc
 	}

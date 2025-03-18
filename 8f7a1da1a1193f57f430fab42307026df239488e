@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c5cf4c4_9915a23d",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-03-18T10:15:38Z",
+      "side": 1,
+      "message": "Thanks, most of these I believe were reused in the Encoder which is now left till later. Will remove exports for now.",
+      "parentUuid": "61bb85fa_e7a06547",
+      "revId": "8f7a1da1a1193f57f430fab42307026df239488e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8f001ca7_7f41644c",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-03-17T23:53:48Z",
       "side": 1,
       "message": "personally I\u0027d inline this. it\u0027s just a few simple lines, and only called once.",
+      "revId": "8f7a1da1a1193f57f430fab42307026df239488e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "569364da_601afde3",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-03-18T10:15:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8f001ca7_7f41644c",
       "revId": "8f7a1da1a1193f57f430fab42307026df239488e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7cd8769_a18df078",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-03-18T10:15:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "91d1ced0_491ff672",
+      "revId": "8f7a1da1a1193f57f430fab42307026df239488e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "909b10c0_b065369d",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-03-17T23:53:48Z",
       "side": 1,
       "message": "this is pretty inefficient - you are compiling a regular expression every time.\n\nyou don\u0027t really need a regular expression for this; just do a pretty simple loop like:\n\n```\nfor _, r :\u003d range s {\n    if !unicode.IsSpace(r) {\n        return false\n    }\n}\nreturn true\n```",
+      "revId": "8f7a1da1a1193f57f430fab42307026df239488e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "357c8225_449f3e7c",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-03-18T10:15:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "909b10c0_b065369d",
       "revId": "8f7a1da1a1193f57f430fab42307026df239488e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -99,6 +171,24 @@
       "writtenOn": "2025-03-17T23:53:48Z",
       "side": 1,
       "message": "refrain from creating errors in the happy path, as they cause allocations and overhead like string formatting. only create them when you actually fail. also in other funcs.",
+      "revId": "8f7a1da1a1193f57f430fab42307026df239488e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5e0155d_f01f9959",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-03-18T10:15:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ab15faca_19b8dd5d",
       "revId": "8f7a1da1a1193f57f430fab42307026df239488e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

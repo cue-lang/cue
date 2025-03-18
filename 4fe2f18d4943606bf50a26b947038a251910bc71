@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae7f0406_371b97c5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-03-18T10:15:38Z",
+      "side": 1,
+      "message": "Thanks for the review Daniel!\nI\u0027ve resolved almost all the comments (I\u0027ll look at the last attribute offset comment tomorrow).\nI\u0027ve also fixed the issue causing the out of range error on \"TestScript/encoding_xml_koala\" caused by spacing following the xml root element, and added an additional test to cover this.",
+      "revId": "4fe2f18d4943606bf50a26b947038a251910bc71",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

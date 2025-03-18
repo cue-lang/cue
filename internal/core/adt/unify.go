@@ -114,7 +114,11 @@ func (n *nodeContext) scheduleConjuncts() {
 }
 
 // TODO(evalv3): consider not returning a result at all.
-func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
+//
+//	func (v *Vertex) unify@(c *OpContext, needs condition, mode runMode) bool {
+//		return v.unifyC(c, needs, mode, true)
+//	}
+func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos bool) bool {
 	if c.LogEval > 0 {
 		defer c.Un(c.Indentf(v, "UNIFY(%x, %v)", needs, mode))
 	}
@@ -211,7 +215,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		n.process(nodeOnlyNeeds, attemptOnly)
 		if n.node.ArcType == ArcPending {
 			for _, a := range n.node.Arcs {
-				a.unify(c, needs, attemptOnly)
+				a.unify(c, needs, attemptOnly, checkTypos)
 			}
 		}
 		n.completePending(mode)
@@ -269,7 +273,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		}
 		// We unify here to proactively detect cycles. We do not need to,
 		// nor should we, if have have already found one.
-		v.unify(n.ctx, needs, mode)
+		v.unify(n.ctx, needs, mode, checkTypos)
 	}
 
 	// At this point, no more conjuncts will be added, so we could decrement
@@ -293,7 +297,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		// TODO: consider bailing on error if n.errs != nil.
 		// At the very least, no longer propagate typo errors if this node
 		// is erroneous.
-		case n.completeAllArcs(needs, mode):
+		case n.completeAllArcs(needs, mode, checkTypos):
 		}
 
 		if mode == finalize {
@@ -376,7 +380,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 
 		// Ensure that shared nodes comply to the same requirements as we
 		// need for the current node.
-		w.unify(c, needs, mode)
+		w.unify(c, needs, mode, checkTypos)
 
 		return true
 	}
@@ -417,7 +421,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 
 	if pc := n.node.PatternConstraints; pc != nil {
 		for _, c := range pc.Pairs {
-			c.Constraint.unify(n.ctx, allKnown, attemptOnly)
+			c.Constraint.unify(n.ctx, allKnown, attemptOnly, checkTypos)
 		}
 	}
 
@@ -436,7 +440,9 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 
 	n.node.updateStatus(finalized)
 
-	n.checkTypos()
+	if checkTypos {
+		n.checkTypos()
+	}
 
 	return n.meets(needs)
 }
@@ -515,7 +521,7 @@ func (n *nodeContext) updateScalar() {
 	}
 }
 
-func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
+func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos bool) bool {
 	if n.underlying != nil {
 		// References within the disjunct may end up referencing the layer that
 		// this node overlays. Also for these nodes we want to be able to detect
@@ -538,6 +544,11 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 	n.incDepth()
 	defer n.decDepth()
 
+	// TODO: do something more principled here.s
+	if n.hasDisjunction {
+		checkTypos = false
+	}
+
 	// XXX(0.7): only set success if needs complete arcs.
 	success := true
 	// Visit arcs recursively to validate and compute error. Use index instead
@@ -545,7 +556,7 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 	for arcPos := 0; arcPos < len(n.node.Arcs); arcPos++ {
 		a := n.node.Arcs[arcPos]
 
-		if !a.unify(n.ctx, needs, mode) {
+		if !a.unify(n.ctx, needs, mode, checkTypos) {
 			success = false
 		}
 
@@ -704,7 +715,7 @@ func (n *nodeContext) evalArcTypes(mode runMode) {
 		if a.ArcType != ArcPending {
 			continue
 		}
-		a.unify(n.ctx, arcTypeKnown, mode)
+		a.unify(n.ctx, arcTypeKnown, mode, false)
 		// Ensure the arc is processed up to the desired level
 		if a.ArcType == ArcPending {
 			// TODO: cancel tasks?

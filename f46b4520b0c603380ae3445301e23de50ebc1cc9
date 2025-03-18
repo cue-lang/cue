@@ -16,6 +16,24 @@
       "message": "What\u0027s the empty line doing here? Does it signify a bug somewhere else?",
       "revId": "f46b4520b0c603380ae3445301e23de50ebc1cc9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "34238ef2_336dd624",
+        "filename": "cmd/cue/cmd/testdata/script/empty_yaml.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-18T11:54:20Z",
+      "side": 1,
+      "message": "Ah, that\u0027s what the next CL is doing. Ignore me :)",
+      "parentUuid": "1982286b_2bae1ccb",
+      "revId": "f46b4520b0c603380ae3445301e23de50ebc1cc9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

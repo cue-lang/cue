@@ -147,7 +147,7 @@ func matchPattern(ctx *OpContext, pattern Value, f Feature) bool {
 // for the majority of cases where pattern constraints are used.
 func matchPatternValue(ctx *OpContext, pattern Value, f Feature, label Value) (result bool) {
 	if v, ok := pattern.(*Vertex); ok {
-		v.unify(ctx, scalarKnown, finalize)
+		v.unify(ctx, scalarKnown, finalize, false)
 	}
 	pattern = Unwrap(pattern)
 	label = Unwrap(label)

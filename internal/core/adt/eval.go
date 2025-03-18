@@ -157,7 +157,7 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state combinedFlags) Value {
 func (c *OpContext) unify(v *Vertex, flags combinedFlags) {
 	if c.isDevVersion() {
 		requires, mode := flags.conditions(), flags.runMode()
-		v.unify(c, requires, mode)
+		v.unify(c, requires, mode, true)
 		return
 	}
 
@@ -1105,10 +1105,11 @@ type nodeContext struct {
 
 	// disjuncts holds disjuncts that evaluated to a non-bottom value.
 	// TODO: come up with a better name.
-	disjuncts    []*nodeContext
-	buffer       []*nodeContext
-	disjunctErrs []*Bottom
-	disjunct     Conjunct
+	disjuncts      []*nodeContext
+	buffer         []*nodeContext
+	disjunctErrs   []*Bottom
+	disjunct       Conjunct
+	hasDisjunction bool
 
 	// snapshot holds the last value of the vertex before calling postDisjunct.
 	snapshot Vertex

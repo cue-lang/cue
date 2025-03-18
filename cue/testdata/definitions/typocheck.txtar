@@ -196,9 +196,6 @@ and.transitive.out.ok: field not allowed:
     ./in.cue:38:3
 and.transitiveWithEmbed.out.ok: field not allowed:
     ./in.cue:46:3
-disjunction.withErr.t1.out.b1: field not allowed:
-    ./validators.cue:29:3
-    ./validators.cue:31:12
 embed.andEmbed.d.err: field not allowed:
     ./in.cue:31:11
 embed.andInStruct.a.err: field not allowed:
@@ -583,27 +580,27 @@ Result:
       }
     }
   }
-  disjunction: (_|_){
-    // [eval]
-    withErr: (_|_){
-      // [eval]
-      t1: (_|_){
-        // [eval]
+  disjunction: (struct){
+    withErr: (struct){
+      t1: (struct){
         params: (struct){
         }
-        out: (_|_){
-          // [eval]
+        out: (#struct){
           b1: (_|_){
-            // [eval] disjunction.withErr.t1.out.b1: field not allowed:
-            //     ./validators.cue:29:3
-            //     ./validators.cue:31:12
-            b2: (_|_){
-              // [eval] disjunction.withErr.t1.out.b1.b2: field not allowed:
-              //     ./validators.cue:29:7
-              b3: (_|_){
-                // [eval] disjunction.withErr.t1.out.b1.b2.b3: field not allowed:
-                //     ./validators.cue:29:11
-              }
+            // [incomplete] disjunction.withErr.t1.out.b1: 5 errors in empty disjunction:
+            // disjunction.withErr.t1.out.b1: cannot combine regular field "b2" with null:
+            //     ./validators.cue:31:17
+            // disjunction.withErr.t1.out.b1: conflicting values null and {b2:{b3:params.mayExistLater}} (mismatched types null and struct):
+            //     ./validators.cue:29:7
+            //     ./validators.cue:31:17
+            // disjunction.withErr.t1.out.b1.b2: 2 errors in empty disjunction:
+            // disjunction.withErr.t1.out.b1.b2: conflicting values null and {b3:params.mayExistLater} (mismatched types null and struct):
+            //     ./validators.cue:29:11
+            //     ./validators.cue:32:17
+            // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
+            //     ./validators.cue:29:22
+            b2: (struct){
+              b3: (_){ _ }
             }
           }
         }
@@ -627,7 +624,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,75 +1,28 @@
+@@ -1,75 +1,25 @@
  Errors:
  and.transitive.out.ok: field not allowed:
 -    ./in.cue:34:5
@@ -644,9 +641,6 @@ diff old new
 -    ./in.cue:44:7
 -    ./in.cue:45:7
      ./in.cue:46:3
-+disjunction.withErr.t1.out.b1: field not allowed:
-+    ./validators.cue:29:3
-+    ./validators.cue:31:12
  embed.andEmbed.d.err: field not allowed:
 -    ./in.cue:28:6
 -    ./in.cue:29:6
@@ -706,7 +700,7 @@ diff old new
  embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
      ./validators.cue:21:5
      ./validators.cue:21:12
-@@ -88,14 +41,11 @@
+@@ -88,14 +38,11 @@
        }
        a: (_|_){
          // [eval]
@@ -722,7 +716,7 @@ diff old new
        }
      }
      andInStruct: (_|_){
-@@ -105,14 +55,11 @@
+@@ -105,14 +52,11 @@
        }
        a: (_|_){
          // [eval]
@@ -738,7 +732,7 @@ diff old new
        }
      }
      embedDefWithEmbedding: (_|_){
-@@ -122,15 +69,11 @@
+@@ -122,15 +66,11 @@
        }
        a: (_|_){
          // [eval]
@@ -755,7 +749,7 @@ diff old new
        }
      }
      embedComprehension: (_|_){
-@@ -140,16 +83,11 @@
+@@ -140,16 +80,11 @@
        }
        a: (_|_){
          // [eval]
@@ -773,7 +767,7 @@ diff old new
        }
      }
      fieldWithAnd: (_|_){
-@@ -160,33 +98,20 @@
+@@ -160,33 +95,20 @@
          // [eval]
          err: (_|_){
            // [eval] embed.fieldWithAnd.a.err: field not allowed:
@@ -813,7 +807,7 @@ diff old new
        }
      }
      andEmbed: (_|_){
-@@ -202,17 +127,11 @@
+@@ -202,17 +124,11 @@
        }
        d: (_|_){
          // [eval]
@@ -832,7 +826,7 @@ diff old new
        }
      }
      nonDef: (struct){
-@@ -221,12 +140,12 @@
+@@ -221,12 +137,12 @@
            a: (string){ string }
          }
          #Y: (#struct){
@@ -849,7 +843,7 @@ diff old new
          }
        }
      }
-@@ -236,12 +155,12 @@
+@@ -236,12 +152,12 @@
            Name: (string){ string }
          }
          #Step: (#struct){
@@ -866,7 +860,7 @@ diff old new
          }
          out: (#struct){
            Name: (string){ "foo" }
-@@ -257,20 +176,17 @@
+@@ -257,20 +173,17 @@
        }
        x: (_|_){
          // [eval]
@@ -890,7 +884,7 @@ diff old new
          #X: (_){
            matchN(0, (#list){
            })
-@@ -277,17 +193,10 @@
+@@ -277,17 +190,10 @@
            a?: (int){ int }
            b?: (int){ int }
          }
@@ -912,7 +906,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -306,10 +215,7 @@
+@@ -306,10 +212,7 @@
            // [eval]
            b: (_|_){
              // [eval] embed.openValidator.t2.a.b: conflicting values 1 and {b?:Y} (mismatched types int and struct):
@@ -923,7 +917,7 @@ diff old new
              //     ./validators.cue:24:8
              // embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
              //     ./validators.cue:21:5
-@@ -336,16 +242,11 @@
+@@ -336,16 +239,11 @@
        }
        out: (_|_){
          // [eval]
@@ -941,7 +935,7 @@ diff old new
        }
      }
      transitiveWithEmbed: (_|_){
-@@ -361,17 +262,11 @@
+@@ -361,17 +259,11 @@
        }
        out: (_|_){
          // [eval]
@@ -960,7 +954,7 @@ diff old new
        }
      }
    }
-@@ -423,38 +318,11 @@
+@@ -423,38 +315,11 @@
      #Main: (#struct){
        namespace: (string){ string }
        output: (_|_){
@@ -1001,7 +995,7 @@ diff old new
          let base#5 = (#struct){
            someMsg: (string){ string }
            obs: (#struct){ |(*(#struct){
-@@ -497,6 +365,19 @@
+@@ -497,6 +362,19 @@
              }
            }
          }
@@ -1021,55 +1015,37 @@ diff old new
        }
      }
      out: (#struct){
-@@ -509,33 +390,26 @@
-       }
-     }
-   }
--  disjunction: (struct){
--    withErr: (struct){
--      t1: (struct){
-+  disjunction: (_|_){
-+    // [eval]
-+    withErr: (_|_){
-+      // [eval]
-+      t1: (_|_){
-+        // [eval]
-         params: (struct){
+@@ -516,7 +394,9 @@
          }
--        out: (#struct){
-+        out: (_|_){
-+          // [eval]
+         out: (#struct){
            b1: (_|_){
 -            // [incomplete] disjunction.withErr.t1.out.b1: 4 errors in empty disjunction:
--            // disjunction.withErr.t1.out.b1: conflicting values null and {b2:{b3:params.mayExistLater}} (mismatched types null and struct):
--            //     ./validators.cue:29:7
--            //     ./validators.cue:31:17
--            // disjunction.withErr.t1.out.b1.b2: 2 errors in empty disjunction:
--            // disjunction.withErr.t1.out.b1.b2: conflicting values null and {b3:params.mayExistLater} (mismatched types null and struct):
--            //     ./validators.cue:29:11
--            //     ./validators.cue:32:17
--            // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
--            //     ./validators.cue:29:22
-+            // [eval] disjunction.withErr.t1.out.b1: field not allowed:
-+            //     ./validators.cue:29:3
-+            //     ./validators.cue:31:12
-             b2: (_|_){
++            // [incomplete] disjunction.withErr.t1.out.b1: 5 errors in empty disjunction:
++            // disjunction.withErr.t1.out.b1: cannot combine regular field "b2" with null:
++            //     ./validators.cue:31:17
+             // disjunction.withErr.t1.out.b1: conflicting values null and {b2:{b3:params.mayExistLater}} (mismatched types null and struct):
+             //     ./validators.cue:29:7
+             //     ./validators.cue:31:17
+@@ -526,17 +406,8 @@
+             //     ./validators.cue:32:17
+             // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
+             //     ./validators.cue:29:22
+-            b2: (_|_){
 -              // [incomplete] disjunction.withErr.t1.out.b1.b2: 2 errors in empty disjunction:
 -              // disjunction.withErr.t1.out.b1.b2: conflicting values null and {b3:params.mayExistLater} (mismatched types null and struct):
 -              //     ./validators.cue:29:11
 -              //     ./validators.cue:32:17
 -              // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
 -              //     ./validators.cue:29:22
-+              // [eval] disjunction.withErr.t1.out.b1.b2: field not allowed:
-+              //     ./validators.cue:29:7
-               b3: (_|_){
+-              b3: (_|_){
 -                // [incomplete] disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
 -                //     ./validators.cue:29:22
-+                // [eval] disjunction.withErr.t1.out.b1.b2.b3: field not allowed:
-+                //     ./validators.cue:29:11
-               }
+-              }
++            b2: (struct){
++              b3: (_){ _ }
              }
            }
+         }
 -- diff/todo/p1 --
 embed.openValidator.err: unexpected pass.
 and.full.out: failure in evalv3

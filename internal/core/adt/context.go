@@ -708,13 +708,13 @@ func (c *OpContext) evalStateCI(v Expr, state combinedFlags) (result Value, ci C
 
 				switch runMode {
 				case finalize:
-					arc.unify(c, needs, attemptOnly) // to set scalar
+					arc.unify(c, needs, attemptOnly, true) // to set scalar
 					arc.state.freeze(needs)
 				case attemptOnly:
-					arc.unify(c, needs, attemptOnly) // to set scalar
+					arc.unify(c, needs, attemptOnly, true) // to set scalar
 
 				case yield:
-					arc.unify(c, needs, runMode) // to set scalar
+					arc.unify(c, needs, runMode, true) // to set scalar
 
 					evaluating := arc.status == evaluating
 
@@ -894,7 +894,7 @@ func (c *OpContext) unifyNode(expr Expr, state combinedFlags) (result Value) {
 			// that disjunctions are finalized, so that disjunction shows
 			// up in BaseValue.
 			if len(n.disjuncts) > 0 {
-				n.node.unify(c, arcTypeKnown, yield)
+				n.node.unify(c, arcTypeKnown, yield, false)
 			}
 		}
 	} else {

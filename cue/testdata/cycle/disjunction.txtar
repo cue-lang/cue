@@ -210,14 +210,10 @@ Result:
       }, (list){
       }) }
     data: (_|_){
-      // [eval]
-      secret: (_|_){
-        // [eval] issue3042.data.secret: field not allowed:
-        //     ./issue3042.cue:8:3
-        infra: (_|_){
-          // [eval] issue3042.data.secret.infra: field not allowed:
-          //     ./issue3042.cue:9:4
-        }
+      // [eval] issue3042.data.secret: field not allowed:
+      //     ./issue3042.cue:8:3
+      secret: (struct){
+        infra: (list){ list }
       }
     }
   }
@@ -239,7 +235,7 @@ diff old new
    cycle: (_|_){
      // [structural cycle]
      a: (_|_){
-@@ -58,22 +60,23 @@
+@@ -58,22 +60,19 @@
      x: (#list){
      }
    }
@@ -257,16 +253,13 @@ diff old new
 -          0: (struct){
 -            name: (string){ "bar1" }
 -          }
-+    data: (_|_){
-+      // [eval]
-+      secret: (_|_){
-+        // [eval] issue3042.data.secret: field not allowed:
-+        //     ./issue3042.cue:8:3
-+        infra: (_|_){
-+          // [eval] issue3042.data.secret.infra: field not allowed:
-+          //     ./issue3042.cue:9:4
-         }
+-        }
 -        name?: (string){ =~"^foo" }
++    data: (_|_){
++      // [eval] issue3042.data.secret: field not allowed:
++      //     ./issue3042.cue:8:3
++      secret: (struct){
++        infra: (list){ list }
        }
 -      name?: (string){ =~"^foo" }
      }

@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a624812_6100e2b9",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-18T11:46:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "60f1dd86_e9b9fd96",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "06e83c2d_8848e224",
@@ -65,6 +83,24 @@
       "writtenOn": "2025-03-17T12:12:57Z",
       "side": 1,
       "message": "I do find these two functions confusing in their implementation. It\u0027s not clear to me (a) when would I use one of these functions but not the other? (this really stems from the fact it\u0027s never been clear to me what difference you imply when you talk of a disjunct vs a disjunction). (b) why testing BaseValue for a *Disjunction is right in one, but *Vertex is right in the other.",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d125de34_e2a85952",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 859,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-18T11:46:47Z",
+      "side": 1,
+      "message": "given `foo: x|y`, `foo` has a disjunction value, whereas `x` and `y` are disjuncts of this disjunction.\n\nAdded documentation.",
+      "parentUuid": "06e83c2d_8848e224",
       "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +122,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0a27aa1_40b4c69f",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 1169,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-18T11:46:47Z",
+      "side": 1,
+      "message": "Actually, there as an isTotal in closeContext before, which used to combine various aspects, including ellipsis, but also patterns that cover all fields.\n\nIn fact, isTotal is no longer used at all, it seems. Replacing it with HasEllipsis results in more diffs with V2. Not using it at all results in strictly less diffs with V2, so just removed it.",
+      "parentUuid": "7b76e793_276ea3d8",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a5808781_f1bb0ee9",
@@ -99,6 +153,24 @@
       "writtenOn": "2025-03-17T12:12:57Z",
       "side": 1,
       "message": "was it deliberate to keep these newly-commented-out lines?",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "94e3a4b5_add6c507",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 1001,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-18T11:46:47Z",
+      "side": 1,
+      "message": "Either way, but as it is not really used at the moment, it seemed safer to disable. Less moving parts. Added a TODO.",
+      "parentUuid": "a5808781_f1bb0ee9",
       "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -122,6 +194,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c492f482_a0d26d71",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-18T11:46:47Z",
+      "side": 1,
+      "message": "Reworded and added some examples.",
+      "parentUuid": "402da2f3_9a0d7a2d",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4499af8b_0337e9b9",
         "filename": "internal/core/adt/typocheck.go",
         "patchSetId": 10
@@ -133,6 +223,24 @@
       "writtenOn": "2025-03-17T15:12:52Z",
       "side": 1,
       "message": "Given this is talking about replacements, I wonder if this method would be better named as `addReplacement`?",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4603061_14f86f1e",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-18T11:46:47Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "4499af8b_0337e9b9",
       "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -156,6 +264,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "68247932_d39597ec",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-18T11:46:47Z",
+      "side": 1,
+      "message": "Why would you say it is not idempotent?",
+      "parentUuid": "f868f7eb_d99efc5d",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "11737522_91fae0fb",
         "filename": "internal/core/adt/typocheck.go",
         "patchSetId": 10
@@ -167,6 +293,24 @@
       "writtenOn": "2025-03-17T15:12:52Z",
       "side": 1,
       "message": "it surprises me that if this is an embedding that _isn\u0027t_ closed then we _don\u0027t_ ignore it. I would have expected this to be `ignore \u003d true` here. What am I missing?",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da441a5b_06e1c2ac",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-18T11:46:47Z",
+      "side": 1,
+      "message": "Yes, if it isn\u0027t closed, ignore will be true.\nIf it _is_ closed, ignore will be false.",
+      "parentUuid": "11737522_91fae0fb",
       "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -188,6 +332,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "58da1d64_8c008099",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-18T11:46:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "35c5bfb8_93e3eada",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1db6038b_ec269f1a",
@@ -201,6 +363,24 @@
       "writtenOn": "2025-03-17T15:12:52Z",
       "side": 1,
       "message": "reference?",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4a91e39_7325f520",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-18T11:46:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1db6038b_ec269f1a",
       "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -222,6 +402,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5da9e260_a1f3f0b2",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-18T11:46:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ac289b04_4c581129",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35847bd0_b0409ae0",
@@ -239,6 +437,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0437f98_79a165ef",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 438,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-18T11:46:47Z",
+      "side": 1,
+      "message": "Ah,left over from debugging.",
+      "parentUuid": "35847bd0_b0409ae0",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fdb421ce_e85f9ed1",
@@ -252,6 +468,30 @@
       "writtenOn": "2025-03-17T15:12:52Z",
       "side": 1,
       "message": "I don\u0027t understand this \"next\" - I\u0027m not seeing any field called `next`.",
+      "range": {
+        "startLine": 463,
+        "startChar": 13,
+        "endLine": 463,
+        "endChar": 17
+      },
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9028a1b8_5da5ae1b",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-18T11:46:47Z",
+      "side": 1,
+      "message": "Ah, I changed this to a relative value called size later. Updated comments.",
+      "parentUuid": "fdb421ce_e85f9ed1",
       "range": {
         "startLine": 463,
         "startChar": 13,
@@ -281,6 +521,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f166869e_5ca3bfb3",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 466,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-18T11:46:47Z",
+      "side": 1,
+      "message": "Hmmm, not sure if that is worth it. That will be slower (returns two slices, instead of just incrementing a counter, and not all that much clearer: I don\u0027t think this abstraction applies everywhere, and then you basically end up with multiple implementations or different approaches.",
+      "parentUuid": "ee7e0308_e5875ed9",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "10426c15_0b512aa4",
         "filename": "internal/core/adt/typocheck.go",
         "patchSetId": 10
@@ -298,6 +556,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "eb78c76c_749f1b9a",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 568,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-18T11:46:47Z",
+      "side": 1,
+      "message": "Yes, I expect this code to be O(n^2), but didn\u0027t want to optimize it yet until it was necessary.\n\nIt does not appear to be an issue now, and if we move to the #A... approach, for instance, some of these data structures might change or render such optimizations moot otherwise.\n\nIn general, I can think of various very different kinds of optimizations that are possible here. I\u0027m not sure yet which one would be best or if any of them is on the critical path.\n\nAdded TODO.",
+      "parentUuid": "10426c15_0b512aa4",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "41637da0_5e69f985",
         "filename": "internal/core/adt/typocheck.go",
         "patchSetId": 10
@@ -309,6 +585,24 @@
       "writtenOn": "2025-03-17T15:12:52Z",
       "side": 1,
       "message": "I don\u0027t understand this line.",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73f0ebef_40a7ed66",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 640,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-18T11:46:47Z",
+      "side": 1,
+      "message": "Debugging leftover.",
+      "parentUuid": "41637da0_5e69f985",
       "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

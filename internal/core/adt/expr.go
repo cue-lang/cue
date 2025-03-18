@@ -952,7 +952,7 @@ func (x *LetReference) resolve(ctx *OpContext, state combinedFlags) *Vertex {
 		arc.Finalize(ctx)
 	}
 	b := arc.Bottom()
-	if !arc.MultiLet && b == nil {
+	if !arc.MultiLet && b == nil && n.Rooted() {
 		return arc
 	}
 

@@ -389,6 +389,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "42293074_b217aa17",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-18T13:17:02Z",
+      "side": 1,
+      "message": "Ah, the comment is wrong. The enclosedEmbed referes to the inner embed \"group\". I\u0027ve updated the comment.",
+      "parentUuid": "57c9dd33_b3740929",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "35c5bfb8_93e3eada",
         "filename": "internal/core/adt/typocheck.go",
         "patchSetId": 10

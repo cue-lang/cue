@@ -16,6 +16,24 @@
       "message": "This is probably just me nit-picking, but just to be sure, it\u0027s `foo.a` and `foo.b` that are marked with 7 here, and not the `a` and `b` fields of this rootless struct?",
       "revId": "8d1b5e8d4773cb211e34b743a0044c768d1b457e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ac4a678_e933087b",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-18T13:53:43Z",
+      "side": 1,
+      "message": "correct.",
+      "parentUuid": "8cd72749_262dbb11",
+      "revId": "8d1b5e8d4773cb211e34b743a0044c768d1b457e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

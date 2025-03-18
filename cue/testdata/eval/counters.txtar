@@ -197,14 +197,14 @@ issue3770: task: {
   }
 }
 -- out/evalalpha/stats --
-Leaks:  225
+Leaks:  229
 Freed:  0
 Reused: 0
-Allocs: 225
+Allocs: 229
 Retain: 0
 
-Unifications: 172
-Conjuncts:    257
+Unifications: 176
+Conjuncts:    265
 Disjuncts:    34
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -216,17 +216,17 @@ diff old new
 -Reused: 138
 -Allocs: 13
 -Retain: 35
-+Leaks:  225
++Leaks:  229
 +Freed:  0
 +Reused: 0
-+Allocs: 225
++Allocs: 229
 +Retain: 0
  
 -Unifications: 125
 -Conjuncts:    229
 -Disjuncts:    186
-+Unifications: 172
-+Conjuncts:    257
++Unifications: 176
++Conjuncts:    265
 +Disjuncts:    34
 -- out/eval/stats --
 Leaks:  0
@@ -360,12 +360,10 @@ Disjuncts:    186
         }
         x: (struct){
           b: (int){ 1 }
+          a: (int){ 1 }
         }
       }
-      out: (_|_){
-        // [incomplete] issue3770.task.out: undefined field: a:
-        //     ./issue3770.cue:10:11
-      }
+      out: (int){ 1 }
     }
   }
   issue3780: (struct){
@@ -501,23 +499,6 @@ diff old new
          a: (struct){
            b: (_){ _ }
          }
-@@ -95,10 +119,12 @@
-         }
-         x: (struct){
-           b: (int){ 1 }
--          a: (int){ 1 }
--        }
--      }
--      out: (int){ 1 }
-+        }
-+      }
-+      out: (_|_){
-+        // [incomplete] issue3770.task.out: undefined field: a:
-+        //     ./issue3770.cue:10:11
-+      }
-     }
-   }
-   issue3780: (struct){
 -- out/eval --
 (struct){
   issue3750: (struct){

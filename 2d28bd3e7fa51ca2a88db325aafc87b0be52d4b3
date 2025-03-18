@@ -33,6 +33,24 @@
       "message": "This comment seems a little out of date now.",
       "revId": "2d28bd3e7fa51ca2a88db325aafc87b0be52d4b3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c33ee32_aae5fcf7",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-18T12:59:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4165ff69_84ff5246",
+      "revId": "2d28bd3e7fa51ca2a88db325aafc87b0be52d4b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

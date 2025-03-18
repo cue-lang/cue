@@ -33,6 +33,24 @@
       "message": "```suggestion\n\t\t\t\t\t\t\tValuePos: pos,\n```",
       "revId": "1ed5215cd27497aa62debde4c22b61848ebeaa82",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "81b45b94_8d2d14b4",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-18T12:59:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0246c6b8_5476304d",
+      "revId": "1ed5215cd27497aa62debde4c22b61848ebeaa82",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

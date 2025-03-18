@@ -157,7 +157,7 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state combinedFlags) Value {
 func (c *OpContext) unify(v *Vertex, flags combinedFlags) {
 	if c.isDevVersion() {
 		requires, mode := flags.conditions(), flags.runMode()
-		v.unify(c, requires, mode)
+		v.unify(c, requires, mode, true)
 		return
 	}
 
@@ -1109,6 +1109,11 @@ type nodeContext struct {
 	buffer       []*nodeContext
 	disjunctErrs []*Bottom
 	disjunct     Conjunct
+
+	// hasDisjunction marks wither any disjunct was added. It is listed here
+	// instead of in nodeContextState as it should be cleared when a disjunction
+	// is split off. TODO: find something more principled.
+	hasDisjunction bool
 
 	// snapshot holds the last value of the vertex before calling postDisjunct.
 	snapshot Vertex

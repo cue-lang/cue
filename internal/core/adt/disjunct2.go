@@ -215,6 +215,7 @@ func (n *nodeContext) scheduleDisjunction(d envDisjunct) {
 	}
 
 	n.disjunctions = append(n.disjunctions, d)
+	n.hasDisjunction = true
 }
 
 func initArcs(ctx *OpContext, v *Vertex) bool {
@@ -513,7 +514,7 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode, hole i
 	n.ctx.blocking = nil
 	defer func() { n.ctx.blocking = saved }()
 
-	v.unify(n.ctx, allKnown, mode)
+	v.unify(n.ctx, allKnown, mode, true)
 
 	if err := d.getErrorAll(); err != nil && !isCyclePlaceholder(err) {
 		d.free()

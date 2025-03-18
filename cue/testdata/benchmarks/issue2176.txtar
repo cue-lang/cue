@@ -66,7 +66,7 @@ Allocs: 449
 Retain: 0
 
 Unifications: 377
-Conjuncts:    1333
+Conjuncts:    1527
 Disjuncts:    8
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -74,32 +74,32 @@ diff old new
 +++ new
 @@ -1,9 +1,9 @@
 -Leaks:  90
--Freed:  684
--Reused: 680
+-Freed:  746
+-Reused: 742
 -Allocs: 94
--Retain: 1359
+-Retain: 1363
 +Leaks:  449
 +Freed:  0
 +Reused: 0
 +Allocs: 449
 +Retain: 0
  
--Unifications: 766
--Conjuncts:    3242
--Disjuncts:    1409
+-Unifications: 828
+-Conjuncts:    3306
+-Disjuncts:    1475
 +Unifications: 377
-+Conjuncts:    1333
++Conjuncts:    1527
 +Disjuncts:    8
 -- out/eval/stats --
 Leaks:  90
-Freed:  684
-Reused: 680
+Freed:  746
+Reused: 742
 Allocs: 94
-Retain: 1359
+Retain: 1363
 
-Unifications: 766
-Conjuncts:    3242
-Disjuncts:    1409
+Unifications: 828
+Conjuncts:    3306
+Disjuncts:    1475
 -- out/evalalpha --
 (struct){
   #Datastream: (#struct){

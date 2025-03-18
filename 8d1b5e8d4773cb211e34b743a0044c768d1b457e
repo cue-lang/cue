@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8cd72749_262dbb11",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-18T12:04:36Z",
+      "side": 1,
+      "message": "This is probably just me nit-picking, but just to be sure, it\u0027s `foo.a` and `foo.b` that are marked with 7 here, and not the `a` and `b` fields of this rootless struct?",
+      "revId": "8d1b5e8d4773cb211e34b743a0044c768d1b457e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

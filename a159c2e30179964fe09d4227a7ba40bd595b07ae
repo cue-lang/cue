@@ -105,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "46366377_909bde84",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 859,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-18T12:04:36Z",
+      "side": 1,
+      "message": "Thank you - that makes sense. I guess I always think of `x` and `y` as _branches_ of the disjunction.",
+      "parentUuid": "d125de34_e2a85952",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7b76e793_276ea3d8",
@@ -210,6 +228,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6c06045_80630807",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-18T12:04:36Z",
+      "side": 1,
+      "message": "Very helpful, thank you.",
+      "parentUuid": "c492f482_a0d26d71",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4499af8b_0337e9b9",
@@ -280,6 +316,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e15b6c5e_8cc4ff68",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-18T12:04:36Z",
+      "side": 1,
+      "message": "Erm, because I\u0027m an idiot and didn\u0027t read your idempotent code correctly. Sorry!",
+      "parentUuid": "68247932_d39597ec",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "11737522_91fae0fb",
@@ -311,6 +365,24 @@
       "side": 1,
       "message": "Yes, if it isn\u0027t closed, ignore will be true.\nIf it _is_ closed, ignore will be false.",
       "parentUuid": "11737522_91fae0fb",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57c9dd33_b3740929",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-18T12:04:36Z",
+      "side": 1,
+      "message": "I suspect I\u0027m just being dumb, but I\u0027m definitely still confused by this. I would have thought if it\u0027s an embedding, we always skip checking. Let\u0027s discuss elsewhere.",
+      "parentUuid": "da441a5b_06e1c2ac",
       "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -533,6 +605,24 @@
       "side": 1,
       "message": "Hmmm, not sure if that is worth it. That will be slower (returns two slices, instead of just incrementing a counter, and not all that much clearer: I don\u0027t think this abstraction applies everywhere, and then you basically end up with multiple implementations or different approaches.",
       "parentUuid": "ee7e0308_e5875ed9",
+      "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d1c7c47_e3caef65",
+        "filename": "internal/core/adt/typocheck.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 466,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-18T12:04:36Z",
+      "side": 1,
+      "message": "Yeah, I thought you\u0027d say that. Ok - if this is performance-critical.",
+      "parentUuid": "f166869e_5ca3bfb3",
       "revId": "a159c2e30179964fe09d4227a7ba40bd595b07ae",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

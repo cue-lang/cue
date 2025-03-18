@@ -241,10 +241,8 @@ func (ctx *overlayContext) cloneScheduler(dst, src *nodeContext) {
 			ds.tasks = append(ds.tasks, t)
 
 		case taskRUNNING:
-			if t.run != handleResolver && t.run != handleExpr {
-				// TODO: consider whether this is also necessary for other
-				// types of tasks.
-				break
+			if t.run == handleDisjunctions {
+				continue
 			}
 
 			t.defunct = true

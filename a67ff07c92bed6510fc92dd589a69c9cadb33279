@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ca03b67_c38a02be",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-03-18T23:11:10Z",
+      "side": 1,
+      "message": "This resolves the last comment on attribute offsets. Thanks again for the review, and the help on the integration points for the cue commands. We\u0027re excited to get this into a cue build. Please let us know what the next steps would be.",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -158,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b619430a_c5028d38",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-03-18T23:11:10Z",
+      "side": 1,
+      "message": "Sure, I\u0027ve updated to use the start element offset.",
+      "parentUuid": "8b5bcf17_2bbcc3bf",
+      "revId": "8f7a1da1a1193f57f430fab42307026df239488e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ab15faca_19b8dd5d",

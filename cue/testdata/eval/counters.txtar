@@ -79,6 +79,27 @@ issue3770: task: {
 	m: null | {  }
 	out: m.x.a
 }
+-- issue3824.cue --
+issue3824: panic: {
+	thing: {
+        spec: name: string
+        outputField: string
+	}
+
+	val: string
+	things: [_]: thing
+
+	things: [_]: {
+			spec: *{
+					name: "self-signed"
+			} | {...}
+	}
+
+	if true {
+			things: "name": {}
+			val: things["name"].outputField
+	}
+}
 -- out/compile --
 --- issue3750.cue
 {
@@ -196,48 +217,80 @@ issue3770: task: {
     }
   }
 }
+--- issue3824.cue
+{
+  issue3824: {
+    panic: {
+      thing: {
+        spec: {
+          name: string
+        }
+        outputField: string
+      }
+      val: string
+      things: {
+        [_]: 〈1;thing〉
+      }
+      things: {
+        [_]: {
+          spec: (*{
+            name: "self-signed"
+          }|{
+            ...
+          })
+        }
+      }
+      if true {
+        things: {
+          name: {}
+        }
+        val: 〈0;things〉["name"].outputField
+      }
+    }
+  }
+}
 -- out/evalalpha/stats --
-Leaks:  229
+Leaks:  253
 Freed:  0
 Reused: 0
-Allocs: 229
+Allocs: 253
 Retain: 0
 
-Unifications: 176
-Conjuncts:    265
-Disjuncts:    34
+Unifications: 192
+Conjuncts:    301
+Disjuncts:    38
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
 @@ -1,9 +1,9 @@
--Leaks:  0
--Freed:  151
--Reused: 138
+-Leaks:  1
+-Freed:  165
+-Reused: 153
 -Allocs: 13
--Retain: 35
-+Leaks:  229
+-Retain: 38
++Leaks:  253
 +Freed:  0
 +Reused: 0
-+Allocs: 229
++Allocs: 253
 +Retain: 0
  
--Unifications: 125
--Conjuncts:    229
--Disjuncts:    186
-+Unifications: 176
-+Conjuncts:    265
-+Disjuncts:    34
+-Unifications: 138
+-Conjuncts:    254
+-Disjuncts:    204
++Unifications: 192
++Conjuncts:    301
++Disjuncts:    38
 -- out/eval/stats --
-Leaks:  0
-Freed:  151
-Reused: 138
+Leaks:  1
+Freed:  165
+Reused: 153
 Allocs: 13
-Retain: 35
+Retain: 38
 
-Unifications: 125
-Conjuncts:    229
-Disjuncts:    186
+Unifications: 138
+Conjuncts:    254
+Disjuncts:    204
 -- out/evalalpha --
 (struct){
   issue3750: (struct){
@@ -382,6 +435,27 @@ Disjuncts:    186
         }
         param?: (bool){ bool }
         #Objects: (#struct){
+        }
+      }
+    }
+  }
+  issue3824: (struct){
+    panic: (struct){
+      thing: (struct){
+        spec: (struct){
+          name: (string){ string }
+        }
+        outputField: (string){ string }
+      }
+      val: (string){ string }
+      things: (struct){
+        name: (struct){
+          spec: (struct){ |(*(struct){
+              name: (string){ "self-signed" }
+            }, (struct){
+              name: (string){ string }
+            }) }
+          outputField: (string){ string }
         }
       }
     }
@@ -619,6 +693,27 @@ diff old new
         }
         param?: (bool){ bool }
         #Objects: (#struct){
+        }
+      }
+    }
+  }
+  issue3824: (struct){
+    panic: (struct){
+      thing: (struct){
+        spec: (struct){
+          name: (string){ string }
+        }
+        outputField: (string){ string }
+      }
+      val: (string){ string }
+      things: (struct){
+        name: (struct){
+          spec: (struct){ |(*(struct){
+              name: (string){ "self-signed" }
+            }, (struct){
+              name: (string){ string }
+            }) }
+          outputField: (string){ string }
         }
       }
     }

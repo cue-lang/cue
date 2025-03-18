@@ -553,10 +553,7 @@ Result:
       x: (int){ 0 }
     }
     inList1: (struct){
-      x: (_|_){
-        // [cycle] indexElimination.inList1.x: cycle error referencing 0:
-        //     ./indexelim.cue:5:17
-      }
+      x: (_){ _ }
     }
     inList2: (struct){
       x: (int){ 0 }
@@ -795,16 +792,19 @@ diff old new
          }
        }
      }
-@@ -280,7 +268,7 @@
+@@ -279,10 +267,7 @@
+       x: (int){ 0 }
      }
      inList1: (struct){
-       x: (_|_){
+-      x: (_|_){
 -        // [incomplete] indexElimination.inList1.x: cycle error referencing 0:
-+        // [cycle] indexElimination.inList1.x: cycle error referencing 0:
-         //     ./indexelim.cue:5:17
-       }
+-        //     ./indexelim.cue:5:17
+-      }
++      x: (_){ _ }
      }
-@@ -402,7 +390,7 @@
+     inList2: (struct){
+       x: (int){ 0 }
+@@ -402,7 +387,7 @@
            let Ok#2 = (bool){ true }
          }, (#struct){
            _ok: (bool){ true }

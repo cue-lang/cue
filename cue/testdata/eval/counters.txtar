@@ -67,6 +67,18 @@ issue3780: panic2: {
 		}
 	}
 }
+-- issue3770.cue --
+issue3770: task: {
+	m: {
+		let t = ["x"]
+		for m in t {
+			(m): a: 1
+		}
+		x: b: 1
+	}
+	m: null | {  }
+	out: m.x.a
+}
 -- out/compile --
 --- issue3750.cue
 {
@@ -117,6 +129,28 @@ issue3780: panic2: {
     }
   }
 }
+--- issue3770.cue
+{
+  issue3770: {
+    task: {
+      m: {
+        let t#1 = [
+          "x",
+        ]
+        for _, m in 〈0;let t#1〉 {
+          〈1;m〉: {
+            a: 1
+          }
+        }
+        x: {
+          b: 1
+        }
+      }
+      m: (null|{})
+      out: 〈0;m〉.x.a
+    }
+  }
+}
 --- issue3780.cue
 {
   issue3780: {
@@ -163,47 +197,47 @@ issue3780: panic2: {
   }
 }
 -- out/evalalpha/stats --
-Leaks:  205
+Leaks:  225
 Freed:  0
 Reused: 0
-Allocs: 205
+Allocs: 225
 Retain: 0
 
-Unifications: 161
-Conjuncts:    240
-Disjuncts:    32
+Unifications: 172
+Conjuncts:    257
+Disjuncts:    34
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
 @@ -1,9 +1,9 @@
 -Leaks:  0
--Freed:  137
--Reused: 124
+-Freed:  151
+-Reused: 138
 -Allocs: 13
--Retain: 34
-+Leaks:  205
+-Retain: 35
++Leaks:  225
 +Freed:  0
 +Reused: 0
-+Allocs: 205
++Allocs: 225
 +Retain: 0
  
--Unifications: 113
--Conjuncts:    209
--Disjuncts:    171
-+Unifications: 161
-+Conjuncts:    240
-+Disjuncts:    32
+-Unifications: 125
+-Conjuncts:    229
+-Disjuncts:    186
++Unifications: 172
++Conjuncts:    257
++Disjuncts:    34
 -- out/eval/stats --
 Leaks:  0
-Freed:  137
-Reused: 124
+Freed:  151
+Reused: 138
 Allocs: 13
-Retain: 34
+Retain: 35
 
-Unifications: 113
-Conjuncts:    209
-Disjuncts:    171
+Unifications: 125
+Conjuncts:    229
+Disjuncts:    186
 -- out/evalalpha --
 (struct){
   issue3750: (struct){
@@ -315,6 +349,22 @@ Disjuncts:    171
         a: (struct){
           b: (_){ _ }
         }
+      }
+    }
+  }
+  issue3770: (struct){
+    task: (struct){
+      m: (struct){
+        let t#1 = (#list){
+          0: (string){ "x" }
+        }
+        x: (struct){
+          b: (int){ 1 }
+        }
+      }
+      out: (_|_){
+        // [incomplete] issue3770.task.out: undefined field: a:
+        //     ./issue3770.cue:10:11
       }
     }
   }
@@ -451,6 +501,23 @@ diff old new
          a: (struct){
            b: (_){ _ }
          }
+@@ -95,10 +119,12 @@
+         }
+         x: (struct){
+           b: (int){ 1 }
+-          a: (int){ 1 }
+-        }
+-      }
+-      out: (int){ 1 }
++        }
++      }
++      out: (_|_){
++        // [incomplete] issue3770.task.out: undefined field: a:
++        //     ./issue3770.cue:10:11
++      }
+     }
+   }
+   issue3780: (struct){
 -- out/eval --
 (struct){
   issue3750: (struct){
@@ -539,6 +606,20 @@ diff old new
           b: (_){ _ }
         }
       }
+    }
+  }
+  issue3770: (struct){
+    task: (struct){
+      m: (struct){
+        let t#1 = (#list){
+          0: (string){ "x" }
+        }
+        x: (struct){
+          b: (int){ 1 }
+          a: (int){ 1 }
+        }
+      }
+      out: (int){ 1 }
     }
   }
   issue3780: (struct){

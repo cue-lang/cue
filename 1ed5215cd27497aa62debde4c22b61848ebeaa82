@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "390e3492_0ca86352",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-18T11:56:26Z",
+      "side": 1,
+      "message": "LGTM with a couple of nits still.",
+      "revId": "1ed5215cd27497aa62debde4c22b61848ebeaa82",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0246c6b8_5476304d",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-18T11:56:26Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t\t\t\t\t\tValuePos: pos,\n```",
+      "revId": "1ed5215cd27497aa62debde4c22b61848ebeaa82",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

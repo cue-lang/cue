@@ -143,10 +143,6 @@ func (n *nodeContext) insertComprehension(
 		ec = &envComprehension{
 			comp:   c,
 			vertex: n.node,
-
-			err:  nil,   // shut up linter
-			envs: nil,   // shut up linter
-			done: false, // shut up linter
 		}
 	}
 

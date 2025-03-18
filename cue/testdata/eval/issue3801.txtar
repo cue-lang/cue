@@ -97,47 +97,47 @@ issue3801: nonRooted: full: {
 	}
 }
 -- out/evalalpha/stats --
-Leaks:  209
+Leaks:  247
 Freed:  0
 Reused: 0
-Allocs: 209
+Allocs: 247
 Retain: 0
 
-Unifications: 167
-Conjuncts:    273
-Disjuncts:    14
+Unifications: 168
+Conjuncts:    343
+Disjuncts:    16
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
 @@ -1,9 +1,9 @@
--Leaks:  98
--Freed:  260
--Reused: 254
--Allocs: 104
--Retain: 121
-+Leaks:  209
+-Leaks:  237
+-Freed:  408
+-Reused: 402
+-Allocs: 243
+-Retain: 430
++Leaks:  247
 +Freed:  0
 +Reused: 0
-+Allocs: 209
++Allocs: 247
 +Retain: 0
  
--Unifications: 332
--Conjuncts:    783
--Disjuncts:    373
-+Unifications: 167
-+Conjuncts:    273
-+Disjuncts:    14
+-Unifications: 599
+-Conjuncts:    1319
+-Disjuncts:    762
++Unifications: 168
++Conjuncts:    343
++Disjuncts:    16
 -- out/eval/stats --
-Leaks:  98
-Freed:  260
-Reused: 254
-Allocs: 104
-Retain: 121
+Leaks:  237
+Freed:  408
+Reused: 402
+Allocs: 243
+Retain: 430
 
-Unifications: 332
-Conjuncts:    783
-Disjuncts:    373
+Unifications: 599
+Conjuncts:    1319
+Disjuncts:    762
 -- out/evalalpha --
 (struct){
   issue3801: (struct){
@@ -152,7 +152,7 @@ Disjuncts:    373
               //     ./nested.cue:4:8
             }
             out: (_|_){
-              // [incomplete] issue3801.let.reduced.F.base.X: invalid interpolation: non-concrete value string (type string):
+              // [incomplete] issue3801.let.reduced.F.base.out: invalid interpolation: non-concrete value string (type string):
               //     ./nested.cue:5:16
               //     ./nested.cue:4:8
             }
@@ -184,7 +184,7 @@ Disjuncts:    373
               op: (string){ "add" }
               path: (string){ "/metadata" }
               value: (_|_){
-                // [incomplete] issue3801.let.full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
+                // [incomplete] issue3801.let.full.#Resource.patches.0.value: invalid interpolation: non-concrete value string (type string):
                 //     ./nested.cue:29:25
                 //     ./nested.cue:25:12
               }
@@ -213,7 +213,7 @@ Disjuncts:    373
         #Main: (#struct){
           namespace: (string){ string }
           output: (_|_){
-            // [incomplete] issue3801.let.full.#Main.jsonPatch.output: key value of dynamic field must be concrete, found string:
+            // [incomplete] issue3801.let.full.#Main.output: key value of dynamic field must be concrete, found string:
             //     ./nested.cue:43:24
             //     ./nested.cue:41:15
           }
@@ -236,7 +236,7 @@ Disjuncts:    373
                   op: (string){ "add" }
                   path: (string){ "/metadata" }
                   value: (_|_){
-                    // [incomplete] issue3801.let.full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
+                    // [incomplete] issue3801.let.full.#Main.jsonPatch.base.patches.0.value: invalid interpolation: non-concrete value string (type string):
                     //     ./nested.cue:29:25
                     //     ./nested.cue:25:12
                   }
@@ -310,8 +310,8 @@ Disjuncts:    373
           }
           out: (#struct){
             val0: (string){ "foo" }
-            msgObj: (string){ string }
-            value: (string){ string }
+            msgObj: (string){ "foo" }
+            value: (string){ "foo" }
           }
         }
       }
@@ -325,7 +325,7 @@ Disjuncts:    373
           }
         }
         out: (#struct){
-          ns1: (string){ string }
+          ns1: (string){ "foo" }
         }
         #SubOutput: (#struct){
           namespace?: (string){ string }
@@ -348,30 +348,12 @@ Disjuncts:    373
 diff old new
 --- old
 +++ new
-@@ -11,7 +11,7 @@
-               //     ./nested.cue:4:8
-             }
-             out: (_|_){
--              // [incomplete] issue3801.let.reduced.F.base.out: invalid interpolation: non-concrete value string (type string):
-+              // [incomplete] issue3801.let.reduced.F.base.X: invalid interpolation: non-concrete value string (type string):
-               //     ./nested.cue:5:16
-               //     ./nested.cue:4:8
-             }
-@@ -43,7 +43,7 @@
-               op: (string){ "add" }
-               path: (string){ "/metadata" }
-               value: (_|_){
--                // [incomplete] issue3801.let.full.#Resource.patches.0.value: invalid interpolation: non-concrete value string (type string):
-+                // [incomplete] issue3801.let.full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
-                 //     ./nested.cue:29:25
-                 //     ./nested.cue:25:12
-               }
 @@ -72,38 +72,11 @@
          #Main: (#struct){
            namespace: (string){ string }
            output: (_|_){
 -            // [incomplete] issue3801.let.full.#Main.output: invalid non-ground value string (must be concrete string):
-+            // [incomplete] issue3801.let.full.#Main.jsonPatch.output: key value of dynamic field must be concrete, found string:
++            // [incomplete] issue3801.let.full.#Main.output: key value of dynamic field must be concrete, found string:
 +            //     ./nested.cue:43:24
              //     ./nested.cue:41:15
 -            //     ./nested.cue:63:15
@@ -407,15 +389,6 @@ diff old new
              let base#8 = (#struct){
                someMsg: (string){ string }
                obs: (#struct){ |(*(#struct){
-@@ -122,7 +95,7 @@
-                   op: (string){ "add" }
-                   path: (string){ "/metadata" }
-                   value: (_|_){
--                    // [incomplete] issue3801.let.full.#Main.jsonPatch.base.patches.0.value: invalid interpolation: non-concrete value string (type string):
-+                    // [incomplete] issue3801.let.full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
-                     //     ./nested.cue:29:25
-                     //     ./nested.cue:25:12
-                   }
 @@ -146,6 +119,19 @@
                  }
                }
@@ -445,29 +418,11 @@ diff old new
            #base: (#struct){
              val0: (string){ string }
              msgObj: (string){ string }
-@@ -183,23 +169,22 @@
-           }
-           out: (#struct){
-             val0: (string){ "foo" }
--            msgObj: (string){ "foo" }
--            value: (string){ "foo" }
--          }
--        }
--      }
--      full: (struct){
--        #Output: (#struct){
--          namespace: (string){ string }
--          output: (_|_){
+@@ -192,13 +178,12 @@
+         #Output: (#struct){
+           namespace: (string){ string }
+           output: (_|_){
 -            // [incomplete] issue3801.nonRooted.full.#Output.output: invalid non-ground value string (must be concrete string):
-+            msgObj: (string){ string }
-+            value: (string){ string }
-+          }
-+        }
-+      }
-+      full: (struct){
-+        #Output: (#struct){
-+          namespace: (string){ string }
-+          output: (_|_){
 +            // [incomplete] issue3801.nonRooted.full.#Output.output: key value of dynamic field must be concrete, found string:
 +            //     ./nested.cue:88:12
              //     ./nested.cue:85:15
@@ -476,14 +431,12 @@ diff old new
 -          }
 -        }
 -        out: (struct){
--          ns1: (string){ "foo" }
 +          }
 +        }
 +        out: (#struct){
-+          ns1: (string){ string }
+           ns1: (string){ "foo" }
          }
          #SubOutput: (#struct){
-           namespace?: (string){ string }
 -- out/eval --
 (struct){
   issue3801: (struct){

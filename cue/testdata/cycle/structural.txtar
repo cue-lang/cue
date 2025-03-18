@@ -583,7 +583,7 @@ Reused: 0
 Allocs: 877
 Retain: 0
 
-Unifications: 597
+Unifications: 595
 Conjuncts:    1066
 Disjuncts:    157
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
@@ -605,7 +605,7 @@ diff old new
 -Unifications: 673
 -Conjuncts:    1299
 -Disjuncts:    896
-+Unifications: 597
++Unifications: 595
 +Conjuncts:    1066
 +Disjuncts:    157
 -- out/eval/stats --

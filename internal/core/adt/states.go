@@ -217,10 +217,15 @@ const (
 		fieldConjunctsKnown
 
 	// a scalarConjunct is one that is guaranteed to result in a scalar or
-	// list value.
+	// list value. TODO: use more widely instead of scalarKnown.
 	scalarConjunct = allTasksCompleted |
 		scalarKnown |
-		valueKnown
+		valueKnown |
+		disjunctionTask
+
+		// a scalarConjunct is one that is guaranteed to result in a scalar or
+	// list value. TODO: use more widely instead of scalarKnown.
+	scalarValue = scalarKnown | disjunctionTask
 
 	// needsX condition sets are used to indicate which conditions need to be
 	// met.

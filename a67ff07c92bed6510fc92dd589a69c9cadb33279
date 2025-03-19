@@ -16,6 +16,432 @@
       "message": "This resolves the last comment on attribute offsets. Thanks again for the review, and the help on the integration points for the cue commands. We\u0027re excited to get this into a cue build. Please let us know what the next steps would be.",
       "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b208960c_eafac12d",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "as far as I can tell, this field can be a local variable.",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ace6c2e_cba09b11",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "this can be a `[]byte`, which avoids having to copy the entire input, given that Go strings are immutable.",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bba40f56_a8b993d7",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "please skim through https://tip.golang.org/doc/comment to get an idea of how to write good Go documentation comments. For example, they should be capitalized and punctuated, and they should begin by naming the type or function you\u0027re documenting.",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b346ae55_542ad846",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "you can omit this; false is the zero value.",
+      "range": {
+        "startLine": 76,
+        "startChar": 51,
+        "endLine": 76,
+        "endChar": 70
+      },
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "266eae4f_3f6f47cc",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "doc lines like this one are unnecessary; what the line below does is obvious enough",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ecc6847f_5dfbe67a",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "this is only used once, so inline it in the call to xml.NewDecoder. the doc above here is also unnecessary.",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42e32323_904a9ce8",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "IMHO clearer to rewrite this as:\n```\nif err \u003d\u003d io.EOF {\n    break\n}\nif err !\u003d nil {\n    return nil, err\n}\n```",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2e64369_363ab839",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "you\u0027re passing the decoder around just to call InputOffset on it; I would personally call InputOffset ahead of time and either pass that as a parameter alongside the token. otherwise it\u0027s hard to tell if the other methods might also be reading tokens from the decoder directly.",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "defe1e7f_86408ad4",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "similar to before, you can move this branch to the top and early return, so that the main chunk of the func body is unindented.",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bde4fc0f_ae49b4f8",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "surely encoding/xml already does this for you? i.e. the Go code below\n\n```\npackage main\n\nimport (\n\t\"encoding/xml\"\n\t\"fmt\"\n\t\"io\"\n\t\"strings\"\n)\n\nconst src \u003d `\n\u003croot\u003e\n\u003c/bad\u003e\t\n`\n\nfunc main() {\n\tdec :\u003d xml.NewDecoder(strings.NewReader(src))\n\tfor {\n\t\tline, col :\u003d dec.InputPos()\n\t\toffs :\u003d dec.InputOffset()\n\t\ttok, err :\u003d dec.Token()\n\t\tif err \u003d\u003d io.EOF {\n\t\t\tbreak\n\t\t}\n\t\tif err !\u003d nil {\n\t\t\tpanic(err)\n\t\t}\n\t\tfmt.Printf(\"line\u003d%d col\u003d%d offs\u003d%d %#v\\n\", line, col, offs, tok)\n\t}\n}\n```\n\nfails with\n\n\u003e XML syntax error on line 3: element \u003croot\u003e closed by \u003c/bad\u003e",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be166d5f_bdf42339",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "join this if with the else above?",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db5a1517_c8adf0a3",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "omit this; a nil slice is perfectly valid in Go, and can be appended to or ranged over.",
+      "range": {
+        "startLine": 192,
+        "startChar": 78,
+        "endLine": 192,
+        "endChar": 105
+      },
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a69c457_cc86b184",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "return early here, which will allow you to unindent the rest of this func body.",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5bf5cf02_f2093aea",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "as before, omit this",
+      "range": {
+        "startLine": 210,
+        "startChar": 101,
+        "endLine": 210,
+        "endChar": 128
+      },
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa55d927_50d71076",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "this is a bit worrying - for each XML element you decode as a field, you linearly check all previous fields to check for duplicates. I get why you do this, to handle lists, but this is also O(n*n) so it will get very slow for large XML elements with many children.\n\nIt seems to me like a nicer approach would be to keep a map next to `dec.currField`, such as `currFieldChildren map[string]*ast.Field`, which would remove the quadratic problem, and if the keys are the unquoted strings, also avoid having to quote or unquote the strings to check for equality.",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da43b5a8_e570fe1e",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "you repeat `elt.(*ast.Field)` and other type assertions a lot. declare these as variables and reuse them, which would go in line with removing funcs like elementNameFromField.",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ffd00f6_ddbc6e3e",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "I think this can be replaced by just `field.Value.(*ast.StructLit).Elts`, which will panic if anything is nil or the type is wrong, but we know those all have to be correct. If they are not, something went very wrong, and a panic is fine - then we would have a bug to fix. But that would be the case with an error anyway.",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec543b0e_75ba84b1",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "similar to the above, I would replace this func with `elt.(*ast.Field).Label.(*ast.BasicLit).Value`.",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4852229e_3425f968",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "it seems to me like this entire mechanism is unnecessary. xml.Decoder.InputOffset gives you the end position of the last token, which is to say, the position of the next token. So you can obtain the start position of each token by simply calling InputOffset before Token, not after.\n\nbelow is an example bit of Go which does this, and correctly shows the line, column, and offset for the start position of each XML element:\n\n```\npackage main\n\nimport (\n\t\"encoding/xml\"\n\t\"fmt\"\n\t\"io\"\n\t\"strings\"\n)\n\nconst src \u003d `\n\u003croot\u003e\n    \u003cmessage\u003eHello World!\u003c/message\u003e\n    \u003cnested\u003e\n        \u003ca1\u003eone level\u003c/a1\u003e\n        \u003ca2\u003e\n            \u003cb\u003etwo levels\u003c/b\u003e\n        \u003c/a2\u003e\n    \u003c/nested\u003e\n\u003c/root\u003e\t\n`\n\nfunc main() {\n\tdec :\u003d xml.NewDecoder(strings.NewReader(src))\n\tfor {\n\t\tline, col :\u003d dec.InputPos()\n\t\toffs :\u003d dec.InputOffset()\n\t\ttok, err :\u003d dec.Token()\n\t\tif err \u003d\u003d io.EOF {\n\t\t\tbreak\n\t\t}\n\t\tif err !\u003d nil {\n\t\t\tpanic(err)\n\t\t}\n\t\tfmt.Printf(\"line\u003d%d col\u003d%d offs\u003d%d %#v\\n\", line, col, offs, tok)\n\t}\n}\n```",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cabb3d2a_fcd5ab4b",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "just like startElementStartOffset, this seems unnecessary.",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4b1bde6_26ffc420",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "declare this `*ast.StructLit` as a variable of its own, then you don\u0027t have to `.(*ast.StructLit)` below.",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2220bdb_16336606",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "typically we return zero values with errors, e.g. `return \"\", err`",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5674b956_c598986a",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "when could this ever occur? if we assume never, then I would panic here, which would simplify the rest of the namespace code quite a bit.",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e1afee0_497c94ea",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-19T22:22:20Z",
+      "side": 1,
+      "message": "I would also inline this. FWIW it seems like you only need to keep currField around as a field in Decoder to add or edit fields of its struct value; it would be much easier for us to replace the field with something like `currStruct *ast.Struct`, then you can still do all that you are doing here and elsewhere, but replacing `dec.currField.Value.(*ast.StructLit).Elts` with just `dec.currStruct.Elts`.",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

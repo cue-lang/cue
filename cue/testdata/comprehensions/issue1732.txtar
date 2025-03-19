@@ -227,36 +227,7 @@ Disjuncts:    126
     formatOutput: (#struct){
       foo: (#struct){
       }
-      "ns/network": (#struct){
-        spec: (#struct){
-          ingress: (#list){
-            0: (#struct){
-              from: (#list){
-                0: (#struct){
-                  namespaceSelector: (#struct){
-                    matchLabels: (#struct){
-                      tenant: (string){ string }
-                    }
-                  }
-                }
-              }
-            }
-          }
-          egress: (#list){
-            0: (#struct){
-              to: (#list){
-                0: (#struct){
-                  namespaceSelector: (#struct){
-                    matchLabels: (#struct){
-                      tenant: (string){ string }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+      "ns/network": ~(#Flux._outputs(:config)."ns/network")
     }
     _outputs(:config): (#struct){
       foo: (#struct){
@@ -417,7 +388,45 @@ diff old new
          }
        }
      }
-@@ -193,5 +158,21 @@
+@@ -128,36 +93,7 @@
+     formatOutput: (#struct){
+       foo: (#struct){
+       }
+-      "ns/network": (#struct){
+-        spec: (#struct){
+-          ingress: (#list){
+-            0: (#struct){
+-              from: (#list){
+-                0: (#struct){
+-                  namespaceSelector: (#struct){
+-                    matchLabels: (#struct){
+-                      tenant: (string){ string }
+-                    }
+-                  }
+-                }
+-              }
+-            }
+-          }
+-          egress: (#list){
+-            0: (#struct){
+-              to: (#list){
+-                0: (#struct){
+-                  namespaceSelector: (#struct){
+-                    matchLabels: (#struct){
+-                      tenant: (string){ string }
+-                    }
+-                  }
+-                }
+-              }
+-            }
+-          }
+-        }
+-      }
++      "ns/network": ~(#Flux._outputs(:config)."ns/network")
+     }
+     _outputs(:config): (#struct){
+       foo: (#struct){
+@@ -193,5 +129,21 @@
          }
        }
      }

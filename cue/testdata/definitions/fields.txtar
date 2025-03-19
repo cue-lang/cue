@@ -321,7 +321,7 @@ Result:
       s: (struct){
         foo: (#struct){
           f: (#struct){
-            d: (#struct){
+            d: (struct){
               foo: (int){ 1 }
             }
           }
@@ -424,7 +424,7 @@ Result:
       s: (struct){
         foo: (#struct){
           f: (#struct){
-            d: (#struct){
+            d: (struct){
               foo: (string){ "bar" }
             }
           }
@@ -833,15 +833,6 @@ diff old new
          f: (string){ "hi" }
        }
      }
-@@ -102,7 +52,7 @@
-       s: (struct){
-         foo: (#struct){
-           f: (#struct){
--            d: (struct){
-+            d: (#struct){
-               foo: (int){ 1 }
-             }
-           }
 @@ -116,11 +66,11 @@
          }
        }
@@ -906,15 +897,6 @@ diff old new
          f: (string){ "hi" }
        }
      }
-@@ -218,7 +155,7 @@
-       s: (struct){
-         foo: (#struct){
-           f: (#struct){
--            d: (struct){
-+            d: (#struct){
-               foo: (string){ "bar" }
-             }
-           }
 @@ -232,11 +169,11 @@
          }
        }

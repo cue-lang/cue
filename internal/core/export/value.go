@@ -114,9 +114,6 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 
 		exprs := make([]ast.Expr, 0, len(a))
 		for _, c := range a {
-			if c.Elem() == adt.EllipsisTop {
-				continue
-			}
 			if x := e.expr(c.Env, c.Elem()); x != dummyTop {
 				exprs = append(exprs, x)
 			}

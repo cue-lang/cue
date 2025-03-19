@@ -2136,14 +2136,14 @@ diff old new
        #ApplicationSpec: (#struct){
          syncPolicy?: ((null|struct)){ |((null){ null }, (#struct){
 -- out/evalalpha/stats --
-Leaks:  624
+Leaks:  620
 Freed:  0
 Reused: 0
-Allocs: 624
+Allocs: 620
 Retain: 0
 
-Unifications: 574
-Conjuncts:    957
+Unifications: 570
+Conjuncts:    943
 Disjuncts:    28
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -2155,17 +2155,17 @@ diff old new
 -Reused: 510
 -Allocs: 71
 -Retain: 107
-+Leaks:  624
++Leaks:  620
 +Freed:  0
 +Reused: 0
-+Allocs: 624
++Allocs: 620
 +Retain: 0
  
 -Unifications: 545
 -Conjuncts:    870
 -Disjuncts:    641
-+Unifications: 574
-+Conjuncts:    957
++Unifications: 570
++Conjuncts:    943
 +Disjuncts:    28
 -- out/eval/stats --
 Leaks:  63

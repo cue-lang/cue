@@ -64,14 +64,14 @@
 
 #ServiceManifest: #Manifest & {ref: kind: "service"}
 -- out/evalalpha/stats --
-Leaks:  77
+Leaks:  85
 Freed:  0
 Reused: 0
-Allocs: 77
+Allocs: 85
 Retain: 0
 
-Unifications: 59
-Conjuncts:    95
+Unifications: 61
+Conjuncts:    101
 Disjuncts:    8
 -- out/evalalpha --
 Errors:
@@ -389,17 +389,17 @@ diff old new
 -Reused: 108
 -Allocs: 25
 -Retain: 53
-+Leaks:  77
++Leaks:  85
 +Freed:  0
 +Reused: 0
-+Allocs: 77
++Allocs: 85
 +Retain: 0
  
 -Unifications: 107
 -Conjuncts:    243
 -Disjuncts:    170
-+Unifications: 59
-+Conjuncts:    95
++Unifications: 61
++Conjuncts:    101
 +Disjuncts:    8
 -- out/eval/stats --
 Leaks:  16

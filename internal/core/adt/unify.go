@@ -109,6 +109,7 @@ func (n *nodeContext) scheduleConjuncts() {
 
 	for _, c := range v.Conjuncts {
 		ci := c.CloseInfo
+		ci = ctx.combineCycleInfo(ci)
 		n.scheduleConjunct(c, ci)
 	}
 }

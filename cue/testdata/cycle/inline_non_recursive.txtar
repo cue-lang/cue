@@ -94,18 +94,20 @@ select: indirect: {
 	opt?: run?: string
 }
 -- out/evalalpha/stats --
-Leaks:  196
+Leaks:  213
 Freed:  0
 Reused: 0
-Allocs: 196
+Allocs: 213
 Retain: 0
 
-Unifications: 128
-Conjuncts:    345
+Unifications: 135
+Conjuncts:    354
 Disjuncts:    0
 -- out/evalalpha --
 Errors:
 issue3182.first.t2.x.b: structural cycle
+structural cycle:
+    ./in.cue:56:8
 
 Result:
 (_|_){
@@ -150,7 +152,8 @@ Result:
     k20: (int){ 0 }
     k30: (int){ 0 }
   }
-  issue1708: (struct){
+  issue1708: (_|_){
+    // [structural cycle]
     #add10: (#struct){
       in: (number){ number }
       a10: (#struct){
@@ -169,8 +172,14 @@ Result:
     }
     k00: (int){ 0 }
     k10: (int){ 10 }
-    k20: (int){ 20 }
-    k30: (int){ 30 }
+    k20: (_|_){
+      // [structural cycle] structural cycle:
+      //     ./in.cue:56:8
+    }
+    k30: (_|_){
+      // [structural cycle] structural cycle:
+      //     ./in.cue:56:8
+    }
   }
   issue3182: (_|_){
     // [structural cycle]
@@ -242,23 +251,41 @@ diff old new
 -Reused: 429
 -Allocs: 317
 -Retain: 1074
-+Leaks:  196
++Leaks:  213
 +Freed:  0
 +Reused: 0
-+Allocs: 196
++Allocs: 213
 +Retain: 0
  
 -Unifications: 746
 -Conjuncts:    2813
 -Disjuncts:    1485
-+Unifications: 128
-+Conjuncts:    345
++Unifications: 135
++Conjuncts:    354
 +Disjuncts:    0
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -53,14 +53,12 @@
+@@ -1,5 +1,7 @@
+ Errors:
+ issue3182.first.t2.x.b: structural cycle
++structural cycle:
++    ./in.cue:56:8
+ 
+ Result:
+ (_|_){
+@@ -44,7 +46,8 @@
+     k20: (int){ 0 }
+     k30: (int){ 0 }
+   }
+-  issue1708: (struct){
++  issue1708: (_|_){
++    // [structural cycle]
+     #add10: (#struct){
+       in: (number){ number }
+       a10: (#struct){
+@@ -53,20 +56,24 @@
            // [incomplete] issue1708.#add10.a10.o: non-concrete value number in operand to +:
            //     ./in.cue:52:20
            //     ./in.cue:51:7
@@ -274,7 +301,21 @@ diff old new
        }
      }
      k00: (int){ 0 }
-@@ -116,7 +114,6 @@
+     k10: (int){ 10 }
+-    k20: (int){ 20 }
+-    k30: (int){ 30 }
++    k20: (_|_){
++      // [structural cycle] structural cycle:
++      //     ./in.cue:56:8
++    }
++    k30: (_|_){
++      // [structural cycle] structural cycle:
++      //     ./in.cue:56:8
++    }
+   }
+   issue3182: (_|_){
+     // [structural cycle]
+@@ -116,7 +123,6 @@
          //     ./select.cue:8:15
          // select.indirect.#Job.req: field is required but not present:
          //     ./select.cue:8:8
@@ -282,6 +323,8 @@ diff old new
          //     ./select.cue:11:2
          opt: (_){ _ }
        }
+-- diff/todo/p2 --
+issue1708.k30: no longer evaluates. Not the worst, but would ideally be fixed.
 -- diff/todo/p3 --
 Error positions.
 Incorrect path due to structure sharing.

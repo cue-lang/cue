@@ -617,6 +617,9 @@ diff old new
      }
    }
  }
+-- diff/explanation --
+embedCycle: technically not a structural cycle, so V3 result
+is okay or even an improvement. See TODO(dyncyclecheck).
 -- out/eval --
 Errors:
 closeCycle.a: structural cycle

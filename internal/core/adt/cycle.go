@@ -666,6 +666,8 @@ func (n *nodeContext) detectCycleV3(arc *Vertex, env *Environment, x Resolver, c
 
 	for r := ci.Refs; r != nil; r = r.Next {
 		if equalDeref(r.Arc, arc) {
+			// TODO(dyncyclecheck): this block can go now and its removal will have some
+			// benefits. But do this in a separate CL.
 			if n.node.IsDynamic {
 				n.reportCycleError()
 				return ci, true
@@ -696,6 +698,9 @@ func (n *nodeContext) detectCycleV3(arc *Vertex, env *Environment, x Resolver, c
 				return ci, false
 			}
 
+			return n.markCyclicPathV3(arc, env, x, ci)
+		}
+		if equalDeref(r.Node, n.node) && r.Ref == x && (arc.nonRooted || arc.withinLet) {
 			return n.markCyclicPathV3(arc, env, x, ci)
 		}
 	}
@@ -744,6 +749,17 @@ func (n *nodeContext) markCyclicPathV3(arc *Vertex, env *Environment, x Resolver
 		return ci, true
 	}
 	return ci, false
+}
+
+// combineCycleInfo merges the cycle information collected in the context into
+// the given CloseInfo. Note that it only merges the cycle information in its
+// entirety, if present, to avoid getting unrelated data.
+func (c *OpContext) combineCycleInfo(ci CloseInfo) CloseInfo {
+	cc := c.ci.CycleInfo
+	if cc.IsCyclic {
+		ci.CycleInfo = cc
+	}
+	return ci
 }
 
 // hasDepthCycle uses depth counters to keep track of cycles:

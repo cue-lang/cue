@@ -169,6 +169,7 @@ func (n *nodeContext) getArc(f Feature, mode ArcType) (arc *Vertex, isNew bool) 
 		ArcType:   mode,
 		nonRooted: v.IsDynamic || v.nonRooted,
 		anonymous: v.anonymous || v.Label.IsLet(),
+		withinLet: v.withinLet || v.Label.IsLet(),
 	}
 	if n.scheduler.frozen&fieldSetKnown != 0 {
 		b := n.ctx.NewErrf("adding field %v not allowed as field set was already referenced", f)

@@ -145,7 +145,7 @@ func processDynamic(ctx *OpContext, t *task, mode runMode) {
 
 	field := t.x.(*DynamicField)
 
-	v := ctx.scalarValue(t, field.Key)
+	v := ctx.value(field.Key, combineMode(scalarValue, mode))
 	if v == nil {
 		return
 	}
@@ -182,7 +182,7 @@ func processPatternConstraint(ctx *OpContext, t *task, mode runMode) {
 
 	// Note that the result may be a disjunction. Be sure to not take the
 	// default value as we want to retain the options of the disjunction.
-	v := ctx.evalState(field.Filter, require(0, scalarKnown))
+	v := ctx.evalState(field.Filter, require(0, scalarValue))
 	if v == nil {
 		return
 	}

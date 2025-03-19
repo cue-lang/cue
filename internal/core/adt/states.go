@@ -220,7 +220,12 @@ const (
 	// list value.
 	scalarConjunct = allTasksCompleted |
 		scalarKnown |
-		valueKnown
+		valueKnown |
+		disjunctionTask
+
+	// a scalarValue is one that is guaranteed to result in a scalar.
+	// TODO: use more widely instead of scalarKnown.
+	scalarValue = scalarKnown | disjunctionTask
 
 	// needsX condition sets are used to indicate which conditions need to be
 	// met.

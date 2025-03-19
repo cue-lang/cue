@@ -103,7 +103,6 @@ type Package struct {
 	imports      []*Package         // packages imported by this one
 	inStd        bool
 	fromExternal bool
-	altMods      []module.Version // modules that could have contained the package but did not
 
 	// Populated by postprocessing in [Packages.buildStacks]:
 	stack *Package // package importing this one in minimal import stack for this pkg
@@ -251,7 +250,7 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 		return
 	}
 	pkg.fromExternal = pkg.mod != pkgs.mainModuleVersion
-	pkg.mod, pkg.locs, pkg.altMods, pkg.err = pkgs.importFromModules(ctx, pkg.path)
+	pkg.mod, pkg.locs, pkg.err = pkgs.importFromModules(ctx, pkg.path)
 	if pkg.err != nil {
 		return
 	}

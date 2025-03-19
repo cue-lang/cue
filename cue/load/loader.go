@@ -51,8 +51,8 @@ func newLoader(c *Config, tg *tagger, pkgs *modpkgload.Packages) *loader {
 	return &loader{
 		cfg:                 c,
 		tagger:              tg,
-		pkgs:                pkgs,
 		dirCachedBuildFiles: make(map[string]cachedDirFiles),
+		pkgs:                pkgs,
 	}
 }
 

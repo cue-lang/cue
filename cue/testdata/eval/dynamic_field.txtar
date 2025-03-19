@@ -204,9 +204,8 @@ Result:
   issue3828: (struct){
     reduced: (struct){
       a: (struct){
-        b: (_|_){
-          // [incomplete] issue3828.reduced.a.b: key value of dynamic field must be concrete, found _|_(issue3828.reduced.a.b: cycle with field: x):
-          //     ./issue3828.cue:5:5
+        b: (struct){
+          foobot1: (bool){ true }
         }
       }
       str: (string){ "foobot1" }
@@ -219,9 +218,8 @@ Result:
             }
           }
           collaborators: (struct){
-            repo1: (_|_){
-              // [incomplete] issue3828.full.orgs.org1.collaborators.repo1: key value of dynamic field must be concrete, found _|_(issue3828.full.orgs.org1.collaborators.repo1: cycle with field: orgBotUser):
-              //     ./issue3828.cue:18:33
+            repo1: (struct){
+              bot1: (bool){ true }
             }
           }
         }
@@ -264,31 +262,7 @@ diff old new
          }
          #ID: (_|_){
            // [incomplete] noCycleError.foo.bar.#ID: invalid interpolation: non-concrete value string (type string):
-@@ -100,8 +100,9 @@
-   issue3828: (struct){
-     reduced: (struct){
-       a: (struct){
--        b: (struct){
--          foobot1: (bool){ true }
-+        b: (_|_){
-+          // [incomplete] issue3828.reduced.a.b: key value of dynamic field must be concrete, found _|_(issue3828.reduced.a.b: cycle with field: x):
-+          //     ./issue3828.cue:5:5
-         }
-       }
-       str: (string){ "foobot1" }
-@@ -114,8 +115,9 @@
-             }
-           }
-           collaborators: (struct){
--            repo1: (struct){
--              bot1: (bool){ true }
-+            repo1: (_|_){
-+              // [incomplete] issue3828.full.orgs.org1.collaborators.repo1: key value of dynamic field must be concrete, found _|_(issue3828.full.orgs.org1.collaborators.repo1: cycle with field: orgBotUser):
-+              //     ./issue3828.cue:18:33
-             }
-           }
-         }
-@@ -123,6 +125,9 @@
+@@ -123,6 +123,9 @@
        botUser: (string){ "bot1" }
      }
    }
@@ -298,7 +272,7 @@ diff old new
    foo: (struct){
      b: (struct){
        c: (struct){
-@@ -130,7 +135,4 @@
+@@ -130,7 +133,4 @@
        }
      }
    }

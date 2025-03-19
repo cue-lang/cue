@@ -1,0 +1,8 @@
+Code-Review+2: Marcel van Lohuizen <mpvl@gmail.com>
+TryBot-Result+1: CUEcueckoo <cueckoo@cuelang.org>
+Submitted-by: Matthew Sackman <matthew@cue.works>
+Submitted-at: Wed, 19 Mar 2025 14:41:03 +0000
+Reviewed-on: https://review.gerrithub.io/c/cue-lang/cue/+/1211279
+Comments-Total: 6
+Project: cue-lang/cue
+Branch: refs/heads/master

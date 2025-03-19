@@ -1,0 +1,202 @@
+-- in.cue --
+_schema // embed schema through indirections
+_schema: #Schema
+#Schema: a?: b?: string
+a: b: "foo"
+c: "foo"
+
+
+x: {
+	_schema // embed schema through indirections
+	_schema: #Schema
+	#Schema: a?: b?: string
+	a: b: "foo"
+	c: "foo"
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  20
+Reused: 14
+Allocs: 6
+Retain: 6
+
+Unifications: 20
+Conjuncts:    34
+Disjuncts:    26
+-- out/evalalpha --
+Errors:
+c: field not allowed:
+    ./in.cue:5:1
+x: field not allowed:
+    ./in.cue:8:1
+
+Result:
+(_|_){
+  // [eval]
+  _schema: ~(#Schema)
+  #Schema: (#struct){
+    a?: (#struct){
+      b?: (string){ string }
+    }
+  }
+  a: (#struct){
+    b: (string){ "foo" }
+  }
+  c: (_|_){
+    // [eval] c: field not allowed:
+    //     ./in.cue:5:1
+  }
+  x: (_|_){
+    // [eval] x: field not allowed:
+    //     ./in.cue:8:1
+    _schema: ~(x.#Schema)
+    #Schema: (#struct){
+      a?: (#struct){
+        b?: (string){ string }
+      }
+    }
+    a: (_|_){
+      // [eval] x.a: field not allowed:
+      //     ./in.cue:11:11
+      //     ./in.cue:12:2
+      b: (_|_){
+        // [eval] x.a.b: field not allowed:
+        //     ./in.cue:11:15
+        //     ./in.cue:12:5
+      }
+    }
+    c: (_|_){
+      // [eval] x.c: field not allowed:
+      //     ./in.cue:13:2
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,13 @@
+-(#struct){
+-  _schema: (#struct){
+-    a?: (#struct){
+-      b?: (string){ string }
+-    }
+-  }
++Errors:
++c: field not allowed:
++    ./in.cue:5:1
++x: field not allowed:
++    ./in.cue:8:1
++
++Result:
++(_|_){
++  // [eval]
++  _schema: ~(#Schema)
+   #Schema: (#struct){
+     a?: (#struct){
+       b?: (string){ string }
+@@ -12,21 +16,32 @@
+   a: (#struct){
+     b: (string){ "foo" }
+   }
+-  c: (string){ "foo" }
+-  x: (#struct){
+-    _schema: (#struct){
+-      a?: (#struct){
+-        b?: (string){ string }
+-      }
+-    }
++  c: (_|_){
++    // [eval] c: field not allowed:
++    //     ./in.cue:5:1
++  }
++  x: (_|_){
++    // [eval] x: field not allowed:
++    //     ./in.cue:8:1
++    _schema: ~(x.#Schema)
+     #Schema: (#struct){
+       a?: (#struct){
+         b?: (string){ string }
+       }
+     }
+-    a: (#struct){
+-      b: (string){ "foo" }
+-    }
+-    c: (string){ "foo" }
++    a: (_|_){
++      // [eval] x.a: field not allowed:
++      //     ./in.cue:11:11
++      //     ./in.cue:12:2
++      b: (_|_){
++        // [eval] x.a.b: field not allowed:
++        //     ./in.cue:11:15
++        //     ./in.cue:12:5
++      }
++    }
++    c: (_|_){
++      // [eval] x.c: field not allowed:
++      //     ./in.cue:13:2
++    }
+   }
+ }
+-- out/eval --
+(#struct){
+  _schema: (#struct){
+    a?: (#struct){
+      b?: (string){ string }
+    }
+  }
+  #Schema: (#struct){
+    a?: (#struct){
+      b?: (string){ string }
+    }
+  }
+  a: (#struct){
+    b: (string){ "foo" }
+  }
+  c: (string){ "foo" }
+  x: (#struct){
+    _schema: (#struct){
+      a?: (#struct){
+        b?: (string){ string }
+      }
+    }
+    #Schema: (#struct){
+      a?: (#struct){
+        b?: (string){ string }
+      }
+    }
+    a: (#struct){
+      b: (string){ "foo" }
+    }
+    c: (string){ "foo" }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  〈0;_schema〉
+  _schema: 〈0;#Schema〉
+  #Schema: {
+    a?: {
+      b?: string
+    }
+  }
+  a: {
+    b: "foo"
+  }
+  c: "foo"
+  x: {
+    〈0;_schema〉
+    _schema: 〈0;#Schema〉
+    #Schema: {
+      a?: {
+        b?: string
+      }
+    }
+    a: {
+      b: "foo"
+    }
+    c: "foo"
+  }
+}

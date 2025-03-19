@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3111959f_0daae305",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-19T13:57:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "50498068_26ba7fa4",
+      "revId": "232362be0004fe0e755d83fd3a2717215b335fdd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f0538da1_d7269cb6",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-03-19T11:47:15Z",
       "side": 1,
       "message": "It would be great if we can get rid of this.",
+      "revId": "232362be0004fe0e755d83fd3a2717215b335fdd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4128561f_25f7a79d",
+        "filename": "internal/core/export/testdata/main/simplify.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1038145
+      },
+      "writtenOn": "2025-03-19T13:57:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f0538da1_d7269cb6",
       "revId": "232362be0004fe0e755d83fd3a2717215b335fdd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

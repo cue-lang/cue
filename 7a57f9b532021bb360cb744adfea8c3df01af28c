@@ -16,6 +16,24 @@
       "message": "this godoc says scalarConjunct, does it need rewriting or adjusting? also note the weird indentation.",
       "revId": "7a57f9b532021bb360cb744adfea8c3df01af28c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "966ced38_c77030ef",
+        "filename": "internal/core/adt/states.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-19T17:14:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6d44b173_6c03c720",
+      "revId": "7a57f9b532021bb360cb744adfea8c3df01af28c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

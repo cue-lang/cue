@@ -24,15 +24,7 @@ Unifications: 20
 Conjuncts:    34
 Disjuncts:    26
 -- out/evalalpha --
-Errors:
-c: field not allowed:
-    ./in.cue:5:1
-x: field not allowed:
-    ./in.cue:8:1
-
-Result:
-(_|_){
-  // [eval]
+(#struct){
   _schema: ~(#Schema)
   #Schema: (#struct){
     a?: (#struct){
@@ -42,103 +34,48 @@ Result:
   a: (#struct){
     b: (string){ "foo" }
   }
-  c: (_|_){
-    // [eval] c: field not allowed:
-    //     ./in.cue:5:1
-  }
-  x: (_|_){
-    // [eval] x: field not allowed:
-    //     ./in.cue:8:1
+  c: (string){ "foo" }
+  x: (#struct){
     _schema: ~(x.#Schema)
     #Schema: (#struct){
       a?: (#struct){
         b?: (string){ string }
       }
     }
-    a: (_|_){
-      // [eval] x.a: field not allowed:
-      //     ./in.cue:11:11
-      //     ./in.cue:12:2
-      b: (_|_){
-        // [eval] x.a.b: field not allowed:
-        //     ./in.cue:11:15
-        //     ./in.cue:12:5
-      }
+    a: (#struct){
+      b: (string){ "foo" }
     }
-    c: (_|_){
-      // [eval] x.c: field not allowed:
-      //     ./in.cue:13:2
-    }
+    c: (string){ "foo" }
   }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,13 @@
--(#struct){
+@@ -1,9 +1,5 @@
+ (#struct){
 -  _schema: (#struct){
 -    a?: (#struct){
 -      b?: (string){ string }
 -    }
 -  }
-+Errors:
-+c: field not allowed:
-+    ./in.cue:5:1
-+x: field not allowed:
-+    ./in.cue:8:1
-+
-+Result:
-+(_|_){
-+  // [eval]
 +  _schema: ~(#Schema)
    #Schema: (#struct){
      a?: (#struct){
        b?: (string){ string }
-@@ -12,21 +16,32 @@
-   a: (#struct){
-     b: (string){ "foo" }
+@@ -14,11 +10,7 @@
    }
--  c: (string){ "foo" }
--  x: (#struct){
+   c: (string){ "foo" }
+   x: (#struct){
 -    _schema: (#struct){
 -      a?: (#struct){
 -        b?: (string){ string }
 -      }
 -    }
-+  c: (_|_){
-+    // [eval] c: field not allowed:
-+    //     ./in.cue:5:1
-+  }
-+  x: (_|_){
-+    // [eval] x: field not allowed:
-+    //     ./in.cue:8:1
 +    _schema: ~(x.#Schema)
      #Schema: (#struct){
        a?: (#struct){
          b?: (string){ string }
-       }
-     }
--    a: (#struct){
--      b: (string){ "foo" }
--    }
--    c: (string){ "foo" }
-+    a: (_|_){
-+      // [eval] x.a: field not allowed:
-+      //     ./in.cue:11:11
-+      //     ./in.cue:12:2
-+      b: (_|_){
-+        // [eval] x.a.b: field not allowed:
-+        //     ./in.cue:11:15
-+        //     ./in.cue:12:5
-+      }
-+    }
-+    c: (_|_){
-+      // [eval] x.c: field not allowed:
-+      //     ./in.cue:13:2
-+    }
-   }
- }
 -- out/eval --
 (#struct){
   _schema: (#struct){

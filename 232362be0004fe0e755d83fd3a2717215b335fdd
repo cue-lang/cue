@@ -16,6 +16,40 @@
       "message": "This is ready for a look. The unity failure is only in our services repo, and is simply the addition of `_ \u0026` to eval output. I\u0027ve checked with @mvdan and he\u0027s relaxed about it.",
       "revId": "232362be0004fe0e755d83fd3a2717215b335fdd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50498068_26ba7fa4",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-19T11:47:15Z",
+      "side": 1,
+      "message": "It would be good to somehow mark that this conjunct comes from an ellipsis. Maybe make \u0026Top{} and/or BasicType a sentinel value? Or set the Src of the BasicType to the ellipsis?",
+      "revId": "232362be0004fe0e755d83fd3a2717215b335fdd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0538da1_d7269cb6",
+        "filename": "internal/core/export/testdata/main/simplify.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2025-03-19T11:47:15Z",
+      "side": 1,
+      "message": "It would be great if we can get rid of this.",
+      "revId": "232362be0004fe0e755d83fd3a2717215b335fdd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

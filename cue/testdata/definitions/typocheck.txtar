@@ -180,14 +180,14 @@ full: {
 	out: (#Main & {namespace: "ns1"}).output
 }
 -- out/evalalpha/stats --
-Leaks:  359
+Leaks:  365
 Freed:  0
 Reused: 0
-Allocs: 359
+Allocs: 365
 Retain: 0
 
-Unifications: 274
-Conjuncts:    524
+Unifications: 276
+Conjuncts:    526
 Disjuncts:    30
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
@@ -199,17 +199,17 @@ diff old new
 -Reused: 490
 -Allocs: 108
 -Retain: 299
-+Leaks:  359
++Leaks:  365
 +Freed:  0
 +Reused: 0
-+Allocs: 359
++Allocs: 365
 +Retain: 0
  
 -Unifications: 538
 -Conjuncts:    1111
 -Disjuncts:    746
-+Unifications: 274
-+Conjuncts:    524
++Unifications: 276
++Conjuncts:    526
 +Disjuncts:    30
 -- out/eval/stats --
 Leaks:  94

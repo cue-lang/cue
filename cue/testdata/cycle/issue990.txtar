@@ -80,14 +80,14 @@ out: #sub & {#p: _test.s1}
 -- diff/todo/p3 --
 Reordering
 -- out/evalalpha/stats --
-Leaks:  961
+Leaks:  937
 Freed:  0
 Reused: 0
-Allocs: 961
+Allocs: 937
 Retain: 0
 
-Unifications: 413
-Conjuncts:    1492
+Unifications: 389
+Conjuncts:    1464
 Disjuncts:    110
 -- out/evalalpha --
 (struct){
@@ -328,17 +328,17 @@ diff old new
 -Reused: 3213
 -Allocs: 25
 -Retain: 26
-+Leaks:  961
++Leaks:  937
 +Freed:  0
 +Reused: 0
-+Allocs: 961
++Allocs: 937
 +Retain: 0
  
 -Unifications: 2588
 -Conjuncts:    12056
 -Disjuncts:    3258
-+Unifications: 413
-+Conjuncts:    1492
++Unifications: 389
++Conjuncts:    1464
 +Disjuncts:    110
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new

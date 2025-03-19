@@ -69,17 +69,38 @@ constraints: {
 	t2: "bar"
 	(t1)?: (t2)!: 3
 }
-
+-- issue3828.cue --
+issue3828: reduced: {
+	a: b: {}
+	a: [_]: {
+		if true let x=str {
+			(x): true
+		}
+	}
+	str: "foobot1"
+}
+issue3828: full: {
+	orgs: org1: {
+		repos: repo1: {}
+	}
+	botUser: "bot1"
+	orgs: [_]: config={
+		for repo_name, _ in config.repos
+		let orgBotUser = botUser {
+			collaborators: (repo_name): (orgBotUser): true
+		}
+	}
+}
 -- out/eval/stats --
-Leaks:  2
-Freed:  59
-Reused: 52
-Allocs: 9
-Retain: 11
+Leaks:  4
+Freed:  76
+Reused: 67
+Allocs: 13
+Retain: 17
 
-Unifications: 61
-Conjuncts:    77
-Disjuncts:    66
+Unifications: 80
+Conjuncts:    101
+Disjuncts:    87
 -- out/evalalpha --
 Errors:
 invalid interpolation: conflicting values 2 and 1:
@@ -180,6 +201,34 @@ Result:
       }
     }
   }
+  issue3828: (struct){
+    reduced: (struct){
+      a: (struct){
+        b: (_|_){
+          // [incomplete] issue3828.reduced.a.b: key value of dynamic field must be concrete, found _|_(issue3828.reduced.a.b: cycle with field: x):
+          //     ./issue3828.cue:5:5
+        }
+      }
+      str: (string){ "foobot1" }
+    }
+    full: (struct){
+      orgs: (struct){
+        org1: (struct){
+          repos: (struct){
+            repo1: (struct){
+            }
+          }
+          collaborators: (struct){
+            repo1: (_|_){
+              // [incomplete] issue3828.full.orgs.org1.collaborators.repo1: key value of dynamic field must be concrete, found _|_(issue3828.full.orgs.org1.collaborators.repo1: cycle with field: orgBotUser):
+              //     ./issue3828.cue:18:33
+            }
+          }
+        }
+      }
+      botUser: (string){ "bot1" }
+    }
+  }
   bar: (struct){
     a: (int){ 1 }
   }
@@ -215,8 +264,32 @@ diff old new
          }
          #ID: (_|_){
            // [incomplete] noCycleError.foo.bar.#ID: invalid interpolation: non-concrete value string (type string):
-@@ -97,6 +97,9 @@
+@@ -100,8 +100,9 @@
+   issue3828: (struct){
+     reduced: (struct){
+       a: (struct){
+-        b: (struct){
+-          foobot1: (bool){ true }
++        b: (_|_){
++          // [incomplete] issue3828.reduced.a.b: key value of dynamic field must be concrete, found _|_(issue3828.reduced.a.b: cycle with field: x):
++          //     ./issue3828.cue:5:5
+         }
        }
+       str: (string){ "foobot1" }
+@@ -114,8 +115,9 @@
+             }
+           }
+           collaborators: (struct){
+-            repo1: (struct){
+-              bot1: (bool){ true }
++            repo1: (_|_){
++              // [incomplete] issue3828.full.orgs.org1.collaborators.repo1: key value of dynamic field must be concrete, found _|_(issue3828.full.orgs.org1.collaborators.repo1: cycle with field: orgBotUser):
++              //     ./issue3828.cue:18:33
+             }
+           }
+         }
+@@ -123,6 +125,9 @@
+       botUser: (string){ "bot1" }
      }
    }
 +  bar: (struct){
@@ -225,7 +298,7 @@ diff old new
    foo: (struct){
      b: (struct){
        c: (struct){
-@@ -104,7 +107,4 @@
+@@ -130,7 +135,4 @@
        }
      }
    }
@@ -335,6 +408,32 @@ Result:
       }
     }
   }
+  issue3828: (struct){
+    reduced: (struct){
+      a: (struct){
+        b: (struct){
+          foobot1: (bool){ true }
+        }
+      }
+      str: (string){ "foobot1" }
+    }
+    full: (struct){
+      orgs: (struct){
+        org1: (struct){
+          repos: (struct){
+            repo1: (struct){
+            }
+          }
+          collaborators: (struct){
+            repo1: (struct){
+              bot1: (bool){ true }
+            }
+          }
+        }
+      }
+      botUser: (string){ "bot1" }
+    }
+  }
   foo: (struct){
     b: (struct){
       c: (struct){
@@ -437,6 +536,47 @@ Result:
     }
     foo: {
       baz: {}
+    }
+  }
+}
+--- issue3828.cue
+{
+  issue3828: {
+    reduced: {
+      a: {
+        b: {}
+      }
+      a: {
+        [_]: {
+          if true let x = 〈2;str〉 {
+            〈1;x〉: true
+          }
+        }
+      }
+      str: "foobot1"
+    }
+  }
+  issue3828: {
+    full: {
+      orgs: {
+        org1: {
+          repos: {
+            repo1: {}
+          }
+        }
+      }
+      botUser: "bot1"
+      orgs: {
+        [_]: {
+          for repo_name, _ in 〈1〉.repos let orgBotUser = 〈3;botUser〉 {
+            collaborators: {
+              〈3;repo_name〉: {
+                〈3;orgBotUser〉: true
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

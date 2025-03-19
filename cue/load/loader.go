@@ -20,19 +20,21 @@ package load
 //    - go/build
 
 import (
+	"fmt"
 	"path/filepath"
 
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/mod/modpkgload"
+	"cuelang.org/go/mod/module"
 )
 
 type loader struct {
 	cfg    *Config
 	tagger *tagger
 	stk    importStack
-	pkgs   *modpkgload.Packages
+	pkgs   pkgResolver
 
 	// dirCachedBuildFiles caches the work involved when reading a
 	// directory. It is keyed by directory name. When we descend into
@@ -42,18 +44,40 @@ type loader struct {
 	dirCachedBuildFiles map[string]cachedDirFiles
 }
 
+type pkgResolver interface {
+	resolvePkg(importPath string) (module.Version, []module.SourceLoc, error)
+}
+
+type modpkgloadResolver struct {
+	pkgs *modpkgload.Packages
+}
+
+func (r modpkgloadResolver) resolvePkg(p string) (module.Version, []module.SourceLoc, error) {
+	pkg := r.pkgs.Pkg(p)
+	if pkg == nil {
+		return module.Version{}, nil, fmt.Errorf("no dependency found for %q", p)
+	}
+	if err := pkg.Error(); err != nil {
+		return module.Version{}, nil, err
+	}
+	return pkg.Mod(), pkg.Locations(), nil
+}
+
 type cachedDirFiles struct {
 	err       errors.Error
 	filenames []string
 }
 
 func newLoader(c *Config, tg *tagger, pkgs *modpkgload.Packages) *loader {
-	return &loader{
+	l := &loader{
 		cfg:                 c,
 		tagger:              tg,
-		pkgs:                pkgs,
 		dirCachedBuildFiles: make(map[string]cachedDirFiles),
 	}
+	if pkgs != nil {
+		l.pkgs = modpkgloadResolver{pkgs}
+	}
+	return l
 }
 
 func (l *loader) abs(filename string) string {

@@ -32,7 +32,7 @@ func TestLoadPackages(t *testing.T) {
 		reg := testRegistry{tfs}
 		testDirs, _ := fs.Glob(tfs, "test[0-9]*")
 		for _, testDir := range testDirs {
-			testName := strings.TrimSuffix(filepath.Base(f), ".txtar")
+			testName := strings.TrimSuffix(filepath.Base(f), ".txtar") + "/" + testDir
 			t.Run(testName, func(t *testing.T) {
 				t.Logf("test file: %v", f)
 				readTestFile := func(name string) string {

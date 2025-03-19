@@ -441,24 +441,20 @@ func (l *loader) absDirFromImportPath1(pos token.Pos, p importPath) (absDir stri
 	// Note: use the canonical form of the import path because
 	// that's the form passed to [modpkgload.LoadPackages]
 	// and hence it's available by that name via Pkg.
-	pkg := l.pkgs.Pkg(parts.Canonical().String())
-	// TODO(mvdan): using "unqualified" for the errors below doesn't seem right,
-	// should we not be using either the original path or the canonical path?
-	// The unqualified import path should only be used for filepath.FromSlash further below.
-	if pkg == nil {
-		return "", "", fmt.Errorf("no dependency found for package %q", unqualified)
-	}
-	if err := pkg.Error(); err != nil {
+	mv, locs, err := l.pkgs.resolvePkg(parts.Canonical().String())
+	if err != nil {
+		// TODO(mvdan): using "unqualified" for the errors below doesn't seem right,
+		// should we not be using either the original path or the canonical path?
+		// The unqualified import path should only be used for filepath.FromSlash further below.
 		return "", "", fmt.Errorf("cannot find package %q: %v", unqualified, err)
 	}
-	if mv := pkg.Mod(); mv.IsLocal() {
+	if mv.IsLocal() {
 		// It's a local package that's present inside one or both of the gen, usr or pkg
 		// directories. Even though modpkgload tells us exactly what those directories
 		// are, the rest of the cue/load logic expects only a single directory for now,
 		// so just use that.
 		absDir = filepath.Join(GenPath(l.cfg.ModuleRoot), parts.Path)
 	} else {
-		locs := pkg.Locations()
 		if len(locs) > 1 {
 			return "", "", fmt.Errorf("package %q unexpectedly found in multiple locations", unqualified)
 		}
@@ -471,7 +467,7 @@ func (l *loader) absDirFromImportPath1(pos token.Pos, p importPath) (absDir stri
 			return "", "", fmt.Errorf("cannot determine source directory for package %q: %v", unqualified, err)
 		}
 	}
-	return absDir, pkg.Mod().Path(), nil
+	return absDir, mv.Path(), nil
 }
 
 func absPathForSourceLoc(loc module.SourceLoc) (string, error) {

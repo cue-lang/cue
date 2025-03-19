@@ -196,6 +196,7 @@ func CheckPath(mpath string) (err error) {
 func CheckImportPath(path string) error {
 	parts := ParseImportPath(path)
 	if semver.Major(parts.Version) != parts.Version {
+		panic("whewre?")
 		return &InvalidPathError{
 			Kind: "import",
 			Path: path,

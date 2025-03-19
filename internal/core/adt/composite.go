@@ -219,12 +219,15 @@ type Vertex struct {
 	// rooted.
 	nonRooted bool // indicates that there is no path from the root of the tree.
 
-	// anonymous indicates that this Vertex is being computed within a
+	// anonymous indicates that this Vertex is being computed without an
 	// addressable context, or in other words, a context for which there is
-	// a path from the root of the file. Typically, the only addressable
+	// np path from the root of the file. Typically, the only addressable
 	// contexts are fields. Examples of fields that are not addressable are
 	// the for source of comprehensions and let fields or let clauses.
 	anonymous bool
+
+	// withinLet indicate that this vertex is a let value.
+	withinLet bool
 
 	// hasPendingArc is set if this Vertex has a void arc (e.g. for comprehensions)
 	hasPendingArc bool
@@ -1356,6 +1359,7 @@ func (v *Vertex) GetArc(c *OpContext, f Feature, t ArcType) (arc *Vertex, isNew 
 		ArcType:   t,
 		nonRooted: v.IsDynamic || v.Label.IsLet() || v.nonRooted,
 		anonymous: v.anonymous || v.Label.IsLet(),
+		withinLet: v.withinLet || v.Label.IsLet(),
 	}
 	v.Arcs = append(v.Arcs, arc)
 	if t == ArcPending {

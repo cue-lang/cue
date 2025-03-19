@@ -555,6 +555,7 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode, checkTypos 
 	// of range in case the Arcs grows during processing.
 	for arcPos := 0; arcPos < len(n.node.Arcs); arcPos++ {
 		a := n.node.Arcs[arcPos]
+		// TODO: Consider skipping lets.
 
 		if !a.unify(n.ctx, needs, mode, checkTypos) {
 			success = false
@@ -838,7 +839,6 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 			if arc.ArcType == ArcPending {
 				return arcReturn
 			}
-			goto handleArcType
 
 		case yield:
 			arcState.process(needs, yield)
@@ -846,12 +846,22 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 			// in an invalid field.
 
 		case finalize:
-			// TODO: should we try to use finalize? Using it results in errors and this works. It would be more principled, though.
-			arcState.process(needs, yield)
+			// TODO: we should try to always use finalize? Using it results in
+			// errors. For now we only use it for let values. Let values are
+			// not normally finalized (they may be cached) and as such might
+			// not trigger the usual unblocking. Force unblocking may cause
+			// some values to be remain unevaluated.
+			if arc.withinLet {
+				arcState.process(needs, finalize)
+				if arc.ArcType == ArcPending {
+					arc.ArcType = ArcNotPresent
+				}
+			} else {
+				arcState.process(needs, yield)
+			}
 		}
 	}
 
-handleArcType:
 	switch arc.ArcType {
 	case ArcMember, ArcRequired:
 		return arcReturn

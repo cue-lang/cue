@@ -104,7 +104,8 @@ Disjuncts:    76
         〈1;cps〉
       },
     ]
-    ports: (list){ list }
+    ports: (#list){
+    }
   }
   reduced: (struct){
     A: (struct){
@@ -123,7 +124,8 @@ Disjuncts:    76
         〈1;x〉
       },
     ]
-    B: (list){ list }
+    B: (#list){
+    }
   }
 }
 -- diff/-out/evalalpha<==>+out/eval --
@@ -154,17 +156,7 @@ diff old new
            }
          }
        }
-@@ -58,8 +43,7 @@
-         〈1;cps〉
-       },
-     ]
--    ports: (#list){
--    }
-+    ports: (list){ list }
-   }
-   reduced: (struct){
-     A: (struct){
-@@ -73,18 +57,11 @@
+@@ -73,17 +58,11 @@
          y?: (int){ int }
        }
      }
@@ -179,16 +171,14 @@ diff old new
 -        y?: (int){ int }
 -      }
 -    }
--    B: (#list){
--    }
 +    let Z#3multi = [
 +      for _, x in 〈2;A〉 {
 +        〈1;x〉
 +      },
 +    ]
-+    B: (list){ list }
+     B: (#list){
+     }
    }
- }
 -- diff/todo/p1 --
 full.ports|reduced.B: incomplete value (list)
 -- out/eval --

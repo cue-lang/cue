@@ -320,7 +320,7 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 	id.defID = dstID
 
 	n.addReplacement(replaceID{from: srcID, to: dstID, add: true})
-	if id.enclosingEmbed != 0 {
+	if id.enclosingEmbed != 0 && !ignore {
 		ph := id.outerID
 		n.addReplacement(replaceID{from: dstID, to: ph, add: true})
 		id.enclosingEmbed = 0

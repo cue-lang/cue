@@ -198,6 +198,8 @@ embed.andEmbed.d.err: field not allowed:
     ./in.cue:31:11
 embed.andInStruct.a.err: field not allowed:
     ./in.cue:8:16
+embed.embedAndRecursive.x.err: field not allowed:
+    ./in.cue:25:11
 embed.embedComprehension.a.err: field not allowed:
     ./in.cue:16:16
 embed.embedDefWithEmbedding.a.err: field not allowed:
@@ -211,6 +213,8 @@ embed.openValidator.t2.a.b: conflicting values 1 and {b?:Y} (mismatched types in
     ./validators.cue:24:8
 embed.simple.a.err: field not allowed:
     ./in.cue:4:5
+embed.withIndirect.err: field not allowed:
+    ./in.cue:71:8
 embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
     ./validators.cue:21:5
     ./validators.cue:21:12
@@ -290,15 +294,20 @@ Result:
         }
       }
     }
-    embedAndRecursive: (struct){
+    embedAndRecursive: (_|_){
+      // [eval]
       #A: (#struct){
         a: (int){ int }
       }
       B: (struct){
         x: ~(embed.embedAndRecursive.#A)
       }
-      x: (#struct){
-        err: (int){ 2 }
+      x: (_|_){
+        // [eval]
+        err: (_|_){
+          // [eval] embed.embedAndRecursive.x.err: field not allowed:
+          //     ./in.cue:25:11
+        }
         a: (int){ int }
       }
     }
@@ -356,12 +365,16 @@ Result:
         }
       }
     }
-    withIndirect: (#struct){
+    withIndirect: (_|_){
+      // [eval]
       A: ~(embed.withIndirect.#B)
       #B: (#struct){
         b: (int){ int }
       }
-      err: (int){ 2 }
+      err: (_|_){
+        // [eval] embed.withIndirect.err: field not allowed:
+        //     ./in.cue:71:8
+      }
       b: (int){ int }
     }
     normalValidator: (_|_){
@@ -613,7 +626,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,81 +1,25 @@
+@@ -1,81 +1,29 @@
  Errors:
  and.transitive.out.ok: field not allowed:
 -    ./in.cue:34:5
@@ -643,11 +656,11 @@ diff old new
 -    ./in.cue:8:5
 -    ./in.cue:8:7
      ./in.cue:8:16
--embed.embedAndRecursive.x.err: field not allowed:
+ embed.embedAndRecursive.x.err: field not allowed:
 -    ./in.cue:23:6
 -    ./in.cue:24:8
 -    ./in.cue:25:2
--    ./in.cue:25:11
+     ./in.cue:25:11
  embed.embedComprehension.a.err: field not allowed:
 -    ./in.cue:15:8
 -    ./in.cue:15:9
@@ -681,12 +694,12 @@ diff old new
 -    ./in.cue:3:5
 -    ./in.cue:3:7
      ./in.cue:4:5
--embed.withIndirect.err: field not allowed:
+ embed.withIndirect.err: field not allowed:
 -    ./in.cue:68:22
 -    ./in.cue:69:5
 -    ./in.cue:70:6
 -    ./in.cue:71:2
--    ./in.cue:71:8
+     ./in.cue:71:8
 -embed.openValidator.t1.x.err: field not allowed:
 -    ./validators.cue:13:3
 -    ./validators.cue:12:6
@@ -695,7 +708,7 @@ diff old new
  embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
      ./validators.cue:21:5
      ./validators.cue:21:12
-@@ -94,14 +38,11 @@
+@@ -94,14 +42,11 @@
        }
        a: (_|_){
          // [eval]
@@ -711,7 +724,7 @@ diff old new
        }
      }
      andInStruct: (_|_){
-@@ -111,14 +52,11 @@
+@@ -111,14 +56,11 @@
        }
        a: (_|_){
          // [eval]
@@ -727,7 +740,7 @@ diff old new
        }
      }
      embedDefWithEmbedding: (_|_){
-@@ -128,15 +66,11 @@
+@@ -128,15 +70,11 @@
        }
        a: (_|_){
          // [eval]
@@ -744,7 +757,7 @@ diff old new
        }
      }
      embedComprehension: (_|_){
-@@ -146,16 +80,11 @@
+@@ -146,16 +84,11 @@
        }
        a: (_|_){
          // [eval]
@@ -762,7 +775,7 @@ diff old new
        }
      }
      fieldWithAnd: (_|_){
-@@ -166,33 +95,20 @@
+@@ -166,9 +99,6 @@
          // [eval]
          err: (_|_){
            // [eval] embed.fieldWithAnd.a.err: field not allowed:
@@ -772,11 +785,7 @@ diff old new
            //     ./in.cue:20:13
          }
        }
-     }
--    embedAndRecursive: (_|_){
--      // [eval]
-+    embedAndRecursive: (struct){
-       #A: (#struct){
+@@ -179,20 +109,15 @@
          a: (int){ int }
        }
        B: (struct){
@@ -787,22 +796,22 @@ diff old new
 -      x: (_|_){
 -        // [eval]
 -        a: (int){ int }
--        err: (_|_){
--          // [eval] embed.embedAndRecursive.x.err: field not allowed:
++        x: ~(embed.embedAndRecursive.#A)
++      }
++      x: (_|_){
++        // [eval]
+         err: (_|_){
+           // [eval] embed.embedAndRecursive.x.err: field not allowed:
 -          //     ./in.cue:23:6
 -          //     ./in.cue:24:8
 -          //     ./in.cue:25:2
--          //     ./in.cue:25:11
--        }
-+        x: ~(embed.embedAndRecursive.#A)
-+      }
-+      x: (#struct){
-+        err: (int){ 2 }
+           //     ./in.cue:25:11
+         }
 +        a: (int){ int }
        }
      }
      andEmbed: (_|_){
-@@ -208,17 +124,11 @@
+@@ -208,17 +133,11 @@
        }
        d: (_|_){
          // [eval]
@@ -821,7 +830,7 @@ diff old new
        }
      }
      nonDef: (struct){
-@@ -227,12 +137,12 @@
+@@ -227,12 +146,12 @@
            a: (string){ string }
          }
          #Y: (#struct){
@@ -838,7 +847,7 @@ diff old new
          }
        }
      }
-@@ -242,12 +152,12 @@
+@@ -242,12 +161,12 @@
            Name: (string){ string }
          }
          #Step: (#struct){
@@ -855,37 +864,34 @@ diff old new
          }
          out: (#struct){
            Name: (string){ "foo" }
-@@ -255,23 +165,13 @@
-         }
-       }
+@@ -257,21 +176,15 @@
      }
--    withIndirect: (_|_){
--      // [eval]
+     withIndirect: (_|_){
+       // [eval]
 -      A: (#struct){
 -        b: (int){ int }
 -      }
 -      #B: (#struct){
 -        b: (int){ int }
 -      }
-+    withIndirect: (#struct){
+-      b: (int){ int }
 +      A: ~(embed.withIndirect.#B)
 +      #B: (#struct){
 +        b: (int){ int }
 +      }
-+      err: (int){ 2 }
-       b: (int){ int }
--      err: (_|_){
--        // [eval] embed.withIndirect.err: field not allowed:
+       err: (_|_){
+         // [eval] embed.withIndirect.err: field not allowed:
 -        //     ./in.cue:68:22
 -        //     ./in.cue:69:5
 -        //     ./in.cue:70:6
 -        //     ./in.cue:71:2
--        //     ./in.cue:71:8
--      }
+         //     ./in.cue:71:8
+       }
++      b: (int){ int }
      }
      normalValidator: (_|_){
        // [eval]
-@@ -281,20 +181,17 @@
+@@ -281,20 +194,17 @@
        }
        x: (_|_){
          // [eval]
@@ -909,7 +915,7 @@ diff old new
          #X: (_){
            matchN(0, (#list){
            })
-@@ -301,17 +198,10 @@
+@@ -301,17 +211,10 @@
            a?: (int){ int }
            b?: (int){ int }
          }
@@ -931,7 +937,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -330,10 +220,7 @@
+@@ -330,10 +233,7 @@
            // [eval]
            b: (_|_){
              // [eval] embed.openValidator.t2.a.b: conflicting values 1 and {b?:Y} (mismatched types int and struct):
@@ -942,7 +948,7 @@ diff old new
              //     ./validators.cue:24:8
              // embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
              //     ./validators.cue:21:5
-@@ -360,16 +247,11 @@
+@@ -360,16 +260,11 @@
        }
        out: (_|_){
          // [eval]
@@ -960,7 +966,7 @@ diff old new
        }
      }
      transitiveWithEmbed: (_|_){
-@@ -385,17 +267,11 @@
+@@ -385,17 +280,11 @@
        }
        out: (_|_){
          // [eval]
@@ -979,7 +985,7 @@ diff old new
        }
      }
    }
-@@ -418,7 +294,7 @@
+@@ -418,7 +307,7 @@
            op: (string){ "add" }
            path: (string){ "/metadata" }
            value: (_|_){
@@ -988,7 +994,7 @@ diff old new
              //     ./large.cue:7:25
              //     ./large.cue:3:12
            }
-@@ -447,38 +323,11 @@
+@@ -447,38 +336,11 @@
      #Main: (#struct){
        namespace: (string){ string }
        output: (_|_){
@@ -1029,7 +1035,7 @@ diff old new
          let base#5 = (#struct){
            someMsg: (string){ string }
            obs: (#struct){ |(*(#struct){
-@@ -497,7 +346,7 @@
+@@ -497,7 +359,7 @@
                op: (string){ "add" }
                path: (string){ "/metadata" }
                value: (_|_){
@@ -1038,7 +1044,7 @@ diff old new
                  //     ./large.cue:7:25
                  //     ./large.cue:3:12
                }
-@@ -511,24 +360,59 @@
+@@ -511,24 +373,59 @@
              }, (#struct){
              }) }
            let pickMsg#1 = (#struct){

@@ -17,7 +17,6 @@ package adt
 import (
 	"fmt"
 
-	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
@@ -225,18 +224,7 @@ loop1:
 	// TODO: if embed, add an "ignore" field.
 	// When inserting a replace that is a definition, flip the ignore.
 	if hasEmbed {
-		if _, ok := s.Src.(*ast.File); !ok {
-			// If this is not a file, the struct indicates the scope/
-			// boundary at which closedness should apply. This is not true
-			// for files.
-			// We should also not spawn if this is a nested Comprehension,
-			// where the spawn is already done as it may lead to spurious
-			// field not allowed errors. We can detect this with a nil s.Src.
-			// TODO(evalv3): use a more principled detection mechanism.
-			// TODO: set this as a flag in StructLit so as to not have to
-			// do the somewhat dangerous cast here.
-			ci = n.splitDefID(s, ci)
-		}
+		ci = n.splitDefID(s, ci)
 	}
 
 	// First add fixed fields and schedule expressions.

@@ -168,6 +168,8 @@ package adt
 import (
 	"math"
 	"slices"
+
+	"cuelang.org/go/cue/ast"
 )
 
 type defID uint32
@@ -399,6 +401,20 @@ func (n *nodeContext) injectEmbedNode(x Decl, id CloseInfo) CloseInfo {
 // the #A vs #A... semantics.
 func (n *nodeContext) splitDefID(s *StructLit, id CloseInfo) CloseInfo {
 	if n.ctx.OpenDef {
+		return id
+	}
+
+	if _, ok := s.Src.(*ast.File); ok {
+		// If this is not a file, the struct indicates the scope/
+		// boundary at which closedness should apply. This is not true
+		// for files.
+		// We should also not spawn if this is a nested Comprehension,
+		// where the spawn is already done as it may lead to spurious
+		// field not allowed errors. We can detect this with a nil s.Src.
+		// TODO(evalv3): use a more principled detection mechanism.
+		// TODO: set this as a flag in StructLit so as to not have to
+		// do the somewhat dangerous cast here.
+		// id.hasOuter = true
 		return id
 	}
 

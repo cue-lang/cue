@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dfed0eb7_daafc567",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-03-20T11:54:44Z",
+      "side": 1,
+      "message": "Removing hold per discussion with @mvdan@mvdan.cc",
+      "revId": "f366a9ff317a1d665f9e48342aed9976f94c344b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

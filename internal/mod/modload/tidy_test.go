@@ -1,11 +1,8 @@
 package modload
 
 import (
-	"archive/zip"
-	"bytes"
 	"context"
 	"fmt"
-	"io"
 	"io/fs"
 	"path/filepath"
 	"strings"
@@ -16,10 +13,9 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"golang.org/x/tools/txtar"
 
-	"cuelang.org/go/mod/modfile"
+	"cuelang.org/go/mod/modcache"
 	"cuelang.org/go/mod/modregistry"
 	"cuelang.org/go/mod/modregistrytest"
-	"cuelang.org/go/mod/module"
 )
 
 func TestTidy(t *testing.T) {
@@ -31,7 +27,7 @@ func TestTidy(t *testing.T) {
 			qt.Assert(t, qt.IsNil(err))
 			tfs, err := txtar.FS(ar)
 			qt.Assert(t, qt.IsNil(err))
-			reg := newRegistry(t, tfs)
+			reg, _ := newRegistry(t, tfs)
 
 			want, err := fs.ReadFile(tfs, "want")
 			qt.Assert(t, qt.IsNil(err))
@@ -82,7 +78,7 @@ func stringFromFile(fsys fs.FS, file string) string {
 	return strings.TrimSpace(string(data))
 }
 
-func newRegistry(t *testing.T, fsys fs.FS) Registry {
+func newRegistry(t *testing.T, fsys fs.FS) (Registry, string) {
 	fsys, err := fs.Sub(fsys, "_registry")
 	qt.Assert(t, qt.IsNil(err))
 	regSrv, err := modregistrytest.New(fsys, "")
@@ -92,59 +88,11 @@ func newRegistry(t *testing.T, fsys fs.FS) Registry {
 		Insecure: true,
 	})
 	qt.Assert(t, qt.IsNil(err))
-	return &registryImpl{modregistry.NewClient(regOCI)}
-}
-
-type registryImpl struct {
-	reg *modregistry.Client
-}
-
-func (r *registryImpl) Requirements(ctx context.Context, mv module.Version) ([]module.Version, error) {
-	m, err := r.reg.GetModule(ctx, mv)
-	if err != nil {
-		return nil, err
-	}
-	data, err := m.ModuleFile(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("cannot get module file from %v: %v", m, err)
-	}
-	mf, err := modfile.Parse(data, mv.String())
-	if err != nil {
-		return nil, fmt.Errorf("cannot parse module file from %v: %v", m, err)
-	}
-	return mf.DepVersions(), nil
-}
-
-// getModContents downloads the module with the given version
-// and returns the directory where it's stored.
-func (c *registryImpl) Fetch(ctx context.Context, mv module.Version) (module.SourceLoc, error) {
-	m, err := c.reg.GetModule(ctx, mv)
-	if err != nil {
-		return module.SourceLoc{}, err
-	}
-	r, err := m.GetZip(ctx)
-	if err != nil {
-		return module.SourceLoc{}, err
-	}
-	defer r.Close()
-	zipData, err := io.ReadAll(r)
-	if err != nil {
-		return module.SourceLoc{}, err
-	}
-	zipr, err := zip.NewReader(bytes.NewReader(zipData), int64(len(zipData)))
-	if err != nil {
-		return module.SourceLoc{}, err
-	}
-	return module.SourceLoc{
-		FS:  zipr,
-		Dir: ".",
-	}, nil
-}
-
-func (r *registryImpl) ModuleVersions(ctx context.Context, mpath string) ([]string, error) {
-	versions, err := r.reg.ModuleVersions(ctx, mpath)
-	if err != nil {
-		return nil, fmt.Errorf("cannot obtain versions for module %q: %v", mpath, err)
-	}
-	return versions, nil
+	cacheDir := t.TempDir()
+	reg, err := modcache.New(modregistry.NewClient(regOCI), cacheDir)
+	qt.Assert(t, qt.IsNil(err))
+	t.Cleanup(func() {
+		modcache.RemoveAll(cacheDir)
+	})
+	return reg, cacheDir
 }

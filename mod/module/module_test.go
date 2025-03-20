@@ -652,164 +652,17 @@ func TestEscapePath(t *testing.T) {
 	}
 }
 
-var parseImportPathTests = []struct {
-	testName      string
-	path          string
-	want          ImportPath
-	wantCanonical string
-}{{
-	testName: "StdlibLikeWithSlash",
-	path:     "stdlib/path",
-	want: ImportPath{
-		Path:      "stdlib/path",
-		Qualifier: "path",
-	},
-}, {
-	testName: "StdlibLikeNoSlash",
-	path:     "math",
-	want: ImportPath{
-		Path:      "math",
-		Qualifier: "math",
-	},
-}, {
-	testName: "StdlibLikeExplicitQualifier",
-	path:     "stdlib/path:other",
-	want: ImportPath{
-		Path:              "stdlib/path",
-		ExplicitQualifier: true,
-		Qualifier:         "other",
-	},
-}, {
-	testName: "StdlibLikeExplicitQualifierNoSlash",
-	path:     "math:other",
-	want: ImportPath{
-		Path:              "math",
-		ExplicitQualifier: true,
-		Qualifier:         "other",
-	},
-}, {
-	testName: "WithMajorVersion",
-	path:     "foo.com/bar@v0",
-	want: ImportPath{
-		Path:      "foo.com/bar",
-		Version:   "v0",
-		Qualifier: "bar",
-	},
-}, {
-	testName: "WithFullVersion",
-	path:     "foo.com/bar@v0.2.3:xxx",
-	want: ImportPath{
-		Path:              "foo.com/bar",
-		Version:           "v0.2.3",
-		Qualifier:         "xxx",
-		ExplicitQualifier: true,
-	},
-}, {
-	testName: "WithMajorVersionNoSlash",
-	path:     "main.test@v0",
-	want: ImportPath{
-		Path:      "main.test",
-		Version:   "v0",
-		Qualifier: "",
-	},
-}, {
-	testName: "WithMajorVersionAndExplicitQualifier",
-	path:     "foo.com/bar@v0:other",
-	want: ImportPath{
-		Path:              "foo.com/bar",
-		Version:           "v0",
-		ExplicitQualifier: true,
-		Qualifier:         "other",
-	},
-}, {
-	testName: "WithMajorVersionAndNoQualifier",
-	path:     "foo.com/bar@v0",
-	want: ImportPath{
-		Path:      "foo.com/bar",
-		Version:   "v0",
-		Qualifier: "bar",
-	},
-}, {
-	testName: "WithRedundantQualifier",
-	path:     "foo.com/bar@v0:bar",
-	want: ImportPath{
-		Path:              "foo.com/bar",
-		Version:           "v0",
-		ExplicitQualifier: true,
-		Qualifier:         "bar",
-	},
-	wantCanonical: "foo.com/bar@v0",
-}, {
-	testName: "WithPattern",
-	path:     "foo.com/bar/.../blah",
-	want: ImportPath{
-		Path:              "foo.com/bar/.../blah",
-		Version:           "",
-		ExplicitQualifier: false,
-		Qualifier:         "blah",
-	},
-	wantCanonical: "foo.com/bar/.../blah",
-}, {
-	testName: "WithPatternAtEnd",
-	path:     "foo.com/bar/...",
-	want: ImportPath{
-		Path:              "foo.com/bar/...",
-		Version:           "",
-		ExplicitQualifier: false,
-		Qualifier:         "",
-	},
-	wantCanonical: "foo.com/bar/...",
-}, {
-	testName: "WithUnderscoreLastElement",
-	path:     "foo.com/bar/_foo",
-	want: ImportPath{
-		Path:              "foo.com/bar/_foo",
-		Version:           "",
-		ExplicitQualifier: false,
-		Qualifier:         "_foo",
-	},
-	wantCanonical: "foo.com/bar/_foo",
-}, {
-	testName: "WithHashLastElement",
-	path:     "foo.com/bar/#foo",
-	want: ImportPath{
-		Path:              "foo.com/bar/#foo",
-		Version:           "",
-		ExplicitQualifier: false,
-		Qualifier:         "",
-	},
-	wantCanonical: "foo.com/bar/#foo",
-}}
-
 func TestParseImportPath(t *testing.T) {
-	for _, test := range parseImportPathTests {
-		t.Run(test.testName, func(t *testing.T) {
-			parts := ParseImportPath(test.path)
-			qt.Assert(t, qt.DeepEquals(parts, test.want))
-			qt.Assert(t, qt.Equals(parts.String(), test.path))
-			if test.wantCanonical == "" {
-				test.wantCanonical = test.path
-			}
-			qt.Assert(t, qt.Equals(parts.Canonical().String(), test.wantCanonical))
-		})
-	}
-}
-
-func TestImportPathStringAddsQualifier(t *testing.T) {
-	ip := ImportPath{
-		Path:      "foo.com/bar",
-		Version:   "v0",
-		Qualifier: "baz",
-	}
-	qt.Assert(t, qt.Equals(ip.String(), "foo.com/bar@v0:baz"))
-}
-
-func TestImportPathStringAddsQualifierWhenNoVersion(t *testing.T) {
-	ip := ImportPath{
-		Path:      "foo.com/bar",
-		Qualifier: "baz",
-	}
-	qt.Assert(t, qt.Equals(ip.String(), "foo.com/bar:baz"))
+	// Just a smoke test to make sure that the (deprecated)
+	// ParseImportPath function is still wired up and the
+	// ImportPath type is still defined.
+	ip := ParseImportPath("foo.com/bar@v0:baz")
+	qt.Assert(t, qt.DeepEquals(ip, ImportPath{
+		Path:              "foo.com/bar",
+		Version:           "v0",
+		Qualifier:         "baz",
+		ExplicitQualifier: true,
+	}))
 }
 
 func errStr(err error) string {

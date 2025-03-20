@@ -6,7 +6,7 @@
 cmp stderr want-stderr
 
 -- want-stderr --
-failed to resolve "example.com/foo/bar@v0": ambiguous import: found package example.com/foo/bar@v0 in multiple modules:
+failed to resolve "example.com/foo/bar@v0": ambiguous import: found package example.com/foo/bar@v0 in multiple locations:
 	example.com@v0 v0.0.1 (foo/bar)
 	example.com/foo@v0 v0.1.0 (bar)
 -- cue.mod/module.cue --

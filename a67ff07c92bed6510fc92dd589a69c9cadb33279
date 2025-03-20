@@ -71,6 +71,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "36a928e8_e90cb642",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-03-20T23:37:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba5731b1_0db7a0b6",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2ace6c2e_cba09b11",

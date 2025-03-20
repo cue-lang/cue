@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "79a43d3a_f679c6cc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-03-20T23:37:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "793b1f23_19aa6f8c",
+      "revId": "e7feb911a6c16fa57c478ec4acacd8ba4195515c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "fa02b001_80fbf2b2",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 9
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7e9dd79_1a349dab",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-03-20T23:37:00Z",
+      "side": 1,
+      "message": "Sure, I\u0027ve added a summary incuding a shortlink, but have left the details to the proposal.",
+      "parentUuid": "14ec82cc_50307f41",
+      "revId": "e7feb911a6c16fa57c478ec4acacd8ba4195515c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aacb1607_742a22aa",
@@ -65,6 +101,30 @@
       "writtenOn": "2025-03-20T11:37:34Z",
       "side": 1,
       "message": "you still do quite a lot of `dec.currField.field.Value.(*ast.StructLit)`; why not store the `*ast.StructLit` as e.g. `dec.currField.structValue`?",
+      "range": {
+        "startLine": 208,
+        "startChar": 25,
+        "endLine": 208,
+        "endChar": 67
+      },
+      "revId": "e7feb911a6c16fa57c478ec4acacd8ba4195515c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42ee8ba7_03dd0db0",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-03-20T23:37:00Z",
+      "side": 1,
+      "message": "As I understand it the concern here is the duplication. I\u0027ve now updated to encapsulate the appendToCurrFieldStruct logic in a function. This removes the duplication and also avoids the need to maintain an additional field on the Decoder struct.",
+      "parentUuid": "aacb1607_742a22aa",
       "range": {
         "startLine": 208,
         "startChar": 25,
@@ -92,6 +152,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3001e7ff_8606ff5e",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-03-20T23:37:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8a9f7c6a_dbad579d",
+      "revId": "e7feb911a6c16fa57c478ec4acacd8ba4195515c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "39e1aa4e_85f2c0cb",
@@ -109,6 +187,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0dfa9001_b4c8c24c",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-03-20T23:37:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "39e1aa4e_85f2c0cb",
+      "revId": "e7feb911a6c16fa57c478ec4acacd8ba4195515c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eb430c70_fa1bd84d",
@@ -122,6 +218,24 @@
       "writtenOn": "2025-03-20T11:37:34Z",
       "side": 1,
       "message": "when would this be nil? if it can never happen under normal circumstances, I\u0027d remove the check.",
+      "revId": "e7feb911a6c16fa57c478ec4acacd8ba4195515c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1950dfe1_2dde065e",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-03-20T23:37:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eb430c70_fa1bd84d",
       "revId": "e7feb911a6c16fa57c478ec4acacd8ba4195515c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

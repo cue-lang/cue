@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa02b001_80fbf2b2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1038725
+      },
+      "writtenOn": "2025-03-20T11:19:10Z",
+      "side": 1,
+      "message": "Thanks Daniel for the thorough review.\n\nI\u0027ve gone through each comment and resolved them, but please let me know if I\u0027ve missed anything.\n\nNote, I\u0027ve made reader local as requested, but I believe this means you\u0027ll need to update your change for the integration point at internal/encoding/encoding.go:270 to handle the error now returned by NewDecoder.",
+      "revId": "e7feb911a6c16fa57c478ec4acacd8ba4195515c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

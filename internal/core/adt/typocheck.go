@@ -324,6 +324,10 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 		ph := id.outerID
 		n.addReplacement(replaceID{from: dstID, to: ph, add: true})
 		id.enclosingEmbed = 0
+
+		// Do not close additionally after this.
+		// NOTE: remove if we want close() to always close.
+		id.hasOuter = true
 	}
 
 	return id

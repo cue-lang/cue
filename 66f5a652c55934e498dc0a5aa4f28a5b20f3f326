@@ -16,6 +16,24 @@
       "message": "This causes a regression in https://github.com/cue-lang/cue/issues/3672, but only when `CUE_DEBUG\u003dopeninline\u003d0` is set:\n\n```\n# -- evalv2 --\nenv CUE_EXPERIMENT\u003devalv3\u003d0\nexec cue eval out.cue -e value0.orgSyntax\nstdout \u0027Only \\[UseSectionName\\]\u0027\n\n# -- evalv3 --\nenv CUE_EXPERIMENT\u003devalv3\u003d1\nenv CUE_DEBUG\u003dopeninline\u003d0\nexec cue eval out.cue -e value0.orgSyntax\nstdout \u0027Only \\[UseSectionName\\]\u0027\n\n-- out.cue --\nimport \"strings\"\n\nimport \"encoding/json\"\n\n#FinDefSetElemType: {\n\t#Type!: _\n}\n#FinDefSetDefinition: {\n\t#Elem!: #FinDefSetElemType\n\t#Alternatives: {\n\t\tallBut: {\n\t\t\tAllBut: [...#Elem.#Type]\n\t\t}\n\t\tonly: {\n\t\t\tOnly: [...#Elem.#Type]\n\t\t}\n\t}\n}\n\n#mkFinDefSet: {\n\t#Definition!: #FinDefSetDefinition\n\t#Type: or([for _, v in #Definition.#Alternatives {v}])\n}\n\n#FinDefSetElemType: {\n\t#Type: _\n\ttoString!: {\n\t\t_input:  #Type\n\t\t_output: string\n\t}\n}\n\n#FinDefSetDefinition: {\n\t#Elem!: #FinDefSetElemType\n\t#Alternatives: {\n\t\tallBut: {\n\t\t\tAllBut: [...#Elem.#Type]\n\t\t\tlet xs \u003d [for x in AllBut {(#Elem.toString \u0026 {_input: x})._output}]\n\t\t\tlet str \u003d strings.Join(xs, \"\\\",\\\"\")\n\t\t\torgSyntax: \"AllBut [\\(str)]\"\n\t\t}\n\t\tonly: {\n\t\t\tOnly: [...#Elem.#Type]\n\t\t\tlet xs \u003d [for x in Only {(#Elem.toString \u0026 {_input: x})._output}]\n\t\t\tlet str \u003d strings.Join(xs, \"\\\",\\\"\")\n\t\t\torgSyntax: \"Only [\\(str)]\"\n\t\t}\n\t}\n}\n\n#ConfigText: string | {UseSectionName: true}\n\n#ConfigTextRule: #ConfigText | {Append: #ConfigText} | {Prepend: #ConfigText}\n\n#ConfigTextRules: #ConfigTextRule | [#ConfigTextRule, #ConfigTextRule, ...#ConfigTextRule]\n\n#FinDefSetConfigTextElem: #FinDefSetElemType\n#FinDefSetConfigTextElem: {\n\t#Type: #ConfigTextRules\n}\n\n#FinDefSetOfConfigText: (\n\t#mkFinDefSet \u0026 {\n\t\t#Definition: {#Elem: #FinDefSetConfigTextElem}\n\t}).#Type\n\n#FinDefSetConfigTextElem: {\n\ttoString: {\n\t\t_input: #ConfigTextRules\n\t\t_output: (#orgForConfigTextRules \u0026 {source: _input}).orgSyntax\n\t}\n}\n\n#orgForConfigText: {\n\tIN\u003dsource: #ConfigText\n\torgSyntax: {\n\t\tlet INS \u003d IN \u0026 string\n\t\tlet INO \u003d IN \u0026 {UseSectionName: _}\n\t\t[\n\t\t\tif INS !\u003d _|_ {\n\t\t\t\tjson.Marshal(INS)\n\t\t\t},\n\t\t\tif INO !\u003d _|_ {\n\t\t\t\t\"UseSectionName\"\n\t\t\t},\n\t\t\t\"Impossible\",\n\t\t][0]\n\t}\n}\n\n#orgForConfigTextRule: {\n\tIN\u003dsource: #ConfigTextRule\n\torgSyntax: {\n\t\tlet INA \u003d IN \u0026 {Append: _}\n\t\tlet INP \u003d IN \u0026 {Prepend: _}\n\t\t[\n\t\t\tif INA !\u003d _|_ {\n\t\t\t\t\"Append \" + (#orgForConfigText \u0026 {source: INA.Append}).orgSyntax\n\t\t\t},\n\t\t\tif INP !\u003d _|_ {\n\t\t\t\t\"Prepend \" + (#orgForConfigText \u0026 {source: INP.Prepend}).orgSyntax\n\t\t\t},\n\t\t\t(#orgForConfigText \u0026 {source: IN}).orgSyntax,\n\t\t][0]\n\t}\n}\n\n#orgForConfigTextRules: {\n\tIN\u003dsource: #ConfigTextRules\n\torgSyntax: {\n\t\tlet INL \u003d IN \u0026 [...]\n\t\t[\n\t\t\tif INL !\u003d _|_ {\n\t\t\t\tlet elems \u003d [for x in IN {(#orgForConfigTextRule \u0026 {source: x}).orgSyntax}]\n\t\t\t\tlet result \u003d strings.Join(elems, \"\\\",\\\"\")\n\t\t\t\t\"[\\(result)]\"\n\t\t\t},\n\t\t\t(#orgForConfigTextRule \u0026 {source: IN}).orgSyntax,\n\t\t][0]\n\t}\n}\n\nvalue0: #FinDefSetOfConfigText\nvalue0: Only: [{UseSectionName: true}]\n```\n\nMarking as hold for now therefore.",
       "revId": "66f5a652c55934e498dc0a5aa4f28a5b20f3f326",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6cbe35c6_19c3c710",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-03-20T07:26:39Z",
+      "side": 1,
+      "message": "Not sure why, but I didn\u0027t leave my message as unresolved.",
+      "parentUuid": "2a9df2e0_2a7baa2b",
+      "revId": "66f5a652c55934e498dc0a5aa4f28a5b20f3f326",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

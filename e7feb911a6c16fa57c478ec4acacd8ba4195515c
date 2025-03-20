@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "793b1f23_19aa6f8c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-20T11:37:34Z",
+      "side": 1,
+      "message": "use a short link: https://cuelang.org/discussion/3776.",
+      "revId": "e7feb911a6c16fa57c478ec4acacd8ba4195515c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "fa02b001_80fbf2b2",
@@ -14,6 +31,97 @@
       "writtenOn": "2025-03-20T11:19:10Z",
       "side": 1,
       "message": "Thanks Daniel for the thorough review.\n\nI\u0027ve gone through each comment and resolved them, but please let me know if I\u0027ve missed anything.\n\nNote, I\u0027ve made reader local as requested, but I believe this means you\u0027ll need to update your change for the integration point at internal/encoding/encoding.go:270 to handle the error now returned by NewDecoder.",
+      "revId": "e7feb911a6c16fa57c478ec4acacd8ba4195515c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14ec82cc_50307f41",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-20T11:37:34Z",
+      "side": 1,
+      "message": "use a short link: https://cuelang.org/discussion/3776.\n\nI would also summarize at a high level the purpose of this encoding, i.e. that it is inspired by BadgerFish (with a link) and that it maps XML attributes, including namespaces, to CUE fields with dollar prefixes.",
+      "revId": "e7feb911a6c16fa57c478ec4acacd8ba4195515c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aacb1607_742a22aa",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-20T11:37:34Z",
+      "side": 1,
+      "message": "you still do quite a lot of `dec.currField.field.Value.(*ast.StructLit)`; why not store the `*ast.StructLit` as e.g. `dec.currField.structValue`?",
+      "range": {
+        "startLine": 208,
+        "startChar": 25,
+        "endLine": 208,
+        "endChar": 67
+      },
+      "revId": "e7feb911a6c16fa57c478ec4acacd8ba4195515c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a9f7c6a_dbad579d",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-20T11:37:34Z",
+      "side": 1,
+      "message": "deduplicate the type assertions to ListLit, like:\n\n```\nlist, ok :\u003d sameNameElements.Value.(*ast.ListLit)\nif !ok {\n    list \u003d \u0026ast.ListLit{Elts: []ast.Expr{sameNameElements.Value}}\n    sameNameElements.Value \u003d list\n}\nlist.Elts \u003d append(list.Elts, newElement.Value)\n```",
+      "revId": "e7feb911a6c16fa57c478ec4acacd8ba4195515c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "39e1aa4e_85f2c0cb",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-20T11:37:34Z",
+      "side": 1,
+      "message": "deduplicate `dec.tokenFile.Pos(int(startOffset))` via vars throughout the file, to avoid verbosity",
+      "revId": "e7feb911a6c16fa57c478ec4acacd8ba4195515c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb430c70_fa1bd84d",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-20T11:37:34Z",
+      "side": 1,
+      "message": "when would this be nil? if it can never happen under normal circumstances, I\u0027d remove the check.",
       "revId": "e7feb911a6c16fa57c478ec4acacd8ba4195515c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

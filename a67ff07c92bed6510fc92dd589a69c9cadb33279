@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ba5731b1_0db7a0b6",
+        "filename": "encoding/koala/decode.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-20T11:37:34Z",
+      "side": 1,
+      "message": "my bad, please undo this - I had forgotten that it\u0027s needed to \"pass\" the reader from NewDecoder to the Decode method call. We indeed don\u0027t want/need NewDecoder to return errors.",
+      "parentUuid": "a92d93dd_26b7ea8e",
+      "revId": "a67ff07c92bed6510fc92dd589a69c9cadb33279",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2ace6c2e_cba09b11",
         "filename": "encoding/koala/decode.go",
         "patchSetId": 7

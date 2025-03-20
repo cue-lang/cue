@@ -37,7 +37,7 @@ main.test@v0:main
 		example.com/blah
 example.com/blah
 	flags: inAll,isRoot,fromRoot
-	error: ambiguous import: found package example.com/blah in multiple modules:
+	error: ambiguous import: found package example.com/blah in multiple locations:
 	example.com@v0 v0.0.1 (_registry/example.com_v0.0.1/blah)
 	local (cue.mod/gen/example.com/blah)
 	missing: false

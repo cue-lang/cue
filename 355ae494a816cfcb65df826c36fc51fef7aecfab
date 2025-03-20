@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c91c28dc_d1dacfce",
+        "filename": "cue/testdata/definitions/typocheck.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-20T12:20:27Z",
+      "side": 1,
+      "message": "this reproducer appears unrelated to 3832, but I guess there\u0027s no harm in mixing reproducers from other issues here.",
+      "revId": "355ae494a816cfcb65df826c36fc51fef7aecfab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

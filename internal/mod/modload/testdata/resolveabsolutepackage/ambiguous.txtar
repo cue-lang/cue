@@ -1,0 +1,40 @@
+# Test that we get an ambiguous import error if there are
+# two candidates that provide the same package.
+-- tests/ambiguous/package --
+foo.com/bar@latest
+-- tests/ambiguous/want --
+ERROR: ambiguous import: found package foo.com/bar@latest in multiple locations:
+	foo.com/bar@v1 v1.2.3 (.)
+	foo.com@v0 v0.0.2 (bar)
+-- tests/specific1/package --
+foo.com/bar@v0.0.2
+-- tests/specific1/want --
+module: foo.com@v0.0.2
+loc: bar
+-- tests/specific2/package --
+foo.com/bar@v1.2.3
+-- tests/specific2/want --
+module: foo.com/bar@v1.2.3
+loc: .
+-- tests/specific3/package --
+foo.com/bar@v1
+-- tests/specific3/want --
+module: foo.com/bar@v1.2.3
+loc: .
+-- tests/specific4/package --
+foo.com/bar@v0
+-- tests/specific4/want --
+module: foo.com@v0.0.2
+loc: bar
+-- _registry/foo.com_v0.0.2/cue.mod/module.cue --
+module: "foo.com@v0"
+language: version: "v0.8.0"
+
+-- _registry/foo.com_v0.0.2/bar/x.cue --
+package bar
+-- _registry/foo.com_bar_v1.2.3/cue.mod/module.cue --
+module: "foo.com/bar@v1"
+language: version: "v0.8.0"
+
+-- _registry/foo.com_bar_v1.2.3/x.cue --
+package bar

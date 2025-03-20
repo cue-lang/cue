@@ -21,6 +21,7 @@ import (
 	"cuelang.org/go/internal/cueconfig"
 	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/mod/modload"
+	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modresolve"
 	"cuelang.org/go/mod/modcache"
 	"cuelang.org/go/mod/modregistry"
@@ -42,12 +43,24 @@ type Registry interface {
 	ModuleVersions(ctx context.Context, mpath string) ([]string, error)
 }
 
+// CachedRegistry is optionally implemented by a registry that
+// contains a cache.
+type CachedRegistry interface {
+	// FetchFromCache looks up the given module in the cache.
+	// It returns an error that satisfies [errors.Is]([modregistry.ErrNotFound]) if the
+	// module is not present in the cache at this version or if there
+	// is no cache.
+	FetchFromCache(mv module.Version) (module.SourceLoc, error)
+}
+
 // We don't want to make modload part of the cue/load API,
 // so we define the above type independently, but we want
 // it to be interchangeable, so check that statically here.
 var (
-	_ Registry         = modload.Registry(nil)
-	_ modload.Registry = Registry(nil)
+	_ Registry                  = modload.Registry(nil)
+	_ modload.Registry          = Registry(nil)
+	_ CachedRegistry            = modpkgload.CachedRegistry(nil)
+	_ modpkgload.CachedRegistry = CachedRegistry(nil)
 )
 
 // DefaultRegistry is the default registry host.

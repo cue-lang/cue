@@ -1,0 +1,1056 @@
+-- x.cue --
+#PatientViewSections: {
+	[string]: #PatientViewSection
+}
+
+#PatientViewSection: #PvSection
+
+#PvSection: {
+	Section: {
+		display?: string
+		entries:  #PatientViewEntries
+	}
+	_json: [for k, v in Section.entries {(k): v._json}]
+}
+
+#PatientViewEntries: [string]: #PatientViewEntry
+
+#PatientViewEntry: {
+	#PvSingleForm | #PvLink
+}
+
+#PvSingleForm: {
+	SingleForm: {
+		formId:                 string
+		showNumberOfInstances?: bool
+	}
+	_json: [{
+		"iDoc":     "singleFormIDoc"
+		"X-FormId": SingleForm.formId
+	}]
+}
+
+#PvLink: {
+	Link: {
+		icon?:    string
+		sections: #PatientViewSections
+	}
+	_json: [for k, v in Link.sections {(k): v._json}]
+}
+
+#TabcatsJson: {
+	config: {
+		tabcats: #PatientViewSections
+		...
+	}
+	json: {
+		//tabcats: #OrgContents
+		tabcats: [for k, v in config.tabcats {(k): v._json}]
+	}
+}
+
+tabcatsExample: #TabcatsJson
+tabcatsExample: {
+	_e1: #PatientViewEntry
+	_e1: {
+		Link: {
+			sections: "Formulare": {
+				Section: entries: "Fotodokumentation": _e2
+			}
+		}
+	}
+	_e2: #PatientViewEntry
+	_e2: {
+		SingleForm: {
+			formId: "fotodokumentation"
+		}
+	}
+	_s: #PvSection
+	_s: Section: entries: "Dokumentation": _e1
+	config: {
+		tabcats: "02": _s
+	}
+}
+-- out/compile --
+--- x.cue
+{
+  #PatientViewSections: {
+    [string]: 〈1;#PatientViewSection〉
+  }
+  #PatientViewSection: 〈0;#PvSection〉
+  #PvSection: {
+    Section: {
+      display?: string
+      entries: 〈2;#PatientViewEntries〉
+    }
+    _json: [
+      for k, v in 〈1;Section〉.entries {
+        〈1;k〉: 〈1;v〉._json
+      },
+    ]
+  }
+  #PatientViewEntries: {
+    [string]: 〈1;#PatientViewEntry〉
+  }
+  #PatientViewEntry: {
+    (〈1;#PvSingleForm〉|〈1;#PvLink〉)
+  }
+  #PvSingleForm: {
+    SingleForm: {
+      formId: string
+      showNumberOfInstances?: bool
+    }
+    _json: [
+      {
+        iDoc: "singleFormIDoc"
+        "X-FormId": 〈2;SingleForm〉.formId
+      },
+    ]
+  }
+  #PvLink: {
+    Link: {
+      icon?: string
+      sections: 〈2;#PatientViewSections〉
+    }
+    _json: [
+      for k, v in 〈1;Link〉.sections {
+        〈1;k〉: 〈1;v〉._json
+      },
+    ]
+  }
+  #TabcatsJson: {
+    config: {
+      tabcats: 〈2;#PatientViewSections〉
+      ...
+    }
+    json: {
+      tabcats: [
+        for k, v in 〈2;config〉.tabcats {
+          〈1;k〉: 〈1;v〉._json
+        },
+      ]
+    }
+  }
+  tabcatsExample: 〈0;#TabcatsJson〉
+  tabcatsExample: {
+    _e1: 〈1;#PatientViewEntry〉
+    _e1: {
+      Link: {
+        sections: {
+          Formulare: {
+            Section: {
+              entries: {
+                Fotodokumentation: 〈6;_e2〉
+              }
+            }
+          }
+        }
+      }
+    }
+    _e2: 〈1;#PatientViewEntry〉
+    _e2: {
+      SingleForm: {
+        formId: "fotodokumentation"
+      }
+    }
+    _s: 〈1;#PvSection〉
+    _s: {
+      Section: {
+        entries: {
+          Dokumentation: 〈3;_e1〉
+        }
+      }
+    }
+    config: {
+      tabcats: {
+        "02": 〈2;_s〉
+      }
+    }
+  }
+}
+-- out/evalalpha/stats --
+Leaks:  250
+Freed:  0
+Reused: 0
+Allocs: 250
+Retain: 0
+
+Unifications: 182
+Conjuncts:    295
+Disjuncts:    16
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  9
+-Freed:  1508
+-Reused: 1482
+-Allocs: 35
+-Retain: 51
++Leaks:  250
++Freed:  0
++Reused: 0
++Allocs: 250
++Retain: 0
+
+-Unifications: 1373
+-Conjuncts:    3626
+-Disjuncts:    1548
++Unifications: 182
++Conjuncts:    295
++Disjuncts:    16
+-- out/eval/stats --
+Leaks:  9
+Freed:  1508
+Reused: 1482
+Allocs: 35
+Retain: 51
+
+Unifications: 1373
+Conjuncts:    3626
+Disjuncts:    1548
+-- out/evalalpha --
+(struct){
+  #PatientViewSections: (#struct){
+  }
+  #PatientViewSection: ~(#PvSection)
+  #PvSection: (#struct){
+    Section: (#struct){
+      display?: (string){ string }
+      entries: (#struct){
+      }
+    }
+    _json: (#list){
+    }
+  }
+  #PatientViewEntries: (#struct){
+  }
+  #PatientViewEntry: (#struct){ |((#struct){
+      SingleForm: (#struct){
+        formId: (string){ string }
+        showNumberOfInstances?: (bool){ bool }
+      }
+      _json: (#list){
+        0: (#struct){
+          iDoc: (string){ "singleFormIDoc" }
+          "X-FormId": (string){ string }
+        }
+      }
+    }, (#struct){
+      Link: (#struct){
+        icon?: (string){ string }
+        sections: (#struct){
+        }
+      }
+      _json: (#list){
+      }
+    }) }
+  #PvSingleForm: (#struct){
+    SingleForm: (#struct){
+      formId: (string){ string }
+      showNumberOfInstances?: (bool){ bool }
+    }
+    _json: (#list){
+      0: (#struct){
+        iDoc: (string){ "singleFormIDoc" }
+        "X-FormId": (string){ string }
+      }
+    }
+  }
+  #PvLink: (#struct){
+    Link: (#struct){
+      icon?: (string){ string }
+      sections: (#struct){
+      }
+    }
+    _json: (#list){
+    }
+  }
+  #TabcatsJson: (#struct){
+    config: (#struct){
+      tabcats: (#struct){
+      }
+    }
+    json: (#struct){
+      tabcats: (#list){
+      }
+    }
+  }
+  tabcatsExample: (#struct){
+    _e1: (#struct){
+      Link: (#struct){
+        sections: (#struct){
+          Formulare: (#struct){
+            Section: (#struct){
+              entries: (#struct){
+                Fotodokumentation: (#struct){
+                  SingleForm: (#struct){
+                    formId: (string){ "fotodokumentation" }
+                    showNumberOfInstances?: (bool){ bool }
+                  }
+                  _json: (#list){
+                    0: (#struct){
+                      iDoc: (string){ "singleFormIDoc" }
+                      "X-FormId": (string){ "fotodokumentation" }
+                    }
+                  }
+                }
+              }
+              display?: (string){ string }
+            }
+            _json: (#list){
+              0: (#struct){
+                Fotodokumentation: ~(tabcatsExample._e1.Link.sections.Formulare.Section.entries.Fotodokumentation._json)
+              }
+            }
+          }
+        }
+        icon?: (string){ string }
+      }
+      _json: (#list){
+        0: (#struct){
+          Formulare: ~(tabcatsExample._e1.Link.sections.Formulare._json)
+        }
+      }
+    }
+    _e2: (#struct){
+      SingleForm: (#struct){
+        formId: (string){ "fotodokumentation" }
+        showNumberOfInstances?: (bool){ bool }
+      }
+      _json: (#list){
+        0: (#struct){
+          iDoc: (string){ "singleFormIDoc" }
+          "X-FormId": (string){ "fotodokumentation" }
+        }
+      }
+    }
+    _s: (#struct){
+      Section: (#struct){
+        entries: (#struct){
+          Dokumentation: (#struct){
+            Link: (#struct){
+              sections: (#struct){
+                Formulare: (#struct){
+                  Section: (#struct){
+                    entries: (#struct){
+                      Fotodokumentation: (#struct){
+                        SingleForm: (#struct){
+                          formId: (string){ "fotodokumentation" }
+                          showNumberOfInstances?: (bool){ bool }
+                        }
+                        _json: (#list){
+                          0: (#struct){
+                            iDoc: (string){ "singleFormIDoc" }
+                            "X-FormId": (string){ "fotodokumentation" }
+                          }
+                        }
+                      }
+                    }
+                    display?: (string){ string }
+                  }
+                  _json: (#list){
+                    0: (#struct){
+                      Fotodokumentation: ~(tabcatsExample._s.Section.entries.Dokumentation.Link.sections.Formulare.Section.entries.Fotodokumentation._json)
+                    }
+                  }
+                }
+              }
+              icon?: (string){ string }
+            }
+            _json: (#list){
+              0: (#struct){
+                Formulare: ~(tabcatsExample._s.Section.entries.Dokumentation.Link.sections.Formulare._json)
+              }
+            }
+          }
+        }
+        display?: (string){ string }
+      }
+      _json: (#list){
+        0: (#struct){
+          Dokumentation: ~(tabcatsExample._s.Section.entries.Dokumentation._json)
+        }
+      }
+    }
+    config: (#struct){
+      tabcats: (#struct){
+        "02": (#struct){
+          Section: (#struct){
+            entries: (#struct){
+              Dokumentation: (#struct){
+                Link: (#struct){
+                  sections: (#struct){
+                    Formulare: (#struct){
+                      Section: (#struct){
+                        entries: (#struct){
+                          Fotodokumentation: (#struct){
+                            SingleForm: (#struct){
+                              formId: (string){ "fotodokumentation" }
+                              showNumberOfInstances?: (bool){ bool }
+                            }
+                            _json: (#list){
+                              0: (#struct){
+                                iDoc: (string){ "singleFormIDoc" }
+                                "X-FormId": (string){ "fotodokumentation" }
+                              }
+                            }
+                          }
+                        }
+                        display?: (string){ string }
+                      }
+                      _json: (#list){
+                        0: (#struct){
+                          Fotodokumentation: ~(tabcatsExample.config.tabcats."02".Section.entries.Dokumentation.Link.sections.Formulare.Section.entries.Fotodokumentation._json)
+                        }
+                      }
+                    }
+                  }
+                  icon?: (string){ string }
+                }
+                _json: (#list){
+                  0: (#struct){
+                    Formulare: ~(tabcatsExample.config.tabcats."02".Section.entries.Dokumentation.Link.sections.Formulare._json)
+                  }
+                }
+              }
+            }
+            display?: (string){ string }
+          }
+          _json: (#list){
+            0: (#struct){
+              Dokumentation: ~(tabcatsExample.config.tabcats."02".Section.entries.Dokumentation._json)
+            }
+          }
+        }
+      }
+    }
+    json: (#struct){
+      tabcats: (#list){
+        0: (#struct){
+          "02": ~(tabcatsExample.config.tabcats."02"._json)
+        }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,15 +1,7 @@
+ (struct){
+   #PatientViewSections: (#struct){
+   }
+-  #PatientViewSection: (#struct){
+-    Section: (#struct){
+-      display?: (string){ string }
+-      entries: (#struct){
+-      }
+-    }
+-    _json: (#list){
+-    }
+-  }
++  #PatientViewSection: ~(#PvSection)
+   #PvSection: (#struct){
+     Section: (#struct){
+       display?: (string){ string }
+@@ -73,109 +65,6 @@
+     }
+   }
+   tabcatsExample: (#struct){
+-    config: (#struct){
+-      tabcats: (#struct){
+-        "02": (#struct){
+-          Section: (#struct){
+-            display?: (string){ string }
+-            entries: (#struct){
+-              Dokumentation: (#struct){
+-                Link: (#struct){
+-                  sections: (#struct){
+-                    Formulare: (#struct){
+-                      Section: (#struct){
+-                        entries: (#struct){
+-                          Fotodokumentation: (#struct){
+-                            SingleForm: (#struct){
+-                              formId: (string){ "fotodokumentation" }
+-                              showNumberOfInstances?: (bool){ bool }
+-                            }
+-                            _json: (#list){
+-                              0: (#struct){
+-                                iDoc: (string){ "singleFormIDoc" }
+-                                "X-FormId": (string){ "fotodokumentation" }
+-                              }
+-                            }
+-                          }
+-                        }
+-                        display?: (string){ string }
+-                      }
+-                      _json: (#list){
+-                        0: (#struct){
+-                          Fotodokumentation: (#list){
+-                            0: (#struct){
+-                              iDoc: (string){ "singleFormIDoc" }
+-                              "X-FormId": (string){ "fotodokumentation" }
+-                            }
+-                          }
+-                        }
+-                      }
+-                    }
+-                  }
+-                  icon?: (string){ string }
+-                }
+-                _json: (#list){
+-                  0: (#struct){
+-                    Formulare: (#list){
+-                      0: (#struct){
+-                        Fotodokumentation: (#list){
+-                          0: (#struct){
+-                            iDoc: (string){ "singleFormIDoc" }
+-                            "X-FormId": (string){ "fotodokumentation" }
+-                          }
+-                        }
+-                      }
+-                    }
+-                  }
+-                }
+-              }
+-            }
+-          }
+-          _json: (#list){
+-            0: (#struct){
+-              Dokumentation: (#list){
+-                0: (#struct){
+-                  Formulare: (#list){
+-                    0: (#struct){
+-                      Fotodokumentation: (#list){
+-                        0: (#struct){
+-                          iDoc: (string){ "singleFormIDoc" }
+-                          "X-FormId": (string){ "fotodokumentation" }
+-                        }
+-                      }
+-                    }
+-                  }
+-                }
+-              }
+-            }
+-          }
+-        }
+-      }
+-    }
+-    json: (#struct){
+-      tabcats: (#list){
+-        0: (#struct){
+-          "02": (#list){
+-            0: (#struct){
+-              Dokumentation: (#list){
+-                0: (#struct){
+-                  Formulare: (#list){
+-                    0: (#struct){
+-                      Fotodokumentation: (#list){
+-                        0: (#struct){
+-                          iDoc: (string){ "singleFormIDoc" }
+-                          "X-FormId": (string){ "fotodokumentation" }
+-                        }
+-                      }
+-                    }
+-                  }
+-                }
+-              }
+-            }
+-          }
+-        }
+-      }
+-    }
+     _e1: (#struct){
+       Link: (#struct){
+         sections: (#struct){
+@@ -199,30 +88,16 @@
+             }
+             _json: (#list){
+               0: (#struct){
+-                Fotodokumentation: (#list){
+-                  0: (#struct){
+-                    iDoc: (string){ "singleFormIDoc" }
+-                    "X-FormId": (string){ "fotodokumentation" }
+-                  }
+-                }
+-              }
+-            }
+-          }
+-        }
+-        icon?: (string){ string }
+-      }
+-      _json: (#list){
+-        0: (#struct){
+-          Formulare: (#list){
+-            0: (#struct){
+-              Fotodokumentation: (#list){
+-                0: (#struct){
+-                  iDoc: (string){ "singleFormIDoc" }
+-                  "X-FormId": (string){ "fotodokumentation" }
+-                }
+-              }
+-            }
+-          }
++                Fotodokumentation: ~(tabcatsExample._e1.Link.sections.Formulare.Section.entries.Fotodokumentation._json)
++              }
++            }
++          }
++        }
++        icon?: (string){ string }
++      }
++      _json: (#list){
++        0: (#struct){
++          Formulare: ~(tabcatsExample._e1.Link.sections.Formulare._json)
+         }
+       }
+     }
+@@ -240,7 +115,6 @@
+     }
+     _s: (#struct){
+       Section: (#struct){
+-        display?: (string){ string }
+         entries: (#struct){
+           Dokumentation: (#struct){
+             Link: (#struct){
+@@ -265,12 +139,7 @@
+                   }
+                   _json: (#list){
+                     0: (#struct){
+-                      Fotodokumentation: (#list){
+-                        0: (#struct){
+-                          iDoc: (string){ "singleFormIDoc" }
+-                          "X-FormId": (string){ "fotodokumentation" }
+-                        }
+-                      }
++                      Fotodokumentation: ~(tabcatsExample._s.Section.entries.Dokumentation.Link.sections.Formulare.Section.entries.Fotodokumentation._json)
+                     }
+                   }
+                 }
+@@ -279,37 +148,75 @@
+             }
+             _json: (#list){
+               0: (#struct){
+-                Formulare: (#list){
+-                  0: (#struct){
+-                    Fotodokumentation: (#list){
+-                      0: (#struct){
+-                        iDoc: (string){ "singleFormIDoc" }
+-                        "X-FormId": (string){ "fotodokumentation" }
+-                      }
+-                    }
+-                  }
+-                }
+-              }
+-            }
+-          }
+-        }
+-      }
+-      _json: (#list){
+-        0: (#struct){
+-          Dokumentation: (#list){
+-            0: (#struct){
+-              Formulare: (#list){
+-                0: (#struct){
+-                  Fotodokumentation: (#list){
+-                    0: (#struct){
+-                      iDoc: (string){ "singleFormIDoc" }
+-                      "X-FormId": (string){ "fotodokumentation" }
+-                    }
+-                  }
+-                }
+-              }
+-            }
+-          }
++                Formulare: ~(tabcatsExample._s.Section.entries.Dokumentation.Link.sections.Formulare._json)
++              }
++            }
++          }
++        }
++        display?: (string){ string }
++      }
++      _json: (#list){
++        0: (#struct){
++          Dokumentation: ~(tabcatsExample._s.Section.entries.Dokumentation._json)
++        }
++      }
++    }
++    config: (#struct){
++      tabcats: (#struct){
++        "02": (#struct){
++          Section: (#struct){
++            entries: (#struct){
++              Dokumentation: (#struct){
++                Link: (#struct){
++                  sections: (#struct){
++                    Formulare: (#struct){
++                      Section: (#struct){
++                        entries: (#struct){
++                          Fotodokumentation: (#struct){
++                            SingleForm: (#struct){
++                              formId: (string){ "fotodokumentation" }
++                              showNumberOfInstances?: (bool){ bool }
++                            }
++                            _json: (#list){
++                              0: (#struct){
++                                iDoc: (string){ "singleFormIDoc" }
++                                "X-FormId": (string){ "fotodokumentation" }
++                              }
++                            }
++                          }
++                        }
++                        display?: (string){ string }
++                      }
++                      _json: (#list){
++                        0: (#struct){
++                          Fotodokumentation: ~(tabcatsExample.config.tabcats."02".Section.entries.Dokumentation.Link.sections.Formulare.Section.entries.Fotodokumentation._json)
++                        }
++                      }
++                    }
++                  }
++                  icon?: (string){ string }
++                }
++                _json: (#list){
++                  0: (#struct){
++                    Formulare: ~(tabcatsExample.config.tabcats."02".Section.entries.Dokumentation.Link.sections.Formulare._json)
++                  }
++                }
++              }
++            }
++            display?: (string){ string }
++          }
++          _json: (#list){
++            0: (#struct){
++              Dokumentation: ~(tabcatsExample.config.tabcats."02".Section.entries.Dokumentation._json)
++            }
++          }
++        }
++      }
++    }
++    json: (#struct){
++      tabcats: (#list){
++        0: (#struct){
++          "02": ~(tabcatsExample.config.tabcats."02"._json)
+         }
+       }
+     }
+-- out/eval --
+(struct){
+  #PatientViewSections: (#struct){
+  }
+  #PatientViewSection: (#struct){
+    Section: (#struct){
+      display?: (string){ string }
+      entries: (#struct){
+      }
+    }
+    _json: (#list){
+    }
+  }
+  #PvSection: (#struct){
+    Section: (#struct){
+      display?: (string){ string }
+      entries: (#struct){
+      }
+    }
+    _json: (#list){
+    }
+  }
+  #PatientViewEntries: (#struct){
+  }
+  #PatientViewEntry: (#struct){ |((#struct){
+      SingleForm: (#struct){
+        formId: (string){ string }
+        showNumberOfInstances?: (bool){ bool }
+      }
+      _json: (#list){
+        0: (#struct){
+          iDoc: (string){ "singleFormIDoc" }
+          "X-FormId": (string){ string }
+        }
+      }
+    }, (#struct){
+      Link: (#struct){
+        icon?: (string){ string }
+        sections: (#struct){
+        }
+      }
+      _json: (#list){
+      }
+    }) }
+  #PvSingleForm: (#struct){
+    SingleForm: (#struct){
+      formId: (string){ string }
+      showNumberOfInstances?: (bool){ bool }
+    }
+    _json: (#list){
+      0: (#struct){
+        iDoc: (string){ "singleFormIDoc" }
+        "X-FormId": (string){ string }
+      }
+    }
+  }
+  #PvLink: (#struct){
+    Link: (#struct){
+      icon?: (string){ string }
+      sections: (#struct){
+      }
+    }
+    _json: (#list){
+    }
+  }
+  #TabcatsJson: (#struct){
+    config: (#struct){
+      tabcats: (#struct){
+      }
+    }
+    json: (#struct){
+      tabcats: (#list){
+      }
+    }
+  }
+  tabcatsExample: (#struct){
+    config: (#struct){
+      tabcats: (#struct){
+        "02": (#struct){
+          Section: (#struct){
+            display?: (string){ string }
+            entries: (#struct){
+              Dokumentation: (#struct){
+                Link: (#struct){
+                  sections: (#struct){
+                    Formulare: (#struct){
+                      Section: (#struct){
+                        entries: (#struct){
+                          Fotodokumentation: (#struct){
+                            SingleForm: (#struct){
+                              formId: (string){ "fotodokumentation" }
+                              showNumberOfInstances?: (bool){ bool }
+                            }
+                            _json: (#list){
+                              0: (#struct){
+                                iDoc: (string){ "singleFormIDoc" }
+                                "X-FormId": (string){ "fotodokumentation" }
+                              }
+                            }
+                          }
+                        }
+                        display?: (string){ string }
+                      }
+                      _json: (#list){
+                        0: (#struct){
+                          Fotodokumentation: (#list){
+                            0: (#struct){
+                              iDoc: (string){ "singleFormIDoc" }
+                              "X-FormId": (string){ "fotodokumentation" }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                  icon?: (string){ string }
+                }
+                _json: (#list){
+                  0: (#struct){
+                    Formulare: (#list){
+                      0: (#struct){
+                        Fotodokumentation: (#list){
+                          0: (#struct){
+                            iDoc: (string){ "singleFormIDoc" }
+                            "X-FormId": (string){ "fotodokumentation" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          _json: (#list){
+            0: (#struct){
+              Dokumentation: (#list){
+                0: (#struct){
+                  Formulare: (#list){
+                    0: (#struct){
+                      Fotodokumentation: (#list){
+                        0: (#struct){
+                          iDoc: (string){ "singleFormIDoc" }
+                          "X-FormId": (string){ "fotodokumentation" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    json: (#struct){
+      tabcats: (#list){
+        0: (#struct){
+          "02": (#list){
+            0: (#struct){
+              Dokumentation: (#list){
+                0: (#struct){
+                  Formulare: (#list){
+                    0: (#struct){
+                      Fotodokumentation: (#list){
+                        0: (#struct){
+                          iDoc: (string){ "singleFormIDoc" }
+                          "X-FormId": (string){ "fotodokumentation" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    _e1: (#struct){
+      Link: (#struct){
+        sections: (#struct){
+          Formulare: (#struct){
+            Section: (#struct){
+              entries: (#struct){
+                Fotodokumentation: (#struct){
+                  SingleForm: (#struct){
+                    formId: (string){ "fotodokumentation" }
+                    showNumberOfInstances?: (bool){ bool }
+                  }
+                  _json: (#list){
+                    0: (#struct){
+                      iDoc: (string){ "singleFormIDoc" }
+                      "X-FormId": (string){ "fotodokumentation" }
+                    }
+                  }
+                }
+              }
+              display?: (string){ string }
+            }
+            _json: (#list){
+              0: (#struct){
+                Fotodokumentation: (#list){
+                  0: (#struct){
+                    iDoc: (string){ "singleFormIDoc" }
+                    "X-FormId": (string){ "fotodokumentation" }
+                  }
+                }
+              }
+            }
+          }
+        }
+        icon?: (string){ string }
+      }
+      _json: (#list){
+        0: (#struct){
+          Formulare: (#list){
+            0: (#struct){
+              Fotodokumentation: (#list){
+                0: (#struct){
+                  iDoc: (string){ "singleFormIDoc" }
+                  "X-FormId": (string){ "fotodokumentation" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    _e2: (#struct){
+      SingleForm: (#struct){
+        formId: (string){ "fotodokumentation" }
+        showNumberOfInstances?: (bool){ bool }
+      }
+      _json: (#list){
+        0: (#struct){
+          iDoc: (string){ "singleFormIDoc" }
+          "X-FormId": (string){ "fotodokumentation" }
+        }
+      }
+    }
+    _s: (#struct){
+      Section: (#struct){
+        display?: (string){ string }
+        entries: (#struct){
+          Dokumentation: (#struct){
+            Link: (#struct){
+              sections: (#struct){
+                Formulare: (#struct){
+                  Section: (#struct){
+                    entries: (#struct){
+                      Fotodokumentation: (#struct){
+                        SingleForm: (#struct){
+                          formId: (string){ "fotodokumentation" }
+                          showNumberOfInstances?: (bool){ bool }
+                        }
+                        _json: (#list){
+                          0: (#struct){
+                            iDoc: (string){ "singleFormIDoc" }
+                            "X-FormId": (string){ "fotodokumentation" }
+                          }
+                        }
+                      }
+                    }
+                    display?: (string){ string }
+                  }
+                  _json: (#list){
+                    0: (#struct){
+                      Fotodokumentation: (#list){
+                        0: (#struct){
+                          iDoc: (string){ "singleFormIDoc" }
+                          "X-FormId": (string){ "fotodokumentation" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+              icon?: (string){ string }
+            }
+            _json: (#list){
+              0: (#struct){
+                Formulare: (#list){
+                  0: (#struct){
+                    Fotodokumentation: (#list){
+                      0: (#struct){
+                        iDoc: (string){ "singleFormIDoc" }
+                        "X-FormId": (string){ "fotodokumentation" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      _json: (#list){
+        0: (#struct){
+          Dokumentation: (#list){
+            0: (#struct){
+              Formulare: (#list){
+                0: (#struct){
+                  Fotodokumentation: (#list){
+                    0: (#struct){
+                      iDoc: (string){ "singleFormIDoc" }
+                      "X-FormId": (string){ "fotodokumentation" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

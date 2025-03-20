@@ -32,7 +32,7 @@ func TestLoadPackages(t *testing.T) {
 		reg := testRegistry{tfs}
 		testDirs, _ := fs.Glob(tfs, "test[0-9]*")
 		for _, testDir := range testDirs {
-			testName := strings.TrimSuffix(filepath.Base(f), ".txtar")
+			testName := strings.TrimSuffix(filepath.Base(f), ".txtar") + "/" + testDir
 			t.Run(testName, func(t *testing.T) {
 				t.Logf("test file: %v", f)
 				readTestFile := func(name string) string {
@@ -95,6 +95,83 @@ func TestLoadPackages(t *testing.T) {
 			})
 		}
 	}
+}
+
+func TestFindPackageLocations(t *testing.T) {
+	versionForModule := func(ctx context.Context, prefixPath string) (module.Version, error) {
+		t.Logf("versionForModule %q", prefixPath)
+		switch prefixPath {
+		case "foo.bar":
+			return module.Version{}, nil
+		case "foo.bar/a":
+			return module.MustNewVersion("foo.bar/a@v1", "v1.2.3"), nil
+		case "foo.bar/a/b":
+			return module.MustNewVersion("foo.bar/a/b@v0", "v0.2.4"), nil
+		case "foo.bar/a/b/c":
+			return module.MustNewVersion("foo.bar/a/b/c@v0", "v0.3.6"), nil
+		case "foo.bar/a/b/c/d":
+			return module.MustNewVersion("foo.bar/a/b/c/d@v5", "v5.10.20"), nil
+		default:
+			t.Errorf("unexpected call to versionForModule with prefix %q", prefixPath)
+			return module.Version{}, fmt.Errorf("no version")
+		}
+	}
+	tfs, err := txtar.FS(txtar.Parse([]byte(`
+-- foo.bar_a/b/c/cue.mod/module.cue --
+// This should cause foo.bar/a to be excluded from the list
+// of possible candidates because c is a nested module.
+module: "something"
+-- foo.bar_a/b/c/d/x.cue --
+package d
+-- foo.bar_a_b/c/d/x.cue --
+package C
+-- foo.bar_a_b_c/d/x.cue --
+package C
+-- foo.bar_a_b_c_d/x.cue --
+package C
+`)))
+	qt.Assert(t, qt.IsNil(err))
+	fetch := func(ctx context.Context, m module.Version) (loc module.SourceLoc, isLocal bool, err error) {
+		t.Logf("fetch %v", m)
+		switch m.String() {
+		case "foo.bar/a@v1.2.3":
+			// Note: return true for isLocal to trigger the nested module
+			// checking logic.
+			return module.SourceLoc{
+				FS:  tfs,
+				Dir: "foo.bar_a",
+			}, true, nil
+		case "foo.bar/a/b@v0.2.4":
+			return module.SourceLoc{
+				FS:  tfs,
+				Dir: "foo.bar_a_b",
+			}, false, nil
+		case "foo.bar/a/b/c@v0.3.6":
+			return module.SourceLoc{
+				FS:  tfs,
+				Dir: "foo.bar_a_b_c",
+			}, false, nil
+		case "foo.bar/a/b/c/d@v5.10.20":
+			return module.SourceLoc{
+				FS:  tfs,
+				Dir: "foo.bar_a_b_c_d",
+			}, false, nil
+		default:
+			t.Errorf("unexpected call to versionForModule with module %q", m)
+			return module.SourceLoc{}, false, fmt.Errorf("no module")
+		}
+	}
+	locs, err := FindPackageLocations(context.Background(), "foo.bar/a/b/c/d", versionForModule, fetch)
+	qt.Assert(t, qt.IsNil(err))
+	var dirs []string
+	for _, loc := range locs {
+		dirs = append(dirs, loc.Locs[0].Dir)
+	}
+	qt.Assert(t, qt.DeepEquals(dirs, []string{
+		"foo.bar_a_b_c_d",
+		"foo.bar_a_b_c/d",
+		"foo.bar_a_b/c/d",
+	}))
 }
 
 type testRegistry struct {

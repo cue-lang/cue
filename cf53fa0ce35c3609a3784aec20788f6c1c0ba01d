@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e713fe08_f9c6a462",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-03-20T06:02:39Z",
+      "side": 1,
+      "message": "#3827?",
+      "range": {
+        "startLine": 13,
+        "startChar": 7,
+        "endLine": 13,
+        "endChar": 11
+      },
+      "revId": "cf53fa0ce35c3609a3784aec20788f6c1c0ba01d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -98,6 +98,40 @@ embed: openValidator: t2: {
 	a: b: 1
 }
 
+disjunction: withErr: t1: {
+	params: {}
+	out: #Schema1 & {
+		b1: b2: b3: params.mayExistLater
+	}
+	#Schema1: b1?: null | #Schema2
+	#Schema2: b2?: null | {b3?: string}
+}
+-- issue3832.cue --
+issue3832: {
+	_person: self: firstName: "Sam"
+
+	#T: {
+		_subject: {
+			in:  _
+			out: {
+				let self = in.self
+				outFirstName: self.firstName
+			}
+		}
+		_assert: pass: _
+		_assert: {
+			check!: _
+			pass:   "never"
+		} | {
+			invoke!: _
+			pass:    (_subject & {in: invoke}).out
+		}
+		results: _assert.pass
+	}
+	#T & {
+		_assert: invoke: _person
+	}
+}
 -- large.cue --
 full: {
 	#Resource: {
@@ -147,53 +181,56 @@ full: {
 	out: (#Main & {namespace: "ns1"}).output
 }
 -- out/evalalpha/stats --
-Leaks:  111
+Leaks:  326
 Freed:  0
 Reused: 0
-Allocs: 111
+Allocs: 326
 Retain: 0
 
-Unifications: 78
-Conjuncts:    141
-Disjuncts:    12
+Unifications: 264
+Conjuncts:    486
+Disjuncts:    26
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
 +++ new
 @@ -1,9 +1,9 @@
--Leaks:  12
--Freed:  160
--Reused: 150
--Allocs: 22
--Retain: 20
-+Leaks:  111
+-Leaks:  25
+-Freed:  378
+-Reused: 364
+-Allocs: 39
+-Retain: 139
++Leaks:  326
 +Freed:  0
 +Reused: 0
-+Allocs: 111
++Allocs: 326
 +Retain: 0
  
--Unifications: 146
--Conjuncts:    331
--Disjuncts:    179
-+Unifications: 78
-+Conjuncts:    141
-+Disjuncts:    12
+-Unifications: 363
+-Conjuncts:    797
+-Disjuncts:    496
++Unifications: 264
++Conjuncts:    486
++Disjuncts:    26
 -- out/eval/stats --
-Leaks:  15
-Freed:  291
-Reused: 280
-Allocs: 26
-Retain: 32
+Leaks:  25
+Freed:  378
+Reused: 364
+Allocs: 39
+Retain: 139
 
-Unifications: 280
-Conjuncts:    594
-Disjuncts:    322
+Unifications: 363
+Conjuncts:    797
+Disjuncts:    496
 -- out/evalalpha --
 Errors:
 and.transitive.out.ok: field not allowed:
     ./in.cue:38:3
 and.transitiveWithEmbed.out.ok: field not allowed:
     ./in.cue:46:3
+disjunction.withErr.t1.out.b1: field not allowed:
+    ./validators.cue:30:3
+    ./validators.cue:32:12
 embed.andEmbed.d.err: field not allowed:
     ./in.cue:31:11
 embed.andInStruct.a.err: field not allowed:
@@ -215,6 +252,11 @@ embed.simple.a.err: field not allowed:
     ./in.cue:4:5
 embed.withIndirect.err: field not allowed:
     ./in.cue:71:8
+issue3832._assert: 2 errors in empty disjunction:
+issue3832._assert.invoke: field not allowed:
+    ./issue3832.cue:23:12
+issue3832._assert.pass.self.firstName: field not allowed:
+    ./issue3832.cue:2:17
 embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
     ./validators.cue:21:5
     ./validators.cue:21:12
@@ -479,6 +521,78 @@ Result:
       }
     }
   }
+  issue3832: (_|_){
+    // [eval]
+    _person: (struct){
+      self: (struct){
+        firstName: (string){ "Sam" }
+      }
+    }
+    #T: (#struct){
+      _subject: (#struct){
+        in: (_){ _ }
+        out: (#struct){
+          let self#1 = (_|_){
+            // [incomplete] issue3832.#T._subject.out.self: in.self undefined as in is incomplete (type _):
+            //     ./issue3832.cue:8:16
+          }
+          outFirstName: (_|_){
+            // [incomplete] issue3832.#T._subject.out.outFirstName: undefined field: firstName:
+            //     ./issue3832.cue:9:24
+          }
+        }
+      }
+      _assert: (#struct){ |((#struct){
+          pass: (string){ "never" }
+          check!: (_){ _ }
+        }, (#struct){
+          pass: (#struct){
+            let self#1 = (_|_){
+              // [cycle] issue3832.#T._assert.pass.self: cycle error referencing self:
+              //     ./issue3832.cue:8:19
+            }
+            outFirstName: (_|_){
+              // [incomplete] issue3832.#T._assert.pass.outFirstName: undefined field: firstName:
+              //     ./issue3832.cue:9:24
+            }
+          }
+          invoke!: (_){ _ }
+        }) }
+      results: (_|_){
+        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#1=_|_(issue3832.#T._assert.pass.self: cycle error referencing self),outFirstName:_|_(issue3832.#T._assert.pass.outFirstName: undefined field: firstName)},invoke!:_} (type struct):
+        //     ./issue3832.cue:20:12
+      }
+    }
+    _assert: (_|_){
+      // [eval] issue3832._assert: 2 errors in empty disjunction:
+      // issue3832._assert.invoke: field not allowed:
+      //     ./issue3832.cue:23:12
+      // issue3832._assert.pass.self.firstName: field not allowed:
+      //     ./issue3832.cue:2:17
+      invoke: (_){ _ }
+      pass: (_){ _ }
+    }
+    _subject: (#struct){
+      in: (_){ _ }
+      out: (#struct){
+        let self#1 = (_|_){
+          // [incomplete] issue3832._subject.out.self: in.self undefined as in is incomplete (type _):
+          //     ./issue3832.cue:8:16
+        }
+        outFirstName: (_|_){
+          // [incomplete] issue3832._subject.out.outFirstName: undefined field: firstName:
+          //     ./issue3832.cue:9:24
+        }
+      }
+    }
+    results: (_|_){
+      // [eval] issue3832._assert: 2 errors in empty disjunction:
+      // issue3832._assert.invoke: field not allowed:
+      //     ./issue3832.cue:23:12
+      // issue3832._assert.pass.self.firstName: field not allowed:
+      //     ./issue3832.cue:2:17
+    }
+  }
   full: (struct){
     #Resource: (#struct){
       someMsg: (string){ string }
@@ -486,7 +600,7 @@ Result:
           missing: (bool){ true }
         }, (#struct){
         }) }
-      let pickMsg#1 = (#struct){
+      let pickMsg#2 = (#struct){
         msg: (_|_){
           // [incomplete] full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
           //     ./large.cue:7:25
@@ -531,14 +645,14 @@ Result:
         //     ./large.cue:21:24
         //     ./large.cue:19:15
       }
-      let jsonPatch#2 = (#struct){
-        let base#5 = (#struct){
+      let jsonPatch#3 = (#struct){
+        let base#6 = (#struct){
           someMsg: (string){ string }
           obs: (#struct){ |(*(#struct){
               missing: (bool){ true }
             }, (#struct){
             }) }
-          let pickMsg#1 = (#struct){
+          let pickMsg#2 = (#struct){
             msg: (_|_){
               // [incomplete] full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
               //     ./large.cue:7:25
@@ -557,13 +671,13 @@ Result:
             }
           }
         }
-        let withMsg#6 = (#struct){
+        let withMsg#7 = (#struct){
           someMsg: (string){ "foo" }
           obs: (#struct){ |(*(#struct){
               missing: (bool){ true }
             }, (#struct){
             }) }
-          let pickMsg#1 = (#struct){
+          let pickMsg#2 = (#struct){
             msg: (_|_){
               // [incomplete] full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
               //     ./large.cue:7:25
@@ -621,12 +735,51 @@ Result:
       }
     }
   }
+  disjunction: (_|_){
+    // [eval]
+    withErr: (_|_){
+      // [eval]
+      t1: (_|_){
+        // [eval]
+        params: (struct){
+        }
+        out: (_|_){
+          // [eval]
+          b1: (_|_){
+            // [eval] disjunction.withErr.t1.out.b1: field not allowed:
+            //     ./validators.cue:30:3
+            //     ./validators.cue:32:12
+            b2: (_|_){
+              // [eval] disjunction.withErr.t1.out.b1.b2: field not allowed:
+              //     ./validators.cue:30:7
+              b3: (_|_){
+                // [eval] disjunction.withErr.t1.out.b1.b2.b3: field not allowed:
+                //     ./validators.cue:30:11
+              }
+            }
+          }
+        }
+        #Schema1: (#struct){
+          b1?: ((null|struct)){ |((null){ null }, (#struct){
+              b2?: ((null|struct)){ |((null){ null }, (#struct){
+                  b3?: (string){ string }
+                }) }
+            }) }
+        }
+        #Schema2: (#struct){
+          b2?: ((null|struct)){ |((null){ null }, (#struct){
+              b3?: (string){ string }
+            }) }
+        }
+      }
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,81 +1,29 @@
+@@ -1,81 +1,37 @@
  Errors:
  and.transitive.out.ok: field not allowed:
 -    ./in.cue:34:5
@@ -643,6 +796,9 @@ diff old new
 -    ./in.cue:44:7
 -    ./in.cue:45:7
      ./in.cue:46:3
++disjunction.withErr.t1.out.b1: field not allowed:
++    ./validators.cue:30:3
++    ./validators.cue:32:12
  embed.andEmbed.d.err: field not allowed:
 -    ./in.cue:28:6
 -    ./in.cue:29:6
@@ -705,10 +861,15 @@ diff old new
 -    ./validators.cue:12:6
 -    ./validators.cue:17:5
 -    ./validators.cue:18:5
++issue3832._assert: 2 errors in empty disjunction:
++issue3832._assert.invoke: field not allowed:
++    ./issue3832.cue:23:12
++issue3832._assert.pass.self.firstName: field not allowed:
++    ./issue3832.cue:2:17
  embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
      ./validators.cue:21:5
      ./validators.cue:21:12
-@@ -94,14 +42,11 @@
+@@ -94,14 +50,11 @@
        }
        a: (_|_){
          // [eval]
@@ -724,7 +885,7 @@ diff old new
        }
      }
      andInStruct: (_|_){
-@@ -111,14 +56,11 @@
+@@ -111,14 +64,11 @@
        }
        a: (_|_){
          // [eval]
@@ -740,7 +901,7 @@ diff old new
        }
      }
      embedDefWithEmbedding: (_|_){
-@@ -128,15 +70,11 @@
+@@ -128,15 +78,11 @@
        }
        a: (_|_){
          // [eval]
@@ -757,7 +918,7 @@ diff old new
        }
      }
      embedComprehension: (_|_){
-@@ -146,16 +84,11 @@
+@@ -146,16 +92,11 @@
        }
        a: (_|_){
          // [eval]
@@ -775,7 +936,7 @@ diff old new
        }
      }
      fieldWithAnd: (_|_){
-@@ -166,9 +99,6 @@
+@@ -166,9 +107,6 @@
          // [eval]
          err: (_|_){
            // [eval] embed.fieldWithAnd.a.err: field not allowed:
@@ -785,7 +946,7 @@ diff old new
            //     ./in.cue:20:13
          }
        }
-@@ -179,20 +109,15 @@
+@@ -179,20 +117,15 @@
          a: (int){ int }
        }
        B: (struct){
@@ -811,7 +972,7 @@ diff old new
        }
      }
      andEmbed: (_|_){
-@@ -208,17 +133,11 @@
+@@ -208,17 +141,11 @@
        }
        d: (_|_){
          // [eval]
@@ -830,7 +991,7 @@ diff old new
        }
      }
      nonDef: (struct){
-@@ -227,12 +146,12 @@
+@@ -227,12 +154,12 @@
            a: (string){ string }
          }
          #Y: (#struct){
@@ -847,7 +1008,7 @@ diff old new
          }
        }
      }
-@@ -242,12 +161,12 @@
+@@ -242,12 +169,12 @@
            Name: (string){ string }
          }
          #Step: (#struct){
@@ -864,7 +1025,7 @@ diff old new
          }
          out: (#struct){
            Name: (string){ "foo" }
-@@ -257,21 +176,15 @@
+@@ -257,21 +184,15 @@
      }
      withIndirect: (_|_){
        // [eval]
@@ -891,7 +1052,7 @@ diff old new
      }
      normalValidator: (_|_){
        // [eval]
-@@ -281,20 +194,17 @@
+@@ -281,20 +202,17 @@
        }
        x: (_|_){
          // [eval]
@@ -915,7 +1076,7 @@ diff old new
          #X: (_){
            matchN(0, (#list){
            })
-@@ -301,17 +211,10 @@
+@@ -301,17 +219,10 @@
            a?: (int){ int }
            b?: (int){ int }
          }
@@ -937,7 +1098,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -330,10 +233,7 @@
+@@ -330,10 +241,7 @@
            // [eval]
            b: (_|_){
              // [eval] embed.openValidator.t2.a.b: conflicting values 1 and {b?:Y} (mismatched types int and struct):
@@ -948,7 +1109,7 @@ diff old new
              //     ./validators.cue:24:8
              // embed.openValidator.t2.a.b: invalid value 1 (does not satisfy matchN): 0 matched, expected 1:
              //     ./validators.cue:21:5
-@@ -360,16 +260,11 @@
+@@ -360,16 +268,11 @@
        }
        out: (_|_){
          // [eval]
@@ -966,7 +1127,7 @@ diff old new
        }
      }
      transitiveWithEmbed: (_|_){
-@@ -385,17 +280,11 @@
+@@ -385,21 +288,16 @@
        }
        out: (_|_){
          // [eval]
@@ -981,11 +1142,108 @@ diff old new
 -          //     ./in.cue:45:7
            //     ./in.cue:46:3
          }
+-      }
+-    }
+-  }
+-  issue3832: (#struct){
 +        a: (string){ string }
++      }
++    }
++  }
++  issue3832: (_|_){
++    // [eval]
+     _person: (struct){
+       self: (struct){
+         firstName: (string){ "Sam" }
+@@ -414,8 +312,8 @@
+             //     ./issue3832.cue:8:16
+           }
+           outFirstName: (_|_){
+-            // [incomplete] issue3832.#T._subject.out.self: in.self undefined as in is incomplete (type _):
+-            //     ./issue3832.cue:8:16
++            // [incomplete] issue3832.#T._subject.out.outFirstName: undefined field: firstName:
++            //     ./issue3832.cue:9:24
+           }
+         }
+       }
+@@ -425,21 +323,30 @@
+         }, (#struct){
+           pass: (#struct){
+             let self#1 = (_|_){
+-              // [incomplete] issue3832.#T._assert.pass.self: in.self undefined (in is incomplete):
+-              //     ./issue3832.cue:8:16
++              // [cycle] issue3832.#T._assert.pass.self: cycle error referencing self:
++              //     ./issue3832.cue:8:19
+             }
+             outFirstName: (_|_){
+-              // [incomplete] issue3832.#T._assert.pass.self: in.self undefined (in is incomplete):
+-              //     ./issue3832.cue:8:16
++              // [incomplete] issue3832.#T._assert.pass.outFirstName: undefined field: firstName:
++              //     ./issue3832.cue:9:24
+             }
+           }
+           invoke!: (_){ _ }
+         }) }
+       results: (_|_){
+-        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#1=_|_(issue3832.#T._assert.pass.self: in.self undefined (in is incomplete)),outFirstName:_|_(issue3832.#T._assert.pass.self: in.self undefined (in is incomplete))},invoke!:_} (type struct):
++        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#1=_|_(issue3832.#T._assert.pass.self: cycle error referencing self),outFirstName:_|_(issue3832.#T._assert.pass.outFirstName: undefined field: firstName)},invoke!:_} (type struct):
+         //     ./issue3832.cue:20:12
        }
      }
++    _assert: (_|_){
++      // [eval] issue3832._assert: 2 errors in empty disjunction:
++      // issue3832._assert.invoke: field not allowed:
++      //     ./issue3832.cue:23:12
++      // issue3832._assert.pass.self.firstName: field not allowed:
++      //     ./issue3832.cue:2:17
++      invoke: (_){ _ }
++      pass: (_){ _ }
++    }
+     _subject: (#struct){
+       in: (_){ _ }
+       out: (#struct){
+@@ -448,29 +355,17 @@
+           //     ./issue3832.cue:8:16
+         }
+         outFirstName: (_|_){
+-          // [incomplete] issue3832._subject.out.self: in.self undefined as in is incomplete (type _):
+-          //     ./issue3832.cue:8:16
+-        }
+-      }
+-    }
+-    _assert: (#struct){
+-      pass: (#struct){
+-        let self#1 = (#struct){
+-          firstName: (string){ "Sam" }
+-        }
+-        outFirstName: (string){ "Sam" }
+-      }
+-      invoke: (struct){
+-        self: (struct){
+-          firstName: (string){ "Sam" }
+-        }
+-      }
+-    }
+-    results: (#struct){
+-      let self#1 = (#struct){
+-        firstName: (string){ "Sam" }
+-      }
+-      outFirstName: (string){ "Sam" }
++          // [incomplete] issue3832._subject.out.outFirstName: undefined field: firstName:
++          //     ./issue3832.cue:9:24
++        }
++      }
++    }
++    results: (_|_){
++      // [eval] issue3832._assert: 2 errors in empty disjunction:
++      // issue3832._assert.invoke: field not allowed:
++      //     ./issue3832.cue:23:12
++      // issue3832._assert.pass.self.firstName: field not allowed:
++      //     ./issue3832.cue:2:17
+     }
    }
-@@ -418,7 +307,7 @@
+   full: (struct){
+@@ -492,7 +387,7 @@
            op: (string){ "add" }
            path: (string){ "/metadata" }
            value: (_|_){
@@ -994,7 +1252,7 @@ diff old new
              //     ./large.cue:7:25
              //     ./large.cue:3:12
            }
-@@ -447,38 +336,11 @@
+@@ -521,38 +416,11 @@
      #Main: (#struct){
        namespace: (string){ string }
        output: (_|_){
@@ -1011,7 +1269,7 @@ diff old new
 -          }
 -        }
        }
-       let jsonPatch#2 = (#struct){
+       let jsonPatch#3 = (#struct){
 -        namespace: (string){ string }
 -        patch: (#list){
 -          0: (#struct){
@@ -1032,10 +1290,10 @@ diff old new
 -            }
 -          }
 -        }
-         let base#5 = (#struct){
+         let base#6 = (#struct){
            someMsg: (string){ string }
            obs: (#struct){ |(*(#struct){
-@@ -497,7 +359,7 @@
+@@ -571,7 +439,7 @@
                op: (string){ "add" }
                path: (string){ "/metadata" }
                value: (_|_){
@@ -1044,10 +1302,10 @@ diff old new
                  //     ./large.cue:7:25
                  //     ./large.cue:3:12
                }
-@@ -511,24 +373,59 @@
+@@ -585,55 +453,83 @@
              }, (#struct){
              }) }
-           let pickMsg#1 = (#struct){
+           let pickMsg#2 = (#struct){
 -            msg: (string){ "foo" }
 -          }
 -          patches: (#list){
@@ -1103,6 +1361,13 @@ diff old new
 -          op: (string){ "add" }
 -          path: (string){ "/metadata" }
 -          value: (string){ "foo" }
+-        }
+-      }
+-    }
+-  }
+-  disjunction: (struct){
+-    withErr: (struct){
+-      t1: (struct){
 +        0: (_|_){
 +          // [incomplete] jsonPatch.output.ns1.0: 2 errors in empty disjunction:
 +          // jsonPatch.output.ns1.0.op: conflicting values "remove" and "add":
@@ -1114,9 +1379,52 @@ diff old new
 +          op: (string){ "add" }
 +          path: (string){ "/metadata" }
 +          value: (_){ _ }
++        }
++      }
++    }
++  }
++  disjunction: (_|_){
++    // [eval]
++    withErr: (_|_){
++      // [eval]
++      t1: (_|_){
++        // [eval]
+         params: (struct){
          }
-       }
-     }
+-        out: (#struct){
++        out: (_|_){
++          // [eval]
+           b1: (_|_){
+-            // [incomplete] disjunction.withErr.t1.out.b1: 4 errors in empty disjunction:
+-            // disjunction.withErr.t1.out.b1: conflicting values null and {b2:{b3:params.mayExistLater}} (mismatched types null and struct):
+-            //     ./validators.cue:30:7
+-            //     ./validators.cue:32:17
+-            // disjunction.withErr.t1.out.b1.b2: 2 errors in empty disjunction:
+-            // disjunction.withErr.t1.out.b1.b2: conflicting values null and {b3:params.mayExistLater} (mismatched types null and struct):
+-            //     ./validators.cue:30:11
+-            //     ./validators.cue:33:17
+-            // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
+-            //     ./validators.cue:30:22
++            // [eval] disjunction.withErr.t1.out.b1: field not allowed:
++            //     ./validators.cue:30:3
++            //     ./validators.cue:32:12
+             b2: (_|_){
+-              // [incomplete] disjunction.withErr.t1.out.b1.b2: 2 errors in empty disjunction:
+-              // disjunction.withErr.t1.out.b1.b2: conflicting values null and {b3:params.mayExistLater} (mismatched types null and struct):
+-              //     ./validators.cue:30:11
+-              //     ./validators.cue:33:17
+-              // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
+-              //     ./validators.cue:30:22
++              // [eval] disjunction.withErr.t1.out.b1.b2: field not allowed:
++              //     ./validators.cue:30:7
+               b3: (_|_){
+-                // [incomplete] disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
+-                //     ./validators.cue:30:22
++                // [eval] disjunction.withErr.t1.out.b1.b2.b3: field not allowed:
++                //     ./validators.cue:30:11
+               }
+             }
+           }
 -- diff/todo/p1 --
 embed.openValidator.err: unexpected pass.
 and.full.out: failure in evalv3
@@ -1524,6 +1832,80 @@ Result:
       }
     }
   }
+  issue3832: (#struct){
+    _person: (struct){
+      self: (struct){
+        firstName: (string){ "Sam" }
+      }
+    }
+    #T: (#struct){
+      _subject: (#struct){
+        in: (_){ _ }
+        out: (#struct){
+          let self#1 = (_|_){
+            // [incomplete] issue3832.#T._subject.out.self: in.self undefined as in is incomplete (type _):
+            //     ./issue3832.cue:8:16
+          }
+          outFirstName: (_|_){
+            // [incomplete] issue3832.#T._subject.out.self: in.self undefined as in is incomplete (type _):
+            //     ./issue3832.cue:8:16
+          }
+        }
+      }
+      _assert: (#struct){ |((#struct){
+          pass: (string){ "never" }
+          check!: (_){ _ }
+        }, (#struct){
+          pass: (#struct){
+            let self#1 = (_|_){
+              // [incomplete] issue3832.#T._assert.pass.self: in.self undefined (in is incomplete):
+              //     ./issue3832.cue:8:16
+            }
+            outFirstName: (_|_){
+              // [incomplete] issue3832.#T._assert.pass.self: in.self undefined (in is incomplete):
+              //     ./issue3832.cue:8:16
+            }
+          }
+          invoke!: (_){ _ }
+        }) }
+      results: (_|_){
+        // [incomplete] issue3832.#T.results: unresolved disjunction {pass:"never",check!:_} | {pass:{let self#1=_|_(issue3832.#T._assert.pass.self: in.self undefined (in is incomplete)),outFirstName:_|_(issue3832.#T._assert.pass.self: in.self undefined (in is incomplete))},invoke!:_} (type struct):
+        //     ./issue3832.cue:20:12
+      }
+    }
+    _subject: (#struct){
+      in: (_){ _ }
+      out: (#struct){
+        let self#1 = (_|_){
+          // [incomplete] issue3832._subject.out.self: in.self undefined as in is incomplete (type _):
+          //     ./issue3832.cue:8:16
+        }
+        outFirstName: (_|_){
+          // [incomplete] issue3832._subject.out.self: in.self undefined as in is incomplete (type _):
+          //     ./issue3832.cue:8:16
+        }
+      }
+    }
+    _assert: (#struct){
+      pass: (#struct){
+        let self#1 = (#struct){
+          firstName: (string){ "Sam" }
+        }
+        outFirstName: (string){ "Sam" }
+      }
+      invoke: (struct){
+        self: (struct){
+          firstName: (string){ "Sam" }
+        }
+      }
+    }
+    results: (#struct){
+      let self#1 = (#struct){
+        firstName: (string){ "Sam" }
+      }
+      outFirstName: (string){ "Sam" }
+    }
+  }
   full: (struct){
     #Resource: (#struct){
       someMsg: (string){ string }
@@ -1531,7 +1913,7 @@ Result:
           missing: (bool){ true }
         }, (#struct){
         }) }
-      let pickMsg#1 = (#struct){
+      let pickMsg#2 = (#struct){
         msg: (_|_){
           // [incomplete] full.#Resource.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
           //     ./large.cue:7:25
@@ -1583,7 +1965,7 @@ Result:
           }
         }
       }
-      let jsonPatch#2 = (#struct){
+      let jsonPatch#3 = (#struct){
         namespace: (string){ string }
         patch: (#list){
           0: (#struct){
@@ -1604,13 +1986,13 @@ Result:
             }
           }
         }
-        let base#5 = (#struct){
+        let base#6 = (#struct){
           someMsg: (string){ string }
           obs: (#struct){ |(*(#struct){
               missing: (bool){ true }
             }, (#struct){
             }) }
-          let pickMsg#1 = (#struct){
+          let pickMsg#2 = (#struct){
             msg: (_|_){
               // [incomplete] full.#Main.jsonPatch.base.pickMsg.msg: invalid interpolation: non-concrete value string (type string):
               //     ./large.cue:7:25
@@ -1629,13 +2011,13 @@ Result:
             }
           }
         }
-        let withMsg#6 = (#struct){
+        let withMsg#7 = (#struct){
           someMsg: (string){ "foo" }
           obs: (#struct){ |(*(#struct){
               missing: (bool){ true }
             }, (#struct){
             }) }
-          let pickMsg#1 = (#struct){
+          let pickMsg#2 = (#struct){
             msg: (string){ "foo" }
           }
           patches: (#list){
@@ -1654,6 +2036,52 @@ Result:
           op: (string){ "add" }
           path: (string){ "/metadata" }
           value: (string){ "foo" }
+        }
+      }
+    }
+  }
+  disjunction: (struct){
+    withErr: (struct){
+      t1: (struct){
+        params: (struct){
+        }
+        out: (#struct){
+          b1: (_|_){
+            // [incomplete] disjunction.withErr.t1.out.b1: 4 errors in empty disjunction:
+            // disjunction.withErr.t1.out.b1: conflicting values null and {b2:{b3:params.mayExistLater}} (mismatched types null and struct):
+            //     ./validators.cue:30:7
+            //     ./validators.cue:32:17
+            // disjunction.withErr.t1.out.b1.b2: 2 errors in empty disjunction:
+            // disjunction.withErr.t1.out.b1.b2: conflicting values null and {b3:params.mayExistLater} (mismatched types null and struct):
+            //     ./validators.cue:30:11
+            //     ./validators.cue:33:17
+            // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
+            //     ./validators.cue:30:22
+            b2: (_|_){
+              // [incomplete] disjunction.withErr.t1.out.b1.b2: 2 errors in empty disjunction:
+              // disjunction.withErr.t1.out.b1.b2: conflicting values null and {b3:params.mayExistLater} (mismatched types null and struct):
+              //     ./validators.cue:30:11
+              //     ./validators.cue:33:17
+              // disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
+              //     ./validators.cue:30:22
+              b3: (_|_){
+                // [incomplete] disjunction.withErr.t1.out.b1.b2.b3: undefined field: mayExistLater:
+                //     ./validators.cue:30:22
+              }
+            }
+          }
+        }
+        #Schema1: (#struct){
+          b1?: ((null|struct)){ |((null){ null }, (#struct){
+              b2?: ((null|struct)){ |((null){ null }, (#struct){
+                  b3?: (string){ string }
+                }) }
+            }) }
+        }
+        #Schema2: (#struct){
+          b2?: ((null|struct)){ |((null){ null }, (#struct){
+              b3?: (string){ string }
+            }) }
         }
       }
     }
@@ -1825,6 +2253,43 @@ Result:
     }
   }
 }
+--- issue3832.cue
+{
+  issue3832: {
+    _person: {
+      self: {
+        firstName: "Sam"
+      }
+    }
+    #T: {
+      _subject: {
+        in: _
+        out: {
+          let self#1 = 〈1;in〉.self
+          outFirstName: 〈0;let self#1〉.firstName
+        }
+      }
+      _assert: {
+        pass: _
+      }
+      _assert: ({
+        check!: _
+        pass: "never"
+      }|{
+        invoke!: _
+        pass: (〈1;_subject〉 & {
+          in: 〈1;invoke〉
+        }).out
+      })
+      results: 〈0;_assert〉.pass
+    }
+    (〈0;#T〉 & {
+      _assert: {
+        invoke: 〈2;_person〉
+      }
+    })
+  }
+}
 --- large.cue
 {
   full: {
@@ -1833,7 +2298,7 @@ Result:
       obs: ({}|*{
         missing: true
       })
-      let pickMsg#1 = [
+      let pickMsg#2 = [
         if 〈1;obs〉.missing {
           msg: "\(〈2;someMsg〉)"
         },
@@ -1845,7 +2310,7 @@ Result:
         {
           op: "add"
           path: "/metadata"
-          value: 〈2;let pickMsg#1〉.msg
+          value: 〈2;let pickMsg#2〉.msg
         },
       ]
     }
@@ -1871,14 +2336,14 @@ Result:
     })
     #Main: {
       namespace: string
-      output: 〈0;let jsonPatch#2〉.output
-      let jsonPatch#2 = (〈1;#JSONPatch〉 & {
-        let base#5 = (〈2;#Resource〉 & {})
-        let withMsg#6 = (〈0;let base#5〉 & {
+      output: 〈0;let jsonPatch#3〉.output
+      let jsonPatch#3 = (〈1;#JSONPatch〉 & {
+        let base#6 = (〈2;#Resource〉 & {})
+        let withMsg#7 = (〈0;let base#6〉 & {
           someMsg: "foo"
         })
         namespace: 〈1;namespace〉
-        patch: 〈0;let withMsg#6〉.patches
+        patch: 〈0;let withMsg#7〉.patches
       })
     }
     out: (〈0;#Main〉 & {
@@ -1928,6 +2393,28 @@ Result:
         a: 〈0;X〉
         a: {
           b: 1
+        }
+      }
+    }
+  }
+  disjunction: {
+    withErr: {
+      t1: {
+        params: {}
+        out: (〈0;#Schema1〉 & {
+          b1: {
+            b2: {
+              b3: 〈3;params〉.mayExistLater
+            }
+          }
+        })
+        #Schema1: {
+          b1?: (null|〈1;#Schema2〉)
+        }
+        #Schema2: {
+          b2?: (null|{
+            b3?: string
+          })
         }
       }
     }

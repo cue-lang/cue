@@ -73,6 +73,30 @@ var parseImportPathTests = []struct {
 		ExplicitQualifier: true,
 	},
 }, {
+	testName: "WithFullVersionNoQualifier",
+	path:     "foo.com/bar@v0.2.3-foo",
+	want: ImportPath{
+		Path:      "foo.com/bar",
+		Version:   "v0.2.3-foo",
+		Qualifier: "bar",
+	},
+}, {
+	testName: "WithLatest",
+	path:     "foo.com/bar@latest",
+	want: ImportPath{
+		Path:      "foo.com/bar",
+		Version:   "latest",
+		Qualifier: "bar",
+	},
+}, {
+	testName: "WithMajorVersionLatest",
+	path:     "foo.com/bar@v1.latest",
+	want: ImportPath{
+		Path:      "foo.com/bar",
+		Version:   "v1.latest",
+		Qualifier: "bar",
+	},
+}, {
 	testName: "WithMajorVersionNoSlash",
 	path:     "main.test@v0",
 	want: ImportPath{

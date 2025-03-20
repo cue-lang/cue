@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"iter"
 	"path"
 	"path/filepath"
 	"slices"
@@ -30,11 +31,11 @@ import (
 // If the package is present in exactly one module, importFromModules will
 // return the module, its root directory, and a list of other modules that
 // lexically could have provided the package but did not.
-func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m module.Version, pkgLocs []module.SourceLoc, altMods []module.Version, err error) {
-	fail := func(err error) (module.Version, []module.SourceLoc, []module.Version, error) {
-		return module.Version{}, []module.SourceLoc(nil), nil, err
+func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m module.Version, pkgLocs []module.SourceLoc, err error) {
+	fail := func(err error) (module.Version, []module.SourceLoc, error) {
+		return module.Version{}, nil, err
 	}
-	failf := func(format string, args ...interface{}) (module.Version, []module.SourceLoc, []module.Version, error) {
+	failf := func(format string, args ...interface{}) (module.Version, []module.SourceLoc, error) {
 		return fail(fmt.Errorf(format, args...))
 	}
 	// Note: we don't care about the package qualifier at this point
@@ -55,16 +56,47 @@ func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m 
 	}
 
 	// Check each module on the build list.
-	var locs [][]module.SourceLoc
-	var mods []module.Version
+	var locs []PackageLoc
 	var mg *modrequirements.ModuleGraph
+	versionForModule := func(ctx context.Context, prefix string) (module.Version, error) {
+		var (
+			v  string
+			ok bool
+		)
+		pkgVersion := pathParts.Version
+		if pkgVersion == "" {
+			if pkgVersion, _ = pkgs.requirements.DefaultMajorVersion(prefix); pkgVersion == "" {
+				return module.Version{}, nil
+			}
+		}
+		prefixPath := prefix + "@" + pkgVersion
+		// Note: mg is nil the first time around the loop.
+		if mg == nil {
+			v, ok = pkgs.requirements.RootSelected(prefixPath)
+		} else {
+			v, ok = mg.Selected(prefixPath), true
+		}
+		if !ok || v == "none" {
+			// No possible module
+			return module.Version{}, nil
+		}
+		m, err := module.NewVersion(prefixPath, v)
+		if err != nil {
+			// Not all package paths are valid module versions,
+			// but a parent might be.
+			return module.Version{}, nil
+		}
+		return m, nil
+	}
 	localPkgLocs, err := pkgs.findLocalPackage(pkgPathOnly)
 	if err != nil {
 		return fail(err)
 	}
 	if len(localPkgLocs) > 0 {
-		mods = append(mods, module.MustNewVersion("local", ""))
-		locs = append(locs, localPkgLocs)
+		locs = append(locs, PackageLoc{
+			Module: module.MustNewVersion("local", ""),
+			Locs:   localPkgLocs,
+		})
 	}
 
 	// Iterate over possible modules for the path, not all selected modules.
@@ -81,67 +113,27 @@ func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m 
 	// to load the package using the full
 	// requirements in mg.
 	for {
-		var altMods []module.Version
-		// TODO we could probably do this loop concurrently.
-
-		for prefix := pkgPathOnly; prefix != "."; prefix = path.Dir(prefix) {
-			var (
-				v  string
-				ok bool
-			)
-			pkgVersion := pathParts.Version
-			if pkgVersion == "" {
-				if pkgVersion, _ = pkgs.requirements.DefaultMajorVersion(prefix); pkgVersion == "" {
-					continue
-				}
-			}
-			prefixPath := prefix + "@" + pkgVersion
-			if mg == nil {
-				v, ok = pkgs.requirements.RootSelected(prefixPath)
-			} else {
-				v, ok = mg.Selected(prefixPath), true
-			}
-			if !ok || v == "none" {
-				continue
-			}
-			m, err := module.NewVersion(prefixPath, v)
-			if err != nil {
-				// Not all package paths are valid module versions,
-				// but a parent might be.
-				continue
-			}
-			mloc, isLocal, err := pkgs.fetch(ctx, m)
-			if err != nil {
-				// Report fetch error.
-				// Note that we don't know for sure this module is necessary,
-				// but it certainly _could_ provide the package, and even if we
-				// continue the loop and find the package in some other module,
-				// we need to look at this module to make sure the import is
-				// not ambiguous.
-				return fail(fmt.Errorf("cannot fetch %v: %v", m, err))
-			}
-			if loc, ok, err := locInModule(pkgPathOnly, prefix, mloc, isLocal); err != nil {
-				return fail(fmt.Errorf("cannot find package: %v", err))
-			} else if ok {
-				mods = append(mods, m)
-				locs = append(locs, []module.SourceLoc{loc})
-			} else {
-				altMods = append(altMods, m)
-			}
+		// Note: if fetch fails, we return an error:
+		// we don't know for sure this module is necessary,
+		// but it certainly _could_ provide the package, and even if we
+		// continue the loop and find the package in some other module,
+		// we need to look at this module to make sure the import is
+		// not ambiguous.
+		plocs, err := FindPackageLocations(ctx, pkgPath, versionForModule, pkgs.fetch)
+		if err != nil {
+			return fail(err)
 		}
-
-		if len(mods) > 1 {
+		locs = append(locs, plocs...)
+		if len(locs) > 1 {
 			// We produce the list of directories from longest to shortest candidate
 			// module path, but the AmbiguousImportError should report them from
 			// shortest to longest. Reverse them now.
-			slices.Reverse(mods)
 			slices.Reverse(locs)
-			return fail(&AmbiguousImportError{ImportPath: pkgPath, Locations: locs, Modules: mods})
+			return fail(&AmbiguousImportError{ImportPath: pkgPath, Locations: locs})
 		}
-
-		if len(mods) == 1 {
+		if len(locs) == 1 {
 			// We've found the unique module containing the package.
-			return mods[0], locs[0], altMods, nil
+			return locs[0].Module, locs[0].Locs, nil
 		}
 
 		if mg != nil {
@@ -163,18 +155,81 @@ func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m 
 	}
 }
 
-// locInModule returns the location that would hold the package named by the given path,
-// if it were in the module with module path mpath and root location mloc.
-// If pkgPath is syntactically not within mpath,
-// or if mdir is a local file tree (isLocal == true) and the directory
-// that would hold path is in a sub-module (covered by a go.mod below mdir),
+// PackageLoc holds a module version and a location of a package
+// within that module.
+type PackageLoc struct {
+	Module module.Version
+	// Locs holds the source locations of the package. There is always
+	// at least one element; there can be more than one when the
+	// module path is "local" (for exampe packages inside cue.mod/pkg).
+	Locs []module.SourceLoc
+}
+
+// FindPackageLocations finds possible module candidates for a given import path.
+//
+// It tries each parent of the import path as a possible module location,
+// using versionForModule to determine a version for that module
+// and fetch to fetch the location for a given module version.
+//
+// versionForModule may indicate that there is no possible module
+// for a given path by returning the zero version and a nil error.
+//
+// The fetch function also reports whether the location is "local"
+// to the current module, allowing some checks to be skipped when false.
+//
+// It returns possible locations for the package. Each location may or may
+// not contain the package itself, although it will hold some CUE files.
+func FindPackageLocations(
+	ctx context.Context,
+	importPath string,
+	versionForModule func(ctx context.Context, prefixPath string) (module.Version, error),
+	fetch func(ctx context.Context, m module.Version) (loc module.SourceLoc, isLocal bool, err error),
+) ([]PackageLoc, error) {
+	ip := module.ParseImportPath(importPath)
+	var locs []PackageLoc
+	for prefix := range pathAncestors(ip.Path) {
+		v, err := versionForModule(ctx, prefix)
+		if err != nil {
+			return nil, err
+		}
+		if !v.IsValid() {
+			continue
+		}
+		mloc, isLocal, err := fetch(ctx, v)
+		if err != nil {
+			return nil, fmt.Errorf("cannot fetch %v: %w", v, err)
+		}
+		if mloc.FS == nil {
+			// Not found but not an error.
+			continue
+		}
+		loc, ok, err := locInModule(ip.Path, prefix, mloc, isLocal)
+		if err != nil {
+			return nil, fmt.Errorf("cannot find package: %v", err)
+		}
+		if ok {
+			locs = append(locs, PackageLoc{
+				Module: v,
+				Locs:   []module.SourceLoc{loc},
+			})
+		}
+	}
+	return locs, nil
+}
+
+// locInModule returns the location that would hold the package named by
+// the given path, if it were in the module with module path mpath and
+// root location mloc. If pkgPath is syntactically not within mpath, or
+// if mdir is a local file tree (isLocal == true) and the directory that
+// would hold path is in a sub-module (covered by a cue.mod below mdir),
 // locInModule returns "", false, nil.
 //
-// Otherwise, locInModule returns the name of the directory where
-// CUE source files would be expected, along with a boolean indicating
-// whether there are in fact CUE source files in that directory.
-// A non-nil error indicates that the existence of the directory and/or
-// source files could not be determined, for example due to a permission error.
+// Otherwise, locInModule returns the name of the directory where CUE
+// source files would be expected, along with a boolean indicating
+// whether there are in fact CUE source files in that directory. A
+// non-nil error indicates that the existence of the directory and/or
+// source files could not be determined, for example due to a permission
+// error.
 func locInModule(pkgPath, mpath string, mloc module.SourceLoc, isLocal bool) (loc module.SourceLoc, haveCUEFiles bool, err error) {
 	loc.FS = mloc.FS
 
@@ -279,9 +334,25 @@ func (pkgs *Packages) fetch(ctx context.Context, mod module.Version) (loc module
 	if mod == pkgs.mainModuleVersion {
 		return pkgs.mainModuleLoc, true, nil
 	}
-
 	loc, err = pkgs.registry.Fetch(ctx, mod)
 	return loc, false, err
+}
+
+// pathAncestors returns an iterator over all the ancestors
+// of p, including p itself.
+func pathAncestors(p string) iter.Seq[string] {
+	return func(yield func(s string) bool) {
+		for {
+			if !yield(p) {
+				return
+			}
+			prev := p
+			p = path.Dir(p)
+			if p == "." || p == prev {
+				return
+			}
+		}
+	}
 }
 
 // An AmbiguousImportError indicates an import of a package found in multiple
@@ -289,34 +360,22 @@ func (pkgs *Packages) fetch(ctx context.Context, mod module.Version) (loc module
 // directory.
 type AmbiguousImportError struct {
 	ImportPath string
-	Locations  [][]module.SourceLoc
-	Modules    []module.Version // Either empty or 1:1 with Dirs.
+	Locations  []PackageLoc
 }
 
 func (e *AmbiguousImportError) Error() string {
-	locType := "modules"
-	if len(e.Modules) == 0 {
-		locType = "locations"
-	}
-
 	var buf strings.Builder
-	fmt.Fprintf(&buf, "ambiguous import: found package %s in multiple %s:", e.ImportPath, locType)
+	fmt.Fprintf(&buf, "ambiguous import: found package %s in multiple locations:", e.ImportPath)
 
-	for i, loc := range e.Locations {
+	for _, loc := range e.Locations {
 		buf.WriteString("\n\t")
-		if i < len(e.Modules) {
-			m := e.Modules[i]
-			buf.WriteString(m.Path())
-			if m.Version() != "" {
-				fmt.Fprintf(&buf, " %s", m.Version())
-			}
-			// TODO work out how to present source locations in error messages.
-			fmt.Fprintf(&buf, " (%s)", loc[0].Dir)
-		} else {
-			buf.WriteString(loc[0].Dir)
+		buf.WriteString(loc.Module.Path())
+		if v := loc.Module.Version(); v != "" {
+			fmt.Fprintf(&buf, " %s", v)
 		}
+		// TODO work out how to present source locations in error messages.
+		fmt.Fprintf(&buf, " (%s)", loc.Locs[0].Dir)
 	}
-
 	return buf.String()
 }
 

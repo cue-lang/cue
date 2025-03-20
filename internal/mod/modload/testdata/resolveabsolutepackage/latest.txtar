@@ -1,0 +1,79 @@
+# Test that we can explicitly ask for the latest version of a package
+# in various ways.
+-- tests/explicit-latest-without-major/package --
+foo.com/bar@latest
+-- tests/explicit-latest-without-major/want --
+module: foo.com@v2.1.0
+loc: bar
+-- tests/explicit-latest-with-major/package --
+foo.com/bar@v0.latest
+-- tests/explicit-latest-with-major/want --
+module: foo.com@v0.2.0
+loc: bar
+-- tests/explicit-latest-with-minor/package --
+foo.com/bar@v0.1.latest
+-- tests/explicit-latest-with-minor/want --
+module: foo.com@v0.1.4
+loc: bar
+-- _registry/foo.com_v0.0.2/cue.mod/module.cue --
+module: "foo.com@v0"
+language: version: "v0.8.0"
+-- _registry/foo.com_v0.0.2/bar/x.cue --
+package bar
+
+-- _registry/foo.com_v0.0.3/cue.mod/module.cue --
+module: "foo.com@v0"
+language: version: "v0.8.0"
+-- _registry/foo.com_v0.0.3/bar/x.cue --
+package bar
+
+-- _registry/foo.com_v0.1.0/cue.mod/module.cue --
+module: "foo.com@v0"
+language: version: "v0.8.0"
+-- _registry/foo.com_v0.1.0/bar/x.cue --
+package bar
+
+-- _registry/foo.com_v0.1.4/cue.mod/module.cue --
+module: "foo.com@v0"
+language: version: "v0.8.0"
+-- _registry/foo.com_v0.1.4/bar/x.cue --
+package bar
+
+-- _registry/foo.com_v0.2.0/cue.mod/module.cue --
+module: "foo.com@v0"
+language: version: "v0.8.0"
+-- _registry/foo.com_v0.2.0/bar/x.cue --
+package bar
+
+-- _registry/foo.com_v2.1.0/cue.mod/module.cue --
+module: "foo.com@v2"
+language: version: "v0.8.0"
+-- _registry/foo.com_v2.1.0/bar/x.cue --
+package bar
+
+-- _registry/foo.com_v2.1.1-pre/cue.mod/module.cue --
+module: "foo.com@v2"
+language: version: "v0.8.0"
+-- _registry/foo.com_v2.1.1-pre/bar/x.cue --
+package bar
+
+-- _registry/foo.com_v3.0.2-pre/cue.mod/module.cue --
+module: "foo.com@v3"
+language: version: "v0.8.0"
+-- _registry/foo.com_v3.0.2-pre/bar/x.cue --
+package bar
+
+-- _registry/foo.com_bar_v1.2.3/cue.mod/module.cue --
+module: "foo.com/bar@v1"
+language: version: "v0.8.0"
+
+-- _registry/foo.com_bar_v1.2.3/baz/x.cue --
+package baz
+
+-- _registry/foo.com_bar_v1.5.0/cue.mod/module.cue --
+module: "foo.com/bar@v1"
+language: version: "v0.8.0"
+
+-- _registry/foo.com_bar_v1.5.0/baz/x.cue --
+package baz
+

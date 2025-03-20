@@ -21,6 +21,8 @@ import (
 type Registry interface {
 	// Fetch returns the location of the contents for the given module
 	// version, downloading it if necessary.
+	// It returns an error that satisfies [errors.Is]([modregistry.ErrNotFound]) if the
+	// module is not present in the store at this version.
 	Fetch(ctx context.Context, m module.Version) (module.SourceLoc, error)
 }
 

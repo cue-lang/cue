@@ -77,6 +77,20 @@ deps: {
 	qt.Assert(t, qt.Matches(string(data), `(?s).*module: "example.com/foo@v0".*`))
 }
 
+func TestFetchFromCacheNotFound(t *testing.T) {
+	dir := t.TempDir()
+	t.Cleanup(func() {
+		RemoveAll(dir)
+	})
+	// The cache should never be hit, so just use a nil registry value.
+	// We'll get a panic if it gets used.
+	cr, err := New(nil, dir)
+	qt.Assert(t, qt.IsNil(err))
+	_, err = cr.FetchFromCache(module.MustNewVersion("example.com/foo", "v0.0.1"))
+	qt.Assert(t, qt.Not(qt.IsNil(err)))
+	qt.Assert(t, qt.ErrorIs(err, modregistry.ErrNotFound))
+}
+
 func TestFetch(t *testing.T) {
 	dir := t.TempDir()
 	t.Cleanup(func() {
@@ -134,6 +148,14 @@ package x
 			return
 		}
 		loc, err := cr.Fetch(ctx, module.MustNewVersion("example.com/foo", "v0.0.1"))
+		if !qt.Check(t, qt.IsNil(err)) {
+			return
+		}
+		checkContents(t, loc)
+
+		// After Fetch has succeeded, FetchFromCache should also succeed
+		// and return the same thing.
+		loc, err = cr.FetchFromCache(module.MustNewVersion("example.com/foo", "v0.0.1"))
 		if !qt.Check(t, qt.IsNil(err)) {
 			return
 		}

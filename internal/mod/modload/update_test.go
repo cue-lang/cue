@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/mod/semver"
 	"cuelang.org/go/mod/modcache"
-	"cuelang.org/go/mod/module"
 	"github.com/go-quicktest/qt"
 	"github.com/google/go-cmp/cmp"
 	"golang.org/x/tools/txtar"
@@ -94,7 +94,7 @@ func TestResolveAbsolutePackage(t *testing.T) {
 					if strings.HasPrefix(string(wantData), "ERROR:") {
 						return
 					}
-					if v := module.ParseImportPath(pkg).Version; v == "" || semver.Canonical(v) != v {
+					if v := ast.ParseImportPath(pkg).Version; v == "" || semver.Canonical(v) != v {
 						return
 					}
 					t.Logf("trying again with %v", pkg)

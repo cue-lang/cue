@@ -1,0 +1,46 @@
+-- x.cue --
+x: {[string]: _}
+x: #d
+#d: f: _
+
+y: { x }
+y: f: true
+-- out/compile --
+--- x.cue
+{
+  x: {
+    [string]: _
+  }
+  x: 〈0;#d〉
+  #d: {
+    f: _
+  }
+  y: {
+    〈1;x〉
+  }
+  y: {
+    f: true
+  }
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  7
+Reused: 3
+Allocs: 4
+Retain: 1
+
+Unifications: 7
+Conjuncts:    17
+Disjuncts:    8
+-- out/eval --
+(struct){
+  x: (#struct){
+    f: (_){ _ }
+  }
+  #d: (#struct){
+    f: (_){ _ }
+  }
+  y: (#struct){
+    f: (bool){ true }
+  }
+}

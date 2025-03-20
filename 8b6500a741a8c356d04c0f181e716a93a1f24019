@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7980a474_01e2fb31",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-20T08:38:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "340b8175_f378f35d",
+      "revId": "8b6500a741a8c356d04c0f181e716a93a1f24019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9680d444_c479c466",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-03-18T10:26:28Z",
       "side": 1,
       "message": "Personally I\u0027d have added the test case even though it causes the test to fail, then demonstrated the fix in the next CL, so it\u0027s clear _why_ the test is failing (because there are `\\x` sequences being generated).",
+      "revId": "8b6500a741a8c356d04c0f181e716a93a1f24019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0e8bd57_137a6f8e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-20T08:38:17Z",
+      "side": 1,
+      "message": "Sure, done. I had avoided this to not break the entire test and cause extra noise, but it\u0027s done now.",
+      "parentUuid": "9680d444_c479c466",
       "revId": "8b6500a741a8c356d04c0f181e716a93a1f24019",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

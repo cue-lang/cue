@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"fmt"
 	"go/ast"
+	"go/constant"
 	"go/token"
 	"go/types"
 	"os"
@@ -787,11 +788,23 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 				}
 
 				typ := e.pkg.TypesInfo.TypeOf(name)
-				c := e.pkg.TypesInfo.Defs[v.Names[i]].(*types.Const)
-				sv := c.Val().ExactString()
-				cv, err := parser.ParseExpr("", sv)
-				if err != nil {
-					panic(fmt.Errorf("failed to parse %v: %v", sv, err))
+				v := e.pkg.TypesInfo.Defs[v.Names[i]].(*types.Const).Val()
+				var cv cueast.Expr
+				switch v.Kind() {
+				case constant.String:
+					cv = &cueast.BasicLit{
+						Kind:  cuetoken.STRING,
+						Value: literal.String.Quote(constant.StringVal(v)),
+					}
+
+				default:
+					// TODO(mvdan): replace this with switch cases for Bool/Int/Float
+					sv := v.ExactString()
+					var err error
+					cv, err = parser.ParseExpr("", sv)
+					if err != nil {
+						panic(fmt.Errorf("failed to parse %v: %v", sv, err))
+					}
 				}
 
 				// Use the original Go value if compatible with CUE (octal is okay)

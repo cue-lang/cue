@@ -8,13 +8,13 @@ cmp decls/p_go_gen.cue decls/p_go_gen.cue.golden
 exec go run ./marshal
 cp stdout go_marshal.json
 cmp go_marshal.json go_marshal.json.golden
-! exec cue vet go_marshal.json schema.cue
+exec cue vet go_marshal.json schema.cue
 
 # Export from CUE and Unmarshal via Go's encoding/json.
-! exec cue export ./decls
-# cmp stdout cue_export.json.golden
-# stdin stdout
-# exec go run ./unmarshal
+exec cue export ./decls
+cmp stdout cue_export.json.golden
+stdin stdout
+exec go run ./unmarshal
 
 -- schema.cue --
 package schema
@@ -80,9 +80,9 @@ package decls
 
 #ValueSecond: int & 3000000000
 
-#ErrorPrefix: "\x1b[31mError:\x1b[0m" // "\033[31mError:\033[0m"
+#ErrorPrefix: "\u001b[31mError:\u001b[0m" // "\033[31mError:\033[0m"
 
-#ResetColor: "\x1b[0m" // "\u001b[0m"
+#ResetColor: "\u001b[0m"
 -- marshal/main.go --
 package main
 

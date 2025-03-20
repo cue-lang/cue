@@ -103,11 +103,15 @@ const (
 
 // TODO: merge with closeInfo: this is a leftover of the refactoring.
 type CloseInfo struct {
-	*closeInfo           // old implementation (TODO: remove)
-	defID          defID // Unique ID to track anything that gets inserted from this Conjunct.
+	*closeInfo // old implementation (TODO: remove)
+	// defID is a unique ID to track anything that gets inserted from this
+	// Conjunct.
+	defID          defID
 	enclosingEmbed defID // Tracks an embedding within a struct.
 	outerID        defID // Tracks the {} that should be closed after unifying.
-	hasOuter       bool
+	// hasOuter marks that an outer struct is present nad/or that an
+	// enclosingEmbed groups has been "activated" (ignore set to false).
+	hasOuter bool
 
 	// IsClosed is true if this conjunct represents a single level of closing
 	// as indicated by the closed builtin.

@@ -187,9 +187,9 @@ list: [1, 2, 3]
 -- export-cue.stdout --
 // Data fits the schema.
 Data: {
-	// name is the schema name.
-
 	// name is a specific name.
+
+	// name is the schema name.
 	name: "Foo"
 }
 

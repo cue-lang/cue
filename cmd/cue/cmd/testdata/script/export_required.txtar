@@ -25,8 +25,7 @@ a: x?: int // do not include this position
 
 b: #Def
 -- stderr.golden --
+#Def.x: field is required but not present:
+    ./y.cue:5:2
 a.x: field is required but not present:
     ./y.cue:1:4
-b.x: field is required but not present:
-    ./y.cue:5:2
-    ./y.cue:8:4

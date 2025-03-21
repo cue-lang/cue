@@ -24,11 +24,6 @@ x: #Def & {
 -- self_contained.golden --
 package blah
 
-DEF.#x & {
+int & {
 	5
-}
-
-//cue:path: #Def
-let DEF = {
-	#x: int
 }

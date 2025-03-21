@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "023a2b4d_0424bd0b",
+        "filename": "internal/mod/modload/update.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-21T12:41:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "76ade7e4_a96721c2",
+      "revId": "52f200e7b19ab81a456e504c350c4ef7b5e13eae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bf1fb3fa_2d837c02",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-03-21T10:01:32Z",
       "side": 1,
       "message": "when can this happen? perhaps add an example?",
+      "revId": "52f200e7b19ab81a456e504c350c4ef7b5e13eae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1655c9c_645c2e50",
+        "filename": "internal/mod/modload/update.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-21T12:41:13Z",
+      "side": 1,
+      "message": "Added an example.",
+      "parentUuid": "bf1fb3fa_2d837c02",
       "revId": "52f200e7b19ab81a456e504c350c4ef7b5e13eae",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0187e7a_f1407a8f",
+        "filename": "internal/mod/modload/update.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-21T12:41:13Z",
+      "side": 1,
+      "message": "Good catch. I started with this approach, then added the interface later but forgot to update the type check. Done.",
+      "parentUuid": "fc75072f_789b4e1a",
+      "revId": "52f200e7b19ab81a456e504c350c4ef7b5e13eae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cca9e394_4b8a5b0b",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-03-21T10:01:32Z",
       "side": 1,
       "message": "this func seems like it repeats the same 20 or so lines twice, but only swapping the version being fetched, and swapping FetchFromCache with Fetch. can we not refactor it so that all the other logic, such as \"exactly one hit\", is deduplicated?",
+      "revId": "52f200e7b19ab81a456e504c350c4ef7b5e13eae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58187ae5_4a63ef2e",
+        "filename": "internal/mod/modload/update.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-21T12:41:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cca9e394_4b8a5b0b",
       "revId": "52f200e7b19ab81a456e504c350c4ef7b5e13eae",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

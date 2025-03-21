@@ -280,16 +280,36 @@ nestedChain: {
 		#E: x: true
 	}
 }
+-- issue3836.cue --
+hidden: {
+	_Value: {
+		foo?: _
+		bar?: _
+		if (foo | bar) == _|_ {
+			bar: type: "bar"
+		}
+		out: [if bar != _|_ {"bar is set"}]
+	}
+	_Value.out
+}
+exposed: {
+	foo?: _
+	bar?: _
+	if (foo | bar) == _|_ {
+		bar: type: "bar"
+	}
+	out: [if bar != _|_ {"bar is set"}]
+}
 -- out/eval/stats --
-Leaks:  15
-Freed:  144
-Reused: 138
-Allocs: 21
-Retain: 67
+Leaks:  17
+Freed:  176
+Reused: 170
+Allocs: 23
+Retain: 77
 
-Unifications: 159
-Conjuncts:    169
-Disjuncts:    204
+Unifications: 181
+Conjuncts:    211
+Disjuncts:    248
 -- out/evalalpha --
 (struct){
   self: (struct){
@@ -323,6 +343,22 @@ Disjuncts:    204
           b?: (int){ int }
         }
       }
+    }
+  }
+  hidden: (#list){
+    _Value: (struct){
+      foo?: (_){ _ }
+      bar?: (struct){
+      }
+      out: (#list){
+      }
+    }
+  }
+  exposed: (struct){
+    foo?: (_){ _ }
+    bar?: (struct){
+    }
+    out: (#list){
     }
   }
   mutual: (struct){
@@ -553,7 +589,37 @@ diff old new
          }
        }
        t2: (struct){
-@@ -43,12 +43,12 @@
+@@ -33,15 +33,20 @@
+     }
+   }
+   hidden: (#list){
+-    _Value: (_|_){
+-      // [cycle] hidden._Value: circular dependency in evaluation of conditionals: (foo|bar) changed after evaluation:
+-      //     ./issue3836.cue:5:7
+-    }
+-    0: (string){ "bar is set" }
+-  }
+-  exposed: (_|_){
+-    // [cycle] exposed: circular dependency in evaluation of conditionals: (foo|bar) changed after evaluation:
+-    //     ./issue3836.cue:15:6
++    _Value: (struct){
++      foo?: (_){ _ }
++      bar?: (struct){
++      }
++      out: (#list){
++      }
++    }
++  }
++  exposed: (struct){
++    foo?: (_){ _ }
++    bar?: (struct){
++    }
++    out: (#list){
++    }
+   }
+   mutual: (struct){
+     noConflicts: (struct){
+@@ -54,12 +59,12 @@
      }
      mutualCycleFail: (struct){
        b: (_|_){
@@ -572,7 +638,7 @@ diff old new
        }
      }
      brokenCycleSuccess: (struct){
-@@ -189,17 +189,19 @@
+@@ -200,17 +205,19 @@
          ret?: (_){ _ }
        }
        expr: (#struct){
@@ -597,7 +663,7 @@ diff old new
      }
      brokenCycleSuccess: (struct){
        #E: (#struct){
-@@ -208,8 +210,12 @@
+@@ -219,8 +226,12 @@
        }
      }
      doubleAddfail: (_|_){
@@ -649,6 +715,17 @@ self.isNotConcrete: t1: int value is not an error.
         }
       }
     }
+  }
+  hidden: (#list){
+    _Value: (_|_){
+      // [cycle] hidden._Value: circular dependency in evaluation of conditionals: (foo|bar) changed after evaluation:
+      //     ./issue3836.cue:5:7
+    }
+    0: (string){ "bar is set" }
+  }
+  exposed: (_|_){
+    // [cycle] exposed: circular dependency in evaluation of conditionals: (foo|bar) changed after evaluation:
+    //     ./issue3836.cue:15:6
   }
   mutual: (struct){
     noConflicts: (struct){
@@ -889,6 +966,40 @@ self.isNotConcrete: t1: int value is not an error.
         }
       }
     }
+  }
+}
+--- issue3836.cue
+{
+  hidden: {
+    _Value: {
+      foo?: _
+      bar?: _
+      if ((〈0;foo〉|〈0;bar〉) == _|_(explicit error (_|_ literal) in source)) {
+        bar: {
+          type: "bar"
+        }
+      }
+      out: [
+        if (〈1;bar〉 != _|_(explicit error (_|_ literal) in source)) {
+          "bar is set"
+        },
+      ]
+    }
+    〈0;_Value〉.out
+  }
+  exposed: {
+    foo?: _
+    bar?: _
+    if ((〈0;foo〉|〈0;bar〉) == _|_(explicit error (_|_ literal) in source)) {
+      bar: {
+        type: "bar"
+      }
+    }
+    out: [
+      if (〈1;bar〉 != _|_(explicit error (_|_ literal) in source)) {
+        "bar is set"
+      },
+    ]
   }
 }
 --- mutual.cue

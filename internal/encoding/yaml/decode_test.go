@@ -488,6 +488,12 @@ b: {
 		"a: &a [1, 2]\nb: *a",
 		"a: [1, 2]\nb: [1, 2]", // TODO: a: [1, 2], b: a
 	},
+	{
+		`a: &a "b"
+*a : "c"`,
+		`a: "b"
+b: "c"`,
+	},
 
 	{
 		"foo: ''",
@@ -921,6 +927,8 @@ var unmarshalErrorTests = []struct {
 	{"a:\n- b: *,", "test.yaml:2: did not find expected alphabetic or numeric character"},
 	{"a: *b\n", "test.yaml: unknown anchor 'b' referenced"},
 	{"a: &a\n  b: *a\n", `test.yaml:2: anchor "a" value contains itself`},
+	{"a: &a { b: c }\n*a : foo", "test.yaml:2: invalid map key: !!map"},
+	{"a: &a [b]\n*a : foo", "test.yaml:2: invalid map key: !!seq"},
 	{"value: -", "test.yaml: block sequence entries are not allowed in this context"},
 	{"a: !!binary ==", "test.yaml:1: !!binary value contains invalid base64 data"},
 	{"{[.]}", `test.yaml:1: invalid map key: !!seq`},

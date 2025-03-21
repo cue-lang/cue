@@ -53,12 +53,15 @@ func TestEval(t *testing.T) {
 		ToDo: needFix,
 	}
 
+	cuedebug.Init()
+	flags := cuedebug.Flags
+
 	if *todo {
 		test.ToDo = nil
 	}
 
 	test.Run(t, func(tc *cuetxtar.Test) {
-		runEvalTest(tc, internal.DefaultVersion, cuedebug.Config{})
+		runEvalTest(tc, internal.DefaultVersion, flags)
 	})
 }
 
@@ -80,9 +83,8 @@ func TestEvalAlpha(t *testing.T) {
 	//
 	adt.DebugDeps = true // check unmatched dependencies.
 
-	flags := cuedebug.Config{
-		Sharing: true,
-	}
+	cuedebug.Init()
+	flags := cuedebug.Flags
 
 	var todoAlpha = map[string]string{}
 
@@ -137,7 +139,10 @@ func skipFiles(a ...*ast.File) (reason string) {
 }
 
 func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, flags cuedebug.Config) (errorCount int) {
-	flags.OpenInline = t.Bool("openInline")
+	// If #openInline is set, override the default as set by the cuedebug package.
+	if s, ok := t.Value("openInline"); ok {
+		flags.OpenInline = s == "true"
+	}
 
 	a := t.Instance()
 	r := runtime.NewWithSettings(version, flags)

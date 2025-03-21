@@ -21,9 +21,13 @@ Foo: {
 }
 foo: {
     foo: {
-        foo?: Foo
-        bar:  "barNested"
-        baz:  "barNested2"
+        foo?: {
+            foo?: Foo
+            bar:  string
+            baz:  bar + "2"
+        }
+        bar: "barNested"
+        baz: "barNested2"
     }
     bar: "barParent"
     baz: "barParent2"

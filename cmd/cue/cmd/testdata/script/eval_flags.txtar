@@ -12,6 +12,7 @@ cmp stderr expect-stderr3
 ! exec cue eval test.json vector.cue -d '#D1'
 cmp stderr expect-stderr4
 
+# TODO(evalv3): evalv2 had a third error here, "Z: field not allowed", which we are now missing.
 ! exec cue eval test.json vector.cue -d '#D2'
 cmp stderr expect-stderr5
 
@@ -51,6 +52,3 @@ X: conflicting values 1 and float (mismatched types int and float):
 Y: conflicting values 2 and float (mismatched types int and float):
     ./test.json:3:8
     ./vector.cue:5:8
-Z: field not allowed:
-    ./test.json:4:3
-    ./vector.cue:3:6

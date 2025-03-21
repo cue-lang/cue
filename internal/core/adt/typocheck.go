@@ -330,6 +330,14 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 	return id
 }
 
+// subField updates a CloseInfo for subfields of a struct.
+func (c *OpContext) subField(ci CloseInfo) CloseInfo {
+	ci.outerID = 0
+	ci.hasOuter = false
+	ci.enclosingEmbed = 0
+	return ci
+}
+
 func (n *nodeContext) newGroup(id CloseInfo) (CloseInfo, defID) {
 	srcID := id.defID
 	dstID := n.ctx.getNextDefID()

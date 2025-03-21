@@ -235,7 +235,7 @@ loop1:
 				n.aStruct = s
 				n.aStructID = ci
 			}
-			ci := ci
+			ci := n.ctx.subField(ci)
 			if x.ArcType == ArcOptional {
 				ci.setOptionalV3(n)
 			}
@@ -244,6 +244,7 @@ loop1:
 			n.insertArc(x.Label, x.ArcType, fc, ci, true)
 
 		case *LetField:
+			ci := n.ctx.subField(ci)
 			lc := MakeConjunct(childEnv, x, ci)
 			n.insertArc(x.Label, ArcMember, lc, ci, true)
 
@@ -257,6 +258,7 @@ loop1:
 			hasEllipsis = true
 
 		case *DynamicField:
+			ci := n.ctx.subField(ci)
 			if x.ArcType == ArcMember {
 				n.aStruct = s
 				n.aStructID = ci
@@ -264,7 +266,7 @@ loop1:
 			n.scheduleTask(handleDynamic, childEnv, x, ci)
 
 		case *BulkOptionalField:
-			ci := ci
+			ci := n.ctx.subField(ci)
 			ci.setOptionalV3(n)
 
 			// All do not depend on each other, so can be added at once.

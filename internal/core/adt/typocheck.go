@@ -333,6 +333,19 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 	return id
 }
 
+func (n *nodeContext) newGroup(id CloseInfo) (CloseInfo, defID) {
+	srcID := id.defID
+	dstID := n.ctx.getNextDefID()
+	n.reqDefIDs = append(n.reqDefIDs, refInfo{
+		v:      emptyNode,
+		id:     dstID,
+		ignore: true,
+	})
+	id.defID = dstID
+	n.addReplacement(replaceID{from: srcID, to: dstID, add: true})
+	return id, dstID
+}
+
 // AddOpenConjunct adds w as a conjunct of v and disables typo checking for w,
 // even if it is a definition.
 func (v *Vertex) AddOpenConjunct(ctx *OpContext, w *Vertex) {
@@ -379,16 +392,8 @@ func (n *nodeContext) injectEmbedNode(x Decl, id CloseInfo) CloseInfo {
 		}
 	}
 
-	dstID := n.ctx.getNextDefID()
-	n.reqDefIDs = append(n.reqDefIDs, refInfo{
-		v:      emptyNode,
-		id:     dstID,
-		ignore: true,
-	})
-	id.defID = dstID
+	id, dstID := n.newGroup(id)
 	id.enclosingEmbed = dstID
-
-	n.addReplacement(replaceID{from: srcID, to: dstID, add: true})
 
 	return id
 }
@@ -422,22 +427,12 @@ func (n *nodeContext) splitDefID(s *StructLit, id CloseInfo) CloseInfo {
 		return id
 	}
 
-	srcID := id.defID
-
-	dstID := n.ctx.getNextDefID()
-	n.reqDefIDs = append(n.reqDefIDs, refInfo{
-		v:      emptyNode,
-		id:     dstID,
-		ignore: true,
-	})
-	id.defID = dstID
+	id, dstID := n.newGroup(id)
 
 	if !id.hasOuter {
 		id.hasOuter = true
 		id.outerID = dstID
 	}
-
-	n.addReplacement(replaceID{from: srcID, to: dstID, add: true})
 
 	return id
 }

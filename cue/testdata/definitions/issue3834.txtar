@@ -157,27 +157,15 @@ Disjuncts:    237
         concrete: (#struct){
         }
       }
-      _a: (#struct){ |((#struct){
-          foo: (bool){ true }
-        }, (#struct){
-          foo: (bool){ true }
-          y!: (#struct){
-            z?: (_){ _ }
-          }
-        }) }
-      _b: (#struct){ |((#struct){
-          y: (#struct){
-          }
-          foo: (bool){ true }
-        }, (#struct){
-          y: (#struct){
-            z?: (_){ _ }
-          }
-          foo: (bool){ true }
-        }) }
-      concrete: (_|_){
-        // [incomplete] sub.t3.concrete: unresolved disjunction {y:{},foo:true} | {y:{z?:_},foo:true} (type struct):
-        //     ./in.cue:34:13
+      _a: (#struct){
+        foo: (bool){ true }
+      }
+      _b: (#struct){
+        y: (#struct){
+        }
+        foo: (bool){ true }
+      }
+      concrete: (#struct){
       }
     }
     t4: (#struct){
@@ -229,25 +217,15 @@ Disjuncts:    237
       }
       out: (bool){ true }
     }
-    _data: (#struct){ |((#struct){
-        Foo: (bool){ true }
-      }, (#struct){
-        Foo: (bool){ true }
-        Extra!: (#struct){
-          optional?: (_){ _ }
-        }
-      }) }
-    _dataWithExtra: (#struct){ |((#struct){
-        Extra: (#struct){
-        }
-        Foo: (bool){ true }
-      }, (#struct){
-        Extra: (#struct){
-          optional?: (_){ _ }
-        }
-        Foo: (bool){ true }
-      }) }
-    out: (bool){ false }
+    _data: (#struct){
+      Foo: (bool){ true }
+    }
+    _dataWithExtra: (#struct){
+      Extra: (#struct){
+      }
+      Foo: (bool){ true }
+    }
+    out: (bool){ true }
   }
   _a: (struct){
     foo: (bool){ true }
@@ -378,7 +356,7 @@ diff old new
        }
      }
      t3: (#struct){
-@@ -78,22 +79,34 @@
+@@ -78,20 +79,20 @@
            foo: (bool){ true }
          }
          _b: (#struct){
@@ -396,8 +374,6 @@ diff old new
 -        foo: (bool){ true }
 -        y: (#struct){
 -        }
--      }
--      concrete: (#struct){
 +          y: (#struct){
 +          }
 +          foo: (bool){ true }
@@ -405,31 +381,17 @@ diff old new
 +        concrete: (#struct){
 +        }
 +      }
-+      _a: (#struct){ |((#struct){
-+          foo: (bool){ true }
-+        }, (#struct){
-+          foo: (bool){ true }
-+          y!: (#struct){
-+            z?: (_){ _ }
-+          }
-+        }) }
-+      _b: (#struct){ |((#struct){
-+          y: (#struct){
-+          }
-+          foo: (bool){ true }
-+        }, (#struct){
-+          y: (#struct){
-+            z?: (_){ _ }
-+          }
-+          foo: (bool){ true }
-+        }) }
-+      concrete: (_|_){
-+        // [incomplete] sub.t3.concrete: unresolved disjunction {y:{},foo:true} | {y:{z?:_},foo:true} (type struct):
-+        //     ./in.cue:34:13
++      _a: (#struct){
++        foo: (bool){ true }
++      }
++      _b: (#struct){
++        y: (#struct){
++        }
++        foo: (bool){ true }
        }
-     }
-     t4: (#struct){
-@@ -102,22 +115,34 @@
+       concrete: (#struct){
+       }
+@@ -102,22 +103,34 @@
            foo: (bool){ true }
          }
          _b: (#struct){
@@ -480,49 +442,28 @@ diff old new
        }
      }
    }
-@@ -127,20 +152,41 @@
+@@ -127,9 +140,9 @@
          Foo: (bool){ true }
        }
        _dataWithExtra: (#struct){
 -        Foo: (bool){ true }
--        Extra: (#struct){
--        }
-+        Extra: (#struct){
-+        }
+         Extra: (#struct){
+         }
 +        Foo: (bool){ true }
        }
        out: (bool){ true }
      }
--    _data: (#struct){
+@@ -137,10 +150,21 @@
+       Foo: (bool){ true }
+     }
+     _dataWithExtra: (#struct){
 -      Foo: (bool){ true }
--    }
--    _dataWithExtra: (#struct){
--      Foo: (bool){ true }
--      Extra: (#struct){
--      }
--    }
--    out: (bool){ true }
--  }
-+    _data: (#struct){ |((#struct){
-+        Foo: (bool){ true }
-+      }, (#struct){
-+        Foo: (bool){ true }
-+        Extra!: (#struct){
-+          optional?: (_){ _ }
-+        }
-+      }) }
-+    _dataWithExtra: (#struct){ |((#struct){
-+        Extra: (#struct){
-+        }
-+        Foo: (bool){ true }
-+      }, (#struct){
-+        Extra: (#struct){
-+          optional?: (_){ _ }
-+        }
-+        Foo: (bool){ true }
-+      }) }
-+    out: (bool){ false }
-+  }
+       Extra: (#struct){
+       }
++      Foo: (bool){ true }
+     }
+     out: (bool){ true }
+   }
 +  _a: (struct){
 +    foo: (bool){ true }
 +  }

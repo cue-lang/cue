@@ -323,11 +323,8 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 	if id.enclosingEmbed != 0 && !ignore {
 		ph := id.outerID
 		n.addReplacement(replaceID{from: dstID, to: ph, add: true})
-		id.enclosingEmbed = 0
-
-		// Do not close additionally after this.
-		// NOTE: remove if we want close() to always close.
-		id.hasOuter = true
+		id, dstID = n.newGroup(id)
+		id.enclosingEmbed = dstID
 	}
 
 	return id

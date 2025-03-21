@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d00cea9_5b288909",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2025-03-21T10:34:51Z",
+      "side": 1,
+      "message": "Removing the hold ahead of trybot etc results.",
+      "revId": "d39c0469328108929ad0e08179e8afa927427a64",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

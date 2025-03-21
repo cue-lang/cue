@@ -464,9 +464,10 @@ func (n *nodeContext) checkTypos() {
 		// TODO(mem): child states of uncompleted nodes must have a state.
 		na := a.state
 
-		required := slices.Clone(required) // TODO(perf): use buffer
+		replacements := na.getReplacements(nil) // TODO(perf): use buffer
+		required := slices.Clone(required)      // TODO(perf): use buffer
 		// do the right thing in appendRequired either way.
-		required.replaceIDs(na.replaceIDs...)
+		required.replaceIDs(replacements...)
 
 		a = a.DerefDisjunct()
 		// TODO(perf): somehow prevent error generation of recursive structures,
@@ -706,6 +707,13 @@ outer2:
 			}
 		}
 	}
+}
+
+func (n *nodeContext) getReplacements(a []replaceID) []replaceID {
+	for p := n.node; p != nil && p.state != nil; p = p.Parent {
+		a = append(a, p.state.replaceIDs...)
+	}
+	return a
 }
 
 // appendRequired

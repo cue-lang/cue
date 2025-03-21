@@ -280,18 +280,81 @@ nestedChain: {
 		#E: x: true
 	}
 }
+-- issue3836.cue --
+issue3836: hidden: {
+	_Value: {
+		foo?: _
+		bar?: _
+		if (foo | bar) == _|_ {
+			bar: type: "bar"
+		}
+		out: [if bar != _|_ {"bar is set"}]
+	}
+	_Value.out
+}
+issue3836: exposed: {
+	foo?: _
+	bar?: _
+	if (foo | bar) == _|_ {
+		bar: type: "bar"
+	}
+	out: [if bar != _|_ {"bar is set"}]
+}
+-- issue3838.cue --
+issue3838: {
+	#T: {
+		subject: {
+			in: opt?: foo: int
+			out: [
+				if in.opt != _|_ {in.opt.foo},
+				0,
+			][0]
+		}
+		_test: {
+			assert: {
+				pass: bool
+			}
+			assert: {
+				notOk: _
+				pass:  false
+			} | {
+				invoke: _
+				res:    subject.out
+				pass:   true
+			}
+		}
+		results: _test.assert.pass
+	}
+	(#T & {
+		_test: assert: invoke: "foo"
+	}).results
+}
 -- out/eval/stats --
-Leaks:  15
-Freed:  144
-Reused: 138
-Allocs: 21
-Retain: 67
+Leaks:  29
+Freed:  207
+Reused: 201
+Allocs: 35
+Retain: 104
 
-Unifications: 159
-Conjuncts:    169
-Disjuncts:    204
+Unifications: 220
+Conjuncts:    279
+Disjuncts:    302
 -- out/evalalpha --
-(struct){
+Errors:
+_test.assert.res: invalid operand [
+	if in.opt != _|_ {in.opt.foo},
+	0,
+] (found list, want list or struct):
+    ./issue3838.cue:5:9
+_test.assert: 2 errors in empty disjunction::
+    ./issue3838.cue:23:12
+_test.assert.invoke: field not allowed:
+    ./issue3838.cue:23:12
+    ./issue3838.cue:26:18
+
+Result:
+(_|_){
+  // [eval]
   self: (struct){
     fail: (struct){
       a: (_|_){
@@ -322,6 +385,60 @@ Disjuncts:    204
         a: (struct){
           b?: (int){ int }
         }
+      }
+    }
+  }
+  issue3836: (struct){
+    hidden: (#list){
+      _Value: (struct){
+        foo?: (_){ _ }
+        bar?: (struct){
+        }
+        out: (#list){
+        }
+      }
+    }
+    exposed: (struct){
+      foo?: (_){ _ }
+      bar?: (struct){
+      }
+      out: (#list){
+      }
+    }
+  }
+  issue3838: (_|_){
+    // [eval] _test.assert.res: invalid operand [
+    // 	if in.opt != _|_ {in.opt.foo},
+    // 	0,
+    // ] (found list, want list or struct):
+    //     ./issue3838.cue:5:9
+    // _test.assert: 2 errors in empty disjunction::
+    //     ./issue3838.cue:23:12
+    // _test.assert.invoke: field not allowed:
+    //     ./issue3838.cue:23:12
+    //     ./issue3838.cue:26:18
+    #T: (#struct){
+      subject: (#struct){
+        in: (#struct){
+          opt?: (#struct){
+            foo: (int){ int }
+          }
+        }
+        out: (int){ 0 }
+      }
+      _test: (#struct){
+        assert: (#struct){ |((#struct){
+            pass: (bool){ false }
+            notOk: (_){ _ }
+          }, (#struct){
+            pass: (bool){ true }
+            invoke: (_){ _ }
+            res: (int){ 0 }
+          }) }
+      }
+      results: (_|_){
+        // [incomplete] issue3838.#T.results: unresolved disjunction {pass:false,notOk:_} | {pass:true,invoke:_,res:0} (type struct):
+        //     ./issue3838.cue:23:12
       }
     }
   }
@@ -523,7 +640,23 @@ Disjuncts:    204
 diff old new
 --- old
 +++ new
-@@ -2,14 +2,14 @@
+@@ -1,15 +1,29 @@
+-(struct){
++Errors:
++_test.assert.res: invalid operand [
++	if in.opt != _|_ {in.opt.foo},
++	0,
++] (found list, want list or struct):
++    ./issue3838.cue:5:9
++_test.assert: 2 errors in empty disjunction::
++    ./issue3838.cue:23:12
++_test.assert.invoke: field not allowed:
++    ./issue3838.cue:23:12
++    ./issue3838.cue:26:18
++
++Result:
++(_|_){
++  // [eval]
    self: (struct){
      fail: (struct){
        a: (_|_){
@@ -542,7 +675,7 @@ diff old new
          }
        }
        t2: (struct){
-@@ -21,8 +21,8 @@
+@@ -21,8 +35,8 @@
      }
      isNotConcrete: (struct){
        t1: (struct){
@@ -553,7 +686,54 @@ diff old new
          }
        }
        t2: (struct){
-@@ -43,12 +43,12 @@
+@@ -34,19 +48,33 @@
+   }
+   issue3836: (struct){
+     hidden: (#list){
+-      _Value: (_|_){
+-        // [cycle] issue3836.hidden._Value: circular dependency in evaluation of conditionals: (foo|bar) changed after evaluation:
+-        //     ./issue3836.cue:5:7
+-      }
+-      0: (string){ "bar is set" }
+-    }
+-    exposed: (_|_){
+-      // [cycle] issue3836.exposed: circular dependency in evaluation of conditionals: (foo|bar) changed after evaluation:
+-      //     ./issue3836.cue:15:6
+-    }
+-  }
+-  issue3838: (bool){
+-    true
++      _Value: (struct){
++        foo?: (_){ _ }
++        bar?: (struct){
++        }
++        out: (#list){
++        }
++      }
++    }
++    exposed: (struct){
++      foo?: (_){ _ }
++      bar?: (struct){
++      }
++      out: (#list){
++      }
++    }
++  }
++  issue3838: (_|_){
++    // [eval] _test.assert.res: invalid operand [
++    // 	if in.opt != _|_ {in.opt.foo},
++    // 	0,
++    // ] (found list, want list or struct):
++    //     ./issue3838.cue:5:9
++    // _test.assert: 2 errors in empty disjunction::
++    //     ./issue3838.cue:23:12
++    // _test.assert.invoke: field not allowed:
++    //     ./issue3838.cue:23:12
++    //     ./issue3838.cue:26:18
+     #T: (#struct){
+       subject: (#struct){
+         in: (#struct){
+@@ -83,12 +111,12 @@
      }
      mutualCycleFail: (struct){
        b: (_|_){
@@ -572,7 +752,7 @@ diff old new
        }
      }
      brokenCycleSuccess: (struct){
-@@ -189,17 +189,19 @@
+@@ -229,17 +257,19 @@
          ret?: (_){ _ }
        }
        expr: (#struct){
@@ -597,7 +777,7 @@ diff old new
      }
      brokenCycleSuccess: (struct){
        #E: (#struct){
-@@ -208,8 +210,12 @@
+@@ -248,8 +278,12 @@
        }
      }
      doubleAddfail: (_|_){
@@ -647,6 +827,46 @@ self.isNotConcrete: t1: int value is not an error.
         a: (struct){
           b?: (int){ int }
         }
+      }
+    }
+  }
+  issue3836: (struct){
+    hidden: (#list){
+      _Value: (_|_){
+        // [cycle] issue3836.hidden._Value: circular dependency in evaluation of conditionals: (foo|bar) changed after evaluation:
+        //     ./issue3836.cue:5:7
+      }
+      0: (string){ "bar is set" }
+    }
+    exposed: (_|_){
+      // [cycle] issue3836.exposed: circular dependency in evaluation of conditionals: (foo|bar) changed after evaluation:
+      //     ./issue3836.cue:15:6
+    }
+  }
+  issue3838: (bool){
+    true
+    #T: (#struct){
+      subject: (#struct){
+        in: (#struct){
+          opt?: (#struct){
+            foo: (int){ int }
+          }
+        }
+        out: (int){ 0 }
+      }
+      _test: (#struct){
+        assert: (#struct){ |((#struct){
+            pass: (bool){ false }
+            notOk: (_){ _ }
+          }, (#struct){
+            pass: (bool){ true }
+            invoke: (_){ _ }
+            res: (int){ 0 }
+          }) }
+      }
+      results: (_|_){
+        // [incomplete] issue3838.#T.results: unresolved disjunction {pass:false,notOk:_} | {pass:true,invoke:_,res:0} (type struct):
+        //     ./issue3838.cue:23:12
       }
     }
   }
@@ -889,6 +1109,85 @@ self.isNotConcrete: t1: int value is not an error.
         }
       }
     }
+  }
+}
+--- issue3836.cue
+{
+  issue3836: {
+    hidden: {
+      _Value: {
+        foo?: _
+        bar?: _
+        if ((〈0;foo〉|〈0;bar〉) == _|_(explicit error (_|_ literal) in source)) {
+          bar: {
+            type: "bar"
+          }
+        }
+        out: [
+          if (〈1;bar〉 != _|_(explicit error (_|_ literal) in source)) {
+            "bar is set"
+          },
+        ]
+      }
+      〈0;_Value〉.out
+    }
+  }
+  issue3836: {
+    exposed: {
+      foo?: _
+      bar?: _
+      if ((〈0;foo〉|〈0;bar〉) == _|_(explicit error (_|_ literal) in source)) {
+        bar: {
+          type: "bar"
+        }
+      }
+      out: [
+        if (〈1;bar〉 != _|_(explicit error (_|_ literal) in source)) {
+          "bar is set"
+        },
+      ]
+    }
+  }
+}
+--- issue3838.cue
+{
+  issue3838: {
+    #T: {
+      subject: {
+        in: {
+          opt?: {
+            foo: int
+          }
+        }
+        out: [
+          if (〈1;in〉.opt != _|_(explicit error (_|_ literal) in source)) {
+            〈2;in〉.opt.foo
+          },
+          0,
+        ][0]
+      }
+      _test: {
+        assert: {
+          pass: bool
+        }
+        assert: ({
+          notOk: _
+          pass: false
+        }|{
+          invoke: _
+          res: 〈2;subject〉.out
+          pass: true
+        })
+      }
+      results: 〈0;_test〉.assert.pass
+    }
+    (〈0;#T〉 & {
+      _test: {
+        assert: {
+          invoke: "foo"
+        }
+      }
+    }).results
   }
 }
 --- mutual.cue

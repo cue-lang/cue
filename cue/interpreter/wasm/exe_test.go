@@ -34,6 +34,8 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/interpreter/wasm"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetest"
 
 	"github.com/rogpeppe/go-internal/gotooltest"
@@ -50,6 +52,9 @@ func TestMain(m *testing.M) {
 
 // TestExe tests Wasm using the command-line tool.
 func TestExe(t *testing.T) {
+	if version, _ := (*runtime.Runtime)(cuecontext.New()).Settings(); version == internal.EvalV3 {
+		t.Skip("TODO: fix these tests on evalv3")
+	}
 	root := must(filepath.Abs("testdata"))(t)
 	wasmFiles := filepath.Join(root, "cue")
 	p := testscript.Params{

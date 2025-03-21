@@ -16,6 +16,24 @@
       "message": "this simply repeats the godoc from the interface, so personally I\u0027d remove it. I assume that most callers would do the call through the interface anyway, so they\u0027d still see the docs.\n\nOr like you did elsewhere:\n\u003e FetchFromCache implements [pkg.Interface].",
       "revId": "14b53a43fb46d573bf1ce1876a2fd7a03d6a6525",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "945725e0_f0b59d09",
+        "filename": "mod/modcache/fetch.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-21T12:41:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c5ce4c9b_853c5e3b",
+      "revId": "14b53a43fb46d573bf1ce1876a2fd7a03d6a6525",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

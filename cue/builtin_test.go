@@ -99,7 +99,7 @@ func TestBuiltins(t *testing.T) {
 		`"""` + "\n\ta: 1\n\t---\n\tb: 2\n\n\t" + `"""`,
 	}, {
 		test("struct", `struct.MinFields(0) & ""`),
-		`_|_ // conflicting values struct.MinFields(0) and "" (mismatched types struct and string)`,
+		`_|_ // conflicting values "" and struct.MinFields(0) (mismatched types string and struct)`,
 	}, {
 		test("struct", `struct.MinFields(0) & {a: 1}`),
 		`{

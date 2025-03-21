@@ -13,7 +13,7 @@ import (
 var Flags struct {
 	// EvalV3 enables the new evaluator. The new evaluator addresses various
 	// performance concerns.
-	EvalV3 bool
+	EvalV3 bool `envflag:"default:true"`
 
 	// Embed enables file embedding.
 	// TODO(v0.14): deprecate this flag to forbid disabling this feature.

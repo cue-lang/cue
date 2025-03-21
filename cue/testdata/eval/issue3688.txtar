@@ -1,0 +1,125 @@
+# This test is important in locking in the behaviour of the now-defalut
+# CUE_DEBUG=openinline=0.
+
+-- x.cue --
+package x
+
+#TypeA: string | {foo: int}
+
+#fun1: {
+	_in: #TypeA
+	out: [
+		// either `in` is a string
+		if (_in & string) != _|_ {
+			_in
+		},
+		// or `in` is has field `foo`
+		if _in.foo != _|_ {
+			"foo"
+		},
+		"impossible", // in & #TypeA != _|_ !!
+	][0]
+}
+
+examples: [string]: {
+	in: _
+	res: (#fun1 & {_in: in, _}).out
+}
+
+examples: eg1: in: "test"
+examples: eg2: in: {
+	foo: 5
+}
+examples: eg3: in: {
+	foo: 5
+	bar: "test"
+}
+-- out/compile --
+--- x.cue
+{
+  #TypeA: (string|{
+    foo: int
+  })
+  #fun1: {
+    _in: 〈1;#TypeA〉
+    out: [
+      if ((〈1;_in〉 & string) != _|_(explicit error (_|_ literal) in source)) {
+        〈2;_in〉
+      },
+      if (〈1;_in〉.foo != _|_(explicit error (_|_ literal) in source)) {
+        "foo"
+      },
+      "impossible",
+    ][0]
+  }
+  examples: {
+    [string]: {
+      in: _
+      res: (〈2;#fun1〉 & {
+        _in: 〈1;in〉
+        _
+      }).out
+    }
+  }
+  examples: {
+    eg1: {
+      in: "test"
+    }
+  }
+  examples: {
+    eg2: {
+      in: {
+        foo: 5
+      }
+    }
+  }
+  examples: {
+    eg3: {
+      in: {
+        foo: 5
+        bar: "test"
+      }
+    }
+  }
+}
+-- out/eval/stats --
+Leaks:  15
+Freed:  105
+Reused: 99
+Allocs: 21
+Retain: 37
+
+Unifications: 82
+Conjuncts:    246
+Disjuncts:    139
+-- out/eval --
+(struct){
+  #TypeA: ((string|struct)){ |((string){ string }, (#struct){
+      foo: (int){ int }
+    }) }
+  #fun1: (#struct){
+    _in(:x): ((string|struct)){ |((string){ string }, (#struct){
+        foo: (int){ int }
+      }) }
+    out: (string){ "impossible" }
+  }
+  examples: (struct){
+    eg1: (struct){
+      in: (string){ "test" }
+      res: (string){ "test" }
+    }
+    eg2: (struct){
+      in: (struct){
+        foo: (int){ 5 }
+      }
+      res: (string){ "foo" }
+    }
+    eg3: (struct){
+      in: (struct){
+        foo: (int){ 5 }
+        bar: (string){ "test" }
+      }
+      res: (string){ "impossible" }
+    }
+  }
+}

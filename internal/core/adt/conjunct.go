@@ -355,7 +355,6 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 	}
 	c.CloseInfo.defID = closeInfo.defID
 	c.CloseInfo.outerID = closeInfo.defID
-	c.CloseInfo.hasOuter = false
 
 	key := arcKey{arc, ciKey}
 	for _, k := range n.arcMap {

@@ -266,7 +266,7 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 
 	if isClosed {
 		for i, x := range n.reqDefIDs {
-			if x.id == id.outerID && id.hasOuter {
+			if x.id == id.outerID && id.outerID != 0 {
 				n.reqDefIDs[i].ignore = false
 				break
 			}
@@ -280,7 +280,7 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 		// This is the case, for instance, if a resolver resolves to a
 		// non-definition.
 		ignore = true
-	case id.enclosingEmbed != 0 || !id.hasOuter:
+	case id.enclosingEmbed != 0 || id.outerID == 0:
 		// We have a reference within an inner embedding group. If this is
 		// a definition, or otherwise typo checked struct, we need to track
 		// the embedding for mutual compatibility.
@@ -333,7 +333,6 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 // subField updates a CloseInfo for subfields of a struct.
 func (c *OpContext) subField(ci CloseInfo) CloseInfo {
 	ci.outerID = 0
-	ci.hasOuter = false
 	ci.enclosingEmbed = 0
 	return ci
 }
@@ -428,14 +427,12 @@ func (n *nodeContext) splitDefID(s *StructLit, id CloseInfo) CloseInfo {
 		// TODO(evalv3): use a more principled detection mechanism.
 		// TODO: set this as a flag in StructLit so as to not have to
 		// do the somewhat dangerous cast here.
-		// id.hasOuter = true
 		return id
 	}
 
 	id, dstID := n.newGroup(id)
 
-	if !id.hasOuter {
-		id.hasOuter = true
+	if id.outerID == 0 {
 		id.outerID = dstID
 	}
 

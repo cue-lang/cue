@@ -109,9 +109,6 @@ type CloseInfo struct {
 	defID          defID
 	enclosingEmbed defID // Tracks an embedding within a struct.
 	outerID        defID // Tracks the {} that should be closed after unifying.
-	// hasOuter marks that an outer struct is present nad/or that an
-	// enclosingEmbed groups has been "activated" (ignore set to false).
-	hasOuter bool
 
 	// IsClosed is true if this conjunct represents a single level of closing
 	// as indicated by the closed builtin.

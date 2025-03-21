@@ -1103,66 +1103,21 @@ issue3784: variant2: {
           }
         }
       }
-      t3: (struct){ |((struct){
-          #A: (#struct){
-            v: (int){ 1 }
-          }
-          BAZ: (_){ _ }
-          S: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          #B: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          f1: (int){ int }
-          f2: (int){ int }
-        }, (struct){
-          #A: (#struct){
-            v: (int){ 1 }
-          }
-          BAZ: (_){ _ }
-          S: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          #B: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          f1: (int){ int }
-          b2: (int){ int }
-        }, (struct){
-          #A: (#struct){
-            v: (int){ 1 }
-          }
-          BAZ: (_){ _ }
-          S: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          #B: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          b2: (int){ int }
-          f2: (int){ int }
-        }, (struct){
-          #A: (#struct){
-            v: (int){ 1 }
-          }
-          BAZ: (_){ _ }
-          S: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          #B: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          b2: (int){ int }
-        }) }
+      t3: (_|_){
+        // [incomplete] issue2209.simplified.t3.BAZ: undefined field: y:
+        //     ./issue2209full.cue:35:9
+        #A: (#struct){
+          v: (int){ 1 }
+        }
+        BAZ: (_){ _ }
+        S: (struct){
+          x: (int){ 1 }
+        }
+        #B: (#struct){
+          x: (int){ 1 }
+          y: (int){ 1 }
+        }
+      }
     }
     full: (struct){
       Foo: (#struct){
@@ -1914,7 +1869,7 @@ diff old new
              nullBar: (null){ null }
            }) }
        }
-@@ -555,48 +448,73 @@
+@@ -555,48 +448,28 @@
              x: (int){ 1 }
            }
          }
@@ -1933,13 +1888,18 @@ diff old new
 -          //     ./issue2209full.cue:24:17
 -        }
 -        b2: (int){ int }
--      }
--      t3: (_|_){
++        spec: (struct){
++          bar: (struct){
++          }
++        }
+       }
+       t3: (_|_){
 -        // [eval] issue2209.simplified.t3.BAZ: undefined field: y:
--        //     ./issue2209full.cue:35:9
--        #A: (#struct){
--          v: (int){ 1 }
--        }
++        // [incomplete] issue2209.simplified.t3.BAZ: undefined field: y:
+         //     ./issue2209full.cue:35:9
+         #A: (#struct){
+           v: (int){ 1 }
+         }
 -        BAZ: (_|_){
 -          // [eval] issue2209.simplified.t3.BAZ: undefined field: y:
 -          //     ./issue2209full.cue:35:9
@@ -1951,86 +1911,26 @@ diff old new
 -            x: (int){ 1 }
 -            y: (int){ 1 }
 -          }) }
--        #B: (#struct){
--          x: (int){ 1 }
--          y: (int){ 1 }
--        }
++        BAZ: (_){ _ }
++        S: (struct){
++          x: (int){ 1 }
++        }
+         #B: (#struct){
+           x: (int){ 1 }
+           y: (int){ 1 }
+         }
 -        b2: (int){ int }
 -      }
 -    }
 -    full: (_|_){
 -      // [eval]
-+        spec: (struct){
-+          bar: (struct){
-+          }
-+        }
 +      }
-+      t3: (struct){ |((struct){
-+          #A: (#struct){
-+            v: (int){ 1 }
-+          }
-+          BAZ: (_){ _ }
-+          S: (#struct){
-+            x: (int){ 1 }
-+            y: (int){ 1 }
-+          }
-+          #B: (#struct){
-+            x: (int){ 1 }
-+            y: (int){ 1 }
-+          }
-+          f1: (int){ int }
-+          f2: (int){ int }
-+        }, (struct){
-+          #A: (#struct){
-+            v: (int){ 1 }
-+          }
-+          BAZ: (_){ _ }
-+          S: (#struct){
-+            x: (int){ 1 }
-+            y: (int){ 1 }
-+          }
-+          #B: (#struct){
-+            x: (int){ 1 }
-+            y: (int){ 1 }
-+          }
-+          f1: (int){ int }
-+          b2: (int){ int }
-+        }, (struct){
-+          #A: (#struct){
-+            v: (int){ 1 }
-+          }
-+          BAZ: (_){ _ }
-+          S: (#struct){
-+            x: (int){ 1 }
-+            y: (int){ 1 }
-+          }
-+          #B: (#struct){
-+            x: (int){ 1 }
-+            y: (int){ 1 }
-+          }
-+          b2: (int){ int }
-+          f2: (int){ int }
-+        }, (struct){
-+          #A: (#struct){
-+            v: (int){ 1 }
-+          }
-+          BAZ: (_){ _ }
-+          S: (#struct){
-+            x: (int){ 1 }
-+            y: (int){ 1 }
-+          }
-+          #B: (#struct){
-+            x: (int){ 1 }
-+            y: (int){ 1 }
-+          }
-+          b2: (int){ int }
-+        }) }
 +    }
 +    full: (struct){
        Foo: (#struct){
          spec: (#struct){
            foo: (#struct){
-@@ -605,135 +523,52 @@
+@@ -605,135 +478,52 @@
            }
          }
          resource: (#struct){
@@ -2212,7 +2112,7 @@ diff old new
          }
        }
        #Abstract: (#struct){
-@@ -749,34 +584,34 @@
+@@ -749,34 +539,34 @@
              }
            }) }
          resource: (#struct){
@@ -2275,7 +2175,7 @@ diff old new
          }
        }
        _#Spec: (#struct){ |(*(#struct){
-@@ -803,36 +638,36 @@
+@@ -803,36 +593,36 @@
          }
        }
        _Thing: (#struct){
@@ -2341,7 +2241,7 @@ diff old new
        }
        #Constrained: (#struct){
          spec: (#struct){ |(*(#struct){
-@@ -916,19 +751,19 @@
+@@ -916,19 +706,19 @@
            common: (int){ 3 }
          }
          #FormFoo: (#struct){
@@ -2368,7 +2268,7 @@ diff old new
            }) }
        }
        #Input: (#struct){
-@@ -936,18 +771,12 @@
+@@ -936,18 +726,12 @@
          }
        }
        #summarizeReturn: (#struct){
@@ -2389,7 +2289,7 @@ diff old new
          out: (#list){
          }
        }
-@@ -1031,13 +860,11 @@
+@@ -1031,13 +815,11 @@
        }
      }
    }
@@ -2405,7 +2305,7 @@ diff old new
        0: (#struct){
          name: (string){ "FooBarFoo" }
        }
-@@ -1047,19 +874,8 @@
+@@ -1047,19 +829,8 @@
        2: (#struct){
          name: (string){ "FooQuuxFoo" }
        }
@@ -2427,7 +2327,7 @@ diff old new
        }
      }
    }
-@@ -1151,7 +967,9 @@
+@@ -1151,7 +922,9 @@
              cname?: (string){ string }
            }, (#struct){
              build_type!: (string){ "workflow" }
@@ -2438,7 +2338,7 @@ diff old new
                branch?: (string){ string }
                path?: (string){ string }
              }
-@@ -1160,12 +978,12 @@
+@@ -1160,12 +933,12 @@
        }
        out: (#struct){
          pages: (#struct){
@@ -2452,7 +2352,7 @@ diff old new
          }
        }
      }
-@@ -1195,9 +1013,15 @@
+@@ -1195,9 +968,15 @@
          build_type!: (string){ "legacy" }
          source: (#struct){
            branch!: (string){ string }
@@ -2471,7 +2371,7 @@ diff old new
        }
      }
    }
-@@ -1216,10 +1040,10 @@
+@@ -1216,10 +995,10 @@
          v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
        }
        c: (#struct){

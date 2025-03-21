@@ -150,16 +150,28 @@ issue3679: {
 	b: null | [string]
 	b: list.Repeat([for k, v in [0] { "bar" }], 1)
 }
--- out/eval/stats --
-Leaks:  3
-Freed:  172
-Reused: 165
-Allocs: 10
-Retain: 21
+-- issue3835.cue --
+issue3835: {
+	foo: {}
 
-Unifications: 173
-Conjuncts:    361
-Disjuncts:    191
+	_global: "global value"
+
+	[string]: {
+		if true let orgBotUser = _global {
+			out: "prefix: " + orgBotUser
+		}
+	}
+}
+-- out/eval/stats --
+Leaks:  5
+Freed:  176
+Reused: 170
+Allocs: 11
+Retain: 24
+
+Unifications: 179
+Conjuncts:    368
+Disjuncts:    197
 -- out/evalalpha --
 Errors:
 shareCycle.t1.Y.x.x: structural cycle
@@ -397,6 +409,15 @@ Result:
         }
       }
     }
+  }
+  issue3835: (struct){
+    foo: (struct){
+      out: (_|_){
+        // [cycle] issue3835.foo.out: cycle with field: orgBotUser:
+        //     ./issue3835.cue:8:22
+      }
+    }
+    _global: (string){ "global value" }
   }
   shareCycle: (_|_){
     // [eval]
@@ -683,7 +704,19 @@ diff old new
        b: (struct){
          c: (int){ 1 }
        }
-@@ -306,7 +260,7 @@
+@@ -283,7 +237,10 @@
+   }
+   issue3835: (struct){
+     foo: (struct){
+-      out: (string){ "prefix: global value" }
++      out: (_|_){
++        // [cycle] issue3835.foo.out: cycle with field: orgBotUser:
++        //     ./issue3835.cue:8:22
++      }
+     }
+     _global: (string){ "global value" }
+   }
+@@ -312,7 +269,7 @@
            // [eval] shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
            //     ./sharecycle.cue:8:6
            //     ./sharecycle.cue:9:5
@@ -976,6 +1009,12 @@ Result:
       }
     }
   }
+  issue3835: (struct){
+    foo: (struct){
+      out: (string){ "prefix: global value" }
+    }
+    _global: (string){ "global value" }
+  }
   shareCycle: (_|_){
     // [eval]
     t1: (_|_){
@@ -1218,6 +1257,18 @@ Result:
         b: {
           c: 1
         }
+      }
+    }
+  }
+}
+--- issue3835.cue
+{
+  issue3835: {
+    foo: {}
+    _global: "global value"
+    [string]: {
+      if true let orgBotUser = 〈1;_global〉 {
+        out: ("prefix: " + 〈1;orgBotUser〉)
       }
     }
   }

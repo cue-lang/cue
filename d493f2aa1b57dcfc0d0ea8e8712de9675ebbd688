@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c1e439d_a3ec5332",
+        "filename": "internal/mod/modpkgload/import.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-21T09:53:51Z",
+      "side": 1,
+      "message": "again, ast.ParseImportPath: https://review.gerrithub.io/c/cue-lang/cue/+/1208072",
+      "revId": "d493f2aa1b57dcfc0d0ea8e8712de9675ebbd688",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db5af1c6_bd43e8fd",
+        "filename": "internal/mod/modpkgload/import.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-21T09:53:51Z",
+      "side": 1,
+      "message": "neat, we should consider proposing this as an API in Go\u0027s path and path/filepath packages.",
+      "revId": "d493f2aa1b57dcfc0d0ea8e8712de9675ebbd688",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

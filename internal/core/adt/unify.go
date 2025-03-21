@@ -868,8 +868,7 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 			// not trigger the usual unblocking. Force unblocking may cause
 			// some values to be remain unevaluated.
 			switch {
-			case arc.withinLet,
-				needs == arcTypeKnown|fieldSetKnown:
+			case needs == arcTypeKnown|fieldSetKnown:
 				arc.unify(c, needs, finalize, false)
 			default:
 				// Now we can't finalize, at least try to get as far as we

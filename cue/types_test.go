@@ -2423,6 +2423,33 @@ func TestConjunctDedup(t *testing.T) {
 	})
 }
 
+// TestIssue3826 tests that if the same value gets added through multiple paths,
+// as can happen more readily through the API, that the deduplication of the
+// conjuncts works as expected.
+func TestIssue3826(t *testing.T) {
+	t.Skip() // TODO: remove when fixed.
+
+	cuetdtest.FullMatrix.Run(t, "test", func(t *testing.T, m *cuetdtest.M) {
+		ctx := m.CueContext()
+
+		v := ctx.CompileString(`
+			_schema: _
+			_schema
+			apiVersion: "foo"
+			spec: group: "foo"
+		`)
+		schema := ctx.CompileString(`
+			#Schema: spec!: group!: string
+		`).LookupPath(cue.MakePath(cue.Def("#Schema")))
+
+		v = v.FillPath(cue.MakePath(cue.Hid("_schema", "_")), schema)
+
+		if err := v.Validate(); err != nil {
+			t.Error(err)
+		}
+	})
+}
+
 func TestEquals(t *testing.T) {
 	testCases := []struct {
 		a, b string

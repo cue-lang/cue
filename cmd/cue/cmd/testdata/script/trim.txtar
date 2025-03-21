@@ -34,7 +34,7 @@ foo: bar: {
 	sList: [{b: "foo"}, {}]
 }
 
-foo: baz: {}
+foo: baz: _
 
 foo: multipath: {
 	t: [string]: {
@@ -43,7 +43,9 @@ foo: multipath: {
 		x: >=5 & <=8 & int
 	}
 
-	t: u: {}
+	t: u: {
+		x: 5
+	}
 }
 
 group: {
@@ -55,7 +57,7 @@ group: {
 		aa: 8 // new value
 	}
 
-	comp: baz: {} // TODO: remove: implied by comprehension above
+	comp: baz: _ // TODO: remove: implied by comprehension above
 }
 -- trim/trim.cue --
 package trim

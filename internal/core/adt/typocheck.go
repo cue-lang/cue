@@ -262,7 +262,7 @@ func (n *nodeContext) addResolver(v *Vertex, id CloseInfo, forceIgnore bool) Clo
 		return id
 	}
 
-	isClosed := id.FromDef || n.node.ClosedNonRecursive
+	isClosed := id.FromDef || v.ClosedNonRecursive
 
 	if isClosed {
 		for i, x := range n.reqDefIDs {
@@ -623,7 +623,7 @@ outer:
 				} else {
 					temp = append(temp, buf...)
 				}
-				buf = buf[:0] // TODO: perf use OpContext buffer.
+				buf = buf[:0] // TODO(perf): use OpContext buffer.
 			}
 		}
 

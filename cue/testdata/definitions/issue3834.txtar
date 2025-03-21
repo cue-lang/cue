@@ -121,27 +121,15 @@ Disjuncts:    237
         concrete: (struct){
         }
       }
-      _a: (struct){ |((struct){
-          foo: (bool){ true }
-        }, (#struct){
-          foo: (bool){ true }
-          y!: (struct){
-            z?: (_){ _ }
-          }
-        }) }
-      _b: (struct){ |((struct){
-          y: (struct){
-          }
-          foo: (bool){ true }
-        }, (#struct){
-          y: (struct){
-            z?: (_){ _ }
-          }
-          foo: (bool){ true }
-        }) }
-      concrete: (_|_){
-        // [incomplete] sub.t2.concrete: unresolved disjunction {y:{},foo:true} | {y:{z?:_},foo:true} (type struct):
-        //     ./in.cue:25:13
+      _a: (struct){
+        foo: (bool){ true }
+      }
+      _b: (struct){
+        y: (struct){
+        }
+        foo: (bool){ true }
+      }
+      concrete: (struct){
       }
     }
     t3: (#struct){
@@ -181,27 +169,15 @@ Disjuncts:    237
         concrete: (#struct){
         }
       }
-      _a: (#struct){ |((#struct){
-          foo: (bool){ true }
-        }, (#struct){
-          foo: (bool){ true }
-          y!: (#struct){
-            z?: (_){ _ }
-          }
-        }) }
-      _b: (#struct){ |((#struct){
-          y: (#struct){
-          }
-          foo: (bool){ true }
-        }, (#struct){
-          y: (#struct){
-            z?: (_){ _ }
-          }
-          foo: (bool){ true }
-        }) }
-      concrete: (_|_){
-        // [incomplete] sub.t4.concrete: unresolved disjunction {y:{},foo:true} | {y:{z?:_},foo:true} (type struct):
-        //     ./in.cue:43:13
+      _a: (#struct){
+        foo: (bool){ true }
+      }
+      _b: (#struct){
+        y: (#struct){
+        }
+        foo: (bool){ true }
+      }
+      concrete: (#struct){
       }
     }
   }
@@ -227,29 +203,17 @@ Disjuncts:    237
     }
     out: (bool){ true }
   }
-  _a: (struct){ |((struct){
-      foo: (bool){ true }
-    }, (#struct){
-      foo: (bool){ true }
-      y!: (struct){
-        z?: (_){ _ }
-      }
-    }) }
-  _b: (struct){ |((struct){
-      y: (struct){
-      }
-      foo: (bool){ true }
-    }, (#struct){
-      y: (struct){
-        z?: (_){ _ }
-      }
-      foo: (bool){ true }
-    }) }
-  concrete: (_|_){
-    // [incomplete] concrete: unresolved disjunction {y:{},foo:true} | {y:{z?:_},foo:true} (type struct):
-    //     ./in.cue:6:12
+  _a: (struct){
+    foo: (bool){ true }
   }
-  isTrue: (bool){ false }
+  _b: (struct){
+    y: (struct){
+    }
+    foo: (bool){ true }
+  }
+  concrete: (struct){
+  }
+  isTrue: (bool){ true }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -260,10 +224,8 @@ diff old new
      }
      _b: (struct){
 -      foo: (bool){ true }
--      y: (struct){
--      }
-+      y: (struct){
-+      }
+       y: (struct){
+       }
 +      foo: (bool){ true }
      }
      concrete: (struct){
@@ -319,7 +281,7 @@ diff old new
        }
        concrete: (struct){
        }
-@@ -54,22 +43,34 @@
+@@ -54,20 +43,20 @@
            foo: (bool){ true }
          }
          _b: (struct){
@@ -337,8 +299,6 @@ diff old new
 -        foo: (bool){ true }
 -        y: (struct){
 -        }
--      }
--      concrete: (struct){
 +          y: (struct){
 +          }
 +          foo: (bool){ true }
@@ -346,31 +306,17 @@ diff old new
 +        concrete: (struct){
 +        }
 +      }
-+      _a: (struct){ |((struct){
-+          foo: (bool){ true }
-+        }, (#struct){
-+          foo: (bool){ true }
-+          y!: (struct){
-+            z?: (_){ _ }
-+          }
-+        }) }
-+      _b: (struct){ |((struct){
-+          y: (struct){
-+          }
-+          foo: (bool){ true }
-+        }, (#struct){
-+          y: (struct){
-+            z?: (_){ _ }
-+          }
-+          foo: (bool){ true }
-+        }) }
-+      concrete: (_|_){
-+        // [incomplete] sub.t2.concrete: unresolved disjunction {y:{},foo:true} | {y:{z?:_},foo:true} (type struct):
-+        //     ./in.cue:25:13
++      _a: (struct){
++        foo: (bool){ true }
++      }
++      _b: (struct){
++        y: (struct){
++        }
++        foo: (bool){ true }
        }
-     }
-     t3: (#struct){
-@@ -78,20 +79,20 @@
+       concrete: (struct){
+       }
+@@ -78,20 +67,20 @@
            foo: (bool){ true }
          }
          _b: (#struct){
@@ -405,7 +351,7 @@ diff old new
        }
        concrete: (#struct){
        }
-@@ -102,22 +103,34 @@
+@@ -102,20 +91,20 @@
            foo: (bool){ true }
          }
          _b: (#struct){
@@ -423,8 +369,6 @@ diff old new
 -        foo: (bool){ true }
 -        y: (#struct){
 -        }
--      }
--      concrete: (#struct){
 +          y: (#struct){
 +          }
 +          foo: (bool){ true }
@@ -432,31 +376,17 @@ diff old new
 +        concrete: (#struct){
 +        }
 +      }
-+      _a: (#struct){ |((#struct){
-+          foo: (bool){ true }
-+        }, (#struct){
-+          foo: (bool){ true }
-+          y!: (#struct){
-+            z?: (_){ _ }
-+          }
-+        }) }
-+      _b: (#struct){ |((#struct){
-+          y: (#struct){
-+          }
-+          foo: (bool){ true }
-+        }, (#struct){
-+          y: (#struct){
-+            z?: (_){ _ }
-+          }
-+          foo: (bool){ true }
-+        }) }
-+      concrete: (_|_){
-+        // [incomplete] sub.t4.concrete: unresolved disjunction {y:{},foo:true} | {y:{z?:_},foo:true} (type struct):
-+        //     ./in.cue:43:13
++      _a: (#struct){
++        foo: (bool){ true }
++      }
++      _b: (#struct){
++        y: (#struct){
++        }
++        foo: (bool){ true }
        }
-     }
-   }
-@@ -127,9 +140,9 @@
+       concrete: (#struct){
+       }
+@@ -127,9 +116,9 @@
          Foo: (bool){ true }
        }
        _dataWithExtra: (#struct){
@@ -467,7 +397,7 @@ diff old new
        }
        out: (bool){ true }
      }
-@@ -137,10 +150,33 @@
+@@ -137,10 +126,21 @@
        Foo: (bool){ true }
      }
      _dataWithExtra: (#struct){
@@ -478,32 +408,18 @@ diff old new
      }
      out: (bool){ true }
    }
-+  _a: (struct){ |((struct){
-+      foo: (bool){ true }
-+    }, (#struct){
-+      foo: (bool){ true }
-+      y!: (struct){
-+        z?: (_){ _ }
-+      }
-+    }) }
-+  _b: (struct){ |((struct){
-+      y: (struct){
-+      }
-+      foo: (bool){ true }
-+    }, (#struct){
-+      y: (struct){
-+        z?: (_){ _ }
-+      }
-+      foo: (bool){ true }
-+    }) }
-+  concrete: (_|_){
-+    // [incomplete] concrete: unresolved disjunction {y:{},foo:true} | {y:{z?:_},foo:true} (type struct):
-+    //     ./in.cue:6:12
++  _a: (struct){
++    foo: (bool){ true }
 +  }
-+  isTrue: (bool){ false }
++  _b: (struct){
++    y: (struct){
++    }
++    foo: (bool){ true }
++  }
++  concrete: (struct){
++  }
++  isTrue: (bool){ true }
  }
--- diff/todo/p1 --
-*.concrete: several fields where there is still an disjunction
 -- out/eval --
 (struct){
   X: (struct){

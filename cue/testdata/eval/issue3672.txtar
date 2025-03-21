@@ -1,0 +1,3596 @@
+-- x.cue --
+import "strings"
+
+import "encoding/json"
+
+#FinDefSetElemType: {
+	#Type!: _
+}
+#FinDefSetDefinition: {
+	#Elem!: #FinDefSetElemType
+	#Alternatives: {
+		allBut: {
+			AllBut: [...#Elem.#Type]
+		}
+		only: {
+			Only: [...#Elem.#Type]
+		}
+	}
+}
+
+#mkFinDefSet: {
+	#Definition!: #FinDefSetDefinition
+	#Type: or([for _, v in #Definition.#Alternatives {v}])
+}
+
+#FinDefSetElemType: {
+	#Type: _
+	toString!: {
+		_input:  #Type
+		_output: string
+	}
+}
+
+#FinDefSetDefinition: {
+	#Elem!: #FinDefSetElemType
+	#Alternatives: {
+		allBut: {
+			AllBut: [...#Elem.#Type]
+			let xs = [for x in AllBut {(#Elem.toString & {_input: x})._output}]
+			let str = strings.Join(xs, "\",\"")
+			orgSyntax: "AllBut [\(str)]"
+		}
+		only: {
+			Only: [...#Elem.#Type]
+			let xs = [for x in Only {(#Elem.toString & {_input: x})._output}]
+			let str = strings.Join(xs, "\",\"")
+			orgSyntax: "Only [\(str)]"
+		}
+	}
+}
+
+#ConfigText: string | {UseSectionName: true}
+
+#ConfigTextRule: #ConfigText | {Append: #ConfigText} | {Prepend: #ConfigText}
+
+#ConfigTextRules: #ConfigTextRule | [#ConfigTextRule, #ConfigTextRule, ...#ConfigTextRule]
+
+#FinDefSetConfigTextElem: #FinDefSetElemType
+#FinDefSetConfigTextElem: {
+	#Type: #ConfigTextRules
+}
+
+#FinDefSetOfConfigText: (
+	#mkFinDefSet & {
+		#Definition: {#Elem: #FinDefSetConfigTextElem}
+	}).#Type
+
+#FinDefSetConfigTextElem: {
+	toString: {
+		_input: #ConfigTextRules
+		_output: (#orgForConfigTextRules & {source: _input}).orgSyntax
+	}
+}
+
+#orgForConfigText: {
+	IN=source: #ConfigText
+	orgSyntax: {
+		let INS = IN & string
+		let INO = IN & {UseSectionName: _}
+		[
+			if INS != _|_ {
+				json.Marshal(INS)
+			},
+			if INO != _|_ {
+				"UseSectionName"
+			},
+			"Impossible",
+		][0]
+	}
+}
+
+#orgForConfigTextRule: {
+	IN=source: #ConfigTextRule
+	orgSyntax: {
+		let INA = IN & {Append: _}
+		let INP = IN & {Prepend: _}
+		[
+			if INA != _|_ {
+				"Append " + (#orgForConfigText & {source: INA.Append}).orgSyntax
+			},
+			if INP != _|_ {
+				"Prepend " + (#orgForConfigText & {source: INP.Prepend}).orgSyntax
+			},
+			(#orgForConfigText & {source: IN}).orgSyntax,
+		][0]
+	}
+}
+
+#orgForConfigTextRules: {
+	IN=source: #ConfigTextRules
+	orgSyntax: {
+		let INL = IN & [...]
+		[
+			if INL != _|_ {
+				let elems = [for x in IN {(#orgForConfigTextRule & {source: x}).orgSyntax}]
+				let result = strings.Join(elems, "\",\"")
+				"[\(result)]"
+			},
+			(#orgForConfigTextRule & {source: IN}).orgSyntax,
+		][0]
+	}
+}
+
+value0: #FinDefSetOfConfigText
+value0: Only: [{UseSectionName: true}]
+-- out/compile --
+--- x.cue
+{
+  #FinDefSetElemType: {
+    #Type!: _
+  }
+  #FinDefSetDefinition: {
+    #Elem!: 〈1;#FinDefSetElemType〉
+    #Alternatives: {
+      allBut: {
+        AllBut: [
+          ...〈3;#Elem〉.#Type,
+        ]
+      }
+      only: {
+        Only: [
+          ...〈3;#Elem〉.#Type,
+        ]
+      }
+    }
+  }
+  #mkFinDefSet: {
+    #Definition!: 〈1;#FinDefSetDefinition〉
+    #Type: or([
+      for _, v in 〈1;#Definition〉.#Alternatives {
+        〈1;v〉
+      },
+    ])
+  }
+  #FinDefSetElemType: {
+    #Type: _
+    toString!: {
+      _input: 〈1;#Type〉
+      _output: string
+    }
+  }
+  #FinDefSetDefinition: {
+    #Elem!: 〈1;#FinDefSetElemType〉
+    #Alternatives: {
+      allBut: {
+        AllBut: [
+          ...〈3;#Elem〉.#Type,
+        ]
+        let xs#1 = [
+          for _, x in 〈1;AllBut〉 {
+            (〈5;#Elem〉.toString & {
+              _input: 〈2;x〉
+            })._output
+          },
+        ]
+        let str#2 = 〈import;strings〉.Join(〈0;let xs#1〉, "\",\"")
+        orgSyntax: "AllBut [\(〈0;let str#2〉)]"
+      }
+      only: {
+        Only: [
+          ...〈3;#Elem〉.#Type,
+        ]
+        let xs#3 = [
+          for _, x in 〈1;Only〉 {
+            (〈5;#Elem〉.toString & {
+              _input: 〈2;x〉
+            })._output
+          },
+        ]
+        let str#4 = 〈import;strings〉.Join(〈0;let xs#3〉, "\",\"")
+        orgSyntax: "Only [\(〈0;let str#4〉)]"
+      }
+    }
+  }
+  #ConfigText: (string|{
+    UseSectionName: true
+  })
+  #ConfigTextRule: (〈0;#ConfigText〉|{
+    Append: 〈1;#ConfigText〉
+  }|{
+    Prepend: 〈1;#ConfigText〉
+  })
+  #ConfigTextRules: (〈0;#ConfigTextRule〉|[
+    〈1;#ConfigTextRule〉,
+    〈1;#ConfigTextRule〉,
+    ...〈1;#ConfigTextRule〉,
+  ])
+  #FinDefSetConfigTextElem: 〈0;#FinDefSetElemType〉
+  #FinDefSetConfigTextElem: {
+    #Type: 〈1;#ConfigTextRules〉
+  }
+  #FinDefSetOfConfigText: (〈0;#mkFinDefSet〉 & {
+    #Definition: {
+      #Elem: 〈2;#FinDefSetConfigTextElem〉
+    }
+  }).#Type
+  #FinDefSetConfigTextElem: {
+    toString: {
+      _input: 〈2;#ConfigTextRules〉
+      _output: (〈2;#orgForConfigTextRules〉 & {
+        source: 〈1;_input〉
+      }).orgSyntax
+    }
+  }
+  #orgForConfigText: {
+    source: 〈1;#ConfigText〉
+    orgSyntax: {
+      let INS#5 = (〈1;source〉 & string)
+      let INO#6 = (〈1;source〉 & {
+        UseSectionName: _
+      })
+      [
+        if (〈1;let INS#5〉 != _|_(explicit error (_|_ literal) in source)) {
+          〈import;"encoding/json"〉.Marshal(〈2;let INS#5〉)
+        },
+        if (〈1;let INO#6〉 != _|_(explicit error (_|_ literal) in source)) {
+          "UseSectionName"
+        },
+        "Impossible",
+      ][0]
+    }
+  }
+  #orgForConfigTextRule: {
+    source: 〈1;#ConfigTextRule〉
+    orgSyntax: {
+      let INA#7 = (〈1;source〉 & {
+        Append: _
+      })
+      let INP#8 = (〈1;source〉 & {
+        Prepend: _
+      })
+      [
+        if (〈1;let INA#7〉 != _|_(explicit error (_|_ literal) in source)) {
+          ("Append " + (〈4;#orgForConfigText〉 & {
+            source: 〈3;let INA#7〉.Append
+          }).orgSyntax)
+        },
+        if (〈1;let INP#8〉 != _|_(explicit error (_|_ literal) in source)) {
+          ("Prepend " + (〈4;#orgForConfigText〉 & {
+            source: 〈3;let INP#8〉.Prepend
+          }).orgSyntax)
+        },
+        (〈3;#orgForConfigText〉 & {
+          source: 〈3;source〉
+        }).orgSyntax,
+      ][0]
+    }
+  }
+  #orgForConfigTextRules: {
+    source: 〈1;#ConfigTextRules〉
+    orgSyntax: {
+      let INL#9 = (〈1;source〉 & [
+        ...,
+      ])
+      [
+        if (〈1;let INL#9〉 != _|_(explicit error (_|_ literal) in source)) {
+          let elems#A = [
+            for _, x in 〈4;source〉 {
+              (〈7;#orgForConfigTextRule〉 & {
+                source: 〈2;x〉
+              }).orgSyntax
+            },
+          ]
+          let result#B = 〈import;strings〉.Join(〈0;let elems#A〉, "\",\"")
+          "[\(〈0;let result#B〉)]"
+        },
+        (〈3;#orgForConfigTextRule〉 & {
+          source: 〈3;source〉
+        }).orgSyntax,
+      ][0]
+    }
+  }
+  value0: 〈0;#FinDefSetOfConfigText〉
+  value0: {
+    Only: [
+      {
+        UseSectionName: true
+      },
+    ]
+  }
+}
+-- out/evalalpha/stats --
+Leaks:  2341
+Freed:  0
+Reused: 0
+Allocs: 2341
+Retain: 0
+
+Unifications: 665
+Conjuncts:    2757
+Disjuncts:    667
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  245
+-Freed:  446592
+-Reused: 446567
+-Allocs: 270
+-Retain: 3132
++Leaks:  2341
++Freed:  0
++Reused: 0
++Allocs: 2341
++Retain: 0
+ 
+-Unifications: 190593
+-Conjuncts:    642054
+-Disjuncts:    449487
++Unifications: 665
++Conjuncts:    2757
++Disjuncts:    667
+-- out/eval/stats --
+Leaks:  245
+Freed:  446592
+Reused: 446567
+Allocs: 270
+Retain: 3132
+
+Unifications: 190593
+Conjuncts:    642054
+Disjuncts:    449487
+-- out/evalalpha --
+(struct){
+  #FinDefSetElemType: (#struct){
+    #Type: (_){ _ }
+    toString!: (#struct){
+      _input: (_){ _ }
+      _output: (string){ string }
+    }
+  }
+  #FinDefSetDefinition: (#struct){
+    #Elem!: ~(#FinDefSetElemType)
+    #Alternatives: (#struct){
+      allBut: (#struct){
+        AllBut: (list){
+        }
+        let xs#1 = (#list){
+        }
+        let str#2 = (string){ "" }
+        orgSyntax: (string){ "AllBut []" }
+      }
+      only: (#struct){
+        Only: (list){
+        }
+        let xs#3 = (#list){
+        }
+        let str#4 = (string){ "" }
+        orgSyntax: (string){ "Only []" }
+      }
+    }
+  }
+  #mkFinDefSet: (#struct){
+    #Definition!: ~(#FinDefSetDefinition)
+    #Type: (#struct){ |((#struct){
+        AllBut: (list){
+        }
+        let xs#1 = (#list){
+        }
+        let str#2 = (string){ "" }
+        orgSyntax: (string){ "AllBut []" }
+      }, (#struct){
+        Only: (list){
+        }
+        let xs#3 = (#list){
+        }
+        let str#4 = (string){ "" }
+        orgSyntax: (string){ "Only []" }
+      }) }
+  }
+  #ConfigText: ((string|struct)){ |((string){ string }, (#struct){
+      UseSectionName: (bool){ true }
+    }) }
+  #ConfigTextRule: ((string|struct)){ |((string){ string }, (#struct){
+      UseSectionName: (bool){ true }
+    }, (#struct){
+      Append: ((string|struct)){ |((string){ string }, (#struct){
+          UseSectionName: (bool){ true }
+        }) }
+    }, (#struct){
+      Prepend: ((string|struct)){ |((string){ string }, (#struct){
+          UseSectionName: (bool){ true }
+        }) }
+    }) }
+  #ConfigTextRules: ((string|list|struct)){ |((string){ string }, (#struct){
+      UseSectionName: (bool){ true }
+    }, (#struct){
+      Append: ((string|struct)){ |((string){ string }, (#struct){
+          UseSectionName: (bool){ true }
+        }) }
+    }, (#struct){
+      Prepend: ((string|struct)){ |((string){ string }, (#struct){
+          UseSectionName: (bool){ true }
+        }) }
+    }, (list){
+      0: ((string|struct)){ |((string){ string }, (#struct){
+          UseSectionName: (bool){ true }
+        }, (#struct){
+          Append: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }) }
+        }, (#struct){
+          Prepend: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }) }
+        }) }
+      1: ((string|struct)){ |((string){ string }, (#struct){
+          UseSectionName: (bool){ true }
+        }, (#struct){
+          Append: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }) }
+        }, (#struct){
+          Prepend: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }) }
+        }) }
+    }) }
+  #FinDefSetConfigTextElem: (#struct){
+    #Type: ((string|list|struct)){ |((string){ string }, (#struct){
+        UseSectionName: (bool){ true }
+      }, (#struct){
+        Append: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }) }
+      }, (#struct){
+        Prepend: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }) }
+      }, (list){
+        0: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }, (#struct){
+            Append: ((string|struct)){ |((string){ string }, (#struct){
+                UseSectionName: (bool){ true }
+              }) }
+          }, (#struct){
+            Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                UseSectionName: (bool){ true }
+              }) }
+          }) }
+        1: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }, (#struct){
+            Append: ((string|struct)){ |((string){ string }, (#struct){
+                UseSectionName: (bool){ true }
+              }) }
+          }, (#struct){
+            Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                UseSectionName: (bool){ true }
+              }) }
+          }) }
+      }) }
+    toString: (#struct){
+      _input: ((string|list|struct)){ |((string){ string }, (#struct){
+          UseSectionName: (bool){ true }
+        }, (#struct){
+          Append: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }) }
+        }, (#struct){
+          Prepend: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }) }
+        }, (list){
+          0: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }, (#struct){
+              Append: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }, (#struct){
+              Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }) }
+          1: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }, (#struct){
+              Append: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }, (#struct){
+              Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }) }
+        }) }
+      _output: (_|_){
+        // [incomplete] #FinDefSetConfigTextElem.toString._output.elems: invalid interpolation: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
+        //     ./x.cue:116:5
+        //     ./x.cue:114:18
+        let INL#9 = (list){
+          0: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }, (#struct){
+              Append: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }, (#struct){
+              Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }) }
+          1: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }, (#struct){
+              Append: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }, (#struct){
+              Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }) }
+        }
+        let elems#A = (_|_){
+          // [incomplete] #FinDefSetConfigTextElem.toString._output.elems: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
+          //     ./x.cue:114:18
+        }
+        let result#B = (_|_){
+          // [incomplete] #FinDefSetConfigTextElem.toString._output.elems: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
+          //     ./x.cue:114:18
+        }
+      }
+    }
+  }
+  #FinDefSetOfConfigText: (#struct){ |((#struct){
+      AllBut: (list){
+      }
+      let xs#1 = (#list){
+      }
+      let str#2 = (string){ "" }
+      orgSyntax: (string){ "AllBut []" }
+    }, (#struct){
+      Only: (list){
+      }
+      let xs#3 = (#list){
+      }
+      let str#4 = (string){ "" }
+      orgSyntax: (string){ "Only []" }
+    }) }
+  #orgForConfigText: (#struct){
+    source: ((string|struct)){ |((string){ string }, (#struct){
+        UseSectionName: (bool){ true }
+      }) }
+    orgSyntax: (string){
+      "UseSectionName"
+      let INS#5 = (string){ string }
+      let INO#6 = (#struct){
+        UseSectionName: (bool){ true }
+      }
+    }
+  }
+  #orgForConfigTextRule: (#struct){
+    source: ((string|struct)){ |((string){ string }, (#struct){
+        UseSectionName: (bool){ true }
+      }, (#struct){
+        Append: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }) }
+      }, (#struct){
+        Prepend: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }) }
+      }) }
+    orgSyntax: (string){
+      "Append UseSectionName"
+      let INA#7 = (#struct){
+        Append: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }) }
+      }
+      let INP#8 = (#struct){
+        Prepend: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }) }
+      }
+    }
+  }
+  #orgForConfigTextRules: (#struct){
+    source: ((string|list|struct)){ |((string){ string }, (#struct){
+        UseSectionName: (bool){ true }
+      }, (#struct){
+        Append: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }) }
+      }, (#struct){
+        Prepend: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }) }
+      }, (list){
+        0: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }, (#struct){
+            Append: ((string|struct)){ |((string){ string }, (#struct){
+                UseSectionName: (bool){ true }
+              }) }
+          }, (#struct){
+            Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                UseSectionName: (bool){ true }
+              }) }
+          }) }
+        1: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }, (#struct){
+            Append: ((string|struct)){ |((string){ string }, (#struct){
+                UseSectionName: (bool){ true }
+              }) }
+          }, (#struct){
+            Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                UseSectionName: (bool){ true }
+              }) }
+          }) }
+      }) }
+    orgSyntax: (_|_){
+      // [incomplete] #orgForConfigTextRules.orgSyntax.elems: invalid interpolation: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
+      //     ./x.cue:116:5
+      //     ./x.cue:114:18
+      let INL#9 = (list){
+        0: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }, (#struct){
+            Append: ((string|struct)){ |((string){ string }, (#struct){
+                UseSectionName: (bool){ true }
+              }) }
+          }, (#struct){
+            Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                UseSectionName: (bool){ true }
+              }) }
+          }) }
+        1: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }, (#struct){
+            Append: ((string|struct)){ |((string){ string }, (#struct){
+                UseSectionName: (bool){ true }
+              }) }
+          }, (#struct){
+            Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                UseSectionName: (bool){ true }
+              }) }
+          }) }
+      }
+      let elems#A = (_|_){
+        // [incomplete] #orgForConfigTextRules.orgSyntax.elems: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
+        //     ./x.cue:114:18
+      }
+      let result#B = (_|_){
+        // [incomplete] #orgForConfigTextRules.orgSyntax.elems: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
+        //     ./x.cue:114:18
+      }
+    }
+  }
+  value0: (#struct){
+    Only: (#list){
+      0: (#struct){
+        UseSectionName: (bool){ true }
+      }
+    }
+    let xs#3 = (#list){
+      0: (string){
+        "UseSectionName"
+        let INL#9 = (_|_){
+          // [eval] value0.xs.0.INL: cannot combine regular field "Append" with [true,string | {UseSectionName:true}]:
+          //     ./x.cue:111:13
+          // value0.xs.0.INL: cannot combine regular field "Prepend" with [true,string | {UseSectionName:true}]:
+          //     ./x.cue:111:13
+          // value0.xs.0.INL: conflicting values [...] and string (mismatched types list and string):
+          //     ./x.cue:51:14
+          //     ./x.cue:111:18
+          // value0.xs.0.INL: conflicting values [...] and {Append:#ConfigText} (mismatched types list and struct):
+          //     ./x.cue:53:32
+          //     ./x.cue:111:18
+          // value0.xs.0.INL: conflicting values [...] and {Prepend:#ConfigText} (mismatched types list and struct):
+          //     ./x.cue:53:56
+          //     ./x.cue:111:18
+          // value0.xs.0.INL: conflicting values [...] and {UseSectionName:true} (mismatched types list and struct):
+          //     ./x.cue:51:23
+          //     ./x.cue:111:18
+          // value0.xs.0.INL: 3 errors in empty disjunction::
+          //     ./x.cue:113:7
+          // value0.xs.0.INL: cannot combine regular field "UseSectionName" with [true,#ConfigTextRule & _,#ConfigTextRule & _]:
+          //     ./x.cue:124:33
+          //     ./x.cue:111:13
+          UseSectionName: (bool){ true }
+        }
+        let INA#7 = (_|_){
+          // [eval] value0.xs.0.INA: conflicting values {Prepend:#ConfigText} and [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] (mismatched types struct and list):
+          //     ./x.cue:53:56
+          //     ./x.cue:55:37
+          // value0.xs.0.INA: 3 errors in empty disjunction::
+          //     ./x.cue:97:7
+          // value0.xs.0.INA.Append: field not allowed:
+          //     ./x.cue:97:7
+          //     ./x.cue:94:19
+          // value0.xs.0.INA.UseSectionName: field not allowed:
+          //     ./x.cue:97:7
+          //     ./x.cue:124:17
+          Append: (_){ _ }
+          UseSectionName: (bool){ true }
+        }
+        let INP#8 = (_|_){
+          // [eval] value0.xs.0.INP: conflicting values {Prepend:#ConfigText} and [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] (mismatched types struct and list):
+          //     ./x.cue:53:56
+          //     ./x.cue:55:37
+          // value0.xs.0.INP: 2 errors in empty disjunction::
+          //     ./x.cue:100:7
+          // value0.xs.0.INP.UseSectionName: field not allowed:
+          //     ./x.cue:100:7
+          //     ./x.cue:124:17
+          Prepend: (_){ _ }
+          UseSectionName: (bool){ true }
+        }
+        let INS#5 = (_|_){
+          // [eval] value0.xs.0.INS: conflicting values string and {UseSectionName:true} (mismatched types string and struct):
+          //     ./x.cue:77:18
+          //     ./x.cue:124:16
+          UseSectionName: (bool){ true }
+        }
+        let INO#6 = (#struct){
+          UseSectionName: (bool){ true }
+        }
+      }
+    }
+    let str#4 = (string){ "UseSectionName" }
+    orgSyntax: (string){ "Only [UseSectionName]" }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -7,13 +7,7 @@
+     }
+   }
+   #FinDefSetDefinition: (#struct){
+-    #Elem!: (#struct){
+-      #Type: (_){ _ }
+-      toString!: (#struct){
+-        _input: (_){ _ }
+-        _output: (string){ string }
+-      }
+-    }
++    #Elem!: ~(#FinDefSetElemType)
+     #Alternatives: (#struct){
+       allBut: (#struct){
+         AllBut: (list){
+@@ -34,33 +28,7 @@
+     }
+   }
+   #mkFinDefSet: (#struct){
+-    #Definition!: (#struct){
+-      #Elem!: (#struct){
+-        #Type: (_){ _ }
+-        toString!: (#struct){
+-          _input: (_){ _ }
+-          _output: (string){ string }
+-        }
+-      }
+-      #Alternatives: (#struct){
+-        allBut: (#struct){
+-          AllBut: (list){
+-          }
+-          let xs#1 = (#list){
+-          }
+-          let str#2 = (string){ "" }
+-          orgSyntax: (string){ "AllBut []" }
+-        }
+-        only: (#struct){
+-          Only: (list){
+-          }
+-          let xs#3 = (#list){
+-          }
+-          let str#4 = (string){ "" }
+-          orgSyntax: (string){ "Only []" }
+-        }
+-      }
+-    }
++    #Definition!: ~(#FinDefSetDefinition)
+     #Type: (#struct){ |((#struct){
+         AllBut: (list){
+         }
+@@ -196,8 +164,41 @@
+             }) }
+         }) }
+       _output: (_|_){
+-        // [cycle] invalid interpolation: cycle error:
++        // [incomplete] #FinDefSetConfigTextElem.toString._output.elems: invalid interpolation: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
+         //     ./x.cue:116:5
++        //     ./x.cue:114:18
++        let INL#9 = (list){
++          0: ((string|struct)){ |((string){ string }, (#struct){
++              UseSectionName: (bool){ true }
++            }, (#struct){
++              Append: ((string|struct)){ |((string){ string }, (#struct){
++                  UseSectionName: (bool){ true }
++                }) }
++            }, (#struct){
++              Prepend: ((string|struct)){ |((string){ string }, (#struct){
++                  UseSectionName: (bool){ true }
++                }) }
++            }) }
++          1: ((string|struct)){ |((string){ string }, (#struct){
++              UseSectionName: (bool){ true }
++            }, (#struct){
++              Append: ((string|struct)){ |((string){ string }, (#struct){
++                  UseSectionName: (bool){ true }
++                }) }
++            }, (#struct){
++              Prepend: ((string|struct)){ |((string){ string }, (#struct){
++                  UseSectionName: (bool){ true }
++                }) }
++            }) }
++        }
++        let elems#A = (_|_){
++          // [incomplete] #FinDefSetConfigTextElem.toString._output.elems: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
++          //     ./x.cue:114:18
++        }
++        let result#B = (_|_){
++          // [incomplete] #FinDefSetConfigTextElem.toString._output.elems: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
++          //     ./x.cue:114:18
++        }
+       }
+     }
+   }
+@@ -290,8 +291,41 @@
+           }) }
+       }) }
+     orgSyntax: (_|_){
+-      // [cycle] invalid interpolation: cycle error:
++      // [incomplete] #orgForConfigTextRules.orgSyntax.elems: invalid interpolation: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
+       //     ./x.cue:116:5
++      //     ./x.cue:114:18
++      let INL#9 = (list){
++        0: ((string|struct)){ |((string){ string }, (#struct){
++            UseSectionName: (bool){ true }
++          }, (#struct){
++            Append: ((string|struct)){ |((string){ string }, (#struct){
++                UseSectionName: (bool){ true }
++              }) }
++          }, (#struct){
++            Prepend: ((string|struct)){ |((string){ string }, (#struct){
++                UseSectionName: (bool){ true }
++              }) }
++          }) }
++        1: ((string|struct)){ |((string){ string }, (#struct){
++            UseSectionName: (bool){ true }
++          }, (#struct){
++            Append: ((string|struct)){ |((string){ string }, (#struct){
++                UseSectionName: (bool){ true }
++              }) }
++          }, (#struct){
++            Prepend: ((string|struct)){ |((string){ string }, (#struct){
++                UseSectionName: (bool){ true }
++              }) }
++          }) }
++      }
++      let elems#A = (_|_){
++        // [incomplete] #orgForConfigTextRules.orgSyntax.elems: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
++        //     ./x.cue:114:18
++      }
++      let result#B = (_|_){
++        // [incomplete] #orgForConfigTextRules.orgSyntax.elems: unresolved disjunction string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}} | [string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}},string | {UseSectionName:true} | {Append:string | {UseSectionName:true}} | {Prepend:string | {UseSectionName:true}}] (type (string|list|struct)):
++        //     ./x.cue:114:18
++      }
+     }
+   }
+   value0: (#struct){
+@@ -304,1180 +338,59 @@
+       0: (string){
+         "UseSectionName"
+         let INL#9 = (_|_){
+-          // [eval] value0.xs.0.INL: conflicting values [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] and {UseSectionName:true} (mismatched types list and struct):
+-          //     ./x.cue:22:52
+-          //     ./x.cue:44:29
+-          //     ./x.cue:44:56
+-          //     ./x.cue:55:37
+-          //     ./x.cue:62:25
+-          //     ./x.cue:70:12
+-          //     ./x.cue:70:47
+-          //     ./x.cue:111:13
+-          //     ./x.cue:123:9
+-          //     ./x.cue:124:16
++          // [eval] value0.xs.0.INL: cannot combine regular field "Append" with [true,string | {UseSectionName:true}]:
++          //     ./x.cue:111:13
++          // value0.xs.0.INL: cannot combine regular field "Prepend" with [true,string | {UseSectionName:true}]:
++          //     ./x.cue:111:13
++          // value0.xs.0.INL: conflicting values [...] and string (mismatched types list and string):
++          //     ./x.cue:51:14
++          //     ./x.cue:111:18
+           // value0.xs.0.INL: conflicting values [...] and {Append:#ConfigText} (mismatched types list and struct):
+-          //     ./x.cue:22:52
+-          //     ./x.cue:44:29
+-          //     ./x.cue:53:32
+-          //     ./x.cue:55:19
+-          //     ./x.cue:62:25
+-          //     ./x.cue:70:12
+-          //     ./x.cue:109:13
+-          //     ./x.cue:111:13
+-          //     ./x.cue:111:18
+-          //     ./x.cue:123:9
++          //     ./x.cue:53:32
++          //     ./x.cue:111:18
+           // value0.xs.0.INL: conflicting values [...] and {Prepend:#ConfigText} (mismatched types list and struct):
+-          //     ./x.cue:22:52
+-          //     ./x.cue:44:29
+-          //     ./x.cue:53:56
+-          //     ./x.cue:55:19
+-          //     ./x.cue:62:25
+-          //     ./x.cue:70:12
+-          //     ./x.cue:109:13
+-          //     ./x.cue:111:13
+-          //     ./x.cue:111:18
+-          //     ./x.cue:123:9
++          //     ./x.cue:53:56
++          //     ./x.cue:111:18
+           // value0.xs.0.INL: conflicting values [...] and {UseSectionName:true} (mismatched types list and struct):
+-          //     ./x.cue:22:52
+-          //     ./x.cue:44:29
+-          //     ./x.cue:51:23
+-          //     ./x.cue:53:18
+-          //     ./x.cue:55:19
+-          //     ./x.cue:62:25
+-          //     ./x.cue:70:12
+-          //     ./x.cue:109:13
+-          //     ./x.cue:111:13
+-          //     ./x.cue:111:18
+-          //     ./x.cue:123:9
+-          // value0.xs.0.INL: conflicting values string and [...] (mismatched types string and list):
+-          //     ./x.cue:22:52
+-          //     ./x.cue:44:29
+-          //     ./x.cue:51:14
+-          //     ./x.cue:62:25
+-          //     ./x.cue:70:12
+-          //     ./x.cue:111:18
+-          //     ./x.cue:123:9
+-          // value0.xs.0.INL: 5 errors in empty disjunction::
++          //     ./x.cue:51:23
++          //     ./x.cue:111:18
++          // value0.xs.0.INL: 3 errors in empty disjunction::
+           //     ./x.cue:113:7
+-          UseSectionName: (_|_){
+-            // [eval] value0.xs.0.INL.UseSectionName: conflicting values true and string (mismatched types bool and string):
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:51:14
+-            //     ./x.cue:53:18
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:109:13
+-            //     ./x.cue:111:13
+-            //     ./x.cue:123:9
+-            //     ./x.cue:124:33
+-            // value0.xs.0.INL.UseSectionName: conflicting values true and {Append:#ConfigText} (mismatched types bool and struct):
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:53:32
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:109:13
+-            //     ./x.cue:111:13
+-            //     ./x.cue:123:9
+-            //     ./x.cue:124:33
+-            // value0.xs.0.INL.UseSectionName: conflicting values true and {Prepend:#ConfigText} (mismatched types bool and struct):
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:53:56
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:109:13
+-            //     ./x.cue:111:13
+-            //     ./x.cue:123:9
+-            //     ./x.cue:124:33
+-            // value0.xs.0.INL.UseSectionName: conflicting values true and {UseSectionName:true} (mismatched types bool and struct):
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:51:23
+-            //     ./x.cue:53:18
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:109:13
+-            //     ./x.cue:111:13
+-            //     ./x.cue:123:9
+-            //     ./x.cue:124:33
+-            // value0.xs.0.INL.UseSectionName: 4 errors in empty disjunction::
+-            //     ./x.cue:113:7
+-            Prepend: ((string|struct)){ |((string){ string }, (#struct){
+-                UseSectionName: (bool){ true }
+-              }) }
+-          }
+-          0: ((string|struct)){ |((string){ string }, (#struct){
+-              UseSectionName: (bool){ true }
+-            }, (#struct){
+-              Append: ((string|struct)){ |((string){ string }, (#struct){
+-                  UseSectionName: (bool){ true }
+-                }) }
+-            }, (#struct){
+-              Prepend: ((string|struct)){ |((string){ string }, (#struct){
+-                  UseSectionName: (bool){ true }
+-                }) }
+-            }) }
+-          1: ((string|struct)){ |((string){ string }, (#struct){
+-              UseSectionName: (bool){ true }
+-            }, (#struct){
+-              Append: ((string|struct)){ |((string){ string }, (#struct){
+-                  UseSectionName: (bool){ true }
+-                }) }
+-            }, (#struct){
+-              Prepend: ((string|struct)){ |((string){ string }, (#struct){
+-                  UseSectionName: (bool){ true }
+-                }) }
+-            }) }
++          // value0.xs.0.INL: cannot combine regular field "UseSectionName" with [true,#ConfigTextRule & _,#ConfigTextRule & _]:
++          //     ./x.cue:124:33
++          //     ./x.cue:111:13
++          UseSectionName: (bool){ true }
+         }
+         let INA#7 = (_|_){
+-          // [eval] value0.xs.0.INA: conflicting values [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] and {Append:#ConfigText} (mismatched types list and struct):
+-          //     ./x.cue:22:52
+-          //     ./x.cue:44:29
+-          //     ./x.cue:53:32
+-          //     ./x.cue:55:19
+-          //     ./x.cue:55:37
+-          //     ./x.cue:62:25
+-          //     ./x.cue:70:12
+-          //     ./x.cue:94:13
+-          //     ./x.cue:109:13
+-          //     ./x.cue:112:3
+-          //     ./x.cue:118:4
+-          //     ./x.cue:118:38
+-          //     ./x.cue:123:9
+-          // value0.xs.0.INA: conflicting values [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] and {Prepend:#ConfigText} (mismatched types list and struct):
+-          //     ./x.cue:22:52
+-          //     ./x.cue:44:29
+-          //     ./x.cue:53:56
+-          //     ./x.cue:55:19
+-          //     ./x.cue:55:37
+-          //     ./x.cue:62:25
+-          //     ./x.cue:70:12
+-          //     ./x.cue:94:13
+-          //     ./x.cue:109:13
+-          //     ./x.cue:112:3
+-          //     ./x.cue:118:4
+-          //     ./x.cue:118:38
+-          //     ./x.cue:123:9
+-          // value0.xs.0.INA: conflicting values [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] and {UseSectionName:true} (mismatched types list and struct):
+-          //     ./x.cue:22:52
+-          //     ./x.cue:28:12
+-          //     ./x.cue:44:29
+-          //     ./x.cue:51:23
+-          //     ./x.cue:53:18
+-          //     ./x.cue:55:19
+-          //     ./x.cue:55:37
+-          //     ./x.cue:59:9
+-          //     ./x.cue:62:25
+-          //     ./x.cue:70:12
+-          //     ./x.cue:70:47
+-          //     ./x.cue:94:13
+-          //     ./x.cue:112:3
+-          //     ./x.cue:118:4
+-          //     ./x.cue:118:38
+-          //     ./x.cue:123:9
+-          // value0.xs.0.INA: conflicting values string and {Append:#ConfigText} (mismatched types string and struct):
+-          //     ./x.cue:22:52
+-          //     ./x.cue:44:29
+-          //     ./x.cue:51:14
+-          //     ./x.cue:53:32
+-          //     ./x.cue:62:25
+-          //     ./x.cue:70:12
+-          //     ./x.cue:92:13
+-          //     ./x.cue:94:13
+-          //     ./x.cue:112:3
+-          //     ./x.cue:118:4
+-          //     ./x.cue:123:9
+-          // value0.xs.0.INA: conflicting values string and {Append:_} (mismatched types string and struct):
+-          //     ./x.cue:22:52
+-          //     ./x.cue:44:29
+-          //     ./x.cue:51:14
+-          //     ./x.cue:62:25
+-          //     ./x.cue:70:12
+-          //     ./x.cue:94:18
+-          //     ./x.cue:112:3
+-          //     ./x.cue:118:4
+-          //     ./x.cue:123:9
+-          // value0.xs.0.INA: conflicting values string and {Prepend:#ConfigText} (mismatched types string and struct):
+-          //     ./x.cue:22:52
+-          //     ./x.cue:28:12
+-          //     ./x.cue:44:29
+-          //     ./x.cue:51:14
+-          //     ./x.cue:53:56
+-          //     ./x.cue:55:19
+-          //     ./x.cue:59:9
+-          //     ./x.cue:62:25
+-          //     ./x.cue:70:12
+-          //     ./x.cue:70:47
+-          //     ./x.cue:94:13
+-          //     ./x.cue:112:3
+-          //     ./x.cue:118:4
+-          //     ./x.cue:118:38
+-          //     ./x.cue:123:9
+-          // value0.xs.0.INA: conflicting values string and {UseSectionName:true} (mismatched types string and struct):
+-          //     ./x.cue:22:52
+-          //     ./x.cue:44:29
+-          //     ./x.cue:51:14
+-          //     ./x.cue:51:23
+-          //     ./x.cue:53:18
+-          //     ./x.cue:62:25
+-          //     ./x.cue:70:12
+-          //     ./x.cue:92:13
+-          //     ./x.cue:94:13
+-          //     ./x.cue:112:3
+-          //     ./x.cue:118:4
+-          //     ./x.cue:123:9
+-          // value0.xs.0.INA: 9 errors in empty disjunction::
++          // [eval] value0.xs.0.INA: conflicting values {Prepend:#ConfigText} and [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] (mismatched types struct and list):
++          //     ./x.cue:53:56
++          //     ./x.cue:55:37
++          // value0.xs.0.INA: 3 errors in empty disjunction::
+           //     ./x.cue:97:7
+           // value0.xs.0.INA.Append: field not allowed:
+           //     ./x.cue:97:7
+-          //     ./x.cue:15:14
+-          //     ./x.cue:22:52
+-          //     ./x.cue:28:12
+-          //     ./x.cue:44:29
+-          //     ./x.cue:44:56
+-          //     ./x.cue:51:23
+-          //     ./x.cue:53:18
+-          //     ./x.cue:55:19
+-          //     ./x.cue:59:9
+-          //     ./x.cue:62:25
+-          //     ./x.cue:69:11
+-          //     ./x.cue:70:12
+-          //     ./x.cue:70:47
+-          //     ./x.cue:92:13
+-          //     ./x.cue:94:13
+           //     ./x.cue:94:19
+-          //     ./x.cue:109:13
+-          //     ./x.cue:112:3
+-          //     ./x.cue:118:4
+-          //     ./x.cue:118:38
+-          //     ./x.cue:123:9
+-          //     ./x.cue:124:16
+           // value0.xs.0.INA.UseSectionName: field not allowed:
+           //     ./x.cue:97:7
+-          //     ./x.cue:15:14
+-          //     ./x.cue:22:52
+-          //     ./x.cue:28:12
+-          //     ./x.cue:44:29
+-          //     ./x.cue:44:56
+-          //     ./x.cue:51:24
+-          //     ./x.cue:53:18
+-          //     ./x.cue:53:32
+-          //     ./x.cue:55:19
+-          //     ./x.cue:59:9
+-          //     ./x.cue:62:25
+-          //     ./x.cue:69:11
+-          //     ./x.cue:70:12
+-          //     ./x.cue:70:47
+-          //     ./x.cue:92:13
+-          //     ./x.cue:94:13
+-          //     ./x.cue:94:18
+-          //     ./x.cue:109:13
+-          //     ./x.cue:112:3
+-          //     ./x.cue:118:4
+-          //     ./x.cue:118:38
+-          //     ./x.cue:123:9
+-          //     ./x.cue:124:17
+-          UseSectionName: (_|_){
+-            // [eval] value0.xs.0.INA.UseSectionName: conflicting values true and string (mismatched types bool and string):
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:51:14
+-            //     ./x.cue:53:18
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:94:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            //     ./x.cue:124:33
+-            // value0.xs.0.INA.UseSectionName: conflicting values true and {Append:#ConfigText} (mismatched types bool and struct):
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:53:32
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:94:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            //     ./x.cue:124:33
+-            // value0.xs.0.INA.UseSectionName: conflicting values true and {Prepend:#ConfigText} (mismatched types bool and struct):
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:53:56
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:94:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            //     ./x.cue:124:33
+-            // value0.xs.0.INA.UseSectionName: conflicting values true and {UseSectionName:true} (mismatched types bool and struct):
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:51:23
+-            //     ./x.cue:53:18
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:94:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            //     ./x.cue:124:33
+-            // value0.xs.0.INA.UseSectionName: 4 errors in empty disjunction::
+-            //     ./x.cue:97:7
+-            Prepend: ((string|struct)){ |((string){ string }, (#struct){
+-                UseSectionName: (bool){ true }
+-              }) }
+-          }
+-          Append: (_|_){
+-            // [eval] value0.xs.0.INA.Append: conflicting values string and {Append:#ConfigText} (mismatched types string and struct):
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:51:14
+-            //     ./x.cue:53:32
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:94:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            // value0.xs.0.INA.Append: conflicting values string and {Prepend:#ConfigText} (mismatched types string and struct):
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:51:14
+-            //     ./x.cue:53:56
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:94:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            // value0.xs.0.INA.Append: conflicting values string and {UseSectionName:true} (mismatched types string and struct):
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:51:14
+-            //     ./x.cue:51:23
+-            //     ./x.cue:53:18
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:94:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            // value0.xs.0.INA.Append: 5 errors in empty disjunction::
+-            //     ./x.cue:97:7
+-            // value0.xs.0.INA.Append.UseSectionName: field not allowed:
+-            //     ./x.cue:97:7
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:28:12
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:51:24
+-            //     ./x.cue:53:32
+-            //     ./x.cue:53:41
+-            //     ./x.cue:55:19
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:94:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            UseSectionName: (_|_){
+-              // [eval] value0.xs.0.INA.Append.UseSectionName: field not allowed:
+-              //     ./x.cue:97:7
+-              //     ./x.cue:15:14
+-              //     ./x.cue:22:52
+-              //     ./x.cue:28:12
+-              //     ./x.cue:44:29
+-              //     ./x.cue:44:56
+-              //     ./x.cue:51:24
+-              //     ./x.cue:53:41
+-              //     ./x.cue:53:56
+-              //     ./x.cue:55:19
+-              //     ./x.cue:55:72
+-              //     ./x.cue:55:75
+-              //     ./x.cue:59:9
+-              //     ./x.cue:62:25
+-              //     ./x.cue:70:12
+-              //     ./x.cue:70:47
+-              //     ./x.cue:94:13
+-              //     ./x.cue:112:3
+-              //     ./x.cue:118:4
+-              //     ./x.cue:118:38
+-              //     ./x.cue:123:9
+-            }
+-            Prepend: (_|_){
+-              // [eval] value0.xs.0.INA.Append.Prepend: field not allowed:
+-              //     ./x.cue:97:7
+-              //     ./x.cue:15:14
+-              //     ./x.cue:22:52
+-              //     ./x.cue:28:12
+-              //     ./x.cue:44:29
+-              //     ./x.cue:44:56
+-              //     ./x.cue:51:23
+-              //     ./x.cue:53:41
+-              //     ./x.cue:53:57
+-              //     ./x.cue:55:19
+-              //     ./x.cue:55:72
+-              //     ./x.cue:55:75
+-              //     ./x.cue:59:9
+-              //     ./x.cue:62:25
+-              //     ./x.cue:70:12
+-              //     ./x.cue:70:47
+-              //     ./x.cue:94:13
+-              //     ./x.cue:112:3
+-              //     ./x.cue:118:4
+-              //     ./x.cue:118:38
+-              //     ./x.cue:123:9
+-              UseSectionName: (bool){ true }
+-            }
+-          }
+-          Prepend: (_|_){
+-            // [eval] value0.xs.0.INA.Prepend: conflicting values string and {Append:#ConfigText} (mismatched types string and struct):
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:51:14
+-            //     ./x.cue:53:32
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:94:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            // value0.xs.0.INA.Prepend: conflicting values string and {Prepend:#ConfigText} (mismatched types string and struct):
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:51:14
+-            //     ./x.cue:53:56
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:94:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            // value0.xs.0.INA.Prepend: conflicting values string and {UseSectionName:true} (mismatched types string and struct):
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:51:14
+-            //     ./x.cue:51:23
+-            //     ./x.cue:53:18
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:94:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            // value0.xs.0.INA.Prepend: 5 errors in empty disjunction::
+-            //     ./x.cue:97:7
+-            // value0.xs.0.INA.Prepend.UseSectionName: field not allowed:
+-            //     ./x.cue:97:7
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:51:24
+-            //     ./x.cue:53:32
+-            //     ./x.cue:53:66
+-            //     ./x.cue:55:19
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:69:11
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:94:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            UseSectionName: (_|_){
+-              // [eval] value0.xs.0.INA.Prepend.UseSectionName: field not allowed:
+-              //     ./x.cue:97:7
+-              //     ./x.cue:15:14
+-              //     ./x.cue:22:52
+-              //     ./x.cue:44:29
+-              //     ./x.cue:44:56
+-              //     ./x.cue:51:24
+-              //     ./x.cue:53:56
+-              //     ./x.cue:53:66
+-              //     ./x.cue:55:19
+-              //     ./x.cue:55:72
+-              //     ./x.cue:55:75
+-              //     ./x.cue:59:9
+-              //     ./x.cue:62:25
+-              //     ./x.cue:69:11
+-              //     ./x.cue:70:12
+-              //     ./x.cue:70:47
+-              //     ./x.cue:94:13
+-              //     ./x.cue:112:3
+-              //     ./x.cue:118:4
+-              //     ./x.cue:118:38
+-              //     ./x.cue:123:9
+-            }
+-            Prepend: (_|_){
+-              // [eval] value0.xs.0.INA.Prepend.Prepend: field not allowed:
+-              //     ./x.cue:97:7
+-              //     ./x.cue:15:14
+-              //     ./x.cue:22:52
+-              //     ./x.cue:44:29
+-              //     ./x.cue:44:56
+-              //     ./x.cue:51:23
+-              //     ./x.cue:53:57
+-              //     ./x.cue:53:66
+-              //     ./x.cue:55:19
+-              //     ./x.cue:55:72
+-              //     ./x.cue:55:75
+-              //     ./x.cue:59:9
+-              //     ./x.cue:62:25
+-              //     ./x.cue:69:11
+-              //     ./x.cue:70:12
+-              //     ./x.cue:70:47
+-              //     ./x.cue:94:13
+-              //     ./x.cue:112:3
+-              //     ./x.cue:118:4
+-              //     ./x.cue:118:38
+-              //     ./x.cue:123:9
+-              UseSectionName: (bool){ true }
+-            }
+-          }
+-          0: ((string|struct)){ |((string){ string }, (#struct){
+-              UseSectionName: (bool){ true }
+-            }, (#struct){
+-              Append: ((string|struct)){ |((string){ string }, (#struct){
+-                  UseSectionName: (bool){ true }
+-                }) }
+-            }, (#struct){
+-              Prepend: ((string|struct)){ |((string){ string }, (#struct){
+-                  UseSectionName: (bool){ true }
+-                }) }
+-            }) }
+-          1: ((string|struct)){ |((string){ string }, (#struct){
+-              UseSectionName: (bool){ true }
+-            }, (#struct){
+-              Append: ((string|struct)){ |((string){ string }, (#struct){
+-                  UseSectionName: (bool){ true }
+-                }) }
+-            }, (#struct){
+-              Prepend: ((string|struct)){ |((string){ string }, (#struct){
+-                  UseSectionName: (bool){ true }
+-                }) }
+-            }) }
++          //     ./x.cue:124:17
++          Append: (_){ _ }
++          UseSectionName: (bool){ true }
+         }
+         let INP#8 = (_|_){
+-          // [eval] value0.xs.0.INP: conflicting values [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] and {Append:#ConfigText} (mismatched types list and struct):
+-          //     ./x.cue:22:52
+-          //     ./x.cue:44:29
+-          //     ./x.cue:53:32
+-          //     ./x.cue:55:19
+-          //     ./x.cue:55:37
+-          //     ./x.cue:62:25
+-          //     ./x.cue:70:12
+-          //     ./x.cue:95:13
+-          //     ./x.cue:109:13
+-          //     ./x.cue:112:3
+-          //     ./x.cue:118:4
+-          //     ./x.cue:118:38
+-          //     ./x.cue:123:9
+-          // value0.xs.0.INP: conflicting values [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] and {Prepend:#ConfigText} (mismatched types list and struct):
+-          //     ./x.cue:22:52
+-          //     ./x.cue:28:12
+-          //     ./x.cue:44:29
+-          //     ./x.cue:53:56
+-          //     ./x.cue:55:19
+-          //     ./x.cue:55:37
+-          //     ./x.cue:59:9
+-          //     ./x.cue:62:25
+-          //     ./x.cue:70:12
+-          //     ./x.cue:70:47
+-          //     ./x.cue:95:13
+-          //     ./x.cue:112:3
+-          //     ./x.cue:118:4
+-          //     ./x.cue:118:38
+-          //     ./x.cue:123:9
+-          // value0.xs.0.INP: conflicting values [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] and {UseSectionName:true} (mismatched types list and struct):
+-          //     ./x.cue:22:52
+-          //     ./x.cue:44:29
+-          //     ./x.cue:51:23
+-          //     ./x.cue:53:18
+-          //     ./x.cue:55:37
+-          //     ./x.cue:62:25
+-          //     ./x.cue:70:12
+-          //     ./x.cue:92:13
+-          //     ./x.cue:95:13
+-          //     ./x.cue:112:3
+-          //     ./x.cue:118:4
+-          //     ./x.cue:123:9
+-          // value0.xs.0.INP: conflicting values string and {Append:#ConfigText} (mismatched types string and struct):
+-          //     ./x.cue:22:52
+-          //     ./x.cue:44:29
+-          //     ./x.cue:51:14
+-          //     ./x.cue:53:32
+-          //     ./x.cue:62:25
+-          //     ./x.cue:70:12
+-          //     ./x.cue:92:13
+-          //     ./x.cue:95:13
+-          //     ./x.cue:112:3
+-          //     ./x.cue:118:4
+-          //     ./x.cue:123:9
+-          // value0.xs.0.INP: conflicting values string and {Prepend:#ConfigText} (mismatched types string and struct):
+-          //     ./x.cue:22:52
+-          //     ./x.cue:28:12
+-          //     ./x.cue:44:29
+-          //     ./x.cue:51:14
+-          //     ./x.cue:53:56
+-          //     ./x.cue:55:19
+-          //     ./x.cue:59:9
+-          //     ./x.cue:62:25
+-          //     ./x.cue:70:12
+-          //     ./x.cue:70:47
+-          //     ./x.cue:95:13
+-          //     ./x.cue:112:3
+-          //     ./x.cue:118:4
+-          //     ./x.cue:118:38
+-          //     ./x.cue:123:9
+-          // value0.xs.0.INP: conflicting values string and {Prepend:_} (mismatched types string and struct):
+-          //     ./x.cue:22:52
+-          //     ./x.cue:44:29
+-          //     ./x.cue:51:14
+-          //     ./x.cue:62:25
+-          //     ./x.cue:70:12
+-          //     ./x.cue:95:18
+-          //     ./x.cue:112:3
+-          //     ./x.cue:118:4
+-          //     ./x.cue:123:9
+-          // value0.xs.0.INP: conflicting values string and {UseSectionName:true} (mismatched types string and struct):
+-          //     ./x.cue:22:52
+-          //     ./x.cue:44:29
+-          //     ./x.cue:51:14
+-          //     ./x.cue:51:23
+-          //     ./x.cue:53:18
+-          //     ./x.cue:62:25
+-          //     ./x.cue:70:12
+-          //     ./x.cue:92:13
+-          //     ./x.cue:95:13
+-          //     ./x.cue:112:3
+-          //     ./x.cue:118:4
+-          //     ./x.cue:123:9
+-          // value0.xs.0.INP: 9 errors in empty disjunction::
+-          //     ./x.cue:100:7
+-          // value0.xs.0.INP.Prepend: field not allowed:
+-          //     ./x.cue:100:7
+-          //     ./x.cue:15:14
+-          //     ./x.cue:22:52
+-          //     ./x.cue:28:12
+-          //     ./x.cue:44:29
+-          //     ./x.cue:44:56
+-          //     ./x.cue:51:23
+-          //     ./x.cue:53:18
+-          //     ./x.cue:55:19
+-          //     ./x.cue:59:9
+-          //     ./x.cue:62:25
+-          //     ./x.cue:69:11
+-          //     ./x.cue:70:12
+-          //     ./x.cue:70:47
+-          //     ./x.cue:92:13
+-          //     ./x.cue:95:13
+-          //     ./x.cue:95:19
+-          //     ./x.cue:109:13
+-          //     ./x.cue:112:3
+-          //     ./x.cue:118:4
+-          //     ./x.cue:118:38
+-          //     ./x.cue:123:9
+-          //     ./x.cue:124:16
++          // [eval] value0.xs.0.INP: conflicting values {Prepend:#ConfigText} and [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] (mismatched types struct and list):
++          //     ./x.cue:53:56
++          //     ./x.cue:55:37
++          // value0.xs.0.INP: 2 errors in empty disjunction::
++          //     ./x.cue:100:7
+           // value0.xs.0.INP.UseSectionName: field not allowed:
+           //     ./x.cue:100:7
+-          //     ./x.cue:15:14
+-          //     ./x.cue:22:52
+-          //     ./x.cue:28:12
+-          //     ./x.cue:44:29
+-          //     ./x.cue:44:56
+-          //     ./x.cue:51:24
+-          //     ./x.cue:53:18
+-          //     ./x.cue:53:32
+-          //     ./x.cue:55:19
+-          //     ./x.cue:59:9
+-          //     ./x.cue:62:25
+-          //     ./x.cue:69:11
+-          //     ./x.cue:70:12
+-          //     ./x.cue:70:47
+-          //     ./x.cue:92:13
+-          //     ./x.cue:95:13
+-          //     ./x.cue:95:18
+-          //     ./x.cue:109:13
+-          //     ./x.cue:112:3
+-          //     ./x.cue:118:4
+-          //     ./x.cue:118:38
+-          //     ./x.cue:123:9
+-          //     ./x.cue:124:17
+-          UseSectionName: (_|_){
+-            // [eval] value0.xs.0.INP.UseSectionName: conflicting values true and string (mismatched types bool and string):
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:51:14
+-            //     ./x.cue:53:18
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:95:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            //     ./x.cue:124:33
+-            // value0.xs.0.INP.UseSectionName: conflicting values true and {Append:#ConfigText} (mismatched types bool and struct):
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:53:32
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:95:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            //     ./x.cue:124:33
+-            // value0.xs.0.INP.UseSectionName: conflicting values true and {Prepend:#ConfigText} (mismatched types bool and struct):
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:53:56
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:95:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            //     ./x.cue:124:33
+-            // value0.xs.0.INP.UseSectionName: conflicting values true and {UseSectionName:true} (mismatched types bool and struct):
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:51:23
+-            //     ./x.cue:53:18
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:95:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            //     ./x.cue:124:33
+-            // value0.xs.0.INP.UseSectionName: 4 errors in empty disjunction::
+-            //     ./x.cue:100:7
+-            Prepend: ((string|struct)){ |((string){ string }, (#struct){
+-                UseSectionName: (bool){ true }
+-              }) }
+-          }
+-          Prepend: (_|_){
+-            // [eval] value0.xs.0.INP.Prepend: conflicting values string and {Append:#ConfigText} (mismatched types string and struct):
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:51:14
+-            //     ./x.cue:53:32
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:95:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            // value0.xs.0.INP.Prepend: conflicting values string and {Prepend:#ConfigText} (mismatched types string and struct):
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:51:14
+-            //     ./x.cue:53:56
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:95:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            // value0.xs.0.INP.Prepend: conflicting values string and {UseSectionName:true} (mismatched types string and struct):
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:51:14
+-            //     ./x.cue:51:23
+-            //     ./x.cue:53:18
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:95:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            // value0.xs.0.INP.Prepend: 5 errors in empty disjunction::
+-            //     ./x.cue:100:7
+-            // value0.xs.0.INP.Prepend.UseSectionName: field not allowed:
+-            //     ./x.cue:100:7
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:51:24
+-            //     ./x.cue:53:32
+-            //     ./x.cue:53:66
+-            //     ./x.cue:55:19
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:69:11
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:95:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            UseSectionName: (_|_){
+-              // [eval] value0.xs.0.INP.Prepend.UseSectionName: field not allowed:
+-              //     ./x.cue:100:7
+-              //     ./x.cue:15:14
+-              //     ./x.cue:22:52
+-              //     ./x.cue:44:29
+-              //     ./x.cue:44:56
+-              //     ./x.cue:51:24
+-              //     ./x.cue:53:56
+-              //     ./x.cue:53:66
+-              //     ./x.cue:55:19
+-              //     ./x.cue:55:72
+-              //     ./x.cue:55:75
+-              //     ./x.cue:59:9
+-              //     ./x.cue:62:25
+-              //     ./x.cue:69:11
+-              //     ./x.cue:70:12
+-              //     ./x.cue:70:47
+-              //     ./x.cue:95:13
+-              //     ./x.cue:112:3
+-              //     ./x.cue:118:4
+-              //     ./x.cue:118:38
+-              //     ./x.cue:123:9
+-            }
+-            Prepend: (_|_){
+-              // [eval] value0.xs.0.INP.Prepend.Prepend: field not allowed:
+-              //     ./x.cue:100:7
+-              //     ./x.cue:15:14
+-              //     ./x.cue:22:52
+-              //     ./x.cue:44:29
+-              //     ./x.cue:44:56
+-              //     ./x.cue:51:23
+-              //     ./x.cue:53:57
+-              //     ./x.cue:53:66
+-              //     ./x.cue:55:19
+-              //     ./x.cue:55:72
+-              //     ./x.cue:55:75
+-              //     ./x.cue:59:9
+-              //     ./x.cue:62:25
+-              //     ./x.cue:69:11
+-              //     ./x.cue:70:12
+-              //     ./x.cue:70:47
+-              //     ./x.cue:95:13
+-              //     ./x.cue:112:3
+-              //     ./x.cue:118:4
+-              //     ./x.cue:118:38
+-              //     ./x.cue:123:9
+-              UseSectionName: (bool){ true }
+-            }
+-          }
+-          Append: (_|_){
+-            // [eval] value0.xs.0.INP.Append: conflicting values string and {Append:#ConfigText} (mismatched types string and struct):
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:51:14
+-            //     ./x.cue:53:32
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:95:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            // value0.xs.0.INP.Append: conflicting values string and {Prepend:#ConfigText} (mismatched types string and struct):
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:51:14
+-            //     ./x.cue:53:56
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:95:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            // value0.xs.0.INP.Append: conflicting values string and {UseSectionName:true} (mismatched types string and struct):
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:51:14
+-            //     ./x.cue:51:23
+-            //     ./x.cue:53:18
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:95:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            // value0.xs.0.INP.Append: 5 errors in empty disjunction::
+-            //     ./x.cue:100:7
+-            // value0.xs.0.INP.Append.UseSectionName: field not allowed:
+-            //     ./x.cue:100:7
+-            //     ./x.cue:15:14
+-            //     ./x.cue:22:52
+-            //     ./x.cue:28:12
+-            //     ./x.cue:44:29
+-            //     ./x.cue:44:56
+-            //     ./x.cue:51:24
+-            //     ./x.cue:53:32
+-            //     ./x.cue:53:41
+-            //     ./x.cue:55:19
+-            //     ./x.cue:55:72
+-            //     ./x.cue:55:75
+-            //     ./x.cue:59:9
+-            //     ./x.cue:62:25
+-            //     ./x.cue:70:12
+-            //     ./x.cue:70:47
+-            //     ./x.cue:95:13
+-            //     ./x.cue:112:3
+-            //     ./x.cue:118:4
+-            //     ./x.cue:118:38
+-            //     ./x.cue:123:9
+-            UseSectionName: (_|_){
+-              // [eval] value0.xs.0.INP.Append.UseSectionName: field not allowed:
+-              //     ./x.cue:100:7
+-              //     ./x.cue:15:14
+-              //     ./x.cue:22:52
+-              //     ./x.cue:28:12
+-              //     ./x.cue:44:29
+-              //     ./x.cue:44:56
+-              //     ./x.cue:51:24
+-              //     ./x.cue:53:41
+-              //     ./x.cue:53:56
+-              //     ./x.cue:55:19
+-              //     ./x.cue:55:72
+-              //     ./x.cue:55:75
+-              //     ./x.cue:59:9
+-              //     ./x.cue:62:25
+-              //     ./x.cue:70:12
+-              //     ./x.cue:70:47
+-              //     ./x.cue:95:13
+-              //     ./x.cue:112:3
+-              //     ./x.cue:118:4
+-              //     ./x.cue:118:38
+-              //     ./x.cue:123:9
+-            }
+-            Prepend: (_|_){
+-              // [eval] value0.xs.0.INP.Append.Prepend: field not allowed:
+-              //     ./x.cue:100:7
+-              //     ./x.cue:15:14
+-              //     ./x.cue:22:52
+-              //     ./x.cue:28:12
+-              //     ./x.cue:44:29
+-              //     ./x.cue:44:56
+-              //     ./x.cue:51:23
+-              //     ./x.cue:53:41
+-              //     ./x.cue:53:57
+-              //     ./x.cue:55:19
+-              //     ./x.cue:55:72
+-              //     ./x.cue:55:75
+-              //     ./x.cue:59:9
+-              //     ./x.cue:62:25
+-              //     ./x.cue:70:12
+-              //     ./x.cue:70:47
+-              //     ./x.cue:95:13
+-              //     ./x.cue:112:3
+-              //     ./x.cue:118:4
+-              //     ./x.cue:118:38
+-              //     ./x.cue:123:9
+-              UseSectionName: (bool){ true }
+-            }
+-          }
+-          0: ((string|struct)){ |((string){ string }, (#struct){
+-              UseSectionName: (bool){ true }
+-            }, (#struct){
+-              Append: ((string|struct)){ |((string){ string }, (#struct){
+-                  UseSectionName: (bool){ true }
+-                }) }
+-            }, (#struct){
+-              Prepend: ((string|struct)){ |((string){ string }, (#struct){
+-                  UseSectionName: (bool){ true }
+-                }) }
+-            }) }
+-          1: ((string|struct)){ |((string){ string }, (#struct){
+-              UseSectionName: (bool){ true }
+-            }, (#struct){
+-              Append: ((string|struct)){ |((string){ string }, (#struct){
+-                  UseSectionName: (bool){ true }
+-                }) }
+-            }, (#struct){
+-              Prepend: ((string|struct)){ |((string){ string }, (#struct){
+-                  UseSectionName: (bool){ true }
+-                }) }
+-            }) }
++          //     ./x.cue:124:17
++          Prepend: (_){ _ }
++          UseSectionName: (bool){ true }
+         }
+         let INS#5 = (_|_){
+           // [eval] value0.xs.0.INS: conflicting values string and {UseSectionName:true} (mismatched types string and struct):
+-          //     ./x.cue:22:52
+-          //     ./x.cue:44:29
+-          //     ./x.cue:44:56
+-          //     ./x.cue:62:25
+-          //     ./x.cue:70:12
+-          //     ./x.cue:70:47
+-          //     ./x.cue:77:13
+           //     ./x.cue:77:18
+-          //     ./x.cue:96:3
+-          //     ./x.cue:103:4
+-          //     ./x.cue:103:34
+-          //     ./x.cue:112:3
+-          //     ./x.cue:118:4
+-          //     ./x.cue:118:38
+-          //     ./x.cue:123:9
+           //     ./x.cue:124:16
+           UseSectionName: (bool){ true }
+         }
+-- out/eval --
+(struct){
+  #FinDefSetElemType: (#struct){
+    #Type: (_){ _ }
+    toString!: (#struct){
+      _input: (_){ _ }
+      _output: (string){ string }
+    }
+  }
+  #FinDefSetDefinition: (#struct){
+    #Elem!: (#struct){
+      #Type: (_){ _ }
+      toString!: (#struct){
+        _input: (_){ _ }
+        _output: (string){ string }
+      }
+    }
+    #Alternatives: (#struct){
+      allBut: (#struct){
+        AllBut: (list){
+        }
+        let xs#1 = (#list){
+        }
+        let str#2 = (string){ "" }
+        orgSyntax: (string){ "AllBut []" }
+      }
+      only: (#struct){
+        Only: (list){
+        }
+        let xs#3 = (#list){
+        }
+        let str#4 = (string){ "" }
+        orgSyntax: (string){ "Only []" }
+      }
+    }
+  }
+  #mkFinDefSet: (#struct){
+    #Definition!: (#struct){
+      #Elem!: (#struct){
+        #Type: (_){ _ }
+        toString!: (#struct){
+          _input: (_){ _ }
+          _output: (string){ string }
+        }
+      }
+      #Alternatives: (#struct){
+        allBut: (#struct){
+          AllBut: (list){
+          }
+          let xs#1 = (#list){
+          }
+          let str#2 = (string){ "" }
+          orgSyntax: (string){ "AllBut []" }
+        }
+        only: (#struct){
+          Only: (list){
+          }
+          let xs#3 = (#list){
+          }
+          let str#4 = (string){ "" }
+          orgSyntax: (string){ "Only []" }
+        }
+      }
+    }
+    #Type: (#struct){ |((#struct){
+        AllBut: (list){
+        }
+        let xs#1 = (#list){
+        }
+        let str#2 = (string){ "" }
+        orgSyntax: (string){ "AllBut []" }
+      }, (#struct){
+        Only: (list){
+        }
+        let xs#3 = (#list){
+        }
+        let str#4 = (string){ "" }
+        orgSyntax: (string){ "Only []" }
+      }) }
+  }
+  #ConfigText: ((string|struct)){ |((string){ string }, (#struct){
+      UseSectionName: (bool){ true }
+    }) }
+  #ConfigTextRule: ((string|struct)){ |((string){ string }, (#struct){
+      UseSectionName: (bool){ true }
+    }, (#struct){
+      Append: ((string|struct)){ |((string){ string }, (#struct){
+          UseSectionName: (bool){ true }
+        }) }
+    }, (#struct){
+      Prepend: ((string|struct)){ |((string){ string }, (#struct){
+          UseSectionName: (bool){ true }
+        }) }
+    }) }
+  #ConfigTextRules: ((string|list|struct)){ |((string){ string }, (#struct){
+      UseSectionName: (bool){ true }
+    }, (#struct){
+      Append: ((string|struct)){ |((string){ string }, (#struct){
+          UseSectionName: (bool){ true }
+        }) }
+    }, (#struct){
+      Prepend: ((string|struct)){ |((string){ string }, (#struct){
+          UseSectionName: (bool){ true }
+        }) }
+    }, (list){
+      0: ((string|struct)){ |((string){ string }, (#struct){
+          UseSectionName: (bool){ true }
+        }, (#struct){
+          Append: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }) }
+        }, (#struct){
+          Prepend: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }) }
+        }) }
+      1: ((string|struct)){ |((string){ string }, (#struct){
+          UseSectionName: (bool){ true }
+        }, (#struct){
+          Append: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }) }
+        }, (#struct){
+          Prepend: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }) }
+        }) }
+    }) }
+  #FinDefSetConfigTextElem: (#struct){
+    #Type: ((string|list|struct)){ |((string){ string }, (#struct){
+        UseSectionName: (bool){ true }
+      }, (#struct){
+        Append: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }) }
+      }, (#struct){
+        Prepend: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }) }
+      }, (list){
+        0: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }, (#struct){
+            Append: ((string|struct)){ |((string){ string }, (#struct){
+                UseSectionName: (bool){ true }
+              }) }
+          }, (#struct){
+            Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                UseSectionName: (bool){ true }
+              }) }
+          }) }
+        1: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }, (#struct){
+            Append: ((string|struct)){ |((string){ string }, (#struct){
+                UseSectionName: (bool){ true }
+              }) }
+          }, (#struct){
+            Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                UseSectionName: (bool){ true }
+              }) }
+          }) }
+      }) }
+    toString: (#struct){
+      _input: ((string|list|struct)){ |((string){ string }, (#struct){
+          UseSectionName: (bool){ true }
+        }, (#struct){
+          Append: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }) }
+        }, (#struct){
+          Prepend: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }) }
+        }, (list){
+          0: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }, (#struct){
+              Append: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }, (#struct){
+              Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }) }
+          1: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }, (#struct){
+              Append: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }, (#struct){
+              Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }) }
+        }) }
+      _output: (_|_){
+        // [cycle] invalid interpolation: cycle error:
+        //     ./x.cue:116:5
+      }
+    }
+  }
+  #FinDefSetOfConfigText: (#struct){ |((#struct){
+      AllBut: (list){
+      }
+      let xs#1 = (#list){
+      }
+      let str#2 = (string){ "" }
+      orgSyntax: (string){ "AllBut []" }
+    }, (#struct){
+      Only: (list){
+      }
+      let xs#3 = (#list){
+      }
+      let str#4 = (string){ "" }
+      orgSyntax: (string){ "Only []" }
+    }) }
+  #orgForConfigText: (#struct){
+    source: ((string|struct)){ |((string){ string }, (#struct){
+        UseSectionName: (bool){ true }
+      }) }
+    orgSyntax: (string){
+      "UseSectionName"
+      let INS#5 = (string){ string }
+      let INO#6 = (#struct){
+        UseSectionName: (bool){ true }
+      }
+    }
+  }
+  #orgForConfigTextRule: (#struct){
+    source: ((string|struct)){ |((string){ string }, (#struct){
+        UseSectionName: (bool){ true }
+      }, (#struct){
+        Append: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }) }
+      }, (#struct){
+        Prepend: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }) }
+      }) }
+    orgSyntax: (string){
+      "Append UseSectionName"
+      let INA#7 = (#struct){
+        Append: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }) }
+      }
+      let INP#8 = (#struct){
+        Prepend: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }) }
+      }
+    }
+  }
+  #orgForConfigTextRules: (#struct){
+    source: ((string|list|struct)){ |((string){ string }, (#struct){
+        UseSectionName: (bool){ true }
+      }, (#struct){
+        Append: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }) }
+      }, (#struct){
+        Prepend: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }) }
+      }, (list){
+        0: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }, (#struct){
+            Append: ((string|struct)){ |((string){ string }, (#struct){
+                UseSectionName: (bool){ true }
+              }) }
+          }, (#struct){
+            Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                UseSectionName: (bool){ true }
+              }) }
+          }) }
+        1: ((string|struct)){ |((string){ string }, (#struct){
+            UseSectionName: (bool){ true }
+          }, (#struct){
+            Append: ((string|struct)){ |((string){ string }, (#struct){
+                UseSectionName: (bool){ true }
+              }) }
+          }, (#struct){
+            Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                UseSectionName: (bool){ true }
+              }) }
+          }) }
+      }) }
+    orgSyntax: (_|_){
+      // [cycle] invalid interpolation: cycle error:
+      //     ./x.cue:116:5
+    }
+  }
+  value0: (#struct){
+    Only: (#list){
+      0: (#struct){
+        UseSectionName: (bool){ true }
+      }
+    }
+    let xs#3 = (#list){
+      0: (string){
+        "UseSectionName"
+        let INL#9 = (_|_){
+          // [eval] value0.xs.0.INL: conflicting values [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] and {UseSectionName:true} (mismatched types list and struct):
+          //     ./x.cue:22:52
+          //     ./x.cue:44:29
+          //     ./x.cue:44:56
+          //     ./x.cue:55:37
+          //     ./x.cue:62:25
+          //     ./x.cue:70:12
+          //     ./x.cue:70:47
+          //     ./x.cue:111:13
+          //     ./x.cue:123:9
+          //     ./x.cue:124:16
+          // value0.xs.0.INL: conflicting values [...] and {Append:#ConfigText} (mismatched types list and struct):
+          //     ./x.cue:22:52
+          //     ./x.cue:44:29
+          //     ./x.cue:53:32
+          //     ./x.cue:55:19
+          //     ./x.cue:62:25
+          //     ./x.cue:70:12
+          //     ./x.cue:109:13
+          //     ./x.cue:111:13
+          //     ./x.cue:111:18
+          //     ./x.cue:123:9
+          // value0.xs.0.INL: conflicting values [...] and {Prepend:#ConfigText} (mismatched types list and struct):
+          //     ./x.cue:22:52
+          //     ./x.cue:44:29
+          //     ./x.cue:53:56
+          //     ./x.cue:55:19
+          //     ./x.cue:62:25
+          //     ./x.cue:70:12
+          //     ./x.cue:109:13
+          //     ./x.cue:111:13
+          //     ./x.cue:111:18
+          //     ./x.cue:123:9
+          // value0.xs.0.INL: conflicting values [...] and {UseSectionName:true} (mismatched types list and struct):
+          //     ./x.cue:22:52
+          //     ./x.cue:44:29
+          //     ./x.cue:51:23
+          //     ./x.cue:53:18
+          //     ./x.cue:55:19
+          //     ./x.cue:62:25
+          //     ./x.cue:70:12
+          //     ./x.cue:109:13
+          //     ./x.cue:111:13
+          //     ./x.cue:111:18
+          //     ./x.cue:123:9
+          // value0.xs.0.INL: conflicting values string and [...] (mismatched types string and list):
+          //     ./x.cue:22:52
+          //     ./x.cue:44:29
+          //     ./x.cue:51:14
+          //     ./x.cue:62:25
+          //     ./x.cue:70:12
+          //     ./x.cue:111:18
+          //     ./x.cue:123:9
+          // value0.xs.0.INL: 5 errors in empty disjunction::
+          //     ./x.cue:113:7
+          UseSectionName: (_|_){
+            // [eval] value0.xs.0.INL.UseSectionName: conflicting values true and string (mismatched types bool and string):
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:51:14
+            //     ./x.cue:53:18
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:109:13
+            //     ./x.cue:111:13
+            //     ./x.cue:123:9
+            //     ./x.cue:124:33
+            // value0.xs.0.INL.UseSectionName: conflicting values true and {Append:#ConfigText} (mismatched types bool and struct):
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:53:32
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:109:13
+            //     ./x.cue:111:13
+            //     ./x.cue:123:9
+            //     ./x.cue:124:33
+            // value0.xs.0.INL.UseSectionName: conflicting values true and {Prepend:#ConfigText} (mismatched types bool and struct):
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:53:56
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:109:13
+            //     ./x.cue:111:13
+            //     ./x.cue:123:9
+            //     ./x.cue:124:33
+            // value0.xs.0.INL.UseSectionName: conflicting values true and {UseSectionName:true} (mismatched types bool and struct):
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:51:23
+            //     ./x.cue:53:18
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:109:13
+            //     ./x.cue:111:13
+            //     ./x.cue:123:9
+            //     ./x.cue:124:33
+            // value0.xs.0.INL.UseSectionName: 4 errors in empty disjunction::
+            //     ./x.cue:113:7
+            Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                UseSectionName: (bool){ true }
+              }) }
+          }
+          0: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }, (#struct){
+              Append: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }, (#struct){
+              Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }) }
+          1: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }, (#struct){
+              Append: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }, (#struct){
+              Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }) }
+        }
+        let INA#7 = (_|_){
+          // [eval] value0.xs.0.INA: conflicting values [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] and {Append:#ConfigText} (mismatched types list and struct):
+          //     ./x.cue:22:52
+          //     ./x.cue:44:29
+          //     ./x.cue:53:32
+          //     ./x.cue:55:19
+          //     ./x.cue:55:37
+          //     ./x.cue:62:25
+          //     ./x.cue:70:12
+          //     ./x.cue:94:13
+          //     ./x.cue:109:13
+          //     ./x.cue:112:3
+          //     ./x.cue:118:4
+          //     ./x.cue:118:38
+          //     ./x.cue:123:9
+          // value0.xs.0.INA: conflicting values [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] and {Prepend:#ConfigText} (mismatched types list and struct):
+          //     ./x.cue:22:52
+          //     ./x.cue:44:29
+          //     ./x.cue:53:56
+          //     ./x.cue:55:19
+          //     ./x.cue:55:37
+          //     ./x.cue:62:25
+          //     ./x.cue:70:12
+          //     ./x.cue:94:13
+          //     ./x.cue:109:13
+          //     ./x.cue:112:3
+          //     ./x.cue:118:4
+          //     ./x.cue:118:38
+          //     ./x.cue:123:9
+          // value0.xs.0.INA: conflicting values [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] and {UseSectionName:true} (mismatched types list and struct):
+          //     ./x.cue:22:52
+          //     ./x.cue:28:12
+          //     ./x.cue:44:29
+          //     ./x.cue:51:23
+          //     ./x.cue:53:18
+          //     ./x.cue:55:19
+          //     ./x.cue:55:37
+          //     ./x.cue:59:9
+          //     ./x.cue:62:25
+          //     ./x.cue:70:12
+          //     ./x.cue:70:47
+          //     ./x.cue:94:13
+          //     ./x.cue:112:3
+          //     ./x.cue:118:4
+          //     ./x.cue:118:38
+          //     ./x.cue:123:9
+          // value0.xs.0.INA: conflicting values string and {Append:#ConfigText} (mismatched types string and struct):
+          //     ./x.cue:22:52
+          //     ./x.cue:44:29
+          //     ./x.cue:51:14
+          //     ./x.cue:53:32
+          //     ./x.cue:62:25
+          //     ./x.cue:70:12
+          //     ./x.cue:92:13
+          //     ./x.cue:94:13
+          //     ./x.cue:112:3
+          //     ./x.cue:118:4
+          //     ./x.cue:123:9
+          // value0.xs.0.INA: conflicting values string and {Append:_} (mismatched types string and struct):
+          //     ./x.cue:22:52
+          //     ./x.cue:44:29
+          //     ./x.cue:51:14
+          //     ./x.cue:62:25
+          //     ./x.cue:70:12
+          //     ./x.cue:94:18
+          //     ./x.cue:112:3
+          //     ./x.cue:118:4
+          //     ./x.cue:123:9
+          // value0.xs.0.INA: conflicting values string and {Prepend:#ConfigText} (mismatched types string and struct):
+          //     ./x.cue:22:52
+          //     ./x.cue:28:12
+          //     ./x.cue:44:29
+          //     ./x.cue:51:14
+          //     ./x.cue:53:56
+          //     ./x.cue:55:19
+          //     ./x.cue:59:9
+          //     ./x.cue:62:25
+          //     ./x.cue:70:12
+          //     ./x.cue:70:47
+          //     ./x.cue:94:13
+          //     ./x.cue:112:3
+          //     ./x.cue:118:4
+          //     ./x.cue:118:38
+          //     ./x.cue:123:9
+          // value0.xs.0.INA: conflicting values string and {UseSectionName:true} (mismatched types string and struct):
+          //     ./x.cue:22:52
+          //     ./x.cue:44:29
+          //     ./x.cue:51:14
+          //     ./x.cue:51:23
+          //     ./x.cue:53:18
+          //     ./x.cue:62:25
+          //     ./x.cue:70:12
+          //     ./x.cue:92:13
+          //     ./x.cue:94:13
+          //     ./x.cue:112:3
+          //     ./x.cue:118:4
+          //     ./x.cue:123:9
+          // value0.xs.0.INA: 9 errors in empty disjunction::
+          //     ./x.cue:97:7
+          // value0.xs.0.INA.Append: field not allowed:
+          //     ./x.cue:97:7
+          //     ./x.cue:15:14
+          //     ./x.cue:22:52
+          //     ./x.cue:28:12
+          //     ./x.cue:44:29
+          //     ./x.cue:44:56
+          //     ./x.cue:51:23
+          //     ./x.cue:53:18
+          //     ./x.cue:55:19
+          //     ./x.cue:59:9
+          //     ./x.cue:62:25
+          //     ./x.cue:69:11
+          //     ./x.cue:70:12
+          //     ./x.cue:70:47
+          //     ./x.cue:92:13
+          //     ./x.cue:94:13
+          //     ./x.cue:94:19
+          //     ./x.cue:109:13
+          //     ./x.cue:112:3
+          //     ./x.cue:118:4
+          //     ./x.cue:118:38
+          //     ./x.cue:123:9
+          //     ./x.cue:124:16
+          // value0.xs.0.INA.UseSectionName: field not allowed:
+          //     ./x.cue:97:7
+          //     ./x.cue:15:14
+          //     ./x.cue:22:52
+          //     ./x.cue:28:12
+          //     ./x.cue:44:29
+          //     ./x.cue:44:56
+          //     ./x.cue:51:24
+          //     ./x.cue:53:18
+          //     ./x.cue:53:32
+          //     ./x.cue:55:19
+          //     ./x.cue:59:9
+          //     ./x.cue:62:25
+          //     ./x.cue:69:11
+          //     ./x.cue:70:12
+          //     ./x.cue:70:47
+          //     ./x.cue:92:13
+          //     ./x.cue:94:13
+          //     ./x.cue:94:18
+          //     ./x.cue:109:13
+          //     ./x.cue:112:3
+          //     ./x.cue:118:4
+          //     ./x.cue:118:38
+          //     ./x.cue:123:9
+          //     ./x.cue:124:17
+          UseSectionName: (_|_){
+            // [eval] value0.xs.0.INA.UseSectionName: conflicting values true and string (mismatched types bool and string):
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:51:14
+            //     ./x.cue:53:18
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:94:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            //     ./x.cue:124:33
+            // value0.xs.0.INA.UseSectionName: conflicting values true and {Append:#ConfigText} (mismatched types bool and struct):
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:53:32
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:94:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            //     ./x.cue:124:33
+            // value0.xs.0.INA.UseSectionName: conflicting values true and {Prepend:#ConfigText} (mismatched types bool and struct):
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:53:56
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:94:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            //     ./x.cue:124:33
+            // value0.xs.0.INA.UseSectionName: conflicting values true and {UseSectionName:true} (mismatched types bool and struct):
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:51:23
+            //     ./x.cue:53:18
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:94:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            //     ./x.cue:124:33
+            // value0.xs.0.INA.UseSectionName: 4 errors in empty disjunction::
+            //     ./x.cue:97:7
+            Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                UseSectionName: (bool){ true }
+              }) }
+          }
+          Append: (_|_){
+            // [eval] value0.xs.0.INA.Append: conflicting values string and {Append:#ConfigText} (mismatched types string and struct):
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:51:14
+            //     ./x.cue:53:32
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:94:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            // value0.xs.0.INA.Append: conflicting values string and {Prepend:#ConfigText} (mismatched types string and struct):
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:51:14
+            //     ./x.cue:53:56
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:94:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            // value0.xs.0.INA.Append: conflicting values string and {UseSectionName:true} (mismatched types string and struct):
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:51:14
+            //     ./x.cue:51:23
+            //     ./x.cue:53:18
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:94:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            // value0.xs.0.INA.Append: 5 errors in empty disjunction::
+            //     ./x.cue:97:7
+            // value0.xs.0.INA.Append.UseSectionName: field not allowed:
+            //     ./x.cue:97:7
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:28:12
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:51:24
+            //     ./x.cue:53:32
+            //     ./x.cue:53:41
+            //     ./x.cue:55:19
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:94:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            UseSectionName: (_|_){
+              // [eval] value0.xs.0.INA.Append.UseSectionName: field not allowed:
+              //     ./x.cue:97:7
+              //     ./x.cue:15:14
+              //     ./x.cue:22:52
+              //     ./x.cue:28:12
+              //     ./x.cue:44:29
+              //     ./x.cue:44:56
+              //     ./x.cue:51:24
+              //     ./x.cue:53:41
+              //     ./x.cue:53:56
+              //     ./x.cue:55:19
+              //     ./x.cue:55:72
+              //     ./x.cue:55:75
+              //     ./x.cue:59:9
+              //     ./x.cue:62:25
+              //     ./x.cue:70:12
+              //     ./x.cue:70:47
+              //     ./x.cue:94:13
+              //     ./x.cue:112:3
+              //     ./x.cue:118:4
+              //     ./x.cue:118:38
+              //     ./x.cue:123:9
+            }
+            Prepend: (_|_){
+              // [eval] value0.xs.0.INA.Append.Prepend: field not allowed:
+              //     ./x.cue:97:7
+              //     ./x.cue:15:14
+              //     ./x.cue:22:52
+              //     ./x.cue:28:12
+              //     ./x.cue:44:29
+              //     ./x.cue:44:56
+              //     ./x.cue:51:23
+              //     ./x.cue:53:41
+              //     ./x.cue:53:57
+              //     ./x.cue:55:19
+              //     ./x.cue:55:72
+              //     ./x.cue:55:75
+              //     ./x.cue:59:9
+              //     ./x.cue:62:25
+              //     ./x.cue:70:12
+              //     ./x.cue:70:47
+              //     ./x.cue:94:13
+              //     ./x.cue:112:3
+              //     ./x.cue:118:4
+              //     ./x.cue:118:38
+              //     ./x.cue:123:9
+              UseSectionName: (bool){ true }
+            }
+          }
+          Prepend: (_|_){
+            // [eval] value0.xs.0.INA.Prepend: conflicting values string and {Append:#ConfigText} (mismatched types string and struct):
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:51:14
+            //     ./x.cue:53:32
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:94:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            // value0.xs.0.INA.Prepend: conflicting values string and {Prepend:#ConfigText} (mismatched types string and struct):
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:51:14
+            //     ./x.cue:53:56
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:94:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            // value0.xs.0.INA.Prepend: conflicting values string and {UseSectionName:true} (mismatched types string and struct):
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:51:14
+            //     ./x.cue:51:23
+            //     ./x.cue:53:18
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:94:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            // value0.xs.0.INA.Prepend: 5 errors in empty disjunction::
+            //     ./x.cue:97:7
+            // value0.xs.0.INA.Prepend.UseSectionName: field not allowed:
+            //     ./x.cue:97:7
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:51:24
+            //     ./x.cue:53:32
+            //     ./x.cue:53:66
+            //     ./x.cue:55:19
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:69:11
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:94:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            UseSectionName: (_|_){
+              // [eval] value0.xs.0.INA.Prepend.UseSectionName: field not allowed:
+              //     ./x.cue:97:7
+              //     ./x.cue:15:14
+              //     ./x.cue:22:52
+              //     ./x.cue:44:29
+              //     ./x.cue:44:56
+              //     ./x.cue:51:24
+              //     ./x.cue:53:56
+              //     ./x.cue:53:66
+              //     ./x.cue:55:19
+              //     ./x.cue:55:72
+              //     ./x.cue:55:75
+              //     ./x.cue:59:9
+              //     ./x.cue:62:25
+              //     ./x.cue:69:11
+              //     ./x.cue:70:12
+              //     ./x.cue:70:47
+              //     ./x.cue:94:13
+              //     ./x.cue:112:3
+              //     ./x.cue:118:4
+              //     ./x.cue:118:38
+              //     ./x.cue:123:9
+            }
+            Prepend: (_|_){
+              // [eval] value0.xs.0.INA.Prepend.Prepend: field not allowed:
+              //     ./x.cue:97:7
+              //     ./x.cue:15:14
+              //     ./x.cue:22:52
+              //     ./x.cue:44:29
+              //     ./x.cue:44:56
+              //     ./x.cue:51:23
+              //     ./x.cue:53:57
+              //     ./x.cue:53:66
+              //     ./x.cue:55:19
+              //     ./x.cue:55:72
+              //     ./x.cue:55:75
+              //     ./x.cue:59:9
+              //     ./x.cue:62:25
+              //     ./x.cue:69:11
+              //     ./x.cue:70:12
+              //     ./x.cue:70:47
+              //     ./x.cue:94:13
+              //     ./x.cue:112:3
+              //     ./x.cue:118:4
+              //     ./x.cue:118:38
+              //     ./x.cue:123:9
+              UseSectionName: (bool){ true }
+            }
+          }
+          0: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }, (#struct){
+              Append: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }, (#struct){
+              Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }) }
+          1: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }, (#struct){
+              Append: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }, (#struct){
+              Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }) }
+        }
+        let INP#8 = (_|_){
+          // [eval] value0.xs.0.INP: conflicting values [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] and {Append:#ConfigText} (mismatched types list and struct):
+          //     ./x.cue:22:52
+          //     ./x.cue:44:29
+          //     ./x.cue:53:32
+          //     ./x.cue:55:19
+          //     ./x.cue:55:37
+          //     ./x.cue:62:25
+          //     ./x.cue:70:12
+          //     ./x.cue:95:13
+          //     ./x.cue:109:13
+          //     ./x.cue:112:3
+          //     ./x.cue:118:4
+          //     ./x.cue:118:38
+          //     ./x.cue:123:9
+          // value0.xs.0.INP: conflicting values [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] and {Prepend:#ConfigText} (mismatched types list and struct):
+          //     ./x.cue:22:52
+          //     ./x.cue:28:12
+          //     ./x.cue:44:29
+          //     ./x.cue:53:56
+          //     ./x.cue:55:19
+          //     ./x.cue:55:37
+          //     ./x.cue:59:9
+          //     ./x.cue:62:25
+          //     ./x.cue:70:12
+          //     ./x.cue:70:47
+          //     ./x.cue:95:13
+          //     ./x.cue:112:3
+          //     ./x.cue:118:4
+          //     ./x.cue:118:38
+          //     ./x.cue:123:9
+          // value0.xs.0.INP: conflicting values [#ConfigTextRule,#ConfigTextRule,...#ConfigTextRule] and {UseSectionName:true} (mismatched types list and struct):
+          //     ./x.cue:22:52
+          //     ./x.cue:44:29
+          //     ./x.cue:51:23
+          //     ./x.cue:53:18
+          //     ./x.cue:55:37
+          //     ./x.cue:62:25
+          //     ./x.cue:70:12
+          //     ./x.cue:92:13
+          //     ./x.cue:95:13
+          //     ./x.cue:112:3
+          //     ./x.cue:118:4
+          //     ./x.cue:123:9
+          // value0.xs.0.INP: conflicting values string and {Append:#ConfigText} (mismatched types string and struct):
+          //     ./x.cue:22:52
+          //     ./x.cue:44:29
+          //     ./x.cue:51:14
+          //     ./x.cue:53:32
+          //     ./x.cue:62:25
+          //     ./x.cue:70:12
+          //     ./x.cue:92:13
+          //     ./x.cue:95:13
+          //     ./x.cue:112:3
+          //     ./x.cue:118:4
+          //     ./x.cue:123:9
+          // value0.xs.0.INP: conflicting values string and {Prepend:#ConfigText} (mismatched types string and struct):
+          //     ./x.cue:22:52
+          //     ./x.cue:28:12
+          //     ./x.cue:44:29
+          //     ./x.cue:51:14
+          //     ./x.cue:53:56
+          //     ./x.cue:55:19
+          //     ./x.cue:59:9
+          //     ./x.cue:62:25
+          //     ./x.cue:70:12
+          //     ./x.cue:70:47
+          //     ./x.cue:95:13
+          //     ./x.cue:112:3
+          //     ./x.cue:118:4
+          //     ./x.cue:118:38
+          //     ./x.cue:123:9
+          // value0.xs.0.INP: conflicting values string and {Prepend:_} (mismatched types string and struct):
+          //     ./x.cue:22:52
+          //     ./x.cue:44:29
+          //     ./x.cue:51:14
+          //     ./x.cue:62:25
+          //     ./x.cue:70:12
+          //     ./x.cue:95:18
+          //     ./x.cue:112:3
+          //     ./x.cue:118:4
+          //     ./x.cue:123:9
+          // value0.xs.0.INP: conflicting values string and {UseSectionName:true} (mismatched types string and struct):
+          //     ./x.cue:22:52
+          //     ./x.cue:44:29
+          //     ./x.cue:51:14
+          //     ./x.cue:51:23
+          //     ./x.cue:53:18
+          //     ./x.cue:62:25
+          //     ./x.cue:70:12
+          //     ./x.cue:92:13
+          //     ./x.cue:95:13
+          //     ./x.cue:112:3
+          //     ./x.cue:118:4
+          //     ./x.cue:123:9
+          // value0.xs.0.INP: 9 errors in empty disjunction::
+          //     ./x.cue:100:7
+          // value0.xs.0.INP.Prepend: field not allowed:
+          //     ./x.cue:100:7
+          //     ./x.cue:15:14
+          //     ./x.cue:22:52
+          //     ./x.cue:28:12
+          //     ./x.cue:44:29
+          //     ./x.cue:44:56
+          //     ./x.cue:51:23
+          //     ./x.cue:53:18
+          //     ./x.cue:55:19
+          //     ./x.cue:59:9
+          //     ./x.cue:62:25
+          //     ./x.cue:69:11
+          //     ./x.cue:70:12
+          //     ./x.cue:70:47
+          //     ./x.cue:92:13
+          //     ./x.cue:95:13
+          //     ./x.cue:95:19
+          //     ./x.cue:109:13
+          //     ./x.cue:112:3
+          //     ./x.cue:118:4
+          //     ./x.cue:118:38
+          //     ./x.cue:123:9
+          //     ./x.cue:124:16
+          // value0.xs.0.INP.UseSectionName: field not allowed:
+          //     ./x.cue:100:7
+          //     ./x.cue:15:14
+          //     ./x.cue:22:52
+          //     ./x.cue:28:12
+          //     ./x.cue:44:29
+          //     ./x.cue:44:56
+          //     ./x.cue:51:24
+          //     ./x.cue:53:18
+          //     ./x.cue:53:32
+          //     ./x.cue:55:19
+          //     ./x.cue:59:9
+          //     ./x.cue:62:25
+          //     ./x.cue:69:11
+          //     ./x.cue:70:12
+          //     ./x.cue:70:47
+          //     ./x.cue:92:13
+          //     ./x.cue:95:13
+          //     ./x.cue:95:18
+          //     ./x.cue:109:13
+          //     ./x.cue:112:3
+          //     ./x.cue:118:4
+          //     ./x.cue:118:38
+          //     ./x.cue:123:9
+          //     ./x.cue:124:17
+          UseSectionName: (_|_){
+            // [eval] value0.xs.0.INP.UseSectionName: conflicting values true and string (mismatched types bool and string):
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:51:14
+            //     ./x.cue:53:18
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:95:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            //     ./x.cue:124:33
+            // value0.xs.0.INP.UseSectionName: conflicting values true and {Append:#ConfigText} (mismatched types bool and struct):
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:53:32
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:95:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            //     ./x.cue:124:33
+            // value0.xs.0.INP.UseSectionName: conflicting values true and {Prepend:#ConfigText} (mismatched types bool and struct):
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:53:56
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:95:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            //     ./x.cue:124:33
+            // value0.xs.0.INP.UseSectionName: conflicting values true and {UseSectionName:true} (mismatched types bool and struct):
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:51:23
+            //     ./x.cue:53:18
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:95:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            //     ./x.cue:124:33
+            // value0.xs.0.INP.UseSectionName: 4 errors in empty disjunction::
+            //     ./x.cue:100:7
+            Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                UseSectionName: (bool){ true }
+              }) }
+          }
+          Prepend: (_|_){
+            // [eval] value0.xs.0.INP.Prepend: conflicting values string and {Append:#ConfigText} (mismatched types string and struct):
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:51:14
+            //     ./x.cue:53:32
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:95:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            // value0.xs.0.INP.Prepend: conflicting values string and {Prepend:#ConfigText} (mismatched types string and struct):
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:51:14
+            //     ./x.cue:53:56
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:95:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            // value0.xs.0.INP.Prepend: conflicting values string and {UseSectionName:true} (mismatched types string and struct):
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:51:14
+            //     ./x.cue:51:23
+            //     ./x.cue:53:18
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:95:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            // value0.xs.0.INP.Prepend: 5 errors in empty disjunction::
+            //     ./x.cue:100:7
+            // value0.xs.0.INP.Prepend.UseSectionName: field not allowed:
+            //     ./x.cue:100:7
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:51:24
+            //     ./x.cue:53:32
+            //     ./x.cue:53:66
+            //     ./x.cue:55:19
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:69:11
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:95:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            UseSectionName: (_|_){
+              // [eval] value0.xs.0.INP.Prepend.UseSectionName: field not allowed:
+              //     ./x.cue:100:7
+              //     ./x.cue:15:14
+              //     ./x.cue:22:52
+              //     ./x.cue:44:29
+              //     ./x.cue:44:56
+              //     ./x.cue:51:24
+              //     ./x.cue:53:56
+              //     ./x.cue:53:66
+              //     ./x.cue:55:19
+              //     ./x.cue:55:72
+              //     ./x.cue:55:75
+              //     ./x.cue:59:9
+              //     ./x.cue:62:25
+              //     ./x.cue:69:11
+              //     ./x.cue:70:12
+              //     ./x.cue:70:47
+              //     ./x.cue:95:13
+              //     ./x.cue:112:3
+              //     ./x.cue:118:4
+              //     ./x.cue:118:38
+              //     ./x.cue:123:9
+            }
+            Prepend: (_|_){
+              // [eval] value0.xs.0.INP.Prepend.Prepend: field not allowed:
+              //     ./x.cue:100:7
+              //     ./x.cue:15:14
+              //     ./x.cue:22:52
+              //     ./x.cue:44:29
+              //     ./x.cue:44:56
+              //     ./x.cue:51:23
+              //     ./x.cue:53:57
+              //     ./x.cue:53:66
+              //     ./x.cue:55:19
+              //     ./x.cue:55:72
+              //     ./x.cue:55:75
+              //     ./x.cue:59:9
+              //     ./x.cue:62:25
+              //     ./x.cue:69:11
+              //     ./x.cue:70:12
+              //     ./x.cue:70:47
+              //     ./x.cue:95:13
+              //     ./x.cue:112:3
+              //     ./x.cue:118:4
+              //     ./x.cue:118:38
+              //     ./x.cue:123:9
+              UseSectionName: (bool){ true }
+            }
+          }
+          Append: (_|_){
+            // [eval] value0.xs.0.INP.Append: conflicting values string and {Append:#ConfigText} (mismatched types string and struct):
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:51:14
+            //     ./x.cue:53:32
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:95:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            // value0.xs.0.INP.Append: conflicting values string and {Prepend:#ConfigText} (mismatched types string and struct):
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:51:14
+            //     ./x.cue:53:56
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:95:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            // value0.xs.0.INP.Append: conflicting values string and {UseSectionName:true} (mismatched types string and struct):
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:51:14
+            //     ./x.cue:51:23
+            //     ./x.cue:53:18
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:95:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            // value0.xs.0.INP.Append: 5 errors in empty disjunction::
+            //     ./x.cue:100:7
+            // value0.xs.0.INP.Append.UseSectionName: field not allowed:
+            //     ./x.cue:100:7
+            //     ./x.cue:15:14
+            //     ./x.cue:22:52
+            //     ./x.cue:28:12
+            //     ./x.cue:44:29
+            //     ./x.cue:44:56
+            //     ./x.cue:51:24
+            //     ./x.cue:53:32
+            //     ./x.cue:53:41
+            //     ./x.cue:55:19
+            //     ./x.cue:55:72
+            //     ./x.cue:55:75
+            //     ./x.cue:59:9
+            //     ./x.cue:62:25
+            //     ./x.cue:70:12
+            //     ./x.cue:70:47
+            //     ./x.cue:95:13
+            //     ./x.cue:112:3
+            //     ./x.cue:118:4
+            //     ./x.cue:118:38
+            //     ./x.cue:123:9
+            UseSectionName: (_|_){
+              // [eval] value0.xs.0.INP.Append.UseSectionName: field not allowed:
+              //     ./x.cue:100:7
+              //     ./x.cue:15:14
+              //     ./x.cue:22:52
+              //     ./x.cue:28:12
+              //     ./x.cue:44:29
+              //     ./x.cue:44:56
+              //     ./x.cue:51:24
+              //     ./x.cue:53:41
+              //     ./x.cue:53:56
+              //     ./x.cue:55:19
+              //     ./x.cue:55:72
+              //     ./x.cue:55:75
+              //     ./x.cue:59:9
+              //     ./x.cue:62:25
+              //     ./x.cue:70:12
+              //     ./x.cue:70:47
+              //     ./x.cue:95:13
+              //     ./x.cue:112:3
+              //     ./x.cue:118:4
+              //     ./x.cue:118:38
+              //     ./x.cue:123:9
+            }
+            Prepend: (_|_){
+              // [eval] value0.xs.0.INP.Append.Prepend: field not allowed:
+              //     ./x.cue:100:7
+              //     ./x.cue:15:14
+              //     ./x.cue:22:52
+              //     ./x.cue:28:12
+              //     ./x.cue:44:29
+              //     ./x.cue:44:56
+              //     ./x.cue:51:23
+              //     ./x.cue:53:41
+              //     ./x.cue:53:57
+              //     ./x.cue:55:19
+              //     ./x.cue:55:72
+              //     ./x.cue:55:75
+              //     ./x.cue:59:9
+              //     ./x.cue:62:25
+              //     ./x.cue:70:12
+              //     ./x.cue:70:47
+              //     ./x.cue:95:13
+              //     ./x.cue:112:3
+              //     ./x.cue:118:4
+              //     ./x.cue:118:38
+              //     ./x.cue:123:9
+              UseSectionName: (bool){ true }
+            }
+          }
+          0: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }, (#struct){
+              Append: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }, (#struct){
+              Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }) }
+          1: ((string|struct)){ |((string){ string }, (#struct){
+              UseSectionName: (bool){ true }
+            }, (#struct){
+              Append: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }, (#struct){
+              Prepend: ((string|struct)){ |((string){ string }, (#struct){
+                  UseSectionName: (bool){ true }
+                }) }
+            }) }
+        }
+        let INS#5 = (_|_){
+          // [eval] value0.xs.0.INS: conflicting values string and {UseSectionName:true} (mismatched types string and struct):
+          //     ./x.cue:22:52
+          //     ./x.cue:44:29
+          //     ./x.cue:44:56
+          //     ./x.cue:62:25
+          //     ./x.cue:70:12
+          //     ./x.cue:70:47
+          //     ./x.cue:77:13
+          //     ./x.cue:77:18
+          //     ./x.cue:96:3
+          //     ./x.cue:103:4
+          //     ./x.cue:103:34
+          //     ./x.cue:112:3
+          //     ./x.cue:118:4
+          //     ./x.cue:118:38
+          //     ./x.cue:123:9
+          //     ./x.cue:124:16
+          UseSectionName: (bool){ true }
+        }
+        let INO#6 = (#struct){
+          UseSectionName: (bool){ true }
+        }
+      }
+    }
+    let str#4 = (string){ "UseSectionName" }
+    orgSyntax: (string){ "Only [UseSectionName]" }
+  }
+}

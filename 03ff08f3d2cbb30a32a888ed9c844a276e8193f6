@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74967253_a402b11e",
+        "filename": "internal/filetypes/util.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-21T09:41:25Z",
+      "side": 1,
+      "message": "as of https://review.gerrithub.io/c/cue-lang/cue/+/1208072, this should be ast.ParseImportPath now.\n\nwhy didn\u0027t we deprecate module.ParseImportPath? that should have alerted you here I think.",
+      "revId": "03ff08f3d2cbb30a32a888ed9c844a276e8193f6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d499894_49c7dce6",
+        "filename": "internal/filetypes/util_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-21T09:41:25Z",
+      "side": 1,
+      "message": "please add the common syntax for line and column numbers, e.g. `foo.cue:123` and `foo.cue:123:456`",
+      "revId": "03ff08f3d2cbb30a32a888ed9c844a276e8193f6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

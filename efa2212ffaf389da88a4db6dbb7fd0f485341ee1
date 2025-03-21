@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a777841f_fc64d61c",
+        "filename": "cue/load/instances.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-21T12:41:13Z",
+      "side": 1,
+      "message": "Because we don\u0027t want to require a cached registry implementation, and there\u0027s no need to, given that it\u0027ll work fine if it doesn\u0027t actually turn out to be cached.",
+      "parentUuid": "8b4de508_1bd62f0c",
+      "revId": "efa2212ffaf389da88a4db6dbb7fd0f485341ee1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ea66d84f_26cee981",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-03-21T10:04:52Z",
       "side": 1,
       "message": "ast.ParseImportPath",
+      "revId": "efa2212ffaf389da88a4db6dbb7fd0f485341ee1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fdbdb9f_145d1ee2",
+        "filename": "cue/load/instances.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-21T12:41:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ea66d84f_26cee981",
       "revId": "efa2212ffaf389da88a4db6dbb7fd0f485341ee1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76ade7e4_a96721c2",
+        "filename": "internal/mod/modload/update.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-21T10:01:32Z",
+      "side": 1,
+      "message": "again, ast.ParseImportPath",
+      "revId": "52f200e7b19ab81a456e504c350c4ef7b5e13eae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf1fb3fa_2d837c02",
+        "filename": "internal/mod/modload/update.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-21T10:01:32Z",
+      "side": 1,
+      "message": "when can this happen? perhaps add an example?",
+      "revId": "52f200e7b19ab81a456e504c350c4ef7b5e13eae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc75072f_789b4e1a",
+        "filename": "internal/mod/modload/update.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-21T10:01:32Z",
+      "side": 1,
+      "message": "why not type assert into the interface rather than the specific implementation? wouldn\u0027t that also mean that we don\u0027t need to export modcache.Cache?",
+      "revId": "52f200e7b19ab81a456e504c350c4ef7b5e13eae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cca9e394_4b8a5b0b",
+        "filename": "internal/mod/modload/update.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-21T10:01:32Z",
+      "side": 1,
+      "message": "this func seems like it repeats the same 20 or so lines twice, but only swapping the version being fetched, and swapping FetchFromCache with Fetch. can we not refactor it so that all the other logic, such as \"exactly one hit\", is deduplicated?",
+      "revId": "52f200e7b19ab81a456e504c350c4ef7b5e13eae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

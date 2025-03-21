@@ -394,10 +394,14 @@ func SplitPathVersion(path string) (prefix, version string, ok bool) {
 }
 
 // ImportPath holds the various components of an import path.
+//
+// Deprecated: use [ast.ImportPath] instead.
 type ImportPath = ast.ImportPath
 
 // ParseImportPath returns the various components of an import path.
 // It does not check the result for validity.
+//
+// Deprecated: use [ast.ParseImportPath] instead.
 func ParseImportPath(p string) ImportPath {
 	return ast.ParseImportPath(p)
 }

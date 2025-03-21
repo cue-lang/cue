@@ -348,16 +348,22 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 
 	n.finalizeDisjunctions()
 
-	if n.completed&(subFieldsProcessed) == 0 {
-		return false
-	}
-
 	w = v.DerefValue() // Dereference anything, including shared nodes.
 	if w != v {
 		// Clear value fields that are now referred to in the dereferenced
 		// value (w).
 		v.ChildErrors = nil
 		v.Arcs = nil
+
+		if n.completed&(subFieldsProcessed) == 0 {
+			// Ensure the shared node is processed to the requested level. This is
+			// typically needed for scalar values.
+			if w.status == unprocessed {
+				w.unify(c, needs, mode, false)
+			}
+
+			return n.meets(needs)
+		}
 
 		// Set control fields that are referenced without dereferencing.
 		if w.ClosedRecursive {
@@ -368,6 +374,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 		if w.HasEllipsis {
 			v.HasEllipsis = true
 		}
+
 		v.status = w.status
 
 		n.finalizeSharing()
@@ -384,6 +391,10 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 		w.unify(c, needs, mode, checkTypos)
 
 		return true
+	}
+
+	if n.completed&(subFieldsProcessed) == 0 {
+		return n.meets(needs)
 	}
 
 	// TODO: adding this is wrong, but it should not cause the snippet below

@@ -412,10 +412,7 @@ Result:
   }
   issue3835: (struct){
     foo: (struct){
-      out: (_|_){
-        // [cycle] issue3835.foo.out: cycle with field: orgBotUser:
-        //     ./issue3835.cue:8:22
-      }
+      out: (string){ "prefix: global value" }
     }
     _global: (string){ "global value" }
   }
@@ -704,19 +701,7 @@ diff old new
        b: (struct){
          c: (int){ 1 }
        }
-@@ -283,7 +237,10 @@
-   }
-   issue3835: (struct){
-     foo: (struct){
--      out: (string){ "prefix: global value" }
-+      out: (_|_){
-+        // [cycle] issue3835.foo.out: cycle with field: orgBotUser:
-+        //     ./issue3835.cue:8:22
-+      }
-     }
-     _global: (string){ "global value" }
-   }
-@@ -312,7 +269,7 @@
+@@ -312,7 +266,7 @@
            // [eval] shareCycle.t2.Y.x: conflicting values int and {x:(#X & Y)} (mismatched types int and struct):
            //     ./sharecycle.cue:8:6
            //     ./sharecycle.cue:9:5

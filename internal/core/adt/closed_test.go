@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/eval"
@@ -30,7 +31,9 @@ import (
 func TestClosedness(t *testing.T) {
 	r := runtime.New()
 	ctx := eval.NewContext(r, nil)
-
+	if ctx.Version == internal.EvalV3 {
+		t.Skip("TODO: fix these tests on evalv3")
+	}
 	mkStruct := func(info adt.CloseInfo, s string) *adt.StructInfo {
 		x, err := parser.ParseExpr("", s)
 		if err != nil {

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0cfff21_617270db",
+        "filename": "internal/filetypes/util.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-21T12:41:13Z",
+      "side": 1,
+      "message": "I\u0027d totally forgotten about that. I added a deprecation for module.ParseImportPath in a subsequent CL and changed to use ast.ParseImportPath here.",
+      "parentUuid": "74967253_a402b11e",
+      "revId": "03ff08f3d2cbb30a32a888ed9c844a276e8193f6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1d499894_49c7dce6",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-03-21T09:41:25Z",
       "side": 1,
       "message": "please add the common syntax for line and column numbers, e.g. `foo.cue:123` and `foo.cue:123:456`",
+      "revId": "03ff08f3d2cbb30a32a888ed9c844a276e8193f6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "38b2789a_56a6acac",
+        "filename": "internal/filetypes/util_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2025-03-21T12:41:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1d499894_49c7dce6",
       "revId": "03ff08f3d2cbb30a32a888ed9c844a276e8193f6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

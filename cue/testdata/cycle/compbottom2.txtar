@@ -346,20 +346,15 @@ Disjuncts:    248
     }
   }
   hidden: (#list){
-    _Value: (struct){
-      foo?: (_){ _ }
-      bar?: (struct){
-      }
-      out: (#list){
-      }
+    _Value: (_|_){
+      // [cycle] hidden._Value: circular dependency in evaluation of conditionals: (foo|bar) changed after evaluation:
+      //     ./issue3836.cue:5:7
     }
+    0: (string){ "bar is set" }
   }
-  exposed: (struct){
-    foo?: (_){ _ }
-    bar?: (struct){
-    }
-    out: (#list){
-    }
+  exposed: (_|_){
+    // [cycle] exposed: circular dependency in evaluation of conditionals: (foo|bar) changed after evaluation:
+    //     ./issue3836.cue:15:6
   }
   mutual: (struct){
     noConflicts: (struct){
@@ -589,37 +584,7 @@ diff old new
          }
        }
        t2: (struct){
-@@ -33,15 +33,20 @@
-     }
-   }
-   hidden: (#list){
--    _Value: (_|_){
--      // [cycle] hidden._Value: circular dependency in evaluation of conditionals: (foo|bar) changed after evaluation:
--      //     ./issue3836.cue:5:7
--    }
--    0: (string){ "bar is set" }
--  }
--  exposed: (_|_){
--    // [cycle] exposed: circular dependency in evaluation of conditionals: (foo|bar) changed after evaluation:
--    //     ./issue3836.cue:15:6
-+    _Value: (struct){
-+      foo?: (_){ _ }
-+      bar?: (struct){
-+      }
-+      out: (#list){
-+      }
-+    }
-+  }
-+  exposed: (struct){
-+    foo?: (_){ _ }
-+    bar?: (struct){
-+    }
-+    out: (#list){
-+    }
-   }
-   mutual: (struct){
-     noConflicts: (struct){
-@@ -54,12 +59,12 @@
+@@ -54,12 +54,12 @@
      }
      mutualCycleFail: (struct){
        b: (_|_){
@@ -638,7 +603,7 @@ diff old new
        }
      }
      brokenCycleSuccess: (struct){
-@@ -200,17 +205,19 @@
+@@ -200,17 +200,19 @@
          ret?: (_){ _ }
        }
        expr: (#struct){
@@ -663,7 +628,7 @@ diff old new
      }
      brokenCycleSuccess: (struct){
        #E: (#struct){
-@@ -219,8 +226,12 @@
+@@ -219,8 +221,12 @@
        }
      }
      doubleAddfail: (_|_){

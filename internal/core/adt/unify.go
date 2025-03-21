@@ -863,7 +863,7 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 			// not normally finalized (they may be cached) and as such might
 			// not trigger the usual unblocking. Force unblocking may cause
 			// some values to be remain unevaluated.
-			if arc.withinLet {
+			if arc.withinLet || needs == arcTypeKnown|fieldSetKnown {
 				arcState.process(needs, finalize)
 				if arc.ArcType == ArcPending {
 					arc.ArcType = ArcNotPresent

@@ -10,6 +10,8 @@
 #
 # The new evaluator correctly results in no errors in these cases.
 
+env CUE_EXPERIMENT=evalv3=0
+
 # evalv2 - scenario 1
 exec cue eval ./scenario1.cue
 
@@ -28,7 +30,7 @@ exec cue eval ./scenario3.cue
 ! exec cue eval ./scenario4.cue
 stderr 'items.a: cannot add to field '
 
-env CUE_EXPERIMENT=evalv3
+env CUE_EXPERIMENT=evalv3=1
 
 # evalv3 - scenario 1
 exec cue eval ./scenario1.cue

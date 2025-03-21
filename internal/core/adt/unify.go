@@ -224,6 +224,10 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode, checkTypos b
 
 	n.process(nodeOnlyNeeds, mode)
 
+	if n.node.ArcType != ArcPending {
+		n.signal(arcTypeKnown)
+	}
+
 	defer c.PopArc(c.PushArc(v))
 
 	w := v.DerefDisjunct()
@@ -863,13 +867,21 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 			// not normally finalized (they may be cached) and as such might
 			// not trigger the usual unblocking. Force unblocking may cause
 			// some values to be remain unevaluated.
-			if arc.withinLet {
-				arcState.process(needs, finalize)
-				if arc.ArcType == ArcPending {
-					arc.ArcType = ArcNotPresent
+			switch {
+			case arc.withinLet,
+				needs == arcTypeKnown|fieldSetKnown:
+				// needs == allAncestorsProcessed|arcTypeKnown|allTasksCompleted:
+				// arcState.unfiy(needs, finalize)
+				arc.unify(c, needs, finalize, false)
+			default:
+				// Now we can't finalize, at least try to get as far as we
+				// can and only yield if we really have to.
+				if !arc.unify(c, needs, attemptOnly, false) {
+					arcState.process(needs, yield)
 				}
-			} else {
-				arcState.process(needs, yield)
+			}
+			if arc.ArcType == ArcPending {
+				arc.ArcType = ArcNotPresent
 			}
 		}
 	}

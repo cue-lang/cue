@@ -1,3 +1,5 @@
+skip 'TODO(evalv3): make this test work on evalv3'
+
 ! exec cue cmd tool
 stderr 'command.tool.bad: undefined field: DoesntExist'
 

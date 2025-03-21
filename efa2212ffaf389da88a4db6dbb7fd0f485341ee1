@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b4de508_1bd62f0c",
+        "filename": "cue/load/instances.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-21T10:04:52Z",
+      "side": 1,
+      "message": "why not do the fetch via the cache interface then, which should work?",
+      "revId": "efa2212ffaf389da88a4db6dbb7fd0f485341ee1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea66d84f_26cee981",
+        "filename": "cue/load/instances.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-21T10:04:52Z",
+      "side": 1,
+      "message": "ast.ParseImportPath",
+      "revId": "efa2212ffaf389da88a4db6dbb7fd0f485341ee1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

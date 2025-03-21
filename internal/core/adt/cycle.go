@@ -700,7 +700,7 @@ func (n *nodeContext) detectCycleV3(arc *Vertex, env *Environment, x Resolver, c
 
 			return n.markCyclicPathV3(arc, env, x, ci)
 		}
-		if equalDeref(r.Node, n.node) && r.Ref == x && (arc.nonRooted || arc.withinLet) {
+		if equalDeref(r.Node, n.node) && r.Ref == x && arc.nonRooted {
 			return n.markCyclicPathV3(arc, env, x, ci)
 		}
 	}

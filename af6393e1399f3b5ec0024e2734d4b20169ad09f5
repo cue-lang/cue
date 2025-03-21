@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f8cdae0_2b3cf787",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2025-03-21T09:50:33Z",
+      "side": 1,
+      "message": "AFAICT these tests, both the existing ones and the new ones, need to go into go/ast per https://review.gerrithub.io/c/cue-lang/cue/+/1208072",
+      "revId": "af6393e1399f3b5ec0024e2734d4b20169ad09f5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

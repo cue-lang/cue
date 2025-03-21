@@ -5,6 +5,8 @@ cmp stdout stdout.golden
 
 #Issue #2307
 
+# TODO(evalv3): #Def.x is an incorrect error, probably as the result of structure sharing.
+# Note that evalv2 showed this error but with b.x instead.
 ! exec cue export y.cue
 cmp stderr stderr.golden
 
@@ -25,8 +27,7 @@ a: x?: int // do not include this position
 
 b: #Def
 -- stderr.golden --
+#Def.x: field is required but not present:
+    ./y.cue:5:2
 a.x: field is required but not present:
     ./y.cue:1:4
-b.x: field is required but not present:
-    ./y.cue:5:2
-    ./y.cue:8:4

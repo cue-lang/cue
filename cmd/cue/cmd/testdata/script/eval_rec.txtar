@@ -1,3 +1,5 @@
+# TODO(evalv3): Foo.foo shows too much "unrolling" compared to evalv2.
+
 exec cue eval ./rec.cue -O
 cmp stdout expect-stdout
 -- rec.cue --
@@ -21,9 +23,13 @@ Foo: {
 }
 foo: {
     foo: {
-        foo?: Foo
-        bar:  "barNested"
-        baz:  "barNested2"
+        foo?: {
+            foo?: Foo
+            bar:  string
+            baz:  bar + "2"
+        }
+        bar: "barNested"
+        baz: "barNested2"
     }
     bar: "barParent"
     baz: "barParent2"

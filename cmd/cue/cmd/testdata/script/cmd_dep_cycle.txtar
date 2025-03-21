@@ -14,7 +14,7 @@ cyclic task dependency:
     ./after_tool.cue:18:2
     ./after_tool.cue:19:2
 -- expect-stderr2 --
-command.aftercycle.t1.$after.$after: structural cycle
+command.aftercycle.t2.$after: structural cycle
 -- expect-stderr3 --
 -- interlocked-stdout --
 v
